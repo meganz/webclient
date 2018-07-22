@@ -25887,7 +25887,7 @@ opacity: 1;
 
 .files-grid-view.user-management-view .user-management-view-data{
     width:100%;
-    height: 500px;
+    height: 580px;
     box-sizing:border-box;
     border-top: 1px solid rgba(0,0,0,0.1);
     border-bottom: 1px solid rgba(0,0,0,0.1);
@@ -26293,7 +26293,7 @@ opacity: 1;
         transform-origin:center center;
 }
 
-.user-management-overview-container .storage-big-chart .pie:before {
+.user-management-overview-container .storage-big-chart .pie .pie-internal {
         content:"";
         position:absolute;
         width:80px;
@@ -26307,11 +26307,11 @@ opacity: 1;
         transform-origin:right center;
 }
 
-.user-management-overview-container .storage-big-chart .pie.big:before {
+.user-management-overview-container .storage-big-chart .pie.big .pie-internal {
         left:0px;
 }
 
-.user-management-overview-container .storage-big-chart .pie.big:after {
+.user-management-overview-container .storage-big-chart .pie.big .pie-internal2 {
         content:"";
         position:absolute;
         width:80px;
@@ -26320,66 +26320,21 @@ opacity: 1;
         border-radius:0 80px 80px 0;
 }
 
-.user-management-overview-container .storage-big-chart .pie:nth-of-type(1):BEFORE, .user-management-overview-container .storage-big-chart .pie:nth-of-type(1):AFTER {
+.user-management-overview-container .storage-big-chart .pie:nth-of-type(1) .pie-internal, .user-management-overview-container .storage-big-chart .pie:nth-of-type(1) .pie-internal2 {
     background-color:rgba(0,191,165,100);  
 }
-.user-management-overview-container .storage-big-chart .pie:nth-of-type(2):AFTER, .user-management-overview-container .storage-big-chart .pie:nth-of-type(2):BEFORE {
+.user-management-overview-container .storage-big-chart .pie:nth-of-type(2) .pie-internal2, .user-management-overview-container .storage-big-chart .pie:nth-of-type(2) .pie-internal {
     background-color:rgba(245,166,35,100); 
 }
-.user-management-overview-container .storage-big-chart .pie:nth-of-type(3):AFTER, .user-management-overview-container .storage-big-chart .pie:nth-of-type(3):BEFORE {
+.user-management-overview-container .storage-big-chart .pie:nth-of-type(3) .pie-internal2, .user-management-overview-container .storage-big-chart .pie:nth-of-type(3) .pie-internal {
     background-color: #bbbbbb;   
 }
-.user-management-overview-container .storage-big-chart .pie:nth-of-type(4):AFTER, .user-management-overview-container .storage-big-chart .pie:nth-of-type(4):BEFORE {
+.user-management-overview-container .storage-big-chart .pie:nth-of-type(4) .pie-internal2, .user-management-overview-container .storage-big-chart .pie:nth-of-type(4) .pie-internal {
     background-color:rgba(88,103,195,100);    
 }
 
-.user-management-overview-container .storage-big-chart .pie[data-start="10"] {
-        -moz-transform: rotate(10deg); /* Firefox */
-        -ms-transform: rotate(10deg); /* IE */
-        -webkit-transform: rotate(10deg); /* Safari and Chrome */
-        -o-transform: rotate(10deg); /* Opera */
-        transform:rotate(10deg);
-}
-.user-management-overview-container .storage-big-chart .pie[data-start="40"] {
-        -moz-transform: rotate(40deg); /* Firefox */
-        -ms-transform: rotate(40deg); /* IE */
-        -webkit-transform: rotate(40deg); /* Safari and Chrome */
-        -o-transform: rotate(40deg); /* Opera */
-        transform:rotate(40deg);
-}
-.user-management-overview-container .storage-big-chart .pie[data-start="70"] {
-        -moz-transform: rotate(70deg); /* Firefox */
-        -ms-transform: rotate(70deg); /* IE */
-        -webkit-transform: rotate(70deg); /* Safari and Chrome */
-        -o-transform: rotate(70deg); /* Opera */
-        transform:rotate(70deg);
-}
 
-.user-management-overview-container .storage-big-chart .pie[data-value="30"]:BEFORE {
-        -moz-transform: rotate(31deg); /* Firefox */
-        -ms-transform: rotate(31deg); /* IE */
-        -webkit-transform: rotate(31deg); /* Safari and Chrome */
-        -o-transform: rotate(31deg); /* Opera */
-        transform:rotate(31deg);
-    }
-.user-management-overview-container .storage-big-chart .pie[data-value="10"]:BEFORE {
-        -moz-transform: rotate(11deg); /* Firefox */
-        -ms-transform: rotate(11deg) /* IE */
-        -webkit-transform: rotate(11deg) /* Safari and Chrome */
-        -o-transform: rotate(11deg) /* Opera */
-        transform:rotate(11deg)
-    }
-.user-management-overview-container .storage-big-chart .pie[data-value="290"]:BEFORE {
-        -moz-transform: rotate(290deg); /* Firefox */
-        -ms-transform: rotate(290deg); /* IE */
-        -webkit-transform: rotate(290deg); /* Safari and Chrome */
-        -o-transform: rotate(290deg); /* Opera */
-        transform:rotate(290deg);
-    }
-
-
-
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-big-chart .storage-small-circle {
+.user-management-overview-container .data-analysis-container .storage-analysis-container  .storage-small-circle {
     position: absolute;
     width:144px;
     height: 144px;
@@ -26388,7 +26343,7 @@ opacity: 1;
     margin: 8px;
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-big-chart .storage-small-circle .total-storage-title {
+.user-management-overview-container .data-analysis-container .storage-analysis-container  .storage-small-circle .total-storage-title {
     position: absolute;
     text-align: center;
     width:144px;
@@ -26398,7 +26353,7 @@ opacity: 1;
     margin: 34px auto 8px auto;
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-big-chart .storage-small-circle .total-storage-number {
+.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-small-circle .total-storage-number {
     position: absolute;
     text-align: center;
     width:144px;
@@ -26414,7 +26369,8 @@ opacity: 1;
     position: relative;
     height: 18px;
     width: auto;
-    margin:0 24px 16px 24px;
+    margin: 0 24px 16px 24px;
+    cursor: pointer;
 }
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container:last-child {
@@ -26495,14 +26451,16 @@ opacity: 1;
 
 .user-management-overview-container .data-analysis-container .transfer-analysis-container .transfer-analysis-summary {
     width:100%;
-    height: 96px;
+    height: 128px;
     background-color: rgba(250,250,250,1);
     position: relative;
+    vertical-align: middle;
+    line-height: 128px;
 }
 
 .user-management-overview-container .data-analysis-container .transfer-analysis-container .transfer-analysis-summary .total-transfer-title{
     margin-left: 24px;
-    line-height: 96px;
+    line-height: 128px;
     font-size: 16px;
     color: #666666;
     float: left;
@@ -26511,7 +26469,7 @@ opacity: 1;
 
 .user-management-overview-container .data-analysis-container .transfer-analysis-container .transfer-analysis-summary .total-transfer-number{
     margin-left: 16px;
-    line-height: 96px;
+    line-height: 128px;
     font-size: 36px;
     font-weight: 300;
     color: #333333;
@@ -26526,7 +26484,7 @@ opacity: 1;
     font-weight: 300;
     color: #666666;
     right: 24px;
-    top: 35px;
+    top: 45px;
     position: absolute;
     margin-left: 300px;
     font-family:source_sans_prolight;
@@ -28562,15 +28520,24 @@ opacity: 1;
     margin-left: -2px;
     margin-top: -2px;
 }
-.user-management-breadcrumb.subaccount .user-management-subuser-avatars {
-    border:unset;
+.user-management-breadcrumb.subaccount .user-management-subuser-avatars, .user-management-edit-profile-dialog .user-management-subuser-avatars {
+    border: unset;
 }
 .user-management-breadcrumb.subaccount .user-management-subuser-avatars .avatar, .user-management-breadcrumb.subaccount .user-management-subuser-avatars .avatar img {
     width: 20px;
     height: 20px;
     margin: 0;
+    border: 1px solid rgba(0,0,0,0.05);
+    margin-top: 2px;
 }
-.user-management-breadcrumb.subaccount .user-management-subuser-avatars .avatar img {
+.user-management-edit-profile-dialog .user-management-subuser-avatars .avatar, .user-management-edit-profile-dialog .user-management-subuser-avatars .avatar img {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    border: 1px solid rgba(0,0,0,0.05);
+    margin-top: 3px;
+}
+.user-management-breadcrumb.subaccount .user-management-subuser-avatars .avatar img, .user-management-edit-profile-dialog .user-management-subuser-avatars .avatar img {
     float: left;
     margin-left: -2px;
     margin-top: -2px;
@@ -28579,11 +28546,18 @@ opacity: 1;
     color: white;
     font-size: 10px;
     float: left;
-    margin-top: 6%;
+    margin-top: 13%;
     margin-left: 33%;
     line-height: initial;
 }
-
+.user-management-edit-profile-dialog .user-management-subuser-avatars .avatar span {
+    color: white;
+    font-size: 10px;
+    float: left;
+    margin-top: 13%;
+    margin-left: 33%;
+    line-height: initial;
+}
 .user-management-view .border, .user-management-dialog .border, .fm-right-header-user-management .border{
     content: " ";
     width: 100%;
@@ -28733,6 +28707,17 @@ opacity: 1;
     background-color: #fff;
 }
 */
+
+
+
+.user-management-list-table .grid-table-user-management tr td {
+    background-color: #fff;
+}
+
+.user-management-list-table .grid-table-user-management tr.tr-gray td {
+    background-color: rgba(250,250,250,1);
+}
+
 
 .user-management-list-table .grid-table-user-management tr:hover td {
     background-color:rgba(245,245,245,1);

@@ -317,9 +317,13 @@
         else if (id && id.substr(0, 15) === 'user-management') {
             // id = 'user-management';
             M.require('businessAcc_js', 'businessAccUI_js').done(function () {
-                
                 M.onFileManagerReady(function () {
+                    if (!new BusinessAccount().isBusinessMasterAcc()) {
+                        return M.openFolder('cloudroot');
+                    }
+
                     var usersM = new BusinessAccountUI();
+                    
                     M.onSectionUIOpen('user-management');
                     // checking if we loaded sub-users and drew them
                     if (!usersM.initialized) {

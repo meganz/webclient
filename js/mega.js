@@ -2848,9 +2848,9 @@ function process_suba(suba, ignoreDB) {
                 bAccount.parseSUBA(suba[k], ignoreDB);
             }
         }
-        else {
-            bAccount.parseSUBA(null, true); // dummy call to flag that this is a master B-account
-        }
+        //else {
+        //    bAccount.parseSUBA(null, true); // dummy call to flag that this is a master B-account
+        //}
     });
 }
 

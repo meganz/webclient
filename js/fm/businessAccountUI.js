@@ -5,12 +5,15 @@
 function BusinessAccountUI() {
     "use strict";
     if (!mega.buinsessController) {
+         /**@type {BusinessAccount} */
         this.business = new BusinessAccount();
         mega.buinsessController = this.business;
         mBroadcaster.addListener('business:subuserUpdate', this.UIEventsHandler);
+        this.initialized = false;
     }
     else {
         this.business = mega.buinsessController;
+        this.initialized = true;
     }
 
     // private function to hide all business accounts UI divs.
@@ -19,10 +22,13 @@ function BusinessAccountUI() {
         $('.user-management-list-table', $businessAccountContianer).addClass('hidden');
         $('.user-management-subaccount-view-container', $businessAccountContianer).addClass('hidden');
         $('.user-management-overview-container', $businessAccountContianer).addClass('hidden');
+        $('.user-management-landing-page.user-management-view', $businessAccountContianer).addClass('hidden');
 
         // hide any possible grid or block view.
         $('.files-grid-view, .fm-blocks-view').addClass('hidden');
-        M.megaRender.cleanupLayout(false, [], '');
+        if (M.megaRender) {
+            M.megaRender.cleanupLayout(false, [], '');
+        }
 
         // view left panel tabs headers [enabled and disabled] account
         $('.fm-left-panel .nw-tree-panel-header').addClass('hidden');
@@ -48,7 +54,7 @@ function BusinessAccountUI() {
  */
 BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView) {
     "use strict";
-    if (!M.isBusinessAccountMaster) {
+    if (!this.business.isBusinessMasterAcc()) {
         return false;
     }
     if (!subAccounts) {
@@ -73,9 +79,10 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     }
     $('.fm-right-files-block').removeClass('hidden');
 
-    if (subAccounts.length) { // no subs, some new UI
+    this.URLchanger('');
 
-        return;
+    if (subAccounts.length) { // no subs
+        return this.viewLandingPage();
     }
 
     subAccountsView.removeClass('hidden'); // un-hide the container
@@ -139,6 +146,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 var $currUser = $tr_user.clone(true); // sub-users table
                 var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
                 colorBg = false;
+                $currUserLeftPane.removeClass('hidden');
 
                 $currUser.attr('id', subUsers[h].u);
                 $currUserLeftPane.attr('id', subUsers[h].u);
@@ -147,8 +155,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
 
                 $currUserLeftPane.removeClass('selected');
-                var uName = a32_to_str(base64_to_a32(subUsers[h].firstname)) + ' ' +
-                    a32_to_str(base64_to_a32((subUsers[h].lastname || '')));
+                var uName = from8(base64urldecode(subUsers[h].firstname)) + ' ' +
+                    from8(base64urldecode(subUsers[h].lastname));
+                uName = uName.trim();
                 $currUser.find('.fm-user-management-user .user-management-name').text(uName);
                 $currUserLeftPane.find('.nw-user-management-name').text(uName);
 
@@ -291,9 +300,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         });
 
         // 3- on clicking on a sub-user to view his info (from left pane or row)
-        $('.user-management-list-table .view-icon.icon, .content-panel.user-management .nw-user-management-item')
+        $('.grid-table-user-management .view-icon.icon, .content-panel.user-management .nw-user-management-item')
             .off('click.subuser');
-        $('.user-management-list-table .view-icon.icon, .content-panel.user-management .nw-user-management-item')
+        $('.grid-table-user-management .view-icon.icon, .content-panel.user-management .nw-user-management-item')
             .on('click.subuser', function subUserViewInfoClickHandler() {
 
                 $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
@@ -319,6 +328,13 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
             });
 
+        // 4- on clicking on a sub-user row to edit his info (edit  icon)
+        $('.grid-table-user-management .edit-icon.icon').off('click.subuser').on('click.subuser',
+            function editSubUserClickHandler() {
+                var userHandle = $(this).closest('tr').attr('id');
+                mySelf.showEditSubUserDialog(userHandle);
+            });
+
     };
 
 
@@ -333,17 +349,29 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         var totalBandwidth = 0;
 
         var $usersTable = $('.user-management-list-table', subAccountsView);
-        for (var sub in quotas) {
-            if (sub === 'timestamp') {
-                continue; // embedded attribute 
-            }
+
+        var todayData = quotas[Object.keys(quotas)[0]];
+        if (!todayData) {
+            return;
+        }
+
+        var subUsersData = todayData.u;
+        if (!subUsersData) {
+            return;
+        }
+
+        for (var sub in subUsersData) {
             numberOfSubs++;
-            totalStorage += quotas[sub][0] || 0;
-            totalBandwidth += quotas[sub][3] || 0;
+            var subStorage = subUsersData[sub].ts || 0;
+            var subBandwidth = subUsersData[sub].dl || 0;
+
+            totalStorage += subStorage;
+            totalBandwidth += subBandwidth;
+
             var $subTr = $('#' + sub, $usersTable);
             if ($subTr.length) {
-                var storage = numOfBytes(quotas[sub][0] || 0, 2);
-                var bandwidth = numOfBytes(quotas[sub][3] || 0, 2);
+                var storage = numOfBytes(subStorage, 2);
+                var bandwidth = numOfBytes(subBandwidth, 2);
                 $('.business-sub-storage-use span', $subTr).text(storage.size + ' ' + storage.unit);
                 $('.business-sub-transfer-use span', $subTr).text(bandwidth.size + ' ' + bandwidth.unit);
             }
@@ -488,6 +516,26 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
 
 };
 
+/** Function to show landing page, for admins without sub-users yet */
+BusinessAccountUI.prototype.viewLandingPage = function () {
+    "use strict";
+    this.initUItoRender();
+    var mySelf = this;
+
+    var $businessAccountContainer = $('.files-grid-view.user-management-view');
+    var $landingContainer = $('.user-management-landing-page.user-management-view', $businessAccountContainer);
+
+    $('.content-panel.user-management .nw-user-management-item').removeClass('selected').addClass('hidden');
+
+    $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
+        .on('click.subuser', function addSubUserClickHandler() {
+            mySelf.showAddSubUserDialog();
+        });
+
+    $businessAccountContainer.removeClass('hidden'); // BA container
+    $landingContainer.removeClass('hidden');
+};
+
 /**
  * A function to show the sub-user info page
  * @param {string} subUserHandle        sub-user handle to view the info page for
@@ -507,9 +555,11 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         console.error('at view sub-user info, with a handle we cant find!');
         return;
     }
+    this.URLchanger(subUser.u);
 
-    var uName = a32_to_str(base64_to_a32(subUser.firstname)) + ' ' +
-        a32_to_str(base64_to_a32((subUser.lastname || '')));
+    var uName = from8(base64urldecode(subUser.firstname)) + ' ' +
+        from8(base64urldecode(subUser.lastname));
+    uName = uName.trim();
 
     $('.subuser-name', $subAccountContainer).text(uName);
     $('.user-management-subuser-name', $subHeader).text(uName);
@@ -522,6 +572,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         .addClass('sub-disable').removeClass('sub-enable');
     $subAccountContainer.find('.profile-button-container .edit-profile').text(l[16735]);
     $subAccountContainer.find('.profile-button-container .resend-verification').addClass('hidden');
+    $subAccountContainer.find('.profile-button-container .migrate-data').addClass('hidden');
     if (subUser.s === 0) {
         $subAccountContainer.find('div.user-management-view-status').addClass('enabled');
     }
@@ -536,7 +587,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $subAccountContainer.find('.profile-button-container .disable-account').text(l[19094])
             .removeClass('default-gray-button-user-management').addClass('default-green-button-user-management')
             .addClass('sub-enable').removeClass('sub-disable');
-        $subAccountContainer.find('.profile-button-container .edit-profile').text(l[19095]);
+        $subAccountContainer.find('.profile-button-container .migrate-data').text(l[19095]).removeClass('hidden');
     }
     $subAccountContainer.find('.user-management-view-status.text').text(this.subUserStatus(subUser.s));
     
@@ -580,8 +631,14 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
                     if (adminAnswer) {
                         var opPromise = mySelf.business.activateSubAccount(subUserHandle);
                         opPromise.done(
-                            function (st,res,req) {
-                                mySelf.viewSubAccountInfoUI(subUserHandle);
+                            function (st, res, req) {
+                                if (res === 0) {
+                                    mySelf.viewSubAccountInfoUI(subUserHandle);
+                                }
+                                else if (typeof res === 'object') {
+                                    res.m = subUser.e;
+                                    mySelf.showAddSubUserDialog(res);
+                                }
                             }
                         ).fail(
                             function () {
@@ -595,48 +652,104 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             }
         });
 
+    // event handler for data-migration of a sub-user
+    $subAccountContainer.find('.profile-button-container .migrate-data').off('click.subuser')
+        .on('click.subuser', function migrateData_ClickHandler() {
+            mySelf.migrateSubUserData(subUserHandle);
+        });
+
+
     // private function to fill quota info
     var fillQuotaInfo = function (st, quotas) {
-
-        return;
-
         if (!quotas) {
+            return;
+        }
+
+        var todayData = quotas[Object.keys(quotas)[0]];
+        if (!todayData) {
+            return;
+        }
+
+        var subUsersData = todayData.u;
+        if (!subUsersData) {
+            return;
+        }
+
+        var subUserStats = subUsersData[subUserHandle];
+        if (!subUserStats) {
             return;
         }
         
         var totalStorage = 0;
         var totalBandwidth = 0;
-        // var inboxHandle = quotas[subUserHandle][2]["4"];
-        var rootHandle = quotas[subUserHandle][2]["2"];
-        var rubbishHandle = quotas[subUserHandle][2]["3"];
-        // var inboxTotal = quotas[subUserHandle][1][inboxHandle][0] || 0;
-        var rootTotal = quotas[subUserHandle][1][rootHandle][0] || 0;
-        var rubbishTotal = quotas[subUserHandle][1][rubbishHandle][0] || 0;
-        var inshareTotal = 0;
+        
+        var emptyArray = [0, 0, 0, 0, 0];
 
+        var rootInfo = subUserStats["2"] || emptyArray;
+        var rubbishInfo = subUserStats["4"] || emptyArray;
+        var inshareInternalInfo = subUserStats["isi"] || emptyArray;
+        var inshareExternalInfo = subUserStats["ise"] || emptyArray;
+        var outshareInfo = subUserStats["os"] || emptyArray;
 
-        totalStorage = quotas[subUserHandle][0] || 0;
-        totalBandwidth = quotas[subUserHandle][3] || 0;
+        totalStorage = subUserStats["ts"] || 0;
+        totalBandwidth = subUserStats["dl"] || 0;
             
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
         var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
-        // var inboxTotalFormatted = numOfBytes(inboxTotal, 2);
-        var rootTotalFormatted = numOfBytes(rootTotal, 2);
-        var rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
-        var inshareTotalFormatted = numOfBytes(inshareTotal, 2);
+        var rootTotalFormatted = numOfBytes(rootInfo[0], 2);
+        var rubbishTotalFormatted = numOfBytes(rubbishInfo[0], 2);
+        var inshareInternalTotalFormatted = numOfBytes(inshareInternalInfo[0], 2);
+        var inshareExternalTotalFormatted = numOfBytes(inshareExternalInfo[0], 2);
+        var outshareTotalFormatted = numOfBytes(outshareInfo[0], 2);
 
+        var versionsTotalFormatted = numOfBytes(rootInfo[3] + rubbishInfo[3]
+            + inshareInternalInfo[3] + inshareExternalInfo[3] + outshareInfo[3], 2);
+
+        // fill in UI
         $('.user-management-view-data .user-management-storage .storage-transfer-data',
             $subAccountContainer).text(totalStorageFormatted.size + ' ' + totalStorageFormatted.unit);
         $('.user-management-view-data .user-management-transfer .storage-transfer-data',
             $subAccountContainer).text(totalBandwidthFormatted.size + ' ' + totalBandwidthFormatted.unit);
-        //$('.user-management-view-data .subaccount-view-used-storage-transfer .folder-occupy.root',
-        //    $subAccountContainer).text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
-        //$('.user-management-view-data .subaccount-view-used-storage-transfer .folder-occupy.inbox',
-        //    $subAccountContainer).text(inboxTotalFormatted.size + ' ' + inboxTotalFormatted.unit);
-        //$('.user-management-view-data .subaccount-view-used-storage-transfer .folder-occupy.inshare',
-        //    $subAccountContainer).text(inshareTotalFormatted.size + ' ' + inshareTotalFormatted.unit);
-        //$('.user-management-view-data .subaccount-view-used-storage-transfer .folder-occupy.rubbish',
-        //    $subAccountContainer).text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
+
+        var $cloudDriveSection = $('.user-management-view-data .subaccount-view-used-data .used-storage-info.ba-root',
+            $subAccountContainer);
+        var $inShareSection = $('.user-management-view-data .subaccount-view-used-data .used-storage-info.ba-inshare',
+            $subAccountContainer);
+        var $inShareExSection = $('.user-management-view-data .subaccount-view-used-data' +
+            ' .used-storage-info.ba-inshare-ex', $subAccountContainer);
+        var $outShareSection = $('.user-management-view-data .subaccount-view-used-data' +
+            ' .used-storage-info.ba-outshare', $subAccountContainer);
+        var $rubbishSection = $('.user-management-view-data .subaccount-view-used-data' +
+            ' .used-storage-info.ba-rubbish', $subAccountContainer);
+        var $versionsSection = $('.user-management-view-data .subaccount-view-used-data' +
+            ' .used-storage-info.ba-version', $subAccountContainer);
+
+        $cloudDriveSection.find('.ff-occupy').text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
+        $cloudDriveSection.find('.folder-number').text(rootInfo[2] + ' ' + l[2035]);
+        $cloudDriveSection.find('.file-number').text(rootInfo[1] + ' ' + l[2034]);
+
+        $inShareSection.find('.ff-occupy').text(inshareInternalTotalFormatted.size + ' ' +
+            inshareInternalTotalFormatted.unit);
+        $inShareSection.find('.folder-number').text(inshareInternalInfo[2] + ' ' + l[2035]);
+        $inShareSection.find('.file-number').text(inshareInternalInfo[1] + ' ' + l[2034]);
+
+        $inShareExSection.find('.ff-occupy').text(inshareExternalTotalFormatted.size + ' ' +
+            inshareExternalTotalFormatted.unit);
+        $inShareExSection.find('.folder-number').text(inshareExternalInfo[2] + ' ' + l[2035]);
+        $inShareExSection.find('.file-number').text(inshareExternalInfo[1] + ' ' + l[2034]);
+
+        $outShareSection.find('.ff-occupy').text(outshareTotalFormatted.size + ' ' +
+            outshareTotalFormatted.unit);
+        $outShareSection.find('.folder-number').text(outshareInfo[2] + ' ' + l[2035]);
+        $outShareSection.find('.file-number').text(outshareInfo[1] + ' ' + l[2034]);
+
+        $rubbishSection.find('.ff-occupy').text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
+        $rubbishSection.find('.folder-number').text(rubbishInfo[2] + ' ' + l[2035]);
+        $rubbishSection.find('.file-number').text(rubbishInfo[1] + ' ' + l[2034]);
+
+        $versionsSection.find('.ff-occupy').text(versionsTotalFormatted.size + ' ' + versionsTotalFormatted.unit);
+        $versionsSection.find('.file-number').text((rootInfo[4] + rubbishInfo[4]
+            + inshareInternalInfo[4] + inshareExternalInfo[4] + outshareInfo[4]) + ' ' + l[2034]);
     };
 
     // viewing the right buttons
@@ -660,15 +773,41 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     "use strict";
 
     this.initUItoRender();
+    var mySelf = this;
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
-    var $overviewContainer = $('.user-management-overview-container', $businessAccountContainer)
-        .removeClass('hidden');
+    var $overviewContainer = $('.user-management-overview-container', $businessAccountContainer);
 
     // header
-    $('.fm-right-header-user-management .user-management-breadcrumb.overview').removeClass('hidden');
-    $('.fm-right-header-user-management .user-management-overview-buttons').removeClass('hidden');
+    var $overviewHeader = $('.fm-right-header-user-management .user-management-breadcrumb.overview');
+    $overviewHeader.removeClass('hidden');
+    var $overviewHeaderBtns = $('.fm-right-header-user-management .user-management-overview-buttons');
+    $overviewHeaderBtns.removeClass('hidden');
+    $overviewHeader.find('.user-management-icon').off('click.subuser').on('click.subuser',
+        function overviewHeaderClickHandler() {
+            mySelf.viewSubAccountListUI();
+        }
+    );
+    $overviewHeaderBtns.find('.pdf-exp').off('click.subuser').on('click.subuser',
+        function overviewHeaderClickHandler() {
+            M.require('jspdf_js').done(
+                function exportOverviewPageToPDF() {
+                    var doc = new jsPDF();
+                    var specialElementHandlers = {
+                        '.hidden': function (element, renderer) {
+                            return true;
+                        }
+                    };
 
+                    doc.fromHTML($overviewContainer.html(), 15, 15, {
+                        'width': 170,
+                        'elementHandlers': specialElementHandlers
+                    });
+                    doc.save('sample-file.pdf');
+                }
+            );
+        }
+    );
 
 
     // private function to populate the dashboard
@@ -676,22 +815,28 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         if (!quotas) {
             return;
         }
+        var todayStats = quotas[Object.keys(quotas)[0]];
 
-        var numberOfSubs = 0;
+        var numberOfSubs = todayStats.tu || 0;
         var activeSubs = 0;
         var pendingSubs = 0;
         var disabledSubs = 0;
-        var totalStorage = 0;
-        var totalBandwidth = 0;
+        var totalStorage = todayStats.ts || 0;
+        var totalBandwidth = todayStats.tdl || 0;
         var inshareTotal = 0;
         var rootTotal = 0;
         var rubbishTotal = 0;
+        var outshareTotal = 0;
 
-        for (var sub in quotas) {
-            if (sub === 'timestamp') {
-                continue; // embedded attribute 
-            }
-            numberOfSubs++;
+        var emptyArray = [0, 0, 0, 0, 0];
+        var currRoot;
+        var currInhare;
+        var currInhareEx;
+        var currOutshare;
+        var currRubbish;
+
+
+        for (var sub in todayStats.u) {
             if (sub === u_handle) {
                 activeSubs++;
             }
@@ -705,40 +850,43 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                 disabledSubs++;
             }
 
-            totalStorage += quotas[sub][0] || 0;
-            totalBandwidth += quotas[sub][3] || 0;
+            currRoot = todayStats.u[sub]["2"] || emptyArray;
+            currInhare = todayStats.u[sub]["isi"] || emptyArray;
+            currInhareEx = todayStats.u[sub]["ise"] || emptyArray;
+            currOutshare = todayStats.u[sub]["os"] || emptyArray;
+            currRubbish = todayStats.u[sub]["4"] || emptyArray;
 
-            var rootHandle = quotas[sub][2]["2"];
-            var rubbishHandle = quotas[sub][2]["3"];
-            var inboxHandle = quotas[sub][2]["4"];
-            var inshareHandle = '';
-
-            rootTotal += (quotas[sub][1][rootHandle][0] || 0);
-            rubbishTotal += (quotas[sub][1][rubbishHandle][0] || 0);
-
-            for (var hh in quotas[sub][1]) {
-                if (hh !== rootHandle && hh !== rubbishHandle && hh !== inboxHandle) {
-                    inshareHandle = hh;
-                    break;
-                }
-            }
-            inshareTotal += (quotas[sub][1][inshareHandle][0] || 0);
-
+            rootTotal += currRoot[0];
+            rubbishTotal += currRubbish[0];
+            outshareTotal += currInhareEx[0];
+            inshareTotal += currInhare[0];
         }
+
+        totalStorage = rootTotal + rubbishTotal + outshareTotal + inshareTotal;
 
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
         var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
         var rootTotalFormatted = numOfBytes(rootTotal, 2);
         var rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
         var inshareTotalFormatted = numOfBytes(inshareTotal, 2);
+        var outshareTotalFormatted = numOfBytes(outshareTotal, 2);
 
         var rootPrecentage = rootTotal / totalStorage;
+        var rootPie = rootPrecentage * 360;
+        rootPrecentage = Number.parseFloat(rootPrecentage * 100).toFixed(2);
         var insharePrecentage = inshareTotal / totalStorage;
+        var insharePie = insharePrecentage * 360;
+        insharePrecentage = Number.parseFloat(insharePrecentage * 100).toFixed(2);
         var rubbishPrecentage = rubbishTotal / totalStorage;
+        var rubbishPie = rubbishPrecentage * 360;
+        rubbishPrecentage = Number.parseFloat(rubbishPrecentage * 100).toFixed(2);
+        var outsharePrecentage = outshareTotal / totalStorage;
+        var outsharePie = outsharePrecentage * 360;
+        outsharePrecentage = Number.parseFloat(outsharePrecentage * 100).toFixed(2);
 
         $overviewContainer.find('.user-segments-container.all-subs .user-segment-number').text(numberOfSubs);
         $overviewContainer.find('.user-segments-container.active-subs .user-segment-number').text(activeSubs);
-        $overviewContainer.find('.user-segments-container.pending-sub .user-segment-number').text(pendingSubs);
+        $overviewContainer.find('.user-segments-container.pending-subs .user-segment-number').text(pendingSubs);
         $overviewContainer.find('.user-segments-container.disabled-subs .user-segment-number').text(disabledSubs);
 
         $overviewContainer.find('.storage-small-circle .total-storage-number')
@@ -756,16 +904,321 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             .text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
         $overviewContainer.find('.storage-division-container.rubbish-node .storage-division-per')
             .text(Math.round(rubbishPrecentage) + '%');
-        $overviewContainer.find('.storage-division-container.inbox-node').addClass('hidden');
+        $overviewContainer.find('.storage-division-container.inbox-node .storage-division-num')
+            .text(outshareTotalFormatted.size + ' ' + outshareTotalFormatted.unit);
+        $overviewContainer.find('.storage-division-container.inbox-node .storage-division-per')
+            .text(Math.round(outsharePrecentage) + '%');
 
+        $overviewContainer.find('.transfer-analysis-summary .total-transfer-number')
+            .text(totalBandwidthFormatted.size + ' ' + totalBandwidthFormatted.unit);
+
+        $businessAccountContainer.removeClass('hidden'); // BA container
+        $overviewContainer.removeClass('hidden');
+
+        var $chartContainer = $('#pie-chart-contianer');
+        $chartContainer.empty();
+        $chartContainer.html('<canvas id="usage-pie-chart"></canvas>');
+        var $pieChart = $('#usage-pie-chart', $chartContainer);
+
+        M.require('charts_js').done(function usagePieChartDataPopulate() {
+
+            var tooltipLabeling = function (tooltipItem, data) {
+                var label = data.labels[tooltipItem.index] || '';
+                var perc = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                if (label) {
+                    label += ': ';
+                }
+                var sizeInfo = numOfBytes(perc);
+                label += sizeInfo.size + ' ' + sizeInfo.unit;
+                return label;
+            };
+
+            var usagePieChart = new Chart($pieChart, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [rootTotal, outshareTotal, inshareTotal, rubbishTotal],
+                        backgroundColor: [
+                            'rgba(88,103,195,1)',
+                            'rgba(0,191,165,1)',
+                            'rgba(245,166,35,1)',
+                            '#bbbbbb'
+                        ]
+                    }],
+                    // These labels appear in the legend and in the tooltips when hovering different arcs
+                    labels: [
+                        l[164],
+                        l[19223],
+                        l[16770],
+                        l[167]
+                    ]
+                },
+                options: {
+                    legend: {
+                        display: false
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: tooltipLabeling
+                        }
+                    }
+                }
+            });
+
+            var $customCharLegend = $('.storage-analysis-container .storage-division-container', $overviewContainer)
+                .off('click.subuser').on('click.subuser', function chartLegendClickHandler(e) {
+                    var $me = $(this);
+                    var ix = 0;
+                    if ($me.hasClass('inbox-node')) {
+                        ix = 1;
+                    }
+                    else if ($me.hasClass('inshare-node')) {
+                        ix = 2;
+                    }
+                    else if ($me.hasClass('rubbish-node')) {
+                        ix = 3;
+                    }
+
+                    if ($me.hasClass('disabled')) {
+                        $me.removeClass('disabled');
+                    }
+                    else {
+                        $me.addClass('disabled');
+                    }
+
+                    var item = usagePieChart.legend.legendItems[ix];
+                    usagePieChart.legend.options.onClick.call(usagePieChart.legend, e, item);
+                });
+            $customCharLegend.removeClass('disabled');
+        });
+
+
+        /*
+        $overviewContainer.find('.storage-big-chart .pie').removeClass('big').removeClass('highlight');
+        $overviewContainer.find('.storage-big-chart .pie .pie-internal2').remove();
+
+        var getPiePartStyle = function (startVal) {
+            var sStyle = '-moz-transform: rotate({0}deg); -ms-transform: rotate({0}deg);'
+                + '-webkit-transform: rotate({0}deg); -o-transform: rotate({0}deg);'
+                + 'transform:rotate({0}deg);';
+            return sStyle.replace(/\{0\}/g, startVal);
+        };
+
+        var start = 0;
+        var curStyle = '';
+        var $currElement;
+        // testing
+        //rootPie = 100, insharePie = 80, outsharePie = 60, rubbishPie = 120;
+
+        $currElement = $overviewContainer.find('.storage-big-chart .pie.nb1');
+        $currElement.attr('data-start', start).attr('data-value', outsharePie);
+        if (outsharePie > 180) {
+            $currElement.addClass('big');
+            $currElement.append('<div class="pie-internal2"></div>');
+        }
+        curStyle = getPiePartStyle(start);
+        $currElement.attr('style', curStyle);
+        curStyle = getPiePartStyle(outsharePie + 1);
+        $currElement.find('.pie-internal').attr('style', curStyle);
+        start += outsharePie;
+        ////////////////
+        $currElement = $overviewContainer.find('.storage-big-chart .pie.nb2');
+        $currElement.attr('data-start', start).attr('data-value', insharePie);
+        if (insharePie > 180) {
+            $currElement.addClass('big');
+            $currElement.append('<div class="pie-internal2"></div>');
+        }
+        curStyle = getPiePartStyle(start);
+        $currElement.attr('style', curStyle);
+        curStyle = getPiePartStyle(insharePie + 1);
+        $currElement.find('.pie-internal').attr('style', curStyle);
+        start += insharePie;
+        ////////////////
+        $currElement = $overviewContainer.find('.storage-big-chart .pie.nb3');
+        $currElement.attr('data-start', start).attr('data-value', rubbishPie);
+        if (rubbishPie > 180) {
+            $currElement.addClass('big');
+            $currElement.append('<div class="pie-internal2"></div>');
+        }
+        curStyle = getPiePartStyle(start);
+        $currElement.attr('style', curStyle);
+        curStyle = getPiePartStyle(rubbishPie + 1);
+        $currElement.find('.pie-internal').attr('style', curStyle);
+        start += rubbishPie;
+        ////////////////
+        $currElement = $overviewContainer.find('.storage-big-chart .pie.nb4');
+        $currElement.attr('data-start', start).attr('data-value', rootPie);
+        if (rootPie > 180) {
+            $currElement.addClass('big');
+            $currElement.append('<div class="pie-internal2"></div>');
+        }
+        curStyle = getPiePartStyle(start);
+        $currElement.attr('style', curStyle);
+        curStyle = getPiePartStyle(rootPie);
+        $currElement.find('.pie-internal').attr('style', curStyle);
+        //start += rootPie;
+        */
+        
 
     };
 
+    // private function to format start and end dates
+    var getReportDates = function (leadingDate) {
+        var today = leadingDate || new Date();
+        var currMonth = '' + (today.getMonth() + 1);
+        if (currMonth.length < 2) {
+            currMonth = '0' + currMonth;
+        }
+        var currYear = today.getFullYear();
+
+        var startDate = currYear + '' + currMonth + '01';
+
+        var endDate = getLastDayofTheMonth(today);
+        if (!endDate) {
+            return;
+        }
+        var endDateStr = endDate.getFullYear() + '' + currMonth + endDate.getDate();
+        return { fromDate: startDate, toDate: endDateStr };
+    };
+
+    // private function to populate the reporting bar chart
+    var populateBarChart = function (st, res) {
+        M.require('charts_js').done(function () {
+            var $charContainer = $("#chartcontainer");
+            $charContainer.empty();
+            $charContainer.html('<canvas id="usage-bar-chart" class="daily-transfer-flow-container"></canvas>');
+            var chartCanvas = $("#usage-bar-chart");
+
+            var availableLabels = Object.keys(res);
+            availableLabels.sort();
+
+            var chartData = [];
+            var divider = 1024 * 1024 * 1024;
+            var totalMonthTransfer = 0;
+            var randVal;
+
+            // if statement only for testing, can be removed after deploy.
+            if (d && localStorage.bTest) {
+                availableLabels = [];
+                for (var h2 = 0; h2 < 30; h2++) {
+                    randVal = Math.random() * 100;
+                    chartData.push(randVal);
+                    availableLabels.push(h2 + 1);
+                    totalMonthTransfer += randVal;
+                }
+            }
+            // building bars data + total transfer
+            else {
+                for (var h = 0; h < availableLabels.length; h++) {
+                    chartData.push(res[availableLabels[h]].tdl / divider);
+                    totalMonthTransfer += res[availableLabels[h]].tdl;
+
+                    // keeping the day number only
+                    availableLabels[h] = availableLabels[h].substr(6, 2);
+                }
+            }
+
+            var allTransferFormatted = numOfBytes(totalMonthTransfer, 2);
+            $overviewContainer.find('.transfer-analysis-container .transfer-analysis-summary .total-transfer-number')
+                .text(allTransferFormatted.size + ' ' + allTransferFormatted.unit);
+
+            var tooltipBarLabeling = function (tooltipItem, data) {
+                var perc = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                var sizeInfo = numOfBytes(perc);
+                var label = sizeInfo.size + ' ' + sizeInfo.unit;
+                return label;
+            }; 
+
+            var myChart = new Chart(chartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: availableLabels, // ["Red", "Green", "Orange"],
+                    datasets: [{
+                        label: '',
+                        data: chartData,
+                        backgroundColor: 'rgba(88, 103, 195, 1)',
+                        borderColor: 'rgba(88, 103, 195, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            },
+                            gridLines: {
+                                display: false
+                            }
+                        }],
+                        xAxes: [{
+                            gridLines: {
+                                display: false
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: false
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: tooltipBarLabeling
+                        }
+                    }
+                }
+            });
+        });
+    };
 
     // getting quotas
     var quotasPromise = this.business.getQuotaUsage();
     quotasPromise.done(populateDashboard);
-    
+
+    var initialBarReport = getReportDates();
+    var reportPromise = this.business.getQuotaUsageReport(false, initialBarReport);
+    reportPromise.done(populateBarChart);
+
+    var populateMonthDropDownList = function () {
+        var monthNames = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416],
+        l[417], l[418], l[419]];
+
+        var adminCreationDate = new Date(u_attr['since'] * 1000);
+
+        var nowDate = new Date();
+        var monthLimit = 12; // 1 year back max
+
+        var $monthSelector = $('#chart-month-selector');
+        $monthSelector.empty();
+
+
+
+        for (var a = 0; a < 12; a++) {
+            var $currOprion = $('<option>', {
+                value: nowDate.getTime(),
+                text: monthNames[nowDate.getMonth()] + ' ' + nowDate.getFullYear()
+            });
+            $monthSelector.append($currOprion);
+
+            nowDate.setMonth(nowDate.getMonth() - 1);
+
+            if (nowDate < adminCreationDate) {
+                break;
+            }
+        }
+
+        $monthSelector.off('change.subuser').on('change.subuse', function transferChartDropDownChangeHandler() {
+            var selectedDate = new Date(Number.parseFloat(this.value));
+            var report = getReportDates(selectedDate);
+
+            var reportPromise2 = mySelf.business.getQuotaUsageReport(false, report);
+            reportPromise2.done(populateBarChart);
+        });
+    };
+
+    populateMonthDropDownList();
+    $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
 };
 
 /**
@@ -775,6 +1228,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
  * @param {boolean} isEnable                a flag to tell that we want enabling conformation
  */
 BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFuncHandler, userName, isEnable) {
+    "use strict";
     var $dialog = $('.user-management-able-user-dialog.user-management-dialog');
 
     var dialogQuestion = l[19098];
@@ -810,9 +1264,12 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
 };
 
 /**
- *  showes the add sub-user dialog
- * */
-BusinessAccountUI.prototype.showAddSubUserDialog = function () {
+ * shows the add sub-user dialog, if result is passed, the result dialog will be shown
+ * @param {object} result   an object contain password + sub-user handle
+ */
+BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
+    "use strict";
+
     var $dialog = $('.user-management-add-user-dialog.user-management-dialog');
     var mySelf = this;
 
@@ -837,6 +1294,24 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function () {
     };
 
     clearDialog(); // remove any previous data
+
+    // checking if we are passing a valid result object
+    if (result && result.lp && result.u && result.m) {
+        var $addContianer = $('.dialog-input-container', $dialog);
+        var $resultContianer = $('.verification-container', $dialog);
+
+        var subUserDefaultAvatar = useravatar.contact(result.u);
+        $('.new-sub-user', $resultContianer).html(subUserDefaultAvatar);
+        $('.sub-e', $resultContianer).text(result.m);
+        $('.sub-p', $resultContianer).text(result.lp);
+
+        $addContianer.addClass('hidden');
+        $resultContianer.removeClass('hidden');
+        $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
+        $('.licence-bar', $dialog).addClass('hidden');
+        $('.dialog-subtitle', $dialog).removeClass('hidden');
+    }
+
 
     // event handler for "X" icon to close the dialog
     $('.delete-img.icon', $dialog).off('click.subuser')
@@ -936,11 +1411,61 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function () {
     });
 };
 
+
+BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
+    "use strict";
+    if (!subUserHandle) {
+        return;
+    }
+    if (!M.suba[subUserHandle]) {
+        return;
+    }
+    var subUser = M.suba[subUserHandle];
+
+    var $dialog = $('.user-management-edit-profile-dialog.user-management-dialog');
+    var $usersContainer = $('.dialog-input-container', $dialog);
+    var $nameInput = $('input.edit-sub-name', $usersContainer);
+    var $emailInput = $('input.edit-sub-email', $usersContainer);
+    var $positionInput = $('input.edit-sub-position', $usersContainer);
+    var $subIDInput = $('input.edit-sub-id-nb', $usersContainer);
+    var $phoneInput = $('input.edit-sub-phone', $usersContainer);
+    var $locationInput = $('input.edit-sub-location', $usersContainer);
+
+    var clearDialog = function () {
+        $nameInput.val('');
+        $emailInput.val('');
+        $positionInput.val('');
+        $subIDInput.val('');
+        $phoneInput.val('');
+        $locationInput.val('');
+    };
+
+    clearDialog();
+
+    var uName = from8(base64urldecode(subUser.firstname)) + ' ' +
+        from8(base64urldecode(subUser.lastname));
+    uName = uName.trim();
+    var subUserDefaultAvatar = useravatar.contact(subUserHandle);
+
+    $nameInput.val(uName);
+    $emailInput.val(subUser.e);
+    $('.user-management-subuser-avatars', $dialog).html(subUserDefaultAvatar);
+
+    $('.dialog-button-container .btn-edit-close, .delete-img.icon', $dialog).off('click.subuser')
+        .on('click.subuser', closeDialog);
+
+    M.safeShowDialog('sub-user-editting-dlg', function () {
+        return $dialog;
+    });
+};
+
+
 /**
  * show the adding result for a list of sub-users
  * @param {object[]} results        array of sub-user object {email,status,initPass,handle}
  */
 BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
+    "use strict";
     var $dialog = $('.user-management-verification-dialog.user-management-dialog');
 
     if (!results || !results.length) {
@@ -994,7 +1519,167 @@ BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
     });
 };
 
+
+/**
+ * Start data migration of a sub-user
+ * @param {string} subUserHandle            sub-user's handle
+ */
+BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
+    "use strict";
+    if (!subUserHandle || subUserHandle.length !== 11) {
+        return;
+    }
+    if (!M.suba[subUserHandle]) {
+        return;
+    }
+    var mySelf = this;
+    loadingDialog.pshow();
+
+
+    // all operations are done in BusinessAccount class level.
+    // Here we only allow user interaction
+
+    /** Steps:
+     * 1- getting sub-user tree
+     * 2- getting sub-user master-key
+     * 3- decrypting
+     * 4- copying to master account
+     */
+    // failed
+    var failing = function (msg) {
+        loadingDialog.phide();
+        msgDialog('warningb', '', msg);
+        return;
+    };
+
+    // getting sub-user tree.
+    var gettingSubTreePromise = this.business.getSubUserTree(subUserHandle);
+
+    gettingSubTreePromise.fail(
+        function getTreefailed(st, res, m) {
+            if (d) {
+                console.error("getting sub-user tree has failed! " + res + " --" + m);
+            }
+            return failing(l[19146]);
+        }
+    );
+
+    gettingSubTreePromise.done(
+        function getTreeOk(st, treeResult) {
+            // getting sub-user master-key
+            var gettingSubMasterKey = mySelf.business.getSubAccountMKey(subUserHandle);
+
+            gettingSubMasterKey.fail(
+                function getMKeyfailed(mkSt, mkRes, mkM) {
+                    if (d) {
+                        console.error("getting sub-user Master key has failed! " + mkRes + " --" + mkM);
+                    }
+                    return failing(l[19146]);
+                }
+            );
+
+            gettingSubMasterKey.done(
+                function getMKeyOK(st2, MKeyResult) {
+                    // sub-user tree decrypting
+                    var treeObj = mySelf.business.decrypteSubUserTree(treeResult.f, MKeyResult.k);
+                    if (!treeObj) {
+                        if (d) {
+                            console.error("decrypting sub-user tree with the Master key has failed! "
+                                + "although the key and tree fetching succeeded");
+                        }
+                        return failing(l[19146]);
+                    }
+                    else {
+
+                        var doMigrateSubUserDate = function (isOK) {
+                            if (!isOK) {
+                                return failing(l[19148].replace('{0}', M.suba[subUserHandle].e));
+                            }
+
+                            // name the folder as the sub-user email + timestamp.
+                            var folderName = M.suba[subUserHandle].e;
+                            folderName += '_' + Date.now();
+
+                            var cpyPromise = mySelf.business.copySubUserTreeToMasterRoot(treeObj.tree, folderName);
+
+                            cpyPromise.fail(
+                                function copySubUserFailHandler(stF, errF, desF) {
+                                    if (d) {
+                                        console.error("copying sub-user data key has failed! " + errF + " --" + desF);
+                                    }
+                                    return failing(l[19146]);
+                                }
+                            );
+
+                            cpyPromise.done(
+                                function copySubUserSuccHandler() {
+                                    loadingDialog.phide();
+                                    msgDialog('info', '', l[19149].replace('{0}', M.suba[subUserHandle].e)
+                                        .replace('{1}', folderName));
+                                    return;
+                                }
+                            );
+
+                        };
+
+                        if (treeObj.errors.length || treeObj.warns.length) {
+                            var msgMsg = l[19147]; // operation contains errors and/or warning
+                            var msgQuestion = l[18229]; // Do you want to proceed?
+                            msgMsg = msgMsg.replace('{0}', M.suba[subUserHandle].e)
+                                .replace('{1}', treeObj.errors.length).replace('{2}', treeObj.warns.length);
+
+                            msgDialog('confirmation', '', msgMsg, msgQuestion, doMigrateSubUserDate);
+                        }
+                        else {
+                            doMigrateSubUserDate(true);
+                        }
+
+
+                    }
+                }
+            );
+
+        }
+    );
+};
+
+
+/**
+ * a function will change the url location depending on opened sub-page in business account
+ * @param {string} subLocation      the sub-location to be added after fm/user-management/
+ */
+BusinessAccountUI.prototype.URLchanger = function (subLocation) {
+    "use strict";
+    try {
+
+        if (hashLogic) {
+            var newHash = '#fm/user-management' + subLocation;
+            if (document.location.hash !== newHash) {
+                document.location.hash = newHash;
+                page = newHash;
+            }
+        }
+        else {
+            var newSubPage = (subLocation) ? ('fm/user-management/' + subLocation)
+                : 'fm/user-management';
+            if (page !== newSubPage) {
+                history.pushState({ subpage: newSubPage }, "", "/" + newSubPage);
+                page = newSubPage;
+            }
+        }
+    }
+    catch (ex) {
+        console.error(ex);
+    }
+};
+
+/**
+ * Event handler for sub-user changes, this handler will be invoked eventually when relate action-packet
+ * is received
+ * @param {object} subuser      the sub-user object
+ */
 BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
+    "use strict";
     if (!subuser) {
         return;
     }
@@ -1006,9 +1691,11 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         if (!$userRow.length) {
             return;
         }
+        var leftPanelClass = 'disabled-accounts';
         if (subuser.s === 0) {
             $userRow.find('.user-management-status').removeClass('pending disabled')
                 .addClass('enabled');
+            leftPanelClass = 'enabled-accounts';
         }
         else if (subuser.s === 10) {
             $userRow.find('.user-management-status').removeClass('enabled disabled')
@@ -1020,11 +1707,12 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
                 .addClass('disabled');
             $userRow.addClass('hidden');
         }
-        $('.user-management-tree-panel-header.disabled-accounts').trigger('click.subuser');
+        $('.user-management-tree-panel-header.' + leftPanelClass).trigger('click.subuser');
     };
 
     // if we are in table view
-    if (!$('.user-management-list-table').hasClass('hidden')) {
+    if (!$('.user-management-list-table').hasClass('hidden')
+        || !$('.user-management-landing-page.user-management-view').hasClass('hidden')) {
         // safe to create new object.
         var busUI = new BusinessAccountUI();
         busUI.viewSubAccountListUI();

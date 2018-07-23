@@ -147,8 +147,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
 
                 $currUserLeftPane.removeClass('selected');
-                var uName = base64urldecode(subUsers[h].firstname) + ' ' +
-                    base64urldecode(subUsers[h].lastname);
+                var uName = from8(base64urldecode(subUsers[h].firstname)) + ' ' +
+                    from8(base64urldecode(subUsers[h].lastname));
                 uName = uName.trim();
                 $currUser.find('.fm-user-management-user .user-management-name').text(uName);
                 $currUserLeftPane.find('.nw-user-management-name').text(uName);
@@ -516,8 +516,8 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         return;
     }
 
-    var uName = base64urldecode(subUser.firstname) + ' ' +
-        base64urldecode(subUser.lastname);
+    var uName = from8(base64urldecode(subUser.firstname)) + ' ' +
+        from8(base64urldecode(subUser.lastname));
     uName = uName.trim();
 
     $('.subuser-name', $subAccountContainer).text(uName);
@@ -531,6 +531,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         .addClass('sub-disable').removeClass('sub-enable');
     $subAccountContainer.find('.profile-button-container .edit-profile').text(l[16735]);
     $subAccountContainer.find('.profile-button-container .resend-verification').addClass('hidden');
+    $subAccountContainer.find('.profile-button-container .migrate-data').addClass('hidden');
     if (subUser.s === 0) {
         $subAccountContainer.find('div.user-management-view-status').addClass('enabled');
     }
@@ -545,7 +546,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $subAccountContainer.find('.profile-button-container .disable-account').text(l[19094])
             .removeClass('default-gray-button-user-management').addClass('default-green-button-user-management')
             .addClass('sub-enable').removeClass('sub-disable');
-        $subAccountContainer.find('.profile-button-container .edit-profile').text(l[19095]);
+        $subAccountContainer.find('.profile-button-container .migrate-data').text(l[19095]).removeClass('hidden');
     }
     $subAccountContainer.find('.user-management-view-status.text').text(this.subUserStatus(subUser.s));
     
@@ -961,13 +962,33 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     var $usersContainer = $('.dialog-input-container', $dialog);
     var $nameInput = $('input.edit-sub-name', $usersContainer);
     var $emailInput = $('input.edit-sub-email', $usersContainer);
+    var $positionInput = $('input.edit-sub-position', $usersContainer);
+    var $subIDInput = $('input.edit-sub-id-nb', $usersContainer);
+    var $phoneInput = $('input.edit-sub-phone', $usersContainer);
+    var $locationInput = $('input.edit-sub-location', $usersContainer);
 
-    var uName = base64urldecode(subUser.firstname) + ' ' +
-        base64urldecode(subUser.lastname);
+    var clearDialog = function () {
+        $nameInput.val('');
+        $emailInput.val('');
+        $positionInput.val('');
+        $subIDInput.val('');
+        $phoneInput.val('');
+        $locationInput.val('');
+    };
+
+    clearDialog();
+
+    var uName = from8(base64urldecode(subUser.firstname)) + ' ' +
+        from8(base64urldecode(subUser.lastname));
     uName = uName.trim();
+    var subUserDefaultAvatar = useravatar.contact(subUserHandle);
 
     $nameInput.val(uName);
     $emailInput.val(subUser.e);
+    $('.user-management-subuser-avatars', $dialog).html(subUserDefaultAvatar);
+
+    $('.dialog-button-container .btn-edit-close, .delete-img.icon', $dialog).off('click.subuser')
+        .on('click.subuser', closeDialog);
 
     M.safeShowDialog('sub-user-editting-dlg', function () {
         return $dialog;

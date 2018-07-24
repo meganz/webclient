@@ -961,8 +961,8 @@ mega.megadrop = (function() {
                 else {
                     if (pupOpts.items[pupId]) {
                         folderId = pupOpts.items[pupId].h;
-                        settings.remove(pupId, folderId);
                         _del(pupId);
+                        settings.remove(pupId, folderId);
                     }
                 }
             }
@@ -1294,7 +1294,7 @@ mega.megadrop = (function() {
             delExpanded(pupHandle);
             ui.nodeIcon(nodeHandle);
 
-            if (Object.keys(puf.items).length === 1 && M.currentdirid === 'account/megadrop') {
+            if (Object.keys(puf.items).length === 0 && M.currentdirid === 'account/megadrop') {
                 M.openFolder(M.RootID);
             }
         };

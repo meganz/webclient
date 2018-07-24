@@ -559,6 +559,15 @@ scparser.$add('s', {
             // if access right are undefined, then share is deleted
             if (typeof a.r === 'undefined') {
                 M.delNodeShare(a.n, a.u, a.okd);
+                if (!folderlink && a.u !== 'EXP' && fminitialized) {
+                    notify.notifyFromActionPacket({
+                        a: 'dshare',
+                        n: a.n,
+                        u: a.o,
+                        orig: a.ou,
+                        rece: a.u
+                    });
+                }
             }
             else {
                 var handle = a.n;
@@ -661,7 +670,9 @@ scparser.$add('s', {
                         notify.notifyFromActionPacket({
                             a: 'dshare',
                             n: a.n,
-                            u: a.o
+                            u: a.o,
+                            orig: a.ou,
+                            rece: a.u
                         });
                     }
                 }

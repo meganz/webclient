@@ -576,6 +576,8 @@
     "1513": "Maling email address",
     "1514": "May problema sa network connection, muling subakan",
     "1517": "Ang may-ari ng file ay ni-block",
+    "1565": "Tunog",
+    "1566": "Video",
     "1578": "Mali",
     "1585": "Babala",
     "1595": "Ilagay sa aking cloud drive",
@@ -1033,6 +1035,7 @@
     "7431": "Maling e-mail at\/o password. Subukang muli",
     "7434": "Email",
     "7534": "Read only",
+    "7537": "Opsyon",
     "7557": "Lahat",
     "7585": "Ang lagda pamula sa %1 key galing kay %2 ay hindi tama.",
     "7597": "Bakanteng folder",
@@ -2616,6 +2619,6 @@
     "19135": "Your upload(s) cannot proceed because your account is full",
     "19136": "Please upgrade to PRO by clicking one of the options below and your upload(s) will resume automatically.",
     "19137": "Welcome to MEGA User Management",
-    "19138": "User management helps you administer all users of your organization in one place. You can add\/edit\/disable users, modify users settings, migrate users data and get an overview of your business account status here.",
+    "19138": "User management helps you administer all users of your organization in one place. You can add\/edit\/disable users, modify user\u2019s settings, migrate user\u2019s data and get an overview of your business account status here.",
     "19139": "Get started by inviting people to your team"
 }

@@ -560,13 +560,15 @@ scparser.$add('s', {
             if (typeof a.r === 'undefined') {
                 M.delNodeShare(a.n, a.u, a.okd);
                 if (!folderlink && a.u !== 'EXP' && fminitialized) {
-                    notify.notifyFromActionPacket({
-                        a: 'dshare',
-                        n: a.n,
-                        u: a.o,
-                        orig: a.ou,
-                        rece: a.u
-                    });
+                    if (a.ou !== u_handle) {
+                        notify.notifyFromActionPacket({
+                            a: 'dshare',
+                            n: a.n,
+                            u: a.o,
+                            orig: a.ou,
+                            rece: a.u
+                        });
+                    }
                 }
             }
             else {
@@ -667,13 +669,15 @@ scparser.$add('s', {
                     }
 
                     if (!folderlink && a.u !== 'EXP' && fminitialized) {
-                        notify.notifyFromActionPacket({
-                            a: 'dshare',
-                            n: a.n,
-                            u: a.o,
-                            orig: a.ou,
-                            rece: a.u
-                        });
+                        if (a.ou !== u_handle) {
+                            notify.notifyFromActionPacket({
+                                a: 'dshare',
+                                n: a.n,
+                                u: a.o,
+                                orig: a.ou,
+                                rece: a.u
+                            });
+                        }
                     }
                 }
                 else {

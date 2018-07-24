@@ -1046,36 +1046,47 @@ var notify = {
     renderDeletedShare: function ($notificationHtml, email, notification) {
 
         var title = '';
-        var nOwner;
-        var nTarget;
-        var nOrginating;
+        var notificationOwner;
+        var notificationTarget;
+        var notificationOrginating;
 
         // first we are parsing an action packet.
         if (notification.data.orig) {
-            nOwner = notification.data.u;
-            nTarget = notification.data.rece;
-            nOrginating = notification.data.orig;
+            notificationOwner = notification.data.u;
+            notificationTarget = notification.data.rece;
+            notificationOrginating = notification.data.orig;
         }
         else {
             // otherwise we are parsing 'c' api response (initial notifications request)
-            nOwner = notification.data.o;
-            nOrginating = notification.data.u;
-            if (nOwner === u_handle) {
-                if (nOrginating === u_handle) {
+            notificationOwner = notification.data.o;
+            notificationOrginating = notification.data.u;
+            if (notificationOwner === u_handle) {
+                if (notificationOrginating === u_handle) {
                     console.error('receiving a wrong notification, this notification shouldnt be sent to me',
                         notification
                     );
                 }
                 else {
-                    nTarget = nOrginating;
+                    notificationTarget = notificationOrginating;
                 }
             }
             else {
-                nTarget = u_handle;
+                notificationTarget = u_handle;
+            }
+
+            // if we are dealing with old notification which doesnt support the new data
+            if (!notificationOwner || notificationOwner === -1) {
+                // fall back to the old not correct notification
+                notificationOwner = notificationOrginating;
+            }
+            // receiving old action packet
+            // .rece without .orig
+            if (notification.data.rece) {
+                notificationOwner = notificationOrginating;
             }
 
         }
-        var sharingRemovedByReciver = nOrginating !== nOwner;
+        var sharingRemovedByReciver = notificationOrginating !== notificationOwner;
 
         if (!sharingRemovedByReciver) {
             // If the email exists use string 'Access to folders shared by [X] was removed'
@@ -1088,14 +1099,13 @@ var notify = {
             }
         }
         else {
-            var nodeH = notification.data.n;
-            var fname = M.d[notification.data.n].name;
-            var removerEmail = notify.userEmails[nTarget];
+            var folderName = M.d[notification.data.n].name || '';
+            var removerEmail = notify.userEmails[notificationTarget];
             if (removerEmail) {
-                title = l[19153].replace('{0}', removerEmail).replace('{1}', fname);
+                title = l[19153].replace('{0}', removerEmail).replace('{1}', folderName);
             }
             else {
-                title = l[19154].replace('{0}', fname);
+                title = l[19154].replace('{0}', folderName);
             }
         }
 

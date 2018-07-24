@@ -1219,10 +1219,6 @@ function init_page() {
         $('.reg-st5-complete-button').rebind('click', function (e) {
             loadSubPage('copyrightnotice');
         });
-        if (lang == 'en') {
-            $('#copyright_txt').text($('#copyright_txt').text().split('(i)')[0]);
-            $('#copyright_en').removeClass('hidden');
-        }
     }
     else if (page === 'disputenotice') {
         parsepage(pages['disputenotice']);

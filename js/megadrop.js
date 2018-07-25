@@ -1137,23 +1137,25 @@ mega.megadrop = (function() {
 
             // Click on PUP basic info, show full PUP informations .expanded-widget
             $('.widget-container').on('click.WS_clickcard', '.widget-card', function() {
-                var $this = $(this).closest('div[id^=pup_]');
-                var pupHandle = $this.attr('id').replace('pup_', '');
-                var expHandle = $('div[id^=ew_]').attr('id');
+                if (!$(this).hasClass("expanded-widget")) {
+                    var $this = $(this).closest('div[id^=pup_]');
+                    var pupHandle = $this.attr('id').replace('pup_', '');
+                    var expHandle = $('div[id^=ew_]').attr('id');
 
-                // Close expanded PUP
-                if (expHandle) {
-                    $('#' + expHandle).addClass('hidden').remove();
-                    $('#pup_' + expHandle.replace('ew_', '')).removeClass('hidden');
-                    delExpanded(expHandle);
+                    // Close expanded PUP
+                    if (expHandle) {
+                        $('#' + expHandle).addClass('hidden').remove();
+                        $('#pup_' + expHandle.replace('ew_', '')).removeClass('hidden');
+                        delExpanded(expHandle);
+                    }
+
+                    drawExpandedCard(pupHandle, $this);
+                    $this.addClass('hidden');
+                    $('#ew_' + pupHandle).removeClass('hidden');
+                    setExpanded(pupHandle);
+                    initAccountScroll();
+                    $(window).trigger('resize');
                 }
-
-                drawExpandedCard(pupHandle, $this);
-                $this.addClass('hidden');
-                $('#ew_' + pupHandle).removeClass('hidden');
-                setExpanded(pupHandle);
-                initAccountScroll();
-                $(window).trigger('resize');
             });
 
             // Click on minimise of PUP expanded informations, replace it  with basic info .widget-card

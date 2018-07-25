@@ -196,4 +196,14 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/big-icons@2x.png);
     background-size: 192px auto;
 }
+
+.fm-picker-dialog .summary-container .transfer-filetype-icon.chat {
+    background-image: url(../images/mega/fm-main-sprite_v3@2x.png);
+    background-size: 48px auto;
+ }
+
+ .fm-picker-dialog .contact-row.selected .contact-checkboxOn.small12::before, .fm-picker-dialog .contact-row:hover .small12::before {
+    background-image: url(../images/mega/fm-main-sprite_v3@2x.png);
+    background-size: 48px auto;
+}
 }

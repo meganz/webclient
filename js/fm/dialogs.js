@@ -281,7 +281,8 @@
                     contactElem += contactStatus + '">';
                     contactElem += '<span class="nw-contact-status"></span>';
                     contactElem += '<span class="nw-contact-name">' + escapeHTML(name) + '</span>';
-                    contactElem += '<span class="nw-contact-email">' + escapeHTML(email) + '</span> </span>';
+                    contactElem += '<span class="nw-contact-email">' + escapeHTML(email) + '</span>';
+                    contactElem += '<span class="nw-contact-checkbox">' + '</span> </span>';
                     contactElem = '<li id="cpy-dlg-chat-itm-' + handle + '">' + contactElem + '</li>';
                     return contactElem;
                 }
@@ -305,7 +306,8 @@
                         namesCombine += '...';
                     }
                     groupElem += '<span class="nw-contact-name group">' + escapeHTML(namesCombine) + '</span>';
-                    groupElem += '<span class="nw-contact-group">' + nb + ' chat members</span> </span>';
+                    groupElem += '<span class="nw-contact-group">' + nb + ' chat members </span>';
+                    groupElem += '<span class="nw-contact-checkbox">' + '</span> </span>';
                     groupElem = '<li id="cpy-dlg-chat-itm-' + handle + '">' + groupElem + '</li>';
                     return groupElem;
                 }

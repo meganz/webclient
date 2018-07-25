@@ -24353,6 +24353,21 @@ opacity: 1;
 .summary-container .transfer-filetype-icon.folder {
     margin: 7px 0 0 9px;
 }
+
+.fm-picker-dialog .summary-container .transfer-filetype-icon.chat {
+    background-image: url(../images/mega/fm-main-sprite_v3.png);
+    background-repeat: no-repeat;
+    background-size: 48px auto;
+    background-position: -12 -4517px;
+    width:24px;
+    height: 24px;
+    opacity: 0.4; 
+ }
+ 
+.fm-picker-dialog .summary-container .transfer-filetype-icon.folder {
+    background-position: -296px -717px;
+}
+
 .fm-picker-dialog .fm-breadcrumbs {
     margin-top: 8px;
 }
@@ -24379,6 +24394,11 @@ opacity: 1;
     max-width: 250px;
 }
 
+.fm-picker-dialog .delete-img.icon {
+    background-position: 0 -12400px;
+    opacity: 0.4; 
+}
+
 .fm-picker-dialog .summary-input .item-row .delete-img.icon {
     position: absolute;
     right: 8px;
@@ -24388,10 +24408,6 @@ opacity: 1;
 
 .fm-picker-dialog .summary-input .item-row .delete-img.icon:hover {
     opacity: 0.7;
-}
-
-.fm-picker-dialog .summary-input .item-row:hover .delete-img.icon {
-    display: inline-block;
 }
 
 .fm-picker-dialog .summary-input .item-row span {
@@ -24410,6 +24426,7 @@ opacity: 1;
     left: 0;
     display: inline-block;
     max-width: 412px;
+    color: #333;
 }
 
 .fm-picker-dialog .summary-row .summary-input .icon {
@@ -24625,15 +24642,16 @@ opacity: 1;
     max-width: -moz-calc(100% - 40px);
     max-width: calc(100% - 40px);
 }
-.fm-picker-dialog .nw-fm-tree-item:hover, .fm-picker-dialog .nw-fm-tree-item.dragover, .fm-picker-dialog .contact-row:hover,  .fm-picker-dialog .contact-row.dragover{
-    background-color: rgba(0,191,165,0.6);
+.fm-picker-dialog .fm-dialog-body .nw-fm-tree-item:hover, .fm-picker-dialog .fm-dialog-body .nw-fm-tree-item.dragover, .fm-picker-dialog .fm-dialog-body .contact-row:hover, .fm-picker-dialog .fm-dialog-body .contact-row.dragover, .fm-picker-dialog .fm-dialog-body .nw-contact-item:hover {
+    background-color: rgba(0,191,165,0.5);
     color: white;
 }
-.fm-picker-dialog .nw-fm-tree-item.selected, .fm-picker-dialog .contact-row.selected {
+
+.fm-picker-dialog .fm-dialog-body .nw-fm-tree-item.selected, .fm-picker-dialog .fm-dialog-body .contact-row.selected, .fm-picker-dialog .fm-dialog-body .nw-contact-item.selected {
     background-color: rgba(0,191,165,1);
     color: white;
 }
-.dialog-tree-panel-scroll .nw-fm-tree-item.selected span, .dialog-tree-panel-scroll .nw-fm-tree-item.dragover span, .dialog-tree-panel-scroll .nw-fm-tree-item:hover span {
+.dialog-tree-panel-scroll .nw-fm-tree-item.selected span, .dialog-tree-panel-scroll .nw-fm-tree-item.dragover span, .dialog-tree-panel-scroll .nw-fm-tree-item:hover span, .fm-picker-dialog .nw-contact-item:hover span, .fm-picker-dialog .nw-contact-item.selected span {
     color: white;
 }
 .fm-picker-dialog .nw-fm-tree-item.disabled, .dropdown-item.disabled {
@@ -24641,6 +24659,7 @@ opacity: 1;
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;
     opacity: 0.5;
+    background-position: 0 -12376px;
 }
 .fm-picker-dialog .nw-fm-tree-item.linked {
     position: relative;
@@ -24710,8 +24729,6 @@ opacity: 1;
     margin:0 8px 0 12px;
 }
 .fm-picker-dialog .contact-row.selected .contact24-icon.icon {
-    background-image: url(../images/mega/fm-main-sprite_v3.png);
-    background-repeat: no-repeat;
     background-position: -24px -12640px;
 }
 .fm-picker-dialog .contact-row .contact-checkboxOn.small12::before,  .fm-picker-dialog .contact-row .contact-checkboxOff.small12::before{
@@ -24843,13 +24860,7 @@ opacity: 1;
     text-align: center;
     display: block;
 }
-.user-management-view .admin-icon {
-    width:16px;
-    height: 18px;
-    background-position: -28px -12060px;
-    background-image: url(../images/mega/fm-main-sprite_v3.png);
-    background-repeat: no-repeat;
-}
+
 .fm-picker-dialog .dialog-subtitle {
     font-size: 14px;
     color: #999999;
@@ -24894,8 +24905,8 @@ opacity: 1;
     border:1px solid rgba(0,0,0,0.07);
 }
 
-.fm-picker-dialog .summary-input.placeholder span {
-    color: #bbbbbb;
+.fm-picker-dialog .summary-input.placeholder * {
+    color: #aaa;
 }
 
 .fm-picker-dialog .summary-input.placeholder:hover {
@@ -24908,7 +24919,7 @@ opacity: 1;
     border:1px solid rgba(0,0,0,0.2);
 }
 
-.fm-picker-dialog .summary-input.focus span {
+.fm-picker-dialog .summary-input.focus * {
     color: #cccccc;
 }
 
@@ -24917,7 +24928,7 @@ opacity: 1;
     border:1px solid rgba(0,0,0,0.2);
 }
 
-.fm-picker-dialog .summary-input.active span {
+.fm-picker-dialog .summary-input.active * {
         color: #333333;
 }
 
@@ -24926,7 +24937,7 @@ opacity: 1;
     border:1px solid rgba(0,0,0,0.2);
 }
 
-.fm-picker-dialog .summary-input.correct-input span {
+.fm-picker-dialog .summary-input.correct-input * {
     color: #888888;
 }
 
@@ -24940,7 +24951,7 @@ opacity: 1;
     border:1px solid rgba(217,0,7,0.5);
 }
 
-.fm-picker-dialog .summary-input.error span {
+.fm-picker-dialog .summary-input.error * {
     color: #333333;
 }
 
@@ -24950,7 +24961,7 @@ opacity: 1;
     opacity: 0.3;
 }
 
-.fm-picker-dialog .summary-input.disable span {
+.fm-picker-dialog .summary-input.disable * {
     color: #888;
 }
 
@@ -24963,12 +24974,9 @@ opacity: 1;
     border:1px solid rgba(0,191,165,0.5);
 }
 
-.fm-picker-dialog .summary-input.high-light span {
+.fm-picker-dialog .summary-input.high-light * {
     color: #888;
 }
-
-
-/*button */
 
 .default-white-button .icon, .default-light-green-button .icon, .default-grey-button .icon {
     width: 24px;
@@ -24981,3 +24989,100 @@ opacity: 1;
     background-repeat: no-repeat;
     float: left;
 }
+
+
+/* status: check-on/check-off needed to add to JS */
+.fm-picker-dialog .fm-dialog-body .nw-contact-item .nw-contact-checkbox {
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    right: 24px;
+    top: 5px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,0.2);
+    -webkit-box-shadow: 0 1 2px 0 rgba(0,0,0,0.2);
+    -moz-box-shadow: 0 1 2px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 1 2px 0 rgba(0,0,0,0.2);
+    display: none;
+    cursor: pointer;
+ }
+
+.fm-picker-dialog .fm-dialog-body .nw-contact-item .nw-contact-checkbox::before {
+    background-image: url(../images/mega/top-login-sprite_v10.png);
+    background-repeat: no-repeat;
+    background-size: 48px auto;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    content: " ";
+    background-position: -13px -2398px;
+ }
+
+ .fm-picker-dialog .fm-dialog-body .nw-contact-item:hover .nw-contact-checkbox {
+    display: block;
+    border: 1px solid rgba(255,255,255,0.5);
+ }
+
+  .fm-picker-dialog .fm-dialog-body .nw-contact-item.check-off:hover .nw-contact-checkbox::before {
+    display: none;
+ }
+
+ .fm-picker-dialog .fm-dialog-body .nw-contact-item.selected .nw-contact-checkbox {
+    display: block;
+    border: 1px solid rgba(255,255,255,0.5);
+ }
+
+.fm-picker-dialog .fm-dialog-body .nw-contact-item.check-on .nw-contact-checkbox {
+     display: block;
+     border: 1px solid #333;
+     opacity: 0.4;
+ }
+
+.fm-picker-dialog .fm-dialog-body .nw-contact-item.check-on .nw-contact-checkbox::before {
+    background-position: 0px -2398px;
+ }
+
+.fm-picker-dialog .summary-input .item-row:not(:last-child)::before {
+    content: " ";
+    width: calc(100% - 16px);
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    bottom: 0;
+    left: 8px;
+}
+
+.fm-picker-dialog .summary-row.unfold .summary-title {
+    vertical-align: top;
+    padding-top: 8px;
+}
+
+.fm-picker-dialog .summary-input.unfold .item-row:first-child .summary-ff-name {
+    max-width: 340px;
+}
+
+.fm-picker-dialog .summary-input.unfold .item-row:hover .delete-img.icon {
+    display: inline-block;
+}
+
+.fm-picker-dialog .summary-row .summary-input .item-row-group {
+    width: 100%;
+    max-height: 151px;
+    position: relative;
+    overflow: hidden;
+}
+
+
+
+
+
+
+
+
+
+

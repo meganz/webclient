@@ -1083,6 +1083,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
         if (foundChatRoom.roomId === chatRoom.roomId) {
             chatRoom.chatdUrl = null;
+            if (chatRoom.messagesBuff) {
+                chatRoom.messagesBuff.sendingListFlushed = false;
+            }
             if (chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
                 chatRoom.setState(
                     ChatRoom.STATE.JOINING,
@@ -1478,7 +1481,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     u_privEd25519,
                     u_pubEd25519
                 );
-
+                Object.keys(chatRoom.members).forEach(function(member) {
+                    chatRoom.protocolHandler.addParticipant(member);
+                });
                 chatRoom.protocolHandler.chatRoom = chatRoom;
                 self.decryptTopic(chatRoom);
                 self.join(chatRoom);
@@ -1758,8 +1763,10 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
         }
     };
 
-    MegaPromise.allDone(promises).always(function() {
-        _runEncryption();
+    ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
+        MegaPromise.allDone(promises).always(function() {
+            _runEncryption();
+        });
     });
 
     return tmpPromise;

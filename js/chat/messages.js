@@ -541,6 +541,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     self.haveMessages = false;
     self.joined = false;
+    self.sendingListFlushed = false;
     self.messageOrders = {};
 
     var loggerIsEnabled = localStorage['messagesBuffLogger'] === '1';
@@ -655,11 +656,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
         if (chatRoom.roomId === self.chatRoom.roomId) {
 
-
             var requestedMessagesCount = self.requestedMessagesCount || Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL;
             self.isRetrievingHistory = false;
             self.chatdIsProcessingHistory = false;
-
+            self.sendingListFlushed = true;
 
             if (
                 typeof(self.expectedMessagesCount) === 'undefined' ||
@@ -1761,15 +1761,23 @@ MessagesBuff.prototype._removeMessagesBefore = function(messageId) {
 MessagesBuff.prototype.getLowHighIds = function(returnNumsInsteadOfIds) {
     var self = this;
     var msg;
-    if (self.messages.length === 0) {
+    var msgsLen = self.messages.length;
+    if (msgsLen === 0) {
         return false;
     }
 
+    var tmpMsg;
     var foundFirst = false;
     var foundLast = false;
     var i = 0;
     do {
-        msg = self.messages.getItem(i++);
+        if (i >= msgsLen) {
+            break;
+        }
+        tmpMsg = self.messages.getItem(i++);
+        if (tmpMsg instanceof Message && tmpMsg.messageId.length === 11) {
+            msg = tmpMsg;
+        }
     }
     while (!(msg instanceof Message) || msg.messageId.length !== 11);
 
@@ -1778,7 +1786,13 @@ MessagesBuff.prototype.getLowHighIds = function(returnNumsInsteadOfIds) {
 
     var last = self.messages.length - 1;
     do {
-        msg = self.messages.getItem(last--);
+        if (last < 0) {
+            break;
+        }
+        tmpMsg = self.messages.getItem(last--);
+        if (tmpMsg instanceof Message && tmpMsg.messageId.length === 11) {
+            msg = tmpMsg;
+        }
     }
     while (!(msg instanceof Message) || msg.messageId.length !== 11);
 

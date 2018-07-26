@@ -45,7 +45,7 @@
     text-align: right;
 }
 .contacts-search .contacts-search-header input {
-    margin: 12px 72px 0 7px;
+    margin: 12px 116px 0 16px;
 }
 .contacts-search .contacts-search-header input:focus {
     margin: 12px 116px 0 16px;
@@ -136,6 +136,11 @@
     margin-top: 8px; 
     max-height: 72px;
     overflow: auto;
+}
+.contacts-search .selected-contact-block .selected-contact-card .user-card-name {
+    max-width: -webkit-calc(100% - 2px);
+    max-width: -moz-calc(100% - 2px);
+    max-width: calc(100% - 2px);
 }
 .popup.contacts-search .small-rounded-avatar {
     margin: 0 0 0 16px;

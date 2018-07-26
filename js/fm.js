@@ -1431,29 +1431,45 @@ function openContactInfoLink(contactLink) {
             $('.avatar-container-qr-contact', $dialog).html(curAvatar);
         }
         var contactStatus = 1;
-        if (ctHandle === u_handle) {
-            $('#qr-ctn-add', $dialog).addClass('disabled');
-            $('#qr-ctn-add', $dialog).off('click');
-            $('.qr-ct-exist', $dialog).text(l[18514]).removeClass('hidden');
-        }
-        else if (M.u[ctHandle] && M.u[ctHandle]._data.c) {
-            contactStatus = 2;
-            $('#qr-ctn-add', $dialog).addClass('disabled');
-            $('.qr-ct-exist', $dialog).text(l[17886]).removeClass('hidden');
-            $('#qr-ctn-add', $dialog).off('click');
+        if (u_handle) {
+            if (ctHandle === u_handle) {
+                $('#qr-ctn-add', $dialog).addClass('disabled');
+                $('#qr-ctn-add', $dialog).off('click');
+                $('.qr-ct-exist', $dialog).text(l[18514]).removeClass('hidden');
+            }
+            else if (M.u[ctHandle] && M.u[ctHandle]._data.c) {
+                contactStatus = 2;
+                $('#qr-ctn-add', $dialog).addClass('disabled');
+                $('.qr-ct-exist', $dialog).text(l[17886]).removeClass('hidden');
+                $('#qr-ctn-add', $dialog).off('click');
+            }
+            else {
+                $('.big-btn-txt', $dialog).text(l[101]);
+                $('#qr-ctn-add', $dialog).removeClass('disabled');
+                $('.qr-ct-exist', $dialog).addClass('hidden');
+                $('#qr-ctn-add', $dialog).rebind('click', function () {
+                    if (contactStatus === 1) {
+                        M.inviteContact(u_attr.email, em, null, contactLink);
+                    }
+                    $('#qr-ctn-add', $dialog).off('click');
+                    closeDialog();
+
+                    return false;
+                });
+            }
         }
         else {
             $('.big-btn-txt', $dialog).text(l[101]);
             $('#qr-ctn-add', $dialog).removeClass('disabled');
             $('.qr-ct-exist', $dialog).addClass('hidden');
             $('#qr-ctn-add', $dialog).rebind('click', function () {
-                if (contactStatus === 1) {
-                    M.inviteContact(u_attr.email, em, null, contactLink);
-                }
-                $('#qr-ctn-add', $dialog).off('click');
                 closeDialog();
+                var page = 'fm/contacts';
+                mBroadcaster.once('fm:initialized', function () {
+                    openContactInfoLink(contactLink);
+                });
 
-                return false;
+                return loadSubPage(page);
             });
         }
         $dialog.removeClass('hidden');

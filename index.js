@@ -345,11 +345,15 @@ function init_page() {
     if (pageBeginLetters === 'C!' && page.length > 2) {
         var ctLink = page.substring(2, page.length);
         if (!is_mobile) {
-            
-            mBroadcaster.once('fm:initialized', function () {
+            if (!u_type) {
                 openContactInfoLink(ctLink);
-            });
-            page = 'fm/contacts';
+            }
+            else {
+                page = 'fm/contacts';
+                mBroadcaster.once('fm:initialized', function () {
+                    openContactInfoLink(ctLink);
+                });
+            }
         }
         else {
             var processContactLink = function () {

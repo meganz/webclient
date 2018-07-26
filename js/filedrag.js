@@ -133,6 +133,9 @@
     }
 
     function FileDragEnter(e) {
+        if (d) {
+            console.log('DragEnter');
+        }
         if ($.dialog === 'avatar') {
             return;
         }
@@ -150,6 +153,9 @@
     }
 
     function FileDragHover(e) {
+        if (d) {
+            console.log('DragOver');
+        }
         e.stopPropagation();
         e.preventDefault();
     }
@@ -255,6 +261,9 @@
         }
     }
     function FileDragLeave(e) {
+        if (d) {
+            console.log('DragLeave');
+        }
         if ($.dialog === 'avatar') {
             return;
         }

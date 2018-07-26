@@ -126,6 +126,7 @@ var ChatdIntegration = function(megaChat) {
                 var chatRoom = self.megaChat.chats[chatRoomJid];
                 if (chatRoom) {
                     if (chatRoom.state !== ChatRoom.STATE.LEFT) {
+                        chatRoom.membersLoaded = false;
                         chatRoom.setState(ChatRoom.STATE.JOINING, true);
                     }
                 }
@@ -391,8 +392,6 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
 
         if (chatRoom && chatRoom.stateIsLeftOrLeaving() && actionPacket.ou !== u_handle) {
             self._cachedHandlers[roomId] = chatRoom.protocolHandler;
-            chatRoom.destroy(undefined, true);
-            chatRoom = false;
 
             if (actionPacket.url) {
                 Soon(finishProcess);
@@ -1056,23 +1055,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         }
     });
 
-    self.chatd.rebind('onRoomConnected.chatdInt' + chatRoomId, function(e, eventData) {
-        var foundChatRoom = self._getChatRoomFromEventData(eventData);
-
-        if (!foundChatRoom) {
-            self.logger.warn("Room not found for: ", e, eventData);
-            return;
-        }
-
-        if (foundChatRoom.roomId === chatRoom.roomId) {
-            if (chatRoom.state === ChatRoom.STATE.JOINING) {
-                chatRoom.setState(
-                    ChatRoom.STATE.READY
-                );
-            }
-        }
-    });
-
     self.chatd.rebind('onRoomDisconnected.chatdInt' + chatRoomId, function(e, eventData) {
         var foundChatRoom = self._getChatRoomFromEventData(eventData);
 
@@ -1087,6 +1069,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 chatRoom.messagesBuff.sendingListFlushed = false;
             }
             if (chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
+                chatRoom.membersLoaded = false;
                 chatRoom.setState(
                     ChatRoom.STATE.JOINING,
                     true
@@ -1104,6 +1087,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         }
 
         if (foundChatRoom.roomId === chatRoom.roomId) {
+            if (
+                chatRoom.state === ChatRoom.STATE.LEFT &&
+                eventData.priv >= 0 && eventData.priv < 255
+            ) {
+                // joining
+                chatRoom.membersLoaded = false;
+                chatRoom.setState(ChatRoom.STATE.JOINING, true);
+            }
 
             if (chatRoom.membersLoaded === false) {
                 if (eventData.priv < 255) {
@@ -1122,8 +1113,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 eventData.userId
                             );
                         }
-                        $(chatRoom).trigger('onMembersUpdated');
-                    }
+                        $(chatRoom).trigger('onMembersUpdated', eventData);
+                    };
+
                     ChatdIntegration._waitForProtocolHandler(chatRoom, addParticipant);
                 }
 
@@ -1158,8 +1150,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         );
                     }
 
-                    $(chatRoom).trigger('onMembersUpdated');
-                }
+                    $(chatRoom).trigger('onMembersUpdated', eventData);
+                };
+
                 ChatdIntegration._waitForProtocolHandler(chatRoom, deleteParticipant);
             }
         }

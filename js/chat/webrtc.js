@@ -2024,6 +2024,21 @@ Av.applyToStream = function(stream, av) {
     }
     return result;
 };
+
+Av.toString = function(av) {
+    if (av & Av.Audio) {
+        if (av & Av.Video) {
+            return 'a+v';
+        } else {
+            return 'a';
+        }
+    } else if (av & Av.Video) {
+        return 'v';
+    } else {
+        return '-';
+    }
+};
+
 var RTCMD = Object.freeze({
 //  CALL_REQUEST: 0, // initiate new call, receivers start ringing
     CALL_RINGING: 1, // notifies caller that there is a receiver and it is ringing
@@ -2295,6 +2310,68 @@ Call.prototype.termCodeToHistCallEndedCode = function(terminationCode) {
                 return CallManager.CALL_END_REMOTE_REASON.FAILED;
             }
     }
+};
+
+RtcModule.rtcmdToString = function(cmd, tx) {
+    // (opcode.1 chatid.8 userid.8 clientid.4 len.2) (type.1 data.(len-1))
+    if (cmd.length < 24) {
+        assert(false, "rtcmdToString: Command buffer length (" +
+            cmd.length + ") is less than 24 bytes. Data:\n" + Chatd.dumpToHex(cmd));
+    }
+    var opCode = cmd.charCodeAt(23);
+    var result = constStateToText(RTCMD, opCode);
+    result += ' chatId: ' + base64urlencode(cmd.substr(1, 8));
+    result += (tx ? ' to:' : ' from:') + base64urlencode(cmd.substr(9, 8));
+    result += ' clientId: 0x' + Chatd.dumpToHex(cmd, 17, 4, true);
+
+    var dataLen = Chatd.unpack16le(cmd.substr(21, 2)) - 1; // first data byte is the RTCMD opcode
+    if (dataLen > 0) {
+        assert(dataLen <= cmd.length - 24);
+        if (opCode === RTCMD.ICE_CANDIDATE) {
+            // FIXME: there is binary data before the candidate text, but it's variable length,
+            // so more complex parsing is required.
+            result += '\n' + cmd.substr(25, dataLen);
+        } else {
+            result += ' data(' + (Chatd.unpack16le(cmd.substr(21, 2)) - 1) + '): ';
+            if (dataLen > 64) {
+                result += Chatd.dumpToHex(cmd, 24, 64) + '...';
+            } else {
+                result += Chatd.dumpToHex(cmd, 24);
+            }
+        }
+    } else {
+        assert(dataLen === 0);
+    }
+
+    return [result, 24 + dataLen];
+};
+
+RtcModule.callDataToString = function(cmd, tx) {
+    // (opcode.1 chatid.8 userid.8 clientid.4 len.2) (payload.len)
+    var result = ' chatid: ' + base64urlencode(cmd.substr(1, 8));
+    if (!tx) {
+        result += ' from: ' + base64urlencode(cmd.substr(9, 8)) +
+        ' (0x' + Chatd.dumpToHex(cmd, 17, 4, true) + ')';
+    }
+    var len = Chatd.unpack16le(cmd.substr(21, 2));
+    if (len < 1) {
+        return [result, 23];
+    }
+    if (len < 10) {
+        result += ' data:\n' + Chatd.dumpToHex(cmd, 23);
+        return [result, 23 + len];
+    }
+
+    result += ' callid: ' + base64urlencode(cmd.substr(23, 8));
+    var type = cmd.charCodeAt(31);
+    result += ' type: ' + constStateToText(CallDataType, type);
+    var av = cmd.charCodeAt(32);
+    result += ' av: ' + Av.toString(av);
+    if (type === CallDataType.kTerminated) {
+        assert(len >= 11);
+        result += ' reason: ' + constStateToText(CallManager.CALL_END_REMOTE_REASON, cmd.charCodeAt(33));
+    }
+    return [result, 23 + len];
 };
 
 scope.RtcModule = RtcModule;

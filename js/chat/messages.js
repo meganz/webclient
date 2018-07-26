@@ -617,23 +617,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.trackDataChange();
         }
     });
-    self.chatd.rebind('onMembersUpdated.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-
-        if (!chatRoom) {
-            self.logger.warn("Message not found for: ", e, eventData);
-            return;
-        }
-
-        if (chatRoom.roomId === self.chatRoom.roomId) {
-            if (eventData.userId === u_handle) {
-                self.joined = true;
-                if (chatRoom.state === ChatRoom.STATE.JOINING) {
-                    chatRoom.setState(ChatRoom.STATE.READY);
-                }
-            }
-        }
-    });
 
     self.chatd.rebind('onMessageConfirm.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);

@@ -50,6 +50,7 @@ var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 
 var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
+var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
 
 /**
  * Check if the user is coming from a mobile device
@@ -1356,8 +1357,9 @@ if (is_ios) {
  * app if any cancel, verify, fm/ipc, newsignup, recover or account links are clicked in the app
  * because the new mobile site is not designed for those yet.
  */
-if (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
-    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' || page.substr(0, 4) === 'blog')) {
+if (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' || page.substr(0, 9) === 'newsignup' ||
+    page.substr(0, 7) === 'account' || page.substr(0, 4) === 'blog' ||
+    (is_old_windows_phone && page.substr(0, 7) === 'confirm'))) {
 
     var app;
     var mobileblog;

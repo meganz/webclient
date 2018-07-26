@@ -794,7 +794,7 @@ var notify = {
             case 'd':
                 return notify.renderRemovedSharedNode($notificationHtml, notification);
             case 'dshare':
-                return notify.renderDeletedShare($notificationHtml, userEmail);
+                return notify.renderDeletedShare($notificationHtml, userEmail, notification);
             case 'put':
                 return notify.renderNewSharedNodes($notificationHtml, notification, userEmail);
             case 'psts':
@@ -1040,19 +1040,73 @@ var notify = {
      * Render a deleted share notification
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
      * @param {String} email The email address
+     * @param {Object} notification notification object
      * @returns {Object} The HTML to be rendered for the notification
      */
-    renderDeletedShare: function($notificationHtml, email) {
+    renderDeletedShare: function ($notificationHtml, email, notification) {
 
         var title = '';
+        var notificationOwner;
+        var notificationTarget;
+        var notificationOrginating;
 
-        // If the email exists use string 'Access to folders shared by [X] was removed'
-        if (email) {
-            title = l[7879].replace('[X]', email);
+        // first we are parsing an action packet.
+        if (notification.data.orig) {
+            notificationOwner = notification.data.u;
+            notificationTarget = notification.data.rece;
+            notificationOrginating = notification.data.orig;
         }
         else {
-            // Otherwise use string 'Access to folders was removed.'
-            title = l[7880];
+            // otherwise we are parsing 'c' api response (initial notifications request)
+            notificationOwner = notification.data.o;
+            notificationOrginating = notification.data.u;
+            if (notificationOwner === u_handle) {
+                if (notificationOrginating === u_handle) {
+                    console.error('receiving a wrong notification, this notification shouldnt be sent to me',
+                        notification
+                    );
+                }
+                else {
+                    notificationTarget = notificationOrginating;
+                }
+            }
+            else {
+                notificationTarget = u_handle;
+            }
+
+            // if we are dealing with old notification which doesnt support the new data
+            if (!notificationOwner || notificationOwner === -1) {
+                // fall back to the old not correct notification
+                notificationOwner = notificationOrginating;
+            }
+            // receiving old action packet
+            // .rece without .orig
+            if (notification.data.rece) {
+                notificationOwner = notificationOrginating;
+            }
+
+        }
+        var sharingRemovedByReciver = notificationOrginating !== notificationOwner;
+
+        if (!sharingRemovedByReciver) {
+            // If the email exists use string 'Access to folders shared by [X] was removed'
+            if (email) {
+                title = l[7879].replace('[X]', email);
+            }
+            else {
+                // Otherwise use string 'Access to folders was removed.'
+                title = l[7880];
+            }
+        }
+        else {
+            var folderName = M.d[notification.data.n].name || '';
+            var removerEmail = notify.userEmails[notificationTarget];
+            if (removerEmail) {
+                title = l[19153].replace('{0}', removerEmail).replace('{1}', folderName);
+            }
+            else {
+                title = l[19154].replace('{0}', folderName);
+            }
         }
 
         // Populate other template information

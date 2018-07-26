@@ -3176,7 +3176,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         tmpId = 'account';
 
         // ToDo: Missing layout for empty Public Upload Page
-        if (!Object.keys(mega.megadrop.pufs).length) {// Hide PUF tab
+        if (!Object.keys(mega.megadrop.pufs).length || !Object.keys(mega.megadrop.pups).length) {// Hide PUF tab
             $('.fm-account-button.megadrop').addClass('hidden');
         }
         else {

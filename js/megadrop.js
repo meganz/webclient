@@ -1285,7 +1285,9 @@ mega.megadrop = (function() {
          * @param {String} nodeHandle Folder id
          *          */
         var remove = function settingsRemove(pupHandle, nodeHandle) {
-
+            if (d) {
+                console.log('settings.remove');
+            }
             // un-bind all events related to .expanded-widget
             $('.widget-container .expanded-widget').off();
 
@@ -1293,8 +1295,8 @@ mega.megadrop = (function() {
             $('#pup_' + pupHandle).remove();// Remove widget-card
             delExpanded(pupHandle);
             ui.nodeIcon(nodeHandle);
-
-            if (Object.keys(puf.items).length === 0 && M.currentdirid === 'account/megadrop') {
+            if ((Object.keys(puf.items).length === 0 || Object.keys(pup.items).length === 0)
+                && M.currentdirid === 'account/megadrop') {
                 M.openFolder(M.RootID);
             }
         };

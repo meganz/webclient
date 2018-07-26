@@ -783,8 +783,8 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                 }
                 else {
                     var myHost;
-                    if (location.href.indexOf('search') > -1) {
-                        myHost = location.href.substr(0, location.href.lastIndexOf('search') - 1);
+                    if (location.href.indexOf('/fm/search/') > -1) {
+                        myHost = location.href.substr(0, location.href.lastIndexOf('/fm/search/'));
                         location.replace(myHost);
                     }
                     else if (location.href.indexOf('/fm/chat/') > -1){

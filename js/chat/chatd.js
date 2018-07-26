@@ -692,7 +692,7 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
         var buf = String.fromCharCode(opCode) + cmd;
         self.cmdq += buf;
         if (self.loggerIsEnabled) {
-            self.logger.log("send:", Chatd.cmdToString(buf, true));
+            self.logger.debug("send:", Chatd.cmdToString(buf, true));
         }
     });
     return this.triggerSendIfAble();
@@ -705,7 +705,7 @@ Chatd.Shard.prototype.cmd = function(opCode, cmd) {
     }
     this.cmdq += buf;
     if (this.loggerIsEnabled) {
-        this.logger.log('send:', Chatd.cmdToString(buf, true));
+        this.logger.debug('send:', Chatd.cmdToString(buf, true));
     }
     return this.triggerSendIfAble();
 };
@@ -1663,9 +1663,10 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
             "type":message.type
             });
     }
-
+    var chatRoom = this.chatd.megaChat.getChatById(base64urlencode(this.chatId));
     // if we believe to be online, send immediately
-    if (this.chatd.chatIdShard[this.chatId].isOnline()) {
+    if (this.chatd.chatIdShard[this.chatId].isOnline() &&
+            chatRoom && chatRoom.messagesBuff && chatRoom.messagesBuff.sendingListFlushed) {
         this.chatd.chatIdShard[this.chatId].msg(this.chatId, messageConstructs);
     }
     return this.sendingnum >>> 0;
@@ -1922,7 +1923,7 @@ Chatd.Messages.prototype.joinrangehistViaMessagesBuff = function(chatId) {
 
     if (!firstLast) {
         if (d) {
-            console.warn("JOINRANGEHIST failed, getLowHighIds, returned err. Doing a regular .JOIN", e);
+            console.warn("JOINRANGEHIST failed, getLowHighIds, returned err. Doing a regular .JOIN");
         }
 
         self.chatd.cmd(
@@ -1930,9 +1931,6 @@ Chatd.Messages.prototype.joinrangehistViaMessagesBuff = function(chatId) {
             chatId,
             self.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE)
         );
-        if (chatRoom && chatRoom.messagesBuff && chatRoom.messagesBuff.messages.length > 0) {
-            console.error("clear the buffer, would need a full resync.");
-        }
         self.chatd.trigger('onMessagesHistoryRequest', {
             count: Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL,
             chatId: base64urlencode(chatId)

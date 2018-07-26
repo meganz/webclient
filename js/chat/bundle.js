@@ -12660,8 +12660,16 @@ React.makeElement = React['createElement'];
 	    });
 
 	    var membersSnapshot = {};
-	    self.rebind('onMembersUpdated.chatRoomMembersSync', function () {
+	    self.rebind('onMembersUpdated.chatRoomMembersSync', function (e, eventData) {
 	        var roomRequiresUpdate = false;
+
+	        if (eventData.userId === u_handle) {
+	            self.messagesBuff.joined = true;
+	            if (self.state === ChatRoom.STATE.JOINING) {
+	                self.setState(ChatRoom.STATE.READY);
+	            }
+	            roomRequiresUpdate = true;
+	        }
 
 	        Object.keys(membersSnapshot).forEach(function (u_h) {
 	            var contact = M.u[u_h];
@@ -13475,9 +13483,10 @@ React.makeElement = React['createElement'];
 
 	    self.callRequest = null;
 	    if (self.state !== ChatRoom.STATE.LEFT) {
+	        self.membersLoaded = false;
 	        self.setState(ChatRoom.STATE.JOINING, true);
 	        self.megaChat.trigger("onRoomCreated", [self]);
-	        return MegaPromise.resolve();;
+	        return MegaPromise.resolve();
 	    } else {
 	        return MegaPromise.reject();
 	    }

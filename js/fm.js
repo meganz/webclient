@@ -2487,6 +2487,7 @@ function closeDialog(ev) {
 
     delete $.dialog;
     delete $.mcImport;
+    treesearch = false;
 
     if ($.propertiesDialog) {
         // if the dialog was close from the properties dialog
@@ -2499,12 +2500,6 @@ function closeDialog(ev) {
 
         $('.fm-dialog').addClass('arrange-to-back');
         $('.fm-dialog.fm-picker-dialog').removeClass('arrange-to-back');
-    }
-    if ($.copyDialogContactsChangeToken) {
-        // a listner for contacts changes is added at copy dialog
-        // we need to remove it on dialog close
-        M.u.removeChangeListener($.copyDialogContactsChangeToken);
-        $.copyDialogContactsChangeToken = 0;
     }
 
     mBroadcaster.sendMessage('closedialog');

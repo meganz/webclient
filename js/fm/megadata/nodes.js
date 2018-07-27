@@ -2720,7 +2720,10 @@ MegaData.prototype.getNameByHandle = function(handle) {
             if (!result) {
                 var members = Object.keys(chat.members || {});
                 array.remove(members, u_handle);
-                result = members.map(this.getNameByHandle.bind(this)).join(', ');
+                result = members.map(function(h) {
+                    user = M.getUserByHandle(h);
+                    return user ? user.name && $.trim(user.name) || user.m : h;
+                }).join(', ');
             }
         }
     }

@@ -17651,7 +17651,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 
 .fm-picker-dialog-button, .fm-picker-dialog-button  {
     width: 100%;
-    height: 72px;
+    height: 64px;
     position: relative;
     cursor: pointer;
 }
@@ -17663,7 +17663,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     width: 56px;
     height: 56px;
     position: absolute;
-    top: 8px;
+    top: 4px;
     left: 0;
     transition: 0.1s;
     opacity: 0.3;
@@ -17711,7 +17711,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     border-radius: 4px;
     white-space: nowrap;
     left: 44px;
-    bottom: 24px;
+    bottom: 22px;
     -webkit-transition: left 0.5s ease-in, visibility 5s, opacity 0.3s ease-in;
     -moz-transition: left 0.5s ease-in, visibility 5s, opacity 0.3s ease-in;
     -o-transition: left 0.5s ease-in, visibility 5s, opacity 0.3s ease-in;
@@ -17736,7 +17736,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 
 .fm-picker-dialog .fm-picker-dialog-button .left-border {
     width: 3px;
-    height:72px;
+    height:64px;
     top: 0;
     left: 0;
     position: absolute;
@@ -17752,7 +17752,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 
 .fm-picker-dialog .side-pane .fm-picker-dialog-button.active::before{
-    opacity: 0.7;
+    opacity: 0.9;
 }
 
 .fm-picker-dialog .fm-picker-dialog-button.cloud56-icon.active .left-border{
@@ -24222,7 +24222,6 @@ opacity: 1;
     width: 620px;
     margin-left: -310px;
     margin-top: -300px;
-    position: absolute;
     z-index: 1119;
 }
 
@@ -24230,6 +24229,11 @@ opacity: 1;
     z-index: 500;
 }
 
+.fm-dialog.fm-picker-dialog .fm-picker-breadcrumbs {
+    white-space: nowrap;
+    max-width: 422px;
+    overflow: hidden;
+}
 
 .fm-picker-dialog .icon {
     background-image: url(../images/mega/fm-main-sprite_v3.png);
@@ -24291,18 +24295,17 @@ opacity: 1;
 
 .fm-picker-dialog .summary-row .summary-input {
     width: 422px;
-    height: auto;
-    max-height: 160px;
+    height: 32px;
+    max-height: 130px;
     display: table-cell;
     border-radius: 4px;
     box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 0px;
+    padding: 0;
     font-size: 14px;
     position: relative;
-    cursor: text;
     vertical-align: top;
     transition: 0.1s;
 }
@@ -24313,11 +24316,12 @@ opacity: 1;
     transition: 0.1s;
     box-sizing: border-box;
     left: 0px;
-    height: 38px;
-    line-height: 37px;
+    height: 32px;
+    line-height: 31px;
     white-space: nowrap;
     vertical-align: top;
     overflow: hidden;
+    bottom: 0;
 }
 
 .fm-picker-dialog .summary-input .item-row:hover {
@@ -24335,10 +24339,11 @@ opacity: 1;
     left: 8px;
 }
 
+
 .fm-picker-dialog .summary-input .summary-ff-name {
-    height: 38px;
+    height: 32px;
     max-width: 340px;
-    line-height: 37px;
+    line-height: 31px;
     margin-left: 36px;
     position: relative;
     display: inline-block;
@@ -24348,28 +24353,28 @@ opacity: 1;
     text-overflow:ellipsis;
 }
 .summary-container .transfer-filetype-icon {
-    margin: 7px 0 0 8px;
+    margin: 3px 0 0 8px;
 }
 .summary-container .transfer-filetype-icon.folder {
-    margin: 7px 0 0 9px;
+    margin: 3px 0 0 9px;
 }
 
 .fm-picker-dialog .summary-container .transfer-filetype-icon.chat {
     background-image: url(../images/mega/fm-main-sprite_v3.png);
     background-repeat: no-repeat;
     background-size: 48px auto;
-    background-position: -12 -4517px;
-    width:24px;
+    background-position: -12px -4517px;
+    width: 24px;
     height: 24px;
-    opacity: 0.4; 
- }
- 
+    opacity: 0.4;
+}
+
 .fm-picker-dialog .summary-container .transfer-filetype-icon.folder {
     background-position: -296px -717px;
 }
 
 .fm-picker-dialog .fm-breadcrumbs {
-    margin-top: 8px;
+    margin-top: 6px;
 }
 .fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg {
     padding: 0 0 0 35px;
@@ -24379,8 +24384,8 @@ opacity: 1;
     display: block !important;
 }
 .fm-picker-dialog .item-row .summary-status {
-    height: 38px;
-    line-height: 37px;
+    height: 32px;
+    line-height: 31px;
     padding: 0 10px 0 36px;
     position: relative;
     display: block;
@@ -24396,7 +24401,7 @@ opacity: 1;
 
 .fm-picker-dialog .delete-img.icon {
     background-position: 0 -12400px;
-    opacity: 0.4; 
+    opacity: 0.4;
 }
 
 .fm-picker-dialog .summary-input .item-row .delete-img.icon {
@@ -24412,9 +24417,9 @@ opacity: 1;
 
 .fm-picker-dialog .summary-input .item-row span {
     left: 0px;
-    height: 38px;
+    height: 32px;
     max-width: 300px;
-    line-height: 37px;
+    line-height: 31px;
     position: relative;
     white-space: nowrap;
     vertical-align: top;
@@ -24449,7 +24454,7 @@ opacity: 1;
 .fm-picker-dialog .summary-input .ff-name {
     display: inline-block;
     vertical-align: top;
-    line-height: 38px;
+    line-height: 32px;
     max-width: 90px;
     white-space: nowrap;
     overflow: hidden;
@@ -24491,20 +24496,20 @@ opacity: 1;
 }
 
 .fm-picker-dialog .summary-row .drop-down-icon.icon{
-    top: 8px;
+    top: 4px;
 }
 
 .fm-picker-dialog .summary-row .drop-up-icon.icon{
-    bottom: 8px;
+    bottom: 4px;
 }
 
 .fm-picker-dialog .summary-row .add-more-img.icon{
-    bottom: 8px;
+    bottom: 4px;
 }
 
 .fm-picker-dialog .fm-dialog-body {
     width: 100%;
-    height: 216px;
+    height: 280px;
     display: block;
     position: relative;
     padding: 0;
@@ -24515,7 +24520,7 @@ opacity: 1;
     left: 0;
     top: 0;
     width: 56px;
-    height: 216px;
+    height: 280px;
     box-sizing: border-box;
     display: inline-block;
 }
@@ -24628,7 +24633,7 @@ opacity: 1;
     opacity: 0.7;
 }
 .fm-picker-dialog .right-pane .dialog-tree-panel-scroll {
-    height: 168px;
+    height: 232px;
     margin: 8px 0 0 0;
     position: relative;
 }
@@ -24813,7 +24818,7 @@ opacity: 1;
     cursor: pointer;
 }
 .fm-picker-dialog .delete-img:hover {
-    opacity: 0.6;
+    opacity: 0.9;
 }
 .fm-picker-dialog .drop-down-icon {
     background-position: -11px -9850px;
@@ -24902,79 +24907,67 @@ opacity: 1;
 /* input type */
 .fm-picker-dialog .summary-input.placeholder {
     background-color: rgba(0,0,0,0.02);
-    border:1px solid rgba(0,0,0,0.07);
-}
-
-.fm-picker-dialog .summary-input.placeholder * {
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.07);
     color: #aaa;
 }
 
 .fm-picker-dialog .summary-input.placeholder:hover {
-    border:1px solid rgba(0,191,165,0.5);
+    box-shadow: 0 0 0 1px rgba(0,191,165,0.5);
     background-color: rgba(0,0,0,0.01);
 }
 
 .fm-picker-dialog .summary-input.focus {
     background-color: #ffffff;
-    border:1px solid rgba(0,0,0,0.2);
-}
-
-.fm-picker-dialog .summary-input.focus * {
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
     color: #cccccc;
 }
 
 .fm-picker-dialog .summary-input.active {
     background-color: #ffffff;
-    border:1px solid rgba(0,0,0,0.2);
-}
-
-.fm-picker-dialog .summary-input.active * {
-        color: #333333;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    color: #333333;
 }
 
 .fm-picker-dialog .summary-input.correct-input {
     background-color: #ffffff;
-    border:1px solid rgba(0,0,0,0.2);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    color: #666;
 }
-
-.fm-picker-dialog .summary-input.correct-input * {
-    color: #888888;
-}
-
 
 .fm-picker-dialog .summary-input.correct-input:hover {
-    border:1px solid rgba(0,191,165,0.5);
+    box-shadow: 0 0 0 1px rgba(0,191,165,0.5);
+}
+
+.fm-picker-dialog .summary-input.correct-input .choose-target {
+    display: none;
 }
 
 .fm-picker-dialog .summary-input.error {
     background-color: rgba(0,0,0,0.05);
-    border:1px solid rgba(217,0,7,0.5);
-}
-
-.fm-picker-dialog .summary-input.error * {
+    box-shadow: 0 0 0 1px rgba(217,0,7,0.5);
     color: #333333;
 }
 
+
 .fm-picker-dialog .summary-input.disable{
     background-color: rgba(0,0,0,0.02);
-    border:1px solid rgba(0,0,0,0.2);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
     opacity: 0.3;
-}
-
-.fm-picker-dialog .summary-input.disable * {
     color: #888;
 }
+
 
 .fm-picker-dialog .summary-input.error-message{
     color: #333333;
 }
 
-.fm-picker-dialog .summary-input.high-light {
-    background-color: rgba(0,191,165,0.05);
-    border:1px solid rgba(0,191,165,0.5);
+.fm-picker-dialog .summary-input.high-light .fm-picker-breadcrumbs {
+    display: none;
 }
 
-.fm-picker-dialog .summary-input.high-light * {
+.fm-picker-dialog .summary-input.high-light {
+    background-color: rgba(0,191,165,0.05);
+    box-shadow: 0 0 0 1px rgba(0,191,165,0.5);
     color: #888;
 }
 
@@ -25021,6 +25014,7 @@ opacity: 1;
     height: 100%;
     content: " ";
     background-position: -13px -2398px;
+    display: none;
  }
 
  .fm-picker-dialog .fm-dialog-body .nw-contact-item:hover .nw-contact-checkbox {
@@ -25059,7 +25053,7 @@ opacity: 1;
 
 .fm-picker-dialog .summary-row.unfold .summary-title {
     vertical-align: top;
-    padding-top: 8px;
+    padding-top: 4px;
 }
 
 .fm-picker-dialog .summary-input.unfold .item-row:first-child .summary-ff-name {
@@ -25072,17 +25066,28 @@ opacity: 1;
 
 .fm-picker-dialog .summary-row .summary-input .item-row-group {
     width: 100%;
-    max-height: 151px;
+    max-height: 130px;
     position: relative;
     overflow: hidden;
+    padding: 2px 0;
 }
 
+.fm-picker-dialog .summary-row .summary-input .item-row-group .jsPane {
+    top: 0;
+    bottom: 0;
+}
 
+.fm-picker-dialog .fm-dialog-body .nw-contact-item.selected .nw-contact-checkbox::before {
+    display: inline-block;
+}
 
+.fm-picker-dialog .fm-breadcrumbs .right-arrow-bg {
+    font-size: 14px;
+}
 
-
-
-
-
-
-
+.disabled {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+}

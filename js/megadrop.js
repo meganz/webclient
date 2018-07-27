@@ -1962,6 +1962,65 @@ mega.megadrop = (function() {
                 return false;
             }
         }
+        
+        /**
+         * Check user trying to upload folder.
+         */
+        if (d) {
+            console.log('Checking user uploading folder.');
+        }
+        if (event.dataTransfer
+                && event.dataTransfer.items
+                && event.dataTransfer.items.length > 0 && event.dataTransfer.items[0].webkitGetAsEntry) {
+            var items = event.dataTransfer.items;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].webkitGetAsEntry) {
+                    var item = items[i].webkitGetAsEntry();
+                    if (item && item.isDirectory) {
+                        // Hide Drop to Upload dialog and show warning notification
+                        $('.drag-n-drop.overlay').addClass('hidden');
+                        $('body').removeClass('overlayed');
+                        msgDialog('warninga', l[135], l[19179], false, false, false);
+                        return false;
+                    }
+                }
+            }
+        }
+        else if (is_chrome_firefox && event.dataTransfer) {
+            try {
+                var m = event.dataTransfer.mozItemCount;
+                for (var j = 0; j < m; ++j) {
+                    file = event.dataTransfer.mozGetDataAt("application/x-moz-file", j);
+                    if (file instanceof Ci.nsIFile) {
+                        filedrag_u = [];
+                        if (j === m - 1) {
+                            $.dostart = true;
+                        }
+                        var mozitem = new mozDirtyGetAsEntry(file); /*,e.dataTransfer*/
+                        if (mozitem.isDirectory) {
+                            // Hide Drop to Upload dialog and show warning notification
+                            $('.drag-n-drop.overlay').addClass('hidden');
+                            $('body').removeClass('overlayed');
+                            msgDialog('warninga', l[135], l[19179], false, false, false);
+                            return false;
+                        }
+                    }
+                    else {
+                        if (d) {
+                            console.log('FileSelectHandler: Not a nsIFile', file);
+                        }
+                    }
+                }
+            }
+            catch (e) {
+                alert(e);
+                Cu.reportError(e);
+            }
+        }
+        else {
+            // ie does not support DataTransfer.items property.
+            // Therefore cannot recognise what user upload is folder or not.
+        }
 
         for (var i = 0; files[i]; i++) {
             file = files[i];

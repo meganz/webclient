@@ -343,18 +343,27 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         var $usersTable = $('.user-management-list-table', subAccountsView);
 
         var todayData = quotas[Object.keys(quotas)[0]];
+        if (!todayData) {
+            return;
+        }
 
-        for (var sub in quotas) {
-            if (sub === 'timestamp') {
-                continue; // embedded attribute 
-            }
+        var subUsersData = todayData.u;
+        if (!subUsersData) {
+            return;
+        }
+
+        for (var sub in subUsersData) {
             numberOfSubs++;
-            totalStorage += quotas[sub][0] || 0;
-            totalBandwidth += quotas[sub][3] || 0;
+            var subStorage = subUsersData[sub].ts || 0;
+            var subBandwidth = subUsersData[sub].dl || 0;
+
+            totalStorage += subStorage;
+            totalBandwidth += subBandwidth;
+
             var $subTr = $('#' + sub, $usersTable);
             if ($subTr.length) {
-                var storage = numOfBytes(quotas[sub][0] || 0, 2);
-                var bandwidth = numOfBytes(quotas[sub][3] || 0, 2);
+                var storage = numOfBytes(subStorage, 2);
+                var bandwidth = numOfBytes(subBandwidth, 2);
                 $('.business-sub-storage-use span', $subTr).text(storage.size + ' ' + storage.unit);
                 $('.business-sub-transfer-use span', $subTr).text(bandwidth.size + ' ' + bandwidth.unit);
             }

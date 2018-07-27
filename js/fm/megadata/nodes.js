@@ -196,6 +196,9 @@ MegaData.prototype.getPath = function(id) {
         else if (!id || (id.length !== 11)) {
             return [];
         }
+        else if (window.megaChatIsReady && megaChat.chats[id]) {
+            return [id, 'contacts'];
+        }
 
         if (
             (id === this.RootID)
@@ -2710,6 +2713,18 @@ MegaData.prototype.getNameByHandle = function(handle) {
         if (user) {
             // XXX: fallback to email
             result = user.name && $.trim(user.name) || user.m;
+        }
+        else if (window.megaChatIsReady && megaChat.chats[handle]) {
+            var chat = megaChat.chats[handle];
+            result = chat.topic;
+            if (!result) {
+                var members = Object.keys(chat.members || {});
+                array.remove(members, u_handle);
+                result = members.map(function(h) {
+                    user = M.getUserByHandle(h);
+                    return user ? user.name && $.trim(user.name) || user.m : h;
+                }).join(', ');
+            }
         }
     }
     else if (handle.length === 8) {

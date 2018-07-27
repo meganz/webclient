@@ -355,7 +355,7 @@
 .fm-dialog:not(.exceeded) .pro-plan-descr::after {
     content: '';
     display: block;
-    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-image: url(../images/mega/top-login-sprite_v10.png);
     background-repeat: no-repeat;
     background-position: -24px -2256px;
     position: absolute;
@@ -1245,12 +1245,12 @@ li.token-input-token-invite .input-close {
     margin-right: 8px;
 }
 .invitation-dialog.table-cell span.desc {
-    background-image: url(../images/mega/fm-main-sprite_v2.png);
+    background-image: url(../images/mega/fm-main-sprite_v3.png);
     background-position: right -11445px;
     background-repeat: no-repeat;
 }
 .invitation-dialog.table-cell span.asc {
-    background-image: url(../images/mega/fm-main-sprite_v2.png);
+    background-image: url(../images/mega/fm-main-sprite_v3.png);
     background-position: right -11475px;
     background-repeat: no-repeat;
 }

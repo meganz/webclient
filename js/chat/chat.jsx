@@ -788,6 +788,7 @@ Chat.prototype.reorderContactTree = function() {
 Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUrl, setAsActive) {
     var self = this;
     type = type || "private";
+    setAsActive = setAsActive === true;
 
     var roomId = chatId;
 

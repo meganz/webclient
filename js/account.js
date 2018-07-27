@@ -207,7 +207,9 @@ function u_checklogin3a(res, ctx) {
         // If they have seen some Public Service Announcement before logging in and saved that in localStorage, now
         // after logging in, send that to the API so that they don't see the same PSA again. The API will retain the
         // highest PSA number if there is a difference.
-        psa.updateApiWithLastPsaSeen(u_attr['^!lastPsa']);
+        if (typeof psa !== 'undefined') {
+            psa.updateApiWithLastPsaSeen(u_attr['^!lastPsa']);
+        }
 
         if (r > 2 && !is_embed) {
             return mBroadcaster.crossTab.initialize(function() {

@@ -1556,8 +1556,10 @@ function init_page() {
         location.assign('/');
     }
 
-    // Initialise the Public Service Announcement system
-    psa.init();
+    // Initialise the Public Service Announcement system if loaded
+    if (typeof psa !== 'undefined') {
+        psa.init();
+    }
 
     // Initialise the update check system
     if (typeof alarm !== 'undefined') {

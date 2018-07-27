@@ -112,7 +112,9 @@ if (typeof loadingInitDialog === 'undefined') {
             mega.loadReport.stepTimeStamp = Date.now();
 
             // If the PSA is visible reposition the account loading bar
-            psa.repositionAccountLoadingBar();
+            if (typeof psa !== 'undefined') {
+                psa.repositionAccountLoadingBar();
+            }
         }
         if (progress) {
             $('.loader-percents').width(progress + '%');

@@ -119,7 +119,7 @@
     width: 24px;
     height: 11px;
     z-index: 123;
-    background-image: url(../images/mega/top-login-sprite_v10.png);
+    background-image: url(../images/mega/top-login-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: 0 -2249px;
 }
@@ -238,7 +238,7 @@
     right: 8px;
     top: 50%;
     margin: -4px 0 0 0;
-    background-image: url(../images/mega/top-login-sprite_v10.png);
+    background-image: url(../images/mega/top-login-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: -30px -1816px;
 }
@@ -392,7 +392,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     content: '';
     width: 14px;
     height: 14px;
-    background-image: url(../images/mega/top-login-sprite_v10.png);
+    background-image: url(../images/mega/top-login-sprite_v11.png);
 }
 .dropdown.text-block {
     font-size: 14px;
@@ -688,7 +688,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     right:10px;
     top: 10px;
     z-index: 10;
-    background-image: url(../images/mega/top-login-sprite_v10.png);
+    background-image: url(../images/mega/top-login-sprite_v11.png);
     background-position: 6px -1157px;
     background-repeat: no-repeat;
     cursor: pointer;

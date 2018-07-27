@@ -282,11 +282,11 @@
         if ($.copyToShare) {
             items = [];
             single = true;
-            $('.summary-target-title', $dialog).text('Selected items:');
+            $('.summary-target-title', $dialog).text(l[19180]);
             $('.summary-selected', $dialog).addClass('hidden');
         }
         else {
-            $('.summary-target-title', $dialog).text('Target:');
+            $('.summary-target-title', $dialog).text(l[19181]);
 
             if ($.onImportCopyNodes) {
                 $('.summary-selected', $dialog).addClass('hidden');

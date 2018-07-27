@@ -122,7 +122,7 @@ function u_checklogin3a(res, ctx) {
         u_attr = res;
         var exclude = [
             'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
-            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup', 'since', 'ut'
+            'ts', 'u', 'currk', 'flags', 'lup', 'since', 'ut'
         ];
 
         for (var n in u_attr) {
@@ -169,17 +169,6 @@ function u_checklogin3a(res, ctx) {
         // Flags is a generic object for various things
         if (typeof u_attr.flags !== 'undefined') {
 
-            // If the 'psa' Public Service Announcement flag is set, this is the current announcement being sent out
-            if (typeof u_attr.flags.psa !== 'undefined') {
-
-                // Get the last seen announcement private attribute
-                var currentAnnounceNum = u_attr.flags.psa;
-                var lastSeenAttr = (typeof u_attr['*!lastPsaSeen'] !== 'undefined') ? u_attr['*!lastPsaSeen'] : null;
-
-                // Set the values we need to know if the PSA should be shown, then show the announcement
-                psa.setInitialValues(currentAnnounceNum, lastSeenAttr);
-            }
-
             // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
             if (typeof u_attr.flags.mcs !== 'undefined') {
                 localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
@@ -213,6 +202,13 @@ function u_checklogin3a(res, ctx) {
         }
         else {
             r = 3;      // Fully registered
+        }
+
+        // If they have seen some Public Service Announcement before logging in and saved that in localStorage, now
+        // after logging in, send that to the API so that they don't see the same PSA again. The API will retain the
+        // highest PSA number if there is a difference.
+        if (typeof psa !== 'undefined') {
+            psa.updateApiWithLastPsaSeen(u_attr['^!lastPsa']);
         }
 
         if (r > 2 && !is_embed) {

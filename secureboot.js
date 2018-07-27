@@ -1941,6 +1941,7 @@ else if (!b_u) {
     jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
@@ -1950,6 +1951,7 @@ else if (!b_u) {
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
+    jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
@@ -1981,7 +1983,6 @@ else if (!b_u) {
         jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});

@@ -1556,7 +1556,7 @@ function init_page() {
         location.assign('/');
     }
 
-    // Initialise the Public Service Announcement system
+    // Initialise the Public Service Announcement system if loaded
     if (typeof psa !== 'undefined') {
         psa.init();
     }

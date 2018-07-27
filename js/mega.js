@@ -112,7 +112,7 @@ if (typeof loadingInitDialog === 'undefined') {
             mega.loadReport.stepTimeStamp = Date.now();
 
             // If the PSA is visible reposition the account loading bar
-            if (!is_mobile) {
+            if (typeof psa !== 'undefined') {
                 psa.repositionAccountLoadingBar();
             }
         }

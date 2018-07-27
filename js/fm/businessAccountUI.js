@@ -341,6 +341,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         var totalBandwidth = 0;
 
         var $usersTable = $('.user-management-list-table', subAccountsView);
+
+        var todayData = quotas[Object.keys(quotas)[0]];
+
         for (var sub in quotas) {
             if (sub === 'timestamp') {
                 continue; // embedded attribute 

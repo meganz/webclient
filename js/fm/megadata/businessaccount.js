@@ -182,9 +182,10 @@ BusinessAccount.prototype.getSubAccountMKey = function (subUserHandle) {
 /**
  * Function to get Quota usage info for the master account and each sub account.
  * @param {boolan} forceUpdate      a flag to force updating the cached values
+ * @param {Object} fromToDate      [optional] object contains .fromDate and .toDate YYYYMMDD
  * @returns {Promise}               Resolves operation result
  */
-BusinessAccount.prototype.getQuotaUsage = function (forceUpdate) {
+BusinessAccount.prototype.getQuotaUsage = function (forceUpdate, fromToDate) {
     "use strict";
     var operationPromise = new MegaPromise();
     if (!forceUpdate) {
@@ -201,6 +202,12 @@ BusinessAccount.prototype.getQuotaUsage = function (forceUpdate) {
         "a": "sbu", // business sub account operation
         "aa": "q" // get quota info
     };
+
+    if (fromToDate && fromToDate.fromDate && fromToDate.toDate
+        && fromToDate.fromDate.length === fromToDate.toDate === 8) {
+        request.fd = fromToDate.fromDate;
+        request.td = fromToDate.toDate;
+    }
 
     api_req(request, {
         callback: function (res) {

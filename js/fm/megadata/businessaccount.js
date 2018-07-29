@@ -2,7 +2,7 @@
  * a class to apply actions on business account in collaboration with API
  */
 function BusinessAccount() {
-    this.QuotaUpdateFreq = 15000; // 15 sec - default threshold to update quotas info
+    this.QuotaUpdateFreq = 30000; // 30 sec - default threshold to update quotas info
 }
 
 /**

@@ -625,27 +625,40 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         if (!quotas) {
             return;
         }
+
+        var todayData = quotas[Object.keys(quotas)[0]];
+        if (!todayData) {
+            return;
+        }
+
+        var subUsersData = todayData.u;
+        if (!subUsersData) {
+            return;
+        }
+
+        var subUserStats = subUsersData[subUserHandle];
+        if (!subUserStats) {
+            return;
+        }
         
         var totalStorage = 0;
         var totalBandwidth = 0;
-        // var inboxHandle = quotas[subUserHandle][2]["4"];
-        var rootHandle = quotas[subUserHandle][2]["2"];
-        var rubbishHandle = quotas[subUserHandle][2]["3"];
-        // var inboxTotal = quotas[subUserHandle][1][inboxHandle][0] || 0;
-        var rootTotal = quotas[subUserHandle][1][rootHandle][0] || 0;
-        var rubbishTotal = quotas[subUserHandle][1][rubbishHandle][0] || 0;
-        var inshareTotal = 0;
+        
+        var rootTotal = subUserStats["2"][0] || 0;
+        var rubbishTotal = subUserStats["4"][0] || 0;
+        var inshareInternalTotal = subUserStats["isi"][0] || 0;
+        var inshareExternalTotal = subUserStats["ise"][0] || 0;
+        var outshareTotal = subUserStats["os"][0] || 0;
 
 
-        totalStorage = quotas[subUserHandle][0] || 0;
-        totalBandwidth = quotas[subUserHandle][3] || 0;
+        totalStorage = subUserStats["ts"][0] || 0;
+        totalBandwidth = subUserStats["dl"][0] || 0;
             
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
         var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
-        // var inboxTotalFormatted = numOfBytes(inboxTotal, 2);
         var rootTotalFormatted = numOfBytes(rootTotal, 2);
         var rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
-        var inshareTotalFormatted = numOfBytes(inshareTotal, 2);
+        var inshareInternalTotalFormatted = numOfBytes(inshareInternalTotal, 2);
 
         $('.user-management-view-data .user-management-storage .storage-transfer-data',
             $subAccountContainer).text(totalStorageFormatted.size + ' ' + totalStorageFormatted.unit);

@@ -200,9 +200,9 @@ describe("account unit test", function() {
 
             it("public attribute, two params", function() {
 
-                mega.attr.get('me3456789xw', 'puEd255');
+                mega.attr.get('me3456789xz', 'puEd255');
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '+puEd255', v: 1});
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xz', ua: '+puEd255', v: 1});
             });
 
             it("private attribute", function() {

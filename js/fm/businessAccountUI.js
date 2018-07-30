@@ -5,12 +5,15 @@
 function BusinessAccountUI() {
     "use strict";
     if (!mega.buinsessController) {
+         /**@type {BusinessAccount} */
         this.business = new BusinessAccount();
         mega.buinsessController = this.business;
         mBroadcaster.addListener('business:subuserUpdate', this.UIEventsHandler);
+        this.initialized = false;
     }
     else {
         this.business = mega.buinsessController;
+        this.initialized = true;
     }
 
     // private function to hide all business accounts UI divs.
@@ -19,10 +22,13 @@ function BusinessAccountUI() {
         $('.user-management-list-table', $businessAccountContianer).addClass('hidden');
         $('.user-management-subaccount-view-container', $businessAccountContianer).addClass('hidden');
         $('.user-management-overview-container', $businessAccountContianer).addClass('hidden');
+        $('.user-management-landing-page.user-management-view', $businessAccountContianer).addClass('hidden');
 
         // hide any possible grid or block view.
         $('.files-grid-view, .fm-blocks-view').addClass('hidden');
-        M.megaRender.cleanupLayout(false, [], '');
+        if (M.megaRender) {
+            M.megaRender.cleanupLayout(false, [], '');
+        }
 
         // view left panel tabs headers [enabled and disabled] account
         $('.fm-left-panel .nw-tree-panel-header').addClass('hidden');
@@ -73,9 +79,10 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     }
     $('.fm-right-files-block').removeClass('hidden');
 
-    if (subAccounts.length) { // no subs, some new UI
+    this.URLchanger('');
 
-        return;
+    if (subAccounts.length) { // no subs
+        return this.viewLandingPage();
     }
 
     subAccountsView.removeClass('hidden'); // un-hide the container
@@ -139,6 +146,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 var $currUser = $tr_user.clone(true); // sub-users table
                 var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
                 colorBg = false;
+                $currUserLeftPane.removeClass('hidden');
 
                 $currUser.attr('id', subUsers[h].u);
                 $currUserLeftPane.attr('id', subUsers[h].u);
@@ -508,6 +516,26 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
 
 };
 
+/** Function to show landing page, for admins without sub-users yet */
+BusinessAccountUI.prototype.viewLandingPage = function () {
+    "use strict";
+    this.initUItoRender();
+    var mySelf = this;
+
+    var $businessAccountContainer = $('.files-grid-view.user-management-view');
+    var $landingContainer = $('.user-management-landing-page.user-management-view', $businessAccountContainer);
+
+    $('.content-panel.user-management .nw-user-management-item').removeClass('selected').addClass('hidden');
+
+    $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
+        .on('click.subuser', function addSubUserClickHandler() {
+            mySelf.showAddSubUserDialog();
+        });
+
+    $businessAccountContainer.removeClass('hidden'); // BA container
+    $landingContainer.removeClass('hidden');
+};
+
 /**
  * A function to show the sub-user info page
  * @param {string} subUserHandle        sub-user handle to view the info page for
@@ -527,6 +555,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         console.error('at view sub-user info, with a handle we cant find!');
         return;
     }
+    this.URLchanger(subUser.u);
 
     var uName = from8(base64urldecode(subUser.firstname)) + ' ' +
         from8(base64urldecode(subUser.lastname));
@@ -602,8 +631,14 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
                     if (adminAnswer) {
                         var opPromise = mySelf.business.activateSubAccount(subUserHandle);
                         opPromise.done(
-                            function (st,res,req) {
-                                mySelf.viewSubAccountInfoUI(subUserHandle);
+                            function (st, res, req) {
+                                if (res === 0) {
+                                    mySelf.viewSubAccountInfoUI(subUserHandle);
+                                }
+                                else if (typeof res === 'object') {
+                                    res.m = subUser.e;
+                                    mySelf.showAddSubUserDialog(res);
+                                }
                             }
                         ).fail(
                             function () {
@@ -617,11 +652,15 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             }
         });
 
+    // event handler for data-migration of a sub-user
+    $subAccountContainer.find('.profile-button-container .migrate-data').off('click.subuser')
+        .on('click.subuser', function migrateData_ClickHandler() {
+            mySelf.migrateSubUserData(subUserHandle);
+        });
+
+
     // private function to fill quota info
     var fillQuotaInfo = function (st, quotas) {
-
-        return;
-
         if (!quotas) {
             return;
         }
@@ -644,34 +683,73 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var totalStorage = 0;
         var totalBandwidth = 0;
         
-        var rootTotal = subUserStats["2"][0] || 0;
-        var rubbishTotal = subUserStats["4"][0] || 0;
-        var inshareInternalTotal = subUserStats["isi"][0] || 0;
-        var inshareExternalTotal = subUserStats["ise"][0] || 0;
-        var outshareTotal = subUserStats["os"][0] || 0;
+        var emptyArray = [0, 0, 0, 0, 0];
 
+        var rootInfo = subUserStats["2"] || emptyArray;
+        var rubbishInfo = subUserStats["4"] || emptyArray;
+        var inshareInternalInfo = subUserStats["isi"] || emptyArray;
+        var inshareExternalInfo = subUserStats["ise"] || emptyArray;
+        var outshareInfo = subUserStats["os"] || emptyArray;
 
-        totalStorage = subUserStats["ts"][0] || 0;
-        totalBandwidth = subUserStats["dl"][0] || 0;
+        totalStorage = subUserStats["ts"] || 0;
+        totalBandwidth = subUserStats["dl"] || 0;
             
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
         var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
-        var rootTotalFormatted = numOfBytes(rootTotal, 2);
-        var rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
-        var inshareInternalTotalFormatted = numOfBytes(inshareInternalTotal, 2);
+        var rootTotalFormatted = numOfBytes(rootInfo[0], 2);
+        var rubbishTotalFormatted = numOfBytes(rubbishInfo[0], 2);
+        var inshareInternalTotalFormatted = numOfBytes(inshareInternalInfo[0], 2);
+        var inshareExternalTotalFormatted = numOfBytes(inshareExternalInfo[0], 2);
+        var outshareTotalFormatted = numOfBytes(outshareInfo[0], 2);
 
+        var versionsTotalFormatted = numOfBytes(rootInfo[3] + rubbishInfo[3]
+            + inshareInternalInfo[3] + inshareExternalInfo[3] + outshareInfo[3], 2);
+
+        // fill in UI
         $('.user-management-view-data .user-management-storage .storage-transfer-data',
             $subAccountContainer).text(totalStorageFormatted.size + ' ' + totalStorageFormatted.unit);
         $('.user-management-view-data .user-management-transfer .storage-transfer-data',
             $subAccountContainer).text(totalBandwidthFormatted.size + ' ' + totalBandwidthFormatted.unit);
-        //$('.user-management-view-data .subaccount-view-used-storage-transfer .folder-occupy.root',
-        //    $subAccountContainer).text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
-        //$('.user-management-view-data .subaccount-view-used-storage-transfer .folder-occupy.inbox',
-        //    $subAccountContainer).text(inboxTotalFormatted.size + ' ' + inboxTotalFormatted.unit);
-        //$('.user-management-view-data .subaccount-view-used-storage-transfer .folder-occupy.inshare',
-        //    $subAccountContainer).text(inshareTotalFormatted.size + ' ' + inshareTotalFormatted.unit);
-        //$('.user-management-view-data .subaccount-view-used-storage-transfer .folder-occupy.rubbish',
-        //    $subAccountContainer).text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
+
+        var $cloudDriveSection = $('.user-management-view-data .subaccount-view-used-data .used-storage-info.ba-root',
+            $subAccountContainer);
+        var $inShareSection = $('.user-management-view-data .subaccount-view-used-data .used-storage-info.ba-inshare',
+            $subAccountContainer);
+        var $inShareExSection = $('.user-management-view-data .subaccount-view-used-data' +
+            ' .used-storage-info.ba-inshare-ex', $subAccountContainer);
+        var $outShareSection = $('.user-management-view-data .subaccount-view-used-data' +
+            ' .used-storage-info.ba-outshare', $subAccountContainer);
+        var $rubbishSection = $('.user-management-view-data .subaccount-view-used-data' +
+            ' .used-storage-info.ba-rubbish', $subAccountContainer);
+        var $versionsSection = $('.user-management-view-data .subaccount-view-used-data' +
+            ' .used-storage-info.ba-version', $subAccountContainer);
+
+        $cloudDriveSection.find('.ff-occupy').text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
+        $cloudDriveSection.find('.folder-number').text(rootInfo[2] + ' ' + l[2035]);
+        $cloudDriveSection.find('.file-number').text(rootInfo[1] + ' ' + l[2034]);
+
+        $inShareSection.find('.ff-occupy').text(inshareInternalTotalFormatted.size + ' ' +
+            inshareInternalTotalFormatted.unit);
+        $inShareSection.find('.folder-number').text(inshareInternalInfo[2] + ' ' + l[2035]);
+        $inShareSection.find('.file-number').text(inshareInternalInfo[1] + ' ' + l[2034]);
+
+        $inShareExSection.find('.ff-occupy').text(inshareExternalTotalFormatted.size + ' ' +
+            inshareExternalTotalFormatted.unit);
+        $inShareExSection.find('.folder-number').text(inshareExternalInfo[2] + ' ' + l[2035]);
+        $inShareExSection.find('.file-number').text(inshareExternalInfo[1] + ' ' + l[2034]);
+
+        $outShareSection.find('.ff-occupy').text(outshareTotalFormatted.size + ' ' +
+            outshareTotalFormatted.unit);
+        $outShareSection.find('.folder-number').text(outshareInfo[2] + ' ' + l[2035]);
+        $outShareSection.find('.file-number').text(outshareInfo[1] + ' ' + l[2034]);
+
+        $rubbishSection.find('.ff-occupy').text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
+        $rubbishSection.find('.folder-number').text(rubbishInfo[2] + ' ' + l[2035]);
+        $rubbishSection.find('.file-number').text(rubbishInfo[1] + ' ' + l[2034]);
+
+        $versionsSection.find('.ff-occupy').text(versionsTotalFormatted.size + ' ' + versionsTotalFormatted.unit);
+        $versionsSection.find('.file-number').text((rootInfo[4] + rubbishInfo[4]
+            + inshareInternalInfo[4] + inshareExternalInfo[4] + outshareInfo[4]) + ' ' + l[2034]);
     };
 
     // viewing the right buttons
@@ -846,9 +924,12 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
 };
 
 /**
- *  showes the add sub-user dialog
- * */
-BusinessAccountUI.prototype.showAddSubUserDialog = function () {
+ * shows the add sub-user dialog, if result is passed, the result dialog will be shown
+ * @param {object} result   an object contain password + sub-user handle
+ */
+BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
+    "use strict";
+
     var $dialog = $('.user-management-add-user-dialog.user-management-dialog');
     var mySelf = this;
 
@@ -873,6 +954,24 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function () {
     };
 
     clearDialog(); // remove any previous data
+
+    // checking if we are passing a valid result object
+    if (result && result.lp && result.u && result.m) {
+        var $addContianer = $('.dialog-input-container', $dialog);
+        var $resultContianer = $('.verification-container', $dialog);
+
+        var subUserDefaultAvatar = useravatar.contact(result.u);
+        $('.new-sub-user', $resultContianer).html(subUserDefaultAvatar);
+        $('.sub-e', $resultContianer).text(result.m);
+        $('.sub-p', $resultContianer).text(result.lp);
+
+        $addContianer.addClass('hidden');
+        $resultContianer.removeClass('hidden');
+        $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
+        $('.licence-bar', $dialog).addClass('hidden');
+        $('.dialog-subtitle', $dialog).removeClass('hidden');
+    }
+
 
     // event handler for "X" icon to close the dialog
     $('.delete-img.icon', $dialog).off('click.subuser')
@@ -1080,6 +1179,165 @@ BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
     });
 };
 
+
+/**
+ * Start data migration of a sub-user
+ * @param {string} subUserHandle            sub-user's handle
+ */
+BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
+    "use strict";
+    if (!subUserHandle || subUserHandle.length !== 11) {
+        return;
+    }
+    if (!M.suba[subUserHandle]) {
+        return;
+    }
+    var mySelf = this;
+    loadingDialog.pshow();
+
+
+    // all operations are done in BusinessAccount class level.
+    // Here we only allow user interaction
+
+    /** Steps:
+     * 1- getting sub-user tree
+     * 2- getting sub-user master-key
+     * 3- decrypting
+     * 4- copying to master account
+     */
+    // failed
+    var failing = function (msg) {
+        loadingDialog.phide();
+        msgDialog('warningb', '', msg);
+        return;
+    };
+
+    // getting sub-user tree.
+    var gettingSubTreePromise = this.business.getSubUserTree(subUserHandle);
+
+    gettingSubTreePromise.fail(
+        function getTreefailed(st, res, m) {
+            if (d) {
+                console.error("getting sub-user tree has failed! " + res + " --" + m);
+            }
+            return failing(l[19146]);
+        }
+    );
+
+    gettingSubTreePromise.done(
+        function getTreeOk(st, treeResult) {
+            // getting sub-user master-key
+            var gettingSubMasterKey = mySelf.business.getSubAccountMKey(subUserHandle);
+
+            gettingSubMasterKey.fail(
+                function getMKeyfailed(mkSt, mkRes, mkM) {
+                    if (d) {
+                        console.error("getting sub-user Master key has failed! " + mkRes + " --" + mkM);
+                    }
+                    return failing(l[19146]);
+                }
+            );
+
+            gettingSubMasterKey.done(
+                function getMKeyOK(st2, MKeyResult) {
+                    // sub-user tree decrypting
+                    var treeObj = mySelf.business.decrypteSubUserTree(treeResult.f, MKeyResult.k);
+                    if (!treeObj) {
+                        if (d) {
+                            console.error("decrypting sub-user tree with the Master key has failed! "
+                                + "although the key and tree fetching succeeded");
+                        }
+                        return failing(l[19146]);
+                    }
+                    else {
+
+                        var doMigrateSubUserDate = function (isOK) {
+                            if (!isOK) {
+                                return failing(l[19148].replace('{0}', M.suba[subUserHandle].e));
+                            }
+
+                            // name the folder as the sub-user email + timestamp.
+                            var folderName = M.suba[subUserHandle].e;
+                            folderName += '_' + Date.now();
+
+                            var cpyPromise = mySelf.business.copySubUserTreeToMasterRoot(treeObj.tree, folderName);
+
+                            cpyPromise.fail(
+                                function copySubUserFailHandler(stF, errF, desF) {
+                                    if (d) {
+                                        console.error("copying sub-user data key has failed! " + errF + " --" + desF);
+                                    }
+                                    return failing(l[19146]);
+                                }
+                            );
+
+                            cpyPromise.done(
+                                function copySubUserSuccHandler() {
+                                    loadingDialog.phide();
+                                    msgDialog('info', '', l[19149].replace('{0}', M.suba[subUserHandle].e)
+                                        .replace('{1}', folderName));
+                                    return;
+                                }
+                            );
+
+                        };
+
+                        if (treeObj.errors.length || treeObj.warns.length) {
+                            var msgMsg = l[19147]; // operation contains errors and/or warning
+                            var msgQuestion = l[18229]; // Do you want to proceed?
+                            msgMsg = msgMsg.replace('{0}', M.suba[subUserHandle].e)
+                                .replace('{1}', treeObj.errors.length).replace('{2}', treeObj.warns.length);
+
+                            msgDialog('confirmation', '', msgMsg, msgQuestion, doMigrateSubUserDate);
+                        }
+                        else {
+                            doMigrateSubUserDate(true);
+                        }
+
+
+                    }
+                }
+            );
+
+        }
+    );
+};
+
+
+/**
+ * a function will change the url location depending on opened sub-page in business account
+ * @param {string} subLocation      the sub-location to be added after fm/user-management/
+ */
+BusinessAccountUI.prototype.URLchanger = function (subLocation) {
+    "use strict";
+    try {
+
+        if (hashLogic) {
+            var newHash = '#fm/user-management' + subLocation;
+            if (document.location.hash !== newHash) {
+                document.location.hash = newHash;
+                page = newHash;
+            }
+        }
+        else {
+            var newSubPage = (subLocation) ? ('fm/user-management/' + subLocation)
+                : 'fm/user-management';
+            if (page !== newSubPage) {
+                history.pushState({ subpage: newSubPage }, "", "/" + newSubPage);
+                page = newSubPage;
+            }
+        }
+    }
+    catch (ex) {
+        console.error(ex);
+    }
+};
+
+/**
+ * Event handler for sub-user changes, this handler will be invoked eventually when relate action-packet
+ * is received
+ * @param {object} subuser      the sub-user object
+ */
 BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
     "use strict";
     if (!subuser) {
@@ -1093,9 +1351,11 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         if (!$userRow.length) {
             return;
         }
+        var leftPanelClass = 'disabled-accounts';
         if (subuser.s === 0) {
             $userRow.find('.user-management-status').removeClass('pending disabled')
                 .addClass('enabled');
+            leftPanelClass = 'enabled-accounts';
         }
         else if (subuser.s === 10) {
             $userRow.find('.user-management-status').removeClass('enabled disabled')
@@ -1107,11 +1367,12 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
                 .addClass('disabled');
             $userRow.addClass('hidden');
         }
-        $('.user-management-tree-panel-header.disabled-accounts').trigger('click.subuser');
+        $('.user-management-tree-panel-header.' + leftPanelClass).trigger('click.subuser');
     };
 
     // if we are in table view
-    if (!$('.user-management-list-table').hasClass('hidden')) {
+    if (!$('.user-management-list-table').hasClass('hidden')
+        || !$('.user-management-landing-page.user-management-view').hasClass('hidden')) {
         // safe to create new object.
         var busUI = new BusinessAccountUI();
         busUI.viewSubAccountListUI();

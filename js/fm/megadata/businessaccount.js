@@ -253,7 +253,7 @@ BusinessAccount.prototype.getQuotaUsage = function (forceUpdate, fromToDate) {
 BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
     "use strict";
     if (M) {
-        M.isBusinessAccountMaster = 1; // init it, or re-set it
+        // M.isBusinessAccountMaster = 1; // init it, or re-set it
 
         if (!M.suba) {
             M.suba = [];
@@ -285,7 +285,7 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
  * @returns {boolean}   true if the user is a Master B-Account
  */
 BusinessAccount.prototype.isBusinessMasterAcc = function () {
-    if ((u_attr.b && !u_attr.b.mu) || M.isBusinessAccountMaster || (M.suba && M.suba.length)) {
+    if ((u_attr.b && !u_attr.b.mu) || (M.suba && M.suba.length)) {
         return true;
     }
     return false;

@@ -54,7 +54,7 @@ function BusinessAccountUI() {
  */
 BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView) {
     "use strict";
-    if (!M.isBusinessAccountMaster) {
+    if (!this.business.isBusinessMasterAcc()) {
         return false;
     }
     if (!subAccounts) {

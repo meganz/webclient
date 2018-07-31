@@ -617,6 +617,9 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
         }
         node.classList.remove('ui-selectee');
     }
+    else if (selList && selList.length === 0) {
+        node.classList.remove('ui-selected');
+    }
 
     if (M.d[aHandle]) {
         M.d[aHandle].seen = true;

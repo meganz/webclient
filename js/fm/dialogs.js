@@ -108,12 +108,6 @@
     var setDialogButtonState = function($btn) {
         $btn = $($btn);
 
-        // if we are using this dialog from contacts (means share with)
-        // --> it does not mean anything to get selected since where choosing something to share from dialog itself
-        if (!$('.share-dialog-permissions', $dialog).hasClass('hidden')) {
-            return;
-        }
-
         if (section === 'conversations') {
             if (getSelectedChats().length) {
                 $btn.removeClass('disabled');
@@ -128,11 +122,17 @@
         else if ($.copyDialog && section === 'cloud-drive') {
             $btn.removeClass('disabled');
         }
-        else if (!getNonCircularNodes().length && !$.onImportCopyNodes && !$.saveToDialog) {
-            $btn.addClass('disabled');
-        }
         else {
-            $btn.removeClass('disabled');
+            var forceEnabled = $.copyToShare || $.onImportCopyNodes || $.saveToDialog;
+
+            console.assert(!$.copyToShare || Object($.selected).length === 0, 'check this...');
+
+            if (!forceEnabled && !getNonCircularNodes().length) {
+                $btn.addClass('disabled');
+            }
+            else {
+                $btn.removeClass('disabled');
+            }
         }
     };
 
@@ -327,7 +327,6 @@
 
         $icon.rebind('click', function() {
             setSelectedItems(!single);
-            dialogPositioning($dialog);
             return false;
         });
 
@@ -354,6 +353,9 @@
                 return false;
             });
         }
+
+        // reposition dialog in case we did hide selected-items (Ie. importing)
+        dialogPositioning($dialog);
     };
 
     /**
@@ -655,21 +657,12 @@
         var html = section !== 'conversations' && $('.content-panel.' + section).html();
 
         // Action button label
-        var $btn = $('.dialog-picker-button', $dialog).text(buttonLabel);
+        $('.dialog-picker-button', $dialog).text(buttonLabel);
 
         // if the site is initialized on the chat, $.selected may be `undefined`,
         // which may cause issues doing .length on it in dialogs.js, so lets define it as empty array
         // if is not def.
         $.selected = $.selected || [];
-
-        // Disable/enable button
-        // coming from contacts tab, and into sharing dlg.
-        if (section === 'cloud-drive' && M.currentrootid === 'contacts') {
-            $btn.removeClass('disabled');
-        }
-        else {
-            setDialogButtonState($btn);
-        }
 
         // check if we will enable conversation tab
         var allowConversationTab = false;
@@ -695,7 +688,7 @@
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).removeClass('hidden');
         }
 
-        if (!u_type || $.saveToDialog) {
+        if (!u_type || $.saveToDialog || $.mcImport) {
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
             $('.fm-picker-dialog-button.conversations', $dialog).addClass('hidden');
         }
@@ -762,8 +755,8 @@
             $[$.dialog + 'Dialog'] = $.dialog;
             $('.search-bar input', $dialog).val('');
             handleDialogContent(typeof aTab === 'string' && aTab);
-            $('.dialog-picker-button', $dialog).addClass('active');
             setDialogBreadcrumb(aTab !== 'conversations' && aTarget);
+            setDialogButtonState($('.dialog-picker-button', $dialog).addClass('active'));
             setSelectedItems(true);
         });
 
@@ -887,7 +880,10 @@
             $('.search-bar input', $dialog).val('');
             $('.nw-fm-tree-item', $dialog).removeClass('selected');
 
-            if (section === 'cloud-drive' || section === 'folder-link') {
+            if ($.copyToShare) {
+                setDialogBreadcrumb();
+            }
+            else if (section === 'cloud-drive' || section === 'folder-link') {
                 setDialogBreadcrumb(M.RootID);
             }
             else if (section === 'rubbish-bin') {

@@ -775,8 +775,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     this.initUItoRender();
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
-    var $overviewContainer = $('.user-management-overview-container', $businessAccountContainer)
-        .removeClass('hidden');
+    var $overviewContainer = $('.user-management-overview-container', $businessAccountContainer);
 
     // header
     $('.fm-right-header-user-management .user-management-breadcrumb.overview').removeClass('hidden');
@@ -790,21 +789,28 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             return;
         }
 
-        var numberOfSubs = 0;
+        var todayStats = quotas[Object.keys(quotas)[0]];
+
+        var numberOfSubs = todayStats.tu || 0;
         var activeSubs = 0;
         var pendingSubs = 0;
         var disabledSubs = 0;
-        var totalStorage = 0;
-        var totalBandwidth = 0;
+        var totalStorage = todayStats.ts || 0;
+        var totalBandwidth = todayStats.tdl || 0;
         var inshareTotal = 0;
         var rootTotal = 0;
         var rubbishTotal = 0;
+        var outshareTotal = 0;
 
-        for (var sub in quotas) {
-            if (sub === 'timestamp') {
-                continue; // embedded attribute 
-            }
-            numberOfSubs++;
+        var emptyArray = [0, 0, 0, 0, 0];
+        var currRoot;
+        var currInhare;
+        var currInhareEx;
+        var currOutshare;
+        var currRubbish;
+
+
+        for (var sub in todayStats.u) {
             if (sub === u_handle) {
                 activeSubs++;
             }
@@ -818,36 +824,39 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                 disabledSubs++;
             }
 
-            totalStorage += quotas[sub][0] || 0;
-            totalBandwidth += quotas[sub][3] || 0;
+            currRoot = todayStats.u[sub]["2"] || emptyArray;
+            currInhare = todayStats.u[sub]["isi"] || emptyArray;
+            currInhareEx = todayStats.u[sub]["ise"] || emptyArray;
+            currOutshare = todayStats.u[sub]["os"] || emptyArray;
+            currRubbish = todayStats.u[sub]["4"] || emptyArray;
 
-            var rootHandle = quotas[sub][2]["2"];
-            var rubbishHandle = quotas[sub][2]["3"];
-            var inboxHandle = quotas[sub][2]["4"];
-            var inshareHandle = '';
-
-            rootTotal += (quotas[sub][1][rootHandle][0] || 0);
-            rubbishTotal += (quotas[sub][1][rubbishHandle][0] || 0);
-
-            for (var hh in quotas[sub][1]) {
-                if (hh !== rootHandle && hh !== rubbishHandle && hh !== inboxHandle) {
-                    inshareHandle = hh;
-                    break;
-                }
-            }
-            inshareTotal += (quotas[sub][1][inshareHandle][0] || 0);
-
+            rootTotal += currRoot[0];
+            rubbishTotal += currRubbish[0];
+            outshareTotal += currInhareEx[0];
+            inshareTotal += currInhare[0];
         }
+
+        totalStorage = rootTotal + rubbishTotal + outshareTotal + inshareTotal;
 
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
         var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
         var rootTotalFormatted = numOfBytes(rootTotal, 2);
         var rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
         var inshareTotalFormatted = numOfBytes(inshareTotal, 2);
+        var outshareTotalFormatted = numOfBytes(outshareTotal, 2);
 
         var rootPrecentage = rootTotal / totalStorage;
+        var rootPie = Math.round(rootPrecentage * 360);
+        rootPrecentage = Number.parseFloat(rootPrecentage * 100).toPrecision(2);
         var insharePrecentage = inshareTotal / totalStorage;
+        var insharePie = Math.round(insharePrecentage * 360);
+        insharePrecentage = Number.parseFloat(insharePrecentage * 100).toPrecision(2);
         var rubbishPrecentage = rubbishTotal / totalStorage;
+        var rubbishPie = Math.round(rubbishPrecentage * 360);
+        rubbishPrecentage = Number.parseFloat(rubbishPrecentage * 100).toPrecision(2);
+        var outsharePrecentage = outshareTotal / totalStorage;
+        var outsharePie = Math.round(outsharePrecentage * 360);
+        outsharePrecentage = Number.parseFloat(outsharePrecentage * 100).toPrecision(2);
 
         $overviewContainer.find('.user-segments-container.all-subs .user-segment-number').text(numberOfSubs);
         $overviewContainer.find('.user-segments-container.active-subs .user-segment-number').text(activeSubs);
@@ -869,8 +878,14 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             .text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
         $overviewContainer.find('.storage-division-container.rubbish-node .storage-division-per')
             .text(Math.round(rubbishPrecentage) + '%');
-        $overviewContainer.find('.storage-division-container.inbox-node').addClass('hidden');
+        $overviewContainer.find('.storage-division-container.inbox-node .storage-division-num')
+            .text(outshareTotalFormatted.size + ' ' + outshareTotalFormatted.unit);
+        $overviewContainer.find('.storage-division-container.inbox-node .storage-division-per')
+            .text(Math.round(outsharePrecentage) + '%');
 
+
+        $businessAccountContainer.removeClass('hidden'); // BA container
+        $overviewContainer.removeClass('hidden');
 
     };
 

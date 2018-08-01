@@ -251,17 +251,19 @@ MegaData.prototype.renderShare = function(h) {
 
 MegaData.prototype.renderTree = function() {
     var build = function(h) {
-        return M.buildtree({h: h}, M.buildtree.FORCE_REBUILD);
+        M.buildtree({h: h}, M.buildtree.FORCE_REBUILD);
     };
 
-    var promise = MegaPromise.allDone([build('shares'), build(M.RootID), build(M.RubbishID), build(M.InboxID)]);
+    build('shares');
+    build(M.RootID);
+    build(M.RubbishID);
+    build(M.InboxID);
 
-    promise.done(function() {
-        M.contacts();
-        M.addTreeUIDelayed();
-    });
+    M.contacts();
+    M.addTreeUIDelayed();
 
-    return promise;
+    // TODO: refactor this back to no-promises
+    return MegaPromise.resolve();
 };
 
 

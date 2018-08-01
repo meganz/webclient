@@ -1033,7 +1033,7 @@
                     treesearch = value;
                 }
 
-                buildDialogTree();
+                delay('mctree:search', buildDialogTree);
             }
 
             return false;
@@ -1080,19 +1080,14 @@
         $dialog.off('click', '.nw-fm-tree-item');
         $dialog.on('click', '.nw-fm-tree-item', function(e) {
 
+            var ts = treesearch;
             var old = $.mcselected;
 
             setDialogBreadcrumb(String($(this).attr('id')).replace('mctreea_', ''));
-            M.buildtree({h: $.mcselected});
 
-            var markup = $('#treesub_' + $.mcselected).html();
-            if (markup) {
-                markup = markup
-                    .replace(/treea_/ig, 'mctreea_')
-                    .replace(/treesub_/ig, 'mctreesub_')
-                    .replace(/treeli_/ig, 'mctreeli_');
-                $('#mctreesub_' + $.mcselected).safeHTML(markup);
-            }
+            treesearch = false;
+            M.buildtree({h: $.mcselected}, 'fm-picker-dialog');
+            treesearch = ts;
             disableFolders();
 
             var c = $(e.target).attr('class');

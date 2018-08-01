@@ -827,7 +827,7 @@ FileManager.prototype.updFileManagerUI = function() {
     for (var h in treebuild) {
         var tb = this.d[h];
         if (tb) {
-            treePromises.push(this.buildtree(tb, this.buildtree.FORCE_REBUILD));
+            this.buildtree(tb, this.buildtree.FORCE_REBUILD);
             UItree = true;
         }
     }
@@ -3025,23 +3025,23 @@ FileManager.prototype.addTreeUIDelayed = function() {
 FileManager.prototype.onTreeUIExpand = function(id, force) {
     "use strict";
 
-    return this.buildtree({h: id})
-        .always(function() {
-            var $tree = $('#treea_' + id);
+    this.buildtree({h: id});
+    var $tree = $('#treea_' + id);
 
-            if ($tree.hasClass('expanded') && !force) {
-                fmtreenode(id, false);
-                $('#treesub_' + id).removeClass('opened');
-                $tree.removeClass('expanded');
-            }
-            else if ($tree.hasClass('contains-folders')) {
-                fmtreenode(id, true);
-                $('#treesub_' + id).addClass('opened');
-                $tree.addClass('expanded');
-            }
+    if ($tree.hasClass('expanded') && !force) {
+        fmtreenode(id, false);
+        $('#treesub_' + id).removeClass('opened');
+        $tree.removeClass('expanded');
+    }
+    else if ($tree.hasClass('contains-folders')) {
+        fmtreenode(id, true);
+        $('#treesub_' + id).addClass('opened')
+            .find('.tree-item-on-search-hidden')
+            .removeClass('tree-item-on-search-hidden');
+        $tree.addClass('expanded');
+    }
 
-            M.addTreeUIDelayed();
-        });
+    M.addTreeUIDelayed();
 };
 
 FileManager.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {

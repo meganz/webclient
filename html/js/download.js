@@ -115,16 +115,16 @@ function dl_g(res) {
             key = base64_to_a32(base64key).slice(0, 8);
             if (key.length === 8) {
                 dl_attr = res.at;
-                var dl_a = base64_to_ab(res.at);
-                fdl_file = dec_attr(dl_a, key);
                 fdl_filesize = res.s;
+                fdl_file = {a: dl_attr};
+                crypto_procattr(fdl_file, key);
             }
         }
-        if (fdl_file)
+        if (fdl_file.name)
         {
             var $pageScrollBlock = $('.bottom-page.scroll-block')
                 .removeClass('video video-theatre-mode resumable');
-            var filename = M.getSafeName(fdl_file.n) || 'unknown.bin';
+            var filename = M.getSafeName(fdl_file.name) || 'unknown.bin';
             var filenameLength = filename.length;
             var fileExtPos =  filename.lastIndexOf('.') > 0 ? filename.lastIndexOf('.') : filenameLength;
             var fileTitle = filename.substring(0, fileExtPos);
@@ -133,7 +133,7 @@ function dl_g(res) {
             var prevBut = isVideo;
             var onMaxSizeKnown;
 
-            dl_node = new MegaNode({
+            dl_node = new MegaNode(Object.assign(fdl_file, {
                 k: key,
                 fa: res.fa,
                 h: dlpage_ph,
@@ -141,7 +141,7 @@ function dl_g(res) {
                 name: filename,
                 s: fdl_filesize,
                 link: dlpage_ph + '!' + dlpage_key
-            });
+            }));
 
             M.v = [dl_node];
             M.d[dlpage_ph] = dl_node;
@@ -670,7 +670,7 @@ function closedlpopup()
 
 function importFile() {
     'use strict';
-    M.importFileLink(dl_import[0], dl_import[1], dl_attr);
+    M.importFileLink(dl_import[0], dl_import[1], dl_attr, dl_import[2]);
 }
 
 function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
@@ -770,9 +770,10 @@ function dlstart(id,name,filesize)
     }
 }
 
-function start_import()
-{
-    dl_import = [dlpage_ph, dlkey];
+function start_import() {
+    'use strict';
+
+    dl_import = [dlpage_ph, dlkey, dl_node];
 
     if (u_type) {
         loadSubPage('fm');

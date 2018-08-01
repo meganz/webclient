@@ -128,7 +128,7 @@
         else if ($.copyDialog && section === 'cloud-drive') {
             $btn.removeClass('disabled');
         }
-        else if (!getNonCircularNodes().length && !$.onImportCopyNodes && !$.dialogIsChatSave) {
+        else if (!getNonCircularNodes().length && !$.onImportCopyNodes && !$.saveToDialog) {
             $btn.addClass('disabled');
         }
         else {
@@ -374,7 +374,7 @@
             return l[1940]; // Send
         }
 
-        if ($.dialogIsChatSave) {
+        if ($.saveToDialog) {
             return l[776]; // Save
         }
 
@@ -399,7 +399,7 @@
             return l[1344]; // Share
         }
 
-        if ($.dialogIsChatSave) {
+        if ($.saveToDialog) {
             return l[776]; // Save
         }
 
@@ -695,7 +695,7 @@
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).removeClass('hidden');
         }
 
-        if (!u_type || $.dialogIsChatSave) {
+        if (!u_type || $.saveToDialog) {
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
             $('.fm-picker-dialog-button.conversations', $dialog).addClass('hidden');
         }
@@ -839,7 +839,7 @@
         M.safeShowDialog('copy', function() {
             $.saveToDialogCb = cb;
             $.saveToDialogNode = node;
-            handleOpenDialog(activeTab, M.RootID, 'dialogIsChatSave');
+            handleOpenDialog(activeTab, M.RootID, 'saveToDialog');
             return $dialog;
         });
 
@@ -1243,7 +1243,8 @@
             // closeDialog would cleanup some $.* variables, so we need them cloned here
             var saveToDialogNode = $.saveToDialogNode;
             var saveToDialogCb = $.saveToDialogCb;
-            var dialogIsChatSave = $.dialogIsChatSave;
+            var saveToDialog = $.saveToDialog;
+            delete $.saveToDialogPromise;
 
             if ($.moveDialog) {
                 closeDialog();
@@ -1251,6 +1252,11 @@
                 return false;
             }
             closeDialog();
+
+            if (saveToDialog) {
+                saveToDialogCb(saveToDialogNode, $.mcselected, section === 'conversations');
+                return false;
+            }
 
             // Get active tab
             if (section === 'cloud-drive' || section === 'folder-link' || section === 'rubbish-bin') {
@@ -1271,22 +1277,12 @@
                     }
                     doShare($.mcselected, [user], true);
                 }
-                else if (dialogIsChatSave) {
-                    saveToDialogCb(saveToDialogNode, $.mcselected);
-                    saveToDialogCb = saveToDialogNode = dialogIsChatSave = undefined;
-                }
                 else {
                     M.copyNodes(selectedNodes, $.mcselected);
                 }
             }
             else if (section === 'shared-with-me') {
-                if (dialogIsChatSave) {
-                    saveToDialogCb(saveToDialogNode, $.mcselected);
-                    saveToDialogCb = saveToDialogNode = dialogIsChatSave = undefined;
-                }
-                else {
-                    M.copyNodes(getNonCircularNodes(selectedNodes), $.mcselected);
-                }
+                M.copyNodes(getNonCircularNodes(selectedNodes), $.mcselected);
             }
             else if (section === 'conversations') {
                 if (!window.megaChatIsReady) {
@@ -1326,13 +1322,8 @@
                         }
                     };
 
-                    if (dialogIsChatSave) {
-                        saveToDialogCb(saveToDialogNode, $.mcselected, true);
-                    }
-                    else {
-                        for (var i = chats.length; i--;) {
-                            openChat(chats[i]);
-                        }
+                    for (var i = chats.length; i--;) {
+                        openChat(chats[i]);
                     }
                 }
             }

@@ -434,7 +434,6 @@ FileManager.prototype.initFileManagerUI = function() {
     initShareDialog();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
-    contactAddDialog();
     onIdle(topmenuUI);
 
     $('.fm-files-view-icon').rebind('click', function() {
@@ -579,7 +578,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
     var fmTabState;
     var isMegaSyncTransfer = true;
-    $('.nw-fm-left-icon').rebind('click', function() {
+    $('.nw-fm-left-icon').rebind('click', function(e) {
         treesearch = false;
         var mySelf = $(this);
         var clickedClass = mySelf.attr('class');
@@ -638,6 +637,11 @@ FileManager.prototype.initFileManagerUI = function() {
             return !!fmTabState[c];
         })[0];
 
+        if (mySelf.hasClass('contacts') && !mySelf.find('.contacts-indicator').is('.hidden')) {
+             M.openFolder('ipc');
+             return false;
+        }
+
         var activeTab = fmTabState[activeClass];
         if (activeTab) {
             if (activeTab.root === M.currentrootid || activeTab.root === 'chat') {
@@ -649,7 +653,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
-        if ($(this).hasClass('account') || $(this).hasClass('dashboard')) {
+        if (mySelf.hasClass('account') || mySelf.hasClass('dashboard')) {
             if (u_type === 0) {
                 if ($(this).hasClass('account')) {
                     ephemeralDialog(l[7687]);
@@ -1177,19 +1181,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.addcontact-item').rebind('click', function() {
-        M.safeShowDialog('add-contact-popup', function() {
-            contactAddDialog();
-            $('.fm-add-user').trigger('click');
-            $('.add-user-size-icon').trigger('click');
-
-            $(window).rebind('keydown.esc_contact_dialog', function(e) {
-                if (e.keyCode === 27) {
-                    closeDialog();
-                }
-            });
-
-            return $dialog;
-        });
+        contactAddDialog();
     });
 
     $(c + '.startchat-item').rebind('click', function() {
@@ -1197,8 +1189,8 @@ FileManager.prototype.initContextUI = function() {
         var user_handle = $.selected;
 
         if (user_handle.length === 1) {
-            if (!$this.is(".disabled") && user_handle) {
-                loadSubPage('fm/chat/' + user_handle);
+            if (!$this.is('.disabled') && user_handle[0]) {
+                loadSubPage('fm/chat/' + user_handle[0]);
             }
         }
         else {
@@ -1206,36 +1198,68 @@ FileManager.prototype.initContextUI = function() {
         }
     });
 
-    $(c + '.startaudio-item').rebind('click', function() {
+    $(c + '.startaudio-item,'+ c + '.startaudiovideo-item').rebind('click', function() {
         var $this = $(this);
         var user_handle = $.selected && $.selected[0];
-        var room;
 
-        if (!$this.is(".disabled") && user_handle) {
-            loadSubPage('fm/chat/' + user_handle);
-            room = megaChat.createAndShowPrivateRoomFor(user_handle);
-            if (room) {
-                room.startAudioCall();
-            }
+        if (!$this.is('.disabled') && user_handle) {
+            megaChat.createAndShowPrivateRoomFor(user_handle)
+                .then(function(room) {
+                    room.setActive();
+                    room.startAudioCall();
+                });
         }
     });
 
     $(c + '.startvideo-item').rebind('click', function() {
         var $this = $(this);
         var user_handle = $.selected && $.selected[0];
-        var room;
 
-        if (!$this.is(".disabled") && user_handle) {
-            loadSubPage('fm/chat/' + user_handle);
-            room = megaChat.createAndShowPrivateRoomFor(user_handle);
-            if (room) {
-                room.startVideoCall();
-            }
+        if (!$this.is('.disabled') && user_handle) {
+            megaChat.createAndShowPrivateRoomFor(user_handle)
+                .then(function(room) {
+                    room.setActive();
+                    room.startVideoCall();
+                });
+        }
+    });
+
+    $(c + '.view-profile-item').rebind('click', function() {
+        var $this = $(this);
+        var user_handle = $.selected && $.selected[0];
+
+        if (!$this.is('.disabled') && user_handle) {
+            loadSubPage('fm/' + user_handle);
+        }
+    });
+
+    $(c + '.send-files-item').rebind('click', function() {
+        var $this = $(this);
+        var user_handle = $.selected && $.selected[0];
+
+        if (!$this.is('.disabled') && user_handle) {
+            megaChat.openChatAndSendFilesDialog(user_handle);
+        }
+    });
+
+    $(c + '.share-folder-item').rebind('click', function() {
+        var $this = $(this);
+        var user_handle = $.selected && $.selected[0];
+
+        if (!$this.is('.disabled') && user_handle) {
+            openCopyShareDialog(user_handle);
         }
     });
 
     $(c + '.removeshare-item').rebind('click', function() {
         fmremove();
+    });
+
+    $(c + '.remove-contact').rebind('click', function() {
+        var user_handle = $.selected && $.selected[0];
+
+        user_handle =user_handle .replace('contact_', '');
+        fmremove(user_handle);
     });
 
     $(c + '.properties-item').rebind('click', function() {
@@ -1524,7 +1548,7 @@ FileManager.prototype.createFolderUI = function() {
 
         $('.fm-new-folder').addClass('active');
         $('.create-new-folder').removeClass('hidden');
-        topPopupAlign('.link-button.fm-new-folder', '.add-user-popup');
+        topPopupAlign('.link-button.fm-new-folder', '.create-folder-dialog');
 
         createFolderDialog(1);
         $('.create-folder-dialog input').val('');
@@ -1881,11 +1905,11 @@ FileManager.prototype.addTransferPanelUI = function() {
 
         var parent = menuitems.parent();
         parent
-            .children('hr').hide().end()
-            .children('hr.pause').show().end();
+            .children('hr').addClass('hidden').end()
+            .children('hr.pause').removeClass('hidden').end();
 
         if (parent.height() < 56) {
-            parent.find('hr.pause').hide();
+            parent.find('hr.pause').addClass('hidden');
         }
     };
 
@@ -2170,8 +2194,155 @@ FileManager.prototype.addTransferPanelUI = function() {
     });
 };
 
+FileManager.prototype.contactsUI = function() {
+    "use strict";
+
+    var $container = $('.contacts-view');
+    var $contactBlocks = $container.find('.data-block-view, .contacts tr');
+    var $buttons = $contactBlocks.find('.default-white-button');
+    var $addContact = $contactBlocks.find('.add-new-contact');
+    var $publicLink = $('.public-contact-link');
+
+    var setContactLink = function() {
+        var linkData = $publicLink.attr('data-lnk');
+
+        // Exit if link exists
+        if (linkData) {
+            return false;
+        }
+
+        // Check data exists in M.account
+        if (M.account.contactLink && M.account.contactLink.length) {
+            $publicLink.attr('data-lnk', 'https://mega.nz/C!' + M.account.contactLink);
+        }
+        else {
+            api_req({ a: 'clc' }, {
+                callback: function (res, ctx) {
+                    if (typeof res === 'string') {
+                        res = 'https://mega.nz/C!' + res;
+                        $publicLink.attr('data-lnk', res);
+                    }
+                }
+            });
+        }
+    };
+
+    setContactLink();
+
+    mega.achievem.enabled()
+        .done(function () {
+            $container.find('.contact-green-info').text(l[19107]);
+            $('.fm-empty-contacts .fm-empty-description.small').text(l[19115]);
+        })
+        .fail(function () {
+            $container.find('.contact-green-info').text(l[19106]);
+            $('.fm-empty-contacts .fm-empty-description.small').text(l[19114]);
+        });
+
+    $('.contacts-tab-lnk').rebind('click', function() {
+        var $this = $(this);
+        var folder = escapeHTML($this.attr('data-folder'));
+
+        if (folder === "ipc") {
+            M.openFolder('ipc');
+        }
+        else if (folder === "opc") {
+            M.openFolder('opc');
+        }
+        else {
+            M.openFolder('contacts');
+        }
+    });
+
+    $contactBlocks.rebind('mouseover.contacts', function() {
+        var $this = $(this);
+        var user_handle = $this.attr('id');
+
+        if (megaChatIsDisabled) {
+            $this.find('.contact-chat-buttons').addClass('hidden');
+        }
+        else {
+            $this.find('.contact-chat-buttons').removeClass('hidden');
+        }
+    });
+
+    $addContact.rebind('clcik.contacts', function() {
+        var $this = $(this);
+        var user_handle = $this.attr('id');
+
+        if ($this.hasClass('offline') || megaChatIsDisabled) {
+            $this.find('.start-audio-call, .start-video-call').addClass('disabled');
+        }
+        else {
+            $this.find('.start-audio-call, .start-video-call').removeClass('disabled');
+        }
+    });
+
+    $buttons.rebind('click.contacts', function() {
+        var $this = $(this);
+        var user_handle = $this.closest('.data-block-view, tr').attr('id');
+
+        if ($this.hasClass('disabled') || !user_handle) {
+            return;
+        }
+
+        if ($this.hasClass('start-conversation')) {
+            loadSubPage("fm/chat/" + user_handle);
+        }
+        else if ($this.hasClass('start-audio-call')) {
+            megaChat.createAndShowPrivateRoomFor(user_handle)
+                .then(function(room) {
+                    room.setActive();
+                    room.startAudioCall();
+                });
+        }
+        else if ($this.hasClass('start-video-call')) {
+            megaChat.createAndShowPrivateRoomFor(user_handle)
+                .then(function(room) {
+                    room.setActive();
+                    room.startVideoCall();
+                });
+        }
+    });
+
+    $('.fm-empty-contacts .fm-empty-button, .add-new-contact, .fm-add-user')
+        .rebind('click', function(e) {
+            var $this = $(this);
+
+            $.hideContextMenu();
+            contactAddDialog();
+            e.stopPropagation();
+    });
+
+    $publicLink.rebind('mouseover.publiclnk', function() {
+        var $this = $(this);
+        var $tooltip = $('.dropdown.tooltip.small');
+        var leftPos = $this.offset().left + $this.width()/2 - $tooltip.outerWidth()/2;
+        var topPos = $this.offset().top - $tooltip.outerHeight() - 10;
+
+        $tooltip.addClass('visible').css({
+            'left': leftPos,
+            'top': topPos
+        });
+    });
+
+    $publicLink.rebind('mouseout.publiclnk', function() {
+        $('.dropdown.tooltip.small').removeClass('visible');
+    });
+
+    $publicLink.rebind('click', function(e) {
+        var linkData = $(this).attr('data-lnk');
+
+        if (linkData.length) {
+            copyToClipboard(linkData, l[371] + '<span>' + linkData + '</span>', 'short');
+        }
+    });
+};
+
 FileManager.prototype.addContactUI = function() {
     "use strict";
+
+    var $container = $('.contact-top-details');
 
     $('.nw-contact-item').removeClass('selected');
 
@@ -2179,21 +2350,21 @@ FileManager.prototype.addContactUI = function() {
     if (n && n.u) {
         var u_h = this.currentdirid;
         var user = this.u[u_h];
-        var avatar = $(useravatar.contact(u_h));
+        var avatar = $(useravatar.contact(u_h, 'medium-avatar'));
 
         var onlinestatus = this.onlineStatusClass(
             megaChatIsReady &&
             this.u[u_h] ? this.u[u_h].presence : "unavailable"
         );
 
-        $('.contact-top-details .nw-contact-block-avatar').empty().append(avatar.removeClass('avatar').addClass('square'));
-        $('.contact-top-details .onlinestatus').removeClass('away offline online busy').addClass(onlinestatus[1]);
-        $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
-        $('.contact-top-details .contact-details-user-name').text(this.getNameByHandle(user.u));
-        $('.contact-top-details .contact-details-email').text(user.m);
+        $container.find('.nw-contact-block-avatar').empty().append(avatar);
+        $container.find('.onlinestatus').removeClass('away offline online busy').addClass(onlinestatus[1]);
+        $container.find('.fm-chat-user-status').text(onlinestatus[0]);
+        $container.find('.contact-details-user-name').text(this.getNameByHandle(user.u));
+        $container.find('.contact-details-email').text(user.m);
 
         // Display the current fingerpring
-        showAuthenticityCredentials(user);
+        showAuthenticityCredentials(user, $container);
 
         // Set authentication state of contact from authring.
         // To be called on settled authring promise.
@@ -2220,10 +2391,15 @@ FileManager.prototype.addContactUI = function() {
             enableVerifyFingerprintsButton(user.u);
 
             // Refetch the key
-            showAuthenticityCredentials(user);
+            showAuthenticityCredentials(user, $container);
+
+            // Trigger manual UI updates
+            M.u[user.u] && M.u[user.u].trackDataChange();
         });
 
-        $('.fm-share-folders').rebind('click', openCopyShareDialog);
+        $('.fm-share-folders').rebind('click', function() {
+            openCopyShareDialog(M.currentdirid);
+        });
 
         // Remove contact button on contacts page
         $('.fm-remove-contact').rebind('click', function() {
@@ -2318,15 +2494,16 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
     }
 
-    $('.fm-blocks-view, .shared-blocks-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
-        $(this).find('.data-block-view').removeClass('ui-selected');
-        // is this required? don't we have a support for a multi-selection context menu?
-        if (selectionManager) {
-            selectionManager.clear_selection();
-        }
-        $.selected = [];
-        $.hideTopMenu();
-        return !!M.contextMenuUI(e, 2);
+    $('.fm-blocks-view, .shared-blocks-view, .fm-empty-cloud, .fm-empty-folder')
+        .rebind('contextmenu.fm', function(e) {
+            $(this).find('.data-block-view').removeClass('ui-selected');
+            // is this required? don't we have a support for a multi-selection context menu?
+            if (selectionManager) {
+                selectionManager.clear_selection();
+            }
+            $.selected = [];
+            $.hideTopMenu();
+            return !!M.contextMenuUI(e, 2);
     });
 
     if (this.currentdirid === 'contacts') {
@@ -2481,15 +2658,16 @@ FileManager.prototype.addGridUI = function(refresh) {
         return !!M.contextMenuUI(e, 6);
     });
 
-    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling' +
-        ',.fm-empty-cloud,.fm-empty-folder,.fm.shared-folder-content').rebind('contextmenu.fm', function(e) {
-        $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
-        if (selectionManager) {
-            selectionManager.clear_selection();
-        }
-        $.selected = [];
-        $.hideTopMenu();
-        return !!M.contextMenuUI(e, 2);
+    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,' +
+        '.fm-empty-cloud,.fm-empty-folder,.fm.shared-folder-content,' +
+        '.files-grid-view.contacts-view').rebind('contextmenu.fm', function(e) {
+            $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
+            if (selectionManager) {
+                selectionManager.clear_selection();
+            }
+            $.selected = [];
+            $.hideTopMenu();
+            return !!M.contextMenuUI(e, 2);
     });
 
     // enable add star on first column click (make favorite)
@@ -2993,7 +3171,7 @@ FileManager.prototype.addTreeUI = function() {
     $('.nw-contact-item', $treePanel).rebind('contextmenu.treeUI', function(e) {
         var $self = $(this);
 
-        if ($self.attr('class').indexOf('selected') === -1) {
+        if (!$self.hasClass('selected')) {
             $('.content-panel.contacts .nw-contact-item.selected').removeClass('selected');
             $self.addClass('selected');
         }
@@ -3253,13 +3431,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.fm-blocks-view.fm').addClass('hidden');
     }
 
-    if (id !== 'contacts' && id !== 'opc' && id !== 'ipc' && String(M.currentdirid).length !== 11) {
-        $('.fm-left-panel').removeClass('contacts-panel');
-        $('.fm-right-header').removeClass('requests-panel');
-        $('.fm-received-requests').removeClass('active');
-        $('.fm-contact-requests').removeClass('active');
-    }
-
     if (id !== 'contacts') {
         $('.contacts-details-block').addClass('hidden');
         $('.files-grid-view.contacts-view').addClass('hidden');
@@ -3275,9 +3446,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     if (id !== 'ipc') {
         $('.contact-requests-grid').addClass('hidden');
-
-        // this's button in left panel of contacts tab
-        $('.fm-contact-requests').removeClass('active');
     }
 
     if (id !== 'shared-with-me') {

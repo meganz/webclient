@@ -877,8 +877,7 @@ scparser.$add('opc', {
         // outgoing pending contact
         processOPC([a]);
 
-        // don't append to sent grid on deletion
-        if (!a.dts) {
+        if (fminitialized) {
             M.drawSentContactRequests([a]);
         }
     }
@@ -2535,9 +2534,14 @@ function processIPC(ipc, ignoreDB) {
                 $('#ipc_' + ipc[i].p).remove();
                 delete M.ipc[ipc[i].p];
                 if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
+                    updateIpcRequests();
                     $('.contact-requests-grid').addClass('hidden');
                     $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                     $('.fm-empty-contacts').removeClass('hidden');
+                    $('.button.link-button.accept-all').addClass('hidden');
+                }
+                else if (Object.keys(M.ipc).length) {
+                    updateIpcRequests();
                 }
 
                 // Update token.input plugin
@@ -2568,6 +2572,7 @@ function processOPC(opc, ignoreDB) {
         M.addOPC(opc[i], ignoreDB);
         if (opc[i].dts) {
             M.delOPC(opc[i].p);
+            $('#opc_' + opc[i].p).remove();
 
             // Update tokenInput plugin
             removeFromMultiInputDDL('.share-multiple-input', {id: opc[i].m, name: opc[i].m});
@@ -2763,9 +2768,14 @@ function processUPCI(ap) {
             M.delIPC(ap[i].p);// Remove from localStorage
             $('#ipc_' + ap[i].p).remove();
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
+                updateIpcRequests();
                 $('.contact-requests-grid').addClass('hidden');
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
+                $('.button.link-button.accept-all').addClass('hidden');
                 $('.fm-empty-contacts').removeClass('hidden');
+            }
+            else if (M.currentdirid === 'ipc') {
+                updateIpcRequests();
             }
         }
     }

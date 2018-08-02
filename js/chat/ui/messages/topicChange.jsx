@@ -36,7 +36,8 @@ var TopicChange = React.createClass({
         var messages = [];
 
 
-        var avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
+        var avatar = <ContactsUI.Avatar contact={contact}
+                                        className="message avatar-wrapper small-rounded-avatar"/>;
 
         var topic = message.meta.topic;
 
@@ -54,7 +55,7 @@ var TopicChange = React.createClass({
                 {avatar}
 
                 <div className="message content-area small-info-txt">
-                    <div className="message user-card-name">{displayName}</div>
+                    <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />
                     {datetime}
 
                     <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>

@@ -220,7 +220,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
         Object.keys(self.members).forEach(function(u_h) {
             var contact = M.u[u_h];
-            if (contact) {
+            if (contact && contact.addChangeListener) {
                 membersSnapshot[u_h] = contact.addChangeListener(function() {
                     self.trackDataChange();
                 });

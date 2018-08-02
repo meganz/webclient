@@ -127,11 +127,11 @@
     cursor: pointer;
     background-color: rgba(255,255,255,1);
     position: relative;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
+    -webkit-transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    -moz-transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    -o-transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    -ms-transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -256,7 +256,6 @@
 }
 .button.disabled, .default-white-button.disabled, .default-grey-button.disabled, .default-red-button.disabled {
     cursor: default;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
     -khtml-opacity: 0.3;
     opacity: 0.3;
@@ -374,6 +373,9 @@
     margin: 6px 6px 1px -5px;
     vertical-align: top;
 }
+.default-white-button:not(.tiny-button) span + i {
+    margin: 6px -5px 1px 6px;
+}
 .default-white-button.small i {
     margin: 3px 3px 1px -5px;
 }
@@ -387,6 +389,13 @@
     -webkit-box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);
     -moz-box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);
     box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);
+}
+.default-white-button.short.inline {
+    padding: 0 4px;
+    min-width: 32px;
+}
+.default-white-button.short i {
+    margin: 6px 0 1px 0;
 }
 .default-white-button.tiny-button {
     width: 25px;
@@ -426,12 +435,20 @@
     opacity: 0.6;
 }
 .icon-dropdown:not(.disabled):hover, .icon-dropdown.active {
-    background-image: url(../images/mega/new-chat-sprite_v2.png);
+    background-image: url(../images/mega/new-chat-sprite_v5.png);
     background-repeat: no-repeat;
     background-position: -64px -657px;
 }
 .icon-dropdown:not(.disabled).active {
     background-position: -64px -699px;
+}
+.default-white-button i.dark {
+    -moz-opacity: 0.73;
+    -khtml-opacity: 0.73;
+    opacity: 0.73;
+}
+.default-white-button.green-txt span {
+    color: #00BFA5;
 }
 .icon-dropdown:not(.disabled):hover::before, .icon-dropdown:not(.disabled):hover::after, .icon-dropdown.active::before, .icon-dropdown.active::after {
     content: '';
@@ -462,14 +479,12 @@
 .shared-link.thumb:hover .tiny-button,
 .message.shared-data.thumb:hover .tiny-button,
 .data-block-view:hover .tiny-button {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
 }
 .button.disabled.visible, .contacts-info:hover .tiny-button.disabled, .message.content-area:hover > .tiny-button.disabled, .default-white-button.tiny-button.active.disabled, .shared-link.thumb:hover .tiny-button.disabled, .data-block-view:hover .tiny-button.disabled {
     cursor: default;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     -moz-opacity: 0.6;
     -khtml-opacity: 0.6;
     opacity: 0.6;
@@ -720,4 +735,73 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1
 .default-56px-button i {
     margin: 14px 10px 0 0;
     vertical-align: top;
+}
+
+.big-red-button {
+    display: inline-block;
+    height: 56px;
+    line-height: 55px;
+    letter-spacing: 0.5px;
+    font-size: 18px;
+    margin: 0 0 0 20px;
+    padding: 0 20px 0 20px;
+    min-width: 200px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
+    background: rgba(255,255,255,1);
+    position: relative;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    white-space: nowrap;
+    font-family: 'montserrat', 'open_sans', sans-serif;
+    overflow: visible;
+    text-transform: none;
+    background: #F0373A;
+    color: white;
+    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+}
+.big-red-button.height-48 {
+    height: 48px;
+    line-height: 47px;
+}
+.big-red-button i {
+    margin: 2px -4px 0 0;
+    vertical-align: top;
+}
+.big-red-button span {
+    vertical-align: top;
+}
+.big-red-button::before, .big-red-button::after {
+    webkit-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+.big-red-button:hover {
+    background: #E12124;
+}
+.big-red-button::after {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
+    box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
 }

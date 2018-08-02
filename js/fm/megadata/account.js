@@ -277,7 +277,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     }
                 }
 
-                tfsq.left = tfsq.max - tfsq.used;
+                tfsq.left = Math.max(tfsq.max - tfsq.used, 0);
                 tfsq.perc = Math.round(tfsq.used * 100 / tfsq.max);
 
                 M.account.tfsq = tfsq;

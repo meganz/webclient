@@ -846,21 +846,21 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         var outshareTotalFormatted = numOfBytes(outshareTotal, 2);
 
         var rootPrecentage = rootTotal / totalStorage;
-        var rootPie = Math.round(rootPrecentage * 360);
-        rootPrecentage = Number.parseFloat(rootPrecentage * 100).toPrecision(2);
+        var rootPie = rootPrecentage * 360;
+        rootPrecentage = Number.parseFloat(rootPrecentage * 100).toFixed(2);
         var insharePrecentage = inshareTotal / totalStorage;
-        var insharePie = Math.round(insharePrecentage * 360);
-        insharePrecentage = Number.parseFloat(insharePrecentage * 100).toPrecision(2);
+        var insharePie = insharePrecentage * 360;
+        insharePrecentage = Number.parseFloat(insharePrecentage * 100).toFixed(2);
         var rubbishPrecentage = rubbishTotal / totalStorage;
-        var rubbishPie = Math.round(rubbishPrecentage * 360);
-        rubbishPrecentage = Number.parseFloat(rubbishPrecentage * 100).toPrecision(2);
+        var rubbishPie = rubbishPrecentage * 360;
+        rubbishPrecentage = Number.parseFloat(rubbishPrecentage * 100).toFixed(2);
         var outsharePrecentage = outshareTotal / totalStorage;
-        var outsharePie = Math.round(outsharePrecentage * 360);
-        outsharePrecentage = Number.parseFloat(outsharePrecentage * 100).toPrecision(2);
+        var outsharePie = outsharePrecentage * 360;
+        outsharePrecentage = Number.parseFloat(outsharePrecentage * 100).toFixed(2);
 
         $overviewContainer.find('.user-segments-container.all-subs .user-segment-number').text(numberOfSubs);
         $overviewContainer.find('.user-segments-container.active-subs .user-segment-number').text(activeSubs);
-        $overviewContainer.find('.user-segments-container.pending-sub .user-segment-number').text(pendingSubs);
+        $overviewContainer.find('.user-segments-container.pending-subs .user-segment-number').text(pendingSubs);
         $overviewContainer.find('.user-segments-container.disabled-subs .user-segment-number').text(disabledSubs);
 
         $overviewContainer.find('.storage-small-circle .total-storage-number')
@@ -882,13 +882,80 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             .text(outshareTotalFormatted.size + ' ' + outshareTotalFormatted.unit);
         $overviewContainer.find('.storage-division-container.inbox-node .storage-division-per')
             .text(Math.round(outsharePrecentage) + '%');
-
-
         $businessAccountContainer.removeClass('hidden'); // BA container
         $overviewContainer.removeClass('hidden');
 
+        $overviewContainer.find('.storage-big-chart .pie').removeClass('big').removeClass('highlight');
+        $overviewContainer.find('.storage-big-chart .pie .pie-internal2').remove();
+
+        var getPiePartStyle = function (startVal) {
+            var sStyle = '-moz-transform: rotate({0}deg); -ms-transform: rotate({0}deg);'
+                + '-webkit-transform: rotate({0}deg); -o-transform: rotate({0}deg);'
+                + 'transform:rotate({0}deg);';
+            return sStyle.replace(/\{0\}/g, startVal);
+        };
+
+        var start = 0;
+        var curStyle = '';
+        var $currElement;
+        // testing
+        //rootPie = 100, insharePie = 80, outsharePie = 60, rubbishPie = 120;
+
+        $currElement = $overviewContainer.find('.storage-big-chart .pie.nb1');
+        $currElement.attr('data-start', start).attr('data-value', outsharePie);
+        if (outsharePie > 180) {
+            $currElement.addClass('big');
+            $currElement.append('<div class="pie-internal2"></div>');
+        }
+        curStyle = getPiePartStyle(start);
+        $currElement.attr('style', curStyle);
+        curStyle = getPiePartStyle(outsharePie + 1);
+        $currElement.find('.pie-internal').attr('style', curStyle);
+        start += outsharePie;
+        ////////////////
+        $currElement = $overviewContainer.find('.storage-big-chart .pie.nb2');
+        $currElement.attr('data-start', start).attr('data-value', insharePie);
+        if (insharePie > 180) {
+            $currElement.addClass('big');
+            $currElement.append('<div class="pie-internal2"></div>');
+        }
+        curStyle = getPiePartStyle(start);
+        $currElement.attr('style', curStyle);
+        curStyle = getPiePartStyle(insharePie + 1);
+        $currElement.find('.pie-internal').attr('style', curStyle);
+        start += insharePie;
+        ////////////////
+        $currElement = $overviewContainer.find('.storage-big-chart .pie.nb3');
+        $currElement.attr('data-start', start).attr('data-value', rubbishPie);
+        if (rubbishPie > 180) {
+            $currElement.addClass('big');
+            $currElement.append('<div class="pie-internal2"></div>');
+        }
+        curStyle = getPiePartStyle(start);
+        $currElement.attr('style', curStyle);
+        curStyle = getPiePartStyle(rubbishPie + 1);
+        $currElement.find('.pie-internal').attr('style', curStyle);
+        start += rubbishPie;
+        ////////////////
+        $currElement = $overviewContainer.find('.storage-big-chart .pie.nb4');
+        $currElement.attr('data-start', start).attr('data-value', rootPie);
+        if (rootPie > 180) {
+            $currElement.addClass('big');
+            $currElement.append('<div class="pie-internal2"></div>');
+        }
+        curStyle = getPiePartStyle(start);
+        $currElement.attr('style', curStyle);
+        curStyle = getPiePartStyle(rootPie);
+        $currElement.find('.pie-internal').attr('style', curStyle);
+        //start += rootPie;
+        
+
     };
 
+
+    var prepapreDailyUsageChart = function (st,res) {
+
+    };
 
     // getting quotas
     var quotasPromise = this.business.getQuotaUsage();

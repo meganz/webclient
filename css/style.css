@@ -25444,7 +25444,7 @@ opacity: 1;
         transform-origin:center center;
 }
 
-.user-management-overview-container .storage-big-chart .pie:before {
+.user-management-overview-container .storage-big-chart .pie .pie-internal {
         content:"";
         position:absolute;
         width:80px;
@@ -25458,11 +25458,11 @@ opacity: 1;
         transform-origin:right center;
 }
 
-.user-management-overview-container .storage-big-chart .pie.big:before {
+.user-management-overview-container .storage-big-chart .pie.big .pie-internal {
         left:0px;
 }
 
-.user-management-overview-container .storage-big-chart .pie.big:after {
+.user-management-overview-container .storage-big-chart .pie.big .pie-internal2 {
         content:"";
         position:absolute;
         width:80px;
@@ -25471,63 +25471,18 @@ opacity: 1;
         border-radius:0 80px 80px 0;
 }
 
-.user-management-overview-container .storage-big-chart .pie:nth-of-type(1):BEFORE, .user-management-overview-container .storage-big-chart .pie:nth-of-type(1):AFTER {
+.user-management-overview-container .storage-big-chart .pie:nth-of-type(1) .pie-internal, .user-management-overview-container .storage-big-chart .pie:nth-of-type(1) .pie-internal2 {
     background-color:rgba(0,191,165,100);  
 }
-.user-management-overview-container .storage-big-chart .pie:nth-of-type(2):AFTER, .user-management-overview-container .storage-big-chart .pie:nth-of-type(2):BEFORE {
+.user-management-overview-container .storage-big-chart .pie:nth-of-type(2) .pie-internal2, .user-management-overview-container .storage-big-chart .pie:nth-of-type(2) .pie-internal {
     background-color:rgba(245,166,35,100); 
 }
-.user-management-overview-container .storage-big-chart .pie:nth-of-type(3):AFTER, .user-management-overview-container .storage-big-chart .pie:nth-of-type(3):BEFORE {
+.user-management-overview-container .storage-big-chart .pie:nth-of-type(3) .pie-internal2, .user-management-overview-container .storage-big-chart .pie:nth-of-type(3) .pie-internal {
     background-color: #bbbbbb;   
 }
-.user-management-overview-container .storage-big-chart .pie:nth-of-type(4):AFTER, .user-management-overview-container .storage-big-chart .pie:nth-of-type(4):BEFORE {
+.user-management-overview-container .storage-big-chart .pie:nth-of-type(4) .pie-internal2, .user-management-overview-container .storage-big-chart .pie:nth-of-type(4) .pie-internal {
     background-color:rgba(88,103,195,100);    
 }
-
-.user-management-overview-container .storage-big-chart .pie[data-start="10"] {
-        -moz-transform: rotate(10deg); /* Firefox */
-        -ms-transform: rotate(10deg); /* IE */
-        -webkit-transform: rotate(10deg); /* Safari and Chrome */
-        -o-transform: rotate(10deg); /* Opera */
-        transform:rotate(10deg);
-}
-.user-management-overview-container .storage-big-chart .pie[data-start="40"] {
-        -moz-transform: rotate(40deg); /* Firefox */
-        -ms-transform: rotate(40deg); /* IE */
-        -webkit-transform: rotate(40deg); /* Safari and Chrome */
-        -o-transform: rotate(40deg); /* Opera */
-        transform:rotate(40deg);
-}
-.user-management-overview-container .storage-big-chart .pie[data-start="70"] {
-        -moz-transform: rotate(70deg); /* Firefox */
-        -ms-transform: rotate(70deg); /* IE */
-        -webkit-transform: rotate(70deg); /* Safari and Chrome */
-        -o-transform: rotate(70deg); /* Opera */
-        transform:rotate(70deg);
-}
-
-.user-management-overview-container .storage-big-chart .pie[data-value="30"]:BEFORE {
-        -moz-transform: rotate(31deg); /* Firefox */
-        -ms-transform: rotate(31deg); /* IE */
-        -webkit-transform: rotate(31deg); /* Safari and Chrome */
-        -o-transform: rotate(31deg); /* Opera */
-        transform:rotate(31deg);
-    }
-.user-management-overview-container .storage-big-chart .pie[data-value="10"]:BEFORE {
-        -moz-transform: rotate(11deg); /* Firefox */
-        -ms-transform: rotate(11deg) /* IE */
-        -webkit-transform: rotate(11deg) /* Safari and Chrome */
-        -o-transform: rotate(11deg) /* Opera */
-        transform:rotate(11deg)
-    }
-.user-management-overview-container .storage-big-chart .pie[data-value="290"]:BEFORE {
-        -moz-transform: rotate(290deg); /* Firefox */
-        -ms-transform: rotate(290deg); /* IE */
-        -webkit-transform: rotate(290deg); /* Safari and Chrome */
-        -o-transform: rotate(290deg); /* Opera */
-        transform:rotate(290deg);
-    }
-
 
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-big-chart .storage-small-circle {

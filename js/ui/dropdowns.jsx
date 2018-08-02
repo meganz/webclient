@@ -299,6 +299,35 @@ var DropdownItem = React.createClass({
             e.preventDefault();
         }
     },
+    onMouseOver: function(e) {
+        var self = this;
+
+        if (this.props.className === "contains-submenu") {
+            var $contextItem = $(e.target).closest(".contains-submenu");
+            var $subMenu = $contextItem.next('.submenu');
+            var contextTopPos = $contextItem.position().top;
+            var contextleftPos = 0;
+
+            $contextItem.addClass("opened");
+            $subMenu.addClass("active");
+
+            contextleftPos = $contextItem.offset().left +
+                $contextItem.outerWidth() + $subMenu.outerWidth() +10;
+
+            if (contextleftPos > $(document.body).width()) {
+                $subMenu.addClass("left-position");
+            }
+
+            $subMenu.css({
+                "top": contextTopPos
+            });
+        }
+        else if (!$(e.target).parent('.submenu').length) {
+            var $dropdown = $(e.target).closest(".dropdown.body");
+            $dropdown.find(".contains-submenu").removeClass("opened");
+            $dropdown.find(".submenu").removeClass("active");
+        }
+    },
     render: function() {
         var self = this;
 
@@ -323,6 +352,7 @@ var DropdownItem = React.createClass({
                         $(document).trigger('closeDropdowns');
                         self.props.onClick(e);
                     } : self.onClick}
+                    onMouseOver={self.onMouseOver}
                 >
                     {icon}
                     {label}

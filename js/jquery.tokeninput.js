@@ -83,7 +83,7 @@
                 lowerValue = email;
             }
 
-            avatar = useravatar.contact(id || email, 'nw-contact-avatar', 'span');
+            avatar = useravatar.contact(id || email, '', 'span');
 
             return '<li class="share-search-result">' + (this.addAvatar ? avatar : '')
                     + '<span class="fm-chat-user-info">'

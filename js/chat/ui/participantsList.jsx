@@ -202,13 +202,15 @@ var ParticipantsListInner = React.createClass({
                 var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
 
                 if (room.type === "group" && room.members && myPresence !== 'offline') {
-                    var removeParticipantButton = null;
+                    var dropdownRemoveButton = [];
 
                     if (room.iAmOperator() && contactHash !== u_handle) {
-                        removeParticipantButton = <DropdownsUI.DropdownItem
-                            key="remove" icon="rounded-stop" label={__(l[8867])} onClick={() => {
-                            $(room).trigger('onRemoveUserRequest', [contactHash]);
-                        }}/>;
+                        dropdownRemoveButton.push(
+                            <DropdownsUI.DropdownItem className="red"
+                                key="remove" icon="rounded-stop" label={__(l[8867])} onClick={() => {
+                                $(room).trigger('onRemoveUserRequest', [contactHash]);
+                            }}/>
+                       );
                     }
 
 
@@ -223,7 +225,7 @@ var ParticipantsListInner = React.createClass({
 
                         dropdowns.push(
                             <DropdownsUI.DropdownItem
-                                key="privOperator" icon="cogwheel-icon"
+                                key="privOperator" icon="gentleman"
                                 label={__(l[8875])}
                                 className={"tick-item " + (room.members[contactHash] === 3 ? "active" : "")}
                                 disabled={myPresence === 'offline' || contactHash === u_handle}
@@ -279,7 +281,7 @@ var ParticipantsListInner = React.createClass({
 
                     // other user privilege
                     if (room.members[contactHash] === 3) {
-                        dropdownIconClasses = "small-icon cogwheel-icon";
+                        dropdownIconClasses = "small-icon gentleman";
                     }
                     else if (room.members[contactHash] === 2) {
                         dropdownIconClasses = "small-icon conversation-icon";
@@ -290,13 +292,7 @@ var ParticipantsListInner = React.createClass({
                         // should not happen.
                     }
 
-                    if (contactHash !== u_handle && room.iAmOperator()) {
-                        dropdowns.push(
-                            removeParticipantButton
-                        );
-                    }
                 }
-
 
                 contactsList.push(
                     <ContactsUI.ContactCard
@@ -304,14 +300,15 @@ var ParticipantsListInner = React.createClass({
                         contact={contact}
                         megaChat={room.megaChat}
                         className="right-chat-contact-card"
-                        dropdownPositionMy="right top"
-                        dropdownPositionAt="right bottom"
+                        dropdownPositionMy="left top"
+                        dropdownPositionAt="left top"
                         dropdowns={dropdowns}
                         dropdownDisabled={contactHash === u_handle}
                         dropdownButtonClasses={
                             room.type == "group" &&
                             myPresence !== 'offline' ? "button icon-dropdown" : "default-white-button tiny-button"
                         }
+                        dropdownRemoveButton={dropdownRemoveButton}
                         dropdownIconClasses={dropdownIconClasses}
                         style={{
                             width: 249,

@@ -755,8 +755,10 @@ var ConversationsApp = React.createClass({
     },
     startChatClicked: function(selected) {
         if (selected.length === 1) {
-            loadSubPage("fm/chat/" + selected[0]);
-            this.props.megaChat.createAndShowPrivateRoomFor(selected[0]);
+            megaChat.createAndShowPrivateRoomFor(selected[0])
+                .then(function(room) {
+                    room.setActive();
+                });
         }
         else {
             this.props.megaChat.createAndShowGroupRoomFor(selected);

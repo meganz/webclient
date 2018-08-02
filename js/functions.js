@@ -178,6 +178,22 @@ function megatitle(nperc) {
     }
 }
 
+// Set Recieved Contacts indicator
+function updateIpcRequests() {
+    var $indicator = $('.contacts-indicator');
+    var $contactTab = $('.contacts-tab-lnk.ipc');
+    var ipcLength = Object.keys(M.ipc).length;
+
+    if (ipcLength) {
+        $indicator.removeClass('hidden').text(ipcLength);
+        $contactTab.addClass('filled').find('span').text(ipcLength);
+    }
+    else {
+        $indicator.addClass('hidden').text('');
+        $contactTab.removeClass('filled').find('span').text('');
+    }
+}
+
 function countrydetails(isocode) {
     var cdetails = {
         name: M.getCountryName(isocode),

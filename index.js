@@ -172,7 +172,7 @@ function topPopupAlign(button, popup, topPos) {
     $.popupAlign = function () {
         var $button = $(button),
             $popup = $(popup),
-            $popupArrow = $popup.find('.dropdown-white-arrow'),
+            $popupArrow = $popup.children('.dropdown-white-arrow'),
             pageWidth,
             popupRightPos,
             arrowRightPos,
@@ -1832,7 +1832,7 @@ function topmenuUI() {
         $topMenu.find('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $topMenu.find('.top-menu-item.account').removeClass('hidden');
         $topMenu.find('.upgrade-your-account').removeClass('hidden');
-        $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+        $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
         $topHeader.find('.top-login-button').addClass('hidden');
         $topHeader.find('.membership-status').removeClass('hidden');
@@ -2020,7 +2020,7 @@ function topmenuUI() {
         if ((!e || $(e.target).parents('.fm-add-user,.add-user-popup').length == 0)
             && (!c || c.indexOf('fm-add-user') == -1)) {
             $('.fm-add-user').removeClass('active');
-            $('.add-user-popup').addClass('dialog hidden');
+            $('.add-user-popup').addClass('hidden');
             $('.add-user-popup').removeAttr('style');
         }
     };

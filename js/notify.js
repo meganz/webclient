@@ -359,6 +359,9 @@ var notify = {
 
         // Update page title
         megatitle();
+        
+        // Update IPC indicator
+        delay('updateIpcRequests', updateIpcRequests);
     },
 
     /**
@@ -706,6 +709,9 @@ var notify = {
 
             // Mark all notifications as seen (because they clicked on a notification within the popup)
             notify.markAllNotificationsAsSeen();
+
+            // Update IPC indicator
+            delay('updateIpcRequests', updateIpcRequests);
         });
     },
 

@@ -1,5 +1,5 @@
-.feedback.round-icon-block {
-	margin: 2px 0 0 0;
+.feedback.call-status-block {
+    margin: 5px 0 0 2px;
 	float: left;
 }
 .feedback.error-notification {

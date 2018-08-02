@@ -814,10 +814,12 @@
 
     /**
      * A version of the Copy dialog used in the contacts page for sharing.
+     * @param {String} [u_id] Share to contact handle.
      * @global
      */
-    global.openCopyShareDialog = function openCopyShareDialog() {
+    global.openCopyShareDialog = function openCopyShareDialog(u_id) {
         M.safeShowDialog('copy', function() {
+            $.shareToContactId = u_id;
             handleOpenDialog('cloud-drive', false, 'copyToShare');
             return $dialog;
         });
@@ -1206,7 +1208,7 @@
             var itemLeftPos = $item.offset().left;
             var itemTopPos = $item.offset().top;
             var $tooltip = $('.contact-preview', $dialog);
-            var avatar = useravatar.contact(owner, 'small-rounded-avatar', 'div');
+            var avatar = useravatar.contact(owner, '', 'div');
             var note = !share.level && !share.circular && "You don't have write privileges in this share.";
 
             $tooltip.find('.contacts-info.body')
@@ -1271,6 +1273,7 @@
             var saveToDialogNode = $.saveToDialogNode;
             var saveToDialogCb = $.saveToDialogCb;
             var saveToDialog = $.saveToDialog;
+            var shareToContactId = $.shareToContactId;
             delete $.saveToDialogPromise;
 
             if ($.moveDialog) {
@@ -1290,7 +1293,7 @@
                 // If copying from contacts tab (Ie, sharing)
                 if ($(this).text().trim() === l[1344]) {
                     var user = {
-                        u: M.currentdirid
+                        u: shareToContactId ? shareToContactId : M.currentdirid
                     };
                     var $sp = $('.share-dialog-permissions', $dialog);
                     if ($sp.hasClass('read-and-write')) {

@@ -1272,8 +1272,40 @@ Chat.prototype.getPrivateRoom = function(h) {
 
 
 Chat.prototype.createAndShowPrivateRoomFor = function(h) {
-    chatui(h);
-    return this.getPrivateRoom(h);
+    var self = this;
+
+    if (self.chats[h]) {
+        chatui(h);
+        return MegaPromise.resolve(this.getPrivateRoom(h));
+    }
+    else {
+        var userHandles = [u_handle, h];
+        var result = megaChat.openChat(userHandles, "private");
+        var roomId = result[1] && result[1].roomId ? result[1].roomId : '';
+        var promise = new MegaPromise();
+
+        if (result && result[1] && result[2]) {
+            var room = result[1];
+            var chatInitDonePromise = result[2];
+            chatInitDonePromise.done(function() {
+                createTimeoutPromise(function() {
+                    return room.state === ChatRoom.STATE.READY;
+                }, 300, 30000).done(function() {
+                    room.setActive();
+                    promise.resolve(room);
+                })
+                    .fail(function(e) {
+                        promise.reject(e);
+                    });
+            });
+        }
+        else if (d) {
+            console.warn('Cannot openChat for %s.', roomId);
+            promise.reject();
+        }
+
+        return promise;
+    }
 };
 
 Chat.prototype.createAndShowGroupRoomFor = function(contactHashes) {
@@ -1521,6 +1553,34 @@ Chat.prototype.getMyChatFilesFolder = function() {
         });
 
     return promise;
+};
+
+
+/**
+ * Creates a 1on1 chat room and opens the send files from cloud drive dialog automatically
+ *
+ * @param {string} user_handle
+ */
+Chat.prototype.openChatAndSendFilesDialog = function(user_handle) {
+    var userHandles = [u_handle, user_handle];
+    var result = megaChat.openChat(userHandles, "private");
+    var roomId = result[1] && result[1].roomId ? result[1].roomId : '';
+
+    if (result && result[1] && result[2]) {
+        var room = result[1];
+        var chatInitDonePromise = result[2];
+        chatInitDonePromise.done(function() {
+            createTimeoutPromise(function() {
+                return room.state === ChatRoom.STATE.READY;
+            }, 300, 30000).done(function() {
+                room.setActive();
+                $(room).trigger('openSendFilesDialog');
+            });
+        });
+    }
+    else if (d) {
+        console.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId);
+    }
 };
 
 window.Chat = Chat;

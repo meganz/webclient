@@ -193,7 +193,9 @@ var slideshowid;
         }
 
         if ($overlay) {
-            if (!n || !n.p || M.getNodeRoot(id) === 'shares' || folderlink) {
+            var root = M.getNodeRoot(id);
+
+            if (!n || !n.p || root === 'shares' || root === M.RubbishID || folderlink) {
                 $overlay.find('.viewer-button.getlink').addClass('hidden');
             }
             else {

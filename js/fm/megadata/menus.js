@@ -217,7 +217,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 if (mediaType) {
                     items['.play-item'] = 1;
 
-                    if (mediaType === 1) {
+                    if (mediaType === 1 && sourceRoot !== M.RubbishID) {
                         items['.embedcode-item'] = 1;
                     }
                 }

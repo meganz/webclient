@@ -73,7 +73,10 @@
     background-position: -85px -860px;
 }
 .clipboard .toast-icon {
-    background-position: -85px -1162px;
+    background-position: -196px -128px;
+    background-image: url(../images/mega/icons-sprite_v21@2x.png);
+    background-size: 262px auto;
+    opacity: 0.74;
 }
 .settings .toast-icon {
     background-position: -85px -1212px;
@@ -110,8 +113,9 @@
     display: inline-block;
     vertical-align: middle;
 }
-.toast-col:nth-child(1) {
-    padding: 0 0 4px 0;
+.toast-col:nth-child(1) span span {
+    color: #999999;
+    display: block;
 }
 .toast-col:nth-child(2) {
     padding: 0 16px 2px 0;
@@ -119,6 +123,13 @@
     white-space: nowrap;
     width: 0;
     font-size: 0;
+}
+.toast-notification.short {
+    max-width: 358px;
+    margin-left: -177px;
+}
+.short .toast-col:nth-child(2) {
+    display: none;
 }
 .toast-col:nth-child(3) {
     width: 40px;
@@ -209,7 +220,7 @@
     float: left;
 }
 .toast-close-button.qr-toast-close {
-    background-image: url(../images/mega/icons-sprite_v20.png);
+    background-image: url(../images/mega/icons-sprite_v21.png);
     background-position: -136px -206px;
     margin-top: -4px;
     margin-left: 226px;
@@ -246,7 +257,7 @@
     display: inline-block;
     width: 14px;
     height: 14px;
-    background-image: url(../images/mega/icons-sprite_v20.png);
+    background-image: url(../images/mega/icons-sprite_v21.png);
     vertical-align: top;
     margin: 2px 9px 0 1px;
     background-position: -198px -1240px;

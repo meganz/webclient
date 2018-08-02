@@ -379,12 +379,16 @@ MegaData.prototype.treeSearchUI = function() {
         $('.nw-fm-tree-header').rebind('click', function(e) {
             var $self = $(this);
 
-            var targetClass = $(e.target).attr('class'),
-                filledInput = $self.attr('class'),
-                $input = $self.find('input');
+            var targetClass = $(e.target).attr('class');
+            var filledInput = $self.attr('class');
+            var $input = $self.find('input');
 
+            // If plus button is clicked
+            if (targetClass && (targetClass.indexOf('button') > -1)) {
+                return false;
+            }
             // Search icon visible
-            if (targetClass && (targetClass.indexOf('nw-fm-search-icon') > -1)) {
+            else if (targetClass && (targetClass.indexOf('nw-fm-search-icon') > -1)) {
 
                 // Remove previous search text
                 if (filledInput && (filledInput.indexOf('filled-input') > -1)) {

@@ -794,10 +794,12 @@
 
     /**
      * A version of the Copy dialog used in the contacts page for sharing.
+     * @param {String} [u_id] Share to contact handle.
      * @global
      */
-    global.openCopyShareDialog = function openCopyShareDialog() {
+    global.openCopyShareDialog = function openCopyShareDialog(u_id) {
         M.safeShowDialog('copy', function() {
+            $.shareToContactId = u_id;
             handleOpenDialog('cloud-drive', false, 'copyToShare');
             return $dialog;
         });
@@ -1183,7 +1185,7 @@
                 return false;
             }
 
-            var html = useravatar.contact(ownerHandle, 'small-rounded-avatar', 'div') +
+            var html = useravatar.contact(ownerHandle, '', 'div') +
                 '<div class="user-card-data no-status">' +
                 '<div class="user-card-name small">' + htmlentities(ownerName) +
                 ' <span class="grey">(' + l[8664] + ')</span></div>' +
@@ -1244,6 +1246,7 @@
             var saveToDialogNode = $.saveToDialogNode;
             var saveToDialogCb = $.saveToDialogCb;
             var dialogIsChatSave = $.dialogIsChatSave;
+            var shareToContactId = $.shareToContactId;
 
             if ($.moveDialog) {
                 closeDialog();
@@ -1257,7 +1260,7 @@
                 // If copying from contacts tab (Ie, sharing)
                 if ($(this).text().trim() === l[1344]) {
                     var user = {
-                        u: M.currentdirid
+                        u: shareToContactId ? shareToContactId : M.currentdirid
                     };
                     var $sp = $('.share-dialog-permissions', $dialog);
                     if ($sp.hasClass('read-and-write')) {

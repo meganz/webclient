@@ -36,8 +36,6 @@ function dashboardUI() {
     // Add-contact plus
     $('.dashboard .contacts-widget .add-contacts').rebind('click', function() {
         contactAddDialog();
-        $('.fm-add-user').trigger('click');
-        $('.add-user-size-icon').trigger('click');
         return false;
     });
 

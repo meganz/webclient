@@ -17,11 +17,22 @@
 .section.conversations .fm-right-files-block {
     height: 100%;
 }
-.nw-fm-tree-header.conversations .button {
+.nw-fm-tree-header .button {
     position: absolute;
-    right: 12px;
+    right: 9px;
     top: 6px;
     padding: 2px;
+     -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    z-index: 7;
+}
+.nw-fm-tree-header.focused-input:not(.conversations) .button {
+     -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
 }
 .conversation-panels, .conversation-panel {
     -webkit-box-sizing: border-box;
@@ -203,8 +214,7 @@
     -khtml-opacity: 0.73;
     opacity: 0.73;
 }
-.contacts-info .icon-dropdown + .user-card-data {
-    padding-right: 6px;
+.group-chat .contacts-info .user-card-data {
     padding-left: 10px;
     overflow: auto;
     height: 32px;
@@ -296,8 +306,8 @@
     height: 32px;
 }
 .group-chat .contacts-info .icon-dropdown {
-    margin: 2px 4px 0 0;
-    padding: 2px 2px 2px 3px;
+    margin: 2px 5px 0 0;
+    padding: 2px 3px 2px 3px;
 }
 .group-chat .chat-contacts-list-inner .contacts-info.body.right-chat-contact-card {
     max-height: 36px;
@@ -396,15 +406,16 @@ table.arc-chat-messages-block {
     padding-bottom: 24px;
 }
 /* Old chat stuff */
-.fm-start-chat-dropdown {
+.fm-start-chat-dropdown.dropdown.body {
 filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
     left: auto;
     right: -13px;
+    z-index: 1000;
 }
-.fm-start-chat-dropdown.active {
+.fm-start-chat-dropdown.dropdown.body.active {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
@@ -475,6 +486,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     margin-right: 20px;
     font-family: 'source_sans_prosemibold';
     display: block;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 .calculated-width {
     width: -webkit-calc(100% - 330px);

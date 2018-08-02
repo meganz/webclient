@@ -831,7 +831,7 @@ function accountUI() {
             }
 
             $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-            $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+            $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
             var firstName = String($('#account-firstname').val() || '').trim();
             var lastName = String($('#account-lastname').val() || '').trim();
@@ -1628,7 +1628,7 @@ function accountUI() {
 
                     useravatar.invalidateAvatar(u_handle);
                     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+                    $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
                     $('.fm-account-remove-avatar').hide();
                 }
             });
@@ -1943,7 +1943,7 @@ accountUI.userUIUpdate = function() {
 
     // update avatar
     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+    $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
 
     // Show first name or last name

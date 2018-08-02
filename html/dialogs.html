@@ -996,55 +996,107 @@
     </div>
 </div>
 
-<div class="add-user-popup dialog dropdown body popup dropdown-arrow hidden">
+<div class="add-user-popup fm-dialog hidden">
     <i class="dropdown-white-arrow"></i>
     <div class="fm-dialog-close"></div>
-    <div class="nw-fm-dialog-title">[$71]</div>
-    <div class="add-user-size-icon full-size"></div>
+    <div class="nw-fm-dialog-title big">[$71]</div>
     <div class="add-user-popup-pad">
-        <div class="add-user-icon">
-            <div class="multiple-input-warning">
-                <div class="arrow"></div>
-                <span>[$5918]</span>
-            </div>
-        </div>
         <div class="multiple-input">
+            <i class="small-icon icons-sprite email"></i>
             <input type="text" class="add-contact-multiple-input" id="add-user-dialog-input" name="" />
             <div class="clear"></div>
         </div>
+        <div class="multiple-input-warning">
+            <span>[$5918]</span>
+        </div>
+        <div class="hidden-textarea-info"><span>[$19109]</span></div>
 
         <div class="add-user-notification">
             <div class="add-user-nt-scrolling">
                 <div class="add-user-textarea textarea-scroll">
-                    <textarea placeholder="[$17738]"></textarea>
+                    <textarea placeholder="[$19110]"></textarea>
                     <div class="add-contact-hidden">[$17738]</div>
                 </div>
             </div>
-
         </div>
-        <div class="default-dialog-bottom">
-            <div class="import-contacts-link"><span></span>[$236] [$950]...</div>
-            <div class="import-contacts-dialog hidden">
-                <div class="import-contacts-header">
-                    <div class="import-contacts-info">
-                        <div class="import-contacts-info-txt">
-                            [$6888]
-                            <div class="import-arrow"></div>
-                        </div>
-                    </div>
-                    <div class="import-contacts-link active"><span></span>[$236] [$950]...</div>
+        
+        <div class="big-red-button add-user-popup-button height-48">
+            [$19112]
+        </div>
+        
+        <div class="hidden-achievement-info">
+            <div class="hidden-achievement-cell">
+                <i class="mid-white-icon ach-create-account"></i>
+            </div>
+            <div class="hidden-achievement-cell">
+                <div class="big-txt">
+                    [$19123]
                 </div>
-                <!--Please add "imported" classname if contact are already imported !-->
-                <div class="import-contacts-service gmail">
-                    <span>
-                        Gmail
-                    </span>
+                <div class="small-txt">
+                    [$19124]
                 </div>
             </div>
-            <div class="add-user-popup-button default-white-button right add"><span>[$155]</span></div>
-            <div class="add-user-popup-button default-white-button right cancel"><span>[$82]</span></div>
+        </div>
+
+    </div>
+    <div class="dialog-dark-bottom">
+        <i class="small-icon icons-sprite white-chain"></i>
+        [$19111]
+    </div>
+</div>
+
+<div class="fm-dialog new-contact hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="nw-fm-dialog-title big">[$18759]</div>
+    <div class="fm-dialog-body">
+        <div class="new-contact-avatar"></div>
+        <div class="new-contact-info">
+            <span></span> [$5851]
+        </div>
+        <div class="new-user-message hidden">
+            <i class="medium-icon icons-sprite quote1"></i>
+            <span>Ah, the technical interview. Nothing like it. Not only does it cause anxiety, but it causes anxiety for several different reasons.</span>
+            <i class="medium-icon icons-sprite quote2"></i>
+        </div>
+        <div class="new-contact-buttons">
+            <div class="contact-request-button default-white-button green-txt inline accept">
+                <i class="small-icon icons-sprite tiny-green-tick"></i>
+                <span>[$5856]</span>
+            </div>
+            <div class="contact-request-button default-white-button grey-txt inline ignore">
+                <i class="small-icon icons-sprite stop dark"></i>
+                <span>[$5860]</span>
+            </div>
+            <div class="contact-request-button default-white-button red-txt inline delete">
+                <i class="small-icon icons-sprite tiny-red-cross"></i>
+                <span>[$5858]</span>
+            </div>
         </div>
     </div>
+</div>
+
+<div class="fm-dialog contact-info hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="nw-fm-dialog-title big"></div>
+    <div class="fm-dialog-body">
+        <div class="new-contact-avatar email">
+            <div class="avatar-wrapper semi-mid-avatar"></div>
+        </div>
+        <div class="new-contact-info">
+            <span></span> [$19127]
+        </div>
+        <div class="new-contact-buttons">
+            <div class="default-white-button inline ok">
+                <span>[$81]</span>
+                <i class="small-icon icons-sprite thumb-up"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dropdown body dropdown-arrow down-arrow tooltip small">
+    <i class="dropdown-white-arrow"></i>
+    [$18739]
 </div>
 
 <div class="imported-contacts-notification hidden">
@@ -1072,15 +1124,13 @@
         <div class="share-dialog-contacts">
             <!--Content goes here-->
         </div>
-        <div class="share-dialog-icon">
-            <div class="multiple-input-warning">
-                <div class="arrow"></div>
-                <span>[$5918]</span>
-            </div>
-        </div>
+        <div class="share-dialog-icon"></div>
         <div class="multiple-input">
             <input type="text" class="share-multiple-input" id="share-multiple-input" name="" />
             <div class="clear"></div>
+        </div>
+        <div class="multiple-input-warning">
+            <span>[$5918]</span>
         </div>
         <div class="share-message">
             <div class="share-message-scrolling">
@@ -1118,7 +1168,7 @@
         </div>
 
         <div class="fingerprint-mid-info">
-            <div class="fingerprint-avatar color1">UU</div>
+            <div class="fingerprint-avatar"></div>
             <div class="fingerprint-code">
                 <div class="contact-fingerprint-title">
                     [$6780]

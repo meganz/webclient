@@ -687,7 +687,7 @@ var ConversationAudioVideoPanel = React.createClass({
                     <i className="tiny-icon grey-minus-icon" />
                 </div>
                 <ContactsUI.Avatar
-                    contact={M.u[u_handle]} className="call semi-big-avatar"
+                    contact={M.u[u_handle]} className="call avatar-wrapper semi-big-avatar"
                     style={{display: !this.state.localMediaDisplay ? "none" : ""}}
                 />
             </div>;
@@ -724,7 +724,7 @@ var ConversationAudioVideoPanel = React.createClass({
             // TODO: When rtc is ready
             var contact = M.u[participants[0]];
             remotePlayerElement = <div className="call user-audio">
-                <ContactsUI.Avatar contact={contact}  className="big-avatar" hideVerifiedBadge={true} />
+                <ContactsUI.Avatar contact={contact}  className="avatar-wrapper big-avatar" hideVerifiedBadge={true} />
             </div>;
         }
         else {
@@ -879,6 +879,9 @@ var ConversationPanel = React.createClass({
             if (self.messagesListScrollable) {
                 self.messagesListScrollable.scrollToBottom();
             }
+        });
+        self.props.chatRoom.rebind('openSendFilesDialog', function(e) {
+            self.setState({'attachCloudDialog': true});
         });
 
         self.eventuallyInit();

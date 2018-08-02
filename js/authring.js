@@ -379,7 +379,7 @@ var authring = (function () {
             u_authring[keyType][userhandle] = { fingerprint: fingerprint,
                                                 method: method,
                                                 confidence: confidence };
-            ns.setContacts(keyType);
+            return ns.setContacts(keyType);
         }
     };
 

@@ -107,7 +107,7 @@
 }
 .popup .contacts-info.body.contacts-search {
     height: 48px;
-    padding: 6px 0;
+    padding: 4px 0;
     cursor: pointer;
 }
 .contacts-search .user-card-presence {
@@ -143,10 +143,10 @@
     max-width: calc(100% - 2px);
 }
 .popup.contacts-search .small-rounded-avatar {
-    margin: 0 0 0 16px;
+    margin: 2px 0 0 16px;
 }
 .popup.contacts-search .contacts-info .user-card-data {
-    padding-left: 68px;
+    padding-left: 64px;
 }
 .popup.contacts-search .horizontal-only {
 	height: auto;

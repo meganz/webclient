@@ -86,11 +86,9 @@ var useravatar = (function() {
         var id = user.u || user;
         var bgBlock = '';
 
-        /**
         if (element === 'ximg') {
             return _getAvatarSVGDataURI(user);
         }
-        */
 
         var s = _getAvatarProperties(user);
 

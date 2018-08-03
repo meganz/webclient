@@ -194,7 +194,7 @@ BusinessAccount.prototype.getSubAccountMKey = function (subUserHandle) {
 /**
  * Function to get Quota usage Report between two dates.
  * @param {boolan} forceUpdate      a flag to force updating the cached values
- * @param {Object} fromToDate      [optional] object contains .fromDate and .toDate YYYYMMDD
+ * @param {Object} fromToDate       object contains .fromDate and .toDate YYYYMMDD
  * @returns {Promise}               Resolves operation result
  */
 BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDate) {
@@ -207,6 +207,13 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
         return operationPromise.reject(0, 10, 'invalid FromToDate');
     }
 
+    var context = Object.create(null);
+    context.dates = fromToDate;
+    var request = {
+        "a": "sbu", // business sub account operation
+        "aa": "q" // get quota info
+    };
+
     if (!forceUpdate) {
         if (mega.buinsessAccount && mega.buinsessAccount.quotaReport) {
             var storedDates = Object.keys(mega.buinsessAccount.quotaReport);
@@ -215,20 +222,24 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
 
             // best case scenario, the period we want is inside the saved
             if (fromToDate.fromDate >= oldestStoredDate && fromToDate.toDate <= newestStoredDate) {
-                var result = {};
+                var result = Object.create(null);
                 var start = storedDates.indexOf(fromToDate.fromDate);
                 var end = storedDates.indexOf(fromToDate.toDate);
                 for (var k = start; k <= end; k++) {
                     result[storedDates[k]] = mega.buinsessAccount.quotaReport[storedDates[k]];
                 }
+                operationPromise.resolve(1, result); // quota report
+            }
+            // the second case, left wing of saved data
+            else if (fromToDate.fromDate < oldestStoredDate && fromToDate.toDate <= newestStoredDate) {
+                /*
+                 *  var d = new Date();
+                    d.setDate(d.getDate()-5);*/
             }
         }
     }
 
-    var request = {
-        "a": "sbu", // business sub account operation
-        "aa": "q" // get quota info
-    };
+    
 
     if (fromToDate && fromToDate.fromDate && fromToDate.toDate
         && fromToDate.fromDate.length === fromToDate.toDate === 8) {

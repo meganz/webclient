@@ -2409,10 +2409,20 @@ function closeDialog(ev) {
         delete $.shareToContactId;
         delete $.copyrightsDialog;
 
-        /* copy/move dialog - chat - save to */
+        /* copy/move dialog - save to */
         delete $.saveToDialogCb;
         delete $.saveToDialogNode;
-        delete $.dialogIsChatSave;
+        delete $.saveToDialog;
+
+        if ($.saveToDialogPromise) {
+            if (typeof $.saveToDialogPromise === 'function') {
+                $.saveToDialogPromise(EEXPIRED);
+            }
+            else {
+                $.saveToDialogPromise.reject(EEXPIRED);
+            }
+            delete $.saveToDialogPromise;
+        }
 
         if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button, .fm-dialog-close')) {
             delete $.onImportCopyNodes;

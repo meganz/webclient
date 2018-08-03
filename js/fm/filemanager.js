@@ -1588,7 +1588,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             // when the user is typing in the "New folder dialog", if the current viewMode is grid/icons view, then
             // left/right navigation in the input field may cause the selection manager to trigger selection changes.
             // Note: I expected that the dialog would set $.dialog, but it doesn't.
-            return true;
+            if (e.keyCode !== 27) {
+                return true;
+            }
         }
 
         var is_transfers_or_accounts = (

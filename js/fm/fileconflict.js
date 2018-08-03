@@ -44,7 +44,7 @@
 
             // this is special if for copying from chat
             // 1- must be 1 item
-            // 2- must be to 1 target. 
+            // 2- must be to 1 target.
             // --> no need to consider in all logical space of file/folder conflicts
             if (M.d[target] && M.d[target].name === 'My chat files') {
                 defaultAction = ns.KEEPBOTH;
@@ -108,7 +108,7 @@
                     if (file) {
                         setName(file, name);
                         var isAddNode = true;
-                        
+
                         if (action === ns.REPLACE) {
                             if (!file.t) {
                                 file._replaces = node.h;
@@ -438,6 +438,13 @@
                     $('.red-header', $a3).text(l[17094]);
                     $('.light-grey', $a1).text(l[17602]);
                     $('.light-grey', $a3).text(l[16493]);
+                    break;
+                case 'import':
+                    $('.red-header', $a1).text(l[17558]);
+                    $('.red-header', $a2).text(l[17559]);
+                    $('.red-header', $a3).text(l[17560]);
+                    $('.light-grey', $a1).html(l[17097]);
+                    $('.light-grey', $a3).text(l[17561]);
                     break;
             }
 

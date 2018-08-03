@@ -319,7 +319,7 @@
 .dropdown.notification-text i {
     margin: 0 8px 0 -1px;
 }
-.dropdown.body.tooltip, .dropdown.body.info-tooltip {
+.dropdown.body.tooltip {
     position: fixed;
     visibility: collapse;
     -webkit-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
@@ -332,7 +332,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -khtml-opacity: 0;
     opacity: 0;
 }
-.dropdown.body.info-tooltip {
+.dropdown.body.tooltip.small {
     position: fixed;
     font-size: 14px;
     line-height: 18px;
@@ -344,7 +344,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     border-radius: 6px;
     z-index: 1500;
 }
-.dropdown.body.tooltip.visible, .dropdown.body.info-tooltip.visible {
+.dropdown.body.tooltip.visible {
     visibility: visible;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;

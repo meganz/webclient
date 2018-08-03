@@ -2318,7 +2318,7 @@ FileManager.prototype.contactsUI = function() {
 
     $publicLink.rebind('mouseover.publiclnk', function() {
         var $this = $(this);
-        var $tooltip = $('.dropdown.info-tooltip');
+        var $tooltip = $('.dropdown.tooltip.small');
         var leftPos = $this.offset().left + $this.width()/2 - $tooltip.outerWidth()/2;
         var topPos = $this.offset().top - $tooltip.outerHeight() - 10;
 
@@ -2329,7 +2329,7 @@ FileManager.prototype.contactsUI = function() {
     });
 
     $publicLink.rebind('mouseout.publiclnk', function() {
-        $('.dropdown.info-tooltip').removeClass('visible');
+        $('.dropdown.tooltip.small').removeClass('visible');
     });
 
     $publicLink.rebind('click', function(e) {

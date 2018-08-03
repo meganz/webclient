@@ -954,6 +954,25 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 
 
     var prepapreDailyUsageChart = function (st,res) {
+        var today = new Date();
+        var currMonth = '' + (today.getMonth() + 1);
+        if (currMonth.length < 2) {
+            currMonth = '0' + currMonth;
+        }
+        var currYear = today.getFullYear();
+
+        var startDate = currYear + '' + currMonth + '01';
+
+
+
+
+        var endDate = getLastDayofTheMonth(today);
+        if (!endDate) {
+            return;
+        }
+        var endDateStr = endDate.getFullYear() + '' + (endDate.getMonth() + 1) + endDate.getDate();
+        
+        
 
     };
 

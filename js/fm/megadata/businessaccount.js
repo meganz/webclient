@@ -192,12 +192,58 @@ BusinessAccount.prototype.getSubAccountMKey = function (subUserHandle) {
 };
 
 /**
- * Function to get Quota usage info for the master account and each sub account.
+ * Function to get Quota usage Report between two dates.
  * @param {boolan} forceUpdate      a flag to force updating the cached values
  * @param {Object} fromToDate      [optional] object contains .fromDate and .toDate YYYYMMDD
  * @returns {Promise}               Resolves operation result
  */
-BusinessAccount.prototype.getQuotaUsage = function (forceUpdate, fromToDate) {
+BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDate) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    if (!fromToDate || !fromToDate.fromDate || !fromToDate.toDate
+        || fromToDate.fromDate.length !== fromToDate.toDate.length
+        || fromToDate.fromDate.length !== 8) {
+        return operationPromise.reject(0, 10, 'invalid FromToDate');
+    }
+
+    if (!forceUpdate) {
+        if (mega.buinsessAccount && mega.buinsessAccount.quotaReport) {
+            var storedDates = Object.keys(mega.buinsessAccount.quotaReport);
+            var oldestStoredDate = storedDates[0];
+            var newestStoredDate = storedDates[storedDates.length - 1];
+
+            // best case scenario, the period we want is inside the saved
+            if (fromToDate.fromDate >= oldestStoredDate && fromToDate.toDate <= newestStoredDate) {
+                var result = {};
+                var start = storedDates.indexOf(fromToDate.fromDate);
+                var end = storedDates.indexOf(fromToDate.toDate);
+                for (var k = start; k <= end; k++) {
+                    result[storedDates[k]] = mega.buinsessAccount.quotaReport[storedDates[k]];
+                }
+            }
+        }
+    }
+
+    var request = {
+        "a": "sbu", // business sub account operation
+        "aa": "q" // get quota info
+    };
+
+    if (fromToDate && fromToDate.fromDate && fromToDate.toDate
+        && fromToDate.fromDate.length === fromToDate.toDate === 8) {
+        request.fd = fromToDate.fromDate;
+        request.td = fromToDate.toDate;
+    }
+};
+
+
+/**
+ * Function to get Quota usage info for the master account and each sub account.
+ * @param {boolan} forceUpdate      a flag to force updating the cached values
+ * @returns {Promise}               Resolves operation result
+ */
+BusinessAccount.prototype.getQuotaUsage = function (forceUpdate) {
     "use strict";
     var operationPromise = new MegaPromise();
     if (!forceUpdate) {
@@ -214,12 +260,6 @@ BusinessAccount.prototype.getQuotaUsage = function (forceUpdate, fromToDate) {
         "a": "sbu", // business sub account operation
         "aa": "q" // get quota info
     };
-
-    if (fromToDate && fromToDate.fromDate && fromToDate.toDate
-        && fromToDate.fromDate.length === fromToDate.toDate === 8) {
-        request.fd = fromToDate.fromDate;
-        request.td = fromToDate.toDate;
-    }
 
     api_req(request, {
         callback: function (res) {

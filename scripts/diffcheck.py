@@ -605,7 +605,7 @@ def reduce_validator(file_line_mapping, **extra):
                           .format(file_path, warning))
             # continue
 
-        if os.path.getsize(file_path) > 120000 and not file_extension in ['.css', '.html']:
+        if os.path.getsize(file_path) > 131072 and not file_extension in ['.css', '.html']:
             result.append('The file "{}" has turned too big, '
                           'any new functions must be moved elsewhere.'.format(file_path))
             # continue

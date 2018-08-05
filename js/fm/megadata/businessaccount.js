@@ -217,6 +217,7 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
     if (!forceUpdate) {
         if (mega.buinsessAccount && mega.buinsessAccount.quotaReport) {
             var storedDates = Object.keys(mega.buinsessAccount.quotaReport);
+            storedDates.sort();
             var oldestStoredDate = storedDates[0];
             var newestStoredDate = storedDates[storedDates.length - 1];
 
@@ -232,20 +233,79 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
             }
             // the second case, left wing of saved data
             else if (fromToDate.fromDate < oldestStoredDate && fromToDate.toDate <= newestStoredDate) {
-                /*
-                 *  var d = new Date();
-                    d.setDate(d.getDate()-5);*/
+                // we need to get data from "fromDate" to "oldestStoredDate-1"
+                var upperDate = new Date(oldestStoredDate.substr(0, 4), oldestStoredDate.substr(4, 2),
+                    oldestStoredDate.substr(6, 2));
+                upperDate.setDate(upperDate.getDate() - 1);
+
+                request.fd = fromToDate.fromDate;
+
+                var upperDateStr = upperDate.getMonth() + '';
+                if (upperDateStr.length < 2) {
+                    upperDateStr = '0' + upperDateStr;
+                }
+                upperDateStr = upperDate.getFullYear() + upperDateStr;
+                var tempDay = upperDate.getDate() + '';
+                if (tempDay.length < 2) {
+                    tempDay = '0' + tempDay;
+                }
+                upperDateStr += tempDay;
+
+                request.td = upperDateStr;
             }
+            // the third case, right wing of saved data
+            else if (fromToDate.fromDate >= oldestStoredDate && fromToDate.toDate > newestStoredDate) {
+                // we need to get data from "newestStoredDate+1" to "toDate"
+                var lowerDate = new Date(newestStoredDate.substr(0, 4), newestStoredDate.substr(4, 2),
+                    newestStoredDate.substr(6, 2));
+                lowerDate.setDate(lowerDate.getDate() + 1);
+
+                request.td = fromToDate.toDate;
+
+                var lowerDateStr = lowerDate.getMonth() + '';
+                if (lowerDateStr.length < 2) {
+                    lowerDateStr = '0' + lowerDateStr;
+                }
+                lowerDateStr = lowerDate.getFullYear() + lowerDateStr;
+                var tempDay2 = lowerDate.getDate() + '';
+                if (tempDay2.length < 2) {
+                    tempDay2 = '0' + tempDay2;
+                }
+                lowerDateStr += tempDay2;
+
+                request.fd = lowerDateStr;
+            }
+            // Else case left + right --> call recursively and combine them then return
         }
     }
 
-    
-
-    if (fromToDate && fromToDate.fromDate && fromToDate.toDate
-        && fromToDate.fromDate.length === fromToDate.toDate === 8) {
+    if (!request.fd || !request.td) {
         request.fd = fromToDate.fromDate;
         request.td = fromToDate.toDate;
     }
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'object') {
+                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                mega.buinsessAccount.quotaReport = mega.buinsessAccount.quotaReport || Map.create(null);
+
+                var returnedDates = Object.keys(res);
+                returnedDates.sort();
+
+
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+
+    });
+
+    return operationPromise;
 };
 
 

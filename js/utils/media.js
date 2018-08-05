@@ -1,6 +1,6 @@
 function isMediaSourceSupported() {
     'use strict';
-    return 'MediaSource' in window && (!window.safari || d);
+    return window.MediaSource && typeof MediaSource.isTypeSupported === 'function' && (!window.safari || d);
 }
 
 function is_video(n) {
@@ -1156,7 +1156,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             eventlog(eid);
         });
 
-        _makethumb(node, s);
+        if (typeof dataURLToAB === 'function') {
+            _makethumb(node, s);
+        }
 
         $(window).rebind('video-destroy.main', function() {
             $('.mobile.filetype-img').removeClass('hidden');

@@ -24,6 +24,11 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     var thumbHandler;
     var onPreviewRetry;
 
+    if (window.omitthumb) {
+        console.warn('Omitting thumb creation on purpose...', arguments);
+        return;
+    }
+
     if (typeof opt === 'object') {
         isRawImage = opt.raw;
         isVideo = opt.isVideo;

@@ -234,7 +234,7 @@ function fmremovesync(selectedNodes) {
             contact = 'contacts';
         }
         else {
-            replaceString = '<strong>' + htmlentities(M.d[selectedNodes[0]].name) + '</strong>';
+            replaceString = '<strong>' + escapeHTML(M.getNameByHandle(selectedNodes[0]) || '') + '</strong>';
             contact = 'contact';
         }
 

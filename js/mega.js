@@ -3133,7 +3133,10 @@ function loadfm_callback(res) {
 
         // Time to save the ufs-size-cache, from which M.tree nodes will be created and being
         // those dependant on in-memory-nodes from the initial load to set flags such SHARED.
-        ufsc.save();
+        console.assert(ufsc, 'check this...');
+        if (ufsc) {
+            ufsc.save();
+        }
 
         // commit transaction and set sn
         setsn(res.sn);
@@ -3537,11 +3540,13 @@ function fm_thumbnail_render(n) {
 mBroadcaster.once('boot_done', function() {
     "use strict";
 
-    if (
-        ua.details.browser === "Safari" ||
-        ua.details.browser === "Edge" ||
-        ua.details.browser === "Internet Explorer"
-    ) {
+    var uad = ua.details || false;
+    var browser = String(uad.browser || '');
+
+    if (!browser || browser === "Safari" || /edge|explorer/i.test(browser)) {
+        if (d) {
+            console.info('Disabling paste proxy on this browser...', browser, [uad]);
+        }
         return;
     }
 
@@ -3549,18 +3554,6 @@ mBroadcaster.once('boot_done', function() {
     // This is basically a proxy of on paste, that would trigger a new event, which would receive the actual
     // File object, name, etc.
     $(document).on('paste', function(event) {
-        if (ua.details.browser === "Safari") {
-            // Safari is not supported
-            return;
-        }
-        else if (
-            ua.details.browser.toLowerCase().indexOf("explorer") !== -1 ||
-            ua.details.browser.toLowerCase().indexOf("edge") !== -1
-        ) {
-            // IE is not supported
-            return;
-        }
-
         var items = (event.clipboardData || event.originalEvent.clipboardData).items;
         if (!items && event.originalEvent.clipboardData && event.originalEvent.clipboardData.files) {
             // safari

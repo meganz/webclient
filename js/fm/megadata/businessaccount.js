@@ -276,6 +276,7 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
                 request.fd = lowerDateStr;
             }
             // Else case left + right --> call recursively and combine them then return
+            // in the current UI is not possible to generate such case
         }
     }
 
@@ -285,18 +286,52 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
     }
 
     api_req(request, {
+        context: context,
         callback: function (res) {
             if ($.isNumeric(res)) {
                 operationPromise.reject(0, res, 'API returned error');
             }
             else if (typeof res === 'object') {
                 mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
-                mega.buinsessAccount.quotaReport = mega.buinsessAccount.quotaReport || Map.create(null);
+                mega.buinsessAccount.quotaReport = mega.buinsessAccount.quotaReport || Object.create(null);
 
-                var returnedDates = Object.keys(res);
-                returnedDates.sort();
+                for (repDay in res) {
+                    mega.buinsessAccount.quotaReport[repDay] = res[repDay];
+                }
 
+                var orderedDates = Object.keys(mega.buinsessAccount.quotaReport);
+                orderedDates.sort();
 
+                var startIx = 0;
+                for (startIx = 0; startIx < orderedDates.length; startIx) {
+                    if (orderedDates[startIx] === context.fromDate) {
+                        break;
+                    }
+                }
+
+                // quit if we didnt find the data
+                if (startIx === orderedDates.length) {
+                    console.error('Requested report start-date is not found');
+                    return operationPromise.reject(0, res, 'Requested report start-date is not found');
+                }
+
+                var result = Object.create(null);
+                var endIx = -1;
+                for (endIx = startIx; endIx < orderedDates.length; endIx++) {
+                    result[orderedDates[endIx]] = res[orderedDates[endIx]];
+                    if (orderedDates[endIx] === context.toDate) {
+                        break;
+                    }
+                }
+
+                // quit if we didnt find the data
+                if (endIx === orderedDates.length) {
+                    delete result;
+                    console.error('Requested report end-date is not found');
+                    return operationPromise.reject(0, res, 'Requested report end-date is not found');
+                }
+
+                operationPromise.resolve(1, result); // quota info
             }
             else {
                 operationPromise.reject(0, 4, 'API returned error, ret=' + res);

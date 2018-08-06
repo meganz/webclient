@@ -88,10 +88,37 @@
         <a class="dropdown-item syncmegasync-item"><i class="small-icon context syncmegasync"></i>[$17621]</a> <!-- Sync-->
         <hr />
     </div>
+    <div class="dropdown-contact-details">
+        <div class="dropdown-avatar hidden"></div>
+        <div class="dropdown-user-name hidden"><span></span><div class="nw-contact-status"></div></div>
+        <a class="dropdown-item view-profile-item"><i class="small-icon human-profile"></i>[$8866]</a>
+        <div class="dropdown-fingerprint">
+            <div class="contact-fingerprint-title">
+                <span>[$6872]</span>
+                <i class="verified_icon"></i>
+            </div>
+            <div class="contact-fingerprint-txt">
+            </div>
+            <div class="dropdown-verify">
+                <i class="small-icon grey-key"></i>
+                <span>[$7692]</span>
+            </div>
+        </div>
+    </div>
     <div class="dropdown-section">
-        <a class="dropdown-item startchat-item"><i class="small-icon context conversation"></i>[$5885]</a>
-        <a class="dropdown-item startaudio-item"><i class="small-icon context handset"></i>[$5896]</a>
-        <a class="dropdown-item startvideo-item"><i class="small-icon context videocam"></i>[$5897]</a>
+        <a class="dropdown-item startchat-item"><i class="small-icon context conversation"></i>[$7997]</a>
+        <a class="dropdown-item startaudiovideo-item contains-submenu"><i class="small-icon context handset"></i>[$19125]</a>
+        <span class="dropdown body submenu">
+            <span>
+                <span class="dropdown-item startaudio-item"><i class="small-icon context handset"></i>[$1565]</span>
+                <span class="dropdown-item startvideo-item"><i class="small-icon context videocam"></i>[$1566]</span>
+            </span>
+        </span>
+        <hr />
+    </div>
+    <div class="dropdown-section">
+        <a class="dropdown-item send-files-item"><i class="small-icon context arrow-in-circle"></i>[$6834]</a>
+        <a class="dropdown-item share-folder-item"><i class="small-icon context share-folder"></i>[$6775]</a>
         <hr />
     </div>
     <div class="dropdown-section">
@@ -103,7 +130,7 @@
         <a class="dropdown-item copy-item"><i class="small-icon context cloned-files"></i>[$63]</a>
         <a class="dropdown-item import-item"><i class="small-icon context plus"></i>[$236]</a>
         <a class="dropdown-item revert-item">
-            <i class="small-icon context icons-sprite reverted-clock"></i>Restore
+            <i class="small-icon context icons-sprite reverted-clock"></i>[$5726]
         </a>
         <hr />
     </div>
@@ -118,6 +145,7 @@
         <input type="file" id="fileselect4" name="fileselect4" webkitdirectory multiple class="hidden" />
     </div>
     <div class="dropdown-section">
+        <a class="dropdown-item remove-contact red"><i class="small-icon context red-stop"></i>[$83]</a>
         <a class="dropdown-item remove-item"><i class="small-icon context remove-to-bin"></i>[$83]</a>
         <a class="dropdown-item removeshare-item red"><i class="small-icon context leave-share"></i>[$5866]</a>
         <a class="dropdown-item clearbin-item red"><i class="small-icon context red-cross"></i>[$7741]</a>
@@ -163,11 +191,12 @@
             </div>
             <div class="nw-fm-left-icon contacts">
                 <div class="nw-fm-left-border"></div>
+                <div class="contacts-indicator hidden"></div>
                 <div class="dark-tooltip">[$950]</div>
             </div>
             <div class="nw-fm-left-icon conversations">
                 <div class="nw-fm-left-border"></div>
-                <div class="new-messages-indicator hidden">2</div>
+                <div class="new-messages-indicator hidden"></div>
                 <div class="dark-tooltip">[$5902]</div>
             </div>
 
@@ -231,11 +260,12 @@
             </div>
             <div class="nw-fm-left-icon contacts">
                 <div class="nw-fm-left-border"></div>
+                <div class="contacts-indicator hidden"></div>
                 <div class="dark-tooltip">[$165]</div>
             </div>
             <div class="nw-fm-left-icon conversations">
                 <div class="nw-fm-left-border"></div>
-                <div class="new-messages-indicator hidden">2</div>
+                <div class="new-messages-indicator hidden"></div>
                 <div class="dark-tooltip">[$5902]</div>
                 <div class="beta-text"></div>
             </div>
@@ -330,6 +360,9 @@
                 <div class="nw-fm-tree-header contacts">
                     <input type="text" value="" placeholder="[$165]" />
                     <div class="nw-fm-search-icon"></div>
+                    <div class="button fm-add-user">
+                        <i class="small-icon white-medium-plus"></i>
+                    </div>
                 </div>
                 <div class="nw-fm-tree-header rubbish-bin">
                     <input type="text" value="" placeholder="[$168]" />
@@ -361,8 +394,8 @@
                 <div class="content-panel dashboard">
                     <div class="account user-data-block">
                         <div class="fm-account-avatar">
-                            <div class="avatar-bg"><span></span></div>
-                            <div class="avatar-wrapper avatar">
+                            <div class="avatar-bg colorized"><span></span></div>
+                            <div class="avatar-wrapper small-rounded-avatar">
                                 <img alt="" />
                             </div>
                         </div>
@@ -404,8 +437,8 @@
                 <div class="content-panel account">
                     <div class="account user-data-block">
                         <div class="fm-account-avatar">
-                            <div class="avatar-bg"><span></span></div>
-                            <div class="avatar-wrapper avatar">
+                            <div class="avatar-bg colorized"><span></span></div>
+                            <div class="avatar-wrapper small-rounded-avatar">
                                 <img alt="" />
                             </div>
                         </div>
@@ -438,10 +471,6 @@
             </div>
 
 
-            <div class="fm-received-requests"><span></span>[$5900]</div>
-            <div class="fm-contact-requests"><span></span>[$5901]</div>
-
-
         </div>
 
         <div id="topmenu"></div>
@@ -456,6 +485,13 @@
             <div class="fm-notification-block almost-full">
                 <div class="fm-notification-close"></div>
                 [$16316]
+            </div>
+
+            <div class="contacts-tabs-bl hidden">
+                <div class="contacts-tab-lnk contacts" data-folder="contacts">[$165]</div>
+                <div class="contacts-tab-lnk ipc" data-folder="ipc">[$5863]<span></span></div>
+                <div class="contacts-tab-lnk opc" data-folder="opc">[$5862]</div>
+                <div class="clear"></div>
             </div>
 
             <div class="fm-right-header fm hidden">
@@ -510,6 +546,10 @@
 
                     <div class="button link-button right fm-add-user hidden">
                         <i class="small-icon dark-grey-plus"></i><span>[$101]</span>
+                    </div>
+
+                    <div class="button link-button right accept-all hidden">
+                        <i class="small-icon icons-sprite tiny-grey-tick"></i><span>[$19062]</span>
                     </div>
 
                     <div class="button link-button right red fm-clearbin-button hidden">
@@ -595,18 +635,22 @@
             <div class="fm-empty-contacts hidden">
                 <div class="fm-empty-pad">
                     <div class="fm-empty-contacts-bg"></div>
-                    <div class="fm-empty-cloud-txt">[$5737]</div>
-                    <div class="fm-empty-description">
-                        [$5913]
+                    <div class="fm-empty-cloud-txt small">[$5737]</div>
+                    <div class="fm-empty-description small">
+                        [$19114]
                     </div>
-                    <div class="fm-empty-button">
+                    <div class=" big-red-button fm-empty-button">
                         [$71]...
                     </div>
+                    <div class="empty-share-public">
+                       <i class="small-icon icons-sprite grey-chain"></i>
+                       [$19111]
+                    </div>
                     <div class="fm-not-logged-text">
-                        <div class="fm-not-logged-description">
+                        <div class="fm-not-logged-description small">
                             [$8762]
                         </div>
-                        <div class="fm-not-logged-button create-account">
+                        <div class="big-red-button fm-not-logged-button create-account">
                             [$968]
                         </div>
                     </div>
@@ -709,6 +753,12 @@
                     </tr>
                 </table>
                 <div class="grid-scrolling-table contacts">
+                    <div class="add-new-contact">
+                        <div class="avatar-wrapper small-rounded-avatar">
+                            <i class="small-icon fm-s green-plus"></i>
+                        </div>
+                        <div class="contact-green-info">[$19106]</div>
+                    </div>
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table contacts">
                     </table>
                 </div>
@@ -717,6 +767,13 @@
 
             <div class="fm-blocks-view contacts-view hidden">
                 <div class="contacts-blocks-scrolling">
+                    <div class="data-block-view semi-big add-new-contact">
+                        <div class="avatar-wrapper medium-avatar">
+                            <i class="big-icon fm-s green-plus"></i>
+                        </div>
+                        <div class="contact-green-info">[$19106]</div>
+                    </div>
+                    <div class="content"></div>
                 </div>
                 <div class="blocks-view-data"></div>
             </div>
@@ -783,25 +840,13 @@
                     <div class="contact-fingerprint-block">
                         <div class="contact-fingerprint-title">[$6872]</div>
                         <div class="contact-fingerprint-txt">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <div class="contact-fingerprint-txt">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
                         </div>
                         <div class="verify-buttons">
                             <div class="fm-verify  default-white-button left small grey-txt">
                                 <span>[$1960]</span>
                             </div>
                             <div class="fm-reset-stored-fingerprint  default-white-button left small grey-txt">
-                                <span>Reset</span>
+                                <span>[$742]</span>
                             </div>
                         </div>
                         <div class="clear"></div>
@@ -901,7 +946,7 @@
                         <th>[$86]</th>
                         <th>[$93]</th>
                         <th>[$87]</th>
-                        <th>[$1346]</th>
+                        <th>[$19134]</th>
                         <th>[$12441]</th>
                         <th>[$89]</th>
                         <th class="grid-url-header"></th>
@@ -2818,3 +2863,14 @@
     </div>
 
 </div>
+
+<ul id="template-tree-item" class="hidden">
+    <li>
+        <span class="nw-fm-tree-item">
+            <span></span>
+            <span class="nw-fm-tree-folder"></span>
+            <span class="data-item-icon"></span>
+        </span>
+        <ul></ul>
+    </li>
+</ul>

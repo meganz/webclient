@@ -178,9 +178,25 @@ function megatitle(nperc) {
     }
 }
 
+// Set Recieved Contacts indicator
+function updateIpcRequests() {
+    var $indicator = $('.contacts-indicator');
+    var $contactTab = $('.contacts-tab-lnk.ipc');
+    var ipcLength = Object.keys(M.ipc).length;
+
+    if (ipcLength) {
+        $indicator.removeClass('hidden').text(ipcLength);
+        $contactTab.addClass('filled').find('span').text(ipcLength);
+    }
+    else {
+        $indicator.addClass('hidden').text('');
+        $contactTab.removeClass('filled').find('span').text('');
+    }
+}
+
 function countrydetails(isocode) {
     var cdetails = {
-        name: isoCountries[isocode],
+        name: M.getCountryName(isocode),
         icon: isocode.toLowerCase() + '.gif'
     };
     return cdetails;
@@ -209,7 +225,9 @@ function numOfBytes(bytes, precision) {
     return { size: parts[0], unit: parts[1] || 'B' };
 }
 
-function bytesToSize(bytes, precision, html_format) {
+function bytesToSize(bytes, precision, format) {
+    'use strict'; /* jshint -W074 */
+
     var s_b = 'B';
     var s_kb = 'KB';
     var s_mb = 'MB';
@@ -233,6 +251,7 @@ function bytesToSize(bytes, precision, html_format) {
     var petabyte = terabyte * 1024;
     var resultSize = 0;
     var resultUnit = '';
+    var capToMB = false;
 
     if (precision === undefined) {
         if (bytes > gigabyte) {
@@ -243,9 +262,14 @@ function bytesToSize(bytes, precision, html_format) {
         }
     }
 
+    if (format < 0) {
+        format = 0;
+        capToMB = true;
+    }
+
     if (!bytes) {
         resultSize = 0;
-        resultUnit = s_mb;
+        resultUnit = s_b;
     }
     else if ((bytes >= 0) && (bytes < kilobyte)) {
         resultSize = parseInt(bytes);
@@ -255,7 +279,7 @@ function bytesToSize(bytes, precision, html_format) {
         resultSize = (bytes / kilobyte).toFixed(precision);
         resultUnit = s_kb;
     }
-    else if ((bytes >= megabyte) && (bytes < gigabyte)) {
+    else if ((bytes >= megabyte) && (bytes < gigabyte) || capToMB) {
         resultSize = (bytes / megabyte).toFixed(precision);
         resultUnit = s_mb;
     }
@@ -277,10 +301,10 @@ function bytesToSize(bytes, precision, html_format) {
     }
 
     // XXX: If ever adding more HTML here, make sure it's safe and/or sanitize it.
-    if (html_format === 2) {
+    if (format === 2) {
         return resultSize + '<span>' + resultUnit + '</span>';
     }
-    else if (html_format) {
+    else if (format) {
         return '<span>' + resultSize + '</span>' + resultUnit;
     }
     else {

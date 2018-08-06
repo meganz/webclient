@@ -38,10 +38,11 @@ var TruncatedMessage = React.createClass({
             cssClasses += " grouped";
         }
         else {
-            avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
+            avatar = <ContactsUI.Avatar contact={contact}
+                                        className="message avatar-wrapper small-rounded-avatar"/>;
             datetime = <div className="message date-time"
                             title={time2date(timestampInt)}>{timestamp}</div>;
-            name = <div className="message user-card-name">{displayName}</div>;
+            name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
         }
 
 
@@ -50,7 +51,7 @@ var TruncatedMessage = React.createClass({
                 {avatar}
 
                 <div className="message content-area small-info-txt">
-                    <div className="message user-card-name">{displayName}</div>
+                    <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />
                     {datetime}
 
                     <div className="message text-block">

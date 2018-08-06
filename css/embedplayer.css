@@ -350,7 +350,7 @@ input, textarea {
 	left: 48px;
 	top: 50%;
 	margin: -33px 0 0 0;
-	background-image: url(../images/mega/icons-sprite_v20.png);
+	background-image: url(../images/mega/icons-sprite_v21.png);
 	background-position: -188px -670px;
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
@@ -951,7 +951,7 @@ input, textarea {
 	width: 24px;
 	height: 11px;
 	z-index: 123;
-	background-image: url(../images/mega/top-login-sprite_v9.png);
+	background-image: url(../images/mega/top-login-sprite_v11.png);
 	background-repeat: no-repeat;
 	background-position: 0 -2249px;
 }
@@ -1036,7 +1036,7 @@ input, textarea {
 	position: absolute;
 	right: 7px;
 	top: 9px;
-	background-image: url(../images/mega/icons-sprite_v20.png);
+	background-image: url(../images/mega/icons-sprite_v21.png);
 	background-repeat: no-repeat;
 	background-position: -106px -254px;
 	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
@@ -1065,7 +1065,7 @@ input, textarea {
 	right: 8px;
 	top: 50%;
 	margin: -4px 0 0 0;
-	background-image: url(../images/mega/top-login-sprite_v9.png);
+	background-image: url(../images/mega/top-login-sprite_v11.png);
 	background-repeat: no-repeat;
 	background-position: -30px -1816px;
 }
@@ -1368,7 +1368,7 @@ input, textarea {
 .embedplayer.video .download.info-txt.big-txt:hover {
 	opacity: 1;
 }
-.embedplayer.video .nw-contact-avatar {
+.embedplayer.video .awatar-wrapper {
 	width: 24px;
 	height: 24px;
 	border: 2px solid white;
@@ -1391,7 +1391,7 @@ input, textarea {
 	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
 }
-.embedplayer.video .nw-contact-avatar::before {
+.embedplayer.video .awatar-wrapper::before {
 	content: '';
 	display: block;
 	width: inherit;
@@ -1405,10 +1405,10 @@ input, textarea {
 	-webkit-border-radius: inherit;
 	border-radius: inherit;
 }
-.embedplayer.video .nw-contact-avatar {
+.embedplayer.video .awatar-wrapper {
 	margin-bottom: 0;
 }
-.embedplayer.video .nw-contact-avatar span {
+.embedplayer.video .awatar-wrapper span {
 	color: white;
 }
 .embedplayer.video .dropdown {

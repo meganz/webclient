@@ -11,7 +11,7 @@ var TypingAreaUI = require('./../typingArea.jsx');
 /* 1h as confirmed by Mathias */
 var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
 
-var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.medium';
+var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.semi-big, .data-block-view.medium';
 
 var NODE_DOESNT_EXISTS_ANYMORE = {};
 
@@ -75,6 +75,10 @@ var GenericConversationMessage = React.createClass({
             function(e){
                 if (e.target.classList.contains('button')) {
                     // prevent recursion
+                    return;
+                }
+                if (e.target.classList.contains('no-thumb-prev')) {
+                    // do now show the dropdown clicking a previeable item without thumbnail
                     return;
                 }
 
@@ -300,6 +304,10 @@ var GenericConversationMessage = React.createClass({
     },
 
     _startPreview: function(v, e) {
+        if ($(e && e.target).is('.tiny-button')) {
+            // prevent launching the previewer clicking the dropdown on an previewable item without thumbnail
+            return;
+        }
         var chatRoom = this.props.message.chatRoom;
         assert(M.chat, 'Not in chat.');
         chatRoom._rebuildAttachmentsImmediate();
@@ -509,9 +517,10 @@ var GenericConversationMessage = React.createClass({
                         var isPreviewable = isImage || isVideo;
 
                         var dropdown = null;
+                        var noThumbPrev = '';
                         var previewButton = null;
 
-                        if (showThumbnail) {
+                        if (showThumbnail || isImage) {
                             var imagesListKey = message.messageId + "_" + v.h;
                             if (!chatRoom.images.exists(imagesListKey)) {
                                 v.id = imagesListKey;
@@ -519,13 +528,17 @@ var GenericConversationMessage = React.createClass({
                                 v.messageId = message.messageId;
                                 chatRoom.images.push(v);
                             }
-                            if (isPreviewable) {
-                                var previewLabel = isVideo ? l[17732] : l[1899];
-                                previewButton = <span key="previewButton">
+                        }
+
+                        if (isPreviewable) {
+                            if (!showThumbnail) {
+                                noThumbPrev = 'no-thumb-prev';
+                            }
+                            var previewLabel = isVideo ? l[17732] : l[1899];
+                            previewButton = <span key="previewButton">
                                     <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
                                                               onClick={self._startPreview.bind(self, v)}/>
                                 </span>;
-                            }
                         }
 
                         if (contact.u === u_handle) {
@@ -670,7 +683,8 @@ var GenericConversationMessage = React.createClass({
 
 
                         var attachmentClasses = "message shared-data";
-                        var preview = <div className="data-block-view medium">
+                        var preview = <div className={"data-block-view medium " + noThumbPrev}
+                                           onClick={isPreviewable && self._startPreview.bind(self, v)}>
                             {dropdown}
 
                             <div className="data-block-bg">
@@ -750,10 +764,10 @@ var GenericConversationMessage = React.createClass({
                         additionalClasses += " grouped";
                     }
                     else {
-                        avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
+                        avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
                         datetime = <div className="message date-time"
                                         title={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <div className="message user-card-name">{displayName}</div>;
+                        name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
                     }
 
                     return <div className={message.messageId + " message body" + additionalClasses}>
@@ -832,6 +846,16 @@ var GenericConversationMessage = React.createClass({
                                     positionAt="right bottom"
                                     horizOffset={4}
                                 >
+
+                                    <div className="dropdown-avatar rounded">
+                                        <ContactsUI.ContactPresence className="small" contact={contact} />
+                                        <ContactsUI.Avatar className="avatar-wrapper context-avatar" contact={contact} />
+                                        <div className="dropdown-user-name">
+                                            {M.getNameByHandle(contact.u)}
+                                        </div>
+                                    </div>
+                                    <ContactsUI.ContactFingerprint contact={contact} />
+
                                     <DropdownsUI.DropdownItem
                                         icon="human-profile"
                                         label={__(l[5868])}
@@ -870,6 +894,15 @@ var GenericConversationMessage = React.createClass({
                                     positionAt="right bottom"
                                     horizOffset={4}
                                 >
+
+                                    <div className="dropdown-avatar rounded">
+                                        <ContactsUI.ContactPresence className="small" contact={contact} />
+                                        <ContactsUI.Avatar className="avatar-wrapper context-avatar" contact={contact} />
+                                        <div className="dropdown-user-name">
+                                            {M.getNameByHandle(contact.u)}
+                                        </div>
+                                    </div>
+
                                     <DropdownsUI.DropdownItem
                                         icon="rounded-grey-plus"
                                         label={__(l[71])}
@@ -914,23 +947,21 @@ var GenericConversationMessage = React.createClass({
                                     <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
                                     {
                                         M.u[contact.u] ?
-                                            <ContactsUI.ContactVerified className="big" contact={contact} /> :
+                                            <ContactsUI.ContactVerified className="right-align" contact={contact} /> :
                                             null
                                     }
 
                                     <div className="user-card-email">{contactEmail}</div>
                                 </div>
                                 <div className="message shared-data">
-                                    <div className="data-block-view medium">
+                                    <div className="data-block-view semi-big">
                                         {
                                             M.u[contact.u] ?
-                                                <ContactsUI.ContactPresence className="big" contact={contact} /> :
+                                                <ContactsUI.ContactPresence className="small" contact={contact} /> :
                                                 null
                                         }
                                         {dropdown}
-                                        <div className="data-block-bg">
-                                            <ContactsUI.Avatar className="medium-avatar share" contact={contact} />
-                                        </div>
+                                        <ContactsUI.Avatar className="avatar-wrapper medium-avatar" contact={contact} />
                                     </div>
                                     <div className="clear"></div>
                                 </div>
@@ -946,10 +977,10 @@ var GenericConversationMessage = React.createClass({
                         additionalClasses += " grouped";
                     }
                     else {
-                        avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
+                        avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
                         datetime = <div className="message date-time"
                                         title={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <div className="message user-card-name">{displayName}</div>;
+                        name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
                     }
 
                     return <div className={message.messageId + " message body" + additionalClasses}>
@@ -1120,10 +1151,10 @@ var GenericConversationMessage = React.createClass({
                     additionalClasses += " grouped";
                 }
                 else {
-                    avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
+                    avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
                     datetime = <div className="message date-time"
                                     title={time2date(timestampInt)}>{timestamp}</div>;
-                    name = <div className="message user-card-name">{displayName}</div>;
+                    name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
                 }
 
                 var messageDisplayBlock;
@@ -1264,46 +1295,46 @@ var GenericConversationMessage = React.createClass({
 
             // mapping css icons to msg types
             if (message.type === "call-rejected") {
-                message.cssClass = "crossed-handset red";
+                message.cssClass = "handset-with-stop";
             }
             else if (message.type === "call-missed") {
-                message.cssClass = "horizontal-handset yellow"
+                message.cssClass = "handset-with-yellow-arrow"
             }
             else if (message.type === "call-handled-elsewhere") {
-                message.cssClass = "handset-with-arrow green";
+                message.cssClass = "handset-with-up-arrow";
             }
             else if (message.type === "call-failed") {
-                message.cssClass = "horizontal-handset red";
+                message.cssClass = "handset-with-cross";
             }
             else if (message.type === "call-timeout") {
-                message.cssClass = "horizontal-handset yellow";
+                message.cssClass = "horizontal-handset";
             }
             else if (message.type === "call-failed-media") {
-                message.cssClass = "diagonal-handset yellow";
+                message.cssClass = "handset-with-yellow-cross";
             }
             else if (message.type === "call-canceled") {
-                message.cssClass = "horizontal-handset grey";
+                message.cssClass = "crossed-handset";
             }
             else if (message.type === "call-ended") {
-                message.cssClass = "horizontal-handset grey";
+                message.cssClass = "horizontal-handset";
             }
             else if (message.type === "call-feedback") {
-                message.cssClass = "diagonal-handset grey";
+                message.cssClass = "diagonal-handset";
             }
             else if (message.type === "call-starting") {
-                message.cssClass = "diagonal-handset blue";
+                message.cssClass = "diagonal-handset";
             }
             else if (message.type === "call-initialising") {
-                message.cssClass = "diagonal-handset blue";
+                message.cssClass = "diagonal-handset";
             }
             else if (message.type === "call-started") {
-                message.cssClass = "diagonal-handset green";
+                message.cssClass = "diagonal-handset";
             }
             else if (message.type === "incoming-call") {
-                message.cssClass = "diagonal-handset green";
+                message.cssClass = "handset-with-down-arrow";
             }
             else if (message.type === "outgoing-call") {
-                message.cssClass = "diagonal-handset blue";
+                message.cssClass = "handset-with-up-arrow";
             }
             else {
                 message.cssClass = message.type;
@@ -1338,8 +1369,8 @@ var GenericConversationMessage = React.createClass({
             return (
                 <div className={message.messageId + " message body" + additionalClasses}
                      data-id={"id" + message.messageId}>
-                    <div className="feedback round-icon-block">
-                        <i className={"round-icon " + message.cssClass}></i>
+                    <div className="feedback call-status-block">
+                        <i className={"call-icon " + message.cssClass}></i>
                     </div>
 
                     <div className="message content-area">

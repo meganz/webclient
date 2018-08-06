@@ -44,7 +44,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             chatShard: undefined,
             members: {},
             membersLoaded: false,
-            topic: ""
+            topic: "",
+            flags: 0x00,
+            archivedSelected: false
         },
         true
     );
@@ -193,8 +195,17 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
      * Manually proxy contact related data change events, for more optimal UI rerendering.
      */
     var membersSnapshot = {};
-    self.rebind('onMembersUpdated.chatRoomMembersSync', function() {
+    self.rebind('onMembersUpdated.chatRoomMembersSync', function(e, eventData) {
         var roomRequiresUpdate = false;
+
+        if (eventData.userId === u_handle) {
+            self.messagesBuff.joined = true;
+            if (self.state === ChatRoom.STATE.JOINING) {
+                self.setState(ChatRoom.STATE.READY);
+            }
+            roomRequiresUpdate = true;
+        }
+
 
         Object.keys(membersSnapshot).forEach(function(u_h) {
             var contact = M.u[u_h];
@@ -209,7 +220,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
         Object.keys(self.members).forEach(function(u_h) {
             var contact = M.u[u_h];
-            if (contact) {
+            if (contact && contact.addChangeListener) {
                 membersSnapshot[u_h] = contact.addChangeListener(function() {
                     self.trackDataChange();
                 });
@@ -277,6 +288,7 @@ ChatRoom.STATE = {
 };
 
 ChatRoom.INSTANCE_INDEX = 0;
+ChatRoom.ARCHIVED = 0x01;
 
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
     var self = this;
@@ -331,6 +343,97 @@ ChatRoom.prototype._resetCallStateNoCall = function() {
 ChatRoom.prototype._resetCallStateInCall = function() {
 
 };
+
+/**
+ * Check whether a chat is archived or not.
+ *
+ * @returns {Boolen}
+ */
+ChatRoom.prototype.isArchived = function() {
+    var self = this;
+    return (self.flags & ChatRoom.ARCHIVED);
+};
+
+/**
+ * Check whether a chat is displayable.
+ *
+ * @returns {Boolen}
+ */
+ChatRoom.prototype.isDisplayable = function() {
+    var self = this;
+    return ((self.showArchived === true) ||
+            !self.isArchived() ||
+            (self.callManagerCall && self.callManagerCall.isActive()));
+};
+
+/**
+ * Save chat into info fmdb.
+ *
+ */
+ChatRoom.prototype.persistToFmdb = function() {
+    var self = this;
+    if (fmdb) {
+        var users = [];
+        if (self.members) {
+            Object.keys(self.members).forEach(function(user_handle) {
+                users.push({
+                    u: user_handle,
+                    p: self.members[user_handle]
+                });
+            });
+        }
+
+        if (self.chatId && self.chatShard !== undefined) {
+            var roomInfo = {
+                'id': self.chatId,
+                'cs': self.chatShard,
+                'g' : (self.type === "group") ? 1 : 0,
+                'u' : users,
+                'ts': self.ctime,
+                'ct': self.ct,
+                'f' : self.flags
+            };
+            fmdb.add('mcf', {id: roomInfo.id, d: roomInfo});
+        }
+    }
+};
+
+/**
+ * Save the chat info into fmdb.
+ * @param f {binary} new flags
+ * @param updateUI {Boolen} flag to indicate whether to update UI.
+ */
+ChatRoom.prototype.updateFlags = function(f, updateUI) {
+    var self = this;
+    var flagChange = (self.flags !== f);
+    self.flags = f;
+    self.archivedSelected = false;
+    if (self.isArchived()) {
+        megaChat.archivedChatsCount++;
+        self.showArchived = false;
+    }
+    else {
+        megaChat.archivedChatsCount--;
+    }
+    self.persistToFmdb();
+
+
+    if (updateUI && flagChange) {
+        if (megaChat.currentlyOpenedChat &&
+            megaChat.chats[megaChat.currentlyOpenedChat] &&
+            megaChat.chats[megaChat.currentlyOpenedChat].chatId === self.chatId) {
+            loadSubPage('fm/chat/');
+        }
+        else {
+            megaChat.refreshConversations();
+        }
+
+        if (megaChat.$conversationsAppInstance) {
+            megaChat.$conversationsAppInstance.safeForceUpdate();
+        }
+    }
+};
+
 
 /**
  * Convert state to text (helper function)
@@ -471,7 +574,8 @@ ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
                 );
             }
         });
-        return names.length > 0 ? names.join(", ") : __(l[8888]);
+        return names.length > 0 ? names.join(", ")
+                                : __(l[19077]).replace('%s1', (new Date(self.ctime * 1000)).toLocaleString());
     }
 };
 
@@ -488,9 +592,6 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
 
     self._leaving = true;
     self._closing = triggerLeaveRequest;
-
-
-    self.members[u_handle] = 0;
 
 
     if (triggerLeaveRequest) {
@@ -516,6 +617,51 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
     else {
         self.setState(ChatRoom.STATE.LEFT);
     }
+};
+
+/**
+ * Archive this chat room
+ *
+ */
+ChatRoom.prototype.archive = function() {
+    var self = this;
+    var mask = 0x01;
+    var flags = ChatRoom.ARCHIVED;
+
+    asyncApiReq({
+        'a' : 'mcsf',
+        'id': self.chatId,
+        'm' : mask,
+        'f' : flags,
+        'v' : Chatd.VERSION}
+        )
+        .done(function(r) {
+            if (r === 0) {
+                self.updateFlags(flags, true);
+            }
+        });
+};
+
+/**
+ * Unarchive this chat room
+ *
+ */
+ChatRoom.prototype.unarchive = function() {
+    var self = this;
+    var mask = 0x01;
+    var flags = 0x00;
+
+    asyncApiReq({
+        'a': 'mcsf',
+        'id': self.chatId,
+        'm':mask, 'f':flags,
+        'v': Chatd.VERSION}
+        )
+        .done(function(r) {
+            if (r === 0) {
+                self.updateFlags(flags, true);
+            }
+        });
 };
 
 /**
@@ -765,9 +911,6 @@ ChatRoom.prototype.arePluginsForcingMessageQueue = function(message) {
 ChatRoom.prototype.sendMessage = function(message) {
     var self = this;
     var megaChat = this.megaChat;
-    if (d && self.state !== ChatRoom.STATE.READY) {
-        console.warn("Tried to do a .sendMessage while the room is not ready");
-    }
     var messageId = megaChat.generateTempMessageId(self.roomId, message);
 
     var msgObject = new Message(
@@ -1175,9 +1318,10 @@ ChatRoom.prototype.recover = function() {
 
     self.callRequest = null;
     if (self.state !== ChatRoom.STATE.LEFT) {
+        self.membersLoaded = false;
         self.setState(ChatRoom.STATE.JOINING, true);
         self.megaChat.trigger("onRoomCreated", [self]); // re-initialise plugins
-        return MegaPromise.resolve();;
+        return MegaPromise.resolve();
     }
     else {
         return MegaPromise.reject();
@@ -1207,11 +1351,10 @@ ChatRoom.prototype._clearChatMessagesFromChatd = function() {
 
 ChatRoom.prototype.isReadOnly = function() {
     return (
-        (this.members && this.members[u_handle] === 0) ||
+        (this.members && this.members[u_handle] <= 0) ||
         this.privateReadOnlyChat ||
         this.state === ChatRoom.STATE.LEAVING ||
-        this.state === ChatRoom.STATE.LEFT ||
-        this.state !== ChatRoom.STATE.READY
+        this.state === ChatRoom.STATE.LEFT
     );
 };
 ChatRoom.prototype.iAmOperator = function() {

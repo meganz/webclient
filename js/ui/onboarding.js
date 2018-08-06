@@ -294,7 +294,7 @@
 
         if (
             $('.notification-popup:visible').size() > 0 ||
-            $('.dropdown:visible:not(.transfer-widget)').size() > 0
+            $('.dropdown:visible:not(.transfer-widget, .tooltip)').size() > 0
         ) {
             return;
         }

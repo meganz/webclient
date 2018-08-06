@@ -172,7 +172,7 @@ function topPopupAlign(button, popup, topPos) {
     $.popupAlign = function () {
         var $button = $(button),
             $popup = $(popup),
-            $popupArrow = $popup.find('.dropdown-white-arrow'),
+            $popupArrow = $popup.children('.dropdown-white-arrow'),
             pageWidth,
             popupRightPos,
             arrowRightPos,
@@ -345,11 +345,15 @@ function init_page() {
     if (pageBeginLetters === 'C!' && page.length > 2) {
         var ctLink = page.substring(2, page.length);
         if (!is_mobile) {
-            
-            mBroadcaster.once('fm:initialized', function () {
+            if (!u_type) {
                 openContactInfoLink(ctLink);
-            });
-            page = 'fm/contacts';
+            }
+            else {
+                page = 'fm/contacts';
+                mBroadcaster.once('fm:initialized', function () {
+                    openContactInfoLink(ctLink);
+                });
+            }
         }
         else {
             var processContactLink = function () {
@@ -1219,10 +1223,6 @@ function init_page() {
         $('.reg-st5-complete-button').rebind('click', function (e) {
             loadSubPage('copyrightnotice');
         });
-        if (lang == 'en') {
-            $('#copyright_txt').text($('#copyright_txt').text().split('(i)')[0]);
-            $('#copyright_en').removeClass('hidden');
-        }
     }
     else if (page === 'disputenotice') {
         parsepage(pages['disputenotice']);
@@ -1413,6 +1413,7 @@ function init_page() {
             fminitialized = false;
             loadfm.loaded = false;
             loadfm.loading = false;
+            fmconfig = Object.create(null);
 
             stopapi();
             api_reset();
@@ -1555,7 +1556,7 @@ function init_page() {
         location.assign('/');
     }
 
-    // Initialise the Public Service Announcement system
+    // Initialise the Public Service Announcement system if loaded
     if (typeof psa !== 'undefined') {
         psa.init();
     }
@@ -1831,7 +1832,7 @@ function topmenuUI() {
         $topMenu.find('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $topMenu.find('.top-menu-item.account').removeClass('hidden');
         $topMenu.find('.upgrade-your-account').removeClass('hidden');
-        $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+        $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
         $topHeader.find('.top-login-button').addClass('hidden');
         $topHeader.find('.membership-status').removeClass('hidden');
@@ -2019,7 +2020,7 @@ function topmenuUI() {
         if ((!e || $(e.target).parents('.fm-add-user,.add-user-popup').length == 0)
             && (!c || c.indexOf('fm-add-user') == -1)) {
             $('.fm-add-user').removeClass('active');
-            $('.add-user-popup').addClass('dialog hidden');
+            $('.add-user-popup').addClass('hidden');
             $('.add-user-popup').removeAttr('style');
         }
     };

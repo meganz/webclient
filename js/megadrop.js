@@ -232,6 +232,8 @@ mega.megadrop = (function() {
             var folderName = '';
             var state = 2;
 
+            var opPromise = new MegaPromise();
+
             if (nodeId) {
                 if (!pufOpts.items[nodeId]) {
                     pufOpts.items[nodeId] = Object.create(null);
@@ -248,6 +250,7 @@ mega.megadrop = (function() {
                         if (d) {
                             console.error('Missing node info M.d ', nodeId);
                         }
+                        return opPromise.reject();
                     }
                     pufOpts.items[nodeId].fn = folderName;
 
@@ -261,12 +264,15 @@ mega.megadrop = (function() {
                             }
                         });
                     }
+                    opPromise.resolve();
                 });
+                return opPromise;
             }
             else {
                 if (d) {
                     console.error('puf.add nodeHandle is not provided.');
                 }
+                return opPromise.reject();
             }
         };
 
@@ -312,10 +318,11 @@ mega.megadrop = (function() {
                     }
                 }
                 else {
-                    add(puh);
-                    if (requesti === puh.i) {
-                        pup.create(puh.h);
-                    }
+                    add(puh).done(function () {
+                        if (requesti === puh.i) {
+                            pup.create(puh.h);
+                        }
+                    });
                 }
             }
         };
@@ -954,8 +961,8 @@ mega.megadrop = (function() {
                 else {
                     if (pupOpts.items[pupId]) {
                         folderId = pupOpts.items[pupId].h;
-                        settings.remove(pupId, folderId);
                         _del(pupId);
+                        settings.remove(pupId, folderId);
                     }
                 }
             }
@@ -1130,23 +1137,25 @@ mega.megadrop = (function() {
 
             // Click on PUP basic info, show full PUP informations .expanded-widget
             $('.widget-container').on('click.WS_clickcard', '.widget-card', function() {
-                var $this = $(this).closest('div[id^=pup_]');
-                var pupHandle = $this.attr('id').replace('pup_', '');
-                var expHandle = $('div[id^=ew_]').attr('id');
+                if (!$(this).hasClass("expanded-widget")) {
+                    var $this = $(this).closest('div[id^=pup_]');
+                    var pupHandle = $this.attr('id').replace('pup_', '');
+                    var expHandle = $('div[id^=ew_]').attr('id');
 
-                // Close expanded PUP
-                if (expHandle) {
-                    $('#' + expHandle).addClass('hidden').remove();
-                    $('#pup_' + expHandle.replace('ew_', '')).removeClass('hidden');
-                    delExpanded(expHandle);
+                    // Close expanded PUP
+                    if (expHandle) {
+                        $('#' + expHandle).addClass('hidden').remove();
+                        $('#pup_' + expHandle.replace('ew_', '')).removeClass('hidden');
+                        delExpanded(expHandle);
+                    }
+
+                    drawExpandedCard(pupHandle, $this);
+                    $this.addClass('hidden');
+                    $('#ew_' + pupHandle).removeClass('hidden');
+                    setExpanded(pupHandle);
+                    initAccountScroll();
+                    $(window).trigger('resize');
                 }
-
-                drawExpandedCard(pupHandle, $this);
-                $this.addClass('hidden');
-                $('#ew_' + pupHandle).removeClass('hidden');
-                setExpanded(pupHandle);
-                initAccountScroll();
-                $(window).trigger('resize');
             });
 
             // Click on minimise of PUP expanded informations, replace it  with basic info .widget-card
@@ -1278,7 +1287,9 @@ mega.megadrop = (function() {
          * @param {String} nodeHandle Folder id
          *          */
         var remove = function settingsRemove(pupHandle, nodeHandle) {
-
+            if (d) {
+                console.log('settings.remove');
+            }
             // un-bind all events related to .expanded-widget
             $('.widget-container .expanded-widget').off();
 
@@ -1286,8 +1297,8 @@ mega.megadrop = (function() {
             $('#pup_' + pupHandle).remove();// Remove widget-card
             delExpanded(pupHandle);
             ui.nodeIcon(nodeHandle);
-
-            if (Object.keys(puf.items).length === 1 && M.currentdirid === 'account/megadrop') {
+            if ((Object.keys(puf.items).length === 0 || Object.keys(pup.items).length === 0)
+                && M.currentdirid === 'account/megadrop') {
                 M.openFolder(M.RootID);
             }
         };
@@ -1380,14 +1391,14 @@ mega.megadrop = (function() {
         };
 
         var _queueScroll = function _uiQueueScroll(itemsNum) {
-            var SCROLL_TRIGGER = 6;
+            var SCROLL_TRIGGER = 5;
             var queueDOM = uiOpts.window.class + ' ' + uiOpts.window.queueClass;
 
-            if (itemsNum > SCROLL_TRIGGER) {// Adapt scroll to new height
-                jScrollReinitialize(queueDOM);
-            }
-            else if (itemsNum === SCROLL_TRIGGER) {// Add scroll
+            if (itemsNum > SCROLL_TRIGGER) {
                 dialogScroll(queueDOM);
+            }
+            else {
+                deleteScrollPanel(queueDOM, 'jsp');
             }
         };
 
@@ -1950,6 +1961,65 @@ mega.megadrop = (function() {
             if (!is_chrome_firefox || !dataTransfer.mozItemCount) {
                 return false;
             }
+        }
+        
+        /**
+         * Check user trying to upload folder.
+         */
+        if (d) {
+            console.log('Checking user uploading folder.');
+        }
+        if (event.dataTransfer
+                && event.dataTransfer.items
+                && event.dataTransfer.items.length > 0 && event.dataTransfer.items[0].webkitGetAsEntry) {
+            var items = event.dataTransfer.items;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].webkitGetAsEntry) {
+                    var item = items[i].webkitGetAsEntry();
+                    if (item && item.isDirectory) {
+                        // Hide Drop to Upload dialog and show warning notification
+                        $('.drag-n-drop.overlay').addClass('hidden');
+                        $('body').removeClass('overlayed');
+                        msgDialog('warninga', l[135], l[19179], false, false, false);
+                        return false;
+                    }
+                }
+            }
+        }
+        else if (is_chrome_firefox && event.dataTransfer) {
+            try {
+                var m = event.dataTransfer.mozItemCount;
+                for (var j = 0; j < m; ++j) {
+                    file = event.dataTransfer.mozGetDataAt("application/x-moz-file", j);
+                    if (file instanceof Ci.nsIFile) {
+                        filedrag_u = [];
+                        if (j === m - 1) {
+                            $.dostart = true;
+                        }
+                        var mozitem = new mozDirtyGetAsEntry(file); /*,e.dataTransfer*/
+                        if (mozitem.isDirectory) {
+                            // Hide Drop to Upload dialog and show warning notification
+                            $('.drag-n-drop.overlay').addClass('hidden');
+                            $('body').removeClass('overlayed');
+                            msgDialog('warninga', l[135], l[19179], false, false, false);
+                            return false;
+                        }
+                    }
+                    else {
+                        if (d) {
+                            console.log('FileSelectHandler: Not a nsIFile', file);
+                        }
+                    }
+                }
+            }
+            catch (e) {
+                alert(e);
+                Cu.reportError(e);
+            }
+        }
+        else {
+            // ie does not support DataTransfer.items property.
+            // Therefore cannot recognise what user upload is folder or not.
         }
 
         for (var i = 0; files[i]; i++) {

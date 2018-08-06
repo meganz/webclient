@@ -58,14 +58,6 @@
         if (fminitialized) {
             // Handle Inbox/RubbishBin UI changes
             delay(fmtopUI);
-
-            // Update M.v it's used for at least preview slideshow
-            for (var k = this.v.length; k--;) {
-                if (this.v[k].h === h) {
-                    this.v.splice(k, 1);
-                    break;
-                }
-            }
         }
 
         if (this.d[h] && !this.d[h].t && this.d[h].tvf) {
@@ -203,6 +195,9 @@ MegaData.prototype.getPath = function(id) {
         }
         else if (!id || (id.length !== 11)) {
             return [];
+        }
+        else if (window.megaChatIsReady && megaChat.chats[id]) {
+            return [id, 'contacts'];
         }
 
         if (
@@ -738,14 +733,6 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
             var h = n.h;
             var p = n.p;
             var tn = [];
-
-            // Update M.v it's used for slideshow preview at least
-            for (i = M.v.length; i--;) {
-                if (M.v[i].h === h) {
-                    M.v.splice(i, 1);
-                    break;
-                }
-            }
 
             // allow to revert nodes sent to the rubbish bin
             if (t === M.RubbishID && M.getNodeRoot(h) !== M.RubbishID) {
@@ -2727,6 +2714,18 @@ MegaData.prototype.getNameByHandle = function(handle) {
             // XXX: fallback to email
             result = user.name && $.trim(user.name) || user.m;
         }
+        else if (window.megaChatIsReady && megaChat.chats[handle]) {
+            var chat = megaChat.chats[handle];
+            result = chat.topic;
+            if (!result) {
+                var members = Object.keys(chat.members || {});
+                array.remove(members, u_handle);
+                result = members.map(function(h) {
+                    user = M.getUserByHandle(h);
+                    return user ? user.name && $.trim(user.name) || user.m : h;
+                }).join(', ');
+            }
+        }
     }
     else if (handle.length === 8) {
         var node = this.getNodeByHandle(handle);
@@ -2959,22 +2958,22 @@ MegaData.prototype.importWelcomePDF = function() {
  * @param {String} ph  Public handle
  * @param {String} key  Node key
  * @param {String} attr Node attributes
+ * @param {String} [srcNode] Prompt the user to choose a target for this source node...
  * @returns {MegaPromise}
  */
-MegaData.prototype.importFileLink = function importFileLink(ph, key, attr) {
+MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNode) {
     'use strict';
     return new MegaPromise(function(resolve, reject) {
-        api_req({
-            a: 'p',
-            t: M.RootID,
-            n: [{
-                ph: ph,
-                t: 0,
-                a: attr,
-                k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(key).slice(0, 8)))
-            }]
-        }, {
-            callback: function(r) {
+        var n = {
+            t: 0,
+            ph: ph,
+            a: attr,
+            k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(key).slice(0, 8)))
+        };
+
+        var _import = function(target) {
+            api_req({a: 'p', t: target, n: [n]}, {
+                callback: function(r) {
                     if (typeof r === 'object') {
                         $.onRenderNewSelectNode = r.f[0].h;
                         resolve(r.f[0].h);
@@ -2985,6 +2984,45 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr) {
                     }
                 }
             });
+        };
+
+        if (srcNode) {
+            $.mcImport = true;
+            $.saveToDialogPromise = reject;
+
+            openSaveToDialog(srcNode, function(srcNode, target) {
+                dbfetch.get(target).always(function() {
+                    var name = srcNode.name;
+
+                    fileconflict.check([srcNode], target, 'import').always(function(files) {
+                        var file = files && files[0];
+
+                        if (file) {
+                            if (file._replaces) {
+                                n.ov = file._replaces;
+                            }
+
+                            if (file.fa) {
+                                n.fa = file.fa;
+                            }
+
+                            if (name !== file.name) {
+                                n.a = ab_to_base64(crypto_makeattr(file));
+                            }
+
+                            _import(target);
+                            M.openFolder(target);
+                        }
+                        else {
+                            reject(EBLOCKED);
+                        }
+                    });
+                });
+            });
+        }
+        else {
+            _import(M.RootID);
+        }
     });
 };
 

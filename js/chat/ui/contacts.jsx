@@ -4,7 +4,6 @@ var RenderDebugger = require("../../stores/mixins.js").RenderDebugger;
 var utils = require("../../ui/utils.jsx");
 var PerfectScrollbar = require("../../ui/perfectScrollbar.jsx").PerfectScrollbar;
 
-
 var ContactsListItem = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     render: function() {
@@ -35,9 +34,234 @@ var ContactsListItem = React.createClass({
     }
 });
 
+var ContactButton = React.createClass({
+    mixins: [MegaRenderMixin, RenderDebugger],
+    render: function() {
+        var self = this;
+
+        var label = self.props.label ? self.props.label : "";
+        var classes = self.props.className ? self.props.className : "";
+        var contact = self.props.contact;
+        var dropdowns = self.props.dropdowns ? self.props.dropdowns : [];
+        var icon = self.props.dropdownIconClasses ? self.props.dropdownIconClasses : [];
+        var dropdownPosition = "left top";
+        var vertOffset = 0;
+        var horizOffset = -30;
+        var megaChat = self.props.megaChat ? self.props.megaChat : window.megaChat;
+
+        if (label) {
+            classes = "user-card-name " + classes;
+            icon = "";
+            dropdownPosition = "left bottom";
+            vertOffset = 25;
+            horizOffset = 0;
+        }
+
+        if (!contact) {
+            return null;
+        }
+
+        var username = M.getNameByHandle(contact.u);
+
+        var buttonComponent = null;
+        if (!self.props.noContextMenu) {
+            var ButtonsUI = require('./../../ui/buttons.jsx');
+            var DropdownsUI = require('./../../ui/dropdowns.jsx');
+
+            var moreDropdowns = [];
+
+            moreDropdowns.push(
+                <div className="dropdown-avatar rounded" key="mainContactInfo">
+                    <Avatar className="avatar-wrapper context-avatar"
+                            contact={contact} hideVerifiedBadge="true" onClick={() => {
+                                if (contact.c === 2) {
+                                    loadSubPage('fm/account');
+                                }
+                                if (contact.c === 1) {
+                                    loadSubPage('fm/' + contact.u);
+                                }
+                    }} />
+                    <div className="dropdown-user-name">
+                        {username}
+                        <ContactPresence className="small" contact={contact} />
+                    </div>
+                </div>
+            );
+
+            moreDropdowns.push(
+                <ContactFingerprint key="fingerprint" contact={contact} />
+            );
+
+            if (dropdowns.length && contact.c !== 2) {
+                moreDropdowns.push(dropdowns);
+
+                moreDropdowns.push(
+                    <hr key="top-separator" />
+                );
+            }
+
+            if (contact.c === 2) {
+                moreDropdowns.push(
+                    <DropdownsUI.DropdownItem
+                        key="view0" icon="human-profile" label={__(l[187])} onClick={() => {
+                            loadSubPage('fm/account');
+                        }} />
+                );
+            }
+            if (contact.c === 1) {
+
+                if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
+                    moreDropdowns.push(
+                        <DropdownsUI.DropdownItem
+                            key="startCall" className="contains-submenu" icon="context handset" label={__(l[19125])} onClick={() => {
+
+                                megaChat.createAndShowPrivateRoomFor(contact.u)
+                                    .then(function(room) {
+                                        room.setActive();
+                                        room.startAudioCall();
+                                    });
+                            }} />
+                    );
+                    moreDropdowns.push(
+                        <div className="dropdown body submenu" key="dropdownGroup">
+                            <div>
+                                <DropdownsUI.DropdownItem
+                                        key="startAudio" icon="context handset" label={__(l[1565])} onClick={() => {
+                                    megaChat.createAndShowPrivateRoomFor(contact.u)
+                                        .then(function(room) {
+                                            room.setActive();
+                                            room.startAudioCall();
+                                        });
+                                        }} />
+                            </div>
+                            <div>
+                                <DropdownsUI.DropdownItem
+                                    key="startVideo" icon="context videocam" label={__(l[1566])} onClick={() => {
+                                    megaChat.createAndShowPrivateRoomFor(contact.u)
+                                        .then(function(room) {
+                                            room.setActive();
+                                            room.startVideoCall();
+                                        });
+                                    }} />
+                            </div>
+                        </div>
+                    );
+                }
+                else {
+                    moreDropdowns.push(
+                            <DropdownsUI.DropdownItem
+                                key="startChat" icon="context conversation" label={__(l[5885])} onClick={() => {
+                                    loadSubPage('fm/chat/' + contact.u);
+                                }} />
+                    );
+                }
+
+                moreDropdowns.push(
+                    <hr key="files-separator" />
+                );
+
+                moreDropdowns.push(
+                    <DropdownsUI.DropdownItem
+                        key="send-files-item" icon="context arrow-in-circle" label={__(l[6834])} onClick={() => {
+                        megaChat.openChatAndSendFilesDialog(contact.u);
+                    }} />
+                );
+                moreDropdowns.push(
+                    <DropdownsUI.DropdownItem
+                        key="share-item" icon="context share-folder" label={__(l[6775])} onClick={() => {
+                            openCopyShareDialog(contact.u);
+                    }} />
+                );
+            }
+            else if (contact.c === 0) {
+                moreDropdowns.push(
+                    <DropdownsUI.DropdownItem
+                        key="view2" icon="small-icon icons-sprite grey-plus" label={__(l[101])} onClick={() => {
+                        loadingDialog.show();
+
+                        M.syncContactEmail(contact.u)
+                            .done(function(email) {
+                                var exists = false;
+                                Object.keys(M.opc).forEach(function (k) {
+                                    if (!exists && M.opc[k].m === email) {
+                                        exists = true;
+                                        return false;
+                                    }
+                                });
+
+                                if (exists) {
+                                    closeDialog();
+                                    msgDialog('warningb', '', l[7413]);
+                                } else {
+                                    M.inviteContact(M.u[u_handle].m, email);
+                                    var title = l[150];
+
+                                    var msg = l[5898].replace('[X]', email);
+
+                                    closeDialog();
+                                    msgDialog('info', title, msg);
+                                }
+                            })
+                            .always(function() {
+                                loadingDialog.hide();
+                            });
+                    }} />
+                );
+            }
+
+            if (self.props.dropdownRemoveButton && self.props.dropdownRemoveButton.length) {
+                moreDropdowns.push(
+                    <hr key="remove-separator" />
+                );
+                moreDropdowns.push(
+                    self.props.dropdownRemoveButton
+                );
+            }
+
+            if (moreDropdowns.length > 0) {
+                buttonComponent = <ButtonsUI.Button
+                    className={classes}
+                    icon={icon}
+                    disabled={moreDropdowns.length === 0 || self.props.dropdownDisabled}
+                    label={label}
+                    >
+                    <DropdownsUI.Dropdown className="contact-card-dropdown"
+                                          positionMy={dropdownPosition}
+                                          positionAt={dropdownPosition}
+                                          vertOffset={vertOffset}
+                                          horizOffset={horizOffset}
+                                          noArrow={true}
+                    >
+                        {moreDropdowns}
+                    </DropdownsUI.Dropdown>
+                </ButtonsUI.Button>;
+            }
+        }
+
+        return buttonComponent
+    }
+});
 
 var ContactVerified = React.createClass({
     mixins: [MegaRenderMixin],
+    componentWillMount:function() {
+        var self = this;
+
+        var contact = this.props.contact;
+        if (contact && contact.addChangeListener) {
+            self._contactListener = contact.addChangeListener(function () {
+                self.safeForceUpdate();
+            });
+        }
+    },
+    componentWillUnmount: function() {
+        var self = this;
+
+        var contact = this.props.contact;
+        if (contact && self._contactListener) {
+            contact.removeChangeListener(self._contactListener);
+        }
+    },
     render: function() {
         var self = this;
 
@@ -86,6 +310,65 @@ var ContactPresence = React.createClass({
     }
 });
 
+var ContactFingerprint = React.createClass({
+    mixins: [MegaRenderMixin],
+    render: function() {
+        var self = this;
+        var contact = this.props.contact;
+        if (!contact || !contact.u) {
+            return null;
+        }
+
+        var infoBlocks = [];
+
+        userFingerprint(contact.u, function(fingerprints) {
+            fingerprints.forEach(function(v, k) {
+                infoBlocks.push(
+                    <span key={"fingerprint-" + k}>
+                        {v}
+                    </span>
+                );
+            });
+        });
+
+        var verifyButton = null;
+
+        if (contact.c === 1 && u_authring && u_authring.Ed25519) {
+            var verifyState = u_authring.Ed25519[contact.u] || {};
+            if (
+                typeof verifyState.method === "undefined" ||
+                verifyState.method < authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON
+            ) {
+                verifyButton = <ButtonsUI.Button
+                    className="dropdown-verify active"
+                    label={__(l[7692])}
+                    icon="grey-key"
+                    onClick={() => {
+                        $(document).trigger('closeDropdowns');
+
+                        fingerprintDialog(contact.u);
+                    }} />
+            }
+        }
+
+        var fingerprintCode;
+        if (infoBlocks.length > 0) {
+            fingerprintCode = <div className="dropdown-fingerprint">
+                <div className="contact-fingerprint-title">
+                    <span>{__(l[6872])}</span>
+                    <ContactVerified contact={contact} />
+                </div>
+                <div className="contact-fingerprint-txt">
+                    {infoBlocks}
+                </div>
+                {verifyButton}
+            </div>;
+        }
+
+        return fingerprintCode;
+    }
+});
+
 var _noAvatars = {};
 
 var Avatar = React.createClass({
@@ -104,7 +387,7 @@ var Avatar = React.createClass({
 
         var avatarMeta = useravatar.generateContactAvatarMeta(contact);
 
-        var classes = (this.props.className ? this.props.className : 'small-rounded-avatar') + ' ' + contact.u;
+        var classes = (this.props.className ? this.props.className : ' avatar-wrapper small-rounded-avatar') + ' ' + contact.u;
 
         var letterClass = 'avatar-letter';
 
@@ -128,15 +411,25 @@ var Avatar = React.createClass({
         }
 
         if(avatarMeta.type === "image") {
-            displayedAvatar = <div className={classes} style={this.props.style}>
-                {verifiedElement}
-                <img src={avatarMeta.avatar} style={this.props.imgStyles}/>
+            displayedAvatar = <div className={classes} style={this.props.style}
+                    onClick={self.props.onClick ? (e) => {
+                        $(document).trigger('closeDropdowns');
+                        self.props.onClick(e);
+                    } : self.onClick}>
+                        {verifiedElement}
+                        <img src={avatarMeta.avatar} style={this.props.imgStyles}/>
             </div>;
         } else {
             classes += " color" + avatarMeta.avatar.colorIndex;
 
-            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}
-                <div className={letterClass} data-user-letter={avatarMeta.avatar.letters}></div></div>;
+            displayedAvatar = <div className={classes} style={this.props.style}
+                    onClick={self.props.onClick ? (e) => {
+                        $(document).trigger('closeDropdowns');
+                        self.props.onClick(e);
+                    } : self.onClick}>
+                        {verifiedElement}
+                        {avatarMeta.avatar.letters}
+                </div>;
 
         }
 
@@ -149,15 +442,16 @@ var ContactCard = React.createClass({
     getDefaultProps: function() {
         return {
             'dropdownButtonClasses': "default-white-button tiny-button",
-            'dropdownIconClasses': "tiny-icon grey-down-arrow"
+            'dropdownIconClasses': "tiny-icon icons-sprite grey-dots"
         }
     },
     specificShouldComponentUpdate: function(nextProps, nextState) {
         var self = this;
 
         var foundKeys = Object.keys(self.props);
-        array.remove(foundKeys, 'dropdowns', true);
-
+        if (foundKeys.indexOf('dropdowns') >= 0) {
+            array.remove(foundKeys, 'dropdowns', true);
+        }
         var shouldUpdate = undefined;
         foundKeys.forEach(function(k) {
             if (typeof(shouldUpdate) === 'undefined') {
@@ -203,83 +497,23 @@ var ContactCard = React.createClass({
         var pres =
             (this.props.megaChat ? this.props.megaChat : window.megaChat).userPresenceToCssClass(contact.presence);
         var avatarMeta = generateAvatarMeta(contact.u);
+        var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
+        var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
+        var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
+        var dropdownRemoveButton = self.props.dropdownRemoveButton ? self.props.dropdownRemoveButton : [];
 
-        var contextMenu;
-        if (!this.props.noContextMenu) {
-            var ButtonsUI = require('./../../ui/buttons.jsx');
-            var DropdownsUI = require('./../../ui/dropdowns.jsx');
-
-            var moreDropdowns = this.props.dropdowns ? $.extend([], this.props.dropdowns) : [];
-
-            if (contact.c === 1) {
-                if (moreDropdowns.length > 0) {
-                    moreDropdowns.unshift(
-                        <hr key="separator" />
-                    );
-                }
-                moreDropdowns.unshift(
-                    <DropdownsUI.DropdownItem
-                            key="view" icon="human-profile" label={__(l[8866])} onClick={() => {
-                                loadSubPage('fm/' + contact.u);
-                            }} />
-                );
-            }
-            else if (contact.c === 0) {
-                if (moreDropdowns.length > 0) {
-                    moreDropdowns.unshift(
-                        <hr key="separator" />
-                    );
-                }
-                moreDropdowns.unshift(
-                    <DropdownsUI.DropdownItem
-                        key="view" icon="human-profile" label={__(l[101])} onClick={() => {
-                        loadingDialog.show();
-
-                        M.syncContactEmail(contact.u)
-                            .done(function(email) {
-                                var exists = false;
-                                Object.keys(M.opc).forEach(function (k) {
-                                    if (!exists && M.opc[k].m === email) {
-                                        exists = true;
-                                        return false;
-                                    }
-                                });
-
-                                if (exists) {
-                                    closeDialog();
-                                    msgDialog('warningb', '', l[7413]);
-                                } else {
-                                    M.inviteContact(M.u[u_handle].m, email);
-                                    var title = l[150];
-
-                                    var msg = l[5898].replace('[X]', email);
-
-                                    closeDialog();
-                                    msgDialog('info', title, msg);
-                                }
-                            })
-                            .always(function() {
-                                loadingDialog.hide();
-                            });
-                    }} />
-                );
-            }
-
-            if (moreDropdowns.length > 0) {
-                contextMenu = <ButtonsUI.Button
-                    className={self.props.dropdownButtonClasses}
-                    icon={self.props.dropdownIconClasses}
-                    disabled={moreDropdowns.length === 0 || self.props.dropdownDisabled}>
-                    <DropdownsUI.Dropdown className="contact-card-dropdown"
-                                          positionMy="right top"
-                                          positionAt="right bottom"
-                                          vertOffset={4}
-                                          noArrow={true}
-                    >
-                        {moreDropdowns}
-                    </DropdownsUI.Dropdown>
-                </ButtonsUI.Button>;
-            }
+        var usernameBlock;
+        if (!noContextMenu) {
+            usernameBlock = <ContactButton key="lnk" dropdowns={dropdowns}
+                    noContextMenu={noContextMenu}
+                    contact={contact}
+                    className="light"
+                    label={username}
+                    dropdownRemoveButton={dropdownRemoveButton}
+            />
+        }
+        else {
+            usernameBlock = <div className="user-card-name light">{username}</div>
         }
 
         return <div
@@ -300,15 +534,22 @@ var ContactCard = React.createClass({
                     }}
                     style={self.props.style}
                     >
-                <ContactPresence contact={contact} className={this.props.presenceClassName}/>
-                <Avatar contact={contact} className="small-rounded-avatar" />
+                <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar" />
 
-                {contextMenu}
+                <ContactButton key="button"
+                        dropdowns={dropdowns}
+                        dropdownIconClasses={self.props.dropdownIconClasses ? self.props.dropdownIconClasses : ""}
+                        disabled={self.props.dropdownDisabled}
+                        noContextMenu={noContextMenu}
+                        contact={contact}
+                        className={self.props.dropdownButtonClasses}
+                        dropdownRemoveButton={dropdownRemoveButton}
+                        megaChat={self.props.megaChat ? this.props.megaChat : window.megaChat}
+                />
 
                 <div className="user-card-data">
-                    <div className="user-card-name light">
-                        {this.props.namePrefix ? this.props.namePrefix : null}{M.getNameByHandle(contact.u)}
-                    </div>
+                    {usernameBlock}
+                    <ContactPresence contact={contact} className={this.props.presenceClassName}/>
                     <div className="user-card-email">{contact.m}</div>
                 </div>
             </div>;
@@ -326,6 +567,8 @@ var ContactItem = React.createClass({
             return null;
         }
 
+        var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
+
         return <div className="selected-contact-card">
             <div className="remove-contact-bttn"  onClick={(e) => {
                         if (self.props.onClick) {
@@ -335,11 +578,9 @@ var ContactItem = React.createClass({
                 <div className="remove-contact-icon">
                 </div>
             </div>
-            <Avatar contact={contact} className="small-rounded-avatar"/>
+            <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar"/>
             <div className="user-card-data">
-                    <div className="user-card-name light">
-                        {this.props.namePrefix ? this.props.namePrefix : null}{M.getNameByHandle(contact.u)}
-                    </div>
+                    <ContactButton contact={contact} className="light" label={username} />
             </div>
         </div>;
     }
@@ -407,21 +648,7 @@ var ContactPickerWidget = React.createClass({
                 e.preventDefault();
                 e.stopPropagation();
 
-                $('.add-user-popup .import-contacts-dialog').fadeOut(0);
-                $('.import-contacts-link').removeClass('active');
-
-                $('.add-user-popup')
-                    .addClass('dialog')
-                    .removeClass('hidden');
-                fm_showoverlay();
-                $('.add-user-size-icon')
-                    .removeClass('full-size')
-                    .addClass('short-size');
-                $('.fm-add-user').removeClass('active');
-                $('.add-user-popup-button.add').addClass('disabled');
-                var $tokenInput = $('#token-input-');
-                $tokenInput
-                    .focus();
+                contactAddDialog();
             };
             var onContactSelectDoneCb = (contact, e) => {
 
@@ -451,12 +678,16 @@ var ContactPickerWidget = React.createClass({
                         }
                     }
                     else {
-                        array.remove(selected, contactHash);
+                        if (selected.indexOf(contactHash) >= 0) {
+                            array.remove(selected, contactHash);
+                        }
                         if (self.props.onSelected) {
                             self.props.onSelected(selected);
                         }
                     }
                     self.setState({'selected': selected});
+                    self.setState({'searchValue': ''});
+                    self.refs.contactSearchField.focus();
                 }
                 self.clickTime = new Date();
                 self.lastClicked = contactHash;
@@ -599,12 +830,16 @@ var ContactPickerWidget = React.createClass({
                                 }
                             }
                             else {
-                                array.remove(selected, contactHash);
+                                if (selected.indexOf(contactHash) >= 0) {
+                                    array.remove(selected, contactHash);
+                                }
                                 if (self.props.onSelected) {
                                     self.props.onSelected(selected);
                                 }
                             }
                             self.setState({'selected': selected});
+                            self.setState({'searchValue': ''});
+                            self.refs.contactSearchField.focus();
                         }
                         self.clickTime = new Date();
                         self.lastClicked = contactHash;
@@ -659,9 +894,11 @@ var ContactPickerWidget = React.createClass({
 
 module.exports = {
     ContactsListItem,
+    ContactButton,
     ContactCard,
     Avatar,
     ContactPickerWidget,
     ContactVerified,
-    ContactPresence
+    ContactPresence,
+    ContactFingerprint
 };

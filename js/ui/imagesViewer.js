@@ -193,7 +193,9 @@ var slideshowid;
         }
 
         if ($overlay) {
-            if (!n || !n.p || M.getNodeRoot(id) === 'shares' || folderlink) {
+            var root = M.getNodeRoot(id);
+
+            if (!n || !n.p || root === 'shares' || root === M.RubbishID || folderlink) {
                 $overlay.find('.viewer-button.getlink').addClass('hidden');
             }
             else {
@@ -242,6 +244,7 @@ var slideshowid;
             $pauseButton.attr('data-state', 'pause');
             $pauseButton.find('i').removeClass('play').addClass('pause');
             clearTimeout(slideshowTimer);
+            slideshowsteps(); // update x of y counter
         }
 
         // Bind Slideshow Mode button
@@ -302,7 +305,7 @@ var slideshowid;
 
         // Clicking the percent value will reset the view to 100%
         $percLabel.rebind('click', function() {
-            $percLabel.attr('data-perc', 90);
+            $percLabel.attr('data-perc', NaN);
             $zoomInButton.trigger('click');
             return false;
         });
@@ -414,27 +417,22 @@ var slideshowid;
     function slideshow_zoom($overlay, zoomout) {
         var $img = $overlay.find('img.active');
         var $percLabel = $overlay.find('.viewer-button-label.zoom');
-        var perc = Math.round(parseInt($percLabel.attr('data-perc')) / 10) * 10;
-        var newPerc = (perc + 10) / 100;
-        var newImgWidth;
-        var newImgHeight;
+        var perc = parseFloat($percLabel.attr('data-perc'));
+        var newPerc = ((perc * (zoomout ? .90 : 1.10) / 100) || 1) / devicePixelRatio;
+        var newImgWidth = origImgWidth * newPerc;
+        var newImgHeight = origImgHeight * newPerc;
 
-        if (zoomout) {
-            newPerc = (perc - 10 > 0) ?  (perc - 10) / 100 : 0;
+        if (newImgHeight * newImgWidth > 240) {
+            $img.css({
+                'width': switchedSides ? newImgHeight : newImgWidth,
+                'height': switchedSides ? newImgWidth : newImgHeight
+            });
+
+            zoom_mode = true;
+
+            // Set zoom, position values and init pick and pan
+            slideshow_imgPosition($overlay);
         }
-
-        newImgWidth = origImgWidth * newPerc;
-        newImgHeight = origImgHeight * newPerc;
-
-        $img.css({
-            'width': switchedSides ? newImgHeight : newImgWidth,
-            'height': switchedSides ? newImgWidth : newImgHeight
-        });
-
-        zoom_mode = true;
-
-        // Set zoom, position values and init pick and pan
-        slideshow_imgPosition($overlay);
     }
 
     // Sets zoom percents and image position
@@ -518,8 +516,8 @@ var slideshowid;
             'left': (viewerWidth - imgWidth) / 2,
             'top': (viewerHeight - imgHeight) / 2,
         });
-        w_perc = Math.round(imgWidth / origImgWidth * 100);
-        $percLabel.attr('data-perc', w_perc).text(w_perc + '%');
+        w_perc = (imgWidth / origImgWidth * 100 * devicePixelRatio);
+        $percLabel.attr('data-perc', w_perc).text(Math.round(w_perc) + '%');
     }
 
     // Viewer Init
@@ -594,6 +592,7 @@ var slideshowid;
         else {
             $.selected = [n.h];
         }
+        mBroadcaster.sendMessage('slideshow:open', n);
 
         // Turn off pick and pan mode
         slideshow_pickpan($overlay, 1);
@@ -609,6 +608,9 @@ var slideshowid;
                 }
                 else if (e.keyCode === 39 && slideshowid) {
                     slideshow_next();
+                }
+                else if (e.keyCode === 46 && fullScreenManager) {
+                    fullScreenManager.exitFullscreen();
                 }
                 else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
                     if ($.dialog) {
@@ -728,7 +730,7 @@ var slideshowid;
         $dlBut.rebind('click', function _dlButClick() {
             var p = previews[n && n.h];
 
-            if (p && p.full) {
+            if (p && p.full && Object(p.buffer).byteLength) {
                 M.saveAs(p.buffer, n.name)
                     .fail(function(ex) {
                         if (d) {
@@ -984,6 +986,7 @@ var slideshowid;
                     mBroadcaster.removeListener(preqs[n.h].ev1);
                     mBroadcaster.removeListener(preqs[n.h].ev2);
                     mBroadcaster.removeListener(preqs[n.h].ev3);
+                    mBroadcaster.removeListener(preqs[n.h].ev4);
 
                     preqs[n.h].destroy();
                     preqs[n.h] = false;
@@ -1000,7 +1003,8 @@ var slideshowid;
 
                 preqs[n.h].ev1 = mBroadcaster.addListener('slideshow:next', destroy);
                 preqs[n.h].ev2 = mBroadcaster.addListener('slideshow:prev', destroy);
-                preqs[n.h].ev3 = mBroadcaster.addListener('slideshow:close', destroy);
+                preqs[n.h].ev3 = mBroadcaster.addListener('slideshow:open', destroy);
+                preqs[n.h].ev4 = mBroadcaster.addListener('slideshow:close', destroy);
 
                 // If video is playing
                 preqs[n.h].on('playing', function() {
@@ -1063,6 +1067,10 @@ var slideshowid;
                 previews[id].poster = uri;
 
                 if (id === slideshowid) {
+                    if ($video.length && !$video[0].parentNode) {
+                        // The video element got already destroyed/replaced due an error
+                        $video = $overlay.find('.viewer-image-bl video');
+                    }
                     $video.attr('poster', uri);
                     $overlay.find('.viewer-image-bl').removeClass('default-state');
                 }
@@ -1256,8 +1264,8 @@ var slideshowid;
                 $img.attr('src', src1).addClass('active');
 
                 // adjust zoom percent label
-                var perc = Math.round($img.width() / origImgWidth * 100);
-                $overlay.find('.viewer-button-label.zoom').attr('data-perc', perc).text(perc + '%');
+                var perc = ($img.width() / origImgWidth * 100 * devicePixelRatio);
+                $overlay.find('.viewer-button-label.zoom').attr('data-perc', perc).text(Math.round(perc) + '%');
             }
 
             // Apply exit orientation
@@ -1380,6 +1388,7 @@ var slideshowid;
     global.slideshow = slideshow;
     global.slideshow_next = slideshow_next;
     global.slideshow_prev = slideshow_prev;
+    global.slideshow_steps = slideshowsteps;
     global.previewsrc = previewsrc;
     global.previewimg = previewimg;
 

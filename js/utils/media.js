@@ -225,25 +225,60 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
             console.time(timeTag);
         }
 
-        var tiff = new Tiff(new Uint8Array(ab));
-        ab = dataURLToAB(tiff.toDataURL());
+        var dv = new DataView(ab.buffer || ab);
+        switch (dv.byteLength > 16 && dv.getUint16(0)) {
+            case 0x4D4D: // TIFF, big-endian
+            case 0x4949: // TIFF, little-endian
+                // XXX: libtiff is unable to handle images with 32-bit samples.
+                var tiff = false;
+
+                try {
+                    Tiff.initialize({TOTAL_MEMORY: 33554432});
+                    tiff = new Tiff(new Uint8Array(ab));
+
+                    ab = dataURLToAB(tiff.toDataURL());
+
+                    if (d) {
+                        console.log('tif2png %sx%s (%s bytes)', tiff.width(), tiff.height(), ab.byteLength);
+                    }
+                }
+                catch (ex) {
+                    if (d) {
+                        console.warn('Caught tiff.js exception, aborting...', ex);
+                    }
+                    ab = false;
+
+                    if (!tiff) {
+                        break;
+                    }
+                }
+
+                try {
+                    tiff.close();
+                    Tiff.Module.FS_unlink(tiff._filename);
+                }
+                catch (ex) {
+                    if (d) {
+                        console.debug(ex);
+                    }
+                }
+
+                if (ab) {
+                    eventlog(99692);
+                }
+                break;
+
+            default:
+                if (d) {
+                    console.debug('This does not seems a TIFF...', [ab]);
+                }
+        }
 
         if (d) {
             console.timeEnd(timeTag);
-            console.log('tif2png %sx%s (%s bytes)', tiff.width(), tiff.height(), ab.byteLength);
         }
 
-        try {
-            tiff.close();
-            Tiff.Module.FS_unlink(tiff._filename);
-        }
-        catch (ex) {
-            if (d) {
-                console.debug(ex);
-            }
-        }
         cb(ab);
-        eventlog(99692);
     });
 });
 
@@ -528,6 +563,7 @@ function FullScreenManager($button, $element) {
         else {
             $element.fullScreen(true);
         }
+        return false;
     };
 
     if (state === null) {
@@ -745,7 +781,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     });
 
                     if (!streamer.hasAudio) {
-                        $('.volume-control', $wrapper).addClass('no-audio');
+                        var $vc = $('.volume-control', $wrapper).addClass('no-audio');
+                        var title = l[19061];
+
+                        if (streamer.hasUnsupportedAudio) {
+                            eventlog(99693, streamer.hasUnsupportedAudio);
+                            title = escapeHTML(l[19060]).replace('%1', streamer.hasUnsupportedAudio);
+                        }
+                        $vc.attr('title', title);
                     }
 
                     hideControls();
@@ -790,6 +833,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             else {
                 videoElement.pause();
             }
+            return false;
         });
 
         // Volume Bar control
@@ -869,6 +913,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 changeButtonState('mute');
                 updateVolumeBar();
             }
+            return false;
         });
 
         var progressBarElementStyle = $progressBar.get(0).style;
@@ -1034,6 +1079,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     dlmanager.onNolongerOverquota();
                     videoFile.flushRetryQueue();
                 });
+            }
+            else if (navigator.onLine && this.currentTime < this.duration) {
+                var data = [1, s.hasVideo, s.hasAudio, ~~s.getProperty('bitrate'), s.getProperty('server')];
+
+                if (d) {
+                    console.log(ev.type, data, this);
+                }
+                eventlog(99694, JSON.stringify(data), true);
             }
 
             return true; // continue listening

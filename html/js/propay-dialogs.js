@@ -1216,7 +1216,7 @@ var addressDialog = {
         var $statesSelect = this.$dialog.find('.states');
 
         // Build options
-        $.each(isoStates, function(isoCode, stateName) {
+        $.each(M.getStates(), function(isoCode, stateName) {
 
             // Create the option and set the ISO code and state name
             var $stateOption = $('<option>').val(isoCode).text(stateName);
@@ -1247,7 +1247,7 @@ var addressDialog = {
         var $countriesSelect = this.$dialog.find('.countries');
 
         // Build options
-        $.each(isoCountries, function(isoCode, countryName) {
+        $.each(M.getCountries(), function(isoCode, countryName) {
 
             // Create the option and set the ISO code and country name
             var $countryOption = $('<option>').val(isoCode).text(countryName);
@@ -1279,6 +1279,7 @@ var addressDialog = {
         var $countriesSelect = this.$dialog.find('.countries');
         var $statesSelect = this.$dialog.find('.states');
         var $stateSelectmenuButton = this.$dialog.find('#address-dialog-states-button');
+        var $postcodeInput = this.$dialog.find(".postcode");
 
         // On dropdown option change
         $countriesSelect.selectmenu({
@@ -1286,6 +1287,28 @@ var addressDialog = {
 
                 // Get the selected country ISO code e.g. CA
                 var selectedCountryCode = ui.item.value;
+
+                // If postcode translations not set, then decalre them.
+                if (addressDialog.localePostalCodeName === undefined || addressDialog.localePostalCodeName === null) {
+                    addressDialog.localePostalCodeName = {
+                        "US": "ZIP code",
+                        "CA": "Postal Code",
+                        "PH": "ZIP code",
+                        "DE": "PLZ",
+                        "AT": "PLZ",
+                        "IN": "Pincode",
+                        "IE": "Eircode",
+                        "BR": "CEP",
+                        "IT": "CAP"
+                    };
+                }
+
+                // If selecting a country whereby the postcode is named differently, update the placeholder value.
+                if (addressDialog.localePostalCodeName.hasOwnProperty(selectedCountryCode)) {
+                    $postcodeInput.attr("placeholder", addressDialog.localePostalCodeName[selectedCountryCode]);
+                } else {
+                    $postcodeInput.attr("placeholder", l[10659]);
+                }
 
                 // Reset states dropdown to default and select first option
                 $statesSelect.find('option:first-child').prop('disabled', false).prop('selected', true);
@@ -1740,7 +1763,7 @@ var cardDialog = {
         var $countriesDropDown = $countriesSelect.find('.default-select-scroll');
 
         // Build options
-        $.each(isoCountries, function(isoCode, countryName) {
+        $.each(M.getCountries(), function(isoCode, countryName) {
             countryOptions += '<div class="default-dropdown-item " data-value="' + isoCode + '">'
                             +     countryName
                             + '</div>';

@@ -423,15 +423,13 @@
             unixtime() - self.passwordReminderAttribute.lastSuccess > SHOW_AFTER_LASTSUCCESS &&
             unixtime() - self.passwordReminderAttribute.lastLogin > SHOW_AFTER_LASTLOGIN
         ) {
-            self.showIcon();
-
             // skip recheck in case:
+            // - there is no top-icon, i.e. we are on a custom page
             // - there is a visible .dropdown
             // - the user had a textarea, input or select field focused
             // - there is a visible/active dialog
-            var skipShowingDialog = $(
-                'textarea:focus, input:focus, select:focus, .dropdown:visible, .fm-dialog:visible'
-            ).length > 0;
+            var skipShowingDialog = !self.showIcon()
+                || $('textarea:focus, input:focus, select:focus, .dropdown:visible, .fm-dialog:visible').length > 0;
 
             if (
                 !skipShowingDialog &&
@@ -469,10 +467,12 @@
         if (!this.topIcon || this.topIcon.classList.contains('hidden') || !document.body.contains(this.topIcon)) {
             // because, we have plenty of top menus, that may not be visible/active
             this.topIcon = $('.top-head:visible .top-icon.pass-reminder')[0];
-            assert(this.topIcon, 'topIcon was not found in DOM');
-            this.topIcon.classList.remove('hidden');
-            $(this.topIcon).rebind('click.prd', this.topIconClicked.bind(this));
+            if (this.topIcon) {
+                this.topIcon.classList.remove('hidden');
+                $(this.topIcon).rebind('click.prd', this.topIconClicked.bind(this));
+            }
         }
+        return !!this.topIcon;
     };
 
     PasswordReminderDialog.prototype._initInternals = function() {

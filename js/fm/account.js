@@ -726,19 +726,20 @@ function accountUI() {
         var html = '', sel = '';
         $('.default-select.country span').text(l[996]);
 
-        for (var country in isoCountries) {
-            if (!isoCountries.hasOwnProperty(country)) {
+        var countries = M.getCountries();
+        for (var country in countries) {
+            if (!countries.hasOwnProperty(country)) {
                 continue;
             }
             if (u_attr.country && country == u_attr.country) {
                 sel = 'active';
-                $('.default-select.country span').text(isoCountries[country]);
+                $('.default-select.country span').text(countries[country]);
             }
             else {
                 sel = '';
             }
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">'
-                + isoCountries[country]
+                + countries[country]
                 + '</div>';
         }
         $('.default-select.country .default-select-scroll').safeHTML(html);
@@ -830,7 +831,7 @@ function accountUI() {
             }
 
             $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-            $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+            $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
             var firstName = String($('#account-firstname').val() || '').trim();
             var lastName = String($('#account-lastname').val() || '').trim();
@@ -1112,7 +1113,7 @@ function accountUI() {
             $('.bandwith-settings').removeClass('hidden');
         }
 
-        $('#slider-range-max').slider({
+        $('#slider-range-max2').slider({
             min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4,
             change: function(e, ui) {
                 if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.dl_maxSlots) {
@@ -1125,10 +1126,10 @@ function accountUI() {
                 $('.upload-settings .numbers.val' + ui.value).addClass('active');
             }
         });
-        $('.upload-settings .numbers.active').removeClass('active');
-        $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
+        $('.download-settings .numbers.active').removeClass('active');
+        $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
 
-        $('#slider-range-max2').slider({
+        $('#slider-range-max').slider({
             min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
             change: function(e, ui) {
                 if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
@@ -1141,8 +1142,8 @@ function accountUI() {
                 $('.download-settings .numbers.val' + ui.value).addClass('active');
             }
         });
-        $('.download-settings .numbers.active').removeClass('active');
-        $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
+        $('.upload-settings .numbers.active').removeClass('active');
+        $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
 
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
         var i = 3;
@@ -1627,7 +1628,7 @@ function accountUI() {
 
                     useravatar.invalidateAvatar(u_handle);
                     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+                    $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
                     $('.fm-account-remove-avatar').hide();
                 }
             });
@@ -1942,16 +1943,11 @@ accountUI.userUIUpdate = function() {
 
     // update avatar
     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+    $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
 
     // Show first name or last name
-    if (u_attr.firstname) {
-        $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
-    }
-    else {
-        $('.membership-big-txt.name').text(u_attr.name);
-    }
+    $('.membership-big-txt.name').text(u_attr.fullname);
 
     // Show email address
     if (u_attr.email) {

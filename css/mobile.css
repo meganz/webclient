@@ -434,7 +434,7 @@ ul, li {
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.03);
     color:  #555;
 }
-.mobile.red-button, .mobile.download-progress .bar, .mobile.upload-progress .bar {
+.mobile.red-button, .mobile.download-progress .bar, .mobile.upload-progress .bar, .membership-bott-button, .payment-address-dialog .payment-buy-now {
     color: white;
     font-size: 13px;
     display: block;
@@ -614,6 +614,9 @@ ul, li {
 }
 .mobile.download-progress, .mobile.upload-progress, .downloading .inline-buttons .mobile.red-button, .downloading .mobile.red-button, .uploading .mobile.red-button {
     display: none;
+}
+.downloading #mobile-ui-delete .mobile.red-button, .downloading #mobile-ui-copy-link .inline-buttons .mobile.red-button  {
+    display: block;
 }
 .downloading .error-overlay .mobile.red-button, .uploading .error-overlay .mobile.red-button {
     display: block;
@@ -1979,12 +1982,14 @@ div.checkboxOn, div.checkboxOff {
 }
 
 /* Pro payment page step 2 */
-.mobile.membership-step2 .page-title {
+.mobile.membership-step2 .page-title, .payment-address-dialog .main-title {
     color: #333;
-    font-family: 'source_sans_prolight', sans-serif;
-    font-size: 32px;
-    line-height: 40px;
-    margin: 36px 24px 55px 24px;
+    font-size: 24px;
+    line-height: 36px;
+    margin: 28px 24px 55px 24px;
+}
+.payment-address-dialog .main-title {
+    margin: 28px 0 32px 0;
 }
 .mobile.membership-step2 .external-payment-options {
     color: #667;
@@ -2006,7 +2011,7 @@ div.checkboxOn, div.checkboxOff {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    padding: 0 25px 25px 25px;
+    padding: 0 20px 25px 20px;
     margin-top: -75px;
     position: relative;
     -moz-border-radius: 3px;
@@ -2116,12 +2121,11 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-step2 .main-mid-pad.third-section {
     padding: 0;
 }
-.mobile.membership-step2 .option-question {
-    color: #999;
+.mobile.membership-step2 .option-question, .payment-address-dialog .container-box-title {
+    color: #777;
     display: block;
-    font-family: 'source_sans_prolight', sans-serif;
-    font-size: 24px;
-    line-height: 31px;
+    font-size: 18px;
+    line-height: 27px;
 }
 .mobile.membership-step2 .option-question.provider {
     margin: 30px 0 32px 0;
@@ -2270,7 +2274,7 @@ div.checkboxOn, div.checkboxOff {
     font-size: 16px;
     display: block;
     line-height: 20px;
-    margin-top: 35px;
+    margin-top: 44px;
     margin-left: 28px;
 }
 .mobile.membership-step2 .renewal-options-list .membership-radio-label {
@@ -2572,36 +2576,30 @@ div.checkboxOn, div.checkboxOff {
 }
 .mobile.membership-step2 .charge-information-container {
     height: 55px;
-    margin-top: 50px;
-    margin-bottom: 24px;
+    margin-top: 24px;
+    margin-bottom: 10px;
 }
 .mobile.membership-step2 .charge-information {
     background-color: #f7f8fa;
     color: #939da3;
     font-size: 15px;
     line-height: 19px;
-    padding: 18px 24px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: 0 -25px;
+    padding: 12px 0;
     letter-spacing: initial;
+    text-align: center;
+    border-radius: 6px;
 }
 .mobile.membership-step2 .membership-bott-button {
-    background-color: #ff4444;
-    border-radius: 2px;
-    color: #fff;
     cursor: pointer;
     font-size: 15px;
-    padding: 15px 0;
-    line-height: 19px;
     margin: 0;
     text-align: center;
     text-transform: capitalize;
     float: none;
     display: block;
     box-sizing: initial;
-    height: auto;
+    height: 44px;
+    line-height: 41px;
     min-width: 0;
     transition: initial;
 }
@@ -3149,13 +3147,7 @@ div.checkboxOn, div.checkboxOff {
     text-align: initial;
 }
 .payment-address-dialog-body {
-    padding: 24px 49px;
-}
-.payment-address-dialog .main-title {
-    color: #333;
-    font-family: "source_sans_prolight", sans-serif;
-    font-size: 32px;
-    line-height: 40px;
+    padding: 24px 20px;
 }
 .payment-address-dialog .payment-note-first {
     color: #667;
@@ -3163,30 +3155,10 @@ div.checkboxOn, div.checkboxOff {
     line-height: 26px;
 }
 .payment-address-dialog .grey-container-box {
-    background-color: #f6f7f8;
-    padding: 25px 23px;
-}
-.payment-address-dialog .white-container-box {
-    box-sizing: border-box;
-    background-color: #fff;
-    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    padding: 13px;
-    position: relative;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
+    padding: 0 4px 24px;
 }
 .payment-address-dialog .container-box-title {
-    padding-top: 0;
-    color: #999;
-    font-family: "source_sans_prolight", sans-serif;
-    font-size: 24px;
-    line-height: 31px;
-    margin-bottom: 24px;
-    margin-left: 12px;
-    margin-top: 12px;
+    margin: 12px 20px 24px 16px;
 }
 .payment-address-dialog .payment-note-first {
     color: #666;
@@ -3206,13 +3178,13 @@ div.checkboxOn, div.checkboxOff {
 }
 .payment-address-dialog .mobile.signin-input {
     background-color: #F8F8F8;
-    height: 60px;
-    padding: 19px 55px 0 12px;
+    height: 48px;
+    padding: 12px 55px 0 12px;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     position: relative;
-    margin-bottom: 2px;
+    margin-bottom: 8px;
 }
 /* Styling for jQueryUI selectmenu in use with address dialog */
 .ui-selectmenu-button {
@@ -3220,7 +3192,6 @@ div.checkboxOn, div.checkboxOff {
 }
 #address-dialog-countries-button {
     display: block;
-    margin-top: 4px;
     float: none;
 }
 #address-dialog-states-button {
@@ -3310,11 +3281,11 @@ div.checkboxOn, div.checkboxOff {
     padding: 0 30px 0 10px;
     color: gray;
     cursor: pointer;
-    margin: -7px 0 0 0;
+    margin: 0 16px 12px;
     border: 0;
-    height: 60px;
+    height: 48px;
     font-size: 14px;
-    line-height: 59px;
+    line-height: 49px;
     min-width: 150px;
     background-color: rgba(255,255,255,1);
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.10);
@@ -3325,7 +3296,7 @@ div.checkboxOn, div.checkboxOff {
     -webkit-border-radius: 4px;
     background-image: url(../images/mobile/mobile-sprite_v11.png);
     background-repeat: no-repeat;
-    background-position: right -2053px;
+    background-position: right -2059px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -3336,7 +3307,7 @@ div.checkboxOn, div.checkboxOff {
     content: '';
     position: absolute;
     width: 100%;
-    height: 60px;
+    height: 48px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -3395,22 +3366,17 @@ div.checkboxOn, div.checkboxOff {
     text-transform: uppercase;
 }
 .payment-address-dialog .payment-buy-now {
-    color: #fff;
-    padding: 0 15px 0 15px;
     font-size: 15px;
     line-height: 48px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
+    height: 48px;
     display: block;
-    background-color: #ff4444;
     cursor: pointer;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     text-align: center;
     text-transform: lowercase;
-    margin-bottom: 8px;
+    margin: 0 16px 8px;
     position: relative;
 }
 .payment-address-dialog .payment-buy-now:first-letter {
@@ -3418,8 +3384,9 @@ div.checkboxOn, div.checkboxOff {
 }
 .payment-address-dialog .error-message {
     color: #ff4444;
-    margin-top: 5px;
+    margin-top: 16px;
     text-align: center;
+    font-size: 14px;
 }
 .payment-address-dialog .error-message.hidden {
     display: block;
@@ -3437,19 +3404,15 @@ div.checkboxOn, div.checkboxOff {
 }
 .payment-address-dialog .redirect-information-container {
     position: relative;
-    height: 55px;
-    margin-top: 40px;
-    margin-bottom: 20px;
+    margin: 12px 16px;
 }
 .payment-address-dialog .redirect-information {
     background-color: #f7f8fa;
     color: #939da3;
-    font-size: 15px;
-    line-height: 19px;
-    padding: 18px 24px;
-    position: absolute;
-    left: -13px;
-    right: -13px;
+    font-size: 14px;
+    line-height: 21px;
+    padding: 12px 16px;
+    text-align: center;
 }
 /* End of Credit card billing address dialog */
 
@@ -6329,7 +6292,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     -webkit-border-radius: 2px;
     border-radius: 2px;
     margin-bottom: 8px;
-    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-image: url(../images/mega/top-login-sprite_v11.png);
     background-position: 9px -65px;
     background-repeat: no-repeat;
     padding: 0 10px 0 35px;
@@ -6531,7 +6494,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     -moz-box-shadow: none;
     box-shadow: none;
     background-position: -35px -396px;
-    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-image: url(../images/mega/top-login-sprite_v11.png);
     background-repeat: no-repeat;
     width: 100%;
     height: 100%;
@@ -6743,7 +6706,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     width: 18px;
     height: 16px;
     display: inline-block;
-    background-image: url(../images/mega/icons-sprite_v20.png);
+    background-image: url(../images/mega/icons-sprite_v21.png);
     background-repeat: no-repeat;
     background-position: -204px -196px;
     background-size: 262px auto;
@@ -6782,6 +6745,7 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .bottom-page .forgot-password-page .mobile.fm-header {
     position: fixed;
+    background-color: #fff;
 }
 body.bottom-pages.mobile .fmholder.no-scroll {
     overflow: hidden;
@@ -6877,6 +6841,114 @@ body.bottom-pages.mobile .fmholder.no-scroll {
 }
 
 
+
+
+.reg-st3-bott-title.price .green-star-img {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAjdJREFUSA3VVUFrE0EUfm+yiUcFkXryFilaFApWRWq3jehBGpqDHgXFJld/gOjFP5Fa6l3BxhQPCtKVHpQqBQ96MILgpZYg6k1rdp7vxZ1hk8zq7NGBYd5+7/u+NzM7OwuQo80+XJqRnkMCQR5yDHAr4Vd8dcqXOPto+QwBzUmX2FfnXSCO9W1jmo4NljViViKNh+27p+KefpHGCoE6HVUXX6YxV+y1Ah2T2Xvr4cJsMhX8cwUz7aUTukebKY0NVYBTz6v1VxZwBLbAJbpf2Fn7fghiXQZUZdD6MCCWWTNJRGMOLadxh/EtIOqAUu+BdAcKqjM2v/fTA7zMhw4Aw8f3Duqfv9oEcByASi6j/Bju8szfqD3FqoouXv0MCm4A0o/8RhkK8WJP8bZbNL26PIWgn/B27MuQecG8bd8I1IWN2vX+e7MFRD291pzEHjwlgv1ebkMkRPhCAZzfmG9smdTAMZVEUak5fjVdQ/AfsSvatLloB1ZgzCqtlSO7uhfxSz9gsL+P2C2pIHy2cO3dMG9gBSaZELfNs8e47TIXnbNAuL4ut+y4h7GhjCca82xHZwH99QN/YHm+CSr90VhfGzgL8HGdsAzPIEvjLEAIR4d9+XxvBlg4J13i4bxLI5yMPxryCvjy6Dd8W0C6GdXqrQSQ4WS42lyICe8wL5mMaEabewVAEzzLjwrxSqW2eCyqNdLmfRfBJCcc4fKfzllgpCRfFXi21WzUXzeLI8kMQLiiEW0G5T+GfwMQdbz1JI11qwAAAABJRU5ErkJggg==');
+    width: 12px;
+    background-size: 12px 12px;
+    height: 11px;
+    margin-top: 10px;
+    display: none;
+    position: absolute;
+    margin-left: 4px;
+}
+
+.reg-st3-txt-localcurrencyprogram .green-star-img {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAjdJREFUSA3VVUFrE0EUfm+yiUcFkXryFilaFApWRWq3jehBGpqDHgXFJld/gOjFP5Fa6l3BxhQPCtKVHpQqBQ96MILgpZYg6k1rdp7vxZ1hk8zq7NGBYd5+7/u+NzM7OwuQo80+XJqRnkMCQR5yDHAr4Vd8dcqXOPto+QwBzUmX2FfnXSCO9W1jmo4NljViViKNh+27p+KefpHGCoE6HVUXX6YxV+y1Ah2T2Xvr4cJsMhX8cwUz7aUTukebKY0NVYBTz6v1VxZwBLbAJbpf2Fn7fghiXQZUZdD6MCCWWTNJRGMOLadxh/EtIOqAUu+BdAcKqjM2v/fTA7zMhw4Aw8f3Duqfv9oEcByASi6j/Bju8szfqD3FqoouXv0MCm4A0o/8RhkK8WJP8bZbNL26PIWgn/B27MuQecG8bd8I1IWN2vX+e7MFRD291pzEHjwlgv1ebkMkRPhCAZzfmG9smdTAMZVEUak5fjVdQ/AfsSvatLloB1ZgzCqtlSO7uhfxSz9gsL+P2C2pIHy2cO3dMG9gBSaZELfNs8e47TIXnbNAuL4ut+y4h7GhjCca82xHZwH99QN/YHm+CSr90VhfGzgL8HGdsAzPIEvjLEAIR4d9+XxvBlg4J13i4bxLI5yMPxryCvjy6Dd8W0C6GdXqrQSQ4WS42lyICe8wL5mMaEabewVAEzzLjwrxSqW2eCyqNdLmfRfBJCcc4fKfzllgpCRfFXi21WzUXzeLI8kMQLiiEW0G5T+GfwMQdbz1JI11qwAAAABJRU5ErkJggg==');
+    width: 12px;
+    background-size: 12px 12px;
+    height: 11px;
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 4px;
+}
+
+.reg-st3-txt-localcurrencyprogram {
+    font-size: 16px;
+    font-family: 'source_sans_proregular';
+    margin-top: 14px;
+    color: #666666;
+    line-height: 24px;
+}
+
+.local-currency .reg-st3-bott-title.price .green-star-img {
+    display: inline-block;
+}
+
+.reg-st3-bott-title.price .euro-price {
+    font-size: 16px;
+    background-color: #fff;
+    line-height: 24px;
+    border: 1px solid #eaeaea;
+    border-radius: 6px;
+    margin: 14px auto;
+    width: -webkit-max-content;
+    width: -moz-fit-content;
+    color: #9aa0ac;
+    padding: 0 12px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.06);
+}
+
+.local-currency .membership-gray-block {
+    height: 132px;
+}
+
+.local-currency .num .big {
+    font-size: 36px;
+}
+
+    .local-currency .num .big.tooBig {
+        font-size: 24px;
+    }
+
+    .local-currency .num .big.tooBig2 {
+        font-size: 18px;
+    }
+
+.local-currency .num .small {
+    font-size: 24px;
+}
+
+    .local-currency .num .small.toosmall {
+        font-size: 18px;
+    }
+
+    .local-currency .num .small.toosmall2 {
+        font-size: 14px;
+    }
+
+.local-currency .reg-st3-storage {
+    padding-top: 32px;
+}
+
+.reg-st3-bott-title.price .local-currency-code {
+    display: none;
+}
+
+.local-currency .reg-st3-bott-title.price .local-currency-code {
+    font-size: 12px;
+    color: #666;
+    line-height: 16px;
+    margin-top: -2px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.local-currency .local-code-block {
+    display: block;
+    font-size: 16px;
+    line-height: initial;
+}
+
+.local-currency .num {
+    line-height: 40px;
+}
+
+.limited-bandwidth-dialog .local-currency .reg-st3-bott-title.price .local-currency-code {
+    margin-top: 2px;
+    margin-bottom: 0px;
+}
 
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
@@ -7534,7 +7606,7 @@ body.bottom-pages.mobile .fmholder.no-scroll {
         background-image: none;
     }
     .mobile .improved-recovery-steps .login-register-input, .mobile .improved-recovery-steps .checkboxOn::after, .mobile .improved-recovery-steps .checkboxOff::after {
-        background-image: url(../images/mega/top-login-sprite_v9@2x.png);
+        background-image: url(../images/mega/top-login-sprite_v11@2x.png);
         background-size: 48px auto;
     }
     .mobile .improved-recovery-steps .feedback-logo {

@@ -54,6 +54,9 @@
     table-layout: fixed;
     height: 100%;
 }
+.chat-content-block.private-chat .messages.content-area {
+    background-color: #FBFCFD;
+}
 .messages.content-area {
     display: table-cell;
     vertical-align: bottom;
@@ -224,7 +227,7 @@
 .message.shared-info .user-card-email {
     padding: 0 0 4px 0;
 }
-.message.content-area .user-card-verified.big {
+.user-card-verified.right-align {
     display: inline-block;
     margin: 3px 0 0 -58px;
     float: none;
@@ -312,7 +315,7 @@
 .message.content-area > .default-white-button.tiny-button {
     position: absolute;
     top: 2px;
-    right: 11px;
+    right: 14px;
     float: none;
     margin: 2px 0 0 0;
     z-index: 100;
@@ -602,7 +605,7 @@
 }
 
 .message.richpreview.confirmation-icon {
-    background-image: url(../images/mega/new-chat-sprite_v1.png);
+    background-image: url(../images/mega/new-chat-sprite_v5.png);
     background-position: -119px -1551px;
     background-size: 237px auto;
     height: 118px;

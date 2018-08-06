@@ -146,9 +146,7 @@
                 this.doSort('status', 1);
             }
             else {
-                if (this.currentdirid !== 'transfers') { // IN TRANSFERS we dont want to re-order
-                    this.doSort('name', 1);
-                }
+                this.doSort('name', 1);
             }
 
             if (this.currentdirid === 'opc') {
@@ -316,13 +314,18 @@
             }
             else {
                 this.chat = true;
-
+                megaChat.displayArchivedChats = false;
                 megaChat.refreshConversations();
                 M.addTreeUI();
                 var room = megaChat.renderListing();
 
                 if (room) {
                     newHashLocation = room.getRoomUrl();
+                }
+                else {
+                    if (megaChat.$conversationsAppInstance) {
+                        megaChat.$conversationsAppInstance.safeForceUpdate();
+                    }
                 }
             }
         }

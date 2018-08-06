@@ -37,23 +37,7 @@ var useravatar = (function() {
     var ns = {};
 
     /**
-     * Take the class colors and create a inject as a CSS.
-     */
-    Soon(function registerCssColors() {
-        var css = '';
-        var len = _colors.length;
-
-        while (len--) {
-            var color = '.color' + (len + 1);
-            css += color + ', .nw-contact-avatar' + color + ', .contacts-avatar' + color
-                + ', .avatar' + color + ' { background-color: ' + _colors[len] + '; color: ' + _colors[len] + '; }';
-        }
-
-        mCreateElement('link', { type: 'text/css', rel: 'stylesheet' }, 'head', [css]);
-    });
-
-    /**
-     * Return a SVG image representing the TWO-Letters avatar
+     * Return a SVG image representing the Letter avatar
      * @param {Object} user The user object or email
      * @returns {String}
      * @private
@@ -62,7 +46,7 @@ var useravatar = (function() {
 
         var s = _getAvatarProperties(user);
         var $template = $('#avatar-svg').clone().removeClass('hidden')
-            .find('svg').css('background-color', s.color).end()
+            .find('svg').addClass('color' + s.colorIndex).end()
             .find('text').text(s.letters).end();
 
         $template = window.btoa(to8($template.html()));
@@ -121,14 +105,18 @@ var useravatar = (function() {
 
         id        = escapeHTML(id);
         element   = escapeHTML(element);
-        className = escapeHTML(className);
+
+        if (className && className !== '') {
+            className = 'avatar-wrapper ' + escapeHTML(className);
+        }
+        else {
+            className = 'avatar-wrapper small-rounded-avatar';
+        }
 
         return  bgBlock +
-            '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper ' +
-                className + ' ' + id + ' color' + s.colorIndex + '">' +
-                '<span>' +
-                    '<i class="verified_icon"></i>' + s.letters +
-                '</span>'  +
+            '<' + element + ' data-color="color' + s.colorIndex + '" class="' +
+                id + ' color' + s.colorIndex + ' ' + className + '">' +
+                '<i class="verified_icon"></i>' + s.letters +
             '</' + element + '>';
     }
 
@@ -148,16 +136,22 @@ var useravatar = (function() {
         id        = escapeHTML(id);
         url       = escapeHTML(url);
         type      = escapeHTML(type);
-        className = escapeHTML(className);
+
+        if (className && className !== '') {
+            className = 'avatar-wrapper ' + escapeHTML(className);
+        }
+        else {
+            className = 'avatar-wrapper small-rounded-avatar';
+        }
 
         if (bg) {
-            bgBlock = '<div class="avatar-bg">' +
-                    '<span style="background-image: url(' + url + ');"></span>' +
+            bgBlock = '<div class="avatar-bg colorized">' +
+                    '<span class="colorized"></span>' +
                 '</div>';
         }
 
         return bgBlock +
-            '<' + type + ' data-color="" class="avatar-wrapper ' + id + ' ' + className + '">' +
+            '<' + type + ' data-color="" class="' + id + ' ' + className + '">' +
                 '<i class="verified_icon"></i>' +
                 '<img src="' + url + '">' +
             '</' + type + '>';
@@ -321,7 +315,7 @@ var useravatar = (function() {
         user = M.getUser(user) || String(user);
 
         element   = element || 'div';
-        className = className || 'avatar';
+        className = className || 'small-rounded-avatar';
 
         if (user.u) {
             isUserVerified(user.u);

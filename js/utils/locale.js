@@ -1,5 +1,15 @@
 var date_months = [];
 
+var locale = "en";
+
+var remappedLangLocales = {
+    "cn": "zh-Hans",
+    "ct": "zh-Hant",
+    "kr": "ko",
+    "jp": "ja",
+    "tl": "fil"
+};
+
 if (typeof l === 'undefined') {
     l = [];
 }
@@ -595,6 +605,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[18787] = l[18787]
         .replace('[A]', '<a href="https://github.com/meganz/MEGAcmd" rel="noreferrer" target="_blank">')
         .replace('[/A]', '</a>');
+    l[19111] = l[19111].replace('[A]', '<a class="public-contact-link">').replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
@@ -617,4 +628,11 @@ mBroadcaster.once('startMega', function populate_l() {
         l[408], l[409], l[410], l[411], l[412], l[413],
         l[414], l[415], l[416], l[417], l[418], l[419]
     ].map(escapeHTML);
+
+    // Set the Locale based the language that is selected. (Required for accurate string comparisons).
+    // If the locale has been remapped, apply the remap.
+    locale = lang;
+    if (remappedLangLocales.hasOwnProperty(locale)) {
+        locale = remappedLangLocales[locale];
+    }
 });

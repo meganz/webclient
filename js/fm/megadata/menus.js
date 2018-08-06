@@ -181,15 +181,23 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 && !M.getShareNodesSync(selNode.h).length
                 && !folderlink) {
 
-                // Create or Remove upload page context menu action
-                if (mega.megadrop.pufs[selNode.h]
-                    && mega.megadrop.pufs[selNode.h].s !== 1
-                    && mega.megadrop.pufs[selNode.h].p) {
-                    items['.removewidget-item'] = 1;
-                    items['.managewidget-item'] = 1;
-                }
-                else {
-                    items['.createwidget-item'] = 1;
+                // Check if the folder is taken down or not
+                var shareNode = M.getNodeShare(selNode.h);
+                if (shareNode === false
+                    || shareNode === null
+                    || shareNode.down === undefined
+                    || shareNode.down !== 1) {
+
+                    // Create or Remove upload page context menu action
+                    if (mega.megadrop.pufs[selNode.h]
+                        && mega.megadrop.pufs[selNode.h].s !== 1
+                        && mega.megadrop.pufs[selNode.h].p) {
+                        items['.removewidget-item'] = 1;
+                        items['.managewidget-item'] = 1;
+                    }
+                    else {
+                        items['.createwidget-item'] = 1;
+                    }
                 }
             }
         }
@@ -209,7 +217,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 if (mediaType) {
                     items['.play-item'] = 1;
 
-                    if (mediaType === 1) {
+                    if (mediaType === 1 && sourceRoot !== M.RubbishID) {
                         items['.embedcode-item'] = 1;
                     }
                 }
@@ -319,6 +327,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
     var flt;
     var asyncShow = false;
     var m = $('.dropdown.body.files-menu');
+    var $contactDetails = m.find('.dropdown-contact-details');
 
     // Selection of first child level ONLY of .dropdown-item in .dropdown.body
     var menuCMI = '.dropdown.body.files-menu .dropdown-section > .dropdown-item';
@@ -358,6 +367,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         m.find('.dropdown-section:visible:last hr').addClass('hidden');
     };
     $.hideContextMenu();
+    $contactDetails.addClass('hidden');
 
     // Used when right click is occured outside item, on empty canvas
     if (ll === 2) {
@@ -442,20 +452,83 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
         // In case that id belongs to contact, 11 char length
         if (id && (id.length === 11)) {
-            flt = '.remove-item';
+            var $contactDetails = m.find('.dropdown-contact-details');
+            var $contactBlock = $('#' + id).length ? $('#' + id) : $('#contact_' + id);
+            var username = M.getNameByHandle(id) || '';
+
+            flt = '.remove-contact, .share-folder-item';
+            // Add .send-files-item to show Send files item
             if (!window.megaChatIsDisabled) {
-                flt += ',.startchat-item,.startaudio-item,.startvideo-item';
+                flt += ',.startchat-item, .startaudiovideo-item, .send-files-item';
             }
             $(menuCMI).filter(flt).show();
 
-            $(menuCMI).filter('.startaudio-item,.startvideo-item').removeClass('disabled');
+            // Enable All buttons
+            $(menuCMI).filter('.startaudiovideo-item, .send-files-item')
+                .removeClass('disabled disabled-submenu');
 
-            // If selected contact is offline make sure that audio and video calls are forbiden (disabled)
-            if ($('#' + id).find('.offline').length || $.selected.length > 1) {
-                $(menuCMI).filter('.startaudio-item').addClass('disabled');
-                $(menuCMI).filter('.startvideo-item').addClass('disabled');
+            // Show Detail block
+            $contactDetails.removeClass('hidden');
+
+            if (M.viewmode) {
+                $contactDetails.find('.view-profile-item').removeClass('hidden');
+                $contactDetails.find('.dropdown-avatar').addClass('hidden');
+                $contactDetails.find('.dropdown-user-name').addClass('hidden');
+            }
+            else {
+                $contactDetails.find('.view-profile-item').addClass('hidden');
+
+                // Set contact avatar
+                $contactDetails.find('.dropdown-avatar').removeClass('hidden')
+                    .safeHTML(useravatar.contact(id, 'context-avatar'));
+
+                // Set username
+                $contactDetails.find('.dropdown-user-name').removeClass('hidden')
+                    .find('span').text(username);
             }
 
+            // Set contact fingerprint
+            showAuthenticityCredentials(id, $contactDetails);
+
+            // Open contact details page
+            $contactDetails.rebind('click.opencontact', function() {
+                M.openFolder(id);
+            });
+
+            var verificationState = u_authring.Ed25519[id] || {};
+            var isVerified = (verificationState.method
+                >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+
+            // Show the user is verified
+            if (isVerified) {
+                $contactDetails.addClass('verified');
+                $contactDetails.find('.dropdown-verify').removeClass('active');
+            }
+            else {
+                $contactDetails.removeClass('verified');
+                $contactDetails.find('.dropdown-verify').addClass('active')
+                    .rebind('click.verify', function(e) {
+                        e.stopPropagation();
+                        $.hideContextMenu(e);
+                        fingerprintDialog(id);
+                    });
+            }
+
+            // Set onlinestatus
+            $contactDetails.removeClass('offline online busy away');
+            if ($contactBlock.hasClass('busy')) {
+                $contactDetails.addClass('busy');
+            }
+            if ($contactBlock.hasClass('away')) {
+                $contactDetails.addClass('away');
+            }
+            if ($contactBlock.hasClass('online')) {
+                $contactDetails.addClass('online');
+            }
+            // If selected contact is offline make sure that audio and video calls are forbiden (disabled)
+            else if ($contactBlock.hasClass('offline') || $.selected.length > 1) {
+                $contactDetails.addClass('offline');
+            }
         }
         else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1
             || currNodeClass.indexOf('folder-link') > -1)) {
@@ -788,7 +861,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
     }
     else {// right click
         cor = 0;
-        dPos = { 'x': x, 'y': y };
+        dPos = { 'x': x + 10, 'y': y + 10 };
 
         if (cmH + 24 >= wH) {// Handle small windows height
             m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block" />');

@@ -109,7 +109,7 @@ MegaUtils.prototype.sortObjFn = function(key, order, alternativeFn) {
         }
 
         if (typeof aVal === 'string' && typeof bVal === 'string') {
-            return aVal.localeCompare(bVal) * currentOrder;
+            return aVal.localeCompare(bVal, locale) * currentOrder;
         }
         else if (typeof aVal === 'string' && typeof bVal === 'undefined') {
             return 1 * currentOrder;
@@ -783,8 +783,8 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                 }
                 else {
                     var myHost;
-                    if (location.href.indexOf('search') > -1) {
-                        myHost = location.href.substr(0, location.href.lastIndexOf('search') - 1);
+                    if (location.href.indexOf('/fm/search/') > -1) {
+                        myHost = location.href.substr(0, location.href.lastIndexOf('/fm/search/'));
                         location.replace(myHost);
                     }
                     else if (location.href.indexOf('/fm/chat/') > -1){
@@ -1755,4 +1755,51 @@ MegaUtils.prototype.getPersistentDataEntries = function(aPrefix, aReadContents) 
     }
 
     return promise;
+};
+
+/**
+ * Returns the name of a country given a country code in the users current language.
+ * Will return Null if the requested countrycode does not exist.
+ * @param {String} countryCode The countrycode of the country to get the name of
+ * @returns {Null|String}.
+ */
+MegaUtils.prototype.getCountryName = function(countryCode) {
+    'use strict';
+
+    if (!this._countries) {
+        this.getCountries();
+    }
+
+    // Get the stringid for the country code specified.
+    if (this._countries.hasOwnProperty(countryCode)) {
+        return this._countries[countryCode];
+    } else {
+        return null;
+    }
+};
+
+/**
+ * Returns an object with all countryCodes:countryNames in the user set language.
+ * @returns Object
+ */
+MegaUtils.prototype.getCountries = function() {
+    'use strict';
+
+    if (!this._countries) {
+        this._countries = (new RegionsCollection()).countries;
+    }
+    return this._countries;
+};
+
+/**
+ * Returns an object with all the stateCodes:stateNames.
+ * @returns Object
+ */
+MegaUtils.prototype.getStates = function() {
+    'use strict';
+
+    if (!this._states) {
+        this._states = (new RegionsCollection()).states;
+    }
+    return this._states;
 };

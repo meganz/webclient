@@ -72,10 +72,15 @@
     position: absolute;
     right: 0;
 }
-.fm-dialog-footer-txt {
+.fm-dialog-footer-txt, .de .contacts-search.popup.add-participant-selector .fm-dialog-footer-txt  {
     text-align: center;
     line-height: 31px;
     color: #777;
+}
+.de .contacts-search.popup .fm-dialog-footer-txt {
+    text-align: right;
+    line-height: 1.5;
+    max-width: 240px;
 }
 /* Send Contact Dialog */
 .fm-dialog.send-contact {
@@ -104,7 +109,7 @@
 .contacts-info.body.contacts-search.selected:nth-child(odd) {
     background-color: #2ba6de;
 }
-.contacts-info.body.contacts-search.selected span, .contacts-info.body.contacts-search.selected .user-card-email {
+.contacts-info.body.contacts-search.selected span, .contacts-info.body.contacts-search.selected .user-card-email, .contacts-info.body.contacts-search.selected .user-card-name {
     color: white;
 }
 .contacts-info.body.contacts-search.selected .user-card-presence {
@@ -350,7 +355,7 @@
 .fm-dialog:not(.exceeded) .pro-plan-descr::after {
     content: '';
     display: block;
-    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-image: url(../images/mega/top-login-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: -24px -2256px;
     position: absolute;
@@ -677,6 +682,24 @@
 }
 .fm-dialog.exceeded.pro.slider .checkboxOff, .fm-dialog.exceeded.pro.slider .checkboxOn {
     margin-top: 10px;
+}
+
+.fm-dialog.limited-bandwidth-dialog .storage-icon {
+    display: none;
+}
+
+.fm-dialog.limited-bandwidth-dialog.uploads .dialog-top-icon {
+    display: none !important;
+}
+
+.fm-dialog.limited-bandwidth-dialog.uploads .storage-icon {
+    display: inline-block;
+}
+
+.fm-dialog.exceeded.uploads .transfer-overquota-txt,
+.fm-dialog.exceeded.uploads .msg-prewarning,
+.fm-dialog.exceeded.uploads .bottom-tips {
+    display: none;
 }
 /* End of Transfer quota exceeded dialog */
 
@@ -1222,12 +1245,12 @@ li.token-input-token-invite .input-close {
     margin-right: 8px;
 }
 .invitation-dialog.table-cell span.desc {
-    background-image: url(../images/mega/fm-main-sprite_v2.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-position: right -11445px;
     background-repeat: no-repeat;
 }
 .invitation-dialog.table-cell span.asc {
-    background-image: url(../images/mega/fm-main-sprite_v2.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-position: right -11475px;
     background-repeat: no-repeat;
 }
@@ -2167,7 +2190,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v20.png);
+    background-image: url(../images/mega/icons-sprite_v21.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -2606,11 +2629,11 @@ li.token-input-token-invite .input-close {
     opacity: 0.8;
 }
 .embed-content-block .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite.png);
+    background-image: url(../images/mega/dialog-sprite_v2.png);
     background-position: -128px -5818px;
 }
 .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite.png);
+    background-image: url(../images/mega/dialog-sprite_v2.png);
     background-position: -88px -5818px;
 }
 .embed-content-block .fm-subheading {
@@ -2727,7 +2750,7 @@ li.token-input-token-invite .input-close {
 }
 .park-account-dialog .fm-dialog-title {
     font-size: 17px;
-    padding-top: 24px; 
+    padding-top: 24px;
 }
 .park-account-dialog .improved-recovery-steps .content-text {
     margin-left: 60px;
@@ -2782,3 +2805,238 @@ li.token-input-token-invite .input-close {
 .widget-dialog .copy-widget-code {
     text-transform: capitalize;
 }
+/* Private chat dialog */
+.create-private-chat {
+    width: 560px;
+    margin: -190px 0 0 -280px;
+    overflow: visible;
+}
+.create-private-chat .fm-dialog-title {
+    font-size: 20px;
+    color: #666666;
+    text-align: center;
+}
+.create-private-chat .wrapper {
+    width: 460px;
+    margin: 24px auto 44px;
+}
+.create-private-chat .fm-body-text {
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+}
+.create-private-chat .default-huge-button.make-private {
+    display: table;
+    margin: 24px auto;
+    font-family: 'montserrat';
+    background-color: #F0373A;
+    box-shadow: 0 1px 2px 0 rgba(217,0,7,0.30), inset 0 1px 1px 0 rgba(255,255,255,0.20);
+    line-height: 65px;
+}
+.private-chat-illustration .bottom-page.big-icon.top-pad {
+    display: table;
+    margin: 24px auto;
+}
+
+/* Add contact */
+.add-user-popup.fm-dialog {
+    z-index: 1200;
+    left: 50%;
+    top: 50%;
+    width: 640px;
+    margin: -150px 0 0 -320px;
+}
+.add-user-popup.fm-dialog.private {
+    margin: -185px 0 0 -320px;
+}
+.add-user-popup.fm-dialog.achievements {
+    margin: -189px 0 0 -320px;
+}
+.add-user-popup.fm-dialog.achievements.private {
+    margin: -224px 0 0 -320px;
+}
+.fm-dialog-add-contact-pad {
+    margin: 0 15px 0 0;
+}
+ .add-user-popup-pad {
+    margin: 58px 48px 24px 48px;
+    position: relative;
+    text-align: center;
+}
+.dropdown.body.add-user-popup {
+    max-width: 90%;
+    z-index: 100;
+    width: 640px !important;
+}
+.add-user-popup .multiple-input i {
+    opacity: 0.74;
+    position: absolute;
+    margin: 8px 0 0 7px;
+    left: 0;
+}
+.hidden-textarea-info {
+    font-size: 14px;
+    line-height: 18px;
+    color: #999999;
+    text-align: center;
+    margin: 10px 0 2px 0;
+}
+.hidden-textarea-info span {
+    display: inline-block;
+    padding: 0 10px;
+    cursor: pointer;
+}
+.hidden-textarea-info span:hover {
+    text-decoration: underline;
+}
+.dialog-dark-bottom {
+    background-color: #333333;
+    height: 48px;
+    -webkit-border-bottom-left-radius: 7px;
+    -moz-border-radius-bottomleft: 7px;
+    border-bottom-left-radius: 7px;
+    -webkit-border-bottom-right-radius: 7px;
+    -moz-border-radius-bottomleft: 7px;
+    border-bottom-right-radius: 7px;
+    padding: 14px 48px 0 48px;
+    font-size: 14px;
+    line-height: 20px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    color: white;
+    position: relative;
+}
+.big-red-button.add-user-popup-button {
+    margin: 16px 0 0 0;
+}
+.big-red-button.add-user-popup-button.disabled {
+    opacity: 0;
+}
+.dialog-dark-bottom i {
+    margin-right: 8px;
+}
+.dialog-dark-bottom a {
+    text-decoration: underline;
+}
+.add-user-popup .add-user-notification, .add-user-popup.private .hidden-textarea-info {
+    display: none;
+}
+.add-user-popup.private .add-user-notification {
+    display: block;
+}
+.hidden-achievement-info {
+    display: none;
+    margin: 0 0 0 0;
+}
+.achievements .hidden-achievement-info {
+    display: table;
+    text-align: left;
+    width: 100%;
+    margin: 22px 0 0 0;
+}
+.hidden-achievement-cell {
+    display: table-cell;
+    vertical-align: middle;
+}
+.hidden-achievement-cell:first-child {
+    width: 68px;
+}
+.hidden-achievement-cell .big-txt {
+    font-size: 16px;
+    line-height: 22px;
+    color: #333333;
+    font-family: 'source_sans_prosemibold';
+}
+.hidden-achievement-cell .small-txt {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+}
+/* end of Add contact */
+
+/* New contact dialog*/
+.fm-dialog.new-contact {
+    width: 560px;
+    margin: -190px 0 0 -280px;
+    text-align: center;
+}
+.new-contact-info {
+    font-size: 16px;
+    line-height: 24px;
+    color: #666666;
+    padding: 0 30px 12px 30px;
+    text-transform: lowercase;
+}
+.new-contact-info:first-letter {
+    text-transform: uppercase;
+}
+.new-contact-info span {
+    font-family: 'source_sans_prosemibold';
+    color: #333333;
+}
+.new-user-message {
+    font-size: 13px;
+    line-height: 24px;
+    color: #777777;
+    font-family: 'Open Sans Italic';
+    position: relative;
+    display: inline-block;
+    padding: 12px 58px 0 58px;
+}
+.new-user-message i.quote1 {
+    position:absolute;
+    left: 25px;
+    top: 0;
+}
+.new-user-message i.quote2 {
+    position:absolute;
+    right: 25px;
+    bottom: -23px;
+}
+.new-contact-buttons {
+    text-align: center;
+    padding: 36px 0 12px 0;
+    font-size: 0;
+}
+.new-contact-avatar {
+    width: 100px;
+    height: 100px;
+    margin: 19px auto 23px auto;
+    background-color: white;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    position: relative;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    padding: 2px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.new-contact-avatar::before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+}
+/* end of New contact dialog*/
+
+/* Contact info dialog*/
+.fm-dialog.contact-info {
+    width: 560px;
+    margin: -190px 0 0 -280px;
+    text-align: center;
+}
+/* end of Contact info dialog*/

@@ -133,6 +133,9 @@
     }
 
     function FileDragEnter(e) {
+        if (d) {
+            console.log('DragEnter');
+        }
         if ($.dialog === 'avatar') {
             return;
         }
@@ -150,6 +153,9 @@
     }
 
     function FileDragHover(e) {
+        if (d) {
+            console.log('DragOver');
+        }
         e.stopPropagation();
         e.preventDefault();
     }
@@ -255,6 +261,9 @@
         }
     }
     function FileDragLeave(e) {
+        if (d) {
+            console.log('DragLeave');
+        }
         if ($.dialog === 'avatar') {
             return;
         }
@@ -413,9 +422,11 @@
                 start_upload();
             }
             $('.fm-file-upload input').remove();
-            $('.fm-file-upload').append('<input type="file" id="fileselect1" multiple="">');
+            $('.fm-file-upload').append('<input type="file" id="fileselect1" title="' + l[99] + '" multiple="">');
             $('.fm-folder-upload input').remove();
-            $('.fm-folder-upload').append('<input type="file" id="fileselect2" webkitdirectory="" multiple="">');
+            $('.fm-folder-upload').append('<input type="file" id="fileselect2" webkitdirectory="" title="' +
+                l[98]
+                + '" multiple="">');
             $('input#fileselect3').remove();
             $('.files-menu .fileupload-item')
                 .after('<input type="file" id="fileselect3" class="hidden" name="fileselect3" multiple="">');

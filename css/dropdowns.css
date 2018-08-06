@@ -1,7 +1,7 @@
 .dropdown.body {
     padding: 8px;
     position: absolute;
-    z-index: 100;
+    z-index: 150;
     background-color: white;
     -moz-border-radius: 8px;
     -webkit-border-radius: 8px;
@@ -45,6 +45,10 @@
     -khtml-opacity: 1;
     opacity: 1;
 }
+.disabled-submenu + .dropdown.body.submenu {
+    display: none;
+    visibility: hidden;
+}
 .dropdown.body.submenu.active {
     display: block;
     opacity: 1;
@@ -73,12 +77,6 @@
     width: 560px;
     margin: -245px 0 0 -233px;
     z-index: 1200;
-}
-.dropdown.body.popup .fm-dialog-close {
-    display: none;
-}
-.dropdown.body.fm-dialog .fm-dialog-close {
-    display: block;
 }
 .dropdown.body:not(.fm-dialog):not(.add-user-popup) .nw-fm-dialog-title {
     padding-top: 34px;
@@ -119,7 +117,7 @@
     width: 24px;
     height: 11px;
     z-index: 123;
-    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-image: url(../images/mega/top-login-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: 0 -2249px;
 }
@@ -201,7 +199,7 @@
     background-color: #AAAAAA;
     color: white;
 }
-.dropdown-item.contains-submenu::before {
+.dropdown-item.contains-submenu:not(.disabled-submenu)::before {
     content: '';
     display: block;
     width: 9px;
@@ -209,7 +207,7 @@
     position: absolute;
     right: 7px;
     top: 9px;
-    background-image: url(../images/mega/icons-sprite_v20.png);
+    background-image: url(../images/mega/icons-sprite_v21.png);
     background-repeat: no-repeat;
     background-position: -106px -254px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
@@ -238,7 +236,7 @@
     right: 8px;
     top: 50%;
     margin: -4px 0 0 0;
-    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-image: url(../images/mega/top-login-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: -30px -1816px;
 }
@@ -248,7 +246,7 @@
 .dropdown-item.red {
     color: #E44C51;
 }
-.dropdown-item.red:hover {
+.dropdown-item.red:not(.disabled):hover {
     background-color: #E44C51;
     color: white;
 }
@@ -261,7 +259,7 @@
     opacity: 0.73;
     float: left;
 }
-.dropdown-item:hover > i, .dropdown-item.opened > i, .dropdown-item.red i, .dropdown-item.do-sort i {
+.dropdown-item:not(.disabled):hover > i, .dropdown-item.opened > i, .dropdown-item.red i, .dropdown-item.do-sort i {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
@@ -334,6 +332,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -khtml-opacity: 0;
     opacity: 0;
 }
+.dropdown.body.tooltip.small {
+    position: fixed;
+    font-size: 14px;
+    line-height: 18px;
+    color: #333333;
+    text-align: center;
+    padding: 12px 24px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    z-index: 1500;
+}
 .dropdown.body.tooltip.visible {
     visibility: visible;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
@@ -392,7 +402,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     content: '';
     width: 14px;
     height: 14px;
-    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-image: url(../images/mega/top-login-sprite_v11.png);
 }
 .dropdown.text-block {
     font-size: 14px;
@@ -410,7 +420,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .context .dropdown-item {
     font-size: 14px;
-    line-height: 31px;
+    line-height: 32px;
 }
 .context .small-icon {
     margin: 6px 13px 1px 1px;
@@ -424,7 +434,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     line-height: 18px;
     color: #777777;
     display: block;
-    margin: 6px 0 10px 8px;
+    margin: 7px 0 9px 8px;
 }
 .dropdown-colour-item {
     width: 16px;
@@ -484,7 +494,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     transition: all 200ms ease-in-out, right 200ms ease-in-out;
 }
 .dropdown-colour-item::after {
-    background-image: url(../images/mega/icons-sprite_v20.png);
+    background-image: url(../images/mega/icons-sprite_v21.png);
     background-position: 2px -532px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
@@ -688,7 +698,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     right:10px;
     top: 10px;
     z-index: 10;
-    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-image: url(../images/mega/top-login-sprite_v11.png);
     background-position: 6px -1157px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -758,3 +768,191 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     vertical-align: top;
 }
 /* end of Tips and Hints */
+
+/* Contact dropdown */
+.dropdown-contact-details {
+    -moz-border-radius: inherit;
+    -webkit-border-radius: inherit;
+    border-radius: inherit;
+}
+.dropdown-avatar {
+    -moz-border-radius: inherit;
+    -webkit-border-radius: inherit;
+    border-radius: inherit;
+    cursor: pointer;
+    position: relative;
+    margin: -8px -8px 8px -8px;
+}
+.dropdown-avatar.rounded {
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+}
+.dropdown-avatar::before {
+    content: '';
+    display: block;
+    position:absolute;
+    width: 100%;
+    height: 75px;
+    bottom: 0;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC4zIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
+background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 100%);
+background: -webkit-linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,0.3) 100%);
+background: linear-gradient(to bottom, rgba(0,0,0,0) 0%,rgba(0,0,0,0.3) 100%);
+z-index: 1;
+    bottom: 0;
+    opacity: 0.3;
+    -webkit-transition: opacity 250ms ease-in-out;
+    -moz-transition: opacity 250ms ease-in-out;
+    -o-transition: opacity 250ms ease-in-out;
+    -ms-transition: opacity 250ms ease-in-out;
+    transition: opacity 250ms ease-in-out;
+}
+.dropdown-avatar:hover::before {
+    opacity: 0;
+}
+.dropdown-fingerprint {
+    position: relative;
+    background-color: #FAFAFA;
+    padding: 11px 8px 6px 8px;
+    -webkit-box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
+    box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
+    margin: -8px -8px 9px -8px;
+    background-image: url(../images/mega/new-chat-sprite_v5.png);
+    background-position: 0 -3881px;
+    background-repeat: repeat-x;
+    height: 80px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.dropdown-item:not(.hidden) + .dropdown-fingerprint {
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    margin: 9px -8px 9px -8px;
+}
+.dropdown .contact-fingerprint-title {
+    font-size: 14px;
+    line-height: 18px;
+    font-family: 'source_sans_proregular';
+    height: auto;
+    color: #666666;
+    padding-bottom: 6px;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    position: relative;
+}
+.dropdown .contact-fingerprint-title span {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    max-width: 180px;
+    vertical-align: top;
+}
+.dropdown .dropdown-verify {
+    display: none;
+}
+.dropdown .dropdown-verify.active {
+    position: absolute;
+    display: table;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background-color: rgba(250, 250, 250, 0.95);
+    font-size: 14px;
+    line-height: 20px;
+    color: #777777;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 20px;
+    opacity: 0;
+    -webkit-transition: opacity 250ms ease-in-out;
+    -moz-transition: opacity 250ms ease-in-out;
+    -o-transition: opacity 250ms ease-in-out;
+    -ms-transition: opacity 250ms ease-in-out;
+    transition: opacity 250ms ease-in-out;
+    cursor: pointer;
+}
+.dropdown .dropdown-verify:hover {
+    opacity: 1;
+}
+.dropdown .dropdown-verify i {
+    margin: 31px 9px 0 0;
+    opacity: 0.73;
+    position: absolute;
+}
+.dropdown .dropdown-verify span {
+    display: table-cell;
+    padding-left: 32px;
+    vertical-align: middle;
+}
+.contact-fingerprint-title .user-card-verified, .verified .contact-fingerprint-title .verified_icon {
+    display: inline-block;
+    vertical-align: top;
+    margin: 1px 0 0 10px;
+    float: none;
+    position: relative;
+    top: auto;
+    right: auto;
+}
+.dropdown .contact-fingerprint-txt span {
+    width: 44px;
+    color: #333333;
+}
+.dropdown-user-name {
+    font-size: 18px;
+    line-height: 24px;
+    color: white;
+    display: inline-block;
+    position: absolute;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    left: 0;
+    top: 145px;
+    padding: 0 24px 0 18px;
+    margin: 0;
+    max-width: -webkit-calc(100% - 10px);
+    max-width: -moz-calc(100% - 10px);
+    max-width: calc(100% - 10px);
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-text-shadow: 0px 1px 2px rgba(0,0,0,0.15);
+    -webkit-text-shadow: 0px 1px 2px rgba(0,0,0,0.15);
+    text-shadow: 0px 1px 2px rgba(0,0,0,0.15);
+    z-index: 10;
+    cursor: pointer;
+    -webkit-transition: opacity 250ms ease-in-out;
+    -moz-transition: opacity 250ms ease-in-out;
+    -o-transition: opacity 250ms ease-in-out;
+    -ms-transition: opacity 250ms ease-in-out;
+    transition: opacity 250ms ease-in-out;
+}
+.dropdown-contact-details:hover .dropdown-user-name {
+    opacity: 0;
+}
+.dropdown .nw-contact-status, .user-card-presence.small {
+    -moz-box-shadow: 0 0 0 1px #FFFFFF;
+    -webkit-box-shadow: 0 0 0 1px #FFFFFF;
+    box-shadow: 0 0 0 2px #FFFFFF;
+    position: absolute;
+    left: auto;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    top: 8px;
+    margin: 0;
+    z-index: 10;
+}

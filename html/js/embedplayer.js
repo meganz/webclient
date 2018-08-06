@@ -231,7 +231,7 @@ function topmenuUI() {
 
         api_req({"a": "uga", "u": u_handle, "ua": "+a"}, {
             callback: tryCatch(function(res) {
-                var src = res.length && mObjectURL([base64_to_ab(res)], 'image/jpeg');
+                var src = res.length > 5 && mObjectURL([base64_to_ab(res)], 'image/jpeg');
                 if (src) {
                     $avatarwrapper.safeHTML('<img src="@@"/>', src);
                 }

@@ -770,15 +770,17 @@ div.pro-feature-icon {
     padding: 0;
 }
 .membership-step2 .subscription-instructions {
-    border: 1px solid #46b0da;
-    border-radius: 5px;
+    border: 1px solid #eee;
+    border-radius: 4px;
     box-sizing: border-box;
-    color: #46b0da;
+    color: #888;
+    background-color: #fff;
     display: block;
     font-size: 13px;
-    line-height: 1.31;
-    margin: 20px 0 0 12px;
-    padding: 14px;
+    text-align: center;
+    line-height: 1.5;
+    margin: 12px 0 4px 12px;
+    padding: 8px;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
     -o-transition: all 200ms ease-in-out;
@@ -787,7 +789,7 @@ div.pro-feature-icon {
     cursor: pointer;
 }
 .membership-step2 .subscription-instructions:hover {
-    background-color: #f7fdff;
+    background-color: #fafafa;
 }
 .membership-step2 .subscription-instructions.hidden {
     display: none;
@@ -874,7 +876,7 @@ div.pro-feature-icon {
 }
 .membership-step2 .payment-instructions {
     color: #555;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 28px;
     max-width: 470px;
     float: left;

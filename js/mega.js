@@ -112,7 +112,7 @@ if (typeof loadingInitDialog === 'undefined') {
             mega.loadReport.stepTimeStamp = Date.now();
 
             // If the PSA is visible reposition the account loading bar
-            if (!is_mobile) {
+            if (typeof psa !== 'undefined') {
                 psa.repositionAccountLoadingBar();
             }
         }
@@ -559,6 +559,17 @@ scparser.$add('s', {
             // if access right are undefined, then share is deleted
             if (typeof a.r === 'undefined') {
                 M.delNodeShare(a.n, a.u, a.okd);
+                if (!folderlink && a.u !== 'EXP' && fminitialized) {
+                    if (a.ou !== u_handle) {
+                        notify.notifyFromActionPacket({
+                            a: 'dshare',
+                            n: a.n,
+                            u: a.o,
+                            orig: a.ou,
+                            rece: a.u
+                        });
+                    }
+                }
             }
             else {
                 var handle = a.n;
@@ -658,11 +669,15 @@ scparser.$add('s', {
                     }
 
                     if (!folderlink && a.u !== 'EXP' && fminitialized) {
-                        notify.notifyFromActionPacket({
-                            a: 'dshare',
-                            n: a.n,
-                            u: a.o
-                        });
+                        if (a.ou !== u_handle) {
+                            notify.notifyFromActionPacket({
+                                a: 'dshare',
+                                n: a.n,
+                                u: a.o,
+                                orig: a.ou,
+                                rece: a.u
+                            });
+                        }
                     }
                 }
                 else {
@@ -862,8 +877,7 @@ scparser.$add('opc', {
         // outgoing pending contact
         processOPC([a]);
 
-        // don't append to sent grid on deletion
-        if (!a.dts) {
+        if (fminitialized) {
             M.drawSentContactRequests([a]);
         }
     }
@@ -1139,11 +1153,25 @@ scparser.$add('usc', function() {
     fm_forcerefresh();
 });
 
+// Payment received
 scparser.$add('psts', function(a) {
     if (!pfid && u_type) {
         M.checkStorageQuota(2000);
     }
     pro.processPaymentReceived(a);
+
+    if (ulmanager.ulOverStorageQuota) {
+        eventlog(99701);
+        onIdle(function() {
+            ulmanager.ulResumeOverStorageQuotaState();
+        });
+    }
+});
+
+// Payment reminder
+scparser.$add('pses', function(a) {
+    'use strict';
+    notify.notifyFromActionPacket(a);
 });
 
 scparser.$add('mcc', function(a) {
@@ -1166,6 +1194,23 @@ scparser.$add('mcc', function(a) {
         delete a.a;
         fmdb.add('mcf', {id: a.id, d: a});
     }
+});
+
+// MEGAchat archive/unarchive
+scparser.$add('mcfc', function(a) {
+    'use strict';
+
+    if (window.megaChatIsReady) {
+        var room = megaChat.getChatById(a.id);
+        if (room) {
+            return room.updateFlags(a.f, true);
+        }
+    }
+
+    if (!loadfm.chatmcfc) {
+        loadfm.chatmcfc = {};
+    }
+    loadfm.chatmcfc[a.id] = a.f;
 });
 
 scparser.$add('_sn', function(a) {
@@ -2489,9 +2534,14 @@ function processIPC(ipc, ignoreDB) {
                 $('#ipc_' + ipc[i].p).remove();
                 delete M.ipc[ipc[i].p];
                 if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
+                    updateIpcRequests();
                     $('.contact-requests-grid').addClass('hidden');
                     $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                     $('.fm-empty-contacts').removeClass('hidden');
+                    $('.button.link-button.accept-all').addClass('hidden');
+                }
+                else if (Object.keys(M.ipc).length) {
+                    updateIpcRequests();
                 }
 
                 // Update token.input plugin
@@ -2522,6 +2572,7 @@ function processOPC(opc, ignoreDB) {
         M.addOPC(opc[i], ignoreDB);
         if (opc[i].dts) {
             M.delOPC(opc[i].p);
+            $('#opc_' + opc[i].p).remove();
 
             // Update tokenInput plugin
             removeFromMultiInputDDL('.share-multiple-input', {id: opc[i].m, name: opc[i].m});
@@ -2717,9 +2768,14 @@ function processUPCI(ap) {
             M.delIPC(ap[i].p);// Remove from localStorage
             $('#ipc_' + ap[i].p).remove();
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
+                updateIpcRequests();
                 $('.contact-requests-grid').addClass('hidden');
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
+                $('.button.link-button.accept-all').addClass('hidden');
                 $('.fm-empty-contacts').removeClass('hidden');
+            }
+            else if (M.currentdirid === 'ipc') {
+                updateIpcRequests();
             }
         }
     }
@@ -2849,6 +2905,16 @@ function processMCF(mcfResponse, ignoreDB) {
             if (chatRoomInfo.active === 0) {
                 // skip non active chats for now...
                 return;
+            }
+
+            if (chatRoomInfo.n) {
+                for (var i = 0; i < chatRoomInfo.n.length; i++) {
+                    var member = chatRoomInfo.n[i];
+                    // was removed from the chat.
+                    if (member.u === u_handle && member.p === -1) {
+                        return;
+                    }
+                }
             }
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });
@@ -2982,11 +3048,23 @@ function loadfm_callback(res) {
     if (res.mcf) {
         // save the response to be processed later once chat files were loaded
         loadfm.chatmcf = res.mcf.c || res.mcf;
+        // cf will include the flags (like whether it is archived) and chatid,
+        // so it needs to combine it before processing it.
+        if (res.mcf.cf) {
+            for (var i = 0; i < res.mcf.cf.length; i++) {
+                loadfm.chatmcf[i].f = res.mcf.cf[i].f;
+            }
+        }
         // ensure the response is saved in fmdb, even if the chat is disabled or not loaded yet
         processMCF(loadfm.chatmcf);
     }
     M.avatars();
     loadfm.fromapi = true;
+
+    if (localStorage['treefixup$' + u_handle]) {
+        // We found inconsistent tree nodes and forced a reload, log it.
+        eventlog(99695);
+    }
 
     process_f(res.f, function onLoadFMDone(hasMissingKeys) {
 
@@ -3041,11 +3119,6 @@ function loadfm_callback(res) {
         // decrypt hitherto undecrypted nodes
         crypto_fixmissingkeys(missingkeys);
 
-        // commit transaction and set sn
-        setsn(res.sn);
-        currsn = res.sn;
-        mega.fcv_fsn = res.sn;
-
         if (res.cr) {
             crypto_procmcr(res.cr);
         }
@@ -3061,6 +3134,10 @@ function loadfm_callback(res) {
         // Time to save the ufs-size-cache, from which M.tree nodes will be created and being
         // those dependant on in-memory-nodes from the initial load to set flags such SHARED.
         ufsc.save();
+
+        // commit transaction and set sn
+        setsn(res.sn);
+        currsn = res.sn;
 
         // retrieve initial batch of action packets, if any
         // we'll then complete the process using loadfm_done
@@ -3096,11 +3173,38 @@ function loadfm_done(mDBload) {
 
     if (!pfid && u_type == 3) {
 
+        // Ensure tree nodes consistency...
+        var tlen = Object.keys(M.tree[M.RootID] || {}).length;
+        var clen = Object.keys(M.c[M.RootID] || {}).filter(function(h) { return M.c[M.RootID][h] > 1 }).length;
+
+        if (tlen < clen) {
+            if (localStorage['treefixup$' + u_handle]) {
+                // The force reload attempt did not helped on getting tree nodes consistency back (?!)
+                eventlog(99696);
+            }
+            else if ((Date.now() - parseInt(localStorage['treeic$' + u_handle] || 0)) < 864e6) {
+                // The user suffered again from inconsistent tree nodes within the
+                // last 10 days, we are not force reloading his account on this case.
+                eventlog(99697);
+            }
+            else {
+                // Force reload the account to get tree nodes consistency back...
+                localStorage['treeic$' + u_handle] = Date.now();
+                localStorage['treefixup$' + u_handle] = 1;
+                return fm_forcerefresh();
+            }
+        }
+        delete localStorage['treefixup$' + u_handle];
+
         // load/initialise the authentication system
         mega.config.fetch()
             .always(function() {
                 authring.initAuthenticationSystem();
             });
+    }
+    else if (pfid && u_type == 3) {
+        // logged in user opening a folder link
+        mega.config.fetch();
     }
 
     // This function is invoked once the M.openFolder()'s promise (through renderfm()) is fulfilled.

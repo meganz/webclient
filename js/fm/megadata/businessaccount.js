@@ -287,7 +287,7 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
 
     api_req(request, {
         context: context,
-        callback: function (res) {
+        callback: function (res,ctx) {
             if ($.isNumeric(res)) {
                 operationPromise.reject(0, res, 'API returned error');
             }
@@ -295,7 +295,7 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
                 mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
                 mega.buinsessAccount.quotaReport = mega.buinsessAccount.quotaReport || Object.create(null);
 
-                for (repDay in res) {
+                for (var repDay in res) {
                     mega.buinsessAccount.quotaReport[repDay] = res[repDay];
                 }
 
@@ -304,13 +304,13 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
 
                 var startIx = 0;
                 for (startIx = 0; startIx < orderedDates.length; startIx) {
-                    if (orderedDates[startIx] === context.fromDate) {
+                    if (orderedDates[startIx] === ctx.context.dates.fromDate) {
                         break;
                     }
                 }
 
                 // quit if we didnt find the data
-                if (startIx === orderedDates.length) {
+                if (orderedDates[startIx] !== ctx.context.dates.fromDate) {
                     console.error('Requested report start-date is not found');
                     return operationPromise.reject(0, res, 'Requested report start-date is not found');
                 }
@@ -319,17 +319,17 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
                 var endIx = -1;
                 for (endIx = startIx; endIx < orderedDates.length; endIx++) {
                     result[orderedDates[endIx]] = res[orderedDates[endIx]];
-                    if (orderedDates[endIx] === context.toDate) {
+                    if (orderedDates[endIx] === ctx.context.dates.toDate) {
                         break;
                     }
                 }
 
                 // quit if we didnt find the data
-                if (endIx === orderedDates.length) {
-                    delete result;
-                    console.error('Requested report end-date is not found');
-                    return operationPromise.reject(0, res, 'Requested report end-date is not found');
-                }
+                //if (endIx === orderedDates.length && orderedDates[endIx] !== ctx.context.dates.toDate) {
+                //    result = null;
+                //    console.error('Requested report end-date is not found');
+                //    return operationPromise.reject(0, res, 'Requested report end-date is not found');
+                //}
 
                 operationPromise.resolve(1, result); // quota info
             }

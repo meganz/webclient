@@ -25601,14 +25601,16 @@ opacity: 1;
 
 .user-management-overview-container .data-analysis-container .transfer-analysis-container .transfer-analysis-summary {
     width:100%;
-    height: 96px;
+    height: 128px;
     background-color: rgba(250,250,250,1);
     position: relative;
+    vertical-align: middle;
+    line-height: 128px;
 }
 
 .user-management-overview-container .data-analysis-container .transfer-analysis-container .transfer-analysis-summary .total-transfer-title{
     margin-left: 24px;
-    line-height: 96px;
+    line-height: 128px;
     font-size: 16px;
     color: #666666;
     float: left;
@@ -25617,7 +25619,7 @@ opacity: 1;
 
 .user-management-overview-container .data-analysis-container .transfer-analysis-container .transfer-analysis-summary .total-transfer-number{
     margin-left: 16px;
-    line-height: 96px;
+    line-height: 128px;
     font-size: 36px;
     font-weight: 300;
     color: #333333;
@@ -25632,7 +25634,7 @@ opacity: 1;
     font-weight: 300;
     color: #666666;
     right: 24px;
-    top: 35px;
+    top: 45px;
     position: absolute;
     margin-left: 300px;
     font-family:source_sans_prolight;

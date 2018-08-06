@@ -144,6 +144,11 @@ Unless otherwise noted, they were released under a [MIT License].
 > This is released under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 ---
+[Chart.min.js]: Charts drawing class in JavaScript. V2.7.2
+
+> https://github.com/chartjs/Chart.js/releases/tag/v2.7.2
+
+---
 [react-dom.js, react.js]: A declarative, efficient, and flexible JavaScript library for building user interfaces.
 
 ---

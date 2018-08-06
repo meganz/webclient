@@ -882,6 +882,10 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             .text(outshareTotalFormatted.size + ' ' + outshareTotalFormatted.unit);
         $overviewContainer.find('.storage-division-container.inbox-node .storage-division-per')
             .text(Math.round(outsharePrecentage) + '%');
+
+        $overviewContainer.find('.transfer-analysis-summary .total-transfer-number')
+            .text(totalBandwidthFormatted.size + ' ' + totalBandwidthFormatted.unit);
+
         $businessAccountContainer.removeClass('hidden'); // BA container
         $overviewContainer.removeClass('hidden');
 
@@ -967,13 +971,92 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         if (!endDate) {
             return;
         }
-        var endDateStr = endDate.getFullYear() + '' + (endDate.getMonth() + 1) + endDate.getDate();
+        var endDateStr = endDate.getFullYear() + '' + currMonth + endDate.getDate();
+        return { fromDate: startDate, toDate: endDateStr };
+    };
+
+    // private function to populate the reporting bar chart
+    var populateBarChart = function (st, res) {
+        M.require('charts_js').done(function () {
+            var ctx = $("#usage-bar-chart");
+            ctx.remove();
+            var $charContainer = $("#chartcontainer");
+            $charContainer.html('<canvas id="usage-bar-chart" class="daily-transfer-flow-container"></canvas>');
+            ctx = $("#usage-bar-chart");
+
+            //var ctx = document.getElementById('usage-bar-chart');
+            //var ctxCtx = ctx.getContext('2d');
+            //ctxCtx.clearRect(0, 0, ctx.width, ctx.height);
+
+            var availableLabels = Object.keys(res);
+            availableLabels.sort();
+
+            //for (var k = 0; k < availableLabels.length; k++) {
+            //    availableLabels[k] = availableLabels[k]
+            //}
+            var chartData = [];
+            var divider = 1024 * 1024;
+            if (d && localStorage.bTest) {
+                availableLabels = [];
+                for (var h2 = 0; h2 < 30; h2++) {
+                    chartData.push(Math.random() * 100);
+                    availableLabels.push(h2 + 1);
+                }
+            }
+            else {
+                for (var h = 0; h < availableLabels.length; h++) {
+                    chartData.push(res[availableLabels[h]].tdl / divider);
+                }
+            }
+
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: availableLabels, // ["Red", "Green", "Orange"],
+                    datasets: [{
+                        // label: 'Bandwidth',
+                        data: chartData,//[12, 19, 3, 5, 2, 3],
+                        //backgroundColor: [
+                        //    'rgba(255, 99, 132, 0.2)',
+                        //    'rgba(54, 162, 235, 0.2)',
+                        //    'rgba(255, 206, 86, 0.2)',
+                        //    'rgba(75, 192, 192, 0.2)',
+                        //    'rgba(153, 102, 255, 0.2)',
+                        //    'rgba(255, 159, 64, 0.2)'
+                        //],
+                        backgroundColor: 'rgba(88, 103, 195, 1)' ,
+                        //borderColor: [
+                        //    'rgba(255,99,132,1)',
+                        //    'rgba(54, 162, 235, 1)',
+                        //    'rgba(255, 206, 86, 1)',
+                        //    'rgba(75, 192, 192, 1)',
+                        //    'rgba(153, 102, 255, 1)',
+                        //    'rgba(255, 159, 64, 1)'
+                        //],
+                        borderColor: 'rgba(88, 103, 195, 1)'  ,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        });
     };
 
     // getting quotas
     var quotasPromise = this.business.getQuotaUsage();
     quotasPromise.done(populateDashboard);
-    
+
+    var initialBarReport = getReportDates();
+    var reportPromise = this.business.getQuotaUsageReport(false, initialBarReport);
+    reportPromise.done(populateBarChart);
 };
 
 /**

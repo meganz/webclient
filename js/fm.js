@@ -2429,6 +2429,7 @@ function closeDialog(ev) {
         }
     }
     $('.fm-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
+    // $('.fm-dialog .dialog-sorting-menu').remove();
 
     $('.export-links-warning').addClass('hidden');
     if ($.dialog === 'terms' && $.termsAgree) {

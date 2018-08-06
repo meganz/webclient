@@ -32,10 +32,11 @@
             fid = fileversioning.getTopNodeSync(id);
             id = M.d[fid].p;
         }
-
         this.previousdirid = this.currentdirid;
         this.currentdirid = id;
         this.currentrootid = M.chat ? "chat" : this.getNodeRoot(id);
+        this.currentLabelType = M.labelType();
+        this.currentLabelFilter = M.filterLabel[this.currentLabelType];
 
         if (first) {
             fminitialized = true;
@@ -98,6 +99,10 @@
             }
             else {
                 this.filterByParent(this.currentdirid);
+            }
+
+            if (id.substr(0, 4) !== 'chat' && id.substr(0, 9) !== 'transfers') {
+                this.labelFilterBlockUI();
             }
 
             var viewmode = 0;// 0 is list view, 1 block view
@@ -173,7 +178,7 @@
                         currentdirid = this.previousdirid;
                     }
                 }
-
+                
                 if ($('#treea_' + currentdirid).length === 0) {
                     var n = this.d[currentdirid];
                     if (n && n.p) {
@@ -228,8 +233,14 @@
             console.error(ex);
         }
 
+        this.currentTreeType = M.treePanelType();
+
         M.searchPath();
         M.treeSearchUI();
+        M.treeSortUI();
+        M.treeFilterUI();
+        M.initLabelFilter(this.v);
+        M.redrawTreeFilterUI();
 
         promise.resolve(id);
         mBroadcaster.sendMessage('mega:openfolder');
@@ -393,6 +404,7 @@
                         M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                     }
                     _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
+                    
                 });
         }
         else {

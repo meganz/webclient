@@ -1,0 +1,140 @@
+.colour-label-ind, .colour-label .file-block-title::after, .colour-label .tranfer-filetype-txt::after, .colour-label .shared-folder-info-block::after {
+    content: '';
+    display: block;
+    position: absolute;
+    right: 6px;
+    top: 11px;
+    background-color: #a4a4a7;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    width: 8px;
+    height: 8px;
+}
+.colour-label-ind.red, .colour-label.red .file-block-title::after, .colour-label.red .tranfer-filetype-txt::after, .colour-label.red .shared-folder-info-block::after {
+    background-color: #FF625C;
+}
+.colour-label-ind.orange, .colour-label.orange .file-block-title::after, .colour-label.orange .tranfer-filetype-txt::after, .colour-label.orange .shared-folder-info-block::after {
+    background-color: #F9A646;
+}
+.colour-label-ind.yellow, .colour-label.yellow .file-block-title::after, .colour-label.yellow .tranfer-filetype-txt::after, .colour-label.yellow .shared-folder-info-block::after {
+    background-color: #F4CE4A;
+}
+.colour-label-ind.green, .colour-label.green .file-block-title::after, .colour-label.green .tranfer-filetype-txt::after, .colour-label.green .shared-folder-info-block::after {
+    background-color: #6DCC50;
+}
+.colour-label-ind.blue, .colour-label.blue .file-block-title::after, .colour-label.blue .tranfer-filetype-txt::after, .colour-label.blue .shared-folder-info-block::after {
+    background-color: #4BB8F3;
+}
+.colour-label-ind.purple, .colour-label.purple .file-block-title::after, .colour-label.purple .tranfer-filetype-txt::after, .colour-label.purple .shared-folder-info-block::after {
+    background-color: #D088E1;
+}
+.colour-label .shared-folder-info-block::after {
+    right: 2px;
+    top: 13px;
+}
+.nw-fm-tree-item .colour-label-ind {
+    right: 36px;
+    top: 8px;
+}
+.nw-fm-tree-item:hover .colour-label-ind, .nw-fm-tree-item.hovered .colour-label-ind, .nw-fm-tree-item.selected .colour-label-ind {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 1);
+    box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 1);
+}
+.nw-fm-tree-item.label {
+    padding-right: 46px;
+}
+.colour-label .file-block-title {
+    padding-right: 18px;
+}
+.colour-label .shared-folder-info-block {
+    padding-right: 12px;
+    position: relative;
+}
+.data-block-view.colour-label .shared-folder-info-block {
+    padding-right: 18px;
+    position: relative;
+}
+.data-block-view.colour-label .shared-folder-info-block::after {
+    right: 6px;
+    top: 24px;
+}
+.colour-label .tranfer-filetype-txt {
+    padding-right: 12px;
+}
+.data-block-view.colour-label .tranfer-filetype-txt {
+    padding-right: 12px;
+}
+.colour-label .tranfer-filetype-txt::after {
+    right: 12px;
+    top: 8px;
+}
+/* Filters */
+.filter-block.body, .filter-block.tree {
+    background-color: #FAFAFA;
+    -webkit-box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.1);
+    font-size: 0;
+    color: #777777;
+    padding: 0 38px 0 7px;
+    white-space: nowrap;
+    position: relative;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    float: right;
+    height: 20px;
+    margin: 8px 0 0 0;
+}
+.filter-block.tree {
+    margin-top: 0;
+    margin-right: 5px;
+}
+.filter-block.body *, .filter-block.tree * {
+    display: inline-block;
+    vertical-align: top;
+}
+.filter-block.info {
+    font-size: 12px;
+    line-height: 19px;
+    padding: 0 2px 0 0;
+}
+.filter-block .colour-label-ind {
+    margin: 6px 0 0 6px;
+    position: static;
+}
+.filter-block.close {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    position:absolute;
+    right: 0;
+    top: 0;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+}
+.filter-block.close:hover {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+    -moz-opacity: 0.8;
+    -khtml-opacity: 0.8;
+    opacity: 0.8;
+}
+.fm-right-header .filter-block.body {
+    margin: 8px -5px 0 0;
+}
+.fm-right-header.long-path .filter-block.body {
+    margin-right: 8px;
+}
+.grid-table-header .filter-block.body {
+    margin: 3px 18px 0 0;
+}
+/*end of Filters */

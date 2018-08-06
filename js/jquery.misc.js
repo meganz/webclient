@@ -185,3 +185,16 @@ $.fn.rotate = function AnimateRotate(finalAngle, initialAngle, time) {
         });
     });
 };
+
+// prevent DOMElement (and its pseudo-elements) to do not use transition while do some actions
+$.fn.noTransition = function(action) {
+    'use strict';
+
+    var $this = $(this);
+    $this.addClass('no-trans');
+    $.when(action()).done(function() {
+        setTimeout(function() {
+            $this.removeClass('no-trans');
+        }, 0);
+    });
+};

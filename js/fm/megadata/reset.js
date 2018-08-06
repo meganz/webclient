@@ -11,6 +11,8 @@ MegaData.prototype.reset = function() {
     this.tree = Object.create(null);
     this.c.shares = Object.create(null);
     this.c.contacts = Object.create(null);
+    this.filterLabel = Object.create(null);
+    this.filterTreePanel = Object.create(null);
 
     if (typeof MegaDataMap !== 'undefined') {
         this.u = new MegaDataMap();

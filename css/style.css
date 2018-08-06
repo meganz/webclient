@@ -3853,9 +3853,15 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.linked {
     padding-right: 37px;
 }
+.nw-fm-tree-item.labeled {
+    padding-right: 48px;
+}
 .nw-fm-tree-item .data-item-icon {
     top: 2px;
     right: 12px;
+}
+.nw-fm-tree-item.linked, .nw-fm-tree-item.undecryptable {
+    padding-right: 30px;
 }
 .nw-fm-tree-item:hover, .nw-fm-tree-item.hovered {
     background-color: rgba(217,0,7,0.2);
@@ -4247,7 +4253,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-contact-item.selected .nw-contact-name, .selected .contacts-username, .selected .add-contact-username {
     color: white;
 }
-.nw-conversations-header, .nw-tree-panel-header {
+.nw-conversations-header, .nw-tree-panel-header, .nw-tree-panel-filter-tag {
     height: 36px;
     font-size: 15px;
     line-height: 36px;
@@ -4258,6 +4264,11 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+.nw-tree-panel-filter-tag {
+    height: 25px;
+    line-height: 25px;
+    padding: 0 3px 0 12px;
 }
 .fm-left-menu.dashboard + .nw-tree-panel-header {
     display: none;
@@ -5764,8 +5775,8 @@ th.grid-first-th {
 .data-block-view.taken-down.linked .data-item-icon {
     background-position: -9px -4852px;
 }
-.undecryptable.nw-fm-tree-item .data-item-icon, .nw-fm-tree-item.selected.linked.undecryptable .data-item-icon, .nw-fm-tree-item.dragover.linked.undecryptable .data-item-icon {
-    background-position: -15px -2639px;
+.undecryptable.nw-fm-tree-item .data-item-icon, .undecryptable.nw-fm-tree-item:hover .data-item-icon, .nw-fm-tree-item.selected.linked.undecryptable .data-item-icon, .nw-fm-tree-item.dragover.linked.undecryptable .data-item-icon {
+    background-position: -14px -2639px;
 }
 .undecryptable .grid-status-icon, .undecryptable .grid-status-icon.star {
     background-repeat: no-repeat;
@@ -6092,10 +6103,6 @@ th.grid-first-th {
 }
 .data-block-view.colour-label .tranfer-filetype-txt {
     padding-right: 12px;
-}
-.colour-label .tranfer-filetype-txt::after {
-    right: 12px;
-    top: 8px;
 }
 .grid-url-arrow, .file-settings-icon, .clear-transfer-icon {
     height: 16px;
@@ -7256,9 +7263,7 @@ table {
     display: none;
 }
 .fm-header-buttons {
-    position: absolute;
-    top: 0;
-    right: 0;
+    float: right;
     font-size: 0;
     white-space: nowrap;
     background-color: #ffffff;
@@ -7286,6 +7291,9 @@ table {
     box-sizing: border-box;
     font-size: 0;
     white-space: nowrap;
+}
+.fm-breadcrumbs-block.deactivated {
+    display: none;
 }
 .fm-breadcrumbs {
     display: block;
@@ -7524,7 +7532,7 @@ table {
     opacity: 0.05;
     cursor: default;
 }
-.fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-messages, .fm-empty-folder, .fm-empty-conversations, .fm-empty-incoming, .fm-invalid-folder, .fm-empty-folder-link {
+.fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-contacts, .fm-empty-messages, .fm-empty-folder, .fm-empty-conversations, .fm-empty-incoming, .fm-invalid-folder, .fm-empty-folder-link, .fm-empty-filter {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -7560,7 +7568,7 @@ table {
     height: 398px;
     margin-top: -199px;
 }
-.fm-empty-search .fm-empty-pad {
+.fm-empty-search .fm-empty-pad, .fm-empty-filter .fm-empty-pad {
     height: 324px;
     margin-top: -162px;
 }
@@ -7602,7 +7610,7 @@ table {
     height: 390px;
     margin-top: -171px;
 }
-.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg {
+.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg, .fm-empty-filter-bg {
     background-image: url(../images/mega/empty-sprite_v5.png);
     background-repeat: no-repeat;
 }
@@ -7614,7 +7622,7 @@ table {
     height: 258px;
     background-position: center -1680px;
 }
-.fm-empty-search-bg {
+.fm-empty-search-bg, .fm-empty-filter-bg {
     height: 244px;
     background-position: center -2350px;
 }
@@ -7697,7 +7705,7 @@ table {
     z-index: 100;
     border: 1px dotted black;
 }
-.context-menu, .nw-sorting-menu, .dialog-sorting-menu {
+.context-menu, .dialog-sorting-menu, .fm-sorting-menu {
     min-width: 160px;
     position: absolute;
     background-color: #333333;
@@ -7716,12 +7724,17 @@ table {
     display: none;
 }
 .nw-sorting-menu {
-    right: -156px;
-    top: 34px;
+    right: -155px;
+    top: 33px;
 }
-.dialog-sorting-menu {
+.dropdown.body.dialog-sorting-menu, .fm-sorting-menu {
+    min-width: 198px;
     left: 590px;
     top: 103px;
+}
+.fm-dialog .dropdown.body.dialog-sorting-menu{
+    left: 176px;
+    top: 202px;
 }
 .context-menu-divider, .pause-item-divider, .sorting-item-divider {
     height: 2px;
@@ -10412,6 +10425,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat;
     background-position: left -7998px;
+    display: block;
     position: absolute;
     width: 10px;
     height: 17px;
@@ -15092,11 +15106,11 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     padding: 0 15px 0 0;
     display: block;
 }
-.arrow.asc {
-    background-position: right -1225px;
-}
 .arrow.desc {
     background-position: right -1285px;
+}
+.arrow.asc {
+    background-position: right -1225px;
 }
 .search-bottom-menu {
     background-color: #EEEEEE;
@@ -18091,7 +18105,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .top-warning-popup.not-activated .warning-popup-body {
     padding-bottom: 8px;
 }
-.tree-item-on-search-hidden {
+.tree-item-on-search-hidden, .tree-item-on-filter-hidden {
     display: none !important;
 }
 /** top header feedback button **/
@@ -24385,6 +24399,11 @@ opacity: 1;
     position: relative;
 }
 
+.fm-picker-dialog .fm-picker-dialog-panel-header .dropdown-color-txt{
+    color: #FFFFFF;
+    padding-left: 0;
+    line-height: 18px;
+}
 
 .fm-picker-dialog .fm-picker-dialog-panel-header .fm-picker-dialog-panel-arrows:not(.hidden) {
     position: relative;
@@ -24964,3 +24983,11 @@ opacity: 1;
     margin: 6px;
 }
 /* end of Add Contact block/grid */
+
+.no-trans, .no-trans:before, .no-trans:after {
+    -webkit-transition: none!important;
+    -moz-transition: none!important;
+    -o-transition: none!important;
+    -ms-transition: none!important;
+    transition: none!important;
+}

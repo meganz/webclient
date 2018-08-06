@@ -978,15 +978,12 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     // private function to populate the reporting bar chart
     var populateBarChart = function (st, res) {
         M.require('charts_js').done(function () {
-            var ctx = $("#usage-bar-chart");
-            ctx.remove();
+            //var chartCanvas = $("#usage-bar-chart");
+            //chartCanvas.remove();
             var $charContainer = $("#chartcontainer");
+            $charContainer.empty();
             $charContainer.html('<canvas id="usage-bar-chart" class="daily-transfer-flow-container"></canvas>');
-            ctx = $("#usage-bar-chart");
-
-            //var ctx = document.getElementById('usage-bar-chart');
-            //var ctxCtx = ctx.getContext('2d');
-            //ctxCtx.clearRect(0, 0, ctx.width, ctx.height);
+            var chartCanvas = $("#usage-bar-chart");
 
             var availableLabels = Object.keys(res);
             availableLabels.sort();
@@ -1009,7 +1006,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                 }
             }
 
-            var myChart = new Chart(ctx, {
+            var myChart = new Chart(chartCanvas, {
                 type: 'bar',
                 data: {
                     labels: availableLabels, // ["Red", "Green", "Orange"],
@@ -1057,6 +1054,46 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     var initialBarReport = getReportDates();
     var reportPromise = this.business.getQuotaUsageReport(false, initialBarReport);
     reportPromise.done(populateBarChart);
+
+    var populateMonthDropDownList = function () {
+        var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+            'October', 'November', 'December'];
+
+        var adminCreationDate = new Date(u_attr['since'] * 1000);
+
+        var nowDate = new Date();
+        var monthLimit = 12; // 1 year back max
+
+        var $monthSelector = $('#chart-month-selector');
+        $monthSelector.empty();
+
+
+
+        for (var a = 0; a < 12; a++) {
+            var $currOprion = $('<option>', {
+                value: nowDate.getTime(),
+                text: monthNames[nowDate.getMonth()] + ' ' + nowDate.getFullYear()
+            });
+            $monthSelector.append($currOprion);
+
+            nowDate.setMonth(nowDate.getMonth() - 1);
+
+            if (nowDate < adminCreationDate) {
+                break;
+            }
+        }
+
+        $monthSelector.off('change.subuser').on('change.subuse', function transferChartDropDownChangeHandler() {
+            var selectedDate = new Date(this.value);
+            var report = getReportDates();
+        });
+
+    };
+
+
+    
+
+
 };
 
 /**

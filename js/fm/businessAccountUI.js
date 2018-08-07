@@ -789,7 +789,6 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         if (!quotas) {
             return;
         }
-
         var todayStats = quotas[Object.keys(quotas)[0]];
 
         var numberOfSubs = todayStats.tu || 0;
@@ -890,6 +889,38 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         $businessAccountContainer.removeClass('hidden'); // BA container
         $overviewContainer.removeClass('hidden');
 
+        var $chartContainer = $('#pie-chart-contianer');
+        $chartContainer.empty();
+        $chartContainer.html('<canvas id="usage-pie-chart"></canvas>');
+        var $pieChart = $('#usage-pie-chart', $chartContainer);
+
+        M.require('charts_js').done(function () {
+            var usagePieChart = new Chart($pieChart, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [50, 20, 30,2],
+                        backgroundColor: [
+                            'rgba(88,103,195,1)',
+                            'rgba(0,191,165,1)',
+                            'rgba(245,166,35,1)',
+                            '#bbbbbb'
+                        ]
+                    }],
+                    // These labels appear in the legend and in the tooltips when hovering different arcs
+                    labels: [
+                        '',
+                        '',
+                        '',
+                        ''
+                    ]
+                }
+            });
+
+        });
+
+
+        /*
         $overviewContainer.find('.storage-big-chart .pie').removeClass('big').removeClass('highlight');
         $overviewContainer.find('.storage-big-chart .pie .pie-internal2').remove();
 
@@ -953,6 +984,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         curStyle = getPiePartStyle(rootPie);
         $currElement.find('.pie-internal').attr('style', curStyle);
         //start += rootPie;
+        */
         
 
     };
@@ -1021,7 +1053,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                 data: {
                     labels: availableLabels, // ["Red", "Green", "Orange"],
                     datasets: [{
-                        // label: 'Bandwidth',
+                        label: 'Bar View',
                         data: chartData,//[12, 19, 3, 5, 2, 3],
                         //backgroundColor: [
                         //    'rgba(255, 99, 132, 0.2)',
@@ -1031,7 +1063,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                         //    'rgba(153, 102, 255, 0.2)',
                         //    'rgba(255, 159, 64, 0.2)'
                         //],
-                        backgroundColor: 'rgba(88, 103, 195, 1)' ,
+                        backgroundColor: 'rgba(88, 103, 195, 1)',
                         //borderColor: [
                         //    'rgba(255,99,132,1)',
                         //    'rgba(54, 162, 235, 1)',
@@ -1040,8 +1072,16 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                         //    'rgba(153, 102, 255, 1)',
                         //    'rgba(255, 159, 64, 1)'
                         //],
-                        borderColor: 'rgba(88, 103, 195, 1)'  ,
+                        borderColor: 'rgba(88, 103, 195, 1)',
                         borderWidth: 1
+                    },
+                    {
+                        data: chartData,
+                        label: 'Trend View',
+                        type: 'line',
+                        backgroundColor: 'rgba(255,99,132, 1)',
+                        borderColor: 'rgba(255,99,132, 1)',
+                        fill: false
                     }]
                 },
                 options: {
@@ -1049,6 +1089,14 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                         yAxes: [{
                             ticks: {
                                 beginAtZero: true
+                            },
+                            gridLines: {
+                                display: false
+                            }
+                        }],
+                        xAxes: [{
+                            gridLines: {
+                                display: false
                             }
                         }]
                     }

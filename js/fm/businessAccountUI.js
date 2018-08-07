@@ -994,18 +994,27 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             //}
             var chartData = [];
             var divider = 1024 * 1024;
+            var totalMonthTransfer = 0;
+            var randVal;
             if (d && localStorage.bTest) {
                 availableLabels = [];
                 for (var h2 = 0; h2 < 30; h2++) {
-                    chartData.push(Math.random() * 100);
+                    randVal = Math.random() * 100;
+                    chartData.push(randVal);
                     availableLabels.push(h2 + 1);
+                    totalMonthTransfer += randVal;
                 }
             }
             else {
                 for (var h = 0; h < availableLabels.length; h++) {
                     chartData.push(res[availableLabels[h]].tdl / divider);
+                    totalMonthTransfer += res[availableLabels[h]].tdl;
                 }
             }
+
+            var allTransferFormatted = numOfBytes(totalMonthTransfer, 2);
+            $overviewContainer.find('.transfer-analysis-container .transfer-analysis-summary .total-transfer-number')
+                .text(allTransferFormatted.size + ' ' + allTransferFormatted.unit);
 
             var myChart = new Chart(chartCanvas, {
                 type: 'bar',
@@ -1057,8 +1066,8 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     reportPromise.done(populateBarChart);
 
     var populateMonthDropDownList = function () {
-        var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
-            'October', 'November', 'December'];
+        var monthNames = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416],
+        l[417], l[418], l[419]];
 
         var adminCreationDate = new Date(u_attr['since'] * 1000);
 

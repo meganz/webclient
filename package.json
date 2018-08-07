@@ -63,7 +63,7 @@
     "jscs": "~2.11.0",
     "jscs-jsdoc": "^1.2.0",
     "jsdoc": "~3.3.0",
-    "jshint": "^2.9.2",
+    "jshint": "^2.9.6",
     "karma": "git+https://github.com/meganz/karma.git#v0.12.8.node8",
     "karma-chai": "0.1.0",
     "karma-chai-plugins": "0.2.1",

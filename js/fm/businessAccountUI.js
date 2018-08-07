@@ -773,6 +773,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     "use strict";
 
     this.initUItoRender();
+    var mySlef = this;
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $overviewContainer = $('.user-management-overview-container', $businessAccountContainer);
@@ -1084,16 +1085,15 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         }
 
         $monthSelector.off('change.subuser').on('change.subuse', function transferChartDropDownChangeHandler() {
-            var selectedDate = new Date(this.value);
-            var report = getReportDates();
-        });
+            var selectedDate = new Date(Number.parseFloat(this.value));
+            var report = getReportDates(selectedDate);
 
+            var reportPromise2 = mySlef.business.getQuotaUsageReport(false, report);
+            reportPromise2.done(populateBarChart);
+        });
     };
 
-
-    
-
-
+    populateMonthDropDownList();
 };
 
 /**

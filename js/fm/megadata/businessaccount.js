@@ -303,22 +303,32 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
                 orderedDates.sort();
 
                 var startIx = 0;
-                for (startIx = 0; startIx < orderedDates.length; startIx) {
-                    if (orderedDates[startIx] === ctx.context.dates.fromDate) {
+                var startFound = false;
+                for (startIx = 0; startIx < orderedDates.length; startIx++) {
+                    if (orderedDates[startIx] >= ctx.context.dates.fromDate) {
+                        startFound = true;
                         break;
                     }
                 }
-
-                // quit if we didnt find the data
-                if (orderedDates[startIx] !== ctx.context.dates.fromDate) {
-                    console.error('Requested report start-date is not found');
-                    return operationPromise.reject(0, res, 'Requested report start-date is not found');
+                if (orderedDates[startIx].substr(4, 2) > ctx.context.dates.fromDate.substr(4, 2)) {
+                    // found date is in the next month
+                    operationPromise.resolve(1, Object.create(null)); // quota info
+                }
+                // quit if we didnt find the data, report in future !!
+                if (!startFound) {
+                    console.error('Requested report start-date is not found (in the future)');
+                    return operationPromise.reject(0, res, 'Requested report start-date is not found (in future)');
                 }
 
                 var result = Object.create(null);
                 var endIx = -1;
                 for (endIx = startIx; endIx < orderedDates.length; endIx++) {
+                    if (orderedDates[endIx] > ctx.context.dates.toDate) {
+                        break;
+                    }
+
                     result[orderedDates[endIx]] = res[orderedDates[endIx]];
+
                     if (orderedDates[endIx] === ctx.context.dates.toDate) {
                         break;
                     }

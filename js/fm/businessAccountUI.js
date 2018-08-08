@@ -1074,15 +1074,17 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                         //],
                         borderColor: 'rgba(88, 103, 195, 1)',
                         borderWidth: 1
-                    },
-                    {
-                        data: chartData,
-                        label: 'Trend View',
-                        type: 'line',
-                        backgroundColor: 'rgba(255,99,132, 1)',
-                        borderColor: 'rgba(255,99,132, 1)',
-                        fill: false
-                    }]
+                    }
+                        //,
+                        //{
+                        //data: chartData,
+                        //label: 'Trend View',
+                        //type: 'line',
+                        //backgroundColor: 'rgba(255,99,132, 1)',
+                        //borderColor: 'rgba(255,99,132, 1)',
+                        //fill: false
+                        //}
+                    ]
                 },
                 options: {
                     scales: {

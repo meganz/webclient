@@ -151,6 +151,7 @@ mega.megadrop = (function() {
         var pufOpts = {
             list: [],
             items: {},
+            callbacks: {},      // Functions used for callbacks
             req: {
                 create: {       // Create PUF
                     a: 'ul',
@@ -504,6 +505,7 @@ mega.megadrop = (function() {
         return {
             // variables
             items: pufOpts.items,
+            callbacks: pufOpts.callbacks,
 
             // Functions
             add: add,
@@ -722,6 +724,9 @@ mega.megadrop = (function() {
                         if (fmdb && !pfkey) {
                             if (puf.items[key]) {
                                 delete puf.items[key];
+                                if (puf.callbacks[key]['del']) {
+                                    puf.callbacks[key]['del']();
+                                }
                             }
                             fmdb.del('puf', elem.ph);
                         }
@@ -2235,6 +2240,7 @@ mega.megadrop = (function() {
 
         // PUF
         pufs: puf.items,
+        pufCallbacks: puf.callbacks,
         pufRemove: puf.remove,
         pufHandle: puf.getHandle,
         pufProcessDb: puf.processDb,

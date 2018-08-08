@@ -665,7 +665,7 @@ $(document).ready(function() {
 	        	</div>
 	        </div>
 
-	        <div class="user-management-overview-container">
+	        <div class="user-management-overview-container hidden">
 	            <div class="user-analysis-container">
 	        		<div class="view-title">User Analytics</div>
 	        		<div class="user-segments-container">
@@ -936,7 +936,7 @@ $(document).ready(function() {
 				</a>
 	        </div>
 
-	        <div class="user-management-account-settings hidden">
+	        <div class="user-management-account-settings">
 	        	<div class="auto-save">
 	        		<div class="confirm-white-img icon"></div>
 	        		Setting saved
@@ -944,11 +944,13 @@ $(document).ready(function() {
 
 
 	        	<div class="settings-menu-bar">
-	        		<div class="settings-menu-item selected">Settings</div>
-	        		<div class="settings-menu-item">Notifications</div>
+	        		<div class="settings-menu-item selected">Invoice</div>
+	        		<div class="settings-menu-item">Settings</div>
 	        	</div>
 	        	<div class="border"></div>
-	        	<div class="setting-block">
+
+	        <div class="settings hidden">
+	        	<div class="setting-block hidden">
 	        		<div class="title">
 	        			<div class="contact-icon48 icon48"></div>
 	        			Contact              			
@@ -1403,6 +1405,116 @@ $(document).ready(function() {
 	            		</div> 
 					</div>
 	        	</div>
+	        </div>
+
+	        <div class="invoice">
+	        	<div class="invoice-list hidden">
+		        	<div class="invoice-subtitle">Invoice list</div>
+					<table class="invoice-table">
+	                    <tr>
+	                        <th>
+	                        	<div class="arrow asc">Date</div>
+	                        </th>
+	                        <th>
+	                        	<div class="arrow desc">Description</div>
+	                       </th>
+	                        <th>
+	                        	<div class="arrow desc">Amount</div>
+	                        </th>
+	                        <th></th>
+	                    </tr>
+	                    <tr>
+	                        <td class="">01 Aug 2018</td>
+	                        <td class="">Place description</td>
+	                        <td class="">$512.30</td>
+	                        <td>
+				 				<div class="default-white-button-user-management">View Details</div>
+	                        </td>
+	                    </tr>
+	                    <tr>
+	                        <td class="">01 Aug 2018</td>
+	                        <td class="">Place description</td>
+	                        <td class="">$512.30</td>
+	                        <td>
+				 				<div class="default-white-button-user-management">View Details</div>
+	                        </td>
+	                    </tr>
+					</table>
+	        	</div>
+	        	<div class="invoice-detail">
+					<div class="default-white-button-user-management">
+						<div class="export-pdf-icon icon"></div>
+						Export to PDF
+					</div>
+					<div class="payment-invoice">
+						<div class="inv-block inv-title">
+							<p>Payment Invoice</p>
+						</div>
+						<div class="inv-block inv-detail">
+							<ul>
+								<li>
+									<span>Invoice Date:	</span>
+									<span>13 Nov 2017	</span>
+								</li>
+								<li>
+									<span>Invoice Number:	</span>
+									<span>NwC-AOyfAxo	</span>
+								</li>	
+								<li>
+									<span>NZBN::	</span>
+									<span>9429030423626	</span>
+								</li>
+								<li>
+									<span>GST No:	</span>
+									<span>110-633-521	</span>
+								</li>												
+							</ul>
+						</div>
+						<div class="inv-block billed">
+							<p>Billed</p>
+							<ul>
+								<li class=" ">money@mega.co.nz</li>
+								<li class=" ">Greg Daniel</li>
+								<li class=" ">120 Albert St 120 Albert St 120 Albert St 120 Albert St 120 Albert St</li>
+								<li class=" ">Auckland</li>
+								<li class=" ">1010</li>
+								<li class=" ">New Zealand </li>
+							</ul>							
+						</div>
+						<div class="inv-block billed">
+							<p>From</p>
+							<ul>
+								<li class=" ">MEGA Limited</li>
+								<li class=" ">Level 21, BDO Tower</li>
+								<li class=" ">120 Albert Street</li>
+								<li class=" ">Auckland</li>
+								<li class=" ">1010</li>
+								<li class=" ">New Zealand </li>
+							</ul>							
+						</div>
+						<div class="inv-block short-block">
+							<p>Date</p>
+							<p>1/8/2018</p>
+						</div>
+						<div class="inv-block short-block">
+							<p>Description</p>
+							<p>Business</p>
+							<p>(1/7/2018 - 31/7/2018)</p>
+						</div>
+						<div class="inv-block long-block">
+							<p>Price</p>
+							<p>€4.34</p>
+							<p>€0.65</p>
+							<p>€4.99</p>
+							<p>GST (15%) </p>
+							<p>Total </p>
+
+						</div>
+					</div>
+
+	        	</div>
+	        </div>
+
 			</div>
 	    </div>
 	</div>

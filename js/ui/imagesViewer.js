@@ -944,9 +944,14 @@ var slideshowid;
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
                 previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
             }, function(ev) {
+                if (ev === EOVERQUOTA || Object(ev.target).status === 509) {
+                    eventlog(99703, true);
+                }
+
                 if (d) {
                     console.debug('slideshow failed to load original %s', n.h, ev.target && ev.target.status || ev);
                 }
+
                 if (slideshowid === n.h) {
                     $progressBar.addClass('hidden');
                 }

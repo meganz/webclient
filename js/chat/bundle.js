@@ -4351,7 +4351,7 @@ React.makeElement = React['createElement'];
 
 	        var classes = (this.props.className ? this.props.className : ' avatar-wrapper small-rounded-avatar') + ' ' + contact.u;
 
-	        var letterClass = 'avatar-letter';
+	        classes += " chat-avatar";
 
 	        var displayedAvatar;
 

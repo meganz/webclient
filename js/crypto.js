@@ -1091,9 +1091,13 @@ function waitsc() {
 
                 var delieveredResponse = this.response;
                 if (delieveredResponse === '0') {
-                    clearTimeout(waittimeout);
+                    // clearTimeout(waittimeout); mo need for clearing, we stopped
                     // immediately re-connect.
                     waittimeout = setTimeout(waitsc, 0);
+                    return;
+                }
+                if ($.isNumeric(delieveredResponse)) {
+                    waittimeout = setTimeout(waitsc, waitbackoff);
                     return;
                 }
                 if (!apixs[5].split) {

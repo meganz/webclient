@@ -83,8 +83,6 @@ var ConversationRightArea = React.createClass({
         }
         self._wasAppendedEvenOnce = true;
 
-        var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
-
         var disabledCalls = room.isReadOnly() || !room.chatId || room.callManagerCall;
 
 
@@ -116,11 +114,9 @@ var ConversationRightArea = React.createClass({
             </div>;
         var AVseperator = <div className="chat-button-seperator"></div>;
         var endCallButton =
-                    <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
-                        if (contact.presence && contact.presence !== "offline") {
-                            if (room.callManagerCall) {
-                                room.callManagerCall.endCall();
-                            }
+                    <div className={"link-button red"} onClick={() => {
+                        if (room.callManagerCall) {
+                            room.callManagerCall.endCall();
                         }
                     }}>
             <i className="small-icon horizontal-red-handset"></i>
@@ -1964,7 +1960,6 @@ var ConversationPanel = React.createClass({
             additionalClass = " small-block";
         }
 
-        var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
 
         return (
             <div className={conversationPanelClasses} onMouseMove={self.onMouseMove}

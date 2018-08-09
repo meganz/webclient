@@ -201,7 +201,7 @@ var ParticipantsListInner = React.createClass({
 
                 var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
 
-                if (room.type === "group" && room.members && myPresence !== 'offline') {
+                if (room.type === "group" && room.members) {
                     var dropdownRemoveButton = [];
 
                     if (room.iAmOperator() && contactHash !== u_handle) {
@@ -228,7 +228,7 @@ var ParticipantsListInner = React.createClass({
                                 key="privOperator" icon="gentleman"
                                 label={__(l[8875])}
                                 className={"tick-item " + (room.members[contactHash] === 3 ? "active" : "")}
-                                disabled={myPresence === 'offline' || contactHash === u_handle}
+                                disabled={contactHash === u_handle}
                                 onClick={() => {
                                     if (room.members[contactHash] !== 3) {
                                         $(room).trigger('alterUserPrivilege', [contactHash, 3]);
@@ -240,7 +240,7 @@ var ParticipantsListInner = React.createClass({
                             <DropdownsUI.DropdownItem
                                 key="privFullAcc" icon="conversation-icon"
                                 className={"tick-item " + (room.members[contactHash] === 2 ? "active" : "")}
-                                disabled={myPresence === 'offline' || contactHash === u_handle}
+                                disabled={contactHash === u_handle}
                                 label={__(l[8874])} onClick={() => {
                                 if (room.members[contactHash] !== 2) {
                                     $(room).trigger('alterUserPrivilege', [contactHash, 2]);
@@ -252,7 +252,7 @@ var ParticipantsListInner = React.createClass({
                             <DropdownsUI.DropdownItem
                                 key="privReadOnly" icon="eye-icon"
                                 className={"tick-item " + (room.members[contactHash] === 0 ? "active" : "")}
-                                disabled={myPresence === 'offline' || contactHash === u_handle}
+                                disabled={contactHash === u_handle}
                                 label={__(l[8873])} onClick={() => {
                                 if (room.members[contactHash] !== 0) {
                                     $(room).trigger('alterUserPrivilege', [contactHash, 0]);
@@ -305,8 +305,7 @@ var ParticipantsListInner = React.createClass({
                         dropdowns={dropdowns}
                         dropdownDisabled={contactHash === u_handle}
                         dropdownButtonClasses={
-                            room.type == "group" &&
-                            myPresence !== 'offline' ? "button icon-dropdown" : "default-white-button tiny-button"
+                            room.type == "group" ? "button icon-dropdown" : "default-white-button tiny-button"
                         }
                         dropdownRemoveButton={dropdownRemoveButton}
                         dropdownIconClasses={dropdownIconClasses}

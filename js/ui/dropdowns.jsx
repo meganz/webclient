@@ -350,7 +350,7 @@ var DropdownItem = React.createClass({
                     className={"dropdown-item " + self.props.className}
                     onClick={self.props.onClick ? (e) => {
                         $(document).trigger('closeDropdowns');
-                        self.props.onClick(e);
+                        !self.props.disabled && self.props.onClick(e);
                     } : self.onClick}
                     onMouseOver={self.onMouseOver}
                 >

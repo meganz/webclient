@@ -2661,5 +2661,11 @@
     "19217": "Two-Factor Authentication is already disabled.",
     "19218": "Return to the My Account page to enable.",
     "19219": "Two-Factor Authentication is already setup.",
-    "19220": "Return to the My Account page to disable."
+    "19220": "Return to the My Account page to disable.",
+    "19221": "Pending Users",
+    "19222": "Storage Analytics",
+    "19223": "Incoming External Shares",
+    "19224": "Transfer Analytics",
+    "19225": "Total Transferred",
+    "19226": "Daily Transfer Volume"
 }

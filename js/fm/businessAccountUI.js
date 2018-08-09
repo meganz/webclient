@@ -897,14 +897,14 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         M.require('charts_js').done(function usagePieChartDataPopulate() {
 
             var tooltipLabeling = function (tooltipItem, data) {
-                var label = data.labels[tooltipItem.datasetIndex] || '';
                 var label = data.labels[tooltipItem.index] || '';
                 var perc = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
 
                 if (label) {
                     label += ': ';
                 }
-                label += Math.round(perc * 100) / 100;
+                var sizeInfo = numOfBytes(perc);
+                label += sizeInfo.size + ' ' + sizeInfo.unit;
                 return label;
             };
 
@@ -912,7 +912,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                 type: 'doughnut',
                 data: {
                     datasets: [{
-                        data: [50, 20, 30,2],
+                        data: [rootTotal, outshareTotal, inshareTotal, rubbishTotal],
                         backgroundColor: [
                             'rgba(88,103,195,1)',
                             'rgba(0,191,165,1)',
@@ -1059,8 +1059,6 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     // private function to populate the reporting bar chart
     var populateBarChart = function (st, res) {
         M.require('charts_js').done(function () {
-            //var chartCanvas = $("#usage-bar-chart");
-            //chartCanvas.remove();
             var $charContainer = $("#chartcontainer");
             $charContainer.empty();
             $charContainer.html('<canvas id="usage-bar-chart" class="daily-transfer-flow-container"></canvas>');
@@ -1069,13 +1067,12 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             var availableLabels = Object.keys(res);
             availableLabels.sort();
 
-            //for (var k = 0; k < availableLabels.length; k++) {
-            //    availableLabels[k] = availableLabels[k]
-            //}
             var chartData = [];
-            var divider = 1024 * 1024;
+            var divider = 1024 * 1024 * 1024;
             var totalMonthTransfer = 0;
             var randVal;
+
+            // if statement only for testing, can be removed after deploy.
             if (d && localStorage.bTest) {
                 availableLabels = [];
                 for (var h2 = 0; h2 < 30; h2++) {
@@ -1085,10 +1082,14 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                     totalMonthTransfer += randVal;
                 }
             }
+            // building bars data + total transfer
             else {
                 for (var h = 0; h < availableLabels.length; h++) {
                     chartData.push(res[availableLabels[h]].tdl / divider);
                     totalMonthTransfer += res[availableLabels[h]].tdl;
+
+                    // keeping the day number only
+                    availableLabels[h] = availableLabels[h].substr(6, 2);
                 }
             }
 
@@ -1096,43 +1097,25 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             $overviewContainer.find('.transfer-analysis-container .transfer-analysis-summary .total-transfer-number')
                 .text(allTransferFormatted.size + ' ' + allTransferFormatted.unit);
 
+            var tooltipBarLabeling = function (tooltipItem, data) {
+                var perc = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                var sizeInfo = numOfBytes(perc);
+                var label = sizeInfo.size + ' ' + sizeInfo.unit;
+                return label;
+            }; 
+
             var myChart = new Chart(chartCanvas, {
                 type: 'bar',
                 data: {
                     labels: availableLabels, // ["Red", "Green", "Orange"],
                     datasets: [{
-                        label: 'Bar View',
-                        data: chartData,//[12, 19, 3, 5, 2, 3],
-                        //backgroundColor: [
-                        //    'rgba(255, 99, 132, 0.2)',
-                        //    'rgba(54, 162, 235, 0.2)',
-                        //    'rgba(255, 206, 86, 0.2)',
-                        //    'rgba(75, 192, 192, 0.2)',
-                        //    'rgba(153, 102, 255, 0.2)',
-                        //    'rgba(255, 159, 64, 0.2)'
-                        //],
+                        label: '',
+                        data: chartData,
                         backgroundColor: 'rgba(88, 103, 195, 1)',
-                        //borderColor: [
-                        //    'rgba(255,99,132,1)',
-                        //    'rgba(54, 162, 235, 1)',
-                        //    'rgba(255, 206, 86, 1)',
-                        //    'rgba(75, 192, 192, 1)',
-                        //    'rgba(153, 102, 255, 1)',
-                        //    'rgba(255, 159, 64, 1)'
-                        //],
                         borderColor: 'rgba(88, 103, 195, 1)',
                         borderWidth: 1
-                    }
-                        //,
-                        //{
-                        //data: chartData,
-                        //label: 'Trend View',
-                        //type: 'line',
-                        //backgroundColor: 'rgba(255,99,132, 1)',
-                        //borderColor: 'rgba(255,99,132, 1)',
-                        //fill: false
-                        //}
-                    ]
+                    }]
                 },
                 options: {
                     scales: {
@@ -1151,7 +1134,12 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                         }]
                     },
                     legend: {
-                        display:false
+                        display: false
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: tooltipBarLabeling
+                        }
                     }
                 }
             });

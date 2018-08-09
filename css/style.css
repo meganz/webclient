@@ -24204,11 +24204,11 @@ opacity: 1;
 
 .default-white-button-user-management.disabled:hover, .default-green-button-user-management.disabled:hover, .default-gray-button-user-management.disabled:hover {
     box-shadow: 0px 0px 0px 0px rgba(0,0,0,0);
-};
+}
 
 .default-white-button-user-management {
     background-color: rgba(255,255,255,1);
-    color: #666666;
+    color: #666;
 }
 
 .default-green-button-user-management {
@@ -26948,7 +26948,7 @@ opacity: 1;
     content: " ";
     width: 100%;
     height: 2px;
-    background-color: rgba(255,81,21,1);
+    background-color: rgba(0,191,165,1);
     display: block;
     position: absolute;
     bottom: 0;
@@ -27735,6 +27735,19 @@ opacity: 1;
     overflow: hidden;
 }
 
+.files-grid-view.user-management-view {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 100%;
+    height: -webkit-calc(100% - 48px);
+    height: -moz-calc(100% - 48px);
+    height: calc(100% - 48px);
+    position: relative;
+    top: -1px;
+    overflow: hidden;
+}
+
 .user-management-view .user-management-list-table {
     position: relative;
     height: 100%;
@@ -28069,6 +28082,304 @@ opacity: 1;
     overflow: auto;
 }
 
+/* Remeber to add the parent class back */
+.user-management-account-settings .invoice .invoice-subtitle {
+    margin: 24px auto 16px 56px;
+    line-height: 20px;
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
+}
+
+.user-management-account-settings .invoice .invoice-table {
+    margin:0 56px;
+    width: calc(100% - 132px);
+    max-width: 1200px;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+    background-color: #fff;
+    box-sizing: border-box;
+    box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
+}
+
+
+.user-management-account-settings .invoice .invoice-table tr:not(:first-child) {
+    height: 56px;
+}
+
+.user-management-account-settings .invoice .invoice-table tr:not(:first-child)::after {
+    content: " ";
+    width: 100%;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    display: block;
+    left: 0;
+    top: 0;
+}
+
+.user-management-account-settings .invoice .invoice-table tr:first-child,  .user-management-account-settings .invoice .invoice-table tr:last-child{
+    border-radius: 8px 8px 0 0;
+}
+
+.user-management-account-settings .invoice .invoice-table th {
+    height: 32px;
+    padding:0 12px;
+    background-color: rgba(250,250,250,1);
+}
+
+.user-management-account-settings .invoice .invoice-table th:first-child {
+    width: 20%;
+}
+
+.user-management-account-settings .invoice .invoice-table th:nth-child(2) {
+    width: 40%;
+}
+
+.user-management-account-settings .invoice .invoice-table th:nth-child(3) {
+    width: 20%;
+}
+
+.user-management-account-settings .invoice .invoice-table th:nth-child(4) {
+    width: 20%;
+    height: 100%;
+    display: inline-block;
+
+}
+
+.user-management-account-settings .invoice .invoice-table th .arrow {
+    vertical-align: middle;
+    background-position: right -1282px;
+}
+
+.user-management-account-settings .invoice .invoice-table td {
+    padding:0 12px;
+    line-height: 56px;
+    font-size: 13px;
+    color: #888;
+}
+
+.user-management-account-settings .invoice .invoice-table td .default-white-button-user-management {
+    margin-top: 12px;
+}
+
+.user-management-account-settings .invoice-detail {
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
+.user-management-account-settings .invoice-detail .default-white-button-user-management {
+    margin:0px auto 24px 56px;
+    right:none;
+    top:0;
+    position: relative;
+}
+
+.user-management-account-settings .invoice-detail .payment-invoice {
+    margin:0px auto auto 56px;
+    width: calc(100% - 132px);
+    min-width: 595px;
+    height: 842px;
+    max-width: 1000px;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+    background-color: #fff;
+    box-sizing: content-box;
+    box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
+}
+
+.user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-title, .user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-detail {
+    width: 49.5%;
+    height: 190px;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+
+}
+
+.user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-title p {
+    font-size: 24px;
+    color: #333;
+    line-height: 32px;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: 40px;
+    margin:0;
+}
+
+.user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-detail ul {
+    list-style-type:none;
+    width: 100%;
+    padding:0;
+    margin:0;
+    bottom: 40px;
+    position: absolute;
+}
+
+.user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-detail ul li{
+    text-decoration: none;
+}
+
+
+.user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-detail ul li>span:first-child {
+    width:45.5%;
+    display: inline-block;
+    text-align: right;
+    font-size: 14px;
+    color: #333;
+    line-height: 22px;
+}
+
+.user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-detail ul li>span:last-child {
+    padding-left: 8.5%;
+    width:44.5%;
+    display: inline-block;
+    text-align: left;
+    font-size: 14px;
+    color: #888;
+    line-height: 22px;
+}
+
+.user-management-account-settings .inv-block.billed {
+    width: 49.5%;
+    height: 280px;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.user-management-account-settings .inv-block.billed p {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    line-height: 20px;
+    margin:24px auto 16px 54px;
+}
+
+.user-management-account-settings .inv-block.billed ul {
+    list-style-type:none;
+    width: 100%;
+    padding:0;
+    margin:0;
+    left: 56px;
+    position: absolute;
+}
+
+.user-management-account-settings .inv-block.billed ul li {
+    text-decoration: none;
+    line-height: 20px;
+    font-size: 13px;
+    color:#888;
+    width: calc(100% - 132px);
+    text-overflow: clip;
+    margin-bottom: 4px;
+}
+
+.user-management-account-settings .inv-block.billed ul li:first-child {
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.user-management-account-settings .inv-block.short-block {
+    width: 25%;
+    height: 260px;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.user-management-account-settings .inv-block.short-block p:first-child{
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    line-height: 20px;
+    margin:64px auto 16px 56px;
+}
+
+.user-management-account-settings .inv-block.short-block p:not(:first-child) {
+    font-size: 13px;
+    color: #888;
+    line-height: 20px;
+    margin: 0 auto 4px 56px;
+}
+
+.user-management-account-settings .inv-block.long-block {
+    width: 49%;
+    height: 260px;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.user-management-account-settings .inv-block.long-block p {
+    margin: 0;
+}
+
+.user-management-account-settings .inv-block.long-block p:first-child {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    line-height: 20px;
+    position: absolute;
+    right: 56px;
+    top: 64px;
+
+} 
+
+.user-management-account-settings .inv-block.long-block p:nth-child(2) {
+    font-size: 13px;
+    font-weight: 400;
+    color: #888;
+    line-height: 20px;
+    right: 56px;
+    top: 100px;
+    position: absolute;
+} 
+
+.user-management-account-settings .inv-block.long-block p:nth-child(3) {
+    font-size: 13px;
+    font-weight: 400;
+    color: #888;
+    line-height: 20px;
+    right: 56px;
+    top: 164px;
+    position: absolute;
+} 
+
+.user-management-account-settings .inv-block.long-block p:nth-child(4) {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    line-height: 20px;
+    right: 56px;
+    top: 192px;
+    position: absolute;
+} 
+
+.user-management-account-settings .inv-block.long-block p:nth-child(5) {
+    font-size: 13px;
+    font-weight: 400;
+    color: #888;
+    line-height: 20px;
+    right: 140px;
+    top: 164px;
+    position: absolute;
+} 
+
+.user-management-account-settings .inv-block.long-block p:nth-child(6) {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    line-height: 20px;
+    right: 140px;
+    top: 192px;
+    position: absolute;
+} 
+
+
+
 
 
 
@@ -28129,3 +28440,8 @@ opacity: 1;
     margin-left: 4px;
     }
 }
+
+
+
+
+

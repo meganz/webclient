@@ -781,10 +781,31 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     // header
     var $overviewHeader = $('.fm-right-header-user-management .user-management-breadcrumb.overview');
     $overviewHeader.removeClass('hidden');
-    $('.fm-right-header-user-management .user-management-overview-buttons').removeClass('hidden');
+    var $overviewHeaderBtns = $('.fm-right-header-user-management .user-management-overview-buttons');
+    $overviewHeaderBtns.removeClass('hidden');
     $overviewHeader.find('.user-management-icon').off('click.subuser').on('click.subuser',
         function overviewHeaderClickHandler() {
             mySelf.viewSubAccountListUI();
+        }
+    );
+    $overviewHeaderBtns.find('.pdf-exp').off('click.subuser').on('click.subuser',
+        function overviewHeaderClickHandler() {
+            M.require('jspdf_js').done(
+                function exportOverviewPageToPDF() {
+                    var doc = new jsPDF();
+                    var specialElementHandlers = {
+                        '.hidden': function (element, renderer) {
+                            return true;
+                        }
+                    };
+
+                    doc.fromHTML($overviewContainer.html(), 15, 15, {
+                        'width': 170,
+                        'elementHandlers': specialElementHandlers
+                    });
+                    doc.save('sample-file.pdf');
+                }
+            );
         }
     );
 

@@ -2243,7 +2243,7 @@ fa_handler.prototype = {
                 fa_handler.chunked = false;
             }
 
-            srvlog(this.xhr.fa_host + ' connection interrupted (chunked fa)');
+            console.warn(this.xhr.fa_host + ' connection interrupted (chunked fa)');
         }
 
         oDestroy(this);
@@ -2290,7 +2290,7 @@ function api_faretry(ctx, error, host) {
     }
 
     mBroadcaster.sendMessage('fa:error', ctx.id, error, ctx.p, 2);
-    srvlog("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
+    console.warn("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
 }
 
 function api_faerrlauncher(ctx, host) {
@@ -2300,9 +2300,6 @@ function api_faerrlauncher(ctx, host) {
 
     if (d) {
         logger.error('FAEOT', id);
-    }
-    else {
-        srvlog('api_fareq: eot for ' + host);
     }
 
     if (id !== slideshowid) {
@@ -2324,11 +2321,6 @@ function api_fareq(res, ctx, xhr) {
 
     if (ctx.startTime && logger) {
         logger.debug('Reply in %dms for %s', (Date.now() - ctx.startTime), xhr.q.url);
-    }
-
-    if (!d && ctx.startTime && (Date.now() - ctx.startTime) > 10000) {
-        var host = (xhr.q && xhr.q.url || '~!').split('//').pop().split('/')[0];
-        srvlog('api_' + (ctx.p ? 'get' : 'store') + 'fileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error);
     }
 
     if (error) {
@@ -2432,13 +2424,6 @@ function api_fareq(res, ctx, xhr) {
             faxhrs[slot].onreadystatechange = function (ev) {
                     this.onprogress(ev);
 
-                    if (this.startTime && this.readyState === 2) {
-                        if (!d && (Date.now() - this.startTime) > 10000) {
-                            srvlog('api_fareq: ' + this.fa_host + ' took +10s');
-                        }
-                        delete this.startTime;
-                    }
-
                     if (this.readyState === 4) {
                         if (this.fart) {
                             clearTimeout(this.fart);
@@ -2499,10 +2484,6 @@ function api_fareq(res, ctx, xhr) {
                                     || (Date.now() - faxhrlastgood[this.fa_host]) > this.timeout) {
                                 faxhrfail[this.fa_host] = failtime = 1;
                                 api_reportfailure(this.fa_host, function () {});
-
-                                if (!d) {
-                                    srvlog('api_fareq: 140s timeout for ' + this.fa_host);
-                                }
                             }
                         }
                     };

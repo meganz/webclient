@@ -359,7 +359,7 @@ var notify = {
 
         // Update page title
         megatitle();
-        
+
         // Update IPC indicator
         delay('updateIpcRequests', updateIpcRequests);
     },
@@ -1105,7 +1105,7 @@ var notify = {
             }
         }
         else {
-            var folderName = M.d[notification.data.n].name || '';
+            var folderName = M.getNameByHandle(notification.data.n) || '';
             var removerEmail = notify.userEmails[notificationTarget];
             if (removerEmail) {
                 title = l[19153].replace('{0}', removerEmail).replace('{1}', folderName);

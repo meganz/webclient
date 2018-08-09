@@ -1590,19 +1590,6 @@ else if (!b_u) {
                 return false;
             }
 
-            if (~dump.m.indexOf('took +10s'))
-            {
-                var lrc = +localStorage.ttfbReportCount || 0;
-                if (lrc > 20)
-                {
-                    var eid = localStorage.ttfbReport;
-                    localStorage.ttfbReport = sbid;
-                    if (!eid || eid == sbid) return false;
-                    lrc = 1;
-                }
-                localStorage.ttfbReportCount = lrc + 1;
-            }
-
             if (errobj)
             {
                 if (errobj.udata) dump.d = errobj.udata;
@@ -1643,6 +1630,10 @@ else if (!b_u) {
                         console.error(msg, errobj, errobj && errobj.stack, url, ln);
                         return false;
                     }
+                }
+
+                if (typeof eventlog === 'function' && !errobj.udata) {
+                    eventlog(99702);
                 }
             }
             if (cn) dump.c = cn;

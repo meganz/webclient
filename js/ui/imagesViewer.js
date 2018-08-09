@@ -193,7 +193,7 @@ var slideshowid;
         }
 
         if ($overlay) {
-            var root = M.getNodeRoot(id);
+            var root = M.getNodeRoot(n && n.h || false);
 
             if (!n || !n.p || root === 'shares' || root === M.RubbishID || folderlink) {
                 $overlay.find('.viewer-button.getlink').addClass('hidden');

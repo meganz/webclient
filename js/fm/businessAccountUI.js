@@ -773,15 +773,20 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     "use strict";
 
     this.initUItoRender();
-    var mySlef = this;
+    var mySelf = this;
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $overviewContainer = $('.user-management-overview-container', $businessAccountContainer);
 
     // header
-    $('.fm-right-header-user-management .user-management-breadcrumb.overview').removeClass('hidden');
+    var $overviewHeader = $('.fm-right-header-user-management .user-management-breadcrumb.overview');
+    $overviewHeader.removeClass('hidden');
     $('.fm-right-header-user-management .user-management-overview-buttons').removeClass('hidden');
-
+    $overviewHeader.find('.user-management-icon').off('click.subuser').on('click.subuser',
+        function overviewHeaderClickHandler() {
+            mySelf.viewSubAccountListUI();
+        }
+    );
 
 
     // private function to populate the dashboard
@@ -1186,7 +1191,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             var selectedDate = new Date(Number.parseFloat(this.value));
             var report = getReportDates(selectedDate);
 
-            var reportPromise2 = mySlef.business.getQuotaUsageReport(false, report);
+            var reportPromise2 = mySelf.business.getQuotaUsageReport(false, report);
             reportPromise2.done(populateBarChart);
         });
     };

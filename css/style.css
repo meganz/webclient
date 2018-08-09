@@ -25520,7 +25520,8 @@ opacity: 1;
     position: relative;
     height: 18px;
     width: auto;
-    margin:0 24px 16px 24px;
+    margin: 0 24px 16px 24px;
+    cursor: pointer;
 }
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container:last-child {

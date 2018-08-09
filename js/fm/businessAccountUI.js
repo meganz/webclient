@@ -894,7 +894,20 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         $chartContainer.html('<canvas id="usage-pie-chart"></canvas>');
         var $pieChart = $('#usage-pie-chart', $chartContainer);
 
-        M.require('charts_js').done(function () {
+        M.require('charts_js').done(function usagePieChartDataPopulate() {
+
+            var tooltipLabeling = function (tooltipItem, data) {
+                var label = data.labels[tooltipItem.datasetIndex] || '';
+                var label = data.labels[tooltipItem.index] || '';
+                var perc = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                if (label) {
+                    label += ': ';
+                }
+                label += Math.round(perc * 100) / 100;
+                return label;
+            };
+
             var usagePieChart = new Chart($pieChart, {
                 type: 'doughnut',
                 data: {
@@ -909,14 +922,49 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                     }],
                     // These labels appear in the legend and in the tooltips when hovering different arcs
                     labels: [
-                        '',
-                        '',
-                        '',
-                        ''
+                        l[164],
+                        l[19223],
+                        l[16770],
+                        l[167]
                     ]
+                },
+                options: {
+                    legend: {
+                        display: false
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: tooltipLabeling
+                        }
+                    }
                 }
             });
 
+            var $customCharLegend = $('.storage-analysis-container .storage-division-container', $overviewContainer)
+                .off('click.subuser').on('click.subuser', function chartLegendClickHandler(e) {
+                    var $me = $(this);
+                    var ix = 0;
+                    if ($me.hasClass('inbox-node')) {
+                        ix = 1;
+                    }
+                    else if ($me.hasClass('inshare-node')) {
+                        ix = 2;
+                    }
+                    else if ($me.hasClass('rubbish-node')) {
+                        ix = 3;
+                    }
+
+                    if ($me.hasClass('disabled')) {
+                        $me.removeClass('disabled');
+                    }
+                    else {
+                        $me.addClass('disabled');
+                    }
+
+                    var item = usagePieChart.legend.legendItems[ix];
+                    usagePieChart.legend.options.onClick.call(usagePieChart.legend, e, item);
+                });
+            $customCharLegend.removeClass('disabled');
         });
 
 
@@ -1101,6 +1149,9 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                                 display: false
                             }
                         }]
+                    },
+                    legend: {
+                        display:false
                     }
                 }
             });
@@ -1153,6 +1204,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     };
 
     populateMonthDropDownList();
+    $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
 };
 
 /**

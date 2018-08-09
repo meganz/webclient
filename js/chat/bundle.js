@@ -9132,6 +9132,10 @@ React.makeElement = React['createElement'];
 	                jsp.scrollToY(textareaCloneSpanHeight - self.textareaLineHeight);
 	            } else if (jsp) {
 	                jsp.scrollToY(0);
+
+	                if (scrPos < 0) {
+	                    $textareaScrollBlock.find('.jspPane').css('top', 0);
+	                }
 	            }
 	        }
 

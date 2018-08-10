@@ -1027,7 +1027,6 @@ FileManager.prototype.initContextUI = function() {
             var isEmbed = $(this).hasClass('embedcode-item');
             var selNodes = Array.isArray($.selected) ? $.selected.concat() : [];
             var showDialog = function() {
-                loadingDialog.hide();
                 mega.Share.initCopyrightsDialog(selNodes, isEmbed);
             };
 

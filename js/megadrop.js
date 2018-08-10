@@ -725,6 +725,7 @@ mega.megadrop = (function() {
                             if (puf.items[key]) {
                                 delete puf.items[key];
                                 if (puf.callbacks[key]['del']) {
+                                    loadingDialog.hide();
                                     puf.callbacks[key]['del']();
                                 }
                             }
@@ -967,12 +968,16 @@ mega.megadrop = (function() {
                     if (pupOpts.items[pupId]) {
                         folderId = pupOpts.items[pupId].h;
                         _del(pupId);
+                        if (puf.callbacks[folderId]['del']) {
+                            var delayHide = true;
+                        }
                         settings.remove(pupId, folderId);
                     }
                 }
             }
-
-            loadingDialog.hide();
+            if(!delayHide){
+                loadingDialog.hide();
+            }
         };
 
         /**

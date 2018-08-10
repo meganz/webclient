@@ -689,7 +689,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var rubbishInfo = subUserStats["4"] || emptyArray;
         var inshareInternalInfo = subUserStats["isi"] || emptyArray;
         var inshareExternalInfo = subUserStats["ise"] || emptyArray;
-        var outshareInfo = subUserStats["os"] || emptyArray;
+        var outshareInfo = subUserStats["ose"] || emptyArray;
 
         totalStorage = subUserStats["ts"] || 0;
         totalBandwidth = subUserStats["dl"] || 0;
@@ -853,7 +853,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             currRoot = todayStats.u[sub]["2"] || emptyArray;
             currInhare = todayStats.u[sub]["isi"] || emptyArray;
             currInhareEx = todayStats.u[sub]["ise"] || emptyArray;
-            currOutshare = todayStats.u[sub]["os"] || emptyArray;
+            currOutshare = todayStats.u[sub]["ose"] || emptyArray;
             currRubbish = todayStats.u[sub]["4"] || emptyArray;
 
             rootTotal += currRoot[0];

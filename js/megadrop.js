@@ -717,23 +717,19 @@ mega.megadrop = (function() {
 
             // Remove from puf.items
             for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    var elem = obj[key];
-
-                    if (elem.p === handle) {
-                        if (fmdb && !pfkey) {
-                            if (puf.items[key]) {
-                                delete puf.items[key];
-                                if (puf.callbacks[key]['del']) {
-                                    loadingDialog.hide();
-                                    puf.callbacks[key]['del']();
-                                }
+                if (obj.hasOwnProperty(key) && obj[key].p === handle) {
+                    if (fmdb && !pfkey) {
+                        if (puf.items[key]) {
+                            delete puf.items[key];
+                            if (puf.callbacks[key]['del']) {
+                                loadingDialog.hide();
+                                puf.callbacks[key]['del']();
                             }
-                            fmdb.del('puf', elem.ph);
                         }
-
-                        break;
+                        fmdb.del('puf', obj[key].ph);
                     }
+
+                    break;
                 }
             }
         };
@@ -943,6 +939,7 @@ mega.megadrop = (function() {
             var state = 0;
             var folderId = '';
             var pupId = '';
+            var delayHide = false;
 
             for (var i = ap.length; i--;) {
                 item = Object.assign({}, ap[i]);
@@ -969,13 +966,13 @@ mega.megadrop = (function() {
                         folderId = pupOpts.items[pupId].h;
                         _del(pupId);
                         if (puf.callbacks[folderId]['del']) {
-                            var delayHide = true;
+                            delayHide = true;
                         }
                         settings.remove(pupId, folderId);
                     }
                 }
             }
-            if(!delayHide){
+            if (!delayHide){
                 loadingDialog.hide();
             }
         };

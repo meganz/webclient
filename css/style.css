@@ -4985,6 +4985,23 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     text-align: left;
     font-size: 14px;
 }
+.nw-fm-tree-header .button {
+    position: absolute;
+    right: 9px;
+    top: 6px;
+    padding: 2px;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    z-index: 7;
+}
+.nw-fm-tree-header.focused-input:not(.conversations) .button {
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
 .nw-fm-tree-header.shared-with-me input::selection {
     background: #FFA500;
 }

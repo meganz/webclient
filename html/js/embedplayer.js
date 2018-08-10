@@ -13,6 +13,7 @@ var folderlink;
 var fminitialized;
 var loadingDialog;
 var dlmanager;
+var preqs = {};
 var thumbnails = {};
 var ep_node = false;
 

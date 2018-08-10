@@ -3937,7 +3937,7 @@ React.makeElement = React['createElement'];
 	                className: "dropdown-item " + self.props.className,
 	                onClick: self.props.onClick ? function (e) {
 	                    $(document).trigger('closeDropdowns');
-	                    self.props.onClick(e);
+	                    !self.props.disabled && self.props.onClick(e);
 	                } : self.onClick,
 	                onMouseOver: self.onMouseOver
 	            },
@@ -4975,8 +4975,6 @@ React.makeElement = React['createElement'];
 	        }
 	        self._wasAppendedEvenOnce = true;
 
-	        var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
-
 	        var disabledCalls = room.isReadOnly() || !room.chatId || room.callManagerCall;
 
 	        var startAudioCallButtonClass = "";
@@ -5010,11 +5008,9 @@ React.makeElement = React['createElement'];
 	        var AVseperator = React.makeElement("div", { className: "chat-button-seperator" });
 	        var endCallButton = React.makeElement(
 	            "div",
-	            { className: "link-button red" + (!contact.presence ? " disabled" : ""), onClick: function onClick() {
-	                    if (contact.presence && contact.presence !== "offline") {
-	                        if (room.callManagerCall) {
-	                            room.callManagerCall.endCall();
-	                        }
+	            { className: "link-button red", onClick: function onClick() {
+	                    if (room.callManagerCall) {
+	                        room.callManagerCall.endCall();
 	                    }
 	                } },
 	            React.makeElement("i", { className: "small-icon horizontal-red-handset" }),
@@ -6622,8 +6618,6 @@ React.makeElement = React['createElement'];
 	        if (additionalClass.length === 0 && self.state.messagesToggledInCall && room.callManagerCall && room.callManagerCall.isActive()) {
 	            additionalClass = " small-block";
 	        }
-
-	        var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
 
 	        return React.makeElement(
 	            "div",
@@ -9138,6 +9132,10 @@ React.makeElement = React['createElement'];
 	                jsp.scrollToY(textareaCloneSpanHeight - self.textareaLineHeight);
 	            } else if (jsp) {
 	                jsp.scrollToY(0);
+
+	                if (scrPos < 0) {
+	                    $textareaScrollBlock.find('.jspPane').css('top', 0);
+	                }
 	            }
 	        }
 
@@ -10475,7 +10473,7 @@ React.makeElement = React['createElement'];
 
 	                var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
 
-	                if (room.type === "group" && room.members && myPresence !== 'offline') {
+	                if (room.type === "group" && room.members) {
 	                    var dropdownRemoveButton = [];
 
 	                    if (room.iAmOperator() && contactHash !== u_handle) {
@@ -10497,7 +10495,7 @@ React.makeElement = React['createElement'];
 	                            key: "privOperator", icon: "gentleman",
 	                            label: __(l[8875]),
 	                            className: "tick-item " + (room.members[contactHash] === 3 ? "active" : ""),
-	                            disabled: myPresence === 'offline' || contactHash === u_handle,
+	                            disabled: contactHash === u_handle,
 	                            onClick: function onClick() {
 	                                if (room.members[contactHash] !== 3) {
 	                                    $(room).trigger('alterUserPrivilege', [contactHash, 3]);
@@ -10507,7 +10505,7 @@ React.makeElement = React['createElement'];
 	                        dropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
 	                            key: "privFullAcc", icon: "conversation-icon",
 	                            className: "tick-item " + (room.members[contactHash] === 2 ? "active" : ""),
-	                            disabled: myPresence === 'offline' || contactHash === u_handle,
+	                            disabled: contactHash === u_handle,
 	                            label: __(l[8874]), onClick: function onClick() {
 	                                if (room.members[contactHash] !== 2) {
 	                                    $(room).trigger('alterUserPrivilege', [contactHash, 2]);
@@ -10517,7 +10515,7 @@ React.makeElement = React['createElement'];
 	                        dropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
 	                            key: "privReadOnly", icon: "eye-icon",
 	                            className: "tick-item " + (room.members[contactHash] === 0 ? "active" : ""),
-	                            disabled: myPresence === 'offline' || contactHash === u_handle,
+	                            disabled: contactHash === u_handle,
 	                            label: __(l[8873]), onClick: function onClick() {
 	                                if (room.members[contactHash] !== 0) {
 	                                    $(room).trigger('alterUserPrivilege', [contactHash, 0]);
@@ -10543,7 +10541,7 @@ React.makeElement = React['createElement'];
 	                    dropdownPositionAt: "left top",
 	                    dropdowns: dropdowns,
 	                    dropdownDisabled: contactHash === u_handle,
-	                    dropdownButtonClasses: room.type == "group" && myPresence !== 'offline' ? "button icon-dropdown" : "default-white-button tiny-button",
+	                    dropdownButtonClasses: room.type == "group" ? "button icon-dropdown" : "default-white-button tiny-button",
 	                    dropdownRemoveButton: dropdownRemoveButton,
 	                    dropdownIconClasses: dropdownIconClasses,
 	                    style: {

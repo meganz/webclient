@@ -3340,7 +3340,9 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         console.log('sectionUIopen', id, folderlink);
     }
 
-    $.hideContextMenu();
+    if ($.hideContextMenu) {
+        $.hideContextMenu();
+    }
     $('.nw-fm-left-icon').removeClass('active');
     if (this.hasInboxItems() === true) {
         $('.nw-fm-left-icon.inbox').removeClass('hidden');

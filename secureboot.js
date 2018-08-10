@@ -1590,19 +1590,6 @@ else if (!b_u) {
                 return false;
             }
 
-            if (~dump.m.indexOf('took +10s'))
-            {
-                var lrc = +localStorage.ttfbReportCount || 0;
-                if (lrc > 20)
-                {
-                    var eid = localStorage.ttfbReport;
-                    localStorage.ttfbReport = sbid;
-                    if (!eid || eid == sbid) return false;
-                    lrc = 1;
-                }
-                localStorage.ttfbReportCount = lrc + 1;
-            }
-
             if (errobj)
             {
                 if (errobj.udata) dump.d = errobj.udata;
@@ -1643,6 +1630,10 @@ else if (!b_u) {
                         console.error(msg, errobj, errobj && errobj.stack, url, ln);
                         return false;
                     }
+                }
+
+                if (typeof eventlog === 'function' && !errobj.udata) {
+                    eventlog(99702);
                 }
             }
             if (cn) dump.c = cn;
@@ -2072,7 +2063,7 @@ else if (!b_u) {
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
 
-        jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});

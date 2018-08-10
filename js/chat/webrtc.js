@@ -140,6 +140,7 @@ RtcModule.prototype.handleMessage = function(shard, msg, len) {
     // (opcode.1 chatid.8 userid.8 clientid.4 len.2) (type.1 data.(len-1))
     //              ^                                          ^
     //          header.hdrlen                             payload.len
+    var self = this;
     try {
         var strLen = msg.length;
         if (len < 24 || strLen < len) {
@@ -149,6 +150,10 @@ RtcModule.prototype.handleMessage = function(shard, msg, len) {
         var type = msg.charCodeAt(23);
         var op = msg.charCodeAt(0);
         var chatid = msg.substr(1, 8);
+        if (this.handler.isGroupChat(chatid)) {
+            this.logger.log("Ignoring a group chat RTMSG");
+            return;
+        }
         var chat = this.chatd.chatIdMessages[chatid];
         if (!chat) {
             this.logger.error(
@@ -195,6 +200,10 @@ RtcModule.prototype.handleCallData = function(shard, msg, payloadLen) {
             return;
         }
         var chatid = msg.substr(1, 8);
+        if (self.handler.isGroupChat(chatid)) {
+            this.logger.log("Ignoring group chat CALLDATA");
+            return;
+        }
         var chat = self.chatd.chatIdMessages[chatid];
         if (!chat) {
             self.logger.error(

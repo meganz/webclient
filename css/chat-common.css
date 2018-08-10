@@ -10,29 +10,12 @@
 }
 .section.conversations {
     height: 100%;
-    height: -webkit-calc(100% -36px);
+    height: -webkit-calc(100% - 36px);
     height: -moz-calc(100% - 36px);
     height: calc(100% - 36px);
 }
 .section.conversations .fm-right-files-block {
     height: 100%;
-}
-.nw-fm-tree-header .button {
-    position: absolute;
-    right: 9px;
-    top: 6px;
-    padding: 2px;
-     -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
-    z-index: 7;
-}
-.nw-fm-tree-header.focused-input:not(.conversations) .button {
-     -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
 }
 .conversation-panels, .conversation-panel {
     -webkit-box-sizing: border-box;
@@ -325,7 +308,7 @@
 
 .arc-chat-messages-block tr.arc-chat-list {
     height: 72px;
-} 
+}
 
 .arc-chat-messages-block tr.arc-chat-list .nw-contact-avatar {
     margin-top: 18px;
@@ -336,9 +319,9 @@
     width: calc(100% - 160px);
 }
 
-.arc-chat-messages-block .user-card-name.conversation-name {    
-    color: #333333; 
-    font-size: 14px;        
+.arc-chat-messages-block .user-card-name.conversation-name {
+    color: #333333;
+    font-size: 14px;
 }
 .arc-chat-messages-block .archived-on {
     margin-top: 22px;

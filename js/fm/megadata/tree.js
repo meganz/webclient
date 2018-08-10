@@ -55,6 +55,10 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype, sDeepIndex)
 
     if (!sDeepIndex) {
         sDeepIndex = 0;
+
+        if (d) {
+            console.time('buildtree');
+        }
     }
 
     if (n.h === M.RootID) {
@@ -336,6 +340,10 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype, sDeepIndex)
 
     if (btd) {
         console.groupEnd();
+    }
+
+    if (!sDeepIndex && d) {
+        console.timeEnd('buildtree');
     }
 };
 

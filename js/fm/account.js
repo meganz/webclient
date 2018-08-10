@@ -392,13 +392,13 @@ function accountUI() {
                         a: 'cld',
                         cl: account.contactLink.substring(2, account.contactLink.length)
                     }, {
-                        myAccount: account,
-                        callback: function (res, ctx) {
-                            if (res === 0) { // success
-                                ctx.myAccount.contactLink = '';
+                            myAccount: account,
+                            callback: function (res, ctx) {
+                                if (res === 0) { // success
+                                    ctx.myAccount.contactLink = '';
+                                }
                             }
-                        }
-                    });
+                        });
                 });
             }
             else {
@@ -540,22 +540,22 @@ function accountUI() {
             $('.fm-close-all-sessions').hide();
         }
 
-        $('.fm-close-all-sessions').rebind('click', function() {			
-			msgDialog('confirmation', '', l[18513], false, function(e) {
+        $('.fm-close-all-sessions').rebind('click', function() {
+            msgDialog('confirmation', '', l[18513], false, function(e) {
                 if (e) {
                     loadingDialog.show();
-					var $activeSessionsRows = $('.active-session-txt').parents('tr');
-					// Expire all sessions but not the current one
-					api_req({a: 'usr', ko: 1}, {
-						callback: function() {
-							M.account = null;
-							/* clear account cache */
-							$activeSessionsRows.find('.settings-logout').remove();
-							$activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
-							$('.fm-close-all-sessions').hide();
-							loadingDialog.hide();
-						}
-					});
+                    var $activeSessionsRows = $('.active-session-txt').parents('tr');
+                    // Expire all sessions but not the current one
+                    api_req({a: 'usr', ko: 1}, {
+                        callback: function() {
+                            M.account = null;
+                            /* clear account cache */
+                            $activeSessionsRows.find('.settings-logout').remove();
+                            $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
+                            $('.fm-close-all-sessions').hide();
+                            loadingDialog.hide();
+                        }
+                    });
                 }
             });
         });
@@ -1588,6 +1588,18 @@ function accountUI() {
         $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
 
         $('#find-duplicate').rebind('click', M.findDupes);
+
+        // if this is a business account
+        if (u_attr.b) {
+            $('#account-country').addClass('hidden');
+            $("label[for='account-country']").attr('style', 'display: none;');
+            $('.account-profile.half-sized.second .account.data-block.second.acc-type').addClass('hidden');
+            $('.account-profile.half-sized.second .account.data-block.second.acc-balance').addClass('hidden');
+            $('.account-profile.half-sized.second .account.data-block.second.acc-cancel').addClass('hidden');
+            $('.account.tab-content.email-and-pass .account.data-block.acc-change-email').addClass('hidden');
+            $('.account.tabs-bl .account.tab-lnk.payment').attr('style', 'display: none;');
+            $('.account.tabs-bl .account.tab-lnk.achievements').attr('style', 'display: none;');
+        }
 
         $.tresizer();
 

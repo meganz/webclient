@@ -23,6 +23,10 @@ function BusinessAccountUI() {
         $('.user-management-subaccount-view-container', $businessAccountContianer).addClass('hidden');
         $('.user-management-overview-container', $businessAccountContianer).addClass('hidden');
         $('.user-management-landing-page.user-management-view', $businessAccountContianer).addClass('hidden');
+        var $accountContainer = $('.user-management-account-settings', $businessAccountContianer).addClass('hidden');
+        $('.invoice', $accountContainer).addClass('hidden');
+        $('.invoice .invoice-list', $accountContainer).addClass('hidden');
+        $('.invoice .invoice-detail', $accountContainer);
 
         // hide any possible grid or block view.
         $('.files-grid-view, .fm-blocks-view').addClass('hidden');
@@ -85,10 +89,12 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         return this.viewLandingPage();
     }
 
-    subAccountsView.removeClass('hidden'); // un-hide the container
-    $('.user-management-list-table', subAccountsView).removeClass('hidden'); // unhide the list table
-    $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide header
-    $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
+    var unhideUsersListSection = function () {
+        subAccountsView.removeClass('hidden'); // un-hide the container
+        $('.user-management-list-table', subAccountsView).removeClass('hidden'); // unhide the list table
+        $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide header
+        $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
+    };
 
     // header events handlers
     $('.fm-right-header-user-management .user-management-main-page-buttons .ba-overview').off('click.subuser')
@@ -98,6 +104,10 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     $('.fm-right-header-user-management .user-management-main-page-buttons .add-sub-user').off('click.subuser')
         .on('click.subuser', function addSubUserHeaderButtonHandler() {
             mySelf.showAddSubUserDialog();
+        });
+    $('.fm-right-header-user-management .user-management-main-page-buttons .ba-account').off('click.subuser')
+        .on('click.subuser', function addSubUserHeaderButtonHandler() {
+            mySelf.viewBusinessAccountPage();
         });
 
     // private function to check if new drawing is needed
@@ -389,6 +399,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         $('.info-block.bandwidth-sub-users .title2', '.user-management-overview-bar')
             .text(totalBandwidthFormatted.unit);
         $('.user-management-overview-bar').removeClass('hidden');
+
+        unhideUsersListSection();
     };
 
     var reDraw = isRedrawNeeded(subAccounts, this.business.previousSubList);
@@ -397,6 +409,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         fillSubUsersTable(subAccounts, this);
         // storing current drawn sub-users to prevent not needed redraw
         this.business.previousSubList = JSON.parse(JSON.stringify(subAccounts));
+    }
+    else {
+        unhideUsersListSection();
     }
 
     // getting quotas
@@ -689,7 +704,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var rubbishInfo = subUserStats["4"] || emptyArray;
         var inshareInternalInfo = subUserStats["isi"] || emptyArray;
         var inshareExternalInfo = subUserStats["ise"] || emptyArray;
-        var outshareInfo = subUserStats["os"] || emptyArray;
+        var outshareInfo = subUserStats["ose"] || emptyArray;
 
         totalStorage = subUserStats["ts"] || 0;
         totalBandwidth = subUserStats["dl"] || 0;
@@ -767,7 +782,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 };
 
 
-/** show business account over view page
+/** show business account overview page
  * */
 BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     "use strict";
@@ -853,7 +868,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             currRoot = todayStats.u[sub]["2"] || emptyArray;
             currInhare = todayStats.u[sub]["isi"] || emptyArray;
             currInhareEx = todayStats.u[sub]["ise"] || emptyArray;
-            currOutshare = todayStats.u[sub]["os"] || emptyArray;
+            currOutshare = todayStats.u[sub]["ose"] || emptyArray;
             currRubbish = todayStats.u[sub]["4"] || emptyArray;
 
             rootTotal += currRoot[0];
@@ -1221,6 +1236,105 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
 };
 
+
+/** show business account page (Settings and invoices)
+ * */
+BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
+    "use strict";
+
+    this.initUItoRender();
+    var mySelf = this;
+
+    var $businessAccountContainer = $('.files-grid-view.user-management-view');
+    var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
+    var $invoiceContainer = $('.invoice', $accountContainer);
+    var $invoiceListContainer = $('.invoice-list', $invoiceContainer);
+
+    // private function to determine if we need to re-draw
+    var isInvoiceRedrawNeeded = function (invoiceList, savedList) {
+        if (!invoiceList) {
+            return true;
+        }
+        if (!savedList) {
+            return true;
+        }
+        if (savedList.length !== invoiceList.length) {
+            return true;
+        }
+        for (var h = 0; h < invoiceList.length; h++) {
+            if (invoiceList[h].n !== savedList[h].n) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    // private function to fill the list of invoices on UI
+    var prepareInvoiceListSection = function (st, invoicesList) {
+
+        var unhideSection = function () {
+            $businessAccountContainer.removeClass('hidden');
+            $accountContainer.removeClass('hidden');
+            $invoiceContainer.removeClass('hidden');
+            $invoiceListContainer.removeClass('hidden');
+        };
+
+        // check if we need to re-draw
+        if (!isInvoiceRedrawNeeded(invoicesList, (this.business) ? this.business.previousInvoices : null)) {
+            return unhideSection();
+        }
+
+        var $invoicesTable = $('.invoice .invoice-list .invoice-table', $accountContainer);
+        var $invoiceRows = $('.invocie-row-data', $invoicesTable);
+        var $invoiceRowTemplate = $($invoiceRows.get(0)).clone(true); // cloning the first one
+        if (st === 1) {
+            $invoiceRows.remove();
+        }
+        else {
+            $invoiceRows.addClass('hidden');
+            invoicesList = Object.create(null); // so the for loop below does nothing
+        }
+
+        // store what we will draw now
+        mySelf.business.previousInvoices = JSON.parse(JSON.stringify(invoicesList));
+
+
+        for (var k = 0; k < invoicesList.length; k++) {
+            var invoiceDate = new Date(invoicesList[k].ts * 1000);
+            var $newInvoiceRow = $invoiceRowTemplate.clone(true);
+
+            $newInvoiceRow.find('.inv-date').text(invoiceDate.toDateString());
+            $newInvoiceRow.find('.inv-desc').text(invoicesList[k].d);
+            $newInvoiceRow.find('.inv-total').text('€' + invoicesList[k].tot);
+            $newInvoiceRow.removeClass('hidden'); // if it was hidden
+
+            $invoicesTable.append($newInvoiceRow);
+        }
+
+        unhideSection();
+    };
+
+    
+
+    var getInvoicesPromise = this.business.getAccountInvoicesList();
+    getInvoicesPromise.always(prepareInvoiceListSection);
+};
+
+
+BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
+    "use strict";
+
+    this.initUItoRender();
+    var mySelf = this;
+
+    var $businessAccountContainer = $('.files-grid-view.user-management-view');
+    var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
+    var $invoiceContainer = $('.invoice', $accountContainer);
+    var $invoiceDetailContainer = $('.invoice-detail', $invoiceContainer);
+
+};
+
+
 /**
  * Shows the confirmation dialog for sub-user disabling 
  * @param {function} actionFuncHandler      user response handler - function accepts 1 boolean parameter
@@ -1447,12 +1561,51 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     uName = uName.trim();
     var subUserDefaultAvatar = useravatar.contact(subUserHandle);
 
+    var subUserAttrs = ['suba-sup', 'suba-idnb', 'suba-phone', 'suba-loc'];
+    var subUserValues = ['', '', '', '']; // same order as above
+
+    var setSubuserAttributes = function (attrName, attrValue) {
+        if (!attrValue) {
+            return;
+        }
+        if (attrName === 'suba-sup') {
+            $positionInput.val(attrValue);
+            subUserValues[0] = attrValue;
+        }
+        else if (attrName === 'suba-idnb') {
+            $subIDInput.val(attrValue);
+            subUserValues[1] = attrValue;
+        }
+        else if (attrName === 'suba-phone') {
+            $phoneInput.val(attrValue);
+            subUserValues[2] = attrValue;
+        }
+        else if (attrName === 'suba-loc') {
+            $locationInput.val(attrValue);
+            subUserValues[3] = attrValue;
+        }
+    };
+
+    
+
+    for (var k = 0; k < subUserAttrs.length; k++) {
+        mega.attr.get(subUserHandle, subUserAttrs[k], -2, true, function (res) {
+            setSubuserAttributes(subUserAttrs[k], res);
+        });
+    }
+
+
     $nameInput.val(uName);
     $emailInput.val(subUser.e);
     $('.user-management-subuser-avatars', $dialog).html(subUserDefaultAvatar);
 
     $('.dialog-button-container .btn-edit-close, .delete-img.icon', $dialog).off('click.subuser')
         .on('click.subuser', closeDialog);
+
+    $('.dialog-button-container .btn-edit-save', $dialog).off('click.subuser')
+        .on('click.subuser', function editSubUserProfileSaveHandler() {
+
+        });
 
     M.safeShowDialog('sub-user-editting-dlg', function () {
         return $dialog;
@@ -1691,7 +1844,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         if (!$userRow.length) {
             return;
         }
-        var leftPanelClass = 'disabled-accounts';
+        var leftPanelClass = 'enabled-accounts';
         if (subuser.s === 0) {
             $userRow.find('.user-management-status').removeClass('pending disabled')
                 .addClass('enabled');
@@ -1702,10 +1855,10 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
                 .addClass('pending');
         }
         else {
-            
             $userRow.find('.user-management-status').removeClass('enabled pending')
                 .addClass('disabled');
-            $userRow.addClass('hidden');
+            //$userRow.addClass('hidden');
+            leftPanelClass = 'disabled-accounts';
         }
         $('.user-management-tree-panel-header.' + leftPanelClass).trigger('click.subuser');
     };

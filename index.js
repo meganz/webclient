@@ -1903,6 +1903,12 @@ function topmenuUI() {
             }
         }
 
+        // if this is a business account sub-user
+        if (u_attr.b) {
+            $topHeader.find('.top-icon.achievements').addClass('hidden');
+            $topMenu.find('.upgrade-your-account').addClass('hidden');
+        }
+
         // Show PRO plan expired warning popup (if applicable)
         alarm.planExpired.render();
     }
@@ -1981,7 +1987,6 @@ function topmenuUI() {
             $topMenu.find('.top-menu-item.login').addClass('hidden');
             $topMenu.find('.top-menu-item.logout').removeClass('hidden');
         }
-
     }
 
     $.hideTopMenu = function (e) {

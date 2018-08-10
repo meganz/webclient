@@ -2,7 +2,8 @@
  * a class to apply actions on business account in collaboration with API
  */
 function BusinessAccount() {
-    this.QuotaUpdateFreq = 30000; // 30 sec - default threshold to update quotas info
+    this.QuotaUpdateFreq = 3e4; // 30 sec - default threshold to update quotas info
+    this.invoiceListUpdateFreq = 9e5; // 15 min - default threshold to update invoices list
 }
 
 /**
@@ -787,6 +788,54 @@ BusinessAccount.prototype.getSubUserTree = function (subUserHandle) {
                 operationPromise.reject(0, res, 'API returned error');
             }
         }
+    });
+
+    return operationPromise;
+};
+
+
+/**
+ * Get business account list of invoices
+ * @param {Boolean} forceUpdate         a flag to force getting info from API not using the cache
+ * @returns {Promise}                   resolve if the operation succeeded
+ */
+BusinessAccount.prototype.getAccountInvoicesList = function (forceUpdate) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    if (!forceUpdate) {
+        if (mega.buinsessAccount && mega.buinsessAccount.invoicesList) {
+            var currTime = new Date().getTime();
+            if (mega.buinsessAccount.invoicesList.timestamp &&
+                (currTime - mega.buinsessAccount.invoicesList.timestamp) < this.invoiceListUpdateFreq) {
+                return operationPromise.resolve(1, mega.buinsessAccount.invoicesList.list);
+            }
+        }
+    }
+
+    var request = {
+        "a": "il" // get a list of invoices
+    };
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'object') {
+                var currTime = new Date().getTime();
+                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                var storedBills = Object.create(null);
+                storedBills.timestamp = currTime;
+                storedBills.list = res;
+                mega.buinsessAccount.invoicesList = storedBills;
+                operationPromise.resolve(1, res); // invoices list
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+
     });
 
     return operationPromise;

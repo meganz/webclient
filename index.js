@@ -505,6 +505,7 @@ function init_page() {
         && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
         && (page !== 'contact')
+        && (page !== 'business')
         && (page !== 'ios')
         && (page !== 'android')
         && (page !== 'wp')
@@ -1272,6 +1273,10 @@ function init_page() {
             html += e.outerHTML;
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
+    }
+    else if (page === 'business') {
+        parsepage(pages['business']);
+        
     }
     else if (page === 'extensions') {
         parsepage(pages['browsers']);

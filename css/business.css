@@ -1,0 +1,197 @@
+@font-face {
+    font-family: 'LatoWeb';
+    src: url('../fonts/Lato-Regular.eot'); /* IE9 Compat Modes */
+    src: url('../fonts/Lato-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../fonts/Lato-Regular.woff2') format('woff2'), /* Modern Browsers */
+         url('../fonts/Lato-Regular.woff') format('woff'), /* Modern Browsers */
+         url('../fonts/Lato-Regular.ttf') format('truetype');
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+.business .bottom-page.half-sized-cell {
+    max-width: 584px;
+    padding: 0 20px;
+}
+.img.business-top {
+    left: 0;
+    /*max-width: 1174px;*/
+    max-width: 165%;
+    top: 0;
+    bottom: 0;
+    width: auto;
+    max-height: 93%;
+    margin: auto;
+    position: absolute;
+    display: block;
+    padding: 8% 0 2% 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.business .bottom-page.top-bl {
+    max-height: 860px;
+    min-height: auto;
+    background-color: #FAFAFA;
+}
+.business .bottom-page.top-bl {
+    max-height: 820px;
+    min-height: auto;
+    background-color: #FAFAFA;
+}
+.business .bottom-page.top-bl > .vertical-centered-cell::before {
+    position: absolute;
+    width: 100%;
+    height: 634px;
+    content: '';
+    left: 0;
+    bottom: -100px;
+    background-image: url(../images/mega/bottom-page/business-bg2@2x.png);
+    background-size: cover;
+    background-color: #FAFAFA;
+}
+.business .bottom-page.info-block {
+    position: relative;
+}
+.bottom-page.big-header.dark {
+    color: #333333;
+    max-width: 457px;
+}
+.bottom-page.medium-txt.monsterat {
+    font-family: 'montserrat', 'open_sans', sans-serif;
+    line-height: 28px;
+    color: #666666;
+    padding: 20px 0 47px 0;
+    max-width: 360px;
+}
+i.medium-icon.business-sprite {
+    background-image: url(../images/mega/business.png);
+}
+.medium-icon.business-sprite.right-arrow {
+    background-position: -46px -111px;
+    margin: 11px 0 0 2px;
+}
+.bottom-page.gradient-block {
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    max-width: 1140px;
+    background: rgb(255,255,255);
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmYWZhZmEiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(250,250,250,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(250,250,250,1) 100%);
+    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(250,250,250,1) 100%);
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    position: relative;
+    min-height: 100px;
+    margin: 40px auto;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.bottom-page.gradient-block::before {
+    position: absolute;
+    content: '';
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    -moz-border-radius: inherit;
+    -webkit-border-radius: inherit;
+    border-radius: inherit;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+}
+.business .bottom-page.horizontal-centered-bl {
+    max-width: 1210px;
+    padding: 0 20px;
+}
+.bottom-page.content-table {
+    display: table;
+    width: 100%;
+}
+.bottom-page.content-cell {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 20px;
+    text-align: left;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 50px 48px;
+}
+.business-green-price {
+    font-size: 24px;
+    line-height: 52px;
+    color: #00BFA5;
+}
+.business-green-price .big {
+    font-size: 48px;
+}
+.business-price-info {
+    font-size: 16px;
+    line-height: 18px;
+    color: #333333;
+    padding-bottom: 25px;
+}
+.business-icon {
+    width: 34px;
+    height: 34px;
+    float: left;
+    background-image: url(../images/mega/business.png);
+    background-position: -486px -28px;
+    margin: 11px 20px 0 0;
+}
+.business-icon.transfer {
+    background-position: -542px -28px;
+}
+.business-red-info {
+    font-size: 16px;
+    line-height: 19px;
+    color: #F0373A;
+    padding: 10px 0 7px 0;
+}
+.business-hr {
+    width: 100%;
+    height: 1px;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    background-color: rgba(0,0,0,0.1);
+}
+.business-price-note {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    padding: 12px 0 0 0;
+}
+.business-price-note .red {
+    color: #F0373A;
+}
+.business-tick-txt {
+    font-size: 20px;
+    line-height: 30px;
+    color: #666666;
+    position: relative;
+    padding: 5px 20px 5px 25px;
+}
+.business-tick-txt::before {
+    width: 20px;
+    height: 20px;
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-image: url(../images/mega/business.png);
+    background-position: -7px -115px;
+    margin: 12px 0 0 0;
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+    
+i.medium-icon.business-sprite, .business-icon, .business-tick-txt::before {
+    background-image: url(../images/mega/business@2x.png);
+    background-size: 367px auto;
+}
+}

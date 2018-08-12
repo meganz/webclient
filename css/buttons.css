@@ -771,6 +771,10 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1
     -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
     box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
 }
+.big-red-button.no-l-space {
+    margin: 0;
+    min-width: 360px;
+}
 .big-red-button.height-48 {
     height: 48px;
     line-height: 47px;

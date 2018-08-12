@@ -23,6 +23,7 @@ function BusinessAccountUI() {
         $('.user-management-subaccount-view-container', $businessAccountContianer).addClass('hidden');
         $('.user-management-overview-container', $businessAccountContianer).addClass('hidden');
         $('.user-management-landing-page.user-management-view', $businessAccountContianer).addClass('hidden');
+        $('.user-management-account-settings', $businessAccountContianer).addClass('hidden');
 
         // hide any possible grid or block view.
         $('.files-grid-view, .fm-blocks-view').addClass('hidden');
@@ -98,6 +99,10 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     $('.fm-right-header-user-management .user-management-main-page-buttons .add-sub-user').off('click.subuser')
         .on('click.subuser', function addSubUserHeaderButtonHandler() {
             mySelf.showAddSubUserDialog();
+        });
+    $('.fm-right-header-user-management .user-management-main-page-buttons .ba-account').off('click.subuser')
+        .on('click.subuser', function addSubUserHeaderButtonHandler() {
+            mySelf.viewBusinessAccountPage();
         });
 
     // private function to check if new drawing is needed
@@ -767,7 +772,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 };
 
 
-/** show business account over view page
+/** show business account overview page
  * */
 BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     "use strict";
@@ -1219,6 +1224,22 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 
     populateMonthDropDownList();
     $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+};
+
+
+/** show business account page (Settings and invoices)
+ * */
+BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
+    "use strict";
+
+    this.initUItoRender();
+    var mySelf = this;
+
+    var $businessAccountContainer = $('.files-grid-view.user-management-view');
+    var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
+
+    $businessAccountContainer.removeClass('hidden');
+    $accountContainer.removeClass('hidden');
 };
 
 /**

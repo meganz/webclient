@@ -37,6 +37,9 @@ var ModalDialog = React.createClass({
                 self.onBlur();
             }
         });
+        $(window).rebind('resize.modalDialog' + self.getUniqueId(), function() {
+            self.onResize();
+        });
     },
     onBlur: function(e) {
         var $element = $(ReactDOM.findDOMNode(this));
@@ -55,6 +58,7 @@ var ModalDialog = React.createClass({
         $(document).unbind('keyup.modalDialog' + this.getUniqueId());
         $(document.body).removeClass('overlayed');
         $('.fm-dialog-overlay').addClass('hidden');
+        $(window).unbind('resize.modalDialog' + this.getUniqueId());
 
     },
     onCloseClicked: function(e) {
@@ -64,17 +68,24 @@ var ModalDialog = React.createClass({
             self.props.onClose(self);
         }
     },
-    onPopupDidMount: function(elem) {
-        this.domNode = elem;
+    onResize: function() {
+        if (!this.domNode) {
+            return;
+        }
 
         // always center modal dialogs after they are mounted
-        $(elem)
+        $(this.domNode)
             .css({
                 'margin': 'auto'
             })
             .position({
                 of: $(document.body)
             });
+    },
+    onPopupDidMount: function(elem) {
+        this.domNode = elem;
+
+        this.onResize();
 
         if (this.props.popupDidMount) {
             // bubble up...

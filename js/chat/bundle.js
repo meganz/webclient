@@ -7042,6 +7042,9 @@ React.makeElement = React['createElement'];
 	                self.onBlur();
 	            }
 	        });
+	        $(window).rebind('resize.modalDialog' + self.getUniqueId(), function () {
+	            self.onResize();
+	        });
 	    },
 	    onBlur: function onBlur(e) {
 	        var $element = $(ReactDOM.findDOMNode(this));
@@ -7056,6 +7059,7 @@ React.makeElement = React['createElement'];
 	        $(document).unbind('keyup.modalDialog' + this.getUniqueId());
 	        $(document.body).removeClass('overlayed');
 	        $('.fm-dialog-overlay').addClass('hidden');
+	        $(window).unbind('resize.modalDialog' + this.getUniqueId());
 	    },
 	    onCloseClicked: function onCloseClicked(e) {
 	        var self = this;
@@ -7064,14 +7068,21 @@ React.makeElement = React['createElement'];
 	            self.props.onClose(self);
 	        }
 	    },
-	    onPopupDidMount: function onPopupDidMount(elem) {
-	        this.domNode = elem;
+	    onResize: function onResize() {
+	        if (!this.domNode) {
+	            return;
+	        }
 
-	        $(elem).css({
+	        $(this.domNode).css({
 	            'margin': 'auto'
 	        }).position({
 	            of: $(document.body)
 	        });
+	    },
+	    onPopupDidMount: function onPopupDidMount(elem) {
+	        this.domNode = elem;
+
+	        this.onResize();
 
 	        if (this.props.popupDidMount) {
 

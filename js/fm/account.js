@@ -1597,8 +1597,8 @@ function accountUI() {
             $('.account-profile.half-sized.second .account.data-block.second.acc-balance').addClass('hidden');
             $('.account-profile.half-sized.second .account.data-block.second.acc-cancel').addClass('hidden');
             $('.account.tab-content.email-and-pass .account.data-block.acc-change-email').addClass('hidden');
-            $('.account.tabs-bl .account.tab-lnk.payment').addClass('hidden');
-            $('.account.tabs-bl .account.tab-lnk.achievements').addClass('hidden');
+            $('.account.tabs-bl .account.tab-lnk.payment').attr('style', 'display: none;');
+            $('.account.tabs-bl .account.tab-lnk.achievements').attr('style', 'display: none;');
         }
 
         $.tresizer();

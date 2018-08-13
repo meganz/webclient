@@ -1982,6 +1982,12 @@ function topmenuUI() {
             $topMenu.find('.top-menu-item.logout').removeClass('hidden');
         }
 
+        // if this is a business account sub-user
+        if (u_attr.b) {
+            $topHeader.find('.top-icon.achievements').addClass('hidden');
+            $topMenu.find('.upgrade-your-account').removeClass('hidden');
+        }
+
     }
 
     $.hideTopMenu = function (e) {

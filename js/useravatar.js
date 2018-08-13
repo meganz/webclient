@@ -251,18 +251,23 @@ var useravatar = (function() {
         }
 
         var $avatar = null;
-        function updateAvatar() {
+        var updateAvatar = function() {
             if ($avatar === null) {
                 // only do a $(....) call IF .updateAvatar is called.
                 $avatar = $(ns.contact(user));
             }
 
             var $this = $(this);
+            if (this.classList.contains("chat-avatar")) {
+                // don't touch chat avatars. they update on their own.
+                return;
+            }
+
             $this.removeClass($this.data('color'))
                 .addClass($avatar.data('color'))
                 .data('color', $avatar.data('color'))
                 .safeHTML($avatar.html());
-        }
+        };
 
         $('.avatar-wrapper.' + user.replace(/[^\w-]/g, '')).each(updateAvatar);
 

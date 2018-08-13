@@ -1468,6 +1468,28 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     uName = uName.trim();
     var subUserDefaultAvatar = useravatar.contact(subUserHandle);
 
+    var setSubuserAttributes = function (attrName, attrValue) {
+        if (!attrValue) {
+            return;
+        }
+        if (attrName === 'suba-sup') {
+            $positionInput.val(attrValue);
+        }
+        else if (attrName === 'suba-sup') {
+            $positionInput.val(attrValue);
+        }
+    };
+
+    var subUserAttrs = ['suba-sup', 'suba-idnb', 'suba-phone', 'suba-loc'];
+
+    for (var k = 0; subUserAttrs.length; k++) {
+        mega.attr.get(subUserHandle, subUserAttrs[k], -2, true, function (res) {
+            setSubuserAttributes(subUserAttrs[k], res);
+        });
+    }
+
+    var userPosition = mega.attr.get(subUserHandle, 'suba-sup', -2, true);
+
     $nameInput.val(uName);
     $emailInput.val(subUser.e);
     $('.user-management-subuser-avatars', $dialog).html(subUserDefaultAvatar);
@@ -1712,7 +1734,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         if (!$userRow.length) {
             return;
         }
-        var leftPanelClass = 'disabled-accounts';
+        var leftPanelClass = 'enabled-accounts';
         if (subuser.s === 0) {
             $userRow.find('.user-management-status').removeClass('pending disabled')
                 .addClass('enabled');
@@ -1723,10 +1745,10 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
                 .addClass('pending');
         }
         else {
-            
             $userRow.find('.user-management-status').removeClass('enabled pending')
                 .addClass('disabled');
-            $userRow.addClass('hidden');
+            //$userRow.addClass('hidden');
+            leftPanelClass = 'disabled-accounts';
         }
         $('.user-management-tree-panel-header.' + leftPanelClass).trigger('click.subuser');
     };

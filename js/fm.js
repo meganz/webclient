@@ -857,6 +857,7 @@ function FMShortcuts() {
     var current_operation = null;
 
     $(window).rebind('keydown.fmshortcuts', function(e) {
+        var isContactOrShareRoot = false;
         if (
             !is_fm() ||
             !selectionManager ||
@@ -864,6 +865,9 @@ function FMShortcuts() {
             M.currentrootid === undefined // prevent shortcut for file transfer, dashboard, settings
         ) {
             return true;
+        }
+        else if (M.currentrootid === 'contacts' || M.currentdirid === 'shares') {
+            isContactOrShareRoot = true;
         }
 
         e = e || window.event;
@@ -877,7 +881,7 @@ function FMShortcuts() {
         var charCode = e.which || e.keyCode; // ff
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
-        if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
+        if (charTyped === "a" && (e.ctrlKey || e.metaKey)) {
             if (typeof selectionManager != 'undefined' && selectionManager) {
                 if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                     return;
@@ -887,10 +891,9 @@ function FMShortcuts() {
             return false; // stop prop.
         }
         else if (
-            (charTyped == "c" || charTyped == "x") &&
+            (charTyped === "c" || charTyped === "x") &&
             (e.ctrlKey || e.metaKey) &&
-            M.currentrootid !== 'contacts' &&
-            M.currentrootid !== 'shares'
+            !isContactOrShareRoot
         ) {
             var items = selectionManager.get_selected();
             if (items.length == 0) {
@@ -905,10 +908,9 @@ function FMShortcuts() {
             return false; // stop prop.
         }
         else if (
-            charTyped == "v" &&
+            charTyped === "v" &&
             (e.ctrlKey || e.metaKey) &&
-            M.currentrootid !== 'contacts' &&
-            M.currentrootid !== 'shares'
+            !isContactOrShareRoot
         ) {
             if (!current_operation) {
                 return false; // stop prop.
@@ -929,9 +931,8 @@ function FMShortcuts() {
             return false; // stop prop.
         }
         else if (
-            charCode == 8 &&
-            M.currentrootid !== 'contacts' &&
-            M.currentrootid !== 'shares'
+            charCode === 8 &&
+            !isContactOrShareRoot
         ) {
             var items = selectionManager.get_selected();
             if (items.length == 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {

@@ -613,7 +613,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
 
         if (chatRoom.roomId === self.chatRoom.roomId) {
-            self.setLastSeen(eventData.messageId);
+            self.setLastSeen(eventData.messageId, eventData.chatd);
             self.trackDataChange();
         }
     });
@@ -1356,15 +1356,20 @@ MessagesBuff.prototype.getUnreadCount = function() {
     return this._unreadCountCache;
 };
 
-MessagesBuff.prototype.setLastSeen = function(msgId) {
+MessagesBuff.prototype.setLastSeen = function(msgId, isFromChatd) {
     var self = this;
+
+    if (msgId === self.lastSeen) {
+        return; // already the same. can be triggered by the reset notifications in the UI.
+    }
+
     var targetMsg = Message._mockupNonLoadedMessage(msgId, self.messages[msgId], 999999999);
     var lastMsg = Message._mockupNonLoadedMessage(self.lastSeen, self.messages[self.lastSeen], 0);
 
     if (!self.lastSeen || lastMsg.orderValue < targetMsg.orderValue) {
         self.lastSeen = msgId;
 
-        if (!self.isRetrievingHistory && !self.chatRoom.stateIsLeftOrLeaving()) {
+        if (!isFromChatd && self.joined && !self.isRetrievingHistory && !self.chatRoom.stateIsLeftOrLeaving()) {
             if (self._lastSeenThrottling) {
                 clearTimeout(self._lastSeenThrottling);
             }
@@ -1392,6 +1397,24 @@ MessagesBuff.prototype.setLastSeen = function(msgId) {
         }
 
         self.trackDataChange();
+    }
+    else if (self.lastSeen && lastMsg.orderValue >= targetMsg.orderValue) {
+        // same message
+        if (lastMsg.orderValue === targetMsg.orderValue) {
+            if (self._lastRetriedSeenId === self.lastSeen) {
+                // lastSeen confirmed.
+                delete self._lastRetriedSeenId;
+            }
+        }
+        else {
+            // currentMessage > reportedMessage
+            // something reported an old lastSeen!
+            if (!self._lastRetriedSeenId || self._lastRetriedSeenId !== self.lastSeen) {
+                // tell chatd that the last seen is `self.lastSeen` message id
+                self.chatdInt.markMessageAsSeen(self.chatRoom, self.lastSeen);
+                self._lastRetriedSeenId = self.lastSeen;
+            }
+        }
     }
 };
 

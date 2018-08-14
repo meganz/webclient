@@ -155,7 +155,8 @@ Chatd.Opcode = {
     'CALLDATA': 31,
     'ECHO': 32,
     'ADDREACTION': 33,
-    'DELREACTION': 34
+    'DELREACTION': 34,
+    'CALLTIME': 42
 };
 
 // privilege levels
@@ -473,7 +474,7 @@ Chatd.Shard.prototype.reconnect = function() {
         self.disconnect();
     }
 
-    var chatdTag = (localStorage.chatdTag ? localStorage.chatdTag : '2');
+    var chatdTag = (localStorage.chatdTag ? localStorage.chatdTag : '4');
     self.s = new WebSocket(this.url + '/' + chatdTag);
     self.s.binaryType = "arraybuffer";
 
@@ -1304,7 +1305,8 @@ Chatd.Shard.prototype.exec = function(a) {
 
                 self.chatd.trigger('onMessageLastSeen', {
                     chatId: base64urlencode(cmd.substr(1, 8)),
-                    messageId: base64urlencode(cmd.substr(9, 8))
+                    messageId: base64urlencode(cmd.substr(9, 8)),
+                    chatd: true
                 });
 
                 len = 17;
@@ -1496,6 +1498,10 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.ECHO:
                 len = 1;
                 self.logger.log("Ignoring received "+constStateToText(Chatd.Opcode, opcode));
+                break;
+            case Chatd.Opcode.CALLTIME:
+                self.keepAlive.restart();
+                len = 13;
                 break;
             default:
                 self.logger.error(

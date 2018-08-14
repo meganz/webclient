@@ -861,9 +861,7 @@ function FMShortcuts() {
             !is_fm() ||
             !selectionManager ||
             M.currentrootid === 'chat' || // prevent shortcut for chat
-            M.currentrootid === 'contacts' || // prevent shortcut for contacts
-            M.currentrootid === undefined || // prevent shortcut for file transfer, dashboard, settings
-            M.currentdirid === 'shares' // prevent shortcut for share root.
+            M.currentrootid === undefined // prevent shortcut for file transfer, dashboard, settings
         ) {
             return true;
         }
@@ -887,9 +885,12 @@ function FMShortcuts() {
                 selectionManager.select_all();
             }
             return false; // stop prop.
-        } else if (
+        }
+        else if (
             (charTyped == "c" || charTyped == "x") &&
-            (e.ctrlKey || e.metaKey)
+            (e.ctrlKey || e.metaKey) &&
+            M.currentrootid !== 'contacts' &&
+            M.currentrootid !== 'shares'
         ) {
             var items = selectionManager.get_selected();
             if (items.length == 0) {
@@ -902,7 +903,13 @@ function FMShortcuts() {
             };
 
             return false; // stop prop.
-        } else if (charTyped == "v" && (e.ctrlKey || e.metaKey)) {
+        }
+        else if (
+            charTyped == "v" &&
+            (e.ctrlKey || e.metaKey) &&
+            M.currentrootid !== 'contacts' &&
+            M.currentrootid !== 'shares'
+        ) {
             if (!current_operation) {
                 return false; // stop prop.
             }
@@ -920,7 +927,12 @@ function FMShortcuts() {
             }
 
             return false; // stop prop.
-        } else if (charCode == 8) {
+        }
+        else if (
+            charCode == 8 &&
+            M.currentrootid !== 'contacts' &&
+            M.currentrootid !== 'shares'
+        ) {
             var items = selectionManager.get_selected();
             if (items.length == 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.

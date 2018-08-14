@@ -848,6 +848,7 @@ function avatarDialog(close) {
 
 /**
  * Really simple shortcut logic for select all, copy, paste, delete
+ * Note: there is another key binding on initUIKeyEvents() for filemanager.
  *
  * @constructor
  */
@@ -856,12 +857,13 @@ function FMShortcuts() {
     var current_operation = null;
 
     $(window).rebind('keydown.fmshortcuts', function(e) {
-
         if (
             !is_fm() ||
             !selectionManager ||
-            window.location.toString().indexOf('fm/account') !== -1 ||
-            window.location.toString().indexOf('fm/transfers') !== -1
+            M.currentrootid === 'chat' || // prevent shortcut for chat
+            M.currentrootid === 'contacts' || // prevent shortcut for contacts
+            M.currentrootid === undefined || // prevent shortcut for file transfer, dashboard, settings
+            M.currentdirid === 'shares' // prevent shortcut for share root.
         ) {
             return true;
         }

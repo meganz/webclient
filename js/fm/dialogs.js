@@ -1329,7 +1329,7 @@
                     var attachNodes = function(room) {
                         delay('copydialog:chatattachnodes', function() {
                             showToast('send-chat', (selectedNodes.length > 1) ? l[17767] : l[17766]);
-                            M.openFolder('chat/' + room.roomId);
+                            M.openFolder('chat/' + (room.type === 'group' ? 'g/' : '') + room.roomId);
                         });
                         room.attachNodes(selectedNodes);
                     };

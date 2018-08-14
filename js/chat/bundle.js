@@ -852,6 +852,11 @@ React.makeElement = React['createElement'];
 	    if (self.plugins.presencedIntegration) {
 	        self.plugins.presencedIntegration.addContact(u);
 	    }
+	    self.chats.forEach(function (chatRoom) {
+	        if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
+	            chatRoom.trackDataChange();
+	        }
+	    });
 
 	    self.renderMyStatus();
 	};
@@ -864,6 +869,11 @@ React.makeElement = React['createElement'];
 	    if (self.plugins.presencedIntegration) {
 	        self.plugins.presencedIntegration.removeContact(u);
 	    }
+	    self.chats.forEach(function (chatRoom) {
+	        if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
+	            chatRoom.trackDataChange();
+	        }
+	    });
 
 	    self.renderMyStatus();
 	};
@@ -1170,7 +1180,10 @@ React.makeElement = React['createElement'];
 	    var self = this;
 	    if (self.chats[chatdId]) {
 	        return self.chats[chatdId];
+	    } else if (self.chatIdToRoomId && self.chatIdToRoomId[chatdId] && self.chats[self.chatIdToRoomId[chatdId]]) {
+	        return self.chats[self.chatIdToRoomId[chatdId]];
 	    }
+
 	    var found = false;
 	    self.chats.forEach(function (chatRoom) {
 	        if (!found && chatRoom.chatId === chatdId) {
@@ -13821,6 +13834,14 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.isReadOnly = function () {
+
+	    if (this.type === "private") {
+	        var members = this.getParticipantsExceptMe();
+	        if (members[0] && M.u[members[0]].c === 0) {
+	            return true;
+	        }
+	    }
+
 	    return this.members && this.members[u_handle] <= 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT;
 	};
 	ChatRoom.prototype.iAmOperator = function () {

@@ -912,7 +912,7 @@ function FMShortcuts() {
             (e.ctrlKey || e.metaKey) &&
             !isContactOrShareRoot
         ) {
-            if (!current_operation) {
+            if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
                 return false; // stop prop.
             }
 

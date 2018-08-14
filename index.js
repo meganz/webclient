@@ -2311,6 +2311,11 @@ function topmenuUI() {
     });
 
     // If the main Mega M logo in the header is clicked
+    $topHeader.find('.default-white-button.individual').rebind('click', function () {
+        loadSubPage('startpage');
+    });
+
+    // If the main Mega M logo in the header is clicked
     $topHeader.find('.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
             if (folderlink) {

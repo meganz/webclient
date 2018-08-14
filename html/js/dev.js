@@ -302,8 +302,8 @@ function load_sdkkeys(cb) {
 
 
 function sdk_key_render() {
-    var $parent = $('.grid-table').parent();
-    $('.grid-table').remove();
+    var $parent = $('.dev-new-appplications-table.apps');
+    $parent.find('.grid-table').remove();
     var markup = '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table">' +
         '<tr><th>App Name</th><th>Key</th><th>Status</th><th></th></tr>';
 
@@ -322,7 +322,7 @@ function sdk_key_render() {
     }
     markup += '</table>';
     $parent.safeAppend(markup);
-    $('.dev-new-appplications-table.apps').removeClass('hidden');
+    $parent.removeClass('hidden');
 
     $('.dev-new-app-settings').rebind('click', function(e) {
             for (var i in sdk_keys) {

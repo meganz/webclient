@@ -206,7 +206,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             roomRequiresUpdate = true;
         }
 
-
         Object.keys(membersSnapshot).forEach(function(u_h) {
             var contact = M.u[u_h];
             if (contact) {
@@ -229,6 +228,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         if (roomRequiresUpdate) {
             self.trackDataChange();
         }
+
     });
 
     self.getParticipantsExceptMe().forEach(function(userHandle) {
@@ -1350,6 +1350,14 @@ ChatRoom.prototype._clearChatMessagesFromChatd = function() {
 };
 
 ChatRoom.prototype.isReadOnly = function() {
+    // check if still contacts.
+    if (this.type === "private") {
+        var members = this.getParticipantsExceptMe();
+        if (members[0] && M.u[members[0]].c === 0) {
+            return true;
+        }
+    }
+
     return (
         (this.members && this.members[u_handle] <= 0) ||
         this.privateReadOnlyChat ||

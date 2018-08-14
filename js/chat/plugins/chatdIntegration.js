@@ -26,7 +26,7 @@ var ChatdIntegration = function(megaChat) {
                 }
             },
             minLogLevel: function() {
-                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.WARN;
             }
         },
         megaChat.logger
@@ -35,7 +35,7 @@ var ChatdIntegration = function(megaChat) {
     self.megaChat = megaChat;
     self.chatd = new Chatd(u_handle, megaChat);
     self.waitingChatIdPromises = {};
-    self.chatIdToRoomJid = {};
+    self.chatIdToRoomId = {};
     self._cachedHandlers = {};
     self._loadingCount = 0;
 
@@ -121,7 +121,7 @@ var ChatdIntegration = function(megaChat) {
         var shard = eventData.shard;
 
         shard.getRelatedChatIds().forEach(function(chatId) {
-            var chatRoomJid = self.chatIdToRoomJid[chatId];
+            var chatRoomJid = self.chatIdToRoomId[chatId];
             if (chatRoomJid) {
                 var chatRoom = self.megaChat.chats[chatRoomJid];
                 if (chatRoom) {
@@ -264,9 +264,9 @@ ChatdIntegration.prototype.requiresUpdate = function() {
 };
 ChatdIntegration.prototype._getChatRoomFromEventData = function(eventData) {
     var self = this;
-    var chatRoomJid = self.chatIdToRoomJid[eventData.chatId];
-    assert(chatRoomJid, 'chat room not found for chat id: ' + eventData.chatId);
-    return self.megaChat.chats[chatRoomJid];
+    var chatRoomId = self.chatIdToRoomId[eventData.chatId];
+    assert(chatRoomId, 'chat room not found for chat id: ' + eventData.chatId);
+    return self.megaChat.chats[chatRoomId] || self.megaChat.getChatById(eventData.chatId);
 };
 
 ChatdIntegration.prototype._getKarereObjFromChatdObj = function(chatdEventObj) {
@@ -380,9 +380,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
             }
         });
     }
-    var roomId = actionPacket.id;
+    var chatId = actionPacket.id;
 
-    var chatRoom = self.megaChat.chats[roomId];
+    var chatRoom = self.megaChat.getChatById(chatId);
     var wasActive = chatRoom ? chatRoom.isCurrentlyActive : false;
 
     var finishProcess = function() {
@@ -391,7 +391,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
         // if the found chatRoom is in LEAVING mode...then try to reinitialise it!
 
         if (chatRoom && chatRoom.stateIsLeftOrLeaving() && actionPacket.ou !== u_handle) {
-            self._cachedHandlers[roomId] = chatRoom.protocolHandler;
+            self._cachedHandlers[chatId] = chatRoom.protocolHandler;
 
             if (actionPacket.url) {
                 Soon(finishProcess);
@@ -418,7 +418,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
         }
 
         // try to find the chat room again, it may had been opened while waiting for the mcurl api call...
-        chatRoom = self.megaChat.chats[roomId];
+        chatRoom = self.megaChat.getChatById(chatId);
         if (!chatRoom) {
             // don't try to open a chat, if its not yet opened and the actionPacket consist of me leaving...
             if (actionPacket.n) {
@@ -463,8 +463,8 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
 
             self.decryptTopic(chatRoom);
             // handler of the same room was cached before, then restore the keys.
-            if (self._cachedHandlers[roomId] && chatRoom.protocolHandler) {
-                chatRoom.protocolHandler.participantKeys = self._cachedHandlers[roomId].participantKeys;
+            if (self._cachedHandlers[chatId] && chatRoom.protocolHandler) {
+                chatRoom.protocolHandler.participantKeys = self._cachedHandlers[chatId].participantKeys;
             }
             if (!isMcf && actionPacket.ou === u_handle && !actionPacket.n) {
                 if (chatRoom.lastActivity === 0) {
@@ -1096,6 +1096,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 chatRoom.setState(ChatRoom.STATE.JOINING, true);
             }
 
+            var queuedMembersUpdatedEvent = false;
+
             if (chatRoom.membersLoaded === false) {
                 if (eventData.priv < 255) {
                     var addParticipant = function addParticipant() {
@@ -1117,6 +1119,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     };
 
                     ChatdIntegration._waitForProtocolHandler(chatRoom, addParticipant);
+                    queuedMembersUpdatedEvent = true;
                 }
 
                 if (eventData.userId === u_handle) {
@@ -1154,6 +1157,12 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 };
 
                 ChatdIntegration._waitForProtocolHandler(chatRoom, deleteParticipant);
+                queuedMembersUpdatedEvent = true;
+            }
+
+            if (!queuedMembersUpdatedEvent) {
+                chatRoom.members[eventData.userId] = eventData.priv;
+                $(chatRoom).trigger('onMembersUpdated', eventData);
             }
         }
     });
@@ -1647,7 +1656,7 @@ ChatdIntegration.prototype.join = function(chatRoom) {
         'missing chatId, chatShard or chadUrl in megaRoom. halting chatd join and code execution.' + chatRoom.chatId
     );
 
-    self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomId;
+    self.chatIdToRoomId[chatRoom.chatId] = chatRoom.roomId;
     self.chatd.join(
         base64urldecode(chatRoom.chatId),
         chatRoom.chatShard,

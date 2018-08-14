@@ -1077,6 +1077,11 @@ Chat.prototype.processNewUser = function(u) {
     if (self.plugins.presencedIntegration) {
         self.plugins.presencedIntegration.addContact(u);
     }
+    self.chats.forEach(function(chatRoom) {
+        if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
+            chatRoom.trackDataChange();
+        }
+    });
 
     self.renderMyStatus();
 };
@@ -1094,6 +1099,11 @@ Chat.prototype.processRemovedUser = function(u) {
     if (self.plugins.presencedIntegration) {
         self.plugins.presencedIntegration.removeContact(u);
     }
+    self.chats.forEach(function(chatRoom) {
+        if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
+            chatRoom.trackDataChange();
+        }
+    });
 
     self.renderMyStatus();
 };
@@ -1517,6 +1527,10 @@ Chat.prototype.getChatById = function(chatdId) {
     if (self.chats[chatdId]) {
         return self.chats[chatdId];
     }
+    else if (self.chatIdToRoomId && self.chatIdToRoomId[chatdId] && self.chats[self.chatIdToRoomId[chatdId]]) {
+        return self.chats[self.chatIdToRoomId[chatdId]];
+    }
+
     var found = false;
     self.chats.forEach(function(chatRoom) {
         if (!found && chatRoom.chatId === chatdId) {

@@ -714,19 +714,20 @@ mega.megadrop = (function() {
             if (pupOpts.items[handle]) {
                 delete pupOpts.items[handle];
             }
-
+            console.log(obj);
             // Remove from puf.items
             for (var key in obj) {
                 if (obj.hasOwnProperty(key) && obj[key].p === handle) {
                     if (fmdb && !pfkey) {
                         if (puf.items[key]) {
-                            delete puf.items[key];
                             if (puf.callbacks[key]['del']) {
                                 loadingDialog.hide();
                                 puf.callbacks[key]['del']();
+                                delete puf.callbacks[key]['del'];
                             }
+                            fmdb.del('puf', obj[key].ph);
+                            delete puf.items[key];
                         }
-                        fmdb.del('puf', obj[key].ph);
                     }
 
                     break;

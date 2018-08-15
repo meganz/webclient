@@ -720,7 +720,7 @@ mega.megadrop = (function() {
                 if (obj.hasOwnProperty(key) && obj[key].p === handle) {
                     if (fmdb && !pfkey) {
                         if (puf.items[key]) {
-                            if (puf.callbacks[key]['del']) {
+                            if (puf.callbacks[key] && puf.callbacks[key]['del']) {
                                 loadingDialog.hide();
                                 puf.callbacks[key]['del']();
                                 delete puf.callbacks[key]['del'];
@@ -966,7 +966,7 @@ mega.megadrop = (function() {
                     if (pupOpts.items[pupId]) {
                         folderId = pupOpts.items[pupId].h;
                         _del(pupId);
-                        if (puf.callbacks[folderId]['del']) {
+                        if (puf.callbacks[folderId] && puf.callbacks[folderId]['del']) {
                             delayHide = true;
                         }
                         settings.remove(pupId, folderId);

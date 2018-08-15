@@ -435,7 +435,7 @@
     opacity: 0.6;
 }
 .icon-dropdown:not(.disabled):hover, .icon-dropdown.active {
-    background-image: url(../images/mega/new-chat-sprite_v5.png);
+    background-image: url(../images/mega/new-chat-sprite_v6.png);
     background-repeat: no-repeat;
     background-position: -64px -657px;
 }

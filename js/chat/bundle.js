@@ -852,6 +852,11 @@ React.makeElement = React['createElement'];
 	    if (self.plugins.presencedIntegration) {
 	        self.plugins.presencedIntegration.addContact(u);
 	    }
+	    self.chats.forEach(function (chatRoom) {
+	        if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
+	            chatRoom.trackDataChange();
+	        }
+	    });
 
 	    self.renderMyStatus();
 	};
@@ -864,6 +869,11 @@ React.makeElement = React['createElement'];
 	    if (self.plugins.presencedIntegration) {
 	        self.plugins.presencedIntegration.removeContact(u);
 	    }
+	    self.chats.forEach(function (chatRoom) {
+	        if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
+	            chatRoom.trackDataChange();
+	        }
+	    });
 
 	    self.renderMyStatus();
 	};
@@ -1170,7 +1180,10 @@ React.makeElement = React['createElement'];
 	    var self = this;
 	    if (self.chats[chatdId]) {
 	        return self.chats[chatdId];
+	    } else if (self.chatIdToRoomId && self.chatIdToRoomId[chatdId] && self.chats[self.chatIdToRoomId[chatdId]]) {
+	        return self.chats[self.chatIdToRoomId[chatdId]];
 	    }
+
 	    var found = false;
 	    self.chats.forEach(function (chatRoom) {
 	        if (!found && chatRoom.chatId === chatdId) {
@@ -4351,7 +4364,7 @@ React.makeElement = React['createElement'];
 
 	        var classes = (this.props.className ? this.props.className : ' avatar-wrapper small-rounded-avatar') + ' ' + contact.u;
 
-	        var letterClass = 'avatar-letter';
+	        classes += " chat-avatar";
 
 	        var displayedAvatar;
 
@@ -7042,6 +7055,9 @@ React.makeElement = React['createElement'];
 	                self.onBlur();
 	            }
 	        });
+	        $(window).rebind('resize.modalDialog' + self.getUniqueId(), function () {
+	            self.onResize();
+	        });
 	    },
 	    onBlur: function onBlur(e) {
 	        var $element = $(ReactDOM.findDOMNode(this));
@@ -7056,6 +7072,7 @@ React.makeElement = React['createElement'];
 	        $(document).unbind('keyup.modalDialog' + this.getUniqueId());
 	        $(document.body).removeClass('overlayed');
 	        $('.fm-dialog-overlay').addClass('hidden');
+	        $(window).unbind('resize.modalDialog' + this.getUniqueId());
 	    },
 	    onCloseClicked: function onCloseClicked(e) {
 	        var self = this;
@@ -7064,14 +7081,21 @@ React.makeElement = React['createElement'];
 	            self.props.onClose(self);
 	        }
 	    },
-	    onPopupDidMount: function onPopupDidMount(elem) {
-	        this.domNode = elem;
+	    onResize: function onResize() {
+	        if (!this.domNode) {
+	            return;
+	        }
 
-	        $(elem).css({
+	        $(this.domNode).css({
 	            'margin': 'auto'
 	        }).position({
 	            of: $(document.body)
 	        });
+	    },
+	    onPopupDidMount: function onPopupDidMount(elem) {
+	        this.domNode = elem;
+
+	        this.onResize();
 
 	        if (this.props.popupDidMount) {
 
@@ -13810,6 +13834,14 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.isReadOnly = function () {
+
+	    if (this.type === "private") {
+	        var members = this.getParticipantsExceptMe();
+	        if (members[0] && M.u[members[0]].c === 0) {
+	            return true;
+	        }
+	    }
+
 	    return this.members && this.members[u_handle] <= 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT;
 	};
 	ChatRoom.prototype.iAmOperator = function () {

@@ -813,5 +813,30 @@ BusinessAccount.prototype.getAccountInvoicesList = function (forceUpdate) {
         }
     }
 
+    var request = {
+        "a": "li" // get a list of invoices
+    };
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'object') {
+                var currTime = new Date().getTime();
+                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                var storedBills = Object.create(null);
+                storedBills.timestamp = currTime;
+                storedBills.list = res;
+                mega.buinsessAccount.invoicesList = storedBills;
+                operationPromise.resolve(1, res); // invoices list
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+
+    });
+
     return operationPromise;
 };

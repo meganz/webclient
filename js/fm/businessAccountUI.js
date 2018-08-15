@@ -1238,8 +1238,13 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
 
-    $businessAccountContainer.removeClass('hidden');
-    $accountContainer.removeClass('hidden');
+    var prepareInvoiceListSection = function (invoicesList) {
+
+        
+
+        $businessAccountContainer.removeClass('hidden');
+        $accountContainer.removeClass('hidden');
+    };    
 };
 
 /**
@@ -1475,20 +1480,19 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
         if (attrName === 'suba-sup') {
             $positionInput.val(attrValue);
         }
-        else if (attrName === 'suba-sup') {
-            $positionInput.val(attrValue);
+        else if (attrName === 'suba-idnb') {
+            $subIDInput.val(attrValue);
         }
     };
 
     var subUserAttrs = ['suba-sup', 'suba-idnb', 'suba-phone', 'suba-loc'];
 
-    for (var k = 0; subUserAttrs.length; k++) {
+    for (var k = 0; k < subUserAttrs.length; k++) {
         mega.attr.get(subUserHandle, subUserAttrs[k], -2, true, function (res) {
             setSubuserAttributes(subUserAttrs[k], res);
         });
     }
 
-    var userPosition = mega.attr.get(subUserHandle, 'suba-sup', -2, true);
 
     $nameInput.val(uName);
     $emailInput.val(subUser.e);
@@ -1496,6 +1500,11 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
 
     $('.dialog-button-container .btn-edit-close, .delete-img.icon', $dialog).off('click.subuser')
         .on('click.subuser', closeDialog);
+
+    $('.dialog-button-container .btn-edit-save', $dialog).off('click.subuser')
+        .on('click.subuser', function editSubUserProfileSaveHandler() {
+
+        });
 
     M.safeShowDialog('sub-user-editting-dlg', function () {
         return $dialog;

@@ -857,7 +857,7 @@ function FMShortcuts() {
     var current_operation = null;
 
     $(window).rebind('keydown.fmshortcuts', function(e) {
-        var isContactOrShareRoot = false;
+        var isContactRootOrShareRoot = false;
         if (
             !is_fm() ||
             !selectionManager ||
@@ -866,8 +866,8 @@ function FMShortcuts() {
         ) {
             return true;
         }
-        else if (M.currentrootid === 'contacts' || M.currentdirid === 'shares') {
-            isContactOrShareRoot = true;
+        else if (M.currentdirid === 'contacts' || M.currentdirid === 'shares') {
+            isContactRootOrShareRoot = true;
         }
 
         e = e || window.event;
@@ -893,7 +893,7 @@ function FMShortcuts() {
         else if (
             (charTyped === "c" || charTyped === "x") &&
             (e.ctrlKey || e.metaKey) &&
-            !isContactOrShareRoot
+            !isContactRootOrShareRoot
         ) {
             var items = selectionManager.get_selected();
             if (items.length == 0) {
@@ -910,7 +910,7 @@ function FMShortcuts() {
         else if (
             charTyped === "v" &&
             (e.ctrlKey || e.metaKey) &&
-            !isContactOrShareRoot
+            !isContactRootOrShareRoot
         ) {
             if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
                 return false; // stop prop.
@@ -932,7 +932,7 @@ function FMShortcuts() {
         }
         else if (
             charCode === 8 &&
-            !isContactOrShareRoot
+            !isContactRootOrShareRoot
         ) {
             var items = selectionManager.get_selected();
             if (items.length == 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {

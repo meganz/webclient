@@ -714,7 +714,7 @@ mega.megadrop = (function() {
             if (pupOpts.items[handle]) {
                 delete pupOpts.items[handle];
             }
-            console.log(obj);
+
             // Remove from puf.items
             for (var key in obj) {
                 if (obj.hasOwnProperty(key) && obj[key].p === handle) {

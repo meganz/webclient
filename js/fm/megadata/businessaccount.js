@@ -814,7 +814,7 @@ BusinessAccount.prototype.getAccountInvoicesList = function (forceUpdate) {
     }
 
     var request = {
-        "a": "li" // get a list of invoices
+        "a": "il" // get a list of invoices
     };
 
     api_req(request, {

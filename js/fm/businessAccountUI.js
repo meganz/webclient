@@ -86,11 +86,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         return this.viewLandingPage();
     }
 
-    subAccountsView.removeClass('hidden'); // un-hide the container
-    $('.user-management-list-table', subAccountsView).removeClass('hidden'); // unhide the list table
-    $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide header
-    $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
-
     // header events handlers
     $('.fm-right-header-user-management .user-management-main-page-buttons .ba-overview').off('click.subuser')
         .on('click.subuser', function overviewHeaderButtonHandler() {
@@ -394,6 +389,11 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         $('.info-block.bandwidth-sub-users .title2', '.user-management-overview-bar')
             .text(totalBandwidthFormatted.unit);
         $('.user-management-overview-bar').removeClass('hidden');
+
+        subAccountsView.removeClass('hidden'); // un-hide the container
+        $('.user-management-list-table', subAccountsView).removeClass('hidden'); // unhide the list table
+        $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide header
+        $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
     };
 
     var reDraw = isRedrawNeeded(subAccounts, this.business.previousSubList);
@@ -1238,13 +1238,59 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
 
-    var prepareInvoiceListSection = function (invoicesList) {
+    var prepareInvoiceListSection = function (st,invoicesList) {
 
-        
+        var $invoicesTable = $('.invoice .invoice-list .invoice-table', $accountContainer);
+        var $invoiceRows = $('.invocie-row-data', $invoicesTable);
+        var $invoiceRowTemplate = $($invoiceRows.get(0)).clone(true); // cloning the first one
+        if (st === 1) {
+            $invoiceRows.remove();
+        }
+        else {
+            $invoiceRows.addClass('hidden');
+            invoicesList = Object.create(null); // so the for loop below does nothing
+        }
+
+        // store what we will draw now
+        this.business.previousInvoices = JSON.parse(JSON.stringify(invoicesList));
+
+
+        for (var k = 0; k < invoicesList.length; k++) {
+            var invoiceDate = new Date(invoicesList[k].ts * 1000);
+            var $newInvoiceRow = $invoiceRowTemplate.clone(true);
+
+            $newInvoiceRow.find('.inv-date').text(invoiceDate.toDateString());
+            $newInvoiceRow.find('.inv-desc').text(invoicesList[k].d);
+            $newInvoiceRow.find('.inv-total').text('€' + invoicesList[k].tot);
+            $newInvoiceRow.removeClass('hidden'); // if it was hidden
+
+            $invoicesTable.append($newInvoiceRow);
+        }
 
         $businessAccountContainer.removeClass('hidden');
         $accountContainer.removeClass('hidden');
-    };    
+    };
+
+    var isInvoiceRedrawNeeded = function (invoiceList) {
+        if (!invoiceList) {
+            return true;
+        }
+        if (!this.business || !this.business.previousInvoices) {
+            return true;
+        }
+        if (this.business.previousInvoices.length !== invoiceList.length) {
+            return true;
+        }
+        for (var h = 0; h < invoiceList.length; h++) {
+            if (invoiceList[h].n !== this.business.previousInvoices[h].n) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    var getInvoicesPromise = this.business.getAccountInvoicesList();
+    getInvoicesPromise.always(prepareInvoiceListSection);
 };
 
 /**

@@ -23,7 +23,9 @@ function BusinessAccountUI() {
         $('.user-management-subaccount-view-container', $businessAccountContianer).addClass('hidden');
         $('.user-management-overview-container', $businessAccountContianer).addClass('hidden');
         $('.user-management-landing-page.user-management-view', $businessAccountContianer).addClass('hidden');
-        $('.user-management-account-settings', $businessAccountContianer).addClass('hidden');
+        var $accountContainer = $('.user-management-account-settings', $businessAccountContianer).addClass('hidden');
+        $('.invoice', $accountContainer).addClass('hidden');
+        $('.invoice .invoice-list', $accountContainer).addClass('hidden');
 
         // hide any possible grid or block view.
         $('.files-grid-view, .fm-blocks-view').addClass('hidden');
@@ -85,6 +87,13 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     if (subAccounts.length) { // no subs
         return this.viewLandingPage();
     }
+
+    var unhideUsersListSection = function () {
+        subAccountsView.removeClass('hidden'); // un-hide the container
+        $('.user-management-list-table', subAccountsView).removeClass('hidden'); // unhide the list table
+        $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide header
+        $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
+    };
 
     // header events handlers
     $('.fm-right-header-user-management .user-management-main-page-buttons .ba-overview').off('click.subuser')
@@ -390,10 +399,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             .text(totalBandwidthFormatted.unit);
         $('.user-management-overview-bar').removeClass('hidden');
 
-        subAccountsView.removeClass('hidden'); // un-hide the container
-        $('.user-management-list-table', subAccountsView).removeClass('hidden'); // unhide the list table
-        $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide header
-        $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
+        unhideUsersListSection();
     };
 
     var reDraw = isRedrawNeeded(subAccounts, this.business.previousSubList);
@@ -402,6 +408,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         fillSubUsersTable(subAccounts, this);
         // storing current drawn sub-users to prevent not needed redraw
         this.business.previousSubList = JSON.parse(JSON.stringify(subAccounts));
+    }
+    else {
+        unhideUsersListSection();
     }
 
     // getting quotas
@@ -1237,8 +1246,42 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
+    var $invoiceContainer = $('.invoice', $accountContainer);
+    var $invoiceListContainer = $('.invoice-list', $invoiceContainer);
 
-    var prepareInvoiceListSection = function (st,invoicesList) {
+    // private function to determine if we need to re-draw
+    var isInvoiceRedrawNeeded = function (invoiceList, savedList) {
+        if (!invoiceList) {
+            return true;
+        }
+        if (!savedList) {
+            return true;
+        }
+        if (savedList.length !== invoiceList.length) {
+            return true;
+        }
+        for (var h = 0; h < invoiceList.length; h++) {
+            if (invoiceList[h].n !== savedList[h].n) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    // private function to fill the list of invoices on UI
+    var prepareInvoiceListSection = function (st, invoicesList) {
+
+        var unhideSection = function () {
+            $businessAccountContainer.removeClass('hidden');
+            $accountContainer.removeClass('hidden');
+            $invoiceContainer.removeClass('hidden');
+            $invoiceListContainer.removeClass('hidden');
+        };
+
+        // check if we need to re-draw
+        if (!isInvoiceRedrawNeeded(invoicesList, (this.business) ? this.business.previousInvoices : null)) {
+            return unhideSection();
+        }
 
         var $invoicesTable = $('.invoice .invoice-list .invoice-table', $accountContainer);
         var $invoiceRows = $('.invocie-row-data', $invoicesTable);
@@ -1252,7 +1295,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         }
 
         // store what we will draw now
-        this.business.previousInvoices = JSON.parse(JSON.stringify(invoicesList));
+        mySelf.business.previousInvoices = JSON.parse(JSON.stringify(invoicesList));
 
 
         for (var k = 0; k < invoicesList.length; k++) {
@@ -1267,31 +1310,27 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
             $invoicesTable.append($newInvoiceRow);
         }
 
-        $businessAccountContainer.removeClass('hidden');
-        $accountContainer.removeClass('hidden');
+        unhideSection();
     };
 
-    var isInvoiceRedrawNeeded = function (invoiceList) {
-        if (!invoiceList) {
-            return true;
-        }
-        if (!this.business || !this.business.previousInvoices) {
-            return true;
-        }
-        if (this.business.previousInvoices.length !== invoiceList.length) {
-            return true;
-        }
-        for (var h = 0; h < invoiceList.length; h++) {
-            if (invoiceList[h].n !== this.business.previousInvoices[h].n) {
-                return true;
-            }
-        }
-        return false;
-    };
+    
 
     var getInvoicesPromise = this.business.getAccountInvoicesList();
     getInvoicesPromise.always(prepareInvoiceListSection);
 };
+
+
+BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
+    "use strict";
+
+    this.initUItoRender();
+    var mySelf = this;
+
+    var $businessAccountContainer = $('.files-grid-view.user-management-view');
+    var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
+
+};
+
 
 /**
  * Shows the confirmation dialog for sub-user disabling 

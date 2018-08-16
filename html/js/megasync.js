@@ -1,7 +1,11 @@
 var megasync = (function() {
 
     var ns = {};
-    var megasyncUrl = "https://localhost.megasyncloopback.mega.nz:6342/";
+    
+    
+    var megasyncUrl = '';
+    var httpMegasyncUrl = "http://127.0.0.1:6341/";
+    var ShttpMegasyncUrl = "https://localhost.megasyncloopback.mega.nz:6342/";
     var enabled = false;
     var version = 0;
     var lastDownload;
@@ -37,6 +41,46 @@ var megasync = (function() {
             mega.config.set('dlThroughMEGAsync', 1);
         }
     });
+    
+
+    /** a function to switch the url to communicate with MEGASync */
+    function switchMegasyncUrlToHttpWhenPossible() {
+
+        if (ua.details.browser === 'Internet Explorer'
+            || ua.details.browser === 'Safari'
+            || ua.details.browser === 'Edge') {
+            return ShttpMegasyncUrl;
+        }
+        else if (ua.details.browser === 'Chrome') {
+            if (ua.details.version.substr(0, 2) >= '30') {
+                return httpMegasyncUrl;
+            }
+            else {
+                return ShttpMegasyncUrl;
+            }
+        }
+        else if (ua.details.browser === 'Firefox') {
+            if (ua.details.version.substr(0, 2) >= '55') {
+                return httpMegasyncUrl;
+            }
+            else {
+                return ShttpMegasyncUrl;
+            }
+        }
+        else if (ua.details.browser === 'Opera') {
+            if (ua.details.version.substr(0, 2) >= '28') {
+                return httpMegasyncUrl;
+            }
+            else {
+                return ShttpMegasyncUrl;
+            }
+        }
+        else {
+            return ShttpMegasyncUrl;
+        }
+
+    };
+
     // Linux stuff {{{
     /**
      * Prepare Linux Dropdown with the list of distro.
@@ -276,6 +320,10 @@ var megasync = (function() {
                 reject(ex);
             }
             return MegaPromise.reject(ex);
+        }
+
+        if (!megasyncUrl) {
+            megasyncUrl = switchMegasyncUrlToHttpWhenPossible();
         }
 
         var promise = M.xhr({

@@ -268,7 +268,7 @@
                     p.t6 = l[5905];
                     p.t7 = htmlentities(M.getNameByHandle(user.h));
                     p.t8 = l[894] + ':';
-                    p.t9 = bytesToSize(size);
+                    p.t9 = versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
                     p.t10 = l[897] + ':';
                     p.t11 = fm_contains(sfilecnt, sfoldercnt);
                 }

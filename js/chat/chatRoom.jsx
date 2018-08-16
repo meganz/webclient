@@ -28,7 +28,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         {
             state: null,
             users: [],
-            attachments: null,
             roomId: null,
             type: null,
             messages: [],
@@ -65,17 +64,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     this.callRequest = null;
     this.callIsActive = false;
     this.shownMessages = {};
-    this.attachments = new MegaDataMap(this);
-    this.images = new MegaDataSortedMap("id", "orderValue", this);
-    this.images.addChangeListener(function() {
-        if (slideshowid) {
-            self._rebuildAttachments();
-        }
-    });
-
-    this._imagesLoading = Object.create(null);
-    this._imagesToBeLoaded = Object.create(null);
-    this._mediaAttachmentsCache = Object.create(null);
 
     self.members = {};
 
@@ -729,9 +717,9 @@ ChatRoom.prototype.show = function() {
 
     M.onSectionUIOpen('conversations');
 
-
     self.megaChat.currentlyOpenedChat = self.roomId;
     self.megaChat.lastOpenedChat = self.roomId;
+    self.megaChat.setAttachments(self.roomId);
 
     self.trigger('activity');
     self.trigger('onChatShown');
@@ -1435,271 +1423,6 @@ ChatRoom.prototype.truncate = function() {
                 });
         }
     }
-};
-
-ChatRoom.prototype._rebuildAttachmentsImmediate = function() {
-    if (!M.chat) {
-        return;
-    }
-
-    var self = this;
-
-    var imagesList = [];
-    var deleted = [];
-    self.images.values().forEach(function(v) {
-        var msg = self.messagesBuff.getMessageById(v.messageId);
-        if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
-            slideshowid && deleted.push(v.id.substr(-8));
-            self.images.removeByKey(v.id);
-            return;
-        }
-        imagesList.push(v);
-    });
-
-    M.v = imagesList;
-
-
-    var slideshowCalled = false;
-    slideshowid && deleted.forEach(function(currentNodeId) {
-        if (currentNodeId === slideshowid) {
-            var lastNode;
-            var found = false;
-            M.v.forEach(function(node) {
-                if (!found && node.h !== currentNodeId) {
-                    lastNode = node.h;
-                }
-                if (node.h === currentNodeId) {
-                    found = true;
-                }
-
-            });
-
-            if (!lastNode) {
-                for (var i = 0; i < M.v.length; i++) {
-                    if (M.v[i].h !== currentNodeId) {
-                        lastNode = M.v[i].h;
-                        break;
-                    }
-                }
-            }
-
-            if (!lastNode) {
-                // no nodes? close
-                slideshow(undefined, true);
-                slideshowCalled = true;
-            }
-            else {
-                // go back 1 node, since slideshow_steps crashes.
-                slideshow(lastNode, undefined, true);
-                slideshowCalled = true;
-            }
-        }
-    });
-
-    slideshowid && !slideshowCalled && slideshow(slideshowid, undefined, true);
-
-};
-
-ChatRoom.prototype._rebuildAttachments = SoonFc(ChatRoom.prototype._rebuildAttachmentsImmediate, 300);
-
-/**
- * Queue up a load of an image/preview (type 1) for a node.
- *
- * @param node {Object} MegaNode-like (.h) object
- */
-ChatRoom.prototype.loadImage = function(node) {
-    "use strict";
-
-    var self = this;
-
-    if (preqs[node.h] || pfails[node.h] || self.getCachedImageURI(node)) {
-        onIdle(self._doneLoadingImage.bind(self, node));
-    }
-    else if (!self._imagesLoading[node.h]) {
-        self._imagesLoading[node.h] = true;
-        self._imagesToBeLoaded[node.h] = node;
-        delay('ChatRoom[' + self.roomId + ']:doLoadImages', self._doLoadImages.bind(self), 90);
-    }
-};
-
-/**
- * Internal - called when an image is loaded in previews
- *
- * @param node {Object} MegaNode-like object
- * @private
- */
-ChatRoom.prototype._doneLoadingImage = function(node) {
-    "use strict";
-
-    var imgNode = document.getElementById(node.imgId || node.h);
-
-    if (imgNode && (imgNode = imgNode.querySelector('img'))) {
-        var src = this.getCachedImageURI(node);
-        var container = imgNode.parentNode.parentNode;
-
-        if (src) {
-            imgNode.setAttribute('src', src);
-            container.classList.add('thumb');
-            container.classList.remove('thumb-loading');
-        }
-        else {
-            imgNode.setAttribute('src', window.noThumbURIs || '');
-            container.classList.add('thumb-failed');
-            container.classList.remove('thumb-loading');
-        }
-
-        node.seen = 2;
-    }
-
-    // trigger React DOM update if needed, by notifying the message there is data that changed.
-    var self = this;
-    if (self.attachments[node.h]) {
-        self.attachments[node.h].keys().forEach(function(foundInMessageId) {
-            var msg = self.messagesBuff.messages[foundInMessageId];
-            if (msg) {
-                msg.trackDataChange();
-            }
-        });
-    }
-};
-
-/**
- * Returns the cached Blob URI for a media resource, if any
- * @param {Object|String} n An ufs-node or handle
- */
-ChatRoom.prototype.getCachedImageURI = function(n) {
-    var h = n && typeof n === 'object' && n.h || n;
-
-    return this._mediaAttachmentsCache[h] || (previews[h] && (previews[h].poster || previews[h].src));
-};
-
-/**
- * Called when an image starts loading from the preview servers
- *
- * @param node {Object} MegaNode-like object
- * @private
- */
-ChatRoom.prototype._startedLoadingImage = function(node) {
-    "use strict";
-
-    // to be used in the UI with the next design changes.
-    var imgNode = document.getElementById(node.imgId || node.h);
-
-    if (imgNode && (imgNode = imgNode.querySelector('img'))) {
-        imgNode.parentNode.parentNode.classList.add('thumb-loading');
-    }
-};
-
-
-/**
- * Internal method for `_doLoadImages` that dereferences .fa_dups and returns a deduped list of nodes as an array
- *
- * @param imagesToBeLoaded {Object}
- * @param origNodeHandle
- * @returns {*[]}
- * @private
- */
-ChatRoom.prototype._getDedupedNodesForThumbanils = function(imagesToBeLoaded, origNodeHandle) {
-    "use strict";
-
-    var origNode = imagesToBeLoaded[origNodeHandle];
-    var nodes = [origNode];
-    if (origNode.fa_dups) {
-        nodes = nodes.concat(origNode.fa_dups);
-    }
-
-    return nodes;
-};
-
-/**
- * Actual code that is throttled and does load a bunch of queued images
- *
- * @private
- */
-ChatRoom.prototype._doLoadImages = function() {
-    "use strict";
-
-    var self = this;
-    var dups = Object.create(null);
-    var thumbToLoad = Object.create(null);
-    var imagesToBeLoaded = self._imagesToBeLoaded;
-    self._imagesToBeLoaded = Object.create(null);
-
-    // dedup the same .fa's as in fm_thumbnails
-    for (var k in imagesToBeLoaded) {
-        var node = imagesToBeLoaded[k];
-        if (dups[node.fa]) {
-            dups[node.fa].fa_dups = dups[node.fa].fa_dups || [];
-            dups[node.fa].fa_dups.push(node);
-
-            delete imagesToBeLoaded[k];
-        }
-        else {
-            dups[node.fa] = node;
-        }
-
-        if (String(node.fa).indexOf(':1*') < 0) {
-            if (String(node.fa).indexOf(':0*') > 0) {
-                if (d) {
-                    console.debug('Chat loading thumbnail for %s since it has no preview fa', node.h, node);
-                }
-                thumbToLoad[node.h] = node;
-            }
-            else if (d) {
-                console.warn('Chat cannot load image for %s since it has no suitable file attribute.', node.h, node);
-            }
-            delete imagesToBeLoaded[k];
-        }
-    }
-
-    var chatImageParser = function(h, data) {
-        var isThumbnail = thumbToLoad[h];
-        var nodes = self._getDedupedNodesForThumbanils(isThumbnail ? thumbToLoad : imagesToBeLoaded, h);
-
-        for (var i = nodes.length; i--;) {
-            var n = nodes[i];
-            h = n.h;
-
-            if (data !== 0xDEAD) {
-                if (!isThumbnail && !previews[h] && is_image3(n)) {
-                    preqs[h] = 1;
-                    previewimg(h, data, 'image/jpeg');
-                    previews[h].fromChat = Date.now();
-                }
-                else {
-                    self._mediaAttachmentsCache[h] = mObjectURL([data.buffer || data], 'image/jpeg');
-                }
-            }
-            else {
-                if (d) {
-                    console.error('Failed to load image for %s', h);
-                }
-                self._mediaAttachmentsCache[h] = false;
-            }
-            delete self._imagesLoading[h];
-            self._doneLoadingImage(n);
-        }
-    };
-
-    var onSuccess = function(ctx, origNodeHandle, data) {
-        chatImageParser(origNodeHandle, data);
-    };
-
-    var onError = function(origNodeHandle) {
-        chatImageParser(origNodeHandle, 0xDEAD);
-    };
-
-    api_getfileattr(imagesToBeLoaded, 1, onSuccess, onError);
-
-    if ($.len(thumbToLoad)) {
-        api_getfileattr(thumbToLoad, 0, onSuccess, onError);
-    }
-
-    [imagesToBeLoaded, thumbToLoad].forEach(function(obj) {
-        Object.keys(obj).forEach(function(handle) {
-            self._startedLoadingImage(obj[handle]);
-        });
-    });
 };
 
 window.ChatRoom = ChatRoom;

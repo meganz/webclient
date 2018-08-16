@@ -324,5 +324,6 @@ function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
 function closeDialog() {}
+function slideshow_handle() {}
 /* jshint +W098 */
 /* jshint +W007 */

@@ -308,14 +308,12 @@ var GenericConversationMessage = React.createClass({
             // prevent launching the previewer clicking the dropdown on an previewable item without thumbnail
             return;
         }
-        var chatRoom = this.props.message.chatRoom;
         assert(M.chat, 'Not in chat.');
-        chatRoom._rebuildAttachmentsImmediate();
 
         if (is_video(v)) {
             $.autoplay = v.h;
         }
-        slideshow(v.h, undefined, true);
+        slideshow(v.ch, undefined, true);
         if (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -332,23 +330,20 @@ var GenericConversationMessage = React.createClass({
         var timestampInt = self.getTimestamp();
         var timestamp = self.getTimestampAsString();
 
-        var textMessage;
-
-
         var additionalClasses = "";
         var buttonsBlock = null;
         var spinnerElement = null;
         var messageNotSendIndicator = null;
         var messageIsNowBeingSent = false;
         var subMessageComponent = [];
-
+        var attachmentMeta = false;
         var extraPreButtons = [];
 
         if (this.props.className) {
             additionalClasses += this.props.className;
         }
 
-        if (message.revoked) {
+        if (message.revoked || !M.chat) {
             // skip doing tons of stuff and just return null, in case this message was marked as revoked.
             return null;
         }
@@ -380,161 +375,87 @@ var GenericConversationMessage = React.createClass({
                 message.wasRendered = 1;
             }
 
-            textMessage = message.messageHtml;
+            var textMessage = message.messageHtml;
 
+            var state = message.getState();
+            var stateText = message.getStateText(state);
+            var textContents = message.textContents || false;
+            var displayName = contact && generateAvatarMeta(contact.u).fullName || '';
 
-            if (
-                (message instanceof Message) ||
-                (typeof(message.userId) !== 'undefined' && message.userId === u_handle)
-            ) {
-                if (
-                    message.getState() === Message.STATE.NULL
-                ) {
-                    additionalClasses += " error";
-                }
-                else if (
-                    message.getState() === Message.STATE.NOT_SENT
-                ) {
-                    messageIsNowBeingSent = (unixtime() - message.delay < 5);
+            if (state === Message.STATE.NOT_SENT) {
+                messageIsNowBeingSent = (unixtime() - message.delay < 5);
 
+                if (!messageIsNowBeingSent) {
+                    additionalClasses += " not-sent";
 
-                    if (!messageIsNowBeingSent) {
-                        additionalClasses += " not-sent";
+                    if (message.sending === true) {
+                        message.sending = false;
+                        $(message).trigger('onChange', [message, "sending", true, false]);
+                    }
 
-                        if (message.sending === true) {
-                            message.sending = false;
-
-
-                            $(message).trigger(
-                                'onChange',
-                                [
-                                    message,
-                                    "sending",
-                                    true,
-                                    false
-                                ]
-                            );
-                        }
-
-                        if (!message.requiresManualRetry) {
-                            additionalClasses += " retrying";
-                        }
-                        else {
-                            additionalClasses += " retrying requires-manual-retry";
-                        }
-
-                        buttonsBlock = null;
+                    if (!message.requiresManualRetry) {
+                        additionalClasses += " retrying";
                     }
                     else {
-                        additionalClasses += " sending";
-                        spinnerElement = <div className="small-blue-spinner"></div>;
-
-                        if (!message.sending) {
-                            message.sending = true;
-                            if (self._rerenderTimer) {
-                                clearTimeout(self._rerenderTimer);
-                            }
-                            self._rerenderTimer = setTimeout(function () {
-                                if (chatRoom.messagesBuff.messages[message.messageId] && message.sending === true) {
-                                    chatRoom.messagesBuff.trackDataChange();
-                                    if (self.isMounted()) {
-                                        self.forceUpdate();
-                                    }
-                                }
-                            }, (5 - (unixtime() - message.delay)) * 1000);
-                        }
+                        additionalClasses += " retrying requires-manual-retry";
                     }
-                }
-                else if (message.getState() === Message.STATE.SENT) {
-                    additionalClasses += " sent";
-                }
-                else if (message.getState() === Message.STATE.DELIVERED) {
-                    additionalClasses += " delivered";
-                }
-                else if (message.getState() === Message.STATE.NOT_SEEN) {
-                    additionalClasses += " unread";
-                }
-                else if (message.getState() === Message.STATE.SEEN) {
-                    additionalClasses += " seen";
-                }
-                else if (message.getState() === Message.STATE.DELETED) {
-                    additionalClasses += " deleted";
+
+                    buttonsBlock = null;
                 }
                 else {
-                    additionalClasses += " not-sent";
+                    additionalClasses += " sending";
+                    spinnerElement = <div className="small-blue-spinner"></div>;
+
+                    if (!message.sending) {
+                        message.sending = true;
+                        if (self._rerenderTimer) {
+                            clearTimeout(self._rerenderTimer);
+                        }
+                        self._rerenderTimer = setTimeout(function() {
+                            if (chatRoom.messagesBuff.messages[message.messageId] && message.sending === true) {
+                                chatRoom.messagesBuff.trackDataChange();
+                                if (self.isMounted()) {
+                                    self.forceUpdate();
+                                }
+                            }
+                        }, (5 - (unixtime() - message.delay)) * 1000);
+                    }
                 }
             }
-
-            var displayName;
-            if (contact) {
-                displayName = generateAvatarMeta(contact.u).fullName;
-            }
             else {
-                displayName = contact;
+                additionalClasses += ' ' + stateText;
             }
-
-            var textContents = message.textContents || false;
 
             if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
                 if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
                     attachmentMeta = message.getAttachmentMeta() || [];
 
                     var files = [];
-
-                    self.attachments = [];
-
                     attachmentMeta.forEach(function(v, attachmentKey) {
-                        self.attachments.push(v);
 
-                        var attachmentMetaInfo;
-                        // cache ALL current attachments, so that we can revoke them later on in an ordered way.
-                        if (message.messageId) {
-                            if (
-                                chatRoom.attachments &&
-                                chatRoom.attachments[v.h] &&
-                                chatRoom.attachments[v.h][message.messageId]
-                            ) {
-                                attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
-                            }
-                            else {
-                                // if the chatRoom.attachments is not filled in yet, just skip the rendering
-                                // and this attachment would be re-rendered on the next loop.
-                                return;
-                            }
-                        }
-
-                        if (attachmentMetaInfo.revoked) {
+                        if (!M.chd[v.ch] || v.revoked) {
                             // don't show revoked files
                             return;
                         }
 
-
                         // generate preview/icon
                         var icon = fileIcon(v);
+                        var mediaType = is_video(v);
                         var isImage = is_image2(v);
-                        var isVideo = is_video(v) > 0;
-                        var showThumbnail = v.fa && isImage || String(v.fa).indexOf(':0*') > 0;
+                        var isVideo = mediaType > 0;
+                        var isAudio = mediaType > 1;
+                        var showThumbnail = String(v.fa).indexOf(':1*') > 0;
                         var isPreviewable = isImage || isVideo;
 
                         var dropdown = null;
                         var noThumbPrev = '';
                         var previewButton = null;
 
-                        if (showThumbnail || isImage) {
-                            var imagesListKey = message.messageId + "_" + v.h;
-                            if (!chatRoom.images.exists(imagesListKey)) {
-                                v.id = imagesListKey;
-                                v.orderValue = message.orderValue;
-                                v.messageId = message.messageId;
-                                chatRoom.images.push(v);
-                            }
-                        }
-
                         if (isPreviewable) {
                             if (!showThumbnail) {
                                 noThumbPrev = 'no-thumb-prev';
                             }
-                            var previewLabel = isVideo ? l[17732] : l[1899];
+                            var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
                             previewButton = <span key="previewButton">
                                     <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
                                                               onClick={self._startPreview.bind(self, v)}/>
@@ -692,19 +613,9 @@ var GenericConversationMessage = React.createClass({
                             </div>
                         </div>;
 
-                        if (M.chat && showThumbnail && !message.revoked) {
-                            var src = chatRoom.getCachedImageURI(v);
-
-                            if (!src) {
-                                v.seen = 1;
-                                chatRoom.loadImage(v);
-                                src = window.noThumbURI || '';
-                            }
-                            if (!v.imgId) {
-                                v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
-                            }
-
-                            var thumbClass = src === window.noThumbURI ? " no-thumb" : "";
+                        if (showThumbnail) {
+                            var src = v.src || window.noThumbURI || '';
+                            var thumbClass = v.src ? '' : " no-thumb";
                             var thumbOverlay = null;
 
                             if (isImage) {
@@ -726,19 +637,19 @@ var GenericConversationMessage = React.createClass({
                                 </div>;
                             }
 
-                            preview = (src ? (<div id={v.imgId} className={"shared-link thumb " + thumbClass}>
+                            preview = (src ? (<div id={v.ch} className={"shared-link thumb " + thumbClass}>
                                 {thumbOverlay}
                                 {dropdown}
 
                                 <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
-                                     key={src === window.noThumbURI ? v.imgId : src}
+                                     key={'thumb-' + v.ch}
                                      onClick={isPreviewable && self._startPreview.bind(self, v)}
                                 />
                             </div>) : preview);
                         }
 
                         files.push(
-                            <div className={attachmentClasses} key={v.h}>
+                            <div className={attachmentClasses} key={'atch-' + v.ch}>
                                 <div className="message shared-info">
                                     <div className="message data-title">
                                         {__(l[17669])}

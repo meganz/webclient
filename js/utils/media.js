@@ -2124,7 +2124,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
     var miCollectedBytes = 0;
     var miCollectRunning = 0;
     var miCollectProcess = function() {
-        if (localStorage.noMediaCollect || miCollectedBytes > 0x1000000) {
+        if (localStorage.noMediaCollect || miCollectedBytes > 0x1000000 || M.chat) {
             return 0xDEAD;
         }
 

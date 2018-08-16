@@ -3427,7 +3427,7 @@ function fm_thumbnails()
         fa_tnwait = y;
     if (d)
         console.time('fm_thumbnails');
-    if (M.viewmode || M.chat)
+    if (M.viewmode && !M.chat)
     {
         for (var i in M.v)
         {
@@ -3526,7 +3526,7 @@ function fm_thumbnails()
 
 function fm_thumbnail_render(n) {
     if (n && thumbnails[n.h]) {
-        var imgNode = document.getElementById(n.imgId || n.h);
+        var imgNode = document.getElementById(n.h);
 
         if (imgNode && (imgNode = imgNode.querySelector('img'))) {
             n.seen = 2;

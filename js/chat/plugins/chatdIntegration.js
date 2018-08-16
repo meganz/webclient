@@ -865,9 +865,8 @@ ChatdIntegration._ensureNamesAreLoaded = function(users) {
     }
 };
 
-
 ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
-    var textContents = message.textContents ? message.textContents : message.message;
+    var textContents = message.textContents || message.message || false;
 
     // reset any flags for what was processed in this message, since it just changed (was edited, or
     // decrypted).
@@ -875,131 +874,22 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
     message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
     message.decrypted = true;
 
-    if (
-        textContents &&
-        textContents.substr &&
-        textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT
-    ) {
-        if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
-            try {
-                var attachmentMeta = JSON.parse(textContents.substr(2));
-            } catch(e) {
-                // debugger;
-                return null;
-            }
+    if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+        if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
 
-
-            attachmentMeta.forEach(function(v) {
-                var attachmentMetaInfo;
-                // cache ALL current attachments, so that we can revoke them later on in an ordered way.
-                if (message.messageId) {
-                    if (!chatRoom.attachments.exists(v.h)) {
-                        chatRoom.attachments.set(v.h, new MegaDataMap(chatRoom.attachments));
-                    }
-
-                    if (!chatRoom.attachments[v.h].exists(message.messageId)) {
-                        chatRoom.attachments[v.h].set(
-                            message.messageId,
-                            attachmentMetaInfo = new MegaDataObject({
-                                messageId: message.messageId,
-                                revoked: false
-                            })
-                        );
-                        attachmentMetaInfo._parent = chatRoom.attachments;
-                    }
-                    else {
-                        attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
-                    }
-                }
-
-                // generate preview/icon
-                if (!attachmentMetaInfo.revoked && !message.revoked) {
-                    if (v.fa && is_image2(v) || String(v.fa).indexOf(':0*') > 0) {
-                        var imagesListKey = message.messageId + "_" + v.h;
-                        if (!chatRoom.images.exists(imagesListKey)) {
-                            v.id = imagesListKey;
-                            v.orderValue = message.orderValue;
-                            v.messageId = message.messageId;
-                            chatRoom.images.push(v);
-                        }
-                    }
-                }
-            });
+            message._onAttachmentReceived(textContents.substr(2));
         }
-        else if (
-            textContents &&
-            textContents.substr &&
-            textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT
-        ) {
-            var foundRevokedNode = null;
-
+        else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
             var revokedNode = textContents.substr(2, textContents.length);
 
-            if (chatRoom.attachments.exists(revokedNode)) {
-                chatRoom.attachments[revokedNode].forEach(function(obj) {
-                    var messageId = obj.messageId;
-                    var attachedMsg = chatRoom.messagesBuff.messages[messageId];
-
-                    var allAttachmentsRevoked = false;
-                    if (!attachedMsg) {
-                        return;
-                    }
-
-                    if (attachedMsg.orderValue < message.orderValue) {
-                        try {
-                            var attc = attachedMsg.textContents;
-                            var attachments = JSON.parse(attc.substr(2, attc.length));
-                            var revokedInSameMessage = 0;
-                            attachments.forEach(function(node) {
-                                if (node.h === revokedNode) {
-                                    foundRevokedNode = node;
-                                }
-                                if (
-                                    chatRoom.attachments[node.h] &&
-                                    chatRoom.attachments[node.h][messageId] &&
-                                    (
-                                        chatRoom.attachments[node.h][messageId].revoked === true ||
-                                        node.h === revokedNode
-                                    )
-                                ) {
-                                    revokedInSameMessage++;
-                                }
-                            });
-                            if (revokedInSameMessage === attachments.length) {
-                                allAttachmentsRevoked = true;
-                            }
-                        } catch(e) {
-                        }
-
-                        obj.revoked = true;
-                        // mark the whole message as revoked if all attachments in it are marked as revoked.
-                        if (allAttachmentsRevoked) {
-                            attachedMsg.revoked = true;
-                        }
-                        else {
-                            // force re-render
-                            attachedMsg.trackDataChange();
-                        }
-
-                        if (!attachedMsg.seen) {
-                            attachedMsg.seen = true;
-                            if (chatRoom.messagesBuff._unreadCountCache > 0) {
-                                chatRoom.messagesBuff._unreadCountCache--;
-                                chatRoom.messagesBuff.trackDataChange();
-                                chatRoom.megaChat.updateSectionUnreadCount();
-                            }
-                        }
-                    }
-                });
-            }
+            message._onAttachmentRevoked(revokedNode);
 
             // don't show anything if this is a 'revoke' message
             return null;
         }
         else if (
-            textContents.substr &&
-            textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META &&
-            textContents.substr(2, 1) === Message.MESSAGE_META_TYPE.RICH_PREVIEW
+            textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META &&
+            textContents[2] === Message.MESSAGE_META_TYPE.RICH_PREVIEW
         ) {
             var meta = textContents.substr(3, textContents.length);
             try {

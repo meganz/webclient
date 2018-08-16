@@ -120,7 +120,7 @@
     "396": "Acerca de nosotros",
     "398": "Cuenta PRO",
     "399": "Cont\u00e1ctanos",
-    "403": "Tu cuenta",
+    "403": "Mi cuenta",
     "405": "Herramientas",
     "408": "Enero",
     "409": "Febrero",
@@ -2664,5 +2664,9 @@
     "19223": "Carpetas compartidas externas",
     "19224": "Datos de las transferencias",
     "19225": "Transferencias totales",
-    "19226": "Transferencias diarias"
+    "19226": "Transferencias diarias",
+    "19282": "Invoices",
+    "19283": "Invoice List",
+    "19284": "View Details",
+    "19285": "Me:"
 }

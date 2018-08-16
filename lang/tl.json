@@ -999,6 +999,7 @@
     "7241": "Kailangan mong pumayag sa aming Terms of Service",
     "7272": "Maling format ng data",
     "7315": "Simulan",
+    "7331": "I-sort",
     "7337": "Seguridad",
     "7352": "State",
     "7354": "Renews on",
@@ -1657,6 +1658,7 @@
     "16401": "Account registration bonus",
     "16402": "Buksan ang bonuses:",
     "16448": "Ipagpatuloy ang Paglilipat",
+    "16462": "Katangian",
     "16471": "Mali ang ibinigay na key.",
     "16472": "Mangyaring tingnan muli kung tama ang key o tanongin ang gumawa ng link.",
     "16474": "Datihang bersyon",
@@ -1823,6 +1825,7 @@
     "16904": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
     "16927": "This action can not be completed as it would take you over your current storage limit",
     "17022": "Account Type",
+    "17023": "Date",
     "17081": "Incomplete transfer, do you want to resume it?",
     "17082": "Natapos na ang paglilipat. I-save na iyong file.",
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
@@ -1980,6 +1983,7 @@
     "17767": "Files sent to chat",
     "17768": "Terminated account",
     "17789": "The entered tax number is invalid.",
+    "17791": "Filter",
     "17792": "Your primary disk volume is full. Please free up some space and try again.",
     "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3].",
     "17794": "Initialising\u2026",
@@ -2660,5 +2664,9 @@
     "19223": "Incoming External Shares",
     "19224": "Transfer Analytics",
     "19225": "Total Transferred",
-    "19226": "Daily Transfer Volume"
+    "19226": "Daily Transfer Volume",
+    "19282": "Invoices",
+    "19283": "Invoice List",
+    "19284": "View Details",
+    "19285": "Me:"
 }

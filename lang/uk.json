@@ -999,6 +999,7 @@
     "7241": "\u0412\u0438 \u043f\u043e\u0432\u0438\u043d\u043d\u0456 \u043f\u043e\u0433\u043e\u0434\u0438\u0442\u0438\u0441\u044f \u0437 \u043d\u0430\u0448\u0438\u043c\u0438 \u0423\u043c\u043e\u0432\u0430\u043c\u0438 \u043d\u0430\u0434\u0430\u043d\u043d\u044f \u043f\u043e\u0441\u043b\u0443\u0433",
     "7272": "\u041d\u0435\u0432\u0456\u0440\u043d\u0438\u0439 \u0444\u043e\u0440\u043c\u0430\u0442 \u0434\u0430\u043d\u0438\u0445",
     "7315": "\u041f\u043e\u0447\u0430\u0442\u043e\u043a",
+    "7331": "\u0421\u043e\u0440\u0442\u0443\u0432\u0430\u0442\u0438",
     "7337": "\u0411\u0435\u0437\u043f\u0435\u043a\u0430",
     "7352": "\u0428\u0442\u0430\u0442",
     "7354": "\u0412\u0456\u0434\u043d\u043e\u0432\u043b\u0435\u043d\u043d\u044f \u043d\u0430",
@@ -1657,6 +1658,7 @@
     "16401": "Account registration bonus",
     "16402": "Unlocked bonuses:",
     "16448": "\u041f\u0440\u043e\u0434\u043e\u0432\u0436\u0438\u0442\u0438 \u043f\u0435\u0440\u0435\u0434\u0430\u0447\u0456",
+    "16462": "Description",
     "16471": "The provided key is invalid.",
     "16472": "Please check that the key is correct or ask the creator of the link again.",
     "16474": "Previous versions",
@@ -1823,6 +1825,7 @@
     "16904": "\u0411\u0435\u0440\u0443\u0447\u0438 \u0443\u0447\u0430\u0441\u0442\u044c \u0443 \u043d\u0430\u0448\u0456\u0439 \u043f\u0440\u043e\u0433\u0440\u0430\u043c\u0456 \u0434\u043e\u0441\u044f\u0433\u043d\u0435\u043d\u044c, \u0432\u0438 \u043c\u043e\u0436\u0435\u0442\u0435 \u043e\u0442\u0440\u0438\u043c\u0430\u0442\u0438 \u0434\u043e\u0434\u0430\u0442\u043a\u043e\u0432\u0435 \u043c\u0456\u0441\u0446\u0435 \u0434\u043b\u044f \u0437\u0431\u0435\u0440\u0435\u0436\u0435\u043d\u043d\u044f \u0456 \u043a\u0432\u043e\u0442\u0438 \u043d\u0430 \u043f\u0435\u0440\u0435\u0434\u0430\u0447\u0443 \u0434\u0430\u043d\u0438\u0445, \u044f\u043a\u0449\u043e \u0432\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u0435 \u0434\u043e\u0434\u0430\u0442\u043a\u0438 MEGA \u0430\u0431\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0438\u0442\u0435 \u0434\u0440\u0443\u0437\u0456\u0432 \u0434\u043e MEGA (\u0430\u043a\u0442\u0438\u0432\u0430\u0446\u0456\u044f \u043c\u043e\u0436\u0435 \u0437\u0430\u0439\u043d\u044f\u0442\u0438 \u0434\u0435\u043a\u0456\u043b\u044c\u043a\u0430 \u0434\u043d\u0456\u0432).",
     "16927": "This action can not be completed as it would take you over your current storage limit",
     "17022": "Account Type",
+    "17023": "Date",
     "17081": "Incomplete transfer, do you want to resume it?",
     "17082": "Completed transfer. Please save your file.",
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
@@ -1980,6 +1983,7 @@
     "17767": "Files sent to chat",
     "17768": "Terminated account",
     "17789": "The entered tax number is invalid.",
+    "17791": "Filter",
     "17792": "Your primary disk volume is full. Please free up some space and try again.",
     "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3].",
     "17794": "Initialising\u2026",
@@ -2660,5 +2664,9 @@
     "19223": "Incoming External Shares",
     "19224": "Transfer Analytics",
     "19225": "Total Transferred",
-    "19226": "Daily Transfer Volume"
+    "19226": "Daily Transfer Volume",
+    "19282": "Invoices",
+    "19283": "Invoice List",
+    "19284": "View Details",
+    "19285": "Me:"
 }

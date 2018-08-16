@@ -999,6 +999,7 @@
     "7241": "U moet akkoord gaan met onze Algemene Voorwaarden",
     "7272": "Dataformaat verkeerd",
     "7315": "Start",
+    "7331": "Sorteer",
     "7337": "Veiligheid",
     "7352": "Staat",
     "7354": "Vernieuwd op",
@@ -1657,6 +1658,7 @@
     "16401": "Account registratie bonus",
     "16402": "Geopende bonussen:",
     "16448": "Hervat Overdrachten",
+    "16462": "Omschrijving",
     "16471": "De gegeven sleutel is ongeldig.",
     "16472": "Controleer of de sleutel juist is of vraag de maker van de koppeling nogmaals.",
     "16474": "Vorige Versies",
@@ -1823,6 +1825,7 @@
     "16904": "Of neem deel aan in ons beloningsprogramma, waar u gratis opslag & overdracht tegoed kunt verdienen als u MEGA applicaties installeert of vrienden uitnodigt bij MEGA (activatie kan enkele dagen duren).",
     "16927": "Deze actie kan niet worden voltooid omdat het u over de huidige opslaglimiet brengt.",
     "17022": "Account Soort",
+    "17023": "Datum",
     "17081": "Incomplete overdracht, wilt u het hervatten?",
     "17082": "Voltooide overdracht. Uw bestand opslaan",
     "17083": "De MEGA Universele Windows Applicatie wordt momenteel ontwikkeld. U kunt de beta versie van de applicatie [A]hier[\/A] krijgen.",
@@ -1980,6 +1983,7 @@
     "17767": "Bestanden verstuurd naar gesprek",
     "17768": "Be\u00ebindigde account",
     "17789": "Het ingevoerde btw nummer is ongeldig.",
+    "17791": "Filter",
     "17792": "Uw primaire schijf inhoud is vol. Maak ruimte vrij en probeer nogmaals.",
     "17793": "Helaas, geeft Chrome MEGA toestemming om alleen een deel te gebruiken van uw beschikbare schijf ruimte die momenteel onvoldoende is. Installeer de [A1]MEGA desktop app[\/A1] of onze [A2]Chrome Extensie[\/A2], of probeer [A3]wat ruimte vrij te maken[\/A3].",
     "17794": "Initialiseren...",
@@ -2660,5 +2664,9 @@
     "19223": "Binnenkomende Externe Gedeeld",
     "19224": "Analytiek Overdragen",
     "19225": "Totaal Overgedragen",
-    "19226": "Dagelijkse Overdracht Hoeveelheid"
+    "19226": "Dagelijkse Overdracht Hoeveelheid",
+    "19282": "Invoices",
+    "19283": "Invoice List",
+    "19284": "View Details",
+    "19285": "Me:"
 }

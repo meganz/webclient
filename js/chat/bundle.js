@@ -1293,7 +1293,7 @@ React.makeElement = React['createElement'];
 	        } else {
 	            renderableSummary = lastMessage.textContents;
 	        }
-	        renderableSummary = renderableSummary && removeHTML(renderableSummary, true) || '';
+	        renderableSummary = renderableSummary && escapeHTML(renderableSummary, true) || '';
 
 	        var escapeUnescapeArgs = [{ 'type': 'onPreBeforeRenderMessage', 'textOnly': true }, { 'message': { 'textContents': renderableSummary } }, ['textContents', 'messageHtml'], 'messageHtml'];
 
@@ -1313,9 +1313,46 @@ React.makeElement = React['createElement'];
 	        renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
 	        renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
 	    }
+
+	    var author = Message.getContactForMessage(lastMessage);
+	    if (author) {
+	        if (!lastMessage._contactChangeListener && author.addChangeListener) {
+	            lastMessage._contactChangeListener = author.addChangeListener(function () {
+	                delete lastMessage.renderableSummary;
+	            });
+	        }
+
+	        if (lastMessage.chatRoom.type === "private") {
+	            if (author && author.u === u_handle) {
+	                renderableSummary = l[19285] + " " + renderableSummary;
+	            }
+	        } else if (lastMessage.chatRoom.type === "group") {
+	            if (author) {
+	                if (author.u === u_handle) {
+	                    renderableSummary = l[19285] + " " + renderableSummary;
+	                } else {
+	                    var name = M.getNameByHandle(author.u);
+	                    if (String(name).length > 10) {
+	                        if (author.firstName) {
+	                            name = author.firstName;
+	                            if (author.lastName && String(author.lastName).length > 0) {
+	                                var letter = String(author.lastName)[0];
+	                                if (letter && letter.toUpperCase()) {
+	                                    name += " " + letter.toUpperCase();
+	                                }
+	                            }
+	                        }
+	                    }
+	                    name = ellipsis(name, undefined, 11);
+	                    if (name) {
+	                        renderableSummary = escapeHTML(name) + ": " + renderableSummary;
+	                    }
+	                }
+	            }
+	        }
+	    }
 	    return renderableSummary;
 	};
-
 	var getRoomName = function getRoomName(chatRoom) {
 	    return chatRoom.getRoomTitle();
 	};
@@ -1413,9 +1450,11 @@ React.makeElement = React['createElement'];
 	        var lastMessageDiv = null;
 	        var lastMessageDatetimeDiv = null;
 	        var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
+	        var lastMsgDivClasses;
 	        if (lastMessage) {
-	            var lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
-	            var renderableSummary = renderMessageSummary(lastMessage);
+	            lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
+
+	            var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
 	            lastMessage.renderableSummary = renderableSummary;
 
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });
@@ -1438,7 +1477,7 @@ React.makeElement = React['createElement'];
 	                curTimeMarker
 	            );
 	        } else {
-	            var lastMsgDivClasses = "conversation-message";
+	            lastMsgDivClasses = "conversation-message";
 
 	            var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
 
@@ -1561,7 +1600,7 @@ React.makeElement = React['createElement'];
 	        var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
 	        if (lastMessage) {
 	            var lastMsgDivClasses = "conversation-message";
-	            var renderableSummary = renderMessageSummary(lastMessage);
+	            var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
 	            lastMessage.renderableSummary = renderableSummary;
 
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });

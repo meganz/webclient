@@ -1035,18 +1035,12 @@ ChatRoom.prototype.attachNodes = function(ids) {
 };
 
 
-ChatRoom.prototype.lookupPendingUpload = function(faid, handle) {
-    if (!this.pendingUploads) {
-        return;
-    }
-    assert(faid || handle, 'lookupPendingUpload is missing both faid and handle args.');
+ChatRoom.prototype.lookupPendingUpload = function(id) {
+    console.assert((id | 0) > 0 || String(id).length === 8, 'Invalid lookupPendingUpload arguments...');
 
     // find pending upload id by faid
-    for (var uid in this.pendingUploads) {
-        if (
-            (faid && this.pendingUploads[uid].faid === faid) ||
-            (handle && this.pendingUploads[uid].h === handle)
-        ) {
+    for (var uid in ulmanager.ulEventData) {
+        if (ulmanager.ulEventData[uid].faid === id || ulmanager.ulEventData[uid].h === id) {
             return uid;
         }
     }
@@ -1059,25 +1053,18 @@ ChatRoom.prototype.onUploadError = function(uid, error) {
         logger.debug(error === -0xDEADBEEF ? 'upload:abort' : 'upload.error', uid, error);
     }
 
-    var ul = self.pendingUploads && self.pendingUploads[uid] || false;
+    var ul = ulmanager.ulEventData[uid];
 
     // handle the onUploadError and if no more uploads are queued - clear any listeners
     if (ul) {
-        delete this.pendingUploads[uid];
-        if (Object.keys(this.pendingUploads).length === 0) {
-            this.clearUploadListeners();
-        }
+        delete ulmanager.ulEventData[uid];
+        this.clearUploadListeners();
     }
 };
 
 
 ChatRoom.prototype.onUploadStart = function(data) {
     var self = this;
-    if (!self.pendingUploads) {
-        self.pendingUploads = Object.create(null);
-    }
-
-    Object.assign(self.pendingUploads, data);
 
     // perhaps make this more lightweight by just queueing data[].chat entries
 
@@ -1100,7 +1087,7 @@ ChatRoom.prototype.onUploadStart = function(data) {
                 }
 
                 var n = M.d[handle];
-                var ul = self.pendingUploads && self.pendingUploads[uid] || false;
+                var ul = ulmanager.ulEventData[uid] || false;
 
                 if (d) {
                     logger.debug('upload:completion', uid, handle, faid, ul, n);
@@ -1108,7 +1095,9 @@ ChatRoom.prototype.onUploadStart = function(data) {
 
                 if (!ul || !n) {
                     // This should not happen...
-                    logger.error('Invalid state error...');
+                    if (d) {
+                        logger.error('Invalid state error...');
+                    }
                 }
                 else {
                     ul.h = handle;
@@ -1135,11 +1124,11 @@ ChatRoom.prototype.onUploadStart = function(data) {
 
         self.uploadListeners.push(
             mBroadcaster.addListener('fa:error', function(faid, error, onStorageAPIError, nFAiled) {
-                var uid = self.lookupPendingUpload(faid, faid);
-                var ul = self.pendingUploads && self.pendingUploads[uid] || false;
+                var uid = self.lookupPendingUpload(faid);
+                var ul = ulmanager.ulEventData[uid] || false;
 
                 if (d) {
-                    logger.debug('fa:error', faid, error, onStorageAPIError, uid, ul);
+                    logger.debug('fa:error', faid, error, onStorageAPIError, uid, ul, nFAiled, ul.efa);
                 }
 
                 // Attaching some fa to the node failed.
@@ -1163,8 +1152,8 @@ ChatRoom.prototype.onUploadStart = function(data) {
         self.uploadListeners.push(
             mBroadcaster.addListener('fa:ready', function(handle, fa) {
                 delay('chat:fa-ready:' + handle, function() {
-                    var uid = self.lookupPendingUpload(false, handle);
-                    var ul = self.pendingUploads && self.pendingUploads[uid] || false;
+                    var uid = self.lookupPendingUpload(handle);
+                    var ul = ulmanager.ulEventData[uid] || false;
 
                     if (d) {
                         logger.debug('fa:ready', handle, fa, uid, ul);
@@ -1184,22 +1173,19 @@ ChatRoom.prototype.onUploadStart = function(data) {
 };
 
 ChatRoom.prototype.onUploadComplete = function(ul) {
-    if (this.pendingUploads && this.pendingUploads[ul.uid]) {
+    if (ulmanager.ulEventData[ul && ul.uid]) {
         if (d) {
             console.debug('Attaching node to chat room...', ul.h, ul.uid, ul, M.d[ul.h]);
         }
         this.attachNodes([ul.h]);
-        delete this.pendingUploads[ul.uid];
-
-        // let's omit this for now...
-        // delete ulmanager.ulEventData[ul.uid];
+        delete ulmanager.ulEventData[ul.uid];
     }
 
     this.clearUploadListeners();
 };
 
 ChatRoom.prototype.clearUploadListeners = function() {
-    if (!this.pendingUploads || Object.keys(this.pendingUploads).length === 0) {
+    if (!$.len(ulmanager.ulEventData)) {
         for (var i = 0; i < this.uploadListeners.length; i++) {
             var listenerId = this.uploadListeners[i];
             mBroadcaster.removeListener(listenerId);

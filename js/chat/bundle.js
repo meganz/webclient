@@ -7919,7 +7919,6 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var Tooltips = __webpack_require__(14);
 	var ModalDialogsUI = __webpack_require__(13);
 
 	var BrowserCol = React.createClass({
@@ -7965,6 +7964,7 @@ React.makeElement = React['createElement'];
 	        };
 	    },
 	    getInitialState: function getInitialState() {
+
 	        return {
 	            'highlighted': [],
 	            'selected': []
@@ -8357,49 +8357,12 @@ React.makeElement = React['createElement'];
 	            var isFolder = node.t;
 	            var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
 
-	            var tooltipElement = null;
-
 	            var icon = React.makeElement(
 	                "span",
 	                {
 	                    className: "transfer-filetype-icon " + (isFolder ? " folder " : "") + fileIcon(node) },
 	                " "
 	            );
-
-	            if (is_image(node) && node.fa) {
-	                var src = thumbnails[node.h];
-	                if (!src) {
-	                    M.v.push(node);
-	                    if (!node.seen) {
-	                        node.seen = 1;
-	                    }
-	                    delay('thumbnails', fm_thumbnails, 90);
-	                    src = window.noThumbURI || '';
-	                }
-	                icon = React.makeElement(
-	                    Tooltips.Tooltip,
-	                    { withArrow: true },
-	                    React.makeElement(
-	                        Tooltips.Handler,
-	                        { className: "transfer-filetype-icon " + fileIcon(node) },
-	                        " "
-	                    ),
-	                    React.makeElement(
-	                        Tooltips.Contents,
-	                        { className: "img-preview" },
-	                        React.makeElement(
-	                            "div",
-	                            { className: "dropdown img-wrapper img-block", id: node.h },
-	                            React.makeElement("img", { alt: "",
-	                                className: "thumbnail-placeholder " + node.h,
-	                                src: src,
-	                                width: "156",
-	                                height: "156"
-	                            })
-	                        )
-	                    )
-	                );
-	            }
 
 	            items.push(React.makeElement(
 	                "tr",

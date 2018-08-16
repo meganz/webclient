@@ -874,7 +874,11 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
     message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
     message.decrypted = true;
 
-    if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+    if (!textContents || textContents === "") {
+        message.deleted = true;
+        message.trackDataChange();
+    }
+    else if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
         if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
 
             message._onAttachmentReceived(textContents.substr(2));

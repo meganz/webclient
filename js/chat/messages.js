@@ -699,12 +699,13 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         var origFn = self.messages[fnName];
 
         self.messages[fnName] = function(messageId, ignoreDB) {
-            var res = origFn.apply(this, arguments);
-
+            // should be called first..otherwise origFn.apply may delete the message and cause `msg` to be undefined.
             var msg = self.messages[messageId];
             if (msg) {
                 msg._onMessageAction(fnName);
             }
+
+            var res = origFn.apply(this, arguments);
 
             if (!ignoreDB && self.chatd.chatdPersist) {
                 chatdPersist.persistMessageBatched(
@@ -1098,6 +1099,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                                     eventData.messageId
                                 );
                             }
+                        }
+                        if (editedMessage.textContents === "") {
+                            editedMessage.deleted = true;
                         }
                     }
                     else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {

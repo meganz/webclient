@@ -2,7 +2,6 @@ var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
-var Tooltips = require("./tooltips.jsx");
 var ModalDialogsUI = require('./modalDialogs.jsx');
 
 var BrowserCol = React.createClass({
@@ -40,6 +39,7 @@ var BrowserEntries = React.createClass({
         }
     },
     getInitialState: function() {
+
         return {
             'highlighted': [],
             'selected': []
@@ -495,35 +495,10 @@ var BrowserEntries = React.createClass({
             var isFolder = node.t;
             var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
 
-            var tooltipElement = null;
 
             var icon = <span
                 className={"transfer-filetype-icon " + (isFolder ? " folder " : "") + fileIcon(node)}> </span>;
 
-            if (is_image(node) && node.fa) {
-                var src = thumbnails[node.h];
-                if (!src) {
-                    M.v.push(node);
-                    if (!node.seen) {
-                        node.seen = 1; // HACK
-                    }
-                    delay('thumbnails', fm_thumbnails, 90);
-                    src = window.noThumbURI || '';
-                }
-                icon = <Tooltips.Tooltip withArrow={true}>
-                    <Tooltips.Handler className={"transfer-filetype-icon " + fileIcon(node)}> </Tooltips.Handler>
-                    <Tooltips.Contents className={"img-preview"}>
-                        <div className="dropdown img-wrapper img-block" id={node.h}>
-                            <img alt=""
-                                 className={"thumbnail-placeholder " + node.h}
-                                 src={src}
-                                 width="156"
-                                 height="156"
-                            />
-                        </div>
-                    </Tooltips.Contents>
-                </Tooltips.Tooltip>;
-            }
 
             items.push(
                 <tr className={

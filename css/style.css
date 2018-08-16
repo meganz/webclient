@@ -28112,23 +28112,18 @@ opacity: 1;
     height: calc(100% - 40px);
 }
 
+.user-management-account-settings .invoice .invoice-table-header tr {
+        background-color: rgba(245,245,245,1);
+          border: 1px solid rgba(0,0,0,0.1);
+}
+
 .user-management-account-settings .invoice .invoice-table-header th {
     height: 32px;
     padding:0 12px;
-    background-color: rgba(245,245,245,1);
     font-size: 14px;
     color:#333;
 }
 
-.user-management-account-settings .invoice .invoice-table-header tr::after{
-    content: '';
-    position: absolute;
-    right: 0;
-    bottom: 0px;
-    height: 1px;
-    width: 100%;
-    background-color: rgba(0,0,0,0.1);
-}
 
 .user-management-account-settings .invoice .invoice-table-list-container {
     height: calc(100% - 33px);
@@ -28138,6 +28133,9 @@ opacity: 1;
 .user-management-account-settings .invoice .invoice-table tr {
     background-color: #fff;
     position: relative;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
+
 }
 
 .user-management-account-settings .invoice .invoice-table tr:hover {
@@ -28150,16 +28148,6 @@ opacity: 1;
     font-size: 14px;
     color: #888;
     position: relative;
-}
-
-.user-management-account-settings .invoice .invoice-table tr::after{
-    content: '';
-    position: absolute;
-    right: 0;
-    bottom: 0px;
-    height: 1px;
-    width: 100%;
-    background-color: rgba(0,0,0,0.1);
 }
 
 .user-management-account-settings .invoice .invoice-table-header th:first-child, .user-management-account-settings .invoice .invoice-table td:first-child{

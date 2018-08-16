@@ -473,7 +473,7 @@ $(document).ready(function() {
 					Add Users
 				</div>
 	        </div>
-			<div class="user-management-breadcrumb subaccount">
+			<div class="user-management-breadcrumb subaccount hidden">
 			    <div class="user-management-icon"></div>
 			    <div class="user-management-next-arrow"></div>
 			    <div class="user-management-subuser-avatars">
@@ -487,7 +487,7 @@ $(document).ready(function() {
 				<div class="user-management-breadcrumbs-img overview-icon"></div>
 				<div class="user-management-subuser-name">Overview</div>
 			</div>
-			<div class="user-management-breadcrumb hidden">
+			<div class="user-management-breadcrumb account">
 			    <div class="user-management-icon"></div>
 			    <div class="user-management-next-arrow"></div>
 				<div class="user-management-breadcrumbs-img account-icon"></div>
@@ -1092,7 +1092,7 @@ $(document).ready(function() {
 					</div>
 	        	</div>
 
-	        	<div class="setting-block">
+	        	<div class="setting-block hidden">
 	        		<div class="title">
 	        			<div class="share-icon48 icon48"></div>
 	        			Share              			
@@ -1119,7 +1119,7 @@ $(document).ready(function() {
 								</div>
 							</form>
 
-							<table class="share-table scroll-auto">
+							<table class="share-table">
 	                            <tr>
 	                                <th>Sharing users</th>
 	                                <th>Shared folders/files</th>
@@ -1410,36 +1410,43 @@ $(document).ready(function() {
 	        <div class="invoice">
 	        	<div class="invoice-list hidden">
 		        	<div class="invoice-subtitle">Invoice list</div>
-					<table class="invoice-table">
-	                    <tr>
-	                        <th>
-	                        	<div class="arrow asc">Date</div>
-	                        </th>
-	                        <th>
-	                        	<div class="arrow desc">Description</div>
-	                       </th>
-	                        <th>
-	                        	<div class="arrow desc">Amount</div>
-	                        </th>
-	                        <th></th>
-	                    </tr>
-	                    <tr>
-	                        <td class="">01 Aug 2018</td>
-	                        <td class="">Place description</td>
-	                        <td class="">$512.30</td>
-	                        <td>
-				 				<div class="default-white-button-user-management">View Details</div>
-	                        </td>
-	                    </tr>
-	                    <tr>
-	                        <td class="">01 Aug 2018</td>
-	                        <td class="">Place description</td>
-	                        <td class="">$512.30</td>
-	                        <td>
-				 				<div class="default-white-button-user-management">View Details</div>
-	                        </td>
-	                    </tr>
-					</table>
+		        	<div class="invoice-table-container">
+						<table class="invoice-table-header">
+		                    <tr>
+		                        <th>
+		                        	<div class="arrow asc">Date</div>
+		                        </th>
+		                        <th>
+		                        	<div class="arrow desc">Description</div>
+		                       </th>
+		                        <th>
+		                        	<div class="arrow desc">Amount</div>
+		                        </th>
+		                        <th></th>
+		                    </tr>
+		                 </table>
+		                 <div class="invoice-table-list-container">
+		                 <table class="invoice-table">
+		                    <tr>
+		                        <td class="">01 Aug 2018</td>
+		                        <td class="">Place description</td>
+		                        <td class="">$512.30</td>
+		                        <td class="">
+		                        	<div class="default-white-button-user-management">View detals</div>
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <td class="">01 Aug 2018</td>
+		                        <td class="">Place description</td>
+		                        <td class="">$512.30</td>
+		                        <td class="">
+		                        	<div class="default-white-button-user-management">View detals</div>
+		                        </td>
+		                    </tr>                    
+						</table>		                 	
+		                 </div>	
+		        	</div>
+
 	        	</div>
 	        	<div class="invoice-detail">
 					<div class="default-white-button-user-management">
@@ -1460,10 +1467,6 @@ $(document).ready(function() {
 									<span>Invoice Number:	</span>
 									<span>NwC-AOyfAxo	</span>
 								</li>	
-								<li>
-									<span>NZBN::	</span>
-									<span>9429030423626	</span>
-								</li>
 								<li>
 									<span>GST No:	</span>
 									<span>110-633-521	</span>
@@ -1487,8 +1490,7 @@ $(document).ready(function() {
 								<li class=" ">MEGA Limited</li>
 								<li class=" ">Level 21, BDO Tower</li>
 								<li class=" ">120 Albert Street</li>
-								<li class=" ">Auckland</li>
-								<li class=" ">1010</li>
+								<li class=" ">Auckland 1010</li>
 								<li class=" ">New Zealand </li>
 							</ul>							
 						</div>

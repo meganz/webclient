@@ -27313,7 +27313,6 @@ opacity: 1;
 .user-management-account-settings table {
     width: 100%;
     position: relative;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
     border-collapse: collapse;
 }
 
@@ -27338,17 +27337,17 @@ opacity: 1;
  display: inline-block;
 }
 
-.user-management-account-settings table tr:first-child {
+.user-management-account-settings .share-table tr:first-child {
     height: 32px;
     position: relative;
 }
 
-.user-management-account-settings table tr:not(:first-child){
+.user-management-account-settings .share-table tr:not(:first-child){
     height: 40px;
     position: relative;
 }
 
-.user-management-account-settings table tr:nth-child(even)::after {
+.user-management-account-settings .share-table tr:nth-child(even)::after {
     content: " ";
     width: 100%;
     height: 1px;
@@ -27767,7 +27766,6 @@ opacity: 1;
     background-repeat: repeat;
     background-image: url(../images/mega/grid-bg3.svg);
     background-position: left top;
-
 }
 
 .user-management-view .user-management-list-table .grid-scrolling-table {
@@ -27864,15 +27862,7 @@ opacity: 1;
 .user-management-view .user-management-list-table .user-management-status{
     margin:28px 8px 0 0;
 }
-/*
-.user-management-list-table .grid-table-user-management tr:nth-child(odd) td{
-    background-color: rgba(250,250,250,1);
-}
 
-.user-management-list-table .grid-table-user-management tr.tr-white td {
-    background-color: #fff;
-}
-*/
 
 
 
@@ -28078,90 +28068,105 @@ opacity: 1;
     height: -webkit-calc(100% - 132px);
     height: -moz-calc(100% - 132px);
     height: calc(100% - 132px);
-    min-height: auto;
+    min-height: auto; 
     overflow: auto;
 }
 
-/* Remeber to add the parent class back */
+.user-management-account-settings {
+    height:100%;
+}
+
+.user-management-account-settings .invoice{
+    height:calc(100% - 74px);
+}
+
+.user-management-account-settings .invoice .invoice-list{
+    height: 100%;
+}
+
 .user-management-account-settings .invoice .invoice-subtitle {
     margin: 24px auto 16px 56px;
     line-height: 20px;
-    font-size: 14px;
+    font-size: 16px;
     color: #333;
     font-weight: 600;
 }
 
-.user-management-account-settings .invoice .invoice-table {
+.user-management-account-settings .invoice .invoice-table-container{
     margin:0 56px;
     width: calc(100% - 132px);
     max-width: 1200px;
-    border: 1px solid rgba(0,0,0,0.1);
-    border-radius: 8px;
-    background-color: #fff;
-    box-sizing: border-box;
-    box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
+    height: calc(100% - 40px);
 }
 
-
-.user-management-account-settings .invoice .invoice-table tr:not(:first-child) {
-    height: 56px;
+.user-management-account-settings .invoice .invoice-table-header tr {
+        background-color: rgba(245,245,245,1);
+          border: 1px solid rgba(0,0,0,0.1);
 }
 
-.user-management-account-settings .invoice .invoice-table tr:not(:first-child)::after {
-    content: " ";
-    width: 100%;
-    height: 1px;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-    display: block;
-    left: 0;
-    top: 0;
-}
-
-.user-management-account-settings .invoice .invoice-table tr:first-child,  .user-management-account-settings .invoice .invoice-table tr:last-child{
-    border-radius: 8px 8px 0 0;
-}
-
-.user-management-account-settings .invoice .invoice-table th {
+.user-management-account-settings .invoice .invoice-table-header th {
     height: 32px;
     padding:0 12px;
-    background-color: rgba(250,250,250,1);
+    font-size: 14px;
+    color:#333;
 }
 
-.user-management-account-settings .invoice .invoice-table th:first-child {
-    width: 20%;
+
+.user-management-account-settings .invoice .invoice-table-list-container {
+    height: calc(100% - 33px);
+    overflow: auto;
 }
 
-.user-management-account-settings .invoice .invoice-table th:nth-child(2) {
-    width: 40%;
-}
-
-.user-management-account-settings .invoice .invoice-table th:nth-child(3) {
-    width: 20%;
-}
-
-.user-management-account-settings .invoice .invoice-table th:nth-child(4) {
-    width: 20%;
-    height: 100%;
-    display: inline-block;
+.user-management-account-settings .invoice .invoice-table tr {
+    background-color: #fff;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
 
 }
 
-.user-management-account-settings .invoice .invoice-table th .arrow {
-    vertical-align: middle;
-    background-position: right -1282px;
+.user-management-account-settings .invoice .invoice-table tr:hover {
+    background-color: rgba(252,252,252,1);
 }
 
 .user-management-account-settings .invoice .invoice-table td {
     padding:0 12px;
     line-height: 56px;
-    font-size: 13px;
+    font-size: 14px;
     color: #888;
+    position: relative;
 }
+
+.user-management-account-settings .invoice .invoice-table-header th:first-child, .user-management-account-settings .invoice .invoice-table td:first-child{
+    width: 20%;
+}
+
+.user-management-account-settings .invoice .invoice-table-header th:nth-child(2), .user-management-account-settings .invoice .invoice-table td:nth-child(2){
+    width: 40%;
+}
+
+.user-management-account-settings .invoice .invoice-table-header th:nth-child(3), .user-management-account-settings .invoice .invoice-table td:nth-child(3) {
+    width: 20%;
+}
+
+.user-management-account-settings .invoice .invoice-table-header th:nth-child(4),  .user-management-account-settings .invoice .invoice-table td:nth-child(4){
+    width: 20%;
+    height: 100%;
+}
+
+.user-management-account-settings .invoice .invoice-table-header th .arrow.asc{
+    background-position: right -1222px;
+}
+
+.user-management-account-settings .invoice .invoice-table-header th .arrow.desc{
+    background-position: right -1281px;
+}
+
 
 .user-management-account-settings .invoice .invoice-table td .default-white-button-user-management {
     margin-top: 12px;
 }
+
 
 .user-management-account-settings .invoice-detail {
     position: relative;

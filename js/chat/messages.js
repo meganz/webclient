@@ -345,7 +345,7 @@ Message.prototype.getManagementMessageSummaryText = function() {
     if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
-            return __(l[8894]).replace("%s", htmlentities(nodes[0].name));
+            return __(l[8894]).replace("%s", nodes[0].name);
         }
         else {
             return __(l[8895]).replace("%s", nodes.length);
@@ -354,7 +354,7 @@ Message.prototype.getManagementMessageSummaryText = function() {
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
-            return __(l[8896]).replace("%s", htmlentities(nodes[0].name));
+            return __(l[8896]).replace("%s", nodes[0].name);
         }
         else {
             return __(l[8897]).replace("%s", nodes.length);

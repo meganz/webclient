@@ -999,6 +999,7 @@
     "7241": "Hizmet \u015eart\u0131m\u0131z\u0131 kabul etmeniz gerekir",
     "7272": "Yanl\u0131\u015f veri format\u0131",
     "7315": "Ba\u015fla",
+    "7331": "S\u0131rala",
     "7337": "G\u00fcvenlik",
     "7352": "Durum",
     "7354": "\u015eu tarihte yenilenir:",
@@ -1657,6 +1658,7 @@
     "16401": "Kaydolma bonusu",
     "16402": "A\u00e7\u0131lan bonuslar",
     "16448": "Transferleri S\u00fcrd\u00fcr",
+    "16462": "A\u00e7\u0131klama",
     "16471": "Sa\u011flanan anahtar ge\u00e7ersiz.",
     "16472": "L\u00fctfen anahtar\u0131n do\u011fru oldu\u011fundan emin olun veya link sahibine sorun.",
     "16474": "\u00d6nceki s\u00fcr\u00fcmler",
@@ -1823,6 +1825,7 @@
     "16904": "Veya MEGA uygulamalar\u0131 indirdi\u011finizde ve arkada\u015flar\u0131n\u0131z\u0131 MEGA'ya davet etti\u011finizde \u00fccretsiz depolama ve aktarma kotas\u0131 kazanabilece\u011finiz ba\u015far\u0131mlar uygulamam\u0131za kat\u0131l\u0131n",
     "16927": "Bu eylem \u015fu andaki depolama s\u0131n\u0131r\u0131n\u0131 a\u015faca\u011f\u0131ndan dolay\u0131 tamamlanamaz.",
     "17022": "Hesap T\u00fcr\u00fc",
+    "17023": "Tarih",
     "17081": "Tamamlanmam\u0131\u015f aktarma, devam ettirmek istiyor musunuz?",
     "17082": "Tamamlanan aktarma. L\u00fctfen dosyan\u0131z\u0131 kaydedin.",
     "17083": "\u00c7ok Ama\u00e7l\u0131 MEGA Windows Uygulamas\u0131 \u015fu anda geli\u015fme a\u015famas\u0131nda. Uygulaman\u0131n beta s\u00fcr\u00fcm\u00fcn\u00fc [A]burada[\/A] bulabilirsiniz.",
@@ -1980,6 +1983,7 @@
     "17767": "Dosyalar sohbete g\u00f6nderildi",
     "17768": "Sona eren hesap",
     "17789": "Girmi\u015f oldu\u011funuz vergi numaras\u0131 ge\u00e7ersizdir.",
+    "17791": "Filtre",
     "17792": "Birincil disk hacminiz dolu. L\u00fctfen biraz yer a\u00e7\u0131n ve tekrar deneyin.",
     "17793": "Maalesef, Chrome yaln\u0131zca MEGA'n\u0131n mevcut disk alan\u0131n\u0131z\u0131n bir b\u00f6l\u00fcm\u00fcn\u00fc kullanmas\u0131na izin veriyor ve o alan yetersiz. L\u00fctfen [A1]MEGA masa\u00fcst\u00fc uygulamas\u0131[\/A1]n\u0131 veya [A2]Chrome Eklentisi[\/A2]ni y\u00fckleyin ya da [A3]biraz yer a\u00e7may\u0131[\/A3] deneyin.",
     "17794": "Kuruluyor...",
@@ -2660,5 +2664,9 @@
     "19223": "Gelen D\u0131\u015f Payla\u015f\u0131mlar",
     "19224": "Aktar\u0131m Analizi",
     "19225": "Toplam Aktar\u0131lan",
-    "19226": "G\u00fcnl\u00fck Aktar\u0131m Hacmi"
+    "19226": "G\u00fcnl\u00fck Aktar\u0131m Hacmi",
+    "19282": "Invoices",
+    "19283": "Invoice List",
+    "19284": "View Details",
+    "19285": "Me:"
 }

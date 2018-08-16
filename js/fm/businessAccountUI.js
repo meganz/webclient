@@ -26,6 +26,7 @@ function BusinessAccountUI() {
         var $accountContainer = $('.user-management-account-settings', $businessAccountContianer).addClass('hidden');
         $('.invoice', $accountContainer).addClass('hidden');
         $('.invoice .invoice-list', $accountContainer).addClass('hidden');
+        $('.invoice .invoice-detail', $accountContainer);
 
         // hide any possible grid or block view.
         $('.files-grid-view, .fm-blocks-view').addClass('hidden');
@@ -1328,6 +1329,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
+    var $invoiceContainer = $('.invoice', $accountContainer);
+    var $invoiceDetailContainer = $('.invoice-detail', $invoiceContainer);
 
 };
 

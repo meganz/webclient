@@ -4062,16 +4062,19 @@ div.checkboxOn, div.checkboxOff {
 .mobile.my-account-page .main-avatar .avatar span {
     color: #fff;
 }
-#mobile-ui-contact-card .avatar-wrapper span {
-    line-height: 96px;
-    font-size: 54px;
+#mobile-ui-contact-card .avatar-wrapper {
+    line-height: 92px;
+    font-size: 48px;
     color: #fff;
-    font-family: 'source_sans_prolight';
+    margin-left: 3px;
+    margin-top: 1px;
 }
 #mobile-ui-contact-card .main-avatar {
     position: relative;
     display: block;
     width: 100px;
+    height: 100px;
+    overflow: auto;
     margin: 0 auto 20px;
 }
 #mobile-ui-contact-card .contact-verification {

@@ -492,6 +492,8 @@ $(document).ready(function() {
 			    <div class="user-management-next-arrow"></div>
 				<div class="user-management-breadcrumbs-img account-icon"></div>
 				<div class="user-management-subuser-name">Account</div>
+				<div class="user-management-next-arrow"></div>
+				<div class="user-management-subuser-name">Inv No. (placeholder!!!!)</div>
 			</div>
 		    <div class="user-management-overview-buttons hidden">
 				<div class="default-white-button-user-management">
@@ -1453,14 +1455,15 @@ $(document).ready(function() {
 						<div class="export-pdf-icon icon"></div>
 						Export to PDF
 					</div>
-					<div class="payment-invoice">
-						<div class="inv-block inv-title">
-							<p>Payment Invoice</p>
+					<div class="invoice-container">
+						<div class="inv-logo-container">
+							<div class="mega-logo"></div>
 						</div>
-						<div class="inv-block inv-detail">
-							<ul>
+						<div class="inv-title-container">
+							<div class="inv-title">INVOICE</div>
+							<ul class=" ">
 								<li>
-									<span>Invoice Date:	</span>
+									<span>Invoice Date:	Invoice Date:</span>
 									<span>13 Nov 2017	</span>
 								</li>
 								<li>
@@ -1468,52 +1471,134 @@ $(document).ready(function() {
 									<span>NwC-AOyfAxo	</span>
 								</li>	
 								<li>
-									<span>GST No:	</span>
-									<span>110-633-521	</span>
+									<span>GST No:</span>
+									<span>110-633-521</span>
 								</li>												
 							</ul>
 						</div>
-						<div class="inv-block billed">
+						<div class="inv-border"></div>
+						<div class="inv-add-container">
 							<p>Billed</p>
 							<ul>
-								<li class=" ">money@mega.co.nz</li>
-								<li class=" ">Greg Daniel</li>
+								<li class="inv-email">money@mega.co.nz</li>
+								<li class="inv-name">Greg Daniel</li>
 								<li class=" ">120 Albert St 120 Albert St 120 Albert St 120 Albert St 120 Albert St</li>
-								<li class=" ">Auckland</li>
-								<li class=" ">1010</li>
+								<li class=" ">Auckland 1010</li>
 								<li class=" ">New Zealand </li>
 							</ul>							
 						</div>
-						<div class="inv-block billed">
+						<div class="inv-add-container">
 							<p>From</p>
 							<ul>
-								<li class=" ">MEGA Limited</li>
+								<li class="inv-email">invoicing@mega.nz</li>
+								<li class="inv-name">MEGA Limited</li>
 								<li class=" ">Level 21, BDO Tower</li>
 								<li class=" ">120 Albert Street</li>
 								<li class=" ">Auckland 1010</li>
 								<li class=" ">New Zealand </li>
 							</ul>							
 						</div>
-						<div class="inv-block short-block">
-							<p>Date</p>
-							<p>1/8/2018</p>
-						</div>
-						<div class="inv-block short-block">
-							<p>Description</p>
-							<p>Business</p>
-							<p>(1/7/2018 - 31/7/2018)</p>
-						</div>
-						<div class="inv-block long-block">
-							<p>Price</p>
-							<p>€4.34</p>
-							<p>€0.65</p>
-							<p>€4.99</p>
-							<p>GST (15%) </p>
-							<p>Total </p>
-
+						<div class="inv-payment-table">
+							<ul>
+								<li>
+									<div class="inv-payment-header">Date</div>
+									<div class="inv-payment-header">Description</div>
+									<div class="inv-payment-header">Price</div>
+								</li>
+								<li>
+									<div class="inv-payment-item">1/8/2018</div>
+									<div class="inv-payment-item">Business account for X user<br>(1/7/2018 - 31/7/2018)</div>
+									<div class="inv-payment-item">€4.34</div>
+								</li>
+								<li>
+									<div class="inv-payment-item">1/8/2018</div>
+									<div class="inv-payment-item">Business account for X user<br>(1/7/2018 - 31/7/2018)</div>
+									<div class="inv-payment-item">€4.34</div>
+								</li>
+								<li class="inv-payment-price">
+									<div class="inv-payment-price-detail">GST (15%):</div>
+									<div class="inv-payment-price-detail">€4.34</div>
+								
+								</li>
+								<li class="inv-payment-price">
+									<div class="inv-payment-price-detail">TOTAL:</div>
+									<div class="inv-payment-price-detail">€40000000.34</div>
+								</li>
+							</ul>
 						</div>
 					</div>
-
+					<div class="invoice-container">
+						<div class="inv-logo-container">
+							<div class="mega-logo"></div>
+						</div>
+						<div class="inv-title-container">
+							<div class="inv-title">RECEIPT</div>
+							<ul class=" ">
+								<li>
+									<span>Receipt Date:	Invoice Date:</span>
+									<span>13 Nov 2017	</span>
+								</li>
+								<li>
+									<span>Receipt Number:	</span>
+									<span>NwC-AOyfAxo	</span>
+								</li>	
+								<li>
+									<span>GST No:</span>
+									<span>110-633-521</span>
+								</li>												
+							</ul>
+						</div>
+						<div class="inv-border"></div>
+						<div class="inv-add-container">
+							<p>Billed</p>
+							<ul>
+								<li class="inv-email">money@mega.co.nz</li>
+								<li class="inv-name">Greg Daniel</li>
+								<li class=" ">120 Albert St 120 Albert St 120 Albert St 120 Albert St 120 Albert St</li>
+								<li class=" ">Auckland 1010</li>
+								<li class=" ">New Zealand </li>
+							</ul>							
+						</div>
+						<div class="inv-add-container">
+							<p>From</p>
+							<ul>
+								<li class="inv-email">invoicing@mega.nz</li>
+								<li class="inv-name">MEGA Limited</li>
+								<li class=" ">Level 21, BDO Tower</li>
+								<li class=" ">120 Albert Street</li>
+								<li class=" ">Auckland 1010</li>
+								<li class=" ">New Zealand </li>
+							</ul>							
+						</div>
+						<div class="inv-payment-table">
+							<ul>
+								<li>
+									<div class="inv-payment-header">Date</div>
+									<div class="inv-payment-header">Description</div>
+									<div class="inv-payment-header">Price</div>
+								</li>
+								<li>
+									<div class="inv-payment-item">1/8/2018</div>
+									<div class="inv-payment-item">Credit card for invoice #1234</div>
+									<div class="inv-payment-item">€4.34</div>
+								</li>
+								<li>
+									<div class="inv-payment-item">1/8/2018</div>
+									<div class="inv-payment-item">Credit card for invoice #1234</div>
+									<div class="inv-payment-item">€4.34</div>
+								</li>
+								<li class="inv-payment-price">
+									<div class="inv-payment-price-detail">GST (15%):</div>
+									<div class="inv-payment-price-detail">€4.34</div>
+								
+								</li>
+								<li class="inv-payment-price">
+									<div class="inv-payment-price-detail">TOTAL:</div>
+									<div class="inv-payment-price-detail">€40000000.34</div>
+								</li>
+							</ul>
+						</div>
+					</div>
 	        	</div>
 	        </div>
 

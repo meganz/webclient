@@ -51,7 +51,8 @@
     left: 0;
 }
 .bottom-info.content {
-    display: table-row;
+    display: table;
+    margin: 0 auto;
 }
 .bottom-info.column {
     display: table-cell;

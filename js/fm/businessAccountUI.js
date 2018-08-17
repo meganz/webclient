@@ -42,8 +42,9 @@ function BusinessAccountUI() {
 
         // headers
         $('.fm-right-header-user-management .user-management-main-page-buttons').addClass('hidden');
-        $('.fm-right-header-user-management .user-management-breadcrumb.subaccount').addClass('hidden');
-        $('.fm-right-header-user-management .user-management-breadcrumb.overview').addClass('hidden');
+        //$('.fm-right-header-user-management .user-management-breadcrumb.subaccount').addClass('hidden');
+        //$('.fm-right-header-user-management .user-management-breadcrumb.overview').addClass('hidden');
+        //$('.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
         $('.fm-right-header-user-management .user-management-breadcrumb').addClass('hidden');
         $('.fm-right-header-user-management .user-management-overview-buttons').addClass('hidden');
         $('.user-management-overview-bar').addClass('hidden');
@@ -1249,6 +1250,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
     var $invoiceContainer = $('.invoice', $accountContainer);
     var $invoiceListContainer = $('.invoice-list', $invoiceContainer);
+    var $accountPageHeader = $('.fm-right-header-user-management .user-management-breadcrumb.account');
 
     // private function to determine if we need to re-draw
     var isInvoiceRedrawNeeded = function (invoiceList, savedList) {
@@ -1277,6 +1279,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
             $accountContainer.removeClass('hidden');
             $invoiceContainer.removeClass('hidden');
             $invoiceListContainer.removeClass('hidden');
+            $accountPageHeader.removeClass('hidden');
         };
 
         // check if we need to re-draw
@@ -1331,6 +1334,14 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
     var $invoiceContainer = $('.invoice', $accountContainer);
     var $invoiceDetailContainer = $('.invoice-detail', $invoiceContainer);
+
+    var unhideSection = function () {
+        $businessAccountContainer.removeClass('hidden');
+        $accountContainer.removeClass('hidden');
+        $invoiceContainer.removeClass('hidden');
+        $invoiceDetailContainer.removeClass('hidden');
+        $accountPageHeader.removeClass('hidden');
+    };
 
 };
 

@@ -896,7 +896,7 @@ function FMShortcuts() {
             !isContactRootOrShareRoot
         ) {
             var items = selectionManager.get_selected();
-            if (items.length == 0) {
+            if (items.length == 0 || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                 return; // dont do anything.
             }
 
@@ -912,7 +912,8 @@ function FMShortcuts() {
             (e.ctrlKey || e.metaKey) &&
             !isContactRootOrShareRoot
         ) {
-            if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
+            if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1
+                || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                 return false; // stop prop.
             }
 

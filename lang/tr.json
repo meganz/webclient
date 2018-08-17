@@ -596,7 +596,7 @@
     "1677": "Okuma hatas\u0131",
     "1679": "Bilinmeyen hata",
     "1686": "\u0130ptal",
-    "1687": "Bulut S\u00fcr\u00fcc\u00fc",
+    "1687": "Bulut S\u00fcr\u00fcc\u00fcs\u00fc",
     "1694": "G\u00f6nder",
     "1710": "A\u00e7",
     "1712": "Genel",
@@ -1295,7 +1295,7 @@
     "8820": "Sa\u011flanan MEGA hesab\u0131 ile ba\u011flant\u0131 sahibi e\u015fle\u015fmedi.",
     "8833": "Bu limiti y\u00fckseltmek i\u00e7in, hesap olu\u015fturabilirsiniz. Hesap olu\u015fturmak ile aktarma kotan\u0131z\u0131n yan\u0131 s\u0131ra [B]\u00fccretsiz[\/B] 50 GB g\u00fcvenli bulut depolama alan\u0131 da kazan\u0131rs\u0131n\u0131z.",
     "8834": "\u0130ndirmeniz devam edemez \u00e7\u00fcnk\u00fc \u015fuanki IP adresiniz i\u00e7in olan aktarma limiti dolmu\u015f.",
-    "8836": "Kurtarma Anahtar\u0131 panoya kopyaland\u0131",
+    "8836": "Kurtarma Anahtar\u0131 panoya kopyaland\u0131.",
     "8839": "Kurtarma Anahtar\u0131",
     "8840": "MEGAchat g\u00fcncellendi ve yeniden y\u00fckleme gerektiriyor. Son versiyona g\u00fcncellemek i\u00e7in sayfay\u0131 yenilemek ister misiniz?",
     "8841": "MEGAchat g\u00fcncellendi ve sadece yeni yay\u0131mlanan MEGA versiyonuyla uyumlu. MEGAchat kullanmaya devam etmek i\u00e7in l\u00fctfen eklentiyi g\u00fcncelleyin.",
@@ -2029,7 +2029,7 @@
     "17884": "Aktarma y\u00f6neticisine %nbFi dosya eklendi",
     "17886": "Bu kullan\u0131c\u0131 zaten ki\u015fi listenizde",
     "17958": "Ge\u00e7ersiz ba\u011flant\u0131",
-    "18051": "Bulut S\u00fcr\u00fcc\u00fc",
+    "18051": "Bulut S\u00fcr\u00fcc\u00fcs\u00fc",
     "18148": "Deste\u011fe Ula\u015f\u0131n",
     "18192": "Bir ad girin, mutlak bir yol (joker karakter * ve ? izin verilir) veya senkronizasyon i\u015fleminden hari\u00e7 tutmak istedi\u011finiz dosyay\u0131 veya klas\u00f6r\u00fc se\u00e7in",
     "18213": "\u0130ndirme boyutu bu taray\u0131c\u0131 taraf\u0131ndan desteklenenin \u00fczerinde. \u0130ndirmeye devam etmek i\u00e7in MEGAsync ile devam edebilirsiniz.",
@@ -2674,5 +2674,6 @@
     "19282": "Faturalar",
     "19283": "Fatura Listesi",
     "19284": "Detaylar\u0131 G\u00f6r\u00fcnt\u00fcle",
-    "19285": "Ben:"
+    "19285": "Ben:",
+    "19288": "PDF'e aktar"
 }

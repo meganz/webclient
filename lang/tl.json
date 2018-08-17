@@ -1295,7 +1295,7 @@
     "8820": "Hindi tugma ang binigay na MEGA account sa may-ari ng link.",
     "8833": "Para maitaas ang limit, pupwede kang gumawa ng account. Hindi lamang ito magbibigay sa iyo ng dagdag na transfer quota pero mayroon din itong 50 GB ng secure storage space sa cloud - [B]for free[\/B].",
     "8834": "Ang inyong download ay hindi makakapagsimula dahil makukuha nito ang kasalukuyang libreng transfer allowance sa inyong IP address.",
-    "8836": "Kinopya na ang Recovery Key sa clipboard",
+    "8836": "Recovery Key copied to clipboard",
     "8839": "Recovery Key",
     "8840": "Ang MEGAchat ay naiupgrade na at kinakailangang mag-reload. Gusto mo bang i-reload na ngayon ang page at mag-update sa pinakahuling bersyon?",
     "8841": "Anh inyong MEGAchat ay na-upgrade na ito lamang ay suportado ng aming bagong labas na bersyon ng MEGA. I-update ang inyong extension at magpatuloy sa paggamit ng MEGAchat.",
@@ -2674,5 +2674,6 @@
     "19282": "Invoices",
     "19283": "Invoice List",
     "19284": "View Details",
-    "19285": "Me:"
+    "19285": "Me:",
+    "19288": "Export to PDF"
 }

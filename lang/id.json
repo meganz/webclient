@@ -596,7 +596,7 @@
     "1677": "Baca bermasalah",
     "1679": "Error tidak diketahui",
     "1686": "Batal",
-    "1687": "Cakram Penyimpanan Awan",
+    "1687": "Cloud Drive",
     "1694": "Submit",
     "1710": "Bukan",
     "1712": "Umum",
@@ -1295,7 +1295,7 @@
     "8820": "Akun MEGA yang anda masukkan tidak sama dengan pemilik link.",
     "8833": "Untuk meningkatkan batasan ini, anda dapat mendaftar akun. Ini tidak hanya akan memberi anda quota transfer extra tapi juga 50 GB storage space aman di cloud - [B]gratis[\/B].",
     "8834": "Download anda tidak dapat dilanjutkan karena itu akan melebihi alokasi transfer gratis untuk IP anda.",
-    "8836": "Recovery Key terkopi ke clipboard",
+    "8836": "Recovery Key copied to clipboard",
     "8839": "Recovery Key",
     "8840": "MEGAchat telah di-upgrade dan butuh reload. Apakah anda ingin me-reload halaman sekarang untuk update ke versi terakhir?",
     "8841": "MEGAchat telah di-upgrade dan itu akan hanya didukung pada versi MEGA terbaru. Harap update extensi anda untuk lanjut menggunakan MEGAchat.",
@@ -2029,7 +2029,7 @@
     "17884": "File %nbFi ditambahkan ke manajer transfer",
     "17886": "Pengguna ini sudah ada di daftar kontak Anda",
     "17958": "Link salah",
-    "18051": "Cakram Penyimpanan Awan",
+    "18051": "Cloud Drive",
     "18148": "Contact Support",
     "18192": "Masukkan nama, path absolut (wildcard * dan ? Diizinkan) atau pilih file atau folder yang ingin Anda kecualikan dari sinkronisasi",
     "18213": "Ukuran unduhan melebihi ukuran maksimum yang didukung oleh browser. Anda dapat menggunakan MEGAsync untuk melanjutkan unduhan.",
@@ -2674,5 +2674,6 @@
     "19282": "Invoices",
     "19283": "Invoice List",
     "19284": "View Details",
-    "19285": "Me:"
+    "19285": "Me:",
+    "19288": "Export to PDF"
 }

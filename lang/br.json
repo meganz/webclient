@@ -596,7 +596,7 @@
     "1677": "Erro de leitura",
     "1679": "Erro desconhecido",
     "1686": "Cancelar",
-    "1687": "Nuvem de arquivos",
+    "1687": "Cloud Drive",
     "1694": "Enviar",
     "1710": "Abrir",
     "1712": "Geral",
@@ -1295,7 +1295,7 @@
     "8820": "A conta MEGA proporcionada n\u00e3o coincide com o propriet\u00e1rio do link.",
     "8833": "Para aumentar esse limite, voc\u00ea pode registrar uma conta. Isso n\u00e3o s\u00f3 lhe dar\u00e1 ampla cota de transfer\u00eancia extra, mas tamb\u00e9m 50 GB de espa\u00e7o de armazenamento seguro na nuvem - [B]de gra\u00e7a[\/B].",
     "8834": "O download n\u00e3o podia continuar porque ele iria lev\u00e1-lo ao longo do actual subs\u00eddio de transporte gratuito para o seu endere\u00e7o IP.",
-    "8836": "Chave de recupera\u00e7\u00e3o copiada para a \u00e1rea de transfer\u00eancia",
+    "8836": "Recovery Key copied to clipboard",
     "8839": "Chave de recupera\u00e7\u00e3o",
     "8840": "MEGAchat foi atualizado e requer uma recarga. Voc\u00ea quer recarregar a p\u00e1gina agora para atualizar para a vers\u00e3o mais recente?",
     "8841": "MEGAchat foi atualizado e vai agora s\u00f3 pode ser suportado em nossa vers\u00e3o rec\u00e9m-lan\u00e7ada do MEGA. Por favor, atualize o seu ramal para continuar usando MEGAchat.",
@@ -2029,7 +2029,7 @@
     "17884": "%nbFi arquivo foi adicionado ao gestor de transfer\u00eancias",
     "17886": "Voc\u00ea j\u00e1 adicionou este contato",
     "17958": "Link inv\u00e1lido",
-    "18051": "Nuvem de arquivos",
+    "18051": "Cloud Drive",
     "18148": "Contatar o suporte",
     "18192": "Digite um nome, um caminho completo (os caracteres-curinga * e ? s\u00e3o permitidos) ou escolha qual arquivo ou pasta voc\u00ea deseja excluir da sincroniza\u00e7\u00e3o.",
     "18213": "O tamanho do download excede o tamanho m\u00e1ximo suportado pelo navegador. Voc\u00ea pode usar o MEGAsync para continuar com o download.",
@@ -2674,5 +2674,6 @@
     "19282": "Invoices",
     "19283": "Invoice List",
     "19284": "View Details",
-    "19285": "Me:"
+    "19285": "Me:",
+    "19288": "Export to PDF"
 }

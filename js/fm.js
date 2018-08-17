@@ -896,7 +896,7 @@ function FMShortcuts() {
             !isContactRootOrShareRoot
         ) {
             var items = selectionManager.get_selected();
-            if (items.length == 0 || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+            if (items.length === 0 || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                 return; // dont do anything.
             }
 

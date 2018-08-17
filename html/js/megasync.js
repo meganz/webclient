@@ -46,6 +46,10 @@ var megasync = (function() {
     /** a function to switch the url to communicate with MEGASync */
     function switchMegasyncUrlToHttpWhenPossible() {
 
+        if (!ua || !ua.details || !ua.details.browser || !ua.details.version) {
+            return ShttpMegasyncUrl;
+        }
+
         if (ua.details.browser === 'Internet Explorer'
             || ua.details.browser === 'Safari'
             || ua.details.browser === 'Edge') {
@@ -79,7 +83,7 @@ var megasync = (function() {
             return ShttpMegasyncUrl;
         }
 
-    };
+    }
 
     // Linux stuff {{{
     /**

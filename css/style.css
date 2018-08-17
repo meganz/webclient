@@ -24799,6 +24799,7 @@ opacity: 1;
     width: auto;
     padding: 12px 0px 12px 24px;
     position: relative;
+    cursor: pointer;
 }
 
 .user-management-breadcrumb .user-management-icon {

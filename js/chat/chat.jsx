@@ -1431,6 +1431,22 @@ Chat.prototype._startedLoadingImage = function(h) {
 Chat.prototype._doneLoadingImage = function(h) {
     "use strict";
 
+    var setSource = function(n, img, src) {
+        var message = n.mo;
+
+        img.onload = function() {
+            img.onload = null;
+            n.srcWidth = this.naturalWidth;
+            n.srcHeight = this.naturalHeight;
+
+            // Notify changes...
+            if (message) {
+                message.trackDataChange();
+            }
+        };
+        img.setAttribute('src', src);
+    };
+
     var root = {};
     var nodes = this._getImageNodes(h, root);
     var src = root.src;
@@ -1444,17 +1460,16 @@ Chat.prototype._doneLoadingImage = function(h) {
             var container = parent.parentNode;
 
             if (src) {
-                imgNode.setAttribute('src', src);
                 container.classList.add('thumb');
                 parent.classList.remove('no-thumb');
             }
             else {
-                imgNode.setAttribute('src', window.noThumbURI || '');
                 container.classList.add('thumb-failed');
             }
 
             n.seen = 2;
             container.classList.remove('thumb-loading');
+            setSource(n, imgNode, src || window.noThumbURI || '');
         }
 
         // Set the same image data/uri across all affected (same) nodes
@@ -1473,11 +1488,8 @@ Chat.prototype._doneLoadingImage = function(h) {
             }
         }
 
-        // Notify changes...
-        if (n.mo) {
-            n.mo.trackDataChange();
-            n.mo = false;
-        }
+        // Remove the reference to the message since it's no longer needed.
+        delete n.mo;
     }
 };
 

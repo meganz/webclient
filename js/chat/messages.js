@@ -218,7 +218,7 @@ Message.prototype._onMessageAction = function(action) {
     'use strict';
     var self = this;
 
-    if (action !== 'push') {
+    if (action === 'revoke') {
         var attachments = this.getAttachmentMeta();
 
         if (attachments.length) {
@@ -702,7 +702,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             // should be called first..otherwise origFn.apply may delete the message and cause `msg` to be undefined.
             var msg = self.messages[messageId];
             if (msg) {
-                msg._onMessageAction(fnName);
+                msg._onMessageAction(ignoreDB ? fnName : 'revoke');
             }
 
             var res = origFn.apply(this, arguments);

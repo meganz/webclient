@@ -8,12 +8,13 @@ function BusinessAccount() {
 
 /**
  * Function to add sub user to a business account
- * @param {String} subEmail  email address of new user
- * @param {String} subFName  First name of new user
- * @param {String} subLName  Last name of new user
- * @returns {Promise}        Resolves with new add user HANDLE + password
+ * @param {String} subEmail     email address of new user
+ * @param {String} subFName     First name of new user
+ * @param {String} subLName     Last name of new user
+ * @param {Object} optionals    contain optional fields if any [position,idnum,phonenum,location]
+ * @returns {Promise}           Resolves with new add user HANDLE + password
  */
-BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName) {
+BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName, optionals) {
     "use strict";
     var operationPromise = new MegaPromise();
     var mySelf = this;
@@ -28,6 +29,7 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
     if (!subLName) {
         return operationPromise.reject(0, 3, 'Empty Last Name');
     }
+
     var request = {
         "a": "sbu", // business sub account operation
         "aa": "a", // add operation
@@ -35,6 +37,21 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
         "fn": subFName, // first name of user to add (not base64 encoded like attributes are)
         "ln": subLName // last name of user to add (also not base64 encoded)
     };
+
+    if (optionals) {
+        if (optionals.position) {
+            request.position = optionals.position;
+        }
+        if (optionals.idnum) {
+            request.idnum = optionals.idnum;
+        }
+        if (optionals.phonenum) {
+            request.phonenum = optionals.phonenum;
+        }
+        if (optionals.location) {
+            request.location = optionals.location;
+        }
+    }
 
     api_req(request, {
         callback: function (res) {
@@ -427,6 +444,10 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
          *      -e: email
          *      -firstname
          *      -lastname
+         *      -position
+         *      -idnum
+         *      -phonenum
+         *      -location
          */
     }
     if (fmdb && !ignoreDB && !pfkey && !folderlink) {

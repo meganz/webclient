@@ -1334,6 +1334,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
     var $invoiceContainer = $('.invoice', $accountContainer);
     var $invoiceDetailContainer = $('.invoice-detail', $invoiceContainer);
+    var $accountPageHeader = $('.fm-right-header-user-management .user-management-breadcrumb.account');
 
     var unhideSection = function () {
         $businessAccountContainer.removeClass('hidden');

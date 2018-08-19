@@ -2895,6 +2895,22 @@ function process_businessAccountSubUsers_SC(packet) {
         subUser.lastname = packet.lastname;
         valChanged = true;
     }
+    if (packet.position && packet.position !== subUser.position) { // new position
+        subUser.position = packet.position;
+        valChanged = true;
+    }
+    if (packet.idnum && packet.idnum !== subUser.idnum) { // new id number
+        subUser.idnum = packet.idnum;
+        valChanged = true;
+    }
+    if (packet.phonenum && packet.phonenum !== subUser.phonenum) { // new phone number
+        subUser.phonenum = packet.phonenum;
+        valChanged = true;
+    }
+    if (packet.location && packet.location !== subUser.location) { // new location
+        subUser.location = packet.location;
+        valChanged = true;
+    }
     if (valChanged) {
         var bAccount = new BusinessAccount();
         bAccount.parseSUBA(subUser, false, true);

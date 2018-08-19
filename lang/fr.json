@@ -2675,5 +2675,7 @@
     "19283": "Liste des factures",
     "19284": "Visualiser les d\u00e9tails",
     "19285": "Moi\u00a0:",
-    "19288": "Export to PDF"
+    "19288": "Exporter en PDF",
+    "19289": "Enable 2FA",
+    "19290": "Disable 2FA"
 }

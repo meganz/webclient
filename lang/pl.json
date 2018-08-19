@@ -2675,5 +2675,7 @@
     "19283": "Lista faktur",
     "19284": "Poka\u017c szczeg\u00f3\u0142y",
     "19285": "Ja:",
-    "19288": "Eksportuj do pliku PDF"
+    "19288": "Eksportuj do pliku PDF",
+    "19289": "Enable 2FA",
+    "19290": "Disable 2FA"
 }

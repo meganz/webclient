@@ -2671,9 +2671,11 @@
     "19224": "Statistiche di trasferimento",
     "19225": "Totale trasferito",
     "19226": "Volume di trasferimento giornaliero",
-    "19282": "Invoices",
-    "19283": "Invoice List",
-    "19284": "View Details",
-    "19285": "Me:",
-    "19288": "Export to PDF"
+    "19282": "Fatture",
+    "19283": "Lista fatture",
+    "19284": "Visualizza dettagli",
+    "19285": "Io:",
+    "19288": "Esporta su PDF",
+    "19289": "Attiva 2FA",
+    "19290": "Disattiva 2FA"
 }

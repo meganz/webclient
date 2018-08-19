@@ -2675,5 +2675,7 @@
     "19283": "Invoice List",
     "19284": "View Details",
     "19285": "Me:",
-    "19288": "Export to PDF"
+    "19288": "Export to PDF",
+    "19289": "Enable 2FA",
+    "19290": "Disable 2FA"
 }

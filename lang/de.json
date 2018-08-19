@@ -2675,5 +2675,7 @@
     "19283": "Rechnungen",
     "19284": "Details",
     "19285": "Ich:",
-    "19288": "Export to PDF"
+    "19288": "Export to PDF",
+    "19289": "Enable 2FA",
+    "19290": "Disable 2FA"
 }

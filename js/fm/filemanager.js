@@ -484,6 +484,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
+        $('.grid-url-arrow').removeClass('active');
         $('.nw-sorting-menu').addClass('hidden');
         $('.fm-start-chat-dropdown').addClass('hidden').removeClass('active');
         $('.start-chat-button').removeClass('active');

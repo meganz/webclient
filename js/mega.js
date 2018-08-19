@@ -459,6 +459,7 @@ function sc_node(n) {
     else nodesinflight[scqhead] = 1;
 
     n.scni = scqhead;       // set scq slot number (sc_packet() call will follow)
+    n.arrivalOrder = nodesinflight[scqhead]; // storing arrival order
     workers[p].postMessage(n);
 }
 
@@ -1799,8 +1800,14 @@ function worker_procmsg(ev) {
 
         if (ev.data.scni >= 0) {
             // enqueue processed node
-            if (scq[ev.data.scni]) scq[ev.data.scni][1].push(ev.data);
-            else scq[ev.data.scni] = [null, [ev.data]];
+            if (scq[ev.data.scni]) {
+                scq[ev.data.scni][1][ev.data.arrivalOrder - 1] = ev.data;
+            }
+            else {
+                var initArray = [];
+                initArray[ev.data.arrivalOrder - 1] = ev.data;
+                scq[ev.data.scni] = [null, initArray];
+            }
 
             if (!--nodesinflight[ev.data.scni]) {
                 delete nodesinflight[ev.data.scni];

@@ -1295,7 +1295,7 @@
     "8820": "Het gegeven MEGA account komt niet overeen met de eigenaar van de koppeling.",
     "8833": "Om deze limiet te verhogen kunt u een account registeren. Dit zal u niet alleen extra overdracht tegoed geven maar ook 50 GB aan beveiligde opslag ruimte in de cloud - [B]gratis[\/B].",
     "8834": "Uw download kon niet doorgaan, omdat u dan uw huidige gratis transfer tegoed van uw IP-adres zal overtreffen.",
-    "8836": "Herstel Sleutel is gekopieerd naar het klembord",
+    "8836": "Herstelsleutel gekopieerd naar klembord",
     "8839": "Herstel Sleutel",
     "8840": "MEGAchat is opgewaardeerd en vereist om opnieuw opgestart te worden. Wilt u de pagina nu opnieuw opstarten om te updaten naar de nieuwste versie?",
     "8841": "MEGAchat is opgewaardeerd en zal nu alleen worden ondersteund in onze onlangs vrijgegeven versie van MEGA. Update alstublieft uw extensie om MEGAchat te kunnen blijven gebruiken.",
@@ -2671,8 +2671,11 @@
     "19224": "Analytiek Overdragen",
     "19225": "Totaal Overgedragen",
     "19226": "Dagelijkse Overdracht Hoeveelheid",
-    "19282": "Invoices",
-    "19283": "Invoice List",
-    "19284": "View Details",
-    "19285": "Me:"
+    "19282": "Facturen",
+    "19283": "Factuurlijst",
+    "19284": "Details Weergeven",
+    "19285": "Ik:",
+    "19288": "Exporteren naar PDF",
+    "19289": "Enable 2FA",
+    "19290": "Disable 2FA"
 }

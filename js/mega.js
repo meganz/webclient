@@ -159,6 +159,7 @@ var scfetches = Object.create(null);     // holds pending nodes to be retrieved 
 var scwaitnodes = Object.create(null);   // supplements scfetches per scqi index
 var nodesinflight = Object.create(null); // number of nodes being processed in the worker for scqi
 var sc_history = [];                     // array holding the history of action-packets
+var nodes_scqi_order = 0;                // variable to count the node arrival order before sending to workers
 
 // enqueue nodes needed to process packets
 function sc_fqueue(handle, packet) {
@@ -455,11 +456,16 @@ function sc_node(n) {
         p = scqhead % workers.length;
     }
 
-    if (nodesinflight[scqhead]) nodesinflight[scqhead]++;
-    else nodesinflight[scqhead] = 1;
+    if (nodesinflight[scqhead]) {
+        nodesinflight[scqhead]++;
+    }
+    else {
+        nodesinflight[scqhead] = 1;
+        nodes_scqi_order = 0; // reset the order var
+    }
 
     n.scni = scqhead;       // set scq slot number (sc_packet() call will follow)
-    n.arrivalOrder = nodesinflight[scqhead]; // storing arrival order
+    n.arrivalOrder = nodes_scqi_order++; // storing arrival order
     workers[p].postMessage(n);
 }
 
@@ -1801,11 +1807,11 @@ function worker_procmsg(ev) {
         if (ev.data.scni >= 0) {
             // enqueue processed node
             if (scq[ev.data.scni]) {
-                scq[ev.data.scni][1][ev.data.arrivalOrder - 1] = ev.data;
+                scq[ev.data.scni][1][ev.data.arrivalOrder] = ev.data;
             }
             else {
                 var initArray = [];
-                initArray[ev.data.arrivalOrder - 1] = ev.data;
+                initArray[ev.data.arrivalOrder] = ev.data;
                 scq[ev.data.scni] = [null, initArray];
             }
 

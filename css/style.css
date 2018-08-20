@@ -24799,6 +24799,7 @@ opacity: 1;
     width: auto;
     padding: 12px 0px 12px 24px;
     position: relative;
+    cursor: pointer;
 }
 
 .user-management-breadcrumb .user-management-icon {
@@ -24845,12 +24846,12 @@ opacity: 1;
 }
 
 .user-management-breadcrumb .user-management-subuser-name {
-    padding-left: 8px;
     font-size: 14px;
     color: #666666;
     display: inline-block;
     line-height: 24px;
-    position: absolute;
+    position: relative;
+    vertical-align: top;
 }
 
 .user-management-subuser-profile-container{
@@ -28181,9 +28182,9 @@ opacity: 1;
     position: relative;
 }
 
-.user-management-account-settings .invoice-detail .payment-invoice {
+.user-management-account-settings .invoice-detail .invoice-container {
     margin:0px auto auto 56px;
-    width: calc(100% - 132px);
+    width: calc(100% - 112px);
     min-width: 595px;
     height: 842px;
     max-width: 1000px;
@@ -28192,196 +28193,299 @@ opacity: 1;
     background-color: #fff;
     box-sizing: content-box;
     box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
+    margin-bottom: 24px;
 }
 
-.user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-title, .user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-detail {
-    width: 49.5%;
-    height: 190px;
+.user-management-account-settings .invoice-detail .mega-contact-container {
+    width: 59.5%;
     position: relative;
     display: inline-block;
     vertical-align: top;
-
+}
+.user-management-account-settings .invoice-detail .inv-title-container {
+    width: 39.5%;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
 }
 
-.user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-title p {
-    font-size: 24px;
-    color: #333;
-    line-height: 32px;
-    width: 100%;
-    text-align: center;
-    position: absolute;
-    bottom: 40px;
-    margin:0;
-}
-
-.user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-detail ul {
+.user-management-account-settings .mega-contact-container ul {
     list-style-type:none;
-    width: 100%;
-    padding:0;
-    margin:0;
-    bottom: 40px;
-    position: absolute;
+    padding-left: 76px;
+    margin:12px 0 32px 0;
 }
 
-.user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-detail ul li{
+.user-management-account-settings .invoice-detail .mega-logo {
+    width: 120px;
+    height: 39px;
+    background-position: 0px 0px;
+    background-size: 120px auto;
+    background-image: url(../images/mega/invoice-image_v1.png);
+    background-repeat: no-repeat;
+    margin:64px auto auto 56px;
+}
+
+.user-management-account-settings .invoice-detail .mega-contact-container .inv-subtitle {
+    margin:12px auto 8px 102px;
+}
+
+.user-management-account-settings .invoice-detail .inv-mega-contact {
+    margin-bottom: 8px;
+    position: relative;
     text-decoration: none;
 }
 
-
-.user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-detail ul li>span:first-child {
-    width:45.5%;
-    display: inline-block;
-    text-align: right;
-    font-size: 14px;
-    color: #333;
-    line-height: 22px;
+.user-management-account-settings .icon12{
+    width:12px;
+    height: 12px;
+    background-image: url(../images/mega/invoice-image_v1.png);
+    background-size: 120px auto;
+    background-repeat: no-repeat;
+    display: inline-block; 
+    vertical-align: top;
+    margin-top: 4px;
 }
 
-.user-management-account-settings .invoice-detail .payment-invoice .inv-block.inv-detail ul li>span:last-child {
-    padding-left: 8.5%;
-    width:44.5%;
+.user-management-account-settings .email-small-icon{
+    background-position: -3px -47px;
+    opacity: 0.5;
+}
+
+.user-management-account-settings .add-small-icon{
+    background-position: -19px -47px;
+    opacity: 0.5;
+}
+
+.user-management-account-settings .post-small-icon{
+    background-position: -35px -47px;
+    opacity: 0.5;
+}
+
+.user-management-account-settings .inv-mega-contact p{
+    margin:0px 0 4px 12px;
+    line-height: 18px;
+    font-size: 13px;
+    max-width: 75%;
+    display: inline-block;
+    color: #666;
+    white-space: normal;
+}
+
+.user-management-account-settings .inv-mega-contact:first-child p{
+    color: #000;
+    font-weight: 600;
+}
+
+.user-management-account-settings .invoice-detail .inv-title-container .inv-right {
+    float: right;
+    margin-right: 56px;
+}
+
+
+.user-management-account-settings .invoice-detail .inv-title-container .inv-title {
+    font-size: 32px;
+    font-weight: 600;
+    text-align: left;
+    line-height: 39px;
+    color: #333;
+    margin:64px 56px 0 0;
+    position: relative;
+}
+
+.user-management-account-settings .invoice-detail .inv-title-container ul{
+    list-style-type:none;
+    position: relative;
+    margin: 12px 0 0 0;
+    padding-left: 0px;
+}
+
+.user-management-account-settings .invoice-detail .inv-title-container ul li{
+    text-decoration: none;
+}
+
+.user-management-account-settings .invoice-detail .inv-title-container ul li>span:first-child {
     display: inline-block;
     text-align: left;
-    font-size: 14px;
-    color: #888;
-    line-height: 22px;
+    font-size: 13px;
+    color: #333;
+    line-height: 20px;
 }
 
-.user-management-account-settings .inv-block.billed {
-    width: 49.5%;
-    height: 280px;
+.user-management-account-settings .invoice-detail .inv-title-container ul li>span:last-child {
+    display: inline-block;
+    text-align: left;
+    font-size: 13px;
+    color: #888;
+    line-height: 20px;
+    margin-left: 4px;
+}
+
+.user-management-account-settings .invoice-detail .inv-add-container {
+    width: 100%;
+    height: auto;
     position: relative;
     display: inline-block;
-    vertical-align: top;
 }
 
-.user-management-account-settings .inv-block.billed p {
+.user-management-account-settings .invoice-detail .inv-border {
+    content: '';
+    position: relative;
+    margin-left: 56px;
+    height: 1px;
+    width: calc(100% - 112px);
+    background-color: rgba(0,0,0,0.1);
+}
+
+.user-management-account-settings .invoice-detail .inv-add-container .inv-subtitle {
+    width:100px;
+    height: 100%;
+    vertical-align: top;
+    display: inline-block;
+    position: relative;
+}
+
+.user-management-account-settings .invoice-detail .inv-subtitle {
     font-size: 16px;
     font-weight: 600;
     color: #333;
     line-height: 20px;
-    margin:24px auto 16px 54px;
+    margin:32px auto 8px 56px;
 }
 
-.user-management-account-settings .inv-block.billed ul {
+.user-management-account-settings .invoice-detail .inv-add-container ul {
     list-style-type:none;
-    width: 100%;
+    width: 63%;
     padding:0;
-    margin:0;
-    left: 56px;
-    position: absolute;
+    margin:32px 0;
+    position: relative;
+    display: inline-block;
 }
 
-.user-management-account-settings .inv-block.billed ul li {
+.user-management-account-settings .invoice-detail .inv-add-container ul li {
     text-decoration: none;
     line-height: 20px;
     font-size: 13px;
-    color:#888;
-    width: calc(100% - 132px);
+    color:#666;
+    width: calc(100% - 56px);
     text-overflow: clip;
     margin-bottom: 4px;
 }
 
-.user-management-account-settings .inv-block.billed ul li:first-child {
-    margin-bottom: 12px;
-    color: #333;
+.user-management-account-settings .invoice-detail .inv-add-container ul .inv-company-name {
+    margin-bottom: 8px;
+    color:#000;
+    font-weight: 600;
 }
 
-.user-management-account-settings .inv-block.short-block {
-    width: 25%;
-    height: 260px;
+.user-management-account-settings .invoice-detail .inv-add-container ul .inv-per-name {
+    margin-bottom: 8px;
+    color:#000;
+}
+
+.user-management-account-settings .invoice-detail .inv-payment-table {
+    width: calc(100% - 112px);
+    margin:0px 56px;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+}
+
+.user-management-account-settings .invoice-detail .inv-payment-table ul {
+    list-style-type:none;
+    width: 100%;
+    padding:0;
+    margin:0;
+}
+
+.user-management-account-settings .invoice-detail .inv-payment-table ul li {
+    padding:8px 0;
+    font-size: 14px;
+    font-weight: 400;
+    color: #888;
+    line-height: 22px;
     position: relative;
+}
+
+.user-management-account-settings .invoice-detail .inv-payment-table ul li:first-child {
+    padding:8px 0;
+    font-size: 16px;
+    font-weight: 900;
+    color: #333;
+    line-height: 20px;
+}
+
+.user-management-account-settings .invoice-detail .inv-payment-table ul li:first-child:before {
+    content: '';
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 1px;
+    width: 100%;
+    background-color: rgba(0,0,0,0.1);
+}
+
+.user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-header, .user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-item {
     display: inline-block;
+}
+
+.user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-header:first-child, .user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-item:first-child {
+    width: 100px;
     vertical-align: top;
 }
 
-.user-management-account-settings .inv-block.short-block p:first-child{
-    font-size: 16px;
-    font-weight: 600;
+.user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-header:nth-child(2), .user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-item:nth-child(2) {
+    width: auto;
+}
+
+.user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-header:nth-child(3), .user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-item:nth-child(3) {
+    width: 120px;
     color: #333;
-    line-height: 20px;
-    margin:64px auto 16px 56px;
-}
-
-.user-management-account-settings .inv-block.short-block p:not(:first-child) {
-    font-size: 13px;
-    color: #888;
-    line-height: 20px;
-    margin: 0 auto 4px 56px;
-}
-
-.user-management-account-settings .inv-block.long-block {
-    width: 49%;
-    height: 260px;
-    position: relative;
-    display: inline-block;
+    text-align: right;
+    float: right;
     vertical-align: top;
 }
 
-.user-management-account-settings .inv-block.long-block p {
-    margin: 0;
+.user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 1px;
+    width: 100%;
+    background-color: rgba(0,0,0,0.1);
 }
 
-.user-management-account-settings .inv-block.long-block p:first-child {
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
-    line-height: 20px;
-    position: absolute;
-    right: 56px;
-    top: 64px;
+.user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price:last-child {
+    font-weight: 900;
+    font-size: 18px;
+    line-height: 24px;
+    color: #000;
+    padding:12px 0;
+}
 
-} 
 
-.user-management-account-settings .inv-block.long-block p:nth-child(2) {
-    font-size: 13px;
-    font-weight: 400;
-    color: #888;
-    line-height: 20px;
-    right: 56px;
-    top: 100px;
+.user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price:last-child::before {
+    content: '';
     position: absolute;
-} 
+    right: 0px;
+    top: 0px;
+    height: 1px;
+    width: 175px;
+    background-color: rgba(0,0,0,0.1);   
+}
 
-.user-management-account-settings .inv-block.long-block p:nth-child(3) {
-    font-size: 13px;
-    font-weight: 400;
-    color: #888;
-    line-height: 20px;
-    right: 56px;
-    top: 164px;
-    position: absolute;
-} 
+.user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price .inv-payment-price-detail:first-child {
+    width: calc(100% - 125px);
+    display: inline-block;
+    text-align: right;
+}
 
-.user-management-account-settings .inv-block.long-block p:nth-child(4) {
-    font-size: 13px;
-    font-weight: 600;
-    color: #333;
-    line-height: 20px;
-    right: 56px;
-    top: 192px;
-    position: absolute;
-} 
+.user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price .inv-payment-price-detail:last-child {
+    width: 120px;
+    display: inline-block;
+    text-align: right;
+}
 
-.user-management-account-settings .inv-block.long-block p:nth-child(5) {
-    font-size: 13px;
-    font-weight: 400;
-    color: #888;
-    line-height: 20px;
-    right: 140px;
-    top: 164px;
-    position: absolute;
-} 
 
-.user-management-account-settings .inv-block.long-block p:nth-child(6) {
-    font-size: 13px;
-    font-weight: 600;
-    color: #333;
-    line-height: 20px;
-    right: 140px;
-    top: 192px;
-    position: absolute;
-} 
 
 
 
@@ -28445,6 +28549,8 @@ opacity: 1;
     margin-left: 4px;
     }
 }
+
+
 
 
 

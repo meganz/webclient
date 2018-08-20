@@ -614,6 +614,8 @@
                     <div class="user-management-next-arrow"></div>
                     <div class="user-management-breadcrumbs-img account-icon"></div>
                     <div class="user-management-subuser-name">[$403]</div>
+                    <div class="user-management-next-arrow inv-det-arrow hidden"></div>
+                    <div class="user-management-subuser-name inv-det-id hidden">Inv No. (placeholder!!!!)</div>
                 </div>
 
                 <div class="user-management-overview-buttons hidden">
@@ -1259,78 +1261,161 @@
                                 </div>
                             </div>
                         </div>
-                            <div class="invoice-detail hidden">
-                                <div class="default-white-button-user-management">
-                                    <div class="export-pdf-icon icon"></div>
-                                    [$19288]
-                                </div>
-                                <div class="payment-invoice">
-                                    <div class="inv-block inv-title">
-                                        <p>Payment Invoice</p>
-                                    </div>
-                                    <div class="inv-block inv-detail">
-                                        <ul>
-                                            <li>
-                                                <span>Invoice Date:	</span>
-                                                <span>13 Nov 2017	</span>
-                                            </li>
-                                            <li>
-                                                <span>Invoice Number:	</span>
-                                                <span>NwC-AOyfAxo	</span>
-                                            </li>
-                                            <li>
-                                                <span>NZBN::	</span>
-                                                <span>9429030423626	</span>
-                                            </li>
-                                            <li>
-                                                <span>GST No:	</span>
-                                                <span>110-633-521	</span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="inv-block billed">
-                                        <p>Billed</p>
-                                        <ul>
-                                            <li class=" ">money@mega.co.nz</li>
-                                            <li class=" ">Greg Daniel</li>
-                                            <li class=" ">120 Albert St 120 Albert St 120 Albert St 120 Albert St 120 Albert St</li>
-                                            <li class=" ">Auckland</li>
-                                            <li class=" ">1010</li>
-                                            <li class=" ">New Zealand </li>
-                                        </ul>
-                                    </div>
-                                    <div class="inv-block billed">
-                                        <p>From</p>
-                                        <ul>
-                                            <li class=" ">MEGA Limited</li>
-                                            <li class=" ">Level 21, BDO Tower</li>
-                                            <li class=" ">120 Albert Street</li>
-                                            <li class=" ">Auckland</li>
-                                            <li class=" ">1010</li>
-                                            <li class=" ">New Zealand </li>
-                                        </ul>
-                                    </div>
-                                    <div class="inv-block short-block">
-                                        <p>Date</p>
-                                        <p>1/8/2018</p>
-                                    </div>
-                                    <div class="inv-block short-block">
-                                        <p>Description</p>
-                                        <p>Business</p>
-                                        <p>(1/7/2018 - 31/7/2018)</p>
-                                    </div>
-                                    <div class="inv-block long-block">
-                                        <p>Price</p>
-                                        <p>€4.34</p>
-                                        <p>€0.65</p>
-                                        <p>€4.99</p>
-                                        <p>GST (15%) </p>
-                                        <p>Total </p>
-
-                                    </div>
-                                </div>
-
+                        <div class="invoice-detail hidden">
+                            <div class="default-white-button-user-management">
+                                <div class="export-pdf-icon icon"></div>
+                                [$19288]
                             </div>
+                            <div class="invoice-container">
+                                <div class="mega-contact-container">
+                                    <div class="mega-logo"></div>
+                                    <p class="inv-subtitle">Mega Limited</p>
+                                    <ul>
+                                        <li class="inv-mega-contact">
+                                            <div class="email-small-icon icon12"></div>
+                                            <p class="biller-email">invoicing@mega.nz</p>
+                                        </li>
+                                        <li class="inv-mega-contact">
+                                            <div class="add-small-icon icon12"></div>
+                                            <p class="biller-address">Level 21, Huawei Centre, 120 Albert Street, Auckland  1010,  New Zealand</pclass="biller-email">
+                                        </li>
+                                        <li class="inv-mega-contact">
+                                            <div class="post-small-icon icon12"></div>
+                                            <p class="biller-post">Private Bag 92 533, Wellesley St, Auckland  1141,  New Zealand</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="inv-title-container suba-inv">
+                                    <div class="inv-right">
+                                        <div class="inv-title">[$19292]</div>
+                                        <ul class=" ">
+                                            <li>
+                                                <span>[$19293]:</span>
+                                                <span id="invoice-date">13 Nov 2017	</span>
+                                            </li>
+                                            <li>
+                                                <span>[$19294]:</span>
+                                                <span id="invoice-number">NwC-AOyfAxo	</span>
+                                            </li>
+                                            <li>
+                                                <span>[$19295]:</span>
+                                                <span id="invoice-vat">110-633-521</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="inv-border"></div>
+                                <div class="inv-add-container">
+                                    <p class="inv-subtitle">[$19296]:</p>
+                                    <ul>
+                                        <li class="inv-company-name billed-name">AAA LTD.</li>
+                                        <li class="inv-per-name billed-attn">ATTN: Greg Daniel</li>
+                                        <li class="billed-email">money@mega.co.nz</li>
+                                        <li class="billed-address">120 Albert St, Auckland 1010, 120 Albert St, Auckland  1010 </li>
+                                        <li class="billed-country">New Zealand</li>
+                                        <li class="billed-vat">VAT: 9429030423626 </li>
+                                    </ul>
+                                </div>
+                                <div class="inv-payment-table">
+                                    <ul>
+                                        <li class="inv-li-table-header">
+                                            <div class="inv-payment-header">[$17023]</div>
+                                            <div class="inv-payment-header">[$16462]</div>
+                                            <div class="inv-payment-header">[$16463]</div>
+                                        </li>
+                                        <li class="inv-li-content">
+                                            <div class="inv-payment-item">1/8/2018</div>
+                                            <div class="inv-payment-item">Business account for X user<br>(1/7/2018 - 31/7/2018)</div>
+                                            <div class="inv-payment-item">€4.34</div>
+                                        </li>
+                                        <li class="inv-payment-price inv-li-gst">
+                                            <div class="inv-payment-price-detail inv-gst-perc">[$19301]:</div>
+                                            <div class="inv-payment-price-detail inv-gst-val">€4.34</div>
+
+                                        </li>
+                                        <li class="inv-payment-price inv-li-total">
+                                            <div class="inv-payment-price-detail">[$19300]:</div>
+                                            <div class="inv-payment-price-detail inv-total-val">€40000000.34</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="invoice-container">
+                                <div class="mega-contact-container">
+                                    <div class="mega-logo"></div>
+                                    <p class="inv-subtitle">Mega Limited</p>
+                                    <ul>
+                                        <li class="inv-mega-contact">
+                                            <div class="email-small-icon icon12"></div>
+                                            <p class="biller-email">invoicing@mega.nz</p>
+                                        </li>
+                                        <li class="inv-mega-contact">
+                                            <div class="add-small-icon icon12"></div>
+                                            <p class="biller-address">Level 21, Huawei Centre, 120 Albert Street, Auckland  1010,  New Zealand</p>
+                                        </li>
+                                        <li class="inv-mega-contact">
+                                            <div class="post-small-icon icon12"></div>
+                                            <p class="biller-post">Private Bag 92 533, Wellesley St, Auckland  1141,  New Zealand</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="inv-title-container">
+                                    <div class="inv-right">
+                                        <div class="inv-title">[$19297]</div>
+                                        <ul class=" ">
+                                            <li>
+                                                <span>[$19298]:</span>
+                                                <span id="rece-date">13 Nov 2017	</span>
+                                            </li>
+                                            <li>
+                                                <span>[$19299]:</span>
+                                                <span id="rece-number">NwC-AOyfAxo	</span>
+                                            </li>
+                                            <li>
+                                                <span>[$19295]:</span>
+                                                <span id="rece-vat">110-633-521</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="inv-border"></div>
+                                <div class="inv-add-container">
+                                    <p class="inv-subtitle">[$19296]:</p>
+                                    <ul>
+                                        <li class="inv-company-name billed-name">AAA LTD.</li>
+                                        <li class="inv-per-name billed-attn">ATTN: Greg Daniel</li>
+                                        <li class="billed-email">money@mega.co.nz</li>
+                                        <li class="billed-address">120 Albert St, Auckland 1010, 120 Albert St, Auckland  1010 </li>
+                                        <li class="billed-country">New Zealand</li>
+                                        <li class="billed-vat">VAT: 9429030423626 </li>
+                                    </ul>
+                                </div>
+                                <div class="inv-payment-table">
+                                    <ul>
+                                        <li class="inv-li-table-header">
+                                            <div class="inv-payment-header">[$17023]</div>
+                                            <div class="inv-payment-header">[$16462]</div>
+                                            <div class="inv-payment-header">[$16463]</div>
+                                        </li>
+                                        <li class="inv-li-content">
+                                            <div class="inv-payment-item">1/8/2018</div>
+                                            <div class="inv-payment-item">Business account for X user</div>
+                                            <div class="inv-payment-item">€4.34</div>
+                                        </li>
+                                        <li class="inv-payment-price inv-li-gst">
+                                            <div class="inv-payment-price-detail inv-gst-perc">[$19301]:</div>
+                                            <div class="inv-payment-price-detail inv-gst-val">€4.34</div>
+
+                                        </li>
+                                        <li class="inv-payment-price inv-li-total">
+                                            <div class="inv-payment-price-detail">[$19300]:</div>
+                                            <div class="inv-payment-price-detail inv-total-val">€40000000.34</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                         </div>
 
                 </div>

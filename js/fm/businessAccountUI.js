@@ -1308,7 +1308,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
             var invoiceDate = new Date(invoicesList[k].ts * 1000);
             var $newInvoiceRow = $invoiceRowTemplate.clone(true);
 
-            $newInvoiceRow.find('.inv-date').text(invoiceDate.toDateString());
+            $newInvoiceRow.find('.inv-date').text(invoiceDate.toLocaleDateString());
             $newInvoiceRow.find('.inv-desc').text(invoicesList[k].d);
             $newInvoiceRow.find('.inv-total').text('€' + invoicesList[k].tot);
             $newInvoiceRow.removeClass('hidden'); // if it was hidden
@@ -1347,6 +1347,58 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $accountPageHeader.find('.inv-det-arrow, .inv-det-id').removeClass('hidden');
     };
 
+    var validateInvoice = function (invoice) {
+        // top level validate
+        if (!invoice || !invoice.mega || !invoice.u || !invoice.items || !invoice.ts
+            || !invoice.tot || !invoice.taxrate) {
+            return false;
+        }
+
+        // mega object validation
+        if (!invoice.mega.cnum || !invoice.mega.taxnum || !invoice.mega.cname
+            || !invoice.mega.phaddr || !invoice.mega.poaddr) {
+            return false
+        }
+        // billed object validate
+        if (!invoice.u.e || !invoice.u.cname || !invoice.u.addr ) {
+            return false;
+        }
+
+        // items validation
+        if (!invoice.items.length) {
+            return false;
+        }
+        for (var k = 0; k < invoice.items.length; k++) {
+            if (!invoice.items[k].ts || !invoice.items[k].gross || !invoice.items[k].net
+                || !invoice.items[k].tax || !invoice.items[k].d) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    var fillInvoiceDetailPage = function (st, invoiceDetail) {
+        
+
+        if (!validateInvoice(invoiceDetail)) {
+            msgDialog('warningb', '', l[19302]);
+            mySelf.viewBusinessAccountPage();
+            return;
+        }
+
+        // mega section on the top of the invoice and receipt
+        var $megaContainer = $('.mega-contact-container', $invoiceDetailContainer);
+        $megaContainer.find('.inv-subtitle').text(invoiceDetail.mega.cname);
+        $megaContainer.find('.biller-email').text(invoiceDetail.mega.e);
+        $megaContainer.find('.biller-address').text(invoiceDetail.mega.phaddr.join(', '));
+        $megaContainer.find('.biller-post').text(invoiceDetail.mega.poaddr.join(', '));
+
+        // invoice top details
+        var $invoiceTopTitle = $('.inv-title-container.suba-inv', $invoiceDetailContainer);
+        $invoiceTopTitle.find('.invoice-date').text((new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
+        $invoiceTopTitle.find('.invoice-number').text(invoiceDetail.n);
+    };
 };
 
 

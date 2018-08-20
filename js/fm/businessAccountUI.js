@@ -46,6 +46,8 @@ function BusinessAccountUI() {
         //$('.fm-right-header-user-management .user-management-breadcrumb.overview').addClass('hidden');
         //$('.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
         $('.fm-right-header-user-management .user-management-breadcrumb').addClass('hidden');
+        $('.inv-det-arrow, .inv-det-id',
+            '.fm-right-header-user-management .user-management-breadcrumb').removeClass('hidden');
         $('.fm-right-header-user-management .user-management-overview-buttons').addClass('hidden');
         $('.user-management-overview-bar').addClass('hidden');
     };
@@ -460,7 +462,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
             }
             
         });
-        $('.fm-dialog-link-pwd-button', $dialog).on('click', function () {
+        $('.fm-dialog-link-pwd-button', $dialog).on('click', function decryptOkBtnHandler () {
             var enteredPassword = $('.fm-dialog-link-pwd-pad input', $dialog).val();
             $('.fm-dialog-link-pwd-pad input', $dialog).val('');
             if (!enteredPassword.length) {
@@ -488,7 +490,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                     
                     getInfoPromise.fail(failureAction);
 
-                    getInfoPromise.done(function (status, res) {
+                    getInfoPromise.done(function signupCodeGettingSuccessHandler (status, res) {
                         if (localStorage.d) {
                             console.log(res);
                         }
@@ -1342,6 +1344,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceContainer.removeClass('hidden');
         $invoiceDetailContainer.removeClass('hidden');
         $accountPageHeader.removeClass('hidden');
+        $accountPageHeader.find('.inv-det-arrow, .inv-det-id').removeClass('hidden');
     };
 
 };

@@ -705,7 +705,6 @@ function api_proc(q) {
               + '?id=' + (q.seqno++)
               + '&' + q.sid
               + (q.split ? '&ec' : '')  // encoding: chunked if splitter attached
-              + '&lang=' + lang         // selected language
               + mega.urlParams();       // additional parameters
 
         if (typeof q.cmdsBuffer[0] === 'string') {

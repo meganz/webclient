@@ -537,6 +537,7 @@ var mega = {
             var apiut = localStorage.apiut ? '&ut=' + localStorage.apiut : "";
             params += apiut;
 
+            params += '&lang=' + lang;
             this._urlParams = params;
         }
 
@@ -2941,36 +2942,133 @@ else if (!b_u) {
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
-    if (!is_drop && (u_sid = u_storage.sid))
-    {
-        loginresponse = true;
-        var lxhr = getxhr();
-        lxhr.onload = function()
-        {
-            loginresponse = false;
-            if (this.status == 200)
-            {
-                try
-                {
-                    loginresponse = this.response || this.responseText;
-                    if (loginresponse && loginresponse[0] == '[') loginresponse = JSON.parse(loginresponse);
-                    else if (parseInt(loginresponse) === -15 /* ESID */) {
+    (function _crossTabSession(u_storage) {
+        'use strict';
+
+        var xhr = function(params, data, callback) {
+            var xhr = getxhr();
+            xhr.onloadend = function() {
+                var response = false;
+
+                if (this.status === 200) {
+                    try {
+                        response = this.response || this.responseText || false;
+                        if (response[0] === '[') {
+                            response = JSON.parse(response);
+                        }
+                    }
+                    catch (ex) {
+                        console.warn(ex);
+                        response = false;
+                    }
+                }
+
+                callback(response);
+                boot_done();
+            };
+
+            xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams() + (params || ''), true);
+            xhr.send(JSON.stringify([data]));
+        };
+
+        var ack = function() {
+            if (!(u_sid = u_storage.sid)) {
+                loginresponse = false;
+            }
+
+            if (loginresponse) {
+                xhr('&sid=' + u_storage.sid, {'a': 'ug'}, function(response) {
+                    loginresponse = false;
+
+                    if (parseInt(response) === -15 /* ESID */) {
                         loginresponse = -15;
                     }
-                    else loginresponse = false;
-                }
-                catch (e) {}
+                    else if (typeof response[0] === 'object') {
+                        loginresponse = response;
+                    }
+                });
             }
+
+            if (dl_res) {
+                var g = {a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': u_sid || ''};
+
+                xhr(false, g, function(response) {
+                    dl_res = response[0] || response;
+                });
+            }
+
             boot_done();
+            ack = xhr = undefined;
         };
-        lxhr.onerror = function()
-        {
-            loginresponse= false;
-            boot_done();
-        };
-		lxhr.open('POST', apipath + 'cs?id=0&lang=' + lang + '&sid=' + u_storage.sid + mega.urlParams(), true);
-        lxhr.send(JSON.stringify([{'a':'ug'}]));
-    }
+
+        // No session handling needed for
+        if (is_drop) {
+            return;
+        }
+
+        loginresponse = true;
+        dl_res = (page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2;
+
+        if (localStorage === u_storage) {
+            ack();
+        }
+        else {
+            var onStorageEvent = function(ev) {
+                if (ev.key === 'sb!sid') {
+                    var value = JSON.parse(ev.newValue || '""');
+
+                    if (typeof value === 'number') {
+                        // Requesting session storage
+
+                        var data = {};
+
+                        if (sessionStorage.sid) {
+                            data.k = sessionStorage.k;
+                            data.sid = sessionStorage.sid;
+                        }
+
+                        onIdle(function() {
+                            localStorage.setItem('sb!sid', JSON.stringify(data));
+                        });
+                    }
+                    else if (typeof value === 'object') {
+                        // Received session storage
+
+                        if (ack) {
+                            if (value.sid) {
+                                u_storage.k = value.k;
+                                u_storage.sid = value.sid;
+                            }
+                            ack();
+                        }
+                    }
+
+                    delete localStorage[ev.key];
+                }
+            };
+
+            if (window.addEventListener) {
+                window.addEventListener('storage', onStorageEvent, false);
+            }
+            else if (window.attachEvent) {
+                window.attachEvent('onstorage', onStorageEvent);
+            }
+            onStorageEvent = undefined;
+
+            if (u_storage.sid) {
+                ack();
+            }
+            else {
+                setTimeout(function() {
+                    if (ack) {
+                        ack();
+                    }
+                    delete localStorage['sb!sid'];
+                }, 800);
+                localStorage.setItem('sb!sid', JSON.stringify(Math.random()));
+            }
+        }
+    })(u_storage);
 
     function boot_auth(u_ctx,r)
     {
@@ -2989,8 +3087,6 @@ else if (!b_u) {
             makeCache();
             return false;
         }
-
-        lxhr = dlxhr = undefined;
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
@@ -3019,31 +3115,6 @@ else if (!b_u) {
             loginresponse = undefined;
         }
         else u_checklogin({checkloginresult:boot_auth},false);
-    }
-
-    if ((page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2 && !is_drop) {
-        dl_res = true;
-        var dlxhr = getxhr();
-        dlxhr.onload = function() {
-            dl_res = false;
-            if (this.status === 200) {
-                try {
-                    dl_res = this.response || this.responseText;
-                    if (dl_res[0] == '[') dl_res = JSON.parse(dl_res);
-                    if (dl_res[0]) dl_res = dl_res[0];
-                }
-                catch (e) {}
-            }
-            boot_done();
-        };
-        dlxhr.onerror = function() {
-            dl_res= false;
-            boot_done();
-        };
-        var esid='';
-        if (u_storage.sid) esid = u_storage.sid;
-        dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
-        dlxhr.send(JSON.stringify([{a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': esid}]));
     }
 }
 

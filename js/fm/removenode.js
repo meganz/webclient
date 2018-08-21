@@ -355,6 +355,7 @@ function fmremovesync(selectedNodes) {
     else {
         var moveToRubbish = function() {
             loadingDialog.pshow();
+            selectionManager.clear_selection();
             M.moveToRubbish(selectedNodes).always(loadingDialog.phide.bind(loadingDialog));
         };
 

@@ -24181,7 +24181,7 @@ opacity: 1;
     cursor: pointer;
 }
 
-.default-white-button-user-management, .default-green-button-user-management, .default-gray-button-user-management{
+.default-white-button-user-management, .default-green-button-user-management, .default-red-button-user-management{
     height: 32px;
     width: auto;
     box-sizing: border-box;
@@ -24198,11 +24198,11 @@ opacity: 1;
     font-weight: 400;
 }
 
-.default-white-button-user-management.disabled, .default-green-button-user-management.disabled, .default-gray-button-user-management.disabled {
+.default-white-button-user-management.disabled, .default-green-button-user-management.disabled, .default-red-button-user-management.disabled {
     cursor: default;
 }
 
-.default-white-button-user-management.disabled:hover, .default-green-button-user-management.disabled:hover, .default-gray-button-user-management.disabled:hover {
+.default-white-button-user-management.disabled:hover, .default-green-button-user-management.disabled:hover, .default-red-button-user-management.disabled:hover {
     box-shadow: 0px 0px 0px 0px rgba(0,0,0,0);
 }
 
@@ -24216,12 +24216,12 @@ opacity: 1;
     color: #ffffff;
 }
 
-.default-gray-button-user-management {
-    background-color: #999999;
+.default-red-button-user-management {
+    background-color: #F0373A;
     color: #ffffff;
 }
 
-.default-white-button-user-management .icon, .default-green-button-user-management .icon, .default-gray-button-user-management .icon{
+.default-white-button-user-management .icon, .default-green-button-user-management .icon, .default-red-button-user-management .icon{
     width: 24px;
     height: 24px;
     margin:3px 8px 4px 0px;
@@ -24233,7 +24233,7 @@ opacity: 1;
     float: left;
 }
 
-.default-white-button-user-management:hover, .default-gray-button-user-management:hover{
+.default-white-button-user-management:hover, .default-red-button-user-management:hover{
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
 }
 
@@ -24487,6 +24487,19 @@ opacity: 1;
     background-position: -0px -12616px;
     opacity: 0.4;
 }
+
+.user-management-view .id-card-icon, .fm-right-header-user-management .id-card-icon, .user-management-dialog .id-card-icon{
+    background-position: -0px -12715px;
+}
+
+.user-management-view .ex-out-share, .fm-right-header-user-management .ex-out-share, .user-management-dialog .ex-out-share{
+    background-position: -0px -12741px;
+}
+
+.user-management-view .ex-in-share, .fm-right-header-user-management .ex-in-share, .user-management-dialog .ex-in-share{
+    background-position: -16px -12741px;
+}
+
 
 .fm-right-files-block {
     margin-left: 304px;
@@ -24879,10 +24892,63 @@ opacity: 1;
 }
 
 .user-management-subuser-profile-container .user-management-subuser-profile{
-    padding:32px 0 32px 242px;
+    padding:32px 0 32px 226px;
     position: relative;
-    height: auto;
 }
+
+.user-management-subuser-profile-container .subuser-container {
+    width: 33%;
+    min-width: 220px;
+    position: relative;
+    display: inline-block;
+}
+
+.user-management-subuser-profile-container .subuser-sec-profile-container {
+    display: inline-block;
+    padding-left: 16px;
+    position: relative;
+    vertical-align: top;
+}
+
+.user-management-subuser-profile-container .subuser-sec-profile-container::before {
+    content: "";
+    height: 100%;
+    width: 1px;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    left: 0;
+}
+
+.user-management-subuser-profile-container .subuser-sec-profile-container .icon {
+    display: inline-block;
+    padding-right: 24px;
+    vertical-align: top;
+}
+
+.user-management-subuser-profile-container .subuser-sec-profile-container ul {
+    display: inline-block;
+    list-style-type: none;
+    margin:6px 0 0 0;
+    padding:0;
+}
+
+.user-management-subuser-profile-container .subuser-sec-profile-container ul li {
+    padding-bottom: 8px;
+}
+
+.user-management-subuser-profile-container .subuser-sec-profile-container ul li>span:first-child {
+    font-size: 14px;
+    color: #111;
+    line-height: 18px;
+}
+
+.user-management-subuser-profile-container .subuser-sec-profile-container ul li>span:last-child {
+    font-size: 14px;
+    color: #888;
+    padding-left: 4px;
+    line-height: 18px;
+}
+
 
 .user-management-subuser-profile-container .user-management-subuser-profile .subuser-name{
     color:#333;
@@ -25032,7 +25098,7 @@ opacity: 1;
     vertical-align: top;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .default-gray-button-user-management, .user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
+.user-management-subuser-profile-container .user-management-subuser-profile .default-red-button-user-management, .user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
     position: absolute;
     right: 60px;
 }
@@ -26199,7 +26265,7 @@ opacity: 1;
     margin-left: 56px;
 }
 
-.user-management-dialog .dialog-input-container .input-user .indi-input {
+.user-management-dialog .dialog-input-container .indi-input {
     margin-right: 16px;
     width: 246px;
     height: 64px;
@@ -26207,14 +26273,14 @@ opacity: 1;
     position: relative;
 }
 
-.user-management-dialog .dialog-input-container .input-user .indi-input .error-message {
+.user-management-dialog .dialog-input-container .indi-input .error-message {
     font-size: 13px;
     padding:8px 0 0 8px;
     color: rgba(229,76,81,1);
     width:500px;
 }
 
-.user-management-dialog .dialog-input-container .input-user .dialog-input {
+.user-management-dialog .dialog-input-container .dialog-input {
     width:246px;
     height: 32px;
     display: inline-block;
@@ -26259,7 +26325,7 @@ opacity: 1;
     border:1px solid rgba(0,0,0,0.2);
 }
 
-.user-management-dialog .dialog-input.correct-input{
+.user-management-dialog .dialog-input.correctinput{
     background-color: #ffffff;
     color: #888888;
     border:1px solid rgba(0,0,0,0.1);
@@ -26282,19 +26348,11 @@ opacity: 1;
     color: #333333;
 }
 
-.user-management-dialog .dialog-input.high-light {
-    background-color: rgba(217,0,7,0.05);
+.user-management-dialog .dialog-input.highlight {
+    background-color: rgba(0,191,165,0.05);
     color: #999999;
-    border:1px solid rgba(217,0,7,0.5);
+    border:1px solid rgba(0,191,165,0.5);
 } 
-
-.user-management-add-user-dialog .dialog-button-container{
-    margin:0 24px 12px 24px;
-    height: 36px;
-    width: 570px;
-    box-sizing: border-box;
-    position: relative;
-}
 
 .user-management-dialog .default-button-no-border, .fm-right-header-user-management .default-button-no-border, .user-management-view .default-button-no-border{
     transition: 0.2s;
@@ -26378,22 +26436,37 @@ opacity: 1;
     margin-top: -265px;
 }
 
+.user-management-add-user-dialog .dialog-button-container {
+    height: 64px;
+    background-color: #fff;
+    position: relative;
+    border-radius: 0 0 8px 8px;
+}
+
 .user-management-add-user-dialog .default-green-button-user-management {
-    height: 32px;
+    height: 36px;
     width: auto;
     padding: 6px 24px;
     float: right;
     line-height: 20px;
-    font-size: 14px;
+    font-size: 16px;
+    margin:14px 32px 0 0;
 }
 
 .user-management-add-user-dialog .default-white-button-user-management {
     float: left;
-    height: 32px;
-    margin-right: 12px;
+    height: 36px;
+    margin:14px 32px 0 32px;
+    line-height: 32px;
+    font-size: 16px;
 }
 
-.user-management-add-user-dialog .licence-bar {
+.user-management-add-user-dialog .default-white-button-user-management .icon {
+    margin:5px 8px 4px 0;
+}
+
+
+/*.user-management-add-user-dialog .licence-bar {
     width: 100%;
     height: 56px;
     background-color: rgba(250,250,250,1);
@@ -26429,7 +26502,7 @@ opacity: 1;
     top:12px;
     color: #666;
     margin-right: 24px;
-}
+}*/
 
 .user-management-add-user-dialog .delete-img.icon, .user-management-edit-profile-dialog .delete-img.icon, .user-management-able-user-dialog .delete-img{
     position: absolute;
@@ -26445,7 +26518,6 @@ opacity: 1;
     height: auto;
     background-color: rgba(250,250,250,1); 
     padding:32px 40px;
-    margin-bottom: 12px;
     box-sizing: border-box;
 }
 
@@ -26459,17 +26531,7 @@ opacity: 1;
     left: 0;
 }
 
-.user-management-add-user-dialog .verification-container::after {
-    content: " ";
-    width: 100%;
-    height: 1px;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-    bottom: 0;
-    left: 0;
-}
-
-.verification-container .avatar {
+.verification-container .new-sub-user {
     width: 48px;
     height: 48px;
     border: 1px solid rgba(0,0,0,0.1);
@@ -26483,24 +26545,23 @@ opacity: 1;
     margin: 0;
 }
 
-.verification-container .avatar .subuser-image {
+.verification-container .new-sub-user .subuser-image {
     width: 42px;
     height: 42px;
     margin:2px;
     border: 1px solid rgba(0,0,0,0.1);
     border-radius: 100%;
     box-sizing: border-box;
-    background-color: DodgerBlue;
     position: absolute;
 }
 
-.verification-container .avatar .subuser-image img {
+.verification-container .new-sub-user .subuser-image img {
     width: 42px;
     height: 42px;
     border-radius: 100%;
     position: absolute;
 }
-.verification-container .avatar span {
+.verification-container .new-sub-user span {
     color: white;
     font-size: 24px;
     float: left;
@@ -26577,16 +26638,12 @@ opacity: 1;
     margin-bottom: 32px;
 }
 
-.user-management-dialog .dialog-input-title-ontop:nth-child(odd) {
+.user-management-dialog .dialog-input-title-ontop {
     margin-left: 32px;  
 }
 
-.user-management-dialog .dialog-input-title-ontop:nth-child(even) {
-    margin-left: 24px;
-}
-
 .user-management-dialog .dialog-input-container .dialog-input-title-ontop .dialog-input {
-    width:250px;
+    width:258px;
     height: 32px;
     display: inline-block;
     position: relative;
@@ -26618,7 +26675,7 @@ opacity: 1;
     border-radius: 0 0 8px 8px;
 }
 
-.user-management-edit-profile-dialog .dialog-button-container::before, .user-management-able-user-dialog .dialog-button-container::before, .user-management-edit-profile-dialog .dialog-button-container::before {
+.user-management-edit-profile-dialog .dialog-button-container::before, .user-management-able-user-dialog .dialog-button-container::before, .user-management-add-user-dialog .dialog-button-container::before {
     content: " ";
     width: 100%;
     height: 1px;
@@ -26642,7 +26699,7 @@ opacity: 1;
     margin-top: -102px;
 }
 
-.user-management-able-user-dialog .dialog-button-container .default-gray-button-user-management{
+.user-management-able-user-dialog .dialog-button-container .default-red-button-user-management{
     position: relative;
     margin:12px 16px 12px 12px;
     float: right;
@@ -27945,6 +28002,11 @@ opacity: 1;
 }
 
 .user-management-list-table .header-table-user-management tr th:nth-child(6), .user-management-list-table tr td:nth-child(6){
+    min-width:128px;
+    width: 200px;
+}
+
+.user-management-list-table .header-table-user-management tr th:nth-child(7), .user-management-list-table tr td:nth-child(7){
     min-width:110px;
     width: 180px;
     padding:0;
@@ -28496,11 +28558,11 @@ opacity: 1;
     .subaccount-view-used-data .used-storage-info .ff-name{
         width: 200px;
     }
-    .subaccount-view-used-data .used-storage-info .ff-number{
-        width: 240px;
+    .subaccount-view-used-data .used-storage-info .ff-name{
+        width: 350px;
     }
     .subaccount-view-used-data .used-storage-info .ff-occupy{
-        width: 100px;
+        width: 80px;
     }
 
     .user-management-list-table tr th:nth-child(2), .user-management-list-table tr td:nth-child(2){
@@ -28517,7 +28579,7 @@ opacity: 1;
         height: auto;
     }
 
-    .user-management-subuser-profile-container .user-management-subuser-profile .default-gray-button-user-management, .user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
+    .user-management-subuser-profile-container .user-management-subuser-profile .default-red-button-user-management, .user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
         right: 24px;
     }
 
@@ -28534,6 +28596,10 @@ opacity: 1;
 
     .user-management-overview-bar-data .info-block .icon, .user-management-overview-bar-data .default-white-button-user-management {
         display: none;
+    }
+
+    .user-management-overview-bar-data .info-block:not(:nth-child(3))::after{
+    margin:6px 20px 0 20px;
     }
 
     .user-management-overview-container .data-analysis-container .storage-analysis-container, .user-management-overview-container .data-analysis-container .transfer-analysis-container {

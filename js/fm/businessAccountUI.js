@@ -387,6 +387,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 var bandwidth = numOfBytes(subBandwidth, 2);
                 $('.business-sub-storage-use span', $subTr).text(storage.size + ' ' + storage.unit);
                 $('.business-sub-transfer-use span', $subTr).text(bandwidth.size + ' ' + bandwidth.unit);
+                $('.business-sub-last-active span', $subTr).text(bandwidth.size + ' ' + bandwidth.unit);
             }
         }
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
@@ -586,7 +587,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     $subAccountContainer.find('.user-management-view-status').removeClass('enabled pending disabled');
     // $subAccountContainer.find('.profile-button-container .disable-account').removeClass('hidden');
     $subAccountContainer.find('.profile-button-container .disable-account').text(l[19092])
-        .removeClass('default-green-button-user-management').addClass('default-gray-button-user-management')
+        .removeClass('default-green-button-user-management').addClass('default-red-button-user-management')
         .addClass('sub-disable').removeClass('sub-enable');
     $subAccountContainer.find('.profile-button-container .edit-profile').text(l[16735]);
     $subAccountContainer.find('.profile-button-container .resend-verification').addClass('hidden');
@@ -603,7 +604,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $subAccountContainer.find('div.user-management-view-status').addClass('disabled');
 
         $subAccountContainer.find('.profile-button-container .disable-account').text(l[19094])
-            .removeClass('default-gray-button-user-management').addClass('default-green-button-user-management')
+            .removeClass('default-red-button-user-management').addClass('default-green-button-user-management')
             .addClass('sub-enable').removeClass('sub-disable');
         $subAccountContainer.find('.profile-button-container .migrate-data').text(l[19095]).removeClass('hidden');
     }
@@ -1517,8 +1518,8 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
                 return;
             }
 
-            var $uName = $('.input-user input.sub-n', $dialog);
-            var $uEmail = $('.input-user input.sub-m', $dialog);
+            var $uName = $('.dialog-input-container input.sub-n', $dialog);
+            var $uEmail = $('.dialog-input-container input.sub-m', $dialog);
 
             if (!$uName.val().trim().length || $uName.val().trim().split(' ', 2).length < 2) {
                 $uName.addClass('error');
@@ -1578,7 +1579,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
 
     
     // event handler for key-down on inputs
-    $('.input-user input', $dialog).off('keydown.subuserresd')
+    $('.dialog-input-container input', $dialog).off('keydown.subuserresd')
         .on('keydown.subuserresd', function inputFieldsKeyDoownHandler() {
             var $me = $(this);
             if ($me.hasClass('error')) {

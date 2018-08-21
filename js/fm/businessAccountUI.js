@@ -1387,6 +1387,9 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             return;
         }
 
+        // navigation bar
+        $accountPageHeader.find('.inv-det-id').text(invoiceDetail.n);
+
         // mega section on the top of the invoice and receipt
         var $megaContainer = $('.mega-contact-container', $invoiceDetailContainer);
         $megaContainer.find('.inv-subtitle').text(invoiceDetail.mega.cname);
@@ -1410,6 +1413,20 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         if (nvoiceDetail.u.taxnum) {
             $invoiceDetailContainer.find('.billed-vat')
                 .text(nvoiceDetail.u.taxnum[0] + ': ' + nvoiceDetail.u.taxnum[1]).removeClass('hidden');
+        }
+
+        // invoice items
+        var $invoiceItemsContainer = $('.inv-payment-table', $invoiceDetailContainer)
+        var $invItemContent = $($('.inv-li-content', $invoiceItemsContainer).get(0));
+        var $invItemContentTemplate = $invItemContent.clone(true);
+        $invItemContent.remove();
+        var $invItemHeader = $('.inv-li-table-header', $invoiceItemsContainer);
+        for (var k = invoiceDetail.items.length - 1; k >= 0; k--) {
+            var $invItem = $invItemContentTemplate.clone(true);
+            $invItem.find('.inv-pay-date').text((new Date(invoiceDetail.items[k].ts * 1000).toLocaleDateString));
+            $invItem.find('.inv-pay-desc').text(invoiceDetail.items[k].d);
+            $invItem.find('.inv-pay-amou').text(invoiceDetail.items[k].gross);
+            $invItem.insertAfter($invItemHeader);
         }
     };
 };

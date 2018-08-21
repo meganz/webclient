@@ -4650,6 +4650,36 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 	    },
+	    componentWillMount: function componentWillMount() {
+	        var self = this;
+
+	        if (self.props.multiple) {
+	            var KEY_ENTER = 13;
+
+	            $(document.body).rebind('keypress.contactPicker' + self.getUniqueId(), function (e) {
+	                var keyCode = e.which || e.keyCode;
+	                if (keyCode === KEY_ENTER) {
+	                    if (self.state.selected) {
+	                        e.preventDefault();
+	                        e.stopPropagation();
+
+	                        $(document).trigger('closeDropdowns');
+
+	                        if (self.props.onSelectDone) {
+	                            self.props.onSelectDone(self.state.selected);
+	                        }
+	                    }
+	                }
+	            });
+	        }
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+
+	        if (self.props.multiple) {
+	            $(document.body).unbind('keypress.contactPicker' + self.getUniqueId());
+	        }
+	    },
 	    render: function render() {
 	        var self = this;
 

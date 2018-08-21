@@ -534,6 +534,8 @@ React.makeElement = React['createElement'];
 	        return;
 	    }
 
+	    self.isLoggingOut = isLogout;
+
 	    self.trigger('onDestroy', [isLogout]);
 
 	    if (self.$conversationsAppInstance && ReactDOM.findDOMNode(self.$conversationsAppInstance) && ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode) {

@@ -2177,6 +2177,10 @@ function topmenuUI() {
         }
         $topHeader.find('.top-search-bl').removeClass('contains-value active');
         $topHeader.find('.top-search-input').val('');
+        // if current page is search result reset it.
+        if(page.indexOf('/search/') !== -1) {
+            loadSubPage(page.slice(0, page.indexOf('/search/')));
+        }
     });
 
     $topHeader.find('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
@@ -2246,6 +2250,10 @@ function topmenuUI() {
                         });
                     });
                 }
+            }
+            // if current page is search and value is empty result move to root.
+            else if (val === '' && page.indexOf('/search/') !== -1) {
+                loadSubPage(page.slice(0, page.indexOf('/search/')));
             }
         }
     });

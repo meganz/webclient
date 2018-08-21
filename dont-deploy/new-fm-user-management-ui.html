@@ -136,7 +136,7 @@ $(document).ready(function() {
 		
 	<!-- Dialog -->
 
-<div class="user-management-add-user-dialog user-management-dialog fm-dialog hidden"> 
+<div class="user-management-add-user-dialog user-management-dialog fm-dialog"> 
     <div class="dialog-title">Invite People to Team</div>
     <div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
     <div class="delete-img icon"></div>
@@ -183,7 +183,7 @@ $(document).ready(function() {
     </div>
 </div><!--END add user dialog-->  
 
-<div class="user-management-edit-profile-dialog user-management-dialog fm-dialog hidden">
+<div class="user-management-edit-profile-dialog user-management-dialog fm-dialog">
     <div class="user-management-subuser-avatars">
     	<div class="user-management-subuser-image"></div>
     </div>
@@ -238,11 +238,10 @@ $(document).ready(function() {
 	</div>
 </div>
 
-<div class="user-management-able-user-dialog user-management-dialog fm-dialog hidden">
+<div class="user-management-able-user-dialog user-management-dialog fm-dialog">
 	<div class="re-enable-large-icon icon56"></div>
 	<div class="dialog-text-container">
 		<div class="dialog-text-one">Are you sure you want to re-enable the account of <b>Jay Pierce</b>?</div>
-		<span class="dialog-text-two">Note: This action will take up user quota.</span>
 	</div>
 	<div class="dialog-button-container">
 		<div class="default-green-button-user-management">
@@ -254,7 +253,7 @@ $(document).ready(function() {
 	</div>				
 </div>
 
-<div class="user-management-able-user-dialog user-management-dialog fm-dialog hidden">
+<div class="user-management-able-user-dialog user-management-dialog fm-dialog">
 	<div class="disable-large-icon icon56"></div>
 	<div class="dialog-text-container">
         <div class="dialog-text-one">Are you sure you want to disable the account of <b>Jay Pierce</b>? </div>
@@ -507,7 +506,7 @@ $(document).ready(function() {
 		    </div>
 		</div>
 
-		<div class="files-grid-view user-management-view">
+		<div class="files-grid-view user-management-view hidden">
 			<div class="user-management-list-table hidden">
 	            <table class="header-table-user-management">
 	                <tbody>
@@ -951,672 +950,671 @@ $(document).ready(function() {
 	        	</div>
 	        	<div class="border"></div>
 
-	        <div class="settings hidden">
-	        	<div class="setting-block hidden">
-	        		<div class="title">
-	        			<div class="contact-icon48 icon48"></div>
-	        			Contact              			
-	        		</div>
+		        <div class="settings">
+		        	<div class="setting-block hidden">
+		        		<div class="title">
+		        			<div class="contact-icon48 icon48"></div>
+		        			Contact              			
+		        		</div>
 
-	            	<div class="option-containers">
-	            		<div class="heading">Contact can be added from:</div>
-	    				<div class="default-white-button-user-management">
-							<div class="close-icon icon"></div>
-							Close
-	    				</div>
-
-	        			<div class="option-group">
-							<form>
-								<div class="checked"><input type="radio"> <span>Any source</span></div>
-								<div><input type="radio"> <span>External users cannot be added</span></div>
-								<div><input type="radio"> <span>Require administrator approval to add external contacts Require administrator approval to add external contacts</span></div>
-
-
-								<div class="sub-option">
-									<div class="checkboxOn-user-management small-user-management"></div>
-								 	<div class="sub-heading">Automatically allow the contacts with emails or domains in the whitelist to be added or sent. Automatically allow the contacts with emails or domains in the whitelist to be added or sent. </div>	
-								</div>
-									<div class="default-white-button-user-management">
-								 	<div class="fold-icon icon"></div>
-									Hide the list
-								</div>
-							 	<div class="dialog">
-							 		<div class="list-heading">
-						 				<div class="list-title">Email</div>
-		 								<div class="default-button-no-border">
-											<div class="close-icon icon"></div>
-											Close
-										</div>
-		 								<div class="default-button-no-border">
-											<div class="add-more-img icon"></div>
-											Add More
-										</div>
-							 		</div>
-							 		<div class="list scroll-auto">
-								 		<div class="list-row">
-							 				<div class="list-email">berniece_gerhold@yahoo.com berniece_gerhold@yahoo.com berniece_gerhold@yahoo.com</div>
-							 				<div class="delete-img icon"></div>
-							 				<div class="quick-edit-icon icon"></div>
-								 		</div>
-								 		<div class="list-row">
-							 				<div class="list-email">berniece_gerhold@yahoo.com</div>
-							 				<div class="delete-img icon"></div>
-							 				<div class="quick-edit-icon icon"></div>
-								 		</div>
-								 		<div class="list-row">
-							 				<div class="list-email">berniece_gerhold@yahoo.com</div>
-							 				<div class="delete-img icon"></div>
-							 				<div class="quick-edit-icon icon"></div>
-								 		</div>								 						
-								 		<div class="list-row">
-							 				<div class="list-email">berniece_gerhold@yahoo.com</div>
-							 				<div class="delete-img icon"></div>
-							 				<div class="quick-edit-icon icon"></div>
-								 		</div>								 						
-								 		<div class="list-row">
-							 				<div class="list-email">berniece_gerhold@yahoo.com</div>
-							 				<div class="delete-img icon"></div>
-							 				<div class="quick-edit-icon icon"></div>
-								 		</div>
-								 		<div class="list-row">
-							 				<div class="list-email">berniece_gerhold@yahoo.com</div>
-							 				<div class="delete-img icon"></div>
-							 				<div class="quick-edit-icon icon"></div>
-								 		</div>
-							 		</div>
-
-
-							 		<div class="list-heading">
-						 				<div class="list-title">Domains</div>
-		 								<div class="default-button-no-border">
-											<div class="close-icon icon"></div>
-											Close
-										</div>
-		 								<div class="default-button-no-border">
-											<div class="add-more-img icon"></div>
-											Add More
-										</div>
-							 		</div>
-							 		<div class="list scroll-auto">
-								 		<div class="list-row">
-							 				<div class="list-email">berniece_gerhold@yahoo.com</div>
-							 				<div class="delete-img icon"></div>
-							 				<div class="quick-edit-icon icon"></div>
-								 		</div>
-								 		<div class="list-row">
-							 				<div class="list-email">berniece_gerhold@yahoo.com</div>
-							 				<div class="delete-img icon"></div>
-							 				<div class="quick-edit-icon icon"></div>
-								 		</div>								 			
-							 		</div>
-
-							 	</div>
-							</form>
-	            		</div> 
-					</div>
-
-	            	<div class="option-containers black-list">
-	            		<div class="heading">Black list</div>
-
-	            		<div class="dialog-feature-toggle toggle-on">
-	            			<div class="dialog-feature-switch"></div>
-	            		</div>
-
-	        			<div class="option-group">
-							<form>
-								<div class="sub-option">
-								 	<div class="sub-heading">Note: After you block individual emails or domains, they will be automatically removed as contacts from all accounts. </div>	
-								</div>
-									<div class="default-white-button-user-management">
-								 	<div class="fold-icon icon"></div>
-									Hide the list
-								</div>
-							 	<div class="dialog">
-							 		<div class="list-heading">
-		 								<div class="default-button-no-border">
-											<div class="add-more-img icon"></div>
-											Add More
-										</div>
-							 		</div>
-							 		<div class="list-row">
-						 				<div class="list-email">berniece_gerhold@yahoo.com</div>
-						 				<div class="delete-img icon"></div>
-						 				<div class="quick-edit-icon icon"></div>
-							 		</div>
-							 		<div class="list-row">
-						 				<div class="list-email">berniece_gerhold@yahoo.com</div>
-						 				<div class="delete-img icon"></div>
-						 				<div class="quick-edit-icon icon"></div>
-							 		</div>
-							 	</div>
-							</form>
-	            		</div> 
-					</div>
-	        	</div>
-
-	        	<div class="setting-block hidden">
-	        		<div class="title">
-	        			<div class="share-icon48 icon48"></div>
-	        			Share              			
-	              	</div>
-
-	            	<div class="option-containers file-share">
-	            		<div class="heading">Files/folders can be shared to:</div>
-	        				<div class="default-white-button-user-management">
+		            	<div class="option-containers">
+		            		<div class="heading">Contact can be added from:</div>
+		    				<div class="default-white-button-user-management">
 								<div class="close-icon icon"></div>
 								Close
-	        				</div>	
-	        			<div class="option-group">
-							<form>
-								<div class="checked"><input type="radio"> <span>Files/folders can be shared to internal and external users</span></div>
-								<div><input type="radio"> <span>Files/folders can be shared to internal users only</span></div>
-								<div><input type="radio"> <span>Files/folders require administrator approval to allow an external user access</span></div>
-								<div class="sub-option">
-								 	<div class="checkboxOn-user-management small-user-management"></div>
-								 	<div class="sub-heading">Automatically allow the files/folders in the following list to be shared.</div>	
-								</div>
-									<div class="default-white-button-user-management">
-								 	<div class="fold-icon icon"></div>
-									Hide the list
-								</div>
-							</form>
+		    				</div>
 
-							<table class="share-table">
-	                            <tr>
-	                                <th>Sharing users</th>
-	                                <th>Shared folders/files</th>
-	                                <th>List of people shared with</th>
-	                                <th>
-	                                    <div class="default-button-no-border">
-	                                    <div class="add-more-img icon"></div>
-	                                    Add More
-	                                    </div>
-	                                </th>
-	                            </tr>
-	                            <tr>
-	                                <td>Jay Pierce</td>
-	                                <td>
-	                                	<div class="file-icon icon"></div>
-	                                	<span>File name</span>
-	                                </td>
-	                                <td>
-	                                    <div class="default-white-button-user-management">
-	                                        <div class="fold-icon icon"></div>
-	                                    	Hide the list
-	                                    </div>
-	                                </td>
-	                                <td>
-						 				<div class="delete-img icon"></div>
-						 				<div class="quick-edit-icon icon"></div>
-	                                </td>
+		        			<div class="option-group">
+								<form>
+									<div class="checked"><input type="radio"> <span>Any source</span></div>
+									<div><input type="radio"> <span>External users cannot be added</span></div>
+									<div><input type="radio"> <span>Require administrator approval to add external contacts Require administrator approval to add external contacts</span></div>
 
-	                            </tr>
-	                            <tr class=" ">
-	                                <td> </td>
-	                                <td> </td>
-	                                <td colspan="3">
-	                                    <div class="dialog share-people-list">
-	                                        <div class="share-people-list-heading">
-	                                        	<div class="default-green-button-user-management">
-	                                        		<div class="add-white-icon icon"></div>
-	                                        		Add People
-	                                        	</div>
-	                                        </div>
-	                                        <div class="list scroll-auto">
-	                                        	<div class="share-people-list-item">Pauline Ward
-	                                        		<div class="delete-img icon"></div>
-	                                        	</div>
-	                                        	 <div class="share-people-list-item">Pauline Ward
-	                                        		<div class="delete-img icon"></div>
-	                                        	</div>	                                            	
-	                                        </div>
-	                                    </div>
-	                                </td>
-	                            </tr>
-							</table>	
-	            		</div> 
-					</div>
 
-	            	<div class="option-containers">
-	            		<div class="heading">Shares can be received from:</div>
-	        				<div class="default-white-button-user-management">
-								<div class="close-icon icon"></div>
-								Close
-	        				</div>
-	        			<div class="option-group">
-							<form>
-								<div class="checked"><input type="radio"> <span>Shares can be received from internal and external users</span></div>
-								<div><input type="radio"> <span>Shares can be received from internal users only</span></div>
-								<div><input type="radio"> <span>Shares required administrator approval to receive from an external user access</span></div>
-							</form>		
-	            		</div> 
-					</div>
+									<div class="sub-option">
+										<div class="checkboxOn-user-management small-user-management"></div>
+									 	<div class="sub-heading">Automatically allow the contacts with emails or domains in the whitelist to be added or sent. Automatically allow the contacts with emails or domains in the whitelist to be added or sent. </div>	
+									</div>
+										<div class="default-white-button-user-management">
+									 	<div class="fold-icon icon"></div>
+										Hide the list
+									</div>
+								 	<div class="dialog">
+								 		<div class="list-heading">
+							 				<div class="list-title">Email</div>
+			 								<div class="default-button-no-border">
+												<div class="close-icon icon"></div>
+												Close
+											</div>
+			 								<div class="default-button-no-border">
+												<div class="add-more-img icon"></div>
+												Add More
+											</div>
+								 		</div>
+								 		<div class="list scroll-auto">
+									 		<div class="list-row">
+								 				<div class="list-email">berniece_gerhold@yahoo.com berniece_gerhold@yahoo.com berniece_gerhold@yahoo.com</div>
+								 				<div class="delete-img icon"></div>
+								 				<div class="quick-edit-icon icon"></div>
+									 		</div>
+									 		<div class="list-row">
+								 				<div class="list-email">berniece_gerhold@yahoo.com</div>
+								 				<div class="delete-img icon"></div>
+								 				<div class="quick-edit-icon icon"></div>
+									 		</div>
+									 		<div class="list-row">
+								 				<div class="list-email">berniece_gerhold@yahoo.com</div>
+								 				<div class="delete-img icon"></div>
+								 				<div class="quick-edit-icon icon"></div>
+									 		</div>								 						
+									 		<div class="list-row">
+								 				<div class="list-email">berniece_gerhold@yahoo.com</div>
+								 				<div class="delete-img icon"></div>
+								 				<div class="quick-edit-icon icon"></div>
+									 		</div>								 						
+									 		<div class="list-row">
+								 				<div class="list-email">berniece_gerhold@yahoo.com</div>
+								 				<div class="delete-img icon"></div>
+								 				<div class="quick-edit-icon icon"></div>
+									 		</div>
+									 		<div class="list-row">
+								 				<div class="list-email">berniece_gerhold@yahoo.com</div>
+								 				<div class="delete-img icon"></div>
+								 				<div class="quick-edit-icon icon"></div>
+									 		</div>
+								 		</div>
 
-	            	<div class="option-containers">
-	            		<div class="heading">Creation of file and folder links:</div>
-	        				<div class="default-white-button-user-management">
-								<div class="close-icon icon"></div>
-								Close
-	        				</div>	
-	        			<div class="option-group">
-							<form>
-								<div class="checked"><input type="radio"> <span>File and folder links can be created</span></div>
-								<div><input type="radio"> <span>Shares can be received from internal users only</span></div>
-								<div><input type="radio"> <span>Shares required administrator approval to receive from an external user access</span></div>
-							</form>	                		
-	            		</div> 
-					</div>
 
-	            	<div class="option-containers">
-	            		<div class="heading">The approval to create MEGAdrop folders:</div>
-	    				<div class="default-white-button-user-management">
-							<div class="close-icon icon"></div>
-							Close
-	    				</div>		                		
-	        			<div class="option-group">
-							<form>
-								<div class="checked"><input type="radio"> <span>MEGAdrop folders can be created</span></div>
-								<div><input type="radio"> <span>SMEGAdrop folders can’t be created</span></div>
-								<div><input type="radio"> <span>MEGAdrop folders require administrator approval to be created</span></div>
-							</form>	                		
-	            		</div> 
-					</div>
-	        	</div>
+								 		<div class="list-heading">
+							 				<div class="list-title">Domains</div>
+			 								<div class="default-button-no-border">
+												<div class="close-icon icon"></div>
+												Close
+											</div>
+			 								<div class="default-button-no-border">
+												<div class="add-more-img icon"></div>
+												Add More
+											</div>
+								 		</div>
+								 		<div class="list scroll-auto">
+									 		<div class="list-row">
+								 				<div class="list-email">berniece_gerhold@yahoo.com</div>
+								 				<div class="delete-img icon"></div>
+								 				<div class="quick-edit-icon icon"></div>
+									 		</div>
+									 		<div class="list-row">
+								 				<div class="list-email">berniece_gerhold@yahoo.com</div>
+								 				<div class="delete-img icon"></div>
+								 				<div class="quick-edit-icon icon"></div>
+									 		</div>								 			
+								 		</div>
 
-	        	<div class="setting-block admin">
-	        		<div class="title">
-	        			<div class="admin-icon48 icon48"></div>
-	        			Admin              			
-	              	</div>
+								 	</div>
+								</form>
+		            		</div> 
+						</div>
 
-	            	<div class="option-containers full-admin">
-	            		<div class="heading">Full – administrators:</div>
-	    				<div class="default-white-button-user-management">
-							<div class="close-icon icon"></div>
-							Close
-	    				</div>		                		
-	        			<div class="option-group">									
-							<div class="sub-heading">Control the delegation of master level administrators.</div>	
+		            	<div class="option-containers black-list">
+		            		<div class="heading">Black list</div>
 
-							<div class="dialog share-people-list">
-	                            <div class="share-people-list-heading">
-	                            	<div class="default-green-button-user-management">
-	                            		<div class="add-white-icon icon"></div>
-	                            		Add Full – administrators
-	                            	</div>
-	                            </div>
-	                            <div class="list scroll-auto">
-	                            	<div class="share-people-list-item">
-	                            		<span>Pauline Ward</span>
-	                            		<div class="disabled-icon icon"></div>
-	                            		<div class="view-icon icon"></div>
-	                            	</div>
-	                            	 <div class="share-people-list-item">
-	                            	 	<span>Pauline Ward</span>
-	                            		<div class="disabled-icon icon"></div>
-	                            		<div class="view-icon icon"></div>
-	                            	</div>                                	
-	                            </div>
+		            		<div class="dialog-feature-toggle toggle-on">
+		            			<div class="dialog-feature-switch"></div>
+		            		</div>
 
-	                        </div>
-	            		</div> 
-					</div>
-
-	            	<div class="option-containers sub-admin">
-	            		<div class="heading">Sub – administrators:</div>
-	    				<div class="default-white-button-user-management">
-							<div class="close-icon icon"></div>
-							Close
-	    				</div>		                		
-	        			<div class="option-group">									
-							<div class="sub-heading">Control the approval functionality for the sub-administrators.</div>	
-
-							<div class="default-green-button-user-management">
-								<div class="add-white-icon icon"></div>
-								Add Sub – administrators
-							</div>
-
-							<table class="sub-admin-table scroll-auto">
-								<tr>
-								    <th>Sub – administrators</th>
-								    <th>Sub - users</th>
-								    <th>Contact</th>
-								    <th>Share</th>
-								    <th>Other</th>
-								    <th> </th>
-								</tr>
-
-								<tr>
-								    <td>Jay Pierce</td>
-								    <td>
-								        <div class="default-white-button-user-management">
-								            <div class="fold-icon icon"></div>
-								            Hide the list
-								        </div>
-								    </td>
-								    <td><div class="checkdiv checkboxOff-user-management small-user-management">
-								    </div></td>
-								    <td><div class="checkdiv checkboxOff-user-management small-user-management">
-								    </div></td>
-								    <td><div class="checkdiv checkboxOff-user-management small-user-management">
-								    </div></td>
-								    <td>
-								        <div class="delete-img icon"></div>
-								        <div class="quick-edit-icon icon"></div>
-								    </td>                                      
-								</tr>
-
-								<tr class=" ">
-								    <td> </td>
-								    <td colspan="6">
-								        <div class="dialog share-people-list">
-								            <div class="share-people-list-heading">
-								                <div class="default-green-button-user-management">
-								                    <div class="add-white-icon icon"></div>
-								                    Add People
-								                </div>
-												<div class="default-button-no-border">
-													<div class="checkdiv checkboxOff-user-management small-user-management right-alignment"></div>
-													<span>Add all users</span>	
-								    			</div>
-								            </div>
-								            <div class="list scroll-auto">
-									            <div class="share-people-list-item">Pauline Ward
-									                <div class="delete-img icon"></div>
-									            </div>
-									             <div class="share-people-list-item">Pauline Ward
-									                <div class="delete-img icon"></div>
-									            </div>								            	
-								            </div>
-								        </div>
-								    </td>
-								</tr>
-
-								<tr>
-								    <td>Jay Pierce</td>
-								    <td>
-								        <div class="default-white-button-user-management">
-								            <div class="unfold-icon icon"></div>
-								            Show/Edit users
-								        </div>
-								    </td>
-								    <td><div class="checkdiv checkboxOff-user-management small-user-management">
-								    </div></td>
-								    <td><div class="checkdiv checkboxOff-user-management small-user-management">
-								    </div></td>
-								    <td><div class="checkdiv checkboxOff-user-management small-user-management">
-								    </div></td>
-								    <td>
-								        <div class="delete-img icon"></div>
-								        <div class="quick-edit-icon icon"></div>
-								    </td>                                      
-								</tr>
-
-								<tr class=" ">
-								    <td> </td>
-								    <td colspan="6">
-								        <div class="dialog share-people-list">
-								            <div class="share-people-list-heading">
-								                <div class="default-green-button-user-management">
-								                    <div class="add-white-icon icon"></div>
-								                    Add People
-								                </div>
-												<div class="default-button-no-border">
-													<div class="checkdiv checkboxOff-user-management small-user-management right-alignment"></div>
-													<span>Add all users</span>	
-								    			</div>
-								            </div>
-								            <div class="list scroll-auto">
-									            <div class="share-people-list-item">Pauline Ward
-									                <div class="delete-img icon"></div>
-									            </div>
-									             <div class="share-people-list-item">Pauline Ward
-									                <div class="delete-img icon"></div>
-									            </div>								            	
-								            </div>
-								        </div>
-								    </td>
-								</tr>
-							</table>
-	            		</div> 
-					</div>
-	        	</div>
-
-	        	<div class="setting-block">
-	        		<div class="title">
-	        			<div class="other-icon48 icon48"></div>
-	        			Other              			
-	              	</div>
-	 
-	            	<div class="option-containers recycle-bin">
-	            		<div class="heading">Recycle bin:</div>
-	    				<div class="default-white-button-user-management">
-							<div class="close-icon icon"></div>
-							Close
-	    				</div>		                		
-	        			<div class="option-group">
-							<form>
-								<div class="checked"><input type="radio"> <span>Users are allowed to empty their recycle bins</span></div>
-								<div><input type="radio"> <span>Users cannot empty their recycle bins</span></div>
-								<div><input type="radio"> 
-									<div class="option-with-varible">Users cannot empty their recycle bins, files are permanently deleted after
-										<div class="recycle-days">30</div>
-									days</div>
-								</div>
-							</form>	                		
-	            		</div> 
-					</div>
-	        	</div>
-	        </div>
-
-	        <div class="invoice">
-	        	<div class="invoice-list hidden">
-		        	<div class="invoice-subtitle">Invoice list</div>
-		        	<div class="invoice-table-container">
-						<table class="invoice-table-header">
-		                    <tr>
-		                        <th>
-		                        	<div class="arrow asc">Date</div>
-		                        </th>
-		                        <th>
-		                        	<div class="arrow desc">Description</div>
-		                       </th>
-		                        <th>
-		                        	<div class="arrow desc">Amount</div>
-		                        </th>
-		                        <th></th>
-		                    </tr>
-		                 </table>
-		                 <div class="invoice-table-list-container">
-		                 <table class="invoice-table">
-		                    <tr>
-		                        <td class="">01 Aug 2018</td>
-		                        <td class="">Place description</td>
-		                        <td class="">$512.30</td>
-		                        <td class="">
-		                        	<div class="default-white-button-user-management">View detals</div>
-		                        </td>
-		                    </tr>
-		                    <tr>
-		                        <td class="">01 Aug 2018</td>
-		                        <td class="">Place description</td>
-		                        <td class="">$512.30</td>
-		                        <td class="">
-		                        	<div class="default-white-button-user-management">View detals</div>
-		                        </td>
-		                    </tr>                    
-						</table>		                 	
-		                 </div>	
+		        			<div class="option-group">
+								<form>
+									<div class="sub-option">
+									 	<div class="sub-heading">Note: After you block individual emails or domains, they will be automatically removed as contacts from all accounts. </div>	
+									</div>
+										<div class="default-white-button-user-management">
+									 	<div class="fold-icon icon"></div>
+										Hide the list
+									</div>
+								 	<div class="dialog">
+								 		<div class="list-heading">
+			 								<div class="default-button-no-border">
+												<div class="add-more-img icon"></div>
+												Add More
+											</div>
+								 		</div>
+								 		<div class="list-row">
+							 				<div class="list-email">berniece_gerhold@yahoo.com</div>
+							 				<div class="delete-img icon"></div>
+							 				<div class="quick-edit-icon icon"></div>
+								 		</div>
+								 		<div class="list-row">
+							 				<div class="list-email">berniece_gerhold@yahoo.com</div>
+							 				<div class="delete-img icon"></div>
+							 				<div class="quick-edit-icon icon"></div>
+								 		</div>
+								 	</div>
+								</form>
+		            		</div> 
+						</div>
 		        	</div>
 
-	        	</div>
-	        	<div class="invoice-detail">
-					<div class="default-white-button-user-management">
-						<div class="export-pdf-icon icon"></div>
-						Export to PDF
-					</div>
-					<div class="invoice-container">
-						<div class="mega-contact-container">
-							<div class="mega-logo"></div>
-							<p class="inv-subtitle">Mega Limited</p>
-							<ul>
-							<li class="inv-mega-contact">
-								<div class="email-small-icon icon12"></div>
-								<p>invoicing@mega.nz</p>
-							</li>
-							<li class="inv-mega-contact">
-								<div class="add-small-icon icon12"></div>
-								<p>Level 21, Huawei Centre, 120 Albert Street, Auckland  1010,  New Zealand</p>
-							</li>
-							<li class="inv-mega-contact">
-								<div class="post-small-icon icon12"></div>
-								<p>Private Bag 92 533, Wellesley St, Auckland  1141,  New Zealand</p>
-							</li>
-							</ul>
+		        	<div class="setting-block hidden">
+		        		<div class="title">
+		        			<div class="share-icon48 icon48"></div>
+		        			Share              			
+		              	</div>
+
+		            	<div class="option-containers file-share">
+		            		<div class="heading">Files/folders can be shared to:</div>
+		        				<div class="default-white-button-user-management">
+									<div class="close-icon icon"></div>
+									Close
+		        				</div>	
+		        			<div class="option-group">
+								<form>
+									<div class="checked"><input type="radio"> <span>Files/folders can be shared to internal and external users</span></div>
+									<div><input type="radio"> <span>Files/folders can be shared to internal users only</span></div>
+									<div><input type="radio"> <span>Files/folders require administrator approval to allow an external user access</span></div>
+									<div class="sub-option">
+									 	<div class="checkboxOn-user-management small-user-management"></div>
+									 	<div class="sub-heading">Automatically allow the files/folders in the following list to be shared.</div>	
+									</div>
+										<div class="default-white-button-user-management">
+									 	<div class="fold-icon icon"></div>
+										Hide the list
+									</div>
+								</form>
+
+								<table class="share-table">
+		                            <tr>
+		                                <th>Sharing users</th>
+		                                <th>Shared folders/files</th>
+		                                <th>List of people shared with</th>
+		                                <th>
+		                                    <div class="default-button-no-border">
+		                                    <div class="add-more-img icon"></div>
+		                                    Add More
+		                                    </div>
+		                                </th>
+		                            </tr>
+		                            <tr>
+		                                <td>Jay Pierce</td>
+		                                <td>
+		                                	<div class="file-icon icon"></div>
+		                                	<span>File name</span>
+		                                </td>
+		                                <td>
+		                                    <div class="default-white-button-user-management">
+		                                        <div class="fold-icon icon"></div>
+		                                    	Hide the list
+		                                    </div>
+		                                </td>
+		                                <td>
+							 				<div class="delete-img icon"></div>
+							 				<div class="quick-edit-icon icon"></div>
+		                                </td>
+
+		                            </tr>
+		                            <tr class=" ">
+		                                <td> </td>
+		                                <td> </td>
+		                                <td colspan="3">
+		                                    <div class="dialog share-people-list">
+		                                        <div class="share-people-list-heading">
+		                                        	<div class="default-green-button-user-management">
+		                                        		<div class="add-white-icon icon"></div>
+		                                        		Add People
+		                                        	</div>
+		                                        </div>
+		                                        <div class="list scroll-auto">
+		                                        	<div class="share-people-list-item">Pauline Ward
+		                                        		<div class="delete-img icon"></div>
+		                                        	</div>
+		                                        	 <div class="share-people-list-item">Pauline Ward
+		                                        		<div class="delete-img icon"></div>
+		                                        	</div>	                                            	
+		                                        </div>
+		                                    </div>
+		                                </td>
+		                            </tr>
+								</table>	
+		            		</div> 
 						</div>
-						<div class="inv-title-container">
-							<div class="inv-right">
-							<div class="inv-title">Invoice</div>
-							<ul class=" ">
-								<li>
-									<span>Invoice Date: Invoice Date</span>
-									<span>13 Nov 2017	</span>
+
+		            	<div class="option-containers">
+		            		<div class="heading">Shares can be received from:</div>
+		        				<div class="default-white-button-user-management">
+									<div class="close-icon icon"></div>
+									Close
+		        				</div>
+		        			<div class="option-group">
+								<form>
+									<div class="checked"><input type="radio"> <span>Shares can be received from internal and external users</span></div>
+									<div><input type="radio"> <span>Shares can be received from internal users only</span></div>
+									<div><input type="radio"> <span>Shares required administrator approval to receive from an external user access</span></div>
+								</form>		
+		            		</div> 
+						</div>
+
+		            	<div class="option-containers">
+		            		<div class="heading">Creation of file and folder links:</div>
+		        				<div class="default-white-button-user-management">
+									<div class="close-icon icon"></div>
+									Close
+		        				</div>	
+		        			<div class="option-group">
+								<form>
+									<div class="checked"><input type="radio"> <span>File and folder links can be created</span></div>
+									<div><input type="radio"> <span>Shares can be received from internal users only</span></div>
+									<div><input type="radio"> <span>Shares required administrator approval to receive from an external user access</span></div>
+								</form>	                		
+		            		</div> 
+						</div>
+
+		            	<div class="option-containers">
+		            		<div class="heading">The approval to create MEGAdrop folders:</div>
+		    				<div class="default-white-button-user-management">
+								<div class="close-icon icon"></div>
+								Close
+		    				</div>		                		
+		        			<div class="option-group">
+								<form>
+									<div class="checked"><input type="radio"> <span>MEGAdrop folders can be created</span></div>
+									<div><input type="radio"> <span>SMEGAdrop folders can’t be created</span></div>
+									<div><input type="radio"> <span>MEGAdrop folders require administrator approval to be created</span></div>
+								</form>	                		
+		            		</div> 
+						</div>
+		        	</div>
+
+		        	<div class="setting-block admin">
+		        		<div class="title">
+		        			<div class="admin-icon48 icon48"></div>
+		        			Admin              			
+		              	</div>
+
+		            	<div class="option-containers full-admin">
+		            		<div class="heading">Full – administrators:</div>
+		    				<div class="default-white-button-user-management">
+								<div class="close-icon icon"></div>
+								Close
+		    				</div>		                		
+		        			<div class="option-group">									
+								<div class="sub-heading">Control the delegation of master level administrators.</div>	
+
+								<div class="dialog share-people-list">
+		                            <div class="share-people-list-heading">
+		                            	<div class="default-green-button-user-management">
+		                            		<div class="add-white-icon icon"></div>
+		                            		Add Full – administrators
+		                            	</div>
+		                            </div>
+		                            <div class="list scroll-auto">
+		                            	<div class="share-people-list-item">
+		                            		<span>Pauline Ward</span>
+		                            		<div class="disabled-icon icon"></div>
+		                            		<div class="view-icon icon"></div>
+		                            	</div>
+		                            	 <div class="share-people-list-item">
+		                            	 	<span>Pauline Ward</span>
+		                            		<div class="disabled-icon icon"></div>
+		                            		<div class="view-icon icon"></div>
+		                            	</div>                                	
+		                            </div>
+
+		                        </div>
+		            		</div> 
+						</div>
+
+		            	<div class="option-containers sub-admin">
+		            		<div class="heading">Sub – administrators:</div>
+		    				<div class="default-white-button-user-management">
+								<div class="close-icon icon"></div>
+								Close
+		    				</div>		                		
+		        			<div class="option-group">									
+								<div class="sub-heading">Control the approval functionality for the sub-administrators.</div>	
+
+								<div class="default-green-button-user-management">
+									<div class="add-white-icon icon"></div>
+									Add Sub – administrators
+								</div>
+
+								<table class="sub-admin-table scroll-auto">
+									<tr>
+									    <th>Sub – administrators</th>
+									    <th>Sub - users</th>
+									    <th>Contact</th>
+									    <th>Share</th>
+									    <th>Other</th>
+									    <th> </th>
+									</tr>
+
+									<tr>
+									    <td>Jay Pierce</td>
+									    <td>
+									        <div class="default-white-button-user-management">
+									            <div class="fold-icon icon"></div>
+									            Hide the list
+									        </div>
+									    </td>
+									    <td><div class="checkdiv checkboxOff-user-management small-user-management">
+									    </div></td>
+									    <td><div class="checkdiv checkboxOff-user-management small-user-management">
+									    </div></td>
+									    <td><div class="checkdiv checkboxOff-user-management small-user-management">
+									    </div></td>
+									    <td>
+									        <div class="delete-img icon"></div>
+									        <div class="quick-edit-icon icon"></div>
+									    </td>                                      
+									</tr>
+
+									<tr class=" ">
+									    <td> </td>
+									    <td colspan="6">
+									        <div class="dialog share-people-list">
+									            <div class="share-people-list-heading">
+									                <div class="default-green-button-user-management">
+									                    <div class="add-white-icon icon"></div>
+									                    Add People
+									                </div>
+													<div class="default-button-no-border">
+														<div class="checkdiv checkboxOff-user-management small-user-management right-alignment"></div>
+														<span>Add all users</span>	
+									    			</div>
+									            </div>
+									            <div class="list scroll-auto">
+										            <div class="share-people-list-item">Pauline Ward
+										                <div class="delete-img icon"></div>
+										            </div>
+										             <div class="share-people-list-item">Pauline Ward
+										                <div class="delete-img icon"></div>
+										            </div>								            	
+									            </div>
+									        </div>
+									    </td>
+									</tr>
+
+									<tr>
+									    <td>Jay Pierce</td>
+									    <td>
+									        <div class="default-white-button-user-management">
+									            <div class="unfold-icon icon"></div>
+									            Show/Edit users
+									        </div>
+									    </td>
+									    <td><div class="checkdiv checkboxOff-user-management small-user-management">
+									    </div></td>
+									    <td><div class="checkdiv checkboxOff-user-management small-user-management">
+									    </div></td>
+									    <td><div class="checkdiv checkboxOff-user-management small-user-management">
+									    </div></td>
+									    <td>
+									        <div class="delete-img icon"></div>
+									        <div class="quick-edit-icon icon"></div>
+									    </td>                                      
+									</tr>
+
+									<tr class=" ">
+									    <td> </td>
+									    <td colspan="6">
+									        <div class="dialog share-people-list">
+									            <div class="share-people-list-heading">
+									                <div class="default-green-button-user-management">
+									                    <div class="add-white-icon icon"></div>
+									                    Add People
+									                </div>
+													<div class="default-button-no-border">
+														<div class="checkdiv checkboxOff-user-management small-user-management right-alignment"></div>
+														<span>Add all users</span>	
+									    			</div>
+									            </div>
+									            <div class="list scroll-auto">
+										            <div class="share-people-list-item">Pauline Ward
+										                <div class="delete-img icon"></div>
+										            </div>
+										             <div class="share-people-list-item">Pauline Ward
+										                <div class="delete-img icon"></div>
+										            </div>								            	
+									            </div>
+									        </div>
+									    </td>
+									</tr>
+								</table>
+		            		</div> 
+						</div>
+		        	</div>
+
+		        	<div class="setting-block">
+		        		<div class="title">
+		        			<div class="other-icon48 icon48"></div>
+		        			Other              			
+		              	</div>
+		 
+		            	<div class="option-containers recycle-bin">
+		            		<div class="heading">Recycle bin:</div>
+		    				<div class="default-white-button-user-management">
+								<div class="close-icon icon"></div>
+								Close
+		    				</div>		                		
+		        			<div class="option-group">
+								<form>
+									<div class="checked"><input type="radio"> <span>Users are allowed to empty their recycle bins</span></div>
+									<div><input type="radio"> <span>Users cannot empty their recycle bins</span></div>
+									<div><input type="radio"> 
+										<div class="option-with-varible">Users cannot empty their recycle bins, files are permanently deleted after
+											<div class="recycle-days">30</div>
+										days</div>
+									</div>
+								</form>	                		
+		            		</div> 
+						</div>
+		        	</div>
+		        </div>
+
+		        <div class="invoice hidden">
+		        	<div class="invoice-list hidden">
+			        	<div class="invoice-subtitle">Invoice list</div>
+			        	<div class="invoice-table-container">
+							<table class="invoice-table-header">
+			                    <tr>
+			                        <th>
+			                        	<div class="arrow asc">Date</div>
+			                        </th>
+			                        <th>
+			                        	<div class="arrow desc">Description</div>
+			                       </th>
+			                        <th>
+			                        	<div class="arrow desc">Amount</div>
+			                        </th>
+			                        <th></th>
+			                    </tr>
+			                 </table>
+			                 <div class="invoice-table-list-container">
+			                 <table class="invoice-table">
+			                    <tr>
+			                        <td class="">01 Aug 2018</td>
+			                        <td class="">Place description</td>
+			                        <td class="">$512.30</td>
+			                        <td class="">
+			                        	<div class="default-white-button-user-management">View detals</div>
+			                        </td>
+			                    </tr>
+			                    <tr>
+			                        <td class="">01 Aug 2018</td>
+			                        <td class="">Place description</td>
+			                        <td class="">$512.30</td>
+			                        <td class="">
+			                        	<div class="default-white-button-user-management">View detals</div>
+			                        </td>
+			                    </tr>                    
+							</table>		                 	
+			                 </div>	
+			        	</div>
+
+		        	</div>
+		        	<div class="invoice-detail">
+						<div class="default-white-button-user-management">
+							<div class="export-pdf-icon icon"></div>
+							Export to PDF
+						</div>
+						<div class="invoice-container">
+							<div class="mega-contact-container">
+								<div class="mega-logo"></div>
+								<p class="inv-subtitle">Mega Limited</p>
+								<ul>
+								<li class="inv-mega-contact">
+									<div class="email-small-icon icon12"></div>
+									<p>invoicing@mega.nz</p>
 								</li>
-								<li>
-									<span>Invoice Number:	</span>
-									<span>NwC-AOyfAxo	</span>
-								</li>	
-								<li>
-									<span>VAT: </span>
-									<span>110-633-521</span>
-								</li>												
-							</ul>								
+								<li class="inv-mega-contact">
+									<div class="add-small-icon icon12"></div>
+									<p>Level 21, Huawei Centre, 120 Albert Street, Auckland  1010,  New Zealand</p>
+								</li>
+								<li class="inv-mega-contact">
+									<div class="post-small-icon icon12"></div>
+									<p>Private Bag 92 533, Wellesley St, Auckland  1141,  New Zealand</p>
+								</li>
+								</ul>
+							</div>
+							<div class="inv-title-container">
+								<div class="inv-right">
+								<div class="inv-title">Invoice</div>
+								<ul class=" ">
+									<li>
+										<span>Invoice Date: Invoice Date</span>
+										<span>13 Nov 2017	</span>
+									</li>
+									<li>
+										<span>Invoice Number:	</span>
+										<span>NwC-AOyfAxo	</span>
+									</li>	
+									<li>
+										<span>VAT: </span>
+										<span>110-633-521</span>
+									</li>												
+								</ul>								
+								</div>
+							</div>
+							<div class="inv-border"></div>
+							<div class="inv-add-container">
+								<p class="inv-subtitle">Billed to:</p>
+								<ul>
+									<li class="inv-company-name">AAA LTD.</li>
+									<li class="inv-per-name">ATTN: Greg Daniel</li>
+									<li class=" ">money@mega.co.nz</li>
+									<li class=" ">120 Albert St, Auckland 1010, 120 Albert St, Auckland  1010 </li>
+									<li class=" ">New Zealand</li>
+									<li class=" ">VAT: 9429030423626 </li>
+								</ul>							
+							</div>
+							<div class="inv-payment-table">
+								<ul>
+									<li>
+										<div class="inv-payment-header">Date</div>
+										<div class="inv-payment-header">Description</div>
+										<div class="inv-payment-header">Price</div>
+									</li>
+									<li>
+										<div class="inv-payment-item">1/8/2018</div>
+										<div class="inv-payment-item">Business account for X user<br>(1/7/2018 - 31/7/2018)</div>
+										<div class="inv-payment-item">€4.34</div>
+									</li>
+									<li>
+										<div class="inv-payment-item">1/8/2018</div>
+										<div class="inv-payment-item">Business account for X user<br>(1/7/2018 - 31/7/2018)</div>
+										<div class="inv-payment-item">€4.34</div>
+									</li>
+									<li class="inv-payment-price">
+										<div class="inv-payment-price-detail">GST (15%):</div>
+										<div class="inv-payment-price-detail">€4.34</div>
+									
+									</li>
+									<li class="inv-payment-price">
+										<div class="inv-payment-price-detail">TOTAL:</div>
+										<div class="inv-payment-price-detail">€40000000.34</div>
+									</li>
+								</ul>
 							</div>
 						</div>
-						<div class="inv-border"></div>
-						<div class="inv-add-container">
-							<p class="inv-subtitle">Billed to:</p>
-							<ul>
-								<li class="inv-company-name">AAA LTD.</li>
-								<li class="inv-per-name">ATTN: Greg Daniel</li>
-								<li class=" ">money@mega.co.nz</li>
-								<li class=" ">120 Albert St, Auckland 1010, 120 Albert St, Auckland  1010 </li>
-								<li class=" ">New Zealand</li>
-								<li class=" ">VAT: 9429030423626 </li>
-							</ul>							
-						</div>
-						<div class="inv-payment-table">
-							<ul>
-								<li>
-									<div class="inv-payment-header">Date</div>
-									<div class="inv-payment-header">Description</div>
-									<div class="inv-payment-header">Price</div>
-								</li>
-								<li>
-									<div class="inv-payment-item">1/8/2018</div>
-									<div class="inv-payment-item">Business account for X user<br>(1/7/2018 - 31/7/2018)</div>
-									<div class="inv-payment-item">€4.34</div>
-								</li>
-								<li>
-									<div class="inv-payment-item">1/8/2018</div>
-									<div class="inv-payment-item">Business account for X user<br>(1/7/2018 - 31/7/2018)</div>
-									<div class="inv-payment-item">€4.34</div>
-								</li>
-								<li class="inv-payment-price">
-									<div class="inv-payment-price-detail">GST (15%):</div>
-									<div class="inv-payment-price-detail">€4.34</div>
-								
-								</li>
-								<li class="inv-payment-price">
-									<div class="inv-payment-price-detail">TOTAL:</div>
-									<div class="inv-payment-price-detail">€40000000.34</div>
-								</li>
-							</ul>
-						</div>
-					</div>
 
-					<div class="invoice-container">
-						<div class="mega-contact-container">
-							<div class="mega-logo"></div>
-							<p class="inv-subtitle">Mega Limited</p>
-							<ul>
-							<li class="inv-mega-contact">
-								<div class="email-small-icon icon12"></div>
-								<p>invoicing@mega.nz</p>
-							</li>
-							<li class="inv-mega-contact">
-								<div class="add-small-icon icon12"></div>
-								<p>Level 21, Huawei Centre, 120 Albert Street, Auckland  1010,  New Zealand</p>
-							</li>
-							<li class="inv-mega-contact">
-								<div class="post-small-icon icon12"></div>
-								<p>Private Bag 92 533, Wellesley St, Auckland  1141,  New Zealand</p>
-							</li>
-							</ul>
-						</div>
-						<div class="inv-title-container">
-							<div class="inv-right">
-							<div class="inv-title">Receipt</div>
-							<ul class=" ">
-								<li>
-									<span>Invoice Date: Invoice Date</span>
-									<span>13 Nov 2017	</span>
+						<div class="invoice-container">
+							<div class="mega-contact-container">
+								<div class="mega-logo"></div>
+								<p class="inv-subtitle">Mega Limited</p>
+								<ul>
+								<li class="inv-mega-contact">
+									<div class="email-small-icon icon12"></div>
+									<p>invoicing@mega.nz</p>
 								</li>
-								<li>
-									<span>Invoice Number:	</span>
-									<span>NwC-AOyfAxo	</span>
-								</li>	
-								<li>
-									<span>VAT: </span>
-									<span>110-633-521</span>
-								</li>												
-							</ul>								
+								<li class="inv-mega-contact">
+									<div class="add-small-icon icon12"></div>
+									<p>Level 21, Huawei Centre, 120 Albert Street, Auckland  1010,  New Zealand</p>
+								</li>
+								<li class="inv-mega-contact">
+									<div class="post-small-icon icon12"></div>
+									<p>Private Bag 92 533, Wellesley St, Auckland  1141,  New Zealand</p>
+								</li>
+								</ul>
+							</div>
+							<div class="inv-title-container">
+								<div class="inv-right">
+								<div class="inv-title">Receipt</div>
+								<ul class=" ">
+									<li>
+										<span>Invoice Date: Invoice Date</span>
+										<span>13 Nov 2017	</span>
+									</li>
+									<li>
+										<span>Invoice Number:	</span>
+										<span>NwC-AOyfAxo	</span>
+									</li>	
+									<li>
+										<span>VAT: </span>
+										<span>110-633-521</span>
+									</li>												
+								</ul>								
+								</div>
+							</div>
+							<div class="inv-border"></div>
+							<div class="inv-add-container">
+								<p class="inv-subtitle">Billed to:</p>
+								<ul>
+									<li class="inv-company-name">AAA LTD.</li>
+									<li class="inv-per-name">ATTN: Greg Daniel</li>
+									<li class=" ">money@mega.co.nz</li>
+									<li class=" ">120 Albert St, Auckland 1010, 120 Albert St, Auckland  1010 </li>
+									<li class=" ">New Zealand</li>
+									<li class=" ">VAT: 9429030423626 </li>
+								</ul>							
+							</div>
+							<div class="inv-payment-table">
+								<ul>
+									<li>
+										<div class="inv-payment-header">Date</div>
+										<div class="inv-payment-header">Description</div>
+										<div class="inv-payment-header">Price</div>
+									</li>
+									<li>
+										<div class="inv-payment-item">1/8/2018</div>
+										<div class="inv-payment-item">Business account for X user</div>
+										<div class="inv-payment-item">€4.34</div>
+									</li>
+									<li>
+										<div class="inv-payment-item">1/8/2018</div>
+										<div class="inv-payment-item">Business account for X user</div>
+										<div class="inv-payment-item">€4.34</div>
+									</li>
+									<li class="inv-payment-price">
+										<div class="inv-payment-price-detail">GST (15%):</div>
+										<div class="inv-payment-price-detail">€4.34</div>
+									
+									</li>
+									<li class="inv-payment-price">
+										<div class="inv-payment-price-detail">TOTAL:</div>
+										<div class="inv-payment-price-detail">€40000000.34</div>
+									</li>
+								</ul>
 							</div>
 						</div>
-						<div class="inv-border"></div>
-						<div class="inv-add-container">
-							<p class="inv-subtitle">Billed to:</p>
-							<ul>
-								<li class="inv-company-name">AAA LTD.</li>
-								<li class="inv-per-name">ATTN: Greg Daniel</li>
-								<li class=" ">money@mega.co.nz</li>
-								<li class=" ">120 Albert St, Auckland 1010, 120 Albert St, Auckland  1010 </li>
-								<li class=" ">New Zealand</li>
-								<li class=" ">VAT: 9429030423626 </li>
-							</ul>							
-						</div>
-						<div class="inv-payment-table">
-							<ul>
-								<li>
-									<div class="inv-payment-header">Date</div>
-									<div class="inv-payment-header">Description</div>
-									<div class="inv-payment-header">Price</div>
-								</li>
-								<li>
-									<div class="inv-payment-item">1/8/2018</div>
-									<div class="inv-payment-item">Business account for X user</div>
-									<div class="inv-payment-item">€4.34</div>
-								</li>
-								<li>
-									<div class="inv-payment-item">1/8/2018</div>
-									<div class="inv-payment-item">Business account for X user</div>
-									<div class="inv-payment-item">€4.34</div>
-								</li>
-								<li class="inv-payment-price">
-									<div class="inv-payment-price-detail">GST (15%):</div>
-									<div class="inv-payment-price-detail">€4.34</div>
-								
-								</li>
-								<li class="inv-payment-price">
-									<div class="inv-payment-price-detail">TOTAL:</div>
-									<div class="inv-payment-price-detail">€40000000.34</div>
-								</li>
-							</ul>
-						</div>
-					</div>
-	        	</div>
-	        </div>
-
+		        	</div>
+		        </div>
 			</div>
 	    </div>
 	</div>

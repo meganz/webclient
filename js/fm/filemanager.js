@@ -427,7 +427,6 @@ FileManager.prototype.initFileManagerUI = function() {
     };
     InitFileDrag();
     M.createFolderUI();
-    M.buildRootSubMenu();
     M.treeSearchUI();
     M.initTreePanelSorting();
     M.initContextUI();
@@ -951,8 +950,8 @@ FileManager.prototype.initContextUI = function() {
         }
 
         currentId = $this.attr('id');
-        if (currentId) {
-            M.buildSubMenu(currentId.replace('fi_', ''));
+        if (currentId || $this.hasClass('move-item')) {
+            M.buildSubMenu(String(currentId).replace('fi_', ''));
         }
 
         // Show necessary submenu

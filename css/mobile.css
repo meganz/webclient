@@ -57,6 +57,7 @@ html.overlayed {
     overflow: hidden;
     position: fixed;
 }
+
 /* Prevent selection and highlighting */
 body * {
     -webkit-touch-callout: none;
@@ -413,6 +414,10 @@ ul, li {
     height: 44px;
     margin-top: 0px;
     line-height: 42px;
+}
+.mobile.fm-dialog-container .mobile.inline-buttons .mobile.red-button  {
+    height: 36px;
+    line-height: 35px;
 }
 .mobile.inline-buttons .mobile.red-button.first  {
     float: right;
@@ -4734,6 +4739,9 @@ textarea.mobile.support-text-field {
 .mobile.recover-account-body-text a {
     color: #eb4444;
 }
+.mobile .recover-account-body-text br {
+    margin-bottom: 12px;
+}
 .mobile.recovery-key-page .mobile.recovery-key-string-block{
     margin: 16px 24px 4px;
 }
@@ -5998,6 +6006,9 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .checkbox-block h3.main-italic-header, .mobile .improved-recovery-steps .app-instruction-block h3.main-italic-header {
     padding: 0 0;
 }
+.mobile .improved-recovery-steps h3.main-italic-header {
+    color: #00BFA5;
+}
 .mobile .improved-recovery-steps h2 {
     top: 0;
     display:block;
@@ -6009,10 +6020,10 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps h1 {
     font-family: 'source_sans_proregular';
-    font-size: 26px;
+    font-size: 20px;
     color: #343A40;
     letter-spacing: 0.2px;
-    line-height: 36px;
+    line-height: 30px;
     -webkit-margin-before: 0.4em;
     -webkit-margin-after: 0.5em;
     -webkit-margin-start: 0px;
@@ -6020,10 +6031,13 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile.fm-dialog.park-account-dialog .fm-dialog-title {
     font-family: 'source_sans_prosemibold';
-    font-size: 17px;
+    font-size: 20px;
     color: #333;
     letter-spacing: 0px;
     line-height: 1.5;
+}
+.mobile.fm-dialog.park-account-dialog .improved-recovery-steps h3.main-italic-header {
+    font-size: 13px;
 }
 .mobile .improved-recovery-steps .register-st2-txt-block {
     display: table;
@@ -6050,12 +6064,14 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .content-wrapper p span {
     font-family: 'source_sans_probold';
     color: #F57223;
+    padding-top: 8px;
+    display: block;
 }
 .mobile .improved-recovery-steps p {
     font-size: 14px;
     color: #495057;
     letter-spacing: 0;
-    line-height: 1.7;
+    line-height: 21px;
     padding-bottom: 0;
     margin-bottom: 24px;
 }
@@ -6087,7 +6103,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     font-family: 'source_sans_proregular', Arial;
 }
 .mobile .improved-recovery-steps .recover-button.yes {
-    color: #2AAF5F;
+    color: #00BFA5;
     margin-bottom: 12px;
 }
 .mobile .improved-recovery-steps .recover-button.yes:hover,.mobile  .recover-button.yes.active {
@@ -6293,21 +6309,21 @@ body.key .reg-st3-membership-bl.free.hidden {
     border-radius: 2px;
     margin-bottom: 8px;
     background-image: url(../images/mega/top-login-sprite_v11.png);
-    background-position: 9px -65px;
+    background-position: 12px -65px;
     background-repeat: no-repeat;
-    padding: 0 10px 0 35px;
+    padding: 0 10px 0 43px;
     position: relative;
     background-color: #F8F9FA;
-    border: 1px solid #EBEEF0;
+    border: 1px solid #eee;
     max-width: 420px;
-    min-height: 48px;
+    min-height: 46px;
 }
 .mobile .improved-recovery-steps .login-register-input:hover {
-    border: 1px solid #ddd;
+    border: 1px solid #eee;
 }
 .mobile .improved-recovery-steps .login-register-input input {
     color: #444;
-    line-height: 25px;
+    line-height: 28px;
     width: 100%;
     margin-top: 8px;
     font-size: 13px;
@@ -6648,16 +6664,15 @@ body.key .reg-st3-membership-bl.free.hidden {
     margin: 0 2px 0 3px;
 }
 .mobile.fm-dialog.park-account-dialog {
-    width: 100%;
+    width: calc(100% - 24px);
     position: relative;
     border: none;
     left: initial;
     top: initial;
-    border-radius: 0;
+    border-radius: 6px;
     max-width: 460px;
     padding: 24px 20px;
     margin: 0 auto;
-    border: 4px;
 }
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps {
     padding: 0;
@@ -7295,7 +7310,7 @@ body.bottom-pages.mobile .fmholder.no-scroll {
         min-height: initial;
     }
     .mobile .improved-recovery-steps h1 {
-        font-size: 22px;
+        font-size: 20px;
     }
 
 }
@@ -7377,6 +7392,31 @@ body.bottom-pages.mobile .fmholder.no-scroll {
     .wrong-file .mobile.white-block {
         margin-top: 32px;
     }
+    .mobile.fm-dialog.park-account-dialog .fm-dialog-title {
+        font-size: 16px;
+    }
+    .mobile.fm-dialog.park-account-dialog .checkbox-container .settings-row label {
+        font-size: 12px;
+    }
+    .mobile.fm-dialog.park-account-dialog .checkbox-block {
+        margin-top: 16px;
+    }
+    .mobile.fm-dialog.park-account-dialog .checkbox-container {
+        padding: 8px 0;
+    }
+    .mobile.fm-dialog.park-account-dialog .improved-recovery-steps {
+        margin: 16px 0;
+    }
+    .mobile.fm-dialog.park-account-dialog .login-register-input input {
+        font-size: 12px;
+    }
+    .mobile.fm-dialog.park-account-dialog .checkbox-container .settings-row label {
+        padding: 6px 12px 6px 0;
+    }
+    .mobile.fm-dialog.park-account-dialog .checkbox-container .settings-row div.checkboxOff, .mobile.fm-dialog.park-account-dialog .checkbox-container .settings-row div.checkboxOn {
+        margin: 8px 14px 16px 14px;
+    }
+
 }
 
 @media only screen and (orientation:landscape) and (max-width: 570px) {

@@ -1388,6 +1388,9 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             return;
         }
 
+        // navigation bar
+        $accountPageHeader.find('.inv-det-id').text(invoiceDetail.n);
+
         // mega section on the top of the invoice and receipt
         var $megaContainer = $('.mega-contact-container', $invoiceDetailContainer);
         $megaContainer.find('.inv-subtitle').text(invoiceDetail.mega.cname);
@@ -1397,8 +1400,35 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         // invoice top details
         var $invoiceTopTitle = $('.inv-title-container.suba-inv', $invoiceDetailContainer);
-        $invoiceTopTitle.find('.invoice-date').text((new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
-        $invoiceTopTitle.find('.invoice-number').text(invoiceDetail.n);
+        $invoiceTopTitle.find('#invoice-date').text((new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
+        $invoiceTopTitle.find('#invoice-number').text(invoiceDetail.n);
+        $invoiceTopTitle.find('#invoice-vat').text(invoiceDetail.taxnum[1]);
+        $invoiceTopTitle.find('#inv-vat-label').text(invoiceDetail.taxnum[0]);
+
+        // billed-to details
+        $invoiceDetailContainer.find('.billed-name').text(invoiceDetail.u.cname);
+        $invoiceDetailContainer.find('.billed-email').text(invoiceDetail.u.e);
+        $invoiceDetailContainer.find('.billed-address').text(invoiceDetail.u.addr.join(', '));
+        $invoiceDetailContainer.find('.billed-country').text(invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]);
+        $invoiceDetailContainer.find('.billed-vat').addClass('hidden');
+        if (nvoiceDetail.u.taxnum) {
+            $invoiceDetailContainer.find('.billed-vat')
+                .text(nvoiceDetail.u.taxnum[0] + ': ' + nvoiceDetail.u.taxnum[1]).removeClass('hidden');
+        }
+
+        // invoice items
+        var $invoiceItemsContainer = $('.inv-payment-table', $invoiceDetailContainer)
+        var $invItemContent = $($('.inv-li-content', $invoiceItemsContainer).get(0));
+        var $invItemContentTemplate = $invItemContent.clone(true);
+        $invItemContent.remove();
+        var $invItemHeader = $('.inv-li-table-header', $invoiceItemsContainer);
+        for (var k = invoiceDetail.items.length - 1; k >= 0; k--) {
+            var $invItem = $invItemContentTemplate.clone(true);
+            $invItem.find('.inv-pay-date').text((new Date(invoiceDetail.items[k].ts * 1000).toLocaleDateString));
+            $invItem.find('.inv-pay-desc').text(invoiceDetail.items[k].d);
+            $invItem.find('.inv-pay-amou').text(invoiceDetail.items[k].gross);
+            $invItem.insertAfter($invItemHeader);
+        }
     };
 };
 

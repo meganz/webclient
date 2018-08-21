@@ -469,11 +469,19 @@ function accountUI() {
             '<th class="no-border session-status">' + l[7664] + '</th>' +
             '<th class="no-border logout-column">&nbsp;</th></tr>';
         var numActiveSessions = 0;
+        
+        for (i = 0; i < account.sessions.length; i++) {
+            var el = account.sessions[i];
+            var currentSession = el[5];
+            var activeSession = el[7];
 
-        $(account.sessions).each(function(i, el) {
+            // If the current session or active then increment count
+            if (currentSession || activeSession) {
+                numActiveSessions++;
+            }
 
-            if (i == $.sessionlimit) {
-                return false;
+            if (i >= $.sessionlimit) {
+                continue;
             }
 
             var userAgent = el[2];
@@ -482,9 +490,7 @@ function accountUI() {
             var browserName = browser.nameTrans;
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
-            var currentSession = el[5];
             var sessionId = el[6];
-            var activeSession = el[7];
             var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
 
             // Show if using an extension e.g. "Firefox on Linux (+Extension)"
@@ -527,12 +533,8 @@ function accountUI() {
             else {
                 html += '<td>&nbsp;</td>';
             }
+        }
 
-            // If the current session or active then increment count
-            if (currentSession || activeSession) {
-                numActiveSessions++;
-            }
-        });
         $('#sessions-table-container').safeHTML(html + '</table>');
 
         // Don't show button to close other sessions if there's only the current session

@@ -24494,10 +24494,12 @@ opacity: 1;
 
 .user-management-view .ex-out-share, .fm-right-header-user-management .ex-out-share, .user-management-dialog .ex-out-share{
     background-position: -0px -12741px;
+    opacity: 0.4;
 }
 
 .user-management-view .ex-in-share, .fm-right-header-user-management .ex-in-share, .user-management-dialog .ex-in-share{
     background-position: -16px -12741px;
+    opacity: 0.4;
 }
 
 
@@ -25258,7 +25260,7 @@ opacity: 1;
     display: inline-block;
     margin-left: 12px;
     float: left;
-    width: 250px;
+    width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -28556,13 +28558,13 @@ opacity: 1;
 
 @media only screen and (max-width: 1270px) {
     .subaccount-view-used-data .used-storage-info .ff-name{
-        width: 200px;
+        width: 180px;
     }
-    .subaccount-view-used-data .used-storage-info .ff-name{
+    .subaccount-view-used-data .used-storage-info .ff-number{
         width: 350px;
     }
     .subaccount-view-used-data .used-storage-info .ff-occupy{
-        width: 80px;
+        width: 60px;
     }
 
     .user-management-list-table tr th:nth-child(2), .user-management-list-table tr td:nth-child(2){

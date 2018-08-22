@@ -16401,6 +16401,9 @@ ul.token-input-list-mega {
     z-index: 100;
     display: none;
 }
+.duplicate .duplicated-input-warning {
+    position: relative;
+}
 .error .multiple-input-warning, .duplicate .duplicated-input-warning {
     display: block;
 }

@@ -16401,6 +16401,9 @@ ul.token-input-list-mega {
     z-index: 100;
     display: none;
 }
+.duplicate .duplicated-input-warning {
+    position: relative;
+}
 .error .multiple-input-warning, .duplicate .duplicated-input-warning {
     display: block;
 }
@@ -16554,7 +16557,7 @@ color: #D90007 !important;
 }
 div.token-input-dropdown-mega {
     position: absolute;
-    width: 342px !important;
+    width: 342px;
     background-color: #fff;
     overflow: hidden;
     border: 2px solid rgba(0,0,0,0.1);
@@ -16580,6 +16583,7 @@ div.token-input-dropdown-mega p {
 div.token-input-dropdown-mega ul {
     margin: 0;
     padding: 0;
+    max-height: 274px;
 }
 div.token-input-dropdown-mega ul li {
     background-color: rgb(255, 255, 255, 1);

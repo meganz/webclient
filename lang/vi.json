@@ -596,7 +596,7 @@
     "1677": "L\u1ed7i \u0111\u1ecdc t\u1ec7p tin",
     "1679": "L\u1ed7i kh\u00f4ng x\u00e1c \u0111\u1ecbnh \u0111\u01b0\u1ee3c",
     "1686": "H\u1ee7y b\u1ecf",
-    "1687": "\u1ed4 M\u00e2y",
+    "1687": "Cloud Drive",
     "1694": "Nh\u1eadp",
     "1710": "M\u1edf",
     "1712": "T\u1ed5ng Quan",
@@ -1295,7 +1295,7 @@
     "8820": "T\u00e0i kho\u1ea3n MEGA v\u1eeba nh\u1eadp kh\u00f4ng c\u00f3 tr\u00f9ng kh\u1edbp v\u1edbi ch\u1ee7 s\u1edf h\u1eefu \u0111\u01b0\u1eddng li\u00ean k\u1ebft URL.",
     "8833": "\u0110\u1ec3 t\u0103ng c\u01b0\u1eddng m\u1ee9c gi\u1edbi h\u1ea1n n\u00e0y, qu\u00fd kh\u00e1ch c\u1ea7n t\u1ea1o m\u1ed9t t\u00e0i kho\u1ea3n. C\u00f3 t\u00e0i kho\u1ea3n kh\u00f4ng nh\u1eefng gi\u00fap qu\u00fd kh\u00e1ch c\u00f3 th\u00eam b\u0103ng th\u00f4ng m\u00e0 c\u00f2n cho th\u00eam 50 GB \u1ed5 m\u00e2y kh\u00f4ng gian l\u01b0u tr\u1eef d\u1eef li\u1ec7u tr\u00ean m\u1ea1ng - [B]mi\u1ec5n ph\u00ed[\/B].",
     "8834": "Phi\u00ean t\u1ea3i xu\u1ed1ng c\u1ee7a b\u1ea1n th\u1ec3 ti\u1ebfn h\u00e0nh \u0111\u01b0\u1ee3c b\u1edfi v\u00ec qu\u00e1 tr\u00ecnh n\u00e0y s\u1ebd ti\u00eau h\u1ebft t\u1ea5t c\u1ea3 phi\u00ean truy\u1ec1n t\u1ea3i mi\u1ec5n ph\u00ed m\u00e0 b\u1ea1n c\u00f3 cho \u0111\u1ecba ch\u1ec9 IP n\u00e0y.",
-    "8836": "M\u00e3 Kh\u00f3a Ph\u1ee5c H\u1ed3i \u0111\u00e3 \u0111\u01b0\u1ee3c l\u01b0u v\u00e0o b\u1ed9 ghi nh\u1edb",
+    "8836": "Recovery Key copied to clipboard",
     "8839": "M\u00e3 Kh\u00f3a Ph\u1ee5c H\u1ed3i",
     "8840": "MEGAchat v\u1eeba \u0111\u01b0\u1ee3c n\u00e2ng c\u1ea5p xong v\u00e0 c\u1ea7n ph\u1ea3i kh\u1edfi \u0111\u1ed9ng l\u1ea1i. B\u1ea1n c\u00f3 mu\u1ed1n t\u1ea3i l\u1ea1i trang n\u00e0y ngay b\u00e2y gi\u1edd \u0111\u1ec3 c\u1eadp nh\u1eadt phi\u00ean b\u1ea3n m\u1edbi kh\u00f4ng?",
     "8841": "MEGAchat v\u1eeba \u0111\u01b0\u1ee3c n\u00e2ng c\u1ea5p xong v\u00e0 b\u00e2y gi\u1edd s\u1ebd ch\u1ec9 ch\u1ea1y v\u1edbi phi\u00ean b\u1ea3n m\u1edbi nh\u1ea5t c\u1ee7a MEGA. Xin vui l\u00f2ng c\u1eadp nh\u1eadt ph\u1ea7n tr\u00ecnh c\u1eafm (b\u1ed5 tr\u1ee3 ti\u1ec7n \u00edch m\u1edf r\u1ed9ng) c\u1ee7a tr\u00ecnh duy\u1ec7t b\u1ea1n \u0111ang s\u1eed d\u1ee5ng \u0111\u1ec3 ti\u1ebfp t\u1ee5c MEGAchat.",
@@ -2029,7 +2029,7 @@
     "17884": "%nbFi t\u1ec7p tin \u0111\u00e3 \u0111\u01b0\u1ee3c th\u00eam v\u00e0o b\u1ed9 qu\u1ea3n l\u00fd truy\u1ec1n t\u1ea3i",
     "17886": "T\u00ean n\u00e0y \u0111\u00e3 c\u00f3 s\u1eb5n trong danh b\u1ea1 r\u1ed3i",
     "17958": "\u0110\u01b0\u1eddng d\u1eabn li\u00ean k\u1ebft kh\u00f4ng h\u1ee3p l\u1ec7",
-    "18051": "\u1ed4 M\u00e2y",
+    "18051": "Cloud Drive",
     "18148": "Li\u00ean h\u1ec7 H\u1ed7 tr\u1ee3",
     "18192": "Nh\u1eadp t\u00ean, d\u1ea1ng t\u00ean hay \u0111\u01b0\u1eddng d\u1eabn m\u1eabu (\u0111\u01b0\u1ee3c ph\u00e9p s\u1eed d\u1ee5ng c\u00e1c ky t\u1ef1 \u0111\u1eb7ng bi\u1ec7t nh\u01b0 * v\u00e0 ? \u0111\u1ec3 bi\u1ec3u hi\u1ec7n) ho\u1eb7c ch\u1ecdn ra t\u1ec7p tin v\u00e0 th\u01b0 m\u1ee5c b\u1ea1n mu\u1ed1n li\u1ec7t v\u00e0o danh s\u00e1ch ngo\u1ea1i l\u1ec7 kh\u1ecfi qu\u00e1 tr\u00ecnh \u0111\u1ed3ng b\u1ed9",
     "18213": "K\u00edch th\u1ee9c c\u1ee7a phi\u00ean t\u1ea3i v\u1ec1 n\u00e0y qu\u00e1 l\u1edbn cho tr\u00ecnh duy\u1ec7t web. S\u1eed d\u1ee5ng tr\u00ecnh MEGAsync \u0111\u1ec3 ti\u1ebfn h\u00e0nh qu\u00e1 tr\u00ecnh t\u1ea3i v\u1ec1.",
@@ -2674,5 +2674,8 @@
     "19282": "Invoices",
     "19283": "Invoice List",
     "19284": "View Details",
-    "19285": "Me:"
+    "19285": "Me:",
+    "19288": "Export to PDF",
+    "19289": "Enable 2FA",
+    "19290": "Disable 2FA"
 }

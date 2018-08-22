@@ -733,6 +733,14 @@ Chatd.cmdToString = function(cmd, tx) {
                         ' clientId: 0x' + Chatd.dumpToHex(cmd, 17, 4, true);
             return [result, 21];
 
+        case Chatd.Opcode.RETENTION:
+            result += " policy change on '" +
+                base64urlencode(cmd.substr(1, 8)) + "' by '" +
+                base64urlencode(cmd.substr(9, 8)) + "': " +
+                Chatd.unpack32le(cmd.substr(17, 4)) + " second(s)";
+
+            return [result, 21];
+
         case Chatd.Opcode.KEEPALIVE:
         case Chatd.Opcode.KEEPALIVEAWAY:
             return [result, 1];

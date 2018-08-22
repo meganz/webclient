@@ -158,7 +158,7 @@ var slideshowid;
     function slideshow_favourite(n, $overlay) {
         var $favButton = $overlay.find('.viewer-button.favourite');
 
-        if (!n || !n.p || folderlink) {
+        if (!n || !n.p || folderlink || M.getNodeRights(n.p) < 2) {
             $favButton.addClass('hidden');
         }
         else {

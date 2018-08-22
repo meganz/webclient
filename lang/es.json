@@ -596,7 +596,7 @@
     "1677": "Error de lectura",
     "1679": "Error desconocido",
     "1686": "Cancelar",
-    "1687": "Mi nube",
+    "1687": "Cloud Drive",
     "1694": "Aceptar",
     "1710": "Abrir",
     "1712": "General",
@@ -1295,7 +1295,7 @@
     "8820": "La cuenta MEGA indicada no coincide con la del due\u00f1o del enlace.",
     "8833": "Para aumentar este l\u00edmite, puedes registrar una cuenta. Esto no s\u00f3lo te dar\u00e1 una mayor cuota de transferencia extra, sino tambi\u00e9n 50 GB de espacio de almacenamiento seguro en la nube - [B]totalmente gratis[\/B].",
     "8834": "Tu descarga no ha podido empezar porque te llevar\u00eda por encima de la cuota de transferencia gratuita permitida con tu IP.",
-    "8836": "Clave de recuperaci\u00f3n copiada al portapapeles",
+    "8836": "Recovery Key copied to clipboard",
     "8839": "Clave de recuperaci\u00f3n",
     "8840": "MEGAchat ha sido actualizado y necesita que se recargue la p\u00e1gina. \u00bfQuieres recargar la p\u00e1gina ahora para actualizar a la \u00faltima versi\u00f3n?",
     "8841": "MEGAchat ha sido actualizado y ahora solo es compatible con la \u00faltima versi\u00f3n de MEGA. Por favor, actualiza tu extensi\u00f3n para seguir usando MEGAchat.",
@@ -2029,7 +2029,7 @@
     "17884": "%nbFi archivo se ha a\u00f1adido al gestor de transferencia",
     "17886": "Este usuario ya existe en tu lista de contactos",
     "17958": "Enlace no v\u00e1lido",
-    "18051": "Mi nube",
+    "18051": "Cloud Drive",
     "18148": "Contactar con Soporte",
     "18192": "Introduce un nombre, una ruta absoluta (comodines * y ? permitidos) o selecciona el archivo o carpeta que quieres excluir de la sincronizaci\u00f3n.",
     "18213": "El tama\u00f1o de la descarga excede la capacidad m\u00e1xima admitida por el navegador. Puedes usar MEGAsync para continuar con la descarga.",
@@ -2674,5 +2674,8 @@
     "19282": "Invoices",
     "19283": "Invoice List",
     "19284": "View Details",
-    "19285": "Me:"
+    "19285": "Me:",
+    "19288": "Export to PDF",
+    "19289": "Enable 2FA",
+    "19290": "Disable 2FA"
 }

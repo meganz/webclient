@@ -1633,7 +1633,7 @@ else if (!b_u) {
                 }
 
                 if (typeof eventlog === 'function' && !errobj.udata) {
-                    eventlog(99702);
+                    eventlog(99702, true);
                 }
             }
             if (cn) dump.c = cn;

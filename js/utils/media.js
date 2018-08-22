@@ -1390,6 +1390,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
             return v.Height | 0;
         }
     });
+    Object.defineProperty(MediaInfoReport.prototype, 'rotation', {
+        get: function() {
+            var v = Object(this.Video && this.Video[0]);
+            return v.Rotation | 0;
+        }
+    });
     Object.defineProperty(MediaInfoReport.prototype, 'shortformat', {
         get: function() {
             var fmt = this.container + ':' + this.vcodec + ':' + this.acodec;
@@ -2507,6 +2513,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
             fps = MediaInfoLib.build;
             width = MediaInfoLib.version;
             playtime = this.avflv;
+        }
+        else {
+            var r = res.rotation;
+
+            if (r === 90 || r === 270) {
+                r = width;
+                width = height;
+                height = r;
+            }
         }
 
         width <<= 1;

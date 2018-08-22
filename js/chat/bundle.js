@@ -538,6 +538,8 @@ React.makeElement = React['createElement'];
 	        return;
 	    }
 
+	    self.isLoggingOut = isLogout;
+
 	    self.trigger('onDestroy', [isLogout]);
 
 	    if (self.$conversationsAppInstance && ReactDOM.findDOMNode(self.$conversationsAppInstance) && ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode) {
@@ -4875,6 +4877,36 @@ React.makeElement = React['createElement'];
 	            if ($jsp) {
 	                $jsp.scrollToPercentX(1, false);
 	            }
+	        }
+	    },
+	    componentWillMount: function componentWillMount() {
+	        var self = this;
+
+	        if (self.props.multiple) {
+	            var KEY_ENTER = 13;
+
+	            $(document.body).rebind('keypress.contactPicker' + self.getUniqueId(), function (e) {
+	                var keyCode = e.which || e.keyCode;
+	                if (keyCode === KEY_ENTER) {
+	                    if (self.state.selected) {
+	                        e.preventDefault();
+	                        e.stopPropagation();
+
+	                        $(document).trigger('closeDropdowns');
+
+	                        if (self.props.onSelectDone) {
+	                            self.props.onSelectDone(self.state.selected);
+	                        }
+	                    }
+	                }
+	            });
+	        }
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+
+	        if (self.props.multiple) {
+	            $(document.body).unbind('keypress.contactPicker' + self.getUniqueId());
 	        }
 	    },
 	    render: function render() {

@@ -1052,12 +1052,13 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
                 }
                 promises.push(M.moveNodes(move, target));
             }
-
+            if (window.selectionManager){
+                selectionManager.clear_selection();
+            }
             // TODO: we need an allDone() variant that does signal rejections back!...
             promise.linkDoneAndFailTo(MegaPromise.allDone(promises).always(console.groupEnd.bind(console)));
         });
-            
-    selectionManager.clear_selection();
+
     return promise;
 };
 

@@ -1548,8 +1548,8 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
                 return;
             }
 
-            var $uName = $('.dialog-input-container input.sub-n', $dialog);
-            var $uEmail = $('.dialog-input-container input.sub-m', $dialog);
+            var $uName = $('.input-user input.sub-n', $dialog);
+            var $uEmail = $('.input-user input.sub-m', $dialog);
 
             if (!$uName.val().trim().length || $uName.val().trim().split(' ', 2).length < 2) {
                 $uName.addClass('error');
@@ -1609,7 +1609,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
 
     
     // event handler for key-down on inputs
-    $('.dialog-input-container input', $dialog).off('keydown.subuserresd')
+    $('.input-user input', $dialog).off('keydown.subuserresd')
         .on('keydown.subuserresd', function inputFieldsKeyDoownHandler() {
             var $me = $(this);
             if ($me.hasClass('error')) {

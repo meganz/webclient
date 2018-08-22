@@ -26261,25 +26261,15 @@ opacity: 1;
     background-color: rgba(0,0,0,0.1);
 }
 
-.user-management-dialog .dialog-input-container .input-user {
-    position: relative;
-    height: 64px;
-    margin-left: 56px;
-}
 
-.user-management-dialog .dialog-input-container .indi-input {
-    margin-right: 16px;
-    width: 246px;
-    height: 64px;
-    float: left;
-    position: relative;
-}
 
 .user-management-dialog .dialog-input-container .indi-input .error-message {
     font-size: 13px;
     padding:8px 0 0 8px;
     color: rgba(229,76,81,1);
-    width:500px;
+    width:240px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .user-management-dialog .dialog-input-container .dialog-input {
@@ -26533,7 +26523,7 @@ opacity: 1;
     left: 0;
 }
 
-.verification-container .new-sub-user {
+.verification-container .avatar {
     width: 48px;
     height: 48px;
     border: 1px solid rgba(0,0,0,0.1);
@@ -26547,7 +26537,7 @@ opacity: 1;
     margin: 0;
 }
 
-.verification-container .new-sub-user .subuser-image {
+.verification-container .avatar .subser-image {
     width: 42px;
     height: 42px;
     margin:2px;
@@ -26557,13 +26547,13 @@ opacity: 1;
     position: absolute;
 }
 
-.verification-container .new-sub-user .subuser-image img {
+.verification-container .avatar .subuser-image img {
     width: 42px;
     height: 42px;
     border-radius: 100%;
     position: absolute;
 }
-.verification-container .new-sub-user span {
+.verification-container .avatar span {
     color: white;
     font-size: 24px;
     float: left;
@@ -26638,6 +26628,7 @@ opacity: 1;
     display: inline-block;
     font-size: 14px;
     margin-bottom: 32px;
+    vertical-align: top;
 }
 
 .user-management-dialog .dialog-input-title-ontop {

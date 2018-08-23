@@ -1399,11 +1399,11 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $megaContainer.find('.biller-post').text(invoiceDetail.mega.poaddr.join(', '));
 
         // invoice top details
-        var $invoiceTopTitle = $('.inv-title-container.suba-inv', $invoiceDetailContainer);
+        var $invoiceTopTitle = $('.inv-title-container .inv-right', $invoiceDetailContainer);
         $invoiceTopTitle.find('#invoice-date').text((new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
         $invoiceTopTitle.find('#invoice-number').text(invoiceDetail.n);
-        $invoiceTopTitle.find('#invoice-vat').text(invoiceDetail.taxnum[1]);
-        $invoiceTopTitle.find('#inv-vat-label').text(invoiceDetail.taxnum[0]);
+        $invoiceTopTitle.find('.invoice-vat').text(invoiceDetail.mega.taxnum[1]);
+        $invoiceTopTitle.find('.inv-vat-label').text(invoiceDetail.mega.taxnum[0]);
 
         // billed-to details
         $invoiceDetailContainer.find('.billed-name').text(invoiceDetail.u.cname);
@@ -1413,7 +1413,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceDetailContainer.find('.billed-vat').addClass('hidden');
         if (nvoiceDetail.u.taxnum) {
             $invoiceDetailContainer.find('.billed-vat')
-                .text(nvoiceDetail.u.taxnum[0] + ': ' + nvoiceDetail.u.taxnum[1]).removeClass('hidden');
+                .text(invoiceDetail.u.taxnum[0] + ': ' + invoiceDetail.u.taxnum[1]).removeClass('hidden');
         }
 
         // invoice items
@@ -1422,13 +1422,26 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         var $invItemContentTemplate = $invItemContent.clone(true);
         $invItemContent.remove();
         var $invItemHeader = $('.inv-li-table-header', $invoiceItemsContainer);
+        var taxSum = 0;
         for (var k = invoiceDetail.items.length - 1; k >= 0; k--) {
             var $invItem = $invItemContentTemplate.clone(true);
             $invItem.find('.inv-pay-date').text((new Date(invoiceDetail.items[k].ts * 1000).toLocaleDateString));
             $invItem.find('.inv-pay-desc').text(invoiceDetail.items[k].d);
             $invItem.find('.inv-pay-amou').text(invoiceDetail.items[k].gross);
             $invItem.insertAfter($invItemHeader);
+            taxSum += invoiceDetail.items[k].tax;
         }
+
+        if (invoiceDetail.u.taxnum) {
+            $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')
+                .text(invoiceDetail.u.taxnum[0] + ': ' + invoiceDetail.taxrate.toFixed(2) + '%');
+        }
+        $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val').text('€' + taxSum);
+        $invoiceItemsContainer.find('.inv-payment-price.inv-li-total .inv-total-val').text('€' + invoiceDetail.tot);
+
+        // receipt top right items
+        $invoiceTopTitle.find('#rece-date').text((new Date(invoiceDetail.payts * 1000)).toLocaleDateString());
+        $invoiceTopTitle.find('#rece-number').text(invoiceDetail.rnum);
     };
 };
 

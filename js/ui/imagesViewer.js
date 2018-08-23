@@ -965,12 +965,12 @@ var slideshowid;
                 if (slideshow_handle() === n.h) {
                     $progressBar.addClass('hidden');
                 }
-                if (loadPreview || isCached) {
-                    slideshow_timereset();
-                }
-                else {
+
+                if (!(loadPreview || isCached)) {
                     getPreview();
                 }
+
+                slideshow_timereset();
             });
         }
 
@@ -1209,8 +1209,14 @@ var slideshowid;
             var $img = $imgCount.find('.' + imgClass);
             var rot = previews[id].orientation | 0;
 
-            if (slideshowplay && (previews[id].full || ev.type === 'error' || is_image(Object(M.d[id]).name) !== 1)) {
-                slideshow_timereset();
+            if (slideshowplay) {
+                if (previews[id].full
+                    || previews[id].ffailed
+                    || ev.type === 'error'
+                    || is_image(M.getNodeByHandle(slideshowid)) !== 1) {
+
+                    slideshow_timereset();
+                }
             }
 
             if (ev.type === 'error') {
@@ -1230,6 +1236,9 @@ var slideshowid;
                     URL.revokeObjectURL(previews[id].src);
                     previews[id] = previews[id].prev;
                     delete previews[id].prev;
+                    previews[id].ffailed = 1;
+                    this.src = previews[id].src;
+                    return;
                 }
             }
             else {

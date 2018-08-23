@@ -826,11 +826,11 @@ BusinessAccount.prototype.getInvoiceDetails = function (invoiceID, forceUpdate) 
     var operationPromise = new MegaPromise();
     if (!forceUpdate) {
         if (mega.buinsessAccount && mega.buinsessAccount.invoicesDetailsList
-            && mega.buinsessAccount.invoicesDetailsList.invoiceID) {
+            && mega.buinsessAccount.invoicesDetailsList[invoiceID]) {
             var currTime = new Date().getTime();
-            var cachedTime = mega.buinsessAccount.invoicesDetailsList.invoiceID.timestamp;
+            var cachedTime = mega.buinsessAccount.invoicesDetailsList[invoiceID].timestamp;
             if (cachedTime && (currTime - cachedTime) < this.invoiceListUpdateFreq) {
-                return operationPromise.resolve(1, mega.buinsessAccount.invoicesDetailsList.invoiceID);
+                return operationPromise.resolve(1, mega.buinsessAccount.invoicesDetailsList[invoiceID]);
             }
         }
     }
@@ -852,7 +852,7 @@ BusinessAccount.prototype.getInvoiceDetails = function (invoiceID, forceUpdate) 
                     || Object.create(null);
                 res.timestamp = currTime;
                 
-                mega.buinsessAccount.invoicesDetailsList.invoiceID = res;
+                mega.buinsessAccount.invoicesDetailsList[invoiceID] = res;
                 operationPromise.resolve(1, res); // invoice detail
             }
             else {

@@ -1451,11 +1451,17 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceItemsContainer.find('.inv-payment-price.inv-li-total .inv-total-val').text('€' + invoiceDetail.tot);
 
         // receipt top right items
-        $invoiceTopTitle.find('#rece-date').text((new Date(invoiceDetail.payts * 1000)).toLocaleDateString());
-        $invoiceTopTitle.find('#rece-number').text(invoiceDetail.rnum);
+        if (invoiceDetail.rnum) {
+            $invoiceTopTitle.find('#rece-date').text((new Date(invoiceDetail.payts * 1000)).toLocaleDateString());
+            $invoiceTopTitle.find('#rece-number').text(invoiceDetail.rnum);
+            $invoiceDetailContainer.find('.invoice-container.pay-receipt').removeClass('hidden');
+        }
+        else {
+            $invoiceDetailContainer.find('.invoice-container.pay-receipt').addClass('hidden');
+        }
 
         unhideSection();
-
+        
         $invoiceDetailContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
     };
 

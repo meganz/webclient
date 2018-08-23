@@ -453,7 +453,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
     l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/blog_8">').replace('[/A2]', '</a>');
-    l[19310] = l[19310].replace('[A1]', '<a href="https://mega.nz/blog_6" target="_blank">').replace('[/A1]', '</a>');
+    l[19310] = l[19310].replace('[A]', '<a href="https://mega.nz/blog_6" target="_blank">').replace('[/A]', '</a>');
 
 
     l[8644] = l[8644].replace('[S]', '<span class="green">').replace('[/S]', '</span>');

@@ -21396,7 +21396,7 @@ body.kr .account.chart.data {
     overflow: auto;
 }
 .contact-us-revamp .main-mid-pad h1 {
-    font-family: 'montserrat_semibold';
+    font-family: 'montserrat_semibold', 'source_sans_prosemibold', Arial;
     font-size: 36px;
     color: #262F3B;
 }
@@ -21416,6 +21416,16 @@ body.kr .account.chart.data {
     display: block;
     padding-left: 40px;
     height: 28px
+}
+/* This is a hackpatch to get contact us page out. I will fix this properly so it doesn't rely on language classes soon */
+.fr .contact-us-revamp .contact-new-title.gdpr {
+    margin-bottom: 40px;   
+}
+.ru .contact-us-revamp .contact-new-title.suggest-improvements, .ru .contact-us-revamp .contact-new-title.other-ip-issues {
+    margin-bottom: 40px;   
+}
+.pl .contact-us-revamp .contact-new-title.gdpr, .pl .contact-us-revamp .contact-new-title.other-ip-issues {
+    margin-bottom: 40px;   
 }
 .contact-us-revamp .main-mid-pad h1 {
     background-image: url(../images/mega/contact-us-sprite.png);

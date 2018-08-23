@@ -816,6 +816,56 @@ BusinessAccount.prototype.getSubUserTree = function (subUserHandle) {
 
 
 /**
+ * get invoice details
+ * @param {String} invoiceID            invoice unique id
+ * @param {Boolean} forceUpdate         a flag to force getting info from API not using the cache
+ * @returns {Promise}                   resolve if the operation succeeded
+ */
+BusinessAccount.prototype.getInvoiceDetails = function (invoiceID, forceUpdate) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+    if (!forceUpdate) {
+        if (mega.buinsessAccount && mega.buinsessAccount.invoicesDetailsList
+            && mega.buinsessAccount.invoicesDetailsList[invoiceID]) {
+            var currTime = new Date().getTime();
+            var cachedTime = mega.buinsessAccount.invoicesDetailsList[invoiceID].timestamp;
+            if (cachedTime && (currTime - cachedTime) < this.invoiceListUpdateFreq) {
+                return operationPromise.resolve(1, mega.buinsessAccount.invoicesDetailsList[invoiceID]);
+            }
+        }
+    }
+
+    var request = {
+        "a": "id", // get invoice details
+        "n": invoiceID   // invoice number
+    };
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'object') {
+                var currTime = new Date().getTime();
+                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                mega.buinsessAccount.invoicesDetailsList = mega.buinsessAccount.invoicesDetailsList
+                    || Object.create(null);
+                res.timestamp = currTime;
+                
+                mega.buinsessAccount.invoicesDetailsList[invoiceID] = res;
+                operationPromise.resolve(1, res); // invoice detail
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+
+    });
+    return operationPromise;
+};
+
+
+/**
  * Get business account list of invoices
  * @param {Boolean} forceUpdate         a flag to force getting info from API not using the cache
  * @returns {Promise}                   resolve if the operation succeeded

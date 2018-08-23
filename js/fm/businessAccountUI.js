@@ -47,7 +47,7 @@ function BusinessAccountUI() {
         //$('.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
         $('.fm-right-header-user-management .user-management-breadcrumb').addClass('hidden');
         $('.inv-det-arrow, .inv-det-id',
-            '.fm-right-header-user-management .user-management-breadcrumb').removeClass('hidden');
+            '.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
         $('.fm-right-header-user-management .user-management-overview-buttons').addClass('hidden');
         $('.user-management-overview-bar').addClass('hidden');
     };
@@ -1308,11 +1308,21 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         for (var k = 0; k < invoicesList.length; k++) {
             var invoiceDate = new Date(invoicesList[k].ts * 1000);
             var $newInvoiceRow = $invoiceRowTemplate.clone(true);
+            var invId = invoicesList[k].n;
 
+            $newInvoiceRow.attr('id', invId);
             $newInvoiceRow.find('.inv-date').text(invoiceDate.toLocaleDateString());
             $newInvoiceRow.find('.inv-desc').text(invoicesList[k].d);
             $newInvoiceRow.find('.inv-total').text('€' + invoicesList[k].tot);
             $newInvoiceRow.removeClass('hidden'); // if it was hidden
+            $newInvoiceRow.off('click.suba').on('click.suba', function invoiceDetailButtonClick() {
+                var clickedInvoiceId = $(this).closest("tr").attr('id');
+                if (!clickedInvoiceId) {
+                    console.error("Cant Find the id of the clicked invoice!");
+                    return;
+                }
+                mySelf.viewInvoiceDetail(clickedInvoiceId);
+            });
 
             $invoicesTable.append($newInvoiceRow);
         }
@@ -1382,7 +1392,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
     var fillInvoiceDetailPage = function (st, invoiceDetail) {
         
 
-        if (!validateInvoice(invoiceDetail)) {
+        if (st !== 1 || !validateInvoice(invoiceDetail)) {
             msgDialog('warningb', '', l[19302]);
             mySelf.viewBusinessAccountPage();
             return;
@@ -1399,11 +1409,11 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $megaContainer.find('.biller-post').text(invoiceDetail.mega.poaddr.join(', '));
 
         // invoice top details
-        var $invoiceTopTitle = $('.inv-title-container.suba-inv', $invoiceDetailContainer);
+        var $invoiceTopTitle = $('.inv-title-container .inv-right', $invoiceDetailContainer);
         $invoiceTopTitle.find('#invoice-date').text((new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
         $invoiceTopTitle.find('#invoice-number').text(invoiceDetail.n);
-        $invoiceTopTitle.find('#invoice-vat').text(invoiceDetail.taxnum[1]);
-        $invoiceTopTitle.find('#inv-vat-label').text(invoiceDetail.taxnum[0]);
+        $invoiceTopTitle.find('.invoice-vat').text(invoiceDetail.mega.taxnum[1]);
+        $invoiceTopTitle.find('.inv-vat-label').text(invoiceDetail.mega.taxnum[0]);
 
         // billed-to details
         $invoiceDetailContainer.find('.billed-name').text(invoiceDetail.u.cname);
@@ -1411,25 +1421,52 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceDetailContainer.find('.billed-address').text(invoiceDetail.u.addr.join(', '));
         $invoiceDetailContainer.find('.billed-country').text(invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]);
         $invoiceDetailContainer.find('.billed-vat').addClass('hidden');
-        if (nvoiceDetail.u.taxnum) {
+        if (invoiceDetail.u.taxnum) {
             $invoiceDetailContainer.find('.billed-vat')
-                .text(nvoiceDetail.u.taxnum[0] + ': ' + nvoiceDetail.u.taxnum[1]).removeClass('hidden');
+                .text(invoiceDetail.u.taxnum[0] + ': ' + invoiceDetail.u.taxnum[1]).removeClass('hidden');
         }
 
         // invoice items
         var $invoiceItemsContainer = $('.inv-payment-table', $invoiceDetailContainer)
-        var $invItemContent = $($('.inv-li-content', $invoiceItemsContainer).get(0));
+        var $allItems = $('.inv-li-content', $invoiceItemsContainer);
+        var $invItemContent = $($allItems.get(0));
         var $invItemContentTemplate = $invItemContent.clone(true);
-        $invItemContent.remove();
+        $allItems.remove();
         var $invItemHeader = $('.inv-li-table-header', $invoiceItemsContainer);
+        var taxSum = 0;
         for (var k = invoiceDetail.items.length - 1; k >= 0; k--) {
             var $invItem = $invItemContentTemplate.clone(true);
-            $invItem.find('.inv-pay-date').text((new Date(invoiceDetail.items[k].ts * 1000).toLocaleDateString));
+            $invItem.find('.inv-pay-date').text((new Date(invoiceDetail.items[k].ts * 1000).toLocaleDateString()));
             $invItem.find('.inv-pay-desc').text(invoiceDetail.items[k].d);
             $invItem.find('.inv-pay-amou').text(invoiceDetail.items[k].gross);
             $invItem.insertAfter($invItemHeader);
+            taxSum += invoiceDetail.items[k].tax;
         }
+
+        if (invoiceDetail.u.taxnum) {
+            $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')
+                .text(invoiceDetail.u.taxnum[0] + ': ' + invoiceDetail.taxrate.toFixed(2) + '%');
+        }
+        $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val').text('€' + taxSum);
+        $invoiceItemsContainer.find('.inv-payment-price.inv-li-total .inv-total-val').text('€' + invoiceDetail.tot);
+
+        // receipt top right items
+        if (invoiceDetail.rnum) {
+            $invoiceTopTitle.find('#rece-date').text((new Date(invoiceDetail.payts * 1000)).toLocaleDateString());
+            $invoiceTopTitle.find('#rece-number').text(invoiceDetail.rnum);
+            $invoiceDetailContainer.find('.invoice-container.pay-receipt').removeClass('hidden');
+        }
+        else {
+            $invoiceDetailContainer.find('.invoice-container.pay-receipt').addClass('hidden');
+        }
+
+        unhideSection();
+        
+        $invoiceDetailContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
     };
+
+    var gettingInvoiceDetailPromise = this.business.getInvoiceDetails(invoiceID, false);
+    gettingInvoiceDetailPromise.always(fillInvoiceDetailPage);
 };
 
 

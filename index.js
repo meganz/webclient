@@ -976,6 +976,16 @@ function init_page() {
         if (lang == 'ru') {
             $('.account-mid-block').addClass('high');
         }
+
+        // On clicking the directory buttons
+        $('.directory-buttons li').rebind('click', function() {
+
+            // Get the class to the directory title element to scroll to
+            var link = $(this).attr('data-link');
+
+            // Scroll to the element's parent (not the element itself because it's hidden by the header)
+            $('.contact-new-title.' + link).parent().get(0).scrollIntoView();
+        });
     }
     else if (page.substr(0, 4) == 'help') {
         return Help.render();

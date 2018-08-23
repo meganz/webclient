@@ -149,12 +149,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 console.warn('All pixels are black, aborting thumbnail creation...', ab.byteLength);
                 return img.onerror('Unsupported image type/format.');
             }
-            len = ab.byteLength;
-            while (len-- && ab[len] === 0xff) {}
-            if (len < 0) {
-                console.warn('All pixels are white, aborting thumbnail creation...', ab.byteLength);
-                return img.onerror('...potentially tainted canvas');
-            }
 
             dataURI = canvas.toDataURL(imageType, 0.80);
             // if (d) console.log('THUMBNAIL', dataURI);

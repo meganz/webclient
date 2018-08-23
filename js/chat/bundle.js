@@ -4749,7 +4749,7 @@ React.makeElement = React['createElement'];
 	                self.clickTime = new Date();
 	                self.lastClicked = contactHash;
 	            };
-	            var selectedWidth = self.state.selected.length * 60;
+	            var selectedWidth = self.state.selected.length * 54;
 	            if (!self.state.selected || self.state.selected.length === 0) {
 	                footer = React.makeElement(
 	                    "div",

@@ -1032,7 +1032,9 @@ FileManager.prototype.initContextUI = function() {
 
                 msgDialog('confirmation', l[1003], fldName, false, function(e) {
                     if (e) {
-                        mega.megadrop.pufRemove(mdList).always(showDialog);
+                        mega.megadrop.pufRemove(mdList);
+                        // set showDialog as callback for after delete puf.
+                        mega.megadrop.pufCallbacks[selNodes[0]] = {del:showDialog};
                     }
                 });
             }

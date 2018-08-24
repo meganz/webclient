@@ -707,7 +707,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
             var res = origFn.apply(this, arguments);
 
-            if (!ignoreDB && self.chatd.chatdPersist) {
+            // note: ignoreDB can be a message, in case fnName is 'replace', which is not actually an ignoreDB.
+            if (ignoreDB !== true && self.chatd.chatdPersist) {
                 chatdPersist.persistMessageBatched(
                     fnName === "removeByKey" ? "remove" : fnName,
                     chatRoom.chatId,
@@ -1100,7 +1101,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                                 );
                             }
                         }
-                        if (editedMessage.textContents === "") {
+                        if (editedMessage.textContents === "" && editedMessage.dialogType !== 'truncated') {
                             editedMessage.deleted = true;
                         }
                     }

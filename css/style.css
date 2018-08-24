@@ -24824,18 +24824,21 @@ opacity: 1;
     height: 24px;
     float: left;
     position: relative;
-    display: inline-block;
     cursor: pointer;
 }
 
-.user-management-breadcrumb .user-management-next-arrow, .nw-drag-drop-dialog .next-arrow {
+.user-management-breadcrumb .user-management-next-arrow {
     background-image: url(../images/mega/fm-main-sprite.png);
     background-position: -41px -1433px;
     width: 7px;
     height: 24px;
     position: relative;
-    display: inline-block;
+    float: left;
     margin:0px 12px;
+}
+
+.user-management-breadcrumb .user-management-subuser-avatars, .user-management-breadcrumb .user-management-breadcrumbs-img{
+	float: left;
 }
 
 .user-management-view .user-management-subuser-avatars, .fm-right-header-user-management .user-management-subuser-avatars, .user-management-dialog .user-management-subuser-avatars{
@@ -24847,7 +24850,6 @@ opacity: 1;
     border: 1px solid rgba(0,0,0,0.05);
     border-radius: 100%;
     position: relative;
-    display: inline-block;
 }
 
 .user-management-view .user-management-subuser-image, .fm-right-header-user-management .user-management-subuser-image, .user-management-dialog .user-management-subuser-image{
@@ -24863,10 +24865,11 @@ opacity: 1;
 .user-management-breadcrumb .user-management-subuser-name {
     font-size: 14px;
     color: #666666;
-    display: inline-block;
     line-height: 24px;
     position: relative;
     vertical-align: top;
+    float: left;
+    margin-left: 8px;
 }
 
 .user-management-subuser-profile-container{
@@ -25313,7 +25316,6 @@ opacity: 1;
     width:24px;
     height: 24px;
     position: relative;
-    display: inline-block;
     background-image: url(../images/mega/fm-main-sprite.png);
     background-repeat: no-repeat;
     opacity: 0.6;
@@ -27768,8 +27770,10 @@ opacity: 1;
     background-color: rgba(0,0,0,0.1);
     position: relative;
     display: block;
-    margin-bottom: 24px;
+    margin-bottom: 0px;
 }
+
+
 
 .user-management-view .disabled, .user-management-dialog .disabled, .user-management-overview-bar .disabled, .fm-left-panel.user-management .disabled, .fm-right-header-user-management .disabled{
     opacity: 0.3;
@@ -28132,8 +28136,8 @@ opacity: 1;
     height:100%;
 }
 
-.user-management-account-settings .invoice{
-    height:calc(100% - 74px);
+.user-management-account-settings .invoice {
+    height:calc(100% - 48px);
 }
 
 .user-management-account-settings .invoice .invoice-list{
@@ -28141,7 +28145,7 @@ opacity: 1;
 }
 
 .user-management-account-settings .invoice .invoice-subtitle {
-    margin: 24px auto 16px 56px;
+    padding: 24px 0 16px 56px;
     line-height: 20px;
     font-size: 16px;
     color: #333;
@@ -28228,11 +28232,11 @@ opacity: 1;
     position: relative;
     top: 0;
     left: 0;
-    height:1200px;
+    height: 100%;
 }
 
 .user-management-account-settings .invoice-detail .default-white-button-user-management {
-    margin:0px auto 24px 56px;
+    margin:24px 0 24px 56px;
     right:none;
     top:0;
     position: relative;
@@ -28240,10 +28244,8 @@ opacity: 1;
 
 .user-management-account-settings .invoice-detail .invoice-container {
     margin:0px auto auto 56px;
-    width: calc(100% - 112px);
-    min-width: 595px;
+    width: 595px;
     height: 842px;
-    max-width: 1000px;
     border: 1px solid rgba(0,0,0,0.1);
     border-radius: 8px;
     background-color: #fff;
@@ -28259,7 +28261,8 @@ opacity: 1;
     vertical-align: top;
 }
 .user-management-account-settings .invoice-detail .inv-title-container {
-    width: 39.5%;
+    width: calc(40% - 56px);
+    margin-right: 56px;
     position: relative;
     display: inline-block;
     vertical-align: top;
@@ -28334,7 +28337,8 @@ opacity: 1;
 
 .user-management-account-settings .invoice-detail .inv-title-container .inv-right {
     float: right;
-    margin-right: 56px;
+    width: 100%;
+
 }
 
 
@@ -28344,7 +28348,7 @@ opacity: 1;
     text-align: left;
     line-height: 39px;
     color: #333;
-    margin:64px 56px 0 0;
+    margin:64px 0 0 0;
     position: relative;
 }
 

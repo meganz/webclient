@@ -1770,22 +1770,41 @@ div.checkboxOn, div.checkboxOff {
 }
 /* General Terms, Privacy Policy and Takedown guidance pages */
 .data-protection, .terms-general, .privacy-policy, .takedown-guidance, .contact-us {
-    padding: 50px 25px 50px 25px;
+    padding: 50px 20px 50px 20px;
 }
 .contact-us .contact-new-column {
-    margin-bottom: 20px;
+    margin-bottom: 48px;
+    margin-top: 48px;
 }
 .data-protection h1, .terms-of-service h1, .terms-general h1, .privacy-policy h1, .takedown-guidance h1, .contact-us h1 {
-    font-family: 'source_sans_prolight', sans-serif;
+    font-family: 'montserrat_semibold', sans-serif;
     font-size: 36px;
-    font-weight: 300;
-    color: #222;
+    color: #262F3B;
 }
 .data-protection h2, .terms-of-service h2, .terms-general h2, .privacy-policy h2, .takedown-guidance h2, .contact-us .contact-new-title {
-    font-family: 'source_sans_prolight', sans-serif;
-    font-size: 24px;
+    font-family: 'source_sans_prosemibold', sans-serif;
+    font-size: 20px;
     font-weight: 300;
-    color: #999;
+    color: #262F3B;
+}
+.contact-us h1 {
+    background-image: none !important;
+    background-repeat: no-repeat;
+    line-height: 1.5;
+    margin-left: 51px;
+    margin-top: 40px;
+}
+.contact-us h1::before {
+    content: '';
+    background-image: url(../images/mega/contact-us-sprite@2x.png);;
+    background-size: 40px auto;
+    background-position: 0 0;
+    height: 40px;
+    width: 40px;
+    position: absolute;
+    display: inline-block;
+    margin-left: -56px;
+    margin-top: 7px;
 }
 .data-protection .number, .terms-of-service .number, .terms-general .number, .privacy-policy .number, .takedown-guidance .number {
     display: block;
@@ -1795,7 +1814,7 @@ div.checkboxOn, div.checkboxOff {
 }
 .data-protection .text,  .terms-of-service .text, .terms-general .text, .privacy-policy .text, .takedown-guidance .text, .takedown-guidance p, .contact-us .contact-new-txt, .contact-us p {
     font-size: 15px;
-    line-height: 1.73;
+    line-height: 1.6;
     color: #667;
 }
 .data-protection .text b {
@@ -1864,14 +1883,89 @@ div.checkboxOn, div.checkboxOff {
     background-image: none;
 }
 .contact-us .contact-new-title, .contact-us .contact-new-button, .contact-us a.contact-new-button {
+    background-repeat:no-repeat;
     background-image: none;
 }
-/* ToDo: Remove grey styling when Help Center is working on mobile */
-.contact-us .help-center-link {
-    color: #667;
+.contact-us .contact-new-title {
+    line-height: 28px;
+    margin-bottom: 16px;
+    display: inline-block;
+    margin-left: 40px;
+}
+.contact-us .contact-new-title::before {
+    content: '';
+    background-image: url(../images/mega/contact-us-sprite@2x.png);;
+    background-size: 80px auto;
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    position: absolute;
+    margin-left: -40px;
+}
+.contact-new-title.legal::before {
+    background-position: -4px -312px;
+}
+.contact-new-title.copyright::before {
+    background-position: -4px -119px;
+}
+.contact-new-title.improvements::before {
+    background-position: -4px -280px;
+}
+.contact-new-title.report-a-bug::before {
+    background-position: -4px -216px;
+}
+.contact-new-title.media::before {
+    background-position: -4px -344px;
+}
+.contact-new-title.get-support::before {
+    background-position: -4px -87px;
+}
+.contact-new-title.report-objectionable-material::before {
+    background-position: -4px -151px;
+}
+.contact-new-title.privacy::before {
+    background-position: -4px -184px;
+}
+.contact-new-title.security::before {
+    background-position: -4px -248px;
+}
+.contact-new-title.suggest-improvements::before {
+    background-position: -4px -280px;
+}
+.contact-new-title.other-ip-issues::before {
+    background-position: -4px -376px;
+}
+.contact-new-title.corporate-office::before {
+    background-position: -4px -409px;
+}
+.contact-new-title.corporate-mail::before {
+    background-position: -4px -441px;
+}
+.contact-new-title.other-group-companies::before {
+    background-position: -4px -473px;
+}
+.contact-new-title.eu-representative::before, .contact-new-title.gdpr::before {
+    background-position: -4px -505px;
 }
 .terms-of-service a, .terms-general a, .privacy-policy a, .takedown-guidance a, .contact-us a {
     color: #eb4444;
+}
+.contact-us a.contact-new-button {
+    background: #F30C14;
+    border: 1px solid #D90007;
+    border-radius: 3px;
+    padding: 0px 20px 0 20px;
+    line-height: 32px;
+    height: 32px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'source_sans_prosemibold';
+    margin: 16px 0 0 0;
+    color: #fff;
+    display: inline-block;
+}
+.contact-new-txt b {
+    font-family: 'source_sans_prosemibold';
 }
 .terms-of-service .list, .terms-general .list, .privacy-policy .list, .takedown-guidance .list {
     margin-left: 18px;
@@ -6966,6 +7060,10 @@ body.bottom-pages.mobile .fmholder.no-scroll {
 .limited-bandwidth-dialog .local-currency .reg-st3-bott-title.price .local-currency-code {
     margin-top: 2px;
     margin-bottom: 0px;
+}
+
+.contact-directory {
+    display: none;
 }
 
 /* Only media queries after here */

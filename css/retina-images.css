@@ -70,9 +70,9 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/new-affiliate-sprite_v1@2x.png);
     background-size: 1500px auto;
 }
-.contact-new-title, .contact-new-button, a.contact-new-button {
-    background-image: url(../images/mega/contact-new-sprite@2x.png);
-    background-size: 541px auto;
+.contact-us-revamp .contact-new-title, .contact-us-revamp .main-mid-pad h1 {
+    background-image: url(../images/mega/contact-us-sprite@2x.png);
+    background-size: 80px auto;
 }
 .new-left-menu-icon, .dev-short-bl-icon, .dev-new-button, .dev-new-table-icon, .dev-new-app-settings, .dev-no-apps-txt, .dev-new-app-big-icon, .new-left-submenu-item, .new-bottom-pages .new-right-content-block li {
     background-image: url(../images/mega/sdk-sprite@2x.png);

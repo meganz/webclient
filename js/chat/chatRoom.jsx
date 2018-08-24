@@ -995,37 +995,62 @@ ChatRoom.prototype.attachNodes = function(ids) {
     ids.forEach(function(nodeId) {
         var proxyPromise = new MegaPromise();
 
-        self._sendNodes(
-                [nodeId],
-                users
-            )
-            .done(function () {
-                var nodesMeta = [];
-                var node = M.d[nodeId];
-                nodesMeta.push({
-                    'h': node.h,
-                    'k': node.k,
-                    't': node.t,
-                    's': node.s,
-                    'name': node.name,
-                    'hash': node.hash,
-                    'fa': node.fa,
-                    'ts': node.ts
+        if (M.d[nodeId] && M.d[nodeId].u !== u_handle) {
+            // I'm not the owner of this file.
+            // can be a d&d to a chat or Send to contact from a share
+            self.megaChat.getMyChatFilesFolder()
+                .done(function(myChatFilesFolderHandle) {
+                    M.copyNodes(
+                            [nodeId],
+                            myChatFilesFolderHandle,
+                            false,
+                            new MegaPromise()
+                        )
+                        .done(function(copyNodesResponse) {
+                            if (copyNodesResponse && copyNodesResponse[0]) {
+                                proxyPromise.linkDoneAndFailTo(self.attachNodes([copyNodesResponse[0]]));
+                            }
+                            else {
+                                proxyPromise.reject();
+                            }
+                        })
+                        .fail(function(err) {
+                            proxyPromise.reject(err);
+                        });
+                })
+                .fail(function(err) {
+                    proxyPromise.reject(err);
                 });
+        }
+        else {
+            self._sendNodes([nodeId], users)
+                .done(function () {
+                    var nodesMeta = [];
+                    var node = M.d[nodeId];
+                    nodesMeta.push({
+                        'h': node.h,
+                        'k': node.k,
+                        't': node.t,
+                        's': node.s,
+                        'name': node.name,
+                        'hash': node.hash,
+                        'fa': node.fa,
+                        'ts': node.ts
+                    });
 
-                // 1b, 1b, JSON
-                self.sendMessage(
-                    Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
-                    Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT +
-                    JSON.stringify(nodesMeta)
-                );
+                    // 1b, 1b, JSON
+                    self.sendMessage(
+                        Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
+                        Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT +
+                        JSON.stringify(nodesMeta)
+                    );
 
-                proxyPromise.resolve([nodeId]);
-            })
-            .fail(function(r) {
-                proxyPromise.reject(r);
-            });
-
+                    proxyPromise.resolve([nodeId]);
+                })
+                .fail(function (r) {
+                    proxyPromise.reject(r);
+                });
+        }
         waitingPromises.push(proxyPromise);
     });
 

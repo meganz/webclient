@@ -4978,7 +4978,7 @@ React.makeElement = React['createElement'];
 	                self.clickTime = new Date();
 	                self.lastClicked = contactHash;
 	            };
-	            var selectedWidth = self.state.selected.length * 60;
+	            var selectedWidth = self.state.selected.length * 54;
 	            if (!self.state.selected || self.state.selected.length === 0) {
 	                footer = React.makeElement(
 	                    "div",
@@ -13755,27 +13755,43 @@ React.makeElement = React['createElement'];
 	    ids.forEach(function (nodeId) {
 	        var proxyPromise = new MegaPromise();
 
-	        self._sendNodes([nodeId], users).done(function () {
-	            var nodesMeta = [];
-	            var node = M.d[nodeId];
-	            nodesMeta.push({
-	                'h': node.h,
-	                'k': node.k,
-	                't': node.t,
-	                's': node.s,
-	                'name': node.name,
-	                'hash': node.hash,
-	                'fa': node.fa,
-	                'ts': node.ts
+	        if (M.d[nodeId] && M.d[nodeId].u !== u_handle) {
+
+	            self.megaChat.getMyChatFilesFolder().done(function (myChatFilesFolderHandle) {
+	                M.copyNodes([nodeId], myChatFilesFolderHandle, false, new MegaPromise()).done(function (copyNodesResponse) {
+	                    if (copyNodesResponse && copyNodesResponse[0]) {
+	                        proxyPromise.linkDoneAndFailTo(self.attachNodes([copyNodesResponse[0]]));
+	                    } else {
+	                        proxyPromise.reject();
+	                    }
+	                }).fail(function (err) {
+	                    proxyPromise.reject(err);
+	                });
+	            }).fail(function (err) {
+	                proxyPromise.reject(err);
 	            });
+	        } else {
+	            self._sendNodes([nodeId], users).done(function () {
+	                var nodesMeta = [];
+	                var node = M.d[nodeId];
+	                nodesMeta.push({
+	                    'h': node.h,
+	                    'k': node.k,
+	                    't': node.t,
+	                    's': node.s,
+	                    'name': node.name,
+	                    'hash': node.hash,
+	                    'fa': node.fa,
+	                    'ts': node.ts
+	                });
 
-	            self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT + JSON.stringify(nodesMeta));
+	                self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT + JSON.stringify(nodesMeta));
 
-	            proxyPromise.resolve([nodeId]);
-	        }).fail(function (r) {
-	            proxyPromise.reject(r);
-	        });
-
+	                proxyPromise.resolve([nodeId]);
+	            }).fail(function (r) {
+	                proxyPromise.reject(r);
+	            });
+	        }
 	        waitingPromises.push(proxyPromise);
 	    });
 

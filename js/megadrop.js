@@ -151,6 +151,7 @@ mega.megadrop = (function() {
         var pufOpts = {
             list: [],
             items: {},
+            callbacks: {},      // Functions used for callbacks
             req: {
                 create: {       // Create PUF
                     a: 'ul',
@@ -504,6 +505,7 @@ mega.megadrop = (function() {
         return {
             // variables
             items: pufOpts.items,
+            callbacks: pufOpts.callbacks,
 
             // Functions
             add: add,
@@ -715,19 +717,20 @@ mega.megadrop = (function() {
 
             // Remove from puf.items
             for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    var elem = obj[key];
-
-                    if (elem.p === handle) {
-                        if (fmdb && !pfkey) {
-                            if (puf.items[key]) {
-                                delete puf.items[key];
+                if (obj.hasOwnProperty(key) && obj[key].p === handle) {
+                    if (fmdb && !pfkey) {
+                        if (puf.items[key]) {
+                            if (puf.callbacks[key] && puf.callbacks[key]['del']) {
+                                loadingDialog.hide();
+                                puf.callbacks[key]['del']();
+                                delete puf.callbacks[key]['del'];
                             }
-                            fmdb.del('puf', elem.ph);
+                            fmdb.del('puf', obj[key].ph);
+                            delete puf.items[key];
                         }
-
-                        break;
                     }
+
+                    break;
                 }
             }
         };
@@ -937,6 +940,7 @@ mega.megadrop = (function() {
             var state = 0;
             var folderId = '';
             var pupId = '';
+            var delayHide = false;
 
             for (var i = ap.length; i--;) {
                 item = Object.assign({}, ap[i]);
@@ -962,12 +966,16 @@ mega.megadrop = (function() {
                     if (pupOpts.items[pupId]) {
                         folderId = pupOpts.items[pupId].h;
                         _del(pupId);
+                        if (puf.callbacks[folderId] && puf.callbacks[folderId]['del']) {
+                            delayHide = true;
+                        }
                         settings.remove(pupId, folderId);
                     }
                 }
             }
-
-            loadingDialog.hide();
+            if (!delayHide){
+                loadingDialog.hide();
+            }
         };
 
         /**
@@ -2235,6 +2243,7 @@ mega.megadrop = (function() {
 
         // PUF
         pufs: puf.items,
+        pufCallbacks: puf.callbacks,
         pufRemove: puf.remove,
         pufHandle: puf.getHandle,
         pufProcessDb: puf.processDb,

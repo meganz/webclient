@@ -427,7 +427,6 @@ FileManager.prototype.initFileManagerUI = function() {
     };
     InitFileDrag();
     M.createFolderUI();
-    M.buildRootSubMenu();
     M.treeSearchUI();
     M.initTreePanelSorting();
     M.initContextUI();
@@ -952,23 +951,19 @@ FileManager.prototype.initContextUI = function() {
         }
 
         currentId = $this.attr('id');
-        var clearedId;
-        if (currentId) {
-            clearedId = currentId.replace('fi_', '');
-            M.buildSubMenu(clearedId);
+        if (currentId || $this.hasClass('move-item')) {
+            M.buildSubMenu(String(currentId).replace('fi_', ''));
         }
 
         // Show necessary submenu
         if (!$this.hasClass('opened') && $this.hasClass('contains-submenu')) {
-            if (!clearedId || $('#csb_' + clearedId + ' > .dropdown-item').length > 0) {
-                menuPos = M.reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
+            menuPos = M.reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
 
-                $this.next('.submenu')
-                    .css({'top': menuPos.top})
-                    .addClass('active');
+            $this.next('.submenu')
+                .css({'top': menuPos.top})
+                .addClass('active');
 
-                $this.addClass('opened');
-            }
+            $this.addClass('opened');
         }
     });
 
@@ -1037,7 +1032,9 @@ FileManager.prototype.initContextUI = function() {
 
                 msgDialog('confirmation', l[1003], fldName, false, function(e) {
                     if (e) {
-                        mega.megadrop.pufRemove(mdList).always(showDialog);
+                        mega.megadrop.pufRemove(mdList);
+                        // set showDialog as callback for after delete puf.
+                        mega.megadrop.pufCallbacks[selNodes[0]] = {del:showDialog};
                     }
                 });
             }

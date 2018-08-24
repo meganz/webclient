@@ -1,86 +1,93 @@
-(function(global) {
+/*
+ * buildSubMenu - context menu related
+ * Create sub-menu for context menu parent directory
+ *
+ * @param {string} id - parent folder handle
+ */
+MegaData.prototype.buildSubMenu = function(id) {
+    'use strict'; /* jshint -W074 */
+
+    var csb;
+    var cs = '';
+    var sm = '';
+    var tree = Object(this.tree[id]);
+    var folders = obj_values(tree);
+    var rootID = escapeHTML(this.RootID);
+    var rootTree = this.tree[rootID] || false;
+    var rootTreeLen = $.len(rootTree);
     var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
 
-    MegaData.prototype.buildRootSubMenu = function() {
+    csb = document.getElementById('sm_move');
+    if (!csb || parseInt(csb.dataset.folders) !== rootTreeLen) {
+        if (rootTree) {
+            cs = ' contains-submenu';
+            sm = '<span class="dropdown body submenu" id="sm_' + rootID + '">'
+                + '<span id="csb_' + rootID + '"></span>' + arrow + '</span>';
+        }
 
-        var cs = '',
-            sm = '',
-            html = '';
+        if (csb) {
+            csb.parentNode.removeChild(csb);
+        }
 
-        for (var h in this.c[this.RootID]) {
-            if (this.d[h] && this.d[h].t) {
+        $('.dropdown-item.move-item').after(
+            '<span class="dropdown body submenu" id="sm_move">' +
+            '  <span id="csb_move">' +
+            '    <span class="dropdown-item cloud-item' + cs + '" id="fi_' + rootID + '">' +
+            '      <i class="small-icon context cloud"></i>' + escapeHTML(l[164]) +
+            '    </span>' + sm +
+            '    <span class="dropdown-item remove-item" id="fi_' + escapeHTML(this.RubbishID) + '">' +
+            '      <i class="small-icon context remove-to-bin"></i>' + escapeHTML(l[168]) +
+            '    </span>' +
+            '    <hr />' +
+            '    <span class="dropdown-item advanced-item">' +
+            '      <i class="small-icon context aim"></i>' + escapeHTML(l[9108]) +
+            '    </span>' + arrow +
+            '  </span>' +
+            '</span>'
+        );
+
+        if ((csb = document.getElementById('sm_move'))) {
+            csb.dataset.folders = rootTreeLen;
+            M.initContextUI(); // rebind just recreated dropdown-item's
+        }
+    }
+
+    csb = document.getElementById('csb_' + id);
+    if (csb && csb.querySelectorAll('.dropdown-item').length !== folders.length) {
+        var $csb = $(csb).empty();
+
+        folders.sort(M.getSortByNameFn2(1));
+        for (var i = 0; i < folders.length; i++) {
+            var fid = escapeHTML(folders[i].h);
+
+            cs = '';
+            sm = '';
+            if (this.tree[fid]) {
                 cs = ' contains-submenu';
-                sm = '<span class="dropdown body submenu" id="sm_' + this.RootID + '">'
-                    + '<span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
-                break;
-            }
-        }
-
-        html = '<span class="dropdown body submenu" id="sm_move"><span id="csb_move">'
-            + '<span class="dropdown-item cloud-item' + cs + '" id="fi_' + this.RootID + '">'
-            + '<i class="small-icon context cloud"></i>' + l[164] + '</span>' + sm
-            + '<span class="dropdown-item remove-item" id="fi_' + this.RubbishID + '">'
-            + '<i class="small-icon context remove-to-bin"></i>' + l[168] + '</span>'
-            + '<hr /><span class="dropdown-item advanced-item"><i class="small-icon context aim"></i>'
-            + l[9108] + '</span>' + arrow + '</span></span>';
-
-        $('.dropdown-item.move-item').after(html);
-    };
-
-    /*
-     * buildSubMenu - context menu related
-     * Create sub-menu for context menu parent directory
-     *
-     * @param {string} id - parent folder handle
-     */
-    MegaData.prototype.buildSubMenu = function(id) {
-        var cs;
-        var sm;
-        var fid;
-        var html;
-        var nodeName;
-        var sharedFolder;
-        var tree = Object(M.tree[id]);
-        var folders = obj_values(tree);
-
-        // Check existance of sub-menu
-        if ($('#csb_' + id + ' > .dropdown-item').length !== folders.length) {
-            // sort by name is default in the tree
-            folders.sort(M.getSortByNameFn2(1));
-
-            for (var i = 0; i < folders.length; i++) {
-                cs = '';
-                sm = '';
-                fid = folders[i].h;
-
-                if (this.tree[fid]) {
-                    cs = ' contains-submenu';
-                    sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
-                        + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
-                }
-
-                sharedFolder = 'folder-item';
-
-                if (folders[i].t & M.IS_SHARED) {
-                    sharedFolder += ' shared-folder-item';
-                }
-                else if (mega.megadrop.pufs[fid] && mega.megadrop.pufs[fid].s !== 1) {
-                    sharedFolder += ' puf-folder';
-                }
-
-                nodeName = missingkeys[fid] ? l[8686] : folders[i].name;
-
-                html = '<span class="dropdown-item ' + sharedFolder + cs + '" id="fi_' + fid + '">'
-                    + '<i class="small-icon context ' + sharedFolder + '"></i>'
-                    + htmlentities(nodeName) + '</span>' + sm;
-
-                $('#csb_' + id).append(html);
+                sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
+                    + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
             }
 
-            M.disableCircularTargets('#fi_');
+            var classes = 'folder-item';
+            if (folders[i].t & M.IS_SHARED) {
+                classes += ' shared-folder-item';
+            }
+            else if (mega.megadrop.pufs[fid] && mega.megadrop.pufs[fid].s !== 1) {
+                classes += ' puf-folder';
+            }
+
+            var nodeName = missingkeys[fid] ? l[8686] : folders[i].name;
+
+            $csb.append(
+                '<span class="dropdown-item ' + classes + cs + '" id="fi_' + fid + '">' +
+                '  <i class="small-icon context ' + classes + '"></i>' + escapeHTML(nodeName) +
+                '</span>' + sm
+            );
         }
-    };
-})(this);
+    }
+
+    M.disableCircularTargets('#fi_');
+};
 
 /**
  * Build an array of context-menu items to show for the selected node

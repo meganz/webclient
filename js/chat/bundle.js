@@ -11162,7 +11162,7 @@ React.makeElement = React['createElement'];
 	            additionalClasses += this.props.className;
 	        }
 
-	        if (message.revoked || !M.chat) {
+	        if (message.revoked) {
 
 	            return null;
 	        }

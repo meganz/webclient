@@ -343,7 +343,7 @@ var GenericConversationMessage = React.createClass({
             additionalClasses += this.props.className;
         }
 
-        if (message.revoked || !M.chat) {
+        if (message.revoked) {
             // skip doing tons of stuff and just return null, in case this message was marked as revoked.
             return null;
         }

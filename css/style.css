@@ -25554,13 +25554,14 @@ opacity: 1;
 }
 
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container  .storage-small-circle {
+.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-small-circle {
     position: absolute;
-    width:144px;
+    width: 144px;
     height: 144px;
     border-radius: 100%;
-    background-color:#ffffff;
-    margin: 8px;
+    background-color: #ffffff;
+    margin-left: 100px;
+    margin-top: -156px;
 }
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container  .storage-small-circle .total-storage-title {

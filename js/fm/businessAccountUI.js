@@ -981,7 +981,8 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                         callbacks: {
                             label: tooltipLabeling
                         }
-                    }
+                    },
+                    cutoutPercentage: 85
                 }
             });
 

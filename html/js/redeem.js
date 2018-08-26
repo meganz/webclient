@@ -23,8 +23,18 @@ var redeem = {
         redeem.$backgroundOverlay = $('.fm-dialog-overlay');
         redeem.$successOverlay = $('.payment-result.success');
 
-        // Init functions
-        redeem.addVoucher();
+        // confirm with the user, that this is right account to redeem the code.
+        var rdmConfirmMsg = l[19328].replace('%1', escapeHTML(u_attr.email));
+        msgDialog('confirmation', l[458], rdmConfirmMsg, '', function(e) {
+            if (e) {
+                // Init functions
+                redeem.addVoucher(voucherCode);
+            }
+            else {
+                redeem.hideBackgroundOverlay();
+                loadSubPage('contact');
+            }
+        });
     },
 
     /**

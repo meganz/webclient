@@ -206,14 +206,15 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
             if (d) {
                 console.debug('Holding tiff thumb creation...', ab && ab.byteLength);
             }
-            onIdle(function() {
-                mBroadcaster.once('TIFThumbHandler.ready', makeTIF);
-            });
+            mBroadcaster.once('TIFThumbHandler.ready', makeTIF);
             return;
         }
         TIFThumbHandler.working = true;
 
         onIdle(function() {
+            if (d) {
+                console.debug('...unholding tiff thumb creation.', mBroadcaster.hasListener('TIFThumbHandler.ready'));
+            }
             TIFThumbHandler.working = false;
             mBroadcaster.sendMessage('TIFThumbHandler.ready');
         });

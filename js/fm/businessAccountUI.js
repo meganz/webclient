@@ -819,14 +819,9 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                     };
 
                     doc.addHTML($overviewContainer[0], function () {
-                        doc.save('overvv.pdf');
+                        doc.save('accountDashboard.pdf');
                     });
 
-                    //doc.fromHTML($overviewContainer.html(), 15, 15, {
-                    //    'width': 170,
-                    //    'elementHandlers': specialElementHandlers
-                    //});
-                    //doc.save('sample-file.pdf');
                 }
             );
         }
@@ -1487,7 +1482,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         var $invoiceDetailDiv = $('.invoice-container', $invoiceDetailContainer);
 
                         doc.addHTML($invoiceDetailDiv[0], function () {
-                            doc.save('Test.pdf');
+                            doc.save('invoice' + invoiceDetail.n + '.pdf');
                         });
                     }
                 );
@@ -1579,7 +1574,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
         $('.dialog-subtitle', $dialog).addClass('hidden');
         $('.dialog-button-container .add-more', $dialog).addClass('hidden');
         $('.dialog-button-container .add-sub-user', $dialog).text(l[19084]).removeClass('a-ok-btn');
-        $('.licence-bar', $dialog).removeClass('hidden');
+        // $('.licence-bar', $dialog).removeClass('hidden');
     };
 
     clearDialog(); // remove any previous data
@@ -1597,7 +1592,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
         $addContianer.addClass('hidden');
         $resultContianer.removeClass('hidden');
         $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
-        $('.licence-bar', $dialog).addClass('hidden');
+        // $('.licence-bar', $dialog).addClass('hidden');
         $('.dialog-subtitle', $dialog).removeClass('hidden');
     }
 
@@ -1627,22 +1622,47 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
 
             var $uName = $('.input-user input.sub-n', $dialog);
             var $uEmail = $('.input-user input.sub-m', $dialog);
+            var uNameTrimed = $uName.val().trim();
+            var uEmailTrimed = $uEmail.val().trim();
 
-            if (!$uName.val().trim().length || $uName.val().trim().split(' ', 2).length < 2) {
+            if (!uNameTrimed.length || uNameTrimed.split(' ', 2).length < 2) {
                 $uName.addClass('error');
-                $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1098]);
+                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1098]);
                 return;
             }
-            if (checkMail($uEmail.val().trim())) {
+            if (checkMail(uEmailTrimed)) {
                 $uEmail.addClass('error');
-                $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[5705]);
+                $('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[5705]);
                 return;
+            }
+
+            var $uPosition = $('.input-user input.sub-p', $dialog);
+            var $uIdNumber = $('.input-user input.sub-id-nb', $dialog);
+            var $uPhone = $('.input-user input.sub-ph', $dialog);
+            var $uLocation = $('.input-user input.sub-lo', $dialog);
+
+            var addUserOptionals = Object.create(null);
+            var ttemp = $uPosition.val().trim();
+            if (ttemp) {
+                addUserOptionals.position = ttemp;
+            }
+            ttemp = $uIdNumber.val().trim();
+            if (ttemp) {
+                addUserOptionals.idnum = ttemp;
+            }
+            ttemp = $uPhone.val().trim();
+            if (ttemp) {
+                addUserOptionals.phonenum = ttemp;
+            }
+            ttemp = $uLocation.val().trim();
+            if (ttemp) {
+                addUserOptionals.location = ttemp;
             }
 
             loadingDialog.pshow();
 
-            var subName = $uName.val().trim(); // i know it's 2 parts at least
-            var subEmail = $uEmail.val().trim();
+            var subName = uNameTrimed; // i know it's 2 parts at least
+            var subEmail = uEmailTrimed;
             var subFnLn = subName.split(' ');
 
             if (subFnLn.length < 2) {
@@ -1650,7 +1670,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
                 return;
             }
 
-            var subPromise = mySelf.business.addSubAccount(subEmail, subFnLn.shift(), subFnLn.join(' '));
+            var subPromise = mySelf.business.addSubAccount(subEmail, subFnLn.shift(), subFnLn.join(' '), addUserOptionals);
 
 
             var finalizeOperation = function (st,res,req) {

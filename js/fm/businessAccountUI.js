@@ -1335,7 +1335,13 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         unhideSection();
     };
 
-    
+    $accountPageHeader.find('.acc-home').off('click.suba').on('click.suba',
+        function invoiceListHeaderClick() {
+            var $me = $(this);
+            if ($me.hasClass('acc-home')) {
+                return mySelf.viewSubAccountListUI();
+            }
+        });
 
     var getInvoicesPromise = this.business.getAccountInvoicesList();
     getInvoicesPromise.always(prepareInvoiceListSection);
@@ -1491,13 +1497,10 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceDetailContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
     };
 
-    $accountPageHeader.find('.acc-home, .acc-acc').off('click.suba').on('click.suba',
+    $accountPageHeader.find('.acc-acc').off('click.suba').on('click.suba',
         function invoiceDetailHeaderClick() {
             var $me = $(this);
-            if ($me.hasClass('acc-home')) {
-                return mySelf.viewSubAccountListUI();
-            }
-            else if ($me.hasClass('acc-acc')) {
+            if ($me.hasClass('acc-acc')) {
                 return mySelf.viewBusinessAccountPage();
             }
     });

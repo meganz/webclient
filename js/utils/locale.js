@@ -553,7 +553,7 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[B]', '<a href="https://github.com/meganz/MEGAcmd/blob/master/README.md" target="_blank" class="red">')
         .replace('[/B]', '</a>');
 	l[16614] = escapeHTML(l[16614])
-        .replace('[A]', '<a href="https://www.mozilla.org/thunderbird" target="_blank">')
+        .replace('[A]', '<a href="https://thunderbird.net" target="_blank">')
         .replace('[/A]', '</a>');
 
     l[12439] = l[12439].replace('[A1]', '').replace('[/A1]', '').replace('[A2]', '').replace('[/A2]', '');

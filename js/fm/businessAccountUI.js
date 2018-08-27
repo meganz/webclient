@@ -818,11 +818,15 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                         }
                     };
 
-                    doc.fromHTML($overviewContainer.html(), 15, 15, {
-                        'width': 170,
-                        'elementHandlers': specialElementHandlers
+                    doc.addHTML($overviewContainer[0], function () {
+                        doc.save('overvv.pdf');
                     });
-                    doc.save('sample-file.pdf');
+
+                    //doc.fromHTML($overviewContainer.html(), 15, 15, {
+                    //    'width': 170,
+                    //    'elementHandlers': specialElementHandlers
+                    //});
+                    //doc.save('sample-file.pdf');
                 }
             );
         }
@@ -1462,9 +1466,41 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         }
 
         unhideSection();
+
+        $invoiceDetailContainer.find('.inv-detail-export').off('click.subuser').on('click.subuser',
+            function invoiceDetailExportClickHandler() {
+                M.require('jspdf_js').done(
+                    function exportOverviewPageToPDF() {
+                        var doc = new jsPDF();
+                        var specialElementHandlers = {
+                            '.hidden': function (element, renderer) {
+                                return true;
+                            }
+                        };
+
+                        var $invoiceDetailDiv = $('.invoice-container', $invoiceDetailContainer);
+
+                        doc.addHTML($invoiceDetailDiv[0], function () {
+                            doc.save('Test.pdf');
+                        });
+                    }
+                );
+            }
+        );
         
         $invoiceDetailContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
     };
+
+    $accountPageHeader.find('.acc-home, .acc-acc').off('click.suba').on('click.suba',
+        function invoiceDetailHeaderClick() {
+            var $me = $(this);
+            if ($me.hasClass('acc-home')) {
+                return mySelf.viewSubAccountListUI();
+            }
+            else if ($me.hasClass('acc-acc')) {
+                return mySelf.viewBusinessAccountPage();
+            }
+    });
 
     var gettingInvoiceDetailPromise = this.business.getInvoiceDetails(invoiceID, false);
     gettingInvoiceDetailPromise.always(fillInvoiceDetailPage);

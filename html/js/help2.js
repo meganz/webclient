@@ -220,7 +220,7 @@ var Help = (function() {
             var $this = $(this);
             $this.autocomplete({
                 source: function(request, response) {
-                    var results = $.ui.autocomplete.filter(titles, request.term);
+                    var results = $.ui.autocomplete.filter(titles, request.term.trim());
                     response(results.slice(0, 7));
                 },
                 appendTo: $this.parent().parent(),

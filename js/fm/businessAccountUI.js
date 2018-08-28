@@ -584,6 +584,13 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     $('.user-management-subuser-name', $subHeader).text(uName);
     $('.subuser-email', $subAccountContainer).text(subUser.e);
 
+    var $extrasContainer = $('.subuser-sec-profile-container', $subAccountContainer);
+    $extrasContainer.find('.sub-info-idnum').text(subUser.idnum || '');
+    $extrasContainer.find('.sub-info-pos').text(subUser.position || '');
+    $extrasContainer.find('.sub-info-phone').text(subUser.phonenum || '');
+    $extrasContainer.find('.sub-info-loc').text(subUser.location || '');
+
+
     $subAccountContainer.find('.user-management-view-status').removeClass('enabled pending disabled');
     // $subAccountContainer.find('.profile-button-container .disable-account').removeClass('hidden');
     $subAccountContainer.find('.profile-button-container .disable-account').text(l[19092])

@@ -141,8 +141,7 @@ var bottompage = {
 
                 $buttons.removeClass('active');
                 $buttons.filter('.slide' + newSlide).addClass('active');
-                $('.slider-content', $slider).removeClass('slide' + activeSlide)
-                    .addClass('slide' + newSlide); 
+                $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide); 
             }
         });
 
@@ -165,8 +164,7 @@ var bottompage = {
 
             $buttons.removeClass('active');
             $buttons.filter('.slide' + newSlide).addClass('active');
-            $('.slider-content', $slider).removeClass('slide' + activeSlide)
-                .addClass('slide' + newSlide); 
+            $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide); 
         });
     },
 

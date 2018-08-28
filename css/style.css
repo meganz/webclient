@@ -1,4 +1,15 @@
 @font-face {
+    font-family: 'LatoWeb';
+    src: url('../fonts/Lato-Regular.eot'); /* IE9 Compat Modes */
+    src: url('../fonts/Lato-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../fonts/Lato-Regular.woff2') format('woff2'), /* Modern Browsers */
+         url('../fonts/Lato-Regular.woff') format('woff'), /* Modern Browsers */
+         url('../fonts/Lato-Regular.ttf') format('truetype');
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
     font-family: 'brandon_textbold_italic';
     src: url('../fonts/brandontext-bolditalic-webfont.eot');
     src: url('../fonts/brandontext-bolditalic-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/brandontext-bolditalic-webfont.woff') format('woff'), url('../fonts/brandontext-bolditalic-webfont.ttf') format('truetype'), url('../fonts/brandontext-bolditalic-webfont_v2.svg#brandon_textbold_italic') format('svg');
@@ -252,7 +263,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     float: left;
     margin: 6px 0 0 12px;
     background-position: -6px -383px;
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-repeat: no-repeat;
     cursor: pointer;
     display: none;
@@ -325,7 +336,7 @@ a.nlanguage-lnk.language-template {
     margin: 16px 0 0 0;
     background-position: 0px -1037px;
     background-position: -2px -286px;
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-repeat: no-repeat;
 }
 .nlanguage-bottom a, .nlanguage-bottom a:link, .nlanguage-bottom a:visited, .nlanguage-bottom a:hover, .nlanguage-bottom a:active {
@@ -377,7 +388,7 @@ a.nlanguage-lnk.language-template {
     vertical-align: middle;
 }
 .languages-dialog .show-more-languages .round-arrow span {
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-position: -13px -1108px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -1591,22 +1602,22 @@ a.blog-button:hover {
 }
 .top-chat-notification .notification-num {
     background-color: #2BA6DE;
-}
+} 
 /* Change top language button */
 .top-change-language {
     float: right;
-    font-size: 16px;
     height: 24px;
-    line-height: 24px;
     margin: 0;
     cursor: pointer;
 }
-.top-change-language-name {
-    color: #555555;
+.top-change-language-name, .top-head-link {
+    color: #000000;
     display: block;
     float: left;
+    font-size: 14px;
+    line-height: 24px;
     margin-left: -6px;
-    padding: 5px 16px 0 0;
+    padding: 6px 16px 0 0;
     white-space: nowrap;
     text-transform: uppercase;
     cursor: pointer;
@@ -1619,6 +1630,12 @@ a.blog-button:hover {
     -moz-opacity: 0.8;
     -khtml-opacity: 0.8;
     opacity: 0.8;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.top-head-link {
+    margin: 0 0 0 16px;
+    padding: 1px 0 0 0;
+    line-height: 18px;
 }
 .top-change-language:hover .top-change-language-name, .top-change-language:hover .top-icon::before, .wu-lang .glob-icon::before, .wu-lang:hover .wu-change-lang {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
@@ -4741,7 +4758,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 48px;
 }
 .site-update-available .mega-icon {
-    background: url(../images/mega/top-sprite_v4.png) no-repeat 0 -1475px;
+    background: url(../images/mega/top-sprite_v5.png) no-repeat 0 -1475px;
     height: 38px;
     width: 38px;
 }
@@ -8884,7 +8901,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     color: #999999;
     display: inline-block;
     padding: 0 0 0 26px;
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-position: -8px -510px;
     background-repeat: no-repeat;
     float: none;
@@ -11827,7 +11844,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     margin-left: 0;
 }
 .top-login-warning-arrow {
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-position: 2px -420px;
     background-repeat: no-repeat;
     width: 30px;
@@ -12044,7 +12061,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     line-height: 28px;
     padding-left: 36px;
     color: white;
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-position: -4px -1261px;
     background-repeat: no-repeat;
     font-size: 14px;
@@ -14573,7 +14590,7 @@ code, c {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     background-color: #5b5a59;
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-position: -9px -941px;
     background-repeat: no-repeat;
     margin: 8px 0 0 240px;
@@ -17980,7 +17997,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .loginrequired-dialog .fm-notification-icon {
     width: 70px;
     height: 70px;
-    background-image: url(../images/mega/startpage-sprite_v6.png);
+    background-image: url(../images/mega/startpage-sprite_v7.png);
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 4px 16px 0 0px;
@@ -18200,7 +18217,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     display: inline-block;
     border-radius: 12px;
     text-transform: uppercase;
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-repeat: no-repeat;
     background-position: -6px -981px;
     color: rgba(255,255,255,0.7) !important;
@@ -19898,7 +19915,7 @@ body.pro:after {
     position: absolute;
     top: 15px;
     right: 15px;
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-repeat: no-repeat;
     background-position: -11px -1544px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -20212,7 +20229,7 @@ a.opensource-icon-txt.coming-soon {
     margin: -146px 0 0 0;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v6.png);
+    background-image: url(../images/mega/startpage-sprite_v7.png);
     background-position: center -2173px;
     background-repeat: no-repeat;
     height: 210px;
@@ -22542,7 +22559,7 @@ opacity: 1;
     float: left;
     margin: 6px 0 0 12px;
     background-position: -6px -383px;
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-repeat: no-repeat;
     cursor: pointer;
 }
@@ -22807,7 +22824,7 @@ opacity: 1;
     width: 24px;
     height: 24px;
     display: block;
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-repeat: no-repeat;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -23664,7 +23681,7 @@ opacity: 1;
     background-position: -6px -773px;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-repeat: no-repeat;
     padding-left: 66px;
     margin: 0 -39px 0 0;

@@ -303,6 +303,16 @@ function init_page() {
         $('body').addClass('rtl');
     }
 
+    //TODO: fix for real business page
+    localStorage.bp = 1;
+
+    if (localStorage.bp) {
+        $('body').addClass('business');
+    }
+    else {
+        $('body').removeClass('business');
+    }
+
     if (is_mobile && is_android) {
         var $html = $('html');
 
@@ -1691,7 +1701,7 @@ function loginDialog(close) {
         topPopupAlign('.top-head .user-name', '.dropdown.top-login-popup', 40);
     }
     else {
-        topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
+        topPopupAlign('.top-login-button:visible', '.dropdown.top-login-popup', 40);
     }
     if (is_chrome_firefox) {
         mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header');

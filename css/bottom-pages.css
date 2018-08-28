@@ -489,7 +489,7 @@ html.gbot {
     vertical-align: top;
     width: 8px;
     height: 13px;
-    background-image: url(../images/mega/startpage-sprite_v6.png);
+    background-image: url(../images/mega/startpage-sprite_v7.png);
     background-position: -165px -7px;
     background-repeat: no-repeat;
 }
@@ -509,7 +509,7 @@ html.gbot {
     width: 102px;
     height: 102px;
     margin: 10px auto 26px auto;
-    background-image: url(../images/mega/startpage-sprite_v6.png);
+    background-image: url(../images/mega/startpage-sprite_v7.png);
     background-position: 0 -533px;
     background-repeat: no-repeat;
     padding: 0;
@@ -734,7 +734,7 @@ html.gbot {
     margin: 14px auto 7px auto;
     width: 22px;
     height: 24px;
-    background-image: url(../images/mega/startpage-sprite_v6.png);
+    background-image: url(../images/mega/startpage-sprite_v7.png);
     background-position: -0px -73px;
     opacity: 0.3;
     -webkit-transition: opacity 200ms ease-in-out;

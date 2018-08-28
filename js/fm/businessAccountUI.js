@@ -1616,6 +1616,40 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
             clearDialog();
         });
 
+    // event handler for input getting focus
+    $('.dialog-input-container input', $dialog).off('focus.suba')
+        .on('focus.suba', function inputHasFocusHandler() {
+            $(this).removeClass('error correctinput').addClass('active');
+        });
+
+    // event handler for input losing focus
+    $('.dialog-input-container input', $dialog).off('blur.suba')
+        .on('blur.suba', function inputHasFocusHandler() {
+            if (this.value.trim()) {
+                $(this).removeClass('error active').addClass('correctinput');
+            }
+            else {
+                $(this).removeClass('error active correctinput');
+            }
+        });
+
+    // generic keydown monitoring function. - will be injected only when needed
+    var keyDownEventHandler = function (target) {
+        var $element = $(target.target);
+        var $targetParent = $element.parent();
+        if ($targetParent && $targetParent.length) {
+            var $errorDiv = $targetParent.find('.error-message');
+            if ($errorDiv && $errorDiv.length && !$errorDiv.hasClass('hidden')) {
+                $errorDiv.addClass('hidden');
+            }
+            $element.off('keydown.suba');
+        }
+        else {
+            console.error('not allowed, not panned change of HTML is business account - add user dialog');
+        }
+    };
+
+
     // event handler for adding sub-users
     $('.dialog-button-container .add-sub-user', $dialog).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
@@ -1635,11 +1669,19 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
             if (!uNameTrimed.length || uNameTrimed.split(' ', 2).length < 2) {
                 $uName.addClass('error');
                 $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1098]);
+
+                // monitoring input
+                $uName.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
+
                 return;
             }
             if (checkMail(uEmailTrimed)) {
                 $uEmail.addClass('error');
                 $('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[5705]);
+
+                // monitoring input
+                $uEmail.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
+
                 return;
             }
 
@@ -1713,14 +1755,14 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
 
     
     // event handler for key-down on inputs
-    $('.input-user input', $dialog).off('keydown.subuserresd')
-        .on('keydown.subuserresd', function inputFieldsKeyDoownHandler() {
-            var $me = $(this);
-            if ($me.hasClass('error')) {
-                $me.removeClass('error');
-                $('.dialog-input-container .error-message', $dialog).addClass('hidden')
-            }
-        });
+    //$('.input-user input', $dialog).off('keydown.subuserresd')
+    //    .on('keydown.subuserresd', function inputFieldsKeyDoownHandler() {
+    //        var $me = $(this);
+    //        if ($me.hasClass('error')) {
+    //            $me.removeClass('error');
+    //            $('.dialog-input-container .error-message', $dialog).addClass('hidden')
+    //        }
+    //    });
 
     M.safeShowDialog('sub-user-adding-dlg', function () {
         return $dialog;

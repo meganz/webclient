@@ -7663,6 +7663,10 @@ table {
     line-height: 24px;
     padding: 1px 20px 29px 20px;
 }
+.fm-not-logged-description.small.footnote-text, .description.footnote-text {
+    margin-top: 16px;
+    color: #aaa;
+}
 .fm-not-logged-text, .not-logged .empty-share-public {
     display: none;
 }

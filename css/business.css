@@ -797,6 +797,10 @@ img.bottom-page.business4 {
 .business-page .changed-order .order2, .business-info.mobile {
     display: none;
 }
+.business-page .bottom-menu.pad {
+    max-width: 1230px;
+    padding: 0 30px;
+}
 @media only screen and (max-width: 925px) {
     .business-top-bl .pages-nav.nav-button {
         margin: 0 20px;

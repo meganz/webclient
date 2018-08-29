@@ -60,7 +60,7 @@ function BusinessAccountUI() {
  * @param {boolean} quickWay        by default false, if true method will skip some ui operations
  * @returns {boolean}               true if OK, false if something went wrong
  */
-BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView,quickWay) {
+BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView, quickWay) {
     "use strict";
     if (!this.business.isBusinessMasterAcc()) {
         return false;
@@ -73,7 +73,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             return false;
         }
     }
-    
+
     this.initUItoRender();
 
     var mySelf = this;
@@ -153,67 +153,67 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         }
 
         // now let's fill the table with sub-users data
-         //for (var a = 0; a < 50; a++) {
+        //for (var a = 0; a < 50; a++) {
         var isGray = true;
         var colorBg = false;
-            for (var h in subUsers) {
-                var $currUser = $tr_user.clone(true); // sub-users table
-                var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
-                colorBg = false;
-                $currUserLeftPane.removeClass('hidden');
+        for (var h in subUsers) {
+            var $currUser = $tr_user.clone(true); // sub-users table
+            var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
+            colorBg = false;
+            $currUserLeftPane.removeClass('hidden');
 
-                $currUser.attr('id', subUsers[h].u);
-                $currUserLeftPane.attr('id', subUsers[h].u);
-                // now we will hide icon and role, since we are not ready to support yet.
-                // $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
-                $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
+            $currUser.attr('id', subUsers[h].u);
+            $currUserLeftPane.attr('id', subUsers[h].u);
+            // now we will hide icon and role, since we are not ready to support yet.
+            // $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
+            $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
 
-                $currUserLeftPane.removeClass('selected');
-                var uName = from8(base64urldecode(subUsers[h].firstname)) + ' ' +
-                    from8(base64urldecode(subUsers[h].lastname));
-                uName = uName.trim();
-                $currUser.find('.fm-user-management-user .user-management-name').text(uName);
-                $currUserLeftPane.find('.nw-user-management-name').text(uName);
+            $currUserLeftPane.removeClass('selected');
+            var uName = from8(base64urldecode(subUsers[h].firstname)) + ' ' +
+                from8(base64urldecode(subUsers[h].lastname));
+            uName = uName.trim();
+            $currUser.find('.fm-user-management-user .user-management-name').text(uName);
+            $currUserLeftPane.find('.nw-user-management-name').text(uName);
 
-                $currUser.find('.user-management-email').text(subUsers[h].e);
-                $currUser.find('.user-management-status').removeClass('enabled pending disabled');
-                if (subUsers[h].s === 0) {
-                    $currUser.find('.user-management-status').addClass('enabled');
-                    $currUserLeftPane.find('.user-management-status').removeClass('pending disabled')
-                        .addClass('enabled');
-                    colorBg = true;
-                }
-                else if (subUsers[h].s === 10) {
-                    $currUser.find('.user-management-status').addClass('pending');
-                    $currUserLeftPane.find('.user-management-status').removeClass('enabled disabled')
-                        .addClass('pending');
-                    colorBg = true;
+            $currUser.find('.user-management-email').text(subUsers[h].e);
+            $currUser.find('.user-management-status').removeClass('enabled pending disabled');
+            if (subUsers[h].s === 0) {
+                $currUser.find('.user-management-status').addClass('enabled');
+                $currUserLeftPane.find('.user-management-status').removeClass('pending disabled')
+                    .addClass('enabled');
+                colorBg = true;
+            }
+            else if (subUsers[h].s === 10) {
+                $currUser.find('.user-management-status').addClass('pending');
+                $currUserLeftPane.find('.user-management-status').removeClass('enabled disabled')
+                    .addClass('pending');
+                colorBg = true;
+            }
+            else {
+                $currUser.find('.user-management-status').addClass('disabled');
+                $currUser.addClass('hidden');
+                $currUserLeftPane.find('.user-management-status').removeClass('enabled pending')
+                    .addClass('disabled');
+                $currUserLeftPane.addClass('hidden');
+            }
+            $currUser.find('.user-management-status-txt').text(uiBusiness.subUserStatus(subUsers[h].s));
+
+            if (colorBg) {
+                if (isGray) {
+                    $currUser.addClass('tr-gray');
                 }
                 else {
-                    $currUser.find('.user-management-status').addClass('disabled');
-                    $currUser.addClass('hidden');
-                    $currUserLeftPane.find('.user-management-status').removeClass('enabled pending')
-                        .addClass('disabled');
-                    $currUserLeftPane.addClass('hidden');
+                    $currUser.removeClass('tr-gray');
                 }
-                $currUser.find('.user-management-status-txt').text(uiBusiness.subUserStatus(subUsers[h].s));
-
-                if (colorBg) {
-                    if (isGray) {
-                        $currUser.addClass('tr-gray');
-                    }
-                    else {
-                        $currUser.removeClass('tr-gray');
-                    }
-                    isGray = !isGray;
-                }
-
-                $detailListTable.append($currUser);
-
-                // left pane part
-                $usersLeftPanel.append($currUserLeftPane);
+                isGray = !isGray;
             }
-         //}
+
+            $detailListTable.append($currUser);
+
+            // left pane part
+            $usersLeftPanel.append($currUserLeftPane);
+        }
+        //}
 
 
         /// events handlers
@@ -310,7 +310,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     }
                 }
             }
-            
+
         });
 
         // 3- on clicking on a sub-user to view his info (from left pane or row)
@@ -419,9 +419,11 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         unhideUsersListSection();
     }
 
-    // getting quotas
-    var quotasPromise = this.business.getQuotaUsage();
-    quotasPromise.done(fillSubUsersUsage);
+    if (!quickWay) {
+        // getting quotas
+        var quotasPromise = this.business.getQuotaUsage();
+        quotasPromise.done(fillSubUsersUsage);
+    }
 
 };
 
@@ -1088,7 +1090,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         //start += rootPie;
         */
         
-
+        $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
     };
 
     // private function to format start and end dates
@@ -1198,6 +1200,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                 }
             });
         });
+        $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
     };
 
     // getting quotas
@@ -1246,7 +1249,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     };
 
     populateMonthDropDownList();
-    $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+    
 };
 
 

@@ -821,7 +821,7 @@ var ConversationsApp = React.createClass({
                 // is visible/active at the moment
                 if (
                     (megaChat.currentlyOpenedChat && megaChat.getCurrentRoom().isReadOnly()) ||
-                    $(e.target).is(".messages-textarea") ||
+                    $(e.target).is(".messages-textarea, input, textarea") ||
                     ((e.ctrlKey || e.metaKey || e.which === 19) && (e.keyCode === 67)) ||
                     e.keyCode === 91 /* cmd+... */ ||
                     e.keyCode === 17 /* ctrl+... */ ||

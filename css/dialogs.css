@@ -134,16 +134,28 @@
 
 /* Add From Cloud Dialog */
 .fm-dialog.add-from-cloud {
-    width: 780px;
-    margin: -247px 0 0 -322px;
+    width: 1394px;
+    margin: -405px 0 0 -684px;
 }
 .fm-dialog .fm-breadcrumbs-block {
     float: none;
     height: 46px;
-    margin: 0 0 11px 0;
-    padding: 22px 0 0 2px;
+    margin: 0 0 0 0;
+    padding: 12px 0 0 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     overflow: hidden;
     position: relative;
+    width: 100%;
+    width: -webkit-calc(100% - 126x);
+    width: -moz-calc(100% - 126px);
+    width: calc(100% - 126px);
+}
+.fm-dialog .fm-header-buttons.active-search + .fm-breadcrumbs-block {
+    width: -webkit-calc(100% - 310x);
+    width: -moz-calc(100% - 310px);
+    width: calc(100% - 310px);
 }
 .fm-dialog .breadcrumbs-wrapper {
     position: absolute;
@@ -159,7 +171,9 @@
     padding: 0 0 0 3px;
 }
 .fm-dialog-table.grid-table-header th:nth-child(2), .fm-dialog-table.grid-table td:nth-child(2) {
-    width: 476px;
+    width: -webkit-calc(100% - 300x);
+    width: -moz-calc(100% - 300px);
+    width: calc(100% - 300px);
 }
 .fm-dialog-table.grid-table-header th:nth-child(3), .fm-dialog-table.grid-table td:nth-child(3) {
     width: 114px;
@@ -168,15 +182,147 @@
 .fm-dialog-table.grid-table-header th:nth-child(4), .fm-dialog-table.grid-table td:nth-child(4) {
     width: 136px;
 }
-.fm-dialog-grid-scroll {
-    height: 312px !important;
+.fm-files-search {
+    float: right;
+    margin: 6px -14px 0 29px;
+    padding-right: 12px;
+    padding: 0 12px;
+    border-right: 1px solid rgba(0,0,0,0.1);
 }
-.fm-dialog-grid-scroll, .fm-dialog-grid-scroll .jspPane {
+.active-search .fm-files-search {
+    border-left: 1px solid rgba(0,0,0,0.1);
+}
+.fm-files-search i.search {
+    width: 24px;
+    height: 24px;
+    display: block;
+    background-position: -6px -474px;
+    background-image: url(../images/mega/top-sprite_v4.png);
+    background-repeat: no-repeat;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    cursor: pointer;
+    -moz-opacity: 0.8;
+    -khtml-opacity: 0.8;
+    opacity: 0.8;
+    float: left;
+}
+.fm-files-search i.search:hover, .active-search .fm-files-search  i.search {
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.fm-files-search input {
+    font-size: 14px;
+    line-height: 24px;
+    color: #666666;
+    float: left;
+    margin: 0;
+    border: 0;
+    padding: 0;
+    width: 0;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.fm-header-buttons.active-search input {
+    width: 165px;
+    padding: 0 0 0 12px;
+}
+.fm-picker-header {
+    position: relative;
+    height: 48px;
+}
+.fm-picker-header .fm-header-buttons {
+    top: 6px;
+    right: 6px;
+}
+.fm-dialog-scroll, .add-from-cloud .dialog-empty-block {
+    height: 612px !important;
+}
+.fm-dialog-scroll.grid, .add-from-cloud .grid-table-header + .dialog-empty-block {
+    height: 588px !important;
+}
+.fm-dialog-scroll.blocks, .add-from-cloud .dialog-empty-block {
+    background-color: #fafafa;
+    -webkit-box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
+    box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
+}
+.fm-dialog-scroll.blocks .content {
+    padding-bottom: 12px;
+}
+.fm-dialog-scroll.grid, .fm-dialog-scroll.grid .jspPane {
     background-image: url(../images/mega/grid-bg.svg);
     background-position: 0 -24px;
 }
+.fm-dialog-scroll.blocks .data-block-view {
+    margin: 12px 0 0 12px;
+}
 .fm-dialog-table.grid-table tr.ui-selected td {
     background-color: rgba(233,233,233,1);
+}
+.fm-dialog-tabs {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 26px 0 0 0;
+}
+.fm-dialog-tab {
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 20px;
+    color: #666;
+    padding: 4px 24px 0 24px;
+    border-bottom: 2px solid transparent;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 32px;
+    margin-bottom: -1px;
+}
+.fm-dialog-tab.active {
+    border-color: #D90007;
+    color: #333333;
+}
+@media only screen and (max-width: 1440px) {
+    .fm-dialog.add-from-cloud {
+        width: 1219px;
+    }
+}
+@media only screen and (max-height: 720px) {
+     .fm-dialog.add-from-cloud {
+        margin-top: -305px;
+    }
+    .fm-dialog-scroll, .add-from-cloud .dialog-empty-block {
+        height: 412px !important;
+    }
+    .fm-dialog-scroll.grid, .add-from-cloud .grid-table-header + .dialog-empty-block {
+        height: 388px !important;
+    }
+}
+@media only screen and (max-width: 1280px) {
+    .fm-dialog.add-from-cloud {
+        width: 1047px;
+        margin-left: -522px;
+    }
+}
+@media only screen and (max-width: 1024px) {
+    .fm-dialog.add-from-cloud {
+        width: 700px;
+        margin-left: -350px;
+    }
+}
+
+.add-from-cloud .tooltip-handler {
+    z-index: 50;
 }
 /* End of Add From Cloud Dialog */
 

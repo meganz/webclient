@@ -7061,6 +7061,9 @@ body.bottom-pages.mobile .fmholder.no-scroll {
     margin-top: 2px;
     margin-bottom: 0px;
 }
+.mobile .bird .bottom-page.small-txt {
+    display: none;
+}
 
 .contact-directory {
     display: none;

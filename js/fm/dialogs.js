@@ -1272,6 +1272,11 @@
             delete $.saveToDialogPromise;
 
             if ($.moveDialog) {
+                if (section === "shared-with-me") {
+                    var $tooltip = $('.contact-preview', $dialog);
+                    clearTimeout(dialogTooltipTimer);
+                    $tooltip.hide();
+                }
                 closeDialog();
                 M.safeMoveNodes($.mcselected);
                 return false;

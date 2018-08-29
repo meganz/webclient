@@ -471,6 +471,27 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         return promise;
     }
 
+    if (del && !tree.safeToDel) {
+        tree.safeToDel = true;
+
+        var mdList = mega.megadrop.isDropExist(cn);
+        if (mdList.length) {
+            loadingDialog.phide();
+            mega.megadrop.showRemoveWarning(mdList)
+                .done(function() {
+                    // No MEGAdrop folders found, proceed with copy+del
+                    M.copyNodes(cn, t, del, promise, tree);
+                })
+                .fail(function() {
+                    // The user didn't want to disable MEGAdrop folders
+                    if (promise) {
+                        promise.reject(EBLOCKED);
+                    }
+                });
+            return promise;
+        }
+    }
+
     if (tree.opSize) {
         loadingDialog.phide();
 

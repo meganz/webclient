@@ -1125,19 +1125,8 @@ FileManager.prototype.initContextUI = function() {
 
         var mdList = mega.megadrop.isDropExist($.selected);
         if (mdList.length) {
-            var fldName = mdList.length > 1
-                ? l[17626]
-                : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
-            msgDialog(
-                'confirmation',
-                l[1003],
-                fldName,
-                false, function(e) {
-                if (e) {
-                    mega.megadrop.pufRemove(mdList).always(function() {
-                        M.safeShowDialog('share', showShareDlg);
-                    });
-                }
+            mega.megadrop.showRemoveWarning(mdList).done(function() {
+                M.safeShowDialog('share', showShareDlg);
             });
         }
         else {

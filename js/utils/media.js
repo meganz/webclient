@@ -233,7 +233,7 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
                 var tiff = false;
 
                 try {
-                    Tiff.initialize({TOTAL_MEMORY: 33554432});
+                    Tiff.initialize({TOTAL_MEMORY: 134217728});
                     tiff = new Tiff(new Uint8Array(ab));
 
                     ab = dataURLToAB(tiff.toDataURL());

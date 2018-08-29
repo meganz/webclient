@@ -1365,6 +1365,10 @@ html.gbot {
     cursor: pointer;
     color: #FF333A;
 }
+.bird .bottom-page .button.default-huge-button {
+     margin: 0 0;
+     padding: 0 20px;
+}
 .bottom-page .button.default-huge-button {
     margin-top: 65px;
     font-family: 'montserrat', 'open_sans', sans-serif;
@@ -1846,6 +1850,9 @@ html.gbot {
     display: block;
     padding: 0 0 88px 0;
 }
+.bird .bottom-page.top-links {
+    padding-top: 24px;
+}
 .bottom-page.top-links {
     padding: 36px 0 9px 0;
     -webkit-box-sizing: border-box;
@@ -1912,6 +1919,9 @@ html.gbot {
     float: none;
     vertical-align: top;
 }
+.bird .browsers.download-txt {
+    border-bottom: 0px solid rgba(235, 68, 68, 0.8);
+}
 .browsers.download-txt {
     border-bottom: 2px solid rgba(235, 68, 68, 0.8);
     display: inline-block;
@@ -1928,11 +1938,19 @@ html.gbot {
     margin: 7px 0 0 0;
     top: 0;
 }
+.bird .browsers.download-info:hover {
+    background-color: #FF333A;
+    color: #fff;
+}
 .browsers.download-info:hover {
     color: rgba(235, 68, 68, 1);
 }
 .browsers.download-info:hover .download-txt {
     border-color: rgba(235, 68, 68, 1);
+}
+.bird .browsers.file-info {
+    margin-top: 20px;
+    color: #ff333a;
 }
 .browsers.file-info {
     display: block;
@@ -1945,7 +1963,7 @@ html.gbot {
     padding-bottom: 29px;
 }
 .browsers.file-info .size {
-    padding-left: 12px;
+    padding-left: 8px;
 }
 .browsers.warning-block {
     font-size: 14px;
@@ -2050,7 +2068,7 @@ html.gbot {
 
 /* MEGAbird */
 .bottom-page.img.megabird {
-    max-width: 256px;
+    max-width: 248px;
     margin: 2px 0 0 54px;
 }
 .bottom-page.big-header.top-small-pad {
@@ -2066,6 +2084,17 @@ html.gbot {
 .bottom-page.img.versatile {
     max-width: 388px;
     margin: 30px 0 0 0;
+}
+.bird .bottom-page.small-txt {
+    font-size: 13px;
+    position: absolute;
+    bottom: 100px;
+    margin: 0 auto;
+    width: 100%;
+    left: 0;
+    text-align: center;
+    display: inline-block;
+    color: #676D75;
 }
 /* end of MEGAbird */
 
@@ -2564,6 +2593,9 @@ html.gbot {
 .bottom-page.top-links.mb {
     margin: 0 -43px;
 }
+.bird .bottom-page.top-links.mb {
+    display: none;
+}
 }
 
 @media only screen and (max-width: 495px) {
@@ -2624,7 +2656,7 @@ html.gbot {
     text-align: center;
 }
 .bottom-page.img.megabird {
-    margin: 2px auto 54px auto;
+    margin: 2px auto 64px auto;
     display: block;
 }
 .bottom-page.img.ios-top, .bottom-page.img.android-top, .bottom-page.img.wp-top {

@@ -4164,7 +4164,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .files-grid-view.fm .grid-scrolling-table, .files-grid-view.fm .grid-scrolling-table .jspPane, .transfer-scrolling-table, .transfer-scrolling-table .jspPane {
     background-image: url(../images/mega/grid-bg.svg);
 }
-.grid-table td, .grid-table-header {
+.grid-table td, .grid-table-header th {
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -10432,6 +10432,7 @@ table {
     float: none;
 }
 .grid-table-header, .transfer-table-header, .contacts-grid-table {
+    width: 100%;
     background-color: white;
     position: relative;
     font-size: 0;
@@ -17863,7 +17864,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     position: absolute;
     top: 50%;
     width: 100%;
-    margin-top: -82px;
+    margin-top: -122px;
 }
 .dialog-empty-txt {
     font-size: 13px;
@@ -21426,13 +21427,13 @@ body.kr .account.chart.data {
 }
 /* This is a hackpatch to get contact us page out. I will fix this properly so it doesn't rely on language classes soon */
 .fr .contact-us-revamp .contact-new-title.gdpr {
-    margin-bottom: 40px;   
+    margin-bottom: 40px;
 }
 .ru .contact-us-revamp .contact-new-title.suggest-improvements, .ru .contact-us-revamp .contact-new-title.other-ip-issues {
-    margin-bottom: 40px;   
+    margin-bottom: 40px;
 }
 .pl .contact-us-revamp .contact-new-title.gdpr, .pl .contact-us-revamp .contact-new-title.other-ip-issues {
-    margin-bottom: 40px;   
+    margin-bottom: 40px;
 }
 .contact-us-revamp .main-mid-pad h1 {
     background-image: url(../images/mega/contact-us-sprite.png);
@@ -21442,7 +21443,7 @@ body.kr .account.chart.data {
     line-height: 72px;
     padding-top: 0px;
     margin-top: 36px;
-    background-position: 0 -6px; 
+    background-position: 0 -6px;
 }
 .contact-us-revamp .contact-directory .contact-new-title {
     background-image: none;

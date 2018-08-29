@@ -333,10 +333,14 @@
                     var subPage = id.replace('/', '').split('user-management')[1];
                     if (subPage && subPage.length > 2) {
                         if (subPage === 'overview') {
-
+                            usersM.viewBusinessAccountOverview();
                         }
-                        else if (subPage === 'blablabla') {
-
+                        else if (subPage === 'account') {
+                            usersM.viewBusinessAccountPage();
+                        }
+                        else if (subPage.indexOf('invdet!') > -1) {
+                            var invId = subPage.split('!')[1];
+                            usersM.viewInvoiceDetail(invId);
                         }
                         else if (subPage.length === 11) {
                             usersM.viewSubAccountInfoUI(subPage);

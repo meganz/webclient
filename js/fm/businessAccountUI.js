@@ -57,9 +57,10 @@ function BusinessAccountUI() {
  * Function to view the right pane of "Users Management" used by master users to manage sub-accounts
  * @param {string[]} subAccounts    optional list of subAccount, Default is M.suba
  * @param {boolean} isBlockView     by default "Grid" view will be used, this param when True will change to "Block"
+ * @param {boolean} quickWay        by default false, if true method will skip some ui operations
  * @returns {boolean}               true if OK, false if something went wrong
  */
-BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView) {
+BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView,quickWay) {
     "use strict";
     if (!this.business.isBusinessMasterAcc()) {
         return false;
@@ -800,6 +801,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 
     this.initUItoRender();
     var mySelf = this;
+    this.URLchanger('overview');
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $overviewContainer = $('.user-management-overview-container', $businessAccountContainer);
@@ -1255,6 +1257,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
     this.initUItoRender();
     var mySelf = this;
+    this.URLchanger('account');
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
@@ -1355,6 +1358,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
     this.initUItoRender();
     var mySelf = this;
+    this.URLchanger('invdet!' + invoiceID);
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);

@@ -127,7 +127,7 @@
 
         var exportLink = new mega.Share.ExportLink({});
         var isTakenDown = exportLink.isTakenDown($.selected);
-        var isUndecrypted = missingkeys[$.selected[0].h];
+        var isUndecrypted = missingkeys[n.h];
         var notificationText = '';
 
         var p = {};
@@ -140,10 +140,10 @@
                 if (isUndecrypted) {
                     $dialog.addClass('undecryptable');
 
-                    if ($.selected[0].t) {// folder
+                    if (n.t) {
                         notificationText += l[8595];
                     }
-                    else {// file
+                    else {
                         notificationText += l[8602];
                     }
                 }
@@ -200,7 +200,10 @@
                 $dialog.addClass('hidden-context');
             }
 
-            if (n.name) {
+            if (isUndecrypted) {
+                p.t2 = htmlentities(l[8649]);
+            }
+            else if (n.name) {
                 p.t2 = htmlentities(n.name);
             }
             else if (n.h === M.RootID) {
@@ -211,10 +214,6 @@
             }
             else if (n.h === M.RubbishID) {
                 p.t2 = htmlentities(l[167]);
-            }
-            // 'Shared with me' tab, info dialog, undecrypted nodes
-            else if (missingkeys[n.h]) {
-                p.t2 = htmlentities(l[8649]);
             }
 
             if (page.substr(0, 7) === 'fm/chat') {

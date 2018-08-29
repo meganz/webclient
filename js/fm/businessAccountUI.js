@@ -1805,42 +1805,21 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     uName = uName.trim();
     var subUserDefaultAvatar = useravatar.contact(subUserHandle);
 
-    var subUserAttrs = ['suba-sup', 'suba-idnb', 'suba-phone', 'suba-loc'];
-    var subUserValues = ['', '', '', '']; // same order as above
-
-    var setSubuserAttributes = function (attrName, attrValue) {
-        if (!attrValue) {
-            return;
-        }
-        if (attrName === 'suba-sup') {
-            $positionInput.val(attrValue);
-            subUserValues[0] = attrValue;
-        }
-        else if (attrName === 'suba-idnb') {
-            $subIDInput.val(attrValue);
-            subUserValues[1] = attrValue;
-        }
-        else if (attrName === 'suba-phone') {
-            $phoneInput.val(attrValue);
-            subUserValues[2] = attrValue;
-        }
-        else if (attrName === 'suba-loc') {
-            $locationInput.val(attrValue);
-            subUserValues[3] = attrValue;
-        }
-    };
-
-    
-
-    for (var k = 0; k < subUserAttrs.length; k++) {
-        mega.attr.get(subUserHandle, subUserAttrs[k], -2, true, function (res) {
-            setSubuserAttributes(subUserAttrs[k], res);
-        });
-    }
-
-
     $nameInput.val(uName);
     $emailInput.val(subUser.e);
+    if (subUser.position) {
+        $positionInput.val(subUser.position);
+    }
+    if (subUser.idnum) {
+        $subIDInput.val(subUser.idnum);
+    }
+    if (subUser.phonenum) {
+        $phoneInput.val(subUser.phonenum);
+    }
+    if (subUser.location) {
+        $locationInput.val(subUser.location);
+    }
+
     $('.user-management-subuser-avatars', $dialog).html(subUserDefaultAvatar);
 
     $('.dialog-button-container .btn-edit-close, .delete-img.icon', $dialog).off('click.subuser')

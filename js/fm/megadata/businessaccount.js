@@ -71,7 +71,11 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
                     s: 10, // pending
                     e: request.m, // assuming that the server MUST not change the requested val
                     firstname: a32_to_base64(str_to_a32(request.fn)), // same assumption as above
-                    lastname: a32_to_base64(str_to_a32(request.ln)) // same assumption as above
+                    lastname: a32_to_base64(str_to_a32(request.ln)), // same assumption as above
+                    position: request.position || '',
+                    idnum: request.idnum || '',
+                    phonenum: request.phonenum || '',
+                    location: request.location || ''
                 };
 
                 mySelf.parseSUBA(usr, false, true);

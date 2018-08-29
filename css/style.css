@@ -25556,35 +25556,48 @@ opacity: 1;
 }
 
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container  .storage-small-circle {
+.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-small-circle {
     position: absolute;
-    width:144px;
-    height: 144px;
+    /*width: 144px;
+    height: 144px;*/
     border-radius: 100%;
-    background-color:#ffffff;
-    margin: 8px;
+    background-color: #ffffff;
+    /*margin-left: 100px;
+    margin-top: -156px;*/
+    width: 36%;
+    height: 36%;
+    margin-left: 33%;
+    margin-top: 21%;
 }
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container  .storage-small-circle .total-storage-title {
     position: absolute;
     text-align: center;
-    width:144px;
+    /*width:144px;*/
     color:#666666;
     font-size: 16px;
     line-height: 20px;
-    margin: 34px auto 8px auto;
+    /*margin: 34px auto 8px auto;*/
+    margin-top: 25%;
+    margin-bottom: 8px;
+    /*margin-left: 23%;*/
+    width: 100%;
 }
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-small-circle .total-storage-number {
     position: absolute;
     text-align: center;
-    width:144px;
+    /*width:144px;*/
     line-height: 38px;
     color:#333333;
     font-size: 30px;
     font-weight: 300;
-     margin: 62px auto 8px auto;
+     /*margin: 62px auto 8px auto;*/
     font-family:source_sans_prolight;
+    margin-top: 35%;
+    margin-bottom: 8px;
+    width: 100%;
+    /*margin-left: 12%;*/
 }
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container {
@@ -28611,6 +28624,20 @@ opacity: 1;
 
     .user-management-account-settings .sub-admin-table tr td:nth-child(6) .icon {
     margin-left: 4px;
+    }
+    .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-small-circle {
+        margin-left: 32%;
+        margin-top: 17%;
+    }
+    .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-small-circle .total-storage-title {
+        /*margin-left: 25%;*/
+        font-size: 21px;
+        /*margin-right: 29%;*/
+    }
+    .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-small-circle .total-storage-number {
+        /*margin-left: 20%;*/
+        font-size: 35px;
+        /*margin-right: 22%;*/
     }
 }
 

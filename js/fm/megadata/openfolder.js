@@ -328,26 +328,28 @@
                     // checking if we loaded sub-users and drew them
                     if (!usersM.initialized) {
                         // if not, then the fastest way is to render the business home page
-                        usersM.viewSubAccountListUI();
+                        usersM.viewSubAccountListUI(undefined, undefined, true);
                     }
                     var subPage = id.replace('/', '').split('user-management')[1];
                     if (subPage && subPage.length > 2) {
                         if (subPage === 'overview') {
-
+                            usersM.viewBusinessAccountOverview();
                         }
-                        else if (subPage === 'blablabla') {
-
+                        else if (subPage === 'account') {
+                            usersM.viewBusinessAccountPage();
+                        }
+                        else if (subPage.indexOf('invdet!') > -1) {
+                            var invId = subPage.split('!')[1];
+                            usersM.viewInvoiceDetail(invId);
                         }
                         else if (subPage.length === 11) {
                             usersM.viewSubAccountInfoUI(subPage);
                         }
                     }
                     else {
-                        // check if the current object is not the first instance
-                        // because if it's there's no need to render again
-                        if (usersM.initialized) {
-                            usersM.viewSubAccountListUI();
-                        }
+                        // No need to heck if the current object is not the first instance
+                        // because rendering is optimized inside it
+                        usersM.viewSubAccountListUI();
                     }
                 });
             });

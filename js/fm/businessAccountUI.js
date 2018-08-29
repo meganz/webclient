@@ -57,9 +57,10 @@ function BusinessAccountUI() {
  * Function to view the right pane of "Users Management" used by master users to manage sub-accounts
  * @param {string[]} subAccounts    optional list of subAccount, Default is M.suba
  * @param {boolean} isBlockView     by default "Grid" view will be used, this param when True will change to "Block"
+ * @param {boolean} quickWay        by default false, if true method will skip some ui operations
  * @returns {boolean}               true if OK, false if something went wrong
  */
-BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView) {
+BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView, quickWay) {
     "use strict";
     if (!this.business.isBusinessMasterAcc()) {
         return false;
@@ -72,7 +73,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             return false;
         }
     }
-    
+
     this.initUItoRender();
 
     var mySelf = this;
@@ -152,67 +153,67 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         }
 
         // now let's fill the table with sub-users data
-         //for (var a = 0; a < 50; a++) {
+        //for (var a = 0; a < 50; a++) {
         var isGray = true;
         var colorBg = false;
-            for (var h in subUsers) {
-                var $currUser = $tr_user.clone(true); // sub-users table
-                var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
-                colorBg = false;
-                $currUserLeftPane.removeClass('hidden');
+        for (var h in subUsers) {
+            var $currUser = $tr_user.clone(true); // sub-users table
+            var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
+            colorBg = false;
+            $currUserLeftPane.removeClass('hidden');
 
-                $currUser.attr('id', subUsers[h].u);
-                $currUserLeftPane.attr('id', subUsers[h].u);
-                // now we will hide icon and role, since we are not ready to support yet.
-                // $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
-                $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
+            $currUser.attr('id', subUsers[h].u);
+            $currUserLeftPane.attr('id', subUsers[h].u);
+            // now we will hide icon and role, since we are not ready to support yet.
+            // $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
+            $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
 
-                $currUserLeftPane.removeClass('selected');
-                var uName = from8(base64urldecode(subUsers[h].firstname)) + ' ' +
-                    from8(base64urldecode(subUsers[h].lastname));
-                uName = uName.trim();
-                $currUser.find('.fm-user-management-user .user-management-name').text(uName);
-                $currUserLeftPane.find('.nw-user-management-name').text(uName);
+            $currUserLeftPane.removeClass('selected');
+            var uName = from8(base64urldecode(subUsers[h].firstname)) + ' ' +
+                from8(base64urldecode(subUsers[h].lastname));
+            uName = uName.trim();
+            $currUser.find('.fm-user-management-user .user-management-name').text(uName);
+            $currUserLeftPane.find('.nw-user-management-name').text(uName);
 
-                $currUser.find('.user-management-email').text(subUsers[h].e);
-                $currUser.find('.user-management-status').removeClass('enabled pending disabled');
-                if (subUsers[h].s === 0) {
-                    $currUser.find('.user-management-status').addClass('enabled');
-                    $currUserLeftPane.find('.user-management-status').removeClass('pending disabled')
-                        .addClass('enabled');
-                    colorBg = true;
-                }
-                else if (subUsers[h].s === 10) {
-                    $currUser.find('.user-management-status').addClass('pending');
-                    $currUserLeftPane.find('.user-management-status').removeClass('enabled disabled')
-                        .addClass('pending');
-                    colorBg = true;
+            $currUser.find('.user-management-email').text(subUsers[h].e);
+            $currUser.find('.user-management-status').removeClass('enabled pending disabled');
+            if (subUsers[h].s === 0) {
+                $currUser.find('.user-management-status').addClass('enabled');
+                $currUserLeftPane.find('.user-management-status').removeClass('pending disabled')
+                    .addClass('enabled');
+                colorBg = true;
+            }
+            else if (subUsers[h].s === 10) {
+                $currUser.find('.user-management-status').addClass('pending');
+                $currUserLeftPane.find('.user-management-status').removeClass('enabled disabled')
+                    .addClass('pending');
+                colorBg = true;
+            }
+            else {
+                $currUser.find('.user-management-status').addClass('disabled');
+                $currUser.addClass('hidden');
+                $currUserLeftPane.find('.user-management-status').removeClass('enabled pending')
+                    .addClass('disabled');
+                $currUserLeftPane.addClass('hidden');
+            }
+            $currUser.find('.user-management-status-txt').text(uiBusiness.subUserStatus(subUsers[h].s));
+
+            if (colorBg) {
+                if (isGray) {
+                    $currUser.addClass('tr-gray');
                 }
                 else {
-                    $currUser.find('.user-management-status').addClass('disabled');
-                    $currUser.addClass('hidden');
-                    $currUserLeftPane.find('.user-management-status').removeClass('enabled pending')
-                        .addClass('disabled');
-                    $currUserLeftPane.addClass('hidden');
+                    $currUser.removeClass('tr-gray');
                 }
-                $currUser.find('.user-management-status-txt').text(uiBusiness.subUserStatus(subUsers[h].s));
-
-                if (colorBg) {
-                    if (isGray) {
-                        $currUser.addClass('tr-gray');
-                    }
-                    else {
-                        $currUser.removeClass('tr-gray');
-                    }
-                    isGray = !isGray;
-                }
-
-                $detailListTable.append($currUser);
-
-                // left pane part
-                $usersLeftPanel.append($currUserLeftPane);
+                isGray = !isGray;
             }
-         //}
+
+            $detailListTable.append($currUser);
+
+            // left pane part
+            $usersLeftPanel.append($currUserLeftPane);
+        }
+        //}
 
 
         /// events handlers
@@ -309,7 +310,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     }
                 }
             }
-            
+
         });
 
         // 3- on clicking on a sub-user to view his info (from left pane or row)
@@ -418,9 +419,11 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         unhideUsersListSection();
     }
 
-    // getting quotas
-    var quotasPromise = this.business.getQuotaUsage();
-    quotasPromise.done(fillSubUsersUsage);
+    if (!quickWay) {
+        // getting quotas
+        var quotasPromise = this.business.getQuotaUsage();
+        quotasPromise.done(fillSubUsersUsage);
+    }
 
 };
 
@@ -583,6 +586,13 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     $('.subuser-name', $subAccountContainer).text(uName);
     $('.user-management-subuser-name', $subHeader).text(uName);
     $('.subuser-email', $subAccountContainer).text(subUser.e);
+
+    var $extrasContainer = $('.subuser-sec-profile-container', $subAccountContainer);
+    $extrasContainer.find('.sub-info-idnum').text(subUser.idnum || '');
+    $extrasContainer.find('.sub-info-pos').text(subUser.position || '');
+    $extrasContainer.find('.sub-info-phone').text(subUser.phonenum || '');
+    $extrasContainer.find('.sub-info-loc').text(subUser.location || '');
+
 
     $subAccountContainer.find('.user-management-view-status').removeClass('enabled pending disabled');
     // $subAccountContainer.find('.profile-button-container .disable-account').removeClass('hidden');
@@ -793,6 +803,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 
     this.initUItoRender();
     var mySelf = this;
+    this.URLchanger('overview');
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $overviewContainer = $('.user-management-overview-container', $businessAccountContainer);
@@ -818,11 +829,10 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                         }
                     };
 
-                    doc.fromHTML($overviewContainer.html(), 15, 15, {
-                        'width': 170,
-                        'elementHandlers': specialElementHandlers
+                    doc.addHTML($overviewContainer[0], function () {
+                        doc.save('accountDashboard.pdf');
                     });
-                    doc.save('sample-file.pdf');
+
                 }
             );
         }
@@ -981,7 +991,8 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                         callbacks: {
                             label: tooltipLabeling
                         }
-                    }
+                    },
+                    cutoutPercentage: 85
                 }
             });
 
@@ -1079,7 +1090,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         //start += rootPie;
         */
         
-
+        $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
     };
 
     // private function to format start and end dates
@@ -1189,6 +1200,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                 }
             });
         });
+        $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
     };
 
     // getting quotas
@@ -1237,7 +1249,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     };
 
     populateMonthDropDownList();
-    $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+    
 };
 
 
@@ -1248,6 +1260,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
     this.initUItoRender();
     var mySelf = this;
+    this.URLchanger('account');
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
@@ -1330,7 +1343,13 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         unhideSection();
     };
 
-    
+    $accountPageHeader.find('.acc-home').off('click.suba').on('click.suba',
+        function invoiceListHeaderClick() {
+            var $me = $(this);
+            if ($me.hasClass('acc-home')) {
+                return mySelf.viewSubAccountListUI();
+            }
+        });
 
     var getInvoicesPromise = this.business.getAccountInvoicesList();
     getInvoicesPromise.always(prepareInvoiceListSection);
@@ -1342,6 +1361,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
     this.initUItoRender();
     var mySelf = this;
+    this.URLchanger('invdet!' + invoiceID);
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
@@ -1461,9 +1481,38 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         }
 
         unhideSection();
+
+        $invoiceDetailContainer.find('.inv-detail-export').off('click.subuser').on('click.subuser',
+            function invoiceDetailExportClickHandler() {
+                M.require('jspdf_js').done(
+                    function exportOverviewPageToPDF() {
+                        var doc = new jsPDF();
+                        var specialElementHandlers = {
+                            '.hidden': function (element, renderer) {
+                                return true;
+                            }
+                        };
+
+                        var $invoiceDetailDiv = $('.invoice-container', $invoiceDetailContainer);
+
+                        doc.addHTML($invoiceDetailDiv[0], function () {
+                            doc.save('invoice' + invoiceDetail.n + '.pdf');
+                        });
+                    }
+                );
+            }
+        );
         
         $invoiceDetailContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
     };
+
+    $accountPageHeader.find('.acc-acc').off('click.suba').on('click.suba',
+        function invoiceDetailHeaderClick() {
+            var $me = $(this);
+            if ($me.hasClass('acc-acc')) {
+                return mySelf.viewBusinessAccountPage();
+            }
+    });
 
     var gettingInvoiceDetailPromise = this.business.getInvoiceDetails(invoiceID, false);
     gettingInvoiceDetailPromise.always(fillInvoiceDetailPage);
@@ -1539,7 +1588,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
         $('.dialog-subtitle', $dialog).addClass('hidden');
         $('.dialog-button-container .add-more', $dialog).addClass('hidden');
         $('.dialog-button-container .add-sub-user', $dialog).text(l[19084]).removeClass('a-ok-btn');
-        $('.licence-bar', $dialog).removeClass('hidden');
+        // $('.licence-bar', $dialog).removeClass('hidden');
     };
 
     clearDialog(); // remove any previous data
@@ -1557,7 +1606,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
         $addContianer.addClass('hidden');
         $resultContianer.removeClass('hidden');
         $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
-        $('.licence-bar', $dialog).addClass('hidden');
+        // $('.licence-bar', $dialog).addClass('hidden');
         $('.dialog-subtitle', $dialog).removeClass('hidden');
     }
 
@@ -1574,6 +1623,40 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
             clearDialog();
         });
 
+    // event handler for input getting focus
+    $('.dialog-input-container input', $dialog).off('focus.suba')
+        .on('focus.suba', function inputHasFocusHandler() {
+            $(this).removeClass('error correctinput').addClass('active');
+        });
+
+    // event handler for input losing focus
+    $('.dialog-input-container input', $dialog).off('blur.suba')
+        .on('blur.suba', function inputHasFocusHandler() {
+            if (this.value.trim()) {
+                $(this).removeClass('error active').addClass('correctinput');
+            }
+            else {
+                $(this).removeClass('error active correctinput');
+            }
+        });
+
+    // generic keydown monitoring function. - will be injected only when needed
+    var keyDownEventHandler = function (target) {
+        var $element = $(target.target);
+        var $targetParent = $element.parent();
+        if ($targetParent && $targetParent.length) {
+            var $errorDiv = $targetParent.find('.error-message');
+            if ($errorDiv && $errorDiv.length && !$errorDiv.hasClass('hidden')) {
+                $errorDiv.addClass('hidden');
+            }
+            $element.off('keydown.suba');
+        }
+        else {
+            console.error('not allowed, not panned change of HTML is business account - add user dialog');
+        }
+    };
+
+
     // event handler for adding sub-users
     $('.dialog-button-container .add-sub-user', $dialog).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
@@ -1587,22 +1670,55 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
 
             var $uName = $('.input-user input.sub-n', $dialog);
             var $uEmail = $('.input-user input.sub-m', $dialog);
+            var uNameTrimed = $uName.val().trim();
+            var uEmailTrimed = $uEmail.val().trim();
 
-            if (!$uName.val().trim().length || $uName.val().trim().split(' ', 2).length < 2) {
+            if (!uNameTrimed.length || uNameTrimed.split(' ', 2).length < 2) {
                 $uName.addClass('error');
-                $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1098]);
+                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1098]);
+
+                // monitoring input
+                $uName.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
+
                 return;
             }
-            if (checkMail($uEmail.val().trim())) {
+            if (checkMail(uEmailTrimed)) {
                 $uEmail.addClass('error');
-                $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[5705]);
+                $('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[5705]);
+
+                // monitoring input
+                $uEmail.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
+
                 return;
+            }
+
+            var $uPosition = $('.input-user input.sub-p', $dialog);
+            var $uIdNumber = $('.input-user input.sub-id-nb', $dialog);
+            var $uPhone = $('.input-user input.sub-ph', $dialog);
+            var $uLocation = $('.input-user input.sub-lo', $dialog);
+
+            var addUserOptionals = Object.create(null);
+            var ttemp = $uPosition.val().trim();
+            if (ttemp) {
+                addUserOptionals.position = ttemp;
+            }
+            ttemp = $uIdNumber.val().trim();
+            if (ttemp) {
+                addUserOptionals.idnum = ttemp;
+            }
+            ttemp = $uPhone.val().trim();
+            if (ttemp) {
+                addUserOptionals.phonenum = ttemp;
+            }
+            ttemp = $uLocation.val().trim();
+            if (ttemp) {
+                addUserOptionals.location = ttemp;
             }
 
             loadingDialog.pshow();
 
-            var subName = $uName.val().trim(); // i know it's 2 parts at least
-            var subEmail = $uEmail.val().trim();
+            var subName = uNameTrimed; // i know it's 2 parts at least
+            var subEmail = uEmailTrimed;
             var subFnLn = subName.split(' ');
 
             if (subFnLn.length < 2) {
@@ -1610,7 +1726,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
                 return;
             }
 
-            var subPromise = mySelf.business.addSubAccount(subEmail, subFnLn.shift(), subFnLn.join(' '));
+            var subPromise = mySelf.business.addSubAccount(subEmail, subFnLn.shift(), subFnLn.join(' '), addUserOptionals);
 
 
             var finalizeOperation = function (st,res,req) {
@@ -1646,14 +1762,14 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
 
     
     // event handler for key-down on inputs
-    $('.input-user input', $dialog).off('keydown.subuserresd')
-        .on('keydown.subuserresd', function inputFieldsKeyDoownHandler() {
-            var $me = $(this);
-            if ($me.hasClass('error')) {
-                $me.removeClass('error');
-                $('.dialog-input-container .error-message', $dialog).addClass('hidden')
-            }
-        });
+    //$('.input-user input', $dialog).off('keydown.subuserresd')
+    //    .on('keydown.subuserresd', function inputFieldsKeyDoownHandler() {
+    //        var $me = $(this);
+    //        if ($me.hasClass('error')) {
+    //            $me.removeClass('error');
+    //            $('.dialog-input-container .error-message', $dialog).addClass('hidden')
+    //        }
+    //    });
 
     M.safeShowDialog('sub-user-adding-dlg', function () {
         return $dialog;
@@ -1696,42 +1812,21 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     uName = uName.trim();
     var subUserDefaultAvatar = useravatar.contact(subUserHandle);
 
-    var subUserAttrs = ['suba-sup', 'suba-idnb', 'suba-phone', 'suba-loc'];
-    var subUserValues = ['', '', '', '']; // same order as above
-
-    var setSubuserAttributes = function (attrName, attrValue) {
-        if (!attrValue) {
-            return;
-        }
-        if (attrName === 'suba-sup') {
-            $positionInput.val(attrValue);
-            subUserValues[0] = attrValue;
-        }
-        else if (attrName === 'suba-idnb') {
-            $subIDInput.val(attrValue);
-            subUserValues[1] = attrValue;
-        }
-        else if (attrName === 'suba-phone') {
-            $phoneInput.val(attrValue);
-            subUserValues[2] = attrValue;
-        }
-        else if (attrName === 'suba-loc') {
-            $locationInput.val(attrValue);
-            subUserValues[3] = attrValue;
-        }
-    };
-
-    
-
-    for (var k = 0; k < subUserAttrs.length; k++) {
-        mega.attr.get(subUserHandle, subUserAttrs[k], -2, true, function (res) {
-            setSubuserAttributes(subUserAttrs[k], res);
-        });
-    }
-
-
     $nameInput.val(uName);
     $emailInput.val(subUser.e);
+    if (subUser.position) {
+        $positionInput.val(subUser.position);
+    }
+    if (subUser.idnum) {
+        $subIDInput.val(subUser.idnum);
+    }
+    if (subUser.phonenum) {
+        $phoneInput.val(subUser.phonenum);
+    }
+    if (subUser.location) {
+        $locationInput.val(subUser.location);
+    }
+
     $('.user-management-subuser-avatars', $dialog).html(subUserDefaultAvatar);
 
     $('.dialog-button-container .btn-edit-close, .delete-img.icon', $dialog).off('click.subuser')

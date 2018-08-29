@@ -146,7 +146,8 @@
                 <!-- Template for folders -->
                 <div class="mobile fm-item folder template">
                     <div class="mobile fm-item-img">
-                        <img alt="" src="{staticpath}images/mobile/extensions/folder.png" />
+                        <img class="regular-folder" alt="" src="{staticpath}images/mobile/extensions/folder.png" />
+                        <img class="shared-folder hidden" alt="" src="{staticpath}images/mobile/extensions/outgoing-share-folder.png" />
                     </div>
                     <div class="mobile fm-icon open-context-menu right hidden"></div>
                     <div class="mobile fm-icon link right hidden"></div>
@@ -237,6 +238,7 @@
         <div class="mobile fm-block create-new-folder-dialog">
             <div class="mobile fm-row">
                 <div class="mobile fm-content">
+                    <img class="mobile filetype-img" alt="" src="{staticpath}images/mobile/extensions/folder.png" />
                     <div class="mobile first-message">[$17617]</div>
                     <div class="mobile folder-input-container">
                         <input class="mobile folder-name-input" type="text" maxlength="70" placeholder="[$157]">

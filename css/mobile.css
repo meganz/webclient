@@ -124,7 +124,7 @@ ul, li {
 .mobile.main-block.overlay {
     position: absolute;
     z-index: 100;
-    background-color: rgba(255, 255, 255, 0.92);
+    background-color: rgba(255, 255, 255, 0.96);
     left: 0;
     top: 0;
 }
@@ -303,6 +303,9 @@ ul, li {
     width: 60px;
     margin: 0 auto;
     position: relative;
+}
+.create-new-folder-overlay .filetype-img {
+    display: block;
 }
 .mobile.filename, .mobile.contactname {
     font-size: 15px;
@@ -645,7 +648,7 @@ ul, li {
     overflow: hidden;
 }
 .mobile.red-button, .mobile.download-progress, .mobile.upload-progress {
-    height: 44px;
+    height: 45px;
     line-height: 43px;
 }
 .mobile.download-progress.complete, .mobile.upload-progress.complete {
@@ -4610,6 +4613,8 @@ textarea.mobile.support-text-field {
 
 .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
     border: 1px solid #eee;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
     height: 48px;
     cursor: pointer;
@@ -4619,6 +4624,10 @@ textarea.mobile.support-text-field {
     margin-left: 12px;
     border-radius: 4px;
     margin-bottom: 12px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    -moz-background-clip: padding;     /* Firefox 3.6 */
+    -webkit-background-clip: padding;  /* Safari 4? Chrome 6? */
+    background-clip: padding-box;
 }
 
 .mobile.grid-view .mobile.fm-item.file {
@@ -4702,7 +4711,7 @@ textarea.mobile.support-text-field {
     height: 100%;
     margin: 0;
     width: 36px;
-    height: 36px;
+    height: 40px;
 }
 .mobile.grid-view .mobile.fm-item.file:last-of-type {
     margin-bottom: 32px;
@@ -4724,7 +4733,7 @@ textarea.mobile.support-text-field {
 }
 .mobile.grid-view .mobile.fm-item-name {
     font-size: 14px;
-    line-height: 36px;
+    line-height: 40px;
     padding-left: 10px;
     padding-right: 5px;
 }
@@ -5927,7 +5936,7 @@ textarea.mobile.support-text-field {
     color: white;
 }
 .mobile.file-download-info, .mobile.file-upload-info {
-    margin: 0 auto 8px;
+    margin: 0 auto 12px;
     line-height: initial;
 }
 .mobile.video.video-theatre-mode .viewer-bottom-bl {
@@ -7244,7 +7253,7 @@ body.bottom-pages.mobile .fmholder.no-scroll {
         display: none;
     }
     .mobile.filetype-img {
-        width: 56px;
+        width: 72px;
     }
     .downloading .mobile.filetype-img, .uploading .mobile.filetype-img, .wrong-file .mobile.filetype-img {
         width: 48px;
@@ -7365,7 +7374,7 @@ body.bottom-pages.mobile .fmholder.no-scroll {
         height: 18px;
     }
     .mobile.filetype-img, .downloaidng .mobile.filetype-img, .wrong-file .mobile.filetype-img {
-        width: 48px;
+        width: 64px;
     }
     .wrong-file .mobile.content-row.first, .wrong-file .mobile.content-row.second {
         height: 100%;
@@ -7429,7 +7438,7 @@ body.bottom-pages.mobile .fmholder.no-scroll {
 }
 @media only screen and (orientation:landscape) and (max-width: 570px), only screen and (orientation:portrait) and (max-height: 570px) {
     .mobile.filetype-img, .downloaidng .mobile.filetype-img, .wrong-file .mobile.filetype-img {
-        width: 40px;
+        width: 54px;
     }
     .mobile.filename {
         font-size: 14px;
@@ -7651,6 +7660,9 @@ body.bottom-pages.mobile .fmholder.no-scroll {
     .mobile .improved-recovery-steps .content-wrapper {
         min-height: initial;
     }
+    .mobile.grid-view .file .fm-item-img {
+        height: 164px;
+    }
 }
 /* Devices larger than 400px wide in portrait */
 @media only screen and (orientation:landscape)and (min-width: 412px) and (max-width: 415px), only screen and (orientation:portrait) and (min-height: 810px) and (max-height: 824px) {
@@ -7665,6 +7677,9 @@ body.bottom-pages.mobile .fmholder.no-scroll {
     }
     .mobile.video .download.video-block {
         height: 150px;
+    }
+    .mobile.grid-view .file .fm-item-img {
+        height: 132px;
     }
 }
 /*iphone se landscape styles */
@@ -7728,9 +7743,7 @@ body.bottom-pages.mobile .fmholder.no-scroll {
         margin: 40px 24px 40px 24px;
         min-height: initial;
     }
-
 }
-
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
     .mobile.tablet-img {
         background-image: url(../images/mobile/ipad-big@2x.png);

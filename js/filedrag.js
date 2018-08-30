@@ -108,7 +108,7 @@
                     start_anoupload();
                 }
                 else {
-                    loginDialog();
+                    tooltiplogin.init();
                     $.awaitingLoginToUpload = true;
 
                     mBroadcaster.once('fm:initialized', function() {
@@ -311,7 +311,7 @@
         $('body').removeClass('overlayed');
 
         if ($.awaitingLoginToUpload) {
-            return loginDialog();
+            return tooltiplogin.init();
         }
 
         if (

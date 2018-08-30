@@ -88,37 +88,62 @@ var emailchange = (function() {
     }
 
     /**
-     * Verify if a given AES-Password (or if none is given, we read from the input)
-     * is the user's password. If everything is correct, we attempt to verify
-     * the email.
+     * Verify if a given password is the user's password. If everything is correct, we attempt to verify the email.
      *
-     * We use the new email address to generate a new "login hash" (email + password AES),
-     * without the step the current user won't be able to login with their new
-     * email address.
+     * In the old method, we use the new email address to generate a new "login hash" (email + password AES),
+     * without the step the current user won't be able to login with their new email address.
      *
-     * @param {Object} passAES The password AES object (optional)
-     * @return {void}
+     * @param {String} password The password from the form
      */
-    function verifyEmailCallback(passAES) {
+    function verifyEmailCallback(password) {
 
-        var encryptedKey  = context.k1 || u_attr.k;
-        var privateRsaKey = context.k2 || u_k;
+        // If the user's Account Authentication Version is set for the new registration process (version 2)
+        if (u_attr.aav === 2) {
+
+            // Derive the keys from the password
+            security.getDerivedEncryptionKey(password, function(derivedEncryptionKeyArray32) {
+                continueEmailVerification(derivedEncryptionKeyArray32);
+            });
+        }
+        else {
+            // Derive the key from the password using the old method
+            var derivedEncryptionKeyArray32 = prepare_key_pw(password);
+
+            // Continue the verification
+            continueEmailVerification(derivedEncryptionKeyArray32);
+        }
+    }
+
+    /**
+     * Continue the email verification
+     * @param {Array} derivedEncryptionKeyArray32
+     */
+    function continueEmailVerification(derivedEncryptionKeyArray32) {
 
         // If the password is incorrect, then quit out
-        if (!checkMyPassword(passAES, encryptedKey, privateRsaKey)) {
+        if (!checkMyPassword(derivedEncryptionKeyArray32)) {
             $('.login-register-input.password').removeClass('loading').addClass('incorrect');
             return;
         }
 
         // API request params
         var args = {
-            a: 'sec',                                   // 'Set Email Confirmation'
+            a: 'sec',           // 'Set Email Confirmation'
             c: context.code,
             e: context.email,
-            uh: stringhash(context.email, passAES),     // User Hash
-            r: 1,                                       // Replace the email address
+            r: 1,               // Replace the email address
             i: requesti
         };
+
+        // If using the old method send the updated email string hash as well, this is not needed in the new method
+        if (u_attr.aav < 2) {
+
+            // Create the SJCL cipher object
+            var derivedEncryptionKeyCipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
+
+            // Add the user email hash to the request
+            args.uh = stringhash(context.email, derivedEncryptionKeyCipherObject);
+        }
 
         loadingDialog.show();
 
@@ -149,12 +174,9 @@ var emailchange = (function() {
     }
 
     /**
-     * Verify if verify code is valid.
-     *
-     * @param {Object} passAES The password AES object (optional)
-     * @param {Array} keys The hash with key 1 (encrypted private key) and key 2 (private key). (optional)
+     * Verify if verify code is valid
      */
-    ns.verify = function(passAES, keys) {
+    ns.verify = function() {
 
         // The user has no context, it happens when a given user login
         // and this function exists (verify new email / logout / login again)
@@ -163,19 +185,13 @@ var emailchange = (function() {
             return;
         }
 
-
         /**
-         *  After we updated the user's data, we verify if they
-         *  typed their password correctly or not.
+         * After we updated the user's data, we verify if they typed their password correctly or not.
          */
-        function verifyUserPassword() {
+        function verifyUserPasswordCallback() {
 
             $input = $input || $('#verify-password');
             var password = $input.val();
-
-            // Use passAES (AES object with the user's password as the key)
-            // *or* whatever the user typed in `$input`.
-            passAES = passAES || new sjcl.cipher.aes(prepare_key_pw(password));
 
             $input.val('');
 
@@ -186,18 +202,12 @@ var emailchange = (function() {
                     return;
                 }
 
-                if (keys) {
-                    context.k1 = keys.k1;
-                    context.k2 = keys.k2;
-                }
-
                 // Receive the old email address and verify the password they typed is correct.
                 // If it is correct, then we update the user hash with the new email address.
                 context.email = res[1];
-                verifyEmailCallback(passAES);
+                verifyEmailCallback(password);
             }});
         }
-
 
         $('.login-register-input.password').addClass('loading').removeClass('incorrect');
 
@@ -209,9 +219,9 @@ var emailchange = (function() {
             callback: function(res) {
 
                 // Update the user's data and then verify their password
-                u_checklogin3a(res, {checkloginresult: verifyUserPassword});
+                u_checklogin3a(res, { checkloginresult: verifyUserPasswordCallback });
             }
-        })
+        });
     };
 
     return ns;

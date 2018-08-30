@@ -2955,6 +2955,216 @@ li.token-input-token-invite .input-close {
 .widget-dialog .copy-widget-code {
     text-transform: capitalize;
 }
+
+/* Two Factor Authentication dialogs */
+.fm-dialog.two-factor-dialog {
+    width: 482px;
+    margin: -172px 0 0 -240px;
+    box-sizing: border-box;
+    width: 482px;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+}
+.fm-dialog.two-factor-dialog.verify-two-factor-login {
+	background-color: #f6f6f6;
+	height: 344px;
+	margin: -172px 0 0 -240px;
+	width: 480px;
+}
+.fm-dialog.two-factor-dialog.verify-two-factor-login .middle-button-wrapper {
+    margin: 22px auto 48px auto;
+}
+.fm-dialog.two-factor-dialog.verify-two-factor-login .fm-account-input {
+    width: 302px;
+}
+.fm-dialog.two-factor-dialog.verify-two-factor-login .fm-account-input input {
+    color: #333;
+    font-size: 20px;
+    line-height: 25px;
+    text-align: center;
+}
+.es .fm-dialog.two-factor-dialog.verify-two-factor-login .fm-account-input input, .es .fm-dialog.two-factor-dialog.setup-two-factor-verify .pin-input {
+    font-size: 16px;
+}
+.fm-dialog.two-factor-dialog.verify-two-factor-login .warning-text-field {
+    background-color: rgba(240,55,58,0.1);
+    border: 1px solid rgba(218,49,53,0.5);
+    border-radius: 2px;
+    box-sizing: border-box;
+    color: #da3135;
+    font-size: 14px;
+    line-height: 18px;
+    margin: 0 auto;
+    padding: 4px 0;
+    text-align: center;
+    text-transform: uppercase;
+    width: 302px;
+}
+.fm-dialog.two-factor-dialog.verify-two-factor-login .warning-text-field.hidden {
+    display: block;
+    visibility: hidden;
+}
+.fm-dialog.two-factor-dialog .two-factor-content-block {
+    width: 400px;
+    position: relative;
+    height: auto;
+    margin: 24px auto 24px;
+}
+.fm-dialog.two-factor-dialog .two-factor-content-block.verify-tfactor {
+    margin: 48px auto 60px;
+}
+.fm-dialog.two-factor-dialog .tf-container {
+    width: 386px;
+    margin: 0 auto;
+}
+.fm-dialog.two-factor-dialog .two-factor-qr-code {
+    width: 224px;
+    height: 224px;
+    background-color: #f2f2f2;
+    margin: 24px auto 48px;
+    position: relative;
+}
+.fm-dialog.two-factor-dialog .fm-account-input input {
+    box-sizing: border-box;
+    height: 38px;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 2px;
+    background-color: rgba(0,0,0,0.02);
+    padding: 0;
+    text-align: center;
+}
+.fm-dialog.two-factor-dialog.setup-two-factor-verify .pin-input {
+	color: #333;
+	font-size: 20px;
+	line-height: 25px;
+	text-align: center;
+}
+.fm-dialog.two-factor-dialog .fm-account-input {
+    height: 38px;
+    margin: 24px auto 16px;
+}
+.fm-dialog.two-factor-dialog .verify-tfactor .fm-account-input {
+    width: 300px;
+}
+.fm-dialog.two-factor-dialog .middle-button-wrapper {
+    margin: 24px auto 48px;
+    width: 300px;
+}
+.fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button {
+    width: 136px;
+    display: inline-block;
+    min-width: 136px;
+}
+.fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button:first-of-type {
+    margin-right: 24px;
+}
+.fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button.hidden {
+    display: none;
+}
+.fm-dialog.two-factor-dialog .default-56px-button.finish-button {
+    height: 40px;
+    line-height: 40px;
+    width: initial;
+    min-width: 120px;
+}
+.fm-dialog.two-factor-dialog .default-56px-button.grey-button {
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,0.45);
+    border-radius: 4px;
+    background: linear-gradient(0deg, #999999 0%, #AAAAAA 100%);
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+}
+.fm-dialog.two-factor-dialog .dialog-body-subheader {
+    width: 300px;
+    color: #333333;
+    font-family: "source_sans_prosemibold";
+    font-size: 16px;
+    line-height: 20px;
+    text-align: center;
+    margin: 0 auto 32px;
+}
+.fm-dialog.verify-two-factor-login .middle-button-wrapper {
+    position: relative;
+}
+.fm-dialog.verify-two-factor-login .back-button {
+    left: 0;
+    position: absolute;
+    top: 0;
+}
+.fm-dialog.verify-two-factor-login .submit-button {
+    right: 0;
+    position: absolute;
+    top: 0;
+}
+.fm-dialog.verify-two-factor-login .submit-button .loading-image {
+    display: none;
+}
+.fm-dialog.verify-two-factor-login .submit-button.loading .label {
+    display: none;
+}
+.fm-dialog.verify-two-factor-login .submit-button.loading .loading-image {
+    display: inline-block;
+    height: 28px;
+    left: 50%;
+    margin-left: -14px;
+    margin-top: 14px;
+    position: absolute;
+    width: 28px;
+    font-size: 0;
+    line-height: 0;
+}
+.fm-dialog.verify-two-factor-login .loading-image img {
+    width: 28px;
+    height: 28px;
+}
+.two-factor-dialog.setup-two-factor .middle-button-wrapper {
+    text-align: center;
+}
+.fm-dialog.two-factor-verify-action .middle-button-wrapper {
+    text-align: center;
+}
+.fm-dialog.two-factor-verify-action .pin-input {
+    color: #333;
+    font-size: 20px;
+    line-height: 25px;
+    text-align: center;
+}
+.recovery-key-info-container {
+    box-sizing: border-box;
+    height: 66px;
+    width: 386px;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    margin: 12px auto 16px;
+}
+.recovery-key-container .recovery-key-icon {
+    height: 48px;
+    width: 48px;
+    background-image: url(../images/mega/files-icons_v3.png);
+    background-position: -211px -1073px;
+    background-repeat: no-repeat;
+    margin: 8px 8px 8px 12px;
+    display: inline-block;
+}
+.fm-dialog .dialog-body-centre-text {
+    width: 384px;
+    color: #333333;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+    margin: 16px auto 24px;
+}
+.fm-dialog.two-factor-dialog.setup-two-factor {
+    margin: -278px 0 0 -240px;
+}
+.setup-two-factor-backup-key .middle-button-wrapper {
+    text-align: center;
+}
+/* End of Two Factor Authentication dialogs */
 /* Private chat dialog */
 .create-private-chat {
     width: 560px;

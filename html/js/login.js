@@ -1,92 +1,149 @@
-var login_txt = false;
-var login_email = false;
+/**
+ * Desktop signin/login functions
+ */
+var signin = {
 
-function dologin() {
-    /* jshint -W074 */
-    if ((document.getElementById('login_email').value === '')) {
-        alert(l[197]);
-    }
-    else if (checkMail(document.getElementById('login_email').value)) {
-        alert(l[198]);
-    }
-    else if (document.getElementById('login_password').value === '') {
-        alert(l[199]);
-    }
-    else {
-        if (m) {
-            loadingDialog.show();
-        }
-        else {
-            document.getElementById('overlay').style.display = '';
-        }
+    /**
+     * Old method functions
+     */
+    old: {
 
-        if (confirmok) {
-            if (u_signupenck) {
-                if (checksignuppw(document.getElementById('login_password').value)) {
-                    var ctx = {
-                        callback: function(res, ctx) {
-                            if (m) {
-                                loadingDialog.hide();
-                            }
-                            else {
-                                document.getElementById('overlay').style.display = 'none';
-                            }
+        /**
+         * Starts the login proceedure
+         * @param {String} email The user's email address
+         * @param {String} password The user's password
+         * @param {String|null} pinCode The two-factor authentication PIN code (6 digit number), or null if N/A
+         * @param {Boolean} rememberMe Whether the user clicked the Remember me checkbox or not
+         */
+        startLogin: function(email, password, pinCode, rememberMe) {
 
-                            if (res[0] === EACCESS) {
-                                alert(l[732]);
-                            }
-                            else if (typeof res[0] === 'string') {
-                                if (u_type) {									
-                                    if (login_next) {
-                                        loadSubPage(login_next);
-                                    }
-                                    else if (page !== 'login') {
-                                        init_page();
-                                    }
-                                    else {
-                                        loadSubPage('fm');
-                                    }
-                                    login_next = false;
-                                    document.title = 'MEGA';
-                                }
-                                else {
-                                    postlogin();
-                                }
-                            }
-                            else {
-                                alert(l[200]);
-                            }
-                        }
-                    };
-                    if (d) {
-                        console.log('u_handle', u_handle);
-                    }
-                    var keypw = prepare_key_pw(document.getElementById('login_password').value);
-                    var passwordaes = new sjcl.cipher.aes(keypw);
-                    api_updateuser(ctx, {
-                        uh: stringhash(document.getElementById('login_email').value.toLowerCase(), passwordaes),
-                        c: confirmcode
+            'use strict';
+
+            if (confirmok) {
+                doConfirm(email, password, function() {
+                    loadingDialog.show();
+                    postLogin(email, password, pinCode, rememberMe, function(result) {
+
+                        loadingDialog.hide();
+
+                        // Proceed with login
+                        signin.proceedWithLogin(result);
                     });
+                });
+            }
+            else {
+                postLogin(email, password, pinCode, rememberMe, function(result) {
+
+                    loadingDialog.hide();
+
+                    // Otherwise proceed with regular login
+                    signin.proceedWithLogin(result);
+                });
+            }
+        }
+    },
+
+    /**
+     * New secure method functions
+     */
+    new: {
+
+        /**
+         * Start the login process
+         * @param {String} email The user's email addresss
+         * @param {String} password The user's password as entered
+         * @param {String|null} pinCode The two-factor authentication PIN code (6 digit number), or null if N/A
+         * @param {Boolean} rememberMe A boolean for if they checked the Remember Me checkbox on the login screen
+         * @param {String} salt The user's salt as a Base64 URL encoded string
+         */
+        startLogin: function(email, password, pinCode, rememberMe, salt) {
+
+            'use strict';
+
+            // Start the login using the new process
+            security.login.startLogin(email, password, pinCode, rememberMe, salt, function(result) {
+
+                loadingDialog.hide();
+
+                // Otherwise proceed with regular login
+                signin.proceedWithLogin(result);
+            });
+        }
+    },
+
+    /**
+     * Proceed to key generation step
+     * @param {Number} result The result from the API, e.g. a negative error num or the user type
+     */
+    proceedWithKeyGeneration: function(result) {
+
+        'use strict';
+
+        u_type = result;
+        loadSubPage('key');
+    },
+
+    /**
+     * Proceed to the login step
+     * @param {Number} result The result from the API, e.g. a negative error num or the user type
+     */
+    proceedWithLogin: function(result) {
+
+        'use strict';
+
+        // Remove loading spinner from 2FA dialog
+        $('.fm-dialog.verify-two-factor-login.submit-button').removeClass('loading');
+
+        // Check and handle the common login errors
+        if (security.login.checkForCommonErrors(result, signin.old.startLogin, signin.new.startLogin)) {
+            return false;
+        }
+
+        // If successful result
+        else if (result !== false && result >= 0) {
+
+            // Otherwise if email confirm code is ok, proceed with RSA key generation
+            if (confirmok) {
+                signin.proceedWithKeyGeneration(result);
+            }
+            else {
+                // Otherwise proceed with regular login
+                u_type = result;
+                passwordManager('#login_form');
+
+                if (login_next) {
+                    loadSubPage(login_next);
+                }
+                else if (page !== 'login') {
+                    init_page();
                 }
                 else {
-                    alert(l[201]);
-                    if (m) {
-                        loadingDialog.hide();
-                    }
-                    else {
-                        document.getElementById('overlay').style.display = 'none';
-                    }
-                    document.getElementById('login_password').value = '';
+                    loadSubPage('fm');
                 }
+                login_next = false;
             }
         }
         else {
-            postlogin();
+            // Show a failed login
+            $('.login-register-input.password').addClass('incorrect');
+            $('.login-register-input.email').addClass('incorrect');
+
+            // Close the 2FA dialog for a generic error
+            twofactor.loginDialog.closeDialog();
+
+            msgDialog('warninga', l[135], l[7431], false, function() {
+                $('#login-password2').val('');
+                $('#login-name2').select();
+            });
         }
     }
-}
+};
+
+var login_txt = false;
+var login_email = false;
 
 function doConfirm(email, password, callback) {
+
     if (u_signupenck) {
         if (checksignuppw(password)) {
             if (d) {
@@ -144,18 +201,22 @@ function doConfirm(email, password, callback) {
     }
 }
 
-function postLogin(email, password, remember, callback) {
+function postLogin(email, password, pinCode, remember, loginCompletionCallback) {
+
+    // A little helper to pass only the final result of the User Get (ug) API request
+    // i.e. the (user type or error code) back to the loginCompletionCallback function
     var ctx = {
-        callback2: callback,
-        checkloginresult: function(ctx, r) {
+        callback2: loginCompletionCallback,
+        checkloginresult: function(ctx, result) {
             if (ctx.callback2) {
-                ctx.callback2(r);
+                ctx.callback2(result);
             }
         }
     };
     var passwordaes = new sjcl.cipher.aes(prepare_key_pw(password));
     var uh = stringhash(email.toLowerCase(), passwordaes);
-    u_login(ctx, email, password, uh, remember);
+
+    u_login(ctx, email, password, uh, pinCode, remember);
 }
 
 function pagelogin() {
@@ -174,64 +235,21 @@ function pagelogin() {
         if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
             localStorage.hideloginwarning = 1;
         }
-        var remember;
+
+        var email = $('#login-name2').val();
+        var password = $('#login-password2').val();
+        var rememberMe = false;
+        var twoFactorPin = null;
+
         // XXX: Set remember on by default if confirming a freshly created account
         if (confirmok || $('.login-check').hasClass('checkboxOn')) {
-            remember = 1;
+            rememberMe = true;
         }
 
-        if (confirmok) {
-            doConfirm($('#login-name2').val(), $('#login-password2').val(), function() {
-                loadingDialog.show();
-                postLogin($('#login-name2').val(), $('#login-password2').val(), remember, function(r) {
-                    loadingDialog.hide();
-                    if (r === EBLOCKED) {
-                        alert(l[730]);
-                    }
-                    else if (r) {
-                        u_type = r;
-                        loadSubPage('key');
-                    }
-                });
-            });
-        }
-        else {
-            postLogin($('#login-name2').val(), $('#login-password2').val(), remember, function(r) {
-                loadingDialog.hide();
-
-                if (r === EBLOCKED) {
-                    alert(l[730]);
-                }
-                else if (r) {
-                    u_type = r;
-                    passwordManager('#login_form');
-
-                    if (login_next) {
-                        loadSubPage(login_next);
-                    }
-                    else if (page !== 'login') {
-                        init_page();
-                    }
-                    else {
-                        loadSubPage('fm');
-                    }
-                    login_next = false;
-                }
-                else {
-                    $('.login-register-input.password').addClass('incorrect');
-                    $('.login-register-input.email').addClass('incorrect');
-
-                    // Check that there is not already a message dialog being shown, otherwise
-                    // this generic one will override the other's more specific error message
-                    if ($('#msgDialog').hasClass('hidden')) {
-                        msgDialog('warninga', l[135], l[7431], false, function(e) {
-                            $('#login-password2').val('');
-                            $('#login-name2').select();
-                        });
-                    }
-                }
-            });
-        }
+        // Checks if they have an old or new registration type, after this the flow will continue to login
+        security.login.checkLoginMethod(email, password, twoFactorPin, rememberMe,
+                                        signin.old.startLogin,
+                                        signin.new.startLogin);
     }
 }
 
@@ -308,64 +326,4 @@ function init_login() {
     if (is_chrome_firefox) {
         Soon(mozLoginManager.fillForm.bind(mozLoginManager, 'login_form'));
     }
-}
-
-function postlogin() {
-    if (m) {
-        loadingDialog.show();
-    }
-    var ctx = {
-        checkloginresult: function(ctx, r) {
-            if (m) {
-                loadingDialog.hide();
-            }
-            else {
-                document.getElementById('overlay').style.display = 'none';
-            }
-
-            if (r === EBLOCKED) {
-                alert(l[730]);
-            }
-            else if (r) {
-                document.getElementById('login_password').value = '';
-                document.getElementById('login_email').value = '';
-                u_type = r;
-                if (page === 'login') {
-                    if (getSitePath().substr(0,3) == '/fm') {
-                        page = 'fm';
-                        init_page();
-                    }
-                    else {
-                        if (login_next) {
-                            loadSubPage(login_next);
-                        }
-                        else if (page !== 'login') {
-                            init_page();
-                        }
-                        else {
-                            loadSubPage('fm');
-                        }
-                        login_next = false;
-                        document.title = 'MEGA';
-                    }
-                }
-                else {
-                    init_page();
-                }
-                if (d) {
-                    console.log('logged in');
-                }
-            }
-            else {
-                document.getElementById('login_password').value = '';
-                alert(l[201]);
-            }
-        }
-    };
-    var passwordaes = new sjcl.cipher.aes(prepare_key_pw(document.getElementById('login_password').value));
-    var uh = stringhash(document.getElementById('login_email').value.toLowerCase(), passwordaes);
-    u_login(ctx,
-        document.getElementById('login_email').value,
-        document.getElementById('login_password').value, uh,
-        document.getElementById('login_remember').checked);
 }

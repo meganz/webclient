@@ -28,9 +28,10 @@ var redeem = {
         msgDialog('confirmation', l[458], rdmConfirmMsg, '', function(e) {
             if (e) {
                 // Init functions
-                redeem.addVoucher(voucherCode);
+            redeem.addVoucher();
             }
             else {
+                delete localStorage.voucher;
                 redeem.hideBackgroundOverlay();
                 loadSubPage('contact');
             }

@@ -2730,5 +2730,16 @@
     "19320": "DGSVO-Stelle zur Entgegennahme von Beschwerden \u00fcber MEGA",
     "19321": "Anfragen bez\u00fcglich unserer Datenschutzregelung senden Sie bitte an:",
     "19322": "Melden Sie die Markenrechtsverletzung:",
-    "19323": "MEGA verfolgt eine Null-Toleranz-Politik bez\u00fcglich Darstellungen sexueller Gewalt gegen Minderj\u00e4hrige oder Tiere, gewaltt\u00e4tigen Extremismus, Malware, illegal erlangte Daten\/Passw\u00f6rter, Erpressung, Rachepornographie usw. Bitte melden Sie entsprechende Links mit Beschreibung an:"
+    "19323": "MEGA verfolgt eine Null-Toleranz-Politik bez\u00fcglich Darstellungen sexueller Gewalt gegen Minderj\u00e4hrige oder Tiere, gewaltt\u00e4tigen Extremismus, Malware, illegal erlangte Daten\/Passw\u00f6rter, Erpressung, Rachepornographie usw. Bitte melden Sie entsprechende Links mit Beschreibung an:",
+    "19325": "Scannen Sie diesen Code mit Ihrer Authentifizierungs-App (oder kopieren Sie Ihn). F\u00fcr den Fall des Verlusts Ihres Mobilger\u00e4ts bewahren Sie bitte eine Kopie an einem sicheren Ort auf.",
+    "19326": "Geben Sie nach Konfiguration Ihrer Authentifizierungs-App den angezeigten sechsstelligen Code ein.",
+    "19328": "Are you sure you want to redeem this voucher for the [B]%1[\/B] account?",
+    "19329": "Importieren",
+    "19330": "[S]MEGAsync:[\/S] Komfortabler automatischer Datenabgleich zwischen Ihren Computern und Ihrem Cloud Drive",
+    "19332": "Danke daf\u00fcr, dass Sie MEGAsync ausprobieren.<br>Diese Betaversion ist nicht mehr aktuell..<br>Bitte folgen Sie <a href=\"https:\/\/twitter.com\/MEGAprivacy\">@MEGAprivacy<\/a> auf Twitter.",
+    "19333": "Das Update konnte nicht installiert werden. Bitte versuchen Sie es sp\u00e4ter erneut oder installieren Sie die aktuelle Version manuell von https:\/\/mega.nz\/sync.\r\n",
+    "19334": "Ihr Account wurde gesperrt. Bitte setzen Sie sich mit support@mega.nz in Verbindung.",
+    "19335": "Ich akzeptiere die MEGA <a href=\"https:\/\/mega.nz\/terms\">Nutzungsbedingungen<\/a>\r\n",
+    "19336": "Synchronisieren Sie ihr komplettes Cloud Drive",
+    "19337": "Synchronisieren Sie einzelne Ordner Ihres Cloud Drives"
 }

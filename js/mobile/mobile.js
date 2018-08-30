@@ -304,6 +304,22 @@ function fm_hideoverlay() {
     $('html').removeClass('overlayed');
 }
 
+/** slimmed down version adapted from fm.js's (desktop) closeDialog() */
+function closeDialog() {
+    'use strict';
+
+    if (d) {
+        MegaLogger.getLogger('closeDialog').debug($.dialog);
+    }
+
+    fm_hideoverlay();
+    $('.fm-dialog').trigger('dialog-closed').addClass('hidden');
+    $('.fm-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
+
+    delete $.dialog;
+    mBroadcaster.sendMessage('closedialog');
+}
+
 mega.ui.showRegisterDialog = function() {};
 
 mega.loadReport = {};
@@ -323,6 +339,5 @@ function fmtopUI() {}
 function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
-function closeDialog() {}
 /* jshint +W098 */
 /* jshint +W007 */

@@ -577,6 +577,8 @@ Chat.prototype.destroy = function(isLogout) {
         return;
     }
 
+    self.isLoggingOut = isLogout;
+
     self.trigger('onDestroy', [isLogout]);
 
     // unmount the UI elements, to reduce any unneeded.

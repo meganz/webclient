@@ -534,6 +534,8 @@ React.makeElement = React['createElement'];
 	        return;
 	    }
 
+	    self.isLoggingOut = isLogout;
+
 	    self.trigger('onDestroy', [isLogout]);
 
 	    if (self.$conversationsAppInstance && ReactDOM.findDOMNode(self.$conversationsAppInstance) && ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode) {
@@ -2066,7 +2068,7 @@ React.makeElement = React['createElement'];
 	            var megaChat = self.props.megaChat;
 	            if (megaChat.currentlyOpenedChat) {
 
-	                if (megaChat.currentlyOpenedChat && megaChat.getCurrentRoom().isReadOnly() || $(e.target).is(".messages-textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91 || e.keyCode === 17 || e.keyCode === 27 || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $('.fm-dialog:visible,.dropdown:visible').length > 0 || $('input:focus,textarea:focus,select:focus').length > 0) {
+	                if (megaChat.currentlyOpenedChat && megaChat.getCurrentRoom().isReadOnly() || $(e.target).is(".messages-textarea, input, textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91 || e.keyCode === 17 || e.keyCode === 27 || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $('.fm-dialog:visible,.dropdown:visible').length > 0 || $('input:focus,textarea:focus,select:focus').length > 0) {
 	                    return;
 	                }
 
@@ -4648,6 +4650,36 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 	    },
+	    componentWillMount: function componentWillMount() {
+	        var self = this;
+
+	        if (self.props.multiple) {
+	            var KEY_ENTER = 13;
+
+	            $(document.body).rebind('keypress.contactPicker' + self.getUniqueId(), function (e) {
+	                var keyCode = e.which || e.keyCode;
+	                if (keyCode === KEY_ENTER) {
+	                    if (self.state.selected) {
+	                        e.preventDefault();
+	                        e.stopPropagation();
+
+	                        $(document).trigger('closeDropdowns');
+
+	                        if (self.props.onSelectDone) {
+	                            self.props.onSelectDone(self.state.selected);
+	                        }
+	                    }
+	                }
+	            });
+	        }
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+
+	        if (self.props.multiple) {
+	            $(document.body).unbind('keypress.contactPicker' + self.getUniqueId());
+	        }
+	    },
 	    render: function render() {
 	        var self = this;
 
@@ -4717,7 +4749,7 @@ React.makeElement = React['createElement'];
 	                self.clickTime = new Date();
 	                self.lastClicked = contactHash;
 	            };
-	            var selectedWidth = self.state.selected.length * 60;
+	            var selectedWidth = self.state.selected.length * 54;
 	            if (!self.state.selected || self.state.selected.length === 0) {
 	                footer = React.makeElement(
 	                    "div",
@@ -7762,7 +7794,7 @@ React.makeElement = React['createElement'];
 
 	        if (!self.lastCursor || self.lastCursor !== self.state.cursor) {
 	            self.lastCursor = self.state.cursor;
-	            var tr = self.findDOMNode().querySelector('tr.node_' + self.lastCursor);
+	            var tr = self.findDOMNode().querySelector('.node_' + self.lastCursor);
 	            var $jsp = $(tr).parents('.jspScrollable').data('jsp');
 	            if (tr && $jsp) {
 	                $jsp.scrollToElement(tr, undefined, false);
@@ -7826,12 +7858,83 @@ React.makeElement = React['createElement'];
 	        self.setState({ 'selected': selected });
 	        self.props.onSelected(selected);
 	    },
+	    _doSelect: function _doSelect(selectionIncludeShift, currentIndex, targetIndex) {
+	        var self = this;
+	        if (targetIndex >= self.props.entries.length) {
+	            if (selectionIncludeShift) {
+
+	                return;
+	            } else {
+	                targetIndex = self.props.entries.length - 1;
+	            }
+	        }
+
+	        if (targetIndex < 0 || !self.props.entries[targetIndex]) {
+	            targetIndex = Math.min(0, currentIndex);
+	        }
+
+	        if (self.props.entries.length === 0 || !self.props.entries[targetIndex]) {
+	            return;
+	        }
+
+	        var highlighted;
+
+	        if (selectionIncludeShift) {
+	            var firstIndex;
+	            var lastIndex;
+	            if (targetIndex < currentIndex) {
+
+	                if (self.state.highlighted && self.state.highlighted.length > 0) {
+
+	                    if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
+
+	                        firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+	                        lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 2], self.state.highlighted.length - 2);
+	                    } else {
+	                        firstIndex = targetIndex;
+	                        lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 1], -1);
+	                    }
+	                } else {
+	                    firstIndex = targetIndex;
+	                    lastIndex = currentIndex;
+	                }
+	            } else {
+
+	                if (self.state.highlighted && self.state.highlighted.length > 0) {
+
+	                    if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
+
+	                        firstIndex = self.getIndexByNodeId(self.state.highlighted[1], 1);
+	                        lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 1], self.state.highlighted.length - 1);
+	                    } else {
+
+	                        firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+	                        lastIndex = targetIndex;
+	                    }
+	                } else {
+	                    firstIndex = currentIndex;
+	                    lastIndex = targetIndex;
+	                }
+	            }
+
+	            highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
+
+	            self.setSelectedAndHighlighted(highlighted, self.props.entries[targetIndex].h);
+	        } else {
+	            highlighted = [self.props.entries[targetIndex].h];
+	            self.setSelectedAndHighlighted(highlighted, highlighted[0]);
+	        }
+	    },
 	    bindEvents: function bindEvents() {
 	        var self = this;
 
 	        var KEY_A = 65;
 	        var KEY_UP = 38;
 	        var KEY_DOWN = 40;
+
+	        var KEY_LEFT = 37;
+	        var KEY_RIGHT = 39;
+
 	        var KEY_ENTER = 13;
 	        var KEY_BACKSPACE = 8;
 
@@ -7839,6 +7942,11 @@ React.makeElement = React['createElement'];
 	            var charTyped = false;
 	            var keyCode = e.which || e.keyCode;
 	            var selectionIncludeShift = e.shiftKey;
+	            if ($('input:focus, textarea:focus').size() > 0) {
+	                return;
+	            }
+
+	            var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
 	            if (keyCode === KEY_A && (e.ctrlKey || e.metaKey)) {
 
@@ -7856,14 +7964,16 @@ React.makeElement = React['createElement'];
 	                e.preventDefault();
 	                e.stopPropagation();
 	            } else if (e.metaKey && keyCode === KEY_UP || keyCode === KEY_BACKSPACE) {
+	                if (viewMode === "0") {
 
-	                var currentFolder = M.getNode(self.props.currentlyViewedEntry);
-	                if (currentFolder.p) {
-	                    self.expandFolder(currentFolder.p);
+	                    var currentFolder = M.getNode(self.props.currentlyViewedEntry);
+	                    if (currentFolder.p) {
+	                        self.expandFolder(currentFolder.p);
+	                    }
 	                }
-	            } else if (!e.metaKey && (keyCode === KEY_UP || keyCode === KEY_DOWN)) {
+	            } else if (!e.metaKey && (viewMode === "0" && (keyCode === KEY_UP || keyCode === KEY_DOWN) || viewMode === "1" && (keyCode === KEY_LEFT || keyCode === KEY_RIGHT))) {
 
-	                var dir = keyCode === KEY_UP ? -1 : 1;
+	                var dir = keyCode === (viewMode === "1" ? KEY_LEFT : KEY_UP) ? -1 : 1;
 
 	                var lastHighlighted = self.state.cursor || false;
 	                if (!self.state.cursor && self.state.highlighted && self.state.highlighted.length > 0) {
@@ -7881,70 +7991,28 @@ React.makeElement = React['createElement'];
 	                    }
 	                }
 
-	                if (targetIndex >= self.props.entries.length) {
-	                    if (selectionIncludeShift) {
+	                self._doSelect(selectionIncludeShift, currentIndex, targetIndex);
+	            } else if (viewMode === "1" && (keyCode === KEY_UP || keyCode === KEY_DOWN)) {
+	                var containerWidth = $('.add-from-cloud .fm-dialog-scroll .content:visible').outerWidth();
+	                var itemWidth = $('.add-from-cloud .fm-dialog-scroll .content:visible .data-block-view:first').outerWidth();
+	                var itemsPerRow = Math.floor(containerWidth / itemWidth);
 
-	                        return;
-	                    } else {
-	                        targetIndex = self.props.entries.length - 1;
-	                    }
+	                var dir = keyCode === KEY_UP ? -1 : 1;
+
+	                var lastHighlighted = self.state.cursor || false;
+	                if (!self.state.cursor && self.state.highlighted && self.state.highlighted.length > 0) {
+	                    lastHighlighted = self.state.highlighted[self.state.highlighted.length - 1];
 	                }
 
-	                if (targetIndex < 0 || !self.props.entries[targetIndex]) {
-	                    targetIndex = Math.min(0, currentIndex);
-	                }
+	                var currentIndex = self.getIndexByNodeId(lastHighlighted, -1);
 
-	                if (self.props.entries.length === 0 || !self.props.entries[targetIndex]) {
+	                var targetIndex = currentIndex + dir * itemsPerRow;
+	                if (self.props.entries.length - 1 < targetIndex || targetIndex < 0) {
+
 	                    return;
 	                }
 
-	                var highlighted;
-
-	                if (selectionIncludeShift) {
-	                    var firstIndex;
-	                    var lastIndex;
-	                    if (targetIndex < currentIndex) {
-
-	                        if (self.state.highlighted && self.state.highlighted.length > 0) {
-
-	                            if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
-
-	                                firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
-	                                lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 2], self.state.highlighted.length - 2);
-	                            } else {
-	                                firstIndex = targetIndex;
-	                                lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 1], -1);
-	                            }
-	                        } else {
-	                            firstIndex = targetIndex;
-	                            lastIndex = currentIndex;
-	                        }
-	                    } else {
-
-	                        if (self.state.highlighted && self.state.highlighted.length > 0) {
-
-	                            if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
-
-	                                firstIndex = self.getIndexByNodeId(self.state.highlighted[1], 1);
-	                                lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 1], self.state.highlighted.length - 1);
-	                            } else {
-
-	                                firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
-	                                lastIndex = targetIndex;
-	                            }
-	                        } else {
-	                            firstIndex = currentIndex;
-	                            lastIndex = targetIndex;
-	                        }
-	                    }
-
-	                    highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
-
-	                    self.setSelectedAndHighlighted(highlighted, self.props.entries[targetIndex].h);
-	                } else {
-	                    highlighted = [self.props.entries[targetIndex].h];
-	                    self.setSelectedAndHighlighted(highlighted, highlighted[0]);
-	                }
+	                self._doSelect(selectionIncludeShift, currentIndex, targetIndex);
 	            } else if (keyCode >= 48 && keyCode <= 57 || keyCode >= 65 && keyCode <= 123 || keyCode > 255) {
 	                charTyped = String.fromCharCode(keyCode).toLowerCase();
 
@@ -8124,13 +8192,15 @@ React.makeElement = React['createElement'];
 	        var self = this;
 
 	        var items = [];
+	        var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
-	        var entry = self.props.entries;
+	        var imagesThatRequireLoading = [];
 	        self.props.entries.forEach(function (node) {
 	            if (node.t !== 0 && node.t !== 1) {
 
 	                return;
 	            }
+
 	            if (!node.name) {
 
 	                return;
@@ -8148,14 +8218,17 @@ React.makeElement = React['createElement'];
 	                " "
 	            );
 
-	            if (is_image(node) && node.fa) {
-	                var src = thumbnails[node.h];
+	            var image = null;
+	            var src = null;
+	            if ((is_image(node) || is_video(node)) && node.fa) {
+	                src = thumbnails[node.h];
 	                if (!src) {
-	                    M.v.push(node);
+	                    node.imgId = "chat_" + node.h;
+	                    imagesThatRequireLoading.push(node);
+
 	                    if (!node.seen) {
 	                        node.seen = 1;
 	                    }
-	                    delay('thumbnails', fm_thumbnails, 90);
 	                    src = window.noThumbURI || '';
 	                }
 	                icon = React.makeElement(
@@ -8181,67 +8254,155 @@ React.makeElement = React['createElement'];
 	                        )
 	                    )
 	                );
+
+	                if (src) {
+	                    image = React.makeElement("img", { alt: "", src: src });
+	                } else {
+	                    image = React.makeElement("img", { alt: "" });
+	                }
 	            }
 
-	            items.push(React.makeElement(
-	                "tr",
-	                { className: "node_" + node.h + " " + (isFolder ? " folder" : "") + (isHighlighted ? " ui-selected" : ""),
-	                    onClick: function onClick(e) {
-	                        self.onEntryClick(e, node);
+	            if (viewMode === "0") {
+	                items.push(React.makeElement(
+	                    "tr",
+	                    { className: "node_" + node.h + " " + (isFolder ? " folder" : "") + (isHighlighted ? " ui-selected" : ""),
+	                        onClick: function onClick(e) {
+	                            self.onEntryClick(e, node);
+	                        },
+	                        onDoubleClick: function onDoubleClick(e) {
+	                            self.onEntryDoubleClick(e, node);
+	                        },
+	                        key: node.h
 	                    },
-	                    onDoubleClick: function onDoubleClick(e) {
-	                        self.onEntryDoubleClick(e, node);
-	                    },
-	                    key: node.h
-	                },
-	                React.makeElement(
-	                    "td",
-	                    null,
-	                    React.makeElement("span", { className: "grid-status-icon" + (node.fav ? " star" : "") })
-	                ),
-	                React.makeElement(
-	                    "td",
-	                    null,
-	                    icon,
 	                    React.makeElement(
-	                        "span",
-	                        { className: "tranfer-filetype-txt" },
+	                        "td",
+	                        null,
+	                        React.makeElement("span", { className: "grid-status-icon" + (node.fav ? " star" : "") })
+	                    ),
+	                    React.makeElement(
+	                        "td",
+	                        null,
+	                        icon,
+	                        React.makeElement(
+	                            "span",
+	                            { className: "tranfer-filetype-txt" },
+	                            node.name
+	                        )
+	                    ),
+	                    React.makeElement(
+	                        "td",
+	                        null,
+	                        !isFolder ? bytesToSize(node.s) : ""
+	                    ),
+	                    React.makeElement(
+	                        "td",
+	                        null,
+	                        time2date(node.ts)
+	                    )
+	                ));
+	            } else {
+	                var playtime = MediaAttribute(node).data.playtime;
+	                if (playtime) {
+	                    playtime = secondsToTimeShort(playtime);
+	                }
+	                var share = M.getNodeShare(node);
+	                var colorLabelClasses = "";
+	                if (node.lbl) {
+	                    var colourLabel = M.getColourClassFromId(node.lbl);
+	                    colorLabelClasses += ' colour-label';
+	                    colorLabelClasses += ' ' + colourLabel;
+	                }
+
+	                items.push(React.makeElement(
+	                    "div",
+	                    { className: "data-block-view node_" + node.h + " " + (isFolder ? " folder" : " file") + (isHighlighted ? " ui-selected" : "") + (share ? " linked" : "") + colorLabelClasses,
+	                        onClick: function onClick(e) {
+	                            self.onEntryClick(e, node);
+	                        },
+	                        onDoubleClick: function onDoubleClick(e) {
+	                            self.onEntryDoubleClick(e, node);
+	                        },
+	                        id: "chat_" + node.h,
+	                        key: "block_" + node.h
+	                    },
+	                    React.makeElement(
+	                        "div",
+	                        { className: (src ? "data-block-bg thumb" : "data-block-bg") + (is_video(node) ? " video" : "") },
+	                        React.makeElement(
+	                            "div",
+	                            { className: "data-block-indicators" },
+	                            React.makeElement("div", { className: "file-status-icon indicator" + (node.fav ? " star" : "") }),
+	                            React.makeElement("div", { className: "data-item-icon indicator" })
+	                        ),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "block-view-file-type " + (isFolder ? " folder " : " file " + fileIcon(node)) },
+	                            image
+	                        ),
+	                        is_video(node) ? React.makeElement(
+	                            "div",
+	                            { className: "video-thumb-details" },
+	                            React.makeElement("i", { className: "small-icon small-play-icon" }),
+	                            React.makeElement(
+	                                "span",
+	                                null,
+	                                playtime ? playtime : "00:00"
+	                            )
+	                        ) : null
+	                    ),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "file-block-title" },
 	                        node.name
 	                    )
-	                ),
-	                React.makeElement(
-	                    "td",
-	                    null,
-	                    !isFolder ? bytesToSize(node.s) : ""
-	                ),
-	                React.makeElement(
-	                    "td",
-	                    null,
-	                    time2date(node.ts)
-	                )
-	            ));
+	                ));
+	            }
 	        });
+	        if (imagesThatRequireLoading.length > 0) {
+	            fm_thumbnails('standalone', imagesThatRequireLoading);
+	        }
+
 	        if (items.length > 0) {
-	            return React.makeElement(
-	                utils.JScrollPane,
-	                { className: "fm-dialog-grid-scroll",
-	                    selected: this.state.selected,
-	                    highlighted: this.state.highlighted,
-	                    entries: this.props.entries,
-	                    ref: function ref(jsp) {
-	                        self.jsp = jsp;
-	                    }
-	                },
-	                React.makeElement(
-	                    "table",
-	                    { className: "grid-table fm-dialog-table" },
+	            if (viewMode === "0") {
+	                return React.makeElement(
+	                    utils.JScrollPane,
+	                    { className: "fm-dialog-scroll grid",
+	                        selected: this.state.selected,
+	                        highlighted: this.state.highlighted,
+	                        entries: this.props.entries,
+	                        ref: function ref(jsp) {
+	                            self.jsp = jsp;
+	                        }
+	                    },
 	                    React.makeElement(
-	                        "tbody",
-	                        null,
-	                        items
+	                        "table",
+	                        { className: "grid-table fm-dialog-table" },
+	                        React.makeElement(
+	                            "tbody",
+	                            null,
+	                            items
+	                        )
 	                    )
-	                )
-	            );
+	                );
+	            } else {
+	                return React.makeElement(
+	                    utils.JScrollPane,
+	                    { className: "fm-dialog-scroll blocks",
+	                        selected: this.state.selected,
+	                        highlighted: this.state.highlighted,
+	                        entries: this.props.entries,
+	                        ref: function ref(jsp) {
+	                            self.jsp = jsp;
+	                        }
+	                    },
+	                    React.makeElement(
+	                        "div",
+	                        { className: "content" },
+	                        items,
+	                        React.makeElement("div", { className: "clear" })
+	                    )
+	                );
+	            }
 	        } else if (self.props.isLoading) {
 	            return React.makeElement(
 	                "div",
@@ -8261,10 +8422,19 @@ React.makeElement = React['createElement'];
 	            return React.makeElement(
 	                "div",
 	                { className: "dialog-empty-block dialog-fm folder" },
-	                React.makeElement(
+	                self.props.currentlyViewedEntry === 'shares' ? React.makeElement(
 	                    "div",
 	                    { className: "dialog-empty-pad" },
-	                    React.makeElement("div", { className: "dialog-empty-icon" }),
+	                    React.makeElement("div", { className: "fm-empty-incoming-bg" }),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "dialog-empty-header" },
+	                        l[6871]
+	                    )
+	                ) : React.makeElement(
+	                    "div",
+	                    { className: "dialog-empty-pad" },
+	                    React.makeElement("div", { className: "fm-empty-folder-bg" }),
 	                    React.makeElement(
 	                        "div",
 	                        { className: "dialog-empty-header" },
@@ -8292,7 +8462,9 @@ React.makeElement = React['createElement'];
 	            'sortBy': ['name', 'asc'],
 	            'selected': [],
 	            'highlighted': [],
-	            'currentlyViewedEntry': M.RootID
+	            'currentlyViewedEntry': M.RootID,
+	            'selectedTab': 'clouddrive',
+	            'searchValue': ''
 	        };
 	    },
 	    toggleSortBy: function toggleSortBy(colId) {
@@ -8301,6 +8473,72 @@ React.makeElement = React['createElement'];
 	        } else {
 	            this.setState({ 'sortBy': [colId, "asc"] });
 	        }
+	    },
+	    onViewButtonClick: function onViewButtonClick(e, node) {
+	        var self = this;
+	        var $this = $(e.target);
+
+	        if ($this.hasClass("active")) {
+	            return false;
+	        }
+
+	        if ($this.hasClass("block-view")) {
+	            localStorage.dialogViewMode = "1";
+	        } else {
+	            localStorage.dialogViewMode = "0";
+	        }
+
+	        self.setState({ entries: self.getEntries() });
+
+	        $this.parent().find('.active').removeClass("active");
+	        $this.addClass("active");
+	    },
+	    onSearchIconClick: function onSearchIconClick(e, node) {
+	        var $parentBlock = $(e.target).closest(".fm-header-buttons");
+
+	        if ($parentBlock.hasClass("active-search")) {
+	            $parentBlock.removeClass("active-search");
+	        } else {
+	            $parentBlock.addClass("active-search");
+	            $('input', $parentBlock).focus();
+	        }
+	    },
+	    onTabButtonClick: function onTabButtonClick(e, selectedTab) {
+	        var $this = $(e.target);
+
+	        $this.parent().find('.active').removeClass("active");
+	        $this.addClass("active");
+
+	        var newState = {
+	            'selectedTab': selectedTab,
+	            'searchValue': ''
+	        };
+	        if (selectedTab === 'shares') {
+	            newState['currentlyViewedEntry'] = 'shares';
+	        } else {
+	            newState['currentlyViewedEntry'] = M.RootID;
+	        }
+	        this.setState(newState);
+	        this.onSelected([]);
+	        this.onHighlighted([]);
+	    },
+	    onSearchChange: function onSearchChange(e) {
+	        var searchValue = e.target.value;
+	        var newState = {
+	            'selectedTab': 'search',
+	            'searchValue': searchValue
+	        };
+	        if (searchValue && searchValue.length >= 3) {
+	            newState['currentlyViewedEntry'] = 'search';
+	        } else if (this.state.currentlyViewedEntry === 'search') {
+	            if (!searchValue || searchValue.length < 3) {
+	                newState['currentlyViewedEntry'] = M.RootID;
+	            }
+	        }
+
+	        this.setState(newState);
+	        this.onSelected([]);
+	        this.onHighlighted([]);
 	    },
 	    resizeBreadcrumbs: function resizeBreadcrumbs() {
 	        var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud', this.findDOMNode());
@@ -8331,11 +8569,19 @@ React.makeElement = React['createElement'];
 	    },
 	    componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
 	        if (prevState.currentlyViewedEntry !== this.state.currentlyViewedEntry) {
-	            this.resizeBreadcrumbs();
+	            var self = this;
 
+	            this.resizeBreadcrumbs();
 	            var handle = this.state.currentlyViewedEntry;
+	            if (handle === 'shares') {
+	                self.setState({ 'isLoading': true });
+
+	                dbfetch.geta(Object.keys(M.c.shares || {}), new MegaPromise()).done(function () {
+	                    self.setState({ 'isLoading': false });
+	                    self.setState({ entries: self.getEntries() });
+	                });
+	            }
 	            if (!M.d[handle] || M.d[handle].t && !M.c[handle]) {
-	                var self = this;
 	                self.setState({ 'isLoading': true });
 	                dbfetch.get(handle).always(function () {
 	                    self.setState({ 'isLoading': false });
@@ -8350,9 +8596,21 @@ React.makeElement = React['createElement'];
 	    getEntries: function getEntries() {
 	        var self = this;
 	        var order = self.state.sortBy[1] === "asc" ? 1 : -1;
-	        var entries = Object.keys(M.c[self.state.currentlyViewedEntry] || {}).map(function (h) {
-	            return M.d[h];
-	        });
+	        var entries = [];
+	        if (self.state.currentlyViewedEntry === "search" && self.state.searchValue && self.state.searchValue.length >= 3) {
+	            M.getFilterBy(M.getFilterBySearchFn(self.state.searchValue)).forEach(function (n) {
+
+	                if (!n.h || n.h.length === 11) {
+	                    return;
+	                }
+	                entries.push(n);
+	            });
+	        } else {
+	            Object.keys(M.c[self.state.currentlyViewedEntry] || {}).forEach(function (h) {
+	                M.d[h] && entries.push(M.d[h]);
+	            });
+	        }
+
 	        var sortFunc;
 
 	        if (self.state.sortBy[0] === "name") {
@@ -8368,7 +8626,7 @@ React.makeElement = React['createElement'];
 	        var folders = [];
 
 	        for (var i = entries.length; i--;) {
-	            if (entries[i].t) {
+	            if (entries[i] && entries[i].t) {
 	                folders.unshift(entries[i]);
 	                entries.splice(i, 1);
 	            }
@@ -8405,6 +8663,7 @@ React.makeElement = React['createElement'];
 	        var self = this;
 
 	        var entries = self.state.entries || self.getEntries();
+	        var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
 	        var classes = "add-from-cloud " + self.props.className;
 
@@ -8412,10 +8671,14 @@ React.makeElement = React['createElement'];
 
 	        var breadcrumb = [];
 
-	        var p = M.d[self.state.currentlyViewedEntry];
-	        do {
+	        M.getPath(self.state.currentlyViewedEntry).forEach(function (breadcrumbNodeId, k) {
+
+	            if (M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].h && M.d[breadcrumbNodeId].h.length === 11) {
+	                return;
+	            }
+
 	            var breadcrumbClasses = "";
-	            if (p.h === M.RootID) {
+	            if (breadcrumbNodeId === M.RootID) {
 	                breadcrumbClasses += " cloud-drive";
 
 	                if (self.state.currentlyViewedEntry !== M.RootID) {
@@ -8425,32 +8688,41 @@ React.makeElement = React['createElement'];
 	                breadcrumbClasses += " folder";
 	            }
 
-	            (function (p) {
-	                if (self.state.currentlyViewedEntry !== p.h) {
-	                    breadcrumbClasses += " has-next-button";
-	                }
+	            if (k !== 0) {
+	                breadcrumbClasses += " has-next-button";
+	            }
+	            if (breadcrumbNodeId === "shares") {
+	                breadcrumbClasses += " shared-with-me";
+	            }
+
+	            (function (breadcrumbNodeId) {
 	                breadcrumb.unshift(React.makeElement(
 	                    "a",
-	                    { className: "fm-breadcrumbs contains-directories " + breadcrumbClasses, key: p.h,
+	                    { className: "fm-breadcrumbs contains-directories " + breadcrumbClasses,
+	                        key: breadcrumbNodeId,
 	                        onClick: function onClick(e) {
 	                            e.preventDefault();
 	                            e.stopPropagation();
-	                            self.setState({ 'currentlyViewedEntry': p.h, 'selected': [] });
+	                            self.setState({
+	                                'currentlyViewedEntry': breadcrumbNodeId,
+	                                'selected': [],
+	                                'searchValue': ''
+	                            });
 	                            self.onSelected([]);
 	                            self.onHighlighted([]);
 	                        } },
 	                    React.makeElement(
 	                        "span",
-	                        { className: "right-arrow-bg invisible" },
+	                        { className: "right-arrow-bg" },
 	                        React.makeElement(
 	                            "span",
 	                            null,
-	                            p.h === M.RootID ? __(l[164]) : p.name
+	                            breadcrumbNodeId === M.RootID ? __(l[164]) : breadcrumbNodeId === "shares" ? l[5589] : M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name
 	                        )
 	                    )
 	                ));
-	            })(p);
-	        } while (p = M.d[M.d[p.h].p]);
+	            })(breadcrumbNodeId);
+	        });
 
 	        self.state.highlighted.forEach(function (nodeId) {
 	            if (M.d[nodeId] && M.d[nodeId].t === 1) {
@@ -8481,12 +8753,12 @@ React.makeElement = React['createElement'];
 	                "className": "default-grey-button",
 	                "onClick": function onClick(e) {
 	                    if (self.state.highlighted.length > 0) {
-	                        self.setState({ 'currentlyViewedEntry': self.state.highlighted[0]
-	                        });
+	                        self.setState({ 'currentlyViewedEntry': self.state.highlighted[0] });
 	                        self.onSelected([]);
 	                        self.onHighlighted([]);
 	                        self.browserEntries.setState({
 	                            'selected': [],
+	                            'searchValue': '',
 	                            'highlighted': []
 	                        });
 	                    }
@@ -8506,29 +8778,12 @@ React.makeElement = React['createElement'];
 	            }
 	        });
 
-	        return React.makeElement(
-	            ModalDialogsUI.ModalDialog,
-	            {
-	                title: __(l[8011]),
-	                className: classes,
-	                onClose: function onClose() {
-	                    self.props.onClose(self);
-	                },
-	                popupDidMount: self.onPopupDidMount,
-	                buttons: buttons },
-	            React.makeElement(
-	                "div",
-	                { className: "fm-breadcrumbs-block add-from-cloud" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "breadcrumbs-wrapper" },
-	                    breadcrumb,
-	                    React.makeElement("div", { className: "clear" })
-	                )
-	            ),
-	            React.makeElement(
+	        var gridHeader = [];
+
+	        if (viewMode === "0") {
+	            gridHeader.push(React.makeElement(
 	                "table",
-	                { className: "grid-table-header fm-dialog-table" },
+	                { className: "grid-table-header fm-dialog-table", key: "grid-table-header" },
 	                React.makeElement(
 	                    "tbody",
 	                    null,
@@ -8544,7 +8799,84 @@ React.makeElement = React['createElement'];
 	                            onClick: self.toggleSortBy })
 	                    )
 	                )
+	            ));
+	        }
+
+	        return React.makeElement(
+	            ModalDialogsUI.ModalDialog,
+	            {
+	                title: __(l[8011]),
+	                className: classes,
+	                onClose: function onClose() {
+	                    self.props.onClose(self);
+	                },
+	                popupDidMount: self.onPopupDidMount,
+	                buttons: buttons },
+	            React.makeElement(
+	                "div",
+	                { className: "fm-dialog-tabs" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "fm-dialog-tab cloud active",
+	                        onClick: function onClick(e) {
+	                            self.onTabButtonClick(e, 'clouddrive');
+	                        } },
+	                    __(l[164])
+	                ),
+	                React.makeElement(
+	                    "div",
+	                    { className: "fm-dialog-tab incoming",
+	                        onClick: function onClick(e) {
+	                            self.onTabButtonClick(e, 'shares');
+	                        } },
+	                    __(l[5542])
+	                ),
+	                React.makeElement("div", { className: "clear" })
 	            ),
+	            React.makeElement(
+	                "div",
+	                { className: "fm-picker-header" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "fm-header-buttons" },
+	                    React.makeElement("a", { className: "fm-files-view-icon block-view" + (viewMode === "1" ? " active" : ""),
+	                        title: "Thumbnail view",
+	                        onClick: function onClick(e) {
+	                            self.onViewButtonClick(e);
+	                        } }),
+	                    React.makeElement("a", { className: "fm-files-view-icon listing-view" + (viewMode === "0" ? " active" : ""),
+	                        title: "List view",
+	                        onClick: function onClick(e) {
+	                            self.onViewButtonClick(e);
+	                        } }),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "fm-files-search" },
+	                        React.makeElement(
+	                            "i",
+	                            { className: "search",
+	                                onClick: function onClick(e) {
+	                                    self.onSearchIconClick(e);
+	                                } },
+	                            ">"
+	                        ),
+	                        React.makeElement("input", { type: "search", placeholder: __(l[102]), value: self.state.searchValue,
+	                            onChange: self.onSearchChange })
+	                    ),
+	                    React.makeElement("div", { className: "clear" })
+	                ),
+	                React.makeElement(
+	                    "div",
+	                    { className: "fm-breadcrumbs-block add-from-cloud" },
+	                    React.makeElement(
+	                        "div",
+	                        { className: "breadcrumbs-wrapper" },
+	                        breadcrumb,
+	                        React.makeElement("div", { className: "clear" })
+	                    )
+	                )
+	            ),
+	            gridHeader,
 	            React.makeElement(BrowserEntries, {
 	                isLoading: self.state.isLoading,
 	                currentlyViewedEntry: self.state.currentlyViewedEntry,
@@ -8552,7 +8884,10 @@ React.makeElement = React['createElement'];
 	                onExpand: function onExpand(node) {
 	                    self.onSelected([]);
 	                    self.onHighlighted([]);
-	                    self.setState({ 'currentlyViewedEntry': node.h });
+	                    self.setState({
+	                        'currentlyViewedEntry': node.h,
+	                        'searchValue': ''
+	                    });
 	                },
 	                folderSelectNotAllowed: self.props.folderSelectNotAllowed,
 	                onSelected: self.onSelected,
@@ -13600,27 +13935,43 @@ React.makeElement = React['createElement'];
 	    ids.forEach(function (nodeId) {
 	        var proxyPromise = new MegaPromise();
 
-	        self._sendNodes([nodeId], users).done(function () {
-	            var nodesMeta = [];
-	            var node = M.d[nodeId];
-	            nodesMeta.push({
-	                'h': node.h,
-	                'k': node.k,
-	                't': node.t,
-	                's': node.s,
-	                'name': node.name,
-	                'hash': node.hash,
-	                'fa': node.fa,
-	                'ts': node.ts
+	        if (M.d[nodeId] && M.d[nodeId].u !== u_handle) {
+
+	            self.megaChat.getMyChatFilesFolder().done(function (myChatFilesFolderHandle) {
+	                M.copyNodes([nodeId], myChatFilesFolderHandle, false, new MegaPromise()).done(function (copyNodesResponse) {
+	                    if (copyNodesResponse && copyNodesResponse[0]) {
+	                        proxyPromise.linkDoneAndFailTo(self.attachNodes([copyNodesResponse[0]]));
+	                    } else {
+	                        proxyPromise.reject();
+	                    }
+	                }).fail(function (err) {
+	                    proxyPromise.reject(err);
+	                });
+	            }).fail(function (err) {
+	                proxyPromise.reject(err);
 	            });
+	        } else {
+	            self._sendNodes([nodeId], users).done(function () {
+	                var nodesMeta = [];
+	                var node = M.d[nodeId];
+	                nodesMeta.push({
+	                    'h': node.h,
+	                    'k': node.k,
+	                    't': node.t,
+	                    's': node.s,
+	                    'name': node.name,
+	                    'hash': node.hash,
+	                    'fa': node.fa,
+	                    'ts': node.ts
+	                });
 
-	            self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT + JSON.stringify(nodesMeta));
+	                self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT + JSON.stringify(nodesMeta));
 
-	            proxyPromise.resolve([nodeId]);
-	        }).fail(function (r) {
-	            proxyPromise.reject(r);
-	        });
-
+	                proxyPromise.resolve([nodeId]);
+	            }).fail(function (r) {
+	                proxyPromise.reject(r);
+	            });
+	        }
 	        waitingPromises.push(proxyPromise);
 	    });
 

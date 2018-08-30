@@ -1159,7 +1159,6 @@ function secToDuration(s, sep) {
     }
 
     for (var i = 0; i < dur.length; i++) {
-        var unit;
         var v = dur[i];
         if (v === "0") {
             if (durStr.length !== 0 && i !== 0) {
@@ -1170,20 +1169,24 @@ function secToDuration(s, sep) {
             }
         }
 
+        var transString = false;
         if (i === 0) {
-            unit = v !== 1 ? "hours" : "hour";
+            // hour
+            transString = v !== "1" ? l[19049].replace("%d", v) : l[19048];
         }
         else if (i === 1) {
-            unit = v !== 1 ? "minutes" : "minute";
+            // minute
+            transString = v !== "1" ? l[5837].replace("[X]", v) : l[5838];
         }
         else if (i === 2) {
-            unit = v !== 1 ? "seconds" : "second";
+            // second
+            transString = v !== "1" ? l[19046].replace("%d", v) : l[19047];
         }
         else {
             throw new Error("this should never happen.");
         }
 
-        durStr += v + " " + unit + sep;
+        durStr += transString + sep;
     }
 
     return durStr.replace(secToDuration.regExp[sep], "");

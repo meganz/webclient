@@ -453,6 +453,8 @@ mBroadcaster.once('startMega', function populate_l() {
     l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
     l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/blog_8">').replace('[/A2]', '</a>');
+    l[19310] = l[19310].replace('[A]', '<a href="https://mega.nz/blog_6" target="_blank">').replace('[/A]', '</a>');
+
 
     l[8644] = l[8644].replace('[S]', '<span class="green">').replace('[/S]', '</span>');
     l[8651] = l[8651].replace('%1', '<span class="header-pro-plan"></span>');
@@ -550,8 +552,9 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[/A]', '</a>')
         .replace('[B]', '<a href="https://github.com/meganz/MEGAcmd/blob/master/README.md" target="_blank" class="red">')
         .replace('[/B]', '</a>');
-	l[16614] = escapeHTML(l[16614])
-        .replace('[A]', '<a href="https://www.mozilla.org/thunderbird" target="_blank">')
+    l[16609] = escapeHTML(l[16609]).replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[16614] = escapeHTML(l[16614])
+        .replace('[A]', '<a href="https://thunderbird.net/" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');
 
     l[12439] = l[12439].replace('[A1]', '').replace('[/A1]', '').replace('[A2]', '').replace('[/A2]', '');

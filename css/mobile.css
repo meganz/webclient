@@ -57,6 +57,7 @@ html.overlayed {
     overflow: hidden;
     position: fixed;
 }
+
 /* Prevent selection and highlighting */
 body * {
     -webkit-touch-callout: none;
@@ -123,7 +124,7 @@ ul, li {
 .mobile.main-block.overlay {
     position: absolute;
     z-index: 100;
-    background-color: rgba(255, 255, 255, 0.92);
+    background-color: rgba(255, 255, 255, 0.96);
     left: 0;
     top: 0;
 }
@@ -303,6 +304,9 @@ ul, li {
     margin: 0 auto;
     position: relative;
 }
+.create-new-folder-overlay .filetype-img {
+    display: block;
+}
 .mobile.filename, .mobile.contactname {
     font-size: 15px;
     line-height: 1.5;
@@ -413,6 +417,10 @@ ul, li {
     height: 44px;
     margin-top: 0px;
     line-height: 42px;
+}
+.mobile.fm-dialog-container .mobile.inline-buttons .mobile.red-button  {
+    height: 36px;
+    line-height: 35px;
 }
 .mobile.inline-buttons .mobile.red-button.first  {
     float: right;
@@ -640,7 +648,7 @@ ul, li {
     overflow: hidden;
 }
 .mobile.red-button, .mobile.download-progress, .mobile.upload-progress {
-    height: 44px;
+    height: 45px;
     line-height: 43px;
 }
 .mobile.download-progress.complete, .mobile.upload-progress.complete {
@@ -1765,22 +1773,41 @@ div.checkboxOn, div.checkboxOff {
 }
 /* General Terms, Privacy Policy and Takedown guidance pages */
 .data-protection, .terms-general, .privacy-policy, .takedown-guidance, .contact-us {
-    padding: 50px 25px 50px 25px;
+    padding: 50px 20px 50px 20px;
 }
 .contact-us .contact-new-column {
-    margin-bottom: 20px;
+    margin-bottom: 48px;
+    margin-top: 48px;
 }
 .data-protection h1, .terms-of-service h1, .terms-general h1, .privacy-policy h1, .takedown-guidance h1, .contact-us h1 {
-    font-family: 'source_sans_prolight', sans-serif;
+    font-family: 'montserrat_semibold', sans-serif;
     font-size: 36px;
-    font-weight: 300;
-    color: #222;
+    color: #262F3B;
 }
 .data-protection h2, .terms-of-service h2, .terms-general h2, .privacy-policy h2, .takedown-guidance h2, .contact-us .contact-new-title {
-    font-family: 'source_sans_prolight', sans-serif;
-    font-size: 24px;
+    font-family: 'source_sans_prosemibold', sans-serif;
+    font-size: 20px;
     font-weight: 300;
-    color: #999;
+    color: #262F3B;
+}
+.contact-us h1 {
+    background-image: none !important;
+    background-repeat: no-repeat;
+    line-height: 1.5;
+    margin-left: 51px;
+    margin-top: 40px;
+}
+.contact-us h1::before {
+    content: '';
+    background-image: url(../images/mega/contact-us-sprite@2x.png);;
+    background-size: 40px auto;
+    background-position: 0 0;
+    height: 40px;
+    width: 40px;
+    position: absolute;
+    display: inline-block;
+    margin-left: -56px;
+    margin-top: 7px;
 }
 .data-protection .number, .terms-of-service .number, .terms-general .number, .privacy-policy .number, .takedown-guidance .number {
     display: block;
@@ -1790,7 +1817,7 @@ div.checkboxOn, div.checkboxOff {
 }
 .data-protection .text,  .terms-of-service .text, .terms-general .text, .privacy-policy .text, .takedown-guidance .text, .takedown-guidance p, .contact-us .contact-new-txt, .contact-us p {
     font-size: 15px;
-    line-height: 1.73;
+    line-height: 1.6;
     color: #667;
 }
 .data-protection .text b {
@@ -1859,14 +1886,89 @@ div.checkboxOn, div.checkboxOff {
     background-image: none;
 }
 .contact-us .contact-new-title, .contact-us .contact-new-button, .contact-us a.contact-new-button {
+    background-repeat:no-repeat;
     background-image: none;
 }
-/* ToDo: Remove grey styling when Help Center is working on mobile */
-.contact-us .help-center-link {
-    color: #667;
+.contact-us .contact-new-title {
+    line-height: 28px;
+    margin-bottom: 16px;
+    display: inline-block;
+    margin-left: 40px;
+}
+.contact-us .contact-new-title::before {
+    content: '';
+    background-image: url(../images/mega/contact-us-sprite@2x.png);;
+    background-size: 80px auto;
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    position: absolute;
+    margin-left: -40px;
+}
+.contact-new-title.legal::before {
+    background-position: -4px -312px;
+}
+.contact-new-title.copyright::before {
+    background-position: -4px -119px;
+}
+.contact-new-title.improvements::before {
+    background-position: -4px -280px;
+}
+.contact-new-title.report-a-bug::before {
+    background-position: -4px -216px;
+}
+.contact-new-title.media::before {
+    background-position: -4px -344px;
+}
+.contact-new-title.get-support::before {
+    background-position: -4px -87px;
+}
+.contact-new-title.report-objectionable-material::before {
+    background-position: -4px -151px;
+}
+.contact-new-title.privacy::before {
+    background-position: -4px -184px;
+}
+.contact-new-title.security::before {
+    background-position: -4px -248px;
+}
+.contact-new-title.suggest-improvements::before {
+    background-position: -4px -280px;
+}
+.contact-new-title.other-ip-issues::before {
+    background-position: -4px -376px;
+}
+.contact-new-title.corporate-office::before {
+    background-position: -4px -409px;
+}
+.contact-new-title.corporate-mail::before {
+    background-position: -4px -441px;
+}
+.contact-new-title.other-group-companies::before {
+    background-position: -4px -473px;
+}
+.contact-new-title.eu-representative::before, .contact-new-title.gdpr::before {
+    background-position: -4px -505px;
 }
 .terms-of-service a, .terms-general a, .privacy-policy a, .takedown-guidance a, .contact-us a {
     color: #eb4444;
+}
+.contact-us a.contact-new-button {
+    background: #F30C14;
+    border: 1px solid #D90007;
+    border-radius: 3px;
+    padding: 0px 20px 0 20px;
+    line-height: 32px;
+    height: 32px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'source_sans_prosemibold';
+    margin: 16px 0 0 0;
+    color: #fff;
+    display: inline-block;
+}
+.contact-new-txt b {
+    font-family: 'source_sans_prosemibold';
 }
 .terms-of-service .list, .terms-general .list, .privacy-policy .list, .takedown-guidance .list {
     margin-left: 18px;
@@ -4062,16 +4164,19 @@ div.checkboxOn, div.checkboxOff {
 .mobile.my-account-page .main-avatar .avatar span {
     color: #fff;
 }
-#mobile-ui-contact-card .avatar-wrapper span {
-    line-height: 96px;
-    font-size: 54px;
+#mobile-ui-contact-card .avatar-wrapper {
+    line-height: 92px;
+    font-size: 48px;
     color: #fff;
-    font-family: 'source_sans_prolight';
+    margin-left: 3px;
+    margin-top: 1px;
 }
 #mobile-ui-contact-card .main-avatar {
     position: relative;
     display: block;
     width: 100px;
+    height: 100px;
+    overflow: auto;
     margin: 0 auto 20px;
 }
 #mobile-ui-contact-card .contact-verification {
@@ -4508,6 +4613,8 @@ textarea.mobile.support-text-field {
 
 .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
     border: 1px solid #eee;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
     height: 48px;
     cursor: pointer;
@@ -4517,6 +4624,10 @@ textarea.mobile.support-text-field {
     margin-left: 12px;
     border-radius: 4px;
     margin-bottom: 12px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    -moz-background-clip: padding;     /* Firefox 3.6 */
+    -webkit-background-clip: padding;  /* Safari 4? Chrome 6? */
+    background-clip: padding-box;
 }
 
 .mobile.grid-view .mobile.fm-item.file {
@@ -4600,7 +4711,7 @@ textarea.mobile.support-text-field {
     height: 100%;
     margin: 0;
     width: 36px;
-    height: 36px;
+    height: 40px;
 }
 .mobile.grid-view .mobile.fm-item.file:last-of-type {
     margin-bottom: 32px;
@@ -4622,7 +4733,7 @@ textarea.mobile.support-text-field {
 }
 .mobile.grid-view .mobile.fm-item-name {
     font-size: 14px;
-    line-height: 36px;
+    line-height: 40px;
     padding-left: 10px;
     padding-right: 5px;
 }
@@ -4733,6 +4844,9 @@ textarea.mobile.support-text-field {
 }
 .mobile.recover-account-body-text a {
     color: #eb4444;
+}
+.mobile .recover-account-body-text br {
+    margin-bottom: 12px;
 }
 .mobile.recovery-key-page .mobile.recovery-key-string-block{
     margin: 16px 24px 4px;
@@ -5822,7 +5936,7 @@ textarea.mobile.support-text-field {
     color: white;
 }
 .mobile.file-download-info, .mobile.file-upload-info {
-    margin: 0 auto 8px;
+    margin: 0 auto 12px;
     line-height: initial;
 }
 .mobile.video.video-theatre-mode .viewer-bottom-bl {
@@ -5998,6 +6112,9 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .checkbox-block h3.main-italic-header, .mobile .improved-recovery-steps .app-instruction-block h3.main-italic-header {
     padding: 0 0;
 }
+.mobile .improved-recovery-steps h3.main-italic-header {
+    color: #00BFA5;
+}
 .mobile .improved-recovery-steps h2 {
     top: 0;
     display:block;
@@ -6009,10 +6126,10 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps h1 {
     font-family: 'source_sans_proregular';
-    font-size: 26px;
+    font-size: 20px;
     color: #343A40;
     letter-spacing: 0.2px;
-    line-height: 36px;
+    line-height: 30px;
     -webkit-margin-before: 0.4em;
     -webkit-margin-after: 0.5em;
     -webkit-margin-start: 0px;
@@ -6020,10 +6137,13 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile.fm-dialog.park-account-dialog .fm-dialog-title {
     font-family: 'source_sans_prosemibold';
-    font-size: 17px;
+    font-size: 20px;
     color: #333;
     letter-spacing: 0px;
     line-height: 1.5;
+}
+.mobile.fm-dialog.park-account-dialog .improved-recovery-steps h3.main-italic-header {
+    font-size: 13px;
 }
 .mobile .improved-recovery-steps .register-st2-txt-block {
     display: table;
@@ -6050,12 +6170,14 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .content-wrapper p span {
     font-family: 'source_sans_probold';
     color: #F57223;
+    padding-top: 8px;
+    display: block;
 }
 .mobile .improved-recovery-steps p {
     font-size: 14px;
     color: #495057;
     letter-spacing: 0;
-    line-height: 1.7;
+    line-height: 21px;
     padding-bottom: 0;
     margin-bottom: 24px;
 }
@@ -6087,7 +6209,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     font-family: 'source_sans_proregular', Arial;
 }
 .mobile .improved-recovery-steps .recover-button.yes {
-    color: #2AAF5F;
+    color: #00BFA5;
     margin-bottom: 12px;
 }
 .mobile .improved-recovery-steps .recover-button.yes:hover,.mobile  .recover-button.yes.active {
@@ -6293,21 +6415,21 @@ body.key .reg-st3-membership-bl.free.hidden {
     border-radius: 2px;
     margin-bottom: 8px;
     background-image: url(../images/mega/top-login-sprite_v11.png);
-    background-position: 9px -65px;
+    background-position: 12px -65px;
     background-repeat: no-repeat;
-    padding: 0 10px 0 35px;
+    padding: 0 10px 0 43px;
     position: relative;
     background-color: #F8F9FA;
-    border: 1px solid #EBEEF0;
+    border: 1px solid #eee;
     max-width: 420px;
-    min-height: 48px;
+    min-height: 46px;
 }
 .mobile .improved-recovery-steps .login-register-input:hover {
-    border: 1px solid #ddd;
+    border: 1px solid #eee;
 }
 .mobile .improved-recovery-steps .login-register-input input {
     color: #444;
-    line-height: 25px;
+    line-height: 28px;
     width: 100%;
     margin-top: 8px;
     font-size: 13px;
@@ -6648,16 +6770,15 @@ body.key .reg-st3-membership-bl.free.hidden {
     margin: 0 2px 0 3px;
 }
 .mobile.fm-dialog.park-account-dialog {
-    width: 100%;
+    width: calc(100% - 24px);
     position: relative;
     border: none;
     left: initial;
     top: initial;
-    border-radius: 0;
+    border-radius: 6px;
     max-width: 460px;
     padding: 24px 20px;
     margin: 0 auto;
-    border: 4px;
 }
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps {
     padding: 0;
@@ -6949,6 +7070,13 @@ body.bottom-pages.mobile .fmholder.no-scroll {
     margin-top: 2px;
     margin-bottom: 0px;
 }
+.mobile .bird .bottom-page.small-txt {
+    display: none;
+}
+
+.contact-directory {
+    display: none;
+}
 
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
@@ -7125,7 +7253,7 @@ body.bottom-pages.mobile .fmholder.no-scroll {
         display: none;
     }
     .mobile.filetype-img {
-        width: 56px;
+        width: 72px;
     }
     .downloading .mobile.filetype-img, .uploading .mobile.filetype-img, .wrong-file .mobile.filetype-img {
         width: 48px;
@@ -7246,7 +7374,7 @@ body.bottom-pages.mobile .fmholder.no-scroll {
         height: 18px;
     }
     .mobile.filetype-img, .downloaidng .mobile.filetype-img, .wrong-file .mobile.filetype-img {
-        width: 48px;
+        width: 64px;
     }
     .wrong-file .mobile.content-row.first, .wrong-file .mobile.content-row.second {
         height: 100%;
@@ -7295,7 +7423,7 @@ body.bottom-pages.mobile .fmholder.no-scroll {
         min-height: initial;
     }
     .mobile .improved-recovery-steps h1 {
-        font-size: 22px;
+        font-size: 20px;
     }
 
 }
@@ -7310,7 +7438,7 @@ body.bottom-pages.mobile .fmholder.no-scroll {
 }
 @media only screen and (orientation:landscape) and (max-width: 570px), only screen and (orientation:portrait) and (max-height: 570px) {
     .mobile.filetype-img, .downloaidng .mobile.filetype-img, .wrong-file .mobile.filetype-img {
-        width: 40px;
+        width: 54px;
     }
     .mobile.filename {
         font-size: 14px;
@@ -7377,6 +7505,31 @@ body.bottom-pages.mobile .fmholder.no-scroll {
     .wrong-file .mobile.white-block {
         margin-top: 32px;
     }
+    .mobile.fm-dialog.park-account-dialog .fm-dialog-title {
+        font-size: 16px;
+    }
+    .mobile.fm-dialog.park-account-dialog .checkbox-container .settings-row label {
+        font-size: 12px;
+    }
+    .mobile.fm-dialog.park-account-dialog .checkbox-block {
+        margin-top: 16px;
+    }
+    .mobile.fm-dialog.park-account-dialog .checkbox-container {
+        padding: 8px 0;
+    }
+    .mobile.fm-dialog.park-account-dialog .improved-recovery-steps {
+        margin: 16px 0;
+    }
+    .mobile.fm-dialog.park-account-dialog .login-register-input input {
+        font-size: 12px;
+    }
+    .mobile.fm-dialog.park-account-dialog .checkbox-container .settings-row label {
+        padding: 6px 12px 6px 0;
+    }
+    .mobile.fm-dialog.park-account-dialog .checkbox-container .settings-row div.checkboxOff, .mobile.fm-dialog.park-account-dialog .checkbox-container .settings-row div.checkboxOn {
+        margin: 8px 14px 16px 14px;
+    }
+
 }
 
 @media only screen and (orientation:landscape) and (max-width: 570px) {
@@ -7507,6 +7660,9 @@ body.bottom-pages.mobile .fmholder.no-scroll {
     .mobile .improved-recovery-steps .content-wrapper {
         min-height: initial;
     }
+    .mobile.grid-view .file .fm-item-img {
+        height: 164px;
+    }
 }
 /* Devices larger than 400px wide in portrait */
 @media only screen and (orientation:landscape)and (min-width: 412px) and (max-width: 415px), only screen and (orientation:portrait) and (min-height: 810px) and (max-height: 824px) {
@@ -7521,6 +7677,9 @@ body.bottom-pages.mobile .fmholder.no-scroll {
     }
     .mobile.video .download.video-block {
         height: 150px;
+    }
+    .mobile.grid-view .file .fm-item-img {
+        height: 132px;
     }
 }
 /*iphone se landscape styles */
@@ -7584,9 +7743,7 @@ body.bottom-pages.mobile .fmholder.no-scroll {
         margin: 40px 24px 40px 24px;
         min-height: initial;
     }
-
 }
-
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
     .mobile.tablet-img {
         background-image: url(../images/mobile/ipad-big@2x.png);

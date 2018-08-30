@@ -1056,6 +1056,10 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     });
 
     self.chatd.rebind('onRoomDisconnected.chatdInt' + chatRoomId, function(e, eventData) {
+        if (self.megaChat.isLoggingOut) {
+            return;
+        }
+
         var foundChatRoom = self._getChatRoomFromEventData(eventData);
 
         if (!foundChatRoom) {

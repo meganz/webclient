@@ -4170,7 +4170,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .files-grid-view.fm .grid-scrolling-table, .files-grid-view.fm .grid-scrolling-table .jspPane, .transfer-scrolling-table, .transfer-scrolling-table .jspPane {
     background-image: url(../images/mega/grid-bg.svg);
 }
-.grid-table td, .grid-table-header {
+.grid-table td, .grid-table-header th {
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -10442,6 +10442,7 @@ table {
     float: none;
 }
 .grid-table-header, .transfer-table-header, .contacts-grid-table {
+    width: 100%;
     background-color: white;
     position: relative;
     font-size: 0;
@@ -11839,6 +11840,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -khtml-opacity: 1;
     opacity: 1;
     margin-left: 0;
+}
+.video-theatre-mode .top-login-warning.active {
+    margin-top: 28px;
 }
 .top-login-warning-arrow {
     background-image: url(../images/mega/top-sprite_v4.png);
@@ -14107,7 +14111,7 @@ ul.cannt-ul li span {
     text-align: center;
 }
 .contact-new-row {
-    border-bottom: 2px solid #fafafa;
+    border-bottom: 1px solid #ccc;
 }
 .main-mid-pad.new-bottom-pages.contact {
     padding: 0 15px;
@@ -14148,19 +14152,52 @@ ul.cannt-ul li span {
     background-repeat: no-repeat;
 }
 .contact-new-title.legal {
-    background-position: -509px 15px;
+    background-position: -4px -312px;
 }
 .contact-new-title.copyright {
-    background-position: 0px -215px;
+    background-position: -4px -119px;
 }
 .contact-new-title.improvements {
-    background-position: -509px -215px;
+    background-position: -4px -280px;
 }
-.contact-new-title.bug {
-    background-position: 0 -444px;
+.contact-new-title.report-a-bug {
+    background-position: -4px -216px;
 }
 .contact-new-title.media {
-    background-position: -509px -444px;
+    background-position: -4px -344px;
+}
+.contact-new-title.get-support {
+    background-position: -4px -87px;
+}
+.contact-new-title.report-objectionable-material {
+    background-position: -4px -151px;
+}
+.contact-new-title.privacy {
+    background-position: -4px -184px;
+}
+.contact-new-title.security {
+    background-position: -4px -248px;
+}
+.contact-new-title.suggest-improvements {
+    background-position: -4px -280px;
+}
+.contact-new-title.other-ip-issues {
+    background-position: -4px -376px;
+}
+.contact-new-title.corporate-office {
+    background-position: -4px -409px;
+}
+.contact-new-title.corporate-mail {
+    background-position: -4px -441px;
+}
+.contact-new-title.other-group-companies {
+    background-position: -4px -473px;
+}
+.contact-new-title.eu-representative {
+    background-position: -4px -505px;
+}
+.contact-new-title.eu-representative, .contact-new-title.gdpr {
+    background-position: -4px -505px;
 }
 .contact-new-txt {
     font-size: 14px;
@@ -14172,6 +14209,7 @@ ul.cannt-ul li span {
 .contact-new-txt a {
     cursor: pointer;
     color: #D92E00;
+    text-decoration: underline;
 }
 .contact-new-button, a.contact-new-button {
     display: block;
@@ -14190,7 +14228,7 @@ ul.cannt-ul li span {
     border-radius: 5px;
 }
 a.contact-new-button:hover {
-    background-color: #D92E00;
+    background-color: #ff3333;
 }
 .contact-new-row.bottom {
     margin-bottom: -2px;
@@ -16415,6 +16453,9 @@ ul.token-input-list-mega {
     z-index: 100;
     display: none;
 }
+.duplicate .duplicated-input-warning {
+    position: relative;
+}
 .error .multiple-input-warning, .duplicate .duplicated-input-warning {
     display: block;
 }
@@ -16568,7 +16609,7 @@ color: #D90007 !important;
 }
 div.token-input-dropdown-mega {
     position: absolute;
-    width: 342px !important;
+    width: 342px;
     background-color: #fff;
     overflow: hidden;
     border: 2px solid rgba(0,0,0,0.1);
@@ -16594,6 +16635,7 @@ div.token-input-dropdown-mega p {
 div.token-input-dropdown-mega ul {
     margin: 0;
     padding: 0;
+    max-height: 274px;
 }
 div.token-input-dropdown-mega ul li {
     background-color: rgb(255, 255, 255, 1);
@@ -17832,7 +17874,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     position: absolute;
     top: 50%;
     width: 100%;
-    margin-top: -82px;
+    margin-top: -122px;
 }
 .dialog-empty-txt {
     font-size: 13px;
@@ -21358,6 +21400,131 @@ body.kr .account.chart.data {
 /* End of common components */
 
 
+/* New Contact Us Page styles */
+.contact-us-revamp .main-mid-pad {
+    width: 1280px;
+}
+.contact-us-revamp .about-top-block .new-bottom-pages {
+    padding: 46px 15px 32px 15px;
+}
+.contact-us-revamp .contact-new-row .main-mid-pad {
+    width: 100%;
+    position: relative;
+    padding: 0 0;
+    overflow: auto;
+}
+.contact-us-revamp .main-mid-pad h1 {
+    font-family: 'montserrat_semibold', 'source_sans_prosemibold', Arial;
+    font-size: 36px;
+    color: #262F3B;
+}
+.contact-us-revamp .about-top-block {
+    background-color: white;
+}
+.contact-us-revamp .contact-new-title {
+    font-family: 'source_sans_probold';
+    font-size: 18px;
+    color: #262F3B;
+    line-height: 28px;
+    padding-left: 0;
+    height: auto;
+    margin-bottom: 16px;
+    background-image: url(../images/mega/contact-us-sprite.png);
+    background-size: 80px auto;
+    display: block;
+    padding-left: 40px;
+    height: 28px
+}
+/* This is a hackpatch to get contact us page out. I will fix this properly so it doesn't rely on language classes soon */
+.fr .contact-us-revamp .contact-new-title.gdpr {
+    margin-bottom: 40px;
+}
+.ru .contact-us-revamp .contact-new-title.suggest-improvements, .ru .contact-us-revamp .contact-new-title.other-ip-issues {
+    margin-bottom: 40px;
+}
+.pl .contact-us-revamp .contact-new-title.gdpr, .pl .contact-us-revamp .contact-new-title.other-ip-issues {
+    margin-bottom: 40px;
+}
+.contact-us-revamp .main-mid-pad h1 {
+    background-image: url(../images/mega/contact-us-sprite.png);
+    background-size: 80px auto;
+    background-repeat: no-repeat;
+    padding-left: 96px;
+    line-height: 72px;
+    padding-top: 0px;
+    margin-top: 36px;
+    background-position: 0 -6px;
+}
+.contact-us-revamp .contact-directory .contact-new-title {
+    background-image: none;
+    padding-left: 0px;
+}
+.contact-us-revamp .contact-new-column {
+    padding: 40px 30px 48px 30px;
+    border-left: none;
+    border-right: none;
+}
+.contact-us-revamp .contact-new-column.two-column {
+    width: 100%;
+}
+.contact-us-revamp .directory-list-wrapper {
+    margin-top: 28px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.contact-us-revamp .contact-new-button, a.contact-new-button {
+    background: #F30C14;
+    border: 1px solid #D90007;
+    border-radius: 3px;
+    padding: 0px 20px 0 20px;
+    line-height: 32px;
+    height: 32px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'source_sans_prosemibold';
+    margin: 28px 0 0 0;
+}
+.contact-us-revamp .contact-new-txt {
+    font-size: 15px;
+    color: #676D75;
+    min-height: 100px;
+}
+.contact-us-revamp .contact-body-wrapper {
+    width: 1280px;
+    margin: 0 auto;
+    overflow: auto;
+}
+.contact-us-revamp .contact-directory {
+    display: inline-block;
+    width: 25%;
+}
+.contact-us-revamp .contact-right-body {
+    width: 75%;
+    float: right;
+}
+.contact-us-revamp .directory-list-wrapper ul li {
+    font-size: 15px;
+    line-height: 24px;
+    color: #262F3B;
+    cursor: pointer;
+    margin-bottom: 12px;
+    list-style-position: outside;
+}
+.contact-us-revamp .directory-list-wrapper ul li:hover {
+    text-decoration: underline;
+}
+.contact-us-revamp .directory-list-wrapper ul {
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    -webkit-padding-start: 20px;
+}
+.contact-us-revamp .contact-new-row.bottom {
+    margin-bottom: 96px;
+    border-bottom: 0px solid #fff;
+}
+
 /* Small font-size settings option */
 .fontsize1 .nw-fm-tree-folder, .fontsize1 .nw-conversations-name, .fontsize1 .fm-tree-panel .nw-contact-name, .fontsize1 .nw-conversations-header, .fontsize1 .nw-tree-panel-header, .fontsize1 .fm-picker-dialog-panel-header, .fontsize1 .fm-picker-dialog-panel-header, .fontsize1 .share-dialog-panel-header, .fontsize1 .top-user-status-item, .fontsize1 .sorting-menu-item, .fontsize1 .permissions-menu-item, .fontsize1 .dropdown.body.submenu, .fontsize1 .tranfer-filetype-txt, .fontsize1 .fm-browsers-txt, .fontsize1 .fm-flags-txt, .fontsize1 .fm-member-icon-txt, .fontsize1 .transfer-table td, .fontsize1 .grid-table td, .fontsize1 .grid-share-table td, .fontsize1 .contacts-grid-table td, .fontsize1 .file-block-title, .fontsize1 .contact-block-view-name, .fontsize1 .shared-folder-info-block, .fontsize1 .fm-chat-user, .fontsize1 .fm-chat-user-status, .fontsize1 .fm-chat-user-email, .fontsize1 .shared-folder-access, .fontsize1 .contacts-interation, .fontsize1 .transfer-table th, .fontsize1 .transfer-table td, .fontsize1 .transfer-table-header th, .fontsize1 .grid-table th, .fontsize1 .grid-table td, .fontsize1 .grid-share-table th, .fontsize1 .grid-share-table td, .fontsize1 .grid-table-header th, .fontsize1 .contacts-grid-header th, .fontsize1 .contacts-grid-table th, .fontsize1 .contacts-grid-table td, .fontsize1 .membership-status, .fontsize1 .new-notification-txt, .fontsize1 .dark-tooltip, .fontsize1 .new-notification-info {
     font-size: 12px;
@@ -21439,6 +21606,16 @@ body.key.vi .reg-st3-mid-txt, body.key.vi .reg-st3-mid-txt {
     width: 100%;
     left: 0;
 }
+.contact-us-revamp .contact-directory {
+    display: none;
+}
+.contact-us-revamp .contact-body-wrapper {
+    width: 1024px;
+}
+.contact-us-revamp .contact-right-body {
+    float: initial;
+    width: 100%;
+}
 .transfer-table td:nth-child(6), .transfer-table-header th:nth-child(6) {
     width: 162px;
 }
@@ -21449,7 +21626,6 @@ body.key.vi .reg-st3-mid-txt, body.key.vi .reg-st3-mid-txt {
     width: calc(100% - 746px);
 }
 }
-
 
 @media only screen and (max-height: 730px) {
 .currentLink img {

@@ -848,6 +848,7 @@ function avatarDialog(close) {
 
 /**
  * Really simple shortcut logic for select all, copy, paste, delete
+ * Note: there is another key binding on initUIKeyEvents() for filemanager.
  *
  * @constructor
  */
@@ -856,14 +857,17 @@ function FMShortcuts() {
     var current_operation = null;
 
     $(window).rebind('keydown.fmshortcuts', function(e) {
-
+        var isContactRootOrShareRoot = false;
         if (
             !is_fm() ||
             !selectionManager ||
-            window.location.toString().indexOf('fm/account') !== -1 ||
-            window.location.toString().indexOf('fm/transfers') !== -1
+            M.currentrootid === 'chat' || // prevent shortcut for chat
+            M.currentrootid === undefined // prevent shortcut for file transfer, dashboard, settings
         ) {
             return true;
+        }
+        else if (M.currentdirid === 'contacts' || M.currentdirid === 'shares') {
+            isContactRootOrShareRoot = true;
         }
 
         e = e || window.event;
@@ -877,7 +881,7 @@ function FMShortcuts() {
         var charCode = e.which || e.keyCode; // ff
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
-        if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
+        if (charTyped === "a" && (e.ctrlKey || e.metaKey)) {
             if (typeof selectionManager != 'undefined' && selectionManager) {
                 if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                     return;
@@ -885,12 +889,14 @@ function FMShortcuts() {
                 selectionManager.select_all();
             }
             return false; // stop prop.
-        } else if (
-            (charTyped == "c" || charTyped == "x") &&
-            (e.ctrlKey || e.metaKey)
+        }
+        else if (
+            (charTyped === "c" || charTyped === "x") &&
+            (e.ctrlKey || e.metaKey) &&
+            !isContactRootOrShareRoot
         ) {
             var items = selectionManager.get_selected();
-            if (items.length == 0) {
+            if (items.length === 0 || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                 return; // dont do anything.
             }
 
@@ -900,8 +906,14 @@ function FMShortcuts() {
             };
 
             return false; // stop prop.
-        } else if (charTyped == "v" && (e.ctrlKey || e.metaKey)) {
-            if (!current_operation) {
+        }
+        else if (
+            charTyped === "v" &&
+            (e.ctrlKey || e.metaKey) &&
+            !isContactRootOrShareRoot
+        ) {
+            if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1
+                || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                 return false; // stop prop.
             }
 
@@ -918,7 +930,11 @@ function FMShortcuts() {
             }
 
             return false; // stop prop.
-        } else if (charCode == 8) {
+        }
+        else if (
+            charCode === 8 &&
+            !isContactRootOrShareRoot
+        ) {
             var items = selectionManager.get_selected();
             if (items.length == 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.

@@ -187,7 +187,7 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
     }
 
     return function(node) {
-        return (node.name && node.name.toLowerCase().indexOf(str) !== -1);
+        return (node.name && node.name.toLowerCase().indexOf(str) !== -1 && node.p !== 'contacts');
     };
 };
 

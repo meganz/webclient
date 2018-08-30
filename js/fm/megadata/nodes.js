@@ -471,6 +471,27 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         return promise;
     }
 
+    if (del && !tree.safeToDel) {
+        tree.safeToDel = true;
+
+        var mdList = mega.megadrop.isDropExist(cn);
+        if (mdList.length) {
+            loadingDialog.phide();
+            mega.megadrop.showRemoveWarning(mdList)
+                .done(function() {
+                    // No MEGAdrop folders found, proceed with copy+del
+                    M.copyNodes(cn, t, del, promise, tree);
+                })
+                .fail(function() {
+                    // The user didn't want to disable MEGAdrop folders
+                    if (promise) {
+                        promise.reject(EBLOCKED);
+                    }
+                });
+            return promise;
+        }
+    }
+
     if (tree.opSize) {
         loadingDialog.phide();
 
@@ -1052,7 +1073,9 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
                 }
                 promises.push(M.moveNodes(move, target));
             }
-
+            if (window.selectionManager){
+                selectionManager.clear_selection();
+            }
             // TODO: we need an allDone() variant that does signal rejections back!...
             promise.linkDoneAndFailTo(MegaPromise.allDone(promises).always(console.groupEnd.bind(console)));
         });

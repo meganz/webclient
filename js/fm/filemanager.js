@@ -428,7 +428,6 @@ FileManager.prototype.initFileManagerUI = function() {
     };
     InitFileDrag();
     M.createFolderUI();
-    M.buildRootSubMenu();
     M.treeSearchUI();
     M.treeFilterUI();
     M.treeSortUI();
@@ -487,6 +486,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
+        $('.grid-url-arrow').removeClass('active');
         $('.nw-sorting-menu').addClass('hidden');
         $('.colour-sorting-menu').addClass('hidden');
         $('.fm-start-chat-dropdown').addClass('hidden').removeClass('active');
@@ -963,23 +963,19 @@ FileManager.prototype.initContextUI = function() {
         }
 
         currentId = $this.attr('id');
-        var clearedId;
-        if (currentId) {
-            clearedId = currentId.replace('fi_', '');
-            M.buildSubMenu(clearedId);
+        if (currentId || $this.hasClass('move-item')) {
+            M.buildSubMenu(String(currentId).replace('fi_', ''));
         }
 
         // Show necessary submenu
         if (!$this.hasClass('opened') && $this.hasClass('contains-submenu')) {
-            if (!clearedId || $('#csb_' + clearedId + ' > .dropdown-item').length > 0) {
-                menuPos = M.reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
+            menuPos = M.reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
 
-                $this.next('.submenu')
-                    .css({'top': menuPos.top})
-                    .addClass('active');
+            $this.next('.submenu')
+                .css({'top': menuPos.top})
+                .addClass('active');
 
-                $this.addClass('opened');
-            }
+            $this.addClass('opened');
         }
     });
 
@@ -1048,7 +1044,9 @@ FileManager.prototype.initContextUI = function() {
 
                 msgDialog('confirmation', l[1003], fldName, false, function(e) {
                     if (e) {
-                        mega.megadrop.pufRemove(mdList).always(showDialog);
+                        mega.megadrop.pufRemove(mdList);
+                        // set showDialog as callback for after delete puf.
+                        mega.megadrop.pufCallbacks[selNodes[0]] = {del:showDialog};
                     }
                 });
             }
@@ -1139,19 +1137,8 @@ FileManager.prototype.initContextUI = function() {
 
         var mdList = mega.megadrop.isDropExist($.selected);
         if (mdList.length) {
-            var fldName = mdList.length > 1
-                ? l[17626]
-                : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
-            msgDialog(
-                'confirmation',
-                l[1003],
-                fldName,
-                false, function(e) {
-                if (e) {
-                    mega.megadrop.pufRemove(mdList).always(function() {
-                        M.safeShowDialog('share', showShareDlg);
-                    });
-                }
+            mega.megadrop.showRemoveWarning(mdList).done(function() {
+                M.safeShowDialog('share', showShareDlg);
             });
         }
         else {

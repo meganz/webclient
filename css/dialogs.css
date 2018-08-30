@@ -278,7 +278,7 @@
     border-bottom: 1px solid rgba(0,0,0,0.1);
     padding: 26px 0 0 0;
 }
-/*.fm-dialog-tab {
+.add-from-cloud .fm-dialog-tab {
     cursor: pointer;
     font-size: 16px;
     line-height: 20px;
@@ -291,8 +291,8 @@
     box-sizing: border-box;
     height: 32px;
     margin-bottom: -1px;
-}*/
-.fm-dialog-tab.active {
+}
+.add-from-cloud .fm-dialog-tab.active {
     border-color: #D90007;
     color: #333333;
 }

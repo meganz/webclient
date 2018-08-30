@@ -7963,6 +7963,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ModalDialogsUI = __webpack_require__(13);
+	var Tooltips = __webpack_require__(14);
 
 	var BrowserCol = React.createClass({
 	    displayName: "BrowserCol",
@@ -8437,6 +8438,8 @@ React.makeElement = React['createElement'];
 
 	            var isFolder = node.t;
 	            var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
+
+	            var tooltipElement = null;
 
 	            var icon = React.makeElement(
 	                "span",

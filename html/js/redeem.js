@@ -28,7 +28,7 @@ var redeem = {
         msgDialog('confirmation', l[458], rdmConfirmMsg, '', function(e) {
             if (e) {
                 // Init functions
-            redeem.addVoucher();
+                redeem.addVoucher();
             }
             else {
                 delete localStorage.voucher;

@@ -607,6 +607,7 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[A]', '<a href="https://github.com/meganz/MEGAcmd" rel="noreferrer" target="_blank">')
         .replace('[/A]', '</a>');
     l[19111] = l[19111].replace('[A]', '<a class="public-contact-link">').replace('[/A]', '</a>');
+    l[19328] = l[19328].replace('[B]', '<b>').replace('[/B]', '</b>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

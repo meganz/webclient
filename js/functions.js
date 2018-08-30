@@ -1029,21 +1029,10 @@ function moveCursortoToEnd(el) {
 }
 
 function asyncApiReq(data) {
-    var $promise = new MegaPromise();
-    api_req(data, {
-        callback: function(r) {
-            if (typeof r === 'number' && r !== 0) {
-                $promise.reject.apply($promise, arguments);
-            }
-            else {
-                $promise.resolve.apply($promise, arguments);
-            }
-        }
-    });
+    'use strict';
 
-    //TODO: fail case?! e.g. the exp. backoff failed after waiting for X minutes??
-
-    return $promise;
+    // TODO: find&replace all occurences
+    return M.req(data);
 }
 
 // Returns pixels position of element relative to document (top left corner) OR to the parent (IF the parent and the

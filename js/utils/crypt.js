@@ -137,8 +137,9 @@ var crypt = (function() {
                     // cache it, the legacy way.
                     u_pubkeys[userhandle] = u_pubkeys[res.u] = pubKey;
 
-                    logger.debug('Got ' + keyType + ' pub key of user '
-                        + debugUserHandle);
+                    if (d > 1 || is_karma) {
+                        logger.debug('Got ' + keyType + ' pub key of user ' + debugUserHandle);
+                    }
 
                     if (!fromCache && attribCache) {
                         // if an email was provided, cache it using the user-handle
@@ -194,7 +195,9 @@ var crypt = (function() {
             pubKeyPromise.done(function(result) {
                 result = base64urldecode(result);
                 ns.getPubKeyCacheMapping(keyType)[userhandle] = result;
-                logger.debug('Got ' + keyType + ' pub key of user ' + userhandle + '.');
+                if (d > 1) {
+                    logger.debug('Got ' + keyType + ' pub key of user ' + userhandle + '.');
+                }
                 masterPromise.resolve(result);
             });
             masterPromise.linkFailTo(pubKeyPromise);
@@ -323,7 +326,9 @@ var crypt = (function() {
 
         if (authring.hadInitialised() === false || typeof u_authring === 'undefined') {
             // Need to initialise the authentication system (authring).
-            logger.debug('Will wait for the authring to initialise first.', 'Tried to access: ', userhandle, keyType);
+            if (d > 1) {
+                logger.debug('Waiting for authring to initialise first.', 'Tried to access: ', userhandle, keyType);
+            }
 
             var authringLoadingPromise = authring.initAuthenticationSystem();
             masterPromise.linkFailTo(authringLoadingPromise);

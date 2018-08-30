@@ -1057,9 +1057,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
     var pauseTxt = '';
     var ttl = this.getTransferTableLengths();
 
-    if ($.onDroppedTreeFolder) {
-        target = $.onDroppedTreeFolder;
-        delete $.onDroppedTreeFolder;
+    if ($.addUploadTarget) {
+        target = $.addUploadTarget;
+        delete $.addUploadTarget;
     }
     else if (String(this.currentdirid).length !== 8) {
         target = this.lastSeenCloudFolder || this.RootID;

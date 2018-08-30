@@ -24269,6 +24269,7 @@ opacity: 1;
 
 .fm-picker-dialog .summary-row .summary-input {
     width: 422px;
+    max-width: 422px;
     height: 32px;
     max-height: 130px;
     display: table-cell;

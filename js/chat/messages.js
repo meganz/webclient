@@ -22,8 +22,7 @@ var Message = function(chatRoom, messagesBuff, vals) {
             'updated': false,
             'sent': Message.STATE.NOT_SENT,
             'deleted': false,
-            'revoked': false,
-            'attachmentMeta': false
+            'revoked': false
         },
         true,
         vals
@@ -207,32 +206,226 @@ Message.getContactForMessage = function(message) {
  */
 Message.prototype.getAttachmentMeta = function() {
     "use strict";
+    return M.chc[this.messageId] || [];
+};
+
+/**
+ * Invoked when an event happens in the message
+ * @param {String} action The action performed, i.e. push, replace, remove
+ * @private
+ */
+Message.prototype._onMessageAction = function(action) {
+    'use strict';
     var self = this;
-    if (self.attachmentMeta) {
-        return self.attachmentMeta;
+
+    if (action === 'revoke') {
+        var attachments = this.getAttachmentMeta();
+
+        if (attachments.length) {
+            attachments.forEach(function(n) {
+                self._onAttachmentRevoked(n.h, true);
+            });
+        }
     }
+};
 
-    var textContents = self.textContents || false;
+/**
+ * Process a received attachment.
+ * @param {String} data The serialized attachment data
+ * @private
+ */
+Message.prototype._onAttachmentReceived = function(data) {
+    'use strict';
 
-    if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT
-        && textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+    var attachments = this._safeParseJSON(data);
 
-        try {
-            self.attachmentMeta = JSON.parse(textContents.substr(2, textContents.length));
+    for (var i = attachments.length; i--;) {
+        // For the chat let's create a MegaNode in steroids...
+        var n = new MegaNode(Object.assign({}, attachments[i], {p: this.chatRoom.roomId, m: this.messageId}));
 
-            for (var i = self.attachmentMeta.length; i--;) {
-                var n = new MegaNode(self.attachmentMeta[i]);
-                if (n.fa && String(n.fa).indexOf(':8*') > 0) {
+        n.ch = n.m + '!' + n.h;
+        n.co = this.orderValue;
+
+        if (M.chd[n.ch]) {
+            // if the message got flushed from history and re-shown later
+            Object.assign(n, M.chd[n.ch]);
+        }
+        else {
+            if (n.fa) {
+                if (String(n.fa).indexOf(':1*') > 0) {
+                    // storing a reference to the message to fire trackDataChange once the preview is loaded
+                    n.mo = this;
+                }
+                if (String(n.fa).indexOf(':8*') > 0) {
                     Object.assign(n, MediaAttribute(n).data);
                 }
-                self.attachmentMeta[i] = n;
+            }
+            n.mime = filemime(n);
+        }
+
+        // Index of attachments per room
+        if (!M.chc[n.p]) {
+            M.chc[n.p] = Object.create(null);
+        }
+        M.chc[n.p][n.ch] = n;
+
+        // Index of attachments per message
+        if (M.chc[n.m]) {
+            var j = M.chc[n.m].length;
+
+            // Ensure the node doesn't exists already.
+            // XXX: We could simplify this since a message can no longer contain more than an attachment though (?)
+
+            while (j--) {
+                if (M.chc[n.m][j].ch === n.ch) {
+                    break;
+                }
+            }
+
+            if (j < 0) {
+                M.chc[n.m].push(n);
             }
         }
-        catch (e) {
+        else {
+            M.chc[n.m] = [n];
+        }
+
+        // Global index for all attachments
+        M.chd[n.ch] = n;
+    }
+
+    this._onAttachmentUpdated();
+};
+
+/**
+ * Process an attachment revocation.
+ * @param {String} h The handle for the node that got revoked.
+ * @param {Boolean} [thisMsg] Revoke only this message attachment(s)
+ * @private
+ */
+Message.prototype._onAttachmentRevoked = function(h, thisMsg) {
+    'use strict';
+
+    var chatRoom = this.chatRoom;
+    var roomId = chatRoom.roomId;
+    var msgId = this.messageId;
+
+    // Revoke all room attachments matching the same handle/message
+    var a = Object.values(M.chc[roomId] || {})
+        .filter(function(n) {
+            return thisMsg ? n.m === msgId : n.h === h;
+        });
+
+    // Get a list of affected messages
+    var m = a.map(function(n) {
+        console.assert(n.p === roomId, 'check this...');
+
+        n.revoked = true;
+        delete M.chc[n.p][n.ch];
+
+        if (!$.len(M.chc[n.p])) {
+            delete M.chc[n.p];
+        }
+
+        if (slideshowid === n.ch) {
+            // We'll reuse some logic at removeUInode() to close/move-next the slideshow
+            removeUInode(n.ch);
+        }
+
+        return n.m;
+    });
+
+    // Process message revocation.
+    for (var i = m.length; i--;) {
+        var mId = m[i];
+        var attachedMsg = chatRoom.messagesBuff.messages[mId];
+
+        console.assert(M.chc[mId] && M.chc[mId].length, 'check this...');
+
+        if (M.chc[mId]) {
+            var c = M.chc[mId];
+            for (var j = c.length; j--;) {
+                if (c[j].h === h) {
+                    c.splice(j, 1);
+                    break;
+                }
+            }
+
+            if (!M.chc[mId].length) {
+                delete M.chc[mId];
+            }
+        }
+
+        if (attachedMsg) {
+            // mark the whole message as revoked if all attachments in it are marked as revoked.
+            if (!M.chc[mId]) {
+                attachedMsg.revoked = true;
+            }
+            else {
+                // force re-render
+                attachedMsg.trackDataChange();
+            }
+
+            if (!attachedMsg.seen) {
+                attachedMsg.seen = true;
+                if (chatRoom.messagesBuff._unreadCountCache > 0) {
+                    chatRoom.messagesBuff._unreadCountCache--;
+                    chatRoom.messagesBuff.trackDataChange();
+                    chatRoom.megaChat.updateSectionUnreadCount();
+                }
+            }
         }
     }
 
-    return self.attachmentMeta || false;
+    this._onAttachmentUpdated();
+};
+
+/**
+ * Signal when new attachments are added/revoked...
+ * @private
+ */
+Message.prototype._onAttachmentUpdated = function() {
+    'use strict';
+
+    // FIXME: This is only needed to fill M.v when the site is (re)loaded within the chat,
+    // since otherwise openFolder() should take care, hence this is overkill FIND A BETTER WAY
+
+    var chatRoom = this.chatRoom;
+    var roomId = chatRoom.roomId;
+
+    delay('chat-attachment-update:' + roomId, function() {
+        if (chatRoom.isCurrentlyActive) {
+            chatRoom.megaChat.setAttachments(roomId);
+        }
+    });
+};
+
+/**
+ * Safer JSON.parse
+ * @param {String} data The serialized data
+ * @returns {*}
+ * @private
+ */
+Message.prototype._safeParseJSON = function(data) {
+    'use strict';
+
+    try {
+        return JSON.parse(data);
+    }
+    catch (ex) {
+        console.warn(ex, this, [data]);
+    }
+    return false;
+};
+
+Message.prototype.getStateText = function(state) {
+    'use strict';
+
+    if (state === undefined) {
+        state = this.getState();
+    }
+
+    return Message._stateToText[state] || 'not-sent';
 };
 
 Message.prototype.getState = function() {
@@ -317,6 +510,15 @@ Message.MESSAGE_META_TYPE = {
     "RICH_PREVIEW": "\0",
 };
 
+Message._stateToText = Object.create(null);
+Message._stateToText[Message.STATE.NULL] = 'error';
+Message._stateToText[Message.STATE.NOT_SEEN] = 'unread';
+Message._stateToText[Message.STATE.SENT] = 'sent';
+Message._stateToText[Message.STATE.NOT_SENT_EXPIRED] = 'expired';
+Message._stateToText[Message.STATE.NOT_SENT] = 'not-sent';
+Message._stateToText[Message.STATE.DELIVERED] = 'delivered';
+Message._stateToText[Message.STATE.SEEN] = 'seen';
+Message._stateToText[Message.STATE.DELETED] = 'deleted';
 
 Message.prototype.isManagement = function() {
     if (!this.textContents) {
@@ -493,38 +695,30 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         return res;
     };
 
-    if (self.chatd.chatdPersist) {
-        [
-            'push',
-            'replace',
-            'remove',
-            'removeByKey'
-        ].forEach(function (fnName) {
-            var origFn = self.messages[fnName];
-            self.messages[fnName] = function() {
-                var res = origFn.apply(this, arguments);
-                if (!self.chatd.chatdPersist) {
-                    // was disabled?
-                    self.messages[fnName] = origFn;
-                    return res;
-                }
+    ['push', 'replace', 'remove', 'removeByKey'].forEach(function(fnName) {
+        var origFn = self.messages[fnName];
 
-                var msg = arguments[0] ? arguments[0] : undefined;
-                if (arguments[1] === true) {
-                    // restoring from indexedDB, don't try to persist this.
-                    return res;
-                }
+        self.messages[fnName] = function(messageId, ignoreDB) {
+            // should be called first..otherwise origFn.apply may delete the message and cause `msg` to be undefined.
+            var msg = self.messages[messageId];
+            if (msg) {
+                msg._onMessageAction(ignoreDB ? fnName : 'revoke');
+            }
+
+            var res = origFn.apply(this, arguments);
+
+            // note: ignoreDB can be a message, in case fnName is 'replace', which is not actually an ignoreDB.
+            if (ignoreDB !== true && self.chatd.chatdPersist) {
                 chatdPersist.persistMessageBatched(
                     fnName === "removeByKey" ? "remove" : fnName,
                     chatRoom.chatId,
                     toArray.apply(null, arguments)
                 );
+            }
 
-                return res;
-            };
-        });
-    }
-
+            return res;
+        };
+    });
 
     self.lastSeen = null;
     self.lastSent = null;
@@ -907,6 +1101,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                                 );
                             }
                         }
+                        if (editedMessage.textContents === "" && editedMessage.dialogType !== 'truncated') {
+                            editedMessage.deleted = true;
+                        }
                     }
                     else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
                         editedMessage.dialogType = 'truncated';
@@ -1275,11 +1472,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self._unreadCountCache = newCounter;
             self.chatRoom.megaChat.updateSectionUnreadCount();
         }
-
-        if (slideshowid) {
-            chatRoom._rebuildAttachments();
-        }
-
     });
 };
 

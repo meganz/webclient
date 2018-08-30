@@ -2991,6 +2991,10 @@ MegaData.prototype.getNodeByHandle = function(handle) {
         return this.d[handle];
     }
 
+    if (this.chd[handle]) {
+        return this.chd[handle];
+    }
+
     for (var i = this.v.length; i--;) {
         if (this.v[i].h === handle) {
             return this.v[i];
@@ -3205,6 +3209,7 @@ MegaData.prototype.importWelcomePDF = function() {
 MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNode) {
     'use strict';
     return new MegaPromise(function(resolve, reject) {
+        var req = {a: 'p'};
         var n = {
             t: 0,
             ph: ph,
@@ -3213,7 +3218,9 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
         };
 
         var _import = function(target) {
-            api_req({a: 'p', t: target, n: [n]}, {
+            req.n = [n];
+            req.t = target;
+            api_req(req, {
                 callback: function(r) {
                     if (typeof r === 'object') {
                         $.onRenderNewSelectNode = r.f[0].h;
@@ -3249,6 +3256,12 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
 
                             if (name !== file.name) {
                                 n.a = ab_to_base64(crypto_makeattr(file));
+                            }
+
+                            if (u_sharekeys[target]) {
+                                req.cr = [
+                                    [target], [], [0, 0, a32_to_base64(encrypt_key(u_sharekeys[target][1], file.k))]
+                                ];
                             }
 
                             _import(target);

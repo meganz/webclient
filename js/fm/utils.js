@@ -92,21 +92,24 @@ MegaUtils.prototype.execCommandUsable = function() {
  * @returns {Function}
  */
 MegaUtils.prototype.sortObjFn = function(key, order, alternativeFn) {
+    'use strict';
+
     if (!order) {
         order = 1;
+    }
+
+    if (typeof key !== 'function') {
+        var k = key;
+        key = function(o) {
+            return o[k];
+        };
     }
 
     return function(a, b, tmpOrder) {
         var currentOrder = tmpOrder ? tmpOrder : order;
 
-        if ($.isFunction(key)) {
-            aVal = key(a);
-            bVal = key(b);
-        }
-        else {
-            aVal = a[key];
-            bVal = b[key];
-        }
+        var aVal = key(a);
+        var bVal = key(b);
 
         if (typeof aVal === 'string' && typeof bVal === 'string') {
             return aVal.localeCompare(bVal, locale) * currentOrder;

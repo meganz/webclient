@@ -339,5 +339,6 @@ function fmtopUI() {}
 function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
+function slideshow_handle() {}
 /* jshint +W098 */
 /* jshint +W007 */

@@ -135,7 +135,7 @@
             $btn.removeClass('disabled');
         }
         else {
-            var forceEnabled = $.copyToShare || $.onImportCopyNodes || $.saveToDialog;
+            var forceEnabled = $.copyToShare || $.copyToUpload || $.onImportCopyNodes || $.saveToDialog;
 
             console.assert(!$.copyToShare || Object($.selected).length === 0, 'check this...');
 
@@ -146,6 +146,18 @@
                 $btn.removeClass('disabled');
             }
         }
+    };
+
+    /**
+     * Select tree item node
+     * @param {String} h The node handle
+     */
+    var selectTreeItem = function(h) {
+        onIdle(function() {
+            if (!$('#mctreesub_' + h, $dialog).hasClass('opened')) {
+                $('#mctreea_' + h, $dialog).trigger('click');
+            }
+        });
     };
 
     /**
@@ -229,11 +241,18 @@
                 name = '';
             }
 
+            var nameFmt = '@@';
+            if (section === 'conversations') {
+                nameFmt = name && megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(name)) || nameFmt;
+            }
+
             $dbc.safeAppend(
                 '<a class="fm-breadcrumbs @@ @@" title="@@" data-node="@@">' +
-                '    <span class="right-arrow-bg"><span>@@</span></span>' +
+                '    <span class="right-arrow-bg"><span>' + nameFmt + '</span></span>' +
                 '</a>', type, i > 0 ? 'has-next-button' : '', titles[h] || name, h, name
             );
+
+            // selectTreeItem(h);
         }
 
         if (path.length) {
@@ -273,7 +292,7 @@
         var jScrollPane = function() {
             var jsp = $div.data('jsp');
 
-            if ($.selected.length > 4) {
+            if (items.length > 4) {
                 if (jsp) {
                     jsp.reinitialise();
                 }
@@ -284,6 +303,15 @@
             else if (jsp) {
                 jsp.destroy();
             }
+        };
+
+        var setTitle = function() {
+            $('.fm-picker-dialog-title', $dialog)
+                .text(
+                    items.length < 2
+                        ? 'Upload 1 file'
+                        : escapeHTML("Upload [x] files").replace('[x]', items.length)
+                );
         };
 
         if ($.saveToDialogNode) {
@@ -306,6 +334,15 @@
             else {
                 $('.summary-selected', $dialog).removeClass('hidden');
             }
+
+            if ($.copyToUpload) {
+                items = $.copyToUploadData[0];
+
+                for (var j = items.length; j--;) {
+                    items[j].uuid = makeUUID();
+                }
+                setTitle();
+            }
         }
 
         if (!single) {
@@ -316,10 +353,11 @@
 
         for (var i = 0; i < items.length; i++) {
             var h = items[i];
-            var n = M.getNodeByHandle(h);
-            var name = names[h] || M.getNameByHandle(h);
+            var n = M.getNodeByHandle(h) || Object(h);
+            var name = names[h] || M.getNameByHandle(h) || n.name;
             var tail = '<div class="delete-img icon"></div>';
             var icon = fileIcon(n);
+            var data = n.uuid || h;
 
             if (single) {
                 tail = '<span>(@@)</span>';
@@ -332,7 +370,7 @@
                 '<div class="item-row" data-node="@@">' +
                 '    <div class="transfer-filetype-icon file @@"></div>' +
                 '    <div class="summary-ff-name">@@</div> &nbsp; ' + tail +
-                '</div>', h, icon, str_mtrunc(name, 42), String(l[10663]).replace('[X]', items.length - 1)
+                '</div>', data, icon, str_mtrunc(name, 42), String(l[10663]).replace('[X]', items.length - 1)
             );
 
             if (single) {
@@ -341,10 +379,10 @@
         }
 
         $icon.rebind('click', function() {
+            $div.unbind('click.unfold');
             setSelectedItems(!single);
             return false;
         });
-        $div.unbind('click.unfold');
 
         if (single) {
             if (items.length > 1) {
@@ -364,12 +402,28 @@
 
             $('.delete-img.icon', $div).rebind('click', function() {
                 var $row = $(this).parent();
+                var data = $row.attr('data-node');
+
                 $row.remove();
                 jScrollPane();
-                array.remove($.selected, $row.attr('data-node'));
-                if ($.selected.length < 2) {
+
+                if ($.copyToUpload) {
+                    for (var i = items.length; i--;) {
+                        if (items[i].uuid === data) {
+                            items.splice(i, 1);
+                            break;
+                        }
+                    }
+                    setTitle();
+                }
+                else {
+                    array.remove(items, data);
+                }
+
+                if (items.length < 2) {
                     setSelectedItems(true);
                 }
+
                 return false;
             });
         }
@@ -390,6 +444,10 @@
 
         if ($.copyToShare || section === 'shared-with-me') {
             return l[1344]; // Share
+        }
+
+        if ($.copyToUpload) {
+            return l[372]; // Upload
         }
 
         if (section === 'conversations') {
@@ -419,6 +477,10 @@
 
         if ($.copyToShare) {
             return l[1344]; // Share
+        }
+
+        if ($.copyToUpload) {
+            return l[372]; // Upload  - will be replaced later
         }
 
         if ($.saveToDialog) {
@@ -486,7 +548,9 @@
                         namesCombine = namesCombine.substr(0, 37);
                         namesCombine += '...';
                     }
-                    groupElem += '<span class="nw-contact-name group">' + escapeHTML(namesCombine) + '</span>';
+                    groupElem += '<span class="nw-contact-name group">' +
+                        megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(namesCombine)) +
+                        '</span>';
                     groupElem += '<span class="nw-contact-group">' + nb + ' chat members </span>';
                     groupElem += '<span class="nw-contact-checkbox">' + '</span> </span>';
                     groupElem = '<li id="cpy-dlg-chat-itm-' + handle + '">' + groupElem + '</li>';
@@ -708,7 +772,7 @@
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).removeClass('hidden');
         }
 
-        if (!u_type || $.saveToDialog || $.copyToShare || $.mcImport) {
+        if (!u_type || $.saveToDialog || $.copyToShare || $.copyToUpload || $.mcImport) {
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
             $('.fm-picker-dialog-button.conversations', $dialog).addClass('hidden');
         }
@@ -821,6 +885,23 @@
         M.safeShowDialog('copy', function() {
             $.shareToContactId = u_id;
             handleOpenDialog('cloud-drive', false, 'copyToShare');
+            return $dialog;
+        });
+
+        return false;
+    };
+
+    /**
+     * A version of the Copy dialog used when uploading.
+     * @param {Array} files The files being uploaded.
+     * @param {Object} [emptyFolders] Empty folders to create hierarchy for.
+     * @global
+     */
+    global.openCopyUploadDialog = function openCopyUploadDialog(files, emptyFolders) {
+        M.safeShowDialog('copy', function() {
+            $.copyToUploadData = [files, emptyFolders];
+            var tab = M.currentrootid === 'shares' ? 'shared-with-me' : 'cloud-drive';
+            handleOpenDialog(tab, M.currentdirid, 'copyToUpload');
             return $dialog;
         });
 
@@ -1089,12 +1170,8 @@
             // Auto-select the created folder.
             $.cfpromise.done(function(h) {
                 var p = $.cftarget;
-                onIdle(function() {
-                    $('#mctreea_' + p, $dialog).trigger('click');
-                    onIdle(function() {
-                        $('#mctreea_' + h, $dialog).trigger('click');
-                    });
-                });
+                selectTreeItem(p);
+                selectTreeItem(h);
             });
         });
 
@@ -1282,6 +1359,14 @@
             var saveToDialog = $.saveToDialog;
             var shareToContactId = $.shareToContactId;
             delete $.saveToDialogPromise;
+
+            if ($.copyToUpload) {
+                var data = $.copyToUploadData;
+                closeDialog();
+                $.addUploadTarget = $.mcselected;
+                M.addUpload(data[0], false, data[1]);
+                return false;
+            }
 
             if ($.moveDialog) {
                 if (section === "shared-with-me") {

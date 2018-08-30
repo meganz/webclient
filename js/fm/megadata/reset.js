@@ -14,6 +14,10 @@ MegaData.prototype.reset = function() {
     this.filterLabel = Object.create(null);
     this.filterTreePanel = Object.create(null);
 
+    // M.d & M.c for chat
+    this.chd = Object.create(null);
+    this.chc = Object.create(null);
+
     if (typeof MegaDataMap !== 'undefined') {
         this.u = new MegaDataMap();
         this.u.addChangeListener(function() {

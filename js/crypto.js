@@ -352,6 +352,15 @@ function api_reset() {
                         '[{[f2{'  : tree_node,       // tree node (versioned)
                         '['       : tree_residue,    // tree residue
                         '#'       : api_esplit });   // numeric error code
+    // WSC interface (chunked mode)
+    api_init(5, 'wsc', {
+        '{[a{': sc_packet,     // SC command
+        '{[a{{t[f{': sc_node,       // SC node
+        '{[a{{t[f2{': sc_node,       // SC node (versioned)
+        '{': sc_residue,    // SC residue
+        '#': api_esplit // numeric error code
+    });
+
 }
 
 mBroadcaster.once('boot_done', api_reset);
@@ -390,6 +399,7 @@ function api_setsid(sid) {
     apixs[2].sid = sid;
     apixs[3].sid = sid;
     apixs[4].sid = sid;
+    apixs[5].sid = sid;
 }
 
 function api_setfolder(h) {
@@ -404,6 +414,7 @@ function api_setfolder(h) {
     apixs[1].sid = h;
     apixs[2].sid = h;
     apixs[4].sid = h;
+    apixs[5].sid = h;
 }
 
 function stopapi() {
@@ -498,10 +509,17 @@ if (typeof Uint8Array.prototype.indexOf !== 'function' || is_firefox_web_ext) {
 }
 
 // this kludge emulates moz-chunked-arraybuffer with XHR-style callbacks
-function chunkedfetch(xhr, uri, postdata) {
+function chunkedfetch(xhr, uri, postdata, httpMethod) {
     "use strict";
-
-    fetch(uri, { method: 'POST', body: postdata }).then(function(response) {
+    var requestBody = {
+        method: 'POST',
+        body: postdata
+    };
+    if (httpMethod && httpMethod === 'GET') {
+        requestBody.method = 'GET';
+        delete requestBody.body;
+    }
+    fetch(uri, requestBody).then(function (response) {
         var reader = response.body.getReader();
         var evt = { loaded: 0 };
         xhr.status = response.status;
@@ -751,7 +769,7 @@ function api_send(q) {
     if (q.split && chunked_method == 2) {
         // use chunked fetch with JSONSplitter input type Uint8Array
         q.splitter = new JSONSplitter(q.split, q.xhr, true);
-        chunkedfetch(q.xhr, q.url, q.rawreq);
+        chunkedfetch(q.xhr, q.url, q.rawreq, (q.service === 'wsc') ? 'GET' : null);
     }
     else {
         // use legacy XHR API
@@ -961,31 +979,35 @@ var initialscfetch;
 
 // last step of the streamed SC response processing
 function sc_residue(sc) {
+    /*jshint validthis: true */
     "use strict";
 
     if (sc.sn) {
         // enqueue new sn
         currsn = sc.sn;
-        scq[scqhead++] = [{ a : '_sn', sn : currsn }];
-        getsc(true);
+        scq[scqhead++] = [{ a: '_sn', sn: currsn }];
         resumesc();
-    }
-    else if (sc.w) {
+
         if (initialscfetch) {
             // we have concluded the post-load SC fetch, as we have now
             // run out of new actionpackets: show filemanager!
-            scq[scqhead++] = [{ a : '_fm' }];
+            scq[scqhead++] = [{ a: '_fm' }];
             initialscfetch = false;
             resumesc();
         }
 
         // we're done, wait for more
-        gettingsc = false;
-        waiturl = sc.w;
+        if (sc.w) {
+            waiturl = sc.w + '?' + apixs[5].sid + '&sn=' + currsn;
+        }
+        else if (!waiturl) {
+            console.error("Strange error, we dont know WSC url and we didnt get it");
+            return getsc(true);
+        }
         waittimeout = setTimeout(waitsc, waitbackoff);
 
         if ((mega.flags & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
-            mega.loadReport.recvAPs       = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.recvAPs = Date.now() - mega.loadReport.stepTimeStamp;
             mega.loadReport.stepTimeStamp = Date.now();
         }
     }
@@ -997,8 +1019,10 @@ function sc_residue(sc) {
     }
 
     // (mandatory steps at the conclusion of a successful split response)
-    api_ready(this.q);
-    api_proc(this.q);
+    if (this.q) {
+        api_ready(this.q);
+        api_proc(this.q);
+    }
 }
 
 // getsc() serialisation (getsc() can be called anytime from anywhere if
@@ -1010,16 +1034,16 @@ var gettingsc;
 function getsc(force) {
     "use strict";
 
-    if (force || !gettingsc) {
+    if (force) {
         gettingsc = true;
 
         if (waitxhr) {
             waitxhr.abort();
         }
 
-        api_cancel(apixs[2]);   // retire existing XHR that may still be completing the request
-        api_ready(apixs[2]);
-        api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {}, 2);
+        api_cancel(apixs[5]);   // retire existing XHR that may still be completing the request
+        api_ready(apixs[5]);
+        api_req('sn=' + currsn, {}, 5);
 
         if (mega.flags & window.MEGAFLAG_LOADINGCLOUD) {
             mega.loadReport.scSent = Date.now();
@@ -1030,7 +1054,7 @@ function getsc(force) {
 function waitsc() {
     "use strict";
 
-    var MAX_WAIT = 180e3;
+    var MAX_WAIT = 40e3;
     var newid = ++waitid;
 
     stopsc();
@@ -1056,6 +1080,7 @@ function waitsc() {
             else {
                 // Increase backoff if we do keep receiving packets is rapid succession, so that we maintain
                 // smaller number of connections to process more data at once - backoff up to 4 seconds.
+                stopsc();
                 if (Date.now() - waitbegin < 1000) {
                     waitbackoff = Math.min(4e3, waitbackoff << 1);
                 }
@@ -1063,8 +1088,27 @@ function waitsc() {
                     waitbackoff = 250;
                 }
 
-                stopsc();
-                getsc();
+                var delieveredResponse = this.response;
+                if (delieveredResponse === '0') {
+                    // clearTimeout(waittimeout); mo need for clearing, we stopped
+                    // immediately re-connect.
+                    waittimeout = setTimeout(waitsc, 0);
+                    return;
+                }
+                if ($.isNumeric(delieveredResponse)) {
+                    waittimeout = setTimeout(waitsc, waitbackoff);
+                    return;
+                }
+                if (!apixs[5].split) {
+                    console.error('WSC has no splitter !!!!');
+                }
+                else {
+                    var wscSplitter = new JSONSplitter(apixs[5].split, waitxhr, false);
+                    if (!wscSplitter.chunkproc(delieveredResponse, true)) {
+                        fm_fullreload(null, 'onload JSON Syntax Error');
+                        return;
+                    }
+                }
             }
         }
     };
@@ -2301,7 +2345,7 @@ function api_faerrlauncher(ctx, host) {
         logger.error('FAEOT', id);
     }
 
-    if (id !== slideshowid) {
+    if (id !== slideshow_handle()) {
         if (id) {
             pfails[id] = 1;
             delete preqs[id];
@@ -2428,7 +2472,7 @@ function api_fareq(res, ctx, xhr) {
                             clearTimeout(this.fart);
                         }
 
-                        if (this.fah.done(ev) || M.chat) {
+                        if (this.fah.done(ev)) {
                             delay('thumbnails', fm_thumbnails, 200);
                         }
 

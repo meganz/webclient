@@ -206,14 +206,15 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
             if (d) {
                 console.debug('Holding tiff thumb creation...', ab && ab.byteLength);
             }
-            onIdle(function() {
-                mBroadcaster.once('TIFThumbHandler.ready', makeTIF);
-            });
+            mBroadcaster.once('TIFThumbHandler.ready', makeTIF);
             return;
         }
         TIFThumbHandler.working = true;
 
         onIdle(function() {
+            if (d) {
+                console.debug('...unholding tiff thumb creation.', mBroadcaster.hasListener('TIFThumbHandler.ready'));
+            }
             TIFThumbHandler.working = false;
             mBroadcaster.sendMessage('TIFThumbHandler.ready');
         });
@@ -233,7 +234,7 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
                 var tiff = false;
 
                 try {
-                    Tiff.initialize({TOTAL_MEMORY: 33554432});
+                    Tiff.initialize({TOTAL_MEMORY: 134217728});
                     tiff = new Tiff(new Uint8Array(ab));
 
                     ab = dataURLToAB(tiff.toDataURL());
@@ -2130,7 +2131,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
     var miCollectedBytes = 0;
     var miCollectRunning = 0;
     var miCollectProcess = function() {
-        if (localStorage.noMediaCollect || miCollectedBytes > 0x1000000) {
+        if (localStorage.noMediaCollect || miCollectedBytes > 0x1000000 || M.chat) {
             return 0xDEAD;
         }
 

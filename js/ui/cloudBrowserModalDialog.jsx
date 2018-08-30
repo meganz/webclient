@@ -2,7 +2,6 @@ var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
-var Tooltips = require("./tooltips.jsx");
 var ModalDialogsUI = require('./modalDialogs.jsx');
 
 var BrowserCol = React.createClass({
@@ -40,6 +39,7 @@ var BrowserEntries = React.createClass({
         }
     },
     getInitialState: function() {
+
         return {
             'highlighted': [],
             'selected': []

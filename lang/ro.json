@@ -2696,7 +2696,7 @@
     "19271": "Numai fotografii",
     "19272": "Numai videoclipuri",
     "19276": "Managementul fi\u015fierelor",
-    "19279": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.[Br]PRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 1 TB of storage space and 2 TB of transfer quota per month.[Br]PRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.[Br]PRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 8 TB of storage space and 16 TB of transfer quota per month.",
+    "19279": "Abonamentul PRO LITE: 4,99\u20ac (4,99$ SUA) pe lun\u0103 sau 49,99\u20ac (49,99$ SUA) pe an \u00ee\u0163i ofer\u0103 200 GB spa\u0163iu de stocare \u015fi 1 TB cot\u0103 de transfer pe lun\u0103.[Br]Abonamentul PRO I: 9,99\u20ac (9,99$ SUA) pe lun\u0103 sau 99,99\u20ac (99,99$ SUA) pe an \u00ee\u0163i ofer\u0103 1 TB spa\u0163iu de stocare \u015fi 2 TB cot\u0103 de transfer pe lun\u0103.[Br]Abonamentul PRO II: 19,99\u20ac (19,99$ SUA) pe lun\u0103 sau 199,99\u20ac (199,99$ SUA) pe an \u00ee\u0163i ofer\u0103 4 TB spa\u0163iu de stocare \u015fi 8 TB cot\u0103 de transfer pe lun\u0103.[Br]Abonamentul PRO III: 29,99\u20ac (29,99$ SUA) pe lun\u0103 sau 299,99\u20ac (299,99$ SUA) pe an \u00ee\u0163i ofer\u0103 8 TB spa\u0163iu de stocare \u015fi 16 TB cot\u0103 de transfer pe lun\u0103.",
     "19282": "Facturi",
     "19283": "List\u0103 cu facturi",
     "19284": "Vezi detaliile",
@@ -2730,5 +2730,16 @@
     "19320": "Lead Data Protection Supervisory Authority under the GDPR for accepting complaints about Mega",
     "19321": "Enquiries and requests relating to our Privacy & Data Policy should be sent to:",
     "19322": "Submit full details of alleged Trademark infringement to:",
-    "19323": "Mega has zero tolerance for Child Exploitation Material, Violent Extremism, Bestiality, Zoophilia, Gore, Malware, Hacked\/Stolen Data\/Passwords, Extortion, Revenge Porn etc. Report links with description to:"
+    "19323": "Mega has zero tolerance for Child Exploitation Material, Violent Extremism, Bestiality, Zoophilia, Gore, Malware, Hacked\/Stolen Data\/Passwords, Extortion, Revenge Porn etc. Report links with description to:",
+    "19325": "Scan or copy the seed to your Authenticator App. Be sure to backup this seed to a safe place in case you lose your phone.",
+    "19326": "After setting up your seed on your Authenticator app enter the 6-digit code provided.",
+    "19328": "Are you sure you want to redeem this voucher for the [B]%1[\/B] account?",
+    "19329": "Import\u0103 \u00een unitatea mea cloud",
+    "19330": "[S]MEGAsync:[\/S] Sincronizare u\u015foar\u0103 \u015fi automat\u0103 \u00eentre calculatoarele tale \u015fi unitatea ta cloud MEGA.",
+    "19332": "\u00ce\u0163i mul\u0163umim pentru testarea MEGAsync.<br>Aceast\u0103 versiune beta nu mai este de actualitate \u015fi a expirat.<br>Te rug\u0103m s\u0103 urm\u0103re\u015fti <a href=\"https:\/\/twitter.com\/MEGAprivacy\">@MEGAprivacy<\/a> pe Twitter pentru nout\u0103\u0163i.",
+    "19333": "There was a problem installing the update. Please try again later or download the latest version from: https:\/\/mega.nz\/sync",
+    "19334": "Contul t\u0103u a fost blocat. Te rug\u0103m s\u0103 contactezi support@mega.nz",
+    "19335": "Sunt de acord cu <a href=\"https:\/\/mega.nz\/#terms\">Termenii de utilizare a serviciului<\/a> MEGA",
+    "19336": "Sincronizeaz\u0103 \u00eentreaga unitate cloud",
+    "19337": "Sincronizeaz\u0103 foldere specifice \u00een unitatea ta cloud"
 }

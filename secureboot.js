@@ -331,6 +331,7 @@ if (!b_u) try
         d = localStorage.d | 0;
         jj = localStorage.jj;
         dd = localStorage.dd;
+
         // Write test
         localStorage['$!--foo'] = Array(100).join(",");
         delete localStorage['$!--foo'];
@@ -465,6 +466,9 @@ var mega = {
 
     maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 12),
 
+    /** An object with flags detailing which features are enabled on the API */
+    apiMiscFlags: {},
+
     /** Get browser brancd internal ID */
     getBrowserBrandID: function() {
         if (Object(window.chrome).torch) {
@@ -542,6 +546,37 @@ var mega = {
         }
 
         return this._urlParams;
+    },
+
+    /**
+     * Fetches information from the API about which features are enabled
+     * @param {Function|undefined} completeCallback The function to run when the function has completed
+     */
+    getApiMiscFlags: function(completeCallback) {
+
+        'use strict';
+
+        // If the flags have already been fetched this session, don't fetch again and run the callback
+        if (Object.keys(mega.apiMiscFlags).length !== 0 && typeof completeCallback === 'function') {
+            completeCallback();
+        }
+        else {
+            // Make Get Miscellaneous Flags (gmf) API request
+            api_req({ a: 'gmf' }, {
+                callback: function(result) {
+                    if (result) {
+
+                        // Cache flags object
+                        mega.apiMiscFlags = result;
+
+                        // Run the callback
+                        if (typeof completeCallback === 'function') {
+                            completeCallback();
+                        }
+                    }
+                }
+            });
+        }
     }
 };
 
@@ -1901,6 +1936,8 @@ else if (!b_u) {
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
+    jsl.push({f:'js/security.js', n: 'security_js', j: 1, w: 5});
+    jsl.push({f:'js/two-factor-auth.js', n: 'two_factor_auth_js', j: 1, w: 5});
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
@@ -1945,6 +1982,8 @@ else if (!b_u) {
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
+    jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
+    jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
 
     if (!is_mobile) {
@@ -1952,8 +1991,6 @@ else if (!b_u) {
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
-        jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
-        jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
 
         // This is not used anymore, unless we process and store credit card details for renewals again
         // jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
@@ -1981,6 +2018,7 @@ else if (!b_u) {
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
         jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
+        jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
         jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
         jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
         jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
@@ -2039,6 +2077,8 @@ else if (!b_u) {
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
+        jsl.push({f:'js/fm/account-change-password.js', n: 'fm_account_change_password_js', j:1});
+        jsl.push({f:'js/fm/account-change-email.js', n: 'fm_account_change_email_js', j:1});
         jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
         jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
         jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
@@ -2157,6 +2197,15 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.megadrop.js', n: 'mobile_megadrop_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.js', n: 'mobile_twofactor_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.intro.js', n: 'mobile_twofactor_info_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.setup.js', n: 'mobile_twofactor_setup_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.verify-setup.js', n: 'mobile_twofactor_verify_setup_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.enabled.js', n: 'mobile_twofactor_enabled_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.verify-disable.js', n: 'mobile_twofactor_verify_disable_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.disabled.js', n: 'mobile_twofactor_disabled_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.verify-action.js', n: 'mobile_twofactor_verify_action_js', j: 1, w: 1});
     }
 
     // We need to keep a consistent order in loaded resources, so that if users
@@ -2210,6 +2259,11 @@ else if (!b_u) {
         if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
             jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j: 1});
         }
+    }
+
+    // If the TextEncoder is not supported natively (IE, Edge) then load the polyfill
+    if (typeof TextEncoder !== 'function') {
+        jsl.push({f:'js/vendor/encoding.js', n: 'encoding_js', j:1});
     }
 
     // only used on beta

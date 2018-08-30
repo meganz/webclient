@@ -165,6 +165,12 @@ pro.propay = {
                     pro.propay.allGateways = mobile.propay.filterPaymentProviderOptions(pro.propay.allGateways);
                 }
 
+                // Check if the API has some issue and not returning any gateways at all
+                if (pro.propay.allGateways.length === 0) {
+                    console.error('No valid gateways returned from the API');
+                    return false;
+                }
+
                 // Separate into two groups, the first group has 6 providers, the second has the rest
                 var primaryGatewayOptions = gatewayOptions.splice(0, 6);
                 var secondaryGatewayOptions = gatewayOptions;
@@ -497,6 +503,12 @@ pro.propay = {
      * the duration/period so it is accurate for a recurring subscription or one off payment.
      */
     updateTextDependingOnRecurring: function() {
+
+        'use strict';
+
+        if (pro.propay.allGateways.length === 0) {
+            return false;
+        }
 
         var $step2 = $('.membership-step2');
         var $paymentDialog = $('.payment-dialog');

@@ -72,13 +72,12 @@ if [ $? -eq 0 ]; then
     echo "3. Created new branch $current_branch-squashed"
     echo "---"
 else
-    # Otherwise reset the branch back to prior commit (should be same as current develop now)
-    # This is done to preserve commit history in GitLab because deleting the squashed branch and remaking loses history
-    git checkout $current_branch-squashed
-    git reset --hard HEAD^
-
+    # Otherwise delete the local branch (but not the remote branch). This is done to preserve commit history in GitLab
+    # because deleting the remote squashed branch and remaking loses history
+    git branch -D $current_branch-squashed
+    git checkout -b $current_branch-squashed
     echo
-    echo "3. Reset of $remote / $current_branch-squashed back to prior commit complete"
+    echo "3. Delete of local $current_branch-squashed complete and created new local branch under same name"
     echo "---"
 fi
 

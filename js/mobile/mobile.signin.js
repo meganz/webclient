@@ -103,108 +103,38 @@ mobile.signin = {
             var email = $emailField.val();
             var password = $passwordField.val();
             var rememberMe = $rememberMeCheckbox.is(':checked');
+            var twoFactorPin = null;
 
             // If the fields are not completed, the button should not do anything and looks disabled anyway
             if (email.length < 1 || password.length < 1) {
                 return false;
             }
 
+            // If the email is invalid
+            if (checkMail(email)) {
+
+                // Add red border, red text and show warning icon
+                $emailField.parent().addClass('incorrect');
+
+                // Show an error and don't proceed
+                mobile.messageOverlay.show(l[198]);         // Please enter a valid e-mail address.
+                return false;
+            }
+
             // Unfocus (blur) the input fields to prevent the cursor showing on iOS and also hide the keyboard
             $emailField.add($passwordField).blur();
 
-            // Pass the details to the login flow
-            mobile.signin.startLogin($signInButton, email, password, rememberMe);
+            // Hide the text and show a loading spinner
+            $signInButton.addClass('loading');
 
+            // Start the login flow and set different callbacks for the old and new registration types
+            security.login.checkLoginMethod(email, password, twoFactorPin, rememberMe,
+                                            mobile.signin.old.startLogin,
+                                            mobile.signin.new.startLogin);
+
+            // Prevent double clicks/taps
             return false;
         });
-    },
-
-    /**
-     * Starts the login proceedure
-     * @param {Object} $signInButton The jQuery selector for the signin button
-     * @param {String} email The user's email address
-     * @param {String} password The user's password
-     * @param {Boolean} rememberMe Whether the user clicked the Remember me checkbox or not
-     */
-    startLogin: function($signInButton, email, password, rememberMe) {
-
-        'use strict';
-
-        // Hide the text and show a loading spinner
-        $signInButton.addClass('loading');
-
-        // If email confirm code is ok
-        if (confirmok) {
-            doConfirm(email, password, function() {
-                postLogin(email, password, rememberMe, function(result) {
-
-                    // Hide the loading spinner
-                    $signInButton.removeClass('loading');
-
-                    if (result === EBLOCKED) {
-                        mobile.messageOverlay.show(l[730]);
-                    }
-                    else if (result) {
-                        u_type = result;
-                        loadSubPage('key');
-                    }
-                });
-            });
-        }
-        else {
-            // Run the regular login process
-            postLogin(email, password, rememberMe, function (result) {
-
-                // Hide the loading spinner
-                $signInButton.removeClass('loading');
-
-                // Check they are not locked out
-                if (result === EBLOCKED) {
-                    mobile.messageOverlay.show(l[730]);
-                }
-
-                // Otherwise if successful
-                else if (result) {
-
-                    // Set the u_type e.g. 3 is fully registered user
-                    u_type = result;
-
-                    // Try getting the plan number they selected on Pro page
-                    var planNum = localStorage.getItem('proPageContinuePlanNum');
-
-                    // If they did come from the Pro page, continue to Pro page Step 2
-                    if (planNum !== null) {
-
-                        // Remove the flag as it's no longer needed
-                        localStorage.removeItem('proPageContinuePlanNum');
-
-                        // Continue to the Pro payment page
-                        loadSubPage('propay_' + planNum);
-                    }
-
-                    // If they were on a page and asked to login before accessing
-                    else if (login_next) {
-
-                        // Store the page temporarily
-                        var nextPageAfterLogin = login_next;
-
-                        // Clear the variable so subsequent logins work fine
-                        login_next = false;
-
-                        // Redirect back to the page
-                        loadSubPage(nextPageAfterLogin);
-                    }
-                    else {
-                        // Load the file manager
-                        loadSubPage('fm');
-                    }
-                }
-                else {
-                    // Otherwise they used an incorrect email or password so show an error
-                    mobile.messageOverlay.show(l[16349], l[16350]);
-                }
-            });
-        }
     },
 
     /**
@@ -221,5 +151,232 @@ mobile.signin = {
             loadSubPage('recovery');
             return false;
         });
+    }
+};
+
+
+/**
+ * Functions for the old login process which will need to be retained until everyone has upgraded to the new process
+ */
+mobile.signin.old = {
+
+    /**
+     * Start the login process
+     * @param {String} email The user's email addresss
+     * @param {String} password The user's password as entered
+     * @param {String|null} pinCode The two-factor authentication PIN code (6 digit number), or null if not applicable
+     * @param {Boolean} rememberMe A boolean for if they checked the Remember Me checkbox on the login screen
+     */
+    startLogin: function(email, password, pinCode, rememberMe) {
+
+        'use strict';
+
+        // If email confirm code is ok
+        if (confirmok) {
+            doConfirm(email, password, function() {
+                postLogin(email, password, pinCode, rememberMe, function(result) {
+
+                    // Hide the loading spinner
+                    mobile.signin.$screen.find('.signin-button').removeClass('loading');
+
+                    // Check they are not locked out
+                    if (result === EBLOCKED) {
+                        mobile.messageOverlay.show(l[730]);
+                    }
+                    else if (result !== false && result >= 0) {
+                        u_type = result;
+                        loadSubPage('key');
+                    }
+                    else {
+                        // Otherwise they used an incorrect email or password so show an error
+                        mobile.messageOverlay.show(l[16349], l[16350]);
+                    }
+                });
+            });
+        }
+        else {
+            // Run the regular login process
+            postLogin(email, password, pinCode, rememberMe, mobile.signin.old.completeLogin);
+        }
+    },
+
+    /**
+     * Complete the login process and redirect to the cloud drive
+     * @param {Number} result If the result is negative there is an error, if positive it is the user type
+     */
+    completeLogin: function(result) {
+
+        'use strict';
+
+        // Hide the loading spinner
+        mobile.signin.$screen.find('.signin-button').removeClass('loading');
+
+        // If the Two-Factor PIN is required
+        if (result === EMFAREQUIRED) {
+
+            // Load the Two-Factor PIN entry page
+            loadSubPage('twofactor/verify-login');
+            return false;
+        }
+
+        // Check they are not locked out
+        else if (result === EBLOCKED) {
+            mobile.messageOverlay.show(l[730]);
+        }
+
+        // If there was a 2FA error, show a message that the PIN code was incorrect and clear the text field
+        else if (result === EFAILED) {
+            mobile.twofactor.verifyLogin.showVerificationError();
+        }
+
+        // Otherwise if successful
+        else if (result !== false && result >= 0) {
+
+            // Set the u_type e.g. 3 is fully registered user
+            u_type = result;
+
+            // Try getting the plan number they selected on Pro page
+            var planNum = localStorage.getItem('proPageContinuePlanNum');
+
+            // If they did come from the Pro page, continue to Pro page Step 2
+            if (planNum !== null) {
+
+                // Remove the flag as it's no longer needed
+                localStorage.removeItem('proPageContinuePlanNum');
+
+                // Continue to the Pro payment page
+                loadSubPage('propay_' + planNum);
+            }
+
+            // If they were on a page and asked to login before accessing
+            else if (login_next) {
+
+                // Store the page temporarily
+                var nextPageAfterLogin = login_next;
+
+                // Clear the variable so subsequent logins work fine
+                login_next = false;
+
+                // Redirect back to the page
+                loadSubPage(nextPageAfterLogin);
+            }
+            else {
+                // Load the file manager
+                loadSubPage('fm');
+            }
+        }
+        else {
+            // Otherwise they used an incorrect email or password so show an error
+            mobile.messageOverlay.show(l[16349], l[16350]);
+        }
+    }
+};
+
+/**
+ * Functions for the new secure login process
+ */
+mobile.signin.new = {
+
+    /**
+     * Start the login process
+     * @param {String} email The user's email addresss
+     * @param {String} password The user's password as entered
+     * @param {String|null} pinCode The two-factor authentication PIN code (6 digit number), or null if not applicable
+     * @param {Boolean} rememberMe A boolean for if they checked the Remember Me checkbox on the login screen
+     * @param {String} salt The user's salt as a Base64 URL encoded string
+     */
+    startLogin: function(email, password, pinCode, rememberMe, salt) {
+
+        'use strict';
+
+        // Start the login using the new process
+        security.login.startLogin(email, password, pinCode, rememberMe, salt, mobile.signin.new.completeLogin);
+    },
+
+    /**
+     * Complete the login process and redirect to key generation step if newly registered, or to the cloud drive
+     * @param {Number} result If the result is negative there is an error, if positive it is the user type
+     */
+    completeLogin: function(result) {
+
+        'use strict';
+
+        // Hide the loading spinner
+        mobile.signin.$screen.find('.signin-button').removeClass('loading');
+
+        // If email confirm code is ok
+        if (confirmok) {
+            if (result === EBLOCKED) {
+                mobile.messageOverlay.show(l[730]);
+            }
+            else if (result !== false && result >= 0) {
+                u_type = result;
+                loadSubPage('key');
+            }
+            else {
+                // Otherwise they used an incorrect email or password so show an error
+                mobile.messageOverlay.show(l[16349], l[16350]);
+            }
+        }
+        else {
+            // If the Two-Factor PIN is required
+            if (result === EMFAREQUIRED) {
+
+                // Load the Two-Factor PIN entry page
+                loadSubPage('twofactor/verify-login');
+                return false;
+            }
+
+            // Check they are not locked out
+            else if (result === EBLOCKED) {
+                mobile.messageOverlay.show(l[730]);
+            }
+
+            // If there was a 2FA error, show a message that the PIN code was incorrect and clear the text field
+            else if (result === EFAILED) {
+                mobile.twofactor.verifyLogin.showVerificationError();
+            }
+
+            // Otherwise if successful
+            else if (result !== false && result >= 0) {
+
+                // Set the u_type e.g. 3 is fully registered user
+                u_type = result;
+
+                // Try getting the plan number they selected on Pro page
+                var planNum = localStorage.getItem('proPageContinuePlanNum');
+
+                // If they did come from the Pro page, continue to Pro page Step 2
+                if (planNum !== null) {
+
+                    // Remove the flag as it's no longer needed
+                    localStorage.removeItem('proPageContinuePlanNum');
+
+                    // Continue to the Pro payment page
+                    loadSubPage('propay_' + planNum);
+                }
+
+                // If they were on a page and asked to login before accessing
+                else if (login_next) {
+
+                    // Store the page temporarily
+                    var nextPageAfterLogin = login_next;
+
+                    // Clear the variable so subsequent logins work fine
+                    login_next = false;
+
+                    // Redirect back to the page
+                    loadSubPage(nextPageAfterLogin);
+                }
+                else {
+                    // Load the file manager
+                    loadSubPage('fm');
+                }
+            }
+            else {
+                // Otherwise they used an incorrect email or password so show an error
+                mobile.messageOverlay.show(l[16349], l[16350]);
+            }
+        }
     }
 };

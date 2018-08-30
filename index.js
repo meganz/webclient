@@ -1640,7 +1640,7 @@ function loginDialog(close) {
             tooltiplogin();
             return false;
         }
-        
+
     });
     $('#login-password, #login-name', $dialog).rebind('keydown', function (e) {
         $('.top-login-pad').removeClass('both-incorrect-inputs');
@@ -2569,7 +2569,7 @@ function loadSubPage(tpage, event) {
         return false;
     }
 
-    if (!is_mobile && slideshowid) {
+    if (window.slideshowid) {
         slideshow(0, 1);
     }
 

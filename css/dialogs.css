@@ -137,6 +137,10 @@
     width: 1394px;
     margin: -405px 0 0 -684px;
 }
+.fm-dialog.add-from-cloud .tooltip-handler {
+    z-index: 10;
+}
+
 .fm-dialog .fm-breadcrumbs-block {
     float: none;
     height: 46px;

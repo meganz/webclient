@@ -176,6 +176,10 @@ React.makeElement = React['createElement'];
 	    this.archivedChatsCount = 0;
 	    this._myPresence = localStorage.megaChatPresence;
 
+	    this._imageLoadCache = Object.create(null);
+	    this._imagesToBeLoaded = Object.create(null);
+	    this._imageAttributeCache = Object.create(null);
+
 	    this.options = {
 	        'delaySendMessageIfRoomNotAvailableTimeout': 3000,
 	        'loadbalancerService': 'gelb.karere.mega.nz',
@@ -947,6 +951,231 @@ React.makeElement = React['createElement'];
 	                $('.fm-empty-conversations').removeClass('hidden');
 	            }
 	        }
+	    }
+	};
+
+	Chat.prototype.setAttachments = function (roomId) {
+	    'use strict';
+
+	    if (M.chat) {
+	        if (d) {
+	            console.assert(this.chats[roomId] && this.chats[roomId].isCurrentlyActive, 'check this...');
+	        }
+
+	        M.v = Object.values(M.chc[roomId] || {});
+
+	        if (M.v.length) {
+	            M.v.sort(M.sortObjFn('co'));
+
+	            for (var i = M.v.length; i--;) {
+	                var n = M.v[i];
+
+	                if (!n.revoked && !n.seen) {
+	                    n.seen = -1;
+
+	                    if (String(n.fa).indexOf(':1*') > 0) {
+	                        this._enqueueImageLoad(n);
+	                    }
+	                }
+	            }
+	        }
+	    } else if (d) {
+	        console.warn('Not in chat...');
+	    }
+	};
+
+	Chat.prototype._enqueueImageLoad = function (n) {
+	    'use strict';
+
+	    var cc = previews[n.h] || previews[n.hash];
+	    if (cc) {
+	        if (cc.poster) {
+	            n.src = cc.poster;
+	        } else {
+	            if (cc.full && n.mime !== 'image/png' && n.mime !== 'image/webp') {
+	                cc = cc.prev || false;
+	            }
+
+	            if (String(cc.type).startsWith('image/')) {
+	                n.src = cc.src;
+	            }
+	        }
+	    }
+
+	    var cached = n.src;
+
+	    if (String(n.fa).indexOf(':1*') > 0) {
+	        var load = false;
+	        var dedup = true;
+
+	        if (this._imageAttributeCache[n.fa]) {
+	            this._imageAttributeCache[n.fa].push(n.ch);
+	        } else {
+	            this._imageAttributeCache[n.fa] = [n.ch];
+	            load = !cached;
+	        }
+
+	        if (this._imageLoadCache[n.h]) {
+	            this._imageLoadCache[n.h].push(n.ch);
+	        } else {
+	            this._imageLoadCache[n.h] = [n.ch];
+
+	            if (load) {
+	                this._imagesToBeLoaded[n.h] = n;
+	                dedup = false;
+	            }
+	        }
+
+	        if (dedup) {
+	            cached = true;
+	        } else {
+	            delay('chat:enqueue-image-load', this._doLoadImages.bind(this), 350);
+	        }
+	    }
+
+	    if (cached) {
+	        this._doneLoadingImage(n.h);
+	    }
+	};
+
+	Chat.prototype._doLoadImages = function () {
+	    "use strict";
+
+	    var self = this;
+	    var imagesToBeLoaded = self._imagesToBeLoaded;
+	    self._imagesToBeLoaded = Object.create(null);
+
+	    var chatImageParser = function chatImageParser(h, data) {
+	        var n = M.chd[self._imageLoadCache[h][0]] || false;
+
+	        if (data !== 0xDEAD) {
+
+	            n.src = mObjectURL([data.buffer || data], 'image/jpeg');
+	            n.srcBuffer = data;
+	        } else if (d) {
+	            console.warn('Failed to load image for %s', h, n);
+	        }
+
+	        self._doneLoadingImage(h);
+	    };
+
+	    var onSuccess = function onSuccess(ctx, origNodeHandle, data) {
+	        chatImageParser(origNodeHandle, data);
+	    };
+
+	    var onError = function onError(origNodeHandle) {
+	        chatImageParser(origNodeHandle, 0xDEAD);
+	    };
+
+	    api_getfileattr(imagesToBeLoaded, 1, onSuccess, onError);
+
+	    [imagesToBeLoaded].forEach(function (obj) {
+	        Object.keys(obj).forEach(function (handle) {
+	            self._startedLoadingImage(handle);
+	        });
+	    });
+	};
+
+	Chat.prototype._getImageNodes = function (h, src) {
+	    var nodes = this._imageLoadCache[h] || [];
+	    var handles = [].concat(nodes);
+
+	    for (var i = nodes.length; i--;) {
+	        var n = M.chd[nodes[i]] || false;
+
+	        if (this._imageAttributeCache[n.fa]) {
+	            handles = handles.concat(this._imageAttributeCache[n.fa]);
+	        }
+	    }
+	    handles = array.unique(handles);
+
+	    nodes = handles.map(function (ch) {
+	        var n = M.chd[ch] || false;
+	        if (src && n.src) {
+	            Object.assign(src, n);
+	        }
+	        return n;
+	    });
+
+	    return nodes;
+	};
+
+	Chat.prototype._startedLoadingImage = function (h) {
+	    "use strict";
+
+	    var nodes = this._getImageNodes(h);
+
+	    for (var i = nodes.length; i--;) {
+	        var n = nodes[i];
+
+	        if (!n.src && n.seen !== 2) {
+
+	            var imgNode = document.getElementById(n.ch);
+
+	            if (imgNode && (imgNode = imgNode.querySelector('img'))) {
+	                imgNode.parentNode.parentNode.classList.add('thumb-loading');
+	            }
+	        }
+	    }
+	};
+
+	Chat.prototype._doneLoadingImage = function (h) {
+	    "use strict";
+
+	    var setSource = function setSource(n, img, src) {
+	        var message = n.mo;
+
+	        img.onload = function () {
+	            img.onload = null;
+	            n.srcWidth = this.naturalWidth;
+	            n.srcHeight = this.naturalHeight;
+
+	            if (message) {
+	                message.trackDataChange();
+	            }
+	        };
+	        img.setAttribute('src', src);
+	    };
+
+	    var root = {};
+	    var nodes = this._getImageNodes(h, root);
+	    var src = root.src;
+
+	    for (var i = nodes.length; i--;) {
+	        var n = nodes[i];
+	        var imgNode = document.getElementById(n.ch);
+
+	        if (imgNode && (imgNode = imgNode.querySelector('img'))) {
+	            var parent = imgNode.parentNode;
+	            var container = parent.parentNode;
+
+	            if (src) {
+	                container.classList.add('thumb');
+	                parent.classList.remove('no-thumb');
+	            } else {
+	                container.classList.add('thumb-failed');
+	            }
+
+	            n.seen = 2;
+	            container.classList.remove('thumb-loading');
+	            setSource(n, imgNode, src || window.noThumbURI || '');
+	        }
+
+	        if (src) {
+	            n.src = src;
+
+	            if (root.srcBuffer && root.srcBuffer.byteLength) {
+	                n.srcBuffer = root.srcBuffer;
+	            }
+
+	            if (n.srcBuffer && !previews[n.h] && is_image3(n)) {
+	                preqs[n.h] = 1;
+	                previewimg(n.h, n.srcBuffer, 'image/jpeg');
+	                previews[n.h].fromChat = Date.now();
+	            }
+	        }
+
+	        delete n.mo;
 	    }
 	};
 
@@ -7733,7 +7962,6 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var Tooltips = __webpack_require__(14);
 	var ModalDialogsUI = __webpack_require__(13);
 
 	var BrowserCol = React.createClass({
@@ -7779,6 +8007,7 @@ React.makeElement = React['createElement'];
 	        };
 	    },
 	    getInitialState: function getInitialState() {
+
 	        return {
 	            'highlighted': [],
 	            'selected': []
@@ -8208,8 +8437,6 @@ React.makeElement = React['createElement'];
 
 	            var isFolder = node.t;
 	            var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
-
-	            var tooltipElement = null;
 
 	            var icon = React.makeElement(
 	                "span",
@@ -11238,14 +11465,12 @@ React.makeElement = React['createElement'];
 
 	            return;
 	        }
-	        var chatRoom = this.props.message.chatRoom;
 	        assert(M.chat, 'Not in chat.');
-	        chatRoom._rebuildAttachmentsImmediate();
 
 	        if (is_video(v)) {
 	            $.autoplay = v.h;
 	        }
-	        slideshow(v.h, undefined, true);
+	        slideshow(v.ch, undefined, true);
 	        if (e) {
 	            e.preventDefault();
 	            e.stopPropagation();
@@ -11262,15 +11487,13 @@ React.makeElement = React['createElement'];
 	        var timestampInt = self.getTimestamp();
 	        var timestamp = self.getTimestampAsString();
 
-	        var textMessage;
-
 	        var additionalClasses = "";
 	        var buttonsBlock = null;
 	        var spinnerElement = null;
 	        var messageNotSendIndicator = null;
 	        var messageIsNowBeingSent = false;
 	        var subMessageComponent = [];
-
+	        var attachmentMeta = false;
 	        var extraPreButtons = [];
 
 	        if (this.props.className) {
@@ -11306,125 +11529,83 @@ React.makeElement = React['createElement'];
 	                message.wasRendered = 1;
 	            }
 
-	            textMessage = message.messageHtml;
+	            var textMessage = message.messageHtml;
 
-	            if (message instanceof Message || typeof message.userId !== 'undefined' && message.userId === u_handle) {
-	                if (message.getState() === Message.STATE.NULL) {
-	                    additionalClasses += " error";
-	                } else if (message.getState() === Message.STATE.NOT_SENT) {
-	                    messageIsNowBeingSent = unixtime() - message.delay < 5;
-
-	                    if (!messageIsNowBeingSent) {
-	                        additionalClasses += " not-sent";
-
-	                        if (message.sending === true) {
-	                            message.sending = false;
-
-	                            $(message).trigger('onChange', [message, "sending", true, false]);
-	                        }
-
-	                        if (!message.requiresManualRetry) {
-	                            additionalClasses += " retrying";
-	                        } else {
-	                            additionalClasses += " retrying requires-manual-retry";
-	                        }
-
-	                        buttonsBlock = null;
-	                    } else {
-	                        additionalClasses += " sending";
-	                        spinnerElement = React.makeElement('div', { className: 'small-blue-spinner' });
-
-	                        if (!message.sending) {
-	                            message.sending = true;
-	                            if (self._rerenderTimer) {
-	                                clearTimeout(self._rerenderTimer);
-	                            }
-	                            self._rerenderTimer = setTimeout(function () {
-	                                if (chatRoom.messagesBuff.messages[message.messageId] && message.sending === true) {
-	                                    chatRoom.messagesBuff.trackDataChange();
-	                                    if (self.isMounted()) {
-	                                        self.forceUpdate();
-	                                    }
-	                                }
-	                            }, (5 - (unixtime() - message.delay)) * 1000);
-	                        }
-	                    }
-	                } else if (message.getState() === Message.STATE.SENT) {
-	                    additionalClasses += " sent";
-	                } else if (message.getState() === Message.STATE.DELIVERED) {
-	                    additionalClasses += " delivered";
-	                } else if (message.getState() === Message.STATE.NOT_SEEN) {
-	                    additionalClasses += " unread";
-	                } else if (message.getState() === Message.STATE.SEEN) {
-	                    additionalClasses += " seen";
-	                } else if (message.getState() === Message.STATE.DELETED) {
-	                    additionalClasses += " deleted";
-	                } else {
-	                    additionalClasses += " not-sent";
-	                }
-	            }
-
-	            var displayName;
-	            if (contact) {
-	                displayName = generateAvatarMeta(contact.u).fullName;
-	            } else {
-	                displayName = contact;
-	            }
-
+	            var state = message.getState();
+	            var stateText = message.getStateText(state);
 	            var textContents = message.textContents || false;
+	            var displayName = contact && generateAvatarMeta(contact.u).fullName || '';
+
+	            if (state === Message.STATE.NOT_SENT) {
+	                messageIsNowBeingSent = unixtime() - message.delay < 5;
+
+	                if (!messageIsNowBeingSent) {
+	                    additionalClasses += " not-sent";
+
+	                    if (message.sending === true) {
+	                        message.sending = false;
+	                        $(message).trigger('onChange', [message, "sending", true, false]);
+	                    }
+
+	                    if (!message.requiresManualRetry) {
+	                        additionalClasses += " retrying";
+	                    } else {
+	                        additionalClasses += " retrying requires-manual-retry";
+	                    }
+
+	                    buttonsBlock = null;
+	                } else {
+	                    additionalClasses += " sending";
+	                    spinnerElement = React.makeElement('div', { className: 'small-blue-spinner' });
+
+	                    if (!message.sending) {
+	                        message.sending = true;
+	                        if (self._rerenderTimer) {
+	                            clearTimeout(self._rerenderTimer);
+	                        }
+	                        self._rerenderTimer = setTimeout(function () {
+	                            if (chatRoom.messagesBuff.messages[message.messageId] && message.sending === true) {
+	                                chatRoom.messagesBuff.trackDataChange();
+	                                if (self.isMounted()) {
+	                                    self.forceUpdate();
+	                                }
+	                            }
+	                        }, (5 - (unixtime() - message.delay)) * 1000);
+	                    }
+	                }
+	            } else {
+	                additionalClasses += ' ' + stateText;
+	            }
 
 	            if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
 	                if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
 	                    attachmentMeta = message.getAttachmentMeta() || [];
 
 	                    var files = [];
-
-	                    self.attachments = [];
-
 	                    attachmentMeta.forEach(function (v, attachmentKey) {
-	                        self.attachments.push(v);
 
-	                        var attachmentMetaInfo;
-
-	                        if (message.messageId) {
-	                            if (chatRoom.attachments && chatRoom.attachments[v.h] && chatRoom.attachments[v.h][message.messageId]) {
-	                                attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
-	                            } else {
-
-	                                return;
-	                            }
-	                        }
-
-	                        if (attachmentMetaInfo.revoked) {
+	                        if (!M.chd[v.ch] || v.revoked) {
 
 	                            return;
 	                        }
 
 	                        var icon = fileIcon(v);
+	                        var mediaType = is_video(v);
 	                        var isImage = is_image2(v);
-	                        var isVideo = is_video(v) > 0;
-	                        var showThumbnail = v.fa && isImage || String(v.fa).indexOf(':0*') > 0;
+	                        var isVideo = mediaType > 0;
+	                        var isAudio = mediaType > 1;
+	                        var showThumbnail = String(v.fa).indexOf(':1*') > 0;
 	                        var isPreviewable = isImage || isVideo;
 
 	                        var dropdown = null;
 	                        var noThumbPrev = '';
 	                        var previewButton = null;
 
-	                        if (showThumbnail || isImage) {
-	                            var imagesListKey = message.messageId + "_" + v.h;
-	                            if (!chatRoom.images.exists(imagesListKey)) {
-	                                v.id = imagesListKey;
-	                                v.orderValue = message.orderValue;
-	                                v.messageId = message.messageId;
-	                                chatRoom.images.push(v);
-	                            }
-	                        }
-
 	                        if (isPreviewable) {
 	                            if (!showThumbnail) {
 	                                noThumbPrev = 'no-thumb-prev';
 	                            }
-	                            var previewLabel = isVideo ? l[17732] : l[1899];
+	                            var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
 	                            previewButton = React.makeElement(
 	                                'span',
 	                                { key: 'previewButton' },
@@ -11572,19 +11753,9 @@ React.makeElement = React['createElement'];
 	                            )
 	                        );
 
-	                        if (M.chat && showThumbnail && !message.revoked) {
-	                            var src = chatRoom.getCachedImageURI(v);
-
-	                            if (!src) {
-	                                v.seen = 1;
-	                                chatRoom.loadImage(v);
-	                                src = window.noThumbURI || '';
-	                            }
-	                            if (!v.imgId) {
-	                                v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
-	                            }
-
-	                            var thumbClass = src === window.noThumbURI ? " no-thumb" : "";
+	                        if (showThumbnail) {
+	                            var src = v.src || window.noThumbURI || '';
+	                            var thumbClass = v.src ? '' : " no-thumb";
 	                            var thumbOverlay = null;
 
 	                            if (isImage) {
@@ -11613,11 +11784,11 @@ React.makeElement = React['createElement'];
 
 	                            preview = src ? React.makeElement(
 	                                'div',
-	                                { id: v.imgId, className: "shared-link thumb " + thumbClass },
+	                                { id: v.ch, className: "shared-link thumb " + thumbClass },
 	                                thumbOverlay,
 	                                dropdown,
 	                                React.makeElement('img', { alt: '', className: "thumbnail-placeholder " + v.h, src: src,
-	                                    key: src === window.noThumbURI ? v.imgId : src,
+	                                    key: 'thumb-' + v.ch,
 	                                    onClick: isPreviewable && self._startPreview.bind(self, v)
 	                                })
 	                            ) : preview;
@@ -11625,7 +11796,7 @@ React.makeElement = React['createElement'];
 
 	                        files.push(React.makeElement(
 	                            'div',
-	                            { className: attachmentClasses, key: v.h },
+	                            { className: attachmentClasses, key: 'atch-' + v.ch },
 	                            React.makeElement(
 	                                'div',
 	                                { className: 'message shared-info' },
@@ -13201,8 +13372,6 @@ React.makeElement = React['createElement'];
 
 	"use strict";
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 	var utils = __webpack_require__(33);
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(12);
@@ -13217,7 +13386,6 @@ React.makeElement = React['createElement'];
 	    MegaDataObject.attachToExistingJSObject(this, {
 	        state: null,
 	        users: [],
-	        attachments: null,
 	        roomId: null,
 	        type: null,
 	        messages: [],
@@ -13252,17 +13420,6 @@ React.makeElement = React['createElement'];
 	    this.callRequest = null;
 	    this.callIsActive = false;
 	    this.shownMessages = {};
-	    this.attachments = new MegaDataMap(this);
-	    this.images = new MegaDataSortedMap("id", "orderValue", this);
-	    this.images.addChangeListener(function () {
-	        if (slideshowid) {
-	            self._rebuildAttachments();
-	        }
-	    });
-
-	    this._imagesLoading = Object.create(null);
-	    this._imagesToBeLoaded = Object.create(null);
-	    this._mediaAttachmentsCache = Object.create(null);
 
 	    self.members = {};
 
@@ -13750,6 +13907,7 @@ React.makeElement = React['createElement'];
 
 	    self.megaChat.currentlyOpenedChat = self.roomId;
 	    self.megaChat.lastOpenedChat = self.roomId;
+	    self.megaChat.setAttachments(self.roomId);
 
 	    self.trigger('activity');
 	    self.trigger('onChatShown');
@@ -13980,14 +14138,11 @@ React.makeElement = React['createElement'];
 	    return $masterPromise;
 	};
 
-	ChatRoom.prototype.lookupPendingUpload = function (faid, handle) {
-	    if (!this.pendingUploads) {
-	        return;
-	    }
-	    assert(faid || handle, 'lookupPendingUpload is missing both faid and handle args.');
+	ChatRoom.prototype.lookupPendingUpload = function (id) {
+	    console.assert((id | 0) > 0 || String(id).length === 8, 'Invalid lookupPendingUpload arguments...');
 
-	    for (var uid in this.pendingUploads) {
-	        if (faid && this.pendingUploads[uid].faid === faid || handle && this.pendingUploads[uid].h === handle) {
+	    for (var uid in ulmanager.ulEventData) {
+	        if (ulmanager.ulEventData[uid].faid === id || ulmanager.ulEventData[uid].h === id) {
 	            return uid;
 	        }
 	    }
@@ -14000,23 +14155,16 @@ React.makeElement = React['createElement'];
 	        logger.debug(error === -0xDEADBEEF ? 'upload:abort' : 'upload.error', uid, error);
 	    }
 
-	    var ul = self.pendingUploads && self.pendingUploads[uid] || false;
+	    var ul = ulmanager.ulEventData[uid];
 
 	    if (ul) {
-	        delete this.pendingUploads[uid];
-	        if (Object.keys(this.pendingUploads).length === 0) {
-	            this.clearUploadListeners();
-	        }
+	        delete ulmanager.ulEventData[uid];
+	        this.clearUploadListeners();
 	    }
 	};
 
 	ChatRoom.prototype.onUploadStart = function (data) {
 	    var self = this;
-	    if (!self.pendingUploads) {
-	        self.pendingUploads = Object.create(null);
-	    }
-
-	    Object.assign(self.pendingUploads, data);
 
 	    if (!self.uploadListeners) {
 	        self.uploadListeners = [];
@@ -14036,7 +14184,7 @@ React.makeElement = React['createElement'];
 	            }
 
 	            var n = M.d[handle];
-	            var ul = self.pendingUploads && self.pendingUploads[uid] || false;
+	            var ul = ulmanager.ulEventData[uid] || false;
 
 	            if (d) {
 	                logger.debug('upload:completion', uid, handle, faid, ul, n);
@@ -14044,7 +14192,9 @@ React.makeElement = React['createElement'];
 
 	            if (!ul || !n) {
 
-	                logger.error('Invalid state error...');
+	                if (d) {
+	                    logger.error('Invalid state error...');
+	                }
 	            } else {
 	                ul.h = handle;
 
@@ -14066,11 +14216,11 @@ React.makeElement = React['createElement'];
 	        self.uploadListeners.push(mBroadcaster.addListener('upload:abort', self.onUploadError.bind(self)));
 
 	        self.uploadListeners.push(mBroadcaster.addListener('fa:error', function (faid, error, onStorageAPIError, nFAiled) {
-	            var uid = self.lookupPendingUpload(faid, faid);
-	            var ul = self.pendingUploads && self.pendingUploads[uid] || false;
+	            var uid = self.lookupPendingUpload(faid);
+	            var ul = ulmanager.ulEventData[uid] || false;
 
 	            if (d) {
-	                logger.debug('fa:error', faid, error, onStorageAPIError, uid, ul);
+	                logger.debug('fa:error', faid, error, onStorageAPIError, uid, ul, nFAiled, ul.efa);
 	            }
 
 	            if (ul) {
@@ -14090,8 +14240,8 @@ React.makeElement = React['createElement'];
 
 	        self.uploadListeners.push(mBroadcaster.addListener('fa:ready', function (handle, fa) {
 	            delay('chat:fa-ready:' + handle, function () {
-	                var uid = self.lookupPendingUpload(false, handle);
-	                var ul = self.pendingUploads && self.pendingUploads[uid] || false;
+	                var uid = self.lookupPendingUpload(handle);
+	                var ul = ulmanager.ulEventData[uid] || false;
 
 	                if (d) {
 	                    logger.debug('fa:ready', handle, fa, uid, ul);
@@ -14109,19 +14259,19 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.onUploadComplete = function (ul) {
-	    if (this.pendingUploads && this.pendingUploads[ul.uid]) {
+	    if (ulmanager.ulEventData[ul && ul.uid]) {
 	        if (d) {
 	            console.debug('Attaching node to chat room...', ul.h, ul.uid, ul, M.d[ul.h]);
 	        }
 	        this.attachNodes([ul.h]);
-	        delete this.pendingUploads[ul.uid];
+	        delete ulmanager.ulEventData[ul.uid];
 	    }
 
 	    this.clearUploadListeners();
 	};
 
 	ChatRoom.prototype.clearUploadListeners = function () {
-	    if (!this.pendingUploads || Object.keys(this.pendingUploads).length === 0) {
+	    if (!$.len(ulmanager.ulEventData)) {
 	        for (var i = 0; i < this.uploadListeners.length; i++) {
 	            var listenerId = this.uploadListeners[i];
 	            mBroadcaster.removeListener(listenerId);
@@ -14293,223 +14443,6 @@ React.makeElement = React['createElement'];
 	            });
 	        }
 	    }
-	};
-
-	ChatRoom.prototype._rebuildAttachmentsImmediate = function () {
-	    if (!M.chat) {
-	        return;
-	    }
-
-	    var self = this;
-
-	    var imagesList = [];
-	    var deleted = [];
-	    self.images.values().forEach(function (v) {
-	        var msg = self.messagesBuff.getMessageById(v.messageId);
-	        if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
-	            slideshowid && deleted.push(v.id.substr(-8));
-	            self.images.removeByKey(v.id);
-	            return;
-	        }
-	        imagesList.push(v);
-	    });
-
-	    M.v = imagesList;
-
-	    var slideshowCalled = false;
-	    slideshowid && deleted.forEach(function (currentNodeId) {
-	        if (currentNodeId === slideshowid) {
-	            var lastNode;
-	            var found = false;
-	            M.v.forEach(function (node) {
-	                if (!found && node.h !== currentNodeId) {
-	                    lastNode = node.h;
-	                }
-	                if (node.h === currentNodeId) {
-	                    found = true;
-	                }
-	            });
-
-	            if (!lastNode) {
-	                for (var i = 0; i < M.v.length; i++) {
-	                    if (M.v[i].h !== currentNodeId) {
-	                        lastNode = M.v[i].h;
-	                        break;
-	                    }
-	                }
-	            }
-
-	            if (!lastNode) {
-
-	                slideshow(undefined, true);
-	                slideshowCalled = true;
-	            } else {
-
-	                slideshow(lastNode, undefined, true);
-	                slideshowCalled = true;
-	            }
-	        }
-	    });
-
-	    slideshowid && !slideshowCalled && slideshow(slideshowid, undefined, true);
-	};
-
-	ChatRoom.prototype._rebuildAttachments = SoonFc(ChatRoom.prototype._rebuildAttachmentsImmediate, 300);
-
-	ChatRoom.prototype.loadImage = function (node) {
-	    "use strict";
-
-	    var self = this;
-
-	    if (preqs[node.h] || pfails[node.h] || self.getCachedImageURI(node)) {
-	        onIdle(self._doneLoadingImage.bind(self, node));
-	    } else if (!self._imagesLoading[node.h]) {
-	        self._imagesLoading[node.h] = true;
-	        self._imagesToBeLoaded[node.h] = node;
-	        delay('ChatRoom[' + self.roomId + ']:doLoadImages', self._doLoadImages.bind(self), 90);
-	    }
-	};
-
-	ChatRoom.prototype._doneLoadingImage = function (node) {
-	    "use strict";
-
-	    var imgNode = document.getElementById(node.imgId || node.h);
-
-	    if (imgNode && (imgNode = imgNode.querySelector('img'))) {
-	        var src = this.getCachedImageURI(node);
-	        var container = imgNode.parentNode.parentNode;
-
-	        if (src) {
-	            imgNode.setAttribute('src', src);
-	            container.classList.add('thumb');
-	            container.classList.remove('thumb-loading');
-	        } else {
-	            imgNode.setAttribute('src', window.noThumbURIs || '');
-	            container.classList.add('thumb-failed');
-	            container.classList.remove('thumb-loading');
-	        }
-
-	        node.seen = 2;
-	    }
-
-	    var self = this;
-	    if (self.attachments[node.h]) {
-	        self.attachments[node.h].keys().forEach(function (foundInMessageId) {
-	            var msg = self.messagesBuff.messages[foundInMessageId];
-	            if (msg) {
-	                msg.trackDataChange();
-	            }
-	        });
-	    }
-	};
-
-	ChatRoom.prototype.getCachedImageURI = function (n) {
-	    var h = n && (typeof n === "undefined" ? "undefined" : _typeof(n)) === 'object' && n.h || n;
-
-	    return this._mediaAttachmentsCache[h] || previews[h] && (previews[h].poster || previews[h].src);
-	};
-
-	ChatRoom.prototype._startedLoadingImage = function (node) {
-	    "use strict";
-
-	    var imgNode = document.getElementById(node.imgId || node.h);
-
-	    if (imgNode && (imgNode = imgNode.querySelector('img'))) {
-	        imgNode.parentNode.parentNode.classList.add('thumb-loading');
-	    }
-	};
-
-	ChatRoom.prototype._getDedupedNodesForThumbanils = function (imagesToBeLoaded, origNodeHandle) {
-	    "use strict";
-
-	    var origNode = imagesToBeLoaded[origNodeHandle];
-	    var nodes = [origNode];
-	    if (origNode.fa_dups) {
-	        nodes = nodes.concat(origNode.fa_dups);
-	    }
-
-	    return nodes;
-	};
-
-	ChatRoom.prototype._doLoadImages = function () {
-	    "use strict";
-
-	    var self = this;
-	    var dups = Object.create(null);
-	    var thumbToLoad = Object.create(null);
-	    var imagesToBeLoaded = self._imagesToBeLoaded;
-	    self._imagesToBeLoaded = Object.create(null);
-
-	    for (var k in imagesToBeLoaded) {
-	        var node = imagesToBeLoaded[k];
-	        if (dups[node.fa]) {
-	            dups[node.fa].fa_dups = dups[node.fa].fa_dups || [];
-	            dups[node.fa].fa_dups.push(node);
-
-	            delete imagesToBeLoaded[k];
-	        } else {
-	            dups[node.fa] = node;
-	        }
-
-	        if (String(node.fa).indexOf(':1*') < 0) {
-	            if (String(node.fa).indexOf(':0*') > 0) {
-	                if (d) {
-	                    console.debug('Chat loading thumbnail for %s since it has no preview fa', node.h, node);
-	                }
-	                thumbToLoad[node.h] = node;
-	            } else if (d) {
-	                console.warn('Chat cannot load image for %s since it has no suitable file attribute.', node.h, node);
-	            }
-	            delete imagesToBeLoaded[k];
-	        }
-	    }
-
-	    var chatImageParser = function chatImageParser(h, data) {
-	        var isThumbnail = thumbToLoad[h];
-	        var nodes = self._getDedupedNodesForThumbanils(isThumbnail ? thumbToLoad : imagesToBeLoaded, h);
-
-	        for (var i = nodes.length; i--;) {
-	            var n = nodes[i];
-	            h = n.h;
-
-	            if (data !== 0xDEAD) {
-	                if (!isThumbnail && !previews[h] && is_image3(n)) {
-	                    preqs[h] = 1;
-	                    previewimg(h, data, 'image/jpeg');
-	                    previews[h].fromChat = Date.now();
-	                } else {
-	                    self._mediaAttachmentsCache[h] = mObjectURL([data.buffer || data], 'image/jpeg');
-	                }
-	            } else {
-	                if (d) {
-	                    console.error('Failed to load image for %s', h);
-	                }
-	                self._mediaAttachmentsCache[h] = false;
-	            }
-	            delete self._imagesLoading[h];
-	            self._doneLoadingImage(n);
-	        }
-	    };
-
-	    var onSuccess = function onSuccess(ctx, origNodeHandle, data) {
-	        chatImageParser(origNodeHandle, data);
-	    };
-
-	    var onError = function onError(origNodeHandle) {
-	        chatImageParser(origNodeHandle, 0xDEAD);
-	    };
-
-	    api_getfileattr(imagesToBeLoaded, 1, onSuccess, onError);
-
-	    if ($.len(thumbToLoad)) {
-	        api_getfileattr(thumbToLoad, 0, onSuccess, onError);
-	    }
-
-	    [imagesToBeLoaded, thumbToLoad].forEach(function (obj) {
-	        Object.keys(obj).forEach(function (handle) {
-	            self._startedLoadingImage(obj[handle]);
-	        });
-	    });
 	};
 
 	window.ChatRoom = ChatRoom;

@@ -2773,6 +2773,10 @@ MegaData.prototype.getNodeByHandle = function(handle) {
         return this.d[handle];
     }
 
+    if (this.chd[handle]) {
+        return this.chd[handle];
+    }
+
     for (var i = this.v.length; i--;) {
         if (this.v[i].h === handle) {
             return this.v[i];

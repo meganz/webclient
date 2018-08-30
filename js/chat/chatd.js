@@ -701,6 +701,7 @@ Chatd.cmdToString = function(cmd, tx) {
             result += " chatId: " + chatId + " fromMsgId: " + fromMsg + " toMsgId: " + toMsg;
             return [result, 25];
 
+        case Chatd.Opcode.OLDMSG:
         case Chatd.Opcode.NEWMSG:
         case Chatd.Opcode.MSGUPD:
             //     chatId + userId + msgid + Chatd.pack32le(timestamp) +

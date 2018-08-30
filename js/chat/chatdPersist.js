@@ -1056,7 +1056,7 @@
 
         self.getMessageByMessageId(chatId, msgId)
             .done(function(r) {
-                self.db.msgs.delete(r.id)
+                self.db.msgs.delete(r.id || r[0] && r[0].id)
                     .then(
                         function() {
                             promise.resolve();
@@ -1172,6 +1172,7 @@
                 var next = function() {
                     var i = currentActionIndex++;
                     var queueEntry = queue.actions[i];
+
                     if (!queueEntry) {
                         return;
                     }
@@ -1795,7 +1796,7 @@
             })
             .fail(function (e) {
                 if (d) {
-                    console.error("Failed to retrieve key for msgmodify", [
+                    console.error("Failed to retrieve key for retrieveAndLoadKeysFor", [
                         chatId,
                         userId,
                         keyId

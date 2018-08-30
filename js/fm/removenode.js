@@ -1,7 +1,8 @@
 function removeUInode(h, parent) {
+    'use strict';
 
-    var n = M.d[h],
-        i = 0;
+    var i = 0;
+    var n = M.getNodeByHandle(h);
 
     // check subfolders
     if (n && n.t) {
@@ -18,8 +19,9 @@ function removeUInode(h, parent) {
 
     // Update M.v it's used for at least preview slideshow
     for (var k = M.v.length; k--;) {
-        if (M.v[k].h === h) {
-            if (slideshowid === h) {
+        var v = M.v[k].ch || M.v[k].h;
+        if (v === h) {
+            if (slideshowid === v) {
                 (function(h) {
                     onIdle(function() {
                         slideshow(h, !h);
@@ -99,6 +101,9 @@ function removeUInode(h, parent) {
             }
             break;
         default:
+            if (M.chat) {
+                break;
+            }
             if (i == 0 && n) {
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
             }

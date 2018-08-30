@@ -2345,7 +2345,7 @@ function api_faerrlauncher(ctx, host) {
         logger.error('FAEOT', id);
     }
 
-    if (id !== slideshowid) {
+    if (id !== slideshow_handle()) {
         if (id) {
             pfails[id] = 1;
             delete preqs[id];
@@ -2472,7 +2472,7 @@ function api_fareq(res, ctx, xhr) {
                             clearTimeout(this.fart);
                         }
 
-                        if (this.fah.done(ev) || M.chat) {
+                        if (this.fah.done(ev)) {
                             delay('thumbnails', fm_thumbnails, 200);
                         }
 

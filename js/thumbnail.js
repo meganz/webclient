@@ -416,7 +416,14 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
         else if (isVideo && file) {
             M.require('videostream').tryCatch(function() {
-                Streamer.getThumbnail(file).then(__render_thumb.bind(null, img)).catch(console.debug.bind(console));
+                Streamer.getThumbnail(file)
+                    .then(__render_thumb.bind(null, img))
+                    .catch(function(ex) {
+                        if (d) {
+                            console.warn('Aborting thumbnail creation for video file...', ex);
+                        }
+                        img.src = 'data:text/xml,streamerror';
+                    });
             });
         }
         else {

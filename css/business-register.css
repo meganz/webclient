@@ -1,5 +1,8 @@
 .business-register {
 	background-color: rgba(250,250,250,1);
+	overflow: auto;
+	width: 100%;
+	height: auto;
 }
 
 .business-register * {
@@ -137,7 +140,7 @@
     font-size: 13px;
     padding:16px 0 0 4px;
     color: rgba(229,76,81,1);
-    width:400px;
+    width:90%;
     white-space: nowrap;
     text-overflow: ellipsis;
     display:none;
@@ -290,17 +293,28 @@
 	cursor: pointer;
 }
 
-.bus-reg-btn {
+.bus-reg-btn, .bus-reg-btn-2 {
 	background-color: rgba(255,51,58,1);
-	float: right;
 	height: 48px;
 	padding: 0 24px;
 	cursor: pointer;
 	border-radius: 4px;
 	margin-top: 64px;
+	margin-bottom: 88px;
+	float: right;
 }
 
-.bus-reg-btn span {
+.bus-reg-btn-2 {
+	display: none;
+}
+
+.business-register .clear {
+	clear: both;
+}
+
+
+
+.bus-reg-btn span, .bus-reg-btn-2 span {
 	line-height: 48px;
 	display: inline;
 	font-size: 18px;
@@ -308,7 +322,7 @@
 	vertical-align: top;
 }
 
-.bus-reg-btn .next-arrow {
+.bus-reg-btn .next-arrow, .bus-reg-btn-2 .next-arrow {
 	width: 24px;
 	height: 24px;
 	background-position: -93px -414px;
@@ -347,22 +361,20 @@
 	color: #333;
 	line-height: 24px;
 	margin: 4px auto 40px auto;
-	width: 380px;
+	width: 100%;
 	text-align: center;
 }
 
 .bus-reg-plan .business-plan-price {
-	width: 348px;
+	width: 90%;
 	height: 72px;
-	margin:auto;
+	margin:16px auto;
 	background-color: #00BFA5;
 	border-radius: 2px;
 	color:#fff;
 	font-size: 16px;
-	width: 348px;
 	text-align: center;
 	line-height: 72px;
-	margin-bottom: 16px;
 }
 
 .bus-reg-plan .business-plan-price .big {
@@ -372,16 +384,16 @@
 }
 
 .bus-reg-plan .business-plan-info {
-	width: 348px;
+	width: 90%;
 	height: 54px;
-	margin:0 16px;
+	margin:0 auto;
 	background-color: #fff;
 }
 
 .bus-reg-plan .business-plan-info.grey {
-	width: 348px;
+	width: 90%;
 	height: 54px;
-	margin:0 16px;
+	margin:0 auto;
 	background-color: rgba(0,0,0,0.03);
 }
 
@@ -411,9 +423,138 @@
 	font-size: 24px;
 	color:#000;
 	line-height: 64px;
-	padding: 0 16px;
+	padding: 0 24px;
 }
 
+.bus-reg-bottom-page {
+	width: 100%;
+	position: relative;
+}
+
+.bus-reg-bottom-page .page-header {
+	width: 100%;
+	font-size: 36px;
+	font-family: montserrat, open_sans, sans-serif;
+	font-weight: 300;
+	text-align: center;
+	margin-bottom: 64px;
+	color: #333;
+	line-height: 54px;
+}
+
+.bus-reg-featureBlock {
+	width:32%;
+	display: inline-block;
+	margin-top: 48px;
+	vertical-align: top;
+}
+
+.bus-reg-featureImg100 {
+	width: 100px;
+	height: 100px;
+	margin: auto;
+	background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+}
+
+.bus-reg-featureTxt {
+	width: 80%;
+	margin:48px auto 64px auto;
+	color: #666;
+	font-size: 14px;
+	line-height: 24px;
+	text-align: center;
+}
+
+.ky-icon {
+	background-position: -16px -464px;
+}
+
+.forbit-icon {
+	background-position: -16px -572px;
+}
+
+.extension-icon {
+	background-position: -16px -691px;
+}
+
+
+
+
+@media only screen and (max-width: 790px) {
+
+.bus-reg-body {
+	width:95%;
+	min-width: 0;
+}
+
+.bus-reg-plan {
+	position: relative;
+}
+
+.bus-reg-header {
+	font-size: 30px;
+}
+
+.bus-reg-info-block {
+	width: 100%;
+}
+
+.bus-reg-input {
+	width: 100%;
+}
+
+.bus-reg-input.num {
+	width: 60%;
+}
+
+.bus-reg-input input {
+	width: -webkit-calc(100% - 50px);
+    width: -moz-calc(100% - 50px);
+    width: calc(100% - 50px);
+}
+
+.bus-reg-input input.fir-name {
+	width: 36%;
+}
+
+.bus-reg-input input.las-name {
+	width: 36%;
+}
+
+.bus-reg-body .provider-icon.ecpMC{
+	margin-right: 10px;
+	background-position: -51px -414px;
+}
+
+.bus-reg-agreement {
+	width: 100%;
+}
+
+.bus-reg-agreement .bus-reg-txt {
+	width: 88%;
+}
+
+.bus-reg-plan {
+	width:100%;
+	top: 48px;
+}
+
+.bus-reg-btn {
+	display: none;
+}
+
+.bus-reg-btn-2 {
+	display: inline-block;
+	margin-top: 80px;
+}
+
+.bus-reg-featureBlock {
+	width:100%;
+}
+
+
+}
 
 
 

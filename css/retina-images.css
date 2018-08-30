@@ -342,6 +342,42 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
      background-size: 38px auto;
 }
 
+.bus-reg-icon {
+    background-image: url(../images/mega/top-sprite_v5@2x.png);
+     background-size: 38px auto;
+}
+
+.bus-reg-body .provider-icon {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+.bus-reg-checkbox.checkOn::before {
+    background-image: url(../images/mega/top-login-sprite_v9@2x.png);
+
+}
+
+.bus-reg-btn .next-arrow, .bus-reg-btn-2 .next-arrow {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+.bus-plan-icon64 {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+.bus-reg-featureImg100 {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+.bus-confirm-body .bus-confirmImg {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+} 
+
+
 
 
 

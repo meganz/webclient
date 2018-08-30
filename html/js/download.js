@@ -787,7 +787,7 @@ function start_import() {
                 start_anoimport();
             }
             else {
-                loginDialog();
+                tooltiplogin.init();
 
                 mBroadcaster.once('login', function() {
                     setTimeout(function() {

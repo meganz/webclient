@@ -878,6 +878,7 @@ scparser.$add('t', function(a, scnodes) {
         if (scnodes[i]) {
             delete scnodes[i].i;
             delete scnodes[i].scni;
+            delete scnodes[i].arrivalOrder;
             M.addNode(scnodes[i]);
             ufsc.feednode(scnodes[i]);
         }
@@ -3446,18 +3447,20 @@ var fa_reqcnt = 0;
 var fa_addcnt = 8;
 var fa_tnwait = 0;
 
-function fm_thumbnails()
+function fm_thumbnails(mode, nodeList)
 {
     var treq = {}, a = 0, max = Math.max($.rmItemsInView || 1, 71) + fa_addcnt, u = max - Math.floor(max / 3), y;
     if (!fa_reqcnt)
         fa_tnwait = y;
     if (d)
         console.time('fm_thumbnails');
-    if (M.viewmode || M.chat)
+
+    nodeList = (mode === 'standalone' ? nodeList : false) || M.v;
+
+    if ((M.viewmode && !M.chat) || mode === 'standalone')
     {
-        for (var i in M.v)
-        {
-            var n = M.v[i];
+        for (var i = 0; i < nodeList.length; i++) {
+            var n = nodeList[i];
             if (n && !missingkeys[n.h] && n.fa && String(n.fa).indexOf(':0') > 0)
             {
                 if (fa_tnwait == n.h && n.seen)
@@ -3533,13 +3536,15 @@ function fm_thumbnails()
                 // deduplicate in view when there is a duplicate fa:
                 if (targetNode && fa_duplicates[targetNode.fa] > 0)
                 {
-                    for (var i in M.v)
+                    for (var i = 0; i < nodeList.length; i++)
                     {
-                        if (M.v[i].h !== node && M.v[i].fa === targetNode.fa && !thumbnails[M.v[i].h])
+                        var n = nodeList[i];
+                        if (n.h !== node && n.fa === targetNode.fa && !thumbnails[n.h])
                         {
-                            thumbnails[M.v[i].h] = thumbnails[node];
-                            if (M.v[i].seen && M.currentdirid === cdid)
-                                fm_thumbnail_render(M.v[i]);
+                            thumbnails[n.h] = thumbnails[node];
+                            if (n.seen && M.currentdirid === cdid)  {
+                                fm_thumbnail_render(n);
+                            }
                         }
                     }
                 }

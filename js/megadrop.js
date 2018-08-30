@@ -77,6 +77,37 @@ mega.megadrop = (function() {
     };
 
     /**
+     * Show user warning dialog when user's action remove public upload folder (PUF)
+     * @param {Object} list MEGAdrop folders id list
+     */
+    var showRemoveWarning = function showRemoveWarning(list) {
+        var promise = new MegaPromise();
+        var fldName = list.length > 1
+            ? l[17626]
+            : l[17403].replace('%1', escapeHTML(M.d[list[0]].name));
+
+        msgDialog(
+            'confirmation',
+            l[1003],
+            fldName,
+            false,
+            function(e) {
+                if (e) {
+                    closeDialog();
+                    mega.megadrop.pufRemove(list).done(function() {
+                        promise.resolve();
+                    });
+                }
+                else {
+                    promise.reject();
+                }
+            }
+        );
+
+        return promise;
+    };
+    
+    /**
      * Make sure that user knows that MEGAdrops wiil be cancelled if any
      * full shares or public links are available for target
      * @param {Array} handles Array of nodes id which will be moved
@@ -85,30 +116,8 @@ mega.megadrop = (function() {
     var preMoveCheck = function preMoveCheck(handles, target) {
         var sel = Array.isArray(handles) ? handles : [handles];
         var count = 0;
-        var fldName = '';
         var list = [];
         var promise = new MegaPromise();
-
-        var tmpFn = function(fldName, list) {
-            var promise = new MegaPromise();
-
-            msgDialog(
-                'confirmation',
-                l[1003],
-                fldName,
-                false, function(e) {
-                if (e) {
-                    mega.megadrop.pufRemove(list).done(function() {
-                        promise.resolve(sel, target);
-                    });
-                }
-                else {
-                    promise.reject();
-                }
-            });
-
-            return promise;
-        };
 
         // Is there any MEGAdrop active for given handles?
         // Count for precise dlg message, will loop to the
@@ -118,18 +127,22 @@ mega.megadrop = (function() {
         }
         count = list.length;
         if (count) {// MEGAdrop detected in source tree
-            fldName = count > 1
-                ? l[17626]
-                : l[17403].replace('%1', escapeHTML(M.d[list[0]].name));
-
             shared(target).done(function(res) {
                 if (res) {// Full share or pub link found
-                    promise = tmpFn(fldName, list);
+                    showRemoveWarning(list).done(function() {
+                        promise.resolve(sel, target);
+                    }).fail(function() {
+                        promise.reject();
+                    });
                 }
                 else {
                     var share = new mega.Share({});
                     if (share.isShareExist([target], false, true)) {// Search pending shares .ps
-                        promise = tmpFn(fldName, list);
+                        showRemoveWarning(list).done(function() {
+                            promise.resolve(sel, target);
+                        }).fail(function() {
+                            promise.reject();
+                        });
                     }
                     else {
                         promise.resolve(sel, target);
@@ -143,6 +156,7 @@ mega.megadrop = (function() {
 
         return promise;
     };
+    
     /**
      * Public upload folder's (PUF) related methods and properties
      */
@@ -2236,6 +2250,7 @@ mega.megadrop = (function() {
         getPufHandle: pufHandle,
         isDropExist: isDropExist,
         preMoveCheck: preMoveCheck,
+        showRemoveWarning: showRemoveWarning,
         processUPHAP: processUPHAP,
         getOwnersHandle: ownersHandle,
         disableDragDrop: disableDragDrop,

@@ -683,12 +683,16 @@ var ulmanager = {
                     {raw: img !== 1 && img, isVideo: vid}
                 );
 
-                if (vid && ulmanager.ulEventData[file.id]) {
-                    if (d) {
-                        console.debug('Increasing the number of expected file attributes for the chat to be aware.');
-                        console.assert(ulmanager.ulEventData[file.id].efa === 1, 'Check this...');
+                var uled = ulmanager.ulEventData[file.id];
+                if (uled) {
+                    if (vid) {
+                        if (d) {
+                            console.debug('Increasing expected file attributes for the chat to be aware...');
+                            console.assert(uled.efa === 1, 'Check this...');
+                        }
+                        uled.efa += 2;
                     }
-                    ulmanager.ulEventData[file.id].efa += 2;
+                    uled.faid = file.faid;
                 }
             }
         }

@@ -455,6 +455,9 @@ mobile.cloud = {
         // Clone the template
         var $template = $templateSelector.clone().removeClass('template');
 
+        // Shared folder variable
+        var share = new mega.Share();
+
         // Show the number of files in that folder
         $template.find('.num-files').text(foldersWording + ', ' + filesWording);
 
@@ -470,6 +473,11 @@ mobile.cloud = {
             // Show the link icon if it already has a public link
             if (typeof node.shares !== 'undefined' && typeof node.shares.EXP !== 'undefined') {
                 $template.find('.fm-icon.link').removeClass('hidden');
+            }
+
+            if (share.isShareExist([node.h], true, true, false)) {
+                $template.find('.shared-folder').removeClass('hidden');
+                $template.find('.regular-folder').addClass('hidden');
             }
         }
 

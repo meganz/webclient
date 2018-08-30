@@ -146,7 +146,8 @@
                 <!-- Template for folders -->
                 <div class="mobile fm-item folder template">
                     <div class="mobile fm-item-img">
-                        <img alt="" src="{staticpath}images/mobile/extensions/folder.png" />
+                        <img class="regular-folder" alt="" src="{staticpath}images/mobile/extensions/folder.png" />
+                        <img class="shared-folder hidden" alt="" src="{staticpath}images/mobile/extensions/outgoing-share-folder.png" />
                     </div>
                     <div class="mobile fm-icon open-context-menu right hidden"></div>
                     <div class="mobile fm-icon link right hidden"></div>
@@ -237,6 +238,7 @@
         <div class="mobile fm-block create-new-folder-dialog">
             <div class="mobile fm-row">
                 <div class="mobile fm-content">
+                    <img class="mobile filetype-img" alt="" src="{staticpath}images/mobile/extensions/folder.png" />
                     <div class="mobile first-message">[$17617]</div>
                     <div class="mobile folder-input-container">
                         <input class="mobile folder-name-input" type="text" maxlength="70" placeholder="[$157]">
@@ -477,6 +479,17 @@
                 <div class="mobile recovery-key-text">[$17688]</div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
+            <div class="mobile account-twofactor-block hidden"><!-- Add enabled class -->
+                <div class="mobile fm-icon lock"></div>
+                <div class="mobile two-factor-heading enabled">[$19290]</div>
+                <div class="mobile two-factor-heading disabled">[$19289]</div>
+                <div class="mobile two-factor-indication-wrapper">
+                    <span class="mobile two-factor-indicator"></span>
+                    <span class="mobile two-factor-text enabled">[$17601]</span>
+                    <span class="mobile two-factor-text disabled">[$7070]</span>
+                </div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
             <div class="mobile acount-cancellation-block">
                 <div class="mobile fm-icon broken-heart"></div>
                 <div class="mobile account-upgrade-text">[$16115]</div>
@@ -685,7 +698,7 @@
                     </div>
                     <div class="mobile signin-input recover-account">
                         <span></span>
-                        <input class="recover-account-email" type="email" value="" placeholder="[$16343]">
+                        <input class="recover-account-email" type="email" value="" placeholder="[$16343]" maxlength="190">
                     </div>
                     <div class="mobile recover-account-btn-block">
                         <div class="mobile recover-account-email-send-btn">
@@ -815,7 +828,7 @@
                     <div class="mobile recover-account-body-text">[$1942]</div>
                     <div class="mobile signin-input recover-account">
                         <span></span>
-                        <input class="recover-account-email" type="email" value="" placeholder="[$16343]">
+                        <input class="recover-account-email" type="email" value="" placeholder="[$16343]" maxlength="190">
                     </div>
                     <div class="mobile recover-account-btn-block">
                         <div class="mobile recover-account-email-send-btn">
@@ -1003,7 +1016,7 @@
                         <div class="mobile invite-friends-text">[$17466]</div>
                     </div>
                     <div class="mobile email-input-container">
-                        <input class="mobile email-input" type="email" placeholder="[$7434]">
+                        <input class="mobile email-input" type="email" placeholder="[$7434]" maxlength="190">
                         <div class="mobile email-warning-block hidden">
                             <div class="mobile fm-icon red-warning"></div>
                             <div class="mobile warning-text">[$1513]</div>
@@ -1302,7 +1315,7 @@
                         <form>
                             <div class="mobile signin-input login">
                                 <span></span>
-                                <input type="email" value="" placeholder="[$16343]" />
+                                <input type="email" value="" placeholder="[$16343]" maxlength="190" />
                             </div>
                             <div class="mobile signin-input password">
                                 <span></span>
@@ -1338,7 +1351,7 @@
                             </div>
                             <div class="mobile signin-input email-address">
                                 <span></span>
-                                <input type="email" value="" placeholder="[$1331]" />
+                                <input type="email" value="" placeholder="[$1331]" maxlength="190" />
                                 <i class="warning-icon"></i>
                             </div>
                             <div class="mobile signin-input password">
@@ -1411,7 +1424,7 @@
                         [$217]
                     </div>
                     <div class="change-email">
-                        <input type="text">
+                        <input type="text" maxlength="190">
                     </div>
                     <div class="instruction-message">
                         [$9029]
@@ -2444,6 +2457,244 @@
                             [$1694]
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Introduction page to setting up Two Factor Authentication -->
+<div class="mobile main-block two-factor-page intro-page hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile fm-icon tfa-lock"></div>
+                <div class="mobile dialog-heading-text">[$19202]</div>
+                <div class="mobile dialog-body-text">
+                    [$19203]
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile red-button first setup-two-factor-button"> <i></i> <span>[$19204]</span> </a>
+                </div>
+                 <a class="mobile text-button third cancel"><span>[$82]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Authentication Set up page  -->
+<div class="mobile main-block two-factor-page setup-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$19194]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="two-factor-qr-block">
+                    <div class="mobile two-factor-heading">[$19204]</div>
+                    <div class="mobile two-factor-body-text">
+                        [$19205]
+                    </div>
+                    <div class="mobile two-factor-qr-code-wrapper">
+                        <div class="qr-code-img"></div>
+                        <div class="mobile two-factor-qr-seed-container">
+                            <textarea id="two-factor-qr-seed" class="mobile two-factor-qr-seed" readonly></textarea>
+                        </div>
+                        <div class="mobile cta-button red two-factor-next-btn active">[$556]</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Authentication Seed verification page  -->
+<div class="mobile main-block two-factor-page verify-setup-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$19194]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="two-factor-qr-block">
+                    <div class="mobile two-factor-heading">[$19204]</div>
+                    <div class="mobile two-factor-body-text">
+                        [$19212]
+                    </div>
+                    <div class="mobile two-factor-verify-seed-wrapper">
+                        <div class="mobile signin-input two-factor-seed-input">
+                            <input type="text" value="" placeholder="[$19193]" />
+                        </div>
+                        <div class="mobile warning-text-field hidden">
+                            [$19210]
+                        </div>
+                         <div class="mobile cta-button red two-factor-verify-btn">
+                            <span class="label">[$1960]</span>
+                            <span class="loading-image">
+                                <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Enabled page -->
+<div class="mobile main-block two-factor-page enabled-page hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile white-block">
+                <div class="mobile fm-icon tfa-lock">
+                    <div class="mobile green-check">
+                        <div class="mobile fm-icon check-mark"></div>
+                    </div>
+                </div>
+                <div class="mobile dialog-heading-text">[$19206]</div>
+                <div class="mobile dialog-body-text">
+                    [$19207]
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile red-button first ok-button"> <i></i> <span>[$81]</span> </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Authentication disable page  -->
+<div class="mobile main-block two-factor-page verify-disable-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$19194]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="two-factor-qr-block">
+                    <div class="mobile two-factor-heading">[$19208]</div>
+                    <div class="mobile two-factor-body-text">
+                        [$19209]
+                    </div>
+                    <div class="mobile two-factor-verify-seed-wrapper">
+                        <div class="mobile signin-input two-factor-seed-input">
+                            <input type="text" value="" placeholder="[$19193]" />
+                        </div>
+                        <div class="mobile warning-text-field hidden">
+                            [$19210]
+                        </div>
+                         <div class="mobile cta-button red two-factor-verify-btn">
+                            <span class="label">[$1960]</span>
+                            <span class="loading-image">
+                                <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Disabled page -->
+<div class="mobile main-block two-factor-page disabled-page hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile white-block">
+                 <div class="mobile fm-icon tfa-lock">
+                    <div class="mobile red-check">
+                        <div class="mobile fm-icon check-mark">+</div>
+                    </div>
+                </div>
+                <div class="mobile dialog-heading-text">[$19211]</div>
+                <div class="mobile buttons">
+                    <a class="mobile red-button first ok-button"> <i></i> <span>[$81]</span> </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Authentication Login verification page  -->
+<div class="mobile main-block two-factor-page verify-login-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon mega left"></div>
+        <div class="mobile fm-header-txt"><span>[$171]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="two-factor-qr-block">
+                    <div class="mobile two-factor-heading">[$19213]</div>
+                    <div class="mobile two-factor-body-text">
+                        [$19214]
+                    </div>
+                    <div class="mobile two-factor-verify-seed-wrapper">
+                        <div class="mobile signin-input two-factor-seed-input">
+                            <input value="" placeholder="[$19193]" class="two-factor-login-input" type="text">
+                        </div>
+                        <div class="mobile warning-text-field hidden">
+                            [$19210]
+                        </div>
+                         <div class="mobile cta-button red two-factor-verify-btn">
+                            <span class="label">[$1960]</span>
+                            <span class="loading-image">
+                                <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mobile lost-authenticator-button">[$19215]</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Authentication verify account action -->
+<div class="mobile main-block two-factor-page verify-action-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon mega left"></div>
+        <div class="mobile fm-header-txt"><span>[$1960]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="two-factor-qr-block">
+                    <div class="mobile two-factor-heading">[$19194]</div>
+                    <div class="mobile two-factor-body-text">
+                        [$19214]
+                    </div>
+                    <div class="mobile two-factor-verify-seed-wrapper">
+                        <div class="mobile signin-input two-factor-seed-input">
+                            <input value="" placeholder="[$19193]" class="two-factor-login-input" type="text">
+                        </div>
+                        <div class="mobile warning-text-field hidden">
+                            [$19210]
+                        </div>
+                         <div class="mobile cta-button red two-factor-verify-btn">
+                            <span class="label">[$1960]</span>
+                            <span class="loading-image">
+                                <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

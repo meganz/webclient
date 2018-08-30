@@ -62,6 +62,11 @@
                     continue;
                 }
 
+                if (missingkeys[file.h]) {
+                    result.push(file);
+                    continue;
+                }
+
                 try {
                     // this could throw NS_ERROR_FILE_NOT_FOUND
                     var test = file.size;

@@ -134,16 +134,32 @@
 
 /* Add From Cloud Dialog */
 .fm-dialog.add-from-cloud {
-    width: 780px;
-    margin: -247px 0 0 -322px;
+    width: 1394px;
+    margin: -405px 0 0 -684px;
 }
+.fm-dialog.add-from-cloud .tooltip-handler {
+    z-index: 10;
+}
+
 .fm-dialog .fm-breadcrumbs-block {
     float: none;
     height: 46px;
-    margin: 0 0 11px 0;
-    padding: 22px 0 0 2px;
+    margin: 0 0 0 0;
+    padding: 12px 0 0 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     overflow: hidden;
     position: relative;
+    width: 100%;
+    width: -webkit-calc(100% - 126x);
+    width: -moz-calc(100% - 126px);
+    width: calc(100% - 126px);
+}
+.fm-dialog .fm-header-buttons.active-search + .fm-breadcrumbs-block {
+    width: -webkit-calc(100% - 310x);
+    width: -moz-calc(100% - 310px);
+    width: calc(100% - 310px);
 }
 .fm-dialog .breadcrumbs-wrapper {
     position: absolute;
@@ -159,7 +175,9 @@
     padding: 0 0 0 3px;
 }
 .fm-dialog-table.grid-table-header th:nth-child(2), .fm-dialog-table.grid-table td:nth-child(2) {
-    width: 476px;
+    width: -webkit-calc(100% - 300x);
+    width: -moz-calc(100% - 300px);
+    width: calc(100% - 300px);
 }
 .fm-dialog-table.grid-table-header th:nth-child(3), .fm-dialog-table.grid-table td:nth-child(3) {
     width: 114px;
@@ -168,15 +186,147 @@
 .fm-dialog-table.grid-table-header th:nth-child(4), .fm-dialog-table.grid-table td:nth-child(4) {
     width: 136px;
 }
-.fm-dialog-grid-scroll {
-    height: 312px !important;
+.fm-files-search {
+    float: right;
+    margin: 6px -14px 0 29px;
+    padding-right: 12px;
+    padding: 0 12px;
+    border-right: 1px solid rgba(0,0,0,0.1);
 }
-.fm-dialog-grid-scroll, .fm-dialog-grid-scroll .jspPane {
+.active-search .fm-files-search {
+    border-left: 1px solid rgba(0,0,0,0.1);
+}
+.fm-files-search i.search {
+    width: 24px;
+    height: 24px;
+    display: block;
+    background-position: -6px -474px;
+    background-image: url(../images/mega/top-sprite_v4.png);
+    background-repeat: no-repeat;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    cursor: pointer;
+    -moz-opacity: 0.8;
+    -khtml-opacity: 0.8;
+    opacity: 0.8;
+    float: left;
+}
+.fm-files-search i.search:hover, .active-search .fm-files-search  i.search {
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.fm-files-search input {
+    font-size: 14px;
+    line-height: 24px;
+    color: #666666;
+    float: left;
+    margin: 0;
+    border: 0;
+    padding: 0;
+    width: 0;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.fm-header-buttons.active-search input {
+    width: 165px;
+    padding: 0 0 0 12px;
+}
+.fm-picker-header {
+    position: relative;
+    height: 48px;
+}
+.fm-picker-header .fm-header-buttons {
+    top: 6px;
+    right: 6px;
+}
+.fm-dialog-scroll, .add-from-cloud .dialog-empty-block {
+    height: 612px !important;
+}
+.fm-dialog-scroll.grid, .add-from-cloud .grid-table-header + .dialog-empty-block {
+    height: 588px !important;
+}
+.fm-dialog-scroll.blocks, .add-from-cloud .dialog-empty-block {
+    background-color: #fafafa;
+    -webkit-box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
+    box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
+}
+.fm-dialog-scroll.blocks .content {
+    padding-bottom: 12px;
+}
+.fm-dialog-scroll.grid, .fm-dialog-scroll.grid .jspPane {
     background-image: url(../images/mega/grid-bg.svg);
     background-position: 0 -24px;
 }
+.fm-dialog-scroll.blocks .data-block-view {
+    margin: 12px 0 0 12px;
+}
 .fm-dialog-table.grid-table tr.ui-selected td {
     background-color: rgba(233,233,233,1);
+}
+.fm-dialog-tabs {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 26px 0 0 0;
+}
+.add-from-cloud .fm-dialog-tab {
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 20px;
+    color: #666;
+    padding: 4px 24px 0 24px;
+    border-bottom: 2px solid transparent;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 32px;
+    margin-bottom: -1px;
+}
+.add-from-cloud .fm-dialog-tab.active {
+    border-color: #D90007;
+    color: #333333;
+}
+@media only screen and (max-width: 1440px) {
+    .fm-dialog.add-from-cloud {
+        width: 1219px;
+    }
+}
+@media only screen and (max-height: 720px) {
+     .fm-dialog.add-from-cloud {
+        margin-top: -305px;
+    }
+    .fm-dialog-scroll, .add-from-cloud .dialog-empty-block {
+        height: 412px !important;
+    }
+    .fm-dialog-scroll.grid, .add-from-cloud .grid-table-header + .dialog-empty-block {
+        height: 388px !important;
+    }
+}
+@media only screen and (max-width: 1280px) {
+    .fm-dialog.add-from-cloud {
+        width: 1047px;
+        margin-left: -522px;
+    }
+}
+@media only screen and (max-width: 1024px) {
+    .fm-dialog.add-from-cloud {
+        width: 700px;
+        margin-left: -350px;
+    }
+}
+
+.add-from-cloud .tooltip-handler {
+    z-index: 50;
 }
 /* End of Add From Cloud Dialog */
 
@@ -2805,6 +2955,216 @@ li.token-input-token-invite .input-close {
 .widget-dialog .copy-widget-code {
     text-transform: capitalize;
 }
+
+/* Two Factor Authentication dialogs */
+.fm-dialog.two-factor-dialog {
+    width: 482px;
+    margin: -172px 0 0 -240px;
+    box-sizing: border-box;
+    width: 482px;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+}
+.fm-dialog.two-factor-dialog.verify-two-factor-login {
+	background-color: #f6f6f6;
+	height: 344px;
+	margin: -172px 0 0 -240px;
+	width: 480px;
+}
+.fm-dialog.two-factor-dialog.verify-two-factor-login .middle-button-wrapper {
+    margin: 22px auto 48px auto;
+}
+.fm-dialog.two-factor-dialog.verify-two-factor-login .fm-account-input {
+    width: 302px;
+}
+.fm-dialog.two-factor-dialog.verify-two-factor-login .fm-account-input input {
+    color: #333;
+    font-size: 20px;
+    line-height: 25px;
+    text-align: center;
+}
+.es .fm-dialog.two-factor-dialog.verify-two-factor-login .fm-account-input input, .es .fm-dialog.two-factor-dialog.setup-two-factor-verify .pin-input {
+    font-size: 16px;
+}
+.fm-dialog.two-factor-dialog.verify-two-factor-login .warning-text-field {
+    background-color: rgba(240,55,58,0.1);
+    border: 1px solid rgba(218,49,53,0.5);
+    border-radius: 2px;
+    box-sizing: border-box;
+    color: #da3135;
+    font-size: 14px;
+    line-height: 18px;
+    margin: 0 auto;
+    padding: 4px 0;
+    text-align: center;
+    text-transform: uppercase;
+    width: 302px;
+}
+.fm-dialog.two-factor-dialog.verify-two-factor-login .warning-text-field.hidden {
+    display: block;
+    visibility: hidden;
+}
+.fm-dialog.two-factor-dialog .two-factor-content-block {
+    width: 400px;
+    position: relative;
+    height: auto;
+    margin: 24px auto 24px;
+}
+.fm-dialog.two-factor-dialog .two-factor-content-block.verify-tfactor {
+    margin: 48px auto 60px;
+}
+.fm-dialog.two-factor-dialog .tf-container {
+    width: 386px;
+    margin: 0 auto;
+}
+.fm-dialog.two-factor-dialog .two-factor-qr-code {
+    width: 224px;
+    height: 224px;
+    background-color: #f2f2f2;
+    margin: 24px auto 48px;
+    position: relative;
+}
+.fm-dialog.two-factor-dialog .fm-account-input input {
+    box-sizing: border-box;
+    height: 38px;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 2px;
+    background-color: rgba(0,0,0,0.02);
+    padding: 0;
+    text-align: center;
+}
+.fm-dialog.two-factor-dialog.setup-two-factor-verify .pin-input {
+	color: #333;
+	font-size: 20px;
+	line-height: 25px;
+	text-align: center;
+}
+.fm-dialog.two-factor-dialog .fm-account-input {
+    height: 38px;
+    margin: 24px auto 16px;
+}
+.fm-dialog.two-factor-dialog .verify-tfactor .fm-account-input {
+    width: 300px;
+}
+.fm-dialog.two-factor-dialog .middle-button-wrapper {
+    margin: 24px auto 48px;
+    width: 300px;
+}
+.fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button {
+    width: 136px;
+    display: inline-block;
+    min-width: 136px;
+}
+.fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button:first-of-type {
+    margin-right: 24px;
+}
+.fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button.hidden {
+    display: none;
+}
+.fm-dialog.two-factor-dialog .default-56px-button.finish-button {
+    height: 40px;
+    line-height: 40px;
+    width: initial;
+    min-width: 120px;
+}
+.fm-dialog.two-factor-dialog .default-56px-button.grey-button {
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,0.45);
+    border-radius: 4px;
+    background: linear-gradient(0deg, #999999 0%, #AAAAAA 100%);
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+}
+.fm-dialog.two-factor-dialog .dialog-body-subheader {
+    width: 300px;
+    color: #333333;
+    font-family: "source_sans_prosemibold";
+    font-size: 16px;
+    line-height: 20px;
+    text-align: center;
+    margin: 0 auto 32px;
+}
+.fm-dialog.verify-two-factor-login .middle-button-wrapper {
+    position: relative;
+}
+.fm-dialog.verify-two-factor-login .back-button {
+    left: 0;
+    position: absolute;
+    top: 0;
+}
+.fm-dialog.verify-two-factor-login .submit-button {
+    right: 0;
+    position: absolute;
+    top: 0;
+}
+.fm-dialog.verify-two-factor-login .submit-button .loading-image {
+    display: none;
+}
+.fm-dialog.verify-two-factor-login .submit-button.loading .label {
+    display: none;
+}
+.fm-dialog.verify-two-factor-login .submit-button.loading .loading-image {
+    display: inline-block;
+    height: 28px;
+    left: 50%;
+    margin-left: -14px;
+    margin-top: 14px;
+    position: absolute;
+    width: 28px;
+    font-size: 0;
+    line-height: 0;
+}
+.fm-dialog.verify-two-factor-login .loading-image img {
+    width: 28px;
+    height: 28px;
+}
+.two-factor-dialog.setup-two-factor .middle-button-wrapper {
+    text-align: center;
+}
+.fm-dialog.two-factor-verify-action .middle-button-wrapper {
+    text-align: center;
+}
+.fm-dialog.two-factor-verify-action .pin-input {
+    color: #333;
+    font-size: 20px;
+    line-height: 25px;
+    text-align: center;
+}
+.recovery-key-info-container {
+    box-sizing: border-box;
+    height: 66px;
+    width: 386px;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    margin: 12px auto 16px;
+}
+.recovery-key-container .recovery-key-icon {
+    height: 48px;
+    width: 48px;
+    background-image: url(../images/mega/files-icons_v3.png);
+    background-position: -211px -1073px;
+    background-repeat: no-repeat;
+    margin: 8px 8px 8px 12px;
+    display: inline-block;
+}
+.fm-dialog .dialog-body-centre-text {
+    width: 384px;
+    color: #333333;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+    margin: 16px auto 24px;
+}
+.fm-dialog.two-factor-dialog.setup-two-factor {
+    margin: -278px 0 0 -240px;
+}
+.setup-two-factor-backup-key .middle-button-wrapper {
+    text-align: center;
+}
+/* End of Two Factor Authentication dialogs */
 /* Private chat dialog */
 .create-private-chat {
     width: 560px;

@@ -499,8 +499,6 @@ mBroadcaster.once('startMega', function populate_l() {
     l[10658] = l[10658].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
 
     l[12482] = l[12482].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[12439] = l[12439].replace('[A1]', '<b>').replace('[/A1]', '</b>')
-                       .replace('[A2]', '<b>').replace('[/A2]', '</b>');
     l[12483] = l[12483].replace('[BR]', '<br>');
     l[12485] = l[12485].replace('[A1]', '<a href="" class="red mac">').replace('[/A1]', '</a>');
     l[12485] = l[12485].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
@@ -552,8 +550,9 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[/A]', '</a>')
         .replace('[B]', '<a href="https://github.com/meganz/MEGAcmd/blob/master/README.md" target="_blank" class="red">')
         .replace('[/B]', '</a>');
-	l[16614] = escapeHTML(l[16614])
-        .replace('[A]', '<a href="https://www.mozilla.org/thunderbird" target="_blank">')
+    l[16609] = escapeHTML(l[16609]).replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[16614] = escapeHTML(l[16614])
+        .replace('[A]', '<a href="https://thunderbird.net/" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');
 
     l[12439] = l[12439].replace('[A1]', '').replace('[/A1]', '').replace('[A2]', '').replace('[/A2]', '');

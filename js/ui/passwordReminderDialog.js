@@ -253,10 +253,32 @@
     };
 
     PasswordReminderDialog.prototype.onConfirmClicked = function(element, evt) {
+
         var enteredPassword = this.passwordField.value;
+        var self = this;
+
         this.resetUI();
 
-        if (checkMyPassword(enteredPassword)) {
+        // If the user's Account Authentication Version is set for the new registration process (version 2)
+        if (u_attr.aav === 2) {
+
+            // Derive the keys from the password
+            security.getDerivedEncryptionKey(enteredPassword, function(derivedEncryptionKeyArray32) {
+                self.completeOnConfirmClicked(derivedEncryptionKeyArray32);
+            });
+        }
+        else {
+            // Derive the key from the password using the old registration method (version 1)
+            var derivedEncryptionKeyArray32 = prepare_key_pw(enteredPassword);
+
+            // Continue the verification
+            self.completeOnConfirmClicked(derivedEncryptionKeyArray32);
+        }
+    };
+
+    PasswordReminderDialog.prototype.completeOnConfirmClicked = function(derivedEncryptionKeyArray32) {
+
+        if (checkMyPassword(derivedEncryptionKeyArray32)) {
             if (this.correctLabel) {
                 this.correctLabel.classList.remove('hidden');
             }

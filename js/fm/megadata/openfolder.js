@@ -35,7 +35,7 @@
 
         this.previousdirid = this.currentdirid;
         this.currentdirid = id;
-        this.currentrootid = M.chat ? "chat" : this.getNodeRoot(id);
+        this.currentrootid = this.chat ? "chat" : this.getNodeRoot(id);
 
         if (first) {
             fminitialized = true;
@@ -62,7 +62,14 @@
         if (this.chat) {
             this.v = [];
             sharedFolderUI(); // remove shares-specific UI
-            //$.tresizer();
+
+            if (megaChatIsReady) {
+                var roomId = String(id).split('/').pop();
+
+                if (roomId.length === 11) {
+                    megaChat.setAttachments(roomId);
+                }
+            }
         }
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
@@ -276,9 +283,6 @@
             M.addNotificationsUI(1);
         }
 
-        this.search = false;
-        this.chat = false;
-
         if (!fminitialized) {
             firstopen = true;
         }
@@ -286,6 +290,9 @@
             // Do nothing if same path is chosen
             return MegaPromise.resolve(EEXIST);
         }
+
+        this.chat = false;
+        this.search = false;
 
         if (id === 'rubbish') {
             id = this.RubbishID;

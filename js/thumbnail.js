@@ -149,6 +149,12 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 console.warn('All pixels are black, aborting thumbnail creation...', ab.byteLength);
                 return img.onerror('Unsupported image type/format.');
             }
+            len = ab.byteLength;
+            while (len-- && ab[len] === 0xff) {}
+            if (len < 0) {
+                console.warn('All pixels are white, aborting thumbnail creation...', ab.byteLength);
+                return img.onerror('...potentially tainted canvas');
+            }
 
             dataURI = canvas.toDataURL(imageType, 0.80);
             // if (d) console.log('THUMBNAIL', dataURI);
@@ -410,7 +416,14 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
         else if (isVideo && file) {
             M.require('videostream').tryCatch(function() {
-                Streamer.getThumbnail(file).then(__render_thumb.bind(null, img)).catch(console.debug.bind(console));
+                Streamer.getThumbnail(file)
+                    .then(__render_thumb.bind(null, img))
+                    .catch(function(ex) {
+                        if (d) {
+                            console.warn('Aborting thumbnail creation for video file...', ex);
+                        }
+                        img.src = 'data:text/xml,streamerror';
+                    });
             });
         }
         else {

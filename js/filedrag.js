@@ -1,9 +1,21 @@
 (function(scope) {
+    'use strict';
 
     var dir_inflight = 0;
     var filedrag_u = [];
     var filedrag_paths = Object.create(null);
     var touchedElement = 0;
+
+    function addUpload(files, emptyFolders) {
+        console.assert(page !== 'start' || window.fminitialized, 'check this...');
+
+        if (page === 'start' || M.chat) {
+            M.addUpload(files, false, emptyFolders);
+        }
+        else {
+            openCopyUploadDialog(files, emptyFolders);
+        }
+    }
 
     function pushUpload() {
         if (!--dir_inflight && $.dostart) {
@@ -12,7 +24,7 @@
                     return filedrag_paths[p] < 1;
                 });
 
-            M.addUpload(filedrag_u, false, emptyFolders);
+            addUpload(filedrag_u, emptyFolders);
             filedrag_u = [];
             filedrag_paths = Object.create(null);
 
@@ -23,8 +35,6 @@
     }
 
     function pushFile(file, path) {
-        'use strict';
-
         if (d > 1) {
             console.warn('Adding file %s', file.name, file);
         }
@@ -42,8 +52,6 @@
     }
 
     function traverseFileTree(item, path, symlink) {
-        'use strict';
-
         path = path || "";
 
         if (item.isFile) {
@@ -100,7 +108,7 @@
                     start_anoupload();
                 }
                 else {
-                    loginDialog();
+                    tooltiplogin.init();
                     $.awaitingLoginToUpload = true;
 
                     mBroadcaster.once('fm:initialized', function() {
@@ -303,7 +311,7 @@
         $('body').removeClass('overlayed');
 
         if ($.awaitingLoginToUpload) {
-            return loginDialog();
+            return tooltiplogin.init();
         }
 
         if (
@@ -417,7 +425,7 @@
                     }
                 }
             }
-            M.addUpload(u);
+            addUpload(u);
             if (page == 'start') {
                 start_upload();
             }

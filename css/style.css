@@ -1530,13 +1530,12 @@ a.blog-button:hover {
 .full-article .blog-date {
     padding-bottom: 18px;
 }
-.account .register-pass-status-line1, .account .register-pass-status-line2, .account .register-pass-status-line3, .account .register-pass-status-line4 {
-    width: 58px;
-    width: 54px;
+.account .register-pass-status-line1, .account .register-pass-status-line2, .account .register-pass-status-line3, .account .register-pass-status-line4, .account .register-pass-status-line5 {
     height: 2px;
-    margin-right: 8px;
+    margin-right: 5px;
+    width: 44px;
 }
-.account .register-pass-status-line4 {
+.account .register-pass-status-line5 {
     margin-right: 0;
 }
 .new-registration .register-pass-status-line1, .new-registration .register-pass-status-line2, .new-registration .register-pass-status-line3, .new-registration .register-pass-status-line4, .new-registration .register-pass-status-line5 {
@@ -4164,7 +4163,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .files-grid-view.fm .grid-scrolling-table, .files-grid-view.fm .grid-scrolling-table .jspPane, .transfer-scrolling-table, .transfer-scrolling-table .jspPane {
     background-image: url(../images/mega/grid-bg.svg);
 }
-.grid-table td, .grid-table-header {
+.grid-table td, .grid-table-header th {
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -7663,6 +7662,10 @@ table {
     line-height: 24px;
     padding: 1px 20px 29px 20px;
 }
+.fm-not-logged-description.small.footnote-text, .description.footnote-text {
+    margin-top: 16px;
+    color: #aaa;
+}
 .fm-not-logged-text, .not-logged .empty-share-public {
     display: none;
 }
@@ -9425,6 +9428,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin: 0;
     color: #666666;
 }
+.warning-dialog-a .fm-notification-info p {
+    overflow-wrap: break-word;
+    width: 357px;
+}
 .fm-notification-warning {
     font-size: 13px;
     line-height: 21px;
@@ -10428,6 +10435,7 @@ table {
     float: none;
 }
 .grid-table-header, .transfer-table-header, .contacts-grid-table {
+    width: 100%;
     background-color: white;
     position: relative;
     font-size: 0;
@@ -11011,8 +11019,13 @@ table {
 .low-width .fm-account-header.big {
     padding-top: 0;
 }
-.account-form-wraper.password {
-    margin: 0 0 -25px 0;
+.account-form-wraper.password-block, .account-form-wraper.email-block {
+    margin: 0;
+}
+.account .change-password-button, .account .change-email-button {
+    display: inline-block;
+    float: right;
+    margin-left: 10px;
 }
 .fm-account-labels .labels-block {
     display: table-row;
@@ -11021,7 +11034,7 @@ table {
     height: 48px;
     font-size: 14px;
     line-height: 17px;
-    color: #777777;
+    color: #777;
     display: table-cell;
     vertical-align: middle;
     padding-right: 15px;
@@ -12495,13 +12508,27 @@ h5.main-italic-header {
     margin: 0 0 10px 0;
 }
 .reset-success-st2 .fm-account-input {
-    margin: 0 8px 20px 8px;
+    margin: 0 8px 10px 8px;
     width: auto;
     float: none;
 }
 .reset-pass-error {
-    position: absolute;
-    width: 24px;
+    background-color: #fdebeb;
+    -webkit-box-shadow: 0px 0px 0px 1px #ec989a;
+    -moz-box-shadow: 0px 0px 0px 1px #ec989a;
+    border-radius: 4px;
+    box-shadow: 0px 0px 0px 1px #ec989a;
+    box-sizing: border-box;
+    color: #da3135;
+    display: none;
+    font-size: 14px;
+    line-height: 18px;
+    margin: 0 8px;
+    padding: 3px 12px;
+    text-transform: uppercase;
+}
+.reset-pass-error.error {
+    display: block;
 }
 .reset-description-txt {
     font-size: 13px;
@@ -17859,7 +17886,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     position: absolute;
     top: 50%;
     width: 100%;
-    margin-top: -82px;
+    margin-top: -122px;
 }
 .dialog-empty-txt {
     font-size: 13px;
@@ -20524,16 +20551,19 @@ div.camera-bottom-txt {
     right: 0;
 }
 .account.data-block {
-    padding: 30px 36px 29px 36px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    padding: 30px 36px 29px 36px;
 }
 .account.data-block.disabled {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     -moz-opacity: 0.6;
     -khtml-opacity: 0.6;
     opacity: 0.6;
+}
+.account.email-and-pass .data-block {
+    overflow: auto;
 }
 .data-block.storage-data .chart-warning, .data-block.storage-data .account.buttons {
     display: none;
@@ -21001,17 +21031,56 @@ div.camera-bottom-txt {
     position: relative;
     margin: 12px 0 0 12px;
 }
-.account.widget.body.masterkey, .account.widget.body.reviewsessions {
+.account.widget.body.masterkey, .account.widget.body.two-factor-authentication, .account.widget.body.reviewsessions {
     margin: 36px 20px 36px 10px;
     float: left;
     width: -webkit-calc(50% - 30px);
     width: -moz-calc(50% -30px);
     width: calc(50% - 30px);
 }
-.low-width .widget.body.masterkey, .widget.body.reviewsessions {
+.low-width .widget.body.masterkey, .low-width .widget.body.two-factor-authentication, .low-width .widget.body.reviewsessions {
     width: 448px;
     margin: 36px 0px 36px 36px;
     float: none;
+}
+.account.widget.body.two-factor-authentication, .account.widget.body.reviewsessions {
+    margin-top: 0;
+}
+.account.two-factor-authentication.enabled .enable-disable-2fa-button {
+    background: #f0373a;
+    border: initial;
+    box-shadow: 0 1px 2px 0 rgba(217,0,7,0.3);
+}
+.account.two-factor-authentication.enabled .two-factor-disable-pin {
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 3px;
+    background-color: rgba(0,0,0,0.02);
+    color: #999;
+    display: block;
+    font-size: 14px;
+    left: 0;
+    line-height: 18px;
+    margin-right: 50px;
+    padding: 7px 77px;
+    position: absolute;
+    text-align: center;
+    top: 0;
+}
+.account.two-factor-authentication .two-factor-disable-pin {
+    display: none;
+}
+.account.two-factor-authentication .text-and-buttons {
+    position: relative
+}
+.account.two-factor-authentication .enable-disable-2fa-button .button-label-enabled {
+    display: none;
+}
+.account.two-factor-authentication.enabled .button-label-enabled {
+    display: block;
+}
+.account.two-factor-authentication.enabled .button-label-disabled {
+    display: none;
 }
 .account.widget.content {
     position: relative;
@@ -21422,13 +21491,13 @@ body.kr .account.chart.data {
 }
 /* This is a hackpatch to get contact us page out. I will fix this properly so it doesn't rely on language classes soon */
 .fr .contact-us-revamp .contact-new-title.gdpr {
-    margin-bottom: 40px;   
+    margin-bottom: 40px;
 }
 .ru .contact-us-revamp .contact-new-title.suggest-improvements, .ru .contact-us-revamp .contact-new-title.other-ip-issues {
-    margin-bottom: 40px;   
+    margin-bottom: 40px;
 }
 .pl .contact-us-revamp .contact-new-title.gdpr, .pl .contact-us-revamp .contact-new-title.other-ip-issues {
-    margin-bottom: 40px;   
+    margin-bottom: 40px;
 }
 .contact-us-revamp .main-mid-pad h1 {
     background-image: url(../images/mega/contact-us-sprite.png);
@@ -21438,7 +21507,7 @@ body.kr .account.chart.data {
     line-height: 72px;
     padding-top: 0px;
     margin-top: 36px;
-    background-position: 0 -6px; 
+    background-position: 0 -6px;
 }
 .contact-us-revamp .contact-directory .contact-new-title {
     background-image: none;
@@ -24179,6 +24248,69 @@ opacity: 1;
     margin-top: 2px;
     margin-bottom: 0px;
 }
+.information-highlight {
+    box-sizing: border-box;
+    width: 300px;
+    line-height: 28px;
+    font-size: 14px;
+    border: 1px solid #f2f2f2;
+    border-radius: 2px;
+    background-color: #fafafa;
+    margin: 0 auto;
+    color: #444;
+    text-align: center;
+    opacity: 0;
+}
+.information-highlight.success {
+    background-color: rgba(0,191,165,0.1);
+    border: 1px solid rgba(0,191,165,0.5);
+    color: #004038;
+    opacity: 1;
+}
+.information-highlight.warning  {
+    box-sizing: border-box;
+    width: 302px;
+    border: 1px solid rgba(218,49,53,0.5);
+    border-radius: 2px;
+    background-color: rgba(240,55,58,0.1);
+    color: #DA3135;
+    opacity: 1;
+}
+.tf-backup-key .information-highlight.warning {
+    width: 100%;
+    margin: 12px auto 16px;
+}
+.recovery-key-container {
+    box-sizing: border-box;
+    height: 66px;
+    width: 386px;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+}
+.recovery-key-info-block {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 15px;
+}
+.recovery-key-info-block .recovery-key-name {
+    height: 18px;
+    width: 140px;
+    color: #333333;
+    font-size: 14px;
+    line-height: 18px;
+}
+.recovery-key-info-block .recovery-key-size {
+    color: #999999;
+    font-size: 13px;
+    line-height: 17px;
+}
+.recovery-key-container  .recovery-key-button {
+    float: right;
+    margin-top: 16px;
+    margin-right: 12px;
+}
 
 /* new drag and drop dialog */
 
@@ -24268,6 +24400,7 @@ opacity: 1;
 
 .fm-picker-dialog .summary-row .summary-input {
     width: 422px;
+    max-width: 422px;
     height: 32px;
     max-height: 130px;
     display: table-cell;

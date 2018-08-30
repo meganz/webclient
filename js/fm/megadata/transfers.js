@@ -564,7 +564,8 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
         dl_queue[dl_queue_num].loaded = bl;
 
         if (!uldl_hold) {
-            if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) {
+            var slideshowid = window.slideshowid && slideshow_handle();
+            if (slideshowid === dl_queue[dl_queue_num].id && !previews[slideshowid]) {
                 var $overlay = $('.viewer-overlay');
                 var $chart = $overlay.find('.viewer-progress');
 
@@ -643,6 +644,7 @@ MegaData.prototype.dlcomplete = function(dl) {
         dlmanager.remResumeInfo(dl).dump();
     }
 
+    var slideshowid = slideshow_handle();
     if (slideshowid == id && !previews[slideshowid]) {
         var $overlay = $('.viewer-overlay');
         $overlay.find('.viewer-pending').addClass('hidden');
@@ -767,7 +769,8 @@ MegaData.prototype.dlerror = function(dl, error) {
     mega.ui.tpp.hide();
     mega.ui.tpp.reset('dl');
 
-    if (window.slideshowid == dl.id && !previews[slideshowid]) {
+    var slideshowid = slideshow_handle();
+    if (slideshowid === dl.id && !previews[slideshowid]) {
         $overlay.find('.viewer-image-bl').addClass('hidden');
         $overlay.find('.viewer-pending').addClass('hidden');
         $overlay.find('.viewer-progress').addClass('hidden');
@@ -1057,9 +1060,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
     var pauseTxt = '';
     var ttl = this.getTransferTableLengths();
 
-    if ($.onDroppedTreeFolder) {
-        target = $.onDroppedTreeFolder;
-        delete $.onDroppedTreeFolder;
+    if ($.addUploadTarget) {
+        target = $.addUploadTarget;
+        delete $.addUploadTarget;
     }
     else if (String(this.currentdirid).length !== 8) {
         target = this.lastSeenCloudFolder || this.RootID;

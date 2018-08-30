@@ -653,6 +653,9 @@
                         <div class="big-red-button fm-not-logged-button create-account">
                             [$968]
                         </div>
+                        <div class="fm-not-logged-description small footnote-text">
+                            &ast;[$16362]
+                        </div>
                     </div>
                 </div>
             </div>
@@ -666,8 +669,11 @@
                         <div class="fm-not-logged-description">
                             [$8762]
                         </div>
-                        <div class="fm-not-logged-button create-account">
+                        <div class="fm-not-logged-button create-account big-red-button">
                             [$968]
+                        </div>
+                        <div class="fm-not-logged-description small footnote-text">
+                            &ast;[$16362]
                         </div>
                     </div>
                 </div>
@@ -1557,67 +1563,64 @@
                         <div class="account max-width-bl">
                              <div class="half-sized">
                                  <div class="account data-block">
-                                      <div class="fm-account-header">[$706]</div>
-                                      <div class="account-form-wraper password">
-                                          <div class="fm-account-labels">
-                                              <!--div class="labels-block">
-                                                  <label for="account-password">[$716]</label>
-                                              </div-->
-                                              <div class="labels-block">
-                                                  <label for="account-new-password">[$717]</label>
-                                              </div>
-                                              <div class="labels-block">
-                                                  <label for="account-confirm-password">[$718]</label>
-                                              </div>
-                                          </div>
-                                          <div class="fm-accout-inputs-blocks">
-                                              <!--div class="fm-account-input">
-                                                  <input type="password" value="" name="account-password" id="account-password" />
-                                              </div-->
-                                              <div class="fm-account-input">
-                                                  <input type="password" value="" name="account-new-password" id="account-new-password" />
-                                              </div>
-                                              <div class="account-pass-lines">
-                                                  <div class="register-pass-status-line1"></div>
-                                                  <div class="register-pass-status-line2"></div>
-                                                  <div class="register-pass-status-line3"></div>
-                                                  <div class="register-pass-status-line4"></div>
-                                                  <div class="clear"></div>
-                                              </div>
-                                              <div class="fm-account-input">
-                                                  <input type="password" value="" name="account-confirm-password" id="account-confirm-password" />
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
+                                     <div class="fm-account-header">[$706]</div>
+                                     <div class="account-form-wraper password-block">
+                                         <div class="fm-account-labels">
+                                             <div class="labels-block">
+                                                 <label for="account-new-password">[$717]</label>
+                                             </div>
+                                             <div class="labels-block">
+                                                 <label for="account-confirm-password">[$718]</label>
+                                             </div>
+                                         </div>
+                                         <div class="fm-accout-inputs-blocks">
+                                             <div class="fm-account-input">
+                                                 <input type="password" value="" name="account-new-password" id="account-new-password" />
+                                             </div>
+                                             <div class="account-pass-lines">
+                                                 <div class="register-pass-status-line1"></div>
+                                                 <div class="register-pass-status-line2"></div>
+                                                 <div class="register-pass-status-line3"></div>
+                                                 <div class="register-pass-status-line4"></div>
+                                                 <div class="register-pass-status-line5"></div>
+                                                 <div class="clear"></div>
+                                             </div>
+                                             <div class="fm-account-input">
+                                                 <input type="password" value="" name="account-confirm-password" id="account-confirm-password" />
+                                             </div>
+                                         </div>
+                                     </div>
+                                     <div class="button default-grey-button change-password-button">[$706]</div>
+                                 </div>
 
-                                <div class="account data-block">
-                                    <div class="fm-account-header">[$7743]</div>
-                                    <div class="account-form-wraper">
-                                        <div class="fm-account-labels">
-                                            <div class="labels-block">
-                                                <label>[$7744]</label>
-                                            </div>
-                                            <div class="labels-block">
-                                                <label for="account-email">[$7745]</label>
-                                            </div>
-                                            <div class="labels-block email-confirm-txt"></div>
-                                        </div>
-                                        <div class="fm-accout-inputs-blocks">
-                                            <div class="fm-account-input current-email disabled">
-                                                <input type="text" value="" name="current-email" disabled id="current-email" />
-                                            </div>
-                                            <div class="fm-account-input">
-                                                <input type="text" value="" name="account-email" id="account-email" />
-                                            </div>
-                                            <div class="fm-account-change-email hidden">
-                                                [$7746]<br>
-                                                <br>
-                                                [$7747]
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                 <div class="account data-block">
+                                     <div class="fm-account-header">[$7743]</div>
+                                     <div class="account-form-wraper email-block">
+                                         <div class="fm-account-labels">
+                                             <div class="labels-block">
+                                                 <label>[$7744]</label>
+                                             </div>
+                                             <div class="labels-block">
+                                                 <label for="account-email">[$7745]</label>
+                                             </div>
+                                             <div class="labels-block email-confirm-txt"></div>
+                                         </div>
+                                         <div class="fm-accout-inputs-blocks">
+                                             <div class="fm-account-input current-email disabled">
+                                                 <input type="text" value="" name="current-email" readonly id="current-email" maxlength="190" />
+                                             </div>
+                                             <div class="fm-account-input">
+                                                 <input type="text" value="" name="account-email" id="account-email" maxlength="190" />
+                                             </div>
+                                         </div>
+                                     </div>
+                                     <div class="button default-grey-button change-email-button">[$7743]</div>
+                                     <div class="fm-account-change-email hidden">
+                                        [$19201]<br>
+                                        <br>
+                                        [$7747]
+                                     </div>
+                                 </div>
                                 <div class="account data-block qr-settings">
                                     <div class="fm-account-header">[$17754]</div>
                                     <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
@@ -1626,12 +1629,11 @@
                                             <span>[$17836]</span>
                                         </div>
                                         <div class="widget buttons qr-settings-acc hidden">
-                                            <div class="button default-white-button semi-big access-qr right"><span>[$17827]</span></div>
+                                            <div class="button default-grey-button semi-big access-qr right"><span>[$17827]</span></div>
                                             <div class="clear"></div>
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
 
                             <div class="account widget body masterkey">
@@ -1643,6 +1645,24 @@
                                         [$16129]
                                     </div>
                                     <div class="button default-grey-button right backup-master-key">[$8928]</div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                            <div class="account widget body two-factor-authentication hidden">
+                                <div class="account widget content">
+                                    <div class="account widget title">
+                                        [$19194]
+                                    </div>
+                                    <div class="account widget text">
+                                        [$19195]
+                                    </div>
+                                    <div class="text-and-buttons">
+                                        <input class="two-factor-disable-pin" type="text" placeholder="[$19193]">
+                                        <div class="button default-grey-button right enable-disable-2fa-button">
+                                            <span class="button-label-disabled">[$16141]</span>
+                                            <span class="button-label-enabled">[$16142]</span>
+                                        </div>
+                                    </div>
                                     <div class="clear"></div>
                                 </div>
                             </div>
@@ -1659,8 +1679,6 @@
                                 </div>
                             </div>
                             <div class="clear"></div>
-
-
                         </div>
                      </div>
 

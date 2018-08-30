@@ -23980,7 +23980,7 @@ opacity: 1;
 }
 
 .content-panel.user-management .user-management-status, .user-management-view .user-management-status {
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     width: 8px;
     height: 8px;
     float: left;
@@ -24078,15 +24078,14 @@ opacity: 1;
     position: absolute;
     left: 16px;
     top: 12px;
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
 }
 
-.user-management-tree-panel-header .img.enabled-accounts{
-    background-image: url(../images/mega/fm-main-sprite.png);
+.user-management-tree-panel-header .img.enabled-accounts{   
     background-position: 0px -12009px;
 }
 
 .user-management-tree-panel-header .img.disabled-accounts{
-    background-image: url(../images/mega/fm-main-sprite.png);
     background-position: -24px -12009px;
 }
 
@@ -24108,7 +24107,7 @@ opacity: 1;
     position: absolute;
     right: 2px;
     top: 12px;
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat;
     background-position: -12px -9768px;
     cursor: pointer;
@@ -24225,7 +24224,7 @@ opacity: 1;
     width: 24px;
     height: 24px;
     margin:3px 8px 4px 0px;
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -24259,7 +24258,7 @@ opacity: 1;
     display: block;
     float: right;
     margin-top: 5px;
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -24488,18 +24487,33 @@ opacity: 1;
     opacity: 0.4;
 }
 
-.user-management-view .id-card-icon, .fm-right-header-user-management .id-card-icon, .user-management-dialog .id-card-icon{
-    background-position: -0px -12715px;
+.user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon{
+    background-position: -7px -1947px;
+    background-image: url(../images/mega/top-sprite_v5.png);
+    background-size: 38px auto;
+    width:24px;
+    height: 24px;
 }
 
-.user-management-view .ex-out-share, .fm-right-header-user-management .ex-out-share, .user-management-dialog .ex-out-share{
-    background-position: -0px -12741px;
+
+
+.user-management-view .folder-small-icon.ex-out-share, .fm-right-header-user-management .folder-small-icon.ex-out-share, .user-management-dialog .folder-small-icon.ex-out-share{
+    background-position: -11px -1981px;
     opacity: 0.4;
+    background-image: url(../images/mega/top-sprite_v5.png);
+    background-size: 38px auto;
+    width:16px;
+    height: 16px;
+
 }
 
-.user-management-view .ex-in-share, .fm-right-header-user-management .ex-in-share, .user-management-dialog .ex-in-share{
-    background-position: -16px -12741px;
+.user-management-view .folder-small-icon.ex-in-share, .fm-right-header-user-management .folder-small-icon.ex-in-share, .user-management-dialog .folder-small-icon.ex-in-share{
+    background-position: -12px -2011px;
     opacity: 0.4;
+    background-image: url(../images/mega/top-sprite_v5.png);
+    background-size: 38px auto;
+    width:16px;
+    height: 16px;
 }
 
 
@@ -24552,7 +24566,7 @@ opacity: 1;
     height:20px;
     padding:0;
     margin:6px 8px 6px 0;
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat;
     float: left;
 }
@@ -24687,7 +24701,7 @@ opacity: 1;
     width:24px;
     height:24px;
     margin: 4px 0px 4px 8px;
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat;
     display: inline-block;
 }
@@ -24712,12 +24726,12 @@ opacity: 1;
     width:24px;
     height:24px;
     margin: 4px 0px;
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat;
     display: inline-block;
     background-position: 0px -12216px;
     position: absolute;
-    right: 8px;
+    right: 8px; 
 }
 
 .user-management{
@@ -24818,7 +24832,7 @@ opacity: 1;
 }
 
 .user-management-breadcrumb .user-management-icon {
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-position: 0 -12281px;
     width:24px;
     height: 24px;
@@ -24828,7 +24842,7 @@ opacity: 1;
 }
 
 .user-management-breadcrumb .user-management-next-arrow {
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-position: -41px -1433px;
     width: 7px;
     height: 24px;
@@ -24986,10 +25000,9 @@ opacity: 1;
     height: 10px;
     border-radius: 100%;
     margin:9px 15px 9px 3px;
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     display: inline-block;
     position: relative;
-
 }
 
 .user-management-view-status.enabled{
@@ -25167,7 +25180,7 @@ opacity: 1;
 
 
 .user-management-view-data .user-management-view-overall-usage .user-management-storage .img, .user-management-view-data .user-management-view-overall-usage .user-management-transfer .img{
-    background-image: url(../images/mega/big-icons@2x.png);
+    background-image: url(../images/mega/big-icons.png);
     background-size: 192px auto;
     background-repeat: no-repeat;
     width: 86px;
@@ -25226,7 +25239,7 @@ opacity: 1;
     width:16px;
     height: 16px;
     margin:4px 0;
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat;
     float: left;
 }
@@ -25316,7 +25329,7 @@ opacity: 1;
     width:24px;
     height: 24px;
     position: relative;
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat;
     opacity: 0.6;
 }
@@ -25779,7 +25792,7 @@ opacity: 1;
     width: 16px;
     height: 16px;
     margin:8px;
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat;
     background-position: -4px -12309px;
     right: 0;
@@ -25957,7 +25970,7 @@ opacity: 1;
     left: 94px;
     bottom:-11px;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat;
     background-position: -24px -12312px;
     opacity: 0.8;
@@ -26043,7 +26056,7 @@ opacity: 1;
 }
 
 .user-management-grid-table .subaccount-img-big .subaccount-selection-button::before {
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat;
     background-position: -16px -4912px;
     width: 15px;
@@ -26351,10 +26364,6 @@ opacity: 1;
     opacity: 0.2;
 }
 
-.user-management-dialog .dialog-input.error-message{
-    color: #333333;
-}
-
 .user-management-dialog .dialog-input.highlight {
     background-color: rgba(0,191,165,0.05);
     color: #999999;
@@ -26385,7 +26394,7 @@ opacity: 1;
 
 
 .user-management-view .icon, .fm-right-header-user-management .icon, .user-management-dialog .icon, .user-management-overview-bar .icon{
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat; 
     width:24px;
     height:24px;
@@ -28053,7 +28062,7 @@ opacity: 1;
     width:16px;
     height: 18px;
     background-position: -28px -12060px;
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat; 
     position: absolute;
 }

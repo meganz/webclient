@@ -1,0 +1,170 @@
+.business-register {
+	background-color: rgba(250,250,250,1);
+}
+
+.business-register * {
+	font-family: 'Lato', sans-serif;
+}
+
+.business-register .top-bar {
+	width: 100%;
+	height: 36px;
+}
+
+.bus-reg-body {
+	width: 922px;
+	margin:88px auto;
+}
+
+
+.bus-reg-header {
+	font-size: 40px;
+	line-height: 48px;
+	text-align: left;
+}
+
+.bus-reg-info-block {
+	width:400px;
+}
+
+.bus-reg-subheader {
+	font-size: 24px;
+	margin:64px 0 24px 0;
+	color: #333;
+}
+
+
+.bus-reg-input {
+	height: 64px;
+	width: 400px;
+	position: relative;
+	display: inline-block;
+	margin-bottom: 12px;
+}
+
+.bus-reg-input::after {
+	content: " ";
+    width: 100%;
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.2);
+    position: absolute;
+}
+
+.bus-reg-title {
+	font-size: 12px;
+	line-height: 15px;
+	color:#888;
+	position: absolute;
+	left: 42px;
+	top: 6px;
+}
+
+.bus-reg-input.num {
+	width: 200px;
+}
+
+.bus-reg-icon {
+    background-image: url(../images/mega/top-sprite_v5.png);
+    width: 24px;
+    height: 24px;
+}
+
+.bus-reg-input .bus-reg-icon {
+	margin: 30px 12px 0 4px;
+	opacity: 0.5;
+	float: left;
+    display: inline-block;
+}
+
+.bus-reg-body .number-of-user {
+	background-position: center -1582px;
+}
+
+.bus-reg-body .company-name {
+	background-position: center -1661px;
+}
+
+.bus-reg-body .phone {
+	background-position: center -1621px;
+}
+
+.bus-reg-body .email {
+	background-position: center -1701px;
+}
+
+.bus-reg-body .pw {
+	background-position: center -1741px;
+}
+
+.bus-reg-input input {
+	border: none;
+	width: 350px;
+	margin-top:30px;
+	line-height: 22px;
+	color: #333;
+	font-size: 600;
+	font-size: 18px;
+	white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.bus-reg-input input::placeholder {
+	font-size: 13px;
+}
+
+.bus-reg-input.num input {
+	width: 100px;
+}
+
+.bus-reg-input .error-message {
+    font-size: 13px;
+    padding:16px 0 0 4px;
+    color: rgba(229,76,81,1);
+    width:400px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display:none;
+}
+
+.bus-reg-input.error::after {
+    background-color: rgba(217,0,7,0.5);
+}
+
+.bus-reg-input.error input {
+	color: rgba(217,0,7,1);
+}
+
+.bus-reg-input.error .error-message {
+	display: inline-block;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

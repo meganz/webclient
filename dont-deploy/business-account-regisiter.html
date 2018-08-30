@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600');
+@import url('https://fonts.googleapis.com/css?family=Lato:300,400,700,900');
+
+</style> 
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<link rel="stylesheet" type="text/css" href="../css/business-register.css" />
+<link rel="stylesheet" type="text/css" href="../css/retina-images.css" />
+<script type="text/javascript" src="../js/jquery-1.8.1.js"></script>
+<script type="text/javascript" src="../js/jquery.jscrollpane.js"></script>
+<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+  function initTreePanelScroll()
+  {
+	  $('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  function initTransferPanelScroll()
+  {
+	  $('.transfer-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  function initSharedGridScroll()
+  {
+	  $('.grid-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  function initSharedBlocksScroll()
+  {
+	  $('.shared-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  
+  
+  $.gridHeader = function()  
+  {	
+		$('.grid-table tbody tr:first-child td').each(function(i,e) {
+		  var headerColumn = $('.grid-table-header th').get(i);
+		  $(headerColumn).width($(e).width());
+	    });
+   }	
+	
+  initTreePanelScroll();
+  initTransferPanelScroll();
+  initSharedGridScroll();
+  initSharedBlocksScroll();
+  $.gridHeader();
+  
+  $(window).bind('resize', function () 
+  {
+	  initTreePanelScroll();
+      initTransferPanelScroll();
+      initSharedGridScroll();
+	  initSharedBlocksScroll();
+      $.gridHeader();
+  });
+  $('.nw-fm-tree-folder').bind('click', function() {
+	  var fmTreeItem = $(this).parent('.nw-fm-tree-item');
+	  if(fmTreeItem.attr('class').indexOf('selected') == -1) {
+		  $('.nw-fm-tree-item.selected').removeClass('selected');
+		  fmTreeItem.addClass('selected');
+	  }
+  });
+  $('.contains-folders > .nw-fm-arrow-icon').bind('click', function() {
+	  var fmTreeItem = $(this).parent('.nw-fm-tree-item');
+	  if(fmTreeItem.attr('class').indexOf('expanded') == -1) {
+		  fmTreeItem.addClass('expanded');
+		  fmTreeItem.next('ul').addClass('opened');
+		  initTreePanelScroll();
+	  } else {
+		  fmTreeItem.removeClass('expanded');
+		  fmTreeItem.next('ul').removeClass('opened');
+		  initTreePanelScroll();
+	  }
+  });
+  $('.nw-fm-left-icon').bind('click', function() {
+	  var currentPanelTitle = $(this).attr('class').split(' ')[1];
+	  if($(this).attr('class').indexOf('active') == -1) {
+		  $('.nw-fm-left-icon.active').removeClass('active');
+		  $(this).addClass('active');
+		  $('.content-panel.active').removeClass('active');
+		  $('.content-panel.'+currentPanelTitle).addClass('active');
+		  initTreePanelScroll();
+		  $('.fm-left-menu').removeClass().addClass('fm-left-menu ' + currentPanelTitle);
+	  }
+  });
+  $('.nw-contact-item').bind('click', function() {
+	  if($(this).attr('class').indexOf('selected') == -1) {
+		  $('.nw-contact-item.selected').removeClass('selected');
+		  $(this).addClass('selected');
+	  }
+  });
+  $('.nw-conversations-item').bind('click', function() {
+	  if($(this).attr('class').indexOf('selected') == -1) {
+		  $('.nw-conversations-item.selected').removeClass('selected');
+		  $(this).addClass('selected');
+	  }
+  });
+  var initial;
+  $('.nw-fm-left-icon').bind('mouseover', function () {
+	  var  tooltip = $(this).find('.nw-fm-left-tooltip');
+	  clearTimeout( initial );
+	  initial = window.setTimeout( 
+      function() {
+        $(tooltip).addClass('hovered');
+      }, 1000);
+  });
+  $('.nw-fm-left-icon').bind('mouseout', function () {
+	    $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
+		clearTimeout( initial );
+  });
+  
+  $('.fm-files-view-icon').bind('click', function () {
+	  if ($(this).attr('class').indexOf('active') == -1) {
+		  if ($(this).attr('class').indexOf('block-view') > -1) {
+			  $('.files-grid-view ').addClass('hidden');
+			  $('.fm-blocks-view').removeClass('hidden'); 
+              initSharedBlocksScroll();
+		  } else {
+			  $('.files-grid-view ').removeClass('hidden');
+			  $('.fm-blocks-view').addClass('hidden');
+			  initSharedGridScroll();
+		  }
+		  $('.fm-files-view-icon').removeClass('active');
+		  $(this).addClass('active');
+	  }
+  }); 
+});
+</script>
+</head>
+
+<body id="bodyel" class="logged rk-saved fontsize2 en free business-register">
+	<div class="top-bar"></div>
+	<div class="bus-reg-body">
+		<div class="bus-reg-header">Create Business Account</div>
+		<div class="bus-reg-info-block">
+
+			<div class="bus-reg-subheader">Plan details</div>
+			<div class="bus-reg-input num">
+				<div class="bus-reg-title">Number of users</div>
+				<div class="bus-reg-icon number-of-user"></div>
+				<input type=" " name=" " placeholder="3">
+				<div class="error-message">is the error signal too red?</div>
+			</div>
+
+			<div class="bus-reg-subheader">Account information</div>
+			<div class="bus-reg-input error">
+				<div class="bus-reg-icon company-name"></div>
+				<input type=" " name=" " placeholder="Company Name">
+				<div class="error-message">is the error signal too red?</div>
+			</div>
+			<div class="bus-reg-input">
+				<div class="bus-reg-icon phone"></div>
+				<input type=" " name=" " placeholder="Phone Number (optional)">
+				<div class="error-message">is the error signal too red?</div>
+			</div>
+			<div class="bus-reg-input">
+				<div class="bus-reg-icon number-of-user"></div>
+				<input type=" " name=" " placeholder="First Name">
+   				<div class="error-message">is the error signal too red?</div>
+			</div>
+			<div class="bus-reg-input">
+				<div class="bus-reg-icon email"></div>
+				<input type=" " name=" " placeholder="Email">
+				<div class="error-message">is the error signal too red?</div>
+			</div>
+			<div class="bus-reg-input">
+				<div class="bus-reg-icon pw"></div>
+				<input type=" " name=" " placeholder="Password">
+				<div class="error-message">is the error signal too red?</div>
+			</div>
+			<div class="bus-reg-input">
+				<div class="bus-reg-icon pw"></div>
+				<input type=" " name=" " placeholder="Retype password">
+				<div class="error-message">is the error signal too red?</div>
+			</div>
+
+			<div class="bus-reg-subheader">Payment method</div>
+			<div>
+				
+			</div>
+
+		</div>
+	</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

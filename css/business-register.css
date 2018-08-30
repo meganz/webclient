@@ -9,6 +9,18 @@
 	font-family: 'Lato', sans-serif;
 }
 
+.business-register .left {
+	float: left;
+}
+
+.business-register .right {
+	float: right;
+}
+
+.business-register .clear {
+	clear: both;
+}
+
 .business-register .top-bar {
 	width: 100%;
 	height: 36px;
@@ -115,6 +127,7 @@
 	font-size: 18px;
 	white-space: nowrap;
     text-overflow: ellipsis;
+    background-color: rgba(255,255,255,0.01);
 }
 
 .bus-reg-input input.fir-name {
@@ -308,12 +321,6 @@
 	display: none;
 }
 
-.business-register .clear {
-	clear: both;
-}
-
-
-
 .bus-reg-btn span, .bus-reg-btn-2 span {
 	line-height: 48px;
 	display: inline;
@@ -345,6 +352,7 @@
     position: absolute;
     right: 0;
     top: 112px;
+    background-color: #fff;
 }
 
 .bus-plan-icon64 {

@@ -878,6 +878,7 @@ scparser.$add('t', function(a, scnodes) {
         if (scnodes[i]) {
             delete scnodes[i].i;
             delete scnodes[i].scni;
+            delete scnodes[i].arrivalOrder;
             M.addNode(scnodes[i]);
             ufsc.feednode(scnodes[i]);
         }

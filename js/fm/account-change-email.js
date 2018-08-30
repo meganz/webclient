@@ -77,7 +77,7 @@ var accountChangeEmail = {
                 loadingDialog.show();
 
                 // Check if 2FA is enabled on their account
-                twofactor.isisEnabledForAccount(function(result) {
+                twofactor.isEnabledForAccount(function(result) {
 
                     loadingDialog.hide();
 

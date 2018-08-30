@@ -11,6 +11,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 <link rel="stylesheet" type="text/css" href="../css/style.css" />
 <link rel="stylesheet" type="text/css" href="../css/business-register.css" />
+<link rel="stylesheet" type="text/css" href="../css/pro.css" />
 <link rel="stylesheet" type="text/css" href="../css/retina-images.css" />
 <script type="text/javascript" src="../js/jquery-1.8.1.js"></script>
 <script type="text/javascript" src="../js/jquery.jscrollpane.js"></script>
@@ -160,7 +161,8 @@ $(document).ready(function() {
 			</div>
 			<div class="bus-reg-input">
 				<div class="bus-reg-icon number-of-user"></div>
-				<input type=" " name=" " placeholder="First Name">
+				<input type=" " name=" " placeholder="First Name" class="fir-name">
+				<input type=" " name=" " placeholder="Last Name" class="las-name">
    				<div class="error-message">is the error signal too red?</div>
 			</div>
 			<div class="bus-reg-input">
@@ -180,10 +182,58 @@ $(document).ready(function() {
 			</div>
 
 			<div class="bus-reg-subheader">Payment method</div>
-			<div>
-				
+			<div class="bus-reg-radio-block">
+				<div class= "bus-reg-radio checkOn"></div>
+				<div class="provider">Credit Card</div> 
+			    <div class="provider-icon ecpVI"></div>
+                <div class="provider-icon ecpMC"></div>
+  				<div class= "bus-reg-radio checkOff"></div>
+  				<div class="provider">Direct Debit</div>
+			</div>
+			<div class="bus-reg-agreement">
+            	<div class="bus-reg-checkbox"></div>
+                <div class="bus-reg-txt">Augue scribentur quo et, eu mea numquam fabulas, nonumy timeam nostrum ei cum. Homero mandamus ut nam, prompta bonorum assueverit vim id.
 			</div>
 
+			<div class="bus-reg-agreement">
+            	<div class="bus-reg-checkbox checkOn"></div>
+                <div class="bus-reg-txt">I agree with the MEGA Business
+                	<a href="/terms" class="terms">Terms of Service &#8827;</div>
+                </div>
+			</div>
+			<div class="bus-reg-btn">
+				<span>Register </span>
+				<div class="next-arrow"></div> 
+			</div>
+		</div>
+		<div class="bus-reg-plan">
+            <div class="bus-plan-icon64"></div>
+            <div class="business-plan-title">
+                BUSINESS
+            </div>
+            <div class="business-plan-price">
+                <span class="big">10 €</span> /per user/month*
+            </div>
+            <div class="business-plan-info grey">
+                <span class="left">Base Plan (3 Licences)</span>
+                <span class="right">30 €</span>
+            </div>
+            <div class="business-plan-info">
+                <span class="left">7x additional licences</span>
+                <span class="right">70 €</span>
+            </div>
+            <div class="business-plan-info grey">
+                <span class="left">Sub Total</span>
+                <span class="right">100 €</span>
+            </div>
+            <div class="business-plan-info ">
+                <span class="left">Tax</span>
+                <span class="right">0 €</span>
+            </div>
+            <div class="business-plan-total">
+                <span class="left">Total</span>
+                <span class="right">100 €</span>
+            </div>
 		</div>
 	</div>
 </body>

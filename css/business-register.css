@@ -12,8 +12,10 @@
 }
 
 .bus-reg-body {
-	width: 922px;
+	min-width: 790px;
+	max-width: 940px;
 	margin:88px auto;
+	position: relative;
 }
 
 
@@ -31,6 +33,8 @@
 	font-size: 24px;
 	margin:64px 0 24px 0;
 	color: #333;
+	height: 30px;
+	line-height: 30px;
 }
 
 
@@ -110,6 +114,17 @@
     text-overflow: ellipsis;
 }
 
+.bus-reg-input input.fir-name {
+	width: 180px;
+	display: inline-block;
+}
+
+.bus-reg-input input.las-name {
+	width: 170px;
+	display: inline-block;
+}
+
+
 .bus-reg-input input::placeholder {
 	font-size: 13px;
 }
@@ -140,7 +155,264 @@
 	display: inline-block;
 }
 
+.bus-reg-radio-block {
+	margin-top: 32px;
+	margin-bottom: 32px;
+	width: 400px;
+	height: 24px;
+	position: relative;
+}
 
+.bus-reg-body .bus-reg-radio {
+	width: 18px;
+    height: 18px;
+    cursor: pointer;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    -moz-background-clip: padding-box;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    position: relative;
+    display: inline-block;
+    margin:3px 0;
+}
+
+.bus-reg-body .bus-reg-radio.checkOn {
+	border: 1px solid rgba(217,0,7,0.5);
+}
+
+.bus-reg-body .bus-reg-radio::before {
+	width:12px;
+	height: 12px;
+	background-color: rgba(0,0,0,0.1);
+	position: absolute;
+	-moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+	left: 2px;
+	top: 2px;
+	content: " ";
+}
+
+.bus-reg-body .bus-reg-radio.checkOn::before {
+	background-color: rgba(217,0,7,1);
+}
+
+.bus-reg-radio-block .provider{
+	margin-left: 12px;
+	font-size: 16px;
+	color: #333;
+	line-height: 24px;
+	height: 24px;
+	display: inline-block;
+	vertical-align: top;
+}
+
+
+
+.bus-reg-body .provider-icon {
+	width: 32px;
+	height: 24px;
+	vertical-align: top;
+	background-image: url(../images/mega/big-icons.png);
+	background-size: 192px 812px;
+	display: inline-block;
+	margin-left: 4px;
+}
+
+.bus-reg-body .provider-icon.ecpVI{
+	background-position: -11px -414px;
+}
+
+
+.bus-reg-body .provider-icon.ecpMC{
+	margin-right: 40px;
+	background-position: -51px -414px;
+}
+
+.bus-reg-agreement {
+	width: 400px;
+	margin-top: 16px;
+}
+
+.bus-reg-checkbox {
+	width: 12px;
+	height: 12px;
+	border:1px solid rgba(0,0,0,0.2);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.2); 
+    cursor: pointer;
+    display: inline-block;
+    content: " ";
+    margin-right: 12px;
+    vertical-align: top;
+    margin-top: 2px;
+}
+
+.bus-reg-checkbox.checkOn::before {
+	background-position: 0px -2381px;
+    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-repeat: no-repeat;
+    background-size: 48px 2406px;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    display: block;
+    content: " ";
+}
+
+.bus-reg-agreement .bus-reg-txt {
+	width: 360px;
+	font-size: 13px;
+	color:#888;
+	line-height: 18px;
+	display: inline-block;
+}
+
+.bus-reg-agreement .terms {
+	color: rgba(217,0,7,1); 
+	display: inline-block;
+	cursor: pointer;
+}
+
+.bus-reg-btn {
+	background-color: rgba(255,51,58,1);
+	float: right;
+	height: 48px;
+	padding: 0 24px;
+	cursor: pointer;
+	border-radius: 4px;
+	margin-top: 64px;
+}
+
+.bus-reg-btn span {
+	line-height: 48px;
+	display: inline;
+	font-size: 18px;
+	color: #fff;
+	vertical-align: top;
+}
+
+.bus-reg-btn .next-arrow {
+	width: 24px;
+	height: 24px;
+	background-position: -93px -414px;
+    background-image: url(../images/mega/big-icons.png);
+    display: inline-block;
+    margin-left: 12px;
+    margin-top: 12px;
+}
+
+.bus-reg-plan {
+	width: 380px;
+	display: inline-block;
+	-moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    border:1px solid rgba(0,0,0,0.1);
+    -webkit-box-shadow: 0 0 30px 1px rgba(0,0,0,0.07);
+    -moz-box-shadow: 0 0 30px 1px rgba(0,0,0,0.07);
+    box-shadow: 0 0 30px 1px rgba(0,0,0,0.07);
+    position: absolute;
+    right: 0;
+    top: 112px;
+}
+
+.bus-plan-icon64 {
+	width: 64px;
+	height: 64px;
+	background-position: -128px -339px;
+    background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+	margin:40px auto 0 auto;
+}
+
+.bus-reg-plan .business-plan-title {
+	font-size: 20px;
+	color: #333;
+	line-height: 24px;
+	margin: 4px auto 40px auto;
+	width: 380px;
+	text-align: center;
+}
+
+.bus-reg-plan .business-plan-price {
+	width: 348px;
+	height: 72px;
+	margin:auto;
+	background-color: #00BFA5;
+	border-radius: 2px;
+	color:#fff;
+	font-size: 16px;
+	width: 348px;
+	text-align: center;
+	line-height: 72px;
+	margin-bottom: 16px;
+}
+
+.bus-reg-plan .business-plan-price .big {
+	font-size: 40px;
+	font-weight: 600;
+	margin-right: 8px;
+}
+
+.bus-reg-plan .business-plan-info {
+	width: 348px;
+	height: 54px;
+	margin:0 16px;
+	background-color: #fff;
+}
+
+.bus-reg-plan .business-plan-info.grey {
+	width: 348px;
+	height: 54px;
+	margin:0 16px;
+	background-color: rgba(0,0,0,0.03);
+}
+
+.bus-reg-plan .business-plan-info .left, .bus-reg-plan .business-plan-info .right {
+	font-size: 16px;
+	color: #333;
+	line-height: 54px;
+	padding: 0 16px;
+}
+
+.bus-reg-plan .business-plan-total {
+	height: 64px;
+	position: relative;
+}
+
+.bus-reg-plan .business-plan-total::before {
+	content: " ";
+    width: 100%;
+    height: 1px;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.2);
+    position: absolute;
+}
+
+.bus-reg-plan .business-plan-total .left, .bus-reg-plan .business-plan-total .right {
+	font-size: 24px;
+	color:#000;
+	line-height: 64px;
+	padding: 0 16px;
+}
 
 
 

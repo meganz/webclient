@@ -2741,5 +2741,9 @@
     "19334": "Contul t\u0103u a fost blocat. Te rug\u0103m s\u0103 contactezi support@mega.nz",
     "19335": "Sunt de acord cu <a href=\"https:\/\/mega.nz\/#terms\">Termenii de utilizare a serviciului<\/a> MEGA",
     "19336": "Sincronizeaz\u0103 \u00eentreaga unitate cloud",
-    "19337": "Sincronizeaz\u0103 foldere specifice \u00een unitatea ta cloud"
+    "19337": "Sincronizeaz\u0103 foldere specifice \u00een unitatea ta cloud",
+    "19338": "Upload 1 file",
+    "19339": "Upload [X] files",
+    "19340": "You don't have write privileges in this share.",
+    "19341": "The account you are currently logged into on your web browser is not the one you want to upgrade. Please logout and login with the account you want to upgrade."
 }

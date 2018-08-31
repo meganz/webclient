@@ -2741,5 +2741,9 @@
     "19334": "Hesab\u0131n\u0131z bloke edilmi\u015ftir.  L\u00fctfen support@mega.nz ile irtibata ge\u00e7iniz",
     "19335": "MEGA Kullan\u0131m Ko\u015fullar\u0131n\u0131 <a href=\"https:\/\/mega.nz\/terms\"> kabul ediyorum\r\n",
     "19336": "T\u00fcm bulut s\u00fcr\u00fcc\u00fcn\u00fcz\u00fc senkronize edin",
-    "19337": "Bulut s\u00fcr\u00fcc\u00fcn\u00fczde belirli klas\u00f6rleri senkronize edin"
+    "19337": "Bulut s\u00fcr\u00fcc\u00fcn\u00fczde belirli klas\u00f6rleri senkronize edin",
+    "19338": "Upload 1 file",
+    "19339": "Upload [X] files",
+    "19340": "You don't have write privileges in this share.",
+    "19341": "The account you are currently logged into on your web browser is not the one you want to upgrade. Please logout and login with the account you want to upgrade."
 }

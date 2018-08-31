@@ -2741,5 +2741,9 @@
     "19334": "Ang iyong account ni-block. Kontakin ang support@mega.nz",
     "19335": "Pumapayag ako sa <a href=\"https:\/\/mega.nz\/terms\">Terms of Service<\/a> ng MEGA",
     "19336": "I-sync ang buong entire cloud drive",
-    "19337": "I-sync ang piling folders sa iyong cloud drive"
+    "19337": "I-sync ang piling folders sa iyong cloud drive",
+    "19338": "Upload 1 file",
+    "19339": "Upload [X] files",
+    "19340": "You don't have write privileges in this share.",
+    "19341": "The account you are currently logged into on your web browser is not the one you want to upgrade. Please logout and login with the account you want to upgrade."
 }

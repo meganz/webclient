@@ -2741,5 +2741,9 @@
     "19334": "\uacc4\uc815\uc774 \ub9c9\ud614\uc2b5\ub2c8\ub2e4. support@mega.nz\ub85c \uc5f0\ub77d\ud558\uc138\uc694",
     "19335": "MEGA <a href=\"https:\/\/mega.nz\/terms\">\uc774\uc6a9 \uc57d\uad00<\/a>\uc5d0 \ub3d9\uc758\ud569\ub2c8\ub2e4\r\n                                ",
     "19336": "\ud074\ub77c\uc6b0\ub4dc \ub4dc\ub77c\uc774\ube0c \uc804\uccb4 \ub3d9\uae30\ud654",
-    "19337": "\ud074\ub77c\uc6b0\ub4dc \ub4dc\ub77c\uc774\ube0c\uc5d0\uc11c \ub3d9\uae30\ud654\ud560 \ud3f4\ub354 \uc120\ud0dd"
+    "19337": "\ud074\ub77c\uc6b0\ub4dc \ub4dc\ub77c\uc774\ube0c\uc5d0\uc11c \ub3d9\uae30\ud654\ud560 \ud3f4\ub354 \uc120\ud0dd",
+    "19338": "Upload 1 file",
+    "19339": "Upload [X] files",
+    "19340": "You don't have write privileges in this share.",
+    "19341": "The account you are currently logged into on your web browser is not the one you want to upgrade. Please logout and login with the account you want to upgrade."
 }

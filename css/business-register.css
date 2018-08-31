@@ -2,6 +2,7 @@
 	background-color: rgba(250,250,250,1);
 	overflow: auto;
 	width: 100%;
+	margin:0;
 	height: auto;
 }
 
@@ -21,9 +22,17 @@
 	clear: both;
 }
 
+.business-register .hidden {
+	display: none;
+}
+
 .business-register .top-bar {
 	width: 100%;
 	height: 36px;
+}
+
+.business-register .disabled {
+	opacity: 0.3;
 }
 
 .bus-reg-body {
@@ -97,23 +106,23 @@
     display: inline-block;
 }
 
-.bus-reg-body .number-of-user {
+.business-register .number-of-user {
 	background-position: center -1582px;
 }
 
-.bus-reg-body .company-name {
+.business-register .company-name {
 	background-position: center -1661px;
 }
 
-.bus-reg-body .phone {
+.business-register .phone {
 	background-position: center -1621px;
 }
 
-.bus-reg-body .email {
+.business-register .email {
 	background-position: center -1701px;
 }
 
-.bus-reg-body .pw {
+.business-register .pw {
 	background-position: center -1741px;
 }
 
@@ -236,7 +245,7 @@
 	height: 24px;
 	vertical-align: top;
 	background-image: url(../images/mega/big-icons.png);
-	background-size: 192px 812px;
+	background-size: 192px auto;
 	display: inline-block;
 	margin-left: 4px;
 }
@@ -278,7 +287,7 @@
 	background-position: 0px -2381px;
     background-image: url(../images/mega/top-login-sprite_v9.png);
     background-repeat: no-repeat;
-    background-size: 48px 2406px;
+    background-size: 48px auto;
     position: absolute;
     width: 12px;
     height: 12px;
@@ -315,6 +324,12 @@
 	margin-top: 64px;
 	margin-bottom: 88px;
 	float: right;
+	transition: 0.2s;
+
+}
+
+.bus-reg-btn:hover, .bus-reg-btn-2:hover {
+	background-color: rgba(223,29,32,1);
 }
 
 .bus-reg-btn-2 {
@@ -439,7 +454,16 @@
 	position: relative;
 }
 
+.bus-reg-bottom-page::before {
+	width:100%;
+	height: 1px;
+	background-color: rgba(0,0,0,0.1);
+	position: absolute;
+	content: " ";
+}
+
 .bus-reg-bottom-page .page-header {
+	padding-top:64px;
 	width: 100%;
 	font-size: 36px;
 	font-family: montserrat, open_sans, sans-serif;
@@ -485,6 +509,35 @@
 .extension-icon {
 	background-position: -16px -691px;
 }
+
+.bus-confirm-body {
+	width:400px;
+	margin:88px auto 128px auto;
+}
+
+.bus-confirm-body.verfication {
+	width: 100%;
+	max-width: 600px;
+}
+
+.bus-confirm-body .bus-reg-header {
+	width: 100%;
+	text-align: center;
+}
+
+.bus-confirm-body .bus-reg-input {
+	margin-top: 48px;
+	margin-bottom: 12px;
+}
+
+.bus-confirm-body .bus-confirmImg {
+	width:160px;
+	height: 120px;
+	background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+    background-position: -16px -809px;
+	margin:0 auto 48px auto;
+} 
 
 
 
@@ -552,6 +605,10 @@
 	display: none;
 }
 
+.bus-confirm-body .bus-reg-btn {
+	display: inline-block;
+}
+
 .bus-reg-btn-2 {
 	display: inline-block;
 	margin-top: 80px;
@@ -561,6 +618,9 @@
 	width:100%;
 }
 
+.bus-confirm-body {
+	width: 90%;
+}
 
 }
 

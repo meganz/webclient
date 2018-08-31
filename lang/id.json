@@ -2741,5 +2741,9 @@
     "19334": "Akun anda telah di-blok. Harap kontak support@mega.nz",
     "19335": "Saya setuju dengan <a href=\"https:\/\/mega.nz\/#terms\">Kebijakan Pelayanan<\/a> MEGA",
     "19336": "Sinkronisasikan seluruh cloud drive anda",
-    "19337": "Sync folder tertentu dalam cloud drive anda"
+    "19337": "Sync folder tertentu dalam cloud drive anda",
+    "19338": "Upload 1 file",
+    "19339": "Upload [X] files",
+    "19340": "You don't have write privileges in this share.",
+    "19341": "The account you are currently logged into on your web browser is not the one you want to upgrade. Please logout and login with the account you want to upgrade."
 }

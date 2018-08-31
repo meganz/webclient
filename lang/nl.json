@@ -2741,5 +2741,9 @@
     "19334": "Uw account is geblokkeerd. Neem alstublieft contact op met support@mega.nz",
     "19335": "Ik ga akkoord met de MEGA <a href=\"https:\/\/mega.nz\/terms\">Terms of Service<\/a>",
     "19336": "Synchroniseer uw volledige cloud schijf",
-    "19337": "Synchroniseer specifieke mappen in uw cloud schijf"
+    "19337": "Synchroniseer specifieke mappen in uw cloud schijf",
+    "19338": "Upload 1 file",
+    "19339": "Upload [X] files",
+    "19340": "You don't have write privileges in this share.",
+    "19341": "The account you are currently logged into on your web browser is not the one you want to upgrade. Please logout and login with the account you want to upgrade."
 }

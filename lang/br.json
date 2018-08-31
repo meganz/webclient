@@ -2741,5 +2741,9 @@
     "19334": "Sua conta foi bloqueada. Por favor, entre em contato com support@mega.nz",
     "19335": "Eu concordo com os <a href=\"https:\/\/mega.nz\/terms\">Termos de servi\u00e7o<\/a> do MEGA",
     "19336": "Sincronizar a nuvem de arquivos inteira",
-    "19337": "Sincronizar pastas espec\u00edficas na sua nuvem de arquivos"
+    "19337": "Sincronizar pastas espec\u00edficas na sua nuvem de arquivos",
+    "19338": "Upload 1 file",
+    "19339": "Upload [X] files",
+    "19340": "You don't have write privileges in this share.",
+    "19341": "The account you are currently logged into on your web browser is not the one you want to upgrade. Please logout and login with the account you want to upgrade."
 }

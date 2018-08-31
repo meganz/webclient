@@ -1,5 +1,4 @@
 (function(scope) {
-    'use strict';
 
     var dir_inflight = 0;
     var filedrag_u = [];

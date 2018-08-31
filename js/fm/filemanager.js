@@ -3418,8 +3418,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     if (id !== 'conversations' || id !== "archivedchats") {
-        $('.fm-right-header').removeClass('hidden');
-    if (id !== 'conversations') {
         if (id !== 'user-management') {
             $('.fm-right-header').removeClass('hidden');
             $('.fm-right-header-user-management').addClass('hidden');

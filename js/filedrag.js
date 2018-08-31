@@ -211,9 +211,6 @@
             else {
                 target = M.currentdirid;
             }
-            if ((onChat = (String(M.currentdirid).substr(0, 4) === 'chat'))) {
-                target = M.currentdirid;
-            }
 
             var uploadCmdIsFine = function _uploadCmdIsFine(error, response) {
                 if (error) {

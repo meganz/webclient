@@ -1913,9 +1913,9 @@
     "17595": "When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded). Are you sure you want to disable file versioning?",
     "17596": "Enable or disable file versioning for your entire account:",
     "17597": "You may still receive file versions from shared folders if your contacts have this enabled.",
-    "17598": "Delete all file versions:",
-    "17599": "Delete all",
-    "17600": "This will permanently delete all your own file versions. Any file version shared to you from a contact will need to be deleted by them.",
+    "17598": "Delete all my older versions of files",
+    "17599": "Delete old versions",
+    "17600": "All current files will remain. Only historic versions of your files will be deleted.",
     "17601": "Enabled",
     "17602": "The current version of the file will be replaced with the file you are uploading.",
     "17603": "Download retrying in MEGAsync",
@@ -2553,5 +2553,8 @@
     "19320": "Lead Data Protection Supervisory Authority under the GDPR for accepting complaints about Mega",
     "19321": "Enquiries and requests relating to our Privacy & Data Policy should be sent to:",
     "19322": "Submit full details of alleged Trademark infringement to:",
-    "19323": "Mega has zero tolerance for Child Exploitation Material, Violent Extremism, Bestiality, Zoophilia, Gore, Malware, Hacked\/Stolen Data\/Passwords, Extortion, Revenge Porn etc. Report links with description to:"
+    "19323": "Mega has zero tolerance for Child Exploitation Material, Violent Extremism, Bestiality, Zoophilia, Gore, Malware, Hacked\/Stolen Data\/Passwords, Extortion, Revenge Porn etc. Report links with description to:",
+    "19338": "Upload 1 file",
+    "19339": "Upload [X] files",
+    "19340": "You don't have write privileges in this share."
 }

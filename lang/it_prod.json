@@ -1166,7 +1166,7 @@
     "8631": "Aggiungi alla chat",
     "8632": "Inizia una nuova chat",
     "8633": "Abbandona Chat",
-    "8634": "Entra o crea un account per [S]avere 50GB gratuiti[\/S] di spazio di archiviazione e per ricevere messaggi dai tuoi amici e colleghi.",
+    "8634": "Entra o crea un account per [S]avere 50GB* gratuiti[\/S] di spazio di archiviazione e per ricevere messaggi dai tuoi amici e colleghi.",
     "8635": "Download aggiunto a MEGAsync",
     "8637": "Aspetter\u00f2",
     "8638": "Password dimenticata",
@@ -1175,7 +1175,7 @@
     "8641": "Problema di MEGAsync",
     "8642": "Dati mancanti o invisibili",
     "8643": "Stai usando una sessione temporanea.",
-    "8644": "Stai usando una sessione temporanea. I dati che salvi verranno persi quando chiuderai la sessione. Per preservare i tuoi file dalla perdita, per favore crea un account e richiedi i tuoi [S]50GB gratuiti di spazio![\/S]",
+    "8644": "Stai utilizzando una sessione temporanea. I dati che salvi verranno persi quando chiuderai la sessione. Per preservare i tuoi file dalla perdita, per favore crea un account e richiedi i tuoi [S]50GB* gratuiti di spazio![\/S]",
     "8645": "Grandezza massima dell'immagine superata",
     "8646": "La tua immagine ha superato il limite di 64KB. Per favore, riprova con un file pi\u00f9 leggero.",
     "8649": "Sconosciuto fino alla decriptazione",
@@ -1218,7 +1218,7 @@
     "8752": "Importa su {0}",
     "8755": "Grazie! Il tuo account sar\u00e0 aggiornato appena riceveremo la conferma del tuo pagamento dal tuo provider. Se hai pagato con una carta di credito o di debito e non hai ancora ricevuto il tuo account MEGA PRO entro poche ore, per favore contattaci a support@mega.nz. Se hai pagato con un bonifico, per favore dacci 4\/5 giorni per controllare il pagamento.",
     "8759": "Link rimosso",
-    "8762": "Crea un account per [S]ottenere 50GB GRATIS[\/S] di spazio di archiviazione gratis eper ricevere i messaggi dai tuoi amici e colleghi.",
+    "8762": "Crea un account per [S]ottenere 50GB* GRATIS[\/S] di spazio di archiviazione gratis eper ricevere i messaggi dai tuoi amici e colleghi.",
     "8763": "Dom",
     "8764": "Lun",
     "8765": "Mar",
@@ -2553,5 +2553,8 @@
     "19320": "Autorit\u00e0 di controllo responsabile della protezione dei dati ai sensi del GDPR per aver accettato reclami su Mega",
     "19321": "Domande e richieste riguardo la nostra Politica su Privacy e Dati dovrebbero essere inviate a:",
     "19322": "Presenta i dettagli completi dell'infrazione di Trademark a:",
-    "19323": "Mega non ha nessuna tolleranza per materiale di sfruttamento di bambini, estremismo violento, bestialit\u00e0, zoofilia, Gore, malware, dati e password rubate, estorsioni, porno vendette ecc. Segnala i link con descrizione a:"
+    "19323": "Mega non ha nessuna tolleranza per materiale di sfruttamento di bambini, estremismo violento, bestialit\u00e0, zoofilia, Gore, malware, dati e password rubate, estorsioni, porno vendette ecc. Segnala i link con descrizione a:",
+    "19338": "Upload 1 file",
+    "19339": "Upload [X] files",
+    "19340": "You don't have write privileges in this share."
 }

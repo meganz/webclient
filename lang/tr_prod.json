@@ -900,7 +900,7 @@
     "6975": "\u00d6deme y\u00f6ntemininizi a\u015fa\u011f\u0131dan se\u00e7in.",
     "6976": "%1 plan\u0131n\u0131 se\u00e7tiniz",
     "6978": "[A]2 ay \u00fccretsiz al\u0131n[\/A] bir y\u0131ll\u0131k PRO plana abone olursan\u0131z.",
-    "6991": "T\u00fcm aktarmalar\u0131 temizle",
+    "6991": "T\u00fcm aktarmalar\u0131 iptal et",
     "6992": "Tamamlananlar\u0131 temizle",
     "6993": "T\u00fcm aktarmalar\u0131 duraklat",
     "6994": "Devam etmek istedi\u011finizden emin misiniz?",
@@ -970,7 +970,7 @@
     "7222": "Bir indirme, aktarma kuyru\u011funa eklendi.",
     "7223": "Bir y\u00fckleme aktarma s\u0131ras\u0131na eklendi",
     "7224": "G\u00f6ster",
-    "7225": "T\u00fcm aktarmalar\u0131 silmek istedi\u011finizden emin misiniz?",
+    "7225": "T\u00fcm aktarmalar\u0131 iptal etmek istedi\u011finizden emin misiniz?",
     "7226": "\u00c7\u00f6p Kutusu Temizleme Zamanlay\u0131c\u0131s\u0131:",
     "7227": "S\u0131raya al\u0131nd\u0131",
     "7228": "Yaz\u0131tipi b\u00fcy\u00fckl\u00fc\u011f\u00fc:",
@@ -2553,5 +2553,8 @@
     "19320": "Mega ile ilgili \u015fikayetleri kabul etmek i\u00e7in GDPR alt\u0131nda Ana Veri Koruma Denetleyici Kurumu",
     "19321": "Gizlilik ve Veri Politikam\u0131zla ilgili sorular ve istekler a\u015fa\u011f\u0131daki adrese g\u00f6nderilmelidir:",
     "19322": "\u0130ddia edilen Ticari Marka ihlalinin t\u00fcm ayr\u0131nt\u0131lar\u0131n\u0131 \u015fu adrese g\u00f6nderin:",
-    "19323": "Mega, \u00c7ocuk S\u00f6m\u00fcr\u00fc Malzemesi, \u015eiddetli A\u015f\u0131r\u0131l\u0131k, Hayvan Pornosu, K\u00f6t\u00fc Ama\u00e7l\u0131 Yaz\u0131l\u0131m, \u00c7al\u0131nt\u0131 Veri\/\u015eifreler, \u015eantaj, \u0130ntikam Pornosu gibi konularda s\u0131f\u0131r toleransa sahiptir.\r\nBu t\u00fcr konularla ilgili ba\u011flant\u0131y\u0131 bildirin:"
+    "19323": "Mega, \u00c7ocuk S\u00f6m\u00fcr\u00fc Malzemesi, \u015eiddetli A\u015f\u0131r\u0131l\u0131k, Hayvan Pornosu, K\u00f6t\u00fc Ama\u00e7l\u0131 Yaz\u0131l\u0131m, \u00c7al\u0131nt\u0131 Veri\/\u015eifreler, \u015eantaj, \u0130ntikam Pornosu gibi konularda s\u0131f\u0131r toleransa sahiptir.\r\nBu t\u00fcr konularla ilgili ba\u011flant\u0131y\u0131 bildirin:",
+    "19338": "Upload 1 file",
+    "19339": "Upload [X] files",
+    "19340": "You don't have write privileges in this share."
 }

@@ -44,7 +44,18 @@ function ui_keycomplete() {
             api_req({ a: 'log', e: 99628, m: 'Completed registration on regular webclient' });
         }
 
-        // Load the Pro page to choose plan
-        loadSubPage('pro');
+        // if this is a sub-user in a business account.
+        if (u_attr.b && u_attr.b.mu) {
+            if (page === 'fm') {
+                loadSubPage('start');
+            }
+            else {
+                loadSubPage('fm');
+            }
+        }
+        else {
+            // Load the Pro page to choose plan
+            loadSubPage('pro');
+        }
     }
 }

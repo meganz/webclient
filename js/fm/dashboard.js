@@ -312,6 +312,13 @@ function dashboardUI() {
 
         /* End of Used Bandwidth progressbar */
 
+        // if this is a business account user (sub or master)
+        if (u_attr.b) {
+            $('.dashboard .button.upgrade-account').addClass('hidden');
+            $('.account.widget.bandwidth').addClass('hidden');
+            $('.account.widget.body.achievements').addClass('hidden');
+        }
+
         // Fill rest of widgets
         dashboardUI.updateWidgets();
 

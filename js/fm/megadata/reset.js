@@ -16,6 +16,7 @@ MegaData.prototype.reset = function() {
     this.chd = Object.create(null);
     this.chc = Object.create(null);
 
+    this.suba = Object.create(null);
     if (typeof MegaDataMap !== 'undefined') {
         this.u = new MegaDataMap();
         this.u.addChangeListener(function() {

@@ -3400,3 +3400,43 @@ li.token-input-token-invite .input-close {
     text-align: center;
 }
 /* end of Contact info dialog*/
+
+/* invitation link password dialog */
+.fm-dialog.sub-account-link-password {
+    left: 35%;
+    top: 45%;
+}
+
+.fm-dialog.sub-account-link-password .wrapper {
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.fm-dialog.sub-account-link-password .instruction-message {
+    color: #777;
+    line-height: 20px;
+    padding: 0 0 20px;
+}
+
+.fm-dialog.sub-account-link-password .decryption-key {
+    position: relative;
+}
+
+.fm-dialog.sub-account-link-password .decryption-key .icon {
+    background-image: url(../images/mega/dialog-sprite.png);
+    background-position: -6px -5510px;
+    background-repeat: no-repeat;
+    height: 22px;
+    left: 13px;
+    opacity: 0.5;
+    position: absolute;
+    top: 5px;
+    width: 24px;
+}
+
+.fm-dialog.sub-account-link-password .decryption-key input {
+    text-indent: 36px;
+}
+.fm-dialog.sub-account-link-password .decryption-key .dialog-link-pwd-empty {
+    color: red;
+}

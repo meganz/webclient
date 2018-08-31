@@ -125,7 +125,7 @@ function u_checklogin3a(res, ctx) {
         u_attr = res;
         var exclude = [
             'aav', 'aas', 'c', 'currk', 'email', 'flags', 'k', 'lup', 'name',
-            'p', 'privk', 'pubk', 's', 'since', 'ts', 'u', 'ut'
+            'p', 'privk', 'pubk', 's', 'since', 'ts', 'u', 'ut', 'b'
         ];
 
         for (var n in u_attr) {
@@ -306,6 +306,37 @@ function u_wasloggedin() {
 function u_setrsa(rsakey) {
     var $promise = new MegaPromise();
 
+    // performance optimization. encode keys once
+    var privateKeyEncoded = crypto_encodeprivkey(rsakey);
+    var publicKeyEncodedB64 = base64urlencode(crypto_encodepubkey(rsakey));
+    var buinessMaster;
+    var buinsesPubKey;
+
+    var request = {
+        a: 'up',
+        privk: a32_to_base64(encrypt_key(u_k_aes,
+            str_to_a32(privateKeyEncoded))),
+        pubk: publicKeyEncodedB64
+    };
+
+    // checking if we are creating keys for a business sub-user
+    if (window.businessSubAc) {
+        // we get current user's master user + its public key (master user pubkey)
+        buinessMaster = window.businessSubAc.mu;
+        buinsesPubKey = window.businessSubAc.mpubk;
+        
+
+        // now we will encrypt the current user master-key using master-user public key. and include it in 'up' request
+        // because master-user must be aware of evey sub-user's master-key.
+        var subUserMasterKey = a32_to_str(u_k);
+        var masterAccountRSA_keyPub = crypto_decodepubkey(base64urldecode(buinsesPubKey));
+        var subUserMasterKeyEncRSA = crypto_rsaencrypt(subUserMasterKey, masterAccountRSA_keyPub);
+        var subUserMasterKeyEncRSA_B64 = base64urlencode(subUserMasterKeyEncRSA);
+
+        request.mk = subUserMasterKeyEncRSA_B64;
+
+    }
+
     var ctx = {
         callback: function (res, ctx) {
             if (window.d) {
@@ -313,8 +344,14 @@ function u_setrsa(rsakey) {
             }
 
             u_privk = rsakey;
-            u_attr.privk = u_storage.privk = base64urlencode(crypto_encodeprivkey(rsakey));
-            u_attr.pubk = u_storage.pubk = base64urlencode(crypto_encodepubkey(rsakey));
+            u_attr.privk = u_storage.privk = base64urlencode(privateKeyEncoded);
+            u_attr.pubk = u_storage.pubk = publicKeyEncodedB64;
+            
+            if (buinessMaster) {
+                u_attr.mu = buinessMaster;
+                u_attr.b = 1;
+                delete window.businessSubAc; // performance measure, freeup memory since it's not useful (nor harmful)
+            }
 
             // Update u_attr and store user data on account activation
             u_checklogin({
@@ -345,13 +382,8 @@ function u_setrsa(rsakey) {
             });
         }
     };
-
-    api_req({
-        a: 'up',
-        privk: a32_to_base64(encrypt_key(u_k_aes,
-            str_to_a32(crypto_encodeprivkey(rsakey)))),
-        pubk: base64urlencode(crypto_encodepubkey(rsakey))
-    }, ctx);
+    
+    api_req(request, ctx);
 
     return $promise;
 }

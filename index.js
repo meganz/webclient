@@ -240,6 +240,10 @@ function init_page() {
             return false;
         }
     }
+    // cleaning local-storage used attr for business signup
+    if (localStorage.businessSubAc && page !== 'register') {
+        delete localStorage.businessSubAc;
+    }
 
     // Get information about what API flags are enabled e.g. 2FA, New Registration etc
     mega.getApiMiscFlags();
@@ -723,6 +727,15 @@ function init_page() {
             // Show message
             alert('We can\'t decipher your invite link, please check you copied the link correctly, or sign up manually with the same email address.');
         }
+    }
+    else if (page.length > 14 && page.substr(0, 14) === 'businesssignup') {
+        var signupCodeEncrypted = page.substring(14, page.length);
+        //$('.fm-dialog.sub-account-link-password').removeClass('hidden');
+        M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+            var business = new BusinessAccountUI();
+            business.showLinkPasswordDialog(signupCodeEncrypted);
+        });
+
     }
     else if (page === 'confirm') {
 
@@ -1712,6 +1725,12 @@ function topmenuUI() {
             }
         }
 
+        // if this is a business account sub-user
+        if (u_attr.b) {
+            $topHeader.find('.top-icon.achievements').addClass('hidden');
+            $topMenu.find('.upgrade-your-account').addClass('hidden');
+        }
+
         // Show PRO plan expired warning popup (if applicable)
         alarm.planExpired.render();
     }
@@ -1790,7 +1809,6 @@ function topmenuUI() {
             $topMenu.find('.top-menu-item.login').addClass('hidden');
             $topMenu.find('.top-menu-item.logout').removeClass('hidden');
         }
-
     }
 
     $.hideTopMenu = function (e) {

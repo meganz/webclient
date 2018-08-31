@@ -50,7 +50,7 @@
 }
 
 .bus-reg-info-block {
-	width:400px;
+	width:100%;
 }
 
 .bus-reg-subheader {
@@ -64,7 +64,7 @@
 
 .bus-reg-input {
 	height: 64px;
-	width: 400px;
+	width: 100%;
 	position: relative;
 	display: inline-block;
 	margin-bottom: 12px;
@@ -90,7 +90,7 @@
 }
 
 .bus-reg-input.num {
-	width: 200px;
+	width: 60%;
 }
 
 .bus-reg-icon {
@@ -128,7 +128,9 @@
 
 .bus-reg-input input {
 	border: none;
-	width: 350px;
+	width: -webkit-calc(100% - 50px);
+    width: -moz-calc(100% - 50px);
+    width: calc(100% - 50px);
 	margin-top:30px;
 	line-height: 22px;
 	color: #333;
@@ -140,15 +142,14 @@
 }
 
 .bus-reg-input input.fir-name {
-	width: 180px;
+	width: 36%;
 	display: inline-block;
 }
 
 .bus-reg-input input.las-name {
-	width: 170px;
+	width: 36%;
 	display: inline-block;
 }
-
 
 .bus-reg-input input::placeholder {
 	font-size: 13px;
@@ -183,7 +184,7 @@
 .bus-reg-radio-block {
 	margin-top: 32px;
 	margin-bottom: 32px;
-	width: 400px;
+	width: 100%;
 	height: 24px;
 	position: relative;
 }
@@ -238,8 +239,6 @@
 	vertical-align: top;
 }
 
-
-
 .bus-reg-body .provider-icon {
 	width: 32px;
 	height: 24px;
@@ -261,7 +260,7 @@
 }
 
 .bus-reg-agreement {
-	width: 400px;
+	width: 95%;
 	margin-top: 16px;
 }
 
@@ -302,7 +301,7 @@
 }
 
 .bus-reg-agreement .bus-reg-txt {
-	width: 360px;
+	width: 88%;
 	font-size: 13px;
 	color:#888;
 	line-height: 18px;
@@ -510,8 +509,10 @@
 	background-position: -16px -691px;
 }
 
+
 .bus-confirm-body {
-	width:400px;
+	width: 90%;
+	max-width:400px;
 	margin:88px auto 128px auto;
 }
 
@@ -550,6 +551,8 @@
 }
 
 .bus-reg-plan {
+	width:100%;
+	top: 48px;
 	position: relative;
 }
 
@@ -557,48 +560,9 @@
 	font-size: 30px;
 }
 
-.bus-reg-info-block {
-	width: 100%;
-}
-
-.bus-reg-input {
-	width: 100%;
-}
-
-.bus-reg-input.num {
-	width: 60%;
-}
-
-.bus-reg-input input {
-	width: -webkit-calc(100% - 50px);
-    width: -moz-calc(100% - 50px);
-    width: calc(100% - 50px);
-}
-
-.bus-reg-input input.fir-name {
-	width: 36%;
-}
-
-.bus-reg-input input.las-name {
-	width: 36%;
-}
-
 .bus-reg-body .provider-icon.ecpMC{
 	margin-right: 10px;
 	background-position: -51px -414px;
-}
-
-.bus-reg-agreement {
-	width: 100%;
-}
-
-.bus-reg-agreement .bus-reg-txt {
-	width: 88%;
-}
-
-.bus-reg-plan {
-	width:100%;
-	top: 48px;
 }
 
 .bus-reg-btn {
@@ -616,10 +580,6 @@
 
 .bus-reg-featureBlock {
 	width:100%;
-}
-
-.bus-confirm-body {
-	width: 90%;
 }
 
 }

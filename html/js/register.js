@@ -471,11 +471,11 @@ function init_register() {
         var userInfo = JSON.parse(localStorage.businessSubAc);
         // we know here that userInfo contain all needed attr, othrewise higher layers wont allow us
         // to get here.
-        $('#register-email').val(userInfo.e);
+        $('#register-email-registerpage').val(userInfo.e);
         // $('#register-email').attr('readonly', true);
-        $('#register-lastname').val(a32_to_str(base64_to_a32(userInfo.lastname)));
+        $('#register-lastname-registerpage').val(a32_to_str(base64_to_a32(userInfo.lastname)));
         // $('#register-lastname').attr('readonly', true);
-        $('#register-firstname').val(a32_to_str(base64_to_a32(userInfo.firstname)));
+        $('#register-firstname-registerpage').val(a32_to_str(base64_to_a32(userInfo.firstname)));
         // $('#register-firstname').attr('readonly', true);
         var headerText = l[19129].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
         $('h3.main-italic-header', $regInfoContainer).html(headerText);

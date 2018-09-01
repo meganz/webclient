@@ -2,6 +2,7 @@
 	background-color: rgba(250,250,250,1);
 	overflow: auto;
 	width: 100%;
+	margin:0;
 	height: auto;
 }
 
@@ -9,9 +10,29 @@
 	font-family: 'Lato', sans-serif;
 }
 
+.business-register .left {
+	float: left;
+}
+
+.business-register .right {
+	float: right;
+}
+
+.business-register .clear {
+	clear: both;
+}
+
+.business-register .hidden {
+	display: none;
+}
+
 .business-register .top-bar {
 	width: 100%;
 	height: 36px;
+}
+
+.business-register .disabled {
+	opacity: 0.3;
 }
 
 .bus-reg-body {
@@ -29,7 +50,7 @@
 }
 
 .bus-reg-info-block {
-	width:400px;
+	width:100%;
 }
 
 .bus-reg-subheader {
@@ -43,7 +64,7 @@
 
 .bus-reg-input {
 	height: 64px;
-	width: 400px;
+	width: 100%;
 	position: relative;
 	display: inline-block;
 	margin-bottom: 12px;
@@ -69,7 +90,7 @@
 }
 
 .bus-reg-input.num {
-	width: 200px;
+	width: 60%;
 }
 
 .bus-reg-icon {
@@ -85,29 +106,31 @@
     display: inline-block;
 }
 
-.bus-reg-body .number-of-user {
+.business-register .number-of-user {
 	background-position: center -1582px;
 }
 
-.bus-reg-body .company-name {
+.business-register .company-name {
 	background-position: center -1661px;
 }
 
-.bus-reg-body .phone {
+.business-register .phone {
 	background-position: center -1621px;
 }
 
-.bus-reg-body .email {
+.business-register .email {
 	background-position: center -1701px;
 }
 
-.bus-reg-body .pw {
+.business-register .pw {
 	background-position: center -1741px;
 }
 
 .bus-reg-input input {
 	border: none;
-	width: 350px;
+	width: -webkit-calc(100% - 50px);
+    width: -moz-calc(100% - 50px);
+    width: calc(100% - 50px);
 	margin-top:30px;
 	line-height: 22px;
 	color: #333;
@@ -115,18 +138,18 @@
 	font-size: 18px;
 	white-space: nowrap;
     text-overflow: ellipsis;
+    background-color: rgba(255,255,255,0.01);
 }
 
 .bus-reg-input input.fir-name {
-	width: 180px;
+	width: 36%;
 	display: inline-block;
 }
 
 .bus-reg-input input.las-name {
-	width: 170px;
+	width: 36%;
 	display: inline-block;
 }
-
 
 .bus-reg-input input::placeholder {
 	font-size: 13px;
@@ -161,7 +184,7 @@
 .bus-reg-radio-block {
 	margin-top: 32px;
 	margin-bottom: 32px;
-	width: 400px;
+	width: 100%;
 	height: 24px;
 	position: relative;
 }
@@ -216,14 +239,12 @@
 	vertical-align: top;
 }
 
-
-
 .bus-reg-body .provider-icon {
 	width: 32px;
 	height: 24px;
 	vertical-align: top;
 	background-image: url(../images/mega/big-icons.png);
-	background-size: 192px 812px;
+	background-size: 192px auto;
 	display: inline-block;
 	margin-left: 4px;
 }
@@ -239,7 +260,7 @@
 }
 
 .bus-reg-agreement {
-	width: 400px;
+	width: 95%;
 	margin-top: 16px;
 }
 
@@ -265,7 +286,7 @@
 	background-position: 0px -2381px;
     background-image: url(../images/mega/top-login-sprite_v9.png);
     background-repeat: no-repeat;
-    background-size: 48px 2406px;
+    background-size: 48px auto;
     position: absolute;
     width: 12px;
     height: 12px;
@@ -280,7 +301,7 @@
 }
 
 .bus-reg-agreement .bus-reg-txt {
-	width: 360px;
+	width: 88%;
 	font-size: 13px;
 	color:#888;
 	line-height: 18px;
@@ -302,17 +323,17 @@
 	margin-top: 64px;
 	margin-bottom: 88px;
 	float: right;
+	transition: 0.2s;
+
+}
+
+.bus-reg-btn:hover, .bus-reg-btn-2:hover {
+	background-color: rgba(223,29,32,1);
 }
 
 .bus-reg-btn-2 {
 	display: none;
 }
-
-.business-register .clear {
-	clear: both;
-}
-
-
 
 .bus-reg-btn span, .bus-reg-btn-2 span {
 	line-height: 48px;
@@ -345,6 +366,7 @@
     position: absolute;
     right: 0;
     top: 112px;
+    background-color: #fff;
 }
 
 .bus-plan-icon64 {
@@ -431,7 +453,16 @@
 	position: relative;
 }
 
+.bus-reg-bottom-page::before {
+	width:100%;
+	height: 1px;
+	background-color: rgba(0,0,0,0.1);
+	position: absolute;
+	content: " ";
+}
+
 .bus-reg-bottom-page .page-header {
+	padding-top:64px;
 	width: 100%;
 	font-size: 36px;
 	font-family: montserrat, open_sans, sans-serif;
@@ -479,6 +510,37 @@
 }
 
 
+.bus-confirm-body {
+	width: 90%;
+	max-width:400px;
+	margin:88px auto 128px auto;
+}
+
+.bus-confirm-body.verfication {
+	width: 100%;
+	max-width: 600px;
+}
+
+.bus-confirm-body .bus-reg-header {
+	width: 100%;
+	text-align: center;
+}
+
+.bus-confirm-body .bus-reg-input {
+	margin-top: 48px;
+	margin-bottom: 12px;
+}
+
+.bus-confirm-body .bus-confirmImg {
+	width:160px;
+	height: 120px;
+	background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+    background-position: -16px -809px;
+	margin:0 auto 48px auto;
+} 
+
+
 
 
 @media only screen and (max-width: 790px) {
@@ -489,6 +551,8 @@
 }
 
 .bus-reg-plan {
+	width:100%;
+	top: 48px;
 	position: relative;
 }
 
@@ -496,52 +560,17 @@
 	font-size: 30px;
 }
 
-.bus-reg-info-block {
-	width: 100%;
-}
-
-.bus-reg-input {
-	width: 100%;
-}
-
-.bus-reg-input.num {
-	width: 60%;
-}
-
-.bus-reg-input input {
-	width: -webkit-calc(100% - 50px);
-    width: -moz-calc(100% - 50px);
-    width: calc(100% - 50px);
-}
-
-.bus-reg-input input.fir-name {
-	width: 36%;
-}
-
-.bus-reg-input input.las-name {
-	width: 36%;
-}
-
 .bus-reg-body .provider-icon.ecpMC{
 	margin-right: 10px;
 	background-position: -51px -414px;
 }
 
-.bus-reg-agreement {
-	width: 100%;
-}
-
-.bus-reg-agreement .bus-reg-txt {
-	width: 88%;
-}
-
-.bus-reg-plan {
-	width:100%;
-	top: 48px;
-}
-
 .bus-reg-btn {
 	display: none;
+}
+
+.bus-confirm-body .bus-reg-btn {
+	display: inline-block;
 }
 
 .bus-reg-btn-2 {
@@ -552,7 +581,6 @@
 .bus-reg-featureBlock {
 	width:100%;
 }
-
 
 }
 

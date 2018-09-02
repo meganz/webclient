@@ -50,7 +50,7 @@
 }
 
 .bus-reg-info-block {
-	width:100%;
+	width: 400px;
 }
 
 .bus-reg-subheader {
@@ -492,8 +492,8 @@
 	width: 80%;
 	margin:48px auto 64px auto;
 	color: #666;
-	font-size: 14px;
-	line-height: 24px;
+	font-size: 16px;
+	line-height: 28px;
 	text-align: center;
 }
 
@@ -550,6 +550,10 @@
 	min-width: 0;
 }
 
+.bus-reg-info-block {
+	width:100%;
+}
+
 .bus-reg-plan {
 	width:100%;
 	top: 48px;
@@ -559,6 +563,7 @@
 .bus-reg-header {
 	font-size: 30px;
 }
+
 
 .bus-reg-body .provider-icon.ecpMC{
 	margin-right: 10px;

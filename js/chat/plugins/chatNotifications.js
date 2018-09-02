@@ -96,7 +96,11 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                             return;
                         }
 
-                        var unreadFlag = message.getState() === Message.STATE.NOT_SEEN && !document.hasFocus();
+                        var unreadFlag = (
+                            message.getState() === Message.STATE.NOT_SEEN &&
+                            !AppActivityHandler.getGlobalAppActivityHandler().isActive
+                        );
+
                         if (message.source === Message.SOURCE.CHATD) {
                             n = self.notifications.notify(
                                 'incoming-chat-message',
@@ -231,7 +235,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                                 'from': avatarMeta.fullName
                             }
                         },
-                        !document.hasFocus()
+                        !AppActivityHandler.getGlobalAppActivityHandler()
                     );
 
                     n.bind('onClick', function(e) {

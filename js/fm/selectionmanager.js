@@ -99,6 +99,16 @@ var SelectionManager = function($selectable, resume) {
         if (selectionManager) {
             selectionManager._$jqSelectable = $jqSelectable;
         }
+
+        if ($(target).is(".file-block-scrolling:not(.hidden)")) {
+            // jQuery UI won't do trigger unselecting, in case of the ui-selected item is NOT in the DOM, so
+            // we need to reset it on our own (on drag on the background OR click)
+            $(target).rebind('mousedown.sm' + idx, function(e) {
+                if ($(e.target.parentNode).is(".file-block-scrolling:not(.hidden)")) {
+                    selectionManager.clear_selection();
+                }
+            });
+        }
     };
 
     /**
@@ -119,8 +129,10 @@ var SelectionManager = function($selectable, resume) {
         $selectable = this._ensure_selectable_is_available();
 
         this.selected_list.forEach(function(nodeId) {
-            $('#' + nodeId, $selectable)
-                .removeClass('ui-selected');
+            var node = $('#' + nodeId, $selectable);
+            if (node && node.size() > 0) {
+                node.removeClass('ui-selected');
+            }
         });
 
         this.selected_list = $.selected = [];

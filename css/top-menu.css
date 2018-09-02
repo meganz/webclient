@@ -303,9 +303,9 @@
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
-    -moz-opacity: 0.8;
-    -khtml-opacity: 0.8;
-    opacity: 0.8;
+    -moz-opacity: 0.9;
+    -khtml-opacity: 0.9;
+    opacity: 0.9;
 }
 .top-head .top-icon::after, .top-bar .top-icon::after {
     content: '';

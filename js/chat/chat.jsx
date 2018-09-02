@@ -13,11 +13,15 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         var roomOrUserHash = id.replace("chat/", "");
 
         var roomType = false;
-
-        if (roomOrUserHash.substr(0, 2) === "g/") {
+        megaChat.displayArchivedChats = false;
+        if (roomOrUserHash === "archived") {
+            roomType = "archived";
+            megaChat.displayArchivedChats = true;
+        }
+        else if (roomOrUserHash.substr(0, 2) === "g/") {
             roomType = "group";
             roomOrUserHash = roomOrUserHash.substr(2, roomOrUserHash.length);
-
+            megaChat.displayArchivedChats = false;
             if (!megaChat.chats[roomOrUserHash]) {
                 // chat not found
                 // is it still loading?
@@ -39,6 +43,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             }
         }
         else {
+            megaChat.displayArchivedChats = false;
             if (!M.u[roomOrUserHash]) {
                 setTimeout(function () {
                     loadSubPage('fm/chat');
@@ -61,9 +66,10 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 
         $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
 
-
-        $('.fm-right-files-block[data-reactid]').removeClass('hidden');
-        $('.fm-right-files-block:not([data-reactid])').addClass('hidden');
+        if (roomType !== "archived") {
+            $('.fm-right-files-block[data-reactid]').removeClass('hidden');
+            $('.fm-right-files-block:not([data-reactid])').addClass('hidden');
+        }
 
         megaChat.refreshConversations();
 
@@ -91,7 +97,18 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             }
         }
         else if(roomType === "group") {
+            if (megaChat.chats[roomOrUserHash].isArchived()) {
+                megaChat.chats[roomOrUserHash].showArchived = true;
+            }
             megaChat.chats[roomOrUserHash].show();
+        }
+        else if(roomType === "archived") {
+            megaChat.hideAllChats();
+            M.onSectionUIOpen('conversations');
+            $('.archived-chat-view').removeClass('hidden');
+            if (megaChat.$conversationsAppInstance) {
+                megaChat.$conversationsAppInstance.safeForceUpdate();
+            }
         }
         else {
             console.error("Unknown room type.");
@@ -131,7 +148,12 @@ var Chat = function() {
     this.chats = new MegaDataMap();
     this.currentlyOpenedChat = null;
     this.lastOpenedChat = null;
+    this.archivedChatsCount = 0;
     this._myPresence = localStorage.megaChatPresence;
+
+    this._imageLoadCache = Object.create(null);
+    this._imagesToBeLoaded = Object.create(null);
+    this._imageAttributeCache = Object.create(null);
 
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
@@ -162,7 +184,8 @@ var Chat = function() {
             'presencedIntegration': PresencedIntegration,
             'persistedTypeArea': PersistedTypeArea,
             'btRtfFilter': BacktickRtfFilter,
-            'rtfFilter': RtfFilter
+            'rtfFilter': RtfFilter,
+            'richpreviewsFilter': RichpreviewsFilter
         },
         'chatNotificationOptions': {
             'textMessages': {
@@ -225,6 +248,7 @@ var Chat = function() {
     this.plugins = {};
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
+    self._chatsAwaitingAps = {};
 
     return this;
 };
@@ -557,6 +581,8 @@ Chat.prototype.destroy = function(isLogout) {
         return;
     }
 
+    self.isLoggingOut = isLogout;
+
     self.trigger('onDestroy', [isLogout]);
 
     // unmount the UI elements, to reduce any unneeded.
@@ -755,15 +781,20 @@ Chat.prototype.reorderContactTree = function() {
 
 
 /**
- * Open (and show) a new chat
+ * Open (and (optionally) show) a new chat
  *
  * @param userHandles {Array} list of user handles
  * @param type {String} "private" or "group"
+ * @param [chatId] {String}
+ * @param [chatShard]  {String}
+ * @param [chatdUrl]  {String}
+ * @param [setAsActive] {Boolean}
  * @returns [roomId {string}, room {MegaChatRoom}, {Deferred}]
  */
 Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUrl, setAsActive) {
     var self = this;
     type = type || "private";
+    setAsActive = setAsActive === true;
 
     var roomId = chatId;
 
@@ -866,8 +897,13 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         // wait for it to load
         ChatdIntegration._loadingChats[roomId].loadingPromise
             .done(function() {
+
                 // already initialized ? other mcc action packet triggered init with the latest data for that chat?
                 if (self.chats[roomId]) {
+                    if ((self.chats[roomId].isArchived())
+                        && (roomId === megaChat.currentlyOpenedChat)) {
+                        self.chats[roomId].showArchived = true;
+                    }
                     return;
                 }
                 var res = self.openChat(
@@ -935,21 +971,20 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
 
     var tmpRoomId = room.roomId;
 
-//    $promise.done(function(roomId, room) {
-//        assert(roomId, "missing room jid");
+    if (self.currentlyOpenedChat === tmpRoomId) {
+        self.currentlyOpenedChat = room.roomId;
+        if (room) {
+            room.show();
+        }
+    }
 
-        if (self.currentlyOpenedChat === tmpRoomId) {
-            self.currentlyOpenedChat = room.roomId;
-            if (room) {
-                room.show();
-            }
-        }
-        else {
-            if (room) {
-                //room.refreshUI();
-            }
-        }
-//    });
+    if (setAsActive === false) {
+        room.showAfterCreation = false;
+    }
+    else {
+        room.showAfterCreation = true;
+    }
+
 
 
 
@@ -1048,6 +1083,11 @@ Chat.prototype.processNewUser = function(u) {
     if (self.plugins.presencedIntegration) {
         self.plugins.presencedIntegration.addContact(u);
     }
+    self.chats.forEach(function(chatRoom) {
+        if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
+            chatRoom.trackDataChange();
+        }
+    });
 
     self.renderMyStatus();
 };
@@ -1065,6 +1105,11 @@ Chat.prototype.processRemovedUser = function(u) {
     if (self.plugins.presencedIntegration) {
         self.plugins.presencedIntegration.removeContact(u);
     }
+    self.chats.forEach(function(chatRoom) {
+        if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
+            chatRoom.trackDataChange();
+        }
+    });
 
     self.renderMyStatus();
 };
@@ -1127,7 +1172,6 @@ Chat.prototype.getChatNum = function(idx) {
 Chat.prototype.renderListing = function() {
     var self = this;
 
-
     self.hideAllChats();
 
     M.hideEmptyGrids();
@@ -1147,7 +1191,6 @@ Chat.prototype.renderListing = function() {
 
     M.onSectionUIOpen('conversations');
 
-
     if (Object.keys(self.chats).length === 0 || Object.keys(ChatdIntegration._loadingChats).length !== 0) {
         $('.fm-empty-conversations').removeClass('hidden');
     }
@@ -1157,7 +1200,8 @@ Chat.prototype.renderListing = function() {
         if (
             self.lastOpenedChat &&
             self.chats[self.lastOpenedChat] &&
-            self.chats[self.lastOpenedChat]._leaving !== true
+            self.chats[self.lastOpenedChat]._leaving !== true &&
+            self.chats[self.lastOpenedChat].isDisplayable()
         ) {
             // have last opened chat, which is active
             self.chats[self.lastOpenedChat].setActive();
@@ -1176,6 +1220,282 @@ Chat.prototype.renderListing = function() {
 };
 
 /**
+ * Inject the list of attachments for the current room into M.v
+ * @param {String} roomId The room identifier
+ */
+Chat.prototype.setAttachments = function(roomId) {
+    'use strict';
+
+    if (M.chat) {
+        if (d) {
+            console.assert(this.chats[roomId] && this.chats[roomId].isCurrentlyActive, 'check this...');
+        }
+
+        // Reset list of attachments
+        M.v = Object.values(M.chc[roomId] || {});
+
+        if (M.v.length) {
+            M.v.sort(M.sortObjFn('co'));
+
+            for (var i = M.v.length; i--;) {
+                var n = M.v[i];
+
+                if (!n.revoked && !n.seen) {
+                    n.seen = -1;
+
+                    if (String(n.fa).indexOf(':1*') > 0) {
+                        this._enqueueImageLoad(n);
+                    }
+                }
+            }
+        }
+    }
+    else if (d) {
+        console.warn('Not in chat...');
+    }
+};
+
+/**
+ * Enqueue image loading.
+ * @param {MegaNode} n The attachment node
+ * @private
+ */
+Chat.prototype._enqueueImageLoad = function(n) {
+    'use strict';
+
+    // check whether the node is cached from the cloud side
+
+    var cc = previews[n.h] || previews[n.hash];
+    if (cc) {
+        if (cc.poster) {
+            n.src = cc.poster;
+        }
+        else {
+            if (cc.full && n.mime !== 'image/png' && n.mime !== 'image/webp') {
+                cc = cc.prev || false;
+            }
+
+            if (String(cc.type).startsWith('image/')) {
+                n.src = cc.src;
+            }
+        }
+    }
+
+    var cached = n.src;
+
+    // check the node does have a file attribute, this should be implicit
+    // invoking this function but we may want to load originals later.
+
+    if (String(n.fa).indexOf(':1*') > 0) {
+        var load = false;
+        var dedup = true;
+
+        // Only load the image if its attribute was not seen before
+        // TODO: also dedup from matching 'n.hash' checksum (?)
+
+        if (this._imageAttributeCache[n.fa]) {
+            this._imageAttributeCache[n.fa].push(n.ch);
+        }
+        else {
+            this._imageAttributeCache[n.fa] = [n.ch];
+            load = !cached;
+        }
+
+        // Only load the image once if its node is posted around several rooms
+
+        if (this._imageLoadCache[n.h]) {
+            this._imageLoadCache[n.h].push(n.ch);
+        }
+        else {
+            this._imageLoadCache[n.h] = [n.ch];
+
+            if (load) {
+                this._imagesToBeLoaded[n.h] = n;
+                dedup = false;
+            }
+        }
+
+        if (dedup) {
+            cached = true;
+        }
+        else {
+            delay('chat:enqueue-image-load', this._doLoadImages.bind(this), 350);
+        }
+    }
+
+    if (cached) {
+        this._doneLoadingImage(n.h);
+    }
+};
+
+/**
+ * Actual code that is throttled and does load a bunch of queued images
+ * @private
+ */
+Chat.prototype._doLoadImages = function() {
+    "use strict";
+
+    var self = this;
+    var imagesToBeLoaded = self._imagesToBeLoaded;
+    self._imagesToBeLoaded = Object.create(null);
+
+    var chatImageParser = function(h, data) {
+        var n = M.chd[self._imageLoadCache[h][0]] || false;
+
+        if (data !== 0xDEAD) {
+            // Set the attachment node image source
+            n.src = mObjectURL([data.buffer || data], 'image/jpeg');
+            n.srcBuffer = data;
+        }
+        else if (d) {
+            console.warn('Failed to load image for %s', h, n);
+        }
+
+        self._doneLoadingImage(h);
+    };
+
+    var onSuccess = function(ctx, origNodeHandle, data) {
+        chatImageParser(origNodeHandle, data);
+    };
+
+    var onError = function(origNodeHandle) {
+        chatImageParser(origNodeHandle, 0xDEAD);
+    };
+
+    api_getfileattr(imagesToBeLoaded, 1, onSuccess, onError);
+
+    [imagesToBeLoaded].forEach(function(obj) {
+        Object.keys(obj).forEach(function(handle) {
+            self._startedLoadingImage(handle);
+        });
+    });
+};
+
+/**
+ * Retrieve all image loading (deduped) nodes for a handle
+ * @param {String} h The node handle
+ * @param {Object} [src] Empty object to store the source node that triggered the load.
+ * @private
+ */
+Chat.prototype._getImageNodes = function(h, src) {
+    var nodes = this._imageLoadCache[h] || [];
+    var handles = [].concat(nodes);
+
+    for (var i = nodes.length; i--;) {
+        var n = M.chd[nodes[i]] || false;
+
+        if (this._imageAttributeCache[n.fa]) {
+            handles = handles.concat(this._imageAttributeCache[n.fa]);
+        }
+    }
+    handles = array.unique(handles);
+
+    nodes = handles.map(function(ch) {
+        var n = M.chd[ch] || false;
+        if (src && n.src) {
+            Object.assign(src, n);
+        }
+        return n;
+    });
+
+    return nodes;
+};
+
+/**
+ * Called when an image starts loading from the preview servers
+ * @param {String} h The node handle being loaded.
+ * @private
+ */
+Chat.prototype._startedLoadingImage = function(h) {
+    "use strict";
+
+    var nodes = this._getImageNodes(h);
+
+    for (var i = nodes.length; i--;) {
+        var n = nodes[i];
+
+        if (!n.src && n.seen !== 2) {
+            // to be used in the UI with the next design changes.
+            var imgNode = document.getElementById(n.ch);
+
+            if (imgNode && (imgNode = imgNode.querySelector('img'))) {
+                imgNode.parentNode.parentNode.classList.add('thumb-loading');
+            }
+        }
+    }
+};
+
+/**
+ * Internal - called when an image is loaded in previews
+ * @param {String} h The node handle being loaded.
+ * @private
+ */
+Chat.prototype._doneLoadingImage = function(h) {
+    "use strict";
+
+    var setSource = function(n, img, src) {
+        var message = n.mo;
+
+        img.onload = function() {
+            img.onload = null;
+            n.srcWidth = this.naturalWidth;
+            n.srcHeight = this.naturalHeight;
+
+            // Notify changes...
+            if (message) {
+                message.trackDataChange();
+            }
+        };
+        img.setAttribute('src', src);
+    };
+
+    var root = {};
+    var nodes = this._getImageNodes(h, root);
+    var src = root.src;
+
+    for (var i = nodes.length; i--;) {
+        var n = nodes[i];
+        var imgNode = document.getElementById(n.ch);
+
+        if (imgNode && (imgNode = imgNode.querySelector('img'))) {
+            var parent = imgNode.parentNode;
+            var container = parent.parentNode;
+
+            if (src) {
+                container.classList.add('thumb');
+                parent.classList.remove('no-thumb');
+            }
+            else {
+                container.classList.add('thumb-failed');
+            }
+
+            n.seen = 2;
+            container.classList.remove('thumb-loading');
+            setSource(n, imgNode, src || window.noThumbURI || '');
+        }
+
+        // Set the same image data/uri across all affected (same) nodes
+        if (src) {
+            n.src = src;
+
+            if (root.srcBuffer && root.srcBuffer.byteLength) {
+                n.srcBuffer = root.srcBuffer;
+            }
+
+            // Cache the loaded image in the cloud side for reuse
+            if (n.srcBuffer && !previews[n.h] && is_image3(n)) {
+                preqs[n.h] = 1;
+                previewimg(n.h, n.srcBuffer, 'image/jpeg');
+                previews[n.h].fromChat = Date.now();
+            }
+        }
+
+        // Remove the reference to the message since it's no longer needed.
+        delete n.mo;
+    }
+};
+
+/**
  * Show the last active chat room
  * @returns {*}
  */
@@ -1186,14 +1506,23 @@ Chat.prototype.showLastActive = function() {
         var sortedConversations = obj_values(self.chats.toJS());
 
         sortedConversations.sort(M.sortObjFn("lastActivity", -1));
-
-        var room = sortedConversations[0];
-        if (!room.isActive()) {
-            room.setActive();
-            room.show();
+        var index = 0;
+        // find next active chat , it means a chat which is active or archived chat opened in the active chat list.
+        while ((index < sortedConversations.length) &&
+               (!sortedConversations[index].isDisplayable())) {
+                index++;
         }
-
-        return room;
+        if (index < sortedConversations.length) {
+            var room = sortedConversations[index];
+            if (!room.isActive()) {
+                room.setActive();
+                room.show();
+            }
+            return room;
+        }
+        else {
+            return false;
+        }
     }
     else {
         return false;
@@ -1235,8 +1564,40 @@ Chat.prototype.getPrivateRoom = function(h) {
 
 
 Chat.prototype.createAndShowPrivateRoomFor = function(h) {
-    chatui(h);
-    return this.getPrivateRoom(h);
+    var self = this;
+
+    if (self.chats[h]) {
+        chatui(h);
+        return MegaPromise.resolve(this.getPrivateRoom(h));
+    }
+    else {
+        var userHandles = [u_handle, h];
+        var result = megaChat.openChat(userHandles, "private");
+        var roomId = result[1] && result[1].roomId ? result[1].roomId : '';
+        var promise = new MegaPromise();
+
+        if (result && result[1] && result[2]) {
+            var room = result[1];
+            var chatInitDonePromise = result[2];
+            chatInitDonePromise.done(function() {
+                createTimeoutPromise(function() {
+                    return room.state === ChatRoom.STATE.READY;
+                }, 300, 30000).done(function() {
+                    room.setActive();
+                    promise.resolve(room);
+                })
+                    .fail(function(e) {
+                        promise.reject(e);
+                    });
+            });
+        }
+        else if (d) {
+            console.warn('Cannot openChat for %s.', roomId);
+            promise.reject();
+        }
+
+        return promise;
+    }
 };
 
 Chat.prototype.createAndShowGroupRoomFor = function(contactHashes) {
@@ -1448,6 +1809,10 @@ Chat.prototype.getChatById = function(chatdId) {
     if (self.chats[chatdId]) {
         return self.chats[chatdId];
     }
+    else if (self.chatIdToRoomId && self.chatIdToRoomId[chatdId] && self.chats[self.chatIdToRoomId[chatdId]]) {
+        return self.chats[self.chatIdToRoomId[chatdId]];
+    }
+
     var found = false;
     self.chats.forEach(function(chatRoom) {
         if (!found && chatRoom.chatId === chatdId) {
@@ -1484,6 +1849,34 @@ Chat.prototype.getMyChatFilesFolder = function() {
         });
 
     return promise;
+};
+
+
+/**
+ * Creates a 1on1 chat room and opens the send files from cloud drive dialog automatically
+ *
+ * @param {string} user_handle
+ */
+Chat.prototype.openChatAndSendFilesDialog = function(user_handle) {
+    var userHandles = [u_handle, user_handle];
+    var result = megaChat.openChat(userHandles, "private");
+    var roomId = result[1] && result[1].roomId ? result[1].roomId : '';
+
+    if (result && result[1] && result[2]) {
+        var room = result[1];
+        var chatInitDonePromise = result[2];
+        chatInitDonePromise.done(function() {
+            createTimeoutPromise(function() {
+                return room.state === ChatRoom.STATE.READY;
+            }, 300, 30000).done(function() {
+                room.setActive();
+                $(room).trigger('openSendFilesDialog');
+            });
+        });
+    }
+    else if (d) {
+        console.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId);
+    }
 };
 
 window.Chat = Chat;

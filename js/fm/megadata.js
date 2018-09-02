@@ -123,7 +123,7 @@ function MegaData() {
         }
 
         var ttl;
-        if (ev.type === 'ps-y-reach-end') {
+        if (ev.type === 'ps-y-reach-end' && !$.isTfsPsUpdate) {
             ttl = M.getTransferTableLengths();
             if (ttl.left > -100) {
                 this.doFlushTransfersDynList(ttl.size);
@@ -169,6 +169,22 @@ function MegaData() {
         for (var i = tf.length; i--;) {
             this[tf[i]] = dummy;
         }
+    }
+    else if (page.substr(0, 8) === 'megadrop') {
+        this['ul' + 'progress'] = function(ul, perc, bl, bt, bps) {
+            if (!bl || !ul.starttime || uldl_hold) {
+                return false;
+            }
+            if (d) {
+                console.assert(mega.megadrop.isInit(), 'Check this...');
+            }
+            var id = ul.id;
+            var retime = bps > 1000 ? (bt - bl) / bps : -1;
+
+            $.transferprogress['ul_' + id] = [bl, bt, bps];
+            delay('percent_megatitle', percent_megatitle, 50);
+            mega.megadrop.uiUpdateItem(id, bps, retime, perc, bl);
+        };
     }
 
     /** @name M.IS_TREE */

@@ -168,9 +168,11 @@
         return callHandler;
     };
 
-    RtcGlobalEventHandler.prototype.isGroupChat = function () {
-        // TO BE IMPLEMENTED
-        return false;
+    RtcGlobalEventHandler.prototype.isGroupChat = function (chatId) {
+        var chatRoom = this.megaChat.getChatById(base64urlencode(chatId));
+        assert(chatRoom, "RtcGlobalEventHandles.isGroupChat: chatroom with specified chatid not found,",
+            "this should never happen");
+        return (chatRoom.type === "group");
     };
     RtcGlobalEventHandler.prototype.get1on1RoomPeer = function(chatid) {
         chatid = base64urlencode(chatid);

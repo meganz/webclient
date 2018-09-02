@@ -43,8 +43,14 @@
         // target is what you want it to go after. Look for this elements parent.
         var parent = targetElement.parentNode;
 
+        if (!parent) {
+            // TODO: fix me properly...
+            console.warn('The target element got detached from the DOM...', [targetElement]);
+            return false;
+        }
+
         // if the parents lastchild is the targetElement...
-        if (parent.lastElementChild == targetElement) {
+        if (parent.lastElementChild === targetElement) {
             // add the newElement after the target element.
             parent.appendChild(newElement);
         } else {

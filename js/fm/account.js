@@ -266,7 +266,7 @@ function accountUI() {
         });
 
         // Upgrade Account Button
-        $('.default-white-button.upgrade-to-pro').rebind('click', function() {
+        $('.upgrade-to-pro').rebind('click', function() {
             loadSubPage('pro');
         });
 
@@ -450,9 +450,6 @@ function accountUI() {
         $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
         $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
 
-        var $passwords = $('#account-password,#account-new-password,#account-confirm-password');
-        $passwords.unbind('click');
-
         M.account.sessions.sort(function(a, b) {
             if (a[0] < b[0]) {
                 return 1;
@@ -465,15 +462,23 @@ function accountUI() {
         $('#sessions-table-container').empty();
         var html =
             '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sessions">' +
-            '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
+            '<tr><th>' + l[19303] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
             '<th class="no-border session-status">' + l[7664] + '</th>' +
             '<th class="no-border logout-column">&nbsp;</th></tr>';
         var numActiveSessions = 0;
+        
+        for (i = 0; i < account.sessions.length; i++) {
+            var el = account.sessions[i];
+            var currentSession = el[5];
+            var activeSession = el[7];
 
-        $(account.sessions).each(function(i, el) {
+            // If the current session or active then increment count
+            if (currentSession || activeSession) {
+                numActiveSessions++;
+            }
 
-            if (i == $.sessionlimit) {
-                return false;
+            if (i >= $.sessionlimit) {
+                continue;
             }
 
             var userAgent = el[2];
@@ -482,9 +487,7 @@ function accountUI() {
             var browserName = browser.nameTrans;
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
-            var currentSession = el[5];
             var sessionId = el[6];
-            var activeSession = el[7];
             var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
 
             // Show if using an extension e.g. "Firefox on Linux (+Extension)"
@@ -527,12 +530,8 @@ function accountUI() {
             else {
                 html += '<td>&nbsp;</td>';
             }
+        }
 
-            // If the current session or active then increment count
-            if (currentSession || activeSession) {
-                numActiveSessions++;
-            }
-        });
         $('#sessions-table-container').safeHTML(html + '</table>');
 
         // Don't show button to close other sessions if there's only the current session
@@ -551,7 +550,8 @@ function accountUI() {
                             M.account = null;
                             /* clear account cache */
                             $activeSessionsRows.find('.settings-logout').remove();
-                            $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
+                            $activeSessionsRows.find('.active-session-txt')
+                                .removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
                             $('.fm-close-all-sessions').hide();
                             loadingDialog.hide();
                         }
@@ -725,19 +725,20 @@ function accountUI() {
         var html = '', sel = '';
         $('.default-select.country span').text(l[996]);
 
-        for (var country in isoCountries) {
-            if (!isoCountries.hasOwnProperty(country)) {
+        var countries = M.getCountries();
+        for (var country in countries) {
+            if (!countries.hasOwnProperty(country)) {
                 continue;
             }
             if (u_attr.country && country == u_attr.country) {
                 sel = 'active';
-                $('.default-select.country span').text(isoCountries[country]);
+                $('.default-select.country span').text(countries[country]);
             }
             else {
                 sel = '';
             }
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">'
-                + isoCountries[country]
+                + countries[country]
                 + '</div>';
         }
         $('.default-select.country .default-select-scroll').safeHTML(html);
@@ -745,53 +746,16 @@ function accountUI() {
         // Bind Dropdowns events
         bindDropdownEvents($('.fm-account-main .default-select'), 1, '.account.tab-content');
 
+        // Initialise functionality to change the user's password and email
+        accountChangePassword.init();
+        accountChangeEmail.init();
+
         // Cache selectors
-        var $newEmail = $('#account-email');
-        var $emailInfoMessage = $('.fm-account-change-email');
         var $personalInfoBlock = $('.profile-form.first');
         var $firstNameField = $personalInfoBlock.find('#account-firstname');
         var $saveBlock = $('.fm-account-save-block');
         var $cancelButton = $saveBlock.find('.fm-account-cancel');
         var $saveButton = $saveBlock.find('.fm-account-save');
-
-        $('#account-password').val('');
-        $('#account-new-password').val('');
-        $('#account-confirm-password').val('');
-
-        // Reset change email fields after change
-        $newEmail.val('');
-        $emailInfoMessage.addClass('hidden');
-
-        $passwords.rebind('keyup.em', function() {
-            var texts = [];
-            $passwords.each(function() {
-                texts.push($(this).val());
-            });
-            $newEmail.val('');
-        });
-
-        // On text entry in the new email text field
-        $newEmail.rebind('keyup', function() {
-            var mail = $.trim($newEmail.val());
-
-            $passwords.val('');
-            $saveBlock.find('.fm-account-save').removeClass('disabled');
-            $saveBlock.addClass('hidden');
-
-            // Show information message
-            $emailInfoMessage.removeClass('hidden');
-
-            // If not valid email yet, exit
-            if (checkMail(mail)) {
-                return;
-            }
-
-            // Show save button
-            if (mail !== u_attr.email) {
-                $personalInfoBlock.addClass('email-confirm');
-                $saveBlock.removeClass('hidden');
-            }
-        });
 
         $firstNameField.on('input', function() {
 
@@ -829,7 +793,7 @@ function accountUI() {
             }
 
             $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-            $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+            $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
             var firstName = String($('#account-firstname').val() || '').trim();
             var lastName = String($('#account-lastname').val() || '').trim();
@@ -886,112 +850,10 @@ function accountUI() {
                 });
             }
 
-            var pws = zxcvbn($('#account-new-password').val());
-
-            if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
-                msgDialog('warninga', l[135], l[715], false, function() {
-                    $('#account-new-password').val('');
-                    $('#account-confirm-password').val('');
-                    $('#account-new-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                });
-            }
-            else if (/*$('#account-password').val() !== ''
-                &&*/ $('#account-confirm-password').val() !== ''
-                && $('#account-new-password').val() !== ''
-                && (pws.score === 0 || pws.entropy < 16)) {
-
-                msgDialog('warninga', l[135], l[1129], false, function() {
-                    $('#account-new-password').val('');
-                    $('#account-confirm-password').val('');
-                    $('#account-new-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                });
-            }
-            else if ($('#account-confirm-password').val() !== '' /*&& $('#account-password').val() !== ''
-                && $('#account-confirm-password').val() !== $('#account-password').val()*/) {
-                loadingDialog.show();
-                changepw($('#account-password').val(), $('#account-confirm-password').val(), {
-                    callback: function(res) {
-                        loadingDialog.hide();
-                        if (res == EACCESS) { // pwd incorrect
-                            msgDialog('warninga', l[135], l[724], false, function() {
-                                $('#account-password').val('');
-                                $('#account-password').focus();
-                                $('#account-password').bind('keyup.accpwd', function() {
-                                    $('.fm-account-save-block').removeClass('hidden');
-                                    $('.fm-account-save').removeClass('disabled');
-                                    $('#account-password').unbind('keyup.accpwd');
-                                });
-                            });
-                        }
-                        else if (typeof res == 'number' && res < 0) { // something went wrong
-                            $passwords.val('');
-                            msgDialog('warninga', l[135], l[6972]);
-                        }
-                        else { // success
-                            showToast('settings', l[725]);
-                            var pw_aes = new sjcl.cipher.aes(prepare_key_pw($('#account-confirm-password').val()));
-                            u_attr.k = a32_to_base64(encrypt_key(pw_aes, u_k));
-                            $passwords.val('');
-                        }
-                        accountUI();
-                    }
-                });
-            }
-            /*else if ($('#account-password').val() !== ''
-                    && $('#account-confirm-password').val() === $('#account-password').val()) {
-                msgDialog('warninga', l[135], l[16664]);
-                $('#account-confirm-password').val('');
-                $('#account-new-password').val('');
-                $('.fm-account-save-block').removeClass('hidden');
-                $('.fm-account-save').addClass('disabled');
-            }*/
-            else {
-                $passwords.val('');
-            }
-
-            // Get the new email address
-            var email = $('#account-email').val().trim().toLowerCase();
-
-            // If there is text in the email field and it doesn't match the existing one
-            if ((email !== '') && (u_attr.email !== email)) {
-
-                loadingDialog.show();
-
-                // Request change of email
-                // e => new email address
-                // i => requesti (Always has the global variable requesti (last request ID))
-                api_req({ a: 'se', aa: 'a', e: email, i: requesti }, {
-                    callback: function(res) {
-
-                        loadingDialog.hide();
-
-                        if (res === -12) {
-                            return msgDialog('warninga', l[135], l[7717]);
-                        }
-
-                        fm_showoverlay();
-                        dialogPositioning('.awaiting-confirmation');
-
-                        $('.awaiting-confirmation').removeClass('hidden');
-                        $('.fm-account-save-block').addClass('hidden');
-                        $('.fm-account-save').removeClass('disabled');
-
-                        localStorage.new_email = email;
-                    }
-                });
-
-                return;
-            }
-
-            $('.fm-account-save-block').addClass('hidden');
-            $('.fm-account-save').removeClass('disabled');
+            $saveBlock.addClass('hidden');
+            $saveButton.removeClass('disabled');
         });
 
-        $('#current-email').val(u_attr.email);
         $('#account-firstname').val(u_attr.firstname);
         $('#account-lastname').val(u_attr.lastname);
 
@@ -1111,7 +973,7 @@ function accountUI() {
             $('.bandwith-settings').removeClass('hidden');
         }
 
-        $('#slider-range-max').slider({
+        $('#slider-range-max2').slider({
             min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4,
             change: function(e, ui) {
                 if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.dl_maxSlots) {
@@ -1124,10 +986,10 @@ function accountUI() {
                 $('.upload-settings .numbers.val' + ui.value).addClass('active');
             }
         });
-        $('.upload-settings .numbers.active').removeClass('active');
-        $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
+        $('.download-settings .numbers.active').removeClass('active');
+        $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
 
-        $('#slider-range-max2').slider({
+        $('#slider-range-max').slider({
             min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
             change: function(e, ui) {
                 if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
@@ -1140,8 +1002,8 @@ function accountUI() {
                 $('.download-settings .numbers.val' + ui.value).addClass('active');
             }
         });
-        $('.download-settings .numbers.active').removeClass('active');
-        $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
+        $('.upload-settings .numbers.active').removeClass('active');
+        $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
 
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
         var i = 3;
@@ -1326,9 +1188,45 @@ function accountUI() {
 
         $('.rubsched, .rubschedopt').removeClass('radioOn').addClass('radioOff');
         var i = 13;
-        if (fmconfig.rubsched) {
+        if (u_attr.flags.ssrs > 0) {
+            var value = 90; // days
+            $('.rubsched-options').removeClass('hidden');
+
+            // non-pro users cannot disable it
+            if (!u_attr.p) {
+                // hide on/off switches
+                $('.rubsched').addClass('hidden').next().addClass('hidden');
+                value = 30; // days
+            }
+            $('.rubschedopt-none').addClass('hidden');
+
+            if (M.account.ssrs !== undefined) {
+                value = M.account.ssrs;
+            }
+            i = 14;
+            $('#rad' + i + '_opt').val(value);
+            $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+            $('#rad' + i).removeClass('radioOff').addClass('radioOn');
             i = 12;
-            $('#rubsched_options').removeClass('hidden');
+            if (!value) {
+                i = 13;
+                $('.rubsched-options').addClass('hidden');
+            }
+
+            // show/hide on/off switches
+            if (u_attr.p) {
+                $('.rubbish-desc').text(l[18685]).removeClass('hidden');
+                $('.pro-rubsched-options').removeClass('hidden');
+            }
+            else {
+                $('.rubbish-settings .green-notification').removeClass('hidden');
+                $('.rubbish-desc').text(l[18686]).removeClass('hidden');
+                $('.pro-rubsched-options').addClass('hidden');
+            }
+        }
+        else if (fmconfig.rubsched) {
+            i = 12;
+            $('.rubsched-options').removeClass('hidden');
             var opt = String(fmconfig.rubsched).split(':');
             $('#rad' + opt[0] + '_opt').val(opt[1]);
             $('#rad' + opt[0] + '_div').removeClass('radioOff').addClass('radioOn');
@@ -1343,34 +1241,48 @@ function accountUI() {
             $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            initAccountScroll(1);
+            // initAccountScroll(1);
         });
-        $('.rubsched_textopt').rebind('click keyup', function(e) {
+        $('.rubsched_textopt').rebind('click.rs blur.rs keypress.rs', function(e) {
+            var minVal = 7;
+            var maxVal = u_attr.p ? Math.pow(2, 53) : 30;
+            var curVal = parseInt($(this).val()) | 0;
+
+            // Do not save value until user leave input or click Enter button
+            if (e.which && e.which !== 13) {
+                return;
+            }
+
+            curVal = Math.min(Math.max(curVal, minVal), maxVal);
+            $(this).val(curVal);
+
             var id = String($(this).attr('id')).split('_')[0];
             $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
             $('#' + id + ',#' + id + '_div').addClass('radioOn').removeClass('radioOff');
-            mega.config.setn('rubsched', id.substr(3) + ':' + $(this).val());
-            initAccountScroll(1);
+            mega.config.setn('rubsched', id.substr(3) + ':' + curVal);
+            // initAccountScroll(1);
         });
-        $('.rubsched input').rebind('click', function(e) {
+        $('.rubsched input').rebind('click', function() {
             var id = $(this).attr('id');
-            if (id == 'rad13') {
+            if (id === 'rad13') {
                 mega.config.setn('rubsched', 0);
-                $('#rubsched_options').addClass('hidden');
+                $('.rubsched-options').addClass('hidden');
             }
-            else if (id == 'rad12') {
-                $('#rubsched_options').removeClass('hidden');
+            else if (id === 'rad12') {
+                $('.rubsched-options').removeClass('hidden');
                 if (!fmconfig.rubsched) {
-                    mega.config.setn('rubsched', "14:15");
+                    var defValue = u_attr.p ? 90 : 30;
                     var defOption = 14;
+                    mega.config.setn('rubsched', defOption + ":" + defValue);
                     $('#rad' + defOption + '_div').removeClass('radioOff').addClass('radioOn');
                     $('#rad' + defOption).removeClass('radioOff').addClass('radioOn');
+                    $('#rad' + defOption + '_opt').val(defValue);
                 }
             }
             $('.rubsched').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            initAccountScroll(1);
+            // initAccountScroll(1);
         });
 
         $('.redeem-voucher').rebind('click', function(event) {
@@ -1576,7 +1488,7 @@ function accountUI() {
 
                     useravatar.invalidateAvatar(u_handle);
                     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+                    $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
                     $('.fm-account-remove-avatar').hide();
                 }
             });
@@ -1637,33 +1549,78 @@ function accountUI() {
             }
         });
 
+        /**
+         * Finalise the account cancellation process
+         * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
+         */
+        var continueCancelAccount = function(twoFactorPin) {
+
+            // Prepare the request
+            var request = { a: 'erm', m: Object(M.u[u_handle]).m, t: 21 };
+
+            // If 2FA PIN is set, add it to the request
+            if (twoFactorPin !== null) {
+                request.mfa = twoFactorPin;
+            }
+
+            api_req(request, {
+                callback: function(res) {
+                    loadingDialog.hide();
+
+                    // Check for invalid 2FA code
+                    if (res === EFAILED || res === EEXPIRED) {
+                        msgDialog('warninga', l[135], l[19216]);
+                    }
+
+                    // Check for incorrect email
+                    else if (res === ENOENT) {
+                        msgDialog('warningb', l[1513], l[1946]);
+                    }
+                    else if (res === 0) {
+                        handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
+                    }
+                    else {
+                        msgDialog('warningb', l[135], l[200]);
+                    }
+                }
+            });
+        };
+
         // Ask for confirmation
         msgDialog('confirmation', l[6181], confirmMessage, false, function(event) {
             if (event) {
+
                 loadingDialog.show();
-                api_req({a: 'erm', m: Object(M.u[u_handle]).m, t: 21}, {
-                    callback: function(res) {
-                        loadingDialog.hide();
-                        if (res === ENOENT) {
-                            msgDialog('warningb', l[1513], l[1946]);
-                        }
-                        else if (res === 0) {
-                            handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
-                        }
-                        else {
-                            msgDialog('warningb', l[135], l[200]);
-                        }
+
+                // Check if 2FA is enabled on their account
+                twofactor.isEnabledForAccount(function(result) {
+
+                    loadingDialog.hide();
+
+                    // If 2FA is enabled on their account
+                    if (result) {
+
+                        // Show the verify 2FA dialog to collect the user's PIN
+                        twofactor.verifyActionDialog.init(function(twoFactorPin) {
+                            continueCancelAccount(twoFactorPin);
+                        });
+                    }
+                    else {
+                        continueCancelAccount(null);
                     }
                 });
             }
         });
     });
 
+    // Initialise the Two Factor Authentication section and show enabled/disabled state
+    twofactor.account.init();
+
     // Button on main Account page to backup their master key
     $('.backup-master-key').rebind('click', function() {
         loadSubPage('backup');
     });
-	
+
     $('.default-grey-button.reviewsessions').rebind('click', function() {
         loadSubPage('fm/account/history');
     });
@@ -1735,46 +1692,7 @@ function accountUI() {
     });
 
     $('.account-pass-lines').attr('class', 'account-pass-lines');
-    $('#account-new-password').rebind('keyup.pwdchg', function(el) {
-        $('.account-pass-lines').attr('class', 'account-pass-lines');
-        if ($(this).val() !== '') {
-            $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-save').addClass('disabled');
-            if ($(this).val() === $('#account-confirm-password').val()) {
-                $('.fm-account-save').removeClass('disabled');
-            }
-            else {
-                $('.fm-account-save').addClass('disabled');
-            }
-            var pws = zxcvbn($(this).val());
-            if (pws.score > 3 && pws.entropy > 75) {
-                $('.account-pass-lines').addClass('good4');
-            }
-            else if (pws.score > 2 && pws.entropy > 50) {
-                $('.account-pass-lines').addClass('good3');
-            }
-            else if (pws.score > 1 && pws.entropy > 40) {
-                $('.account-pass-lines').addClass('good2');
-            }
-            else if (pws.score > 0 && pws.entropy > 15) {
-                $('.account-pass-lines').addClass('good1');
-            }
-            else {
-                $('.account-pass-lines').addClass('weak-password');
-            }
-        }
-    });
 
-    $('#account-confirm-password').rebind('keyup.pwdchg', function(el) {
-
-        $('.fm-account-save-block').removeClass('hidden');
-        if ($(this).val() === $('#account-new-password').val()) {
-            $('.fm-account-save').removeClass('disabled');
-        }
-        else {
-            $('.fm-account-save').addClass('disabled');
-        }
-    });
 
     // Account Notifications settings handling
     var accNotifHandler = function accNotifHandler() {
@@ -1903,16 +1821,11 @@ accountUI.userUIUpdate = function() {
 
     // update avatar
     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+    $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
 
     // Show first name or last name
-    if (u_attr.firstname) {
-        $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
-    }
-    else {
-        $('.membership-big-txt.name').text(u_attr.name);
-    }
+    $('.membership-big-txt.name').text(u_attr.fullname);
 
     // Show email address
     if (u_attr.email) {
@@ -2382,6 +2295,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         presenceInt.userPresence.ui_setautoaway(newVal);
     };
 
+
     if (autoawaytimeout !== false) {
 
         accountUI.initCheckbox(
@@ -2452,6 +2366,20 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             })
             .val(lastValidNumber);
     }
+
+    accountUI.initCheckbox(
+        'richpreviews-confirmation',
+        $sectionContainerChat,
+        RichpreviewsFilter.previewGenerationConfirmation === true,
+        function(newVal) {
+            if (newVal) {
+                RichpreviewsFilter.confirmationDoConfirm();
+            }
+            else {
+                RichpreviewsFilter.confirmationDoNever();
+            }
+        }
+    );
 
     $('.versioning-switch')
     .rebind('click', function() {

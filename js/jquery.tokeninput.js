@@ -83,7 +83,7 @@
                 lowerValue = email;
             }
 
-            avatar = useravatar.contact(id || email, 'nw-contact-avatar', 'span');
+            avatar = useravatar.contact(id || email, '', 'span');
 
             return '<li class="share-search-result">' + (this.addAvatar ? avatar : '')
                     + '<span class="fm-chat-user-info">'
@@ -454,7 +454,7 @@
             .bind("input.testerresize", function() {
                 $(this).trigger("keydown");
             })
-            .keydown(function(event) {
+            .keyup(function(event) {
 
                 var previous_token,
                     next_token;
@@ -468,7 +468,8 @@
                             previous_token = input_token.prev();
                             next_token = input_token.next();
 
-                            if ((previous_token.length && previous_token.get(0) === selected_token) || (next_token.length && next_token.get(0) === selected_token)) {
+                            if ((previous_token.length && previous_token.get(0) === selected_token) ||
+                                (next_token.length && next_token.get(0) === selected_token)) {
 
                                 // Check if there is a previous/next token and it is selected
                                 if (event.keyCode === KEY.LEFT || event.keyCode === KEY.UP) {
@@ -508,6 +509,10 @@
                                 }
                             }
 
+                            var $jsp = dropdown_item.getParentJScrollPane();
+                            if ($jsp) {
+                                $jsp.scrollToElement(dropdown_item);
+                            }
                             select_dropdown_item(dropdown_item);
                         }
 
@@ -526,11 +531,11 @@
                                 delete_token($(previous_token.get(0)));
                                 focus_with_timeout(input_box);
                             }
-
+                            // waiting previous search to be finished and prevent show animation.
+                            setTimeout(function() {
+                                hide_dropdown();
+                            }, $(input).data("settings").searchDelay);
                             return false;
-                        }
-                        else if ($(this).val().length === 1) {
-                            hide_dropdown();
                         }
                         else {
                             // set a timeout just long enough to let this function finish.
@@ -1176,6 +1181,9 @@
                 dropdown.html("<p>" + escapeHTML($(input).data("settings").searchingText) + "</p>");
                 show_dropdown();
             }
+            else {
+                hide_dropdown();
+            }
         }
 
         function show_dropdown_hint() {
@@ -1242,20 +1250,24 @@
                 dropdown.empty();
                 var dropdown_ul = $("<ul/>")
                     .appendTo(dropdown)
-                    .mouseover(function(event) {
-                        select_dropdown_item($(event.target).closest("li"));
-                    })
-                    .mousedown(function(event) {
-                        add_token($(event.target).closest("li").data("tokeninput"));
-                        hidden_input.change();
-                        return false;
+                    // to prevent auto selecting when mouse pointer is on it,
+                    // bind mouseover when mouse pointer is move.
+                    .mousemove(function() {
+                        $(this).mouseover(function(event) {
+                            select_dropdown_item($(event.target).closest("li"));
+                        })
+                        .mousedown(function(event) {
+                            add_token($(event.target).closest("li").data("tokeninput"));
+                            hidden_input.change();
+                            return false;
+                        })
+                        .mouseout(function(event) {
+                            deselect_dropdown_item($(event.target).closest("li"));
+                        })
+                        .off('mousemove'); // remove mousemove so not cause multiple binding.
                     })
                     .hide();
-
-                if ($(input).data("settings").resultsLimit && results.length > $(input).data("settings").resultsLimit) {
-                    results = results.slice(0, $(input).data("settings").resultsLimit);
-                }
-
+                    
                 $.each(results, function(index, value) {
                     var this_li = $(input).data("settings").resultsFormatter(value);
 
@@ -1278,9 +1290,12 @@
                 show_dropdown();
 
                 if ($(input).data("settings").animateDropdown) {
-                    dropdown_ul.slideDown("fast");
+                    dropdown_ul.slideDown(100, function() {
+                        $(this).jScrollPane();
+                    });
                 } else {
                     dropdown_ul.show();
+                    dropdown_ul.jScrollPane();
                 }
             } else {
                 if ($(input).data("settings").noResultsText) {

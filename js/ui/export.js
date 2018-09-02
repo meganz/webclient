@@ -298,8 +298,9 @@ var exportPassword = {
                 if (typeof zxcvbn !== 'undefined') {
 
                     // Estimate the password strength
-                    var password = $passwordInput.val();
-                    var passwordStrength = zxcvbn(password);
+                    var password = $.trim($passwordInput.val());
+                    var passwordScore = zxcvbn(password).score;
+                    var passwordLength = password.length;
 
                     // Remove previous strength classes that were added
                     $passwordStrengthField.removeClass().addClass('password-strength');
@@ -308,16 +309,19 @@ var exportPassword = {
                     if (password.length === 0) {
                         $passwordStrengthField.text('');   // No password entered, hide text
                     }
-                    else if (passwordStrength.score > 3 && passwordStrength.entropy > 75) {
+                    else if (passwordLength < 8) {
+                        $passwordStrengthField.addClass('good1').text(l[18700]);    // Too short
+                    }
+                    else if (passwordScore === 4) {
                         $passwordStrengthField.addClass('good5').text(l[1128]);    // Strong
                     }
-                    else if (passwordStrength.score > 2 && passwordStrength.entropy > 50) {
+                    else if (passwordScore === 3) {
                         $passwordStrengthField.addClass('good4').text(l[1127]);    // Good
                     }
-                    else if (passwordStrength.score > 1 && passwordStrength.entropy > 40) {
+                    else if (passwordScore === 2) {
                         $passwordStrengthField.addClass('good3').text(l[1126]);    // Medium
                     }
-                    else if (passwordStrength.score > 0 && passwordStrength.entropy > 15) {
+                    else if (passwordScore === 1) {
                         $passwordStrengthField.addClass('good2').text(l[1125]);    // Weak
                     }
                     else {
@@ -454,7 +458,7 @@ var exportPassword = {
             }
 
             // Check that the password length is sufficient and exclude very weak passwords
-            if ((password.length < 1) || $strengthLabel.hasClass('good1')) {
+            if ((password.length < 8) || $strengthLabel.hasClass('good1')) {
 
                 $errorLabel.text(l[9067]);  // Please use a stronger password
                 return false;
@@ -1883,24 +1887,42 @@ var exportExpiry = {
 
     /**
      * Removes public link for file or folder.
+     * @param {Boolean} [quiet] No loading overlay
+     * @returns {MegaPromise}
      */
-    ExportLink.prototype.removeExportLink = function() {
-
+    ExportLink.prototype.removeExportLink = function(quiet) {
         var self = this;
+        var promises = [];
+        var handles = self.options.nodesToProcess || [];
 
-        if (self.options.nodesToProcess.length) {
-            loadingDialog.show();
+        if (handles.length) {
+            if (!quiet) {
+                loadingDialog.show();
+            }
             self.logger.debug('removeExportLink');
 
-            $.each(self.options.nodesToProcess, function(index, nodeId) {
-                if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
-                    self._removeFolderExportLinkRequest(nodeId);
+            $.each(handles, function(index, h) {
+                var n = M.d[h];
+
+                if (n) {
+                    if (n.t) {
+                        promises.push(self._removeFolderExportLinkRequest(h, quiet));
+                    }
+                    else {
+                        promises.push(self._removeFileExportLinkRequest(h, quiet));
+                    }
                 }
-                else if (M.d[nodeId] && M.d[nodeId].t === 0) {// File
-                    self._removeFileExportLinkRequest(nodeId);
+                else if (d) {
+                    console.warn('removeExportLink: node not found.', h);
                 }
             });
         }
+
+        if (!promises.length) {
+            return MegaPromise.reject(EARGS);
+        }
+
+        return MegaPromise.allDone(promises);
     };
 
     /**
@@ -2017,10 +2039,13 @@ var exportExpiry = {
     /**
      * A 'Private' function, send folder delete public link request.
      * @param {String} nodeId The node ID.
+     * @param {Boolean} [quiet] No loading overlay
+     * @returns {MegaPromise}
      */
-    ExportLink.prototype._removeFolderExportLinkRequest = function(nodeId) {
+    ExportLink.prototype._removeFolderExportLinkRequest = function(nodeId, quiet) {
 
         var self = this;
+        var masterPromise = new MegaPromise();
 
         api_req({ a: 's2', n:  nodeId, s: [{ u: 'EXP', r: ''}], ha: '', i: requesti }, {
             nodeId: nodeId,
@@ -2037,26 +2062,34 @@ var exportExpiry = {
                     if (is_mobile) {
                         mobile.linkOverlay.completeLinkRemovalProcess(this.nodeId);
                     }
+
+                    masterPromise.resolve();
                 }
                 else {
                     // Error
                     self.logger.warn('_removeFolerExportLinkRequest failed for node:', this.nodeId, 'Error: ', result);
+                    masterPromise.reject(result);
                 }
 
-                if (!--self.nodesLeft) {
-                    loadingDialog.hide();
+                if (!--self.nodesLeft && !quiet) {
+                    loadingDialog.phide();
                 }
             }
         });
+
+        return masterPromise;
     };
 
     /**
      * A 'Private' function, send file delete public link request.
      * @param {String} nodeId The node IDs.
+     * @param {Boolean} [quiet] No loading overlay
+     * @returns {MegaPromise}
      */
-    ExportLink.prototype._removeFileExportLinkRequest = function(nodeId) {
+    ExportLink.prototype._removeFileExportLinkRequest = function(nodeId, quiet) {
 
         var self = this;
+        var promise = new MegaPromise();
 
         api_req({ a: 'l', n: nodeId, d: 1, i:requesti }, {
             nodeId: nodeId,
@@ -2073,17 +2106,22 @@ var exportExpiry = {
                     if (is_mobile) {
                         mobile.linkOverlay.completeLinkRemovalProcess(this.nodeId);
                     }
+
+                    promise.resolve();
                 }
                 else {
                     // Error
                     self.logger.warn('_removeFileExportLinkRequest failed for node:', this.nodeId, 'Error: ', result);
+                    promise.reject(result);
                 }
 
-                if (!--self.nodesLeft) {
-                    loadingDialog.hide();
+                if (!--self.nodesLeft && !quiet) {
+                    loadingDialog.phide();
                 }
             }
         });
+
+        return promise;
     };
 
     /**

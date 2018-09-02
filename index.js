@@ -172,7 +172,7 @@ function topPopupAlign(button, popup, topPos) {
     $.popupAlign = function () {
         var $button = $(button),
             $popup = $(popup),
-            $popupArrow = $popup.find('.dropdown-white-arrow'),
+            $popupArrow = $popup.children('.dropdown-white-arrow'),
             pageWidth,
             popupRightPos,
             arrowRightPos,
@@ -244,6 +244,9 @@ function init_page() {
     if (localStorage.businessSubAc && page !== 'register') {
         delete localStorage.businessSubAc;
     }
+
+    // Get information about what API flags are enabled e.g. 2FA, New Registration etc
+    mega.getApiMiscFlags();
 
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
@@ -322,19 +325,6 @@ function init_page() {
         page = (mega.chrome) ? 'chrome' : 'firefox';
     }
 
-    if (localStorage.signupcode && u_type !== false) {
-        delete localStorage.signupcode;
-    }
-    else if (localStorage.signupcode
-            && page.substr(0, 6) !== 'signup'
-            && page !== 'register'
-            && page !== 'terms'
-            && page !== 'mega'
-            && page !== 'privacy' && page !== 'gdpr' && page !== 'chrome' && page !== 'firefox') {
-        register_txt = l[1291];
-        loadSubPage('signup' + localStorage.signupcode);
-        return false;
-    }
     if (!page.match(/^(blog|help|corporate|page_)/)) {
         $('.top-head').remove();
     }
@@ -349,11 +339,15 @@ function init_page() {
     if (pageBeginLetters === 'C!' && page.length > 2) {
         var ctLink = page.substring(2, page.length);
         if (!is_mobile) {
-            
-            mBroadcaster.once('fm:initialized', function () {
+            if (!u_type) {
                 openContactInfoLink(ctLink);
-            });
-            page = 'fm/contacts';
+            }
+            else {
+                page = 'fm/contacts';
+                mBroadcaster.once('fm:initialized', function () {
+                    openContactInfoLink(ctLink);
+                });
+            }
         }
         else {
             var processContactLink = function () {
@@ -483,10 +477,6 @@ function init_page() {
     if (page.substr(0, 7) == 'pwreset') {
         resetpwcode = page.replace("pwreset", "");
         page = 'resetpassword';
-    }
-    if (page.substr(0, 5) == 'newpw') {
-        pwchangecode = page.replace("newpw", "");
-        page = 'newpw';
     }
 
     if ((pfkey || dlkey) && location.hash[0] !== '#') {
@@ -747,131 +737,86 @@ function init_page() {
         });
 
     }
-    else if (page.substr(0, 6) == 'signup') {
-        var signupcode = page.substr(6, page.length - 1);
-        loadingDialog.show();
-        api_req({
-            a: 'uv',
-            c: signupcode
-        }, {
-                callback: function (res) {
-                    loadingDialog.hide();
-                    if (typeof res == 'number' && res < 0) {
-                        if (localStorage.signupcode) {
-                            delete localStorage.signupcode;
-                            delete localStorage.registeremail;
-                        }
-                        else {
-                            msgDialog('warningb', l[135], l[1290]);
-                        }
-                        loadSubPage('start');
-                    }
-                    else if (u_type === false) {
-                        localStorage.signupcode = signupcode;
-                        localStorage.registeremail = res;
-                        loadSubPage('register');
-                        if (!register_txt) {
-                            register_txt = l[1289];
-                        }
-                    }
-                    else {
-                        var confirmtxt = 'You are currently logged in. Would you like to log out and register a new account?';
-                        if (l[1824]) {
-                            confirmtxt = l[1824];
-                        }
-                        msgDialog('confirmation', l[968], confirmtxt, '', function (e) {
-                            if (e) {
-                                mLogout();
-                            }
-                            else {
-                                loadSubPage('');
-                            }
-                        });
-                    }
-                }
-            });
-    }
-    else if (page == 'newpw') {
-        setpwset(pwchangecode, {
-            callback: function (res) {
-                loadingDialog.hide();
-                if (res[0] == EACCESS || res[0] == 0) {
-                    alert(l[727]);
-                }
-                else if (res[0] == EEXPIRED) {
-                    alert(l[728]);
-                }
-                else if (res[0] == ENOENT) {
-                    alert(l[729]);
-                }
-                else {
-                    alert(l[200]);
-                }
-                if (u_type == 3) {
-                    page = 'account';
-                    parsepage(pages['account']);
-                    load_acc();
-                }
-                else {
-                    page = 'login';
-                    parsepage(pages['login']);
-                    init_login();
-                }
-            }
-        });
-    }
     else if (page === 'confirm') {
 
         loadingDialog.show();
 
-        var ctx = {
-            signupcodeok: function (email) {
+        // A callback for when the email confirm code was valid
+        var signUpSucceededCallback = function(email) {
 
-                loadingDialog.hide();
-                confirmok = true;
-                page = 'login';
+            loadingDialog.hide();
+            confirmok = true;
+            page = 'login';
 
-                if (is_mobile) {
-                    parsepage(pages['mobile']);
-                    mobile.register.showConfirmAccountScreen(email);
-                }
-                else {
-                    parsepage(pages['login']);
-                    login_txt = l[378];
-                    init_login();
-                    $('#login-name2').val(email);
-                    $('.register-st2-button').addClass('active');
-                    $('#login-name2').attr('readonly', true);
-                    topmenuUI();
-                }
-            },
-            signupcodebad: function (res) {
-
-                loadingDialog.hide();
-                page = 'login';
-
-                if (is_mobile) {
-                    parsepage(pages['mobile']);
-                    mobile.register.showConfirmAccountFailure(res);
-                }
-                else {
-                    if (res === EINCOMPLETE) {
-                        alert(l[703]);
-                    }
-                    else if (res === ENOENT) {
-                        login_txt = l[704];
-                    }
-                    else {
-                        alert(l[705] + res);
-                    }
-                    parsepage(pages['login']);
-                    init_login();
-                    topmenuUI();
-                }
+            if (is_mobile) {
+                parsepage(pages['mobile']);
+                mobile.register.showConfirmAccountScreen(email);
             }
-        }
+            else {
+                parsepage(pages['login']);
+                login_txt = l[378];
+                init_login();
+                $('#login-name2').val(email);
+                $('.register-st2-button').addClass('active');
+                $('#login-name2').attr('readonly', true);
+                topmenuUI();
+            }
+        };
 
-        verifysignupcode(confirmcode, ctx);
+        // A callback for when the email confirm code was invalid
+        var signUpFailedCallback = function(result) {
+
+            loadingDialog.hide();
+            page = 'login';
+
+            if (is_mobile) {
+                parsepage(pages['mobile']);
+                mobile.register.showConfirmAccountFailure(result);
+            }
+            else {
+                if (result === EINCOMPLETE) {
+                    alert(l[703]);
+                }
+                else if (result === ENOENT) {
+                    login_txt = l[704];
+                }
+                else {
+                    alert(l[705] + result);
+                }
+
+                parsepage(pages['login']);
+                init_login();
+                $('.register-st2-button').addClass('active');
+                $('#login-name2').attr('readonly', true);
+                topmenuUI();
+            }
+        };
+
+        // Decode the email confirm code
+        var decodedConfirmCode = base64urldecode(confirmcode);
+
+        // Check if they registered using the new registration process (version 2)
+        if (decodedConfirmCode.substr(0, 13) === 'ConfirmCodeV2') {
+
+            // Verify the confirm code using the new process
+            security.register.verifyEmailConfirmCode(confirmcode, function(result, email) {
+
+                // If successful
+                if (typeof email === 'string') {
+                    signUpSucceededCallback(email);
+                }
+                else {
+                    signUpFailedCallback(result);
+                }
+            });
+        }
+        else {
+            // Verify the confirm code using the old process
+            verifysignupcode(confirmcode, {
+                signupcodeok: signUpSucceededCallback,
+                signupcodebad: signUpFailedCallback
+            });
+        }
     }
     else if (u_type == 2) {
         if (is_mobile) {
@@ -922,6 +867,41 @@ function init_page() {
         loadSubPage('fm/account/achievements');
         return false;
     }
+    else if (is_mobile && page === 'twofactor/intro') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.intro.init();
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/setup') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.setup.init();
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/verify-setup') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.verifySetup.init();
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/enabled') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.enabled.init();
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/verify-disable') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.verifyDisable.init();
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/disabled') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.disabled.init();
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/verify-login') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.verifyLogin.init();
+        return false;
+    }
     else if (page === 'fm/account/profile') {
 
         // Handle old invalid links from emails and redirect them back to fm/account
@@ -967,7 +947,13 @@ function init_page() {
         }
     }
     else if (page == 'key') {
-        parsepage(pages['key']);
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.register.showGeneratingKeysScreen();
+        }
+        else {
+            parsepage(pages['key']);
+        }
         init_key();
     }
     else if (page === 'support') {
@@ -985,6 +971,16 @@ function init_page() {
         if (lang == 'ru') {
             $('.account-mid-block').addClass('high');
         }
+
+        // On clicking the directory buttons
+        $('.directory-buttons li').rebind('click', function() {
+
+            // Get the class to the directory title element to scroll to
+            var link = $(this).attr('data-link');
+
+            // Scroll to the element's parent (not the element itself because it's hidden by the header)
+            $('.contact-new-title.' + link).parent().get(0).scrollIntoView();
+        });
     }
     else if (page.substr(0, 4) == 'help') {
         return Help.render();
@@ -1232,10 +1228,6 @@ function init_page() {
         $('.reg-st5-complete-button').rebind('click', function (e) {
             loadSubPage('copyrightnotice');
         });
-        if (lang == 'en') {
-            $('#copyright_txt').text($('#copyright_txt').text().split('(i)')[0]);
-            $('#copyright_en').removeClass('hidden');
-        }
     }
     else if (page === 'disputenotice') {
         parsepage(pages['disputenotice']);
@@ -1426,6 +1418,7 @@ function init_page() {
             fminitialized = false;
             loadfm.loaded = false;
             loadfm.loading = false;
+            fmconfig = Object.create(null);
 
             stopapi();
             api_reset();
@@ -1568,7 +1561,7 @@ function init_page() {
         location.assign('/');
     }
 
-    // Initialise the Public Service Announcement system
+    // Initialise the Public Service Announcement system if loaded
     if (typeof psa !== 'undefined') {
         psa.init();
     }
@@ -1580,179 +1573,8 @@ function init_page() {
 
     topmenuUI();
 
-
     loggedout = false;
     flhashchange = false;
-}
-
-function loginDialog(close) {
-    var $dialog = $('.dropdown.top-login-popup');
-    if (close) {
-        $dialog.find('form').empty();
-        $dialog.addClass('hidden');
-        $(document).off('keydown.logingpopup');
-        return false;
-    }
-    $dialog.find('form').replaceWith(getTemplate('top-login'));
-    if (localStorage.hideloginwarning || is_extension) {
-        $dialog.find('.top-login-warning').addClass('hidden');
-        $dialog.find('.login-notification-icon').removeClass('hidden');
-    }
-    $dialog.find('.login-checkbox, .radio-txt').rebind('click', function (e) {
-        var c = $dialog.find('.login-checkbox').attr('class');
-        if (c.indexOf('checkboxOff') > -1) {
-            $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOn');
-        }
-        else {
-            $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOff');
-        }
-    });
-
-    $('.top-login-forgot-pass').rebind('click', function (e) {
-        loadSubPage('recovery');
-        loginDialog(1);
-    });
-
-    $('.top-dialog-login-button').rebind('click', function (e) {
-        tooltiplogin();
-    });
-    $('.top-login-full').rebind('click', function (e) {
-        loginDialog(1);
-        loadSubPage('login');
-    });
-    $(document).off('keydown.logingpopup').on('keydown.logingpopup', function (e) {
-        if ($('.dropdown.top-login-popup').hasClass('hidden')) {
-            $(document).off('keydown.logingpopup');
-            return;
-        }
-        if (e.keyCode === 32) { // space
-            if (document.activeElement !== $('#login-name', $dialog)[0]
-                && document.activeElement !== $('#login-password', $dialog)[0]) {
-                var c = $dialog.find('.login-checkbox').attr('class');
-                if (c.indexOf('checkboxOff') > -1) {
-                    $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOn');
-                }
-                else {
-                    $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOff');
-                }
-                return false;
-            }
-        }
-        if (e.keyCode === 13) { // enter
-            tooltiplogin();
-            return false;
-        }
-        
-    });
-    $('#login-password, #login-name', $dialog).rebind('keydown', function (e) {
-        $('.top-login-pad').removeClass('both-incorrect-inputs');
-        $('.top-login-input-tooltip.both-incorrect').removeClass('active');
-        $('.top-login-input-block.password').removeClass('incorrect');
-        $('.top-login-input-block.e-mail').removeClass('incorrect');
-        if (e.keyCode == 13) {
-            tooltiplogin();
-            return false;
-        }
-    });
-
-    $('.top-login-warning-close').rebind('click', function (e) {
-        if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
-            localStorage.hideloginwarning = 1;
-        }
-        $('.top-login-warning').removeClass('active');
-        $('.login-notification-icon').removeClass('hidden');
-    });
-    $('.login-notification-icon').rebind('click', function (e) {
-        $('.top-login-warning').removeClass('hidden');
-        $('.top-login-warning').addClass('active');
-        $(this).addClass('hidden');
-    });
-
-    $('.top-login-input-block').rebind('click', function (e) {
-        $(this).find('input').focus();
-    });
-
-    $('.top-login-input-block.password input,.top-login-input-block.e-mail input').rebind('blur', function () {
-        $(this).parents('.top-login-input-block').removeClass('focused');
-    }).rebind('focus', function () {
-        $(this).parents('.top-login-input-block').addClass('focused');
-    });
-
-
-    $('.loginwarning-checkbox,.top-login-warning .radio-txt').rebind('click', function (e) {
-        var c = '.loginwarning-checkbox',
-            c2 = $(c).attr('class');
-        $(c).removeClass('checkboxOn checkboxOff');
-        if (c2.indexOf('checkboxOff') > -1) {
-            $(c).addClass('checkboxOn');
-        }
-        else {
-            $(c).addClass('checkboxOff');
-        }
-    });
-
-
-    $('.dropdown.top-login-popup').removeClass('hidden');
-    $('#login-name', $dialog).focus();
-    if ($('body').hasClass('logged')) {
-        topPopupAlign('.top-head .user-name', '.dropdown.top-login-popup', 40);
-    }
-    else {
-        topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
-    }
-    if (is_chrome_firefox) {
-        mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header');
-    }
-
-}
-
-function tooltiplogin() {
-    var e = $('#login-name').val();
-    if (e === '' || checkMail(e)) {
-        $('.top-login-input-block.e-mail').addClass('incorrect');
-        $('#login-name').val('');
-        $('#login-name').focus();
-    }
-    else if ($('#login-password').val() === '') {
-        $('.top-login-input-block.password').addClass('incorrect');
-    }
-    else {
-        $('.top-dialog-login-button').addClass('loading');
-        if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
-            localStorage.hideloginwarning = 1;
-        }
-        var remember;
-        if ($('.login-checkbox').attr('class').indexOf('checkboxOn') > -1) {
-            remember = 1;
-        }
-        postLogin($('#login-name').val(), $('#login-password').val(), remember, function (r) {
-            $('.top-dialog-login-button').removeClass('loading');
-            if (r == EBLOCKED) {
-                alert(l[730]);
-            }
-            else if (r) {
-                passwordManager('#form_login_header');
-                u_type = r;
-
-                if (login_next) {
-                    loadSubPage(login_next);
-                }
-                else if (page !== 'login') {
-                    page = getSitePath().substr(1);
-                    init_page();
-                }
-                else {
-                    loadSubPage('fm');
-                }
-                login_next = false;
-            }
-            else {
-                $('.top-login-pad').addClass('both-incorrect-inputs');
-                $('.top-login-input-tooltip.both-incorrect').addClass('active');
-                $('#login-password').select();
-            }
-        });
-    }
 }
 
 function topmenuUI() {
@@ -1844,7 +1666,7 @@ function topmenuUI() {
         $topMenu.find('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $topMenu.find('.top-menu-item.account').removeClass('hidden');
         $topMenu.find('.upgrade-your-account').removeClass('hidden');
-        $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+        $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
         $topHeader.find('.top-login-button').addClass('hidden');
         $topHeader.find('.membership-status').removeClass('hidden');
@@ -1950,10 +1772,10 @@ function topmenuUI() {
             else {
                 var c = $topHeader.find('.dropdown.top-login-popup').attr('class');
                 if (c && c.indexOf('hidden') > -1) {
-                    loginDialog();
+                    tooltiplogin.init();
                 }
                 else {
-                    loginDialog(1);
+                    tooltiplogin.init(1);
                 }
             }
         });
@@ -2037,7 +1859,7 @@ function topmenuUI() {
         if ((!e || $(e.target).parents('.fm-add-user,.add-user-popup').length == 0)
             && (!c || c.indexOf('fm-add-user') == -1)) {
             $('.fm-add-user').removeClass('active');
-            $('.add-user-popup').addClass('dialog hidden');
+            $('.add-user-popup').addClass('hidden');
             $('.add-user-popup').removeAttr('style');
         }
     };
@@ -2161,6 +1983,10 @@ function topmenuUI() {
         return false;
     });
 
+    $topMenu.find('.top-social-bl a').rebind('click', function () {
+        window.open($(this).attr('href'));
+    });
+
     // Initialise the language sub menu for mobile
     if (is_mobile) {
         mobile.languageMenu.init();
@@ -2190,6 +2016,10 @@ function topmenuUI() {
         }
         $topHeader.find('.top-search-bl').removeClass('contains-value active');
         $topHeader.find('.top-search-input').val('');
+        // if current page is search result reset it.
+        if(page.indexOf('/search/') !== -1) {
+            loadSubPage(page.slice(0, page.indexOf('/search/')));
+        }
     });
 
     $topHeader.find('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
@@ -2259,6 +2089,10 @@ function topmenuUI() {
                         });
                     });
                 }
+            }
+            // if current page is search and value is empty result move to root.
+            else if (val === '' && page.indexOf('/search/') !== -1) {
+                loadSubPage(page.slice(0, page.indexOf('/search/')));
             }
         }
     });
@@ -2564,7 +2398,7 @@ function loadSubPage(tpage, event) {
         return false;
     }
 
-    if (!is_mobile && slideshowid) {
+    if (window.slideshowid) {
         slideshow(0, 1);
     }
 
@@ -2664,8 +2498,4 @@ mBroadcaster.once('boot_done', function () {
     M = new MegaData();
     attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
     attribCache.bitMapsManager = new MegaDataBitMapManager();
-
-    $(window).rebind('resize.subpage', function () {
-        M.zoomLevelNotification();
-    });
 });

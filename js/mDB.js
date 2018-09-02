@@ -96,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm19_';
+    var dbpfx = 'fm22_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -118,9 +118,6 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                         fmdb.db = false;
                     });
                 }
-
-                // force no-treecache gettree
-                localStorage.force = 1;
             }
 
             result(sn);
@@ -184,7 +181,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     }
                     resolve(r[0]);
                 }
-                else if (slave) {
+                else if (slave || fmdb.crashed) {
                     fmdb.crashed = 2;
                     resolve(false);
                 }
@@ -357,6 +354,10 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
         // even indexes hold additions, odd indexes hold deletions
         c[table] = { t : -1, h : type };
         c = c[table];
+
+        if (table === 'f') {
+            c.r = Object.create(null);
+        }
     }
     else {
         // (we continue to use the highest index if it is of the requested type
@@ -367,7 +368,18 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
     }
 
     if (!c[c.h]) c[c.h] = [row];
-    else c[c.h].push(row);    // add row to the highest index (we want big IndexedDB bulkPut()s)
+    else {
+        // add row to the highest index (we want big IndexedDB bulkPut()s)
+        if (type || table !== 'f' || !window.safari) {
+            c[c.h].push(row);
+        }
+        else if (c.r[row.h]) {
+            c[c.h][c.r[row.h]] = row;
+        }
+        else {
+            c.r[row.h] = c[c.h].push(row) - 1;
+        }
+    }
 
     // force a flush when a lot of data is pending or the _sn was updated
     // also, force a flush for non-transactional channels (> 0)
@@ -1775,7 +1787,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     var folders = [];
                     for (var i = handles.length; i--;) {
                         var h = handles[i];
-                        if (M.d[h] && (M.d[h].t || M.d[h].tf)) {
+                        if (M.d[h] && (M.d[h].t || M.d[h].tvf)) {
                             folders.push(h);
                         }
                     }

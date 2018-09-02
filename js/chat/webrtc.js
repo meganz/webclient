@@ -1,6 +1,12 @@
 (function(scope) {
 "use strict";
 
+var CallDataType = Object.freeze({
+    kNotRinging: 0,
+    kRinging: 1,
+    kTerminated: 2
+});
+
 function RtcModule(chatd, crypto, handler, iceServers) {
     if (!RTC) {
         throw new RtcModule.NotSupportedError(
@@ -134,6 +140,7 @@ RtcModule.prototype.handleMessage = function(shard, msg, len) {
     // (opcode.1 chatid.8 userid.8 clientid.4 len.2) (type.1 data.(len-1))
     //              ^                                          ^
     //          header.hdrlen                             payload.len
+    var self = this;
     try {
         var strLen = msg.length;
         if (len < 24 || strLen < len) {
@@ -143,6 +150,10 @@ RtcModule.prototype.handleMessage = function(shard, msg, len) {
         var type = msg.charCodeAt(23);
         var op = msg.charCodeAt(0);
         var chatid = msg.substr(1, 8);
+        if (this.handler.isGroupChat(chatid)) {
+            this.logger.log("Ignoring a group chat RTMSG");
+            return;
+        }
         var chat = this.chatd.chatIdMessages[chatid];
         if (!chat) {
             this.logger.error(
@@ -184,11 +195,15 @@ RtcModule.prototype.handleCallData = function(shard, msg, payloadLen) {
             self.logger.error("Ignoring short CALLDATA packet");
             return;
         }
-        var ringing = msg.charCodeAt(31);
-        if (!ringing) {
+        var type = msg.charCodeAt(31);
+        if (type !== CallDataType.kRinging) {
             return;
         }
         var chatid = msg.substr(1, 8);
+        if (self.handler.isGroupChat(chatid)) {
+            this.logger.log("Ignoring group chat CALLDATA");
+            return;
+        }
         var chat = self.chatd.chatIdMessages[chatid];
         if (!chat) {
             self.logger.error(
@@ -707,7 +722,7 @@ Call.prototype.msgCallReqDecline = function(packet) {
         this.logger.warn("Ignoring unexpected CALL_REQ_DECLINE while in state", constStateToText(this.state));
         return;
     }
-    this._destroy(code | Term.kPeer, false);
+    this.hangup(code | Term.kPeer);
 };
 
 Call.prototype.msgCallReqCancel = function(packet) {
@@ -751,14 +766,6 @@ Call.prototype.msgRinging = function(packet) {
     if (!self.ringOutUsers) {
         self.ringOutUsers = {};
         self.ringOutUsers[fromUser] = true;
-        self._clearCallOutTimer();
-        self._callOutTimer = setTimeout(function() {
-            if (self.state !== CallState.kReqSent) {
-                return;
-            }
-            self.logger.log("Answer timeout, cancelling call request");
-            self.hangup(Term.kAnswerTimeout); // TODO: differentiate whether peer has sent us RINGING or not
-        }, RtcModule.kCallAnswerTimeout);
     } else {
         if (self.ringOutUsers[fromUser]) {
             return;
@@ -775,15 +782,20 @@ Call.prototype._clearCallOutTimer = function() {
     delete this._callOutTimer;
 };
 
-Call.prototype._bcastCallData = function(ringing) {
+Call.prototype._bcastCallData = function(state, uiTermCode) {
     var self = this;
-    assert(self.state <= CallState.kInProgress);
-    assert(self._callInitiateAvFlags);
-    var cmd = self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0'+
-    Chatd.pack16le(10) + self.id +
-    String.fromCharCode(ringing?1:0) +
-    String.fromCharCode(self._callInitiateAvFlags);
-    if (!self.shard.rtcmd(Chatd.Opcode.CALLDATA, cmd)) {
+    var payload = self.id
+        + String.fromCharCode(state)
+        + String.fromCharCode(self._callInitiateAvFlags);
+    if (state === CallDataType.kTerminated) {
+        assert(uiTermCode != null);
+        payload += String.fromCharCode(uiTermCode);
+    }
+    var cmd = self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0'
+        + Chatd.pack16le(payload.length)
+        + payload;
+
+    if (!self.shard.cmd(Chatd.Opcode.CALLDATA, cmd)) {
         setTimeout(function() { self._destroy(Term.kErrNetSignalling, true); }, 0);
         return false;
     }
@@ -831,10 +843,8 @@ Call.prototype.msgJoin = function(packet) {
         assert(packet.callid);
         if (this.state === CallState.kReqSent) {
             this._setState(CallState.kInProgress);
-            if (this._callInitiateAvFlags) { //if we are the caller
-                if (!this._bcastCallData(false)) {
-                    return;
-                }
+            if (!this._bcastCallData(CallDataType.kNotRinging)) {
+                return;
             }
         }
         // create session to this peer
@@ -906,10 +916,22 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
     self.predestroyState = self.state;
     self._setState(CallState.kTerminating);
     self._clearCallOutTimer();
-
+    var reasonNoPeer = code & ~Term.kPeer; // jscs:ignore disallowImplicitTypeConversion
     var pms = new Promise(function(resolve, reject) {
+        self.logger.log("Terminating call in state", constStateToText(CallState, self.predestroyState),
+            "with reason", constStateToText(Term, reasonNoPeer));
+        if (self.predestroyState !== CallState.kRingIn && reasonNoPeer !== Term.kBusy) {
+            // kBusy is a local thing, there is another call in the room
+            self._bcastCallData(CallDataType.kTerminated, self.termCodeToHistCallEndedCode(code));
+        } else {
+            self.logger.log("Not posting termination CALLDATA because term code is",
+                constStateToText(Term, reasonNoPeer),
+                "and call state is", constStateToText(CallState, self.predestroyState));
+        }
         if (weTerminate) {
             if (!self.isGroup) {
+                // TODO: Maybe replace CALL_TERMINATE with CALLDATA? But we need the detailed termcode,
+                // whereas the CALLDATA packet has the GUI state code
                 self.cmdBroadcast(RTCMD.CALL_TERMINATE, String.fromCharCode(code));
             }
             // if we initiate the call termination, we must initiate the
@@ -926,7 +948,7 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
         assert(Object.keys(self.sessions).length === 0);
         self._stopIncallPingTimer();
         self._setState(CallState.kDestroyed);
-        self._fire('onDestroy', code & 0x7f, !!(code & 0x80), msg);// jscs:ignore disallowImplicitTypeConversion
+        self._fire('onDestroy', reasonNoPeer, !!(code & 0x80), msg);// jscs:ignore disallowImplicitTypeConversion
         self.manager._removeCall(self);
     });
     return self._destroyPromise;
@@ -954,7 +976,7 @@ Call.prototype._broadcastCallReq = function() {
         return;
     }
     assert(self.state === CallState.kHasLocalStream);
-    if (!self._bcastCallData(true)) {
+    if (!self._bcastCallData(CallDataType.kRinging)) {
         return;
     }
 
@@ -965,8 +987,18 @@ Call.prototype._broadcastCallReq = function() {
             return;
         }
         self.logger.log("Timed out waiting for ring confirmation, cancelling call request");
-        self.hangup(Term.kRingOutTimeout);
+        self._destroy(Term.kRingOutTimeout, true);
     }, RtcModule.kRingOutTimeout);
+
+    self._clearCallOutTimer();
+    self._callOutTimer = setTimeout(function() {
+        if (self.state !== CallState.kReqSent) {
+            return;
+        }
+        self.logger.log("Answer timeout, cancelling call request");
+        self._destroy(Term.kAnswerTimeout, true); // TODO: differentiate whether peer has sent us RINGING or not
+    }, RtcModule.kCallAnswerTimeout);
+
     return true;
 };
 Call.prototype._startIncallPingTimer = function() {
@@ -1187,41 +1219,38 @@ Call.prototype.answer = function(av) {
 };
 
 Call.prototype.hangup = function(reason) {
-    var term;
+    var reasonNoPeer;
+    if (reason != null) {
+        reasonNoPeer = reason & ~Term.kPeer;
+    }
+
     switch (this.state) {
     case CallState.kReqSent:
-        if (typeof reason === 'undefined') {
+        if (reasonNoPeer == null) {
             reason = Term.kUserHangup;
-        } else {
-            assert(reason === Term.kUserHangup
-                || reason === Term.kAnswerTimeout
-                || reason === Term.kRingOutTimeout,
-                "Invalid reason "+reason+" for hangup of outgoing call request");
         }
-        this._cmd(RTCMD.CALL_REQ_CANCEL, 0, 0, this.id+String.fromCharCode(reason));
+        this.cmdBroadcast(RTCMD.CALL_REQ_CANCEL, this.id + String.fromCharCode(reason));
         return this._destroy(reason, false);
     case CallState.kRingIn:
-        if (typeof reason === 'undefined') {
-            term = Term.kCallRejected;
-        } else if (reason === Term.kBusy) {
-            term = Term.kBusy;
+        if (reason == null) {
+            reason = Term.kCallRejected;
         } else {
-            assert(false, "Hangup reason can only be undefined or kBusy when hanging up call in state kRingIn");
+            assert(reasonNoPeer === Term.kBusy,
+                "Hangup reason can only be undefined or kBusy when hanging up call in state kRingIn");
         }
         var cinfo = this._callerInfo;
         assert(cinfo);
         assert(Object.keys(this.sessions).length === 0);
-        this.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, cinfo.callid + String.fromCharCode(term));
-        return this._destroy(term, false);
+        this.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, cinfo.callid + String.fromCharCode(reason));
+        return this._destroy(reason, false);
     case CallState.kJoining:
     case CallState.kInProgress:
     case CallState.kWaitLocalStream:
         // TODO: For group calls, check if the sender is the call host and only then destroy the call
         if (reason == null) { // covers both 'undefined' and 'null'
-            term = Term.kUserHangup;
+            reason = Term.kUserHangup;
         } else {
-            assert(reason === Term.kUserHangup || RtcModule.termCodeIsError(reason));
-            term = reason;
+            assert(reasonNoPeer === Term.kUserHangup || RtcModule.termCodeIsError(reasonNoPeer));
         }
         break;
     case CallState.kTerminating:
@@ -1229,30 +1258,38 @@ Call.prototype.hangup = function(reason) {
         this.logger.debug("hangup: Call already terminating/terminated");
         return Promise.resolve();
     default:
-        term = Term.kUserHangup;
-        this.logger.warn("Don't know what term code to send in state", constStateToText(Term, this.state));
+        reason = Term.kUserHangup;
+        this.logger.warn("Don't know what term code to send in state", constStateToText(CallState, this.state));
         break;
     }
     // in any state, we just have to send CALL_TERMINATE and that's all
-    return this._destroy(term, true);
+    return this._destroy(reason, true);
 };
 
 Call.prototype._onUserOffline = function(userid, clientid) {
-    if (this.state === CallState.kRingIn && userid === this._callerInfo.fromUser
-        && clientid === this._callerInfo.fromClient) {
-            this._destroy(Term.kUserHangup, false);
-            return;
+    var self = this;
+    if (self.state === CallState.kRingIn && userid === self._callerInfo.fromUser
+    && clientid === self._callerInfo.fromClient) {
+        self._destroy(Term.kUserHangup, false);
+        return;
     }
-    for (var sid in this.sessions) {
-        var sess = this.sessions[sid];
+    for (var sid in self.sessions) {
+        var sess = self.sessions[sid];
         if (sess.peer === userid && sess.peerClient === clientid) {
             setTimeout(function() {
-                sess.terminateAndDestroy(Term.kErrUserOffline | Term.kPeer);
+                if (!self.isGroup) {
+                    self._destroy(Term.kErrUserOffline | Term.kPeer, false);
+                } else {
+                    sess.terminateAndDestroy(Term.kErrUserOffline | Term.kPeer);
+                }
             }, 0);
-            return true;
+            return;
         }
     }
-    return false;
+    if (self.sessRetries[userid + clientid] && !self.isGroup) {
+        self._destroy(Term.kErrUserOffline | Term.kPeer, false);
+        return;
+    }
 };
 
 Call.prototype._notifySessionConnected = function(sess) {
@@ -1661,7 +1698,7 @@ Session.prototype.msgSdpOfferSendAnswer = function(packet) {
 Session.prototype.msgSdpAnswer = function(packet) {
     var self = this;
     if (self.state !== SessState.kWaitSdpAnswer) {
-        self.logger.warn("Ingoring unexpected SDP_ANSWER");
+        self.logger.warn("Ignoring unexpected SDP_ANSWER");
         return;
     }
     // SDP_ANSWER sid.8 fprHash.32 av.1 sdpLen.2 sdpAnswer.sdpLen
@@ -1996,6 +2033,21 @@ Av.applyToStream = function(stream, av) {
     }
     return result;
 };
+
+Av.toString = function(av) {
+    if (av & Av.Audio) {
+        if (av & Av.Video) {
+            return 'a+v';
+        } else {
+            return 'a';
+        }
+    } else if (av & Av.Video) {
+        return 'v';
+    } else {
+        return '-';
+    }
+};
+
 var RTCMD = Object.freeze({
 //  CALL_REQUEST: 0, // initiate new call, receivers start ringing
     CALL_RINGING: 1, // notifies caller that there is a receiver and it is ringing
@@ -2195,7 +2247,7 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
             assert(!isIncoming);
             return UICallTerm.REJECTED;
         case Term.kAppTerminating:
-            return (self.predestroyState === CallState.kInProgress)
+            return (self.predestroyState === CallState.kInProgress && self._hasConnectedSession)
                 ? UICallTerm.ENDED
                 : UICallTerm.FAILED;
         default:
@@ -2212,6 +2264,124 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
     }
 };
 
+/*
+CallManager.CALL_END_REMOTE_REASON = {
+    "CALL_ENDED": 0x01,
+    "REJECTED": 0x02,
+    "NO_ANSWER": 0x03,
+    "FAILED": 0x04
+};
+ */
+Call.prototype.termCodeToHistCallEndedCode = function(terminationCode) {
+    var self = this;
+    var isIncoming = self.isJoiner;
+    switch (terminationCode & 0x7f) {
+        case Term.kUserHangup:
+            switch (self.predestroyState) {
+                case CallState.kReqSent:
+                    return CallManager.CALL_END_REMOTE_REASON.CANCELED;
+                case CallState.kRingIn:
+                    return (terminationCode & 0x80)
+                    ? CallManager.CALL_END_REMOTE_REASON.CANCELED // if peer hung up, it's canceled
+                    : CallManager.CALL_END_REMOTE_REASON.REJECTED; // if we hung up, it's rejected
+                case CallState.kInProgress:
+                    return CallManager.CALL_END_REMOTE_REASON.CALL_ENDED;
+                default:
+                    return CallManager.CALL_END_REMOTE_REASON.FAILED;
+            }
+            break; // just in case
+        case Term.kCallRejected:
+            return CallManager.CALL_END_REMOTE_REASON.REJECTED;
+        case Term.kAnsElsewhere:
+            assert(false, "Can't generate a history call ended message for local kAnsElsewhere code");
+            return 0;
+        case Term.kRingOutTimeout:
+        case Term.kAnswerTimeout:
+            return CallManager.CALL_END_REMOTE_REASON.NO_ANSWER;
+        case Term.kBusy:
+            assert(!isIncoming);
+            return CallManager.CALL_END_REMOTE_REASON.REJECTED;
+        case Term.kAppTerminating:
+            return (self.predestroyState === CallState.kInProgress && self._hasConnectedSession)
+                ? CallManager.CALL_END_REMOTE_REASON.CALL_ENDED
+                : CallManager.CALL_END_REMOTE_REASON.FAILED;
+        default:
+            var name = constStateToText(Term, terminationCode);
+            if (RtcModule.termCodeIsError(terminationCode)) {
+                return CallManager.CALL_END_REMOTE_REASON.FAILED;
+            } else if (RtcModule.termCodeIsTimeout(terminationCode, name)) {
+                return (self.predestroyState < CallState.kInProgress)
+                    ? CallManager.CALL_END_REMOTE_REASON.NO_ANSWER
+                    : CallManager.CALL_END_REMOTE_REASON.FAILED;
+            } else {
+                self.logger.warn("termCodeToHistCallEndedCode: Don't know how to translate term code " +
+                    name + ", returning FAILED");
+                return CallManager.CALL_END_REMOTE_REASON.FAILED;
+            }
+    }
+};
+
+RtcModule.rtcmdToString = function(cmd, tx) {
+    // (opcode.1 chatid.8 userid.8 clientid.4 len.2) (type.1 data.(len-1))
+    if (cmd.length < 24) {
+        assert(false, "rtcmdToString: Command buffer length (" +
+            cmd.length + ") is less than 24 bytes. Data:\n" + Chatd.dumpToHex(cmd));
+    }
+    var opCode = cmd.charCodeAt(23);
+    var result = constStateToText(RTCMD, opCode);
+    result += ' chatId: ' + base64urlencode(cmd.substr(1, 8));
+    result += (tx ? ' to:' : ' from:') + base64urlencode(cmd.substr(9, 8));
+    result += ' clientId: 0x' + Chatd.dumpToHex(cmd, 17, 4, true);
+
+    var dataLen = Chatd.unpack16le(cmd.substr(21, 2)) - 1; // first data byte is the RTCMD opcode
+    if (dataLen > 0) {
+        assert(dataLen <= cmd.length - 24);
+        if (opCode === RTCMD.ICE_CANDIDATE) {
+            // FIXME: there is binary data before the candidate text, but it's variable length,
+            // so more complex parsing is required.
+            result += '\n' + cmd.substr(25, dataLen);
+        } else {
+            result += ' data(' + (Chatd.unpack16le(cmd.substr(21, 2)) - 1) + '): ';
+            if (dataLen > 64) {
+                result += Chatd.dumpToHex(cmd, 24, 64) + '...';
+            } else {
+                result += Chatd.dumpToHex(cmd, 24);
+            }
+        }
+    } else {
+        assert(dataLen === 0);
+    }
+
+    return [result, 24 + dataLen];
+};
+
+RtcModule.callDataToString = function(cmd, tx) {
+    // (opcode.1 chatid.8 userid.8 clientid.4 len.2) (payload.len)
+    var result = ' chatid: ' + base64urlencode(cmd.substr(1, 8));
+    if (!tx) {
+        result += ' from: ' + base64urlencode(cmd.substr(9, 8)) +
+        ' (0x' + Chatd.dumpToHex(cmd, 17, 4, true) + ')';
+    }
+    var len = Chatd.unpack16le(cmd.substr(21, 2));
+    if (len < 1) {
+        return [result, 23];
+    }
+    if (len < 10) {
+        result += ' data:\n' + Chatd.dumpToHex(cmd, 23);
+        return [result, 23 + len];
+    }
+
+    result += ' callid: ' + base64urlencode(cmd.substr(23, 8));
+    var type = cmd.charCodeAt(31);
+    result += ' type: ' + constStateToText(CallDataType, type);
+    var av = cmd.charCodeAt(32);
+    result += ' av: ' + Av.toString(av);
+    if (type === CallDataType.kTerminated) {
+        assert(len >= 11);
+        result += ' reason: ' + constStateToText(CallManager.CALL_END_REMOTE_REASON, cmd.charCodeAt(33));
+    }
+    return [result, 23 + len];
+};
 
 scope.RtcModule = RtcModule;
 scope.Call = Call;

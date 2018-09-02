@@ -68,11 +68,6 @@ mobile.slideshow = {
 
         'use strict';
 
-        // TODO: FIXME
-        if (1) {
-            return;
-        }
-
         // Cache selectors
         var $slideShowBackground = mobile.slideshow.$overlay.find('.slideshow-wrapper, .fs');
         var $slideShowHeader = mobile.slideshow.$overlay.find('.slideshow-header');
@@ -80,7 +75,11 @@ mobile.slideshow = {
         var $slideShowNavButtons = mobile.slideshow.$overlay.find('.slideshow-back-arrow, .slideshow-forward-arrow');
 
         // On clicking the image or black background of the slideshow
-        $slideShowBackground.off('tap').on('tap', function() {
+        $slideShowBackground.off().on('tap', SoonFc(function(ev) {
+            if ($(ev.target).closest('.video-controls').length) {
+                return false;
+            }
+
             if ($slideShowHeader.hasClass('hidden')) {
                 $slideShowHeader.removeClass('hidden');
                 $slideShowFooterButtons.removeClass('hidden');
@@ -92,7 +91,7 @@ mobile.slideshow = {
                 $slideShowFooterButtons.addClass('hidden');
                 $slideShowNavButtons.addClass('hidden');
             }
-        });
+        }));
     },
 
 
@@ -157,6 +156,8 @@ mobile.slideshow = {
     displayImage: function(nodeHandle, slideClass) {
 
         'use strict';
+
+        mobile.slideshow.cleanupCurrentlyViewedInstance();
 
         // Cache selectors
         var $fileName = mobile.slideshow.$overlay.find('.slideshow-file-name');
@@ -235,7 +236,7 @@ mobile.slideshow = {
             var nodeHandle = node.h;
 
             // If the node is an image or a video, add it to the array and map
-            if (((is_image(node) && fileext(node.name) !== 'pdf')) || (is_video(node))) {
+            if (is_image3(node) || is_video(node)) {
 
                 mobile.slideshow.imagesInCurrentViewArray.push(nodeHandle);
                 mobile.slideshow.imagesInCurrentViewMap[nodeHandle] = imageNumber;
@@ -299,6 +300,15 @@ mobile.slideshow = {
         });
     },
 
+    /**
+     * What the function name says :-P
+     */
+    cleanupCurrentlyViewedInstance: function() {
+        'use strict';
+
+        // Destroy any streaming instance
+        $(window).trigger('video-destroy');
+    },
 
     /**
      * Find the next image handle to be displayed
@@ -449,8 +459,10 @@ mobile.slideshow = {
             // Hide the dialog
             mobile.slideshow.$overlay.addClass('hidden');
 
-            // Destroy any streaming instance
-            $(window).trigger('video-destroy');
+            // Cleanup curr....
+            mobile.slideshow.cleanupCurrentlyViewedInstance();
+            mobile.slideshow.$overlay.find('.slides.mid img').remove();
+            mobile.slideshow.$overlay.find('.slides.mid').prepend('<img alt="" /></div>');
 
             // Prevent double taps
             return false;

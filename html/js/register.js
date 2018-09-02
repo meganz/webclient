@@ -1,188 +1,156 @@
-function doregister() {
-    /* jshint -W074 */
-    if ((document.getElementById('register_name').value === '')) {
-        alert(l[212]);
-        document.getElementById('register_name').focus();
-    }
-    else if ((document.getElementById('register_email').value === '')) {
-        alert(l[197]);
-        document.getElementById('register_email').focus();
-    }
-    else if (checkMail(document.getElementById('register_email').value)) {
-        alert(l[198]);
-        document.getElementById('register_email').focus();
-    }
-    else if ((document.getElementById('register_password').value === '')) {
-        alert(l[213]);
-        document.getElementById('register_email').focus();
-    }
-    else if (localStorage.signupcode
-            && (document.getElementById('register_password').value
-                !== document.getElementById('register_password_confirm').value)) {
-        alert(l[715]);
+var rv = {};
 
-        if (m) {
-            document.getElementById('register_password').value = '';
-            document.getElementById('register_password_confirm').value = '';
-            document.getElementById('register_password').focus();
+/**
+ * When the user tries to register, but they already have an account and they used the same password for registration,
+ * log them in and if they were in an ephemeral session, try transfer their ephemeral files as well to the account
+ */
+var loginFromEphemeral = {
+
+    init: function() {
+
+        'use strict';
+
+        var rememberMe = true;
+        var twoFactorPin = null;
+
+        loadingDialog.show();
+
+        // Checks if they have an old or new registration type, after this the flow will continue to login
+        security.login.checkLoginMethod(rv.email, rv.password, twoFactorPin, rememberMe,
+                                        loginFromEphemeral.old.startLogin,
+                                        loginFromEphemeral.new.startLogin);
+    },
+
+    /**
+     * Functions for the old login process which will need to be retained until everyone's upgraded to the new process
+     */
+    old: {
+        /**
+         * Starts the login proceedure
+         * @param {String} email The user's email address
+         * @param {String} password The user's password as entered
+         * @param {String|null} pinCode The two-factor authentication PIN code (6 digit number), or null if N/A
+         * @param {Boolean} rememberMe Whether the user clicked the Remember me checkbox or not
+         */
+        startLogin: function(email, password, pinCode, rememberMe) {
+
+            'use strict';
+
+            postLogin(email, password, pinCode, rememberMe, loginFromEphemeral.completeLogin);
         }
-    }
-    else if (!document.getElementById('register_checkbox').checked) {
-        alert(l[214]);
-    }
-    else {
-        if (m) {
-            loadingDialog.show();
+    },
+
+    /**
+     * Functions for the new secure login process
+     */
+    new: {
+        /**
+         * Start the login proceedure
+         * @param {String} email The user's email addresss
+         * @param {String} password The user's password as entered
+         * @param {String|null} pinCode The two-factor authentication PIN code (6 digit number), or null if N/A
+         * @param {Boolean} rememberMe A boolean for if they checked the Remember Me checkbox on the login screen
+         * @param {String} salt The user's salt as a Base64 URL encoded string
+         */
+        startLogin: function(email, password, pinCode, rememberMe, salt) {
+
+            'use strict';
+
+            // Start the login using the new process
+            security.login.startLogin(email, password, pinCode, rememberMe, salt, loginFromEphemeral.completeLogin);
         }
-        else {
-            document.getElementById('overlay').style.display = '';
+    },
+
+    /**
+     * Complete the login process and redirect to the cloud drive
+     * @param {Number} result If the result is negative there is an error, if positive it is the user type
+     */
+    completeLogin: function(result) {
+
+        'use strict';
+
+        // Remove loading spinner on the button
+        $('.top-dialog-login-button').removeClass('loading');
+
+        loadingDialog.hide();
+
+        // Check and handle the common login errors
+        if (security.login.checkForCommonErrors(result, loginFromEphemeral.old.startLogin,
+                                                loginFromEphemeral.new.startLogin)) {
+
+            return false;
         }
 
-        if (localStorage.signupcode) {
-            u_storage = init_storage(localStorage);
-            var ctx = {
-                checkloginresult: function(u_ctx, r) {
-                    if (m) {
-                        loadingDialog.hide();
-                    }
-                    else {
-                        document.getElementById('overlay').style.display = 'none';
-                    }
-                    if ((typeof r[0] === 'number') && (r[0] < 0)) {
-                        alert(l[200]);
-                    }
-                    else {
-                        u_type = r;
-                        loadSubPage('fm');
-                    }
-                }
-            };
-            var passwordaes = new sjcl.cipher.aes(prepare_key_pw(document.getElementById('register_password').value));
-            var uh = stringhash(document.getElementById('register_email').value.toLowerCase(), passwordaes);
-            u_checklogin(ctx,
-                true,
-                prepare_key_pw(document.getElementById('register_password').value),
-                localStorage.signupcode, document.getElementById('register_name').value, uh);
-        }
-        else if (u_type === false) {
-            u_storage = init_storage(localStorage);
-            var u_ctx = {
-                checkloginresult: function(u_ctx, r) {
-                    u_type = r;
-                    registeraccount();
-                }
-            };
-            u_checklogin(u_ctx, true);
-        }
-        else {
-            registeraccount();
-        }
-    }
-}
+        // If successful result
+        else if (result !== false && result >= 0) {
 
-function registeraccount() {
-    var rv = {};
-    var ctx = {
-        callback: function(res) {
-            if (res === 0) {
-                var ops = {
-                    a: 'up'
-                };
-                loadingDialog.hide();
-                passwordManager($('#register_form'));
+            // If the user got logged-in when trying to register, let's migrate the ephemeral account
+            if ($.ephNodes) {
 
-                if (m) {
-                    done_text1 = l[216];
-                    done_text2 = l[217];
-                    page = 'done';
-                    mobileui();
+                passwordManager('#register_form');
+                showToast('megasync', l[8745]);
+                boot_auth(null, result);
 
-                    ops.name2 = $('#register_name').val();
-                }
-                else {
-                    $('.fm-dialog.registration-page-success').unbind('click');
-                    // $('.fm-dialog.registration-page-success').removeClass('hidden');
-                    // fm_showoverlay();
-                    // ^ legacy confirmation dialog, with no email change option
-                    mega.ui.sendSignupLinkDialog(rv);
+                // The user got logged-in when trying to register, let's migrate the ephemeral account
+                var msg = l[16517].replace('%1', rv.email);
 
-                    ops.terms = 'Mq';
-                    ops.firstname = base64urlencode(to8(rv.first));
-                    ops.lastname = base64urlencode(to8(rv.last));
-                    ops.name2 = base64urlencode(to8(rv.name));
-                    u_attr.terms = 1;
-
-                    localStorage.awaitingConfirmationAccount = JSON.stringify(rv);
-                }
-                api_req(ops);
-            }
-            else if (res === EACCESS || res === EEXIST) {
-
-                var passwordaes = new sjcl.cipher.aes(prepare_key_pw(rv.password));
-                var uh = stringhash(rv.email.toLowerCase(), passwordaes);
-                var ctx = {
-                    checkloginresult: function(ctx, r) {
-                        loadingDialog.hide();
-
-                        if (!r) {
-                            if (m) {
-                                alert(l[219]);
-                            }
-                            else {
-                                $('.login-register-input.email .top-loginp-tooltip-txt')
-                                    .safeHTML('@@<div class="white-txt">@@</div>', l[1297], l[1298]);
-                                $('.login-register-input.email').addClass('incorrect');
-                                msgDialog('warninga', 'Error', l[7869]);
-                            }
+                // On dialog confirm, import the ephemeral session files to the user's Inbox
+                msgDialog('info', l[761], msg, null, function() {
+                    $.onImportCopyNodes = $.ephNodes;
+                    M.copyNodes(['meh'], u_handle, false, function(e) {
+                        if (!Array.isArray(e)) {
+                            console.error(e);
                         }
-                        else if (r === EBLOCKED) {
-                            alert(l[730]);
-                        }
-                        else {
-                            passwordManager($('#register_form'));
-                            showToast('megasync', l[8745]);
-                            boot_auth(ctx, r);
-
-                            if ($.ephNodes) {
-                                // The user got logged-in when trying to register, let's migrate the ephemeral account
-                                var msg = l[16517].replace('%1', rv.email);
-
-                                msgDialog('info', l[761], msg, null, function() {
-                                    $.onImportCopyNodes = $.ephNodes;
-                                    M.copyNodes(['meh'], u_handle, false, function(e) {
-                                        if (!Array.isArray(e)) {
-                                            console.error(e);
-                                            debugger
-                                        }
-                                        location.reload();
-                                    });
-                                });
-                            }
-                        }
-                    }
-                };
-                u_login(ctx, rv.email, rv.password, uh, true);
+                        location.reload();
+                    });
+                });
             }
             else {
-                loadingDialog.hide();
-                msgDialog('warninga', 'Error', l[200], res);
+                // Show message that they've been successfully logged in then on OK reload the page
+                msgDialog('info', l[18280], l[8745], null, function() {
+                    location.reload();
+                });
             }
         }
-    };
-    if (m) {
-        rv.name = $('#register_name').val();
-        rv.email = $('#register_email').val();
-        rv.password = $('#register_password').val();
+        else {
+            // Close the 2FA dialog for a generic error
+            twofactor.loginDialog.closeDialog();
+
+            // Show message that the email has already been registered and to choose an alternative email to proceed
+            $('.login-register-input.email .top-loginp-tooltip-txt')
+                .safeHTML('@@<div class="white-txt">@@</div>', l[1297], l[1298]);
+            $('.login-register-input.email').addClass('incorrect');
+            msgDialog('warninga', 'Error', l[7869]);
+        }
+    }
+};
+
+function registeraccount() {
+
+    'use strict';
+
+    rv.password = $.trim($('#register-password-registerpage').val());
+    rv.first = $.trim($('#register-firstname-registerpage').val());
+    rv.last = $.trim($('#register-lastname-registerpage').val());
+    rv.email = $.trim($('#register-email-registerpage').val());
+    rv.name = rv.first + ' ' + rv.last;
+
+    var signup = null;
+    var fromProPage = false;
+
+    // Set the signup function to start the new secure registration process
+    if (security.register.newRegistrationEnabled()) {
+        signup = function() {
+            security.register.startRegistration(rv.first, rv.last, rv.email, rv.password, fromProPage,
+                                                continueNewRegistration);
+        };
     }
     else {
-        rv.password = $('#register-password').val();
-        rv.first = $('#register-firstname').val();
-        rv.last = $('#register-lastname').val();
-        rv.email = $('#register-email').val();
-        rv.name = rv.first + ' ' + rv.last;
+        // Set the signup function to use the legacy registration process
+        signup = function() {
+            sendsignuplink(rv.name, rv.email, rv.password, { callback: continueOldRegistration }, fromProPage);
+        };
     }
-
-    var signup = sendsignuplink.bind(null, rv.name, rv.email, rv.password, ctx);
 
     if (u_type === 0) {
         // An ephemeral account is registering, save the cloud nodes in case we need to migrate later
@@ -204,49 +172,126 @@ function registeraccount() {
     }
 }
 
+/**
+ * Continue the old method registration
+ * @param {Number} result The result of the 'uc' API request
+ */
+function continueOldRegistration(result) {
+
+    'use strict';
+
+    loadingDialog.hide();
+
+    if (result === 0) {
+        var ops = {
+            a: 'up'
+        };
+
+        passwordManager($('#register_form'));
+
+        $('.fm-dialog.registration-page-success').unbind('click');
+
+        mega.ui.sendSignupLinkDialog(rv);
+
+        ops.terms = 'Mq';
+        ops.firstname = base64urlencode(to8(rv.first));
+        ops.lastname = base64urlencode(to8(rv.last));
+        ops.name2 = base64urlencode(to8(rv.name));
+        u_attr.terms = 1;
+
+        localStorage.awaitingConfirmationAccount = JSON.stringify(rv);
+
+        api_req(ops);
+    }
+    else if (result === EACCESS || result === EEXIST) {
+        loginFromEphemeral.init();
+    }
+    else {
+        msgDialog('warninga', l[1578], l[200], result);
+    }
+}
+
+/**
+ * Continue the new method registration
+ * @param {Number} result The result of the 'uc2' API request
+ */
+function continueNewRegistration(result) {
+
+    'use strict';
+
+    loadingDialog.hide();
+
+    if (result === 0) {
+
+        // Setup the password manager
+        passwordManager($('#register_form'));
+
+        $('.fm-dialog.registration-page-success').unbind('click');
+
+        mega.ui.sendSignupLinkDialog(rv);
+
+        u_attr.terms = 1;
+        localStorage.awaitingConfirmationAccount = JSON.stringify(rv);
+    }
+    else if (result === EACCESS || result === EEXIST) {
+        loginFromEphemeral.init();
+    }
+    else {
+        msgDialog('warninga', l[1578], l[200], result);
+    }
+}
+
 function pageregister() {
+
     /* jshint -W074 */
     if (u_type > 0) {
-        msgDialog('warninga', l[135], l[5843]);
+        msgDialog('warninga', l[135], l[5843]); // You are already logged in. You can only create one MEGA account
         return false;
     }
 
     var err = false;
+    var firstName = $.trim($('#register-firstname-registerpage').val());
+    var lastName = $.trim($('#register-lastname-registerpage').val());
+    var email = $.trim($('#register-email-registerpage').val());
+    var password = $.trim($('#register-password-registerpage').val());
+    var passwordConfirm = $.trim($('#register-password-registerpage2').val());
 
-    if ($('#register-firstname').val() === ''
-            || $('#register-lastname').val() === '') {
+    if (firstName === '' || lastName === '') {
         $('.login-register-input.name').addClass('incorrect');
         err = 1;
     }
-    if ($('#register-email').val() === ''
-            || checkMail($('#register-email').val())) {
+    if (email === '' || checkMail(email)) {
         $('.login-register-input.email').addClass('incorrect');
         err = 1;
     }
 
-    if ($('#register-email').val() === ''
-            || checkMail($('#register-email').val())) {
+    if (email === '' || checkMail(email)) {
         $('.login-register-input.email').addClass('incorrect');
         err = 1;
     }
 
-    if ($('#register-password').val() === '') {
+    if (password === '') {
         $('.login-register-input.password.first').addClass('incorrect');
         $('.white-txt.password').text(l[213]);
         err = 1;
     }
+    else if (password.length < security.minPasswordLength) {
+        $('.login-register-input.password.first').addClass('incorrect');
+        $('.white-txt.password').text(l[18701]);
+        err = 1;
+    }
     else if (typeof zxcvbn !== 'undefined') {
-        var pw = zxcvbn($('#register-password').val());
-        if (pw.score === 0 || pw.entropy < 16) {
+        var pw = zxcvbn(password);
+        if (pw.score < 1) {
             $('.login-register-input.password.first').addClass('incorrect');
             $('.white-txt.password').text(l[1104]);
             err = 1;
         }
     }
 
-    if ($('#register-password').val() !== $('#register-password2').val()) {
-        $('#register-password').val('');
-        $('#register-password2').val('');
+    if (password !== passwordConfirm) {
+        $('#register-password-registerpage').val('');
+        $('#register-password-registerpage2').val('');
         $('.login-register-input.password.confirm').addClass('incorrect');
         err = 1;
     }
@@ -257,19 +302,15 @@ function pageregister() {
     }
     else if (!err) {
         if ($('.register-check').attr('class').indexOf('checkboxOff') > -1) {
-            msgDialog('warninga', l[1117], l[1118]);
+            msgDialog('warninga', l[1117], l[1118]);    // You need to agree with the Terms of Service to register...
         }
         else {
-            if (localStorage.signupcode || localStorage.businessSubAc) {
-                loadingDialog.show();
-                u_storage = init_storage(localStorage);
-                var signupcode = localStorage.signupcode;
-                if (localStorage.businessSubAc) {
-                    window.businessSubAc = JSON.parse(localStorage.businessSubAc);
-                    signupcode = window.businessSubAc.signupcode;
-                }
+            if (localStorage.businessSubAc) {
+                var signupcode = '';
+                window.businessSubAc = JSON.parse(localStorage.businessSubAc);
+                signupcode = window.businessSubAc.signupcode;
                 var ctx = {
-                    checkloginresult: function(u_ctx, r) {
+                    checkloginresult: function (u_ctx, r) {
                         if (typeof r[0] === 'number' && r[0] < 0) {
                             msgDialog('warningb', l[135], l[200]);
                         }
@@ -288,7 +329,6 @@ function pageregister() {
                     prepare_key_pw($('#register-password').val()),
                     signupcode,
                     $('#register-firstname').val() + ' ' + $('#register-lastname').val(), uh);
-                delete localStorage.signupcode;
                 delete localStorage.businessSubAc;
             }
             else if (u_type === false) {
@@ -317,52 +357,49 @@ function init_register() {
     }
 
     if (localStorage.registeremail) {
-        $('#register-email').val(localStorage.registeremail);
-        if (localStorage.signupcode) {
-            $('#register-email').attr('readonly', true);
-        }
+        $('#register-email-registerpage').val(localStorage.registeremail);
     }
 
-    $('#register-firstname').rebind('focus', function(e) {
+    $('#register-firstname-registerpage').rebind('focus.initregister', function() {
         $('.login-register-input.name').removeClass('incorrect');
         $('.login-register-input.name').addClass('focused');
     });
-    $('#register-firstname').rebind('blur', function(e) {
+    $('#register-firstname-registerpage').rebind('blur.initregister', function() {
         $('.login-register-input.name').removeClass('focused');
     });
-    $('#register-lastname').rebind('focus', function(e) {
+    $('#register-lastname-registerpage').rebind('focus.initregister', function() {
         $('.login-register-input.name').removeClass('incorrect');
         $('.login-register-input.name').addClass('focused');
     });
-    $('#register-lastname').rebind('blur', function(e) {
+    $('#register-lastname-registerpage').rebind('blur.initregister', function() {
         $('.login-register-input.name').removeClass('focused');
     });
-    $('#register-email').rebind('focus', function(e) {
+    $('#register-email-registerpage').rebind('focus.initregister', function() {
         $('.login-register-input.email .top-loginp-tooltip-txt')
             .safeHTML('@@<div class="white-txt">@@</div>', l[1100], l[1101]);
         $('.login-register-input.email').removeClass('incorrect');
         $('.login-register-input.email').addClass('focused');
     });
-    $('#register-email').rebind('blur', function(e) {
+    $('#register-email-registerpage').rebind('blur.initregister', function() {
         $('.login-register-input.email').removeClass('focused');
     });
-    $('#register-password').rebind('focus', function(e) {
+    $('#register-password-registerpage').rebind('focus.initregister', function() {
         $('.login-register-input.password.first').removeClass('incorrect');
         $('.login-register-input.password.confirm').removeClass('incorrect');
         $(this).parents('.password').addClass('focused');
     });
-    $('#register-password').rebind('blur', function(e) {
+    $('#register-password-registerpage').rebind('blur.initregister', function() {
         $('.login-register-input.password').removeClass('focused');
         registerpwcheck();
     });
-    $('#register-password2').rebind('focus', function(e) {
+    $('#register-password-registerpage2').rebind('focus.initregister', function() {
         $('.login-register-input.password.confirm').removeClass('incorrect');
         $(this).parents('.password').addClass('focused');
     });
-    $('#register-password2').rebind('blur', function(e) {
+    $('#register-password-registerpage2').rebind('blur.initregister', function() {
         $(this).parents('.password').removeClass('focused');
     });
-    $('.new-registration-checkbox .radio-txt,.register-check').rebind('click.uiCheckboxes', function(e) {
+    $('.new-registration-checkbox .radio-txt,.register-check').rebind('click.uiCheckboxes', function() {
         if ($('.register-check').attr('class').indexOf('checkboxOn') > -1) {
             $('.register-check').addClass('checkboxOff');
             $('.register-check').removeClass('checkboxOn');
@@ -381,10 +418,10 @@ function init_register() {
                 registerpwcheck();
             });
     }
-    $('#register-password').rebind('keyup', function(e) {
+    $('#register-password-registerpage').rebind('keyup.initregister', function() {
         registerpwcheck();
     });
-    $('.password-status-icon').rebind('mouseover', function(e) {
+    $('.password-status-icon').rebind('mouseover.initregister', function() {
         if ($(this).parents('.strong-password').length === 0) {
             $('.password-status-warning').removeClass('hidden');
         }
@@ -412,10 +449,10 @@ function init_register() {
     $('.login-register-input.name').rebind('click', function(e) {
         var c = $(e.target).attr('class');
         if (c && c.indexOf('login-register-input name') > -1) {
-            $('#register-firstname').focus();
+            $('#register-firstname-registerpage').focus();
         }
         else if (c && c.indexOf('register-family-input-block') > -1) {
-            $('#register-lastname').focus();
+            $('#register-lastname-registerpage').focus();
         }
     });
 
@@ -434,11 +471,11 @@ function init_register() {
         var userInfo = JSON.parse(localStorage.businessSubAc);
         // we know here that userInfo contain all needed attr, othrewise higher layers wont allow us
         // to get here.
-        $('#register-email').val(userInfo.e);
+        $('#register-email-registerpage').val(userInfo.e);
         // $('#register-email').attr('readonly', true);
-        $('#register-lastname').val(a32_to_str(base64_to_a32(userInfo.lastname)));
+        $('#register-lastname-registerpage').val(a32_to_str(base64_to_a32(userInfo.lastname)));
         // $('#register-lastname').attr('readonly', true);
-        $('#register-firstname').val(a32_to_str(base64_to_a32(userInfo.firstname)));
+        $('#register-firstname-registerpage').val(a32_to_str(base64_to_a32(userInfo.firstname)));
         // $('#register-firstname').attr('readonly', true);
         var headerText = l[19129].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
         $('h3.main-italic-header', $regInfoContainer).html(headerText);
@@ -453,46 +490,17 @@ function init_register() {
 
 
 function registerpwcheck() {
+
     $('.login-register-input.password').removeClass('weak-password strong-password');
     $('.new-registration').removeClass('good1 good2 good3 good4 good5');
-    if (typeof zxcvbn === 'undefined'
-            || $('#register-password').val() === '') {
+
+    var trimmedPassword = $.trim($('#register-password-registerpage').val());
+
+    if (typeof zxcvbn === 'undefined' || trimmedPassword === '') {
         return false;
     }
-    var pw = zxcvbn($('#register-password').val());
-    if (pw.score > 3 && pw.entropy > 75) {
-        $('.login-register-input.password').addClass('strong-password');
-        $('.new-registration').addClass('good5');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1128]);
-        $('.new-reg-status-description').text(l[1123]);
-    }
-    else if (pw.score > 2 && pw.entropy > 50) {
-        $('.login-register-input.password').addClass('strong-password');
-        $('.new-registration').addClass('good4');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1127]);
-        $('.new-reg-status-description').text(l[1122]);
-    }
-    else if (pw.score > 1 && pw.entropy > 40) {
-        $('.login-register-input.password').addClass('strong-password');
-        $('.new-registration').addClass('good3');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1126]);
-        $('.new-reg-status-description').text(l[1121]);
-    }
-    else if (pw.score > 0 && pw.entropy > 15) {
-        $('.new-registration').addClass('good2');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1125]);
-        $('.new-reg-status-description').text(l[1120]);
-    }
-    else {
-        $('.login-register-input.password').addClass('weak-password');
-        $('.new-registration').addClass('good1');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1124]);
-        $('.new-reg-status-description').text(l[1119]);
-    }
-    $('.password-status-warning')
-        .safeHTML('<span class="password-warning-txt">@@</span> ' +
-            '@@<div class="password-tooltip-arrow"></div>', l[34], l[1129]);
-    $('.password-status-warning').css('margin-left', ($('.password-status-warning').width() / 2 * -1) - 13);
+
+    classifyPassword(trimmedPassword);
 }
 
 

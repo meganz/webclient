@@ -141,7 +141,7 @@ mBroadcaster.once('startMega', function() {
             var now = Date.now();
             var known = [
                 '1:setUserAvatar', '1:previewimg', '1:procfa', '2:procfa', '3:addScript', '1:MediaElementWrapper',
-                '2:chatImageParser', '2:initall'
+                '2:chatImageParser', '2:initall', '3:initall'
             ];
             // ^ think twice before whitelisting anything new here...
 

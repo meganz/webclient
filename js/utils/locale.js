@@ -1,5 +1,15 @@
 var date_months = [];
 
+var locale = "en";
+
+var remappedLangLocales = {
+    "cn": "zh-Hans",
+    "ct": "zh-Hant",
+    "kr": "ko",
+    "jp": "ja",
+    "tl": "fil"
+};
+
 if (typeof l === 'undefined') {
     l = [];
 }
@@ -443,6 +453,8 @@ mBroadcaster.once('startMega', function populate_l() {
     l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
     l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/blog_8">').replace('[/A2]', '</a>');
+    l[19310] = l[19310].replace('[A]', '<a href="https://mega.nz/blog_6" target="_blank">').replace('[/A]', '</a>');
+
 
     l[8644] = l[8644].replace('[S]', '<span class="green">').replace('[/S]', '</span>');
     l[8651] = l[8651].replace('%1', '<span class="header-pro-plan"></span>');
@@ -487,8 +499,6 @@ mBroadcaster.once('startMega', function populate_l() {
     l[10658] = l[10658].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
 
     l[12482] = l[12482].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[12439] = l[12439].replace('[A1]', '<b>').replace('[/A1]', '</b>')
-                       .replace('[A2]', '<b>').replace('[/A2]', '</b>');
     l[12483] = l[12483].replace('[BR]', '<br>');
     l[12485] = l[12485].replace('[A1]', '<a href="" class="red mac">').replace('[/A1]', '</a>');
     l[12485] = l[12485].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
@@ -540,8 +550,9 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[/A]', '</a>')
         .replace('[B]', '<a href="https://github.com/meganz/MEGAcmd/blob/master/README.md" target="_blank" class="red">')
         .replace('[/B]', '</a>');
-	l[16614] = escapeHTML(l[16614])
-        .replace('[A]', '<a href="https://www.mozilla.org/thunderbird" target="_blank">')
+    l[16609] = escapeHTML(l[16609]).replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[16614] = escapeHTML(l[16614])
+        .replace('[A]', '<a href="https://thunderbird.net/" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');
 
     l[12439] = l[12439].replace('[A1]', '').replace('[/A1]', '').replace('[A2]', '').replace('[/A2]', '');
@@ -592,6 +603,11 @@ mBroadcaster.once('startMega', function populate_l() {
     l[18490] = l[18490].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
     l[18491] = l[18491].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
 
+    l[18787] = l[18787]
+        .replace('[A]', '<a href="https://github.com/meganz/MEGAcmd" rel="noreferrer" target="_blank">')
+        .replace('[/A]', '</a>');
+    l[19111] = l[19111].replace('[A]', '<a class="public-contact-link">').replace('[/A]', '</a>');
+
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
         16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444
@@ -613,4 +629,11 @@ mBroadcaster.once('startMega', function populate_l() {
         l[408], l[409], l[410], l[411], l[412], l[413],
         l[414], l[415], l[416], l[417], l[418], l[419]
     ].map(escapeHTML);
+
+    // Set the Locale based the language that is selected. (Required for accurate string comparisons).
+    // If the locale has been remapped, apply the remap.
+    locale = lang;
+    if (remappedLangLocales.hasOwnProperty(locale)) {
+        locale = remappedLangLocales[locale];
+    }
 });

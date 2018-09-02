@@ -27,11 +27,14 @@ function selectText(elementId) {
  * Copy the provided content to the clipboard.
  * @param {String} content The content to copy to the clipboard
  * @param {String} [toastText] Optional toast notification message
+ * @param {String} [description] Optional toast notification grey message under first one
+ * @param {String} [class] Optional toast notification addition classname
  * @returns {Boolean} Whether the operation was successful
  */
-function copyToClipboard(content, toastText) {
+function copyToClipboard(content, toastText, classname) {
     'use strict';
     var success = true;
+    var classname = classname ? 'clipboard ' + classname : 'clipboard';
 
     if (is_chrome_firefox) {
         mozSetClipboard(content);
@@ -59,7 +62,7 @@ function copyToClipboard(content, toastText) {
     }
 
     if (success && toastText) {
-        showToast('clipboard', toastText);
+        showToast(classname, toastText);
     }
 
     return success;

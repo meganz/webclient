@@ -49,6 +49,8 @@ var ulmanager = {
     ulSetupQueue: false,
     ulStartingPhase: false,
     ulCompletingPhase: false,
+    ulOverStorageQuota: false,
+    ulOverStorageQueue: [],
     ulPendingCompletion: [],
     ulBlockSize: 131072,
     ulBlockExtraSize: 1048576,
@@ -72,6 +74,85 @@ var ulmanager = {
         var keys = Object.keys(this.ulErrorMap);
         var values = obj_values(this.ulErrorMap);
         return keys[values.indexOf(code)] || code;
+    },
+
+    ulShowOverStorageQuotaDialog: function(aFileUpload) {
+        'use strict';
+
+        var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
+
+        ulQueue.pause();
+        mega.ui.tpp.hide();
+        this.ulOverStorageQuota = true;
+
+        // clear completed uploads and set over quota for the rest.
+        if ($.removeTransferItems) {
+            $.removeTransferItems();
+        }
+        $("tr[id^='ul_']").addClass('transfer-error').find('.transfer-status').text(l[1010]);
+
+        // Store the entry whose upload ticket failed to resume it later
+        if (aFileUpload) {
+            this.ulOverStorageQueue.push(aFileUpload);
+        }
+
+        // Inform user that upload MEGAdrop is not available anymore
+        if (page.substr(0, 8) === 'megadrop') {
+            mBroadcaster.sendMessage('MEGAdrop:overquota');
+        }
+
+        // Load and fill membership plans.
+        pro.loadMembershipPlans(function() {
+            dlmanager.prepareLimitedBandwidthDialogPlans($dialog);
+        });
+
+        M.safeShowDialog('upload-overquota', function() {
+            $dialog.removeClass('registered achievements pro slider').addClass('uploads exceeded');
+            $('.header-before-icon.exceeded', $dialog).text(l[19135]);
+            $('.p-after-icon.msg-overquota', $dialog).text(l[19136]);
+
+            $('.reg-st3-membership-bl', $dialog).rebind('click', function() {
+                eventlog(99700, true);
+                open(getAppBaseUrl() + '#propay_' + $(this).data('payment'));
+                return false;
+            });
+
+            $('.fm-dialog-close', $dialog).rebind('click', closeDialog);
+
+            eventlog(99699, true);
+            return $dialog;
+        });
+    },
+
+    ulResumeOverStorageQuotaState: function() {
+        'use strict';
+
+        if ($('.fm-dialog.limited-bandwidth-dialog').is(':visible')) {
+            closeDialog();
+        }
+
+        ulQueue.resume();
+        this.ulOverStorageQuota = false;
+
+        if (!this.ulOverStorageQueue.length) {
+            if (d) {
+                ulmanager.logger.info('ulResumeOverStorageQuotaState: Nothing to resume.');
+            }
+        }
+        else {
+            // clear completed uploads and remove over quota state for the rest.
+            if ($.removeTransferItems) {
+                $.removeTransferItems();
+            }
+            $("tr[id^='ul_']").removeClass('transfer-error').find('.transfer-status').text(l[7227]);
+
+            this.ulOverStorageQueue.forEach(function(aFileUpload) {
+                aFileUpload.ul.uReqFired = null;
+                ulmanager.ulStart(aFileUpload);
+            });
+        }
+
+        this.ulOverStorageQueue = [];
     },
 
     getGID: function UM_GetGID(ul) {
@@ -306,85 +387,6 @@ var ulmanager = {
             });
     },
 
-    ulFileReader: function UM_ul_filereader(file) {
-        var handler;
-        if (is_chrome_firefox && "u8" in file) {
-            if (d > 1) {
-                ulmanager.logger.info('Using Firefox ulReader');
-            }
-
-            handler = function ulReader(task, done) {
-                var error = null;
-
-                try {
-                    task.bytes = file.u8(task.start, task.end);
-                }
-                catch (e) {
-                    error = e;
-                }
-                Soon(function() {
-                    done(error);
-                });
-            };
-        }
-        if (!handler) {
-            var fs = new FileReader();
-
-            handler = function(task, done) {
-                var end = task.start + task.end;
-                var blob;
-
-                fs.pos = task.start;
-                fs.onerror = function(evt) {
-                    done(new Error(evt));
-                    done = null;
-                };
-                fs.onloadend = function(evt) {
-                    if (done) {
-                        var target = evt.target;
-                        var error = true;
-                        if (target.readyState === FileReader.DONE) {
-                            if (target.result instanceof ArrayBuffer) {
-                                try {
-                                    task.bytes = new Uint8Array(target.result);
-                                    error = null;
-                                }
-                                catch (e) {
-                                    handler.logger.error(e);
-                                    error = e;
-                                }
-                            }
-                        }
-                        done(error);
-                    }
-                    blob = undefined;
-                };
-                try {
-                    if (file.slice || file.mozSlice) {
-                        if (file.slice) {
-                            blob = file.slice(task.start, end);
-                        }
-                        else {
-                            blob = file.mozSlice(task.start, end);
-                        }
-                        xhr_supports_typed_arrays = true;
-                    }
-                    else {
-                        blob = file.webkitSlice(task.start, end);
-                    }
-                    fs.readAsArrayBuffer(blob);
-                }
-                catch (e) {
-                    handler.logger.error(e);
-                    done(e);
-                    done = null;
-                }
-            };
-        }
-        handler = new MegaQueue(handler, 1, 'ul-filereader');
-        return handler;
-    },
-
     ulFinalize: function UM_ul_finalize(file, target) {
         if (d) {
             ulmanager.logger.info(file.name, "ul_finalize", file.target, target);
@@ -500,7 +502,7 @@ var ulmanager = {
             if (res === EOVERQUOTA || res === EGOINGOVERQUOTA) {
 
                 // Show a warning popup
-                M.ulerror(ul_queue[ctx.reqindex], res);
+                ulmanager.ulShowOverStorageQuotaDialog(File, res);
 
                 // Return early so it does not retry automatically and spam the API server with requests
                 return false;
@@ -607,14 +609,10 @@ var ulmanager = {
             }
         }
 
-        file.ul_keyNonce = JSON.stringify(file.ul_key);
+        file.ul_offsets = [];
+        file.ul_lastProgressUpdate = 0;
         file.ul_macs = Object.create(null);
-        file.totalbytessent = 0;
-        file.ul_readq = [];
-        file.ul_plainq = {};
-        file.ul_intransit = 0;
-        file.ul_inflight = {};
-        file.ul_sendchunks = {};
+        file.ul_keyNonce = JSON.stringify(file.ul_key);
         file.ul_aes = new sjcl.cipher.aes([
             file.ul_key[0], file.ul_key[1], file.ul_key[2], file.ul_key[3]
         ]);
@@ -622,17 +620,35 @@ var ulmanager = {
         if (file.size) {
             var pp;
             var p = 0;
-            var tasks = {};
-            for (i = 1; i <= 8 && p < file.size - i * ulmanager.ulBlockSize; i++) {
-                tasks[p] = new ChunkUpload(file, p, i * ulmanager.ulBlockSize);
-                pp = p;
-                p += i * ulmanager.ulBlockSize;
+            var tasks = Object.create(null);
+            var ulBlockExtraSize = ulmanager.ulBlockExtraSize;
+            //var boost = !mega.chrome || parseInt(ua.details.version) < 68;
+			var boost = false;
+
+            if (file.size > 0x1880000 && boost) {
+                tasks[p] = new ChunkUpload(file, p, 0x480000);
+                p += 0x480000;
+
+                for (i = 2; i < 4; i++) {
+                    tasks[p] = new ChunkUpload(file, p, i * 0x400000);
+                    pp = p;
+                    p += i * 0x400000;
+                }
+
+                ulBlockExtraSize = 16 * 1048576;
+            }
+            else {
+                for (i = 1; i <= 8 && p < file.size - i * ulmanager.ulBlockSize; i++) {
+                    tasks[p] = new ChunkUpload(file, p, i * ulmanager.ulBlockSize);
+                    pp = p;
+                    p += i * ulmanager.ulBlockSize;
+                }
             }
 
             while (p < file.size) {
-                tasks[p] = new ChunkUpload(file, p, ulmanager.ulBlockExtraSize);
+                tasks[p] = new ChunkUpload(file, p, ulBlockExtraSize);
                 pp = p;
-                p += ulmanager.ulBlockExtraSize;
+                p += ulBlockExtraSize;
             }
 
             if (file.size - pp > 0) {
@@ -640,16 +656,19 @@ var ulmanager = {
             }
 
             // if (d) ulmanager.logger.info('ulTasks', tasks);
-            Object.keys(tasks).reverse().forEach(function(s) {
-                    ulQueue.pushFirst(tasks[s]);
+            Object.keys(tasks).reverse().forEach(function(k) {
+                file.ul_offsets.push({
+                    byteOffset: parseInt(k),
+                    byteLength: tasks[k].end
                 });
-
+                ulQueue.pushFirst(tasks[k]);
+            });
         }
         else {
             ulQueue.pushFirst(new ChunkUpload(file, 0, 0));
         }
 
-        if (!file.faid) {
+        if (!file.faid && !window.omitthumb) {
             var img = is_image(file.name);
             var vid = is_video(file.name);
 
@@ -664,12 +683,16 @@ var ulmanager = {
                     {raw: img !== 1 && img, isVideo: vid}
                 );
 
-                if (vid && ulmanager.ulEventData[file.id]) {
-                    if (d) {
-                        console.debug('Increasing the number of expected file attributes for the chat to be aware.');
-                        console.assert(ulmanager.ulEventData[file.id].efa === 1, 'Check this...');
+                var uled = ulmanager.ulEventData[file.id];
+                if (uled) {
+                    if (vid) {
+                        if (d) {
+                            console.debug('Increasing expected file attributes for the chat to be aware...');
+                            console.assert(uled.efa === 1, 'Check this...');
+                        }
+                        uled.efa += 2;
                     }
-                    ulmanager.ulEventData[file.id].efa += 2;
+                    uled.faid = file.faid;
                 }
             }
         }
@@ -818,7 +841,7 @@ var ulmanager = {
             return ulmanager.ulStart(File);
         }
         if (d) {
-            ulmanager.logger.debug('[%s] deduplicating file %s', n.h, File.file.name, n);
+            ulmanager.logger.info('[%s] deduplicating file %s', n.h, File.file.name, n);
         }
         api_req({
             a: 'g',
@@ -831,10 +854,10 @@ var ulmanager = {
             skipfile: (fmconfig.ul_skipIdentical && identical),
             callback: function(res, ctx) {
                 if (d) {
-                    ulmanager.logger.debug('[%s] deduplication result:', ctx.n.h, res.e, res, ctx.skipfile);
+                    ulmanager.logger.info('[%s] deduplication result:', ctx.n.h, res.e, res, ctx.skipfile);
                 }
                 if (oIsFrozen(File)) {
-                    ulmanager.logger.debug('Upload aborted on deduplication...', File);
+                    ulmanager.logger.warn('Upload aborted on deduplication...', File);
                 }
                 else if (res.e === ETEMPUNAVAIL && ctx.skipfile) {
                     ctx.uq.repair = ctx.n.k;
@@ -857,6 +880,20 @@ var ulmanager = {
                     File.file.ddfa = ctx.n.fa;
                     File.file.path = ctx.uq.path;
                     File.file.name = ctx.uq.name;
+
+                    var eventData = ulmanager.ulEventData[File.file.id];
+                    if (eventData) {
+                        var efa = ctx.n.fa ? String(ctx.n.fa).split('/').length : 0;
+
+                        if (eventData.efa !== efa) {
+                            if (d) {
+                                ulmanager.logger.info('[%s] Fixing up efa on deduplication ' +
+                                    'for the chat to be aware... (%s != %s)', ctx.n.h, eventData.efa, efa);
+                            }
+                            eventData.efa = efa;
+                        }
+                    }
+
                     // File.file.done_starting();
                     ulmanager.ulFinalize(File.file);
                 }
@@ -1001,9 +1038,7 @@ ChunkUpload.prototype.updateprogress = function() {
     var p = this.file.progress;
     var tp = this.file.sent || 0;
     for (var i in p) {
-        if (p.hasOwnProperty(i)) {
-            tp += p[i];
-        }
+        tp += p[i];
     }
 
     // only start measuring progress once the TCP buffers are filled
@@ -1050,8 +1085,12 @@ ChunkUpload.prototype.onXHRprogress = function(xhrEvent) {
     if (!this.file || !this.file.progress || this.file.abort) {
         return this.done && this.done();
     }
-    this.file.progress[this.start] = xhrEvent.loaded;
-    this.updateprogress();
+    var now = Date.now();
+    if ((now - this.file.ul_lastProgressUpdate) > 200) {
+        this.file.ul_lastProgressUpdate = now;
+        this.file.progress[this.start] = xhrEvent.loaded;
+        this.updateprogress();
+    }
 };
 
 ChunkUpload.prototype.onXHRerror = function(args, xhr, reason) {
@@ -1228,17 +1267,19 @@ ChunkUpload.prototype.upload = function() {
     this.xhr = xhr;
 };
 
-ChunkUpload.prototype.io_ready = function(task, args) {
-    if (args[0] || !this.file || !this.file.ul_keyNonce) {
+ChunkUpload.prototype.io_ready = function(res) {
+    'use strict';
+
+    if (res < 0 || !this.file || !this.file.ul_keyNonce) {
         if (this.file) {
             if (d) {
-                this.logger.error('UL IO Error', args[0]);
+                this.logger.error('UL IO Error', res);
             }
 
             if (this.file.done_starting) {
                 this.file.done_starting();
             }
-            ulmanager.retry(this.file, this, "IO failed: " + args[0]);
+            ulmanager.retry(this.file, this, "IO failed: " + res);
         }
         else {
             if (d) {
@@ -1247,12 +1288,11 @@ ChunkUpload.prototype.io_ready = function(task, args) {
         }
     }
     else {
-        task = [this, this.file.ul_keyNonce, this.start / 16, this.bytes];
-        // TODO: Modify CreateWorkers() and use this gid to terminate over cancelled uploads
-        task[this.gid] = 1;
-        Encrypter.push(task, this.upload, this);
+        this.bytes = res.bytes;
+        this.suffix = res.suffix;
+        Object.assign(this.file.ul_macs, res.file.ul_macs);
+        this.upload();
     }
-    this.bytes = null;
 };
 
 ChunkUpload.prototype.done = function(ee) {
@@ -1275,12 +1315,31 @@ ChunkUpload.prototype.run = function(done) {
         this.logger.info('.run', 'Reusing previously encrypted data.');
         this.upload();
     }
+    else if (this.file.size === 0) {
+        this.logger.info('.run', 'Uploading 0-bytes file...');
+        this.bytes = new Uint8Array(0);
+        this.suffix = '/0?c=AAAAAAAAAAAAAAAA';
+        this.upload();
+    }
+    else if (!this.start && localStorage.ulFailTest) {
+        this.logger.warn('Intentionally blocking the first chunk.');
+    }
     else {
         this.logger.info('.run');
         if (!this.file.ul_reader) {
-            this.file.ul_reader = ulmanager.ulFileReader(this.file);
+            this.file.ul_reader = new FileUploadReader(this.file);
+
+            if (d > 1) {
+                if (!window.ul_reader) {
+                    window.ul_reader = [];
+                }
+                window.ul_reader.push(this.file.ul_reader);
+            }
         }
-        this.file.ul_reader.push(this, this.io_ready, this);
+        var self = this;
+        this.file.ul_reader.getChunk(this.start, function(res) {
+            self.io_ready(res);
+        });
     }
     array.remove(GlobalProgress[this.gid].working, this, 1);
     GlobalProgress[this.gid].working.push(this);
@@ -1479,8 +1538,9 @@ ulQueue.poke = function(file, meth) {
 
         file.retries = 0;
         file.sent = 0;
-        file.progress = {};
+        file.progress = Object.create(null);
         file.posturl = "";
+        file.uReqFired = null;
         file.completion = [];
         file.abort = true;
 
@@ -1497,7 +1557,6 @@ ulQueue.poke = function(file, meth) {
             ulQueue.resume();
         }
         if (file.ul_reader) {
-            file.ul_reader.filter(gid);
             file.ul_reader.destroy();
             file.ul_reader = null;
         }
@@ -1511,7 +1570,7 @@ ulQueue.poke = function(file, meth) {
 
     if (meth !== 0xdead) {
         file.sent = 0;
-        file.progress = {};
+        file.progress = Object.create(null);
         file.completion = [];
         file.owner = new FileUpload(file);
         ulQueue[meth || 'push'](file.owner);
@@ -1563,16 +1622,24 @@ mBroadcaster.once('startMega', function _setupEncrypter() {
             return typeof e.data === 'string' || done();
         }
 
+        // target byteOffset as defined at CreateWorkers()
+        var offset = e.target.byteOffset;// || context.start;
+
         if (typeof e.data === 'string') {
             if (e.data[0] === '[') {
-                file.ul_macs[context.start] = JSON.parse(e.data);
+                file.ul_macs[offset] = JSON.parse(e.data);
             }
             else {
                 encrypter.logger.info('WORKER:', e.data);
             }
         }
         else {
-            context.bytes = new Uint8Array(e.data.buffer || e.data);
+            if (context.appendMode) {
+                context.bytes.set(new Uint8Array(e.data.buffer || e.data), offset);
+            }
+            else {
+                context.bytes = new Uint8Array(e.data.buffer || e.data);
+            }
             context.suffix = '/' + context.start + '?c=' + base64urlencode(chksum(context.bytes.buffer));
             done();
         }

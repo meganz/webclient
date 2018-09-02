@@ -1,7 +1,7 @@
 (function(scope) {
     "use strict";
 
-    var VERSION = 4;
+    var VERSION = 5;
 
     /**
      * ChatdPersist is a container that manages the (local/clientside) chat history (and keys) persistence for chatd.
@@ -1056,7 +1056,7 @@
 
         self.getMessageByMessageId(chatId, msgId)
             .done(function(r) {
-                self.db.msgs.delete(r.id)
+                self.db.msgs.delete(r.id || r[0] && r[0].id)
                     .then(
                         function() {
                             promise.resolve();
@@ -1168,28 +1168,45 @@
 
         delete self._msgActionsQueuePerChat[chatId];
         self.db.transaction('rw', self.db.msgs, function(msgs, trans) {
-                queue.actions.forEach(function(queueEntry) {
+                var currentActionIndex = 0;
+                var next = function() {
+                    var i = currentActionIndex++;
+                    var queueEntry = queue.actions[i];
+
+                    if (!queueEntry) {
+                        return;
+                    }
+
                     if (trans.active !== true) {
                         self.logger.error('transaction got inactive. this should never happen.');
+                        return;
                     }
 
                     if (queueEntry[0] === 'push') {
-                        self.persistMessage.apply(self, [chatId].concat(queueEntry[1]));
+                        self.persistMessage.apply(self, [chatId].concat(queueEntry[1])).always(next);
                     }
                     else if (queueEntry[0] === 'replace') {
-                        self.persistMessage.apply(self, [chatId].concat(queueEntry[1][1]).concat([true]));
+                        self.persistMessage.apply(self, [chatId].concat(queueEntry[1][1]).concat([true]))
+                            .always(next);
                     }
                     else if (queueEntry[0] === 'remove') {
                         if (queueEntry[1][1] !== true) {
-                            self.unpersistMessage.apply(self, [chatId].concat(queueEntry[1]));
+                            self.unpersistMessage.apply(self, [chatId].concat(queueEntry[1]))
+                                .always(next);
                         }
                         // else, its a "soft remove" (e.g. don't persist!)
+                        else {
+                            next();
+                        }
                     }
 
                     else {
                         self.logger.error("Unknown queue type entry found in queue: ", chatId, queueEntry);
+                        next();
                     }
-                });
+                };
+
+                next();
             })
             .then(function() {
                 self.logger.debug(
@@ -1779,7 +1796,7 @@
             })
             .fail(function (e) {
                 if (d) {
-                    console.error("Failed to retrieve key for msgmodify", [
+                    console.error("Failed to retrieve key for retrieveAndLoadKeysFor", [
                         chatId,
                         userId,
                         keyId

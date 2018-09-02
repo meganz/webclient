@@ -11,7 +11,7 @@ var extensions = {
     'font': [['fnt', 'otf', 'ttf', 'fon'], 'Font'],
     'generic': [['*'], 'File'],
     'illustrator': [['ai', 'ait'], 'Adobe Illustrator'],
-    'image': [['gif', 'tiff', 'tif', 'bmp', 'png', 'tga', 'jpg', 'jpeg', 'heic'], 'Image'],
+    'image': [['gif', 'tiff', 'tif', 'bmp', 'png', 'tga', 'jpg', 'jpeg', 'heic', 'webp'], 'Image'],
     'indesign': [['indd'], 'Adobe InDesign'],
     'keynote': [['key'], 'Apple Keynote'],
     'numbers': [['numbers'], 'Apple Numbers'],
@@ -201,6 +201,7 @@ var extdesc = {
     'vob': 'DVD-Video',
     'wav': 'Wave Audio',
     'webm': 'WebM Video',
+    'webp': 'WebP Image',
     'wma': 'WM Audio',
     'wmv': 'WM Video',
     'wpd': 'WordPerfect',
@@ -530,9 +531,9 @@ function fileIcon(node) {
     if (node.t) {
         if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
             icon = 'folder-shared';
-            
+
             if(is_mobile){
-                icon = 'folder-shared_v2';
+                icon = 'outgoing-share-folder';
             }
         }
         else if ( mega.megadrop.pufs[node.h] && mega.megadrop.pufs[node.h].s !== 1) {

@@ -4,70 +4,40 @@
  * Re-creates tree DOM elements in given order i.e. { ascending, descending }
  * for given parameters i.e. { name, [last interaction, status] },
  * Sorting for status and last interaction are available only for contacts.
- * @param {String} n, node id.
- * @param {String} dialog, dialog identifier or force rebuild constant.
- * @param {type} stype, what to sort.
+ * @param {Object} n The ufs-like node.
+ * @param {String} [dialog] dialog identifier or force rebuild constant.
+ * @param {String} [stype] what to sort.
+ * @param {Number} [sDeepIndex] Internal use
  * @returns {MegaPromise}
  */
-MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
+MegaData.prototype.buildtree = function _buildtree(n, dialog, stype, sDeepIndex) {
+    'use strict'; /* jshint -W074, -W073 */
 
     if (!n) {
         console.error('Invalid node passed to M.buildtree');
-        return MegaPromise.reject();
+        return false;
     }
-    var levels = 1;
-    var promise = new MegaPromise();
-    var args = toArray.apply(null, arguments);
 
-    // Retrieve whole cloud for copy/move dialogs...
-    // FIXME: find a proper way to retrieve folders only
-    /* TODO: make move/copy dialogs logic async
-     if (dialog === 'copy-dialog' || dialog === 'move-dialog') {
-     levels = -1;
-     }*/
-    /*
-     if (dialog !== M.buildtree.FORCE_REBUILD && levels > 0 || pfid) {
-     _buildtree.apply(M, args);
-     promise.resolve();
-     }
-     else {
-     var folders;
-
-     if (n.h === 'shares') {
-
-     folders = Object.keys(M.c[n.h] || {});
-     }
-     else {
-     folders = [n.h];
-     }
-
-     dbfetch.geta(folders)
-     .always(function() {
-     _buildtree.apply(M, args);
-     promise.resolve();
-     });
-     }
-
-     return promise;
-     };
-     var _buildtree = function(n, dialog, stype) {*/
-
-    var folders = [],
-        _ts_l = (typeof treesearch !== 'undefined' && treesearch) ? treesearch.toLowerCase() : undefined,
-        _li = 'treeli_',
-        _sub = 'treesub_',
-        _a = 'treea_',
-        rebuild = false,
-        sharedfolder, openedc, arrowIcon,
-        ulc, expandedc, buildnode, containsc, i, node, html, sExportLink,
-        fName = '',
-        curItemHandle = '',
-        undecryptableClass = '',
-        titleTooltip = '',
-        fIcon = '',
-        prefix;
-
+    var folders = [];
+    var _ts_l = (typeof treesearch !== 'undefined' && treesearch) ? treesearch.toLowerCase() : undefined;
+    var _a = 'treea_';
+    var _li = 'treeli_';
+    var _sub = 'treesub_';
+    var rebuild = false;
+    var curItemHandle;
+    var buildnode;
+    var containsc;
+    var i;
+    var node;
+    var name;
+    var html;
+    var prefix;
     var inshares = n.h === 'shares';
+    var expand = function(i, e) {
+        if (i) {
+            e.firstElementChild.classList.add('expanded');
+        }
+    };
 
     /*
      * XXX: Initially this function was designed to render new nodes only,
@@ -82,6 +52,15 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
         dialog = undefined;
     }
     stype = stype || "cloud-drive";
+
+    if (!sDeepIndex) {
+        sDeepIndex = 0;
+
+        if (d) {
+            console.time('buildtree');
+        }
+    }
+
     if (n.h === M.RootID) {
         if (typeof dialog === 'undefined') {
             if (rebuild || $('.content-panel.cloud-drive ul').length === 0) {
@@ -127,10 +106,10 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
     // Detect copy and move dialogs, make sure that right DOMtree will be sorted.
     // copy and move dialogs have their own trees and sorting is done independently
     if (dialog) {
-        if (dialog.indexOf('copy-dialog') !== -1) {
+        if ($.copyDialog) {
             prefix = 'Copy' + stype;
         }
-        else if (dialog.indexOf('move-dialog') !== -1) {
+        else if ($.moveDialog) {
             prefix = 'Move' + stype;
         }
     }
@@ -187,92 +166,104 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             _sub = 'mctreesub_';
         }
 
-        if (folders.length) {
+        if (folders.length && (node = document.getElementById(_a + n.h))) {
             // render > if new folders found on an empty folder
-            ulc = $('#' + _a + n.h);
-
-            if (!ulc.hasClass('contains-folders')) {
-                ulc.addClass('contains-folders').find('span:first').addClass('nw-fm-arrow-icon');
+            if (!node.classList.contains('contains-folders')) {
+                node.classList.add('contains-folders');
+                node.firstElementChild.classList.add('nw-fm-arrow-icon');
             }
         }
 
         for (var idx = 0; idx < folders.length; idx++) {
 
-            ulc = '';
-            expandedc = '';
             buildnode = false;
-            containsc = '';
             curItemHandle = folders[idx].h;
-            undecryptableClass = '';
-            titleTooltip = [];
-            fIcon = '';
+            containsc = this.tree[curItemHandle] || '';
+            name = folders[idx].name;
 
-            fName = folders[idx].name;
-
-            // Undecryptable node indicators
-            if (missingkeys[curItemHandle]) {
-                undecryptableClass = 'undecryptable';
-                fName = l[8686];
-                fIcon = 'generic';
-            }
-
-            if (this.tree[curItemHandle]) {
-                containsc = 'contains-folders';
-            }
-            if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[curItemHandle]) {
-                buildnode = !!containsc;
-            }
-            if (buildnode) {
-                ulc = 'class="opened"';
-                expandedc = 'expanded';
-            }
-            else if (Object(fmconfig.treenodes).hasOwnProperty(curItemHandle)) {
-                fmtreenode(curItemHandle, false);
-            }
-
-            // Check is there a full and pending share available, exclude public link shares i.e. 'EXP'
-            // if (this.d[curItemHandle].su) {
-            if (folders[idx].su || Object(M.c.shares[curItemHandle]).su) {
-                sharedfolder = ' inbound-share';
-            }
-            else if (folders[idx].t & M.IS_SHARED) {
-                sharedfolder = ' shared-folder';
-            }
-            else if (mega.megadrop.pufs[curItemHandle] && mega.megadrop.pufs[curItemHandle].s !== 1) {
-                sharedfolder = ' puf-folder';
-            }
-            else {
-                sharedfolder = '';
-            }
-            openedc = (M.currentdirid === curItemHandle) ? 'opened' : '';
-
-            var k = $('#' + _li + curItemHandle).length;
-
-            if (k) {
+            if (Object(fmconfig.treenodes).hasOwnProperty(curItemHandle)) {
                 if (containsc) {
-                    $('#' + _li + curItemHandle + ' .nw-fm-tree-item').addClass(containsc)
-                        .find('span').eq(0).addClass('nw-fm-arrow-icon');
+                    buildnode = true;
                 }
                 else {
-                    $('#' + _li + curItemHandle + ' .nw-fm-tree-item').removeClass('contains-folders')
-                        .find('span').eq(0).removeClass('nw-fm-arrow-icon');
+                    fmtreenode(curItemHandle, false);
+                }
+            }
+
+            if ((node = document.getElementById(_li + curItemHandle))) {
+
+                if ((node = node.querySelector('.nw-fm-tree-item'))) {
+
+                    if (containsc) {
+                        node.classList.add('contains-folders');
+                    }
+                    else {
+                        node.classList.remove('contains-folders');
+                    }
+
+                    if ((node = node.querySelector('span'))) {
+                        if (containsc) {
+                            node.classList.add('nw-fm-arrow-icon');
+                        }
+                        else {
+                            node.classList.remove('nw-fm-arrow-icon');
+                        }
+                    }
                 }
             }
             else {
 
+                node = this.tree$tmpl.cloneNode(true);
+                node.id = _li + curItemHandle;
+                node = node.lastElementChild;
+                node.id = _sub + curItemHandle;
+                if (buildnode) {
+                    node.classList.add('opened');
+                }
+
+                node = node.parentNode.firstElementChild;
+                node.id = _a + curItemHandle;
+                if (buildnode) {
+                    node.classList.add('expanded');
+                }
+                if (containsc) {
+                    node.classList.add('contains-folders');
+                    node.firstElementChild.classList.add('nw-fm-arrow-icon');
+                }
+                if (M.currentdirid === curItemHandle) {
+                    node.classList.add('opened');
+                }
+                if (folders[idx].t & M.IS_LINKED) {
+                    node.classList.add('linked');
+                }
+
+                var titleTooltip = [];
                 if (folders[idx].t & M.IS_TAKENDOWN) {
                     titleTooltip.push(l[7705]);
                 }
-
-                if (undecryptableClass) {
-                    // Undecryptable
+                if (missingkeys[curItemHandle]) {
+                    node.classList.add('undecryptable');
                     titleTooltip.push(l[8595]);
+                    name = l[8686];
                 }
-                titleTooltip = titleTooltip.map(escapeHTML).join("\n");
+                if (titleTooltip.length) {
+                    node.setAttribute('title', titleTooltip.map(escapeHTML).join("\n"));
+                }
 
-                sExportLink = folders[idx].t & M.IS_LINKED ? 'linked' : '';
-                arrowIcon = containsc ? 'class="nw-fm-arrow-icon"' : '';
+                node = node.querySelector('.nw-fm-tree-folder');
+                if (folders[idx].su || Object(M.c.shares[curItemHandle]).su) {
+                    node.classList.add('inbound-share');
+                }
+                else if (folders[idx].t & M.IS_SHARED) {
+                    node.classList.add('shared-folder');
+                }
+                else if (mega.megadrop.pufs[curItemHandle] && mega.megadrop.pufs[curItemHandle].s !== 1) {
+                    node.classList.add('puf-folder');
+                }
+                node.textContent = name;
+                html = node.parentNode.parentNode;
 
+                /*
                 html = '<li id="' + _li + curItemHandle + '">' +
                     '<span  id="' + _a + curItemHandle + '"' +
                     ' class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' +
@@ -283,39 +274,56 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
                     '</span>' +
                     '<ul id="' + _sub + curItemHandle + '" ' + ulc + '></ul>' +
                     '</li>';
+                    */
 
-                if (folders[idx - 1] && $('#' + _li + folders[idx - 1].h).length > 0) {
+                if (folders[idx - 1] && (node = document.getElementById(_li + folders[idx - 1].h))) {
                     if (btd) {
-                        console.debug('Buildtree, ' + curItemHandle + ' after ' + _li + folders[idx - 1].h);
+                        console.debug('Buildtree, ' + curItemHandle + ' after ' + _li + folders[idx - 1].h, name);
                     }
-                    $('#' + _li + folders[idx - 1].h).after(html);
-                }
-                else if (idx === 0 && $('#' + _sub + n.h + ' li').length > 0) {
-                    if (btd) {
-                        console.debug('Buildtree, ' + curItemHandle + ' before ' + _sub + n.h);
-                    }
-                    $($('#' + _sub + n.h + ' li')[0]).before(html);
+                    $(node).after(html);
                 }
                 else {
-                    if (btd) {
-                        console.debug('Buildtree, ' + curItemHandle + ' append ' + _sub + n.h);
+                    node = document.getElementById(_sub + n.h);
+
+                    if (idx === 0 && (i = node && node.querySelector('li'))) {
+                        if (btd) {
+                            console.debug('Buildtree, ' + curItemHandle + ' before ' + _sub + n.h, name);
+                        }
+                        $(i).before(html);
                     }
-                    $('#' + _sub + n.h).append(html);
+                    else {
+                        if (btd) {
+                            console.debug('Buildtree, ' + curItemHandle + ' append ' + _sub + n.h, name);
+                        }
+                        $(node).append(html);
+                    }
                 }
             }
 
             if (_ts_l) {
-                if (fName.toLowerCase().indexOf(_ts_l) === -1) {
-                    $('#' + _li + curItemHandle).addClass('tree-item-on-search-hidden');
+                if (name.toLowerCase().indexOf(_ts_l) === -1) {
+                    node = document.getElementById(_li + curItemHandle);
+                    if (node) {
+                        node.classList.add('tree-item-on-search-hidden');
+                    }
+
+                    // TODO: calculate the actual deepest folder and base this on it.
+                    buildnode = sDeepIndex < 6;
                 }
                 else {
-                    $('#' + _li + curItemHandle).parents('li').removeClass('tree-item-on-search-hidden');
+                    buildnode = false;
+                    $(document.getElementById(_a + curItemHandle))
+                        .parents('li').removeClass('tree-item-on-search-hidden').each(expand)
+                        .parents('ul').addClass('opened');
                 }
             }
+
             if (buildnode) {
-                _buildtree.call(this, folders[idx], dialog, stype);
+                M.buildtree(folders[idx], dialog, stype, sDeepIndex + 1);
             }
 
+            /*
+             * XXX: if this was really needed, add it at DOM node creation
             if (fminitialized) {
                 var currNode = M.d[curItemHandle];
 
@@ -326,7 +334,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
                 if (currNode && currNode.lbl) {
                     M.colourLabelDomUpdate(curItemHandle, currNode.lbl);
                 }
-            }
+            }*/
         }// END of for folders loop
     }
 
@@ -334,7 +342,9 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
         console.groupEnd();
     }
 
-    return MegaPromise.resolve();
+    if (!sDeepIndex && d) {
+        console.timeEnd('buildtree');
+    }
 };
 
 MegaData.prototype.buildtree.FORCE_REBUILD = 34675890009;
@@ -381,19 +391,25 @@ MegaData.prototype.treeSearchUI = function() {
     $('.nw-fm-tree-header input').unbind('keyup').unbind('blur');
 
     var treeredraw = function() {
+        var flag;
+
+        if (!treesearch) {
+            flag = M.buildtree.FORCE_REBUILD;
+        }
+
         $('li.tree-item-on-search-hidden').removeClass('tree-item-on-search-hidden');
 
         if (M.currentrootid === M.RootID) {
-            M.buildtree(M.d[M.RootID]);
+            M.buildtree(M.d[M.RootID], flag);
         }
         if (M.currentrootid === M.InboxID) {
-            M.buildtree(M.d[M.InboxID]);
+            M.buildtree(M.d[M.InboxID], flag);
         }
         else if (M.currentrootid === M.RubbishID) {
-            M.buildtree({h: M.RubbishID});
+            M.buildtree({h: M.RubbishID}, flag);
         }
         else if (M.currentrootid === 'shares') {
-            M.buildtree({h: 'shares'});
+            M.buildtree({h: 'shares'}, flag);
         }
         else if (M.currentrootid === 'contacts') {
             M.contacts();
@@ -415,12 +431,16 @@ MegaData.prototype.treeSearchUI = function() {
         $('.nw-fm-tree-header').rebind('click', function(e) {
             var $self = $(this);
 
-            var targetClass = $(e.target).attr('class'),
-                filledInput = $self.attr('class'),
-                $input = $self.find('input');
+            var targetClass = $(e.target).attr('class');
+            var filledInput = $self.attr('class');
+            var $input = $self.find('input');
 
+            // If plus button is clicked
+            if (targetClass && (targetClass.indexOf('button') > -1)) {
+                return false;
+            }
             // Search icon visible
-            if (targetClass && (targetClass.indexOf('nw-fm-search-icon') > -1)) {
+            else if (targetClass && (targetClass.indexOf('nw-fm-search-icon') > -1)) {
 
                 // Remove previous search text
                 if (filledInput && (filledInput.indexOf('filled-input') > -1)) {
@@ -447,25 +467,26 @@ MegaData.prototype.treeSearchUI = function() {
             .prop('readonly', false)
             .rebind('keyup', function(e) {
                 var $self = $(this);
-
                 var $parentElem = $self.parent();
 
-                if (e.keyCode === 27) {
-                    $parentElem.removeClass('filled-input');
-                    $self.val('');
-                    $self.blur();
-                    treesearch = false;
-                }
-                else {
-                    $parentElem.addClass('filled-input');
-                    treesearch = $self.val();
-                }
+                delay('treesearch:keyup', function() {
+                    if (e.keyCode === 27) {
+                        $parentElem.removeClass('filled-input');
+                        $self.val('');
+                        $self.blur();
+                        treesearch = false;
+                    }
+                    else {
+                        $parentElem.addClass('filled-input');
+                        treesearch = $self.val();
+                    }
 
-                if ($self.val() === '') {
-                    $parentElem.removeClass('filled-input');
-                }
+                    if ($self.val() === '') {
+                        $parentElem.removeClass('filled-input');
+                    }
 
-                treeredraw();
+                    treeredraw();
+                });
             })
             .rebind('blur', function() {
                 var $self = $(this);

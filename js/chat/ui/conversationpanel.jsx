@@ -83,8 +83,6 @@ var ConversationRightArea = React.createClass({
         }
         self._wasAppendedEvenOnce = true;
 
-        var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
-
         var disabledCalls = room.isReadOnly() || !room.chatId || room.callManagerCall;
 
 
@@ -114,13 +112,11 @@ var ConversationRightArea = React.createClass({
                 <i className="small-icon video-call"></i>
                 {__(l[5897])}
             </div>;
-
+        var AVseperator = <div className="chat-button-seperator"></div>;
         var endCallButton =
-                    <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
-                        if (contact.presence && contact.presence !== "offline") {
-                            if (room.callManagerCall) {
-                                room.callManagerCall.endCall();
-                            }
+                    <div className={"link-button red"} onClick={() => {
+                        if (room.callManagerCall) {
+                            room.callManagerCall.endCall();
                         }
                     }}>
             <i className="small-icon horizontal-red-handset"></i>
@@ -148,8 +144,9 @@ var ConversationRightArea = React.createClass({
             )   :
             room.getParticipants();
 
-        array.remove(excludedParticipants, u_handle, false);
-
+        if (excludedParticipants.indexOf(u_handle) >= 0) {
+            array.remove(excludedParticipants, u_handle, false);
+        }
         var dontShowTruncateButton = false;
         if (
             !room.iAmOperator() ||
@@ -201,43 +198,43 @@ var ConversationRightArea = React.createClass({
                         members={room.members}
                         isCurrentlyActive={room.isCurrentlyActive}
                     />
-
+                    <ButtonsUI.Button
+                        className="add-chat-contact"
+                        label={__(l[8007])}
+                        contacts={this.props.contacts}
+                        disabled={
+                            /* Disable in case I don't have any more contacts to add ... */
+                            !(
+                                !self.allContactsInChat(excludedParticipants) &&
+                                !room.isReadOnly() &&
+                                room.iAmOperator()
+                            )
+                        }
+                        >
+                        <DropdownsUI.DropdownContactsSelector
+                            contacts={this.props.contacts}
+                            megaChat={this.props.megaChat}
+                            chatRoom={room}
+                            exclude={
+                                excludedParticipants
+                            }
+                            multiple={true}
+                            className="popup add-participant-selector"
+                            singleSelectedButtonLabel={__(l[8869])}
+                            multipleSelectedButtonLabel={__(l[8869])}
+                            nothingSelectedButtonLabel={__(l[8870])}
+                            onSelectDone={this.props.onAddParticipantSelected}
+                            positionMy="center top"
+                            positionAt="left bottom"
+                            />
+                    </ButtonsUI.Button>
                     <div className="buttons-block">
+                        <div className="chat-right-head-txt">
+                            Options
+                        </div>
                         {room.type !== "group" ? startAudioCallButton : null}
                         {room.type !== "group" ? startVideoCallButton : null}
-
-                        <ButtonsUI.Button
-                            className="link-button dropdown-element"
-                            icon="rounded-grey-plus"
-                            label={__(l[8007])}
-                            contacts={this.props.contacts}
-                            disabled={
-                                /* Disable in case I don't have any more contacts to add ... */
-                                !(
-                                    !self.allContactsInChat(excludedParticipants) &&
-                                    !room.isReadOnly() &&
-                                    room.iAmOperator()
-                                )
-                            }
-                            >
-                            <DropdownsUI.DropdownContactsSelector
-                                contacts={this.props.contacts}
-                                megaChat={this.props.megaChat}
-                                chatRoom={room}
-                                exclude={
-                                    excludedParticipants
-                                }
-                                multiple={true}
-                                className="popup add-participant-selector"
-                                singleSelectedButtonLabel={__(l[8869])}
-                                multipleSelectedButtonLabel={__(l[8869])}
-                                nothingSelectedButtonLabel={__(l[8870])}
-                                onSelectDone={this.props.onAddParticipantSelected}
-                                positionMy="center top"
-                                positionAt="left bottom"
-                                />
-                        </ButtonsUI.Button>
-
+                        {room.type !== "group" ? AVseperator : null}
                         {
                             room.type == "group" ?
                             (
@@ -291,6 +288,27 @@ var ConversationRightArea = React.createClass({
                             }}>
                                 <i className="small-icon clear-arrow"></i>
                                 {__(l[8871])}
+                            </div>
+                        }
+                        {<div className="chat-button-seperator"></div>}
+                        {
+                            <div className={"link-button"}
+                                 onClick={(e) => {
+                                    if ($(e.target).closest('.disabled').size() > 0) {
+                                        return false;
+                                    }
+                                    if (room.isArchived()) {
+                                        if (self.props.onUnarchiveClicked) {
+                                           self.props.onUnarchiveClicked();
+                                        }
+                                    } else {
+                                        if (self.props.onArchiveClicked) {
+                                           self.props.onArchiveClicked();
+                                        }
+                                    }
+                            }}>
+                                <i className={"small-icon " +  ((room.isArchived()) ? "unarchive" : "archive")}></i>
+                                {room.isArchived() ? __(l[19065]) : __(l[16689])}
                             </div>
                         }
                         { room.type === "group" ? (
@@ -665,7 +683,7 @@ var ConversationAudioVideoPanel = React.createClass({
                     <i className="tiny-icon grey-minus-icon" />
                 </div>
                 <ContactsUI.Avatar
-                    contact={M.u[u_handle]} className="call semi-big-avatar"
+                    contact={M.u[u_handle]} className="call avatar-wrapper semi-big-avatar"
                     style={{display: !this.state.localMediaDisplay ? "none" : ""}}
                 />
             </div>;
@@ -702,7 +720,7 @@ var ConversationAudioVideoPanel = React.createClass({
             // TODO: When rtc is ready
             var contact = M.u[participants[0]];
             remotePlayerElement = <div className="call user-audio">
-                <ContactsUI.Avatar contact={contact}  className="big-avatar" hideVerifiedBadge={true} />
+                <ContactsUI.Avatar contact={contact}  className="avatar-wrapper big-avatar" hideVerifiedBadge={true} />
             </div>;
         }
         else {
@@ -857,6 +875,9 @@ var ConversationPanel = React.createClass({
             if (self.messagesListScrollable) {
                 self.messagesListScrollable.scrollToBottom();
             }
+        });
+        self.props.chatRoom.rebind('openSendFilesDialog', function(e) {
+            self.setState({'attachCloudDialog': true});
         });
 
         self.eventuallyInit();
@@ -1412,6 +1433,14 @@ var ConversationPanel = React.createClass({
                     }
                 }
 
+                if (
+                    v.dialogType === "remoteCallEnded" &&
+                    v &&
+                    v.wrappedChatDialogMessage
+                ) {
+                    v = v.wrappedChatDialogMessage;
+                }
+
 
                 if (v.dialogType) {
                     var messageInstance = null;
@@ -1484,6 +1513,7 @@ var ConversationPanel = React.createClass({
                                     self.lastScrollPositionPerc = 1;
                                 }
                                 else if (messageContents) {
+                                    $(room).trigger('onMessageUpdating', v);
                                     room.megaChat.plugins.chatdIntegration.updateMessage(
                                         room,
                                         v.internalId ? v.internalId : v.orderValue,
@@ -1491,7 +1521,10 @@ var ConversationPanel = React.createClass({
                                     );
                                     if (
                                         v.getState &&
-                                        v.getState() === Message.STATE.NOT_SENT &&
+                                        (
+                                            v.getState() === Message.STATE.NOT_SENT ||
+                                            v.getState() === Message.STATE.SENT
+                                        ) &&
                                         !v.requiresManualRetry
                                     ) {
                                         if (v.textContents) {
@@ -1517,6 +1550,8 @@ var ConversationPanel = React.createClass({
                                                 messageContents
                                             ]
                                         );
+
+                                        megaChat.plugins.richpreviewsFilter.processMessage({}, v);
                                     }
 
                                     self.messagesListScrollable.scrollToBottom(true);
@@ -1621,6 +1656,9 @@ var ConversationPanel = React.createClass({
                         msg.getState() === Message.STATE.DELIVERED ||
                         msg.getState() === Message.STATE.NOT_SENT) {
                         chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
+                        msg.deleted = true;
+                        msg.textContents = "";
+                        room.messagesBuff.removeMessageById(msg.messageId);
                     }
                     else if (
                         msg.getState() === Message.STATE.NOT_SENT_EXPIRED
@@ -1744,6 +1782,7 @@ var ConversationPanel = React.createClass({
                 chatRoom={room}
                 title={__(l[8871])}
                 name="truncate-conversation"
+                dontShowAgainCheckbox={false}
                 onClose={() => {
                     self.setState({'truncateDialog': false});
                 }}
@@ -1761,6 +1800,60 @@ var ConversationPanel = React.createClass({
 
                     <div className="dialog secondary-header">
                         {__(l[8881])}
+                    </div>
+                </div>
+            </ModalDialogsUI.ConfirmDialog>
+        }
+        if (self.state.archiveDialog === true) {
+            confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
+                megaChat={room.megaChat}
+                chatRoom={room}
+                title={__(l[19068])}
+                name="archive-conversation"
+                onClose={() => {
+                    self.setState({'archiveDialog': false});
+                }}
+                onConfirmClicked={() => {
+                    self.scrolledToBottom = true;
+
+                    room.archive();
+
+                    self.setState({
+                        'archiveDialog': false
+                    });
+                }}
+            >
+                <div className="fm-dialog-content">
+
+                    <div className="dialog secondary-header">
+                        {__(l[19069])}
+                    </div>
+                </div>
+            </ModalDialogsUI.ConfirmDialog>
+        }
+        if (self.state.unarchiveDialog === true) {
+            confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
+                megaChat={room.megaChat}
+                chatRoom={room}
+                title={__(l[19063])}
+                name="unarchive-conversation"
+                onClose={() => {
+                    self.setState({'unarchiveDialog': false});
+                }}
+                onConfirmClicked={() => {
+                    self.scrolledToBottom = true;
+
+                    room.unarchive();
+
+                    self.setState({
+                        'unarchiveDialog': false
+                    });
+                }}
+            >
+                <div className="fm-dialog-content">
+
+                    <div className="dialog secondary-header">
+                        {__(l[19064])}
                     </div>
                 </div>
             </ModalDialogsUI.ConfirmDialog>
@@ -1867,7 +1960,6 @@ var ConversationPanel = React.createClass({
             additionalClass = " small-block";
         }
 
-        var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
 
         return (
             <div className={conversationPanelClasses} onMouseMove={self.onMouseMove}
@@ -1884,6 +1976,12 @@ var ConversationPanel = React.createClass({
                         }}
                         onTruncateClicked={function() {
                             self.setState({'truncateDialog': true});
+                        }}
+                        onArchiveClicked={function() {
+                            self.setState({'archiveDialog': true});
+                        }}
+                        onUnarchiveClicked={function() {
+                            self.setState({'unarchiveDialog': true});
                         }}
                         onRenameClicked={function() {
                             self.setState({
@@ -2184,13 +2282,11 @@ var ConversationPanels = React.createClass({
             var contactsList = [];
             var contactsListOffline = [];
 
-
             if (hadLoaded) {
                 self.props.contacts.forEach(function (contact) {
                     if (contact.u === u_handle) {
                         return;
                     }
-
                     if(contact.c === 1) {
                         var pres = self.props.megaChat.userPresenceToCssClass(contact.presence);
 
@@ -2230,7 +2326,7 @@ var ConversationPanels = React.createClass({
         }
         else {
             return (
-                <div className="conversation-panels">
+                <div className={"conversation-panels " + self.props.className}>
                     {conversations}
                 </div>
             );

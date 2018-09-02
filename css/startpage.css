@@ -308,7 +308,7 @@
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-.reg-st3-membership-icon, .membership-icon, .mobile.membership-icon, .pro-icon, div.pro-feature-icon, .startpage.mega-logo, .startpage.upload-cloud-icon, .bottom-page.scroll-icon, .startpage.white-question, .pages-nav.nav-icon, .bottom-page.big-icon, .startpage.medium-icon, .small-red-link i, .flip-bg, .startpage.quote-icon, .bottom-menu.logo, .loginrequired-dialog .fm-notification-icon, .top-arrow-icon, .mobile.icon {
+.reg-st3-membership-icon, .membership-icon, .mobile.membership-icon, .pro-icon, div.pro-feature-icon, .startpage.mega-logo, .startpage.upload-cloud-icon, .startpage.white-question, .pages-nav.nav-icon, .bottom-page.big-icon, .startpage.medium-icon, .small-red-link i, .flip-bg, .startpage.quote-icon, .bottom-menu.logo, .loginrequired-dialog .fm-notification-icon, .top-arrow-icon, .mobile.icon {
     background-image: url(../images/mega/startpage-sprite_v6@2x.png) !important;
     background-size: 267px auto;
 }
@@ -440,7 +440,7 @@
 .mobile-apps-button.wp {
     width: 220px;
     height: 64px;
-    background-position: 5px -777px;
+    background-position: 11px -644px;
     background-size: 210px auto;
 }
 .mobile.logged .startpage .mobile-apps-button {

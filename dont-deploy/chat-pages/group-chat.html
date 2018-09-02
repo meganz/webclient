@@ -22,7 +22,7 @@
 <body>
 
 <!-- Group chat dropdown. Remove style attr (its just an example !-->
-<div class="dropdown body contact-card-dropdown" style="right: 4px; top: 195px;">
+<div class="dropdown body contact-card-dropdown hidden" style="right: 4px; top: 195px;">
     <div class="dropdown-item">
         <i class="small-icon human-profile"></i>
         <span>View Profile</span>
@@ -91,8 +91,16 @@
     <div class="fm-right-files-block">
         
         <!-- Chat content block !-->
+        <!-- Add private-chat class to swap between white and blue backgrounds -->
         <div class="chat-content-block">
-    
+            <!-- Chat heading block -->
+
+            <div class="chat-heading-area">
+                <div class="chat-heading">
+                    <span>Group Chat Heading</span>
+                     <i class="small-icon video-call"></i>
+                </div>
+            </div>
             <!-- Right contacts block !-->
             <div class="chat-right-area">
                 <!-- jScrollPane block !-->
@@ -105,7 +113,7 @@
                                 3
                             </div>
                             <div class="chat-right-head-txt">
-                                Group members
+                                Members
                             </div>
                         </div>
                         <!-- End of Group chat header !-->
@@ -115,9 +123,7 @@
                             <div  class="chat-contacts-list-inner">
                             
                                 <div class="contacts-info body">
-                                    <!-- Please add "online/away/busy/offline" classname !-->
-                                    <div class="user-card-presence online"></div>
-                                    <div class="small-rounded-avatar"><img alt="" src="../../images/temp/avatar-img.jpg" /></div>
+                                    <div class="small-rounded-avatar square-avatar"></div>
                                     
                                     <div class="button icon-dropdown">
                                         <i class="small-icon cogwheel-icon"></i>
@@ -125,14 +131,13 @@
                                     
                                     <div class="user-card-data">
                                         <div class="user-card-name">Bruce Schneider</div>
-                                        <div class="user-card-email">bs@mega.co.nz</div>
+                                        <!-- Please add "online/away/busy/offline" classname !-->
+                                        <div class="user-card-presence online"></div>
                                     </div>
                                 </div>
                                 
                                 <div class="contacts-info body">
-                                    <!-- Please add "online/away/busy/offline" classname !-->
-                                    <div class="user-card-presence online"></div>
-                                    <div class="small-rounded-avatar"><img alt="" src="../../images/temp/avatar-img.jpg" /></div>
+                                    <div class="small-rounded-avatar square-avatar"></div>
                                     
                                     <div class="button icon-dropdown active">
                                         <i class="small-icon conversation-icon"></i>
@@ -140,14 +145,14 @@
                                     
                                     <div class="user-card-data">
                                         <div class="user-card-name">Clifford Cocks</div>
-                                        <div class="user-card-email">cc@mega.co.nz</div>
+                                        <!-- Please add "online/away/busy/offline" classname !-->
+                                    <div class="user-card-presence online"></div>
                                     </div>
+
                                 </div>
                                 
                                 <div class="contacts-info body">
-                                    <!-- Please add "online/away/busy/offline" classname !-->
-                                    <div class="user-card-presence online"></div>
-                                    <div class="small-rounded-avatar"><img alt="" src="../../images/temp/avatar-img.jpg" /></div>
+                                    <div class="small-rounded-avatar square-avatar"></div>
                                     
                                     <div class="button icon-dropdown">
                                         <i class="small-icon eye-icon"></i>
@@ -155,15 +160,29 @@
                                     
                                     <div class="user-card-data">
                                         <div class="user-card-name">David Chaum</div>
-                                        <div class="user-card-email">dc@mega.co.nz</div>
+                                         <!-- Please add "online/away/busy/offline" classname !-->
+                                        <div class="user-card-presence online"></div>
                                     </div>
-                                </div>
-                                
+                                   
+                                </div> 
+                            </div>
+                            <div class="add-chat-contact">
+                                Add more people…
+                            </div>
+                            <div class="public-observer-block">
+                            <div class="chat-white-counter">
+                                3
+                            </div>
+                            <div class="chat-right-head-txt">
+                                Observers
                             </div>
                         </div>
-                        
+                        </div>
+
                         <div class="buttons-block">
-             
+                            <div class="chat-right-head-txt">
+                                Options
+                            </div>
                             <div class="link-button">
                                 <i class="small-icon audio-call"></i>
                                 <span>Start audio call</span>
@@ -172,17 +191,35 @@
                                 <i class="small-icon video-call"></i>
                                 <span>Start video call</span>
                             </div>
+                            <div class="chat-button-seperator"></div>
                             <div class="button link-button dropdown-element">
-                                <i class="small-icon rounded-grey-plus"></i>
-                                <span>Add participant...</span>
+                                <i class="small-icon rounded-grey-up-arrow"></i>
+                                <span>Make Private</span>
+                            </div>
+                            <div class="button link-button dropdown-element">
+                                <i class="small-icon icons-sprite writing-pencil"></i>
+                                <span>Rename Group</span>
+                            </div>
+                            <div class="button link-button dropdown-element">
+                                <i class="small-icon context get-link"></i>
+                                <span>Get Chat Link</span>
                             </div>
                             <div class="button link-button dropdown-element">
                                 <i class="small-icon rounded-grey-up-arrow"></i>
                                 <span>Send files...</span>
                             </div>
+                            <div class="link-button">
+                                <i class="small-icon small-icon clear-arrow"></i>
+                                <span>Clear chat history</span>
+                            </div>
+                            <div class="chat-button-seperator"></div>
+                            <div class="link-button">
+                                <i class="small-icon small-icon clear-arrow"></i>
+                                <span>Archive</span>
+                            </div>
                             <div class="link-button red">
                                 <i class="small-icon rounded-stop"></i>
-                                <span>Truncate</span>
+                                <span>Leave Chat</span>
                             </div>
                             
                         </div>
@@ -260,10 +297,14 @@
                     </div>
                 </div>
                 
-                
+                <div class="join-chat-block">
+                    <div class="join-chat-button">
+                        Join Chat!
+                    </div>
+                </div>
                 <!-- Chat textarea component !-->
                 <div class="chat-textarea-block">
-                	
+                
                     <!-- Typing component !-->
                     <div class="typing-block">
                     	<div class="typing-text">Bruce, Clifford and David are typing</div>

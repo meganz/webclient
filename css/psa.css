@@ -1,0 +1,160 @@
+/**
+ * CSS for the Public Service Announcement for desktop and mobile
+ */
+.bottom-info.body {
+    background: #ffffff;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlZWVlZWUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top, #ffffff 0%, #eeeeee 100%);
+    background: -webkit-linear-gradient(top, #ffffff 0%, #eeeeee 100%);
+    background: linear-gradient(to bottom, #ffffff 0%, #eeeeee 100%);
+    padding: 16px;
+    display: none;
+    position: absolute;
+    bottom: 0;
+    z-index: 1400;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+.notification .bottom-info.body {
+    display: table;
+}
+.notification .fmholder {
+    height: 100%;
+    height: -webkit-calc(100% -120px);
+    height: -moz-calc(100% - 120px);
+    height: calc(100% - 120px);
+}
+.notification .st-main-block {
+    height: 100%;
+    height: -webkit-calc(100% + 52px);
+    height: -moz-calc(100% + 52px);
+    height: calc(100% + 52px);
+}
+.notification .st-full-block {
+    padding: 20px 0 50px 0;
+}
+.bottom-info.body::before {
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC4wNSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.05) 100%);
+    background: -webkit-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.05) 100%);
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.05) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#0d000000', GradientType=0 );
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 8px;
+    top: -8px;
+    left: 0;
+}
+.bottom-info.content {
+    display: table;
+    margin: 0 auto;
+}
+.bottom-info.column {
+    display: table-cell;
+    vertical-align: middle;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 50px 0 24px;
+    font-size: 0;
+    line-height: 0;
+    height: 70px;
+}
+.bottom-info.column:first-child, .bottom-info.column:last-child {
+    width: 66px;
+    padding: 0;
+}
+.bottom-info.column:last-child {
+    white-space: nowrap;
+}
+.bottom-info.display-icon {
+    width: 128px;
+    height: 128px;
+}
+.bottom-info.content h4 {
+    color: #667;
+    font-size: 18px;
+    line-height: 23px;
+    font-family: 'source_sans_proregular', sans-serif;
+    font-weight: normal;
+    padding: 0;
+    margin: 0;
+}
+.bottom-info.content .messageA {
+    color: #999;
+    font-family: 'source_sans_proregular', sans-serif;
+    font-size: 14px;
+    line-height: 18px;
+    margin: 5px 0 0 0;
+}
+.bottom-info.button {
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 3px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FCFCFC 100%);
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    color: #777;
+    cursor: pointer;
+    display: inline-block;
+    font-family: 'source_sans_proregular', sans-serif;
+    font-size: 14px;
+    line-height: 18px;
+    padding: 8px 25px;
+    margin: 15px 0 0 0;
+}
+.bottom-info.button:hover {
+    background-color: #686565;
+}
+.bottom-info.fm-dialog-close {
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
+    background-position: -53px -4825px;
+    background-image: url(../images/mega/dialog-sprite_v2.png);
+    background-repeat: no-repeat;
+    position: absolute;
+    right: 10px;
+    top: 11px;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.5;
+    z-index: 10;
+}
+
+/* Mobile tweaks */
+.mobile.notification .fmholder {
+    height: 100%;
+}
+.mobile.bottom-info.display-icon {
+    width: 64px;
+    height: 64px;
+}
+.mobile.bottom-info.fm-dialog-close {
+    left: initial;
+    right: 3px;
+    top: 5px;
+    margin: 0;
+}
+.mobile.bottom-info.content h4 {
+    font-size: 16px;
+}
+.mobile.bottom-info.content .messageA {
+    font-size: 14px;
+}
+.mobile.bottom-info.body {
+    bottom: 0;
+}
+.mobile.bottom-info.column.text-column {
+    padding: 0 24px 0 24px;
+}

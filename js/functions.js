@@ -140,6 +140,11 @@ function easeOutCubic(t, b, c, d) {
 }
 
 function ellipsis(text, location, maxCharacters) {
+    "use strict";
+    if (!text) {
+        return "";
+    }
+
     if (text.length > 0 && text.length > maxCharacters) {
         if (typeof location === 'undefined') {
             location = 'end';
@@ -173,9 +178,25 @@ function megatitle(nperc) {
     }
 }
 
+// Set Recieved Contacts indicator
+function updateIpcRequests() {
+    var $indicator = $('.contacts-indicator');
+    var $contactTab = $('.contacts-tab-lnk.ipc');
+    var ipcLength = Object.keys(M.ipc).length;
+
+    if (ipcLength) {
+        $indicator.removeClass('hidden').text(ipcLength);
+        $contactTab.addClass('filled').find('span').text(ipcLength);
+    }
+    else {
+        $indicator.addClass('hidden').text('');
+        $contactTab.removeClass('filled').find('span').text('');
+    }
+}
+
 function countrydetails(isocode) {
     var cdetails = {
-        name: isoCountries[isocode],
+        name: M.getCountryName(isocode),
         icon: isocode.toLowerCase() + '.gif'
     };
     return cdetails;
@@ -204,7 +225,9 @@ function numOfBytes(bytes, precision) {
     return { size: parts[0], unit: parts[1] || 'B' };
 }
 
-function bytesToSize(bytes, precision, html_format) {
+function bytesToSize(bytes, precision, format) {
+    'use strict'; /* jshint -W074 */
+
     var s_b = 'B';
     var s_kb = 'KB';
     var s_mb = 'MB';
@@ -228,6 +251,7 @@ function bytesToSize(bytes, precision, html_format) {
     var petabyte = terabyte * 1024;
     var resultSize = 0;
     var resultUnit = '';
+    var capToMB = false;
 
     if (precision === undefined) {
         if (bytes > gigabyte) {
@@ -238,9 +262,14 @@ function bytesToSize(bytes, precision, html_format) {
         }
     }
 
+    if (format < 0) {
+        format = 0;
+        capToMB = true;
+    }
+
     if (!bytes) {
         resultSize = 0;
-        resultUnit = s_mb;
+        resultUnit = s_b;
     }
     else if ((bytes >= 0) && (bytes < kilobyte)) {
         resultSize = parseInt(bytes);
@@ -250,7 +279,7 @@ function bytesToSize(bytes, precision, html_format) {
         resultSize = (bytes / kilobyte).toFixed(precision);
         resultUnit = s_kb;
     }
-    else if ((bytes >= megabyte) && (bytes < gigabyte)) {
+    else if ((bytes >= megabyte) && (bytes < gigabyte) || capToMB) {
         resultSize = (bytes / megabyte).toFixed(precision);
         resultUnit = s_mb;
     }
@@ -272,10 +301,10 @@ function bytesToSize(bytes, precision, html_format) {
     }
 
     // XXX: If ever adding more HTML here, make sure it's safe and/or sanitize it.
-    if (html_format === 2) {
+    if (format === 2) {
         return resultSize + '<span>' + resultUnit + '</span>';
     }
-    else if (html_format) {
+    else if (format) {
         return '<span>' + resultSize + '</span>' + resultUnit;
     }
     else {
@@ -1000,21 +1029,10 @@ function moveCursortoToEnd(el) {
 }
 
 function asyncApiReq(data) {
-    var $promise = new MegaPromise();
-    api_req(data, {
-        callback: function(r) {
-            if (typeof r === 'number' && r !== 0) {
-                $promise.reject.apply($promise, arguments);
-            }
-            else {
-                $promise.resolve.apply($promise, arguments);
-            }
-        }
-    });
+    'use strict';
 
-    //TODO: fail case?! e.g. the exp. backoff failed after waiting for X minutes??
-
-    return $promise;
+    // TODO: find&replace all occurences
+    return M.req(data);
 }
 
 // Returns pixels position of element relative to document (top left corner) OR to the parent (IF the parent and the
@@ -1130,7 +1148,6 @@ function secToDuration(s, sep) {
     }
 
     for (var i = 0; i < dur.length; i++) {
-        var unit;
         var v = dur[i];
         if (v === "0") {
             if (durStr.length !== 0 && i !== 0) {
@@ -1141,20 +1158,24 @@ function secToDuration(s, sep) {
             }
         }
 
+        var transString = false;
         if (i === 0) {
-            unit = v !== 1 ? "hours" : "hour";
+            // hour
+            transString = v !== "1" ? l[19049].replace("%d", v) : l[19048];
         }
         else if (i === 1) {
-            unit = v !== 1 ? "minutes" : "minute";
+            // minute
+            transString = v !== "1" ? l[5837].replace("[X]", v) : l[5838];
         }
         else if (i === 2) {
-            unit = v !== 1 ? "seconds" : "second";
+            // second
+            transString = v !== "1" ? l[19046].replace("%d", v) : l[19047];
         }
         else {
             throw new Error("this should never happen.");
         }
 
-        durStr += v + " " + unit + sep;
+        durStr += transString + sep;
     }
 
     return durStr.replace(secToDuration.regExp[sep], "");
@@ -1604,7 +1625,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 var inRub = (M.RubbishID === M.currentrootid);
 
                 handles.map(function(handle) {
-                    M.delNode(handle, true);    // must not update DB pre-API
+                    // M.delNode(handle, true);    // must not update DB pre-API
                     api_req({a: 'd', n: handle/*, i: requesti*/});
 
                     if (inRub) {
@@ -1784,10 +1805,10 @@ function rand_range(a, b) {
  *  2. The form needs to be filled and visible when this function is called
  *  3. After this function is called, within the next second the form needs to be gone
  *
- * As an example take a look at the `tooltiplogin()` function in `index.js`.
+ * As an example take a look at the `tooltiplogin.init()` function in `top-tooltip-login.js`.
  *
  * @param {String|Object} form jQuery selector of the form
- * @return {Bool}   True if the password manager can be called.
+ * @return {Boolean} Returns true if the password manager can be called.
  *
  */
 function passwordManager(form) {
@@ -2574,6 +2595,64 @@ function invalidLinkError() {
         mobile.notFoundOverlay.show();
     }
 }
+
+/* jshint -W098 */
+
+/**
+ * Classifies the strength of the password (used on the main Registration, Reset password (key or park) pages and
+ * in the Pro Register dialog.
+ * @param {String} password The user's password (should be trimmed for whitespace beforehand)
+ */
+function classifyPassword(password) {
+
+    'use strict';
+
+    // Calculate the password score using the ZXCVBN library and its length
+    var passwordScore = zxcvbn(password).score;
+    var passwordLength = password.length;
+
+    if (passwordLength < security.minPasswordLength) {
+        $('.login-register-input.password').addClass('weak-password');
+        $('.new-registration').addClass('good1');
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[18700]);   // Too short
+        $('.new-reg-status-description').text(l[18701]);
+    }
+    else if (passwordScore === 4) {
+        $('.login-register-input.password').addClass('strong-password');
+        $('.new-registration').addClass('good5');
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1128]); // Strong
+        $('.new-reg-status-description').text(l[1123]);
+    }
+    else if (passwordScore === 3) {
+        $('.login-register-input.password').addClass('strong-password');
+        $('.new-registration').addClass('good4');
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1127]); // Good
+        $('.new-reg-status-description').text(l[1122]);
+    }
+    else if (passwordScore === 2) {
+        $('.login-register-input.password').addClass('strong-password');
+        $('.new-registration').addClass('good3');
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1126]); // Medium
+        $('.new-reg-status-description').text(l[1121]);
+    }
+    else if (passwordScore === 1) {
+        $('.new-registration').addClass('good2');
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1125]); // Weak
+        $('.new-reg-status-description').text(l[1120]);
+    }
+    else {
+        $('.login-register-input.password').addClass('weak-password');
+        $('.new-registration').addClass('good1');
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1124]); // Very Weak
+        $('.new-reg-status-description').text(l[1119]);
+    }
+
+    $('.password-status-warning')
+        .safeHTML('<span class="password-warning-txt">@@</span> ' +
+            '@@<div class="password-tooltip-arrow"></div>', l[34], l[1129]);
+    $('.password-status-warning').css('margin-left', ($('.password-status-warning').width() / 2 * -1) - 13);
+}
+/* jshint +W098 */
 
 /**
  * A function to get the last day of the month

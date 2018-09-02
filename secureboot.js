@@ -50,6 +50,7 @@ var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 
 var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
+var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
 
 /**
  * Check if the user is coming from a mobile device
@@ -330,6 +331,7 @@ if (!b_u) try
         d = localStorage.d | 0;
         jj = localStorage.jj;
         dd = localStorage.dd;
+
         // Write test
         localStorage['$!--foo'] = Array(100).join(",");
         delete localStorage['$!--foo'];
@@ -464,6 +466,9 @@ var mega = {
 
     maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 12),
 
+    /** An object with flags detailing which features are enabled on the API */
+    apiMiscFlags: {},
+
     /** Get browser brancd internal ID */
     getBrowserBrandID: function() {
         if (Object(window.chrome).torch) {
@@ -536,10 +541,42 @@ var mega = {
             var apiut = localStorage.apiut ? '&ut=' + localStorage.apiut : "";
             params += apiut;
 
+            params += '&lang=' + lang;
             this._urlParams = params;
         }
 
         return this._urlParams;
+    },
+
+    /**
+     * Fetches information from the API about which features are enabled
+     * @param {Function|undefined} completeCallback The function to run when the function has completed
+     */
+    getApiMiscFlags: function(completeCallback) {
+
+        'use strict';
+
+        // If the flags have already been fetched this session, don't fetch again and run the callback
+        if (Object.keys(mega.apiMiscFlags).length !== 0 && typeof completeCallback === 'function') {
+            completeCallback();
+        }
+        else {
+            // Make Get Miscellaneous Flags (gmf) API request
+            api_req({ a: 'gmf' }, {
+                callback: function(result) {
+                    if (result) {
+
+                        // Cache flags object
+                        mega.apiMiscFlags = result;
+
+                        // Run the callback
+                        if (typeof completeCallback === 'function') {
+                            completeCallback();
+                        }
+                    }
+                }
+            });
+        }
     }
 };
 
@@ -1356,8 +1393,9 @@ if (is_ios) {
  * app if any cancel, verify, fm/ipc, newsignup, recover or account links are clicked in the app
  * because the new mobile site is not designed for those yet.
  */
-if (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
-    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' || page.substr(0, 4) === 'blog')) {
+if (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' || page.substr(0, 9) === 'newsignup' ||
+    page.substr(0, 7) === 'account' || page.substr(0, 4) === 'blog' ||
+    (is_old_windows_phone && page.substr(0, 7) === 'confirm'))) {
 
     var app;
     var mobileblog;
@@ -1588,19 +1626,6 @@ else if (!b_u) {
                 return false;
             }
 
-            if (~dump.m.indexOf('took +10s'))
-            {
-                var lrc = +localStorage.ttfbReportCount || 0;
-                if (lrc > 20)
-                {
-                    var eid = localStorage.ttfbReport;
-                    localStorage.ttfbReport = sbid;
-                    if (!eid || eid == sbid) return false;
-                    lrc = 1;
-                }
-                localStorage.ttfbReportCount = lrc + 1;
-            }
-
             if (errobj)
             {
                 if (errobj.udata) dump.d = errobj.udata;
@@ -1641,6 +1666,10 @@ else if (!b_u) {
                         console.error(msg, errobj, errobj && errobj.stack, url, ln);
                         return false;
                     }
+                }
+
+                if (typeof eventlog === 'function' && !errobj.udata) {
+                    eventlog(99702, true);
                 }
             }
             if (cn) dump.c = cn;
@@ -1907,6 +1936,8 @@ else if (!b_u) {
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
+    jsl.push({f:'js/security.js', n: 'security_js', j: 1, w: 5});
+    jsl.push({f:'js/two-factor-auth.js', n: 'two_factor_auth_js', j: 1, w: 5});
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
@@ -1941,6 +1972,7 @@ else if (!b_u) {
     jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
@@ -1950,14 +1982,15 @@ else if (!b_u) {
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
+    jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
+    jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
+    jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
-        jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
-        jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
 
         // This is not used anymore, unless we process and store credit card details for renewals again
         // jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
@@ -1981,11 +2014,11 @@ else if (!b_u) {
         jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
         jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
+        jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
         jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
         jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
         jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
@@ -2005,6 +2038,7 @@ else if (!b_u) {
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
     jsl.push({f:'js/transfers/meths.js', n: 'dl_meths', j: 1, w: 3});
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
+    jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
     jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
 
     // Everything else...
@@ -2043,6 +2077,8 @@ else if (!b_u) {
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
+        jsl.push({f:'js/fm/account-change-password.js', n: 'fm_account_change_password_js', j:1});
+        jsl.push({f:'js/fm/account-change-email.js', n: 'fm_account_change_email_js', j:1});
         jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
         jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
         jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
@@ -2068,7 +2104,7 @@ else if (!b_u) {
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
 
-        jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2097,6 +2133,7 @@ else if (!b_u) {
     jsl.push({f:'js/fm/megadata/transfers.js', n: 'fm_megadata_transfers_js', j: 1});
     jsl.push({f:'js/fm/megadata/tree.js', n: 'fm_megadata_tree_js', j: 1});
     jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
+    jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -2160,6 +2197,15 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.megadrop.js', n: 'mobile_megadrop_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.js', n: 'mobile_twofactor_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.intro.js', n: 'mobile_twofactor_info_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.setup.js', n: 'mobile_twofactor_setup_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.verify-setup.js', n: 'mobile_twofactor_verify_setup_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.enabled.js', n: 'mobile_twofactor_enabled_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.verify-disable.js', n: 'mobile_twofactor_verify_disable_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.disabled.js', n: 'mobile_twofactor_disabled_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.verify-action.js', n: 'mobile_twofactor_verify_action_js', j: 1, w: 1});
     }
 
     // We need to keep a consistent order in loaded resources, so that if users
@@ -2213,6 +2259,11 @@ else if (!b_u) {
         if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
             jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j: 1});
         }
+    }
+
+    // If the TextEncoder is not supported natively (IE, Edge) then load the polyfill
+    if (typeof TextEncoder !== 'function') {
+        jsl.push({f:'js/vendor/encoding.js', n: 'encoding_js', j:1});
     }
 
     // only used on beta
@@ -2278,6 +2329,7 @@ else if (!b_u) {
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
         'tiffjs': {f:'js/vendor/tiff.js', n: 'tiffjs', j:1},
+        'webpjs': {f:'js/vendor/webp.js', n: 'webpjs', j:1},
         'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
         'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
@@ -2347,6 +2399,7 @@ else if (!b_u) {
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
             'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presInt_js', j:1, w:1},
+            'richpreviewsFilt_js': {f:'js/chat/plugins/richpreviewsFilter.js', n: 'richpreviewsFilt_js', j:1, w:1},
             'chatStats_js': {f:'js/chat/plugins/chatStats.js', n: 'chatStats_js', j:1, w:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
@@ -2947,36 +3000,133 @@ else if (!b_u) {
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
-    if (!is_drop && (u_sid = u_storage.sid))
-    {
-        loginresponse = true;
-        var lxhr = getxhr();
-        lxhr.onload = function()
-        {
-            loginresponse = false;
-            if (this.status == 200)
-            {
-                try
-                {
-                    loginresponse = this.response || this.responseText;
-                    if (loginresponse && loginresponse[0] == '[') loginresponse = JSON.parse(loginresponse);
-                    else if (parseInt(loginresponse) === -15 /* ESID */) {
+    (function _crossTabSession(u_storage) {
+        'use strict';
+
+        var xhr = function(params, data, callback) {
+            var xhr = getxhr();
+            xhr.onloadend = function() {
+                var response = false;
+
+                if (this.status === 200) {
+                    try {
+                        response = this.response || this.responseText || false;
+                        if (response[0] === '[') {
+                            response = JSON.parse(response);
+                        }
+                    }
+                    catch (ex) {
+                        console.warn(ex);
+                        response = false;
+                    }
+                }
+
+                callback(response);
+                boot_done();
+            };
+
+            xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams() + (params || ''), true);
+            xhr.send(JSON.stringify([data]));
+        };
+
+        var ack = function() {
+            if (!(u_sid = u_storage.sid)) {
+                loginresponse = false;
+            }
+
+            if (loginresponse) {
+                xhr('&sid=' + u_storage.sid, {'a': 'ug'}, function(response) {
+                    loginresponse = false;
+
+                    if (parseInt(response) === -15 /* ESID */) {
                         loginresponse = -15;
                     }
-                    else loginresponse = false;
-                }
-                catch (e) {}
+                    else if (typeof response[0] === 'object') {
+                        loginresponse = response;
+                    }
+                });
             }
+
+            if (dl_res) {
+                var g = {a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': u_sid || ''};
+
+                xhr(false, g, function(response) {
+                    dl_res = response[0] || response;
+                });
+            }
+
             boot_done();
+            ack = xhr = undefined;
         };
-        lxhr.onerror = function()
-        {
-            loginresponse= false;
-            boot_done();
-        };
-		lxhr.open('POST', apipath + 'cs?id=0&lang=' + lang + '&sid=' + u_storage.sid + mega.urlParams(), true);
-        lxhr.send(JSON.stringify([{'a':'ug'}]));
-    }
+
+        // No session handling needed for
+        if (is_drop) {
+            return;
+        }
+
+        loginresponse = true;
+        dl_res = (page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2;
+
+        if (localStorage === u_storage) {
+            ack();
+        }
+        else {
+            var onStorageEvent = function(ev) {
+                if (ev.key === 'sb!sid') {
+                    var value = JSON.parse(ev.newValue || '""');
+
+                    if (typeof value === 'number') {
+                        // Requesting session storage
+
+                        var data = {};
+
+                        if (sessionStorage.sid) {
+                            data.k = sessionStorage.k;
+                            data.sid = sessionStorage.sid;
+                        }
+
+                        onIdle(function() {
+                            localStorage.setItem('sb!sid', JSON.stringify(data));
+                        });
+                    }
+                    else if (typeof value === 'object') {
+                        // Received session storage
+
+                        if (ack) {
+                            if (value.sid) {
+                                u_storage.k = value.k;
+                                u_storage.sid = value.sid;
+                            }
+                            ack();
+                        }
+                    }
+
+                    delete localStorage[ev.key];
+                }
+            };
+
+            if (window.addEventListener) {
+                window.addEventListener('storage', onStorageEvent, false);
+            }
+            else if (window.attachEvent) {
+                window.attachEvent('onstorage', onStorageEvent);
+            }
+            onStorageEvent = undefined;
+
+            if (u_storage.sid) {
+                ack();
+            }
+            else {
+                setTimeout(function() {
+                    if (ack) {
+                        ack();
+                    }
+                    delete localStorage['sb!sid'];
+                }, 800);
+                localStorage.setItem('sb!sid', JSON.stringify(Math.random()));
+            }
+        }
+    })(u_storage);
 
     function boot_auth(u_ctx,r)
     {
@@ -2995,8 +3145,6 @@ else if (!b_u) {
             makeCache();
             return false;
         }
-
-        lxhr = dlxhr = undefined;
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
@@ -3025,31 +3173,6 @@ else if (!b_u) {
             loginresponse = undefined;
         }
         else u_checklogin({checkloginresult:boot_auth},false);
-    }
-
-    if ((page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2 && !is_drop) {
-        dl_res = true;
-        var dlxhr = getxhr();
-        dlxhr.onload = function() {
-            dl_res = false;
-            if (this.status === 200) {
-                try {
-                    dl_res = this.response || this.responseText;
-                    if (dl_res[0] == '[') dl_res = JSON.parse(dl_res);
-                    if (dl_res[0]) dl_res = dl_res[0];
-                }
-                catch (e) {}
-            }
-            boot_done();
-        };
-        dlxhr.onerror = function() {
-            dl_res= false;
-            boot_done();
-        };
-        var esid='';
-        if (u_storage.sid) esid = u_storage.sid;
-        dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
-        dlxhr.send(JSON.stringify([{a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': esid}]));
     }
 }
 

@@ -21,16 +21,16 @@ checkoutResult=$(git checkout translations)
 if [ $? -eq 0 ]; then
 
     # Clear any local changes and make sure it's up to date with the remote
-    git reset --hard origin/translations
+    git reset --hard remotes/origin/translations
     git pull
 
-    echo "Updated translations branch with latest changes from origin/translations."
+    echo "Updated translations branch with latest changes from remotes/origin/translations."
 else
     # If the checkout failed, fetch the branch from the remote server and check it out locally
     git fetch
-    git checkout -b translations origin/translations
+    git checkout -b translations remotes/origin/translations
 
-    echo "Created a new local translations branch based on the latest origin/translations."
+    echo "Created a new local translations branch based on the latest remotes/origin/translations."
 fi
 
 # Change to the lang directory

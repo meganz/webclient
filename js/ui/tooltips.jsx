@@ -88,7 +88,7 @@ var Tooltip = React.createClass({
 
         var tooltipOffset = this.props.tooltipOffset;
         var arrow = this.props.withArrow;
-        
+
         if ($el && $tooltip) {
             elWidth = $el.outerWidth();
             elHeight = $el.outerHeight();

@@ -1,6 +1,6 @@
 function isMediaSourceSupported() {
     'use strict';
-    return 'MediaSource' in window && (!window.safari || d);
+    return window.MediaSource && typeof MediaSource.isTypeSupported === 'function' && (!window.safari || d);
 }
 
 function is_video(n) {
@@ -28,21 +28,52 @@ if (!isMediaSourceSupported()) {
     };
 }
 
-function is_image(name) {
+/**
+ * Returns a truthy value whenever we can get a previewable image for a file/node.
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function}
+ *      {Number}: Build-in support in browsers,
+ *      {String}: RAW Image file type
+ *      {Function}: Handler we can use to get a preview image out of the file/node data
+ */
+function is_image(n, ext) {
     'use strict';
-
-    if (name) {
-        if (typeof name === 'object') {
-            name = name.name;
-        }
-        var ext = fileext(name, true, true);
-
-        return is_image.def[ext] || is_rawimage(null, ext) || mThumbHandler.has(0, ext);
-    }
-
-    return false;
+    ext = ext || fileext(n && n.name || n, true, true);
+    return is_image.def[ext] || is_rawimage(null, ext) || mThumbHandler.has(0, ext);
 }
 
+/**
+ * Same as is_image(), additionally checking whether the node has an image file attribute we can preview
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function|Boolean}
+ */
+function is_image2(n, ext) {
+    'use strict';
+    ext = ext || fileext(n && n.name || n, true, true);
+    return (is_image(n, ext) && (!mega.chrome || !n || n.s < 6e8))
+        || (filemime(n).startsWith('image') && String(n.fa).indexOf(':1*') > 0);
+}
+
+/**
+ * Same as is_image2(), additionally skipping non-image files regardless of file attributes or generation handlers
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function|Boolean}
+ */
+function is_image3(n, ext) {
+    'use strict';
+    ext = ext || fileext(n && n.name || n, true, true);
+    return ext !== 'PDF' && is_image2(n, ext);
+}
+
+/**
+ * Check whether a file/node is a RAW image.
+ * @param {String|MegaNode|Object} name An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {String}
+ */
 function is_rawimage(name, ext) {
     'use strict';
 
@@ -56,8 +87,7 @@ is_image.def = {
     'JPEG': 1,
     'GIF': 1,
     'BMP': 1,
-    'PNG': 1,
-    'HEIC': -1
+    'PNG': 1
 };
 
 is_image.raw = {
@@ -176,14 +206,15 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
             if (d) {
                 console.debug('Holding tiff thumb creation...', ab && ab.byteLength);
             }
-            onIdle(function() {
-                mBroadcaster.once('TIFThumbHandler.ready', makeTIF);
-            });
+            mBroadcaster.once('TIFThumbHandler.ready', makeTIF);
             return;
         }
         TIFThumbHandler.working = true;
 
         onIdle(function() {
+            if (d) {
+                console.debug('...unholding tiff thumb creation.', mBroadcaster.hasListener('TIFThumbHandler.ready'));
+            }
             TIFThumbHandler.working = false;
             mBroadcaster.sendMessage('TIFThumbHandler.ready');
         });
@@ -195,26 +226,117 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
             console.time(timeTag);
         }
 
-        var tiff = new Tiff(new Uint8Array(ab));
-        ab = dataURLToAB(tiff.toDataURL());
+        var dv = new DataView(ab.buffer || ab);
+        switch (dv.byteLength > 16 && dv.getUint16(0)) {
+            case 0x4D4D: // TIFF, big-endian
+            case 0x4949: // TIFF, little-endian
+                // XXX: libtiff is unable to handle images with 32-bit samples.
+                var tiff = false;
+
+                try {
+                    Tiff.initialize({TOTAL_MEMORY: 134217728});
+                    tiff = new Tiff(new Uint8Array(ab));
+
+                    ab = dataURLToAB(tiff.toDataURL());
+
+                    if (d) {
+                        console.log('tif2png %sx%s (%s bytes)', tiff.width(), tiff.height(), ab.byteLength);
+                    }
+                }
+                catch (ex) {
+                    if (d) {
+                        console.warn('Caught tiff.js exception, aborting...', ex);
+                    }
+                    ab = false;
+
+                    if (!tiff) {
+                        break;
+                    }
+                }
+
+                try {
+                    tiff.close();
+                    Tiff.Module.FS_unlink(tiff._filename);
+                }
+                catch (ex) {
+                    if (d) {
+                        console.debug(ex);
+                    }
+                }
+
+                if (ab) {
+                    eventlog(99692);
+                }
+                break;
+
+            default:
+                if (d) {
+                    console.debug('This does not seems a TIFF...', [ab]);
+                }
+        }
 
         if (d) {
             console.timeEnd(timeTag);
-            console.log('tif2png %sx%s (%s bytes)', tiff.width(), tiff.height(), ab.byteLength);
         }
 
-        try {
-            tiff.close();
-            Tiff.Module.FS_unlink(tiff._filename);
+        cb(ab);
+    });
+});
+
+mThumbHandler.add('WEBP', function WEBPThumbHandler(ab, cb) {
+    'use strict';
+
+    M.require('webpjs').tryCatch(function() {
+        var timeTag = 'webpjs.' + makeUUID();
+
+        if (d) {
+            console.debug('Creating WEBP thumbnail...', ab && ab.byteLength);
+            console.time(timeTag);
         }
-        catch (ex) {
+
+        var canvas = webpToCanvas(new Uint8Array(ab), ab.byteLength);
+
+        if (d) {
+            console.timeEnd(timeTag);
+        }
+
+        if (canvas) {
+            ab = dataURLToAB(canvas.toDataURL());
+
             if (d) {
-                console.debug(ex);
+                console.log('webp2png %sx%s (%s bytes)', canvas.width, canvas.height, ab.byteLength);
             }
         }
+        else {
+            if (d) {
+                console.debug('WebP thumbnail creation failed.');
+            }
+            ab = null;
+        }
         cb(ab);
-        eventlog(99692);
     });
+});
+
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    var img = new Image();
+    img.onload = function() {
+        // This browser does natively support WebP
+        delete mThumbHandler.sup.WEBP;
+        is_image.def.WEBP = 1;
+
+        if (d) {
+            console.debug('Using build in WebP support...');
+        }
+    };
+    img.onerror = function() {
+        if (d) {
+            console.debug('This browser does not support WebP, we will use libwebp...', ua);
+        }
+    };
+    img.src = 'data:image/webp;base64,' +
+        'UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
 });
 
 mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
@@ -442,6 +564,7 @@ function FullScreenManager($button, $element) {
         else {
             $element.fullScreen(true);
         }
+        return false;
     };
 
     if (state === null) {
@@ -659,7 +782,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     });
 
                     if (!streamer.hasAudio) {
-                        $('.volume-control', $wrapper).addClass('no-audio');
+                        var $vc = $('.volume-control', $wrapper).addClass('no-audio');
+                        var title = l[19061];
+
+                        if (streamer.hasUnsupportedAudio) {
+                            eventlog(99693, streamer.hasUnsupportedAudio);
+                            title = escapeHTML(l[19060]).replace('%1', streamer.hasUnsupportedAudio);
+                        }
+                        $vc.attr('title', title);
                     }
 
                     hideControls();
@@ -704,6 +834,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             else {
                 videoElement.pause();
             }
+            return false;
         });
 
         // Volume Bar control
@@ -783,6 +914,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 changeButtonState('mute');
                 updateVolumeBar();
             }
+            return false;
         });
 
         var progressBarElementStyle = $progressBar.get(0).style;
@@ -949,6 +1081,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     videoFile.flushRetryQueue();
                 });
             }
+            else if (navigator.onLine && this.currentTime < this.duration) {
+                var data = [1, s.hasVideo, s.hasAudio, ~~s.getProperty('bitrate'), s.getProperty('server')];
+
+                if (d) {
+                    console.log(ev.type, data, this);
+                }
+                eventlog(99694, JSON.stringify(data), true);
+            }
 
             return true; // continue listening
         });
@@ -1017,7 +1157,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             eventlog(eid);
         });
 
-        _makethumb(node, s);
+        if (typeof dataURLToAB === 'function') {
+            _makethumb(node, s);
+        }
 
         $(window).rebind('video-destroy.main', function() {
             $('.mobile.filetype-img').removeClass('hidden');
@@ -1247,6 +1389,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
         get: function() {
             var v = Object(this.Video && this.Video[0]);
             return v.Height | 0;
+        }
+    });
+    Object.defineProperty(MediaInfoReport.prototype, 'rotation', {
+        get: function() {
+            var v = Object(this.Video && this.Video[0]);
+            return v.Rotation | 0;
         }
     });
     Object.defineProperty(MediaInfoReport.prototype, 'shortformat', {
@@ -1983,7 +2131,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
     var miCollectedBytes = 0;
     var miCollectRunning = 0;
     var miCollectProcess = function() {
-        if (localStorage.noMediaCollect || miCollectedBytes > 0x1000000) {
+        if (localStorage.noMediaCollect || miCollectedBytes > 0x1000000 || M.chat) {
             return 0xDEAD;
         }
 
@@ -2366,6 +2514,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
             fps = MediaInfoLib.build;
             width = MediaInfoLib.version;
             playtime = this.avflv;
+        }
+        else {
+            var r = res.rotation;
+
+            if (r === 90 || r === 270) {
+                r = width;
+                width = height;
+                height = r;
+            }
         }
 
         width <<= 1;

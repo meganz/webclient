@@ -113,7 +113,6 @@ module.exports = function(config) {
         'js/mDB.js',
         'js/thumbnail.js',
         'js/vendor/exif.js',
-        'js/vendor/megapix.js',
         'js/vendor/smartcrop.js',
         'js/filetypes.js',
         'js/ui/miniui.js',
@@ -140,6 +139,7 @@ module.exports = function(config) {
         'js/transfers/queue.js',
         'js/transfers/downloader.js',
         'js/transfers/download2.js',
+        'js/transfers/reader.js',
         'js/transfers/upload2.js',
         'js/transfers/zip64.js',
         {pattern: 'aesasm.js', included: false},
@@ -147,6 +147,7 @@ module.exports = function(config) {
 
         // Our chat code.
         'js/chat/strongvelope.js',
+        'js/fm/linkinfohelper.js',
         'js/chat/plugins/urlFilter.js',
         'js/chat/plugins/emoticonShortcutsFilter.js',
         'js/chat/plugins/emoticonsFilter.js',

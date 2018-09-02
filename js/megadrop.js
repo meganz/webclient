@@ -77,6 +77,37 @@ mega.megadrop = (function() {
     };
 
     /**
+     * Show user warning dialog when user's action remove public upload folder (PUF)
+     * @param {Object} list MEGAdrop folders id list
+     */
+    var showRemoveWarning = function showRemoveWarning(list) {
+        var promise = new MegaPromise();
+        var fldName = list.length > 1
+            ? l[17626]
+            : l[17403].replace('%1', escapeHTML(M.d[list[0]].name));
+
+        msgDialog(
+            'confirmation',
+            l[1003],
+            fldName,
+            false,
+            function(e) {
+                if (e) {
+                    closeDialog();
+                    mega.megadrop.pufRemove(list).done(function() {
+                        promise.resolve();
+                    });
+                }
+                else {
+                    promise.reject();
+                }
+            }
+        );
+
+        return promise;
+    };
+    
+    /**
      * Make sure that user knows that MEGAdrops wiil be cancelled if any
      * full shares or public links are available for target
      * @param {Array} handles Array of nodes id which will be moved
@@ -85,30 +116,8 @@ mega.megadrop = (function() {
     var preMoveCheck = function preMoveCheck(handles, target) {
         var sel = Array.isArray(handles) ? handles : [handles];
         var count = 0;
-        var fldName = '';
         var list = [];
         var promise = new MegaPromise();
-
-        var tmpFn = function(fldName, list) {
-            var promise = new MegaPromise();
-
-            msgDialog(
-                'confirmation',
-                l[1003],
-                fldName,
-                false, function(e) {
-                if (e) {
-                    mega.megadrop.pufRemove(list).done(function() {
-                        promise.resolve(sel, target);
-                    });
-                }
-                else {
-                    promise.reject();
-                }
-            });
-
-            return promise;
-        };
 
         // Is there any MEGAdrop active for given handles?
         // Count for precise dlg message, will loop to the
@@ -118,18 +127,22 @@ mega.megadrop = (function() {
         }
         count = list.length;
         if (count) {// MEGAdrop detected in source tree
-            fldName = count > 1
-                ? l[17626]
-                : l[17403].replace('%1', escapeHTML(M.d[list[0]].name));
-
             shared(target).done(function(res) {
                 if (res) {// Full share or pub link found
-                    promise = tmpFn(fldName, list);
+                    showRemoveWarning(list).done(function() {
+                        promise.resolve(sel, target);
+                    }).fail(function() {
+                        promise.reject();
+                    });
                 }
                 else {
                     var share = new mega.Share({});
                     if (share.isShareExist([target], false, true)) {// Search pending shares .ps
-                        promise = tmpFn(fldName, list);
+                        showRemoveWarning(list).done(function() {
+                            promise.resolve(sel, target);
+                        }).fail(function() {
+                            promise.reject();
+                        });
                     }
                     else {
                         promise.resolve(sel, target);
@@ -143,6 +156,7 @@ mega.megadrop = (function() {
 
         return promise;
     };
+    
     /**
      * Public upload folder's (PUF) related methods and properties
      */
@@ -151,6 +165,7 @@ mega.megadrop = (function() {
         var pufOpts = {
             list: [],
             items: {},
+            callbacks: {},      // Functions used for callbacks
             req: {
                 create: {       // Create PUF
                     a: 'ul',
@@ -232,6 +247,8 @@ mega.megadrop = (function() {
             var folderName = '';
             var state = 2;
 
+            var opPromise = new MegaPromise();
+
             if (nodeId) {
                 if (!pufOpts.items[nodeId]) {
                     pufOpts.items[nodeId] = Object.create(null);
@@ -248,6 +265,7 @@ mega.megadrop = (function() {
                         if (d) {
                             console.error('Missing node info M.d ', nodeId);
                         }
+                        return opPromise.reject();
                     }
                     pufOpts.items[nodeId].fn = folderName;
 
@@ -261,12 +279,15 @@ mega.megadrop = (function() {
                             }
                         });
                     }
+                    opPromise.resolve();
                 });
+                return opPromise;
             }
             else {
                 if (d) {
                     console.error('puf.add nodeHandle is not provided.');
                 }
+                return opPromise.reject();
             }
         };
 
@@ -312,10 +333,11 @@ mega.megadrop = (function() {
                     }
                 }
                 else {
-                    add(puh);
-                    if (requesti === puh.i) {
-                        pup.create(puh.h);
-                    }
+                    add(puh).done(function () {
+                        if (requesti === puh.i) {
+                            pup.create(puh.h);
+                        }
+                    });
                 }
             }
         };
@@ -392,11 +414,10 @@ mega.megadrop = (function() {
         /**
          * Removes public upload folder (PUF)
          * @param {Object} list MEGAdrop folders id list
-         * @param {String} selection Selected folders id
-         * @param {String} cb Callback function
-         * @returns {Promise}
+         * @param {Boolean} [quiet] No loading overlay
+         * @returns {MegaPromise}
          */
-        var remove = function pufRemove(list) {
+        var remove = function pufRemove(list, quiet) {
             if (d) {
                 console.log('puf.remove');
             }
@@ -419,7 +440,9 @@ mega.megadrop = (function() {
             };
 
             if (len) {
-                loadingDialog.show();
+                if (!quiet) {
+                    loadingDialog.show();
+                }
                 for (var k = len; k--;) {
                     if (!pufOpts.items[list[k]]) {
                         continue;
@@ -441,7 +464,7 @@ mega.megadrop = (function() {
             MegaPromise.allDone(requestPromises)
             .always(function () {
                 masterPromise.resolve([collectedData, failedRequests]);
-                if (failedRequests.length) {
+                if (!quiet && failedRequests.length) {
                     loadingDialog.hide();
                 }
             });
@@ -496,6 +519,7 @@ mega.megadrop = (function() {
         return {
             // variables
             items: pufOpts.items,
+            callbacks: pufOpts.callbacks,
 
             // Functions
             add: add,
@@ -707,19 +731,20 @@ mega.megadrop = (function() {
 
             // Remove from puf.items
             for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    var elem = obj[key];
-
-                    if (elem.p === handle) {
-                        if (fmdb && !pfkey) {
-                            if (puf.items[key]) {
-                                delete puf.items[key];
+                if (obj.hasOwnProperty(key) && obj[key].p === handle) {
+                    if (fmdb && !pfkey) {
+                        if (puf.items[key]) {
+                            if (puf.callbacks[key] && puf.callbacks[key]['del']) {
+                                loadingDialog.hide();
+                                puf.callbacks[key]['del']();
+                                delete puf.callbacks[key]['del'];
                             }
-                            fmdb.del('puf', elem.ph);
+                            fmdb.del('puf', obj[key].ph);
+                            delete puf.items[key];
                         }
-
-                        break;
                     }
+
+                    break;
                 }
             }
         };
@@ -929,6 +954,7 @@ mega.megadrop = (function() {
             var state = 0;
             var folderId = '';
             var pupId = '';
+            var delayHide = false;
 
             for (var i = ap.length; i--;) {
                 item = Object.assign({}, ap[i]);
@@ -953,13 +979,17 @@ mega.megadrop = (function() {
                 else {
                     if (pupOpts.items[pupId]) {
                         folderId = pupOpts.items[pupId].h;
-                        settings.remove(pupId, folderId);
                         _del(pupId);
+                        if (puf.callbacks[folderId] && puf.callbacks[folderId]['del']) {
+                            delayHide = true;
+                        }
+                        settings.remove(pupId, folderId);
                     }
                 }
             }
-
-            loadingDialog.hide();
+            if (!delayHide){
+                loadingDialog.hide();
+            }
         };
 
         /**
@@ -1129,23 +1159,25 @@ mega.megadrop = (function() {
 
             // Click on PUP basic info, show full PUP informations .expanded-widget
             $('.widget-container').on('click.WS_clickcard', '.widget-card', function() {
-                var $this = $(this).closest('div[id^=pup_]');
-                var pupHandle = $this.attr('id').replace('pup_', '');
-                var expHandle = $('div[id^=ew_]').attr('id');
+                if (!$(this).hasClass("expanded-widget")) {
+                    var $this = $(this).closest('div[id^=pup_]');
+                    var pupHandle = $this.attr('id').replace('pup_', '');
+                    var expHandle = $('div[id^=ew_]').attr('id');
 
-                // Close expanded PUP
-                if (expHandle) {
-                    $('#' + expHandle).addClass('hidden').remove();
-                    $('#pup_' + expHandle.replace('ew_', '')).removeClass('hidden');
-                    delExpanded(expHandle);
+                    // Close expanded PUP
+                    if (expHandle) {
+                        $('#' + expHandle).addClass('hidden').remove();
+                        $('#pup_' + expHandle.replace('ew_', '')).removeClass('hidden');
+                        delExpanded(expHandle);
+                    }
+
+                    drawExpandedCard(pupHandle, $this);
+                    $this.addClass('hidden');
+                    $('#ew_' + pupHandle).removeClass('hidden');
+                    setExpanded(pupHandle);
+                    initAccountScroll();
+                    $(window).trigger('resize');
                 }
-
-                drawExpandedCard(pupHandle, $this);
-                $this.addClass('hidden');
-                $('#ew_' + pupHandle).removeClass('hidden');
-                setExpanded(pupHandle);
-                initAccountScroll();
-                $(window).trigger('resize');
             });
 
             // Click on minimise of PUP expanded informations, replace it  with basic info .widget-card
@@ -1277,7 +1309,9 @@ mega.megadrop = (function() {
          * @param {String} nodeHandle Folder id
          *          */
         var remove = function settingsRemove(pupHandle, nodeHandle) {
-
+            if (d) {
+                console.log('settings.remove');
+            }
             // un-bind all events related to .expanded-widget
             $('.widget-container .expanded-widget').off();
 
@@ -1285,8 +1319,8 @@ mega.megadrop = (function() {
             $('#pup_' + pupHandle).remove();// Remove widget-card
             delExpanded(pupHandle);
             ui.nodeIcon(nodeHandle);
-
-            if (Object.keys(puf.items).length === 1 && M.currentdirid === 'account/megadrop') {
+            if ((Object.keys(puf.items).length === 0 || Object.keys(pup.items).length === 0)
+                && M.currentdirid === 'account/megadrop') {
                 M.openFolder(M.RootID);
             }
         };
@@ -1379,14 +1413,14 @@ mega.megadrop = (function() {
         };
 
         var _queueScroll = function _uiQueueScroll(itemsNum) {
-            var SCROLL_TRIGGER = 6;
+            var SCROLL_TRIGGER = 5;
             var queueDOM = uiOpts.window.class + ' ' + uiOpts.window.queueClass;
 
-            if (itemsNum > SCROLL_TRIGGER) {// Adapt scroll to new height
-                jScrollReinitialize(queueDOM);
-            }
-            else if (itemsNum === SCROLL_TRIGGER) {// Add scroll
+            if (itemsNum > SCROLL_TRIGGER) {
                 dialogScroll(queueDOM);
+            }
+            else {
+                deleteScrollPanel(queueDOM, 'jsp');
             }
         };
 
@@ -1950,6 +1984,65 @@ mega.megadrop = (function() {
                 return false;
             }
         }
+        
+        /**
+         * Check user trying to upload folder.
+         */
+        if (d) {
+            console.log('Checking user uploading folder.');
+        }
+        if (event.dataTransfer
+                && event.dataTransfer.items
+                && event.dataTransfer.items.length > 0 && event.dataTransfer.items[0].webkitGetAsEntry) {
+            var items = event.dataTransfer.items;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].webkitGetAsEntry) {
+                    var item = items[i].webkitGetAsEntry();
+                    if (item && item.isDirectory) {
+                        // Hide Drop to Upload dialog and show warning notification
+                        $('.drag-n-drop.overlay').addClass('hidden');
+                        $('body').removeClass('overlayed');
+                        msgDialog('warninga', l[135], l[19179], false, false, false);
+                        return false;
+                    }
+                }
+            }
+        }
+        else if (is_chrome_firefox && event.dataTransfer) {
+            try {
+                var m = event.dataTransfer.mozItemCount;
+                for (var j = 0; j < m; ++j) {
+                    file = event.dataTransfer.mozGetDataAt("application/x-moz-file", j);
+                    if (file instanceof Ci.nsIFile) {
+                        filedrag_u = [];
+                        if (j === m - 1) {
+                            $.dostart = true;
+                        }
+                        var mozitem = new mozDirtyGetAsEntry(file); /*,e.dataTransfer*/
+                        if (mozitem.isDirectory) {
+                            // Hide Drop to Upload dialog and show warning notification
+                            $('.drag-n-drop.overlay').addClass('hidden');
+                            $('body').removeClass('overlayed');
+                            msgDialog('warninga', l[135], l[19179], false, false, false);
+                            return false;
+                        }
+                    }
+                    else {
+                        if (d) {
+                            console.log('FileSelectHandler: Not a nsIFile', file);
+                        }
+                    }
+                }
+            }
+            catch (e) {
+                alert(e);
+                Cu.reportError(e);
+            }
+        }
+        else {
+            // ie does not support DataTransfer.items property.
+            // Therefore cannot recognise what user upload is folder or not.
+        }
 
         for (var i = 0; files[i]; i++) {
             file = files[i];
@@ -2157,6 +2250,7 @@ mega.megadrop = (function() {
         getPufHandle: pufHandle,
         isDropExist: isDropExist,
         preMoveCheck: preMoveCheck,
+        showRemoveWarning: showRemoveWarning,
         processUPHAP: processUPHAP,
         getOwnersHandle: ownersHandle,
         disableDragDrop: disableDragDrop,
@@ -2164,6 +2258,7 @@ mega.megadrop = (function() {
 
         // PUF
         pufs: puf.items,
+        pufCallbacks: puf.callbacks,
         pufRemove: puf.remove,
         pufHandle: puf.getHandle,
         pufProcessDb: puf.processDb,

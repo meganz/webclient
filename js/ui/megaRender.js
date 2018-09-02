@@ -120,6 +120,18 @@
                             '<div class="fm-chat-user-status"></div>' +
                             '<div class="clear"></div>' +
                         '</div>' +
+                        '<div class="contact-chat-buttons">' +
+                            '<div class="default-white-button inline start-conversation">' +
+                                '<i class="small-icon conversations dark"></i>' +
+                                '<span></span>' +
+                            '</div>' +
+                            '<div class="default-white-button inline short start-audio-call">' +
+                                '<i class="small-icon audio-call dark"></i>' +
+                            '</div>' +
+                            '<div class="default-white-button inline short start-video-call">' +
+                                '<i class="small-icon video-call dark"></i>' +
+                            '</div>' +
+                        '</div>' +
                     '</td>' +
                     '<td width="270">' +
                         '<div class="contacts-interation"></div>' +
@@ -131,14 +143,26 @@
             '</table>',
 
             // Icon view mode
-            '<a class="data-block-view ustatus">' +
+            '<a class="data-block-view semi-big ustatus">' +
                 '<span class="file-settings-icon"></span>' +
                 '<span class="shared-folder-info-block">' +
-                    '<span class="u-card-data">' +
+                    '<span class="u-card-data overlayed">' +
                         '<span class="shared-folder-name"></span>' +
                         '<span class="nw-contact-status"></span>' +
                     '</span>' +
-                    '<span class="shared-folder-info"></span>' +
+                    '<span class="shared-folder-info overlayed""></span>' +
+                    '<span class="contact-chat-buttons">' +
+                        '<span class="default-white-button inline start-conversation">' +
+                            '<i class="small-icon conversations dark"></i>' +
+                            '<span></span>' +
+                        '</span>' +
+                        '<span class="default-white-button inline short start-audio-call">' +
+                            '<i class="small-icon audio-call dark"></i>' +
+                        '</span>' +
+                        '<span class="default-white-button inline short start-video-call">' +
+                            '<i class="small-icon video-call dark"></i>' +
+                        '</span>' +
+                    '</span>' +
                 '</span>' +
             '</a>'
         ],
@@ -192,7 +216,7 @@
         ],
         'contacts': [
             '.grid-table.contacts',
-            '.contacts-blocks-scrolling'
+            '.contacts-blocks-scrolling .content'
         ],
         'shares': [
             '.shared-grid-view .grid-table.shared-with-me',
@@ -347,9 +371,9 @@
                 initOpcGridScrolling();
                 initIpcGridScrolling();
 
-                $('.grid-table tr').remove();
+                $('.grid-table:not(.arc-chat-messages-block) tr').remove();
                 $('.file-block-scrolling a').remove();
-                $('.contacts-blocks-scrolling a').remove();
+                $('.contacts-blocks-scrolling .content a').remove();
 
                 $(lSel).show().parent().children('table').show();
             }
@@ -365,6 +389,9 @@
                     $('.fm-empty-contacts').removeClass('hidden');
                 }
                 else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
+                    $('.contacts-tab-lnk.ipc[data-folder=' + M.currentdirid+ ']')
+                        .removeClass('filled').find('span').text('');
+                    $('.button.link-button.accept-all').addClass('hidden');
                     $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                     $('.fm-empty-contacts').removeClass('hidden');
                 }
@@ -788,7 +815,7 @@
 
                 if (this.viewmode) {
                     if (aExtendedInfo !== false) {
-                        avatar = useravatar.contact(props.userHandle, 'nw-contact-avatar', 'span');
+                        avatar = useravatar.contact(props.userHandle, '', 'span');
                     }
                 }
                 else {
@@ -811,7 +838,7 @@
                     }
 
                     if (aExtendedInfo !== false) {
-                        avatar = useravatar.contact(props.userHandle, 'nw-contact-avatar');
+                        avatar = useravatar.contact(props.userHandle);
                     }
                 }
 
@@ -833,13 +860,21 @@
             },
             'contacts': function(aNode, aHandle, aExtendedInfo) {
                 var props = {classNames: []};
+                var avatar;
+
+                props.conversationText = l[7997];
 
                 if (this.logger) {
                     // We only care about active contacts
                     assert(Object(M.u[aHandle]).c === 1, 'Found non-active contact');
                 }
 
-                var avatar = useravatar.contact(aHandle, 'nw-contact-avatar');
+                if (M.viewmode === 0) {
+                    avatar = useravatar.contact(aHandle);
+                }
+                else {
+                    avatar = useravatar.contact(aHandle, 'medium-avatar');
+                }
 
                 if (avatar) {
                     props.avatar = parseHTML(avatar).firstChild;
@@ -1001,6 +1036,8 @@
                 return aTemplate;
             },
             'contacts': function(aNode, aProperties, aTemplate) {
+
+                aTemplate.querySelector('.start-conversation span').textContent = aProperties.conversationText;
 
                 if (aProperties.avatar) {
                     var avatar = this.viewmode ? '.shared-folder-info-block' : '.fm-chat-user-info';

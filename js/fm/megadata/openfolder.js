@@ -35,7 +35,7 @@
 
         this.previousdirid = this.currentdirid;
         this.currentdirid = id;
-        this.currentrootid = M.chat ? "chat" : this.getNodeRoot(id);
+        this.currentrootid = this.chat ? "chat" : this.getNodeRoot(id);
 
         if (first) {
             fminitialized = true;
@@ -62,7 +62,14 @@
         if (this.chat) {
             this.v = [];
             sharedFolderUI(); // remove shares-specific UI
-            //$.tresizer();
+
+            if (megaChatIsReady) {
+                var roomId = String(id).split('/').pop();
+
+                if (roomId.length === 11) {
+                    megaChat.setAttachments(roomId);
+                }
+            }
         }
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
@@ -118,7 +125,7 @@
                 for (var i = Math.min(this.v.length, 200); i--;) {
                     var n = this.v[i];
 
-                    if (String(n.fa).indexOf(':0*') > 0 || is_image(n)
+                    if (String(n.fa).indexOf(':0*') > 0 || is_image2(n)
                         || is_video(n) || MediaInfoLib.isFileSupported(n)) {
 
                         viewmode = 1;
@@ -147,9 +154,7 @@
                 this.doSort('status', 1);
             }
             else {
-                if (this.currentdirid !== 'transfers') { // IN TRANSFERS we dont want to re-order
-                    this.doSort('name', 1);
-                }
+                this.doSort('name', 1);
             }
 
             if (this.currentdirid === 'opc') {
@@ -285,9 +290,6 @@
             M.addNotificationsUI(1);
         }
 
-        this.search = false;
-        this.chat = false;
-
         if (!fminitialized) {
             firstopen = true;
         }
@@ -295,6 +297,9 @@
             // Do nothing if same path is chosen
             return MegaPromise.resolve(EEXIST);
         }
+
+        this.chat = false;
+        this.search = false;
 
         if (id === 'rubbish') {
             id = this.RubbishID;
@@ -363,13 +368,18 @@
             }
             else {
                 this.chat = true;
-
+                megaChat.displayArchivedChats = false;
                 megaChat.refreshConversations();
                 M.addTreeUI();
                 var room = megaChat.renderListing();
 
                 if (room) {
                     newHashLocation = room.getRoomUrl();
+                }
+                else {
+                    if (megaChat.$conversationsAppInstance) {
+                        megaChat.$conversationsAppInstance.safeForceUpdate();
+                    }
                 }
             }
         }

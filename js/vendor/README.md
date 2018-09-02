@@ -9,7 +9,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/vibornoff/asmcrypto.js/compare/master...meganz:master)
 >
 > NB: We are using a custom, unobfuscated build which was created using:
-> 
+>
 > ```bash
 > git clone https://github.com/meganz/asmcrypto.js.git
 > cd asmcrypto.js
@@ -44,6 +44,12 @@ Unless otherwise noted, they were released under a [MIT License].
 [dcraw.js]: Dave Coffin's raw photo decoder [dcraw.c](http://www.cybercom.net/~dcoffin/dcraw/) ported to JavaScript using [Emscripten]
 
 > NB: To compile from C source, fork the repo and run `build.sh`.
+
+---
+[encoding.js, encoding-indexes.js]: Polyfill for the Living Standard's Encoding API
+
+> **This is a fork** to remove UTF characters, [see the changes](https://github.com/inexorabletash/text-encoding/compare/master...meganz:master)
+> Released as public domain.
 
 ---
 [es6-shim]: ECMAScript 6 compatibility shims for legacy JavaScript engines.
@@ -106,7 +112,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [jsbn.js]: Basic BigInteger implementation, just enough for RSA encryption and not much more.
 
 > **This is a fork**, [See the changes](https://github.com/meganz/jsbn.js/commits/master/jsbn.js)
-  
+
 [jsbn2.js]: The rest of the library, including most public BigInteger methods.
 
 ---
@@ -170,19 +176,23 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/jhiesey/videostream/compare/master...meganz:master)
 
 ---
-[zxcvbn.js]: A realistic password strength estimator.
+[webp.js]: library to encode and decode images in WebP format.
+
+> **This is a fork**, [Compare the changes](https://github.com/webmproject/libwebp/compare/master...meganz:master)
+
+---
+[zxcvbn.js]: Low-Budget Password Strength Estimation.
 
 > NB: We are using a custom, unobfuscated build which was created using:
-> 
+>
 > ```bash
 > git clone https://github.com/dropbox/zxcvbn.git
 > cd zxcvbn
-> git checkout 1.0.1
+> git checkout v4.4.2
 > npm install
-> nano compile_and_minify.sh
-> Comment out or delete the last 4 lines to prevent minification by the Closure compiler
-> ./compile_and_minify.sh
-> Use output in compiled.js
+> Edit the package.json file and on the `"build-dist":` line, remove `-t uglifyify` to prevent minification.
+> Save the file and run: `npm run build`
+> Use the new file in dist/zxcvbn.js
 > ```
 
 ---
@@ -190,7 +200,7 @@ Unless otherwise noted, they were released under a [MIT License].
 
 > NB: We had to fork the project and remove the UTF characters from adapter.js, so we are using the repo:
 > https://github.com/meganz/adapter
-> 
+>
 > ```bash
 > git clone https://github.com/webrtc/adapter
 > cd release
@@ -203,7 +213,7 @@ Unless otherwise noted, they were released under a [MIT License].
 
 > NB: We had to fork the project and remove the UTF characters from twemoji.js, so we are using the repo:
 > https://github.com/meganz/twemoji
-> 
+>
 > ```bash
 > git clone https://github.com/meganz/twemoji
 > cd twemoji/2/
@@ -220,6 +230,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [dexie.js]: <https://github.com/dfahlander/Dexie.js>
 [dcraw.js]: <https://github.com/meganz/dcraw.js>
+[encoding.js, encoding-indexes.js]: <https://github.com/inexorabletash/text-encoding/tree/v0.6.3>
 [es6-shim]: <https://github.com/meganz/es6-shim>
 [exif-js]: <https://github.com/meganz/exif-js>
 [favico.js]: <https://github.com/meganz/favico.js>
@@ -247,5 +258,6 @@ Unless otherwise noted, they were released under a [MIT License].
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [tiff.js]: <https://github.com/seikichi/tiff.js>
 [videostream.js]: <https://github.com/meganz/videostream>
+[webp.js]: <https://github.com/meganz/libwebp>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
 [chat/adapter.js]: <https://github.com/webrtc/adapter>

@@ -54,6 +54,9 @@
     table-layout: fixed;
     height: 100%;
 }
+.chat-content-block.private-chat .messages.content-area {
+    background-color: #FBFCFD;
+}
 .messages.content-area {
     display: table-cell;
     vertical-align: bottom;
@@ -164,8 +167,11 @@
     cursor: default;
 }
 .message.text-block a {
-    color: #017bb2;
+    color: #2BA6DE;
     text-decoration: underline;
+}
+.message.text-block a.red {
+    color: #F0373A;
 }
 .message.text-block a:hover {
     text-decoration: none;
@@ -216,32 +222,35 @@
     padding: 17px 0 4px 0;
 }
 .message.shared-info:first-child {
-    padding: 1px 0 4px 0;
+    padding: 1px 0 8px 0;
 }
 .message.shared-info .user-card-email {
     padding: 0 0 4px 0;
 }
-.message.content-area .user-card-verified.big {
+.user-card-verified.right-align {
     display: inline-block;
     margin: 3px 0 0 -58px;
     float: none;
     position: absolute;
 }
 .message.data-title {
-    font-size: 13px;
+    font-size: 14px;
     line-height: 20px;
-    font-family: 'Open Sans Italic';
     display: inline-block;
-    color: #0387C3;
+    color: #2BA6DE;
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
-    max-width: 100%;
     padding: 0 70px 0 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    max-width: 100%;
+}
+.message.data-title .file-name {
+    color: #333333;
+    padding-left: 5px;
 }
 .message.data-title.red {
     color: rgba(217,0,7,0.7);
@@ -306,7 +315,7 @@
 .message.content-area > .default-white-button.tiny-button {
     position: absolute;
     top: 2px;
-    right: 11px;
+    right: 14px;
     float: none;
     margin: 2px 0 0 0;
     z-index: 100;
@@ -388,4 +397,278 @@
 
 .message.content-area .buttons-block {
     padding: 10px 0 6px 0;
+}
+
+.shared-link.thumb.video.no-thumb img {
+    opacity: 0;
+}
+
+.message.richpreview.previews-container {
+    padding-right: 27px;
+}
+.message.richpreview .title {
+    font-size: 15px;
+    line-height: 24px;
+}
+.confirmation .message.richpreview.title {
+    margin-top: 7px;
+}
+.message.richpreview .url-container {
+    font-size: 14px;
+    line-height: 20px;
+    padding-bottom: 6px;
+    margin-top: 4px;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.message.richpreview .desc {
+    font-size: 14px;
+    line-height: 18px;
+    margin-top: 2px;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.confirmation .message.richpreview .desc {
+    min-height: 36px;
+    margin-top: 3px;
+    line-height: 20px;
+}
+.message.richpreview .desc span span:last-child {
+    padding-top: 6px;
+    display: inline-block;
+}
+.message.richpreview.container {
+    padding: 4px;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    cursor: pointer;
+    display: inline-block;
+    float: left;
+    clear: both;
+    position: relative;
+    width: 100%;
+    margin-top: 9px;
+    margin-bottom: 8px;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.message.richpreview.container.done-loading:hover {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+    z-index: 10001;
+}
+.message.richpreview.have-description {
+    min-height: 80px;
+}
+.message.richpreview.no-description {
+    min-height: 80px;
+}
+
+
+.message.richpreview.container.is-loading {
+    cursor: wait;
+}
+
+.message.richpreview.container::before {
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    -moz-border-radius: inherit;
+    -webkit-border-radius: inherit;
+    border-radius: inherit;
+}
+
+
+.message.richpreview.container.done-loading,
+.message.richpreview.container.is-loading {
+    /*-webkit-transition: color 0.5s linear, opacity 0.5s linear, -webkit-box-shadow 200ms linear;*/
+    /*-moz-transition: color 0.5s linear, opacity 0.5s linear, -moz-box-shadow 200ms linear;*/
+    /*-o-transition: color 0.5s linear, opacity 0.5s linear, box-shadow 200ms linear;*/
+    /*transition: color 0.5s linear, opacity 0.5s linear, box-shadow 200ms linear;*/
+
+    width: 402px;
+}
+
+.message.richpreview.preview {
+    width: 112px;
+    height: 112px;
+    background-position: center middle;
+    background-size: contain;
+    border-radius: 4px;
+    opacity: 0.9;
+}
+.message.richpreview .data-title {
+    display: block;
+    padding: 0;
+}
+.message.richpreview.done-loading .title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90%;
+}
+.message.richpreview .data-title img {
+    margin-top: 4px;
+    float: left;
+    margin-right: 4px;
+    opacity: 0.9;
+}
+.message.richpreview.title {
+    margin-top: 5px;
+    padding-top: 2px;
+    float: left;
+    font-family: 'source_sans_prosemibold', Arial;
+    color: rgba(62, 62, 62, 1);
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.message.richpreview.body {
+    display: table;
+    table-layout: fixed;
+    position: relative;
+    z-index: 1000 /* temp */;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.message.richpreview.img-wrapper, .message.richpreview.inner-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 0 16px;
+}
+.confirmation .message.richpreview.img-wrapper {
+    width: 128px;
+}
+.message.richpreview.img-wrapper {
+    width: 112px;
+    padding: 0;
+}
+.message.richpreview.url {
+    text-decoration: none;
+    color: #666666;
+}
+.message.richpreview.url:hover {
+    text-decoration: underline;
+}
+.message.richpreview.url-favicon {
+    margin-top: 2px;
+    padding-right: 8px;
+    float: left;
+}
+.message.richpreview.loading-message {
+    text-align: center;
+}
+
+.richpreview.no-preview.container {
+    min-height: 80px;
+}
+.richpreview.no-description.no-preview.container {
+    min-height: 60px;
+}
+
+.message.richpreview.container.is-loading {
+    min-height: 110px !important;
+    background-color: rgba(250, 250, 250, 1);
+}
+.message.richpreview.previews-container > :not(:last-child) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.message.richpreview.previews-container > :not(:first-child) {
+    border-top: 0px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-top: -8px;
+}
+
+.message.richpreview.confirmation-icon {
+    background-image: url(../images/mega/new-chat-sprite_v6.png);
+    background-position: -119px -1551px;
+    background-size: 237px auto;
+    height: 118px;
+    margin: 5px 0 5px 10px;
+}
+.message.richpreview.container {
+    background-color: white;
+}
+.message.richpreview.container.confirmation {
+    cursor: default;
+    max-width: 620px;
+}
+.message.body.preview-requires-confirmation-container {
+    background: url(../images/mega/loading-bg.gif);
+    background-size: 40px;
+}
+.preview-requires-confirmation-container .message.content-area:hover::before {
+    background-color: rgba(43,166,222,0.02);
+}
+.message.richpreview.have-preview  .message.richpreview.url-container {
+    left: 124px;
+    line-height: 18px;
+}
+.message.richpreview.confirmation .buttons-block {
+    padding: 10px 0 8px 0;
+    margin: 0 -12px 0 0;
+    float: right;
+}
+.message.richpreview.confirmation .buttons-block > * {
+    margin: 0 4px;
+    height: 34px;
+    padding: 0 17px;
+}
+.message.richpreview.confirmation .buttons-block span {
+    line-height: 34px;
+}
+.richpreview.icon.block-view-file-type {
+    float: left;
+    margin: 0;
+    margin-right: 14px;
+    left: auto;
+    top: auto;
+    position: static;
+}
+
+.richpreview.have-icon .block-view-file-type {
+    margin-top: 14px;
+    margin-left: 20px;
+    margin-bottom: 14px;
+    margin-right: 12px;
+}
+
+.richpreview .main-loader {
+    margin-top: -16px;
+    margin-left: -16px;
+}
+.message.richpreview.container.is-loading::before,
+.message.richpreview.container.is-loading::after,
+.message.richpreview.container.is-loading {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+.message.richpreview.container.is-loading {
+    border-color: rgba(237, 237, 237, 1);
 }

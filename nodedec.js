@@ -275,6 +275,9 @@ function crypto_makeattr(n, nn) {
     if (typeof n.fav != 'undefined') ar.fav = n.fav;
     if (typeof n.lbl != 'undefined') ar.lbl = n.lbl;
     if (typeof n.f != 'undefined') ar.f = n.f;
+    if (typeof n.rr !== 'undefined') {
+        ar.rr = n.rr;
+    }
 
     try {
         var ab = str_to_ab('MEGA' + to8(JSON.stringify(ar)));
@@ -288,7 +291,7 @@ function crypto_makeattr(n, nn) {
 }
 
 // derived node attr directory
-var dattrs = [ 'ar', 'name', 'hash', 'mtime', 'fav', 'lbl', 'f' ];
+var dattrs = ['ar', 'name', 'hash', 'mtime', 'fav', 'lbl', 'f', 'rr'];
 
 // clear all node attributes, including derived ones
 function crypto_clearattr(n) {
@@ -355,6 +358,11 @@ function crypto_procattr(n, key) {
             if (typeof o.f != 'undefined') {
                 n.f = o.f;
                 delete o.f;
+            }
+
+            if (typeof o.rr !== 'undefined') {
+                n.rr = o.rr;
+                delete o.rr;
             }
 
             n.k = key;

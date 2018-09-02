@@ -45,7 +45,7 @@
     text-align: right;
 }
 .contacts-search .contacts-search-header input {
-    margin: 12px 72px 0 7px;
+    margin: 12px 116px 0 16px;
 }
 .contacts-search .contacts-search-header input:focus {
     margin: 12px 116px 0 16px;
@@ -107,25 +107,26 @@
 }
 .popup .contacts-info.body.contacts-search {
     height: 48px;
-    padding: 6px 0;
+    padding: 4px 0;
     cursor: pointer;
 }
 .contacts-search .user-card-presence {
-    margin: 14px 10px 0 14px;
-}
-.contacts-search .user-card-presence {
-    margin: 14px 10px 0 14px;
+    margin: 2px 4px 6px 8px;
 }
 .contacts-search .user-card-data {
     padding: 0 30px 0 79px;
 }
 .contacts-search .user-card-email {
     font-size: 13px;
-    line-height: 14px;
+    line-height: 18px;
 }
 .contacts-search .user-card-name {
     font-size: 14px;
+    display: inline-block;
     line-height: 19px;
+    max-width: -webkit-calc(100% - 24px);
+    max-width: -moz-calc(100% - 24px);
+    max-width: calc(100% - 24px);
 }
 .popup.contacts-search .selected-contact-block {
     height: auto;
@@ -135,6 +136,17 @@
     margin-top: 8px; 
     max-height: 72px;
     overflow: auto;
+}
+.contacts-search .selected-contact-block .selected-contact-card .user-card-name {
+    max-width: -webkit-calc(100% - 2px);
+    max-width: -moz-calc(100% - 2px);
+    max-width: calc(100% - 2px);
+}
+.popup.contacts-search .small-rounded-avatar {
+    margin: 2px 0 0 16px;
+}
+.popup.contacts-search .contacts-info .user-card-data {
+    padding-left: 64px;
 }
 .popup.contacts-search .horizontal-only {
 	height: auto;
@@ -160,7 +172,6 @@
     float: left;
     height: 54px;
     position: relative;
-    margin-right: 6px;
     margin-top: 6px;
     margin-bottom: 12px;
 }
@@ -233,7 +244,9 @@
     color: #777E82;
     margin-left: 12px;
 }
-
+.fm-dialog.send-contact .small-rounded-avatar {
+    margin-left: 32px;
+}
 /* End of Search contacts popup */
 
 /* Emoji one popup */

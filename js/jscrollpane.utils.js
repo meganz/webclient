@@ -216,17 +216,19 @@ function reselect(n) {
     $('.ui-selected').removeClass('ui-selected');
 
     if (!Array.isArray($.selected)) {
-        if (window.selectionManager) {
-            selectionManager.clear_selection();
-        }
         $.selected = [];
     }
+
     var ids = $.selected.map(function(h) {
         if (h && typeof h === 'object') {
             h = h.h;
         }
         return String(h).replace(/[^\w-]/g, '');
     });
+
+    if (window.selectionManager) {
+        selectionManager.clear_selection();
+    }
 
     for (var i = ids.length; i--;) {
         if (window.selectionManager) {

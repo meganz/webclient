@@ -25,6 +25,10 @@ var RtfFilter = function(megaChat) {
 RtfFilter.prototype.processStripRtfFromMessage = function(msg) {
     "use strict";
     var self = this;
+    if (!msg) {
+        return "";
+    }
+
     Object.keys(self.regexps).forEach(function(regexp) {
         var replacement = self.regexps[regexp];
         msg = msg.replace(new RegExp(regexp, replacement[0]), replacement[2]);

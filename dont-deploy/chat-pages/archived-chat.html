@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Chat one on one</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css" />
+<link rel="stylesheet" type="text/css" href="../../css/user-card.css" />
+<link rel="stylesheet" type="text/css" href="../../css/avatars.css" />
+<link rel="stylesheet" type="text/css" href="../../css/icons.css" />
+<link rel="stylesheet" type="text/css" href="../../css/buttons.css" />
+<link rel="stylesheet" type="text/css" href="../../css/dropdowns.css" />
+<link rel="stylesheet" type="text/css" href="../../css/popups.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-messages.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-textarea.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-typing.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-left-pane.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-feedback.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/archived-chat.css" />
+</head>
+
+<body>
+
+<div class="fmholder" id="fmholder">
+  <div class="top-head"></div>
+  <div class="fm-main default">
+    <div class="nw-fm-left-icons-panel">
+          <div class="nw-fm-left-icon cloud-drive"></div>
+          <div class="nw-fm-left-icon shared-with-me"></div>
+          <div class="nw-fm-left-icon contacts"></div>
+          <div class="nw-fm-left-icon conversations active"><div class="nw-fm-left-border"></div></div>
+          <div class="nw-fm-left-icon rubbish-bin"></div>
+          <div class="nw-fm-left-icon settings"></div>
+          <div class="nw-fm-left-icon transfers"></div>
+    </div>
+    <div class="fm-left-panel">
+    	<div class="left-pane-drag-handle"></div>
+		<div class="fm-left-menu conversations">
+            <div class="nw-fm-tree-header conversations"> 
+            	<span>Chat</span>
+                <div class="button"><i class="small-icon white-medium-plus"></i></div>
+            </div>
+		</div>
+        <div class="fm-tree-panel">
+            <div class="content-panel conversations active">
+                
+                <!-- Left Conversations List !--> 
+            	<ul class="conversations-pane">
+                    <li class="active">
+                    	<div class="user-card-name conversation-name">
+                            Bruce Schneier
+                            <span class="user-card-presence online"></span>
+                        </div>
+                        <div class="conversation-message">Write a message…</div>
+                        <div class="date-time">12:35 AM</div>
+                    </li>
+                    <li>
+                    	<div class="user-card-name conversation-name">
+                            Bruce Schneier
+                            <span class="user-card-presence away"></span>
+                        </div>
+                        <!-- Unread messages counter !-->
+                        <div class="unread-messages">
+                        	2
+                        </div>
+                        <!-- Please add 'unread" classname !-->
+                        <div class="conversation-message unread">Hey man, where are you?</div>
+                        <div class="date-time">12:35 AM</div>
+                    </li>
+                    <li>
+                    	<div class="user-card-name conversation-name">
+                            Bruce Schneier
+                            <span class="user-card-presence offline"></span>
+                        </div>
+                        <div class="conversation-message">Hey Ho, lets go</div>
+                        <div class="date-time">12:35 AM</div>
+                    </li>
+                    <li>
+                    	<div class="user-card-name conversation-name">
+                            Bruce Schneier
+                            <span class="user-card-presence online"></span>
+                        </div>
+                        <div class="conversation-message">Hahaha, no way. Long long long message!!</div>
+                        <div class="date-time">Yesterday</div>
+                    </li>
+                </ul>
+                <!-- Left Conversations List !--> 
+                <!-- Archived conversations init button
+                     Add 'active' class below to show blue button -->
+                <div class="arc-conversation-btn-block">
+                    <div class="arc-conversation-icon">
+                        <i class="small-icon rounded-stop"></i>
+                    </div>
+                    <div class="arc-conversation-heading">
+                        Archived chats
+                    </div>
+                    <div class="arc-conversation-number">
+                            2
+                    </div>
+                </div>
+            </div>  
+        </div>
+    </div>
+              
+    <div class="fm-right-files-block">
+        
+        <!-- Archive chat content block 
+             Add this HTML block to chat-content-block -->
+        <div class="chat-content-block archived-chats">
+            <div class="files-grid-view archived-chat-view">
+                <table class="grid-table-header" width="100%" cellspacing="0" cellpadding="0" border="0">
+                    <tbody>
+                        <tr>
+                        <!-- Name th width is changed dynamically. I can't do it myself-->
+                        <th style=""><div class="arrow name desc">Name</div></th>
+                        <th style="width: 294px;"><div class="arrow interaction">Archived on</div></th>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- Insert arc-chat-message inside jspane for the scrolling -->
+                <table class="grid-table arc-chat-messages-block">
+                    <tr id="" class="arc-chat-list ui-droppable ui-draggable ui-draggable-handle">
+                        <td id="conversations...">
+                            <div data-color="color6" class="avatar-wrapper nw-contact-avatar loXvJ7yALVg color6">
+                                <span><i class="verified_icon"></i>B</span>
+                            </div>
+                            <div class="fm-chat-user-info todo-star">
+                                <div class="user-card-name conversation-name"><span>V</span></div>
+                                <div class="conversation-message">Hello, how are you going this weekend??</div>
+                                <div class="date-time">Today, 13:27</div>
+                            </div>
+                            <div class="archived-badge">ARCHIVED</div>
+                        </td>
+                        <td width="294">
+                            <div class="archived-on">
+                                <div class="archived-date-time">09:00 AM</div>
+                                <div class="clear"></div>
+                            </div>
+                             <div class="button default-white-button semi-big unarchive-chat right"><span>Unarchive</span></div>
+                        </td>
+                    </tr>
+                    <tr id="" class="arc-chat-list ui-droppable ui-draggable ui-draggable-handle">
+                        <td id="conversations...">
+                            <div data-color="color6" class="avatar-wrapper nw-contact-avatar loXvJ7yALVg color6">
+                                <span><i class="verified_icon"></i>B</span>
+                            </div>
+                            <div class="fm-chat-user-info todo-star">
+                                <div class="user-card-name conversation-name"><span>V</span></div>
+                                <div class="conversation-message">Hello, how are you going this weekend??</div>
+                                <div class="date-time">Today, 13:27</div>
+                            </div>
+                            <div class="archived-badge">ARCHIVED</div>
+                        </td>
+                        <td width="294">
+                            <div class="archived-on">
+                                <div class="archived-date-time">09:00 AM</div>
+                                <div class="clear"></div>
+                            </div>
+                             <div class="button default-white-button semi-big unarchive-chat right"><span>Unarchive</span></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- End of Chat content block !-->
+    	
+        
+    </div>    
+
+    
+  </div>
+</div>
+  
+</div>
+</body>
+</html>

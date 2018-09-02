@@ -2730,5 +2730,20 @@
     "19320": "Lead Data Protection Supervisory Authority under the GDPR for accepting complaints about Mega",
     "19321": "Enquiries and requests relating to our Privacy & Data Policy should be sent to:",
     "19322": "Submit full details of alleged Trademark infringement to:",
-    "19323": "Mega has zero tolerance for Child Exploitation Material, Violent Extremism, Bestiality, Zoophilia, Gore, Malware, Hacked\/Stolen Data\/Passwords, Extortion, Revenge Porn etc. Report links with description to:"
+    "19323": "Mega has zero tolerance for Child Exploitation Material, Violent Extremism, Bestiality, Zoophilia, Gore, Malware, Hacked\/Stolen Data\/Passwords, Extortion, Revenge Porn etc. Report links with description to:",
+    "19325": "Scan or copy the seed to your Authenticator App. Be sure to backup this seed to a safe place in case you lose your phone.",
+    "19326": "After setting up your seed on your Authenticator app enter the 6-digit code provided.",
+    "19328": "Are you sure you want to redeem this voucher for the [B]%1[\/B] account?",
+    "19329": "\u532f\u5165\u81f3\u6211\u7684\u96f2\u7aef\u786c\u789f",
+    "19330": "[S]MEGAsync\uff1a[\/S] \u8f15\u9b06\u81ea\u52d5\u540c\u6b65\u4f60\u7684\u96fb\u8166\u548cMEGA\u96f2\u7aef\u6a94\u6848",
+    "19332": "\u8b1d\u8b1d\u60a8\u6e2c\u8a66MEGAsync\u540c\u6b65\u529f\u80fd\u3002<br>\u6b64\u6e2c\u8a66\u7248\u672c\u4e0d\u518d\u5b58\u5728\u4e14\u5931\u6548\u904e\u671f\u3002<br>\u8acb\u53c3\u7167Twitter\u4e0a\u7684\u66f4\u65b0<a href=\"https:\/\/twitter.com\/MEGAprivacy\">@MEGAprivacy<\/a>",
+    "19333": "There was a problem installing the update. Please try again later or download the latest version from: https:\/\/mega.nz\/sync",
+    "19334": "\u60a8\u7684\u5e33\u865f\u5df2\u88ab\u9396\u5b9a\u3002\u8acb\u9023\u7e6bsupport@mega.nz",
+    "19335": "\u6211\u540c\u610fMEGA <a href=\"https:\/\/mega.nz\/terms\">\u670d\u52d9\u689d\u6b3e<\/a>",
+    "19336": "\u540c\u6b65\u60a8\u7684\u6574\u500b\u96f2\u7aef\u786c\u789f",
+    "19337": "\u540c\u6b65\u9078\u5b9a\u7684\u96f2\u7aef\u786c\u789f\u8cc7\u6599\u593e",
+    "19338": "Upload 1 file",
+    "19339": "Upload [X] files",
+    "19340": "You don't have write privileges in this share.",
+    "19341": "The account you are currently logged into on your web browser is not the one you want to upgrade. Please logout and login with the account you want to upgrade."
 }

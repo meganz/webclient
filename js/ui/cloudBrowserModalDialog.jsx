@@ -3,6 +3,7 @@ var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
 var ModalDialogsUI = require('./modalDialogs.jsx');
+var Tooltips = require("./tooltips.jsx");
 
 var BrowserCol = React.createClass({
     mixins: [MegaRenderMixin],

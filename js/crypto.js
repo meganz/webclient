@@ -102,7 +102,7 @@ var ERANGE = -7;
 var EEXPIRED = -8;
 
 // FS access errors
-var ENOENT = -9;
+var ENOENT = -9;            // No Entity (does not exist)
 var ECIRCULAR = -10;
 var EACCESS = -11;
 var EEXIST = -12;
@@ -118,6 +118,11 @@ var EOVERQUOTA = -17;
 var ETEMPUNAVAIL = -18;
 var ETOOMANYCONNECTIONS = -19;
 var EGOINGOVERQUOTA = -24;
+
+/* jshint -W098 */          // It is used in another file
+var EROLLEDBACK = -25;
+var EMFAREQUIRED = -26;     // Multi-Factor Authentication Required
+/* jshint +W098 */
 
 // custom errors
 var ETOOERR = -400;
@@ -222,7 +227,7 @@ function crypto_rsagenkey() {
             ko.oncomplete = function () {
                 var jwk = JSON.parse(asmCrypto.bytes_to_string(new Uint8Array(ko.result)));
                 _done(['n', 'e', 'd', 'p', 'q', 'dp', 'dq', 'qi'].map(function (x) {
-                    return base64urldecode(jwk[x])
+                    return base64urldecode(jwk[x]);
                 }));
             };
         };
@@ -1212,10 +1217,13 @@ function api_checkconfirmcode(ctx, c) {
     }, ctx);
 }
 
-function api_resetuser(ctx, c, email, pw) {
+/* jshint -W098 */  // It is used in another file
+function api_resetuser(ctx, emailCode, email, password) {
+
     // start fresh account
     api_create_u_k();
-    var pw_aes = new sjcl.cipher.aes(prepare_key_pw(pw));
+
+    var pw_aes = new sjcl.cipher.aes(prepare_key_pw(password));
 
     var ssc = Array(4);
     for (var i = 4; i--;) {
@@ -1223,16 +1231,19 @@ function api_resetuser(ctx, c, email, pw) {
     }
 
     api_req({
-            a: 'erx',
-            c: c,
-            x: a32_to_base64(encrypt_key(pw_aes, u_k)),
-            y: stringhash(email.toLowerCase(), pw_aes),
-            z: base64urlencode(a32_to_str(ssc) + a32_to_str(encrypt_key(new sjcl.cipher.aes(u_k), ssc)))
-        }, ctx);
+        a: 'erx',
+        c: emailCode,
+        x: a32_to_base64(encrypt_key(pw_aes, u_k)),
+        y: stringhash(email.toLowerCase(), pw_aes),
+        z: base64urlencode(a32_to_str(ssc) + a32_to_str(encrypt_key(new sjcl.cipher.aes(u_k), ssc)))
+    }, ctx);
 }
 
-function api_resetkeykey(ctx, c, key, email, pw) {
-    ctx.c = c;
+function api_resetkeykey(ctx, code, key, email, pw) {
+
+    'use strict';
+
+    ctx.c = code;
     ctx.email = email;
     ctx.k = key;
     ctx.pw = pw;
@@ -1241,9 +1252,10 @@ function api_resetkeykey(ctx, c, key, email, pw) {
     api_req({
         a: 'erx',
         r: 'gk',
-        c: c
+        c: code
     }, ctx);
 }
+/* jshint +W098 */
 
 function api_resetkeykey2(res, ctx) {
     try {
@@ -1253,23 +1265,17 @@ function api_resetkeykey2(res, ctx) {
         ctx.result(EKEY);
     }
 }
+
 function api_resetkeykey3(res, ctx) {
+
+    'use strict';
+
     if (typeof res === 'string') {
-        var privk = a32_to_str(decrypt_key(new sjcl.cipher.aes(ctx.k), base64_to_a32(res)));
 
-        // verify the integrity of the decrypted private key
-        for (var i = 0; i < 4; i++) {
-            var l = ((privk.charCodeAt(0) * 256 + privk.charCodeAt(1) + 7) >> 3) + 2;
-            if (privk.substr(0, l).length < 2) {
-                break;
-            }
-            privk = privk.substr(l);
-        }
-
-        if (i !== 4 || privk.length >= 16) {
+        if (!verifyPrivateRsaKeyDecryption(res, ctx.k)) {
             ctx.result(EKEY);
         }
-        else if (ctx.email) {
+        else if (ctx.email && ctx.pw) {
             var pw_aes = new sjcl.cipher.aes(prepare_key_pw(ctx.pw));
 
             ctx.callback = ctx.result;
@@ -1290,11 +1296,50 @@ function api_resetkeykey3(res, ctx) {
     }
 }
 
+/**
+ * Verify that the Private RSA key was decrypted successfully by the Master/Recovery Key
+ * @param {String} encryptedPrivateRsaKeyBase64 The encrypted Private RSA key as a Base64 string
+ * @param {Array} masterKeyArray32 The Master/Recovery Key
+ * @returns {Boolean} Returns true if the decryption succeeded, false if it failed
+ */
+function verifyPrivateRsaKeyDecryption(encryptedPrivateRsaKeyBase64, masterKeyArray32) {
+
+    'use strict';
+
+    try {
+        // Decrypt the RSA key
+        var privateRsaKeyArray32 = base64_to_a32(encryptedPrivateRsaKeyBase64);
+        var cipherObject = new sjcl.cipher.aes(masterKeyArray32);
+        var decryptedPrivateRsaKey = decrypt_key(cipherObject, privateRsaKeyArray32);
+        var privateRsaKeyStr = a32_to_str(decryptedPrivateRsaKey);
+
+        // Verify the integrity of the decrypted private key
+        for (var i = 0; i < 4; i++) {
+            var l = ((privateRsaKeyStr.charCodeAt(0) * 256 + privateRsaKeyStr.charCodeAt(1) + 7) >> 3) + 2;
+
+            if (privateRsaKeyStr.substr(0, l).length < 2) {
+                break;
+            }
+            privateRsaKeyStr = privateRsaKeyStr.substr(l);
+        }
+
+        // If invalid
+        if (i !== 4 || privateRsaKeyStr.length >= 16) {
+            return false;
+        }
+
+        return true;
+    }
+    catch (exception) {
+        return false;
+    }
+}
+
 // We query the sid using the supplied user handle (or entered email address, if already attached)
 // and check the supplied password key.
 // Returns [decrypted master key,verified session ID(,RSA private key)] or false if API error or
 // supplied information incorrect
-function api_getsid(ctx, user, passwordkey, hash) {
+function api_getsid(ctx, user, passwordkey, hash, pinCode) {
     "use strict";
 
     ctx.callback = api_getsid2;
@@ -1305,11 +1350,15 @@ function api_getsid(ctx, user, passwordkey, hash) {
         return ctx.result(ctx, false);
     }
 
-    api_req({
-        a: 'us',
-        user: user,
-        uh: hash
-    }, ctx);
+    // Setup the login request
+    var requestVars = { a: 'us', user: user, uh: hash };
+
+    // If the two-factor authentication code was entered by the user, add it to the request as well
+    if (pinCode !== null) {
+        requestVars.mfa = pinCode;
+    }
+
+    api_req(requestVars, ctx);
 }
 
 api_getsid.warning = function() {
@@ -1322,22 +1371,10 @@ function api_getsid2(res, ctx) {
     var t, k;
     var r = false;
 
+    // If the result is an error, pass that back to get an exact error
     if (typeof res === 'number') {
-
-        if (res === ETOOMANY) {
-            api_getsid.etoomany = Date.now();
-            api_getsid.warning();
-        }
-
-        // Check for incomplete registration
-        else if (res === EINCOMPLETE) {
-            if (is_mobile) {
-                mobile.messageOverlay.show(l[882], l[9082]);
-            }
-            else {
-                msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration process...
-            }
-        }
+        ctx.checkloginresult(ctx, res);
+        return false;
     }
     else if (typeof res === 'object') {
         var aes = new sjcl.cipher.aes(ctx.passwordkey);
@@ -1376,6 +1413,11 @@ function api_getsid2(res, ctx) {
                     if (privk) {
                         // TODO: check remaining padding for added early wrong password detection likelihood
                         r = [k, base64urlencode(crypto_rsadecrypt(t, privk).substr(0, 43)), privk];
+                    }
+                    else {
+                        // Bad decryption of RSA is an indication that the password was wrong
+                        ctx.checkloginresult(ctx, false);
+                        return false;
                     }
                 }
             }

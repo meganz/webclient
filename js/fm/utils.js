@@ -34,14 +34,30 @@ MegaApi.prototype.prod = function(aSave) {
     this.setDomain('eu.api.mega.co.nz', aSave);
 };
 
+MegaApi.prototype._apiReqInflight = Object.create(null);
+
 MegaApi.prototype.req = function(params) {
     'use strict';
-
-    var promise = new MegaPromise();
 
     if (typeof params === 'string') {
         params = {a: params};
     }
+
+    var key = JSON.stringify(params);
+
+    if (this._apiReqInflight[key]) {
+        if (d) {
+            console.info('Reusing pending api request...', params);
+        }
+        return this._apiReqInflight[key];
+    }
+
+    var promise = new MegaPromise();
+    this._apiReqInflight[key] = promise;
+
+    promise.always(function() {
+        delete M._apiReqInflight[key];
+    });
 
     api_req(params, {
         callback: tryCatch(function(res) {

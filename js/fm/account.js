@@ -450,9 +450,6 @@ function accountUI() {
         $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
         $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
 
-        var $passwords = $('#account-password,#account-new-password,#account-confirm-password');
-        $passwords.unbind('click');
-
         M.account.sessions.sort(function(a, b) {
             if (a[0] < b[0]) {
                 return 1;
@@ -749,53 +746,16 @@ function accountUI() {
         // Bind Dropdowns events
         bindDropdownEvents($('.fm-account-main .default-select'), 1, '.account.tab-content');
 
+        // Initialise functionality to change the user's password and email
+        accountChangePassword.init();
+        accountChangeEmail.init();
+
         // Cache selectors
-        var $newEmail = $('#account-email');
-        var $emailInfoMessage = $('.fm-account-change-email');
         var $personalInfoBlock = $('.profile-form.first');
         var $firstNameField = $personalInfoBlock.find('#account-firstname');
         var $saveBlock = $('.fm-account-save-block');
         var $cancelButton = $saveBlock.find('.fm-account-cancel');
         var $saveButton = $saveBlock.find('.fm-account-save');
-
-        $('#account-password').val('');
-        $('#account-new-password').val('');
-        $('#account-confirm-password').val('');
-
-        // Reset change email fields after change
-        $newEmail.val('');
-        $emailInfoMessage.addClass('hidden');
-
-        $passwords.rebind('keyup.em', function() {
-            var texts = [];
-            $passwords.each(function() {
-                texts.push($(this).val());
-            });
-            $newEmail.val('');
-        });
-
-        // On text entry in the new email text field
-        $newEmail.rebind('keyup', function() {
-            var mail = $.trim($newEmail.val());
-
-            $passwords.val('');
-            $saveBlock.find('.fm-account-save').removeClass('disabled');
-            $saveBlock.addClass('hidden');
-
-            // Show information message
-            $emailInfoMessage.removeClass('hidden');
-
-            // If not valid email yet, exit
-            if (checkMail(mail)) {
-                return;
-            }
-
-            // Show save button
-            if (mail !== u_attr.email) {
-                $personalInfoBlock.addClass('email-confirm');
-                $saveBlock.removeClass('hidden');
-            }
-        });
 
         $firstNameField.on('input', function() {
 
@@ -890,112 +850,10 @@ function accountUI() {
                 });
             }
 
-            var pws = zxcvbn($('#account-new-password').val());
-
-            if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
-                msgDialog('warninga', l[135], l[715], false, function() {
-                    $('#account-new-password').val('');
-                    $('#account-confirm-password').val('');
-                    $('#account-new-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                });
-            }
-            else if (/*$('#account-password').val() !== ''
-                &&*/ $('#account-confirm-password').val() !== ''
-                && $('#account-new-password').val() !== ''
-                && (pws.score === 0 || pws.entropy < 16)) {
-
-                msgDialog('warninga', l[135], l[1129], false, function() {
-                    $('#account-new-password').val('');
-                    $('#account-confirm-password').val('');
-                    $('#account-new-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                });
-            }
-            else if ($('#account-confirm-password').val() !== '' /*&& $('#account-password').val() !== ''
-                && $('#account-confirm-password').val() !== $('#account-password').val()*/) {
-                loadingDialog.show();
-                changepw($('#account-password').val(), $('#account-confirm-password').val(), {
-                    callback: function(res) {
-                        loadingDialog.hide();
-                        if (res == EACCESS) { // pwd incorrect
-                            msgDialog('warninga', l[135], l[724], false, function() {
-                                $('#account-password').val('');
-                                $('#account-password').focus();
-                                $('#account-password').bind('keyup.accpwd', function() {
-                                    $('.fm-account-save-block').removeClass('hidden');
-                                    $('.fm-account-save').removeClass('disabled');
-                                    $('#account-password').unbind('keyup.accpwd');
-                                });
-                            });
-                        }
-                        else if (typeof res == 'number' && res < 0) { // something went wrong
-                            $passwords.val('');
-                            msgDialog('warninga', l[135], l[6972]);
-                        }
-                        else { // success
-                            showToast('settings', l[725]);
-                            var pw_aes = new sjcl.cipher.aes(prepare_key_pw($('#account-confirm-password').val()));
-                            u_attr.k = a32_to_base64(encrypt_key(pw_aes, u_k));
-                            $passwords.val('');
-                        }
-                        accountUI();
-                    }
-                });
-            }
-            /*else if ($('#account-password').val() !== ''
-                    && $('#account-confirm-password').val() === $('#account-password').val()) {
-                msgDialog('warninga', l[135], l[16664]);
-                $('#account-confirm-password').val('');
-                $('#account-new-password').val('');
-                $('.fm-account-save-block').removeClass('hidden');
-                $('.fm-account-save').addClass('disabled');
-            }*/
-            else {
-                $passwords.val('');
-            }
-
-            // Get the new email address
-            var email = $('#account-email').val().trim().toLowerCase();
-
-            // If there is text in the email field and it doesn't match the existing one
-            if ((email !== '') && (u_attr.email !== email)) {
-
-                loadingDialog.show();
-
-                // Request change of email
-                // e => new email address
-                // i => requesti (Always has the global variable requesti (last request ID))
-                api_req({ a: 'se', aa: 'a', e: email, i: requesti }, {
-                    callback: function(res) {
-
-                        loadingDialog.hide();
-
-                        if (res === -12) {
-                            return msgDialog('warninga', l[135], l[7717]);
-                        }
-
-                        fm_showoverlay();
-                        dialogPositioning('.awaiting-confirmation');
-
-                        $('.awaiting-confirmation').removeClass('hidden');
-                        $('.fm-account-save-block').addClass('hidden');
-                        $('.fm-account-save').removeClass('disabled');
-
-                        localStorage.new_email = email;
-                    }
-                });
-
-                return;
-            }
-
-            $('.fm-account-save-block').addClass('hidden');
-            $('.fm-account-save').removeClass('disabled');
+            $saveBlock.addClass('hidden');
+            $saveButton.removeClass('disabled');
         });
 
-        $('#current-email').val(u_attr.email);
         $('#account-firstname').val(u_attr.firstname);
         $('#account-lastname').val(u_attr.lastname);
 
@@ -1679,27 +1537,72 @@ function accountUI() {
             }
         });
 
+        /**
+         * Finalise the account cancellation process
+         * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
+         */
+        var continueCancelAccount = function(twoFactorPin) {
+
+            // Prepare the request
+            var request = { a: 'erm', m: Object(M.u[u_handle]).m, t: 21 };
+
+            // If 2FA PIN is set, add it to the request
+            if (twoFactorPin !== null) {
+                request.mfa = twoFactorPin;
+            }
+
+            api_req(request, {
+                callback: function(res) {
+                    loadingDialog.hide();
+
+                    // Check for invalid 2FA code
+                    if (res === EFAILED || res === EEXPIRED) {
+                        msgDialog('warninga', l[135], l[19216]);
+                    }
+
+                    // Check for incorrect email
+                    else if (res === ENOENT) {
+                        msgDialog('warningb', l[1513], l[1946]);
+                    }
+                    else if (res === 0) {
+                        handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
+                    }
+                    else {
+                        msgDialog('warningb', l[135], l[200]);
+                    }
+                }
+            });
+        };
+
         // Ask for confirmation
         msgDialog('confirmation', l[6181], confirmMessage, false, function(event) {
             if (event) {
+
                 loadingDialog.show();
-                api_req({a: 'erm', m: Object(M.u[u_handle]).m, t: 21}, {
-                    callback: function(res) {
-                        loadingDialog.hide();
-                        if (res === ENOENT) {
-                            msgDialog('warningb', l[1513], l[1946]);
-                        }
-                        else if (res === 0) {
-                            handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
-                        }
-                        else {
-                            msgDialog('warningb', l[135], l[200]);
-                        }
+
+                // Check if 2FA is enabled on their account
+                twofactor.isEnabledForAccount(function(result) {
+
+                    loadingDialog.hide();
+
+                    // If 2FA is enabled on their account
+                    if (result) {
+
+                        // Show the verify 2FA dialog to collect the user's PIN
+                        twofactor.verifyActionDialog.init(function(twoFactorPin) {
+                            continueCancelAccount(twoFactorPin);
+                        });
+                    }
+                    else {
+                        continueCancelAccount(null);
                     }
                 });
             }
         });
     });
+
+    // Initialise the Two Factor Authentication section and show enabled/disabled state
+    twofactor.account.init();
 
     // Button on main Account page to backup their master key
     $('.backup-master-key').rebind('click', function() {
@@ -1777,46 +1680,7 @@ function accountUI() {
     });
 
     $('.account-pass-lines').attr('class', 'account-pass-lines');
-    $('#account-new-password').rebind('keyup.pwdchg', function(el) {
-        $('.account-pass-lines').attr('class', 'account-pass-lines');
-        if ($(this).val() !== '') {
-            $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-save').addClass('disabled');
-            if ($(this).val() === $('#account-confirm-password').val()) {
-                $('.fm-account-save').removeClass('disabled');
-            }
-            else {
-                $('.fm-account-save').addClass('disabled');
-            }
-            var pws = zxcvbn($(this).val());
-            if (pws.score > 3 && pws.entropy > 75) {
-                $('.account-pass-lines').addClass('good4');
-            }
-            else if (pws.score > 2 && pws.entropy > 50) {
-                $('.account-pass-lines').addClass('good3');
-            }
-            else if (pws.score > 1 && pws.entropy > 40) {
-                $('.account-pass-lines').addClass('good2');
-            }
-            else if (pws.score > 0 && pws.entropy > 15) {
-                $('.account-pass-lines').addClass('good1');
-            }
-            else {
-                $('.account-pass-lines').addClass('weak-password');
-            }
-        }
-    });
 
-    $('#account-confirm-password').rebind('keyup.pwdchg', function(el) {
-
-        $('.fm-account-save-block').removeClass('hidden');
-        if ($(this).val() === $('#account-new-password').val()) {
-            $('.fm-account-save').removeClass('disabled');
-        }
-        else {
-            $('.fm-account-save').addClass('disabled');
-        }
-    });
 
     // Account Notifications settings handling
     var accNotifHandler = function accNotifHandler() {

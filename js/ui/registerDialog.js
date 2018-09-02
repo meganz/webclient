@@ -18,6 +18,8 @@
     }
 
     function doProRegister($dialog) {
+
+        var rv = {};
         var hideOverlay = function() {
             loadingDialog.hide();
             $dialog.removeClass('arrange-to-back');
@@ -35,89 +37,100 @@
             return false;
         }
 
-        var registeraccount = function() {
-            var rv = {};
-            var done = function(login) {
-                var onAccountCreated = options.onAccountCreated;
+        var registrationDone = function(login) {
 
+            var onAccountCreated = options.onAccountCreated;
+
+            hideOverlay();
+            closeRegisterDialog($dialog);
+            $('.fm-dialog.registration-page-success').unbind('click');
+
+            if (login) {
+                Soon(function() {
+                    showToast('megasync', l[8745]);
+                    $('.fm-avatar img').attr('src', useravatar.mine());
+                });
+            }
+            onIdle(topmenuUI);
+
+            if (typeof onAccountCreated === 'function') {
+                onAccountCreated(login, rv);
+            }
+            else {
+                // $('.fm-dialog.registration-page-success').removeClass('hidden');
+                // fm_showoverlay();
+                // ^ legacy confirmation dialog, with no email change option
+                sendSignupLinkDialog(rv);
+            }
+        };
+
+        /**
+         * When the user has an account already, show them the Pro Login dialog instead so they can log in
+         */
+        var redirectToProLoginForExistingAccount = function() {
+
+            // Log out the ephemeral account that was created
+            u_logout();
+
+            // Close the Pro register dialog, pre-set email and password into the Pro login dialog
+            closeRegisterDialog($dialog, false);
+            showLoginDialog(rv.email, rv.password);
+
+            // Show a message dialog telling them to log in
+            msgDialog('warninga', l[882], l[1783], l[1768]);
+        };
+
+        /**
+         * Continue the old method Pro registration
+         * @param {Number} result The result of the 'uc' API request
+         */
+        var continueOldProRegistration = function(result) {
+
+            if (result === 0) {
+                var ops = {
+                    a: 'up'
+                };
+
+                ops.terms = 'Mq';
+                ops.firstname = base64urlencode(to8(rv.first));
+                ops.lastname = base64urlencode(to8(rv.last));
+                ops.name2 = base64urlencode(to8(rv.name));
+                u_attr.terms = 1;
+
+                api_req(ops);
+                registrationDone();
+            }
+            else if (result === EACCESS || result === EEXIST) {
+                redirectToProLoginForExistingAccount();
+            }
+            else {
                 hideOverlay();
-                closeRegisterDialog($dialog);
-                $('.fm-dialog.registration-page-success').unbind('click');
+                msgDialog('warninga', 'Error', l[200], result);
+            }
+        };
 
-                if (login) {
-                    Soon(function() {
-                        showToast('megasync', l[8745]);
-                        $('.fm-avatar img').attr('src', useravatar.mine());
-                    });
-                }
-                onIdle(topmenuUI);
+        /**
+         * Continue the new method registration
+         * @param {Number} result The result of the 'uc2' API request
+         */
+        var continueNewProRegistration = function(result) {
 
-                if (typeof onAccountCreated === 'function') {
-                    onAccountCreated(login, rv);
-                }
-                else {
-                    // $('.fm-dialog.registration-page-success').removeClass('hidden');
-                    // fm_showoverlay();
-                    // ^ legacy confirmation dialog, with no email change option
-                    sendSignupLinkDialog(rv);
-                }
-            };
+            if (result === 0) {
+                registrationDone();
+            }
+            else if (result === EACCESS || result === EEXIST) {
+                redirectToProLoginForExistingAccount();
+            }
+            else {
+                loadingDialog.hide();
+                msgDialog('warninga', l[1578], l[200], result);
+            }
+        };
 
-            var ctx = {
-                callback: function(res) {
-                    if (res === 0) {
-                        var ops = {
-                            a: 'up'
-                        };
-
-                        ops.terms = 'Mq';
-                        ops.firstname = base64urlencode(to8(rv.first));
-                        ops.lastname = base64urlencode(to8(rv.last));
-                        ops.name2 = base64urlencode(to8(rv.name));
-                        u_attr.terms = 1;
-
-                        api_req(ops);
-                        done();
-                    }
-                    else if (res === EACCESS || res === EEXIST) {
-
-                        var passwordaes = new sjcl.cipher.aes(prepare_key_pw(rv.password));
-                        var uh = stringhash(rv.email.toLowerCase(), passwordaes);
-                        var ctx = {
-                            checkloginresult: function(ctx, r) {
-                                hideOverlay();
-
-                                if (!r) {
-                                    $('.login-register-input.email', $dialog).addClass('incorrect');
-                                    $('.login-register-input.email .top-loginp-tooltip-txt', $dialog)
-                                        .safeHTML('@@<div class="white-txt">@@</div>', l[1297], l[1298]);
-
-                                    if (options.onLoginAttemptFailed) {
-                                        options.onLoginAttemptFailed(rv);
-                                    }
-                                    else {
-                                        msgDialog('warninga', l[1578], l[218]);
-                                    }
-                                }
-                                else if (r === EBLOCKED) {
-                                    alert(l[730]);
-                                }
-                                else {
-                                    u_type = r;
-                                    u_checked = true;
-                                    done(true);
-                                }
-                            }
-                        };
-                        u_login(ctx, rv.email, rv.password, uh, true);
-                    }
-                    else {
-                        hideOverlay();
-                        msgDialog('warninga', 'Error', l[200], res);
-                    }
-                }
-            };
-
+        /**
+         * The main function to register the account
+         */
+        var registeraccount = function() {
 
             rv.password = $('#register-password', $dialog).val();
             rv.first = $('#register-firstname', $dialog).val();
@@ -125,9 +138,19 @@
             rv.email = $('#register-email', $dialog).val();
             rv.name = rv.first + ' ' + rv.last;
 
-            sendsignuplink(rv.name, rv.email, rv.password, ctx, true);
-        };
+            // Set a flag that the registration came from the Pro page
+            var fromProPage = true;
 
+            // Set the signup function to start the new secure registration process
+            if (security.register.newRegistrationEnabled()) {
+                security.register.startRegistration(rv.first, rv.last, rv.email, rv.password,
+                                                    fromProPage, continueNewProRegistration);
+            }
+            else {
+                // Set the signup function to use the legacy registration process
+                sendsignuplink(rv.name, rv.email, rv.password, { callback: continueOldProRegistration }, fromProPage);
+            }
+        };
 
         var err = false;
 
@@ -155,6 +178,8 @@
             err = 1;
         }
 
+        var password = $.trim($('#register-password', $dialog).val());
+
         var pw = {};
         if (typeof zxcvbn !== 'undefined') {
             pw = zxcvbn($('#register-password', $dialog).val());
@@ -164,7 +189,12 @@
             $('.white-txt.password', $dialog).text(l[213]);
             err = 1;
         }
-        else if (pw.score === 0 || pw.entropy < 16) {
+        else if (password.length < security.minPasswordLength) {
+            $('.login-register-input.password.first').addClass('incorrect');
+            $('.white-txt.password').text(l[18701]);
+            err = 1;
+        }
+        else if (pw.score < 1) {
             $('.login-register-input.password.first', $dialog).addClass('incorrect');
             $('.white-txt.password', $dialog).text(l[1104]);
             err = 1;
@@ -190,31 +220,7 @@
                 msgDialog('warninga', l[1117], l[1118]);
             }
             else {
-                if (localStorage.signupcode) {
-                    u_storage = init_storage(localStorage);
-                    var ctx = {
-                        checkloginresult: function(u_ctx, r) {
-                            hideOverlay();
-
-                            if (typeof r[0] === 'number' && r[0] < 0) {
-                                msgDialog('warningb', l[135], l[200]);
-                            }
-                            else {
-                                u_type = r;
-                                loadSubPage('fm');
-                            }
-                        }
-                    };
-                    var passwordaes = new sjcl.cipher.aes(prepare_key_pw($('#register-password', $dialog).val()));
-                    var uh = stringhash($('#register-email', $dialog).val().toLowerCase(), passwordaes);
-                    u_checklogin(ctx,
-                        true,
-                        prepare_key_pw($('#register-password', $dialog).val()),
-                        localStorage.signupcode,
-                        $('#register-firstname', $dialog).val() + ' ' + $('#register-lastname', $dialog).val(), uh);
-                    delete localStorage.signupcode;
-                }
-                else if (u_type === false) {
+                if (u_type === false) {
                     hideOverlay();
                     u_storage = init_storage(localStorage);
                     u_checklogin({
@@ -233,7 +239,6 @@
             hideOverlay();
         }
     }
-
 
     function showRegisterDialog(opts) {
         var $dialog = $('.fm-dialog.pro-register-dialog');
@@ -344,47 +349,16 @@
             $('.new-registration', $dialog)
                 .removeClass('good1 good2 good3 good4 good5');
 
+            var $passwordInput = $('#register-password', $dialog);
+            var password = $.trim($passwordInput.val());
+
             if (typeof zxcvbn === 'undefined'
-                    || $('#register-password', $dialog).attr('type') === 'text'
-                    || $('#register-password', $dialog).val() === '') {
+                    || $passwordInput.attr('type') === 'text'
+                    || password === '') {
                 return false;
             }
 
-            var pw = zxcvbn($('#register-password', $dialog).val());
-            if (pw.score > 3 && pw.entropy > 75) {
-                $('.login-register-input.password', $dialog).addClass('strong-password');
-                $('.new-registration', $dialog).addClass('good5');
-                $('.new-reg-status-pad', $dialog).safeHTML('<strong>@@</strong>@@', l[1105], l[1128]);
-                $('.new-reg-status-description', $dialog).text(l[1123]);
-            }
-            else if (pw.score > 2 && pw.entropy > 50) {
-                $('.login-register-input.password', $dialog).addClass('strong-password');
-                $('.new-registration', $dialog).addClass('good4');
-                $('.new-reg-status-pad', $dialog).safeHTML('<strong>@@</strong>@@', l[1105], l[1127]);
-                $('.new-reg-status-description', $dialog).text(l[1122]);
-            }
-            else if (pw.score > 1 && pw.entropy > 40) {
-                $('.login-register-input.password', $dialog).addClass('strong-password');
-                $('.new-registration', $dialog).addClass('good3');
-                $('.new-reg-status-pad', $dialog).safeHTML('<strong>@@</strong>@@', l[1105], l[1126]);
-                $('.new-reg-status-description', $dialog).text(l[1121]);
-            }
-            else if (pw.score > 0 && pw.entropy > 15) {
-                $('.new-registration', $dialog).addClass('good2');
-                $('.new-reg-status-pad', $dialog).safeHTML('<strong>@@</strong>@@', l[1105], l[1125]);
-                $('.new-reg-status-description', $dialog).text(l[1120]);
-            }
-            else {
-                $('.login-register-input.password', $dialog).addClass('weak-password');
-                $('.new-registration', $dialog).addClass('good1');
-                $('.new-reg-status-pad', $dialog).safeHTML('<strong>@@</strong> @@', l[1105], l[1124]);
-                $('.new-reg-status-description', $dialog).text(l[1119]);
-            }
-            $('.password-status-warning', $dialog)
-                .safeHTML('<span class="password-warning-txt">@@</span> '
-                        + '@@<div class="password-tooltip-arrow"></div>', l[34], l[1129]);
-            $('.password-status-warning', $dialog).css('margin-left',
-                ($('.password-status-warning', $dialog).width() / 2 * -1) - 13);
+            classifyPassword(password);
             reposition();
             dialogBodyScroll();
         };
@@ -484,8 +458,16 @@
             };
             loadingDialog.show();
 
-            var email = $('input', $dialog).val().trim() || accountData.email;
-            sendsignuplink(accountData.name, email, accountData.password, ctx, true);
+            var newEmail = $.trim($('input', $dialog).val()) || accountData.email;
+
+            // If the new registration method is enabled, re-send the signup link using the new method
+            if (security.register.newRegistrationEnabled()) {
+                security.register.repeatSendSignupLink(newEmail, ctx.callback);
+            }
+            else {
+                // Otherwise use the old method
+                sendsignuplink(accountData.name, newEmail, accountData.password, ctx, true);
+            }
         });
 
         if (typeof onCloseCallback === 'function') {

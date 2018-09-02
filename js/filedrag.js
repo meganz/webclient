@@ -1,5 +1,4 @@
 (function(scope) {
-    'use strict';
 
     var dir_inflight = 0;
     var filedrag_u = [];
@@ -108,7 +107,7 @@
                     start_anoupload();
                 }
                 else {
-                    loginDialog();
+                    tooltiplogin.init();
                     $.awaitingLoginToUpload = true;
 
                     mBroadcaster.once('fm:initialized', function() {
@@ -211,9 +210,6 @@
             else {
                 target = M.currentdirid;
             }
-            if ((onChat = (String(M.currentdirid).substr(0, 4) === 'chat'))) {
-                target = M.currentdirid;
-            }
 
             var uploadCmdIsFine = function _uploadCmdIsFine(error, response) {
                 if (error) {
@@ -311,7 +307,7 @@
         $('body').removeClass('overlayed');
 
         if ($.awaitingLoginToUpload) {
-            return loginDialog();
+            return tooltiplogin.init();
         }
 
         if (

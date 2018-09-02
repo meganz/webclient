@@ -28,6 +28,7 @@ mobile.account = {
         mobile.account.fetchSubscriptionInformation($page);
         mobile.account.initRecoveryKeyButton($page);
         mobile.account.initCancelAccountButton($page);
+        mobile.account.fetchAndDisplayTwoFactorAuthStatus($page);
 
         // Initialise the top menu
         topmenuUI();
@@ -378,6 +379,68 @@ mobile.account = {
     },
 
     /**
+     * Displays the current Two-Factor Authentication status (enabled/disabled)
+     * @param {String} $page The jQuery selector for the current page
+     */
+    fetchAndDisplayTwoFactorAuthStatus: function($page) {
+
+        'use strict';
+
+        var $twoFactorBlock = $page.find('.account-twofactor-block');
+
+        // Check if 2FA is actually enabled on the API for everyone
+        if (twofactor.isEnabledGlobally()) {
+
+            // Show the 2FA section
+            $twoFactorBlock.removeClass('hidden');
+
+            // Check if 2FA is enabled on the account
+            mobile.twofactor.isEnabledForAccount(function(result) {
+
+                // If enabled, show green icon and text to Disable 2FA
+                if (result) {
+                    $twoFactorBlock.addClass('enabled');
+                }
+                else {
+                    // Otherwise it's disabled, show red icon and text to Enable 2FA
+                    $twoFactorBlock.removeClass('enabled');
+                }
+
+                // Init the click handler now for the button now that the enabled/disabled status has been retrieved
+                mobile.account.initTwoFactorAuthenticationButton($page);
+            });
+        }
+    },
+
+    /**
+     * Initialise the Two Factor Authentication button so the user can enable/disable the feature
+     * @param {String} $page The jQuery selector for the current page
+     */
+    initTwoFactorAuthenticationButton: function($page) {
+
+        'use strict';
+
+        var $twoFactorBlock = $page.find('.account-twofactor-block');
+
+        // On clicking/tapping the Two-Factor Authentication button
+        $twoFactorBlock.off('tap').on('tap', function() {
+
+            // If 2FA is currently enabled
+            if ($twoFactorBlock.hasClass('enabled')) {
+
+                // Load the Disable page to disable the 2FA
+                loadSubPage('twofactor/verify-disable');
+                return false;
+            }
+            else {
+                // Load the Intro page to setup the 2FA
+                loadSubPage('twofactor/intro');
+                return false;
+            }
+        });
+    },
+
+    /**
      * Initialise the Cancel Account button to send the user an account cancellation confirmation email
      * @param {String} $page The jQuery selector for the current page
      */
@@ -390,7 +453,8 @@ mobile.account = {
 
             // Please confirm that all your data will be deleted
             var confirmMessage = l[1974];
-            var $cancelAccountOverlay = $("#mobile-ui-error");
+            var $cancelAccountOverlay = $('#mobile-ui-error');
+
             // Search through their Pro plan purchase history
             $(account.purchases).each(function(index, purchaseTransaction) {
 
@@ -408,7 +472,7 @@ mobile.account = {
             });
 
             // Show a confirm dialog
-            mobile.account.showAccountCancelConfirmDialog(confirmMessage);
+            mobile.account.showAccountCancelConfirmDialog($page, confirmMessage);
 
             // Show close button
             $cancelAccountOverlay.find('.text-button').removeClass('hidden');
@@ -420,38 +484,102 @@ mobile.account = {
 
     /**
      * Show dialog asking for confirmation and send an email to the user to finish the process if they agree
-     * @param {String} confirmMessage
+     * @param {String} $page The jQuery selector for the current page
+     * @param {String} confirmMessage The message to be displayed in the confirmation dialog
      */
-    showAccountCancelConfirmDialog: function(confirmMessage) {
+    showAccountCancelConfirmDialog: function($page, confirmMessage) {
 
         'use strict';
+
+        // Hide the current page as there is some scrolling issue / problem with
+        // the native browser header which shows buttons below the overlay
+        $page.addClass('hidden');
 
         // Show dialog asking for confirmation and continue if they agree
         mobile.messageOverlay.show(l[6181], confirmMessage, function() {
 
             loadingDialog.show();
 
-            // Make account cancellation request
-            api_req({a: 'erm', m: u_attr.email, t: 21}, {
-                callback: function(result) {
+            // Check if 2FA is enabled on their account
+            mobile.twofactor.isEnabledForAccount(function(result) {
 
-                    loadingDialog.hide();
+                loadingDialog.hide();
 
-                    // Please check the e-mail address and try again
-                    if (result === ENOENT) {
-                        mobile.messageOverlay.show(l[1513], l[1946]);
-                    }
+                // If 2FA is enabled
+                if (result) {
 
-                    // If successful, show a dialog saying they need to check their email
-                    else if (result === 0) {
-                        mobile.showEmailConfirmOverlay();
-                    }
-                    else {
-                        // Oops, something went wrong
-                        mobile.messageOverlay.show(l[135], l[200]);
-                    }
+                    // Show the verify 2FA page to collect the user's PIN
+                    mobile.twofactor.verifyAction.init(function(twoFactorPin) {
+
+                        // Complete the cancellation process
+                        mobile.account.continueAccountCancelProcess($page, twoFactorPin);
+                    });
+                }
+                else {
+                    // Complete the cancellation process
+                    mobile.account.continueAccountCancelProcess($page, null);
                 }
             });
+        },
+        // Close button callback to re-show the My Account page
+        function() {
+            $page.removeClass('hidden');
+        });
+    },
+
+    /**
+     * Finalise the account cancellation process
+     * @param {String} $page The jQuery selector for the current page
+     * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
+     */
+    continueAccountCancelProcess: function($page, twoFactorPin) {
+
+        'use strict';
+
+        // Cache selector
+        var $verifyActionPage = $('.mobile.two-factor-page.verify-action-page');
+
+        // Prepare the request
+        var request = { a: 'erm', m: u_attr.email, t: 21 };
+
+        // If 2FA PIN is set, add it to the request
+        if (twoFactorPin !== null) {
+            request.mfa = twoFactorPin;
+        }
+
+        loadingDialog.show();
+
+        // Make account cancellation request
+        api_req(request, {
+            callback: function(result) {
+
+                loadingDialog.hide();
+
+                // If something went wrong with the 2FA PIN
+                if (result === EFAILED || result === EEXPIRED) {
+                    mobile.twofactor.verifyAction.showVerificationError();
+                }
+
+                // Check for incorrect email
+                else if (result === ENOENT) {
+                    $page.removeClass('hidden');
+                    $verifyActionPage.addClass('hidden');
+                    mobile.messageOverlay.show(l[1513], l[1946]);
+                }
+
+                // If successful, show a dialog saying they need to check their email
+                else if (result === 0) {
+                    $page.removeClass('hidden');
+                    $verifyActionPage.addClass('hidden');
+                    mobile.showEmailConfirmOverlay();
+                }
+                else {
+                    // Oops, something went wrong
+                    $page.removeClass('hidden');
+                    $verifyActionPage.addClass('hidden');
+                    mobile.messageOverlay.show(l[135], l[200]);
+                }
+            }
         });
     }
 };

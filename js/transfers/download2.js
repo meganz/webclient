@@ -96,7 +96,7 @@ var dlmanager = {
         }
 
         if (typeof dl === 'string') {
-            dl = {ph: dl};
+            dl = {ph: dl, hasResumeSupport: true};
         }
         var promise;
         var tag = this.getResumeInfoTag(dl);
@@ -108,6 +108,9 @@ var dlmanager = {
         if (this.resumeInfoCache[tag]) {
             this.resumeInfoCache[tag].tag = tag;
             promise = MegaPromise.resolve(this.resumeInfoCache[tag]);
+        }
+        else if (!dl.hasResumeSupport) {
+            promise = MegaPromise.resolve(false);
         }
         else {
             promise = M.getPersistentData(tag);

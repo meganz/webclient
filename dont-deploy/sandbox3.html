@@ -47,11 +47,31 @@
         else if (window.location.search.indexOf('apipath=prod') > -1) {
             localStorage.apipath = 'https://eu.api.mega.co.nz/';
         }
+        else if (window.location.search.indexOf('apipath=sandbox4') > -1) {
+            localStorage.apipath = 'https://api-sandbox4.developers.mega.co.nz/';
+        }
         else if (window.location.search.indexOf('apipath=sandbox2') > -1) {
             localStorage.apipath = 'https://api-sandbox2.developers.mega.co.nz/';
         }
         else {
             localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
+        }
+
+        // Force the new secure registration method on or off for testing
+        if (window.location.search.indexOf('securereg=1') > -1) {
+            localStorage.newRegistrationEnabled = '1';
+        }
+        else if (window.location.search.indexOf('securereg=0') > -1) {
+            localStorage.newRegistrationEnabled = '0';
+        }
+
+        // Force the Two-Factor authentication on or off for testing. This just shows/hides the 2FA section in the
+        // My Account area of desktop and mobile web. It overrides the API flag value
+        if (window.location.search.indexOf('twofactor=1') > -1) {
+            localStorage.twoFactorAuthEnabled = '1';
+        }
+        else if (window.location.search.indexOf('twofactor=0') > -1) {
+            localStorage.twoFactorAuthEnabled = '0';
         }
 
         // Use the beta CMS if requested

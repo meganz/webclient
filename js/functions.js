@@ -1029,21 +1029,10 @@ function moveCursortoToEnd(el) {
 }
 
 function asyncApiReq(data) {
-    var $promise = new MegaPromise();
-    api_req(data, {
-        callback: function(r) {
-            if (typeof r === 'number' && r !== 0) {
-                $promise.reject.apply($promise, arguments);
-            }
-            else {
-                $promise.resolve.apply($promise, arguments);
-            }
-        }
-    });
+    'use strict';
 
-    //TODO: fail case?! e.g. the exp. backoff failed after waiting for X minutes??
-
-    return $promise;
+    // TODO: find&replace all occurences
+    return M.req(data);
 }
 
 // Returns pixels position of element relative to document (top left corner) OR to the parent (IF the parent and the
@@ -1816,10 +1805,10 @@ function rand_range(a, b) {
  *  2. The form needs to be filled and visible when this function is called
  *  3. After this function is called, within the next second the form needs to be gone
  *
- * As an example take a look at the `tooltiplogin()` function in `index.js`.
+ * As an example take a look at the `tooltiplogin.init()` function in `top-tooltip-login.js`.
  *
  * @param {String|Object} form jQuery selector of the form
- * @return {Bool}   True if the password manager can be called.
+ * @return {Boolean} Returns true if the password manager can be called.
  *
  */
 function passwordManager(form) {
@@ -2606,3 +2595,61 @@ function invalidLinkError() {
         mobile.notFoundOverlay.show();
     }
 }
+
+/* jshint -W098 */
+
+/**
+ * Classifies the strength of the password (used on the main Registration, Reset password (key or park) pages and
+ * in the Pro Register dialog.
+ * @param {String} password The user's password (should be trimmed for whitespace beforehand)
+ */
+function classifyPassword(password) {
+
+    'use strict';
+
+    // Calculate the password score using the ZXCVBN library and its length
+    var passwordScore = zxcvbn(password).score;
+    var passwordLength = password.length;
+
+    if (passwordLength < security.minPasswordLength) {
+        $('.login-register-input.password').addClass('weak-password');
+        $('.new-registration').addClass('good1');
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[18700]);   // Too short
+        $('.new-reg-status-description').text(l[18701]);
+    }
+    else if (passwordScore === 4) {
+        $('.login-register-input.password').addClass('strong-password');
+        $('.new-registration').addClass('good5');
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1128]); // Strong
+        $('.new-reg-status-description').text(l[1123]);
+    }
+    else if (passwordScore === 3) {
+        $('.login-register-input.password').addClass('strong-password');
+        $('.new-registration').addClass('good4');
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1127]); // Good
+        $('.new-reg-status-description').text(l[1122]);
+    }
+    else if (passwordScore === 2) {
+        $('.login-register-input.password').addClass('strong-password');
+        $('.new-registration').addClass('good3');
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1126]); // Medium
+        $('.new-reg-status-description').text(l[1121]);
+    }
+    else if (passwordScore === 1) {
+        $('.new-registration').addClass('good2');
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1125]); // Weak
+        $('.new-reg-status-description').text(l[1120]);
+    }
+    else {
+        $('.login-register-input.password').addClass('weak-password');
+        $('.new-registration').addClass('good1');
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1124]); // Very Weak
+        $('.new-reg-status-description').text(l[1119]);
+    }
+
+    $('.password-status-warning')
+        .safeHTML('<span class="password-warning-txt">@@</span> ' +
+            '@@<div class="password-tooltip-arrow"></div>', l[34], l[1129]);
+    $('.password-status-warning').css('margin-left', ($('.password-status-warning').width() / 2 * -1) - 13);
+}
+/* jshint +W098 */

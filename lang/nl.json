@@ -2730,5 +2730,20 @@
     "19320": "Lead Data Protection Supervisory Authority under the GDPR for accepting complaints about Mega",
     "19321": "Enquiries and requests relating to our Privacy & Data Policy should be sent to:",
     "19322": "Submit full details of alleged Trademark infringement to:",
-    "19323": "Mega has zero tolerance for Child Exploitation Material, Violent Extremism, Bestiality, Zoophilia, Gore, Malware, Hacked\/Stolen Data\/Passwords, Extortion, Revenge Porn etc. Report links with description to:"
+    "19323": "Mega has zero tolerance for Child Exploitation Material, Violent Extremism, Bestiality, Zoophilia, Gore, Malware, Hacked\/Stolen Data\/Passwords, Extortion, Revenge Porn etc. Report links with description to:",
+    "19325": "Scan or copy the seed to your Authenticator App. Be sure to backup this seed to a safe place in case you lose your phone.",
+    "19326": "After setting up your seed on your Authenticator app enter the 6-digit code provided.",
+    "19328": "Are you sure you want to redeem this voucher for the [B]%1[\/B] account?",
+    "19329": "Importeer naar mijn cloud schijf",
+    "19330": "[S]MEGAsync:[\/S] Gemakkelijke automatische synchronisatie tussen uw computers en uw MEGA Cloud Drive",
+    "19332": "Bedankt voor het testen van MEGAsync. <br>Deze beta versie is niet meer actueel en is verlopen. <br>Volg <a href=\"https:\/\/twitter.com\/MEGAprivacy\">@MEGAprivacy <\/a> op Twitter voor updates.",
+    "19333": "Er was een probleem met het installeren van de update. Probeer later nogmaals of download de laatste versie van: https:\/\/mega.nz\/sync",
+    "19334": "Uw account is geblokkeerd. Neem alstublieft contact op met support@mega.nz",
+    "19335": "Ik ga akkoord met de MEGA <a href=\"https:\/\/mega.nz\/terms\">Terms of Service<\/a>",
+    "19336": "Synchroniseer uw volledige cloud schijf",
+    "19337": "Synchroniseer specifieke mappen in uw cloud schijf",
+    "19338": "Upload 1 file",
+    "19339": "Upload [X] files",
+    "19340": "You don't have write privileges in this share.",
+    "19341": "The account you are currently logged into on your web browser is not the one you want to upgrade. Please logout and login with the account you want to upgrade."
 }

@@ -40,13 +40,10 @@
         <div class="reset-small-txt">[$6220]</div>
 
         <div class="fm-account-input">
-            <div class="reset-pass-error">
-                <div class="multiple-input-warning">
-                    <div class="arrow"></div>
-                    <span>[$6001]</span>
-                </div>
-            </div>
             <input id="reset_success_st2_pass" type="password" value="" />
+        </div>
+        <div class="reset-pass-error">
+            [$6001]
         </div>
 
         <div class="default-dialog-bottom">
@@ -265,7 +262,7 @@
         <div class="reg-success-txt">[$217]</div>
         <div class="reg-resend-email">
             <div class="reg-resend-input-bl">
-                <input type="text" value="" />
+                <input type="text" value="" maxlength="190" />
             </div>
             <div class="reg-resend-button-bl">
                 <div class="resend-email-button">
@@ -1018,11 +1015,11 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="big-red-button add-user-popup-button height-48">
             [$19112]
         </div>
-        
+
         <div class="hidden-achievement-info">
             <div class="hidden-achievement-cell">
                 <i class="mid-white-icon ach-create-account"></i>
@@ -1293,7 +1290,7 @@
                     </div>
                 </div>
             </div>
-            <input type="text" name="login-name" id="login-name" value="" placeholder="[$195]" class="input-email">
+            <input type="text" name="login-name" id="login-name" value="" placeholder="[$195]" class="input-email" maxlength="190">
         </div>
         <div class="top-login-input-block password">
             <div class="top-login-input-tooltip">
@@ -1376,7 +1373,7 @@
                         </div>
                     </div>
                 </div>
-                <input type="text" name="login-email" id="register-email" value="" placeholder="[$95]" class="have-placeholder" />
+                <input type="text" name="login-email" id="register-email" value="" placeholder="[$95]" class="have-placeholder" maxlength="190" />
             </div>
             <div class="login-register-input password first">
                 <div class="top-login-input-tooltip">
@@ -1499,7 +1496,7 @@
                     <div class="clear"></div>
                 </div>
                 <div class="feedback-dialog-input hidden">
-                    <input name="feedback-email" type="text" placeholder="email@domain.com" />
+                    <input name="feedback-email" type="text" placeholder="email@domain.com" maxlength="190" />
                 </div>
                 <div class="stats">
                     <div class="feedback-label-txt">
@@ -3296,7 +3293,7 @@
                 [$16319]
             </div>
             <div class="achievement-dialog input-field multiple-input emails">
-                <input type="text" class="achievement-dialog input" name="" id="ach-invite-dialog-input" />
+                <input type="text" class="achievement-dialog input" id="ach-invite-dialog-input" maxlength="190" />
                 <div class="clear"></div>
             </div>
             <div class="achievement-dialog input-info">
@@ -4652,7 +4649,7 @@
        </div>
           <div class="login-register-input email">
 
-                <input type="text" name="recover-input1-di" id="recover-input1-di" value="" placeholder="Your email address">
+                <input type="text" name="recover-input1-di" id="recover-input1-di" value="" placeholder="[$195]" maxlength="190">
             </div>
     <!-- Only show this div when all the checkboxes have been ticked and the email field has been filled in. -->
     <div class="content-highlight warning hidden">
@@ -4747,3 +4744,165 @@
     </div>
 </div>
 
+
+<!-- Login with two-factor authentication !-->
+<div class="fm-dialog two-factor-dialog verify-two-factor-login hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title"></div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="two-factor-content-block">
+        <div class="tf-container">
+            <div class="dialog-body-subheader">
+                <span>[$19191]:</span>
+            </div>
+            <div class="fm-account-input">
+                <input class="pin-input" type="text" value="" placeholder="[$19193]" maxlength="6">
+            </div>
+            <div class="warning-text-field hidden">[$19192]</div>
+        </div>
+        <div class="clear"></div>
+        <div class="middle-button-wrapper inline-buttons">
+            <div class="default-56px-button grey-button back-button">
+                <div class="big-btn-txt">[$822]</div>
+            </div>
+            <div class="default-56px-button red-button submit-button">
+                <span class="label">[$1694]</span>
+                <span class="loading-image">
+                    <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Setup Two-Factor Authentication !-->
+<div class="fm-dialog two-factor-dialog setup-two-factor hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title"></div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="two-factor-content-block set-up-tfactor">
+        <div class="tf-container">
+            <div class="information-highlight success">
+                <span>[$17864]</span>
+            </div>
+            <div class="two-factor-qr-code"></div>
+            <div class="fm-account-input disabled">
+                <input class="two-factor-qr-seed" type="text" value="" readonly="readonly">
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="middle-button-wrapper inline-buttons">
+            <div class="default-56px-button red-button two-factor-next-btn">
+                <div class="big-btn-txt">[$556]</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+ <!-- Set up Two factor verify the code from Authentication app -->
+<div class="fm-dialog two-factor-dialog setup-two-factor-verify hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title"></div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="two-factor-content-block verify-tfactor">
+        <div class="tf-container">
+            <div class="dialog-body-subheader">
+                <span>[$19196]:</span>
+            </div>
+            <div class="fm-account-input">
+                <input class="pin-input" type="text" value="" placeholder="[$19193]" maxlength="6">
+            </div>
+            <div class="information-highlight warning hidden">
+                <span>[$19197]</span>
+            </div>
+            <div class="information-highlight success hidden">
+                <span>[$19198]</span>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="middle-button-wrapper inline-buttons">
+            <div class="default-56px-button grey-button back-button">
+                <div class="big-btn-txt">[$822]</div>
+            </div>
+            <div class="default-56px-button red-button next-button">
+                <div class="big-btn-txt">[$556]</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Post set up of Two Factor Authentication to backup the recovery key -->
+<div class="fm-dialog two-factor-dialog setup-two-factor-backup-key hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title"></div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="two-factor-content-block tf-backup-key">
+        <div class="tf-container">
+            <div class="dialog-body-subheader">
+                <span>[$8963]</span>
+            </div>
+            <div class="recovery-key-container">
+                <div class="recovery-key-icon">
+                </div>
+                <div class="recovery-key-info-block">
+                    <div class="recovery-key-name">
+                        MEGA-RECOVERYKEY.txt
+                    </div>
+                    <div class="recovery-key-size">
+                        22 KB
+                    </div>
+                </div>
+                <div class="recovery-key-button">
+                    <div class="default-red-button">[$1988]</div>
+                </div>
+            </div>
+            <div class="information-highlight warning">
+                <span>[$19199]</span>
+            </div>
+            <div class="dialog-body-centre-text">[$19200]</div>
+        </div>
+        <div class="clear"></div>
+        <div class="middle-button-wrapper inline-buttons">
+            <div class="default-56px-button red-button finish-button">
+                <div class="big-btn-txt">[$148]</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Verify an account action with two-factor authentication PIN required !-->
+<div class="fm-dialog two-factor-dialog two-factor-verify-action hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title"></div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="two-factor-content-block">
+        <div class="tf-container">
+            <div class="dialog-body-subheader">
+                <span>[$19191]:</span>
+            </div>
+            <div class="fm-account-input">
+                <input class="pin-input" type="text" value="" placeholder="[$19193]" maxlength="6">
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="middle-button-wrapper inline-buttons">
+            <div class="default-56px-button red-button submit-button">
+                <span class="label">[$1694]</span>
+            </div>
+        </div>
+    </div>
+</div>

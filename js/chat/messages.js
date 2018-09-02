@@ -701,7 +701,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         self.messages[fnName] = function(messageId, ignoreDB) {
             // should be called first..otherwise origFn.apply may delete the message and cause `msg` to be undefined.
             var msg = self.messages[messageId];
-            if (msg) {
+            if (msg instanceof Message) {
                 msg._onMessageAction(ignoreDB ? fnName : 'revoke');
             }
 

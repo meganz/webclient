@@ -309,8 +309,8 @@
             $('.fm-picker-dialog-title', $dialog)
                 .text(
                     items.length < 2
-                        ? 'Upload 1 file'
-                        : escapeHTML("Upload [x] files").replace('[x]', items.length)
+                        ? l[19338]
+                        : escapeHTML(l[19339]).replace('[x]', items.length)
                 );
         };
 
@@ -1293,7 +1293,7 @@
             var itemTopPos = $item.offset().top;
             var $tooltip = $('.contact-preview', $dialog);
             var avatar = useravatar.contact(owner, '', 'div');
-            var note = !share.level && !share.circular && "You don't have write privileges in this share.";
+            var note = !share.level && !share.circular && l[19340];
 
             $tooltip.find('.contacts-info.body')
                 .safeHTML(

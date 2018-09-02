@@ -168,20 +168,13 @@ var notify = {
         'use strict';
 
         // Make User Get Email (uge) request to get the user's email address from the user handle
-        api_req({ a: 'uge', 'u': userHandle }, {
-            callback: function(result) {
+        M.req({a: 'uge', 'u': userHandle}).done(function(result) {
 
-                // Exit if there was an API error
-                if (typeof result === 'number' && result < 0) {
-                    return false;
-                }
+            // Update the local state with the user's email
+            notify.userEmails[userHandle] = result;
 
-                // Update the local state with the user's email
-                notify.userEmails[userHandle] = result;
-
-                // Re-call the notify function with the action packet now that the email has been stored
-                notify.notifyFromActionPacket(actionPacket);
-            }
+            // Re-call the notify function with the action packet now that the email has been stored
+            notify.notifyFromActionPacket(actionPacket);
         });
     },
 

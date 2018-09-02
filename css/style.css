@@ -26400,11 +26400,12 @@ opacity: 1;
     height:24px;
 }
 
-.user-management-view .icon48, .user-management-dialog .icon48{
+.user-management-view .icon48, .user-management-dialog .icon48 {
     background-image: url(../images/mega/big-icons.png);
     background-repeat: no-repeat;
     display: inline-block;
     width:48px;
+    height: 48px;
     position: relative;
 }
 
@@ -27001,7 +27002,7 @@ opacity: 1;
 
 .user-management-account-settings .settings-menu-bar .settings-menu-item{
     color:#999999;
-    font-size: 16px;
+    font-size: 20px;
     line-height: 20px;
     padding: 20px 24px 8px 24px;
     position: relative;
@@ -27030,6 +27031,50 @@ opacity: 1;
     left: 0;
 }
 
+.user-management-account-settings .settings-submenu-bar {
+    width: 100%;
+    height: 48px;
+    background-color: #ffffff;
+    position:relative;
+    padding-left: 32px;
+    box-sizing: border-box;
+}
+
+.user-management-account-settings .settings-submenu-item {
+    color:#666;
+    font-size: 16px;
+    line-height: 48px;
+    display: inline-block;
+    margin-right:80px;
+}
+
+.user-management-account-settings .settings-submenu-item .setting-icon24 {
+    display: inline-block;
+    margin:12px 4px 12px 12px;
+}
+
+.user-management-account-settings .settings-submenu-item:hover {
+    color:#333;
+}
+
+.user-management-account-settings .settings-submenu-item:hover .setting-icon24 {
+    opacity: 0.5;
+}
+
+.user-management-account-settings .settings-submenu-item.selected {
+    color:#333;
+    font-weight: 600;
+}
+
+.user-management-account-settings .settings-submenu-item.selected .setting-icon24{
+    opacity: 0.7;
+}
+
+.user-management-account-settings .settings-submenu-item * {
+    vertical-align: top;
+}
+
+
 .user-management-account-settings .setting-block {
     width: calc(100% - 64px);
     max-width: 1500px;
@@ -27040,7 +27085,7 @@ opacity: 1;
     border-radius: 4px;
     border:1px solid rgba(0,0,0,0.1);
     box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
-    margin:0px 32px 0 32px;
+    margin:24px 32px 0 32px;
 }
 
 .user-management-account-settings .setting-block:not(:nth-child(3)) {
@@ -27057,8 +27102,7 @@ opacity: 1;
     color: #333333;
     line-height: 20px;
     text-align: center;
-    font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .user-management-account-settings .setting-block .title::after{
@@ -27077,24 +27121,71 @@ opacity: 1;
 }
 
 
-.user-management-view .contact-icon48.icon48 {
+.user-management-account-settings .contact-icon48.icon48 {
     background-position: 0 -172px;
     opacity: 0.2;
 }
 
-.user-management-view .share-icon48.icon48 {
+.user-management-account-settings .share-icon48.icon48 {
     background-position: -48px -172px;
      opacity: 0.2;
 }
 
-.user-management-view .admin-icon48.icon48 {
+.user-management-account-settings .admin-icon48.icon48 {
     background-position: -96px -172px;
      opacity: 0.2;
 }
 
-.user-management-view .other-icon48.icon48 {
+.user-management-account-settings .other-icon48.icon48 {
     background-position: -144px -172px;
      opacity: 0.2;
+}
+
+.user-management-account-settings .company-icon48.icon48 {
+    background-position: -144px -458px;
+     opacity: 0.2;
+}
+
+.user-management-account-settings .number-of-user {
+    background-position: center -1582px;
+    opacity: 0.4;
+}
+
+.user-management-account-settings .company-name {
+    background-position: center -1661px;
+    opacity: 0.4;
+}
+
+.user-management-account-settings .phone {
+    background-position: center -1621px;
+    opacity: 0.4;
+}
+
+.user-management-account-settings .email {
+    background-position: center -1701px;
+    opacity: 0.4;
+}
+
+.user-management-account-settings .pw {
+    background-position: center -1741px;
+    opacity: 0.4;
+}
+
+.user-management-account-settings .setting-icon24 {
+    background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+}
+
+.user-management-account-settings .setting-icon24.company-name {
+    background-position: -156px -633px;
+    opacity: 0.4; 
+}
+
+.user-management-account-settings .setting-icon24.admin {
+    background-position: -156px -517px;
+    opacity: 0.4; 
 }
 
 .user-management-account-settings .setting-block .option-containers {
@@ -27112,6 +27203,105 @@ opacity: 1;
     position: relative;
     display: block;
 }
+
+.user-management-account-settings .bus-input-block {
+    min-width: 300px;
+    width: 600px;
+    position: relative;
+    display: inline-block;
+    margin: 32px;
+}
+
+.user-management-account-settings .bus-input-block.non-add {
+    margin-right: 32px;
+}
+
+.user-management-account-settings .bus-input {
+    width: 100%;
+    height: 64px;
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.user-management-account-settings .bus-input::after {
+    content: " ";
+    width: 100%;
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.2);
+    position: absolute;
+}
+
+.user-management-account-settings .bus-input .bus-reg-icon {
+    margin: 30px 12px 0 4px;
+    opacity: 0.5;
+    float: left;
+    display: inline-block;
+}
+
+.user-management-account-settings .bus-input input {
+    border: none;
+    box-shadow:none;
+    border-radius: none;
+    width: -webkit-calc(100% - 70px);
+    width: -moz-calc(100% - 70px);
+    width: calc(100% - 70px);
+    height: 22px;
+    margin-top:30px;
+    line-height: 22px;
+    color: #333;
+    font-size: 600;
+    font-size: 18px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background-color: none;
+    cursor: pointer;
+}
+
+.user-management-account-settings .bus-input input.fir-name {
+    width: 36%;
+    display: inline-block;
+}
+
+.user-management-account-settings .bus-input input.las-name {
+    width: 36%;
+    display: inline-block;
+}
+
+.user-management-account-settings .bus-input input::placeholder {
+    font-size: 13px;
+}
+
+.user-management-account-settings .bus-input.num input {
+    width: 100px;
+}
+
+.user-management-account-settings .bus-input .error-message {
+    font-size: 13px;
+    padding: 8px 0 0 4px;
+    color: rgba(229,76,81,1);
+    width:90%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display:none;
+}
+
+
+.user-management-account-settings .bus-input.error::after {
+    background-color: rgba(217,0,7,0.5);
+}
+
+.user-management-account-settings .bus-input.error input {
+    color: rgba(217,0,7,1);
+}
+
+.user-management-account-settings .bus-input.error .error-message {
+    display: inline-block;
+}
+
+
+
 
 .user-management-account-settings .heading {
     position: relative;

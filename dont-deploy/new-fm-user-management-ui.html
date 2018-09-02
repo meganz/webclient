@@ -8,6 +8,7 @@
 <title>MEGA 2.0</title>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 <link rel="stylesheet" type="text/css" href="../css/style.css" />
+<link rel="stylesheet" type="text/css" href="../css/business-register.css" />
 <link rel="stylesheet" type="text/css" href="../css/retina-images.css" />
 <script type="text/javascript" src="../js/jquery-1.8.1.js"></script>
 <script type="text/javascript" src="../js/jquery.jscrollpane.js"></script>
@@ -136,7 +137,7 @@ $(document).ready(function() {
 		
 	<!-- Dialog -->
 
-<div class="user-management-add-user-dialog user-management-dialog fm-dialog"> 
+<div class="user-management-add-user-dialog user-management-dialog fm-dialog hidden"> 
     <div class="dialog-title">Invite People to Team</div>
     <div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
     <div class="delete-img icon"></div>
@@ -183,7 +184,7 @@ $(document).ready(function() {
     </div>
 </div><!--END add user dialog-->  
 
-<div class="user-management-edit-profile-dialog user-management-dialog fm-dialog">
+<div class="user-management-edit-profile-dialog user-management-dialog fm-dialog hidden">
     <div class="user-management-subuser-avatars">
     	<div class="user-management-subuser-image"></div>
     </div>
@@ -238,7 +239,7 @@ $(document).ready(function() {
 	</div>
 </div>
 
-<div class="user-management-able-user-dialog user-management-dialog fm-dialog">
+<div class="user-management-able-user-dialog user-management-dialog fm-dialog hidden">
 	<div class="re-enable-large-icon icon56"></div>
 	<div class="dialog-text-container">
 		<div class="dialog-text-one">Are you sure you want to re-enable the account of <b>Jay Pierce</b>?</div>
@@ -253,7 +254,7 @@ $(document).ready(function() {
 	</div>				
 </div>
 
-<div class="user-management-able-user-dialog user-management-dialog fm-dialog">
+<div class="user-management-able-user-dialog user-management-dialog fm-dialog hidden">
 	<div class="disable-large-icon icon56"></div>
 	<div class="dialog-text-container">
         <div class="dialog-text-one">Are you sure you want to disable the account of <b>Jay Pierce</b>? </div>
@@ -506,7 +507,7 @@ $(document).ready(function() {
 		    </div>
 		</div>
 
-		<div class="files-grid-view user-management-view hidden">
+		<div class="files-grid-view user-management-view">
 			<div class="user-management-list-table hidden">
 	            <table class="header-table-user-management">
 	                <tbody>
@@ -945,12 +946,22 @@ $(document).ready(function() {
 
 
 	        	<div class="settings-menu-bar">
-	        		<div class="settings-menu-item selected">Invoice</div>
-	        		<div class="settings-menu-item">Settings</div>
+	        		<div class="settings-menu-item selected">Profile</div>
+	        		<div class="settings-menu-item">Invoice</div>
 	        	</div>
 	        	<div class="border"></div>
 
-		        <div class="settings">
+	        	<div class="settings-submenu-bar">
+	        		<div class="settings-submenu-item selected">
+	        			<div class="setting-icon24 company-name"></div>
+	        			Company information</div>
+	        		<div class="settings-submenu-item">
+		        		<div class="setting-icon24 admin"></div>
+		        		Admin information</div>
+	        	</div>
+	        	<div class="border"></div>
+
+		        <div class="settings hidden">
 		        	<div class="setting-block hidden">
 		        		<div class="title">
 		        			<div class="contact-icon48 icon48"></div>
@@ -1406,6 +1417,68 @@ $(document).ready(function() {
 		            		</div> 
 						</div>
 		        	</div>
+		        </div>
+
+		        <div class="profile">
+		        	<div class="setting-block">
+		        		<div class="title">
+		        			<div class="company-icon48 icon48"></div>
+		        			Company information              			
+		        		</div>
+
+		            	<div class="option-containers">
+		            		<div class="bus-input-block non-add">
+							    <div class="bus-input error">
+									<div class="bus-reg-icon company-name"></div>
+									<input type=" " name=" " placeholder="Company Name">
+									<div class="error-message">is the error signal too red?</div>
+								</div>
+								<div class="bus-input">
+									<div class="bus-reg-icon phone"></div>
+									<input type=" " name=" " placeholder="Phone Number (optional)">
+									<div class="error-message">is the error signal too red?</div>
+								</div>
+								<div class="bus-input">
+									<div class="bus-reg-icon number-of-user"></div>
+									<input type=" " name=" " placeholder="First Name" class="fir-name">
+									<input type=" " name=" " placeholder="Last Name" class="las-name">
+										<div class="error-message">is the error signal too red?</div>
+								</div>
+								<div class="bus-input">
+									<div class="bus-reg-icon email"></div>
+									<input type=" " name=" " placeholder="Email">
+									<div class="error-message">is the error signal too red?</div>
+								</div>
+		            		</div>
+
+		            		<div class="bus-input-block">
+							    <div class="bus-input error">
+									<div class="bus-reg-icon company-name"></div>
+									<input type=" " name=" " placeholder="Company Name">
+									<div class="error-message">is the error signal too red?</div>
+								</div>
+								<div class="bus-input">
+									<div class="bus-reg-icon phone"></div>
+									<input type=" " name=" " placeholder="Phone Number (optional)">
+									<div class="error-message">is the error signal too red?</div>
+								</div>
+								<div class="bus-input">
+									<div class="bus-reg-icon number-of-user"></div>
+									<input type=" " name=" " placeholder="First Name" class="fir-name">
+									<input type=" " name=" " placeholder="Last Name" class="las-name">
+										<div class="error-message">is the error signal too red?</div>
+								</div>
+								<div class="bus-input">
+									<div class="bus-reg-icon email"></div>
+									<input type=" " name=" " placeholder="Email">
+									<div class="error-message">is the error signal too red?</div>
+								</div>
+		            		</div>
+
+
+
+						</div>
+		        	</div>		        	
 		        </div>
 
 		        <div class="invoice hidden">

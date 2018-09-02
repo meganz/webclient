@@ -25007,6 +25007,13 @@ opacity: 1;
     position: relative;
 }
 
+.user-management-view .user-management-subuser-avatars .avatar-wrapper, .fm-right-header-user-management .user-management-subuser-avatars .avatar-wrapper, .user-management-dialog .user-management-subuser-avatars .avatar-wrapper{
+    width:24px;
+    height: 24px;
+    line-height: 20px;
+    font-size: 16px;
+}
+
 .user-management-view .user-management-subuser-image, .fm-right-header-user-management .user-management-subuser-image, .user-management-dialog .user-management-subuser-image{
     margin: 1px;
     padding: 0;
@@ -25049,6 +25056,23 @@ opacity: 1;
     float: left;
     box-sizing: border-box;
     background-color: #F0F8FF;
+}
+
+.user-management-subuser-profile-container .subaccount-img-big .avatar-wrapper.small-rounded-avatar {
+    width: 162px;
+    height: 162px;
+    border-radius: 4px;
+    font-size: 80px;
+    line-height: 158px;
+}
+
+.user-management-subuser-profile-container .subaccount-img-big .avatar-wrapper.small-rounded-avatar::before {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    -moz-border-radius: none;
+    -webkit-border-radius: none;
+    border-radius: none;
 }
 
 .user-management-subuser-profile-container .user-management-subuser-profile{
@@ -28138,13 +28162,7 @@ opacity: 1;
     border: 1px solid rgba(0,0,0,0.05);
     margin-top: 2px;
 }
-.user-management-edit-profile-dialog .user-management-subuser-avatars .avatar, .user-management-edit-profile-dialog .user-management-subuser-avatars .avatar img {
-    width: 20px;
-    height: 20px;
-    margin: 0;
-    border: 1px solid rgba(0,0,0,0.05);
-    margin-top: 3px;
-}
+
 .user-management-breadcrumb.subaccount .user-management-subuser-avatars .avatar img, .user-management-edit-profile-dialog .user-management-subuser-avatars .avatar img {
     float: left;
     margin-left: -2px;

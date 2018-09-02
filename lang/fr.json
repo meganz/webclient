@@ -1935,9 +1935,9 @@
     "17595": "Quand le versionnage des fichiers est d\u00e9sactiv\u00e9, la version actuelle est remplac\u00e9e par la nouvelle version lorsque le fichier est mis \u00e0 jour (et vos changements apport\u00e9s au fichier ne sont plus enregistr\u00e9s). Souhaitez-vous vraiment d\u00e9sactiver le versionnage des fichiers\u2009?",
     "17596": "Activer ou d\u00e9sactiver le versionnage des fichiers pour votre compte entier\u00a0:",
     "17597": "Vous pourrez encore recevoir des versions de fichiers provenant de dossiers partag\u00e9s si vous contacts ont activ\u00e9s cette option.",
-    "17598": "Supprimer toutes les versions de fichiers\u00a0:",
-    "17599": "Tout supprimer",
-    "17600": "Ceci supprimera irr\u00e9m\u00e9diablement toutes vos propres versions de fichiers. Toute version de fichier partag\u00e9e avec vous par un contact devra \u00eatre supprim\u00e9e par ce contact.",
+    "17598": "Supprimer toutes les anciennes versions de mes fichiers",
+    "17599": "Supprimer les anciennes versions",
+    "17600": "Tous les fichiers actuels seront conserv\u00e9s. Seules les versions archiv\u00e9es de vos fichiers seront supprim\u00e9es.",
     "17601": "Activ\u00e9",
     "17602": "La version actuelle du fichier sera remplac\u00e9e par le fichier que vous t\u00e9l\u00e9versez.",
     "17603": "Nouvelle tentative de t\u00e9l\u00e9chargement dans MEGAsync",
@@ -2742,8 +2742,8 @@
     "19335": "J\u2019accepte les <a href=\"https:\/\/mega.nz\/terms\">conditions g\u00e9n\u00e9rales d\u2019utilisation<\/a> de MEGA\r\n",
     "19336": "Synchroniser l\u2019int\u00e9gralit\u00e9 de votre disque nuagique",
     "19337": "Synchroniser des dossiers pr\u00e9cis vers votre disque nuagique",
-    "19338": "Upload 1 file",
+    "19338": "T\u00e9l\u00e9verser un fichier",
     "19339": "Upload [X] files",
-    "19340": "You don't have write privileges in this share.",
-    "19341": "The account you are currently logged into on your web browser is not the one you want to upgrade. Please logout and login with the account you want to upgrade."
+    "19340": "Vous n\u2019avez pas de privil\u00e8ges d\u2019\u00e9criture sur ce partage.",
+    "19341": "Le compte avec lequel vous \u00eates actuellement connect\u00e9 dans votre navigateur Web n\u2019est pas celui que vous souhaitez surclasser. Veuillez vous d\u00e9connecter, puis vous reconnecter avec le compte que vous souhaitez surclasser."
 }

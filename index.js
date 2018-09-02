@@ -946,6 +946,9 @@ function init_page() {
             init_register();
         }
     }
+    else if ((page == 'registerb')) { // buiness register
+        parsepage(pages['registerb']);
+    }
     else if (page == 'key') {
         if (is_mobile) {
             parsepage(pages['mobile']);

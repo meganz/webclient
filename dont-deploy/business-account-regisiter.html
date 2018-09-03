@@ -137,8 +137,9 @@ $(document).ready(function() {
 </head>
 
 <body id="bodyel" class="logged rk-saved fontsize2 en free business-register">
-	<div class="top-bar"></div>
-	<div class="bus-reg-body hidden">
+<div class="top-head"></div>
+<div class="main-pad-block">
+	<div class="bus-reg-body">
 		<div class="bus-reg-header">Create Business Account</div>
 		<div class="bus-reg-info-block">
 			<div class="bus-reg-subheader">Plan details</div>
@@ -246,7 +247,7 @@ $(document).ready(function() {
 		<div class="clear"></div>
 	</div>
 
-	<div class="bus-confirm-body confirm">
+	<div class="bus-confirm-body confirm hidden">
 		<div class="bus-reg-header">Comfirm your account</div>
 		<div class="bus-reg-input error">
 			<div class="bus-reg-icon email"></div>
@@ -260,11 +261,15 @@ $(document).ready(function() {
 		<div class="clear"></div>	
 	</div>
 
-	<div class="bus-confirm-body verfication">
+	<div class="bus-confirm-body verfication hidden">
 		<div class="bus-confirmImg"></div>
 		<div class="bus-reg-header">Verification emails have been sent</div>
 		<div class="bus-reg-featureTxt">New accounts will be activated after the link in the verification emails has been confirmed and the user sets their own password.</div>
 	</div>
+</div>
+
+
+
 
 	<div class="bus-reg-bottom-page">
 		<div class="page-header">Your password is your master encryption key</div>

@@ -946,8 +946,10 @@ function init_page() {
             init_register();
         }
     }
-    else if ((page == 'registerb')) { // buiness register
+    else if ((page == 'registerb')) { // business register
         parsepage(pages['registerb']);
+        var regBusiness = new BusinessRegister();
+        regBusiness.initPage();
     }
     else if (page == 'key') {
         if (is_mobile) {

@@ -889,7 +889,7 @@ BusinessAccount.prototype.getListOfPaymentGateways = function (forceUpdate) {
     }
 
     var request = {
-        "a": "ufpqfull", // get a list of payment gateways
+        a: "ufpqfull", // get a list of payment gateways
         d: 0, // get all gateways [debugging]
         t: 0
     };
@@ -914,6 +914,8 @@ BusinessAccount.prototype.getListOfPaymentGateways = function (forceUpdate) {
         }
 
     });
+
+    return operationPromise;
 };
 
 

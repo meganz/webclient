@@ -346,7 +346,7 @@ var SelectionManager = function($selectable, resume) {
                     this.clear_selection();
                     this.set_currently_selected(nextId, scrollTo);
                 }
-                else if (nextIndex > -1) { 
+                else if (nextIndex > -1) {
                     // shift key selection logic
 
                     if (

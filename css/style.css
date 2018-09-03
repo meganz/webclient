@@ -10807,9 +10807,6 @@ table {
     border-color: #00897B;
     color: #333333;
 }
-.account.tab-lnk.achievements, .active-achievements .account.tab-lnk.payment {
-    display: none;
-}
 .account.quota-txt {
     font-size: 18px;
     line-height: 24px;

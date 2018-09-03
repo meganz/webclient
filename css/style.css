@@ -3947,6 +3947,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display:block;
     position:absolute;
     background-image: url(../images/mega/files-icons_v3.png);
+    background-size: 399px 5575px;
     background-position: -337px -717px;
     background-repeat: no-repeat;
     left: 0;
@@ -6252,6 +6253,7 @@ table {
     margin: 0 0 0 -1px;
     background-position: -336px -357px;
     background-image: url(../images/mega/files-icons_v3.png);
+    background-size: 399px 5575px;
     background-repeat: no-repeat;
 }
 .medium-file-icon {
@@ -6259,6 +6261,7 @@ table {
     height: 38px;
     background-position: -216px -3239px;
     background-image: url(../images/mega/files-icons_v3.png);
+    background-size: 399px 5575px;
     background-repeat: no-repeat;
 }
 .medium-file-icon.word {
@@ -6520,6 +6523,7 @@ table {
     display: block;
     background-position: 0 -3234px;
     background-image: url(../images/mega/files-icons_v3.png);
+    background-size: 399px 5575px;
     background-repeat: no-repeat;
     position: absolute;
     margin: -42px 0 0 -41px;
@@ -9498,6 +9502,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin: 17px 15px 17px 23px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
+    background-size: 399px 5575px;
     background-position: 0 0;
 }
 .export-link-text-pad {
@@ -9810,6 +9815,7 @@ span.orange {
     left: 0;
     display: none;
     background-image: url(../images/mega/properties-sprite_v2.png);
+    background-size: 589px 6320px;
     background-position: 29px 40px;
     background-repeat: no-repeat;
     margin: 8px;
@@ -12605,6 +12611,7 @@ h5.main-italic-header {
     float: left;
     margin: 0 0 0 0;
     background-image: url(../images/mega/files-icons_v3.png);
+    background-size: 399px 5575px;
     background-position: 0 0;
     background-repeat: no-repeat;
 }
@@ -13374,6 +13381,7 @@ strong, b {
     height: 64px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
+    background-size: 399px 5575px;
     margin-top: 3px;
 }
 .share-folder-info {
@@ -15202,6 +15210,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .search-path-icon-span {
     background-position: 0 0px;
     background-image: url(../images/mega/files-icons_v3.png);
+    background-size: 399px 5575px;
     background-repeat: no-repeat;
     width: 24px;
     height: 24px;
@@ -15216,6 +15225,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .search-path-icon.folder, .search-path-icon.shared-folder {
     background-position: -337px -717px;
     background-image: url(../images/mega/files-icons_v3.png);
+    background-size: 399px 5575px;
 }
 .search-path-icon.shared-folder {
     background-position: -12px -4369px;
@@ -15872,6 +15882,7 @@ span.incoming-call-name {
 }
 .shared-folder-icon {
     background-image: url(../images/mega/files-icons_v3.png);
+    background-size: 399px 5575px;
     background-position: -217px -4799px;
     background-repeat: no-repeat;
     width: 40px;
@@ -16004,6 +16015,7 @@ span.incoming-call-name {
     background-position: -4px -4791px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
+    background-size: 399px 5575px;
     margin: 15px 0 0 28px;
 }
 .shared-details-info-block {
@@ -16219,6 +16231,7 @@ span.incoming-call-name {
     width:24px;
     height:24px;
     background-image: url(../images/mega/files-icons_v3.png);
+    background-size: 399px 5575px;
     background-position: -297px -877px;
     background-repeat: no-repeat;
     position: absolute;

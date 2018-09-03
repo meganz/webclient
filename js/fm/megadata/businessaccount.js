@@ -889,8 +889,8 @@ BusinessAccount.prototype.getListOfPaymentGateways = function (forceUpdate) {
     }
 
     var request = {
-        a: "ufpqfull", // get a list of payment gateways
-        d: 0, // get all gateways [debugging]
+        a: "ufpqfull",  // get a list of payment gateways
+        d: 0,           // get all gateways [debugging]
         t: 0
     };
 
@@ -904,9 +904,15 @@ BusinessAccount.prototype.getListOfPaymentGateways = function (forceUpdate) {
                 mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
                 var paymentGateways = Object.create(null);
                 paymentGateways.timestamp = currTime;
-                paymentGateways.list = res;
+                var res2 = [];
+                for (var h = 0; h < res.length; h++) {
+                    if (res[h].supportsBusinessPlans) {
+                        res2.push(res[h]);
+                    }
+                }
+                paymentGateways.list = res2;
                 mega.buinsessAccount.cachedBusinessGateways = paymentGateways;
-                operationPromise.resolve(1, res); // payment gateways list
+                operationPromise.resolve(1, res2); // payment gateways list
             }
             else {
                 operationPromise.reject(0, 4, 'API returned error, ret=' + res);
@@ -916,6 +922,63 @@ BusinessAccount.prototype.getListOfPaymentGateways = function (forceUpdate) {
     });
 
     return operationPromise;
+};
+
+
+/**
+ * a function to get the business account plan (only 1). as the UI is not ready to handle more than 1 plan
+ * @param {Boolean} forceUpdate         force updating from API
+ * @returns {Promise}                   resolves when we get the answer
+ */
+BusinessAccount.prototype.getBusinessPlanInfo = function (forceUpdate) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    if (!forceUpdate) {
+        if (mega.buinsessAccount && mega.buinsessAccount.cachedBusinessPlan) {
+            var currTime = new Date().getTime();
+            if (mega.buinsessAccount.cachedBusinessPlan.timestamp &&
+                (currTime - mega.buinsessAccount.cachedBusinessPlan.timestamp) < this.invoiceListUpdateFreq) {
+                return operationPromise.resolve(1, mega.buinsessAccount.cachedBusinessPlan);
+            }
+        }
+    }
+
+    var request = {
+        a: "utqa",  // get a list of plans
+        nf: 1,      // extended format
+        b: 1        // also show business plans
+    };
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'object') {
+                var currTime = new Date().getTime();
+                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                var businessPlan = Object.create(null);
+                businessPlan.timestamp = currTime;
+                for (var h = 0; h < res.length; h++) {
+                    if (res[h].it) {
+                        businessPlan = res[h];
+                        businessPlan.timestamp = currTime;
+                        break;
+                    }
+                }
+                mega.buinsessAccount.cachedBusinessPlan = businessPlan;
+                operationPromise.resolve(1, businessPlan); // payment gateways list
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+
+    });
+
+    return operationPromise;
+
 };
 
 
@@ -962,6 +1025,47 @@ BusinessAccount.prototype.getAccountInvoicesList = function (forceUpdate) {
         }
 
     });
+
+    return operationPromise;
+};
+
+
+BusinessAccount.prototype.setMasterUserAttributes = function (nbusers, cname, tel) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+    
+    if (!tel) {
+        return operationPromise.reject(0, 3, 'Empty phone');
+    }
+    if (!cname) {
+        return operationPromise.reject(0, 3, 'Empty company name');
+    }
+
+    var request = {
+        "a": "upb",                                     // up - business
+        "^companyname": base64urlencode(to8(cname)),    // company name
+        "^companyphone": base64urlencode(to8(tel))      // company phone
+    };
+
+    if (nbusers) {
+        request['^companynbusers'] = base64urlencode(to8(nbusers)); // nb of users
+    }
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'string') {
+                operationPromise.resolve(1, res); // user handle
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+
+    });
+
 
     return operationPromise;
 };

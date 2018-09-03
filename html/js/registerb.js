@@ -25,14 +25,19 @@ BusinessRegister.prototype.initPage = function () {
     $pageContainer.find('#business-rpass').val('');
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
     $pageContainer.find('.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
+    $pageContainer.find('.bus-reg-input').removeClass('error');
 
     // hiding everything to get ready first
     $pageContainer.addClass('hidden');  // hiding the main sign-up part
     $('.bus-confirm-body.confirm').addClass('hidden'); // hiding confirmation part
     $('.bus-confirm-body.verfication').addClass('hidden'); // hiding verification part
 
-    // clear the payment block
-    $pageContainer.find('.bus-reg-radio-block').empty();
+    // function to show first step of registration
+    var unhidePage = function () {
+        $pageContainer.removeClass('hidden');  // viewing the main sign-up part
+        $('.bus-confirm-body.confirm').addClass('hidden'); // hiding confirmation part
+        $('.bus-confirm-body.verfication').addClass('hidden'); // hiding verification part
+    };
 
     var fillPaymentGateways = function (st, list) {
         "use strict";
@@ -47,14 +52,10 @@ BusinessRegister.prototype.initPage = function () {
             return failureExit();
         }
 
+        // clear the payment block
+        $pageContainer.find('.bus-reg-radio-block').empty();
+
         var $paymentBlock = $('.bus-reg-radio-block', $pageContainer);
-
-        var unhidePage = function () {
-            $pageContainer.removeClass('hidden');  // viewing the main sign-up part
-            $('.bus-confirm-body.confirm').addClass('hidden'); // hiding confirmation part
-            $('.bus-confirm-body.verfication').addClass('hidden'); // hiding verification part
-        };
-
 
         var radioHtml = '<div class="bus-reg-radio payment-[x] checkOff"></div>';
         var textHtml = '<div class="provider">[x]</div>';
@@ -82,6 +83,19 @@ BusinessRegister.prototype.initPage = function () {
         unhidePage();
     };
 
+
+    $('.bus-reg-agreement .bus-reg-checkbox').off('click.suba').on('click.suba',
+        function businessRegisterationCheckboxClick() {
+            var $me = $(this);
+            if ($me.hasClass('checkOn')) {
+                $me.removeClass('checkOn').addClass('checkOff');
+            }
+            else {
+                $me.removeClass('checkOff').addClass('checkOn');
+            }
+        });
+
+    return unhidePage(); // DELETE ME
 
     M.require('businessAcc_js').done(function afterLoadingBusinessClass() {
         var business = new BusinessAccount();

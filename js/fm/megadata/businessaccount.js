@@ -870,6 +870,54 @@ BusinessAccount.prototype.getInvoiceDetails = function (invoiceID, forceUpdate) 
 
 
 /**
+ * a function to get a list of payment gateways for business accounts
+ * @param {Boolean} forceUpdate         force updating from API
+ * @returns {Promise}                   resolves when we get the answer
+ */
+BusinessAccount.prototype.getListOfPaymentGateways = function (forceUpdate) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    if (!forceUpdate) {
+        if (mega.buinsessAccount && mega.buinsessAccount.cachedBusinessGateways) {
+            var currTime = new Date().getTime();
+            if (mega.buinsessAccount.cachedBusinessGateways.timestamp &&
+                (currTime - mega.buinsessAccount.cachedBusinessGateways.timestamp) < this.invoiceListUpdateFreq) {
+                return operationPromise.resolve(1, mega.buinsessAccount.cachedBusinessGateways.list);
+            }
+        }
+    }
+
+    var request = {
+        "a": "ufpqfull", // get a list of payment gateways
+        d: 0, // get all gateways [debugging]
+        t: 0
+    };
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'object') {
+                var currTime = new Date().getTime();
+                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                var paymentGateways = Object.create(null);
+                paymentGateways.timestamp = currTime;
+                paymentGateways.list = res;
+                mega.buinsessAccount.cachedBusinessGateways = paymentGateways;
+                operationPromise.resolve(1, res); // payment gateways list
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+
+    });
+};
+
+
+/**
  * Get business account list of invoices
  * @param {Boolean} forceUpdate         a flag to force getting info from API not using the cache
  * @returns {Promise}                   resolve if the operation succeeded

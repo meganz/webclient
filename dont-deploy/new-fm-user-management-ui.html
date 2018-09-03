@@ -137,22 +137,22 @@ $(document).ready(function() {
 		
 	<!-- Dialog -->
 
-<div class="user-management-add-user-dialog user-management-dialog fm-dialog hidden"> 
+<div class="user-management-add-user-dialog user-management-dialog fm-dialog"> 
     <div class="dialog-title">Invite People to Team</div>
-    <div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
+    <div class="dialog-subtitle hidden">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
     <div class="delete-img icon"></div>
-        <div class="dialog-input-container hidden">
+        <div class="dialog-input-container">
             <div class="input-user">
                 <div class="indi-input">
-                    <input type="text" class="dialog-input focus" value="Name" autofocus>
+                    <input type="text" class="dialog-input active" placeholder="Name" autofocus>
                     <div class="error-message">Server error, please try again.</div> 
                 </div>
                 <div class="indi-input">
-                    <input type="text" class="dialog-input placeholder" value="Email">
+                    <input type="text" class="dialog-input placeholder" placeholder="Email">
                 </div>
             </div>                
         </div>
-        <div class="verification-container">
+        <div class="verification-container hidden">
                 <div class="avatar">
                     <div class="subuser-image">
                         <img src="" class="hidden">

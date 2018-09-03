@@ -26517,6 +26517,10 @@ opacity: 1;
     border:1px solid rgba(0,0,0,0.2);
 }
 
+.user-management-dialog .dialog-input.active::placeholder{
+    color: #888;
+}
+
 .user-management-dialog .dialog-input.correctinput{
     background-color: #ffffff;
     color: #888888;

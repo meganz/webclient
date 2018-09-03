@@ -1,10 +1,15 @@
 ﻿/** a class contains the code-behind of business register "registerb" page */
 function BusinessRegister() {
-
+    this.cacheTimeout = 9e5; // 15 min - default threshold to update payment gateway list
+    if (mega) {
+        if (!mega.cachedBusinessGateways) {
+            mega.cachedBusinessGateways = Object.create(null);
+        }
+    }
 }
 
 
-/** afunction to rest business registeration page to its initial state*/
+/** a function to rest business registration page to its initial state*/
 BusinessRegister.prototype.initPage = function () {
     "use strict";
 
@@ -25,11 +30,8 @@ BusinessRegister.prototype.initPage = function () {
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio.payment-typ1').removeClass('checkOff')
         .addClass('checkOn');
 
-    $pageContainer.removeClass('hidden');  // viewing the maing signup part
+    $pageContainer.removeClass('hidden');  // viewing the main sign-up part
     $('.bus-confirm-body.confirm').addClass('hidden'); // hiding confirmation part
     $('.bus-confirm-body.verfication').addClass('hidden'); // hiding verification part
 };
 
-BusinessRegister.prototype.getListOfPaymentGateways = function() {
-    "use strict";
-};

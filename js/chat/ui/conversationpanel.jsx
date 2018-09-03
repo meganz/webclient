@@ -1551,7 +1551,7 @@ var ConversationPanel = React.createClass({
                                             ]
                                         );
 
-                                        megaChat.plugins.richpreviewsFilter.processMessage({}, v);
+                                        megaChat.plugins.richpreviewsFilter.processMessage({}, v, false, true);
                                     }
 
                                     self.messagesListScrollable.scrollToBottom(true);

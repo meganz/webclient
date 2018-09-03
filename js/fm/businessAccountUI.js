@@ -1536,7 +1536,14 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
         dialogQuestion = l[19101];
         note = l[19102];
         $dialog.find('.icon56').removeClass('disable-large-icon').addClass('re-enable-large-icon');
+        $dialog.find('.dialog-button-container .yes-answer').removeClass('default-red-button-user-management')
+            .addClass('default-green-button-user-management');
     }
+    else {
+        $dialog.find('.dialog-button-container .yes-answer').removeClass('default-green-button-user-management')
+            .addClass('default-red-button-user-management');
+    }
+
     dialogQuestion = dialogQuestion.replace('[B]', '<b>').replace('[/B]', '</b>')
         .replace('{0}', userName);
     $dialog.find('.dialog-text-one').html(dialogQuestion);

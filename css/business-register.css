@@ -240,24 +240,24 @@
 }
 
 .bus-reg-body .provider-icon {
-	width: 32px;
-	height: 24px;
-	vertical-align: top;
-	background-image: url(../images/mega/big-icons.png);
-	background-size: 192px auto;
-	display: inline-block;
-	margin-left: 4px;
+    width: 32px;
+    height: 24px;
+    vertical-align: top;
+    /*background-image: url(../images/mega/payment-provider-icons-v3.png);*/
+    /*background-size: 192px auto;*/
+    display: inline-block;
+    margin-left: 4px;
+    margin-right: 40px;
 }
 
-.bus-reg-body .provider-icon.ecpVI{
+/*.bus-reg-body .provider-icon.ecpVI{
 	background-position: -11px -414px;
 }
 
 
 .bus-reg-body .provider-icon.ecpMC{
-	margin-right: 40px;
 	background-position: -51px -414px;
-}
+}*/
 
 .bus-reg-agreement {
 	width: 95%;

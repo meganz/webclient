@@ -30,6 +30,16 @@ BusinessRegister.prototype.initPage = function () {
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio.payment-typ1').removeClass('checkOff')
         .addClass('checkOn');
 
+    var getAndFilPaymentGateways = function (st, list) {
+        if (!st) { // failed result from API
+            msgDialog('warninga', '', l[19342], '', function () {
+                loadSubPage('start');
+            });
+            return;
+        }
+
+    };
+
     $pageContainer.removeClass('hidden');  // viewing the main sign-up part
     $('.bus-confirm-body.confirm').addClass('hidden'); // hiding confirmation part
     $('.bus-confirm-body.verfication').addClass('hidden'); // hiding verification part

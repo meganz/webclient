@@ -2102,7 +2102,7 @@ function initShareDialog() {
      * Adding new contacts to shared item
      */
     $('.share-dialog .dialog-share-button').rebind('click', function() {
-        addNewContact($(this), false).done(function(e){
+        addNewContact($(this), false).done(function(){
             var share = new mega.Share();
             share.updateNodeShares();
             $('.token-input-token-mega').remove();

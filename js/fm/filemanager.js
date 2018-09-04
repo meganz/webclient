@@ -1716,7 +1716,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
         else if ((e.keyCode === 13) && ($.dialog === 'share')) {
-            addNewContact($('.add-user-popup-button'), false).done(function(e) {
+            addNewContact($('.add-user-popup-button'), false).done(function() {
                 var share = new mega.Share();
                 share.updateNodeShares();
                 $('.token-input-token-mega').remove();

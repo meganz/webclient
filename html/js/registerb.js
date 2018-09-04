@@ -1,7 +1,8 @@
 ﻿/** a class contains the code-behind of business register "registerb" page */
 function BusinessRegister() {
     this.cacheTimeout = 9e5; // 15 min - default threshold to update payment gateway list
-    this.planPrice = 29.99; // initial value
+    this.planPrice = 9.99; // initial value
+    this.minUsers = 3; // minimum number of users
     if (mega) {
         if (!mega.cachedBusinessGateways) {
             mega.cachedBusinessGateways = Object.create(null);
@@ -28,6 +29,8 @@ BusinessRegister.prototype.initPage = function () {
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
     $pageContainer.find('.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
     $pageContainer.find('.bus-reg-input').removeClass('error');
+    $pageContainer.find('.bus-reg-plan .business-base-plan .left')
+        .text(l[19503].replace('[0]', this.minUsers));
 
     // hiding everything to get ready first
     $pageContainer.addClass('hidden');  // hiding the main sign-up part
@@ -39,6 +42,7 @@ BusinessRegister.prototype.initPage = function () {
         $pageContainer.removeClass('hidden');  // viewing the main sign-up part
         $('.bus-confirm-body.confirm').addClass('hidden'); // hiding confirmation part
         $('.bus-confirm-body.verfication').addClass('hidden'); // hiding verification part
+        $pageContainer.find('#business-nbusrs').focus();
     };
 
     var fillPaymentGateways = function (st, list) {
@@ -71,7 +75,6 @@ BusinessRegister.prototype.initPage = function () {
             var payRadio = radioHtml.replace('[x]', list[k].gatewayName);
             var payText = textHtml.replace('[x]', list[k].displayName);
             var payIcon = iconHtml.replace('[x]', list[k].gatewayName);
-            foundOnePaymentGatewayAtLeast = true;
             $paymentBlock.append(payRadio + payText + payIcon);
         }
 
@@ -98,12 +101,17 @@ BusinessRegister.prototype.initPage = function () {
 
     var updatePriceGadget = function (users) {
         if (!users) {
-            users = 3; // minimum val
+            users = mySelf.minUsers; // minimum val
         }
         var $gadget = $('.bus-reg-plan', $pageContainer);
-        $gadget.find('.business-plan-price span.big').text(mySelf.planPrice);
-        $gadget.find('.business-base-plan span.right').text(mySelf.planPrice * 3); // minimum
-        $gadget.find('.business-users-plan span.right').text(mySelf.planPrice * (users - 3));
+        $gadget.find('.business-plan-price span.big').text(mySelf.planPrice.toFixed(3) + ' €');
+        $gadget.find('.business-base-plan span.right')
+            .text((mySelf.planPrice * mySelf.minUsers).toFixed(2) + ' €'); // minimum
+        $gadget.find('.business-users-plan span.right')
+            .text((mySelf.planPrice * (users - mySelf.minUsers)).toFixed(2) + ' €');
+        $gadget.find('.business-plan-total span.right').text((mySelf.planPrice * users).toFixed(2) + ' €');
+
+        $gadget.find('.business-users-plan .left').text(l[19504].replace('{0}', users - mySelf.minUsers));
     };
 
     // event handler for check box
@@ -123,18 +131,29 @@ BusinessRegister.prototype.initPage = function () {
     $('#business-nbusrs', $pageContainer).off('blur.suba').on('blur.suba',
         function nbOfUsersBlurEventHandler() {
             var $me = $(this);
-            if ($me.val()) {
-
+            var usr = 3;
+            if (!$me.val() || $me.val() < 3) {
+                var $meParent = $me.parent().addClass('error');
+                $meParent.find('.error-message').text(l[19501]);
             }
+            else {
+                $me.parent().removeClass('error');
+                usr = $me.val();
+            }
+            updatePriceGadget(usr);
         });
 
-    
 
     M.require('businessAcc_js').done(function afterLoadingBusinessClass() {
         var business = new BusinessAccount();
 
         business.getListOfPaymentGateways(false).always(fillPaymentGateways);
+        business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
+            mySelf.planPrice = info.mbp / 3;
+            updatePriceGadget(3);
+        });
     });
     
 };
+
 

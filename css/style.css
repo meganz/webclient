@@ -21483,22 +21483,69 @@ body.kr .account.chart.data {
     padding-left: 0;
     height: auto;
     margin-bottom: 16px;
-    background-image: url(../images/mega/contact-us-sprite.png);
-    background-size: 80px auto;
     display: block;
+    background-image: none;
     padding-left: 40px;
-    height: 28px
 }
-/* This is a hackpatch to get contact us page out. I will fix this properly so it doesn't rely on language classes soon */
-.fr .contact-us-revamp .contact-new-title.gdpr {
-    margin-bottom: 40px;
+.contact-us .contact-new-title::before {
+    content: '';
+    background-image: url(../images/mega/contact-us-sprite@2x.png);;
+    background-size: 80px auto;
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    position: absolute;
+    margin-left: -40px;
 }
-.ru .contact-us-revamp .contact-new-title.suggest-improvements, .ru .contact-us-revamp .contact-new-title.other-ip-issues {
-    margin-bottom: 40px;
+.contact-us .contact-new-title.directory::before {
+    background-image: none;
 }
-.pl .contact-us-revamp .contact-new-title.gdpr, .pl .contact-us-revamp .contact-new-title.other-ip-issues {
-    margin-bottom: 40px;
+.contact-new-title.legal::before {
+    background-position: -4px -312px;
 }
+.contact-new-title.copyright::before {
+    background-position: -4px -119px;
+}
+.contact-new-title.improvements::before {
+    background-position: -4px -280px;
+}
+.contact-new-title.report-a-bug::before {
+    background-position: -4px -216px;
+}
+.contact-new-title.media::before {
+    background-position: -4px -344px;
+}
+.contact-new-title.get-support::before {
+    background-position: -4px -87px;
+}
+.contact-new-title.report-objectionable-material::before {
+    background-position: -4px -151px;
+}
+.contact-new-title.privacy::before {
+    background-position: -4px -184px;
+}
+.contact-new-title.security::before {
+    background-position: -4px -248px;
+}
+.contact-new-title.suggest-improvements::before {
+    background-position: -4px -280px;
+}
+.contact-new-title.other-ip-issues::before {
+    background-position: -4px -376px;
+}
+.contact-new-title.corporate-office::before {
+    background-position: -4px -409px;
+}
+.contact-new-title.corporate-mail::before {
+    background-position: -4px -441px;
+}
+.contact-new-title.other-group-companies::before {
+    background-position: -4px -473px;
+}
+.contact-new-title.eu-representative::before, .contact-new-title.gdpr::before {
+    background-position: -4px -505px;
+}
+
 .contact-us-revamp .main-mid-pad h1 {
     background-image: url(../images/mega/contact-us-sprite.png);
     background-size: 80px auto;
@@ -21536,12 +21583,12 @@ body.kr .account.chart.data {
     border-radius: 4px;
     font-size: 14px;
     font-family: 'source_sans_prosemibold';
-    margin: 28px 0 0 0;
+    margin: 16px 0 0 0;
 }
 .contact-us-revamp .contact-new-txt {
     font-size: 15px;
     color: #676D75;
-    min-height: 100px;
+    min-height: initial;
 }
 .contact-us-revamp .contact-body-wrapper {
     width: 1280px;

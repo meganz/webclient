@@ -930,7 +930,7 @@ MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
             if (typeof resp !== 'object' && contactLink) {
                 M.inviteContactMessageHandler(resp);
             }
-            invitePromise.reject(false);    
+            invitePromise.reject(false);
         }
     });
     return invitePromise;

@@ -585,7 +585,7 @@
                                 $addContactBtn = $('.add-user-popup-button');
                             }
 
-                            addNewContact($addContactBtn, false).done(function(e){
+                            addNewContact($addContactBtn, false).done(function(e) {
                                 var share = new mega.Share();
                                 share.updateNodeShares();
                                 $('.token-input-token-mega').remove();

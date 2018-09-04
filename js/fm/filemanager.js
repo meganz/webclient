@@ -1716,11 +1716,14 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
         else if ((e.keyCode === 13) && ($.dialog === 'share')) {
-            var share = new mega.Share();
-            share.updateNodeShares();
+            addNewContact($('.add-user-popup-button'), false).done(function(e){
+                var share = new mega.Share();
+                share.updateNodeShares();
+                $('.token-input-token-mega').remove();
+            });
         }
         else if ((e.keyCode === 13) && ($.dialog === 'add-contact-popup')) {
-            addNewContact($('.add-user-popup-button.add'));
+            addNewContact($('.add-user-popup-button'));
         }
         else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
             $('.rename-dialog-button.rename').trigger('click');

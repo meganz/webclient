@@ -1913,7 +1913,7 @@
     "17595": "Bei deaktivierter Dateiversionierung wird die bestehende Datei beim \u00dcberschreiben gel\u00f6scht (der \u00c4nderungsverlauf bleibt dadurch nicht erhalten). Wollen Sie die Dateiversionierung wirklich abschalten?",
     "17596": "Dateiversionierung f\u00fcr Ihren Account:",
     "17597": "Dateiversionen in Ihnen freigegebenen Ordnern sind hiervon nicht betroffen.",
-    "17598": "Alte Dateiversionen l\u00f6schen:",
+    "17598": "Delete all older versions of my files",
     "17599": "Alle l\u00f6schen",
     "17600": "Alle alten Dateiversionen werden gel\u00f6scht. Dateiversionen in Ordnerfreigaben eines Kontakts m\u00fcssen vom Eigent\u00fcmer entfernt werden werden.",
     "17601": "Aktiv",

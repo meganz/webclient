@@ -1913,9 +1913,9 @@
     "17595": "Si desactivas el control de versiones y subes un archivo, la versi\u00f3n nueva reemplazar\u00e1 la actual y los cambios no ser\u00e1n archivados como versiones. \u00bfSeguro que quieres desactivar el control de versiones?",
     "17596": "Activar o desactivar el control de versiones para tu cuenta:",
     "17597": "Es posible que recibas versiones de archivos en las carpetas compartidas si tus contactos lo tienen activado.",
-    "17598": "Eliminar todas las versiones de archivo:",
-    "17599": "Eliminar todo",
-    "17600": "Esta acci\u00f3n eliminar\u00e1 permanentemente todas las versiones de tus archivos. Las versiones que han sido compartidas contigo por tus contactos tendr\u00e1n que ser eliminadas por ellos.",
+    "17598": "Eliminar todas las versiones anteriores de mis archivos",
+    "17599": "Eliminar versiones anteriores",
+    "17600": "Los archivos actuales permanecer\u00e1n. Solo se borrar\u00e1 el hist\u00f3rico de versiones de tus archivos.",
     "17601": "Activado",
     "17602": "La versi\u00f3n actual del archivo ser\u00e1 reemplazada por el archivo que est\u00e1s subiendo.",
     "17603": "Reintentando la descarga en MEGAsync",
@@ -2554,7 +2554,7 @@
     "19321": "Las consultas y solicitudes relacionadas con nuestra pol\u00edtica de privacidad y de datos deben enviarse a:",
     "19322": "Env\u00ede todos los detalles de la supuesta infracci\u00f3n de marcas registradas a:",
     "19323": "Mega tiene tolerancia cero para material de explotaci\u00f3n infantil, extremismo violento, bestialismo, zoofilia, gore, malware, datos\/contrase\u00f1as pirateados\/robados, extorsi\u00f3n, porno de venganza, etc. \r\nReporta los enlaces con una breve descripci\u00f3n a:",
-    "19338": "Upload 1 file",
+    "19338": "Subir 1 archivo",
     "19339": "Upload [X] files",
-    "19340": "You don't have write privileges in this share."
+    "19340": "No tienes permiso de escritura en esta carpeta compartida."
 }

@@ -1913,9 +1913,9 @@
     "17595": "Quando le versioni dei file sono disabilitate, la versione corrente verr\u00e0 rimpiazzata dalla nuova versione una volta che il file viene aggiornato (e i cambiamenti del file non verranno pi\u00f9 registrati). Sei sicuro di voler disabilitare le versioni dei file?",
     "17596": "Attiva o disattiva le versioni dei file per il tuo intero account:",
     "17597": "Potresti ancora ricevere le versioni dei file dalle cartelle condivise se i tuoi contatti hanno questa impostazione attiva.",
-    "17598": "Elimina tutte le versioni del file:",
-    "17599": "Elimina tutto",
-    "17600": "Questo eliminer\u00e0 permanentemente tutte le tue versioni del file. Qualsiasi versione del file condivisa da te con un contatto dovr\u00e0 essere eliminata da loro.",
+    "17598": "Elimina tutte le precedenti versioni dei miei file",
+    "17599": "Elimina le versioni precedenti",
+    "17600": "Tutti i file correnti rimarranno. Solo le versioni precedenti dei tuoi file verranno eliminate.",
     "17601": "Attivato",
     "17602": "La versione corrente del file verr\u00e0 rimpiazzata con il file che stai caricando.",
     "17603": "Riprova del download in MEGAsync in corso",
@@ -2554,7 +2554,7 @@
     "19321": "Domande e richieste riguardo la nostra Politica su Privacy e Dati dovrebbero essere inviate a:",
     "19322": "Presenta i dettagli completi dell'infrazione di Trademark a:",
     "19323": "Mega non ha nessuna tolleranza per materiale di sfruttamento di bambini, estremismo violento, bestialit\u00e0, zoofilia, Gore, malware, dati e password rubate, estorsioni, porno vendette ecc. Segnala i link con descrizione a:",
-    "19338": "Upload 1 file",
+    "19338": "Carica 1 file",
     "19339": "Upload [X] files",
-    "19340": "You don't have write privileges in this share."
+    "19340": "Non hai i privilegi in questa condivisione."
 }

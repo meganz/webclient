@@ -1913,9 +1913,9 @@
     "17595": "Se o controle de vers\u00f5es de arquivos estiver desativado, assim que um arquivo for atualizado a vers\u00e3o atual ser\u00e1 substitu\u00edda pela nova vers\u00e3o assim (e suas altera\u00e7\u00f5es no arquivo n\u00e3o ser\u00e3o mais gravadas). Voc\u00ea tem certeza de que deseja desativar o controle de vers\u00f5es de arquivos?",
     "17596": "Ativar ou desativar o controle de vers\u00f5es de arquivos para toda a sua conta:",
     "17597": "Voc\u00ea ainda pode receber vers\u00f5es de arquivos em pastas compartilhadas, se os seus contatos tiverem essa fun\u00e7\u00e3o ativa.",
-    "17598": "Deletar todas as vers\u00f5es de arquivos",
-    "17599": "Deletar todas",
-    "17600": "Esta a\u00e7\u00e3o deletar\u00e1 permanentemente todas as vers\u00f5es de arquivos criadas por voc\u00ea. As vers\u00f5es de arquivos compartilhadas com voc\u00ea por um contato precisam ser exclu\u00eddas por ele.",
+    "17598": "Deletar todas as vers\u00f5es anteriores dos meus arquivos",
+    "17599": "Deletar vers\u00f5es anteriores",
+    "17600": "Todos os arquivos atuais permanecer\u00e3o. Apenas as vers\u00f5es antigas dos seus arquivos ser\u00e3o deletadas.",
     "17601": "Ativo",
     "17602": "A vers\u00e3o atual do arquivo ser\u00e1 substitu\u00edda pelo arquivo que voc\u00ea est\u00e1 fazendo upload.",
     "17603": "Fazendo uma nova tentativa de download no MEGAsync",
@@ -2554,7 +2554,7 @@
     "19321": "D\u00favidas e solicita\u00e7\u00f5es relacionadas \u00e0 nossa Pol\u00edtica de privacidade e de dados devem ser enviadas para:",
     "19322": "Envie todos os detalhes da suposta infra\u00e7\u00e3o de direitos autorais para:",
     "19323": "O Mega tem toler\u00e2ncia zero com conte\u00fados relacionados \u00e0 explora\u00e7\u00e3o infantil, extremismo, bestialidade, zoofilia, derramamento de sangue, v\u00edrus, roubo ou hackeo de dados\/senhas, extors\u00e3o, pornografia de vingan\u00e7a etc. Denuncie os links incluindo uma descri\u00e7\u00e3o do conte\u00fado para:",
-    "19338": "Upload 1 file",
+    "19338": "Fazer o upload de 1 arquivo",
     "19339": "Upload [X] files",
-    "19340": "You don't have write privileges in this share."
+    "19340": "Voc\u00ea n\u00e3o tem permiss\u00e3o de edi\u00e7\u00e3o neste compartilhamento."
 }

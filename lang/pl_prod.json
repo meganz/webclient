@@ -1913,9 +1913,9 @@
     "17595": "Kiedy wersjonowanie jest zablokowane, aktualna wersja pliku zostanie zast\u0105piona now\u0105 wersj\u0105 (zmiany nie b\u0119d\u0105 rejestrowane). Czy chcesz wy\u0142\u0105czy\u0107 wersjonowanie?",
     "17596": "W\u0142\u0105cz lub wy\u0142\u0105cz wersjonowanie dla swojego konta:",
     "17597": "Mo\u017cesz wci\u0105\u017c otrzymywa\u0107 nowe wersj\u0119 plik\u00f3w w katalogach udost\u0119pnionych, je\u017celi Twoje kontakty maj\u0105 t\u0105 funkcj\u0119 w\u0142\u0105czon\u0105.",
-    "17598": "Usu\u0144 wszystkie wersje:",
-    "17599": "Usu\u0144 wszystko",
-    "17600": "Ta operacja usunie wszystkie wersje plik\u00f3w. Wersje plik\u00f3w w katalog udost\u0119pnionych musz\u0105 zosta\u0107 usuni\u0119te przez ich w\u0142a\u015bcicieli.",
+    "17598": "Usu\u0144 wszystkie starsze wersje moich plik\u00f3w",
+    "17599": "Usu\u0144 stare wersje",
+    "17600": "Wszystkie bie\u017c\u0105ce pliki pozostan\u0105. Tylko historyczne wersje twoich plik\u00f3w zostan\u0105 usuni\u0119te.",
     "17601": "W\u0142\u0105cz",
     "17602": "Aktualna wersja zostanie zast\u0105piona wersj\u0105 wgrywanego pliku.",
     "17603": "Pobieranie wznowione w MEGAsync",
@@ -2554,7 +2554,7 @@
     "19321": "Zapytania i wnioski dotycz\u0105ce naszej Polityki prywatno\u015bci i danych nale\u017cy przesy\u0142a\u0107 na adres:",
     "19322": "Prze\u015blij wszystkie szczeg\u00f3\u0142y dotycz\u0105ce rzekomego naruszenia praw do znaku towarowego:",
     "19323": "Mega ma zerow\u0105 tolerancj\u0119 na materia\u0142y do wykorzystywania dzieci, brutalny ekstremizm, bestialstwo, zofizm, gore, z\u0142o\u015bliwe oprogramowanie, zhakowane \/ skradzione dane \/ has\u0142a, wymuszenia, zemsta porno itp. Zg\u0142o\u015b linki z opisem do:",
-    "19338": "Upload 1 file",
+    "19338": "Prze\u015blij 1 plik",
     "19339": "Upload [X] files",
-    "19340": "You don't have write privileges in this share."
+    "19340": "Nie masz uprawnie\u0144 do zapisu."
 }

@@ -1913,9 +1913,9 @@
     "17595": "Quand le versionnage des fichiers est d\u00e9sactiv\u00e9, la version actuelle est remplac\u00e9e par la nouvelle version lorsque le fichier est mis \u00e0 jour (et vos changements apport\u00e9s au fichier ne sont plus enregistr\u00e9s). Souhaitez-vous vraiment d\u00e9sactiver le versionnage des fichiers\u2009?",
     "17596": "Activer ou d\u00e9sactiver le versionnage des fichiers pour votre compte entier\u00a0:",
     "17597": "Vous pourrez encore recevoir des versions de fichiers provenant de dossiers partag\u00e9s si vous contacts ont activ\u00e9s cette option.",
-    "17598": "Supprimer toutes les versions de fichiers\u00a0:",
-    "17599": "Tout supprimer",
-    "17600": "Ceci supprimera irr\u00e9m\u00e9diablement toutes vos propres versions de fichiers. Toute version de fichier partag\u00e9e avec vous par un contact devra \u00eatre supprim\u00e9e par ce contact.",
+    "17598": "Supprimer toutes les anciennes versions de mes fichiers",
+    "17599": "Supprimer les anciennes versions",
+    "17600": "Tous les fichiers actuels seront conserv\u00e9s. Seules les versions archiv\u00e9es de vos fichiers seront supprim\u00e9es.",
     "17601": "Activ\u00e9",
     "17602": "La version actuelle du fichier sera remplac\u00e9e par le fichier que vous t\u00e9l\u00e9versez.",
     "17603": "Nouvelle tentative de t\u00e9l\u00e9chargement dans MEGAsync",
@@ -2554,7 +2554,7 @@
     "19321": "Les demandes relatives \u00e0 notre politique de confidentialit\u00e9 et de donn\u00e9es devraient \u00eatre envoy\u00e9es \u00e0\u00a0:",
     "19322": "Envoyez des informations compl\u00e8tes concernant la violation pr\u00e9sum\u00e9e de marque de commerce \u00e0\u00a0:",
     "19323": "Mega a une politique de tol\u00e9rance z\u00e9ro concernant l\u2019exploitation des enfants, l\u2019extr\u00e9misme violent, la bestialit\u00e9, la zoophilie, les sc\u00e8nes sanglantes, les programmes malveillants, les donn\u00e9es et les mots de passe pirat\u00e9s ou vol\u00e9s, l\u2019extorsion, la pornographie de vengeance, etc.. Signalez les liens avec une description \u00e0\u00a0:",
-    "19338": "Upload 1 file",
+    "19338": "T\u00e9l\u00e9verser un fichier",
     "19339": "Upload [X] files",
-    "19340": "You don't have write privileges in this share."
+    "19340": "Vous n\u2019avez pas de privil\u00e8ges d\u2019\u00e9criture sur ce partage."
 }

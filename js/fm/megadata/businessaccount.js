@@ -1028,3 +1028,12 @@ BusinessAccount.prototype.getAccountInvoicesList = function (forceUpdate) {
 
     return operationPromise;
 };
+
+
+BusinessAccount.prototype.setMasterUserAttributes = function (nbusers, cname, fname, lname, tel, email, pass) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+
+    return operationPromise;
+};

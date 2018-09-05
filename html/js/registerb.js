@@ -15,17 +15,19 @@ function BusinessRegister() {
 BusinessRegister.prototype.initPage = function () {
     "use strict";
 
+    loadingDialog.show();
+
     var $pageContainer = $('.bus-reg-body');
     var mySelf = this;
 
-    $pageContainer.find('#business-nbusrs').val('');
-    $pageContainer.find('#business-cname').val('');
-    $pageContainer.find('#business-tel').val('');
-    $pageContainer.find('#business-fname').val('');
-    $pageContainer.find('#business-lname').val('');
-    $pageContainer.find('#business-email').val('');
-    $pageContainer.find('#business-pass').val('');
-    $pageContainer.find('#business-rpass').val('');
+    var $nbUsersInput = $pageContainer.find('#business-nbusrs').val('');
+    var $cnameInput = $pageContainer.find('#business-cname').val('');
+    var $telInput = $pageContainer.find('#business-tel').val('');
+    var $fnameInput = $pageContainer.find('#business-fname').val('');
+    var $lnameInput = $pageContainer.find('#business-lname').val('');
+    var $emailInput = $pageContainer.find('#business-email').val('');
+    var $passInput = $pageContainer.find('#business-pass').val('');
+    var $rPassInput = $pageContainer.find('#business-rpass').val('');
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
     $pageContainer.find('.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
     $pageContainer.find('.bus-reg-input').removeClass('error');
@@ -43,6 +45,7 @@ BusinessRegister.prototype.initPage = function () {
         $('.bus-confirm-body.confirm').addClass('hidden'); // hiding confirmation part
         $('.bus-confirm-body.verfication').addClass('hidden'); // hiding verification part
         $pageContainer.find('#business-nbusrs').focus();
+        loadingDialog.hide();
     };
 
     var fillPaymentGateways = function (st, list) {
@@ -120,29 +123,113 @@ BusinessRegister.prototype.initPage = function () {
             var $me = $(this);
             if ($me.hasClass('checkOn')) {
                 $me.removeClass('checkOn').addClass('checkOff');
+                $('.bus-reg-btn', $pageContainer).addClass('disabled');
             }
             else {
                 $me.removeClass('checkOff').addClass('checkOn');
+                if ($('.bus-reg-agreement .bus-reg-checkbox.checkOn', $pageContainer).length === 2) {
+                    $('.bus-reg-btn', $pageContainer).removeClass('disabled');
+                }
+                else {
+                    $('.bus-reg-btn', $pageContainer).addClass('disabled');
+                }
             }
         });
 
+    /**input values validation
+     * @param {Object}  $element    the single element to validate, if not passed all will be validated
+     * @returns {Boolean}   whether the validation passed or not*/
+    var inputsValidator = function ($element) {
+        var passed = true;
+        if (!$element || $element.is($nbUsersInput)) {
+            if (!$nbUsersInput.val() || $nbUsersInput.val() < mySelf.minUsers) {
+                $nbUsersInput.parent().addClass('error').find('.error-message').text(l[19501]);
+                $nbUsersInput.focus();
+                passed = false;
+            }
+        }
+        if (!$element || $element.is($cnameInput)) {
+            if (!$cnameInput.val()) {
+                $cnameInput.parent().addClass('error').find('.error-message').text(l[19507]);
+                $cnameInput.focus();
+                passed = false;
+            }
+        }
+        if (!$element || $element.is($telInput)) {
+            if (!$telInput.val()) {
+                $telInput.parent().addClass('error').find('.error-message').text(l[8814]);
+                $telInput.focus();
+                passed = false;
+            }
+        }
+        if (!$element || $element.is($fnameInput)) {
+            if (!$fnameInput.val()) {
+                $fnameInput.parent().addClass('error').find('.error-message').text(l[1098]);
+                $fnameInput.focus();
+                passed = false;
+            }
+        }
+        if (!$element || $element.is($lnameInput)) {
+            if (!$lnameInput.val()) {
+                $lnameInput.parent().addClass('error').find('.error-message').text(l[1098]);
+                $lnameInput.focus();
+                passed = false;
+            }
+        }
+        if (!$element || $element.is($emailInput)) {
+            if (!$emailInput.val() || checkMail($emailInput.val())) {
+                $emailInput.parent().addClass('error').find('.error-message').text(l[7415]);
+                $emailInput.focus();
+                passed = false;
+            }
+        }
+        if (!$element || $element.is($passInput)) {
+            if (!$passInput.val()) {
+                $passInput.parent().addClass('error').find('.error-message').text(l[1104]);
+                $passInput.focus();
+                passed = false;
+            }
+        }
+        if (!$element || $element.is($rPassInput)) {
+            if (!$rPassInput.val()) {
+                $rPassInput.parent().addClass('error').find('.error-message').text(l[1104]);
+                $rPassInput.focus();
+                passed = false;
+            }
+        }
 
-    // event handler for blur on number of users input
-    $('#business-nbusrs', $pageContainer).off('blur.suba').on('blur.suba',
-        function nbOfUsersBlurEventHandler() {
+        return passed;
+    };
+
+
+    // event handler for change on inputs
+    $('.bus-reg-info-block input', $pageContainer).off('change.suba').on('change.suba',
+        function nbOfUsersChangeEventHandler() {
             var $me = $(this);
-            var usr = 3;
-            if (!$me.val() || $me.val() < 3) {
-                var $meParent = $me.parent().addClass('error');
-                $meParent.find('.error-message').text(l[19501]);
-            }
-            else {
+            var valid = false;
+            if (inputsValidator($me)) {
                 $me.parent().removeClass('error');
-                usr = $me.val();
+                valid = true;
             }
-            updatePriceGadget(usr);
-        });
+            if ($me.attr('id') === 'business-nbusrs') {
+                updatePriceGadget((valid) ? $me.val() : mySelf.minUsers);
+            }
+        }
+    );
 
+    // event handler for register button, validation + basic check
+    $('#business-reg-btn', $pageContainer).off('click.suba').on('click.suba',
+        function registerBusinessAccButtonClickHandler() {
+
+            if ($(this).hasClass('disabled')) {
+                return false;
+            }
+            if (!inputsValidator()) {
+                return false;
+            }
+            
+        }
+    );
 
     M.require('businessAcc_js').done(function afterLoadingBusinessClass() {
         var business = new BusinessAccount();
@@ -156,4 +243,27 @@ BusinessRegister.prototype.initPage = function () {
     
 };
 
+/**
+ * register new business account, values must be validated 
+ * @param {Number} nbusers      number of users in this business account
+ * @param {String} cname        company name
+ * @param {String} fname        first name of account owner
+ * @param {String} lname        last name of account holder
+ * @param {String} tel          telephone
+ * @param {String} email        email
+ * @param {String} pass         password
+ */
+BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, tel, email, pass) {
+    "use strict";
 
+    loadingDialog.show();
+
+    var afterEmphermalAccountCreation = function (ctx, usrType) {
+
+    };
+
+
+    // call create ephemeral account function in security package
+    security.register.createEphemeralAccount();
+
+};

@@ -466,10 +466,10 @@ function init_register() {
     $('p.account-sec', $tipsContainer).html(l[1093] + ' ' + l[1094]);
     $('.account-business', $tipsContainer).addClass('hidden');
 
-    // business sub-account registeration
+    // business sub-account registration
     if (localStorage.businessSubAc) {
         var userInfo = JSON.parse(localStorage.businessSubAc);
-        // we know here that userInfo contain all needed attr, othrewise higher layers wont allow us
+        // we know here that userInfo contain all needed attr, otherwise higher layers wont allow us
         // to get here.
         $('#register-email-registerpage').val(userInfo.e);
         // $('#register-email').attr('readonly', true);

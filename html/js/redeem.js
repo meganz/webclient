@@ -384,6 +384,8 @@ var redeem = {
         redeem.$successOverlay.removeClass('hidden');
         redeem.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
 
+        insertEmailToPayResult(redeem.$successOverlay);
+
         // Add click handlers for 'Go to my account' and Close buttons
         redeem.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
 

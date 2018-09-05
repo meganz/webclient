@@ -182,12 +182,21 @@
     background-color: rgba(217,0,7,0.5);
 }
 
+.bus-reg-input.active::after {
+    background-color: #666;
+}
+
 .bus-reg-input.error input {
 	color: rgba(217,0,7,1);
 }
 
 .bus-reg-input.error .error-message {
 	display: inline-block;
+	font-weight: 600;
+}
+
+.bus-reg-body .new-registration .register-pass-status-line1, .bus-reg-body .new-registration .register-pass-status-line2, .bus-reg-body .new-registration .register-pass-status-line3, .bus-reg-body .new-registration .register-pass-status-line4, .bus-reg-body .new-registration .register-pass-status-line5 {
+	width: 76px;
 }
 
 .bus-reg-radio-block {
@@ -215,6 +224,10 @@
     position: relative;
     display: inline-block;
     margin:3px 0;
+}
+
+.bus-reg-radio.last-child{
+	margin-left: 32px;
 }
 
 .bus-reg-body .bus-reg-radio.checkOn {
@@ -249,14 +262,14 @@
 }
 
 .bus-reg-body .provider-icon {
-    width: 32px;
-    height: 24px;
+ /*   width: 32px;
+    height: 24px;*/
     vertical-align: top;
     /*background-image: url(../images/mega/payment-provider-icons-v3.png);*/
     /*background-size: 192px auto;*/
     display: inline-block;
     margin-left: 4px;
-    margin-right: 40px;
+    margin-right: 8px;
 }
 
 /*.bus-reg-body .provider-icon.ecpVI{

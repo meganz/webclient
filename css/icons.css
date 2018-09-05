@@ -1516,3 +1516,14 @@ i.icons-sprite {
 .default-warning .download.big-icon {
     background-position: -708px -76px;
 }
+
+
+.tiny-icon.membership-status.bus {
+    background-image: url(../images/mega/big-icon.png);
+    background-position: -126px -418px;
+}
+
+.small-icon.membership.bus {
+    background-image: url(../images/mega/big-icon.png);
+    background-position: -149px -415px;
+}

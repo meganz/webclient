@@ -347,11 +347,6 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
      background-size: 38px auto;
 }
 
-.bus-reg-body .provider-icon {
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
 .bus-reg-checkbox.checkOn::before {
     background-image: url(../images/mega/top-login-sprite_v11@2x.png);
 

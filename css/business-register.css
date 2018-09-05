@@ -1,10 +1,10 @@
-.business-register {
+/*.business-register {
 	background-color: rgba(250,250,250,1);
 	overflow: auto;
 	width: 100%;
 	margin:0;
 	height: auto;
-}
+}*/
 
 .business-register * {
 	font-family: 'Lato', sans-serif;
@@ -115,23 +115,23 @@
     display: inline-block;
 }
 
-.business-register .number-of-user {
+.bus-reg-body .number-of-user {
 	background-position: center -1582px;
 }
 
-.business-register .company-name {
+.bus-reg-body .company-name {
 	background-position: center -1661px;
 }
 
-.business-register .phone {
+.bus-reg-body .phone {
 	background-position: center -1621px;
 }
 
-.business-register .email {
+.bus-reg-body .email {
 	background-position: center -1701px;
 }
 
-.business-register .pw {
+.bus-reg-body .pw {
 	background-position: center -1741px;
 }
 

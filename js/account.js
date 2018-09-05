@@ -313,6 +313,13 @@ function u_setrsa(rsakey) {
             }
 
             u_privk = rsakey;
+
+            // If coming from a #confirm link in the new registration process and logging in from a clean browser
+            // session the u_attr might not be set to an object yet, this will prevent an exception below
+            if (typeof u_attr === 'undefined') {
+                u_attr = {};
+            }
+
             u_attr.privk = u_storage.privk = base64urlencode(crypto_encodeprivkey(rsakey));
             u_attr.pubk = u_storage.pubk = base64urlencode(crypto_encodepubkey(rsakey));
 

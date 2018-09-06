@@ -30,6 +30,7 @@ BusinessRegister.prototype.initPage = function () {
     var $rPassInput = $pageContainer.find('#business-rpass').val('');
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
     $pageContainer.find('.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
+    $pageContainer.find('.bus-reg-agreement .bus-reg-txt a').addClass('terms');
     $pageContainer.find('.bus-reg-input').removeClass('error');
     $pageContainer.find('.bus-reg-plan .business-base-plan .left')
         .text(l[19503].replace('[0]', this.minUsers));
@@ -107,7 +108,7 @@ BusinessRegister.prototype.initPage = function () {
             users = mySelf.minUsers; // minimum val
         }
         var $gadget = $('.bus-reg-plan', $pageContainer);
-        $gadget.find('.business-plan-price span.big').text(mySelf.planPrice.toFixed(3) + ' €');
+        $gadget.find('.business-plan-price span.big').text(mySelf.planPrice.toFixed(2) + ' €');
         $gadget.find('.business-base-plan span.right')
             .text((mySelf.planPrice * mySelf.minUsers).toFixed(2) + ' €'); // minimum
         $gadget.find('.business-users-plan span.right')
@@ -142,42 +143,42 @@ BusinessRegister.prototype.initPage = function () {
     var inputsValidator = function ($element) {
         var passed = true;
         if (!$element || $element.is($nbUsersInput)) {
-            if (!$nbUsersInput.val() || $nbUsersInput.val() < mySelf.minUsers) {
+            if (!$nbUsersInput.val().trim() || $nbUsersInput.val() < mySelf.minUsers) {
                 $nbUsersInput.parent().addClass('error').find('.error-message').text(l[19501]);
                 $nbUsersInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($cnameInput)) {
-            if (!$cnameInput.val()) {
+            if (!$cnameInput.val().trim()) {
                 $cnameInput.parent().addClass('error').find('.error-message').text(l[19507]);
                 $cnameInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($telInput)) {
-            if (!$telInput.val()) {
+            if (!$telInput.val().trim()) {
                 $telInput.parent().addClass('error').find('.error-message').text(l[8814]);
                 $telInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($fnameInput)) {
-            if (!$fnameInput.val()) {
+            if (!$fnameInput.val().trim()) {
                 $fnameInput.parent().addClass('error').find('.error-message').text(l[1098]);
                 $fnameInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($lnameInput)) {
-            if (!$lnameInput.val()) {
+            if (!$lnameInput.val().trim()) {
                 $lnameInput.parent().addClass('error').find('.error-message').text(l[1098]);
                 $lnameInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($emailInput)) {
-            if (!$emailInput.val() || checkMail($emailInput.val())) {
+            if (!$emailInput.val().trim() || checkMail($emailInput.val())) {
                 $emailInput.parent().addClass('error').find('.error-message').text(l[7415]);
                 $emailInput.focus();
                 passed = false;
@@ -193,6 +194,13 @@ BusinessRegister.prototype.initPage = function () {
         if (!$element || $element.is($rPassInput)) {
             if (!$rPassInput.val()) {
                 $rPassInput.parent().addClass('error').find('.error-message').text(l[1104]);
+                $rPassInput.focus();
+                passed = false;
+            }
+        }
+        if (passed && !$element) {
+            if ($passInput.val() !== $rPassInput.val()) {
+                $rPassInput.parent().addClass('error').find('.error-message').text(l[1107]);
                 $rPassInput.focus();
                 passed = false;
             }
@@ -227,7 +235,9 @@ BusinessRegister.prototype.initPage = function () {
             if (!inputsValidator()) {
                 return false;
             }
-            
+            mySelf.doRegister($nbUsersInput.val().trim(), $cnameInput.val().trim(),
+                $fnameInput.val().trim(), $lnameInput.val().trim(), $telInput.val().trim(), $emailInput.val().trim(),
+                $passInput.val());
         }
     );
 
@@ -236,8 +246,18 @@ BusinessRegister.prototype.initPage = function () {
 
         business.getListOfPaymentGateways(false).always(fillPaymentGateways);
         business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
-            mySelf.planPrice = info.mbp / 3;
+            mySelf.planPrice = Number.parseFloat(info.p);
+            mySelf.planInfo = info;
             updatePriceGadget(3);
+
+            ///// testing
+            //var userInfo = {
+            //    fname: 'khaled',
+            //    lname: 'daif',
+            //    nbOfUsers: 4
+            //};
+            //mySelf.goToPayment(userInfo);
+            ///// end of testing
         });
     });
     
@@ -257,13 +277,72 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
     "use strict";
 
     loadingDialog.show();
+    var mySelf = this;
 
-    var afterEmphermalAccountCreation = function (ctx, usrType) {
-
+    var afterEmphermalAccountCreation = function () {
+        // at this point i know BusinessAccount Class is required before
+        var business = new BusinessAccount();
+        var settingPromise = business.setMasterUserAttributes(nbusers, cname, tel, fname, lname, email, pass);
+        settingPromise.always(function settingAttrHandler(st, res) {
+            if (st === 0) {
+                msgDialog('warninga', '', l[19508], '', function () {
+                    loadingDialog.hide();
+                    mySelf.initPage();
+                });
+                return;
+            }
+            loadingDialog.hide();
+            var userInfo = {
+                fname: fname,
+                lname: lname,
+                nbOfUsers: nbusers
+            };
+            mySelf.goToPayment(userInfo);
+        });
     };
 
 
     // call create ephemeral account function in security package
-    security.register.createEphemeralAccount();
+    security.register.createEphemeralAccount(afterEmphermalAccountCreation);
+
+};
+
+/**
+ * show the payment dialog
+ * @param {Object} userInfo     user info (fname, lname and nbOfUsers)
+ */
+BusinessRegister.prototype.goToPayment = function (userInfo) {
+    "use strict";
+
+    addressDialog.init(this.planInfo, userInfo, this);
+
+};
+
+/**
+ * Process the payment
+ * @param {Object} payDetails       payment collected details from payment dialog
+ * @param {Object} businessPlan     business plan details
+ */
+BusinessRegister.prototype.processPayment = function (payDetails, businessPlan) {
+    "use strict";
+    loadingDialog.show();
+
+    var finalizePayment = function (st, res) {
+        if (st === 0) {
+            msgDialog('warninga', '', l[19511], '', function () {
+                loadingDialog.hide();
+                addressDialog.closeDialog();
+            });
+            return;
+        }
+        var url = res.EUR['url'];
+        window.location = url + '?lang=' + lang;
+    };
+
+    // at this point i know BusinessAccount class is required before
+    var business = new BusinessAccount();
+    var payingPromise = business.doPaymentWithAPI(payDetails, businessPlan);
+
+    payingPromise.always(finalizePayment);
 
 };

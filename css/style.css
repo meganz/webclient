@@ -7389,7 +7389,7 @@ table {
 .fm-breadcrumbs.hidden {
     display: none;
 }
-.contact-request-content {
+.contact-requests td, .sent-requests-grid td {
     font-size: 13px;
     color: #666666;
 }
@@ -7428,11 +7428,14 @@ table {
     position: relative;
     white-space: nowrap;
 }
-.contact-requests-grid td:nth-child(3) {
-    width: 400px;
+.contact-requests td:nth-child(2), .sent-requests td:nth-child(2) {
+    width: 240px;
 }
-.sent-requests-grid th:nth-child(1) {
-    width: 100% !important;
+.contact-requests td:nth-child(3), .sent-requests td:nth-child(3) {
+    width: 340px;
+}
+.contact-requests th:nth-child(2)::after, .sent-requests th:nth-child(2)::after {
+    display: none;
 }
 .sent-requests-grid .grid-table tr td:first-child, .sent-requests-grid tr th:first-child, .contact-requests-grid .grid-table tr td:first-child, .contact-requests-grid tr th:first-child {
     padding: 0 12px 0 16px;
@@ -16457,7 +16460,7 @@ ul.token-input-list-mega {
 }
 .multiple-input-warning, .duplicated-input-warning {
     min-height: 24px;
-    position: absolute;
+    position: relative;
     background-color: #fdebeb;
     -webkit-box-shadow: 0px 0px 0px 1px #ec989a;
     -moz-box-shadow: 0px 0px 0px 1px #ec989a;
@@ -16477,9 +16480,6 @@ ul.token-input-list-mega {
     box-sizing: border-box;
     z-index: 100;
     display: none;
-}
-.duplicate .duplicated-input-warning {
-    position: relative;
 }
 .error .multiple-input-warning, .duplicate .duplicated-input-warning {
     display: block;

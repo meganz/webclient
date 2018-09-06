@@ -171,6 +171,31 @@ MegaData.prototype.getSortByDateTimeFn = function() {
     return sortfn;
 };
 
+MegaData.prototype.sortByRts = function(d) {
+    'use strict';
+    this.sortfn = this.getSortByRtsFn();
+    this.sortd = d;
+    this.sort();
+};
+
+MegaData.prototype.getSortByRtsFn = function() {
+    'use strict';
+
+    var sortfn;
+
+    sortfn = function(a, b, d) {
+        var time1 = a.rts - a.rts % 60;
+        var time2 = b.rts - b.rts % 60;
+        if (time1 !== time2) {
+            return (time1 < time2 ? -1 : 1) * d;
+        }
+
+        return M.doFallbackSortWithName(a, b, d);
+    };
+
+    return sortfn;
+};
+
 MegaData.prototype.sortByFav = function(d) {
     this.sortfn = this.getSortByFavFn();
     this.sortd = d;

@@ -40,6 +40,9 @@
  * @property {Number} ts
  *     UNIX epoch time stamp as an integer in seconds to record last change of
  *     parameters values.
+  * @property {Number} rTimeStamp
+ *     UNIX epoch time stamp as an integer in seconds to record last change of
+ *     time stamp.
  * @property {Number} lastChatActivity
  *     UNIX epoch time stamp as an integer in seconds for the last chat
  *     activity.
@@ -62,6 +65,7 @@ Object.defineProperty(this, 'MEGA_USER_STRUCT', {
         "firstName": "",
         "lastName": "",
         "ts": undefined,
+        "rTimeStamp": undefined,
         "avatar": undefined
     })
 });
@@ -105,6 +109,7 @@ function MegaData() {
         'type': this.sortByType.bind(this),
         'date': this.sortByDateTime.bind(this),
         'ts': this.sortByDateTime.bind(this),
+        'rTimeStamp': this.sortByRts.bind(this),
         'owner': this.sortByOwner.bind(this),
         'modified': this.sortByModTime.bind(this),
         'mtime': this.sortByModTime.bind(this),

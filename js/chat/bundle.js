@@ -6541,7 +6541,7 @@ React.makeElement = React['createElement'];
 
 	                                    $(v).trigger('onChange', [v, "textContents", "", messageContents]);
 
-	                                    megaChat.plugins.richpreviewsFilter.processMessage({}, v);
+	                                    megaChat.plugins.richpreviewsFilter.processMessage({}, v, false, true);
 	                                }
 
 	                                self.messagesListScrollable.scrollToBottom(true);

@@ -1159,8 +1159,8 @@ scparser.$add('d', function(a) {
     if (!pfid) {
         scparser.$notify(a);
 
-        if (u_type) {
-            M.checkStorageQuota();
+        if (fminitialized && u_type) {
+            M.checkStorageQuota(ulmanager.ulOverStorageQuota ? 2000 : 0);
         }
     }
     if (!is_mobile) {

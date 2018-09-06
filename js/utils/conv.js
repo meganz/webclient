@@ -241,7 +241,7 @@ function oDestroy(obj) {
         }
     });
 
-    if (!oIsFrozen(obj)) {
+    if (!oIsFrozen(obj) && Object.isExtensible(obj)) {
         Object.defineProperty(obj, ":$:frozen:", {
             value: String(new Date()),
             writable: false

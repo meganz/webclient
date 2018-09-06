@@ -141,7 +141,7 @@ function MegaData() {
         var dummy = function() {
             return MegaPromise.resolve();
         };
-        this['check' + 'StorageQuota'] = dummy;
+        // this['check' + 'StorageQuota'] = dummy;
         this['show' + 'OverStorageQuota'] = dummy;
         this['init' + 'UIKeyEvents'] = dummy;
         this['abort' + 'Transfers'] = dummy;

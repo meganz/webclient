@@ -1360,6 +1360,7 @@
     "8951": "This file is too large to open in your mobile browser. Please use our mobile app for [S]unlimited file size support and free 50 GB cloud storage![\/S]",
     "8952": "This file could not be opened in your mobile browser. Please use our mobile app for [S]unlimited file size, unlimited file types and free 50 GB cloud storage![\/S]",
     "8953": "Set an expiry date",
+    "8963": "Backup your Recovery Key",
     "8969": "Forgot password?",
     "8970": "If you have a backup of your Recovery Key, you can reset your password by selecting YES. No data will be lost.",
     "8971": "You can still export your Recovery Key now if you have an active MEGA session in any other browser on this or any other computer. If you don\u2019t, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.",

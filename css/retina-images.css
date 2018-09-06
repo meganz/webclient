@@ -144,7 +144,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 }
 .block-view-file-type, .dragger-icon, .export-icon, .new-download-file-icon, .share-folder-icon div, .transfer-filetype-icon, .medium-file-icon, .shared-folder-icon, .nw-fm-tree-folder::before, .shared-details-icon, .contact-share-notification::before, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon-span {
     background-image: url(../images/mega/files-icons_v3@2x.png);
-    background-size: 399px auto;
+    background-size: 399px 5575px;
 }
 .fm-widget-illustration {
     background-image: url(../images/mega/PUf_illustration_v1@2x.png);
@@ -160,7 +160,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 }
 .properties-file-icon div {
     background-image: url(../images/mega/properties-sprite_v2@2x.png);
-    background-size: 589px auto;
+    background-size: 589px 6320px;
 }
 .drag-n-drop.header, .drag-n-drop hr, .drag-n-drop.info-block i {
     background-image: url(../images/mega/overlay-sprite@2x.png);

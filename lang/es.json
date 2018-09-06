@@ -804,7 +804,7 @@
     "6188": "La cuenta ha sido cancelada",
     "6189": "Tu cuenta ha sido cancelada correctamente.",
     "6190": "COMPRAR",
-    "6196": "No tienes invitaciones pendientes por el momento",
+    "6196": "No tienes solicitudes pendientes por el momento",
     "6197": "Nombre de la cuenta",
     "6198": "Transferencia bancaria",
     "6200": "N\u00famero de cuenta",
@@ -2733,10 +2733,10 @@
     "19340": "No tienes permiso de escritura en esta carpeta compartida.",
     "19341": "Est\u00e1s conectado a una cuenta diferente en este navegador. Si no es la cuenta que quieres pasar a PRO, descon\u00e9ctate e inicia sesi\u00f3n con la cuenta correcta.",
     "19342": "Error al obtener las opciones de pago para el registro de la cuenta Business. Por favor, int\u00e9ntalo de nuevo m\u00e1s tarde.",
-    "19501": "Minimum number of users is 3",
-    "19503": "Base Plan ([0] users)",
-    "19504": "{0}x additional users",
-    "19505": "Received",
-    "19506": "Sent",
-    "19507": "Company name is required, please fill the company name field"
+    "19501": "El n\u00famero m\u00ednimo de usuarios es 3",
+    "19503": "Plan Base ([0] users)",
+    "19504": "{0}x usuarios adicionales",
+    "19505": "Recibida",
+    "19506": "Enviada",
+    "19507": "El nombre de la empresa es obligatorio, completa el campo del nombre de la empresa"
 }

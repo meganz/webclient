@@ -827,7 +827,7 @@ var ConversationPanel = React.createClass({
     },
 
     uploadFromComputer: function() {
-        this.scrolledToBottom = true;
+        this.props.chatRoom.scrolledToBottom = true;
 
         this.props.chatRoom.uploadFromComputer();
     },
@@ -871,7 +871,7 @@ var ConversationPanel = React.createClass({
         });
 
         self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function (e, eventData) {
-            self.scrolledToBottom = true;
+            self.props.chatRoom.scrolledToBottom = true;
             if (self.messagesListScrollable) {
                 self.messagesListScrollable.scrollToBottom();
             }
@@ -917,7 +917,7 @@ var ConversationPanel = React.createClass({
         self.$messages.droppable(droppableConfig);
 
         self.lastScrollPosition = null;
-        self.lastScrolledToBottom = true;
+        self.props.chatRoom.scrolledToBottom = true;
         self.lastScrollHeight = 0;
         self.lastUpdatedScrollHeight = 0;
 
@@ -1073,7 +1073,7 @@ var ConversationPanel = React.createClass({
 
         if (forced) {
             if (!scrollPositionYPerc && !scrollToElement) {
-                if (self.scrolledToBottom && !self.editDomElement) {
+                if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
                     ps.scrollToBottom(true);
                     return true;
                 }
@@ -1085,7 +1085,7 @@ var ConversationPanel = React.createClass({
         }
 
         if (self.isComponentEventuallyVisible()) {
-            if (self.scrolledToBottom && !self.editDomElement) {
+            if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
                 ps.scrollToBottom(true);
                 return true;
             }
@@ -1110,21 +1110,22 @@ var ConversationPanel = React.createClass({
         var mb = chatRoom.messagesBuff;
 
         if (mb.messages.length === 0) {
-            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
+            self.props.chatRoom.scrolledToBottom = true;
             return;
         }
 
+        // console.error(self.getUniqueId(), "is user scroll!");
+
         // turn on/off auto scroll to bottom.
         if (ps.isCloseToBottom(30) === true) {
-            if (!self.scrolledToBottom) {
+            if (!self.props.chatRoom.scrolledToBottom) {
                 mb.detachMessages();
             }
-            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
+            self.props.chatRoom.scrolledToBottom = true;
         }
         else {
-            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = false;
+            self.props.chatRoom.scrolledToBottom = false;
         }
-
 
         if (isAtTop || (ps.getScrollPositionY() < 5 && ps.getScrollHeight() > 500)) {
             if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull && !mb.isRetrievingHistory) {
@@ -1187,17 +1188,19 @@ var ConversationPanel = React.createClass({
 
                         delete self.lastContentHeightBeforeHist;
 
+                        setTimeout(function() {
+                            self.isRetrievingHistoryViaScrollPull = false;
+                            // because of mousewheel animation, we would delay the re-enabling of the "pull to load
+                            // history", so that it won't re-trigger another hist retrieval request
+
+                            ps.enable();
+                            self.forceUpdate();
+                        }, 1150);
+
                         return 0xDEAD;
                     });
 
-                    setTimeout(function() {
-                        self.isRetrievingHistoryViaScrollPull = false;
-                        // because of mousewheel animation, we would delay the re-enabling of the "pull to load
-                        // history", so that it won't re-trigger another hist retrieval request
 
-                        ps.enable();
-                        self.forceUpdate();
-                    }, 1150);
 
                 });
 
@@ -1498,10 +1501,12 @@ var ConversationPanel = React.createClass({
                             editing={self.state.editing === v.messageId || self.state.editing === v.pendingMessageId}
                             onEditStarted={($domElement) => {
                                 self.editDomElement = $domElement;
+                                self.props.chatRoom.scrolledToBottom = false;
                                 self.setState({'editing': v.messageId});
                                 self.forceUpdate();
                             }}
                             onEditDone={(messageContents) => {
+                                self.props.chatRoom.scrolledToBottom = true;
                                 self.editDomElement = null;
 
                                 var currentContents = v.textContents;
@@ -1596,7 +1601,7 @@ var ConversationPanel = React.createClass({
                 onAttachClicked={() => {
                     self.setState({'attachCloudDialog': false});
 
-                    self.scrolledToBottom = true;
+                    self.props.chatRoom.scrolledToBottom = true;
 
                     room.attachNodes(
                         selected
@@ -1736,7 +1741,7 @@ var ConversationPanel = React.createClass({
                     }
                     catch (e) {}
 
-                    self.scrolledToBottom = true;
+                    self.props.chatRoom.scrolledToBottom = true;
 
                     M.addUpload([meta[0]]);
 
@@ -1787,7 +1792,7 @@ var ConversationPanel = React.createClass({
                     self.setState({'truncateDialog': false});
                 }}
                 onConfirmClicked={() => {
-                    self.scrolledToBottom = true;
+                    self.props.chatRoom.scrolledToBottom = true;
 
                     room.truncate();
 
@@ -1814,7 +1819,7 @@ var ConversationPanel = React.createClass({
                     self.setState({'archiveDialog': false});
                 }}
                 onConfirmClicked={() => {
-                    self.scrolledToBottom = true;
+                    self.props.chatRoom.scrolledToBottom = true;
 
                     room.archive();
 
@@ -1841,7 +1846,7 @@ var ConversationPanel = React.createClass({
                     self.setState({'unarchiveDialog': false});
                 }}
                 onConfirmClicked={() => {
-                    self.scrolledToBottom = true;
+                    self.props.chatRoom.scrolledToBottom = true;
 
                     room.unarchive();
 
@@ -1863,7 +1868,7 @@ var ConversationPanel = React.createClass({
                 if ($.trim(self.state.renameDialogValue).length > 0 &&
                     self.state.renameDialogValue !== self.props.chatRoom.getRoomTitle()
                 ) {
-                    self.scrolledToBottom = true;
+                    self.props.chatRoom.scrolledToBottom = true;
 
                     var participants = self.props.chatRoom.protocolHandler.getTrackedParticipants();
                     var promises = [];
@@ -1999,7 +2004,7 @@ var ConversationPanel = React.createClass({
                             self.setState({'attachCloudDialog': true});
                         }}
                         onAddParticipantSelected={function(contactHashes) {
-                            self.scrolledToBottom = true;
+                            self.props.chatRoom.scrolledToBottom = true;
 
                             if (self.props.chatRoom.type == "private") {
                                 var megaChat = self.props.chatRoom.megaChat;
@@ -2078,7 +2083,7 @@ var ConversationPanel = React.createClass({
                             <PerfectScrollbar
                                    onFirstInit={(ps, node) => {
                                         ps.scrollToBottom(true);
-                                        self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = 1;
+                                        self.props.chatRoom.scrolledToBottom = 1;
 
                                     }}
                                    onReinitialise={self.onMessagesScrollReinitialise}
@@ -2092,6 +2097,10 @@ var ConversationPanel = React.createClass({
                                    editingMessageId={self.state.editing}
                                    confirmDeleteDialog={self.state.confirmDeleteDialog}
                                    renderedMessagesCount={messagesList.length}
+                                   isLoading={
+                                       this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() ||
+                                       this.loadingShown
+                                   }
                                 >
                                 <div className="messages main-pad">
                                     <div className="messages content-area">
@@ -2158,7 +2167,7 @@ var ConversationPanel = React.createClass({
                                     }
                                     else {
                                         self.setState({'editing': foundMessage.messageId});
-                                        self.lastScrolledToBottom = false;
+                                        self.props.chatRoom.scrolledToBottom = false;
                                         return true;
                                     }
                                 }}
@@ -2168,8 +2177,8 @@ var ConversationPanel = React.createClass({
                                 }}
                                 onConfirm={(messageContents) => {
                                     if (messageContents && messageContents.length > 0) {
-                                        if (!self.scrolledToBottom) {
-                                            self.scrolledToBottom = true;
+                                        if (!self.props.chatRoom.scrolledToBottom) {
+                                            self.props.chatRoom.scrolledToBottom = true;
                                             self.lastScrollPosition = 0;
                                             // tons of hacks required because of the super weird continuous native
                                             // scroll event under Chrome + OSX, e.g. when the user scrolls up to the

@@ -32,7 +32,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
     var self = this;
 
     megaChat
-        .rebind('onRoomCreated.chatNotifications', function(e, megaRoom) {
+        .rebind('onRoomInitialized.chatNotifications', function(e, megaRoom) {
             var resetChatNotificationCounters = function() {
                 if (megaRoom.isCurrentlyActive) {
                     var uiElement = $('.conversation-panel[data-room-id="' + megaRoom.chatId + '"]');

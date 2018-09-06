@@ -287,7 +287,7 @@
         );
 
         var decryptionStart = {};
-        self.megaChat.rebind("onRoomCreated.chatStats", function(e, chatRoom) {
+        self.megaChat.rebind("onRoomInitialized.chatStats", function(e, chatRoom) {
             $(chatRoom).rebind('onChatdIntegrationReady.chatStats', function() {
                 $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatStats', function(e, data) {
                     var chatId = base64urldecode(chatRoom.chatId);
@@ -333,7 +333,7 @@
 
         });
         self.eventsForUnbinding.push(
-            [self.megaChat, "onRoomCreated.chatStats"]
+            [self.megaChat, "onRoomInitialized.chatStats"]
         );
     };
 

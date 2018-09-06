@@ -16,7 +16,7 @@ var RichpreviewsFilter = function(megaChat) {
     });
 
     megaChat
-        .rebind('onRoomCreated.richpreviewsFilter', function(e, megaRoom) {
+        .rebind('onRoomInitialized.richpreviewsFilter', function(e, megaRoom) {
             $(megaRoom).rebind('onPendingMessageConfirmed.richpreviewsFilter', function(e, msgObj) {
                 self.onPendingMessageConfirmed(megaRoom, msgObj);
                 msgObj.confirmed = true;

@@ -1186,7 +1186,7 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
         $('.progress-title', $baseq).text(l[16299]);
 
         transferBaseQuota = maf.transfer.base;
-        $baseq = $('.achievements-block .data-block.transfer .baseq');
+        $baseq = $('.achievements-block .data-block.transfer .baseq').addClass('achieved');
         $('.progress-txt', $baseq).text(bytesToSize(transferBaseQuota, 0));
         $('.progress-title', $baseq).text(l[16299]);
     }

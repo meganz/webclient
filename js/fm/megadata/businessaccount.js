@@ -1030,9 +1030,41 @@ BusinessAccount.prototype.getAccountInvoicesList = function (forceUpdate) {
 };
 
 
-BusinessAccount.prototype.setMasterUserAttributes = function (nbusers, cname, fname, lname, tel, email, pass) {
+BusinessAccount.prototype.setMasterUserAttributes = function (nbusers, cname, tel) {
     "use strict";
     var operationPromise = new MegaPromise();
+    
+    if (!tel) {
+        return operationPromise.reject(0, 3, 'Empty phone');
+    }
+    if (!cname) {
+        return operationPromise.reject(0, 3, 'Empty company name');
+    }
+
+    var request = {
+        "a": "upb",                                     // up - business
+        "^companyname": base64urlencode(to8(cname)),    // company name
+        "^companyphone": base64urlencode(to8(tel))      // company phone
+    };
+
+    if (nbusers) {
+        request['^companynbusers'] = base64urlencode(to8(nbusers)); // nb of users
+    }
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'string') {
+                operationPromise.resolve(1, res); // user handle
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+
+    });
 
 
     return operationPromise;

@@ -1029,43 +1029,81 @@ BusinessAccount.prototype.getAccountInvoicesList = function (forceUpdate) {
     return operationPromise;
 };
 
+/**
+ * adding business account attributes to business account
+ * @param {Number} nbusers      number of users
+ * @param {String} cname        company name
+ * @param {String} tel          company phone
+ * @param {String} fname        first name of the user
+ * @param {String} lname        last name of the user
+ * @param {String} email        email of the user
+ * @param {String} pass         user's entered password
+ * @returns {Promise}           resolve with the operation result
+ */
+BusinessAccount.prototype.setMasterUserAttributes =
+    function (nbusers, cname, tel, fname, lname, email, pass) {
+        "use strict";
+        var operationPromise = new MegaPromise();
 
-BusinessAccount.prototype.setMasterUserAttributes = function (nbusers, cname, tel) {
-    "use strict";
-    var operationPromise = new MegaPromise();
-    
-    if (!tel) {
-        return operationPromise.reject(0, 3, 'Empty phone');
-    }
-    if (!cname) {
-        return operationPromise.reject(0, 3, 'Empty company name');
-    }
-
-    var request = {
-        "a": "upb",                                     // up - business
-        "^companyname": base64urlencode(to8(cname)),    // company name
-        "^companyphone": base64urlencode(to8(tel))      // company phone
-    };
-
-    if (nbusers) {
-        request['^companynbusers'] = base64urlencode(to8(nbusers)); // nb of users
-    }
-
-    api_req(request, {
-        callback: function (res) {
-            if ($.isNumeric(res)) {
-                operationPromise.reject(0, res, 'API returned error');
-            }
-            else if (typeof res === 'string') {
-                operationPromise.resolve(1, res); // user handle
-            }
-            else {
-                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
-            }
+        if (!tel) {
+            return operationPromise.reject(0, 3, 'Empty phone');
+        }
+        if (!cname) {
+            return operationPromise.reject(0, 4, 'Empty company name');
         }
 
-    });
+        var request_upb = {
+            "a": "upb",                                     // up - business
+            "^companyname": base64urlencode(to8(cname)),    // company name
+            "^companyphone": base64urlencode(to8(tel)),     // company phone
+            terms: 'Mq',
+            firstname: base64urlencode(to8(fname)),
+            lastname: base64urlencode(to8(lname)),
+            name2: base64urlencode(to8(fname + ' ' + lname))
+        };
+
+        if (nbusers) {
+            request_upb['^companynbusers'] = base64urlencode(to8(nbusers)); // nb of users
+        }
+
+        security.deriveKeysFromPassword(pass, u_k,
+            function (clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+
+                // Encode parameters to Base64 before sending to the API
+                var sendEmailRequestParams = {
+                    a: 'uc2',
+                    n: base64urlencode(to8(fname + ' ' + lname)),         // Name (used just for the email)
+                    m: base64urlencode(email),                                   // Email
+                    crv: ab_to_base64(clientRandomValueBytes),                   // Client Random Value
+                    k: a32_to_base64(encryptedMasterKeyArray32),                 // Encrypted Master Key
+                    hak: ab_to_base64(hashedAuthenticationKeyBytes),             // Hashed Authentication Key
+                    v: 2                                                         // Version of this protocol
+                };
+
+                api_req([request_upb, sendEmailRequestParams], {
+                    callback: function (res) {
+                        if ($.isNumeric(res)) {
+                            operationPromise.reject(0, res, 'API returned error');
+                        }
+                        else if (!Array.isArray(res)) {
+                            operationPromise.reject(0, res, 'API returned error');
+                        }
+                        else if (res.length !== 2) {
+                            operationPromise.reject(0, res, 'API returned error');
+                        }
+                        else if (typeof res[0] !== 'string' || res[1] !== 0) {
+                            operationPromise.reject(0, res, 'API returned error');
+                        }
+                        else {
+                            operationPromise.resolve(1, res); // user handle
+                        }
+                    }
+
+                });
 
 
-    return operationPromise;
-};
+            }
+        );
+
+        return operationPromise;
+    };

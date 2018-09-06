@@ -142,42 +142,42 @@ BusinessRegister.prototype.initPage = function () {
     var inputsValidator = function ($element) {
         var passed = true;
         if (!$element || $element.is($nbUsersInput)) {
-            if (!$nbUsersInput.val() || $nbUsersInput.val() < mySelf.minUsers) {
+            if (!$nbUsersInput.val().trim() || $nbUsersInput.val() < mySelf.minUsers) {
                 $nbUsersInput.parent().addClass('error').find('.error-message').text(l[19501]);
                 $nbUsersInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($cnameInput)) {
-            if (!$cnameInput.val()) {
+            if (!$cnameInput.val().trim()) {
                 $cnameInput.parent().addClass('error').find('.error-message').text(l[19507]);
                 $cnameInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($telInput)) {
-            if (!$telInput.val()) {
+            if (!$telInput.val().trim()) {
                 $telInput.parent().addClass('error').find('.error-message').text(l[8814]);
                 $telInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($fnameInput)) {
-            if (!$fnameInput.val()) {
+            if (!$fnameInput.val().trim()) {
                 $fnameInput.parent().addClass('error').find('.error-message').text(l[1098]);
                 $fnameInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($lnameInput)) {
-            if (!$lnameInput.val()) {
+            if (!$lnameInput.val().trim()) {
                 $lnameInput.parent().addClass('error').find('.error-message').text(l[1098]);
                 $lnameInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($emailInput)) {
-            if (!$emailInput.val() || checkMail($emailInput.val())) {
+            if (!$emailInput.val().trim() || checkMail($emailInput.val())) {
                 $emailInput.parent().addClass('error').find('.error-message').text(l[7415]);
                 $emailInput.focus();
                 passed = false;
@@ -193,6 +193,13 @@ BusinessRegister.prototype.initPage = function () {
         if (!$element || $element.is($rPassInput)) {
             if (!$rPassInput.val()) {
                 $rPassInput.parent().addClass('error').find('.error-message').text(l[1104]);
+                $rPassInput.focus();
+                passed = false;
+            }
+        }
+        if (passed && !$element) {
+            if ($passInput.val() !== $rPassInput.val()) {
+                $rPassInput.parent().addClass('error').find('.error-message').text(l[1107]);
                 $rPassInput.focus();
                 passed = false;
             }
@@ -227,7 +234,9 @@ BusinessRegister.prototype.initPage = function () {
             if (!inputsValidator()) {
                 return false;
             }
-            
+            mySelf.doRegister($nbUsersInput.val().trim(), $cnameInput.val().trim(),
+                $fnameInput.val().trim(), $lnameInput.val().trim(), $telInput.val().trim(), $emailInput.val().trim(),
+                $passInput.val());
         }
     );
 
@@ -257,13 +266,32 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
     "use strict";
 
     loadingDialog.show();
+    var mySelf = this;
 
-    var afterEmphermalAccountCreation = function (ctx, usrType) {
-
+    var afterEmphermalAccountCreation = function () {
+        // at this point i know BusinessAccount Class is required before
+        var business = new BusinessAccount();
+        var settingPromise = business.setMasterUserAttributes(nbusers, cname, tel, fname, lname, email, pass);
+        settingPromise.always(function settingAttrHandler(st, res) {
+            if (st === 0) {
+                msgDialog('warninga', '', l[19508], '', function () {
+                    loadingDialog.hide();
+                    mySelf.initPage();
+                });
+                return;
+            }
+            loadingDialog.hide();
+            mySelf.goToPayment();
+        });
     };
 
 
     // call create ephemeral account function in security package
-    security.register.createEphemeralAccount();
+    security.register.createEphemeralAccount(afterEmphermalAccountCreation);
 
+};
+
+BusinessRegister.prototype.goToPayment = function () {
+    "use strict";
+    return;
 };

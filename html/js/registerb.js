@@ -30,6 +30,7 @@ BusinessRegister.prototype.initPage = function () {
     var $rPassInput = $pageContainer.find('#business-rpass').val('');
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
     $pageContainer.find('.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
+    $pageContainer.find('.bus-reg-agreement .bus-reg-txt a').addClass('terms');
     $pageContainer.find('.bus-reg-input').removeClass('error');
     $pageContainer.find('.bus-reg-plan .business-base-plan .left')
         .text(l[19503].replace('[0]', this.minUsers));

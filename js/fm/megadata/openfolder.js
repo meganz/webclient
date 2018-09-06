@@ -166,12 +166,14 @@
                 for (var i in this.opc) {
                     this.v.push(this.opc[i]);
                 }
+                this.doSort('email', 1);
             }
             else if (this.currentdirid === 'ipc') {
                 this.v = [];
                 for (var i in this.ipc) {
                     this.v.push(this.ipc[i]);
                 }
+                this.doSort('email', 1);
             }
 
             this.renderMain();

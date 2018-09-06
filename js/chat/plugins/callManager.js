@@ -79,8 +79,8 @@ CallManager.prototype._attachToChat = function (megaChat) {
         CallManager.assert(chatRoom.type, 'missing room type');
     });
 
-    megaChat.unbind("onRoomCreated.chatStore");
-    megaChat.bind("onRoomCreated.chatStore", function (e, chatRoom) {
+    megaChat.unbind("onRoomInitialized.chatStore");
+    megaChat.bind("onRoomInitialized.chatStore", function (e, chatRoom) {
         CallManager.assert(chatRoom.type, 'missing room type');
     });
 };

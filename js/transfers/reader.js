@@ -122,10 +122,12 @@ FileUploadReader.prototype._dispatch = function(chunk, data) {
 FileUploadReader.prototype._setCacheItem = function(offset, data) {
     'use strict';
 
-    this.cached++;
-    this.inflight--;
-    this.cache[offset] = data;
-    this._drain(offset);
+    if (this.cache) {
+        this.cached++;
+        this.inflight--;
+        this.cache[offset] = data;
+        this._drain(offset);
+    }
 };
 
 // @private

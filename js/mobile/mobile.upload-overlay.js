@@ -133,7 +133,7 @@ mobile.uploadOverlay = {
             try {
                 file.target = targetId;
                 file.flashid = false;
-                file.id = '8001';
+                file.id = ++ulmanager.ulFaId;
                 file.ownerId = u_attr.u;
 
                 // Start the upload, this happens automatically using the desktop code
@@ -303,7 +303,7 @@ mobile.uploadOverlay = {
         // On tapping/clicking the Close icon
         $closeIcon.off('tap').on('tap', function() {
 
-            // ToDo: Cancel the upload
+            ulmanager.abort(null);
 
             // Close the upload overlay
             $overlay.addClass('hidden').removeClass('overlay');

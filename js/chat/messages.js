@@ -838,8 +838,14 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.chatdIsProcessingHistory = false;
             self.sendingListFlushed = true;
 
+
             if (
-                typeof(self.expectedMessagesCount) === 'undefined' ||
+                typeof(self.expectedMessagesCount) === 'undefined'
+            ) {
+                self.expectedMessagesCount = 0;
+                self.retrievedAllMessages = false;
+            }
+            else if (
                 self.expectedMessagesCount === requestedMessagesCount
             ) {
                 // this is an empty/new chat.
@@ -860,6 +866,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 // requested #, which means, that there is no more history.
                 self.retrievedAllMessages = self.expectedMessagesCount < requestedMessagesCount;
             }
+
 
 
 
@@ -885,10 +892,13 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessagesHistoryRequest.messagesBuff' + chatRoomId, function(e, eventData) {
 
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+        if (!chatRoom) {
+            self.logger.warn("Chat room not found for onMessagesHistoryRequest, called with eventData:", eventData);
+        }
 
         if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
             self.isRetrievingHistory = true;
-            self.expectedMessagesCount = Math.abs(eventData.count);
+            self.expectedMessagesCount = eventData.count === 0xDEAD ? null : Math.abs(eventData.count);
             self.trackDataChange();
         }
     });
@@ -937,7 +947,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
 
             if (!eventData.isNew) {
-                self.expectedMessagesCount--;
+                if (typeof self.expectedMessagesCount !== 'undefined') {
+                    self.expectedMessagesCount--;
+                }
+
                 if (eventData.userId !== u_handle) {
                     if (self.lastDeliveredMessageRetrieved === true) {
                         // received a message from history, which was NOT marked as received, e.g. was sent during
@@ -977,7 +990,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 if (eventData.userId !== u_handle) {
                     self.setLastReceived(eventData.messageId);
                 }
-                $(self).trigger('onNewMessageReceived', msgObject);
+
+                if (!self.isRetrievingHistory) {
+                    $(self).trigger('onNewMessageReceived', msgObject);
+                }
 
                 if (eventData.pendingid) {
                     $(chatRoom).trigger('onPendingMessageConfirmed', msgObject);
@@ -1261,7 +1277,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 foundMessage.requiresManualRetry = true;
             }
             else {
-                var foundMessage = self.getByInternalId(eventData.id & 0xffffffff);
+                foundMessage = self.getByInternalId(eventData.id & 0xffffffff);
 
                 if (foundMessage) {
                     foundMessage.sent = Message.STATE.NOT_SENT_EXPIRED;
@@ -1875,7 +1891,9 @@ MessagesBuff.prototype.restoreMessage = function(msgObject) {
     }
     self.haveMessages = true;
 
-    self.expectedMessagesCount--;
+    if (typeof self.expectedMessagesCount !== 'undefined') {
+        self.expectedMessagesCount--;
+    }
 
     if (msgObject.messageId === self.lastSeen) {
         self.lastSeenMessageRetrieved = true;

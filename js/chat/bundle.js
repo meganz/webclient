@@ -389,7 +389,7 @@ React.makeElement = React['createElement'];
 
 	    $('.activity-status-block, .activity-status').show();
 
-	    self.on('onRoomCreated', function (e, room) {
+	    self.on('onRoomInitialized', function (e, room) {
 	        if (room.type === "private") {
 	            var userHandle = room.getParticipantsExceptMe()[0];
 
@@ -802,6 +802,7 @@ React.makeElement = React['createElement'];
 	        room.showAfterCreation = true;
 	    }
 
+	    this.trigger('onRoomInitialized', [room]);
 	    room.setState(ChatRoom.STATE.JOINING);
 	    return [roomId, room, MegaPromise.resolve(roomId, self.chats[roomId])];
 	};
@@ -3421,17 +3422,48 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-
+	var x = 0;
 	var PerfectScrollbar = React.createClass({
 	    displayName: "PerfectScrollbar",
 
 	    mixins: [MegaRenderMixin],
 	    isUserScroll: true,
+	    scrollEventIncId: 0,
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            className: "perfectScrollbarContainer",
 	            requiresUpdateOnResize: true
 	        };
+	    },
+	    doProgramaticScrollY: function doProgramaticScrollY(newPosY, forced) {
+	        var self = this;
+	        var $elem = $(ReactDOM.findDOMNode(self));
+	        var animFrameInner = false;
+
+	        if (!forced && $elem[0] && $elem[0].scrollTop === newPosY) {
+	            return;
+	        }
+
+	        var idx = self.scrollEventIncId++;
+
+	        $elem.rebind('scroll.progscroll' + idx, function (idx, e) {
+	            if (animFrameInner) {
+	                cancelAnimationFrame(animFrameInner);
+	                animFrameInner = false;
+	            }
+	            $elem.unbind('scroll.progscroll' + idx);
+	            self.isUserScroll = true;
+	        }.bind(this, idx));
+
+	        self.isUserScroll = false;
+	        $elem[0].scrollTop = newPosY;
+	        Ps.update($elem[0]);
+
+	        animFrameInner = requestAnimationFrame(function (idx) {
+	            animFrameInner = false;
+	            self.isUserScroll = true;
+	            $elem.unbind('scroll.progscroll' + idx);
+	        }.bind(this, idx));
 	    },
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
@@ -3449,7 +3481,7 @@ React.makeElement = React['createElement'];
 	            self.props.onFirstInit(self, $elem);
 	        }
 
-	        $(document).rebind('ps-scroll-y.ps' + self.getUniqueId(), function (e) {
+	        $elem.rebind('ps-scroll-y.ps' + self.getUniqueId(), function (e) {
 	            if ($elem.attr('data-scroll-disabled') === "true") {
 	                e.stopPropagation();
 	                e.preventDefault();
@@ -3457,6 +3489,7 @@ React.makeElement = React['createElement'];
 	                e.originalEvent.preventDefault();
 	                return false;
 	            }
+
 	            if (self.props.onUserScroll && self.isUserScroll === true && $elem.is(e.target)) {
 	                self.props.onUserScroll(self, $elem, e);
 	            }
@@ -3475,7 +3508,7 @@ React.makeElement = React['createElement'];
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        var $elem = $(ReactDOM.findDOMNode(this));
-	        $(document).unbind('ps-scroll-y.ps' + this.getUniqueId());
+	        $elem.unbind('ps-scroll-y.ps' + this.getUniqueId());
 	    },
 	    eventuallyReinitialise: function eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
 	        var self = this;
@@ -3504,9 +3537,7 @@ React.makeElement = React['createElement'];
 	            return;
 	        }
 
-	        self.isUserScroll = false;
-	        Ps.update($elem[0]);
-	        self.isUserScroll = true;
+	        self.doProgramaticScrollY($elem[0].scrollTop, true);
 
 	        var manualReinitialiseControl = false;
 	        if (self.props.onReinitialise) {
@@ -3526,11 +3557,7 @@ React.makeElement = React['createElement'];
 	        }
 	    },
 	    scrollToBottom: function scrollToBottom(skipReinitialised) {
-	        var $elem = $(this.findDOMNode());
-	        $elem[0].scrollTop = this.getScrollHeight();
-	        this.isUserScroll = false;
-	        Ps.update($elem[0]);
-	        this.isUserScroll = true;
+	        this.doProgramaticScrollY(9999999);
 
 	        if (!skipReinitialised) {
 	            this.reinitialised(true);
@@ -3597,10 +3624,8 @@ React.makeElement = React['createElement'];
 	        var $elem = $(this.findDOMNode());
 	        var targetPx = this.getScrollHeight() / 100 * posPerc;
 	        if ($elem[0].scrollTop !== targetPx) {
-	            $elem[0].scrollTop = targetPx;
-	            this.isUserScroll = false;
-	            Ps.update($elem[0]);
-	            this.isUserScroll = true;
+	            this.doProgramaticScrollY(targetPx);
+
 	            if (!skipReinitialised) {
 	                this.reinitialised(true);
 	            }
@@ -3610,10 +3635,7 @@ React.makeElement = React['createElement'];
 	        var $elem = $(this.findDOMNode());
 	        var targetPx = this.getScrollWidth() / 100 * posPerc;
 	        if ($elem[0].scrollLeft !== targetPx) {
-	            $elem[0].scrollLeft = targetPx;
-	            this.isUserScroll = false;
-	            Ps.update($elem[0]);
-	            this.isUserScroll = true;
+	            this.doProgramaticScrollY(targetPx);
 	            if (!skipReinitialised) {
 	                this.reinitialised(true);
 	            }
@@ -3622,10 +3644,8 @@ React.makeElement = React['createElement'];
 	    scrollToY: function scrollToY(posY, skipReinitialised) {
 	        var $elem = $(this.findDOMNode());
 	        if ($elem[0].scrollTop !== posY) {
-	            $elem[0].scrollTop = posY;
-	            this.isUserScroll = false;
-	            Ps.update($elem[0]);
-	            this.isUserScroll = true;
+	            this.doProgramaticScrollY(posY);
+
 	            if (!skipReinitialised) {
 	                this.reinitialised(true);
 	            }
@@ -3633,10 +3653,11 @@ React.makeElement = React['createElement'];
 	    },
 	    scrollToElement: function scrollToElement(element, skipReinitialised) {
 	        var $elem = $(this.findDOMNode());
-	        $elem[0].scrollTop = element.offsetTop;
-	        this.isUserScroll = false;
-	        Ps.update($elem[0]);
-	        this.isUserScroll = true;
+	        if (!element || !element.offsetTop) {
+	            return;
+	        }
+
+	        this.doProgramaticScrollY(element.offsetTop);
 
 	        if (!skipReinitialised) {
 	            this.reinitialised(true);
@@ -5982,7 +6003,7 @@ React.makeElement = React['createElement'];
 	    },
 
 	    uploadFromComputer: function uploadFromComputer() {
-	        this.scrolledToBottom = true;
+	        this.props.chatRoom.scrolledToBottom = true;
 
 	        this.props.chatRoom.uploadFromComputer();
 	    },
@@ -6026,7 +6047,7 @@ React.makeElement = React['createElement'];
 	        });
 
 	        self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function (e, eventData) {
-	            self.scrolledToBottom = true;
+	            self.props.chatRoom.scrolledToBottom = true;
 	            if (self.messagesListScrollable) {
 	                self.messagesListScrollable.scrollToBottom();
 	            }
@@ -6067,7 +6088,7 @@ React.makeElement = React['createElement'];
 	        self.$messages.droppable(droppableConfig);
 
 	        self.lastScrollPosition = null;
-	        self.lastScrolledToBottom = true;
+	        self.props.chatRoom.scrolledToBottom = true;
 	        self.lastScrollHeight = 0;
 	        self.lastUpdatedScrollHeight = 0;
 
@@ -6200,7 +6221,7 @@ React.makeElement = React['createElement'];
 
 	        if (forced) {
 	            if (!scrollPositionYPerc && !scrollToElement) {
-	                if (self.scrolledToBottom && !self.editDomElement) {
+	                if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
 	                    ps.scrollToBottom(true);
 	                    return true;
 	                }
@@ -6211,7 +6232,7 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (self.isComponentEventuallyVisible()) {
-	            if (self.scrolledToBottom && !self.editDomElement) {
+	            if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
 	                ps.scrollToBottom(true);
 	                return true;
 	            }
@@ -6231,17 +6252,17 @@ React.makeElement = React['createElement'];
 	        var mb = chatRoom.messagesBuff;
 
 	        if (mb.messages.length === 0) {
-	            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
+	            self.props.chatRoom.scrolledToBottom = true;
 	            return;
 	        }
 
 	        if (ps.isCloseToBottom(30) === true) {
-	            if (!self.scrolledToBottom) {
+	            if (!self.props.chatRoom.scrolledToBottom) {
 	                mb.detachMessages();
 	            }
-	            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
+	            self.props.chatRoom.scrolledToBottom = true;
 	        } else {
-	            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = false;
+	            self.props.chatRoom.scrolledToBottom = false;
 	        }
 
 	        if (isAtTop || ps.getScrollPositionY() < 5 && ps.getScrollHeight() > 500) {
@@ -6277,15 +6298,15 @@ React.makeElement = React['createElement'];
 
 	                        delete self.lastContentHeightBeforeHist;
 
+	                        setTimeout(function () {
+	                            self.isRetrievingHistoryViaScrollPull = false;
+
+	                            ps.enable();
+	                            self.forceUpdate();
+	                        }, 1150);
+
 	                        return 0xDEAD;
 	                    });
-
-	                    setTimeout(function () {
-	                        self.isRetrievingHistoryViaScrollPull = false;
-
-	                        ps.enable();
-	                        self.forceUpdate();
-	                    }, 1150);
 	                });
 
 	                mb.retrieveChatHistory();
@@ -6509,10 +6530,12 @@ React.makeElement = React['createElement'];
 	                        editing: self.state.editing === v.messageId || self.state.editing === v.pendingMessageId,
 	                        onEditStarted: function onEditStarted($domElement) {
 	                            self.editDomElement = $domElement;
+	                            self.props.chatRoom.scrolledToBottom = false;
 	                            self.setState({ 'editing': v.messageId });
 	                            self.forceUpdate();
 	                        },
 	                        onEditDone: function onEditDone(messageContents) {
+	                            self.props.chatRoom.scrolledToBottom = true;
 	                            self.editDomElement = null;
 
 	                            var currentContents = v.textContents;
@@ -6541,7 +6564,7 @@ React.makeElement = React['createElement'];
 
 	                                    $(v).trigger('onChange', [v, "textContents", "", messageContents]);
 
-	                                    megaChat.plugins.richpreviewsFilter.processMessage({}, v);
+	                                    megaChat.plugins.richpreviewsFilter.processMessage({}, v, false, true);
 	                                }
 
 	                                self.messagesListScrollable.scrollToBottom(true);
@@ -6584,7 +6607,7 @@ React.makeElement = React['createElement'];
 	                onAttachClicked: function onAttachClicked() {
 	                    self.setState({ 'attachCloudDialog': false });
 
-	                    self.scrolledToBottom = true;
+	                    self.props.chatRoom.scrolledToBottom = true;
 
 	                    room.attachNodes(selected);
 	                }
@@ -6706,7 +6729,7 @@ React.makeElement = React['createElement'];
 	                            });
 	                        } catch (e) {}
 
-	                        self.scrolledToBottom = true;
+	                        self.props.chatRoom.scrolledToBottom = true;
 
 	                        M.addUpload([meta[0]]);
 
@@ -6760,7 +6783,7 @@ React.makeElement = React['createElement'];
 	                        self.setState({ 'truncateDialog': false });
 	                    },
 	                    onConfirmClicked: function onConfirmClicked() {
-	                        self.scrolledToBottom = true;
+	                        self.props.chatRoom.scrolledToBottom = true;
 
 	                        room.truncate();
 
@@ -6792,7 +6815,7 @@ React.makeElement = React['createElement'];
 	                        self.setState({ 'archiveDialog': false });
 	                    },
 	                    onConfirmClicked: function onConfirmClicked() {
-	                        self.scrolledToBottom = true;
+	                        self.props.chatRoom.scrolledToBottom = true;
 
 	                        room.archive();
 
@@ -6824,7 +6847,7 @@ React.makeElement = React['createElement'];
 	                        self.setState({ 'unarchiveDialog': false });
 	                    },
 	                    onConfirmClicked: function onConfirmClicked() {
-	                        self.scrolledToBottom = true;
+	                        self.props.chatRoom.scrolledToBottom = true;
 
 	                        room.unarchive();
 
@@ -6847,7 +6870,7 @@ React.makeElement = React['createElement'];
 	        if (self.state.renameDialog === true) {
 	            var onEditSubmit = function onEditSubmit(e) {
 	                if ($.trim(self.state.renameDialogValue).length > 0 && self.state.renameDialogValue !== self.props.chatRoom.getRoomTitle()) {
-	                    self.scrolledToBottom = true;
+	                    self.props.chatRoom.scrolledToBottom = true;
 
 	                    var participants = self.props.chatRoom.protocolHandler.getTrackedParticipants();
 	                    var promises = [];
@@ -6973,7 +6996,7 @@ React.makeElement = React['createElement'];
 	                        self.setState({ 'attachCloudDialog': true });
 	                    },
 	                    onAddParticipantSelected: function onAddParticipantSelected(contactHashes) {
-	                        self.scrolledToBottom = true;
+	                        self.props.chatRoom.scrolledToBottom = true;
 
 	                        if (self.props.chatRoom.type == "private") {
 	                            var megaChat = self.props.chatRoom.megaChat;
@@ -7054,7 +7077,7 @@ React.makeElement = React['createElement'];
 	                            {
 	                                onFirstInit: function onFirstInit(ps, node) {
 	                                    ps.scrollToBottom(true);
-	                                    self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = 1;
+	                                    self.props.chatRoom.scrolledToBottom = 1;
 	                                },
 	                                onReinitialise: self.onMessagesScrollReinitialise,
 	                                onUserScroll: self.onMessagesScrollUserScroll,
@@ -7068,7 +7091,8 @@ React.makeElement = React['createElement'];
 	                                editDomElement: self.state.editDomElement,
 	                                editingMessageId: self.state.editing,
 	                                confirmDeleteDialog: self.state.confirmDeleteDialog,
-	                                renderedMessagesCount: messagesList.length
+	                                renderedMessagesCount: messagesList.length,
+	                                isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown
 	                            },
 	                            React.makeElement(
 	                                "div",
@@ -7131,7 +7155,7 @@ React.makeElement = React['createElement'];
 	                                        return false;
 	                                    } else {
 	                                        self.setState({ 'editing': foundMessage.messageId });
-	                                        self.lastScrolledToBottom = false;
+	                                        self.props.chatRoom.scrolledToBottom = false;
 	                                        return true;
 	                                    }
 	                                },
@@ -7141,8 +7165,8 @@ React.makeElement = React['createElement'];
 	                                },
 	                                onConfirm: function onConfirm(messageContents) {
 	                                    if (messageContents && messageContents.length > 0) {
-	                                        if (!self.scrolledToBottom) {
-	                                            self.scrolledToBottom = true;
+	                                        if (!self.props.chatRoom.scrolledToBottom) {
+	                                            self.props.chatRoom.scrolledToBottom = true;
 	                                            self.lastScrollPosition = 0;
 
 	                                            $(self.props.chatRoom).bind('onMessagesBuffAppend.pull', function () {
@@ -13419,6 +13443,7 @@ React.makeElement = React['createElement'];
 
 	    this.chatShard = chatShard;
 	    this.chatdUrl = chatdUrl;
+	    this.scrolledToBottom = 1;
 
 	    this.callRequest = null;
 	    this.callIsActive = false;

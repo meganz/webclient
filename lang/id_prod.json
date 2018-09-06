@@ -44,7 +44,6 @@
     "102": "Cari",
     "103": "Batalkan transfer",
     "104": "Transfer berkas",
-    "105": "ditunda",
     "115": "Nama berkas",
     "120": "Undahan anda tidak dapat dilanjutkan, karena akan memindahkan anda dari izin transfer gratis untuk alamat IP anda.",
     "121": "Pembatasan ini dinamis dan tergantung dari jumlah bandwidth tak terpakai yang kami punya.",
@@ -283,7 +282,6 @@
     "799": "Space Terpakai",
     "808": "Link Folder",
     "812": "Konfirmasi akun",
-    "813": "Folder Berbagi",
     "822": "Kembali",
     "823": "Pengaturan",
     "824": "Folder Berbagi baru dari [X]",
@@ -354,7 +352,6 @@
     "969": "Harap coba lagi",
     "970": "Harap masukkan sandi yang benar.",
     "978": "Pencarian anda tidak ditemukan",
-    "982": "Isi",
     "983": "Overview",
     "985": "Riwayat",
     "987": "Berakhir pada",
@@ -1497,7 +1494,6 @@
     "16136": "Akun anda telah melewati batas quota storage yang diperbolehkan. Kosongkan space pada Cloud Drive anda atau [A]upgrade[\/A] untuk tetap menikmati storage aman yang terenkripsi secara menyeluruh",
     "16137": "Akun anda telah melewati batas quota storage yang diperbolehkan. Kosongkan space pada Cloud Drive anda atau [A]upgrade[\/A] untuk tetap menikmati storage aman yang terenkripsi secara menyeluruh",
     "16138": "Akun anda telah melebihi storage & quota transfer yang diperbolehkan. Anda dapat membebaskan space pada Cloud Drive anda dan menunggu sampai anda memiliki quota transfer tersedia yang cukup atau [A]upgrade[\/A] untuk tetap menikmati storage terenkripsi aman yang menyeluruh.",
-    "16140": "Pembayaran dan plan",
     "16141": "Aktifkan",
     "16142": "Matikan",
     "16143": "Aktifkan Notifikasi",
@@ -2556,5 +2552,7 @@
     "19323": "Mega tidak memiliki toleransi sama sekali terhadap Materi Eksploitasi Anak, Ekstremisme Kekerasan, Bestialitas, Zoophilia, Gore, Malware, Data \/ Sandi yang Diretas \/ Dicuri, Pemerasan, Pembalasan Dendam, dll. Laporkan tautan dengan deskripsi ke:",
     "19338": "Upload 1 file",
     "19339": "Upload [X] files",
-    "19340": "You don't have write privileges in this share."
+    "19340": "You don't have write privileges in this share.",
+    "19505": "Received",
+    "19506": "Sent"
 }

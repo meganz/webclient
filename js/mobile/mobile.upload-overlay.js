@@ -303,7 +303,7 @@ mobile.uploadOverlay = {
         // On tapping/clicking the Close icon
         $closeIcon.off('tap').on('tap', function() {
 
-            // ToDo: Cancel the upload
+            ulmanager.abort(null);
 
             // Close the upload overlay
             $overlay.addClass('hidden').removeClass('overlay');

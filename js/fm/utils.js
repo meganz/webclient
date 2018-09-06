@@ -1133,6 +1133,12 @@ MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
         M.req({a: 'uq', strg: 1, qc: 1}).done(function(data) {
             var perc = Math.floor(data.cstrg / data.mstrg * 100);
 
+            if (ulmanager.ulOverStorageQuota && perc < 100) {
+                onIdle(function() {
+                    ulmanager.ulResumeOverStorageQuotaState();
+                });
+            }
+
             M.showOverStorageQuota(perc, data.cstrg, data.mstrg);
         });
     }, timeout || 30000);

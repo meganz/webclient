@@ -156,6 +156,12 @@ mega.megadrop = (function() {
 
         return promise;
     };
+
+    var updatePUPUserName = function updatePUPUserName(newName) {
+        $.each(mega.megadrop.pufs, function(index, puf){
+            mega.megadrop.pupUpdate(index, 'name', newName);
+        });
+    }
     
     /**
      * Public upload folder's (PUF) related methods and properties
@@ -1008,7 +1014,7 @@ mega.megadrop = (function() {
             if (!fminitialized || type === 'msg' && value === puf.items[id].fn) {
                 return false;
             }
-            var req = pupOpts.req.update;
+            var req = Object.assign({}, pupOpts.req.update);
             var pupId = puf.items[id].p;
 
             req.d.msg = puf.items[id].fn;
@@ -2255,6 +2261,7 @@ mega.megadrop = (function() {
         getOwnersHandle: ownersHandle,
         disableDragDrop: disableDragDrop,
         overQuota: showMEGAdropOverQuota,
+        updatePUPUserName: updatePUPUserName,
 
         // PUF
         pufs: puf.items,

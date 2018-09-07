@@ -845,6 +845,8 @@ function accountUI() {
                             $('.user-name').text(u_attr.name);
                             showToast('settings', l[7698]);
                             accountUI();
+                            // update megadrop username for existing megadrop
+                            mega.megadrop.updatePUPUserName(u_attr.firstname + " " + u_attr.lastname);
                         }
                     }
                 });

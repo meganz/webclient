@@ -785,7 +785,7 @@
     "6188": "La cuenta ha sido cancelada",
     "6189": "Tu cuenta ha sido cancelada correctamente.",
     "6190": "COMPRAR",
-    "6196": "No tienes invitaciones pendientes por el momento",
+    "6196": "No tienes solicitudes pendientes por el momento",
     "6197": "Nombre de la cuenta",
     "6198": "Transferencia bancaria",
     "6200": "N\u00famero de cuenta",
@@ -2553,6 +2553,6 @@
     "19338": "Subir 1 archivo",
     "19339": "Upload [X] files",
     "19340": "No tienes permiso de escritura en esta carpeta compartida.",
-    "19505": "Received",
-    "19506": "Sent"
+    "19505": "Recibida",
+    "19506": "Enviada"
 }

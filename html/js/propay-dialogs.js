@@ -1173,7 +1173,15 @@ var addressDialog = {
     /**
      * Open and setup the dialog
      */
-    init: function() {
+    init: function (plan, userInfo) {
+        if (plan) {
+            this.businessPlan = plan;
+            this.userInfo = userInfo;
+        }
+        else {
+            delete this.businessPlan;
+            delete this.userInfo;
+        }
         this.showDialog();
         this.initStateDropDown();
         this.initCountryDropDown();
@@ -1191,19 +1199,47 @@ var addressDialog = {
         this.$dialog = $('.payment-address-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
 
-        // Get the selected package
-        var selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
-        var selectedPackage = pro.membershipPlans[selectedPlanIndex];
+        var selectedPlanIndex;
+        var selectedPackage;
+        var proNum;
+        var proPlan;
+        var proPrice;
+        var numOfMonths;
+        var monthsWording;
 
-        // Get the selected Pro plan details
-        var proNum = selectedPackage[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
-        var proPlan = pro.getProPlanName(proNum);
-        var proPrice = selectedPackage[pro.UTQA_RES_INDEX_PRICE];
-        var numOfMonths = selectedPackage[pro.UTQA_RES_INDEX_MONTHS];
-        var monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
+        this.$dialog.find('.plan-icon .reg-st3-membership-icon').removeClass('hidden');
+        this.$dialog.find('input.first-name').val('');
+        this.$dialog.find('input.last-name').val('');
+
+        if (!this.businessPlan || !this.userInfo) {
+            // Get the selected package
+            selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
+            selectedPackage = pro.membershipPlans[selectedPlanIndex];
+
+            // Get the selected Pro plan details
+            proNum = selectedPackage[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+            proPlan = pro.getProPlanName(proNum);
+            proPrice = selectedPackage[pro.UTQA_RES_INDEX_PRICE];
+            numOfMonths = selectedPackage[pro.UTQA_RES_INDEX_MONTHS];
+            proNum = 'pro' + proNum;
+        }
+        else {
+            // selectedPackage = plan;
+            proNum = 'bus-plan-icon64'; // business account Plan icon
+            proPlan = l[19510];
+            proPrice = (this.userInfo.nbOfUsers * this.businessPlan.p / 3).toFixed(2);
+            numOfMonths = this.businessPlan.m;
+
+            this.$dialog.find('.plan-icon .reg-st3-membership-icon').addClass('hidden');
+            this.$dialog.find('input.first-name').val(this.userInfo.fname);
+            this.$dialog.find('input.last-name').val(this.userInfo.lname);
+        }
+        monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
+        
 
         // Update template
-        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
+        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 bus-plan-icon64')
+            .addClass(proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
         this.$dialog.find('.payment-plan-price .price').text(proPrice);

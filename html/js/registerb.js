@@ -246,8 +246,18 @@ BusinessRegister.prototype.initPage = function () {
 
         business.getListOfPaymentGateways(false).always(fillPaymentGateways);
         business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
-            mySelf.planPrice = info.mbp / 3;
+            mySelf.planPrice = info.p / 3;
+            mySelf.planInfo = info;
             updatePriceGadget(3);
+
+            ///// testing
+            var userInfo = {
+                fname: 'khaled',
+                lname: 'daif',
+                nbOfUsers: 4
+            };
+            mySelf.goToPayment(userInfo);
+            ///// end of testing
         });
     });
     
@@ -282,7 +292,12 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
                 return;
             }
             loadingDialog.hide();
-            mySelf.goToPayment();
+            var userInfo = {
+                fname: fname,
+                lname: lname,
+                nbOfUsers: nbusers
+            };
+            mySelf.goToPayment(userInfo);
         });
     };
 
@@ -292,7 +307,10 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
 
 };
 
-BusinessRegister.prototype.goToPayment = function () {
+BusinessRegister.prototype.goToPayment = function (userInfo) {
     "use strict";
+
+    addressDialog.init(this.planInfo, userInfo);
+
     return;
 };

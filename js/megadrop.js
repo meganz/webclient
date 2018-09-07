@@ -158,10 +158,10 @@ mega.megadrop = (function() {
     };
 
     var updatePUPUserName = function updatePUPUserName(newName) {
-        $.each(mega.megadrop.pufs, function(index, puf){
+        $.each(mega.megadrop.pufs, function(index) {
             mega.megadrop.pupUpdate(index, 'name', newName);
         });
-    }
+    };
     
     /**
      * Public upload folder's (PUF) related methods and properties

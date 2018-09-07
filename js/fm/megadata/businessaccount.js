@@ -1081,7 +1081,7 @@ BusinessAccount.prototype.setMasterUserAttributes =
                 };
 
                 api_req([request_upb, sendEmailRequestParams], {
-                    callback: function (res) {
+                    callback: function (res1, ctx, queue, res) {
                         if ($.isNumeric(res)) {
                             operationPromise.reject(0, res, 'API returned error');
                         }

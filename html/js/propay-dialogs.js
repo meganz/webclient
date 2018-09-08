@@ -1211,6 +1211,7 @@ var addressDialog = {
         this.$dialog.find('input.first-name').val('');
         this.$dialog.find('input.last-name').val('');
 
+        // in case we are coming from normal users sign ups (PRO) 
         if (!this.businessPlan || !this.userInfo) {
             // Get the selected package
             selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
@@ -1224,7 +1225,7 @@ var addressDialog = {
             proNum = 'pro' + proNum;
         }
         else {
-            // selectedPackage = plan;
+            // here it means we are coming from business account register page
             proNum = 'bus-plan-icon64'; // business account Plan icon
             proPlan = l[19510];
             proPrice = (this.userInfo.nbOfUsers * this.businessPlan.p / 3).toFixed(2);
@@ -1521,11 +1522,18 @@ var addressDialog = {
             this.extraDetails.state = state.substr(3);
         }
 
-        // Get the value for whether the user wants the plan to renew automatically
-        var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
+        // check if we are coming from business account register
+        if (!this.businessPlan || !this.userInfo) {
+            // Get the value for whether the user wants the plan to renew automatically
+            var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
 
-        // If the provider supports recurring payments and the user wants the plan to renew automatically
-        if (autoRenewCheckedValue === 'yes') {
+            // If the provider supports recurring payments and the user wants the plan to renew automatically
+            if (autoRenewCheckedValue === 'yes') {
+                this.extraDetails.recurring = true;
+            }
+        }
+        else {
+            // in business accounts recurring is mandatory
             this.extraDetails.recurring = true;
         }
 

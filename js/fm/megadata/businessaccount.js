@@ -1107,3 +1107,71 @@ BusinessAccount.prototype.setMasterUserAttributes =
 
         return operationPromise;
     };
+
+
+/**
+ * Do the payment with the API
+ * @param {Object} payDetails       payment collected details from payment dialog
+ * @param {Object} businessPlan     business plan details
+ * @return {Promise}                resolve with the result
+ */
+BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    if (!payDetails) {
+        return operationPromise.reject(0, 11, 'Empty payment details');
+    }
+    if (!businessPlan) {
+        return operationPromise.reject(0, 12, 'Empty business plan details');
+    }
+
+    var request = {
+        a: 'uts',
+        it: businessPlan.it,
+        si: businessPlan.id,
+        p: businessPlan.totalPrice,
+        c: businessPlan.c,
+        aff: 0,
+        m: m,
+        bq: 0,
+        pbq: 0
+    };
+
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res) && res < 0) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else {
+
+                var utcRequest = {
+                    a: 'utc',                   // User Transaction Complete
+                    s: [res],                   // Sale ID
+                    m: addressDialog.gatewayId, // Gateway number
+                    bq: 0,                      // Log for bandwidth quota triggered
+                    extra: payDetails           // Extra information for the specific gateway
+                };
+
+                api_req(utcRequest, {
+                    callback: function (res) {
+                        if ($.isNumeric(res) && res < 0) {
+                            operationPromise.reject(0, res, 'API returned error');
+                        }
+                        else if (!res.EUR || !res.EUR.url) {
+                            operationPromise.reject(0, res, 'API returned error');
+                        }
+                        else {
+                            operationPromise.resolve(1, res); // ready of redirection
+                        }
+                    }
+
+                });
+            }
+        }
+
+    });
+
+    return operationPromise;
+};

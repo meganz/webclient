@@ -1173,14 +1173,16 @@ var addressDialog = {
     /**
      * Open and setup the dialog
      */
-    init: function (plan, userInfo) {
+    init: function (plan, userInfo, businessRegisterPage) {
         if (plan) {
             this.businessPlan = plan;
             this.userInfo = userInfo;
+            this.businessRegPage = businessRegisterPage;
         }
         else {
             delete this.businessPlan;
             delete this.userInfo;
+            delete this.businessRegPage;
         }
         this.showDialog();
         this.initStateDropDown();
@@ -1229,6 +1231,7 @@ var addressDialog = {
             proNum = 'bus-plan-icon64'; // business account Plan icon
             proPlan = l[19510];
             proPrice = (this.userInfo.nbOfUsers * this.businessPlan.p / 3).toFixed(2);
+            this.businessPlan.totalPrice = proPrice;
             numOfMonths = this.businessPlan.m;
 
             this.$dialog.find('.plan-icon .reg-st3-membership-icon').addClass('hidden');
@@ -1539,7 +1542,13 @@ var addressDialog = {
 
         // Hide the dialog so the loading one will show, then proceed to pay
         this.$dialog.addClass('hidden');
-        pro.propay.sendPurchaseToApi();
+
+        if (!this.businessPlan || !this.userInfo || !this.businessRegPage) {
+            pro.propay.sendPurchaseToApi();
+        }
+        else {
+            this.businessRegPage.processPayment(this.extraDetails, this.businessPlan);
+        }
     },
 
     /**

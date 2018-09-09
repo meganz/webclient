@@ -307,10 +307,42 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
 
 };
 
+/**
+ * show the payment dialog
+ * @param {Object} userInfo     user info (fname, lname and nbOfUsers)
+ */
 BusinessRegister.prototype.goToPayment = function (userInfo) {
     "use strict";
 
-    addressDialog.init(this.planInfo, userInfo);
+    addressDialog.init(this.planInfo, userInfo, this);
 
-    return;
+};
+
+/**
+ * Process the payment
+ * @param {Object} payDetails       payment collected details from payment dialog
+ * @param {Object} businessPlan     business plan details
+ */
+BusinessRegister.prototype.processPayment = function (payDetails, businessPlan) {
+    "use strict";
+    loadingDialog.show();
+
+    var finalizePayment = function (st, res) {
+        if (st === 0) {
+            msgDialog('warninga', '', l[19511], '', function () {
+                loadingDialog.hide();
+                addressDialog.closeDialog();
+            });
+            return;
+        }
+        var url = res.EUR['url'];
+        window.location = url + '?lang=' + lang;
+    };
+
+    // at this point i know BusinessAccount class is required before
+    var business = new BusinessAccount();
+    var payingPromise = business.doPaymentWithAPI(payDetails, businessPlan);
+
+    payingPromise.always(finalizePayment);
+
 };

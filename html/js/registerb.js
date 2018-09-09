@@ -251,12 +251,12 @@ BusinessRegister.prototype.initPage = function () {
             updatePriceGadget(3);
 
             ///// testing
-            var userInfo = {
-                fname: 'khaled',
-                lname: 'daif',
-                nbOfUsers: 4
-            };
-            mySelf.goToPayment(userInfo);
+            //var userInfo = {
+            //    fname: 'khaled',
+            //    lname: 'daif',
+            //    nbOfUsers: 4
+            //};
+            //mySelf.goToPayment(userInfo);
             ///// end of testing
         });
     });

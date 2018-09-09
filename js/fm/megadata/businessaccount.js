@@ -1028,3 +1028,150 @@ BusinessAccount.prototype.getAccountInvoicesList = function (forceUpdate) {
 
     return operationPromise;
 };
+
+/**
+ * adding business account attributes to business account
+ * @param {Number} nbusers      number of users
+ * @param {String} cname        company name
+ * @param {String} tel          company phone
+ * @param {String} fname        first name of the user
+ * @param {String} lname        last name of the user
+ * @param {String} email        email of the user
+ * @param {String} pass         user's entered password
+ * @returns {Promise}           resolve with the operation result
+ */
+BusinessAccount.prototype.setMasterUserAttributes =
+    function (nbusers, cname, tel, fname, lname, email, pass) {
+        "use strict";
+        var operationPromise = new MegaPromise();
+
+        if (!tel) {
+            return operationPromise.reject(0, 3, 'Empty phone');
+        }
+        if (!cname) {
+            return operationPromise.reject(0, 4, 'Empty company name');
+        }
+
+        var request_upb = {
+            "a": "upb",                                     // up - business
+            "^companyname": base64urlencode(to8(cname)),    // company name
+            "^companyphone": base64urlencode(to8(tel)),     // company phone
+            terms: 'Mq',
+            firstname: base64urlencode(to8(fname)),
+            lastname: base64urlencode(to8(lname)),
+            name2: base64urlencode(to8(fname + ' ' + lname))
+        };
+
+        if (nbusers) {
+            request_upb['^companynbusers'] = base64urlencode(to8(nbusers)); // nb of users
+        }
+
+        security.deriveKeysFromPassword(pass, u_k,
+            function (clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+
+                // Encode parameters to Base64 before sending to the API
+                var sendEmailRequestParams = {
+                    a: 'uc2',
+                    n: base64urlencode(to8(fname + ' ' + lname)),         // Name (used just for the email)
+                    m: base64urlencode(email),                                   // Email
+                    crv: ab_to_base64(clientRandomValueBytes),                   // Client Random Value
+                    k: a32_to_base64(encryptedMasterKeyArray32),                 // Encrypted Master Key
+                    hak: ab_to_base64(hashedAuthenticationKeyBytes),             // Hashed Authentication Key
+                    v: 2                                                         // Version of this protocol
+                };
+
+                api_req([request_upb, sendEmailRequestParams], {
+                    callback: function (res1, ctx, queue, res) {
+                        if ($.isNumeric(res)) {
+                            operationPromise.reject(0, res, 'API returned error');
+                        }
+                        else if (!Array.isArray(res)) {
+                            operationPromise.reject(0, res, 'API returned error');
+                        }
+                        else if (res.length !== 2) {
+                            operationPromise.reject(0, res, 'API returned error');
+                        }
+                        else if (typeof res[0] !== 'string' || res[1] !== 0) {
+                            operationPromise.reject(0, res, 'API returned error');
+                        }
+                        else {
+                            operationPromise.resolve(1, res); // user handle
+                        }
+                    }
+
+                });
+
+
+            }
+        );
+
+        return operationPromise;
+    };
+
+
+/**
+ * Do the payment with the API
+ * @param {Object} payDetails       payment collected details from payment dialog
+ * @param {Object} businessPlan     business plan details
+ * @return {Promise}                resolve with the result
+ */
+BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    if (!payDetails) {
+        return operationPromise.reject(0, 11, 'Empty payment details');
+    }
+    if (!businessPlan) {
+        return operationPromise.reject(0, 12, 'Empty business plan details');
+    }
+
+    var request = {
+        a: 'uts',
+        it: businessPlan.it,
+        si: businessPlan.id,
+        p: businessPlan.totalPrice,
+        c: businessPlan.c,
+        aff: 0,
+        m: m,
+        bq: 0,
+        pbq: 0
+    };
+
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res) && res < 0) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else {
+
+                var utcRequest = {
+                    a: 'utc',                   // User Transaction Complete
+                    s: [res],                   // Sale ID
+                    m: addressDialog.gatewayId, // Gateway number
+                    bq: 0,                      // Log for bandwidth quota triggered
+                    extra: payDetails           // Extra information for the specific gateway
+                };
+
+                api_req(utcRequest, {
+                    callback: function (res) {
+                        if ($.isNumeric(res) && res < 0) {
+                            operationPromise.reject(0, res, 'API returned error');
+                        }
+                        else if (!res.EUR || !res.EUR.url) {
+                            operationPromise.reject(0, res, 'API returned error');
+                        }
+                        else {
+                            operationPromise.resolve(1, res); // ready of redirection
+                        }
+                    }
+
+                });
+            }
+        }
+
+    });
+
+    return operationPromise;
+};

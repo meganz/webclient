@@ -709,7 +709,7 @@ function api_proc(q) {
                         var ctx = ctxs[i];
 
                         if (typeof ctx.callback === 'function') {
-                            ctx.callback(t[i], ctx, this);
+                            ctx.callback(t[i], ctx, this, t);
                         }
                     }
 

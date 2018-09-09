@@ -2741,5 +2741,12 @@
     "19504": "\u0e1c\u0e39\u0e49\u0e43\u0e0a\u0e49\u0e40\u0e1e\u0e34\u0e48\u0e21\u0e40\u0e15\u0e34\u0e21 {0}x",
     "19505": "\u0e17\u0e35\u0e48\u0e44\u0e14\u0e49\u0e23\u0e31\u0e1a",
     "19506": "\u0e17\u0e35\u0e48\u0e2a\u0e48\u0e07\u0e2d\u0e2d\u0e01",
-    "19507": "\u0e0a\u0e37\u0e48\u0e2d\u0e1a\u0e23\u0e34\u0e29\u0e31\u0e17\u0e08\u0e33\u0e40\u0e1b\u0e47\u0e19\u0e15\u0e49\u0e2d\u0e07\u0e01\u0e23\u0e2d\u0e01 \u0e01\u0e23\u0e38\u0e13\u0e32\u0e01\u0e23\u0e2d\u0e01\u0e0a\u0e37\u0e48\u0e2d\u0e1a\u0e23\u0e34\u0e29\u0e31\u0e17"
+    "19507": "\u0e0a\u0e37\u0e48\u0e2d\u0e1a\u0e23\u0e34\u0e29\u0e31\u0e17\u0e08\u0e33\u0e40\u0e1b\u0e47\u0e19\u0e15\u0e49\u0e2d\u0e07\u0e01\u0e23\u0e2d\u0e01 \u0e01\u0e23\u0e38\u0e13\u0e32\u0e01\u0e23\u0e2d\u0e01\u0e0a\u0e37\u0e48\u0e2d\u0e1a\u0e23\u0e34\u0e29\u0e31\u0e17",
+    "19508": "A server error occurred while trying to register the account, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
+    "19509": "Setup automatic monthly payment for Business Account subscription",
+    "19510": "Business Account",
+    "19511": "The payment operation failed, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
+    "19512": "You successfully upgraded your account [B]%2[\/B] to %1.",
+    "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A]."
 }

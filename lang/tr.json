@@ -2741,5 +2741,12 @@
     "19504": "{0} ek kullan\u0131c\u0131",
     "19505": "Al\u0131nd\u0131",
     "19506": "G\u00f6nderildi",
-    "19507": "\u015eirket ismi gereklidir, l\u00fctfen \u015firket ismi alan\u0131n\u0131 doldurun"
+    "19507": "\u015eirket ismi gereklidir, l\u00fctfen \u015firket ismi alan\u0131n\u0131 doldurun",
+    "19508": "A server error occurred while trying to register the account, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
+    "19509": "Setup automatic monthly payment for Business Account subscription",
+    "19510": "Business Account",
+    "19511": "The payment operation failed, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
+    "19512": "You successfully upgraded your account [B]%2[\/B] to %1.",
+    "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A]."
 }

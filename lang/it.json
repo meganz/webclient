@@ -2741,5 +2741,12 @@
     "19504": "{0}x utenti addizionali",
     "19505": "Ricevuto",
     "19506": "Inviato",
-    "19507": "Il nome della compagnia \u00e8 obbligatorio, per favore riempi il campo del nome della compagnia"
+    "19507": "Il nome della compagnia \u00e8 obbligatorio, per favore riempi il campo del nome della compagnia",
+    "19508": "A server error occurred while trying to register the account, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
+    "19509": "Setup automatic monthly payment for Business Account subscription",
+    "19510": "Business Account",
+    "19511": "The payment operation failed, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
+    "19512": "You successfully upgraded your account [B]%2[\/B] to %1.",
+    "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A]."
 }

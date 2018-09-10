@@ -1985,6 +1985,9 @@ else if (!b_u) {
     jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
+    jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
+    jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'html/js/registerb.js', n: 'registerb_js', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
@@ -2348,7 +2351,11 @@ else if (!b_u) {
         'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
         'megadrop': {f:'html/megadrop.html', n: 'megadrop', j: 0 },
         'nomegadrop': {f:'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
-        'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j: 1 }
+        'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j: 1 },
+        'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
+        'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 },
+        'charts_js': {f:'js/vendor/Chart.min.js', n: 'charts_js', j:1 },
+        'jspdf_js': {f:'js/vendor/jspdf.min.js', n: 'jspdf_js', j:1 }
     };
 
     var jsl3 = {

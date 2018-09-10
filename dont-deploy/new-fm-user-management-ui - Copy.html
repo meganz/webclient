@@ -1,0 +1,420 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600');
+</style> 
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script type="text/javascript" src="../js/jquery-1.8.1.js"></script>
+<script type="text/javascript" src="../js/jquery.jscrollpane.js"></script>
+<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+  function initTreePanelScroll()
+  {
+	  $('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  function initTransferPanelScroll()
+  {
+	  $('.transfer-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  function initSharedGridScroll()
+  {
+	  $('.grid-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  function initSharedBlocksScroll()
+  {
+	  $('.shared-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  
+  
+  $.gridHeader = function()  
+  {	
+		$('.grid-table tbody tr:first-child td').each(function(i,e) {
+		  var headerColumn = $('.grid-table-header th').get(i);
+		  $(headerColumn).width($(e).width());
+	    });
+   }	
+	
+  initTreePanelScroll();
+  initTransferPanelScroll();
+  initSharedGridScroll();
+  initSharedBlocksScroll();
+  $.gridHeader();
+  
+  $(window).bind('resize', function () 
+  {
+	  initTreePanelScroll();
+      initTransferPanelScroll();
+      initSharedGridScroll();
+	  initSharedBlocksScroll();
+      $.gridHeader();
+  });
+  $('.nw-fm-tree-folder').bind('click', function() {
+	  var fmTreeItem = $(this).parent('.nw-fm-tree-item');
+	  if(fmTreeItem.attr('class').indexOf('selected') == -1) {
+		  $('.nw-fm-tree-item.selected').removeClass('selected');
+		  fmTreeItem.addClass('selected');
+	  }
+  });
+  $('.contains-folders > .nw-fm-arrow-icon').bind('click', function() {
+	  var fmTreeItem = $(this).parent('.nw-fm-tree-item');
+	  if(fmTreeItem.attr('class').indexOf('expanded') == -1) {
+		  fmTreeItem.addClass('expanded');
+		  fmTreeItem.next('ul').addClass('opened');
+		  initTreePanelScroll();
+	  } else {
+		  fmTreeItem.removeClass('expanded');
+		  fmTreeItem.next('ul').removeClass('opened');
+		  initTreePanelScroll();
+	  }
+  });
+  $('.nw-fm-left-icon').bind('click', function() {
+	  var currentPanelTitle = $(this).attr('class').split(' ')[1];
+	  if($(this).attr('class').indexOf('active') == -1) {
+		  $('.nw-fm-left-icon.active').removeClass('active');
+		  $(this).addClass('active');
+		  $('.content-panel.active').removeClass('active');
+		  $('.content-panel.'+currentPanelTitle).addClass('active');
+		  initTreePanelScroll();
+		  $('.fm-left-menu').removeClass().addClass('fm-left-menu ' + currentPanelTitle);
+	  }
+  });
+  $('.nw-contact-item').bind('click', function() {
+	  if($(this).attr('class').indexOf('selected') == -1) {
+		  $('.nw-contact-item.selected').removeClass('selected');
+		  $(this).addClass('selected');
+	  }
+  });
+  $('.nw-conversations-item').bind('click', function() {
+	  if($(this).attr('class').indexOf('selected') == -1) {
+		  $('.nw-conversations-item.selected').removeClass('selected');
+		  $(this).addClass('selected');
+	  }
+  });
+  var initial;
+  $('.nw-fm-left-icon').bind('mouseover', function () {
+	  var  tooltip = $(this).find('.nw-fm-left-tooltip');
+	  clearTimeout( initial );
+	  initial = window.setTimeout( 
+      function() {
+        $(tooltip).addClass('hovered');
+      }, 1000);
+  });
+  $('.nw-fm-left-icon').bind('mouseout', function () {
+	    $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
+		clearTimeout( initial );
+  });
+  
+  $('.fm-files-view-icon').bind('click', function () {
+	  if ($(this).attr('class').indexOf('active') == -1) {
+		  if ($(this).attr('class').indexOf('block-view') > -1) {
+			  $('.files-grid-view ').addClass('hidden');
+			  $('.fm-blocks-view').removeClass('hidden'); 
+              initSharedBlocksScroll();
+		  } else {
+			  $('.files-grid-view ').removeClass('hidden');
+			  $('.fm-blocks-view').addClass('hidden');
+			  initSharedGridScroll();
+		  }
+		  $('.fm-files-view-icon').removeClass('active');
+		  $(this).addClass('active');
+	  }
+  }); 
+});
+</script>
+</head>
+
+<body id="bodyel" class="logged rk-saved fontsize2 en free">
+
+<div id="fmholder" class="fmholder" style="display: block;">
+	<div class="main-blur-block">
+		<div class="fm-main default">
+		 	<div class="nw-fm-left-icons-panel">
+		 	 	<div class="nw-fm-left-icon dashboard ui-droppable">
+	                <div class="nw-fm-left-border"></div>
+	                <div class="dark-tooltip">Dashboard</div>
+	            </div>
+
+				<div class="nw-fm-left-icon cloud-drive ui-droppable">
+	                <div class="nw-fm-left-border"></div>
+	                <div class="dark-tooltip">Cloud Drive</div>
+	            </div>
+	            
+				<div class="nw-fm-left-icon inbox ui-droppable hidden">
+	                <div class="nw-fm-left-border"></div>
+	                <div class="dark-tooltip">Inbox</div>
+	            </div>
+
+
+				<div class="nw-fm-left-icon shared-with-me ui-droppable">
+	                <div class="nw-fm-left-border"></div>
+	                <div class="dark-tooltip">Shared with me</div>
+	            </div>
+
+				<div class="nw-fm-left-icon contacts ui-droppable">
+	                <div class="nw-fm-left-border"></div>
+	                <div class="dark-tooltip">Contacts</div>
+	            </div>
+
+				<div class="nw-fm-left-icon conversations ui-droppable">
+	                <div class="nw-fm-left-border"></div>
+	                <div class="new-messages-indicator hidden">2</div>
+	                <div class="dark-tooltip">Conversations</div>
+	                <div class="beta-text"></div>
+	            </div>
+
+	            <div class="nw-fm-left-icon user-management ui-droppable active">
+	                <div class="nw-fm-left-border"></div>
+	                <div class="dark-tooltip">User Management</div>
+	                <div class="beta-text"></div>
+	            </div> 
+
+				<div class="nw-fm-left-icon rubbish-bin ui-droppable">
+	                <div class="nw-fm-left-border"></div>
+	                <div class="dark-tooltip">Rubbish Bin</div>
+	            </div>
+
+				<div class="nw-fm-left-icon account ui-droppable">
+	                <div class="nw-fm-left-border"></div>
+	                <div class="dark-tooltip">Settings</div>
+	            </div>
+
+				<div class="nw-fm-left-icon transfers ui-droppable">
+	                <div class="nw-fm-left-border file-transfer-icon"></div>
+	                <div class="dark-tooltip">File Transfers</div>
+	                <div class="nw-fm-percentage download">
+	                    <ul>
+	                      <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
+	                      <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+	                    </ul>
+	                    <div class="transfer-bar-overlay"></div>
+	                </div>
+
+	                <div class="nw-fm-percentage upload">
+	                    <ul>
+	                      <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
+	                      <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+	                    </ul>
+	                    <div class="transfer-bar-overlay"><div></div></div>
+	                </div>
+	            </div>
+		 	</div>
+
+		 	<div class="fm-left-panel ui-resizable user-management-panel" style="width:256px">
+
+            	<div class="left-pane-drag-handle ui-resizable-handle ui-resizable-e"></div>
+           
+            	<div class="user-management-sorting-menu hidden"> 
+                    <div class="sorting-menu-arrow"></div>
+                    <p> SORT </p>
+
+                    <div class="sorting-menu-item-user-managment">
+                    	<div class="user-management-sort-name sort-icon"></div>
+                    	<span>Name</span>
+                    	<div class="up-arrow-icon"></div>
+                    </div>
+                    <div class="sorting-menu-item-user-managment">
+                    	<div class="user-management-sort-status sort-icon"></div>
+                    	<span>Status</span>
+                    </div>
+            	</div>
+            
+            	<div class="fm-left-menu user-management">
+	                <div class="nw-fm-tree-header user-management">
+	                    <input value="" placeholder="User Management" type="text">
+	                    <div class="nw-fm-search-icon" style="display: block;"></div>
+	                </div>
+            	</div>
+
+            	<div class="user-management-tree-panel-header enabled-accounts active" style="">
+	            	<div class="img enabled-accounts"></div>
+	                	<span>Enabled Accounts</span>
+	                <div class="user-management-tree-panel-arrows"></div>
+            	</div>
+        
+	            <div class="fm-tree-panel" style="overflow: hidden; padding: 0px;">    
+	            	<div class="jspContainer" style=" ">
+	                	<div class="jspPane" style="padding: 0px; top: 0px; left: 0px; width: 272px;">
+
+			            	<div class="content-panel user-management active">
+			                    <div class="nw-user-management-item">
+			                        <div class="user-management-status enabled"></div>
+			                        <div class="nw-user-management-name">Jay Pierce</div>
+			                    </div>
+			                    <div class="nw-user-management-item">
+			                        <div class="user-management-status pending"></div>
+			                        <div class="nw-user-management-name">Ollie Gibson</div>
+			                    </div>
+			                    <div class="nw-user-management-item selected">
+			                        <div class="user-management-status enabled"></div>
+			                        <div class="nw-user-management-name">John Bailey</div>
+			                    </div>
+			                </div>
+			            </div>
+		            </div>
+	            </div>
+
+             	<div class="user-management-tree-panel-header disabled-accounts">
+            		<div class="img disabled-accounts"></div>
+                	<span>Disabled Accounts</span>
+                	<div class="user-management-tree-panel-arrows"></div>
+            	</div>
+
+            	<div class="fm-tree-panel hidden" style="overflow: hidden; padding: 0px;">    
+	            	<div class="jspContainer" style=" ">
+	                	<div class="jspPane" style="padding: 0px; top: 0px; left: 0px; width: 272px;">
+
+			            	<div class="content-panel user-management active">
+			                    <div class="nw-user-management-item">
+			                        <div class="user-management-status disabled"></div>
+			                        <div class="nw-user-management-name">Jay Pierce</div>
+			                    </div>
+			                    <div class="nw-user-management-item">
+			                        <div class="user-management-status disable"></div>
+			                        <div class="nw-user-management-name">Ollie Gibson</div>
+			                    </div>
+			                </div>
+			            </div>
+		            </div>
+	            </div>
+
+		 		<div class="fm-right-files-block">
+		 		</div>
+		 	</div>
+
+		 	<div class="top-head user-management-border">
+			</div>
+
+			<div class="fm-right-files-block-user-management" style="margin-left: 304px">
+				<div class="fm-right-header-user-management fm">
+					<div class="fm-header-buttons-user-management">
+						<a class="fm-files-view-icon-user-management block-view" title="Thumbnail view"></a>
+						<a class="fm-files-view-icon-user-management listing-view active" title="List view"></a>
+						<div class="default-white-button">
+							<div class="overview-img"></div>
+							<span>Overview</span>
+						</div>
+
+						<div class="default-white-button">
+							<div class="account-img"></div>
+							<span>Account</span> 
+						</div>
+
+						<div class="default-green-button">
+							<div class="add-users-img"></div>
+							<span>Add Users</span>
+						</div>
+                    </div>
+				</div>
+
+				<div class="files-grid-view user-management-view">  
+					<div class="user-management-overview-bar">
+						<div class="user-management-overview-bar-data">
+								<div class="info-block">
+									<div class="number-of-user-icon icon"></div>
+									<span class="title">Number Of Users:</span>
+									<span class="number">11</span>
+								</div>
+
+								<div class="info-block">
+									<div class="total-storage-usage-icon icon"></div>
+									<span class="title">Total Storage Usage:</span>
+									<span class="number">12.4</span>
+									<span class="title2"> GB</span>
+								</div>
+								<div class="info-block">
+									<div class="total-transfer-usage-icon icon"></div>
+									<span class="title">Total Transfer Usage:</span>
+									<span class="number">1.4</span>
+									<span class="title2"> GB</span>
+								</div>
+								<div class="user-management-overview-bar-button">
+									<div class="view-plan-icon"></div>
+									<span>View Plans</span>  
+								</div>
+						</div>
+					</div>
+
+                    <table class="grid-table-user-management" width="100%" cellspacing="0" cellpadding="0" border="0">
+	                      	<tr class="grid-table-header-user-management">
+			                    <th>  
+		                    		<div class="checkdiv left checkboxOn small-user-management">
+                                	</div>
+			                    </th>
+			                    <th> <div class="arrow name desc">Name</div> </th>
+			                    <th><div class="arrow desc">Status</div></th>
+			                    <th><div class="arrow asc">Storage usage</div></th>
+			                    <th><div class="arrow desc">Transfer usage</div></th>
+			                    <th>
+			                    	<div class="disable-icon icon"></div>
+			                    </th>
+	                        </tr>
+
+	                        <tr>
+			                    <td>  
+		                    		<div class="checkdiv left checkboxOff small-user-management">
+                                	</div>
+			                    </td>
+			                    <td>			                    	
+	                                <div class="fm-user-management-user">
+	                                	<div class="admin-icon"></div>
+	                                	<div class="tooltip">Sub – administrators</div>	
+	                                    <span>Jay Pierce</span>
+	                                </div>
+	                                <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
+			                    </td>
+			                    <td>
+			                    	<div class="user-management-status enabled"></div>
+			                    	<span>Active</span>
+			                	</td>
+			                    <td><span>0.8 GB</span></td>
+			                    <td><span>13.2 GB</span></td>
+			                    <td>
+			                    	<div class="disable-icon icon"></div>
+			                    	<div class="edit-icon icon"></div>
+			                    	<div class="view-icon icon"></div>  	
+			                    </td>
+                       		</tr>
+
+	                        <tr>
+			                    <td>  
+		                    		<div class="checkdiv left checkboxOn small-user-management">
+                                	</div>
+			                    </td>
+			                    <td>			                    	
+	                                <div class="fm-user-management-user">
+	                                	<div class="admin-icon" style="visibility: hidden;"></div>	
+	                                    <span>Jay Pierce</span>
+	                                </div>
+	                                <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
+			                    </td>
+			                    <td>
+			                    	<div class="user-management-status pending"></div>
+			                    	<span>Pending</span>
+			                	</td>
+			                    <td><span>0.8 GB</span></td>
+			                    <td><span>0.8 GB</span></td>
+			                    <td>
+			                    	<div class="disable-icon icon"></div>
+			                    	<div class="edit-icon icon"></div>
+			                    	<div class="view-icon icon"></div>  	
+			                    </td>
+                       		</tr>
+                    </table>
+                    
+                    </div>
+           		</div>
+			</div>
+
+
+		 </div>
+	</div>
+</div>
+
+</body>
+</html>

@@ -377,7 +377,15 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 192px auto;
 }
 
+.tiny-icon.membership-status.bus {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
 
+.small-icon.membership.bus {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
 
 
 

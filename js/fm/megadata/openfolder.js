@@ -162,12 +162,14 @@
                 for (var a in this.opc) {
                     this.v.push(this.opc[a]);
                 }
+                this.doSort('email', 1);
             }
             else if (this.currentdirid === 'ipc') {
                 this.v = [];
                 for (var h in this.ipc) {
                     this.v.push(this.ipc[h]);
                 }
+                this.doSort('email', 1);
             }
             // else if (this.currentdirid === 'user-management') {
             //    this.v = [];

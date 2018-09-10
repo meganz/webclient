@@ -1135,7 +1135,8 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
         aff: 0,
         m: m,
         bq: 0,
-        pbq: 0
+        pbq: 0,
+        num: businessPlan.totalUsers        // number of users
     };
 
 

@@ -130,6 +130,12 @@ MegaData.prototype.sortByEmail = function(d) {
 
 MegaData.prototype.sortByModTime = function(d) {
     this.sortfn = function(a, b, d) {
+
+        // folder not having mtime, so sort by added time.
+        if (!a.mtime || !b.mtime) {
+            return M.getSortByDateTimeFn()(a, b, d);
+        }
+
         var time1 = a.mtime - a.mtime % 60;
         var time2 = b.mtime - b.mtime % 60;
         if (time1 !== time2) {
@@ -155,6 +161,31 @@ MegaData.prototype.getSortByDateTimeFn = function() {
     sortfn = function(a, b, d) {
         var time1 = a.ts - a.ts % 60;
         var time2 = b.ts - b.ts % 60;
+        if (time1 !== time2) {
+            return (time1 < time2 ? -1 : 1) * d;
+        }
+
+        return M.doFallbackSortWithName(a, b, d);
+    };
+
+    return sortfn;
+};
+
+MegaData.prototype.sortByRts = function(d) {
+    'use strict';
+    this.sortfn = this.getSortByRtsFn();
+    this.sortd = d;
+    this.sort();
+};
+
+MegaData.prototype.getSortByRtsFn = function() {
+    'use strict';
+
+    var sortfn;
+
+    sortfn = function(a, b, d) {
+        var time1 = a.rts - a.rts % 60;
+        var time2 = b.rts - b.rts % 60;
         if (time1 !== time2) {
             return (time1 < time2 ? -1 : 1) * d;
         }

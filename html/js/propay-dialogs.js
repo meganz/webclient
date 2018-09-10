@@ -1230,8 +1230,9 @@ var addressDialog = {
             // here it means we are coming from business account register page
             proNum = 'bus-plan-icon64'; // business account Plan icon
             proPlan = l[19510];
-            proPrice = (this.userInfo.nbOfUsers * this.businessPlan.p / 3).toFixed(2);
+            proPrice = (this.userInfo.nbOfUsers * this.businessPlan.p).toFixed(2);
             this.businessPlan.totalPrice = proPrice;
+            this.businessPlan.totalUsers = this.userInfo.nbOfUsers;
             numOfMonths = this.businessPlan.m;
 
             this.$dialog.find('.plan-icon .reg-st3-membership-icon').addClass('hidden');

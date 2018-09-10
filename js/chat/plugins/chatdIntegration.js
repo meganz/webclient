@@ -41,7 +41,7 @@ var ChatdIntegration = function(megaChat) {
 
     // chat events
     megaChat.rebind("onInit.chatdInt", function(e) {
-        megaChat.rebind("onRoomCreated.chatdInt", function(e, chatRoom) {
+        megaChat.rebind("onRoomInitialized.chatdInt", function(e, chatRoom) {
             assert(chatRoom.type, 'missing room type');
             self._attachToChatRoom(chatRoom);
         });

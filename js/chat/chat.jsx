@@ -409,7 +409,7 @@ Chat.prototype.init = function() {
     $('.activity-status-block, .activity-status').show();
 
     // contacts tab update
-    self.on('onRoomCreated', function(e, room) {
+    self.on('onRoomInitialized', function(e, room) {
         if (room.type === "private") {
             var userHandle = room.getParticipantsExceptMe()[0];
 
@@ -988,6 +988,7 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
 
 
 
+    this.trigger('onRoomInitialized', [room]);
     room.setState(ChatRoom.STATE.JOINING);
     return [roomId, room, MegaPromise.resolve(roomId, self.chats[roomId])];
 };

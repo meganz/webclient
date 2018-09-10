@@ -1,5 +1,5 @@
 /**
- * Simple class which will show +/- type of rating after a call had finished and will integrate that with the 
+ * Simple class which will show +/- type of rating after a call had finished and will integrate that with the
  * "Feedback" dialog
  *
  * @param megaChat
@@ -31,8 +31,8 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
     var self = this;
 
     megaChat
-        .unbind('onRoomCreated.CallFeedback')
-        .bind('onRoomCreated.CallFeedback', function(e, megaRoom) {
+        .unbind('onRoomInitialized.CallFeedback')
+        .bind('onRoomInitialized.CallFeedback', function(e, megaRoom) {
             megaRoom
                 .unbind('call-ended.CallFeedback')
                 .bind('call-ended.CallFeedback', function(e, eventData) {

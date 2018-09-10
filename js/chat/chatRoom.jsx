@@ -60,6 +60,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     this.chatShard = chatShard;
     this.chatdUrl = chatdUrl;
+    this.scrolledToBottom = 1;
 
     this.callRequest = null;
     this.callIsActive = false;

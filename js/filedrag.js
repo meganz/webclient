@@ -1,5 +1,4 @@
 (function(scope) {
-    'use strict';
 
     var dir_inflight = 0;
     var filedrag_u = [];
@@ -7,7 +6,7 @@
     var touchedElement = 0;
 
     function addUpload(files, emptyFolders) {
-        console.assert(page !== 'start' || window.fminitialized, 'check this...');
+        console.assert(page === 'start' || window.fminitialized, 'check this...');
 
         if (page === 'start' || M.chat) {
             M.addUpload(files, false, emptyFolders);
@@ -209,9 +208,6 @@
                 target = M.lastSeenCloudFolder || M.RootID;
             }
             else {
-                target = M.currentdirid;
-            }
-            if ((onChat = (String(M.currentdirid).substr(0, 4) === 'chat'))) {
                 target = M.currentdirid;
             }
 

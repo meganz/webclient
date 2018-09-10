@@ -78,6 +78,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
     var mySelf = this;
 
+    loadingDialog.show();
+
     var subAccountsView;
     if (!isBlockView) {
         subAccountsView = $('.files-grid-view.user-management-view');
@@ -98,6 +100,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         $('.user-management-list-table', subAccountsView).removeClass('hidden'); // unhide the list table
         $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide header
         $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
+        loadingDialog.hide();
     };
 
     // header events handlers
@@ -388,7 +391,13 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 var bandwidth = numOfBytes(subBandwidth, 2);
                 $('.business-sub-storage-use span', $subTr).text(storage.size + ' ' + storage.unit);
                 $('.business-sub-transfer-use span', $subTr).text(bandwidth.size + ' ' + bandwidth.unit);
-                $('.business-sub-last-active span', $subTr).text(bandwidth.size + ' ' + bandwidth.unit);
+                var dd = subUsersData[sub].ad;
+                var activeDate = '--------';
+                if (dd) {
+                    activeDate = new Date(dd.substr(4, 4), dd.substr(2, 2), dd.substr(0, 2));
+                    activeDate = activeDate.toLocaleDateString();
+                }
+                $('.business-sub-last-active span', $subTr).text(activeDate);
             }
         }
         var totalStorageFormatted = numOfBytes(totalStorage, 2);

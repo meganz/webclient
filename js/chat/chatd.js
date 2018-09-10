@@ -483,7 +483,6 @@ Chatd.Shard.prototype.reconnect = function() {
         self.keepAlivePing.restart();
         self.logger.debug('chatd connection established');
         self.connectionRetryManager.gotConnected();
-        self.histRequests = {};
 
         self.sendIdentity();
 
@@ -512,7 +511,7 @@ Chatd.Shard.prototype.reconnect = function() {
         self.logger.error("WebSocket error:", e);
         self.keepAlive.stop();
         self.connectionRetryManager.doConnectionRetry();
-
+        self.histRequests = {};
         self.chatd.trigger('onError', {
             shard: self
         });
@@ -533,6 +532,8 @@ Chatd.Shard.prototype.reconnect = function() {
         self.connectionRetryManager.gotDisconnected();
         self.mcurlRequests = {};
         self.triggerEventOnAllChats('onRoomDisconnected');
+
+        self.histRequests = {};
 
         self.chatd.trigger('onClose', {
             shard: self
@@ -674,7 +675,7 @@ Chatd.cmdToString = function(cmd, tx) {
 
         case Chatd.Opcode.HIST:
             var histLen = Chatd.unpack32le(cmd.substr(9, 4));
-            result += " chatId: " + base64urlencode(cmd.substr(1, 8)) + " len: " + histLen;
+            result += " chatId: " + base64urlencode(cmd.substr(1, 8)) + " len: " + (histLen - 4294967296);
             return [result, 13];
 
         case Chatd.Opcode.JOIN:
@@ -1058,12 +1059,6 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                                         chatIdMessagesObj.highnum = result[3];
                                     }
                                 }
-
-                                // queued this as last to execute after this current .done cb.
-                                self.chatd.trigger('onMessagesHistoryRequest', {
-                                    count: 0,
-                                    chatId: base64urlencode(chatId)
-                                });
 
                                 self.chatd.cmd(Chatd.Opcode.JOINRANGEHIST, chatId,
                                     base64urldecode(result[0]) + base64urldecode(result[1]));
@@ -1965,7 +1960,7 @@ Chatd.Messages.prototype.joinrangehistViaMessagesBuff = function(chatId) {
         if (firstLast) {
             // queued this as last to execute after this current .done cb.
             self.chatd.trigger('onMessagesHistoryRequest', {
-                count: 0,
+                count: 0xDEAD,
                 chatId: base64urlencode(chatId)
             });
 
@@ -2015,7 +2010,7 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
 
                 // queued this as last to execute after this current .done cb.
                 self.chatd.trigger('onMessagesHistoryRequest', {
-                    count: 0,
+                    count: 0xDEAD,
                     chatId: base64urlencode(chatId)
                 });
 
@@ -2054,7 +2049,7 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
                     this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
 
                 this.chatd.trigger('onMessagesHistoryRequest', {
-                    count: Chatd.MESSAGE_HISTORY_LOAD_COUNT,
+                    count: 0xDEAD,
                     chatId: base64urlencode(chatId)
                 });
                 requested = true;

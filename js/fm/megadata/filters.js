@@ -177,7 +177,7 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
 
     if (regex) {
         return function(node) {
-            return regex.test(node.name);
+            return (regex.test(node.name) && node.p !== 'contacts');
         };
     }
 

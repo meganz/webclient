@@ -108,7 +108,7 @@ BusinessRegister.prototype.initPage = function () {
             users = mySelf.minUsers; // minimum val
         }
         var $gadget = $('.bus-reg-plan', $pageContainer);
-        $gadget.find('.business-plan-price span.big').text(mySelf.planPrice.toFixed(3) + ' €');
+        $gadget.find('.business-plan-price span.big').text(mySelf.planPrice.toFixed(2) + ' €');
         $gadget.find('.business-base-plan span.right')
             .text((mySelf.planPrice * mySelf.minUsers).toFixed(2) + ' €'); // minimum
         $gadget.find('.business-users-plan span.right')
@@ -246,7 +246,7 @@ BusinessRegister.prototype.initPage = function () {
 
         business.getListOfPaymentGateways(false).always(fillPaymentGateways);
         business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
-            mySelf.planPrice = info.p / 3;
+            mySelf.planPrice = Number.parseFloat(info.p);
             mySelf.planInfo = info;
             updatePriceGadget(3);
 

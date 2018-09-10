@@ -45,7 +45,9 @@ function ui_keycomplete() {
         }
 
         // if this is a sub-user in a business account.
-        if (u_attr.b && u_attr.b.mu) {
+        // either This is the master  --> wont get the confirmation link until we receive successful payment
+        // or, this is a sub-user --> no need to ask them anything after this point
+        if (u_attr.b) {
             if (page === 'fm') {
                 loadSubPage('start');
             }

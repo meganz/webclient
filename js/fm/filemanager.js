@@ -1312,6 +1312,9 @@ FileManager.prototype.initContextUI = function() {
         if (labelId && (M.getNodeRights($.selected[0]) > 1)) {
             M.labeling($.selected, labelId);
         }
+
+        // refresh page for filter and sort with new label.
+        M.openFolder(M.currentdirid, true);
     });
 
     $('.colour-sorting-menu .filter-by .dropdown-colour-item').rebind('click', function(e) {

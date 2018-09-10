@@ -1032,7 +1032,7 @@
                 }
                 else {
                     // Hide sort by status and last-interaction items from menu
-                    $menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+                    $menu.find('*[data-by=status],*[data-by=last-interaction],*[data-by=fav]').addClass('hidden');
                     $menu.find('*[data-by=label]').removeClass('hidden');
                 }
 

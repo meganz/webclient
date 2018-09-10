@@ -24885,6 +24885,9 @@ opacity: 1;
     right: 22px;
     top: 2px;
 }
+.fm-picker-dialog .nw-fm-tree-item .colour-label-ind {
+    right: 47px;
+}
 .fm-picker-dialog .contact-row {
     height: 24px;
     width: 100%;

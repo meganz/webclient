@@ -25141,7 +25141,7 @@ opacity: 1;
 }
 
 .user-management-subuser-profile-container .subuser-container {
-    width: 33%;
+    width: 30%;
     min-width: 220px;
     position: relative;
     display: inline-block;
@@ -25152,6 +25152,8 @@ opacity: 1;
     padding-left: 16px;
     position: relative;
     vertical-align: top;
+    width: 56%;
+    box-sizing: border-box;
 }
 
 .user-management-subuser-profile-container .subuser-sec-profile-container::before {
@@ -25174,10 +25176,16 @@ opacity: 1;
     list-style-type: none;
     margin:6px 0 0 0;
     padding:0;
+    width: calc(100% - 52px);
 }
 
 .user-management-subuser-profile-container .subuser-sec-profile-container ul li {
     padding-bottom: 8px;
+}
+
+.user-management-subuser-profile-container .subuser-sec-profile-container ul li span{
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .user-management-subuser-profile-container .subuser-sec-profile-container ul li>span:first-child {
@@ -25201,6 +25209,8 @@ opacity: 1;
     padding-top:4px;
     position: relative;
     display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .user-management-subuser-profile-container .user-management-subuser-profile .subuser-email{
@@ -25210,6 +25220,8 @@ opacity: 1;
     margin:12px 0;
     position: relative;
     display: block;
+        text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .user-management-subaccount-view-container .user-management-subuser-profile-container .view-status-row {

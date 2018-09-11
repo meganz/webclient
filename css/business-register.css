@@ -79,6 +79,8 @@
 	margin-bottom: 12px;
 }
 
+
+
 .bus-reg-input::after {
 	content: " ";
     width: 100%;
@@ -167,6 +169,22 @@
 .bus-reg-input.num input {
 	width: 100px;
 }
+
+.bus-reg-input.pw-first input {
+	width: -webkit-calc(100% - 86px);
+    width: -moz-calc(100% - 86px);
+    width: calc(100% - 86px);
+    display: inline-block;
+}
+
+.bus-reg-input.pw-first .password-status-icon {
+	position: absolute;
+	right: 0;
+	top: 30px;
+}
+
+
+
 
 .bus-reg-input .error-message {
     font-size: 13px;
@@ -270,6 +288,7 @@
     display: inline-block;
     margin-left: 4px;
     margin-right: 8px;
+    margin-top: 4px;
 }
 
 /*.bus-reg-body .provider-icon.ecpVI{

@@ -26544,21 +26544,6 @@ opacity: 1;
     text-overflow: ellipsis;
 }
 
-.user-management-dialog .dialog-input-container .input-user .dialog-input {
-    width:246px;
-    height: 32px;
-    display: inline-block;
-    overflow: visible;
-    border-radius: 4px;
-    box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
-    box-sizing: border-box;
-    padding: 0 8px;
-    line-height: 32px;
-    font-size: 14px;
-    font-family: 'Source Sans Pro', sans-serif;
-    cursor: text;
-}
-
 .user-management-dialog .dialog-input-container .input-user .confirm-img.icon {
     position: absolute;
     bottom: 36px;
@@ -26717,7 +26702,7 @@ opacity: 1;
     float: right;
     line-height: 20px;
     font-size: 16px;
-    margin:14px 32px 0 0;
+    margin:14px 38px 0 0;
 }
 
 .user-management-add-user-dialog .default-white-button-user-management {
@@ -26910,31 +26895,40 @@ opacity: 1;
     margin-left: 32px;  
 }
 
+.user-management-dialog .dialog-input-title-ontop .title.last-name {
+    display: inline-block;
+    margin-left: 100px;
+}
+
 .user-management-dialog .dialog-input-container .dialog-input-title-ontop .dialog-input {
     width:258px;
     height: 32px;
     display: inline-block;
     position: relative;
-    overflow: hidden;
-    border-radius: 4px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-radius: 2px;
     box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
     box-sizing: border-box;
     padding: 0 8px;
     margin-top: 8px;
     line-height: 32px;
     font-size: 14px;
-    font-family: 'Source Sans Pro', sans-serif;
+    cursor: text;
 }
 
-.user-management-dialog .dialog-input-title-ontop .dialog-input select {
-    background:transparent;
-    border:none;
-    font-size: 14px;
-    color: #666666;
-    height: 32px;
-    width: 258px;
-    font-family: 'Source Sans Pro', sans-serif; 
-} 
+.user-management-dialog .dialog-input-container .dialog-input-title-ontop .dialog-input::placeholder {
+    font-size: 13px;
+    color: #aaa;
+}
+
+.user-management-dialog .dialog-input-title-ontop .dialog-input.sub-n, .user-management-dialog .dialog-input-title-ontop .dialog-input.sub-n-l, .user-management-dialog .dialog-input-title-ontop .dialog-input.edit-sub-name, .user-management-dialog .dialog-input-title-ontop .dialog-input.edit-sub-lname {
+    width: 123px;
+}
+
+.user-management-dialog .dialog-input-title-ontop .dialog-input.sub-n-l, .user-management-dialog .dialog-input-title-ontop .dialog-input.edit-sub-lname {
+    margin-left: 10px;
+}
 
 .user-management-edit-profile-dialog .dialog-button-container, .user-management-able-user-dialog .dialog-button-container {
     height: 56px;
@@ -26956,7 +26950,7 @@ opacity: 1;
 
 .user-management-edit-profile-dialog .dialog-button-container .default-green-button-user-management, .user-management-able-user-dialog .dialog-button-container .default-green-button-user-management {
     position: relative;
-    margin:12px 24px 12px 12px;
+    margin:12px 36px 12px 12px;
     float: right;
     padding: 0 24px;
 }

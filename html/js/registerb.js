@@ -17,6 +17,9 @@ BusinessRegister.prototype.initPage = function () {
 
     loadingDialog.show();
 
+    // we will need it to evaluate the password
+    M.require('zxcvbn_js');
+
     var $pageContainer = $('.bus-reg-body');
     var mySelf = this;
 
@@ -190,6 +193,18 @@ BusinessRegister.prototype.initPage = function () {
                 $passInput.focus();
                 passed = false;
             }
+            else if (typeof zxcvbn !== 'undefined') {
+                passed = mySelf.ratePasswordStrength($pageContainer, $passInput.val());
+                if (!passed) {
+                    $passInput.parent().addClass('error').find('.error-message').text(l[1104]);
+                    $passInput.focus();
+                }
+            }
+            else { // the possibility to get to this else is almost 0 , however it's added to eliminate any chances of problems
+                M.require('zxcvbn_js').done(function () {
+                    inputsValidator($element); // recall me after loading
+                });
+            }
         }
         if (!$element || $element.is($rPassInput)) {
             if (!$rPassInput.val()) {
@@ -238,6 +253,16 @@ BusinessRegister.prototype.initPage = function () {
             mySelf.doRegister($nbUsersInput.val().trim(), $cnameInput.val().trim(),
                 $fnameInput.val().trim(), $lnameInput.val().trim(), $telInput.val().trim(), $emailInput.val().trim(),
                 $passInput.val());
+        }
+    );
+
+    // event handler for password key-up
+    $('#business-pass', $pageContainer).off('keyup.suba').on('keyup.suba',
+        function passwordFieldKeyupHandler() {
+            var $me = $(this);
+            if (inputsValidator($me)) {
+                $me.parent().removeClass('error');
+            }
         }
     );
 
@@ -345,4 +370,64 @@ BusinessRegister.prototype.processPayment = function (payDetails, businessPlan) 
 
     payingPromise.always(finalizePayment);
 
+};
+
+/**
+ * evaluate password strength and change ui elements on business register page
+ * @param {Object} $container       jQuery page container
+ * @param {String} password         password to evaluate
+ */
+BusinessRegister.prototype.ratePasswordStrength = function ($container, password) {
+    "use strict";
+
+    var $passInputContianer = $('.bus-reg-input.pass-1st', $container).removeClass('weak-password strong-password');
+    var $passStrengthContainer = $('.new-registration.suba', $container).removeClass('good1 good2 good3 good4 good5');
+    var $passStrengthPad = $('.new-reg-status-pad', $passStrengthContainer);
+    var $passStrengthDesc = $('.new-reg-status-description', $passStrengthContainer);
+
+    var passwordScore = zxcvbn(password).score;
+    var passwordLength = password.length;
+
+    var overallResult = true;
+
+    if (passwordLength < security.minPasswordLength) {
+        $passInputContianer.addClass('weak-password');
+        $passStrengthContainer.addClass('good1');
+        $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[18700]);   // Too short
+        $passStrengthDesc.text(l[18701]);
+        overallResult = false;
+    }
+    else if (passwordScore >= 4) {
+        $passInputContianer.addClass('strong-password');
+        $passStrengthContainer.addClass('good5');
+        $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[1128]); // Strong
+        $passStrengthDesc.text(l[1123]);
+    }
+    else if (passwordScore === 3) {
+        $passInputContianer.addClass('strong-password');
+        $passStrengthContainer.addClass('good4');
+        $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[1127]); // Good
+        $passStrengthDesc.text(l[1122]);
+    }
+    else if (passwordScore === 2) {
+        $passInputContianer.addClass('strong-password');
+        $passStrengthContainer.addClass('good3');
+        $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[1126]); // Medium
+        $passStrengthDesc.text(l[1121]);
+    }
+    else if (passwordScore === 1) {
+        $passStrengthContainer.addClass('good2');
+        $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[1125]); // Weak
+        $passStrengthDesc.text(l[1120]);
+        overallResult = false;
+    }
+    else {
+        $passInputContianer.addClass('weak-password');
+        $passStrengthContainer.addClass('good1');
+        $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[1124]); // Very Weak
+        $passStrengthDesc.text(l[1119]);
+        overallResult = false;
+    }
+
+    return overallResult;
 };

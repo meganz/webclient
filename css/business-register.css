@@ -563,14 +563,14 @@
     background-repeat: no-repeat;
     background-position: -16px -809px;
 	margin:0 auto 48px auto;
-} 
+}
 
-
-
+.new-registration.suba {
+    margin-top: 18px;
+}
 
 @media only screen and (max-width: 790px) {
-
-.bus-reg-body {
+    .bus-reg-body {
 	width:95%;
 	min-width: 0;
 }

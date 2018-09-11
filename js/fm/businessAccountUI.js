@@ -394,7 +394,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 var dd = subUsersData[sub].ad;
                 var activeDate = '--------';
                 if (dd) {
-                    activeDate = new Date(dd.substr(4, 4), dd.substr(2, 2), dd.substr(0, 2));
+                    activeDate = new Date(dd.substr(0, 4), dd.substr(4, 2), dd.substr(6, 2));
                     activeDate = activeDate.toLocaleDateString();
                 }
                 $('.business-sub-last-active span', $subTr).text(activeDate);

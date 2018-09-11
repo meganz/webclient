@@ -26,7 +26,12 @@ function init_start() {
     }
     else {
         $('.button-48-height.register').rebind('click', function () {
-            loadSubPage('register');
+            if ($(this).hasClass('business-reg')) {
+                loadSubPage('registerb');
+            }
+            else {
+                loadSubPage('register');
+            }
         });
         $('.startpage.try-mega').text(l[16535]);
 

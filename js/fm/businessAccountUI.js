@@ -728,6 +728,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var inshareInternalInfo = subUserStats["isi"] || emptyArray;
         var inshareExternalInfo = subUserStats["ise"] || emptyArray;
         var outshareInfo = subUserStats["ose"] || emptyArray;
+        var outshareInternalInfo = subUserStats["osi"] || emptyArray;
 
         totalStorage = subUserStats["ts"] || 0;
         totalBandwidth = subUserStats["dl"] || 0;
@@ -739,6 +740,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var inshareInternalTotalFormatted = numOfBytes(inshareInternalInfo[0], 2);
         var inshareExternalTotalFormatted = numOfBytes(inshareExternalInfo[0], 2);
         var outshareTotalFormatted = numOfBytes(outshareInfo[0], 2);
+        var outshareTotalInternalFormatted = numOfBytes(outshareInternalInfo[0], 2);
 
         var versionsTotalFormatted = numOfBytes(rootInfo[3] + rubbishInfo[3]
             + inshareInternalInfo[3] + inshareExternalInfo[3] + outshareInfo[3], 2);
@@ -757,6 +759,8 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             ' .used-storage-info.ba-inshare-ex', $subAccountContainer);
         var $outShareSection = $('.user-management-view-data .subaccount-view-used-data' +
             ' .used-storage-info.ba-outshare', $subAccountContainer);
+        var $outShareExternalSection = $('.user-management-view-data .subaccount-view-used-data' +
+            ' .used-storage-info.ba-outshare-ex', $subAccountContainer);
         var $rubbishSection = $('.user-management-view-data .subaccount-view-used-data' +
             ' .used-storage-info.ba-rubbish', $subAccountContainer);
         var $versionsSection = $('.user-management-view-data .subaccount-view-used-data' +
@@ -780,6 +784,11 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             outshareTotalFormatted.unit);
         $outShareSection.find('.folder-number').text(outshareInfo[2] + ' ' + l[2035]);
         $outShareSection.find('.file-number').text(outshareInfo[1] + ' ' + l[2034]);
+
+        $outShareExternalSection.find('.ff-occupy').text(outshareTotalInternalFormatted.size + ' ' +
+            outshareTotalInternalFormatted.unit);
+        $outShareExternalSection.find('.folder-number').text(outshareInternalInfo[2] + ' ' + l[2035]);
+        $outShareExternalSection.find('.file-number').text(outshareInternalInfo[1] + ' ' + l[2034]);
 
         $rubbishSection.find('.ff-occupy').text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
         $rubbishSection.find('.folder-number').text(rubbishInfo[2] + ' ' + l[2035]);

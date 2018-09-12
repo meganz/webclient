@@ -92,6 +92,21 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
 };
 
 /**
+ * edit sub-user info
+ * @param {String} subuserHandle
+ * @param {String} subEmail
+ * @param {String} subFName
+ * @param {String} subLName
+ * @param {any} optionals
+ */
+BusinessAccount.prototype.editSubAccount = function (subuserHandle,subEmail, subFName, subLName, optionals) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    return operationPromise;
+};
+
+/**
  * Function to deactivate sub user from business account
  * @param {String} subUserHandle    sub user handle to deactivate
  * @returns {Promise}               Resolves deactivate operation result

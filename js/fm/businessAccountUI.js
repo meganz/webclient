@@ -1,5 +1,4 @@
-﻿
-/**
+﻿/**
  * A UI control Class to perform Business Account related UI
  */
 function BusinessAccountUI() {
@@ -1815,14 +1814,17 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     var $dialog = $('.user-management-edit-profile-dialog.user-management-dialog');
     var $usersContainer = $('.dialog-input-container', $dialog);
     var $nameInput = $('input.edit-sub-name', $usersContainer);
+    var $lnameInput = $('input.edit-sub-lname', $usersContainer);
     var $emailInput = $('input.edit-sub-email', $usersContainer);
     var $positionInput = $('input.edit-sub-position', $usersContainer);
     var $subIDInput = $('input.edit-sub-id-nb', $usersContainer);
     var $phoneInput = $('input.edit-sub-phone', $usersContainer);
     var $locationInput = $('input.edit-sub-location', $usersContainer);
+    var userAttrs = Object.create(null);
 
     var clearDialog = function () {
         $nameInput.val('');
+        $lnameInput.val('');
         $emailInput.val('');
         $positionInput.val('');
         $subIDInput.val('');
@@ -1832,12 +1834,16 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
 
     clearDialog();
 
-    var uName = from8(base64urldecode(subUser.firstname)) + ' ' +
-        from8(base64urldecode(subUser.lastname));
-    uName = uName.trim();
+    //var uName = from8(base64urldecode(subUser.firstname)) + ' ' +
+    //    from8(base64urldecode(subUser.lastname));
+    //uName = uName.trim();
     var subUserDefaultAvatar = useravatar.contact(subUserHandle);
 
-    $nameInput.val(uName);
+    userAttrs.fname = from8(base64urldecode(subUser.firstname));
+    userAttrs.lname = from8(base64urldecode(subUser.lastname));
+
+    $nameInput.val(userAttrs.fname);
+    $lnameInput.val(userAttrs.lname);
     $emailInput.val(subUser.e);
     if (subUser.position) {
         $positionInput.val(subUser.position);
@@ -1854,11 +1860,13 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
 
     $('.user-management-subuser-avatars', $dialog).html(subUserDefaultAvatar);
 
+    // close event handler
     $('.dialog-button-container .btn-edit-close, .delete-img.icon', $dialog).off('click.subuser')
         .on('click.subuser', closeDialog);
 
-    $('.dialog-button-container .btn-edit-save', $dialog).off('click.subuser')
-        .on('click.subuser', function editSubUserProfileSaveHandler() {
+    // event handler for value change
+    $('input.dialog-input', $dialog).off('change.subuser')
+        .on('change.subuser', function editSubUserFieldChangeHandler() {
 
         });
 

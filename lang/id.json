@@ -2049,6 +2049,7 @@
     "18230": "Aktifkan kembali QR Code",
     "18231": "Kode QR Anda dinonaktifkan.",
     "18232": "Apakah Anda ingin mengaktifkan kembali Kode QR Anda?",
+    "18233": "Filter Anda tidak cocok dengan dokumen apa pun",
     "18238": "Karena teknologi enkripsi MEGA, Anda tidak dapat mengatur ulang kata sandi tanpa kehilangan data. Harap pastikan Anda mengingat kata sandi Anda.",
     "18254": "Apakah Anda masuk ke akun Anda di web browser lain?",
     "18255": "Silakan periksa semua browser Anda (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari, dll.) Untuk melihat apakah Anda masih masuk ke akun Anda. Anda mungkin juga masuk ke MEGA di komputer orang lain dan lupa untuk keluar.",
@@ -2741,5 +2742,12 @@
     "19504": "{0}x additional users",
     "19505": "Received",
     "19506": "Sent",
-    "19507": "Company name is required, please fill the company name field"
+    "19507": "Company name is required, please fill the company name field",
+    "19508": "A server error occurred while trying to register the account, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
+    "19509": "Setup automatic monthly payment for Business Account subscription",
+    "19510": "Business Account",
+    "19511": "The payment operation failed, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
+    "19512": "You successfully upgraded your account [B]%2[\/B] to %1.",
+    "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A]."
 }

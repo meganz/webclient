@@ -2049,6 +2049,7 @@
     "18230": "QR-Code reaktivieren",
     "18231": "Ihr QR-Code ist deaktiviert.",
     "18232": "M\u00f6chten Sie Ihren QR-Code reaktivieren?",
+    "18233": "Ihr Filter ergab keine Treffer",
     "18238": "Aufgrund der sicheren MEGA-Verschl\u00fcsselungstechnologie ist ein Zur\u00fccksetzen Ihres Passworts ohne Datenverlust nicht m\u00f6glich. Bitte stellen Sie sicher, dass Sie sich an Ihr Passwort erinnern k\u00f6nnen.",
     "18254": "Haben Sie sich in einem anderen Webbrowser in Ihren Account eingeloggt?",
     "18255": "Bitte pr\u00fcfen Sie alle installierten Browser (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari etc.) auf bestehende mega.nz-Sitzungen. Haben Sie sich vielleicht auf dem Computer eines Bekannten eingeloggt und vergessen, die Sitzung zu beenden?",
@@ -2741,5 +2742,12 @@
     "19504": "{0}x additional users",
     "19505": "Received",
     "19506": "Sent",
-    "19507": "Company name is required, please fill the company name field"
+    "19507": "Company name is required, please fill the company name field",
+    "19508": "A server error occurred while trying to register the account, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
+    "19509": "Setup automatic monthly payment for Business Account subscription",
+    "19510": "Business Account",
+    "19511": "The payment operation failed, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
+    "19512": "You successfully upgraded your account [B]%2[\/B] to %1.",
+    "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A]."
 }

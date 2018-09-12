@@ -2049,6 +2049,7 @@
     "18230": "Riattiva QRcode",
     "18231": "Il tuo QRcode \u00e8 disattivato",
     "18232": "Vuoi riattivare il tuo QRcode?",
+    "18233": "Il tuo filtro non ha nessun documento compatibile",
     "18238": "A causa della tecnologia di criptazione utilizzata da MEGA non \u00e8 possibile resettare la password senza una perdita di dati. Per favore, fai in modo di ricordare la tua password.",
     "18254": "Hai effettuato l'accesso nel tuo account in un altro web browser?",
     "18255": "Per favore, controlla tutti i tuoi web browser (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari ecc.) per vedere se hai ancora un accesso disponibile al tuo account. Potresti anche aver effettuato l'accesso a MEGA sul computer di qualcun altro e dimenticato di effettuare il log out.",
@@ -2741,5 +2742,12 @@
     "19504": "{0}x utenti addizionali",
     "19505": "Ricevuto",
     "19506": "Inviato",
-    "19507": "Il nome della compagnia \u00e8 obbligatorio, per favore riempi il campo del nome della compagnia"
+    "19507": "Il nome della compagnia \u00e8 obbligatorio, per favore riempi il campo del nome della compagnia",
+    "19508": "Un errore del server \u00e8 stato riscontrato mentre avveniva la registrazione dell'account, per favore riprova pi\u00f9 tardi.\r\nSe il problema persiste, per favore contatta il supporto MEGA a https:\/\/mega.nz\/support",
+    "19509": "Imposta il pagamento automatico mensile per l'abbonamento all'account Business",
+    "19510": "Account Business",
+    "19511": "L'operazione di pagamento \u00e8 fallita, per favore riprova pi\u00f9 tardi.\r\nSe il problema persiste, per favore contatta il supporto MEGA a https:\/\/mega.nz\/support",
+    "19512": "Hai aggiornato con successo il tuo account [B]%2[\/B] a %1.",
+    "19513": "Grazie! Il tuo account [B]%2[\/B] sar\u00e0 aggiornato appena riceviamo conferma del tuo pagamento dal nostro provider di pagamento. Se hai pagato con carta di debito o carta di credito e non hai ricevuto il tuo account MEGA PRO nel giro di qualche ora, per favore contattaci a [A]support@mega.nz[\/A]. Se hai pagato con un trasferimento bancario per favore permetti 4-5 giorni di tempo al pagamento per essere eseguito.",
+    "19514": "Grazie! Il tuo account [B]%2[\/B] sar\u00e0 aggiornato appena riceviamo conferma dell'avvenuto pagamento dal nostro provider di pagamento. Se non ricevi il tuo account MEGA PRO nel giro di %1 ore, per favore contattaci a [A]support@mega.nz[\/A]."
 }

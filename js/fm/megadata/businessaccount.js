@@ -92,6 +92,59 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
 };
 
 /**
+ * edit sub-user info
+ * @param {String} subuserHandle        sub-user handle
+ * @param {String} subEmail             new email address, or null to don't change
+ * @param {String} subFName             new first name, or null to don't change
+ * @param {String} subLName             new last name, or null to don't change
+ * @param {any} optionals               new optionals, or null to don't change
+ */
+BusinessAccount.prototype.editSubAccount = function (subuserHandle,subEmail, subFName, subLName, optionals) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    if (!subuserHandle) {
+        return operationPromise.reject(0, 18, 'Empty User Handle');
+    }
+    if (!subEmail && !subFName && !subLName && !optionals) {
+        return operationPromise.reject(0, 19, 'Empty User attributes. nothing to edit');
+    }
+    if (subEmail && checkMail(subEmail)) {
+        return operationPromise.reject(0, 1, 'Invalid Email');
+    }
+
+    var request = {
+        "a": "upsub",               // business sub account update
+        "su": subuserHandle,        // sub-user handle
+    };
+    if (subEmail) {
+        request.email = subEmail;
+    }
+    if (subFName) {
+        request.firstname = subFName;
+    }
+    if (subLName) {
+        request.lastname = subLName;
+    }
+    if (optionals) {
+        if (optionals.position) {
+            request.position = optionals.position;
+        }
+        if (optionals.idnum) {
+            request.idnum = optionals.idnum;
+        }
+        if (optionals.phonenum) {
+            request.phonenum = optionals.phonenum;
+        }
+        if (optionals.location) {
+            request.location = optionals.location;
+        }
+    }
+
+    return operationPromise;
+};
+
+/**
  * Function to deactivate sub user from business account
  * @param {String} subUserHandle    sub user handle to deactivate
  * @returns {Promise}               Resolves deactivate operation result
@@ -1175,4 +1228,36 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
     });
 
     return operationPromise;
+};
+
+
+BusinessAccount.prototype.resendInvitation = function (subuserHandle) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    if (!subuserHandle) {
+        return operationPromise.reject(0, 11, 'Empty sub-user handle');
+    }
+
+    var request = {
+        "a": "sbu",
+        "aa": "r",
+        "u": subuserHandle // user handle
+    };
+
+    api_req(request, {
+        callback: function (res) {
+            if (typeof res === 'object') {
+                operationPromise.resolve(1, res); // user activated successfully, object contain lp + u
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+
+    });
+
+
+    return operationPromise;
+
 };

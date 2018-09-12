@@ -77,8 +77,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
     var mySelf = this;
 
-    loadingDialog.show();
-
     var subAccountsView;
     if (!isBlockView) {
         subAccountsView = $('.files-grid-view.user-management-view');
@@ -90,16 +88,18 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
     this.URLchanger('');
 
-    if (subAccounts.length) { // no subs
+    if (!Object.keys(subAccounts).length) { // no subs
         return this.viewLandingPage();
     }
+
+    loadingDialog.pshow();
 
     var unhideUsersListSection = function () {
         subAccountsView.removeClass('hidden'); // un-hide the container
         $('.user-management-list-table', subAccountsView).removeClass('hidden'); // unhide the list table
         $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide header
         $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
-        loadingDialog.hide();
+        loadingDialog.phide();
     };
 
     // header events handlers
@@ -411,7 +411,13 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             .text(totalBandwidthFormatted.size);
         $('.info-block.bandwidth-sub-users .title2', '.user-management-overview-bar')
             .text(totalBandwidthFormatted.unit);
+
         $('.user-management-overview-bar').removeClass('hidden');
+
+        // handler for clicking on overview bar at the bottom
+        $('.user-management-overview-bar').off('click.suba').on('click.suba', function overviewBarClickHandler() {
+            mySelf.viewBusinessAccountOverview();
+        });
 
         unhideUsersListSection();
     };
@@ -557,6 +563,13 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
 
     $('.content-panel.user-management .nw-user-management-item').removeClass('selected').addClass('hidden');
 
+    // handler for add users button
+    $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
+        .on('click.subuser', function addSubUserClickHandler() {
+            mySelf.showAddSubUserDialog();
+        });
+
+    // handler account setting page
     $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
             mySelf.showAddSubUserDialog();

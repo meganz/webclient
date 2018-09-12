@@ -152,7 +152,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype, sDeepIndex)
                 };
                 break;
             case 'label':
-                sortFn = M.sortByLabelFn(sortDirection);
+                sortFn = M.sortByLabelFn(sortDirection, true);
                 break;
         }
 
@@ -682,10 +682,6 @@ MegaData.prototype.treeSortUI = function() {
                 return el.fav;
             };
 
-            var lbl = function(el) {
-                return el.lbl;
-            };
-
             // Check is there a need for sorting at all
             if (data.by === 'fav') {
                 if (!M.v.some(fav)) {
@@ -693,7 +689,7 @@ MegaData.prototype.treeSortUI = function() {
                 }
             }
             else if (data.by === 'label') {
-                if (!M.v.some(lbl)) {
+                if (!M.isLabelExistTree()) {
                     return false;
                 }
             }

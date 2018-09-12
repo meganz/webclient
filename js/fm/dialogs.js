@@ -690,7 +690,7 @@
         var $dpa = $('.fm-picker-dialog-panel-arrows', $dialog).removeClass('hidden');
 
         if (section === 'cloud-drive' || section === 'folder-link') {
-            M.buildtree(M.d[M.RootID], 'fm-picker-dialog');
+            M.buildtree(M.d[M.RootID], 'fm-picker-dialog', 'cloud-drive');
         }
         else if (section === 'shared-with-me') {
             M.buildtree({h: 'shares'}, 'fm-picker-dialog');

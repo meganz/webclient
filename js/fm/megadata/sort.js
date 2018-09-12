@@ -517,7 +517,7 @@ MegaData.prototype.sortByLabel = function(d) {
     });
 };
 
-MegaData.prototype.sortByLabelFn = function(d) {
+MegaData.prototype.sortByLabelFn = function(d, isTree) {
     "use strict";
 
     // sorting with labels
@@ -527,8 +527,14 @@ MegaData.prototype.sortByLabelFn = function(d) {
                 return (a.lbl < b.lbl ? -1 : 1) * d;
             }
             else {
-                // after sorting with labels, sort again with folder
-                return M.doFallbackSortWithFolder(a, b);
+                // after sorting with labels, if this is not tree sorting, sort again with folder
+                if (!isTree) {
+                    return M.doFallbackSortWithFolder(a, b);
+                }
+                else {
+                    // if this is tree, skip folder sorting and sort by name;
+                    return M.doFallbackSortWithName(a, b, 1);
+                }
             }
         }
         else if (a.lbl) {
@@ -548,8 +554,14 @@ MegaData.prototype.sortByLabelFn = function(d) {
             }
         }
         else {
-            // if this items are not set with labels, sorting it with folder.
-            return M.doFallbackSortWithFolder(a, b);
+            // if this items are not set with labels, if this is not tree sorting, sorting it with folder.
+            if (!isTree) {
+                return M.doFallbackSortWithFolder(a, b);
+            }
+            else {
+                // if this is tree, skip folder sorting and sort by name;
+                return M.doFallbackSortWithName(a, b, 1);
+            }
         }
     };
 };

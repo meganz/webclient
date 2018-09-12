@@ -24729,6 +24729,7 @@ opacity: 1;
     bottom: 0px;
     background-color: rgba(250,250,250,1);
     z-index: 102;
+    cursor: pointer;
 }
 
 .user-management-overview-bar::before{
@@ -27086,15 +27087,11 @@ opacity: 1;
 }
 
 .user-management-landing-page .landing-sub-container:hover {
-    /*
-    -ms-transform: scale(1.05,1.05); 
-    -webkit-transform: scale(1.05,1.05); /
-    transform: scale(1.05,1.05);
-    */
     border-radius: 8px;
-    box-shadow: 0 0 4px 0 rgba(0,0,0,0.1);
     background-color: rgba(253,253,253,1);
-    border: 1px solid rgba(0,0,0,0.1);
+    border:1px solid rgba(0,0,0,0.07);
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.05);
+
 }
 
 .user-management-landing-page .landing-sub-container:hover::before, .user-management-landing-page .landing-sub-container:hover::after{
@@ -27129,7 +27126,9 @@ opacity: 1;
     left: 16px;
 }
 
-
+.user-management-landing-page .landing-page-container .landing-sub-container:nth-child(5) {
+    margin-top: -5px;
+}
 
 .user-management-landing-page .landing-page-container .landing-sub-container:nth-child(5)::before {
     display: none;

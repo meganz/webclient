@@ -1283,14 +1283,37 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 };
 
 
+BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
+    "use strict";
+    this.initUItoRender();
+    var mySelf = this;
+    this.URLchanger('account');
+
+    var $businessAccountContainer = $('.files-grid-view.user-management-view');
+    var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
+    var $profileContainer = $('.profile', $accountContainer);
+    var $accountPageHeader = $('.fm-right-header-user-management .user-management-breadcrumb.account');
+
+    var unhideSection = function () {
+        $businessAccountContainer.removeClass('hidden');
+        $accountContainer.removeClass('hidden');
+        $profileContainer.removeClass('hidden');
+        $accountPageHeader.removeClass('hidden');
+    };
+
+    unhideSection();
+    
+};
+
+
 /** show business account page (Settings and invoices)
  * */
-BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
+BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
     "use strict";
 
     this.initUItoRender();
     var mySelf = this;
-    this.URLchanger('account');
+    this.URLchanger('invoices');
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
@@ -2086,6 +2109,7 @@ BusinessAccountUI.prototype.URLchanger = function (subLocation) {
             if (document.location.hash !== newHash) {
                 document.location.hash = newHash;
                 page = newHash;
+                M.currentdirid = page;
             }
         }
         else {
@@ -2094,6 +2118,7 @@ BusinessAccountUI.prototype.URLchanger = function (subLocation) {
             if (page !== newSubPage) {
                 history.pushState({ subpage: newSubPage }, "", "/" + newSubPage);
                 page = newSubPage;
+                M.currentdirid = page;
             }
         }
     }

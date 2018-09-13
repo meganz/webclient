@@ -345,6 +345,9 @@
                         else if (subPage === 'account') {
                             usersM.viewBusinessAccountPage();
                         }
+                        else if (subPage === 'invoices') {
+                            usersM.viewBusinessInvoicesPage();
+                        }
                         else if (subPage.indexOf('invdet!') > -1) {
                             var invId = subPage.split('!')[1];
                             usersM.viewInvoiceDetail(invId);

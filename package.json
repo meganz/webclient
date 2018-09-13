@@ -57,7 +57,7 @@
     "esformatter": "^0.9.6",
     "eslint": "^1.10.3",
     "eslint-loader": "^1.1.1",
-    "htmlhint": "0.9.12",
+    "htmlhint": "^0.10.1",
     "istanbul": "^0.4.2",
     "jscpd": "^0.6.23",
     "jscs": "~2.11.0",

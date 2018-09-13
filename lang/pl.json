@@ -2049,6 +2049,7 @@
     "18230": "Ponownie aktywuj kod QR",
     "18231": "Tw\u00f3j kod QR jest dezaktywowany.",
     "18232": "Czy chcesz ponownie aktywowa\u0107 sw\u00f3j kod QR?",
+    "18233": "Tw\u00f3j filtr nie pasuje do \u017cadnych dokument\u00f3w",
     "18238": "Ze wzgl\u0119du na mechanizmy bezpiecze\u0144stwa nie mo\u017cemy zrestartowa\u0107 Twojego has\u0142o. Upewnij si\u0119, \u017ce pami\u0119tasz swoje has\u0142o.",
     "18254": "Czy jeste\u015b zalogowany na swoje konto w innej przegl\u0105darce?",
     "18255": "Sprawd\u017a wszystkie przegl\u0105darki (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari itp.), Aby sprawdzi\u0107, czy nadal jeste\u015b zalogowany na swoim koncie. By\u0107 mo\u017ce zalogowa\u0142e\u015b si\u0119 r\u00f3wnie\u017c do MEGA na komputerze innej osoby i zapomnia\u0142e\u015b si\u0119 wylogowa\u0107.",
@@ -2748,5 +2749,7 @@
     "19511": "The payment operation failed, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
     "19512": "You successfully upgraded your account [B]%2[\/B] to %1.",
     "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
-    "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A]."
+    "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A].",
+    "19516": "Create business account",
+    "19517": "Create Business Account"
 }

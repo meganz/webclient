@@ -2049,6 +2049,7 @@
     "18230": "Reactivate QR Code",
     "18231": "Your QR code is deactivated.",
     "18232": "Do you want to reactivate your QR Code?",
+    "18233": "Your filter did not match any documents",
     "18238": "\u56e0MEGA\u4f7f\u7528\u5b89\u5168\u52a0\u5bc6\u6280\u8853\uff0c\u60a8\u5c07\u7121\u6cd5\u76f4\u63a5\u91cd\u65b0\u8a2d\u5b9a\u5bc6\u78bc\u800c\u4e0d\u907a\u5931\u4efb\u4f55\u8cc7\u6599\u3002\u6240\u4ee5\u8acb\u78ba\u4fdd\u60a8\u5df2\u7262\u8a18\u60a8\u7684\u5bc6\u78bc\u3002",
     "18254": "\u60a8\u662f\u5426\u9084\u6709\u5728\u5176\u4ed6\u7db2\u8def\u700f\u89bd\u5668\u4e2d\u767b\u5165\u81ea\u5df1\u7684\u5e33\u6236\uff1f",
     "18255": "Please check all your browsers (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari etc.) to see if you are still logged into your account. You may have also logged into MEGA on someone else\u2019s computer and forgotten to log out.",
@@ -2748,5 +2749,7 @@
     "19511": "The payment operation failed, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
     "19512": "You successfully upgraded your account [B]%2[\/B] to %1.",
     "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
-    "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A]."
+    "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A].",
+    "19516": "Create business account",
+    "19517": "Create Business Account"
 }

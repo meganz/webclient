@@ -105,7 +105,7 @@
     "258": "Downloaden",
     "368": "Opgepast:",
     "371": "Gekopie\u00ebrd naar het klembord",
-    "372": "Upload",
+    "372": "Uploaden",
     "377": "U heeft momenteel ten minste \u00e9\u00e9n bestandsoverdracht in werking.Als u verder gaat, dan zullen uw overdrachten onderbroken worden.",
     "378": "Gelieve uw wachtwoord in te voeren ter bevestiging van uw account.",
     "381": "Alle rechten voorbehouden",
@@ -2049,6 +2049,7 @@
     "18230": "QR Code heractiveren",
     "18231": "Uw QR code is gedeactiveerd",
     "18232": "Wilt u uw QR Code reactiveren?",
+    "18233": "Uw filter komt niet overeen met alle documenten",
     "18238": "Door MEGA's coderings-technologie bent u niet in staat uw wachtwoord te resetten zonder gegevens verlies. Zorg ervoor dat u uw wachtwoord onthoud.",
     "18254": "Bent u ingelogd in uw account in een andere webbrowser?",
     "18255": "Controleer al uw browsers (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari etc.) Om te zien of u nog steeds ingelogd bent in uw account. U kunt ook nog ingelogd zijn in MEGA op iemand anders computer en vergeten uit te loggen.",
@@ -2748,5 +2749,7 @@
     "19511": "The payment operation failed, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
     "19512": "You successfully upgraded your account [B]%2[\/B] to %1.",
     "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
-    "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A]."
+    "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A].",
+    "19516": "Create business account",
+    "19517": "Create Business Account"
 }

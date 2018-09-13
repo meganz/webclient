@@ -1729,16 +1729,27 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
             }
 
             var $uName = $('.input-user input.sub-n', $dialog);
+            var $uLastName = $('.input-user input.sub-n-l', $dialog);
             var $uEmail = $('.input-user input.sub-m', $dialog);
             var uNameTrimed = $uName.val().trim();
+            var uLastNameTrimed = $uLastName.val().trim();
             var uEmailTrimed = $uEmail.val().trim();
 
-            if (!uNameTrimed.length || uNameTrimed.split(' ', 2).length < 2) {
+            if (!uNameTrimed.length) {
                 $uName.addClass('error');
-                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1098]);
+                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
 
                 // monitoring input
                 $uName.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
+
+                return;
+            }
+            if (!uLastNameTrimed) {
+                $uLastName.addClass('error');
+                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
+
+                // monitoring input
+                $uLastName.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
 
                 return;
             }
@@ -1777,16 +1788,11 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
 
             loadingDialog.pshow();
 
-            var subName = uNameTrimed; // i know it's 2 parts at least
+            var subName = uNameTrimed;
+            var subLastName = uLastNameTrimed;
             var subEmail = uEmailTrimed;
-            var subFnLn = subName.split(' ');
 
-            if (subFnLn.length < 2) {
-                console.error('name does not consist of 2 parts, how did we get here?');
-                return;
-            }
-
-            var subPromise = mySelf.business.addSubAccount(subEmail, subFnLn.shift(), subFnLn.join(' '), addUserOptionals);
+            var subPromise = mySelf.business.addSubAccount(subEmail, subName, subLastName, addUserOptionals);
 
 
             var finalizeOperation = function (st,res,req) {
@@ -1814,10 +1820,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
             };
 
             subPromise.always(finalizeOperation);
-            // subPromise.fail(function (args) {
-            //    msgDialog('warninga', 'Error', l[1679]);
-            //    console.error(args);
-            // });
+
         });
 
     

@@ -54,7 +54,7 @@
     "webpack": "^1.12.9"
   },
   "devDependencies": {
-    "esformatter": "^0.9.6",
+    "esformatter": "^0.10.0",
     "eslint": "^1.10.3",
     "eslint-loader": "^1.1.1",
     "htmlhint": "^0.10.1",

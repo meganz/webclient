@@ -4,7 +4,7 @@
     "12": "Nul ne sera l\u2019objet d\u2019immixtions arbitraires dans sa vie priv\u00e9e, sa famille, son domicile ou sa correspondance ni d\u2019atteintes \u00e0 son honneur et \u00e0 sa r\u00e9putation. Toute personne a droit \u00e0 la protection de la loi contre de telles immixtions ou de telles atteintes.",
     "13": "D\u00e9claration universelle des droits de l\u2019homme.",
     "14": "Confirmer la suppression",
-    "15": "Voulez-vous vraiment supprimer d\u00e9finitivement toutes les donn\u00e9es de votre corbeille\u2009?",
+    "15": "Vous \u00eates sur le point de supprimer d\u00e9finitivement tous les \u00e9l\u00e9ments contenus dans votre corbeille.",
     "16": "Erreur interne",
     "17": "Le quota de transfert a \u00e9t\u00e9 d\u00e9pass\u00e9",
     "18": "Il y a trop de connexions pour ce t\u00e9l\u00e9chargement",
@@ -2749,5 +2749,7 @@
     "19511": "L\u2019op\u00e9ration de paiement a \u00e9chou\u00e9, veuillez ressayer ult\u00e9rieurement.\r\nSi le probl\u00e8me persiste, veuillez contacter l\u2019assistance MEGA sur https:\/\/mega.nz\/support",
     "19512": "Vous avez surclass\u00e9 votre compte [B]%2[\/B] en %1 avec succ\u00e8s.",
     "19513": "Merci ! Votre compte [B]%2[\/B] sera surclass\u00e9 d\u00e8s que nous aurons re\u00e7u la confirmation de votre paiement de notre fournisseur de services de paiement. Si vous avez pay\u00e9 par carte de d\u00e9bit ou de cr\u00e9dit, et si vous n\u2019avez pas acc\u00e8s \u00e0 votre compte MEGA PRO dans les heures qui suivent, veuillez nous contacter \u00e0 [A]support@mega.nz[\/A]. Si vous avez pay\u00e9 par transfert bancaire, la compensation du paiement peut prendre de 4 \u00e0 5 jours.",
-    "19514": "Merci\u2009! Votre compte [B]%2[\/B] sera surclass\u00e9 d\u00e8s que nous aurons re\u00e7u la confirmation de votre paiement de notre fournisseur de services de paiement, dans quelques minutes. Si vous n\u2019avez pas acc\u00e8s \u00e0 votre compte MEGA PRO dans les %1 heures qui suivent, veuillez nous contacter \u00e0 [A]support@mega.nz[\/A]."
+    "19514": "Merci\u2009! Votre compte [B]%2[\/B] sera surclass\u00e9 d\u00e8s que nous aurons re\u00e7u la confirmation de votre paiement de notre fournisseur de services de paiement, dans quelques minutes. Si vous n\u2019avez pas acc\u00e8s \u00e0 votre compte MEGA PRO dans les %1 heures qui suivent, veuillez nous contacter \u00e0 [A]support@mega.nz[\/A].",
+    "19516": "Cr\u00e9er un compte d\u2019entreprise",
+    "19517": "Cr\u00e9er un compte d\u2019entreprise"
 }

@@ -4,7 +4,7 @@
     "12": "Nadie ser\u00e1 objeto de injerencias arbitrarias en su vida privada, su familia, su domicilio o su correspondencia, ni de ataques a su honra o a su reputaci\u00f3n. Toda persona tiene derecho a la protecci\u00f3n de la ley contra tales injerencias o ataques.",
     "13": "Declaraci\u00f3n Universal de los Derechos Humanos.",
     "14": "Confirmar eliminaci\u00f3n",
-    "15": "\u00bfEsta seguro de que desea eliminar todos los elementos de la Papelera de Reciclaje?",
+    "15": "Eliminar\u00e1s permanentemente todos los elementos de la papelera.",
     "16": "Error interno",
     "17": "Cuota de transferencia excedida",
     "18": "Demasiadas conexiones para esta descarga",
@@ -2744,10 +2744,12 @@
     "19506": "Enviada",
     "19507": "El nombre de la empresa es obligatorio, completa el campo del nombre de la empresa",
     "19508": "Se ha producido un error en el servidor al intentar registrar la cuenta. Int\u00e9ntalo de nuevo m\u00e1s tarde.\r\nSi el problema persiste, ponte en contacto con el soporte de MEGA en https:\/\/mega.nz\/support",
-    "19509": "Setup automatic monthly payment for Business Account subscription",
+    "19509": "Configurar el pago mensual autom\u00e1tico para la suscripci\u00f3n a la cuenta Business",
     "19510": "Cuenta Business",
-    "19511": "The payment operation failed, please try again later.If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
-    "19512": "You successfully upgraded your account [B]%2[\/B] to %1.",
-    "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
-    "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A]."
+    "19511": "La operaci\u00f3n de pago ha fallado, int\u00e9ntalo de nuevo m\u00e1s tarde.\r\nSi el problema persiste, ponte en contacto con el soporte de MEGA en https:\/\/mega.nz\/support",
+    "19512": "Has pasado tu cuenta [B]%2[\/B] a %1.",
+    "19513": "\u00a1Gracias! Tu cuenta [B]%2[\/B] pasar\u00e1 a PRO en cuanto nuestro proveedor nos confirme el pago. Si has pagado con tarjeta de cr\u00e9dito o de d\u00e9bito y no has recibido tu cuenta PRO dentro de unas horas, por favor env\u00edanos un correo a [A]support@mega.nz[\/A] Si has pagado a trav\u00e9s de transferencia bancaria por favor espera 4-5 d\u00edas para que se confirme el pago.",
+    "19514": "\u00a1Gracias! Tu cuenta [B]%2[\/B] pasar\u00e1 a PRO en cuanto nuestro proveedor nos confirme el pago. Si no has recibido tu cuenta PRO dentro de %1 horas, por favor env\u00edanos un correo a [A]support@mega.nz[\/A].",
+    "19516": "Crear una cuenta Business",
+    "19517": "Crear una cuenta Business"
 }

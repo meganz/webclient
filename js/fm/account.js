@@ -466,7 +466,7 @@ function accountUI() {
             '<th class="no-border session-status">' + l[7664] + '</th>' +
             '<th class="no-border logout-column">&nbsp;</th></tr>';
         var numActiveSessions = 0;
-        
+
         for (i = 0; i < account.sessions.length; i++) {
             var el = account.sessions[i];
             var currentSession = el[5];
@@ -845,6 +845,8 @@ function accountUI() {
                             $('.user-name').text(u_attr.name);
                             showToast('settings', l[7698]);
                             accountUI();
+                            // update megadrop username for existing megadrop
+                            mega.megadrop.updatePUPUserName(u_attr.fullname);
                         }
                     }
                 });

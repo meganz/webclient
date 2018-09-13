@@ -4,7 +4,7 @@
     "12": "Nessuna persona sar\u00e0 soggetta ad un'interferenza arbitraria riguardante la sua privacy o quella della sua famiglia, casa o corrispondenti, n\u00e9 sar\u00e0 soggetta ad attacchi all'onore o alla reputazione. Ogni persona ha il diritto alla protezione della legge contro interferenze o attacchi simili.",
     "13": "Dichiarazione Universale dei Diritti Umani.",
     "14": "Conferma cancellazione",
-    "15": "Sei sicuro\/a che vorresti rimuovere permanentemente tutti gli oggetti dal tuo Cestino?",
+    "15": "Stai per rimuovere in modo permanente tutti gli elementi presenti nel tuo Cestino.",
     "16": "Errore interno",
     "17": "Quota di trasferimento superata",
     "18": "Troppe connessioni per questo download",
@@ -105,7 +105,7 @@
     "258": "Scaricamento in corso",
     "368": "Attenzione:",
     "371": "Copiato negli appunti",
-    "372": "Upload",
+    "372": "Invia",
     "377": "Hai almeno un trasferimento file in corso. Se continui questi trasferimenti verranno interrotti.",
     "378": "Inserire password per confermare l'account.",
     "381": "Tutti i diritti riservati",
@@ -2749,5 +2749,7 @@
     "19511": "L'operazione di pagamento \u00e8 fallita, per favore riprova pi\u00f9 tardi.\r\nSe il problema persiste, per favore contatta il supporto MEGA a https:\/\/mega.nz\/support",
     "19512": "Hai aggiornato con successo il tuo account [B]%2[\/B] a %1.",
     "19513": "Grazie! Il tuo account [B]%2[\/B] sar\u00e0 aggiornato appena riceviamo conferma del tuo pagamento dal nostro provider di pagamento. Se hai pagato con carta di debito o carta di credito e non hai ricevuto il tuo account MEGA PRO nel giro di qualche ora, per favore contattaci a [A]support@mega.nz[\/A]. Se hai pagato con un trasferimento bancario per favore permetti 4-5 giorni di tempo al pagamento per essere eseguito.",
-    "19514": "Grazie! Il tuo account [B]%2[\/B] sar\u00e0 aggiornato appena riceviamo conferma dell'avvenuto pagamento dal nostro provider di pagamento. Se non ricevi il tuo account MEGA PRO nel giro di %1 ore, per favore contattaci a [A]support@mega.nz[\/A]."
+    "19514": "Grazie! Il tuo account [B]%2[\/B] sar\u00e0 aggiornato appena riceviamo conferma dell'avvenuto pagamento dal nostro provider di pagamento. Se non ricevi il tuo account MEGA PRO nel giro di %1 ore, per favore contattaci a [A]support@mega.nz[\/A].",
+    "19516": "Crea account business",
+    "19517": "Crea account Business"
 }

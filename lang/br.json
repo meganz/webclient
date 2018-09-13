@@ -4,7 +4,7 @@
     "12": "Ningu\u00e9m ser\u00e1 sujeito a interfer\u00eancias arbitr\u00e1rias na sua vida privada, na sua fam\u00edlia, no seu domic\u00edlio ou na sua correspond\u00eancia, nem a ataques \u00e0 sua honra e reputa\u00e7\u00e3o. Toda pessoa tem o direito \u00e0 prote\u00e7\u00e3o da lei contra tais interfer\u00eancias ou ataques.",
     "13": "Declara\u00e7\u00e3o Universal dos Direitos Humanos.",
     "14": "Confirma a exclus\u00e3o",
-    "15": "Voc\u00ea tem certeza que deseja apagar permanentemente todos os itens da sua Lixeira?",
+    "15": "Voc\u00ea vai remover permanentemente os itens da sua lixeira.",
     "16": "Erro Interno",
     "17": "Cota de transfer\u00eancia excedida",
     "18": "Excesso de conex\u00f5es para este download",
@@ -2749,5 +2749,7 @@
     "19511": "N\u00e3o foi poss\u00edvel fazer o pagamento. Tente novamente mais tarde.\r\nSe o problema persistir, entre em contato com o suporte da MEGA em https:\/\/mega.nz\/support",
     "19512": "Voc\u00ea fez o upgrade da sua conta [B]%2[\/B] a %1.",
     "19513": "Obrigado! O upgrade da sua conta [B]%2[\/B] ser\u00e1 feito assim que recebermos a confirma\u00e7\u00e3o do pagamento por parte do nosso provedor. Se voc\u00ea pagou com cart\u00e3o de d\u00e9bito ou de cr\u00e9dito e e a sua conta do MEGA ainda n\u00e3o for PRO depois de algumas horas, entre em contato conosco em [A]support@mega.nz[\/A]. Se voc\u00ea fez uma transfer\u00eancia banc\u00e1ria, aguarde de quatro a cinco dias para que o pagamento seja recebido.",
-    "19514": "Obrigado! O upgrade da sua conta [B]%2[\/B] ser\u00e1 feito assim que recebermos a confirma\u00e7\u00e3o do pagamento por parte do nosso provedor, o que pode demorar alguns minutos. Se a sua conta do MEGA ainda n\u00e3o for PRO em %1 horas, entre em contato conosco em [A]support@mega.nz[\/A]."
+    "19514": "Obrigado! O upgrade da sua conta [B]%2[\/B] ser\u00e1 feito assim que recebermos a confirma\u00e7\u00e3o do pagamento por parte do nosso provedor, o que pode demorar alguns minutos. Se a sua conta do MEGA ainda n\u00e3o for PRO em %1 horas, entre em contato conosco em [A]support@mega.nz[\/A].",
+    "19516": "Criar conta business",
+    "19517": "Criar conta Business"
 }

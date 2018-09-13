@@ -59,7 +59,7 @@
     "eslint-loader": "^1.1.1",
     "htmlhint": "0.9.12",
     "istanbul": "^0.4.2",
-    "jscpd": "^0.6.22",
+    "jscpd": "^0.6.23",
     "jscs": "~2.11.0",
     "jscs-jsdoc": "^1.2.0",
     "jsdoc": "~3.3.0",

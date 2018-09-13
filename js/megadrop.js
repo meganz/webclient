@@ -1831,7 +1831,7 @@ mega.megadrop = (function() {
         var onItemCompletion = function uiOnItemCompletion(id) {
             var $item = uiOpts.window.queueItems[id].$;
 
-            $item.status.text('Complete');// l[554]
+            $item.status.text(l[554]);
         };
 
         var isDlgInit = function uiIsDlgInit() {

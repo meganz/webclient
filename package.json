@@ -78,6 +78,7 @@
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-script-launcher": "~0.1.0",
     "karma-sinon": "~1.0.4",
+    "minimatch": "^3.0.4",
     "mocha": "~1.17.1",
     "phantomjs-prebuilt": "^2.1.16",
     "plato": "^1.5.0",

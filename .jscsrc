@@ -131,6 +131,7 @@
         "aesasm.js",
         "keygen.js",
         "makecache.js",
+        "secureboot.js",
         "nacl-fast.js",
         "karma.conf.js",
         "js/chat/mpenc.js",

@@ -939,8 +939,10 @@ function accountUI() {
 
                             var done = delay.bind(null, 'bandwidthLimit', function() {
                                 api_req({"a": "up", "srvratio": Math.round(bandwidthLimit)});
+                                if (localStorage.bandwidthLimit !== undefined) {
+                                    showToast('settings', l[16168]);
+                                }
                                 localStorage.bandwidthLimit = bandwidthLimit;
-                                showToast('settings', l[16168]);
                             }, 700);
 
                             if (bandwidthLimit > 99) {

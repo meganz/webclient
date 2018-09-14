@@ -34,22 +34,22 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
         "a": "sbu", // business sub account operation
         "aa": "a", // add operation
         "m": subEmail, // email address of user to add
-        "fn": subFName, // first name of user to add (not base64 encoded like attributes are)
-        "ln": subLName // last name of user to add (also not base64 encoded)
+        "firstname": base64urlencode(to8(subFName)), // first name of user to add (not base64 encoded like attributes are)
+        "lastname": base64urlencode(to8(subLName)) // last name of user to add (also not base64 encoded)
     };
 
     if (optionals) {
         if (optionals.position) {
-            request.position = optionals.position;
+            request['%position'] = optionals.position;
         }
         if (optionals.idnum) {
-            request.idnum = optionals.idnum;
+            request['%idnum'] = optionals.idnum;
         }
         if (optionals.phonenum) {
-            request.phonenum = optionals.phonenum;
+            request['%phonenum'] = optionals.phonenum;
         }
         if (optionals.location) {
-            request.location = optionals.location;
+            request['%location'] = optionals.location;
         }
     }
 
@@ -70,8 +70,8 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
                     p: null,
                     s: 10, // pending
                     e: request.m, // assuming that the server MUST not change the requested val
-                    firstname: a32_to_base64(str_to_a32(request.fn)), // same assumption as above
-                    lastname: a32_to_base64(str_to_a32(request.ln)), // same assumption as above
+                    firstname: request.fn, // same assumption as above
+                    lastname: request.ln, // same assumption as above
                     position: request.position || '',
                     idnum: request.idnum || '',
                     phonenum: request.phonenum || '',
@@ -118,28 +118,49 @@ BusinessAccount.prototype.editSubAccount = function (subuserHandle,subEmail, sub
         "su": subuserHandle,        // sub-user handle
     };
     if (subEmail) {
-        request.email = subEmail;
+        request['email'] = subEmail;
     }
     if (subFName) {
-        request.firstname = subFName;
+        request.firstname = base64urlencode(to8(subFName));
     }
     if (subLName) {
-        request.lastname = subLName;
+        request.lastname = base64urlencode(to8(subLName));
     }
     if (optionals) {
         if (optionals.position) {
-            request.position = optionals.position;
+            request['%position'] = optionals.position;
         }
         if (optionals.idnum) {
-            request.idnum = optionals.idnum;
+            request['%idnum'] = optionals.idnum;
         }
         if (optionals.phonenum) {
-            request.phonenum = optionals.phonenum;
+            request['%phonenum'] = optionals.phonenum;
         }
         if (optionals.location) {
-            request.location = optionals.location;
+            request['%location'] = optionals.location;
         }
     }
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'string') {
+                operationPromise.resolve(1); // user edit succeeded
+            }
+            else if (typeof res === 'object') {
+                operationPromise.resolve(1, res, request); // user edit involved email change
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+                if (d) {
+                    console.error('API returned error, ret=' + res);
+                }
+            }
+        }
+
+    });
 
     return operationPromise;
 };

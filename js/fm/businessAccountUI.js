@@ -1,4 +1,5 @@
-﻿/**
+﻿
+/**
  * A UI control Class to perform Business Account related UI
  */
 function BusinessAccountUI() {
@@ -171,8 +172,12 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
 
             $currUserLeftPane.removeClass('selected');
-            var uName = from8(base64urldecode(subUsers[h].firstname)) + ' ' +
-                from8(base64urldecode(subUsers[h].lastname));
+            var uName = 'Error';
+            try {
+                var uName = from8(base64urldecode(subUsers[h].firstname)) + ' ' +
+                    from8(base64urldecode(subUsers[h].lastname));
+            }
+            catch (e) { }
             uName = uName.trim();
             $currUser.find('.fm-user-management-user .user-management-name').text(uName);
             $currUserLeftPane.find('.nw-user-management-name').text(uName);
@@ -1849,6 +1854,7 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
         return;
     }
     var subUser = M.suba[subUserHandle];
+    var mySelf = this;
 
     var $dialog = $('.user-management-edit-profile-dialog.user-management-dialog');
     var $usersContainer = $('.dialog-input-container', $dialog);
@@ -1897,16 +1903,102 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
         $locationInput.val(subUser.location);
     }
 
+    /** checks if a user attribute got changed and returns changes
+     * @returns {Object}   if changes happed it will contain changed attrs*/
+    var getchangedValues = function () {
+        var changes = Object.create(null);
+
+        var fname = $nameInput.val().trim();
+        var lname = $lnameInput.val().trim();
+        var email = $emailInput.val().trim();
+        var pos = $positionInput.val().trim();
+        var subid = $subIDInput.val().trim();
+        var tel = $phoneInput.val().trim();
+        var loc = $locationInput.val().trim();
+
+        var refPos = subUser.position || '';
+        var refId = subUser.idnum || '';
+        var refTel = subUser.phonenum || '';
+        var refLoc = subUser.location || '';
+
+        if (fname !== userAttrs.fname) {
+            changes.fname = fname;
+        }
+        if (lname !== userAttrs.fname) {
+            changes.lname = lname;
+        }
+        if (email !== subUser.e) {
+            changes.email = email;
+        }
+        if (pos !== refPos) {
+            changes.pos = pos;
+        }
+        if (subid !== refId) {
+            changes.subid = subid;
+        }
+        if (tel !== refTel) {
+            changes.tel = tel;
+        }
+        if (loc !== refLoc) {
+            changes.loc = loc;
+        }
+
+        if (Object.keys(changes).length > 0) {
+            return changes;
+        }
+        else {
+            return null;
+        }
+
+    };
+
+    var handleEditResult = function (st, res, req) {
+        closeDialog();
+        if (st === 0) {
+            msgDialog('warningb', '', l[19524]);
+            if (d) {
+                console.error(res);
+            }
+        }
+        else {
+            // no extra info ... just show operation success message
+            if (!res) {
+                msgDialog('info', '', l[19525]);
+            }
+            else {
+                // we received LP + handle --> changes included email change
+                // calling show add sub-user dialog with "result" passed will show the result dialog
+                res.m = req.m;
+                mySelf.showAddSubUserDialog(res);
+            }
+
+        }
+    };
+
     $('.user-management-subuser-avatars', $dialog).html(subUserDefaultAvatar);
 
     // close event handler
     $('.dialog-button-container .btn-edit-close, .delete-img.icon', $dialog).off('click.subuser')
         .on('click.subuser', closeDialog);
 
-    // event handler for value change
-    $('input.dialog-input', $dialog).off('change.subuser')
-        .on('change.subuser', function editSubUserFieldChangeHandler() {
+    // event handler for save button clicking
+    $('.dialog-button-container .btn-edit-save', $dialog).off('click.subuser')
+        .on('click.subuser', function editSubUserSaveButtonClickHandler() {
+            var changedVals = getchangedValues();
+            if (!changedVals) {
+                return closeDialog();
+            }
+            else {
+                var editPromise = mySelf.business.editSubAccount(subUserHandle, changedVals.email, changedVals.fname, changedVals.lname,
+                    {
+                        position: changedVals.pos,
+                        idnum: changedVals.subid,
+                        phonenum: changedVals.tel,
+                        location: changedVals.loc
+                    });
 
+                editPromise.always(handleEditResult);
+            }
         });
 
     M.safeShowDialog('sub-user-editting-dlg', function () {

@@ -2101,6 +2101,9 @@ var ConversationPanel = React.createClass({
                                        this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() ||
                                        this.loadingShown
                                    }
+                                   options={{
+                                       'suppressScrollX': true
+                                   }}
                                 >
                                 <div className="messages main-pad">
                                     <div className="messages content-area">

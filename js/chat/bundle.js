@@ -7092,7 +7092,10 @@ React.makeElement = React['createElement'];
 	                                editingMessageId: self.state.editing,
 	                                confirmDeleteDialog: self.state.confirmDeleteDialog,
 	                                renderedMessagesCount: messagesList.length,
-	                                isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown
+	                                isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown,
+	                                options: {
+	                                    'suppressScrollX': true
+	                                }
 	                            },
 	                            React.makeElement(
 	                                "div",

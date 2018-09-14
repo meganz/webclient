@@ -17,12 +17,14 @@ var PerfectScrollbar = React.createClass({
             requiresUpdateOnResize: true
         };
     },
-    doProgramaticScrollY: function(newPosY, forced) {
+    doProgramaticScroll: function(newPos, forced, isX) {
         var self = this;
         var $elem = $(ReactDOM.findDOMNode(self));
         var animFrameInner = false;
 
-        if (!forced && $elem[0] && $elem[0].scrollTop === newPosY) {
+        var prop = !isX ? 'scrollTop' : 'scrollLeft';
+
+        if (!forced && $elem[0] && $elem[0][prop] === newPos) {
             return;
         }
 
@@ -33,20 +35,20 @@ var PerfectScrollbar = React.createClass({
                 cancelAnimationFrame(animFrameInner);
                 animFrameInner = false;
             }
-            $elem.unbind('scroll.progscroll' + idx);
+            $elem.off('scroll.progscroll' + idx);
             self.isUserScroll = true;
         }).bind(this, idx));
 
         // do the actual scroll
         self.isUserScroll = false;
-        $elem[0].scrollTop = newPosY;
+        $elem[0][prop] = newPos;
         Ps.update($elem[0]);
 
         // reset the flag on next re-paint of the browser
         animFrameInner = requestAnimationFrame(function (idx) {
             animFrameInner = false;
             self.isUserScroll = true;
-            $elem.unbind('scroll.progscroll' + idx);
+            $elem.off('scroll.progscroll' + idx);
         }.bind(this, idx));
     },
     componentDidMount: function() {
@@ -98,7 +100,7 @@ var PerfectScrollbar = React.createClass({
     },
     componentWillUnmount: function() {
         var $elem = $(ReactDOM.findDOMNode(this));
-        $elem.unbind('ps-scroll-y.ps' + this.getUniqueId());
+        $elem.off('ps-scroll-y.ps' + this.getUniqueId());
     },
     eventuallyReinitialise: function(forced, scrollPositionYPerc, scrollToElement) {
         var self = this;
@@ -128,7 +130,7 @@ var PerfectScrollbar = React.createClass({
         }
 
         // triggers an
-        self.doProgramaticScrollY($elem[0].scrollTop, true);
+        self.doProgramaticScroll($elem[0].scrollTop, true);
 
         var manualReinitialiseControl = false;
         if (self.props.onReinitialise) {
@@ -156,7 +158,7 @@ var PerfectScrollbar = React.createClass({
         }
     },
     scrollToBottom: function(skipReinitialised) {
-        this.doProgramaticScrollY(9999999);
+        this.doProgramaticScroll(9999999);
 
         if (!skipReinitialised) {
             this.reinitialised(true);
@@ -223,7 +225,7 @@ var PerfectScrollbar = React.createClass({
         var $elem = $(this.findDOMNode());
         var targetPx = this.getScrollHeight()/100 * posPerc;
         if ($elem[0].scrollTop !== targetPx) {
-            this.doProgramaticScrollY(targetPx);
+            this.doProgramaticScroll(targetPx);
 
             if (!skipReinitialised) {
                 this.reinitialised(true);
@@ -234,7 +236,7 @@ var PerfectScrollbar = React.createClass({
         var $elem = $(this.findDOMNode());
         var targetPx = this.getScrollWidth()/100 * posPerc;
         if ($elem[0].scrollLeft !== targetPx) {
-            this.doProgramaticScrollY(targetPx);
+            this.doProgramaticScroll(targetPx, false, true);
             if (!skipReinitialised) {
                 this.reinitialised(true);
             }
@@ -243,7 +245,7 @@ var PerfectScrollbar = React.createClass({
     scrollToY: function(posY, skipReinitialised) {
         var $elem = $(this.findDOMNode());
         if ($elem[0].scrollTop !== posY) {
-            this.doProgramaticScrollY(posY);
+            this.doProgramaticScroll(posY);
 
             if (!skipReinitialised) {
                 this.reinitialised(true);
@@ -256,7 +258,7 @@ var PerfectScrollbar = React.createClass({
             return;
         }
 
-        this.doProgramaticScrollY(element.offsetTop);
+        this.doProgramaticScroll(element.offsetTop);
 
         if (!skipReinitialised) {
             this.reinitialised(true);

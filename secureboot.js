@@ -1907,7 +1907,7 @@ else if (!b_u) {
     jsl.push({f:langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
     jsl.push({f:'nodedec.js', n: 'nodedec_js', j:1});
-    jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j:1, w:10});
+    jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
@@ -2218,7 +2218,7 @@ else if (!b_u) {
         jsl = [{f: langFilepath, n: 'lang', j: 3}];
         jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1});
         jsl.push({f:'nodedec.js', n: 'nodedec_js', j: 1});
-        jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j: 1, w: 10});
+        jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j: 1, w: 10});
         jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
         jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j: 1});
         jsl.push({f:'html/js/embedplayer.js', n: 'embedplayer_js', j: 1, w: 4});

@@ -41,11 +41,11 @@ var EmoticonShortcutsFilter = function(megaChat) {
 
     self.emoticonsRegExp = new RegExp(regExpStr, "gi");
 
-    megaChat.bind("onBeforeRenderMessage", function(e, eventData) {
+    megaChat.on("onBeforeRenderMessage", function(e, eventData) {
         self.processMessage(e, eventData);
     });
 
-    megaChat.bind("onBeforeSendMessage", function(e, messageObject) {
+    megaChat.on("onBeforeSendMessage", function(e, messageObject) {
         var formatted = self.processMessage(e, {
             'message': {
                 'textContents': messageObject.textContents

@@ -214,7 +214,7 @@ var tooltiplogin = {
         if (email === '' || checkMail(email)) {
             $emailContainer.addClass('incorrect');
             $emailField.val('');
-            $emailField.focus();
+            $emailField.trigger("focus");
         }
         else if (password === '') {
             $emailContainer.removeClass('incorrect');

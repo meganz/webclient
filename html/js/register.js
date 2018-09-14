@@ -190,7 +190,7 @@ function continueOldRegistration(result) {
 
         passwordManager($('#register_form'));
 
-        $('.fm-dialog.registration-page-success').unbind('click');
+        $('.fm-dialog.registration-page-success').off('click');
 
         mega.ui.sendSignupLinkDialog(rv);
 
@@ -227,7 +227,7 @@ function continueNewRegistration(result) {
         // Setup the password manager
         passwordManager($('#register_form'));
 
-        $('.fm-dialog.registration-page-success').unbind('click');
+        $('.fm-dialog.registration-page-success').off('click');
 
         mega.ui.sendSignupLinkDialog(rv);
 

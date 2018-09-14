@@ -30,8 +30,8 @@ var GenericConversationMessage = React.createClass({
         if (self.isBeingEdited() && self.isMounted()) {
             var $generic = $(self.findDOMNode());
             var $textarea = $('textarea', $generic);
-            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
-                $textarea.focus();
+            if ($textarea.length > 0 && !$textarea.is(":focus")) {
+                $textarea.trigger("focus");
                 moveCursortoToEnd($textarea[0]);
             }
             if (!oldState.editing) {
@@ -63,15 +63,15 @@ var GenericConversationMessage = React.createClass({
         if (self.isBeingEdited() && self.isMounted()) {
             var $generic = $(self.findDOMNode());
             var $textarea = $('textarea', $generic);
-            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
-                $textarea.focus();
+            if ($textarea.length > 0 && !$textarea.is(":focus")) {
+                $textarea.trigger("focus");
                 moveCursortoToEnd($textarea[0]);
             }
         }
 
-        $node.delegate(
-            CLICKABLE_ATTACHMENT_CLASSES,
+        $node.rebind(
             'click.dropdownShortcut',
+            CLICKABLE_ATTACHMENT_CLASSES,
             function(e){
                 if (e.target.classList.contains('button')) {
                     // prevent recursion
@@ -106,8 +106,8 @@ var GenericConversationMessage = React.createClass({
         var self = this;
         var $node = $(self.findDOMNode());
 
-        $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
-        $node.undelegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut');
+        $(self.props.message).off('onChange.GenericConversationMessage' + self.getUniqueId());
+        $node.off('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES);
     },
     _nodeUpdated: function(h) {
         var self = this;
@@ -226,25 +226,37 @@ var GenericConversationMessage = React.createClass({
         M.addDownload([v]);
     },
     _addToCloudDrive: function(v, openSendToChat) {
-        openSaveToDialog(v, function(node, target, isForward) {
-            if (isForward) {
+        openSaveToDialog(v, function(node, target) {
+            if (Array.isArray(target)) {
                 megaChat.getMyChatFilesFolder()
-                    .done(function(myChatFolderId) {
+                    .then(function(myChatFolderId) {
                         M.injectNodes(node, myChatFolderId, function(res) {
                             if (!Array.isArray(res)) {
                                 if (d) {
                                     console.error("Failed to inject nodes. Res:", res);
                                 }
+                                return;
                             }
-                            else {
-                                // TODO:
-                                // megaChat.chats[$.mcselected].attachNodes($.selected); // 17766 // 17767
-                                megaChat.chats[$.mcselected].attachNodes(res);
+
+                            var lastRoom;
+                            for (var i = target.length; i--;) {
+                                var room = megaChat.chats[target[i]];
+                                if (room) {
+                                    room.attachNodes(res);
+                                    lastRoom = room;
+                                }
+                                else {
+                                    console.warn('Invalid room...', target[i]);
+                                }
+                            }
+
+                            if (lastRoom) {
                                 showToast('send-chat', (res.length > 1) ? l[17767] : l[17766]);
+                                M.openFolder('chat/' + (lastRoom.type === 'group' ? 'g/' : '') + lastRoom.roomId);
                             }
                         })
                     })
-                    .fail(function() {
+                    .catch(function() {
                         if (d) {
                             console.error("Failed to allocate 'My chat files' folder.", arguments);
                         }

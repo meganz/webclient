@@ -712,7 +712,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
             $('.mobile #startholder.fmholder').removeClass('no-scroll');
         }
         else {
-            $(document).unbind('keydown.parkwarn');
+            $(document).off('keydown.parkwarn');
             closeDialog();
         }
     };
@@ -767,7 +767,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
 
     M.safeShowDialog('parkwarning', function () {
         $dialog.removeClass('hidden');
-        $dialog.focus();
+        $dialog.trigger("focus");
         if (is_mobile) {
             $('.mobile.fm-dialog-container').removeClass('hidden');
         }

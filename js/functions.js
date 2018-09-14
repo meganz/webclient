@@ -343,18 +343,31 @@ function checkMail(email) {
  * @param kls class on which prototype this method should add the on, bind, unbind, etc methods
  */
 function makeObservable(kls) {
+    'use strict';
+
     var target = kls.prototype || kls;
-    var aliases = ['on', 'bind', 'unbind', 'one', 'trigger', 'rebind'];
+    var aliases = [['on'], ['off'], ['bind', 'on'], ['unbind', 'off'], ['one'], ['trigger'], ['rebind']];
 
     aliases.forEach(function(fn) {
-        target[fn] = function() {
-            // trying to save few ms here...
-            if (this && !this._$thisCache) {
-                this._$thisCache = $(this);
-            }
+        var prop = fn[0];
+        fn = fn[1] || prop;
 
-            return this._$thisCache[fn].apply(this._$thisCache, arguments);
-        };
+        Object.defineProperty(target, prop, {
+            value: function() {
+                return this.$__eventEmitter___[fn].apply(this.$__eventEmitter___, arguments);
+            },
+            writable: true,
+            configurable: true
+        });
+    });
+
+    Object.defineProperty(target, '$__eventEmitter___', {
+        get: function() {
+            // TODO: Get a real event emitter and deprecate jQuery here.
+            Object.defineProperty(this, '$__eventEmitter___', {value: $(this)});
+            return this.$__eventEmitter___;
+        },
+        configurable: true
     });
 
     target = aliases = kls = undefined;
@@ -1025,7 +1038,7 @@ function moveCursortoToEnd(el) {
         range.collapse(false);
         range.select();
     }
-    $(el).focus();
+    $(el).trigger("focus");
 }
 
 function asyncApiReq(data) {
@@ -1323,29 +1336,23 @@ function generateAnonymousReport() {
             return;
         }
         promises.push(
-            $.ajax({
-                url: self.src,
-                dataType: "text"
-            })
-            .done(function(r) {
-                report.scripts[src] = [
-                        MurmurHash3(r, 0x4ef5391a),
-                        r.length
-                    ];
-            })
-            .fail(function(r) {
-                report.scripts[src] = false;
-            })
+            M.xhr({type: "text", url: self.src})
+                .then(function(ev, r) {
+                    report.scripts[src] = [MurmurHash3(r, 0x4ef5391a), r.length];
+                })
+                .catch(function() {
+                    report.scripts[src] = false;
+                })
         );
     });
 
     report.version = null; // TODO: how can we find this?
 
     MegaPromise.allDone(promises)
-        .done(function() {
+        .then(function() {
             $promise.resolve(report);
         })
-        .fail(function() {
+        .catch(function() {
             $promise.resolve(report)
         });
 

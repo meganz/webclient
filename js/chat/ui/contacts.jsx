@@ -608,13 +608,10 @@ var ContactPickerWidget = React.createClass({
     componentDidUpdate: function() {
 
         var self = this;
-        if (self.scrollToLastSelected && self.jspSelected) {
+        if (self.scrollToLastSelected && self.psSelected) {
             // set the flag back to false, so on next updates we won't scroll to the last item again.
             self.scrollToLastSelected = false;
-            var $jsp = $(self.jspSelected.findDOMNode()).data('jsp');
-            if ($jsp) {
-                $jsp.scrollToPercentX(1, false);
-            }
+            self.psSelected.scrollToPercentX(100, false);
         }
 
     },
@@ -645,7 +642,7 @@ var ContactPickerWidget = React.createClass({
         var self = this;
 
         if (self.props.multiple) {
-            $(document.body).unbind('keypress.contactPicker' + self.getUniqueId());
+            $(document.body).off('keypress.contactPicker' + self.getUniqueId());
         }
     },
     render: function() {
@@ -736,46 +733,25 @@ var ContactPickerWidget = React.createClass({
                     }</div>
                 </div>;
             }
-            else if (self.state.selected.length === 1) {
-                self.state.selected.forEach(function(v, k) {
+            else {
+                (self.state.selected || []).forEach(function (v, k) {
                     contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
                                                        key={v}
-                    /> );
+                    />);
                 });
-                footer = <div className="contacts-search-footer">
-                        <PerfectScrollbar className="selected-contact-block" selected={this.state.selected}>
-                            <div className="select-contact-centre" style={{width : selectedWidth}}>
-                                {contactsSelected}
-                            </div>
-                        </PerfectScrollbar>
-                    <div className="fm-dialog-footer">
-                        <span className="selected-contact-amount">
-                            {self.state.selected.length} contacts selected
-                        </span>
-                        <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
-                            {self.props.singleSelectedButtonLabel ? self.props.singleSelectedButtonLabel : l[5885]}
-                        </a>
-                    </div>
-                </div>
-            }
-            else if (self.state.selected.length > 1) {
-                self.state.selected.forEach(function(v, k) {
-                    contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
-                                                       key={v}
-                    /> );
-                });
+
 
                 footer =
                     <div className="contacts-search-footer">
-                        <utils.JScrollPane className="selected-contact-block horizontal-only"
+                        <PerfectScrollbar className="perfectScrollbarContainer selected-contact-block horizontal-only"
                                           selected={this.state.selected}
-                                          ref={function(jspSelected) {
-                                              self.jspSelected = jspSelected;
+                                          ref={function (psSelected) {
+                                              self.psSelected = psSelected;
                                           }}>
-                            <div className="select-contact-centre" style={{width : selectedWidth}}>
+                            <div className="select-contact-centre" style={{width: selectedWidth}}>
                                 {contactsSelected}
                             </div>
-                        </utils.JScrollPane>
+                        </PerfectScrollbar>
                         <div className="fm-dialog-footer">
                             <span className="selected-contact-amount">
                                 {self.state.selected.length} contacts selected

@@ -140,13 +140,13 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
-        var c = $(ui.draggable.context).attr('class');
+        var c = $(ui.draggable).attr('class');
         var t, ids, dd;
 
 
         if (c && c.indexOf('nw-fm-tree-item') > -1) {
             // tree dragged:
-            var id = $(ui.draggable.context).attr('id');
+            var id = $(ui.draggable).attr('id');
             if (id.indexOf('treea_') > -1) {
                 ids = [id.replace('treea_', '')];
             }
@@ -191,7 +191,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             else if (
                 $(e.target).is('ul.conversations-pane > li') ||
-                $(e.target).closest('ul.conversations-pane > li').size() > 0 ||
+                $(e.target).closest('ul.conversations-pane > li').length > 0 ||
                 $(e.target).is('.messages-block')
             ) {
                 if (M.isFile(ids)) {
@@ -1118,7 +1118,7 @@ FileManager.prototype.initContextUI = function() {
             $('.fm-dialog-title', $dialog).text(l[5631] + ' "' + M.d[$.selected].name + '"');
             $('.multiple-input .token-input-token-mega', $dialog).remove();
             dialogPositioning($dialog);
-            $('.token-input-input-token-mega input', $dialog).focus();
+            $('.token-input-input-token-mega input', $dialog).trigger("focus");
 
             return $dialog;
         };
@@ -1440,7 +1440,7 @@ FileManager.prototype.createFolderUI = function() {
             setTimeout(function () {
                 $inputWrapper.removeClass('error');
                 $input.removeClass('error');
-                $input.focus();
+                $input.trigger("focus");
             }, 2000);
         }
         else {
@@ -1451,7 +1451,7 @@ FileManager.prototype.createFolderUI = function() {
                 setTimeout(function () {
                     $inputWrapper.removeClass('duplicate');
                     $input.removeClass('error');
-                    $input.focus();
+                    $input.trigger("focus");
                 }, 2000);
 
                 return;
@@ -1489,7 +1489,7 @@ FileManager.prototype.createFolderUI = function() {
             b1.addClass('active');
             d1.removeClass('hidden');
             topPopupAlign(this, '.dropdown.create-new-folder');
-            $('.create-new-folder input').focus();
+            $('.create-new-folder input').trigger("focus");
         }
         else {
             b1.removeClass('active filled-input');
@@ -1516,7 +1516,7 @@ FileManager.prototype.createFolderUI = function() {
             $('.create-folder-dialog input').val(v);
         }
 
-        $('.create-new-folder input').focus();
+        $('.create-new-folder input').trigger("focus");
         $('.create-new-folder').removeClass('filled-input');
         $('.create-new-folder').addClass('hidden');
         $('.fm-new-folder').removeClass('active');
@@ -1539,7 +1539,7 @@ FileManager.prototype.createFolderUI = function() {
 
         createFolderDialog(1);
         $('.create-folder-dialog input').val('');
-        $('.create-new-folder input').focus();
+        $('.create-new-folder input').trigger("focus");
     });
 
     $('.create-new-folder input').rebind('keyup.create-new-f', function(e) {
@@ -2319,8 +2319,8 @@ FileManager.prototype.contactsUI = function() {
         $('.dropdown.tooltip.small').removeClass('visible');
     });
 
-    $publicLink.rebind('click', function(e) {
-        var linkData = $(this).attr('data-lnk');
+    $publicLink.rebind('click', function() {
+        var linkData = $(this).attr('data-lnk') || '';
 
         if (linkData.length) {
             copyToClipboard(linkData, l[371] + '<span>' + linkData + '</span>', 'short');
@@ -2534,7 +2534,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     $.gridHeader = function() {
         var headerColumn = '';
         var $firstChildTd = $('.grid-table tr:first-child td:visible');
-        if ($firstChildTd.size() === 0) {
+        if ($firstChildTd.length === 0) {
             // if the first <tr> does not contain any TDs, pick the next one
             // this can happen when MegaList's prepusher (empty <TR/> is first)
             $firstChildTd = $('.grid-table tr:nth-child(2) td:visible');
@@ -2628,14 +2628,14 @@ FileManager.prototype.addGridUI = function(refresh) {
         $.gridHeader();
     }
 
-    if (folderlink) {
-        $('.grid-url-arrow').hide();
-        $('.grid-url-header').text('');
-    }
-    else {
+    // if (folderlink) {
+    //    $('.grid-url-arrow').hide();
+    //    $('.grid-url-header').text('');
+    // }
+    // else {
         $('.grid-url-arrow').show();
         $('.grid-url-header').text('');
-    }
+    // }
 
     $('.fm .grid-table-header th:nth-child(5)').rebind('contextmenu.column_time', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
@@ -3365,7 +3365,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         'conversations opc ipc inbox account dashboard transfers'
     ).addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
-    $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
+    $('.fm-import-to-cloudrive, .fm-download-as-zip').off('click');
 
     $('.fm-main').removeClass('active-folder-link');
     $('.nw-fm-tree-header.folder-link').hide();
@@ -3595,7 +3595,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
         }
 
         var closeDialog = function() {
-            $strgdlg.unbind('dialog-closed');
+            $strgdlg.off('dialog-closed');
             window.closeDialog();
 
             promise.resolve();

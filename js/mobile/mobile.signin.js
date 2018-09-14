@@ -122,7 +122,7 @@ mobile.signin = {
             }
 
             // Unfocus (blur) the input fields to prevent the cursor showing on iOS and also hide the keyboard
-            $emailField.add($passwordField).blur();
+            $emailField.add($passwordField).trigger("blur");
 
             // Hide the text and show a loading spinner
             $signInButton.addClass('loading');

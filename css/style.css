@@ -2308,6 +2308,12 @@ a.nt-settings-button:hover span {
 * html .jspCorner {
     margin: 0 -3px 0 0;
 }
+
+.jspHorizontalBar {
+    /* If you do require horizontal scrollbars, don't use jScrollPane - we're deprecating it anyway */
+    display: none !important;
+}
+
 ul.tagit {
     overflow: auto;
     margin-left: inherit;
@@ -22243,6 +22249,7 @@ table.speed-table {
     border-radius: 8px;
     right: 2px;
 }
+
 div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
@@ -22250,11 +22257,29 @@ div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
     height: 8px;
     bottom: 2px;
 }
-.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y,
 .ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
     opacity: 0.3 !important;
     background-color: rgb(0, 0, 0) !important;
 }
+
+.ps-container > .ps-scrollbar-x-rail {
+    opacity:  1 !important;
+    cursor: pointer;
+}
+
+.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
+    opacity: 0.2 !important;
+    background-color: rgb(0, 0, 0) !important;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+}
+.ps-container > .ps-scrollbar-x-rail:hover > .ps-scrollbar-x {
+    opacity: 0.3 !important;
+}
+
 body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-start-conversation, body.megaChatDisabled .nw-contact-name .button.start-chat-button {
     display: none;
 }

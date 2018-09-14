@@ -134,7 +134,7 @@ mobile.downloadOverlay = {
             var preventDialog = function() {
                 clearTimeout(timeout);
                 timeout = null;
-                $(window).unbind(events.join(ns) + ns);
+                $(window).off(events.join(ns) + ns);
             };
 
             var redirectToStore = function() {
@@ -145,7 +145,7 @@ mobile.downloadOverlay = {
                 var ms = 500;
 
                 preventDialog();
-                $(window).bind(events.join(ns) + ns, preventDialog);
+                $(window).rebind(events.join(ns) + ns, preventDialog);
 
                 window.location = appLink;
 

@@ -19,7 +19,7 @@ module.exports = function(config) {
         'test/test_utils.js',
 
         // == Basics ==
-        'js/vendor/jquery-2.2.1.js',
+        'js/vendor/jquery.js',
         'js/vendor/jquery-ui.js',
         'js/vendor/jquery.jscrollpane.js',
         'js/vendor/jquery.mousewheel.js',

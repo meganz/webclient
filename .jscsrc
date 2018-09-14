@@ -104,8 +104,6 @@
 
     "maxErrors": -1,
 
-    "disallowEmptyBlocks": false,
-
     "fileExtensions": [".js", ".jsx"],
 
     "excludeFiles": [

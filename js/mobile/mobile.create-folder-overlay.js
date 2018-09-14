@@ -34,7 +34,7 @@ mobile.createFolderOverlay = {
         this.$lightBackgroundOverlay.removeClass('hidden');
 
         // Clear the input from old dialog openings and open the keyboard for typing
-        this.$overlay.find('.folder-name-input').val('').focus();
+        this.$overlay.find('.folder-name-input').val('').trigger("focus");
     },
 
     /**
@@ -100,7 +100,7 @@ mobile.createFolderOverlay = {
 
                             // Click out of the input to hide the on screen keyboard which
                             // is a bug on mobile Firefox with the keyboard not closing
-                            $folderNameInput.blur();
+                            $folderNameInput.trigger("blur");
 
                             // Show message 'Folder created'
                             mobile.showToast(l[5645]);
@@ -142,7 +142,7 @@ mobile.createFolderOverlay = {
 
             // Click out of the input to hide the on screen keyboard which
             // fixes a bug on mobile Firefox with the keyboard not closing
-            $folderNameInput.blur();
+            $folderNameInput.trigger("blur");
 
             // Prevent double taps
             return false;

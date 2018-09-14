@@ -6,9 +6,9 @@
 
     function closeRegisterDialog($dialog, isUserTriggered) {
         closeDialog();
-        $(window).unbind('resize.proregdialog');
-        $('.fm-dialog-overlay').unbind('click.proDialog');
-        $('.fm-dialog-close', $dialog).unbind('click.proDialog');
+        $(window).off('resize.proregdialog');
+        $('.fm-dialog-overlay').off('click.proDialog');
+        $('.fm-dialog-close', $dialog).off('click.proDialog');
 
         if (isUserTriggered && options.onDialogClosed) {
             options.onDialogClosed($dialog);
@@ -45,7 +45,7 @@
 
             hideOverlay();
             closeRegisterDialog($dialog);
-            $('.fm-dialog.registration-page-success').unbind('click');
+            $('.fm-dialog.registration-page-success').off('click');
 
             if (login) {
                 Soon(function() {
@@ -415,7 +415,7 @@
                         console.error('sendsignuplink failed', res);
 
                         $button.addClass('disabled');
-                        $button.unbind('click');
+                        $button.off('click');
 
                         var tick = 26;
                         var timer = setInterval(function() {

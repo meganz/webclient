@@ -867,8 +867,8 @@ var ConversationsApp = React.createClass({
                 }
 
                 var $typeArea = $('.messages-textarea:visible:first');
-                if ($typeArea.size() === 1 && !$typeArea.is(":focus")) {
-                    $typeArea.focus();
+                if ($typeArea.length === 1 && !$typeArea.is(":focus")) {
+                    $typeArea.trigger("focus");
                     e.megaChatHandled = true;
                     moveCursortoToEnd($typeArea[0]);
                 }
@@ -944,7 +944,7 @@ var ConversationsApp = React.createClass({
     },
     componentWillUnmount: function() {
         window.removeEventListener('resize', this.handleWindowResize);
-        $(document).unbind('keydown.megaChatTextAreaFocus');
+        $(document).off('keydown.megaChatTextAreaFocus');
         mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
     },
     componentDidUpdate: function() {

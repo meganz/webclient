@@ -59,6 +59,7 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
                 operationPromise.reject(0, res, 'API returned error', request);
             }
             else if (typeof res === 'object') {
+                // this must be re done
                 // since no action packet will be sent for sub-user adding
                 // and since the return handle + password is a true confirmation of success
                 // we will simulate the effect locally 

@@ -1,4 +1,106 @@
 /**
+ * Logic for the Account forms Inputs behaviour
+*/
+var accountinputs = {
+
+    /**
+     * Initialise inputs events
+     * @param {Object} $formWrapper. DOM form wrapper.
+     */
+    init: function($formWrapper) {
+        "use strict";
+
+        if (!$formWrapper.length) {
+            return false;
+        }
+
+        var $loginForm = $formWrapper.find('form');
+        var $inputs = $('.account.input-wrapper input',  $loginForm);
+        var $checkbox = $loginForm.find('.account.checkbox-block input');
+        var $button = $loginForm.find('.big-red-button');
+
+        $loginForm.removeClass('both-incorrect-inputs');
+        $inputs.parent().removeClass('incorrect');
+
+        $inputs.rebind('click.commonevent', function() {
+            $(this).parent().removeClass('incorrect');
+            $loginForm.removeClass('both-incorrect-inputs');
+        });
+
+        $inputs.rebind('focus.commonevent', function() {
+            $(this).parent().addClass('focused');
+        });
+
+        $inputs.rebind('blur.commonevent', function() {
+            $(this).parent().removeClass('focused');
+        });
+
+        $inputs.rebind('keydown.commonevent', function(e) {
+            $loginForm.removeClass('both-incorrect-inputs');
+            $inputs.parent().removeClass('incorrect');
+        });
+
+        $checkbox.rebind('focus.commonevent', function() {
+            $(this).parents('.checkbox-block').addClass('focused');
+        });
+
+        $checkbox.rebind('blur.commonevent', function() {
+            $(this).parents('.checkbox-block').removeClass('focused');
+        });
+
+        $checkbox.rebind('keydown.commonevent', function (e) {
+            if (e.keyCode === 9) {
+                e.preventDefault();
+                $(this).blur();
+                $button.focus().addClass('focused');
+            }
+            else if (e.keyCode === 32) {
+                var $wrapper = $(this).parent().find('.checkbox');
+
+                if ($wrapper.hasClass('checkboxOn')) {
+                    $wrapper.addClass('checkboxOff').removeClass('checkboxOn');
+                }
+                else {
+                    $wrapper .addClass('checkboxOn').removeClass('checkboxOff');
+                }
+            }
+        });
+
+        $button.rebind('click.commonevent', function() {
+            $button.removeClass('focused');
+        });
+
+        $button.rebind('keydown.commonevent', function (e) {
+            if (e.keyCode === 9) {
+                e.preventDefault();
+                $inputs.first().focus();
+            }
+        });
+
+        $button.rebind('blur.commonevent', function() {
+            $(this).removeClass('focused');
+        });
+
+        $('.radio-txt, .checkbox', $formWrapper).rebind('click.commonevent', function(e) {
+            var $wrapper = $(this).parent().find('.checkbox');
+    
+            $wrapper.parent().removeClass('focused');
+    
+            if ($wrapper.hasClass('checkboxOn')) {
+                $wrapper.addClass('checkboxOff').removeClass('checkboxOn');
+            }
+            else {
+                $wrapper .addClass('checkboxOn').removeClass('checkboxOff');
+            }
+        });
+
+        Soon(function() {
+            $inputs.first().focus()
+        });
+    }
+};
+
+/**
  * Logic for the top navigation bar's signin tooltip
  */
 var tooltiplogin = {
@@ -12,137 +114,80 @@ var tooltiplogin = {
         'use strict';
 
         var $dialog = $('.dropdown.top-login-popup');
+        var $inputs;
+        var $checkbox;
+        var $button;
 
         if (close) {
             $dialog.find('form').empty();
             $dialog.addClass('hidden');
-            $(document).off('keydown.logingpopup');
             return false;
         }
 
         $dialog.find('form').replaceWith(getTemplate('top-login'));
+
+        $inputs = $('.account.input-wrapper input',  $dialog);
+        $button = $dialog.find('.big-red-button');
 
         if (localStorage.hideloginwarning || is_extension) {
             $dialog.find('.top-login-warning').addClass('hidden');
             $dialog.find('.login-notification-icon').removeClass('hidden');
         }
 
-        $dialog.find('.login-checkbox, .radio-txt').rebind('click', function() {
-
-            var c = $dialog.find('.login-checkbox').attr('class');
-            if (c.indexOf('checkboxOff') > -1) {
-                $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOn');
-            }
-            else {
-                $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOff');
-            }
-        });
-
-        $('.top-login-forgot-pass').rebind('click', function() {
-            loadSubPage('recovery');
-            tooltiplogin.init(1);
-        });
-
-        $('.top-dialog-login-button').rebind('click', function() {
+        $('.top-dialog-login-button', $dialog).rebind('click', function() {
             tooltiplogin.startLogin();
         });
 
-        $('.top-login-full').rebind('click', function() {
+        $('.top-login-full', $dialog).rebind('click', function() {
             tooltiplogin.init(1);
             loadSubPage('login');
         });
 
-        $(document).off('keydown.logingpopup').on('keydown.logingpopup', function(e) {
-
-            if ($('.dropdown.top-login-popup').hasClass('hidden')) {
-                $(document).off('keydown.logingpopup');
-                return;
-            }
-            if (e.keyCode === 32) { // space
-                if (document.activeElement !== $('#login-name', $dialog)[0]
-                    && document.activeElement !== $('#login-password', $dialog)[0]) {
-                    var c = $dialog.find('.login-checkbox').attr('class');
-                    if (c.indexOf('checkboxOff') > -1) {
-                        $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOn');
-                    }
-                    else {
-                        $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOff');
-                    }
-                    return false;
-                }
-            }
-            if (e.keyCode === 13) { // enter
-                tooltiplogin.startLogin();
-                return false;
-            }
-        });
-
-        $('#login-password, #login-name', $dialog).rebind('keydown.toplogintooltip', function (e) {
-
-            $('.top-login-pad').removeClass('both-incorrect-inputs');
-            $('.top-login-input-tooltip.both-incorrect').removeClass('active');
-            $('.top-login-input-block.password').removeClass('incorrect');
-            $('.top-login-input-block.e-mail').removeClass('incorrect');
-
+        $inputs.rebind('keydown.loginpopup', function(e) {
             if (e.keyCode === 13) {
                 tooltiplogin.startLogin();
                 return false;
             }
         });
 
-        $('.top-login-warning-close').rebind('click', function() {
-            if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
-                localStorage.hideloginwarning = 1;
-            }
-            $('.top-login-warning').removeClass('active');
-            $('.login-notification-icon').removeClass('hidden');
+        $button.rebind('click.loginpopup', function() {
+            tooltiplogin.startLogin();
         });
 
-        $('.login-notification-icon').rebind('click', function() {
-            $('.top-login-warning').removeClass('hidden');
-            $('.top-login-warning').addClass('active');
+        $button.rebind('keydown.loginpopup', function (e) {
+            if (e.keyCode === 13) {
+                tooltiplogin.startLogin();
+            }
+        });
+
+        $('.top-login-warning-close', $dialog).rebind('click', function() {
+            if ($('.loginwarning-checkbox', $dialog).hasClass('checkboxOn')) {
+                localStorage.hideloginwarning = 1;
+            }
+            $('.top-login-warning', $dialog).removeClass('active');
+            $('.login-notification-icon', $dialog).removeClass('hidden');
+        });
+
+        $('.login-notification-icon', $dialog).rebind('click', function() {
+            $('.top-login-warning', $dialog).removeClass('hidden');
+            $('.top-login-warning', $dialog).addClass('active');
             $(this).addClass('hidden');
         });
 
-        $('.top-login-input-block').rebind('click', function() {
-            $(this).find('input').focus();
-        });
-
-        $('.top-login-input-block.password input, .top-login-input-block.e-mail input').rebind('blur.toplogintooltip',
-            function() {
-                $(this).parents('.top-login-input-block').removeClass('focused');
-            })
-            .rebind('focus', function() {
-                $(this).parents('.top-login-input-block').addClass('focused');
-            }
-        );
-
-        $('.loginwarning-checkbox,.top-login-warning .radio-txt').rebind('click', function() {
-
-            var c = '.loginwarning-checkbox';
-            var c2 = $(c).attr('class');
-
-            $(c).removeClass('checkboxOn checkboxOff');
-            if (c2.indexOf('checkboxOff') > -1) {
-                $(c).addClass('checkboxOn');
-            }
-            else {
-                $(c).addClass('checkboxOff');
-            }
-        });
-
-        $('.dropdown.top-login-popup').removeClass('hidden');
-        $('#login-name', $dialog).focus();
+        $dialog.removeClass('hidden');
 
         if ($('body').hasClass('logged')) {
             topPopupAlign('.top-head .user-name', '.dropdown.top-login-popup', 40);
         }
         else {
-            topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
+            topPopupAlign('.top-login-button:visible', '.dropdown.top-login-popup', 40);
         }
         if (is_chrome_firefox) {
             mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header');
         }
+
+        // Init inputs events
+        accountinputs.init($dialog);
     },
 
     /**
@@ -153,13 +198,13 @@ var tooltiplogin = {
         'use strict';
 
         var $topLoginPopup = $('.top-login-popup');
-        var $emailContainer = $topLoginPopup.find('.top-login-input-block.e-mail');
-        var $passwordContainer = $topLoginPopup.find('.top-login-input-block.password');
+        var $loginForm = $topLoginPopup.find('.account.top-login-form');
+        var $emailContainer = $topLoginPopup.find('.account.input-wrapper.email');
         var $emailField = $topLoginPopup.find('#login-name');
         var $passwordField = $topLoginPopup.find('#login-password');
         var $loginButton = $topLoginPopup.find('.top-dialog-login-button');
         var $loginWarningCheckbox = $topLoginPopup.find('.loginwarning-checkbox');
-        var $loginRememberCheckbox = $topLoginPopup.find('.login-checkbox');
+        var $loginRememberCheckbox = $topLoginPopup.find('.login-check');
 
         var email = $emailField.val();
         var password = $passwordField.val();
@@ -172,7 +217,9 @@ var tooltiplogin = {
             $emailField.focus();
         }
         else if (password === '') {
-            $passwordContainer.addClass('incorrect');
+            $emailContainer.removeClass('incorrect');
+            $loginForm.addClass('both-incorrect-inputs');
+            $passwordField.focus();
         }
         else {
             $loginButton.addClass('loading');
@@ -237,11 +284,17 @@ var tooltiplogin = {
      * @param {Number} result If the result is negative there is an error, if positive it is the user type
      */
     completeLogin: function(result) {
-
         'use strict';
 
+        var $topLoginPopup = $('.top-login-popup');
+        var $loginForm = $topLoginPopup.find('.account.top-login-form');
+        var $emailContainer = $topLoginPopup.find('.account.input-wrapper.email');
+        var $passwordContainer = $topLoginPopup.find('.account.input-wrapper.password');
+        var $passwordField = $passwordContainer.find('input');
+        var $button = $topLoginPopup.find('.top-dialog-login-button');
+
         // Remove loading spinner on the button
-        $('.top-dialog-login-button').removeClass('loading');
+        $button.removeClass('loading');
 
         // Check and handle the common login errors
         if (security.login.checkForCommonErrors(result, tooltiplogin.old.startLogin, tooltiplogin.new.startLogin)) {
@@ -268,10 +321,10 @@ var tooltiplogin = {
         else {
             // Close the 2FA dialog for a generic error
             twofactor.loginDialog.closeDialog();
-
-            $('.top-login-pad').addClass('both-incorrect-inputs');
-            $('.top-login-input-tooltip.both-incorrect').addClass('active');
-            $('#login-password').select();
+            $passwordField.focus();
+            $emailContainer.removeClass('incorrect');
+            $loginForm.addClass('both-incorrect-inputs');
+            $passwordField.select();
         }
     }
 };

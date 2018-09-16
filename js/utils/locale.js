@@ -384,7 +384,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l['472c'] = l[472].replace('[X]', 250);
     l['208a'] = l[208].replace('[A]', '<a href="/terms" class="red clickurl">');
     l['208a'] = l['208a'].replace('[/A]', '</a>');
-    l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl">');
+    l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl" tabindex="-1">');
     l[208] = l[208].replace('[/A]', '</a>');
     l[517] = l[517].replace('[A]', '<a href="/help" class="help-center-link clickurl">').replace('[/A]', '</a>');
     l[521] = l[521].replace('[A]', '<a href="/copyright" class="clickurl">').replace('[/A]', '</a>');
@@ -433,7 +433,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[1957] = l[1957].replace('[A]', '<a href="/recovery" class="clickurl">').replace('[/A]', '</a>');
     l[1965] = l[1965].replace('[A]', '<a href="/recovery" class="clickurl">').replace('[/A]', '</a>');
     l[1982] = l[1982].replace('[A]', '<font style="color:#D21F00;">').replace('[/A]', '</font>');
-    l[1993] = l[1993].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[1993] = l[1993].replace('[A]', '<a href="/register" class="clickurl">').replace('[/A]', '</a>');
 
     l[5931] = l[5931].replace('[A]', '<a class="red" href="/fm/account" class="clickurl">').replace('[/A]', '</a>');
     l[6962] = l[6962].replace('%1', '<span class="plan-name"></span>');

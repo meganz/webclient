@@ -125,13 +125,12 @@ var signin = {
         }
         else {
             // Show a failed login
-            $('.login-register-input.password').addClass('incorrect');
-            $('.login-register-input.email').addClass('incorrect');
+            $('.account.login-form').addClass('both-incorrect-inputs');
 
             // Close the 2FA dialog for a generic error
             twofactor.loginDialog.closeDialog();
 
-            msgDialog('warninga', l[135], l[7431], false, function() {
+            msgDialog('warninga', l[135], l[7431] + '.', false, function() {
                 $('#login-password2').val('');
                 $('#login-name2').select();
             });
@@ -143,6 +142,9 @@ var login_txt = false;
 var login_email = false;
 
 function doConfirm(email, password, callback) {
+    'use strict';
+
+    var $formWrapper = $('.main-mid-pad.login form');
 
     if (u_signupenck) {
         if (checksignuppw(password)) {
@@ -193,8 +195,9 @@ function doConfirm(email, password, callback) {
                 $('.mobile.signin-register-block .signin-button').removeClass('loading');
             }
             else {
-                $('#login-password2').val('');
-                $('.login-register-input.password').addClass('incorrect');
+                $('.account.input-wrapper.password input', $formWrapper).val('');
+                $('.account.input-wrapper', $formWrapper).removeClass('incorrect');
+                $('.account.login-form', $formWrapper).addClass('both-incorrect-inputs');
                 msgDialog('warninga', l[135], l[201]);
             }
         }
@@ -202,6 +205,7 @@ function doConfirm(email, password, callback) {
 }
 
 function postLogin(email, password, pinCode, remember, loginCompletionCallback) {
+    'use strict';
 
     // A little helper to pass only the final result of the User Get (ug) API request
     // i.e. the (user type or error code) back to the loginCompletionCallback function
@@ -220,29 +224,38 @@ function postLogin(email, password, pinCode, remember, loginCompletionCallback) 
 }
 
 function pagelogin() {
-    var e = $('#login-name2').val();
+    'use strict';
+
+    var $formWrapper = $('.main-mid-pad.login form');
+    var $emailContainer = $formWrapper.find('.account.input-wrapper.email');
+    var $email = $emailContainer.find('input');
+    var $passwordContainer = $formWrapper.find('.account.input-wrapper.password');
+    var $password = $passwordContainer.find('input');
+    
+    var e = $email.val();
     if (e === '' || checkMail(e)) {
-        $('.login-register-input.email').addClass('incorrect');
-        $('#login-name2').focus();
+        $emailContainer.addClass('incorrect');
+        $email.focus();
     }
     else if ($('#login-password2').val() === '') {
-        $('.login-register-input.password').addClass('incorrect');
-        $('#login-password2').focus();
+        $formWrapper.find('.account.input-wrapper').removeClass('incorrect');
+        $formWrapper.addClass('both-incorrect-inputs');
+        $password.focus();
     }
     else {
         loadingDialog.show();
-        $('.top-dialog-login-button').addClass('loading');
-        if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
+        $formWrapper.find('.top-dialog-login-button').addClass('loading');
+        if ($formWrapper.find('.loginwarning-checkbox').hasClass('checkboxOn')) {
             localStorage.hideloginwarning = 1;
         }
 
-        var email = $('#login-name2').val();
-        var password = $('#login-password2').val();
+        var email = $email.val();
+        var password = $password.val();
         var rememberMe = false;
         var twoFactorPin = null;
 
         // XXX: Set remember on by default if confirming a freshly created account
-        if (confirmok || $('.login-check').hasClass('checkboxOn')) {
+        if (confirmok || $formWrapper.find('.login-check').hasClass('checkboxOn')) {
             rememberMe = true;
         }
 
@@ -254,22 +267,28 @@ function pagelogin() {
 }
 
 function init_login() {
+    'use strict';
+
+    var $formWrapper = $('.main-mid-pad.login');
+    var $inputs = $formWrapper.find('.account.input-wrapper input');
+    var $button = $formWrapper.find('.big-red-button');
+
     if (login_email) {
-        $('#login-name2').val(login_email);
+        $('#login-name2', $formWrapper).val(login_email);
     }
 
     if (confirmok) {
+        $('.main-left-block').addClass('confirm');
         $('.register-st2-txt-block').addClass('hidden');
-        $('.login-page-create-new').addClass('hidden');
+        $('.account.small-header-txt').addClass('hidden');
         $('.top-login-forgot-pass').addClass('hidden');
         $('.main-top-info-block').removeClass('hidden');
-        $('.register-st2-button-arrow').text(l[1131]);
-        $('.main-italic-header.login').text(l[1131]);
+        $('.big-red-button.login-button').text(l[1131]);
+        $('.account.top-header.login').text(l[1131]);
         $('.main-top-info-text').text(l[378]);
         $('.login-check').addClass('hidden').next().addClass('hidden');
     }
     else {
-        $('.register-st2-button').addClass('active');
         if (login_txt) {
             $('.main-top-info-block').removeClass('hidden');
             $('.main-top-info-text').text(login_txt);
@@ -277,51 +296,24 @@ function init_login() {
         }
     }
 
-    $('#login-name2,#login-password2').rebind('focus', function(e) {
-        $(this).parents('.login-register-input').addClass('focused');
-    });
-    $('#login-name2,#login-password2').rebind('blur', function(e) {
-        $(this).parents('.login-register-input').removeClass('focused');
-    });
-
-    $('#login-password2, #login-name2').rebind('keydown', function(e) {
-        if ($('#login-name2').val() !== '' && $('#login-password2').val() !== '') {
-            $('.register-st2-button').addClass('active');
-        }
-        $('.login-register-input.password').removeClass('incorrect');
-        $('.login-register-input.email').removeClass('incorrect');
+    $inputs.rebind('keydown.initlogin', function(e) {
         if (e.keyCode === 13) {
             pagelogin();
         }
     });
 
-    $('.register-st2-button').rebind('click', function(e) {
+    $button.rebind('click.initlogin', function() {
         pagelogin();
     });
 
-    $('.login .radio-txt,.login-check').rebind('click', function(e) {
-        if ($('.login-check').hasClass('checkboxOn')) {
-            $('.login-check').addClass('checkboxOff');
-            $('.login-check').removeClass('checkboxOn');
-        }
-        else {
-            $('.login-check').addClass('checkboxOn');
-            $('.login-check').removeClass('checkboxOff');
+    $button.rebind('keydown.initlogin', function (e) {
+        if (e.keyCode === 13) {
+            pagelogin();
         }
     });
 
-    $('.top-login-forgot-pass').rebind('click', function(e) {
-        loadSubPage('recovery');
-    });
-
-    $('.login-page-create-new span').rebind('click', function(e) {
-        loadSubPage('register');
-    });
-
-    $('.login-register-input').rebind('click', function(e) {
-        $(this).find('input').focus();
-    });
-    document.getElementById('login-name2').focus();
+    // Init inputs events
+    accountinputs.init($formWrapper);
 
     if (is_chrome_firefox) {
         Soon(mozLoginManager.fillForm.bind(mozLoginManager, 'login_form'));

@@ -971,7 +971,13 @@ function fm_showoverlay() {
     "use strict";
 
     $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+
+    if (is_mobile) {
+        $('body').addClass('overlayed');
+    }
+    else if (!$('body').hasClass('bottom-pages')) {
+        $('body').addClass('overlayed');
+    }
 }
 
 /**

@@ -77,53 +77,50 @@
 
     function showLoginDialog(aPromise) {
         var $dialog = $('.fm-dialog.pro-login-dialog');
+        var $inputs = $dialog.find('.account.input-wrapper input');
+        var $button = $dialog.find('.big-red-button');
 
         M.safeShowDialog('pro-login-dialog', function() {
-            $dialog.removeClass('hidden').addClass('active');
 
             $dialog.css({
                 'margin-left': -1 * ($dialog.outerWidth() / 2),
                 'margin-top': -1 * ($dialog.outerHeight() / 2)
             });
 
-            return $dialog.css('zoom', '1.2');
+            // Init inputs events
+            accountinputs.init($dialog);
+
+            return $dialog;
         });
 
-        $('.top-login-input-block').removeClass('incorrect');
-
         // controls
-        $('.fm-dialog-close', $dialog)
-            .rebind('click.proDialog', function() {
-                closeDialog();
-                aPromise.reject();
-            });
+        $('.fm-dialog-close', $dialog).rebind('click.proDialog', function() {
+            closeDialog();
+            aPromise.reject();
+        });
 
-        $('.input-email', $dialog)
-            .val('');
+        $inputs.val('');
 
-        $('.input-password', $dialog)
-            .data('placeholder', l[909]);
-
-        uiPlaceholders($dialog);
-        uiCheckboxes($dialog);
-
-        $('#login-password, #login-name', $dialog).rebind('keydown', function(e) {
-            $('.top-login-pad', $dialog).removeClass('both-incorrect-inputs');
-            $('.top-login-input-tooltip.both-incorrect', $dialog).removeClass('active');
-            $('.top-login-input-block.password', $dialog).removeClass('incorrect');
-            $('.top-login-input-block.e-mail', $dialog).removeClass('incorrect');
+        $inputs.rebind('keydown', function(e) {
             if (e.keyCode == 13) {
                 doLogin($dialog, aPromise);
             }
         });
 
-        $('.top-login-forgot-pass', $dialog).rebind('click', function(e) {
+        $('.top-login-forgot-pass', $dialog).rebind('click.loginreq', function(e) {
+            e.preventDefault();
             aPromise.reject();
             loadSubPage('recovery');
         });
 
-        $('.top-dialog-login-button', $dialog).rebind('click', function(e) {
+        $button.rebind('click.loginreq', function(e) {
             doLogin($dialog, aPromise);
+        });
+
+        $button.rebind('keydown.loginreq', function (e) {
+            if (e.keyCode === 13) {
+                doLogin($dialog, aPromise);
+            }
         });
     }
 
@@ -136,10 +133,33 @@
         // Save the promise for use in the completeLogin function
         completePromise = aPromise;
 
-        var email = $dialog.find('#login-name').val();
-        var password = $dialog.find('#login-password').val();
-        var rememberMe = $dialog.find('#login-checkbox').is('.checkboxOn');
+        var $emailContainer = $dialog.find('.account.input-wrapper.email');
+        var $passwordContainer = $dialog.find('.account.input-wrapper.password');
+        var $formWrapper = $dialog.find('form');
+        var $emailInput = $emailContainer.find('input');
+        var $passwordInput = $passwordContainer.find('input');
+        var $rememberMeCheckbox = $dialog.find('.login-check input');
+
+        var email = $emailInput.val();
+        var password = $passwordInput.val();
+        var rememberMe = $rememberMeCheckbox.is('.checkboxOn');  // ToDo check if correct
         var twoFactorPin = null;
+
+        if (email === '' || checkMail(email)) {
+            $emailContainer.addClass('incorrect');
+            $emailInput.val('');
+            $emailInput.focus();
+            loadingDialog.hide();
+
+            return false;
+        }
+        else if (password === '') {
+            $emailContainer.removeClass('incorrect');
+            $formWrapper.addClass('both-incorrect-inputs');
+            loadingDialog.hide();
+
+            return false;
+        }
 
         // Checks if they have an old or new registration type, after this the flow will continue to login
         security.login.checkLoginMethod(email, password, twoFactorPin, rememberMe, startOldLogin, startNewLogin);
@@ -176,9 +196,13 @@
      * @param {Number} result The result from the API, e.g. a negative error num or the user type e.g. 3 for full user
      */
     function completeLogin(result) {
-
-        var $emailField = $('#login-email');
-        var $passwordField = $('#login-password');
+        'use strict';
+    
+        var $formWrapper = $('.pro-login-dialog form');
+        var $emailContainer = $formWrapper.find('.account.input-wrapper.email');
+        var $emailField = $emailContainer.find('input');
+        var $passwordContainer = $formWrapper.find('.account.input-wrapper.password');
+        var $passwordField = $passwordContainer.find('input');
 
         loadingDialog.hide();
 
@@ -209,8 +233,9 @@
             // Close the 2FA dialog for a generic error
             twofactor.loginDialog.closeDialog();
 
-            $passwordField.val('');
-            alert(l[201]);
+            $emailContainer.removeClass('incorrect');
+            $formWrapper.addClass('both-incorrect-inputs');
+            $passwordField.focus();
         }
     }
 

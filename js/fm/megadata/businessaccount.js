@@ -1276,7 +1276,6 @@ BusinessAccount.prototype.resendInvitation = function (subuserHandle) {
                 operationPromise.reject(0, 4, 'API returned error, ret=' + res);
             }
         }
-
     });
 
 

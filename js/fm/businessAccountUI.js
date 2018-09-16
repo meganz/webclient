@@ -714,6 +714,20 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         });
 
 
+    // event handler for re-send invitation
+    $subAccountContainer.find('.profile-button-container .resend-verification').off('click.subuser')
+        .on('click.subuser', function resendInvitation_ClickHandler() {
+            if ($(this).hasClass('hidden')) {
+                return;
+            }
+            var resendPromise = mySelf.business.resendInvitation(subUserHandle);
+            resendPromise.done(
+                function resendSuccess(st, res, req) {
+
+                }
+            );
+        });
+
     // private function to fill quota info
     var fillQuotaInfo = function (st, quotas) {
         if (!quotas) {

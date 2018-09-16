@@ -2340,7 +2340,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v21.png);
+    background-image: url(../images/mega/icons-sprite_v22.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -2779,11 +2779,11 @@ li.token-input-token-invite .input-close {
     opacity: 0.8;
 }
 .embed-content-block .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite_v2.png);
+    background-image: url(../images/mega/dialog-sprite_v3.png);
     background-position: -128px -5818px;
 }
 .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v2.png);
+    background-image: url(../images/mega/dialog-sprite_v3.png);
     background-position: -88px -5818px;
 }
 .embed-content-block .fm-subheading {
@@ -3056,9 +3056,10 @@ li.token-input-token-invite .input-close {
     width: 136px;
     display: inline-block;
     min-width: 136px;
+    margin-left: 24px
 }
 .fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button:first-of-type {
-    margin-right: 24px;
+    margin-left: 0;
 }
 .fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button.hidden {
     display: none;

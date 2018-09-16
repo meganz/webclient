@@ -403,54 +403,60 @@ function showLoginDialog(email, password) {
     $.dialog = 'pro-login-dialog';
 
     var $dialog = $('.pro-login-dialog');
-    $dialog
-        .removeClass('hidden')
-        .addClass('active');
+    var $inputs = $dialog.find('.account.input-wrapper input');
+    var $button = $dialog.find('.big-red-button');
 
-    $('.fm-dialog-overlay').removeClass("hidden");
+    M.safeShowDialog('pro-login-dialog', function() {
 
-    $dialog.css({
-        'margin-left': -1 * ($dialog.outerWidth() / 2),
-        'margin-top': -1 * ($dialog.outerHeight() / 2)
+        $dialog.css({
+            'margin-left': -1 * ($dialog.outerWidth() / 2),
+            'margin-top': -1 * ($dialog.outerHeight() / 2)
+        });
+
+        // Init inputs events
+        accountinputs.init($dialog);
+
+        return $dialog;
     });
 
-    $('.top-login-input-block').removeClass('incorrect');
-
     // controls
-    $('.fm-dialog-close', $dialog)
-        .unbind('click.proDialog')
-        .bind('click.proDialog', function() {
+    $('.fm-dialog-close', $dialog).rebind('click.proDialog', function() {
+        closeLoginDialog($dialog);
+    });
 
-            closeDialog();
+    $('.fm-dialog-overlay')
+        .rebind('click.proDialog', function() {
+            closeLoginDialog($dialog);
         });
 
     $('.input-email', $dialog).val(email || '');
     $('.input-password', $dialog).val(password || '');
 
-    uiPlaceholders($dialog);
-    uiCheckboxes($dialog);
-
-    $('#login-password, #login-name', $dialog).rebind('keydown.prologin', function(e)
-    {
-        $('.top-login-pad', $dialog).removeClass('both-incorrect-inputs');
-        $('.top-login-input-tooltip.both-incorrect', $dialog).removeClass('active');
-        $('.top-login-input-block.password', $dialog).removeClass('incorrect');
-        $('.top-login-input-block.e-mail', $dialog).removeClass('incorrect');
-
+    $inputs.rebind('keydown.initdialog', function(e) {
         if (e.keyCode === 13) {
             doProLogin($dialog);
         }
     });
 
-    $('.top-login-forgot-pass', $dialog).rebind('click.toploginforgotpass', function() {
-        loadSubPage('recovery');
-    });
-
-    $('.top-dialog-login-button', $dialog).rebind('click.toploginbutton', function() {
+    $button.rebind('click.initdialog', function() {
         doProLogin($dialog);
     });
 
+    $button.rebind('keydown.initdialog', function (e) {
+        if (e.keyCode === 13) {
+            doProLogin($dialog);
+        }
+    });
+
     clickURLs();
+}
+
+function closeLoginDialog($dialog) {
+    'use strict';
+
+    closeDialog();
+    $('.fm-dialog-overlay').unbind('click.proDialog');
+    $('.fm-dialog-close', $dialog).unbind('click.proDialog');
 }
 
 var doProLogin = function($dialog) {
@@ -458,11 +464,12 @@ var doProLogin = function($dialog) {
     megaAnalytics.log('pro', 'doLogin');
     loadingDialog.show();
 
-    var $emailContainer = $dialog.find('.top-login-input-block.e-mail');
-    var $passwordContainer = $dialog.find('.top-login-input-block.password');
-    var $emailInput = $dialog.find('#login-name');
-    var $passwordInput = $dialog.find('#login-password');
-    var $rememberMeCheckbox = $dialog.find('#login-checkbox');
+    var $emailContainer = $dialog.find('.account.input-wrapper.email');
+    var $passwordContainer = $dialog.find('.account.input-wrapper.password');
+    var $formWrapper = $dialog.find('form');
+    var $emailInput = $emailContainer.find('input');
+    var $passwordInput = $passwordContainer.find('input');
+    var $rememberMeCheckbox = $dialog.find('.login-check input');
 
     var email = $emailInput.val();
     var password = $passwordInput.val();
@@ -473,11 +480,14 @@ var doProLogin = function($dialog) {
         $emailContainer.addClass('incorrect');
         $emailInput.val('');
         $emailInput.focus();
+        loadingDialog.hide();
 
         return false;
     }
     else if (password === '') {
-        $passwordContainer.addClass('incorrect');
+        $emailContainer.removeClass('incorrect');
+        $formWrapper.addClass('both-incorrect-inputs');
+        loadingDialog.hide();
 
         return false;
     }
@@ -521,13 +531,13 @@ function startNewProLogin(email, password, pinCode, rememberMe, salt) {
  * @param {Number} result The result from the API, e.g. a negative error num or the user type e.g. 3 for full user
  */
 function completeProLogin(result) {
-
     'use strict';
 
-    var $emailField = $('#login-email');
-    var $passwordField = $('#login-password');
-    var $loginContainer = $('.top-login-pad');
-    var $incorrectTooltip = $('.top-login-input-tooltip.both-incorrect');
+    var $formWrapper = $('.pro-login-dialog form');
+    var $emailContainer = $formWrapper.find('.account.input-wrapper.email');
+    var $emailField = $emailContainer.find('input');
+    var $passwordContainer = $formWrapper.find('.account.input-wrapper.password');
+    var $passwordField = $passwordContainer.find('input');
 
     loadingDialog.hide();
 
@@ -555,9 +565,9 @@ function completeProLogin(result) {
         // Close the 2FA dialog for a generic error
         twofactor.loginDialog.closeDialog();
 
-        $loginContainer.addClass('both-incorrect-inputs');
-        $incorrectTooltip.addClass('active');
-        $passwordField.select();
+        $emailContainer.removeClass('incorrect');
+        $formWrapper.addClass('both-incorrect-inputs');
+        $passwordField.focus();
     }
 }
 

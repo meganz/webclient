@@ -129,16 +129,16 @@ BusinessAccount.prototype.editSubAccount = function (subuserHandle,subEmail, sub
     }
     if (optionals) {
         if (optionals.position) {
-            request['%position'] = optionals.position;
+            request['%position'] = base64urlencode(to8(optionals.position));
         }
         if (optionals.idnum) {
-            request['%idnum'] = optionals.idnum;
+            request['%idnum'] = base64urlencode(to8(optionals.idnum));
         }
         if (optionals.phonenum) {
-            request['%phonenum'] = optionals.phonenum;
+            request['%phonenum'] = base64urlencode(to8(optionals.phonenum));
         }
         if (optionals.location) {
-            request['%location'] = optionals.location;
+            request['%location'] = base64urlencode(to8(optionals.location));
         }
     }
 

@@ -370,7 +370,8 @@
         });
 
         $('.checkbox-block a', $dialog)
-            .rebind('click.proRegisterDialog', function(e) {
+            .rebind('click', function(e) {
+                e.preventDefault();
                 $.termsAgree = function() {
                     $('.register-check').removeClass('checkboxOff');
                     $('.register-check').addClass('checkboxOn');

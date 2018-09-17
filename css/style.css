@@ -9735,7 +9735,7 @@ label.radio-txt {
     color: #71AD32;
 }
 .red {
-    color: #BF1900;
+    color: #FF4D4A;
 }
 .fm-bandwidth-small-txt {
     text-align: center;
@@ -12148,7 +12148,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .main-right-block {
     margin-left: 520px;
-    margin-top: 100px;
+}
+.sign .main-right-block {
+    padding-top: 100px;
 }
 h3.main-italic-header {
     font-size: 19px;
@@ -12167,6 +12169,9 @@ h5.main-italic-header {
     padding: 0px 0 5px 0;
     font-weight: normal;
     color: #333333
+}
+.main-italic-header .red {
+    color: #FF333A;
 }
 .login-register-input {
     height: 40px;
@@ -12271,56 +12276,29 @@ h5.main-italic-header {
 }
 .register-st2-button {
     float: left;
-    padding-right: 20px;
     cursor: pointer;
-    background-image: url(../images/mega/top-login-sprite_v11.png);
-    background-position: right -772px;
-    background-repeat: no-repeat;
     margin-bottom: 20px;
 }
 .register-st2-button-arrow {
     height: 40px;
     background-color: rgba(0,0,0,0.05);
     color: white;
-    padding: 0 25px 0 15px;
+    padding: 0 30px 0 15px;
     font-size: 14px;
     line-height: 38px;
-    -webkit-border-bottom-left-radius: 5px;
-    -moz-border-radius-bottomleft: 5px;
-    border-bottom-left-radius: 5px;
-    -webkit-border-top-left-radius: 5px;
-    -moz-border-radius-topleft: 5px;
-    border-top-left-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
     background-image: url(../images/mega/top-login-sprite_v11.png);
     background-position: right -662px;
     background-repeat: no-repeat;
 }
-.register-st2-button.back {
-    padding-right: 0;
-    padding-left: 20px;
-    background-position: -28px -1307px;
-}
 .back .register-st2-button-arrow {
-    padding: 0 15px 0 25px;
+    padding: 0 15px 0 30px;
     background-position: -28px -1197px;
-    -moz-border-radius: 0px;
-    -webkit-border-radius: 0px;
-    border-radius: 0px;
-    -webkit-border-bottom-right-radius: 5px;
-    -moz-border-radius-bottomright: 5px;
-    border-bottom-right-radius: 5px;
-    -webkit-border-top-right-radius: 5px;
-    -moz-border-radius-topright: 5px;
-    border-top-right-radius: 5px;
-}
-.register-st2-button.active {
-    background-position: right -712px;
-}
-.register-st2-button.back.active {
-    background-position: -28px -1247px;
 }
 .active .register-st2-button-arrow {
-    background-color: #D92E00;
+    background-color: #F0373A;
 }
 .register-name-input-block {
     float: left;
@@ -12896,7 +12874,7 @@ h5.main-italic-header {
     font-size: 16px;
     line-height: 20px;
     letter-spacing: -0.1px;
-    color: #D22400;
+    color: #FF4D4A;
     font-family: 'Open Sans Semibold Italic', Arial;
 }
 .download-error-txt, .download-error-temp-txt {
@@ -13007,7 +12985,7 @@ h5.main-italic-header {
     margin: 2px 0 0 70px;
 }
 .new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a, .new-bottom-page li a, .new-bottom-pages li a, .download.error-text a, .bottom-pages-dialog a {
-    color: #D22400;
+    color: #FF4D4A;
 }
 .new-bottom-pages h2 span.number, .new-bottom-pages h2.list span.number, .new-bottom-pages h2.sub-list span.number {
     margin: 0 10px 0 0;
@@ -13199,7 +13177,7 @@ p.privacy-list {
     font-size: 20px;
     line-height: 31px;
     letter-spacing: -0.1px;
-    color: #D22400;
+    color: rgb(255, 51, 58);
     font-family: 'Open Sans Semibold Italic', Arial;
     padding-bottom: 17px;
 }
@@ -14766,7 +14744,6 @@ p.copyrights-red {
 }
 .register-st2-button.active.back.copyrights-form {
     float: left;
-    background-position: -28px -1407px;
 }
 .register-st2-button.active.back.copyrights-form .register-st2-button-arrow {
     background-color: #4c4c4c;
@@ -15388,7 +15365,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .backup-download-percents, .restore-upload-percents {
     position: absolute;
-    color: #D22400;
+    color: #FF4D4A;
     font-size: 21px;
     text-align: center;
     line-height: 24px;
@@ -15409,7 +15386,10 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .backup-download-button {
     height: 24px;
-    background-color: #D32200;
+    background: #F0373A;
+    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
     padding: 0 15px;
     float: left;
     line-height: 23px;
@@ -15420,6 +15400,17 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     -webkit-border-radius: 4px;
     border-radius: 4px;
     cursor: pointer;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.backup-download-button:hover {
+    background: #E12124;
+    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
 }
 .cancel-account-button {
     height: 24px;
@@ -20836,7 +20827,7 @@ div.camera-bottom-txt {
     display: block;
 }
 .red-txt {
-    color: #D90007;
+    color: #FF4D4A;
 }
 .account.progress-block {
     height: 12px;
@@ -21009,12 +21000,12 @@ div.camera-bottom-txt {
     margin: 0 0 -18px 0;
 }
 .red-star {
-    color: #D90007;
+    color: #FF4D4A;
 }
 .account .progress-title.star::after {
     content: ' *';
     display: inline;
-    color: #D90007;
+    color: #FF4D4A;
 }
 .achievement-full.description {
     font-size: 14px;
@@ -23672,23 +23663,29 @@ opacity: 1;
     text-align: center;
     text-decoration: none;
     background: #F0373A;
-    border: 1px solid rgba(0,0,0,0.05);
-    box-shadow: 0 0 1px 0 rgba(0,0,0,0.05);
+    webkit-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
     border-radius: 4px;
 }
 .improved-recovery-steps .recover-button.yes.default-grey-button::after {
-    box-shadow: 0 0 1px 0 rgba(0,0,0,0.05);
+    webkit-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
 }
 .improved-recovery-steps .recover-button.yes.default-grey-button::before {
-    box-shadow: 0 0 1px 0 rgba(0,0,0,0.05);
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
+    box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
 }
 .improved-recovery-steps .recover-button.yes.default-grey-button:hover {
-    background: #ff2222;
-    border: 1px solid rgba(0,0,0,0.05);
-    box-shadow: 0 0 1px 0 rgba(0,0,0,0.05);
+    background: #E12124;
+    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
 }
 .improved-recovery-steps .recover-button.yes:hover, .recover-button.yes.active {
-    background-color: rgba(42,175,95,0.1);
+    background: rgba(42,175,95,0.1);
     -webkit-box-shadow: 0 0 0 0 #6BB219;
     -moz-box-shadow: 0 0 0 0 #6BB219;
     box-shadow: 0 0 0 0 #6BB219;
@@ -23697,7 +23694,7 @@ opacity: 1;
     color: #eb4444;
 }
 .improved-recovery-steps .recover-button.no:hover, .recover-button.no.active {
-    background-color: rgba(235,68,68,0.10);
+    background: rgba(235,68,68,0.10);
     -webkit-box-shadow: 0 0 0 0 #FDECEC;
     -moz-box-shadow: 0 0 0 0 #FDECEC;
     box-shadow: 0 0 0 0 #FDECEC;

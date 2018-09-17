@@ -997,15 +997,15 @@ scparser.$add('ua', {
                 mega.attr.uaPacketParser(attributeName, actionPacketUserId, false, a.v && a.v[j]);
             }
 
-            // for performance optimization i will repeat the loop in case of business master
-            // instead of doing the check inside the loop.
+            // in case of business master
             // first, am i a master?
             if (u_attr && u_attr.b && !u_attr.b.mu) {
                 // then, do i have this user as sub-user?
                 if (M.suba && M.suba[actionPacketUserId]) {
                     M.require('businessAcc_js', 'businessAccUI_js').done(
                         function () {
-
+                            var business = new BusinessAccount();
+                            business.updateSubUserInfo(actionPacketUserId, attrs);
                         }
                     );
                 }
@@ -1035,6 +1035,20 @@ scparser.$add('ua', {
                 else if (attributeName === 'firstname' || attributeName === 'lastname') {
                     // handle firstname/lastname attributes
                     mega.attr.uaPacketParser(attributeName, actionPacketUserId, true, version);
+                }
+            }
+
+            // in case of business master
+            // first, am i a master?
+            if (u_attr && u_attr.b && !u_attr.b.mu) {
+                // then, do i have this user as sub-user?
+                if (M.suba && M.suba[actionPacketUserId]) {
+                    M.require('businessAcc_js', 'businessAccUI_js').done(
+                        function () {
+                            var business = new BusinessAccount();
+                            business.updateSubUserInfo(actionPacketUserId, attrs);
+                        }
+                    );
                 }
             }
         }

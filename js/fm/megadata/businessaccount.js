@@ -1284,5 +1284,59 @@ BusinessAccount.prototype.resendInvitation = function (subuserHandle) {
 
 
     return operationPromise;
+};
+
+
+
+BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAttrs) {
+    "use strict";
+
+    if (!subuserHandle) {
+        return ;
+    }
+    var mySelf = this;
+
+    var subUser = M.suba[subuserHandle];
+
+    var considereAttrs = ["e", "firstname", "lastname", "%position", "%idnum", "%phonenum", "%location"];
+    var totalAttrs = 0;
+
+    var attrFetched = function (res, ctx) {
+
+        if (typeof res !== 'number') {
+            if (ctx.ua === "e") {
+                subUser.m = res;
+            }
+            else if (ctx.ua === "firstname") {
+                subUser.firstname = res;
+            }
+            else if (ctx.ua === "lastname") {
+                subUser.lastname = res;
+            }
+            else if (ctx.ua === "%position") {
+                subUser["%position"] = res;
+            }
+            else if (ctx.ua === "%idnum") {
+                subUser["%idnum"] = res;
+            }
+            else if (ctx.ua === "%phonenum") {
+                subUser["%phonenum"] = res;
+            }
+            else if (ctx.ua === "%location") {
+                subUser["%location"] = res;
+            }
+        }
+
+        if (!--totalAttrs) {
+            mySelf.parseSUBA(subUser, false, true);
+        }
+    };
+
+    for (var k = 0; k < changedAttrs.length; k++) {
+        if (considereAttrs.indexOf(changedAttrs[k]) > -1) {
+            totalAttrs++;
+            mega.attr.get(subuserHandle, changedAttrs[k], -1, undefined, attrFetched);
+        }
+    }
 
 };

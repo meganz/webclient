@@ -25,6 +25,7 @@ function BusinessAccountUI() {
         $('.user-management-landing-page.user-management-view', $businessAccountContianer).addClass('hidden');
         var $accountContainer = $('.user-management-account-settings', $businessAccountContianer).addClass('hidden');
         $('.invoice', $accountContainer).addClass('hidden');
+        $('.profile', $accountContainer).addClass('hidden');
         $('.invoice .invoice-list', $accountContainer).addClass('hidden');
         $('.invoice .invoice-detail', $accountContainer);
 
@@ -397,7 +398,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 var bandwidth = numOfBytes(subBandwidth, 2);
                 $('.business-sub-storage-use span', $subTr).text(storage.size + ' ' + storage.unit);
                 $('.business-sub-transfer-use span', $subTr).text(bandwidth.size + ' ' + bandwidth.unit);
-                var dd = subUsersData[sub].ad;
+                var dd = subUsersData[sub].ad === '00000000' ? null : subUsersData[sub].ad;
                 var activeDate = '--------';
                 if (dd) {
                     activeDate = new Date(dd.substr(0, 4), dd.substr(4, 2), dd.substr(6, 2));
@@ -732,6 +733,12 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     $subAccountContainer.find('.profile-button-container .migrate-data').off('click.subuser')
         .on('click.subuser', function migrateData_ClickHandler() {
             mySelf.migrateSubUserData(subUserHandle);
+        });
+
+    // event handler for edit sub-user button
+    $subAccountContainer.find('.profile-button-container .edit-profile').off('click.subuser').on('click.subuser',
+        function editSubUserClickHandler() {
+            mySelf.showEditSubUserDialog(subUserHandle);
         });
 
 
@@ -1342,6 +1349,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
     var $profileContainer = $('.profile', $accountContainer);
+    var $invoiceContainer = $('.invoice', $accountContainer);
     var $accountPageHeader = $('.fm-right-header-user-management .user-management-breadcrumb.account');
 
     var unhideSection = function () {
@@ -1351,7 +1359,25 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         $accountPageHeader.removeClass('hidden');
     };
 
-    // event handler
+    // event handler for header clicking
+    $('.settings-menu-bar .settings-menu-item', $accountContainer).off('click').on('click.suba',
+        function settingHeaderClickHandler() {
+            var $me = $(this);
+            $('.settings-menu-bar .settings-menu-item', $accountContainer).removeClass('selected');
+            if ($me.hasClass('suba-setting-profile')) {
+                $me.addClass('selected');
+                if ($profileContainer.hasClass('hidden')) {
+                    mySelf.viewBusinessAccountPage();
+                }
+            }
+            else if ($me.hasClass('suba-setting-inv')) {
+                $me.addClass('selected');
+                if ($invoiceContainer.hasClass('hidden')) {
+                    mySelf.viewBusinessInvoicesPage();
+                }
+            }
+        }
+    );
 
     unhideSection();
     
@@ -1505,8 +1531,9 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             return false;
         }
         for (var k = 0; k < invoice.items.length; k++) {
-            if (!invoice.items[k].ts || !invoice.items[k].gross || !invoice.items[k].net
-                || !invoice.items[k].tax || !invoice.items[k].d) {
+            if (typeof invoice.items[k].ts === 'undefined' || typeof invoice.items[k].gross === 'undefined'
+                || typeof invoice.items[k].net === 'undefined' || typeof invoice.items[k].tax === 'undefined'
+                || !typeof invoice.items[k].d === 'undefined') {
                 return false;
             }
         }
@@ -1942,16 +1969,20 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     $lnameInput.val(userAttrs.lname);
     $emailInput.val(subUser.e);
     if (subUser.position) {
-        $positionInput.val(subUser.position);
+        userAttrs.position = from8(base64urldecode(subUser.position));
+        $positionInput.val(userAttrs.position);
     }
     if (subUser.idnum) {
-        $subIDInput.val(subUser.idnum);
+        userAttrs.idnum = from8(base64urldecode(subUser.idnum));
+        $subIDInput.val(userAttrs.idnum);
     }
     if (subUser.phonenum) {
-        $phoneInput.val(subUser.phonenum);
+        userAttrs.phonenum = from8(base64urldecode(subUser.phonenum));
+        $phoneInput.val(userAttrs.phonenum);
     }
     if (subUser.location) {
-        $locationInput.val(subUser.location);
+        userAttrs.location = from8(base64urldecode(subUser.location));
+        $locationInput.val(userAttrs.location);
     }
 
     /** checks if a user attribute got changed and returns changes
@@ -1967,10 +1998,10 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
         var tel = $phoneInput.val().trim();
         var loc = $locationInput.val().trim();
 
-        var refPos = subUser.position || '';
-        var refId = subUser.idnum || '';
-        var refTel = subUser.phonenum || '';
-        var refLoc = subUser.location || '';
+        var refPos = userAttrs.position || '';
+        var refId = userAttrs.idnum || '';
+        var refTel = userAttrs.phonenum || '';
+        var refLoc = userAttrs.location || '';
 
         if (fname !== userAttrs.fname) {
             changes.fname = fname;

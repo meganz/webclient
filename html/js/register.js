@@ -389,11 +389,17 @@ function init_register() {
         }
     });
 
-    $('.checkbox-block.register a', $formWrapper).rebind('click', function(e) {
+    $('.checkbox-block.register .radio-txt', $formWrapper).safeHTML(l['208s']);
+
+    $('.checkbox-block.register span', $formWrapper).rebind('click', function(e) {
         e.preventDefault();
         $.termsAgree = function() {
-            $('.register-check', $registerForm).removeClass('checkboxOff')
+            $('.register-check', $formWrapper).removeClass('checkboxOff')
                 .addClass('checkboxOn');
+        };
+        $.termsDeny = function() {
+            $('.register-check', $formWrapper).removeClass('checkboxOn')
+                .addClass('checkboxOff');
         };
         bottomPageDialog(false, 'terms');
         return false;

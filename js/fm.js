@@ -2384,7 +2384,10 @@ function closeDialog(ev) {
         return;
     }
 
-    if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
+    if ($.dialog === 'terms' && $.registerDialog) {
+        $('.fm-dialog.bottom-pages-dialog').addClass('hidden');
+    }
+    else if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
     }

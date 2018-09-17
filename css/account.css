@@ -20,7 +20,7 @@
     font-size: 26px;
 }
 .account.top-header span {
-    color: #FF333A;
+    color: #F0373B;
 }
 .account.top-header.wide {
     width: 112%;
@@ -40,7 +40,7 @@
     padding: 64px 0 0 0;
 }
 .account.small-header-txt a {
-    color: #FF333A;
+    color: #F0373B;
     cursor: pointer;
 }
 .account.small-header-txt a:hover {
@@ -405,7 +405,7 @@
     text-align: center;
 }
 .top-login-popup .account.checkbox-block {
-    padding: 10px 0 34px 0;
+    padding: 8px 0 34px 0;
 }
 .dropdown.body.popup.top-login-popup {
     width: 480px;

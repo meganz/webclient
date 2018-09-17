@@ -514,9 +514,6 @@
 .default-white-button.right, .default-grey-button.right, .default-light-green-button.right {
     margin-left: 12px;
 }
-.red {
-    color: #FF4D4A;
-}
 .button.overlay-button {
     position: absolute;
     left: 50%;

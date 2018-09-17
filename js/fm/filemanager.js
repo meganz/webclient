@@ -3669,7 +3669,8 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
     var diagInheritance = {
         properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share'],
         copy: ['createfolder'],
-        move: ['createfolder']
+        move: ['createfolder'],
+        register: ['terms']
     };
 
     var _openDialog = function(name, dsp) {

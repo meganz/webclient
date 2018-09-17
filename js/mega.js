@@ -994,8 +994,21 @@ scparser.$add('ua', {
 
             for (var j = 0; j < attrs.length; j++) {
                 var attributeName = attrs[j];
-
                 mega.attr.uaPacketParser(attributeName, actionPacketUserId, false, a.v && a.v[j]);
+            }
+
+            // for performance optimization i will repeat the loop in case of business master
+            // instead of doing the check inside the loop.
+            // first, am i a master?
+            if (u_attr && u_attr.b && !u_attr.b.mu) {
+                // then, do i have this user as sub-user?
+                if (M.suba && M.suba[actionPacketUserId]) {
+                    M.require('businessAcc_js', 'businessAccUI_js').done(
+                        function () {
+
+                        }
+                    );
+                }
             }
         }
     },
@@ -2956,8 +2969,8 @@ function process_businessAccountSubUsers_SC(packet) {
     }
 
     var subUser = M.suba[packet.u];
-    if (!subUser) { // sub-user not found
-        return;
+    if (!subUser) { // sub-user not found --> it's new one
+        subUser = Object.create(null);
     }
 
     var valChanged = false;

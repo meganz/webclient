@@ -66,20 +66,21 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
                 // however, this may introduce theoretical data inconsistency between server and local
                 // as although we know the operation is successful, we are assuming that the server used
                 // the sent email + first-name + last-name without any alternation
-                var usr = {
-                    u: res.u,
-                    p: null,
-                    s: 10, // pending
-                    e: request.m, // assuming that the server MUST not change the requested val
-                    firstname: request.firstname, // same assumption as above
-                    lastname: request.lastname, // same assumption as above
-                    position: request['%position'] || '',
-                    idnum: request['%idnum'] || '',
-                    phonenum: request['%phonenum'] || '',
-                    location: request['%location'] || ''
-                };
 
-                mySelf.parseSUBA(usr, false, true);
+                //var usr = {
+                //    u: res.u,
+                //    p: null,
+                //    s: 10, // pending
+                //    e: request.m, // assuming that the server MUST not change the requested val
+                //    firstname: request.firstname, // same assumption as above
+                //    lastname: request.lastname, // same assumption as above
+                //    position: request['%position'] || '',
+                //    idnum: request['%idnum'] || '',
+                //    phonenum: request['%phonenum'] || '',
+                //    location: request['%location'] || ''
+                //};
+
+                //mySelf.parseSUBA(usr, false, true);
 
                 operationPromise.resolve(1, res, request); // new added user handle
             }
@@ -1252,7 +1253,10 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
     return operationPromise;
 };
 
-
+/**
+ * resend invitation link to sub-user with new password
+ * @param {String} subuserHandle        sub-user handle
+ */
 BusinessAccount.prototype.resendInvitation = function (subuserHandle) {
     "use strict";
     var operationPromise = new MegaPromise();

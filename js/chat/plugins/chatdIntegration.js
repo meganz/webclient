@@ -1650,9 +1650,21 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
                 messageObject.encryptedMessageContents = [result, keyid];
                 messageObject.msgIdentity = result[result.length - 1].identity;
                 messageObject.references = refids;
+                if (
+                    messageObject.message.charCodeAt(0) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT.charCodeAt(0)
+                    &&
+                    messageObject.message.charCodeAt(1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT.charCodeAt(0)
+                ) {
+                    messageObject.isPostedAttachment = true;
+                }
 
                 tmpPromise.resolve(
-                    self.chatd.submit(base64urldecode(chatRoom.chatId), result, keyid)
+                    self.chatd.submit(
+                        base64urldecode(chatRoom.chatId),
+                        result,
+                        keyid,
+                        messageObject.isPostedAttachment
+                    )
                 );
             }
             else {

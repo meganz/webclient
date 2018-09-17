@@ -319,7 +319,12 @@
 
         // close dialog by click on overlay
         $('.fm-dialog-overlay').rebind('click.proDialog', function() {
-            closeRegisterDialog($dialog, true);
+            if ($.registerDialog === $.dialog) {
+                closeRegisterDialog($dialog, true);
+            }
+            else {
+                closeDialog();
+            }
             return false;
         });
 

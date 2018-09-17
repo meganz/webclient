@@ -225,29 +225,29 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
         /// events handlers
         // 1- check boxes
-        $('.business-sub-checkbox-td, .business-sub-checkbox-th', $usersTable).off('click.subuser');
-        $('.business-sub-checkbox-td, .business-sub-checkbox-th', $usersTable).on('click.subuser',
-            function subUserCheckBoxHandler() {
-                var $me = $(this).find('.checkdiv');
-                if ($me.hasClass('checkboxOff-user-management')) {
-                    $me.removeClass('checkboxOff-user-management').addClass('checkboxOn-user-management');
-                    if ($(this).hasClass('business-sub-checkbox-th')) {
-                        $('.business-sub-checkbox-td .checkdiv', $usersTable).
-                            removeClass('checkboxOff-user-management').addClass('checkboxOn-user-management');
-                    }
-                }
-                else {
-                    $me.addClass('checkboxOff-user-management').removeClass('checkboxOn-user-management');
-                    if ($(this).hasClass('business-sub-checkbox-th')) {
-                        $('.business-sub-checkbox-td .checkdiv', $usersTable).
-                            addClass('checkboxOff-user-management').removeClass('checkboxOn-user-management');
-                    }
-                    else {
-                        $('.business-sub-checkbox-th .checkdiv', $usersTable).
-                            addClass('checkboxOff-user-management').removeClass('checkboxOn-user-management');
-                    }
-                }
-            });
+        // $('.business-sub-checkbox-td, .business-sub-checkbox-th', $usersTable).off('click.subuser');
+        // $('.business-sub-checkbox-td, .business-sub-checkbox-th', $usersTable).on('click.subuser',
+        //    function subUserCheckBoxHandler() {
+        //        var $me = $(this).find('.checkdiv');
+        //        if ($me.hasClass('checkboxOff-user-management')) {
+        //            $me.removeClass('checkboxOff-user-management').addClass('checkboxOn-user-management');
+        //            if ($(this).hasClass('business-sub-checkbox-th')) {
+        //                $('.business-sub-checkbox-td .checkdiv', $usersTable).
+        //                    removeClass('checkboxOff-user-management').addClass('checkboxOn-user-management');
+        //            }
+        //        }
+        //        else {
+        //            $me.addClass('checkboxOff-user-management').removeClass('checkboxOn-user-management');
+        //            if ($(this).hasClass('business-sub-checkbox-th')) {
+        //                $('.business-sub-checkbox-td .checkdiv', $usersTable).
+        //                    addClass('checkboxOff-user-management').removeClass('checkboxOn-user-management');
+        //            }
+        //            else {
+        //                $('.business-sub-checkbox-th .checkdiv', $usersTable).
+        //                    addClass('checkboxOff-user-management').removeClass('checkboxOn-user-management');
+        //            }
+        //        }
+        //    });
 
         // 2- left pane headers (enabled,disabled) sub-users
         $('.user-management-tree-panel-header').off('click.subuser');
@@ -355,6 +355,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 var userHandle = $(this).closest('tr').attr('id');
                 mySelf.showEditSubUserDialog(userHandle);
             });
+
+
 
     };
 
@@ -577,7 +579,7 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
     // handler account setting page
     $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
-            mySelf.showAddSubUserDialog();
+            mySelf.showAddSubUserDialog(null, mySelf.viewSubAccountListUI);
         });
 
     $businessAccountContainer.removeClass('hidden'); // BA container
@@ -613,11 +615,30 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     $('.user-management-subuser-name', $subHeader).text(uName);
     $('.subuser-email', $subAccountContainer).text(subUser.e);
 
+    var sUserId = '';
+    var sUserPos = '';
+    var sUserTel = '';
+    var sUserLoc = '';
+
+    if (subUser.idnum) {
+        sUserId = from8(base64urldecode(subUser.idnum));
+    }
+    if (subUser.position) {
+        sUserPos = from8(base64urldecode(subUser.position));
+    }
+    if (subUser.position) {
+        sUserTel = from8(base64urldecode(subUser.position));
+    }
+    if (subUser.location) {
+        sUserLoc = from8(base64urldecode(subUser.location));
+    }
+
+
     var $extrasContainer = $('.subuser-sec-profile-container', $subAccountContainer);
-    $extrasContainer.find('.sub-info-idnum').text(subUser.idnum || '');
-    $extrasContainer.find('.sub-info-pos').text(subUser.position || '');
-    $extrasContainer.find('.sub-info-phone').text(subUser.phonenum || '');
-    $extrasContainer.find('.sub-info-loc').text(subUser.location || '');
+    $extrasContainer.find('.sub-info-idnum').text(sUserId);
+    $extrasContainer.find('.sub-info-pos').text(sUserPos);
+    $extrasContainer.find('.sub-info-phone').text(sUserTel);
+    $extrasContainer.find('.sub-info-loc').text(sUserLoc);
 
 
     $subAccountContainer.find('.user-management-view-status').removeClass('enabled pending disabled');
@@ -721,9 +742,19 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
                 return;
             }
             var resendPromise = mySelf.business.resendInvitation(subUserHandle);
+            // success
             resendPromise.done(
-                function resendSuccess(st, res, req) {
-
+                function resendSuccess(st, res) {
+                    if (st === 1) {
+                        res.m = M.suba[subUserHandle].e;
+                        mySelf.showAddSubUserDialog(res);
+                    }
+                }
+            );
+            // failure
+            resendPromise.fail(
+                function resendFail() {
+                    msgDialog('warningb', '', l[19527]);
                 }
             );
         });
@@ -1320,6 +1351,8 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         $accountPageHeader.removeClass('hidden');
     };
 
+    // event handler
+
     unhideSection();
     
 };
@@ -1642,9 +1675,10 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
 
 /**
  * shows the add sub-user dialog, if result is passed, the result dialog will be shown
- * @param {object} result   an object contain password + sub-user handle
+ * @param {object} result           an object contain password + sub-user handle
+ * @param {Function} callback       a function to call when OK button is pressed on result-view slide
  */
-BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
+BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
     "use strict";
 
     var $dialog = $('.user-management-add-user-dialog.user-management-dialog');
@@ -1744,6 +1778,9 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result) {
             }
             if ($(this).hasClass('a-ok-btn')) {
                 closeDialog();
+                if (callback) {
+                    return callback();
+                }
                 return;
             }
 

@@ -71,8 +71,8 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
                     p: null,
                     s: 10, // pending
                     e: request.m, // assuming that the server MUST not change the requested val
-                    firstname: request.fn, // same assumption as above
-                    lastname: request.ln, // same assumption as above
+                    firstname: request.firstname, // same assumption as above
+                    lastname: request.lastname, // same assumption as above
                     position: request.position || '',
                     idnum: request.idnum || '',
                     phonenum: request.phonenum || '',

@@ -1263,25 +1263,22 @@ div.radioOn, div.radioOff {
     margin-top: 7px;
     cursor: pointer;
     background-color: white;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    -moz-background-clip: padding-box;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
     position: relative;
-    padding: 2px;
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
 }
 .fm-account-notifications .radioOn, .fm-account-notifications .radioOff {
     margin-left: -25px;
     margin-right: 36px;
 }
 div.radioOn {
-    border: 1px solid rgba(255, 51, 58, 0.5);
+    -webkit-box-shadow: 0 0 0 1px rgba(255, 51, 58, 0.5);
+    -moz-box-shadow: 0 0 0 rgba(255, 51, 58, 0.5);
+    box-shadow: 0 0 0 1px rgba(255, 51, 58, 0.5);
 }
 div.radioOn::before, div.radioOff::before {
     width: 100%;
@@ -1306,6 +1303,10 @@ div.radioOn::after, div.radioOff::after {
     -webkit-border-radius: 100%;
     border-radius: 100%;
     background-color: rgba(0,0,0,0.05);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 2px solid white;
 }
 div.radioOn::after {
     background: rgb(255,51,58);

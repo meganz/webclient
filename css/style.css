@@ -594,14 +594,6 @@ input[type="checkbox"] {
 .fm-dialog .radio-txt, .top-login-popup .radio-txt {
     padding-top: 18px;
 }
-.top-login-popup .radio-txt {
-    padding-top: 13px;
-}
-
-.top-login-popup .top-login-pad .account.checkbox-block .radio-txt {
-    padding-top:0;
-}
-
 .new-registration-checkbox .radio-txt {
     padding-top: 2px;
 }
@@ -1646,17 +1638,6 @@ a.blog-button:hover {
     margin: 0 0 0 16px;
     padding: 1px 0 0 0;
     line-height: 18px;
-}
-
-.top-buttons .top-head-link {
-    margin: -3px 0 0 8px;
-    height: 24px;
-    line-height: 23px;
-    border:1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-    padding: 0px 16px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
-    text-transform: capitalize;
 }
 
 
@@ -4480,14 +4461,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .top-buttons {
     float: right;
-    padding: 0 12px 0 12px;
+    padding: 0 12px 0 4px;
     margin: 8px 0 0 0;
     border-left: 1px solid rgba(0,0,0,0.05);
 }
-.top-buttons a {
+.top-buttons .default-white-button.small {
     float: left;
-    margin: -2px 5px;
-    min-width: 10px;
+    margin: -2px 0 0 14px;
+    min-width: 68px;
 }
 .fm-avatar img {
     width: 24px;
@@ -11812,17 +11793,11 @@ table {
     background-image: url(../images/mega/top-login-sprite_v11.png);
     background-position: 1px 4px;
     background-repeat: no-repeat;
-    margin: 32px 32px 5px 0px;
+    margin: 14px 14px 5px 0px;
     cursor: pointer;
     display: block;
     position: absolute;
 }
-
-.top-login-popup .top-login-full{
-    margin: 14px 14px 5px 0px;
-}
-
-
 .top-login-full:hover {
     background-position: 1px -36px;
 }
@@ -11897,29 +11872,20 @@ table {
     background-color: #333333;
     width: 100%;
     min-height: 60px;
-    -moz-border-radius: 24px;
-    -webkit-border-radius: 24px;
-    border-radius: 24px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
     margin-top: 14px;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
     -o-transition: opacity 200ms ease-in-out;
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
     margin-left: 150%;
 }
-
-.top-login-popup .top-login-warning {
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-}
-
-
 .top-login-warning.active {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
@@ -11947,27 +11913,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background-position: -3px -237px;
     background-repeat: no-repeat;
     cursor: pointer;
-    margin: 30px 32px 0px 0px;
+    margin: 16px 16px 0px 0px;
 }
 .top-login-warning-close:hover {
     background-position: -37px -237px;
 }
-
-.top-login-popup .top-login-warning-close{
-    margin: 16px 16px 0px 0px;
-}
-
 .top-login-warning-pad {
-    padding: 40px;
+    padding: 24px;
     font-size: 13px;
     line-height: 16px;
     color: #CCCCCC;
 }
-
-.top-login-popup .top-login-warning-pad {
-    padding: 24px;
-}
-
 .top-login-warning-icon {
     float: left;
     width: 55px;
@@ -12062,7 +12018,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background-repeat: no-repeat;
     float: right;
     padding: 0 0 0 23px;
-    margin-top:8px;
+    margin-top: 8px;
     cursor: pointer;
     -webkit-transition: color 200ms ease-in-out;
     -moz-transition: color 150ms ease-in-out;
@@ -12070,12 +12026,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -ms-transition: color 150ms ease-in-out;
     transition: color 150ms ease-in-out;
 }
-
-.top-login-popup .top-login-forgot-pass {
-    margin-top:0;
-} 
-
-
 .top-login-forgot-pass:hover, .top-login-forgot-pass:focus {
     color: #F0373B;
     background-position: 0 -1622px;
@@ -12315,11 +12265,9 @@ h5.main-italic-header {
     padding: 0 0 64px 0;
     margin-top: -10px;
 }
-
 .top-login-popup .login-page-forgot-bl {
-    margin-top: 8px;
+    margin-top: -8px;
 }
-
 .register-st2-txt-block {
     padding-top: 80px;
 }
@@ -18179,18 +18127,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .pro-login-dialog .fm-dialog-header {
     margin-bottom: 10px;
 }
-
-.top-login-forgot-pass {
-    font-size: 13px;
-    color: #999999;
-    line-height: 21px;
-    background-image: url(../images/mega/top-login-sprite_v11.png);
-    background-position: 0 -1582px;
-    background-repeat: no-repeat;
-    float: right;
-    padding: 0 0 0 23px;
-    cursor: pointer;
-}
 /* register */
 .pro-register-dialog {
     z-index: 1180;
@@ -18207,15 +18143,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     margin: 0;
 }
 .pro-register-dialog div.big-red-button.register-button {
-    margin-top: 10px;
-    margin-bottom: 25px;
-}
-
-.top-login-popup.pro-register-dialog div.big-red-button.register-button {
     margin-top: 20px;
     margin-bottom: 0px;
 }
-
 .pro-register-dialog.hidden {
     display: none;
 }

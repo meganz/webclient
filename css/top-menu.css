@@ -362,14 +362,6 @@
 .top-head .top-icon.search::before {
     background-position: -6px -474px;
 }
-.top-head .default-white-button.small.red-bg {
-    text-transform: uppercase;
-}
-
-.top-head .top-buttons .default-white-button.small.red-bg {
-     text-transform: capitalize;
-}
-
 .top-head .default-white-button.small.red-bg i {
     margin: 3px 3px 1px -3px;
 }

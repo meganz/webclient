@@ -397,10 +397,6 @@ function init_register() {
             $('.register-check', $formWrapper).removeClass('checkboxOff')
                 .addClass('checkboxOn');
         };
-        $.termsDeny = function() {
-            $('.register-check', $formWrapper).removeClass('checkboxOn')
-                .addClass('checkboxOff');
-        };
         bottomPageDialog(false, 'terms');
         return false;
     });

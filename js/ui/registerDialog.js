@@ -386,10 +386,6 @@
                 $('.register-check', $dialog).removeClass('checkboxOff')
                     .addClass('checkboxOn');
             };
-            $.termsDeny = function() {
-                $('.register-check', $dialog).removeClass('checkboxOn')
-                    .addClass('checkboxOff');
-            };
             bottomPageDialog(false, 'terms'); // show terms dialog
             return false;
         });

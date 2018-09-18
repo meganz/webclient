@@ -597,10 +597,10 @@ input[type="checkbox"] {
 .new-registration-checkbox .radio-txt {
     padding-top: 2px;
 }
-.radio-txt a, .radio-txt span {
+.radio-txt a, .radio-txt span.red {
     color: #F0373B;
 }
-.radio-txt a:hover, .radio-txt span:hover {
+.radio-txt a:hover, .radio-txt span.red:hover {
     text-decoration: underline;
 }
 label span.black {

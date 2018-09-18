@@ -1287,6 +1287,10 @@ function init_page() {
         parsepage(pages['browsers']);
         browserspage.init();
     }
+    else if (page === 'business') {
+        parsepage(pages['business']);
+
+    }
     else if (page === 'ios') {
         parsepage(pages['ios']);
     }

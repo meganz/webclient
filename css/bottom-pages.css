@@ -489,7 +489,7 @@ html.gbot {
     vertical-align: top;
     width: 8px;
     height: 13px;
-    background-image: url(../images/mega/startpage-sprite_v6.png);
+    background-image: url(../images/mega/startpage-sprite_v7.png);
     background-position: -165px -7px;
     background-repeat: no-repeat;
 }
@@ -509,7 +509,7 @@ html.gbot {
     width: 102px;
     height: 102px;
     margin: 10px auto 26px auto;
-    background-image: url(../images/mega/startpage-sprite_v6.png);
+    background-image: url(../images/mega/startpage-sprite_v7.png);
     background-position: 0 -533px;
     background-repeat: no-repeat;
     padding: 0;
@@ -734,11 +734,8 @@ html.gbot {
     margin: 14px auto 7px auto;
     width: 22px;
     height: 24px;
-    background-image: url(../images/mega/startpage-sprite_v6.png);
+    background-image: url(../images/mega/startpage-sprite_v7.png);
     background-position: -0px -73px;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-    -moz-opacity: 0.3;
-    -khtml-opacity: 0.3;
     opacity: 0.3;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -747,19 +744,12 @@ html.gbot {
     transition: opacity 200ms ease-in-out;
 }
 .contrast .pages-nav.nav-icon {
-    -moz-opacity: 0.8;
-    -khtml-opacity: 0.8;
     opacity: 0.8;
 }
 .contrast .nav-button:hover .nav-icon {
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
     opacity: 1;
 }
 .nav-button.active.greyed-out .nav-icon {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-    -moz-opacity: 0.3;
-    -khtml-opacity: 0.3;
     opacity: 0.3;
 }
 .nav-buttons-bl .pages-nav.nav-icon.bott-sprite {
@@ -816,9 +806,6 @@ html.gbot {
     display: none;
 }
 .nav-button:hover .nav-icon, .nav-button.active .nav-icon, .nav-button.opened .nav-icon {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
     opacity: 0.5;
 }
 .pages-nav.button-label, .pages-nav.nav-button.active.greyed-out .button-label {

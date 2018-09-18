@@ -18210,6 +18210,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     margin-top: 10px;
     margin-bottom: 25px;
 }
+
+.top-login-popup.pro-register-dialog div.big-red-button.register-button {
+    margin-top: 20px;
+    margin-bottom: 0px;
+}
+
 .pro-register-dialog.hidden {
     display: none;
 }
@@ -18217,7 +18223,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     margin-bottom: 24px;
 }
 .top-login-popup.sign .top-login-pad {
-    padding: 0px 24px 24px;
+    padding: 0px 32px 24px;
 }
 .top-login-popup.sign .login-page-forgot-bl {
     padding: 0 0 34px 0;

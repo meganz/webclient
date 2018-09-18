@@ -13,8 +13,10 @@
 }
 .fm-dialog-header .account.top-header {
     padding: 40px 0px 10px 40px;
-    color: #666666;
+    color: #333;
 }
+
+
 .fm-dialog-header .account.top-header.small {
     padding: 40px 0px 0px 40px;
     font-size: 26px;

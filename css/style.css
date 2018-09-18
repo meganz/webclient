@@ -18176,6 +18176,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .pro-login-dialog.hidden {
     display: none;
 }
+.pro-login-dialog .fm-dialog-header {
+    margin-bottom: 10px;
+}
 
 .top-login-forgot-pass {
     font-size: 13px;

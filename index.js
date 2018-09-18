@@ -277,6 +277,8 @@ function init_page() {
         $.lastSeenFilelink = getSitePath();
     }
 
+    $('body').removeClass('business');
+
     // Set class if gbot
     if (is_bot) {
         $('html').addClass('gbot');
@@ -495,6 +497,7 @@ function init_page() {
         && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
         && (page !== 'contact')
+        && (page !== 'business')
         && (page !== 'ios')
         && (page !== 'android')
         && (page !== 'wp')
@@ -948,6 +951,7 @@ function init_page() {
     }
     else if ((page == 'registerb')) { // business register
         parsepage(pages['registerb']);
+        $('body').addClass('business');
         var regBusiness = new BusinessRegister();
         regBusiness.initPage();
     }
@@ -1289,6 +1293,7 @@ function init_page() {
     }
     else if (page === 'business') {
         parsepage(pages['business']);
+        $('body').addClass('business');
 
     }
     else if (page === 'ios') {

@@ -1282,12 +1282,15 @@ BusinessAccount.prototype.resendInvitation = function (subuserHandle) {
         }
     });
 
-
     return operationPromise;
 };
 
 
-
+/**
+ * update a sub user attributes upon their change notification
+ * @param {String} subuserHandle            Sub-user handle
+ * @param {String[]} changedAttrs           Array of changed attributes names
+ */
 BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAttrs) {
     "use strict";
 
@@ -1314,16 +1317,16 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
                 subUser.lastname = res;
             }
             else if (ctx.ua === "%position") {
-                subUser["%position"] = res;
+                subUser["position"] = res;
             }
             else if (ctx.ua === "%idnum") {
-                subUser["%idnum"] = res;
+                subUser["idnum"] = res;
             }
             else if (ctx.ua === "%phonenum") {
-                subUser["%phonenum"] = res;
+                subUser["phonenum"] = res;
             }
             else if (ctx.ua === "%location") {
-                subUser["%location"] = res;
+                subUser["location"] = res;
             }
         }
 

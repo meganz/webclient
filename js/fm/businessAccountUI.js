@@ -627,8 +627,8 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     if (subUser.position) {
         sUserPos = from8(base64urldecode(subUser.position));
     }
-    if (subUser.position) {
-        sUserTel = from8(base64urldecode(subUser.position));
+    if (subUser.phonenum) {
+        sUserTel = from8(base64urldecode(subUser.phonenum));
     }
     if (subUser.location) {
         sUserLoc = from8(base64urldecode(subUser.location));
@@ -2006,7 +2006,7 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
         if (fname !== userAttrs.fname) {
             changes.fname = fname;
         }
-        if (lname !== userAttrs.fname) {
+        if (lname !== userAttrs.lname) {
             changes.lname = lname;
         }
         if (email !== subUser.e) {

@@ -2985,6 +2985,7 @@ function process_businessAccountSubUsers_SC(packet) {
     var subUser = M.suba[packet.u];
     if (!subUser) { // sub-user not found --> it's new one
         subUser = Object.create(null);
+        subUser.u = packet.u;
     }
 
     var valChanged = false;

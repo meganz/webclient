@@ -49,7 +49,7 @@
 .account.input-wrapper {
     border-bottom: 1px solid rgba(0,0,0,0.2);
     padding: 9px 0 9px 38px;
-    margin: 0 0 28px 0;
+    margin: 0 0 24px 0;
     position: relative;
     font-size: 0;
     line-height: 0;
@@ -60,6 +60,11 @@
     -ms-transition: border-color 200ms ease-in-out;
     transition: border-color 200ms ease-in-out;
 }
+
+.top-login-popup .account.input-wrapper {
+    margin: 0 0 8px 0;
+}
+
 .account.input-wrapper.focused {
     border-color: rgba(0,0,0,0.4);
 }
@@ -405,8 +410,8 @@
     text-align: center;
 }
 .top-login-popup .account.checkbox-block {
-    padding: 8px 0 34px 0;
+    padding: 0;
 }
 .dropdown.body.popup.top-login-popup {
-    width: 480px;
+    width: 400px;
 }

@@ -818,6 +818,12 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1
     height: 48px;
     line-height: 47px;
 }
+
+.big-red-button.height-32 {
+    height: 32px;
+    line-height: 31px;
+}
+
 .big-red-button i {
     margin: 2px -4px 0 0;
     vertical-align: top;

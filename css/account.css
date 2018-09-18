@@ -418,6 +418,10 @@
     margin: 36px auto 0 auto;
     text-align: center;
 }
+.confirm .account.top-header {
+    width: 160%;
+    margin: 0 -30%;
+}
 .top-login-popup .account.checkbox-block {
     padding: 0 0 16px 0;
 }

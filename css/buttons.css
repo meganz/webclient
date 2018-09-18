@@ -803,6 +803,13 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1
     -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
     box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
 }
+
+.top-login-popup .big-red-button {
+        font-size: 16px;
+}
+
+
+
 .default-white-button.small.red-bg {
     background: #F0373A;
     color: white;

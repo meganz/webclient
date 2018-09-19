@@ -793,6 +793,7 @@
     "6088": "Niciun fi\u015fier \u00een folder",
     "6089": "Niciun transfer",
     "6110": "Se \u00eencarc\u0103...",
+    "6112": "Anulat",
     "6117": "set\u0103ri",
     "6125": "PRO II",
     "6126": "PRO III",
@@ -1007,6 +1008,7 @@
     "7241": "Trebuie s\u0103 fii de acord cu Termenii de utilizare a serviciului nostru",
     "7272": "Format gre\u015fit al datei",
     "7315": "Start",
+    "7331": "Sortare",
     "7337": "Securitate",
     "7352": "Stare",
     "7354": "Se re\u00eennoie\u015fte pe",
@@ -2009,6 +2011,7 @@
     "17767": "Fi\u015fiere trimise \u00een chat",
     "17768": "Terminated account",
     "17789": "The entered tax number is invalid.",
+    "17791": "Filtru",
     "17792": "Your primary disk volume is full. Please free up some space and try again.",
     "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3].",
     "17794": "Se ini\u0163ializeaz\u0103...",
@@ -2778,5 +2781,11 @@
     "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
     "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A].",
     "19516": "Create business account",
-    "19517": "Create Business Account"
+    "19517": "Create Business Account",
+    "19521": "Modify account settings",
+    "19522": "Manage Account",
+    "19523": "Company information",
+    "19524": "The edit user operation has failed, please try again later",
+    "19525": "The user has been updated",
+    "19527": "Invitation link re-sending has failed due to a server error, please try again later"
 }

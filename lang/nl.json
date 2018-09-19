@@ -793,6 +793,7 @@
     "6088": "Lege map",
     "6089": "Geen overdrachten",
     "6110": "Uploaden...",
+    "6112": "Be\u00ebindigd",
     "6117": "Instellingen",
     "6125": "PRO II",
     "6126": "PRO III",
@@ -1007,6 +1008,7 @@
     "7241": "U moet akkoord gaan met onze Algemene Voorwaarden",
     "7272": "Dataformaat verkeerd",
     "7315": "Start",
+    "7331": "Sorteer",
     "7337": "Veiligheid",
     "7352": "Staat",
     "7354": "Vernieuwd op",
@@ -2009,6 +2011,7 @@
     "17767": "Bestanden verstuurd naar gesprek",
     "17768": "Be\u00ebindigde account",
     "17789": "Het ingevoerde btw nummer is ongeldig.",
+    "17791": "Filter",
     "17792": "Uw primaire schijf inhoud is vol. Maak ruimte vrij en probeer nogmaals.",
     "17793": "Helaas, geeft Chrome MEGA toestemming om alleen een deel te gebruiken van uw beschikbare schijf ruimte die momenteel onvoldoende is. Installeer de [A1]MEGA desktop app[\/A1] of onze [A2]Chrome Extensie[\/A2], of probeer [A3]wat ruimte vrij te maken[\/A3].",
     "17794": "Initialiseren...",
@@ -2778,5 +2781,11 @@
     "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
     "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A].",
     "19516": "Create business account",
-    "19517": "Create Business Account"
+    "19517": "Create Business Account",
+    "19521": "Modify account settings",
+    "19522": "Manage Account",
+    "19523": "Company information",
+    "19524": "The edit user operation has failed, please try again later",
+    "19525": "The user has been updated",
+    "19527": "Invitation link re-sending has failed due to a server error, please try again later"
 }

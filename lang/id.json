@@ -793,6 +793,7 @@
     "6088": "Tidak ada file di folder",
     "6089": "Tidak ada transfer",
     "6110": "Mengupload...",
+    "6112": "Dibatalkan",
     "6117": "settings",
     "6125": "PRO II",
     "6126": "PRO III",
@@ -1007,6 +1008,7 @@
     "7241": "Anda harus setuju dengan Kebijakan Pelayanan kami.",
     "7272": "Format data salah",
     "7315": "Mulai",
+    "7331": "Urutkan",
     "7337": "Keamanan",
     "7352": "State",
     "7354": "Pembaruan pada tanggal",
@@ -2009,6 +2011,7 @@
     "17767": "File dikirim ke obrolan",
     "17768": "Akun yang dihentikan",
     "17789": "Nomor pajak yang dimasukkan tidak valid.",
+    "17791": "Filter",
     "17792": "Volume disk utama Anda penuh. Silakan kosongkan beberapa ruang dan coba lagi.",
     "17793": "Sayangnya, Chrome hanya memungkinkan MEGA untuk menggunakan sebagian ruang disk Anda yang tersedia yang saat ini tidak memadai. Silakan instal [A1]aplikasi desktop MEGA[\/A1] atau [A2]Ekstensi Chrome[\/A2] kami, atau coba [A3]kosongkan beberapa ruang[\/A3].",
     "17794": "Memulai ...",
@@ -2778,5 +2781,11 @@
     "19513": "Terima kasih! Akun Anda [B]%2[\/B] akan ditingkatkan segera setelah kami menerima konfirmasi pembayaran Anda dari penyedia pembayaran kami. Jika Anda membayar dengan kartu debit atau kredit dan Anda belum menerima akun MEGA PRO Anda dalam beberapa jam, silakan hubungi kami di [A]support@mega.nz[\/A]. Jika Anda membayar dengan transfer bank, beri waktu 4-5 hari agar pembayaran dapat dihapus.",
     "19514": "Terima kasih! Akun Anda [B]%2[\/B] akan ditingkatkan segera setelah kami menerima konfirmasi pembayaran Anda dari penyedia pembayaran kami dalam beberapa menit. Jika Anda belum menerima akun MEGA PRO Anda dalam %1 jam, silakan hubungi kami di [A]support@mega.nz[\/A].",
     "19516": "Buat akun bisnis",
-    "19517": "Buat Akun Bisnis"
+    "19517": "Buat Akun Bisnis",
+    "19521": "Modify account settings",
+    "19522": "Manage Account",
+    "19523": "Company information",
+    "19524": "The edit user operation has failed, please try again later",
+    "19525": "The user has been updated",
+    "19527": "Invitation link re-sending has failed due to a server error, please try again later"
 }

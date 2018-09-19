@@ -1451,6 +1451,9 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         var $countriesSelect = $('#cnt-ddl', $profileContainer);
         $countriesSelect.empty();
 
+        // first option as place-holder
+        $countriesSelect.append('<option value="" hidden disabled>{0}</option >'.replace('{0}', l[481]));
+
         var ctnKeys = Object.keys(countries);
 
         for (var k = 0; k < ctnKeys.length; k++) {

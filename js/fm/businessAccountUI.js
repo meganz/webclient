@@ -356,6 +356,70 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 mySelf.showEditSubUserDialog(userHandle);
             });
 
+        // 5- on clicking on a sub-user row to enable/disable
+        $('.grid-table-user-management .dis-en-icon').off('click.subuser').on('click.subuser',
+            function disableEnableSubUserClickHandler() {
+                var userHandle = $(this).closest('tr').attr('id');
+                if (!M.suba[userHandle]) {
+                    return;
+                }
+                var isDisable = false;
+                if (M.suba[userHandle].s === 10 || M.suba[userHandle].s === 0) {
+                    isDisable = true;
+                }
+
+                var uName = from8(base64urldecode(M.suba[userHandle].firstname)) + ' ' +
+                    from8(base64urldecode(M.suba[userHandle].lastname));
+                uName = uName.trim();
+
+                if (isDisable) {
+                    var confirmationDlgResultHandler = function (adminAnswer) {
+                        if (adminAnswer) {
+                            var opPromise = mySelf.business.deActivateSubAccount(userHandle);
+                            opPromise.done(
+                                function () {
+                                    // action packet will update DB. [+ memory]
+                                    // subUser.s = 11; // disabled
+                                    return;
+                                }
+                            ).fail(
+                                function () {
+                                    msgDialog('warningb', '', l[19100]);
+                                }
+                            );
+                        }
+                    };
+
+                    mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler, uName);
+                }
+                else {
+                    // enable on
+                    var confirmationDlgResultHandler2 = function (adminAnswer) {
+                        if (adminAnswer) {
+                            var opPromise = mySelf.business.activateSubAccount(userHandle);
+                            opPromise.done(
+                                function (st, res, req) {
+                                    if (res === 0) {
+                                        return;
+                                    }
+                                    else if (typeof res === 'object') {
+                                        res.m = M.suba[userHandle].e;
+                                        mySelf.showAddSubUserDialog(res);
+                                    }
+                                }
+                            ).fail(
+                                function () {
+                                    msgDialog('warningb', '', l[19128]);
+                                }
+                            );
+                        }
+                    };
+
+                    mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler2, uName, true);
+                }
+
+            });
+
 
 
     };
@@ -2509,6 +2573,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         // safe to create new object.
         var busUI = new BusinessAccountUI();
         busUI.viewSubAccountListUI();
+        updateLeftSubUserPanel(subuser);
     }
     // if we are in sub-user view
     else if (!$('.files-grid-view.user-management-view .user-management-subaccount-view-container')

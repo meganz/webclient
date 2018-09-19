@@ -1114,10 +1114,11 @@ BusinessAccount.prototype.getAccountInvoicesList = function (forceUpdate) {
  * @param {String} lname        last name of the user
  * @param {String} email        email of the user
  * @param {String} pass         user's entered password
+ * @param {Boolean} isUpgrade   a flag to tell that this is a user upgrade and no need to create the user
  * @returns {Promise}           resolve with the operation result
  */
 BusinessAccount.prototype.setMasterUserAttributes =
-    function (nbusers, cname, tel, fname, lname, email, pass) {
+    function (nbusers, cname, tel, fname, lname, email, pass, isUpgrade) {
         "use strict";
         var operationPromise = new MegaPromise();
 
@@ -1142,44 +1143,62 @@ BusinessAccount.prototype.setMasterUserAttributes =
             request_upb['^companynbusers'] = base64urlencode(to8(nbusers)); // nb of users
         }
 
-        security.deriveKeysFromPassword(pass, u_k,
-            function (clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+        if (!isUpgrade) {
 
-                // Encode parameters to Base64 before sending to the API
-                var sendEmailRequestParams = {
-                    a: 'uc2',
-                    n: base64urlencode(to8(fname + ' ' + lname)),         // Name (used just for the email)
-                    m: base64urlencode(email),                                   // Email
-                    crv: ab_to_base64(clientRandomValueBytes),                   // Client Random Value
-                    k: a32_to_base64(encryptedMasterKeyArray32),                 // Encrypted Master Key
-                    hak: ab_to_base64(hashedAuthenticationKeyBytes),             // Hashed Authentication Key
-                    v: 2                                                         // Version of this protocol
-                };
+            security.deriveKeysFromPassword(pass, u_k,
+                function (clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
 
-                api_req([request_upb, sendEmailRequestParams], {
-                    callback: function (res1, ctx, queue, res) {
-                        if ($.isNumeric(res)) {
-                            operationPromise.reject(0, res, 'API returned error');
+                    // Encode parameters to Base64 before sending to the API
+                    var sendEmailRequestParams = {
+                        a: 'uc2',
+                        n: base64urlencode(to8(fname + ' ' + lname)),         // Name (used just for the email)
+                        m: base64urlencode(email),                                   // Email
+                        crv: ab_to_base64(clientRandomValueBytes),                   // Client Random Value
+                        k: a32_to_base64(encryptedMasterKeyArray32),                 // Encrypted Master Key
+                        hak: ab_to_base64(hashedAuthenticationKeyBytes),             // Hashed Authentication Key
+                        v: 2                                                         // Version of this protocol
+                    };
+
+                    api_req([request_upb, sendEmailRequestParams], {
+                        callback: function (res1, ctx, queue, res) {
+                            if ($.isNumeric(res)) {
+                                operationPromise.reject(0, res, 'API returned error');
+                            }
+                            else if (!Array.isArray(res)) {
+                                operationPromise.reject(0, res, 'API returned error');
+                            }
+                            else if (res.length !== 2) {
+                                operationPromise.reject(0, res, 'API returned error');
+                            }
+                            else if (typeof res[0] !== 'string' || res[1] !== 0) {
+                                operationPromise.reject(0, res, 'API returned error');
+                            }
+                            else {
+                                operationPromise.resolve(1, res); // user handle
+                            }
                         }
-                        else if (!Array.isArray(res)) {
-                            operationPromise.reject(0, res, 'API returned error');
-                        }
-                        else if (res.length !== 2) {
-                            operationPromise.reject(0, res, 'API returned error');
-                        }
-                        else if (typeof res[0] !== 'string' || res[1] !== 0) {
-                            operationPromise.reject(0, res, 'API returned error');
-                        }
-                        else {
-                            operationPromise.resolve(1, res); // user handle
-                        }
+
+                    });
+
+
+                }
+            );
+        }
+        else {
+            api_req(request_upb, {
+                callback: function (res) {
+                    if ($.isNumeric(res)) {
+                        operationPromise.reject(0, res, 'API returned error');
                     }
-
-                });
-
-
-            }
-        );
+                    else if (typeof res === 'string') {
+                        operationPromise.resolve(1, res); // update success
+                    }
+                    else {
+                        operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+                    }
+                }
+            });
+        }
 
         return operationPromise;
     };

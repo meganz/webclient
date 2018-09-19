@@ -96,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm22_';
+    var dbpfx = 'fm23_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;

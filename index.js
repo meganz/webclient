@@ -850,6 +850,11 @@ function init_page() {
         mobile.achieve.init();
         return false;
     }
+    else if (is_mobile && page === 'fm/account/history') {
+        parsepage(pages['mobile']);
+        mobile.account.history.init();
+        return false;
+    }
     else if (page === 'achievements') {
         loadSubPage('fm/account/achievements');
         return false;

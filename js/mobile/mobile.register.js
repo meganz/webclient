@@ -192,7 +192,9 @@ mobile.register = {
             }
 
             // Unfocus (blur) the input fields to prevent the cursor showing on iOS and also hide the keyboard
-            $firstNameField.add($lastNameField).add($emailField).add($passwordField).add($confirmPasswordField).blur();
+            $firstNameField.add($lastNameField).add($emailField)
+                .add($passwordField).add($confirmPasswordField)
+                .trigger("blur");
 
             // Clear old errors from past form submissions
             $containerFields.removeClass('incorrect');

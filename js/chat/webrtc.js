@@ -1,5 +1,5 @@
 (function(scope) {
-"use strict";
+    'use strict'; // jscs:disable validateIndentation
 
 var CallDataType = Object.freeze({
     kNotRinging: 0,
@@ -58,26 +58,20 @@ RtcModule.prototype.logToServer = function(type, data) {
         data = { data: data };
     }
     data.client = RTC.browser;
+    data = JSON.stringify(data);
+
     var wait = 500;
     var retryNo = 0;
     var self = this;
-    function req() {
-        jQuery.ajax("https://stats.karere.mega.nz/msglog?aid=" + base64urlencode(self.ownAnonId) + "&t=" + type, {
-            type: 'POST',
-            data: JSON.stringify(data),
-            error: function(jqXHR, textStatus, errorThrown) {
-                retryNo++;
-                if (retryNo < 20) {
-                    wait *= 2;
-                    setTimeout(function() {
-                        req();
-                    }, wait);
-                }
-            },
-            dataType: 'json'
+    var url = "https://stats.karere.mega.nz/msglog?aid=" + base64urlencode(self.ownAnonId) + "&t=" + type;
+
+    (function req() {
+        M.xhr(url, data).catch(function() {
+            if (++retryNo < 20) {
+                setTimeout(req, wait *= 2);
+            }
         });
-    }
-    req();
+    })();
 };
 
 RtcModule.prototype.setupLogger = function() {
@@ -1891,12 +1885,9 @@ Session.prototype.submitStats = function(termCode, errInfo) {
     }
     var url = this.call.manager.statsUrl;
     if (url) {
-        jQuery.ajax(url, {
-                        type: 'POST',
-                        data: JSON.stringify(stats)
-                    });
+        M.xhr(url, JSON.stringify(stats));
     }
-}
+};
 
 // we actually verify the whole SDP, not just the fingerprints
 Session.prototype.verifySdpFingerprints = function(sdp, peerHash) {

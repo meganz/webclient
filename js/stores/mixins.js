@@ -134,7 +134,7 @@ var MegaRenderMixin = {
     },
     componentWillUnmount: function() {
         if (this.props.requiresUpdateOnResize) {
-            $(window).unbind('resize.megaRenderMixing' + this.getUniqueId());
+            $(window).off('resize.megaRenderMixing' + this.getUniqueId());
         }
 
         // window.removeEventListener('hashchange', this.onHashChangeDoUpdate);

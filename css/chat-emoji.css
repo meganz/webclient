@@ -36,7 +36,7 @@
     color:#666666;
     text-transform:uppercase;
     padding: 21px 11px 13px 11px;
-    
+
 }
 .emoji-type-txt:first-child {
     padding: 2px 11px 15px 11px;
@@ -73,7 +73,7 @@
     margin-top: 6px;
 }
 
-img.emoji, .chat-topic-block img.emoji.big, .small-info-txt img.emoji.big {
+img.emoji, .chat-topic-block img.emoji.big, .small-info-txt img.emoji.big, .fm-picker-dialog img.emoji.big {
     width: 20px;
     height: 20px;
     display:inline-block;
@@ -81,6 +81,9 @@ img.emoji, .chat-topic-block img.emoji.big, .small-info-txt img.emoji.big {
     margin-top: -3px;
     margin-left: 2px;
     margin-right: 2px;
+}
+.fm-picker-dialog img.emoji.big {
+    margin-top: 2px;
 }
 
 img.emoji.big {

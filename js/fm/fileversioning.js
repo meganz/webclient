@@ -619,9 +619,9 @@
                     // Init scrolling
                     fileversioning.initFileVersioningScrolling();
                 });
-            $(window).bind('resize.fmbreadcrumbs', function() {
+            $(window).rebind('resize.fileversioning', SoonFc(function() {
                 fileversioning.initFileVersioningScrolling();
-            });
+            }));
             $('.fm-versioning .header .button.settings').rebind('click', function() {
                 pd.addClass('hidden');
                 loadSubPage('fm/account/file-management');

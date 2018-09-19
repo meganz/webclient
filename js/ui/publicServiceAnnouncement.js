@@ -226,7 +226,7 @@ var psa = {
 
         // Reset file manager height
         $('.fmholder').css('height', '');
-        $(window).unbind('resize.bottomNotification');
+        $(window).off('resize.bottomNotification');
 
         // Trigger resize so that full content in the file manager is visible after closing
         $(window).trigger('resize');

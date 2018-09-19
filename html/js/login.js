@@ -279,6 +279,7 @@ function init_login() {
 
     if (confirmok) {
         $('.main-left-block').addClass('confirm');
+        $('.main-right-block').addClass('hidden');
         $('.register-st2-txt-block').addClass('hidden');
         $('.account.small-header-txt').addClass('hidden');
         $('.top-login-forgot-pass').addClass('hidden');

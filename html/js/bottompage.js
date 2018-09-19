@@ -110,8 +110,8 @@ var bottompage = {
             $('.nav-button.compound-lnk.opened').removeClass('opened');
             $('.pages-nav.nav-button.active.greyed-out').removeClass('greyed-out');
             $('.pages-nav.compound-items.active').removeClass('active').removeAttr('style');
-            $('body, html').unbind('touchmove.bodyscroll');
-            $(window).unbind('resize.navdropdown');
+            $('body, html').off('touchmove.bodyscroll');
+            $(window).off('resize.navdropdown');
         }
 
         $('.nav-overlay').rebind('click', function() {

@@ -62,22 +62,18 @@
         }
 
 
-        $('.cancel-call', self.$dialog).unbind('mouseup');
-        $('.cancel-call', self.$dialog).bind('mouseup', function() {
+        $('.cancel-call', self.$dialog).rebind('mouseup.IncomingCallDialog', function() {
             cancelFn();
         });
 
-        $('.audio-call', self.$dialog).unbind('mouseup');
-        $('.audio-call', self.$dialog).bind('mouseup', function() {
+        $('.audio-call', self.$dialog).rebind('mouseup.IncomingCallDialog', function() {
             answerAudioFn();
         });
 
-        $('.video-call', self.$dialog).unbind('mouseup');
-        $('.video-call', self.$dialog).bind('mouseup', function() {
+        $('.video-call', self.$dialog).rebind('mouseup.IncomingCallDialog', function() {
             answerVideoFn();
         });
-        $('.fm-dialog-close', self.$dialog).unbind('mouseup');
-        $('.fm-dialog-close', self.$dialog).bind('mouseup', function() {
+        $('.fm-dialog-close', self.$dialog).rebind('mouseup.IncomingCallDialog', function() {
             self.hide();
         });
 
@@ -91,14 +87,6 @@
 
         self.$dialog.removeClass('hidden');
         $('.fm-dialog-overlay').removeClass('hidden');
-
-        // auto hide on click out of the dialog
-        //$(document).unbind('mouseup.IncomingCallDialog');
-        //$(document).bind('mouseup.IncomingCallDialog', function(e) {
-        //    if ($(e.target).parents('.fm-chat-attach-popup').size() == 0 && !$(e.target).is(self.options.buttonElement)) {
-        //        self.hide();
-        //    }
-        //});
     };
 
     /**
@@ -111,8 +99,8 @@
             return;
         }
         // auto hide on click out of the dialog - cleanup
-        $(document).unbind('mouseup.IncomingCallDialog');
-        $(document).unbind('keypress.IncomingCallDialog');
+        $(document).off('mouseup.IncomingCallDialog');
+        $(document).off('keypress.IncomingCallDialog');
 
         self.visible = false;
         self.$dialog.addClass('hidden');

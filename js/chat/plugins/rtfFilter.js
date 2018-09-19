@@ -14,7 +14,7 @@ var RtfFilter = function(megaChat) {
     self.regexps['(^|\\s)_{1,2}([^_\\n]{1,})_{1,2}'] = ['gi', '$1<em class="rtf-italic">$2</em>', '$1 $2'];
     self.regexps['^&gt;(.*)'] = ['gm', '<pre class="rtf-quote">$1</pre>', '$1']; // support > style.
 
-    megaChat.bind("onBeforeRenderMessage", function(e, eventData) {
+    megaChat.on("onBeforeRenderMessage", function(e, eventData) {
         self.processMessage(e, eventData);
     });
 

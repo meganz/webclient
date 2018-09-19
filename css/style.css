@@ -537,7 +537,7 @@ input[type="checkbox"] {
     margin: 20px 12px 0 7px;
 }
 .top-login-popup .checkboxOn, .top-login-popup .checkboxOff {
-    margin: 8px 11px 0 1px;
+    margin: 0px 11px 0 1px;
 }
 .top-login-popup .loginwarning-checkbox {
     margin: 12px 11px 0 0;
@@ -594,16 +594,13 @@ input[type="checkbox"] {
 .fm-dialog .radio-txt, .top-login-popup .radio-txt {
     padding-top: 18px;
 }
-.top-login-popup .radio-txt {
-    padding-top: 13px;
-}
 .new-registration-checkbox .radio-txt {
     padding-top: 2px;
 }
-.radio-txt a, .radio-txt span {
+.radio-txt a, .radio-txt span.red {
     color: #F0373B;
 }
-.radio-txt a:hover, .radio-txt span:hover {
+.radio-txt a:hover, .radio-txt span.red:hover {
     text-decoration: underline;
 }
 label span.black {
@@ -1266,24 +1263,22 @@ div.radioOn, div.radioOff {
     margin-top: 7px;
     cursor: pointer;
     background-color: white;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    -moz-background-clip: padding-box;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
     position: relative;
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
 }
 .fm-account-notifications .radioOn, .fm-account-notifications .radioOff {
     margin-left: -25px;
     margin-right: 36px;
 }
 div.radioOn {
-    border: 1px solid rgba(255, 51, 58, 0.5);
+    -webkit-box-shadow: 0 0 0 1px rgba(255, 51, 58, 0.5);
+    -moz-box-shadow: 0 0 0 rgba(255, 51, 58, 0.5);
+    box-shadow: 0 0 0 1px rgba(255, 51, 58, 0.5);
 }
 div.radioOn::before, div.radioOff::before {
     width: 100%;
@@ -1300,16 +1295,18 @@ div.radioOn::before, div.radioOff::before {
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 }
 div.radioOn::after, div.radioOff::after {
-    width: 12px;
-    height: 12px;
-    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: inline-block;
     content: '';
-    left: 2px;
-    top: 2px;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
     background-color: rgba(0,0,0,0.05);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 2px solid white;
 }
 div.radioOn::after {
     background: rgb(255,51,58);
@@ -1376,13 +1373,12 @@ input.radioOn, input.radioOff {
     padding-bottom: 7px;
 }
 .radioOff input, .radioOn input {
- filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
-    width: 18px;
-    height: 18px;
-    position: relative;
+    width: 100%;
+    height: 100%;
+    position: absolute;
     z-index: 1;
     cursor: pointer;
 }
@@ -1642,6 +1638,8 @@ a.blog-button:hover {
     padding: 1px 0 0 0;
     line-height: 18px;
 }
+
+
 .top-change-language:hover .top-change-language-name, .top-change-language:hover .top-icon::before, .wu-lang .glob-icon::before, .wu-lang:hover .wu-change-lang {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
@@ -2308,6 +2306,12 @@ a.nt-settings-button:hover span {
 * html .jspCorner {
     margin: 0 -3px 0 0;
 }
+
+.jspHorizontalBar {
+    /* If you do require horizontal scrollbars, don't use jScrollPane - we're deprecating it anyway */
+    display: none !important;
+}
+
 ul.tagit {
     overflow: auto;
     margin-left: inherit;
@@ -4456,14 +4460,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .top-buttons {
     float: right;
-    padding: 0 12px 0 12px;
+    padding: 0 12px 0 4px;
     margin: 8px 0 0 0;
     border-left: 1px solid rgba(0,0,0,0.05);
 }
-.top-buttons a {
+.top-buttons .default-white-button.small {
     float: left;
-    margin: -2px 5px;
-    min-width: 10px;
+    margin: -2px 0 0 14px;
+    min-width: 68px;
 }
 .fm-avatar img {
     width: 24px;
@@ -11788,7 +11792,7 @@ table {
     background-image: url(../images/mega/top-login-sprite_v11.png);
     background-position: 1px 4px;
     background-repeat: no-repeat;
-    margin: 32px 32px 5px 0px;
+    margin: 14px 14px 5px 0px;
     cursor: pointer;
     display: block;
     position: absolute;
@@ -11867,16 +11871,15 @@ table {
     background-color: #333333;
     width: 100%;
     min-height: 60px;
-    -moz-border-radius: 24px;
-    -webkit-border-radius: 24px;
-    border-radius: 24px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
     margin-top: 14px;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
     -o-transition: opacity 200ms ease-in-out;
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
@@ -11909,13 +11912,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background-position: -3px -237px;
     background-repeat: no-repeat;
     cursor: pointer;
-    margin: 30px 32px 0px 0px;
+    margin: 16px 16px 0px 0px;
 }
 .top-login-warning-close:hover {
     background-position: -37px -237px;
 }
 .top-login-warning-pad {
-    padding: 40px;
+    padding: 24px;
     font-size: 13px;
     line-height: 16px;
     color: #CCCCCC;
@@ -12014,6 +12017,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background-repeat: no-repeat;
     float: right;
     padding: 0 0 0 23px;
+    margin-top: 8px;
     cursor: pointer;
     -webkit-transition: color 200ms ease-in-out;
     -moz-transition: color 150ms ease-in-out;
@@ -12259,6 +12263,9 @@ h5.main-italic-header {
 .login-page-forgot-bl {
     padding: 0 0 64px 0;
     margin-top: -10px;
+}
+.top-login-popup .login-page-forgot-bl {
+    margin-top: -8px;
 }
 .register-st2-txt-block {
     padding-top: 80px;
@@ -18119,17 +18126,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .pro-login-dialog .fm-dialog-header {
     margin-bottom: 10px;
 }
-.top-login-forgot-pass {
-    font-size: 13px;
-    color: #999999;
-    line-height: 21px;
-    background-image: url(../images/mega/top-login-sprite_v11.png);
-    background-position: 0 -1582px;
-    background-repeat: no-repeat;
-    float: right;
-    padding: 0 0 0 23px;
-    cursor: pointer;
-}
 /* register */
 .pro-register-dialog {
     z-index: 1180;
@@ -18146,17 +18142,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     margin: 0;
 }
 .pro-register-dialog div.big-red-button.register-button {
-    margin-top: 10px;
-    margin-bottom: 25px;
+    margin-top: 20px;
+    margin-bottom: 0px;
 }
 .pro-register-dialog.hidden {
     display: none;
 }
 .top-login-popup.sign .fm-dialog-header {
-    margin-bottom: 10px;
+    margin-bottom: 24px;
 }
 .top-login-popup.sign .top-login-pad {
-    padding: 12px 40px 18px;
+    padding: 0px 32px 24px;
 }
 .top-login-popup.sign .login-page-forgot-bl {
     padding: 0 0 34px 0;
@@ -22243,6 +22239,7 @@ table.speed-table {
     border-radius: 8px;
     right: 2px;
 }
+
 div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
@@ -22250,11 +22247,29 @@ div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
     height: 8px;
     bottom: 2px;
 }
-.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y,
 .ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
     opacity: 0.3 !important;
     background-color: rgb(0, 0, 0) !important;
 }
+
+.ps-container > .ps-scrollbar-x-rail {
+    opacity:  1 !important;
+    cursor: pointer;
+}
+
+.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
+    opacity: 0.2 !important;
+    background-color: rgb(0, 0, 0) !important;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+}
+.ps-container > .ps-scrollbar-x-rail:hover > .ps-scrollbar-x {
+    opacity: 0.3 !important;
+}
+
 body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-start-conversation, body.megaChatDisabled .nw-contact-name .button.start-chat-button {
     display: none;
 }

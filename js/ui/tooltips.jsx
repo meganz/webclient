@@ -61,7 +61,7 @@ var Tooltip = React.createClass({
     componentDidUpdate(oldProps, oldState) {
         var self = this;
         if (oldState.active === true && this.state.active === false) {
-            $(window).unbind('resize.tooltip' + this.getUniqueId());
+            $(window).off('resize.tooltip' + this.getUniqueId());
         }
         if(self.state.active === true) {
             self.repositionTooltip();

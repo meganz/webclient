@@ -1348,14 +1348,19 @@
 
                             <div class="option-containers">
                                 <div class="bus-input-block">
-                                    <div class="bus-input error">
+                                    <div class="bus-input">
                                         <div class="bus-reg-icon company-name"></div>
                                         <input type="text" id="prof-cname" placeholder="Company Name">
                                         <div class="error-message">is the error signal too red?</div>
                                     </div>
                                     <div class="bus-input">
                                         <div class="bus-reg-icon email"></div>
-                                        <input type="email" id="prof-email" placeholder="Email">
+                                        <input type="email" id="prof-email" placeholder="[$7434]">
+                                        <div class="error-message">is the error signal too red?</div>
+                                    </div>
+                                    <div class="bus-input">
+                                        <div class="bus-reg-icon phone"></div>
+                                        <input type="tel" id="prof-phone" placeholder="Phone">
                                         <div class="error-message">is the error signal too red?</div>
                                     </div>
                                     <div class="bus-input note">
@@ -1386,7 +1391,7 @@
                                         <div class="error-message">is the error signal too red?</div>
                                     </div>
                                     <div class="bus-input short-input">
-                                        <select name="prf-country" placeholder="Country">
+                                        <select id ="cnt-ddl" name="prf-country" placeholder="Country">
                                             <option value="New Zealand">New Zealand</option>
                                             <option value="Syria">Syria</option>
                                             <option value="Spain">Spain</option>

@@ -1379,6 +1379,79 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         }
     );
 
+    // function to fill dropdown list of countries
+    var loadCountries = function () {
+        var countries = M.getCountries();
+
+        var optionHtml = '<option value="{0}">{1}</option>';
+
+        var $countriesSelect = $('#cnt-ddl', $profileContainer);
+        $countriesSelect.empty();
+
+        var ctnKeys = Object.keys(countries);
+
+        for (var k = 0; k < ctnKeys.length; k++) {
+            var currOption = optionHtml.replace('{0}', ctnKeys[k]).replace('{1}', countries[ctnKeys[k]]);
+            $countriesSelect.append(currOption);
+        }
+    };
+
+    // collecting info
+    var cName = '';
+    var cTel = '';
+    var cEmail = '';
+    var cVat = '';
+    var cAddress = '';
+    var cAddress2 = '';
+    var cCity = '';
+    var cState = '';
+    var cCountry = '';
+    var cZip = '';
+
+    loadCountries();
+
+    if (u_attr['^companyname']) {
+        cName = u_attr['^companyname'];
+    }
+    if (u_attr['^companyphone']) {
+        cTel = u_attr['^companyphone'];
+    }
+    if (u_attr['^companyemail']) {
+        cEmail = u_attr['^companyemail'];
+    }
+    if (u_attr['^companytaxnum']) {
+        cVat = u_attr['^companytaxnum'];
+    }
+    if (u_attr['^companyaddress1']) {
+        cAddress = u_attr['^companyaddress1'];
+    }
+    if (u_attr['^companyaddress2']) {
+        cAddress2 = u_attr['^companyaddress2'];
+    }
+    if (u_attr['^companycity']) {
+        cCity = u_attr['^companycity'];
+    }
+    if (u_attr['^companystate']) {
+        cState = u_attr['^companystate'];
+    }
+    if (u_attr['^companycountry']) {
+        cCountry = u_attr['^companycountry'];
+    }
+    if (u_attr['^companyzip']) {
+        cZip = u_attr['^companyzip'];
+    }
+
+    var $cNameInput = $('input#prof-cname', $profileContainer).val(cName);
+    var $cTelInput = $('input#prof-phone', $profileContainer).val(cTel);
+    var $cEmailInput = $('input#prof-email', $profileContainer).val(cEmail);
+    var $cVatInput = $('input#prof-vat', $profileContainer).val(cVat);
+    var $cAddressInput = $('input#prof-addr1', $profileContainer).val(cAddress);
+    var $cAddress2Input = $('input#prof-addr2', $profileContainer).val(cAddress2);
+    var $cCityInput = $('input#prof-city', $profileContainer).val(cCity);
+    var $cStateInput = $('input#prof-state', $profileContainer).val(cState);
+    var $cCountryInput = $('select#cnt-ddl', $profileContainer).val(cCountry);
+    var $cZipInput = $('input#prof-zip', $profileContainer).val(cZip);
+
     unhideSection();
     
 };

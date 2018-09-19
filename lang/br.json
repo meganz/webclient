@@ -793,6 +793,7 @@
     "6088": "Pasta vazia",
     "6089": "N\u00e3o h\u00e1 transfer\u00eancias",
     "6110": "Enviando...",
+    "6112": "Cancelado",
     "6117": "configura\u00e7\u00f5es",
     "6125": "PRO II",
     "6126": "PRO III",
@@ -2785,6 +2786,6 @@
     "19522": "Gerenciamento da conta",
     "19523": "Informa\u00e7\u00f5es corporativas",
     "19524": "N\u00e3o foi poss\u00edvel editar as informa\u00e7\u00f5es do usu\u00e1rio. Tente novamente mais tarde",
-    "19525": "O usu\u00e1rio foi atualizado",
-    "19527": "N\u00e3o foi poss\u00edvel reenviar o link de convite por um erro do servidor. Tente novamente mais tarde"
+    "19525": "As informa\u00e7\u00f5es do usu\u00e1rio foram editadas",
+    "19527": "N\u00e3o foi poss\u00edvel reenviar o link de convite. Tente novamente mais tarde"
 }

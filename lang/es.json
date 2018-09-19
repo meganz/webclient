@@ -793,6 +793,7 @@
     "6088": "Carpeta vac\u00eda",
     "6089": "No hay transferencias",
     "6110": "Subiendo...",
+    "6112": "Cancelada",
     "6117": "Ajustes",
     "6125": "PRO II",
     "6126": "PRO III",
@@ -1105,7 +1106,7 @@
     "7880": "El acceso a la carpeta ha sido eliminado.",
     "7881": "\u00a1Gracias! Uno de nuestro t\u00e9cnicos de soporte responder\u00e1 a tu consulta tan pronto como sea posible.",
     "7882": "Mensaje enviado",
-    "7883": "Se ha producido un error al intentar enviar tu mensaje. Por favor, intenta reenviarlo.",
+    "7883": "No se ha podido enviar tu mensaje, int\u00e9ntalo de nuevo.",
     "7884": "Mensaje demasiado corto",
     "7944": "Tu cuenta ha sido bloqueada. Por favor contacta con support@mega.nz",
     "7945": "Para acceder a esta carpeta\/archivo, necesitas la [B]Clave de cifrado[\/B]",
@@ -2781,10 +2782,10 @@
     "19514": "\u00a1Gracias! Tu cuenta [B]%2[\/B] pasar\u00e1 a PRO en cuanto nuestro proveedor nos confirme el pago. Si no has recibido tu cuenta PRO dentro de %1 horas, por favor env\u00edanos un correo a [A]support@mega.nz[\/A].",
     "19516": "Crear una cuenta Business",
     "19517": "Crear una cuenta Business",
-    "19521": "Modify account settings",
-    "19522": "Manage Account",
-    "19523": "Company information",
-    "19524": "The edit user operation has failed, please try again later",
-    "19525": "The user has been updated",
-    "19527": "Invitation link re-sending has failed due to a server error, please try again later"
+    "19521": "Modificar los ajustes de la cuenta",
+    "19522": "Gestionar cuenta",
+    "19523": "Informaci\u00f3n de la empresa",
+    "19524": "No se ha podido editar la informaci\u00f3n del usuario, int\u00e9ntalo de nuevo",
+    "19525": "La informaci\u00f3n del usuario ha sido actualizada",
+    "19527": "No se ha podido reenviar el enlace de invitaci\u00f3n, int\u00e9ntalo de nuevo"
 }

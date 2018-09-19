@@ -277,8 +277,6 @@ function init_page() {
         $.lastSeenFilelink = getSitePath();
     }
 
-    $('body').removeClass('business');
-
     // Set class if gbot
     if (is_bot) {
         $('html').addClass('gbot');
@@ -307,6 +305,8 @@ function init_page() {
 
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
+    // add business class to affect the top header
+    $('body').removeClass('business');
 
     if ('-fa-ar-he-'.indexOf('-' + lang + '-') > -1) {
         $('body').addClass('rtl');
@@ -1886,6 +1886,11 @@ function topmenuUI() {
 
     $topHeader.find('.top-icon.achievements').rebind('click', function () {
         mega.achievem.achievementsListDialog();
+    });
+
+    // try individual button in business mode
+    $topHeader.find('.top-centered-margin .individual').rebind('click', function () {
+        loadSubPage('start');
     });
 
     $('.top-icon.menu, .top-icon.close').rebind('click', function () {

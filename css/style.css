@@ -24136,6 +24136,19 @@ opacity: 1;
 
 /* codes for user-management */
 
+.top-head .top-buttons {
+    display: block;
+}
+.top-head .top-buttons.business {
+    display:none;
+}
+.business .top-head .top-buttons {
+    display: none;
+}
+.business .top-head .top-buttons.business {
+    display: block;
+}
+
 .font-user-management, .font-user-management td, .font-user-management th{
     font-family: 'Source Sans Pro', sans-serif;
 }

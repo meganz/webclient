@@ -1596,7 +1596,7 @@ function topmenuUI() {
         $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
     }
 
-    var avatar = window.useravatar && useravatar.my;
+    var avatar = window.useravatar && useravatar.mine();
     if (!avatar) {
         $topHeader.find('.fm-avatar').addClass('hidden');
     }

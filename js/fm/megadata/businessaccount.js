@@ -1204,7 +1204,7 @@ BusinessAccount.prototype.updateBusinessAttrs= function (attrs) {
     };
 
     for (var k = 0; k < attrs.length; k++) {
-        request[attrs[k].key] = attrs[k].val;
+        request[attrs[k].key] = base64urlencode(to8(attrs[k].val));
     }
 
     api_req(request, {

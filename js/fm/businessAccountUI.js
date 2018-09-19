@@ -1,5 +1,4 @@
-﻿
-/**
+﻿/**
  * A UI control Class to perform Business Account related UI
  */
 function BusinessAccountUI() {
@@ -1456,50 +1455,91 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         function companyProfileSaveButtonClick() {
             var attrsToChange = [];
             var valid = true;
-            if ($cNameInput.val() !== cName) {
-                if (!$cNameInput.val().length) {
+            if ($cNameInput.val().trim() !== cName) {
+                if (!$cNameInput.val().trim()) {
                     $cNameInput.parent().addClass('error').find('.error-message').text(l[19507]);
                     $cNameInput.focus();
                     valid = false;
                 }
-                attrsToChange.push({ key: '^companyname', val: $cNameInput.val() });
+                else {
+                    $cNameInput.parent().removeClass('error');
+                    attrsToChange.push({ key: '^companyname', val: $cNameInput.val().trim() });
+                }
             }
-            if ($cTelInput.val() !== cTel) {
-                if (!$cTelInput.val().length) {
+            if ($cTelInput.val().trim() !== cTel) {
+                if (!$cTelInput.val().trim()) {
                     $cTelInput.parent().addClass('error').find('.error-message').text(l[8814]);
                     $cTelInput.focus();
                     valid = false;
                 }
-                attrsToChange.push({ key: '^companyphone', val: $cTelInput.val() });
+                else {
+                    $cTelInput.parent().removeClass('error');
+                    attrsToChange.push({ key: '^companyphone', val: $cTelInput.val().trim() });
+                }
             }
-            if ($cEmailInput.val() !== cEmail) {
-                attrsToChange.push({ key: '^companyemail', val: $cEmailInput.val() });
+            if ($cEmailInput.val().trim() !== cEmail) {
+                if (!$cEmailInput.val().trim() || checkMail($cEmailInput.val())) {
+                    $cEmailInput.parent().addClass('error').find('.error-message').text(l[7415]);
+                    $cEmailInput.focus();
+                    valid = false;
+                }
+                else {
+                    $cEmailInput.parent().removeClass('error');
+                    attrsToChange.push({ key: '^companyemail', val: $cEmailInput.val().trim() });
+                }
             }
-            if ($cVatInput.val() !== cVat) {
-                attrsToChange.push({ key: '^companytaxnum', val: $cVatInput.val() });
+            if ($cVatInput.val().trim() !== cVat) {
+                attrsToChange.push({ key: '^companytaxnum', val: $cVatInput.val().trim() });
             }
-            if ($cAddressInput.val() !== cAddress) {
-                attrsToChange.push({ key: '^companyaddress1', val: $cAddressInput.val() });
+            if ($cAddressInput.val().trim() !== cAddress) {
+                attrsToChange.push({ key: '^companyaddress1', val: $cAddressInput.val().trim() });
             }
-            if ($cAddress2Input.val() !== cAddress2) {
-                attrsToChange.push({ key: '^companyaddress2', val: $cAddress2Input.val() });
+            if ($cAddress2Input.val().trim() !== cAddress2) {
+                attrsToChange.push({ key: '^companyaddress2', val: $cAddress2Input.val().trim() });
             }
-            if ($cCityInput.val() !== cCity) {
-                attrsToChange.push({ key: '^companycity', val: $cCityInput.val() });
+            if ($cCityInput.val().trim() !== cCity) {
+                attrsToChange.push({ key: '^companycity', val: $cCityInput.val().trim() });
             }
-            if ($cStateInput.val() !== cState) {
-                attrsToChange.push({ key: '^companystate', val: $cStateInput.val() });
+            if ($cStateInput.val().trim() !== cState) {
+                attrsToChange.push({ key: '^companystate', val: $cStateInput.val().trim() });
             }
             if ($cCountryInput.val() !== cCountry) {
                 attrsToChange.push({ key: '^companycountry', val: $cCountryInput.val() });
             }
-            if ($cZipInput.val() !== cZip) {
-                attrsToChange.push({ key: '^companyzip', val: $cZipInput.val() });
+            if ($cZipInput.val().trim() !== cZip) {
+                attrsToChange.push({ key: '^companyzip', val: $cZipInput.val().trim() });
             }
 
-            var settingPromise = mySelf.business.updateBusinessAttrs(attrsToChange);
+
+            var settingResultHandler = function (st) {
+                if (st) {
+                    var $savingNotidication = $('.auto-save', $accountContainer);
+                    $savingNotidication.removeClass('hidden');
+                    $savingNotidication.show();
+                    setTimeout(function () {
+                        $savingNotidication.fadeOut(1000);
+                    }, 1000);
+                }
+                else {
+                    msgDialog('warningb', '', l[19528]);
+                }
+            };
+
+            if (valid) {
+                var settingPromise = mySelf.business.updateBusinessAttrs(attrsToChange);
+                settingPromise.always(settingResultHandler);
+            }
         }
     );
+
+    // event handler for clicking on header
+    $accountPageHeader.find('.acc-home').off('click.suba').on('click.suba',
+        function invoiceListHeaderClick() {
+            var $me = $(this);
+            if ($me.hasClass('acc-home')) {
+                return mySelf.viewSubAccountListUI();
+            }
+        });
 
     unhideSection();
     

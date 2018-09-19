@@ -27236,7 +27236,6 @@ opacity: 1;
     box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
     background-color: #00BFA5;
     transition:0.3s;
-    opacity: 0;
 }
 
 .user-management-account-settings .auto-save:hover {

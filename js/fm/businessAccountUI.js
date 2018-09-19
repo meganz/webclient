@@ -1452,6 +1452,55 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var $cCountryInput = $('select#cnt-ddl', $profileContainer).val(cCountry);
     var $cZipInput = $('input#prof-zip', $profileContainer).val(cZip);
 
+    $('.saving-btn-profile', $profileContainer).off('click.suba').on('click.suba',
+        function companyProfileSaveButtonClick() {
+            var attrsToChange = [];
+            var valid = true;
+            if ($cNameInput.val() !== cName) {
+                if (!$cNameInput.val().length) {
+                    $cNameInput.parent().addClass('error').find('.error-message').text(l[19507]);
+                    $cNameInput.focus();
+                    valid = false;
+                }
+                attrsToChange.push({ key: '^companyname', val: $cNameInput.val() });
+            }
+            if ($cTelInput.val() !== cTel) {
+                if (!$cTelInput.val().length) {
+                    $cTelInput.parent().addClass('error').find('.error-message').text(l[8814]);
+                    $cTelInput.focus();
+                    valid = false;
+                }
+                attrsToChange.push({ key: '^companyphone', val: $cTelInput.val() });
+            }
+            if ($cEmailInput.val() !== cEmail) {
+                attrsToChange.push({ key: '^companyemail', val: $cEmailInput.val() });
+            }
+            if ($cVatInput.val() !== cVat) {
+                attrsToChange.push({ key: '^companytaxnum', val: $cVatInput.val() });
+            }
+            if ($cAddressInput.val() !== cAddress) {
+                attrsToChange.push({ key: '^companyaddress1', val: $cAddressInput.val() });
+            }
+            if ($cAddress2Input.val() !== cAddress2) {
+                attrsToChange.push({ key: '^companyaddress2', val: $cAddress2Input.val() });
+            }
+            if ($cCityInput.val() !== cCity) {
+                attrsToChange.push({ key: '^companycity', val: $cCityInput.val() });
+            }
+            if ($cStateInput.val() !== cState) {
+                attrsToChange.push({ key: '^companystate', val: $cStateInput.val() });
+            }
+            if ($cCountryInput.val() !== cCountry) {
+                attrsToChange.push({ key: '^companycountry', val: $cCountryInput.val() });
+            }
+            if ($cZipInput.val() !== cZip) {
+                attrsToChange.push({ key: '^companyzip', val: $cZipInput.val() });
+            }
+
+            var settingPromise = mySelf.business.updateBusinessAttrs(attrsToChange);
+        }
+    );
+
     unhideSection();
     
 };

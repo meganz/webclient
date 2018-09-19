@@ -1184,6 +1184,46 @@ BusinessAccount.prototype.setMasterUserAttributes =
         return operationPromise;
     };
 
+/**
+ * update the business account attributes (company)
+ * @param {Object[]} attrs              array of key,val of attributes to update
+ */
+BusinessAccount.prototype.updateBusinessAttrs= function (attrs) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    if (!attrs) {
+        return operationPromise.reject(0, 19, 'Empty attributes array');
+    }
+    if (!attrs.length) {
+        return operationPromise.resolve(1); // as nothing to change.
+    }
+
+    var request = {
+        "a": "upb" // get a list of invoices
+    };
+
+    for (var k = 0; k < attrs.length; k++) {
+        request[attrs[k].key] = attrs[k].val;
+    }
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'string') {
+                operationPromise.resolve(1, res); // update success
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+    });
+
+    return operationPromise;
+};
+
 
 /**
  * Do the payment with the API

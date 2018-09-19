@@ -44,7 +44,6 @@
     "102": "Zoeken",
     "103": "Overdracht Annuleren",
     "104": "Bestandsoverdracht",
-    "105": "In afwachting van",
     "115": "Bestandsnaam",
     "120": "Uw download kon niet verdergaan, want het zou u over de huidige gratis overdracht tegoed voor uw IP adres brengen.",
     "121": "Dit limiet is variabel en afhankelijk van de ongebruikte bandbreedte die we beschikbaar hebben.",
@@ -283,7 +282,6 @@
     "799": "Gebruikte Ruimte",
     "808": "Map Koppeling",
     "812": "Bevestig account",
-    "813": "Gedeelde Map",
     "822": "Terug",
     "823": "Instellingen",
     "824": "Nieuwe gedeelde map van [X]",
@@ -354,7 +352,6 @@
     "969": "Probeer het opnieuw",
     "970": "Vul een geldig wachtwoord in.",
     "978": "Uw zoekopdracht heeft geen resultaten opgeleverd",
-    "982": "Inhoud",
     "983": "Overzicht",
     "985": "Geschiedenis",
     "987": "Verloopt op",
@@ -1497,7 +1494,6 @@
     "16136": "Uw account heeft de toegestane opslagruimte overschreden. Maak ruimte vrij in uw cloud schijf of [A]upgrade[\/A] om te blijven genieten van uw beveiligde eind-tot-eind gecodeerde opslag.",
     "16137": "Uw account heeft de toegestane overdracht tegoed limiet bereikt. U kunt wachten tot u meer overdracht tegoed beschikbaar heeft of u kunt [A]upgraden[\/A] om te blijven genieten van veilige eind-tot-eind gecodeerde opslag.",
     "16138": "Uw account heeft de toegestane opslag & overdracht tegoed overschreden. U kunt ruimte vrij maken in uw Cloud Schijf en wachten tot u weer voldoende overdracht tegoed heeft of u kunt [A]upgraden[\/A] om te blijven genieten van beveiligde eind-tot-eind gecodeerde opslag.",
-    "16140": "Betaling & Abonnement",
     "16141": "Inschakelen",
     "16142": "Uitschakelen",
     "16143": "Notificaties inschakelen",
@@ -2556,5 +2552,7 @@
     "19323": "Mega has zero tolerance for Child Exploitation Material, Violent Extremism, Bestiality, Zoophilia, Gore, Malware, Hacked\/Stolen Data\/Passwords, Extortion, Revenge Porn etc. Report links with description to:",
     "19338": "Upload 1 file",
     "19339": "Upload [X] files",
-    "19340": "You don't have write privileges in this share."
+    "19340": "You don't have write privileges in this share.",
+    "19505": "Received",
+    "19506": "Sent"
 }

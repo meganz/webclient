@@ -135,7 +135,12 @@ var psa = {
         $psa.find('.messageA').text(description);
         $psa.find('.view-more-info').attr('data-continue-link', psa.currentPsa.l);
         $psa.find('.view-more-info .text').text(buttonLabel);
-        $psa.find('.display-icon').attr('src', imagePath);
+        $psa.find('.display-icon').attr('src', imagePath).on('error', function() {
+
+            // If the icon doesn't exist for new PSAs which is likely while in local development, use the one
+            // on the default static path as they are added directly to the static servers now for each new PSA
+            $(this).attr('src', psa.currentPsa.dsp + psa.currentPsa.img + retina + '.png');
+        });
     },
 
     /**
@@ -221,7 +226,7 @@ var psa = {
 
         // Reset file manager height
         $('.fmholder').css('height', '');
-        $(window).unbind('resize.bottomNotification');
+        $(window).off('resize.bottomNotification');
 
         // Trigger resize so that full content in the file manager is visible after closing
         $(window).trigger('resize');

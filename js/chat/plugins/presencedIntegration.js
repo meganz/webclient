@@ -50,8 +50,7 @@ var PresencedIntegration = function(megaChat) {
     self._is_webrtc = {};
     self._presence = {};
 
-    megaChat.unbind("onInit.presencedIntegration");
-    megaChat.bind("onInit.presencedIntegration", function() {
+    megaChat.rebind("onInit.presencedIntegration", function() {
         // auto disable if the current connection is not to a websocket.
         self.init();
     });
@@ -369,6 +368,7 @@ PresencedIntegration.prototype.getAutoaway = function() {
 };
 
 PresencedIntegration.prototype._initAutoawayEvents = function() {
+    'use strict';
 
     var self = this;
     $(document.body).rebind('mousemove.presencedInt keypress.presencedInt', function() {
@@ -379,8 +379,10 @@ PresencedIntegration.prototype._initAutoawayEvents = function() {
 };
 
 PresencedIntegration.prototype._destroyAutoawayEvents = function() {
-    $(document.body).unbind('mousemove.presencedInt');
-    $(document.body).unbind('keypress.presencedInt');
+    'use strict';
+
+    $(document.body).off('mousemove.presencedInt');
+    $(document.body).off('keypress.presencedInt');
 };
 
 /**

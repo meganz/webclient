@@ -160,6 +160,16 @@ mobile.cloud.actionBar = {
         // On the upload icon click/tap
         $uploadIcon.off('tap').on('tap', function() {
 
+            if (ulmanager.ulOverStorageQuota) {
+                ulmanager.ulShowOverStorageQuotaDialog();
+                return false;
+            }
+
+            if (ulmanager.isUploading) {
+                msgDialog('warninga', l[135], l[47], l[1155]);
+                return false;
+            }
+
             // Clear file input so change handler works again in Chrome
             $fileInput.val('');
 

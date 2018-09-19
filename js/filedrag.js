@@ -6,7 +6,7 @@
     var touchedElement = 0;
 
     function addUpload(files, emptyFolders) {
-        console.assert(page !== 'start' || window.fminitialized, 'check this...');
+        console.assert(page === 'start' || window.fminitialized, 'check this...');
 
         if (page === 'start' || M.chat) {
             M.addUpload(files, false, emptyFolders);

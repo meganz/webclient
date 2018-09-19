@@ -44,7 +44,6 @@
     "102": "Search",
     "103": "Cancel Transfer",
     "104": "File Transfers",
-    "105": "pending",
     "115": "Filename",
     "120": "Your download cannot proceed, because it would take you over the current free transfer allowance for your IP address.",
     "121": "This limit is dynamic and depends on the amount of unused bandwidth we have available.",
@@ -283,7 +282,6 @@
     "799": "Used Space",
     "808": "Folder Link",
     "812": "Confirm Account",
-    "813": "Shared Folder",
     "822": "Back",
     "823": "Settings",
     "824": "New shared folder from [X]",
@@ -354,7 +352,6 @@
     "969": "Please try again",
     "970": "Please enter a valid password.",
     "978": "Your search did not match any documents",
-    "982": "Content",
     "983": "Overview",
     "985": "History",
     "987": "Expires on",
@@ -1497,7 +1494,6 @@
     "16136": "Your account has exceeded its allowed storage quota. Free space on your Cloud Drive or [A]upgrade[\/A] to keep enjoying secure, end-to-end encrypted storage.",
     "16137": "Your account has exceeded its allowed transfer quota. You can wait until you have enough transfer quota available or [A]upgrade[\/A] to keep enjoying secure, end-to-end encrypted storage.",
     "16138": "Your account has exceeded its allowed storage & transfer quota. You can free up space on your Cloud Drive and wait until you have enough transfer quota available or [A]upgrade[\/A] to keep enjoying secure, end-to-end encrypted storage.",
-    "16140": "Payment and Plan",
     "16141": "Enable",
     "16142": "Disable",
     "16143": "Enable Notifications",
@@ -2556,5 +2552,7 @@
     "19323": "Mega has zero tolerance for Child Exploitation Material, Violent Extremism, Bestiality, Zoophilia, Gore, Malware, Hacked\/Stolen Data\/Passwords, Extortion, Revenge Porn etc. Report links with description to:",
     "19338": "Upload 1 file",
     "19339": "Upload [X] files",
-    "19340": "You don't have write privileges in this share."
+    "19340": "You don't have write privileges in this share.",
+    "19505": "Received",
+    "19506": "Sent"
 }

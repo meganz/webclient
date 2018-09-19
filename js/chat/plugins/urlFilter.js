@@ -8,7 +8,7 @@
 var UrlFilter = function(megaChat) {
     var self = this;
 
-    megaChat.bind("onBeforeRenderMessage", function(e, eventData) {
+    megaChat.on("onBeforeRenderMessage", function(e, eventData) {
         self.processMessage(e, eventData);
     });
 

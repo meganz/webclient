@@ -44,7 +44,6 @@
     "102": "Ricerca",
     "103": "Cancella trasferimento",
     "104": "Trasferimenti File",
-    "105": "in sospeso",
     "115": "Nome file",
     "120": "Il tuo download non pu\u00f2 procedere, perch\u00e9 ti porterebbe a superare il limite di trasferimento gratuito per il tuo indirizzo IP.",
     "121": "Questo limite \u00e8 dinamico e dipende dalla nostra quantit\u00e0 di banda inutilizzato disponibile.",
@@ -283,7 +282,6 @@
     "799": "Spazio Usato",
     "808": "Link cartella",
     "812": "Conferma account",
-    "813": "Cartella condivisa",
     "822": "Indietro",
     "823": "Impostazioni",
     "824": "Nuova cartella condivisa da [X]",
@@ -354,7 +352,6 @@
     "969": "Riprova",
     "970": "Inserisci una password valida.",
     "978": "La tua ricerca non ha prodotto risultati in nessun documento",
-    "982": "Contenuto",
     "983": "Panoramica",
     "985": "Storia",
     "987": "Scade il",
@@ -1497,7 +1494,6 @@
     "16136": "Il tuo account ha superato la quota di archiviazione. Libera spazio sul tuo Cloud Drive o [A]aggiorna[\/A] per mantenere questo spazio criptato end-to-end e sicuro.",
     "16137": "Il tuo account ha superato la quota di archiviazione. Puoi aspettare finch\u00e9 altra quota di trasferimento diventi disponibile o [A]aggiornare[\/A] per mantenere questo spazio criptato end-to-end e sicuro.",
     "16138": "Il tuo account ha superato la sua quota di trasferimento e di archiviazione. Puoi liberare spazio sul tuo Cloud Drive ed aspettare finch\u00e9 hai abbastanza quota di trasferimento disponibile o [A]aggiornare[\/A] per mantenere il tuo spazio criptato end-to-end e sicuro.",
-    "16140": "Pagamento e piano",
     "16141": "Attiva",
     "16142": "Disattiva",
     "16143": "Attiva le notifiche",
@@ -2556,5 +2552,7 @@
     "19323": "Mega non ha nessuna tolleranza per materiale di sfruttamento di bambini, estremismo violento, bestialit\u00e0, zoofilia, Gore, malware, dati e password rubate, estorsioni, porno vendette ecc. Segnala i link con descrizione a:",
     "19338": "Carica 1 file",
     "19339": "Upload [X] files",
-    "19340": "Non hai i privilegi in questa condivisione."
+    "19340": "Non hai i privilegi in questa condivisione.",
+    "19505": "Ricevuto",
+    "19506": "Inviato"
 }

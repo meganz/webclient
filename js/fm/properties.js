@@ -44,7 +44,7 @@
         var close = !update && action;
         var $dialog = $('.fm-dialog.properties-dialog');
 
-        $(document).unbind('MegaCloseDialog.Properties');
+        $(document).off('MegaCloseDialog.Properties');
 
         if (close) {
             delete $.propertiesDialog;
@@ -379,7 +379,7 @@
             return false;
         });
 
-        $(document).bind('MegaCloseDialog.Properties', __fsi_close);
+        $(document).rebind('MegaCloseDialog.Properties', __fsi_close);
 
         if (p.hideContacts) {
             $('.properties-txt-pad .contact-list-icon').hide();

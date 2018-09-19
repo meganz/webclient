@@ -106,7 +106,7 @@ mega.megadrop = (function() {
 
         return promise;
     };
-    
+
     /**
      * Make sure that user knows that MEGAdrops wiil be cancelled if any
      * full shares or public links are available for target
@@ -155,6 +155,12 @@ mega.megadrop = (function() {
         }
 
         return promise;
+    };
+
+    var updatePUPUserName = function updatePUPUserName(newName) {
+        $.each(mega.megadrop.pufs, function(index) {
+            mega.megadrop.pupUpdate(index, 'name', newName);
+        });
     };
     
     /**
@@ -1008,7 +1014,7 @@ mega.megadrop = (function() {
             if (!fminitialized || type === 'msg' && value === puf.items[id].fn) {
                 return false;
             }
-            var req = pupOpts.req.update;
+            var req = Object.assign({}, pupOpts.req.update);
             var pupId = puf.items[id].p;
 
             req.d.msg = puf.items[id].fn;
@@ -1831,7 +1837,7 @@ mega.megadrop = (function() {
         var onItemCompletion = function uiOnItemCompletion(id) {
             var $item = uiOpts.window.queueItems[id].$;
 
-            $item.status.text('Complete');// l[554]
+            $item.status.text(l[554]);
         };
 
         var isDlgInit = function uiIsDlgInit() {
@@ -1984,7 +1990,7 @@ mega.megadrop = (function() {
                 return false;
             }
         }
-        
+
         /**
          * Check user trying to upload folder.
          */
@@ -2095,56 +2101,33 @@ mega.megadrop = (function() {
     };
 
     /**
-     * Process 'uph' action packet which is received on hard refresh
-     * From this AP, db and cached data structures will be recreated
+     * Process 'uph' object from gettree reply, db and cached data structures will be recreated
      * and updated with active PUP informations. We are taking
      * enabled and disabled PUPs into account
      * @param {Object} ap 'uph' action packet {ph: puhId, h : nodeId}
      */
     var processUPH = function widgetProcessUPH(ap) {
         if (d) {
-            console.log('processUPH');
+            console.log('processUPH', ap);
         }
-        var promise = new MegaPromise();
 
-        // Use data from AP
-        // Get folder name from 'h' attribute
-        for (var i in ap) {
-            if (ap.hasOwnProperty(i)) {
-                var item = ap[i];
-                var pufId = item.ph;
-                var nodeId = item.h;
-                var nodeName = '';
+        for (var i = ap.length; i--;) {
+            var n = clone(ap[i]);
 
-                dbfetch.get(nodeId)
-                    .done(function() {
-                        nodeName = M.d[nodeId].name;
-                        if (pufId && fmdb && !pfkey) {
-                            fmdb.add('puf', { ph: pufId,
-                                d: { h: nodeId,
-                                    p: '',
-                                    fn: nodeName,
-                                    ph: pufId
-                                }
-                            });
-                        }
+            n.p = '';
+            n.fn = M.getNameByHandle(n.h) || 'unknown';
 
-                        puf.items[nodeId] = {};
-                        puf.items[nodeId].h = nodeId;
-                        puf.items[nodeId].ph = pufId;
-                        puf.items[nodeId].fn = nodeName;
-                        promise.resolve();
-                    })
-                    .fail(function() {
-                        if (d) {
-                            console.warn('widget.processUph Missing M.d for handle: ', nodeId);
-                        }
-                        promise.reject();
-                    });
+            if (n.ph && fmdb && !pfkey) {
+                fmdb.add('puf', {
+                    ph: n.ph,
+                    d: n
+                });
             }
+
+            puf.items[n.h] = n;
         }
 
-        return promise;
+        return MegaPromise.resolve();
     };
 
     var processUPHAP = function processUPHAP(ap) {
@@ -2255,6 +2238,7 @@ mega.megadrop = (function() {
         getOwnersHandle: ownersHandle,
         disableDragDrop: disableDragDrop,
         overQuota: showMEGAdropOverQuota,
+        updatePUPUserName: updatePUPUserName,
 
         // PUF
         pufs: puf.items,

@@ -12,7 +12,7 @@ var support = (function() {
 
     function resizeHandler() {
         if (!$textarea.is(':visible')) {
-            return $window.unbind('resize.support-textarea', resizeHandler);
+            return $window.off('resize.support-textarea');
         }
 
         var height = Math.max(150, $window.height() - bottomHeight - headerHeight - 200);
@@ -30,7 +30,7 @@ var support = (function() {
                 l[7884], // Message too short
                 l[8650], // Your message needs to be at least %d letters long.
                 false, function() {
-                    $textarea.focus();
+                    $textarea.trigger("focus");
                 });
             return false;
         }
@@ -72,8 +72,8 @@ var support = (function() {
             return;
         }
         $textarea = $('.support textarea');
-        bottomHeight = $('.nw-bottom-block').height();
-        headerHeight = $('.about-top-block').height();
+        bottomHeight = $('.nw-bottom-block').height() | 0;
+        headerHeight = $('.about-top-block').height() | 0;
         $subject = $('#support-subject');
 
         var supportSubjects = {
@@ -116,7 +116,7 @@ var support = (function() {
             window.onsupport = null;
         }
 
-    
+
 
         resizeHandler();
     };

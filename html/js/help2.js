@@ -267,14 +267,13 @@ var Help = (function() {
                 $deviceIcon.rotate(180, 0, 300, 'easeOutQuint').css('backgroundPosition', '-133px -307px');
                 $articleSlider.css({'opacity':'.1', 'cursor':'default'});
                 $tagContainer.css({'opacity':'.1', 'cursor':'default'});
-                $articleList.unbind('mouseenter mouseleave');
             } else {
                 $deviceIcon.rotate(0, 180, 300, 'easeOutQuint').css('backgroundPosition', '-133px -339px');
                 $deviceTop.fadeOut(500, 'easeOutQuart');
                 $articleSlider.css({'opacity':'1', 'cursor':'pointer'});
                 $tagContainer.css({'opacity':'1', 'cursor':'default'});
-                $articleList.bind('mouseenter mouseleave');
             }
+            $articleList.off('mouseenter mouseleave');
         });
 
         $(document).rebind('click.deviceHover', function() {
@@ -322,9 +321,8 @@ var Help = (function() {
                         data[val.name] = val.value;
                     });
 
-                $.post('https://cms2.mega.nz/feedback', data);
+                M.xhr('https://cms2.mega.nz/feedback', JSON.stringify(data));
                 sent($this.parents('.article-feedback-container'));
-
             });
         });
 
@@ -333,7 +331,7 @@ var Help = (function() {
             $this.find('.icon').animate({marginTop: 1}, 200, 'easeOutQuint')
                          .animate({marginTop: 6}, 200, 'easeOutQuint');
 
-            $.post('https://cms2.mega.nz/feedback', {hash: $this.data('hash')});
+            M.xhr('https://cms2.mega.nz/feedback', JSON.stringify({hash: $this.data('hash')}));
             sent($this.parents('.article-feedback-container'));
         });
 
@@ -562,7 +560,8 @@ var Help = (function() {
                 var link = 'https://mega.nz/' + parts.join('/');
                 var $input = $('.share-help').removeClass('hidden')
                     .find('input').val(link)
-                    .focus().select();
+                    .trigger("focus")
+                    .trigger('select');
                 $('.fm-dialog-close').rebind('click', function() {
                     $('.share-help').addClass('hidden');
                     fm_hideoverlay();

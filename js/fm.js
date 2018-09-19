@@ -53,13 +53,13 @@ function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
             $textareaScrollBlock.jScrollPane(
                 {enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
             if (!jsp && keyEvents) {
-                $textarea.focus();
+                $textarea.trigger("focus");
             }
         }
         else if (jsp) {
             jsp.destroy();
             if (keyEvents) {
-                $textarea.focus();
+                $textarea.trigger("focus");
             }
         }
 
@@ -88,7 +88,7 @@ function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
     // Bind window resize if textarea is resizeable
     if (resizeEvent) {
         var eventName = textareaWrapperClass.replace(/[_\s]/g, '');
-        $(window).bind('resize.' + eventName, function () {
+        $(window).rebind('resize.' + eventName, function () {
             textareaScrolling();
         });
     }
@@ -358,7 +358,7 @@ function initAddDialogMultiInputPlugin() {
                         animateScroll: true
                     });
                     setTimeout(function() {
-                        $scope.find('.token-input-input-token-mega input').focus();
+                        $scope.find('.token-input-input-token-mega input').trigger("focus");
                     }, 0);
                 }
             }
@@ -368,7 +368,7 @@ function initAddDialogMultiInputPlugin() {
             var itemNum;
 
             setTimeout(function() {
-                $inputTokens.find('input').blur();
+                $inputTokens.find('input').trigger("blur");
             }, 0);
 
             // Get number of emails
@@ -562,7 +562,7 @@ function contactAddDialog(close) {
     $d.find('.add-user-popup-button').text(l[19112]).addClass('disabled');
 
     initTextareaScrolling($textarea, 72);
-    $d.find('.token-input-input-token-mega input').focus();
+    $d.find('.token-input-input-token-mega input').trigger("focus");
     focusOnInput();
 
     $d.find('.hidden-textarea-info span').rebind('click', function() {
@@ -572,7 +572,7 @@ function contactAddDialog(close) {
     function focusOnInput() {
         var $tokenInput = $('#token-input-');
 
-        $tokenInput.focus();
+        $tokenInput.trigger("focus");
     }
 
     $('.add-user-notification textarea').rebind('focus.add-user-n', function() {
@@ -987,7 +987,13 @@ function fm_showoverlay() {
     "use strict";
 
     $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+
+    if (is_mobile) {
+        $('body').addClass('overlayed');
+    }
+    else if (!$('body').hasClass('bottom-pages')) {
+        $('body').addClass('overlayed');
+    }
 }
 
 /**
@@ -1031,7 +1037,7 @@ function renameDialog() {
 
         M.safeShowDialog('rename', function() {
             $dialog.removeClass('hidden').addClass('active');
-            $input.focus();
+            $input.trigger("focus");
             return $dialog;
         });
 
@@ -1056,7 +1062,7 @@ function renameDialog() {
                                     $dialog.removeClass('duplicate');
                                     $input.removeClass('error');
 
-                                    $input.focus();
+                                    $input.trigger("focus");
                                 }, 2000);
 
                             return;
@@ -1164,13 +1170,13 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', extraButton || l[1018], l[82]);
 
-        $('#msgDialog .default-white-button').eq(0).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-        $('#msgDialog .default-white-button').eq(1).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -1184,13 +1190,13 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[78], l[79]);
 
-        $('#msgDialog .default-white-button').eq(0).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-        $('#msgDialog .default-white-button').eq(1).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -1204,13 +1210,13 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                     '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                     '<div class="clear"></div>', doneButton, extraButton);
 
-            $('#msgDialog .default-white-button').eq(0).bind('click', function() {
+            $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(false);
                 }
             });
-            $('#msgDialog .default-white-button').eq(1).bind('click', function() {
+            $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
@@ -1222,7 +1228,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 .safeHTML('<div class="default-white-button right notification-button"><span>@@</span></div>' +
                     '<div class="clear"></div>', l[81]);
 
-            $('#msgDialog .default-white-button').bind('click', function() {
+            $('#msgDialog .default-white-button').rebind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
@@ -1253,14 +1259,14 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[229], l[78], l[79]);
 
-        $('#msgDialog .default-white-button').eq(0).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
 
-        $('#msgDialog .default-white-button').eq(1).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -1300,7 +1306,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             .addClass('hidden')
             .html('');
 
-        $('#msgDialog .default-white-button').bind('click', function() {
+        $('#msgDialog .default-white-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
@@ -1955,7 +1961,7 @@ function initShareDialogMultiInputPlugin() {
                         animateScroll: true
                     });
                     setTimeout(function() {
-                        $shareDialog.find('.token-input-input-token-mega input').focus();
+                        $shareDialog.find('.token-input-input-token-mega input').trigger("focus");
                     }, 0);
                 }
 
@@ -1972,7 +1978,7 @@ function initShareDialogMultiInputPlugin() {
                     iNewItemsNum, iItemsNum;
 
                 setTimeout(function() {
-                    $shareDialog.find('.token-input-input-token-mega input').blur();
+                    $shareDialog.find('.token-input-input-token-mega input').trigger("blur");
                 }, 0);
 
                 iNewItemsNum = $shareDialog.find('.token-input-list-mega .token-input-token-mega').length;
@@ -2363,7 +2369,7 @@ function closeImportContactNotification(c) {
     $('.import-contacts-link').removeClass('active');
 
     // Remove focus from input element, related to tokeninput plugin
-    $(c + ' input#token-input-').blur();
+    $(c + ' input#token-input-').trigger("blur");
 }
 
 function closeDialog(ev) {
@@ -2396,7 +2402,10 @@ function closeDialog(ev) {
         return;
     }
 
-    if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
+    if ($.dialog === 'terms' && $.registerDialog) {
+        $('.fm-dialog.bottom-pages-dialog').addClass('hidden');
+    }
+    else if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
     }
@@ -2534,7 +2543,7 @@ function createFolderDialog(close) {
                     $dialog.removeClass('duplicate');
                     $input.removeClass('error');
 
-                    $input.focus();
+                    $input.trigger("focus");
                 }, 2000);
 
                 return;
@@ -2612,7 +2621,7 @@ function createFolderDialog(close) {
 
     M.safeShowDialog('createfolder', function() {
         $dialog.removeClass('hidden');
-        $('.create-folder-input-bl input').focus();
+        $('.create-folder-input-bl input').trigger("focus");
         $dialog.removeClass('active');
         return $dialog;
     });
@@ -2640,14 +2649,14 @@ function chromeDialog(close) {
             localStorage.chromeDialog = 1;
             $(this).attr('class', 'checkboxOn');
             $(this).parent().attr('class', 'checkboxOn');
-            $(this).attr('checked', true);
+            $(this).prop('checked', true);
         }
         else
         {
             delete localStorage.chromeDialog;
             $(this).attr('class', 'checkboxOff');
             $(this).parent().attr('class', 'checkboxOff');
-            $(this).attr('checked', false);
+            $(this).prop('checked', false);
         }
     });
 }
@@ -2676,13 +2685,13 @@ function browserDialog(close) {
             localStorage.browserDialog = 1;
             $(this).attr('class', 'checkboxOn');
             $(this).parent().attr('class', 'checkboxOn');
-            $(this).attr('checked', true);
+            $(this).prop('checked', true);
         }
         else {
             delete localStorage.chromeDialog;
             $(this).attr('class', 'checkboxOff');
             $(this).parent().attr('class', 'checkboxOff');
-            $(this).attr('checked', false);
+            $(this).prop('checked', false);
         }
     });
 
@@ -2759,7 +2768,7 @@ function bottomPageDialog(close, pp, hh) {
 
     var $dialog = $('.fm-dialog.bottom-pages-dialog');
     var closeDialog = function() {
-        $dialog.unbind('dialog-closed');
+        $dialog.off('dialog-closed');
         window.closeDialog();
         delete $.termsAgree;
         delete $.termsDeny;
@@ -3195,9 +3204,9 @@ function fingerprintDialog(userid) {
     var $dialog = $('.fingerprint-dialog');
     var closeFngrPrntDialog = function() {
         closeDialog();
-        $('.fm-dialog-close', $dialog).unbind('click');
-        $('.dialog-approve-button').unbind('click');
-        $('.dialog-skip-button').unbind('click');
+        $('.fm-dialog-close', $dialog).off('click');
+        $('.dialog-approve-button').off('click');
+        $('.dialog-skip-button').off('click');
         mega.ui.CredentialsWarningDialog.rendernext();
     };
 
@@ -3253,7 +3262,7 @@ function fingerprintDialog(userid) {
                 );
 
                 // Change button state to 'Verified'
-                $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
+                $('.fm-verify').off('click').addClass('verified').find('span').text(l[6776]);
 
                 closeFngrPrntDialog();
 
@@ -3494,11 +3503,13 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
             $this.addClass('active');
             $select.find('span').text($this.text());
 
-            var nameLen = $('#account-firstname').val().trim().length;
+            if (saveOption) {
+                var nameLen = String($('#account-firstname').val() || '').trim().length;
 
-            // Save changes for account page
-            if (saveOption && nameLen) {
-                $('.fm-account-save-block').removeClass('hidden');
+                // Save changes for account page
+                if (nameLen) {
+                    $('.fm-account-save-block').removeClass('hidden');
+                }
             }
         }
     });

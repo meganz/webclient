@@ -117,9 +117,10 @@ var loginFromEphemeral = {
             twofactor.loginDialog.closeDialog();
 
             // Show message that the email has already been registered and to choose an alternative email to proceed
-            $('.login-register-input.email .top-loginp-tooltip-txt')
-                .safeHTML('@@<div class="white-txt">@@</div>', l[1297], l[1298]);
-            $('.login-register-input.email').addClass('incorrect');
+            $('.account.input-wrapper.email .account.input-tooltip')
+                .safeHTML(l[1100] + '<br>' + l[1297]);
+            $('.account.input-wrapper.email').addClass('incorrect');
+            $('.account.input-wrapper.email input').focus();
             msgDialog('warninga', 'Error', l[7869]);
         }
     }
@@ -129,10 +130,10 @@ function registeraccount() {
 
     'use strict';
 
-    rv.password = $.trim($('#register-password-registerpage').val());
-    rv.first = $.trim($('#register-firstname-registerpage').val());
-    rv.last = $.trim($('#register-lastname-registerpage').val());
-    rv.email = $.trim($('#register-email-registerpage').val());
+    rv.password = $.trim($('#register-password-registerpage2').val());
+    rv.first = $.trim($('#register-firstname-registerpage2').val());
+    rv.last = $.trim($('#register-lastname-registerpage2').val());
+    rv.email = $.trim($('#register-email-registerpage2').val());
     rv.name = rv.first + ' ' + rv.last;
 
     var signup = null;
@@ -189,7 +190,7 @@ function continueOldRegistration(result) {
 
         passwordManager($('#register_form'));
 
-        $('.fm-dialog.registration-page-success').unbind('click');
+        $('.fm-dialog.registration-page-success').off('click');
 
         mega.ui.sendSignupLinkDialog(rv);
 
@@ -226,7 +227,7 @@ function continueNewRegistration(result) {
         // Setup the password manager
         passwordManager($('#register_form'));
 
-        $('.fm-dialog.registration-page-success').unbind('click');
+        $('.fm-dialog.registration-page-success').off('click');
 
         mega.ui.sendSignupLinkDialog(rv);
 
@@ -250,49 +251,64 @@ function pageregister() {
     }
 
     var err = false;
-    var firstName = $.trim($('#register-firstname-registerpage').val());
-    var lastName = $.trim($('#register-lastname-registerpage').val());
-    var email = $.trim($('#register-email-registerpage').val());
-    var password = $.trim($('#register-password-registerpage').val());
-    var passwordConfirm = $.trim($('#register-password-registerpage2').val());
+    var $formWrapper = $('.main-mid-pad.register1 form');
+    var $firstName = $('.input-wrapper.name .f-name', $formWrapper);
+    var $lastName = $('.input-wrapper.name .l-name', $formWrapper);
+    var $email = $('.input-wrapper.email input', $formWrapper);
+    var $password = $('.input-wrapper.first input', $formWrapper);
+    var $passwordConfirm = $('.input-wrapper.confirm input', $formWrapper);
 
-    if (firstName === '' || lastName === '') {
-        $('.login-register-input.name').addClass('incorrect');
-        err = 1;
-    }
-    if (email === '' || checkMail(email)) {
-        $('.login-register-input.email').addClass('incorrect');
-        err = 1;
-    }
+    var firstName = $.trim($firstName.val());
+    var lastName = $.trim($lastName.val());
+    var email = $.trim($email.val());
+    var password = $.trim($password.val());
+    var passwordConfirm = $.trim($passwordConfirm.val());
 
-    if (email === '' || checkMail(email)) {
-        $('.login-register-input.email').addClass('incorrect');
+    if (password !== passwordConfirm) {
+        $password.parent().find('.account.password-stutus').removeClass('checked');
+        $password.val('');
+        $passwordConfirm.val('');
+        $passwordConfirm.parent().addClass('incorrect');
+        $password.focus();
         err = 1;
     }
 
     if (password === '') {
-        $('.login-register-input.password.first').addClass('incorrect');
-        $('.white-txt.password').text(l[213]);
+        $password.parent().addClass('incorrect');
+        $password.focus();
+        $password.parent().find('.account.input-tooltip')
+            .safeHTML(l[1102] + '<br>' + l[213]);
         err = 1;
     }
     else if (password.length < security.minPasswordLength) {
-        $('.login-register-input.password.first').addClass('incorrect');
-        $('.white-txt.password').text(l[18701]);
+        $password.parent().addClass('incorrect');
+        $password.focus();
+        $password.parent().find('.account.input-tooltip')
+            .safeHTML(l[1102] + '<br>' + l[18701]);
         err = 1;
     }
     else if (typeof zxcvbn !== 'undefined') {
         var pw = zxcvbn(password);
         if (pw.score < 1) {
-            $('.login-register-input.password.first').addClass('incorrect');
-            $('.white-txt.password').text(l[1104]);
+            $password.parent().addClass('incorrect');
+            $password.focus();
+            $password.parent().find('.account.input-tooltip')
+                .safeHTML(l[1102] + '<br>' + l[1104]);
             err = 1;
         }
     }
 
-    if (password !== passwordConfirm) {
-        $('#register-password-registerpage').val('');
-        $('#register-password-registerpage2').val('');
-        $('.login-register-input.password.confirm').addClass('incorrect');
+    if (email === '' || checkMail(email)) {
+        $email.parent().addClass('incorrect');
+        $email.parent().find('.account.input-tooltip')
+            .safeHTML(l[1100] + '<br>' + l[1101]);
+        $email.focus();
+        err = 1;
+    }
+
+    if (firstName === '' || lastName === '') {
+        $firstName.parent().addClass('incorrect');
+        $firstName.focus();
         err = 1;
     }
 
@@ -301,8 +317,8 @@ function pageregister() {
         return false;
     }
     else if (!err) {
-        if ($('.register-check').attr('class').indexOf('checkboxOff') > -1) {
-            msgDialog('warninga', l[1117], l[1118]);    // You need to agree with the Terms of Service to register...
+        if ($('.register-check', $formWrapper).hasClass('checkboxOff')) {
+            msgDialog('warninga', l[1117], l[1118]);
         }
         else {
             if (u_type === false) {
@@ -324,6 +340,14 @@ function pageregister() {
 
 
 function init_register() {
+    'use strict';
+
+    var $formWrapper = $('.main-mid-pad.register1');
+    var $inputs = $formWrapper.find('.account.input-wrapper input');
+    var $button = $formWrapper.find('.big-red-button');
+    var $email = $formWrapper.find('.account.input-wrapper.email input');
+    var $password = $formWrapper.find('.account.input-wrapper.password input');
+
     if (register_txt) {
         $('.main-top-info-block').removeClass('hidden');
         $('.main-top-info-text').text(register_txt);
@@ -331,113 +355,64 @@ function init_register() {
     }
 
     if (localStorage.registeremail) {
-        $('#register-email-registerpage').val(localStorage.registeremail);
+        $email.val(localStorage.registeremail);
     }
 
-    $('#register-firstname-registerpage').rebind('focus.initregister', function() {
-        $('.login-register-input.name').removeClass('incorrect');
-        $('.login-register-input.name').addClass('focused');
+    $inputs.rebind('keydown.initregister', function(e) {
+        if (e.keyCode === 13) {
+            pageregister();
+            return false;
+        }
     });
-    $('#register-firstname-registerpage').rebind('blur.initregister', function() {
-        $('.login-register-input.name').removeClass('focused');
-    });
-    $('#register-lastname-registerpage').rebind('focus.initregister', function() {
-        $('.login-register-input.name').removeClass('incorrect');
-        $('.login-register-input.name').addClass('focused');
-    });
-    $('#register-lastname-registerpage').rebind('blur.initregister', function() {
-        $('.login-register-input.name').removeClass('focused');
-    });
-    $('#register-email-registerpage').rebind('focus.initregister', function() {
-        $('.login-register-input.email .top-loginp-tooltip-txt')
-            .safeHTML('@@<div class="white-txt">@@</div>', l[1100], l[1101]);
-        $('.login-register-input.email').removeClass('incorrect');
-        $('.login-register-input.email').addClass('focused');
-    });
-    $('#register-email-registerpage').rebind('blur.initregister', function() {
-        $('.login-register-input.email').removeClass('focused');
-    });
-    $('#register-password-registerpage').rebind('focus.initregister', function() {
-        $('.login-register-input.password.first').removeClass('incorrect');
-        $('.login-register-input.password.confirm').removeClass('incorrect');
-        $(this).parents('.password').addClass('focused');
-    });
-    $('#register-password-registerpage').rebind('blur.initregister', function() {
-        $('.login-register-input.password').removeClass('focused');
+
+    $password.first().rebind('blur.password, keyup.password', function() {
         registerpwcheck();
     });
-    $('#register-password-registerpage2').rebind('focus.initregister', function() {
-        $('.login-register-input.password.confirm').removeClass('incorrect');
-        $(this).parents('.password').addClass('focused');
-    });
-    $('#register-password-registerpage2').rebind('blur.initregister', function() {
-        $(this).parents('.password').removeClass('focused');
-    });
-    $('.new-registration-checkbox .radio-txt,.register-check').rebind('click.uiCheckboxes', function() {
-        if ($('.register-check').attr('class').indexOf('checkboxOn') > -1) {
-            $('.register-check').addClass('checkboxOff');
-            $('.register-check').removeClass('checkboxOn');
-        }
-        else {
-            $('.register-check').addClass('checkboxOn');
-            $('.register-check').removeClass('checkboxOff');
-        }
-    });
+
     if (typeof zxcvbn === 'undefined') {
-        $('.login-register-input.password').addClass('loading');
+        $('.account.input-wrapper.password').addClass('loading');
 
         M.require('zxcvbn_js')
             .done(function() {
-                $('.login-register-input.password').removeClass('loading');
+                $('.account.input-wrapper.password').removeClass('loading');
                 registerpwcheck();
             });
     }
-    $('#register-password-registerpage').rebind('keyup.initregister', function() {
-        registerpwcheck();
+
+    $button.rebind('click.initregister', function() {
+        pageregister();
     });
-    $('.password-status-icon').rebind('mouseover.initregister', function() {
-        if ($(this).parents('.strong-password').length === 0) {
-            $('.password-status-warning').removeClass('hidden');
-        }
-    });
-    $('.password-status-icon').rebind('mouseout', function(e) {
-        if ($(this).parents('.strong-password').length === 0) {
-            $('.password-status-warning').addClass('hidden');
+
+    $button.rebind('keydown.initregister', function (e) {
+        if (e.keyCode === 13) {
+            pageregister();
         }
     });
 
-    $('.register-st2-button').rebind('click', function() {
-        pageregister();
-    });
-    $('.new-registration-checkbox a').rebind('click', function(e) {
+    $('.checkbox-block.register .radio-txt', $formWrapper).safeHTML(l['208s']);
+
+    $('.checkbox-block.register span', $formWrapper).rebind('click', function(e) {
+        e.preventDefault();
         $.termsAgree = function() {
-            $('.register-check').removeClass('checkboxOff');
-            $('.register-check').addClass('checkboxOn');
+            $('.register-check', $formWrapper).removeClass('checkboxOff')
+                .addClass('checkboxOn');
         };
         bottomPageDialog(false, 'terms');
         return false;
     });
-    $('.login-register-input.email,.login-register-input.password').rebind('click', function(e) {
-        $(this).find('input').focus();
-    });
-    $('.login-register-input.name').rebind('click', function(e) {
-        var c = $(e.target).attr('class');
-        if (c && c.indexOf('login-register-input name') > -1) {
-            $('#register-firstname-registerpage').focus();
-        }
-        else if (c && c.indexOf('register-family-input-block') > -1) {
-            $('#register-lastname-registerpage').focus();
-        }
-    });
+
+    // Init inputs events
+    accountinputs.init($formWrapper);
 }
 
 
 function registerpwcheck() {
+    'use strict';
 
-    $('.login-register-input.password').removeClass('weak-password strong-password');
-    $('.new-registration').removeClass('good1 good2 good3 good4 good5');
+    $('.account.password-stutus')
+        .removeClass('good1 good2 good3 good4 good5 checked');
 
-    var trimmedPassword = $.trim($('#register-password-registerpage').val());
+    var trimmedPassword = $.trim($('#register-password-registerpage2').val());
 
     if (typeof zxcvbn === 'undefined' || trimmedPassword === '') {
         return false;

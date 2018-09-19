@@ -471,7 +471,7 @@
 
             var done = function(file, name, action) {
                 closeDialog();
-                promise.resolve(file, name, action, $('#duplicates-checkbox').attr('checked'));
+                promise.resolve(file, name, action, $('#duplicates-checkbox').prop('checked'));
             };
 
             $a1.rebind('click', function() {

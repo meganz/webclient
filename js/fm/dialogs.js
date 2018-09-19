@@ -379,7 +379,7 @@
         }
 
         $icon.rebind('click', function() {
-            $div.unbind('click.unfold');
+            $div.off('click.unfold');
             setSelectedItems(!single);
             return false;
         });
@@ -810,7 +810,7 @@
 
                     $items
                         .rebind('click', function() {
-                            $items.unbind('click');
+                            $items.off('click');
 
                             $items.removeClass('active');
                             $(this).addClass('active');
@@ -1104,7 +1104,7 @@
                 if (exit) {
                     $lis.removeClass('tree-item-on-search-hidden');
                     if (value) {
-                        $(this).val('').blur();
+                        $(this).val('').trigger("blur");
                     }
                 }
                 else {
@@ -1132,7 +1132,7 @@
                 if (exit) {
                     treesearch = false;
                     if (value) {
-                        $(this).val('').blur();
+                        $(this).val('').trigger("blur");
                     }
                 }
                 else {
@@ -1369,7 +1369,7 @@
             closeDialog();
 
             if (saveToDialog) {
-                saveToDialogCb(saveToDialogNode, $.mcselected, section === 'conversations');
+                saveToDialogCb(saveToDialogNode, section === 'conversations' && chats || $.mcselected);
                 return false;
             }
 

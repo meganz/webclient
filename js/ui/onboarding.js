@@ -108,10 +108,10 @@
             }
 
 
-            $(document.body).unbind('mousedown.onboarding' + screenId);
-            $(document.body).unbind('keyup.onboarding' + screenId);
+            $(document.body).off('mousedown.onboarding' + screenId);
+            $(document.body).off('keyup.onboarding' + screenId);
 
-            $(window).unbind('resize.onboardingRepos');
+            $(window).off('resize.onboardingRepos');
 
             if (screenInfo && wasScreenVisible && screenInfo.onHideFn) {
                 screenInfo.onHideFn(screenId, screenInfo);
@@ -131,7 +131,7 @@
 
         setTimeout(function() {
             // give some time for animations and stuff to finish.
-            if ($('.onboarding-dialog:visible').size() === 0 && !$.dialog) {
+            if ($('.onboarding-dialog:visible').length === 0 && !$.dialog) {
                 // all onboarding dialogs had been closed, lets trigger a 'closedialog' in case a dialog is queued to
                 // be 'safe'-shown (@see M.safeShowDialog)
                 mBroadcaster.sendMessage('closedialog');
@@ -192,8 +192,8 @@
                  */
                 if (
                     (
-                        $(e.target).closest($screen).size() === 0 &&
-                        $(e.target).closest($dialog).size() === 0
+                        $(e.target).closest($screen).length === 0 &&
+                        $(e.target).closest($dialog).length === 0
                     ) ||
                     (
                         $(e.target).is(".onboarding-dialog p a")
@@ -201,7 +201,7 @@
                 ) {
                     if (!self._lastShown) {
                         // was destroyed.
-                        $(document.body).unbind('mousedown.onboarding' + screenId);
+                        $(document.body).off('mousedown.onboarding' + screenId);
                         return;
                     }
                     self.hideDialog(screenId);
@@ -210,7 +210,7 @@
             $(document.body).rebind('keyup.onboarding' + screenId, function(e) {
                 if (!self._lastShown) {
                     // was destroyed.
-                    $(document.body).unbind('keyup.onboarding' + screenId);
+                    $(document.body).off('keyup.onboarding' + screenId);
                     return;
                 }
 
@@ -293,8 +293,8 @@
         }
 
         if (
-            $('.notification-popup:visible').size() > 0 ||
-            $('.dropdown:visible:not(.transfer-widget, .tooltip)').size() > 0
+            $('.notification-popup:visible').length > 0 ||
+            $('.dropdown:visible:not(.transfer-widget, .tooltip)').length > 0
         ) {
             return;
         }
@@ -321,7 +321,7 @@
 
         MegaPromise.allDone(promises).always(function() {
             var $currentlyOpened = $('.onboarding-dialog.active');
-            if ($currentlyOpened.size() > 0) {
+            if ($currentlyOpened.length > 0) {
                 var screenId = $currentlyOpened.attr('id').replace("onboarding-dialog-", "");
                 self._initGenericEvents(
                     screenId,
@@ -440,7 +440,7 @@
                 at: posAt,
                 my: posMy
             };
-            if ($(query).size() > 0) {
+            if ($(query).length > 0) {
                 // if a selector is passed to $.position what returns 0 elements, $.position crashed with a JS error,
                 // so we should never do that.
                 attrs['of'] = query;
@@ -465,8 +465,8 @@
             mBroadcaster.removeListener(self._closeDialogListener);
         }
 
-        $(document.body).unbind('onMegaNotification.onboarding');
-        $(window).unbind('resize.onboarding');
+        $(document.body).off('onMegaNotification.onboarding');
+        $(window).off('resize.onboarding');
 
         if (!self.screens) {
             // not initialised/was destroyed
@@ -552,7 +552,7 @@
                     is_fm() &&
                     !folderlink &&
                     rootNodesCount < 3 &&
-                    $('.top-icon.notification .notification-num:visible').size() > 0 &&
+                    $('.top-icon.notification .notification-num:visible').length > 0 &&
                     parseInt($('.top-icon.notification .notification-num:visible').text(), 10) > 0
                 ) {
                     return true;
@@ -634,8 +634,8 @@
                     is_fm() &&
                     !folderlink &&
                     Object.keys(Object(M.su.EXP)).length === 0 &&
-                    $('.fm-blocks-view.fm:visible,.files-grid-view.fm:visible').size() > 0 &&
-                    fileNodeInUi.size() > 0
+                    $('.fm-blocks-view.fm:visible,.files-grid-view.fm:visible').length > 0 &&
+                    fileNodeInUi.length > 0
                 ) {
                     return true;
                 }
@@ -659,8 +659,8 @@
                     is_fm() &&
                     !folderlink &&
                     Object.keys(M.su).filter(function(n) { return n !== 'EXP'; }).length === 0 &&
-                    $('.fm-blocks-view.fm:visible,.files-grid-view.fm:visible').size() > 0 &&
-                    folderInUI.size() > 0
+                    $('.fm-blocks-view.fm:visible,.files-grid-view.fm:visible').length > 0 &&
+                    folderInUI.length > 0
                 ) {
                     return true;
                 }
@@ -683,8 +683,8 @@
                         parseInt(u_attr.flags.ssrs, 10) === 1 &&
                         !u_attr['^!rubbishtime']
                     ) &&
-                    $('.nw-fm-left-icon.rubbish-bin.active').size() === 0 &&
-                    $('.nw-fm-left-icon.rubbish-bin.filled:visible').size() > 0
+                    $('.nw-fm-left-icon.rubbish-bin.active').length === 0 &&
+                    $('.nw-fm-left-icon.rubbish-bin.filled:visible').length > 0
                 ) {
                     return true;
                 }
@@ -702,8 +702,8 @@
                     is_fm() &&
                     !folderlink &&
                     M.u.keys().length <= 2 /* 1 of them == u_handle */ &&
-                    $('.nw-fm-left-icon.contacts.active').size() === 0 &&
-                    $('.nw-fm-left-icon.contacts:visible').size() > 0
+                    $('.nw-fm-left-icon.contacts.active').length === 0 &&
+                    $('.nw-fm-left-icon.contacts:visible').length > 0
                 ) {
                     return true;
                 }
@@ -728,8 +728,8 @@
                     ChatdIntegration.mcfHasFinishedPromise.state() === "resolved" &&
                     !megaChat.plugins.chatdIntegration.isLoading() &&
                     Number.isNaN(parseInt($('.new-messages-indicator:visible').text(), 10)) === true &&
-                    $('.nw-fm-left-icon.conversations.active').size() === 0 &&
-                    $('.nw-fm-left-icon.conversations:visible').size() > 0
+                    $('.nw-fm-left-icon.conversations.active').length === 0 &&
+                    $('.nw-fm-left-icon.conversations:visible').length > 0
                 ) {
                     return true;
                 }

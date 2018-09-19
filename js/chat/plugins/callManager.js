@@ -1,7 +1,5 @@
 (function(scope) {
-"use strict";
-
-
+    'use strict'; // jscs:disable validateIndentation
 
 /**
  * Manages RTC <-> MegChat logic and mapping to UI
@@ -24,8 +22,7 @@ var CallManager = function (megaChat) {
     self.outgoingRequestJingleSessions = {};
     self.callEndedJingleSessions = {};
 
-    megaChat.unbind("onInit.callManager");
-    megaChat.bind("onInit.callManager", function () {
+    megaChat.rebind("onInit.callManager", function() {
         try {
             megaChat.rtcGlobalEventHandler = new RtcGlobalEventHandler(megaChat);
             megaChat.rtc = new RtcModule(
@@ -74,13 +71,11 @@ CallManager.CALL_END_REMOTE_REASON = {
 CallManager.prototype._attachToChat = function (megaChat) {
     megaChat.rtc.statsUrl = "https://stats.karere.mega.nz/stats";
 
-    megaChat.unbind("onRoomDestroy.callManager");
-    megaChat.bind("onRoomDestroy.callManager", function (e, chatRoom) {
+    megaChat.rebind("onRoomDestroy.callManager", function(e, chatRoom) {
         CallManager.assert(chatRoom.type, 'missing room type');
     });
 
-    megaChat.unbind("onRoomCreated.chatStore");
-    megaChat.bind("onRoomCreated.chatStore", function (e, chatRoom) {
+    megaChat.rebind("onRoomInitialized.chatStore", function(e, chatRoom) {
         CallManager.assert(chatRoom.type, 'missing room type');
     });
 };

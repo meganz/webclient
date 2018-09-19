@@ -25702,14 +25702,14 @@ opacity: 1;
 }
 
 .user-management-overview-container .user-analysis-container .user-segments-container .user-segment-trend{
-    width:96%;
+    width:86%;
     text-align: center;
     color:#999999;
     font-size: 13px;
     line-height: 20px;
     margin-top: 0px;
     margin-bottom:24px;
-    margin-left: 2%;
+    margin-left: 7%;
     min-width: 175px;
 
 }
@@ -26054,6 +26054,7 @@ opacity: 1;
     color: #333333;
     height: 32px;
     width: 166px;
+    margin-top:-4px;
     padding: 8px;
     font-family: 'Source Sans Pro', sans-serif; 
 }
@@ -27366,7 +27367,7 @@ opacity: 1;
 }
 
 .user-management-account-settings .setting-block .title {
-    width: 104px;
+    width: 120px;
     height: 100%;
     position: absolute;
     left: 0;
@@ -27541,8 +27542,8 @@ opacity: 1;
     margin-right: 0;
     line-height: 22px;
     color: #333;
-    font-size: 600;
-    font-size: 18px;
+    font-size: 400;
+    font-size: 15px;
     white-space: nowrap;
     text-overflow: ellipsis;
     background-color: none;

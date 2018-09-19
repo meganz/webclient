@@ -244,10 +244,6 @@
     margin:3px 0;
 }
 
-.bus-reg-radio.last-child{
-	margin-left: 32px;
-}
-
 .bus-reg-body .bus-reg-radio.checkOn {
 	border: 1px solid rgba(217,0,7,0.5);
 }
@@ -267,6 +263,10 @@
 
 .bus-reg-body .bus-reg-radio.checkOn::before {
 	background-color: rgba(217,0,7,1);
+}
+
+.bus-reg-body .bus-reg-radio.not-first-child {
+	margin-left: 32px;
 }
 
 .bus-reg-radio-block .provider{

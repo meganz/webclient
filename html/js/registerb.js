@@ -3,6 +3,7 @@ function BusinessRegister() {
     this.cacheTimeout = 9e5; // 15 min - default threshold to update payment gateway list
     this.planPrice = 9.99; // initial value
     this.minUsers = 3; // minimum number of users
+    this.isLoggedIn = false;
     if (mega) {
         if (!mega.cachedBusinessGateways) {
             mega.cachedBusinessGateways = Object.create(null);
@@ -51,6 +52,27 @@ BusinessRegister.prototype.initPage = function () {
         $pageContainer.find('#business-nbusrs').focus();
         loadingDialog.hide();
     };
+
+    // check if this is logged in user
+    if (u_type) {
+        if (u_attr.b) {
+            return loadSubPage("start");
+        }
+        $emailInput.val(u_attr['email']);
+        $emailInput.prop('disabled', true);
+        $fnameInput.val(u_attr['firstname']);
+        $fnameInput.prop('disabled', true);
+        $lnameInput.val(u_attr['lastname']);
+        $lnameInput.prop('disabled', true);
+
+        ///
+        $pageContainer.find('.bus-reg-input.pass-1st').addClass('hidden');
+        $pageContainer.find('.bus-reg-input.pass-2nd').addClass('hidden');
+        $pageContainer.find('.new-registration.suba').addClass('hidden');
+        ///
+        this.isLoggedIn = true;
+    }
+
 
     var fillPaymentGateways = function (st, list) {
         "use strict";
@@ -187,30 +209,32 @@ BusinessRegister.prototype.initPage = function () {
                 passed = false;
             }
         }
-        if (!$element || $element.is($passInput)) {
-            if (!$passInput.val()) {
-                $passInput.parent().addClass('error').find('.error-message').text(l[1104]);
-                $passInput.focus();
-                passed = false;
-            }
-            else if (typeof zxcvbn !== 'undefined') {
-                passed = mySelf.ratePasswordStrength($pageContainer, $passInput.val());
-                if (!passed) {
+        if (mySelf.isLoggedIn === false) {
+            if (!$element || $element.is($passInput)) {
+                if (!$passInput.val()) {
                     $passInput.parent().addClass('error').find('.error-message').text(l[1104]);
                     $passInput.focus();
+                    passed = false;
+                }
+                else if (typeof zxcvbn !== 'undefined') {
+                    passed = mySelf.ratePasswordStrength($pageContainer, $passInput.val());
+                    if (!passed) {
+                        $passInput.parent().addClass('error').find('.error-message').text(l[1104]);
+                        $passInput.focus();
+                    }
+                }
+                else { // the possibility to get to this else is almost 0 , however it's added to eliminate any chances of problems
+                    M.require('zxcvbn_js').done(function () {
+                        inputsValidator($element); // recall me after loading
+                    });
                 }
             }
-            else { // the possibility to get to this else is almost 0 , however it's added to eliminate any chances of problems
-                M.require('zxcvbn_js').done(function () {
-                    inputsValidator($element); // recall me after loading
-                });
-            }
-        }
-        if (!$element || $element.is($rPassInput)) {
-            if (!$rPassInput.val()) {
-                $rPassInput.parent().addClass('error').find('.error-message').text(l[1104]);
-                $rPassInput.focus();
-                passed = false;
+            if (!$element || $element.is($rPassInput)) {
+                if (!$rPassInput.val()) {
+                    $rPassInput.parent().addClass('error').find('.error-message').text(l[1104]);
+                    $rPassInput.focus();
+                    passed = false;
+                }
             }
         }
         if (passed && !$element) {
@@ -304,10 +328,10 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
     loadingDialog.show();
     var mySelf = this;
 
-    var afterEmphermalAccountCreation = function () {
+    var afterEmphermalAccountCreation = function (isUpgrade) {
         // at this point i know BusinessAccount Class is required before
         var business = new BusinessAccount();
-        var settingPromise = business.setMasterUserAttributes(nbusers, cname, tel, fname, lname, email, pass);
+        var settingPromise = business.setMasterUserAttributes(nbusers, cname, tel, fname, lname, email, pass, isUpgrade);
         settingPromise.always(function settingAttrHandler(st, res) {
             if (st === 0) {
                 msgDialog('warninga', '', l[19508], '', function () {
@@ -328,7 +352,12 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
 
 
     // call create ephemeral account function in security package
-    security.register.createEphemeralAccount(afterEmphermalAccountCreation);
+    if (!this.isLoggedIn || !u_type) {
+        security.register.createEphemeralAccount(afterEmphermalAccountCreation);
+    }
+    else {
+        afterEmphermalAccountCreation(true);
+    }
 
 };
 

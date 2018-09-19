@@ -1007,6 +1007,7 @@
     "7241": "Debes aceptar nuestros T\u00e9rminos de Servicio",
     "7272": "Formato de datos incorrecto",
     "7315": "Empezar",
+    "7331": "Ordenar",
     "7337": "Seguridad",
     "7352": "Estado",
     "7354": "Renovaci\u00f3n el",
@@ -2009,6 +2010,7 @@
     "17767": "Archivos enviados al chat",
     "17768": "Cuenta cerrada",
     "17789": "El n\u00famero de identificaci\u00f3n tributaria no es v\u00e1lido.",
+    "17791": "Filtro",
     "17792": "Tu disco principal est\u00e1 lleno. Por favor libera espacio y prueba de nuevo.",
     "17793": "Desgraciadamente Chrome s\u00f3lo permite que MEGA use una parte del espacio disponible en tu disco que actualmente es insuficiente. Instala [A1]la aplicaci\u00f3n de escritorio[\/A1] o nuestra [A2]extensi\u00f3n de Chrome[\/A2], o [A3]libera espacio[\/A3].",
     "17794": "Iniciando...",
@@ -2778,5 +2780,11 @@
     "19513": "\u00a1Gracias! Tu cuenta [B]%2[\/B] pasar\u00e1 a PRO en cuanto nuestro proveedor nos confirme el pago. Si has pagado con tarjeta de cr\u00e9dito o de d\u00e9bito y no has recibido tu cuenta PRO dentro de unas horas, por favor env\u00edanos un correo a [A]support@mega.nz[\/A] Si has pagado a trav\u00e9s de transferencia bancaria por favor espera 4-5 d\u00edas para que se confirme el pago.",
     "19514": "\u00a1Gracias! Tu cuenta [B]%2[\/B] pasar\u00e1 a PRO en cuanto nuestro proveedor nos confirme el pago. Si no has recibido tu cuenta PRO dentro de %1 horas, por favor env\u00edanos un correo a [A]support@mega.nz[\/A].",
     "19516": "Crear una cuenta Business",
-    "19517": "Crear una cuenta Business"
+    "19517": "Crear una cuenta Business",
+    "19521": "Modify account settings",
+    "19522": "Manage Account",
+    "19523": "Company information",
+    "19524": "The edit user operation has failed, please try again later",
+    "19525": "The user has been updated",
+    "19527": "Invitation link re-sending has failed due to a server error, please try again later"
 }

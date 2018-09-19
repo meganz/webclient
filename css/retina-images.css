@@ -197,6 +197,82 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 192px auto;
 }
 
+
+
+/*business icon start from here*/
+.content-panel.user-management .user-management-status, .user-management-view .user-management-status {
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-tree-panel-header .img{
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-tree-panel-arrows {
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.default-white-button-user-management .icon, .default-green-button-user-management .icon, .default-red-button-user-management .icon{
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.fm-files-view-icon-user-management {
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-overview-bar-data .info-block .icon{
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+.user-management-sorting-menu .sort-icon{
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.up-arrow-icon {
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-breadcrumb .user-management-icon {
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-breadcrumb .user-management-next-arrow {
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-view-status.enabled, .user-management-view-status.disabled, .user-management-view-status.pending{
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.subaccount-view-used-data .used-storage-info .folder-small-icon{
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-breadcrumbs-img {
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-view .default-white-drop-box .list-arrow, .user-management-dialog .list-arrow {
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-overview-container .daily-transfer-flow-bar .tooltip::after {
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
 .fm-picker-dialog .summary-container .transfer-filetype-icon.chat {
     background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
     background-size: 48px auto;
@@ -205,5 +281,98 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
  .fm-picker-dialog .contact-row.selected .contact-checkboxOn.small12::before, .fm-picker-dialog .contact-row:hover .small12::before {
     background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
     background-size: 48px auto;
+}
+.user-management-view .admin-icon{
+    background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-view .icon48, .user-management-dialog .icon48{
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+.user-management-view .icon56, .user-management-dialog .icon56 {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+.user-management-view-data .user-management-view-overall-usage .user-management-storage .img, .user-management-view-data .user-management-view-overall-usage .user-management-transfer .img{
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+.user-management-landing-page .mega-56px-icon{
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+.user-management-account-settings .invoice-detail .mega-logo {
+    background-image: url(../images/mega/invoice-image_v1@2x.png);
+    background-size: 120px auto;
+}
+
+.user-management-account-settings .icon12{
+    background-image: url(../images/mega/invoice-image_v1@2x.png);
+    background-size: 120px auto;
+}
+
+.user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon{
+    background-image: url(../images/mega/top-sprite_v5@2x.png);
+     background-size: 38px auto;
+}
+
+.user-management-view .folder-small-icon.ex-out-share, .fm-right-header-user-management .folder-small-icon.ex-out-share, .user-management-dialog .folder-small-icon.ex-out-share{
+    background-image: url(../images/mega/top-sprite_v5@2x.png);
+     background-size: 38px auto;
+}
+
+.user-management-view .folder-small-icon.ex-in-share, .fm-right-header-user-management .folder-small-icon.ex-in-share, .user-management-dialog .folder-small-icon.ex-in-share{
+    background-image: url(../images/mega/top-sprite_v5@2x.png);
+     background-size: 38px auto;
+}
+
+.bus-reg-icon {
+    background-image: url(../images/mega/top-sprite_v5@2x.png);
+     background-size: 38px auto;
+}
+
+.bus-reg-body .provider-icon {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+.bus-reg-checkbox.checkOn::before {
+    background-image: url(../images/mega/top-login-sprite_v11@2x.png);
+
+}
+
+.bus-reg-btn .next-arrow, .bus-reg-btn-2 .next-arrow {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+.bus-plan-icon64 {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+.bus-reg-featureImg100 {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+.bus-confirm-body .bus-confirmImg {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+} 
+
+.user-management-account-settings .setting-icon24 {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+.bottom-page.large-icon, .cropped-page .bottom-page.big-icon, .cropped-page .bottom-page.top-title::before, .mobile-apps-button.uwp,.uwp .advertise-chat .mobile-apps-button.red span::before {
+    background-image: url(../images/mega/new-pages-sprite@2x.png) !important;
+    background-size: 376px auto;
 }
 }

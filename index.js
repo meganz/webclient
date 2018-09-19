@@ -987,6 +987,16 @@ function init_page() {
         if (lang == 'ru') {
             $('.account-mid-block').addClass('high');
         }
+
+        // On clicking the directory buttons
+        $('.directory-buttons li').rebind('click', function() {
+
+            // Get the class to the directory title element to scroll to
+            var link = $(this).attr('data-link');
+
+            // Scroll to the element's parent (not the element itself because it's hidden by the header)
+            $('.contact-new-title.' + link).parent().get(0).scrollIntoView();
+        });
     }
     else if (page.substr(0, 4) == 'help') {
         return Help.render();
@@ -1300,6 +1310,10 @@ function init_page() {
     }
     else if (page === 'wp') {
         parsepage(pages['wp']);
+        bottompage.initTabs();
+    }
+    else if (page === 'uwp') {
+        parsepage(pages['uwp']);
         bottompage.initTabs();
     }
     else if (page === 'bird') {
@@ -2192,6 +2206,10 @@ function topmenuUI() {
         }
         $topHeader.find('.top-search-bl').removeClass('contains-value active');
         $topHeader.find('.top-search-input').val('');
+        // if current page is search result reset it.
+        if(page.indexOf('/search/') !== -1) {
+            loadSubPage(page.slice(0, page.indexOf('/search/')));
+        }
     });
 
     $topHeader.find('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
@@ -2261,6 +2279,10 @@ function topmenuUI() {
                         });
                     });
                 }
+            }
+            // if current page is search and value is empty result move to root.
+            else if (val === '' && page.indexOf('/search/') !== -1) {
+                loadSubPage(page.slice(0, page.indexOf('/search/')));
             }
         }
     });

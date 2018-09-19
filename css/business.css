@@ -5,7 +5,10 @@
 .business .top-buttons, .top-business-button {
     display: none;
 }
-.business .top-buttons.business {
+.business .top-buttons, .top-business-button, .top-buttons.business {
+    display: none;
+}
+.business .top-buttons.business, .business .top-buttons.business {
     display: block;
 }
 .business .bottom-page .top-business-title {
@@ -45,14 +48,21 @@
     font-size: 16px;
     font-family: 'source_sans_prosemibold', Arial;
 }
-.business .bottom-page .top-head, .business .bottom-page .top-head.floating {
+.business-page.bottom-page .top-head, .business-page.bottom-page .top-head.floating {
     background-color: #F0F2F5;
 }
-.business .bottom-page .top-head::after, .business .bottom-page .top-head.floating::after {
+.business-page.bottom-page .top-head::after, .business-page.bottom-page .top-head.floating::after {
     display: block;
     background-color: rgba(0,0,0,0.1) !important;
 }
-.business .bottom-page .top-head.floating {
+.business-page.bottom-page .top-head, .business-page.bottom-page .top-head.floating {
+    background-color: #F0F2F5;
+}
+.business-page.bottom-page .top-head::after, .business-page.bottom-page .top-head.floating::after {
+    display: block;
+    background-color: rgba(0,0,0,0.1) !important;
+}
+.business-page.bottom-page .top-head.floating {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
@@ -178,6 +188,9 @@ i.medium-icon.business-sprite {
     color: #666666;
     padding: 20px 0 47px 0;
     max-width: 360px;
+}
+.bottom-page.big-header.dark + .bottom-page.medium-txt.lato {
+    text-align: left;
 }
 .medium-icon.business-sprite.right-arrow {
     background-position: -46px -111px;
@@ -520,10 +533,10 @@ i.medium-icon.business-sprite {
     margin-top: -30px;
 }
 .bottom-page.business-header {
+    line-height: 32px;
     font-size: 24px;
-    line-height: 29px;
     color: #333333;
-    font-family: 'montserrat', 'open_sans', sans-serif;
+    font-family: 'montserrat_lights', 'open_sans', sans-serif;
     padding: 34px 0 24px 0;
 }
 .bottom-page.business-text {
@@ -614,7 +627,7 @@ div.bottom-page.slider-controls {
     background-color: rgba(102,102,102,1);
 }
 .business-info-block {
-    max-width: 458px;
+    max-width: 464px;
     margin: 0 auto;
     text-align: center;
 }
@@ -800,6 +813,9 @@ img.bottom-page.business4 {
 .business-page .bottom-menu.pad {
     max-width: 1230px;
     padding: 0 30px;
+}
+.top-buttons.business .default-white-button.small i.white-mega {
+    margin: 3px 3px 1px -0px;
 }
 @media only screen and (max-width: 925px) {
     .business-top-bl .pages-nav.nav-button {
@@ -1101,8 +1117,8 @@ img.bottom-page.business4 {
         margin: 0 auto -10px auto;
     }
     .bottom-page.business-header {
-        font-size: 20px;
-        line-height: 24px;
+        font-size: 24px;
+        line-height: 32px;
         text-align: center;
         padding: 33px 0 24px 0;
     }

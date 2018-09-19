@@ -80,10 +80,15 @@ MegaData.prototype.onlineStatusEvent = function(u, status) {
  */
 MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
     if (d) console.debug('Draw received contacts grid.');
-    var html, email, ps, trClass, id,
-        type = '',
-        drawn = false,
-        t = '.grid-table.contact-requests';
+    var html;
+    var email;
+    var ps;
+    var ts;
+    var trClass;
+    var id;
+    var type = '';
+    var drawn = false;
+    var t = '.grid-table.contact-requests';
     var contactName = '';
 
     if (this.currentdirid === 'ipc') {
@@ -105,13 +110,9 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
                 }
                 trClass = (type !== '') ? ' class="' + type + '"' : '';
                 email = ipc[i].m;
-                contactName = this.getNameByHandle(ipc[i].p);
 
-                if (ipc[i].ps && ipc[i].ps !== 0) {
-                    ps = '<span class="contact-request-content">' + ipc[i].ps + ' ' + l[105] + ' ' + l[813] + '</span>';
-                }
-                else {
-                    ps = '<span class="contact-request-content">' + l[5851] + '</span>';
+                if (ipc[i].ts) {
+                    ts = time2last(ipc[i].ts);
                 }
                 html = '<tr id="ipc_' + id + '"' + trClass + '>' +
                     '<td>' +
@@ -121,7 +122,7 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
                     '<div class="contact-email">' + htmlentities(email) + '</div>' +
                     '</div>' +
                     '</td>' +
-                    '<td>' + ps + '</td>' +
+                    '<td>' + ts + '</td>' +
                     '<td class="right-textalign">' +
                     '<div class="contact-request-button default-white-button green-txt inline accept">' +
                     '<i class="small-icon icons-sprite tiny-green-tick"></i>' +
@@ -245,11 +246,15 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
 
     if (d) console.debug('Draw sent invites.');
 
-    var html, hideCancel, hideReinvite, hideOPC,
-        drawn = false,
-        TIME_FRAME = 60 * 60 * 24 * 14,// 14 days in seconds
-        utcDateNow = Math.floor(Date.now() / 1000),
-        t = '.grid-table.sent-requests';
+    var html;
+    var hideCancel;
+    var hideReinvite;
+    var hideOPC;
+    var drawn = false;
+    var TIME_FRAME = 60 * 60 * 24 * 14;// 14 days in seconds
+    var utcDateNow = Math.floor(Date.now() / 1000);
+    var rts;
+    var t = '.grid-table.sent-requests';
 
     if (this.currentdirid === 'opc') {
 
@@ -273,6 +278,10 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
                     }
                 }
 
+                if (opc[i].rts) {
+                    rts = time2last(opc[i].rts);
+                }
+
                 hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
                 html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +
                     '<td>' +
@@ -283,6 +292,7 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
                     '</div>' +
                     '</div>' +
                     '</td>' +
+                    '<td>' + rts + '</td>' +
                     '<td class="right-textalign">' +
                     '<div class="default-white-button grey-txt ' +
                     'contact-request-button inline reinvite ' + hideReinvite + '">' +
@@ -478,8 +488,7 @@ MegaData.prototype.contacts = function() {
     if (megaChatIsReady) {
         var $dropdown = $('.fm-start-chat-dropdown');
 
-        $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
-        $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
+        $('.fm-tree-panel').rebind('click.megaChat', '.start-chat-button', function() {
             var scrollPos = 0;
 
             var $this = $(this);
@@ -562,8 +571,7 @@ MegaData.prototype.contacts = function() {
         });
     }
 
-    $('.fm-tree-panel').undelegate('.nw-contact-item', 'click');
-    $('.fm-tree-panel').delegate('.nw-contact-item', 'click', function() {
+    $('.fm-tree-panel').rebind('click', '.nw-contact-item', function() {
         var id = $(this).attr('id');
         if (id) {
             id = id.replace('contact_', '');
@@ -574,7 +582,7 @@ MegaData.prototype.contacts = function() {
     });
 
     // On the Contacts screen, initiate a call by double clicking a contact name in the left panel
-    $('.fm-tree-panel').delegate('.nw-contact-item.online', 'dblclick', function() {
+    $('.fm-tree-panel').rebind('dblclick.treepanel', '.nw-contact-item.online', function() {
 
         // Get the element ID
         var $this = $(this);

@@ -157,7 +157,7 @@ copyright.init_cn = function() {
             .addClass("red")
             .css('font-weight', 'bold')
             .rebind('click', function() {
-                $(this).unbind('click')
+                $(this).off('click')
                     .removeClass("red")
                     .css('font-weight', 'normal')
                     .parent()
@@ -229,7 +229,7 @@ copyright.init_cn = function() {
 
             });
 
-            if (proceed && !$('.cn_check1 .checkinput').attr('checked')) {
+            if (proceed && !$('.cn_check1 .checkinput').prop('checked')) {
                 msgDialog('warninga', l[135], escapeHTML(l[665]));
             }
             else if (proceed) {
@@ -272,36 +272,36 @@ copyright.init_cn = function() {
     $('.signbtn').rebind('click', function() {
         if ($('input.copyrightowner').val() === '') {
             msgDialog('warninga', l[135], escapeHTML(l[661]), false, function() {
-                $('input.copyrightowner').focus();
+                $('input.copyrightowner').trigger("focus");
             });
         }
         else if ($('input.agent').val() === '') {
             msgDialog('warninga', l[135], escapeHTML(l[662]), false, function() {
-                $('input.agent').focus();
+                $('input.agent').trigger("focus");
             });
         }
         else if ($('input.email').val() === '') {
             msgDialog('warninga', l[135], escapeHTML(l[663]), false, function() {
-                $('input.email').focus();
+                $('input.email').trigger("focus");
             });
         }
         else if (!copyright.validateEmail($('input.email').val())) {
             msgDialog('warninga', l[135], escapeHTML(l[198]), false, function() {
-                $('input.email').focus();
+                $('input.email').trigger("focus");
             });
         }
         else if ($('input.city').val() === '') {
             msgDialog('warninga', l[135], escapeHTML(l[1262]), false, function() {
-                $('input.city').focus();
+                $('input.city').trigger("focus");
             });
         }
         else if (!$('.select.country').hasClass('selected')) {
             msgDialog('warninga', l[135], escapeHTML(l[568]));
         }
-        else if (!$('.cn_check2 .checkinput').attr('checked')) {
+        else if (!$('.cn_check2 .checkinput').prop('checked')) {
             msgDialog('warninga', l[135], escapeHTML(l[666]));
         }
-        else if (!$('.cn_check3 .checkinput').attr('checked')) {
+        else if (!$('.cn_check3 .checkinput').prop('checked')) {
             msgDialog('warninga', l[135], escapeHTML(l[667]));
         }
         else {
@@ -408,43 +408,43 @@ copyright.validateDisputeForm = function() {
 
     if ($('input.copyrightowner').val() === '') {
         msgDialog('warninga', l[135], escapeHTML(l[662]), false, function() {
-            $('input.copyrightowner').focus();
+            $('input.copyrightowner').trigger("focus");
         });
         return false;
     }
     else if ($('input.phonenumber').val() === '') {
         msgDialog('warninga', l[135], escapeHTML(l[8813]), false, function() {
-            $('input.phonenumber').focus();
+            $('input.phonenumber').trigger("focus");
         });
         return false;
     }
     else if (!copyright.validatePhoneNumber($('input.phonenumber').val())) {
         msgDialog('warninga', l[135], escapeHTML(l[8814]), false, function() {
-            $('input.phonenumber').focus();
+            $('input.phonenumber').trigger("focus");
         });
         return false;
     }
     else if ($('input.email').val() === '') {
         msgDialog('warninga', l[135], escapeHTML(l[663]), false, function() {
-            $('input.email').focus();
+            $('input.email').trigger("focus");
         });
         return false;
     }
     else if (!copyright.validateEmail($('input.email').val())) {
         msgDialog('warninga', l[135], escapeHTML(l[198]), false, function() {
-            $('input.email').focus();
+            $('input.email').trigger("focus");
         });
         return false;
     }
     else if ($('input.address').val() === '') {
         msgDialog('warninga', l[135], escapeHTML(l[8815]), false, function() {
-            $('input.address').focus();
+            $('input.address').trigger("focus");
         });
         return false;
     }
     else if ($('input.city').val() === '') {
         msgDialog('warninga', l[135], escapeHTML(l[1262]), false, function() {
-            $('input.city').focus();
+            $('input.city').trigger("focus");
         });
         return false;
     }
@@ -454,11 +454,11 @@ copyright.validateDisputeForm = function() {
     }
 
     // The checkboxes depend on the type
-    if (proceed && !$('.cn_check1 .checkinput').attr('checked')) {
+    if (proceed && !$('.cn_check1 .checkinput').prop('checked')) {
         msgDialog('warninga', l[135], escapeHTML(l[8816]));
         return false;
     }
-    else if (!$('.cn_check2 .checkinput').attr('checked')) {
+    else if (!$('.cn_check2 .checkinput').prop('checked')) {
         msgDialog('warninga', l[135], escapeHTML(l[8817]));
         return false;
     }
@@ -574,12 +574,12 @@ copyright.initCheckboxListeners = function() {
 
         // If unticked, tick the box
         if ($input.hasClass('checkboxOff')) {
-            $input.removeClass('checkboxOff').addClass('checkboxOn').attr('checked', 'checked');
+            $input.removeClass('checkboxOff').addClass('checkboxOn').prop('checked', true);
             $checkboxDiv.removeClass('checkboxOff').addClass('checkboxOn');
         }
         else {
             // Otherwise untick the box
-            $input.removeClass('checkboxOn').addClass('checkboxOff').removeAttr('checked');
+            $input.removeClass('checkboxOn').addClass('checkboxOff').prop('checked', false);
             $checkboxDiv.removeClass('checkboxOn').addClass('checkboxOff');
         }
     });

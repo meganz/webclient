@@ -61,16 +61,10 @@ var uiCheckboxes = function($scope, saveState, stateChangeCb, initialState) {
 
         var doToggle = function(state) {
             if (state) {
-                $cbxElement
-                    .removeClass('checkboxOff')
-                    .addClass('checkboxOn')
-                    .trigger('onFakeCheckboxChange', [true]);
+                $cbxElement.removeClass('checkboxOff').addClass('checkboxOn');
             }
             else {
-                $cbxElement
-                    .removeClass('checkboxOn')
-                    .addClass('checkboxOff')
-                    .trigger('onFakeCheckboxChange', [false]);
+                $cbxElement.removeClass('checkboxOn').addClass('checkboxOff');
             }
 
             if (saveState) {
@@ -89,25 +83,25 @@ var uiCheckboxes = function($scope, saveState, stateChangeCb, initialState) {
         var _onToggle = function() {
             if ($cbxElement.hasClass('checkboxOn')) {
                 doToggle();
-                $input.removeAttr('checked');
+                $input.prop('checked', false);
             }
             else {
                 doToggle(true);
-                $input.attr('checked', true);
+                $input.prop('checked', true);
             }
             return false;
         };
 
-        $label.unbind('click.uiCheckboxes');
-        $cbxElement.unbind('click.uiCheckboxes');
-        $input.unbind('change.uiCheckboxes');
+        $label.off('click.uiCheckboxes');
+        $cbxElement.off('click.uiCheckboxes');
+        $input.off('change.uiCheckboxes').addClass('hidden');
 
         if (initialState === true) {
-            $input.attr('checked', true);
+            $input.prop('checked', true);
             $cbxElement.removeClass('checkboxOff').addClass('checkboxOn');
         }
         else {
-            $input.removeAttr('checked');
+            $input.prop('checked', false);
             $cbxElement.removeClass('checkboxOn').addClass('checkboxOff');
         }
 
@@ -115,7 +109,7 @@ var uiCheckboxes = function($scope, saveState, stateChangeCb, initialState) {
         $cbxElement.rebind('click.uiCheckboxes', _onToggle);
 
         $input.rebind('change.uiCheckboxes', function() {
-            doToggle($(this).attr('checked'));
+            doToggle($(this).prop('checked'));
         });
     });
 

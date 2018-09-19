@@ -6,13 +6,15 @@
 
     function closeRegisterDialog($dialog, isUserTriggered) {
         closeDialog();
-        $(window).unbind('resize.proregdialog');
-        $('.fm-dialog-overlay').unbind('click.proDialog');
-        $('.fm-dialog-close', $dialog).unbind('click.proDialog');
+        $(window).off('resize.proregdialog');
+        $('.fm-dialog-overlay').off('click.proDialog');
+        $('.fm-dialog-close', $dialog).off('click.proDialog');
 
         if (isUserTriggered && options.onDialogClosed) {
             options.onDialogClosed($dialog);
         }
+
+        delete $.registerDialog;
 
         options = {};
     }
@@ -43,7 +45,7 @@
 
             hideOverlay();
             closeRegisterDialog($dialog);
-            $('.fm-dialog.registration-page-success').unbind('click');
+            $('.fm-dialog.registration-page-success').off('click');
 
             if (login) {
                 Soon(function() {
@@ -153,64 +155,66 @@
         };
 
         var err = false;
+        var $formWrapper = $dialog.find('form');
+        var $firstName = $('.input-wrapper.name .f-name', $formWrapper);
+        var $lastName = $('.input-wrapper.name .l-name', $formWrapper);
+        var $email = $('.input-wrapper.email input', $formWrapper);
+        var $password = $('.input-wrapper.first input', $formWrapper);
+        var $passwordConfirm = $('.input-wrapper.confirm input', $formWrapper);
 
-        if ($('#register-firstname', $dialog).val() === ''
-                || $('#register-firstname', $dialog).val() === l[1096]
-                || $('#register-lastname', $dialog).val() === ''
-                || $('#register-lastname', $dialog).val() === l[1097]) {
+        var firstName = $.trim($firstName.val());
+        var lastName = $.trim($lastName.val());
+        var email = $.trim($email.val());
+        var password = $.trim($password.val());
+        var passwordConfirm = $.trim($passwordConfirm.val());
 
-            $('.login-register-input.name', $dialog).addClass('incorrect');
-            err = 1;
-        }
-        if ($('#register-email', $dialog).val() === ''
-                || $('#register-email', $dialog).val() === l[1096]
-                || checkMail($('#register-email', $dialog).val())) {
-
-            $('.login-register-input.email', $dialog).addClass('incorrect');
-            err = 1;
-        }
-
-        if ($('#register-email', $dialog).val() === ''
-                || $('#register-email', $dialog).val() === l[1096]
-                || checkMail($('#register-email', $dialog).val())) {
-
-            $('.login-register-input.email', $dialog).addClass('incorrect');
+        if (password !== passwordConfirm) {
+            $password.parent().find('.account.password-stutus').removeClass('checked');
+            $password.val('');
+            $passwordConfirm.val('');
+            $passwordConfirm.parent().addClass('incorrect');
+            $passwordConfirm.focus();
             err = 1;
         }
 
-        var password = $.trim($('#register-password', $dialog).val());
-
-        var pw = {};
-        if (typeof zxcvbn !== 'undefined') {
-            pw = zxcvbn($('#register-password', $dialog).val());
-        }
-        if ($('#register-password', $dialog).attr('type') === 'text') {
-            $('.login-register-input.password.first', $dialog).addClass('incorrect');
-            $('.white-txt.password', $dialog).text(l[213]);
+        if (password === '') {
+            $password.parent().addClass('incorrect');
+            $password.focus();
+            $password.parent().find('.account.input-tooltip')
+                .safeHTML(l[1102] + '<br>' + l[213]);
             err = 1;
         }
         else if (password.length < security.minPasswordLength) {
-            $('.login-register-input.password.first').addClass('incorrect');
-            $('.white-txt.password').text(l[18701]);
+            $password.parent().addClass('incorrect');
+            $password.focus();
+            $password.parent().find('.account.input-tooltip')
+                .safeHTML(l[1102] + '<br>' + l[18701]);
             err = 1;
         }
-        else if (pw.score < 1) {
-            $('.login-register-input.password.first', $dialog).addClass('incorrect');
-            $('.white-txt.password', $dialog).text(l[1104]);
+        else if (typeof zxcvbn !== 'undefined') {
+            var pw = zxcvbn(password);
+            if (pw.score < 1) {
+                $password.parent().addClass('incorrect');
+                $password.focus();
+                $password.parent().find('.account.input-tooltip')
+                    .safeHTML(l[1102] + '<br>' + l[1104]);
+                err = 1;
+            }
+        }
+
+        if (email === '' || checkMail(email)) {
+            $email.parent().addClass('incorrect');
+            $email.focus();
             err = 1;
         }
 
-        if ($('#register-password', $dialog).val() !== $('#register-password2', $dialog).val()) {
-            $('#register-password', $dialog)[0].type = 'password';
-            $('#register-password2', $dialog)[0].type = 'password';
-            $('#register-password', $dialog).val('');
-            $('#register-password2', $dialog).val('');
-            $('.login-register-input.password.confirm', $dialog).addClass('incorrect');
+        if (firstName === '' || lastName === '') {
+            $firstName.parent().addClass('incorrect');
+            $firstName.focus();
             err = 1;
         }
 
         if (!err && typeof zxcvbn === 'undefined') {
-            hideOverlay();
             msgDialog('warninga', l[135], l[1115] + '<br>' + l[1116]);
             return false;
         }
@@ -242,10 +246,13 @@
 
     function showRegisterDialog(opts) {
         var $dialog = $('.fm-dialog.pro-register-dialog');
+        var $inputs = $dialog.find('.account.input-wrapper input');
+        var $button = $dialog.find('.big-red-button');
+        var $password = $dialog.find('.account.input-wrapper.password input');
 
         var dialogBodyScroll = function() {
             var bodyHeight = $('body').height();
-            var $scrollBlock =  $('.pro-register-scroll');
+            var $scrollBlock =  $('.pro-register-scroll', $dialog);
             var scrollBlockHeight = $scrollBlock.height();
             $scrollBlock.css({
                 'max-height': bodyHeight - 100
@@ -279,75 +286,51 @@
             });
         };
 
-        M.safeShowDialog('pro-register-dialog', function() {
+        M.safeShowDialog('register', function() {
             options = Object(opts);
 
             $('.fm-dialog-title', $dialog).text(options.title || l[5840]);
 
             if (options.body) {
-                $('.fm-dialog-body', $dialog).removeClass('hidden').safeHTML(options.body);
+                $('.fm-dialog-body', $dialog).safeHTML(options.body);
             }
-            else {
-                $('.fm-dialog-body', $dialog).addClass('hidden');
-            }
-            $dialog.removeClass('hidden').addClass('active');
 
             redraw();
-            $('.pro-register-scroll').removeAttr('style');
+            $('.pro-register-scroll', $dialog).removeAttr('style');
             $(window).rebind('resize.proregdialog', redraw);
             deleteScrollPanel('.pro-register-scroll', 'jsp');
+
+            // Init inputs events
+            accountinputs.init($dialog);
+
+            $.registerDialog = 'register';
 
             return $dialog;
         });
 
-        $('*', $dialog).removeClass('incorrect'); // <- how bad idea is that "*" there?
-
-        // this might gets binded from init_page() which will conflict here..
-        $('.login-register-input').unbind('click');
+        $inputs.val('');
+        $password.parent().find('.password-stutus').removeClass('checked');
 
         // controls
-        $('.fm-dialog-close', $dialog)
-            .rebind('click.proDialog', function() {
+        $('.fm-dialog-close', $dialog).rebind('click.proDialog', function() {
+            closeRegisterDialog($dialog, true);
+            return false;
+        });
+
+        // close dialog by click on overlay
+        $('.fm-dialog-overlay').rebind('click.proDialog', function() {
+            if ($.registerDialog === $.dialog) {
                 closeRegisterDialog($dialog, true);
-                return false;
-            });
-
-        $('.fm-dialog-overlay')
-            .rebind('click.proDialog', function() {
-                closeRegisterDialog($dialog, true);
-                return false;
-            });
-
-        $('#register-email', $dialog)
-            .data('placeholder', l[95])
-            .val(l[95]);
-
-        $('#register-firstname', $dialog)
-            .data('placeholder', l[1096])
-            .val(l[1096]);
-
-        $('#register-lastname', $dialog)
-            .data('placeholder', l[1097])
-            .val(l[1097]);
-
-        $('#register-password', $dialog)
-            .addClass('input-password')
-            .data('placeholder', l[909])
-            .val(l[909]);
-
-        $('#register-password2', $dialog)
-            .addClass('input-password')
-            .data('placeholder', l[1114])
-            .val(l[1114]);
-
-        uiPlaceholders($dialog);
-        uiCheckboxes($dialog);
+            }
+            else {
+                closeDialog();
+            }
+            return false;
+        });
 
         var registerpwcheck = function() {
-            $('.login-register-input.password', $dialog)
-                .removeClass('weak-password strong-password');
-            $('.new-registration', $dialog)
-                .removeClass('good1 good2 good3 good4 good5');
+            $('.account.password-stutus', $dialog)
+                .removeClass('good1 good2 good3 good4 good5 checked');
 
             var $passwordInput = $('#register-password', $dialog);
             var password = $.trim($passwordInput.val());
@@ -364,51 +347,48 @@
         };
 
         if (typeof zxcvbn === 'undefined') {
-            $('.login-register-input.password', $dialog).addClass('loading');
+            $('.account.input-wrapper.password', $dialog).addClass('loading');
 
             M.require('zxcvbn_js')
                 .done(function() {
-                    $('.login-register-input.password', $dialog).removeClass('loading');
+                    $('.account.input-wrapper.password', $dialog).removeClass('loading');
                     registerpwcheck();
                 });
         }
 
-        $('#register-password', $dialog).rebind('keyup.proRegister', function(e) {
+        $password.first().rebind('keyup.proRegister', function(e) {
             registerpwcheck();
         });
 
-        $('.password-status-icon', $dialog).rebind('mouseover.proRegister', function(e) {
-            if ($(this).parents('.strong-password').length === 0) {
-                $('.password-status-warning', $dialog).removeClass('hidden');
-            }
-        });
-
-        $('.password-status-icon', $dialog).rebind('mouseout.proRegister', function(e) {
-            if ($(this).parents('.strong-password').length === 0) {
-                $('.password-status-warning', $dialog).addClass('hidden');
-            }
-        });
-
-        $('input', $dialog).rebind('keydown.proRegister', function(e) {
+        $inputs.rebind('keydown.proRegister', function(e) {
             if (e.keyCode === 13) {
                 doProRegister($dialog);
             }
         });
 
-        $('.register-st2-button', $dialog).rebind('click', function(e) {
+        $button.rebind('click.proRegister', function(e) {
             doProRegister($dialog);
             return false;
         });
 
-        $('.new-registration-checkbox a', $dialog)
-            .rebind('click.proRegisterDialog', function(e) {
-                $.termsAgree = function() {
-                    $('.register-check').removeClass('checkboxOff');
-                    $('.register-check').addClass('checkboxOn');
-                };
-                bottomPageDialog(false, 'terms'); // show terms dialog
+        $button.rebind('keydown.proRegister', function (e) {
+            if (e.keyCode === 13) {
+                doProRegister($dialog);
                 return false;
-            });
+            }
+        });
+
+        $('.checkbox-block.register .radio-txt', $dialog).safeHTML(l['208s']);
+
+        $('.checkbox-block.register span', $dialog).rebind('click', function(e) {
+            e.preventDefault();
+            $.termsAgree = function() {
+                $('.register-check', $dialog).removeClass('checkboxOff')
+                    .addClass('checkboxOn');
+            };
+            bottomPageDialog(false, 'terms'); // show terms dialog
+            return false;
+        });
     }
 
     /**
@@ -431,7 +411,7 @@
                         console.error('sendsignuplink failed', res);
 
                         $button.addClass('disabled');
-                        $button.unbind('click');
+                        $button.off('click');
 
                         var tick = 26;
                         var timer = setInterval(function() {

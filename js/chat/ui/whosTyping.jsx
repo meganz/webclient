@@ -60,7 +60,7 @@ var WhosTyping = React.createClass({
         var chatRoom = self.props.chatRoom;
         var megaChat = chatRoom.megaChat;
 
-        chatRoom.unbind("onParticipantTyping.whosTyping");
+        chatRoom.off("onParticipantTyping.whosTyping");
     },
     stoppedTyping: function(u_h) {
         var self = this;

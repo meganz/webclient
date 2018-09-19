@@ -466,7 +466,7 @@ function accountUI() {
             '<th class="no-border session-status">' + l[7664] + '</th>' +
             '<th class="no-border logout-column">&nbsp;</th></tr>';
         var numActiveSessions = 0;
-        
+
         for (i = 0; i < account.sessions.length; i++) {
             var el = account.sessions[i];
             var currentSession = el[5];
@@ -845,6 +845,8 @@ function accountUI() {
                             $('.user-name').text(u_attr.name);
                             showToast('settings', l[7698]);
                             accountUI();
+                            // update megadrop username for existing megadrop
+                            mega.megadrop.updatePUPUserName(u_attr.fullname);
                         }
                     }
                 });
@@ -937,8 +939,10 @@ function accountUI() {
 
                             var done = delay.bind(null, 'bandwidthLimit', function() {
                                 api_req({"a": "up", "srvratio": Math.round(bandwidthLimit)});
+                                if (localStorage.bandwidthLimit !== undefined) {
+                                    showToast('settings', l[16168]);
+                                }
                                 localStorage.bandwidthLimit = bandwidthLimit;
-                                showToast('settings', l[16168]);
                             }, 700);
 
                             if (bandwidthLimit > 99) {
@@ -1306,7 +1310,7 @@ function accountUI() {
                 $('.fm-account-overlay').fadeOut(200);
                 $this.removeClass('active');
                 $('.fm-voucher-popup').addClass('hidden');
-                $(window).unbind('resize.voucher');
+                $(window).off('resize.voucher');
             }
         });
 
@@ -2110,13 +2114,16 @@ accountUI.cancelSubscriptionDialog = {
 };
 
 accountUI.disableElement = function(element) {
-    $(element).addClass('disabled').attr('disabled', 1);
+    'use strict';
+    $(element).addClass('disabled').prop('disabled', true);
 };
 accountUI.enableElement = function(element) {
-    $(element).removeClass('disabled').removeAttr('disabled');
+    'use strict';
+    $(element).removeClass('disabled').prop('disabled', false);
 };
 
 accountUI.initCheckbox = function(className, $container, currentValue, onChangeCb) {
+    'use strict';
     var $wrapperDiv = $('.' + className, $container);
     var $input = $('input[type="checkbox"]', $wrapperDiv);
 
@@ -2150,19 +2157,23 @@ accountUI.initCheckbox = function(className, $container, currentValue, onChangeC
 };
 
 accountUI.initCheckbox.check = function($input, $wrapperDiv) {
-    $input.removeClass('checkboxOff').addClass('checkboxOn').attr('checked', true);
+    'use strict';
+    $input.removeClass('checkboxOff').addClass('checkboxOn').prop('checked', true);
     $wrapperDiv.removeClass('checkboxOff').addClass('checkboxOn');
 };
 accountUI.initCheckbox.uncheck = function($input, $wrapperDiv) {
-    $input.removeClass('checkboxOn').addClass('checkboxOff').attr('checked', false);
+    'use strict';
+    $input.removeClass('checkboxOn').addClass('checkboxOff').prop('checked', false);
     $wrapperDiv.removeClass('checkboxOn').addClass('checkboxOff');
 };
 
 accountUI.initCheckbox.enable = function(className, $container) {
+    'use strict';
     var $wrapperDiv = $('.' + className, $container);
     $wrapperDiv.removeClass('disabled');
 };
 accountUI.initCheckbox.disable = function(className, $container) {
+    'use strict';
     var $wrapperDiv = $('.' + className, $container);
     $wrapperDiv.addClass('disabled');
 };
@@ -2194,7 +2205,7 @@ accountUI.initRadio.setValue = function(className, newVal, $container) {
 
     $input
         .removeClass('radioOff').addClass('radioOn')
-        .attr('checked', 1);
+        .prop('checked', true);
 
     $input.parent().addClass('radioOn').removeClass('radioOff');
 };
@@ -2203,13 +2214,13 @@ accountUI.initRadio.setValue = function(className, newVal, $container) {
 accountUI.initRadio.disable = function($input) {
     $('input.[value="' + newVal + '"]', $container)
         .addClass('disabled')
-        .attr('disabled', 1);
+        .prop('disabled', true);
 };
 
 accountUI.initRadio.enable = function(value, $container) {
     $('input.[value="' + newVal + '"]', $container)
         .removeClass('disabled')
-        .removeAttr('disabled');
+        .prop('disabled', false);
 };
 
 accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
@@ -2382,7 +2393,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             )
             .done(
             function(e) {
-                $('#versioning-status').prop('checked', val ? false : true);
+                $('#versioning-status').prop('checked', !val);
                 $('.label-heading').text(val ? l[7070] : l[17601]);
                 fileversioning.dvState = val;
             });

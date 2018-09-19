@@ -104,8 +104,6 @@
 
     "maxErrors": -1,
 
-    "disallowEmptyBlocks": false,
-
     "fileExtensions": [".js", ".jsx"],
 
     "excludeFiles": [
@@ -131,6 +129,7 @@
         "aesasm.js",
         "keygen.js",
         "makecache.js",
+        "secureboot.js",
         "nacl-fast.js",
         "karma.conf.js",
         "js/chat/mpenc.js",

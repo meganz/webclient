@@ -26,7 +26,7 @@ var ModalDialog = React.createClass({
         $('.fm-dialog-overlay').removeClass('hidden');
 
         // blur the chat textarea if its selected.
-        $('textarea:focus').blur();
+        $('textarea:focus').trigger("blur");
 
 
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
@@ -55,10 +55,10 @@ var ModalDialog = React.createClass({
     },
     componentWillUnmount: function() {
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
-        $(document).unbind('keyup.modalDialog' + this.getUniqueId());
+        $(document).off('keyup.modalDialog' + this.getUniqueId());
         $(document.body).removeClass('overlayed');
         $('.fm-dialog-overlay').addClass('hidden');
-        $(window).unbind('resize.modalDialog' + this.getUniqueId());
+        $(window).off('resize.modalDialog' + this.getUniqueId());
 
     },
     onCloseClicked: function(e) {
@@ -261,7 +261,7 @@ var ConfirmDialog = React.createClass({
         }
     },
     unbindEvents: function() {
-        $(document).unbind('keyup.confirmDialog' + this.getUniqueId());
+        $(document).off('keyup.confirmDialog' + this.getUniqueId());
     },
     componentDidMount: function() {
         var self = this;

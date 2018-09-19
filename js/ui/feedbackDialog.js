@@ -50,7 +50,7 @@
                     'className': "feedback-button-send disabled",
                     'callback': function() {
                         self._report.message = self.$textarea.val();
-                        if ($('input[name="contact_me"]', self.$dialog).attr('checked')) {
+                        if ($('input[name="contact_me"]', self.$dialog).prop('checked')) {
                             self._report.contact_me = 1;
                         } else {
                             self._report.contact_me = 0;
@@ -90,11 +90,24 @@
         self._report = {};
         self._type = "undefined";
 
-        mega.ui.Dialog.prototype.constructor.apply(self, [
-            $.extend({}, defaultOptions, opts)
-        ]);
+        mega.ui.Dialog.call(this, Object.assign({}, defaultOptions, opts));
 
-        uiCheckboxes(self.$dialog);
+        uiCheckboxes(self.$dialog, function(enabled) {
+            if (enabled) {
+                loadingDialog.show();
+
+                generateAnonymousReport()
+                    .done(function(report) {
+                        self._report = report;
+                    })
+                    .always(function() {
+                        loadingDialog.hide();
+                    });
+            }
+            else {
+                self._report = {};
+            }
+        });
 
         self.$checkboxes = $('.reply, .stats', self.$dialog);
 
@@ -123,27 +136,12 @@
             $('.collected-data', self.$dialog)
                 .html('');
 
-            $('.stats .checkdiv').rebind('onFakeCheckboxChange.feedbackDialog', function(e, val) {
-                if (val === true) {
-                    loadingDialog.show();
-                    generateAnonymousReport()
-                        .done(function (report) {
-                            self._report = report;
-                        })
-                        .always(function () {
-                            loadingDialog.hide();
-                        });
-                } else {
-                    self._report = {};
-                }
-            });
-
             $('input[name="send_stats"]', self.$dialog)
-                .attr('checked', true)
+                .prop('checked', true)
                 .trigger('change');
 
             $('input[name="contact_me"]', self.$dialog)
-                .attr('checked', false)
+                .prop('checked', false)
                 .trigger('change');
 
         });
@@ -154,6 +152,8 @@
             self._type = "undefined";
         });
     };
+
+    FeedbackDialog.prototype = Object.create(mega.ui.Dialog.prototype);
 
     FeedbackDialog.prototype._initGenericEvents = function() {
         var self = this,
@@ -217,10 +217,6 @@
 
         mega.ui.Dialog.prototype._initGenericEvents.apply(self);
     };
-
-
-    FeedbackDialog.prototype = $.extend({}, mega.ui.Dialog.prototype, FeedbackDialog.prototype);
-
 
     FeedbackDialog.singleton = function($toggleButton, rating, typeOfFeedback) {
         if (!FeedbackDialog._instance) {

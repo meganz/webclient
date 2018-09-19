@@ -106,7 +106,7 @@ function init_reset() {
     });
 
     $('.login-register-input').rebind('click', function(e) {
-        $(this).find('input').focus();
+        $(this).find('input').trigger("focus");
     });
 }
 

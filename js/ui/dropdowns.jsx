@@ -53,7 +53,7 @@ var Dropdown = React.createClass({
                 var offsetLeft = 0;
                 var $container = positionToElement.closest('.messages.scroll-area');
 
-                if ($container.size() == 0) {
+                if ($container.length == 0) {
                     $container = $(document.body);
                 }
 

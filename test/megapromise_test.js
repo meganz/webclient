@@ -142,12 +142,13 @@ describe("MegaPromise Unit Test", function() {
                     v = arg + '-failcb';
 
                     return v;
-                });
+            })
+            .then(function() {
+                expect(v).to.eql('rej-arg-failcb');
+                done();
+            });
 
         p.reject('rej-arg');
-        expect(v).to.eql('rej-arg-failcb');
-
-        done();
     });
 
     it("then passthrough resolve", function(done) {
@@ -161,12 +162,13 @@ describe("MegaPromise Unit Test", function() {
             .then(undefined, function(arg) {
                 v = arg + '-failcb';
                 return v;
+            })
+            .then(function() {
+                expect(v).to.eql('res-arg-donecb');
+                done();
             });
 
         p.resolve('res-arg');
-        expect(v).to.eql('res-arg-donecb');
-
-        done();
     });
 
     it("all with no promises", function(done) {

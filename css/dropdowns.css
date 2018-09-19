@@ -15,6 +15,15 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+.dropdown.body.big-radius, .fm-dialog.big-radius {
+    -moz-border-radius: 24px;
+    -webkit-border-radius: 24px;
+    border-radius: 24px;
+}
+.big-radius .fm-dialog-close {
+    right: 27px;
+    top: 27px;
+}
 .dropdown.body.context {
     min-width: 188px;
 }
@@ -207,7 +216,7 @@
     position: absolute;
     right: 7px;
     top: 9px;
-    background-image: url(../images/mega/icons-sprite_v21.png);
+    background-image: url(../images/mega/icons-sprite_v22.png);
     background-repeat: no-repeat;
     background-position: -106px -254px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
@@ -494,7 +503,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     transition: all 200ms ease-in-out, right 200ms ease-in-out;
 }
 .dropdown-colour-item::after {
-    background-image: url(../images/mega/icons-sprite_v21.png);
+    background-image: url(../images/mega/icons-sprite_v22.png);
     background-position: 2px -532px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;

@@ -60,6 +60,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     this.chatShard = chatShard;
     this.chatdUrl = chatdUrl;
+    this.scrolledToBottom = 1;
 
     this.callRequest = null;
     this.callIsActive = false;
@@ -106,7 +107,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     // Events
     if (d) {
-        this.bind('onStateChange', function(e, oldState, newState) {
+        this.rebind('onStateChange.chatRoom', function(e, oldState, newState) {
             self.logger.debug("Will change state from: ",
                 ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState)
             );
@@ -237,7 +238,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     self.megaChat.rebind("onRoomDestroy." + self.roomId, function(e, room) {
         if (room.roomId == self.roomId) {
-            $(window).unbind("focus." + self.roomId);
+            $(window).off("focus." + self.roomId);
         }
     });
 
@@ -279,27 +280,25 @@ ChatRoom.INSTANCE_INDEX = 0;
 ChatRoom.ARCHIVED = 0x01;
 
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
+    'use strict';
+
     var self = this;
-
-    var $promise = new MegaPromise();
-
     var anonId = "";
+    var $promise = new MegaPromise();
 
     if (self.megaChat.rtc && self.megaChat.rtc.ownAnonId) {
         anonId = self.megaChat.rtc.ownAnonId;
     }
-    $.ajax("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId, {
-        method: "GET",
-        timeout: timeout ? timeout : 10000
-    })
-        .done(function(r) {
+
+    M.xhr({
+        timeout: timeout || 10000,
+        url: "https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId
+    }).then(function(ev, r) {
+            r = JSON.parse(r);
             if (r.turn && r.turn.length > 0) {
                 var servers = [];
                 r.turn.forEach(function(v) {
-                    var transport = v.transport;
-                    if (!transport) {
-                        transport = "udp";
-                    }
+                    var transport = v.transport || 'udp';
 
                     servers.push({
                         urls: ['turn:' + v.host + ':' + v.port + '?transport=' + transport],
@@ -308,15 +307,12 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
                     });
                 });
                 self.megaChat.rtc.updateIceServers(servers);
+            }
 
-                $promise.resolve();
-            }
-            else {
-                $promise.resolve();
-            }
+            $promise.resolve();
         })
-        .fail(function() {
-            $promise.reject();
+        .catch(function() {
+            $promise.reject.apply($promise, arguments);
         });
 
     return $promise;
@@ -999,14 +995,14 @@ ChatRoom.prototype.attachNodes = function(ids) {
             // I'm not the owner of this file.
             // can be a d&d to a chat or Send to contact from a share
             self.megaChat.getMyChatFilesFolder()
-                .done(function(myChatFilesFolderHandle) {
+                .then(function(myChatFilesFolderHandle) {
                     M.copyNodes(
                             [nodeId],
                             myChatFilesFolderHandle,
                             false,
                             new MegaPromise()
                         )
-                        .done(function(copyNodesResponse) {
+                        .then(function(copyNodesResponse) {
                             if (copyNodesResponse && copyNodesResponse[0]) {
                                 proxyPromise.linkDoneAndFailTo(self.attachNodes([copyNodesResponse[0]]));
                             }
@@ -1014,17 +1010,17 @@ ChatRoom.prototype.attachNodes = function(ids) {
                                 proxyPromise.reject();
                             }
                         })
-                        .fail(function(err) {
+                        .catch(function(err) {
                             proxyPromise.reject(err);
                         });
                 })
-                .fail(function(err) {
+                .catch(function(err) {
                     proxyPromise.reject(err);
                 });
         }
         else {
             self._sendNodes([nodeId], users)
-                .done(function () {
+                .then(function() {
                     var nodesMeta = [];
                     var node = M.d[nodeId];
                     nodesMeta.push({
@@ -1047,7 +1043,7 @@ ChatRoom.prototype.attachNodes = function(ids) {
 
                     proxyPromise.resolve([nodeId]);
                 })
-                .fail(function (r) {
+                .catch(function(r) {
                     proxyPromise.reject(r);
                 });
         }

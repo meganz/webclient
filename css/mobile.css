@@ -2335,7 +2335,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-icon {
     width: 32px;
     height: 32px;
-    background-image: url(../images/mega/startpage-sprite_v6.png);
+    background-image: url(../images/mega/startpage-sprite_v7.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -3910,7 +3910,7 @@ div.checkboxOn, div.checkboxOff {
     position: relative;
 }
 .mobile.icon {
-    background-image: url(../images/mega/startpage-sprite_v6.png);
+    background-image: url(../images/mega/startpage-sprite_v7.png);
     background-position: 0 -2109px;
     background-repeat: no-repeat;
     width: 20px;
@@ -6820,7 +6820,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     background-position: -6px -773px;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-repeat: no-repeat;
     padding-left: 29px;
     margin: -16px 2px 2px 3px;
@@ -6910,7 +6910,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     width: 18px;
     height: 16px;
     display: inline-block;
-    background-image: url(../images/mega/icons-sprite_v21.png);
+    background-image: url(../images/mega/icons-sprite_v22.png);
     background-repeat: no-repeat;
     background-position: -204px -196px;
     background-size: 262px auto;
@@ -7910,7 +7910,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         background-size: 250px auto;
     }
     .mobile .improved-recovery-steps .list-point b.megasync-logo {
-        background-image: url(../images/mega/top-sprite_v4@2x.png);
+        background-image: url(../images/mega/top-sprite_v5@2x.png);
         background-size: 38px auto;
     }
 }

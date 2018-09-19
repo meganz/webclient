@@ -248,7 +248,7 @@ var slideshowid;
         var $percLabel = $overlay.find('.viewer-button-label.zoom');
 
         if (slideshow_stop) {
-            $overlay.removeClass('slideshow').unbind('mousewheel.imgzoom');
+            $overlay.removeClass('slideshow').off('mousewheel.imgzoom');
             slideshowplay = false;
             $pauseButton.attr('data-state', 'pause');
             $pauseButton.find('i').removeClass('play').addClass('pause');
@@ -356,9 +356,9 @@ var slideshowid;
         var lastPos = {x: null, y: null};
 
         if (close) {
-            $imgWrap.unbind('mousedown.pickpan');
-            $imgWrap.unbind('mouseup.pickpan, mouseout.pickpan');
-            $imgWrap.unbind('mousemove.pickpan');
+            $imgWrap.off('mousedown.pickpan');
+            $imgWrap.off('mouseup.pickpan, mouseout.pickpan');
+            $imgWrap.off('mousemove.pickpan');
             return false;
         }
 
@@ -547,8 +547,8 @@ var slideshowid;
             slideshowplay = false;
             $overlay.removeClass('video video-theatre-mode mouse-idle slideshow fullscreen').addClass('hidden');
             $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
-            $(window).unbind('resize.imgResize');
-            $document.unbind('keydown.slideshow mousemove.idle');
+            $(window).off('resize.imgResize');
+            $document.off('keydown.slideshow mousemove.idle');
             $overlay.find('.viewer-image-bl').removeClass('default-state');
             $overlay.find('.viewer-image-bl .img-wrap').attr('data-count', '');
             $overlay.find('.viewer-image-bl img').attr('src', '').removeAttr('style');
@@ -665,8 +665,8 @@ var slideshowid;
             });
 
             clearTimeout(mouseIdleTimer);
-            $document.unbind('mousemove.idle');
-            $controls.unbind('mousemove.idle');
+            $document.off('mousemove.idle');
+            $controls.off('mousemove.idle');
             $('.viewer-short-controls.img-controls', $overlay).addClass('hidden');
 
             // Slideshow Mode Init
@@ -1068,7 +1068,7 @@ var slideshowid;
         }
 
         var $video = $overlay.find('.viewer-image-bl video');
-        $video.attr('poster', '').attr('controls', false).removeClass('hidden');
+        $video.attr('poster', '').prop('controls', false).removeClass('hidden');
 
         if (previews[id].poster !== undefined) {
             $video.attr('poster', previews[id].poster);
@@ -1367,20 +1367,8 @@ var slideshowid;
             previewsrc(id);
         }
 
-        if (Object.keys(previews).length === 1) {
-            $(window).unload(function() {
-                for (var id in previews) {
-                    if (previews[id].src) {
-                        myURL.revokeObjectURL(previews[id].src);
-                    }
-                }
-            });
-        }
-
         // Ensure we are not eating too much memory...
         delay('slideshow:freemem', slideshow_freemem, 6e3);
-
-        blob = uint8arr = undefined;
     }
 
     function slideshow_freemem() {

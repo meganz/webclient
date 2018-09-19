@@ -458,12 +458,12 @@
 
     ChatdPersist.prototype._destroy = function() {
         var self = this;
-        self.chatd.unbind('onMessageKeysDone.chatdPersist');
-        self.chatd.unbind('onMessagesKeyIdDone.chatdPersist');
-        self.chatd.unbind('onMessageLastSeen.chatdPersist');
-        self.chatd.unbind('onMessagesHistoryDone.chatdPersist');
-        self.chatd.unbind('onMessagesHistoryRequest.chatdPersist');
-        self.chatd.megaChat.unbind('onRoomDestroy.chatdPersist');
+        self.chatd.off('onMessageKeysDone.chatdPersist');
+        self.chatd.off('onMessagesKeyIdDone.chatdPersist');
+        self.chatd.off('onMessageLastSeen.chatdPersist');
+        self.chatd.off('onMessagesHistoryDone.chatdPersist');
+        self.chatd.off('onMessagesHistoryRequest.chatdPersist');
+        self.chatd.megaChat.off('onRoomDestroy.chatdPersist');
         delete self.chatd.chatdPersist;
     };
 
@@ -972,7 +972,7 @@
 
         if (!ChatdPersist.isMasterTab()) {
             // don't do anything if this is not the master tab!
-            return;
+            return MegaPromise.reject(EACCESS);
         }
 
         var msgId = msgObject.messageId;
@@ -982,11 +982,11 @@
 
         if (keyId === true || ((keyId & 0xffff0000) >>> 0) === (0xffff0000 >>> 0)) {
             self.logger.critical(".persistMessage, received a temp keyId");
-            return;
+            return MegaPromise.reject(EINTERNAL);
         }
 
-        var args = arguments;
         var promise = new MegaPromise();
+        var args = toArray.apply(null, arguments);
 
         self.getMessageByMessageId(chatId, msgId)
             .done(function(found) {
@@ -1002,11 +1002,11 @@
                 ) {
                     self.logger.error("Message: ", chatId, msgId, "already exists, but its assigned to different " +
                         "user:", userId, "!=", found.userId, "Halting.");
+                    promise.reject();
                 }
                 else if (!isEdit) {
                     self.logger.debug("Message: ", chatId, msgId, "already exists. Its ok, ignoring.");
                     promise.reject();
-                    return;
                 }
                 else {
                     // this is an edit .persistMessage
@@ -1017,7 +1017,6 @@
                             );
                         });
                 }
-
             })
             .fail(function(e) {
                 if (e instanceof Dexie.DexieError) {
@@ -1166,65 +1165,41 @@
             return;
         }
 
+        var queueLength = queue.actions.length;
         delete self._msgActionsQueuePerChat[chatId];
-        self.db.transaction('rw', self.db.msgs, function(msgs, trans) {
-                var currentActionIndex = 0;
-                var next = function() {
-                    var i = currentActionIndex++;
-                    var queueEntry = queue.actions[i];
 
-                    if (!queueEntry) {
-                        return;
-                    }
+        (function next() {
+            var queueEntry = queue.actions.shift();
 
-                    if (trans.active !== true) {
-                        self.logger.error('transaction got inactive. this should never happen.');
-                        return;
-                    }
+            if (!queueEntry) {
+                self.logger.debug("Flushed message actions queue for chat %s: %d items.", chatId, queueLength);
 
-                    if (queueEntry[0] === 'push') {
-                        self.persistMessage.apply(self, [chatId].concat(queueEntry[1])).always(next);
-                    }
-                    else if (queueEntry[0] === 'replace') {
-                        self.persistMessage.apply(self, [chatId].concat(queueEntry[1][1]).concat([true]))
-                            .always(next);
-                    }
-                    else if (queueEntry[0] === 'remove') {
-                        if (queueEntry[1][1] !== true) {
-                            self.unpersistMessage.apply(self, [chatId].concat(queueEntry[1]))
-                                .always(next);
-                        }
-                        // else, its a "soft remove" (e.g. don't persist!)
-                        else {
-                            next();
-                        }
-                    }
+                if (queue.promise instanceof MegaPromise) {
+                    queue.promise.resolve(queueLength);
+                }
+                return;
+            }
 
-                    else {
-                        self.logger.error("Unknown queue type entry found in queue: ", chatId, queueEntry);
-                        next();
-                    }
-                };
-
+            if (queueEntry[0] === 'push') {
+                self.persistMessage.apply(self, [chatId].concat(queueEntry[1])).always(next);
+            }
+            else if (queueEntry[0] === 'replace') {
+                self.persistMessage.apply(self, [chatId].concat(queueEntry[1][1]).concat([true])).always(next);
+            }
+            else if (queueEntry[0] === 'remove') {
+                if (queueEntry[1][1] !== true) {
+                    self.unpersistMessage.apply(self, [chatId].concat(queueEntry[1])).always(next);
+                }
+                else {
+                    // else, its a "soft remove" (e.g. don't persist!)
+                    next();
+                }
+            }
+            else {
+                self.logger.error("Unknown queue type entry found in queue: ", chatId, queueEntry);
                 next();
-            })
-            .then(function() {
-                self.logger.debug(
-                    "Transaction commited for chat: ", chatId,
-                    ". Total of: ", (
-                        queue && queue.actions ? queue.actions.length : '?'
-                    ), 'items'
-                );
-                queue = null;
-            })
-            .catch(function (error) {
-                // Log or display the error
-                self.logger.error('transaction error', error.stack || error);
-                self.onDbCrashCritical();
-            });
-
-
-
+            }
+        })();
     };
 
     /**

@@ -171,7 +171,7 @@ mobile.recovery.changePassword = {
             }
 
             // Unfocus (blur) the input fields to prevent the cursor showing on iOS and also hide the keyboard
-            $passwordField.add($confirmPasswordField).blur();
+            $passwordField.add($confirmPasswordField).trigger("blur");
 
             // If the passwords are not the same
             if (password !== confirmPassword) {

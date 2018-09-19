@@ -607,8 +607,8 @@ FullScreenManager.prototype.destroy = function() {
 
     if (!this.destroyed) {
         this.destroyed = true;
-        this.$button.unbind('click.' + this.iid);
-        this.$document.unbind('fullscreenchange.' + this.iid);
+        this.$button.off('click.' + this.iid);
+        this.$document.off('fullscreenchange.' + this.iid);
         this.exitFullscreen();
     }
 };
@@ -811,7 +811,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         $video.rebind('ended.idle pause.idle', function() {
             clearTimeout(timer);
             $wrapper.removeClass('mouse-idle');
-            $document.unbind('mousemove.idle');
+            $document.off('mousemove.idle');
             playevent = false;
         });
 
@@ -1016,14 +1016,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
         $wrapper.rebind('video-destroy', function() {
             clearTimeout(timer);
             $wrapper.removeClass('mouse-idle video-theatre-mode video')
-                .unbind('is-over-quota')
+                .off('is-over-quota')
                 .find('.viewer-pending').addClass('hidden');
-            $video.unbind('mousemove.idle');
-            $document.unbind('mousemove.videoprogress');
-            $document.unbind('mouseup.videoprogress');
-            $document.unbind('mousemove.volumecontrol');
-            $document.unbind('mouseup.volumecontrol');
-            $(window).unbind('video-destroy.main');
+            $video.off('mousemove.idle');
+            $document.off('mousemove.videoprogress');
+            $document.off('mouseup.videoprogress');
+            $document.off('mousemove.volumecontrol');
+            $document.off('mouseup.volumecontrol');
+            $(window).off('video-destroy.main');
             dlmanager.isStreaming = false;
             fullScreenManager.destroy();
             pagemetadata();

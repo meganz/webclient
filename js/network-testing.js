@@ -286,7 +286,7 @@ var NetworkTesting = (function() {
         $input.parents('.fm-dialog-new-folder-input').removeClass('hidden');
         $table.addClass('hidden');
         $input.val('');
-        $input.focus();
+        $input.trigger("focus");
     };
 
     return ns;

@@ -2152,6 +2152,7 @@ mega.megadrop = (function() {
             var pupHandle = puf.items[handle].p;
 
             // Update cache and db with new folder name
+            pup.update(handle, 'msg', name);
             puf.updateFolderName(handle, name);
             pup.updateFolderName(pupHandle, name);
 

@@ -403,9 +403,9 @@ var treesearch = false;
 MegaData.prototype.treeSearchUI = function() {
     "use strict";
 
-    $('.nw-fm-tree-header').unbind('click');
-    $('.nw-fm-search-icon').unbind('click');
-    $('.nw-fm-tree-header input').unbind('keyup').unbind('blur');
+    $('.nw-fm-tree-header').off('click');
+    $('.nw-fm-search-icon').off('click');
+    $('.nw-fm-tree-header input').off('keyup').off('blur');
 
     // Items are NOT available in left panel, hide search
     if (!$('.fm-tree-panel .content-panel.active').find('ul li, .nw-contact-item').length) {
@@ -436,7 +436,7 @@ MegaData.prototype.treeSearchUI = function() {
             }
             else {
                 $self.addClass('focused-input');
-                $input.focus();
+                $input.trigger("focus");
             }
         }); // END left panel header click
 
@@ -447,7 +447,7 @@ MegaData.prototype.treeSearchUI = function() {
             treesearch = false;
             M.redrawTree();
             $self.prev().val('');
-            $self.parent().find('input').blur();
+            $self.parent().find('input').trigger("blur");
         });
 
         $('.nw-fm-tree-header input')
@@ -460,7 +460,7 @@ MegaData.prototype.treeSearchUI = function() {
                     if (e.keyCode === 27) {
                         $parentElem.removeClass('filled-input');
                         $self.val('');
-                        $self.blur();
+                        $self.trigger("blur");
                         treesearch = false;
                     }
                     else {

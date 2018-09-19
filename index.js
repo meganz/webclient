@@ -111,7 +111,7 @@ function topMenu(close) {
             $('html').removeClass('overlayed');
             $('.mobile.dark-overlay').addClass('hidden').removeClass('active').off('tap');
         }
-        $(window).unbind('resize.topmenu');
+        $(window).off('resize.topmenu');
     }
     else {
         $.topMenu = 'topmenu';
@@ -745,7 +745,7 @@ function init_page() {
                 init_login();
                 $('#login-name2').val(email);
                 $('.register-st2-button').addClass('active');
-                $('#login-name2').attr('readonly', true);
+                $('#login-name2').prop('readonly', true);
                 topmenuUI();
             }
         };
@@ -774,7 +774,7 @@ function init_page() {
                 parsepage(pages['login']);
                 init_login();
                 $('.register-st2-button').addClass('active');
-                $('#login-name2').attr('readonly', true);
+                $('#login-name2').prop('readonly', true);
                 topmenuUI();
             }
         };
@@ -1976,7 +1976,7 @@ function topmenuUI() {
 
     $topHeader.find('.top-search-bl').rebind('click', function () {
         $(this).addClass('active');
-        $('.top-search-input').focus();
+        $('.top-search-input').trigger("focus");
     });
 
     $topHeader.find('.top-search-input').rebind('blur', function () {

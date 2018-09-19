@@ -123,7 +123,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 68px auto;
 }
 .small-icon.context, .dropdown-item.contains-submenu:not(.disabled-submenu)::before, .labels:not(.disabled) .dropdown-colour-item::after, .download.thumb-hover-icon, .small-icon.red-lens, .small-icon.red-play, .small-icon.small-play-icon, .medium-icon.icons-img, .semi-big-icon.icons-img, .viewer-mid-button, .small-icon.clock, i.icons-sprite, .fm-versioning.file-path span:not(:first-child)::before, .fm-account-button.megadrop::before, .transfer-panel-title span::before, .transfer-type.upload::before, .transfer-type.download::before, .megasync-transfer .toast-col:nth-child(1) span::before, .megasync-transfer .toast-col:nth-child(1) span::before, .grid-url-arrow::after, .file-settings-icon::after, .improved-recovery-steps .nav-back-icon, .clipboard .toast-icon, .small-icon.icons-sprite.grey-plus .dropdown-dark-arrow, .dropdown-item.asc i::after, .dropdown-item.desc i::after, .improved-recovery-steps .nav-back-icon {
-    background-image: url(../images/mega/icons-sprite_v21@2x.png);
+    background-image: url(../images/mega/icons-sprite_v22@2x.png);    
     background-size: 262px auto;
 }
 #help2-main .ui-autocomplete .client, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .webclient-icon {
@@ -138,8 +138,8 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/big-achievements@2x.png);
     background-size: 436px auto;
 }
-.logo, .languages-dialog .show-more-languages .round-arrow span, .top-head .top-icon::before, .top-menu-popup .top-icon::before, .top-bar .top-icon::before, .main-top.top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status, .top-menu-item.submenu-item::before, .medium-icon.rocket, .nlanguage-bottom, .tiny-icon.green-tick, .tiny-icon.red-cross, .site-update-available .mega-icon, .megasync-close, .improved-recovery-steps .list-point b.megasync-logo, .fm-files-search i.search {
-    background-image: url(../images/mega/top-sprite_v4@2x.png);
+.logo, .languages-dialog .show-more-languages .round-arrow span, .top-head .top-icon::before, .top-menu-popup .top-icon::before, .top-bar .top-icon::before, .main-top.top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.white-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status, .top-menu-item.submenu-item::before, .medium-icon.rocket, .nlanguage-bottom, .tiny-icon.green-tick, .tiny-icon.red-cross, .site-update-available .mega-icon, .megasync-close, .improved-recovery-steps .list-point b.megasync-logo, i.account-icon {
+    background-image: url(../images/mega/top-sprite_v5@2x.png);
     background-size: 38px auto;
 }
 .block-view-file-type, .dragger-icon, .export-icon, .new-download-file-icon, .share-folder-icon div, .transfer-filetype-icon, .medium-file-icon, .shared-folder-icon, .nw-fm-tree-folder::before, .shared-details-icon, .contact-share-notification::before, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon-span {
@@ -155,7 +155,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 768px auto;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v6@2x.png);
+    background-image: url(../images/mega/startpage-sprite_v7@2x.png);
     background-size: 267px auto;
 }
 .properties-file-icon div {
@@ -180,7 +180,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/hints-sprite-cn@2x.png);
 }
 .widget-dialog .fm-body-text .widget-folder-icon, .tab-icon.url, .tab-icon.embed, .widget-card .widget-minimise, .widget-card .widget-maximise, .shared .contact-list-icon, .properties-context-arrow, .properties-share-icon, .fm-notification-close, .dlkey-dialog .decryption-key .icon, .password-dialog .decryption-password .icon, .fm-dialog-close, .btn-close-dialog, .export-links-warning-close, .fm-notification-icon, .delete-contact.multiple .fm-del-contact-avatar, .fm-notification-warning::before, .export-gradient, .export-link-expiry-icon, .export-links-warning-close, .shared-with-me.read-only .properties-elements-counter span, .shared-with-me.read-and-write .properties-elements-counter span, .shared-with-me.full-access .properties-elements-counter span, .full-access .context-menu-icon, .read-and-write .context-menu-icon, .read-only .context-menu-icon, .notification-empty-icon, .start-chat-button, .start-chat-button span, .multiple-input-warning .arrow, .duplicated-input-warning .arrow, li.token-input-token-mega .input-close, li.token-input-token-invite .input-close, .share-pending-arrow, .email .search-avatar::after, .gmail .search-avatar::after, .gmail .avatar-wrapper::after, .email .avatar-wrapper::after, .pending .search-avatar::after, .pending-indicator::after, .share-search-result.selected, .share-dialog-img, .share-dialog-icon, .add-user-icon, .import-contacts-link span, #ui-datepicker-div .ui-icon.ui-icon-circle-triangle-w, #ui-datepicker-div .ui-icon.ui-icon-circle-triangle-e, #ui-datepicker-div.ui-widget-content .ui-datepicker-buttonpane .ui-datepicker-close, .link-handle .icon, .link-decryption-key .icon, .link-handle-and-key .icon, .file-link-block .icon, .information-icon, .information-icon div span, .share-dialog-permissions span, .share-dialog-icon.permissions-icon span, .permissions-menu span, .fm-dialogs-select span, .fm-dialogs-dropdown span, .share-dialog-remove-button, .import-contacts-service.imported, .import-contacts-service span, .import-contacts-info, .import-contacts-info-txt .import-arrow, .imported-notification-close, .rating a, .feedback-label-txt div.checkboxOn, .feedback-label-txt .checkboxOff, .membership-question.stats-button, .nw-fm-dialog-title span, .bandwidth-text-bl .star, .bandwidth-back-button, .copyrights-dialog-icon, .embed-content-block .tab-icon.url, .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v2@2x.png);
+    background-image: url(../images/mega/dialog-sprite_v3@2x.png);
     background-size: 160px auto;
 }
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon, .huge-grey-warning, .round-icon, .call-icon, .verified .verified_icon, .icon-dropdown:not(.disabled):hover, .icon-dropdown.active, .user-card-verified, div.message.richpreview.confirmation-icon, .dropdown-fingerprint {

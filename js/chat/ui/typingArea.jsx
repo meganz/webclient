@@ -556,7 +556,7 @@ var TypingArea = React.createClass({
         var room = this.props.chatRoom;
 
         if (room.isCurrentlyActive && self.isMounted()) {
-            if ($('textarea:focus,select:focus,input:focus').filter(":visible").size() === 0) {
+            if ($('textarea:focus,select:focus,input:focus').filter(":visible").length === 0) {
                 // no other element is focused...
                 this.focusTypeArea();
             }
@@ -831,12 +831,13 @@ var TypingArea = React.createClass({
             height: self.state.textareaHeight
         };
 
-        var textareaScrollBlockStyles = {
-            height: Math.min(
-                    self.state.textareaHeight,
-                    self.getTextareaMaxHeight()
-                )
-        };
+        var textareaScrollBlockStyles = {};
+        var newHeight = Math.min(self.state.textareaHeight, self.getTextareaMaxHeight());
+
+        if (newHeight > 0) {
+            textareaScrollBlockStyles['height'] = newHeight;
+        }
+
 
         var emojiAutocomplete = null;
         if (self.state.emojiSearchQuery) {

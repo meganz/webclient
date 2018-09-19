@@ -34,7 +34,7 @@ var EmojiAutocomplete = React.createClass({
         };
     },
     unbindKeyEvents: function() {
-        $(document).unbind('keydown.emojiAutocomplete' + this.getUniqueId());
+        $(document).off('keydown.emojiAutocomplete' + this.getUniqueId());
     },
     bindKeyEvents: function() {
         var self = this;

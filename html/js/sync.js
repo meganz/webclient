@@ -19,10 +19,10 @@ function renderLinuxOptions(linuxsync) {
             'MEGA <a href="" class="red">Nautilus extension</a> (@@)</span>', l[2028])
         .addClass('disabled');
     $('.megaapp-linux').removeClass('hidden');
-    $('.architecture-checkbox input').bind('click', function() {
+    $('.architecture-checkbox input').rebind('click', function() {
         $('.architecture-checkbox.radioOn').removeClass('radioOn').addClass('radioOff');
         $(this).parent().removeClass('radioOff').addClass('radioOn');
-        $(this).attr('checked', true);
+        $(this).prop('checked', true);
     });
     $('.megasync .download-megasync').addClass('disabled');
     $('.megasync .megaapp-linux-default').text(l[7086]);
@@ -107,7 +107,7 @@ function sync_switchOS(os) {
     if (os === 'windows') {
         $('.megaapp-button-info.os').safeHTML(l[12485]);
         $('.megasync .download-megasync').attr('href', syncurl);
-        //$('.megasync .download-megasync').unbind('click');
+        //$('.megasync .download-megasync').off('click');
     }
     else if (os === 'mac') {
         ostxt = l[2031];

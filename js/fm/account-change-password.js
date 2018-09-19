@@ -99,7 +99,7 @@ var accountChangePassword = {
             // If the minimum length of the password is not reached, show an error
             if (newPassword !== '' && passwordLength < security.minPasswordLength) {
                 msgDialog('warninga', l[135], l[18701], false, function() {
-                    $newPasswordField.focus();
+                    $newPasswordField.trigger("focus");
                 });
             }
 
@@ -108,7 +108,7 @@ var accountChangePassword = {
                 msgDialog('warninga', l[135], l[715], false, function() {
                     $newPasswordField.val('');
                     $newPasswordConfirmField.val('');
-                    $newPasswordField.focus();
+                    $newPasswordField.trigger("focus");
                     $passwordStrengthBar.removeClass('good1 good2 good3 good4 good5');
                 });
             }
@@ -118,7 +118,7 @@ var accountChangePassword = {
                 msgDialog('warninga', l[135], l[1129], false, function() {
                     $newPasswordField.val('');
                     $newPasswordConfirmField.val('');
-                    $newPasswordField.focus();
+                    $newPasswordField.trigger("focus");
                     $passwordStrengthBar.removeClass('good1 good2 good3 good4 good5');
                 });
             }

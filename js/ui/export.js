@@ -1400,7 +1400,7 @@ var exportExpiry = {
                     $setting.removeClass('disabled').find('input').prop('readonly', false).rebind('input', setCode);
                 }
                 else {
-                    $setting.addClass('disabled').find('input').prop('readonly', true).unbind('input');
+                    $setting.addClass('disabled').find('input').prop('readonly', true).off('input');
                 }
                 setCode();
             });

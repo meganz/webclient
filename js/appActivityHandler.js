@@ -255,8 +255,8 @@
             self._timer = false;
         }
 
-        $(window).unbind('mousemove.appActivityHandler');
-        $(window).unbind('keypress.appActivityHandler');
+        $(window).off('mousemove.appActivityHandler');
+        $(window).off('keypress.appActivityHandler');
     };
 
     /**

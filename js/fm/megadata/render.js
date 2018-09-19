@@ -448,9 +448,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
     }
 
     breadcrumbsResize();
-    $(window).bind('resize.fmbreadcrumbs', function() {
-        breadcrumbsResize();
-    });
+    $(window).rebind('resize.fmbreadcrumbs', SoonFc(breadcrumbsResize, 202));
 
     if ($('.fm-right-header .fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
         $('.fm-right-header .fm-breadcrumbs-block').removeClass('deactivated');

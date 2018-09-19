@@ -1,5 +1,5 @@
 (function(scope) {
-"use strict";
+    'use strict'; // jscs:disable validateIndentation
 
 /**
  * Uses c2s pings to determinate if the current connection is broken or not
@@ -17,14 +17,12 @@ var PersistedTypeArea = function (megaChat) {
     self.megaChat = megaChat;
 
 
-    megaChat.unbind("onInit.persistedTypeArea");
-    megaChat.bind("onInit.persistedTypeArea", function () {
+    megaChat.rebind("onInit.persistedTypeArea", function() {
         self.data = new SharedLocalKVStorage("pta2");
     });
 
     // clear on logout
-    megaChat.unbind("onDestroy.persistedTypeArea");
-    megaChat.bind("onDestroy.persistedTypeArea", function () {
+    megaChat.rebind("onDestroy.persistedTypeArea", function() {
         self.data.destroy(true);
     });
 

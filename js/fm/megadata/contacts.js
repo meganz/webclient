@@ -488,8 +488,7 @@ MegaData.prototype.contacts = function() {
     if (megaChatIsReady) {
         var $dropdown = $('.fm-start-chat-dropdown');
 
-        $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
-        $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
+        $('.fm-tree-panel').rebind('click.megaChat', '.start-chat-button', function() {
             var scrollPos = 0;
 
             var $this = $(this);
@@ -572,8 +571,7 @@ MegaData.prototype.contacts = function() {
         });
     }
 
-    $('.fm-tree-panel').undelegate('.nw-contact-item', 'click');
-    $('.fm-tree-panel').delegate('.nw-contact-item', 'click', function() {
+    $('.fm-tree-panel').rebind('click', '.nw-contact-item', function() {
         var id = $(this).attr('id');
         if (id) {
             id = id.replace('contact_', '');
@@ -584,7 +582,7 @@ MegaData.prototype.contacts = function() {
     });
 
     // On the Contacts screen, initiate a call by double clicking a contact name in the left panel
-    $('.fm-tree-panel').delegate('.nw-contact-item.online', 'dblclick', function() {
+    $('.fm-tree-panel').rebind('dblclick.treepanel', '.nw-contact-item.online', function() {
 
         // Get the element ID
         var $this = $(this);

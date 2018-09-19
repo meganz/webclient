@@ -955,7 +955,7 @@ MegaData.prototype.addToTransferTable = function(gid, ttl, elem) {
             .addEventListener('ps-y-reach-end', M, {passive: true});
         mBroadcaster.addListener('tfs-dynlist-flush', M);
 
-        $(window).bind('resize.tfsdynlist', this.tfsResizeHandler);
+        $(window).rebind('resize.tfsdynlist', this.tfsResizeHandler);
         this.tfsResizeHandler = null;
     }
 
@@ -1003,10 +1003,10 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
             var $chk = $('.megasync-upload-overlay .checkdiv');
             var hideMEGAsyncDialog = function() {
                 $('.megasync-upload-overlay').hide();
-                $(document).unbind('keyup.megasync-upload');
-                $('.download-button.light-white.continue, .fm-dialog-close').unbind('click');
-                $('.download-button.light-red.download').unbind('click');
-                $chk.unbind('click.dialog');
+                $(document).off('keyup.megasync-upload');
+                $('.download-button.light-white.continue, .fm-dialog-close').off('click');
+                $('.download-button.light-red.download').off('click');
+                $chk.off('click.dialog');
                 $chk = undefined;
             };
             $('.download-button.light-white.continue, .fm-dialog-close').rebind('click', function() {

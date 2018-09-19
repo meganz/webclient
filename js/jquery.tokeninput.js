@@ -410,12 +410,12 @@
             input_val;
 
             // Create a new text input an attach keyup events
-        var input_box = $("<input type=\"text\" autocomplete=\"off\" autocapitalize=\"off\"/>")
+        var input_box = $('<input type="text" autocomplete="off" autocapitalize="off"/>')
             .css({
                 outline: "none"
             })
             .attr("id", $(input).data("settings").idPrefix + input.id)
-            .focus(function() {
+            .on('focus', function() {
                 if ($(input).data("settings").disabled) {
                     return false;
                 }
@@ -433,7 +433,7 @@
                 $('.share-dialog-permissions.active').removeClass('active');
                 $('.permissions-menu').removeClass('search-permissions');
             })
-            .blur(function() {
+            .on('blur', function() {
                 hide_dropdown();
                 if ($(input).data("settings").allowFreeTagging) {
                     add_freetagging_tokens();
@@ -449,15 +449,16 @@
                 $('.multiple-input').parent().removeClass('active');
                 $('.multiple-input *').removeClass('red');
             })
-            .bind("keyup keydown blur update", resize_input)
+            .on("keyup keydown blur update", resize_input)
             // Fix of paste issue. These is bug in tokenInut lib.
-            .bind("input.testerresize", function() {
+            .rebind("input.testerresize", function() {
                 $(this).trigger("keydown");
             })
-            .keyup(function(event) {
+            .on('keyup', function(event) {
+                /* jshint -W074 */
 
-                var previous_token,
-                    next_token;
+                var next_token;
+                var previous_token;
 
                 switch (event.keyCode) {
                     case KEY.LEFT:
@@ -610,16 +611,15 @@
         var hidden_input = $(input)
             .hide()
             .val("")
-            .focus(function() {
+            .on('focus', function() {
                 focus_with_timeout(input_box);
             })
-            .blur(function() {
-                input_box.blur();
+            .on('blur', function() {
+                input_box.trigger('blur');
 
                 //return the object to this can be referenced in the callback functions.
                 return hidden_input;
-            })
-            ;
+            });
 
         // Keep a reference to the selected token and dropdown item
         var selected_token = null;
@@ -629,7 +629,7 @@
         // The list to store the token items in
         var token_list = $("<ul />")
             .addClass($(input).data("settings").classes.tokenList)
-            .click(function(event) {
+            .on('click', function(event) {
                 var li = $(event.target).closest("li");
                 if (li && li.get(0) && $.data(li.get(0), "tokeninput")) {
                     toggle_select_token(li);
@@ -643,13 +643,13 @@
                     focus_with_timeout(input_box);
                 }
             })
-            .mouseover(function(event) {
+            .on('mouseover', function(event) {
                 var li = $(event.target).closest("li");
                 if (li && selected_token !== this) {
                     li.addClass($(input).data("settings").classes.highlightedToken);
                 }
             })
-            .mouseout(function(event) {
+            .on('mouseout', function(event) {
                 var li = $(event.target).closest("li");
                 if (li && selected_token !== this) {
                     li.removeClass($(input).data("settings").classes.highlightedToken);
@@ -839,7 +839,7 @@
                 $("<span class='input-close'></span>")
                     .addClass($(input).data("settings").classes.tokenDelete)
                     .appendTo($this_token)
-                    .click(function() {
+                    .on('click', function() {
                         if (!$(input).data("settings").disabled && $(input).data("settings").something !== '') {
                             delete_token($(this).parent());
                             hidden_input.change();
@@ -1252,22 +1252,20 @@
                     .appendTo(dropdown)
                     // to prevent auto selecting when mouse pointer is on it,
                     // bind mouseover when mouse pointer is move.
-                    .mousemove(function() {
-                        $(this).mouseover(function(event) {
+                    .on('mousemove', function() {
+                        $(this).on('mouseover', function(event) {
                             select_dropdown_item($(event.target).closest("li"));
-                        })
-                        .mousedown(function(event) {
+                        }).on('mousedown', function(event) {
                             add_token($(event.target).closest("li").data("tokeninput"));
-                            hidden_input.change();
+                            hidden_input.trigger('change');
                             return false;
-                        })
-                        .mouseout(function(event) {
+                        }).on('mouseout', function(event) {
                             deselect_dropdown_item($(event.target).closest("li"));
                         })
                         .off('mousemove'); // remove mousemove so not cause multiple binding.
                     })
                     .hide();
-                    
+
                 $.each(results, function(index, value) {
                     var this_li = $(input).data("settings").resultsFormatter(value);
 
@@ -1459,11 +1457,10 @@
         //
         // obj: a jQuery object to focus()
         function focus_with_timeout(obj) {
-            setTimeout(function() {
-                obj.focus();
-            }, 0);
+            onIdle(function() {
+                $(obj).trigger('focus');
+            });
         }
-
     };
 
     // Really basic cache for the results

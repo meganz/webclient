@@ -69,13 +69,10 @@ var SelectionManager = function($selectable, resume) {
             console.error("(re)bindselectable", target, self);
         }
 
-        $jqSelectable.unbind('selectableselecting.sm' + idx + ' selectableselected.sm' + idx);
-        $jqSelectable.unbind('selectableunselecting.sm' + idx + ' selectableunselected.sm' + idx);
-
         /**
          * Push the last selected item to the end of the selected_list array.
          */
-        $jqSelectable.bind('selectableselecting.sm' + idx + ' selectableselected.sm' + idx, function (e, data) {
+        $jqSelectable.rebind('selectableselecting.sm' + idx + ' selectableselected.sm' + idx, function(e, data) {
             var $selected = $(data.selecting || data.selected);
             var id = $selected.attr('id');
             if (id) {
@@ -87,7 +84,7 @@ var SelectionManager = function($selectable, resume) {
         /**
          * Remove any unselected element from the selected_list array.
          */
-        $jqSelectable.bind('selectableunselecting.sm' + idx + ' selectableunselected.sm' + idx, function (e, data) {
+        $jqSelectable.rebind('selectableunselecting.sm' + idx + ' selectableunselected.sm' + idx, function(e, data) {
             var $unselected = $(data.unselecting || data.unselected);
             var unselectedId = $unselected.attr('id');
             if (unselectedId) {
@@ -130,7 +127,7 @@ var SelectionManager = function($selectable, resume) {
 
         this.selected_list.forEach(function(nodeId) {
             var node = $('#' + nodeId, $selectable);
-            if (node && node.size() > 0) {
+            if (node && node.length > 0) {
                 node.removeClass('ui-selected');
             }
         });
@@ -488,10 +485,10 @@ var SelectionManager = function($selectable, resume) {
 
     this.destroy = function() {
         if (this._$jqSelectable) {
-            this._$jqSelectable.unbind('selectableunselecting.sm' + this.idx + ' selectableunselected.sm' + this.idx);
-            this._$jqSelectable.unbind('selectableselecting.sm' + this.idx + ' selectableselected.sm' + this.idx);
+            this._$jqSelectable.off('selectableunselecting.sm' + this.idx + ' selectableunselected.sm' + this.idx);
+            this._$jqSelectable.off('selectableselecting.sm' + this.idx + ' selectableselected.sm' + this.idx);
         }
-        $('.fm-right-files-block').undelegate('selectablecreate.sm');
+        $('.fm-right-files-block').off('selectablecreate.sm');
     };
 
 
@@ -524,12 +521,11 @@ var SelectionManager = function($selectable, resume) {
         this.bindSelectable($uiSelectable);
     }
 
-    $('.fm-right-files-block').undelegate('selectablecreate.sm');
-
-    $('.fm-right-files-block').delegate('.ui-selectable', 'selectablecreate.sm', function(e) {
-        selectionManager.bindSelectable(e.target);
-    });
-
+    $('.fm-right-files-block')
+        .off('selectablecreate.sm')
+        .on('selectablecreate.sm', '.ui-selectable', function(e) {
+            selectionManager.bindSelectable(e.target);
+        });
 
     if (localStorage.selectionManagerDebug) {
         Object.keys(self).forEach(function(k) {

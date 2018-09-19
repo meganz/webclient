@@ -5,9 +5,9 @@
  */
 $.fn.getParentJScrollPane = function() {
     "use strict";
-    
+
     var $scrollable_parent = $(this).closest('.jspScrollable');
-    if ($scrollable_parent.size() > 0) {
+    if ($scrollable_parent.length) {
         var $jsp = $scrollable_parent.data('jsp');
         if ($jsp) {
             return $jsp;
@@ -15,7 +15,7 @@ $.fn.getParentJScrollPane = function() {
             return false;
         }
     }
-}
+};
 
 /**
  * Find jQuery Element in an jQuery array of elements and return its index OR -1 if not found.
@@ -27,6 +27,8 @@ $.fn.getParentJScrollPane = function() {
  * @returns int -1 or key index
  */
 $.elementInArray = function(el, arr) {
+    'use strict';
+
     var found = $.map(
         arr,
         function(n, i) {
@@ -44,9 +46,9 @@ $.elementInArray = function(el, arr) {
  * @param m
  * @returns {boolean}
  */
-jQuery.expr[':'].istartswith = function(a, i, m) {
-    return jQuery(a).text().toUpperCase()
-        .indexOf(m[3].toUpperCase()) == 0;
+jQuery.expr.pseudos.istartswith = function(a, i, m) {
+    'use strict';
+    return $(a).text().toUpperCase().indexOf(m[3].toUpperCase()) === 0;
 };
 
 /**
@@ -54,6 +56,8 @@ jQuery.expr[':'].istartswith = function(a, i, m) {
  * @param {String} attr attribute
  */
 $.fn.attrs = function(attr) {
+    'use strict';
+
     var i = 0, l = this.length, result = {};
     while (l > i) {
         var val = this[i++].getAttribute(attr);
@@ -79,8 +83,9 @@ $.fn.visible = function (e, i)
 };
 
 // Based on http://stackoverflow.com/a/10835425
-$.fn.removeClassWith = function(pfx)
-{
+$.fn.removeClassWith = function(pfx) {
+    'use strict';
+
     var i = 0, l = this.length, n;
     while (l > i)
     {
@@ -97,6 +102,8 @@ $.fn.removeClassWith = function(pfx)
  * Shortcut to count object keys
  */
 $.len = function(obj) {
+    'use strict';
+
     return Object.keys(obj).length;
 };
 
@@ -104,6 +111,8 @@ $.len = function(obj) {
  * Helper to trigger resize once within a second
  */
 $.tresizer = function tresizer() {
+    'use strict';
+
     if ($.tresizer.last !== -1) {
 
         setTimeout(function tresizer() {
@@ -115,37 +124,28 @@ $.tresizer = function tresizer() {
 };
 $.tresizer.last = 0;
 
-/*
-// @crodas -- http://stackoverflow.com/a/2200886/1608408
-(function() {
-	var orig = $.fn.remove;
-	$.fn.remove = function() {
-		$(this).trigger("remove")
-		return orig.apply(this, arguments);
-	}
-})();
-*/
-
 /**
- *	Making the unbind/bind in a single call
- *	Less error prone, less code lines :-)
- *	@crodas
+ * Attach an event handler function for one or more events to the selected elements, replacing
+ * any matching previous event handler already attached to the element.
+ * This is basically a wrapper for off->on (formerly unbind->bind)
+ *
+ * @param {String} events One or more space-separated event types and optional namespaces, such as "click"
+ * @param {String} [selector] selector to filter the descendants of the selected elements that trigger the event.
+ * @param {Function} handler function to execute when the event is triggered.
+ * @returns {jQuery}
  */
-/*jQuery.fn.extend({
-	rebind: function(actions, callback) {
-		return this.each(function() {
-			var $this = $(this);
-			$this.unbind(actions);
-			$this.bind(actions, callback);
-		});
-	}
-});*/
-// Rewritten to be less overkill, too ;)
-$.fn.rebind = function(actions, callback) {
+$.fn.rebind = function(events, selector, handler) {
+    'use strict';
+
+    if (typeof selector === 'function') {
+        handler = selector;
+        selector = null;
+    }
+
     var i = 0;
     var l = this.length;
     while (l > i) {
-        $(this[i++]).unbind(actions).bind(actions, callback);
+        $(this[i++]).off(events, selector || null).on(events, selector || null, handler);
     }
     return this;
 };
@@ -187,6 +187,18 @@ $.fn.rotate = function AnimateRotate(finalAngle, initialAngle, time) {
         });
     });
 };
+
+// REMOVE ONCE JQUERY.MOBILE.JS SUPPORTS JQUERY +3.x
+if (!$.event.props) {
+    // Includes some event props shared by KeyEvent and MouseEvent
+    $.event.props = ("altKey bubbles cancelable ctrlKey currentTarget detail " +
+        "eventPhase metaKey relatedTarget shiftKey target timeStamp view which").split(" ");
+
+    $.event.mouseHooks = {
+        props: ("button buttons clientX clientY offsetX offsetY pageX pageY " +
+            "screenX screenY toElement").split(" ")
+    };
+}
 
 // prevent DOMElement (and its pseudo-elements) to do not use transition while do some actions
 $.fn.noTransition = function(action) {

@@ -1007,6 +1007,7 @@
     "7241": "\u60a8\u5fc5\u9808\u540c\u610f\u6211\u5011\u7684\u689d\u6b3e",
     "7272": "\u932f\u8aa4\u6578\u64da\u683c\u5f0f",
     "7315": "\u958b\u59cb",
+    "7331": "\u6392\u5e8f",
     "7337": "\u5b89\u5168\u6027",
     "7352": "\u72c0\u614b",
     "7354": "\u66f4\u65b0",
@@ -2009,6 +2010,7 @@
     "17767": "\u6a94\u6848\u5df2\u767c\u9001\u81f3\u804a\u5929\u5c0d\u8a71\u4e2d",
     "17768": "\u5df2\u7d42\u6b62\u7684\u5e33\u6236",
     "17789": "The entered tax number is invalid.",
+    "17791": "Filter",
     "17792": "Your primary disk volume is full. Please free up some space and try again.",
     "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3].",
     "17794": "\u6b63\u5728\u521d\u59cb\u5316...",
@@ -2778,5 +2780,11 @@
     "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
     "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A].",
     "19516": "Create business account",
-    "19517": "Create Business Account"
+    "19517": "Create Business Account",
+    "19521": "Modify account settings",
+    "19522": "Manage Account",
+    "19523": "Company information",
+    "19524": "The edit user operation has failed, please try again later",
+    "19525": "The user has been updated",
+    "19527": "Invitation link re-sending has failed due to a server error, please try again later"
 }

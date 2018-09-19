@@ -1007,6 +1007,7 @@
     "7241": "Sie m\u00fcssen unseren AGBs zustimmen",
     "7272": "Ung\u00fcltiges Format",
     "7315": "Start",
+    "7331": "Sortieren",
     "7337": "Sicherheit",
     "7352": "Staat",
     "7354": "Erneuert sich am",
@@ -2009,6 +2010,7 @@
     "17767": "Dateien an den Chat gesendet",
     "17768": "Benutzerkonto gesperrt",
     "17789": "Die eingegebene Steuernummer ist ung\u00fcltig.",
+    "17791": "Filter",
     "17792": "Ihre Prim\u00e4rfestplatte ist voll. Bitte geben Sie etwas Platz frei und versuchen Sie es dann noch einmal.",
     "17793": "Chrome erlaubt MEGA nur die Nutzung eines kleinen Teils Ihrer verf\u00fcgbaren Speicherkapazit\u00e4t. Dieser Teil reicht derzeit nicht aus. Bitte installieren Sie die [A1]MEGA Desktop-App[\/A1], unsere [A2]Chrome Extension[\/A2], oder [A3]l\u00f6schen Sie tempor\u00e4re MEGA-Daten[\/A3].",
     "17794": "Initialisierung....",
@@ -2778,5 +2780,11 @@
     "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
     "19514": "Vielen Dank! Sobald Ihre Zahlung bei uns angekommen ist, werden wir Ihren Account [B]%2[\/B] aktualisieren (dies dauert normalerweise nur wenige Minuten). Sollten Sie Ihren MEGA PRO-Status auch nach %1 Stunden noch nicht erhalten haben, setzen Sie sich bitte mit uns unter [A]support@mega.nz[\/A] in Verbindung.",
     "19516": "Business-Account erstellen",
-    "19517": "Business-Account erstellen"
+    "19517": "Business-Account erstellen",
+    "19521": "Modify account settings",
+    "19522": "Manage Account",
+    "19523": "Company information",
+    "19524": "The edit user operation has failed, please try again later",
+    "19525": "The user has been updated",
+    "19527": "Invitation link re-sending has failed due to a server error, please try again later"
 }

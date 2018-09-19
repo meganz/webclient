@@ -1007,6 +1007,7 @@
     "7241": "Vous devez accepter nos conditions g\u00e9n\u00e9rales d'utilisation.",
     "7272": "Format de donn\u00e9es erron\u00e9",
     "7315": "D\u00e9marrer",
+    "7331": "Trier",
     "7337": "S\u00e9curit\u00e9",
     "7352": "\u00c9tat",
     "7354": "Renouvelle",
@@ -2009,6 +2010,7 @@
     "17767": "Les fichiers ont \u00e9t\u00e9 envoy\u00e9s vers la conversation",
     "17768": "Compte r\u00e9sili\u00e9",
     "17789": "Le num\u00e9ro d\u2019identification fiscale saisi est invalide.",
+    "17791": "Filtre",
     "17792": "Votre volume de stockage principal est plein. Veuillez lib\u00e9rer de l\u2019espace et ressayer.",
     "17793": "Malheureusement, Chrome ne permet \u00e0 MEGA de n\u2019utiliser qu\u2019une partie de l\u2019espace disque libre, qui est actuellement insuffisant. Veuillez installer l\u2019[A1]appli MEGA pour ordinateur[\/A1] ou notre [A2]extension Chrome[\/A2], ou encore essayer de [A3]lib\u00e9rer de l\u2019espace[\/A3].",
     "17794": "Initialisation\u2026",
@@ -2778,5 +2780,11 @@
     "19513": "Merci ! Votre compte [B]%2[\/B] sera surclass\u00e9 d\u00e8s que nous aurons re\u00e7u la confirmation de votre paiement de notre fournisseur de services de paiement. Si vous avez pay\u00e9 par carte de d\u00e9bit ou de cr\u00e9dit, et si vous n\u2019avez pas acc\u00e8s \u00e0 votre compte MEGA PRO dans les heures qui suivent, veuillez nous contacter \u00e0 [A]support@mega.nz[\/A]. Si vous avez pay\u00e9 par transfert bancaire, la compensation du paiement peut prendre de 4 \u00e0 5 jours.",
     "19514": "Merci\u2009! Votre compte [B]%2[\/B] sera surclass\u00e9 d\u00e8s que nous aurons re\u00e7u la confirmation de votre paiement de notre fournisseur de services de paiement, dans quelques minutes. Si vous n\u2019avez pas acc\u00e8s \u00e0 votre compte MEGA PRO dans les %1 heures qui suivent, veuillez nous contacter \u00e0 [A]support@mega.nz[\/A].",
     "19516": "Cr\u00e9er un compte d\u2019entreprise",
-    "19517": "Cr\u00e9er un compte d\u2019entreprise"
+    "19517": "Cr\u00e9er un compte d\u2019entreprise",
+    "19521": "Modifier les param\u00e8tres du compte",
+    "19522": "G\u00e9rer le compte",
+    "19523": "Renseignements sur l\u2019entreprise",
+    "19524": "L\u2019op\u00e9ration de modification de l\u2019utilisateur a \u00e9chou\u00e9, veuillez ressayer ult\u00e9rieurement",
+    "19525": "L\u2019utilisateur a \u00e9t\u00e9 mis \u00e0 jour",
+    "19527": "Le renvoi du lien d\u2019invitation a \u00e9chou\u00e9 en raison d\u2019une erreur de serveur, veuillez r\u00e9essayer ult\u00e9rieurement"
 }

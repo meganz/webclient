@@ -659,9 +659,12 @@ function processEmailChangeActionPacket(ap) {
      * @returns {MegaPromise}
      */
     var getLastInteractionWith = function (u_h, triggeredBySet) {
-        assert(u_handle, "missing u_handle, can't proceed");
-        assert(u_h, "missing argument u_h, can't proceed");
+        console.assert(u_handle, "missing u_handle, can't proceed");
+        console.assert(u_h, "missing argument u_h, can't proceed");
 
+        if (!u_handle || !u_h) {
+            return MegaPromise.reject(EARGS);
+        }
 
         var _renderLastInteractionDone = function (r) {
             r = r.split(":");
@@ -812,8 +815,12 @@ function processEmailChangeActionPacket(ap) {
      */
     var _realSetLastInteractionWith = function (u_h, v) {
 
-        assert(u_handle, "missing u_handle, can't proceed");
-        assert(u_h, "missing argument u_h, can't proceed");
+        console.assert(u_handle, "missing u_handle, can't proceed");
+        console.assert(u_h, "missing argument u_h, can't proceed");
+
+        if (!u_handle || !u_h) {
+            return MegaPromise.reject(EARGS);
+        }
 
         var isDone = false;
         var $promise = createTimeoutPromise(

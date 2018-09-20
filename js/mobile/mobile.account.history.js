@@ -9,6 +9,12 @@ mobile.account.history = {
     $page: null,
 
     /**
+     * The maximum number of sessions to display
+     * NB: if there are more than 100 active sessions they will all be displayed
+     */
+    maxSessionsToDisplay: 100,
+
+    /**
      * Initialise the page
      */
     init: function() {
@@ -60,22 +66,75 @@ mobile.account.history = {
                     sessions = [];
                 }
 
-                // Sort by most recent datetime
-                sessions.sort(function(a, b) {
-                    if (a[0] < b[0]) {
-                        return 1;
-                    }
-                    else {
-                        return -1;
-                    }
-                });
+                // Sort by datetime, but group the current and active sessions at the top, then the expired sessions
+                var sessionsToDisplay = mobile.account.history.sortAndGroupSessionInformation(sessions);
 
                 // Display the results
-                mobile.account.history.displaySessionHistory(sessions);
+                mobile.account.history.displaySessionHistory(sessionsToDisplay);
                 mobile.account.history.initRowCloseSessionButton();
                 mobile.account.history.initCloseOtherSessionsButton();
             }
         });
+    },
+
+    /**
+     * Sort the sessions by most recent datetime, but put the current session at the top, then group the active
+     * sessions at the top after that, then group the expired sessions after that. Finally, the number of sessions
+     * will be truncated to the maximum that need to be shown. Note that if there are more than 100 active sessions
+     * they will all be displayed as that is of interest to the user.
+     * @param {Array} allSessions The entire array of sessions from the API
+     * @returns {Array} Returns the list of sessions to be displayed
+     */
+    sortAndGroupSessionInformation: function(allSessions) {
+
+        // Sort the sessions by the most recent datetime
+        allSessions.sort(function(sessionA, sessionB) {
+            if (sessionA[0] < sessionB[0]) {
+                return 1;
+            }
+            else {
+                return -1;
+            }
+        });
+
+        var activeSessions = [];
+        var expiredSessions = [];
+
+        // Loop through the sessions to group the current session at the top,
+        // active sessions below that and expired sessions at the bottom
+        for (var i = 0; i < allSessions.length; i++) {
+
+            var session = allSessions[i];
+            var currentSession = session[5];
+            var activeSession = session[7];
+
+            // If the current session put it at as the first item in the array
+            if (currentSession) {
+                activeSessions.unshift(session);
+            }
+            else {
+                // If an active session, add to the array of active sessions
+                if (activeSession) {
+                    activeSessions.push(session);
+                }
+                else {
+                    // Otherwise add to the array of expired sessions
+                    expiredSessions.push(session);
+                }
+            }
+        }
+
+        // If there are more active sessions than the maximum number of sessions to be displayed, then return all
+        if (activeSessions.length >= mobile.account.history.maxSessionsToDisplay) {
+            return activeSessions;
+        }
+        else {
+            // Otherwise join the active and expired sessions together and truncate the array to show the max e.g. 100
+            var activeAndExpiredSessions = activeSessions.concat(expiredSessions);
+            var sessionsToDisplay = activeAndExpiredSessions.slice(0, mobile.account.history.maxSessionsToDisplay);
+
+            return sessionsToDisplay;
+        }
     },
 
     /**

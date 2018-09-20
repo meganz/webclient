@@ -87,6 +87,8 @@ mobile.account.history = {
      */
     sortAndGroupSessionInformation: function(allSessions) {
 
+        'use strict';
+
         // Sort the sessions by the most recent datetime
         allSessions.sort(function(sessionA, sessionB) {
             if (sessionA[0] < sessionB[0]) {

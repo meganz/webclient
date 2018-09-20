@@ -281,6 +281,10 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
                 if (opc[i].rts) {
                     rts = time2last(opc[i].rts);
                 }
+                else {
+                    // if action packet does not contains rts, it is treated as canceled
+                    rts = l[6112];
+                }
 
                 hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
                 html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +

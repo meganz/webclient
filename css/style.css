@@ -22856,15 +22856,18 @@ opacity: 1;
     background-color: #F8F9FA;
     position: absolute;
     overflow: hidden;
+    min-height: 650px;
 }
 .widget-upload .wu-main, .widget-upload .wu-missing-main {
     width: 400px;
     height: 562px;
-    margin: 0px auto 0px;
+    top: 50%;
+    left: 50%;
+    margin: -313px 0 0 -200px;
     border-radius: 0px;
     background-color: #FFFFFF;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    vertical-align: center;
+    position: absolute;
 }
 .wu-main .wu-data, .wu-missing-main .wu-data {
     height: 55px;
@@ -23265,16 +23268,15 @@ opacity: 1;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.1);
 }
 .widget-upload .wu-footer {
-    position: relative;
-      padding: 1rem;
+    position: absolute;
     width: inherit;
     display: block;
-    padding-top: 11px;
     background-color: #fff;
     color: #333;
-  height: 64px;
-  clear: both;
-  margin-top: -64px;
+    clear: both;
+    margin-top: -64px;
+    bottom: 0;
+    padding: 13px 0;
 }
 .wu-footer .wu-copyrights {
     font-size: 14px;
@@ -23314,10 +23316,9 @@ opacity: 1;
     line-height: 38px;
 }
 .widget-upload .wu-wrapper {
-    margin: 0 auto;
-    min-height: calc(100vh - 128px);
-    padding-bottom: 64px;
-    padding-top: 64px;
+    position: relative;
+    height: 100%;
+
 }
 .wu-wrapper .wu-push {
     height: 64px;

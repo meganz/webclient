@@ -49,7 +49,7 @@ mobile.cloud.contextMenu = {
         var $folderContextMenu = $('.context-menu-container.folder');
         var $fileContextMenu = $('.mobile.context-menu-container.file');
         var $previewButton = $fileContextMenu.find('.preview-file-button');
-        var $overlay = $('.light-overlay');
+        var $overlay = $('.dark-overlay');
 
         // Get the node type
         var node = M.d[nodeHandle];
@@ -105,7 +105,7 @@ mobile.cloud.contextMenu = {
 
         var $folderContextMenu = $('.context-menu-container.folder');
         var $fileContextMenu = $('.mobile.context-menu-container.file');
-        var $overlay = $('.light-overlay');
+        var $overlay = $('.dark-overlay');
 
         // Hide overlay
         $overlay.addClass('hidden');
@@ -247,7 +247,7 @@ mobile.cloud.contextMenu = {
 
         'use strict';
 
-        var $overlay = $('.light-overlay');
+        var $overlay = $('.dark-overlay');
 
         // When the Overlay is tapped
         $overlay.off('tap').on('tap', function() {

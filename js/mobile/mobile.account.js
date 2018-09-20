@@ -28,6 +28,7 @@ mobile.account = {
         mobile.account.fetchSubscriptionInformation($page);
         mobile.account.initRecoveryKeyButton($page);
         mobile.account.initCancelAccountButton($page);
+        mobile.account.initSessionHistoryButton($page);
         mobile.account.fetchAndDisplayTwoFactorAuthStatus($page);
 
         // Initialise the top menu
@@ -430,13 +431,32 @@ mobile.account = {
 
                 // Load the Disable page to disable the 2FA
                 loadSubPage('twofactor/verify-disable');
-                return false;
             }
             else {
                 // Load the Intro page to setup the 2FA
                 loadSubPage('twofactor/intro');
-                return false;
             }
+
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the Session History button
+     * @param {String} $page The jQuery selector for the current page
+     */
+    initSessionHistoryButton: function($page) {
+
+        'use strict';
+
+        var $buttonBlock = $page.find('.account-session-history-block');
+
+        // On clicking/tapping the button
+        $buttonBlock.off('tap').on('tap', function() {
+
+            // Load the Session History page
+            loadSubPage('fm/account/history');
+            return false;
         });
     },
 

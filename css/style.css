@@ -24419,7 +24419,7 @@ opacity: 1;
     border-radius: 4px;
     box-shadow:0 0.5px 1px 0 rgba(0,0,0,0.05);
     position: relative;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 30px;
     padding: 0 16px;
     cursor: pointer;
@@ -25702,14 +25702,14 @@ opacity: 1;
 }
 
 .user-management-overview-container .user-analysis-container .user-segments-container .user-segment-trend{
-    width:96%;
+    width:86%;
     text-align: center;
     color:#999999;
     font-size: 13px;
     line-height: 20px;
     margin-top: 0px;
     margin-bottom:24px;
-    margin-left: 2%;
+    margin-left: 7%;
     min-width: 175px;
 
 }
@@ -26054,6 +26054,7 @@ opacity: 1;
     color: #333333;
     height: 32px;
     width: 166px;
+    margin-top:-4px;
     padding: 8px;
     font-family: 'Source Sans Pro', sans-serif; 
 }
@@ -27366,7 +27367,7 @@ opacity: 1;
 }
 
 .user-management-account-settings .setting-block .title {
-    width: 104px;
+    width: 120px;
     height: 100%;
     position: absolute;
     left: 0;
@@ -27506,7 +27507,7 @@ opacity: 1;
     width: 84%;
     height: 64px;
     position: relative;
-    margin:24px auto;
+    margin:12px auto;
 }
 
 .user-management-account-settings .bus-input::after {
@@ -27541,8 +27542,8 @@ opacity: 1;
     margin-right: 0;
     line-height: 22px;
     color: #333;
-    font-size: 600;
-    font-size: 18px;
+    font-size: 400;
+    font-size: 15px;
     white-space: nowrap;
     text-overflow: ellipsis;
     background-color: none;
@@ -29079,9 +29080,38 @@ opacity: 1;
     text-align: right;
 }
 
+.user-management-account-settings .bus-input.short-input.underline-dropdown-input {
+    width: calc(84% - 28px);
+    margin-left: calc(8% + 28px);
+    height: 64px;
+    position: relative;
+    overflow: hidden;
+}
 
+.user-management-account-settings .bus-input.short-input.underline-dropdown-input .list-arrow {
+    width: 16px;
+    height: 16px;
+    background-image: url(../images/mega/fm-main-sprite_v4.png);
+    background-repeat: no-repeat;
+    background-position: -4px -12309px;
+    right: 8px;
+    top:28px;
+    position: absolute;
+}
 
-
+.user-management-account-settings .bus-input.short-input.underline-dropdown-input select{
+    background:transparent;
+    border:none;
+    font-size: 14px;
+    color: #333333;
+    height: 64px;
+    width: calc(100% + 16px);
+    margin-top:-4px;
+    padding: 8px;
+    position: absolute;
+    right: -16px;
+    bottom: 0;
+}
 
 
 
@@ -29148,6 +29178,21 @@ opacity: 1;
     .user-management-account-settings .sub-admin-table tr td:nth-child(6) .icon {
     margin-left: 4px;
     }
+
+    .user-management-account-settings .bus-input-block {
+        width:100%;
+        margin-left: 0;
+        margin-bottom: 8px;
+    }
+
+    .user-management-account-settings .profile .default-green-button-user-management {
+    margin: 24px 8% 24px 0;
+    }
+
+    .user-management-account-settings .profile .default-green-button-user-management {
+    margin: -0px 36px 24px 0;
+    }
+
     .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-small-circle {
         margin-left: 32%;
         margin-top: 17%;
@@ -29162,6 +29207,10 @@ opacity: 1;
         font-size: 35px;
         /*margin-right: 22%;*/
     }
+
+
+
+
 }
 
 

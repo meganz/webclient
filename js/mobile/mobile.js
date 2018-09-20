@@ -334,6 +334,11 @@ function removeUInode(nodeHandle, parentHandle) {
     mobile.cloud.renderDelete(nodeHandle, parentHandle);
 }
 
+function showToast(type, msg) {
+    'use strict';
+    mobile.showToast(msg);
+}
+
 // Not required for mobile
 function fmtopUI() {}
 function sharedUInode() {}

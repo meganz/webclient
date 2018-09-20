@@ -240,7 +240,7 @@ var ConversationRightArea = React.createClass({
                             (
                                 <div className={renameButtonClass}
                                      onClick={(e) => {
-                                         if ($(e.target).closest('.disabled').size() > 0) {
+                                         if ($(e.target).closest('.disabled').length > 0) {
                                              return false;
                                          }
                                          if (self.props.onRenameClicked) {
@@ -279,7 +279,7 @@ var ConversationRightArea = React.createClass({
                         {
                             <div className={"link-button " + (dontShowTruncateButton ? "disabled" : "")}
                                  onClick={(e) => {
-                                     if ($(e.target).closest('.disabled').size() > 0) {
+                                     if ($(e.target).closest('.disabled').length > 0) {
                                          return false;
                                      }
                                      if (self.props.onTruncateClicked) {
@@ -294,7 +294,7 @@ var ConversationRightArea = React.createClass({
                         {
                             <div className={"link-button"}
                                  onClick={(e) => {
-                                    if ($(e.target).closest('.disabled').size() > 0) {
+                                    if ($(e.target).closest('.disabled').length > 0) {
                                         return false;
                                     }
                                     if (room.isArchived()) {
@@ -316,7 +316,7 @@ var ConversationRightArea = React.createClass({
                                     room.stateIsLeftOrLeaving() ? "disabled" : ""
                                 )}
                                  onClick={(e) => {
-                                     if ($(e.target).closest('.disabled').size() > 0) {
+                                     if ($(e.target).closest('.disabled').length > 0) {
                                          return false;
                                      }
                                      if (self.props.onLeaveClicked) {
@@ -457,8 +457,7 @@ var ConversationAudioVideoPanel = React.createClass({
 
 
         $(document)
-            .unbind("fullscreenchange.megaChat_" + room.roomId)
-            .bind("fullscreenchange.megaChat_" + room.roomId, function() {
+            .rebind("fullscreenchange.megaChat_" + room.roomId, function() {
                 if (!$(document).fullScreen() && room.isCurrentlyActive) {
                     self.setState({fullScreenModeEnabled: false});
                 }
@@ -576,14 +575,14 @@ var ConversationAudioVideoPanel = React.createClass({
 
         var $container = $(ReactDOM.findDOMNode(self));
         if ($container) {
-            $container.unbind('mouseover.chatUI' + self.props.chatRoom.roomId);
-            $container.unbind('mouseout.chatUI' + self.props.chatRoom.roomId);
-            $container.unbind('mousemove.chatUI' + self.props.chatRoom.roomId);
+            $container.off('mouseover.chatUI' + self.props.chatRoom.roomId);
+            $container.off('mouseout.chatUI' + self.props.chatRoom.roomId);
+            $container.off('mousemove.chatUI' + self.props.chatRoom.roomId);
         }
 
-        $(document).unbind("fullscreenchange.megaChat_" + room.roomId);
-        $(window).unbind('resize.chatUI_' + room.roomId);
-        $(room).unbind('toggleMessages.av');
+        $(document).off("fullscreenchange.megaChat_" + room.roomId);
+        $(window).off('resize.chatUI_' + room.roomId);
+        $(room).off('toggleMessages.av');
     },
     toggleMessages: function(e) {
         if (e) {
@@ -876,7 +875,7 @@ var ConversationPanel = React.createClass({
                 self.messagesListScrollable.scrollToBottom();
             }
         });
-        self.props.chatRoom.rebind('openSendFilesDialog', function(e) {
+        self.props.chatRoom.rebind('openSendFilesDialog.cpanel', function(e) {
             self.setState({'attachCloudDialog': true});
         });
 
@@ -925,8 +924,7 @@ var ConversationPanel = React.createClass({
 
         // collapse on ESC pressed (exited fullscreen)
         $(document)
-            .unbind("fullscreenchange.megaChat_" + room.roomId)
-            .bind("fullscreenchange.megaChat_" + room.roomId, function() {
+            .rebind("fullscreenchange.megaChat_" + room.roomId, function() {
                 if (!$(document).fullScreen() && room.isCurrentlyActive) {
                     self.setState({isFullscreenModeEnabled: false});
                 }
@@ -956,7 +954,7 @@ var ConversationPanel = React.createClass({
 
         window.removeEventListener('resize', self.handleWindowResize);
         window.removeEventListener('keydown', self.handleKeyDown);
-        $(document).unbind("fullscreenchange.megaChat_" + chatRoom.roomId);
+        $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
     },
     componentDidUpdate: function(prevProps, prevState) {
         var self = this;
@@ -991,14 +989,14 @@ var ConversationPanel = React.createClass({
 
         if (prevProps.isActive === false && self.props.isActive === true) {
             var $typeArea = $('.messages-textarea:visible:first', $node);
-            if ($typeArea.size() === 1) {
-                $typeArea.focus();
+            if ($typeArea.length === 1) {
+                $typeArea.trigger("focus");
                 moveCursortoToEnd($typeArea[0]);
             }
         }
         if (!prevState.renameDialog && self.state.renameDialog === true) {
             var $input = $('.chat-rename-dialog input');
-            $input.focus();
+            $input.trigger("focus");
             $input[0].selectionStart = 0;
             $input[0].selectionEnd = $input.val().length;
         }
@@ -1008,7 +1006,7 @@ var ConversationPanel = React.createClass({
                 self.messagesListScrollable.reinitialise(false);
                 // wait for the reinit...
                 Soon(function() {
-                    if (self.editDomElement && self.editDomElement.size() === 1) {
+                    if (self.editDomElement && self.editDomElement.length === 1) {
                         self.messagesListScrollable.scrollToElement(self.editDomElement[0], false);
                     }
                 });
@@ -1038,8 +1036,8 @@ var ConversationPanel = React.createClass({
         // We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
         var scrollBlockHeight = (
             $('.chat-content-block', $container).outerHeight() -
-            $('.chat-topic-block', $container).outerHeight() -
-            $('.call-block', $container).outerHeight() -
+            ($('.chat-topic-block', $container).outerHeight() || 0) -
+            ($('.call-block', $container).outerHeight() || 0) -
             $('.chat-textarea-block', $container).outerHeight()
         );
 
@@ -1141,8 +1139,7 @@ var ConversationPanel = React.createClass({
 
 
                 var msgsAppended = 0;
-                $(chatRoom).unbind('onMessagesBuffAppend.pull');
-                $(chatRoom).bind('onMessagesBuffAppend.pull', function() {
+                $(chatRoom).rebind('onMessagesBuffAppend.pull', function() {
                     msgsAppended++;
 
                     // var prevPosY = (
@@ -1159,9 +1156,9 @@ var ConversationPanel = React.createClass({
                     // self.lastScrollPosition = prevPosY;
                 });
 
-                $(chatRoom).unbind('onHistoryDecrypted.pull');
+                $(chatRoom).off('onHistoryDecrypted.pull');
                 $(chatRoom).one('onHistoryDecrypted.pull', function(e) {
-                    $(chatRoom).unbind('onMessagesBuffAppend.pull');
+                    $(chatRoom).off('onMessagesBuffAppend.pull');
                     var prevPosY = (
                         ps.getScrollHeight() - self.lastContentHeightBeforeHist
                     ) + self.lastScrollPosition;
@@ -2101,6 +2098,9 @@ var ConversationPanel = React.createClass({
                                        this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() ||
                                        this.loadingShown
                                    }
+                                   options={{
+                                       'suppressScrollX': true
+                                   }}
                                 >
                                 <div className="messages main-pad">
                                     <div className="messages content-area">
@@ -2185,7 +2185,7 @@ var ConversationPanel = React.createClass({
                                             // start of the chat, the event continues to be received event that the
                                             // scrollTop is now 0..and if in that time the user sends a message
                                             // the event triggers a weird "scroll up" animation out of nowhere...
-                                            $(self.props.chatRoom).bind('onMessagesBuffAppend.pull', function() {
+                                            $(self.props.chatRoom).rebind('onMessagesBuffAppend.pull', function() {
                                                 self.messagesListScrollable.scrollToBottom(false);
                                                 setTimeout(function() {
                                                     self.messagesListScrollable.enable();

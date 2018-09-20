@@ -14,8 +14,7 @@ var CallFeedback = function(megaChat, options) {
 
     options.parentLogger = megaChat.logger;
 
-    megaChat.unbind("onInit.CallFeedback");
-    megaChat.bind("onInit.CallFeedback", function(e) {
+    megaChat.rebind("onInit.CallFeedback", function() {
         self.attachToChat(megaChat)
     });
 
@@ -31,11 +30,9 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
     var self = this;
 
     megaChat
-        .unbind('onRoomInitialized.CallFeedback')
-        .bind('onRoomInitialized.CallFeedback', function(e, megaRoom) {
+        .rebind('onRoomInitialized.CallFeedback', function(e, megaRoom) {
             megaRoom
-                .unbind('call-ended.CallFeedback')
-                .bind('call-ended.CallFeedback', function(e, eventData) {
+                .rebind('call-ended.CallFeedback', function(e, eventData) {
                     var msgId = 'call-feedback' + unixtime();
                     megaRoom.appendMessage(
                         new ChatDialogMessage({
@@ -56,12 +53,12 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                                             "call-ended"
                                         );
                                         feedbackDialog._type = "call-ended";
-                                        feedbackDialog.bind('onHide.callEnded', function() {
+                                        feedbackDialog.on('onHide.callEnded', function() {
 
                                             megaRoom.messagesBuff.removeMessageById(msgId);
                                             megaRoom.trigger('resize');
 
-                                            feedbackDialog.unbind('onHide.callEnded');
+                                            feedbackDialog.off('onHide.callEnded');
                                         });
                                     }
                                 },

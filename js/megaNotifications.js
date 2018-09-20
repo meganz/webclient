@@ -64,8 +64,7 @@
             });
 
             self
-                .unbind("onCounterUpdated.favicon")
-                .bind("onCounterUpdated.favicon", function(e) {
+                .rebind("onCounterUpdated.favicon", function() {
                     var count = 0;
                     obj_values(self._counters).forEach(function(v) {
                         count += v ? v : 0;

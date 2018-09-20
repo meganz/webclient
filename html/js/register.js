@@ -118,7 +118,7 @@ var loginFromEphemeral = {
 
             // Show message that the email has already been registered and to choose an alternative email to proceed
             $('.account.input-wrapper.email .account.input-tooltip')
-               .safeHTML(l[1297] + '<br>' + l[1298]);
+                .safeHTML(l[1100] + '<br>' + l[1297]);
             $('.account.input-wrapper.email').addClass('incorrect');
             $('.account.input-wrapper.email input').focus();
             msgDialog('warninga', 'Error', l[7869]);
@@ -190,7 +190,7 @@ function continueOldRegistration(result) {
 
         passwordManager($('#register_form'));
 
-        $('.fm-dialog.registration-page-success').unbind('click');
+        $('.fm-dialog.registration-page-success').off('click');
 
         mega.ui.sendSignupLinkDialog(rv);
 
@@ -227,7 +227,7 @@ function continueNewRegistration(result) {
         // Setup the password manager
         passwordManager($('#register_form'));
 
-        $('.fm-dialog.registration-page-success').unbind('click');
+        $('.fm-dialog.registration-page-success').off('click');
 
         mega.ui.sendSignupLinkDialog(rv);
 
@@ -300,6 +300,8 @@ function pageregister() {
 
     if (email === '' || checkMail(email)) {
         $email.parent().addClass('incorrect');
+        $email.parent().find('.account.input-tooltip')
+            .safeHTML(l[1100] + '<br>' + l[1101]);
         $email.focus();
         err = 1;
     }
@@ -363,11 +365,6 @@ function init_register() {
         }
     });
 
-    $email.rebind('focus.email', function() {
-        $(this).parent().find('.account.input-tooltip', $formWrapper)
-            .safeHTML(l[1100] + '<br>' + l[1101] + '.');
-    });
-
     $password.first().rebind('blur.password, keyup.password', function() {
         registerpwcheck();
     });
@@ -392,9 +389,12 @@ function init_register() {
         }
     });
 
-    $('.checkbox-block.register a', $formWrapper).rebind('click', function(e) {
+    $('.checkbox-block.register .radio-txt', $formWrapper).safeHTML(l['208s']);
+
+    $('.checkbox-block.register span', $formWrapper).rebind('click', function(e) {
+        e.preventDefault();
         $.termsAgree = function() {
-            $('.register-check', $registerForm).removeClass('checkboxOff')
+            $('.register-check', $formWrapper).removeClass('checkboxOff')
                 .addClass('checkboxOn');
         };
         bottomPageDialog(false, 'terms');

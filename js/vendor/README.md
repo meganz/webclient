@@ -80,7 +80,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/IonDen/ion.sound/compare/master...meganz:master)
 
 ---
-[jquery-2.2.1.js]: jQuery JavaScript Library.
+[jquery.js]: jQuery JavaScript Library.
 
 ---
 [jquery-ui.js]: jQuery-UI - jQuery User Interface library.
@@ -227,7 +227,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [filesaver.js]: <https://github.com/eligrey/FileSaver.js/tree/d8388a1a3c781821caae9110ee3d7c28aa7d6e0b>
 [int64.js]: <https://github.com/meganz/node-int64>
 [ion.sound.js]: <https://github.com/meganz/ion.sound>
-[jquery-2.2.1.js]: <https://github.com/jquery/jquery/blob/2.2.1/dist/jquery.js>
+[jquery.js]: <https://github.com/jquery/jquery/blob/3.3.1/dist/jquery.js>
 [jquery-ui.js]: <https://code.jquery.com/ui/1.12.1/jquery-ui.js>
 [jquery.fullscreen.js]: <https://github.com/kayahr/jquery-fullscreen-plugin/tree/5c95707f9ebf3d4962e9057b09cc43c10f11c3f4>
 [jquery.jscrollpane.js]: <https://github.com/meganz/jScrollPane>

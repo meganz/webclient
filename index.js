@@ -111,7 +111,7 @@ function topMenu(close) {
             $('html').removeClass('overlayed');
             $('.mobile.dark-overlay').addClass('hidden').removeClass('active').off('tap');
         }
-        $(window).unbind('resize.topmenu');
+        $(window).off('resize.topmenu');
     }
     else {
         $.topMenu = 'topmenu';
@@ -745,7 +745,7 @@ function init_page() {
                 init_login();
                 $('#login-name2').val(email);
                 $('.register-st2-button').addClass('active');
-                $('#login-name2').attr('readonly', true);
+                $('#login-name2').prop('readonly', true);
                 topmenuUI();
             }
         };
@@ -774,7 +774,7 @@ function init_page() {
                 parsepage(pages['login']);
                 init_login();
                 $('.register-st2-button').addClass('active');
-                $('#login-name2').attr('readonly', true);
+                $('#login-name2').prop('readonly', true);
                 topmenuUI();
             }
         };
@@ -830,24 +830,29 @@ function init_page() {
             init_login();
         }
     }
-    else if (is_mobile && page === 'fm/account/invites/how-it-works') {
+    else if (is_mobile && u_type && page === 'fm/account/invites/how-it-works') {
         parsepage(pages['mobile']);
         mobile.achieve.howItWorks.init();
         return false;
     }
-    else if (is_mobile && page === 'fm/account/invites') {
+    else if (is_mobile && u_type && page === 'fm/account/invites') {
         parsepage(pages['mobile']);
         mobile.achieve.invites.init();
         return false;
     }
-    else if (is_mobile && page === 'fm/account/referrals') {
+    else if (is_mobile && u_type && page === 'fm/account/referrals') {
         parsepage(pages['mobile']);
         mobile.achieve.referrals.init();
         return false;
     }
-    else if (is_mobile && page === 'fm/account/achievements') {
+    else if (is_mobile && u_type && page === 'fm/account/achievements') {
         parsepage(pages['mobile']);
         mobile.achieve.init();
+        return false;
+    }
+    else if (is_mobile && u_type && page === 'fm/account/history') {
+        parsepage(pages['mobile']);
+        mobile.account.history.init();
         return false;
     }
     else if (page === 'achievements') {
@@ -1596,7 +1601,7 @@ function topmenuUI() {
         $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
     }
 
-    var avatar = window.useravatar && useravatar.my;
+    var avatar = window.useravatar && useravatar.mine();
     if (!avatar) {
         $topHeader.find('.fm-avatar').addClass('hidden');
     }
@@ -1976,7 +1981,7 @@ function topmenuUI() {
 
     $topHeader.find('.top-search-bl').rebind('click', function () {
         $(this).addClass('active');
-        $('.top-search-input').focus();
+        $('.top-search-input').trigger("focus");
     });
 
     $topHeader.find('.top-search-input').rebind('blur', function () {

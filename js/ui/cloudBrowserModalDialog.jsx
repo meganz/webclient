@@ -232,7 +232,7 @@ var BrowserEntries = React.createClass({
             var charTyped = false;
             var keyCode = e.which || e.keyCode;
             var selectionIncludeShift = e.shiftKey;
-            if ($('input:focus, textarea:focus').size() > 0) {
+            if ($('input:focus, textarea:focus').length > 0) {
                 return;
             }
 
@@ -403,7 +403,7 @@ var BrowserEntries = React.createClass({
         });
     },
     unbindEvents: function() {
-        $(document.body).unbind('keydown.cloudBrowserModalDialog');
+        $(document.body).off('keydown.cloudBrowserModalDialog');
     },
     onEntryClick: function(e, node) {
         var self = this;
@@ -799,7 +799,7 @@ var CloudBrowserDialog = React.createClass({
             $parentBlock.removeClass("active-search");
         } else {
             $parentBlock.addClass("active-search");
-            $('input', $parentBlock).focus();
+            $('input', $parentBlock).trigger("focus");
         }
     },
     onTabButtonClick: function(e, selectedTab) {
@@ -933,7 +933,7 @@ var CloudBrowserDialog = React.createClass({
             sortFunc = M.getSortByDateTimeFn();
         }
         else /*if(self.state.sortBy[0] === "grid-header-star")*/ {
-            sortFunc = M.getSortByFavFn();
+            sortFunc = M.sortByFavFn(order);
         }
 
         // always return first the folders and then the files

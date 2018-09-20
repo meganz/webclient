@@ -13,14 +13,16 @@
 }
 .fm-dialog-header .account.top-header {
     padding: 40px 0px 10px 40px;
-    color: #666666;
+    color: #333;
 }
+
+
 .fm-dialog-header .account.top-header.small {
     padding: 40px 0px 0px 40px;
     font-size: 26px;
 }
 .account.top-header span {
-    color: #FF333A;
+    color: #F0373B;
 }
 .account.top-header.wide {
     width: 112%;
@@ -40,7 +42,7 @@
     padding: 64px 0 0 0;
 }
 .account.small-header-txt a {
-    color: #FF333A;
+    color: #F0373B;
     cursor: pointer;
 }
 .account.small-header-txt a:hover {
@@ -49,7 +51,7 @@
 .account.input-wrapper {
     border-bottom: 1px solid rgba(0,0,0,0.2);
     padding: 9px 0 9px 38px;
-    margin: 0 0 28px 0;
+    margin: 0 0 24px 0;
     position: relative;
     font-size: 0;
     line-height: 0;
@@ -59,6 +61,12 @@
     -o-transition: border-color 200ms ease-in-out;
     -ms-transition: border-color 200ms ease-in-out;
     transition: border-color 200ms ease-in-out;
+}
+.top-login-popup.sign .account.input-wrapper {
+    margin: 0 0 8px 0;
+}
+.fm-dialog.top-login-popup.sign .account.input-wrapper {
+        margin: 0 0 24px 0;
 }
 .account.input-wrapper.focused {
     border-color: rgba(0,0,0,0.4);
@@ -190,6 +198,9 @@
 .account.checkbox-block {
     padding: 10px 0 64px 1px;
 }
+.pro-login-dialog .account.checkbox-block{
+    padding: 16px 0 16px 1px;
+}
 .account.checkbox-block.focused .checkboxOn::before, .account.checkbox-block.focused .checkboxOff::before {
     -webkit-box-shadow: 0 0 0 1px rgba(240, 55, 58, 0.5);
     -moz-box-shadow: 0 0 0 1px rgba(240, 55, 58, 0.5);
@@ -283,6 +294,9 @@
     color: #666666;
     line-height: 18px;
     padding-top: 7px;
+}
+.top-login-popup .account.checkbox-block .radio-txt {
+    padding-top: 0;
 }
 .account.business-plan {
     width: 360px;
@@ -404,9 +418,13 @@
     margin: 36px auto 0 auto;
     text-align: center;
 }
+.confirm .account.top-header {
+    width: 160%;
+    margin: 0 -30%;
+}
 .top-login-popup .account.checkbox-block {
-    padding: 10px 0 34px 0;
+    padding: 0 0 16px 0;
 }
 .dropdown.body.popup.top-login-popup {
-    width: 480px;
+    width: 400px;
 }

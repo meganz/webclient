@@ -283,16 +283,11 @@ Chat.prototype.init = function() {
 
 
     // UI events
-    $(document.body).undelegate('.top-user-status-popup .tick-item', 'mousedown.megachat');
-
-    $(document.body).delegate('.top-user-status-popup .tick-item', 'mousedown.megachat', function(e) {
+    $(document.body).rebind('mousedown.megachat', '.top-user-status-popup .tick-item', function() {
         var presence = $(this).data("presence");
         self._myPresence = presence;
 
-        $('.top-user-status-popup').removeClass("active");
-
-        $('.top-user-status-popup').addClass("hidden");
-
+        $('.top-user-status-popup').removeClass("active").addClass("hidden");
 
         // presenced integration
         var targetPresence = PresencedIntegration.cssClassToPresence(presence);
@@ -426,7 +421,7 @@ Chat.prototype.init = function() {
                 .addClass("active");
         }
 
-        room.bind("onChatShown", function() {
+        room.rebind("onChatShown.chatMainList", function() {
             $('.conversations-main-listing').addClass("hidden");
         });
 
@@ -449,7 +444,7 @@ Chat.prototype.init = function() {
         }
     });
 
-    $(document.body).delegate('.tooltip-trigger', 'mouseover.notsentindicator', function() {
+    $(document.body).rebind('mouseover.notsentindicator', '.tooltip-trigger', function() {
         var $this = $(this),
             $notification = $('.tooltip.' + $(this).attr('data-tooltip')),
             iconTopPos,
@@ -466,7 +461,7 @@ Chat.prototype.init = function() {
         $notification.offset({ top: iconTopPos - notificatonHeight, left: iconLeftPos - notificatonWidth});
     });
 
-    $(document.body).delegate('.tooltip-trigger', 'mouseout.notsentindicator click.notsentindicator', function() {
+    $(document.body).rebind('mouseout.notsentindicator click.notsentindicator', '.tooltip-trigger', function() {
         // hide all tooltips
         var $notification = $('.tooltip');
         $notification.addClass('hidden').removeAttr('style');
@@ -1132,7 +1127,7 @@ Chat.prototype.refreshConversations = function() {
         return false;
     }
     // move to the proper place if loaded before the FM
-    if (self.$container.parent('.section.conversations .fm-right-files-block').size() == 0) {
+    if (self.$container.parent('.section.conversations .fm-right-files-block').length == 0) {
         $('.section.conversations .fm-right-files-block').append(self.$container);
     }
 };
@@ -1697,17 +1692,25 @@ Chat.prototype.getEmojiDataSet = function(name) {
         return MegaPromise.resolve(self._emojiData[name]);
     }
     else {
-        self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy(
-            $.getJSON(staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json")
-        );
-        self._emojiDataLoading[name].done(function(data) {
+        var promise = new MegaPromise();
+        self._emojiDataLoading[name] = promise;
+
+        M.xhr({
+            type: 'json',
+            url: staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json"
+        }).then(function(ev, data) {
             self._emojiData[name] = data;
             delete self._emojiDataLoading[name];
-        }).fail(function() {
+            promise.resolve(data);
+        }).catch(function(ev, error) {
+            if (d) {
+                self.logger.warn('Failed to load emoji data "%s": %s', name, error, [ev]);
+            }
             delete self._emojiDataLoading[name];
+            promise.reject(error);
         });
 
-        return self._emojiDataLoading[name];
+        return promise;
     }
 };
 

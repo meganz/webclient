@@ -12,6 +12,8 @@
  * @constructor
  */
 var QuickFinder = function(searchable_elements, containers) {
+    'use strict'; /* jshint -W074 */
+
     var self = this;
 
     var DEBUG = false;
@@ -32,11 +34,7 @@ var QuickFinder = function(searchable_elements, containers) {
         }
     });
 
-    // unbind if already bound.
-    $(window).unbind('keypress.quickFinder');
-
-    // bind
-    $(window).bind('keypress.quickFinder', function(e) {
+    $(window).rebind('keypress.quickFinder', function(e) {
 
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
@@ -56,7 +54,7 @@ var QuickFinder = function(searchable_elements, containers) {
 
             // get the currently visible container
             var $container = $(containers).filter(":visible");
-            if ($container.size() == 0) {
+            if (!$container.length) {
                 // no active container, this means that we are receiving events for a page, for which we should not
                 // do anything....
                 return;
@@ -121,7 +119,7 @@ var QuickFinder = function(searchable_elements, containers) {
                     if ($jsp) {
                         var $scrolled_elm = $target_elm.parent("a");
 
-                        if ($scrolled_elm.size() == 0) { // not in icon view, its a list view, search for a tr
+                        if (!$scrolled_elm.length) { // not in icon view, its a list view, search for a tr
                             $scrolled_elm = $target_elm.parents('tr:first');
                         }
                         $jsp.scrollToElement($scrolled_elm);
@@ -181,7 +179,7 @@ var QuickFinder = function(searchable_elements, containers) {
     });
 
     // hide the search field when the user had clicked somewhere in the document
-    $(document.body).delegate('> *', 'mousedown', function(e) {
+    $(document.body).on('mousedown', '> *', function() {
         if (!is_fm()) {
             return;
         }

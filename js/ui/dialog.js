@@ -103,7 +103,7 @@
 
         // link dialog size with the textareas when/if resized by the user using the native resize func
         $('textarea', self.$dialog)
-            .bind('mouseup mousemove',function(){
+            .rebind('mouseup mousemove', function() {
                 if (this.oldwidth  === null){this.oldwidth  = this.style.width;}
                 if (this.oldheight === null){this.oldheight = this.style.height;}
                 if (this.style.width != this.oldwidth || this.style.height != this.oldheight){
@@ -112,7 +112,7 @@
                     this.oldheight = this.style.height;
                 }
             })
-            .bind('resize', function() {
+            .rebind('resize', function() {
                 self.reposition();
             });
     };
@@ -297,11 +297,11 @@
         }
 
         if (self.options.closable) {
-            $(document.body).unbind('mousedown.dialogClose' + self.dialogIdx);
+            $(document.body).off('mousedown.dialogClose' + self.dialogIdx);
         }
 
         if (self.options.closableByEsc) {
-            $(document).unbind('keyup.' + self.options.className);
+            $(document).off('keyup.' + self.options.className);
         }
 
         self.$dialog.addClass('hidden');
@@ -310,7 +310,7 @@
             self._hideOverlay();
         }
 
-        $(document.body).unbind('resize.dialogReposition' + self.dialogIdx);
+        $(document.body).off('resize.dialogReposition' + self.dialogIdx);
 
         self.trigger('onHide');
     };
@@ -405,7 +405,7 @@
             $('body').removeClass('overlayed');
         }
 
-        $('.fm-dialog-overlay').unbind('click.dialog' + self.dialogIdx);
+        $('.fm-dialog-overlay').off('click.dialog' + self.dialogIdx);
     };
     /**
      * Toggle (show/hide) the picker

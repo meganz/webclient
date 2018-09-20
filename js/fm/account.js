@@ -673,7 +673,9 @@ function accountUI() {
         });
 
         $('.grid-table.transactions').html(html);
-        var i = new Date().getFullYear() - 10, html = '', sel = '';
+        i = new Date().getFullYear() - 16;
+        html = '';
+        var sel = '';
         $('.default-select.year span').text('YYYY');
 
         while (i >= 1900) {
@@ -1310,7 +1312,7 @@ function accountUI() {
                 $('.fm-account-overlay').fadeOut(200);
                 $this.removeClass('active');
                 $('.fm-voucher-popup').addClass('hidden');
-                $(window).unbind('resize.voucher');
+                $(window).off('resize.voucher');
             }
         });
 
@@ -2114,13 +2116,16 @@ accountUI.cancelSubscriptionDialog = {
 };
 
 accountUI.disableElement = function(element) {
-    $(element).addClass('disabled').attr('disabled', 1);
+    'use strict';
+    $(element).addClass('disabled').prop('disabled', true);
 };
 accountUI.enableElement = function(element) {
-    $(element).removeClass('disabled').removeAttr('disabled');
+    'use strict';
+    $(element).removeClass('disabled').prop('disabled', false);
 };
 
 accountUI.initCheckbox = function(className, $container, currentValue, onChangeCb) {
+    'use strict';
     var $wrapperDiv = $('.' + className, $container);
     var $input = $('input[type="checkbox"]', $wrapperDiv);
 
@@ -2154,19 +2159,23 @@ accountUI.initCheckbox = function(className, $container, currentValue, onChangeC
 };
 
 accountUI.initCheckbox.check = function($input, $wrapperDiv) {
-    $input.removeClass('checkboxOff').addClass('checkboxOn').attr('checked', true);
+    'use strict';
+    $input.removeClass('checkboxOff').addClass('checkboxOn').prop('checked', true);
     $wrapperDiv.removeClass('checkboxOff').addClass('checkboxOn');
 };
 accountUI.initCheckbox.uncheck = function($input, $wrapperDiv) {
-    $input.removeClass('checkboxOn').addClass('checkboxOff').attr('checked', false);
+    'use strict';
+    $input.removeClass('checkboxOn').addClass('checkboxOff').prop('checked', false);
     $wrapperDiv.removeClass('checkboxOn').addClass('checkboxOff');
 };
 
 accountUI.initCheckbox.enable = function(className, $container) {
+    'use strict';
     var $wrapperDiv = $('.' + className, $container);
     $wrapperDiv.removeClass('disabled');
 };
 accountUI.initCheckbox.disable = function(className, $container) {
+    'use strict';
     var $wrapperDiv = $('.' + className, $container);
     $wrapperDiv.addClass('disabled');
 };
@@ -2198,7 +2207,7 @@ accountUI.initRadio.setValue = function(className, newVal, $container) {
 
     $input
         .removeClass('radioOff').addClass('radioOn')
-        .attr('checked', 1);
+        .prop('checked', true);
 
     $input.parent().addClass('radioOn').removeClass('radioOff');
 };
@@ -2207,13 +2216,13 @@ accountUI.initRadio.setValue = function(className, newVal, $container) {
 accountUI.initRadio.disable = function($input) {
     $('input.[value="' + newVal + '"]', $container)
         .addClass('disabled')
-        .attr('disabled', 1);
+        .prop('disabled', true);
 };
 
 accountUI.initRadio.enable = function(value, $container) {
     $('input.[value="' + newVal + '"]', $container)
         .removeClass('disabled')
-        .removeAttr('disabled');
+        .prop('disabled', false);
 };
 
 accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
@@ -2386,7 +2395,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             )
             .done(
             function(e) {
-                $('#versioning-status').prop('checked', val ? false : true);
+                $('#versioning-status').prop('checked', !val);
                 $('.label-heading').text(val ? l[7070] : l[17601]);
                 fileversioning.dvState = val;
             });

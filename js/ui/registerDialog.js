@@ -6,13 +6,15 @@
 
     function closeRegisterDialog($dialog, isUserTriggered) {
         closeDialog();
-        $(window).unbind('resize.proregdialog');
-        $('.fm-dialog-overlay').unbind('click.proDialog');
-        $('.fm-dialog-close', $dialog).unbind('click.proDialog');
+        $(window).off('resize.proregdialog');
+        $('.fm-dialog-overlay').off('click.proDialog');
+        $('.fm-dialog-close', $dialog).off('click.proDialog');
 
         if (isUserTriggered && options.onDialogClosed) {
             options.onDialogClosed($dialog);
         }
+
+        delete $.registerDialog;
 
         options = {};
     }
@@ -43,7 +45,7 @@
 
             hideOverlay();
             closeRegisterDialog($dialog);
-            $('.fm-dialog.registration-page-success').unbind('click');
+            $('.fm-dialog.registration-page-success').off('click');
 
             if (login) {
                 Soon(function() {
@@ -284,7 +286,7 @@
             });
         };
 
-        M.safeShowDialog('pro-register-dialog', function() {
+        M.safeShowDialog('register', function() {
             options = Object(opts);
 
             $('.fm-dialog-title', $dialog).text(options.title || l[5840]);
@@ -301,6 +303,8 @@
             // Init inputs events
             accountinputs.init($dialog);
 
+            $.registerDialog = 'register';
+
             return $dialog;
         });
 
@@ -315,7 +319,12 @@
 
         // close dialog by click on overlay
         $('.fm-dialog-overlay').rebind('click.proDialog', function() {
-            closeRegisterDialog($dialog, true);
+            if ($.registerDialog === $.dialog) {
+                closeRegisterDialog($dialog, true);
+            }
+            else {
+                closeDialog();
+            }
             return false;
         });
 
@@ -369,15 +378,17 @@
             }
         });
 
-        $('.checkbox-block a', $dialog)
-            .rebind('click.proRegisterDialog', function(e) {
-                $.termsAgree = function() {
-                    $('.register-check').removeClass('checkboxOff');
-                    $('.register-check').addClass('checkboxOn');
-                };
-                bottomPageDialog(false, 'terms'); // show terms dialog
-                return false;
-            });
+        $('.checkbox-block.register .radio-txt', $dialog).safeHTML(l['208s']);
+
+        $('.checkbox-block.register span', $dialog).rebind('click', function(e) {
+            e.preventDefault();
+            $.termsAgree = function() {
+                $('.register-check', $dialog).removeClass('checkboxOff')
+                    .addClass('checkboxOn');
+            };
+            bottomPageDialog(false, 'terms'); // show terms dialog
+            return false;
+        });
     }
 
     /**
@@ -400,7 +411,7 @@
                         console.error('sendsignuplink failed', res);
 
                         $button.addClass('disabled');
-                        $button.unbind('click');
+                        $button.off('click');
 
                         var tick = 26;
                         var timer = setInterval(function() {

@@ -1,4 +1,6 @@
 function FileManager() {
+    "use strict";
+
     this.logger = new MegaLogger('FileManager');
 }
 FileManager.prototype.constructor = FileManager;
@@ -54,7 +56,6 @@ FileManager.prototype.initFileManager = function() {
                     promise.resolve.apply(promise, arguments);
                 });
         });
-
     return promise;
 };
 
@@ -140,13 +141,13 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
-        var c = $(ui.draggable.context).attr('class');
+        var c = $(ui.draggable).attr('class');
         var t, ids, dd;
 
 
         if (c && c.indexOf('nw-fm-tree-item') > -1) {
             // tree dragged:
-            var id = $(ui.draggable.context).attr('id');
+            var id = $(ui.draggable).attr('id');
             if (id.indexOf('treea_') > -1) {
                 ids = [id.replace('treea_', '')];
             }
@@ -191,7 +192,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             else if (
                 $(e.target).is('ul.conversations-pane > li') ||
-                $(e.target).closest('ul.conversations-pane > li').size() > 0 ||
+                $(e.target).closest('ul.conversations-pane > li').length > 0 ||
                 $(e.target).is('.messages-block')
             ) {
                 if (M.isFile(ids)) {
@@ -428,6 +429,8 @@ FileManager.prototype.initFileManagerUI = function() {
     InitFileDrag();
     M.createFolderUI();
     M.treeSearchUI();
+    M.treeFilterUI();
+    M.treeSortUI();
     M.initTreePanelSorting();
     M.initContextUI();
     initShareDialog();
@@ -456,9 +459,9 @@ FileManager.prototype.initFileManagerUI = function() {
         }
 
         M.openFolder(M.currentdirid, true)
-            .always(function() {
-                reselect();
-            });
+        .always(function() {
+            reselect();
+        });
 
         return false;
     });
@@ -485,6 +488,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         $('.grid-url-arrow').removeClass('active');
         $('.nw-sorting-menu').addClass('hidden');
+        $('.colour-sorting-menu').addClass('hidden');
         $('.fm-start-chat-dropdown').addClass('hidden').removeClass('active');
         $('.start-chat-button').removeClass('active');
         $('.nw-tree-panel-arrows').removeClass('active');
@@ -576,6 +580,11 @@ FileManager.prototype.initFileManagerUI = function() {
         return false;
     });
 
+    // stop sort and filter dialog clicking close itself
+    $('.nw-sorting-menu').on('click', function(e) {
+        e.stopPropagation();
+    });
+
     var fmTabState;
     var isMegaSyncTransfer = true;
     $('.nw-fm-left-icon').rebind('click', function(e) {
@@ -600,7 +609,6 @@ FileManager.prototype.initFileManagerUI = function() {
                 'rubbish-bin':     {root: M.RubbishID, prev: null}
             };
         }
-
         if ((ul_queue && ul_queue.length) || (dl_queue && dl_queue.length)) {
             isMegaSyncTransfer = false;
         }
@@ -940,6 +948,10 @@ FileManager.prototype.initContextUI = function() {
             menuPos,
             currentId;
 
+        if ($this.hasClass('disabled')){
+            return false;
+        }
+
         // Hide opened submenus
         if (!$this.parent().parent().hasClass('submenu')) {
             $('.dropdown-item').removeClass('opened');
@@ -1118,7 +1130,7 @@ FileManager.prototype.initContextUI = function() {
             $('.fm-dialog-title', $dialog).text(l[5631] + ' "' + M.d[$.selected].name + '"');
             $('.multiple-input .token-input-token-mega', $dialog).remove();
             dialogPositioning($dialog);
-            $('.token-input-input-token-mega input', $dialog).focus();
+            $('.token-input-input-token-mega input', $dialog).trigger("focus");
 
             return $dialog;
         };
@@ -1294,15 +1306,68 @@ FileManager.prototype.initContextUI = function() {
         openCopyDialog('conversations');
     });
 
-    $('.labels .dropdown-colour-item').rebind('click', function() {
+    $('.submenu.labels .dropdown-colour-item').rebind('click', function() {
         var labelId = parseInt(this.dataset.labelId);
 
         if (labelId && (M.getNodeRights($.selected[0]) > 1)) {
-            M.colourLabeling($.selected, labelId);
+            M.labeling($.selected, labelId);
+        }
+
+        // refresh page for filter and sort with new label.
+        M.openFolder(M.currentdirid, true);
+    });
+
+    $('.colour-sorting-menu .filter-by .dropdown-colour-item').rebind('click', function(e) {
+        if (d){
+            console.log('label color selected');
+        }
+        var labelId = parseInt(this.dataset.labelId);
+        var parent = $(this).parents('.labels');
+        
+        if (labelId && !parent.hasClass("disabled")) {
+            // init M.filterLabel[type] if not exist.
+            if (!M.currentLabelFilter) {
+                M.filterLabel[M.currentLabelType] = Object.create(null);
+            }
+
+            M.applyLabelFilter(e);
         }
     });
 
-    $('.labels .dropdown-colour-item').rebind('mouseover', function() {
+    $('.filter-block.fm .filter-block.close').rebind('click', function() {
+        delete M.filterLabel[M.currentLabelType];
+        $('.colour-sorting-menu .dropdown-colour-item').removeClass('active');
+        $('.filter-block.fm.body')
+            .addClass('hidden')// Hide 'Filter:' DOM elements
+            .find('.colour-label-ind').remove();// Remove all colors from it
+
+        $.hideContextMenu();
+        M.openFolder(M.currentdirid, true);
+    });
+
+    $('.filter-block.shares .filter-block.close').rebind('click', function() {
+        delete M.filterLabel[M.currentLabelType];
+        $('.colour-sorting-menu .dropdown-colour-item').removeClass('active');
+        $('.filter-block.shares.body')
+        .addClass('hidden')// Hide 'Filter:' DOM elements
+        .find('.colour-label-ind').remove();// Remove all colors from it
+
+        $.hideContextMenu();
+        M.openFolder(M.currentdirid, true);
+    });
+
+    $('.filter-block.rubbish .filter-block.close').rebind('click', function() {
+        delete M.filterLabel[M.currentLabelType];
+        $('.colour-sorting-menu .dropdown-colour-item').removeClass('active');
+        $('.filter-block.rubbish.body')
+        .addClass('hidden')// Hide 'Filter:' DOM elements
+        .find('.colour-label-ind').remove();// Remove all colors from it
+
+        $.hideContextMenu();
+        M.openFolder(M.currentdirid, true);
+    });
+
+    $('.submenu.labels .dropdown-colour-item').rebind('mouseover.clrSort', function() {
         var labelTxt = this.dataset.labelTxt;
         var labelInfo;
 
@@ -1313,7 +1378,13 @@ FileManager.prototype.initContextUI = function() {
             labelInfo = l[16221];
         }
         labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
-        $('.labels .dropdown-color-info').text(labelTxt).addClass('active');
+        $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
+    });
+
+    $('.colour-sorting-menu .labels .dropdown-colour-item').rebind('mouseover.clrSort', function(e) {
+        if (!$(this).parents('.labels').hasClass('disabled')){
+            M.updateLabelInfo(e);
+        }
     });
 
     $('.labels .dropdown-colour-item').rebind('mouseout', function() {
@@ -1440,7 +1511,7 @@ FileManager.prototype.createFolderUI = function() {
             setTimeout(function () {
                 $inputWrapper.removeClass('error');
                 $input.removeClass('error');
-                $input.focus();
+                $input.trigger("focus");
             }, 2000);
         }
         else {
@@ -1451,7 +1522,7 @@ FileManager.prototype.createFolderUI = function() {
                 setTimeout(function () {
                     $inputWrapper.removeClass('duplicate');
                     $input.removeClass('error');
-                    $input.focus();
+                    $input.trigger("focus");
                 }, 2000);
 
                 return;
@@ -1489,7 +1560,7 @@ FileManager.prototype.createFolderUI = function() {
             b1.addClass('active');
             d1.removeClass('hidden');
             topPopupAlign(this, '.dropdown.create-new-folder');
-            $('.create-new-folder input').focus();
+            $('.create-new-folder input').trigger("focus");
         }
         else {
             b1.removeClass('active filled-input');
@@ -1516,7 +1587,7 @@ FileManager.prototype.createFolderUI = function() {
             $('.create-folder-dialog input').val(v);
         }
 
-        $('.create-new-folder input').focus();
+        $('.create-new-folder input').trigger("focus");
         $('.create-new-folder').removeClass('filled-input');
         $('.create-new-folder').addClass('hidden');
         $('.fm-new-folder').removeClass('active');
@@ -1539,7 +1610,7 @@ FileManager.prototype.createFolderUI = function() {
 
         createFolderDialog(1);
         $('.create-folder-dialog input').val('');
-        $('.create-new-folder input').focus();
+        $('.create-new-folder input').trigger("focus");
     });
 
     $('.create-new-folder input').rebind('keyup.create-new-f', function(e) {
@@ -2319,8 +2390,8 @@ FileManager.prototype.contactsUI = function() {
         $('.dropdown.tooltip.small').removeClass('visible');
     });
 
-    $publicLink.rebind('click', function(e) {
-        var linkData = $(this).attr('data-lnk');
+    $publicLink.rebind('click', function() {
+        var linkData = $(this).attr('data-lnk') || '';
 
         if (linkData.length) {
             copyToClipboard(linkData, l[371] + '<span>' + linkData + '</span>', 'short');
@@ -2534,7 +2605,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     $.gridHeader = function() {
         var headerColumn = '';
         var $firstChildTd = $('.grid-table tr:first-child td:visible');
-        if ($firstChildTd.size() === 0) {
+        if ($firstChildTd.length === 0) {
             // if the first <tr> does not contain any TDs, pick the next one
             // this can happen when MegaList's prepusher (empty <TR/> is first)
             $firstChildTd = $('.grid-table tr:nth-child(2) td:visible');
@@ -2628,14 +2699,14 @@ FileManager.prototype.addGridUI = function(refresh) {
         $.gridHeader();
     }
 
-    if (folderlink) {
-        $('.grid-url-arrow').hide();
-        $('.grid-url-header').text('');
-    }
-    else {
+    // if (folderlink) {
+    //    $('.grid-url-arrow').hide();
+    //    $('.grid-url-header').text('');
+    // }
+    // else {
         $('.grid-url-arrow').show();
         $('.grid-url-header').text('');
-    }
+    // }
 
     $('.fm .grid-table-header th:nth-child(5)').rebind('contextmenu.column_time', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
@@ -2676,39 +2747,55 @@ FileManager.prototype.addGridUI = function(refresh) {
         M.renderMain();
     });
 
-    $('.grid-table-header .arrow').rebind('click', function() {
+    $('.grid-table-header .arrow').rebind('click', function(e) {
         var cls = $(this).attr('class');
         var dir = 1;
 
-        if (cls && cls.indexOf('desc') > -1) {
-            dir = -1;
+        // Excludes colour sorting dialog for contacts
+        if (cls.indexOf('name') !== -1 && $(this).parents('.files-grid-view.contacts-view').length === 0) {
+            return M.labelSortMenuUI(e);
         }
+        else {
+            M.resetLabelSortMenuUI();
 
-        for (var sortBy in M.sortRules) {
-            if (cls.indexOf(sortBy) !== -1) {
-                M.doSort(sortBy, dir);
-                M.renderMain();
-                break;
+            if (cls && cls.indexOf('desc') > -1) {
+                dir = -1;
+            }
+            for (var sortBy in M.sortRules) {
+                if (cls.indexOf(sortBy) !== -1) {
+                    M.doSort(sortBy, dir);
+                    M.renderMain();
+                    break;
+                }
             }
         }
-
-        return false;
     });
 
     $('.grid-first-th').rebind('click', function() {
-        var c = $(this).children().first().attr('class');
+        var $el = $(this).children().first();
+        var c = $el.attr('class');
         var d = 1;
 
         if (c && (c.indexOf('desc') > -1)) {
             d = -1;
+            $el.removeClass('desc').addClass('asc');
+        }
+        else {
+            $el.removeClass('asc').addClass('desc');
         }
 
-        for (var e in M.sortRules) {
-            if (M.sortRules.hasOwnProperty(e)) {
-                if (c.indexOf(e) !== -1) {
-                    M.doSort(e, d);
-                    M.renderMain();
-                    break;
+        var fav = function(el) {
+            return el.fav;
+        };
+
+        if (M.v.some(fav)) {
+            for (var f in M.sortRules) {
+                if (M.sortRules.hasOwnProperty(f)) {
+                    if (c.indexOf(f) !== -1) {
+                        M.doSort(f, d);
+                        M.renderMain();
+                        break;
+                    }
                 }
             }
         }
@@ -2891,15 +2978,11 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         }
     });
 
-
-
-
     $ddUIitem.rebind('contextmenu', function(e) {
         if (e.shiftKey) {
             selectionManager.shift_select_to($(this).attr('id'), false, true, true);
         }
-        else if (e.ctrlKey !== false || e.metaKey !== false)
-        {
+        else if (e.ctrlKey !== false || e.metaKey !== false) {
             selectionManager.add_to_selection($(this).attr('id'));
         }
         else {
@@ -2911,10 +2994,15 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 selectionManager.add_to_selection($(this).attr('id'));
             }
 
+            // Show sort menu for FM, block view only
+            // if (fmconfig.viewmodes && fmconfig.viewmodes[M.currentdirid]) {
+            //     return M.labelSortMenuUI(e, true);
+            // }
         }
 
         M.searchPath();
         $.hideTopMenu();
+
         return !!M.contextMenuUI(e, 1);
     });
 
@@ -3218,8 +3306,9 @@ FileManager.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     var id_r = this.getNodeRoot(id);
     var id_s = id.split('/')[0];
     var e, scrollTo = false, stickToTop = false;
-
-    //console.error("treeUIopen", id);
+    if (d){
+        console.log("treeUIopen", id);
+    }
 
     if (id_r === 'shares') {
         this.onSectionUIOpen('shared-with-me');
@@ -3365,7 +3454,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         'conversations opc ipc inbox account dashboard transfers'
     ).addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
-    $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
+    $('.fm-import-to-cloudrive, .fm-download-as-zip').off('click');
 
     $('.fm-main').removeClass('active-folder-link');
     $('.nw-fm-tree-header.folder-link').hide();
@@ -3595,7 +3684,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
         }
 
         var closeDialog = function() {
-            $strgdlg.unbind('dialog-closed');
+            $strgdlg.off('dialog-closed');
             window.closeDialog();
 
             promise.resolve();
@@ -3669,7 +3758,8 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
     var diagInheritance = {
         properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share'],
         copy: ['createfolder'],
-        move: ['createfolder']
+        move: ['createfolder'],
+        register: ['terms']
     };
 
     var _openDialog = function(name, dsp) {

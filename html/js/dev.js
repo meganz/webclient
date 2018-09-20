@@ -204,7 +204,7 @@ function dev_app() {
     $('.radiodiv').attr('class', 'radiodiv radioOff');
     $('.radiodiv input').attr('class', 'radioOff');
 
-    $('.radiodiv').bind('click', function(e) {
+    $('.radiodiv').rebind('click', function() {
         $('.radiodiv').attr('class', 'radiodiv radioOff');
         $('.radiodiv input').attr('class', 'radioOff');
         $(this).attr('class', 'radiodiv radioOn');

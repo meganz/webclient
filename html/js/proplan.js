@@ -637,12 +637,8 @@ var showSignupPromptDialog = function() {
             'title': l[5841],
             'buttons': []
         });
-        signupPromptDialog.bind('onBeforeShow', function() {
-
-            $('.fm-dialog-title', this.$dialog)
-                .text(
-                    this.options.title
-                );
+        signupPromptDialog.rebind('onBeforeShow', function() {
+            $('.fm-dialog-title', this.$dialog).text(this.options.title);
 
             // custom buttons, because of the styling
             $('.fm-notification-info', this.$dialog)

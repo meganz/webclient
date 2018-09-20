@@ -281,6 +281,10 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
                 if (opc[i].rts) {
                     rts = time2last(opc[i].rts);
                 }
+                else {
+                    // if action packet does not contains rts, it is treated as canceled
+                    rts = l[6112];
+                }
 
                 hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
                 html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +
@@ -429,6 +433,7 @@ MegaData.prototype.contacts = function() {
         });
 
     var sortBy = $.sortTreePanel['contacts'].by;
+    var sortDirection = $.sortTreePanel['contacts'].dir;
     var sortFn;
 
     if (sortBy === 'last-interaction') {
@@ -444,10 +449,9 @@ MegaData.prototype.contacts = function() {
         sortFn = this.getSortByDateTimeFn();
     }
     else if (sortBy === 'fav') {
-        sortFn = this.getSortByFavFn();
+        sortFn = this.sortByFavFn(sortDirection);
     }
 
-    var sortDirection = $.sortTreePanel['contacts'].dir;
     activeContacts.sort(
         function(a, b) {
             return sortFn(a, b, sortDirection);
@@ -488,8 +492,7 @@ MegaData.prototype.contacts = function() {
     if (megaChatIsReady) {
         var $dropdown = $('.fm-start-chat-dropdown');
 
-        $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
-        $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
+        $('.fm-tree-panel').rebind('click.megaChat', '.start-chat-button', function() {
             var scrollPos = 0;
 
             var $this = $(this);
@@ -572,8 +575,7 @@ MegaData.prototype.contacts = function() {
         });
     }
 
-    $('.fm-tree-panel').undelegate('.nw-contact-item', 'click');
-    $('.fm-tree-panel').delegate('.nw-contact-item', 'click', function() {
+    $('.fm-tree-panel').rebind('click', '.nw-contact-item', function() {
         var id = $(this).attr('id');
         if (id) {
             id = id.replace('contact_', '');
@@ -584,7 +586,7 @@ MegaData.prototype.contacts = function() {
     });
 
     // On the Contacts screen, initiate a call by double clicking a contact name in the left panel
-    $('.fm-tree-panel').delegate('.nw-contact-item.online', 'dblclick', function() {
+    $('.fm-tree-panel').rebind('dblclick.treepanel', '.nw-contact-item.online', function() {
 
         // Get the element ID
         var $this = $(this);

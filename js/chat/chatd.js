@@ -156,7 +156,9 @@ Chatd.Opcode = {
     'ECHO': 32,
     'ADDREACTION': 33,
     'DELREACTION': 34,
-    'CALLTIME': 42
+    'CALLTIME': 42,
+    'NEWNODEMSG': 44,
+    'NODEHIST': 45
 };
 
 // privilege levels
@@ -705,6 +707,7 @@ Chatd.cmdToString = function(cmd, tx) {
         case Chatd.Opcode.OLDMSG:
         case Chatd.Opcode.NEWMSG:
         case Chatd.Opcode.MSGUPD:
+        case Chatd.Opcode.NEWNODEMSG:
             //     chatId + userId + msgid + Chatd.pack32le(timestamp) +
             //        8           8                   8           4
             //     Chatd.pack16le(0) + Chatd.pack32le(keyid) + Chatd.pack32le(message.length) + message];
@@ -745,6 +748,18 @@ Chatd.cmdToString = function(cmd, tx) {
         case Chatd.Opcode.KEEPALIVE:
         case Chatd.Opcode.KEEPALIVEAWAY:
             return [result, 1];
+
+        case Chatd.Opcode.NODEHIST:
+            // chatid.8 msgid.8 count.4 ?
+            var count = Chatd.unpack32le(cmd.substr(17, 4));
+            if (count > 0x7fffffff) {
+                count -= 0x100000000;
+            }
+
+            result += "chatId: " + base64urlencode(cmd.substr(1, 8)) +
+                      "msgId: " + base64urlencode(cmd.substr(9, 8)) +
+                      "count: " + count;
+            return [result, 21];
 
         default:
             if (cmd.length > 64) {
@@ -1591,10 +1606,10 @@ Chatd.prototype.shutdown = function() {
 };
 
 // submit a new message to the chatId
-Chatd.prototype.submit = function(chatId, messages, keyId) {
+Chatd.prototype.submit = function(chatId, messages, keyId, isAttachment) {
 
     if (this.chatIdMessages[chatId]) {
-        return this.chatIdMessages[chatId].submit(messages, keyId);
+        return this.chatIdMessages[chatId].submit(messages, keyId, isAttachment);
     }
     else {
         return false;
@@ -1631,9 +1646,11 @@ Chatd.Shard.prototype.msg = function(chatId, messages) {
                     Chatd.pack16le(updated) + Chatd.pack32le(keyid) +
                     Chatd.pack32le(message.length) + message];
         } else {
-            cmd = [Chatd.Opcode.NEWMSG,
+            cmd = [
+                messageObj.isAttachment ? Chatd.Opcode.NEWNODEMSG : Chatd.Opcode.NEWMSG,
                 chatId + Chatd.Const.UNDEFINED + msgxid + Chatd.pack32le(timestamp) +
-                Chatd.pack16le(0) + Chatd.pack32le(keyid) + Chatd.pack32le(message.length) + message];
+                Chatd.pack16le(0) + Chatd.pack32le(keyid) + Chatd.pack32le(message.length) + message
+            ];
         }
         cmds.push(cmd);
     }
@@ -1683,7 +1700,7 @@ Chatd.Messages = function(chatd, chatId) {
     this.needsRestore = true;
 };
 
-Chatd.Messages.prototype.submit = function(messages, keyId) {
+Chatd.Messages.prototype.submit = function(messages, keyId, isAttachment) {
     // messages is an array
     var messageConstructs = [];
 
@@ -1702,13 +1719,14 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
         this.sendingList.push(messagekey);
         this.persist(messagekey);
 
-        messageConstructs.push(
-            {"msgxid":msgxid,
-            "timestamp":timestamp,
-            "keyid":keyId,
-            "updated":0,
-            "message":message.message,
-            "type":message.type
+        messageConstructs.push({
+                "msgxid": msgxid,
+                "timestamp": timestamp,
+                "keyid": keyId,
+                "updated": 0,
+                "message": message.message,
+                "type": message.type,
+                "isAttachment": isAttachment
             });
     }
     var chatRoom = this.chatd.megaChat.getChatById(base64urlencode(this.chatId));

@@ -650,6 +650,22 @@ function processEmailChangeActionPacket(ap) {
         }
         // update the underlying fmdb cache
         M.addUser(user);
+
+        // in case of business master
+        // first, am i a master?
+        if (u_attr && u_attr.b && !u_attr.b.mu) {
+            // then, do i have this user as sub-user?
+            if (M.suba && M.suba[ap.u]) {
+                M.require('businessAcc_js', 'businessAccUI_js').done(
+                    function () {
+                        var business = new BusinessAccount();
+                        var sub = M.suba[ap.u];
+                        sub.e = ap.e;
+                        business.parseSUBA(sub, false, true);
+                    }
+                );
+            }
+        }
     }
 }
 

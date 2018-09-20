@@ -174,7 +174,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             $currUserLeftPane.removeClass('selected');
             var uName = 'Error';
             try {
-                var uName = from8(base64urldecode(subUsers[h].firstname)) + ' ' +
+                uName = from8(base64urldecode(subUsers[h].firstname)) + ' ' +
                     from8(base64urldecode(subUsers[h].lastname));
             }
             catch (e) { }

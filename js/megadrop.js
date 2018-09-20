@@ -31,7 +31,7 @@ mega.megadrop = (function() {
         ignoreDb: false,
         initialized: false,
         widgetParams: [
-            '"width=750, height=738, resizable=no, status=no, location=no, titlebar=no, toolbar=no", ',
+            '"width=750, height=770, resizable=no, status=no, location=no, titlebar=no, toolbar=no", ',
             'true'
         ]
     };

@@ -490,6 +490,11 @@
                 </div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
+            <div class="mobile account-session-history-block">
+                <div class="mobile fm-icon device"></div>
+                <div class="mobile two-factor-heading">[$429]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
             <div class="mobile acount-cancellation-block">
                 <div class="mobile fm-icon broken-heart"></div>
                 <div class="mobile account-upgrade-text">[$16115]</div>
@@ -643,6 +648,78 @@
                         [$17690]
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Session History page -->
+<div class="mobile main-block session-history-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$429]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile folders-files-text">
+                    <span class="sh-device-header">[$19303]</span>
+                    <span class="sh-status-header">[$89]</span>
+                     <span class="sh-date-header">[$482]</span>
+                    <span class="sh-location-header">[$481] &bull; [$480]</span>
+                </div>
+                <div class="mobile session-history-list">
+
+                    <!-- Template for Session History item - valid classes to add: current, active or expired -->
+                    <div class="mobile fm-item session-history template">
+                        <div class="mobile right sh-round-button">
+                            <span class="confirm-button">[$967]</span>
+                        </div>
+                        <div class="mobile right session-status info-badge">[$7665]</div>
+                        <div class="mobile right session-status inactive-badge">[$1664]</div>
+                        <div class="mobile fm-item-info">
+                            <div class="mobile sh-item-date"></div>
+                            <div class="mobile sh-item-device"></div>
+                            <div class="mobile sh-item-location">
+                                <div class="sh-item-icon">
+                                    <img alt="" />
+                                </div>
+                                <span class="sh-item-country"></span>
+                                <span class="sh-item-ip"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mobile fm-row bottom-action-bar-container">
+        <div class="mobile bottom-action-bar">
+           <div class="mobile sh-round-button close-other-sessions-button">
+            <span>[$7667]</span>
+           </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Session history Close All Other Sessions dialog -->
+<div class="mobile main-block generic-dialog-overlay sh-dialog hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile fm-icon device-history"></div>
+                <div class="mobile dialog-heading-text">[$882]</div>
+                <div class="mobile dialog-body-text">
+                    [$18513]
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile red-button first confirm-close-other-sessions-button"> <i></i> <span>[$7667]</span> </a>
+                </div>
+                 <a class="mobile text-button third cancel"><span>[$82]</span> </a>
             </div>
         </div>
     </div>
@@ -2701,7 +2778,6 @@
     </div>
 </div>
 
-
 <!-- Video Block template -->
 <div class="mobile-video-template">
     <div class="download video-block hidden">
@@ -2734,7 +2810,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- Public Service Announcement -->
 <div class="mobile bottom-info body public-service-anouncement">

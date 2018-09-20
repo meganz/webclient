@@ -310,7 +310,7 @@
                 .text(
                     items.length < 2
                         ? l[19338]
-                        : escapeHTML(l[19339]).replace('[x]', items.length)
+                        : escapeHTML(l[19339]).replace('[X]', items.length)
                 );
         };
 

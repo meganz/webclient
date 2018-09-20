@@ -138,33 +138,41 @@ function addNewContact($addButton, cd) {
             mailNum = $mails.length;
 
             if (mailNum) {
-
                 // Loop through new email list
                 $mails.each(function(index, value) {
-
                     // Extract email addresses one by one
                     email = $(value).contents().eq(1).text();
                     promises.push(M.inviteContact(M.u[u_handle].m, email, emailText));
                 });
-
-                // Singular or plural
-                if (mailNum === 1) {
-                    title = l[150];
-                    msg = l[5898];
-                }
-                else {
-                    title = l[165] + ' ' + l[5859];
-                    msg = l[5899];
-                }
-
-                if (cd) {
-                    closeDialog();
-                    $('.token-input-token-mega').remove();
-                }
-                contactsInfoDialog(title, email, msg);
             }
 
-            MegaPromise.allDone(promises).always(function() {
+            MegaPromise.allDone(promises).always(function(res) {
+                if (res) {
+                    var addedEmails = [];
+                    for (var i = 0; i < res.length; i++) {
+                        if (res[i][0]) {
+                            addedEmails.push(res[i][0]);
+                        }
+                    }
+
+                    var addedEmailNum = addedEmails.length;
+
+                    // Singular or plural
+                    if (addedEmailNum === 1) {
+                        title = l[150];
+                        msg = l[5898];
+                    }
+                    else {
+                        title = l[165] + ' ' + l[5859];
+                        msg = l[5899];
+                    }
+
+                    if (cd) {
+                        closeDialog();
+                        $('.token-input-token-mega').remove();
+                    }
+                    contactsInfoDialog(title, addedEmails[0], msg);
+                }
                 promise.resolve();
             });
         }

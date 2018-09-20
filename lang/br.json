@@ -25,6 +25,7 @@
     "63": "Copiar",
     "64": "Permiss\u00e3o",
     "68": "Nova pasta",
+    "70": "Lixeira vazia",
     "71": "Adicionar contato",
     "78": "Sim",
     "79": "N\u00e3o",
@@ -2767,6 +2768,8 @@
     "19340": "Voc\u00ea n\u00e3o tem permiss\u00e3o de edi\u00e7\u00e3o neste compartilhamento.",
     "19341": "Voc\u00ea est\u00e1 logado no navegador com uma conta diferente. Fa\u00e7a logout desta conta e fa\u00e7a login na conta na qual voc\u00ea quer fazer o upgrade.",
     "19342": "N\u00e3o foi poss\u00edvel obter op\u00e7\u00f5es de pagamento para o registro da conta Business. Por favor, tente novamente mais tarde.",
+    "19441": "Adicionar \u00e0 Nuvem de arquivos",
+    "19471": "Deletar vers\u00f5es anteriores",
     "19501": "O m\u00ednimo s\u00e3o 3 usu\u00e1rios",
     "19503": "Plano base ([0] usu\u00e1rios)",
     "19504": "{0}x usu\u00e1rios adicionais",
@@ -2780,6 +2783,7 @@
     "19512": "Voc\u00ea fez o upgrade da sua conta [B]%2[\/B] a %1.",
     "19513": "Obrigado! O upgrade da sua conta [B]%2[\/B] ser\u00e1 feito assim que recebermos a confirma\u00e7\u00e3o do pagamento por parte do nosso provedor. Se voc\u00ea pagou com cart\u00e3o de d\u00e9bito ou de cr\u00e9dito e e a sua conta do MEGA ainda n\u00e3o for PRO depois de algumas horas, entre em contato conosco em [A]support@mega.nz[\/A]. Se voc\u00ea fez uma transfer\u00eancia banc\u00e1ria, aguarde de quatro a cinco dias para que o pagamento seja recebido.",
     "19514": "Obrigado! O upgrade da sua conta [B]%2[\/B] ser\u00e1 feito assim que recebermos a confirma\u00e7\u00e3o do pagamento por parte do nosso provedor, o que pode demorar alguns minutos. Se a sua conta do MEGA ainda n\u00e3o for PRO em %1 horas, entre em contato conosco em [A]support@mega.nz[\/A].",
+    "19515": "Working together with your team on the MEGA platform is easy and secure; collaborate with text chat, file sharing and audio\/video calls, all using our advanced end-to-end encryption.",
     "19516": "Criar conta business",
     "19517": "Criar conta Business",
     "19521": "Alterar as configura\u00e7\u00f5es da conta",
@@ -2787,5 +2791,8 @@
     "19523": "Informa\u00e7\u00f5es corporativas",
     "19524": "N\u00e3o foi poss\u00edvel editar as informa\u00e7\u00f5es do usu\u00e1rio. Tente novamente mais tarde",
     "19525": "As informa\u00e7\u00f5es do usu\u00e1rio foram editadas",
-    "19527": "N\u00e3o foi poss\u00edvel reenviar o link de convite. Tente novamente mais tarde"
+    "19527": "N\u00e3o foi poss\u00edvel reenviar o link de convite. Tente novamente mais tarde",
+    "19528": "An error occurred while updating your account details, please try again later.",
+    "19529": "Or Try MEGA individual",
+    "19530": "Business"
 }

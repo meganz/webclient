@@ -25,6 +25,7 @@
     "63": "Copiar",
     "64": "Permisos",
     "68": "Nueva carpeta",
+    "70": "No tienes archivos en la Papelera",
     "71": "A\u00f1adir contacto",
     "78": "S\u00ed",
     "79": "No",
@@ -1094,7 +1095,7 @@
     "7731": "Introduce tu contrase\u00f1a para verificar tu direcci\u00f3n de correo electr\u00f3nico",
     "7732": "Confirma el correo electr\u00f3nico",
     "7740": "La Papelera est\u00e1 vac\u00eda",
-    "7741": "Vaciar la Papelera",
+    "7741": "Vaciar Papelera",
     "7743": "Cambiar correo electr\u00f3nico",
     "7744": "Correo electr\u00f3nico actual",
     "7745": "Nuevo correo electr\u00f3nico",
@@ -2767,6 +2768,8 @@
     "19340": "No tienes permiso de escritura en esta carpeta compartida.",
     "19341": "Est\u00e1s conectado a una cuenta diferente en este navegador. Si no es la cuenta que quieres pasar a PRO, descon\u00e9ctate e inicia sesi\u00f3n con la cuenta correcta.",
     "19342": "Error al obtener las opciones de pago para el registro de la cuenta Business. Por favor, int\u00e9ntalo de nuevo m\u00e1s tarde.",
+    "19441": "A\u00f1adir a Mi nube",
+    "19471": "Eliminar versiones anteriores",
     "19501": "El n\u00famero m\u00ednimo de usuarios es 3",
     "19503": "Plan Base ([0] users)",
     "19504": "{0}x usuarios adicionales",
@@ -2780,6 +2783,7 @@
     "19512": "Has pasado tu cuenta [B]%2[\/B] a %1.",
     "19513": "\u00a1Gracias! Tu cuenta [B]%2[\/B] pasar\u00e1 a PRO en cuanto nuestro proveedor nos confirme el pago. Si has pagado con tarjeta de cr\u00e9dito o de d\u00e9bito y no has recibido tu cuenta PRO dentro de unas horas, por favor env\u00edanos un correo a [A]support@mega.nz[\/A] Si has pagado a trav\u00e9s de transferencia bancaria por favor espera 4-5 d\u00edas para que se confirme el pago.",
     "19514": "\u00a1Gracias! Tu cuenta [B]%2[\/B] pasar\u00e1 a PRO en cuanto nuestro proveedor nos confirme el pago. Si no has recibido tu cuenta PRO dentro de %1 horas, por favor env\u00edanos un correo a [A]support@mega.nz[\/A].",
+    "19515": "Working together with your team on the MEGA platform is easy and secure; collaborate with text chat, file sharing and audio\/video calls, all using our advanced end-to-end encryption.",
     "19516": "Crear una cuenta Business",
     "19517": "Crear una cuenta Business",
     "19521": "Modificar los ajustes de la cuenta",
@@ -2787,5 +2791,8 @@
     "19523": "Informaci\u00f3n de la empresa",
     "19524": "No se ha podido editar la informaci\u00f3n del usuario, int\u00e9ntalo de nuevo",
     "19525": "La informaci\u00f3n del usuario ha sido actualizada",
-    "19527": "No se ha podido reenviar el enlace de invitaci\u00f3n, int\u00e9ntalo de nuevo"
+    "19527": "No se ha podido reenviar el enlace de invitaci\u00f3n, int\u00e9ntalo de nuevo",
+    "19528": "An error occurred while updating your account details, please try again later.",
+    "19529": "Or Try MEGA individual",
+    "19530": "Business"
 }

@@ -25,6 +25,7 @@
     "63": "Kopiuj",
     "64": "Prawa dost\u0119pu",
     "68": "Nowy folder",
+    "70": "Opr\u00f3\u017cnij kosz",
     "71": "Dodaj kontakt",
     "78": "Tak",
     "79": "Nie",
@@ -2767,6 +2768,8 @@
     "19340": "Nie masz uprawnie\u0144 do zapisu.",
     "19341": "Jeste\u015b obecnie zalogowany na inne konto w tej przegl\u0105darce. Je\u015bli nie jest to konto, kt\u00f3re chcesz uaktualni\u0107, wyloguj si\u0119 i zaloguj, u\u017cywaj\u0105c w\u0142a\u015bciwego konta.",
     "19342": "Wyst\u0105pi\u0142 b\u0142\u0105d podczas pobierania opcji p\u0142atno\u015bci dla rejestracji konta biznesowego. Spr\u00f3buj ponownie p\u00f3\u017aniej.",
+    "19441": "Dodaj do Cloud Drive",
+    "19471": "Usu\u0144 stare wersje",
     "19501": "Minimalna liczba u\u017cytkownik\u00f3w to 3",
     "19503": "Plan bazowy ([0] u\u017cytkownik\u00f3w)",
     "19504": "{0}x dodatkowych u\u017cytkownik\u00f3w",
@@ -2780,6 +2783,7 @@
     "19512": "Pomy\u015blnie zaktualizowa\u0142e\u015b swoje konto [B]%2[\/B] do %1.",
     "19513": "Dzi\u0119ki! Twoje konto [B]%2[\/B] zostanie uaktualnione, gdy tylko otrzymamy potwierdzenie p\u0142atno\u015bci od naszego dostawcy p\u0142atno\u015bci. Je\u015bli zap\u0142aci\u0142e\u015b kart\u0105 debetow\u0105 lub kredytow\u0105 i nie otrzyma\u0142e\u015b swojego konta MEGA PRO w ci\u0105gu kilku godzin, skontaktuj si\u0119 z nami pod adresem [A]support@mega.nz[\/A]. Je\u015bli zap\u0142aci\u0142e\u015b przelewem bankowym, odczekaj 4-5 dni na uregulowanie p\u0142atno\u015bci.",
     "19514": "Dzi\u0119ki! Twoje konto [B]%2[\/B] zostanie uaktualnione, gdy tylko otrzymamy potwierdzenie p\u0142atno\u015bci od naszego dostawcy p\u0142atno\u015bci w ci\u0105gu kilku minut. Je\u015bli nie otrzyma\u0142e\u015b swojego konta MEGA PRO w ci\u0105gu %1 hours, skontaktuj si\u0119 z nami pod adresem [A]support@mega.nz[\/A].",
+    "19515": "Working together with your team on the MEGA platform is easy and secure; collaborate with text chat, file sharing and audio\/video calls, all using our advanced end-to-end encryption.",
     "19516": "Utw\u00f3rz konto biznesowe",
     "19517": "Utw\u00f3rz konto biznesowe",
     "19521": "Zmodyfikuj ustawienia konta",
@@ -2787,5 +2791,8 @@
     "19523": "Informacje o firmie",
     "19524": "Operacja edycji u\u017cytkownika nie powiod\u0142a si\u0119, spr\u00f3buj ponownie p\u00f3\u017aniej",
     "19525": "U\u017cytkownik zosta\u0142 zaktualizowany",
-    "19527": "Ponowne wysy\u0142anie link\u00f3w do zaproszenia nie powiod\u0142o si\u0119 z powodu b\u0142\u0119du serwera. Spr\u00f3buj ponownie p\u00f3\u017aniej"
+    "19527": "Ponowne wysy\u0142anie link\u00f3w do zaproszenia nie powiod\u0142o si\u0119 z powodu b\u0142\u0119du serwera. Spr\u00f3buj ponownie p\u00f3\u017aniej",
+    "19528": "An error occurred while updating your account details, please try again later.",
+    "19529": "Or Try MEGA individual",
+    "19530": "Business"
 }

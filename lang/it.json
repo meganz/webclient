@@ -25,6 +25,7 @@
     "63": "Copia",
     "64": "Permessi",
     "68": "Nuova cartella",
+    "70": "Svuota il Cestino\r\n",
     "71": "Aggiungi contatto",
     "78": "S\u00ec",
     "79": "No",
@@ -1094,7 +1095,7 @@
     "7731": "Per favore, inserisci la tua password per verificare il tuo indirizzo email",
     "7732": "Confermare email",
     "7740": "Cestino vuoto",
-    "7741": "Svuota cestino",
+    "7741": "Svuota Cestino",
     "7743": "Cambiare Email",
     "7744": "Email attuale",
     "7745": "Nuova email",
@@ -2767,6 +2768,8 @@
     "19340": "Non hai i privilegi in questa condivisione.",
     "19341": "Sei correntemente loggato con un account diverso su questo web browser. Se questo non \u00e8 l'account che vuoi aggiornare, per favore esci e rientra utilizzando l'account corretto.",
     "19342": "Errore nell'ottenere opzioni di pagamento per la registrazione dell'account Business. Per favore, riprova pi\u00f9 tardi.",
+    "19441": "Aggiungi al Cloud Drive",
+    "19471": "Elimina le versioni precedenti",
     "19501": "Il numero minimo di utenti \u00e8 3",
     "19503": "Piano base ([0] utenti)",
     "19504": "{0}x utenti addizionali",
@@ -2780,6 +2783,7 @@
     "19512": "Hai aggiornato con successo il tuo account [B]%2[\/B] a %1.",
     "19513": "Grazie! Il tuo account [B]%2[\/B] sar\u00e0 aggiornato appena riceviamo conferma del tuo pagamento dal nostro provider di pagamento. Se hai pagato con carta di debito o carta di credito e non hai ricevuto il tuo account MEGA PRO nel giro di qualche ora, per favore contattaci a [A]support@mega.nz[\/A]. Se hai pagato con un trasferimento bancario per favore permetti 4-5 giorni di tempo al pagamento per essere eseguito.",
     "19514": "Grazie! Il tuo account [B]%2[\/B] sar\u00e0 aggiornato appena riceviamo conferma dell'avvenuto pagamento dal nostro provider di pagamento. Se non ricevi il tuo account MEGA PRO nel giro di %1 ore, per favore contattaci a [A]support@mega.nz[\/A].",
+    "19515": "Working together with your team on the MEGA platform is easy and secure; collaborate with text chat, file sharing and audio\/video calls, all using our advanced end-to-end encryption.",
     "19516": "Crea account business",
     "19517": "Crea account Business",
     "19521": "Modifica impostazioni dell'account",
@@ -2787,5 +2791,8 @@
     "19523": "Informazioni della compagnia",
     "19524": "L'operazione di modifica dell'utente \u00e8 fallita, per favore riprova pi\u00f9 tardi",
     "19525": "L'utente \u00e8 stato aggiornato",
-    "19527": "La nuova spedizione del link di invito \u00e8 fallita a causa di un errore del server, pertanto favore riprova pi\u00f9 tardi"
+    "19527": "La nuova spedizione del link di invito \u00e8 fallita a causa di un errore del server, pertanto favore riprova pi\u00f9 tardi",
+    "19528": "An error occurred while updating your account details, please try again later.",
+    "19529": "Or Try MEGA individual",
+    "19530": "Business"
 }

@@ -138,7 +138,12 @@ var tooltiplogin = {
             topPopupAlign('.top-head .user-name', '.dropdown.top-login-popup', 40);
         }
         else {
-            topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
+            if ($('body').hasClass('business')) {
+                topPopupAlign('.top-buttons.business .top-login-button', '.dropdown.top-login-popup', 40);
+            }
+            else {
+                topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
+            }
         }
         if (is_chrome_firefox) {
             mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header');

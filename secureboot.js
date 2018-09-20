@@ -1980,6 +1980,7 @@ else if (!b_u) {
     jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
     jsl.push({f:'html/business.html', n: 'business',j:0});
+    jsl.push({f:'html/js/business.js', n: 'business_pp_js', j:1});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});

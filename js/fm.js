@@ -3010,7 +3010,7 @@ function fm_resize_handler(force) {
         }
     }
 
-    if (M.currentdirid === 'user-management') {
+    if (M.currentdirid && M.currentdirid.indexOf('user-management') > -1) {
         var $businessAccountContainer = $('.files-grid-view.user-management-view');
         var $subAccountContainer = $('.user-management-subaccount-view-container', $businessAccountContainer);
         // sub-user info pgae

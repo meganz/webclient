@@ -1294,6 +1294,8 @@ function init_page() {
     else if (page === 'business') {
         parsepage(pages['business']);
         $('body').addClass('business');
+        var businessP = new BusinessProductPage();
+        businessP.init();
 
     }
     else if (page === 'ios') {

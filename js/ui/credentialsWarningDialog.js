@@ -54,14 +54,14 @@
             ]
         };
 
-        mega.ui.Dialog.prototype.constructor.apply(self, [
-            $.extend({}, defaultOptions, opts)
-        ]);
+        mega.ui.Dialog.call(this, Object.assign({}, defaultOptions, opts));
 
         self.bind("onBeforeShow", function() {
             $('.fm-dialog-overlay').addClass('hidden');
         });
     };
+
+    CredentialsWarningDialog.prototype = Object.create(mega.ui.Dialog.prototype);
 
     CredentialsWarningDialog.prototype._initGenericEvents = function() {
         var self = this;
@@ -217,8 +217,6 @@
         $dialog.find('.previousCredentials .fingerprint').html(previousFingerprintHtml);
         $dialog.find('.newCredentials .fingerprint').html(newFingerprintHtml);
     };
-
-    CredentialsWarningDialog.prototype = $.extend({}, mega.ui.Dialog.prototype, CredentialsWarningDialog.prototype);
 
     /**
      * Render next warning in the waiting list.

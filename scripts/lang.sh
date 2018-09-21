@@ -75,7 +75,7 @@ git push -u origin translations
 git checkout $currentBranch
 
 # Merge translations branch into the current branch
-git merge translations -m "Merge branch 'translations' into $currentBranch"
+git pull origin translations
 
 # Check result of merge to see if it merged cleanly without conflicts
 mergeResult=$(git ls-files -u)

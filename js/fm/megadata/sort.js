@@ -197,30 +197,28 @@ MegaData.prototype.getSortByRtsFn = function() {
 };
 
 MegaData.prototype.sortByFav = function(d) {
-    "use strict";
-
-    this.sortfn = this.sortByFavFn(d);
+    this.sortfn = this.getSortByFavFn();
     this.sortd = d;
     this.sort();
 };
 
-MegaData.prototype.sortByFavFn = function(d) {
-    "use strict";
+MegaData.prototype.getSortByFavFn = function() {
 
-    return function(a, b) {
-        if ((a.t & M.IS_FAV || a.fav) && (b.t & M.IS_FAV || b.fav)) {
-            return M.doFallbackSortWithName(a, b, d);
-        }
-        if (a.t & M.IS_FAV || a.fav) {
+    var sortfn;
+
+    sortfn = function(a, b, d) {
+        if (a.fav) {
             return -1 * d;
         }
-        else if (b.t & M.IS_FAV || b.fav) {
+
+        if (b.fav) {
             return d;
         }
-        else {
-            return M.doFallbackSortWithName(a, b, d);
-        }
+
+        return M.doFallbackSortWithName(a, b, d);
     };
+
+    return sortfn;
 };
 
 MegaData.prototype.sortBySize = function(d) {
@@ -465,11 +463,6 @@ MegaData.prototype.doSort = function(n, d) {
     else if (d) {
         console.warn("Cannot sort by " + n);
     }
-
-    // Store current sort setting
-    var type = M.currentLabelType;
-    $.sortTreePanel[type].by = n;
-    $.sortTreePanel[type].dir = d;
 };
 
 MegaData.prototype.setLastColumn = function(col) {
@@ -504,77 +497,18 @@ MegaData.prototype.setLastColumn = function(col) {
 MegaData.prototype.sortByLabel = function(d) {
     "use strict";
 
-    var fn = this.sortfn = this.sortByLabelFn(d);
+    this.sortfn = this.getSortByLabelFn();
     this.sortd = d;
-
-    if (!d) {
-        d = 1;
-    }
-
-    // label sort is not doing folder sorting first. therefore using view sort directly to avoid.
-    this.v.sort(function(a, b) {
-        return fn(a, b, d);
-    });
+    this.sort();
 };
 
-MegaData.prototype.sortByLabelFn = function(d, isTree) {
+MegaData.prototype.getSortByLabelFn = function() {
     "use strict";
+    var sortfn;
 
-    // sorting with labels
-    return function(a, b) {
-        if (a.lbl && b.lbl) {
-            if (a.lbl !== b.lbl) {
-                return (a.lbl < b.lbl ? -1 : 1) * d;
-            }
-            else {
-                // after sorting with labels, if this is not tree sorting, sort again with folder
-                if (!isTree) {
-                    return M.doFallbackSortWithFolder(a, b);
-                }
-                else {
-                    // if this is tree, skip folder sorting and sort by name;
-                    return M.doFallbackSortWithName(a, b, 1);
-                }
-            }
-        }
-        else if (a.lbl) {
-            if (d < 0){
-                return a.lbl * d;
-            }
-            else {
-                return -a.lbl * d;
-            }
-        }
-        else if (b.lbl) {
-            if (d < 0){
-                return -b.lbl * d;
-            }
-            else {
-                return b.lbl * d;
-            }
-        }
-        else {
-            // if this items are not set with labels, if this is not tree sorting, sorting it with folder.
-            if (!isTree) {
-                return M.doFallbackSortWithFolder(a, b);
-            }
-            else {
-                // if this is tree, skip folder sorting and sort by name;
-                return M.doFallbackSortWithName(a, b, 1);
-            }
-        }
+    sortfn = function(a, b, d) {
+        return (a.lbl < b.lbl ? -1 : 1) * d;
     };
-};
 
-MegaData.prototype.doFallbackSortWithFolder = function(a, b) {
-    "use strict";
-
-    if (a.t > b.t) {
-        return -1;
-    }
-    else if (a.t < b.t) {
-        return 1;
-    }
-    // even direction is desc, sort name by asc.
-    return M.doFallbackSortWithName(a, b, 1);
+    return sortfn;
 };

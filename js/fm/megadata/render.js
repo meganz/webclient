@@ -47,6 +47,7 @@ MegaData.prototype.renderMain = function(aUpdate) {
 
     // No need to bind mouse events etc (gridUI/iconUI/selecddUI)
     // if there weren't new rendered nodes (Ie, they were cached)
+
     if (numRenderedNodes) {
         if (!aUpdate) {
             M.addContactUI();
@@ -267,18 +268,7 @@ MegaData.prototype.renderTree = function() {
 
 
 MegaData.prototype.pathLength = function() {
-    "use strict";
-
-    var filterLength = 0;
-    var length = 0;
-    var $filter = $('.fm-right-header .filter-block.body:visible');
-
-    if ($filter.length > 0) {
-        filterLength = $filter.outerWidth() + 20;
-    }
-
-    length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
-        + filterLength
+    var length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
         + $('.fm-right-header .fm-header-buttons:visible').outerWidth();
     return length;
 };
@@ -589,8 +579,7 @@ MegaData.prototype.searchPath = function() {
 MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
     'use strict';
 
-    $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search')
-        .add('.fm-empty-cloud,.fm-invalid-folder,.fm-empty-filter').addClass('hidden');
+    $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud,.fm-invalid-folder').addClass('hidden');
     $('.fm-empty-folder,.fm-empty-incoming,.fm-empty-folder-link').addClass('hidden');
     $('.fm-empty-pad.fm-empty-sharef').remove();
 };

@@ -433,7 +433,6 @@ MegaData.prototype.contacts = function() {
         });
 
     var sortBy = $.sortTreePanel['contacts'].by;
-    var sortDirection = $.sortTreePanel['contacts'].dir;
     var sortFn;
 
     if (sortBy === 'last-interaction') {
@@ -449,9 +448,10 @@ MegaData.prototype.contacts = function() {
         sortFn = this.getSortByDateTimeFn();
     }
     else if (sortBy === 'fav') {
-        sortFn = this.sortByFavFn(sortDirection);
+        sortFn = this.getSortByFavFn();
     }
 
+    var sortDirection = $.sortTreePanel['contacts'].dir;
     activeContacts.sort(
         function(a, b) {
             return sortFn(a, b, sortDirection);

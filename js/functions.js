@@ -2675,3 +2675,39 @@ function classifyPassword(password) {
     $('.password-status-warning').css('margin-left', ($('.password-status-warning').width() / 2 * -1) - 13);
 }
 /* jshint +W098 */
+
+/**
+ * A function to get the last day of the month
+ * @param {Date} dateObj        The Date for which to return the last day of the month
+ * @returns {Date}              the result date object with the last day of the month
+ */
+function getLastDayofTheMonth(dateObj) {
+    if (!dateObj) {
+        return null;
+    }
+
+    var day;
+    var month = dateObj.getMonth();
+    var year = dateObj.getFullYear();
+    if ([0, 2, 4, 6, 7, 9, 11].indexOf(month) >= 0) {
+        day = 31;
+    }
+    else if (month === 1) {
+        if (year % 4 !== 0) {
+            day = 28;
+        }
+        else if (year % 100 !== 0) {
+            day = 29;
+        }
+        else if (year % 400 !== 0) {
+            day = 28;
+        }
+        else {
+            day = 29;
+        }
+    }
+    else {
+        day = 30;
+    }
+    return new Date(year, month, day);
+}

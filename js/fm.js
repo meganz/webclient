@@ -3021,6 +3021,21 @@ function fm_resize_handler(force) {
         }
     }
 
+    if (M.currentdirid && M.currentdirid.indexOf('user-management') > -1) {
+        var $businessAccountContainer = $('.files-grid-view.user-management-view');
+        var $subAccountContainer = $('.user-management-subaccount-view-container', $businessAccountContainer);
+        // sub-user info pgae
+        if (!$subAccountContainer.hasClass('hidden')) {
+            $subAccountContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+        }
+        // overview page
+        else if (!$('.user-management-overview-container', $businessAccountContainer).hasClass('hidden')) {
+            $('.user-management-overview-container', $businessAccountContainer).jScrollPane(
+                { enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true }
+            );
+        }
+    }
+
     if (d) {
         console.timeEnd('fm_resize_handler');
     }

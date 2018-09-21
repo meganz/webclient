@@ -1014,6 +1014,10 @@ html.gbot {
     max-width: 1194px;
     padding: 0 40px;
 }
+.bottom-page.horizontal-centered-bl.mid-wide {
+    max-width: 1194px;
+    padding: 0 40px;
+}
 .bottom-page.green-block {
     background-color: #00BFA5;
 }

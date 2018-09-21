@@ -1549,3 +1549,14 @@ i.account-icon.email {
 i.account-icon.lock {
     background-position: -6px -1740px;
 }
+
+
+.tiny-icon.membership-status.bus {
+    background-image: url(../images/mega/big-icon.png);
+    background-position: -126px -418px;
+}
+
+.small-icon.membership.bus {
+    background-image: url(../images/mega/big-icon.png);
+    background-position: -149px -415px;
+}

@@ -994,8 +994,21 @@ scparser.$add('ua', {
 
             for (var j = 0; j < attrs.length; j++) {
                 var attributeName = attrs[j];
-
                 mega.attr.uaPacketParser(attributeName, actionPacketUserId, false, a.v && a.v[j]);
+            }
+
+            // in case of business master
+            // first, am i a master?
+            if (u_attr && u_attr.b && !u_attr.b.mu) {
+                // then, do i have this user as sub-user?
+                if (M.suba && M.suba[actionPacketUserId]) {
+                    M.require('businessAcc_js', 'businessAccUI_js').done(
+                        function () {
+                            var business = new BusinessAccount();
+                            business.updateSubUserInfo(actionPacketUserId, attrs);
+                        }
+                    );
+                }
             }
         }
     },
@@ -1022,6 +1035,20 @@ scparser.$add('ua', {
                 else if (attributeName === 'firstname' || attributeName === 'lastname') {
                     // handle firstname/lastname attributes
                     mega.attr.uaPacketParser(attributeName, actionPacketUserId, true, version);
+                }
+            }
+
+            // in case of business master
+            // first, am i a master?
+            if (u_attr && u_attr.b && !u_attr.b.mu) {
+                // then, do i have this user as sub-user?
+                if (M.suba && M.suba[actionPacketUserId]) {
+                    M.require('businessAcc_js', 'businessAccUI_js').done(
+                        function () {
+                            var business = new BusinessAccount();
+                            business.updateSubUserInfo(actionPacketUserId, attrs);
+                        }
+                    );
                 }
             }
         }
@@ -1267,6 +1294,9 @@ scparser.$add('_fm', function() {
     crypto_fixmissingkeys(missingkeys);
     loadfm_done();
 });
+
+// sub-user status change in business account
+scparser.$add('ssc', process_businessAccountSubUsers_SC);
 
 scparser.$notify = function(a) {
     // only show a notification if we did not trigger the action ourselves
@@ -1956,6 +1986,7 @@ function loadfm(force) {
                     u      : '&u',             // users - handle
                     ph     : '&h',             // exported links - handle
                     tree   : '&h',             // tree folders - handle
+                    suba   : '&s_ac',          // sub_accounts of master business account
                     opc    : '&p',             // outgoing pending contact - id
                     ipc    : '&p',             // incoming pending contact - id
                     ps     : '&h_p',           // pending share - handle/id
@@ -2094,6 +2125,7 @@ function dbfetchfm() {
                             opc: processOPC,
                             ipc: processIPC,
                             ps: processPS,
+                            suba: process_suba,
                             puf: mega.megadrop.pufProcessDb,
                             pup: mega.megadrop.pupProcessDb,
                             tree: function(r) {
@@ -2902,6 +2934,101 @@ function process_u(u, ignoreDB) {
      }*/
 }
 
+/**
+ * a function to parse the JSON object received holding information about sub-accounts of a business account.
+ * This object will exist only in business accounts.
+ * @param {string[]} suba    the object to parse, it must contain an array of sub-accounts ids (can be empty)
+ * @param {boolean} ignoreDB if we want to skip DB updating
+ */
+function process_suba(suba, ignoreDB) {
+    "use strict";
+    M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+
+        // the response is an array of users's handles (Masters). this means at least it will contain
+        // the current user handle.
+        // later-on we need to iterate on all of them. For now we dont know how to treat sub-masters yet
+        // --> we will target only current users's subs
+        var bAccount = new BusinessAccount();
+        //if (!suba || !suba[u_handle]) {
+        //    return;
+        //}
+        //suba = suba[u_handle];
+        if (suba.length) {
+            for (var k = 0; k < suba.length; k++) {
+                bAccount.parseSUBA(suba[k], ignoreDB);
+            }
+        }
+        //else {
+        //    bAccount.parseSUBA(null, true); // dummy call to flag that this is a master B-account
+        //}
+    });
+}
+
+/**
+ * A function to precess the action packets received related to business account sub-users
+ * @param {object} packet
+ */
+function process_businessAccountSubUsers_SC(packet) {
+    if (!packet) { // no packet
+        return;
+    }
+    if (!M.suba) { // no sub-users in memory
+        return;
+    }
+    if (!packet.a) { // no packet type/operation
+        return;
+    }
+    if (!packet.u) { // no user handle
+        return;
+    }
+
+    var subUser = M.suba[packet.u];
+    if (!subUser) { // sub-user not found --> it's new one
+        subUser = Object.create(null);
+        subUser.u = packet.u;
+    }
+
+    var valChanged = false;
+
+    if ('s' in packet && packet.s !== subUser.s) { // new status
+        subUser.s = packet.s;
+        valChanged = true;
+    }
+    if (packet.e && packet.e !== subUser.e) { // new email
+        subUser.e = packet.e;
+        valChanged = true;
+    }
+    if (packet.firstname && packet.firstname !== subUser.firstname) { // new first-name
+        subUser.firstname = packet.firstname;
+        valChanged = true;
+    }
+    if (packet.lastname && packet.lastname !== subUser.lastname) { // new last-name
+        subUser.lastname = packet.lastname;
+        valChanged = true;
+    }
+    if (packet.position && packet.position !== subUser.position) { // new position
+        subUser.position = packet.position;
+        valChanged = true;
+    }
+    if (packet.idnum && packet.idnum !== subUser.idnum) { // new id number
+        subUser.idnum = packet.idnum;
+        valChanged = true;
+    }
+    if (packet.phonenum && packet.phonenum !== subUser.phonenum) { // new phone number
+        subUser.phonenum = packet.phonenum;
+        valChanged = true;
+    }
+    if (packet.location && packet.location !== subUser.location) { // new location
+        subUser.location = packet.location;
+        valChanged = true;
+    }
+    if (valChanged) {
+        var bAccount = new BusinessAccount();
+        bAccount.parseSUBA(subUser, false, true);
+        // mBroadcaster.sendMessage('business:subuserUpdate', subUser);
+    }
+}
+
 function process_ok(ok, ignoreDB) {
     "use strict";
 
@@ -3065,6 +3192,11 @@ function loadfm_callback(res) {
     }
     if (res.opc) {
         processOPC(res.opc);
+    }
+    if (res.suba) {
+        if (!is_mobile) {
+            process_suba(res.suba);
+        }
     }
     if (res.ipc) {
         processIPC(res.ipc);

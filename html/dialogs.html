@@ -219,6 +219,31 @@
     </div>
 </div>
 
+<div class="fm-dialog sub-account-link-password hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">[$18771]</div>
+        <div class="clear"></div>
+    </div>
+    <div class="fm-dialog-body">
+        <div class="wrapper">
+            <div class="instruction-message">
+                [$18772]
+            </div>
+            <div class="fm-dialog-new-folder-input">
+                <div class="fm-dialog-link-pwd-pad decryption-key">
+                    <span class="icon"></span>
+                    <input name="dialog-link-pwd" type="text" placeholder="[$18773]" value="" />
+                    <span class="dialog-link-pwd-empty hidden">[$18774]</span>
+                </div>
+            </div>
+        </div>
+        <div class="default-dialog-bottom">
+            <div class="fm-dialog-link-pwd-button default-white-button right"><span>[$1027]</span></div>
+        </div>
+    </div>
+</div>
+
+
 <div class="fm-dialog password-dialog hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$9070]</div>
@@ -604,7 +629,7 @@
         <div class="wrapper embed-video">
             <div class="video-thumbnail-container">
                 <!-- Render video thumnail here. Display using 16:9 ratio, if you can't display normally and the video should centre itself -->
-                <div class="video-thumbnail"><img/></div>
+                <div class="video-thumbnail"><img /></div>
                 <div class="file-information-container">
                     <div class="video-filename">
                         <span>bunny.mp4</span>
@@ -631,13 +656,13 @@
                     <div class="start-video-at">
                         <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
                         <div class="checkdiv checkboxOff">
-                            <input type="checkbox" id="embed-start-at" class="checkboxOff"/>
+                            <input type="checkbox" id="embed-start-at" class="checkboxOff" />
                         </div>
                         <label for="embed-start-at" class="radio-txt">[$17822]</label>
                         <!-- Add enabled class to embed-setting to this div to remove the disabled styling -->
                         <div class="embed-setting disabled">
                             <div class="start-at-time">
-                                <input type="number" value="0" min="0" readonly/>
+                                <input type="number" value="0" min="0" readonly />
                             </div>
                             <span class="video-resolution-by">[$7136]</span>
                         </div>
@@ -647,13 +672,13 @@
                     <div class="change-video-resolution">
                         <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
                         <div class="checkdiv checkboxOff">
-                            <input type="checkbox" id="embed-video-res" class="checkboxOff"/>
+                            <input type="checkbox" id="embed-video-res" class="checkboxOff" />
                         </div>
                         <label for="embed-video-res" class="radio-txt">[$17823]</label>
                         <!-- Add enabled class to embed-setting to this div to remove the disabled styling -->
                         <div class="embed-setting disabled">
                             <div class="video-resolution width-video">
-                                <input type="number" value="640" min="128" readonly/>
+                                <input type="number" value="640" min="128" readonly />
                             </div>
                             <span class="video-resolution-by">x</span>
                             <div class="video-resolution height-video">
@@ -1408,25 +1433,25 @@
     <div class="feedback-dialog-body">
         <div class="feedback-dialog-header">[$7238]</div>
         <div class="fm-mega-dialog-pad">
-                <div class="rating">
-                    <a class="unhappy"></a>
-                    <a class="sad"></a>
-                    <a class="neutral"></a>
-                    <a class="happy"></a>
-                    <a class="awesome"></a>
-                    <div class="clear"></div>
+            <div class="rating">
+                <a class="unhappy"></a>
+                <a class="sad"></a>
+                <a class="neutral"></a>
+                <a class="happy"></a>
+                <a class="awesome"></a>
+                <div class="clear"></div>
+            </div>
+            <div class="feedback-dialog-textarea">
+                <div class="feedback-dialog-scr textarea-scroll">
+                    <textarea name="feedback" placeholder="[$17700]"></textarea>
+                    <div class="feedback-dialog-hidden"></div>
                 </div>
-                <div class="feedback-dialog-textarea">
-                    <div class="feedback-dialog-scr textarea-scroll">
-                        <textarea name="feedback" placeholder="[$17700]"></textarea>
-                        <div class="feedback-dialog-hidden"></div>
+            </div>
+            <div class="reply">
+                <div class="feedback-label-txt">
+                    <div class="checkdiv checkboxOff">
+                        <input type="checkbox" name="contact_me" id="contact_me" />
                     </div>
-                </div>
-                <div class="reply">
-                    <div class="feedback-label-txt">
-                        <div class="checkdiv checkboxOff">
-                            <input type="checkbox" name="contact_me" id="contact_me" />
-                        </div>
 
                         <label for="contact_me" class="radio-txt">[$6856]</label>
                     </div>
@@ -1441,18 +1466,18 @@
                             <input type="checkbox" name="send_stats" id="send_stats" />
                         </div>
 
-                        <label for="send_stats" class="radio-txt">
-                            [$6945]
-                        </label>
-                        <span class="membership-question stats-button">
-                            <span class="membership-notification">
-                                <span>[$17701]</span>
-                                <span class="membership-arrow"></span>
-                            </span>
+                    <label for="send_stats" class="radio-txt">
+                        [$6945]
+                    </label>
+                    <span class="membership-question stats-button">
+                        <span class="membership-notification">
+                            <span>[$17701]</span>
+                            <span class="membership-arrow"></span>
                         </span>
-                    </div>
-                    <div class="clear"></div>
+                    </span>
                 </div>
+                <div class="clear"></div>
+            </div>
         </div>
     </div>
     <div class="feedback-result-pad hidden">
@@ -4335,64 +4360,64 @@
 
     <div class="fm-dialog-body megadrop">
         <div class="wrapper embed-link hidden">
-                <div class="fm-body-text">
-                    <div class="widget-folder-icon"></div>
-                    <span>[$18218]</span>
+            <div class="fm-body-text">
+                <div class="widget-folder-icon"></div>
+                <span>[$18218]</span>
+            </div>
+            <div class="fm-dialog-block">
+                <div class="widget-code">
+                    <div class="tab-icon embed"></div>
+                    <span class="widget-code-wrapper">
+                    </span>
                 </div>
-                <div class="fm-dialog-block">
-                    <div class="widget-code">
-                         <div class="tab-icon embed"></div>
-                        <span class="widget-code-wrapper">
-                        </span>
-                    </div>
+            </div>
+            <div class="fm-dialog-block">
+                <div class="fm-block-subheading">
+                    Embed button options
                 </div>
-                <div class="fm-dialog-block">
-                    <div class="fm-block-subheading">
-                        Embed button options
-                    </div>
-                    <div class="embed-button-container">
-                        <!-- Apply `active` class to the embed block right/left buttons to show which one is selected. -->
-                        <div class="embed-block left-button active">
-                            <div class="embed-button-centre">
-                                <div class="embed-button-select">
-                                    <!-- Radio button logic still needs to be correctly applied. I have only included the markup -->
-                                    <div class="uiembed-button radioOn" id="rad22_div"><input type="radio" class="uiembed-button radioOn" value="1"></div>
-                                    <div class="embed-button-subheading">
-                                        [$18217]
-                                    </div>
-                                </div>
-                                <div class="embed-button light-theme centre-button">
-                                    <div class="embed-content-wrapper">
-                                        <div class="embed-mega-icon">
-                                        </div>
-                                        <div class="embed-action-text">
-                                            [$18215]
-                                        </div>
-                                    </div>
+                <div class="embed-button-container">
+                    <!-- Apply `active` class to the embed block right/left buttons to show which one is selected. -->
+                    <div class="embed-block left-button active">
+                        <div class="embed-button-centre">
+                            <div class="embed-button-select">
+                                <!-- Radio button logic still needs to be correctly applied. I have only included the markup -->
+                                <div class="uiembed-button radioOn" id="rad22_div"><input type="radio" class="uiembed-button radioOn" value="1"></div>
+                                <div class="embed-button-subheading">
+                                    [$18217]
                                 </div>
                             </div>
-                        </div>
-                        <div class="embed-block right-button">
-                            <div class="embed-button-centre">
-                                <div class="embed-button-select">
-                                    <div class="uiembed-button radioOff" id="rad23_div"><input type="radio" class="uiembed-button radioOff" value="1"></div>
-                                    <div class="embed-button-subheading">
-                                        [$18216]
+                            <div class="embed-button light-theme centre-button">
+                                <div class="embed-content-wrapper">
+                                    <div class="embed-mega-icon">
                                     </div>
-                                </div>
-                                <div class="embed-button dark-theme centre-button">
-                                    <div class="embed-content-wrapper">
-                                        <div class="embed-mega-icon">
-                                        </div>
-                                        <div class="embed-action-text">
-                                            [$18215]
-                                        </div>
+                                    <div class="embed-action-text">
+                                        [$18215]
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="embed-block right-button">
+                        <div class="embed-button-centre">
+                            <div class="embed-button-select">
+                                <div class="uiembed-button radioOff" id="rad23_div"><input type="radio" class="uiembed-button radioOff" value="1"></div>
+                                <div class="embed-button-subheading">
+                                    [$18216]
+                                </div>
+                            </div>
+                            <div class="embed-button dark-theme centre-button">
+                                <div class="embed-content-wrapper">
+                                    <div class="embed-mega-icon">
+                                    </div>
+                                    <div class="embed-action-text">
+                                        [$18215]
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
         </div>
         <div class="wrapper url-link">
             <div class="fm-body-text">
@@ -4408,8 +4433,8 @@
     </div>
     <div class="fm-notifications-bottom">
         <div class="button default-white-button left preview-widget">
-                    <span>[$17409]</span>
-                </div>
+            <span>[$17409]</span>
+        </div>
         <div class="button default-grey-button right copy-widget-code url">
             <span>[$17835]</span>
         </div>
@@ -4493,26 +4518,25 @@
     <div class="fm-dialog-body improved-recovery-steps">
         <div class="checkbox-block park-account-checkbox">
             <h3 class="main-italic-header">[$18307]</h3>
-              <div class="checkbox-container">
+            <div class="checkbox-container">
                 <div class="settings-row">
-                  <div class="">
-                      <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
-                      <!-- Toggle between checkboxOff and checkboxOn -->
-                      <div class="checkdiv checkboxOff">
+                    <div class="">
+                        <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
                         <!-- Toggle between checkboxOff and checkboxOn -->
-                          <input type="checkbox" id="" class="checkboxOff"/>
-                      </div>
-                      <label for="" class="radio-txt" id="warn1-check">Yes, I understand parking my account will <strong class="warning-text">remove all my files, contacts, messages from my account.</strong></label>
-                  </div>
+                        <div class="checkdiv checkboxOff">
+                            <!-- Toggle between checkboxOff and checkboxOn -->
+                            <input type="checkbox" id="" class="checkboxOff" />
+                        </div>
+                        <label for="" class="radio-txt" id="warn1-check">Yes, I understand parking my account will <strong class="warning-text">remove all my files, contacts, messages from my account.</strong></label>
+                    </div>
                 </div>
                 <div class="settings-row">
                     <div class="">
                         <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
-
                         <!-- Toggle between checkboxOff and checkboxOn -->
                         <div class="checkdiv checkboxOff">
                             <!-- Toggle between checkboxOff and checkboxOn -->
-                            <input type="checkbox" id="" class="checkboxOff"/>
+                            <input type="checkbox" id="" class="checkboxOff" />
                         </div>
                         <label for="" class="radio-txt" id="warn2-check">Yes, I understand there is no way to undo a parked account,<strong class="warning-text"> all my files will be gone forever.</strong></label>
 
@@ -4524,14 +4548,14 @@
                         <!-- Toggle between checkboxOff and checkboxOn -->
                         <div class="checkdiv checkboxOff">
                             <!-- Toggle between checkboxOff and checkboxOn -->
-                            <input type="checkbox" id="" class="checkboxOff"/>
+                            <input type="checkbox" id="" class="checkboxOff" />
                         </div>
                         <label for="" class="radio-txt">[$18308]</label>
                     </div>
                 </div>
-          </div>
-       </div>
-          <div class="login-register-input email">
+            </div>
+        </div>
+        <div class="login-register-input email">
 
                 <input type="text" name="recover-input1-di" id="recover-input1-di" value="" placeholder="[$195]" maxlength="190">
             </div>
@@ -4788,6 +4812,164 @@
             <div class="default-56px-button red-button submit-button">
                 <span class="label">[$1694]</span>
             </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- user management dialog !-->
+<div class="user-management-add-user-dialog user-management-dialog fm-dialog hidden"> 
+    <div class="dialog-title">[$19104]</div>
+    <div class="dialog-subtitle">[$19117]</div>
+    <div class="delete-img icon"></div>
+        <div class="dialog-input-container hidden">
+            <div class="input-user">
+                <div class="indi-input">
+                    <div class="dialog-input-title-ontop">
+                        [$86]*
+                        <span class="title last-name">[$1097]*</span>
+                        <br>
+                        <input class="dialog-input placeholder sub-n" type="text" placeholder="[$7436]" autofocus>
+                        <input class="dialog-input placeholder sub-n-l" type="text" placeholder="[$1097]">
+
+                        <div class="error-message er-sub-n">Sorry,.....</div>
+                    </div>
+                    <div class="dialog-input-title-ontop">
+                        [$7434]*<br>
+                        <input class="dialog-input placeholder sub-m" type="text" placeholder="[$9002]">
+                        <div class="error-message er-sub-m">Sorry,.....</div>
+                    </div>
+
+                    <div class="border"></div>
+                    <div class="dialog-input-title-ontop">
+                        [$19150]<br>
+                        <input class="dialog-input placeholder sub-p" type="text" placeholder="[$19150]">
+                        <div class="error-message er-sub-p">Sorry,.....</div>
+                    </div>
+                    <div class="dialog-input-title-ontop">
+                        [$19151]<br>
+                        <input class="dialog-input placeholder sub-id-nb" type="text" placeholder="000">
+                        <div class="error-message er-sub-id-nb">Sorry,.....</div>
+                    </div>
+                    <div class="dialog-input-title-ontop">
+                        [$19152]<br>
+                        <input class="dialog-input placeholder sub-ph" type="text" placeholder="(123) 000 000">
+                        <div class="error-message er-sub-ph">Sorry,.....</div>
+                    </div>
+                    <div class="dialog-input-title-ontop">
+                        [$17818]<br>
+                        <input class="dialog-input placeholder sub-lo" type="text" placeholder="[$17818]">
+                        <div class="error-message er-sub-lo">Sorry,.....</div>
+                    </div>                  
+                </div>               
+            </div>
+                     
+        </div>
+
+        <div class="verification-container">
+                <div class="new-sub-user">
+                    <div class="subuser-image">
+                        <img src="" class="hidden">
+                    </div>
+                </div>
+                <div class="verification-user-info">
+                    <div class="verification-user-email"><b>[$7434]:</b><div class="sub-e">major@126.com</div></div>
+                    <div class="verification-user-pw"><b>[$18771]:</b><div class="sub-p">major@126.com</div></div>
+                </div>
+                <div class="checked-icon56 icon56"></div>                                   
+        </div><!--END folder container-->
+    <div class="dialog-button-container">
+        <div class="default-white-button-user-management add-more">
+            <div class="add-more-img icon"></div>
+            [$19103]
+        </div>               
+        <div class="default-white-button-user-management hidden">
+            <div class="import-contact-img icon"></div>
+            [$16268]
+        </div>  
+        <div class="default-green-button-user-management add-sub-user">[$19084]</div> 
+    </div>
+<!--     <div class="licence-bar hidden">
+        <div class="notification-img icon"></div>
+        5 (WAIT 4 API) sub account license used.
+    </div> -->
+</div><!--END add user dialog-->
+
+
+
+
+<div class="user-management-edit-profile-dialog user-management-dialog fm-dialog hidden">
+    <div class="user-management-subuser-avatars">
+        <div class="user-management-subuser-image"></div>
+    </div>
+    <div class="dialog-title">[$16735]</div>
+    <div class="delete-img icon"></div>
+    <div class="dialog-input-container">
+        <div class="dialog-input-title-ontop">
+            [$86]
+            <span class="title last-name">Last Name*</span>
+            <br>
+            <input class="dialog-input correctinput edit-sub-name" type="text" placeholder="[$7436]" autofocus>
+            <input class="dialog-input correctinput edit-sub-lname" type="text" placeholder="[$7436]">           
+        </div>
+
+        <div class="dialog-input-title-ontop">
+            [$7434]<br>
+            <input class="dialog-input correctinput edit-sub-email" type="text" placeholder="[$9002]">
+        </div>
+        <!--<div class="dialog-input-title-ontop">
+            Role<br>
+            <div class="dialog-input correct-input">
+                <div class="list-arrow"></div>
+                <select size="1">
+                    <option value=" ">Sub-administrator</option>
+                    <option value=" ">Product manager</option>
+                    <option value=" ">Developer</option>
+                    <option value=" ">Designer</option>
+                </select>
+            </div>
+        </div>-->
+        <div class="border"></div>
+        <div class="dialog-input-title-ontop">
+            [$19150]<br>
+            <input class="dialog-input placeholder edit-sub-position" type="text" placeholder="[$19150]">
+        </div>
+        <div class="dialog-input-title-ontop">
+            [$19151]<br>
+            <input class="dialog-input placeholder edit-sub-id-nb" type="text" placeholder="000">
+        </div>
+        <div class="dialog-input-title-ontop">
+            [$19152]<br>
+            <input class="dialog-input placeholder edit-sub-phone" type="text" placeholder="(123) 000 000">
+        </div>
+        <div class="dialog-input-title-ontop">
+            [$17818]<br>
+            <input class="dialog-input placeholder edit-sub-location" type="text" placeholder="[$17818]">
+        </div>
+    </div>
+    <div class="dialog-button-container">
+        <div class="default-green-button-user-management btn-edit-save">
+            [$776]
+        </div>
+        <div class="default-white-button-user-management btn-edit-close">
+            [$82]
+        </div>
+    </div>
+</div>
+
+<div class="user-management-able-user-dialog user-management-dialog fm-dialog hidden">
+    <div class="disable-large-icon icon56"></div>
+    <div class="dialog-text-container">
+        <div class="dialog-text-one">Are you sure you want to disable the account of <b>Jay Pierce</b>? </div>
+        <span class="dialog-text-two">Note: You can re-enable the account at any later stage from the disabled accounts list.</span>
+    </div>
+    <div class="dialog-button-container">
+        <div class="default-red-button-user-management dlg-btn yes-answer">
+            [$78]
+        </div>
+        <div class="default-white-button-user-management dlg-btn no-answer">
+            [$82]
         </div>
     </div>
 </div>

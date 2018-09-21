@@ -15,6 +15,12 @@ var bottompage = {
         else {
             $('body').removeClass('old');
         }
+
+        // Init Slider for business page
+        if (page === 'business') {
+            bottompage.initSlider();
+        }
+
         if (!is_mobile) {
             bottompage.initFloatingTop();
             $('body').removeClass('mobile');
@@ -116,6 +122,49 @@ var bottompage = {
 
         $('.nav-overlay').rebind('click', function() {
             hiddenNavDropdown();
+        });
+    },
+
+    initSlider: function() {
+        var $slider = $('.bottom-page.slider-body');
+        
+        $('.slider-button, .slider-dot-button', $slider).rebind('click', function() {
+            var $this = $(this);
+            var $buttons;
+            var activeSlide;
+            var newSlide;
+
+            if (!$this.hasClass('active')) {
+                $buttons = $('.slider-button, .slider-dot-button', $slider);
+                activeSlide = $('.slider-button.active', $slider).attr('data-num');
+                newSlide = $this.attr('data-num');
+
+                $buttons.removeClass('active');
+                $buttons.filter('.slide' + newSlide).addClass('active');
+                $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide); 
+            }
+        });
+
+        $('.slider-ctrl-button', $slider).rebind('click', function() {
+            var $this = $(this);
+            var $buttons = $('.slider-button, .slider-dot-button', $slider);
+            var activeSlide = parseInt($('.slider-button.active', $slider).attr('data-num'));
+            var slidesNum = $('.slider-button', $slider).length;
+            var newSlide;
+
+            if ($this.hasClass('prev') && activeSlide > 1) {
+                newSlide = activeSlide - 1;
+            }
+            else if ($this.hasClass('next') && activeSlide < slidesNum) {
+                newSlide = activeSlide + 1;
+            }
+            else {
+                return false;
+            }
+
+            $buttons.removeClass('active');
+            $buttons.filter('.slide' + newSlide).addClass('active');
+            $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide); 
         });
     },
 

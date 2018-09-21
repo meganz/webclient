@@ -321,7 +321,33 @@ function pageregister() {
             msgDialog('warninga', l[1117], l[1118]);
         }
         else {
-            if (u_type === false) {
+            if (localStorage.businessSubAc) {
+                var signupcode = '';
+                window.businessSubAc = JSON.parse(localStorage.businessSubAc);
+                signupcode = window.businessSubAc.signupcode;
+                var ctx = {
+                    checkloginresult: function (u_ctx, r) {
+                        if (typeof r[0] === 'number' && r[0] < 0) {
+                            msgDialog('warningb', l[135], l[200]);
+                        }
+                        else {
+                            loadingDialog.hide();
+                            u_type = r;
+                            loadSubPage('fm');
+                        }
+                    },
+                    businessUser: localStorage.businessSubAc
+                };
+                var passwordaes = new sjcl.cipher.aes(prepare_key_pw($('#register-password').val()));
+                var uh = stringhash($('#register-email').val().toLowerCase(), passwordaes);
+                u_checklogin(ctx,
+                    true,
+                    prepare_key_pw($('#register-password').val()),
+                    signupcode,
+                    $('#register-firstname').val() + ' ' + $('#register-lastname').val(), uh);
+                delete localStorage.businessSubAc;
+            }
+            else if (u_type === false) {
                 loadingDialog.show();
                 u_storage = init_storage(localStorage);
                 u_checklogin({
@@ -400,6 +426,38 @@ function init_register() {
         bottomPageDialog(false, 'terms');
         return false;
     });
+    
+
+    var $regInfoContainer = $('#register_form .main-mid-pad.big-pad.register1 .main-left-block');
+    $('.login-register-input.name', $regInfoContainer).removeClass('hidden');
+    $('.login-register-input.email', $regInfoContainer).removeClass('hidden');
+    $('h3.main-italic-header', $regInfoContainer).html(l[1095]);
+
+    var $tipsContainer = $('#register_form .main-mid-pad.big-pad.register1 .main-right-block');
+    $('.dont-forget-pass', $tipsContainer).removeClass('hidden'); //19130
+    $('p.account-sec', $tipsContainer).html(l[1093] + ' ' + l[1094]);
+    $('.account-business', $tipsContainer).addClass('hidden');
+
+    // business sub-account registration
+    if (localStorage.businessSubAc) {
+        var userInfo = JSON.parse(localStorage.businessSubAc);
+        // we know here that userInfo contain all needed attr, otherwise higher layers wont allow us
+        // to get here.
+        $('#register-email-registerpage').val(userInfo.e);
+        // $('#register-email').attr('readonly', true);
+        $('#register-lastname-registerpage').val(a32_to_str(base64_to_a32(userInfo.lastname)));
+        // $('#register-lastname').attr('readonly', true);
+        $('#register-firstname-registerpage').val(a32_to_str(base64_to_a32(userInfo.firstname)));
+        // $('#register-firstname').attr('readonly', true);
+        var headerText = l[19129].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+        $('h3.main-italic-header', $regInfoContainer).html(headerText);
+
+        $('.login-register-input.name', $regInfoContainer).addClass('hidden');
+        $('.login-register-input.email', $regInfoContainer).addClass('hidden');
+        $('.dont-forget-pass', $tipsContainer).addClass('hidden');
+        $('p.account-sec', $tipsContainer).text(l[19131]);
+        $('.account-business', $tipsContainer).removeClass('hidden');
+    }
 
     // Init inputs events
     accountinputs.init($formWrapper);

@@ -1966,6 +1966,7 @@ else if (!b_u) {
     // Common desktop and mobile, bottom pages
     jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
@@ -1978,6 +1979,8 @@ else if (!b_u) {
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
     jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
+    jsl.push({f:'html/business.html', n: 'business',j:0});
+    jsl.push({f:'html/js/business.js', n: 'business_pp_js', j:1});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
@@ -1985,6 +1988,9 @@ else if (!b_u) {
     jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
+    jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
+    jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'html/js/registerb.js', n: 'registerb_js', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
@@ -2350,7 +2356,11 @@ else if (!b_u) {
         'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
         'megadrop': {f:'html/megadrop.html', n: 'megadrop', j: 0 },
         'nomegadrop': {f:'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
-        'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j: 1 }
+        'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j: 1 },
+        'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
+        'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 },
+        'charts_js': {f:'js/vendor/Chart.min.js', n: 'charts_js', j:1 },
+        'jspdf_js': {f:'js/vendor/jspdf.min.js', n: 'jspdf_js', j:1 }
     };
 
     var jsl3 = {

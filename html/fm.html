@@ -269,6 +269,11 @@
                 <div class="dark-tooltip">[$5902]</div>
                 <div class="beta-text"></div>
             </div>
+            <div class="nw-fm-left-icon user-management">
+                <div class="nw-fm-left-border"></div>
+                <div class="dark-tooltip">[$18677]</div>
+                <div class="beta-text"></div>
+            </div>
             <!-- Please add "filled" classname if user have deleted items !-->
             <div class="nw-fm-left-icon rubbish-bin">
                 <div class="nw-fm-left-border"></div>
@@ -277,22 +282,22 @@
             <div class="nw-fm-left-icon account">
                 <div class="nw-fm-left-border"></div>
                 <div class="dark-tooltip">[$823]</div>
-                </div>
+            </div>
             <div class="nw-fm-left-icon transfers">
                 <div class="nw-fm-left-border file-transfer-icon"></div>
                 <div class="dark-tooltip">[$104]</div>
                 <div class="nw-fm-percentage download">
                     <ul>
-                      <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
-                      <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+                        <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
+                        <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
                     </ul>
                     <div class="transfer-bar-overlay"></div>
                 </div>
 
                 <div class="nw-fm-percentage upload">
                     <ul>
-                      <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
-                      <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+                        <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
+                        <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
                     </ul>
                     <div class="transfer-bar-overlay"><div></div></div>
                 </div>
@@ -322,9 +327,9 @@
             </div>
 
             <div class="dropdown body fm-start-chat-dropdown hidden">
-              <div class="dropdown-item startchat-item"><i class="small-icon conversations"></i>[$5885]</div>
-              <div class="dropdown-item startaudio-item"><i class="small-icon audio-call"></i>[$5896]</div>
-              <div class="dropdown-item startvideo-item"><i class="small-icon video-call"></i>[$5897]</div>
+                <div class="dropdown-item startchat-item"><i class="small-icon conversations"></i>[$5885]</div>
+                <div class="dropdown-item startaudio-item"><i class="small-icon audio-call"></i>[$5896]</div>
+                <div class="dropdown-item startvideo-item"><i class="small-icon video-call"></i>[$5897]</div>
             </div>
 
             <!-- Please add one of necessary classname: "folder-link"/"cloud-drive"/"shared-with-me"/"contacts"/"conversations"/"rubbish-bin" !-->
@@ -338,7 +343,7 @@
                     </div>
                     <div class="button default-white-button small-height bold-txt grey enable-native-transfers hidden">
                         <i class="small-icon icons-sprite mega"></i>
-                         App detected: <span class="red">Enable native transfers</span>
+                        App detected: <span class="red">Enable native transfers</span>
                     </div>
                 </div>
                 <div class="nw-fm-tree-header folder-link">
@@ -372,10 +377,24 @@
                     <input type="text" value="" placeholder="[$823]" />
                     <div class="nw-fm-search-icon"></div>
                 </div>
+                <div class="nw-fm-tree-header user-management">
+                    <input value="" placeholder="[$18677]" type="text">
+                    <div class="nw-fm-search-icon"></div>
+                </div>
             </div>
             <div class="nw-tree-panel-header">
                 <span>[$5916]</span>
                 <div class="nw-tree-panel-arrows"></div>
+            </div>
+            <div class="user-management-tree-panel-header enabled-accounts active hidden">
+                <div class="img enabled-accounts"></div>
+                <span>[$19085]</span>
+                <div class="user-management-tree-panel-arrows"></div>
+            </div>
+            <div class="user-management-tree-panel-header disabled-accounts hidden">
+                <div class="img disabled-accounts"></div>
+                <span>[$19086]</span>
+                <div class="user-management-tree-panel-arrows"></div>
             </div>
             <div class="fm-tree-panel">
 
@@ -390,6 +409,20 @@
                 <div class="content-panel contacts">
                 </div>
                 <div class="content-panel rubbish-bin">
+                </div>
+                <div class="content-panel user-management">
+                    <div class="nw-user-management-item selected">
+                        <div class="user-management-status enabled"></div>
+                        <div class="nw-user-management-name">Jay Pierce</div>
+                    </div>
+                    <div class="nw-user-management-item">
+                        <div class="user-management-status pending"></div>
+                        <div class="nw-user-management-name">Ollie Gibson</div>
+                    </div>
+                    <div class="nw-user-management-item">
+                        <div class="user-management-status enabled"></div>
+                        <div class="nw-user-management-name">John Bailey</div>
+                    </div>
                 </div>
                 <div class="content-panel dashboard">
                     <div class="account user-data-block">
@@ -581,6 +614,68 @@
 
             </div>
 
+            <!-- Users Management Header -->
+            <div class="fm-right-header-user-management">
+                <div class="user-management-main-page-buttons hidden">
+                    <a class="fm-files-view-icon-user-management block-view hidden" title="Thumbnail view"></a>
+                    <a class="fm-files-view-icon-user-management listing-view active hidden" title="List view"></a>
+                    <div class="default-white-button-user-management ba-overview">
+                        <div class="overview-icon icon"></div>
+                        <!-- Overview -->
+                        [$983]
+                    </div>
+
+                    <div class="default-white-button-user-management ba-account">
+                        <div class="account-icon icon"></div>
+                        <!--Account-->
+                        [$403]
+                    </div>
+
+                    <div class="default-green-button-user-management add-sub-user">
+                        <div class="add-users-icon icon"></div>
+                        <!--Add Users-->
+                        [$19084]
+                    </div>
+                </div>
+
+                <div class="user-management-breadcrumb subaccount hidden">
+                    <div class="user-management-icon"></div>
+                    <div class="user-management-next-arrow"></div>
+                    <div class="user-management-subuser-avatars">
+                        <div class="user-management-subuser-image"></div>
+                    </div>
+                    <div class="user-management-subuser-name">Jay Pierce</div>
+                </div>
+
+                <div class="user-management-breadcrumb overview hidden">
+                    <div class="user-management-icon"></div>
+                    <div class="user-management-next-arrow"></div>
+                    <div class="user-management-breadcrumbs-img overview-icon"></div>
+                    <div class="user-management-subuser-name">[$983]</div>
+                </div>
+
+                <div class="user-management-breadcrumb account hidden">
+                    <div class="user-management-icon acc-home"></div>
+                    <div class="user-management-next-arrow"></div>
+                    <div class="user-management-breadcrumbs-img account-icon acc-acc"></div>
+                    <div class="user-management-subuser-name acc-acc">[$403]</div>
+                    <div class="user-management-next-arrow inv-det-arrow hidden"></div>
+                    <div class="user-management-subuser-name inv-det-id hidden">Inv No. (placeholder!!!!)</div>
+                </div>
+
+                <div class="user-management-overview-buttons hidden">
+                    <div class="default-white-button-user-management pdf-exp">
+                        <div class="export-pdf-icon icon"></div>
+                        Export to PDF
+                    </div>
+                    <div class="default-white-button-user-management hidden">
+                        <div class="view-plan-icon icon"></div>
+                        View Plans
+                    </div>
+                </div>
+            </div>
+            
+            <!-- End Users Management Header -->
 
             <div class="fm-empty-cloud hidden">
                 <div class="fm-empty-pad">
@@ -769,6 +864,750 @@
                     </table>
                 </div>
             </div>
+
+            <!-- USERS managment right block -->
+
+            <div class="files-grid-view user-management-view hidden">
+
+                <div class="user-management-landing-page user-management-view hidden">
+                    <div class="landing-page-container">
+                        <div class="mega-56px-icon"></div>
+                        <div class="landing-title">[$19137]</div>
+                        <div class="landing-sub-title">[$19138]</div>
+                        <div class="landing-sub-container adding-subuser">
+                            <div class="add-user-icon56 icon56"></div>
+                            <div class="landing-container-title">[$19084]</div>
+                            <div class="landing-container-subtitle">[$19139]</div>
+                            <div class="default-white-button-user-management">[$19084]</div>
+                        </div>
+                        <div class="landing-sub-container hidden">
+                            <div class="accounts-icon56 icon56"></div>
+                            <div class="landing-container-title">[$403]</div>
+                            <div class="landing-container-subtitle">[$19521]</div>
+                            <div class="default-white-button-user-management">[$19522]</div>
+                        </div>
+                        <!--<div class="licence-bar">
+                            <div class="notification-white-img icon"></div>
+                            <span>5 sub account licences used.</span>
+                             <div class="default-white-button-user-management">
+                                View Plan
+                            </div> 
+                        </div>-->
+                    </div>
+                </div>
+
+                <div class="user-management-list-table hidden">
+                    <table class="header-table-user-management">
+                        <tbody>
+                            <tr class="grid-table-header-user-management">
+                                <th class="business-sub-checkbox-th hidden">
+                                    <div class="checkdiv left checkboxOff-user-management small-user-management">
+                                    </div>
+                                </th>
+                                <th> <div class="arrow name desc">[$86]</div> </th>
+                                <th><div class="arrow desc"><span>[$89]</span></div></th>
+                                <th><div class="arrow asc">
+                                    <div class="table-sub-title">[$18760]</div>
+                                </div></th>
+                                <th><div class="arrow desc">
+                                    <div class="table-sub-title">[$19091]</div>
+                                </div></th>
+                                <th><div class="arrow desc">
+                                    <div class="table-sub-title">Last Active</div>
+                                </div></th>
+                                <th>
+                                    <div class="disabled-icon icon">
+                                        <div class="tooltip">[$19092]</div>
+                                    </div>
+                                    <div class="resend-email-icon icon">
+                                        <div class="tooltip">Re-send Verification Email</div>
+                                    </div>
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="grid-scrolling-table">
+                        <table class="grid-table-user-management">
+                            <tr>
+                                <td class="business-sub-checkbox-td hidden">
+                                    <div class="checkdiv left checkboxOff-user-management small-user-management">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fm-user-management-user">
+                                        <div class="admin-icon hidden">
+                                            <div class="tooltip">Sub – administrators</div>
+                                        </div>
+                                        <div class="user-management-name">Jay Pierce</div>
+                                    </div>
+                                    <div class="user-management-email">alvah_powlowski@yahoo.com</div>
+                                </td>
+                                <td>
+                                    <div class="user-management-status enabled"></div>
+                                    <span class="user-management-status-txt">Active</span>
+                                </td>
+                                <td class="business-sub-storage-use"><span>0.8 GB</span></td>
+                                <td class="business-sub-transfer-use"><span>13.2 GB</span></td>
+                                <td class="business-sub-last-active"><span>8-2-2018</span></td>
+                                <td>
+                                    <div class="view-icon icon">
+                                        <div class="tooltip">[$19093]</div>
+                                    </div>
+                                    <div class="edit-icon icon">
+                                        <div class="tooltip">[$16735]</div>
+                                    </div>
+                                    <div class="disabled-icon icon dis-en-icon">
+                                        <div class="tooltip">[$19092]</div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        </table>
+                        <!--<div class="ps-scrollbar-x-rail">
+                <div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+            </div>
+            <div class="ps-scrollbar-y-rail">
+                <div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 200px;"></div>
+            </div>-->
+                    </div>
+                    <div class="user-management-overview-bar hidden">
+                        <div class="user-management-overview-bar-data">
+                            <div class="info-block nb-sub-users">
+                                <div class="number-of-user-icon icon"></div>
+                                <span class="title">[$19087]:</span>
+                                <span class="number">11</span>
+                            </div>
+
+                            <div class="info-block storage-sub-users">
+                                <div class="total-storage-usage-icon icon"></div>
+                                <span class="title">[$19088]:</span>
+                                <span class="number">12.4</span>
+                                <span class="title2"> GB</span>
+                            </div>
+                            <div class="info-block bandwidth-sub-users">
+                                <div class="total-transfer-usage-icon icon"></div>
+                                <span class="title">[$19089]:</span>
+                                <span class="number">1.4</span>
+                                <span class="title2"> GB</span>
+                            </div>
+<!--                             <div class="default-white-button-user-management">
+                                <div class="view-plan-icon icon"></div>[$19090]
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="user-management-subaccount-view-container hidden">
+                    <div class="user-management-subuser-profile-container">
+                        <div class="subaccount-img-big"></div>
+                        <div class="user-management-subuser-profile">
+                            <div class="subuser-container">
+                                <div class="subuser-name">Jay Pierce</div>
+                                <div class="subuser-email">hermiston_alessandra@janie.net</div>
+
+                                <div class="view-status-row">
+                                    <div class="user-management-view-status pending"></div>
+                                    <span class="user-management-view-status text">Pending</span>
+                                </div>
+
+                                <div class="admin-icon role hidden">
+                                    <div class="admin-text">Sub-adminstrator</div>
+                                </div>                               
+                            </div>
+
+                            <div class="subuser-sec-profile-container">
+                                <div class="id-card-icon icon"></div>
+                                <ul>
+                                    <li>
+                                        <span>[$19151]:</span>
+                                        <span class="sub-info-idnum">3929299</span>
+                                    </li>
+                                    <li>
+                                        <span>[$19150]:</span>
+                                        <span class="sub-info-pos">Designer</span>
+                                    </li>
+                                    <li>
+                                        <span>[$19152]:</span>
+                                        <span class="sub-info-phone">138-3452-862</span>
+                                    </li>
+                                    <li>
+                                        <span>[$17818]:</span>
+                                        <span class="sub-info-loc">Auckland</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            
+                            <div class="profile-button-container">
+                                <div class="default-white-button-user-management resend-verification">Re-send Verification Email</div>
+                                <div class="default-white-button-user-management edit-profile">Edit Profile</div>
+                                <div class="default-white-button-user-management migrate-data">migrate</div>
+                                <div class="default-red-button-user-management disable-account">Disable Account</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-management-view-data">
+                        <div class="user-management-view-overall-usage">
+                            <div class="view-title">[$18076]</div>
+                            <div class="user-management-storage">
+                                <div class="storage-img img"></div>
+                                <div class="view-info">
+                                    <div class="storage-transfer-text">[$495]</div>
+                                    <div class="storage-transfer-data">30.3 GB</div>
+                                </div>
+                            </div>
+
+                            <div class="user-management-transfer">
+                                <div class="transfer-img img"></div>
+                                <div class="view-info">
+                                    <div class="storage-transfer-text">[$18057]</div>
+                                    <div class="storage-transfer-data">16.7 GB</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="subaccount-view-used-data">
+                            <div class="view-title">[$16130]</div>
+                            <div class="used-storage-info ba-root">
+                                <i class="folder-small-icon cloud"></i>
+                                <div class="ff-name">[$164]</div>
+                                <div class="ff-number">
+                                    <div class="folder-number">32 folders</div>
+                                    <div class="file-number">322 files</div>
+                                </div>
+                                <div class="ff-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="used-storage-info ba-inshare">
+                                <i class="folder-small-icon income"></i>
+                                <div class="ff-name">[$16770]</div>
+                                <div class="ff-number">
+                                    <div class="folder-number">32 folders</div>
+                                    <div class="file-number">322 files</div>
+                                </div>
+                                <div class="ff-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="used-storage-info ba-inshare-ex">
+                                <i class="folder-small-icon ex-in-share"></i>
+                                <div class="ff-name">[$19187]</div>
+                                <div class="ff-number">
+                                    <div class="folder-number">32 folders</div>
+                                    <div class="file-number">322 files</div>
+                                </div>
+                                <div class="ff-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="used-storage-info ba-outshare">
+                                <i class="folder-small-icon income"></i>
+                                <div class="ff-name">[$5543]</div>
+                                <div class="ff-number">
+                                    <div class="folder-number">32 folders</div>
+                                    <div class="file-number">322 files</div>
+                                </div>
+                                <div class="ff-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="used-storage-info ba-outshare-ex">
+                                <i class="folder-small-icon ex-out-share"></i>
+                                <div class="ff-name">[$5543]</div>
+                                <div class="ff-number">
+                                    <div class="folder-number">32 folders</div>
+                                    <div class="file-number">322 files</div>
+                                </div>
+                                <div class="ff-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="used-storage-info ba-rubbish">
+                                <i class="folder-small-icon rubbish"></i>
+                                <div class="ff-name">[$167]</div>
+                                <div class="ff-number">
+                                    <div class="folder-number">32 folders</div>
+                                    <div class="file-number">322 files</div>
+                                </div>
+                                <div class="ff-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="used-storage-info ba-version">
+                                <i class="folder-small-icon tiny-clock"></i>
+                                <div class="ff-name">[$17821]</div>
+                                <div class="ff-number">
+                                    <div class="file-number">322 files</div>
+                                </div>
+                                <div class="ff-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="user-management-overview-container hidden">
+                    <div class="user-analysis-container">
+                        <div class="view-title">[$19189]</div>
+                        <div class="user-segments-container all-subs">
+                            <div class="user-segment-title">[$19190]:</div>
+                            <div class="user-segment-number">24</div>
+                            <div class="user-segment-trend">
+                                <b>&#8679; (4%) </b> over the last 30 days over the last 30 days
+                            </div>
+                        </div>
+                        <div class="user-segments-container active-subs">
+                            <div class="user-segment-title">[$19085]:</div>
+                            <div class="user-segment-number">18</div>
+                            <div class="user-segment-trend">
+                                <b class="bond-color">&#8679; 2  </b> over the last 30 days
+                            </div>
+                        </div>
+                        <div class="user-segments-container pending-subs">
+                            <div class="user-segment-title">[$19221]:</div>
+                            <div class="user-segment-number">3</div>
+                        </div>
+                        <div class="user-segments-container disabled-subs">
+                            <div class="user-segment-title">[$19086]:</div>
+                            <div class="user-segment-number">3</div>
+                        </div>
+                    </div>
+
+                    <div class="data-analysis-container">
+                        <div class="storage-analysis-container">
+                            <div class="storage-small-circle">
+                                <span class="total-storage-title">[$18082]</span>
+                                <span class="total-storage-number">102.7 GB</span>
+                            </div>
+                            <div class="view-title">[$19222]</div>
+                            <!--<div class="storage-big-chart-old hidden">
+        <div class="pie nb1" data-start="0" data-value="10">
+            <div class="pie-internal"></div>
+        </div>
+        <div class="pie highlight nb2" data-start="10" data-value="30">
+            <div class="pie-internal"></div>
+        </div>
+        <div class="pie nb3" data-start="40" data-value="30">
+            <div class="pie-internal"></div>
+        </div>
+        <div class="pie big nb4" data-start="70" data-value="290">
+            <div class="pie-internal"></div>
+            <div class="pie-internal2"></div>
+        </div>
+        <div class="storage-small-circle">
+            <span class="total-storage-title">[$18082]</span>
+            <span class="total-storage-number">102.7 GB</span>
+        </div>
+    </div>-->
+                            <div class="storage-big-chart2">
+                                <div id="pie-chart-contianer">
+                                    <canvas id="usage-pie-chart" class="storage-big-chart"></canvas>
+                                </div>
+
+                            </div>
+                            <div class="storage-division-container cloud-node">
+                                <div class="storage-division-per cloud-drive-color">72%</div>
+                                <div class="storage-division-name">[$164]</div>
+                                <div class="storage-division-num">356 GB</div>
+                            </div>
+
+                            <div class="storage-division-container inbox-node">
+                                <div class="storage-division-per inbox-color">0.2%</div>
+                                <div class="storage-division-name">[$19223]</div>
+                                <div class="storage-division-num">356 GB</div>
+                            </div>
+
+                            <div class="storage-division-container inshare-node">
+                                <div class="storage-division-per incoming-color">11%</div>
+                                <div class="storage-division-name">[$16770]</div>
+                                <div class="storage-division-num">356 GB</div>
+                            </div>
+
+                            <div class="storage-division-container rubbish-node">
+                                <div class="storage-division-per rubbish-color">11%</div>
+                                <div class="storage-division-name">[$167]</div>
+                                <div class="storage-division-num">356 GB</div>
+                            </div>
+                        </div>
+
+                        <div class="transfer-analysis-container">
+                            <div class="view-title">[$19224]</div>
+                            <div class="transfer-analysis-summary">
+                                <div class="total-transfer-title">[$19225]:</div>
+                                <div class="total-transfer-number">310.3 GB</div>
+                                <div class="total-transfer-trend">
+                                    <b class="bond-color">&#8679; 2.3 GB </b>
+                                    (+1.2%) over the last 30 days over the last 30 days
+                                </div>
+                            </div>
+                            <div class="daily-transfer-container">
+                                <div class="daily-transfer-title">[$19226]:</div>
+                                <div class="default-white-drop-box">
+                                    <div class="list-arrow"></div>
+                                    <select id="chart-month-selector">
+                                        <option value="dec2017">December 2017</option>
+                                        <option value="nov2017">November 2017</option>
+                                        <option value="oct2017">October 2017</option>
+                                        <option value="sep2017">September 2017</option>
+                                        <option value="aug2017">August 2017</option>
+                                    </select>
+                                </div>
+
+
+                                <div id="chartcontainer">
+                                    <canvas id="usage-bar-chart" class="daily-transfer-flow-container"></canvas>
+                                </div>
+                                <!--<div class="daily-transfer-flow-container-d hidden">
+                        <div class="daily-transfer-flow">
+                            <span>500</span>
+                            <span>0</span>
+                        </div>
+                        <div class="daily-transfer-measure">
+                            <div class="daily-transfer-flow-background"></div>
+                            <div class="daily-transfer-flow-background"></div>
+                            <div class="daily-transfer-flow-background"></div>
+                            <div class="daily-transfer-flow-background"></div>
+                            <div class="daily-transfer-flow-background"></div>
+                        </div>
+                        <div class="daily-transfer-data">
+                            <div class="daily-transfer-flow-bar bar1">
+                                <div class="tooltip">
+                                    <span>1.12.2017</span>
+                                    <div class="border"></div>
+                                    <span>184.5 GB</span>
+                                </div>
+                            </div>
+
+
+                            <div class="daily-transfer-flow-bar bar2"></div>
+                            <div class="daily-transfer-flow-bar bar3"></div>
+                            <div class="daily-transfer-flow-bar bar1"></div>
+                            <div class="daily-transfer-flow-bar bar2"></div>
+                            <div class="daily-transfer-flow-bar bar3"></div>
+                            <div class="daily-transfer-flow-bar bar1"></div>
+                            <div class="daily-transfer-flow-bar bar2"></div>
+                            <div class="daily-transfer-flow-bar bar3"></div>
+                            <div class="daily-transfer-flow-bar bar1"></div>
+                            <div class="daily-transfer-flow-bar bar2"></div>
+                            <div class="daily-transfer-flow-bar bar3"></div>
+                            <div class="daily-transfer-flow-bar bar1"></div>
+                            <div class="daily-transfer-flow-bar bar2"></div>
+                            <div class="daily-transfer-flow-bar bar3"></div>
+                            <div class="daily-transfer-flow-bar bar1"></div>
+                            <div class="daily-transfer-flow-bar bar2"></div>
+                            <div class="daily-transfer-flow-bar bar3"></div>
+                            <div class="daily-transfer-flow-bar bar1"></div>
+                            <div class="daily-transfer-flow-bar bar2"></div>
+                            <div class="daily-transfer-flow-bar bar3"></div>
+                            <div class="daily-transfer-flow-bar bar1"></div>
+                            <div class="daily-transfer-flow-bar bar2"></div>
+                            <div class="daily-transfer-flow-bar bar3"></div>
+                            <div class="daily-transfer-flow-bar bar3"></div>
+                            <div class="daily-transfer-flow-bar bar1"></div>
+                            <div class="daily-transfer-flow-bar bar2"></div>
+                            <div class="daily-transfer-flow-bar bar3"></div>
+                            <div class="daily-transfer-flow-bar bar1"></div>
+                            <div class="daily-transfer-flow-bar bar2"></div>
+                            <div class="daily-transfer-flow-bar bar3"></div>
+                        </div>
+                        <div class="daily-transfer-date">
+                            <div class="date date1">01 Dec</div>
+                            <div class="date date2">15 Dec</div>
+                            <div class="date date3">30 Dec</div>
+                        </div>
+                    </div>-->
+
+                                <span>Use your mouse to see statistics from particular day</span>
+                                <span>Unit: GB</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="user-management-account-settings hidden">
+                    <div class="auto-save hidden">
+                        <div class="confirm-white-img icon"></div>
+                        Setting saved
+                    </div>
+
+
+                    <div class="settings-menu-bar">
+                        <div class="settings-menu-item selected suba-setting-profile">Profile</div>
+                        <div class="settings-menu-item suba-setting-inv">[$19282]</div>
+                        <!--<div class="settings-menu-item hidden">Settings</div>-->
+                    </div>
+                    <div class="border"></div>
+
+
+                    <div class="profile">
+                        <div class="setting-block">
+                            <div class="title">
+                                <div class="company-icon48 icon48"></div>
+                                [$19523]
+                            </div>
+
+                            <div class="option-containers">
+                                <div class="bus-input-block">
+                                    <div class="bus-input">
+                                        <div class="bus-reg-icon company-name"></div>
+                                        <input type="text" id="prof-cname" placeholder="Company Name">
+                                        <div class="error-message">is the error signal too red?</div>
+                                    </div>
+                                    <div class="bus-input">
+                                        <div class="bus-reg-icon email"></div>
+                                        <input type="email" id="prof-email" placeholder="[$7434]">
+                                        <div class="error-message">is the error signal too red?</div>
+                                    </div>
+                                    <div class="bus-input">
+                                        <div class="bus-reg-icon phone"></div>
+                                        <input type="tel" id="prof-phone" placeholder="[$19152]">
+                                        <div class="error-message">is the error signal too red?</div>
+                                    </div>
+                                    <div class="bus-input note">
+                                        <div class="setting-icon24 vat"></div>
+                                        <input type="text" id="prof-vat" placeholder="[$19295]">
+                                        <div class="error-message">is the error signal too red?</div>
+                                        <div class="note-message">*Please insert the TAX code for your country.</div>
+                                    </div>
+                                </div>
+
+                                <div class="bus-input-block">
+                                    <div class="bus-input">
+                                        <div class="setting-icon24 add"></div>
+                                        <input type="text" id="prof-addr1" placeholder="Address line 1">
+                                        <div class="error-message">is the error signal too red?</div>
+                                    </div>
+                                    <div class="bus-input short-input">
+                                        <input type="text" id="prof-addr2" placeholder="Address line 2">
+                                        <div class="error-message">is the error signal too red?</div>
+                                    </div>
+                                    <div class="bus-input short-input">
+                                        <input type="text" id="prof-city" placeholder="[$565]">
+                                        <div class="error-message">is the error signal too red?</div>
+                                    </div>
+                                    <div class="bus-input short-input">
+                                        <input type="text" id="prof-state" placeholder="[$7352]" class="state">
+                                        <input type="text" id="prof-zip" placeholder="Zip Code" class="zip">
+                                        <div class="error-message">is the error signal too red?</div>
+                                    </div>
+                                    <div class="bus-input short-input underline-dropdown-input">
+                                        <div class="list-arrow"></div>
+                                        <select id ="cnt-ddl" name="prf-country" placeholder="Country">
+                                            <option value="New Zealand">New Zealand</option>
+                                            <option value="Syria">Syria</option>
+                                            <option value="Spain">Spain</option>
+                                        </select>
+
+                                        <div class="error-message">is the error signal too red?</div>
+
+                                    </div>
+                                </div>
+                                <div class="default-green-button-user-management saving-btn-profile">
+                                    Save changes
+                                </div>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="invoice hidden">
+                        <div class="invoice-list hidden">
+                            <div class="invoice-subtitle">[$19283]</div>
+                            <div class="invoice-table-container">
+                                <table class="invoice-table-header">
+                                    <tr>
+                                        <th>
+                                            <div class="arrow asc">[$17023]</div>
+                                        </th>
+                                        <th>
+                                            <div class="arrow desc">[$16462]</div>
+                                        </th>
+                                        <th>
+                                            <div class="arrow desc">[$477]</div>
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </table>
+                                <div class="invoice-table-list-container">
+                                    <table class="invoice-table">
+                                        <tr class="invocie-row-data">
+                                            <td class="inv-date">01 Aug 2018</td>
+                                            <td class="inv-desc">Place description</td>
+                                            <td class="inv-total">$512.30</td>
+                                            <td>
+                                                <div class="default-white-button-user-management btn-show-detail">[$19284]</div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="invoice-detail hidden">
+                            <div class="default-white-button-user-management inv-detail-export">
+                                <div class="export-pdf-icon icon"></div>
+                                [$19288]
+                            </div>
+                            <div class="invoice-container">
+                                <div class="mega-contact-container">
+                                    <div class="mega-logo"></div>
+                                    <p class="inv-subtitle">Mega Limited</p>
+                                    <ul>
+                                        <li class="inv-mega-contact">
+                                            <div class="email-small-icon icon12"></div>
+                                            <p class="biller-email">invoicing@mega.nz</p>
+                                        </li>
+                                        <li class="inv-mega-contact">
+                                            <div class="add-small-icon icon12"></div>
+                                            <p class="biller-address">Level 21, Huawei Centre, 120 Albert Street, Auckland  1010,  New Zealand</pclass="biller-email">
+                                        </li>
+                                        <li class="inv-mega-contact">
+                                            <div class="post-small-icon icon12"></div>
+                                            <p class="biller-post">Private Bag 92 533, Wellesley St, Auckland  1141,  New Zealand</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="inv-title-container suba-inv">
+                                    <div class="inv-right">
+                                        <div class="inv-title">[$19292]</div>
+                                        <ul class=" ">
+                                            <li>
+                                                <span>[$19293]:</span>
+                                                <span id="invoice-date">13 Nov 2017	</span>
+                                            </li>
+                                            <li>
+                                                <span>[$19294]:</span>
+                                                <span id="invoice-number">NwC-AOyfAxo	</span>
+                                            </li>
+                                            <li>
+                                                <span class="inv-vat-label">[$19295]:</span>
+                                                <span class="invoice-vat">110-633-521</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="inv-border"></div>
+                                <div class="inv-add-container">
+                                    <p class="inv-subtitle">[$19296]:</p>
+                                    <ul>
+                                        <li class="inv-company-name billed-name">AAA LTD.</li>
+                                        <li class="inv-per-name billed-attn hidden">ATTN: Khaled Captain</li>
+                                        <li class="billed-email">money@mega.co.nz</li>
+                                        <li class="billed-address">120 Albert St, Auckland 1010, 120 Albert St, Auckland  1010 </li>
+                                        <li class="billed-country">New Zealand</li>
+                                        <li class="billed-vat">VAT: 9429030423626 </li>
+                                    </ul>
+                                </div>
+                                <div class="inv-payment-table">
+                                    <ul>
+                                        <li class="inv-li-table-header">
+                                            <div class="inv-payment-header">[$17023]</div>
+                                            <div class="inv-payment-header">[$16462]</div>
+                                            <div class="inv-payment-header">[$16463]</div>
+                                        </li>
+                                        <li class="inv-li-content">
+                                            <div class="inv-payment-item inv-pay-date">1/8/2018</div>
+                                            <div class="inv-payment-item inv-pay-desc">Business account for X user<br>(1/7/2018 - 31/7/2018)</div>
+                                            <div class="inv-payment-item inv-pay-amou">€4.34</div>
+                                        </li>
+                                        <li class="inv-payment-price inv-li-gst">
+                                            <div class="inv-payment-price-detail inv-gst-perc">[$19301]:</div>
+                                            <div class="inv-payment-price-detail inv-gst-val">€4.34</div>
+
+                                        </li>
+                                        <li class="inv-payment-price inv-li-total">
+                                            <div class="inv-payment-price-detail">[$19300]:</div>
+                                            <div class="inv-payment-price-detail inv-total-val">€40000000.34</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="invoice-container pay-receipt">
+                                <div class="mega-contact-container">
+                                    <div class="mega-logo"></div>
+                                    <p class="inv-subtitle">Mega Limited</p>
+                                    <ul>
+                                        <li class="inv-mega-contact">
+                                            <div class="email-small-icon icon12"></div>
+                                            <p class="biller-email">invoicing@mega.nz</p>
+                                        </li>
+                                        <li class="inv-mega-contact">
+                                            <div class="add-small-icon icon12"></div>
+                                            <p class="biller-address">Level 21, Huawei Centre, 120 Albert Street, Auckland  1010,  New Zealand</p>
+                                        </li>
+                                        <li class="inv-mega-contact">
+                                            <div class="post-small-icon icon12"></div>
+                                            <p class="biller-post">Private Bag 92 533, Wellesley St, Auckland  1141,  New Zealand</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="inv-title-container">
+                                    <div class="inv-right">
+                                        <div class="inv-title">[$19297]</div>
+                                        <ul class=" ">
+                                            <li>
+                                                <span>[$19298]:</span>
+                                                <span id="rece-date">13 Nov 2017	</span>
+                                            </li>
+                                            <li>
+                                                <span>[$19299]:</span>
+                                                <span id="rece-number">NwC-AOyfAxo	</span>
+                                            </li>
+                                            <li>
+                                                <span class="inv-vat-label">[$19295]:</span>
+                                                <span class="invoice-vat">110-633-521</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="inv-border"></div>
+                                <div class="inv-add-container">
+                                    <p class="inv-subtitle">[$19296]:</p>
+                                    <ul>
+                                        <li class="inv-company-name billed-name">AAA LTD.</li>
+                                        <li class="inv-per-name billed-attn hidden">ATTN: Khaled Captain</li>
+                                        <li class="billed-email">money@mega.co.nz</li>
+                                        <li class="billed-address">120 Albert St, Auckland 1010, 120 Albert St, Auckland  1010 </li>
+                                        <li class="billed-country">New Zealand</li>
+                                        <li class="billed-vat">VAT: 9429030423626 </li>
+                                    </ul>
+                                </div>
+                                <div class="inv-payment-table">
+                                    <ul>
+                                        <li class="inv-li-table-header">
+                                            <div class="inv-payment-header">[$17023]</div>
+                                            <div class="inv-payment-header">[$16462]</div>
+                                            <div class="inv-payment-header">[$16463]</div>
+                                        </li>
+                                        <li class="inv-li-content">
+                                            <div class="inv-payment-item inv-pay-date">1/8/2018</div>
+                                            <div class="inv-payment-item inv-pay-desc">Business account for X user<br>(1/7/2018 - 31/7/2018)</div>
+                                            <div class="inv-payment-item inv-pay-amou">€4.34</div>
+                                        </li>
+                                        <li class="inv-payment-price inv-li-gst">
+                                            <div class="inv-payment-price-detail inv-gst-perc">[$19301]:</div>
+                                            <div class="inv-payment-price-detail inv-gst-val">€4.34</div>
+
+                                        </li>
+                                        <li class="inv-payment-price inv-li-total">
+                                            <div class="inv-payment-price-detail">[$19300]:</div>
+                                            <div class="inv-payment-price-detail inv-total-val">€40000000.34</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+            </div>
+                    <!-- End of USERS managment right block -->
+
 
 
             <div class="fm-blocks-view contacts-view hidden">
@@ -1118,7 +1957,7 @@
                                     </div>
                             </div>
                             <div class="account-profile half-sized second">
-                              <div class="account data-block second">
+                              <div class="account data-block second acc-type">
                                       <div class="fm-account-header">[$432]</div>
                                       <div class="account plan-info-block">
                                           <div class="account plan-info-row">
@@ -1166,7 +2005,7 @@
                                       </div>
                               </div>
 
-                              <div class="account data-block second">
+                              <div class="account data-block second acc-balance">
                                       <div class="fm-account-header">[$7108]</div>
                                       <div class="half-sized data-list">
                                           <div class="account plan-info grey small">
@@ -1185,7 +2024,7 @@
                                       </div>
                               </div>
 
-                              <div class="account data-block second">
+                              <div class="account data-block second acc-cancel">
                                       <div class="fm-account-header big light-grey">[$16115]</div>
                                       <div class="account data-txt">
                                           [$16116]
@@ -1594,7 +2433,7 @@
                                      <div class="button default-grey-button change-password-button">[$706]</div>
                                  </div>
 
-                                 <div class="account data-block">
+                                 <div class="account data-block acc-change-email">
                                      <div class="fm-account-header">[$7743]</div>
                                      <div class="account-form-wraper email-block">
                                          <div class="fm-account-labels">

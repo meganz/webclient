@@ -1658,7 +1658,10 @@ function topmenuUI() {
         $topMenu.find('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $topMenu.find('.top-menu-item.account').removeClass('hidden');
         $topMenu.find('.upgrade-your-account').removeClass('hidden');
-        $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle));
+        // for top menu, load avatar and show for logged in user
+        useravatar.loadAvatar(u_handle).always(function(){
+            $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle));
+        });
 
         $topHeader.find('.top-login-button').addClass('hidden');
         $topHeader.find('.membership-status').removeClass('hidden');

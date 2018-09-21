@@ -8,7 +8,6 @@ var fetcher = null;
 var workerstate;
 
 var fmconfig = Object.create(null);
-
 if (localStorage.fmconfig) {
     fmconfig = JSON.parse(localStorage.fmconfig);
 }
@@ -1133,7 +1132,7 @@ scparser.$add('u', function(a) {
                         M.favouriteDomUpdate(n, n.fav);
                     }
                     if (n.lbl !== oldlbl) {
-                        M.labelDomUpdate(n.h, n.lbl);
+                        M.colourLabelDomUpdate(n.h, n.lbl);
                     }
                 }
             }

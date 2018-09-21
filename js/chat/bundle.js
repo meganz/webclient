@@ -8847,7 +8847,7 @@ React.makeElement = React['createElement'];
 	        } else if (self.state.sortBy[0] === "ts") {
 	            sortFunc = M.getSortByDateTimeFn();
 	        } else {
-	            sortFunc = M.sortByFavFn(order);
+	            sortFunc = M.getSortByFavFn();
 	        }
 
 	        var folders = [];

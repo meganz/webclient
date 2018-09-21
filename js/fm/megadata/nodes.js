@@ -1630,7 +1630,7 @@ MegaData.prototype.colourLabelcmUpdate = function(node) {
     }
 };
 
-MegaData.prototype.getLabelClassFromId = function(id) {
+MegaData.prototype.getColourClassFromId = function(id) {
 
     return ({
         '1': 'red', '2': 'orange', '3': 'yellow',
@@ -1639,66 +1639,38 @@ MegaData.prototype.getLabelClassFromId = function(id) {
 };
 
 /**
- * labelDomUpdate
+ * colourLabelDomUpdate
  *
  * @param {String} handle
  * @param {Number} value Current labelId
  */
-MegaData.prototype.labelDomUpdate = function(handle, value) {
-    "use strict";
+MegaData.prototype.colourLabelDomUpdate = function(handle, value) {
 
     if (fminitialized) {
         var labelId = parseInt(value);
         var removeClasses = 'colour-label red orange yellow blue green grey purple';
-        var color = '<div class="colour-label-ind %1"></div>';
 
         // Remove all colour label classes
         $('#' + handle).removeClass(removeClasses);
         $('#' + handle + ' a').removeClass(removeClasses);
-        $('#treea_' + handle).removeClass('labeled').find('.colour-label-ind').remove();
 
         if (labelId) {
             // Add colour label classes.
-            var colourClass = 'colour-label ' + M.getLabelClassFromId(labelId);
+            var colourClass = 'colour-label ' + this.getColourClassFromId(labelId);
 
             $('#' + handle).addClass(colourClass);
             $('#' + handle + ' a').addClass(colourClass);
-            $('#treea_' + handle).append(color.replace('%1', M.getLabelClassFromId(labelId)))
-                .addClass('labeled');
-        }
-
-        var currentTreeLabel = M.filterTreePanel[M.currentTreeType + '-label'];
-        // if current tree is on filtering
-        if (currentTreeLabel && Object.keys(currentTreeLabel).length > 0) {
-            // and action is assigning new tag
-            if (labelId && currentTreeLabel[labelId]) {
-                $('#treeli_' + handle).removeClass("tree-item-on-filter-hidden");
-            }
-            // and action is unassigning old tag
-            else {
-                $('#treeli_' + handle).addClass("tree-item-on-filter-hidden");
-            }
-        }
-
-        // make filter enable/disable depending on filter availabilty.
-        $('.dropdown-section .dropdown-item-label')
-            .add('.dropdown-section.filter-by .labels')
-            .addClass('disabled static');
-        if (M.checkFilterAvailable()) {
-            $('.dropdown-section .dropdown-item-label')
-                .add('.dropdown-section.filter-by .labels')
-                .removeClass('disabled static');
         }
     }
 };
 
 /*
- * labeling Handles colour labeling of nodes updates DOM and API
+ * colourLabeling Handles colour labeling of nodes updates DOM and API
  *
  * @param {Array | string} handles Selected nodes handles
  * @param {Integer} labelId Numeric value of label
  */
-MegaData.prototype.labeling = function(handles, labelId) {
+MegaData.prototype.colourLabeling = function(handles, labelId) {
 
     var newLabelState = 0;
 
@@ -1720,198 +1692,8 @@ MegaData.prototype.labeling = function(handles, labelId) {
                 fileversioning.labelVersions(handle, newLabelState);
             }
             api_setattr(node, mRandomToken('lbl'));
-
-            // sync with global tree
-            if (node.t > 0) {
-                M.tree[node.p][node.h].lbl = node.lbl;
-            }
-
-            M.labelDomUpdate(handle, newLabelState);
+            M.colourLabelDomUpdate(handle, newLabelState);
         });
-        
-        M.initLabelFilter(M.v);
-    }
-};
-
-MegaData.prototype.labelFilterBlockUI = function() {
-    "use strict";
-
-    var type = M.currentLabelType;
-    // Hide all filter DOM elements
-    $('.fm-right-header.fm .filter-block.body').addClass('hidden');
-    $('.files-grid-view.fm .filter-block.body').addClass('hidden');
-
-    if (M.currentLabelFilter) {
-        if (fmconfig.viewmodes[M.currentdirid]) {// Block view
-            if (type === 'shares') {
-                $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
-            }
-            else if (type === 'contact') {
-                $('.filter-block.body').addClass('hidden');
-                $('.fm-right-header.fm .filter-block.body').addClass('hidden');
-            }
-            else {
-                $('.filter-block.' + type + '.body').addClass('hidden');
-                $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
-            }
-        }
-        else {// List view
-            if (type === 'shares') {
-                $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
-            }
-            else if (type === 'contact') {
-                $('.filter-block.body').addClass('hidden');
-                $('.fm-right-header.fm .filter-block.body').addClass('hidden');
-            }
-            else {
-                $('.fm-right-header.fm .filter-block.' + type + '.body').addClass('hidden');
-                $('.filter-block.' + type + '.body').removeClass('hidden');
-            }
-        }
-    }
-};
-
-MegaData.prototype.labelType = function() {
-    "use strict";
-
-    var result = 'fm';
-    switch (M.currentrootid) {
-        case 'shares':
-            result = 'shares';
-            break;
-        case M.RubbishID:
-            result = 'rubbish';
-            break;
-        case 'contacts':
-            result = 'contacts';
-            break;
-        default:
-            break;
-    }
-
-    return result;
-};
-
-/*
- * update clicked label's display info
- *
- * @param {Object} e  event triggered to excuting this.
- */
-MegaData.prototype.updateLabelInfo = function(e) {
-    "use strict";
-
-    var $t = $(e.target);
-    var labelTxt = $t.data('label-txt');
-    var labelInfo;
-
-    if ($(this).hasClass('active')) {
-        labelInfo = 'Remove from filter label %1';
-    }
-    else {
-        labelInfo = 'Add filter by label %1';
-    }
-    labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
-    $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
-};
-
-/*
- * filter fm and shared with me by tag colour
- *
- * @param {Object} e  event triggered to excuting this.
- */
-MegaData.prototype.applyLabelFilter = function (e) {
-    "use strict";
-
-    var $t = $(e.target);
-    var labelId = parseInt($t.data('label-id'));
-    var type = M.currentLabelType;
-    var $menuItems = $('.colour-sorting-menu .dropdown-colour-item');
-    var $filterBlock = $('.filter-block.' + type + '.body');
-    var fltIndicator = '<div class="colour-label-ind %1"></div>';
-    var obj = M.filterLabel[type];// Global var holding colour tag filter information for fm and shares
-
-    obj[labelId] = !obj[labelId];
-
-    if (obj[labelId]) {
-        $menuItems.filter('[data-label-id=' + labelId + ']').addClass('active');
-        $filterBlock.find('.content').append(fltIndicator.replace('%1', M.getLabelClassFromId(labelId)));
-
-        if (fmconfig.viewmodes[M.currentdirid]) {
-            $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
-        }
-        else {
-            if (M.currentrootid === M.RootID || M.currentrootid === M.RubbishID) {
-                $('.filter-block.' + type + '.body').removeClass('hidden');
-            }
-            else {
-                $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
-            }
-        }
-    }
-    else {
-        delete obj[labelId];
-
-        $menuItems.filter('[data-label-id=' + labelId + ']').removeClass('active');
-        $filterBlock.find('.colour-label-ind.' + M.getLabelClassFromId(labelId)).remove();
-        if (!Object.keys(obj).length) {
-            delete M.filterLabel[type];
-            $filterBlock.addClass('hidden');
-            $.hideContextMenu();
-        }
-    }
-
-    M.updateLabelInfo(e);
-    M.openFolder(M.currentdirid, true);
-};
-
-/*
- * Check nodelist contains label
- *
- * @param {Object} nodelist     array of nodes
- *
- * @return {Boolean}
- */
-
-MegaData.prototype.isLabelExistNodeList = function(nodelist) {
-    "use strict";
-
-    for (var i = 0; i < nodelist.length; i++) {
-        if (typeof nodelist[i] !== 'undefined'
-            && (typeof nodelist[i].lbl !== 'undefined'
-            && nodelist[i].lbl !== 0)){
-            return true;
-        }
-    }
-    return false;
-};
-
-/*
- * init label filter and sort if node item has label.
- *
- * @param {Object} nodelist     array of nodes
- */
-
-MegaData.prototype.initLabelFilter = function(nodelist) {
-    "use strict";
-
-    if (d){
-        console.log('checking label is existing');
-    }
-    
-    var $fmMenu = $('.colour-sorting-menu .dropdown-section .dropdown-item-label')
-        .add('.colour-sorting-menu .dropdown-section.filter-by .labels');
-        
-    if (this.isLabelExistNodeList(nodelist)){
-        $fmMenu.removeClass('disabled static');
-        if (d){
-            console.log('label exist on node list, label filter is ON');
-        }
-    }
-    else {
-        $fmMenu.addClass('disabled static');
-        if (d){
-            console.log('no label exist on node list, label filter is OFF');
-        }
     }
 };
 

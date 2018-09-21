@@ -167,9 +167,8 @@ function MegaData() {
         };
 
         var tf = [
-            "renderTree", "buildtree", "initTreePanelSorting", "treeSearchUI",
-            "treePanelType", "addTreeUI", "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen",
-            "treeSortUI", "treeFilterUI"
+            "renderTree", "buildtree", "initTreePanelSorting", "treeSearchUI", "treePanelType", "addTreeUI",
+            "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen"
         ];
 
         for (var i = tf.length; i--;) {

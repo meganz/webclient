@@ -690,7 +690,7 @@
         var $dpa = $('.fm-picker-dialog-panel-arrows', $dialog).removeClass('hidden');
 
         if (section === 'cloud-drive' || section === 'folder-link') {
-            M.buildtree(M.d[M.RootID], 'fm-picker-dialog', 'cloud-drive');
+            M.buildtree(M.d[M.RootID], 'fm-picker-dialog');
         }
         else if (section === 'shared-with-me') {
             M.buildtree({h: 'shares'}, 'fm-picker-dialog');
@@ -965,9 +965,6 @@
         });
         treePanelHeader.parentNode.removeChild(treePanelHeader);
 
-        // dialog sort
-        $dialog.find('.fm-picker-dialog-panel-header').append($('.dialog-sorting-menu.hidden').clone());
-
         $('.fm-picker-dialog-tree-panel.conversations .fm-picker-dialog-panel-header span:first').text(l[17765]);
 
         $('.fm-dialog-close, .dialog-cancel-button', $dialog).rebind('click', closeDialog);
@@ -1018,12 +1015,8 @@
             var $self = $(this);
 
             if (!$self.hasClass('active')) {
+
                 var $menu = $('.dialog-sorting-menu', $dialog).removeClass('hidden');
-
-                var p = $self.position();
-
-                $menu.css('left', p.left + 24 + 'px');
-                $menu.css('top', p.top - 8 + 'px');
 
                 if (section === 'contacts') {
                     // Enable all menu items
@@ -1032,7 +1025,7 @@
                 }
                 else {
                     // Hide sort by status and last-interaction items from menu
-                    $menu.find('*[data-by=status],*[data-by=last-interaction],*[data-by=fav]').addClass('hidden');
+                    $menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
                     $menu.find('*[data-by=label]').removeClass('hidden');
                 }
 
@@ -1041,31 +1034,27 @@
                 // Copy dialog key only
                 var key = $.dialog[0].toUpperCase() + $.dialog.substr(1) + section;
 
-                $menu.find('.dropdown-item').removeClass('active asc desc');
-
                 // Check existance of previous sort options, direction (dir)
                 if (localStorage['sort' + key + 'Dir']) {
                     $.sortTreePanel[key].dir = localStorage['sort' + key + 'Dir'];
-                    $menu.find('.dropdown-item[data-by="' + localStorage['sort' + key + 'By'] + '"]')
-                        .addClass($.sortTreePanel[key].dir > 0 ? 'asc' : 'desc');
                 }
                 else {
                     $.sortTreePanel[key].dir = 1;
-                    $menu.find('.dropdown-item[data-by="' + localStorage['sort' + key + 'By'] + '"]')
-                        .addClass('asc');
                 }
 
                 // Check existance of previous sort option, ascending/descending (By)
                 if (localStorage['sort' + key + 'By']) {
                     $.sortTreePanel[key].by = localStorage['sort' + key + 'By'];
-                    $menu.find('.dropdown-item[data-by="' + localStorage['sort' + key + 'By'] + '"]')
-                        .addClass('active');
                 }
                 else {
                     $.sortTreePanel[key].by = 'name';
-                    $menu.find('.dropdown-item[data-by="name"]')
-                        .addClass('active');
                 }
+
+                // dir stands for direction i.e. [ascending, descending]
+                $dialog.find('.dialog-sorting-menu .sorting-menu-item')
+                    .removeClass('active')
+                    .filter('*[data-by=' + $.sortTreePanel[key].by + '],*[data-dir=' + $.sortTreePanel[key].dir + ']')
+                    .addClass('active');
 
                 $self.addClass('active');
                 $dialog.find('.dialog-sorting-menu').removeClass('hidden');
@@ -1076,30 +1065,29 @@
             }
         });
 
-        $('.dialog-sorting-menu .dropdown-item', $dialog).rebind('click', function() {
+        $('.sorting-menu-item', $dialog).rebind('click', function() {
             var $self = $(this);
 
-            // Arbitrary element data
-            var data = $self.data();
-            var key = $.dialog[0].toUpperCase() + $.dialog.substr(1) + section;
+            if (!$self.hasClass('active')) {
 
-            if (data.by) {
-                localStorage['sort' + key + 'By'] = $.sortTreePanel[key].by = data.by;
+                // Arbitrary element data
+                var data = $self.data();
+                var key = $.dialog[0].toUpperCase() + $.dialog.substr(1) + section;
+
+                // Check arbitrary data associated with current menu item
+                if (data.dir) {
+                    localStorage['sort' + key + 'Dir'] = $.sortTreePanel[key].dir = data.dir;
+                }
+                if (data.by) {
+                    localStorage['sort' + key + 'By'] = $.sortTreePanel[key].by = data.by;
+                }
+
+                buildDialogTree();
+
+                // Disable previously selected
+                $self.parent().find('.sorting-menu-item').removeClass('active');
+                $self.addClass('active');
             }
-
-            $self.removeClass('asc desc');
-
-            if ($self.hasClass('active')) {
-                $.sortTreePanel[key].dir *= -1;
-                localStorage['sort' + key + 'Dir'] = $.sortTreePanel[key].dir;
-                $self.addClass($.sortTreePanel[key].dir > 0 ? 'asc' : 'desc');
-            }
-
-            buildDialogTree();
-
-            // Disable previously selected
-            $self.parent().find('.sorting-menu-item').removeClass('active');
-            $self.addClass('active');
 
             // Hide menu
             $('.dialog-sorting-menu', $dialog).addClass('hidden');

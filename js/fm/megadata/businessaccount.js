@@ -1265,7 +1265,7 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
         a: 'uts',
         it: businessPlan.it,
         si: businessPlan.id,
-        p: businessPlan.totalPrice,
+        p: businessPlan.p,
         c: businessPlan.c,
         aff: 0,
         m: m,

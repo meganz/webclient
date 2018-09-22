@@ -321,20 +321,23 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         });
 
         // 3- on clicking on a sub-user to view his info (from left pane or row)
-        $('.grid-table-user-management .view-icon.icon, .content-panel.user-management .nw-user-management-item')
-            .off('click.subuser');
-        $('.grid-table-user-management .view-icon.icon, .content-panel.user-management .nw-user-management-item')
+        $('.grid-table-user-management .view-icon.icon, .content-panel.user-management .nw-user-management-item,' +
+            '.grid-table-user-management tr').off('click.subuser')
             .on('click.subuser', function subUserViewInfoClickHandler() {
 
                 $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
 
                 var userHandle = false;
+                var $me = $(this);
 
-                if ($(this).hasClass('nw-user-management-item')) { // left pane
-                    userHandle = $(this).attr('id');
+                if ($me.hasClass('nw-user-management-item')) { // left pane
+                    userHandle = $me.attr('id');
                 }
-                else if ($(this).hasClass('view-icon')) { // user row
-                    userHandle = $(this).closest('tr').attr('id');
+                else if ($me.hasClass('view-icon')) { // user row
+                    userHandle = $me.closest('tr').attr('id');
+                }
+                else if ($me.is('tr')) { // user row
+                    userHandle = $me.attr('id');
                 }
                 else {
                     console.error('click handler fired in business account pages on wrong element');
@@ -346,7 +349,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 }
                 $('.content-panel.user-management .nw-user-management-item#' + userHandle).addClass('selected');
                 uiBusiness.viewSubAccountInfoUI(userHandle);
-
+                return false;
             });
 
         // 4- on clicking on a sub-user row to edit his info (edit  icon)
@@ -354,6 +357,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             function editSubUserClickHandler() {
                 var userHandle = $(this).closest('tr').attr('id');
                 mySelf.showEditSubUserDialog(userHandle);
+                return false;
             });
 
         // 5- on clicking on a sub-user row to enable/disable
@@ -417,6 +421,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
                     mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler2, uName, true);
                 }
+                return false;
 
             });
 
@@ -641,9 +646,9 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
         });
 
     // handler account setting page
-    $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
-        .on('click.subuser', function addSubUserClickHandler() {
-            mySelf.showAddSubUserDialog(null, mySelf.viewSubAccountListUI);
+    $('.landing-sub-container.suba-account-setting', $landingContainer).off('click.subuser')
+        .on('click.subuser', function accountSettingClickHandler() {
+            mySelf.viewBusinessAccountPage();
         });
 
     $businessAccountContainer.removeClass('hidden'); // BA container
@@ -1659,7 +1664,7 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
         };
 
         // check if we need to re-draw
-        if (!isInvoiceRedrawNeeded(invoicesList, (this.business) ? this.business.previousInvoices : null)) {
+        if (!isInvoiceRedrawNeeded(invoicesList, (mySelf.business) ? mySelf.business.previousInvoices : null)) {
             return unhideSection();
         }
 

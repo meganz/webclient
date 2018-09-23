@@ -1961,6 +1961,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('.error-message', $adduserContianer).addClass('hidden');
         $('.verification-container', $dialog).addClass('hidden');
         $('.dialog-subtitle', $dialog).addClass('hidden');
+        $('.dialog-title', $dialog).text(l[19104]);
         $('.dialog-button-container .add-more', $dialog).addClass('hidden');
         $('.dialog-button-container .add-sub-user', $dialog).text(l[19084]).removeClass('a-ok-btn');
         // $('.licence-bar', $dialog).removeClass('hidden');
@@ -1983,6 +1984,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
         // $('.licence-bar', $dialog).addClass('hidden');
         $('.dialog-subtitle', $dialog).removeClass('hidden');
+        $('.dialog-title', $dialog).text(l[18280]);
     }
 
 
@@ -2129,6 +2131,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
                     $('.licence-bar', $dialog).addClass('hidden');
                     $('.dialog-subtitle', $dialog).removeClass('hidden');
+                    $('.dialog-title', $dialog).text(l[18280]);
                 }
                 else {
                     $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1679]);

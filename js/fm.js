@@ -2778,7 +2778,10 @@ function bottomPageDialog(close, pp, hh) {
     var closeDialog = function() {
         $dialog.off('dialog-closed');
         // reset scroll position to top for re-open
-        $dialog.find('.bp-body').data('jsp').scrollToY(0);
+        var jsp = $dialog.find('.bp-body').data('jsp');
+        if (jsp) {
+            jsp.scrollToY(0);
+        }
         window.closeDialog();
         delete $.termsAgree;
         delete $.termsDeny;

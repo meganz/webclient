@@ -28465,6 +28465,7 @@ opacity: 1;
 
 .user-management-list-table .grid-scrolling-table tr td {
     padding:0 12px;
+    cursor:pointer;
 }
 
 .user-management-list-table .grid-scrolling-table .business-sub-storage-use span, .user-management-list-table .grid-scrolling-table .business-sub-transfer-use span, .user-management-list-table .grid-scrolling-table .business-sub-last-active span {

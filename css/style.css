@@ -24449,6 +24449,7 @@ opacity: 1;
     box-sizing: border-box;
     padding: 10px 16px;
     cursor: pointer;
+    z-index:40;
 }
 
 .default-white-button-user-management, .default-green-button-user-management, .default-red-button-user-management{

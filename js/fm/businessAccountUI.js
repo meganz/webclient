@@ -41,7 +41,7 @@ function BusinessAccountUI() {
         $('.fm-left-panel').addClass('user-management');
 
         // headers
-        $('.fm-right-header-user-management .user-management-main-page-buttons').addClass('hidden');
+        $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden');
         //$('.fm-right-header-user-management .user-management-breadcrumb.subaccount').addClass('hidden');
         //$('.fm-right-header-user-management .user-management-breadcrumb.overview').addClass('hidden');
         //$('.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
@@ -651,6 +651,7 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
             mySelf.viewBusinessAccountPage();
         });
 
+    $('.fm-right-header-user-management .user-management-main-page-buttons').addClass('hidden');
     $businessAccountContainer.removeClass('hidden'); // BA container
     $landingContainer.removeClass('hidden');
 };

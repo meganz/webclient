@@ -2770,8 +2770,9 @@ browserDialog.isWeak = function() {
  * @param {Boolean} close dialog parameter
  * @param {String} bottom page title
  * @param {String} dialog header
+ * @param {Boolean} tickbox tickbox existency to let user agree this dialog
  */
-function bottomPageDialog(close, pp, hh) {
+function bottomPageDialog(close, pp, hh, tickbox) {
     "use strict";
 
     var $dialog = $('.fm-dialog.bottom-pages-dialog');
@@ -2797,8 +2798,8 @@ function bottomPageDialog(close, pp, hh) {
         pp = 'terms';
     }
 
-    // Show Agree/Cancel buttons for Terms dialogs
-    if (pp === 'terms' || pp === 'sdkterms') {
+    // Show Agree/Cancel buttons for Terms dialogs if it does not have tickbox to agree=
+    if ((pp === 'terms' && !tickbox) || pp === 'sdkterms') {
         $('.fm-bp-cancel, .fm-bp-agree', $dialog).removeClass('hidden');
         $('.fm-bp-close', $dialog).addClass('hidden');
         $('.fm-dialog-title', $dialog).text(l[385]);

@@ -397,7 +397,7 @@ function init_register() {
             $('.register-check', $formWrapper).removeClass('checkboxOff')
                 .addClass('checkboxOn');
         };
-        bottomPageDialog(false, 'terms');
+        bottomPageDialog(false, 'terms', false, true);
         return false;
     });
 

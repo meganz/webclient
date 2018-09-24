@@ -1200,7 +1200,7 @@
             setDialogBreadcrumb(String($(this).attr('id')).replace('mctreea_', ''));
 
             treesearch = false;
-            M.buildtree({h: $.mcselected}, 'fm-picker-dialog');
+            M.buildtree({h: $.mcselected}, 'fm-picker-dialog', section);
             treesearch = ts;
             disableFolders();
 

@@ -44,7 +44,7 @@
         var close = !update && action;
         var $dialog = $('.fm-dialog.properties-dialog');
 
-        $(document).unbind('MegaCloseDialog.Properties');
+        $(document).off('MegaCloseDialog.Properties');
 
         if (close) {
             delete $.propertiesDialog;
@@ -196,7 +196,7 @@
             p.t1 = l[86] + ':';
 
             // Hide context menu button
-            if (n.h === M.RootID || slideshowid) {
+            if (n.h === M.RootID || slideshowid || n.h === M.RubbishID) {
                 $dialog.addClass('hidden-context');
             }
 
@@ -379,7 +379,7 @@
             return false;
         });
 
-        $(document).bind('MegaCloseDialog.Properties', __fsi_close);
+        $(document).rebind('MegaCloseDialog.Properties', __fsi_close);
 
         if (p.hideContacts) {
             $('.properties-txt-pad .contact-list-icon').hide();

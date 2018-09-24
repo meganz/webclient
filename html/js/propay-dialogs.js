@@ -1888,12 +1888,13 @@ var cardDialog = {
      * Inputs focused states
      */
     initInputsFocus: function() {
+        'use strict';
 
-        this.$dialog.find('.fm-account-input input').bind('focus', function() {
+        this.$dialog.find('.fm-account-input input').rebind('focus', function() {
             $(this).parent().addClass('focused');
         });
 
-        this.$dialog.find('.fm-account-input input').bind('blur', function() {
+        this.$dialog.find('.fm-account-input input').rebind('blur', function() {
             $(this).parent().removeClass('focused');
         });
     },

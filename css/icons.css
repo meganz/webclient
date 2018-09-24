@@ -589,7 +589,7 @@
     width: 18px;
 }
 .medium-icon.icons-img, .semi-big-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v21.png);
+    background-image: url(../images/mega/icons-sprite_v22.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -925,15 +925,15 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v21.png);
+    background-image: url(../images/mega/icons-sprite_v22.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v21.png);
+    background-image: url(../images/mega/icons-sprite_v22.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v21.png);
+    background-image: url(../images/mega/icons-sprite_v22.png);
     background-position: -148px -634px;
 }
 .thumb .small-icon.small-play-icon {
@@ -941,7 +941,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v21.png);
+    background-image: url(../images/mega/icons-sprite_v22.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -1422,7 +1422,7 @@
     background-position: -192px -781px;
 }
 i.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v21.png);
+    background-image: url(../images/mega/icons-sprite_v22.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;
@@ -1519,6 +1519,35 @@ i.icons-sprite {
 }
 .default-warning .download.big-icon {
     background-position: -708px -76px;
+}
+.medium-icon.right-arrow.icons-sprite {
+    background-position: -708px -76px;
+}
+.medium-icon.right-arrow.icons-sprite {
+    background-position: -82px -1312px;
+}
+
+/* Account Icons */
+i.account-icon {
+    width: 26px;
+    height: 26px;
+    background-image: url(../images/mega/top-sprite_v5.png);
+    background-repeat: no-repeat;
+}
+i.account-icon.building {
+    background-position: -6px -1660px;
+}
+i.account-icon.phone {
+    background-position: -6px -1620px;
+}
+i.account-icon.person {
+    background-position: -6px -1580px;
+}
+i.account-icon.email {
+    background-position: -6px -1700px;
+}
+i.account-icon.lock {
+    background-position: -6px -1740px;
 }
 
 

@@ -1,42 +1,30 @@
-<form id="form_login_header" autocomplete="off">
-    <div class="top-login-input-tooltip both-incorrect">
-        <div class="top-login-tooltip-arrow">
-            <div class="top-loginp-tooltip-txt">
-                [$1130]
-                <div class="white-txt">[$969]</div>
-            </div>
+<form id="form_login_header" autocomplete="off" class="account top-login-form">
+    <div class="account input-wrapper email">
+        <div class="account input-tooltip mid left">
+            [$141]
         </div>
-    </div>
-    <div class="top-login-input-block e-mail">
-        <div class="top-login-input-tooltip">
-            <div class="top-login-tooltip-arrow">
-                <div class="top-loginp-tooltip-txt">
-                    [$664]
-                </div>
-            </div>
+        <div class="account both-input-tooltip left">
+            [$1130]<br>[$969].
         </div>
-        <input type="text" name="login-name" id="login-name" value="" placeholder="[$195]" autocomplete="off" />
+        <i class="account-icon email"></i>
+        <input autocomplete="off" type="text" name="login-name" id="login-name" value="" placeholder="[$195]" maxlength="190" />
     </div>
-    <div class="top-login-input-block password">
-        <div class="top-login-input-tooltip">
-            <div class="top-login-tooltip-arrow">
-                <div class="top-loginp-tooltip-txt">
-                    [$970]
-                </div>
-            </div>
-        </div>
-        <input type="password" name="login-password" id="login-password" autocomplete="off" placeholder="[$909]" />
-        <div class="login-notification-icon hidden"></div>
+    <div class="account input-wrapper password">
+        <i class="account-icon lock"></i>
+        <input autocomplete="off" type="password" name="login-password" id="login-password" placeholder="[$909]"  />
     </div>
-    <div class="top-login-forgot-pass-bl">
-        <div class="top-login-forgot-pass">[$1934]</div>
+    <div class="login-page-forgot-bl">
+        <a href="/recovery" class="top-login-forgot-pass clickurl" tabindex="-1">[$1934]</a>
         <div class="clear"></div>
     </div>
-    <div class="top-login-bott-gray-block">
-        <div class="checkboxOn login-checkbox"></div>
+    <div class="account checkbox-block left">
+        <div class="login-check checkboxOn checkbox">
+            <input class="checkboxOn" type="checkbox" name="login-check" id="login-check" checked="checked">
+        </div>
         <label class="radio-txt">[$192]</label>
-
-        <div class="default-white-button right top-dialog-login-button"><span>[$16345] <i><span class="loading-gif"></span></i></span></div>
-        <div class="clear"></div>
     </div>
+    <div class="big-red-button height-32 top-dialog-login-button right" tabindex="0">
+        [$16345]
+    </div>
+    <div class="clear"></div>
 </form>

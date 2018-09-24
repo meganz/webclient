@@ -650,6 +650,22 @@ function processEmailChangeActionPacket(ap) {
         }
         // update the underlying fmdb cache
         M.addUser(user);
+
+        // in case of business master
+        // first, am i a master?
+        if (u_attr && u_attr.b && !u_attr.b.mu) {
+            // then, do i have this user as sub-user?
+            if (M.suba && M.suba[ap.u]) {
+                M.require('businessAcc_js', 'businessAccUI_js').done(
+                    function () {
+                        var business = new BusinessAccount();
+                        var sub = M.suba[ap.u];
+                        sub.e = ap.e;
+                        business.parseSUBA(sub, false, true);
+                    }
+                );
+            }
+        }
     }
 }
 
@@ -689,9 +705,12 @@ function processEmailChangeActionPacket(ap) {
      * @returns {MegaPromise}
      */
     var getLastInteractionWith = function (u_h, triggeredBySet) {
-        assert(u_handle, "missing u_handle, can't proceed");
-        assert(u_h, "missing argument u_h, can't proceed");
+        console.assert(u_handle, "missing u_handle, can't proceed");
+        console.assert(u_h, "missing argument u_h, can't proceed");
 
+        if (!u_handle || !u_h) {
+            return MegaPromise.reject(EARGS);
+        }
 
         var _renderLastInteractionDone = function (r) {
             r = r.split(":");
@@ -842,8 +861,12 @@ function processEmailChangeActionPacket(ap) {
      */
     var _realSetLastInteractionWith = function (u_h, v) {
 
-        assert(u_handle, "missing u_handle, can't proceed");
-        assert(u_h, "missing argument u_h, can't proceed");
+        console.assert(u_handle, "missing u_handle, can't proceed");
+        console.assert(u_h, "missing argument u_h, can't proceed");
+
+        if (!u_handle || !u_h) {
+            return MegaPromise.reject(EARGS);
+        }
 
         var isDone = false;
         var $promise = createTimeoutPromise(

@@ -31,8 +31,7 @@
 
         options.parentLogger = megaChat.logger;
 
-        megaChat.unbind("onInit.ChatStats");
-        megaChat.bind("onInit.ChatStats", function(e) {
+        megaChat.rebind("onInit.ChatStats", function() {
             self.attachToChat(megaChat);
         });
 
@@ -450,7 +449,7 @@
         });
 
         self.eventsForUnbinding.forEach(function(eventInfo) {
-            $(eventInfo[0]).unbind(eventInfo[1]);
+            $(eventInfo[0]).off(eventInfo[1]);
         });
         self.unwrapOnDone = [];
         self.eventsForUnbinding = [];

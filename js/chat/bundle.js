@@ -282,15 +282,11 @@ React.makeElement = React['createElement'];
 	        self.renderMyStatus();
 	    };
 
-	    $(document.body).undelegate('.top-user-status-popup .tick-item', 'mousedown.megachat');
-
-	    $(document.body).delegate('.top-user-status-popup .tick-item', 'mousedown.megachat', function (e) {
+	    $(document.body).rebind('mousedown.megachat', '.top-user-status-popup .tick-item', function () {
 	        var presence = $(this).data("presence");
 	        self._myPresence = presence;
 
-	        $('.top-user-status-popup').removeClass("active");
-
-	        $('.top-user-status-popup').addClass("hidden");
+	        $('.top-user-status-popup').removeClass("active").addClass("hidden");
 
 	        var targetPresence = PresencedIntegration.cssClassToPresence(presence);
 
@@ -405,7 +401,7 @@ React.makeElement = React['createElement'];
 	            $('#contact_' + c.u + ' .start-chat-button').addClass("active");
 	        }
 
-	        room.bind("onChatShown", function () {
+	        room.rebind("onChatShown.chatMainList", function () {
 	            $('.conversations-main-listing').addClass("hidden");
 	        });
 
@@ -427,7 +423,7 @@ React.makeElement = React['createElement'];
 	        }
 	    });
 
-	    $(document.body).delegate('.tooltip-trigger', 'mouseover.notsentindicator', function () {
+	    $(document.body).rebind('mouseover.notsentindicator', '.tooltip-trigger', function () {
 	        var $this = $(this),
 	            $notification = $('.tooltip.' + $(this).attr('data-tooltip')),
 	            iconTopPos,
@@ -440,7 +436,7 @@ React.makeElement = React['createElement'];
 	        $notification.offset({ top: iconTopPos - notificatonHeight, left: iconLeftPos - notificatonWidth });
 	    });
 
-	    $(document.body).delegate('.tooltip-trigger', 'mouseout.notsentindicator click.notsentindicator', function () {
+	    $(document.body).rebind('mouseout.notsentindicator click.notsentindicator', '.tooltip-trigger', function () {
 
 	        var $notification = $('.tooltip');
 	        $notification.addClass('hidden').removeAttr('style');
@@ -893,7 +889,7 @@ React.makeElement = React['createElement'];
 	        return false;
 	    }
 
-	    if (self.$container.parent('.section.conversations .fm-right-files-block').size() == 0) {
+	    if (self.$container.parent('.section.conversations .fm-right-files-block').length == 0) {
 	        $('.section.conversations .fm-right-files-block').append(self.$container);
 	    }
 	};
@@ -1338,15 +1334,25 @@ React.makeElement = React['createElement'];
 
 	        return MegaPromise.resolve(self._emojiData[name]);
 	    } else {
-	        self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy($.getJSON(staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json"));
-	        self._emojiDataLoading[name].done(function (data) {
+	        var promise = new MegaPromise();
+	        self._emojiDataLoading[name] = promise;
+
+	        M.xhr({
+	            type: 'json',
+	            url: staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json"
+	        }).then(function (ev, data) {
 	            self._emojiData[name] = data;
 	            delete self._emojiDataLoading[name];
-	        }).fail(function () {
+	            promise.resolve(data);
+	        }).catch(function (ev, error) {
+	            if (d) {
+	                self.logger.warn('Failed to load emoji data "%s": %s', name, error, [ev]);
+	            }
 	            delete self._emojiDataLoading[name];
+	            promise.reject(error);
 	        });
 
-	        return self._emojiDataLoading[name];
+	        return promise;
 	    }
 	};
 
@@ -2328,8 +2334,8 @@ React.makeElement = React['createElement'];
 	                }
 
 	                var $typeArea = $('.messages-textarea:visible:first');
-	                if ($typeArea.size() === 1 && !$typeArea.is(":focus")) {
-	                    $typeArea.focus();
+	                if ($typeArea.length === 1 && !$typeArea.is(":focus")) {
+	                    $typeArea.trigger("focus");
 	                    e.megaChatHandled = true;
 	                    moveCursortoToEnd($typeArea[0]);
 	                }
@@ -2395,7 +2401,7 @@ React.makeElement = React['createElement'];
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        window.removeEventListener('resize', this.handleWindowResize);
-	        $(document).unbind('keydown.megaChatTextAreaFocus');
+	        $(document).off('keydown.megaChatTextAreaFocus');
 	        mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
@@ -2617,7 +2623,7 @@ React.makeElement = React['createElement'];
 
 	        $elem.find('.jspContainer').replaceWith(function () {
 	            var $children = $elem.find('.jspPane').children();
-	            if ($children.size() === 0 || $children.size() > 1) {
+	            if ($children.length === 0 || $children.length > 1) {
 	                console.error("JScrollPane on element: ", $elem, "encountered multiple (or zero) children nodes.", "Mean while, JScrollPane should always (!) have 1 children element.");
 	            }
 	            return $children;
@@ -2662,9 +2668,9 @@ React.makeElement = React['createElement'];
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        var $elem = $(ReactDOM.findDOMNode(this));
-	        $elem.unbind('jsp-will-scroll-y.jsp' + this.getUniqueId());
+	        $elem.off('jsp-will-scroll-y.jsp' + this.getUniqueId());
 
-	        $(window).unbind('resize.jsp' + this.getUniqueId());
+	        $(window).off('resize.jsp' + this.getUniqueId());
 	    },
 	    eventuallyReinitialise: function eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
 	        var self = this;
@@ -2966,7 +2972,7 @@ React.makeElement = React['createElement'];
 	    },
 	    componentWillUnmount: function() {
 	        if (this.props.requiresUpdateOnResize) {
-	            $(window).unbind('resize.megaRenderMixing' + this.getUniqueId());
+	            $(window).off('resize.megaRenderMixing' + this.getUniqueId());
 	        }
 
 	        // window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
@@ -3435,12 +3441,14 @@ React.makeElement = React['createElement'];
 	            requiresUpdateOnResize: true
 	        };
 	    },
-	    doProgramaticScrollY: function doProgramaticScrollY(newPosY, forced) {
+	    doProgramaticScroll: function doProgramaticScroll(newPos, forced, isX) {
 	        var self = this;
 	        var $elem = $(ReactDOM.findDOMNode(self));
 	        var animFrameInner = false;
 
-	        if (!forced && $elem[0] && $elem[0].scrollTop === newPosY) {
+	        var prop = !isX ? 'scrollTop' : 'scrollLeft';
+
+	        if (!forced && $elem[0] && $elem[0][prop] === newPos) {
 	            return;
 	        }
 
@@ -3451,18 +3459,18 @@ React.makeElement = React['createElement'];
 	                cancelAnimationFrame(animFrameInner);
 	                animFrameInner = false;
 	            }
-	            $elem.unbind('scroll.progscroll' + idx);
+	            $elem.off('scroll.progscroll' + idx);
 	            self.isUserScroll = true;
 	        }.bind(this, idx));
 
 	        self.isUserScroll = false;
-	        $elem[0].scrollTop = newPosY;
+	        $elem[0][prop] = newPos;
 	        Ps.update($elem[0]);
 
 	        animFrameInner = requestAnimationFrame(function (idx) {
 	            animFrameInner = false;
 	            self.isUserScroll = true;
-	            $elem.unbind('scroll.progscroll' + idx);
+	            $elem.off('scroll.progscroll' + idx);
 	        }.bind(this, idx));
 	    },
 	    componentDidMount: function componentDidMount() {
@@ -3508,7 +3516,7 @@ React.makeElement = React['createElement'];
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        var $elem = $(ReactDOM.findDOMNode(this));
-	        $elem.unbind('ps-scroll-y.ps' + this.getUniqueId());
+	        $elem.off('ps-scroll-y.ps' + this.getUniqueId());
 	    },
 	    eventuallyReinitialise: function eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
 	        var self = this;
@@ -3537,7 +3545,7 @@ React.makeElement = React['createElement'];
 	            return;
 	        }
 
-	        self.doProgramaticScrollY($elem[0].scrollTop, true);
+	        self.doProgramaticScroll($elem[0].scrollTop, true);
 
 	        var manualReinitialiseControl = false;
 	        if (self.props.onReinitialise) {
@@ -3557,7 +3565,7 @@ React.makeElement = React['createElement'];
 	        }
 	    },
 	    scrollToBottom: function scrollToBottom(skipReinitialised) {
-	        this.doProgramaticScrollY(9999999);
+	        this.doProgramaticScroll(9999999);
 
 	        if (!skipReinitialised) {
 	            this.reinitialised(true);
@@ -3624,7 +3632,7 @@ React.makeElement = React['createElement'];
 	        var $elem = $(this.findDOMNode());
 	        var targetPx = this.getScrollHeight() / 100 * posPerc;
 	        if ($elem[0].scrollTop !== targetPx) {
-	            this.doProgramaticScrollY(targetPx);
+	            this.doProgramaticScroll(targetPx);
 
 	            if (!skipReinitialised) {
 	                this.reinitialised(true);
@@ -3635,7 +3643,7 @@ React.makeElement = React['createElement'];
 	        var $elem = $(this.findDOMNode());
 	        var targetPx = this.getScrollWidth() / 100 * posPerc;
 	        if ($elem[0].scrollLeft !== targetPx) {
-	            this.doProgramaticScrollY(targetPx);
+	            this.doProgramaticScroll(targetPx, false, true);
 	            if (!skipReinitialised) {
 	                this.reinitialised(true);
 	            }
@@ -3644,7 +3652,7 @@ React.makeElement = React['createElement'];
 	    scrollToY: function scrollToY(posY, skipReinitialised) {
 	        var $elem = $(this.findDOMNode());
 	        if ($elem[0].scrollTop !== posY) {
-	            this.doProgramaticScrollY(posY);
+	            this.doProgramaticScroll(posY);
 
 	            if (!skipReinitialised) {
 	                this.reinitialised(true);
@@ -3657,7 +3665,7 @@ React.makeElement = React['createElement'];
 	            return;
 	        }
 
-	        this.doProgramaticScrollY(element.offsetTop);
+	        this.doProgramaticScroll(element.offsetTop);
 
 	        if (!skipReinitialised) {
 	            this.reinitialised(true);
@@ -3787,7 +3795,7 @@ React.makeElement = React['createElement'];
 	                onActiveChange: function onActiveChange(newVal) {
 	                    var $element = $(self.findDOMNode());
 	                    var $scrollables = $element.parents('.jScrollPaneContainer, .perfectScrollbarContainer');
-	                    if ($scrollables.size() > 0) {
+	                    if ($scrollables.length > 0) {
 	                        if (newVal === true) {
 
 	                            $scrollables.attr('data-scroll-disabled', true);
@@ -3817,8 +3825,8 @@ React.makeElement = React['createElement'];
 
 	        if (!e || !$(e.target).closest(".button").is($element)) {
 	            this.setState({ focused: false });
-	            $(document).unbind('keyup.button' + this.getUniqueId());
-	            $(document).unbind('closeDropdowns.' + this.getUniqueId());
+	            $(document).off('keyup.button' + this.getUniqueId());
+	            $(document).off('closeDropdowns.' + this.getUniqueId());
 	            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
 
 	            if (this._pageChangeListener) {
@@ -3950,7 +3958,7 @@ React.makeElement = React['createElement'];
 	                var offsetLeft = 0;
 	                var $container = positionToElement.closest('.messages.scroll-area');
 
-	                if ($container.size() == 0) {
+	                if ($container.length == 0) {
 	                    $container = $(document.body);
 	                }
 
@@ -4891,13 +4899,10 @@ React.makeElement = React['createElement'];
 	    componentDidUpdate: function componentDidUpdate() {
 
 	        var self = this;
-	        if (self.scrollToLastSelected && self.jspSelected) {
+	        if (self.scrollToLastSelected && self.psSelected) {
 
 	            self.scrollToLastSelected = false;
-	            var $jsp = $(self.jspSelected.findDOMNode()).data('jsp');
-	            if ($jsp) {
-	                $jsp.scrollToPercentX(1, false);
-	            }
+	            self.psSelected.scrollToPercentX(100, false);
 	        }
 	    },
 	    componentWillMount: function componentWillMount() {
@@ -4927,7 +4932,7 @@ React.makeElement = React['createElement'];
 	        var self = this;
 
 	        if (self.props.multiple) {
-	            $(document.body).unbind('keypress.contactPicker' + self.getUniqueId());
+	            $(document.body).off('keypress.contactPicker' + self.getUniqueId());
 	        }
 	    },
 	    render: function render() {
@@ -5015,42 +5020,8 @@ React.makeElement = React['createElement'];
 	                        self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : __(l[8889])
 	                    )
 	                );
-	            } else if (self.state.selected.length === 1) {
-	                self.state.selected.forEach(function (v, k) {
-	                    contactsSelected.push(React.makeElement(ContactItem, { contact: self.props.contacts[v], onClick: onContactSelectDoneCb,
-	                        key: v
-	                    }));
-	                });
-	                footer = React.makeElement(
-	                    "div",
-	                    { className: "contacts-search-footer" },
-	                    React.makeElement(
-	                        PerfectScrollbar,
-	                        { className: "selected-contact-block", selected: this.state.selected },
-	                        React.makeElement(
-	                            "div",
-	                            { className: "select-contact-centre", style: { width: selectedWidth } },
-	                            contactsSelected
-	                        )
-	                    ),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "fm-dialog-footer" },
-	                        React.makeElement(
-	                            "span",
-	                            { className: "selected-contact-amount" },
-	                            self.state.selected.length,
-	                            " contacts selected"
-	                        ),
-	                        React.makeElement(
-	                            "a",
-	                            { href: "javascript:;", className: "default-grey-button right", onClick: onSelectDoneCb },
-	                            self.props.singleSelectedButtonLabel ? self.props.singleSelectedButtonLabel : l[5885]
-	                        )
-	                    )
-	                );
-	            } else if (self.state.selected.length > 1) {
-	                self.state.selected.forEach(function (v, k) {
+	            } else {
+	                (self.state.selected || []).forEach(function (v, k) {
 	                    contactsSelected.push(React.makeElement(ContactItem, { contact: self.props.contacts[v], onClick: onContactSelectDoneCb,
 	                        key: v
 	                    }));
@@ -5060,11 +5031,11 @@ React.makeElement = React['createElement'];
 	                    "div",
 	                    { className: "contacts-search-footer" },
 	                    React.makeElement(
-	                        utils.JScrollPane,
-	                        { className: "selected-contact-block horizontal-only",
+	                        PerfectScrollbar,
+	                        { className: "perfectScrollbarContainer selected-contact-block horizontal-only",
 	                            selected: this.state.selected,
-	                            ref: function ref(jspSelected) {
-	                                self.jspSelected = jspSelected;
+	                            ref: function ref(psSelected) {
+	                                self.psSelected = psSelected;
 	                            } },
 	                        React.makeElement(
 	                            "div",
@@ -5445,7 +5416,7 @@ React.makeElement = React['createElement'];
 	                            "div",
 	                            { className: renameButtonClass,
 	                                onClick: function onClick(e) {
-	                                    if ($(e.target).closest('.disabled').size() > 0) {
+	                                    if ($(e.target).closest('.disabled').length > 0) {
 	                                        return false;
 	                                    }
 	                                    if (self.props.onRenameClicked) {
@@ -5484,7 +5455,7 @@ React.makeElement = React['createElement'];
 	                            "div",
 	                            { className: "link-button " + (dontShowTruncateButton ? "disabled" : ""),
 	                                onClick: function onClick(e) {
-	                                    if ($(e.target).closest('.disabled').size() > 0) {
+	                                    if ($(e.target).closest('.disabled').length > 0) {
 	                                        return false;
 	                                    }
 	                                    if (self.props.onTruncateClicked) {
@@ -5499,7 +5470,7 @@ React.makeElement = React['createElement'];
 	                            "div",
 	                            { className: "link-button",
 	                                onClick: function onClick(e) {
-	                                    if ($(e.target).closest('.disabled').size() > 0) {
+	                                    if ($(e.target).closest('.disabled').length > 0) {
 	                                        return false;
 	                                    }
 	                                    if (room.isArchived()) {
@@ -5519,7 +5490,7 @@ React.makeElement = React['createElement'];
 	                            "div",
 	                            { className: "link-button red " + (room.stateIsLeftOrLeaving() ? "disabled" : ""),
 	                                onClick: function onClick(e) {
-	                                    if ($(e.target).closest('.disabled').size() > 0) {
+	                                    if ($(e.target).closest('.disabled').length > 0) {
 	                                        return false;
 	                                    }
 	                                    if (self.props.onLeaveClicked) {
@@ -5652,7 +5623,7 @@ React.makeElement = React['createElement'];
 	            }, 2000);
 	        });
 
-	        $(document).unbind("fullscreenchange.megaChat_" + room.roomId).bind("fullscreenchange.megaChat_" + room.roomId, function () {
+	        $(document).rebind("fullscreenchange.megaChat_" + room.roomId, function () {
 	            if (!$(document).fullScreen() && room.isCurrentlyActive) {
 	                self.setState({ fullScreenModeEnabled: false });
 	            } else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
@@ -5745,14 +5716,14 @@ React.makeElement = React['createElement'];
 
 	        var $container = $(ReactDOM.findDOMNode(self));
 	        if ($container) {
-	            $container.unbind('mouseover.chatUI' + self.props.chatRoom.roomId);
-	            $container.unbind('mouseout.chatUI' + self.props.chatRoom.roomId);
-	            $container.unbind('mousemove.chatUI' + self.props.chatRoom.roomId);
+	            $container.off('mouseover.chatUI' + self.props.chatRoom.roomId);
+	            $container.off('mouseout.chatUI' + self.props.chatRoom.roomId);
+	            $container.off('mousemove.chatUI' + self.props.chatRoom.roomId);
 	        }
 
-	        $(document).unbind("fullscreenchange.megaChat_" + room.roomId);
-	        $(window).unbind('resize.chatUI_' + room.roomId);
-	        $(room).unbind('toggleMessages.av');
+	        $(document).off("fullscreenchange.megaChat_" + room.roomId);
+	        $(window).off('resize.chatUI_' + room.roomId);
+	        $(room).off('toggleMessages.av');
 	    },
 	    toggleMessages: function toggleMessages(e) {
 	        if (e) {
@@ -6052,7 +6023,7 @@ React.makeElement = React['createElement'];
 	                self.messagesListScrollable.scrollToBottom();
 	            }
 	        });
-	        self.props.chatRoom.rebind('openSendFilesDialog', function (e) {
+	        self.props.chatRoom.rebind('openSendFilesDialog.cpanel', function (e) {
 	            self.setState({ 'attachCloudDialog': true });
 	        });
 
@@ -6094,7 +6065,7 @@ React.makeElement = React['createElement'];
 
 	        var room = self.props.chatRoom;
 
-	        $(document).unbind("fullscreenchange.megaChat_" + room.roomId).bind("fullscreenchange.megaChat_" + room.roomId, function () {
+	        $(document).rebind("fullscreenchange.megaChat_" + room.roomId, function () {
 	            if (!$(document).fullScreen() && room.isCurrentlyActive) {
 	                self.setState({ isFullscreenModeEnabled: false });
 	            } else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
@@ -6123,7 +6094,7 @@ React.makeElement = React['createElement'];
 
 	        window.removeEventListener('resize', self.handleWindowResize);
 	        window.removeEventListener('keydown', self.handleKeyDown);
-	        $(document).unbind("fullscreenchange.megaChat_" + chatRoom.roomId);
+	        $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
 	    },
 	    componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
 	        var self = this;
@@ -6154,14 +6125,14 @@ React.makeElement = React['createElement'];
 
 	        if (prevProps.isActive === false && self.props.isActive === true) {
 	            var $typeArea = $('.messages-textarea:visible:first', $node);
-	            if ($typeArea.size() === 1) {
-	                $typeArea.focus();
+	            if ($typeArea.length === 1) {
+	                $typeArea.trigger("focus");
 	                moveCursortoToEnd($typeArea[0]);
 	            }
 	        }
 	        if (!prevState.renameDialog && self.state.renameDialog === true) {
 	            var $input = $('.chat-rename-dialog input');
-	            $input.focus();
+	            $input.trigger("focus");
 	            $input[0].selectionStart = 0;
 	            $input[0].selectionEnd = $input.val().length;
 	        }
@@ -6171,7 +6142,7 @@ React.makeElement = React['createElement'];
 	                self.messagesListScrollable.reinitialise(false);
 
 	                Soon(function () {
-	                    if (self.editDomElement && self.editDomElement.size() === 1) {
+	                    if (self.editDomElement && self.editDomElement.length === 1) {
 	                        self.messagesListScrollable.scrollToElement(self.editDomElement[0], false);
 	                    }
 	                });
@@ -6197,7 +6168,7 @@ React.makeElement = React['createElement'];
 	            return;
 	        }
 
-	        var scrollBlockHeight = $('.chat-content-block', $container).outerHeight() - $('.chat-topic-block', $container).outerHeight() - $('.call-block', $container).outerHeight() - $('.chat-textarea-block', $container).outerHeight();
+	        var scrollBlockHeight = $('.chat-content-block', $container).outerHeight() - ($('.chat-topic-block', $container).outerHeight() || 0) - ($('.call-block', $container).outerHeight() || 0) - $('.chat-textarea-block', $container).outerHeight();
 
 	        if (scrollBlockHeight != self.$messages.outerHeight()) {
 	            self.$messages.css('height', scrollBlockHeight);
@@ -6275,14 +6246,13 @@ React.makeElement = React['createElement'];
 	                self.lastContentHeightBeforeHist = ps.getScrollHeight();
 
 	                var msgsAppended = 0;
-	                $(chatRoom).unbind('onMessagesBuffAppend.pull');
-	                $(chatRoom).bind('onMessagesBuffAppend.pull', function () {
+	                $(chatRoom).rebind('onMessagesBuffAppend.pull', function () {
 	                    msgsAppended++;
 	                });
 
-	                $(chatRoom).unbind('onHistoryDecrypted.pull');
+	                $(chatRoom).off('onHistoryDecrypted.pull');
 	                $(chatRoom).one('onHistoryDecrypted.pull', function (e) {
-	                    $(chatRoom).unbind('onMessagesBuffAppend.pull');
+	                    $(chatRoom).off('onMessagesBuffAppend.pull');
 	                    var prevPosY = ps.getScrollHeight() - self.lastContentHeightBeforeHist + self.lastScrollPosition;
 
 	                    ps.scrollToY(prevPosY, true);
@@ -7092,7 +7062,10 @@ React.makeElement = React['createElement'];
 	                                editingMessageId: self.state.editing,
 	                                confirmDeleteDialog: self.state.confirmDeleteDialog,
 	                                renderedMessagesCount: messagesList.length,
-	                                isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown
+	                                isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown,
+	                                options: {
+	                                    'suppressScrollX': true
+	                                }
 	                            },
 	                            React.makeElement(
 	                                "div",
@@ -7169,7 +7142,7 @@ React.makeElement = React['createElement'];
 	                                            self.props.chatRoom.scrolledToBottom = true;
 	                                            self.lastScrollPosition = 0;
 
-	                                            $(self.props.chatRoom).bind('onMessagesBuffAppend.pull', function () {
+	                                            $(self.props.chatRoom).rebind('onMessagesBuffAppend.pull', function () {
 	                                                self.messagesListScrollable.scrollToBottom(false);
 	                                                setTimeout(function () {
 	                                                    self.messagesListScrollable.enable();
@@ -7369,7 +7342,7 @@ React.makeElement = React['createElement'];
 	        $(document.body).addClass('overlayed');
 	        $('.fm-dialog-overlay').removeClass('hidden');
 
-	        $('textarea:focus').blur();
+	        $('textarea:focus').trigger("blur");
 
 	        document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
 	        document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
@@ -7393,10 +7366,10 @@ React.makeElement = React['createElement'];
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
-	        $(document).unbind('keyup.modalDialog' + this.getUniqueId());
+	        $(document).off('keyup.modalDialog' + this.getUniqueId());
 	        $(document.body).removeClass('overlayed');
 	        $('.fm-dialog-overlay').addClass('hidden');
-	        $(window).unbind('resize.modalDialog' + this.getUniqueId());
+	        $(window).off('resize.modalDialog' + this.getUniqueId());
 	    },
 	    onCloseClicked: function onCloseClicked(e) {
 	        var self = this;
@@ -7592,7 +7565,7 @@ React.makeElement = React['createElement'];
 	        return {};
 	    },
 	    unbindEvents: function unbindEvents() {
-	        $(document).unbind('keyup.confirmDialog' + this.getUniqueId());
+	        $(document).off('keyup.confirmDialog' + this.getUniqueId());
 	    },
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
@@ -7784,7 +7757,7 @@ React.makeElement = React['createElement'];
 	    componentDidUpdate: function componentDidUpdate(oldProps, oldState) {
 	        var self = this;
 	        if (oldState.active === true && this.state.active === false) {
-	            $(window).unbind('resize.tooltip' + this.getUniqueId());
+	            $(window).off('resize.tooltip' + this.getUniqueId());
 	        }
 	        if (self.state.active === true) {
 	            self.repositionTooltip();
@@ -8196,7 +8169,7 @@ React.makeElement = React['createElement'];
 	            var charTyped = false;
 	            var keyCode = e.which || e.keyCode;
 	            var selectionIncludeShift = e.shiftKey;
-	            if ($('input:focus, textarea:focus').size() > 0) {
+	            if ($('input:focus, textarea:focus').length > 0) {
 	                return;
 	            }
 
@@ -8335,7 +8308,7 @@ React.makeElement = React['createElement'];
 	        });
 	    },
 	    unbindEvents: function unbindEvents() {
-	        $(document.body).unbind('keydown.cloudBrowserModalDialog');
+	        $(document.body).off('keydown.cloudBrowserModalDialog');
 	    },
 	    onEntryClick: function onEntryClick(e, node) {
 	        var self = this;
@@ -8754,7 +8727,7 @@ React.makeElement = React['createElement'];
 	            $parentBlock.removeClass("active-search");
 	        } else {
 	            $parentBlock.addClass("active-search");
-	            $('input', $parentBlock).focus();
+	            $('input', $parentBlock).trigger("focus");
 	        }
 	    },
 	    onTabButtonClick: function onTabButtonClick(e, selectedTab) {
@@ -9647,7 +9620,7 @@ React.makeElement = React['createElement'];
 	        var room = this.props.chatRoom;
 
 	        if (room.isCurrentlyActive && self.isMounted()) {
-	            if ($('textarea:focus,select:focus,input:focus').filter(":visible").size() === 0) {
+	            if ($('textarea:focus,select:focus,input:focus').filter(":visible").length === 0) {
 
 	                this.focusTypeArea();
 	            }
@@ -9880,9 +9853,12 @@ React.makeElement = React['createElement'];
 	            height: self.state.textareaHeight
 	        };
 
-	        var textareaScrollBlockStyles = {
-	            height: Math.min(self.state.textareaHeight, self.getTextareaMaxHeight())
-	        };
+	        var textareaScrollBlockStyles = {};
+	        var newHeight = Math.min(self.state.textareaHeight, self.getTextareaMaxHeight());
+
+	        if (newHeight > 0) {
+	            textareaScrollBlockStyles['height'] = newHeight;
+	        }
 
 	        var emojiAutocomplete = null;
 	        if (self.state.emojiSearchQuery) {
@@ -10547,7 +10523,7 @@ React.makeElement = React['createElement'];
 	        };
 	    },
 	    unbindKeyEvents: function unbindKeyEvents() {
-	        $(document).unbind('keydown.emojiAutocomplete' + this.getUniqueId());
+	        $(document).off('keydown.emojiAutocomplete' + this.getUniqueId());
 	    },
 	    bindKeyEvents: function bindKeyEvents() {
 	        var self = this;
@@ -10859,7 +10835,7 @@ React.makeElement = React['createElement'];
 	        var chatRoom = self.props.chatRoom;
 	        var megaChat = chatRoom.megaChat;
 
-	        chatRoom.unbind("onParticipantTyping.whosTyping");
+	        chatRoom.off("onParticipantTyping.whosTyping");
 	    },
 	    stoppedTyping: function stoppedTyping(u_h) {
 	        var self = this;
@@ -11257,8 +11233,8 @@ React.makeElement = React['createElement'];
 	        if (self.isBeingEdited() && self.isMounted()) {
 	            var $generic = $(self.findDOMNode());
 	            var $textarea = $('textarea', $generic);
-	            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
-	                $textarea.focus();
+	            if ($textarea.length > 0 && !$textarea.is(":focus")) {
+	                $textarea.trigger("focus");
 	                moveCursortoToEnd($textarea[0]);
 	            }
 	            if (!oldState.editing) {
@@ -11287,13 +11263,13 @@ React.makeElement = React['createElement'];
 	        if (self.isBeingEdited() && self.isMounted()) {
 	            var $generic = $(self.findDOMNode());
 	            var $textarea = $('textarea', $generic);
-	            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
-	                $textarea.focus();
+	            if ($textarea.length > 0 && !$textarea.is(":focus")) {
+	                $textarea.trigger("focus");
 	                moveCursortoToEnd($textarea[0]);
 	            }
 	        }
 
-	        $node.delegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut', function (e) {
+	        $node.rebind('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES, function (e) {
 	            if (e.target.classList.contains('button')) {
 
 	                return;
@@ -11322,8 +11298,8 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        var $node = $(self.findDOMNode());
 
-	        $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
-	        $node.undelegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut');
+	        $(self.props.message).off('onChange.GenericConversationMessage' + self.getUniqueId());
+	        $node.off('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES);
 	    },
 	    _nodeUpdated: function _nodeUpdated(h) {
 	        var self = this;
@@ -11424,21 +11400,34 @@ React.makeElement = React['createElement'];
 	        M.addDownload([v]);
 	    },
 	    _addToCloudDrive: function _addToCloudDrive(v, openSendToChat) {
-	        openSaveToDialog(v, function (node, target, isForward) {
-	            if (isForward) {
-	                megaChat.getMyChatFilesFolder().done(function (myChatFolderId) {
+	        openSaveToDialog(v, function (node, target) {
+	            if (Array.isArray(target)) {
+	                megaChat.getMyChatFilesFolder().then(function (myChatFolderId) {
 	                    M.injectNodes(node, myChatFolderId, function (res) {
 	                        if (!Array.isArray(res)) {
 	                            if (d) {
 	                                console.error("Failed to inject nodes. Res:", res);
 	                            }
-	                        } else {
+	                            return;
+	                        }
 
-	                            megaChat.chats[$.mcselected].attachNodes(res);
+	                        var lastRoom;
+	                        for (var i = target.length; i--;) {
+	                            var room = megaChat.chats[target[i]];
+	                            if (room) {
+	                                room.attachNodes(res);
+	                                lastRoom = room;
+	                            } else {
+	                                console.warn('Invalid room...', target[i]);
+	                            }
+	                        }
+
+	                        if (lastRoom) {
 	                            showToast('send-chat', res.length > 1 ? l[17767] : l[17766]);
+	                            M.openFolder('chat/' + (lastRoom.type === 'group' ? 'g/' : '') + lastRoom.roomId);
 	                        }
 	                    });
-	                }).fail(function () {
+	                }).catch(function () {
 	                    if (d) {
 	                        console.error("Failed to allocate 'My chat files' folder.", arguments);
 	                    }
@@ -13479,7 +13468,7 @@ React.makeElement = React['createElement'];
 	    this.isCurrentlyActive = false;
 
 	    if (d) {
-	        this.bind('onStateChange', function (e, oldState, newState) {
+	        this.rebind('onStateChange.chatRoom', function (e, oldState, newState) {
 	            self.logger.debug("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
 	        });
 	    }
@@ -13594,7 +13583,7 @@ React.makeElement = React['createElement'];
 
 	    self.megaChat.rebind("onRoomDestroy." + self.roomId, function (e, room) {
 	        if (room.roomId == self.roomId) {
-	            $(window).unbind("focus." + self.roomId);
+	            $(window).off("focus." + self.roomId);
 	        }
 	    });
 
@@ -13621,26 +13610,25 @@ React.makeElement = React['createElement'];
 	ChatRoom.ARCHIVED = 0x01;
 
 	ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function (timeout) {
+	    'use strict';
+
 	    var self = this;
-
-	    var $promise = new MegaPromise();
-
 	    var anonId = "";
+	    var $promise = new MegaPromise();
 
 	    if (self.megaChat.rtc && self.megaChat.rtc.ownAnonId) {
 	        anonId = self.megaChat.rtc.ownAnonId;
 	    }
-	    $.ajax("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId, {
-	        method: "GET",
-	        timeout: timeout ? timeout : 10000
-	    }).done(function (r) {
+
+	    M.xhr({
+	        timeout: timeout || 10000,
+	        url: "https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId
+	    }).then(function (ev, r) {
+	        r = JSON.parse(r);
 	        if (r.turn && r.turn.length > 0) {
 	            var servers = [];
 	            r.turn.forEach(function (v) {
-	                var transport = v.transport;
-	                if (!transport) {
-	                    transport = "udp";
-	                }
+	                var transport = v.transport || 'udp';
 
 	                servers.push({
 	                    urls: ['turn:' + v.host + ':' + v.port + '?transport=' + transport],
@@ -13649,13 +13637,11 @@ React.makeElement = React['createElement'];
 	                });
 	            });
 	            self.megaChat.rtc.updateIceServers(servers);
-
-	            $promise.resolve();
-	        } else {
-	            $promise.resolve();
 	        }
-	    }).fail(function () {
-	        $promise.reject();
+
+	        $promise.resolve();
+	    }).catch(function () {
+	        $promise.reject.apply($promise, arguments);
 	    });
 
 	    return $promise;
@@ -14123,21 +14109,21 @@ React.makeElement = React['createElement'];
 
 	        if (M.d[nodeId] && M.d[nodeId].u !== u_handle) {
 
-	            self.megaChat.getMyChatFilesFolder().done(function (myChatFilesFolderHandle) {
-	                M.copyNodes([nodeId], myChatFilesFolderHandle, false, new MegaPromise()).done(function (copyNodesResponse) {
+	            self.megaChat.getMyChatFilesFolder().then(function (myChatFilesFolderHandle) {
+	                M.copyNodes([nodeId], myChatFilesFolderHandle, false, new MegaPromise()).then(function (copyNodesResponse) {
 	                    if (copyNodesResponse && copyNodesResponse[0]) {
 	                        proxyPromise.linkDoneAndFailTo(self.attachNodes([copyNodesResponse[0]]));
 	                    } else {
 	                        proxyPromise.reject();
 	                    }
-	                }).fail(function (err) {
+	                }).catch(function (err) {
 	                    proxyPromise.reject(err);
 	                });
-	            }).fail(function (err) {
+	            }).catch(function (err) {
 	                proxyPromise.reject(err);
 	            });
 	        } else {
-	            self._sendNodes([nodeId], users).done(function () {
+	            self._sendNodes([nodeId], users).then(function () {
 	                var nodesMeta = [];
 	                var node = M.d[nodeId];
 	                nodesMeta.push({
@@ -14154,7 +14140,7 @@ React.makeElement = React['createElement'];
 	                self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT + JSON.stringify(nodesMeta));
 
 	                proxyPromise.resolve([nodeId]);
-	            }).fail(function (r) {
+	            }).catch(function (r) {
 	                proxyPromise.reject(r);
 	            });
 	        }

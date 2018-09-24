@@ -1398,8 +1398,8 @@ var dlmanager = {
             if (page === 'download') {
                 var $dtb = $('.download.transfer-buttons, .download.video-transfer-buttons');
 
-                $('.create-account-button', $dtb).addClass('hidden').unbind('click');
-                $('.get-more-bonuses', $dtb).addClass('hidden').unbind('click');
+                $('.create-account-button', $dtb).addClass('hidden').off('click');
+                $('.get-more-bonuses', $dtb).addClass('hidden').off('click');
 
                 if (flags & this.LMT_HASACHIEVEMENTS) {
                     if (flags & this.LMT_ISREGISTERED) {
@@ -1685,10 +1685,10 @@ var dlmanager = {
         this.onLimitedBandwidth = function() {
             if (callback) {
                 $dialog.removeClass('registered achievements exceeded pro slider');
-                $('.bottom-tips a', $dialog).unbind('click');
-                $('.continue, .continue-download', $dialog).unbind('click');
-                $('.upgrade, .reg-st3-membership-bl', $dialog).unbind('click');
-                $('.get-more-bonuses', $dialog).unbind('click');
+                $('.bottom-tips a', $dialog).off('click');
+                $('.continue, .continue-download', $dialog).off('click');
+                $('.upgrade, .reg-st3-membership-bl', $dialog).off('click');
+                $('.get-more-bonuses', $dialog).off('click');
                 if ($.dialog === 'download-pre-warning') {
                     $.dialog = false;
                 }
@@ -1846,8 +1846,8 @@ var dlmanager = {
                 if (!$('.download.transfer-overquota-txt').is(':visible')) {
                     clearInterval(dlmanager._overQuotaTimeLeftTick);
                 }
-                $('.fm-dialog-overlay').unbind('click.dloverq');
-                $dialog.unbind('dialog-closed').find('.fm-dialog-close').unbind('click.quota');
+                $('.fm-dialog-overlay').off('click.dloverq');
+                $dialog.off('dialog-closed').find('.fm-dialog-close').off('click.quota');
                 closeDialog();
                 return false;
             };
@@ -2120,7 +2120,7 @@ var dlmanager = {
         var $body = $('body');
 
         var hideOverlay = function() {
-            $body.unbind('keyup.msd');
+            $body.off('keyup.msd');
             $overlay.addClass('hidden');
             $body.removeClass('overlayed');
         };

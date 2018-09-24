@@ -41,7 +41,7 @@ function BusinessAccountUI() {
         $('.fm-left-panel').addClass('user-management');
 
         // headers
-        $('.fm-right-header-user-management .user-management-main-page-buttons').addClass('hidden');
+        $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden');
         //$('.fm-right-header-user-management .user-management-breadcrumb.subaccount').addClass('hidden');
         //$('.fm-right-header-user-management .user-management-breadcrumb.overview').addClass('hidden');
         //$('.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
@@ -174,7 +174,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             $currUserLeftPane.removeClass('selected');
             var uName = 'Error';
             try {
-                var uName = from8(base64urldecode(subUsers[h].firstname)) + ' ' +
+                uName = from8(base64urldecode(subUsers[h].firstname)) + ' ' +
                     from8(base64urldecode(subUsers[h].lastname));
             }
             catch (e) { }
@@ -321,20 +321,23 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         });
 
         // 3- on clicking on a sub-user to view his info (from left pane or row)
-        $('.grid-table-user-management .view-icon.icon, .content-panel.user-management .nw-user-management-item')
-            .off('click.subuser');
-        $('.grid-table-user-management .view-icon.icon, .content-panel.user-management .nw-user-management-item')
+        $('.grid-table-user-management .view-icon.icon, .content-panel.user-management .nw-user-management-item,' +
+            '.grid-table-user-management tr').off('click.subuser')
             .on('click.subuser', function subUserViewInfoClickHandler() {
 
                 $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
 
                 var userHandle = false;
+                var $me = $(this);
 
-                if ($(this).hasClass('nw-user-management-item')) { // left pane
-                    userHandle = $(this).attr('id');
+                if ($me.hasClass('nw-user-management-item')) { // left pane
+                    userHandle = $me.attr('id');
                 }
-                else if ($(this).hasClass('view-icon')) { // user row
-                    userHandle = $(this).closest('tr').attr('id');
+                else if ($me.hasClass('view-icon')) { // user row
+                    userHandle = $me.closest('tr').attr('id');
+                }
+                else if ($me.is('tr')) { // user row
+                    userHandle = $me.attr('id');
                 }
                 else {
                     console.error('click handler fired in business account pages on wrong element');
@@ -346,7 +349,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 }
                 $('.content-panel.user-management .nw-user-management-item#' + userHandle).addClass('selected');
                 uiBusiness.viewSubAccountInfoUI(userHandle);
-
+                return false;
             });
 
         // 4- on clicking on a sub-user row to edit his info (edit  icon)
@@ -354,6 +357,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             function editSubUserClickHandler() {
                 var userHandle = $(this).closest('tr').attr('id');
                 mySelf.showEditSubUserDialog(userHandle);
+                return false;
             });
 
         // 5- on clicking on a sub-user row to enable/disable
@@ -417,6 +421,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
                     mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler2, uName, true);
                 }
+                return false;
 
             });
 
@@ -641,11 +646,12 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
         });
 
     // handler account setting page
-    $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
-        .on('click.subuser', function addSubUserClickHandler() {
-            mySelf.showAddSubUserDialog(null, mySelf.viewSubAccountListUI);
+    $('.landing-sub-container.suba-account-setting', $landingContainer).off('click.subuser')
+        .on('click.subuser', function accountSettingClickHandler() {
+            mySelf.viewBusinessAccountPage();
         });
 
+    $('.fm-right-header-user-management .user-management-main-page-buttons').addClass('hidden');
     $businessAccountContainer.removeClass('hidden'); // BA container
     $landingContainer.removeClass('hidden');
 };
@@ -1451,6 +1457,9 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         var $countriesSelect = $('#cnt-ddl', $profileContainer);
         $countriesSelect.empty();
 
+        // first option as place-holder
+        $countriesSelect.append('<option value="" hidden disabled>{0}</option >'.replace('{0}', l[481]));
+
         var ctnKeys = Object.keys(countries);
 
         for (var k = 0; k < ctnKeys.length; k++) {
@@ -1656,7 +1665,7 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
         };
 
         // check if we need to re-draw
-        if (!isInvoiceRedrawNeeded(invoicesList, (this.business) ? this.business.previousInvoices : null)) {
+        if (!isInvoiceRedrawNeeded(invoicesList, (mySelf.business) ? mySelf.business.previousInvoices : null)) {
             return unhideSection();
         }
 
@@ -1952,6 +1961,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('.error-message', $adduserContianer).addClass('hidden');
         $('.verification-container', $dialog).addClass('hidden');
         $('.dialog-subtitle', $dialog).addClass('hidden');
+        $('.dialog-title', $dialog).text(l[19104]);
         $('.dialog-button-container .add-more', $dialog).addClass('hidden');
         $('.dialog-button-container .add-sub-user', $dialog).text(l[19084]).removeClass('a-ok-btn');
         // $('.licence-bar', $dialog).removeClass('hidden');
@@ -1974,6 +1984,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
         // $('.licence-bar', $dialog).addClass('hidden');
         $('.dialog-subtitle', $dialog).removeClass('hidden');
+        $('.dialog-title', $dialog).text(l[18280]);
     }
 
 
@@ -2120,6 +2131,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
                     $('.licence-bar', $dialog).addClass('hidden');
                     $('.dialog-subtitle', $dialog).removeClass('hidden');
+                    $('.dialog-title', $dialog).text(l[18280]);
                 }
                 else {
                     $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1679]);

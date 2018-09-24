@@ -342,12 +342,12 @@ pro.propay = {
             // Remove checked state on the other buttons
             $durationOptions.find('.membership-radio').removeClass('checked');
             $durationOptions.find('.membership-radio-label').removeClass('checked');
-            $durationOptions.find('input').removeAttr('checked');
+            $durationOptions.find('input').prop('checked', false);
 
             // Add checked state to just to the clicked one
             $this.find('.membership-radio').addClass('checked');
             $this.find('.membership-radio-label').addClass('checked');
-            $this.find('input').attr('checked', 'checked');
+            $this.find('input').prop('checked', true);
 
             // Update the main price and wording for one-time or recurring
             pro.propay.updateMainPrice(planIndex);
@@ -806,7 +806,7 @@ pro.propay = {
 
         // Find and select the first payment option
         var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
-        $paymentOption.find('input').attr('checked', 'checked');
+        $paymentOption.find('input').prop('checked', true);
         $paymentOption.find('.membership-radio').addClass('checked');
         $paymentOption.find('.provider-details').addClass('checked');
     },
@@ -830,7 +830,7 @@ pro.propay = {
         $durationOptions.removeClass('hidden');
         $durationOptions.find('.membership-radio').removeClass('checked');
         $durationOptions.find('.membership-radio-label').removeClass('checked');
-        $durationOptions.find('input').removeAttr('checked', 'checked');
+        $durationOptions.find('input').prop('checked', false);
 
         // Loop through renewal period options (1 month, 1 year)
         $.each($durationOptions, function(key, durationOption) {
@@ -865,7 +865,7 @@ pro.propay = {
         }
         $newDurationOption.find('.membership-radio').addClass('checked');
         $newDurationOption.find('.membership-radio-label').addClass('checked');
-        $newDurationOption.find('input').attr('checked', 'checked');
+        $newDurationOption.find('input').prop('checked', true);
 
         // Update the text for one-time or recurring
         pro.propay.updateMainPrice(newPlanIndex);

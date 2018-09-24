@@ -343,18 +343,31 @@ function checkMail(email) {
  * @param kls class on which prototype this method should add the on, bind, unbind, etc methods
  */
 function makeObservable(kls) {
+    'use strict';
+
     var target = kls.prototype || kls;
-    var aliases = ['on', 'bind', 'unbind', 'one', 'trigger', 'rebind'];
+    var aliases = [['on'], ['off'], ['bind', 'on'], ['unbind', 'off'], ['one'], ['trigger'], ['rebind']];
 
     aliases.forEach(function(fn) {
-        target[fn] = function() {
-            // trying to save few ms here...
-            if (this && !this._$thisCache) {
-                this._$thisCache = $(this);
-            }
+        var prop = fn[0];
+        fn = fn[1] || prop;
 
-            return this._$thisCache[fn].apply(this._$thisCache, arguments);
-        };
+        Object.defineProperty(target, prop, {
+            value: function() {
+                return this.$__eventEmitter___[fn].apply(this.$__eventEmitter___, arguments);
+            },
+            writable: true,
+            configurable: true
+        });
+    });
+
+    Object.defineProperty(target, '$__eventEmitter___', {
+        get: function() {
+            // TODO: Get a real event emitter and deprecate jQuery here.
+            Object.defineProperty(this, '$__eventEmitter___', {value: $(this)});
+            return this.$__eventEmitter___;
+        },
+        configurable: true
     });
 
     target = aliases = kls = undefined;
@@ -1025,7 +1038,7 @@ function moveCursortoToEnd(el) {
         range.collapse(false);
         range.select();
     }
-    $(el).focus();
+    $(el).trigger("focus");
 }
 
 function asyncApiReq(data) {
@@ -1323,29 +1336,23 @@ function generateAnonymousReport() {
             return;
         }
         promises.push(
-            $.ajax({
-                url: self.src,
-                dataType: "text"
-            })
-            .done(function(r) {
-                report.scripts[src] = [
-                        MurmurHash3(r, 0x4ef5391a),
-                        r.length
-                    ];
-            })
-            .fail(function(r) {
-                report.scripts[src] = false;
-            })
+            M.xhr({type: "text", url: self.src})
+                .then(function(ev, r) {
+                    report.scripts[src] = [MurmurHash3(r, 0x4ef5391a), r.length];
+                })
+                .catch(function() {
+                    report.scripts[src] = false;
+                })
         );
     });
 
     report.version = null; // TODO: how can we find this?
 
     MegaPromise.allDone(promises)
-        .done(function() {
+        .then(function() {
             $promise.resolve(report);
         })
-        .fail(function() {
+        .catch(function() {
             $promise.resolve(report)
         });
 
@@ -2610,41 +2617,56 @@ function classifyPassword(password) {
     // Calculate the password score using the ZXCVBN library and its length
     var passwordScore = zxcvbn(password).score;
     var passwordLength = password.length;
+    var $passStatus = $('.account.password-stutus');
+    var className = '';
+    var string1 = '';
+    var string2 = '';
+    var strongWeak = '';
 
     if (passwordLength < security.minPasswordLength) {
-        $('.login-register-input.password').addClass('weak-password');
-        $('.new-registration').addClass('good1');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[18700]);   // Too short
-        $('.new-reg-status-description').text(l[18701]);
+        string1 = l[18700];
+        string2 = l[18701];
+        className = 'good1';
+        strongWeak = 'strong-password';
     }
     else if (passwordScore === 4) {
-        $('.login-register-input.password').addClass('strong-password');
-        $('.new-registration').addClass('good5');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1128]); // Strong
-        $('.new-reg-status-description').text(l[1123]);
+        string1 = l[1128];
+        string2 = l[1123];
+        className = 'good5';
+        strongWeak = 'strong-password';
     }
     else if (passwordScore === 3) {
-        $('.login-register-input.password').addClass('strong-password');
-        $('.new-registration').addClass('good4');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1127]); // Good
-        $('.new-reg-status-description').text(l[1122]);
+        string1 = l[1127];
+        string2 = l[1122];
+        className = 'good4';
     }
     else if (passwordScore === 2) {
-        $('.login-register-input.password').addClass('strong-password');
-        $('.new-registration').addClass('good3');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1126]); // Medium
-        $('.new-reg-status-description').text(l[1121]);
+        string1 = l[1126];
+        string2 = l[1121];
+        className = 'good3';
+        strongWeak = 'weak-password';
     }
     else if (passwordScore === 1) {
-        $('.new-registration').addClass('good2');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1125]); // Weak
-        $('.new-reg-status-description').text(l[1120]);
+        string1 = l[1125];
+        string2 = l[1120];
+        className = 'good2';
+        strongWeak = 'weak-password';
     }
     else {
-        $('.login-register-input.password').addClass('weak-password');
-        $('.new-registration').addClass('good1');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1124]); // Very Weak
-        $('.new-reg-status-description').text(l[1119]);
+        string1 = l[1124];
+        string2 = l[1119];
+        className = 'good1';
+        strongWeak = 'weak-password';
+    }
+
+    if ($('.login-register-input.password').length) {
+        $('.login-register-input.password').addClass(strongWeak);
+        $('.new-registration').addClass(className);
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], string1);   // Too short
+        $('.new-reg-status-description').text(string2);
+    }
+    else if ($passStatus.length) {
+        $passStatus.addClass(className + ' checked').text(string1);
     }
 
     $('.password-status-warning')

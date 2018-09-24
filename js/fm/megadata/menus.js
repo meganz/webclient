@@ -695,7 +695,7 @@ MegaData.prototype.adjustContextMenuPosition = function(e, m) {
 
     var mPos;// menu position
     if (e.type === 'click' && !e.calculatePosition) {// Clicked on file-settings-icon
-        var ico = { 'x': e.currentTarget.context.clientWidth, 'y': e.currentTarget.context.clientHeight };
+        var ico = { 'x': e.delegateTarget.clientWidth, 'y': e.delegateTarget.clientHeight };
         var icoPos = getHtmlElemPos(e.delegateTarget);// Get position of clicked file-settings-icon
         mPos = M.reCalcMenuPosition(m, icoPos.x, icoPos.y, ico);
     }

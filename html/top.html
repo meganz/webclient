@@ -27,7 +27,7 @@
             <div class="top-icon search"><div class="dark-tooltip top">[$102]</div></div>
             <div class="top-search-clear">
                 <div class="top-clear-button"></div>
-                <input type="text" placeholder="[$102]" class="top-search-input"/>
+                <input type="text" placeholder="[$102]" class="top-search-input" />
             </div>
         </div>
 
@@ -47,15 +47,14 @@
         <div class="top-chat-notification hidden"><span class="notification-num" style="display: none;">0</span></div>
 
         <div class="top-buttons">
-            <a class="default-grey-button small top-login-button hidden">
-                [$171]
-            </a>
-            <a class="default-white-button small grey-txt create-account-button hidden">
-                <i class="semi-small-icon grey-mega"></i>
+            <a class="default-white-button small no-hover red-bg create-account-button hidden">
+                <i class="semi-small-icon white-mega"></i>
                 [$968]
             </a>
+            <a class="default-white-button small no-hover top-login-button hidden">
+                [$171]
+            </a>
         </div>
-
         <div class="top-buttons business">
             <a class="default-white-button small red create-account-button hidden">
                 <i class="semi-small-icon white-mega"></i>
@@ -65,7 +64,6 @@
                 [$171]
             </div>
         </div>
-
         <div class="top-change-language hidden">
             <span class="top-icon language"><div class="dark-tooltip top">[$670]</div></span>
             <span class="top-change-language-name">[$1436]</span>
@@ -209,13 +207,14 @@
             </div>
         </div>
 
-        <div class="dropdown body popup dropdown-arrow top-login-popup hidden">
+        <div class="dropdown body popup dropdown-arrow top-login-popup sign hidden">
             <i class="dropdown-white-arrow"></i>
-            <div class="top-login-full"></div>
-            <div class="clear"></div>
-            <div class="top-login-pad">
-                <form id="form_login_header" autocomplete="off">
-                </form>
+            <div class="fm-dialog-header">
+                <div class="top-login-full"></div>
+                <div class="clear"></div>
+            </div>
+            <div class="top-login-pad login">
+                <form id="form_login_header" autocomplete="off"></form>
             </div>
             <div class="top-login-warning active">
                 <div class="top-login-warning-arrow"></div>
@@ -228,7 +227,7 @@
                     <div class="clear"></div>
                     [$1094]
                     <div class="top-login-warning-bott">
-                        <div class="loginwarning-checkbox checkboxOff"></div>
+                        <div class="loginwarning-checkbox checkboxOff checkbox"></div>
                         <label class="radio-txt">[$229]</label>
                         <div class="clear"></div>
                     </div>
@@ -238,7 +237,7 @@
 
         <div class="dropdown body dropdown-arrow top-user-status-popup hidden">
             <i class="dropdown-white-arrow"></i>
-            <div class="dropdown-item mid-txt tick-item"  data-presence="chat">
+            <div class="dropdown-item mid-txt tick-item" data-presence="chat">
                 <span class="activity-status online"></span>
                 <span>[$5923]</span>
             </div>
@@ -246,11 +245,11 @@
                 <span class="activity-status away"></span>
                 <span>[$5924]</span>
             </div>
-            <div class="dropdown-item mid-txt tick-item"  data-presence="dnd">
+            <div class="dropdown-item mid-txt tick-item" data-presence="dnd">
                 <span class="activity-status busy"></span>
                 <span>[$5925]</span>
             </div>
-            <div class="dropdown-item mid-txt tick-item active"  data-presence="unavailable">
+            <div class="dropdown-item mid-txt tick-item active" data-presence="unavailable">
                 <span class="activity-status offline"></span>
                 <span>[$5926]</span>
             </div>

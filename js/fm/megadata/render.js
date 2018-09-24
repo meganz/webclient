@@ -438,9 +438,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
     }
 
     breadcrumbsResize();
-    $(window).bind('resize.fmbreadcrumbs', function() {
-        breadcrumbsResize();
-    });
+    $(window).rebind('resize.fmbreadcrumbs', SoonFc(breadcrumbsResize, 202));
 
     if ($('.fm-right-header .fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
         $('.fm-right-header .fm-breadcrumbs-block').removeClass('deactivated');
@@ -449,8 +447,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
         $('.fm-right-header .fm-breadcrumbs-block').addClass('deactivated');
     }
 
-    $('.fm-right-header .fm-breadcrumbs-block a').unbind('click');
-    $('.fm-right-header .fm-breadcrumbs-block a').bind('click', function() {
+    $('.fm-right-header .fm-breadcrumbs-block a').rebind('click', function() {
         var crumbId = $(this).attr('id');
 
         // When NOT deactivated

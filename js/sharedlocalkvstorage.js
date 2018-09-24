@@ -213,10 +213,11 @@ SharedLocalKVStorage.prototype._initPersistance = function() {
 
     self._setupPersistance();
 
-    $(self).unbind("onChange.logger" + self.name);
-    $(self).bind("onChange.logger" + self.name, function(e, k, v) {
-        self.logger.debug("Got onChange event:", k, v);
-    });
+    if (d) {
+        $(self).rebind("onChange.logger" + self.name, function(e, k, v) {
+            self.logger.debug("Got onChange event:", k, v);
+        });
+    }
 
     self._leavingListener = self.broadcaster.addListener('crossTab:leaving', function slkv_crosstab_leaving(data) {
         // master had changed?

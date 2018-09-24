@@ -11,7 +11,7 @@ var RichpreviewsFilter = function(megaChat) {
     "use strict";
     var self = this;
 
-    megaChat.bind("onBeforeSendMessage", function(e, eventData) {
+    megaChat.on("onBeforeSendMessage", function(e, eventData) {
         self.processMessage(e, eventData);
     });
 

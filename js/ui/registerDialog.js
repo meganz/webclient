@@ -386,7 +386,7 @@
                 $('.register-check', $dialog).removeClass('checkboxOff')
                     .addClass('checkboxOn');
             };
-            bottomPageDialog(false, 'terms'); // show terms dialog
+            bottomPageDialog(false, 'terms', false, true); // show terms dialog
             return false;
         });
     }

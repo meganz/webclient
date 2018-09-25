@@ -512,6 +512,8 @@ FileManager.prototype.initFileManagerUI = function() {
 
         // Remove all sub-menues from context-menu move-item
         $('#csb_' + M.RootID).empty();
+
+        $(window).off('resize.ccmui');
     };
 
     $('#fmholder').rebind('click.contextmenu', function(e) {

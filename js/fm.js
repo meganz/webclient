@@ -124,6 +124,7 @@ function addNewContact($addButton, cd) {
         }
         else {
             var promises = [];
+            var addedEmails = [];
 
             // Custom text message
             emailText = $textarea.val();
@@ -142,23 +143,18 @@ function addNewContact($addButton, cd) {
                 $mails.each(function(index, value) {
                     // Extract email addresses one by one
                     email = $(value).contents().eq(1).text();
-                    promises.push(M.inviteContact(M.u[u_handle].m, email, emailText));
+                    // if invitation is sent, push as added Emails.
+                    promises.push(M.inviteContact(M.u[u_handle].m, email, emailText).done(function(res) {
+                        addedEmails.push(res);
+                    }));
                 });
             }
 
-            MegaPromise.allDone(promises).always(function(res) {
-                if (res) {
-                    var addedEmails = [];
-                    for (var i = 0; i < res.length; i++) {
-                        if (res[i][0]) {
-                            addedEmails.push(res[i][0]);
-                        }
-                    }
-
-                    var addedEmailNum = addedEmails.length;
-
+            // after all process is done, and there is added email(s), show invitation sent dialog.
+            MegaPromise.allDone(promises).always(function() {
+                if (addedEmails.length > 0) {
                     // Singular or plural
-                    if (addedEmailNum === 1) {
+                    if (addedEmails.length === 1) {
                         title = l[150];
                         msg = l[5898];
                     }

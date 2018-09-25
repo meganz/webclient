@@ -2360,7 +2360,8 @@ else if (!b_u) {
         'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
         'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 },
         'charts_js': {f:'js/vendor/Chart.min.js', n: 'charts_js', j:1 },
-        'jspdf_js': {f:'js/vendor/jspdf.min.js', n: 'jspdf_js', j:1 }
+        'jspdf_js': {f:'js/vendor/jspdf.min.js', n: 'jspdf_js', j:1 },
+        'htmlcanvas_js': {f:'js/vendor/html2canvas.min.js', n: 'htmlcanvas_js', j:1 }
     };
 
     var jsl3 = {

@@ -514,6 +514,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         var quotasPromise = this.business.getQuotaUsage();
         quotasPromise.done(fillSubUsersUsage);
     }
+    else {
+        loadingDialog.phide();
+    }
 
 };
 
@@ -1426,6 +1429,8 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         $accountContainer.removeClass('hidden');
         $profileContainer.removeClass('hidden');
         $accountPageHeader.removeClass('hidden');
+        $('.settings-menu-bar .settings-menu-item', $accountContainer).removeClass('selected');
+        $('.settings-menu-bar .suba-setting-profile', $accountContainer).addClass('selected');
     };
 
     // event handler for header clicking
@@ -1851,19 +1856,42 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         $invoiceDetailContainer.find('.inv-detail-export').off('click.subuser').on('click.subuser',
             function invoiceDetailExportClickHandler() {
-                M.require('jspdf_js').done(
+                M.require('htmlcanvas_js', 'jspdf_js').done(
                     function exportOverviewPageToPDF() {
-                        var doc = new jsPDF();
-                        var specialElementHandlers = {
-                            '.hidden': function (element, renderer) {
-                                return true;
-                            }
-                        };
+                        //var doc = new jsPDF();
+                        //var specialElementHandlers = {
+                        //    '.hidden': function (element, renderer) {
+                        //        return true;
+                        //    }
+                        //};
 
                         var $invoiceDetailDiv = $('.invoice-container', $invoiceDetailContainer);
 
-                        doc.addHTML($invoiceDetailDiv[0], function () {
-                            doc.save('invoice' + invoiceDetail.n + '.pdf');
+                        //doc.addHTML($invoiceDetailDiv[0], function () {
+                        //    doc.save('invoice' + invoiceDetail.n + '.pdf');
+                        //});
+                        //var scaleBy = 5;
+                        //var w = 600;
+                        //var h = 840;
+                        var div = $invoiceDetailDiv[0];
+                        //var canvas = document.createElement('canvas');
+                        //canvas.width = w * scaleBy;
+                        //canvas.height = h * scaleBy;
+                        //canvas.style.width = w + 'px';
+                        //canvas.style.height = h + 'px';
+                        //var context = canvas.getContext('2d');
+                        //context.scale(scaleBy, scaleBy);
+
+
+                        html2canvas(div, {
+                            //canvas: canvas,
+                            onrendered: function (canvas) {
+                                var img = canvas.toDataURL('image/png');
+                                var doc = new jsPDF();
+                                doc.addImage(img, 'JPEG', 20, 20);
+                                doc.save('invoice' + invoiceDetail.n + '.pdf');
+                            },
+                            letterRendering: 1, allowTaint: true, 
                         });
                     }
                 );

@@ -317,10 +317,10 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 192px auto;
 }
 
-.user-management-account-settings .invoice-detail .mega-logo {
+/*.user-management-account-settings .invoice-detail .mega-logo {
     background-image: url(../images/mega/invoice-image_v1@2x.png);
     background-size: 120px auto;
-}
+}*/
 
 .user-management-account-settings .icon12{
     background-image: url(../images/mega/invoice-image_v1@2x.png);

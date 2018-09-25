@@ -578,11 +578,19 @@
 
                         // If users press enter/return on empty input field behave like done/share button is clicked
                         else {
+                            var $addContactBtn;
+                            if ($.dialog === "share") { // if it is share dialog
+                                $addContactBtn = $('.share-dialog .dialog-share-button');
+                            }
+                            else if ($.dialog === "add-user-popup") { // if it is add user dialog.
+                                $addContactBtn = $('.add-user-popup-button');
+                            }
 
-                            var share = new mega.Share();
-                            share.updateNodeShares();
-
-                            addNewContact($('.add-user-popup-button.add'));
+                            addNewContact($addContactBtn, false).done(function() {
+                                var share = new mega.Share();
+                                share.updateNodeShares();
+                                $('.token-input-token-mega').remove();
+                            });
                         }
 
                         return false;

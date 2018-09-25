@@ -100,8 +100,9 @@ function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
  *
  * User adding new contact/s from add contact dialog.
  * @param {String} $addBtnClass, contact dialog add button class, i.e. .add-user-popup-button.
+ * @param {Boolean} cd close dialog or not. default: true
  */
-function addNewContact($addButton) {
+function addNewContact($addButton, cd) {
 
     var mailNum;
     var msg;
@@ -110,6 +111,8 @@ function addNewContact($addButton) {
     var emailText;
     var $mails;
     var $textarea = $('.add-user-textarea textarea');
+    var promise = new MegaPromise();
+    cd = cd === undefined ? true : cd;
 
     // Add button is enabled
     if (!$addButton.hasClass('disabled')) {
@@ -117,8 +120,11 @@ function addNewContact($addButton) {
         // Check user type
         if (u_type === 0) {
             ephemeralDialog(l[997]);
+            promise.resolve();
         }
         else {
+            var promises = [];
+            var addedEmails = [];
 
             // Custom text message
             emailText = $textarea.val();
@@ -133,31 +139,45 @@ function addNewContact($addButton) {
             mailNum = $mails.length;
 
             if (mailNum) {
-
                 // Loop through new email list
                 $mails.each(function(index, value) {
-
                     // Extract email addresses one by one
                     email = $(value).contents().eq(1).text();
-                    M.inviteContact(M.u[u_handle].m, email, emailText);
+                    // if invitation is sent, push as added Emails.
+                    promises.push(M.inviteContact(M.u[u_handle].m, email, emailText).done(function(res) {
+                        addedEmails.push(res);
+                    }));
                 });
-
-                // Singular or plural
-                if (mailNum === 1) {
-                    title = l[150];
-                    msg = l[5898];
-                }
-                else {
-                    title = l[165] + ' ' + l[5859];
-                    msg = l[5899];
-                }
-
-                closeDialog();
-                contactsInfoDialog(title, email, msg);
-                $('.token-input-token-mega').remove();
             }
+
+            // after all process is done, and there is added email(s), show invitation sent dialog.
+            MegaPromise.allDone(promises).always(function() {
+                if (addedEmails.length > 0) {
+                    // Singular or plural
+                    if (addedEmails.length === 1) {
+                        title = l[150];
+                        msg = l[5898];
+                    }
+                    else {
+                        title = l[165] + ' ' + l[5859];
+                        msg = l[5899];
+                    }
+
+                    if (cd) {
+                        closeDialog();
+                        $('.token-input-token-mega').remove();
+                    }
+                    contactsInfoDialog(title, addedEmails[0], msg);
+                }
+                promise.resolve();
+            });
         }
     }
+    else {
+        promise.reject();
+    }
+
+    return promise;
 }
 
 /**
@@ -2092,9 +2112,11 @@ function initShareDialog() {
      * Adding new contacts to shared item
      */
     $('.share-dialog .dialog-share-button').rebind('click', function() {
-
-        var share = new mega.Share();
-        share.updateNodeShares();
+        addNewContact($(this), false).done(function(){
+            var share = new mega.Share();
+            share.updateNodeShares();
+            $('.token-input-token-mega').remove();
+        });
     });
 
     $('.share-dialog').off('click', '.share-dialog-remove-button');

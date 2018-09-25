@@ -917,6 +917,8 @@ MegaData.prototype.delPS = function(pcrId, nodeId) {
 MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
     "use strict";
 
+    var invitePromise = new MegaPromise();
+
     if (d) {
         console.debug('inviteContact');
     }
@@ -934,13 +936,16 @@ MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
                 // In case of invite-dialog we will use notifications
                 if ($.dialog !== 'invite-friend') {
                     M.inviteContactMessageHandler(resp.p);
+                    invitePromise.resolve(resp.m);
                 }
             }
             if (typeof resp !== 'object' && contactLink) {
                 M.inviteContactMessageHandler(resp);
             }
+            invitePromise.reject(false);
         }
     });
+    return invitePromise;
 };
 
 /**

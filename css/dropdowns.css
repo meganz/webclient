@@ -149,7 +149,7 @@
     background-position: 0 -2249px;
 }
 .dropdown-dark-arrow {
-    background-image: url(../images/mega/icons-sprite_v21.png);
+    background-image: url(../images/mega/icons-sprite_v22.png);
     background-repeat: no-repeat;
     background-position: -41px -1315px;
     display: none;
@@ -334,7 +334,7 @@
     top: 7px;
     content: '';
     display: block;
-    background-image: url(../images/mega/icons-sprite_v21.png);
+    background-image: url(../images/mega/icons-sprite_v22.png);
     background-repeat: no-repeat;
 }
 .colour-sorting-menu .dropdown-item.asc i::after {/* Dark arrow pointing up */

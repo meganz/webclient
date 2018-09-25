@@ -1804,7 +1804,7 @@ MegaData.prototype.updateLabelInfo = function(e) {
     var labelTxt = $t.data('label-txt');
     var labelInfo;
 
-    if ($(this).hasClass('active')) {
+    if ($(e.target).hasClass('active')) {
         labelInfo = 'Remove from filter label %1';
     }
     else {

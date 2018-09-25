@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MEGA invoice</title>
+    <style>
+body {
+    font-family: 'LatoWeb';
+    src: url('../fonts/Lato-Regular.eot'); /* IE9 Compat Modes */
+    src: url('../fonts/Lato-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../fonts/Lato-Regular.woff2') format('woff2'), /* Modern Browsers */
+         url('../fonts/Lato-Regular.woff') format('woff'), /* Modern Browsers */
+         url('../fonts/Lato-Regular.ttf') format('truetype');
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+    margin:0;
+    padding: 0;
+}
+
+.invoice-container {
+        margin:0px auto 24px 0;
+        width: 640px;
+        height: 842px;
+        font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+
+.mega-contact-container {
+    width: 58%;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.inv-title-container {
+    width: 40%;
+    margin-right: 0px;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+}
+
+
+.mega-contact-container ul {
+    list-style-type:none;
+    padding-left: 0px;
+    margin:12px 0 32px 0;
+}
+
+.mega-logo {
+    width: 120px;
+    height: 40px;
+    background-position: 0px 0px;
+    background-size: 120px auto;
+    background-repeat: no-repeat;
+    margin:64px auto auto 0px;
+}
+
+.mega-contact-container .inv-subtitle {
+    margin:12px auto 16px 0px;
+}
+
+.mega-contact-container ul li{
+    margin:0px 0 12px 0px;
+    line-height: 18px;
+    font-size: 12px;
+    max-width: 100%;
+    display: inline-block;
+    color: #888;
+    white-space: normal;
+    position: relative;
+    text-decoration: none;
+}
+
+.inv-title-container .inv-right {
+    float: right;
+}
+
+.inv-title-container .inv-title {
+    font-size: 26px;
+    font-weight: 600;
+    text-align: left;
+    line-height: 39px;
+    color: #333;
+    margin:64px 0 0 0;
+    position: relative;
+}
+
+.inv-title-container ul{
+    list-style-type:none;
+    position: relative;
+    margin: 12px 0 0 0;
+    padding-left: 0px;
+}
+
+.inv-title-container ul li{
+    text-decoration: none;
+}
+
+.inv-title-container ul li>span:first-child {
+    display: inline-block;
+    text-align: left;
+    font-size: 13px;
+    color: #333;
+    line-height: 20px;
+}
+
+.inv-title-container ul li>span:last-child {
+    display: inline-block;
+    text-align: left;
+    font-size: 13px;
+    color: #888;
+    line-height: 20px;
+    margin-left: 4px;
+}
+
+.inv-add-container {
+    width: 100%;
+    margin-left: 0px;
+    height: auto;
+    position: relative;
+    display: inline-block;
+    border-top:1px solid rgba(0,0,0,0.1);
+}
+
+
+.inv-add-container .inv-subtitle {
+    width:100px;
+    height: 100%;
+    vertical-align: top;
+    display: inline-block;
+    position: relative;
+    margin-left: 0;
+}
+
+.inv-subtitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    line-height: 20px;
+    margin:48px auto 12px 0px;
+}
+
+.inv-add-container ul {
+    list-style-type:none;
+    width: 75%;
+    padding:0;
+    margin:48px 0;
+    position: relative;
+    display: inline-block;
+}
+
+.inv-add-container ul li {
+    text-decoration: none;
+    line-height: 20px;
+    font-size: 12px;
+    color:#666;
+    width: calc(100% - 0px);
+    text-overflow: clip;
+    margin-bottom: 4px;
+}
+
+.inv-add-container ul .inv-company-name {
+    margin-bottom: 8px;
+    color:#000;
+    font-weight: 600;
+}
+
+.inv-add-container ul .inv-per-name {
+    margin-bottom: 8px;
+    color:#000;
+}
+
+.inv-payment-table {
+    width: calc(100% - 0px);
+    margin:0px 0px;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+}
+
+.inv-payment-table ul {
+    list-style-type:none;
+    width: 100%;
+    padding:0;
+    margin:0;
+}
+
+.inv-payment-table ul li {
+    padding:12px 0;
+    font-size: 12px;
+    font-weight: 400;
+    color: #888;
+    line-height: 22px;
+    position: relative;
+}
+
+.inv-payment-table ul li:first-child {
+    padding:8px 0;
+    font-size: 16px;
+    font-weight: 900;
+    color: #333;
+    line-height: 20px;
+}
+
+.inv-payment-table ul li:first-child:before {
+    content: '';
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 1px;
+    width: 100%;
+    background-color: rgba(0,0,0,0.1);
+}
+
+.inv-payment-header, .inv-payment-item {
+    display: inline-block;
+}
+
+.inv-payment-header:first-child, .inv-payment-item:first-child {
+    width: 100px;
+    vertical-align: top;
+}
+
+.inv-payment-header:nth-child(2), .inv-payment-item:nth-child(2) {
+    width: auto;
+}
+
+.inv-payment-header:nth-child(3), .inv-payment-item:nth-child(3) {
+    width: 120px;
+    color: #333;
+    text-align: right;
+    float: right;
+    vertical-align: top;
+}
+
+.inv-payment-table ul .inv-payment-price:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 1px;
+    width: 100%;
+    background-color: rgba(0,0,0,0.1);
+}
+
+.inv-payment-price:last-child {
+    font-weight: 900;
+    font-size: 16px;
+    line-height: 24px;
+    color: #000;
+    padding:12px 0;
+}
+
+
+.inv-payment-price:last-child::before {
+    content: '';
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    height: 1px;
+    width: 175px;
+    background-color: rgba(0,0,0,0.1);   
+}
+
+.inv-payment-price .inv-payment-price-detail:first-child {
+    width: calc(100% - 155px);
+    display: inline-block;
+    text-align: right;
+}
+
+.inv-payment-price .inv-payment-price-detail:last-child {
+    width: 150px;
+    display: inline-block;
+    text-align: right;
+}
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="mega-contact-container">
+            <img class="mega-logo" src="../images/mega/invoice-logo_v1@2x.png">
+            <p class="inv-subtitle">Mega Limited</p>
+            <ul> 
+                <li>Level 21, Huawei Centre, 120 Albert Street, <br>Auckland  1010,  New Zealand</li><br>
+                <li>Private Bag 92 533, Wellesley St, <br>Auckland  1141,  New Zealand</li><br>
+                <li>invoicing@mega.nz</li>
+            </ul>
+        </div>
+        <div class="inv-title-container suba-inv">
+            <div class="inv-right">
+                <div class="inv-title">[$19292]</div>
+                <ul class=" ">
+                    <li>
+                        <span>[$19293]:</span>
+                        <span id="invoice-date">13 Nov 2017 </span>
+                    </li>
+                    <li>
+                        <span>[$19294]:</span>
+                        <span id="invoice-number">NwC-AOyfAxo   </span>
+                    </li>
+                    <li>
+                        <span class="inv-vat-label">[$19295]:</span>
+                        <span class="invoice-vat">110-633-521</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="inv-add-container">
+            <p class="inv-subtitle">[$19296]:</p>
+            <ul>
+                <li class="inv-company-name billed-name">AAA LTD.</li>
+                <li class="inv-per-name billed-attn hidden">ATTN: Khaled Captain</li>
+                <li class="billed-email">money@mega.co.nz</li>
+                <li class="billed-address">120 Albert St, Auckland 1010, 120 Albert St, Auckland  1010 </li>
+                <li class="billed-country">New Zealand</li>
+                <li class="billed-vat">VAT: 9429030423626 </li>
+            </ul>
+        </div>
+        <div class="inv-payment-table">
+            <ul>
+                <li class="inv-li-table-header">
+                    <div class="inv-payment-header">[$17023]</div>
+                    <div class="inv-payment-header">[$16462]</div>
+                    <div class="inv-payment-header">[$16463]</div>
+                </li>
+                <li class="inv-li-content">
+                    <div class="inv-payment-item inv-pay-date">1/8/2018</div>
+                    <div class="inv-payment-item inv-pay-desc">Business account for X user<br>(1/7/2018 - 31/7/2018)</div>
+                    <div class="inv-payment-item inv-pay-amou">€4.34</div>
+                </li>
+                <li class="inv-payment-price inv-li-gst">
+                    <div class="inv-payment-price-detail inv-gst-perc">[$19301]:</div>
+                    <div class="inv-payment-price-detail inv-gst-val">€4.34</div>
+
+                </li>
+                <li class="inv-payment-price inv-li-total">
+                    <div class="inv-payment-price-detail">[$19300]:</div>
+                    <div class="inv-payment-price-detail inv-total-val">€40000000.34</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

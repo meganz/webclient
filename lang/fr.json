@@ -2776,5 +2776,7 @@
     "19527": "Une erreur est survenue lors du renvoi du lien d\u2019invitation, veuillez ressayer ult\u00e9rieurement",
     "19528": "An error occurred while updating your account details, please try again later.",
     "19529": "Or Try MEGA individual",
-    "19530": "Business"
+    "19530": "Business",
+    "19563": "Remove %1 label filter",
+    "19564": "Add %1 label filter"
 }

@@ -2776,5 +2776,7 @@
     "19527": "Un errore \u00e8 stato riscontrato durante il reinvio del link di invito, per favore riprova pi\u00f9 tardi",
     "19528": "Un errore \u00e8 stato riscontrato durante l'aggiornamento dei dettagli del tuo account, per favore riprova pi\u00f9 tardi",
     "19529": "O prova MEGA individuale",
-    "19530": "Business"
+    "19530": "Business",
+    "19563": "Remove %1 label filter",
+    "19564": "Add %1 label filter"
 }

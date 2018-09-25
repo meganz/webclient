@@ -2776,5 +2776,7 @@
     "19527": "An error occurred while re-sending the invitation link, please try again later",
     "19528": "An error occurred while updating your account details, please try again later.",
     "19529": "Or Try MEGA individual",
-    "19530": "Business"
+    "19530": "Business",
+    "19563": "Remove %1 label filter",
+    "19564": "Add %1 label filter"
 }

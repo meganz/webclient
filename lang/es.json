@@ -2776,5 +2776,7 @@
     "19527": "No se ha podido reenviar el enlace de invitaci\u00f3n, int\u00e9ntalo de nuevo",
     "19528": "No se ha podido actualizar la informaci\u00f3n de la cuenta, int\u00e9ntalo m\u00e1s tarde.",
     "19529": "O prueba MEGA individual",
-    "19530": "Business"
+    "19530": "Business",
+    "19563": "Remove %1 label filter",
+    "19564": "Add %1 label filter"
 }

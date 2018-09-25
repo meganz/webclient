@@ -38,10 +38,11 @@ MegaData.prototype.filterByParent = function(id) {
     if (id === 'shares') {
         this.v = [];
         var inshares = Object.keys(this.c.shares || {});
+
         for (i = inshares.length; i--;) {
             node = this.d[inshares[i]] || false;
-
-            if (node.su && !this.d[node.p]) {
+            // filter label applies here.
+            if (node.su && !this.d[node.p] && (!M.currentLabelFilter || M.filterByLabel(node))) {
                 this.v.push(node);
             }
         }
@@ -65,6 +66,10 @@ MegaData.prototype.filterByParent = function(id) {
                 return M.d[h];
             })
             .filter(function(n) {
+                // filter label applies here.
+                if (M.currentLabelFilter && !M.filterByLabel(n)){
+                    return false;
+                }
                 return n !== undefined;
             });
     }
@@ -184,4 +189,20 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
     return function(node) {
         return (node.name && node.name.toLowerCase().indexOf(str) !== -1 && node.p !== 'contacts');
     };
+};
+
+/**
+ * Filter a node contains right .lbl value
+ *
+ * @param {Object} node  target node
+ *
+ * @return {Boolean} node has the label or not
+ */
+MegaData.prototype.filterByLabel = function(node) {
+    "use strict";
+
+    if (!node.lbl || !M.currentLabelFilter[node.lbl]) {
+        return false;
+    }
+    return true;
 };

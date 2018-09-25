@@ -980,6 +980,10 @@ var attribCache = false;
 
         uaPacketParserHandler['^!prd'] = function() {
             mBroadcaster.sendMessage('attr:passwordReminderDialog');
+            // if page is session history and new password action detected. update session table.
+            if (fminitialized && page === 'fm/account/history') {
+                accountUI.updateSessionTable();
+            }
         };
 
         uaPacketParserHandler['^!dv'] = function() {

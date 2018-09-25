@@ -1005,6 +1005,19 @@ scparser.$add('ua', {
     }
 });
 
+scparser.$add('sd', {
+    b: function() {
+        "use strict";
+
+        if (fminitialized && page === 'fm/account/history') {
+            // need to wait until session history is refreshed.
+            setTimeout(function() {
+                accountUI.updateSessionTable(true);
+            }, 3000);
+        }
+    }
+});
+
 scparser.$add('e', function(a) {
     // CMS update
     var str = hex2bin(a.c || "");

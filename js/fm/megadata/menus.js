@@ -344,6 +344,13 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         return true;
     }
 
+    // function to recuring repositioning for sub menus.
+    var findNewPosition = function() {
+        M.adjustContextMenuPosition(e, m);
+        m.find('.contains-submenu.opened').removeClass('opened');
+        m.find('.submenu.active').removeClass('active');
+    };
+
     var showContextMenu = function() {
         // This part of code is also executed when ll == 'undefined'
         var v = m.children('.dropdown-section');
@@ -372,7 +379,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         // Hide last divider
         v.find('hr').removeClass('hidden');
         m.find('.dropdown-section:visible:last hr').addClass('hidden');
+
+        $(window).rebind('resize.ccmui', SoonFc(findNewPosition));
     };
+
     $.hideContextMenu();
     $contactDetails.addClass('hidden');
 
@@ -786,6 +796,28 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
         return top;
     };
 
+    var handleSmall = function(dPos) {
+        m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block" />');
+        m.append('<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>');
+        m.addClass('mega-height');
+        cmH = wH - TOP_MARGIN * 2;
+        m.css({ 'height': wH - TOP_MARGIN * 2 + 'px' });
+        m.on('mousemove', M.scrollMegaSubMenu);
+        dPos.y = wH - cmH;
+    };
+
+    var removeMegaHeight = function() {
+        if (m.hasClass('mega-height')) {
+            // Cleanup for scrollable context menu upon resizing window.
+            var cnt = $('#cm_scroll').contents();
+            $('#cm_scroll').replaceWith(cnt);// Remove .context-scrollable-block
+            m.removeClass('mega-height');
+            m.find('> .context-top-arrow').remove();
+            m.find('> .context-bottom-arrow').remove();
+            m.css({ 'height': 'auto' });// In case that window is enlarged
+        }
+    };
+
     var dPos;// new context menu position
     var cor;// corner, check setBordersRadius for more info
     if (typeof ico === 'object') {// draw context menu relative to file-settings-icon
@@ -799,15 +831,10 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
         }
 
         if (cmH + 24 >= wH) {// Handle small windows height
-            m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block" />');
-            m.append('<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>');
-            m.addClass('mega-height');
-            cmH = wH - TOP_MARGIN * 2;
-            m.css({ 'height': wH - TOP_MARGIN * 2 + 'px' });
-            m.on('mousemove', M.scrollMegaSubMenu);
-            dPos.y = wH - cmH;
+            handleSmall(dPos);
         }
         else {
+            removeMegaHeight();
             if (hMax > maxY - TOP_MARGIN) {
                 dPos.y = y - cmH - 4;
                 if (dPos.y < TOP_MARGIN) {
@@ -821,14 +848,14 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
         var n = m.next('.dropdown.body.submenu');
         var nmW = n.outerWidth();// margin not calculated
         var nmH = n.outerHeight();// margins not calculated
-
-        if (nmH > (maxY - TOP_MARGIN)) {// Handle huge menu
+        if (nmH >= (maxY - TOP_MARGIN)) {// Handle huge menu
             nmH = maxY - TOP_MARGIN;
             var tmp = document.getElementById('csb_' + String(m.attr('id')).replace('fi_', ''));
             if (tmp) {
                 $(tmp).addClass('context-scrolling-block');
                 tmp.addEventListener('mousemove', M.scrollMegaSubMenu.bind(this));
 
+                // add scrollable context menu.
                 n.addClass('mega-height');
                 n.css({'height': nmH + 'px'});
             }
@@ -871,15 +898,10 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
         dPos = { 'x': x + 10, 'y': y + 10 };
 
         if (cmH + 24 >= wH) {// Handle small windows height
-            m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block" />');
-            m.append('<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>');
-            m.addClass('mega-height');
-            cmH = wH - TOP_MARGIN * 2;
-            m.css({ 'height': wH - TOP_MARGIN * 2 + 'px' });
-            m.on('mousemove', M.scrollMegaSubMenu);
-            dPos.y = wH - cmH;
+            handleSmall(dPos);
         }
         else {
+            removeMegaHeight();
             if (hMax > maxY) {
                 dPos.y = wH - cmH - TOP_MARGIN;// align with bottom
             }

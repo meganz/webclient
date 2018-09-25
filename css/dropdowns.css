@@ -26,6 +26,7 @@
 }
 .dropdown.body.context {
     min-width: 188px;
+    transition: top 100ms ease, left 100ms ease;
 }
 .dropdown.body.submenu {
     -webkit-transition: all 200ms ease-in-out, right 200ms ease-in-out;

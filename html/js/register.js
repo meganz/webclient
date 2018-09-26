@@ -428,12 +428,12 @@ function init_register() {
     });
     
 
-    var $regInfoContainer = $('#register_form .main-mid-pad.big-pad.register1 .main-left-block');
-    $('.login-register-input.name', $regInfoContainer).removeClass('hidden');
-    $('.login-register-input.email', $regInfoContainer).removeClass('hidden');
-    $('h3.main-italic-header', $regInfoContainer).html(l[1095]);
+    var $regInfoContainer = $('.main-mid-pad.big-pad.register1 .main-left-block');
+    $('.input-wrapper.name', $regInfoContainer).removeClass('hidden');
+    $('.input-wrapper.email', $regInfoContainer).removeClass('hidden');
+    $('.account.top-header.wide', $regInfoContainer).html(l[1095]);
 
-    var $tipsContainer = $('#register_form .main-mid-pad.big-pad.register1 .main-right-block');
+    var $tipsContainer = $('.main-mid-pad.big-pad.register1 .main-right-block');
     $('.dont-forget-pass', $tipsContainer).removeClass('hidden'); //19130
     $('p.account-sec', $tipsContainer).html(l[1093] + ' ' + l[1094]);
     $('.account-business', $tipsContainer).addClass('hidden');
@@ -443,17 +443,17 @@ function init_register() {
         var userInfo = JSON.parse(localStorage.businessSubAc);
         // we know here that userInfo contain all needed attr, otherwise higher layers wont allow us
         // to get here.
-        $('#register-email-registerpage').val(userInfo.e);
+        $('.input-wrapper.email input').val(userInfo.e);
         // $('#register-email').attr('readonly', true);
-        $('#register-lastname-registerpage').val(a32_to_str(base64_to_a32(userInfo.lastname)));
+        $('.input-wrapper.name .l-name').val(from8(base64urldecode(userInfo.lastname)));
         // $('#register-lastname').attr('readonly', true);
-        $('#register-firstname-registerpage').val(a32_to_str(base64_to_a32(userInfo.firstname)));
+        $('.input-wrapper.name .f-name').val(from8(base64urldecode(userInfo.firstname)));
         // $('#register-firstname').attr('readonly', true);
         var headerText = l[19129].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-        $('h3.main-italic-header', $regInfoContainer).html(headerText);
+        $('.account.top-header.wide', $regInfoContainer).html(headerText);
 
-        $('.login-register-input.name', $regInfoContainer).addClass('hidden');
-        $('.login-register-input.email', $regInfoContainer).addClass('hidden');
+        $('.input-wrapper.name', $regInfoContainer).addClass('hidden');
+        $('.input-wrapper.email', $regInfoContainer).addClass('hidden');
         $('.dont-forget-pass', $tipsContainer).addClass('hidden');
         $('p.account-sec', $tipsContainer).text(l[19131]);
         $('.account-business', $tipsContainer).removeClass('hidden');

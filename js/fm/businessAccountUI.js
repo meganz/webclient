@@ -469,7 +469,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 var dd = subUsersData[sub].ad === '00000000' ? null : subUsersData[sub].ad;
                 var activeDate = '--------';
                 if (dd) {
-                    activeDate = new Date(dd.substr(0, 4), dd.substr(4, 2), dd.substr(6, 2));
+                    activeDate = new Date(dd.substr(0, 4), dd.substr(4, 2) - 1, dd.substr(6, 2) + 1);
                     activeDate = activeDate.toLocaleDateString();
                 }
                 $('.business-sub-last-active span', $subTr).text(activeDate);
@@ -636,6 +636,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
  * @param {String} signupCode       sub-user signup code
  */
 BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
+    var business = new BusinessAccount();
     var getInfoPromise = business.getSignupCodeInfo(signupCode);
 
     var failureAction = function (st, res, desc) {
@@ -655,7 +656,7 @@ BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
         }
         else {
             if (u_type === false) {
-                res.signupcode = decryptedTokenBase64;
+                res.signupcode = signupCode;
                 localStorage.businessSubAc = JSON.stringify(res);
                 loadSubPage('register');
             }

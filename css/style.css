@@ -28860,6 +28860,11 @@ opacity: 1;
     background-repeat: no-repeat;
     margin:64px auto auto 56px;
 }
+.user-management-account-settings .invoice-detail .mega-logo2 {
+    width: 120px;
+    height: 40px;
+    margin: 64px auto auto 54px;
+}
 
 .user-management-account-settings .invoice-detail .mega-contact-container .inv-subtitle {
     margin:12px auto 8px 102px;

@@ -631,6 +631,52 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
 
 };
 
+/**
+ * Opens a signup code of a business account sub-user
+ * @param {String} signupCode       sub-user signup code
+ */
+BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
+    var getInfoPromise = business.getSignupCodeInfo(signupCode);
+
+    var failureAction = function (st, res, desc) {
+        msgDialog('warninga', '', l[19567], '', function () {
+            loadSubPage('start');
+        });
+    };
+
+    getInfoPromise.fail(failureAction);
+
+    getInfoPromise.done(function signupCodeGettingSuccessHandler(status, res) {
+        if (localStorage.d) {
+            console.log(res);
+        }
+        if (!res.e || !res.firstname || !res.mpubk || !res.mu) {
+            failureAction(1, res, 'uv2 not complete response');
+        }
+        else {
+            if (u_type === false) {
+                res.signupcode = decryptedTokenBase64;
+                localStorage.businessSubAc = JSON.stringify(res);
+                loadSubPage('register');
+            }
+            else {
+                var msgTxt = l[18795];
+                // 'You are currently logged in. ' +
+                //  'Would you like to log out and proceed with business account registration ? ';
+                closeDialog();
+                msgDialog('confirmation', l[968], msgTxt, '', function (e) {
+                    if (e) {
+                        mLogout();
+                    }
+                    else {
+                        loadSubPage('');
+                    }
+                });
+            }
+        }
+    });
+};
+
 /** Function to show landing page, for admins without sub-users yet */
 BusinessAccountUI.prototype.viewLandingPage = function () {
     "use strict";
@@ -1856,24 +1902,33 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         $invoiceDetailContainer.find('.inv-detail-export').off('click.subuser').on('click.subuser',
             function invoiceDetailExportClickHandler() {
-                M.require('htmlcanvas_js', 'jspdf_js').done(
+                M.require('htmlcanvas_js', 'jspdf_js', 'business_invoice').done(
                     function exportOverviewPageToPDF() {
-                        //var doc = new jsPDF();
-                        //var specialElementHandlers = {
-                        //    '.hidden': function (element, renderer) {
-                        //        return true;
-                        //    }
-                        //};
+                        var doc = new jsPDF();
+                        var specialElementHandlers = {
+                            '.hidden': function (element, renderer) {
+                                return false;
+                            },
+                            '.icon12': function (element, renderer) {
+                                return false;
+                            }
+                        };
+                        // business_invoice
 
+                        //var myInvoice = $.parseHTML(pages['business_invoice'], null);
+                        //var $invoiceDetail = myInvoice.find('.invoice-container');
+                        //var div = myInvoice[5];
                         var $invoiceDetailDiv = $('.invoice-container', $invoiceDetailContainer);
 
-                        //doc.addHTML($invoiceDetailDiv[0], function () {
-                        //    doc.save('invoice' + invoiceDetail.n + '.pdf');
-                        //});
+                        //doc.internal.scaleFactor = 2;
+                        doc.addHTML($invoiceDetailDiv[0], { retina: true, 'elementHandlers': specialElementHandlers}, function () {
+                            doc.save('invoice' + invoiceDetail.n + '.pdf');
+                        });
+
                         //var scaleBy = 5;
                         //var w = 600;
                         //var h = 840;
-                        var div = $invoiceDetailDiv[0];
+                        //var div = $invoiceDetailDiv[0];
                         //var canvas = document.createElement('canvas');
                         //canvas.width = w * scaleBy;
                         //canvas.height = h * scaleBy;
@@ -1883,16 +1938,16 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         //context.scale(scaleBy, scaleBy);
 
 
-                        html2canvas(div, {
-                            //canvas: canvas,
-                            onrendered: function (canvas) {
-                                var img = canvas.toDataURL('image/png');
-                                var doc = new jsPDF();
-                                doc.addImage(img, 'JPEG', 20, 20);
-                                doc.save('invoice' + invoiceDetail.n + '.pdf');
-                            },
-                            letterRendering: 1, allowTaint: true, 
-                        });
+                        //html2canvas(div, {
+                        //    //canvas: canvas,
+                        //    onrendered: function (canvas) {
+                        //        var img = canvas.toDataURL('image/png');
+                        //        var doc = new jsPDF();
+                        //        doc.addImage(img, 'JPEG', 20, 20);
+                        //        doc.save('invoice' + invoiceDetail.n + '.pdf');
+                        //    },
+                        //    letterRendering: 1, allowTaint: true,
+                        //});
                     }
                 );
             }

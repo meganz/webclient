@@ -733,7 +733,14 @@ function init_page() {
     }
     else if (page.length > 14 && page.substr(0, 14) === 'businesssignup') {
         var signupCodeEncrypted = page.substring(14, page.length);
-        //$('.fm-dialog.sub-account-link-password').removeClass('hidden');
+        M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+            var business = new BusinessAccountUI();
+            business.showLinkPasswordDialog(signupCodeEncrypted);
+        });
+
+    }
+    else if (page.length > 14 && page.substr(0, 14) === 'businessinvite') {
+        var signupCode = page.substring(14, page.length);
         M.require('businessAcc_js', 'businessAccUI_js').done(function () {
             var business = new BusinessAccountUI();
             business.showLinkPasswordDialog(signupCodeEncrypted);

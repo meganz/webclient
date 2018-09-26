@@ -2354,14 +2354,15 @@ else if (!b_u) {
         'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
         'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
-        'megadrop': {f:'html/megadrop.html', n: 'megadrop', j: 0 },
-        'nomegadrop': {f:'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
-        'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j: 1 },
+        'megadrop': {f:'html/megadrop.html', n: 'megadrop', j:0 },
+        'nomegadrop': {f:'html/nomegadrop.html', n: 'nomegadrop', j:0 },
+        'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j:1 },
         'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
         'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 },
-        'charts_js': {f:'js/vendor/Chart.min.js', n: 'charts_js', j:1 },
-        'jspdf_js': {f:'js/vendor/jspdf.min.js', n: 'jspdf_js', j:1 },
-        'htmlcanvas_js': {f:'js/vendor/html2canvas.min.js', n: 'htmlcanvas_js', j:1 }
+        'charts_js': {f:'js/vendor/Chart.min.js', n: 'charts_js', j:1},
+        'jspdf_js': {f:'js/vendor/jspdf.min.js', n: 'jspdf_js', j:1},
+        'htmlcanvas_js': {f:'js/vendor/html2canvas.min.js', n: 'htmlcanvas_js', j:1},
+        'business_invoice': {f:'html/invoicePDF.html', n: 'business_invoice', j:0}
     };
 
     var jsl3 = {

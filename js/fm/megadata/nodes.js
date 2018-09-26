@@ -1804,11 +1804,11 @@ MegaData.prototype.updateLabelInfo = function(e) {
     var labelTxt = $t.data('label-txt');
     var labelInfo;
 
-    if ($(this).hasClass('active')) {
-        labelInfo = 'Remove from filter label %1';
+    if ($(e.target).hasClass('active')) {
+        labelInfo = l['19563'];
     }
     else {
-        labelInfo = 'Add filter by label %1';
+        labelInfo = l['19564'];
     }
     labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
     $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');

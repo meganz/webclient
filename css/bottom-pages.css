@@ -1293,7 +1293,7 @@ html.gbot {
     width: 48px;
     height: 48px;
     margin: -6px 13px 0 0px;
-    background-image: url(../images/mega/new-page-sprite.png);
+    background-image: url(../images/mega/new-page-sprite_v2.png);
     background-repeat: no-repeat;
 }
 .cropped-page.megasync .bottom-page.top-title::before {
@@ -1778,7 +1778,7 @@ html.gbot {
     width: 28px;
     height: 28px;
     margin: 6px 9px 0 0px;
-    background-image: url(../images/mega/new-page-sprite.png);
+    background-image: url(../images/mega/new-page-sprite_v2.png);
     background-repeat: no-repeat;
 }
 .uwp .advertise-chat .mobile-apps-button.red.android span::before {

@@ -466,10 +466,12 @@ MegaData.prototype.doSort = function(n, d) {
         console.warn("Cannot sort by " + n);
     }
 
-    // Store current sort setting
-    var type = M.currentLabelType;
-    $.sortTreePanel[type].by = n;
-    $.sortTreePanel[type].dir = d;
+    if ($.sortTreePanel) {
+        // Store current sort setting
+        var type = M.currentLabelType;
+        $.sortTreePanel[type].by = n;
+        $.sortTreePanel[type].dir = d;
+    }
 };
 
 MegaData.prototype.setLastColumn = function(col) {

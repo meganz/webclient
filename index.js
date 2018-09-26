@@ -743,7 +743,7 @@ function init_page() {
         var signupCode = page.substring(14, page.length);
         M.require('businessAcc_js', 'businessAccUI_js').done(function () {
             var business = new BusinessAccountUI();
-            business.showLinkPasswordDialog(signupCodeEncrypted);
+            business.openInvitationLink(signupCode);
         });
 
     }

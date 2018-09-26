@@ -1593,7 +1593,7 @@ html.gbot {
 .cropped-page .bottom-page.big-icon {
     width: 96px;
     height: 96px;
-    margin: 10px auto 16px;
+    margin: 0 auto 16px;
     background-image: url(../images/mega/new-pages-sprite.png);
     background-size: 376px auto;
     background-repeat: no-repeat;

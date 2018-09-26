@@ -302,7 +302,7 @@
     }
 }
 @media only screen and (max-height: 720px) {
-     .fm-dialog.add-from-cloud {
+    .fm-dialog.add-from-cloud {
         margin-top: -305px;
     }
     .fm-dialog-scroll, .add-from-cloud .dialog-empty-block {
@@ -1710,10 +1710,10 @@ li.token-input-token-invite .input-close {
     top: 17px;
 }
 .fm-dialog-close.big:hover {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
- -moz-opacity: 0.8;
- -khtml-opacity: 0.8;
- opacity: 0.8;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+    -moz-opacity: 0.8;
+    -khtml-opacity: 0.8;
+    opacity: 0.8;
 }
 .megasync-content.slider {
     width: 768px;
@@ -1813,11 +1813,11 @@ li.token-input-token-invite .input-close {
     display: block;
 }
 .megasync-slide.current {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
- -moz-opacity: 1;
- -khtml-opacity: 1;
- opacity: 1;
- visibility: visible;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    visibility: visible;
 }
 .megasync-slide.slide2 {
     text-align: left;
@@ -2126,8 +2126,8 @@ li.token-input-token-invite .input-close {
     -webkit-text-security: disc;
 }
 .dialog.big-input-bg input:-webkit-autofill, .dialog.big-input-bg input:-webkit-autofill:focus {
- -webkit-box-shadow: 0 0 0 50px #FAFAFA inset;
- -webkit-text-fill-color: #777777;
+    -webkit-box-shadow: 0 0 0 50px #FAFAFA inset;
+    -webkit-text-fill-color: #777777;
 }
 .wrong .dialog.big-input-bg {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(217,0,7,0.4);
@@ -2150,18 +2150,18 @@ li.token-input-token-invite .input-close {
     box-shadow: 0px 0px 0px 1px rgba(236,82,87,1);
 }
 .dialog.big-input-bg input::-webkit-input-placeholder {
- color:#777777;
+    color:#777777;
 }
 .dialog.big-input-bg input:-moz-placeholder {
- color:#777777;
- opacity: 1;
+    color:#777777;
+    opacity: 1;
 }
 .dialog.big-input-bg input::-moz-placeholder {
- color:#777777;
- opacity: 1;
+    color:#777777;
+    opacity: 1;
 }
 .dialog.big-input-bg input:-ms-input-placeholder {
- color:#777777;
+    color:#777777;
 }
 .dialog.input-button {
     display: table-cell;
@@ -2968,10 +2968,10 @@ li.token-input-token-invite .input-close {
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
 }
 .fm-dialog.two-factor-dialog.verify-two-factor-login {
-	background-color: #f6f6f6;
-	height: 344px;
-	margin: -172px 0 0 -240px;
-	width: 480px;
+    background-color: #f6f6f6;
+    height: 344px;
+    margin: -172px 0 0 -240px;
+    width: 480px;
 }
 .fm-dialog.two-factor-dialog.verify-two-factor-login .middle-button-wrapper {
     margin: 22px auto 48px auto;
@@ -3036,10 +3036,10 @@ li.token-input-token-invite .input-close {
     text-align: center;
 }
 .fm-dialog.two-factor-dialog.setup-two-factor-verify .pin-input {
-	color: #333;
-	font-size: 20px;
-	line-height: 25px;
-	text-align: center;
+    color: #333;
+    font-size: 20px;
+    line-height: 25px;
+    text-align: center;
 }
 .fm-dialog.two-factor-dialog .fm-account-input {
     height: 38px;
@@ -3162,10 +3162,101 @@ li.token-input-token-invite .input-close {
 .fm-dialog.two-factor-dialog.setup-two-factor {
     margin: -278px 0 0 -240px;
 }
+.setup-two-factor .instruction-message {
+    color: #333;
+    font-size: 16px;
+    line-height: 24px;
+}
+.setup-two-factor .no-auth-app-button {
+    color: #00a58f;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    line-height: 18px;
+    margin-top: 12px;
+}
+.auth-app-select-tooltip {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px 0 rgba(0,0,0,0.15);
+    margin: 5px;
+    position: absolute;
+    width: 376px;
+    z-index: 1300;
+}
+.auth-app-select-tooltip .dropdown-white-arrow {
+    display: block;
+}
+.auth-app-select-tooltip .explanation {
+    color: #262f3b;
+    font-size: 14px;
+    line-height: 22px;
+    margin: 24px 20px 20px 20px;
+}
+.auth-app-select-tooltip .app-link {
+    cursor: pointer;
+    display: block;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    margin: 4px 20px 0 20px;
+    position: relative;
+}
+.auth-app-select-tooltip .app-link:hover {
+    border: 1px solid #00bfa5;
+}
+.auth-app-select-tooltip .app-link:last-child {
+    margin-bottom: 20px;
+}
+.auth-app-select-tooltip .app-link-icon {
+    background: url(../images/mega/2fa-auth-apps.png);
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 32px;
+    position: absolute;
+    left: 14px;
+    top: 10px;
+    width: 32px;
+}
+.auth-app-select-tooltip .authy .app-link-icon {
+    background-position: -2px -2px;
+}
+.auth-app-select-tooltip .duomobile .app-link-icon {
+    background-position: -38px -2px;
+}
+.auth-app-select-tooltip .googleauthenticator .app-link-icon {
+    background-position: -2px -38px;
+}
+.auth-app-select-tooltip .microsoftauthenticator .app-link-icon {
+    background-position: -38px -38px;
+}
+.auth-app-select-tooltip .app-link-text {
+    color: #676d75;
+    display: block;
+    font-size: 15px;
+    line-height: 51px;
+    margin-left: 64px;
+}
+.auth-app-select-tooltip .app-link-arrow {
+    background-image: url(../images/mega/2fa-auth-apps.png);
+    background-position: -14px -77px;
+    background-repeat: no-repeat;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
+    height: 14px;
+    right: 25px;
+    position: absolute;
+    top: 19px;
+    width: 8px;
+}
+.auth-app-select-tooltip .app-link:hover .app-link-arrow {
+    background-position: -50px -77px;
+}
 .setup-two-factor-backup-key .middle-button-wrapper {
     text-align: center;
 }
 /* End of Two Factor Authentication dialogs */
+
 /* Private chat dialog */
 .create-private-chat {
     width: 560px;
@@ -3219,7 +3310,7 @@ li.token-input-token-invite .input-close {
 .fm-dialog-add-contact-pad {
     margin: 0 15px 0 0;
 }
- .add-user-popup-pad {
+.add-user-popup-pad {
     margin: 58px 48px 24px 48px;
     position: relative;
     text-align: center;

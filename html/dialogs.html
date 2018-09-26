@@ -4720,14 +4720,15 @@
 <!-- Setup Two-Factor Authentication !-->
 <div class="fm-dialog two-factor-dialog setup-two-factor hidden">
     <div class="fm-dialog-header">
-        <div class="fm-dialog-title"></div>
+        <div class="fm-dialog-title">[$19289]</div>
         <div class="fm-dialog-close"></div>
         <div class="clear"></div>
     </div>
     <div class="two-factor-content-block set-up-tfactor">
         <div class="tf-container">
-            <div class="information-highlight success">
-                <span>[$17864]</span>
+            <div class="instruction-message">
+                <div class="text">[$19205]</div>
+                <div class="no-auth-app-button">[$19565]</div>
             </div>
             <div class="two-factor-qr-code"></div>
             <div class="fm-account-input disabled">
@@ -4744,7 +4745,34 @@
 </div>
 
 
- <!-- Set up Two factor verify the code from Authentication app -->
+<!-- Select Authenticator App tooltip launched on the Setup 2FA dialog -->
+<div class="mobile auth-app-select-tooltip hidden">
+    <i class="dropdown-white-arrow"></i>
+    <div class="mobile explanation">[$19566]</div>
+    <a class="mobile app-link authy" href="https://authy.com/download/" target="_blank" rel="noopener noreferrer">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Authy</span>
+        <span class="mobile app-link-arrow"></span>
+    </a>
+    <a class="mobile app-link duomobile" href="https://duo.com/product/trusted-users/two-factor-authentication/duo-mobile" target="_blank" rel="noopener noreferrer">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Duo Mobile</span>
+        <span class="mobile app-link-arrow"></span>
+    </a>
+    <a class="mobile app-link googleauthenticator" href="https://support.google.com/accounts/answer/1066447" target="_blank" rel="noopener noreferrer">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Google Authenticator</span>
+        <span class="mobile app-link-arrow"></span>
+    </a>
+    <a class="mobile app-link microsoftauthenticator" href="https://www.microsoft.com/en-us/account/authenticator#getapp" target="_blank" rel="noopener noreferrer">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Microsoft Authenticator</span>
+        <span class="mobile app-link-arrow"></span>
+    </a>
+</div>
+
+
+<!-- Set up Two factor verify the code from Authentication app -->
 <div class="fm-dialog two-factor-dialog setup-two-factor-verify hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title"></div>

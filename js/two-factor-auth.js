@@ -395,6 +395,7 @@ twofactor.setupDialog = {
         this.getSharedSecret();
         this.initNextButton();
         this.initCloseButton();
+        this.initNoAuthenticatorAppButton();
 
         // Show the dialog
         this.$dialog.removeClass('hidden');
@@ -488,6 +489,75 @@ twofactor.setupDialog = {
         // Hide the dialog and background
         this.$dialog.addClass('hidden');
         this.$overlay.addClass('hidden');
+    },
+
+    /**
+     * Initialise the Don't have an authenticator app? button to open the Select Authenticator App tooltip
+     */
+    initNoAuthenticatorAppButton: function() {
+
+        'use strict';
+
+        var $noAuthAppButton = this.$dialog.find('.no-auth-app-button');
+        var $authAppSelectDialog = $('.auth-app-select-tooltip');
+
+        // On button click
+        $noAuthAppButton.rebind('click', function() {
+
+            // Get the absolute position of the button, the width of the button and dialog
+            var buttonOffset = $noAuthAppButton.offset();
+            var buttonWidth = $noAuthAppButton.width();
+            var dialogWidth = $authAppSelectDialog.outerWidth();
+
+            // Put the dialog in the middle of the button horizontally
+            var offsetMiddleOfButton = buttonOffset.left + (buttonWidth / 2);
+            var leftOffset = offsetMiddleOfButton - (dialogWidth / 2);
+
+            // Move the dialog down below the button text (14px text height + 10px top margin)
+            var topOffset = buttonOffset.top + 14 + 10;
+
+            // Show the tooltip above the Select Authenticator app dialog and below the button
+            $authAppSelectDialog.css({ top: topOffset, left: leftOffset }).removeClass('hidden');
+
+            // Initialise the handler to close the tooltip
+            twofactor.setupDialog.initTooltipClose();
+
+            // Prevent click closing the tooltip straight away
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the click handler to close the tooltip if they click anywhere in or out of the tooltip or press the
+     * Esc key. The authenticator app buttons/hyperlinks should still open the link in a new tab/window regardless.
+     */
+    initTooltipClose: function() {
+
+        'use strict';
+
+        // If there is a click anywhere on the page
+        $(document).rebind('click.closeauthapptooltip', function() {
+
+            // Close the tooltip
+            $('.auth-app-select-tooltip').addClass('hidden');
+
+            // Remove the click handler
+            $(document).off('click.closeauthapptooltip');
+        });
+
+        // If there is a keypress
+        $(document).rebind('keyup.closeauthapptooltip', function(event) {
+
+            // If the Esc key was pressed
+            if (event.keyCode === 27) {
+
+                // Close the tooltip
+                $('.auth-app-select-tooltip').addClass('hidden');
+
+                // Remove the keyup handler
+                $(document).off('keyup.closeauthapptooltip');
+            }
+        });
     }
 };
 

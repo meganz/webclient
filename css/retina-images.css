@@ -203,4 +203,8 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
     background-size: 48px auto;
 }
+.auth-app-select-tooltip .app-link-icon, .auth-app-select-tooltip .app-link-arrow {
+    background-image: url(../images/mega/2fa-auth-apps@2x.png);
+    background-size: 72px auto;
+}
 }

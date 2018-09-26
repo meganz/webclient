@@ -1236,7 +1236,7 @@ html.gbot {
     font-size: 16px;
     padding: 8px 0 60px 0;
     color: #FFFFFF;
-    font-family: Lato;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     line-height: 24px;
     text-align: center;
 }
@@ -1696,7 +1696,7 @@ html.gbot {
     font-size: 16px;
     letter-spacing: 0;
     line-height: 24px;
-    font-family: 'LatoWeb';
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .uwp .small-txt.footnote {
     font-size: 13px;

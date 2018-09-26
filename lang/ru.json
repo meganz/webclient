@@ -2776,5 +2776,16 @@
     "19527": "\u041f\u0440\u043e\u0438\u0437\u043e\u0448\u043b\u0430 \u043e\u0448\u0438\u0431\u043a\u0430 \u043f\u0440\u0438 \u043f\u043e\u0432\u0442\u043e\u0440\u043d\u043e\u0439 \u043e\u0442\u043f\u0440\u0430\u0432\u043a\u0435 \u043f\u0440\u0438\u0433\u043b\u0430\u0441\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0439 \u0441\u0441\u044b\u043b\u043a\u0438, \u043f\u043e\u0432\u0442\u043e\u0440\u0438\u0442\u0435 \u043f\u043e\u043f\u044b\u0442\u043a\u0443 \u043f\u043e\u0437\u0436\u0435.",
     "19528": "\u041f\u0440\u043e\u0438\u0437\u043e\u0448\u043b\u0430 \u043e\u0448\u0438\u0431\u043a\u0430 \u043f\u0440\u0438 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u0438 \u0434\u0430\u043d\u043d\u044b\u0445 \u0432\u0430\u0448\u0435\u0433\u043e \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u0430, \u043f\u043e\u0432\u0442\u043e\u0440\u0438\u0442\u0435 \u043f\u043e\u043f\u044b\u0442\u043a\u0443 \u043f\u043e\u0437\u0436\u0435.",
     "19529": "\u0418\u043b\u0438 \u0438\u043d\u0434\u0438\u0432\u0438\u0434\u0443\u0430\u043b\u044c\u043d\u044b\u0439 MEGA",
-    "19530": "\u0411\u0438\u0437\u043d\u0435\u0441"
+    "19530": "\u0411\u0438\u0437\u043d\u0435\u0441",
+    "19531": "The secure solution for your business",
+    "19532": "With our end-to-end encryption your data has never been safer",
+    "19533": "user \/ month",
+    "19534": "minimum of 3 users",
+    "19538": "subject to reasonable use limits",
+    "19539": "All the space your business needs",
+    "19562": "The email address already exists. Please enter another email address",
+    "19563": "Remove %1 label filter",
+    "19564": "Add %1 label filter",
+    "19565": "Don't have an authenticator app?",
+    "19566": "You need an authenticator app to enable 2FA on MEGA. You can download and install one of the apps below for your phone or tablet."
 }

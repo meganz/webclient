@@ -1293,7 +1293,7 @@ html.gbot {
     width: 48px;
     height: 48px;
     margin: -6px 13px 0 0px;
-    background-image: url(../images/mega/new-page-sprite_v2.png);
+    background-image: url(../images/mega/new-pages-sprite_v2.png);
     background-repeat: no-repeat;
 }
 .cropped-page.megasync .bottom-page.top-title::before {
@@ -1567,7 +1567,7 @@ html.gbot {
     width: 188px;
     height: 188px;
     margin: 0 auto;
-    background-image: url(../images/mega/new-pages-sprite.png);
+    background-image: url(../images/mega/new-pages-sprite_v2.png);
     background-size: 376px auto;
     background-repeat: no-repeat;
     padding: 0;
@@ -1594,7 +1594,7 @@ html.gbot {
     width: 96px;
     height: 96px;
     margin: 0 auto 16px;
-    background-image: url(../images/mega/new-pages-sprite.png);
+    background-image: url(../images/mega/new-pages-sprite_v2.png);
     background-size: 376px auto;
     background-repeat: no-repeat;
     padding: 0;
@@ -1778,7 +1778,7 @@ html.gbot {
     width: 28px;
     height: 28px;
     margin: 6px 9px 0 0px;
-    background-image: url(../images/mega/new-page-sprite_v2.png);
+    background-image: url(../images/mega/new-pages-sprite_v2.png);
     background-repeat: no-repeat;
 }
 .uwp .advertise-chat .mobile-apps-button.red.android span::before {
@@ -2547,7 +2547,7 @@ html.gbot {
     border-radius: 0;
     margin: 54px auto 0;
     background-color: #000;
-    background-image: url(../images/mega/new-pages-sprite.png);
+    background-image: url(../images/mega/new-pages-sprite_v2.png);
     background-size: 376px auto;
 }
 

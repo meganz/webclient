@@ -371,7 +371,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 192px auto;
 }
 .bottom-page.large-icon, .cropped-page .bottom-page.big-icon, .cropped-page .bottom-page.top-title::before, .mobile-apps-button.uwp,.uwp .advertise-chat .mobile-apps-button.red span::before {
-    background-image: url(../images/mega/new-pages-sprite@2x.png) !important;
+    background-image: url(../images/mega/new-pages-sprite_v2@2x.png) !important;
     background-size: 376px auto;
 }
 }

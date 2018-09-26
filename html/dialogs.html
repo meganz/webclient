@@ -4819,7 +4819,11 @@
 
 
 <!-- user management dialog !-->
-<div class="user-management-add-user-dialog user-management-dialog fm-dialog hidden"> 
+
+ <div class="user-management-add-user-dialog user-management-dialog fm-dialog hidden">
+    <div class="mega-logo icon56 dialog-heading-img hidden"></div>
+    <div class="sent-email-logo dialog-heading-img"></div>
+<!-- For the dialog-title, toggle left-version class to change alignment style!-->
     <div class="dialog-title">[$19104]</div>
     <div class="dialog-subtitle">[$19117]</div>
     <div class="delete-img icon"></div>
@@ -4827,61 +4831,72 @@
             <div class="input-user">
                 <div class="indi-input">
                     <div class="dialog-input-title-ontop">
-                        [$86]*
-                        <span class="title last-name">[$1097]*</span>
-                        <br>
+                        <div class="title first-name">[$86]</div>
+                        <div class="title last-name">[$1097]</div>
+                        <div class="bus-reg-icon number-of-user"></div>
                         <input class="dialog-input placeholder sub-n" type="text" placeholder="[$7436]" autofocus>
                         <input class="dialog-input placeholder sub-n-l" type="text" placeholder="[$1097]">
-
                         <div class="error-message er-sub-n">Sorry,.....</div>
                     </div>
+
                     <div class="dialog-input-title-ontop">
-                        [$7434]*<br>
+                        <div class="title">[$7434]</div>
+                        <div class="bus-reg-icon email"></div>
                         <input class="dialog-input placeholder sub-m" type="text" placeholder="[$9002]">
                         <div class="error-message er-sub-m">Sorry,.....</div>
                     </div>
 
-                    <div class="border"></div>
-                    <div class="dialog-input-title-ontop">
-                        [$19150]<br>
-                        <input class="dialog-input placeholder sub-p" type="text" placeholder="[$19150]">
-                        <div class="error-message er-sub-p">Sorry,.....</div>
+                    <div class="default-white-button-user-management toggle-optional-inputs show">
+                        <span>Show optional inputs</span>
+                        <div class="close-icon icon"></div>
                     </div>
-                    <div class="dialog-input-title-ontop">
-                        [$19151]<br>
-                        <input class="dialog-input placeholder sub-id-nb" type="text" placeholder="000">
-                        <div class="error-message er-sub-id-nb">Sorry,.....</div>
-                    </div>
-                    <div class="dialog-input-title-ontop">
-                        [$19152]<br>
-                        <input class="dialog-input placeholder sub-ph" type="text" placeholder="(123) 000 000">
-                        <div class="error-message er-sub-ph">Sorry,.....</div>
-                    </div>
-                    <div class="dialog-input-title-ontop">
-                        [$17818]<br>
-                        <input class="dialog-input placeholder sub-lo" type="text" placeholder="[$17818]">
-                        <div class="error-message er-sub-lo">Sorry,.....</div>
-                    </div>                  
+
+                    <div class="optional-input-container hidden">
+                        <div class="dialog-input-title-ontop">
+                            <div class="title">[$19150]</div>
+                             <div class="bus-reg-icon number-of-user"></div>
+                            <input class="dialog-input placeholder sub-p" type="text" placeholder="[$19150]">
+                            <div class="error-message er-sub-p">Sorry,.....</div>
+                        </div>
+                        <div class="dialog-input-title-ontop">
+                            <div class="title">[$19151]</div>
+                            <div class="id-card-icon icon bus-reg-icon"></div>
+                            <input class="dialog-input placeholder sub-id-nb" type="text" placeholder="ID number">
+                            <div class="error-message er-sub-id-nb">Sorry,.....</div>
+                        </div>
+                        <div class="dialog-input-title-ontop">
+                            <div class="title">[$19152]</div>
+                            <div class="bus-reg-icon phone"></div>
+                            <input class="dialog-input placeholder sub-ph" type="text" placeholder="phone number">
+                            <div class="error-message er-sub-ph">Sorry,.....</div>
+                        </div>
+                        <div class="dialog-input-title-ontop">
+                            <div class="title">[$17818]</div>
+                            <div class="setting-icon24 add"></div>
+                            <input class="dialog-input placeholder sub-lo" type="text" placeholder="[$17818]">
+                            <div class="error-message er-sub-lo">Sorry,.....</div>
+                        </div>  
+                    </div>     
                 </div>               
-            </div>
-                     
+            </div>     
         </div>
 
         <div class="verification-container">
-                <div class="new-sub-user">
-                    <div class="subuser-image">
-                        <img src="" class="hidden">
-                    </div>
-                </div>
-                <div class="verification-user-info">
-                    <div class="verification-user-email"><b>[$7434]:</b><div class="sub-e">major@126.com</div></div>
-                    <div class="verification-user-pw"><b>[$18771]:</b><div class="sub-p">major@126.com</div></div>
-                </div>
-                <div class="checked-icon56 icon56"></div>                                   
-        </div><!--END folder container-->
+            <div class="verification-user-info">
+                <div class="verification-user-email"><b>[$7434]:</b><div class="sub-e">major@126.com</div></div>
+                <div class="verification-user-pw"><b>[$18771]:</b><div class="sub-p">major@126.com</div></div>
+            </div>  
+            <div class="default-green-button-user-management copy-pw-btn">[$19084]</div>                                
+        </div><!-- END folder container -->
     <div class="dialog-button-container">
+        <div class="invite-link-option">
+            <span> Invite link passwords</span>
+            <div class="dialog-feature-toggle toggle-on">
+                <div class="dialog-feature-switch"></div>
+            </div>
+        </div>
+
         <div class="default-white-button-user-management add-more">
-            <div class="add-more-img icon"></div>
             [$19103]
         </div>               
         <div class="default-white-button-user-management hidden">
@@ -4890,13 +4905,11 @@
         </div>  
         <div class="default-green-button-user-management add-sub-user">[$19084]</div> 
     </div>
-<!--     <div class="licence-bar hidden">
+     <div class="licence-bar hidden">
         <div class="notification-img icon"></div>
         5 (WAIT 4 API) sub account license used.
-    </div> -->
+    </div> 
 </div><!--END add user dialog-->
-
-
 
 
 <div class="user-management-edit-profile-dialog user-management-dialog fm-dialog hidden">

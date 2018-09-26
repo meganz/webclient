@@ -24453,7 +24453,7 @@ opacity: 1;
 }
 
 .default-white-button-user-management, .default-green-button-user-management, .default-red-button-user-management{
-    height: 32px;
+    height: 36px;
     width: auto;
     box-sizing: border-box;
     border: 1px solid rgba(0,0,0,0.1);
@@ -24461,12 +24461,11 @@ opacity: 1;
     box-shadow:0 0.5px 1px 0 rgba(0,0,0,0.05);
     position: relative;
     font-size: 15px;
-    line-height: 30px;
+    line-height: 34px;
     padding: 0 16px;
     cursor: pointer;
     transition: 0.1s;
     display: inline-block;
-    font-weight: 400;
 }
 
 .default-white-button-user-management.disabled, .default-green-button-user-management.disabled, .default-red-button-user-management.disabled {
@@ -26560,61 +26559,47 @@ opacity: 1;
     -webkit-filter: blur(0.25em);
 }
 
+.user-management-dialog * {
+    font-family: 'LatoWeb';
+}
+
 .user-management-dialog .dialog-tree-panel-scroll {
     overflow:hidden;
 }
 
 .user-management-dialog .dialog-title {
-    font-size: 20px;
+    font-size: 26px;
     color: #333333;
-    line-height: 24px;
-    font-weight: 600;
+    line-height: 32px;
+    font-weight: 300;
     position: relative;
-    margin:24px auto;
+    margin:0 auto 16px auto;
     text-align: center;
     display: block;
+    font-family: 'montserrat';
+}
+
+.user-management-dialog .dialog-title.left-version {
+    margin:32px auto 8px 40px;
+    text-align: left;
 }
 
 .user-management-dialog .dialog-subtitle {
-    font-size: 14px;
+    font-size: 13px;
     color: #999;
-    line-height: 24px;
-    width: 618px;
-    margin-bottom: 24px;
-    padding:0 100px;
-    box-sizing: border-box;
+    line-height: 21px;
+    width: 390px;
     height: auto;
     text-align: center;
     position: relative;
+    margin:0 auto 40px auto;
 }
 
 .user-management-dialog .dialog-input-container {
-    width: 620px;
+    width: 100%;
     height: auto;
     position: relative;
-    padding: 24px 0;
-}
-
-.user-management-dialog .dialog-input-container::before {
-    content: "";
-    width: 100%;
-    height: 1px;
-    margin: 0 auto;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    background-color: rgba(0,0,0,0.1);
-}
-
-
-
-.user-management-dialog .dialog-input-container .input-user .indi-input .error-message {
-    font-size: 13px;
-    padding:8px 0 0 8px;
-    color: rgba(229,76,81,1);
-    width:240px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    padding: 0;
 }
 
 .user-management-dialog .dialog-input-container .input-user .confirm-img.icon {
@@ -26623,61 +26608,36 @@ opacity: 1;
     left: 220px;
 }
 
-.user-management-dialog .dialog-input.placeholder {
-    background-color: rgba(0,0,0,0.02);
-    color: #bbbbbb;
-    border:1px solid rgba(0,0,0,0.07);
-}
 
-.user-management-dialog .dialog-input.hover{
-    background-color: rgba(0,0,0,0.02);
-    color: #999999;
-    border:1px solid rgba(0,0,0,0.07);
-}
-
-.user-management-dialog .dialog-input.focus{
-    background-color: #ffffff;
-    color: #cccccc;
-    border:1px solid rgba(0,0,0,0.2);
-}
-
-.user-management-dialog .dialog-input.active{
-    background-color: #ffffff;
-    color: #333333;
-    border:1px solid rgba(0,0,0,0.2);
-}
-.user-management-dialog .dialog-input.active::placeholder{
-   color: #888;
-}
-
-.user-management-dialog .dialog-input.active::placeholder{
+.user-management-add-user-dialog .default-white-button-user-management.toggle-optional-inputs {
+    position: relative;
+    margin:32px auto 0 195px;
+    border-radius: 18px;
+    height: 32px;
+    line-height: 30px;
+    font-size:14px;
     color: #888;
+    display: default;
+    box-sizing: border-box;
 }
 
-.user-management-dialog .dialog-input.correctinput{
-    background-color: #ffffff;
-    color: #888888;
-    border:1px solid rgba(0,0,0,0.1);
+.user-management-add-user-dialog .default-white-button-user-management.toggle-optional-inputs span {
+    min-width:106px;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.user-management-dialog .dialog-input.error{
-    background-color: rgba(0,0,0,0.05);
-    color: #333333;
-    border:1px solid rgba(217,0,7,0.5);
+.user-management-add-user-dialog .default-white-button-user-management.toggle-optional-inputs .close-icon {
+    float: right;
+    margin:3px 0 0px 12px;
 }
 
-.user-management-dialog .dialog-input.disable{
-    background-color: rgba(0,0,0,0.02);
-    color: #999999;
-    border:1px solid rgba(0,0,0,0.2);
-    opacity: 0.2;
+.user-management-add-user-dialog .default-white-button-user-management.toggle-optional-inputs.show .close-icon {
+    -ms-transform: rotate(180deg); /* IE 9 */
+    -webkit-transform: rotate(180deg); /* Safari */
+    transform: rotate(180deg);
 }
-
-.user-management-dialog .dialog-input.highlight {
-    background-color: rgba(0,191,165,0.05);
-    color: #999999;
-    border:1px solid rgba(0,191,165,0.5);
-} 
 
 .user-management-dialog .default-button-no-border, .fm-right-header-user-management .default-button-no-border, .user-management-view .default-button-no-border{
     transition: 0.2s;
@@ -26696,6 +26656,56 @@ opacity: 1;
 .user-management-add-user-dialog .default-button-no-border {
     float: left;
 }
+
+.user-management-add-user-dialog .invite-link-option {
+    height: 24px;
+    margin: 24px 32px;
+    float: left;
+    position: relative;
+}
+
+.user-management-add-user-dialog .invite-link-option span{
+    font-size: 13px;
+    line-height: 24px;
+    color:#888;
+    height: 24px;
+    vertical-align: top;
+}
+
+.user-management-add-user-dialog .dialog-feature-toggle {
+    border: solid 1px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 100%);
+    border-radius: 40px;
+    cursor: pointer;
+    display: inline-block;
+    height: 20px;
+    margin-left: 16px;
+    width: 40px;
+}
+
+.user-management-add-user-dialog .dialog-feature-toggle .dialog-feature-switch {
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    height: 14px;
+    margin-left: 2px;
+    margin-top: 2px;
+    width: 14px;
+}
+
+.user-management-add-user-dialog .dialog-feature-toggle.toggle-on {
+    background: linear-gradient(180deg, #00BFA5 0%, #00BFA5 100%);
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+}
+
+.user-management-add-user-dialog .dialog-feature-toggle .dialog-feature-switch {
+    margin-right: 2px;
+    float: right;
+}
+
+
 
 .user-management-add-user-dialog .dialog-button-container .default-button-no-border:nth-child(2){
     margin-left: 24px;
@@ -26720,7 +26730,6 @@ opacity: 1;
 .user-management-view .icon56, .user-management-dialog .icon56 {
     background-image: url(../images/mega/big-icons.png);
     background-repeat: no-repeat;
-    display: inline-block;
     width:56px;
     height: 56px;
     position: relative;
@@ -26737,6 +26746,25 @@ opacity: 1;
 .user-management-dialog .checked-icon56 {
     background-position: -124px -280px;
 }
+
+.user-management-dialog .mega-logo {
+    background-position: -129px -98px;
+}
+
+.user-management-dialog .dialog-heading-img {
+    margin:40px auto 24px auto;
+}
+
+.user-management-dialog .sent-email-logo {
+    background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+    width:86px;
+    height: 44px;
+    position: relative;
+    background-position: -17px -1091px;
+}
+
+
 
 .user-management-view .default-button-no-border .icon, .fm-right-header-user-management .default-button-no-border .icon, .user-management-dialog .default-button-no-border .icon {
     cursor: pointer;
@@ -26756,34 +26784,33 @@ opacity: 1;
 }
 
 .user-management-add-user-dialog  {
-    width: 620px;
-    margin-left: -310px;
-    margin-top: -265px;
+    width: 598px;
+    margin-left: -299px;
+    margin-top: -280px;
 }
 
 .user-management-add-user-dialog .dialog-button-container {
-    height: 64px;
-    background-color: #fff;
+    height: 72px;
+    background-color: rgba(250,250,250,1);
     position: relative;
     border-radius: 0 0 8px 8px;
+    margin-top:40px;
 }
 
-.user-management-add-user-dialog .default-green-button-user-management {
-    height: 36px;
-    width: auto;
+.user-management-add-user-dialog .dialog-button-container .default-green-button-user-management {
     padding: 6px 24px;
     float: right;
     line-height: 20px;
     font-size: 16px;
-    margin:14px 38px 0 0;
+    margin:18px 32px 0 0;
 }
 
 .user-management-add-user-dialog .default-white-button-user-management {
-    float: left;
     height: 36px;
-    margin:14px 32px 0 32px;
-    line-height: 32px;
+    margin:18px 32px 0 32px;
+    line-height: 34px;
     font-size: 16px;
+    float: right
 }
 
 .user-management-add-user-dialog .default-white-button-user-management .icon {
@@ -26839,70 +26866,24 @@ opacity: 1;
 
 .user-management-add-user-dialog .verification-container {
     position: relative;
-    width: 100%;
+    width: 532px;
     height: auto;
-    background-color: rgba(250,250,250,1); 
-    padding:32px 40px;
+    background-color: rgba(250,250,250,1);
+    margin:32px; 
+    padding:12px 32px;
     box-sizing: border-box;
+    border-radius: 4px;
+    border:1px solid rgba(0,0,0,0.1);
 }
 
-.user-management-add-user-dialog .verification-container::before {
-    content: " ";
-    width: 100%;
-    height: 1px;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.verification-container .avatar {
-    width: 48px;
-    height: 48px;
-    border: 1px solid rgba(0,0,0,0.1);
-    border-radius: 100%;
-    padding: 0;
-    box-sizing: border-box;
-    background-color: #fff;
-    position: relative;
-    display: inline-block;
-    vertical-align: top;
-    margin: 0;
-}
-
-.verification-container .avatar .subuser-image {
-    width: 42px;
-    height: 42px;
-    margin:2px;
-    border: 1px solid rgba(0,0,0,0.1);
-    border-radius: 100%;
-    box-sizing: border-box;
-    position: absolute;
-}
-
-.verification-container .avatar .subuser-image img {
-    width: 42px;
-    height: 42px;
-    border-radius: 100%;
-    position: absolute;
-}
-.verification-container .avatar span {
-    color: white;
-    font-size: 24px;
-    float: left;
-    margin-top: 15%;
-    margin-left: 36%;
-}
 
 .user-management-add-user-dialog .verification-container .verification-user-info {
-    width: 400px;
-    margin-left: 24px;
+    width: auto;
     position: relative;
     display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; 
-    vertical-align: top;
 }
 
 .user-management-add-user-dialog .verification-container .verification-user-info * {
@@ -26929,6 +26910,13 @@ opacity: 1;
     margin-right: 12px;
 }
 
+.user-management-add-user-dialog .verification-container .default-green-button-user-management {
+    position: absolute;
+    margin:0;
+    right: 32px;
+    top: 18px;
+}
+
 .user-management-add-user-dialog .verification-container .checked-icon56.icon56 {
     position: absolute;
     right: 40px;
@@ -26947,61 +26935,11 @@ opacity: 1;
     cursor: pointer;
 }
 
-.user-management-edit-profile-dialog .dialog-input-container {
-    padding:24px 0 8px 0;
-}
-
 
 .user-management-edit-profile-dialog .dialog-title {
     text-align: left;
 }
 
-.user-management-dialog .dialog-input-title-ontop {
-    color:#333333;
-    display: inline-block;
-    font-size: 14px;
-    margin-bottom: 32px;
-    vertical-align: top;
-}
-
-.user-management-dialog .dialog-input-title-ontop {
-    margin-left: 32px;  
-}
-
-.user-management-dialog .dialog-input-title-ontop .title.last-name {
-    display: inline-block;
-    margin-left: 100px;
-}
-
-.user-management-dialog .dialog-input-container .dialog-input-title-ontop .dialog-input {
-    width:258px;
-    height: 32px;
-    display: inline-block;
-    position: relative;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    border-radius: 2px;
-    box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
-    box-sizing: border-box;
-    padding: 0 8px;
-    margin-top: 8px;
-    line-height: 32px;
-    font-size: 14px;
-    cursor: text;
-}
-
-.user-management-dialog .dialog-input-container .dialog-input-title-ontop .dialog-input::placeholder {
-    font-size: 13px;
-    color: #aaa;
-}
-
-.user-management-dialog .dialog-input-title-ontop .dialog-input.sub-n, .user-management-dialog .dialog-input-title-ontop .dialog-input.sub-n-l, .user-management-dialog .dialog-input-title-ontop .dialog-input.edit-sub-name, .user-management-dialog .dialog-input-title-ontop .dialog-input.edit-sub-lname {
-    width: 123px;
-}
-
-.user-management-dialog .dialog-input-title-ontop .dialog-input.sub-n-l, .user-management-dialog .dialog-input-title-ontop .dialog-input.edit-sub-lname {
-    margin-left: 10px;
-}
 
 .user-management-edit-profile-dialog .dialog-button-container, .user-management-able-user-dialog .dialog-button-container {
     height: 56px;
@@ -27368,6 +27306,7 @@ opacity: 1;
     margin:12px 4px 12px 12px;
 }
 
+
 .user-management-account-settings .settings-submenu-item:hover {
     color:#333;
 }
@@ -27408,7 +27347,7 @@ opacity: 1;
 }
 
 .user-management-account-settings .setting-block .title {
-    width: 120px;
+    width: 128px;
     height: 100%;
     position: absolute;
     left: 0;
@@ -27461,32 +27400,32 @@ opacity: 1;
      opacity: 0.2;
 }
 
-.user-management-account-settings .number-of-user {
+.user-management-account-settings .number-of-user, .user-management-dialog .number-of-user {
     background-position: center -1582px;
-    opacity: 0.4;
+
 }
 
-.user-management-account-settings .company-name {
+.user-management-account-settings .company-name, .user-management-dialog .company-name{
     background-position: center -1661px;
-    opacity: 0.4;
+
 }
 
-.user-management-account-settings .phone {
+.user-management-account-settings .phone, .user-management-dialog .phone {
     background-position: center -1621px;
-    opacity: 0.4;
+
 }
 
-.user-management-account-settings .email {
+.user-management-account-settings .email, .user-management-dialog .email{
     background-position: center -1701px;
-    opacity: 0.4;
+
 }
 
-.user-management-account-settings .pw {
+.user-management-account-settings .pw, .user-management-dialog .pw{
     background-position: center -1741px;
-    opacity: 0.4;
+
 }
 
-.user-management-account-settings .setting-icon24 {
+.user-management-account-settings .setting-icon24, .user-management-dialog .setting-icon24{
     background-image: url(../images/mega/big-icons.png);
     background-repeat: no-repeat;
     width: 24px;
@@ -27495,26 +27434,26 @@ opacity: 1;
 
 .user-management-account-settings .setting-icon24.company-name {
     background-position: -156px -633px;
-    opacity: 0.4; 
+    opacity: 0.6; 
 }
 
 .user-management-account-settings .setting-icon24.admin {
     background-position: -156px -517px;
-    opacity: 0.4; 
+    opacity: 0.6; 
 }
 
 .user-management-account-settings .setting-icon24.vat {
     background-position: -156px -670px;
-    margin: 30px 12px 0 4px;
-    opacity: 0.5;
+    margin: 24px 12px 6px 4px;
+    opacity: 0.6;
     float: left;
     display: inline-block;
 }
 
-.user-management-account-settings .setting-icon24.add {
+.user-management-account-settings .setting-icon24.add, .user-management-dialog .setting-icon24.add {
     background-position: -156px -703px;
-    margin: 30px 12px 0 4px;
-    opacity: 0.5;
+    margin: 24px 12px 6px 4px;
+    opacity: 0.7;
     float: left;
     display: inline-block;
 }
@@ -27544,14 +27483,26 @@ opacity: 1;
 
 }
 
-.user-management-account-settings .bus-input {
-    width: 84%;
-    height: 64px;
+.user-management-account-settings .bus-input, .user-management-dialog .dialog-input-title-ontop {
+    height: 56px;
     position: relative;
-    margin:12px auto;
+    
 }
 
-.user-management-account-settings .bus-input::after {
+.user-management-account-settings .bus-input {
+    width: 84%;
+    margin:32px auto 0 auto;
+}
+
+.user-management-dialog .dialog-input-title-ontop {
+    width:250px;
+    margin:32px 0 0px 32px;
+    display: inline-block;
+    vertical-align: top;
+}
+
+
+.user-management-account-settings .bus-input::after, .user-management-dialog .dialog-input-title-ontop::after {
     content: " ";
     width: 100%;
     height: 1px;
@@ -27561,30 +27512,53 @@ opacity: 1;
     position: absolute;
 }
 
+.user-management-account-settings .bus-input .bus-input-title, .user-management-dialog .title {
+    position: absolute;
+    left: 40px;
+    top: 0;
+    font-size: 13px;
+    color: #aaa;
+    line-height: 18px;
+    display: none;
+}
+
+ .user-management-dialog .title.last-name {
+    left: 147px;
+ }
+
 .user-management-account-settings .bus-input.short-input {
     width: calc(84% - 28px);
     margin-left:calc(8% + 28px);
 }
 
-.user-management-account-settings .bus-input .bus-reg-icon {
-    margin: 30px 12px 0 4px;
-    opacity: 0.5;
+.user-management-account-settings .bus-input.short-input .bus-input-title {
+    left: 12px;
+}
+
+.user-management-account-settings .bus-input.short-input .bus-input-title.zip {
+    left: calc(56% + 12px);
+}
+
+
+.user-management-account-settings .bus-input .bus-reg-icon, .user-management-dialog .bus-reg-icon{
+    margin: 24px 12px 0 6px;
+    opacity: 0.7;
     float: left;
     display: inline-block;
 }
 
-.user-management-account-settings .bus-input input {
+.user-management-account-settings .bus-input input, .user-management-dialog .dialog-input-title-ontop input{
     border: none;
     width: -webkit-calc(100% - 56px);
     width: -moz-calc(100% - 56px);
     width: calc(100% - 56px);
-    height: 22px;
-    margin-top:30px;
+    height: 24px;
+    margin-top:24px;
     margin-right: 0;
-    line-height: 22px;
+    line-height: 24px;
     color: #333;
     font-size: 400;
-    font-size: 15px;
+    font-size: 16px;
     white-space: nowrap;
     text-overflow: ellipsis;
     background-color: none;
@@ -27610,33 +27584,51 @@ opacity: 1;
     display: inline-block;
 }
 
+.user-management-dialog .dialog-input-title-ontop input.sub-n, .user-management-dialog .dialog-input-title-ontop input.sub-n-l{
+    width:100px;
+    display: inline-block;
+}
+
 .user-management-account-settings .bus-input input.las-name {
     width: 36%;
     display: inline-block;
 }
 
-.user-management-account-settings .bus-input input::placeholder {
-    font-size: 13px;
-
+.user-management-account-settings .bus-input input::placeholder, .user-management-dialog .dialog-input-title-ontop input::placeholder{
+    font-size: 14px;
+    color:#aaa;
 }
 
 .user-management-account-settings .bus-input.num input {
     width: 100px;
 }
 
-.user-management-account-settings .bus-input .error-message {
+.user-management-account-settings .bus-input .error-message, .user-management-dialog .dialog-input-title-ontop .error-message{
     font-size: 13px;
     padding: 8px 0 0 4px;
     color: rgba(229,76,81,1);
-    width:90%;
     white-space: nowrap;
     text-overflow: ellipsis;
+    position: absolute;
+    top: 56px;
+    left: 38px;
+    width: -webkit-calc(100% - 40px);
+    width: -moz-calc(100% - 40px);
+    width: calc(100% - 40px);
     display:none;
+}
+
+.user-management-account-settings .bus-input.note .error-message {
+    top: 80px;
+}
+
+.user-management-account-settings .bus-input.short-input .error-message {
+    left: 8px;
 }
 
 .user-management-account-settings .bus-input .note-message {
     font-size: 13px;
-    padding: 8px 0 0 4px;
+    padding: 8px 0 0 38px;
     color: #888;
     width:90%;
     white-space: nowrap;
@@ -27649,15 +27641,40 @@ opacity: 1;
 }
 
 
-.user-management-account-settings .bus-input.error::after {
+/* three extra status for the inputs: error, active, correctinput */
+.user-management-account-settings .bus-input.correctinput .bus-input-title, 
+.user-management-dialog .dialog-input-title-ontop.correctinput .title {
+    display: inline-block;
+}
+
+.user-management-account-settings .bus-input.active .bus-input-title, 
+.user-management-dialog .dialog-input-title-ontop.active .title {
+    display: inline-block;
+}
+
+.user-management-account-settings .bus-input.active input::placeholder, .user-management-dialog .dialog-input-title-ontop.active input::placeholder{
+    opacity: 0;
+}
+
+.user-management-account-settings .bus-input.active::after, .user-management-dialog .dialog-input-title-ontop.active::after{
+    background-color: rgba(0,0,0,0.6);
+}
+
+.user-management-account-settings .bus-input.error::after, .user-management-dialog .dialog-input-title-ontop.error::after{
     background-color: rgba(217,0,7,0.5);
 }
 
-.user-management-account-settings .bus-input.error input {
+.user-management-account-settings .bus-input.error input, .user-management-dialog .dialog-input-title-ontop.error input{
     color: rgba(217,0,7,1);
 }
 
-.user-management-account-settings .bus-input.error .error-message {
+.user-management-account-settings .bus-input.error .bus-input-title, 
+.user-management-dialog .dialog-input-title-ontop.error .title {
+    display: inline-block;
+}
+
+.user-management-account-settings .bus-input.error .error-message, 
+.user-management-dialog .dialog-input-title-ontop.error .error-message{
     display: inline-block;
 }
 
@@ -27689,7 +27706,7 @@ opacity: 1;
     display: block;
     position: relative;
     margin-bottom: 24px;
-}xs
+}
 
 .user-management-account-settings .option-group .list {
     max-height: 200px;
@@ -29125,7 +29142,7 @@ opacity: 1;
 .user-management-account-settings .bus-input.short-input.underline-dropdown-input {
     width: calc(84% - 28px);
     margin-left: calc(8% + 28px);
-    height: 64px;
+    height: 45px;
     position: relative;
     overflow: hidden;
 }
@@ -29137,7 +29154,7 @@ opacity: 1;
     background-repeat: no-repeat;
     background-position: -4px -12309px;
     right: 8px;
-    top:28px;
+    top:20px;
     position: absolute;
 }
 
@@ -29146,7 +29163,7 @@ opacity: 1;
     border:none;
     font-size: 14px;
     color: #333333;
-    height: 64px;
+    height: 40px;
     width: calc(100% + 16px);
     margin-top:-4px;
     padding: 8px;
@@ -29154,8 +29171,6 @@ opacity: 1;
     right: -16px;
     bottom: 0;
 }
-
-
 
 
 @media only screen and (max-width: 1270px) {

@@ -1310,7 +1310,7 @@ html.gbot {
 .bottom-page.top-title span {
     display: inline-block;
     vertical-align: top;
-    margin: 2px 0 24px 0;
+    margin: 1px 0 24px 0;
 }
 .bottom-page.dark-big-header {
     font-size: 36px;
@@ -1726,9 +1726,9 @@ html.gbot {
     max-width: 935px
 }
 .uwp-3 .desktop-img {
-    width: auto;
+    width: 138%;
+    margin-left: -38%;
     max-width: 850px;
-    margin-left:-38%;
 }
 .uwp-5 .img {
     width: auto;
@@ -2677,7 +2677,12 @@ html.gbot {
 .top-bl .bottom-page.table.changed-order .order2, .bottom-page.table.changed-order .order2 {
     display: none;
 }
-
+.megasync .left-cell .business-info-block, .uwp .left-cell .business-info-block {
+    padding-right: 40px;
+}
+.megasync .right-cell .business-info-block, .uwp .right-cell .business-info-block {
+    padding-left: 40px;
+}
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow, .bottom-page.top-title::before, .pages-nav.nav-icon.bott-sprite, .bottom-page.mid-icon, .bottom-page.cols-container .col3::before, .bottom-page.tab-lnk-icon, .cmd-top-img, .bottom-page.scroll-icon {
     background-image: url(../images/mega/pages-sprite_v2@2x.png) !important;
@@ -2762,7 +2767,6 @@ html.gbot {
     display: block;
     margin: 0 auto 48px;
     max-width: 640px;
-    margin-left: initial;
     width: 100%
 }
 .uwp-4 .desktop-img {
@@ -2802,8 +2806,6 @@ html.gbot {
     vertical-align: initial;
     display: block;
 }
-.uwp .advertise-chat .img-wrap {
-}
 .mobile-apps-button.uwp {
     margin: 40px auto 0;
 }
@@ -2812,6 +2814,9 @@ html.gbot {
 }
 .megasync .sync-3 .bottom-page img {
     margin: 32px auto;
+}
+.megasync .left-cell .business-info-block, .uwp .left-cell .business-info-block, .megasync .right-cell .business-info-block, .uwp .right-cell .business-info-block {
+    padding: 0;
 }
 }
 

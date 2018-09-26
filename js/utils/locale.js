@@ -591,6 +591,7 @@ mBroadcaster.once('startMega', function populate_l() {
                 .replace('[/A]', '</a>');
     l[17690] = l[17690].replace('[A]', '<a href="https://mega.nz/recovery" target="_blank" class="red">')
                        .replace('[/A]', '</a>');
+    l[17701] = l[17701].replace('[B]', '<b>').replace('[/B]', '</b>');
     if (l[17742]) {
         l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     }

@@ -84,6 +84,7 @@ html.gbot {
 }
 .bottom-page .top-head.floating {
     background-color: white;
+    box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
     position: fixed;
     top: -38px;
 }
@@ -93,12 +94,9 @@ html.gbot {
 .bottom-page .logo:not(.bottom-menu) {
     background-position: -6px -773px;
 }
-.bottom-page.light-blue-top .top-head {
+.bottom-page.light-blue-top .top-head, .bottom-page.light-blue-top .top-head.floating {
     background-color: #F0F2F5;
-}
-.bottom-page.light-blue-top .top-head::after, .bottom-page.light-blue-top .top-head.floating::after {
-    display: block;
-    background-color: rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 1px 0 0 rgba(0,0,0,0.15);
 }
 .bottom-page.top-bl {
     max-height: 800px;

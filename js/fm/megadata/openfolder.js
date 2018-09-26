@@ -32,10 +32,11 @@
             fid = fileversioning.getTopNodeSync(id);
             id = M.d[fid].p;
         }
-
         this.previousdirid = this.currentdirid;
         this.currentdirid = id;
-        this.currentrootid = M.chat ? "chat" : this.getNodeRoot(id);
+        this.currentrootid = this.chat ? "chat" : this.getNodeRoot(id);
+        this.currentLabelType = M.labelType();
+        this.currentLabelFilter = M.filterLabel[this.currentLabelType];
 
         if (first) {
             fminitialized = true;
@@ -62,7 +63,14 @@
         if (this.chat) {
             this.v = [];
             sharedFolderUI(); // remove shares-specific UI
-            //$.tresizer();
+
+            if (megaChatIsReady) {
+                var roomId = String(id).split('/').pop();
+
+                if (roomId.length === 11) {
+                    megaChat.setAttachments(roomId);
+                }
+            }
         }
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
@@ -98,6 +106,10 @@
             }
             else {
                 this.filterByParent(this.currentdirid);
+            }
+
+            if (id.substr(0, 4) !== 'chat' && id.substr(0, 9) !== 'transfers') {
+                this.labelFilterBlockUI();
             }
 
             var viewmode = 0;// 0 is list view, 1 block view
@@ -154,12 +166,14 @@
                 for (var i in this.opc) {
                     this.v.push(this.opc[i]);
                 }
+                this.doSort('email', 1);
             }
             else if (this.currentdirid === 'ipc') {
                 this.v = [];
                 for (var i in this.ipc) {
                     this.v.push(this.ipc[i]);
                 }
+                this.doSort('email', 1);
             }
 
             this.renderMain();
@@ -173,7 +187,7 @@
                         currentdirid = this.previousdirid;
                     }
                 }
-
+                
                 if ($('#treea_' + currentdirid).length === 0) {
                     var n = this.d[currentdirid];
                     if (n && n.p) {
@@ -228,8 +242,14 @@
             console.error(ex);
         }
 
+        this.currentTreeType = M.treePanelType();
+
         M.searchPath();
         M.treeSearchUI();
+        M.treeSortUI();
+        M.treeFilterUI();
+        M.initLabelFilter(this.v);
+        M.redrawTreeFilterUI();
 
         promise.resolve(id);
         mBroadcaster.sendMessage('mega:openfolder');
@@ -276,9 +296,6 @@
             M.addNotificationsUI(1);
         }
 
-        this.search = false;
-        this.chat = false;
-
         if (!fminitialized) {
             firstopen = true;
         }
@@ -286,6 +303,9 @@
             // Do nothing if same path is chosen
             return MegaPromise.resolve(EEXIST);
         }
+
+        this.chat = false;
+        this.search = false;
 
         if (id === 'rubbish') {
             id = this.RubbishID;
@@ -393,6 +413,7 @@
                         M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                     }
                     _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
+                    
                 });
         }
         else {

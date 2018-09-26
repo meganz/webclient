@@ -77,98 +77,166 @@
 
     function showLoginDialog(aPromise) {
         var $dialog = $('.fm-dialog.pro-login-dialog');
+        var $inputs = $dialog.find('.account.input-wrapper input');
+        var $button = $dialog.find('.big-red-button');
 
         M.safeShowDialog('pro-login-dialog', function() {
-            $dialog.removeClass('hidden').addClass('active');
 
             $dialog.css({
                 'margin-left': -1 * ($dialog.outerWidth() / 2),
                 'margin-top': -1 * ($dialog.outerHeight() / 2)
             });
 
-            return $dialog.css('zoom', '1.2');
+            // Init inputs events
+            accountinputs.init($dialog);
+
+            return $dialog;
         });
 
-        $('.top-login-input-block').removeClass('incorrect');
-
         // controls
-        $('.fm-dialog-close', $dialog)
-            .rebind('click.proDialog', function() {
-                closeDialog();
-                aPromise.reject();
-            });
+        $('.fm-dialog-close', $dialog).rebind('click.proDialog', function() {
+            closeDialog();
+            aPromise.reject();
+        });
 
-        $('.input-email', $dialog)
-            .val('');
+        $inputs.val('');
 
-        $('.input-password', $dialog)
-            .data('placeholder', l[909]);
-
-        uiPlaceholders($dialog);
-        uiCheckboxes($dialog);
-
-        $('#login-password, #login-name', $dialog).rebind('keydown', function(e) {
-            $('.top-login-pad', $dialog).removeClass('both-incorrect-inputs');
-            $('.top-login-input-tooltip.both-incorrect', $dialog).removeClass('active');
-            $('.top-login-input-block.password', $dialog).removeClass('incorrect');
-            $('.top-login-input-block.e-mail', $dialog).removeClass('incorrect');
+        $inputs.rebind('keydown', function(e) {
             if (e.keyCode == 13) {
                 doLogin($dialog, aPromise);
             }
         });
 
-        $('.top-login-forgot-pass', $dialog).rebind('click', function(e) {
+        $('.top-login-forgot-pass', $dialog).rebind('click.loginreq', function(e) {
+            e.preventDefault();
             aPromise.reject();
             loadSubPage('recovery');
         });
 
-        $('.top-dialog-login-button', $dialog).rebind('click', function(e) {
+        $button.rebind('click.loginreq', function(e) {
             doLogin($dialog, aPromise);
+        });
+
+        $button.rebind('keydown.loginreq', function (e) {
+            if (e.keyCode === 13) {
+                doLogin($dialog, aPromise);
+            }
         });
     }
 
+    var completePromise = null;
 
     function doLogin($dialog, aPromise) {
+
         loadingDialog.show();
 
-        var ctx = {
-            checkloginresult: function(ctx, r) {
-                loadingDialog.hide();
+        // Save the promise for use in the completeLogin function
+        completePromise = aPromise;
 
-                if (r == EBLOCKED) {
-                    aPromise.reject(l[730]);
-                }
-                else if (r) {
-                    passwordManager('#form_login_header');
+        var $emailContainer = $dialog.find('.account.input-wrapper.email');
+        var $passwordContainer = $dialog.find('.account.input-wrapper.password');
+        var $formWrapper = $dialog.find('form');
+        var $emailInput = $emailContainer.find('input');
+        var $passwordInput = $passwordContainer.find('input');
+        var $rememberMeCheckbox = $dialog.find('.login-check input');
 
-                    u_type = r;
-                    u_checked = true;
-                    if (u_type === 3) {
-                        aPromise.resolve();
-                    }
-                    else {
-                        boot_auth(ctx, r);
-                        aPromise.reject();
-                    }
-                    $('#login-password', $dialog).val('');
-                    $('#login-email', $dialog).val('');
+        var email = $emailInput.val();
+        var password = $passwordInput.val();
+        var rememberMe = $rememberMeCheckbox.is('.checkboxOn');  // ToDo check if correct
+        var twoFactorPin = null;
 
-                }
-                else {
-                    $('#login-password', $dialog).val('');
-                    alert(l[201]);
-                }
+        if (email === '' || checkMail(email)) {
+            $emailContainer.addClass('incorrect');
+            $emailInput.val('');
+            $emailInput.focus();
+            loadingDialog.hide();
+
+            return false;
+        }
+        else if (password === '') {
+            $emailContainer.removeClass('incorrect');
+            $formWrapper.addClass('both-incorrect-inputs');
+            loadingDialog.hide();
+
+            return false;
+        }
+
+        // Checks if they have an old or new registration type, after this the flow will continue to login
+        security.login.checkLoginMethod(email, password, twoFactorPin, rememberMe, startOldLogin, startNewLogin);
+    }
+
+    /**
+     * Starts the old login proceedure
+     * @param {String} email The user's email address
+     * @param {String} password The user's password as entered
+     * @param {String|null} pinCode The two-factor authentication PIN code (6 digit number), or null if N/A
+     * @param {Boolean} rememberMe Whether the user clicked the Remember me checkbox or not
+     */
+    function startOldLogin(email, password, pinCode, rememberMe) {
+
+        postLogin(email, password, pinCode, rememberMe, completeLogin);
+    }
+
+    /**
+     * Start the new login proceedure
+     * @param {String} email The user's email addresss
+     * @param {String} password The user's password as entered
+     * @param {String|null} pinCode The two-factor authentication PIN code (6 digit number), or null if N/A
+     * @param {Boolean} rememberMe A boolean for if they checked the Remember Me checkbox on the login screen
+     * @param {String} salt The user's salt as a Base64 URL encoded string
+     */
+    function startNewLogin(email, password, pinCode, rememberMe, salt) {
+
+        // Start the login using the new process
+        security.login.startLogin(email, password, pinCode, rememberMe, salt, completeLogin);
+    }
+
+    /**
+     * Completes the login process
+     * @param {Number} result The result from the API, e.g. a negative error num or the user type e.g. 3 for full user
+     */
+    function completeLogin(result) {
+        'use strict';
+    
+        var $formWrapper = $('.pro-login-dialog form');
+        var $emailContainer = $formWrapper.find('.account.input-wrapper.email');
+        var $emailField = $emailContainer.find('input');
+        var $passwordContainer = $formWrapper.find('.account.input-wrapper.password');
+        var $passwordField = $passwordContainer.find('input');
+
+        loadingDialog.hide();
+
+        // Check and handle the common login errors
+        if (security.login.checkForCommonErrors(result, startOldLogin, startNewLogin)) {
+            return false;
+        }
+
+        // If successful result
+        else if (result !== false && result >= 0) {
+            passwordManager('#form_login_header');
+
+            u_type = result;
+            u_checked = true;
+
+            if (u_type === 3) {
+                completePromise.resolve();
             }
-        };
+            else {
+                boot_auth(null, result);
+                completePromise.reject();
+            }
 
-        var passwordaes = new sjcl.cipher.aes(prepare_key_pw($('#login-password', $dialog).val()));
-        var uh = stringhash($('#login-name', $dialog).val().toLowerCase(), passwordaes);
-        u_login(
-            ctx,
-            $('#login-name', $dialog).val(),
-            $('#login-password', $dialog).val(),
-            uh,
-            $('#login-checkbox').is('.checkboxOn'));
+            $emailField.val('');
+            $passwordField.val('');
+        }
+        else {
+            // Close the 2FA dialog for a generic error
+            twofactor.loginDialog.closeDialog();
+
+            $emailContainer.removeClass('incorrect');
+            $formWrapper.addClass('both-incorrect-inputs');
+            $passwordField.focus();
+        }
     }
 
     // export

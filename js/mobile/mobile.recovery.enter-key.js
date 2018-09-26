@@ -35,7 +35,7 @@ mobile.recovery.enterKey = {
     initVerifyKeyButton: function($screen) {
 
         'use strict';
-        
+
         // On Verify button click/tap
         $screen.find('.verify-recovery-key-btn').off('tap').on('tap', function() {
 
@@ -96,43 +96,43 @@ mobile.recovery.enterKey = {
         // Trim whitespace, new lines etc from the key then convert it to a 32 bit signed array
         var recoveryKeyTrimmed = $.trim(recoveryKey);
         var recoveryKeyArray = base64_to_a32(recoveryKeyTrimmed);
+        var recoveryCode = mobile.recovery.fromEmailLink.recoveryCode;
+        var recoveryEmail = mobile.recovery.fromEmailLink.recoveryEmail;
 
         // Show loading spinner
         loadingDialog.show();
 
         // Send the recovery code back to the API for verification (ERX / email request validate and execute)
-        api_resetkeykey({
-            result: function(result) {
+        security.resetKey(recoveryCode, recoveryKeyArray, recoveryEmail, null, function(result) {
 
-                loadingDialog.hide();
+            loadingDialog.hide();
 
-                // If success
-                if (result === 0) {
+            // If success
+            if (result === 0) {
 
-                    // Store for use by the next page
-                    mobile.recovery.enterKey.recoveryKeyArray = recoveryKeyArray;
+                // Store for use by the next page
+                mobile.recovery.enterKey.recoveryKeyArray = recoveryKeyArray;
 
-                    // Load the change password screen
-                    loadSubPage('recoverykeychangepass');
-                }
-
-                // If invalid master key, show error
-                else if (result === EKEY) {
-                    mobile.messageOverlay.show(l[1977], l[1978]);
-                }
-
-                // If the account they are trying to reset is blocked, show an error
-                else if (result === EBLOCKED) {
-                    mobile.messageOverlay.show(l[1979], l[1980]);
-                }
-
-                // If an invalid/expired/already used code, show an error
-                else if (result === EEXPIRED || result === ENOENT) {
-                    mobile.messageOverlay.show(l[1966], l[1967], function() {
-                        loadSubPage('login');
-                    });
-                }
+                // Load the change password screen
+                loadSubPage('recoverykeychangepass');
             }
-        }, mobile.recovery.fromEmailLink.recoveryCode, recoveryKeyArray);
+
+            // If invalid master key, show error
+            else if (result === EKEY) {
+                mobile.messageOverlay.show(l[1977], l[1978]);
+            }
+
+            // If the account they are trying to reset is blocked, show an error
+            else if (result === EBLOCKED) {
+                mobile.messageOverlay.show(l[1979], l[1980]);
+            }
+
+            // If an invalid/expired/already used code, show an error
+            else if (result === EEXPIRED || result === ENOENT) {
+                mobile.messageOverlay.show(l[1966], l[1967], function() {
+                    loadSubPage('login');
+                });
+            }
+        });
     }
 };

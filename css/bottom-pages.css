@@ -32,7 +32,7 @@
 
 /* Bottom pages common styles*/
 .red {
-    color: #FF4D4A;
+    color: #F0373B;
 }
 body.bottom-pages .fmholder {
     overflow: hidden;
@@ -352,7 +352,7 @@ html.gbot {
     padding-bottom: 10px;
 }
 .bottom-page.small-txt a, .bottom-page.small-txt span {
-    color: #F0373A;
+    color: #F0373B;
 }
 .bottom-page.small-txt.no-pad {
     padding: 0;

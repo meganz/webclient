@@ -7,9 +7,11 @@ var attribCache = false;
 (function _userAttributeHandling(global) {
     "use strict";
 
-    var ns = {};
-    var logger = MegaLogger.getLogger('account');
+    var ns = Object.create(null);
+    var _inflight = Object.create(null);
+    var logger = MegaLogger.getLogger('user-attribute');
     var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 2 * 60 * 60;
+    var REVOKE_INFLIGHT = !1; // Lyubo is not happy so disabled for now :)
 
     /**
      * Assemble property name on Mega API.
@@ -60,6 +62,31 @@ var attribCache = false;
     };
 
     /**
+     * Revoke a pending attribute retrieval if it gets overwritten/invalidated meanwhile.
+     * @param {String} cacheKey The key obtained from buildCacheKey()
+     * @returns {Boolean} Whether it was revoked
+     * @private
+     */
+    var revokeRequest = function(cacheKey) {
+        if (_inflight[cacheKey]) {
+            if (REVOKE_INFLIGHT) {
+                if (d > 1) {
+                    logger.info('Revoking Inflight Request...', cacheKey);
+                }
+                _inflight[cacheKey].revoked = true;
+            }
+            else {
+                if (d > 1) {
+                    logger.info('Invalidating Inflight Request...', cacheKey);
+                }
+            }
+            delete _inflight[cacheKey];
+            return true;
+        }
+        return false;
+    };
+
+    /**
      * Retrieves a user attribute.
      *
      * @param userhandle {String}
@@ -87,16 +114,42 @@ var attribCache = false;
     ns.get = function _getUserAttribute(userhandle, attribute, pub, nonHistoric, callback, ctx) {
         assertUserHandle(userhandle);
         var self = this;
-
         var myCtx = ctx || {};
+        var args = toArray.apply(null, arguments);
 
         // Assemble property name on Mega API.
         attribute = buildAttribute(attribute, pub, nonHistoric);
+        var cacheKey = buildCacheKey(userhandle, attribute);
+
+        if (_inflight[cacheKey]) {
+            if (d > 1) {
+                logger.warn('Attribute retrieval "%s" already pending,...', cacheKey);
+            }
+            return _inflight[cacheKey];
+        }
 
         // Make the promise to execute the API code.
         var thePromise = new MegaPromise();
+        _inflight[cacheKey] = thePromise;
 
-        var cacheKey = buildCacheKey(userhandle, attribute);
+        /**
+         * Check whether the request was revoked meanwhile and pipe it to retrieve fresh data
+         * @returns {Boolean}
+         * @private
+         */
+        var isRevoked = function() {
+            if (thePromise.revoked) {
+                logger.info('Attribute retrieval got revoked...', cacheKey);
+
+                if (_inflight[cacheKey]) {
+                    logger.info('Another inflight request got set for "%s", reusing for revoked one.', cacheKey);
+                }
+
+                thePromise.linkDoneAndFailTo(_inflight[cacheKey] || mega.attr.get.apply(mega.attr, args));
+                return true;
+            }
+            return false;
+        };
 
         /**
          * mega.attr.get::settleFunctionDone
@@ -142,6 +195,10 @@ var attribCache = false;
                 thePromise.reject(res);
             }
 
+            // remove pending promise cache
+            console.assert(!isRevoked(), 'The attribute retrieval should not have been revoked at this point...');
+            delete _inflight[cacheKey];
+
             // Finish off if we have a callback.
             if (callback) {
                 callback(res, myCtx);
@@ -156,6 +213,9 @@ var attribCache = false;
          * @param {Number|Object} res The received result.
          */
         var settleFunction = function _settleFunction(res) {
+            if (isRevoked()) {
+                return;
+            }
             // Cache all returned values, except errors other than ENOENT
             if (typeof res !== 'number' || res === ENOENT) {
                 var exp = 0;
@@ -189,12 +249,18 @@ var attribCache = false;
          *
          * settleFunction will be used to process the api result.
          *
-         * @param {MegaPromise} promise Optional promise to wait for.
+         * @param {MegaPromise|Number} [promise] Optional promise to wait for.
          */
         var doApiReq = function _doApiReq(promise) {
+            if (isRevoked()) {
+                if (promise === -0xdeadbeef) {
+                    logger.warn('Attribute "%s" got revoked while removing a cached entry!', cacheKey);
+                }
+                return;
+            }
             if (promise instanceof MegaPromise) {
                 promise.always(function() {
-                    doApiReq();
+                    doApiReq(-0xdeadbeef);
                 });
             }
             else {
@@ -207,6 +273,10 @@ var attribCache = false;
             .fail(doApiReq)
             .done(function __attribCacheGetDone(v) {
                 var result;
+
+                if (isRevoked()) {
+                    return;
+                }
 
                 try {
                     var res = JSON.parse(v);
@@ -269,6 +339,9 @@ var attribCache = false;
             .always(function() {
                 api_req({'a': 'upr', 'ua': attribute}, {
                     callback: function(res) {
+                        // Revoke pending attribute retrieval, if any.
+                        revokeRequest(cacheKey);
+
                         if (typeof res !== 'number' || res < 0) {
                             logger.warn('Error removing user attribute "%s", result: %s!', attribute, res);
                             promise.reject(res);
@@ -349,6 +422,9 @@ var attribCache = false;
         var thePromise = new MegaPromise();
 
         var cacheKey = buildCacheKey(u_handle, attribute);
+
+        // Revoke pending attribute retrieval, if any.
+        revokeRequest(cacheKey);
 
         // clear when the value is being sent to the API server, during that period
         // the value should be retrieved from the server, because of potential
@@ -844,13 +920,15 @@ var attribCache = false;
      * @param {String}  [version]         version, as returned by the API
      */
     ns.uaPacketParser = function uaPacketParser(attrName, userHandle, ownActionPacket, version) {
-        var logger = MegaLogger.getLogger('account');
         var cacheKey = userHandle + "_" + attrName;
 
         if (this._versions[cacheKey] === version) {
             // dont invalidate if we have the same version in memory.
             return;
         }
+
+        // Revoke pending attribute retrieval, if any.
+        revokeRequest(cacheKey);
 
         logger.debug('uaPacketParser: Invalidating cache entry "%s"', cacheKey);
 
@@ -960,6 +1038,10 @@ var attribCache = false;
 
         return true;
     });
+
+    if (d) {
+        ns._inflight = _inflight;
+    }
 
     if (is_karma) {
         ns._logger = logger;

@@ -450,9 +450,6 @@ function accountUI() {
         $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
         $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
 
-        var $passwords = $('#account-password,#account-new-password,#account-confirm-password');
-        $passwords.unbind('click');
-
         M.account.sessions.sort(function(a, b) {
             if (a[0] < b[0]) {
                 return 1;
@@ -465,15 +462,23 @@ function accountUI() {
         $('#sessions-table-container').empty();
         var html =
             '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sessions">' +
-            '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
+            '<tr><th>' + l[19303] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
             '<th class="no-border session-status">' + l[7664] + '</th>' +
             '<th class="no-border logout-column">&nbsp;</th></tr>';
         var numActiveSessions = 0;
 
-        $(account.sessions).each(function(i, el) {
+        for (i = 0; i < account.sessions.length; i++) {
+            var el = account.sessions[i];
+            var currentSession = el[5];
+            var activeSession = el[7];
 
-            if (i == $.sessionlimit) {
-                return false;
+            // If the current session or active then increment count
+            if (currentSession || activeSession) {
+                numActiveSessions++;
+            }
+
+            if (i >= $.sessionlimit) {
+                continue;
             }
 
             var userAgent = el[2];
@@ -482,9 +487,7 @@ function accountUI() {
             var browserName = browser.nameTrans;
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
-            var currentSession = el[5];
             var sessionId = el[6];
-            var activeSession = el[7];
             var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
 
             // Show if using an extension e.g. "Firefox on Linux (+Extension)"
@@ -527,12 +530,8 @@ function accountUI() {
             else {
                 html += '<td>&nbsp;</td>';
             }
+        }
 
-            // If the current session or active then increment count
-            if (currentSession || activeSession) {
-                numActiveSessions++;
-            }
-        });
         $('#sessions-table-container').safeHTML(html + '</table>');
 
         // Don't show button to close other sessions if there's only the current session
@@ -674,7 +673,9 @@ function accountUI() {
         });
 
         $('.grid-table.transactions').html(html);
-        var i = new Date().getFullYear() - 10, html = '', sel = '';
+        i = new Date().getFullYear() - 16;
+        html = '';
+        var sel = '';
         $('.default-select.year span').text('YYYY');
 
         while (i >= 1900) {
@@ -747,53 +748,16 @@ function accountUI() {
         // Bind Dropdowns events
         bindDropdownEvents($('.fm-account-main .default-select'), 1, '.account.tab-content');
 
+        // Initialise functionality to change the user's password and email
+        accountChangePassword.init();
+        accountChangeEmail.init();
+
         // Cache selectors
-        var $newEmail = $('#account-email');
-        var $emailInfoMessage = $('.fm-account-change-email');
         var $personalInfoBlock = $('.profile-form.first');
         var $firstNameField = $personalInfoBlock.find('#account-firstname');
         var $saveBlock = $('.fm-account-save-block');
         var $cancelButton = $saveBlock.find('.fm-account-cancel');
         var $saveButton = $saveBlock.find('.fm-account-save');
-
-        $('#account-password').val('');
-        $('#account-new-password').val('');
-        $('#account-confirm-password').val('');
-
-        // Reset change email fields after change
-        $newEmail.val('');
-        $emailInfoMessage.addClass('hidden');
-
-        $passwords.rebind('keyup.em', function() {
-            var texts = [];
-            $passwords.each(function() {
-                texts.push($(this).val());
-            });
-            $newEmail.val('');
-        });
-
-        // On text entry in the new email text field
-        $newEmail.rebind('keyup', function() {
-            var mail = $.trim($newEmail.val());
-
-            $passwords.val('');
-            $saveBlock.find('.fm-account-save').removeClass('disabled');
-            $saveBlock.addClass('hidden');
-
-            // Show information message
-            $emailInfoMessage.removeClass('hidden');
-
-            // If not valid email yet, exit
-            if (checkMail(mail)) {
-                return;
-            }
-
-            // Show save button
-            if (mail !== u_attr.email) {
-                $personalInfoBlock.addClass('email-confirm');
-                $saveBlock.removeClass('hidden');
-            }
-        });
 
         $firstNameField.on('input', function() {
 
@@ -883,117 +847,17 @@ function accountUI() {
                             $('.user-name').text(u_attr.name);
                             showToast('settings', l[7698]);
                             accountUI();
+                            // update megadrop username for existing megadrop
+                            mega.megadrop.updatePUPUserName(u_attr.fullname);
                         }
                     }
                 });
             }
 
-            var pws = zxcvbn($('#account-new-password').val());
-
-            if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
-                msgDialog('warninga', l[135], l[715], false, function() {
-                    $('#account-new-password').val('');
-                    $('#account-confirm-password').val('');
-                    $('#account-new-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                });
-            }
-            else if (/*$('#account-password').val() !== ''
-                &&*/ $('#account-confirm-password').val() !== ''
-                && $('#account-new-password').val() !== ''
-                && (pws.score === 0 || pws.entropy < 16)) {
-
-                msgDialog('warninga', l[135], l[1129], false, function() {
-                    $('#account-new-password').val('');
-                    $('#account-confirm-password').val('');
-                    $('#account-new-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                });
-            }
-            else if ($('#account-confirm-password').val() !== '' /*&& $('#account-password').val() !== ''
-                && $('#account-confirm-password').val() !== $('#account-password').val()*/) {
-                loadingDialog.show();
-                changepw($('#account-password').val(), $('#account-confirm-password').val(), {
-                    callback: function(res) {
-                        loadingDialog.hide();
-                        if (res == EACCESS) { // pwd incorrect
-                            msgDialog('warninga', l[135], l[724], false, function() {
-                                $('#account-password').val('');
-                                $('#account-password').focus();
-                                $('#account-password').bind('keyup.accpwd', function() {
-                                    $('.fm-account-save-block').removeClass('hidden');
-                                    $('.fm-account-save').removeClass('disabled');
-                                    $('#account-password').unbind('keyup.accpwd');
-                                });
-                            });
-                        }
-                        else if (typeof res == 'number' && res < 0) { // something went wrong
-                            $passwords.val('');
-                            msgDialog('warninga', l[135], l[6972]);
-                        }
-                        else { // success
-                            showToast('settings', l[725]);
-                            var pw_aes = new sjcl.cipher.aes(prepare_key_pw($('#account-confirm-password').val()));
-                            u_attr.k = a32_to_base64(encrypt_key(pw_aes, u_k));
-                            $passwords.val('');
-                        }
-                        accountUI();
-                    }
-                });
-            }
-            /*else if ($('#account-password').val() !== ''
-                    && $('#account-confirm-password').val() === $('#account-password').val()) {
-                msgDialog('warninga', l[135], l[16664]);
-                $('#account-confirm-password').val('');
-                $('#account-new-password').val('');
-                $('.fm-account-save-block').removeClass('hidden');
-                $('.fm-account-save').addClass('disabled');
-            }*/
-            else {
-                $passwords.val('');
-            }
-
-            // Get the new email address
-            var email = $('#account-email').val().trim().toLowerCase();
-
-            // If there is text in the email field and it doesn't match the existing one
-            if ((email !== '') && (u_attr.email !== email)) {
-
-                loadingDialog.show();
-
-                // Request change of email
-                // e => new email address
-                // i => requesti (Always has the global variable requesti (last request ID))
-                api_req({ a: 'se', aa: 'a', e: email, i: requesti }, {
-                    callback: function(res) {
-
-                        loadingDialog.hide();
-
-                        if (res === -12) {
-                            return msgDialog('warninga', l[135], l[7717]);
-                        }
-
-                        fm_showoverlay();
-                        dialogPositioning('.awaiting-confirmation');
-
-                        $('.awaiting-confirmation').removeClass('hidden');
-                        $('.fm-account-save-block').addClass('hidden');
-                        $('.fm-account-save').removeClass('disabled');
-
-                        localStorage.new_email = email;
-                    }
-                });
-
-                return;
-            }
-
-            $('.fm-account-save-block').addClass('hidden');
-            $('.fm-account-save').removeClass('disabled');
+            $saveBlock.addClass('hidden');
+            $saveButton.removeClass('disabled');
         });
 
-        $('#current-email').val(u_attr.email);
         $('#account-firstname').val(u_attr.firstname);
         $('#account-lastname').val(u_attr.lastname);
 
@@ -1077,8 +941,10 @@ function accountUI() {
 
                             var done = delay.bind(null, 'bandwidthLimit', function() {
                                 api_req({"a": "up", "srvratio": Math.round(bandwidthLimit)});
+                                if (localStorage.bandwidthLimit !== undefined) {
+                                    showToast('settings', l[16168]);
+                                }
                                 localStorage.bandwidthLimit = bandwidthLimit;
-                                showToast('settings', l[16168]);
                             }, 700);
 
                             if (bandwidthLimit > 99) {
@@ -1446,7 +1312,7 @@ function accountUI() {
                 $('.fm-account-overlay').fadeOut(200);
                 $this.removeClass('active');
                 $('.fm-voucher-popup').addClass('hidden');
-                $(window).unbind('resize.voucher');
+                $(window).off('resize.voucher');
             }
         });
 
@@ -1677,27 +1543,72 @@ function accountUI() {
             }
         });
 
+        /**
+         * Finalise the account cancellation process
+         * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
+         */
+        var continueCancelAccount = function(twoFactorPin) {
+
+            // Prepare the request
+            var request = { a: 'erm', m: Object(M.u[u_handle]).m, t: 21 };
+
+            // If 2FA PIN is set, add it to the request
+            if (twoFactorPin !== null) {
+                request.mfa = twoFactorPin;
+            }
+
+            api_req(request, {
+                callback: function(res) {
+                    loadingDialog.hide();
+
+                    // Check for invalid 2FA code
+                    if (res === EFAILED || res === EEXPIRED) {
+                        msgDialog('warninga', l[135], l[19216]);
+                    }
+
+                    // Check for incorrect email
+                    else if (res === ENOENT) {
+                        msgDialog('warningb', l[1513], l[1946]);
+                    }
+                    else if (res === 0) {
+                        handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
+                    }
+                    else {
+                        msgDialog('warningb', l[135], l[200]);
+                    }
+                }
+            });
+        };
+
         // Ask for confirmation
         msgDialog('confirmation', l[6181], confirmMessage, false, function(event) {
             if (event) {
+
                 loadingDialog.show();
-                api_req({a: 'erm', m: Object(M.u[u_handle]).m, t: 21}, {
-                    callback: function(res) {
-                        loadingDialog.hide();
-                        if (res === ENOENT) {
-                            msgDialog('warningb', l[1513], l[1946]);
-                        }
-                        else if (res === 0) {
-                            handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
-                        }
-                        else {
-                            msgDialog('warningb', l[135], l[200]);
-                        }
+
+                // Check if 2FA is enabled on their account
+                twofactor.isEnabledForAccount(function(result) {
+
+                    loadingDialog.hide();
+
+                    // If 2FA is enabled on their account
+                    if (result) {
+
+                        // Show the verify 2FA dialog to collect the user's PIN
+                        twofactor.verifyActionDialog.init(function(twoFactorPin) {
+                            continueCancelAccount(twoFactorPin);
+                        });
+                    }
+                    else {
+                        continueCancelAccount(null);
                     }
                 });
             }
         });
     });
+
+    // Initialise the Two Factor Authentication section and show enabled/disabled state
+    twofactor.account.init();
 
     // Button on main Account page to backup their master key
     $('.backup-master-key').rebind('click', function() {
@@ -1775,46 +1686,7 @@ function accountUI() {
     });
 
     $('.account-pass-lines').attr('class', 'account-pass-lines');
-    $('#account-new-password').rebind('keyup.pwdchg', function(el) {
-        $('.account-pass-lines').attr('class', 'account-pass-lines');
-        if ($(this).val() !== '') {
-            $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-save').addClass('disabled');
-            if ($(this).val() === $('#account-confirm-password').val()) {
-                $('.fm-account-save').removeClass('disabled');
-            }
-            else {
-                $('.fm-account-save').addClass('disabled');
-            }
-            var pws = zxcvbn($(this).val());
-            if (pws.score > 3 && pws.entropy > 75) {
-                $('.account-pass-lines').addClass('good4');
-            }
-            else if (pws.score > 2 && pws.entropy > 50) {
-                $('.account-pass-lines').addClass('good3');
-            }
-            else if (pws.score > 1 && pws.entropy > 40) {
-                $('.account-pass-lines').addClass('good2');
-            }
-            else if (pws.score > 0 && pws.entropy > 15) {
-                $('.account-pass-lines').addClass('good1');
-            }
-            else {
-                $('.account-pass-lines').addClass('weak-password');
-            }
-        }
-    });
 
-    $('#account-confirm-password').rebind('keyup.pwdchg', function(el) {
-
-        $('.fm-account-save-block').removeClass('hidden');
-        if ($(this).val() === $('#account-new-password').val()) {
-            $('.fm-account-save').removeClass('disabled');
-        }
-        else {
-            $('.fm-account-save').addClass('disabled');
-        }
-    });
 
     // Account Notifications settings handling
     var accNotifHandler = function accNotifHandler() {
@@ -2244,13 +2116,16 @@ accountUI.cancelSubscriptionDialog = {
 };
 
 accountUI.disableElement = function(element) {
-    $(element).addClass('disabled').attr('disabled', 1);
+    'use strict';
+    $(element).addClass('disabled').prop('disabled', true);
 };
 accountUI.enableElement = function(element) {
-    $(element).removeClass('disabled').removeAttr('disabled');
+    'use strict';
+    $(element).removeClass('disabled').prop('disabled', false);
 };
 
 accountUI.initCheckbox = function(className, $container, currentValue, onChangeCb) {
+    'use strict';
     var $wrapperDiv = $('.' + className, $container);
     var $input = $('input[type="checkbox"]', $wrapperDiv);
 
@@ -2284,19 +2159,23 @@ accountUI.initCheckbox = function(className, $container, currentValue, onChangeC
 };
 
 accountUI.initCheckbox.check = function($input, $wrapperDiv) {
-    $input.removeClass('checkboxOff').addClass('checkboxOn').attr('checked', true);
+    'use strict';
+    $input.removeClass('checkboxOff').addClass('checkboxOn').prop('checked', true);
     $wrapperDiv.removeClass('checkboxOff').addClass('checkboxOn');
 };
 accountUI.initCheckbox.uncheck = function($input, $wrapperDiv) {
-    $input.removeClass('checkboxOn').addClass('checkboxOff').attr('checked', false);
+    'use strict';
+    $input.removeClass('checkboxOn').addClass('checkboxOff').prop('checked', false);
     $wrapperDiv.removeClass('checkboxOn').addClass('checkboxOff');
 };
 
 accountUI.initCheckbox.enable = function(className, $container) {
+    'use strict';
     var $wrapperDiv = $('.' + className, $container);
     $wrapperDiv.removeClass('disabled');
 };
 accountUI.initCheckbox.disable = function(className, $container) {
+    'use strict';
     var $wrapperDiv = $('.' + className, $container);
     $wrapperDiv.addClass('disabled');
 };
@@ -2328,7 +2207,7 @@ accountUI.initRadio.setValue = function(className, newVal, $container) {
 
     $input
         .removeClass('radioOff').addClass('radioOn')
-        .attr('checked', 1);
+        .prop('checked', true);
 
     $input.parent().addClass('radioOn').removeClass('radioOff');
 };
@@ -2337,13 +2216,13 @@ accountUI.initRadio.setValue = function(className, newVal, $container) {
 accountUI.initRadio.disable = function($input) {
     $('input.[value="' + newVal + '"]', $container)
         .addClass('disabled')
-        .attr('disabled', 1);
+        .prop('disabled', true);
 };
 
 accountUI.initRadio.enable = function(value, $container) {
     $('input.[value="' + newVal + '"]', $container)
         .removeClass('disabled')
-        .removeAttr('disabled');
+        .prop('disabled', false);
 };
 
 accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
@@ -2516,7 +2395,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             )
             .done(
             function(e) {
-                $('#versioning-status').prop('checked', val ? false : true);
+                $('#versioning-status').prop('checked', !val);
                 $('.label-heading').text(val ? l[7070] : l[17601]);
                 fileversioning.dvState = val;
             });

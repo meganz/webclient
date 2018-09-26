@@ -189,7 +189,7 @@ pro.proplan = {
                 var monthlyBasePrice;
                 var monthlyBasePriceCurrencySign;
                 var zeroPrice;
-                
+
                 if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
                     $euroPrice.removeClass('hidden');
                     $currncyAbbrev.removeClass('hidden');
@@ -394,66 +394,69 @@ pro.proplan = {
 
 /**
  * The old Login / Register dialogs which are used if they are not logged in and try to go to Step 2.
+ * @param {String} email An email address to be optionally pre-filled into the dialog
+ * @param {String} password A password to be optionally pre-filled into the dialog
  */
-function showLoginDialog(email) {
+function showLoginDialog(email, password) {
 
     megaAnalytics.log("pro", "loginDialog");
     $.dialog = 'pro-login-dialog';
 
     var $dialog = $('.pro-login-dialog');
-    $dialog
-        .removeClass('hidden')
-        .addClass('active');
+    var $inputs = $dialog.find('.account.input-wrapper input');
+    var $button = $dialog.find('.big-red-button');
 
-    $('.fm-dialog-overlay').removeClass("hidden");
+    M.safeShowDialog('pro-login-dialog', function() {
 
-    $dialog.css({
-        'margin-left': -1 * ($dialog.outerWidth() / 2),
-        'margin-top': -1 * ($dialog.outerHeight() / 2)
-    });
-
-    $('.top-login-input-block').removeClass('incorrect');
-
-    // controls
-    $('.fm-dialog-close', $dialog)
-        .unbind('click.proDialog')
-        .bind('click.proDialog', function() {
-
-            closeDialog();
+        $dialog.css({
+            'margin-left': -1 * ($dialog.outerWidth() / 2),
+            'margin-top': -1 * ($dialog.outerHeight() / 2)
         });
 
-    $('.input-email', $dialog)
-        .val(email || '');
+        // Init inputs events
+        accountinputs.init($dialog);
 
-    $('.input-password', $dialog)
-        .val('');
+        return $dialog;
+    });
 
-    uiPlaceholders($dialog);
-    uiCheckboxes($dialog);
+    // controls
+    $('.fm-dialog-close', $dialog).rebind('click.proDialog', function() {
+        closeLoginDialog($dialog);
+    });
 
+    $('.fm-dialog-overlay')
+        .rebind('click.proDialog', function() {
+            closeLoginDialog($dialog);
+        });
 
-    $('#login-password, #login-name', $dialog).rebind('keydown.prologin', function(e)
-    {
-        $('.top-login-pad', $dialog).removeClass('both-incorrect-inputs');
-        $('.top-login-input-tooltip.both-incorrect', $dialog).removeClass('active');
-        $('.top-login-input-block.password', $dialog).removeClass('incorrect');
-        $('.top-login-input-block.e-mail', $dialog).removeClass('incorrect');
+    $('.input-email', $dialog).val(email || '');
+    $('.input-password', $dialog).val(password || '');
 
+    $inputs.rebind('keydown.initdialog', function(e) {
         if (e.keyCode === 13) {
             doProLogin($dialog);
         }
     });
 
-
-    $('.top-login-forgot-pass', $dialog).rebind('click.toploginforgotpass', function() {
-        loadSubPage('recovery');
-    });
-
-    $('.top-dialog-login-button', $dialog).rebind('click.toploginbutton', function() {
+    $button.rebind('click.initdialog', function() {
         doProLogin($dialog);
     });
 
+    $button.rebind('keydown.initdialog', function (e) {
+        if (e.keyCode === 13) {
+            doProLogin($dialog);
+        }
+    });
+
     clickURLs();
+}
+
+function closeLoginDialog($dialog) {
+    'use strict';
+
+    closeDialog();
+    $('.fm-dialog-overlay').unbind('click.proDialog');
+    $('.fm-dialog-close', $dialog).unbind('click.proDialog');
 }
 
 var doProLogin = function($dialog) {
@@ -461,55 +464,112 @@ var doProLogin = function($dialog) {
     megaAnalytics.log('pro', 'doLogin');
     loadingDialog.show();
 
-    var ctx =
-    {
-        checkloginresult: function(ctx,r)
-        {
-            loadingDialog.hide();
-            var e = $('#login-name', $dialog).val();
-            if (e === '' || checkMail(e)) {
-                $('.top-login-input-block.e-mail', $dialog).addClass('incorrect');
-                $('#login-name', $dialog).val('');
-                $('#login-name', $dialog).focus();
-            }
-            else if ($('#login-password', $dialog).val() === '') {
-                $('.top-login-input-block.password', $dialog).addClass('incorrect');
-            }
-            else if (r === EBLOCKED)
-            {
-                alert(l[730]);
-            }
-            else if (r)
-            {
-                $('#login-password', $dialog).val('');
-                $('#login-email', $dialog).val('');
-                u_type = r;
+    var $emailContainer = $dialog.find('.account.input-wrapper.email');
+    var $passwordContainer = $dialog.find('.account.input-wrapper.password');
+    var $formWrapper = $dialog.find('form');
+    var $emailInput = $emailContainer.find('input');
+    var $passwordInput = $passwordContainer.find('input');
+    var $rememberMeCheckbox = $dialog.find('.login-check input');
 
-                // Find the plan they clicked on before the login/register prompt popped up
-                var proNum = $('.reg-st3-membership-bl.selected').data('payment');
+    var email = $emailInput.val();
+    var password = $passwordInput.val();
+    var rememberMe = $rememberMeCheckbox.is('.checkboxOn');  // ToDo check if correct
+    var twoFactorPin = null;
 
-                // Load the Pro payment page (step 2)
-                loadSubPage('propay_' + proNum);
-            }
-            else
-            {
-                $('.top-login-pad', $dialog).addClass('both-incorrect-inputs');
-                $('.top-login-input-tooltip.both-incorrect', $dialog).addClass('active');
-                $('#login-password', $dialog).select();
-            }
-        }
-    };
+    if (email === '' || checkMail(email)) {
+        $emailContainer.addClass('incorrect');
+        $emailInput.val('');
+        $emailInput.focus();
+        loadingDialog.hide();
 
-    var passwordaes = new sjcl.cipher.aes(prepare_key_pw($('#login-password', $dialog).val()));
-    var uh = stringhash($('#login-name', $dialog).val().toLowerCase(), passwordaes);
-    u_login(
-        ctx,
-        $('#login-name', $dialog).val(),
-        $('#login-password', $dialog).val(),
-        uh,
-        $('#login-checkbox').is('.checkboxOn')
-    );
+        return false;
+    }
+    else if (password === '') {
+        $emailContainer.removeClass('incorrect');
+        $formWrapper.addClass('both-incorrect-inputs');
+        loadingDialog.hide();
+
+        return false;
+    }
+
+    // Checks if they have an old or new registration type, after this the flow will continue to login
+    security.login.checkLoginMethod(email, password, twoFactorPin, rememberMe, startOldProLogin, startNewProLogin);
 };
+
+/**
+ * Starts the old login proceedure
+ * @param {String} email The user's email address
+ * @param {String} password The user's password as entered
+ * @param {String|null} pinCode The two-factor authentication PIN code (6 digit number), or null if N/A
+ * @param {Boolean} rememberMe Whether the user clicked the Remember me checkbox or not
+ */
+function startOldProLogin(email, password, pinCode, rememberMe) {
+
+    'use strict';
+
+    postLogin(email, password, pinCode, rememberMe, completeProLogin);
+}
+
+/**
+ * Start the new login proceedure
+ * @param {String} email The user's email addresss
+ * @param {String} password The user's password as entered
+ * @param {String|null} pinCode The two-factor authentication PIN code (6 digit number), or null if N/A
+ * @param {Boolean} rememberMe A boolean for if they checked the Remember Me checkbox on the login screen
+ * @param {String} salt The user's salt as a Base64 URL encoded string
+ */
+function startNewProLogin(email, password, pinCode, rememberMe, salt) {
+
+    'use strict';
+
+    // Start the login using the new process
+    security.login.startLogin(email, password, pinCode, rememberMe, salt, completeProLogin);
+}
+
+/**
+ * Completes the login process
+ * @param {Number} result The result from the API, e.g. a negative error num or the user type e.g. 3 for full user
+ */
+function completeProLogin(result) {
+    'use strict';
+
+    var $formWrapper = $('.pro-login-dialog form');
+    var $emailContainer = $formWrapper.find('.account.input-wrapper.email');
+    var $emailField = $emailContainer.find('input');
+    var $passwordContainer = $formWrapper.find('.account.input-wrapper.password');
+    var $passwordField = $passwordContainer.find('input');
+
+    loadingDialog.hide();
+
+    // Check and handle the common login errors
+    if (security.login.checkForCommonErrors(result, startOldProLogin, startNewProLogin)) {
+        return false;
+    }
+
+    // If successful result
+    else if (result !== false && result >= 0) {
+        passwordManager('#form_login_header');
+
+        $emailField.val('');
+        $passwordField.val('');
+
+        u_type = result;
+
+        // Find the plan they clicked on before the login/register prompt popped up
+        var proNum = $('.reg-st3-membership-bl.selected').data('payment');
+
+        // Load the Pro payment page (step 2)
+        loadSubPage('propay_' + proNum);
+    }
+    else {
+        // Close the 2FA dialog for a generic error
+        twofactor.loginDialog.closeDialog();
+
+        $emailContainer.removeClass('incorrect');
+        $formWrapper.addClass('both-incorrect-inputs');
+        $passwordField.focus();
+    }
+}
 
 function showRegisterDialog() {
 
@@ -577,12 +637,8 @@ var showSignupPromptDialog = function() {
             'title': l[5841],
             'buttons': []
         });
-        signupPromptDialog.bind('onBeforeShow', function() {
-
-            $('.fm-dialog-title', this.$dialog)
-                .text(
-                    this.options.title
-                );
+        signupPromptDialog.rebind('onBeforeShow', function() {
+            $('.fm-dialog-title', this.$dialog).text(this.options.title);
 
             // custom buttons, because of the styling
             $('.fm-notification-info', this.$dialog)

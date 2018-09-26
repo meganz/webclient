@@ -79,7 +79,7 @@ function initMegacmd() {
 function linuxMegacmdDropdown() {
     var $content = $('.bottom-page.megacmd');
     var $button = $content.find('.pages-nav.nav-button.linux');
-    var $dropdown = $content.find('.megaapp-dropdown'); 
+    var $dropdown = $content.find('.megaapp-dropdown');
     var $select = $dropdown.find('.megaapp-scr-pad');
     var $list = $dropdown.find('.megaapp-dropdown-list');
     $button.addClass('disabled').attr('data-link','');
@@ -187,20 +187,20 @@ function linuxMegacmdDropdownResizeHandler() {
         $pane.height(overlayHeight - listPosition - 72);
         $pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
 
-        $pane.bind('jsp-arrow-change', function(event, isAtTop, isAtBottom, isAtLeft, isAtRight) {
-
-        if (isAtBottom) {
-            $arrow.addClass('inactive');
-        } else {
-            $arrow.removeClass('inactive');
-        }
-    });
-
-    } else {
+        $pane.rebind('jsp-arrow-change', function(event, isAtTop, isAtBottom) {
+            if (isAtBottom) {
+                $arrow.addClass('inactive');
+            }
+            else {
+                $arrow.removeClass('inactive');
+            }
+        });
+    }
+    else {
         if (jsp) {
             jsp.destroy();
         }
-        $pane.unbind('jsp-arrow-change');
+        $pane.off('jsp-arrow-change');
         $arrow.removeAttr('style');
         $arrow.addClass('hidden');
     }
@@ -221,8 +221,8 @@ function changeLinux(linuxdist, i) {
         else {
             $content.find('.linux32').parent().addClass('hidden');
             $content.find('.radio-txt.32').addClass('hidden');
-            $content.find('#rad1').attr('checked', false).parent().switchClass('radioOn', 'radioOff');
-            $content.find('#rad2').attr('checked', true).parent().switchClass('radioOff', 'radioOn');
+            $content.find('#rad1').prop('checked', false).parent().switchClass('radioOn', 'radioOff');
+            $content.find('#rad2').prop('checked', true).parent().switchClass('radioOff', 'radioOn');
             platformsel = '64';
         }
         var link = linuxurl+linuxdist[i][platformsel];

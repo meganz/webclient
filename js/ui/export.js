@@ -298,8 +298,9 @@ var exportPassword = {
                 if (typeof zxcvbn !== 'undefined') {
 
                     // Estimate the password strength
-                    var password = $passwordInput.val();
-                    var passwordStrength = zxcvbn(password);
+                    var password = $.trim($passwordInput.val());
+                    var passwordScore = zxcvbn(password).score;
+                    var passwordLength = password.length;
 
                     // Remove previous strength classes that were added
                     $passwordStrengthField.removeClass().addClass('password-strength');
@@ -308,16 +309,19 @@ var exportPassword = {
                     if (password.length === 0) {
                         $passwordStrengthField.text('');   // No password entered, hide text
                     }
-                    else if (passwordStrength.score > 3 && passwordStrength.entropy > 75) {
+                    else if (passwordLength < 8) {
+                        $passwordStrengthField.addClass('good1').text(l[18700]);    // Too short
+                    }
+                    else if (passwordScore === 4) {
                         $passwordStrengthField.addClass('good5').text(l[1128]);    // Strong
                     }
-                    else if (passwordStrength.score > 2 && passwordStrength.entropy > 50) {
+                    else if (passwordScore === 3) {
                         $passwordStrengthField.addClass('good4').text(l[1127]);    // Good
                     }
-                    else if (passwordStrength.score > 1 && passwordStrength.entropy > 40) {
+                    else if (passwordScore === 2) {
                         $passwordStrengthField.addClass('good3').text(l[1126]);    // Medium
                     }
-                    else if (passwordStrength.score > 0 && passwordStrength.entropy > 15) {
+                    else if (passwordScore === 1) {
                         $passwordStrengthField.addClass('good2').text(l[1125]);    // Weak
                     }
                     else {
@@ -454,7 +458,7 @@ var exportPassword = {
             }
 
             // Check that the password length is sufficient and exclude very weak passwords
-            if ((password.length < 1) || $strengthLabel.hasClass('good1')) {
+            if ((password.length < 8) || $strengthLabel.hasClass('good1')) {
 
                 $errorLabel.text(l[9067]);  // Please use a stronger password
                 return false;
@@ -1396,7 +1400,7 @@ var exportExpiry = {
                     $setting.removeClass('disabled').find('input').prop('readonly', false).rebind('input', setCode);
                 }
                 else {
-                    $setting.addClass('disabled').find('input').prop('readonly', true).unbind('input');
+                    $setting.addClass('disabled').find('input').prop('readonly', true).off('input');
                 }
                 setCode();
             });
@@ -2292,7 +2296,7 @@ var exportExpiry = {
         $node.filter('.data-block-view').removeClass('linked');
 
         // Remove link icon from left panel
-        $('#treeli_' + nodeId + ' span').removeClass('linked');
+        $('#treeli_' + nodeId + ' > span').removeClass('linked');
     };
 
     /**

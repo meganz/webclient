@@ -26,7 +26,7 @@ var ChatdIntegration = function(megaChat) {
                 }
             },
             minLogLevel: function() {
-                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.WARN;
             }
         },
         megaChat.logger
@@ -35,13 +35,13 @@ var ChatdIntegration = function(megaChat) {
     self.megaChat = megaChat;
     self.chatd = new Chatd(u_handle, megaChat);
     self.waitingChatIdPromises = {};
-    self.chatIdToRoomJid = {};
+    self.chatIdToRoomId = {};
     self._cachedHandlers = {};
     self._loadingCount = 0;
 
     // chat events
     megaChat.rebind("onInit.chatdInt", function(e) {
-        megaChat.rebind("onRoomCreated.chatdInt", function(e, chatRoom) {
+        megaChat.rebind("onRoomInitialized.chatdInt", function(e, chatRoom) {
             assert(chatRoom.type, 'missing room type');
             self._attachToChatRoom(chatRoom);
         });
@@ -121,7 +121,7 @@ var ChatdIntegration = function(megaChat) {
         var shard = eventData.shard;
 
         shard.getRelatedChatIds().forEach(function(chatId) {
-            var chatRoomJid = self.chatIdToRoomJid[chatId];
+            var chatRoomJid = self.chatIdToRoomId[chatId];
             if (chatRoomJid) {
                 var chatRoom = self.megaChat.chats[chatRoomJid];
                 if (chatRoom) {
@@ -264,9 +264,9 @@ ChatdIntegration.prototype.requiresUpdate = function() {
 };
 ChatdIntegration.prototype._getChatRoomFromEventData = function(eventData) {
     var self = this;
-    var chatRoomJid = self.chatIdToRoomJid[eventData.chatId];
-    assert(chatRoomJid, 'chat room not found for chat id: ' + eventData.chatId);
-    return self.megaChat.chats[chatRoomJid];
+    var chatRoomId = self.chatIdToRoomId[eventData.chatId];
+    assert(chatRoomId, 'chat room not found for chat id: ' + eventData.chatId);
+    return self.megaChat.chats[chatRoomId] || self.megaChat.getChatById(eventData.chatId);
 };
 
 ChatdIntegration.prototype._getKarereObjFromChatdObj = function(chatdEventObj) {
@@ -380,9 +380,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
             }
         });
     }
-    var roomId = actionPacket.id;
+    var chatId = actionPacket.id;
 
-    var chatRoom = self.megaChat.chats[roomId];
+    var chatRoom = self.megaChat.getChatById(chatId);
     var wasActive = chatRoom ? chatRoom.isCurrentlyActive : false;
 
     var finishProcess = function() {
@@ -391,7 +391,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
         // if the found chatRoom is in LEAVING mode...then try to reinitialise it!
 
         if (chatRoom && chatRoom.stateIsLeftOrLeaving() && actionPacket.ou !== u_handle) {
-            self._cachedHandlers[roomId] = chatRoom.protocolHandler;
+            self._cachedHandlers[chatId] = chatRoom.protocolHandler;
 
             if (actionPacket.url) {
                 Soon(finishProcess);
@@ -418,7 +418,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
         }
 
         // try to find the chat room again, it may had been opened while waiting for the mcurl api call...
-        chatRoom = self.megaChat.chats[roomId];
+        chatRoom = self.megaChat.getChatById(chatId);
         if (!chatRoom) {
             // don't try to open a chat, if its not yet opened and the actionPacket consist of me leaving...
             if (actionPacket.n) {
@@ -463,8 +463,8 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
 
             self.decryptTopic(chatRoom);
             // handler of the same room was cached before, then restore the keys.
-            if (self._cachedHandlers[roomId] && chatRoom.protocolHandler) {
-                chatRoom.protocolHandler.participantKeys = self._cachedHandlers[roomId].participantKeys;
+            if (self._cachedHandlers[chatId] && chatRoom.protocolHandler) {
+                chatRoom.protocolHandler.participantKeys = self._cachedHandlers[chatId].participantKeys;
             }
             if (!isMcf && actionPacket.ou === u_handle && !actionPacket.n) {
                 if (chatRoom.lastActivity === 0) {
@@ -865,9 +865,8 @@ ChatdIntegration._ensureNamesAreLoaded = function(users) {
     }
 };
 
-
 ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
-    var textContents = message.textContents ? message.textContents : message.message;
+    var textContents = message.textContents || message.message || false;
 
     // reset any flags for what was processed in this message, since it just changed (was edited, or
     // decrypted).
@@ -875,131 +874,26 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
     message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
     message.decrypted = true;
 
-    if (
-        textContents &&
-        textContents.substr &&
-        textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT
-    ) {
-        if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
-            try {
-                var attachmentMeta = JSON.parse(textContents.substr(2));
-            } catch(e) {
-                // debugger;
-                return null;
-            }
+    if (!textContents || textContents === "") {
+        message.deleted = true;
+        message.trackDataChange();
+    }
+    else if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+        if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
 
-
-            attachmentMeta.forEach(function(v) {
-                var attachmentMetaInfo;
-                // cache ALL current attachments, so that we can revoke them later on in an ordered way.
-                if (message.messageId) {
-                    if (!chatRoom.attachments.exists(v.h)) {
-                        chatRoom.attachments.set(v.h, new MegaDataMap(chatRoom.attachments));
-                    }
-
-                    if (!chatRoom.attachments[v.h].exists(message.messageId)) {
-                        chatRoom.attachments[v.h].set(
-                            message.messageId,
-                            attachmentMetaInfo = new MegaDataObject({
-                                messageId: message.messageId,
-                                revoked: false
-                            })
-                        );
-                        attachmentMetaInfo._parent = chatRoom.attachments;
-                    }
-                    else {
-                        attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
-                    }
-                }
-
-                // generate preview/icon
-                if (!attachmentMetaInfo.revoked && !message.revoked) {
-                    if (v.fa && is_image2(v) || String(v.fa).indexOf(':0*') > 0) {
-                        var imagesListKey = message.messageId + "_" + v.h;
-                        if (!chatRoom.images.exists(imagesListKey)) {
-                            v.id = imagesListKey;
-                            v.orderValue = message.orderValue;
-                            v.messageId = message.messageId;
-                            chatRoom.images.push(v);
-                        }
-                    }
-                }
-            });
+            message._onAttachmentReceived(textContents.substr(2));
         }
-        else if (
-            textContents &&
-            textContents.substr &&
-            textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT
-        ) {
-            var foundRevokedNode = null;
-
+        else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
             var revokedNode = textContents.substr(2, textContents.length);
 
-            if (chatRoom.attachments.exists(revokedNode)) {
-                chatRoom.attachments[revokedNode].forEach(function(obj) {
-                    var messageId = obj.messageId;
-                    var attachedMsg = chatRoom.messagesBuff.messages[messageId];
-
-                    var allAttachmentsRevoked = false;
-                    if (!attachedMsg) {
-                        return;
-                    }
-
-                    if (attachedMsg.orderValue < message.orderValue) {
-                        try {
-                            var attc = attachedMsg.textContents;
-                            var attachments = JSON.parse(attc.substr(2, attc.length));
-                            var revokedInSameMessage = 0;
-                            attachments.forEach(function(node) {
-                                if (node.h === revokedNode) {
-                                    foundRevokedNode = node;
-                                }
-                                if (
-                                    chatRoom.attachments[node.h] &&
-                                    chatRoom.attachments[node.h][messageId] &&
-                                    (
-                                        chatRoom.attachments[node.h][messageId].revoked === true ||
-                                        node.h === revokedNode
-                                    )
-                                ) {
-                                    revokedInSameMessage++;
-                                }
-                            });
-                            if (revokedInSameMessage === attachments.length) {
-                                allAttachmentsRevoked = true;
-                            }
-                        } catch(e) {
-                        }
-
-                        obj.revoked = true;
-                        // mark the whole message as revoked if all attachments in it are marked as revoked.
-                        if (allAttachmentsRevoked) {
-                            attachedMsg.revoked = true;
-                        }
-                        else {
-                            // force re-render
-                            attachedMsg.trackDataChange();
-                        }
-
-                        if (!attachedMsg.seen) {
-                            attachedMsg.seen = true;
-                            if (chatRoom.messagesBuff._unreadCountCache > 0) {
-                                chatRoom.messagesBuff._unreadCountCache--;
-                                chatRoom.messagesBuff.trackDataChange();
-                                chatRoom.megaChat.updateSectionUnreadCount();
-                            }
-                        }
-                    }
-                });
-            }
+            message._onAttachmentRevoked(revokedNode);
 
             // don't show anything if this is a 'revoke' message
             return null;
         }
         else if (
-            textContents.substr &&
-            textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META &&
-            textContents.substr(2, 1) === Message.MESSAGE_META_TYPE.RICH_PREVIEW
+            textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META &&
+            textContents[2] === Message.MESSAGE_META_TYPE.RICH_PREVIEW
         ) {
             var meta = textContents.substr(3, textContents.length);
             try {
@@ -1056,6 +950,10 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     });
 
     self.chatd.rebind('onRoomDisconnected.chatdInt' + chatRoomId, function(e, eventData) {
+        if (self.megaChat.isLoggingOut) {
+            return;
+        }
+
         var foundChatRoom = self._getChatRoomFromEventData(eventData);
 
         if (!foundChatRoom) {
@@ -1096,6 +994,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 chatRoom.setState(ChatRoom.STATE.JOINING, true);
             }
 
+            var queuedMembersUpdatedEvent = false;
+
             if (chatRoom.membersLoaded === false) {
                 if (eventData.priv < 255) {
                     var addParticipant = function addParticipant() {
@@ -1117,6 +1017,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     };
 
                     ChatdIntegration._waitForProtocolHandler(chatRoom, addParticipant);
+                    queuedMembersUpdatedEvent = true;
                 }
 
                 if (eventData.userId === u_handle) {
@@ -1154,6 +1055,12 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 };
 
                 ChatdIntegration._waitForProtocolHandler(chatRoom, deleteParticipant);
+                queuedMembersUpdatedEvent = true;
+            }
+
+            if (!queuedMembersUpdatedEvent) {
+                chatRoom.members[eventData.userId] = eventData.priv;
+                $(chatRoom).trigger('onMembersUpdated', eventData);
             }
         }
     });
@@ -1647,7 +1554,7 @@ ChatdIntegration.prototype.join = function(chatRoom) {
         'missing chatId, chatShard or chadUrl in megaRoom. halting chatd join and code execution.' + chatRoom.chatId
     );
 
-    self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomId;
+    self.chatIdToRoomId[chatRoom.chatId] = chatRoom.roomId;
     self.chatd.join(
         base64urldecode(chatRoom.chatId),
         chatRoom.chatShard,
@@ -1743,9 +1650,21 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
                 messageObject.encryptedMessageContents = [result, keyid];
                 messageObject.msgIdentity = result[result.length - 1].identity;
                 messageObject.references = refids;
+                if (
+                    messageObject.message.charCodeAt(0) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT.charCodeAt(0)
+                    &&
+                    messageObject.message.charCodeAt(1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT.charCodeAt(0)
+                ) {
+                    messageObject.isPostedAttachment = true;
+                }
 
                 tmpPromise.resolve(
-                    self.chatd.submit(base64urldecode(chatRoom.chatId), result, keyid)
+                    self.chatd.submit(
+                        base64urldecode(chatRoom.chatId),
+                        result,
+                        keyid,
+                        messageObject.isPostedAttachment
+                    )
                 );
             }
             else {

@@ -11,12 +11,12 @@ var RichpreviewsFilter = function(megaChat) {
     "use strict";
     var self = this;
 
-    megaChat.bind("onBeforeSendMessage", function(e, eventData) {
+    megaChat.on("onBeforeSendMessage", function(e, eventData) {
         self.processMessage(e, eventData);
     });
 
     megaChat
-        .rebind('onRoomCreated.richpreviewsFilter', function(e, megaRoom) {
+        .rebind('onRoomInitialized.richpreviewsFilter', function(e, megaRoom) {
             $(megaRoom).rebind('onPendingMessageConfirmed.richpreviewsFilter', function(e, msgObj) {
                 self.onPendingMessageConfirmed(megaRoom, msgObj);
                 msgObj.confirmed = true;
@@ -37,7 +37,7 @@ var RichpreviewsFilter = function(megaChat) {
                     else if (RichpreviewsFilter._messageUpdating[k]) {
                         delete RichpreviewsFilter._messageUpdating[k];
                         if (msgObj) {
-                            self.processMessage(e, msgObj);
+                            self.processMessage(e, msgObj, false, true);
                         }
                     }
                 });
@@ -112,9 +112,10 @@ RichpreviewsFilter.retrievePreview = function(url) {
  * @private
  * @param e {Object}
  * @param eventData {Message}
- * @param forced {Boolean}
+ * @param [forced] {Boolean}
+ * @param [isEdit] {Boolean}
  */
-RichpreviewsFilter.prototype.processMessage = function(e, eventData, forced) {
+RichpreviewsFilter.prototype.processMessage = function(e, eventData, forced, isEdit) {
     "use strict";
 
     var self = this;
@@ -130,6 +131,18 @@ RichpreviewsFilter.prototype.processMessage = function(e, eventData, forced) {
 
     if (RichpreviewsFilter.previewGenerationConfirmation === false) {
         return;
+    }
+
+    if (isEdit) {
+        textContents = megaChat.plugins.btRtfFilter.escapeAndProcessMessage(
+            e,
+            eventData,
+            ["messageHtml", "textContents"],
+            "messageHtml",
+            true
+        );
+
+        textContents = megaChat.plugins.rtfFilter.processStripRtfFromMessage(textContents);
     }
 
     var haveLinks = false;
@@ -345,6 +358,7 @@ RichpreviewsFilter.prototype.onPendingMessageConfirmed = function(chatRoom, msgO
                         .done(urlLoaded)
                         .fail(urlFailedToLoad)
                 );
+                delete RichpreviewsFilter._waitConfirm[key];
             }
 
             if (key === chatRoom.roomId + "_" + msgObj.pendingMessageId) {

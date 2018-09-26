@@ -22,8 +22,7 @@ var Message = function(chatRoom, messagesBuff, vals) {
             'updated': false,
             'sent': Message.STATE.NOT_SENT,
             'deleted': false,
-            'revoked': false,
-            'attachmentMeta': false
+            'revoked': false
         },
         true,
         vals
@@ -207,32 +206,226 @@ Message.getContactForMessage = function(message) {
  */
 Message.prototype.getAttachmentMeta = function() {
     "use strict";
+    return M.chc[this.messageId] || [];
+};
+
+/**
+ * Invoked when an event happens in the message
+ * @param {String} action The action performed, i.e. push, replace, remove
+ * @private
+ */
+Message.prototype._onMessageAction = function(action) {
+    'use strict';
     var self = this;
-    if (self.attachmentMeta) {
-        return self.attachmentMeta;
+
+    if (action === 'revoke') {
+        var attachments = this.getAttachmentMeta();
+
+        if (attachments.length) {
+            attachments.forEach(function(n) {
+                self._onAttachmentRevoked(n.h, true);
+            });
+        }
     }
+};
 
-    var textContents = self.textContents || false;
+/**
+ * Process a received attachment.
+ * @param {String} data The serialized attachment data
+ * @private
+ */
+Message.prototype._onAttachmentReceived = function(data) {
+    'use strict';
 
-    if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT
-        && textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+    var attachments = this._safeParseJSON(data);
 
-        try {
-            self.attachmentMeta = JSON.parse(textContents.substr(2, textContents.length));
+    for (var i = attachments.length; i--;) {
+        // For the chat let's create a MegaNode in steroids...
+        var n = new MegaNode(Object.assign({}, attachments[i], {p: this.chatRoom.roomId, m: this.messageId}));
 
-            for (var i = self.attachmentMeta.length; i--;) {
-                var n = new MegaNode(self.attachmentMeta[i]);
-                if (n.fa && String(n.fa).indexOf(':8*') > 0) {
+        n.ch = n.m + '!' + n.h;
+        n.co = this.orderValue;
+
+        if (M.chd[n.ch]) {
+            // if the message got flushed from history and re-shown later
+            Object.assign(n, M.chd[n.ch]);
+        }
+        else {
+            if (n.fa) {
+                if (String(n.fa).indexOf(':1*') > 0) {
+                    // storing a reference to the message to fire trackDataChange once the preview is loaded
+                    n.mo = this;
+                }
+                if (String(n.fa).indexOf(':8*') > 0) {
                     Object.assign(n, MediaAttribute(n).data);
                 }
-                self.attachmentMeta[i] = n;
+            }
+            n.mime = filemime(n);
+        }
+
+        // Index of attachments per room
+        if (!M.chc[n.p]) {
+            M.chc[n.p] = Object.create(null);
+        }
+        M.chc[n.p][n.ch] = n;
+
+        // Index of attachments per message
+        if (M.chc[n.m]) {
+            var j = M.chc[n.m].length;
+
+            // Ensure the node doesn't exists already.
+            // XXX: We could simplify this since a message can no longer contain more than an attachment though (?)
+
+            while (j--) {
+                if (M.chc[n.m][j].ch === n.ch) {
+                    break;
+                }
+            }
+
+            if (j < 0) {
+                M.chc[n.m].push(n);
             }
         }
-        catch (e) {
+        else {
+            M.chc[n.m] = [n];
+        }
+
+        // Global index for all attachments
+        M.chd[n.ch] = n;
+    }
+
+    this._onAttachmentUpdated();
+};
+
+/**
+ * Process an attachment revocation.
+ * @param {String} h The handle for the node that got revoked.
+ * @param {Boolean} [thisMsg] Revoke only this message attachment(s)
+ * @private
+ */
+Message.prototype._onAttachmentRevoked = function(h, thisMsg) {
+    'use strict';
+
+    var chatRoom = this.chatRoom;
+    var roomId = chatRoom.roomId;
+    var msgId = this.messageId;
+
+    // Revoke all room attachments matching the same handle/message
+    var a = Object.values(M.chc[roomId] || {})
+        .filter(function(n) {
+            return thisMsg ? n.m === msgId : n.h === h;
+        });
+
+    // Get a list of affected messages
+    var m = a.map(function(n) {
+        console.assert(n.p === roomId, 'check this...');
+
+        n.revoked = true;
+        delete M.chc[n.p][n.ch];
+
+        if (!$.len(M.chc[n.p])) {
+            delete M.chc[n.p];
+        }
+
+        if (slideshowid === n.ch) {
+            // We'll reuse some logic at removeUInode() to close/move-next the slideshow
+            removeUInode(n.ch);
+        }
+
+        return n.m;
+    });
+
+    // Process message revocation.
+    for (var i = m.length; i--;) {
+        var mId = m[i];
+        var attachedMsg = chatRoom.messagesBuff.messages[mId];
+
+        console.assert(M.chc[mId] && M.chc[mId].length, 'check this...');
+
+        if (M.chc[mId]) {
+            var c = M.chc[mId];
+            for (var j = c.length; j--;) {
+                if (c[j].h === h) {
+                    c.splice(j, 1);
+                    break;
+                }
+            }
+
+            if (!M.chc[mId].length) {
+                delete M.chc[mId];
+            }
+        }
+
+        if (attachedMsg) {
+            // mark the whole message as revoked if all attachments in it are marked as revoked.
+            if (!M.chc[mId]) {
+                attachedMsg.revoked = true;
+            }
+            else {
+                // force re-render
+                attachedMsg.trackDataChange();
+            }
+
+            if (!attachedMsg.seen) {
+                attachedMsg.seen = true;
+                if (chatRoom.messagesBuff._unreadCountCache > 0) {
+                    chatRoom.messagesBuff._unreadCountCache--;
+                    chatRoom.messagesBuff.trackDataChange();
+                    chatRoom.megaChat.updateSectionUnreadCount();
+                }
+            }
         }
     }
 
-    return self.attachmentMeta || false;
+    this._onAttachmentUpdated();
+};
+
+/**
+ * Signal when new attachments are added/revoked...
+ * @private
+ */
+Message.prototype._onAttachmentUpdated = function() {
+    'use strict';
+
+    // FIXME: This is only needed to fill M.v when the site is (re)loaded within the chat,
+    // since otherwise openFolder() should take care, hence this is overkill FIND A BETTER WAY
+
+    var chatRoom = this.chatRoom;
+    var roomId = chatRoom.roomId;
+
+    delay('chat-attachment-update:' + roomId, function() {
+        if (chatRoom.isCurrentlyActive) {
+            chatRoom.megaChat.setAttachments(roomId);
+        }
+    });
+};
+
+/**
+ * Safer JSON.parse
+ * @param {String} data The serialized data
+ * @returns {*}
+ * @private
+ */
+Message.prototype._safeParseJSON = function(data) {
+    'use strict';
+
+    try {
+        return JSON.parse(data);
+    }
+    catch (ex) {
+        console.warn(ex, this, [data]);
+    }
+    return false;
+};
+
+Message.prototype.getStateText = function(state) {
+    'use strict';
+
+    if (state === undefined) {
+        state = this.getState();
+    }
+
+    return Message._stateToText[state] || 'not-sent';
 };
 
 Message.prototype.getState = function() {
@@ -317,6 +510,15 @@ Message.MESSAGE_META_TYPE = {
     "RICH_PREVIEW": "\0",
 };
 
+Message._stateToText = Object.create(null);
+Message._stateToText[Message.STATE.NULL] = 'error';
+Message._stateToText[Message.STATE.NOT_SEEN] = 'unread';
+Message._stateToText[Message.STATE.SENT] = 'sent';
+Message._stateToText[Message.STATE.NOT_SENT_EXPIRED] = 'expired';
+Message._stateToText[Message.STATE.NOT_SENT] = 'not-sent';
+Message._stateToText[Message.STATE.DELIVERED] = 'delivered';
+Message._stateToText[Message.STATE.SEEN] = 'seen';
+Message._stateToText[Message.STATE.DELETED] = 'deleted';
 
 Message.prototype.isManagement = function() {
     if (!this.textContents) {
@@ -345,7 +547,7 @@ Message.prototype.getManagementMessageSummaryText = function() {
     if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
-            return __(l[8894]).replace("%s", htmlentities(nodes[0].name));
+            return __(l[8894]).replace("%s", nodes[0].name);
         }
         else {
             return __(l[8895]).replace("%s", nodes.length);
@@ -354,7 +556,7 @@ Message.prototype.getManagementMessageSummaryText = function() {
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
-            return __(l[8896]).replace("%s", htmlentities(nodes[0].name));
+            return __(l[8896]).replace("%s", nodes[0].name);
         }
         else {
             return __(l[8897]).replace("%s", nodes.length);
@@ -493,38 +695,30 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         return res;
     };
 
-    if (self.chatd.chatdPersist) {
-        [
-            'push',
-            'replace',
-            'remove',
-            'removeByKey'
-        ].forEach(function (fnName) {
-            var origFn = self.messages[fnName];
-            self.messages[fnName] = function() {
-                var res = origFn.apply(this, arguments);
-                if (!self.chatd.chatdPersist) {
-                    // was disabled?
-                    self.messages[fnName] = origFn;
-                    return res;
-                }
+    ['push', 'replace', 'remove', 'removeByKey'].forEach(function(fnName) {
+        var origFn = self.messages[fnName];
 
-                var msg = arguments[0] ? arguments[0] : undefined;
-                if (arguments[1] === true) {
-                    // restoring from indexedDB, don't try to persist this.
-                    return res;
-                }
+        self.messages[fnName] = function(messageId, ignoreDB) {
+            // should be called first..otherwise origFn.apply may delete the message and cause `msg` to be undefined.
+            var msg = self.messages[messageId];
+            if (msg instanceof Message) {
+                msg._onMessageAction(ignoreDB ? fnName : 'revoke');
+            }
+
+            var res = origFn.apply(this, arguments);
+
+            // note: ignoreDB can be a message, in case fnName is 'replace', which is not actually an ignoreDB.
+            if (ignoreDB !== true && self.chatd.chatdPersist) {
                 chatdPersist.persistMessageBatched(
                     fnName === "removeByKey" ? "remove" : fnName,
                     chatRoom.chatId,
                     toArray.apply(null, arguments)
                 );
+            }
 
-                return res;
-            };
-        });
-    }
-
+            return res;
+        };
+    });
 
     self.lastSeen = null;
     self.lastSent = null;
@@ -613,7 +807,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
 
         if (chatRoom.roomId === self.chatRoom.roomId) {
-            self.setLastSeen(eventData.messageId);
+            self.setLastSeen(eventData.messageId, eventData.chatd);
             self.trackDataChange();
         }
     });
@@ -644,8 +838,14 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.chatdIsProcessingHistory = false;
             self.sendingListFlushed = true;
 
+
             if (
-                typeof(self.expectedMessagesCount) === 'undefined' ||
+                typeof(self.expectedMessagesCount) === 'undefined'
+            ) {
+                self.expectedMessagesCount = 0;
+                self.retrievedAllMessages = false;
+            }
+            else if (
                 self.expectedMessagesCount === requestedMessagesCount
             ) {
                 // this is an empty/new chat.
@@ -666,6 +866,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 // requested #, which means, that there is no more history.
                 self.retrievedAllMessages = self.expectedMessagesCount < requestedMessagesCount;
             }
+
 
 
 
@@ -691,10 +892,13 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessagesHistoryRequest.messagesBuff' + chatRoomId, function(e, eventData) {
 
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+        if (!chatRoom) {
+            self.logger.warn("Chat room not found for onMessagesHistoryRequest, called with eventData:", eventData);
+        }
 
         if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
             self.isRetrievingHistory = true;
-            self.expectedMessagesCount = Math.abs(eventData.count);
+            self.expectedMessagesCount = eventData.count === 0xDEAD ? null : Math.abs(eventData.count);
             self.trackDataChange();
         }
     });
@@ -743,7 +947,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
 
             if (!eventData.isNew) {
-                self.expectedMessagesCount--;
+                if (typeof self.expectedMessagesCount !== 'undefined') {
+                    self.expectedMessagesCount--;
+                }
+
                 if (eventData.userId !== u_handle) {
                     if (self.lastDeliveredMessageRetrieved === true) {
                         // received a message from history, which was NOT marked as received, e.g. was sent during
@@ -783,7 +990,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 if (eventData.userId !== u_handle) {
                     self.setLastReceived(eventData.messageId);
                 }
-                $(self).trigger('onNewMessageReceived', msgObject);
+
+                if (!self.isRetrievingHistory) {
+                    $(self).trigger('onNewMessageReceived', msgObject);
+                }
 
                 if (eventData.pendingid) {
                     $(chatRoom).trigger('onPendingMessageConfirmed', msgObject);
@@ -906,6 +1116,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                                     eventData.messageId
                                 );
                             }
+                        }
+                        if (editedMessage.textContents === "" && editedMessage.dialogType !== 'truncated') {
+                            editedMessage.deleted = true;
                         }
                     }
                     else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
@@ -1064,7 +1277,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 foundMessage.requiresManualRetry = true;
             }
             else {
-                var foundMessage = self.getByInternalId(eventData.id & 0xffffffff);
+                foundMessage = self.getByInternalId(eventData.id & 0xffffffff);
 
                 if (foundMessage) {
                     foundMessage.sent = Message.STATE.NOT_SENT_EXPIRED;
@@ -1275,11 +1488,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self._unreadCountCache = newCounter;
             self.chatRoom.megaChat.updateSectionUnreadCount();
         }
-
-        if (slideshowid) {
-            chatRoom._rebuildAttachments();
-        }
-
     });
 };
 
@@ -1356,15 +1564,20 @@ MessagesBuff.prototype.getUnreadCount = function() {
     return this._unreadCountCache;
 };
 
-MessagesBuff.prototype.setLastSeen = function(msgId) {
+MessagesBuff.prototype.setLastSeen = function(msgId, isFromChatd) {
     var self = this;
+
+    if (msgId === self.lastSeen) {
+        return; // already the same. can be triggered by the reset notifications in the UI.
+    }
+
     var targetMsg = Message._mockupNonLoadedMessage(msgId, self.messages[msgId], 999999999);
     var lastMsg = Message._mockupNonLoadedMessage(self.lastSeen, self.messages[self.lastSeen], 0);
 
     if (!self.lastSeen || lastMsg.orderValue < targetMsg.orderValue) {
         self.lastSeen = msgId;
 
-        if (!self.isRetrievingHistory && !self.chatRoom.stateIsLeftOrLeaving()) {
+        if (!isFromChatd && self.joined && !self.isRetrievingHistory && !self.chatRoom.stateIsLeftOrLeaving()) {
             if (self._lastSeenThrottling) {
                 clearTimeout(self._lastSeenThrottling);
             }
@@ -1392,6 +1605,24 @@ MessagesBuff.prototype.setLastSeen = function(msgId) {
         }
 
         self.trackDataChange();
+    }
+    else if (self.lastSeen && lastMsg.orderValue >= targetMsg.orderValue) {
+        // same message
+        if (lastMsg.orderValue === targetMsg.orderValue) {
+            if (self._lastRetriedSeenId === self.lastSeen) {
+                // lastSeen confirmed.
+                delete self._lastRetriedSeenId;
+            }
+        }
+        else {
+            // currentMessage > reportedMessage
+            // something reported an old lastSeen!
+            if (!self._lastRetriedSeenId || self._lastRetriedSeenId !== self.lastSeen) {
+                // tell chatd that the last seen is `self.lastSeen` message id
+                self.chatdInt.markMessageAsSeen(self.chatRoom, self.lastSeen);
+                self._lastRetriedSeenId = self.lastSeen;
+            }
+        }
     }
 };
 
@@ -1660,7 +1891,9 @@ MessagesBuff.prototype.restoreMessage = function(msgObject) {
     }
     self.haveMessages = true;
 
-    self.expectedMessagesCount--;
+    if (typeof self.expectedMessagesCount !== 'undefined') {
+        self.expectedMessagesCount--;
+    }
 
     if (msgObject.messageId === self.lastSeen) {
         self.lastSeenMessageRetrieved = true;

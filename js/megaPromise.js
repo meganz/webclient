@@ -489,10 +489,10 @@ MegaPromise.all = function(promisesList) {
     var promise = new MegaPromise();
 
     $.when.apply($, _jQueryPromisesList)
-        .then(function megaPromiseResProxy() {
+        .done(function megaPromiseResProxy() {
             promise.resolve(toArray.apply(null, arguments));
-        },
-        MegaPromise.getTraceableReject(promise));
+        })
+        .fail(MegaPromise.getTraceableReject(promise));
 
     return promise;
 };

@@ -564,7 +564,8 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
         dl_queue[dl_queue_num].loaded = bl;
 
         if (!uldl_hold) {
-            if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) {
+            var slideshowid = window.slideshowid && slideshow_handle();
+            if (slideshowid === dl_queue[dl_queue_num].id && !previews[slideshowid]) {
                 var $overlay = $('.viewer-overlay');
                 var $chart = $overlay.find('.viewer-progress');
 
@@ -643,6 +644,7 @@ MegaData.prototype.dlcomplete = function(dl) {
         dlmanager.remResumeInfo(dl).dump();
     }
 
+    var slideshowid = slideshow_handle();
     if (slideshowid == id && !previews[slideshowid]) {
         var $overlay = $('.viewer-overlay');
         $overlay.find('.viewer-pending').addClass('hidden');
@@ -767,7 +769,8 @@ MegaData.prototype.dlerror = function(dl, error) {
     mega.ui.tpp.hide();
     mega.ui.tpp.reset('dl');
 
-    if (window.slideshowid == dl.id && !previews[slideshowid]) {
+    var slideshowid = slideshow_handle();
+    if (slideshowid === dl.id && !previews[slideshowid]) {
         $overlay.find('.viewer-image-bl').addClass('hidden');
         $overlay.find('.viewer-pending').addClass('hidden');
         $overlay.find('.viewer-progress').addClass('hidden');
@@ -952,7 +955,7 @@ MegaData.prototype.addToTransferTable = function(gid, ttl, elem) {
             .addEventListener('ps-y-reach-end', M, {passive: true});
         mBroadcaster.addListener('tfs-dynlist-flush', M);
 
-        $(window).bind('resize.tfsdynlist', this.tfsResizeHandler);
+        $(window).rebind('resize.tfsdynlist', this.tfsResizeHandler);
         this.tfsResizeHandler = null;
     }
 
@@ -1000,10 +1003,10 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
             var $chk = $('.megasync-upload-overlay .checkdiv');
             var hideMEGAsyncDialog = function() {
                 $('.megasync-upload-overlay').hide();
-                $(document).unbind('keyup.megasync-upload');
-                $('.download-button.light-white.continue, .fm-dialog-close').unbind('click');
-                $('.download-button.light-red.download').unbind('click');
-                $chk.unbind('click.dialog');
+                $(document).off('keyup.megasync-upload');
+                $('.download-button.light-white.continue, .fm-dialog-close').off('click');
+                $('.download-button.light-red.download').off('click');
+                $chk.off('click.dialog');
                 $chk = undefined;
             };
             $('.download-button.light-white.continue, .fm-dialog-close').rebind('click', function() {
@@ -1057,9 +1060,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
     var pauseTxt = '';
     var ttl = this.getTransferTableLengths();
 
-    if ($.onDroppedTreeFolder) {
-        target = $.onDroppedTreeFolder;
-        delete $.onDroppedTreeFolder;
+    if ($.addUploadTarget) {
+        target = $.addUploadTarget;
+        delete $.addUploadTarget;
     }
     else if (String(this.currentdirid).length !== 8) {
         target = this.lastSeenCloudFolder || this.RootID;

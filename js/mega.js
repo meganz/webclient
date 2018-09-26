@@ -8,6 +8,7 @@ var fetcher = null;
 var workerstate;
 
 var fmconfig = Object.create(null);
+
 if (localStorage.fmconfig) {
     fmconfig = JSON.parse(localStorage.fmconfig);
 }
@@ -159,6 +160,7 @@ var scfetches = Object.create(null);     // holds pending nodes to be retrieved 
 var scwaitnodes = Object.create(null);   // supplements scfetches per scqi index
 var nodesinflight = Object.create(null); // number of nodes being processed in the worker for scqi
 var sc_history = [];                     // array holding the history of action-packets
+var nodes_scqi_order = 0;                // variable to count the node arrival order before sending to workers
 
 // enqueue nodes needed to process packets
 function sc_fqueue(handle, packet) {
@@ -287,6 +289,26 @@ function sc_fetcher() {
     })();
 }
 
+/**
+ * function to start fetching nodes needed for the action packets
+ * @param {Number} scni         id of action packe in scq
+ */
+function startNodesFetching(scni) {
+    "use strict";
+    if (!--nodesinflight[scni]) {
+        delete nodesinflight[scni];
+
+        if (scloadtnodes && scq[scni][0] && sc_fqueuet(scni)) {
+            // fetch required nodes from db
+            sc_fetcher();
+        }
+        else {
+            // resume processing, if appropriate and needed
+            resumesc();
+        }
+    }
+}
+
 // enqueue parsed actionpacket
 function sc_packet(a) {
     "use strict";
@@ -388,6 +410,10 @@ function sc_packet(a) {
         }
     }
 
+    if (a.a === 't') {
+        startNodesFetching(scqhead);
+    }
+
     // other packet types do not warrant the worker detour
     if (scq[scqhead]) scq[scqhead++][0] = a;
     else scq[scqhead++] = [a, []];
@@ -455,10 +481,16 @@ function sc_node(n) {
         p = scqhead % workers.length;
     }
 
-    if (nodesinflight[scqhead]) nodesinflight[scqhead]++;
-    else nodesinflight[scqhead] = 1;
+    if (nodesinflight[scqhead]) {
+        nodesinflight[scqhead]++;
+    }
+    else {
+        nodesinflight[scqhead] = 2;
+        nodes_scqi_order = 0; // reset the order var
+    }
 
     n.scni = scqhead;       // set scq slot number (sc_packet() call will follow)
+    n.arrivalOrder = nodes_scqi_order++; // storing arrival order
     workers[p].postMessage(n);
 }
 
@@ -847,6 +879,7 @@ scparser.$add('t', function(a, scnodes) {
         if (scnodes[i]) {
             delete scnodes[i].i;
             delete scnodes[i].scni;
+            delete scnodes[i].arrivalOrder;
             M.addNode(scnodes[i]);
             ufsc.feednode(scnodes[i]);
         }
@@ -1100,7 +1133,7 @@ scparser.$add('u', function(a) {
                         M.favouriteDomUpdate(n, n.fav);
                     }
                     if (n.lbl !== oldlbl) {
-                        M.colourLabelDomUpdate(n.h, n.lbl);
+                        M.labelDomUpdate(n.h, n.lbl);
                     }
                 }
             }
@@ -1127,8 +1160,8 @@ scparser.$add('d', function(a) {
     if (!pfid) {
         scparser.$notify(a);
 
-        if (u_type) {
-            M.checkStorageQuota();
+        if (fminitialized && u_type) {
+            M.checkStorageQuota(ulmanager.ulOverStorageQuota ? 2000 : 0);
         }
     }
     if (!is_mobile) {
@@ -1799,21 +1832,16 @@ function worker_procmsg(ev) {
 
         if (ev.data.scni >= 0) {
             // enqueue processed node
-            if (scq[ev.data.scni]) scq[ev.data.scni][1].push(ev.data);
-            else scq[ev.data.scni] = [null, [ev.data]];
-
-            if (!--nodesinflight[ev.data.scni]) {
-                delete nodesinflight[ev.data.scni];
-
-                if (scloadtnodes && scq[ev.data.scni][0] && sc_fqueuet(ev.data.scni)) {
-                    // fetch required nodes from db
-                    sc_fetcher();
-                }
-                else {
-                    // resume processing, if appropriate and needed
-                    resumesc();
-                }
+            if (scq[ev.data.scni]) {
+                scq[ev.data.scni][1][ev.data.arrivalOrder] = ev.data;
             }
+            else {
+                var initArray = [];
+                initArray[ev.data.arrivalOrder] = ev.data;
+                scq[ev.data.scni] = [null, initArray];
+            }
+
+            startNodesFetching(ev.data.scni);
         }
         else {
             // maintain special incoming shares index
@@ -3420,18 +3448,20 @@ var fa_reqcnt = 0;
 var fa_addcnt = 8;
 var fa_tnwait = 0;
 
-function fm_thumbnails()
+function fm_thumbnails(mode, nodeList)
 {
     var treq = {}, a = 0, max = Math.max($.rmItemsInView || 1, 71) + fa_addcnt, u = max - Math.floor(max / 3), y;
     if (!fa_reqcnt)
         fa_tnwait = y;
     if (d)
         console.time('fm_thumbnails');
-    if (M.viewmode || M.chat)
+
+    nodeList = (mode === 'standalone' ? nodeList : false) || M.v;
+
+    if ((M.viewmode && !M.chat) || mode === 'standalone')
     {
-        for (var i in M.v)
-        {
-            var n = M.v[i];
+        for (var i = 0; i < nodeList.length; i++) {
+            var n = nodeList[i];
             if (n && !missingkeys[n.h] && n.fa && String(n.fa).indexOf(':0') > 0)
             {
                 if (fa_tnwait == n.h && n.seen)
@@ -3507,13 +3537,15 @@ function fm_thumbnails()
                 // deduplicate in view when there is a duplicate fa:
                 if (targetNode && fa_duplicates[targetNode.fa] > 0)
                 {
-                    for (var i in M.v)
+                    for (var i = 0; i < nodeList.length; i++)
                     {
-                        if (M.v[i].h !== node && M.v[i].fa === targetNode.fa && !thumbnails[M.v[i].h])
+                        var n = nodeList[i];
+                        if (n.h !== node && n.fa === targetNode.fa && !thumbnails[n.h])
                         {
-                            thumbnails[M.v[i].h] = thumbnails[node];
-                            if (M.v[i].seen && M.currentdirid === cdid)
-                                fm_thumbnail_render(M.v[i]);
+                            thumbnails[n.h] = thumbnails[node];
+                            if (n.seen && M.currentdirid === cdid)  {
+                                fm_thumbnail_render(n);
+                            }
                         }
                     }
                 }

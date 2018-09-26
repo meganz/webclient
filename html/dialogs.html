@@ -40,13 +40,10 @@
         <div class="reset-small-txt">[$6220]</div>
 
         <div class="fm-account-input">
-            <div class="reset-pass-error">
-                <div class="multiple-input-warning">
-                    <div class="arrow"></div>
-                    <span>[$6001]</span>
-                </div>
-            </div>
             <input id="reset_success_st2_pass" type="password" value="" />
+        </div>
+        <div class="reset-pass-error">
+            [$6001]
         </div>
 
         <div class="default-dialog-bottom">
@@ -182,12 +179,12 @@
     <div class="create-folder-pad">
         <div class="create-folder-input-bl">
             <div class="transfer-filetype-icon folder">
-                <div class="duplicated-input-warning">
-                    <div class="arrow"></div>
-                    <span>[$17579]</span>
-                </div>
             </div>
             <input name="dialog-new-folder" type="text" value="" placeholder="[$157]" autofocus />
+        </div>
+        <div class="duplicated-input-warning">
+            <div class="arrow"></div>
+            <span>[$17579]</span>
         </div>
         <div class="create-folder-bottom">
             <div class="fm-dialog-new-folder-button default-white-button right"><span>[$455]</span></div>
@@ -265,7 +262,7 @@
         <div class="reg-success-txt">[$217]</div>
         <div class="reg-resend-email">
             <div class="reg-resend-input-bl">
-                <input type="text" value="" />
+                <input type="text" value="" maxlength="190" />
             </div>
             <div class="reg-resend-button-bl">
                 <div class="resend-email-button">
@@ -286,12 +283,12 @@
     <div class="fm-dialog-body">
         <div class="rename-input-bl">
             <div class="transfer-filetype-icon">
-                <div class="duplicated-input-warning">
-                    <div class="arrow"></div>
-                    <span>[$17578]</span>
-                </div>
             </div>
             <input name="dialog-rename" type="text" value="[$157]" />
+        </div>
+        <div class="duplicated-input-warning">
+            <div class="arrow"></div>
+            <span>[$17578]</span>
         </div>
         <div class="default-dialog-bottom">
             <div class="rename-dialog-button rename default-white-button right"><span>[$61]</span></div>
@@ -309,22 +306,22 @@
     <div class="fm-picker-dialog-panel-header">
         <span>[$5916]</span>
         <div class="fm-picker-dialog-panel-arrows"></div>
-        <div class="dialog-sorting-menu hidden">
+        <!-- <div class="dialog-sorting-menu hidden old-v">
             <div class="context-menu-section">
                 <div class="sorting-menu-arrow"></div>
                 <div data-by="name" class="sorting-menu-item active">[$86]</div>
                 <div data-by="label" class="sorting-menu-item">[$17398]</div>
-                <!--
+                
                 <div data-by="status" class="sorting-menu-item">[$89]</div>
                 <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
-                -->
+                
                 <div class="sorting-item-divider"></div>
             </div>
             <div class="context-menu-section">
                 <div data-dir="1" class="sorting-menu-item active">[$6773]</div>
                 <div data-dir="-1" class="sorting-menu-item">[$6774]</div>
             </div>
-        </div>
+        </div> -->
         <div class="search-bar summary-input placeholder">
             <input type="text" placeholder="[$102]">
             <div class="search-icon icon"></div>
@@ -366,7 +363,7 @@
             </div>
         </div>
     </div><!--END summary-->
-
+    
     <!--Folder container-->
     <div class="fm-dialog-body">
         <div class="dropdown body dropdown-arrow down-arrow contact-preview hidden">
@@ -388,7 +385,6 @@
                 <div class="left-border"></div>
                 <div class="tooltip">[$17764]</div>
             </div>
-
             <div class="fm-picker-dialog-button rubbish-bin rubbish56-icon">
                 <div class="left-border"></div>
                 <div class="tooltip">[$167]</div>
@@ -565,8 +561,8 @@
                 </div>
                 <div class="expiry-date-select-container hidden">
                     <input type="text" id="link-expiry-datepicker"
-                           class="fm-dialogs-select expiry-date-select"
-                           value="[$8697]" placeholder="[$8697]" />
+                        class="fm-dialogs-select expiry-date-select"
+                        value="[$8697]" placeholder="[$8697]" />
                 </div>
                 <div class="disabled-overlay hidden"></div>
             </div>
@@ -967,12 +963,12 @@
     <div class="create-folder-pad">
         <div class="create-folder-input-bl">
             <div class="transfer-filetype-icon folder">
-                <div class="duplicated-input-warning">
-                    <div class="arrow"></div>
-                    <span>[$17579]</span><!--  -->
-                </div>
             </div>
             <input type="text" value="" placeholder="[$157]" autofocus />
+        </div>
+        <div class="duplicated-input-warning">
+            <div class="arrow"></div>
+            <span>[$17579]</span><!--  -->
         </div>
         <a class="create-folder-button"><span>[$455]</span></a>
         <div class="clear"></div>
@@ -1019,11 +1015,11 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="big-red-button add-user-popup-button height-48">
             [$19112]
         </div>
-        
+
         <div class="hidden-achievement-info">
             <div class="hidden-achievement-cell">
                 <i class="mid-white-icon ach-create-account"></i>
@@ -1155,6 +1151,7 @@
         <div class="clear"></div>
     </div>
 </div><!--End Share Dialog-->
+
 <!--Contact Fingerprint Dialog-->
 <div class="fm-dialog fingerprint-dialog hidden">
     <div class="fm-dialog-header">
@@ -1206,6 +1203,7 @@
         <div class="clear"></div>
     </div>
 </div><!--End Contact Fingerprint Dialog-->
+
 <!-- Share with contact dialog -->
 <div class="fm-dialog share-with-contact-dialog hidden">
     <div class="fm-dialog-header">
@@ -1260,177 +1258,117 @@
         <div class="default-white-button right dialog-cancel-button"> <span>[$148]</span> </div>
         <div class="clear"></div>
     </div>
-</div><!-- END. Share with contact dialog -->
+</div>
+<!-- END. Share with contact dialog -->
 
 
 
 
-<div class="top-login-popup fm-dialog pro-login-dialog hidden">
+<div class="top-login-popup sign fm-dialog pro-login-dialog big-radius login hidden">
 
     <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$190]</div>
-        <div class="fm-dialog-close"></div>
+        <div class="account top-header login left small">[$190]</div>
+        <div class="fm-dialog-close mid"></div>
         <div class="clear"></div>
     </div>
-
-    <div class="top-login-pad">
-
-        <div class="top-login-input-tooltip both-incorrect">
-            <div class="top-login-tooltip-arrow">
-                <div class="top-loginp-tooltip-txt">
-                    [$1130]
-                    <div class="white-txt">[$969]</div>
+    <form autocomplete="off" class="account dialog-login-form">
+        <div class="top-login-pad">
+            <div class="account input-wrapper email">
+                <div class="account input-tooltip mid">
+                    [$141]
                 </div>
-            </div>
-        </div>
-        <div class="top-login-input-block e-mail incorrect">
-            <div class="top-login-input-tooltip">
-                <div class="top-login-tooltip-arrow">
-                    <div class="top-loginp-tooltip-txt">
-                        [$141]
-                    </div>
+                <div class="account both-input-tooltip">
+                    [$1130]<br>[$969].
                 </div>
+                <i class="account-icon email"></i>
+                <input type="text" name="login-name3" id="login-name3" placeholder="[$195]" class="input-email" maxlength="190" />
             </div>
-            <input type="text" name="login-name" id="login-name" value="" placeholder="[$195]" class="input-email">
-        </div>
-        <div class="top-login-input-block password">
-            <div class="top-login-input-tooltip">
-                <div class="top-login-tooltip-arrow">
-                    <div class="top-loginp-tooltip-txt">
-                        [$970]
-                    </div>
-                </div>
+            <div class="account input-wrapper password">
+                <i class="account-icon lock"></i>
+                <input autocomplete="off" type="password" name="login-password3" id="login-password3" class="input-password" placeholder="[$909]"  />
             </div>
-            <input type="password" name="login-password" id="login-password" value="" placeholder="[$909]" class="input-password">
-            <div class="login-notification-icon"></div>
-        </div>
-
-        <div class="top-login-forgot-pass-bl">
-            <a class="top-login-forgot-pass clickurl" href="/recovery">[$1934]</a>
-            <div class="clear"></div>
-        </div>
-        <div class="top-login-bott-gray-block">
-            <div class="checkboxOn login-checkbox"></div>
-            <label class="radio-txt">[$192]</label>
-
-            <div class="default-white-button right top-dialog-login-button"><span>[$16345] <i><span class="loading-gif"></span></i></span></div>
-            <div class="clear"></div>
-        </div>
-    </div>
-    <div class="top-login-warning hidden">
-        <div class="top-login-warning-arrow"></div>
-        <div class="top-login-warning-close"></div>
-        <div class="top-login-warning-pad">
-            <div class="top-login-warning-icon"></div>
-            <div class="top-login-warning-txt">
-                [$1093]<br>
-            </div>
-            <div class="clear"></div>
-            [$1094]
-            <div class="top-login-warning-bott">
-                <div class="loginwarning-checkbox checkboxOff"></div>
-                <label class="radio-txt">[$229]</label>
+            <div class="login-page-forgot-bl">
+                <a class="top-login-forgot-pass clickurl" href="/recovery" tabindex="-1">[$1934]</a>
                 <div class="clear"></div>
             </div>
+            <div class="account checkbox-block left">
+                <div class="login-check checkboxOn checkbox">
+                    <input class="checkboxOn" type="checkbox" name="login-check3" id="login-check3" checked="checked">
+                </div>
+                <label class="radio-txt">[$192]</label>
+            </div>
+            <div class="big-red-button height-48 top-dialog-login-button right" tabindex="0">
+                [$16345]
+                <i class="medium-icon right-arrow icons-sprite"></i>
+            </div>
+            <div class="clear"></div>
         </div>
-    </div>
+    </form>
 </div>
 
-
-<div class="top-login-popup fm-dialog pro-register-dialog hidden">
+<div class="top-login-popup sign fm-dialog pro-register-dialog big-radius hidden">
     <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$5840]</div>
-        <div class="fm-dialog-close"></div>
+        <div class="account top-header login left small">[$968]</div>
+        <div class="fm-dialog-close mid"></div>
         <div class="clear"></div>
     </div>
 
     <div class="pro-register-scroll">
         <div class="fm-dialog-body hidden"></div>
-
-        <div class="top-login-pad">
-
-            <div class="login-register-input name">
-                <div class="top-login-input-tooltip">
-                    <div class="top-login-tooltip-arrow">
-                        <div class="top-loginp-tooltip-txt">
-                            [$1098]
-                            <div class="white-txt">[$1099]</div>
-                        </div>
+        <form autocomplete="off" class="account dialog-register-form">
+            <div class="top-login-pad">
+    
+                <div class="account input-wrapper name double">
+                    <div class="account input-tooltip">
+                        [$1098]<br>[$1099]
                     </div>
+                    <i class="account-icon person"></i>
+                    <input type="text" name="register-name" id="register-firstname" placeholder="[$1096]" maxlength="40" class="f-name" />
+                    <input type="text" name="register-familyname" id="register-lastname" placeholder="[$1097]" maxlength="40" class="l-name" />
                 </div>
-                <div class="register-name-input-block">
-                    <input type="text" name="login-name" id="register-firstname" value="" placeholder="[$1096]" class="have-placeholder" />
-                </div>
-                <div class="register-family-input-block ">
-                    <input type="text" name="login-familyname" id="register-lastname" value="" placeholder="[$1097]" class="have-placeholder" />
-                </div>
-            </div>
-            <div class="login-register-input email">
-                <div class="top-login-input-tooltip">
-                    <div class="top-login-tooltip-arrow">
-                        <div class="top-loginp-tooltip-txt">
-                            [$1100]
-                            <div class="white-txt">[$1101]</div>
-                        </div>
+                <div class="account input-wrapper email">
+                    <div class="account input-tooltip">
+                        [$1100]<br>[$1101].
                     </div>
+                    <i class="account-icon email"></i>
+                    <input autocomplete="off" type="text" name="rigister-email" id="register-email" placeholder="[$95]" maxlength="190" />
                 </div>
-                <input type="text" name="login-email" id="register-email" value="" placeholder="[$95]" class="have-placeholder" />
-            </div>
-            <div class="login-register-input password first">
-                <div class="top-login-input-tooltip">
-                    <div class="top-login-tooltip-arrow">
-                        <div class="top-loginp-tooltip-txt password">
-                            [$1102]
-                            <div class="white-txt password">[$1104]</div>
-                        </div>
+                <div class="account input-wrapper password first">
+                    <div class="account input-tooltip">
+                        [$1102]<br>[$1104]
                     </div>
-                </div>
-                <div class="password-status-icon">
-                    <div class="password-status-warning hidden">
+                    <div class="password-status-icon">
+                        <div class="password-status-warning hidden"> </div>
                     </div>
-                </div>
-                <div class="register-loading-icon"></div>
-                <input type="password" name="login-password" id="register-password" value="" placeholder="[$909]" class="have-placeholder" />
-            </div>
-            <div class="new-registration">
-                <div class="register-pass-status-line1"></div>
-                <div class="register-pass-status-line2"></div>
-                <div class="register-pass-status-line3"></div>
-                <div class="register-pass-status-line4"></div>
-                <div class="register-pass-status-line5"></div>
-                <div class="clear"></div>
-                <div class="password-stutus-txt hidden">
-                    <div class="new-reg-status-pad">
-                        <strong>[$1105]</strong>
+                    <div class="register-loading-icon"><img alt="" src="{staticpath}images/mega/ajax-loader-gray.gif" /></div>
+                    <i class="account-icon lock"></i>
+                    <input autocomplete="off" type="password" name="register-password" id="register-password" placeholder="[$909]"  />
+                    <div class="account password-stutus hidden">
                         [$1106]
                     </div>
-                    <div class="new-reg-status-description">
-                    </div>
                 </div>
-            </div>
-            <div class="login-register-input password confirm">
-                <div class="top-login-input-tooltip">
-                    <div class="top-login-tooltip-arrow">
-                        <div class="top-loginp-tooltip-txt">
-                            [$1107]
-                            <div class="white-txt">[$969]</div>
-                        </div>
+                <div class="account input-wrapper password confirm">
+                    <div class="account input-tooltip">
+                        [$1107]<br>[$969].
                     </div>
+                    <i class="account-icon lock"></i>
+                    <input autocomplete="off" type="password" name="register-password2" id="register-password2" placeholder="[$1114]"  />
                 </div>
-                <input type="password" name="login-password2" id="register-password2" value="" placeholder="[$1114]" class="have-placeholder" />
-            </div>
-            <div class="new-registration-checkbox">
-                <div class="register-check checkboxOff"></div>
-                <label class="radio-txt">[$208]</label>
+                <div class="account checkbox-block register">
+                    <div class="register-check checkboxOff checkbox">
+                        <input class="checkboxOff" type="checkbox" name="reset-pass" id="reset-pass" checked="">
+                    </div>
+    
+                    <label class="radio-txt">[$208]</label>
+                    <div class="clear"></div>
+                </div>
+                <div class="big-red-button height-48 register-button right active" tabindex="0">
+                    [$1108] 
+                    <i class="medium-icon right-arrow icons-sprite"></i>
+                </div>
                 <div class="clear"></div>
             </div>
-            <div class="register-st2-button active">
-                <div class="register-st2-button-arrow">
-                    [$1108]
-                </div>
-            </div>
-            <div class="clear"></div>
-        </div>
+        </form>
     </div>
 </div>
 
@@ -1497,7 +1435,7 @@
                     <div class="clear"></div>
                 </div>
                 <div class="feedback-dialog-input hidden">
-                    <input name="feedback-email" type="text" placeholder="email@domain.com" />
+                    <input name="feedback-email" type="text" placeholder="email@domain.com" maxlength="190" />
                 </div>
                 <div class="stats">
                     <div class="feedback-label-txt">
@@ -3294,7 +3232,7 @@
                 [$16319]
             </div>
             <div class="achievement-dialog input-field multiple-input emails">
-                <input type="text" class="achievement-dialog input" name="" id="ach-invite-dialog-input" />
+                <input type="text" class="achievement-dialog input" id="ach-invite-dialog-input" maxlength="190" />
                 <div class="clear"></div>
             </div>
             <div class="achievement-dialog input-info">
@@ -3634,7 +3572,7 @@
         <!-- Please add "hidden" class !-->
         <div class="bottom-checkbox">
             <div class="checkdiv checkboxOff">
-                <input type="checkbox" name="duplicates-checkbox" id="duplicates-checkbox" class="checkboxOff">
+                <input type="checkbox" name="duplicates-checkbox" id="duplicates-checkbox" />
             </div>
             <!-- Please replace [S], [/S] by <span>, </span> !-->
             <label for="duplicates-checkbox" class="radio-txt">[$16494]</label>
@@ -4523,7 +4461,7 @@
         </div>
         <div class="default-dialog-bottom">
             <div class="default-widget-buttons">
-                <div class="fm-dialog-new-folder-button default-grey-button right"><span>Close</span></div>
+                <div class="fm-dialog-new-folder-button default-grey-button right"><span>[$148]</span></div>
                 <div class="fm-dialog-new-folder-button default-white-button right"><span>More settings</span></div>
             </div>
             <div class="remove-widget-buttons hidden">
@@ -4544,6 +4482,59 @@
         <div class="drag-n-drop info-block">
             <i></i><span>[$16560]</span>
         </div>
+    </div>
+</div>
+
+<!-- Sort and filter dialog for Tree panel and Dialog Tree -->
+<div class="dropdown body dark dialog-sorting-menu hidden">
+    <div class="dropdown-section sort-by">
+        <div class="sorting-menu-arrow"></div>
+        <span class="dropdown-color-txt">[$7331]</span>
+        <a data-by="name" class="dropdown-item asc active">
+            <i class="small-icon context az"></i>[$86]</a>
+        <a data-by="label" class="dropdown-item">
+            <i class="small-icon context labels"></i>[$17398]</a>
+        <a data-by="status" class="dropdown-item">
+            <i class="small-icon context status"></i>[$89]</a>
+        <a data-by="last-interaction" class="dropdown-item">
+            <i class="small-icon context conversation"></i>[$5904]</a>
+        <a data-by="fav" class="dropdown-item">
+            <i class="small-icon context heart"></i>[$5871]</a>
+    </div>
+ </div>
+
+<!-- Sort and filter dialog for File Manager -->
+<div class="dropdown body colour-sorting-menu hidden">
+    <div class="dropdown-section sort-by">
+        <span class="dropdown-color-txt">[$7331]</span>
+        <a data-by="name" class="dropdown-item asc active">
+            <i class="small-icon context az"></i>[$86]</a>
+        <a data-by="label" class="dropdown-item dropdown-item-label disabled static">
+            <i class="small-icon context labels"></i>[$17398]</a>
+        <hr>
+    </div>
+    <div class="dropdown-section filter-by">
+        <span class="no-tips">
+            <span>
+                <span class="dropdown-color-txt">[$17791]</span>
+                <div class="labels small">
+                    <span class="dropdown-item static">
+                        <i class="small-icon context labels"></i>[$17398]
+                    </span>
+                    <span class="dropdown-colour-item red-colour-label" data-label-id="1" data-label-txt="[$16223]"></span>
+                    <span class="dropdown-colour-item orange-colour-label" data-label-id="2" data-label-txt="[$16224]"></span>
+                    <span class="dropdown-colour-item yellow-colour-label" data-label-id="3" data-label-txt="[$16225]"></span>
+                    <span class="dropdown-colour-item green-colour-label" data-label-id="4" data-label-txt="[$16226]"></span>
+                    <span class="dropdown-colour-item blue-colour-label" data-label-id="5" data-label-txt="[$16227]"></span>
+                    <span class="dropdown-colour-item purple-colour-label" data-label-id="6" data-label-txt="[$16228]"></span>
+                    <span class="dropdown-colour-item grey-colour-label" data-label-id="7" data-label-txt="[$16229]"></span>
+                    <span class="clear"></span>
+                    <span class="dropdown-color-info">
+                        [$16221]
+                    </span>
+                </div>
+            </span>
+        </span>
     </div>
 </div>
 
@@ -4597,7 +4588,7 @@
        </div>
           <div class="login-register-input email">
 
-                <input type="text" name="recover-input1-di" id="recover-input1-di" value="" placeholder="Your email address">
+                <input type="text" name="recover-input1-di" id="recover-input1-di" value="" placeholder="[$195]" maxlength="190">
             </div>
     <!-- Only show this div when all the checkboxes have been ticked and the email field has been filled in. -->
     <div class="content-highlight warning hidden">
@@ -4615,7 +4606,6 @@
         <div class="default-white-button right closebtn"><span>[$82]</span></div>
     </div>
 </div>
-
 
 <!-- QR Code Dialog !-->
 <div class="fm-dialog qr-dialog hidden">
@@ -4693,3 +4683,165 @@
     </div>
 </div>
 
+
+<!-- Login with two-factor authentication !-->
+<div class="fm-dialog two-factor-dialog verify-two-factor-login hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title"></div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="two-factor-content-block">
+        <div class="tf-container">
+            <div class="dialog-body-subheader">
+                <span>[$19191]:</span>
+            </div>
+            <div class="fm-account-input">
+                <input class="pin-input" type="text" value="" placeholder="[$19193]" maxlength="6">
+            </div>
+            <div class="warning-text-field hidden">[$19192]</div>
+        </div>
+        <div class="clear"></div>
+        <div class="middle-button-wrapper inline-buttons">
+            <div class="default-56px-button grey-button back-button">
+                <div class="big-btn-txt">[$822]</div>
+            </div>
+            <div class="default-56px-button red-button submit-button">
+                <span class="label">[$1694]</span>
+                <span class="loading-image">
+                    <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Setup Two-Factor Authentication !-->
+<div class="fm-dialog two-factor-dialog setup-two-factor hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title"></div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="two-factor-content-block set-up-tfactor">
+        <div class="tf-container">
+            <div class="information-highlight success">
+                <span>[$17864]</span>
+            </div>
+            <div class="two-factor-qr-code"></div>
+            <div class="fm-account-input disabled">
+                <input class="two-factor-qr-seed" type="text" value="" readonly>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="middle-button-wrapper inline-buttons">
+            <div class="default-56px-button red-button two-factor-next-btn">
+                <div class="big-btn-txt">[$556]</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+ <!-- Set up Two factor verify the code from Authentication app -->
+<div class="fm-dialog two-factor-dialog setup-two-factor-verify hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title"></div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="two-factor-content-block verify-tfactor">
+        <div class="tf-container">
+            <div class="dialog-body-subheader">
+                <span>[$19196]:</span>
+            </div>
+            <div class="fm-account-input">
+                <input class="pin-input" type="text" value="" placeholder="[$19193]" maxlength="6">
+            </div>
+            <div class="information-highlight warning hidden">
+                <span>[$19197]</span>
+            </div>
+            <div class="information-highlight success hidden">
+                <span>[$19198]</span>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="middle-button-wrapper inline-buttons">
+            <div class="default-56px-button grey-button back-button">
+                <div class="big-btn-txt">[$822]</div>
+            </div>
+            <div class="default-56px-button red-button next-button">
+                <div class="big-btn-txt">[$556]</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Post set up of Two Factor Authentication to backup the recovery key -->
+<div class="fm-dialog two-factor-dialog setup-two-factor-backup-key hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title"></div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="two-factor-content-block tf-backup-key">
+        <div class="tf-container">
+            <div class="dialog-body-subheader">
+                <span>[$8963]</span>
+            </div>
+            <div class="recovery-key-container">
+                <div class="recovery-key-icon">
+                </div>
+                <div class="recovery-key-info-block">
+                    <div class="recovery-key-name">
+                        MEGA-RECOVERYKEY.txt
+                    </div>
+                    <div class="recovery-key-size">
+                        22 KB
+                    </div>
+                </div>
+                <div class="recovery-key-button">
+                    <div class="default-red-button">[$1988]</div>
+                </div>
+            </div>
+            <div class="information-highlight warning">
+                <span>[$19199]</span>
+            </div>
+            <div class="dialog-body-centre-text">[$19200]</div>
+        </div>
+        <div class="clear"></div>
+        <div class="middle-button-wrapper inline-buttons">
+            <div class="default-56px-button red-button finish-button">
+                <div class="big-btn-txt">[$148]</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Verify an account action with two-factor authentication PIN required !-->
+<div class="fm-dialog two-factor-dialog two-factor-verify-action hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title"></div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="two-factor-content-block">
+        <div class="tf-container">
+            <div class="dialog-body-subheader">
+                <span>[$19191]:</span>
+            </div>
+            <div class="fm-account-input">
+                <input class="pin-input" type="text" value="" placeholder="[$19193]" maxlength="6">
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="middle-button-wrapper inline-buttons">
+            <div class="default-56px-button red-button submit-button">
+                <span class="label">[$1694]</span>
+            </div>
+        </div>
+    </div>
+</div>

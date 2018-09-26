@@ -232,7 +232,9 @@ var useravatar = (function() {
             logger.warn('Invalid user-handle provided!', user);
             return false;
         }
-        logger.debug('Processing loaded user-avatar', user);
+        if (d > 1) {
+            logger.debug('Processing loaded user-avatar', user);
+        }
 
         if (user === u_handle) {
             var myavatar = ns.mine();
@@ -251,18 +253,23 @@ var useravatar = (function() {
         }
 
         var $avatar = null;
-        function updateAvatar() {
+        var updateAvatar = function() {
             if ($avatar === null) {
                 // only do a $(....) call IF .updateAvatar is called.
                 $avatar = $(ns.contact(user));
             }
 
             var $this = $(this);
+            if (this.classList.contains("chat-avatar")) {
+                // don't touch chat avatars. they update on their own.
+                return;
+            }
+
             $this.removeClass($this.data('color'))
                 .addClass($avatar.data('color'))
                 .data('color', $avatar.data('color'))
                 .safeHTML($avatar.html());
-        }
+        };
 
         $('.avatar-wrapper.' + user.replace(/[^\w-]/g, '')).each(updateAvatar);
 
@@ -349,16 +356,22 @@ var useravatar = (function() {
             }
             if (missingAvatars[handle]) {
                 // If the retrieval already failed for the current session
-                logger.warn('User-avatar retrieval for "%s" had failed...', handle, missingAvatars[handle]);
+                if (d > 1) {
+                    logger.warn('User-avatar retrieval for "%s" had failed...', handle, missingAvatars[handle]);
+                }
                 return MegaPromise.reject(missingAvatars[handle]);
             }
             if (pendingGetters[handle]) {
                 // It's already pending, return associated promise
-                logger.warn('User-avatar retrieval for "%s" already pending...', handle);
+                if (d > 1) {
+                    logger.warn('User-avatar retrieval for "%s" already pending...', handle);
+                }
                 return pendingGetters[handle];
             }
             if (avatars[handle]) {
-                logger.warn('User-avatar for "%s" is already loaded...', handle, avatars[handle]);
+                if (d > 1) {
+                    logger.warn('User-avatar for "%s" is already loaded...', handle, avatars[handle]);
+                }
                 return MegaPromise.resolve(EEXIST);
             }
 
@@ -366,13 +379,17 @@ var useravatar = (function() {
             pendingGetters[handle] = promise;
 
             var reject = function(error) {
-                logger.warn('User-avatar retrieval for "%s" failed...', handle, error);
+                if (d > 1) {
+                    logger.warn('User-avatar retrieval for "%s" failed...', handle, error);
+                }
 
                 missingAvatars[handle] = error;
                 promise.reject.apply(promise, arguments);
             };
 
-            logger.debug('Initiating user-avatar retrieval for "%s"...', handle);
+            if (d > 1) {
+                logger.debug('Initiating user-avatar retrieval for "%s"...', handle);
+            }
 
             mega.attr.get(handle, 'a', true, false)
                 .fail(reject)
@@ -384,7 +401,9 @@ var useravatar = (function() {
                             var ab = base64_to_ab(res);
                             ns.setUserAvatar(handle, ab);
 
-                            logger.info('User-avatar retrieval for "%s" successful.', handle, ab, avatars[handle]);
+                            if (d > 1) {
+                                logger.info('User-avatar retrieval for "%s" successful.', handle, ab, avatars[handle]);
+                            }
 
                             return promise.resolve();
                         }
@@ -444,7 +463,9 @@ var useravatar = (function() {
          * @param {String} handle The user handle
          */
         ns.invalidateAvatar = function(handle) {
-            logger.debug('Invalidating user-avatar for "%s"...', handle);
+            if (d > 1) {
+                logger.debug('Invalidating user-avatar for "%s"...', handle);
+            }
 
             if (pendingGetters[handle]) {
                 // this could indicate an out-of-sync flow, or calling M.avatars() twice...

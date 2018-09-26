@@ -860,13 +860,19 @@ var wireTransferDialog = {
             wireTransferDialog.$dialog.find('.email-address').text(email);
         }
 
-        // Update plan price in the dialog
-        var proPrice = pro.propay.selectedProPackage[5];
-        if (proPrice) {
-            this.$dialog.find('.amount').text(proPrice).closest('tr').removeClass('hidden');
-        }
-        else {
-            this.$dialog.find('.amount').closest('tr').addClass('hidden');
+        // Check a Pro plan is selected (it might not be if /wiretransfer page is visited directly)
+        if (pro.propay.selectedProPackage !== null) {
+
+            // Get the price of the package
+            var proPrice = pro.propay.selectedProPackage[5];
+
+            // Update plan price in the dialog
+            if (proPrice) {
+                this.$dialog.find('.amount').text(proPrice).closest('tr').removeClass('hidden');
+            }
+            else {
+                this.$dialog.find('.amount').closest('tr').addClass('hidden');
+            }
         }
     }
 };
@@ -1828,12 +1834,13 @@ var cardDialog = {
      * Inputs focused states
      */
     initInputsFocus: function() {
+        'use strict';
 
-        this.$dialog.find('.fm-account-input input').bind('focus', function() {
+        this.$dialog.find('.fm-account-input input').rebind('focus', function() {
             $(this).parent().addClass('focused');
         });
 
-        this.$dialog.find('.fm-account-input input').bind('blur', function() {
+        this.$dialog.find('.fm-account-input input').rebind('blur', function() {
             $(this).parent().removeClass('focused');
         });
     },

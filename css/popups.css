@@ -129,13 +129,18 @@
     max-width: calc(100% - 24px);
 }
 .popup.contacts-search .selected-contact-block {
-    height: auto;
-    border:1px solid rgba(0,0,0,0.2);
+    border: 1px solid rgba(0,0,0,0.2);
     border-radius: 3px;
-    background-color: rgba(0,0,0,0.02); 
-    margin-top: 8px; 
-    max-height: 72px;
+    background-color: rgba(0,0,0,0.02);
+    margin-top: 8px;
+    min-height: 72px;
     overflow: auto;
+    text-align: center;
+    font-size: 0;
+    line-height: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .contacts-search .selected-contact-block .selected-contact-card .user-card-name {
     max-width: -webkit-calc(100% - 2px);
@@ -152,9 +157,8 @@
 	height: auto;
 }
 .popup.contacts-search .selected-contact-block .select-contact-centre {
-    margin: 0 auto;
-    height: 66px;
-    display: table;
+    vertical-align: top;
+    display: inline-block;
 }
 .popup.contacts-search .selected-contact-block .small-rounded-avatar {
     margin: 0 auto;
@@ -172,7 +176,6 @@
     float: left;
     height: 54px;
     position: relative;
-    margin-right: 6px;
     margin-top: 6px;
     margin-bottom: 12px;
 }

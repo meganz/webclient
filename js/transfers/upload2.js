@@ -48,10 +48,9 @@ var ulmanager = {
     isUploading: false,
     ulSetupQueue: false,
     ulStartingPhase: false,
-    ulCompletingPhase: false,
+    ulCompletingPhase: Object.create(null),
     ulOverStorageQuota: false,
     ulOverStorageQueue: [],
-    ulPendingCompletion: [],
     ulBlockSize: 131072,
     ulBlockExtraSize: 1048576,
     ulMaxFastTrackSize: 1048576 * 3,
@@ -147,8 +146,21 @@ var ulmanager = {
             $("tr[id^='ul_']").removeClass('transfer-error').find('.transfer-status').text(l[7227]);
 
             this.ulOverStorageQueue.forEach(function(aFileUpload) {
-                aFileUpload.ul.uReqFired = null;
-                ulmanager.ulStart(aFileUpload);
+                var ul = aFileUpload.ul;
+
+                if (d) {
+                    ulmanager.logger.info('Attempting to resume ' + aFileUpload, [ul], aFileUpload);
+                }
+
+                if (ul) {
+                    ul.uReqFired = null;
+                    ulmanager.ulStart(aFileUpload);
+                }
+                else {
+                    // re-fire the putnodes api request for which we got the -17
+                    console.assert(Object(aFileUpload[0]).a === 'p', 'check this...');
+                    api_req.apply(null, aFileUpload);
+                }
             });
         }
 
@@ -448,6 +460,9 @@ var ulmanager = {
             ul_queue_num: file.pos,
             callback: function(res, ctx) {
                 if (!req.v || typeof res === 'number') {
+                    if (res === EOVERQUOTA && req_type === 'p') {
+                        return ulmanager.ulShowOverStorageQuotaDialog([req, ctx]);
+                    }
                     ulmanager.ulCompletePending2.apply(ulmanager, arguments);
                 }
                 else {
@@ -683,41 +698,23 @@ var ulmanager = {
                     {raw: img !== 1 && img, isVideo: vid}
                 );
 
-                if (vid && ulmanager.ulEventData[file.id]) {
-                    if (d) {
-                        console.debug('Increasing the number of expected file attributes for the chat to be aware.');
-                        console.assert(ulmanager.ulEventData[file.id].efa === 1, 'Check this...');
+                var uled = ulmanager.ulEventData[file.id];
+                if (uled) {
+                    if (vid) {
+                        if (d) {
+                            console.debug('Increasing expected file attributes for the chat to be aware...');
+                            console.assert(uled.efa === 1, 'Check this...');
+                        }
+                        uled.efa += 2;
                     }
-                    ulmanager.ulEventData[file.id].efa += 2;
+                    uled.faid = file.faid;
                 }
             }
         }
 
         M.ulstart(file);
-        file.done_starting();
-    },
-
-    ulCompletePending: function UM_ul_completepending(target) {
-        if (ulmanager.ulPendingCompletion.length) {
-            ulmanager.logger.error("I'm weak, debug me.");
-            var ul = ulmanager.ulPendingCompletion.shift();
-            // var ctx = {
-            // target : target,
-            // ul_queue_num : ul[3],
-            // size: ul_queue[ul[3]].size,
-            // callback : ul_completepending2,
-            // faid : ul[1].faid,
-            // file : ul[1]
-            // };
-            // api_completeupload(ul[0],ul[1],ul[2],ctx);
-
-            var file = ul[1];
-            file.response = ul[0];
-            file.filekey = ul[2];
-            ulmanager.ulFinalize(file);
-        }
-        else {
-            ulmanager.ulCompletingPhase = false;
+        if (file.done_starting) {
+            file.done_starting();
         }
     },
 
@@ -732,10 +729,12 @@ var ulmanager = {
             if (ctx.faid && h) {
                 api_attachfileattr(h, ctx.faid);
             }
+
             if (ul_queue[ctx.ul_queue_num]) {
                 ulmanager.ulIDToNode[ulmanager.getGID(ul_queue[ctx.ul_queue_num])] = h || ctx.target;
                 M.ulcomplete(ul_queue[ctx.ul_queue_num], h || false, ctx.faid);
             }
+
             if (MediaInfoLib.isFileSupported(h)) {
                 var n = M.d[h] || false;
                 var file = ctx.file;
@@ -761,9 +760,11 @@ var ulmanager = {
                     done();
                 }
             }
-            ctx.file.ul_failed = false;
-            ctx.file.retries = 0;
-            ulmanager.ulCompletePending(ctx.target);
+
+            if (ctx.file.owner) {
+                ctx.file.ul_failed = false;
+                ctx.file.retries = 0;
+            }
         };
 
         if (typeof res === 'object' && res.f) {
@@ -799,9 +800,7 @@ var ulmanager = {
         else {
             var ul = ul_queue[ctx.ul_queue_num];
 
-            onIdle(function() {
-                M.ulerror(ul, res);
-            });
+            M.ulerror(ul, res);
 
             if (res !== EOVERQUOTA && res !== EGOINGOVERQUOTA) {
                 srvlog('Unexpected upload completion server response (' + res
@@ -812,7 +811,7 @@ var ulmanager = {
         if (ctx.file.owner) {
             ctx.file.owner.destroy();
         }
-        else {
+        else if (!oIsFrozen(ctx.file)) {
             oDestroy(ctx.file);
         }
     },
@@ -1148,14 +1147,11 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
                     mac[2] ^ mac[3]
                 ];
 
-                if (!u_k_aes) {
-                    console.error('No master key found...');
-                }
-                else if (!this.file.ulCompletingPhase) {
+                if (u_k_aes && this.gid && !ulmanager.ulCompletingPhase[this.gid]) {
                     var u8 = new Uint8Array(response);
 
                     this.file.filekey = filekey;
-                    this.file.ulCompletingPhase = true;
+                    ulmanager.ulCompletingPhase[this.gid] = Date.now();
                     this.file.response = (u8[35] === 1)
                         ? ab_to_base64(response)
                         : ab_to_str(response);
@@ -1163,8 +1159,7 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
                     u8 = undefined;
                 }
                 else {
-                    ASSERT(0, 'BUG: Assigning to file.completion which is unused.');
-                    this.file.completion.push([response.url, this.file, filekey, this.file.id]);
+                    console.assert(false, 'check this...');
                 }
             }
 
@@ -1537,7 +1532,6 @@ ulQueue.poke = function(file, meth) {
         file.progress = Object.create(null);
         file.posturl = "";
         file.uReqFired = null;
-        file.completion = [];
         file.abort = true;
 
         ulQueue.pause(gid);
@@ -1567,7 +1561,6 @@ ulQueue.poke = function(file, meth) {
     if (meth !== 0xdead) {
         file.sent = 0;
         file.progress = Object.create(null);
-        file.completion = [];
         file.owner = new FileUpload(file);
         ulQueue[meth || 'push'](file.owner);
     }

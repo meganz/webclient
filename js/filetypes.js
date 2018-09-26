@@ -533,7 +533,7 @@ function fileIcon(node) {
             icon = 'folder-shared';
 
             if(is_mobile){
-                icon = 'folder-shared_v2';
+                icon = 'outgoing-share-folder';
             }
         }
         else if ( mega.megadrop.pufs[node.h] && mega.megadrop.pufs[node.h].s !== 1) {

@@ -16,7 +16,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
     }
     else {
         var uqres = false;
-        var pstatus = u_attr.p;
+        var pstatus = Object(window.u_attr).p;
         var mRootID = M.RootID;
 
         if (blockui) {

@@ -188,7 +188,7 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
             self._connectionRetryUI();
         });
 
-        $(window).unbind("offline.megaChatRetry" + self._instanceIdx);
+        $(window).off("offline.megaChatRetry" + self._instanceIdx);
         $(window).rebind("online.megaChatRetry" + self._instanceIdx, function() {
             self._isOffline = false;
             if (
@@ -201,7 +201,7 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
                 }, 3000);
             }
 
-            $(window).unbind("online.megaChatRetry" + self._instanceIdx);
+            $(window).off("online.megaChatRetry" + self._instanceIdx);
         });
 
         if (!self._connectionRetryInProgress) {
@@ -236,9 +236,9 @@ ConnectionRetryManager.prototype.gotConnected = function(){
         self._connectionRetryInProgress = null;
     }
     //console.error(self._instanceIdx, "unbind mouse move");
-    $(document).unbind("mousemove.megaChatRetry" + self._instanceIdx);
+    $(document).off("mousemove.megaChatRetry" + self._instanceIdx);
 
-    $(window).unbind("online.megaChatRetry" + self._instanceIdx);
+    $(window).off("online.megaChatRetry" + self._instanceIdx);
     $(window).rebind("offline.megaChatRetry" + self._instanceIdx, function() {
         if (localStorage.connectionRetryManagerDebug) {
             self.logger.warn("OS notified we are offline.");
@@ -252,7 +252,7 @@ ConnectionRetryManager.prototype.gotConnected = function(){
             self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
             self.gotDisconnected();
         }
-        $(window).unbind("offline.megaChatRetry" + self._instanceIdx);
+        $(window).off("offline.megaChatRetry" + self._instanceIdx);
     });
 
     if (self._$connectingPromise) {

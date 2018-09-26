@@ -56,7 +56,7 @@ BacktickRtfFilter.prototype.processStripRtfFromMessage = function(msg) {
 };
 
 
-BacktickRtfFilter.prototype.escapeAndProcessMessage = function(e, eventData, props, mainProp) {
+BacktickRtfFilter.prototype.escapeAndProcessMessage = function(e, eventData, props, mainProp, skipSet) {
     "use strict";
     var self = this;
 
@@ -80,6 +80,7 @@ BacktickRtfFilter.prototype.escapeAndProcessMessage = function(e, eventData, pro
         return; // not yet decrypted.
     }
 
+    var tmp = {};
 
     props.forEach(function(prop) {
         var messageContents = eventData.message[prop] ? eventData.message[prop] : textContents;
@@ -113,11 +114,16 @@ BacktickRtfFilter.prototype.escapeAndProcessMessage = function(e, eventData, pro
         if (prop === "messageHtml") {
             messageContents = messageContents.replace(/\n/gi, "<br/>");
         }
-        eventData.message[prop] = messageContents;
+        if (!skipSet) {
+            eventData.message[prop] = messageContents;
+        }
+        else {
+            tmp[prop] = messageContents;
+        }
     });
 
 
-    return eventData.message[mainProp];
+    return !skipSet ? eventData.message[mainProp] : tmp[mainProp];
 };
 
 BacktickRtfFilter.PARSER_STATE = {

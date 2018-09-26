@@ -898,9 +898,6 @@ img.bottom-page.business4 {
     .business-page .bottom-page.top-bl {
         height: auto;
     }
-    .business .bottom-page .top-head {
-        background-color: transparent;
-    }
     .business .bottom-page .top-head::after {
         display: none;
     }

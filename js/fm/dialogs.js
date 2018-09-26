@@ -135,7 +135,7 @@
             $btn.removeClass('disabled');
         }
         else {
-            var forceEnabled = $.copyToShare || $.onImportCopyNodes || $.saveToDialog;
+            var forceEnabled = $.copyToShare || $.copyToUpload || $.onImportCopyNodes || $.saveToDialog;
 
             console.assert(!$.copyToShare || Object($.selected).length === 0, 'check this...');
 
@@ -146,6 +146,18 @@
                 $btn.removeClass('disabled');
             }
         }
+    };
+
+    /**
+     * Select tree item node
+     * @param {String} h The node handle
+     */
+    var selectTreeItem = function(h) {
+        onIdle(function() {
+            if (!$('#mctreesub_' + h, $dialog).hasClass('opened')) {
+                $('#mctreea_' + h, $dialog).trigger('click');
+            }
+        });
     };
 
     /**
@@ -229,11 +241,18 @@
                 name = '';
             }
 
+            var nameFmt = '@@';
+            if (section === 'conversations') {
+                nameFmt = name && megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(name)) || nameFmt;
+            }
+
             $dbc.safeAppend(
                 '<a class="fm-breadcrumbs @@ @@" title="@@" data-node="@@">' +
-                '    <span class="right-arrow-bg"><span>@@</span></span>' +
+                '    <span class="right-arrow-bg"><span>' + nameFmt + '</span></span>' +
                 '</a>', type, i > 0 ? 'has-next-button' : '', titles[h] || name, h, name
             );
+
+            // selectTreeItem(h);
         }
 
         if (path.length) {
@@ -273,7 +292,7 @@
         var jScrollPane = function() {
             var jsp = $div.data('jsp');
 
-            if ($.selected.length > 4) {
+            if (items.length > 4) {
                 if (jsp) {
                     jsp.reinitialise();
                 }
@@ -284,6 +303,15 @@
             else if (jsp) {
                 jsp.destroy();
             }
+        };
+
+        var setTitle = function() {
+            $('.fm-picker-dialog-title', $dialog)
+                .text(
+                    items.length < 2
+                        ? l[19338]
+                        : escapeHTML(l[19339]).replace('[X]', items.length)
+                );
         };
 
         if ($.saveToDialogNode) {
@@ -306,6 +334,15 @@
             else {
                 $('.summary-selected', $dialog).removeClass('hidden');
             }
+
+            if ($.copyToUpload) {
+                items = $.copyToUploadData[0];
+
+                for (var j = items.length; j--;) {
+                    items[j].uuid = makeUUID();
+                }
+                setTitle();
+            }
         }
 
         if (!single) {
@@ -316,10 +353,11 @@
 
         for (var i = 0; i < items.length; i++) {
             var h = items[i];
-            var n = M.getNodeByHandle(h);
-            var name = names[h] || M.getNameByHandle(h);
+            var n = M.getNodeByHandle(h) || Object(h);
+            var name = names[h] || M.getNameByHandle(h) || n.name;
             var tail = '<div class="delete-img icon"></div>';
             var icon = fileIcon(n);
+            var data = n.uuid || h;
 
             if (single) {
                 tail = '<span>(@@)</span>';
@@ -332,7 +370,7 @@
                 '<div class="item-row" data-node="@@">' +
                 '    <div class="transfer-filetype-icon file @@"></div>' +
                 '    <div class="summary-ff-name">@@</div> &nbsp; ' + tail +
-                '</div>', h, icon, str_mtrunc(name, 42), String(l[10663]).replace('[X]', items.length - 1)
+                '</div>', data, icon, str_mtrunc(name, 42), String(l[10663]).replace('[X]', items.length - 1)
             );
 
             if (single) {
@@ -341,10 +379,10 @@
         }
 
         $icon.rebind('click', function() {
+            $div.off('click.unfold');
             setSelectedItems(!single);
             return false;
         });
-        $div.unbind('click.unfold');
 
         if (single) {
             if (items.length > 1) {
@@ -364,12 +402,28 @@
 
             $('.delete-img.icon', $div).rebind('click', function() {
                 var $row = $(this).parent();
+                var data = $row.attr('data-node');
+
                 $row.remove();
                 jScrollPane();
-                array.remove($.selected, $row.attr('data-node'));
-                if ($.selected.length < 2) {
+
+                if ($.copyToUpload) {
+                    for (var i = items.length; i--;) {
+                        if (items[i].uuid === data) {
+                            items.splice(i, 1);
+                            break;
+                        }
+                    }
+                    setTitle();
+                }
+                else {
+                    array.remove(items, data);
+                }
+
+                if (items.length < 2) {
                     setSelectedItems(true);
                 }
+
                 return false;
             });
         }
@@ -390,6 +444,10 @@
 
         if ($.copyToShare || section === 'shared-with-me') {
             return l[1344]; // Share
+        }
+
+        if ($.copyToUpload) {
+            return l[372]; // Upload
         }
 
         if (section === 'conversations') {
@@ -419,6 +477,10 @@
 
         if ($.copyToShare) {
             return l[1344]; // Share
+        }
+
+        if ($.copyToUpload) {
+            return l[372]; // Upload  - will be replaced later
         }
 
         if ($.saveToDialog) {
@@ -486,7 +548,9 @@
                         namesCombine = namesCombine.substr(0, 37);
                         namesCombine += '...';
                     }
-                    groupElem += '<span class="nw-contact-name group">' + escapeHTML(namesCombine) + '</span>';
+                    groupElem += '<span class="nw-contact-name group">' +
+                        megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(namesCombine)) +
+                        '</span>';
                     groupElem += '<span class="nw-contact-group">' + nb + ' chat members </span>';
                     groupElem += '<span class="nw-contact-checkbox">' + '</span> </span>';
                     groupElem = '<li id="cpy-dlg-chat-itm-' + handle + '">' + groupElem + '</li>';
@@ -626,7 +690,7 @@
         var $dpa = $('.fm-picker-dialog-panel-arrows', $dialog).removeClass('hidden');
 
         if (section === 'cloud-drive' || section === 'folder-link') {
-            M.buildtree(M.d[M.RootID], 'fm-picker-dialog');
+            M.buildtree(M.d[M.RootID], 'fm-picker-dialog', 'cloud-drive');
         }
         else if (section === 'shared-with-me') {
             M.buildtree({h: 'shares'}, 'fm-picker-dialog');
@@ -708,7 +772,7 @@
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).removeClass('hidden');
         }
 
-        if (!u_type || $.saveToDialog || $.copyToShare || $.mcImport) {
+        if (!u_type || $.saveToDialog || $.copyToShare || $.copyToUpload || $.mcImport) {
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
             $('.fm-picker-dialog-button.conversations', $dialog).addClass('hidden');
         }
@@ -746,7 +810,7 @@
 
                     $items
                         .rebind('click', function() {
-                            $items.unbind('click');
+                            $items.off('click');
 
                             $items.removeClass('active');
                             $(this).addClass('active');
@@ -828,6 +892,23 @@
     };
 
     /**
+     * A version of the Copy dialog used when uploading.
+     * @param {Array} files The files being uploaded.
+     * @param {Object} [emptyFolders] Empty folders to create hierarchy for.
+     * @global
+     */
+    global.openCopyUploadDialog = function openCopyUploadDialog(files, emptyFolders) {
+        M.safeShowDialog('copy', function() {
+            $.copyToUploadData = [files, emptyFolders];
+            var tab = M.currentrootid === 'shares' ? 'shared-with-me' : 'cloud-drive';
+            handleOpenDialog(tab, M.currentdirid, 'copyToUpload');
+            return $dialog;
+        });
+
+        return false;
+    };
+
+    /**
      * Generic function to open the Copy dialog.
      * @global
      */
@@ -884,6 +965,9 @@
         });
         treePanelHeader.parentNode.removeChild(treePanelHeader);
 
+        // dialog sort
+        $dialog.find('.fm-picker-dialog-panel-header').append($('.dialog-sorting-menu.hidden').clone());
+
         $('.fm-picker-dialog-tree-panel.conversations .fm-picker-dialog-panel-header span:first').text(l[17765]);
 
         $('.fm-dialog-close, .dialog-cancel-button', $dialog).rebind('click', closeDialog);
@@ -934,8 +1018,12 @@
             var $self = $(this);
 
             if (!$self.hasClass('active')) {
-
                 var $menu = $('.dialog-sorting-menu', $dialog).removeClass('hidden');
+
+                var p = $self.position();
+
+                $menu.css('left', p.left + 24 + 'px');
+                $menu.css('top', p.top - 8 + 'px');
 
                 if (section === 'contacts') {
                     // Enable all menu items
@@ -944,7 +1032,7 @@
                 }
                 else {
                     // Hide sort by status and last-interaction items from menu
-                    $menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+                    $menu.find('*[data-by=status],*[data-by=last-interaction],*[data-by=fav]').addClass('hidden');
                     $menu.find('*[data-by=label]').removeClass('hidden');
                 }
 
@@ -953,27 +1041,31 @@
                 // Copy dialog key only
                 var key = $.dialog[0].toUpperCase() + $.dialog.substr(1) + section;
 
+                $menu.find('.dropdown-item').removeClass('active asc desc');
+
                 // Check existance of previous sort options, direction (dir)
                 if (localStorage['sort' + key + 'Dir']) {
                     $.sortTreePanel[key].dir = localStorage['sort' + key + 'Dir'];
+                    $menu.find('.dropdown-item[data-by="' + localStorage['sort' + key + 'By'] + '"]')
+                        .addClass($.sortTreePanel[key].dir > 0 ? 'asc' : 'desc');
                 }
                 else {
                     $.sortTreePanel[key].dir = 1;
+                    $menu.find('.dropdown-item[data-by="' + localStorage['sort' + key + 'By'] + '"]')
+                        .addClass('asc');
                 }
 
                 // Check existance of previous sort option, ascending/descending (By)
                 if (localStorage['sort' + key + 'By']) {
                     $.sortTreePanel[key].by = localStorage['sort' + key + 'By'];
+                    $menu.find('.dropdown-item[data-by="' + localStorage['sort' + key + 'By'] + '"]')
+                        .addClass('active');
                 }
                 else {
                     $.sortTreePanel[key].by = 'name';
+                    $menu.find('.dropdown-item[data-by="name"]')
+                        .addClass('active');
                 }
-
-                // dir stands for direction i.e. [ascending, descending]
-                $dialog.find('.dialog-sorting-menu .sorting-menu-item')
-                    .removeClass('active')
-                    .filter('*[data-by=' + $.sortTreePanel[key].by + '],*[data-dir=' + $.sortTreePanel[key].dir + ']')
-                    .addClass('active');
 
                 $self.addClass('active');
                 $dialog.find('.dialog-sorting-menu').removeClass('hidden');
@@ -984,29 +1076,30 @@
             }
         });
 
-        $('.sorting-menu-item', $dialog).rebind('click', function() {
+        $('.dialog-sorting-menu .dropdown-item', $dialog).rebind('click', function() {
             var $self = $(this);
 
-            if (!$self.hasClass('active')) {
+            // Arbitrary element data
+            var data = $self.data();
+            var key = $.dialog[0].toUpperCase() + $.dialog.substr(1) + section;
 
-                // Arbitrary element data
-                var data = $self.data();
-                var key = $.dialog[0].toUpperCase() + $.dialog.substr(1) + section;
-
-                // Check arbitrary data associated with current menu item
-                if (data.dir) {
-                    localStorage['sort' + key + 'Dir'] = $.sortTreePanel[key].dir = data.dir;
-                }
-                if (data.by) {
-                    localStorage['sort' + key + 'By'] = $.sortTreePanel[key].by = data.by;
-                }
-
-                buildDialogTree();
-
-                // Disable previously selected
-                $self.parent().find('.sorting-menu-item').removeClass('active');
-                $self.addClass('active');
+            if (data.by) {
+                localStorage['sort' + key + 'By'] = $.sortTreePanel[key].by = data.by;
             }
+
+            $self.removeClass('asc desc');
+
+            if ($self.hasClass('active')) {
+                $.sortTreePanel[key].dir *= -1;
+                localStorage['sort' + key + 'Dir'] = $.sortTreePanel[key].dir;
+                $self.addClass($.sortTreePanel[key].dir > 0 ? 'asc' : 'desc');
+            }
+
+            buildDialogTree();
+
+            // Disable previously selected
+            $self.parent().find('.sorting-menu-item').removeClass('active');
+            $self.addClass('active');
 
             // Hide menu
             $('.dialog-sorting-menu', $dialog).addClass('hidden');
@@ -1023,7 +1116,7 @@
                 if (exit) {
                     $lis.removeClass('tree-item-on-search-hidden');
                     if (value) {
-                        $(this).val('').blur();
+                        $(this).val('').trigger("blur");
                     }
                 }
                 else {
@@ -1051,7 +1144,7 @@
                 if (exit) {
                     treesearch = false;
                     if (value) {
-                        $(this).val('').blur();
+                        $(this).val('').trigger("blur");
                     }
                 }
                 else {
@@ -1077,12 +1170,8 @@
             // Auto-select the created folder.
             $.cfpromise.done(function(h) {
                 var p = $.cftarget;
-                onIdle(function() {
-                    $('#mctreea_' + p, $dialog).trigger('click');
-                    onIdle(function() {
-                        $('#mctreea_' + h, $dialog).trigger('click');
-                    });
-                });
+                selectTreeItem(p);
+                selectTreeItem(h);
             });
         });
 
@@ -1111,7 +1200,7 @@
             setDialogBreadcrumb(String($(this).attr('id')).replace('mctreea_', ''));
 
             treesearch = false;
-            M.buildtree({h: $.mcselected}, 'fm-picker-dialog');
+            M.buildtree({h: $.mcselected}, 'fm-picker-dialog', section);
             treesearch = ts;
             disableFolders();
 
@@ -1204,7 +1293,7 @@
             var itemTopPos = $item.offset().top;
             var $tooltip = $('.contact-preview', $dialog);
             var avatar = useravatar.contact(owner, '', 'div');
-            var note = !share.level && !share.circular && "You don't have write privileges in this share.";
+            var note = !share.level && !share.circular && l[19340];
 
             $tooltip.find('.contacts-info.body')
                 .safeHTML(
@@ -1271,7 +1360,20 @@
             var shareToContactId = $.shareToContactId;
             delete $.saveToDialogPromise;
 
+            if ($.copyToUpload) {
+                var data = $.copyToUploadData;
+                closeDialog();
+                $.addUploadTarget = $.mcselected;
+                M.addUpload(data[0], false, data[1]);
+                return false;
+            }
+
             if ($.moveDialog) {
+                if (section === "shared-with-me") {
+                    var $tooltip = $('.contact-preview', $dialog);
+                    clearTimeout(dialogTooltipTimer);
+                    $tooltip.hide();
+                }
                 closeDialog();
                 M.safeMoveNodes($.mcselected);
                 return false;
@@ -1279,7 +1381,7 @@
             closeDialog();
 
             if (saveToDialog) {
-                saveToDialogCb(saveToDialogNode, $.mcselected, section === 'conversations');
+                saveToDialogCb(saveToDialogNode, section === 'conversations' && chats || $.mcselected);
                 return false;
             }
 
@@ -1317,7 +1419,7 @@
                     var attachNodes = function(room) {
                         delay('copydialog:chatattachnodes', function() {
                             showToast('send-chat', (selectedNodes.length > 1) ? l[17767] : l[17766]);
-                            M.openFolder('chat/' + room.roomId);
+                            M.openFolder('chat/' + (room.type === 'group' ? 'g/' : '') + room.roomId);
                         });
                         room.attachNodes(selectedNodes);
                     };

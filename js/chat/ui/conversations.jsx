@@ -27,7 +27,7 @@ var renderMessageSummary = function(lastMessage) {
         else {
             renderableSummary = lastMessage.textContents;
         }
-        renderableSummary = renderableSummary && removeHTML(renderableSummary, true) || '';
+        renderableSummary = renderableSummary && escapeHTML(renderableSummary, true) || '';
 
         var escapeUnescapeArgs = [
             {'type': 'onPreBeforeRenderMessage', 'textOnly': true},
@@ -62,12 +62,51 @@ var renderMessageSummary = function(lastMessage) {
         renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
         renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
     }
-    return renderableSummary;
-}
 
+    var author = Message.getContactForMessage(lastMessage);
+    if (author) {
+        if (!lastMessage._contactChangeListener && author.addChangeListener) {
+            lastMessage._contactChangeListener = author.addChangeListener(function() {
+                delete lastMessage.renderableSummary;
+            });
+        }
+
+        if (lastMessage.chatRoom.type === "private") {
+            if (author && author.u === u_handle) {
+                renderableSummary = l[19285] + " " + renderableSummary;
+            }
+        }
+        else if (lastMessage.chatRoom.type === "group") {
+            if (author) {
+                if (author.u === u_handle) {
+                    renderableSummary = l[19285] + " " + renderableSummary;
+                }
+                else {
+                    var name = M.getNameByHandle(author.u);
+                    if (String(name).length > 10) {
+                        if (author.firstName) {
+                            name = author.firstName;
+                            if (author.lastName && String(author.lastName).length > 0) {
+                                var letter = String(author.lastName)[0];
+                                if (letter && letter.toUpperCase()) {
+                                    name += " " + letter.toUpperCase();
+                                }
+                            }
+                        }
+                    }
+                    name = ellipsis(name, undefined, 11);
+                    if (name) {
+                        renderableSummary = escapeHTML(name) + ": " + renderableSummary;
+                    }
+                }
+            }
+        }
+    }
+    return renderableSummary;
+};
 var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
-}
+};
 
 var ConversationsListItem = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
@@ -190,9 +229,11 @@ var ConversationsListItem = React.createClass({
         var lastMessageDiv = null;
         var lastMessageDatetimeDiv = null;
         var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
+        var lastMsgDivClasses;
         if (lastMessage) {
-            var lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
-            var renderableSummary = renderMessageSummary(lastMessage);
+            lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
+            // safe some CPU cycles...
+            var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
             lastMessage.renderableSummary = renderableSummary;
 
             lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
@@ -214,7 +255,7 @@ var ConversationsListItem = React.createClass({
             lastMessageDatetimeDiv = <div className="date-time">{curTimeMarker}</div>;
         }
         else {
-            var lastMsgDivClasses = "conversation-message";
+            lastMsgDivClasses = "conversation-message";
 
             /**
              * Show "Loading" until:
@@ -353,7 +394,7 @@ var ArchivedConversationsListItem = React.createClass({
         var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
         if (lastMessage) {
             var lastMsgDivClasses = "conversation-message";
-            var renderableSummary = renderMessageSummary(lastMessage);
+            var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
             lastMessage.renderableSummary = renderableSummary;
 
             lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
@@ -780,7 +821,7 @@ var ConversationsApp = React.createClass({
                 // is visible/active at the moment
                 if (
                     (megaChat.currentlyOpenedChat && megaChat.getCurrentRoom().isReadOnly()) ||
-                    $(e.target).is(".messages-textarea") ||
+                    $(e.target).is(".messages-textarea, input, textarea") ||
                     ((e.ctrlKey || e.metaKey || e.which === 19) && (e.keyCode === 67)) ||
                     e.keyCode === 91 /* cmd+... */ ||
                     e.keyCode === 17 /* ctrl+... */ ||
@@ -826,8 +867,8 @@ var ConversationsApp = React.createClass({
                 }
 
                 var $typeArea = $('.messages-textarea:visible:first');
-                if ($typeArea.size() === 1 && !$typeArea.is(":focus")) {
-                    $typeArea.focus();
+                if ($typeArea.length === 1 && !$typeArea.is(":focus")) {
+                    $typeArea.trigger("focus");
                     e.megaChatHandled = true;
                     moveCursortoToEnd($typeArea[0]);
                 }
@@ -903,7 +944,7 @@ var ConversationsApp = React.createClass({
     },
     componentWillUnmount: function() {
         window.removeEventListener('resize', this.handleWindowResize);
-        $(document).unbind('keydown.megaChatTextAreaFocus');
+        $(document).off('keydown.megaChatTextAreaFocus');
         mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
     },
     componentDidUpdate: function() {

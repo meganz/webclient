@@ -206,14 +206,15 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
             if (d) {
                 console.debug('Holding tiff thumb creation...', ab && ab.byteLength);
             }
-            onIdle(function() {
-                mBroadcaster.once('TIFThumbHandler.ready', makeTIF);
-            });
+            mBroadcaster.once('TIFThumbHandler.ready', makeTIF);
             return;
         }
         TIFThumbHandler.working = true;
 
         onIdle(function() {
+            if (d) {
+                console.debug('...unholding tiff thumb creation.', mBroadcaster.hasListener('TIFThumbHandler.ready'));
+            }
             TIFThumbHandler.working = false;
             mBroadcaster.sendMessage('TIFThumbHandler.ready');
         });
@@ -233,7 +234,7 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
                 var tiff = false;
 
                 try {
-                    Tiff.initialize({TOTAL_MEMORY: 33554432});
+                    Tiff.initialize({TOTAL_MEMORY: 134217728});
                     tiff = new Tiff(new Uint8Array(ab));
 
                     ab = dataURLToAB(tiff.toDataURL());
@@ -606,8 +607,8 @@ FullScreenManager.prototype.destroy = function() {
 
     if (!this.destroyed) {
         this.destroyed = true;
-        this.$button.unbind('click.' + this.iid);
-        this.$document.unbind('fullscreenchange.' + this.iid);
+        this.$button.off('click.' + this.iid);
+        this.$document.off('fullscreenchange.' + this.iid);
         this.exitFullscreen();
     }
 };
@@ -810,7 +811,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         $video.rebind('ended.idle pause.idle', function() {
             clearTimeout(timer);
             $wrapper.removeClass('mouse-idle');
-            $document.unbind('mousemove.idle');
+            $document.off('mousemove.idle');
             playevent = false;
         });
 
@@ -1015,14 +1016,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
         $wrapper.rebind('video-destroy', function() {
             clearTimeout(timer);
             $wrapper.removeClass('mouse-idle video-theatre-mode video')
-                .unbind('is-over-quota')
+                .off('is-over-quota')
                 .find('.viewer-pending').addClass('hidden');
-            $video.unbind('mousemove.idle');
-            $document.unbind('mousemove.videoprogress');
-            $document.unbind('mouseup.videoprogress');
-            $document.unbind('mousemove.volumecontrol');
-            $document.unbind('mouseup.volumecontrol');
-            $(window).unbind('video-destroy.main');
+            $video.off('mousemove.idle');
+            $document.off('mousemove.videoprogress');
+            $document.off('mouseup.videoprogress');
+            $document.off('mousemove.volumecontrol');
+            $document.off('mouseup.volumecontrol');
+            $(window).off('video-destroy.main');
             dlmanager.isStreaming = false;
             fullScreenManager.destroy();
             pagemetadata();
@@ -1388,6 +1389,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
         get: function() {
             var v = Object(this.Video && this.Video[0]);
             return v.Height | 0;
+        }
+    });
+    Object.defineProperty(MediaInfoReport.prototype, 'rotation', {
+        get: function() {
+            var v = Object(this.Video && this.Video[0]);
+            return v.Rotation | 0;
         }
     });
     Object.defineProperty(MediaInfoReport.prototype, 'shortformat', {
@@ -2124,7 +2131,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
     var miCollectedBytes = 0;
     var miCollectRunning = 0;
     var miCollectProcess = function() {
-        if (localStorage.noMediaCollect || miCollectedBytes > 0x1000000) {
+        if (localStorage.noMediaCollect || miCollectedBytes > 0x1000000 || M.chat) {
             return 0xDEAD;
         }
 
@@ -2507,6 +2514,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
             fps = MediaInfoLib.build;
             width = MediaInfoLib.version;
             playtime = this.avflv;
+        }
+        else {
+            var r = res.rotation;
+
+            if (r === 90 || r === 270) {
+                r = width;
+                width = height;
+                height = r;
+            }
         }
 
         width <<= 1;

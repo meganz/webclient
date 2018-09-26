@@ -3,10 +3,11 @@
 var u_p; // prepared password
 var u_attr; // attributes
 
+/* jshint -W098 */  // It is used in another file
 // log in
 // returns user type if successful, false if not
 // valid user types are: 0 - anonymous, 1 - email set, 2 - confirmed, but no RSA, 3 - complete
-function u_login(ctx, email, password, uh, permanent) {
+function u_login(ctx, email, password, uh, pinCode, permanent) {
     var keypw;
 
     ctx.result = u_login2;
@@ -26,8 +27,9 @@ function u_login(ctx, email, password, uh, permanent) {
         keypw = prepare_key_pw(password);
     }
 
-    api_getsid(ctx, email, keypw, uh);
+    api_getsid(ctx, email, keypw, uh, pinCode);
 }
+/* jshint +W098 */
 
 function u_login2(ctx, ks) {
     if (ks !== false) {
@@ -59,8 +61,8 @@ function u_login2(ctx, ks) {
     }
 }
 
-// if no valid session present, return false if force == false, otherwise create anonymous account and return 0 if successful or false if error;
-// if valid session present, return user type
+// if no valid session present, return ENOENT if force == false, otherwise create anonymous account and return 0 if
+// successful or ENOENT if error; if valid session present, return user type
 function u_checklogin(ctx, force, passwordkey, invitecode, invitename, uh) {
     if ((u_sid = u_storage.sid)) {
         api_setsid(u_sid);
@@ -93,6 +95,7 @@ function u_checklogin2(ctx, u) {
 }
 
 function u_checklogin2a(ctx, ks) {
+
     if (ks === false) {
         ctx.checkloginresult(ctx, false);
     }
@@ -121,12 +124,12 @@ function u_checklogin3a(res, ctx) {
     else {
         u_attr = res;
         var exclude = [
-            'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
-            'ts', 'u', 'currk', 'flags', 'lup', 'since', 'ut'
+            'aav', 'aas', 'c', 'currk', 'email', 'flags', 'k', 'lup', 'name',
+            'p', 'privk', 'pubk', 's', 'since', 'ts', 'u', 'ut'
         ];
 
         for (var n in u_attr) {
-            if (exclude.indexOf(n) == -1) {
+            if (exclude.indexOf(n) === -1) {
                 try {
                     u_attr[n] = from8(base64urldecode(u_attr[n]));
                 } catch (e) {
@@ -310,6 +313,13 @@ function u_setrsa(rsakey) {
             }
 
             u_privk = rsakey;
+
+            // If coming from a #confirm link in the new registration process and logging in from a clean browser
+            // session the u_attr might not be set to an object yet, this will prevent an exception below
+            if (typeof u_attr === 'undefined') {
+                u_attr = {};
+            }
+
             u_attr.privk = u_storage.privk = base64urlencode(crypto_encodeprivkey(rsakey));
             u_attr.pubk = u_storage.pubk = base64urlencode(crypto_encodepubkey(rsakey));
 
@@ -371,53 +381,29 @@ function createanonuser2(u, ctx) {
     ctx.createanonuserresult(ctx, u);
 }
 
-function setpwreq(newpw, ctx) {
-    var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newpw));
-
-    api_req({
-        a: 'upkm',
-        k: a32_to_base64(encrypt_key(pw_aes, u_k)),
-        uh: stringhash(u_attr['email'].toLowerCase(), pw_aes)
-    }, ctx);
-}
-
-function setpwset(confstring, ctx) {
-    api_req({
-        a: 'up',
-        uk: confstring
-    }, ctx);
-}
-
 /**
- *  checkMyPassword
+ * Check if the password is the user's password without doing any API call. It tries to decrypt the user's key.
  *
- *  Check if the password is the user's password without doing
- *  any API call, it tries to decrypt the user's private key.
- *
- *  @param string|AES   password
- *  @param array        encrypted private key (optional)
- *  @param array        private key (optional)
- *
- *
- *  @return bool
+ * @param {Array} derivedEncryptionKeyArray32 The derived encryption key from the Password Processing Function
+ * @returns {Boolean} Whether the password is correct or not
  */
-function checkMyPassword(password, k1, k2) {
-    if (typeof password === "string") {
-        password = new sjcl.cipher.aes(prepare_key_pw(password));
-    }
+function checkMyPassword(derivedEncryptionKeyArray32) {
 
-    return decrypt_key(password, base64_to_a32(k1 || u_attr.k)).join(",")  === (k2||u_k).join(",");
-}
+    'use strict';
 
-function changepw(currentpw, newpw, ctx) {
-    var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newpw));
+    // Create SJCL cipher object
+    var derivedEncryptionKeyCipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
 
-    api_req({
-        a: 'up',
-        // currk: a32_to_base64(encrypt_key(new sjcl.cipher.aes(prepare_key_pw(currentpw)), u_k)),
-        k: a32_to_base64(encrypt_key(pw_aes, u_k)),
-        uh: stringhash(u_attr['email'].toLowerCase(), pw_aes)
-    }, ctx);
+    // Decrypt the Master Key using the Derived Encryption Key
+    var encryptedMasterKeyArray32 = base64_to_a32(u_attr.k);
+    var decryptedMasterKeyArray32 = decrypt_key(derivedEncryptionKeyCipherObject, encryptedMasterKeyArray32);
+    var decryptedMasterKeyString = decryptedMasterKeyArray32.join(',');
+
+    // Convert the in memory copy of the unencrypted Master Key to string for comparison
+    var masterKeyStringToCompare = u_k.join(',');
+
+    // Compare the decrypted Master Key to the stored unencrypted Master Key
+    return decryptedMasterKeyString === masterKeyStringToCompare;
 }
 
 /**
@@ -673,9 +659,12 @@ function processEmailChangeActionPacket(ap) {
      * @returns {MegaPromise}
      */
     var getLastInteractionWith = function (u_h, triggeredBySet) {
-        assert(u_handle, "missing u_handle, can't proceed");
-        assert(u_h, "missing argument u_h, can't proceed");
+        console.assert(u_handle, "missing u_handle, can't proceed");
+        console.assert(u_h, "missing argument u_h, can't proceed");
 
+        if (!u_handle || !u_h) {
+            return MegaPromise.reject(EARGS);
+        }
 
         var _renderLastInteractionDone = function (r) {
             r = r.split(":");
@@ -826,8 +815,12 @@ function processEmailChangeActionPacket(ap) {
      */
     var _realSetLastInteractionWith = function (u_h, v) {
 
-        assert(u_handle, "missing u_handle, can't proceed");
-        assert(u_h, "missing argument u_h, can't proceed");
+        console.assert(u_handle, "missing u_handle, can't proceed");
+        console.assert(u_h, "missing argument u_h, can't proceed");
+
+        if (!u_handle || !u_h) {
+            return MegaPromise.reject(EARGS);
+        }
 
         var isDone = false;
         var $promise = createTimeoutPromise(

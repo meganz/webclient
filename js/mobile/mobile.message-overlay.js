@@ -8,8 +8,9 @@ mobile.messageOverlay = {
      * @param {String} firstMessage The main message to be displayed
      * @param {String} optionalSecondMessage An optional second message to be displayed after the first
      * @param {Function} optionalSuccessCallback An optional success callback to be run after they confirm OK
+     * @param {Function} optionalFailureCallback An optional failure callback to be run after they click Close
      */
-    show: function(firstMessage, optionalSecondMessage, optionalSuccessCallback) {
+    show: function(firstMessage, optionalSecondMessage, optionalSuccessCallback, optionalFailureCallback) {
 
         'use strict';
 
@@ -17,6 +18,7 @@ mobile.messageOverlay = {
         var $overlay = $('#mobile-ui-error');
         var $firstMessage = $overlay.find('.first-message');
         var $optionalSecondMessage = $overlay.find('.optional-second-message');
+        var $fileManagerHolder = $('.mobile .fmholder');
 
         // Set the first message
         $firstMessage.text(firstMessage);
@@ -25,19 +27,23 @@ mobile.messageOverlay = {
         if (typeof optionalSecondMessage !== 'undefined' && optionalSecondMessage) {
             $optionalSecondMessage.text(optionalSecondMessage);
         }
+
         // Initialise the OK/close button
-        this.initConfirmOkButton($overlay, optionalSuccessCallback);
-        this.initOverlayCloseButton();
-        // Show the error overlay
+        this.initConfirmOkButton($overlay, $fileManagerHolder, optionalSuccessCallback);
+        this.initOverlayCloseButton($overlay, $fileManagerHolder, optionalFailureCallback);
+
+        // Show the error overlay and prevent scrolling behind
         $overlay.removeClass('hidden');
+        $fileManagerHolder.addClass('no-scroll');
     },
 
     /**
      * Initialise the OK button to close the error overlay
      * @param {Object} $overlay A cached selector for the error overlay
+     * @param {Object} $fileManagerHolder A cached selector for the file manager/My Account block behind the overlay
      * @param {Function} optionalSuccessCallback An optional success callback to be run after they confirm OK
      */
-    initConfirmOkButton: function($overlay, optionalSuccessCallback) {
+    initConfirmOkButton: function($overlay, $fileManagerHolder, optionalSuccessCallback) {
 
         'use strict';
 
@@ -48,6 +54,7 @@ mobile.messageOverlay = {
 
             // Hide the error overlay
             $overlay.addClass('hidden');
+            $fileManagerHolder.removeClass('no-scroll');
 
             // Remove the loading spinner if on the Login page and came back from an error
             if (page === 'login') {
@@ -63,25 +70,32 @@ mobile.messageOverlay = {
             return false;
         });
     },
+
     /**
      * Initialises the close button on the generic mobile ui error overlay
+     * @param {Object} $overlay A cached selector for the error overlay
+     * @param {Object} $fileManagerHolder A cached selector for the file manager/My Account block behind the overlay
+     * @param {Function} optionalFailureCallback An optional failure callback to be run after they click Close
      */
-    initOverlayCloseButton: function() {
+    initOverlayCloseButton: function($overlay, $fileManagerHolder, optionalFailureCallback) {
 
         'use strict';
 
-        var $overlay = $('#mobile-ui-error');
         var $closeButton = $overlay.find('.fm-dialog-close, .text-button');
-
 
         // Add tap handler
         $closeButton.off('tap').on('tap', function() {
 
             // Hide overlay with download button options
             $overlay.addClass('hidden');
+            $fileManagerHolder.removeClass('no-scroll');
+
+            // Run the failure callback if requested
+            if (typeof optionalFailureCallback === 'function') {
+                optionalFailureCallback();
+            }
 
             return false;
         });
-    },
-
+    }
 };

@@ -124,26 +124,33 @@ mobile.register = {
             if (typeof zxcvbn !== 'undefined') {
 
                 // Estimate the password strength
-                var password = $passwordInput.val();
-                var passwordStrength = zxcvbn(password);
+                var password = $.trim($passwordInput.val());
+                var passwordScore = zxcvbn(password).score;
+                var passwordLength = password.length;
 
                 // Remove previous strength classes that were added
                 $passwordStrengthBar.removeClass('good1 good2 good3 good4 good5');
 
                 // Add colour coding
-                if (passwordStrength.score > 3 && passwordStrength.entropy > 75) {
+                if (passwordLength === 0) {
+                    return false;
+                }
+                else if (passwordLength < security.minPasswordLength) {
+                    $passwordStrengthBar.addClass('good1');    // Too short
+                }
+                else if (passwordScore === 4) {
                     $passwordStrengthBar.addClass('good5');    // Strong
                 }
-                else if (passwordStrength.score > 2 && passwordStrength.entropy > 50) {
+                else if (passwordScore === 3) {
                     $passwordStrengthBar.addClass('good4');    // Good
                 }
-                else if (passwordStrength.score > 1 && passwordStrength.entropy > 40) {
+                else if (passwordScore === 2) {
                     $passwordStrengthBar.addClass('good3');    // Medium
                 }
-                else if (passwordStrength.score > 0 && passwordStrength.entropy > 15) {
+                else if (passwordScore === 1) {
                     $passwordStrengthBar.addClass('good2');    // Weak
                 }
-                else if (password.length !== 0) {
+                else {
                     $passwordStrengthBar.addClass('good1');    // Very Weak
                 }
             }
@@ -185,7 +192,9 @@ mobile.register = {
             }
 
             // Unfocus (blur) the input fields to prevent the cursor showing on iOS and also hide the keyboard
-            $firstNameField.add($lastNameField).add($emailField).add($passwordField).add($confirmPasswordField).blur();
+            $firstNameField.add($lastNameField).add($emailField)
+                .add($passwordField).add($confirmPasswordField)
+                .trigger("blur");
 
             // Clear old errors from past form submissions
             $containerFields.removeClass('incorrect');
@@ -219,6 +228,18 @@ mobile.register = {
                 return false;
             }
 
+            // Check for minimum length password
+            if (password.length < security.minPasswordLength) {
+
+                // Add red border, red text and show warning icon
+                $passwordField.parent().addClass('incorrect');
+                $confirmPasswordField.parent().addClass('incorrect');
+
+                // Then show an error and don't proceed
+                mobile.messageOverlay.show(l[18701]);        // Your password needs to be at least 8 characters long.
+                return false;
+            }
+
             // If the password has the 'Very weak' class i.e. it's not strong enough
             if ($passwordStrengthBar.hasClass('good1')) {
 
@@ -230,8 +251,21 @@ mobile.register = {
                 return false;
             }
 
-            // Pass the details to the registration flow
-            mobile.register.doRegister(firstName, lastName, email, password);
+            // If they came from the Pro page, set the flag
+            var fromProPage = (localStorage.getItem('proPageContinuePlanNum') !== null) ? true : false;
+
+            // If the flag has been set to use the new registration method
+            var method = (security.register.newRegistrationEnabled()) ? 'new' : 'old';
+
+            // Start the registration process
+            mobile.register[method].startRegistration(
+                firstName,
+                lastName,
+                email,
+                password,
+                fromProPage,
+                mobile.register[method].completeRegistration     // Complete callback
+            );
 
             // Prevent double taps
             return false;
@@ -239,13 +273,138 @@ mobile.register = {
     },
 
     /**
+     * Shows the email confirmation screen
+     * @param {Object} registrationVars The registration form variables i.e. name, email etc
+     */
+    showConfirmEmailScreen: function(registrationVars) {
+
+        'use strict';
+
+        var $confirmScreen = $('.registration-confirm-email');
+        var $registerScreen = $('.mobile.signin-register-block');
+        var $changeEmailInput = $confirmScreen.find('.change-email input');
+        var $resendButton = $confirmScreen.find('.resend-button');
+
+        // If the flag has been set to use the new registration method
+        var method = (security.register.newRegistrationEnabled()) ? 'new' : 'old';
+
+        // Hide the current register screen and show the confirmation one
+        $registerScreen.addClass('hidden');
+        $confirmScreen.removeClass('hidden');
+
+        // Set the email into the text field
+        $changeEmailInput.val(registrationVars.email);
+
+        // Init email input keyup
+        mobile.register.initConfirmEmailScreenKeyup($changeEmailInput, $resendButton);
+
+        // Initialise the Resend button
+        mobile.register[method].initConfirmEmailScreenResendButton(
+            $changeEmailInput, $resendButton, registrationVars
+        );
+    },
+
+    /**
+     * Initialise the email input keyup which will enable the Resend button
+     * @param {Object} $changeEmailInput jQuery selector for the email input
+     * @param {Object} $resendButton jQuery selector for the Resend button
+     */
+    initConfirmEmailScreenKeyup: function($changeEmailInput, $resendButton) {
+
+        'use strict';
+
+        // Enable the resend button on keyup
+        $changeEmailInput.rebind('keyup', function(event) {
+
+            var email = $(this).val();
+
+            // Change the button to red if the email is valid
+            if (!checkMail(email)) {
+
+                // Activate the resend button
+                $resendButton.addClass('active');
+
+                // If the Enter key is pressed try resending
+                if (event.which === 13) {
+                    $resendButton.trigger('tap');
+                }
+            }
+            else {
+                // Grey it out if they have not completed one of the fields
+                $resendButton.removeClass('active');
+            }
+        });
+    },
+
+    /**
+     * Shows the login screen with a few things changed so they know they are
+     * confirming their account and about to proceed to the key creation step
+     * @param {String} email The user's email address from the confirm code
+     */
+    showConfirmAccountScreen: function(email) {
+
+        'use strict';
+
+        // Show the general login screen
+        mobile.signin.show();
+
+        // Change the header text, hide the registration and preinput the email
+        var $loginScreen = $('.signin-register-block');
+        $loginScreen.find('.fm-header-txt.sign-in').text(l[812]);            // Confirm Account
+        $loginScreen.find('.signin-input.login input').val(email);
+    },
+
+    /**
+     * Show an account confirmation failure
+     * @param {Number} apiResult An error code from the API
+     */
+    showConfirmAccountFailure: function(apiResult) {
+
+        'use strict';
+
+        // Show the general login screen
+        mobile.signin.show();
+
+        // Check for various error codes and show error messages
+        if (apiResult === EINCOMPLETE) {
+            mobile.messageOverlay.show(l[703]);   // Your sign-up link is not valid...
+        }
+        else if (apiResult === ENOENT) {
+            mobile.messageOverlay.show(l[704]);   // Your account has already been activated. Please log in.
+        }
+        else {
+            mobile.messageOverlay.show(l[705] + ' ' + apiResult);     // Please sign up again. Error code: xx
+        }
+    },
+
+    /**
+     * Shows the screen with a spinning image while the RSA keys are being generated
+     */
+    showGeneratingKeysScreen: function() {
+
+        'use strict';
+
+        // Show animation
+        $('.mobile.registration-generating-keys').removeClass('hidden');
+    }
+};
+
+
+/**
+ * Functions for the old registration process. ToDo: remove this code once the new process is enabled across all apps.
+ **/
+mobile.register.old = {
+
+    /**
      * Start the registration process
      * @param {String} firstName The user's first name
      * @param {String} lastName The user's last name
      * @param {String} email The user's email address
      * @param {String} password The user's password
+     * @param {Boolean} fromProPage Whether the registration started on the Pro page or not
+     * @param {Function} completeCallback A function to run when the registration is complete
      */
-    doRegister: function(firstName, lastName, email, password) {
+    startRegistration: function(firstName, lastName, email, password, fromProPage, completeCallback) {
 
         'use strict';
 
@@ -264,7 +423,7 @@ mobile.register = {
                 u_type = result;
 
                 // Register the account
-                mobile.register.registerAccount(firstName, lastName, email, password);
+                completeCallback(firstName, lastName, email, password, fromProPage);
             }
         };
 
@@ -278,8 +437,9 @@ mobile.register = {
      * @param {String} lastName The user's last name
      * @param {String} email The user's email address
      * @param {String} password The user's password
+     * @param {Boolean} fromProPage Whether the registration started on the Pro page or not
      */
-    registerAccount: function(firstName, lastName, email, password) {
+    completeRegistration: function(firstName, lastName, email, password, fromProPage) {
 
         'use strict';
 
@@ -339,69 +499,13 @@ mobile.register = {
             }
         };
 
-        // Send the confirmation email
-        sendsignuplink(registrationVars.name, registrationVars.email, registrationVars.password, context);
-    },
-
-    /**
-     * Shows the email confirmation screen
-     * @param {Object} registrationVars The registration form variables i.e. name, email etc
-     */
-    showConfirmEmailScreen: function(registrationVars) {
-
-        'use strict';
-
-        var $confirmScreen = $('.registration-confirm-email');
-        var $registerScreen = $('.mobile.signin-register-block');
-        var $changeEmailInput = $confirmScreen.find('.change-email input');
-        var $resendButton = $confirmScreen.find('.resend-button');
-
-        // Hide the current register screen and show the confirmation one
-        $registerScreen.addClass('hidden');
-        $confirmScreen.removeClass('hidden');
-
-        // Set the email into the text field
-        $changeEmailInput.val(registrationVars.email);
-
-        // Init email input keyup and Resend button
-        mobile.register.initConfirmEmailScreenKeyup($changeEmailInput, $resendButton);
-        mobile.register.initConfirmEmailScreenResendButton($changeEmailInput, $resendButton, registrationVars);
-    },
-
-    /**
-     * Initialise the email input keyup which will enable the Resend button
-     * @param {Object} $changeEmailInput jQuery selector for the email input
-     * @param {Object} $resendButton jQuery selector for the Resend button
-     */
-    initConfirmEmailScreenKeyup: function($changeEmailInput, $resendButton) {
-
-        'use strict';
-
-        // Enable the resend button on keyup
-        $changeEmailInput.rebind('keyup', function(event) {
-
-            var email = $(this).val();
-
-            // Change the button to red if the email is valid
-            if (!checkMail(email)) {
-
-                // Activate the resend button
-                $resendButton.addClass('active');
-
-                // If the Enter key is pressed try resending
-                if (event.which === 13) {
-                    $resendButton.trigger('tap');
-                }
-            }
-            else {
-                // Grey it out if they have not completed one of the fields
-                $resendButton.removeClass('active');
-            }
-        });
+        // Run the old password key derivation function, encrypt the Master Key and send the confirmation email
+        sendsignuplink(registrationVars.name, registrationVars.email, registrationVars.password, context, fromProPage);
     },
 
     /**
      * Initialises the Resend button on the email confirmation screen to send the confirmation link again
+     * Uses the old registration process. ToDo: Remove in future when old registrations are no longer used.
      * @param {Object} $changeEmailInput jQuery selector for the email input
      * @param {Object} $resendButton jQuery selector for the Resend button
      * @param {Object} registrationVars The registration form variables i.e. name, email etc
@@ -464,57 +568,117 @@ mobile.register = {
             // Prevent double taps
             return false;
         });
-    },
+    }
+};
+
+
+/**
+ * Functions for the new secure registration process
+ */
+mobile.register.new = {
 
     /**
-     * Shows the login screen with a few things changed so they know they are
-     * confirming their account and about to proceed to the key creation step
-     * @param {String} email The user's email address from the confirm code
+     * Start the registration process
+     * @param {String} firstName The user's first name
+     * @param {String} lastName The user's last name
+     * @param {String} email The user's email address
+     * @param {String} password The user's password
+     * @param {Boolean} fromProPage Whether the registration started on the Pro page or not
+     * @param {Function} completeCallback A function to run when the registration is complete
      */
-    showConfirmAccountScreen: function(email) {
+    startRegistration: function(firstName, lastName, email, password, fromProPage, completeCallback) {
 
         'use strict';
 
-        // Show the general login screen
-        mobile.signin.show();
+        // Show loading dialog
+        loadingDialog.show();
 
-        // Change the header text and preinput the email
-        var $loginScreen = $('.signin-register-block');
-        $loginScreen.find('.fm-header-txt.sign-in').text(l[812]);   // Confirm Account
-        $loginScreen.find('.signin-input.login input').val(email);
+        // Set a flag to check at the end of the registration process
+        localStorage.signUpStartedInMobileWeb = '1';
+
+        // Start the new secure registration process
+        security.register.startRegistration(firstName, lastName, email, password, fromProPage, completeCallback);
     },
 
     /**
-     * Show an account confirmation failure
-     * @param {Number} apiResult An error code from the API
+     * Initialises the Resend button on the email confirmation screen to send the confirmation link again
+     * Uses the new improved registration process.
+     * @param {Object} $changeEmailInput jQuery selector for the email input
+     * @param {Object} $resendButton jQuery selector for the Resend button
      */
-    showConfirmAccountFailure: function(apiResult) {
+    initConfirmEmailScreenResendButton: function($changeEmailInput, $resendButton) {
 
         'use strict';
 
-        // Show the general login screen
-        mobile.signin.show();
+        // Add click/tap handler to resend button
+        $resendButton.off('tap').on('tap', function() {
 
-        // Check for various error codes and show error messages
-        if (apiResult === EINCOMPLETE) {
-            mobile.messageOverlay.show(l[703]);   // Your sign-up link is not valid...
+            // Make sure the button is enabled
+            if (!$resendButton.hasClass('active')) {
+                return false;
+            }
+
+            // Get the new email address entered by the user
+            var newEmail = $.trim($changeEmailInput.val());
+
+            // Re-send signup link email
+            security.register.repeatSendSignupLink(
+                newEmail,
+                mobile.register.new.completeRegistration    // Complete callback
+            );
+        });
+    },
+
+    /**
+     * Complete the initial registration process after sending the user a confirmation email
+     * @param {Number} result The result of the API request that sent the user's a confirmation email
+     * @param {String} firstName The user's first name
+     * @param {String} lastName The user's last name
+     * @param {String} email The user's email address
+     */
+    completeRegistration: function(result, firstName, lastName, email) {
+
+        'use strict';
+
+        // Set some variables which are saved for use later
+        var registrationVars = {
+            first: firstName,
+            last: lastName,
+            email: email,
+            name: firstName + ' ' + lastName
+        };
+
+        // If successful result
+        if (result === 0) {
+
+            u_attr.terms = 1;
+            localStorage.awaitingConfirmationAccount = JSON.stringify(registrationVars);
+
+            // Try getting the plan number they selected on Pro page
+            var planNum = localStorage.getItem('proPageContinuePlanNum');
+
+            // If they did come from the Pro page, continue to Pro page Step 2 and skip email confirmation
+            if (planNum !== null) {
+
+                // Remove the flag as it's no longer needed
+                localStorage.removeItem('proPageContinuePlanNum');
+
+                // Continue to the Pro payment page
+                loadSubPage('propay_' + planNum);
+            }
+            else {
+                // Otherwise show the signup email confirmation screen
+                mobile.register.showConfirmEmailScreen(registrationVars);
+            }
         }
-        else if (apiResult === ENOENT) {
-            mobile.messageOverlay.show(l[704]);   // Your account has already been activated. Please log in.
+
+        // Show an error if the email is already in use
+        else if (result === EEXIST) {
+            mobile.messageOverlay.show(l[9000]);    // Error. This email address is already in use.
         }
         else {
-            mobile.messageOverlay.show(l[705] + ' ' + apiResult);     // Please sign up again. Error code: xx
+            // Show an error
+            mobile.messageOverlay.show(l[47], result);      // Oops, something went wrong.
         }
-    },
-
-    /**
-     * Shows the screen with a spinning image while the RSA keys are being generated
-     */
-    showGeneratingKeysScreen: function() {
-
-        'use strict';
-
-        // Show animation
-        $('.mobile.registration-generating-keys').removeClass('hidden');
     }
 };

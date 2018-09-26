@@ -44,7 +44,7 @@
         var close = !update && action;
         var $dialog = $('.fm-dialog.properties-dialog');
 
-        $(document).unbind('MegaCloseDialog.Properties');
+        $(document).off('MegaCloseDialog.Properties');
 
         if (close) {
             delete $.propertiesDialog;
@@ -127,7 +127,7 @@
 
         var exportLink = new mega.Share.ExportLink({});
         var isTakenDown = exportLink.isTakenDown($.selected);
-        var isUndecrypted = missingkeys[$.selected[0].h];
+        var isUndecrypted = missingkeys[n.h];
         var notificationText = '';
 
         var p = {};
@@ -140,10 +140,10 @@
                 if (isUndecrypted) {
                     $dialog.addClass('undecryptable');
 
-                    if ($.selected[0].t) {// folder
+                    if (n.t) {
                         notificationText += l[8595];
                     }
-                    else {// file
+                    else {
                         notificationText += l[8602];
                     }
                 }
@@ -196,11 +196,14 @@
             p.t1 = l[86] + ':';
 
             // Hide context menu button
-            if (n.h === M.RootID || slideshowid) {
+            if (n.h === M.RootID || slideshowid || n.h === M.RubbishID) {
                 $dialog.addClass('hidden-context');
             }
 
-            if (n.name) {
+            if (isUndecrypted) {
+                p.t2 = htmlentities(l[8649]);
+            }
+            else if (n.name) {
                 p.t2 = htmlentities(n.name);
             }
             else if (n.h === M.RootID) {
@@ -211,10 +214,6 @@
             }
             else if (n.h === M.RubbishID) {
                 p.t2 = htmlentities(l[167]);
-            }
-            // 'Shared with me' tab, info dialog, undecrypted nodes
-            else if (missingkeys[n.h]) {
-                p.t2 = htmlentities(l[8649]);
             }
 
             if (page.substr(0, 7) === 'fm/chat') {
@@ -268,7 +267,7 @@
                     p.t6 = l[5905];
                     p.t7 = htmlentities(M.getNameByHandle(user.h));
                     p.t8 = l[894] + ':';
-                    p.t9 = bytesToSize(size);
+                    p.t9 = versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
                     p.t10 = l[897] + ':';
                     p.t11 = fm_contains(sfilecnt, sfoldercnt);
                 }
@@ -380,7 +379,7 @@
             return false;
         });
 
-        $(document).bind('MegaCloseDialog.Properties', __fsi_close);
+        $(document).rebind('MegaCloseDialog.Properties', __fsi_close);
 
         if (p.hideContacts) {
             $('.properties-txt-pad .contact-list-icon').hide();

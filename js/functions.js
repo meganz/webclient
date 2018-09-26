@@ -343,18 +343,31 @@ function checkMail(email) {
  * @param kls class on which prototype this method should add the on, bind, unbind, etc methods
  */
 function makeObservable(kls) {
+    'use strict';
+
     var target = kls.prototype || kls;
-    var aliases = ['on', 'bind', 'unbind', 'one', 'trigger', 'rebind'];
+    var aliases = [['on'], ['off'], ['bind', 'on'], ['unbind', 'off'], ['one'], ['trigger'], ['rebind']];
 
     aliases.forEach(function(fn) {
-        target[fn] = function() {
-            // trying to save few ms here...
-            if (this && !this._$thisCache) {
-                this._$thisCache = $(this);
-            }
+        var prop = fn[0];
+        fn = fn[1] || prop;
 
-            return this._$thisCache[fn].apply(this._$thisCache, arguments);
-        };
+        Object.defineProperty(target, prop, {
+            value: function() {
+                return this.$__eventEmitter___[fn].apply(this.$__eventEmitter___, arguments);
+            },
+            writable: true,
+            configurable: true
+        });
+    });
+
+    Object.defineProperty(target, '$__eventEmitter___', {
+        get: function() {
+            // TODO: Get a real event emitter and deprecate jQuery here.
+            Object.defineProperty(this, '$__eventEmitter___', {value: $(this)});
+            return this.$__eventEmitter___;
+        },
+        configurable: true
     });
 
     target = aliases = kls = undefined;
@@ -1025,25 +1038,14 @@ function moveCursortoToEnd(el) {
         range.collapse(false);
         range.select();
     }
-    $(el).focus();
+    $(el).trigger("focus");
 }
 
 function asyncApiReq(data) {
-    var $promise = new MegaPromise();
-    api_req(data, {
-        callback: function(r) {
-            if (typeof r === 'number' && r !== 0) {
-                $promise.reject.apply($promise, arguments);
-            }
-            else {
-                $promise.resolve.apply($promise, arguments);
-            }
-        }
-    });
+    'use strict';
 
-    //TODO: fail case?! e.g. the exp. backoff failed after waiting for X minutes??
-
-    return $promise;
+    // TODO: find&replace all occurences
+    return M.req(data);
 }
 
 // Returns pixels position of element relative to document (top left corner) OR to the parent (IF the parent and the
@@ -1159,7 +1161,6 @@ function secToDuration(s, sep) {
     }
 
     for (var i = 0; i < dur.length; i++) {
-        var unit;
         var v = dur[i];
         if (v === "0") {
             if (durStr.length !== 0 && i !== 0) {
@@ -1170,20 +1171,24 @@ function secToDuration(s, sep) {
             }
         }
 
+        var transString = false;
         if (i === 0) {
-            unit = v !== 1 ? "hours" : "hour";
+            // hour
+            transString = v !== "1" ? l[19049].replace("%d", v) : l[19048];
         }
         else if (i === 1) {
-            unit = v !== 1 ? "minutes" : "minute";
+            // minute
+            transString = v !== "1" ? l[5837].replace("[X]", v) : l[5838];
         }
         else if (i === 2) {
-            unit = v !== 1 ? "seconds" : "second";
+            // second
+            transString = v !== "1" ? l[19046].replace("%d", v) : l[19047];
         }
         else {
             throw new Error("this should never happen.");
         }
 
-        durStr += v + " " + unit + sep;
+        durStr += transString + sep;
     }
 
     return durStr.replace(secToDuration.regExp[sep], "");
@@ -1331,29 +1336,23 @@ function generateAnonymousReport() {
             return;
         }
         promises.push(
-            $.ajax({
-                url: self.src,
-                dataType: "text"
-            })
-            .done(function(r) {
-                report.scripts[src] = [
-                        MurmurHash3(r, 0x4ef5391a),
-                        r.length
-                    ];
-            })
-            .fail(function(r) {
-                report.scripts[src] = false;
-            })
+            M.xhr({type: "text", url: self.src})
+                .then(function(ev, r) {
+                    report.scripts[src] = [MurmurHash3(r, 0x4ef5391a), r.length];
+                })
+                .catch(function() {
+                    report.scripts[src] = false;
+                })
         );
     });
 
     report.version = null; // TODO: how can we find this?
 
     MegaPromise.allDone(promises)
-        .done(function() {
+        .then(function() {
             $promise.resolve(report);
         })
-        .fail(function() {
+        .catch(function() {
             $promise.resolve(report)
         });
 
@@ -1813,10 +1812,10 @@ function rand_range(a, b) {
  *  2. The form needs to be filled and visible when this function is called
  *  3. After this function is called, within the next second the form needs to be gone
  *
- * As an example take a look at the `tooltiplogin()` function in `index.js`.
+ * As an example take a look at the `tooltiplogin.init()` function in `top-tooltip-login.js`.
  *
  * @param {String|Object} form jQuery selector of the form
- * @return {Bool}   True if the password manager can be called.
+ * @return {Boolean} Returns true if the password manager can be called.
  *
  */
 function passwordManager(form) {
@@ -2603,3 +2602,76 @@ function invalidLinkError() {
         mobile.notFoundOverlay.show();
     }
 }
+
+/* jshint -W098 */
+
+/**
+ * Classifies the strength of the password (used on the main Registration, Reset password (key or park) pages and
+ * in the Pro Register dialog.
+ * @param {String} password The user's password (should be trimmed for whitespace beforehand)
+ */
+function classifyPassword(password) {
+
+    'use strict';
+
+    // Calculate the password score using the ZXCVBN library and its length
+    var passwordScore = zxcvbn(password).score;
+    var passwordLength = password.length;
+    var $passStatus = $('.account.password-stutus');
+    var className = '';
+    var string1 = '';
+    var string2 = '';
+    var strongWeak = '';
+
+    if (passwordLength < security.minPasswordLength) {
+        string1 = l[18700];
+        string2 = l[18701];
+        className = 'good1';
+        strongWeak = 'strong-password';
+    }
+    else if (passwordScore === 4) {
+        string1 = l[1128];
+        string2 = l[1123];
+        className = 'good5';
+        strongWeak = 'strong-password';
+    }
+    else if (passwordScore === 3) {
+        string1 = l[1127];
+        string2 = l[1122];
+        className = 'good4';
+    }
+    else if (passwordScore === 2) {
+        string1 = l[1126];
+        string2 = l[1121];
+        className = 'good3';
+        strongWeak = 'weak-password';
+    }
+    else if (passwordScore === 1) {
+        string1 = l[1125];
+        string2 = l[1120];
+        className = 'good2';
+        strongWeak = 'weak-password';
+    }
+    else {
+        string1 = l[1124];
+        string2 = l[1119];
+        className = 'good1';
+        strongWeak = 'weak-password';
+    }
+
+    if ($('.login-register-input.password').length) {
+        $('.login-register-input.password').addClass(strongWeak);
+        $('.new-registration').addClass(className);
+        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], string1);   // Too short
+        $('.new-reg-status-description').text(string2);
+    }
+    else if ($passStatus.length) {
+        $passStatus.addClass(className + ' checked').text(string1);
+    }
+
+    $('.password-status-warning')
+        .safeHTML('<span class="password-warning-txt">@@</span> ' +
+            '@@<div class="password-tooltip-arrow"></div>', l[34], l[1129]);
+    $('.password-status-warning').css('margin-left', ($('.password-status-warning').width() / 2 * -1) - 13);
+}
+/* jshint +W098 */

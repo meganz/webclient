@@ -389,7 +389,7 @@ var Avatar = React.createClass({
 
         var classes = (this.props.className ? this.props.className : ' avatar-wrapper small-rounded-avatar') + ' ' + contact.u;
 
-        var letterClass = 'avatar-letter';
+        classes += " chat-avatar";
 
         var displayedAvatar;
 
@@ -608,15 +608,42 @@ var ContactPickerWidget = React.createClass({
     componentDidUpdate: function() {
 
         var self = this;
-        if (self.scrollToLastSelected && self.jspSelected) {
+        if (self.scrollToLastSelected && self.psSelected) {
             // set the flag back to false, so on next updates we won't scroll to the last item again.
             self.scrollToLastSelected = false;
-            var $jsp = $(self.jspSelected.findDOMNode()).data('jsp');
-            if ($jsp) {
-                $jsp.scrollToPercentX(1, false);
-            }
+            self.psSelected.scrollToPercentX(100, false);
         }
 
+    },
+    componentWillMount: function() {
+        var self = this;
+
+        if (self.props.multiple) {
+            var KEY_ENTER = 13;
+
+            $(document.body).rebind('keypress.contactPicker' + self.getUniqueId(), function(e) {
+                var keyCode = e.which || e.keyCode;
+                if (keyCode === KEY_ENTER) {
+                    if (self.state.selected) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        $(document).trigger('closeDropdowns');
+
+                        if (self.props.onSelectDone) {
+                            self.props.onSelectDone(self.state.selected);
+                        }
+                    }
+                }
+            })
+        }
+    },
+    componentWillUnmount: function() {
+        var self = this;
+
+        if (self.props.multiple) {
+            $(document.body).off('keypress.contactPicker' + self.getUniqueId());
+        }
     },
     render: function() {
         var self = this;
@@ -692,7 +719,7 @@ var ContactPickerWidget = React.createClass({
                 self.clickTime = new Date();
                 self.lastClicked = contactHash;
             };
-            var selectedWidth = self.state.selected.length * 60;
+            var selectedWidth = self.state.selected.length * 54;
             if (!self.state.selected || self.state.selected.length === 0) {
                 footer = <div className="fm-dialog-footer">
                     <a href="javascript:;" className="default-white-button left" onClick={onAddContact}>
@@ -706,46 +733,25 @@ var ContactPickerWidget = React.createClass({
                     }</div>
                 </div>;
             }
-            else if (self.state.selected.length === 1) {
-                self.state.selected.forEach(function(v, k) {
+            else {
+                (self.state.selected || []).forEach(function (v, k) {
                     contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
                                                        key={v}
-                    /> );
+                    />);
                 });
-                footer = <div className="contacts-search-footer">
-                        <PerfectScrollbar className="selected-contact-block" selected={this.state.selected}>
-                            <div className="select-contact-centre" style={{width : selectedWidth}}>
-                                {contactsSelected}
-                            </div>
-                        </PerfectScrollbar>
-                    <div className="fm-dialog-footer">
-                        <span className="selected-contact-amount">
-                            {self.state.selected.length} contacts selected
-                        </span>
-                        <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
-                            {self.props.singleSelectedButtonLabel ? self.props.singleSelectedButtonLabel : l[5885]}
-                        </a>
-                    </div>
-                </div>
-            }
-            else if (self.state.selected.length > 1) {
-                self.state.selected.forEach(function(v, k) {
-                    contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
-                                                       key={v}
-                    /> );
-                });
+
 
                 footer =
                     <div className="contacts-search-footer">
-                        <utils.JScrollPane className="selected-contact-block horizontal-only"
+                        <PerfectScrollbar className="perfectScrollbarContainer selected-contact-block horizontal-only"
                                           selected={this.state.selected}
-                                          ref={function(jspSelected) {
-                                              self.jspSelected = jspSelected;
+                                          ref={function (psSelected) {
+                                              self.psSelected = psSelected;
                                           }}>
-                            <div className="select-contact-centre" style={{width : selectedWidth}}>
+                            <div className="select-contact-centre" style={{width: selectedWidth}}>
                                 {contactsSelected}
                             </div>
-                        </utils.JScrollPane>
+                        </PerfectScrollbar>
                         <div className="fm-dialog-footer">
                             <span className="selected-contact-amount">
                                 {self.state.selected.length} contacts selected

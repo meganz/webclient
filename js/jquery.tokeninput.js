@@ -410,12 +410,12 @@
             input_val;
 
             // Create a new text input an attach keyup events
-        var input_box = $("<input type=\"text\" autocomplete=\"off\" autocapitalize=\"off\"/>")
+        var input_box = $('<input type="text" autocomplete="off" autocapitalize="off"/>')
             .css({
                 outline: "none"
             })
             .attr("id", $(input).data("settings").idPrefix + input.id)
-            .focus(function() {
+            .on('focus', function() {
                 if ($(input).data("settings").disabled) {
                     return false;
                 }
@@ -433,7 +433,7 @@
                 $('.share-dialog-permissions.active').removeClass('active');
                 $('.permissions-menu').removeClass('search-permissions');
             })
-            .blur(function() {
+            .on('blur', function() {
                 hide_dropdown();
                 if ($(input).data("settings").allowFreeTagging) {
                     add_freetagging_tokens();
@@ -449,15 +449,16 @@
                 $('.multiple-input').parent().removeClass('active');
                 $('.multiple-input *').removeClass('red');
             })
-            .bind("keyup keydown blur update", resize_input)
+            .on("keyup keydown blur update", resize_input)
             // Fix of paste issue. These is bug in tokenInut lib.
-            .bind("input.testerresize", function() {
+            .rebind("input.testerresize", function() {
                 $(this).trigger("keydown");
             })
-            .keydown(function(event) {
+            .on('keyup', function(event) {
+                /* jshint -W074 */
 
-                var previous_token,
-                    next_token;
+                var next_token;
+                var previous_token;
 
                 switch (event.keyCode) {
                     case KEY.LEFT:
@@ -468,7 +469,8 @@
                             previous_token = input_token.prev();
                             next_token = input_token.next();
 
-                            if ((previous_token.length && previous_token.get(0) === selected_token) || (next_token.length && next_token.get(0) === selected_token)) {
+                            if ((previous_token.length && previous_token.get(0) === selected_token) ||
+                                (next_token.length && next_token.get(0) === selected_token)) {
 
                                 // Check if there is a previous/next token and it is selected
                                 if (event.keyCode === KEY.LEFT || event.keyCode === KEY.UP) {
@@ -508,6 +510,10 @@
                                 }
                             }
 
+                            var $jsp = dropdown_item.getParentJScrollPane();
+                            if ($jsp) {
+                                $jsp.scrollToElement(dropdown_item);
+                            }
                             select_dropdown_item(dropdown_item);
                         }
 
@@ -526,11 +532,11 @@
                                 delete_token($(previous_token.get(0)));
                                 focus_with_timeout(input_box);
                             }
-
+                            // waiting previous search to be finished and prevent show animation.
+                            setTimeout(function() {
+                                hide_dropdown();
+                            }, $(input).data("settings").searchDelay);
                             return false;
-                        }
-                        else if ($(this).val().length === 1) {
-                            hide_dropdown();
                         }
                         else {
                             // set a timeout just long enough to let this function finish.
@@ -572,11 +578,19 @@
 
                         // If users press enter/return on empty input field behave like done/share button is clicked
                         else {
+                            var $addContactBtn;
+                            if ($.dialog === "share") { // if it is share dialog
+                                $addContactBtn = $('.share-dialog .dialog-share-button');
+                            }
+                            else if ($.dialog === "add-user-popup") { // if it is add user dialog.
+                                $addContactBtn = $('.add-user-popup-button');
+                            }
 
-                            var share = new mega.Share();
-                            share.updateNodeShares();
-
-                            addNewContact($('.add-user-popup-button.add'));
+                            addNewContact($addContactBtn, false).done(function() {
+                                var share = new mega.Share();
+                                share.updateNodeShares();
+                                $('.token-input-token-mega').remove();
+                            });
                         }
 
                         return false;
@@ -605,16 +619,15 @@
         var hidden_input = $(input)
             .hide()
             .val("")
-            .focus(function() {
+            .on('focus', function() {
                 focus_with_timeout(input_box);
             })
-            .blur(function() {
-                input_box.blur();
+            .on('blur', function() {
+                input_box.trigger('blur');
 
                 //return the object to this can be referenced in the callback functions.
                 return hidden_input;
-            })
-            ;
+            });
 
         // Keep a reference to the selected token and dropdown item
         var selected_token = null;
@@ -624,7 +637,7 @@
         // The list to store the token items in
         var token_list = $("<ul />")
             .addClass($(input).data("settings").classes.tokenList)
-            .click(function(event) {
+            .on('click', function(event) {
                 var li = $(event.target).closest("li");
                 if (li && li.get(0) && $.data(li.get(0), "tokeninput")) {
                     toggle_select_token(li);
@@ -638,13 +651,13 @@
                     focus_with_timeout(input_box);
                 }
             })
-            .mouseover(function(event) {
+            .on('mouseover', function(event) {
                 var li = $(event.target).closest("li");
                 if (li && selected_token !== this) {
                     li.addClass($(input).data("settings").classes.highlightedToken);
                 }
             })
-            .mouseout(function(event) {
+            .on('mouseout', function(event) {
                 var li = $(event.target).closest("li");
                 if (li && selected_token !== this) {
                     li.removeClass($(input).data("settings").classes.highlightedToken);
@@ -834,7 +847,7 @@
                 $("<span class='input-close'></span>")
                     .addClass($(input).data("settings").classes.tokenDelete)
                     .appendTo($this_token)
-                    .click(function() {
+                    .on('click', function() {
                         if (!$(input).data("settings").disabled && $(input).data("settings").something !== '') {
                             delete_token($(this).parent());
                             hidden_input.change();
@@ -1176,6 +1189,9 @@
                 dropdown.html("<p>" + escapeHTML($(input).data("settings").searchingText) + "</p>");
                 show_dropdown();
             }
+            else {
+                hide_dropdown();
+            }
         }
 
         function show_dropdown_hint() {
@@ -1242,19 +1258,21 @@
                 dropdown.empty();
                 var dropdown_ul = $("<ul/>")
                     .appendTo(dropdown)
-                    .mouseover(function(event) {
-                        select_dropdown_item($(event.target).closest("li"));
-                    })
-                    .mousedown(function(event) {
-                        add_token($(event.target).closest("li").data("tokeninput"));
-                        hidden_input.change();
-                        return false;
+                    // to prevent auto selecting when mouse pointer is on it,
+                    // bind mouseover when mouse pointer is move.
+                    .on('mousemove', function() {
+                        $(this).on('mouseover', function(event) {
+                            select_dropdown_item($(event.target).closest("li"));
+                        }).on('mousedown', function(event) {
+                            add_token($(event.target).closest("li").data("tokeninput"));
+                            hidden_input.trigger('change');
+                            return false;
+                        }).on('mouseout', function(event) {
+                            deselect_dropdown_item($(event.target).closest("li"));
+                        })
+                        .off('mousemove'); // remove mousemove so not cause multiple binding.
                     })
                     .hide();
-
-                if ($(input).data("settings").resultsLimit && results.length > $(input).data("settings").resultsLimit) {
-                    results = results.slice(0, $(input).data("settings").resultsLimit);
-                }
 
                 $.each(results, function(index, value) {
                     var this_li = $(input).data("settings").resultsFormatter(value);
@@ -1278,9 +1296,12 @@
                 show_dropdown();
 
                 if ($(input).data("settings").animateDropdown) {
-                    dropdown_ul.slideDown("fast");
+                    dropdown_ul.slideDown(100, function() {
+                        $(this).jScrollPane();
+                    });
                 } else {
                     dropdown_ul.show();
+                    dropdown_ul.jScrollPane();
                 }
             } else {
                 if ($(input).data("settings").noResultsText) {
@@ -1444,11 +1465,10 @@
         //
         // obj: a jQuery object to focus()
         function focus_with_timeout(obj) {
-            setTimeout(function() {
-                obj.focus();
-            }, 0);
+            onIdle(function() {
+                $(obj).trigger('focus');
+            });
         }
-
     };
 
     // Really basic cache for the results

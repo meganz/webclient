@@ -1,7 +1,11 @@
 var megasync = (function() {
 
     var ns = {};
-    var megasyncUrl = "https://localhost.megasyncloopback.mega.nz:6342/";
+
+
+    var megasyncUrl = '';
+    var httpMegasyncUrl = "http://127.0.0.1:6341/";
+    var ShttpMegasyncUrl = "https://localhost.megasyncloopback.mega.nz:6342/";
     var enabled = false;
     var version = 0;
     var lastDownload;
@@ -37,6 +41,50 @@ var megasync = (function() {
             mega.config.set('dlThroughMEGAsync', 1);
         }
     });
+
+
+    /** a function to switch the url to communicate with MEGASync */
+    function switchMegasyncUrlToHttpWhenPossible() {
+
+        if (!ua || !ua.details || !ua.details.browser || !ua.details.version) {
+            return ShttpMegasyncUrl;
+        }
+
+        if (ua.details.browser === 'Internet Explorer'
+            || ua.details.browser === 'Safari'
+            || ua.details.browser === 'Edge') {
+            return ShttpMegasyncUrl;
+        }
+        else if (ua.details.browser === 'Chrome') {
+            if (ua.details.version.substr(0, 2) >= '30') {
+                return httpMegasyncUrl;
+            }
+            else {
+                return ShttpMegasyncUrl;
+            }
+        }
+        else if (ua.details.browser === 'Firefox') {
+            if (ua.details.version.substr(0, 2) >= '55') {
+                return httpMegasyncUrl;
+            }
+            else {
+                return ShttpMegasyncUrl;
+            }
+        }
+        else if (ua.details.browser === 'Opera') {
+            if (ua.details.version.substr(0, 2) >= '28') {
+                return httpMegasyncUrl;
+            }
+            else {
+                return ShttpMegasyncUrl;
+            }
+        }
+        else {
+            return ShttpMegasyncUrl;
+        }
+
+    }
+
     // Linux stuff {{{
     /**
      * Prepare Linux Dropdown with the list of distro.
@@ -48,14 +96,14 @@ var megasync = (function() {
     function linuxDropdown(selected) {
 
         var is64    = browserdetails().is64bit;
-        var $dropdown = $('.megasync .megaapp-dropdown'); 
+        var $dropdown = $('.megasync .megaapp-dropdown');
         var $select = $dropdown.find('.megaapp-scr-pad').empty();
         var $list   = $dropdown.find('.megaapp-dropdown-list');
         $('.megasync-overlay').addClass('linux');
 
         if (typeof selected !== "function") {
             /**
-             * Default click handler 
+             * Default click handler
              * @param {jquery} $element     Element that has been clicked.
              */
             selected = function followLink($element) {
@@ -131,21 +179,20 @@ var megasync = (function() {
             $pane.height(overlayHeight - listPosition - 72);
             $pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
 
-
-            $pane.bind('jsp-arrow-change', function(event, isAtTop, isAtBottom, isAtLeft, isAtRight) {
-
+            $pane.rebind('jsp-arrow-change', function(event, isAtTop, isAtBottom) {
                 if (isAtBottom) {
                     $arrow.addClass('inactive');
-                } else {
+                }
+                else {
                     $arrow.removeClass('inactive');
                 }
             });
-
-        } else {
+        }
+        else {
             if (jsp) {
                 jsp.destroy();
             }
-            $pane.unbind('jsp-arrow-change');
+            $pane.off('jsp-arrow-change');
             $arrow.removeAttr('style');
             $arrow.addClass('hidden');
         }
@@ -193,7 +240,7 @@ var megasync = (function() {
             $('body').removeClass('overlayed');
         });
 
-        $('body').bind('keyup.sdd', function(e) {
+        $('body').rebind('keyup.sdd', function(e) {
             if (e.keyCode === 27) {
                 $overlay.addClass('hidden');
                 $('body').removeClass('overlayed');
@@ -276,6 +323,10 @@ var megasync = (function() {
                 reject(ex);
             }
             return MegaPromise.reject(ex);
+        }
+
+        if (!megasyncUrl) {
+            megasyncUrl = switchMegasyncUrlToHttpWhenPossible();
         }
 
         var promise = M.xhr({
@@ -556,7 +607,7 @@ var megasync = (function() {
                     setTimeout(_uploadTick, 2000);
                 }
             }
-            
+
         }
         return next(null, response);
     }
@@ -646,22 +697,22 @@ var megasync = (function() {
 
         }
     };
-	
+
     ns.uploadFile = function (handle, next) {
         SyncAPI({ a: "ufi", h: handle, bid: getNewBid() }, next);
     };
-	
+
 	ns.uploadFolder = function(handle,next) {
         SyncAPI({ a: "ufo", h: handle, bid: getNewBid() }, next);
     };
-	
+
 	ns.syncFolder = function(handle,next) {
         SyncAPI({a: "s",h:handle}, next);
     };
     ns.syncPossible = function (handle, next) {
         SyncAPI({ a: "sp", h: handle }, next);
     };
-	
+
 	ns.downloadStatus = function(handle,next) {
         SyncAPI({"a":"t","h":handle}, next);
     };
@@ -674,7 +725,7 @@ var megasync = (function() {
 
     ns.megaSyncRequest = megaSyncRequest;
     ns.megaSyncIsNotResponding = megaSyncIsNotResponding;
-    
+
 
     return ns;
 })();

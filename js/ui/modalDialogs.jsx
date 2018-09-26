@@ -26,7 +26,7 @@ var ModalDialog = React.createClass({
         $('.fm-dialog-overlay').removeClass('hidden');
 
         // blur the chat textarea if its selected.
-        $('textarea:focus').blur();
+        $('textarea:focus').trigger("blur");
 
 
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
@@ -36,6 +36,9 @@ var ModalDialog = React.createClass({
             if (e.keyCode == 27) { // escape key maps to keycode `27`
                 self.onBlur();
             }
+        });
+        $(window).rebind('resize.modalDialog' + self.getUniqueId(), function() {
+            self.onResize();
         });
     },
     onBlur: function(e) {
@@ -52,9 +55,10 @@ var ModalDialog = React.createClass({
     },
     componentWillUnmount: function() {
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
-        $(document).unbind('keyup.modalDialog' + this.getUniqueId());
+        $(document).off('keyup.modalDialog' + this.getUniqueId());
         $(document.body).removeClass('overlayed');
         $('.fm-dialog-overlay').addClass('hidden');
+        $(window).off('resize.modalDialog' + this.getUniqueId());
 
     },
     onCloseClicked: function(e) {
@@ -64,17 +68,24 @@ var ModalDialog = React.createClass({
             self.props.onClose(self);
         }
     },
-    onPopupDidMount: function(elem) {
-        this.domNode = elem;
+    onResize: function() {
+        if (!this.domNode) {
+            return;
+        }
 
         // always center modal dialogs after they are mounted
-        $(elem)
+        $(this.domNode)
             .css({
                 'margin': 'auto'
             })
             .position({
                 of: $(document.body)
             });
+    },
+    onPopupDidMount: function(elem) {
+        this.domNode = elem;
+
+        this.onResize();
 
         if (this.props.popupDidMount) {
             // bubble up...
@@ -250,7 +261,7 @@ var ConfirmDialog = React.createClass({
         }
     },
     unbindEvents: function() {
-        $(document).unbind('keyup.confirmDialog' + this.getUniqueId());
+        $(document).off('keyup.confirmDialog' + this.getUniqueId());
     },
     componentDidMount: function() {
         var self = this;

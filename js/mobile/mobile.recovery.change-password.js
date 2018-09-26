@@ -76,26 +76,33 @@ mobile.recovery.changePassword = {
             if (typeof zxcvbn !== 'undefined') {
 
                 // Estimate the password strength
-                var password = $passwordInput.val();
-                var passwordStrength = zxcvbn(password);
+                var password = $.trim($passwordInput.val());
+                var passwordScore = zxcvbn(password).score;
+                var passwordLength = password.length;
 
                 // Remove previous strength classes that were added
                 $passwordStrengthBar.removeClass('good1 good2 good3 good4 good5');
 
                 // Add colour coding
-                if (passwordStrength.score > 3 && passwordStrength.entropy > 75) {
+                if (passwordLength === 0) {
+                    return false;
+                }
+                else if (passwordLength < 8) {
+                    $passwordStrengthBar.addClass('good1');    // Too short
+                }
+                else if (passwordScore === 4) {
                     $passwordStrengthBar.addClass('good5');    // Strong
                 }
-                else if (passwordStrength.score > 2 && passwordStrength.entropy > 50) {
+                else if (passwordScore === 3) {
                     $passwordStrengthBar.addClass('good4');    // Good
                 }
-                else if (passwordStrength.score > 1 && passwordStrength.entropy > 40) {
+                else if (passwordScore === 2) {
                     $passwordStrengthBar.addClass('good3');    // Medium
                 }
-                else if (passwordStrength.score > 0 && passwordStrength.entropy > 15) {
+                else if (passwordScore === 1) {
                     $passwordStrengthBar.addClass('good2');    // Weak
                 }
-                else if (password.length !== 0) {
+                else {
                     $passwordStrengthBar.addClass('good1');    // Very Weak
                 }
             }
@@ -164,7 +171,7 @@ mobile.recovery.changePassword = {
             }
 
             // Unfocus (blur) the input fields to prevent the cursor showing on iOS and also hide the keyboard
-            $passwordField.add($confirmPasswordField).blur();
+            $passwordField.add($confirmPasswordField).trigger("blur");
 
             // If the passwords are not the same
             if (password !== confirmPassword) {
@@ -175,6 +182,14 @@ mobile.recovery.changePassword = {
 
                 // Show an error and don't proceed
                 mobile.messageOverlay.show(l[9066]);        // The passwords are not the same...
+                return false;
+            }
+
+            // Check for minimum password length
+            if (password.length < 8) {
+
+                // Then show an error and don't proceed
+                mobile.messageOverlay.show(l[18701]);
                 return false;
             }
 
@@ -219,43 +234,41 @@ mobile.recovery.changePassword = {
         loadingDialog.show();
 
         // Change the password, re-encrypt the Master Key and send the encrypted key to the server
-        api_resetkeykey({
-            result: function(responseCode) {
+        security.resetKey(recoveryCode, recoveryKeyArray, recoveryEmail, newPassword, function(responseCode) {
 
-                loadingDialog.hide();
+            loadingDialog.hide();
 
-                // If successful
-                if (responseCode === 0) {
+            // If successful
+            if (responseCode === 0) {
 
-                    // Show message that the password has been reset successfully
-                    mobile.messageOverlay.show(l[1955], l[1981], function() {
+                // Show message that the password has been reset successfully
+                mobile.messageOverlay.show(l[1955], l[1981], function() {
 
-                        // Pre-fill the email on the login page
-                        mobile.signin.previousEmailUsed = recoveryEmail;
+                    // Pre-fill the email on the login page
+                    mobile.signin.previousEmailUsed = recoveryEmail;
 
-                        // Load the login page
-                        loadSubPage('login');
-                    });
-                }
-
-                // Show error that the Recovery Key you supplied does not match this account
-                else if (responseCode === EKEY) {
-                    mobile.messageOverlay.show(l[1977], l[1978]);
-                }
-
-                // The account they're trying to reset is blocked
-                else if (responseCode === EBLOCKED) {
-                    mobile.messageOverlay.show(l[1979], l[1980]);
-                }
-
-                // This recovery link has expired
-                else if (responseCode === EEXPIRED || responseCode === ENOENT) {
-                    mobile.messageOverlay.show(l[1966], l[1967], function() {
-                        loadSubPage('login');
-                    });
-                }
+                    // Load the login page
+                    loadSubPage('login');
+                });
             }
-        }, recoveryCode, recoveryKeyArray, recoveryEmail, newPassword);
+
+            // Show error that the Recovery Key you supplied does not match this account
+            else if (responseCode === EKEY) {
+                mobile.messageOverlay.show(l[1977], l[1978]);
+            }
+
+            // The account they're trying to reset is blocked
+            else if (responseCode === EBLOCKED) {
+                mobile.messageOverlay.show(l[1979], l[1980]);
+            }
+
+            // This recovery link has expired
+            else if (responseCode === EEXPIRED || responseCode === ENOENT) {
+                mobile.messageOverlay.show(l[1966], l[1967], function() {
+                    loadSubPage('login');
+                });
+            }
+        });
     },
 
     /**
@@ -273,42 +286,40 @@ mobile.recovery.changePassword = {
         loadingDialog.show();
 
         // Finish the Park Account process
-        api_resetuser({
-            callback: function(responseCode) {
+        security.resetUser(recoveryCode, recoveryEmail, newPassword, function(responseCode) {
 
-                loadingDialog.hide();
+            loadingDialog.hide();
 
-                // If successful
-                if (responseCode === 0) {
+            // If successful
+            if (responseCode === 0) {
 
-                    // Show message that the account has been parked successfully
-                    mobile.messageOverlay.show(l[1975], l[1976], function() {
+                // Show message that the account has been parked successfully
+                mobile.messageOverlay.show(l[1975], l[1976], function() {
 
-                        // Pre-fill the email on the login page
-                        mobile.signin.previousEmailUsed = recoveryEmail;
+                    // Pre-fill the email on the login page
+                    mobile.signin.previousEmailUsed = recoveryEmail;
 
-                        // Load the login page
-                        loadSubPage('login');
-                    });
-                }
-
-                // Show error that the Recovery Key you supplied does not match this account
-                else if (responseCode === EKEY) {
-                    mobile.messageOverlay.show(l[1977], l[1978]);
-                }
-
-                // The account they're trying to park is blocked
-                else if (responseCode === EBLOCKED) {
-                    mobile.messageOverlay.show(l[1979], l[1980]);
-                }
-
-                // This recovery link has expired
-                else if (responseCode === EEXPIRED || responseCode === ENOENT) {
-                    mobile.messageOverlay.show(l[1966], l[1967], function() {
-                        loadSubPage('login');
-                    });
-                }
+                    // Load the login page
+                    loadSubPage('login');
+                });
             }
-        }, recoveryCode, recoveryEmail, newPassword);
+
+            // Show error that the Recovery Key you supplied does not match this account
+            else if (responseCode === EKEY) {
+                mobile.messageOverlay.show(l[1977], l[1978]);
+            }
+
+            // The account they're trying to park is blocked
+            else if (responseCode === EBLOCKED) {
+                mobile.messageOverlay.show(l[1979], l[1980]);
+            }
+
+            // This recovery link has expired
+            else if (responseCode === EEXPIRED || responseCode === ENOENT) {
+                mobile.messageOverlay.show(l[1966], l[1967], function() {
+                    loadSubPage('login');
+                });
+            }
+        });
     }
 };

@@ -17,6 +17,15 @@ var slideshowid;
     var switchedSides = false;
     var fitToWindow = Object.create(null);
 
+    function slideshow_handle(raw) {
+        var result;
+
+        if (slideshowid) {
+            result = raw ? slideshowid : slideshowid.slice(-8);
+        }
+        return result || false;
+    }
+
     function slideshowsteps() {
         var $overlay = $('.viewer-overlay');
         var $controls = $overlay.find('.viewer-button.slideshow, .viewer-mid-button.prev, .viewer-mid-button.next');
@@ -28,6 +37,9 @@ var slideshowid;
         var filter = function(n) {
             return is_image2(n) || is_video(n);
         };
+        var index = function(i) {
+            return M.v[i].h;
+        };
 
         if (slideshowplay) {
             filter = function(n) {
@@ -35,11 +47,17 @@ var slideshowid;
             };
         }
 
+        if (M.chat) {
+            index = function(i) {
+                return M.v[i].ch;
+            };
+        }
+
         // Loop through available items and extract images
         for (var i = 0, m = M.v.length; i < m; i++) {
             if (filter(M.v[i])) {
                 // is currently previewed item
-                if (M.v[i].h === slideshowid) {
+                if (index(i) === slideshowid) {
                     ci = i;
                 }
                 ii.push(i);
@@ -53,19 +71,19 @@ var slideshowid;
             switch (n) {
                 // last
                 case len - 1:
-                    forward.push(M.v[ii[0]].h);
-                    backward.push(M.v[ii[n - 1]].h);
+                    forward.push(index(ii[0]));
+                    backward.push(index(ii[n - 1]));
                     break;
                 // first
                 case 0:
-                    forward.push(M.v[ii[n + 1]].h);
-                    backward.push(M.v[ii[len - 1]].h);
+                    forward.push(index(ii[n + 1]));
+                    backward.push(index(ii[len - 1]));
                     break;
                 case -1:
                     break;
                 default:
-                    forward.push(M.v[ii[n + 1]].h);
-                    backward.push(M.v[ii[n - 1]].h);
+                    forward.push(index(ii[n + 1]));
+                    backward.push(index(ii[n - 1]));
             }
             $counter.find('.first').text(n + 1);
             $counter.find('.last').text(len);
@@ -87,42 +105,33 @@ var slideshowid;
         return {backward: backward, forward: forward};
     }
 
-    function slideshow_next() {
+    function slideshow_move(dir) {
         var valid = true;
+        var h = slideshow_handle();
+        var step = dir === 'next' ? 'forward' : 'backward';
+
         $.each(dl_queue || [], function(id, file) {
-            if (file.id === slideshowid && file.preview) {
+            if (file.id === h && file.preview) {
                 valid = false;
                 return false;
-                /* break loop */
             }
         });
         if (!valid) {
             return;
         }
         var steps = slideshowsteps();
-        if (steps.forward.length > 0) {
-            mBroadcaster.sendMessage('slideshow:next', steps);
-            slideshow(steps.forward[0]);
+        if (steps[step].length > 0) {
+            mBroadcaster.sendMessage('slideshow:' + dir, steps);
+            slideshow(steps[step][0]);
         }
     }
 
+    function slideshow_next() {
+        slideshow_move('next');
+    }
+
     function slideshow_prev() {
-        var valid = true;
-        $.each(dl_queue || [], function(id, file) {
-            if (file.id === slideshowid && file.preview) {
-                valid = false;
-                return false;
-                /* break loop */
-            }
-        });
-        if (!valid) {
-            return;
-        }
-        var steps = slideshowsteps();
-        if (steps.backward.length > 0) {
-            mBroadcaster.sendMessage('slideshow:prev', steps);
-            slideshow(steps.backward[steps.backward.length - 1]);
-        }
+        slideshow_move('prev');
     }
 
     function slideshow_fullscreen($overlay) {
@@ -149,7 +158,7 @@ var slideshowid;
     function slideshow_favourite(n, $overlay) {
         var $favButton = $overlay.find('.viewer-button.favourite');
 
-        if (!n || !n.p || folderlink) {
+        if (!n || !n.p || folderlink || M.getNodeRights(n.p) < 2) {
             $favButton.addClass('hidden');
         }
         else {
@@ -208,7 +217,7 @@ var slideshowid;
                             ephemeralDialog(l[1005]);
                         }
                         else {
-                            mega.Share.initCopyrightsDialog([slideshowid]);
+                            mega.Share.initCopyrightsDialog([slideshow_handle()]);
                         }
 
                         return false;
@@ -239,7 +248,7 @@ var slideshowid;
         var $percLabel = $overlay.find('.viewer-button-label.zoom');
 
         if (slideshow_stop) {
-            $overlay.removeClass('slideshow').unbind('mousewheel.imgzoom');
+            $overlay.removeClass('slideshow').off('mousewheel.imgzoom');
             slideshowplay = false;
             $pauseButton.attr('data-state', 'pause');
             $pauseButton.find('i').removeClass('play').addClass('pause');
@@ -347,9 +356,9 @@ var slideshowid;
         var lastPos = {x: null, y: null};
 
         if (close) {
-            $imgWrap.unbind('mousedown.pickpan');
-            $imgWrap.unbind('mouseup.pickpan, mouseout.pickpan');
-            $imgWrap.unbind('mousemove.pickpan');
+            $imgWrap.off('mousedown.pickpan');
+            $imgWrap.off('mouseup.pickpan, mouseout.pickpan');
+            $imgWrap.off('mousemove.pickpan');
             return false;
         }
 
@@ -538,8 +547,8 @@ var slideshowid;
             slideshowplay = false;
             $overlay.removeClass('video video-theatre-mode mouse-idle slideshow fullscreen').addClass('hidden');
             $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
-            $(window).unbind('resize.imgResize');
-            $document.unbind('keydown.slideshow mousemove.idle');
+            $(window).off('resize.imgResize');
+            $document.off('keydown.slideshow mousemove.idle');
             $overlay.find('.viewer-image-bl').removeClass('default-state');
             $overlay.find('.viewer-image-bl .img-wrap').attr('data-count', '');
             $overlay.find('.viewer-image-bl img').attr('src', '').removeAttr('style');
@@ -584,7 +593,7 @@ var slideshowid;
             _hideCounter = hideCounter;
         }
 
-        slideshowid = n.h;
+        slideshowid = n.ch || n.h;
         if (window.selectionManager) {
             selectionManager.clear_selection();
             selectionManager.set_currently_selected(n.h);
@@ -656,8 +665,8 @@ var slideshowid;
             });
 
             clearTimeout(mouseIdleTimer);
-            $document.unbind('mousemove.idle');
-            $controls.unbind('mousemove.idle');
+            $document.off('mousemove.idle');
+            $controls.off('mousemove.idle');
             $('.viewer-short-controls.img-controls', $overlay).addClass('hidden');
 
             // Slideshow Mode Init
@@ -743,7 +752,7 @@ var slideshowid;
             }
 
             for (var i = dl_queue.length; i--;) {
-                if (dl_queue[i] && dl_queue[i].id === slideshowid && dl_queue[i].preview) {
+                if (dl_queue[i] && dl_queue[i].id === slideshow_handle() && dl_queue[i].preview) {
                     dl_queue[i].preview = false;
                     M.openTransfersPanel();
                     return;
@@ -754,8 +763,8 @@ var slideshowid;
             if (page === 'download') {
                 $('.big-button.download-file').click();
             }
-            else if (M.d[slideshowid]) {
-                M.addDownload([slideshowid]);
+            else if (M.d[slideshow_handle()]) {
+                M.addDownload([slideshow_handle()]);
             }
             else {
                 M.addDownload([n]);
@@ -828,7 +837,7 @@ var slideshowid;
             if (isThumbnailMissing(n)) {
                 createNodeThumbnail(n, u8);
             }
-            if (h === slideshowid) {
+            if (h === slideshow_handle()) {
                 fetchnext();
             }
             delete pfails[h];
@@ -879,7 +888,7 @@ var slideshowid;
 
         if (pfails[n.h]) {
             // for slideshow_next/prev
-            if (slideshowid === n.h) {
+            if (slideshow_handle() === n.h) {
                 return eot(n.h, 1);
             }
             delete pfails[n.h];
@@ -891,7 +900,8 @@ var slideshowid;
         var maxSize = ua.details.engine === 'Trident' ? 12 : 50;
         var loadOriginal = n.s < maxSize * 1048576 && is_image(n) === 1;
         var loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
-        var getPreview = api_getfileattr.bind(window, treq, 1, preview, !loadOriginal && eot);
+        var onPreviewError = loadOriginal ? previewimg.bind(window, n.h, null) : eot;
+        var getPreview = api_getfileattr.bind(window, treq, 1, preview, onPreviewError);
 
         if (d) {
             console.debug('slideshow.fetchsrc(%s), preview=%s original=%s', id, loadPreview, loadOriginal, n, n.h);
@@ -917,7 +927,7 @@ var slideshowid;
             var progress = function(perc) {
                 var loadingDeg = 360 * perc / 100;
 
-                if (slideshowid !== n.h) {
+                if (slideshow_handle() !== n.h) {
                     if (d && ((perc | 0) % 10) < 1) {
                         console.debug('slideshow original image loading in background progress...', n.h, perc);
                     }
@@ -952,15 +962,15 @@ var slideshowid;
                     console.debug('slideshow failed to load original %s', n.h, ev.target && ev.target.status || ev);
                 }
 
-                if (slideshowid === n.h) {
+                if (slideshow_handle() === n.h) {
                     $progressBar.addClass('hidden');
                 }
-                if (loadPreview || isCached) {
-                    slideshow_timereset();
-                }
-                else {
+
+                if (!(loadPreview || isCached)) {
                     getPreview();
                 }
+
+                slideshow_timereset();
             });
         }
 
@@ -1058,7 +1068,7 @@ var slideshowid;
         }
 
         var $video = $overlay.find('.viewer-image-bl video');
-        $video.attr('poster', '').attr('controls', false).removeClass('hidden');
+        $video.attr('poster', '').prop('controls', false).removeClass('hidden');
 
         if (previews[id].poster !== undefined) {
             $video.attr('poster', previews[id].poster);
@@ -1071,7 +1081,7 @@ var slideshowid;
             getImage(n, 1).then(function(uri) {
                 previews[id].poster = uri;
 
-                if (id === slideshowid) {
+                if (id === slideshow_handle()) {
                     if ($video.length && !$video[0].parentNode) {
                         // The video element got already destroyed/replaced due an error
                         $video = $overlay.find('.viewer-image-bl video');
@@ -1095,7 +1105,7 @@ var slideshowid;
     }
 
     function isThumbnailMissing(n) {
-        return !n.fa || n.fa.indexOf(':0*') < 0;
+        return !M.chat && (!n.fa || n.fa.indexOf(':0*') < 0);
     }
 
     function createNodeThumbnail(n, ab) {
@@ -1189,7 +1199,7 @@ var slideshowid;
 
         var img = new Image();
         img.onload = img.onerror = function(ev) {
-            if (id !== slideshowid) {
+            if (id !== slideshow_handle()) {
                 if (d) {
                     console.debug('Moved to another image, not displaying %s...', id);
                 }
@@ -1199,8 +1209,14 @@ var slideshowid;
             var $img = $imgCount.find('.' + imgClass);
             var rot = previews[id].orientation | 0;
 
-            if (slideshowplay && (previews[id].full || ev.type === 'error' || is_image(Object(M.d[id]).name) !== 1)) {
-                slideshow_timereset();
+            if (slideshowplay) {
+                if (previews[id].full
+                    || previews[id].ffailed
+                    || ev.type === 'error'
+                    || is_image(M.getNodeByHandle(slideshowid)) !== 1) {
+
+                    slideshow_timereset();
+                }
             }
 
             if (ev.type === 'error') {
@@ -1220,6 +1236,9 @@ var slideshowid;
                     URL.revokeObjectURL(previews[id].src);
                     previews[id] = previews[id].prev;
                     delete previews[id].prev;
+                    previews[id].ffailed = 1;
+                    this.src = previews[id].src;
+                    return;
                 }
             }
             else {
@@ -1284,6 +1303,7 @@ var slideshowid;
 
     function previewimg(id, uint8arr, type) {
         var blob;
+        var n = M.getNodeByHandle(id);
 
         if (uint8arr === null) {
             if (d) {
@@ -1315,6 +1335,9 @@ var slideshowid;
                 if (d) {
                     console.warn('Not overwriting a full preview...', id);
                 }
+                if (id === slideshow_handle()) {
+                    previewsrc(id);
+                }
                 return;
             }
             previews[id].prev = previews[id];
@@ -1325,41 +1348,39 @@ var slideshowid;
         }
 
         previews[id] = Object.assign(Object.create(null), previews[id], {
+            h: id,
             blob: blob,
             type: type,
             time: Date.now(),
             src: myURL.createObjectURL(blob),
             buffer: uint8arr.buffer || uint8arr,
-            full: M.getNodeByHandle(id).s === blob.size
+            full: n.s === blob.size
         });
 
-        if (id === slideshowid) {
-            previewsrc(id);
+        if (n.hash) {
+            // cache previews by hash to reuse them in the chat
+            previews[id].hash = n.hash;
+            previews[n.hash] = previews[id];
         }
 
-        if (Object.keys(previews).length === 1) {
-            $(window).unload(function() {
-                for (var id in previews) {
-                    if (previews[id].src) {
-                        myURL.revokeObjectURL(previews[id].src);
-                    }
-                }
-            });
+        if (id === slideshow_handle()) {
+            previewsrc(id);
         }
 
         // Ensure we are not eating too much memory...
         delay('slideshow:freemem', slideshow_freemem, 6e3);
-
-        blob = uint8arr = undefined;
     }
 
     function slideshow_freemem() {
+        var i;
         var k;
         var size = 0;
         var now = Date.now();
+        var slideshowid = slideshow_handle();
+        var entries = array.unique(Object.values(previews));
 
-        for (k in previews) {
-            k = previews[k];
+        for (i = entries.length; i--;) {
+            k = entries[i];
             size += k.buffer && k.buffer.byteLength || 0;
         }
 
@@ -1369,18 +1390,33 @@ var slideshowid;
 
         if (size > 450 * 1048576) {
             size = 0;
-            for (k in previews) {
-                if (k !== slideshowid) {
-                    var p = previews[k];
-                    if (p.buffer && (now - p.time) > 2e4) {
-                        size += p.buffer.byteLength;
-                        M.neuterArrayBuffer(p.buffer);
-                        p.buffer = p.full = preqs[k] = false;
-                        if (p.type.startsWith('image')) {
-                            URL.revokeObjectURL(p.src);
-                            previews[k] = false;
-                        }
+
+            for (i = entries.length; i--;) {
+                var p = entries[i];
+
+                if (p.h === slideshowid || !p.buffer || (now - p.time) < 2e4) {
+                    continue;
+                }
+                k = p.h;
+
+                size += p.buffer.byteLength;
+                M.neuterArrayBuffer(p.buffer);
+                p.buffer = p.full = preqs[k] = false;
+
+                if (p.prev) {
+                    previews[k] = p.prev;
+                    delete p.prev;
+                }
+
+                if (p.type.startsWith('image')) {
+                    URL.revokeObjectURL(p.src);
+                    if (previews[k] === p) {
+                        previews[k] = false;
                     }
+                }
+
+                if (!previews[k] && p.hash) {
+                    previews[p.hash] = false;
                 }
             }
 
@@ -1393,6 +1429,7 @@ var slideshowid;
     global.slideshow = slideshow;
     global.slideshow_next = slideshow_next;
     global.slideshow_prev = slideshow_prev;
+    global.slideshow_handle = slideshow_handle;
     global.slideshow_steps = slideshowsteps;
     global.previewsrc = previewsrc;
     global.previewimg = previewimg;

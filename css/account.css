@@ -1,0 +1,430 @@
+.sign .main-pad-block {
+    background-color: #FAFAFA;
+}
+.bottom-page.sign .register-st2-txt-block {
+    padding-top: 94px;
+}
+.account.top-header {
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 36px;
+    line-height: 44px;
+    color: black;
+    padding: 44px 0 64px 0;
+}
+.fm-dialog-header .account.top-header {
+    padding: 40px 0px 10px 40px;
+    color: #333;
+}
+
+
+.fm-dialog-header .account.top-header.small {
+    padding: 40px 0px 0px 40px;
+    font-size: 26px;
+}
+.account.top-header span {
+    color: #F0373B;
+}
+.account.top-header.wide {
+    width: 112%;
+}
+.account.text-header {
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 18px;
+    line-height: 30px;
+    color: black;
+    padding: 35px 0 44px 0;
+}
+.account.small-header-txt {
+    float: right;
+    font-size: 14px;
+    line-height: 24px;
+    color: #666666;
+    padding: 64px 0 0 0;
+}
+.account.small-header-txt a {
+    color: #F0373B;
+    cursor: pointer;
+}
+.account.small-header-txt a:hover {
+    text-decoration: underline;
+}
+.account.input-wrapper {
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    padding: 9px 0 9px 38px;
+    margin: 0 0 24px 0;
+    position: relative;
+    font-size: 0;
+    line-height: 0;
+    white-space: nowrap;
+    -webkit-transition: border-color 200ms ease-in-out;
+    -moz-transition: border-color 200ms ease-in-out;
+    -o-transition: border-color 200ms ease-in-out;
+    -ms-transition: border-color 200ms ease-in-out;
+    transition: border-color 200ms ease-in-out;
+}
+.top-login-popup.sign .account.input-wrapper {
+    margin: 0 0 8px 0;
+}
+.fm-dialog.top-login-popup.sign .account.input-wrapper {
+        margin: 0 0 24px 0;
+}
+.account.input-wrapper.focused {
+    border-color: rgba(0,0,0,0.4);
+}
+.account.input-wrapper.incorrect, .both-incorrect-inputs .account.input-wrapper {
+    border-color: rgba(218,49,53,0.5);
+}
+.account.input-wrapper i {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    left: 4px;
+    top: 9px;
+    opacity: 0.6;
+}
+.account.input-wrapper input {
+    background-color: transparent;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    line-height: 25px;
+    letter-spacing: 1px;
+    color: #000000;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-transition: color 200ms ease-in-out;
+    -moz-transition: color 200ms ease-in-out;
+    -o-transition: color 200ms ease-in-out;
+    -ms-transition: color 200ms ease-in-out;
+    transition: color 200ms ease-in-out;
+}
+.account.input-wrapper input[type='number'] {
+    font-size: 20px;
+}
+.account.input-wrapper.double input {
+    width: 50%;
+    display: inline-block;
+    padding-right: 15px;
+}
+.account.input-wrapper.incorrect input, .both-incorrect-inputs .account.input-wrapper input {
+    color: #DA3135;
+}
+.account.input-wrapper input::-webkit-input-placeholder {
+    color: #999999;
+    font-size: 12px;
+    letter-spacing: 0.86px;
+}
+.account.input-wrapper input:-moz-placeholder {
+    color: #999999;
+    font-size: 12px;
+    letter-spacing: 0.86px;
+    opacity: 1;
+}
+.account.input-wrapper input::-moz-placeholder {
+    color: #999999;
+    letter-spacing: 0.86px;
+    opacity: 1;
+}
+.account.input-wrapper input:-ms-input-placeholder {
+    color: #999999;
+    font-size: 12px;
+    letter-spacing: 0.86px;
+}
+.account.input-wrapper.focused input::-webkit-input-placeholder {
+    color: #CCC;
+}
+.account.input-wrapper.focused input:-moz-placeholder {
+    color: #CCC;
+}
+.account.input-wrapper.focused input::-moz-placeholder {
+    color: #CCC;
+}
+.account.input-wrapper.focused input:-ms-input-placeholder {
+    color: #CCC;
+}
+.account.input-wrapper input:-webkit-autofill, input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 50px #FAFAFA inset;
+    -webkit-text-fill-color: #000000;
+}
+.account.input-tooltip, .both-input-tooltip {
+    background-color: #f8e6e6;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    font-size: 14px;
+    line-height: 18px;
+    min-height: 24px;
+    padding: 4px 0;
+    text-transform: uppercase;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 3px 10px;
+    color: #DA3135;
+    position: absolute;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(218,49,53,0.5);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(218,49,53,0.5);
+    box-shadow: 0px 0px 0px 1px rgba(218,49,53,0.5);
+    left: 100%;
+    bottom: 0;
+    margin: 0 0 0 20px;
+    display: none;
+    z-index: 10;
+}
+.both-input-tooltip {
+    bottom: -22px;
+}
+.account.input-tooltip.left, .both-input-tooltip.left {
+     left: auto;
+     right: 100%;
+     margin: 0 20px 0 0;
+}
+.account.input-tooltip.mid {
+    top: 9px;
+    bottom: auto;
+}
+.incorrect .account.input-tooltip, .both-incorrect-inputs .both-input-tooltip {
+    display: block;
+}
+.incorrect .account.input-tooltip.bottom {
+    left: -20px;
+    top: auto;
+    bottom: -40px;
+}
+.account.checkbox-block {
+    padding: 10px 0 64px 1px;
+}
+.pro-login-dialog .account.checkbox-block{
+    padding: 16px 0 16px 1px;
+}
+.account.checkbox-block.focused .checkboxOn::before, .account.checkbox-block.focused .checkboxOff::before {
+    -webkit-box-shadow: 0 0 0 1px rgba(240, 55, 58, 0.5);
+    -moz-box-shadow: 0 0 0 1px rgba(240, 55, 58, 0.5);
+    box-shadow: 0 0 0 1px rgba(240, 55, 58, 0.5);
+}
+.account.checkbox-block.left {
+    white-space: nowrap;
+}
+.big-red-button.login-button {
+    margin-top: 2px;
+}
+.business .big-red-button.register-button {
+    margin-top: 30px;
+}
+.account.password-stutus {
+    font-size: 12px;
+    line-height: 24px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    position: absolute;
+    right: 0;
+    top: 9px;
+    display: none;
+    color: #ff2a0b;
+}
+.account.password-stutus.good2 {
+    color: #ffc926;
+}
+.account.password-stutus.good3 {
+    color: #7ab148;
+}
+.account.password-stutus.good4 {
+    color: #7dd016;
+}
+.account.password-stutus.good5 {
+    color: #1DA1E9;
+}
+.account.password-stutus.checked {
+    display: block;
+}
+.account.input-wrapper.password {
+    padding-right: 80px;
+}
+.login .account.input-wrapper.password {
+    padding-right: 0;
+}
+.sign .main-pad-block .big-red-button {
+    margin-bottom: 46px;
+}
+.sign .big-red-button {
+    min-width: 0;
+}
+.business-block, .business .personal-block {
+    display: none;
+}
+.business .business-block {
+    display: block;
+}
+.account.input-hint {
+    font-size: 12px;
+    line-height: 24px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    color: #999999;
+    position: absolute;
+    left: 38px;
+    top: -18px;
+    letter-spacing: 0.86px;
+}
+.account.radio-buttons.register-pad {
+    padding: 0 0 29px 0;
+    margin: -2px 0 0 0;
+}
+.register-pad div.right {
+    float: right;
+}
+.radio-txt.medium {
+    font-size: 16px;
+    color: #333333;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    padding-right: 5px;
+}
+.radio-txt.medium span {
+    padding-right: 8px;
+}
+.account.radio-buttons .provider-icon {
+    margin: 0 0 0 8px;
+}
+.account.checkbox-block.terms {
+    padding-bottom: 3px;
+}
+.account.checkbox-block .radio-txt {
+    color: #666666;
+    line-height: 18px;
+    padding-top: 7px;
+}
+.top-login-popup .account.checkbox-block .radio-txt {
+    padding-top: 0;
+}
+.account.business-plan {
+    width: 360px;
+    background-color: white;
+    float: right;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 0 20px 0 rgba(0,0,0,0.05);
+    -moz-box-shadow: 0 0 20px 0 rgba(0,0,0,0.05);
+    box-shadow: 0 0 20px 0 rgba(0,0,0,0.05);
+    position: relative;
+    margin: 198px 0 0 0;
+}
+.account.business-plan * {
+    position: relative;
+}
+.account.business-plan::before, .account.business-plan::after {
+    position: absolute;
+    display: block;
+    content: "";
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    -webkit-box-shadow: 0 2px 5px 0 rgba(102,102,102,0.1);
+    -moz-box-shadow: 0 2px 5px 0 rgba(102,102,102,0.1);
+    box-shadow: 0 2px 5px 0 rgba(102,102,102,0.1);
+}
+.account.business-plan::after {
+    -webkit-box-shadow: 0 0 1px 0 #E6E6E6;
+    -moz-box-shadow: 0 0 1px 0 #E6E6E6;
+    box-shadow: 0 0 1px 0 #E6E6E6;
+}
+.account.business-plan-icon {
+    height: 68px;
+    width: 68px;
+    margin: 35px auto 2px auto;
+    background-image: url(../images/mega/business.png);
+    background-position: -255px -1255px;
+}
+.account.business-plan-title {
+    font-size: 20px;
+    line-height: 26px;
+    color: #666666;
+    text-align: center;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    padding: 0 0 40px 0;
+}
+.account.business-plan-price {
+    height: 72px;
+    background-color: #00BFA5;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    color: white;
+    padding: 15px 0 0 0;
+    margin: 0 16px 16px 16px;
+    font-size: 16px;
+    line-height: 40px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    text-align: center;
+}
+.account.business-plan-price .big {
+    font-size: 40px;
+    padding-right: 12px;
+}
+.account.business-plan-info, .account.business-plan-total {
+    height: 54px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    font-size: 16px;
+    line-height: 20px;
+    color: #333333;
+    padding: 17px 16px 0 16px;
+    margin: 0 16px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.account.business-plan-info.grey {
+    background-color: rgba(0,0,0,0.03);
+}
+.account.business-plan-total {
+    border-top: 1px solid rgba(0,0,0,0.1);
+    font-size: 24px;
+    line-height: 30px;
+    height: 67px;
+}
+.account.icons-blocks {
+    font-size: 0;
+}
+.sign .bottom-page.small-txt {
+    font-size: 14px;
+    line-height: 24px;
+    color: #666666;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.sign .bottom-page.big-icon.top-pad {
+    margin: 9px auto 16px auto;
+}
+.bottom-page.big-icon.business {
+    background-image: url(../images/mega/business.png);
+}
+.bottom-page.big-icon.business.key {
+    background-position: 1px -1370px;
+}
+.bottom-page.big-icon.business.revert {
+    background-position: -149px -1370px;
+}
+.bottom-page.big-icon.business.https {
+    background-position: 1px -1520px;
+}
+.main-left-block.confirm {
+    float: none;
+    margin: 36px auto 0 auto;
+    text-align: center;
+}
+.confirm .account.top-header {
+    width: 160%;
+    margin: 0 -30%;
+}
+.top-login-popup .account.checkbox-block {
+    padding: 0 0 16px 0;
+}
+.dropdown.body.popup.top-login-popup {
+    width: 400px;
+}

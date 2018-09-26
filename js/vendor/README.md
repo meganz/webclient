@@ -46,6 +46,12 @@ Unless otherwise noted, they were released under a [MIT License].
 > NB: To compile from C source, fork the repo and run `build.sh`.
 
 ---
+[encoding.js, encoding-indexes.js]: Polyfill for the Living Standard's Encoding API
+
+> **This is a fork** to remove UTF characters, [see the changes](https://github.com/inexorabletash/text-encoding/compare/master...meganz:master)
+> Released as public domain.
+
+---
 [es6-shim]: ECMAScript 6 compatibility shims for legacy JavaScript engines.
 
 > **This is a fork**, [Compare the changes](https://github.com/paulmillr/es6-shim/compare/master...meganz:master)
@@ -74,7 +80,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/IonDen/ion.sound/compare/master...meganz:master)
 
 ---
-[jquery-2.2.1.js]: jQuery JavaScript Library.
+[jquery.js]: jQuery JavaScript Library.
 
 ---
 [jquery-ui.js]: jQuery-UI - jQuery User Interface library.
@@ -165,19 +171,18 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/webmproject/libwebp/compare/master...meganz:master)
 
 ---
-[zxcvbn.js]: A realistic password strength estimator.
+[zxcvbn.js]: Low-Budget Password Strength Estimation.
 
 > NB: We are using a custom, unobfuscated build which was created using:
 >
 > ```bash
 > git clone https://github.com/dropbox/zxcvbn.git
 > cd zxcvbn
-> git checkout 1.0.1
+> git checkout v4.4.2
 > npm install
-> nano compile_and_minify.sh
-> Comment out or delete the last 4 lines to prevent minification by the Closure compiler
-> ./compile_and_minify.sh
-> Use output in compiled.js
+> Edit the package.json file and on the `"build-dist":` line, remove `-t uglifyify` to prevent minification.
+> Save the file and run: `npm run build`
+> Use the new file in dist/zxcvbn.js
 > ```
 
 ---
@@ -215,13 +220,14 @@ Unless otherwise noted, they were released under a [MIT License].
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [dexie.js]: <https://github.com/dfahlander/Dexie.js>
 [dcraw.js]: <https://github.com/meganz/dcraw.js>
+[encoding.js, encoding-indexes.js]: <https://github.com/inexorabletash/text-encoding/tree/v0.6.3>
 [es6-shim]: <https://github.com/meganz/es6-shim>
 [exif-js]: <https://github.com/meganz/exif-js>
 [favico.js]: <https://github.com/meganz/favico.js>
 [filesaver.js]: <https://github.com/eligrey/FileSaver.js/tree/d8388a1a3c781821caae9110ee3d7c28aa7d6e0b>
 [int64.js]: <https://github.com/meganz/node-int64>
 [ion.sound.js]: <https://github.com/meganz/ion.sound>
-[jquery-2.2.1.js]: <https://github.com/jquery/jquery/blob/2.2.1/dist/jquery.js>
+[jquery.js]: <https://github.com/jquery/jquery/blob/3.3.1/dist/jquery.js>
 [jquery-ui.js]: <https://code.jquery.com/ui/1.12.1/jquery-ui.js>
 [jquery.fullscreen.js]: <https://github.com/kayahr/jquery-fullscreen-plugin/tree/5c95707f9ebf3d4962e9057b09cc43c10f11c3f4>
 [jquery.jscrollpane.js]: <https://github.com/meganz/jScrollPane>

@@ -1583,7 +1583,7 @@ var strongvelope = {};
             }
             else if (
                 parsedMessage.recipients.length > 0 &&
-                parsedMessage.recipients.indexOf(this.ownHandle) === -1
+                parsedMessage.recipients.indexOf(self.ownHandle) === -1
             ) {
                 logger.info('I am not participating in this chat, cannot read message.');
             }

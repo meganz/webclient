@@ -240,7 +240,7 @@ function dl_g(res) {
 
                     if (dl_node.s > maxDownloadSize || !supported) {
                         $('body').addClass('wrong-file');
-                        $('.mobile.dl-browser').addClass('disabled').unbind('click');
+                        $('.mobile.dl-browser').addClass('disabled').off('click');
 
                         if (!supported) {
                             $('.mobile.error-txt.file-unsupported').removeClass('hidden');
@@ -294,7 +294,7 @@ function dl_g(res) {
                                     $('.mobile .dl-app-link').removeClass('hidden');
 
                                     $('.download-progress').rebind('click', function() {
-                                        $('.download-progress').unbind('click');
+                                        $('.download-progress').off('click');
                                         $progress.text(l[5740]).removeClass('resume-bttn');
                                         browserDownload();
                                         return false;
@@ -653,7 +653,7 @@ function setMobileAppInfo() {
 
         case 'Windows Phone':
             $('.app-info-block').addClass('wp');
-            $('.mobile.dl-browser').addClass('disabled').unbind('click');
+            $('.mobile.dl-browser').addClass('disabled').off('click');
             break;
 
         case 'Android':
@@ -787,7 +787,7 @@ function start_import() {
                 start_anoimport();
             }
             else {
-                loginDialog();
+                tooltiplogin.init();
 
                 mBroadcaster.once('login', function() {
                     setTimeout(function() {
@@ -832,11 +832,9 @@ function dlcomplete(dl) {
         $('.fm-dialog-overlay').removeClass('hidden');
         $('body').addClass('overlayed');
         $('.fm-dialog.download-dialog').css('left','50%');
-        $('.fm-dialog.download-dialog .fm-dialog-close').unbind('click');
-        $('.fm-dialog.download-dialog .fm-dialog-close').bind('click',function(e)
-        {
+        $('.fm-dialog.download-dialog .fm-dialog-close').rebind('click', function() {
             $('.fm-dialog.download-dialog').css('left','-1000px');
-            msgDialog('confirmation',l[1196],l[1197],l[1198],function(e)
+            msgDialog('confirmation', l[1196], l[1197], l[1198], function(e)
             {
                 if (e) $('.fm-dialog.download-dialog').addClass('hidden');
                 else
@@ -874,7 +872,7 @@ function dlbeforecomplete(filename) {
         var doneText = String(l[239]).toUpperCase();
         var $dlprogress = $('.download-progress');
 
-        $dlprogress.unbind('click');
+        $dlprogress.off('click');
         $('body').addClass('download-complete');
         $('.download-progress .bar').width('100%');
         $('.mobile.download-speed, .mobile.download-percents').text('');

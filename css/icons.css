@@ -1290,7 +1290,7 @@
 .dropdown-item:hover:not(.static) .small-icon.context.az, .dark .dropdown-item:not(.static) .small-icon.context.az {
     background-position: -40px -1277px;
 }
-.dropdown-item:hover:not(.static) .small-icon.context.single-clock, .dark .dropdown-item:not(.static) .small-icon.context.single-clock {
+.dropdown-item:hover:not(.static) .small-icon.context.single-clock, .dark .dropdown-item:not(.static) .small-icon.context.single-clock, .video.thumb .small-icon.icons-sprite.grey-clock {
     background-position: -120px -1277px;
 }
 .dropdown-item:hover:not(.static) .small-icon.context.status, .dark .dropdown-item:not(.static) .small-icon.context.status {
@@ -1369,7 +1369,7 @@
     width: 22px;
 }
 .small-icon.icons-sprite.grey-clock {
-    background-position: -81px -1159px;
+    background-position: -79px -1276px;
     width: 21px;
 }
 .medium-icon.icons-sprite.quote1 {

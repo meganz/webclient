@@ -990,6 +990,7 @@ var sabadell = {
                 // Hide the overlay
                 $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 $failureOverlay.addClass('hidden');
+                loadSubPage('pro');
             });
         }
     }
@@ -1604,6 +1605,7 @@ var addressDialog = {
                 // Hide the overlay
                 $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 $failureOverlay.addClass('hidden');
+                loadSubPage('pro');
             });
         }
     }
@@ -2071,6 +2073,8 @@ var cardDialog = {
 
             // Re-open the card dialog
             cardDialog.$dialog.addClass('active').removeClass('hidden');
+
+            loadSubPage('pro');
         });
     },
 

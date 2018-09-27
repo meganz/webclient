@@ -2048,7 +2048,8 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('.dialog-title', $dialog).text(l[19104]);
         $('.dialog-button-container .add-more', $dialog).addClass('hidden');
         $('.dialog-button-container .add-sub-user', $dialog).text(l[19084]).removeClass('a-ok-btn');
-        // $('.licence-bar', $dialog).removeClass('hidden');
+        $('.mega-logo.icon56.dialog-heading-img', $dialog).addClass('hidden');
+        $('.sent-email-logo.dialog-heading-img', $dialog).addClass('hidden');
     };
 
     clearDialog(); // remove any previous data

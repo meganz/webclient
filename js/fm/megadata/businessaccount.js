@@ -8,13 +8,14 @@ function BusinessAccount() {
 
 /**
  * Function to add sub user to a business account
- * @param {String} subEmail     email address of new user
- * @param {String} subFName     First name of new user
- * @param {String} subLName     Last name of new user
- * @param {Object} optionals    contain optional fields if any [position,idnum,phonenum,location]
- * @returns {Promise}           Resolves with new add user HANDLE + password
+ * @param {String} subEmail         email address of new user
+ * @param {String} subFName         First name of new user
+ * @param {String} subLName         Last name of new user
+ * @param {Object} optionals        contain optional fields if any [position,idnum,phonenum,location]
+ * @param {Boolean} isProtectLink   true if we want to protect invitation link with a password
+ * @returns {Promise}               Resolves with new add user HANDLE + password
  */
-BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName, optionals) {
+BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName, optionals, isProtectLink) {
     "use strict";
     var operationPromise = new MegaPromise();
     var mySelf = this;
@@ -51,6 +52,9 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
         if (optionals.location) {
             request['%location'] = base64urlencode(to8(optionals.location));
         }
+    }
+    if (isProtectLink) {
+        request.lp = 1;
     }
 
     api_req(request, {
@@ -100,8 +104,9 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
  * @param {String} subFName             new first name, or null to don't change
  * @param {String} subLName             new last name, or null to don't change
  * @param {any} optionals               new optionals, or null to don't change
+ * @param {Boolean} isProtectLink       true if we want to protect invitation link with a password
  */
-BusinessAccount.prototype.editSubAccount = function (subuserHandle,subEmail, subFName, subLName, optionals) {
+BusinessAccount.prototype.editSubAccount = function (subuserHandle, subEmail, subFName, subLName, optionals, isProtectLink) {
     "use strict";
     var operationPromise = new MegaPromise();
 
@@ -141,6 +146,9 @@ BusinessAccount.prototype.editSubAccount = function (subuserHandle,subEmail, sub
         if (optionals.location) {
             request['%location'] = base64urlencode(to8(optionals.location));
         }
+    }
+    if (isProtectLink) {
+        request.lp = 1;
     }
 
     api_req(request, {
@@ -665,7 +673,7 @@ BusinessAccount.prototype.getSignupCodeInfo = function (signupCode) {
  * copying the sub-user decrypted tree to master user root
  * @param {Array} treeObj       sub-user tree decrypted
  * @param {string} folderName   name of the folder to create in master's root
- * @returns {Promise}           resolves if oprtation succeeded
+ * @returns {Promise}           resolves if operation succeeded
  */
 BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folderName) {
     "use strict";

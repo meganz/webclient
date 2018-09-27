@@ -3637,7 +3637,12 @@ label.iPhoneCheckLabelOff span {
     -khtml-opacity: 1;
     opacity: 1;
 }
-.nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel, .not-logged .contacts-panel .fm-tree-panel {
+.nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel {
+    height: -webkit-calc(100% - 97px);
+    height: -moz-calc(100% - 97px);
+    height: calc(100% - 97px);
+}
+.nw-tree-panel-header + .nw-tree-panel-filter-tag.hidden + .fm-tree-panel, .not-logged .contacts-panel .fm-tree-panel {
     height: -webkit-calc(100% - 72px);
     height: -moz-calc(100% - 72px);
     height: calc(100% - 72px);

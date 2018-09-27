@@ -464,6 +464,8 @@ var astroPayDialog = {
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         this.$pendingOverlay.removeClass('hidden');
 
+        insertEmailToPayResult(this.$pendingOverlay);
+
         // Add click handlers for 'Go to my account' and Close buttons
         this.$pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
 
@@ -793,6 +795,8 @@ var voucherDialog = {
         voucherDialog.$successOverlay.removeClass('hidden');
         voucherDialog.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
 
+        insertEmailToPayResult(voucherDialog.$successOverlay);
+
         // Add click handlers for 'Go to my account' and Close buttons
         voucherDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
 
@@ -957,6 +961,8 @@ var sabadell = {
 
             // Show the success
             $pendingOverlay.removeClass('hidden');
+
+            insertEmailToPayResult($pendingOverlay);
 
             // Add click handlers for 'Go to my account' and Close buttons
             $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
@@ -1573,6 +1579,8 @@ var addressDialog = {
             // Show the success
             $pendingOverlay.removeClass('hidden');
 
+            insertEmailToPayResult($pendingOverlay);
+
             // Add click handlers for 'Go to my account' and Close buttons
             $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
 
@@ -2023,6 +2031,9 @@ var cardDialog = {
         cardDialog.$successOverlay.removeClass('hidden');
         cardDialog.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
 
+        insertEmailToPayResult(cardDialog.$successOverlay);
+
+
         // Add click handlers for 'Go to my account' and Close buttons
         cardDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
 
@@ -2369,3 +2380,14 @@ if (is_chrome_firefox) {
             });
     });
 }
+
+var insertEmailToPayResult = function($overlay) {
+    "use strict";
+
+    if (u_attr.email) {
+        $overlay.find('.payment-result-txt .user-email').text(u_attr.email);
+    } else if (localStorage.awaitingConfirmationAccount) {
+        var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
+        $overlay.find('.payment-result-txt .user-email').text(acc.email);
+    }
+};

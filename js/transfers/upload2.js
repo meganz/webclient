@@ -461,7 +461,12 @@ var ulmanager = {
             callback: function(res, ctx) {
                 if (!req.v || typeof res === 'number') {
                     if (res === EOVERQUOTA && req_type === 'p') {
-                        return ulmanager.ulShowOverStorageQuotaDialog([req, ctx]);
+                        if (sharer(req.t)) {
+                            ctx.inShareOQ = true;
+                        }
+                        else {
+                            return ulmanager.ulShowOverStorageQuotaDialog([req, ctx]);
+                        }
                     }
                     ulmanager.ulCompletePending2.apply(ulmanager, arguments);
                 }
@@ -800,13 +805,14 @@ var ulmanager = {
         else {
             var ul = ul_queue[ctx.ul_queue_num];
 
-            M.ulerror(ul, res);
+            M.ulerror(ul, ctx.inShareOQ ? ESHAREROVERQUOTA : res);
 
             if (res !== EOVERQUOTA && res !== EGOINGOVERQUOTA) {
                 srvlog('Unexpected upload completion server response (' + res
                     + ' @ ' + hostname(ctx.file.posturl) + ')');
             }
         }
+        delete ulmanager.ulCompletingPhase['ul_' + ctx.file.id];
 
         if (ctx.file.owner) {
             ctx.file.owner.destroy();

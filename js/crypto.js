@@ -119,13 +119,12 @@ var ETEMPUNAVAIL = -18;
 var ETOOMANYCONNECTIONS = -19;
 var EGOINGOVERQUOTA = -24;
 
-/* jshint -W098 */          // It is used in another file
 var EROLLEDBACK = -25;
 var EMFAREQUIRED = -26;     // Multi-Factor Authentication Required
-/* jshint +W098 */
 
 // custom errors
 var ETOOERR = -400;
+var ESHAREROVERQUOTA = -401;
 
 function ssl_needed() {
     var ssl_opt = ['Chrome/'];
@@ -3071,6 +3070,8 @@ function api_strerror(errno) {
         return "Connection overflow";
     case EGOINGOVERQUOTA:
         return "Not enough quota";
+    case ESHAREROVERQUOTA:
+        return "Share owner is over storage quota.";
     default:
         break;
     }

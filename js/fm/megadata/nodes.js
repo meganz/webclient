@@ -1802,59 +1802,58 @@ MegaData.prototype.updateLabelInfo = function(e) {
 
     var $t = $(e.target);
     var labelTxt = $t.data('label-txt');
-    var labelInfo;
 
     if ($(e.target).hasClass('active')) {
         switch (labelTxt) {
             case "Red":
-                labelInfo = l[19571];
+                labelTxt = l[19571];
                 break;
             case "Orange":
-                labelInfo = l[19575];
+                labelTxt = l[19575];
                 break;
             case "Yellow":
-                labelInfo = l[19579];
+                labelTxt = l[19579];
                 break;
             case "Green":
-                labelInfo = l[19583];
+                labelTxt = l[19583];
                 break;
             case "Blue":
-                labelInfo = l[19587];
+                labelTxt = l[19587];
                 break;
             case "Purple":
-                labelInfo = l[19591];
+                labelTxt = l[19591];
                 break;
-            case "Gray":
-                labelInfo = l[19595];
+            case "Grey":
+                labelTxt = l[19595];
                 break;
         }
     }
     else {
         switch (labelTxt) {
             case "Red":
-                labelInfo = l[19570];
+                labelTxt = l[19570];
                 break;
             case "Orange":
-                labelInfo = l[19574];
+                labelTxt = l[19574];
                 break;
             case "Yellow":
-                labelInfo = l[19578];
+                labelTxt = l[19578];
                 break;
             case "Green":
-                labelInfo = l[19582];
+                labelTxt = l[19582];
                 break;
             case "Blue":
-                labelInfo = l[19586];
+                labelTxt = l[19586];
                 break;
             case "Purple":
-                labelInfo = l[19590];
+                labelTxt = l[19590];
                 break;
-            case "Gray":
-                labelInfo = l[19594];
+            case "Grey":
+                labelTxt = l[19594];
                 break;
         }
     }
-    labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
+
     $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
 };
 

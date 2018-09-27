@@ -2561,6 +2561,8 @@
     "19513": "Terima kasih! Akun Anda [B]%2[\/B] akan ditingkatkan segera setelah kami menerima konfirmasi pembayaran Anda dari penyedia pembayaran kami. Jika Anda membayar dengan kartu debit atau kredit dan Anda belum menerima akun MEGA PRO Anda dalam beberapa jam, silakan hubungi kami di [A]support@mega.nz[\/A]. Jika Anda membayar dengan transfer bank, beri waktu 4-5 hari agar pembayaran dapat dihapus.",
     "19514": "Terima kasih! Akun Anda [B]%2[\/B] akan ditingkatkan segera setelah kami menerima konfirmasi pembayaran Anda dari penyedia pembayaran kami dalam beberapa menit. Jika Anda belum menerima akun MEGA PRO Anda dalam %1 jam, silakan hubungi kami di [A]support@mega.nz[\/A].",
     "19562": "The email address already exists. Please enter another email address.",
+    "19563": "Remove %1 label filter",
+    "19564": "Add %1 label filter",
     "19565": "Don't have an authenticator app?",
     "19566": "You need an authenticator app to enable 2FA on MEGA. You can download and install one of the apps below for your phone or tablet."
 }

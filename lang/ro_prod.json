@@ -2561,6 +2561,8 @@
     "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
     "19514": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A].",
     "19562": "The email address already exists. Please enter another email address.",
+    "19563": "Remove %1 label filter",
+    "19564": "Add %1 label filter",
     "19565": "Don't have an authenticator app?",
     "19566": "You need an authenticator app to enable 2FA on MEGA. You can download and install one of the apps below for your phone or tablet."
 }

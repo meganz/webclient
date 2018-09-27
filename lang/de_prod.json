@@ -2561,6 +2561,8 @@
     "19513": "Thanks! Your account [B]%2[\/B] will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at [A]support@mega.nz[\/A]. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
     "19514": "Vielen Dank! Sobald Ihre Zahlung bei uns angekommen ist, werden wir Ihren Account [B]%2[\/B] aktualisieren (dies dauert normalerweise nur wenige Minuten). Sollten Sie Ihren MEGA PRO-Status auch nach %1 Stunden noch nicht erhalten haben, setzen Sie sich bitte mit uns unter [A]support@mega.nz[\/A] in Verbindung.",
     "19562": "Diese Adresse existiert bereits. Bitte geben Sie eine andere ein.",
+    "19563": "Filter f\u00fcr %1 entfernen",
+    "19564": "Filter f\u00fcr %1 hinzuf\u00fcgen",
     "19565": "Haben Sie noch keine Authenticator-App?",
     "19566": "Zur Nutzung von Zwei-Faktor-Authentifizierung ben\u00f6tigen Sie eine Authenticator-App. Installieren Sie eine solche auf Ihrem Mobilger\u00e4t."
 }

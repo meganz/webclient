@@ -2561,6 +2561,8 @@
     "19513": "Merci ! Votre compte [B]%2[\/B] sera surclass\u00e9 d\u00e8s que nous aurons re\u00e7u la confirmation de votre paiement de notre fournisseur de services de paiement. Si vous avez pay\u00e9 par carte de d\u00e9bit ou de cr\u00e9dit, et si vous n\u2019avez pas acc\u00e8s \u00e0 votre compte MEGA PRO dans les heures qui suivent, veuillez nous contacter \u00e0 [A]support@mega.nz[\/A]. Si vous avez pay\u00e9 par transfert bancaire, la compensation du paiement peut prendre de 4 \u00e0 5 jours.",
     "19514": "Merci\u2009! Votre compte [B]%2[\/B] sera surclass\u00e9 d\u00e8s que nous aurons re\u00e7u la confirmation de votre paiement de notre fournisseur de services de paiement, dans quelques minutes. Si vous n\u2019avez pas acc\u00e8s \u00e0 votre compte MEGA PRO dans les %1 heures qui suivent, veuillez nous contacter \u00e0 [A]support@mega.nz[\/A].",
     "19562": "The email address already exists. Please enter another email address.",
+    "19563": "Remove %1 label filter",
+    "19564": "Add %1 label filter",
     "19565": "Don't have an authenticator app?",
     "19566": "You need an authenticator app to enable 2FA on MEGA. You can download and install one of the apps below for your phone or tablet."
 }

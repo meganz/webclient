@@ -2561,6 +2561,8 @@
     "19513": "Dzi\u0119ki! Twoje konto [B]%2[\/B] zostanie uaktualnione, gdy tylko otrzymamy potwierdzenie p\u0142atno\u015bci od naszego dostawcy p\u0142atno\u015bci. Je\u015bli zap\u0142aci\u0142e\u015b kart\u0105 debetow\u0105 lub kredytow\u0105 i nie otrzyma\u0142e\u015b swojego konta MEGA PRO w ci\u0105gu kilku godzin, skontaktuj si\u0119 z nami pod adresem [A]support@mega.nz[\/A]. Je\u015bli zap\u0142aci\u0142e\u015b przelewem bankowym, odczekaj 4-5 dni na uregulowanie p\u0142atno\u015bci.",
     "19514": "Dzi\u0119ki! Twoje konto [B]%2[\/B] zostanie uaktualnione, gdy tylko otrzymamy potwierdzenie p\u0142atno\u015bci od naszego dostawcy p\u0142atno\u015bci w ci\u0105gu kilku minut. Je\u015bli nie otrzyma\u0142e\u015b swojego konta MEGA PRO w ci\u0105gu %1 hours, skontaktuj si\u0119 z nami pod adresem [A]support@mega.nz[\/A].",
     "19562": "The email address already exists. Please enter another email address.",
+    "19563": "Remove %1 label filter",
+    "19564": "Add %1 label filter",
     "19565": "Don't have an authenticator app?",
     "19566": "You need an authenticator app to enable 2FA on MEGA. You can download and install one of the apps below for your phone or tablet."
 }

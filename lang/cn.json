@@ -2783,9 +2783,10 @@
     "19534": "\u81f3\u5c113\u4f4d\u7528\u6237",
     "19538": "\u53d7\u5236\u4e8e\u5408\u7406\u4f7f\u7528\u9650\u5236",
     "19539": "\u6ee1\u8db3\u60a8\u4f01\u4e1a\u6240\u9700\u7684\u6240\u6709\u7a7a\u95f4",
-    "19562": "The email address already exists. Please enter another email address",
+    "19562": "The email address already exists. Please enter another email address.",
     "19563": "\u5220\u9664%1 \u6807\u7b7e\u8fc7\u6ee4",
     "19564": "\u6dfb\u52a0%1 \u6807\u7b7e\u8fc7\u6ee4",
     "19565": "Don't have an authenticator app?",
-    "19566": "You need an authenticator app to enable 2FA on MEGA. You can download and install one of the apps below for your phone or tablet."
+    "19566": "You need an authenticator app to enable 2FA on MEGA. You can download and install one of the apps below for your phone or tablet.",
+    "19567": "The invitation link does not appear to be valid. Please contact your organization administrator."
 }

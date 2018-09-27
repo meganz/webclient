@@ -1109,6 +1109,25 @@ function accountUI() {
             mega.config.setn('dlThroughMEGAsync', dlThroughMEGAsync);
         });
 
+        $('.ulddd').removeClass('radioOn').addClass('radioOff');
+        i = 22;
+        if (fmconfig.ulddd === 0) {
+            i = 23;
+        }
+        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+        $('.ulddd input').rebind('click', function() {
+            var ulddd = 0;
+            var id = $(this).attr('id');
+            if (id === 'rad22') {
+                ulddd = undefined;
+            }
+            $('.ulddd').removeClass('radioOn').addClass('radioOff');
+            $(this).addClass('radioOn').removeClass('radioOff');
+            $(this).parent().addClass('radioOn').removeClass('radioOff');
+            mega.config.setn('ulddd', ulddd);
+        });
+
         var $cbTpp = $('#transfers-tooltip');// Checkbox transfers popup
         if (fmconfig.tpp) {
 

@@ -2456,7 +2456,6 @@ function closeDialog(ev) {
         delete $.copyToUpload;
         delete $.shareToContactId;
         delete $.copyrightsDialog;
-        delete $.copyToUploadData;
 
         /* copy/move dialog - save to */
         delete $.saveToDialogCb;

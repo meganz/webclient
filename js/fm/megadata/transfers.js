@@ -995,7 +995,8 @@ MegaData.prototype.addToTransferTable = function(gid, ttl, elem) {
 };
 
 var __ul_id = 8000;
-MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
+MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) {
+    'use strict'; /* jshint -W074 */
     var flag = 'ulMegaSyncAD';
 
     if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {
@@ -1012,14 +1013,12 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
                 $chk.off('click.dialog');
                 $chk = undefined;
             };
-            $('.download-button.light-white.continue, .fm-dialog-close').rebind('click', function() {
+            var onclick = function() {
                 hideMEGAsyncDialog();
-                M.addUpload(u, true);
-            });
-            $(document).rebind('keyup.megasync-upload', function() {
-                hideMEGAsyncDialog();
-                M.addUpload(u, true);
-            });
+                M.addUpload(u, true, emptyFolders, target);
+            };
+            $(document).rebind('keyup.megasync-upload', onclick);
+            $('.download-button.light-white.continue, .fm-dialog-close').rebind('click', onclick);
             $('.download-button.light-red.download').rebind('click', function() {
                 hideMEGAsyncDialog();
 
@@ -1055,28 +1054,23 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
             });
         return;
     }
-    var target;
-    var onChat;
+    var toChat;
     var added = 0;
     var ul_id;
     var pause = '';
     var pauseTxt = '';
+    var ephemeral = page === 'start';
     var ttl = this.getTransferTableLengths();
 
-    if ($.addUploadTarget) {
-        target = $.addUploadTarget;
-        delete $.addUploadTarget;
+    target = target || this.currentdirid;
+
+    if (String(target).startsWith('chat')) {
+        toChat = true;
     }
-    else if (String(this.currentdirid).length !== 8) {
+    else if (String(target).length !== 8 && String(target).length !== 11) {
         target = this.lastSeenCloudFolder || this.RootID;
     }
-    else {
-        target = this.currentdirid;
-    }
-
-    if ((onChat = (String(this.currentdirid).substr(0, 4) === 'chat'))) {
-        target = this.currentdirid;
-    }
+    console.assert(ephemeral || this.RootID, 'Unexpected M.addUpload() invocation...');
 
     if (uldl_hold) {
         pause = 'transfer-paused';
@@ -1085,6 +1079,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
 
     // Foreach the queue and start uploading
     var startUpload = function(u) {
+        u.sort(function(a, b) {
+            return a.size < b.size ? 1 : -1;
+        });
 
         for (var i = u.length; i--;) {
             var f = u[i];
@@ -1121,11 +1118,12 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
             added++;
             mega.ui.tpp.setTotal(1, 'ul');
 
-            if (uldl_hold) {
+            // When dragging files to create an ephemeral, uldl_hold is set at the time of showing the terms dialog.
+            if (!ephemeral && uldl_hold) {
                 fm_tfspause('ul_' + ul_id);
             }
 
-            if (onChat) {
+            if (toChat) {
                 f.chatid = target;
             }
         }
@@ -1136,7 +1134,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
         if (!$.transferHeader) {
             M.addTransferPanelUI();
         }
-        if (page === 'start') {
+        if (ephemeral && !Object(u_attr).terms) {
             ulQueue.pause();
             uldl_hold = true;
         }
@@ -1186,11 +1184,14 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
 
     // Prepare uploads by creating their target path beforehand as needed for the new fileconflict logic
     var paths = Object.create(null);
+    var queue = Object.create(null);
+    var files = [];
 
-    if (onChat) {
+    if (toChat) {
         // onChat = 'My chat files/' + (M.getNameByHandle(target.substr(5)) || target.substr(5));
-        onChat = 'My chat files';
-        paths[onChat] = null;
+        toChat = 'My chat files';
+        paths[toChat] = null;
+        files = u;
     }
     else {
         for (var i = u.length; i--;) {
@@ -1198,7 +1199,18 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
 
             if (file.path) {
                 paths[file.path] = null;
+
+                var path = M.getSafePath(file.path)[0];
+                if (path) {
+                    if (!queue[path]) {
+                        queue[path] = [];
+                    }
+                    queue[path].push(file);
+                    continue;
+                }
             }
+
+            files.push(file);
         }
 
         if (emptyFolders) {
@@ -1208,156 +1220,99 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
         }
     }
 
-    // Make one folder at a time
-    var makeDir = function(path, target) {
-        var promise = new MegaPromise();
-        var safePath = M.getSafePath(path);
-
-        if (safePath.length === 1) {
-            safePath = safePath[0];
-        }
-
-        if (onChat) {
-            target = M.RootID;
-        }
-
-        M.createFolder(target, safePath, new MegaPromise())
-            .always(function(_target) {
-                if (typeof _target === 'number') {
-                    ulmanager.logger.warn('Unable to create folder "%s" on target "%s"',
-                        path, target, api_strerror(_target));
-                }
-                else {
-                    paths[path] = _target;
-                }
-
-                promise.resolve();
-            });
-
-        return promise;
-    };
-
+    var uuid = makeUUID();
     var makeDirPromise = new MegaPromise();
 
-    var makeDirProc = function () {
-        var dirMaker = function _md(paths) {
-            var path = paths.pop();
+    if (d) {
+        ulmanager.logger.info('[%s] Pre-upload preparation...', uuid, u.length, [u]);
+        console.time('makeDirPromise-' + uuid);
+    }
 
-            if (path) {
-                makeDir(path, target).done(_md.bind(null, paths));
+    var dequeue = function(name) {
+        var files = queue[name] || false;
+
+        if (d) {
+            ulmanager.logger.info('Skipping uploads under "%s"...', name, files);
+        }
+
+        for (var i = files.length; i--;) {
+            delete paths[files[i].path];
+        }
+
+        delete queue[name];
+    };
+
+    var makeDirProc = function() {
+        var conflicts = [];
+        var folders = Object.keys(queue);
+
+        if (d) {
+            console.time('makeDirProc-' + uuid);
+        }
+
+        for (var i = folders.length; i--;) {
+            var name = folders[i];
+            var found = fileconflict.getNodeByName(target, name);
+
+            if (found) {
+                conflicts.push([{t: 1, name: name}, found]);
             }
-            else {
-                makeDirPromise.resolve();
-            }
-        };
-        // loadingDialog.show();
-        if (!onChat) {
-            var looped_checked = false;
-            var conflictedFolders = [];
-            var checkedF = [];
-            for (var folderO in paths) {
-                var foldersList = M.getSafePath(folderO);
-                if (foldersList && foldersList.length >= 1) {
-                    var folderName = foldersList[0];
-                    if (checkedF.indexOf(folderName) > -1) {
-                        continue;
-                    }
-                    checkedF.push(folderName);
-                    var matchNode = fileconflict.getNodeByName(target, folderName, false);
-                    if (matchNode && matchNode !== null) {
-                        looped_checked = true;
-                        var fl = {
-                            name: folderName,
-                            t: 1,
-                        };
-                        conflictedFolders.push([fl, matchNode]);
-                    }
-                }
-            }
-            if (!looped_checked) {
-                dirMaker(Object.keys(paths));
-            }
-            else {
-                var gettingUserResponse = function _gettingUserResponse() {
-                    var waitUser = new MegaPromise();
-                    var excludedFolders = [];
-                    var askUserForConflicts = function _askUserForConflicts(confs) {
-                        var pair = confs.pop();
-                        if (pair) {
-                            fileconflict.prompt('upload', pair[0], pair[1], confs.length, target)
-                                .always(function _userChoice(file, name, action, checked) {
-                                    if (file === -0xBADF || !action) {
-                                        waitUser.reject();
-                                    }
-                                    else if (action !== fileconflict.REPLACE) { // not merging
-                                        excludedFolders.push(pair[0].name);
-                                        if (checked) {
-                                            var itm = confs.pop();
-                                            while (itm) {
-                                                excludedFolders.push(itm[0].name);
-                                                itm = confs.pop();
-                                            }
-                                            waitUser.resolve(excludedFolders);
-                                        }
-                                        else {
-                                            askUserForConflicts(confs);
-                                        }
-                                    }
-                                    else {
-                                        if (checked) {
-                                            waitUser.resolve(excludedFolders);
-                                        }
-                                        else {
-                                            askUserForConflicts(confs);
-                                        }
-                                    }
-                                });
-                        }
-                        else {
-                            waitUser.resolve(excludedFolders);
-                        }
-                    };
-                    askUserForConflicts(conflictedFolders);
-                    return waitUser;
-                };
-                gettingUserResponse().done(function (noMerge) {
-                    if (noMerge && noMerge.length) {
-                        var acceptedPathes = [];
-                        for (var currPath in paths) {
-                            var currFolders = M.getSafePath(currPath);
-                            if (noMerge.indexOf(currFolders[0]) === -1) {
-                                acceptedPathes.push(currPath);
+        }
+
+        if (d && conflicts.length) {
+            ulmanager.logger.info('[%s] Resolving folder conflicts...', uuid, conflicts.concat());
+        }
+
+        (function _foreach() {
+            var entry = conflicts.pop();
+
+            if (entry) {
+                var node = entry[1];
+                entry = entry[0];
+
+                fileconflict.prompt('upload', entry, node, conflicts.length, target)
+                    .always(function(file, name, action, repeat) {
+                        if (file === -0xBADF) {
+                            if (d) {
+                                console.timeEnd('makeDirProc-' + uuid);
                             }
+                            return makeDirPromise.reject(EACCESS);
                         }
-                        var fileToUpload = [];
-                        for (var kh = 0; kh < u.length; kh++) { // N^2  :(
-                            if (!u[kh].path) { // a file to target location
-                                fileToUpload.push(u[kh]);
-                                continue;
-                            }
-                            for (var al = 0; al < acceptedPathes.length; al++) {
-                                if (u[kh].path.startsWith(acceptedPathes[al])) {
-                                    fileToUpload.push(u[kh]);
-                                    break;
+
+                        if (action === fileconflict.DONTCOPY) {
+                            dequeue(entry.name);
+
+                            if (repeat) {
+                                while ((entry = conflicts.pop())) {
+                                    dequeue(entry[0].name);
                                 }
                             }
                         }
-                        u = fileToUpload;
-                        dirMaker(acceptedPathes);
-                    }
-                    else {
-                        dirMaker(Object.keys(paths));
-                    }
-                })
-                    .fail(function () {
-                        return false;
-                    });
+                        else {
+                            console.assert(action === fileconflict.REPLACE, 'Invalid action...');
 
+                            if (repeat) {
+                                conflicts = [];
+                            }
+                        }
+
+                        onIdle(_foreach);
+                    });
             }
-        }
-        else {
-            dirMaker(Object.keys(paths));
-        }
+            else {
+                u = Array.prototype.concat.apply([], Object.values(queue).concat(files));
+                M.createFolders(paths, toChat ? M.RootID : target).always(function(res) {
+                    if (d && res !== paths) {
+                        ulmanager.logger.debug('Failed to create paths hierarchy...', res);
+                    }
+                    makeDirPromise.resolve();
+                });
+
+                if (d) {
+                    console.timeEnd('makeDirProc-' + uuid);
+                }
+            }
+        })();
     };
 
     var ulOpSize = 0; // how much bytes we're going to upload
@@ -1366,43 +1321,53 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
         ulOpSize += u[j].size;
     }
 
-    makeDirProc();
-    // M.checkGoingOverStorageQuota(ulOpSize).done(makeDirProc);
-
-    makeDirPromise
-        .done(function() {
-            var targets = Object.create(null);
-
-            for (var i = u.length; i--;) {
-                var file = u[i];
-
-                if (onChat) {
-                    file.target = paths[onChat] || M.RootID;
-                }
-                else if (paths[file.path]) {
-                    file.target = paths[file.path];
-                }
-
-                targets[file.target] = 1;
-            }
-            targets[target] = 1;
-
-            dbfetch.geta(Object.keys(targets))
-                .always(function(r) {
-                    // loadingDialog.hide();
-
-                    if (!M.c[target] && String(target).length !== 11 && !onChat) {
-                        if (d) {
-                            ulmanager.logger.warn("Error dbfetch'ing target %s", target, r);
-                        }
-                        target = M.currentdirid;
-                    }
-
-                    fileconflict
-                        .check(u, onChat ? u[0].target : target, fileversioning.dvState ? 'replace' : 'upload', onChat ? fileconflict.KEEPBOTH : 0)
-                        .done(startUpload);
-                });
+    M.onFileManagerReady(function() {
+        if (target === undefined) {
+            // On ephemeral was undefined
+            target = M.RootID;
+        }
+        dbfetch.get(String(target), new MegaPromise()).always(function() {
+            makeDirProc();
+            // M.checkGoingOverStorageQuota(ulOpSize).done(makeDirProc);
         });
+    });
+
+    makeDirPromise.done(function() {
+        var targets = Object.create(null);
+
+        for (var i = u.length; i--;) {
+            var file = u[i];
+
+            if (toChat) {
+                file.target = paths[toChat] || M.RootID;
+            }
+            else if (paths[file.path]) {
+                file.target = paths[file.path];
+            }
+
+            targets[file.target] = 1;
+        }
+
+        dbfetch.geta(Object.keys(targets)).always(function(r) {
+            // loadingDialog.hide();
+
+            if (!M.c[target] && String(target).length !== 11 && !toChat) {
+                if (d) {
+                    ulmanager.logger.warn("Error dbfetch'ing target %s", target, r);
+                }
+                target = M.currentdirid;
+            }
+
+            var to = toChat ? u[0].target : target;
+            var op = fileversioning.dvState ? 'replace' : 'upload';
+
+            fileconflict.check(u, to, op, toChat ? fileconflict.KEEPBOTH : 0).done(startUpload);
+        });
+    }).always(function() {
+        if (d) {
+            console.timeEnd('makeDirPromise-' + uuid);
+        }
+    });
 };
 
 MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
@@ -1558,6 +1523,9 @@ MegaData.prototype.ulerror = function(ul, error) {
             }
         }
         else {
+            if (error < 0) {
+                $('#ul_' + id).addClass('transfer-error').removeClass('transfer-completed');
+            }
 
             // Inform user that upload MEGAdrop is not available anymore
             if (page.substr(0, 8) === 'megadrop' && error === ENOENT || error === EACCESS) {

@@ -1257,16 +1257,16 @@ ul, li {
     display: none;
 }
 .mobile.session-history-page .folders-files-text .sh-device-header {
-    display: none; 
+    display: none;
 }
 .mobile.session-history-page .folders-files-text .sh-location-header {
-    display: none; 
+    display: none;
 }
 .mobile.session-history-page .folders-files-text .sh-date-header {
-    display: inline-block; 
+    display: inline-block;
 }
 .mobile.session-history-page .folders-files-text .sh-status-header {
-    display: none; 
+    display: none;
 }
 .mobile.main-block .mobile.info-badge {
     color: #4A90E2;
@@ -1609,22 +1609,22 @@ ul, li {
 .verify-login-page .mobile.signin-input input::placeholder {
     color: #aaa;
     font-size: 20px;
-    letter-spacing: 0px;   
+    letter-spacing: 0px;
 }
 .verify-login-page .mobile.signin-input input::-webkit-input-placeholder {
     color: #aaa;
     font-size: 20px;
-    letter-spacing: 0px;   
-} 
+    letter-spacing: 0px;
+}
 .verify-login-page .mobile.signin-input input::-moz-placeholder {
     color: #aaa;
     font-size: 20px;
-    letter-spacing: 0px;   
+    letter-spacing: 0px;
 }
 .verify-login-page .mobile.signin-input input:-moz-placeholder {
     color: #aaa;
     font-size: 20px;
-    letter-spacing: 0px;   
+    letter-spacing: 0px;
 }
 .verify-login-page .mobile.signin-input input:-ms-input-placeholder {
 }
@@ -3420,7 +3420,7 @@ div.checkboxOn, div.checkboxOff {
 }
 .mobile .two-factor-page .warning-text-field {
     color: #eb4444;
-    margin-top: -24px; 
+    margin-top: -24px;
     padding-left: 0;
 }
 .mobile .two-factor-page.verify-login-page .warning-text-field {
@@ -7343,6 +7343,14 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .mobile .bird .bottom-page.small-txt {
     display: none;
 }
+.mobile.two-factor-page.setup-page .no-auth-app-button {
+    color: #eb4444;
+    cursor: pointer;
+    display: block;
+    font-size: 14px;
+    line-height: 18px;
+    margin-top: 17px;
+}
 .mobile.two-factor-page .qr-code-img {
     width: 160px;
     height: 160px;
@@ -7398,6 +7406,98 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     line-height: 1.5;
     white-space: normal;
     margin: 8px auto 16px;
+}
+.mobile.auth-app-select-dialog {
+    background-color: #fff;
+    bottom: 0;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px 0 rgba(0,0,0,0.15);
+    left: 0;
+    margin: 5px;
+    position: absolute;
+    right: 0;
+    z-index: 2000;
+}
+.mobile.auth-app-select-dialog .explanation {
+    color: #262f3b;
+    font-size: 14px;
+    line-height: 22px;
+    margin: 24px 20px 20px 20px;
+}
+.mobile.auth-app-select-dialog .app-link {
+    cursor: pointer;
+    position: relative;
+}
+.mobile.auth-app-select-dialog .app-link-icon {
+    background: url(../images/mega/2fa-auth-apps.png);
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 32px;
+    position: absolute;
+    left: 14px;
+    top: 10px;
+    width: 32px;
+}
+.mobile.auth-app-select-dialog .authy .app-link-icon {
+    background-position: -2px -2px;
+}
+.mobile.auth-app-select-dialog .duomobile .app-link-icon {
+    background-position: -38px -2px;
+}
+.mobile.auth-app-select-dialog .googleauthenticator .app-link-icon {
+    background-position: -2px -38px;
+}
+.mobile.auth-app-select-dialog .microsoftauthenticator .app-link-icon {
+    background-position: -38px -38px;
+}
+.mobile.auth-app-select-dialog .app-link-text {
+    color: #676d75;
+    display: block;
+    font-size: 15px;
+    line-height: 51px;
+    margin-left: 64px;
+}
+.mobile.auth-app-select-dialog .app-link-arrow {
+    background-image: url(../images/mega/2fa-auth-apps.png);
+    background-position: -14px -77px;
+    background-repeat: no-repeat;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
+    height: 14px;
+    right: 25px;
+    position: absolute;
+    top: 19px;
+    width: 8px;
+}
+.mobile.auth-app-select-dialog .separator-line {
+    background-color: #eee;
+    height: 1px;
+    margin-left: 64px;
+}
+.mobile.auth-app-select-dialog .cancel-button {
+    cursor: pointer;
+    position: relative;
+}
+.mobile.auth-app-select-dialog .cancel-button-icon {
+    background-image: url(../images/mobile/mobile-sprite_v14.png);
+    background-position: -76px -1138px;
+    background-repeat: no-repeat;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
+    height: 40px;
+    left: 0;
+    margin: 5px 0 0 7px;
+    position: absolute;
+    top: 0;
+    width: 42px;
+}
+.mobile.auth-app-select-dialog .cancel-button-text {
+    color: #676d75;
+    display: block;
+    font-size: 15px;
+    line-height: 51px;
+    margin-left: 64px;
 }
 
 .contact-directory {
@@ -7570,16 +7670,16 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         width: 236px;
         float: right;
         margin-right: 8px;
-        line-height: 26px; 
+        line-height: 26px;
     }
     .mobile.session-history-page .folders-files-text .sh-device-header {
-        display: inline-block; 
+        display: inline-block;
     }
     .mobile.session-history-page .folders-files-text .sh-location-header {
         display: inline-block;
         display: inline-block;
         float: right;
-        width: 244px; 
+        width: 244px;
     }
     .mobile.session-history-page .folders-files-text .sh-date-header {
         display: inline-block;
@@ -7587,7 +7687,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         width: 180px;
     }
     .mobile.session-history-page .folders-files-text .sh-status-header {
-        display: inline-block; 
+        display: inline-block;
         float: right;
         text-align: right;
         float: right;
@@ -8149,7 +8249,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .android .mobile.tablet-img {
         background-image: url(../images/mobile/android@2x.png);
     }
-    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i {
+    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon {
         background-image: url(../images/mobile/mobile-sprite_v14@2x.png);
         background-size: 280px auto;
     }
@@ -8175,6 +8275,10 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile.session-history-page .sh-round-button::before  {
         background-image: url(../images/mobile/mobile-sprite_v14@2x.png);
         background-size: 280px auto;
+    }
+    .mobile.auth-app-select-dialog .app-link-icon, .mobile.auth-app-select-dialog .app-link-arrow {
+        background-image: url(../images/mega/2fa-auth-apps@2x.png);
+        background-size: 72px auto;
     }
 }
 

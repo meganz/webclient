@@ -342,6 +342,11 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
      background-size: 38px auto;
 }
 
+.user-management-dialog .sent-email-logo {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
 .bus-reg-icon {
     background-image: url(../images/mega/top-sprite_v5@2x.png);
      background-size: 38px auto;

@@ -2787,5 +2787,6 @@
     "19563": "Rimuovi %1 filtro",
     "19564": "Aggiungi %1 filtro",
     "19565": "Non hai un'app di autenticazione?",
-    "19566": "Hai bisogno di un'app di autenticazione per attivare la 2FA su MEGA. Puoi scaricare ed installare una delle app sottostanti per il tuo telefono o tablet."
+    "19566": "Hai bisogno di un'app di autenticazione per attivare la 2FA su MEGA. Puoi scaricare ed installare una delle app sottostanti per il tuo telefono o tablet.",
+    "19567": "The invitation link does not appear to be valid. Please contact your organization administrator."
 }

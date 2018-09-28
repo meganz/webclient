@@ -2053,7 +2053,10 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('.sent-email-logo.dialog-heading-img', $dialog).addClass('hidden');
         $('.dialog-input-title-ontop', $dialog).removeClass('correctinput error');
         $('.dialog-button-container .dialog-feature-toggle', $dialog).removeClass('toggle-on');
+        $('.dialog-button-container .dialog-feature-toggle .dialog-feature-switch', $dialog)
+            .attr('style', '');
         $('.dialog-button-container .invite-link-option', $dialog).removeClass('hidden');
+        $('.dialog-button-container .add-sub-user', $dialog).removeClass('disabled');
     };
 
     clearDialog(); // remove any previous data

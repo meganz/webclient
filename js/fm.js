@@ -2379,6 +2379,14 @@ function closeDialog(ev) {
         $('.fm-dialog.password-dialog').addClass('hidden');
     }
 
+    // business account, add sub-user dialog. we wont allow closing before copying password
+    if ($.dialog === 'sub-user-adding-dlg') {
+        if ($('.user-management-add-user-dialog.user-management-dialog .dialog-button-container .add-sub-user')
+            .hasClass('disabled')) {
+            return false;
+        }
+    }
+
     if ($.dialog === 'prd') {
         // PasswordReminderDialog manages its own states, so don't do anything.
         return;

@@ -378,8 +378,7 @@ MegaData.prototype.initTreePanelSorting = function() {
 
     var sections = [
         'folder-link', 'contacts', 'conversations', 'inbox',
-        'shared-with-me', 'cloud-drive', 'rubbish-bin', // Sorting sections for tree parts
-        'fm', 'shares', 'rubbish' // Sorting sections for file manager parts
+        'shared-with-me', 'cloud-drive', 'rubbish-bin' // Sorting sections for tree parts
     ];
     var byType = ['name', 'status', 'last-interaction', 'label'];
 
@@ -579,7 +578,6 @@ MegaData.prototype.treeSortUI = function() {
 
             menu = $('.nw-sorting-menu');
             menu.removeClass('hidden');
-            menu.css('right', '-' + (menu.outerWidth() - 3) + 'px');
 
             type = M.currentTreeType;
 
@@ -603,6 +601,8 @@ MegaData.prototype.treeSortUI = function() {
                 menu.find('.dropdown-section.labels').removeClass('hidden');
                 menu.find('.filter-by').removeClass('hidden');
             }
+
+            menu.css('right', '-' + (menu.outerWidth() - 3) + 'px');
 
             sortTreePanel = $.sortTreePanel[type];
 

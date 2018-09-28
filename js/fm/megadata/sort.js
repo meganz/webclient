@@ -450,6 +450,7 @@ MegaData.prototype.doSort = function(n, d) {
     else {
         $('.arrow.' + n).addClass('asc');
     }
+
     this.sortmode = {n: n, d: d};
 
     if (typeof this.sortRules[n] === 'function') {
@@ -464,13 +465,6 @@ MegaData.prototype.doSort = function(n, d) {
     }
     else if (d) {
         console.warn("Cannot sort by " + n);
-    }
-
-    if ($.sortTreePanel) {
-        // Store current sort setting
-        var type = M.currentLabelType;
-        $.sortTreePanel[type].by = n;
-        $.sortTreePanel[type].dir = d;
     }
 };
 

@@ -998,27 +998,19 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
 
     var $menu = $('.colour-sorting-menu');
     var $menuItems = $('.colour-sorting-menu .dropdown-colour-item');
-    var $nameColumn;
-    var $sizeColumn;
     var x = 0;
     var y = 0;
     var $sortMenuItems = $('.dropdown-item', $menu).removeClass('active asc desc');
-    var type = M.currentLabelType;
-    var dir = ($.sortTreePanel[type].dir === 1) ? 'asc' : 'desc';
+    var type = this.currentLabelType;
+    var sorting = M.sortmode || {n: 'name', d: 1};
+
+    var dir = sorting.d > 0 ? 'asc' : 'desc';
 
     // Close label filtering sorting menu on second Name column click
     if ($menu.is(':visible') && !rightClick) {
         $menu.addClass('hidden');
         return false;
     }
-
-    var tmpFn = function() {
-        x = event.clientX;
-        y = event.clientY;
-        
-        $menu.css('left', x + 'px');
-        $menu.css('top', y + 'px');
-    };
 
     $('.colour-sorting-menu .dropdown-colour-item').removeClass('active');
     if (M.filterLabel[type]) {
@@ -1030,31 +1022,22 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
     }
 
     $sortMenuItems
-        .filter('*[data-by=' + $.sortTreePanel[type].by + ']')
+        .filter('*[data-by=' + sorting.n + ']')
         .addClass('active')
         .addClass(dir);
+        
+    var tmpFn = function() {
+        x = event.clientX;
+        y = event.clientY;
+        
+        $menu.css('left', x + 'px');
+        $menu.css('top', y + 'px');
+    };
 
     if (rightClick) {// FM right mouse click on node
         M.adjustContextMenuPosition(event, $menu);
     }
     else {
-        if (type === 'fm') {// Name column click
-            $nameColumn = $('#fmholder .files-grid-view th:eq(1)');
-            $sizeColumn = $('#fmholder .files-grid-view th:eq(2)');
-        }
-        else if (type === 'shares') {
-            $nameColumn = $('.shared-grid-view .grid-table-header th:eq(1)');
-            $sizeColumn = $('.shared-grid-view .grid-table-header th:eq(2)');
-
-            if (M.currentdirid !== 'shares') {
-                $nameColumn = $('#fmholder .files-grid-view th:eq(1)');
-                $sizeColumn = $('#fmholder .files-grid-view th:eq(2)');
-            }
-        }
-        else if (type === 'rubbish') {
-            $nameColumn = $('.rubbish-bin .files-grid-view th:eq(1)');
-            $sizeColumn = $('.rubbish-bin .files-grid-view th:eq(2)');
-        }
         tmpFn();
     }
 
@@ -1075,13 +1058,10 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
         }
 
         var data = $(this).data();
-        var type = M.currentLabelType;
-
-        localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
+        var dir = 1;
 
         if ($(this).hasClass('active')) {// Change sort direction
-            $.sortTreePanel[type].dir *= -1;
-            localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir;
+            dir = sorting.d * -1;
         }
 
         $('.colour-sorting-menu').addClass('hidden');
@@ -1093,7 +1073,7 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
             return false;
         }
 
-        M.doSort(data.by, $.sortTreePanel[type].dir);
+        M.doSort(data.by, dir);
         M.renderMain();
 
         return false;
@@ -1104,6 +1084,7 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
 
 MegaData.prototype.resetLabelSortMenuUI = function() {
     "use strict";
+
     $('.colour-sorting-menu .dropdown-item').removeClass('active asc desc');
     return false;
 };

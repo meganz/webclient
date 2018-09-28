@@ -328,6 +328,8 @@ mega.ui.showRegisterDialog = function() {};
  */
 mega.ui.sendSignupLinkDialog = function(accountData) {
 
+    'use strict';
+
     parsepage(pages['mobile']);
     mobile.register.showConfirmEmailScreen(accountData);
     topmenuUI();

@@ -134,10 +134,6 @@ var tooltiplogin = {
             $dialog.find('.login-notification-icon').removeClass('hidden');
         }
 
-        $('.top-dialog-login-button', $dialog).rebind('click', function() {
-            tooltiplogin.startLogin();
-        });
-
         $('.top-login-full', $dialog).rebind('click', function() {
             tooltiplogin.init(1);
             loadSubPage('login');

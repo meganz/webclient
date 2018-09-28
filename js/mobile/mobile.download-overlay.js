@@ -324,6 +324,7 @@ mobile.downloadOverlay = {
                 }
             },
             onDownloadError: function(dl, error) {
+
                 if (d) {
                     dlmanager.logger.error(error, dl);
                 }

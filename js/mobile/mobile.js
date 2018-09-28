@@ -322,6 +322,17 @@ function closeDialog() {
 
 mega.ui.showRegisterDialog = function() {};
 
+/**
+ * Shim for sendSignupLinkDialog, likely called from showOverQuotaRegisterDialog
+ * @param {Object} accountData The registration vars in localStorage.awaitingConfirmationAccount
+ */
+mega.ui.sendSignupLinkDialog = function(accountData) {
+
+    parsepage(pages['mobile']);
+    mobile.register.showConfirmEmailScreen(accountData);
+    topmenuUI();
+};
+
 mega.loadReport = {};
 var previews = {};
 var preqs = Object.create(null); // FIXME: mobile needs to use preqs[] to prevent dupe requests sent to API!

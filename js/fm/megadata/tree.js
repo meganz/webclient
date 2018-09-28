@@ -10,9 +10,9 @@
  * @param {Number} [sDeepIndex] Internal use
  * @returns {MegaPromise}
  */
-MegaData.prototype.buildtree = function _buildtree(n, dialog, stype, sDeepIndex) {
+MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
     'use strict'; /* jshint -W074, -W073 */
-    
+
     if (!n) {
         console.error('Invalid node passed to M.buildtree');
         return false;
@@ -53,7 +53,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype, sDeepIndex)
         rebuild = true;
         dialog = undefined;
     }
-    
+
     stype = stype || M.currentTreeType || "cloud-drive";
     _tf = M.filterTreePanel[stype + '-label'];
 
@@ -172,10 +172,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype, sDeepIndex)
                 node.firstElementChild.classList.add('nw-fm-arrow-icon');
             }
         }
-        var currentTree;
-        if (n.h === M.currentrootid) {
-            currentTree = true;
-        }
+
         for (var idx = 0; idx < folders.length; idx++) {
             buildnode = false;
             curItemHandle = folders[idx].h;
@@ -219,6 +216,10 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype, sDeepIndex)
                     node.classList.add('tree-item-on-filter-hidden');
                 }
                 node = node.lastElementChild;
+                if (!node) {
+                    console.warn('Tree template error...', [node]);
+                    continue;
+                }
                 node.id = _sub + curItemHandle;
                 if (buildnode) {
                     node.classList.add('opened');
@@ -254,10 +255,17 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype, sDeepIndex)
                 }
 
                 if (folders[idx].lbl){
-                    node.classList.add('labeled');
-                    var nodeLabel = node.querySelector('.colour-label-ind');
-                    nodeLabel.classList.add(M.getLabelClassFromId(folders[idx].lbl));
-                    nodeLabel.classList.remove('hidden');
+                    var labelClass = M.getLabelClassFromId(folders[idx].lbl);
+
+                    if (!labelClass) {
+                        console.error('Invalid label %s for %s (%s)', folders[idx].lbl, curItemHandle, name);
+                    }
+                    else {
+                        node.classList.add('labeled');
+                        var nodeLabel = node.querySelector('.colour-label-ind');
+                        nodeLabel.classList.add(labelClass);
+                        nodeLabel.classList.remove('hidden');
+                    }
                 }
                 node = node.querySelector('.nw-fm-tree-folder');
                 if (folders[idx].su || Object(M.c.shares[curItemHandle]).su) {
@@ -298,11 +306,13 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype, sDeepIndex)
 
             if (_ts_l) {
                 node = document.getElementById(_li + curItemHandle);
-                if (_tf && node) {
-                    node.classList.add('tree-item-on-filter-hidden');
-                }
-                else {
-                    node.classList.remove('tree-item-on-filter-hidden');
+                if (node) {
+                    if (_tf) {
+                        node.classList.add('tree-item-on-filter-hidden');
+                    }
+                    else {
+                        node.classList.remove('tree-item-on-filter-hidden');
+                    }
                 }
                 if (name.toLowerCase().indexOf(_ts_l) === -1) {
                     if (node) {
@@ -327,7 +337,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype, sDeepIndex)
             if (buildnode) {
                 M.buildtree(folders[idx], dialog, stype, sDeepIndex + 1);
             }
-            
+
             /**
              * XXX: if this was really needed, add it at DOM node creation
              * if (fminitialized) {

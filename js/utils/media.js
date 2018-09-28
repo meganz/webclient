@@ -819,6 +819,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         $playpause.rebind('click', function() {
             if (videoElement.paused || videoElement.ended) {
                 if (dlmanager.isOverQuota) {
+                    $wrapper.trigger('is-over-quota');
                     dlmanager.showOverQuotaDialog();
                 }
                 else {
@@ -1240,6 +1241,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 $('.play-video-button', $wrapper).rebind('click', function() {
                     if (dlmanager.isOverQuota) {
+                        $wrapper.trigger('is-over-quota');
                         return dlmanager.showOverQuotaDialog();
                     }
 

@@ -1325,7 +1325,7 @@ FileManager.prototype.initContextUI = function() {
         }
         var labelId = parseInt(this.dataset.labelId);
         var parent = $(this).parents('.labels');
-        
+
         if (labelId && !parent.hasClass("disabled")) {
             // init M.filterLabel[type] if not exist.
             if (!M.currentLabelFilter) {
@@ -2270,6 +2270,7 @@ FileManager.prototype.contactsUI = function() {
 
     var setContactLink = function() {
         var linkData = $publicLink.attr('data-lnk');
+        var account = M.account || false;
 
         // Exit if link exists
         if (linkData) {
@@ -2277,7 +2278,7 @@ FileManager.prototype.contactsUI = function() {
         }
 
         // Check data exists in M.account
-        if (M.account.contactLink && M.account.contactLink.length) {
+        if (account.contactLink && account.contactLink.length) {
             $publicLink.attr('data-lnk', 'https://mega.nz/C!' + M.account.contactLink);
         }
         else {

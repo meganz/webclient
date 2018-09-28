@@ -2053,6 +2053,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('.sent-email-logo.dialog-heading-img', $dialog).addClass('hidden');
         $('.dialog-input-title-ontop', $dialog).removeClass('correctinput error');
         $('.dialog-button-container .dialog-feature-toggle', $dialog).removeClass('toggle-on');
+        $('.dialog-button-container .invite-link-option', $dialog).removeClass('hidden');
     };
 
     clearDialog(); // remove any previous data
@@ -2268,10 +2269,12 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     $('.sub-e', $resultContianer).text(req.m);
                     if (res.lp) {
                         $('.verification-user-pw', $resultContianer).removeClass('hidden');
+                        $('.copy-pw-btn', $resultContianer).removeClass('hidden');
                         $('.sub-p', $resultContianer).text(res.lp);
                     }
                     else {
                         $('.verification-user-pw', $resultContianer).addClass('hidden');
+                        $('.copy-pw-btn', $resultContianer).addClass('hidden');
                     }
 
                     $addContianer.addClass('hidden');
@@ -2283,9 +2286,16 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     //$('.dialog-title', $dialog).text(l[18280]);
                     $('.dialog-title', $dialog).addClass('hidden');
                     $('.sent-email-logo.dialog-heading-img', $dialog).removeClass('hidden');
+                    $('.dialog-button-container .invite-link-option', $dialog).addClass('hidden');
                 }
                 else {
-                    $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1679]);
+                    if (res === -12) {
+                        $uEmail.parent().addClass('error');
+                        $('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[1783]);
+                    }
+                    else {
+                        $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1679]);
+                    }
                 }
 
                 loadingDialog.phide();

@@ -26570,7 +26570,6 @@ opacity: 1;
     position: relative;
     margin:0 auto 16px auto;
     text-align: center;
-    display: block;
     font-family: 'montserrat';
 }
 
@@ -26696,7 +26695,7 @@ opacity: 1;
 }
 
 .user-management-add-user-dialog .dialog-feature-toggle .dialog-feature-switch {
-    margin-right: 2px;
+    margin-right: 22px;
     float: right;
 }
 

@@ -469,7 +469,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 var dd = subUsersData[sub].ad === '00000000' ? null : subUsersData[sub].ad;
                 var activeDate = '--------';
                 if (dd) {
-                    activeDate = new Date(dd.substr(0, 4), dd.substr(4, 2) - 1, dd.substr(6, 2) + 1);
+                    activeDate = new Date(dd.substr(0, 4), dd.substr(4, 2) - 1, dd.substr(6, 2));
                     activeDate = activeDate.toLocaleDateString();
                 }
                 $('.business-sub-last-active span', $subTr).text(activeDate);
@@ -2042,16 +2042,27 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         // }
         $('input', $adduserContianer).val('');
         $adduserContianer.removeClass('hidden');
-        $('.error-message', $adduserContianer).addClass('hidden');
+        // $('.error-message', $adduserContianer).addClass('hidden');
         $('.verification-container', $dialog).addClass('hidden');
         $('.dialog-subtitle', $dialog).addClass('hidden');
-        $('.dialog-title', $dialog).text(l[19104]);
+        // $('.dialog-title', $dialog).text(l[19104]);
+        $('.dialog-title', $dialog).text(l[19084]).addClass('left-version').removeClass('hidden');
         $('.dialog-button-container .add-more', $dialog).addClass('hidden');
         $('.dialog-button-container .add-sub-user', $dialog).text(l[19084]).removeClass('a-ok-btn');
-        // $('.licence-bar', $dialog).removeClass('hidden');
+        $('.mega-logo.icon56.dialog-heading-img', $dialog).addClass('hidden');
+        $('.sent-email-logo.dialog-heading-img', $dialog).addClass('hidden');
+        $('.dialog-input-title-ontop', $dialog).removeClass('correctinput error');
+        $('.dialog-button-container .dialog-feature-toggle', $dialog).removeClass('toggle-on');
+        $('.dialog-button-container .invite-link-option', $dialog).removeClass('hidden');
     };
 
     clearDialog(); // remove any previous data
+
+    // checking if we are coming from landing page
+    if (!result && callback) {
+        $('.mega-logo.icon56.dialog-heading-img', $dialog).removeClass('hidden');
+        $('.dialog-title', $dialog).text(l[19104]).removeClass('left-version');
+    }
 
     // checking if we are passing a valid result object
     if (result && result.lp && result.u && result.m) {
@@ -2084,38 +2095,82 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             clearDialog();
         });
 
-    // event handler for input getting focus
-    $('.dialog-input-container input', $dialog).off('focus.suba')
-        .on('focus.suba', function inputHasFocusHandler() {
-            $(this).removeClass('error correctinput').addClass('active');
+    // event handler for clicking on show-more button to view optional fields
+    $('.dialog-input-container .opti-add-suba', $dialog).off('click.subuser')
+        .on('click.subuser', function showMoreMoreClickHandler() {
+            var $me = $(this);
+            if ($me.hasClass('show')) {
+                $('.dialog-input-container .optional-input-container', $dialog).slideDown('slow');
+                $me.removeClass('show').addClass('hide');
+            }
+            else {
+                $('.dialog-input-container .optional-input-container', $dialog).slideUp('slow');
+                $me.removeClass('hide').addClass('show');
+            }
         });
+
+
+    // event handler for toggle switch of Protect link with Password
+    $('.dialog-button-container .dialog-feature-toggle', $dialog).off('click.subuser')
+        .on('click.subuser', function protectLinkClickHandler() {
+            var $me = $(this);
+            if ($me.hasClass('toggle-on')) {
+                $me.find('.dialog-feature-switch').animate({ marginRight: '22px' }, 150, 'swing', function () {
+                    $me.removeClass('toggle-on').addClass('toggle-off');
+                });
+                
+            }
+            else {
+                $me.find('.dialog-feature-switch').animate({ marginRight: '2px' }, 150, 'swing', function () {
+                    $me.addClass('toggle-on').removeClass('toggle-off');
+                });
+            }
+        });
+
+    // event handler for input getting focus
+    //$('.dialog-input-container input', $dialog).off('focus.suba')
+    //    .on('focus.suba', function inputHasFocusHandler() {
+    //        $(this).removeClass('error correctinput').addClass('active');
+    //    });
 
     // event handler for input losing focus
     $('.dialog-input-container input', $dialog).off('blur.suba')
         .on('blur.suba', function inputHasFocusHandler() {
             if (this.value.trim()) {
-                $(this).removeClass('error active').addClass('correctinput');
+                var $me = $(this);
+                if (!$me.hasClass('sub-n') && !$me.hasClass('sub-n-l')) {
+                    $me.parent().addClass('correctinput').removeClass('error');
+                }
+                else {
+                    if ($('.dialog-input-container input.sub-n', $dialog).val().trim()
+                        && $('.dialog-input-container input.sub-n-l', $dialog).val().trim()) {
+                        $me.parent().addClass('correctinput').removeClass('error');
+                    }
+                    else {
+                        $me.parent().removeClass('correctinput');
+                    }
+                }
             }
             else {
-                $(this).removeClass('error active correctinput');
+                $(this).parent().removeClass('correctinput');
             }
         });
 
     // generic keydown monitoring function. - will be injected only when needed
-    var keyDownEventHandler = function (target) {
-        var $element = $(target.target);
-        var $targetParent = $element.parent();
-        if ($targetParent && $targetParent.length) {
-            var $errorDiv = $targetParent.find('.error-message');
-            if ($errorDiv && $errorDiv.length && !$errorDiv.hasClass('hidden')) {
-                $errorDiv.addClass('hidden');
-            }
-            $element.off('keydown.suba');
-        }
-        else {
-            console.error('not allowed, not panned change of HTML is business account - add user dialog');
-        }
-    };
+    //var keyDownEventHandler = function (target) {
+    //    var $element = $(target.target);
+    //    var $targetParent = $element.parent();
+    //    if ($targetParent && $targetParent.length) {
+    //        var $errorDiv = $targetParent.find('.error-message');
+    //        if ($errorDiv && $errorDiv.length && !$errorDiv.hasClass('hidden')) {
+    //            $errorDiv.addClass('hidden');
+    //        }
+    //        $element.off('keydown.suba');
+    //    }
+    //    else {
+    //        console.error('not allowed, not panned change of HTML is business account - add user dialog');
+    //    }
+    //};
 
 
     // event handler for adding sub-users
@@ -2140,29 +2195,29 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             var uEmailTrimed = $uEmail.val().trim();
 
             if (!uNameTrimed.length) {
-                $uName.addClass('error');
+                $uName.parent().addClass('error');
                 $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
 
                 // monitoring input
-                $uName.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
+                //$uName.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
 
                 return;
             }
             if (!uLastNameTrimed) {
-                $uLastName.addClass('error');
+                $uLastName.parent().addClass('error');
                 $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
 
                 // monitoring input
-                $uLastName.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
+                //$uLastName.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
 
                 return;
             }
             if (checkMail(uEmailTrimed)) {
-                $uEmail.addClass('error');
+                $uEmail.parent().addClass('error');
                 $('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[5705]);
 
                 // monitoring input
-                $uEmail.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
+                //$uEmail.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
 
                 return;
             }
@@ -2173,21 +2228,24 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             var $uLocation = $('.input-user input.sub-lo', $dialog);
 
             var addUserOptionals = Object.create(null);
-            var ttemp = $uPosition.val().trim();
-            if (ttemp) {
-                addUserOptionals.position = ttemp;
-            }
-            ttemp = $uIdNumber.val().trim();
-            if (ttemp) {
-                addUserOptionals.idnum = ttemp;
-            }
-            ttemp = $uPhone.val().trim();
-            if (ttemp) {
-                addUserOptionals.phonenum = ttemp;
-            }
-            ttemp = $uLocation.val().trim();
-            if (ttemp) {
-                addUserOptionals.location = ttemp;
+            // check if optional section is visible, then collect fields values
+            if ($('.dialog-input-container .opti-add-suba', $dialog).hasClass('hide')) {
+                var ttemp = $uPosition.val().trim();
+                if (ttemp) {
+                    addUserOptionals.position = ttemp;
+                }
+                ttemp = $uIdNumber.val().trim();
+                if (ttemp) {
+                    addUserOptionals.idnum = ttemp;
+                }
+                ttemp = $uPhone.val().trim();
+                if (ttemp) {
+                    addUserOptionals.phonenum = ttemp;
+                }
+                ttemp = $uLocation.val().trim();
+                if (ttemp) {
+                    addUserOptionals.location = ttemp;
+                }
             }
 
             loadingDialog.pshow();
@@ -2195,8 +2253,10 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             var subName = uNameTrimed;
             var subLastName = uLastNameTrimed;
             var subEmail = uEmailTrimed;
+            var isProtectLink = $('.dialog-button-container .dialog-feature-toggle', $dialog).hasClass('toggle-on');
 
-            var subPromise = mySelf.business.addSubAccount(subEmail, subName, subLastName, addUserOptionals);
+            var subPromise =
+                mySelf.business.addSubAccount(subEmail, subName, subLastName, addUserOptionals, isProtectLink);
 
 
             var finalizeOperation = function (st,res,req) {
@@ -2207,7 +2267,15 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     var subUserDefaultAvatar = useravatar.contact(res.u);
                     $('.new-sub-user', $resultContianer).html(subUserDefaultAvatar);
                     $('.sub-e', $resultContianer).text(req.m);
-                    $('.sub-p', $resultContianer).text(res.lp);
+                    if (res.lp) {
+                        $('.verification-user-pw', $resultContianer).removeClass('hidden');
+                        $('.copy-pw-btn', $resultContianer).removeClass('hidden');
+                        $('.sub-p', $resultContianer).text(res.lp);
+                    }
+                    else {
+                        $('.verification-user-pw', $resultContianer).addClass('hidden');
+                        $('.copy-pw-btn', $resultContianer).addClass('hidden');
+                    }
 
                     $addContianer.addClass('hidden');
                     $resultContianer.removeClass('hidden');
@@ -2215,10 +2283,19 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
                     $('.licence-bar', $dialog).addClass('hidden');
                     $('.dialog-subtitle', $dialog).removeClass('hidden');
-                    $('.dialog-title', $dialog).text(l[18280]);
+                    //$('.dialog-title', $dialog).text(l[18280]);
+                    $('.dialog-title', $dialog).addClass('hidden');
+                    $('.sent-email-logo.dialog-heading-img', $dialog).removeClass('hidden');
+                    $('.dialog-button-container .invite-link-option', $dialog).addClass('hidden');
                 }
                 else {
-                    $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1679]);
+                    if (res === -12) {
+                        $uEmail.parent().addClass('error');
+                        $('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[1783]);
+                    }
+                    else {
+                        $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1679]);
+                    }
                 }
 
                 loadingDialog.phide();

@@ -34,6 +34,12 @@ body.pro:after {
     background-image: url(../images/mega/top-login-sprite_v11@2x.png);
     background-size: 48px auto;
 }
+
+.small-icon.membership.bus, .tiny-icon.membership-status.bus {
+    background-image: url(../images/mega/big_icons@2x.png);
+    background-size: 192px auto;
+}
+
 .reg-success-icon, .reg-st3-save-icon, .toast-icon, .resend-email-button, .reg-st3-storage::before, .reg-st3-bandwidth::before, .pro-icon, .pro-bottom-info-header::before, .toast-close-button, .small-icon.green-arrow, .small-icon.blue-arrow, .fm-dialog-close.small, .reg-st5-info-icon {
     background-image: url(../images/mega/register-big-sprite-v15@2x.png);
     background-size: 200px auto;
@@ -267,6 +273,12 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 48px auto;
 }
 
+.subaccount-view-used-data .used-storage-info .folder-small-icon.ex-out-share, 
+.subaccount-view-used-data .used-storage-info .folder-small-icon.ex-in-share{
+    background-image: url(../images/mega/top-sprite_v5@2x.png);
+    background-size: 38px auto;
+}
+
 .user-management-breadcrumbs-img {
     background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
     background-size: 48px auto;
@@ -332,12 +344,18 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
      background-size: 38px auto;
 }
 
-.user-management-view .folder-small-icon.ex-out-share, .fm-right-header-user-management .folder-small-icon.ex-out-share, .user-management-dialog .folder-small-icon.ex-out-share{
+.user-management-view .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-out-share, 
+.fm-right-header-user-management .folder-small-icon.ex-out-share, 
+.user-management-dialog .folder-small-icon.ex-out-share,
+.business-dashboard .folder-small-icon.ex-out-share{
     background-image: url(../images/mega/top-sprite_v5@2x.png);
      background-size: 38px auto;
 }
 
-.user-management-view .folder-small-icon.ex-in-share, .fm-right-header-user-management .folder-small-icon.ex-in-share, .user-management-dialog .folder-small-icon.ex-in-share{
+.user-management-view .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-in-share, 
+.fm-right-header-user-management .folder-small-icon.ex-in-share, 
+.user-management-dialog .folder-small-icon.ex-in-share,
+.business-dashboard .folder-small-icon.ex-in-share{
     background-image: url(../images/mega/top-sprite_v5@2x.png);
      background-size: 38px auto;
 }

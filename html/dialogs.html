@@ -4883,12 +4883,13 @@
 
         <div class="verification-container">
             <div class="verification-user-info">
+                <!--add class: single-line-->
                 <div class="verification-user-email"><b>[$7434]:</b><div class="sub-e">major@126.com</div></div>
                 <div class="verification-user-pw"><b>[$18771]:</b><div class="sub-p">major@126.com</div></div>
             </div>  
             <div class="default-green-button-user-management copy-pw-btn">[$19084]</div>                                
         </div><!-- END folder container -->
-    <div class="dialog-button-container">
+    <div class="dialog-button-container white-bg">
         <div class="invite-link-option">
             <span> Invite link passwords</span>
             <div class="dialog-feature-toggle toggle-on">
@@ -4896,14 +4897,12 @@
             </div>
         </div>
 
-        <div class="default-white-button-user-management add-more">
-            [$19103]
-        </div>               
+           
         <div class="default-white-button-user-management hidden">
-            <div class="import-contact-img icon"></div>
             [$16268]
         </div>  
-        <div class="default-green-button-user-management add-sub-user">[$19084]</div> 
+        <div class="default-green-button-user-management add-sub-user">[$19084]</div>
+        <div class="default-white-button-user-management add-more">[$19103]</div>    
     </div>
      <div class="licence-bar hidden">
         <div class="notification-img icon"></div>
@@ -4916,21 +4915,39 @@
     <div class="user-management-subuser-avatars">
         <div class="user-management-subuser-image"></div>
     </div>
-    <div class="dialog-title">[$16735]</div>
+    <div class="dialog-title left-version">[$16735]</div>
     <div class="delete-img icon"></div>
     <div class="dialog-input-container">
-        <div class="dialog-input-title-ontop">
-            [$86]
-            <span class="title last-name">Last Name*</span>
-            <br>
-            <input class="dialog-input correctinput edit-sub-name" type="text" placeholder="[$7436]" autofocus>
-            <input class="dialog-input correctinput edit-sub-lname" type="text" placeholder="[$7436]">           
+        <div class="dialog-input-title-ontop correctinput">
+            <div class="title first-name">[$86]</div>
+            <div class="title last-name">[$1097]</div>
+            <input class="dialog-input edit-sub-name" type="text" placeholder="[$7436]" autofocus>
+            <input class="dialog-input edit-sub-lname" type="text" placeholder="[$7436]">    
         </div>
 
-        <div class="dialog-input-title-ontop">
-            [$7434]<br>
-            <input class="dialog-input correctinput edit-sub-email" type="text" placeholder="[$9002]">
+        <div class="dialog-input-title-ontop email active">
+            <div class="title">[$7434]</div>
+            <input class="dialog-input edit-sub-email" type="text" placeholder="[$9002]">
+            <div class="top-login-warning edit-email-warning">
+                <div class="top-login-warning-arrow"></div>
+                <div class="top-login-warning-close"></div>
+                <div class="top-login-warning-pad">
+                    <div class="top-login-warning-txt">
+                        New email is remain pending until it is activated. Meanwhile, this wouldn’t affect the function of this account.<br>
+                    </div>
+                    <div class="top-login-warning-bott">
+                        <div class="loginwarning-checkbox checkboxOff checkbox"></div>
+                        <label class="radio-txt">Do not show again</label>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+            <div class="pending-email-note active">
+                <b>Pending email:</b> jay_pierce2@gmail.com
+            </div>
+
         <!--<div class="dialog-input-title-ontop">
             Role<br>
             <div class="dialog-input correct-input">
@@ -4943,22 +4960,22 @@
                 </select>
             </div>
         </div>-->
-        <div class="border"></div>
+
         <div class="dialog-input-title-ontop">
-            [$19150]<br>
-            <input class="dialog-input placeholder edit-sub-position" type="text" placeholder="[$19150]">
+             <div class="title">[$19150]</div>
+            <input class="dialog-input edit-sub-position" type="text" placeholder="[$19150]">
         </div>
         <div class="dialog-input-title-ontop">
-            [$19151]<br>
-            <input class="dialog-input placeholder edit-sub-id-nb" type="text" placeholder="000">
+             <div class="title">[$19151]</div>
+            <input class="dialog-input edit-sub-id-nb" type="text" placeholder="000">
         </div>
         <div class="dialog-input-title-ontop">
-            [$19152]<br>
-            <input class="dialog-input placeholder edit-sub-phone" type="text" placeholder="(123) 000 000">
+             <div class="title">[$19152]</div>
+            <input class="dialog-input edit-sub-phone" type="text" placeholder="(123) 000 000">
         </div>
         <div class="dialog-input-title-ontop">
-            [$17818]<br>
-            <input class="dialog-input placeholder edit-sub-location" type="text" placeholder="[$17818]">
+             <div class="title">[[$17818]</div>
+            <input class="dialog-input edit-sub-location" type="text" placeholder="[$17818]">
         </div>
     </div>
     <div class="dialog-button-container">

@@ -737,7 +737,7 @@ MegaData.prototype.redrawTree = function(f) {
     else if (M.currentrootid === 'shares') {
         M.buildtree({h: 'shares'}, force);
     }
-    else if (M.currentrootid === 'contacts') {
+    else if (M.currentrootid === 'contacts' || M.currentrootid === 'opc' || M.currentrootid === 'ipc') {
         M.contacts();
     }
     else if (M.currentrootid === 'chat') {

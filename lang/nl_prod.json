@@ -2560,9 +2560,9 @@
     "19512": "U heeft succesvol uw account [B]%2[\/B] naar %1 ge\u00fcpgraded.",
     "19513": "Bedankt! Uw account [B]%2[\/B] wordt ge\u00fcpgraded zodra we bevestiging ontvangen hebben van uw betaling van onze betalingsaanbieder. Als u betaald heeft met debiet of krediet kaart en nog niet uw MEGA PRO account binnen enkele uren heeft ontvangen, neem dan contact op met ons bij [A]support@mega.nz[\/A]. Als u heeft met een bank overdracht houd dan rekening met 4-5 dagen om de betaling te laten voltooien.",
     "19514": "Bedankt! Uw account [B]%2[\/B] wordt ge\u00fcpgraded zodra we bevestiging ontvangen hebben van uw betaling van onze betalingsaanbieder in enkele minuten. Als u niet uw MEGA PRO account binnen %1 uur ontvangen heeft neem dan contact op met ons bij [A]support@mega.nz[\/A].",
-    "19562": "The email address already exists. Please enter another email address.",
-    "19563": "Remove %1 label filter",
-    "19564": "Add %1 label filter",
-    "19565": "Don't have an authenticator app?",
-    "19566": "You need an authenticator app to enable 2FA on MEGA. You can download and install one of the apps below for your phone or tablet."
+    "19562": "Het e-mailadres bestaat al. Voer een ander e-mailadres in.",
+    "19563": "Verwijder %1 etiket filter",
+    "19564": "%1 Etiket filter toevoegen",
+    "19565": "Heeft u geen authenticatie applicatie?",
+    "19566": "U heeft een authenticatie applicatie nodig om 2FA op MEGA in te schakelen. U kunt \u00e9\u00e9n van de applicaties hieronder downloaden en installeren voor uw telefoon of tablet."
 }

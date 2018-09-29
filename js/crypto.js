@@ -3071,7 +3071,7 @@ function api_strerror(errno) {
     case EGOINGOVERQUOTA:
         return "Not enough quota";
     case ESHAREROVERQUOTA:
-        return "Share owner is over storage quota.";
+        return l[19597] || 'Share owner is over storage quota.';
     default:
         break;
     }

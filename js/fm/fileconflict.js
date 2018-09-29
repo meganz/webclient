@@ -362,7 +362,7 @@
                     if (file.t) {
                         $('.red-header', $a1).text(l[17555]);
                         $('.red-header', $a2).text(l[16490]);
-                        $('.light-grey', $a2).text('Skip this folder:');
+                        $('.light-grey', $a2).text(l[19598]);
                     }
                     else {
                         $('.red-header', $a1).text(l[17093]);

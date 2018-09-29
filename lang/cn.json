@@ -2815,5 +2815,12 @@
     "19592": "\u6dfb\u52a0\u6807\u7b7e\u201c\u7070\u8272\u201d",
     "19593": "\u5220\u9664\u6807\u7b7e\u201c\u7070\u8272\u201d",
     "19594": "\u6dfb\u52a0\u201c\u7070\u8272\u201d\u6807\u7b7e\u8fc7\u6ee4\u5668",
-    "19595": "\u5220\u9664\u201c\u7070\u8272\u201d\u6807\u7b7e\u8fc7\u6ee4\u5668"
+    "19595": "\u5220\u9664\u201c\u7070\u8272\u201d\u6807\u7b7e\u8fc7\u6ee4\u5668",
+    "19596": "Use drag-and-drop uploads dialog:",
+    "19597": "Share owner is over storage quota.",
+    "19598": "Skip this folder:",
+    "19599": "Protect invite link by a password",
+    "19600": "Show optional fields",
+    "19601": "Copy password",
+    "19602": "Password copied to clipboard"
 }

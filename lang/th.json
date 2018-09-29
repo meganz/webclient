@@ -2815,5 +2815,12 @@
     "19592": "\u0e40\u0e1e\u0e34\u0e48\u0e21\u0e1b\u0e49\u0e32\u0e22\u0e01\u0e33\u0e01\u0e31\u0e1a \"\u0e2a\u0e35\u0e40\u0e17\u0e32\"",
     "19593": "\u0e25\u0e1a\u0e1b\u0e49\u0e32\u0e22\u0e01\u0e33\u0e01\u0e31\u0e1a \"\u0e2a\u0e35\u0e40\u0e17\u0e32\"",
     "19594": "\u0e40\u0e1e\u0e34\u0e48\u0e21\u0e15\u0e31\u0e27\u0e01\u0e23\u0e2d\u0e07\u0e1b\u0e49\u0e32\u0e22\u0e01\u0e33\u0e01\u0e31\u0e1a \"\u0e2a\u0e35\u0e40\u0e17\u0e32\"",
-    "19595": "\u0e25\u0e1a\u0e15\u0e31\u0e27\u0e01\u0e23\u0e2d\u0e07\u0e1b\u0e49\u0e32\u0e22\u0e01\u0e33\u0e01\u0e31\u0e1a \"\u0e2a\u0e35\u0e40\u0e17\u0e32\""
+    "19595": "\u0e25\u0e1a\u0e15\u0e31\u0e27\u0e01\u0e23\u0e2d\u0e07\u0e1b\u0e49\u0e32\u0e22\u0e01\u0e33\u0e01\u0e31\u0e1a \"\u0e2a\u0e35\u0e40\u0e17\u0e32\"",
+    "19596": "Use drag-and-drop uploads dialog:",
+    "19597": "Share owner is over storage quota.",
+    "19598": "Skip this folder:",
+    "19599": "Protect invite link by a password",
+    "19600": "Show optional fields",
+    "19601": "Copy password",
+    "19602": "Password copied to clipboard"
 }

@@ -2053,7 +2053,10 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('.sent-email-logo.dialog-heading-img', $dialog).addClass('hidden');
         $('.dialog-input-title-ontop', $dialog).removeClass('correctinput error');
         $('.dialog-button-container .dialog-feature-toggle', $dialog).removeClass('toggle-on');
+        $('.dialog-button-container .dialog-feature-toggle .dialog-feature-switch', $dialog)
+            .attr('style', '');
         $('.dialog-button-container .invite-link-option', $dialog).removeClass('hidden');
+        $('.dialog-button-container .add-sub-user', $dialog).removeClass('disabled');
     };
 
     clearDialog(); // remove any previous data
@@ -2065,21 +2068,57 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
     }
 
     // checking if we are passing a valid result object
-    if (result && result.lp && result.u && result.m) {
+    if (result && result.u && result.m) {
         var $addContianer = $('.dialog-input-container', $dialog);
         var $resultContianer = $('.verification-container', $dialog);
 
         var subUserDefaultAvatar = useravatar.contact(result.u);
         $('.new-sub-user', $resultContianer).html(subUserDefaultAvatar);
         $('.sub-e', $resultContianer).text(result.m);
-        $('.sub-p', $resultContianer).text(result.lp);
+        if (result.lp) {
+            $('.verification-user-pw', $resultContianer).removeClass('hidden');
+            if (is_extension || M.execCommandUsable()) {
+                $('.copy-pw-btn', $resultContianer).removeClass('hidden');
+                $('.copy-pw-btn', $resultContianer).off('click.suba').on('click.suba',
+                    function copyPasswordButtonClickHandler() {
+                        copyToClipboard(result.lp, l[19602]);
+                        $('.dialog-button-container .add-sub-user', $dialog).removeClass('disabled');
+                    }
+                );
+            }
+            $('.dialog-button-container .add-sub-user', $dialog).addClass('disabled');
+            $('.sub-p', $resultContianer).off('copy.suba').on('copy.suba',
+                function passwordTextTouchHandler() {
+                    $('.dialog-button-container .add-sub-user', $dialog).removeClass('disabled');
+                }
+            );
+            $('.sub-p', $resultContianer).text(result.lp);
+        }
+        else {
+            $('.verification-user-pw', $resultContianer).addClass('hidden');
+            $('.copy-pw-btn', $resultContianer).addClass('hidden');
+        }
 
         $addContianer.addClass('hidden');
         $resultContianer.removeClass('hidden');
         $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
-        // $('.licence-bar', $dialog).addClass('hidden');
         $('.dialog-subtitle', $dialog).removeClass('hidden');
-        $('.dialog-title', $dialog).text(l[18280]);
+        //$('.dialog-title', $dialog).text(l[18280]);
+        $('.dialog-title', $dialog).addClass('hidden');
+        $('.sent-email-logo.dialog-heading-img', $dialog).removeClass('hidden');
+        $('.dialog-button-container .invite-link-option', $dialog).addClass('hidden');
+
+        //var subUserDefaultAvatar = useravatar.contact(result.u);
+        //$('.new-sub-user', $resultContianer).html(subUserDefaultAvatar);
+        //$('.sub-e', $resultContianer).text(result.m);
+        //$('.sub-p', $resultContianer).text(result.lp);
+
+        //$addContianer.addClass('hidden');
+        //$resultContianer.removeClass('hidden');
+        //$('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
+        //// $('.licence-bar', $dialog).addClass('hidden');
+        //$('.dialog-subtitle', $dialog).removeClass('hidden');
+        //$('.dialog-title', $dialog).text(l[18280]);
     }
 
 
@@ -2269,7 +2308,21 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     $('.sub-e', $resultContianer).text(req.m);
                     if (res.lp) {
                         $('.verification-user-pw', $resultContianer).removeClass('hidden');
-                        $('.copy-pw-btn', $resultContianer).removeClass('hidden');
+                        if (is_extension || M.execCommandUsable()) {
+                            $('.copy-pw-btn', $resultContianer).removeClass('hidden');
+                            $('.copy-pw-btn', $resultContianer).off('click.suba').on('click.suba',
+                                function copyPasswordButtonClickHandler() {
+                                    copyToClipboard(res.lp, l[19602]);
+                                    $('.dialog-button-container .add-sub-user', $dialog).removeClass('disabled');
+                                }
+                            );
+                        }
+                        $('.dialog-button-container .add-sub-user', $dialog).addClass('disabled');
+                        $('.sub-p', $resultContianer).off('copy.suba').on('copy.suba',
+                            function passwordTextTouchHandler() {
+                                $('.dialog-button-container .add-sub-user', $dialog).removeClass('disabled');
+                            }
+                        );
                         $('.sub-p', $resultContianer).text(res.lp);
                     }
                     else {

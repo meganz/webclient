@@ -29325,6 +29325,12 @@ opacity: 1;
     overflow: hidden;
 }
 
+.business-dashboard .business-dashboard-container{
+    width:100%;
+    margin: 0 auto;
+    max-width: 1064px;
+}
+
 .business-dashboard .default-green-button-user-management {
     float: right;
     margin:16px 24px;
@@ -29356,9 +29362,9 @@ opacity: 1;
 }
 
 .business-dashboard .data-container {
-    width:61%;
-    min-width: 600px;
-    margin:0 12px 24px 24px;
+    width:calc(66% - 24px);
+    min-width: 540px;
+    margin:0 0px 24px 24px;
     display: inline-block;
     vertical-align: top;
 }
@@ -29383,21 +29389,23 @@ opacity: 1;
 }
 
 .business-dashboard .subaccount-view-used-data .used-storage-info .ff-number {
-    width: 200px;
+    width: 180px;
 }
 
 .business-dashboard .qr-container {
-    width:33%;
-    height: 354px;
+    width:calc(34% - 42px);
+    height: 352px;
+    margin:0 0px 24px 12px;
     display: inline-block;
     vertical-align: top;
+    position: relative;
 }
 
 .business-dashboard .qr-code {
     width: 120px;
     height: 120px;
     position: relative;
-    margin-top: 24px;
+    margin-top: 12px;
     margin-left: calc(50% - 60px);
     margin-bottom: 12px;
     display: inline-block;
@@ -29407,18 +29415,18 @@ opacity: 1;
 .business-dashboard .qr-container .default-white-button-user-management {
     width:150px;
     text-align: center;
-    margin-bottom: 32px;
     margin-left: calc(50% - 75px);
 }
 
 .business-dashboard .qr-container .note {
     width:86%;
-    margin-left: 7%;
-    margin-bottom: 18px;
+    left: 7%;
+    bottom: 16px;
     text-align: center;
     color:#888;
     font-size: 13px;
     line-height: 18px;
+    position: absolute;
 }
 
 .content-panel.business-dashboard .intro-title{
@@ -29551,12 +29559,15 @@ opacity: 1;
         /*margin-right: 22%;*/
     }
 
+    .business-dashboard .data-container, .business-dashboard .qr-container {
+    width: calc(100% - 48px);
+    margin:24px 24px 12px 24px;
+    clear: both;
+    }
 
 
 
 }
-
-
 
 
 

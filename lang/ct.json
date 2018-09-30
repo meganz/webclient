@@ -4,7 +4,7 @@
     "12": "\u4efb\u4f55\u4eba\u4e0d\u61c9\u88ab\u4efb\u610f\u5e72\u6d89\u96b1\u79c1\uff0c\u5bb6\u4eba\uff0c\u4f4f\u5b85\u6216\u901a\u8a0a\uff0c\u4e5f\u4e0d\u61c9\u88ab\u653b\u64ca\u5176\u69ae\u8b7d\u8207\u540d\u8b7d\u3002\u6bcf\u500b\u4eba\u7686\u6709\u6b0a\u5229\u88ab\u6cd5\u5f8b\u4fdd\u8b77\uff0c\u514d\u65bc\u53d7\u5230\u9019\u7a2e\u5e72\u6d89\u6216\u653b\u64ca\u3002",
     "13": "\u4e16\u754c\u4eba\u6b0a\u5ba3\u8a00\u3002",
     "14": "\u78ba\u8a8d\u522a\u9664",
-    "15": "\u60a8\u78ba\u5b9a\u8981\u6c38\u4e45\u6e05\u9664\u5783\u573e\u6876\u4e2d\u7684\u6a94\u6848\u55ce\uff1f",
+    "15": "\u60a8\u5c07\u6703\u6c38\u4e45\u6e05\u9664\u6240\u6709\u5783\u573e\u6876\u4e2d\u7684\u6a94\u6848\u3002",
     "16": "\u5167\u90e8\u932f\u8aa4",
     "17": "\u5df2\u8d85\u904e\u50b3\u8f38\u914d\u984d",
     "18": "\u6b64\u4e0b\u8f09\u9805\u9023\u7d50\u6578\u904e\u591a",
@@ -2815,5 +2815,12 @@
     "19592": "Add label \u201cGrey\u201d",
     "19593": "Remove label \u201cGrey\u201d",
     "19594": "Add \u201cGrey\u201d label filter",
-    "19595": "Remove \u201cGrey\u201d label filter"
+    "19595": "Remove \u201cGrey\u201d label filter",
+    "19596": "Use drag-and-drop uploads dialog:",
+    "19597": "Share owner is over storage quota.",
+    "19598": "Skip this folder:",
+    "19599": "Protect invite link by a password",
+    "19600": "Show optional fields",
+    "19601": "Copy password",
+    "19602": "Password copied to clipboard"
 }

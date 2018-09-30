@@ -1132,7 +1132,7 @@ var dlmanager = {
             $('.download.in-progress, .video-mode-wrapper', $dlPageTW).removeClass('over-quota');
             $('.download.file-info').removeClass('overquota');
         }
-        else {
+        else if (ids.length) {
             $('#' + ids.join(',#'))
                 .addClass('transfer-queued')
                 .find('.transfer-status')
@@ -1221,9 +1221,9 @@ var dlmanager = {
     },
 
     _overquotaInfo: function() {
+        'use strict'; /* jshint -W074 */
 
-        api_req({a: 'uq', xfer: 1}, {
-            callback: function(res) {
+        var onQuotaInfo = function(res) {
                 if (typeof res === "number") {
                     // Error, just keep retrying
                     Soon(this._overquotaInfo.bind(this));
@@ -1307,6 +1307,17 @@ var dlmanager = {
                         }, 1000);
                 }
             }.bind(this)
+
+        M.req({a: 'uq', xfer: 1}).then(function(res) {
+            delay('overquotainfo:reply.success', function() {
+                onQuotaInfo(res);
+            });
+        }).catch(function(ex) {
+            if (d) {
+                dlmanager.logger.warn('_overquotaInfo', ex);
+            }
+
+            delay('overquotainfo:reply.error', dlmanager._overquotaInfo.bind(dlmanager));
         });
     },
 

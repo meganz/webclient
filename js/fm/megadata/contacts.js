@@ -451,12 +451,14 @@ MegaData.prototype.contacts = function() {
     else if (sortBy === 'fav') {
         sortFn = this.sortByFavFn(sortDirection);
     }
-
-    activeContacts.sort(
-        function(a, b) {
-            return sortFn(a, b, sortDirection);
-        }
-    );
+    
+    if (typeof sortFn === 'function') {
+        activeContacts.sort(
+            function(a, b) {
+                return sortFn(a, b, sortDirection);
+            }
+        );
+    }
 
     var html = '';
     var onlinestatus;

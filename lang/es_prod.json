@@ -2193,12 +2193,12 @@
     "18778": "Despl\u00e1zate hacia abajo para m\u00e1s informaci\u00f3n",
     "18779": "Libera todo el potencial de MEGA con una amplia serie de comandos",
     "18780": "Una shell para ejecutar los comandos de MEGA de forma interactiva. Te permite navegar en tu cuenta MEGA como si fuera una carpeta local, adem\u00e1s de que admite todas las funciones avanzadas de MEGA.",
-    "18781": "Ejecuta los comandos de MEGAcmd desde tu lenguaje de script favorito para automatizar la interacci\u00f3n con tu cuenta MEGA sin tener que usar API complejas de bajo nivel",
-    "18782": "Accede y trabaja con tus datos en diferentes ubicaciones y dispositivos e forma segura gracias al cifrado punto a punto de MEGA.",
+    "18781": "Ejecuta los comandos de MEGAcmd desde tu lenguaje de script favorito para automatizar la interacci\u00f3n con tu cuenta MEGA sin tener que usar API complejas de bajo nivel.",
+    "18782": "Accede y trabaja con tus datos en diferentes ubicaciones y dispositivos de forma segura gracias al cifrado punto a punto de MEGA.",
     "18783": "Configuraci\u00f3n de copias de seguridad autom\u00e1ticas",
     "18784": "MEGAcmd permite configurar copias de seguridad peri\u00f3dicas de una carpeta local para mantener puntos de restauraci\u00f3n de tus archivos.",
     "18785": "Soporte WebDAV",
-    "18786": "Usa tu cliente WebDAV favorito para interactuar contsu cuenta MEGA a trav\u00e9s de MEGAcmd.",
+    "18786": "Usa tu cliente WebDAV favorito para interactuar con tu cuenta MEGA a trav\u00e9s de MEGAcmd.",
     "18787": "Visita nuestro [A]repositorio de GitHub[\/A] para m\u00e1s informaci\u00f3n.",
     "18788": "M\u00e1s informaci\u00f3n sobre MEGAcmd",
     "18789": "ReadMe",
@@ -2560,9 +2560,9 @@
     "19512": "Has pasado tu cuenta [B]%2[\/B] a %1.",
     "19513": "\u00a1Gracias! Tu cuenta [B]%2[\/B] pasar\u00e1 a PRO en cuanto nuestro proveedor nos confirme el pago. Si has pagado con tarjeta de cr\u00e9dito o de d\u00e9bito y no has recibido tu cuenta PRO dentro de unas horas, por favor env\u00edanos un correo a [A]support@mega.nz[\/A] Si has pagado a trav\u00e9s de transferencia bancaria por favor espera 4-5 d\u00edas para que se confirme el pago.",
     "19514": "\u00a1Gracias! Tu cuenta [B]%2[\/B] pasar\u00e1 a PRO en cuanto nuestro proveedor nos confirme el pago. Si no has recibido tu cuenta PRO dentro de %1 horas, por favor env\u00edanos un correo a [A]support@mega.nz[\/A].",
-    "19562": "The email address already exists. Please enter another email address.",
+    "19562": "La direcci\u00f3n de correo electr\u00f3nico ya existe. Por favor ingresa otra direcci\u00f3n de correo electr\u00f3nico.",
     "19563": "Remove %1 label filter",
     "19564": "Add %1 label filter",
-    "19565": "Don't have an authenticator app?",
-    "19566": "You need an authenticator app to enable 2FA on MEGA. You can download and install one of the apps below for your phone or tablet."
+    "19565": "\u00bfNo tienes una aplicaci\u00f3n de autenticaci\u00f3n?",
+    "19566": "Necesita una aplicaci\u00f3n de autenticaci\u00f3n para activar el 2FA en MEGA. Puedes descargar e instalar una de las siguientes aplicaciones para tu tel\u00e9fono o tablet."
 }

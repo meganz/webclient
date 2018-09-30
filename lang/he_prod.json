@@ -2193,7 +2193,7 @@
     "18778": "Roll down to learn more",
     "18779": "Unleash MEGA\u2019s full potential with a rich set of commands",
     "18780": "A shell to interactively execute MEGA commands. It lets you navigate your MEGA account as if it was a local folder, plus it supports all of MEGA\u2019s advanced functionality.",
-    "18781": "Execute MEGAcmd commands from your favourite scripting language to automate the interaction with your MEGA account without having to use complex low-level APIs",
+    "18781": "Execute MEGAcmd commands from your favourite scripting language to automate the interaction with your MEGA account without having to use complex low-level APIs.",
     "18782": "Access and work with your data securely across different locations and devices protected by MEGA\u2019s end-to-end encryption.",
     "18783": "Configure Automatic Backups",
     "18784": "MEGAcmd allows configuring periodic backups of a local folder to keep historical snapshots of your files.",
@@ -2553,7 +2553,7 @@
     "19328": "Are you sure you want to redeem this voucher for the [B]%1[\/B] account?",
     "19338": "Upload 1 file",
     "19339": "Upload [X] files",
-    "19340": "You don't have write privileges in this share.",
+    "19340": "You don\u2019t have write privileges in this share.",
     "19341": "You are currently logged into a different account on this web browser. If it is not the account you want to upgrade, please log out and log in using the correct account.",
     "19505": "Received",
     "19506": "Sent",
@@ -2563,6 +2563,6 @@
     "19562": "The email address already exists. Please enter another email address.",
     "19563": "Remove %1 label filter",
     "19564": "Add %1 label filter",
-    "19565": "Don't have an authenticator app?",
+    "19565": "Don\u2019t have an authenticator app?",
     "19566": "You need an authenticator app to enable 2FA on MEGA. You can download and install one of the apps below for your phone or tablet."
 }

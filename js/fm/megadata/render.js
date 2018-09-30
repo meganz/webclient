@@ -249,9 +249,11 @@ MegaData.prototype.renderShare = function(h) {
 };
 
 MegaData.prototype.renderTree = function() {
-    var build = function(h) {
+    'use strict';
+
+    var build = tryCatch(function(h) {
         M.buildtree({h: h}, M.buildtree.FORCE_REBUILD);
-    };
+    });
 
     build('shares');
     build(M.RootID);

@@ -2553,7 +2553,7 @@
     "19328": "Are you sure you want to redeem this voucher for the [B]%1[\/B] account?",
     "19338": "Upload 1 file",
     "19339": "Upload [X] files",
-    "19340": "You don't have write privileges in this share.",
+    "19340": "You don\u2019t have write privileges in this share.",
     "19341": "You are currently logged into a different account on this web browser. If it is not the account you want to upgrade, please log out and log in using the correct account.",
     "19505": "Received",
     "19506": "Sent",
@@ -2563,6 +2563,6 @@
     "19562": "The email address already exists. Please enter another email address.",
     "19563": "Remove %1 label filter",
     "19564": "Add %1 label filter",
-    "19565": "Don't have an authenticator app?",
+    "19565": "Don\u2019t have an authenticator app?",
     "19566": "You need an authenticator app to enable 2FA on MEGA. You can download and install one of the apps below for your phone or tablet."
 }

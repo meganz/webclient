@@ -2815,5 +2815,12 @@
     "19592": "Add label \u201cGrey\u201d",
     "19593": "Remove label \u201cGrey\u201d",
     "19594": "Add \u201cGrey\u201d label filter",
-    "19595": "Remove \u201cGrey\u201d label filter"
+    "19595": "Remove \u201cGrey\u201d label filter",
+    "19596": "Use drag-and-drop uploads dialog:",
+    "19597": "Share owner is over storage quota.",
+    "19598": "Skip this folder:",
+    "19599": "Protect invite link by a password",
+    "19600": "Show optional fields",
+    "19601": "Copy password",
+    "19602": "Password copied to clipboard"
 }

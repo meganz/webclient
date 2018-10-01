@@ -28769,6 +28769,10 @@ opacity: 1;
     top: 32px; 
 }
 
+.user-management-list-table tr td .user-management-email.pending-email {
+    color: #FFA500;
+}
+
 .user-management-list-table tr td .user-management-email.warning{
     color:#F5A623;
 }

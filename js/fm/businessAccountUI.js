@@ -182,7 +182,12 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             $currUser.find('.fm-user-management-user .user-management-name').text(uName);
             $currUserLeftPane.find('.nw-user-management-name').text(uName);
 
-            $currUser.find('.user-management-email').text(subUsers[h].e);
+            if (subUsers[h].pe && subUsers[h].pe.e) {
+                $currUser.find('.user-management-email').addClass('pending-email').text(l[19606]);
+            }
+            else {
+                $currUser.find('.user-management-email').removeClass('pending-email').text(subUsers[h].e);
+            }
             $currUser.find('.user-management-status').removeClass('enabled pending disabled');
             if (subUsers[h].s === 0) {
                 $currUser.find('.user-management-status').addClass('enabled');

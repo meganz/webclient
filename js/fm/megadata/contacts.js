@@ -622,14 +622,19 @@ MegaData.prototype.syncUsersFullname = function(userId) {
     var lastName = {name: 'lastname', value: null};
     var firstName = {name: 'firstname', value: null};
 
+    var fnameEncoded = '';
+    var lnameEncoded = '';
+
     MegaPromise.allDone([
         mega.attr.get(userId, 'firstname', -1)
             .done(function(r) {
                 firstName.value = r;
+                fnameEncoded = r;
             }),
         mega.attr.get(userId, 'lastname', -1)
             .done(function(r) {
                 lastName.value = r;
+                lnameEncoded = r;
             })
     ]).done(function() {
         if (!self.u[userId]) {
@@ -696,6 +701,23 @@ MegaData.prototype.syncUsersFullname = function(userId) {
 
             $('.user-name').text(u_attr.fullname);
             $('.membership-big-txt.name').text(u_attr.fullname);
+        }
+        // check if this first name + last belongs to business sub-user
+        // we added here to avoid re-calling get attribute + minimize the need of code refactoring
+        if (u_attr && u_attr.b && !u_attr.b.mu) {
+            if (M.suba && M.suba[userId]) {
+                M.require('businessAcc_js', 'businessAccUI_js').done(
+                    function () {
+                        var business = new BusinessAccount();
+
+                        var subUser = M.suba[userId];
+                        subUser.firstname = fnameEncoded;
+                        subUser.lastname = lnameEncoded;
+
+                        business.parseSUBA(subUser, false, true);
+                    }
+                );
+            }
         }
     });
 };

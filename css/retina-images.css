@@ -35,8 +35,8 @@ body.pro:after {
     background-size: 48px auto;
 }
 
-.small-icon.membership.bus, .tiny-icon.membership-status.bus {
-    background-image: url(../images/mega/big_icons@2x.png);
+.small-icon.membership.pro100, .tiny-icon.membership-status.pro100 {
+    background-image: url(../images/mega/big-icons@2x.png);
     background-size: 192px auto;
 }
 
@@ -399,17 +399,5 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/big-icons@2x.png);
     background-size: 192px auto;
 }
-
-.tiny-icon.membership-status.bus {
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
-.small-icon.membership.bus {
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
-
 
 }

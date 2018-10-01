@@ -667,6 +667,25 @@ function processEmailChangeActionPacket(ap) {
             }
         }
     }
+    else {
+        // if the is business master we might accept other cases
+        if (u_attr && u_attr.b && !u_attr.b.mu) {
+            // then, do i have this user as sub-user?
+            if (M.suba && M.suba[ap.u]) {
+                var stillOkEmail = (ap.s === 2 && typeof ap.e === 'string' && ap.e.indexOf('@') !== -1);
+                if (stillOkEmail) {
+                    M.require('businessAcc_js', 'businessAccUI_js').done(
+                        function () {
+                            var business = new BusinessAccount();
+                            var sub = M.suba[ap.u];
+                            sub.pe = { e: ap.e, ts: ap.ts };
+                            business.parseSUBA(sub, false, true);
+                        }
+                    );
+                }
+            }
+        }
+    }
 }
 
 (function(exportScope) {

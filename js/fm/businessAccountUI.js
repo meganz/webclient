@@ -760,6 +760,14 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     $extrasContainer.find('.sub-info-phone').text(sUserTel);
     $extrasContainer.find('.sub-info-loc').text(sUserLoc);
 
+    // hide or show pending email
+    if (subUser.pe && subUser.pe.e) {
+        var $pending = $subAccountContainer.find('.pending-email-note').addClass('active');
+        $pending.find('.pending-email-txt').text(subUser.pe.e);
+    }
+    else {
+        $subAccountContainer.find('.pending-email-note').removeClass('active');
+    }
 
     $subAccountContainer.find('.user-management-view-status').removeClass('enabled pending disabled');
     // $subAccountContainer.find('.profile-button-container .disable-account').removeClass('hidden');
@@ -2437,6 +2445,14 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
         $locationInput.val(userAttrs.location);
     }
 
+    if (subUser.pe && subUser.pe.e) {
+        var $pending = $dialog.find('.pending-email-note').addClass('active');
+        $pending.find('.pending-email-txt').text(subUser.pe.e);
+    }
+    else {
+        $dialog.find('.pending-email-note').removeClass('active');
+    }
+
     /** checks if a user attribute got changed and returns changes
      * @returns {Object}   if changes happed it will contain changed attrs*/
     var getchangedValues = function () {
@@ -2462,7 +2478,9 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
             changes.lname = lname;
         }
         if (email !== subUser.e) {
-            changes.email = email;
+            if (!subUser.pe || subUser.pe !== email) {
+                changes.email = email;
+            }
         }
         if (pos !== refPos) {
             changes.pos = pos;
@@ -2502,7 +2520,7 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
             else {
                 // we received LP + handle --> changes included email change
                 // calling show add sub-user dialog with "result" passed will show the result dialog
-                res.m = req.m;
+                res.m = req.email;
                 mySelf.showAddSubUserDialog(res);
             }
 

@@ -1368,8 +1368,13 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
 
     var subUser = M.suba[subuserHandle];
 
-    var considereAttrs = ["e", "firstname", "lastname", "%position", "%idnum", "%phonenum", "%location"];
+    var considereAttrs = ["%position", "%idnum", "%phonenum", "%location"];
     var totalAttrs = 0;
+
+    // if the user is not active, --> it wont be considered in contacts updating mechanisms
+    if (subUser.s !== 0) {
+        considereAttrs.push('lastname', 'firstname');
+    }
 
     var attrFetched = function (res, ctx) {
 

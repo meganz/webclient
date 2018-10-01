@@ -122,6 +122,8 @@ var pro = {
                 return l[6126];     // PRO III
             case 4:
                 return l[8413];     // PRO LITE
+            case 100:
+                return l[19530];    // business
             default:
                 return l[435];      // FREE
         }

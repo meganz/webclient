@@ -3384,7 +3384,19 @@ function loadfm_done(mDBload) {
     };
 
     mega.config.ready(function() {
-        mclp.then(_onConfigReady).catch(_onConfigReady);
+        mclp.then(_onConfigReady)
+            .catch(function() {
+                try {
+                    _onConfigReady();
+                }
+                catch (ex) {
+                    onIdle(function() {
+                        // reach window.onerror
+                        throw ex;
+                    });
+                    siteLoadError(ex, 'loadfm');
+                }
+            });
     });
 }
 

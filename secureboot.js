@@ -550,15 +550,19 @@ var mega = {
 
     /**
      * Fetches information from the API about which features are enabled
-     * @param {Function|undefined} completeCallback The function to run when the function has completed
+     * @param {Function|undefined} completeCallback Optional function to run when the function has completed
      */
     getApiMiscFlags: function(completeCallback) {
 
         'use strict';
 
-        // If the flags have already been fetched this session, don't fetch again and run the callback
-        if (Object.keys(mega.apiMiscFlags).length !== 0 && typeof completeCallback === 'function') {
-            completeCallback();
+        // If the flags have already been fetched this session, don't fetch again
+        if (Object.keys(mega.apiMiscFlags).length !== 0) {
+
+            // Run the callback if it exists
+            if (typeof completeCallback === 'function') {
+                completeCallback();
+            }
         }
         else {
             // Make Get Miscellaneous Flags (gmf) API request

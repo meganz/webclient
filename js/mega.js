@@ -3391,10 +3391,14 @@ function loadfm_done(mDBload) {
                 }
                 catch (ex) {
                     onIdle(function() {
+                        // give time for window.onerror to fire 'cd2' before showing the blocking confirm-dialog
+                        setTimeout(function() {
+                            siteLoadError(ex, 'loadfm');
+                        }, 2e3);
+
                         // reach window.onerror
                         throw ex;
                     });
-                    siteLoadError(ex, 'loadfm');
                 }
             });
     });

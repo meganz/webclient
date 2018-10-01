@@ -417,8 +417,9 @@ MegaData.prototype.treeSearchUI = function() {
     $('.nw-fm-search-icon').off('click');
     $('.nw-fm-tree-header input').off('keyup').off('blur');
 
-    // Items are NOT available in left panel, hide search
-    if (!$('.fm-tree-panel .content-panel.active').find('ul li, .nw-contact-item').length) {
+    // Items are NOT available in left panel and not result of search, hide search
+    if (!$('.fm-tree-panel .content-panel.active').find('ul li, .nw-contact-item').length
+        && !$('.nw-fm-tree-header').hasClass('filled-input')) {
         $('.nw-fm-tree-header input').prop('readonly', true);
         $('.nw-fm-search-icon').hide();
     }

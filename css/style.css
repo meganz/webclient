@@ -8227,7 +8227,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     -webkit-background-clip: padding;
      background-clip: padding-box;
 }
-
+.fm-dialog.share-dialog {
+    z-index: 1100;
+}
 .fm-dialog.rename-dialog, .fm-dialog.network-testing {
     min-width: 440px;
     margin: -77px 0 0 -220px;

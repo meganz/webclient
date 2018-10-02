@@ -454,7 +454,8 @@
             .rebind("input.testerresize", function() {
                 $(this).trigger("keydown");
             })
-            .on('keyup', function(event) {
+            // keydown instead of keyup to preventDefault.
+            .on('keydown', function(event) {
                 /* jshint -W074 */
 
                 var next_token;
@@ -553,6 +554,8 @@
                     case KEY.COMMA:
                     case KEY.SEMICOLON:
 
+                        // preventDefault to remove default behaviour from the keydown.
+                        event.preventDefault();
                         if (this.value.length) {
                             if (selected_dropdown_item) {
                                 add_token($(selected_dropdown_item).data("tokeninput"));

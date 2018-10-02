@@ -580,7 +580,7 @@
                         }
 
                         // If users press enter/return on empty input field behave like done/share button is clicked
-                        else {
+                        else if (event.keyCode === KEY.ENTER || event.keyCode === KEY.NUMPAD_ENTER) {
                             var $addContactBtn;
                             if ($.dialog === "share") { // if it is share dialog
                                 $addContactBtn = $('.share-dialog .dialog-share-button');

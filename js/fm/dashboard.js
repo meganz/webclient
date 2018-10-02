@@ -17,7 +17,7 @@ function dashboardUI() {
 
     $('.fm-right-files-block, .section.conversations, .fm-right-account-block').addClass('hidden');
     $('.fm-right-block.dashboard').removeClass('hidden');
-
+    
     // Hide backup widget is user already saved recovery key before
     if (localStorage.recoverykey) {
         $('.account.widget.recovery-key').addClass('hidden');
@@ -104,7 +104,7 @@ function dashboardUI() {
         };
         drawQRCanvas();
 
-        $('.qr-widget-w .button.access-qr').rebind('click', function () {
+        $('.qr-widget-w .access-qr').rebind('click', function () {
             if (account.contactLink && account.contactLink.length) {
                 openAccessQRDialog();
             }
@@ -139,7 +139,7 @@ function dashboardUI() {
         $('.fm-account-blocks.storage, .fm-account-blocks.bandwidth').removeClass('exceeded going-out');
 
         // Achievements Widget
-        if (account.maf) {
+        if (account.maf && !u_attr.b) {
             $('.fm-right-block.dashboard').addClass('active-achievements');
             var $achWidget = $('.account.widget.achievements');
             var maf = M.maf;
@@ -201,6 +201,43 @@ function dashboardUI() {
                 $('.account.left-pane.plan-date-info').text(l[16175]);
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
             }
+
+            if (u_attr.p === 100 && u_attr.b) {
+                $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden');
+                var $businessLeft = $('.account.left-pane.info-block.business-users').removeClass('hidden');
+                if (u_attr.b.s === 1) {
+                    $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
+                        .text(l[7666]);
+                    if (!u_attr.b.mu) { // master
+                        if ((Date.now() / 1000) - timestamp > 0) {
+                            $businessLeft.find('.suba-status').addClass('pending').removeClass('disabled active')
+                                .text(l[19609]);
+                        }
+                    }
+                }
+                else {
+                    $businessLeft.find('.suba-status').removeClass('disabled').removeClass('pending active')
+                        .text(l[19608]);
+                }
+
+                if (!u_attr.b.mu) { // master
+                    $businessLeft.find('.suba-role').text(l[19610]);
+                }
+                else {
+                    $businessLeft.find('.suba-role').text(l[5568]);
+                }
+
+                var $businessDashboard = $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
+                $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
+
+            }
+        }
+        else {
+            // resetting things might be changed in business account
+            $('.fm-right-block.dashboard .business-dashboard').addClass('hidden');
+            $('.account.left-pane.info-block.business-users').addClass('hidden');
+            $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').removeClass('hidden');
+            $('.fm-right-block.dashboard .non-business-dashboard').removeClass('hidden');
         }
 
         /* Registration date, bandwidth notification link */
@@ -210,8 +247,15 @@ function dashboardUI() {
         $('.account.left-pane.reg-date-info').text(l[16128]);
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
 
-
-        accountUI.fillCharts(account, true);
+        if (!u_attr.b) {
+            accountUI.fillCharts(account, true);
+        }
+        else {
+            $('.business-dashboard .user-management-storage .storage-transfer-data')
+                .text(bytesToSize(account.space_used));
+            $('.business-dashboard .user-management-transfer .storage-transfer-data')
+                .text(bytesToSize(account.tfsq.used));
+        }
 
 
         /* Used Storage progressbar */

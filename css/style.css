@@ -29410,10 +29410,8 @@ opacity: 1;
     height: 120px;
     position: relative;
     margin-top: 12px;
-    margin-left: calc(50% - 60px);
+    margin-left: calc(50% - 53px);
     margin-bottom: 12px;
-    display: inline-block;
-    background-color: red;
 }
 
 .business-dashboard .qr-container .default-white-button-user-management {
@@ -29433,37 +29431,37 @@ opacity: 1;
     position: absolute;
 }
 
-.content-panel.business-dashboard .intro-title{
-    width:30%;
+.content-panel.business-dashboard .intro-title, .content-panel.dashboard .intro-title {
+    width: 30%;
     display: inline-block;
     font-size: 14px;
-    color:#333;
+    color: #333;
     height: 24px;
     margin-bottom: 8px;
     line-height: 20px;
     white-space: normal;
 }
 
-.content-panel.business-dashboard .intro-info{
-    width:68%;
+.content-panel.business-dashboard .intro-info, .content-panel.dashboard .intro-info {
+    width: 68%;
     display: inline-block;
     font-size: 14px;
-    color:#999;
+    color: #999;
     height: 24px;
     margin-bottom: 4px;
     line-height: 20px;
     white-space: normal;
 }
 
-.content-panel.business-dashboard .intro-info.active{
+.content-panel.business-dashboard .intro-info.active, .content-panel.dashboard .intro-info.active{
     color:#00BFA5;
 }
 
-.content-panel.business-dashboard .intro-info.pending{
+.content-panel.business-dashboard .intro-info.pending, .content-panel.dashboard .intro-info.pending{
     color:#F5A623;
 }
 
-.content-panel.business-dashboard .intro-info.disabled{
+.content-panel.business-dashboard .intro-info.disabled, .content-panel.dashboard .intro-info.disabled{{
     color:#666;
 }
 

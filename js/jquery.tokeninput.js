@@ -593,8 +593,10 @@
                             }
 
                             addNewContact($addContactBtn, cd).done(function() {
-                                var share = new mega.Share();
-                                share.updateNodeShares();
+                                if ($.dialog === "share") {
+                                    var share = new mega.Share();
+                                    share.updateNodeShares();
+                                }
                                 $('.token-input-token-mega').remove();
                             });
                         }

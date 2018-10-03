@@ -24761,9 +24761,9 @@ opacity: 1;
 }
 
 .user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon{
-    background-position: -7px -1947px;
-    background-image: url(../images/mega/top-sprite_v5.png);
-    background-size: 38px auto;
+    background-position: -157px -736px;
+    background-image: url(../images/mega/big-icons.png);
+    background-size: 192px auto;
     width:24px;
     height: 24px;
 }
@@ -25138,12 +25138,22 @@ opacity: 1;
     position: relative;
 }
 
-.user-management-view .user-management-subuser-avatars .avatar-wrapper, .fm-right-header-user-management .user-management-subuser-avatars .avatar-wrapper, .user-management-dialog .user-management-subuser-avatars .avatar-wrapper{
+.user-management-view .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar, 
+.fm-right-header-user-management .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar, 
+.user-management-dialog .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar{
     width:24px;
     height: 24px;
     line-height: 20px;
     font-size: 16px;
 }
+
+.user-management-view .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar img, 
+.fm-right-header-user-management .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar img, 
+.user-management-dialog .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar img{
+    width:24px;
+    height: 24px;
+}
+
 
 .user-management-view .user-management-subuser-image, .fm-right-header-user-management .user-management-subuser-image, .user-management-dialog .user-management-subuser-image{
     margin: 1px;
@@ -25204,6 +25214,11 @@ opacity: 1;
     -moz-border-radius: none;
     -webkit-border-radius: none;
     border-radius: none;
+}
+
+.user-management-subuser-profile-container .subaccount-img-big .avatar-wrapper.small-rounded-avatar img {
+    width: 162px;
+    height: 162px;
 }
 
 .user-management-subuser-profile-container .user-management-subuser-profile{
@@ -25542,9 +25557,15 @@ opacity: 1;
 }
 
 .subaccount-view-used-data .used-storage-info{
-    width:100%;
+    width:70%;
     height: 24px;
     margin-bottom: 16px;
+    max-width: 800px;
+    min-width: 500px;
+}
+
+.business-dashboard-container .used-storage-info{
+    width:100%;
 }
 
 .subaccount-view-used-data .used-storage-info .folder-small-icon{
@@ -25612,10 +25633,11 @@ opacity: 1;
     line-height: 24px;
     position: relative;
     display: inline-block;
-    width:400px;
+    width:200px;
 }
 
-.subaccount-view-used-data .used-storage-info .file-number,.subaccount-view-used-data .used-storage-info .folder-number{
+.subaccount-view-used-data .used-storage-info .file-number,
+.subaccount-view-used-data .used-storage-info .folder-number{
     font-size: 14px;
     color: #999;
     line-height: 24px;
@@ -25640,7 +25662,8 @@ opacity: 1;
     line-height: 24px;
     position: relative;
     display: inline-block;
-    width: 200px;
+    float: right;
+
 }
 
 .user-management-breadcrumbs-img {
@@ -25776,8 +25799,6 @@ opacity: 1;
     margin-top: 0px;
     margin-bottom:24px;
     margin-left: 7%;
-    min-width: 175px;
-
 }
 
 .user-management-overview-container b{
@@ -26582,7 +26603,7 @@ opacity: 1;
     font-size: 13px;
     color: #999;
     line-height: 21px;
-    width: 390px;
+    width: 500px;
     height: auto;
     text-align: center;
     position: relative;
@@ -26888,7 +26909,7 @@ opacity: 1;
     height: auto;
     background-color: rgba(250,250,250,1);
     margin:32px; 
-    padding:12px 32px;
+    padding:12px 20px;
     box-sizing: border-box;
     border-radius: 4px;
     border:1px solid rgba(0,0,0,0.1);
@@ -26933,10 +26954,12 @@ opacity: 1;
 }
 
 .user-management-add-user-dialog .verification-container .default-green-button-user-management {
-    position: absolute;
-    margin:0;
-    right: 32px;
-    top: 18px;
+    max-width: 140px;
+    line-height: 20px;
+    min-height: 36px;
+    padding:6px 12px;
+    float: right;
+    margin: 6px 0;
 }
 
 .user-management-add-user-dialog .verification-container .checked-icon56.icon56 {
@@ -27643,7 +27666,7 @@ opacity: 1;
     display: none;
 }
 
- .user-management-dialog .user-management-add-user-dialog .title.last-name {
+ .user-management-dialog.user-management-add-user-dialog .title.last-name {
     left: 147px;
  }
 
@@ -29333,6 +29356,7 @@ opacity: 1;
     width:100%;
     margin: 0 auto;
     max-width: 1064px;
+    min-width: 710px;
 }
 
 .business-dashboard .default-green-button-user-management {
@@ -29461,10 +29485,9 @@ opacity: 1;
     color:#F5A623;
 }
 
-.content-panel.business-dashboard .intro-info.disabled, .content-panel.dashboard .intro-info.disabled{{
+.content-panel.business-dashboard .intro-info.disabled, .content-panel.dashboard .intro-info.disabled{
     color:#666;
 }
-
 
 
 
@@ -29567,15 +29590,17 @@ opacity: 1;
     clear: both;
     }
 
+    .user-management-view-data .user-management-view-overall-usage .view-info .storage-transfer-data, 
+    .business-dashboard .view-info .storage-transfer-data {
+    font-size: 38px;
+    }
 
-
+    .user-management-view-data .user-management-view-overall-usage .view-info, 
+    .business-dashboard .view-info {
+    padding: 8px 0 0px 24px;
+    }
 }
 
-
-
-
-
-}
 
 .dragger-block {
     position: absolute;
@@ -29584,6 +29609,7 @@ opacity: 1;
     left: 200px;
     top: 200px;
 }
+
 .dragger-content {
     min-height: 20px;
     position: absolute;

@@ -790,7 +790,7 @@ BusinessAccount.prototype.decrypteSubUserTree = function (treeF, key) {
     var er;
 
     for (var k = 0; k < treeF.length; k++) {
-        var nodeKey;
+        var nodeKey = false;
         var p = -1;
 
         if (typeof treeF[k].k === 'undefined' || treeF[k].name) {
@@ -805,6 +805,12 @@ BusinessAccount.prototype.decrypteSubUserTree = function (treeF, key) {
             else if (treeF[k].k[11] === ':') {
                 p = 12;
             }
+            //else {
+            //    var dots = treeF[k].k.indexOf(':', 8);
+            //    if (dots !== -1) {
+            //        p = dots + 1;
+            //    }
+            //}
 
             if (p >= 0) {
                 var pp = treeF[k].k.indexOf('/', p + 21);
@@ -885,7 +891,7 @@ BusinessAccount.prototype.getSubUserTree = function (subUserHandle) {
         "a": "fsub", // operation - get user tree
         "su": subUserHandle, // sub-user Handle
         "r": 1, // recursive
-        "c": 0 // don't get extra data (contacts, sub-users ...etc)
+        "c": 1 // don't get extra data (contacts, sub-users ...etc)
     };
 
     api_req(request, {

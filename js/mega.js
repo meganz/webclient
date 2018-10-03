@@ -1175,6 +1175,14 @@ scparser.$add('psts', function(a) {
             ulmanager.ulResumeOverStorageQuotaState();
         });
     }
+
+    onIdle(function() {
+        dlmanager._onOverQuotaAttemptRetry();
+    });
+
+    onIdle(function() {
+        watchdog.notify('psts', (a.r === 's' && a.p) | 0);
+    });
 });
 
 // Payment reminder

@@ -1539,6 +1539,7 @@ else if (!b_u) {
 
     // Do not report exceptions if this build is older than 10 days
     var exTimeLeft = ((buildVersion.timestamp + (10 * 86400)) * 1000) > Date.now();
+    window.buildOlderThan10Days = !exTimeLeft;
 
     if (!d && exTimeLeft && (location.host === 'mega.nz' || is_extension || onBetaW))
     {
@@ -3270,6 +3271,15 @@ if (window.requestIdleCallback) {
 
         return window.requestIdleCallback(callback, {timeout: 20});
     };
+}
+
+/** Helper to replace process.nextTick in videostream.js */
+function onIdleA(boundCallBack) {
+    'use strict';
+
+    onIdle(function() {
+        boundCallBack();
+    });
 }
 
 function makeUUID(a) {

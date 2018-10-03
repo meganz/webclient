@@ -1036,6 +1036,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
     // @private Launch video streaming
     var _initVideoStream = function(node, $wrapper, destroy, options) {
+        var onOverQuotaCT;
+
         if (typeof destroy === 'object') {
             options = destroy;
             destroy = null;
@@ -1081,6 +1083,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     dlmanager.onNolongerOverquota();
                     videoFile.flushRetryQueue();
                 });
+
+                onOverQuotaCT = (s.currentTime | 0) + 1;
             }
             else if (navigator.onLine && this.currentTime < this.duration) {
                 var data = [1, s.hasVideo, s.hasAudio, ~~s.getProperty('bitrate'), s.getProperty('server')];
@@ -1107,6 +1111,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
             $pinner.find('span').text('');
 
+            // if resumed from over bandwidth quota state.
+            if (onOverQuotaCT && s.currentTime > onOverQuotaCT) {
+                onOverQuotaCT = false;
+                eventlog(99705);
+            }
+
             return true; // continue listening
         });
 
@@ -1125,8 +1135,18 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     hint = l[16151] + ' ' + l[242];
                 }
 
-                emsg = String(hint) === 'The provided type is not supported' ? l[17743]
-                     : String(hint) === 'Access denied' ? l[23] : hint;
+                switch (String(hint)) {
+                    case 'Blocked':
+                    case 'Not found':
+                    case 'Access denied':
+                        emsg = l[23];
+                        break;
+                    case 'The provided type is not supported':
+                        emsg = l[17743];
+                        break;
+                    default:
+                        emsg = hint;
+                }
 
                 if (s.options.autoplay) {
                     msgDialog('warninga', l[135], l[47], emsg);
@@ -1141,7 +1161,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             destroy();
             s.error = emsg;
 
-            if (!d && String(Object.entries).indexOf('native') > 0) {
+            if (!d && String(Object.entries).indexOf('native') > 0
+                && !window.buildOlderThan10Days && emsg && emsg !== l[23]) {
+
                 eventlog(99669, JSON.stringify(info));
             }
         });

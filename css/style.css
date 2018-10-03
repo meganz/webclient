@@ -728,7 +728,7 @@ label span.black {
     z-index: 87;
 }
 .select_box div.select-button {
-    background-image: url(../images/mega/fm_sprite2.png);
+    /*background-image: url(../images/mega/fm_sprite2.png);*/
     background-position: left -42px;
     background-repeat: no-repeat;
     height: 30px;

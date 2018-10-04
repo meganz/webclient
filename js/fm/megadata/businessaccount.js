@@ -1447,12 +1447,16 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
     var mySelf = this;
 
     var subUser = M.suba[subuserHandle];
+    var isMasterAttr = false;
+    var isSubAttr = false;
 
-    var considereAttrs = ["%position", "%idnum", "%phonenum", "%location"];
+    var considereAttrs = ["%position", "%idnum", "%phonenum", "%location", '^companyname', '^companyphone',
+        '^companyemail', '^companytaxnum', '^companyaddress1', '^companyaddress2', '^companycity', '^companystate',
+        '^companycountry', '^companyzip'];
     var totalAttrs = 0;
 
     // if the user is not active, --> it wont be considered in contacts updating mechanisms
-    if (subUser.s !== 0) {
+    if (subUser && subUser.s !== 0) {
         considereAttrs.push('lastname', 'firstname');
     }
 
@@ -1461,29 +1465,45 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
         if (typeof res !== 'number') {
             if (ctx.ua === "e") {
                 subUser.m = res;
+                isSubAttr = true;
             }
             else if (ctx.ua === "firstname") {
                 subUser.firstname = res;
+                isSubAttr = true;
             }
             else if (ctx.ua === "lastname") {
                 subUser.lastname = res;
+                isSubAttr = true;
             }
             else if (ctx.ua === "%position") {
                 subUser["position"] = res;
+                isSubAttr = true;
             }
             else if (ctx.ua === "%idnum") {
                 subUser["idnum"] = res;
+                isSubAttr = true;
             }
             else if (ctx.ua === "%phonenum") {
                 subUser["phonenum"] = res;
+                isSubAttr = true;
             }
             else if (ctx.ua === "%location") {
                 subUser["location"] = res;
+                isSubAttr = true;
+            }
+            else {
+                u_attr[ctx.ua] = res;
+                isMasterAttr = true;
             }
         }
 
         if (!--totalAttrs) {
-            mySelf.parseSUBA(subUser, false, true);
+            if (isSubAttr) {
+                mySelf.parseSUBA(subUser, false, true);
+            }
+            else if (isMasterAttr) {
+                mBroadcaster.sendMessage('business:subuserUpdate', {});
+            }
         }
     };
 

@@ -2848,5 +2848,13 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
             // update the left pane
             updateLeftSubUserPanel(subuser);
         }
-    } 
+    }
+    else if (!$('.files-grid-view.user-management-view .user-management-account-settings')
+        .hasClass('hidden')) {
+        if (!subuser.u) { // dummy attr
+            // safe to create new object.
+            var busUI = new BusinessAccountUI();
+            busUI.viewBusinessAccountPage();
+        }
+    }
 };

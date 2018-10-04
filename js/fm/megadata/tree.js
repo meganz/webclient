@@ -55,7 +55,9 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
     }
 
     stype = stype || M.currentTreeType || "cloud-drive";
-    _tf = M.filterTreePanel[stype + '-label'];
+    if (!dialog || rebuild) { // dialog should not be filtered unless it is forced.
+        _tf = M.filterTreePanel[stype + '-label'];
+    }
 
     if (!sDeepIndex) {
         sDeepIndex = 0;

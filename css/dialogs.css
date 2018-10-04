@@ -3086,18 +3086,9 @@ li.token-input-token-invite .input-close {
     text-align: center;
     margin: 0 auto 32px;
 }
-.fm-dialog.verify-two-factor-login .middle-button-wrapper {
-    position: relative;
-}
-.fm-dialog.verify-two-factor-login .back-button {
-    left: 0;
-    position: absolute;
-    top: 0;
-}
-.fm-dialog.verify-two-factor-login .submit-button {
-    right: 0;
-    position: absolute;
-    top: 0;
+.fm-dialog.two-factor-dialog.verify-two-factor-login .middle-button-wrapper {
+    margin-bottom: 0;
+    text-align: center;
 }
 .fm-dialog.verify-two-factor-login .submit-button .loading-image {
     display: none;
@@ -3119,6 +3110,16 @@ li.token-input-token-invite .input-close {
 .fm-dialog.verify-two-factor-login .loading-image img {
     width: 28px;
     height: 28px;
+}
+.fm-dialog.verify-two-factor-login .lost-authenticator-button {
+    color: #333;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 15px;
+    text-align: center;
+}
+.fm-dialog.verify-two-factor-login .lost-authenticator-button:hover {
+    text-decoration: underline;
 }
 .two-factor-dialog.setup-two-factor .middle-button-wrapper {
     text-align: center;

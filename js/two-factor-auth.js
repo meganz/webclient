@@ -88,7 +88,8 @@ twofactor.loginDialog = {
         // Initialise functionality
         this.initKeyupFunctionality();
         this.initSubmitButton(oldStartLoginCallback, newStartLoginCallback);
-        this.initBackAndCloseButton();
+        this.initLostAuthenticatorDeviceButton();
+        this.initCloseButton();
     },
 
     /**
@@ -144,7 +145,7 @@ twofactor.loginDialog = {
         var $pinCodeInput = $dialog.find('.pin-input');
         var $submitButton = $dialog.find('.submit-button');
 
-        // On Submit button click/tap
+        // On Submit button click
         $submitButton.rebind('click', function() {
 
             // Get the Google Authenticator PIN code from the user
@@ -162,26 +163,41 @@ twofactor.loginDialog = {
             security.login.checkLoginMethod(email, password, pinCode, rememberMe,
                                             oldStartLoginCallback,
                                             newStartLoginCallback);
-
-            // Prevent double taps
-            return false;
         });
     },
 
     /**
-     * Initialise the Back and Close buttons to close the overlay
+     * Initialise the Lost Authenticator Device button
      */
-    initBackAndCloseButton: function() {
+    initLostAuthenticatorDeviceButton: function() {
+
+        'use strict';
+
+        // Cache selectors
+        var $dialog = $('.fm-dialog.verify-two-factor-login');
+        var $lostDeviceButton = $dialog.find('.lost-authenticator-button');
+
+        // On button click
+        $lostDeviceButton.rebind('click', function() {
+
+            // Load the Recovery page where they can recover using their Recovery Key
+            loadSubPage('recovery');
+        });
+    },
+
+    /**
+     * Initialise the Close button to close the overlay
+     */
+    initCloseButton: function() {
 
         'use strict';
 
         // Show the dialog
         var $dialog = $('.fm-dialog.verify-two-factor-login');
         var $closeButton = $dialog.find('.fm-dialog-close');
-        var $backButton = $dialog.find('.back-button');
 
         // On click of the close and back buttons
-        $closeButton.add($backButton).rebind('click', function() {
+        $closeButton.rebind('click', function() {
 
             // Close the modal dialog
             twofactor.loginDialog.closeDialog();

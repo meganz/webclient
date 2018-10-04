@@ -304,6 +304,7 @@ mBroadcaster.once('startMega', function() {
     dlmanager.getCurrentDownloads = dummy;
     dlmanager.onNolongerOverquota = dummy;
     dlmanager.getCurrentDownloadsSize = dummy;
+    dlmanager._onOverQuotaAttemptRetry = dummy;
     dlmanager.showOverQuotaDialog = function(task) {
         var $wrapper = $('.video-wrapper').addClass('main-blur-block');
         var $block = $('.transfer-limitation-block').removeClass('hidden');

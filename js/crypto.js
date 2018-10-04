@@ -382,16 +382,7 @@ function api_setsid(sid) {
 
         if (typeof dlmanager === 'object') {
 
-            if (!dlmanager.onOverquotaWithAchievements) {
-                if (dlmanager.isOverQuota && !dlmanager.isOverFreeQuota) {
-                    dlmanager.uqFastTrack = !Object(u_attr).p;
-                    delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
-                }
-
-                if (typeof dlmanager.onLimitedBandwidth === 'function') {
-                    dlmanager.onLimitedBandwidth();
-                }
-            }
+            dlmanager._onOverQuotaAttemptRetry();
         }
         sid = 'sid=' + sid;
     }

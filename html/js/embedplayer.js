@@ -167,6 +167,8 @@ function init_embed(ph, key, g) {
         });
         watchdog.registerOverrider('loadfm_done', function() {});
 
+        watchdog.registerOverrider('psts', dlmanager._onQuotaRetry.bind(dlmanager));
+
         iniVideoStreamLayout(node, $('body'), {preBuffer: false})
             .then(function(stream) {
                 if (stream instanceof Streamer) {

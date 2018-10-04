@@ -1220,6 +1220,21 @@ var dlmanager = {
         }
     },
 
+    _onOverQuotaAttemptRetry: function() {
+        'use strict';
+
+        if (!this.onOverquotaWithAchievements) {
+            if (this.isOverQuota && !this.isOverFreeQuota) {
+                this.uqFastTrack = !Object(u_attr).p;
+                delay('overquota:uqft', this._overquotaInfo.bind(this), 900);
+            }
+
+            if (typeof this.onLimitedBandwidth === 'function') {
+                this.onLimitedBandwidth();
+            }
+        }
+    },
+
     _overquotaInfo: function() {
         'use strict'; /* jshint -W074 */
 
@@ -1785,6 +1800,7 @@ var dlmanager = {
             dlmanager.prepareLimitedBandwidthDialogPlans($dialog);
         });
 
+        $(document).fullScreen(false);
         this._setOverQuotaState(dlTask);
 
         if ($dialog.is(':visible') && !$dialog.hasClass('uploads')) {

@@ -760,8 +760,8 @@
     overflow: hidden;
     background-color: #fff;
     margin: 0 auto;
-    padding-left: 32px;
-    padding-right: 32px;
+    padding-left: 54px;
+    padding-right: 54px;
     max-width: 1440px;
     border-top: 1px solid #eee;
     min-width: 960px;
@@ -1709,7 +1709,7 @@
     margin-bottom: 0;
     margin-left: auto;
     margin-right: auto;
-    margin-top: -50px;
+/*#help2-main .mobile-support-image-container*/
     padding-bottom: 0;
     padding-left: 0;
     padding-right: 0;
@@ -1717,10 +1717,14 @@
     position: relative;
     font-size: 0;
 }
-#help2-main .mobile-support-image-container .nav-dots-container {
+/*#help2-main .mobile-support-image-container .nav-dots-container {
     left: 50%;
     margin-left: -19px;
     position: absolute;
+}*/
+#help2-main .mobile-support-image-container .image-alignment-container {
+    display: inline-block;
+    float: right;
 }
 #help2-main .nav-dots-container {
     text-align: center;
@@ -1776,8 +1780,8 @@
     color: #f55;
 }
 #help2-main .mobile-support-images-gallery {
-    width: 42%;
-    max-width: 42%;
+/*    width: 42%;
+    max-width: 42%;*/
     display: inline-block;
     box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.15);
     border-radius: 6px;
@@ -1786,11 +1790,9 @@
 }
 #help2-main .mobile-support-image-container {
     width: 100%;
-    position: relative;
     display: block;
     background-color: #fafafa;
     border: 1px solid #f6f6f6;
-    border-radius: 6px;
     line-height: 30px;
     margin-top: 30px;
     margin-bottom: 30px;
@@ -1801,6 +1803,7 @@
     padding-top: 10px;
     margin-left: -10px;
     padding-bottom: 10px;
+    overflow: auto;
 }
 #help2-main .mobile-support-image-instructions {
     margin: 0 auto;

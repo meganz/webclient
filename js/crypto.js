@@ -1100,6 +1100,10 @@ function waitsc() {
                     return;
                 }
                 if ($.isNumeric(delieveredResponse)) {
+                    if (delieveredResponse == ENOENT && apixs[5].sid[0] === 'n') {
+                        // WSC is stopped at the beginning.
+                        return;
+                    }
                     waittimeout = setTimeout(waitsc, waitbackoff);
                     return;
                 }

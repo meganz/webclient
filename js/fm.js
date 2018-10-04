@@ -126,6 +126,8 @@ function addNewContact($addButton, cd) {
             var promises = [];
             var addedEmails = [];
 
+            loadingDialog.pshow();
+
             // Custom text message
             emailText = $textarea.val();
 
@@ -162,13 +164,16 @@ function addNewContact($addButton, cd) {
                         title = l[165] + ' ' + l[5859];
                         msg = l[5899];
                     }
-
-                    if (cd) {
-                        closeDialog();
-                        $('.token-input-token-mega').remove();
-                    }
                     contactsInfoDialog(title, addedEmails[0], msg);
                 }
+
+                if (cd) {
+                    closeDialog();
+                    $('.token-input-token-mega').remove();
+                }
+                
+                loadingDialog.phide();
+
                 promise.resolve();
             });
         }

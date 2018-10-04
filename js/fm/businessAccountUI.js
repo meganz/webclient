@@ -2696,7 +2696,7 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
             gettingSubMasterKey.done(
                 function getMKeyOK(st2, MKeyResult) {
                     // sub-user tree decrypting
-                    var treeObj = mySelf.business.decrypteSubUserTree(treeResult.f, MKeyResult.k);
+                    var treeObj = mySelf.business.decrypteSubUserTree(treeResult, MKeyResult.k);
                     if (!treeObj) {
                         if (d) {
                             console.error("decrypting sub-user tree with the Master key has failed! "

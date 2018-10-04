@@ -693,37 +693,71 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
     var attr = ab_to_base64(crypto_makeattr(fNode));
     var key = a32_to_base64(encrypt_key(u_k_aes, fNode.k));
 
+    var cloudNode = { name: 'Cloud-Drive' };
+    var cloudAttr = ab_to_base64(crypto_makeattr(cloudNode));
+    var cloudKey = a32_to_base64(encrypt_key(u_k_aes, cloudNode.k));
+
+    var rubbishNode = { name: 'User-Rubbish-bin'};
+    var rubbishAttr = ab_to_base64(crypto_makeattr(rubbishNode));
+    var rubbishKey = a32_to_base64(encrypt_key(u_k_aes, rubbishNode.k));
+
+    var foldersToCreate = [
+        { h: 'xxxxxxxx', t: 1, a: attr, k: key },
+        { h: 'xxxxxxx1', t: 1, a: cloudAttr, k: cloudKey, p: 'xxxxxxxx' },
+        { h: 'xxxxxxx2', t: 1, a: rubbishAttr, k: rubbishKey, p: 'xxxxxxxx' }
+    ];
+
     var request = {
         "a": "p",
         "t": M.RootID,
-        "n": [{ h: 'xxxxxxxx', t: 1, a: attr, k: key }],
+        "n": foldersToCreate,
         "i": requesti
     };
 
-    var sn = M.getShareNodesSync(M.RootID);
-    if (sn.length) {
-        request.cr = crypto_makecr([fNode], sn, false);
-        request.cr[1][0] = 'xxxxxxxx';
-    }
+    // since cloud root cant be shared, no need to do below check
+
+    // var sn = M.getShareNodesSync(M.RootID);
+    // if (sn.length) {
+    //    request.cr = crypto_makecr([fNode], sn, false);
+    //    request.cr[1][0] = 'xxxxxxxx';
+    // }
 
     api_req(request, {
         callback: function subUserFolderCreateApiResultHandler(res) {
             if (res && typeof res === 'object') {
-                var n = Array.isArray(res.f) && res.f[0];
-
-                if (!n || typeof n !== 'object' || typeof n.h !== 'string' || n.h.length !== 8) {
-                    return operationPromise.reject(0, res, 'Empty returned Node');
+                if (!res.f || !res.f.length || res.f.length !== 3) {
+                    return operationPromise.reject(0, res, 'Empty returned created folders Node');
                 }
 
-                M.addNode(n);
-                ufsc.addNode(n);
+                for (var ix = 0; ix < 3; ix++) {
+                    var n = res.f[ix];
+
+                    if (!n || typeof n !== 'object' || typeof n.h !== 'string' || n.h.length !== 8) {
+                        return operationPromise.reject(0, res, 'Empty returned Node');
+                    }
+                    M.addNode(n);
+                    ufsc.addNode(n);
+                }
 
                 var copyPromise = new MegaPromise();
                 var treeToCopy = [];
                 var opSize = 0;
+                var rootParentsMap = Object.create(null);
+                var copyHeads = Object.create(null);
 
-                for (var h = 1; h < treeObj.length; h++) {
+                for (var h = 0; h < treeObj.length; h++) {
                     var originalNode = treeObj[h];
+
+                    if (originalNode.t > 1) {
+                        if (originalNode.t === 4) { // rubbish
+                            rootParentsMap[originalNode.h] = res.f[2].h;
+                        }
+                        else { // cloud (originalNode.t === 2) or anything else
+                            rootParentsMap[originalNode.h] = res.f[1].h;
+                        }
+                        continue;
+                    }
+
                     var newNode = {};
 
                     if (!originalNode.t) {
@@ -735,13 +769,24 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
                     newNode.h = originalNode.h;
                     newNode.p = originalNode.p;
                     newNode.t = originalNode.t;
-                    if (newNode.p === treeObj[0].h) {
+                    //if (newNode.p === treeObj[0].h) {
+                    //    delete newNode.p;
+                    //}
+                    if (rootParentsMap[newNode.p]) {
+                        newNode.newTarget = rootParentsMap[newNode.p];
                         delete newNode.p;
+                        copyHeads[newNode.h] = rootParentsMap[newNode.p];
+                    }
+                    else {
+
                     }
 
                     treeToCopy.push(newNode);
                 }
                 treeToCopy.opSize = opSize;
+
+
+
 
                 M.copyNodes(treeToCopy, n.h, false, copyPromise, treeToCopy);
                 //treeObj.shift();
@@ -771,8 +816,14 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
  * @param {string} key      sub-user's master key
  * @returns {object}        if succeeded, contains .tree attribute and .errors .warn
  */
-BusinessAccount.prototype.decrypteSubUserTree = function (treeF, key) {
+BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
     "use strict";
+
+    if (!theTree || !theTree.ok0) {
+        return null;
+    }
+
+    var treeF = theTree.f;
 
     if (!treeF || !treeF.length || !key) {
         return null;
@@ -785,6 +836,14 @@ BusinessAccount.prototype.decrypteSubUserTree = function (treeF, key) {
     var dKey = crypto_rsadecrypt(t, u_privk);
     var subUserKey = new sjcl.cipher.aes(str_to_a32(dKey.substr(0, 16)));
 
+    // loading sharing keys, as out-shares will be sent with sharing keys (instead of owner node key)
+    var subUserShareKeys = Object.create(null);
+    for (var ok in theTree.ok0) {
+        var currKey = null;
+        currKey = decrypt_key(subUserKey, base64_to_a32(theTree.ok0[ok].k));
+        subUserShareKeys[theTree.ok0[ok].h] = [currKey, new sjcl.cipher.aes(currKey)];
+    }
+
     var errors = [];
     var warns = [];
     var er;
@@ -792,10 +851,14 @@ BusinessAccount.prototype.decrypteSubUserTree = function (treeF, key) {
     for (var k = 0; k < treeF.length; k++) {
         var nodeKey = false;
         var p = -1;
+        var sId = null;
+
+
 
         if (typeof treeF[k].k === 'undefined' || treeF[k].name) {
             // no decryption needed
             continue;
+
         }
 
         if (typeof treeF[k].k === 'string') {
@@ -805,12 +868,20 @@ BusinessAccount.prototype.decrypteSubUserTree = function (treeF, key) {
             else if (treeF[k].k[11] === ':') {
                 p = 12;
             }
-            //else {
-            //    var dots = treeF[k].k.indexOf(':', 8);
-            //    if (dots !== -1) {
-            //        p = dots + 1;
-            //    }
-            //}
+            else {
+                //var dots = treeF[k].k.indexOf(':', 8);
+                //if (dots !== -1) {
+                //    p = dots + 1;
+                //}
+                for (p = 8; (p = treeF[k].k.indexOf(':', p)) >= 0;) {
+                    if (++p == 9 || treeF[k].k[p - 10] == '/') {
+                        sId = treeF[k].k.substr(p - 9, 8);
+                        if (subUserShareKeys[sId]) {
+                            break;
+                        }
+                    }
+                }
+            }
 
             if (p >= 0) {
                 var pp = treeF[k].k.indexOf('/', p + 21);
@@ -827,7 +898,7 @@ BusinessAccount.prototype.decrypteSubUserTree = function (treeF, key) {
 
                     // check for permitted key lengths (4 == folder, 8 == file)
                     if (keyInt.length === 4 || keyInt.length === 8) {
-                        nodeKey = decrypt_key(subUserKey, keyInt);
+                        nodeKey = decrypt_key((sId) ? subUserShareKeys[sId][1] : subUserKey, keyInt);
                     }
                     else {
                         er = treeF[k].h + ": Received invalid key length [sub-user] (" + keyInt.length + "): ";

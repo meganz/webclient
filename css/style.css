@@ -5040,6 +5040,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     transition: opacity 200ms ease-in-out;
     z-index: 7;
 }
+.contacts.filled-input .fm-add-user {
+    display: none;
+}
 .nw-fm-tree-header.focused-input:not(.conversations) .button {
     -moz-opacity: 0;
     -khtml-opacity: 0;

@@ -25224,10 +25224,10 @@ opacity: 1;
 .user-management-subuser-profile-container .user-management-subuser-profile{
     padding:32px 0 32px 226px;
     position: relative;
+    max-width: 800px;
 }
 
 .user-management-subuser-profile-container .subuser-container {
-    width: 30%;
     min-width: 220px;
     position: relative;
     display: inline-block;
@@ -25235,10 +25235,11 @@ opacity: 1;
 
 .user-management-subuser-profile-container .subuser-sec-profile-container {
     display: inline-block;
-    padding-left: 16px;
+    padding: 0 24px;
+    margin-left: 40px;
     position: relative;
     vertical-align: top;
-    width: 56%;
+    min-width: 340px;
     box-sizing: border-box;
 }
 
@@ -25296,7 +25297,6 @@ opacity: 1;
     position: relative;
     display: block;
     text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .user-management-subuser-profile-container .user-management-subuser-profile .subuser-email{
@@ -25306,8 +25306,7 @@ opacity: 1;
     margin:12px 0;
     position: relative;
     display: block;
-        text-overflow: ellipsis;
-    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .user-management-subaccount-view-container .user-management-subuser-profile-container .view-status-row {
@@ -25479,6 +25478,7 @@ opacity: 1;
 .user-management-transfer{
     height: 86px;
     width: 49%;
+    max-width: 500px;
     position: relative;
     padding-bottom: 24px;
     display: inline-block;
@@ -26600,7 +26600,7 @@ opacity: 1;
 }
 
 .user-management-dialog .dialog-subtitle {
-    font-size: 13px;
+    font-size: 14px;
     color: #999;
     line-height: 21px;
     width: 500px;
@@ -26804,7 +26804,8 @@ opacity: 1;
     margin-top: -280px;
 }
 
-.user-management-add-user-dialog .dialog-button-container {
+.user-management-add-user-dialog .dialog-button-container,
+.fm-dialog.sub-account-link-password .dialog-button-container{
     height: 72px;
     background-color: rgba(250,250,250,1);
     position: relative;
@@ -26816,7 +26817,8 @@ opacity: 1;
     background-color: #fff;
 }
 
-.user-management-add-user-dialog .dialog-button-container::before {
+.user-management-add-user-dialog .dialog-button-container::before,
+.fm-dialog.sub-account-link-password .dialog-button-container::before {
     content: " ";
     width: 100%;
     height: 1px;
@@ -26832,7 +26834,7 @@ opacity: 1;
 }
 
 
-.user-management-add-user-dialog .dialog-button-container .default-green-button-user-management {
+.user-management-dialog .dialog-button-container .default-green-button-user-management {
     padding: 6px 24px;
     float: right;
     line-height: 20px;
@@ -26895,7 +26897,7 @@ opacity: 1;
     margin-right: 24px;
 }*/
 
-.user-management-add-user-dialog .delete-img.icon, .user-management-edit-profile-dialog .delete-img.icon, .user-management-able-user-dialog .delete-img{
+.user-management-dialog .delete-img.icon {
     position: absolute;
     width: 24px;
     height: 24px;
@@ -26956,6 +26958,7 @@ opacity: 1;
 .user-management-add-user-dialog .verification-container .default-green-button-user-management {
     max-width: 140px;
     line-height: 20px;
+    height: auto;
     min-height: 36px;
     padding:6px 12px;
     float: right;
@@ -27462,7 +27465,7 @@ opacity: 1;
 
 .user-management-account-settings .setting-block {
     width: calc(100% - 64px);
-    max-width: 1500px;
+    max-width: 1200px;
     height: auto;
     position: relative;
     margin:0 auto;
@@ -27502,7 +27505,7 @@ opacity: 1;
 }
 
 .user-management-account-settings .setting-block .title .icon48 {
-    margin:16px 28px 0px 28px;
+    margin:16px 40px 0px 40px;
 }
 
 
@@ -27646,7 +27649,8 @@ opacity: 1;
 }
 
 .user-management-account-settings .bus-input .bus-input-title, 
-.user-management-dialog.user-management-add-user-dialog .title {
+.user-management-dialog.user-management-add-user-dialog .title,
+.fm-dialog.sub-account-link-password .dialog-input-title-ontop .title {
     position: absolute;
     left: 40px;
     top: 0;
@@ -29491,18 +29495,7 @@ opacity: 1;
 
 
 
-
 @media only screen and (max-width: 1270px) {
-    .subaccount-view-used-data .used-storage-info .ff-name{
-        width: 180px;
-    }
-    .subaccount-view-used-data .used-storage-info .ff-number{
-        width: 350px;
-    }
-    .subaccount-view-used-data .used-storage-info .ff-occupy{
-        width: 60px;
-    }
-
     .user-management-list-table tr td .user-management-name, .user-management-list-table tr td .user-management-email{
         width: 170px;
     }
@@ -29511,12 +29504,6 @@ opacity: 1;
         text-overflow: ellipsis;
         overflow: hidden;
         width:85px;
-    }
-
-    .user-management-subuser-profile-container .default-white-button-user-management{
-        max-width: 188px;
-        left: -32px;
-        height: auto;
     }
 
     .user-management-subuser-profile-container .user-management-subuser-profile .default-red-button-user-management, .user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{

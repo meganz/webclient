@@ -3403,12 +3403,21 @@ li.token-input-token-invite .input-close {
 /* end of Contact info dialog*/
 
 /* invitation link password dialog */
+
 .fm-dialog.sub-account-link-password {
-    left: 35%;
-    top: 45%;
+    left: 50%;
+    margin-left: -297px;
+    top: 50%;
+    margin-top: -275px;
+    width: 594px;
 }
 
-.fm-dialog.sub-account-link-password .wrapper {
+.fm-dialog.sub-account-link-password.user-management-dialog .dialog-input-title-ontop {
+    margin:8px 172px;
+}
+
+
+/*.fm-dialog.sub-account-link-password .wrapper {
     margin-bottom: 20px;
     padding: 10px;
 }
@@ -3440,4 +3449,4 @@ li.token-input-token-invite .input-close {
 }
 .fm-dialog.sub-account-link-password .decryption-key .dialog-link-pwd-empty {
     color: red;
-}
+}*/

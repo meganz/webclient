@@ -40,8 +40,8 @@
 .business-register .main-pad-block {
 	position: relative;
 	margin:0;
-
 }
+
 
 .bus-reg-body {
 	min-width: 790px;
@@ -582,10 +582,6 @@
     background-repeat: no-repeat;
     background-position: -16px -809px;
 	margin:0 auto 48px auto;
-}
-
-.new-registration.suba {
-    margin-top: 18px;
 }
 
 @media only screen and (max-width: 790px) {

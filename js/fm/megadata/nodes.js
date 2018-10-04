@@ -1802,15 +1802,58 @@ MegaData.prototype.updateLabelInfo = function(e) {
 
     var $t = $(e.target);
     var labelTxt = $t.data('label-txt');
-    var labelInfo;
 
     if ($(e.target).hasClass('active')) {
-        labelInfo = l[19563];
+        switch (labelTxt) {
+            case "Red":
+                labelTxt = l[19571];
+                break;
+            case "Orange":
+                labelTxt = l[19575];
+                break;
+            case "Yellow":
+                labelTxt = l[19579];
+                break;
+            case "Green":
+                labelTxt = l[19583];
+                break;
+            case "Blue":
+                labelTxt = l[19587];
+                break;
+            case "Purple":
+                labelTxt = l[19591];
+                break;
+            case "Grey":
+                labelTxt = l[19595];
+                break;
+        }
     }
     else {
-        labelInfo = l[19564];
+        switch (labelTxt) {
+            case "Red":
+                labelTxt = l[19570];
+                break;
+            case "Orange":
+                labelTxt = l[19574];
+                break;
+            case "Yellow":
+                labelTxt = l[19578];
+                break;
+            case "Green":
+                labelTxt = l[19582];
+                break;
+            case "Blue":
+                labelTxt = l[19586];
+                break;
+            case "Purple":
+                labelTxt = l[19590];
+                break;
+            case "Grey":
+                labelTxt = l[19594];
+                break;
+        }
     }
-    labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
+
     $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
 };
 

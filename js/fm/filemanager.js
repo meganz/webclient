@@ -1371,15 +1371,56 @@ FileManager.prototype.initContextUI = function() {
 
     $('.submenu.labels .dropdown-colour-item').rebind('mouseover.clrSort', function() {
         var labelTxt = this.dataset.labelTxt;
-        var labelInfo;
-
         if ($(this).hasClass('active')) {
-            labelInfo = l[16222];
+            switch (labelTxt) {
+                case "Red":
+                    labelTxt = l[19569];
+                    break;
+                case "Orange":
+                    labelTxt = l[19573];
+                    break;
+                case "Yellow":
+                    labelTxt = l[19577];
+                    break;
+                case "Green":
+                    labelTxt = l[19581];
+                    break;
+                case "Blue":
+                    labelTxt = l[19585];
+                    break;
+                case "Purple":
+                    labelTxt = l[19589];
+                    break;
+                case "Grey":
+                    labelTxt = l[19593];
+                    break;
+            }
         }
         else {
-            labelInfo = l[16221];
+            switch (labelTxt) {
+                case "Red":
+                    labelTxt = l[19568];
+                    break;
+                case "Orange":
+                    labelTxt = l[19572];
+                    break;
+                case "Yellow":
+                    labelTxt = l[19576];
+                    break;
+                case "Green":
+                    labelTxt = l[19580];
+                    break;
+                case "Blue":
+                    labelTxt = l[19584];
+                    break;
+                case "Purple":
+                    labelTxt = l[19588];
+                    break;
+                case "Grey":
+                    labelTxt = l[19592];
+                    break;
+            }
         }
-        labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
         $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
     });
 

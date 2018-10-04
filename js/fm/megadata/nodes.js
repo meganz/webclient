@@ -1728,7 +1728,7 @@ MegaData.prototype.labeling = function(handles, labelId) {
 
             M.labelDomUpdate(handle, newLabelState);
         });
-        
+
         M.initLabelFilter(M.v);
     }
 };
@@ -1940,10 +1940,10 @@ MegaData.prototype.initLabelFilter = function(nodelist) {
     if (d){
         console.log('checking label is existing');
     }
-    
+
     var $fmMenu = $('.colour-sorting-menu .dropdown-section .dropdown-item-label')
         .add('.colour-sorting-menu .dropdown-section.filter-by .labels');
-        
+
     if (this.isLabelExistNodeList(nodelist)){
         $fmMenu.removeClass('disabled static');
         if (d){
@@ -3417,15 +3417,18 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
     "use strict";
 
     var _import = function(data) {
-        $.mcImport = true;
-        $.selected = data[0];
-        $.onImportCopyNodes = data[1];
-        $.onImportCopyNodes.opSize = data[2];
+        M.onFileManagerReady(function() {
+            openCopyDialog(function() {
+                $.mcImport = true;
+                $.selected = data[0];
+                $.onImportCopyNodes = data[1];
+                $.onImportCopyNodes.opSize = data[2];
 
-        if (d) {
-            console.log('Importing Nodes...', $.selected, $.onImportCopyNodes, data[2]);
-        }
-        $('.dropdown-item.copy-item').click();
+                if (d) {
+                    console.log('Importing Nodes...', $.selected, $.onImportCopyNodes, data[2]);
+                }
+            });
+        });
     };
 
     if (localStorage.folderLinkImport && !folderlink) {

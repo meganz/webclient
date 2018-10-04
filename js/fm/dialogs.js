@@ -881,6 +881,8 @@
 
         $.hideContextMenu();
         dialogPositioning($dialog);
+
+        console.assert($dialog, 'The dialogs subsystem is not yet initialized!...');
     };
 
 
@@ -939,8 +941,15 @@
      * Generic function to open the Copy dialog.
      * @global
      */
-    global.openCopyDialog = function openCopyDialog(activeTab) {
+    global.openCopyDialog = function openCopyDialog(activeTab, onBeforeShown) {
         M.safeShowDialog('copy', function() {
+            if (typeof activeTab === 'function') {
+                onBeforeShown = activeTab;
+                activeTab = false;
+            }
+            if (typeof onBeforeShown === 'function') {
+                onBeforeShown($dialog);
+            }
             handleOpenDialog(activeTab, M.RootID);
             return $dialog;
         });

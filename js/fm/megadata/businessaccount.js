@@ -775,10 +775,13 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
                     if (rootParentsMap[newNode.p]) {
                         newNode.newTarget = rootParentsMap[newNode.p];
                         delete newNode.p;
-                        copyHeads[newNode.h] = rootParentsMap[newNode.p];
+                        copyHeads[newNode.h] = newNode.newTarget;
                     }
                     else {
-
+                        if (copyHeads[newNode.p]) {
+                            newNode.newTarget = copyHeads[newNode.p];
+                            copyHeads[newNode.h] = newNode.newTarget;
+                        }
                     }
 
                     treeToCopy.push(newNode);

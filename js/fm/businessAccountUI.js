@@ -130,7 +130,17 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 return true;
             }
             for (var h in subs[k]) {
-                if (subs[k][h] !== previousSubs[k][h]) {
+                if (subs[k][h] instanceof Object) {
+                    if (!previousSubs[k][h] instanceof Object) {
+                        return true;
+                    }
+                    for (var a in subs[k][h]) {
+                        if (subs[k][h][a] !== previousSubs[k][h][a]) {
+                            return true;
+                        }
+                    }
+                }
+                else if (subs[k][h] !== previousSubs[k][h]) {
                     return true;
                 }
             }
@@ -143,6 +153,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         var $usersTable = $('.user-management-list-table', subAccountsView).removeClass('hidden');
         var $tr = $('tr', $usersTable);
         var $tr_user = $($tr.get(1)).clone(true); // the first one is the table header
+        $tr_user.removeClass('hidden');
         var $detailListTable = $('.grid-table-user-management', $usersTable);
 
         var $usersLeftPanel = $('.fm-tree-panel .content-panel.user-management');

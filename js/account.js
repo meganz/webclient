@@ -661,6 +661,9 @@ function processEmailChangeActionPacket(ap) {
                         var business = new BusinessAccount();
                         var sub = M.suba[ap.u];
                         sub.e = ap.e;
+                        if (sub.pe) {
+                            delete sub.pe;
+                        }
                         business.parseSUBA(sub, false, true);
                     }
                 );

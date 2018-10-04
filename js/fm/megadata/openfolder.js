@@ -187,7 +187,7 @@
                         currentdirid = this.previousdirid;
                     }
                 }
-                
+
                 if ($('#treea_' + currentdirid).length === 0) {
                     var n = this.d[currentdirid];
                     if (n && n.p) {
@@ -206,7 +206,6 @@
                 M.renderPath(fid);
             });
         }
-
 
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {

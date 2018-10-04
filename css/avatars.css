@@ -33,6 +33,7 @@
 .token-input-dropdown-mega .small-rounded-avatar {
     margin: 6px 0 6px 8px;
 }
+
 .small-rounded-avatar::before {
     content: '';
     display: block;
@@ -51,6 +52,8 @@
     -webkit-border-radius: 100%;
     border-radius: 100%;
 }
+
+
 .small-rounded-avatar img {
     width: 32px;
     height: 32px;
@@ -64,6 +67,7 @@
     font-size: 48px;
     line-height: 162px;
 }
+
 .semi-mid-avatar {
     width: 96px;
     height: 96px;

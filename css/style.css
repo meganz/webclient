@@ -24761,9 +24761,9 @@ opacity: 1;
 }
 
 .user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon{
-    background-position: -7px -1947px;
-    background-image: url(../images/mega/top-sprite_v5.png);
-    background-size: 38px auto;
+    background-position: -157px -736px;
+    background-image: url(../images/mega/big-icons.png);
+    background-size: 192px auto;
     width:24px;
     height: 24px;
 }
@@ -25138,12 +25138,22 @@ opacity: 1;
     position: relative;
 }
 
-.user-management-view .user-management-subuser-avatars .avatar-wrapper, .fm-right-header-user-management .user-management-subuser-avatars .avatar-wrapper, .user-management-dialog .user-management-subuser-avatars .avatar-wrapper{
+.user-management-view .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar, 
+.fm-right-header-user-management .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar, 
+.user-management-dialog .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar{
     width:24px;
     height: 24px;
     line-height: 20px;
     font-size: 16px;
 }
+
+.user-management-view .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar img, 
+.fm-right-header-user-management .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar img, 
+.user-management-dialog .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar img{
+    width:24px;
+    height: 24px;
+}
+
 
 .user-management-view .user-management-subuser-image, .fm-right-header-user-management .user-management-subuser-image, .user-management-dialog .user-management-subuser-image{
     margin: 1px;
@@ -25206,13 +25216,18 @@ opacity: 1;
     border-radius: none;
 }
 
+.user-management-subuser-profile-container .subaccount-img-big .avatar-wrapper.small-rounded-avatar img {
+    width: 162px;
+    height: 162px;
+}
+
 .user-management-subuser-profile-container .user-management-subuser-profile{
     padding:32px 0 32px 226px;
     position: relative;
+    max-width: 800px;
 }
 
 .user-management-subuser-profile-container .subuser-container {
-    width: 30%;
     min-width: 220px;
     position: relative;
     display: inline-block;
@@ -25220,10 +25235,11 @@ opacity: 1;
 
 .user-management-subuser-profile-container .subuser-sec-profile-container {
     display: inline-block;
-    padding-left: 16px;
+    padding: 0 24px;
+    margin-left: 40px;
     position: relative;
     vertical-align: top;
-    width: 56%;
+    min-width: 340px;
     box-sizing: border-box;
 }
 
@@ -25281,7 +25297,6 @@ opacity: 1;
     position: relative;
     display: block;
     text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .user-management-subuser-profile-container .user-management-subuser-profile .subuser-email{
@@ -25291,8 +25306,7 @@ opacity: 1;
     margin:12px 0;
     position: relative;
     display: block;
-        text-overflow: ellipsis;
-    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .user-management-subaccount-view-container .user-management-subuser-profile-container .view-status-row {
@@ -25464,6 +25478,7 @@ opacity: 1;
 .user-management-transfer{
     height: 86px;
     width: 49%;
+    max-width: 500px;
     position: relative;
     padding-bottom: 24px;
     display: inline-block;
@@ -25542,9 +25557,15 @@ opacity: 1;
 }
 
 .subaccount-view-used-data .used-storage-info{
-    width:100%;
+    width:70%;
     height: 24px;
     margin-bottom: 16px;
+    max-width: 800px;
+    min-width: 500px;
+}
+
+.business-dashboard-container .used-storage-info{
+    width:100%;
 }
 
 .subaccount-view-used-data .used-storage-info .folder-small-icon{
@@ -25612,10 +25633,11 @@ opacity: 1;
     line-height: 24px;
     position: relative;
     display: inline-block;
-    width:400px;
+    width:200px;
 }
 
-.subaccount-view-used-data .used-storage-info .file-number,.subaccount-view-used-data .used-storage-info .folder-number{
+.subaccount-view-used-data .used-storage-info .file-number,
+.subaccount-view-used-data .used-storage-info .folder-number{
     font-size: 14px;
     color: #999;
     line-height: 24px;
@@ -25640,7 +25662,8 @@ opacity: 1;
     line-height: 24px;
     position: relative;
     display: inline-block;
-    width: 200px;
+    float: right;
+
 }
 
 .user-management-breadcrumbs-img {
@@ -25776,8 +25799,6 @@ opacity: 1;
     margin-top: 0px;
     margin-bottom:24px;
     margin-left: 7%;
-    min-width: 175px;
-
 }
 
 .user-management-overview-container b{
@@ -26579,10 +26600,10 @@ opacity: 1;
 }
 
 .user-management-dialog .dialog-subtitle {
-    font-size: 13px;
+    font-size: 14px;
     color: #999;
     line-height: 21px;
-    width: 390px;
+    width: 500px;
     height: auto;
     text-align: center;
     position: relative;
@@ -26783,7 +26804,8 @@ opacity: 1;
     margin-top: -280px;
 }
 
-.user-management-add-user-dialog .dialog-button-container {
+.user-management-add-user-dialog .dialog-button-container,
+.fm-dialog.sub-account-link-password .dialog-button-container{
     height: 72px;
     background-color: rgba(250,250,250,1);
     position: relative;
@@ -26795,7 +26817,8 @@ opacity: 1;
     background-color: #fff;
 }
 
-.user-management-add-user-dialog .dialog-button-container::before {
+.user-management-add-user-dialog .dialog-button-container::before,
+.fm-dialog.sub-account-link-password .dialog-button-container::before {
     content: " ";
     width: 100%;
     height: 1px;
@@ -26811,7 +26834,7 @@ opacity: 1;
 }
 
 
-.user-management-add-user-dialog .dialog-button-container .default-green-button-user-management {
+.user-management-dialog .dialog-button-container .default-green-button-user-management {
     padding: 6px 24px;
     float: right;
     line-height: 20px;
@@ -26874,7 +26897,7 @@ opacity: 1;
     margin-right: 24px;
 }*/
 
-.user-management-add-user-dialog .delete-img.icon, .user-management-edit-profile-dialog .delete-img.icon, .user-management-able-user-dialog .delete-img{
+.user-management-dialog .delete-img.icon {
     position: absolute;
     width: 24px;
     height: 24px;
@@ -26888,7 +26911,7 @@ opacity: 1;
     height: auto;
     background-color: rgba(250,250,250,1);
     margin:32px; 
-    padding:12px 32px;
+    padding:12px 20px;
     box-sizing: border-box;
     border-radius: 4px;
     border:1px solid rgba(0,0,0,0.1);
@@ -26933,10 +26956,13 @@ opacity: 1;
 }
 
 .user-management-add-user-dialog .verification-container .default-green-button-user-management {
-    position: absolute;
-    margin:0;
-    right: 32px;
-    top: 18px;
+    max-width: 140px;
+    line-height: 20px;
+    height: auto;
+    min-height: 36px;
+    padding:6px 12px;
+    float: right;
+    margin: 6px 0;
 }
 
 .user-management-add-user-dialog .verification-container .checked-icon56.icon56 {
@@ -27439,7 +27465,7 @@ opacity: 1;
 
 .user-management-account-settings .setting-block {
     width: calc(100% - 64px);
-    max-width: 1500px;
+    max-width: 1200px;
     height: auto;
     position: relative;
     margin:0 auto;
@@ -27479,7 +27505,7 @@ opacity: 1;
 }
 
 .user-management-account-settings .setting-block .title .icon48 {
-    margin:16px 28px 0px 28px;
+    margin:16px 40px 0px 40px;
 }
 
 
@@ -27623,7 +27649,8 @@ opacity: 1;
 }
 
 .user-management-account-settings .bus-input .bus-input-title, 
-.user-management-dialog.user-management-add-user-dialog .title {
+.user-management-dialog.user-management-add-user-dialog .title,
+.fm-dialog.sub-account-link-password .dialog-input-title-ontop .title {
     position: absolute;
     left: 40px;
     top: 0;
@@ -27643,7 +27670,7 @@ opacity: 1;
     display: none;
 }
 
- .user-management-dialog .user-management-add-user-dialog .title.last-name {
+ .user-management-dialog.user-management-add-user-dialog .title.last-name {
     left: 147px;
  }
 
@@ -29333,6 +29360,7 @@ opacity: 1;
     width:100%;
     margin: 0 auto;
     max-width: 1064px;
+    min-width: 710px;
 }
 
 .business-dashboard .default-green-button-user-management {
@@ -29461,25 +29489,13 @@ opacity: 1;
     color:#F5A623;
 }
 
-.content-panel.business-dashboard .intro-info.disabled, .content-panel.dashboard .intro-info.disabled{{
+.content-panel.business-dashboard .intro-info.disabled, .content-panel.dashboard .intro-info.disabled{
     color:#666;
 }
 
 
 
-
-
 @media only screen and (max-width: 1270px) {
-    .subaccount-view-used-data .used-storage-info .ff-name{
-        width: 180px;
-    }
-    .subaccount-view-used-data .used-storage-info .ff-number{
-        width: 350px;
-    }
-    .subaccount-view-used-data .used-storage-info .ff-occupy{
-        width: 60px;
-    }
-
     .user-management-list-table tr td .user-management-name, .user-management-list-table tr td .user-management-email{
         width: 170px;
     }
@@ -29488,12 +29504,6 @@ opacity: 1;
         text-overflow: ellipsis;
         overflow: hidden;
         width:85px;
-    }
-
-    .user-management-subuser-profile-container .default-white-button-user-management{
-        max-width: 188px;
-        left: -32px;
-        height: auto;
     }
 
     .user-management-subuser-profile-container .user-management-subuser-profile .default-red-button-user-management, .user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
@@ -29567,15 +29577,17 @@ opacity: 1;
     clear: both;
     }
 
+    .user-management-view-data .user-management-view-overall-usage .view-info .storage-transfer-data, 
+    .business-dashboard .view-info .storage-transfer-data {
+    font-size: 38px;
+    }
 
-
+    .user-management-view-data .user-management-view-overall-usage .view-info, 
+    .business-dashboard .view-info {
+    padding: 8px 0 0px 24px;
+    }
 }
 
-
-
-
-
-}
 
 .dragger-block {
     position: absolute;
@@ -29584,6 +29596,7 @@ opacity: 1;
     left: 200px;
     top: 200px;
 }
+
 .dragger-content {
     min-height: 20px;
     position: absolute;

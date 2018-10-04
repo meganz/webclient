@@ -340,8 +340,8 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 }
 
 .user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon{
-    background-image: url(../images/mega/top-sprite_v5@2x.png);
-     background-size: 38px auto;
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
 }
 
 .user-management-view .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-out-share, 

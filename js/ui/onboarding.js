@@ -1,4 +1,6 @@
 (function($, mBroadcaster, scope) {
+    'use strict';
+
     /**
      * Onboarding related stuff
      *
@@ -64,6 +66,12 @@
             mBroadcaster.removeListener(self._pageChangeListener);
         }
         self._pageChangeListener = mBroadcaster.addListener('pagechange', function() {
+            // close any dialog if such is opened
+            if (Object.keys(self._lastShown).length > 0) {
+                var screenId = Object.keys(self._lastShown)[0];
+                self.hideDialog(screenId);
+                delete self._lastShown[screenId];
+            }
             self.eventuallyRenderDialogs();
         });
 
@@ -75,9 +83,9 @@
             self.eventuallyRenderDialogs();
         });
 
-        $(window).rebind('resize.onboarding', function() {
+        $(window).rebind('resize.onboarding', SoonFc(function() {
             self.eventuallyRenderDialogs();
-        });
+        }));
 
         self.eventuallyRenderDialogs();
     };
@@ -219,9 +227,9 @@
                 }
             });
 
-            $(window).rebind('resize.onboardingRepos', function() {
+            $(window).rebind('resize.onboardingRepos', SoonFc(function() {
                 self._positionDialog(screenId);
-            });
+            }));
         }
         else {
             self._positionDialog(screenId);
@@ -336,7 +344,7 @@
                 }
             }
         });
-    }, 150);
+    }, 350);
 
 
     Onboarding.prototype.renderDialog = function(screenId, screenInfo) {
@@ -548,9 +556,7 @@
             'have-notifications',
             function shouldShowNotificationsTip() {
                 if (
-                    u_type !== 0 &&
-                    is_fm() &&
-                    !folderlink &&
+                    self.shouldShow &&
                     rootNodesCount < 3 &&
                     $('.top-icon.notification .notification-num:visible').length > 0 &&
                     parseInt($('.top-icon.notification .notification-num:visible').text(), 10) > 0
@@ -567,9 +573,7 @@
             'how-to-upload',
             function _shouldShowOnboardingUpload() {
                 if (
-                    u_type !== 0 &&
-                    is_fm() &&
-                    !folderlink &&
+                    self.shouldShow &&
                     M.currentdirid === M.RootID &&
                     M.v.length <= 1 /* 1st item is the welcome pdf */
                 ) {
@@ -598,9 +602,7 @@
             'manage-transfers',
             function _shouldShowOnboardingTransfers() {
                 if (
-                    u_type !== 0 &&
-                    is_fm() &&
-                    !folderlink &&
+                    self.shouldShow &&
                     rootNodesCount < 3 &&
                     $('.nw-fm-left-icon.transfers').is(":visible") &&
                     M.hasPendingTransfers()
@@ -630,12 +632,10 @@
                 var fileNodeInUi = $('tr.file.megaListItem:visible:first, .data-block-view.file:visible:first');
 
                 if (
-                    u_type !== 0 &&
-                    is_fm() &&
-                    !folderlink &&
+                    self.shouldShow &&
                     Object.keys(Object(M.su.EXP)).length === 0 &&
                     $('.fm-blocks-view.fm:visible,.files-grid-view.fm:visible').length > 0 &&
-                    fileNodeInUi.length > 0
+                    fileNodeInUi.length
                 ) {
                     return true;
                 }
@@ -655,12 +655,10 @@
                 var folderInUI = $('tr.folder.megaListItem:visible:first, .data-block-view.folder:visible:first');
 
                 if (
-                    u_type !== 0 &&
-                    is_fm() &&
-                    !folderlink &&
+                    self.shouldShow &&
                     Object.keys(M.su).filter(function(n) { return n !== 'EXP'; }).length === 0 &&
                     $('.fm-blocks-view.fm:visible,.files-grid-view.fm:visible').length > 0 &&
-                    folderInUI.length > 0
+                    folderInUI.length
                 ) {
                     return true;
                 }
@@ -675,14 +673,9 @@
             'rubbish-bin',
             function shouldShowRubbishBinTip() {
                 if (
-                    u_type !== 0 &&
-                    is_fm() &&
-                    !folderlink &&
-                    (
-                        typeof u_attr.flags.ssrs !== 'undefined' &&
-                        parseInt(u_attr.flags.ssrs, 10) === 1 &&
-                        !u_attr['^!rubbishtime']
-                    ) &&
+                    self.shouldShow &&
+                    u_attr.flags.ssrs &&
+                    !u_attr['^!rubbishtime'] &&
                     $('.nw-fm-left-icon.rubbish-bin.active').length === 0 &&
                     $('.nw-fm-left-icon.rubbish-bin.filled:visible').length > 0
                 ) {
@@ -698,9 +691,7 @@
             'add-contacts',
             function _shouldShowOnboardingContacts() {
                 if (
-                    u_type !== 0 &&
-                    is_fm() &&
-                    !folderlink &&
+                    self.shouldShow &&
                     M.u.keys().length <= 2 /* 1 of them == u_handle */ &&
                     $('.nw-fm-left-icon.contacts.active').length === 0 &&
                     $('.nw-fm-left-icon.contacts:visible').length > 0
@@ -716,12 +707,11 @@
         self.registerScreen(
             'megachat',
             function shouldShowOnboardingChats() {
+                if (!megaChatIsReady) {
+                    return false;
+                }
                 if (
-                    u_type !== 0 &&
-                    is_fm() &&
-                    !folderlink &&
-                    megaChatIsReady &&
-                    !megaChatIsDisabled &&
+                    self.shouldShow &&
                     M.u.keys().length >= 2 /* 1st of them == u_handle */ &&
                     megaChat.chats.length <= 1 &&
                     ChatdIntegration.mcfHasFinishedPromise &&
@@ -734,9 +724,6 @@
                     return true;
                 }
                 else {
-                    if (megaChatIsDisabled) {
-                        return;
-                    }
                     if (
                         ChatdIntegration.mcfHasFinishedPromise &&
                         ChatdIntegration.mcfHasFinishedPromise.state() === "pending"
@@ -789,26 +776,30 @@
                 });
         });
     };
-
-    M.onFileManagerReady(function _delayedInitOnboarding() {
-        if (folderlink) {
-            return mBroadcaster.once('fm:initialized', _delayedInitOnboarding);
+    Onboarding.prototype.resetState = function() {
+        if (d) {
+            console.warn('Reinitializing onboarding state....');
+            this._persisted.reset();
+            this._persisted.commit();
         }
+    };
 
-        assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');
-        assert(typeof u_handle !== 'undefined', 'onboarding expects a valid user...');
+    Object.defineProperty(Onboarding.prototype, 'shouldShow', {
+        get: function() {
+            return u_type && fminitialized && !pfid && is_fm();
+        }
+    });
 
-        if (megaChatIsDisabled) {
+    mBroadcaster.addListener('fm:initialized', function _delayedInitOnboarding() {
+        if (!folderlink) {
+            assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');
+            assert(typeof u_handle !== 'undefined', 'onboarding expects a valid user...');
+
             mega.ui.onboarding = new mega.ui.Onboarding({});
-        }
-        else {
-            ChatdIntegration.mcfHasFinishedPromise.always(function() {
-                mega.ui.onboarding = new mega.ui.Onboarding({});
-            });
-        }
 
-        // we reached our goal, stop listening for fminitialized
-        return 0xDEAD;
+            // we reached our goal, stop listening for fminitialized
+            return 0xDEAD;
+        }
     });
 
     // export

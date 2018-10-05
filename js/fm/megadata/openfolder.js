@@ -101,6 +101,29 @@
                     this.v = [];
                 }
             }
+            else if ($.ofShowNoFolders) {
+                delete $.ofShowNoFolders;
+
+                this.v = (function _(v) {
+                    var p = [];
+                    var hton = function(h) {
+                        return M.d[h];
+                    };
+                    var fltn = function(h) {
+                        var n = M.d[h];
+                        if (n) {
+                            if (!n.t) {
+                                return h;
+                            }
+                            p.push(h);
+                        }
+                        return '';
+                    };
+                    return v.reduce(function(v, h) {
+                        return v.concat(Object.keys(M.c[h] || {}));
+                    }, []).map(fltn).filter(String).map(hton).concat(p.length ? _(p) : []);
+                })([id]);
+            }
             else if (id.substr(0, 6) === 'search') {
                 this.filterBySearch(this.currentdirid);
             }
@@ -394,15 +417,15 @@
 
         var promise = new MegaPromise();
 
-        if (fetchdbnodes) {
+        if (fetchdbnodes || $.ofShowNoFolders) {
+            var tp = $.ofShowNoFolders ? dbfetch.tree([id]) : dbfetch.get(id);
 
-            dbfetch.get(id)
-                .always(function() {
-                    if (!M.d[id]) {
-                        id = M.RootID;
-                    }
-                    _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
-                });
+            tp.always(function() {
+                if (!M.d[id]) {
+                    id = M.RootID;
+                }
+                _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
+            });
         }
         else if (fetchshares || id === 'shares') {
             dbfetch.geta(Object.keys(M.c.shares || {}))
@@ -412,7 +435,6 @@
                         M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                     }
                     _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
-                    
                 });
         }
         else {

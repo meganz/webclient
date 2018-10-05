@@ -3095,6 +3095,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         var h = $(e.currentTarget).attr('id');
         var n = M.d[h] || {};
         if (n.t) {
+            if (e.ctrlKey) {
+                $.ofShowNoFolders = true;
+            }
             $('.top-context-menu').hide();
             M.openFolder(h);
         }
@@ -3286,7 +3289,10 @@ FileManager.prototype.addTreeUI = function() {
             if ($target.hasClass('opened')) {
                 M.onTreeUIExpand(id);
             }
-            M.openFolder(id);
+            if (e.ctrlKey) {
+                $.ofShowNoFolders = true;
+            }
+            M.openFolder(id, e.ctrlKey);
         }
 
         return false;

@@ -27,6 +27,7 @@
      */
     var _openFolderCompletion = function(id, newHashLocation, first, promise) {
         // if the id is a file handle, then set the folder id as the file's folder.
+        var n;
         var fid;
         if (M.d[id] && (M.d[id].t === 0)) {
             fid = fileversioning.getTopNodeSync(id);
@@ -37,6 +38,7 @@
         this.currentrootid = this.chat ? "chat" : this.getNodeRoot(id);
         this.currentLabelType = M.labelType();
         this.currentLabelFilter = M.filterLabel[this.currentLabelType];
+        this.fmsorting = (id === 'contacts' || id === 'shares') ? 0 : fmconfig.uisorting;
 
         if (first) {
             fminitialized = true;
@@ -124,6 +126,12 @@
                     }, []).map(fltn).filter(String).map(hton).concat(p.length ? _(p) : []);
                 })([id]);
             }
+            else if (id === 'opc') {
+                this.v = Object.values(this.opc || {});
+            }
+            else if (id === 'ipc') {
+                this.v = Object.values(this.ipc || {});
+            }
             else if (id.substr(0, 6) === 'search') {
                 this.filterBySearch(this.currentdirid);
             }
@@ -150,7 +158,7 @@
             }
             else {
                 for (var i = Math.min(this.v.length, 200); i--;) {
-                    var n = this.v[i];
+                    n = this.v[i];
 
                     if (String(n.fa).indexOf(':0*') > 0 || is_image2(n)
                         || is_video(n) || MediaInfoLib.isFileSupported(n)) {
@@ -171,7 +179,7 @@
                 this.doSort(this.overrideSortMode[0], this.overrideSortMode[1]);
                 delete this.overrideSortMode;
             }
-            else if (fmconfig.uisorting && fmconfig.sorting) {
+            else if (this.fmsorting && fmconfig.sorting) {
                 this.doSort(fmconfig.sorting.n, fmconfig.sorting.d);
             }
             else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) {
@@ -180,23 +188,11 @@
             else if (this.currentdirid === 'contacts') {
                 this.doSort('status', 1);
             }
+            else if (this.currentdirid === 'opc' || this.currentdirid === 'ipc') {
+                M.doSort('email', 1);
+            }
             else {
                 this.doSort('name', 1);
-            }
-
-            if (this.currentdirid === 'opc') {
-                this.v = [];
-                for (var i in this.opc) {
-                    this.v.push(this.opc[i]);
-                }
-                this.doSort('email', 1);
-            }
-            else if (this.currentdirid === 'ipc') {
-                this.v = [];
-                for (var i in this.ipc) {
-                    this.v.push(this.ipc[i]);
-                }
-                this.doSort('email', 1);
             }
 
             this.renderMain();
@@ -212,7 +208,7 @@
                 }
 
                 if ($('#treea_' + currentdirid).length === 0) {
-                    var n = this.d[currentdirid];
+                    n = this.d[currentdirid];
                     if (n && n.p) {
                         M.onTreeUIOpen(n.p, false, true);
                     }

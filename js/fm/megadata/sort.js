@@ -456,7 +456,7 @@ MegaData.prototype.doSort = function(n, d) {
     if (typeof this.sortRules[n] === 'function') {
         this.sortRules[n](d);
 
-        if (fmconfig.uisorting) {
+        if (this.fmsorting) {
             mega.config.set('sorting', this.sortmode);
         }
         else {

@@ -673,6 +673,10 @@ function accountUI() {
         });
 
         $('.grid-table.transactions').html(html);
+
+        // Initialise the Download personal data button on the /fm/account/history page
+        gdprDownload.initDownloadDataButton('personal-data-container');
+
         i = new Date().getFullYear() - 16;
         html = '';
         var sel = '';

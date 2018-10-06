@@ -11295,6 +11295,65 @@ table {
     text-align: right;
     position: relative;
 }
+.fm-account-history .personal-data-container {
+    margin:24px 32px;
+    background-color: #fff;
+}
+.fm-account-history .personal-data-container .message {
+    font-size: 14px;
+    line-height: 20px;
+    color: #333;
+}
+.fm-account-history .personal-data-container .sub-message {
+    font-size: 13px;
+    line-height: 18px;
+    color: #666;
+    margin-top:8px;
+}
+.fm-account-history .personal-data-container .download-button {
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    box-sizing: border-box;
+    box-shadow:0 0.5px 1px 0 rgba(0,0,0,0.05);
+    cursor: pointer;
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    margin-top: 24px;
+    min-width: 100px;
+    padding: 0 16px;
+    position: relative;
+    transition: 0.1s;
+}
+.fm-account-history .personal-data-container .download-button .label {
+    font-size: 14px;
+    font-weight: 400;
+}
+.fm-account-history .personal-data-container .loading-image {
+    display: none;
+}
+.fm-account-history .personal-data-container .download-button.loading .label {
+    display: none;
+}
+.fm-account-history .personal-data-container .download-button.loading .loading-image {
+    display: inline-block;
+    font-size: 0;
+    height: 16px;
+    left: 50%;
+    line-height: 0;
+    margin-left: -8px;
+    margin-top: 6px;
+    position: absolute;
+    width: 16px;
+}
+.fm-account-history .personal-data-container .download-button .loading-image img {
+    width: 16px;
+    height: 16px;
+}
+.fm-account-history .personal-data-container .error-message {
+    color: #d90007;
+    margin-top: 10px;
+}
 .account-history-drop-items {
     line-height: 30px;
 }

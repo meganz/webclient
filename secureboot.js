@@ -2073,6 +2073,7 @@ else if (!b_u) {
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
     jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
     jsl.push({f:'js/fm/fileversioning.js', n: 'fm_fileversioning_js', j:1});
+    jsl.push({f:'js/ui/gdpr-download.js', n: 'gdpr_download', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});

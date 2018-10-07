@@ -26634,6 +26634,7 @@ opacity: 1;
     color: #888;
     display: default;
     box-sizing: border-box;
+    float: none;
 }
 
 .user-management-add-user-dialog .default-white-button-user-management.toggle-optional-inputs span {
@@ -26804,7 +26805,7 @@ opacity: 1;
     margin-top: -280px;
 }
 
-.user-management-add-user-dialog .dialog-button-container,
+.user-management-dialog .dialog-button-container,
 .fm-dialog.sub-account-link-password .dialog-button-container{
     height: 72px;
     background-color: rgba(250,250,250,1);
@@ -26813,11 +26814,7 @@ opacity: 1;
     margin-top:40px;
 }
 
-.user-management-add-user-dialog .dialog-button-container.white-bg {
-    background-color: #fff;
-}
-
-.user-management-add-user-dialog .dialog-button-container::before,
+.user-management-dialog .dialog-button-container::before,
 .fm-dialog.sub-account-link-password .dialog-button-container::before {
     content: " ";
     width: 100%;
@@ -26829,33 +26826,21 @@ opacity: 1;
     left: 0;
 }
 
-.user-management-add-user-dialog .dialog-button-container.white-bg::before {
-     background-color: #fff;
-}
-
-
-.user-management-dialog .dialog-button-container .default-green-button-user-management {
+.user-management-dialog .dialog-button-container .default-green-button-user-management,
+.user-management-dialog .dialog-button-container .default-red-button-user-management {
     padding: 6px 24px;
     float: right;
-    line-height: 20px;
+    line-height: 22px;
     font-size: 16px;
-    margin:18px 32px 0 0;
+    margin:18px 32px 0 12px;
 }
 
-.user-management-add-user-dialog .default-white-button-user-management {
+.user-management-dialog .default-white-button-user-management {
     height: 36px;
-    margin:18px 32px 0 32px;
+    float: right;
+    margin:18px 0px 0 32px;
     line-height: 34px;
     font-size: 16px;
-}
-
-.user-management-add-user-dialog .default-white-button-user-management.add-more {
-    float: right;
-    margin:18px 16px 0 32px;
-}
-
-.user-management-add-user-dialog .default-white-button-user-management .icon {
-    margin:5px 8px 4px 0;
 }
 
 
@@ -26955,16 +26940,6 @@ opacity: 1;
     margin-right: 12px;
 }
 
-.user-management-add-user-dialog .verification-container .default-green-button-user-management {
-    max-width: 140px;
-    line-height: 20px;
-    height: auto;
-    min-height: 36px;
-    padding:6px 12px;
-    float: right;
-    margin: 6px 0;
-}
-
 .user-management-add-user-dialog .verification-container .checked-icon56.icon56 {
     position: absolute;
     right: 40px;
@@ -27061,62 +27036,12 @@ opacity: 1;
     margin:20px 12px 0 0;
 }
 
-
-.user-management-edit-profile-dialog .dialog-button-container {
-    height: 72px;
-    background-color: #fff;
-    position: relative;
-    border-radius: 0 0 8px 8px;
-    margin-top:40px;
-}
-
-.user-management-edit-profile-dialog .dialog-button-container .default-green-button-user-management {
-    position: relative;
-    margin:16px 36px 12px 12px;
-    float: right;
-    padding: 0 24px;
-}
-
 .user-management-able-user-dialog {
     width: 480px;
     margin-left: -240px;
     margin-top: -102px;
 }
 
-.user-management-able-user-dialog .dialog-button-container{
-    height: 68px;
-    background-color: rgba(250,250,250,1);
-    position: relative;
-    border-radius: 0 0 8px 8px;
-    margin-top:32px;
-}
-
-.user-management-able-user-dialog .dialog-button-container::before{
-    content: '';
-    height: 1px;
-    width: 100%;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.user-management-able-user-dialog .dialog-button-container .default-red-button-user-management,
-.user-management-able-user-dialog .dialog-button-container .default-green-button-user-management
-{
-    position: relative;
-    margin:16px 32px 12px 12px;
-    float: right;
-    padding: 0 24px;
-}
-
-.user-management-edit-profile-dialog .dialog-button-container .default-white-button-user-management, 
-.user-management-able-user-dialog .dialog-button-container .default-white-button-user-management {
-    position: relative;
-    margin:16px 0px;
-    float: right;
-    padding: 0 24px;
-}
 
 .user-management-able-user-dialog .icon56{
     margin: 40px 32px auto 32px;

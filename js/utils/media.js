@@ -620,6 +620,18 @@ FullScreenManager.prototype.change = function(cb) {
     return this;
 };
 
+// switch full screen
+FullScreenManager.prototype.switchFullscreen = function() {
+    'use strict';
+
+    if (this.state) {
+        this.exitFullscreen();
+    }
+    else {
+        this.enterFullscreen();
+    }
+};
+
 // exit full screen
 FullScreenManager.prototype.exitFullscreen = function() {
     'use strict';
@@ -742,8 +754,35 @@ FullScreenManager.prototype.enterFullscreen = function() {
             return {time: selectedTime | 0, percent: percentage};
         };
 
+        // Set video duration in progress bar
         var setDuration = function(value) {
             $wrapper.find('.video-timing.duration').text(secondsToTimeShort(value, 1));
+        };
+
+        // Increase/decrease video speed
+        var setVideoSpeed = function(rate) {
+            if (!rate) {
+                videoElement.playbackRate = 1.0;
+            }
+            else {
+                var r = videoElement.playbackRate;
+                videoElement.playbackRate = Math.min(Math.max(r + rate, 0.25), 4);
+            }
+        };
+
+        // Increase/decrease video volume.
+        var setVideoVolume = function(v) {
+            if (videoElement.muted) {
+                videoElement.muted = false;
+                changeButtonState('mute');
+            }
+            videoElement.volume = Math.min(1.0, Math.max(videoElement.volume + v, 0.1));
+            $volumeBar.find('span').css('height', Math.round(videoElement.volume * 100) + '%');
+        };
+
+        // Seek by specified number of seconds.
+        var seekBy = function(sec) {
+            streamer.currentTime = Math.min(streamer.duration, Math.max(0, streamer.currentTime + sec));
         };
 
         // Set Init Values
@@ -812,7 +851,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             clearTimeout(timer);
             $wrapper.removeClass('mouse-idle');
             $document.off('mousemove.idle');
-            playevent = false;
+            // playevent = false;
         });
 
         // Add events for all buttons
@@ -861,14 +900,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         $('.volume-control', $wrapper).rebind('mousewheel.volumecontrol', function(e) {
             var delta = Math.max(-1, Math.min(1, (e.wheelDelta || e.deltaY || -e.detail)));
-
-            if (delta > 0 && videoElement.volume < 1.0) {
-                videoElement.volume += 0.1;
-            }
-            if (delta < 0 && videoElement.volume > 0.1) {
-                videoElement.volume -= 0.1;
-            }
-            $volumeBar.find('span').css('height', Math.round(videoElement.volume * 100) + '%');
+            setVideoVolume(0.1 * delta);
             return false;
         });
 
@@ -1008,6 +1040,76 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $element = page === 'download' ? $wrapper.find('.video-block') : $wrapper;
         var fullScreenManager = FullScreenManager($fullscreen, $element).change(setFullscreenData);
 
+        // Video playback keyboard event handler.
+        var videoKeyboardHandler = function(ev) {
+            var bubble = false;
+            var key = playevent && (ev.code || ev.key);
+
+            switch (key) {
+                case 'KeyK':
+                case 'Space':
+                case 'MediaPlayPause':
+                    $playpause.trigger('click');
+                    break;
+                case 'ArrowUp':
+                    setVideoVolume(0.1);
+                    break;
+                case 'ArrowDown':
+                    setVideoVolume(-0.1);
+                    break;
+                case 'ArrowLeft':
+                    seekBy(-5);
+                    break;
+                case 'ArrowRight':
+                    seekBy(5);
+                    break;
+                case 'KeyJ':
+                    seekBy(-10);
+                    break;
+                case 'KeyL':
+                    seekBy(10);
+                    break;
+                case 'KeyF':
+                    fullScreenManager.switchFullscreen();
+                    break;
+                case 'KeyM':
+                    $mute.trigger('click');
+                    break;
+                case 'Home':
+                case 'Digit0':
+                    streamer.currentTime = 0;
+                    break;
+                case 'End':
+                    streamer.currentTime = streamer.duration - 0.2;
+                    break;
+                case 'Digit1':
+                case 'Digit2':
+                case 'Digit3':
+                case 'Digit4':
+                case 'Digit5':
+                case 'Digit6':
+                case 'Digit7':
+                case 'Digit8':
+                case 'Digit9':
+                    streamer.currentTime = streamer.duration * key.substr(5) / 10;
+                    break;
+                default:
+                    if (ev.key === '<' || ev.key === '>') {
+                        setVideoSpeed(ev.ctrlKey ? null : 0.25 * (ev.key.charCodeAt(0) - 0x3d));
+                    }
+                    else {
+                        bubble = true;
+                    }
+                    break;
+            }
+
+            if (!bubble) {
+                ev.preventDefault();
+                ev.stopPropagation();
+            }
+        };
+        window.addEventListener('keydown', videoKeyboardHandler, true);
+
         $wrapper.rebind('is-over-quota', function() {
             fullScreenManager.exitFullscreen();
             videoElement.pause();
@@ -1015,16 +1117,17 @@ FullScreenManager.prototype.enterFullscreen = function() {
         });
 
         $wrapper.rebind('video-destroy', function() {
+            $video.off();
             clearTimeout(timer);
+            window.removeEventListener('keydown', videoKeyboardHandler, true);
             $wrapper.removeClass('mouse-idle video-theatre-mode video')
-                .off('is-over-quota')
-                .find('.viewer-pending').addClass('hidden');
-            $video.off('mousemove.idle');
+                .off('is-over-quota').find('.viewer-pending').addClass('hidden');
             $document.off('mousemove.videoprogress');
             $document.off('mouseup.videoprogress');
             $document.off('mousemove.volumecontrol');
             $document.off('mouseup.volumecontrol');
             $(window).off('video-destroy.main');
+            videoElement = streamer = null;
             dlmanager.isStreaming = false;
             fullScreenManager.destroy();
             pagemetadata();

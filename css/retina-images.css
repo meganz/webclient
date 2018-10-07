@@ -329,6 +329,12 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 192px auto;
 }
 
+.user-management-view .icon64, .user-management-dialog .icon64 {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
+
 /*.user-management-account-settings .invoice-detail .mega-logo {
     background-image: url(../images/mega/invoice-image_v1@2x.png);
     background-size: 120px auto;

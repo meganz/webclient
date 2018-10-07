@@ -40,7 +40,7 @@ function dashboardUI() {
         if (!u_attr.b.mu) {
             $('.business-dashboard .go-to-usermanagement-btn').removeClass('hidden');
 
-            // event handler for clicking on user-management button in dashboard
+            // event handler for clicking on user-management button in dashboard.
             $('.business-dashboard .go-to-usermanagement-btn').off('click').on('click',
                 function userManagementBtnClickHandler() {
                     M.openFolder('user-management', true);

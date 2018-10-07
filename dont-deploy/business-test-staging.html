@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script>
+
+        var devhost = window.location.host;
+        var pathSuffix = window.location.pathname;
+        pathSuffix = pathSuffix.split("/").slice(0, -2).join("/");
+
+        localStorage.clear();
+        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+
+        // Disable the cryptographic hash verification logic.
+        localStorage.dd = '1';
+        localStorage.apipath = 'https://staging.api.mega.co.nz/';
+        //localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
+
+        // localStorage.contextmenu = '1';
+        localStorage.bTest = true;
+
+        localStorage.jj = '1';
+        // localStorage.stopOnAssertFail = '1';
+
+        // Turn on full debugging.
+        localStorage.d = '1'; // Using console.*
+        localStorage.businessTestDate = 1;
+        localStorage.minLogLevel = '0'; // Using MegaLogger, '0' = MegaLogger.LEVELS.DEBUG.
+        //localStorage.hashLogic = 1;
+        // Chat stuff.
+        // localStorage.dxmpp = '1';
+        // localStorage.chatDisabled = '1';
+
+        if (window.location.host == "mega.dev") { // Lyubo's local env settings
+            // localStorage.mpencDebug = '1';
+            localStorage.dxmpp = '1';
+            // localStorage.stopOnAssertFail = '1';
+            localStorage.contextmenu = '1';
+
+            // MegaLogger setup.
+            // TODO: muteList -> loggerMuteList
+            localStorage.muteList = JSON.stringify([
+                "mdbEncryptionPlugin",
+                "querySet\\[chatMessages\\]",
+                "mDBEncryptionPlugin"
+            ]);
+        }
+
+        window.location = '../index.html';
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>

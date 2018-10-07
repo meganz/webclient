@@ -1790,7 +1790,12 @@ function topmenuUI() {
         $topHeader.find('.create-account-button').removeClass('hidden');
 
         $('.create-account-button').rebind('click', function () {
-            loadSubPage('register');
+            if ($(this).hasClass('business-reg')) {
+                loadSubPage('registerb');
+            }
+            else {
+                loadSubPage('register');
+            }
         });
         $topHeader.find('.top-login-button').removeClass('hidden');
         $('.top-login-button').rebind('click', function () {

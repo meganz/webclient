@@ -36,10 +36,11 @@ function dashboardUI() {
     if (u_attr.b) {
         $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
         $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
+        $('.dashboard .button.upgrade-account').addClass('hidden');
         if (!u_attr.b.mu) {
             $('.business-dashboard .go-to-usermanagement-btn').removeClass('hidden');
 
-            // event handler for clicking on user-management button in dashboard
+            // event handler for clicking on user-management button in dashboard.
             $('.business-dashboard .go-to-usermanagement-btn').off('click').on('click',
                 function userManagementBtnClickHandler() {
                     M.openFolder('user-management', true);
@@ -53,6 +54,7 @@ function dashboardUI() {
     else {
         $('.fm-right-block.dashboard .non-business-dashboard').removeClass('hidden');
         $('.fm-right-block.dashboard .business-dashboard').addClass('hidden');
+        $('.dashboard .button.upgrade-account').removeClass('hidden');
     }
 
     // Add-contact plus

@@ -708,7 +708,7 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
     // handler for add users button
     $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
-            mySelf.showAddSubUserDialog();
+            mySelf.showAddSubUserDialog(null, mySelf.viewSubAccountListUI);
         });
 
     // handler account setting page
@@ -1811,6 +1811,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
     var $invoiceDetailContainer = $('.invoice-detail', $invoiceContainer);
     var $accountPageHeader = $('.fm-right-header-user-management .user-management-breadcrumb.account');
 
+    loadingDialog.pshow();
+
     var unhideSection = function () {
         $businessAccountContainer.removeClass('hidden');
         $accountContainer.removeClass('hidden');
@@ -1818,6 +1820,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceDetailContainer.removeClass('hidden');
         $accountPageHeader.removeClass('hidden');
         $accountPageHeader.find('.inv-det-arrow, .inv-det-id').removeClass('hidden');
+        loadingDialog.phide();
     };
 
     var validateInvoice = function (invoice) {
@@ -1932,10 +1935,10 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         var doc = new jsPDF();
                         var specialElementHandlers = {
                             '.hidden': function (element, renderer) {
-                                return false;
+                                return true;
                             },
                             '.icon12': function (element, renderer) {
-                                return false;
+                                return true;
                             }
                         };
                         // business_invoice
@@ -1946,33 +1949,36 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         var $invoiceDetailDiv = $('.invoice-container', $invoiceDetailContainer);
 
                         //doc.internal.scaleFactor = 2;
-                        doc.addHTML($invoiceDetailDiv[0], { retina: true, 'elementHandlers': specialElementHandlers}, function () {
-                            doc.save('invoice' + invoiceDetail.n + '.pdf');
-                        });
-
-                        //var scaleBy = 5;
-                        //var w = 600;
-                        //var h = 840;
-                        //var div = $invoiceDetailDiv[0];
-                        //var canvas = document.createElement('canvas');
-                        //canvas.width = w * scaleBy;
-                        //canvas.height = h * scaleBy;
-                        //canvas.style.width = w + 'px';
-                        //canvas.style.height = h + 'px';
-                        //var context = canvas.getContext('2d');
-                        //context.scale(scaleBy, scaleBy);
-
-
-                        //html2canvas(div, {
-                        //    //canvas: canvas,
-                        //    onrendered: function (canvas) {
-                        //        var img = canvas.toDataURL('image/png');
-                        //        var doc = new jsPDF();
-                        //        doc.addImage(img, 'JPEG', 20, 20);
-                        //        doc.save('invoice' + invoiceDetail.n + '.pdf');
-                        //    },
-                        //    letterRendering: 1, allowTaint: true,
+                        //doc.addHTML($invoiceDetailDiv[0], { retina: true, 'elementHandlers': specialElementHandlers}, function () {
+                        //    doc.save('invoice' + invoiceDetail.n + '.pdf');
                         //});
+
+                        var scaleBy = 2;
+                        var w = 600;
+                        var h = 840;
+                        var invClone = $invoiceDetailDiv.clone();
+                        invClone.find('.icon12').remove();
+                        var div = invClone[0];
+                        var canvas = document.createElement('canvas');
+                        canvas.width = w * scaleBy;
+                        canvas.height = h * scaleBy;
+                        canvas.style.width = w + 'px';
+                        canvas.style.height = h + 'px';
+                        var context = canvas.getContext('2d');
+                        context.scale(scaleBy, scaleBy);
+
+                        
+
+                        html2canvas(div, {
+                            //canvas: canvas,
+                            onrendered: function (canvas) {
+                                var img = canvas.toDataURL('image/png');
+                                var doc = new jsPDF();
+                                doc.addImage(img, 'PNG', 20, 20);
+                                doc.save('invoice' + invoiceDetail.n + '.pdf');
+                            },
+                            letterRendering: 1, allowTaint: true,
+                        });
                     }
                 );
             }
@@ -2696,7 +2702,7 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
             gettingSubMasterKey.done(
                 function getMKeyOK(st2, MKeyResult) {
                     // sub-user tree decrypting
-                    var treeObj = mySelf.business.decrypteSubUserTree(treeResult.f, MKeyResult.k);
+                    var treeObj = mySelf.business.decrypteSubUserTree(treeResult, MKeyResult.k);
                     if (!treeObj) {
                         if (d) {
                             console.error("decrypting sub-user tree with the Master key has failed! "
@@ -2738,7 +2744,7 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
                         };
 
                         if (treeObj.errors.length || treeObj.warns.length) {
-                            var msgMsg = l[19147]; // operation contains errors and/or warning
+                            var msgMsg = l[19147].replace('[Br]', '<br/>'); // operation contains errors and/or warning
                             var msgQuestion = l[18229]; // Do you want to proceed?
                             msgMsg = msgMsg.replace('{0}', M.suba[subUserHandle].e)
                                 .replace('{1}', treeObj.errors.length).replace('{2}', treeObj.warns.length);
@@ -2848,5 +2854,13 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
             // update the left pane
             updateLeftSubUserPanel(subuser);
         }
-    } 
+    }
+    else if (!$('.files-grid-view.user-management-view .user-management-account-settings')
+        .hasClass('hidden')) {
+        if (!subuser.u) { // dummy attr
+            // safe to create new object.
+            var busUI = new BusinessAccountUI();
+            busUI.viewBusinessAccountPage();
+        }
+    }
 };

@@ -1339,9 +1339,9 @@ function api_getsid(ctx, user, passwordkey, hash, pinCode) {
     ctx.callback = api_getsid2;
     ctx.passwordkey = passwordkey;
 
+    // If previously blocked for too many login attempts, return early and show warning with time they can try again
     if (api_getsid.etoomany + 3600000 > Date.now() || location.host === 'webcache.googleusercontent.com') {
-        api_getsid.warning();
-        return ctx.result(ctx, false);
+        return ctx.checkloginresult(ctx, ETOOMANY);
     }
 
     // Setup the login request

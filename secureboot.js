@@ -1355,7 +1355,7 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
-    tag.href = staticpath + "images/favicons/apple-touch-icon-57x57.png"
+    tag.href = staticpath + "images/favicons/apple-touch-icon-57x57.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "shortcut icon";

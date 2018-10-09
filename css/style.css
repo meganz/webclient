@@ -29529,6 +29529,7 @@ opacity: 1;
     height: 4px;
     border-radius: 2px;
     width: 60%;
+    border-radius: 0 8px 8px 0;
 }
 
 .user-management-migrate-process-dialog .process-percentage {

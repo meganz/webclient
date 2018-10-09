@@ -708,52 +708,6 @@ label span.black {
 .notice-right-block .select_box {
     width: 423px;
 }
-.select_box option {
-    font-size: 14px;
-    line-height: 16px;
-    color: #888787;
-    background: #F2F2F3;
-    border: 0;
-    padding: 0;
-    margin: 0;
-}
-.select_box span.select-txt {
-    position: absolute;
-    left: 10px;
-    font-size: 14px;
-    line-height: 25px;
-    color: #888787;
-    top: 2px;
-    display: block;
-    z-index: 87;
-}
-.select_box div.select-button {
-    /*background-image: url(../images/mega/fm_sprite2.png);*/
-    background-position: left -42px;
-    background-repeat: no-repeat;
-    height: 30px;
-    width: 27px;
-    position: absolute;
-    right: -27px;
-    top: 0;
-}
-.select_box select {
-    border: 0;
- filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-    width: 973px;
-    height: 30px;
-    font-size: 13px;
-    line-height: 16px;
-    color: #888787;
-    padding: 0;
-    position: absolute;
-    z-index: 88;
-    left: 0;
-    top: 0;
-}
 .notice-right-block .select_box select {
     width: 450px;
 }

@@ -2197,14 +2197,15 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         });
 
     // event handler for input getting focus
-    //$('.dialog-input-container input', $dialog).off('focus.suba')
-    //    .on('focus.suba', function inputHasFocusHandler() {
-    //        $(this).removeClass('error correctinput').addClass('active');
-    //    });
+    $('.dialog-input-container input', $dialog).off('focus.suba')
+        .on('focus.suba', function inputHasFocusHandler() {
+            $(this).parent().addClass('active');
+        });
 
     // event handler for input losing focus
     $('.dialog-input-container input', $dialog).off('blur.suba')
         .on('blur.suba', function inputHasFocusHandler() {
+            $(this).parent().removeClass('active');
             if (this.value.trim()) {
                 var $me = $(this);
                 if (!$me.hasClass('sub-n') && !$me.hasClass('sub-n-l')) {

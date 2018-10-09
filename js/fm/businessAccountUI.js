@@ -565,21 +565,21 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
     var $dialog = $('.fm-dialog.sub-account-link-password');
     var prepareSubAccountLinkDialog = function () {
 
-        $('.default-dialog-bottom', $dialog).off('click');
-        $('.dialog-link-pwd', $dialog).off('keydown');
+        $('.decrypt-sub-user-link', $dialog).off('click');
+        $('.link-sub-user-pass input', $dialog).off('keydown');
 
-        $('.fm-dialog-link-pwd-pad input', $dialog).on('keydown', function (e) {
-            $('.dialog-link-pwd-empty', $dialog).addClass('hidden');
+        $('.link-sub-user-pass input', $dialog).on('keydown', function (e) {
+            $(this).parent().removeClass('error');
             if (e.keyCode === 13 || e.code === 'Enter' || e.key === 'Enter') {
-                return $('.fm-dialog-link-pwd-button', $dialog).trigger('click');
+                return $('.decrypt-sub-user-link', $dialog).trigger('click');
             }
             
         });
-        $('.fm-dialog-link-pwd-button', $dialog).on('click', function decryptOkBtnHandler () {
-            var enteredPassword = $('.fm-dialog-link-pwd-pad input', $dialog).val();
-            $('.fm-dialog-link-pwd-pad input', $dialog).val('');
+        $('.decrypt-sub-user-link', $dialog).on('click', function decryptOkBtnHandler () {
+            var enteredPassword = $('.link-sub-user-pass input', $dialog).val();
+            $('.link-sub-user-pass input', $dialog).val('');
             if (!enteredPassword.length) {
-                $('.dialog-link-pwd-empty', $dialog).removeClass('hidden');
+                $('.link-sub-user-pass input', $dialog).parent().addClass('error');
                 return false;
             }
             else {

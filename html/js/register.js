@@ -338,13 +338,13 @@ function pageregister() {
                     },
                     businessUser: localStorage.businessSubAc
                 };
-                var passwordaes = new sjcl.cipher.aes(prepare_key_pw($('#register-password').val()));
-                var uh = stringhash($('#register-email').val().toLowerCase(), passwordaes);
+                var passwordaes = new sjcl.cipher.aes(prepare_key_pw($password.val()));
+                var uh = stringhash($email.val().toLowerCase(), passwordaes);
                 u_checklogin(ctx,
                     true,
-                    prepare_key_pw($('#register-password').val()),
+                    prepare_key_pw($password.val()),
                     signupcode,
-                    $('#register-firstname').val() + ' ' + $('#register-lastname').val(), uh);
+                    $firstName.val() + ' ' + $lastName.val(), uh);
                 delete localStorage.businessSubAc;
             }
             else if (u_type === false) {

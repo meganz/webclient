@@ -3296,8 +3296,9 @@ MegaData.prototype.importWelcomePDF = function() {
                 if (typeof res.at === 'string') {
                     M.onFileManagerReady(function() {
                         var doit = true;
-                        for (var i = M.v.length; i--;) {
-                            if (fileext(M.v[i].name) === 'pdf') {
+                        var keys = Object.keys(M.d);
+                        for (var i = keys.length; i--;) {
+                            if (fileext(M.d[keys[i]].name) === 'pdf') {
                                 doit = false;
                                 break;
                             }

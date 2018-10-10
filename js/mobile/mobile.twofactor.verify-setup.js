@@ -31,6 +31,9 @@ mobile.twofactor.verifySetup = {
 
         // Show the account page content
         mobile.twofactor.verifySetup.$page.removeClass('hidden');
+
+        // Put the focus in the PIN input field after its visible
+        mobile.twofactor.verifySetup.$page.find('.two-factor-seed-input input').trigger('focus');
     },
 
     /**
@@ -103,6 +106,9 @@ mobile.twofactor.verifySetup = {
                         // If there was an error, show a message that the code was incorrect and clear the text field
                         $warningText.removeClass('hidden');
                         $pinCode.val('');
+
+                        // Put the focus in the PIN input field
+                        $pinCode.trigger('focus');
                     }
                     else {
                         // Render the Enabled page

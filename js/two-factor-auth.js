@@ -129,6 +129,9 @@ twofactor.loginDialog = {
                 $submitButton.addClass('active');
             }
         });
+
+        // Put the focus in the PIN input field
+        $pinCodeInput.trigger('focus');
     },
 
     /**
@@ -223,6 +226,9 @@ twofactor.loginDialog = {
         $submitButton.removeClass('loading');
         $warningText.removeClass('hidden');
         $pinCodeInput.val('');
+
+        // Put the focus back in the PIN input field
+        $pinCodeInput.trigger('focus');
     },
 
     /**
@@ -610,6 +616,9 @@ twofactor.verifySetupDialog = {
         // Show the dialog
         this.$dialog.removeClass('hidden');
         this.$overlay.removeClass('hidden');
+
+        // Put the focus in the PIN input field after its visible
+        this.$dialog.find('.pin-input').trigger('focus');
     },
 
     /**
@@ -704,7 +713,7 @@ twofactor.verifySetupDialog = {
         'use strict';
 
         // Cache selectors
-        var $pinCode = this.$dialog.find('.pin-input');
+        var $pinCodeInput = this.$dialog.find('.pin-input');
         var $backButton = this.$dialog.find('.back-button');
         var $closeButton = this.$dialog.find('.fm-dialog-close');
         var $verifyButton = this.$dialog.find('.next-button');
@@ -721,7 +730,7 @@ twofactor.verifySetupDialog = {
             if ($successText.hasClass('hidden')) {
 
                 // Get the Google Authenticator PIN code from the user
-                var pinCode = $.trim($pinCode.val());
+                var pinCode = $.trim($pinCodeInput.val());
 
                 // Run Multi-Factor Auth Setup (mfas) request
                 api_req({ a: 'mfas', mfa: pinCode }, {
@@ -740,7 +749,10 @@ twofactor.verifySetupDialog = {
 
                             // If there was an error, show message that the code was incorrect and clear the text field
                             $warningText.removeClass('hidden');
-                            $pinCode.val('');
+                            $pinCodeInput.val('');
+
+                            // Put the focus back in the PIN input field
+                            $pinCodeInput.trigger('focus');
                         }
                         else {
                             // Disable the back button and hide the close button to force them to go to the next step
@@ -891,6 +903,9 @@ twofactor.verifyActionDialog = {
         // Show the modal dialog
         this.$dialog.removeClass('hidden');
         this.$overlay.removeClass('hidden');
+
+        // Put the focus in the PIN input field after its visible
+        this.$dialog.find('.pin-input').trigger('focus');
     },
 
     /**

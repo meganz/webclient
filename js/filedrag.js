@@ -146,11 +146,14 @@
         if (d) {
             console.log('DragEnter');
         }
+        e.preventDefault();
         if ($.dialog === 'avatar') {
             return;
         }
         e.stopPropagation();
-        e.preventDefault();
+        if ((page !== 'start' && !is_fm()) || slideshowid || !$('.feedback-dialog').hasClass('hidden')) {
+            return;
+        }
         if (localStorage.d > 1) {
             console.info('----- ENTER event :' + e.target.className);
         }
@@ -166,8 +169,11 @@
         if (d) {
             console.log('DragOver');
         }
-        e.stopPropagation();
         e.preventDefault();
+        if ((page !== 'start' && !is_fm()) || slideshowid || !$('.feedback-dialog').hasClass('hidden')) {
+            return;
+        }
+        e.stopPropagation();
     }
     var useMegaSync = -1;
     var usageMegaSync = 0;
@@ -271,11 +277,14 @@
         if (d) {
             console.log('DragLeave');
         }
+        e.preventDefault();
         if ($.dialog === 'avatar') {
             return;
         }
         e.stopPropagation();
-        e.preventDefault();
+        if ((page !== 'start' && !is_fm()) || slideshowid || !$('.feedback-dialog').hasClass('hidden')) {
+            return;
+        }
         if (localStorage.d > 1) {
             console.warn('----- LEAVE event :' + e.target.className + '   ' + e.type);
         }
@@ -290,16 +299,20 @@
 
     // on Drop event
     function FileSelectHandler(e) {
-        if ($.dialog === 'avatar') {
-            return;
-        }
-        useMegaSync = -1;
-        if (e.stopPropagation) {
-            e.stopPropagation();
-        }
         if (e.preventDefault) {
             e.preventDefault();
         }
+        if ($.dialog === 'avatar') {
+            return;
+        }
+        if (e.stopPropagation) {
+            e.stopPropagation();
+        }
+        if ((page !== 'start' && !is_fm()) || slideshowid || !$('.feedback-dialog').hasClass('hidden')) {
+            return;
+        }
+        
+        useMegaSync = -1;
 
         var currentDir = M.currentdirid;
 

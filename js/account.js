@@ -90,7 +90,7 @@ function u_checklogin2(ctx, u) {
     }
     else {
         ctx.result = u_checklogin2a;
-        api_getsid(ctx, u, ctx.passwordkey);
+        api_getsid(ctx, u, ctx.passwordkey, ctx.uh); // if ctx.uh is defined --> we need it fo "us"
     }
 }
 

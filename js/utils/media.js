@@ -831,13 +831,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         $vc.attr('title', title);
                     }
 
-                    hideControls();
-                    $document.rebind('mousemove.idle', hideControls);
-
                     streamer._megaNode = node;
                     dlmanager.isStreaming = streamer;
                     pagemetadata();
                 }
+
+                hideControls();
+                $document.rebind('mousemove.idle', hideControls);
             }
         });
 
@@ -1178,13 +1178,21 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $pinner.removeClass('hidden');
             $pinner.find('span').text(navigator.onLine === false ? 'No internet access.' : '');
 
-            if (this.file.overquota) {
-                var videoFile = this.file;
+            if (this.isOverQuota) {
+                var self = this;
+                var file = this.file;
+                var video = this.video;
 
                 $wrapper.trigger('is-over-quota');
                 dlmanager.showOverQuotaDialog(function() {
                     dlmanager.onNolongerOverquota();
-                    videoFile.flushRetryQueue();
+                    file.flushRetryQueue();
+
+                    if (video.paused) {
+                        $wrapper.removeClass('paused');
+                        $pinner.removeClass('hidden');
+                        onIdle(self.play.bind(self));
+                    }
                 });
 
                 onOverQuotaCT = (s.currentTime | 0) + 1;

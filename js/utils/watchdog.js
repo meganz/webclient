@@ -216,12 +216,14 @@ var watchdog = Object.freeze({
                                 console.error('Unexpected user-type: got %s, expected %s', r, type);
                             }
 
-                            if (n_h) {
+                            if (window.n_h) {
                                 // set new u_sid under folderlinks
                                 api_setfolder(n_h);
 
                                 // hide ephemeral account warning
-                                alarm.hideAllWarningPopups();
+                                if (typeof alarm !== 'undefined') {
+                                    alarm.hideAllWarningPopups();
+                                }
                             }
 
                             dlmanager._onQuotaRetry(true, sid);

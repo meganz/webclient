@@ -589,6 +589,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -khtml-opacity: 1;
     opacity: 1;
 }
+.context .dropdown-colour-info {
+    max-width: 200px;
+}
 .dropdown-colour-item::before, .dropdown-colour-item::after {
     content: '';
     width: 100%;

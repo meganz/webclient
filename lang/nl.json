@@ -2897,5 +2897,7 @@
     "19610": "Beheerder",
     "19615": "Uw video is gestopt met afspelen omdat het u over de huidige gratis overdracht tegoed brengt voor uw IP adres. Upgrade naar PRO om meer overdracht tegoed te krijgen, waardoor uw video automatisch wordt hervat.",
     "19616": "Upgrade PRO",
-    "19617": "Uw video is gestopt met afspelen omdat het u over de huidige overdracht tegoed brengt van uw PRO account. Upgrade naar een hogere PRO rang, die automatisch uw video hervat."
+    "19617": "Uw video is gestopt met afspelen omdat het u over de huidige overdracht tegoed brengt van uw PRO account. Upgrade naar een hogere PRO rang, die automatisch uw video hervat.",
+    "19621": "Data migration is in progress, it may take few minutes depending on the migrated account size.",
+    "19622": "Your cloud drive"
 }

@@ -2707,7 +2707,7 @@
     "19206": "L\u2019authentification \u00e0 deux facteurs est activ\u00e9e",
     "19207": "La prochaine fois que vous vous connecterez \u00e0 votre compte, un code \u00e0 6 chiffres fourni par votre appli d\u2019authentification vous sera demand\u00e9.",
     "19208": "D\u00e9sactiver l\u2019authentification \u00e0 deux facteurs",
-    "19209": "Saisissez le code \u00e0 6 chiffres affich\u00e9 par l\u2019appli d\u2019authentification pour d\u00e9sactiver l\u2019authentification \u00e0 deux facteurs.",
+    "19209": "Saisissez le code \u00e0 6 chiffres affich\u00e9 par votre appli d\u2019authentification pour d\u00e9sactiver l\u2019authentification \u00e0 deux facteurs.",
     "19210": "Le code est invalide. Veuillez ressayer.",
     "19211": "L\u2019authentification \u00e0 deux facteurs est d\u00e9sactiv\u00e9e",
     "19212": "Apr\u00e8s avoir configur\u00e9 votre graine dans votre appli d\u2019authentification, saisissez le code \u00e0 6 chiffres fourni.",
@@ -2849,7 +2849,7 @@
     "19538": "sous r\u00e9serve de limites d\u2019utilisation raisonnable",
     "19539": "Tout l\u2019espace dont votre entreprise a besoin",
     "19562": "L\u2019adresse courriel est d\u00e9j\u00e0 utilis\u00e9e. Veuillez saisir une adresse courriel diff\u00e9rente.",
-    "19565": "N\u2019avez-vous pas une appli d\u2019authentification\u2009?",
+    "19565": "Vous faut-il une appli d\u2019authentification\u2009?",
     "19566": "Il vous faut une appli d\u2019authentification pour activer l\u2019A2F avec MEGA. Vous pouvez t\u00e9l\u00e9charger et installer une des applis ci-dessous pour votre t\u00e9l\u00e9phone ou votre tablette.",
     "19567": "Le lien d\u2019invitation ne semble pas \u00eatre valide. Veuillez contacter l\u2019administrateur de votre organisation.",
     "19568": "Ajouter une \u00e9tiquette \u00ab\u00a0Rouge\u00a0\u00bb",
@@ -2897,5 +2897,7 @@
     "19610": "Administrateur",
     "19615": "La lecture de votre vid\u00e9o s\u2019est arr\u00eat\u00e9e, car cela vous ferait d\u00e9passer la quantit\u00e9 actuelle gratuite de transfert allou\u00e9e \u00e0 votre adresse IP. Veuillez passer \u00e0 un compte PRO pour obtenir un quota de transfert suppl\u00e9mentaire suffisant. La lecture de votre vid\u00e9o reprendra alors automatiquement.",
     "19616": "Passez \u00e0 un compte PRO",
-    "19617": "La lecture de votre vid\u00e9o s\u2019est arr\u00eat\u00e9e, car cela vous ferait d\u00e9passer la quantit\u00e9 actuelle de transfert allou\u00e9e \u00e0 votre compte PRO. Veuillez passer \u00e0 un compte PRO sup\u00e9rieur. La lecture de votre vid\u00e9o reprendra alors automatiquement."
+    "19617": "La lecture de votre vid\u00e9o s\u2019est arr\u00eat\u00e9e, car cela vous ferait d\u00e9passer la quantit\u00e9 actuelle de transfert allou\u00e9e \u00e0 votre compte PRO. Veuillez passer \u00e0 un compte PRO sup\u00e9rieur. La lecture de votre vid\u00e9o reprendra alors automatiquement.",
+    "19621": "La migration des donn\u00e9es est en cours. Elle pourrait prendre quelques minutes selon la taille du compte migr\u00e9.",
+    "19622": "Votre disque nuagique"
 }

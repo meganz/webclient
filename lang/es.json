@@ -2859,7 +2859,7 @@
     "19572": "A\u00f1adir etiqueta naranja",
     "19573": "Eliminar etiqueta naranja",
     "19574": "A\u00f1adir filtro de etiqueta naranja",
-    "19575": "Eliminar filtro de etiqueta roja",
+    "19575": "Eliminar filtro de etiqueta naranja",
     "19576": "A\u00f1adir etiqueta amarilla",
     "19577": "Eliminar etiqueta amarilla",
     "19578": "A\u00f1adir filtro de etiqueta amarilla",
@@ -2895,7 +2895,9 @@
     "19608": "Pago vencido",
     "19609": "Pago requerido",
     "19610": "Administrador",
-    "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for ample more transfer quota, which will automatically resume your video.",
-    "19616": "Upgrade PRO",
-    "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video."
+    "19615": "El video ha dejado de reproducirse porque sobrepasar\u00edas la cuota de transferencia gratuita asignada a tu direcci\u00f3n IP. Hazte PRO para obtener m\u00e1s cuota de transferencia, y el video se reanudar\u00e1 autom\u00e1ticamente.",
+    "19616": "Amplia tu plan PRO",
+    "19617": "El video ha dejado de reproducirse porque sobrepasar\u00edas la cuota de transferencia gratuita asignada a tu direcci\u00f3n IP. Amplia tu plan PRO para obtener m\u00e1s cuota de transferencia, y el video se reanudar\u00e1 autom\u00e1ticamente.",
+    "19621": "Data migration is in progress, it may take few minutes depending on the migrated account size.",
+    "19622": "Your cloud drive"
 }

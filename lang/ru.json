@@ -2897,5 +2897,7 @@
     "19610": "\u0410\u0434\u043c\u0438\u043d\u0438\u0441\u0442\u0440\u0430\u0442\u043e\u0440",
     "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for ample more transfer quota, which will automatically resume your video.",
     "19616": "Upgrade PRO",
-    "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video."
+    "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video.",
+    "19621": "Data migration is in progress, it may take few minutes depending on the migrated account size.",
+    "19622": "Your cloud drive"
 }

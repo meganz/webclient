@@ -2895,7 +2895,9 @@
     "19608": "\u903e\u671f\u652f\u4ed8",
     "19609": "\u9700\u652f\u4ed8",
     "19610": "\u7ba1\u7406\u5458",
-    "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for ample more transfer quota, which will automatically resume your video.",
-    "19616": "Upgrade PRO",
-    "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video."
+    "19615": "\u7531\u4e8e\u5373\u5c06\u8d85\u51fa\u60a8\u5f53\u524dIP\u5730\u5740\u7684\u514d\u8d39\u4f20\u8f93\u9650\u989d\uff0c\u60a8\u7684\u89c6\u9891\u5df2\u505c\u6b62\u64ad\u653e\u3002 \u8bf7\u5347\u7ea7\u81f3PRO\u4ee5\u83b7\u5f97\u66f4\u591a\u4f20\u8f93\u6d41\u91cf\uff0c\u968f\u540e\u5c06\u81ea\u52a8\u6062\u590d\u60a8\u7684\u89c6\u9891\u3002",
+    "19616": "\u5347\u7ea7PRO",
+    "19617": "\u7531\u4e8e\u5373\u5c06\u8d85\u51fa\u60a8PRO\u5e10\u6237\u7684\u5f53\u524d\u4f20\u8f93\u9650\u989d\uff0c\u60a8\u7684\u89c6\u9891\u5df2\u505c\u6b62\u64ad\u653e\u3002 \u8bf7\u5347\u7ea7\u81f3\u66f4\u9ad8\u7684PRO\u7ea7\u522b\uff0c\u968f\u540e\u5c06\u81ea\u52a8\u6062\u590d\u60a8\u7684\u89c6\u9891\u3002",
+    "19621": "Data migration is in progress, it may take few minutes depending on the migrated account size.",
+    "19622": "Your cloud drive"
 }

@@ -2503,18 +2503,22 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     if (subUser.position) {
         userAttrs.position = from8(base64urldecode(subUser.position));
         $positionInput.val(userAttrs.position);
+        $positionInput.parent().addClass('correctinput');
     }
     if (subUser.idnum) {
         userAttrs.idnum = from8(base64urldecode(subUser.idnum));
         $subIDInput.val(userAttrs.idnum);
+        $subIDInput.parent().addClass('correctinput');
     }
     if (subUser.phonenum) {
         userAttrs.phonenum = from8(base64urldecode(subUser.phonenum));
         $phoneInput.val(userAttrs.phonenum);
+        $phoneInput.parent().addClass('correctinput');
     }
     if (subUser.location) {
         userAttrs.location = from8(base64urldecode(subUser.location));
         $locationInput.val(userAttrs.location);
+        $locationInput.parent().addClass('correctinput');
     }
 
     if (subUser.pe && subUser.pe.e) {
@@ -2601,6 +2605,36 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
 
     $('.user-management-subuser-avatars', $dialog).html(subUserDefaultAvatar);
 
+    // event handler for input getting focus
+    $('.dialog-input-container input', $dialog).off('focus.suba')
+        .on('focus.suba', function inputHasFocusHandler() {
+            $(this).parent().addClass('active');
+        });
+
+    // event handler for input losing focus
+    $('.dialog-input-container input', $dialog).off('blur.suba')
+        .on('blur.suba', function inputHasFocusHandler() {
+            $(this).parent().removeClass('active');
+            if (this.value.trim()) {
+                var $me = $(this);
+                if (!$me.hasClass('edit-sub-name') && !$me.hasClass('edit-sub-lname')) {
+                    $me.parent().addClass('correctinput').removeClass('error');
+                }
+                else {
+                    if ($('.dialog-input-container input.edit-sub-name', $dialog).val().trim()
+                        && $('.dialog-input-container input.edit-sub-lname', $dialog).val().trim()) {
+                        $me.parent().addClass('correctinput').removeClass('error');
+                    }
+                    else {
+                        $me.parent().removeClass('correctinput');
+                    }
+                }
+            }
+            else {
+                $(this).parent().removeClass('correctinput');
+            }
+        });
+
     // close event handler
     $('.dialog-button-container .btn-edit-close, .delete-img.icon', $dialog).off('click.subuser')
         .on('click.subuser', closeDialog);
@@ -2613,6 +2647,24 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
                 return closeDialog();
             }
             else {
+                if ('fname' in changedVals && !changedVals.fname.length) {
+                    $nameInput.parent().addClass('error');
+                    //$('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
+
+                    return;
+                }
+                if ('lname' in changedVals && !changedVals.lname.length) {
+                    $lnameInput.parent().addClass('error');
+                    //$('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
+
+                    return;
+                }
+                if ('email' in changedVals && checkMail(changedVals.email)) {
+                    $emailInput.parent().addClass('error');
+                    //$('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[5705]);
+
+                    return;
+                }
                 var editPromise = mySelf.business.editSubAccount(subUserHandle, changedVals.email, changedVals.fname, changedVals.lname,
                     {
                         position: changedVals.pos,

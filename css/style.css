@@ -537,7 +537,7 @@ input[type="checkbox"] {
     margin: 20px 12px 0 7px;
 }
 .top-login-popup .checkboxOn, .top-login-popup .checkboxOff {
-    margin: 0px 11px 0 1px;
+    margin: 1px 11px 0 1px;
 }
 .top-login-popup .loginwarning-checkbox {
     margin: 12px 11px 0 0;
@@ -11879,6 +11879,7 @@ table {
     cursor: pointer;
     display: block;
     position: absolute;
+    z-index: 10;
 }
 .top-login-full:hover {
     background-position: 1px -36px;
@@ -12033,6 +12034,7 @@ table {
     background-color: transparent;
     width: 21px;
     height: 21px;
+    margin-top: 17px;
 }
 .top-login-popup .top-login-warning-bott .checkboxOn::before, .top-login-popup .top-login-warning-bott .checkboxOff::before, .top-login-popup .top-login-warning-bott .checkboxOn::after, .top-login-popup .top-login-warning-bott .checkboxOff::after {
     display: none;

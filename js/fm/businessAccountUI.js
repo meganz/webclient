@@ -1981,6 +1981,35 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         //});
                         var myPage = pages['business_invoice'];
                         myPage = translate(myPage);
+
+                        // now prepare the incovice.
+                        myPage = myPage.replace('{0Date}', (new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
+                        myPage = myPage.replace('{1InvoiceNB}', invoiceDetail.n);
+                        myPage = myPage.replace('{2VATNB}', invoiceDetail.mega.taxnum[1]);
+                        myPage = myPage.replace('{3CompanyName}', invoiceDetail.u.cname);
+                        myPage = myPage.replace('{4CompanyEmail}', invoiceDetail.u.e);
+                        myPage = myPage.replace('{5CompanyAddress}', invoiceDetail.u.addr.join(', '));
+                        myPage = myPage.replace('{6CompanyCountry}', invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]);
+                        var cVat = '---';
+                        if (invoiceDetail.u.taxnum && invoiceDetail.u.taxnum[1]) {
+                            cVat = invoiceDetail.u.taxnum[1];
+                        }
+                        myPage = myPage.replace('{7CompanyVat}', cVat);
+                        var itemDate = '---';
+                        var itemDec = '---';
+                        var itemAmount = '---';
+                        if (invoiceDetail.items && invoiceDetail.items.length) {
+                            itemDate = (new Date(invoiceDetail.items[0].ts * 1000).toLocaleDateString());
+                            itemDec = invoiceDetail.items[0].d;
+                            itemAmount = invoiceDetail.items[0].gross;
+                        }
+                        myPage = myPage.replace('{8itemDate}', itemDate);
+                        myPage = myPage.replace('{9itemDesc}', itemDec);
+                        myPage = myPage.replace('{10itemAmount}', itemAmount);
+
+                        myPage = myPage.replace('{11itemVat}', $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent);
+                        myPage = myPage.replace('{12totalCost}', '€' + invoiceDetail.tot);
+
                         var pdfPrintIframe = document.getElementById('invoicePdfPrinter');
                         var newPdfPrintIframe = document.createElement('iframe');
                         newPdfPrintIframe.id = 'invoicePdfPrinter';

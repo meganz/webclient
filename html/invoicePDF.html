@@ -262,7 +262,7 @@ body {
 }
 
 .inv-payment-price .inv-payment-price-detail:first-child {
-    width: calc(100% - 155px);
+    width: calc(100% - 156px);
     display: inline-block;
     text-align: right;
 }
@@ -291,15 +291,15 @@ body {
                 <ul class=" ">
                     <li>
                         <span>[$19293]:</span>
-                        <span id="invoice-date">13 Nov 2017 </span>
+                        <span id="invoice-date">{0Date}</span>
                     </li>
                     <li>
                         <span>[$19294]:</span>
-                        <span id="invoice-number">NwC-AOyfAxo   </span>
+                        <span id="invoice-number">{1InvoiceNB}</span>
                     </li>
                     <li>
                         <span class="inv-vat-label">[$19295]:</span>
-                        <span class="invoice-vat">110-633-521</span>
+                        <span class="invoice-vat">{2VATNB}</span>
                     </li>
                 </ul>
             </div>
@@ -307,12 +307,11 @@ body {
         <div class="inv-add-container">
             <p class="inv-subtitle">[$19296]:</p>
             <ul>
-                <li class="inv-company-name billed-name">AAA LTD.</li>
-                <li class="inv-per-name billed-attn hidden">ATTN: Khaled Captain</li>
-                <li class="billed-email">money@mega.co.nz</li>
-                <li class="billed-address">120 Albert St, Auckland 1010, 120 Albert St, Auckland  1010 </li>
-                <li class="billed-country">New Zealand</li>
-                <li class="billed-vat">VAT: 9429030423626 </li>
+                <li class="inv-company-name billed-name">{3CompanyName}</li>
+                <li class="billed-email">{4CompanyEmail}</li>
+                <li class="billed-address">{5CompanyAddress}</li>
+                <li class="billed-country">{6CompanyCountry}</li>
+                <li class="billed-vat">{7CompanyVat}</li>
             </ul>
         </div>
         <div class="inv-payment-table">
@@ -323,18 +322,18 @@ body {
                     <div class="inv-payment-header">[$16463]</div>
                 </li>
                 <li class="inv-li-content">
-                    <div class="inv-payment-item inv-pay-date">1/8/2018</div>
-                    <div class="inv-payment-item inv-pay-desc">Business account for X user<br>(1/7/2018 - 31/7/2018)</div>
-                    <div class="inv-payment-item inv-pay-amou">€4.34</div>
+                    <div class="inv-payment-item inv-pay-date">{8itemDate}</div>
+                    <div class="inv-payment-item inv-pay-desc">{9itemDesc}</div>
+                    <div class="inv-payment-item inv-pay-amou">{10itemAmount}</div>
                 </li>
                 <li class="inv-payment-price inv-li-gst">
                     <div class="inv-payment-price-detail inv-gst-perc">[$19301]:</div>
-                    <div class="inv-payment-price-detail inv-gst-val">€4.34</div>
+                    <div class="inv-payment-price-detail inv-gst-val">{11itemVat}</div>
 
                 </li>
                 <li class="inv-payment-price inv-li-total">
                     <div class="inv-payment-price-detail">[$19300]:</div>
-                    <div class="inv-payment-price-detail inv-total-val">€40000000.34</div>
+                    <div class="inv-payment-price-detail inv-total-val">{12totalCost}</div>
                 </li>
             </ul>
         </div>

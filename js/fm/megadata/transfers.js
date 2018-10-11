@@ -764,10 +764,6 @@ MegaData.prototype.dlerror = function(dl, error) {
             break;
     }
 
-    if (error === ETEMPUNAVAIL) {
-        eventlog(99698, true);
-    }
-
     // Hide TPP
     mega.ui.tpp.hide();
     mega.ui.tpp.reset('dl');

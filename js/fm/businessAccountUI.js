@@ -1930,55 +1930,75 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         $invoiceDetailContainer.find('.inv-detail-export').off('click.subuser').on('click.subuser',
             function invoiceDetailExportClickHandler() {
-                M.require('htmlcanvas_js', 'jspdf_js', 'business_invoice').done(
+                M.require('business_invoice').done(
                     function exportOverviewPageToPDF() {
-                        var doc = new jsPDF();
-                        var specialElementHandlers = {
-                            '.hidden': function (element, renderer) {
-                                return true;
-                            },
-                            '.icon12': function (element, renderer) {
-                                return true;
-                            }
-                        };
-                        // business_invoice
+                        //var doc = new jsPDF();
+                        //var specialElementHandlers = {
+                        //    '.hidden': function (element, renderer) {
+                        //        return true;
+                        //    },
+                        //    '.icon12': function (element, renderer) {
+                        //        return true;
+                        //    }
+                        //};
+                        //// business_invoice
 
-                        //var myInvoice = $.parseHTML(pages['business_invoice'], null);
-                        //var $invoiceDetail = myInvoice.find('.invoice-container');
-                        //var div = myInvoice[5];
-                        var $invoiceDetailDiv = $('.invoice-container', $invoiceDetailContainer);
+                        ////var myInvoice = $.parseHTML(pages['business_invoice'], null);
+                        ////var $invoiceDetail = myInvoice.find('.invoice-container');
+                        ////var div = myInvoice[5];
+                        //var $invoiceDetailDiv = $('.invoice-container', $invoiceDetailContainer);
 
-                        //doc.internal.scaleFactor = 2;
-                        //doc.addHTML($invoiceDetailDiv[0], { retina: true, 'elementHandlers': specialElementHandlers}, function () {
-                        //    doc.save('invoice' + invoiceDetail.n + '.pdf');
-                        //});
+                        ////doc.internal.scaleFactor = 2;
+                        ////doc.addHTML($invoiceDetailDiv[0], { retina: true, 'elementHandlers': specialElementHandlers}, function () {
+                        ////    doc.save('invoice' + invoiceDetail.n + '.pdf');
+                        ////});
 
-                        var scaleBy = 2;
-                        var w = 600;
-                        var h = 840;
-                        var invClone = $invoiceDetailDiv.clone();
-                        invClone.find('.icon12').remove();
-                        var div = invClone[0];
-                        var canvas = document.createElement('canvas');
-                        canvas.width = w * scaleBy;
-                        canvas.height = h * scaleBy;
-                        canvas.style.width = w + 'px';
-                        canvas.style.height = h + 'px';
-                        var context = canvas.getContext('2d');
-                        context.scale(scaleBy, scaleBy);
+                        //var scaleBy = 2;
+                        //var w = 600;
+                        //var h = 840;
+                        //var invClone = $invoiceDetailDiv.clone();
+                        //invClone.find('.icon12').remove();
+                        //var div = invClone[0];
+                        //var canvas = document.createElement('canvas');
+                        //canvas.width = w * scaleBy;
+                        //canvas.height = h * scaleBy;
+                        //canvas.style.width = w + 'px';
+                        //canvas.style.height = h + 'px';
+                        //var context = canvas.getContext('2d');
+                        //context.scale(scaleBy, scaleBy);
 
                         
 
-                        html2canvas(div, {
-                            //canvas: canvas,
-                            onrendered: function (canvas) {
-                                var img = canvas.toDataURL('image/png');
-                                var doc = new jsPDF();
-                                doc.addImage(img, 'PNG', 20, 20);
-                                doc.save('invoice' + invoiceDetail.n + '.pdf');
-                            },
-                            letterRendering: 1, allowTaint: true,
-                        });
+                        //html2canvas(div, {
+                        //    //canvas: canvas,
+                        //    onrendered: function (canvas) {
+                        //        var img = canvas.toDataURL('image/png');
+                        //        var doc = new jsPDF();
+                        //        doc.addImage(img, 'PNG', 20, 20);
+                        //        doc.save('invoice' + invoiceDetail.n + '.pdf');
+                        //    },
+                        //    letterRendering: 1, allowTaint: true,
+                        //});
+                        var myPage = pages['business_invoice'];
+                        myPage = translate(myPage);
+                        var pdfPrintIframe = document.getElementById('invoicePdfPrinter');
+                        var newPdfPrintIframe = document.createElement('iframe');
+                        newPdfPrintIframe.id = 'invoicePdfPrinter';
+                        newPdfPrintIframe.src = 'about:blank';
+                        newPdfPrintIframe.classList.add('hidden');
+                        var pdfIframeParent = pdfPrintIframe.parentNode;
+                        pdfIframeParent.replaceChild(newPdfPrintIframe, pdfPrintIframe);
+                        newPdfPrintIframe.onload = function () {
+                            setTimeout(function () {
+                                newPdfPrintIframe.focus();
+                                newPdfPrintIframe.contentWindow.print();
+                            }, 1);
+                        };
+                        var doc = newPdfPrintIframe.contentWindow.document;
+                        doc.open();
+                        doc.write(myPage);
+                        doc.close();
+                        
                     }
                 );
             }

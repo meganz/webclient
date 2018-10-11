@@ -2651,6 +2651,9 @@ li.token-input-token-invite .input-close {
 .fm-dialog .embed-content-block .checkboxOff, .fm-dialog .embed-content-block .checkboxOn, .checkbox-container .settings-row .checkboxOff, .checkbox-container .settings-row .checkboxOn{
     margin:  16px 14px;
 }
+.checkbox-container .settings-row .checkboxOff, .checkbox-container .settings-row .checkboxOn {
+    margin-left: 1px
+}
 .fm-dialog .embed-content-block input.checkboxOn, .fm-dialog .embed-content-block input.checkboxOff, .checkbox-container .settings-row input.checkboxOn, .checkbox-container .settings-row input.checkboxOff {
     margin: 0;
 }
@@ -2687,27 +2690,13 @@ li.token-input-token-invite .input-close {
     box-shadow: inset 0 1px 3px 0 rgba(0,0,0,0.10);
     border-radius: 3px;
 }
-.fm-dialog .embed-content-block .settings-container, .improved-recovery-steps .checkbox-container/*, .instruction-block, .improved-recovery-steps .app-button-block*/ {
+.fm-dialog .embed-content-block .settings-container{
     overflow: auto;
     margin-top: 8px;
     background-color: #fff;
     border: 1px solid #eee;
     border-radius: 3px;
     min-height: 44px;
-}
-.improved-recovery-steps .checkbox-container/*, .improved-recovery-steps .app-button-block  .instruction-block */{
-    background-color: #F8F9FA;
-    border: 1px solid #EBEEF0;
-    border-radius: 2px;
-    padding: 6px 0;
-    margin: 0 0;
-}
-/*.improved-recovery-steps  .instruction-block {
-    padding: 0 12px;
-}*/
-.improved-recovery-steps .app-button-block {
-    padding: 0 0;
-    min-height: initial;
 }
 .fm-dialog.export-embed-player .bullet-point {
     height: 3px;
@@ -2895,12 +2884,28 @@ li.token-input-token-invite .input-close {
 }
 /*  Park account warning styles */
 .park-account-dialog.fm-dialog {
-    width: 700px;
-    margin: -270px 0 0 -350px;
+    width: 640px;
+    margin: -270px 0 0 -320px;
 }
 .park-account-dialog .fm-dialog-title {
-    font-size: 17px;
-    padding-top: 24px;
+    font-family: Montserrat-Regular;
+    font-size: 20px;
+    color: #262F3B;
+    letter-spacing: 0;
+    text-align: center;
+    line-height: 30px;
+    margin: 50px auto 16px;
+    width: 560px;
+    overflow: initial
+    padding: 0 0;
+}
+.improved-recovery-steps .park-account-dialog h3.main-italic-header {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 14px;
+    color: #495057;
+    letter-spacing: 0;
+    text-align: center;
+    width: 52px;
 }
 .park-account-dialog .improved-recovery-steps .content-text {
     margin-left: 60px;
@@ -2937,7 +2942,8 @@ li.token-input-token-invite .input-close {
     display: none;
 }
 .park-account-dialog .park-account-checkbox {
-    margin-top: 24px;
+    width: 560px;
+    margin: 0 auto;
 }
 .park-account-dialog .improved-recovery-steps .login-register-input {
     margin-top: 12px;
@@ -3111,20 +3117,20 @@ li.token-input-token-invite .input-close {
     width: 28px;
     height: 28px;
 }
-.fm-dialog.verify-two-factor-login .lost-authenticator-button {
+.fm-dialog.verify-two-factor-login .lost-authenticator-button, .fm-dialog.two-factor-verify-action .lost-authenticator-button {
     color: #333;
     cursor: pointer;
     font-size: 14px;
     margin-top: 15px;
     text-align: center;
 }
-.fm-dialog.verify-two-factor-login .lost-authenticator-button:hover {
+.fm-dialog.verify-two-factor-login .lost-authenticator-button:hover, .fm-dialog.two-factor-verify-action .lost-authenticator-button:hover {
     text-decoration: underline;
 }
 .two-factor-dialog.setup-two-factor .middle-button-wrapper {
     text-align: center;
 }
-.fm-dialog.two-factor-verify-action .middle-button-wrapper {
+.fm-dialog.two-factor-verify-action .middle-button-wrapper, .fm-dialog.two-factor-verify-action .lost-authenticator-button {
     text-align: center;
 }
 .fm-dialog.two-factor-verify-action .pin-input {
@@ -3493,3 +3499,23 @@ li.token-input-token-invite .input-close {
     text-align: center;
 }
 /* end of Contact info dialog*/
+
+/* Recover account */
+.fm-dialog.recovery-key-dialog {
+    width: 640px;
+    height: 620px;
+    margin: -310px 0 0 -320px;
+    text-align: center; 
+}
+.fm-dialog.recovery-key-dialog  .fm-dialog-close {
+    right: -6px;
+    top: -6px;
+}
+.fm-dialog.improved-recovery-steps .recover-paste-block h5.main-italic-header {
+    display: block;
+    text-align: left;
+}
+.fm-dialog.improved-recovery-steps .recover-paste-block {
+    margin: 32px auto 48px;
+}
+

@@ -98,6 +98,11 @@
     </div>
 </div>
 
+<div class="fm-dialog account-reset-confirmation hidden">
+    <div class="reg-success-icon"></div>
+    <div class="reg-success-header">[$735]</div>
+    <div class="reg-success-txt">[$17805]</div>
+</div>
 <div class="fm-dialog share-help filled-input hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$9104]</div>
@@ -4552,19 +4557,19 @@
         <div class="clear"></div>
     </div>
     <div class="fm-dialog-body improved-recovery-steps">
+        <h3 class="main-italic-header">[$18307]</h3>
         <div class="checkbox-block park-account-checkbox">
-            <h3 class="main-italic-header">[$18307]</h3>
-              <div class="checkbox-container">
+            <div class="checkbox-container">
                 <div class="settings-row">
-                  <div class="">
-                      <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
-                      <!-- Toggle between checkboxOff and checkboxOn -->
-                      <div class="checkdiv checkboxOff">
+                    <div class="">
+                        <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
                         <!-- Toggle between checkboxOff and checkboxOn -->
-                          <input type="checkbox" id="" class="checkboxOff"/>
-                      </div>
-                      <label for="" class="radio-txt" id="warn1-check">Yes, I understand parking my account will <strong class="warning-text">remove all my files, contacts, messages from my account.</strong></label>
-                  </div>
+                        <div class="checkdiv checkboxOff">
+                            <!-- Toggle between checkboxOff and checkboxOn -->
+                            <input type="checkbox" id="" class="checkboxOff"/>
+                        </div>
+                        <label for="" class="radio-txt" id="warn1-check">Yes, I understand parking my account will <strong class="warning-text">remove all my files, contacts, messages from my account.</strong></label>
+                    </div>
                 </div>
                 <div class="settings-row">
                     <div class="">
@@ -4575,8 +4580,7 @@
                             <!-- Toggle between checkboxOff and checkboxOn -->
                             <input type="checkbox" id="" class="checkboxOff"/>
                         </div>
-                        <label for="" class="radio-txt" id="warn2-check">Yes, I understand there is no way to undo a parked account,<strong class="warning-text"> all my files will be gone forever.</strong></label>
-
+                        <label for="" class="radio-txt" id="warn2-check">[$19851]</label>
                     </div>
                 </div>
                 <div class="settings-row">
@@ -4590,26 +4594,25 @@
                         <label for="" class="radio-txt">[$18308]</label>
                     </div>
                 </div>
-          </div>
+            </div>
        </div>
-          <div class="login-register-input email">
-
-                <input type="text" name="recover-input1-di" id="recover-input1-di" value="" placeholder="[$195]" maxlength="190">
-            </div>
-    <!-- Only show this div when all the checkboxes have been ticked and the email field has been filled in. -->
-    <div class="content-highlight warning hidden">
-        <div class="highlight-wrapper">
-            <div class="warning-icon"></div>
-            <div class="content-text">
-                [$18309]
+        <div class="recover-account-email-block">
+            <div class="account input-wrapper email">
+                <div class="account input-tooltip mid left">
+                    [$141]
+                </div>
+                <div class="account both-input-tooltip left">
+                    [$7431]
+                </div>
+                <i class="account-icon email"></i>
+                <input autocomplete="off" type="text" name="recover-input1" id="recover-input1-di" value="" placeholder="[$195]" maxlength="190">
             </div>
         </div>
+        <div class="fm-notifications-bottom">
+            <div class="default-white-button left supportbtn"><span>[$18148]</span></div>
+            <div class="default-grey-button right parkbtn"><span>[$1947]</span></div>
+            <div class="default-white-button right closebtn"><span>[$82]</span></div>
         </div>
-    </div>
-    <div class="fm-notifications-bottom">
-        <div class="default-white-button left supportbtn"><span>[$18148]</span></div>
-        <div class="default-grey-button right parkbtn"><span>[$1947]</span></div>
-        <div class="default-white-button right closebtn"><span>[$82]</span></div>
     </div>
 </div>
 
@@ -4831,7 +4834,7 @@
                         MEGA-RECOVERYKEY.txt
                     </div>
                     <div class="recovery-key-size">
-                        22 KB
+                        22 Bytes
                     </div>
                 </div>
                 <div class="recovery-key-button">
@@ -4875,5 +4878,38 @@
                 <span class="label">[$1694]</span>
             </div>
         </div>
+        <div class="lost-authenticator-button">[$19215]</div>
+    </div>
+</div>
+
+<!-- Recover Account (Display recover key) !-->
+<div class="fm-dialog recovery-key-dialog backup-recover improved-recovery-steps hidden">
+    <div class="content-wrapper">
+        <div class="fm-dialog-header">
+            <h3 class="main-italic-header main-header">[$19826]</h3>
+            <div class="fm-dialog-close"></div>
+            <div class="clear"></div>
+        </div>
+        <div class="recover-image-block">
+            <div class="recover-image device-key">
+            </div>
+        </div>
+        <h1 class="step-main-question">[$19852]</h1>
+        <p>[$19853]</p>
+        <p>[$19854]</p>
+        <div class="recover-paste-block">
+            <div class="left-section">
+                <h5 class="main-italic-header">[$8963]</h5>
+                <div class="account input-wrapper recovery-key recover-image input-key">
+                    <span class="recover-image icon"></span>
+                    <input id="backup_keyinput_2fa" type="text" value="u1i34fieinf13ifhf98dfasdfji" readonly>
+                </div>
+            </div>
+            <div class="account right-section button-wrapper">
+                <div class="copy-recovery-key-button default-white-button no-hover">[$17386]</div>
+                <div class="save-recovery-key-button default-green-button">[$17694]</div>
+            </div>
+        </div>
+        <p>[$19840]</p>
     </div>
 </div>

@@ -2667,6 +2667,15 @@ function classifyPassword(password) {
     }
     else if ($passStatus.length) {
         $passStatus.addClass(className + ' checked').text(string1);
+
+        if ($('.password-tooltip.visible').length && string2 !== l[18701]) {
+            $('.password-advice').text(string2);
+            $('.minimum-password-block .password-icon').addClass('success');
+        }
+        else {
+            $('.password-advice').empty();
+            $('.minimum-password-block .password-icon').removeClass('success');
+        }
     }
 
     $('.password-status-warning')

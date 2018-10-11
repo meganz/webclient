@@ -671,11 +671,12 @@ BusinessAccount.prototype.getSignupCodeInfo = function (signupCode) {
 
 /**
  * copying the sub-user decrypted tree to master user root
- * @param {Array} treeObj       sub-user tree decrypted
- * @param {string} folderName   name of the folder to create in master's root
- * @returns {Promise}           resolves if operation succeeded
+ * @param {Array} treeObj               sub-user tree decrypted
+ * @param {string} folderName           name of the folder to create in master's root
+ * @param {Function} progressCallback   optional callback function for progress reporting
+ * @returns {Promise}                   resolves if operation succeeded
  */
-BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folderName) {
+BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folderName, progressCallback) {
     "use strict";
     var operationPromise = new MegaPromise();
 
@@ -707,6 +708,10 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
         { h: 'xxxxxxx2', t: 1, a: rubbishAttr, k: rubbishKey, p: 'xxxxxxxx' }
     ];
 
+    if (progressCallback) {
+        progressCallback(33);
+    }
+
     var request = {
         "a": "p",
         "t": M.RootID,
@@ -724,6 +729,10 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
 
     api_req(request, {
         callback: function subUserFolderCreateApiResultHandler(res) {
+            if (progressCallback) {
+                progressCallback(38);
+            }
+
             if (res && typeof res === 'object') {
                 if (!res.f || !res.f.length || res.f.length !== 3) {
                     return operationPromise.reject(0, res, 'Empty returned created folders Node');
@@ -737,6 +746,10 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
                     }
                     M.addNode(n);
                     ufsc.addNode(n);
+                }
+
+                if (progressCallback) {
+                    progressCallback(42);
                 }
 
                 var copyPromise = new MegaPromise();
@@ -785,6 +798,9 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
                     }
 
                     treeToCopy.push(newNode);
+                    if (progressCallback) {
+                        progressCallback(42 + Math.floor((50 / treeObj.length) * (h + 1)));
+                    }
                 }
                 treeToCopy.opSize = opSize;
 
@@ -800,6 +816,9 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
                 });
 
                 copyPromise.done(function (results) {
+                    if (progressCallback) {
+                        progressCallback(96);
+                    }
                     operationPromise.resolve(1, results);
                 });
             }

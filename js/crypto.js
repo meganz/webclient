@@ -1197,23 +1197,45 @@ function api_createuser(ctx, invitecode, invitename, uh) {
 
     logger.debug("api_createuser - masterkey: " + u_k + " passwordkey: " + ctx.passwordkey);
 
+    // in business sub-users API team decided to hack "UP" command to include "UC2" new arguments.
+    // so now. we will check if this is a business sub-user --> we will add extra arguments to "UP" (crv,hak,v)
+
+    var doApiRequest = function (request) {
+        logger.debug("Storing key: " + request.k);
+
+        api_req(request, ctx);
+        watchdog.notify('createuser');
+    };
+
     req = {
             a: 'up',
             k: a32_to_base64(encrypt_key(new sjcl.cipher.aes(ctx.passwordkey), u_k)),
             ts: base64urlencode(a32_to_str(ssc) + a32_to_str(encrypt_key(new sjcl.cipher.aes(u_k), ssc)))
         };
 
+    // invite code usage is obsolete. it's only used in case of business sub-users
+    // therefore, if it exists --> we are registering a business sub-user
     if (invitecode) {
-        req.uh = uh;
         req.ic = invitecode;
         req.name = invitename;
+
+        security.deriveKeysFromPassword(ctx.businessUser, u_k,
+            function (clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes, derivedAuthenticationKeyBytes) {
+                req.crv = ab_to_base64(clientRandomValueBytes);
+                req.hak = ab_to_base64(hashedAuthenticationKeyBytes);
+                req.v = 2;
+                req.k = a32_to_base64(encryptedMasterKeyArray32);
+                ctx.uh = ab_to_base64(derivedAuthenticationKeyBytes);
+
+                doApiRequest(req);
+            }
+        );
+
+    }
+    else {
+        doApiRequest(req);
     }
 
-    //if (confirmcode) req.c = confirmcode;
-    logger.debug("Storing key: " + req.k);
-
-    api_req(req, ctx);
-    watchdog.notify('createuser');
 }
 
 function api_checkconfirmcode(ctx, c) {

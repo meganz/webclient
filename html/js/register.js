@@ -321,6 +321,11 @@ function pageregister() {
             msgDialog('warninga', l[1117], l[1118]);
         }
         else {
+            // for business sub-users signup we are still using signup code.
+            // and business sub-users registration flow is different and more direct than normal users
+            // as it doesnt contain "uc2" due to the implied email confirmation (because the user is coming
+            // from invitation email)
+            // Note: for business no backward compatibility is needed and V2 registration is mandatory
             if (localStorage.businessSubAc) {
                 var signupcode = '';
                 window.businessSubAc = JSON.parse(localStorage.businessSubAc);
@@ -336,15 +341,17 @@ function pageregister() {
                             loadSubPage('fm');
                         }
                     },
-                    businessUser: localStorage.businessSubAc
+                    businessUser: $password.val()   // we need the plain enterd password in later stages
+                                                    // because u_checklogin take the byte array of the password.
                 };
-                var passwordaes = new sjcl.cipher.aes(prepare_key_pw($('#register-password').val()));
-                var uh = stringhash($('#register-email').val().toLowerCase(), passwordaes);
+                var passwordByteArray = prepare_key_pw($password.val());
+                var passwordaes = new sjcl.cipher.aes(passwordByteArray);
+                // var uh = stringhash($email.val().toLowerCase(), passwordaes);
                 u_checklogin(ctx,
                     true,
-                    prepare_key_pw($('#register-password').val()),
+                    passwordByteArray,
                     signupcode,
-                    $('#register-firstname').val() + ' ' + $('#register-lastname').val(), uh);
+                    $firstName.val() + ' ' + $lastName.val());
                 delete localStorage.businessSubAc;
             }
             else if (u_type === false) {

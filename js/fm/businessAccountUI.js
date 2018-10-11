@@ -565,21 +565,21 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
     var $dialog = $('.fm-dialog.sub-account-link-password');
     var prepareSubAccountLinkDialog = function () {
 
-        $('.default-dialog-bottom', $dialog).off('click');
-        $('.dialog-link-pwd', $dialog).off('keydown');
+        $('.decrypt-sub-user-link', $dialog).off('click');
+        $('.link-sub-user-pass input', $dialog).off('keydown');
 
-        $('.fm-dialog-link-pwd-pad input', $dialog).on('keydown', function (e) {
-            $('.dialog-link-pwd-empty', $dialog).addClass('hidden');
+        $('.link-sub-user-pass input', $dialog).on('keydown', function (e) {
+            $(this).parent().removeClass('error');
             if (e.keyCode === 13 || e.code === 'Enter' || e.key === 'Enter') {
-                return $('.fm-dialog-link-pwd-button', $dialog).trigger('click');
+                return $('.decrypt-sub-user-link', $dialog).trigger('click');
             }
             
         });
-        $('.fm-dialog-link-pwd-button', $dialog).on('click', function decryptOkBtnHandler () {
-            var enteredPassword = $('.fm-dialog-link-pwd-pad input', $dialog).val();
-            $('.fm-dialog-link-pwd-pad input', $dialog).val('');
+        $('.decrypt-sub-user-link', $dialog).on('click', function decryptOkBtnHandler () {
+            var enteredPassword = $('.link-sub-user-pass input', $dialog).val();
+            $('.link-sub-user-pass input', $dialog).val('');
             if (!enteredPassword.length) {
-                $('.dialog-link-pwd-empty', $dialog).removeClass('hidden');
+                $('.link-sub-user-pass input', $dialog).parent().addClass('error');
                 return false;
             }
             else {
@@ -1930,55 +1930,75 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         $invoiceDetailContainer.find('.inv-detail-export').off('click.subuser').on('click.subuser',
             function invoiceDetailExportClickHandler() {
-                M.require('htmlcanvas_js', 'jspdf_js', 'business_invoice').done(
+                M.require('business_invoice').done(
                     function exportOverviewPageToPDF() {
-                        var doc = new jsPDF();
-                        var specialElementHandlers = {
-                            '.hidden': function (element, renderer) {
-                                return true;
-                            },
-                            '.icon12': function (element, renderer) {
-                                return true;
-                            }
-                        };
-                        // business_invoice
+                        //var doc = new jsPDF();
+                        //var specialElementHandlers = {
+                        //    '.hidden': function (element, renderer) {
+                        //        return true;
+                        //    },
+                        //    '.icon12': function (element, renderer) {
+                        //        return true;
+                        //    }
+                        //};
+                        //// business_invoice
 
-                        //var myInvoice = $.parseHTML(pages['business_invoice'], null);
-                        //var $invoiceDetail = myInvoice.find('.invoice-container');
-                        //var div = myInvoice[5];
-                        var $invoiceDetailDiv = $('.invoice-container', $invoiceDetailContainer);
+                        ////var myInvoice = $.parseHTML(pages['business_invoice'], null);
+                        ////var $invoiceDetail = myInvoice.find('.invoice-container');
+                        ////var div = myInvoice[5];
+                        //var $invoiceDetailDiv = $('.invoice-container', $invoiceDetailContainer);
 
-                        //doc.internal.scaleFactor = 2;
-                        //doc.addHTML($invoiceDetailDiv[0], { retina: true, 'elementHandlers': specialElementHandlers}, function () {
-                        //    doc.save('invoice' + invoiceDetail.n + '.pdf');
-                        //});
+                        ////doc.internal.scaleFactor = 2;
+                        ////doc.addHTML($invoiceDetailDiv[0], { retina: true, 'elementHandlers': specialElementHandlers}, function () {
+                        ////    doc.save('invoice' + invoiceDetail.n + '.pdf');
+                        ////});
 
-                        var scaleBy = 2;
-                        var w = 600;
-                        var h = 840;
-                        var invClone = $invoiceDetailDiv.clone();
-                        invClone.find('.icon12').remove();
-                        var div = invClone[0];
-                        var canvas = document.createElement('canvas');
-                        canvas.width = w * scaleBy;
-                        canvas.height = h * scaleBy;
-                        canvas.style.width = w + 'px';
-                        canvas.style.height = h + 'px';
-                        var context = canvas.getContext('2d');
-                        context.scale(scaleBy, scaleBy);
+                        //var scaleBy = 2;
+                        //var w = 600;
+                        //var h = 840;
+                        //var invClone = $invoiceDetailDiv.clone();
+                        //invClone.find('.icon12').remove();
+                        //var div = invClone[0];
+                        //var canvas = document.createElement('canvas');
+                        //canvas.width = w * scaleBy;
+                        //canvas.height = h * scaleBy;
+                        //canvas.style.width = w + 'px';
+                        //canvas.style.height = h + 'px';
+                        //var context = canvas.getContext('2d');
+                        //context.scale(scaleBy, scaleBy);
 
                         
 
-                        html2canvas(div, {
-                            //canvas: canvas,
-                            onrendered: function (canvas) {
-                                var img = canvas.toDataURL('image/png');
-                                var doc = new jsPDF();
-                                doc.addImage(img, 'PNG', 20, 20);
-                                doc.save('invoice' + invoiceDetail.n + '.pdf');
-                            },
-                            letterRendering: 1, allowTaint: true,
-                        });
+                        //html2canvas(div, {
+                        //    //canvas: canvas,
+                        //    onrendered: function (canvas) {
+                        //        var img = canvas.toDataURL('image/png');
+                        //        var doc = new jsPDF();
+                        //        doc.addImage(img, 'PNG', 20, 20);
+                        //        doc.save('invoice' + invoiceDetail.n + '.pdf');
+                        //    },
+                        //    letterRendering: 1, allowTaint: true,
+                        //});
+                        var myPage = pages['business_invoice'];
+                        myPage = translate(myPage);
+                        var pdfPrintIframe = document.getElementById('invoicePdfPrinter');
+                        var newPdfPrintIframe = document.createElement('iframe');
+                        newPdfPrintIframe.id = 'invoicePdfPrinter';
+                        newPdfPrintIframe.src = 'about:blank';
+                        newPdfPrintIframe.classList.add('hidden');
+                        var pdfIframeParent = pdfPrintIframe.parentNode;
+                        pdfIframeParent.replaceChild(newPdfPrintIframe, pdfPrintIframe);
+                        newPdfPrintIframe.onload = function () {
+                            setTimeout(function () {
+                                newPdfPrintIframe.focus();
+                                newPdfPrintIframe.contentWindow.print();
+                            }, 1);
+                        };
+                        var doc = newPdfPrintIframe.contentWindow.document;
+                        doc.open();
+                        doc.write(myPage);
+                        doc.close();
+                        
                     }
                 );
             }
@@ -2008,7 +2028,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
  */
 BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFuncHandler, userName, isEnable) {
     "use strict";
-    var $dialog = $('.user-management-able-user-dialog.user-management-dialog');
+    var $dialog = $('.user-management-able-user-dialog.sub-en-dis.user-management-dialog');
 
     var dialogQuestion = l[19098];
     var note = l[19099];
@@ -2657,6 +2677,18 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
     var mySelf = this;
     loadingDialog.pshow();
 
+    var subUser = M.suba[subUserHandle];
+    var $migrateDialog = $('.user-management-migrate-process-dialog.user-management-dialog');
+    var subName = from8(base64urldecode(subUser.firstname)) + ' ' + from8(base64urldecode(subUser.lastname));
+    $migrateDialog.find('.sub-user-name-from').text(subName);
+    $migrateDialog.find('.process-percentage').text('0%');
+    $migrateDialog.find('.data-migrate.progress-bar').attr('style', 'width:0');
+    $migrateDialog.removeClass('hidden');
+
+    var changePercentage = function (val) {
+        $migrateDialog.find('.process-percentage').text(val + '%'); // .attr('style', 'width:' + val + '%').
+        $migrateDialog.find('.data-migrate.progress-bar').attr('style', 'width:' + val + '%');
+    };
 
     // all operations are done in BusinessAccount class level.
     // Here we only allow user interaction
@@ -2670,6 +2702,7 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
     // failed
     var failing = function (msg) {
         loadingDialog.phide();
+        $migrateDialog.addClass('hidden');
         msgDialog('warningb', '', msg);
         return;
     };
@@ -2688,9 +2721,10 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
 
     gettingSubTreePromise.done(
         function getTreeOk(st, treeResult) {
+            changePercentage(10);
             // getting sub-user master-key
             var gettingSubMasterKey = mySelf.business.getSubAccountMKey(subUserHandle);
-
+            changePercentage(15);
             gettingSubMasterKey.fail(
                 function getMKeyfailed(mkSt, mkRes, mkM) {
                     if (d) {
@@ -2702,8 +2736,10 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
 
             gettingSubMasterKey.done(
                 function getMKeyOK(st2, MKeyResult) {
+                    changePercentage(20);
                     // sub-user tree decrypting
                     var treeObj = mySelf.business.decrypteSubUserTree(treeResult, MKeyResult.k);
+                    changePercentage(30);
                     if (!treeObj) {
                         if (d) {
                             console.error("decrypting sub-user tree with the Master key has failed! "
@@ -2722,8 +2758,7 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
                             var folderName = M.suba[subUserHandle].e;
                             folderName += '_' + Date.now();
 
-                            var cpyPromise = mySelf.business.copySubUserTreeToMasterRoot(treeObj.tree, folderName);
-
+                            var cpyPromise = mySelf.business.copySubUserTreeToMasterRoot(treeObj.tree, folderName, changePercentage);
                             cpyPromise.fail(
                                 function copySubUserFailHandler(stF, errF, desF) {
                                     if (d) {
@@ -2735,9 +2770,17 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
 
                             cpyPromise.done(
                                 function copySubUserSuccHandler() {
+                                    changePercentage(100);
                                     loadingDialog.phide();
-                                    msgDialog('info', '', l[19149].replace('{0}', M.suba[subUserHandle].e)
-                                        .replace('{1}', folderName));
+                                    $migrateDialog.addClass('hidden');
+
+                                    M.safeShowDialog('migration-success-dlg', function () {
+                                        var $dialog = $('.user-management-able-user-dialog.mig-success.user-management-dialog');
+                                        $('.yes-answer', $dialog).off('click.suba').on('click.suba', closeDialog);
+                                        $dialog.find('.dialog-text-one').html(l[19149].replace('{0}', '<b>' + M.suba[subUserHandle].e + '</b>')
+                                            .replace('{1}', '<b>' + folderName + '</b>'));
+                                        return $dialog;
+                                    });
                                     return;
                                 }
                             );

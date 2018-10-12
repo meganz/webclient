@@ -11293,6 +11293,10 @@ table {
     padding: 17px 25px 24px 25px;
 }
 
+.account.left-pane.info-block.business-users {
+    padding:0;
+}
+
 .account.left-pane.divider {
     height: 1px;
     background-color: rgba(0,0,0,0.1);
@@ -25700,22 +25704,12 @@ opacity: 1;
     height: 100%;
 }
 
-.user-management-overview-container::before, .user-management-subaccount-view-container::before, .user-management-grid-table::before {
-    content: '';
-    display: inline-block;
-    width:100%;
-    height: 1px;
-    bottom: 0;
-    position: relative;
-    background-color: rgba(0,0,0,0.1);
-}
-
 .user-management-overview-container .user-analysis-container {
     position: relative;
     min-width: 695px;
     max-width:1400px;
     width: 90%;
-    height: 252px;
+    height: 221px;
     margin: 24px auto 12px auto;
     box-sizing: border-box;
 }
@@ -25758,7 +25752,7 @@ opacity: 1;
 
 .user-management-overview-container .user-analysis-container .user-segments-container {
     width:25%;
-    height: 194px;
+    height: 164px;
     float: left;
     position: relative; 
 }
@@ -25785,20 +25779,9 @@ opacity: 1;
     color:#333333; 
     font-size: 64px;
     font-weight: 300;
-    line-height: 72px;
-    margin-bottom:12px;
-   font-family:source_sans_prolight;
-}
-
-.user-management-overview-container .user-analysis-container .user-segments-container .user-segment-trend{
-    width:86%;
-    text-align: center;
-    color:#999999;
-    font-size: 13px;
-    line-height: 20px;
-    margin-top: 0px;
-    margin-bottom:24px;
-    margin-left: 7%;
+    line-height: 88px;
+    margin:12px 0;
+    font-family: 'source_sans_prolight';
 }
 
 .user-management-overview-container b{
@@ -25811,10 +25794,6 @@ opacity: 1;
 
 .user-management-overview-container .user-analysis-container .user-segments-container:nth-child(2) .user-segment-number {
       color:#ffffff; 
-}
-
-.user-management-overview-container .user-analysis-container .user-segments-container:nth-child(2) .user-segment-trend {
-   color:rgba(250,250,250,0.95);
 }
 
 .user-management-overview-container .data-analysis-container {
@@ -25830,9 +25809,9 @@ opacity: 1;
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container {
     position: relative;
-    width: 35%;
+    width: 40%;
     height: auto;
-    margin: 0 12px 12px 1px;
+    margin: 0 0 12px 1px;
     display: inline-block;
     box-sizing: border-box;
 }
@@ -25850,16 +25829,16 @@ opacity: 1;
 }
 
 .user-management-overview-container .storage-big-chart .pie {
-        position:absolute;
-        width:80px;
-        height:160px;
-        overflow:hidden;
-        left:80px;
-        -moz-transform-origin:left center;
-        -ms-transform-origin:left center;
-        -o-transform-origin:left center;
-        -webkit-transform-origin:left center;
-        transform-origin:left center;
+    position:absolute;
+    width:80px;
+    height:160px;
+    overflow:hidden;
+    left:80px;
+    -moz-transform-origin:left center;
+    -ms-transform-origin:left center;
+    -o-transform-origin:left center;
+    -webkit-transform-origin:left center;
+    transform-origin:left center;
 }
 
 .user-management-overview-container .storage-big-chart .pie.big {
@@ -25949,7 +25928,7 @@ opacity: 1;
     /*width:144px;*/
     line-height: 32px;
     color:#333333;
-    font-size: 24px;
+    font-size: 30px;
     font-weight: 300;
      /*margin: 62px auto 8px auto;*/
     font-family:source_sans_prolight;
@@ -25962,7 +25941,6 @@ opacity: 1;
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container {
     position: relative;
-    height: 18px;
     width: auto;
     margin: 0 24px 16px 24px;
     cursor: pointer;
@@ -25982,7 +25960,8 @@ opacity: 1;
     font-size: 13px;
     line-height: 18px;
     text-align: center;
-    float: left;
+    display: inline-block;
+    vertical-align: top;
 }
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container .storage-division-name {
@@ -25991,7 +25970,8 @@ opacity: 1;
     font-size: 14px;
     line-height: 18px;
     color:#333333;
-    float: left;
+    display: inline-block;
+    width: calc(100% - 140px);
 }
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container .storage-division-num {
@@ -26000,6 +25980,7 @@ opacity: 1;
     line-height: 18px;
     color:#999999;
     right: 0;
+    top: 0;
 }
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container .storage-division-per.cloud-drive-color {
@@ -26021,12 +26002,11 @@ opacity: 1;
 .user-management-overview-container .data-analysis-container .transfer-analysis-container {
     position: relative;
     right: 1px;
-    width: 63.5%;
+    width: 58.5%;
     height: auto;
     box-sizing: border-box;
     float: right;
     margin-bottom: 24px;
-    
 }
 
 .user-management-overview-container .data-analysis-container .transfer-analysis-container .transfer-analysis-summary {
@@ -26058,26 +26038,13 @@ opacity: 1;
    font-family:source_sans_prolight;
 }
 
-.user-management-overview-container .data-analysis-container .transfer-analysis-container .transfer-analysis-summary .total-transfer-trend{
-    line-height: 26px;
-    font-size: 13px;
-    font-weight: 300;
-    color: #666666;
-    right: 24px;
-    top: 30px;
-    position: absolute;
-    margin-left: 300px;
-    font-family:source_sans_prolight;
-}
-
 .user-management-overview-container .bond-color {
     color:rgba(0,191,165,100);
 }
 
-
 .user-management-overview-container .daily-transfer-container {
     width: 100%;
-    height: auto;
+    height: 200px;
     position: relative;
 }
 
@@ -26822,6 +26789,8 @@ opacity: 1;
     margin-top:40px;
 }
 
+
+
 .user-management-dialog .dialog-button-container::before,
 .fm-dialog.sub-account-link-password .dialog-button-container::before {
     content: " ";
@@ -26904,7 +26873,7 @@ opacity: 1;
     height: auto;
     background-color: rgba(250,250,250,1);
     margin:32px; 
-    padding:12px 20px;
+    padding:12px 16px;
     box-sizing: border-box;
     border-radius: 4px;
     border:1px solid rgba(0,0,0,0.1);
@@ -26913,6 +26882,7 @@ opacity: 1;
 
 .user-management-add-user-dialog .verification-container .verification-user-info {
     width: auto;
+    max-width: 340px;
     position: relative;
     display: inline-block;
     overflow: hidden;
@@ -26921,7 +26891,7 @@ opacity: 1;
 }
 
 .user-management-add-user-dialog .verification-container .verification-user-info * {
-    font-size: 14px;
+    font-size: 13px;
     color: #666;
     line-height: 18px;
 }
@@ -26952,6 +26922,18 @@ opacity: 1;
     position: absolute;
     right: 40px;
     top: 28px;
+}
+
+.user-management-add-user-dialog .verification-container .default-green-button-user-management {
+    width:140px;
+    text-align: center;
+    height: auto;
+    line-height: 18px;
+    padding:8px 16px;
+    vertical-align: middle;
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
 }
 
 .user-management-edit-profile-dialog {
@@ -27045,40 +27027,44 @@ opacity: 1;
 }
 
 .user-management-able-user-dialog {
-    width: 480px;
-    margin-left: -240px;
-    margin-top: -102px;
+    width: 500px;
+    height: 224px;
+    margin-left: -250px;
+    margin-top: -112px;
 }
 
 
-.user-management-able-user-dialog .icon56{
-    margin: 40px 32px auto 32px;
+.user-management-able-user-dialog .icon64{
     position: relative;
-    vertical-align: top;
+    vertical-align: middle;
+    margin: 44px 32px;
+    display: inline-block;
 }
 
 .user-management-able-user-dialog .re-enable-large-icon {
-    background-position: -64px -98px;
-    display: inline-block;
+    background-position: -117px -1261px;
 }
 
 .user-management-able-user-dialog .disable-large-icon {
     background-position: -4px -98px;
-    display: inline-block;
+}
+
+.user-management-dialog .warning-large-icon {
+    background-position: -22px -1261px;
 }
 
 .user-management-able-user-dialog .dialog-text-container {
     display: inline-block;
-    width:326px;
-    margin-top:32px;
+    width:348px;
     position: relative;
+    vertical-align: middle;
 }
 
 .user-management-able-user-dialog .dialog-text-container .dialog-text-one {
     font-size: 15px;
-    color: #666666;
+    color: #333;
     line-height: 24px;
-    display: inline-block;
+    margin-bottom: 12px;
 }
 
 .user-management-able-user-dialog .dialog-text-container .dialog-text-one b {
@@ -27089,8 +27075,10 @@ opacity: 1;
     font-size: 13px;
     color: #999999;
     line-height: 20px;
-    margin-top: 8px;
-    display: inline-block;
+}
+
+.user-management-dialog.user-management-able-user-dialog .dialog-button-container {
+    margin-top:0;
 }
 
 .files-grid-view.user-management-view {
@@ -27582,32 +27570,36 @@ opacity: 1;
 }
 
 .user-management-account-settings .bus-input .bus-input-title, 
-.user-management-dialog.user-management-add-user-dialog .title,
+.user-management-dialog .dialog-input-title-ontop .title,
 .fm-dialog.sub-account-link-password .dialog-input-title-ontop .title {
     position: absolute;
     left: 40px;
-    top: 0;
+    top: 4px;
     font-size: 13px;
     color: #aaa;
     line-height: 18px;
-    display: none;
+    -webkit-transition: opacity 0.2s ease-in,top 0.2s ease-in, visibility 0.2s ease-in;
+    -moz-transition: opacity 0.2s ease-in,top 0.2s ease-in, visibility 0.2s ease-in;
+    -o-transition: opacity 0.2s ease-in,top 0.2s ease-in, visibility 0.2s ease-in;
+    -ms-transition: opacity 0.2s ease-in,top 0.2s ease-in, visibility 0.2s ease-in;
+    transition: opacity 0.2s ease-in,top 0.2s ease-in, visibility 0.2s ease-in;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=1);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    z-index: 1129;
+    visibility: hidden;
 }
 
-.user-management-dialog.user-management-edit-profile-dialog .title {
-    position: absolute;
+.user-management-dialog.user-management-edit-profile-dialog .dialog-input-title-ontop .title {
     left: 4px;
-    top: 0;
-    font-size: 13px;
-    color: #aaa;
-    line-height: 18px;
-    display: none;
 }
 
- .user-management-dialog.user-management-add-user-dialog .title.last-name {
+ .user-management-dialog.user-management-add-user-dialog .dialog-input-title-ontop .title.last-name {
     left: 147px;
  }
 
- .user-management-dialog.user-management-edit-profile-dialog .title.last-name {
+ .user-management-dialog.user-management-edit-profile-dialog .dialog-input-title-ontop .title.last-name {
     left: 124px;
 }
 
@@ -27742,12 +27734,23 @@ opacity: 1;
 /* three extra status for the inputs: error, active, correctinput */
 .user-management-account-settings .bus-input.correctinput .bus-input-title, 
 .user-management-dialog .dialog-input-title-ontop.correctinput .title {
-    display: inline-block;
+    visibility: visible;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    top:0;
 }
 
 .user-management-account-settings .bus-input.active .bus-input-title, 
 .user-management-dialog .dialog-input-title-ontop.active .title {
-    display: inline-block;
+    visibility: visible;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    top: 0;
+
 }
 
 .user-management-account-settings .bus-input.active input::placeholder, 
@@ -27769,7 +27772,12 @@ opacity: 1;
 
 .user-management-account-settings .bus-input.error .bus-input-title, 
 .user-management-dialog .dialog-input-title-ontop.error .title {
-    display: inline-block;
+    visibility: visible;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    top:0;
 }
 
 .user-management-account-settings .bus-input.error .error-message, 
@@ -29354,7 +29362,7 @@ opacity: 1;
 }
 
 .business-dashboard .subaccount-view-used-data .used-storage-info .ff-number {
-    width: 180px;
+    width: 220px;
 }
 
 .business-dashboard .qr-container {
@@ -29392,19 +29400,21 @@ opacity: 1;
     position: absolute;
 }
 
-.content-panel.business-dashboard .intro-title, .content-panel.dashboard .intro-title {
-    width: 30%;
+.content-panel.dashboard .intro-title, .content-panel.dashboard .plan-date-info.intro-title {
+    width: 42%;
     display: inline-block;
     font-size: 14px;
     color: #333;
-    height: 24px;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     line-height: 20px;
     white-space: normal;
+    text-transform: capitalize;
+    overflow: visible;
+    vertical-align: top;
 }
 
-.content-panel.business-dashboard .intro-info, .content-panel.dashboard .intro-info {
-    width: 68%;
+.content-panel.dashboard .intro-info, .content-panel.dashboard .plan-date-info.intro-info {
+    width: 56%;
     display: inline-block;
     font-size: 14px;
     color: #999;
@@ -29412,7 +29422,10 @@ opacity: 1;
     margin-bottom: 4px;
     line-height: 20px;
     white-space: normal;
+    text-transform: capitalize;
+    padding: 0;
 }
+
 
 .content-panel.business-dashboard .intro-info.active, .content-panel.dashboard .intro-info.active{
     color:#00BFA5;

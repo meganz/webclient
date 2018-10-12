@@ -1200,6 +1200,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 });
 
                 onOverQuotaCT = (s.currentTime | 0) + 1;
+
+                eventlog(is_embed ? 99708 : folderlink ? 99709 : fminitialized ? 99710 : 99707);
             }
             else if (navigator.onLine && this.currentTime < this.duration && this.hasStartedPlaying) {
                 var data = [

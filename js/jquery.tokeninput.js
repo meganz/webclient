@@ -591,6 +591,11 @@
                                 $addContactBtn = $('.add-user-popup-button');
                                 cd = true;
                             }
+                            else {
+                                // FIXME: what is this?
+                                console.warn('Cannot add contact from here...', $.dialog);
+                                return false;
+                            }
 
                             addNewContact($addContactBtn, cd).done(function() {
                                 if ($.dialog === "share") {

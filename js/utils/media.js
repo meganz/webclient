@@ -1117,7 +1117,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
         });
 
         $wrapper.rebind('video-destroy', function() {
+            $mute.off();
             $video.off();
+            $progress.off();
+            $playpause.off();
+            $volumeBar.off();
             clearTimeout(timer);
             window.removeEventListener('keydown', videoKeyboardHandler, true);
             $wrapper.removeClass('mouse-idle video-theatre-mode video')
@@ -1197,8 +1201,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 onOverQuotaCT = (s.currentTime | 0) + 1;
             }
-            else if (navigator.onLine && this.currentTime < this.duration) {
-                var data = [1, s.hasVideo, s.hasAudio, ~~s.getProperty('bitrate'), s.getProperty('server')];
+            else if (navigator.onLine && this.currentTime < this.duration && this.hasStartedPlaying) {
+                var data = [
+                    2, s.hasVideo, s.hasAudio, ~~s.getProperty('bitrate'), s.getProperty('server'), s.playbackTook
+                ];
 
                 if (d) {
                     console.log(ev.type, data, this);

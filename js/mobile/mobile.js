@@ -280,8 +280,12 @@ var alarm = {
 };
 /* jshint strict: true */
 
-function msgDialog(type, title, msg, submsg, callback, checkbox) {
+function accountUI() {
+    'use strict';
+    loadSubPage('fm/account');
+}
 
+function msgDialog(type, title, msg, submsg, callback, checkbox) {
     'use strict';
 
     // Call the mobile version
@@ -289,7 +293,6 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 }
 
 function fm_showoverlay() {
-
     'use strict';
 
     $('.fm-dialog-overlay').removeClass('hidden');
@@ -297,7 +300,6 @@ function fm_showoverlay() {
 }
 
 function fm_hideoverlay() {
-
     'use strict';
 
     $('.fm-dialog-overlay').addClass('hidden');

@@ -69,7 +69,13 @@
             // close any dialog if such is opened
             if (Object.keys(self._lastShown).length > 0) {
                 var screenId = Object.keys(self._lastShown)[0];
+
                 self.hideDialog(screenId);
+
+                if (!self._lastShown) {
+                    // was destroyed.
+                    return;
+                }
                 delete self._lastShown[screenId];
             }
             self.eventuallyRenderDialogs();

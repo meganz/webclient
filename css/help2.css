@@ -381,6 +381,11 @@
     background-color: #fff;
     max-width: 1440px;
 }
+#help2-main .client-container-wrapper {
+    max-width: 1548px;
+    background-color: #fff;
+    margin: 0 auto;
+}
 #help2-main body {
     background-color: #fafafa;
     font-family: 'source_sans_proregular';
@@ -405,7 +410,7 @@
     background-color: #f44;
 }
 #help2-main .first-search-section {
-    height: 220px;
+    height: 240px;
     background-color: #f44;
     min-width: 1024px;  
     }
@@ -2332,7 +2337,7 @@
     position: absolute;
     width: 18px;
 }
-#help2-main .windowsphone-icon {
+#help2-main .windowsphone-icon, #help2-main .uwp-icon {
     display: block;
     position: absolute;
     background-image: url(../images/mega/help2/welcome_icons_v3.png);
@@ -2363,6 +2368,7 @@
     margin-top: 8px;
     margin-left: -1px;
     left: auto;
+    background-size: 250px auto;
 }
 #help2-main .megachat-icon {
     background-image: url(../images/mega/help2/welcome_icons_v3.png);
@@ -2870,7 +2876,7 @@
     display: none;
 }
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    #help2-main .getstart-img, #help2-main .usemega-img, #help2-main .browsearticle-button .article-arrow, #help2-main .block-megachat, #help2-main .block-megasync, #help2-main .block-business, #help2-main .feedback-logo, .feedback-logo,#help2-main .yes-icon, #help2-main .no-icon, #help2-main .support-link-icon, #help2-main .support-email-icon, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop, #help2-main .support-search-icon, #help2-main .support-go-back-icon, #help2-main input.submit, #help2-main .device-menu-icon, #help2-main .result-filter-icon, #help2-main .megachat-icon, #help2-main .megasync-icon, #help2-main .ios-icon, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .windowsphone-icon, #help2-main .android-icon, #help2-main .block-webclient, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync, #help2-main .close-icon, #help2-main .iOS-mobile-block, #help2-main .android-mobile-block, #help2-main .window-mobile-block, #help2-main .support-section-header-clone .support-go-back-icon, #help2-main .block-android,  #help2-main .support-section-header-clone .support-search-icon, #help2-main .nav-arrow, #help2-main .cmd-icon, #help2-main .block-cmd, #help2-main .block-uwp {
+    #help2-main .getstart-img, #help2-main .usemega-img, #help2-main .browsearticle-button .article-arrow, #help2-main .block-megachat, #help2-main .block-megasync, #help2-main .block-business, #help2-main .feedback-logo, .feedback-logo,#help2-main .yes-icon, #help2-main .no-icon, #help2-main .support-link-icon, #help2-main .support-email-icon, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop, #help2-main .support-search-icon, #help2-main .support-go-back-icon, #help2-main input.submit, #help2-main .device-menu-icon, #help2-main .result-filter-icon, #help2-main .megachat-icon, #help2-main .megasync-icon, #help2-main .ios-icon, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .windowsphone-icon, #help2-main .android-icon, #help2-main .block-webclient, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync, #help2-main .close-icon, #help2-main .iOS-mobile-block, #help2-main .android-mobile-block, #help2-main .window-mobile-block, #help2-main .support-section-header-clone .support-go-back-icon, #help2-main .block-android,  #help2-main .support-section-header-clone .support-search-icon, #help2-main .nav-arrow, #help2-main .cmd-icon, #help2-main .block-cmd, #help2-main .block-uwp, #help2-main .uwp-icon, #help2-main .megasync-icon {
         background-image: url(../images/mega/help2/welcome_icons_v3@2x.png);
         background-size: 250px 700px;
     }

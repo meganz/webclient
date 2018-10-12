@@ -1600,6 +1600,21 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var $cCountryInput = $('select#cnt-ddl', $profileContainer).val(cCountry);
     var $cZipInput = $('input#prof-zip', $profileContainer).val(cZip);
 
+    var addCorrectValClass = function ($item) {
+        if ($item.val().trim()) {
+            $item.parent().addClass('correctinput')
+        }
+    };
+    addCorrectValClass($cNameInput);
+    addCorrectValClass($cTelInput);
+    addCorrectValClass($cEmailInput);
+    addCorrectValClass($cVatInput);
+    addCorrectValClass($cAddressInput);
+    addCorrectValClass($cAddress2Input);
+    addCorrectValClass($cCityInput);
+    addCorrectValClass($cStateInput);
+    addCorrectValClass($cZipInput);
+
     $('.saving-btn-profile', $profileContainer).off('click.suba').on('click.suba',
         function companyProfileSaveButtonClick() {
             var attrsToChange = [];
@@ -1689,6 +1704,27 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                 return mySelf.viewSubAccountListUI();
             }
         });
+
+    // event handler for input getting focus
+    $('.option-containers input', $profileContainer).off('focus.suba')
+        .on('focus.suba', function inputHasFocusHandler() {
+            $(this).parent().addClass('active');
+        });
+
+    // event handler for input losing focus
+    $('.option-containers input', $profileContainer).off('blur.suba')
+        .on('blur.suba', function inputHasFocusHandler() {
+            $(this).parent().removeClass('active');
+            if (this.value.trim()) {
+                var $me = $(this);
+                    $me.parent().addClass('correctinput').removeClass('error');
+            }
+            else {
+                $(this).parent().removeClass('correctinput');
+            }
+        });
+
+
 
     unhideSection();
     
@@ -1981,6 +2017,35 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         //});
                         var myPage = pages['business_invoice'];
                         myPage = translate(myPage);
+
+                        // now prepare the incovice.
+                        myPage = myPage.replace('{0Date}', (new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
+                        myPage = myPage.replace('{1InvoiceNB}', invoiceDetail.n);
+                        myPage = myPage.replace('{2VATNB}', invoiceDetail.mega.taxnum[1]);
+                        myPage = myPage.replace('{3CompanyName}', invoiceDetail.u.cname);
+                        myPage = myPage.replace('{4CompanyEmail}', invoiceDetail.u.e);
+                        myPage = myPage.replace('{5CompanyAddress}', invoiceDetail.u.addr.join(', '));
+                        myPage = myPage.replace('{6CompanyCountry}', invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]);
+                        var cVat = '---';
+                        if (invoiceDetail.u.taxnum && invoiceDetail.u.taxnum[1]) {
+                            cVat = invoiceDetail.u.taxnum[1];
+                        }
+                        myPage = myPage.replace('{7CompanyVat}', cVat);
+                        var itemDate = '---';
+                        var itemDec = '---';
+                        var itemAmount = '---';
+                        if (invoiceDetail.items && invoiceDetail.items.length) {
+                            itemDate = (new Date(invoiceDetail.items[0].ts * 1000).toLocaleDateString());
+                            itemDec = invoiceDetail.items[0].d;
+                            itemAmount = invoiceDetail.items[0].gross;
+                        }
+                        myPage = myPage.replace('{8itemDate}', itemDate);
+                        myPage = myPage.replace('{9itemDesc}', itemDec);
+                        myPage = myPage.replace('{10itemAmount}', itemAmount);
+
+                        myPage = myPage.replace('{11itemVat}', $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent);
+                        myPage = myPage.replace('{12totalCost}', '€' + invoiceDetail.tot);
+
                         var pdfPrintIframe = document.getElementById('invoicePdfPrinter');
                         var newPdfPrintIframe = document.createElement('iframe');
                         newPdfPrintIframe.id = 'invoicePdfPrinter';
@@ -2474,18 +2539,22 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     if (subUser.position) {
         userAttrs.position = from8(base64urldecode(subUser.position));
         $positionInput.val(userAttrs.position);
+        $positionInput.parent().addClass('correctinput');
     }
     if (subUser.idnum) {
         userAttrs.idnum = from8(base64urldecode(subUser.idnum));
         $subIDInput.val(userAttrs.idnum);
+        $subIDInput.parent().addClass('correctinput');
     }
     if (subUser.phonenum) {
         userAttrs.phonenum = from8(base64urldecode(subUser.phonenum));
         $phoneInput.val(userAttrs.phonenum);
+        $phoneInput.parent().addClass('correctinput');
     }
     if (subUser.location) {
         userAttrs.location = from8(base64urldecode(subUser.location));
         $locationInput.val(userAttrs.location);
+        $locationInput.parent().addClass('correctinput');
     }
 
     if (subUser.pe && subUser.pe.e) {
@@ -2572,6 +2641,36 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
 
     $('.user-management-subuser-avatars', $dialog).html(subUserDefaultAvatar);
 
+    // event handler for input getting focus
+    $('.dialog-input-container input', $dialog).off('focus.suba')
+        .on('focus.suba', function inputHasFocusHandler() {
+            $(this).parent().addClass('active');
+        });
+
+    // event handler for input losing focus
+    $('.dialog-input-container input', $dialog).off('blur.suba')
+        .on('blur.suba', function inputHasFocusHandler() {
+            $(this).parent().removeClass('active');
+            if (this.value.trim()) {
+                var $me = $(this);
+                if (!$me.hasClass('edit-sub-name') && !$me.hasClass('edit-sub-lname')) {
+                    $me.parent().addClass('correctinput').removeClass('error');
+                }
+                else {
+                    if ($('.dialog-input-container input.edit-sub-name', $dialog).val().trim()
+                        && $('.dialog-input-container input.edit-sub-lname', $dialog).val().trim()) {
+                        $me.parent().addClass('correctinput').removeClass('error');
+                    }
+                    else {
+                        $me.parent().removeClass('correctinput');
+                    }
+                }
+            }
+            else {
+                $(this).parent().removeClass('correctinput');
+            }
+        });
+
     // close event handler
     $('.dialog-button-container .btn-edit-close, .delete-img.icon', $dialog).off('click.subuser')
         .on('click.subuser', closeDialog);
@@ -2584,6 +2683,24 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
                 return closeDialog();
             }
             else {
+                if ('fname' in changedVals && !changedVals.fname.length) {
+                    $nameInput.parent().addClass('error');
+                    //$('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
+
+                    return;
+                }
+                if ('lname' in changedVals && !changedVals.lname.length) {
+                    $lnameInput.parent().addClass('error');
+                    //$('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
+
+                    return;
+                }
+                if ('email' in changedVals && checkMail(changedVals.email)) {
+                    $emailInput.parent().addClass('error');
+                    //$('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[5705]);
+
+                    return;
+                }
                 var editPromise = mySelf.business.editSubAccount(subUserHandle, changedVals.email, changedVals.fname, changedVals.lname,
                     {
                         position: changedVals.pos,

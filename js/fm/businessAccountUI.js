@@ -1600,6 +1600,21 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var $cCountryInput = $('select#cnt-ddl', $profileContainer).val(cCountry);
     var $cZipInput = $('input#prof-zip', $profileContainer).val(cZip);
 
+    var addCorrectValClass = function ($item) {
+        if ($item.val().trim()) {
+            $item.parent().addClass('correctinput')
+        }
+    };
+    addCorrectValClass($cNameInput);
+    addCorrectValClass($cTelInput);
+    addCorrectValClass($cEmailInput);
+    addCorrectValClass($cVatInput);
+    addCorrectValClass($cAddressInput);
+    addCorrectValClass($cAddress2Input);
+    addCorrectValClass($cCityInput);
+    addCorrectValClass($cStateInput);
+    addCorrectValClass($cZipInput);
+
     $('.saving-btn-profile', $profileContainer).off('click.suba').on('click.suba',
         function companyProfileSaveButtonClick() {
             var attrsToChange = [];
@@ -1689,6 +1704,27 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                 return mySelf.viewSubAccountListUI();
             }
         });
+
+    // event handler for input getting focus
+    $('.option-containers input', $profileContainer).off('focus.suba')
+        .on('focus.suba', function inputHasFocusHandler() {
+            $(this).parent().addClass('active');
+        });
+
+    // event handler for input losing focus
+    $('.option-containers input', $profileContainer).off('blur.suba')
+        .on('blur.suba', function inputHasFocusHandler() {
+            $(this).parent().removeClass('active');
+            if (this.value.trim()) {
+                var $me = $(this);
+                    $me.parent().addClass('correctinput').removeClass('error');
+            }
+            else {
+                $(this).parent().removeClass('correctinput');
+            }
+        });
+
+
 
     unhideSection();
     

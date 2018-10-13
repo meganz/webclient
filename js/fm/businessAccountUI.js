@@ -1253,73 +1253,6 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             $customCharLegend.removeClass('disabled');
         });
 
-
-        /*
-        $overviewContainer.find('.storage-big-chart .pie').removeClass('big').removeClass('highlight');
-        $overviewContainer.find('.storage-big-chart .pie .pie-internal2').remove();
-
-        var getPiePartStyle = function (startVal) {
-            var sStyle = '-moz-transform: rotate({0}deg); -ms-transform: rotate({0}deg);'
-                + '-webkit-transform: rotate({0}deg); -o-transform: rotate({0}deg);'
-                + 'transform:rotate({0}deg);';
-            return sStyle.replace(/\{0\}/g, startVal);
-        };
-
-        var start = 0;
-        var curStyle = '';
-        var $currElement;
-        // testing
-        //rootPie = 100, insharePie = 80, outsharePie = 60, rubbishPie = 120;
-
-        $currElement = $overviewContainer.find('.storage-big-chart .pie.nb1');
-        $currElement.attr('data-start', start).attr('data-value', outsharePie);
-        if (outsharePie > 180) {
-            $currElement.addClass('big');
-            $currElement.append('<div class="pie-internal2"></div>');
-        }
-        curStyle = getPiePartStyle(start);
-        $currElement.attr('style', curStyle);
-        curStyle = getPiePartStyle(outsharePie + 1);
-        $currElement.find('.pie-internal').attr('style', curStyle);
-        start += outsharePie;
-        ////////////////
-        $currElement = $overviewContainer.find('.storage-big-chart .pie.nb2');
-        $currElement.attr('data-start', start).attr('data-value', insharePie);
-        if (insharePie > 180) {
-            $currElement.addClass('big');
-            $currElement.append('<div class="pie-internal2"></div>');
-        }
-        curStyle = getPiePartStyle(start);
-        $currElement.attr('style', curStyle);
-        curStyle = getPiePartStyle(insharePie + 1);
-        $currElement.find('.pie-internal').attr('style', curStyle);
-        start += insharePie;
-        ////////////////
-        $currElement = $overviewContainer.find('.storage-big-chart .pie.nb3');
-        $currElement.attr('data-start', start).attr('data-value', rubbishPie);
-        if (rubbishPie > 180) {
-            $currElement.addClass('big');
-            $currElement.append('<div class="pie-internal2"></div>');
-        }
-        curStyle = getPiePartStyle(start);
-        $currElement.attr('style', curStyle);
-        curStyle = getPiePartStyle(rubbishPie + 1);
-        $currElement.find('.pie-internal').attr('style', curStyle);
-        start += rubbishPie;
-        ////////////////
-        $currElement = $overviewContainer.find('.storage-big-chart .pie.nb4');
-        $currElement.attr('data-start', start).attr('data-value', rootPie);
-        if (rootPie > 180) {
-            $currElement.addClass('big');
-            $currElement.append('<div class="pie-internal2"></div>');
-        }
-        curStyle = getPiePartStyle(start);
-        $currElement.attr('style', curStyle);
-        curStyle = getPiePartStyle(rootPie);
-        $currElement.find('.pie-internal').attr('style', curStyle);
-        //start += rootPie;
-        */
-        
         $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
     };
 
@@ -1394,7 +1327,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             var myChart = new Chart(chartCanvas, {
                 type: 'bar',
                 data: {
-                    labels: availableLabels, // ["Red", "Green", "Orange"],
+                    labels: availableLabels,
                     datasets: [{
                         label: '',
                         data: chartData,

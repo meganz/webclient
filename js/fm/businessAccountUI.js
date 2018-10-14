@@ -1984,11 +1984,11 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
 
     var dialogQuestion = l[19098];
     var note = l[19099];
-    $dialog.find('.icon56').removeClass('re-enable-large-icon').addClass('disable-large-icon');
+    $dialog.find('.dlg-suba-icon').removeClass('re-enable-large-icon').addClass('disable-large-icon');
     if (isEnable) {
         dialogQuestion = l[19101];
         note = l[19102];
-        $dialog.find('.icon56').removeClass('disable-large-icon').addClass('re-enable-large-icon');
+        $dialog.find('.dlg-suba-icon').removeClass('disable-large-icon').addClass('re-enable-large-icon');
         $dialog.find('.dialog-button-container .yes-answer').removeClass('default-red-button-user-management')
             .addClass('default-green-button-user-management');
     }

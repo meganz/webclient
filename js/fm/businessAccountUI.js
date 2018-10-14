@@ -1901,53 +1901,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             function invoiceDetailExportClickHandler() {
                 M.require('business_invoice').done(
                     function exportOverviewPageToPDF() {
-                        //var doc = new jsPDF();
-                        //var specialElementHandlers = {
-                        //    '.hidden': function (element, renderer) {
-                        //        return true;
-                        //    },
-                        //    '.icon12': function (element, renderer) {
-                        //        return true;
-                        //    }
-                        //};
-                        //// business_invoice
-
-                        ////var myInvoice = $.parseHTML(pages['business_invoice'], null);
-                        ////var $invoiceDetail = myInvoice.find('.invoice-container');
-                        ////var div = myInvoice[5];
-                        //var $invoiceDetailDiv = $('.invoice-container', $invoiceDetailContainer);
-
-                        ////doc.internal.scaleFactor = 2;
-                        ////doc.addHTML($invoiceDetailDiv[0], { retina: true, 'elementHandlers': specialElementHandlers}, function () {
-                        ////    doc.save('invoice' + invoiceDetail.n + '.pdf');
-                        ////});
-
-                        //var scaleBy = 2;
-                        //var w = 600;
-                        //var h = 840;
-                        //var invClone = $invoiceDetailDiv.clone();
-                        //invClone.find('.icon12').remove();
-                        //var div = invClone[0];
-                        //var canvas = document.createElement('canvas');
-                        //canvas.width = w * scaleBy;
-                        //canvas.height = h * scaleBy;
-                        //canvas.style.width = w + 'px';
-                        //canvas.style.height = h + 'px';
-                        //var context = canvas.getContext('2d');
-                        //context.scale(scaleBy, scaleBy);
-
                         
-
-                        //html2canvas(div, {
-                        //    //canvas: canvas,
-                        //    onrendered: function (canvas) {
-                        //        var img = canvas.toDataURL('image/png');
-                        //        var doc = new jsPDF();
-                        //        doc.addImage(img, 'PNG', 20, 20);
-                        //        doc.save('invoice' + invoiceDetail.n + '.pdf');
-                        //    },
-                        //    letterRendering: 1, allowTaint: true,
-                        //});
                         var myPage = pages['business_invoice'];
                         myPage = translate(myPage);
 
@@ -2156,17 +2110,6 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('.sent-email-logo.dialog-heading-img', $dialog).removeClass('hidden');
         $('.dialog-button-container .invite-link-option', $dialog).addClass('hidden');
 
-        //var subUserDefaultAvatar = useravatar.contact(result.u);
-        //$('.new-sub-user', $resultContianer).html(subUserDefaultAvatar);
-        //$('.sub-e', $resultContianer).text(result.m);
-        //$('.sub-p', $resultContianer).text(result.lp);
-
-        //$addContianer.addClass('hidden');
-        //$resultContianer.removeClass('hidden');
-        //$('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
-        //// $('.licence-bar', $dialog).addClass('hidden');
-        //$('.dialog-subtitle', $dialog).removeClass('hidden');
-        //$('.dialog-title', $dialog).text(l[18280]);
     }
 
 
@@ -2407,16 +2350,6 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
 
         });
 
-    
-    // event handler for key-down on inputs
-    //$('.input-user input', $dialog).off('keydown.subuserresd')
-    //    .on('keydown.subuserresd', function inputFieldsKeyDoownHandler() {
-    //        var $me = $(this);
-    //        if ($me.hasClass('error')) {
-    //            $me.removeClass('error');
-    //            $('.dialog-input-container .error-message', $dialog).addClass('hidden')
-    //        }
-    //    });
 
     M.safeShowDialog('sub-user-adding-dlg', function () {
         return $dialog;

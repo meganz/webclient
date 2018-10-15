@@ -99,6 +99,10 @@
                 ops.name2 = base64urlencode(to8(rv.name));
                 u_attr.terms = 1;
 
+                if (mega.affid) {
+                    ops.aff = mega.affid;
+                }
+
                 api_req(ops);
                 registrationDone();
             }

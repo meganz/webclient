@@ -2780,11 +2780,27 @@ else if (!b_u) {
             xhr_stack[xhri].send(null);
         }
     }
-    window.onload = function ()
-    {
+
+    window.onload = function() {
+        'use strict';
+
         pageLoadTime = Date.now();
         mBroadcaster.once('startMega', function() {
-            pageLoadTime = Date.now() - pageLoadTime;
+            var now = Date.now();
+
+            pageLoadTime = now - pageLoadTime;
+
+            var ph = String(isPublicLink(page)).split('!')[1];
+            if (ph) {
+                localStorage.affid = ph;
+                localStorage.affts = now;
+            }
+
+            Object.defineProperty(mega, 'affid', {
+                get: function() {
+                    return parseInt(localStorage.affts) + 864e5 > Date.now() && localStorage.affid || 0;
+                }
+            });
         });
 
         if (!maintenance && !androidsplash && !is_karma) {

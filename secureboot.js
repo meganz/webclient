@@ -1318,6 +1318,11 @@ function siteLoadError(error, filename) {
     }
 }
 
+// Add manifest.json so this can be used on latest browsers.
+var tag=document.createElement('link');
+tag.rel = "manifest";
+tag.href = staticpath + "images/favicons/manifest.json";
+document.getElementsByTagName('head')[0].appendChild(tag);
 
 if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
@@ -1336,21 +1341,21 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
     tag.sizes = "144x144";
-    tag.href = staticpath + "images/mobile/App_ipad_144x144.png";
+    tag.href = staticpath + "images/favicons/apple-touch-icon-144x144.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
     tag.sizes = "114x114";
-    tag.href = staticpath + "images/mobile/App_iphone_114x114.png";
+    tag.href = staticpath + "images/favicons/apple-touch-icon-114x114.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
     tag.sizes = "72x72";
-    tag.href = staticpath + "images/mobile/App_ipad_72X72.png";
+    tag.href = staticpath + "images/favicons/apple-touch-icon-72x72.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
-    tag.href = staticpath + "images/mobile/App_iphone_57X57.png"
+    tag.href = staticpath + "images/favicons/apple-touch-icon-57x57.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "shortcut icon";

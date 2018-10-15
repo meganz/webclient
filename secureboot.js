@@ -546,41 +546,6 @@ var mega = {
         }
 
         return this._urlParams;
-    },
-
-    /**
-     * Fetches information from the API about which features are enabled
-     * @param {Function|undefined} completeCallback Optional function to run when the function has completed
-     */
-    getApiMiscFlags: function(completeCallback) {
-
-        'use strict';
-
-        // If the flags have already been fetched this session, don't fetch again
-        if (Object.keys(mega.apiMiscFlags).length !== 0) {
-
-            // Run the callback if it exists
-            if (typeof completeCallback === 'function') {
-                completeCallback();
-            }
-        }
-        else {
-            // Make Get Miscellaneous Flags (gmf) API request
-            api_req({ a: 'gmf' }, {
-                callback: function(result) {
-                    if (result) {
-
-                        // Cache flags object
-                        mega.apiMiscFlags = result;
-
-                        // Run the callback
-                        if (typeof completeCallback === 'function') {
-                            completeCallback();
-                        }
-                    }
-                }
-            });
-        }
     }
 };
 
@@ -2799,6 +2764,14 @@ else if (!b_u) {
             Object.defineProperty(mega, 'affid', {
                 get: function() {
                     return parseInt(localStorage.affts) + 864e5 > Date.now() && localStorage.affid || 0;
+                }
+            });
+
+            // Get information about what API flags are enabled e.g. 2FA, New Registration etc
+            M.req('gmf').done(function(result) {
+                if (typeof result === 'object') {
+                    // Cache flags object
+                    mega.apiMiscFlags = result;
                 }
             });
         });

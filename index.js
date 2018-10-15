@@ -241,9 +241,6 @@ function init_page() {
         }
     }
 
-    // Get information about what API flags are enabled e.g. 2FA, New Registration etc
-    mega.getApiMiscFlags();
-
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
 

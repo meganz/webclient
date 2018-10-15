@@ -785,6 +785,7 @@
     "5929": "\u05d4\u05d9\u05e0\u05da \u05e0\u05de\u05e6\u05d0 \u05d4\u05e8\u05d1\u05d4 \u05de\u05e2\u05dc \u05de\u05d2\u05d1\u05dc\u05ea \u05d4\u05e2\u05dc\u05d0\u05ea \u05e7\u05d1\u05e6\u05d9\u05dd \u05e9\u05dc\u05da \u05d5\u05dc\u05db\u05df \u05d4\u05d0\u05e4\u05e9\u05e8\u05d5\u05ea \u05dc\u05d4\u05e2\u05dc\u05d5\u05ea \u05e7\u05d1\u05e6\u05d9\u05dd \u05d1\u05d5\u05d8\u05dc\u05d4. \u05d0\u05e0\u05d0 \u05d5\u05d5\u05d3\u05d0 \u05db\u05d9 \u05d4\u05d9\u05e0\u05da \u05d1\u05ea\u05d5\u05db\u05e0\u05d9\u05ea \u05d4\u05de\u05ea\u05d0\u05d9\u05de\u05d4 \u05e9\u05dc MEGA PRO \u05d0\u05d5 \u05e6\u05d5\u05e8 \u05e7\u05e9\u05e8 \u05e2\u05dd support@mega.nz.",
     "5931": "\u05dc\u05d7\u05e5 [A]\u05db\u05d0\u05df[\/A] \u05e2\u05dc \u05de\u05e0\u05ea \u05dc\u05e8\u05d0\u05d5\u05ea \u05d0\u05ea \u05de\u05e6\u05d1 \u05e9\u05d9\u05de\u05d5\u05e9 \u05d4\u05d0\u05d7\u05e1\u05d5\u05df \u05e9\u05dc\u05da.",
     "5945": "\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05d4\u05d5\u05e8\u05d3\u05ea \u05d4\u05e7\u05d5\u05d1\u05e5. \u05d0\u05e0\u05d0 \u05e0\u05e1\u05d4 \u05e9\u05d5\u05d1. [{0}]",
+    "5998": "\u05d7\u05e9\u05d1\u05d5\u05e0\u05da \u05db\u05d1\u05e8 \u05d0\u05d5\u05de\u05ea. \u05d0\u05e0\u05d0 \u05d4\u05ea\u05d7\u05d1\u05e8.",
     "6001": "\u05e1\u05d9\u05e1\u05de\u05d0 \u05dc\u05d0 \u05e0\u05db\u05d5\u05e0\u05d4",
     "6078": "MEGA",
     "6080": "\u05d0\u05e9\u05e8",
@@ -2872,10 +2873,16 @@
     "19608": "Payment overdue",
     "19609": "Payment required",
     "19610": "Administrator",
-    "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for ample more transfer quota, which will automatically resume your video.",
+    "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for additional transfer quota, which will automatically resume your video.",
     "19616": "Upgrade PRO",
     "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video.",
     "19621": "Data migration is in progress, it may take few minutes depending on the migrated account size.",
     "19622": "Your cloud drive",
-    "19628": "If you wish to submit a copyright takedown, please visit this page in a desktop browser."
+    "19624": "You need an authenticator app to enable 2FA on MEGA. You can download and install the Google Authenticator, Duo Mobile, Authy or Microsoft Authenticator app for your phone or tablet.",
+    "19628": "If you wish to submit a takedown notice through our web form, please visit this page in a desktop browser. Alternatively, you can send us an email at [A]copyright@mega.nz[\/A].",
+    "19629": "Address Line 1:",
+    "19630": "Address Line 2:",
+    "19631": "Save changes",
+    "19632": "Please enter the tax number for your business",
+    "19633": "Settings saved"
 }

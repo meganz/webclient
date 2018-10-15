@@ -785,6 +785,7 @@
     "5929": "Anda telah melampaui batas storage dan upload anda kami matikan. Harap pastikan anda dalam MEGA PRO, atau kontak support@mega.nz.",
     "5931": "Klik [A]disini[\/A] untuk melihat pemakaian storage.",
     "5945": "Gagal men-download file. Harap coba kembali. [{0}]",
+    "5998": "Akun anda telah aktif. Mohon masuk.",
     "6001": "Password salah",
     "6078": "MEGA",
     "6080": "konfirmasi",
@@ -2872,10 +2873,16 @@
     "19608": "Payment overdue",
     "19609": "Payment required",
     "19610": "Administrator",
-    "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for ample more transfer quota, which will automatically resume your video.",
+    "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for additional transfer quota, which will automatically resume your video.",
     "19616": "Upgrade PRO",
     "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video.",
     "19621": "Data migration is in progress, it may take few minutes depending on the migrated account size.",
     "19622": "Your cloud drive",
-    "19628": "If you wish to submit a copyright takedown, please visit this page in a desktop browser."
+    "19624": "You need an authenticator app to enable 2FA on MEGA. You can download and install the Google Authenticator, Duo Mobile, Authy or Microsoft Authenticator app for your phone or tablet.",
+    "19628": "If you wish to submit a takedown notice through our web form, please visit this page in a desktop browser. Alternatively, you can send us an email at [A]copyright@mega.nz[\/A].",
+    "19629": "Address Line 1:",
+    "19630": "Address Line 2:",
+    "19631": "Save changes",
+    "19632": "Please enter the tax number for your business",
+    "19633": "Settings saved"
 }

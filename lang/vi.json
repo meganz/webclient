@@ -785,6 +785,7 @@
     "5929": "B\u1ea1n \u0111\u00e3 d\u00f9ng v\u01b0\u1ee3t m\u1ee9c gi\u1edbi h\u1ea1n kh\u00f4ng gian l\u01b0u tr\u1eef v\u00e0 t\u00ednh n\u0103ng t\u1ea3i l\u00ean \u0111\u00e3 b\u1ecb v\u00f4 hi\u1ec7u cho t\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n. H\u00e3y ch\u1eafc r\u1eb1ng b\u1ea1n \u0111ang d\u00f9ng \u0111\u00fang g\u00f3i MEGA PRO ph\u00f9 h\u1ee3p, ho\u1eb7c li\u00ean h\u1ec7 support@mega.nz.",
     "5931": "Nh\u1ea5p [A]v\u00e0o \u0111\u00e2y[\/A] \u0111\u1ec3 xem l\u01b0\u1ee3ng s\u1eed d\u1ee5ng c\u1ee7a b\u1ea1n.",
     "5945": "T\u1ea3i t\u1ec7p tin th\u1ea5t b\u1ea1i. Xin th\u1eed l\u1ea1i. [{0}]",
+    "5998": "T\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n v\u1eeba \u0111\u01b0\u1ee3c k\u00edch ho\u1ea1t. Vui l\u00f2ng \u0111\u0103ng nh\u1eadp.",
     "6001": "Sai m\u1eadt kh\u1ea9u",
     "6078": "MEGA",
     "6080": "x\u00e1c nh\u1eadn",
@@ -2872,10 +2873,16 @@
     "19608": "Payment overdue",
     "19609": "Payment required",
     "19610": "Administrator",
-    "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for ample more transfer quota, which will automatically resume your video.",
+    "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for additional transfer quota, which will automatically resume your video.",
     "19616": "Upgrade PRO",
     "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video.",
     "19621": "Data migration is in progress, it may take few minutes depending on the migrated account size.",
     "19622": "Your cloud drive",
-    "19628": "If you wish to submit a copyright takedown, please visit this page in a desktop browser."
+    "19624": "You need an authenticator app to enable 2FA on MEGA. You can download and install the Google Authenticator, Duo Mobile, Authy or Microsoft Authenticator app for your phone or tablet.",
+    "19628": "If you wish to submit a takedown notice through our web form, please visit this page in a desktop browser. Alternatively, you can send us an email at [A]copyright@mega.nz[\/A].",
+    "19629": "\u0110\u1ecba Ch\u1ec9, d\u00f2ng 1:",
+    "19630": "\u0110\u1ecba Ch\u1ec9, d\u00f2ng 2:",
+    "19631": "Save changes",
+    "19632": "Please enter the tax number for your business",
+    "19633": "Settings saved"
 }

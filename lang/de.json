@@ -785,6 +785,7 @@
     "5929": "Sie \u00fcberschreiten Ihr Speicherplatzlimit in erheblichem Ma\u00dfe. Weitere Uploads sind derzeit nicht erlaubt. Bitte pr\u00fcfen Sie Ihren PRO-Status oder kontaktieren Sie support@mega.nz.",
     "5931": "Ihre Speicherplatznutzung ist [A]hier[\/A] verf\u00fcgbar.",
     "5945": "Download fehlgeschlagen, bitte versuchen Sie es erneut.  [{0}]",
+    "5998": "Ihr Account wurde bereits aktiviert. Bitte melden Sie sich an.",
     "6001": "Falsches Passwort",
     "6078": "MEGA",
     "6080": "best\u00e4tigen",
@@ -2877,5 +2878,11 @@
     "19617": "Sie haben Ihr PRO-Transfervolumen aufgebraucht. Bitte wechseln Sie auf eine h\u00f6here PRO-Stufe. Ihr Video wird dann automatisch fortgesetzt.",
     "19621": "Die Datenmigration l\u00e4uft und kann - abh\u00e4ngig von der Accountgr\u00f6\u00dfe - einige Minuten in Anspruch nehmen.",
     "19622": "Ihr Cloud Drive",
-    "19628": "If you wish to submit a copyright takedown, please visit this page in a desktop browser."
+    "19624": "You need an authenticator app to enable 2FA on MEGA. You can download and install the Google Authenticator, Duo Mobile, Authy or Microsoft Authenticator app for your phone or tablet.",
+    "19628": "If you wish to submit a takedown notice through our web form, please visit this page in a desktop browser. Alternatively, you can send us an email at [A]copyright@mega.nz[\/A].",
+    "19629": "Adresse 1:",
+    "19630": "Adresse 2:",
+    "19631": "Save changes",
+    "19632": "Please enter the tax number for your business",
+    "19633": "Settings saved"
 }

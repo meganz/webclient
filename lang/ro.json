@@ -785,6 +785,7 @@
     "5929": "Ai dep\u0103\u015fit semnificativ stocarea alocat\u0103 permis\u0103 iar \u00eenc\u0103rc\u0103rile \u0163i-au fost dezactivate. Te rug\u0103m s\u0103 te asiguri c\u0103 e\u015fti pe planul corect MEGA PRO sau contacteaz\u0103 support@mega.nz.",
     "5931": "Clic [A]aici[\/A] pentru a vedea utilizarea spa\u0163iului de stocare.",
     "5945": "E\u015fec la desc\u0103rcarea fi\u015fierului. Te rug\u0103m s\u0103 \u00eencerci din nou. [{0}]",
+    "5998": "Contul t\u0103u a fost activat deja. Te rug\u0103m s\u0103 te autentifici.",
     "6001": "Parol\u0103 gre\u015fit\u0103",
     "6078": "MEGA",
     "6080": "confirm\u0103",
@@ -2872,10 +2873,16 @@
     "19608": "Payment overdue",
     "19609": "Payment required",
     "19610": "Administrator",
-    "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for ample more transfer quota, which will automatically resume your video.",
+    "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for additional transfer quota, which will automatically resume your video.",
     "19616": "Upgrade PRO",
     "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video.",
     "19621": "Data migration is in progress, it may take few minutes depending on the migrated account size.",
     "19622": "Your cloud drive",
-    "19628": "If you wish to submit a copyright takedown, please visit this page in a desktop browser."
+    "19624": "You need an authenticator app to enable 2FA on MEGA. You can download and install the Google Authenticator, Duo Mobile, Authy or Microsoft Authenticator app for your phone or tablet.",
+    "19628": "If you wish to submit a takedown notice through our web form, please visit this page in a desktop browser. Alternatively, you can send us an email at [A]copyright@mega.nz[\/A].",
+    "19629": "Linia de adres\u0103 1:",
+    "19630": "Linia de adres\u0103 2:",
+    "19631": "Save changes",
+    "19632": "Please enter the tax number for your business",
+    "19633": "Settings saved"
 }

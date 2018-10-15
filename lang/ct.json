@@ -785,6 +785,7 @@
     "5929": "\u60a8\u7684\u5132\u5b58\u914d\u7f6e\u904e\u5927\uff0c\u4e0a\u50b3\u5df2\u88ab\u505c\u7528\u3002\u8acb\u78ba\u8a8d\u60a8\u662f\u4f7f\u7528\u6b63\u78ba\u7684MEGA Pro\u8a08\u756b\uff0c\u6216\u806f\u7d61support@mega.nz",
     "5931": "\u9ede\u64ca[A]\u9019\u88e1[\/A]\u4ee5\u67e5\u770b\u60a8\u7684\u5132\u5b58\u4f7f\u7528\u91cf\u3002",
     "5945": "\u4e0b\u8f09\u6a94\u6848\u5931\u6557\uff0c\u8acb\u91cd\u8a66 [{0}]",
+    "5998": "\u5e33\u865f\u5df2\u53ef\u4f7f\u7528\u3002\u8acb\u767b\u5165\u3002",
     "6001": "\u932f\u8aa4\u5bc6\u78bc",
     "6078": "MEGA",
     "6080": "\u78ba\u8a8d",
@@ -2872,10 +2873,16 @@
     "19608": "Payment overdue",
     "19609": "Payment required",
     "19610": "Administrator",
-    "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for ample more transfer quota, which will automatically resume your video.",
+    "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for additional transfer quota, which will automatically resume your video.",
     "19616": "Upgrade PRO",
     "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video.",
     "19621": "Data migration is in progress, it may take few minutes depending on the migrated account size.",
     "19622": "Your cloud drive",
-    "19628": "If you wish to submit a copyright takedown, please visit this page in a desktop browser."
+    "19624": "You need an authenticator app to enable 2FA on MEGA. You can download and install the Google Authenticator, Duo Mobile, Authy or Microsoft Authenticator app for your phone or tablet.",
+    "19628": "If you wish to submit a takedown notice through our web form, please visit this page in a desktop browser. Alternatively, you can send us an email at [A]copyright@mega.nz[\/A].",
+    "19629": "\u5730\u5740\u6b041\uff1a",
+    "19630": "\u5730\u5740\u6b042\uff1a",
+    "19631": "Save changes",
+    "19632": "Please enter the tax number for your business",
+    "19633": "Settings saved"
 }

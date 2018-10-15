@@ -343,8 +343,8 @@ function u_setrsa(rsakey) {
 
                         watchdog.notify('setrsa', [u_type, u_sid]);
 
-                        // Import welcome pdf at account creation
-                        M.importWelcomePDF();
+                        // Import welcome pdf at account creation -- Removed
+                        // NOT needed, since the file is create on account creation (initial ephemral accoount)
                     }
                     $promise.resolve(rsakey);
                     ui_keycomplete();

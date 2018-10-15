@@ -3294,26 +3294,12 @@ MegaData.prototype.importWelcomePDF = function() {
             var key = res.k;
             M.req({a: 'g', p: ph}).done(function(res) {
                 if (typeof res.at === 'string') {
-                    M.onFileManagerReady(function() {
-                        var doit = true;
-                        var keys = Object.keys(M.d);
-                        for (var i = keys.length; i--;) {
-                            if (fileext(M.d[keys[i]].name) === 'pdf') {
-                                doit = false;
-                                break;
-                            }
-                        }
-
-                        if (doit) {
-                            if (d) {
-                                console.log('Importing Welcome PDF (%s)', ph, res.at);
-                            }
-                            promise.linkDoneAndFailTo(M.importFileLink(ph, key, res.at));
-                        }
-                        else {
-                            promise.reject(EEXIST);
-                        }
-                    });
+                    // No need to wait for FileManager to be ready, and no need to check anything
+                    // This method is ONLY called when the initial ephemral account is created
+                    if (d) {
+                        console.log('Importing Welcome PDF (%s)', ph, res.at);
+                    }
+                    promise.linkDoneAndFailTo(M.importFileLink(ph, key, res.at));
                 }
                 else {
                     promise.reject(res);

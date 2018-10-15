@@ -3391,7 +3391,7 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             });
         }
         else {
-            _import(M.RootID);
+            _import(M.RootID ? M.RootID : undefined);
         }
     });
 };

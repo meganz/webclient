@@ -768,9 +768,14 @@ var dlmanager = {
             }
         }
 
-        if (eekey && String(dl && dl.url).length > 256) {
-            // Decryption error from proxied CloudRAID download
-            eventlog(99706);
+        if (eekey) {
+            if (String(dl && dl.url).length > 256) {
+                // Decryption error from proxied CloudRAID download
+                eventlog(99706, JSON.stringify([1, dl && dl.id]));
+            }
+            else {
+                eventlog(99711, JSON.stringify([1, dl && dl.id]));
+            }
         }
 
         if (code === ETEMPUNAVAIL) {

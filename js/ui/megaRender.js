@@ -924,12 +924,15 @@
                     aTemplate.classList.add('versioning');
                 }
 
-                if (this.viewmode || aProperties.name.length > 78 || aProperties.playtime) {
+                if (this.viewmode || aProperties.name.length > 78 || aProperties.playtime !== undefined) {
                     if (aProperties.width) {
                         title.push(aProperties.width + 'x' + aProperties.height + ' @' + aProperties.fps + 'fps');
                     }
                     if (aProperties.codecs) {
-                        title.push(aProperties.codecs.join('/'));
+                        title.push(aProperties.codecs);
+                    }
+                    if (aNode.s) {
+                        title.push(bytesToSize(aNode.s, 0).replace(' ', ''));
                     }
                     title.push(aProperties.name);
                 }
@@ -942,7 +945,7 @@
                         tmp.classList.add(aProperties.icon);
                     }
 
-                    if (aProperties.playtime) {
+                    if (aProperties.playtime !== undefined) {
                         aTemplate.querySelector('.data-block-bg').classList.add('video');
                         aTemplate.querySelector('.video-thumb-details span').textContent
                             = secondsToTimeShort(aProperties.playtime);

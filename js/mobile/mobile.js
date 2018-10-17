@@ -227,6 +227,35 @@ var mobile = {
 };
 
 
+mBroadcaster.once('startMega:mobile', function() {
+    'use strict';
+
+    var getOrientation = function() {
+        return !window.orientation || window.orientation === 180 ? 'portrait' : 'landscape';
+    };
+
+    $(window).on('orientationchange.moboc', function(ev) {
+        mobile.orientation = ev.orientation || getOrientation();
+
+        if (dlmanager.isOverQuota) {
+            onIdle(function() {
+                var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
+
+                if (mobile.orientation === 'landscape') {
+                    $('.speedometer.full', $dialog).removeClass('big-104px-icon');
+                }
+                else {
+                    $('.speedometer.full', $dialog).addClass('big-104px-icon');
+                }
+            });
+        }
+        mBroadcaster.sendMessage('orientationchange', mobile.orientation);
+    });
+
+    mobile.orientation = getOrientation();
+});
+
+
 /**
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */

@@ -37,7 +37,7 @@ function dashboardUI() {
         $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
         $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
         $('.dashboard .button.upgrade-account').addClass('hidden');
-        if (!u_attr.b.mu) {
+        if (u_attr.b.m) {
             $('.business-dashboard .go-to-usermanagement-btn').removeClass('hidden');
 
             // event handler for clicking on user-management button in dashboard.
@@ -232,7 +232,7 @@ function dashboardUI() {
                 if (u_attr.b.s === 1) {
                     $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
                         .text(l[7666]);
-                    if (!u_attr.b.mu) { // master
+                    if (u_attr.b.m) { // master
                         if ((Date.now() / 1000) - timestamp > 0) {
                             $businessLeft.find('.suba-status').addClass('pending').removeClass('disabled active')
                                 .text(l[19609]);
@@ -244,7 +244,7 @@ function dashboardUI() {
                         .text(l[19608]);
                 }
 
-                if (!u_attr.b.mu) { // master
+                if (u_attr.b.m) { // master
                     $businessLeft.find('.suba-role').text(l[19610]);
                 }
                 else {

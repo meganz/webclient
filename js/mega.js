@@ -999,7 +999,7 @@ scparser.$add('ua', {
 
             // in case of business master
             // first, am i a master?
-            if (u_attr && u_attr.b && !u_attr.b.mu) {
+            if (u_attr && u_attr.b && u_attr.b.m) {
                 // then, do i have this user as sub-user?
                 if ((M.suba && M.suba[actionPacketUserId]) || u_handle === actionPacketUserId) {
                     M.require('businessAcc_js', 'businessAccUI_js').done(
@@ -1040,7 +1040,7 @@ scparser.$add('ua', {
 
             // in case of business master
             // first, am i a master?
-            if (u_attr && u_attr.b && !u_attr.b.mu) {
+            if (u_attr && u_attr.b && u_attr.b.m) {
                 // then, do i have this user as sub-user?
                 if ((M.suba && M.suba[actionPacketUserId]) || u_handle === actionPacketUserId) {
                     M.require('businessAcc_js', 'businessAccUI_js').done(

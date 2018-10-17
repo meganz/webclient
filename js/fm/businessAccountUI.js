@@ -607,7 +607,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                         if (localStorage.d) {
                             console.log(res);
                         }
-                        if (!res.e || !res.firstname || !res.mpubk || !res.mu) {
+                        if (!res.e || !res.firstname || !res.bpubk || !res.bu) {
                             failureAction(1, res, 'uv2 not complete response');
                         }
                         else {
@@ -667,7 +667,7 @@ BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
         if (localStorage.d) {
             console.log(res);
         }
-        if (!res.e || !res.firstname || !res.mpubk || !res.mu) {
+        if (!res.e || !res.firstname || !res.bpubk || !res.bu) {
             failureAction(1, res, 'uv2 not complete response');
         }
         else {

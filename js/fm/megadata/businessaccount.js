@@ -551,7 +551,7 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
  * @returns {boolean}   true if the user is a Master B-Account
  */
 BusinessAccount.prototype.isBusinessMasterAcc = function () {
-    if ((u_attr.b && !u_attr.b.mu) || (M.suba && M.suba.length)) {
+    if ((u_attr.b && u_attr.b.m) || (M.suba && M.suba.length)) {
         return true;
     }
     return false;
@@ -615,59 +615,6 @@ BusinessAccount.prototype.getSignupCodeInfo = function (signupCode) {
     return operationPromise;
 };
 
-///**
-// * migrate a sub-user data to a target destination
-// * @param {string} subUserHandle        sub-user handle to migrate the data from
-// * @param {string} target               node handle for a folder to migrate the data to
-// * @returns {Promise}                   resolves if the operation succeeded
-// */
-//BusinessAccount.prototype.migrateSubUserData = function (subUserHandle, target) {
-//    "use strict";
-//    var operationPromise = new MegaPromise();
-//    var mySelf = this;
-
-//    if (!subUserHandle || subUserHandle.length !== 11) {
-//        return operationPromise.reject(0, 5, 'invalid U_HANDLE');
-//    }
-//    if (!target) {
-//        return operationPromise.reject(0, 6, 'Target is empty');
-//    }
-//    if (!M.suba[subUserHandle]) {
-//        return operationPromise.reject(0, 7, 'u_handle is not a sub-user');
-//    }
-
-
-//    var failReject = function (st, res, res2) {
-//        operationPromise.reject(st, res, res2);
-//    };
-
-//    var gettingSubTreePromise = this.getSubUserTree(subUserHandle);
-
-//    gettingSubTreePromise.done(function (st, res) {
-//        var gettingSubMasterKey = mySelf.getSubAccountMKey(subUserHandle);
-//        gettingSubMasterKey.fail(failReject);
-//        gettingSubMasterKey.done(function (st2, res2) {
-//            var treeObj = mySelf.decrypteSubUserTree(res.f, res2.k);
-//            if (!treeObj) {
-//                return operationPromise.reject(0, 9, 'Fatal error in sub-user tree encryption');
-//            }
-//            else {
-//                var folderName = M.suba[subUserHandle].e;
-//                folderName += '_' + Date.now();
-//                var cpyPromise = mySelf.copySubUserTreeToMasterRoot(treeObj.tree, folderName);
-
-
-//            }
-//        });
-//    });
-
-//    gettingSubTreePromise.fail(failReject);
-
-
-
-
-//    return operationPromise;
-//};
 
 /**
  * copying the sub-user decrypted tree to master user root
@@ -850,12 +797,18 @@ BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
     if (!treeF || !treeF.length || !key) {
         return null;
     }
-    if (!u_privk) {
+    //if (!u_privk) {
+    //    return null;
+    //}
+    if (!u_attr.b || !u_attr.b.bprivk) {
         return null;
     }
 
+    var business_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.b.bprivk))));
+
     var t = base64urldecode(key);
-    var dKey = crypto_rsadecrypt(t, u_privk);
+    //var dKey = crypto_rsadecrypt(t, u_privk);
+    var dKey = crypto_rsadecrypt(t, business_privk);
     var subUserKey = new sjcl.cipher.aes(str_to_a32(dKey.substr(0, 16)));
 
     // loading sharing keys, as out-shares will be sent with sharing keys (instead of owner node key)
@@ -1556,7 +1509,7 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
 BusinessAccount.prototype.creatBusinessAccountMasterKey = function () {
     var bKey = Array(4);
     for (var i = 4; i--;) {
-        u_kbKey[i] = rand(0x100000000);
+        bKey[i] = rand(0x100000000);
     }
     return bKey;
 };

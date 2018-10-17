@@ -704,7 +704,7 @@ MegaData.prototype.syncUsersFullname = function(userId) {
         }
         // check if this first name + last belongs to business sub-user
         // we added here to avoid re-calling get attribute + minimize the need of code refactoring
-        if (u_attr && u_attr.b && !u_attr.b.mu) {
+        if (u_attr && u_attr.b && u_attr.b.m) {
             if (M.suba && M.suba[userId]) {
                 M.require('businessAcc_js', 'businessAccUI_js').done(
                     function () {

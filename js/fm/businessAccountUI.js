@@ -708,7 +708,8 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
     // handler for add users button
     $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
-            mySelf.showAddSubUserDialog(null, mySelf.viewSubAccountListUI);
+            var bu = new BusinessAccountUI();
+            mySelf.showAddSubUserDialog(null, bu.viewSubAccountListUI);
         });
 
     // handler account setting page
@@ -1491,6 +1492,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
     loadCountries();
 
+    
     if (u_attr['%name']) {
         cName = u_attr['%name'];
     }

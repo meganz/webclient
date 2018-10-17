@@ -966,12 +966,6 @@ pro.propay = {
     /* jshint -W074 */  // Old code, refactor another day
     sendPurchaseToApi: function() {
 
-        // Set affiliate ID
-        var affiliateId = 0;
-        if (localStorage.affid && (localStorage.affts > (new Date().getTime() - 86400000))) {
-            affiliateId = localStorage.affid;
-        }
-
         // Show different loading animation text depending on the payment methods
         switch (pro.propay.proPaymentMethod) {
             case 'bitcoin':
@@ -1001,7 +995,7 @@ pro.propay = {
             si:  apiId,
             p:   price,
             c:   currency,
-            aff: affiliateId,
+            aff: mega.affid,
             m:   m,
             bq:  fromBandwidthDialog,
             pbq: fromPreWarnBandwidthDialog

@@ -241,9 +241,6 @@ function init_page() {
         }
     }
 
-    // Get information about what API flags are enabled e.g. 2FA, New Registration etc
-    mega.getApiMiscFlags();
-
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
 
@@ -1241,9 +1238,19 @@ function init_page() {
         pro.propay.init();
     }
     else if (page.substr(0, 3) === 'pro') {
-        var tmp = page.split('/uao=');
+        /* jshint -W018 */
+        var tmp = page.split(/(\/\w+=)/);
         if (tmp.length > 1) {
-            mega.uaoref = decodeURIComponent(tmp[1]);
+            for (var s = 1; s < tmp.length; s += 2) {
+                tmp[String(tmp[s]).replace(/\W/g, '')] = mURIDecode(tmp[s + 1]);
+            }
+            if (tmp.uao) {
+                mega.uaoref = tmp.uao;
+            }
+            if (tmp.aff && (tmp.aff_time *= 1000) && !(localStorage.affts > tmp.aff_time)) {
+                localStorage.affid = tmp.aff;
+                localStorage.affts = tmp.aff_time;
+            }
             loadSubPage(tmp[0]);
             return;
         }

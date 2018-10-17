@@ -367,6 +367,9 @@ ul, li {
     box-sizing: border-box;
     white-space: normal;
 }
+.mobile.error-messages .optional-second-message a {
+    color: #ff4444;
+}
 .mobile.download-speed, .mobile.upload-speed {
     text-align: right;
     padding: 0 28px 0 0;

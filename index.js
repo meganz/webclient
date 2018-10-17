@@ -1230,9 +1230,24 @@ function init_page() {
         parsepage(pages['blog']);
         init_blog();
     }
-    else if (page == 'copyright') {
+    else if (is_mobile && (page === 'copyright' || page === 'copyrightnotice')) {
+
+        // Show message that the copyright takedown should be submitted in a desktop browser
+        parsepage(pages['mobile']);
+        mobile.messageOverlay.show(l[621], l[19628], function() {
+
+            // On clicking OK in the dialog, go to the file manager if logged in, or start page if not
+            loadSubPage(u_type === 3 ? 'fm' : 'start');
+        });
+        return false;
+    }
+    else if (page === 'copyrightnotice') {
+        parsepage(pages['copyrightnotice']);
+        copyright.init_cn();
+    }
+    else if (page === 'copyright') {
         parsepage(pages['copyright']);
-        $('.reg-st5-complete-button').rebind('click', function (e) {
+        $('.reg-st5-complete-button').rebind('click', function () {
             loadSubPage('copyrightnotice');
         });
     }
@@ -1330,10 +1345,6 @@ function init_page() {
     else if (page == 'done') {
         parsepage(pages['done']);
         init_done();
-    }
-    else if (page == 'copyrightnotice') {
-        parsepage(pages['copyrightnotice']);
-        copyright.init_cn();
     }
     else if (dlid) {
         page = 'download';

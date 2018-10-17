@@ -782,6 +782,24 @@ function init_page() {
         // Check if they registered using the new registration process (version 2)
         if (decodedConfirmCode.substr(0, 13) === 'ConfirmCodeV2') {
 
+            // If already logged into an account
+            if (u_type === 3) {
+
+                // Ask them to log out and click on the confirmation link again
+                if (is_mobile) {
+                    parsepage(pages['mobile']);
+                    mobile.messageOverlay.show(l[2480], l[12440], function () {
+                        loadSubPage('fm');
+                    });
+                }
+                else {
+                    msgDialog('warningb', l[2480], l[12440], false, function () {
+                        loadSubPage('fm');
+                    });
+                }
+                return false;
+            }
+
             // Verify the confirm code using the new process
             security.register.verifyEmailConfirmCode(confirmcode, function(result, email) {
 

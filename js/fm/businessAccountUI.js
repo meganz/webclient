@@ -131,7 +131,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             }
             for (var h in subs[k]) {
                 if (subs[k][h] instanceof Object) {
-                    if (!previousSubs[k][h] instanceof Object) {
+                    if (!(previousSubs[k][h] instanceof Object)) {
                         return true;
                     }
                     for (var a in subs[k][h]) {

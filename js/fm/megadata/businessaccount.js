@@ -1478,7 +1478,7 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
                 isSubAttr = true;
             }
             else {
-                u_attr[ctx.ua] = res;
+                u_attr[ctx.ua] = from8(base64urldecode(res));
                 isMasterAttr = true;
             }
         }

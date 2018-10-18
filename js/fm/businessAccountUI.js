@@ -1422,6 +1422,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     this.initUItoRender();
     var mySelf = this;
     this.URLchanger('account');
+    loadingDialog.pshow();
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
@@ -1436,6 +1437,16 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         $accountPageHeader.removeClass('hidden');
         $('.settings-menu-bar .settings-menu-item', $accountContainer).removeClass('selected');
         $('.settings-menu-bar .suba-setting-profile', $accountContainer).addClass('selected');
+        loadingDialog.phide();
+
+        // if we dont find essential business attrs --> get them
+        if (!u_attr['%name'] && !u_attr['%phone']) {
+            mySelf.business.updateSubUserInfo(u_attr.b.bu, ['%name', '%phone',
+                '%email', '%taxnum', '%address1', '%address2', '%city', '%state',
+                '%country', '%zip']);
+            return;
+        }
+        
     };
 
     // event handler for header clicking
@@ -1489,6 +1500,8 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var cState = '';
     var cCountry = '';
     var cZip = '';
+
+    
 
     loadCountries();
 

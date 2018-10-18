@@ -689,6 +689,7 @@
     "5569": "ng\u01b0\u1eddi",
     "5582": "T\u1ea1o t\u00e0i kho\u1ea3n",
     "5589": "\u0110\u01b0\u1ee3c chia s\u1ebb cho t\u00f4i",
+    "5599": "Th\u00f9ng R\u00e1c Tr\u1ed1ng",
     "5622": "Chia s\u1ebb \u0111\u01b0\u1eddng d\u1eabn li\u00ean k\u1ebft",
     "5631": "Chia s\u1ebb th\u01b0 m\u1ee5c n\u00e0y",
     "5644": "Th\u01b0 m\u1ee5c \u0111\u00e3 t\u1ed3n t\u1ea1i",
@@ -1123,6 +1124,7 @@
     "8021": "DU L\u1ecaCH & N\u01a0I CH\u1ed0N",
     "8022": "V\u1eacT TH\u1ec2 & K\u00dd T\u1ef0",
     "8023": "\u0110\u00ednh k\u00e8m",
+    "8062": "B\u1ea1n c\u00f3 ch\u1eafc mu\u1ed1n x\u00f3a v\u0129nh vi\u1ec5n c\u00e1c t\u1ec7p tin trong th\u00f9ng r\u00e1c hay kh\u00f4ng?",
     "8074": "Cloud Drive c\u1ee7a b\u1ea1n kh\u00f4ng c\u00f3 t\u1eadp tin.",
     "8080": "MEGA b\u1ea3o v\u1ec7 c\u00e1c cu\u1ed9c tr\u00f2 chuy\u1ec7n nghi\u00eam ng\u1eb7t v\u1edbi c\u00f4ng ngh\u1ec7 b\u1ea3o m\u1eadt \u0111\u1ea7u-cu\u1ed1i (ng\u01b0\u1eddi d\u00f9ng ki\u1ec3m so\u00e1t) cung c\u1ea5p s\u1ef1 \u0111\u1ea3m b\u1ea3o an to\u00e0n c\u1ea7n thi\u1ebft:",
     "8413": "PRO LITE",
@@ -2845,5 +2847,9 @@
     "19630": "\u0110\u1ecba Ch\u1ec9, d\u00f2ng 2:",
     "19631": "Save changes",
     "19632": "Please enter the tax number for your business",
-    "19633": "Settings saved"
+    "19633": "Settings saved",
+    "19634": "Desktop App",
+    "19635": "Item permanently deleted",
+    "19636": "Item restored to Cloud Drive",
+    "19637": "Failed to restore item"
 }

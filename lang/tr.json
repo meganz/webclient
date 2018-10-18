@@ -689,6 +689,7 @@
     "5569": "kullan\u0131c\u0131",
     "5582": "Hesap olu\u015ftur",
     "5589": "Benimle payla\u015f\u0131lan",
+    "5599": "\u00c7\u00f6p Kutusunu bo\u015falt\r\n",
     "5622": "Payla\u015fma ba\u011flant\u0131s\u0131",
     "5631": "Payla\u015f\u0131m klas\u00f6r\u00fc",
     "5644": "Klas\u00f6r zaten var",
@@ -1123,6 +1124,7 @@
     "8021": "SEYAHAT & YERLER",
     "8022": "NESNELER & SEMBOLLER",
     "8023": "Ekle",
+    "8062": "\u00c7\u00f6p kutusundaki t\u00fcm dosyalar\u0131 kal\u0131c\u0131 olarak silmek istedi\u011finizden emin misiniz?",
     "8074": "Bulut S\u00fcr\u00fcc\u00fcn\u00fczde dosya yok",
     "8080": "MEGA, sohbetlerinizi u\u00e7tan uca (kullan\u0131c\u0131 taraf\u0131ndan kontrol edilen) \u015fifreleme ile temel g\u00fcvenlik g\u00fcvenceleri sunarak korur:",
     "8413": "PRO LITE",
@@ -2845,5 +2847,9 @@
     "19630": "Address Line 2:",
     "19631": "De\u011fi\u015fiklikleri kaydet",
     "19632": "L\u00fctfen \u015firketinizin vergi numaras\u0131n\u0131 girin",
-    "19633": "Ayarlar kaydedildi"
+    "19633": "Ayarlar kaydedildi",
+    "19634": "Desktop App",
+    "19635": "Item permanently deleted",
+    "19636": "Item restored to Cloud Drive",
+    "19637": "Failed to restore item"
 }

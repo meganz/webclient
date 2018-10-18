@@ -689,6 +689,7 @@
     "5569": "gebruikers",
     "5582": "Maak een account aan",
     "5589": "Gedeeld met mij",
+    "5599": "Prullenbak leegmaken",
     "5622": "Deel koppeling",
     "5631": "Gedeelde map",
     "5644": "Map bestaat al",
@@ -1123,6 +1124,7 @@
     "8021": "REIZEN & PLAATSEN",
     "8022": "VOORWERPEN & SYMBOLEN",
     "8023": "Toevoegen",
+    "8062": "Weet u zeker dat u alle bestanden uit de prullenbak definitief wil verwijderen ?",
     "8074": "Geen bestanden in uw Cloud schijf",
     "8080": "MEGA beschermt uw chat met eind-tot-eind codering (gebruiker bestuurd) door het verstrekken van essenti\u00eble veiligheidswaarborgen:",
     "8413": "PRO LITE",
@@ -2845,5 +2847,9 @@
     "19630": "Address Line 2:",
     "19631": "Wijzigingen Opslaan",
     "19632": "Voer het btw nummer van uw bedrijf in",
-    "19633": "Instellingen opsgeslagen"
+    "19633": "Instellingen opsgeslagen",
+    "19634": "Desktop App",
+    "19635": "Item permanently deleted",
+    "19636": "Item restored to Cloud Drive",
+    "19637": "Failed to restore item"
 }

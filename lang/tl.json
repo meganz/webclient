@@ -689,6 +689,7 @@
     "5569": "users",
     "5582": "Gumawa ng account",
     "5589": "Naibahagi sa akin",
+    "5599": "Bakatehin ang Basurahan",
     "5622": "Ibahagi ang link",
     "5631": "Folder ng mga share",
     "5644": "meron na ganitong folder",
@@ -1123,6 +1124,7 @@
     "8021": "BYAHE AT MGA LUGAR",
     "8022": "MGA BAGAY AT SIMBOLO",
     "8023": "Isama",
+    "8062": "Gusto mo bang burahin ng tuluyan ang lahat ng files sa iyong basurahan?",
     "8074": "Wala kang files sa inyong Cloud Drive",
     "8080": "Inaalagan ng MEGA ang inyong end-to-end (kontrolado ng gumagamit) encryption sa pamamagitan ng mga mahahalagang kasiguruhang pangkaligtasan:",
     "8413": "PRO LITE",
@@ -2845,5 +2847,9 @@
     "19630": "Address Line 2:",
     "19631": "Save changes",
     "19632": "Please enter the tax number for your business",
-    "19633": "Settings saved"
+    "19633": "Settings saved",
+    "19634": "Desktop App",
+    "19635": "Item permanently deleted",
+    "19636": "Item restored to Cloud Drive",
+    "19637": "Failed to restore item"
 }

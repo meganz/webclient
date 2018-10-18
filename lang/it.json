@@ -689,6 +689,7 @@
     "5569": "utenti",
     "5582": "Crea account",
     "5589": "Condivise con me",
+    "5599": "Svuota il Cestino\r\n",
     "5622": "Condividi link",
     "5631": "Condividi cartella",
     "5644": "Una cartella con lo stesso nome esiste gi\u00e0",
@@ -1123,6 +1124,7 @@
     "8021": "VIAGGI E LUOGHI",
     "8022": "OGGETTI E SIMBOLI",
     "8023": "Allega",
+    "8062": "Sei sicuro di voler cancellare definitivamente tutti i file dal Cestino?",
     "8074": "Nessun file nel tuo Cloud Drive",
     "8080": "MEGA protegge la tua chat con una criptazione end-to-end (controllata dall'utente) provvedendo un'assicurazione di sicurezza essenziale:",
     "8413": "PRO LITE",
@@ -2845,5 +2847,9 @@
     "19630": "Address Line 2:",
     "19631": "Salva cambiamenti",
     "19632": "Per favore, inserisci la partita IVA della tua azienda.",
-    "19633": "Impostazioni salvate"
+    "19633": "Impostazioni salvate",
+    "19634": "Desktop App",
+    "19635": "Item permanently deleted",
+    "19636": "Item restored to Cloud Drive",
+    "19637": "Failed to restore item"
 }

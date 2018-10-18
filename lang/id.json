@@ -689,6 +689,7 @@
     "5569": "Pengguna",
     "5582": "Buat akun",
     "5589": "Folder yang dibagikan dengan saya",
+    "5599": "Kosongkan Sampah",
     "5622": "Bagikan link",
     "5631": "Folder Berbagi",
     "5644": "Folder sudah ada",
@@ -1123,6 +1124,7 @@
     "8021": "WISATA & TEMPAT",
     "8022": "OBJEK & SIMBOL",
     "8023": "Lampirkan",
+    "8062": "Apakah anda yakin ingin menghapus seluruh file dari sampah secara permanen?",
     "8074": "Tidak ada berkas di Cloud Drive anda",
     "8080": "MEGA melindungi chat anda dengan enkripsi menyeluruh (diatur oleh pengguna) yang memberikan jaminan keamanan:",
     "8413": "PRO LITE",
@@ -2845,5 +2847,9 @@
     "19630": "Address Line 2:",
     "19631": "Save changes",
     "19632": "Please enter the tax number for your business",
-    "19633": "Settings saved"
+    "19633": "Settings saved",
+    "19634": "Desktop App",
+    "19635": "Item permanently deleted",
+    "19636": "Item restored to Cloud Drive",
+    "19637": "Failed to restore item"
 }

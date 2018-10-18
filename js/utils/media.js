@@ -2622,6 +2622,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
 
             mc = Object.create(Array.prototype, {
+                toJSON: {
+                    value: function() {
+                        return this.slice();
+                    }
+                },
                 toString: {
                     value: function() {
                         return array.unique(this).map(function(k) {

@@ -3038,7 +3038,7 @@ else if (!b_u) {
                 var g = {a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': u_sid || ''};
 
                 xhr(false, g, function(response) {
-                    dl_res = response[0] || response;
+                    dl_res = Array.isArray(response) && response[0];
                 });
             }
 

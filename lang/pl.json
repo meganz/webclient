@@ -689,6 +689,7 @@
     "5569": "u\u017cytkownicy",
     "5582": "Utw\u00f3rz konto",
     "5589": "Udost\u0119pnione dla mnie",
+    "5599": "Opr\u00f3\u017cnij kosz",
     "5622": "Udost\u0119pnij link",
     "5631": "Udost\u0119pnij katalog",
     "5644": "Katalog ju\u017c istnieje",
@@ -1123,6 +1124,7 @@
     "8021": "PODR\u00d3\u017bE & MIEJSCA",
     "8022": "OBIEKTY & SYMBOLE",
     "8023": "Za\u0142\u0105cz",
+    "8062": "Czy na pewno chcesz usun\u0105\u0107 wszystkie pliki z kosza?",
     "8074": "Brak plik\u00f3w na dysku",
     "8080": "MEGA zabezpiecza Twoje rozmowy poprzez szyfrowanie danych po storonie u\u017cytkownika.",
     "8413": "PRO LITE",
@@ -2845,5 +2847,9 @@
     "19630": "Address Line 2:",
     "19631": "Zapisz zmiany",
     "19632": "Podaj numer podatkowy swojej firmy",
-    "19633": "Ustawienia zapisane"
+    "19633": "Ustawienia zapisane",
+    "19634": "Desktop App",
+    "19635": "Item permanently deleted",
+    "19636": "Item restored to Cloud Drive",
+    "19637": "Failed to restore item"
 }

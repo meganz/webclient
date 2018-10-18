@@ -689,6 +689,7 @@
     "5569": "users",
     "5582": "Create account",
     "5589": "Shared with me",
+    "5599": "Empty Rubbish Bin",
     "5622": "Share link",
     "5631": "Share folder",
     "5644": "Folder already exists",
@@ -1123,6 +1124,7 @@
     "8021": "TRAVEL & PLACES",
     "8022": "OBJECTS & SYMBOLS",
     "8023": "Attach",
+    "8062": "Are you sure you want to permanently delete all files from the rubbish bin?",
     "8074": "No files in your Cloud Drive",
     "8080": "MEGA protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:",
     "8413": "PRO LITE",
@@ -2845,5 +2847,9 @@
     "19630": "Address Line 2:",
     "19631": "Save changes",
     "19632": "Please enter the tax number for your business",
-    "19633": "Settings saved"
+    "19633": "Settings saved",
+    "19634": "Desktop App",
+    "19635": "Item permanently deleted",
+    "19636": "Item restored to Cloud Drive",
+    "19637": "Failed to restore item"
 }

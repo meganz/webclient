@@ -689,6 +689,7 @@
     "5569": "usu\u00e1rios",
     "5582": "Criar conta",
     "5589": "Compartilhado comigo",
+    "5599": "Lixeira vazia",
     "5622": "Compartilhar link",
     "5631": "Compartilhar pasta",
     "5644": "Pasta j\u00e1 existe",
@@ -1123,6 +1124,7 @@
     "8021": "VIAGENS & LUGARES",
     "8022": "OBJETOS & S\u00cdMBOLOS",
     "8023": "Anexar",
+    "8062": "Tem certeza de que deseja excluir permanentemente todos os arquivos do caixote do lixo?",
     "8074": "N\u00e3o h\u00e1 arquivos na sua nuvem",
     "8080": "O MEGA protege o seu chat com criptografia de ponta a ponta (controlada pelo usu\u00e1rio), proporcionando garantias de seguran\u00e7a essenciais:",
     "8413": "PRO LITE",
@@ -2845,5 +2847,9 @@
     "19630": "Endere\u00e7o Linha 2:",
     "19631": "Salvar altera\u00e7\u00f5es",
     "19632": "Por favor, digite o n\u00famero fiscal da sua empresa",
-    "19633": "Configura\u00e7\u00f5es salvas"
+    "19633": "Configura\u00e7\u00f5es salvas",
+    "19634": "Desktop App",
+    "19635": "Item permanently deleted",
+    "19636": "Item restored to Cloud Drive",
+    "19637": "Failed to restore item"
 }

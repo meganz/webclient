@@ -689,6 +689,7 @@
     "5569": "utilizatori",
     "5582": "Creeaz\u0103 cont",
     "5589": "Partajate cu mine",
+    "5599": "Co\u015f de gunoi gol",
     "5622": "Partajeaz\u0103 linkul",
     "5631": "Partajeaz\u0103 folderul",
     "5644": "Folderul exist\u0103 deja",
@@ -1123,6 +1124,7 @@
     "8021": "C\u0102L\u0102TORIE \u015eI LOCURI",
     "8022": "OBIECTE \u015eI SIMBOLURI",
     "8023": "Ata\u015feaz\u0103",
+    "8062": "Sigur vrei s\u0103 \u015ftergi definitiv toate fi\u015fierele din co\u015ful de gunoi?",
     "8074": "Niciun fi\u015fier \u00een unitatea cloud",
     "8080": "MEGA \u00ee\u0163i protejeaz\u0103 conversa\u0163iile cu criptare (controlat\u0103 de utilizator) cap\u0103t-la-cap\u0103t oferind asigur\u0103ri de siguran\u0163\u0103:",
     "8413": "PRO LITE",
@@ -2845,5 +2847,9 @@
     "19630": "Linia de adres\u0103 2:",
     "19631": "Save changes",
     "19632": "Please enter the tax number for your business",
-    "19633": "Settings saved"
+    "19633": "Settings saved",
+    "19634": "Desktop App",
+    "19635": "Item permanently deleted",
+    "19636": "Item restored to Cloud Drive",
+    "19637": "Failed to restore item"
 }

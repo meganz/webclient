@@ -689,6 +689,7 @@
     "5569": "utilisateurs",
     "5582": "Cr\u00e9er un compte",
     "5589": "Partag\u00e9s avec moi",
+    "5599": "Vider la corbeille\r\n",
     "5622": "Partager le lien",
     "5631": "Partager un dossier",
     "5644": "Dossier d\u00e9j\u00e0 existant",
@@ -1123,6 +1124,7 @@
     "8021": "VOYAGES ET LIEUX",
     "8022": "OBJETS ET SYMBOLES",
     "8023": "Joindre",
+    "8062": "Voulez-vous vraiment supprimer d\u00e9finitivement tous les fichiers de la corbeille\u2009?",
     "8074": "Aucun fichier dans votre disque nuagique",
     "8080": "MEGA prot\u00e8ge votre conversaton gr\u00e2ce au chiffrement de bout en bout (contr\u00f4l\u00e9 par l'utilisateur) apportant ainsi une garantie de s\u00e9curit\u00e9 essentielle.",
     "8413": "PRO l\u00e9ger",
@@ -2845,5 +2847,9 @@
     "19630": "Adresse ligne 2 :",
     "19631": "Enregistrer les changements",
     "19632": "Veuillez saisir le num\u00e9ro d\u2019identification fiscale de votre entreprise",
-    "19633": "Les param\u00e8tres ont \u00e9t\u00e9 enregistr\u00e9s"
+    "19633": "Les param\u00e8tres ont \u00e9t\u00e9 enregistr\u00e9s",
+    "19634": "Desktop App",
+    "19635": "Item permanently deleted",
+    "19636": "Item restored to Cloud Drive",
+    "19637": "Failed to restore item"
 }

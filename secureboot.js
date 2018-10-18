@@ -2762,12 +2762,14 @@ else if (!b_u) {
             });
 
             // Get information about what API flags are enabled e.g. 2FA, New Registration etc
-            M.req('gmf').done(function(result) {
-                if (typeof result === 'object') {
-                    // Cache flags object
-                    mega.apiMiscFlags = result;
-                }
-            });
+            if (!is_iframed) {
+                M.req('gmf').done(function(result) {
+                    if (typeof result === 'object') {
+                        // Cache flags object
+                        mega.apiMiscFlags = result;
+                    }
+                });
+            }
         });
 
         if (!maintenance && !androidsplash && !is_karma) {

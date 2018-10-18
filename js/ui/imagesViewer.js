@@ -1063,7 +1063,7 @@ var slideshowid;
         if (n.name) {
             var c = MediaAttribute.getCodecStrings(n);
             if (c) {
-                $overlay.find('.viewer-filename').attr('title', c.join("/"));
+                $overlay.find('.viewer-filename').attr('title', c);
             }
         }
 

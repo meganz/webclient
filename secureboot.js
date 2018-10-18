@@ -208,20 +208,9 @@ if (is_chrome_firefox) {
 
     ua = navigator.userAgent.toLowerCase();
 }
-else if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
-        && parseInt(String(navigator.appVersion).split('Chrome/').pop()) < 22) {
-    b_u = 1;
-}
-else if (ua.indexOf('firefox') > -1 && typeof DataView === 'undefined') {
-    b_u = 1;
-}
-else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem === 'undefined') {
-    b_u = 1;
-}
-var myURL = URL;
-if (!myURL) {
-    b_u = 1;
-}
+
+var myURL = window.URL;
+b_u = b_u || !myURL || typeof DataView === 'undefined' || (window.chrome && !document.exitPointerLock);
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {

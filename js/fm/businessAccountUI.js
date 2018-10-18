@@ -607,7 +607,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                         if (localStorage.d) {
                             console.log(res);
                         }
-                        if (!res.e || !res.firstname || !res.mpubk || !res.mu) {
+                        if (!res.e || !res.firstname || !res.bpubk || !res.bu) {
                             failureAction(1, res, 'uv2 not complete response');
                         }
                         else {
@@ -667,7 +667,7 @@ BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
         if (localStorage.d) {
             console.log(res);
         }
-        if (!res.e || !res.firstname || !res.mpubk || !res.mu) {
+        if (!res.e || !res.firstname || !res.bpubk || !res.bu) {
             failureAction(1, res, 'uv2 not complete response');
         }
         else {
@@ -708,7 +708,8 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
     // handler for add users button
     $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
-            mySelf.showAddSubUserDialog(null, mySelf.viewSubAccountListUI);
+            var bu = new BusinessAccountUI();
+            mySelf.showAddSubUserDialog(null, bu.viewSubAccountListUI);
         });
 
     // handler account setting page
@@ -1491,35 +1492,36 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
     loadCountries();
 
-    if (u_attr['^companyname']) {
-        cName = u_attr['^companyname'];
+    
+    if (u_attr['%name']) {
+        cName = u_attr['%name'];
     }
-    if (u_attr['^companyphone']) {
-        cTel = u_attr['^companyphone'];
+    if (u_attr['%phone']) {
+        cTel = u_attr['%phone'];
     }
-    if (u_attr['^companyemail']) {
-        cEmail = u_attr['^companyemail'];
+    if (u_attr['%email']) {
+        cEmail = u_attr['%email'];
     }
-    if (u_attr['^companytaxnum']) {
-        cVat = u_attr['^companytaxnum'];
+    if (u_attr['%taxnum']) {
+        cVat = u_attr['%taxnum'];
     }
-    if (u_attr['^companyaddress1']) {
-        cAddress = u_attr['^companyaddress1'];
+    if (u_attr['%address1']) {
+        cAddress = u_attr['%address1'];
     }
-    if (u_attr['^companyaddress2']) {
-        cAddress2 = u_attr['^companyaddress2'];
+    if (u_attr['%address2']) {
+        cAddress2 = u_attr['%address2'];
     }
-    if (u_attr['^companycity']) {
-        cCity = u_attr['^companycity'];
+    if (u_attr['%city']) {
+        cCity = u_attr['%city'];
     }
-    if (u_attr['^companystate']) {
-        cState = u_attr['^companystate'];
+    if (u_attr['%state']) {
+        cState = u_attr['%state'];
     }
-    if (u_attr['^companycountry']) {
-        cCountry = u_attr['^companycountry'];
+    if (u_attr['%country']) {
+        cCountry = u_attr['%country'];
     }
-    if (u_attr['^companyzip']) {
-        cZip = u_attr['^companyzip'];
+    if (u_attr['%zip']) {
+        cZip = u_attr['%zip'];
     }
 
     var $cNameInput = $('input#prof-cname', $profileContainer).val(cName);
@@ -1560,7 +1562,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                 }
                 else {
                     $cNameInput.parent().removeClass('error');
-                    attrsToChange.push({ key: '^companyname', val: $cNameInput.val().trim() });
+                    attrsToChange.push({ key: '%name', val: $cNameInput.val().trim() });
                 }
             }
             if ($cTelInput.val().trim() !== cTel) {
@@ -1571,7 +1573,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                 }
                 else {
                     $cTelInput.parent().removeClass('error');
-                    attrsToChange.push({ key: '^companyphone', val: $cTelInput.val().trim() });
+                    attrsToChange.push({ key: '%phone', val: $cTelInput.val().trim() });
                 }
             }
             if ($cEmailInput.val().trim() !== cEmail) {
@@ -1582,29 +1584,29 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                 }
                 else {
                     $cEmailInput.parent().removeClass('error');
-                    attrsToChange.push({ key: '^companyemail', val: $cEmailInput.val().trim() });
+                    attrsToChange.push({ key: '%email', val: $cEmailInput.val().trim() });
                 }
             }
             if ($cVatInput.val().trim() !== cVat) {
-                attrsToChange.push({ key: '^companytaxnum', val: $cVatInput.val().trim() });
+                attrsToChange.push({ key: '%taxnum', val: $cVatInput.val().trim() });
             }
             if ($cAddressInput.val().trim() !== cAddress) {
-                attrsToChange.push({ key: '^companyaddress1', val: $cAddressInput.val().trim() });
+                attrsToChange.push({ key: '%address1', val: $cAddressInput.val().trim() });
             }
             if ($cAddress2Input.val().trim() !== cAddress2) {
-                attrsToChange.push({ key: '^companyaddress2', val: $cAddress2Input.val().trim() });
+                attrsToChange.push({ key: '%address2', val: $cAddress2Input.val().trim() });
             }
             if ($cCityInput.val().trim() !== cCity) {
-                attrsToChange.push({ key: '^companycity', val: $cCityInput.val().trim() });
+                attrsToChange.push({ key: '%city', val: $cCityInput.val().trim() });
             }
             if ($cStateInput.val().trim() !== cState) {
-                attrsToChange.push({ key: '^companystate', val: $cStateInput.val().trim() });
+                attrsToChange.push({ key: '%state', val: $cStateInput.val().trim() });
             }
             if ($cCountryInput.val() !== cCountry) {
-                attrsToChange.push({ key: '^companycountry', val: $cCountryInput.val() });
+                attrsToChange.push({ key: '%country', val: $cCountryInput.val() });
             }
             if ($cZipInput.val().trim() !== cZip) {
-                attrsToChange.push({ key: '^companyzip', val: $cZipInput.val().trim() });
+                attrsToChange.push({ key: '%zip', val: $cZipInput.val().trim() });
             }
 
 

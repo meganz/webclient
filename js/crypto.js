@@ -211,7 +211,13 @@ function rand(n) {
     return r[0] % n; // <- oops, it's uniformly distributed only when `n` divides 0x100000000
 }
 
-function crypto_rsagenkey() {
+
+/**
+ * generate RSA key
+ * @param {Function} callBack   optional callback function to be called.
+ *                              if not specified the standard set_RSA will be called
+ */
+function crypto_rsagenkey(callBack) {
     var $promise = new MegaPromise();
     var logger = MegaLogger.getLogger('crypt');
 
@@ -250,12 +256,18 @@ function crypto_rsagenkey() {
         var endTime = new Date();
         logger.debug("Key generation took "
                      + (endTime.getTime() - startTime.getTime()) / 1000.0
-                     + " seconds!");
+            + " seconds!");
 
-        u_setrsa(k)
-            .done(function () {
-                $promise.resolve(k);
-            });
+        if (callBack && typeof callBack === 'function') {
+            callBack(k);
+            $promise.resolve(); // release the promise
+        }
+        else {
+            u_setrsa(k)
+                .done(function () {
+                    $promise.resolve(k);
+                });
+        }
     }
 
     return $promise;

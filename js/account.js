@@ -322,8 +322,8 @@ function u_setrsa(rsakey) {
     // checking if we are creating keys for a business sub-user
     if (window.businessSubAc) {
         // we get current user's master user + its public key (master user pubkey)
-        buinessMaster = window.businessSubAc.mu;
-        buinsesPubKey = window.businessSubAc.mpubk;
+        buinessMaster = window.businessSubAc.bu;
+        buinsesPubKey = window.businessSubAc.bpubk;
         
 
         // now we will encrypt the current user master-key using master-user public key. and include it in 'up' request
@@ -353,8 +353,8 @@ function u_setrsa(rsakey) {
             u_attr.pubk = u_storage.pubk = publicKeyEncodedB64;
             
             if (buinessMaster) {
-                u_attr.mu = buinessMaster;
-                u_attr.b = 1;
+                //u_attr.mu = buinessMaster;
+                //u_attr.b = 1;
                 delete window.businessSubAc; // performance measure, freeup memory since it's not useful (nor harmful)
             }
 
@@ -653,7 +653,7 @@ function processEmailChangeActionPacket(ap) {
 
         // in case of business master
         // first, am i a master?
-        if (u_attr && u_attr.b && !u_attr.b.mu) {
+        if (u_attr && u_attr.b && u_attr.b.m) {
             // then, do i have this user as sub-user?
             if (M.suba && M.suba[ap.u]) {
                 M.require('businessAcc_js', 'businessAccUI_js').done(
@@ -672,7 +672,7 @@ function processEmailChangeActionPacket(ap) {
     }
     else {
         // if the is business master we might accept other cases
-        if (u_attr && u_attr.b && !u_attr.b.mu) {
+        if (u_attr && u_attr.b && u_attr.b.m) {
             // then, do i have this user as sub-user?
             if (M.suba && M.suba[ap.u]) {
                 var stillOkEmail = (ap.s === 2 && typeof ap.e === 'string' && ap.e.indexOf('@') !== -1);

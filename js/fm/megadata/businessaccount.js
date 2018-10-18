@@ -551,7 +551,7 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
  * @returns {boolean}   true if the user is a Master B-Account
  */
 BusinessAccount.prototype.isBusinessMasterAcc = function () {
-    if ((u_attr.b && !u_attr.b.mu) || (M.suba && M.suba.length)) {
+    if ((u_attr.b && u_attr.b.m) || (M.suba && M.suba.length)) {
         return true;
     }
     return false;
@@ -615,59 +615,6 @@ BusinessAccount.prototype.getSignupCodeInfo = function (signupCode) {
     return operationPromise;
 };
 
-///**
-// * migrate a sub-user data to a target destination
-// * @param {string} subUserHandle        sub-user handle to migrate the data from
-// * @param {string} target               node handle for a folder to migrate the data to
-// * @returns {Promise}                   resolves if the operation succeeded
-// */
-//BusinessAccount.prototype.migrateSubUserData = function (subUserHandle, target) {
-//    "use strict";
-//    var operationPromise = new MegaPromise();
-//    var mySelf = this;
-
-//    if (!subUserHandle || subUserHandle.length !== 11) {
-//        return operationPromise.reject(0, 5, 'invalid U_HANDLE');
-//    }
-//    if (!target) {
-//        return operationPromise.reject(0, 6, 'Target is empty');
-//    }
-//    if (!M.suba[subUserHandle]) {
-//        return operationPromise.reject(0, 7, 'u_handle is not a sub-user');
-//    }
-
-
-//    var failReject = function (st, res, res2) {
-//        operationPromise.reject(st, res, res2);
-//    };
-
-//    var gettingSubTreePromise = this.getSubUserTree(subUserHandle);
-
-//    gettingSubTreePromise.done(function (st, res) {
-//        var gettingSubMasterKey = mySelf.getSubAccountMKey(subUserHandle);
-//        gettingSubMasterKey.fail(failReject);
-//        gettingSubMasterKey.done(function (st2, res2) {
-//            var treeObj = mySelf.decrypteSubUserTree(res.f, res2.k);
-//            if (!treeObj) {
-//                return operationPromise.reject(0, 9, 'Fatal error in sub-user tree encryption');
-//            }
-//            else {
-//                var folderName = M.suba[subUserHandle].e;
-//                folderName += '_' + Date.now();
-//                var cpyPromise = mySelf.copySubUserTreeToMasterRoot(treeObj.tree, folderName);
-
-
-//            }
-//        });
-//    });
-
-//    gettingSubTreePromise.fail(failReject);
-
-
-
-
-//    return operationPromise;
-//};
 
 /**
  * copying the sub-user decrypted tree to master user root
@@ -850,12 +797,18 @@ BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
     if (!treeF || !treeF.length || !key) {
         return null;
     }
-    if (!u_privk) {
+    //if (!u_privk) {
+    //    return null;
+    //}
+    if (!u_attr.b || !u_attr.b.bprivk) {
         return null;
     }
 
+    var business_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.b.bprivk))));
+
     var t = base64urldecode(key);
-    var dKey = crypto_rsadecrypt(t, u_privk);
+    //var dKey = crypto_rsadecrypt(t, u_privk);
+    var dKey = crypto_rsadecrypt(t, business_privk);
     var subUserKey = new sjcl.cipher.aes(str_to_a32(dKey.substr(0, 16)));
 
     // loading sharing keys, as out-shares will be sent with sharing keys (instead of owner node key)
@@ -1228,6 +1181,7 @@ BusinessAccount.prototype.setMasterUserAttributes =
     function (nbusers, cname, tel, fname, lname, email, pass, isUpgrade) {
         "use strict";
         var operationPromise = new MegaPromise();
+        var mySelf = this;
 
         if (!tel) {
             return operationPromise.reject(0, 3, 'Empty phone');
@@ -1238,74 +1192,87 @@ BusinessAccount.prototype.setMasterUserAttributes =
 
         var request_upb = {
             "a": "upb",                                     // up - business
-            "^companyname": base64urlencode(to8(cname)),    // company name
-            "^companyphone": base64urlencode(to8(tel)),     // company phone
-            terms: 'Mq',
-            firstname: base64urlencode(to8(fname)),
-            lastname: base64urlencode(to8(lname)),
-            name2: base64urlencode(to8(fname + ' ' + lname))
+            "%name": base64urlencode(to8(cname)),    // company name
+            "%phone": base64urlencode(to8(tel)),     // company phone
+            //terms: 'Mq',
+            //firstname: base64urlencode(to8(fname)),
+            //lastname: base64urlencode(to8(lname)),
+            //name2: base64urlencode(to8(fname + ' ' + lname))
         };
 
         if (nbusers) {
-            request_upb['^companynbusers'] = base64urlencode(to8(nbusers)); // nb of users
+            request_upb['%nbusers'] = base64urlencode(to8(nbusers)); // nb of users
         }
 
-        if (!isUpgrade) {
+        var businessKey = mySelf.creatBusinessAccountMasterKey();
+        var generateRSA = crypto_rsagenkey(
+            function (businessRSA) {
 
-            security.deriveKeysFromPassword(pass, u_k,
-                function (clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+                request_upb.k = a32_to_base64(encrypt_key(u_k_aes, businessKey));
+                request_upb.pubk = base64urlencode(crypto_encodepubkey(businessRSA));
+                request_upb.privk = a32_to_base64(
+                    encrypt_key(u_k_aes, str_to_a32(crypto_encodeprivkey(businessRSA)))
+                );
 
-                    // Encode parameters to Base64 before sending to the API
-                    var sendEmailRequestParams = {
-                        a: 'uc2',
-                        n: base64urlencode(to8(fname + ' ' + lname)),         // Name (used just for the email)
-                        m: base64urlencode(email),                                   // Email
-                        crv: ab_to_base64(clientRandomValueBytes),                   // Client Random Value
-                        k: a32_to_base64(encryptedMasterKeyArray32),                 // Encrypted Master Key
-                        hak: ab_to_base64(hashedAuthenticationKeyBytes),             // Hashed Authentication Key
-                        v: 2                                                         // Version of this protocol
-                    };
+                if (!isUpgrade) {
 
-                    api_req([request_upb, sendEmailRequestParams], {
-                        callback: function (res1, ctx, queue, res) {
+                    security.deriveKeysFromPassword(pass, u_k,
+                        function (clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+
+                            // Encode parameters to Base64 before sending to the API
+                            var sendEmailRequestParams = {
+                                a: 'uc2',
+                                n: base64urlencode(to8(fname + ' ' + lname)),         // Name (used just for the email)
+                                m: base64urlencode(email),                                   // Email
+                                crv: ab_to_base64(clientRandomValueBytes),                   // Client Random Value
+                                k: a32_to_base64(encryptedMasterKeyArray32),                 // Encrypted Master Key
+                                hak: ab_to_base64(hashedAuthenticationKeyBytes),             // Hashed Authentication Key
+                                v: 2                                                         // Version of this protocol
+                            };
+
+                            api_req([request_upb, sendEmailRequestParams], {
+                                callback: function (res1, ctx, queue, res) {
+                                    if ($.isNumeric(res)) {
+                                        operationPromise.reject(0, res, 'API returned error');
+                                    }
+                                    else if (!Array.isArray(res)) {
+                                        operationPromise.reject(0, res, 'API returned error');
+                                    }
+                                    else if (res.length !== 2) {
+                                        operationPromise.reject(0, res, 'API returned error');
+                                    }
+                                    else if (typeof res[0] !== 'string' || res[1] !== 0) {
+                                        operationPromise.reject(0, res, 'API returned error');
+                                    }
+                                    else {
+                                        security.register.sendAdditionalInformation(fname, lname);
+                                        operationPromise.resolve(1, res); // user handle
+                                    }
+                                }
+
+                            });
+
+
+                        }
+                    );
+                }
+                else {
+                    api_req(request_upb, {
+                        callback: function (res) {
                             if ($.isNumeric(res)) {
                                 operationPromise.reject(0, res, 'API returned error');
                             }
-                            else if (!Array.isArray(res)) {
-                                operationPromise.reject(0, res, 'API returned error');
-                            }
-                            else if (res.length !== 2) {
-                                operationPromise.reject(0, res, 'API returned error');
-                            }
-                            else if (typeof res[0] !== 'string' || res[1] !== 0) {
-                                operationPromise.reject(0, res, 'API returned error');
+                            else if (typeof res === 'string') {
+                                operationPromise.resolve(1, res); // update success
                             }
                             else {
-                                operationPromise.resolve(1, res); // user handle
+                                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
                             }
                         }
-
                     });
-
-
                 }
-            );
-        }
-        else {
-            api_req(request_upb, {
-                callback: function (res) {
-                    if ($.isNumeric(res)) {
-                        operationPromise.reject(0, res, 'API returned error');
-                    }
-                    else if (typeof res === 'string') {
-                        operationPromise.resolve(1, res); // update success
-                    }
-                    else {
-                        operationPromise.reject(0, 4, 'API returned error, ret=' + res);
-                    }
-                }
-            });
-        }
+            }
+        );
 
         return operationPromise;
     };
@@ -1469,9 +1436,9 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
     var isMasterAttr = false;
     var isSubAttr = false;
 
-    var considereAttrs = ["%position", "%idnum", "%phonenum", "%location", '^companyname', '^companyphone',
-        '^companyemail', '^companytaxnum', '^companyaddress1', '^companyaddress2', '^companycity', '^companystate',
-        '^companycountry', '^companyzip'];
+    var considereAttrs = ["%position", "%idnum", "%phonenum", "%location", '%name', '%phone',
+        '%email', '%taxnum', '%address1', '%address2', '%city', '%state',
+        '%country', '%zip'];
     var totalAttrs = 0;
 
     // if the user is not active, --> it wont be considered in contacts updating mechanisms
@@ -1533,4 +1500,16 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
         }
     }
 
+};
+
+
+/** Create the master key for Business account
+ * @returns {Array}     The key
+ */
+BusinessAccount.prototype.creatBusinessAccountMasterKey = function () {
+    var bKey = Array(4);
+    for (var i = 4; i--;) {
+        bKey[i] = rand(0x100000000);
+    }
+    return bKey;
 };

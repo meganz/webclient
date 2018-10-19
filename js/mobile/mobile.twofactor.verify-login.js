@@ -34,6 +34,9 @@ mobile.twofactor.verifyLogin = {
 
         // Show the account page content
         mobile.twofactor.verifyLogin.$page.removeClass('hidden');
+
+        // Put the focus in the PIN input field after its visible
+        mobile.twofactor.verifyLogin.$page.find('.two-factor-seed-input input').trigger('focus');
     },
 
     /**
@@ -135,6 +138,9 @@ mobile.twofactor.verifyLogin = {
         $submitButton.removeClass('loading');
         $warningText.removeClass('hidden');
         $pinCodeInput.val('');
+
+        // Put the focus in the PIN input field
+        $pinCodeInput.trigger('focus');
     },
 
     /**

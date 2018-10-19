@@ -154,7 +154,10 @@
      */
     var selectTreeItem = function(h) {
         onIdle(function() {
-            if (!$('#mctreesub_' + h, $dialog).hasClass('opened')) {
+            if (section === 'conversations') {
+                $('#cpy-dlg-chat-itm-spn-' + h, $dialog).trigger('click');
+            }
+            else if (!$('#mctreesub_' + h, $dialog).hasClass('opened')) {
                 $('#mctreea_' + h, $dialog).trigger('click');
             }
         });
@@ -170,6 +173,7 @@
         var names = Object.create(null);
         var titles = Object.create(null);
         var $dbc = $('.fm-picker-breadcrumbs', $dialog).empty();
+        var autoSelect = $.copyToUpload && !$.copyToUpload[2];
 
         if (section === 'conversations') {
             var chats = getSelectedChats();
@@ -178,7 +182,7 @@
                 names[u_handle] = l[1025];
             }
             else {
-                aTarget = chats[0];
+                aTarget = chats[0] || String(aTarget || '').split('/').pop();
             }
         }
 
@@ -252,7 +256,9 @@
                 '</a>', type, i > 0 ? 'has-next-button' : '', titles[h] || name, h, name
             );
 
-            // selectTreeItem(h);
+            if (autoSelect) {
+                selectTreeItem(h);
+            }
         }
 
         if (path.length) {
@@ -276,6 +282,11 @@
             }
             return false;
         });
+
+        if ($.copyToUpload) {
+            // auto-select entries once
+            $.copyToUpload[2] = true;
+        }
     };
 
     /**
@@ -336,7 +347,7 @@
             }
 
             if ($.copyToUpload) {
-                items = $.copyToUploadData[0];
+                items = $.copyToUpload[0];
 
                 for (var j = items.length; j--;) {
                     items[j].uuid = makeUUID();
@@ -480,7 +491,10 @@
         }
 
         if ($.copyToUpload) {
-            return l[372]; // Upload  - will be replaced later
+            var len = $.copyToUpload[0].length;
+            return len < 2
+                ? l[19338]
+                : escapeHTML(l[19339]).replace('[X]', len);
         }
 
         if ($.saveToDialog) {
@@ -763,7 +777,7 @@
             }
         }
 
-        if (allowConversationTab) {
+        if (allowConversationTab || $.copyToUpload) {
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
             $('.fm-picker-dialog-button.conversations', $dialog).removeClass('hidden');
         }
@@ -772,7 +786,7 @@
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).removeClass('hidden');
         }
 
-        if (!u_type || $.saveToDialog || $.copyToShare || $.copyToUpload || $.mcImport) {
+        if (!u_type || $.saveToDialog || $.copyToShare || $.mcImport) {
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
             $('.fm-picker-dialog-button.conversations', $dialog).addClass('hidden');
         }
@@ -782,6 +796,13 @@
         }
         else {
             $('.fm-picker-dialog-button.shared-with-me', $dialog).removeClass('hidden');
+        }
+
+        if ($.copyToUpload) {
+            $('.fm-picker-notagain', $dialog).removeClass('hidden');
+        }
+        else {
+            $('.fm-picker-notagain', $dialog).addClass('hidden');
         }
 
         handleDialogTabContent(section, section === 'conversations' ? 'div' : 'ul', html);
@@ -836,23 +857,32 @@
      * Handle opening dialogs and content
      * @param {String} aTab The section/tab to activate
      * @param {String} [aTarget] The target folder for the operation
-     * @param {String} [aMode] Copy dialog mode (share, save, etc)
+     * @param {String|Object} [aMode] Copy dialog mode (share, save, etc)
      */
     var handleOpenDialog = function(aTab, aTarget, aMode) {
         onIdle(function() {
-            if (aMode) {
-                $[aMode] = true;
-            }
+            /** @name $.copyDialog */
+            /** @name $.moveDialog */
             $[$.dialog + 'Dialog'] = $.dialog;
+
+            if (aMode) {
+                /** @name $.copyToShare */
+                /** @name $.copyToUpload */
+                /** @name $.saveToDialog */
+                $[aMode.key || aMode] = aMode.value || true;
+            }
+
             $('.search-bar input', $dialog).val('');
             handleDialogContent(typeof aTab === 'string' && aTab);
-            setDialogBreadcrumb(aTab !== 'conversations' && aTarget);
+            setDialogBreadcrumb(aTarget);
             setDialogButtonState($('.dialog-picker-button', $dialog).addClass('active'));
             setSelectedItems(true);
         });
 
         $.hideContextMenu();
         dialogPositioning($dialog);
+
+        console.assert($dialog, 'The dialogs subsystem is not yet initialized!...');
     };
 
 
@@ -899,10 +929,9 @@
      */
     global.openCopyUploadDialog = function openCopyUploadDialog(files, emptyFolders) {
         M.safeShowDialog('copy', function() {
-            $.copyToUploadData = [files, emptyFolders];
-            var tab = M.currentrootid === 'shares' ? 'shared-with-me' : 'cloud-drive';
-            handleOpenDialog(tab, M.currentdirid, 'copyToUpload');
-            return $dialog;
+            var tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ? 'shared-with-me' : 'cloud-drive';
+            handleOpenDialog(tab, M.currentdirid, {key: 'copyToUpload', value: [files, emptyFolders]});
+            return uiCheckboxes($dialog);
         });
 
         return false;
@@ -912,8 +941,15 @@
      * Generic function to open the Copy dialog.
      * @global
      */
-    global.openCopyDialog = function openCopyDialog(activeTab) {
+    global.openCopyDialog = function openCopyDialog(activeTab, onBeforeShown) {
         M.safeShowDialog('copy', function() {
+            if (typeof activeTab === 'function') {
+                onBeforeShown = activeTab;
+                activeTab = false;
+            }
+            if (typeof onBeforeShown === 'function') {
+                onBeforeShown($dialog);
+            }
             handleOpenDialog(activeTab, M.RootID);
             return $dialog;
         });
@@ -1175,8 +1211,7 @@
             });
         });
 
-        $dialog.off('click', '.nw-contact-item');
-        $dialog.on('click', '.nw-contact-item', function () {
+        $dialog.rebind('click', '.nw-contact-item', function() {
             var $this = $(this);
 
             if ($this.hasClass('selected')) {
@@ -1189,10 +1224,15 @@
             setDialogBreadcrumb();
             setDialogButtonState($btn);
             dialogScroll('.dialog-tree-panel-scroll');
+
+            // Scroll the element into view, only needed if element triggered.
+            var jsp = $(this).parents('.dialog-tree-panel-scroll').data('jsp');
+            if (jsp) {
+                jsp.scrollToElement($(this));
+            }
         });
 
-        $dialog.off('click', '.nw-fm-tree-item');
-        $dialog.on('click', '.nw-fm-tree-item', function(e) {
+        $dialog.rebind('click', '.nw-fm-tree-item', function(e) {
 
             var ts = treesearch;
             var old = $.mcselected;
@@ -1264,12 +1304,11 @@
             // Scroll the element into view, only needed if element triggered.
             var jsp = $(this).parents('.dialog-tree-panel-scroll').data('jsp');
             if (jsp) {
-                jsp.scrollToElement($(this));
+                jsp.scrollToElement($(this), true);
             }
         });
 
-        $swm.off('mouseenter', '.nw-fm-tree-item');
-        $swm.on('mouseenter', '.nw-fm-tree-item', function _try(ev) {
+        $swm.rebind('mouseenter', '.nw-fm-tree-item', function _try(ev) {
             var h = $(this).attr('id').replace('mctreea_', '');
 
             if (ev !== 0xEFAEE && !M.d[h]) {
@@ -1317,8 +1356,7 @@
             return false;
         });
 
-        $swm.off('mouseleave', '.nw-fm-tree-item');
-        $swm.on('mouseleave', '.nw-fm-tree-item', function() {
+        $swm.rebind('mouseleave', '.nw-fm-tree-item', function() {
 
             var $tooltip = $('.contact-preview', $dialog);
 
@@ -1329,8 +1367,7 @@
         });
 
         // Handle conversations tab item selection
-        $dialog.off('click', '.nw-conversations-item');
-        $dialog.on('click', '.nw-conversations-item', function() {
+        $dialog.rebind('click', '.nw-conversations-item', function() {
 
             setDialogBreadcrumb(String($(this).attr('id')).replace('contact2_', ''));
 
@@ -1361,10 +1398,21 @@
             delete $.saveToDialogPromise;
 
             if ($.copyToUpload) {
-                var data = $.copyToUploadData;
+                var data = $.copyToUpload;
+                var target = $.mcselected;
+
+                if (section === 'conversations') {
+                    target = chats.map(function(h) {
+                        return 'chat/' + h;
+                    });
+                }
+
+                if ($('.notagain', $dialog).prop('checked')) {
+                    mega.config.setn('ulddd', 0);
+                }
+
                 closeDialog();
-                $.addUploadTarget = $.mcselected;
-                M.addUpload(data[0], false, data[1]);
+                M.addUpload(data[0], false, data[1], target);
                 return false;
             }
 

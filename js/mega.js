@@ -289,26 +289,6 @@ function sc_fetcher() {
     })();
 }
 
-/**
- * function to start fetching nodes needed for the action packets
- * @param {Number} scni         id of action packe in scq
- */
-function startNodesFetching(scni) {
-    "use strict";
-    if (!--nodesinflight[scni]) {
-        delete nodesinflight[scni];
-
-        if (scloadtnodes && scq[scni][0] && sc_fqueuet(scni)) {
-            // fetch required nodes from db
-            sc_fetcher();
-        }
-        else {
-            // resume processing, if appropriate and needed
-            resumesc();
-        }
-    }
-}
-
 // enqueue parsed actionpacket
 function sc_packet(a) {
     "use strict";
@@ -410,10 +390,6 @@ function sc_packet(a) {
         }
     }
 
-    if (a.a === 't') {
-        startNodesFetching(scqhead);
-    }
-
     // other packet types do not warrant the worker detour
     if (scq[scqhead]) scq[scqhead++][0] = a;
     else scq[scqhead++] = [a, []];
@@ -485,7 +461,7 @@ function sc_node(n) {
         nodesinflight[scqhead]++;
     }
     else {
-        nodesinflight[scqhead] = 2;
+        nodesinflight[scqhead] = 1;
         nodes_scqi_order = 0; // reset the order var
     }
 
@@ -1199,6 +1175,14 @@ scparser.$add('psts', function(a) {
             ulmanager.ulResumeOverStorageQuotaState();
         });
     }
+
+    onIdle(function() {
+        dlmanager._onOverQuotaAttemptRetry();
+    });
+
+    onIdle(function() {
+        watchdog.notify('psts', (a.r === 's' && a.p) | 0);
+    });
 });
 
 // Payment reminder
@@ -1832,16 +1816,23 @@ function worker_procmsg(ev) {
 
         if (ev.data.scni >= 0) {
             // enqueue processed node
-            if (scq[ev.data.scni]) {
-                scq[ev.data.scni][1][ev.data.arrivalOrder] = ev.data;
+            if (!scq[ev.data.scni]) {
+                scq[ev.data.scni] = [null, []];
             }
-            else {
-                var initArray = [];
-                initArray[ev.data.arrivalOrder] = ev.data;
-                scq[ev.data.scni] = [null, initArray];
-            }
+            scq[ev.data.scni][1][ev.data.arrivalOrder] = ev.data;
 
-            startNodesFetching(ev.data.scni);
+            if (!--nodesinflight[ev.data.scni]) {
+                delete nodesinflight[ev.data.scni];
+
+                if (scloadtnodes && scq[ev.data.scni][0] && sc_fqueuet(ev.data.scni)) {
+                    // fetch required nodes from db
+                    sc_fetcher();
+                }
+                else {
+                    // resume processing, if appropriate and needed
+                    resumesc();
+                }
+            }
         }
         else {
             // maintain special incoming shares index
@@ -3384,7 +3375,23 @@ function loadfm_done(mDBload) {
     };
 
     mega.config.ready(function() {
-        mclp.then(_onConfigReady).catch(_onConfigReady);
+        mclp.then(_onConfigReady)
+            .catch(function() {
+                try {
+                    _onConfigReady();
+                }
+                catch (ex) {
+                    onIdle(function() {
+                        // give time for window.onerror to fire 'cd2' before showing the blocking confirm-dialog
+                        setTimeout(function() {
+                            siteLoadError(ex, 'loadfm');
+                        }, 2e3);
+
+                        // reach window.onerror
+                        throw ex;
+                    });
+                }
+            });
     });
 }
 

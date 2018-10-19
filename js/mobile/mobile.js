@@ -280,8 +280,12 @@ var alarm = {
 };
 /* jshint strict: true */
 
-function msgDialog(type, title, msg, submsg, callback, checkbox) {
+function accountUI() {
+    'use strict';
+    loadSubPage('fm/account');
+}
 
+function msgDialog(type, title, msg, submsg, callback, checkbox) {
     'use strict';
 
     // Call the mobile version
@@ -289,7 +293,6 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 }
 
 function fm_showoverlay() {
-
     'use strict';
 
     $('.fm-dialog-overlay').removeClass('hidden');
@@ -297,7 +300,6 @@ function fm_showoverlay() {
 }
 
 function fm_hideoverlay() {
-
     'use strict';
 
     $('.fm-dialog-overlay').addClass('hidden');
@@ -321,6 +323,19 @@ function closeDialog() {
 }
 
 mega.ui.showRegisterDialog = function() {};
+
+/**
+ * Shim for sendSignupLinkDialog, likely called from showOverQuotaRegisterDialog
+ * @param {Object} accountData The registration vars in localStorage.awaitingConfirmationAccount
+ */
+mega.ui.sendSignupLinkDialog = function(accountData) {
+
+    'use strict';
+
+    parsepage(pages['mobile']);
+    mobile.register.showConfirmEmailScreen(accountData);
+    topmenuUI();
+};
 
 mega.loadReport = {};
 var previews = {};

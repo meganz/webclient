@@ -94,7 +94,7 @@ pro.proplan = {
             $planBlocks.removeClass('selected');
             $selectedPlan.addClass('selected');
 
-            // If coming from the process key step
+            // If coming from the process key step and they click on the Free plan
             if (planNum === '0') {
                 if (page === 'fm') {
                     loadSubPage('start');
@@ -122,6 +122,11 @@ pro.proplan = {
             else if (isEphemeral() && !localStorage.awaitingConfirmationAccount) {
                 showRegisterDialog();
                 return false;
+            }
+
+            // If they clicked the plan immediately after completing registration, set the flag so it can be logged
+            if ($('body').hasClass('key')) {
+                pro.propay.planChosenAfterRegistration = true;
             }
 
             // Load the Pro page step 2 where they can make payment

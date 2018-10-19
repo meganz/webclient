@@ -1,4 +1,5 @@
 (function(scope) {
+    'use strict';
 
     var dir_inflight = 0;
     var filedrag_u = [];
@@ -6,9 +7,11 @@
     var touchedElement = 0;
 
     function addUpload(files, emptyFolders) {
+        var straight = $.doStraightUpload || Object(window.fmconfig).ulddd === 0 || M.currentrootid === M.RubbishID;
+
         console.assert(page === 'start' || window.fminitialized, 'check this...');
 
-        if (page === 'start' || M.chat) {
+        if (page === 'start' || straight) {
             M.addUpload(files, false, emptyFolders);
         }
         else {
@@ -421,7 +424,7 @@
                     }
                 }
             }
-            addUpload(u);
+            M.addUpload(u);
             if (page == 'start') {
                 start_upload();
             }

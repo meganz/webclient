@@ -20,7 +20,7 @@
     background-image: url(../images/mega/startpage-sprite_v7.png);
     background-position: -2px -263px;
     background-repeat: no-repeat;
-    margin: 0 auto;
+    margin: 40px auto 0 auto;
 }
 .startpage .bottom-page.top-header {
     color: rgba(0,0,0,0.7);
@@ -262,7 +262,7 @@
     padding: 0 15px;
     visibility: visible;
     position: absolute;
-    bottom: 83px;
+    bottom: 20px;
     width: 100%;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;

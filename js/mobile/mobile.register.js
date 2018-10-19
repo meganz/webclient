@@ -36,6 +36,7 @@ mobile.register = {
         // Activate register button when fields are complete
         this.initKeyupEvents();
         this.initRegisterButton();
+        this.initBlurEvents();
 
         // Load password strength estimator
         this.loadPasswordEstimatorLibrary();
@@ -67,9 +68,15 @@ mobile.register = {
             var password = $passwordField.val();
             var confirmPassword = $confirmPasswordField.val();
 
+            // when email was incorrect and it updated as correct, remove incorrect class with keyup
+            if ($emailField.parent().hasClass('incorrect') && !checkMail(email)) {
+                $emailField.parent().removeClass('incorrect');
+            }
+
             // Change the button to red to enable it if they have entered something in all the fields
             if (firstName.length > 0 && lastName.length > 0 && email.length > 0 &&
-                    password.length > 0 && confirmPassword.length > 0) {
+                    password.length > 0 && confirmPassword.length > 0 &&
+                    !$emailField.parent().hasClass('incorrect')) {
 
                 // Activate the register button
                 $registerButton.addClass('active');
@@ -82,6 +89,37 @@ mobile.register = {
             else {
                 // Grey it out if they have not completed one of the fields
                 $registerButton.removeClass('active');
+            }
+        });
+    },
+
+    /**
+     * Enable the register button if email is valid.
+     */
+    initBlurEvents: function() {
+
+        'use strict';
+
+        var $emailField = this.$registerScreen.find('.email-address input');
+        var $registerButton = this.$registerScreen.find('.register-button');
+
+        // Add blur event to the email input fields
+        $emailField.rebind('blur', function() {
+
+            var email = $emailField.val();
+
+            // If invalid email, deactivate register button, show toast and add red border to field
+            if (checkMail(email)) {
+                $emailField.parent().addClass('incorrect');
+                $registerButton.removeClass('active');
+                mobile.showToast(l[1101]);
+            }
+            else {
+                // Remove field red border, activate the register button,
+                // trigger keyup handler to set register button to active
+                $emailField.parent().removeClass('incorrect');
+                $registerButton.addClass('active');
+                $emailField.trigger('keyup');
             }
         });
     },
@@ -191,6 +229,16 @@ mobile.register = {
                 return false;
             }
 
+            // If email is incorrect make button invalid and show toast message.
+            if (checkMail(email)) {
+                if (!$emailField.parent().hasClass('incorrect')) {
+                    mobile.showToast(l[1101]);
+                }
+                $emailField.parent().addClass('incorrect');
+                $registerButton.removeClass('active');
+                return false;
+            }
+
             // Unfocus (blur) the input fields to prevent the cursor showing on iOS and also hide the keyboard
             $firstNameField.add($lastNameField).add($emailField)
                 .add($passwordField).add($confirmPasswordField)
@@ -201,18 +249,7 @@ mobile.register = {
 
             // If they have not confirmed the Terms of Service then show an error and don't proceed
             if (!$confirmTermsCheckbox.is(':checked')) {
-                mobile.messageOverlay.show(l[7241]);        // You must agree with our Terms of Service
-                return false;
-            }
-
-            // If the email is invalid
-            if (checkMail(email)) {
-
-                // Add red border, red text and show warning icon
-                $emailField.parent().addClass('incorrect');
-
-                // Show an error and don't proceed
-                mobile.messageOverlay.show(l[198]);         // Please enter a valid e-mail address.
+                mobile.showToast(l[7241]);        // You must agree with our Terms of Service
                 return false;
             }
 

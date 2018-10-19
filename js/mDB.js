@@ -1599,6 +1599,13 @@ Object.defineProperty(self, 'dbfetch', (function() {
             // setup promise
             promise = promise || MegaPromise.busy();
 
+            if (!fmdb) {
+                if (d) {
+                    console.debug('No fmdb available...', folderlink, pfid);
+                }
+                return promise.reject(EFAILED);
+            }
+
             // first round: replace undefined handles with the parents
             if (!handles) {
                 handles = parents;

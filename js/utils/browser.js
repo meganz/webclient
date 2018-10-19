@@ -74,6 +74,9 @@ function browserdetails(useragent) {
         browser = 'Internet Explorer';
     }
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
+        if (useragent.indexOf(' opr/') > 0) {
+            verTag = 'opr';
+        }
         browser = 'Opera';
     }
     else if (useragent.indexOf(' dragon/') > 0) {
@@ -123,12 +126,37 @@ function browserdetails(useragent) {
         browser = 'Chrome';
         details.brand = verTag = 'CriOS';
     }
+    else if (useragent.indexOf(' opios') > 0) {
+        browser = 'Opera';
+        details.brand = verTag = 'OPiOS';
+    }
+    else if (useragent.indexOf(' fxios') > 0) {
+        browser = 'Firefox';
+        details.brand = verTag = 'FxiOS';
+    }
+    else if (useragent.indexOf('ucbrowser') > 0) {
+        browser = 'UCBrowser';
+    }
+    else if (useragent.indexOf('samsungbrowser') > 0) {
+        icon = 'samsung.png';
+        browser = 'SamsungBrowser';
+    }
+    else if (useragent.indexOf('yabrowser') > 0) {
+        browser = 'YaBrowser';
+    }
+    else if (useragent.indexOf('miuibrowser') > 0) {
+        verTag = 'XiaoMi/MiuiBrowser';
+        browser = 'MiuiBrowser';
+    }
+    else if (useragent.indexOf('puffin/') > 0) {
+        browser = 'Puffin';
+    }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
     }
     else if (useragent.indexOf('safari') > 0) {
         verTag = 'Version';
-        browser = 'Safari';
+        browser = os === 'Android' ? null : 'Safari';
     }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
@@ -167,6 +195,7 @@ function browserdetails(useragent) {
         name = 'Unknown';
         icon = 'unknown.png';
     }
+
     if (!icon && browser) {
         if (browser === 'Internet Explorer' || browser === 'Edge') {
             icon = 'ie.png';
@@ -174,6 +203,11 @@ function browserdetails(useragent) {
         else {
             icon = browser.toLowerCase() + '.png';
         }
+    }
+
+    if (browser === null && os === 'Android') {
+        icon = 'android.png';
+        name = browser = 'Android Browser';
     }
 
     details.name = name;
@@ -209,6 +243,9 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('gecko') > 0) {
         details.engine = 'Gecko';
+    }
+    else if (useragent.indexOf('presto') > 0) {
+        details.engine = 'Presto';
     }
     else {
         details.engine = 'Unknown';

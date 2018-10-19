@@ -30,7 +30,7 @@ function init_start() {
         });
         $('.startpage.try-mega').text(l[16535]);
 
-        
+
 
         $('.startpage.try-mega').rebind('click', function () {
             if (u_type === false) {
@@ -285,7 +285,7 @@ function start_countUpdate() {
         if (total.length === startCountRenderData[type].length) {
             for (var i = 0, len = total.length; i < len; i++) {
                 if (startCountRenderData[type][i] !== total[i]) {
-                    document.getElementById(type + '_number_' + i).innerHTML = total[i];
+                    $('#' + type + '_number_' + i).safeHTML(total[i]);
                 }
             }
         }

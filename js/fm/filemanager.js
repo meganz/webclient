@@ -1325,7 +1325,7 @@ FileManager.prototype.initContextUI = function() {
         }
         var labelId = parseInt(this.dataset.labelId);
         var parent = $(this).parents('.labels');
-        
+
         if (labelId && !parent.hasClass("disabled")) {
             // init M.filterLabel[type] if not exist.
             if (!M.currentLabelFilter) {
@@ -1371,15 +1371,56 @@ FileManager.prototype.initContextUI = function() {
 
     $('.submenu.labels .dropdown-colour-item').rebind('mouseover.clrSort', function() {
         var labelTxt = this.dataset.labelTxt;
-        var labelInfo;
-
         if ($(this).hasClass('active')) {
-            labelInfo = l[16222];
+            switch (labelTxt) {
+                case "Red":
+                    labelTxt = l[19569];
+                    break;
+                case "Orange":
+                    labelTxt = l[19573];
+                    break;
+                case "Yellow":
+                    labelTxt = l[19577];
+                    break;
+                case "Green":
+                    labelTxt = l[19581];
+                    break;
+                case "Blue":
+                    labelTxt = l[19585];
+                    break;
+                case "Purple":
+                    labelTxt = l[19589];
+                    break;
+                case "Grey":
+                    labelTxt = l[19593];
+                    break;
+            }
         }
         else {
-            labelInfo = l[16221];
+            switch (labelTxt) {
+                case "Red":
+                    labelTxt = l[19568];
+                    break;
+                case "Orange":
+                    labelTxt = l[19572];
+                    break;
+                case "Yellow":
+                    labelTxt = l[19576];
+                    break;
+                case "Green":
+                    labelTxt = l[19580];
+                    break;
+                case "Blue":
+                    labelTxt = l[19584];
+                    break;
+                case "Purple":
+                    labelTxt = l[19588];
+                    break;
+                case "Grey":
+                    labelTxt = l[19592];
+                    break;
+            }
         }
-        labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
         $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
     });
 
@@ -2270,6 +2311,7 @@ FileManager.prototype.contactsUI = function() {
 
     var setContactLink = function() {
         var linkData = $publicLink.attr('data-lnk');
+        var account = M.account || false;
 
         // Exit if link exists
         if (linkData) {
@@ -2277,7 +2319,7 @@ FileManager.prototype.contactsUI = function() {
         }
 
         // Check data exists in M.account
-        if (M.account.contactLink && M.account.contactLink.length) {
+        if (account.contactLink && account.contactLink.length) {
             $publicLink.attr('data-lnk', 'https://mega.nz/C!' + M.account.contactLink);
         }
         else {
@@ -3053,6 +3095,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         var h = $(e.currentTarget).attr('id');
         var n = M.d[h] || {};
         if (n.t) {
+            if (e.ctrlKey) {
+                $.ofShowNoFolders = true;
+            }
             $('.top-context-menu').hide();
             M.openFolder(h);
         }
@@ -3244,7 +3289,10 @@ FileManager.prototype.addTreeUI = function() {
             if ($target.hasClass('opened')) {
                 M.onTreeUIExpand(id);
             }
-            M.openFolder(id);
+            if (e.ctrlKey) {
+                $.ofShowNoFolders = true;
+            }
+            M.openFolder(id, e.ctrlKey);
         }
 
         return false;

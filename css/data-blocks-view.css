@@ -204,3 +204,6 @@
     background-color: rgba(0,0,0,0.4);
     color: white;
 }
+.video.thumb .data-block-indicators i {
+    opacity: 0.8;
+}

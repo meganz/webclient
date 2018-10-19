@@ -767,6 +767,20 @@ var dlmanager = {
                 showToast('download', eekey ? l[24] : l[23]);
             }
         }
+
+        if (eekey) {
+            if (String(dl && dl.url).length > 256) {
+                // Decryption error from proxied CloudRAID download
+                eventlog(99706, JSON.stringify([1, dl && dl.id]));
+            }
+            else {
+                eventlog(99711, JSON.stringify([1, dl && dl.id]));
+            }
+        }
+
+        if (code === ETEMPUNAVAIL) {
+            eventlog(99698, true);
+        }
     },
 
     dlClearActiveTransfer: function DM_dlClearActiveTransfer(dl_id) {
@@ -1132,7 +1146,7 @@ var dlmanager = {
             $('.download.in-progress, .video-mode-wrapper', $dlPageTW).removeClass('over-quota');
             $('.download.file-info').removeClass('overquota');
         }
-        else {
+        else if (ids.length) {
             $('#' + ids.join(',#'))
                 .addClass('transfer-queued')
                 .find('.transfer-status')
@@ -1220,10 +1234,25 @@ var dlmanager = {
         }
     },
 
-    _overquotaInfo: function() {
+    _onOverQuotaAttemptRetry: function() {
+        'use strict';
 
-        api_req({a: 'uq', xfer: 1}, {
-            callback: function(res) {
+        if (!this.onOverquotaWithAchievements) {
+            if (this.isOverQuota && !this.isOverFreeQuota) {
+                this.uqFastTrack = !Object(u_attr).p;
+                delay('overquota:uqft', this._overquotaInfo.bind(this), 900);
+            }
+
+            if (typeof this.onLimitedBandwidth === 'function') {
+                this.onLimitedBandwidth();
+            }
+        }
+    },
+
+    _overquotaInfo: function() {
+        'use strict'; /* jshint -W074 */
+
+        var onQuotaInfo = function(res) {
                 if (typeof res === "number") {
                     // Error, just keep retrying
                     Soon(this._overquotaInfo.bind(this));
@@ -1307,6 +1336,17 @@ var dlmanager = {
                         }, 1000);
                 }
             }.bind(this)
+
+        M.req({a: 'uq', xfer: 1}).then(function(res) {
+            delay('overquotainfo:reply.success', function() {
+                onQuotaInfo(res);
+            });
+        }).catch(function(ex) {
+            if (d) {
+                dlmanager.logger.warn('_overquotaInfo', ex);
+            }
+
+            delay('overquotainfo:reply.error', dlmanager._overquotaInfo.bind(dlmanager));
         });
     },
 
@@ -1320,9 +1360,22 @@ var dlmanager = {
             }
             window.closeDialog();
         };
+        var open = function(url) {
+            if (is_mobile) {
+                location.href = url;
+                return false;
+            }
+            window.open.apply(window, arguments);
+        };
         var onclick = function onProClicked() {
-            self.onOverQuotaProClicked = true;
-            delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
+            if (preWarning) {
+                api_req({a: 'log', e: 99643, m: 'on overquota pre-warning upgrade/pro-plans clicked'});
+            }
+            else {
+                self.onOverQuotaProClicked = true;
+                delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
+                api_req({a: 'log', e: 99640, m: 'on overquota pro-plans clicked'});
+            }
 
             if ($(this).hasClass('reg-st3-membership-bl')) {
                 open(getAppBaseUrl() + '#propay_' + $(this).data('payment'));
@@ -1331,7 +1384,7 @@ var dlmanager = {
                 open(getAppBaseUrl() + '#pro');
             }
 
-            api_req({a: 'log', e: 99640, m: 'on overquota pro-plans clicked'});
+            return false;
         };
         var getMoreBonusesListener = function() {
             closeDialog();
@@ -1360,24 +1413,10 @@ var dlmanager = {
                 .removeAttr('style')
                 .rebind('click', this.onLimitedBandwidth.bind(this));
 
-            $('.upgrade', $dialog).rebind('click', function() {
-                api_req({a: 'log', e: 99643, m: 'on overquota pre-warning upgrade clicked'});
-
-                // closeDialog();
-
-                // if (preWarning > 1) {
-                //     loadingDialog.show();
-                    open(getAppBaseUrl() + '#pro');
-                    return false;
-                // }
-                //
-                // dlmanager.showRegisterDialog4ach($dialog, flags);
-            });
-
-            $('.reg-st3-membership-bl', $dialog).rebind('click', function() {
-                open(getAppBaseUrl() + '#propay_' + $(this).data('payment'));
-                return false;
-            });
+            if (is_mobile) {
+                // desktop has a 'continue' button, on mobile we do treat the close button as such
+                $dialog.find('.fm-dialog-close').rebind('click', this.onLimitedBandwidth.bind(this));
+            }
         }
         else {
             var $dlPageTW = $('.download.transfer-wrapper');
@@ -1389,9 +1428,6 @@ var dlmanager = {
             $('.msg-prewarning', $dialog).addClass('hidden');
 
             $('.continue', $dialog).attr('style', 'display:none');
-
-            $('.upgrade', $dialog).rebind('click', onclick);
-            $dialog.find('.reg-st3-membership-bl').rebind('click', onclick);
 
             $('.video-theatre-mode:visible').addClass('paused');
 
@@ -1420,6 +1456,8 @@ var dlmanager = {
                 $('.download.in-progress, .video-mode-wrapper', $dlPageTW).addClass('over-quota');
             }
         }
+
+        $('.upgrade, .mobile.upgrade-to-pro, .reg-st3-membership-bl', $dialog).rebind('click', onclick);
 
         $('.bottom-tips a', $dialog).rebind('click', function() {
             open(getAppBaseUrl() +
@@ -1686,8 +1724,8 @@ var dlmanager = {
             if (callback) {
                 $dialog.removeClass('registered achievements exceeded pro slider');
                 $('.bottom-tips a', $dialog).off('click');
-                $('.continue, .continue-download', $dialog).off('click');
-                $('.upgrade, .reg-st3-membership-bl', $dialog).off('click');
+                $('.continue, .continue-download, .fm-dialog-close', $dialog).off('click');
+                $('.upgrade, .reg-st3-membership-bl, .mobile.upgrade-to-pro', $dialog).off('click');
                 $('.get-more-bonuses', $dialog).off('click');
                 if ($.dialog === 'download-pre-warning') {
                     $.dialog = false;
@@ -1697,6 +1735,7 @@ var dlmanager = {
                 callback = $dialog = undefined;
             }
             delete this.onLimitedBandwidth;
+            return false;
         };
 
         flags = flags !== undefined ? flags : this.lmtUserFlags;
@@ -1724,12 +1763,6 @@ var dlmanager = {
             uiCheckboxes($dialog, 'ignoreLimitedBandwidth');
             dlmanager._overquotaClickListeners($dialog, flags, res || true);
 
-            if (is_mobile) {
-                $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {
-                    $dialog.addClass('hidden');
-                    fm_hideoverlay();
-                });
-            }
             return $dialog.removeClass('exceeded');
         });
     },
@@ -1766,6 +1799,7 @@ var dlmanager = {
             dlmanager.prepareLimitedBandwidthDialogPlans($dialog);
         });
 
+        $(document).fullScreen(false);
         this._setOverQuotaState(dlTask);
 
         if ($dialog.is(':visible') && !$dialog.hasClass('uploads')) {
@@ -1832,13 +1866,6 @@ var dlmanager = {
 
                     mBroadcaster.sendMessage(asyncTaskID);
                     asyncTaskID = null;
-                });
-            }
-
-            if (is_mobile) {
-                $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {
-                    $dialog.addClass('hidden');
-                    fm_hideoverlay();
                 });
             }
 

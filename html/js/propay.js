@@ -22,6 +22,9 @@ pro.propay = {
     /** The gateway name of the selected payment method */
     proPaymentMethod: null,
 
+    /** Whether they selected the PRO plan immediately after completing the registration process */
+    planChosenAfterRegistration: false,
+
     /** Darker background modal overlay */
     $backgroundOverlay: null,
 
@@ -1006,6 +1009,11 @@ pro.propay = {
 
         if (mega.uaoref) {
             utsRequest.uao = escapeHTML(mega.uaoref);
+        }
+
+        // If the plan was chosen immediately after registration, add an 'fr' (from registration) log to the request
+        if (pro.propay.planChosenAfterRegistration) {
+            utsRequest.fr = 1;
         }
 
         // Setup the 'uts' API request

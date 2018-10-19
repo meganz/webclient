@@ -306,16 +306,6 @@ function init_page() {
         $('body').addClass('rtl');
     }
 
-    //TODO: fix for real business page
-    localStorage.bp = 1;
-
-    if (localStorage.bp) {
-        $('body').addClass('business');
-    }
-    else {
-        $('body').removeClass('business');
-    }
-
     if (is_mobile && is_android) {
         var $html = $('html');
 
@@ -501,10 +491,8 @@ function init_page() {
         && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
         && (page !== 'contact')
-        && (page !== 'business')
-        && (page !== 'ios')
-        && (page !== 'android')
-        && (page !== 'wp')
+        && (page !== 'mobileinfo')
+        && (page !== 'uwp')
         && (page !== 'extensions')
         && (page !== 'sync')
         && (page !== 'bird')
@@ -1281,23 +1269,12 @@ function init_page() {
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
     }
-    else if (page === 'business') {
-        parsepage(pages['business']);
-        
+    else if (page === 'mobileapp') {
+        parsepage(pages['mobileapp']);
     }
     else if (page === 'extensions') {
         parsepage(pages['browsers']);
         browserspage.init();
-    }
-    else if (page === 'ios') {
-        parsepage(pages['ios']);
-    }
-    else if (page === 'android') {
-        parsepage(pages['android']);
-    }
-    else if (page === 'wp') {
-        parsepage(pages['wp']);
-        bottompage.initTabs();
     }
     else if (page === 'uwp') {
         parsepage(pages['uwp']);
@@ -1950,11 +1927,11 @@ function topmenuUI() {
 
             var subpage;
             var subPages = [
-                'about', 'account', 'android', 'backup', 'blog', 'cmd', 'contact',
+                'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
-                'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'privacycompany',
+                'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileinfo', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'wp', 'start'
+                'sync', 'takedown', 'terms', 'start', 'uwp'
             ];
             var moveTo = {'account': 'fm/account'};
 
@@ -2267,16 +2244,12 @@ function getTemplate(name) {
 function pagemetadata() {
     var mega_desc = false;
 
-    if (page == 'android') {
-        mega_title = 'Android - MEGA';
-        mega_desc = 'The MEGA Android app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
-    }
-    else if (page == 'ios') {
-        mega_title = 'iOS - MEGA';
-        mega_desc = 'The MEGA iOS app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
-    }
-    else if (page == 'wp') {
+    if (page == 'uwp') {
         mega_title = 'Windows Phone - MEGA';
+    }
+    else if (page == 'mobileinfo') {
+        mega_title = 'MEGA - Mobile Apps';
+        mega_desc = 'Securely manage your files and collaborate everyone from anywhere.';
     }
     else if (page == 'sync') {
         mega_title = 'MEGAsync - Download';

@@ -1728,7 +1728,7 @@ MegaData.prototype.labeling = function(handles, labelId) {
 
             M.labelDomUpdate(handle, newLabelState);
         });
-        
+
         M.initLabelFilter(M.v);
     }
 };
@@ -1802,15 +1802,58 @@ MegaData.prototype.updateLabelInfo = function(e) {
 
     var $t = $(e.target);
     var labelTxt = $t.data('label-txt');
-    var labelInfo;
 
-    if ($(this).hasClass('active')) {
-        labelInfo = 'Remove from filter label %1';
+    if ($(e.target).hasClass('active')) {
+        switch (labelTxt) {
+            case "Red":
+                labelTxt = l[19571];
+                break;
+            case "Orange":
+                labelTxt = l[19575];
+                break;
+            case "Yellow":
+                labelTxt = l[19579];
+                break;
+            case "Green":
+                labelTxt = l[19583];
+                break;
+            case "Blue":
+                labelTxt = l[19587];
+                break;
+            case "Purple":
+                labelTxt = l[19591];
+                break;
+            case "Grey":
+                labelTxt = l[19595];
+                break;
+        }
     }
     else {
-        labelInfo = 'Add filter by label %1';
+        switch (labelTxt) {
+            case "Red":
+                labelTxt = l[19570];
+                break;
+            case "Orange":
+                labelTxt = l[19574];
+                break;
+            case "Yellow":
+                labelTxt = l[19578];
+                break;
+            case "Green":
+                labelTxt = l[19582];
+                break;
+            case "Blue":
+                labelTxt = l[19586];
+                break;
+            case "Purple":
+                labelTxt = l[19590];
+                break;
+            case "Grey":
+                labelTxt = l[19594];
+                break;
+        }
     }
-    labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
+
     $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
 };
 
@@ -1897,10 +1940,10 @@ MegaData.prototype.initLabelFilter = function(nodelist) {
     if (d){
         console.log('checking label is existing');
     }
-    
+
     var $fmMenu = $('.colour-sorting-menu .dropdown-section .dropdown-item-label')
         .add('.colour-sorting-menu .dropdown-section.filter-by .labels');
-        
+
     if (this.isLabelExistNodeList(nodelist)){
         $fmMenu.removeClass('disabled static');
         if (d){
@@ -2521,7 +2564,7 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
 
         api_req(req, {
             callback: function(res) {
-                if (d) {
+                if (d > 1) {
                     console.log('Create folder result...', res);
                 }
                 if (res && typeof res === 'object') {
@@ -2534,24 +2577,35 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
                         return reject(EINTERNAL);
                     }
 
-                    $('.fm-new-folder').removeClass('active');
-                    $('.create-new-folder').addClass('hidden');
-                    $('.create-new-folder input').val('');
-                    newnodes = [];
+                    newnodes = newnodes || [];
 
                     // this is only safe once sn enforcement has been deployed
                     M.addNode(n);
                     ufsc.addNode(n);
 
-                    M.updFileManagerUI()
-                        .always(function() {
+                    if (!M._cfUIUpdateQ) {
+                        M._cfUIUpdateQ = [];
+                    }
+                    M._cfUIUpdateQ.push([resolve, n.h]);
+
+                    delay('createfolder:ui-update', function() {
+                        $('.fm-new-folder').removeClass('active');
+                        $('.create-new-folder').addClass('hidden');
+                        $('.create-new-folder input').val('');
+
+                        M.updFileManagerUI().always(function() {
                             if ($.copyDialog || $.moveDialog) {
                                 refreshDialogContent();
                             }
                             hideOverlay();
 
-                            resolve(n.h);
+                            for (var i = M._cfUIUpdateQ.length; i--;) {
+                                var q = M._cfUIUpdateQ[i];
+                                q[0](q[1]);
+                            }
+                            delete M._cfUIUpdateQ;
                         });
+                    });
                 }
                 else {
                     hideOverlay();
@@ -2569,6 +2623,81 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
     }
 
     return ulparams;
+};
+
+/**
+ * Create new folder on the cloud
+ * @param {Object} paths Object containing folders on keys, node handles will be filled as their values
+ * @param {String} target Node handle where the paths will be created
+ * @return {MegaPromise}
+ */
+MegaData.prototype.createFolders = function(paths, target) {
+    'use strict';
+    var promise = new MegaPromise();
+    var logger = MegaLogger.getLogger('mkdir', false, this.logger);
+
+    // paths walker to create hierarchy
+    var walk = function(paths, s) {
+        var p = paths.shift();
+
+        if (p) {
+            s = walk(paths, s[p] = s[p] || Object.create(null));
+        }
+        return s;
+    };
+
+    var struct = Object.create(null);
+    var folders = Object.keys(paths);
+
+    // create paths hierarchy
+    for (var i = folders.length; i--;) {
+        var path = folders[i];
+
+        Object.defineProperty(walk(M.getSafePath(path), struct), 'path', {value: path});
+    }
+    folders = folders.length;
+
+    (function _mkdir(s, t) {
+        if (d > 1) {
+            logger.debug('mkdir under %s (%s) for...', t, M.getNodeByHandle(t).name, s);
+        }
+        Object.keys(s).forEach(function(name) {
+            M.createFolder(t, name, new MegaPromise()).always(function(res) {
+                if (res.length !== 8) {
+                    var err = 'Failed to create folder "%s" on target %s(%s)';
+                    logger.warn(err, name, t, M.getNodeByHandle(t).name, res);
+                    return promise.reject(res);
+                }
+
+                var c = s[name]; // children for the just created folder
+
+                if (c.path) {
+                    if (d) {
+                        console.assert(paths[c.path] === null, 'Hmm... check this...');
+                    }
+
+                    // record created folder node handle
+                    paths[c.path] = res;
+                    folders--;
+                }
+
+                if (d > 1) {
+                    logger.debug('folder "%s" got handle %s on %s (%s)', name, res, t, M.getNodeByHandle(t).name);
+                }
+
+                onIdle(_mkdir.bind(null, c, res));
+            });
+        });
+
+        if (!folders) {
+            if (d) {
+                logger.info('Operation completed.', paths);
+            }
+            promise.resolve(paths);
+        }
+    })(struct, target);
+
+    return promise;
 };
 
 // leave incoming share h
@@ -3167,8 +3296,9 @@ MegaData.prototype.importWelcomePDF = function() {
                 if (typeof res.at === 'string') {
                     M.onFileManagerReady(function() {
                         var doit = true;
-                        for (var i = M.v.length; i--;) {
-                            if (fileext(M.v[i].name) === 'pdf') {
+                        var keys = Object.keys(M.d);
+                        for (var i = keys.length; i--;) {
+                            if (fileext(M.d[keys[i]].name) === 'pdf') {
                                 doit = false;
                                 break;
                             }
@@ -3288,15 +3418,18 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
     "use strict";
 
     var _import = function(data) {
-        $.mcImport = true;
-        $.selected = data[0];
-        $.onImportCopyNodes = data[1];
-        $.onImportCopyNodes.opSize = data[2];
+        M.onFileManagerReady(function() {
+            openCopyDialog(function() {
+                $.mcImport = true;
+                $.selected = data[0];
+                $.onImportCopyNodes = data[1];
+                $.onImportCopyNodes.opSize = data[2];
 
-        if (d) {
-            console.log('Importing Nodes...', $.selected, $.onImportCopyNodes, data[2]);
-        }
-        $('.dropdown-item.copy-item').click();
+                if (d) {
+                    console.log('Importing Nodes...', $.selected, $.onImportCopyNodes, data[2]);
+                }
+            });
+        });
     };
 
     if (localStorage.folderLinkImport && !folderlink) {

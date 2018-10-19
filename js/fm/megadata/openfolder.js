@@ -27,15 +27,18 @@
      */
     var _openFolderCompletion = function(id, newHashLocation, first, promise) {
         // if the id is a file handle, then set the folder id as the file's folder.
+        var n;
         var fid;
         if (M.d[id] && (M.d[id].t === 0)) {
             fid = fileversioning.getTopNodeSync(id);
             id = M.d[fid].p;
         }
-
         this.previousdirid = this.currentdirid;
         this.currentdirid = id;
         this.currentrootid = this.chat ? "chat" : this.getNodeRoot(id);
+        this.currentLabelType = M.labelType();
+        this.currentLabelFilter = M.filterLabel[this.currentLabelType];
+        this.fmsorting = (id === 'contacts' || id === 'shares') ? 0 : fmconfig.uisorting;
 
         if (first) {
             fminitialized = true;
@@ -101,11 +104,44 @@
                     this.v = [];
                 }
             }
+            else if ($.ofShowNoFolders) {
+                delete $.ofShowNoFolders;
+
+                this.v = (function _(v) {
+                    var p = [];
+                    var hton = function(h) {
+                        return M.d[h];
+                    };
+                    var fltn = function(h) {
+                        var n = M.d[h];
+                        if (n) {
+                            if (!n.t) {
+                                return h;
+                            }
+                            p.push(h);
+                        }
+                        return '';
+                    };
+                    return v.reduce(function(v, h) {
+                        return v.concat(Object.keys(M.c[h] || {}));
+                    }, []).map(fltn).filter(String).map(hton).concat(p.length ? _(p) : []);
+                })([id]);
+            }
+            else if (id === 'opc') {
+                this.v = Object.values(this.opc || {});
+            }
+            else if (id === 'ipc') {
+                this.v = Object.values(this.ipc || {});
+            }
             else if (id.substr(0, 6) === 'search') {
                 this.filterBySearch(this.currentdirid);
             }
             else {
                 this.filterByParent(this.currentdirid);
+            }
+
+            if (id.substr(0, 4) !== 'chat' && id.substr(0, 9) !== 'transfers') {
+                this.labelFilterBlockUI();
             }
 
             var viewmode = 0;// 0 is list view, 1 block view
@@ -123,7 +159,7 @@
             }
             else {
                 for (var i = Math.min(this.v.length, 200); i--;) {
-                    var n = this.v[i];
+                    n = this.v[i];
 
                     if (String(n.fa).indexOf(':0*') > 0 || is_image2(n)
                         || is_video(n) || MediaInfoLib.isFileSupported(n)) {
@@ -144,7 +180,7 @@
                 this.doSort(this.overrideSortMode[0], this.overrideSortMode[1]);
                 delete this.overrideSortMode;
             }
-            else if (fmconfig.uisorting && fmconfig.sorting) {
+            else if (this.fmsorting && fmconfig.sorting) {
                 this.doSort(fmconfig.sorting.n, fmconfig.sorting.d);
             }
             else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) {
@@ -153,30 +189,12 @@
             else if (this.currentdirid === 'contacts') {
                 this.doSort('status', 1);
             }
+            else if (this.currentdirid === 'opc' || this.currentdirid === 'ipc') {
+                M.doSort('email', 1);
+            }
             else {
                 this.doSort('name', 1);
             }
-
-            if (this.currentdirid === 'opc') {
-                this.v = [];
-                for (var a in this.opc) {
-                    this.v.push(this.opc[a]);
-                }
-                this.doSort('email', 1);
-            }
-            else if (this.currentdirid === 'ipc') {
-                this.v = [];
-                for (var h in this.ipc) {
-                    this.v.push(this.ipc[h]);
-                }
-                this.doSort('email', 1);
-            }
-            // else if (this.currentdirid === 'user-management') {
-            //    this.v = [];
-            //    for (var k in this.suba) {
-            //        this.v.push(this.suba[k]);
-            //    }
-            // }
 
             this.renderMain();
 
@@ -191,9 +209,9 @@
                 }
 
                 if ($('#treea_' + currentdirid).length === 0) {
-                    var n1 = this.d[currentdirid];
-                    if (n1 && n1.p) {
-                        M.onTreeUIOpen(n1.p, false, true);
+                    n = this.d[currentdirid];
+                    if (n && n.p) {
+                        M.onTreeUIOpen(n.p, false, true);
                     }
                 }
                 M.onTreeUIOpen(currentdirid, currentdirid === 'contacts');
@@ -208,7 +226,6 @@
                 M.renderPath(fid);
             });
         }
-
 
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {
@@ -244,8 +261,14 @@
             console.error(ex);
         }
 
+        this.currentTreeType = M.treePanelType();
+
         M.searchPath();
         M.treeSearchUI();
+        M.treeSortUI();
+        M.treeFilterUI();
+        M.initLabelFilter(this.v);
+        M.redrawTreeFilterUI();
 
         promise.resolve(id);
         mBroadcaster.sendMessage('mega:openfolder');
@@ -434,15 +457,15 @@
 
         var promise = new MegaPromise();
 
-        if (fetchdbnodes) {
+        if (fetchdbnodes || $.ofShowNoFolders) {
+            var tp = $.ofShowNoFolders ? dbfetch.tree([id]) : dbfetch.get(id);
 
-            dbfetch.get(id)
-                .always(function() {
-                    if (!M.d[id]) {
-                        id = M.RootID;
-                    }
-                    _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
-                });
+            tp.always(function() {
+                if (!M.d[id]) {
+                    id = M.RootID;
+                }
+                _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
+            });
         }
         else if (fetchshares || id === 'shares') {
             dbfetch.geta(Object.keys(M.c.shares || {}))

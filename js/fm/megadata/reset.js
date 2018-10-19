@@ -11,6 +11,8 @@ MegaData.prototype.reset = function() {
     this.tree = Object.create(null);
     this.c.shares = Object.create(null);
     this.c.contacts = Object.create(null);
+    this.filterLabel = Object.create(null);
+    this.filterTreePanel = Object.create(null);
 
     // M.d & M.c for chat
     this.chd = Object.create(null);

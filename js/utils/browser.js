@@ -8,7 +8,7 @@ function browserdetails(useragent) {
     var browser = false;
     var icon = '';
     var name = '';
-    var brand = '';
+    var verSep = "\\s+";
     var verTag = '';
     var nameTrans = '';
     var current = false;
@@ -55,11 +55,22 @@ function browserdetails(useragent) {
         || useragent.indexOf('darwin') > 0) {
         os = 'Apple';
     }
-    else if (useragent.indexOf('linux') > 0) {
+    else if (useragent.indexOf('linux') > 0
+        || useragent.indexOf('freebsd') > 0
+        || useragent.indexOf('netbsd') > 0
+        || useragent.indexOf('openbsd') > 0
+        || useragent.indexOf('sunos') > 0
+        || useragent.indexOf('gentoo') > 0) {
         os = 'Linux';
     }
     else if (useragent.indexOf('blackberry') > 0) {
         os = 'Blackberry';
+    }
+    else if (useragent.indexOf(' cros ') > 0) {
+        os = 'ChromeOS';
+    }
+    else if (useragent.indexOf(' kaios') > 0) {
+        os = 'KaiOS';
     }
 
     if (mega.browserBrand[brand]) {
@@ -74,6 +85,9 @@ function browserdetails(useragent) {
         browser = 'Internet Explorer';
     }
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
+        if (useragent.indexOf(' opr/') > 0) {
+            verTag = 'opr';
+        }
         browser = 'Opera';
     }
     else if (useragent.indexOf(' dragon/') > 0) {
@@ -86,7 +100,7 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('maxthon') > 0) {
         browser = 'Maxthon';
     }
-    else if (useragent.indexOf('electron') > 0) {
+    else if (useragent.indexOf(' electron/') > 0) {
         browser = 'Electron';
     }
     else if (useragent.indexOf('palemoon') > 0) {
@@ -110,6 +124,9 @@ function browserdetails(useragent) {
     else if (useragent.indexOf(' iron/') > 0) {
         browser = 'Iron';
     }
+    else if (useragent.indexOf(' superbird/') > 0) {
+        browser = 'Superbird';
+    }
     else if (useragent.indexOf('avant browser') > 0) {
         browser = 'Avant';
     }
@@ -119,16 +136,92 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('k-meleon') > 0) {
         browser = 'K-Meleon';
     }
+    else if (useragent.indexOf(' edga/') > 0) {
+        os = 'Android';
+        browser = 'Edge';
+        details.brand = verTag = 'EdgA';
+    }
+    else if (useragent.indexOf(' edgios') > 0) {
+        browser = 'Edge';
+        details.brand = verTag = 'EdgiOS';
+    }
     else if (useragent.indexOf(' crios') > 0) {
         browser = 'Chrome';
         details.brand = verTag = 'CriOS';
+    }
+    else if (useragent.indexOf(' opios') > 0) {
+        browser = 'Opera';
+        details.brand = verTag = 'OPiOS';
+    }
+    else if (useragent.indexOf(' fxios') > 0) {
+        browser = 'Firefox';
+        details.brand = verTag = 'FxiOS';
+    }
+    else if (useragent.indexOf('ucbrowser') > 0) {
+        browser = 'UCBrowser';
+    }
+    else if (useragent.indexOf('samsungbrowser') > 0) {
+        icon = 'samsung.png';
+        browser = 'SamsungBrowser';
+    }
+    else if (useragent.indexOf('yabrowser') > 0) {
+        browser = 'YaBrowser';
+    }
+    else if (useragent.indexOf('miuibrowser') > 0) {
+        verTag = 'XiaoMi/MiuiBrowser';
+        browser = 'MiuiBrowser';
+    }
+    else if (useragent.indexOf('puffin/') > 0) {
+        browser = 'Puffin';
+    }
+    else if (useragent.indexOf(' mcent/') > 0) {
+        browser = 'mCent';
+    }
+    else if (useragent.indexOf(' avast/') > 0 || useragent.indexOf(' asw/') > 0) {
+        if (useragent.indexOf(' asw/') > 0) {
+            verTag = 'ASW';
+        }
+        browser = 'Avast';
+    }
+    else if (useragent.indexOf(' vivobrowser/') > 0) {
+        browser = 'VivoBrowser';
+    }
+    else if (useragent.indexOf('qqbrowser/') > 0) {
+        browser = 'QQBrowser';
+    }
+    else if (useragent.indexOf('coc_coc_browser') > 0) {
+        browser = 'Coc';
+        icon = 'coc.png';
+        verTag = 'coc_coc_browser';
+    }
+    else if (useragent.indexOf(' [fb') > 0
+        || useragent.indexOf(' steam ') > 0
+        || useragent.indexOf(' eve-') > 0
+        || useragent.indexOf(' kik/') > 0
+        || useragent.indexOf('messenger') > 0
+        || useragent.indexOf('twit' + 'ter') > 0
+        || useragent.indexOf('cros' + 'swalk') > 0
+        || useragent.indexOf('snap' + 'chat') > 0
+        || useragent.indexOf('pint' + 'erest') > 0
+        || useragent.indexOf('inst' + 'agram') > 0) {
+
+        if (useragent.indexOf(' [fb') > 0) {
+            verSep = ';';
+            verTag = 'FBAV';
+        }
+        icon = 'app.png';
+        browser = 'In-App WebView';
+        details.brand = os === 'Android' ? 'Chrome' : 'Safari';
+    }
+    else if (useragent.indexOf(' chromium/') > 0) {
+        browser = 'Chromium';
     }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
     }
     else if (useragent.indexOf('safari') > 0) {
         verTag = 'Version';
-        browser = 'Safari';
+        browser = os === 'Android' || os === 'Linux' ? null : 'Safari';
     }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
@@ -167,6 +260,7 @@ function browserdetails(useragent) {
         name = 'Unknown';
         icon = 'unknown.png';
     }
+
     if (!icon && browser) {
         if (browser === 'Internet Explorer' || browser === 'Edge') {
             icon = 'ie.png';
@@ -176,13 +270,18 @@ function browserdetails(useragent) {
         }
     }
 
+    if (browser === null && os === 'Android') {
+        icon = 'android.png';
+        name = browser = 'Android Browser';
+    }
+
     details.name = name;
     details.nameTrans = nameTrans || name;
     details.icon = icon;
     details.os = os || '';
     details.browser = browser;
     details.version =
-        (useragent.match(RegExp("\\s+" + (verTag || brand || browser) + "/([\\d.]+)", 'i')) || [])[1] || 0;
+        (useragent.match(RegExp(verSep + (verTag || brand || browser) + "/([\\d.]+)", 'i')) || [])[1] || 0;
 
     // Determine if the OS is 64bit
     details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
@@ -209,6 +308,9 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('gecko') > 0) {
         details.engine = 'Gecko';
+    }
+    else if (useragent.indexOf('presto') > 0) {
+        details.engine = 'Presto';
     }
     else {
         details.engine = 'Unknown';

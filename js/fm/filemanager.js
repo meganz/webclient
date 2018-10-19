@@ -1,4 +1,6 @@
 function FileManager() {
+    "use strict";
+
     this.logger = new MegaLogger('FileManager');
 }
 FileManager.prototype.constructor = FileManager;
@@ -54,7 +56,6 @@ FileManager.prototype.initFileManager = function() {
                     promise.resolve.apply(promise, arguments);
                 });
         });
-
     return promise;
 };
 
@@ -428,6 +429,8 @@ FileManager.prototype.initFileManagerUI = function() {
     InitFileDrag();
     M.createFolderUI();
     M.treeSearchUI();
+    M.treeFilterUI();
+    M.treeSortUI();
     M.initTreePanelSorting();
     M.initContextUI();
     initShareDialog();
@@ -456,9 +459,9 @@ FileManager.prototype.initFileManagerUI = function() {
         }
 
         M.openFolder(M.currentdirid, true)
-            .always(function() {
-                reselect();
-            });
+        .always(function() {
+            reselect();
+        });
 
         return false;
     });
@@ -485,6 +488,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         $('.grid-url-arrow').removeClass('active');
         $('.nw-sorting-menu').addClass('hidden');
+        $('.colour-sorting-menu').addClass('hidden');
         $('.fm-start-chat-dropdown').addClass('hidden').removeClass('active');
         $('.start-chat-button').removeClass('active');
         $('.nw-tree-panel-arrows').removeClass('active');
@@ -512,6 +516,8 @@ FileManager.prototype.initFileManagerUI = function() {
 
         // Remove all sub-menues from context-menu move-item
         $('#csb_' + M.RootID).empty();
+
+        $(window).off('resize.ccmui');
     };
 
     $('#fmholder').rebind('click.contextmenu', function(e) {
@@ -576,6 +582,11 @@ FileManager.prototype.initFileManagerUI = function() {
         return false;
     });
 
+    // stop sort and filter dialog clicking close itself
+    $('.nw-sorting-menu').on('click', function(e) {
+        e.stopPropagation();
+    });
+
     var fmTabState;
     var isMegaSyncTransfer = true;
     $('.nw-fm-left-icon').rebind('click', function(e) {
@@ -601,7 +612,6 @@ FileManager.prototype.initFileManagerUI = function() {
                 'user-management':      {root: 'user-management', prev: null}
             };
         }
-
         if ((ul_queue && ul_queue.length) || (dl_queue && dl_queue.length)) {
             isMegaSyncTransfer = false;
         }
@@ -940,6 +950,10 @@ FileManager.prototype.initContextUI = function() {
             pos = $this.offset(),
             menuPos,
             currentId;
+
+        if ($this.hasClass('disabled')){
+            return false;
+        }
 
         // Hide opened submenus
         if (!$this.parent().parent().hasClass('submenu')) {
@@ -1295,26 +1309,126 @@ FileManager.prototype.initContextUI = function() {
         openCopyDialog('conversations');
     });
 
-    $('.labels .dropdown-colour-item').rebind('click', function() {
+    $('.submenu.labels .dropdown-colour-item').rebind('click', function() {
         var labelId = parseInt(this.dataset.labelId);
 
         if (labelId && (M.getNodeRights($.selected[0]) > 1)) {
-            M.colourLabeling($.selected, labelId);
+            M.labeling($.selected, labelId);
+        }
+
+        // refresh page for filter and sort with new label.
+        M.openFolder(M.currentdirid, true);
+    });
+
+    $('.colour-sorting-menu .filter-by .dropdown-colour-item').rebind('click', function(e) {
+        if (d){
+            console.log('label color selected');
+        }
+        var labelId = parseInt(this.dataset.labelId);
+        var parent = $(this).parents('.labels');
+
+        if (labelId && !parent.hasClass("disabled")) {
+            // init M.filterLabel[type] if not exist.
+            if (!M.currentLabelFilter) {
+                M.filterLabel[M.currentLabelType] = Object.create(null);
+            }
+
+            M.applyLabelFilter(e);
         }
     });
 
-    $('.labels .dropdown-colour-item').rebind('mouseover', function() {
-        var labelTxt = this.dataset.labelTxt;
-        var labelInfo;
+    $('.filter-block.fm .filter-block.close').rebind('click', function() {
+        delete M.filterLabel[M.currentLabelType];
+        $('.colour-sorting-menu .dropdown-colour-item').removeClass('active');
+        $('.filter-block.fm.body')
+            .addClass('hidden')// Hide 'Filter:' DOM elements
+            .find('.colour-label-ind').remove();// Remove all colors from it
 
+        $.hideContextMenu();
+        M.openFolder(M.currentdirid, true);
+    });
+
+    $('.filter-block.shares .filter-block.close').rebind('click', function() {
+        delete M.filterLabel[M.currentLabelType];
+        $('.colour-sorting-menu .dropdown-colour-item').removeClass('active');
+        $('.filter-block.shares.body')
+        .addClass('hidden')// Hide 'Filter:' DOM elements
+        .find('.colour-label-ind').remove();// Remove all colors from it
+
+        $.hideContextMenu();
+        M.openFolder(M.currentdirid, true);
+    });
+
+    $('.filter-block.rubbish .filter-block.close').rebind('click', function() {
+        delete M.filterLabel[M.currentLabelType];
+        $('.colour-sorting-menu .dropdown-colour-item').removeClass('active');
+        $('.filter-block.rubbish.body')
+        .addClass('hidden')// Hide 'Filter:' DOM elements
+        .find('.colour-label-ind').remove();// Remove all colors from it
+
+        $.hideContextMenu();
+        M.openFolder(M.currentdirid, true);
+    });
+
+    $('.submenu.labels .dropdown-colour-item').rebind('mouseover.clrSort', function() {
+        var labelTxt = this.dataset.labelTxt;
         if ($(this).hasClass('active')) {
-            labelInfo = l[16222];
+            switch (labelTxt) {
+                case "Red":
+                    labelTxt = l[19569];
+                    break;
+                case "Orange":
+                    labelTxt = l[19573];
+                    break;
+                case "Yellow":
+                    labelTxt = l[19577];
+                    break;
+                case "Green":
+                    labelTxt = l[19581];
+                    break;
+                case "Blue":
+                    labelTxt = l[19585];
+                    break;
+                case "Purple":
+                    labelTxt = l[19589];
+                    break;
+                case "Grey":
+                    labelTxt = l[19593];
+                    break;
+            }
         }
         else {
-            labelInfo = l[16221];
+            switch (labelTxt) {
+                case "Red":
+                    labelTxt = l[19568];
+                    break;
+                case "Orange":
+                    labelTxt = l[19572];
+                    break;
+                case "Yellow":
+                    labelTxt = l[19576];
+                    break;
+                case "Green":
+                    labelTxt = l[19580];
+                    break;
+                case "Blue":
+                    labelTxt = l[19584];
+                    break;
+                case "Purple":
+                    labelTxt = l[19588];
+                    break;
+                case "Grey":
+                    labelTxt = l[19592];
+                    break;
+            }
         }
-        labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
-        $('.labels .dropdown-color-info').text(labelTxt).addClass('active');
+        $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
+    });
+
+    $('.colour-sorting-menu .labels .dropdown-colour-item').rebind('mouseover.clrSort', function(e) {
+        if (!$(this).parents('.labels').hasClass('disabled')){
+            M.updateLabelInfo(e);
+        }
     });
 
     $('.labels .dropdown-colour-item').rebind('mouseout', function() {
@@ -1717,11 +1831,14 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
         else if ((e.keyCode === 13) && ($.dialog === 'share')) {
-            var share = new mega.Share();
-            share.updateNodeShares();
+            addNewContact($('.add-user-popup-button'), false).done(function() {
+                var share = new mega.Share();
+                share.updateNodeShares();
+                $('.token-input-token-mega').remove();
+            });
         }
         else if ((e.keyCode === 13) && ($.dialog === 'add-contact-popup')) {
-            addNewContact($('.add-user-popup-button.add'));
+            addNewContact($('.add-user-popup-button'));
         }
         else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
             $('.rename-dialog-button.rename').trigger('click');
@@ -2195,6 +2312,7 @@ FileManager.prototype.contactsUI = function() {
 
     var setContactLink = function() {
         var linkData = $publicLink.attr('data-lnk');
+        var account = M.account || false;
 
         // Exit if link exists
         if (linkData) {
@@ -2202,7 +2320,7 @@ FileManager.prototype.contactsUI = function() {
         }
 
         // Check data exists in M.account
-        if (M.account.contactLink && M.account.contactLink.length) {
+        if (account.contactLink && account.contactLink.length) {
             $publicLink.attr('data-lnk', 'https://mega.nz/C!' + M.account.contactLink);
         }
         else {
@@ -2686,39 +2804,55 @@ FileManager.prototype.addGridUI = function(refresh) {
         M.renderMain();
     });
 
-    $('.grid-table-header .arrow').rebind('click', function() {
+    $('.grid-table-header .arrow').rebind('click', function(e) {
         var cls = $(this).attr('class');
         var dir = 1;
 
-        if (cls && cls.indexOf('desc') > -1) {
-            dir = -1;
+        // Excludes colour sorting dialog for contacts
+        if (cls.indexOf('name') !== -1 && $(this).parents('.files-grid-view.contacts-view').length === 0) {
+            return M.labelSortMenuUI(e);
         }
+        else {
+            M.resetLabelSortMenuUI();
 
-        for (var sortBy in M.sortRules) {
-            if (cls.indexOf(sortBy) !== -1) {
-                M.doSort(sortBy, dir);
-                M.renderMain();
-                break;
+            if (cls && cls.indexOf('desc') > -1) {
+                dir = -1;
+            }
+            for (var sortBy in M.sortRules) {
+                if (cls.indexOf(sortBy) !== -1) {
+                    M.doSort(sortBy, dir);
+                    M.renderMain();
+                    break;
+                }
             }
         }
-
-        return false;
     });
 
     $('.grid-first-th').rebind('click', function() {
-        var c = $(this).children().first().attr('class');
+        var $el = $(this).children().first();
+        var c = $el.attr('class');
         var d = 1;
 
         if (c && (c.indexOf('desc') > -1)) {
             d = -1;
+            $el.removeClass('desc').addClass('asc');
+        }
+        else {
+            $el.removeClass('asc').addClass('desc');
         }
 
-        for (var e in M.sortRules) {
-            if (M.sortRules.hasOwnProperty(e)) {
-                if (c.indexOf(e) !== -1) {
-                    M.doSort(e, d);
-                    M.renderMain();
-                    break;
+        var fav = function(el) {
+            return el.fav;
+        };
+
+        if (M.v.some(fav)) {
+            for (var f in M.sortRules) {
+                if (M.sortRules.hasOwnProperty(f)) {
+                    if (c.indexOf(f) !== -1) {
+                        M.doSort(f, d);
+                        M.renderMain();
+                        break;
+                    }
                 }
             }
         }
@@ -2901,15 +3035,11 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         }
     });
 
-
-
-
     $ddUIitem.rebind('contextmenu', function(e) {
         if (e.shiftKey) {
             selectionManager.shift_select_to($(this).attr('id'), false, true, true);
         }
-        else if (e.ctrlKey !== false || e.metaKey !== false)
-        {
+        else if (e.ctrlKey !== false || e.metaKey !== false) {
             selectionManager.add_to_selection($(this).attr('id'));
         }
         else {
@@ -2921,10 +3051,15 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 selectionManager.add_to_selection($(this).attr('id'));
             }
 
+            // Show sort menu for FM, block view only
+            // if (fmconfig.viewmodes && fmconfig.viewmodes[M.currentdirid]) {
+            //     return M.labelSortMenuUI(e, true);
+            // }
         }
 
         M.searchPath();
         $.hideTopMenu();
+
         return !!M.contextMenuUI(e, 1);
     });
 
@@ -2970,6 +3105,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         var h = $(e.currentTarget).attr('id');
         var n = M.d[h] || {};
         if (n.t) {
+            if (e.ctrlKey) {
+                $.ofShowNoFolders = true;
+            }
             $('.top-context-menu').hide();
             M.openFolder(h);
         }
@@ -3161,7 +3299,10 @@ FileManager.prototype.addTreeUI = function() {
             if ($target.hasClass('opened')) {
                 M.onTreeUIExpand(id);
             }
-            M.openFolder(id);
+            if (e.ctrlKey) {
+                $.ofShowNoFolders = true;
+            }
+            M.openFolder(id, e.ctrlKey);
         }
 
         return false;
@@ -3228,8 +3369,9 @@ FileManager.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     var id_r = this.getNodeRoot(id);
     var id_s = id.split('/')[0];
     var e, scrollTo = false, stickToTop = false;
-
-    //console.error("treeUIopen", id);
+    if (d){
+        console.log("treeUIopen", id);
+    }
 
     if (id_r === 'shares') {
         this.onSectionUIOpen('shared-with-me');

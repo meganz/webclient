@@ -840,7 +840,7 @@ var GenericConversationMessage = React.createClass({
 
                                             if (exists) {
                                                 closeDialog();
-                                                msgDialog('warningb', '', l[7413]);
+                                                msgDialog('warningb', '', l[17545]);
                                             }
                                             else {
                                                 M.inviteContact(M.u[u_handle].m, contactEmail);

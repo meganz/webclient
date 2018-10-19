@@ -188,7 +188,7 @@
             }
             catch (ex) {
             }
-            return new Blob(dblob, {type: filemime(name)});
+            return new Blob(dblob || [], {type: filemime(name)});
         };
 
         if (is_mobile) {

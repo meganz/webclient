@@ -31,6 +31,9 @@ mobile.twofactor.verifyDisable = {
 
         // Show the account page content
         mobile.twofactor.verifyDisable.$page.removeClass('hidden');
+
+        // Put the focus in the PIN input field after its visible
+        mobile.twofactor.verifyDisable.$page.find('.two-factor-seed-input input').trigger('focus');
     },
 
     /**
@@ -74,7 +77,7 @@ mobile.twofactor.verifyDisable = {
         'use strict';
 
         // Cache selectors
-        var $pinCode = mobile.twofactor.verifyDisable.$page.find('.two-factor-seed-input input');
+        var $pinCodeInput = mobile.twofactor.verifyDisable.$page.find('.two-factor-seed-input input');
         var $verifyButton = mobile.twofactor.verifyDisable.$page.find('.two-factor-verify-btn');
         var $warningText = mobile.twofactor.verifyDisable.$page.find('.warning-text-field');
 
@@ -82,7 +85,7 @@ mobile.twofactor.verifyDisable = {
         $verifyButton.off('tap').on('tap', function() {
 
             // Get the Google Authenticator PIN code from the user
-            var pinCode = $.trim($pinCode.val());
+            var pinCode = $.trim($pinCodeInput.val());
 
             loadingDialog.show();
 
@@ -102,7 +105,10 @@ mobile.twofactor.verifyDisable = {
 
                         // If there was an error, show a message that the code was incorrect and clear the text field
                         $warningText.removeClass('hidden');
-                        $pinCode.val('');
+                        $pinCodeInput.val('');
+
+                        // Put the focus in the PIN input field
+                        $pinCodeInput.trigger('focus');
                     }
                     else {
                         // Render the Disabled page

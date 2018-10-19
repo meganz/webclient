@@ -454,7 +454,8 @@
             .rebind("input.testerresize", function() {
                 $(this).trigger("keydown");
             })
-            .on('keyup', function(event) {
+            // keydown instead of keyup to preventDefault.
+            .on('keydown', function(event) {
                 /* jshint -W074 */
 
                 var next_token;
@@ -553,6 +554,8 @@
                     case KEY.COMMA:
                     case KEY.SEMICOLON:
 
+                        // preventDefault to remove default behaviour from the keydown.
+                        event.preventDefault();
                         if (this.value.length) {
                             if (selected_dropdown_item) {
                                 add_token($(selected_dropdown_item).data("tokeninput"));
@@ -577,12 +580,30 @@
                         }
 
                         // If users press enter/return on empty input field behave like done/share button is clicked
-                        else {
+                        else if (event.keyCode === KEY.ENTER || event.keyCode === KEY.NUMPAD_ENTER) {
+                            var $addContactBtn;
+                            var cd;
+                            if ($.dialog === "share") { // if it is share dialog
+                                $addContactBtn = $('.share-dialog .dialog-share-button');
+                                cd = false;
+                            }
+                            else if ($.dialog === "add-user-popup") { // if it is add user dialog.
+                                $addContactBtn = $('.add-user-popup-button');
+                                cd = true;
+                            }
+                            else {
+                                // FIXME: what is this?
+                                console.warn('Cannot add contact from here...', $.dialog);
+                                return false;
+                            }
 
-                            var share = new mega.Share();
-                            share.updateNodeShares();
-
-                            addNewContact($('.add-user-popup-button.add'));
+                            addNewContact($addContactBtn, cd).done(function() {
+                                if ($.dialog === "share") {
+                                    var share = new mega.Share();
+                                    share.updateNodeShares();
+                                }
+                                $('.token-input-token-mega').remove();
+                            });
                         }
 
                         return false;

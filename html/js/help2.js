@@ -779,7 +779,7 @@ var Help = (function() {
             helpAlreadyLogged = true;
             api_req({
                 a: 'log',
-                e: 99332,
+                e: 99704,
                 m: 'web help viewed'
             });
         }

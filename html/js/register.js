@@ -202,6 +202,10 @@ function continueOldRegistration(result) {
 
         localStorage.awaitingConfirmationAccount = JSON.stringify(rv);
 
+        if (mega.affid) {
+            ops.aff = mega.affid;
+        }
+
         api_req(ops);
     }
     else if (result === EACCESS || result === EEXIST) {
@@ -430,7 +434,7 @@ function init_register() {
             $('.register-check', $formWrapper).removeClass('checkboxOff')
                 .addClass('checkboxOn');
         };
-        bottomPageDialog(false, 'terms');
+        bottomPageDialog(false, 'terms', false, true);
         return false;
     });
     

@@ -665,6 +665,10 @@ security.register = {
             name2: base64urlencode(to8(firstName + ' ' + lastName))
         };
 
+        if (mega.affid) {
+            options.aff = mega.affid;
+        }
+
         // Send API request
         api_req(options);
     },
@@ -965,7 +969,7 @@ security.login = {
         u_storage.sid = decryptedSessionIdBase64;
 
         // Notify other tabs of login
-        watchdog.notify('login', decryptedSessionIdBase64);
+        watchdog.notify('login', [!security.login.rememberMe && masterKeyArray32, decryptedSessionIdBase64]);
 
         // Store the RSA private key
         if (decodedPrivateRsaKey) {

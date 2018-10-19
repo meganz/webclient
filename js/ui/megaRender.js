@@ -363,16 +363,17 @@
 
             if (!aUpdate) {
                 sharedFolderUI();
-
                 deleteScrollPanel('.contacts-blocks-scrolling', 'jsp');
                 deleteScrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
                 deleteScrollPanel('.file-block-scrolling', 'jsp');
+                deleteScrollPanel('.shared-blocks-scrolling', 'jsp');
 
                 initOpcGridScrolling();
                 initIpcGridScrolling();
 
                 $('.grid-table:not(.arc-chat-messages-block) tr').remove();
                 $('.file-block-scrolling a').remove();
+                $('.shared-blocks-scrolling a').remove();
                 $('.contacts-blocks-scrolling .content a').remove();
 
                 $(lSel).show().parent().children('table').show();
@@ -411,20 +412,27 @@
                         $('.fm-empty-folder-link').removeClass('hidden');
                     }
                 }
-                else if (M.currentdirid === M.RootID) {
-                    $('.fm-empty-cloud').removeClass('hidden');
-                }
                 else if (M.currentdirid === M.InboxID) {
                     $('.fm-empty-messages').removeClass('hidden');
                 }
-                else if (M.currentdirid === 'shares') {
-                    $('.fm-empty-incoming').removeClass('hidden');
-                }
                 else if (M.currentrootid === M.RootID
                         || M.currentrootid === M.RubbishID
-                        || M.currentrootid === M.InboxID) {
+                        || M.currentrootid === M.InboxID
+                        || M.currentrootid === 'shares') {
 
-                    $('.fm-empty-folder').removeClass('hidden');
+                    // If filter is empty show 'Your label filter did not match any documents'
+                    if (M.currentLabelFilter) {
+                        $('.fm-empty-filter').removeClass('hidden');
+                    }
+                    else if (M.currentdirid === M.RootID) {
+                        $('.fm-empty-cloud').removeClass('hidden');
+                    }
+                    else if (M.currentdirid === 'shares') {
+                        $('.fm-empty-incoming').removeClass('hidden');
+                    }
+                    else {
+                        $('.fm-empty-folder').removeClass('hidden');
+                    }
                 }
                 else if (M.currentrootid === 'shares') {
                     M.emptySharefolderUI(lSel);
@@ -785,7 +793,7 @@
 
                     // Colour label
                     if (aNode.lbl && !folderlink) {
-                        var colourLabel = M.getColourClassFromId(aNode.lbl);
+                        var colourLabel = M.getLabelClassFromId(aNode.lbl);
                         props.classNames.push('colour-label');
                         props.classNames.push(colourLabel);
                     }
@@ -848,7 +856,7 @@
 
                 // Colour label
                 if (aNode.lbl && !folderlink && (aNode.su !== u_handle)) {
-                    var colourLabel = M.getColourClassFromId(aNode.lbl);
+                    var colourLabel = M.getLabelClassFromId(aNode.lbl);
                     props.classNames.push('colour-label');
                     props.classNames.push(colourLabel);
                 }
@@ -916,12 +924,15 @@
                     aTemplate.classList.add('versioning');
                 }
 
-                if (this.viewmode || aProperties.name.length > 78 || aProperties.playtime) {
+                if (this.viewmode || aProperties.name.length > 78 || aProperties.playtime !== undefined) {
                     if (aProperties.width) {
                         title.push(aProperties.width + 'x' + aProperties.height + ' @' + aProperties.fps + 'fps');
                     }
                     if (aProperties.codecs) {
-                        title.push(aProperties.codecs.join('/'));
+                        title.push(aProperties.codecs);
+                    }
+                    if (aNode.s) {
+                        title.push(bytesToSize(aNode.s, 0).replace(' ', ''));
                     }
                     title.push(aProperties.name);
                 }
@@ -934,7 +945,7 @@
                         tmp.classList.add(aProperties.icon);
                     }
 
-                    if (aProperties.playtime) {
+                    if (aProperties.playtime !== undefined) {
                         aTemplate.querySelector('.data-block-bg').classList.add('video');
                         aTemplate.querySelector('.video-thumb-details span').textContent
                             = secondsToTimeShort(aProperties.playtime);

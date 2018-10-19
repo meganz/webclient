@@ -2184,7 +2184,7 @@
                     </p>
                     <p>
                         <span class="number">25</span>
-                        <span class="text">To file a counter-notice with us, you must provide a written communication to <a href="mailto:copyright@mega.nz">copyright@mega.nz</a> that includes substantially the following.</span>
+                        <span class="text">To file a counter-notification with us, you must provide a written communication at <a href="/dispute" class="clickurl">https://mega.nz/dispute</a> that sets forth the items specified below.</span>
                     </p>
                     <p class="list">
                         <span class="number">25.1</span>
@@ -2562,7 +2562,7 @@
 </div>
 
 
-<!-- Two-Factor Authentication Set up page  -->
+<!-- Two-Factor Authentication Setup page  -->
 <div class="mobile main-block two-factor-page setup-page hidden">
     <div class="mobile fm-header fm-hr">
         <div class="mobile fm-icon top-icon menu right"></div>
@@ -2576,6 +2576,7 @@
                     <div class="mobile two-factor-heading">[$19204]</div>
                     <div class="mobile two-factor-body-text">
                         [$19205]
+                        <span class="no-auth-app-button">[$19565]</span>
                     </div>
                     <div class="mobile two-factor-qr-code-wrapper">
                         <div class="qr-code-img"></div>
@@ -2587,6 +2588,37 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+
+<!-- Select Authenticator App dialog on the 2FA Setup page -->
+<div class="mobile auth-app-select-dialog hidden">
+    <div class="mobile explanation">[$19566]</div>
+    <div class="mobile app-link authy">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Authy</span>
+        <span class="mobile app-link-arrow"></span>
+    </div>
+    <div class="mobile app-link duomobile">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Duo Mobile</span>
+        <span class="mobile app-link-arrow"></span>
+    </div>
+    <div class="mobile app-link googleauthenticator">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Google Authenticator</span>
+        <span class="mobile app-link-arrow"></span>
+    </div>
+    <div class="mobile app-link microsoftauthenticator">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Microsoft Authenticator</span>
+        <span class="mobile app-link-arrow"></span>
+    </div>
+    <div class="mobile separator-line"></div>
+    <div class="mobile cancel-button">
+        <span class="mobile cancel-button-icon"></span>
+        <span class="mobile cancel-button-text">Close</span>
     </div>
 </div>
 
@@ -2608,7 +2640,7 @@
                     </div>
                     <div class="mobile two-factor-verify-seed-wrapper">
                         <div class="mobile signin-input two-factor-seed-input">
-                            <input type="text" value="" placeholder="[$19193]" />
+                            <input type="number" value="" placeholder="[$19193]" maxlength="6" />
                         </div>
                         <div class="mobile warning-text-field hidden">
                             [$19210]
@@ -2667,7 +2699,7 @@
                     </div>
                     <div class="mobile two-factor-verify-seed-wrapper">
                         <div class="mobile signin-input two-factor-seed-input">
-                            <input type="text" value="" placeholder="[$19193]" />
+                            <input type="number" value="" placeholder="[$19193]" maxlength="6" />
                         </div>
                         <div class="mobile warning-text-field hidden">
                             [$19210]
@@ -2723,7 +2755,7 @@
                     </div>
                     <div class="mobile two-factor-verify-seed-wrapper">
                         <div class="mobile signin-input two-factor-seed-input">
-                            <input value="" placeholder="[$19193]" class="two-factor-login-input" type="text">
+                            <input class="two-factor-login-input" type="number" value="" placeholder="[$19193]" maxlength="6" />
                         </div>
                         <div class="mobile warning-text-field hidden">
                             [$19210]
@@ -2760,7 +2792,7 @@
                     </div>
                     <div class="mobile two-factor-verify-seed-wrapper">
                         <div class="mobile signin-input two-factor-seed-input">
-                            <input value="" placeholder="[$19193]" class="two-factor-login-input" type="text">
+                            <input value="" placeholder="[$19193]" class="two-factor-login-input" type="number" maxlength="6">
                         </div>
                         <div class="mobile warning-text-field hidden">
                             [$19210]

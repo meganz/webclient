@@ -966,7 +966,7 @@
 .small-icon.context.download-as-zip {
     background-position: -101px -499px;
 }
-.small-icon.context.labels {
+.small-icon.context.labels, .txt-hovers .dropdown-item:not(.static):hover .small-icon.context.labels {
     background-position: -101px -99px;
 }
 .small-icon.context.download {
@@ -997,8 +997,9 @@
     width: 23px;
     margin: 6px 12px 1px -1px;
 }
-.small-icon.context.conversation {
-    background-position: -1px -146px;
+.small-icon.context.conversation, .txt-hovers .dropdown-item:not(.static):hover .small-icon.context.conversation  {
+    background-position: -1px -147px;
+    margin-left: -1px;
 }
 .small-icon.context.handset {
     background-position: -1px -333px;
@@ -1050,7 +1051,7 @@
     background-position: -240px -1200px;
     margin: 6px 13px 1px 0px;
 }
-.small-icon.context.heart {
+.small-icon.context.heart, .txt-hovers .dropdown-item:not(.static):hover .small-icon.context.heart {
     background-position: -202px -499px;
 }
 .small-icon.context.broken-heart {
@@ -1146,11 +1147,14 @@
 .dropdown-item:hover .small-icon.context.download-as-zip {
     background-position: -141px -499px;
 }
-.dropdown-item:hover .small-icon.context.labels, .dropdown-item.opened .small-icon.context.labels {
-    background-position: -141px -99px;
+.small-icon.context.az, .txt-hovers .dropdown-item:not(.static):hover .small-icon.context.az  {
+    background-position: 0px -1277px;
 }
-.dropdown-item:hover .small-icon.context.download, .dropdown-item.opened .small-icon.context.download {
-    background-position: -141px -138px;
+.small-icon.context.single-clock, .txt-hovers .dropdown-item:not(.static):hover .small-icon.context.single-clock {
+    background-position: -80px -1277px;
+}
+.small-icon.context.status, .txt-hovers .dropdown-item:not(.static):hover .small-icon.context.status {
+    background-position: -159px -1277px;
 }
 .small-icon.context.cloud {
     background-position: -102px -30px;
@@ -1180,7 +1184,7 @@
 .dropdown-item:hover .small-icon.context.download-as-zip {
     background-position: -141px -499px;
 }
-.dropdown-item:hover .small-icon.context.labels, .dropdown-item.opened .small-icon.context.labels {
+.dropdown-item:not(.static):hover .small-icon.context.labels, .dropdown-item.opened .small-icon.context.labels, .dark .dropdown-item .small-icon.context.labels {
     background-position: -141px -99px;
 }
 .dropdown-item:hover .small-icon.context.download, .dropdown-item.opened .small-icon.context.download {
@@ -1198,8 +1202,8 @@
 .dropdown-item:hover .small-icon.context.share {
     background-position: -139px -172px;
 }
-.dropdown-item:hover .small-icon.context.conversation {
-    background-position: -41px -146px;
+.dropdown-item:hover .small-icon.context.conversation, .dark .dropdown-item:not(.static) .small-icon.context.conversation {
+    background-position: -41px -147px;
 }
 .dropdown-item:hover .small-icon.context.handset, .dropdown-item.opened .small-icon.context.handset {
     background-position: -41px -333px;
@@ -1243,7 +1247,7 @@
 .dropdown-item:hover .small-icon.context.clock-with-cross {
     background-position: -120px -1200px;
 }
-.dropdown-item:hover .small-icon.context.heart {
+.dropdown-item:hover:not(.static) .small-icon.context.heart, .dark .dropdown-item:not(.static) .small-icon.context.heart {
     background-position: -242px -499px;
 }
 .dropdown-item:hover .small-icon.context.broken-heart {
@@ -1299,6 +1303,15 @@
 }
 .dropdown-item:hover .small-icon.context.manage-widget {
     background-position: -42px -1112px;
+}
+.dropdown-item:hover:not(.static) .small-icon.context.az, .dark .dropdown-item:not(.static) .small-icon.context.az {
+    background-position: -40px -1277px;
+}
+.dropdown-item:hover:not(.static) .small-icon.context.single-clock, .dark .dropdown-item:not(.static) .small-icon.context.single-clock, .video.thumb .small-icon.icons-sprite.grey-clock {
+    background-position: -120px -1277px;
+}
+.dropdown-item:hover:not(.static) .small-icon.context.status, .dark .dropdown-item:not(.static) .small-icon.context.status {
+    background-position: -199px -1277px;
 }
 /* End of Context menu icons */
 .huge-icon.storage-icon {
@@ -1373,7 +1386,7 @@
     width: 22px;
 }
 .small-icon.icons-sprite.grey-clock {
-    background-position: -81px -1159px;
+    background-position: -79px -1276px;
     width: 21px;
 }
 .medium-icon.icons-sprite.quote1 {
@@ -1437,6 +1450,9 @@
 }
 .small-icon.icons-sprite.filled-rubbish-bin {
     background-position: -192px -781px;
+}
+.small-icon.icons-sprite.small-cross {
+    background-position: 1px -1316px;
 }
 i.icons-sprite {
     background-image: url(../images/mega/icons-sprite_v22.png);

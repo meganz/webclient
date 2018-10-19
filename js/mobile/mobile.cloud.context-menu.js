@@ -48,12 +48,10 @@ mobile.cloud.contextMenu = {
 
         var $folderContextMenu = $('.context-menu-container.folder');
         var $fileContextMenu = $('.mobile.context-menu-container.file');
-        var $previewButton = $fileContextMenu.find('.preview-file-button');
         var $overlay = $('.dark-overlay');
 
         // Get the node type
-        var node = M.d[nodeHandle];
-        var nodeType = node.t;
+        var nodeType = M.d[nodeHandle].t;
 
         // Show overlay
         $overlay.removeClass('hidden');
@@ -73,14 +71,6 @@ mobile.cloud.contextMenu = {
             $folderContextMenu.removeClass('hidden');
         }
         else {
-            // If the file is previewable, show the preview button
-            if (is_image3(node) || is_video(node)) {
-                $previewButton.removeClass('hidden');
-            }
-            else {
-                // Otherwise hide it
-                $previewButton.addClass('hidden');
-            }
 
             // Initialise buttons
             mobile.cloud.contextMenu.initPreviewButton($fileContextMenu, nodeHandle);
@@ -142,6 +132,35 @@ mobile.cloud.contextMenu = {
     initPreviewButton: function($contextMenu, nodeHandle) {
 
         'use strict';
+
+        var $previewButton = $contextMenu.find('.preview-file-button');
+        var node = M.d[nodeHandle];
+
+        // If the file is previewable, show the preview button
+        if (is_image3(node)) {
+            // This is an image file
+            $previewButton.find('.fm-icon').removeClass('playvideo playaudio').addClass('preview');
+            $previewButton.find('.text').text(l[1899]); // Preview
+            $previewButton.removeClass('hidden');
+        }
+        else if (is_video(node)) {
+            // If the file is playable, show play button
+            if (is_video(node) === 2) {
+                // This is an audio file
+                $previewButton.find('.fm-icon').removeClass('playvideo preview').addClass('playaudio');
+                $previewButton.find('.text').text(l[17828]); // Play audio
+            }
+            else {
+                // This is a video file
+                $previewButton.find('.fm-icon').removeClass('preview playaudio').addClass('playvideo');
+                $previewButton.find('.text').text(l[16275]); // Play video
+            }
+            $previewButton.removeClass('hidden');
+        }
+        else {
+            // Otherwise hide it
+            $previewButton.addClass('hidden');
+        }
 
         // If the Preview button is tapped
         $contextMenu.find('.preview-file-button').off('tap').on('tap', function() {

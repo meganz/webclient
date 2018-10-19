@@ -720,6 +720,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $videoControls = $wrapper.find('.video-controls');
         var $document = $(document);
         var timer;
+        var filters = Object.create(null);
 
         // Hide the default controls
         videoElement.controls = false;
@@ -805,6 +806,38 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $volumeBar.find('span').css('height', Math.round(videoElement.volume * 100) + '%');
         };
 
+        // Increase/decrease color filter
+        var setVideoFilter = function(v) {
+            var style = [];
+            var op = v > 0 && v < 4 ? 2 : v > 3 && v < 7 ? 5 : 8;
+            var filter = ({'2': 'saturate', '5': 'contrast', '8': 'brightness'})[op];
+
+            if (!v) {
+                filters = Object.create(null);
+            }
+            else if (v === op) {
+                delete filters[filter];
+            }
+            else {
+                v = '147'.indexOf(v) < 0 ? 0.1 : -0.1;
+                filters[filter] = Number(Math.min(8.0, Math.max((filters[filter] || 1) + v, 0.1)).toFixed(2));
+            }
+
+            Object.keys(filters).forEach(function(k) {
+                style.push(k + '(' + filters[k] + ')');
+            });
+
+            videoElement.style.filter = style.join(' ') || 'none';
+        };
+
+        // Apply specific video filter
+        var applyVideoFilter = function(s, c, b) {
+            filters.saturate = s;
+            filters.contrast = c;
+            filters.brightness = b;
+            videoElement.style.filter = 'saturate(' + s + ') contrast(' + c + ') brightness(' + b + ')';
+        };
+
         // Seek by specified number of seconds.
         var seekBy = function(sec) {
             streamer.currentTime = Math.min(streamer.duration, Math.max(0, streamer.currentTime + sec));
@@ -877,6 +910,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $wrapper.removeClass('mouse-idle');
             $document.off('mousemove.idle');
             // playevent = false;
+        });
+
+        $video.rebind('contextmenu.mvs', function() {
+            if (playevent) {
+                $video.off('contextmenu.mvs');
+            }
+            else {
+                return false;
+            }
         });
 
         // Add events for all buttons
@@ -995,6 +1037,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 onTimeUpdate(options.startTime, playtime);
             }
         }
+
+        if (options.filter) {
+            applyVideoFilter.apply(this, options.filter.map(function(v) { return v / 10; }));
+        }
+
         $video.rebind('timeupdate', function() {
             onTimeUpdate(streamer.currentTime, streamer.duration);
         });
@@ -1118,6 +1165,18 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 case 'Digit9':
                     streamer.currentTime = streamer.duration * key.substr(5) / 10;
                     break;
+                case 'Numpad0':
+                case 'Numpad1':
+                case 'Numpad2':
+                case 'Numpad3':
+                case 'Numpad4':
+                case 'Numpad5':
+                case 'Numpad6':
+                case 'Numpad7':
+                case 'Numpad8':
+                case 'Numpad9':
+                    setVideoFilter(key.substr(6) | 0);
+                    break;
                 default:
                     if (ev.key === '<' || ev.key === '>') {
                         setVideoSpeed(ev.ctrlKey ? null : 0.25 * (ev.key.charCodeAt(0) - 0x3d));
@@ -1148,6 +1207,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $playpause.off();
             $volumeBar.off();
             clearTimeout(timer);
+            videoElement.style.filter = 'none';
             window.removeEventListener('keydown', videoKeyboardHandler, true);
             $wrapper.removeClass('mouse-idle video-theatre-mode video')
                 .off('is-over-quota').find('.viewer-pending').addClass('hidden');
@@ -1176,9 +1236,23 @@ FullScreenManager.prototype.enterFullscreen = function() {
         }
         options = Object.assign(Object.create(null), options);
 
-        if ($.playbackTimeOffset) {
-            options.startTime = $.playbackTimeOffset | 0;
-            $.playbackTimeOffset = null;
+        if ($.playbackOptions) {
+            String($.playbackOptions).replace(/(\d+)(\w)/g, function(m, v, k) {
+                if (k === 's') {
+                    options.startTime = v | 0;
+                }
+                else if (k === 'f') {
+                    v = String(v | 0);
+                    while (v.length < 6) {
+                        if (v.length & 1) {
+                            v = '1' + v;
+                        }
+                        v = '0' + v;
+                    }
+                    options.filter = v.slice(-6).split(/(.{2})/).filter(String);
+                }
+            });
+            $.playbackOptions = null;
         }
 
         if (!options.type) {

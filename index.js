@@ -252,7 +252,7 @@ function init_page() {
         if (ar[1]) {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
-        $.playbackTimeOffset = parseInt(ar[2]) | 0;
+        $.playbackOptions = ar[2];
 
         if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';

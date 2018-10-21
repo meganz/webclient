@@ -239,7 +239,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         //}
 
 
-        /// events handlers
+        /// events handlers   ---- Keep commented for now, as the check box is only hidden
         // 1- check boxes
         // $('.business-sub-checkbox-td, .business-sub-checkbox-th', $usersTable).off('click.subuser');
         // $('.business-sub-checkbox-td, .business-sub-checkbox-th', $usersTable).on('click.subuser',
@@ -441,8 +441,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
             });
 
-
-
     };
 
 
@@ -536,7 +534,11 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
 };
 
-
+/**
+ * get the status string of a sub-user
+ * @param {Number} statusCode       a number represents the status code of a sub-user
+ * @returns {String}                the status string (Active, disabled ...etc)
+ */
 BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
     "use strict";
     if (statusCode === 0) {
@@ -558,7 +560,7 @@ BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
 
 /**
  * show the password dialog for invitation link
- * @param {string} invitationLink :         sub-user invitation link
+ * @param {string} invitationLink       sub-user invitation link
  */
 BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
     "use strict";

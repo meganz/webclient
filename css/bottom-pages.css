@@ -677,9 +677,7 @@ html.gbot {
 
 
 .bottom-btn-container {
-    margin-top: 48px;
-    height: 48px;
-    margin-left: calc(50% - 306px);
+    margin: 48px 0;
     display: inline-block;
 }
 

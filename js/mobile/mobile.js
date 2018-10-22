@@ -227,6 +227,35 @@ var mobile = {
 };
 
 
+mBroadcaster.once('startMega:mobile', function() {
+    'use strict';
+
+    var getOrientation = function() {
+        return !window.orientation || window.orientation === 180 ? 'portrait' : 'landscape';
+    };
+
+    $(window).on('orientationchange.moboc', function(ev) {
+        mobile.orientation = ev.orientation || getOrientation();
+
+        if (dlmanager.isOverQuota) {
+            onIdle(function() {
+                var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
+
+                if (mobile.orientation === 'landscape') {
+                    $('.speedometer.full', $dialog).removeClass('big-104px-icon');
+                }
+                else {
+                    $('.speedometer.full', $dialog).addClass('big-104px-icon');
+                }
+            });
+        }
+        mBroadcaster.sendMessage('orientationchange', mobile.orientation);
+    });
+
+    mobile.orientation = getOrientation();
+});
+
+
 /**
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */
@@ -280,8 +309,12 @@ var alarm = {
 };
 /* jshint strict: true */
 
-function msgDialog(type, title, msg, submsg, callback, checkbox) {
+function accountUI() {
+    'use strict';
+    loadSubPage('fm/account');
+}
 
+function msgDialog(type, title, msg, submsg, callback, checkbox) {
     'use strict';
 
     // Call the mobile version
@@ -289,7 +322,6 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 }
 
 function fm_showoverlay() {
-
     'use strict';
 
     $('.fm-dialog-overlay').removeClass('hidden');
@@ -297,7 +329,6 @@ function fm_showoverlay() {
 }
 
 function fm_hideoverlay() {
-
     'use strict';
 
     $('.fm-dialog-overlay').addClass('hidden');
@@ -321,6 +352,19 @@ function closeDialog() {
 }
 
 mega.ui.showRegisterDialog = function() {};
+
+/**
+ * Shim for sendSignupLinkDialog, likely called from showOverQuotaRegisterDialog
+ * @param {Object} accountData The registration vars in localStorage.awaitingConfirmationAccount
+ */
+mega.ui.sendSignupLinkDialog = function(accountData) {
+
+    'use strict';
+
+    parsepage(pages['mobile']);
+    mobile.register.showConfirmEmailScreen(accountData);
+    topmenuUI();
+};
 
 mega.loadReport = {};
 var previews = {};

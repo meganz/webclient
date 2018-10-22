@@ -137,6 +137,11 @@ var accountChangeEmail = {
                     return msgDialog('warninga', l[135], l[7717]);
                 }
 
+                // EACCESS, the email address is already in use or current user is invalid. (less likely).
+                else if (typeof result === 'number' && result === -11) {
+                    return msgDialog('warninga', l[135], l[19562]);
+                }
+
                 // If something else went wrong, show an error
                 else if (typeof result === 'number' && result < 0) {
                     msgDialog('warninga', l[135], l[47]);

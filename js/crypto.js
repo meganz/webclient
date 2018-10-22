@@ -119,13 +119,12 @@ var ETEMPUNAVAIL = -18;
 var ETOOMANYCONNECTIONS = -19;
 var EGOINGOVERQUOTA = -24;
 
-/* jshint -W098 */          // It is used in another file
 var EROLLEDBACK = -25;
 var EMFAREQUIRED = -26;     // Multi-Factor Authentication Required
-/* jshint +W098 */
 
 // custom errors
 var ETOOERR = -400;
+var ESHAREROVERQUOTA = -401;
 
 function ssl_needed() {
     var ssl_opt = ['Chrome/'];
@@ -395,16 +394,7 @@ function api_setsid(sid) {
 
         if (typeof dlmanager === 'object') {
 
-            if (!dlmanager.onOverquotaWithAchievements) {
-                if (dlmanager.isOverQuota && !dlmanager.isOverFreeQuota) {
-                    dlmanager.uqFastTrack = !Object(u_attr).p;
-                    delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
-                }
-
-                if (typeof dlmanager.onLimitedBandwidth === 'function') {
-                    dlmanager.onLimitedBandwidth();
-                }
-            }
+            dlmanager._onOverQuotaAttemptRetry();
         }
         sid = 'sid=' + sid;
     }
@@ -1119,6 +1109,10 @@ function waitsc() {
                     return;
                 }
                 if ($.isNumeric(delieveredResponse)) {
+                    if (delieveredResponse == ENOENT && apixs[5].sid[0] === 'n') {
+                        // WSC is stopped at the beginning.
+                        return;
+                    }
                     waittimeout = setTimeout(waitsc, waitbackoff);
                     return;
                 }
@@ -1213,6 +1207,9 @@ function api_createuser(ctx, invitecode, invitename, uh) {
     // so now. we will check if this is a business sub-user --> we will add extra arguments to "UP" (crv,hak,v)
 
     var doApiRequest = function (request) {
+        if (mega.affid) {
+            req.aff = mega.affid;
+        }
         logger.debug("Storing key: " + request.k);
 
         api_req(request, ctx);
@@ -1385,9 +1382,9 @@ function api_getsid(ctx, user, passwordkey, hash, pinCode) {
     ctx.callback = api_getsid2;
     ctx.passwordkey = passwordkey;
 
+    // If previously blocked for too many login attempts, return early and show warning with time they can try again
     if (api_getsid.etoomany + 3600000 > Date.now() || location.host === 'webcache.googleusercontent.com') {
-        api_getsid.warning();
-        return ctx.result(ctx, false);
+        return ctx.checkloginresult(ctx, ETOOMANY);
     }
 
     // Setup the login request
@@ -1551,7 +1548,11 @@ function stringhash(s, aes) {
 function api_updateuser(ctx, newuser) {
     newuser.a = 'up';
 
-    res = api_req(newuser, ctx);
+    if (mega.affid) {
+        newuser.aff = mega.affid;
+    }
+
+    api_req(newuser, ctx);
 }
 
 var u_pubkeys = Object.create(null);
@@ -3111,6 +3112,8 @@ function api_strerror(errno) {
         return "Connection overflow";
     case EGOINGOVERQUOTA:
         return "Not enough quota";
+    case ESHAREROVERQUOTA:
+        return l[19597] || 'Share owner is over storage quota.';
     default:
         break;
     }

@@ -149,6 +149,7 @@ UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
     tmp.h = n.h;
     tmp.p = n.p;
     tmp.t = M.IS_TREE;
+    tmp.lbl = n.lbl;
 
     if (ignoreDB) {
         if (n.t & M.IS_TREE) tmp.t = n.t;

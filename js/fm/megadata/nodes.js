@@ -1630,7 +1630,7 @@ MegaData.prototype.colourLabelcmUpdate = function(node) {
     }
 };
 
-MegaData.prototype.getColourClassFromId = function(id) {
+MegaData.prototype.getLabelClassFromId = function(id) {
 
     return ({
         '1': 'red', '2': 'orange', '3': 'yellow',
@@ -1639,38 +1639,66 @@ MegaData.prototype.getColourClassFromId = function(id) {
 };
 
 /**
- * colourLabelDomUpdate
+ * labelDomUpdate
  *
  * @param {String} handle
  * @param {Number} value Current labelId
  */
-MegaData.prototype.colourLabelDomUpdate = function(handle, value) {
+MegaData.prototype.labelDomUpdate = function(handle, value) {
+    "use strict";
 
     if (fminitialized) {
         var labelId = parseInt(value);
         var removeClasses = 'colour-label red orange yellow blue green grey purple';
+        var color = '<div class="colour-label-ind %1"></div>';
 
         // Remove all colour label classes
         $('#' + handle).removeClass(removeClasses);
         $('#' + handle + ' a').removeClass(removeClasses);
+        $('#treea_' + handle).removeClass('labeled').find('.colour-label-ind').remove();
 
         if (labelId) {
             // Add colour label classes.
-            var colourClass = 'colour-label ' + this.getColourClassFromId(labelId);
+            var colourClass = 'colour-label ' + M.getLabelClassFromId(labelId);
 
             $('#' + handle).addClass(colourClass);
             $('#' + handle + ' a').addClass(colourClass);
+            $('#treea_' + handle).append(color.replace('%1', M.getLabelClassFromId(labelId)))
+                .addClass('labeled');
+        }
+
+        var currentTreeLabel = M.filterTreePanel[M.currentTreeType + '-label'];
+        // if current tree is on filtering
+        if (currentTreeLabel && Object.keys(currentTreeLabel).length > 0) {
+            // and action is assigning new tag
+            if (labelId && currentTreeLabel[labelId]) {
+                $('#treeli_' + handle).removeClass("tree-item-on-filter-hidden");
+            }
+            // and action is unassigning old tag
+            else {
+                $('#treeli_' + handle).addClass("tree-item-on-filter-hidden");
+            }
+        }
+
+        // make filter enable/disable depending on filter availabilty.
+        $('.dropdown-section .dropdown-item-label')
+            .add('.dropdown-section.filter-by .labels')
+            .addClass('disabled static');
+        if (M.checkFilterAvailable()) {
+            $('.dropdown-section .dropdown-item-label')
+                .add('.dropdown-section.filter-by .labels')
+                .removeClass('disabled static');
         }
     }
 };
 
 /*
- * colourLabeling Handles colour labeling of nodes updates DOM and API
+ * labeling Handles colour labeling of nodes updates DOM and API
  *
  * @param {Array | string} handles Selected nodes handles
  * @param {Integer} labelId Numeric value of label
  */
-MegaData.prototype.colourLabeling = function(handles, labelId) {
+MegaData.prototype.labeling = function(handles, labelId) {
 
     var newLabelState = 0;
 
@@ -1692,8 +1720,241 @@ MegaData.prototype.colourLabeling = function(handles, labelId) {
                 fileversioning.labelVersions(handle, newLabelState);
             }
             api_setattr(node, mRandomToken('lbl'));
-            M.colourLabelDomUpdate(handle, newLabelState);
+
+            // sync with global tree
+            if (node.t > 0) {
+                M.tree[node.p][node.h].lbl = node.lbl;
+            }
+
+            M.labelDomUpdate(handle, newLabelState);
         });
+
+        M.initLabelFilter(M.v);
+    }
+};
+
+MegaData.prototype.labelFilterBlockUI = function() {
+    "use strict";
+
+    var type = M.currentLabelType;
+    // Hide all filter DOM elements
+    $('.fm-right-header.fm .filter-block.body').addClass('hidden');
+    $('.files-grid-view.fm .filter-block.body').addClass('hidden');
+
+    if (M.currentLabelFilter) {
+        if (fmconfig.viewmodes[M.currentdirid]) {// Block view
+            if (type === 'shares') {
+                $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
+            }
+            else if (type === 'contact') {
+                $('.filter-block.body').addClass('hidden');
+                $('.fm-right-header.fm .filter-block.body').addClass('hidden');
+            }
+            else {
+                $('.filter-block.' + type + '.body').addClass('hidden');
+                $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
+            }
+        }
+        else {// List view
+            if (type === 'shares') {
+                $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
+            }
+            else if (type === 'contact') {
+                $('.filter-block.body').addClass('hidden');
+                $('.fm-right-header.fm .filter-block.body').addClass('hidden');
+            }
+            else {
+                $('.fm-right-header.fm .filter-block.' + type + '.body').addClass('hidden');
+                $('.filter-block.' + type + '.body').removeClass('hidden');
+            }
+        }
+    }
+};
+
+MegaData.prototype.labelType = function() {
+    "use strict";
+
+    var result = 'fm';
+    switch (M.currentrootid) {
+        case 'shares':
+            result = 'shares';
+            break;
+        case M.RubbishID:
+            result = 'rubbish';
+            break;
+        case 'contacts':
+            result = 'contacts';
+            break;
+        default:
+            break;
+    }
+
+    return result;
+};
+
+/*
+ * update clicked label's display info
+ *
+ * @param {Object} e  event triggered to excuting this.
+ */
+MegaData.prototype.updateLabelInfo = function(e) {
+    "use strict";
+
+    var $t = $(e.target);
+    var labelTxt = $t.data('label-txt');
+
+    if ($(e.target).hasClass('active')) {
+        switch (labelTxt) {
+            case "Red":
+                labelTxt = l[19571];
+                break;
+            case "Orange":
+                labelTxt = l[19575];
+                break;
+            case "Yellow":
+                labelTxt = l[19579];
+                break;
+            case "Green":
+                labelTxt = l[19583];
+                break;
+            case "Blue":
+                labelTxt = l[19587];
+                break;
+            case "Purple":
+                labelTxt = l[19591];
+                break;
+            case "Grey":
+                labelTxt = l[19595];
+                break;
+        }
+    }
+    else {
+        switch (labelTxt) {
+            case "Red":
+                labelTxt = l[19570];
+                break;
+            case "Orange":
+                labelTxt = l[19574];
+                break;
+            case "Yellow":
+                labelTxt = l[19578];
+                break;
+            case "Green":
+                labelTxt = l[19582];
+                break;
+            case "Blue":
+                labelTxt = l[19586];
+                break;
+            case "Purple":
+                labelTxt = l[19590];
+                break;
+            case "Grey":
+                labelTxt = l[19594];
+                break;
+        }
+    }
+
+    $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
+};
+
+/*
+ * filter fm and shared with me by tag colour
+ *
+ * @param {Object} e  event triggered to excuting this.
+ */
+MegaData.prototype.applyLabelFilter = function (e) {
+    "use strict";
+
+    var $t = $(e.target);
+    var labelId = parseInt($t.data('label-id'));
+    var type = M.currentLabelType;
+    var $menuItems = $('.colour-sorting-menu .dropdown-colour-item');
+    var $filterBlock = $('.filter-block.' + type + '.body');
+    var fltIndicator = '<div class="colour-label-ind %1"></div>';
+    var obj = M.filterLabel[type];// Global var holding colour tag filter information for fm and shares
+
+    obj[labelId] = !obj[labelId];
+
+    if (obj[labelId]) {
+        $menuItems.filter('[data-label-id=' + labelId + ']').addClass('active');
+        $filterBlock.find('.content').append(fltIndicator.replace('%1', M.getLabelClassFromId(labelId)));
+
+        if (fmconfig.viewmodes[M.currentdirid]) {
+            $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
+        }
+        else {
+            if (M.currentrootid === M.RootID || M.currentrootid === M.RubbishID) {
+                $('.filter-block.' + type + '.body').removeClass('hidden');
+            }
+            else {
+                $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
+            }
+        }
+    }
+    else {
+        delete obj[labelId];
+
+        $menuItems.filter('[data-label-id=' + labelId + ']').removeClass('active');
+        $filterBlock.find('.colour-label-ind.' + M.getLabelClassFromId(labelId)).remove();
+        if (!Object.keys(obj).length) {
+            delete M.filterLabel[type];
+            $filterBlock.addClass('hidden');
+            $.hideContextMenu();
+        }
+    }
+
+    M.updateLabelInfo(e);
+    M.openFolder(M.currentdirid, true);
+};
+
+/*
+ * Check nodelist contains label
+ *
+ * @param {Object} nodelist     array of nodes
+ *
+ * @return {Boolean}
+ */
+
+MegaData.prototype.isLabelExistNodeList = function(nodelist) {
+    "use strict";
+
+    for (var i = 0; i < nodelist.length; i++) {
+        if (typeof nodelist[i] !== 'undefined'
+            && (typeof nodelist[i].lbl !== 'undefined'
+            && nodelist[i].lbl !== 0)){
+            return true;
+        }
+    }
+    return false;
+};
+
+/*
+ * init label filter and sort if node item has label.
+ *
+ * @param {Object} nodelist     array of nodes
+ */
+
+MegaData.prototype.initLabelFilter = function(nodelist) {
+    "use strict";
+
+    if (d){
+        console.log('checking label is existing');
+    }
+
+    var $fmMenu = $('.colour-sorting-menu .dropdown-section .dropdown-item-label')
+        .add('.colour-sorting-menu .dropdown-section.filter-by .labels');
+
+    if (this.isLabelExistNodeList(nodelist)){
+        $fmMenu.removeClass('disabled static');
+        if (d){
+            console.log('label exist on node list, label filter is ON');
+        }
+    }
+    else {
+        $fmMenu.addClass('disabled static');
+        if (d){
+            console.log('no label exist on node list, label filter is OFF');
+        }
     }
 };
 
@@ -2303,7 +2564,7 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
 
         api_req(req, {
             callback: function(res) {
-                if (d) {
+                if (d > 1) {
                     console.log('Create folder result...', res);
                 }
                 if (res && typeof res === 'object') {
@@ -2316,24 +2577,35 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
                         return reject(EINTERNAL);
                     }
 
-                    $('.fm-new-folder').removeClass('active');
-                    $('.create-new-folder').addClass('hidden');
-                    $('.create-new-folder input').val('');
-                    newnodes = [];
+                    newnodes = newnodes || [];
 
                     // this is only safe once sn enforcement has been deployed
                     M.addNode(n);
                     ufsc.addNode(n);
 
-                    M.updFileManagerUI()
-                        .always(function() {
+                    if (!M._cfUIUpdateQ) {
+                        M._cfUIUpdateQ = [];
+                    }
+                    M._cfUIUpdateQ.push([resolve, n.h]);
+
+                    delay('createfolder:ui-update', function() {
+                        $('.fm-new-folder').removeClass('active');
+                        $('.create-new-folder').addClass('hidden');
+                        $('.create-new-folder input').val('');
+
+                        M.updFileManagerUI().always(function() {
                             if ($.copyDialog || $.moveDialog) {
                                 refreshDialogContent();
                             }
                             hideOverlay();
 
-                            resolve(n.h);
+                            for (var i = M._cfUIUpdateQ.length; i--;) {
+                                var q = M._cfUIUpdateQ[i];
+                                q[0](q[1]);
+                            }
+                            delete M._cfUIUpdateQ;
                         });
+                    });
                 }
                 else {
                     hideOverlay();
@@ -2351,6 +2623,81 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
     }
 
     return ulparams;
+};
+
+/**
+ * Create new folder on the cloud
+ * @param {Object} paths Object containing folders on keys, node handles will be filled as their values
+ * @param {String} target Node handle where the paths will be created
+ * @return {MegaPromise}
+ */
+MegaData.prototype.createFolders = function(paths, target) {
+    'use strict';
+    var promise = new MegaPromise();
+    var logger = MegaLogger.getLogger('mkdir', false, this.logger);
+
+    // paths walker to create hierarchy
+    var walk = function(paths, s) {
+        var p = paths.shift();
+
+        if (p) {
+            s = walk(paths, s[p] = s[p] || Object.create(null));
+        }
+        return s;
+    };
+
+    var struct = Object.create(null);
+    var folders = Object.keys(paths);
+
+    // create paths hierarchy
+    for (var i = folders.length; i--;) {
+        var path = folders[i];
+
+        Object.defineProperty(walk(M.getSafePath(path), struct), 'path', {value: path});
+    }
+    folders = folders.length;
+
+    (function _mkdir(s, t) {
+        if (d > 1) {
+            logger.debug('mkdir under %s (%s) for...', t, M.getNodeByHandle(t).name, s);
+        }
+        Object.keys(s).forEach(function(name) {
+            M.createFolder(t, name, new MegaPromise()).always(function(res) {
+                if (res.length !== 8) {
+                    var err = 'Failed to create folder "%s" on target %s(%s)';
+                    logger.warn(err, name, t, M.getNodeByHandle(t).name, res);
+                    return promise.reject(res);
+                }
+
+                var c = s[name]; // children for the just created folder
+
+                if (c.path) {
+                    if (d) {
+                        console.assert(paths[c.path] === null, 'Hmm... check this...');
+                    }
+
+                    // record created folder node handle
+                    paths[c.path] = res;
+                    folders--;
+                }
+
+                if (d > 1) {
+                    logger.debug('folder "%s" got handle %s on %s (%s)', name, res, t, M.getNodeByHandle(t).name);
+                }
+
+                onIdle(_mkdir.bind(null, c, res));
+            });
+        });
+
+        if (!folders) {
+            if (d) {
+                logger.info('Operation completed.', paths);
+            }
+            promise.resolve(paths);
+        }
+    })(struct, target);
+
+    return promise;
 };
 
 // leave incoming share h
@@ -2947,25 +3294,12 @@ MegaData.prototype.importWelcomePDF = function() {
             var key = res.k;
             M.req({a: 'g', p: ph}).done(function(res) {
                 if (typeof res.at === 'string') {
-                    M.onFileManagerReady(function() {
-                        var doit = true;
-                        for (var i = M.v.length; i--;) {
-                            if (fileext(M.v[i].name) === 'pdf') {
-                                doit = false;
-                                break;
-                            }
-                        }
-
-                        if (doit) {
-                            if (d) {
-                                console.log('Importing Welcome PDF (%s)', ph, res.at);
-                            }
-                            promise.linkDoneAndFailTo(M.importFileLink(ph, key, res.at));
-                        }
-                        else {
-                            promise.reject(EEXIST);
-                        }
-                    });
+                    // No need to wait for FileManager to be ready, and no need to check anything
+                    // This method is ONLY called when the initial ephemral account is created
+                    if (d) {
+                        console.log('Importing Welcome PDF (%s)', ph, res.at);
+                    }
+                    promise.linkDoneAndFailTo(M.importFileLink(ph, key, res.at));
                 }
                 else {
                     promise.reject(res);
@@ -3057,7 +3391,7 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             });
         }
         else {
-            _import(M.RootID);
+            _import(M.RootID ? M.RootID : undefined);
         }
     });
 };
@@ -3070,15 +3404,18 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
     "use strict";
 
     var _import = function(data) {
-        $.mcImport = true;
-        $.selected = data[0];
-        $.onImportCopyNodes = data[1];
-        $.onImportCopyNodes.opSize = data[2];
+        M.onFileManagerReady(function() {
+            openCopyDialog(function() {
+                $.mcImport = true;
+                $.selected = data[0];
+                $.onImportCopyNodes = data[1];
+                $.onImportCopyNodes.opSize = data[2];
 
-        if (d) {
-            console.log('Importing Nodes...', $.selected, $.onImportCopyNodes, data[2]);
-        }
-        $('.dropdown-item.copy-item').click();
+                if (d) {
+                    console.log('Importing Nodes...', $.selected, $.onImportCopyNodes, data[2]);
+                }
+            });
+        });
     };
 
     if (localStorage.folderLinkImport && !folderlink) {

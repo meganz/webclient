@@ -75,7 +75,7 @@ $.fn.visible = function (e, i)
         c = $(window),
         g = c.scrollTop();
     c = g + c.height() /*- ($('.transfer-panel').height() || 48)*/;
-    var b = a.offset().top,
+    var b = a.length && a.offset().top,
         h = b + a.height();
     a = e === true ? h : b;
     b = e === true ? b : h;
@@ -199,3 +199,16 @@ if (!$.event.props) {
             "screenX screenY toElement").split(" ")
     };
 }
+
+// prevent DOMElement (and its pseudo-elements) to do not use transition while do some actions
+$.fn.noTransition = function(action) {
+    'use strict';
+
+    var $this = $(this);
+    $this.addClass('no-trans');
+    $.when(action()).done(function() {
+        setTimeout(function() {
+            $this.removeClass('no-trans');
+        }, 0);
+    });
+};

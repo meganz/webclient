@@ -327,22 +327,22 @@
     <div class="fm-picker-dialog-panel-header">
         <span>[$5916]</span>
         <div class="fm-picker-dialog-panel-arrows"></div>
-        <div class="dialog-sorting-menu hidden">
+        <!-- <div class="dialog-sorting-menu hidden old-v">
             <div class="context-menu-section">
                 <div class="sorting-menu-arrow"></div>
                 <div data-by="name" class="sorting-menu-item active">[$86]</div>
                 <div data-by="label" class="sorting-menu-item">[$17398]</div>
-                <!--
+
                 <div data-by="status" class="sorting-menu-item">[$89]</div>
                 <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
-                -->
+
                 <div class="sorting-item-divider"></div>
             </div>
             <div class="context-menu-section">
                 <div data-dir="1" class="sorting-menu-item active">[$6773]</div>
                 <div data-dir="-1" class="sorting-menu-item">[$6774]</div>
             </div>
-        </div>
+        </div> -->
         <div class="search-bar summary-input placeholder">
             <input type="text" placeholder="[$102]">
             <div class="search-icon icon"></div>
@@ -406,7 +406,6 @@
                 <div class="left-border"></div>
                 <div class="tooltip">[$17764]</div>
             </div>
-
             <div class="fm-picker-dialog-button rubbish-bin rubbish56-icon">
                 <div class="left-border"></div>
                 <div class="tooltip">[$167]</div>
@@ -486,6 +485,12 @@
         </div>
         <div class="default-white-button left dialog-newfolder-button">
             [$68]
+        </div>
+        <div class="fm-picker-notagain left checkbox-block hidden">
+            <div class="checkdiv checkboxOff">
+                <input type="checkbox" id="fm-picker-notagain" class="notagain"/>
+            </div>
+            <label for="fm-picker-notagain" class="radio-txt">[$229]</label>
         </div>
 
         <div class="permissions-menu left hidden">
@@ -583,8 +588,8 @@
                 </div>
                 <div class="expiry-date-select-container hidden">
                     <input type="text" id="link-expiry-datepicker"
-                           class="fm-dialogs-select expiry-date-select"
-                           value="[$8697]" placeholder="[$8697]" />
+                        class="fm-dialogs-select expiry-date-select"
+                        value="[$8697]" placeholder="[$8697]" />
                 </div>
                 <div class="disabled-overlay hidden"></div>
             </div>
@@ -1173,6 +1178,7 @@
         <div class="clear"></div>
     </div>
 </div><!--End Share Dialog-->
+
 <!--Contact Fingerprint Dialog-->
 <div class="fm-dialog fingerprint-dialog hidden">
     <div class="fm-dialog-header">
@@ -1224,6 +1230,7 @@
         <div class="clear"></div>
     </div>
 </div><!--End Contact Fingerprint Dialog-->
+
 <!-- Share with contact dialog -->
 <div class="fm-dialog share-with-contact-dialog hidden">
     <div class="fm-dialog-header">
@@ -1278,7 +1285,8 @@
         <div class="default-white-button right dialog-cancel-button"> <span>[$148]</span> </div>
         <div class="clear"></div>
     </div>
-</div><!-- END. Share with contact dialog -->
+</div>
+<!-- END. Share with contact dialog -->
 
 
 
@@ -1336,7 +1344,7 @@
         <div class="fm-dialog-body hidden"></div>
         <form autocomplete="off" class="account dialog-register-form">
             <div class="top-login-pad">
-    
+
                 <div class="account input-wrapper name double">
                     <div class="account input-tooltip">
                         [$1098]<br>[$1099]
@@ -1377,12 +1385,12 @@
                     <div class="register-check checkboxOff checkbox">
                         <input class="checkboxOff" type="checkbox" name="reset-pass" id="reset-pass" checked="">
                     </div>
-    
+
                     <label class="radio-txt">[$208]</label>
                     <div class="clear"></div>
                 </div>
                 <div class="big-red-button height-48 register-button right active" tabindex="0">
-                    [$1108] 
+                    [$1108]
                     <i class="medium-icon right-arrow icons-sprite"></i>
                 </div>
                 <div class="clear"></div>
@@ -3620,7 +3628,7 @@
     </div>
     <div class="payment-result-pad">
         <div class="payment-result-header">[$6961]!</div>
-        <div class="payment-result-txt">[$6962]</div>
+        <div class="payment-result-txt">[$19512]</div>
         <div class="payment-result-icon"></div>
         <div class="payment-result-button">[$6690]</div>
     </div>
@@ -3648,7 +3656,7 @@
     </div>
     <div class="payment-result-pad">
         <div class="payment-result-header">[$7983]</div>
-        <div class="payment-result-txt">[$8755]</div>
+        <div class="payment-result-txt">[$19513]</div>
         <div class="payment-result-icon"></div>
         <div class="payment-result-button">[$6690]</div>
     </div>
@@ -3662,7 +3670,7 @@
     </div>
     <div class="payment-result-pad">
         <div class="payment-result-header">[$7983]</div>
-        <div class="payment-result-txt">[$10636]</div>
+        <div class="payment-result-txt">[$19514]</div>
         <div class="payment-result-icon"></div>
         <div class="payment-result-button">[$6690]</div>
     </div>
@@ -4480,7 +4488,7 @@
         </div>
         <div class="default-dialog-bottom">
             <div class="default-widget-buttons">
-                <div class="fm-dialog-new-folder-button default-grey-button right"><span>Close</span></div>
+                <div class="fm-dialog-new-folder-button default-grey-button right"><span>[$148]</span></div>
                 <div class="fm-dialog-new-folder-button default-white-button right"><span>More settings</span></div>
             </div>
             <div class="remove-widget-buttons hidden">
@@ -4501,6 +4509,59 @@
         <div class="drag-n-drop info-block">
             <i></i><span>[$16560]</span>
         </div>
+    </div>
+</div>
+
+<!-- Sort and filter dialog for Tree panel and Dialog Tree -->
+<div class="dropdown body dark dialog-sorting-menu hidden">
+    <div class="dropdown-section sort-by">
+        <div class="sorting-menu-arrow"></div>
+        <span class="dropdown-color-txt">[$7331]</span>
+        <a data-by="name" class="dropdown-item asc active">
+            <i class="small-icon context az"></i>[$86]</a>
+        <a data-by="label" class="dropdown-item">
+            <i class="small-icon context labels"></i>[$17398]</a>
+        <a data-by="status" class="dropdown-item">
+            <i class="small-icon context status"></i>[$89]</a>
+        <a data-by="last-interaction" class="dropdown-item">
+            <i class="small-icon context conversation"></i>[$5904]</a>
+        <a data-by="fav" class="dropdown-item">
+            <i class="small-icon context heart"></i>[$5871]</a>
+    </div>
+ </div>
+
+<!-- Sort and filter dialog for File Manager -->
+<div class="dropdown body colour-sorting-menu hidden">
+    <div class="dropdown-section sort-by">
+        <span class="dropdown-color-txt">[$7331]</span>
+        <a data-by="name" class="dropdown-item asc active">
+            <i class="small-icon context az"></i>[$86]</a>
+        <a data-by="label" class="dropdown-item dropdown-item-label disabled static">
+            <i class="small-icon context labels"></i>[$17398]</a>
+        <hr>
+    </div>
+    <div class="dropdown-section filter-by">
+        <span class="no-tips">
+            <span>
+                <span class="dropdown-color-txt">[$17791]</span>
+                <div class="labels small">
+                    <span class="dropdown-item static">
+                        <i class="small-icon context labels"></i>[$17398]
+                    </span>
+                    <span class="dropdown-colour-item red-colour-label" data-label-id="1" data-label-txt="Red"></span>
+                    <span class="dropdown-colour-item orange-colour-label" data-label-id="2" data-label-txt="Orange"></span>
+                    <span class="dropdown-colour-item yellow-colour-label" data-label-id="3" data-label-txt="Yellow"></span>
+                    <span class="dropdown-colour-item green-colour-label" data-label-id="4" data-label-txt="Green"></span>
+                    <span class="dropdown-colour-item blue-colour-label" data-label-id="5" data-label-txt="Blue"></span>
+                    <span class="dropdown-colour-item purple-colour-label" data-label-id="6" data-label-txt="Purple"></span>
+                    <span class="dropdown-colour-item grey-colour-label" data-label-id="7" data-label-txt="Grey"></span>
+                    <span class="clear"></span>
+                    <span class="dropdown-color-info">
+                        [$16221]
+                    </span>
+                </div>
+            </span>
+        </span>
     </div>
 </div>
 
@@ -4571,7 +4632,6 @@
         <div class="default-white-button right closebtn"><span>[$82]</span></div>
     </div>
 </div>
-
 
 <!-- QR Code Dialog !-->
 <div class="fm-dialog qr-dialog hidden">
@@ -4669,9 +4729,6 @@
         </div>
         <div class="clear"></div>
         <div class="middle-button-wrapper inline-buttons">
-            <div class="default-56px-button grey-button back-button">
-                <div class="big-btn-txt">[$822]</div>
-            </div>
             <div class="default-56px-button red-button submit-button">
                 <span class="label">[$1694]</span>
                 <span class="loading-image">
@@ -4679,6 +4736,7 @@
                 </span>
             </div>
         </div>
+        <div class="lost-authenticator-button">[$19215]</div>
     </div>
 </div>
 
@@ -4686,14 +4744,15 @@
 <!-- Setup Two-Factor Authentication !-->
 <div class="fm-dialog two-factor-dialog setup-two-factor hidden">
     <div class="fm-dialog-header">
-        <div class="fm-dialog-title"></div>
+        <div class="fm-dialog-title">[$19289]</div>
         <div class="fm-dialog-close"></div>
         <div class="clear"></div>
     </div>
     <div class="two-factor-content-block set-up-tfactor">
         <div class="tf-container">
-            <div class="information-highlight success">
-                <span>[$17864]</span>
+            <div class="instruction-message">
+                <div class="text">[$19205]</div>
+                <div class="no-auth-app-button">[$19565]</div>
             </div>
             <div class="two-factor-qr-code"></div>
             <div class="fm-account-input disabled">
@@ -4710,7 +4769,34 @@
 </div>
 
 
- <!-- Set up Two factor verify the code from Authentication app -->
+<!-- Select Authenticator App tooltip launched on the Setup 2FA dialog -->
+<div class="mobile auth-app-select-tooltip hidden">
+    <i class="dropdown-white-arrow"></i>
+    <div class="mobile explanation">[$19566]</div>
+    <a class="mobile app-link authy" href="https://authy.com/download/" target="_blank" rel="noopener noreferrer">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Authy</span>
+        <span class="mobile app-link-arrow"></span>
+    </a>
+    <a class="mobile app-link duomobile" href="https://duo.com/product/trusted-users/two-factor-authentication/duo-mobile" target="_blank" rel="noopener noreferrer">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Duo Mobile</span>
+        <span class="mobile app-link-arrow"></span>
+    </a>
+    <a class="mobile app-link googleauthenticator" href="https://support.google.com/accounts/answer/1066447" target="_blank" rel="noopener noreferrer">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Google Authenticator</span>
+        <span class="mobile app-link-arrow"></span>
+    </a>
+    <a class="mobile app-link microsoftauthenticator" href="https://www.microsoft.com/en-us/account/authenticator#getapp" target="_blank" rel="noopener noreferrer">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Microsoft Authenticator</span>
+        <span class="mobile app-link-arrow"></span>
+    </a>
+</div>
+
+
+<!-- Set up Two factor verify the code from Authentication app -->
 <div class="fm-dialog two-factor-dialog setup-two-factor-verify hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title"></div>
@@ -4944,19 +5030,6 @@
                 <b>[$19604]:</b> <span class="pending-email-txt">kd@mega.co.nz</span>
             </div>
 
-        <!--<div class="dialog-input-title-ontop">
-            Role<br>
-            <div class="dialog-input correct-input">
-                <div class="list-arrow"></div>
-                <select size="1">
-                    <option value=" ">Sub-administrator</option>
-                    <option value=" ">Product manager</option>
-                    <option value=" ">Developer</option>
-                    <option value=" ">Designer</option>
-                </select>
-            </div>
-        </div>-->
-
         <div class="dialog-input-title-ontop">
              <div class="title">[$19150]</div>
             <input class="dialog-input edit-sub-position" type="text" placeholder="[$19150]">
@@ -5004,7 +5077,7 @@
     <div class="re-enable-large-icon icon64 dlg-suba-icon"></div>
     <div class="dialog-text-container">
         <div class="dialog-text-one">Are you sure you want to disable the account of <b>Jay Pierce</b>? </div>
-        <!--<span class="dialog-text-two">Note: You can re-enable the account at any later stage from the disabled accounts list.</span>-->
+
     </div>
     <div class="dialog-button-container">
         <div class="default-green-button-user-management dlg-btn yes-answer">

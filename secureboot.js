@@ -208,20 +208,9 @@ if (is_chrome_firefox) {
 
     ua = navigator.userAgent.toLowerCase();
 }
-else if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
-        && parseInt(String(navigator.appVersion).split('Chrome/').pop()) < 22) {
-    b_u = 1;
-}
-else if (ua.indexOf('firefox') > -1 && typeof DataView === 'undefined') {
-    b_u = 1;
-}
-else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem === 'undefined') {
-    b_u = 1;
-}
-var myURL = URL;
-if (!myURL) {
-    b_u = 1;
-}
+
+var myURL = window.URL;
+b_u = b_u || !myURL || typeof DataView === 'undefined' || (window.chrome && !document.exitPointerLock);
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -546,37 +535,6 @@ var mega = {
         }
 
         return this._urlParams;
-    },
-
-    /**
-     * Fetches information from the API about which features are enabled
-     * @param {Function|undefined} completeCallback The function to run when the function has completed
-     */
-    getApiMiscFlags: function(completeCallback) {
-
-        'use strict';
-
-        // If the flags have already been fetched this session, don't fetch again and run the callback
-        if (Object.keys(mega.apiMiscFlags).length !== 0 && typeof completeCallback === 'function') {
-            completeCallback();
-        }
-        else {
-            // Make Get Miscellaneous Flags (gmf) API request
-            api_req({ a: 'gmf' }, {
-                callback: function(result) {
-                    if (result) {
-
-                        // Cache flags object
-                        mega.apiMiscFlags = result;
-
-                        // Run the callback
-                        if (typeof completeCallback === 'function') {
-                            completeCallback();
-                        }
-                    }
-                }
-            });
-        }
     }
 };
 
@@ -1314,6 +1272,11 @@ function siteLoadError(error, filename) {
     }
 }
 
+// Add manifest.json so this can be used on latest browsers.
+var tag=document.createElement('link');
+tag.rel = "manifest";
+tag.href = staticpath + "images/favicons/manifest.json";
+document.getElementsByTagName('head')[0].appendChild(tag);
 
 if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
@@ -1332,21 +1295,21 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
     tag.sizes = "144x144";
-    tag.href = staticpath + "images/mobile/App_ipad_144x144.png";
+    tag.href = staticpath + "images/favicons/apple-touch-icon-144x144.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
     tag.sizes = "114x114";
-    tag.href = staticpath + "images/mobile/App_iphone_114x114.png";
+    tag.href = staticpath + "images/favicons/apple-touch-icon-114x114.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
     tag.sizes = "72x72";
-    tag.href = staticpath + "images/mobile/App_ipad_72X72.png";
+    tag.href = staticpath + "images/favicons/apple-touch-icon-72x72.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
-    tag.href = staticpath + "images/mobile/App_iphone_57X57.png"
+    tag.href = staticpath + "images/favicons/apple-touch-icon-57x57.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "shortcut icon";
@@ -1535,6 +1498,7 @@ else if (!b_u) {
 
     // Do not report exceptions if this build is older than 10 days
     var exTimeLeft = ((buildVersion.timestamp + (10 * 86400)) * 1000) > Date.now();
+    window.buildOlderThan10Days = !exTimeLeft;
 
     if (!d && exTimeLeft && (location.host === 'mega.nz' || is_extension || onBetaW))
     {
@@ -2074,6 +2038,7 @@ else if (!b_u) {
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
     jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
     jsl.push({f:'js/fm/fileversioning.js', n: 'fm_fileversioning_js', j:1});
+    jsl.push({f:'js/ui/gdpr-download.js', n: 'gdpr_download', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2090,36 +2055,37 @@ else if (!b_u) {
         jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
-        jsl.push({f:'html/key.html', n: 'key', j:0});
-        jsl.push({f:'html/login.html', n: 'login', j:0});
-        jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
-        jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
+        jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
+        jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
+
+        jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
+        jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
+        jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
+
         jsl.push({f:'css/download.css', n: 'download_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
-
         jsl.push({f:'css/account.css', n: 'account_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/labels-and-filters.css', n: 'labels-and-filters_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
-
         jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
 
-        jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-        jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
+        jsl.push({f:'html/key.html', n: 'key', j:0});
+        jsl.push({f:'html/login.html', n: 'login', j:0});
+        jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
+        jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
-        jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
     } // !is_mobile
 
     // do not change the order...
@@ -2414,10 +2380,7 @@ else if (!b_u) {
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
-            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1},
-
-            /* misc */
-            'onboarding_js': {f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1}
+            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
         }
     };
 
@@ -2788,11 +2751,37 @@ else if (!b_u) {
             xhr_stack[xhri].send(null);
         }
     }
-    window.onload = function ()
-    {
+
+    window.onload = function() {
+        'use strict';
+
         pageLoadTime = Date.now();
         mBroadcaster.once('startMega', function() {
-            pageLoadTime = Date.now() - pageLoadTime;
+            var now = Date.now();
+
+            pageLoadTime = now - pageLoadTime;
+
+            var ph = String(isPublicLink(page)).split('!')[1];
+            if (ph) {
+                localStorage.affid = ph;
+                localStorage.affts = now;
+            }
+
+            Object.defineProperty(mega, 'affid', {
+                get: function() {
+                    return parseInt(localStorage.affts) + 864e5 > Date.now() && localStorage.affid || 0;
+                }
+            });
+
+            // Get information about what API flags are enabled e.g. 2FA, New Registration etc
+            if (!is_iframed) {
+                M.req('gmf').done(function(result) {
+                    if (typeof result === 'object') {
+                        // Cache flags object
+                        mega.apiMiscFlags = result;
+                    }
+                });
+            }
         });
 
         if (!maintenance && !androidsplash && !is_karma) {
@@ -3061,7 +3050,7 @@ else if (!b_u) {
                 var g = {a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': u_sid || ''};
 
                 xhr(false, g, function(response) {
-                    dl_res = response[0] || response;
+                    dl_res = Array.isArray(response) && response[0];
                 });
             }
 
@@ -3277,6 +3266,15 @@ if (window.requestIdleCallback) {
 
         return window.requestIdleCallback(callback, {timeout: 20});
     };
+}
+
+/** Helper to replace process.nextTick in videostream.js */
+function onIdleA(boundCallBack) {
+    'use strict';
+
+    onIdle(function() {
+        boundCallBack();
+    });
 }
 
 function makeUUID(a) {

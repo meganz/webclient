@@ -933,7 +933,7 @@ var CloudBrowserDialog = React.createClass({
             sortFunc = M.getSortByDateTimeFn();
         }
         else /*if(self.state.sortBy[0] === "grid-header-star")*/ {
-            sortFunc = M.getSortByFavFn();
+            sortFunc = M.sortByFavFn(order);
         }
 
         // always return first the folders and then the files

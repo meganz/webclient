@@ -2296,7 +2296,7 @@ var exportExpiry = {
         $node.filter('.data-block-view').removeClass('linked');
 
         // Remove link icon from left panel
-        $('#treeli_' + nodeId + ' span').removeClass('linked');
+        $('#treeli_' + nodeId + ' > span').removeClass('linked');
     };
 
     /**

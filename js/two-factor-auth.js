@@ -88,7 +88,8 @@ twofactor.loginDialog = {
         // Initialise functionality
         this.initKeyupFunctionality();
         this.initSubmitButton(oldStartLoginCallback, newStartLoginCallback);
-        this.initBackAndCloseButton();
+        this.initLostAuthenticatorDeviceButton();
+        this.initCloseButton();
     },
 
     /**
@@ -128,6 +129,9 @@ twofactor.loginDialog = {
                 $submitButton.addClass('active');
             }
         });
+
+        // Put the focus in the PIN input field
+        $pinCodeInput.trigger('focus');
     },
 
     /**
@@ -144,7 +148,7 @@ twofactor.loginDialog = {
         var $pinCodeInput = $dialog.find('.pin-input');
         var $submitButton = $dialog.find('.submit-button');
 
-        // On Submit button click/tap
+        // On Submit button click
         $submitButton.rebind('click', function() {
 
             // Get the Google Authenticator PIN code from the user
@@ -162,26 +166,41 @@ twofactor.loginDialog = {
             security.login.checkLoginMethod(email, password, pinCode, rememberMe,
                                             oldStartLoginCallback,
                                             newStartLoginCallback);
-
-            // Prevent double taps
-            return false;
         });
     },
 
     /**
-     * Initialise the Back and Close buttons to close the overlay
+     * Initialise the Lost Authenticator Device button
      */
-    initBackAndCloseButton: function() {
+    initLostAuthenticatorDeviceButton: function() {
+
+        'use strict';
+
+        // Cache selectors
+        var $dialog = $('.fm-dialog.verify-two-factor-login');
+        var $lostDeviceButton = $dialog.find('.lost-authenticator-button');
+
+        // On button click
+        $lostDeviceButton.rebind('click', function() {
+
+            // Load the Recovery page where they can recover using their Recovery Key
+            loadSubPage('recovery');
+        });
+    },
+
+    /**
+     * Initialise the Close button to close the overlay
+     */
+    initCloseButton: function() {
 
         'use strict';
 
         // Show the dialog
         var $dialog = $('.fm-dialog.verify-two-factor-login');
         var $closeButton = $dialog.find('.fm-dialog-close');
-        var $backButton = $dialog.find('.back-button');
 
         // On click of the close and back buttons
-        $closeButton.add($backButton).rebind('click', function() {
+        $closeButton.rebind('click', function() {
 
             // Close the modal dialog
             twofactor.loginDialog.closeDialog();
@@ -207,6 +226,9 @@ twofactor.loginDialog = {
         $submitButton.removeClass('loading');
         $warningText.removeClass('hidden');
         $pinCodeInput.val('');
+
+        // Put the focus back in the PIN input field
+        $pinCodeInput.trigger('focus');
     },
 
     /**
@@ -395,6 +417,7 @@ twofactor.setupDialog = {
         this.getSharedSecret();
         this.initNextButton();
         this.initCloseButton();
+        this.initNoAuthenticatorAppButton();
 
         // Show the dialog
         this.$dialog.removeClass('hidden');
@@ -488,6 +511,75 @@ twofactor.setupDialog = {
         // Hide the dialog and background
         this.$dialog.addClass('hidden');
         this.$overlay.addClass('hidden');
+    },
+
+    /**
+     * Initialise the Don't have an authenticator app? button to open the Select Authenticator App tooltip
+     */
+    initNoAuthenticatorAppButton: function() {
+
+        'use strict';
+
+        var $noAuthAppButton = this.$dialog.find('.no-auth-app-button');
+        var $authAppSelectDialog = $('.auth-app-select-tooltip');
+
+        // On button click
+        $noAuthAppButton.rebind('click', function() {
+
+            // Get the absolute position of the button, the width of the button and dialog
+            var buttonOffset = $noAuthAppButton.offset();
+            var buttonWidth = $noAuthAppButton.width();
+            var dialogWidth = $authAppSelectDialog.outerWidth();
+
+            // Put the dialog in the middle of the button horizontally
+            var offsetMiddleOfButton = buttonOffset.left + (buttonWidth / 2);
+            var leftOffset = offsetMiddleOfButton - (dialogWidth / 2);
+
+            // Move the dialog down below the button text (14px text height + 10px top margin)
+            var topOffset = buttonOffset.top + 14 + 10;
+
+            // Show the tooltip above the Select Authenticator app dialog and below the button
+            $authAppSelectDialog.css({ top: topOffset, left: leftOffset }).removeClass('hidden');
+
+            // Initialise the handler to close the tooltip
+            twofactor.setupDialog.initTooltipClose();
+
+            // Prevent click closing the tooltip straight away
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the click handler to close the tooltip if they click anywhere in or out of the tooltip or press the
+     * Esc key. The authenticator app buttons/hyperlinks should still open the link in a new tab/window regardless.
+     */
+    initTooltipClose: function() {
+
+        'use strict';
+
+        // If there is a click anywhere on the page
+        $(document).rebind('click.closeauthapptooltip', function() {
+
+            // Close the tooltip
+            $('.auth-app-select-tooltip').addClass('hidden');
+
+            // Remove the click handler
+            $(document).off('click.closeauthapptooltip');
+        });
+
+        // If there is a keypress
+        $(document).rebind('keyup.closeauthapptooltip', function(event) {
+
+            // If the Esc key was pressed
+            if (event.keyCode === 27) {
+
+                // Close the tooltip
+                $('.auth-app-select-tooltip').addClass('hidden');
+
+                // Remove the keyup handler
+                $(document).off('keyup.closeauthapptooltip');
+            }
+        });
     }
 };
 
@@ -524,6 +616,9 @@ twofactor.verifySetupDialog = {
         // Show the dialog
         this.$dialog.removeClass('hidden');
         this.$overlay.removeClass('hidden');
+
+        // Put the focus in the PIN input field after its visible
+        this.$dialog.find('.pin-input').trigger('focus');
     },
 
     /**
@@ -618,7 +713,7 @@ twofactor.verifySetupDialog = {
         'use strict';
 
         // Cache selectors
-        var $pinCode = this.$dialog.find('.pin-input');
+        var $pinCodeInput = this.$dialog.find('.pin-input');
         var $backButton = this.$dialog.find('.back-button');
         var $closeButton = this.$dialog.find('.fm-dialog-close');
         var $verifyButton = this.$dialog.find('.next-button');
@@ -635,7 +730,7 @@ twofactor.verifySetupDialog = {
             if ($successText.hasClass('hidden')) {
 
                 // Get the Google Authenticator PIN code from the user
-                var pinCode = $.trim($pinCode.val());
+                var pinCode = $.trim($pinCodeInput.val());
 
                 // Run Multi-Factor Auth Setup (mfas) request
                 api_req({ a: 'mfas', mfa: pinCode }, {
@@ -654,7 +749,10 @@ twofactor.verifySetupDialog = {
 
                             // If there was an error, show message that the code was incorrect and clear the text field
                             $warningText.removeClass('hidden');
-                            $pinCode.val('');
+                            $pinCodeInput.val('');
+
+                            // Put the focus back in the PIN input field
+                            $pinCodeInput.trigger('focus');
                         }
                         else {
                             // Disable the back button and hide the close button to force them to go to the next step
@@ -805,6 +903,9 @@ twofactor.verifyActionDialog = {
         // Show the modal dialog
         this.$dialog.removeClass('hidden');
         this.$overlay.removeClass('hidden');
+
+        // Put the focus in the PIN input field after its visible
+        this.$dialog.find('.pin-input').trigger('focus');
     },
 
     /**

@@ -275,13 +275,6 @@ Chat.prototype.init = function() {
         self.plugins[k] = new v(self);
     });
 
-
-
-    var updateMyConnectionStatus = function() {
-        self.renderMyStatus();
-    };
-
-
     // UI events
     $(document.body).rebind('mousedown.megachat', '.top-user-status-popup .tick-item', function() {
         var presence = $(this).data("presence");
@@ -445,19 +438,12 @@ Chat.prototype.init = function() {
     });
 
     $(document.body).rebind('mouseover.notsentindicator', '.tooltip-trigger', function() {
-        var $this = $(this),
-            $notification = $('.tooltip.' + $(this).attr('data-tooltip')),
-            iconTopPos,
-            iconLeftPos,
-            notificatonWidth,
-            notificatonHeight;
-
-
-        $notification.removeClass('hidden');
-        iconTopPos = $this.offset().top,
-            iconLeftPos = $this.offset().left,
-            notificatonWidth = $notification.outerWidth()/2 - 10,
-            notificatonHeight = $notification.outerHeight() + 10;
+        var $this = $(this);
+        var $notification = $('.tooltip.' + $this.attr('data-tooltip')).removeClass('hidden');
+        var iconTopPos = $this.offset().top;
+        var iconLeftPos = $this.offset().left;
+        var notificatonHeight = $notification.outerHeight() + 10;
+        var notificatonWidth = $notification.outerWidth() / 2 - 10;
         $notification.offset({ top: iconTopPos - notificatonHeight, left: iconLeftPos - notificatonWidth});
     });
 
@@ -468,23 +454,217 @@ Chat.prototype.init = function() {
     });
 
 
-    mBroadcaster.addListener('upload:start', function(data) {
-        if (d) {
-            MegaLogger.getLogger('onUploadEvent').debug('upload:start', data);
+    self.registerUploadListeners();
+    self.trigger("onInit");
+};
+
+Chat.prototype.unregisterUploadListeners = function(destroy) {
+    'use strict';
+    var self = this;
+
+    mBroadcaster.removeListener(self._uplDone);
+    mBroadcaster.removeListener(self._uplError);
+    mBroadcaster.removeListener(self._uplAbort);
+    mBroadcaster.removeListener(self._uplFAError);
+    mBroadcaster.removeListener(self._uplFAReady);
+
+    if (destroy) {
+        mBroadcaster.removeListener(self._uplStart);
+    }
+
+    delete self._uplError;
+};
+
+Chat.prototype.registerUploadListeners = function() {
+    'use strict';
+    var self = this;
+    var logger = d && MegaLogger.getLogger('chatUploadListener', false, self.logger);
+
+    self.unregisterUploadListeners(true);
+
+    // Iterate chats for which we are uploading
+    var forEachChat = function(chats, callback) {
+        var result = 0;
+
+        if (!Array.isArray(chats)) {
+            chats = [chats];
         }
 
-        for (var k in data) {
-            if (data[k].chat) {
-                var roomId = data[k].chat.replace("g/", "").split("/")[1];
-                if (self.chats[roomId]) {
-                    self.chats[roomId].onUploadStart(data);
-                    break;
+        for (var i = chats.length; i--;) {
+            var roomId = String(chats[i]).split('/').pop();
+
+            if (self.chats[roomId]) {
+                callback(roomId, ++result);
+            }
+        }
+
+        return result;
+    };
+
+    // find pending upload id by faid or handle
+    var lookupPendingUpload = function(id) {
+        console.assert((id | 0) > 0 || String(id).length === 8, 'Invalid lookupPendingUpload arguments...');
+
+        for (var uid in ulmanager.ulEventData) {
+            if (ulmanager.ulEventData[uid].faid === id || ulmanager.ulEventData[uid].h === id) {
+                return uid;
+            }
+        }
+    };
+
+    // Stop listening for upload-related events if there are no more pending uploads
+    var unregisterListeners = function() {
+        if (!$.len(ulmanager.ulEventData)) {
+            self.unregisterUploadListeners();
+        }
+    };
+
+    // Attach nodes to a chat room on upload completion
+    var onUploadComplete = function(ul) {
+        if (ulmanager.ulEventData[ul && ul.uid]) {
+            forEachChat(ul.chat, function(roomId) {
+                var room = self.chats[roomId];
+
+                if (d) {
+                    logger.debug('Attaching node[%s] to chat room[%s]...', ul.h, roomId, ul.uid, ul, M.d[ul.h]);
+                }
+                room.attachNodes([ul.h]);
+            });
+
+            delete ulmanager.ulEventData[ul.uid];
+            unregisterListeners();
+        }
+    };
+
+    // Handle upload completions
+    var onUploadCompletion = function(uid, handle, faid, chat) {
+        if (!chat) {
+            if (d > 1) {
+                logger.debug('ignoring upload:completion that is unrelated to chat.', arguments);
+            }
+            return;
+        }
+
+        var n = M.d[handle];
+        var ul = ulmanager.ulEventData[uid] || false;
+
+        if (d) {
+            logger.debug('upload:completion', uid, handle, faid, ul, n);
+        }
+
+        if (!ul || !n) {
+            // This should not happen...
+            if (d) {
+                logger.error('Invalid state error...');
+            }
+        }
+        else {
+            ul.h = handle;
+
+            if (ul.efa && (!n.fa || String(n.fa).split('/').length < ul.efa)) {
+                // The fa was not yet attached to the node, wait for fa:* events
+                ul.faid = faid;
+
+                if (d) {
+                    logger.debug('Waiting for file attribute to arrive.', handle, ul);
+                }
+            }
+            else {
+                // this is not a media file or the fa is already set, attach node to chat room
+                onUploadComplete(ul);
+            }
+        }
+    };
+
+    // Handle upload errors
+    var onUploadError = function(uid, error) {
+        var ul = ulmanager.ulEventData[uid];
+
+        if (d) {
+            logger.debug(error === -0xDEADBEEF ? 'upload:abort' : 'upload.error', uid, error, [ul]);
+        }
+
+        if (ul) {
+            delete ulmanager.ulEventData[uid];
+            unregisterListeners();
+        }
+    };
+
+    // Signal upload completion on file attribute availability
+    var onAttributeReady = function(handle, fa) {
+        delay('chat:fa-ready:' + handle, function() {
+            var uid = lookupPendingUpload(handle);
+            var ul = ulmanager.ulEventData[uid] || false;
+
+            if (d) {
+                logger.debug('fa:ready', handle, fa, uid, ul);
+            }
+
+            if (ul.h && String(fa).split('/').length >= ul.efa) {
+                // The fa is now attached to the node, add it to the chat room(s)
+                onUploadComplete(ul);
+            }
+            else if (d) {
+                logger.debug('Not enough file attributes yet, holding...', ul);
+            }
+        });
+    };
+
+    // Signal upload completion if we were unable to store file attributes
+    var onAttributeError = function(faid, error, onStorageAPIError, nFAiled) {
+        var uid = lookupPendingUpload(faid);
+        var ul = ulmanager.ulEventData[uid] || false;
+
+        if (d) {
+            logger.debug('fa:error', faid, error, onStorageAPIError, uid, ul, nFAiled, ul.efa);
+        }
+
+        // Attaching some fa to the node failed.
+        if (ul) {
+            // decrement the number of expected file attributes
+            ul.efa = Math.max(0, ul.efa - nFAiled) | 0;
+
+            // has this upload finished?
+            if (ul.h) {
+                // Yes, check whether we must attach the node
+                var n = M.d[ul.h] || false;
+
+                if (!ul.efa || (n.fa && String(n.fa).split('/').length >= ul.efa)) {
+                    onUploadComplete(ul);
                 }
             }
         }
-    });
+    };
 
-    self.trigger("onInit");
+    // Register additional listeners when starting to upload
+    var registerLocalListeners = function() {
+        self._uplError = mBroadcaster.addListener('upload:error', onUploadError);
+        self._uplAbort = mBroadcaster.addListener('upload:abort', onUploadError);
+        self._uplFAReady = mBroadcaster.addListener('fa:ready', onAttributeReady);
+        self._uplFAError = mBroadcaster.addListener('fa:error', onAttributeError);
+        self._uplDone = mBroadcaster.addListener('upload:completion', onUploadCompletion);
+    };
+
+    // Listen to upload events
+    var onUploadStart = function(data) {
+        if (d) {
+            logger.info('onUploadStart', [data]);
+        }
+
+        var notify = function(roomId) {
+            self.chats[roomId].onUploadStart(data);
+        };
+
+        for (var k in data) {
+            var chats = data[k].chat;
+
+            if (chats && forEachChat(chats, notify) && !self._uplError) {
+                registerLocalListeners();
+            }
+        }
+    };
+
+    self._uplStart = mBroadcaster.addListener('upload:start', onUploadStart);
 };
 
 Chat.prototype.getRoomFromUrlHash = function(urlHash) {
@@ -578,6 +758,7 @@ Chat.prototype.destroy = function(isLogout) {
 
     self.isLoggingOut = isLogout;
 
+    self.unregisterUploadListeners(true);
     self.trigger('onDestroy', [isLogout]);
 
     // unmount the UI elements, to reduce any unneeded.
@@ -1336,7 +1517,7 @@ Chat.prototype._doLoadImages = function() {
     self._imagesToBeLoaded = Object.create(null);
 
     var chatImageParser = function(h, data) {
-        var n = M.chd[self._imageLoadCache[h][0]] || false;
+        var n = M.chd[(self._imageLoadCache[h] || [])[0]] || false;
 
         if (data !== 0xDEAD) {
             // Set the attachment node image source

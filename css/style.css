@@ -537,7 +537,7 @@ input[type="checkbox"] {
     margin: 20px 12px 0 7px;
 }
 .top-login-popup .checkboxOn, .top-login-popup .checkboxOff {
-    margin: 0px 11px 0 1px;
+    margin: 1px 11px 0 1px;
 }
 .top-login-popup .loginwarning-checkbox {
     margin: 12px 11px 0 0;
@@ -707,52 +707,6 @@ label span.black {
 }
 .notice-right-block .select_box {
     width: 423px;
-}
-.select_box option {
-    font-size: 14px;
-    line-height: 16px;
-    color: #888787;
-    background: #F2F2F3;
-    border: 0;
-    padding: 0;
-    margin: 0;
-}
-.select_box span.select-txt {
-    position: absolute;
-    left: 10px;
-    font-size: 14px;
-    line-height: 25px;
-    color: #888787;
-    top: 2px;
-    display: block;
-    z-index: 87;
-}
-.select_box div.select-button {
-    background-image: url(../images/mega/fm_sprite2.png);
-    background-position: left -42px;
-    background-repeat: no-repeat;
-    height: 30px;
-    width: 27px;
-    position: absolute;
-    right: -27px;
-    top: 0;
-}
-.select_box select {
-    border: 0;
- filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-    width: 973px;
-    height: 30px;
-    font-size: 13px;
-    line-height: 16px;
-    color: #888787;
-    padding: 0;
-    position: absolute;
-    z-index: 88;
-    left: 0;
-    top: 0;
 }
 .notice-right-block .select_box select {
     width: 450px;
@@ -3637,7 +3591,12 @@ label.iPhoneCheckLabelOff span {
     -khtml-opacity: 1;
     opacity: 1;
 }
-.nw-tree-panel-header + .fm-tree-panel, .not-logged .contacts-panel .fm-tree-panel {
+.nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel {
+    height: -webkit-calc(100% - 97px);
+    height: -moz-calc(100% - 97px);
+    height: calc(100% - 97px);
+}
+.nw-tree-panel-header + .nw-tree-panel-filter-tag.hidden + .fm-tree-panel, .not-logged .contacts-panel .fm-tree-panel {
     height: -webkit-calc(100% - 72px);
     height: -moz-calc(100% - 72px);
     height: calc(100% - 72px);
@@ -3879,9 +3838,15 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.linked {
     padding-right: 37px;
 }
+.nw-fm-tree-item.labeled {
+    padding-right: 48px;
+}
 .nw-fm-tree-item .data-item-icon {
     top: 2px;
     right: 12px;
+}
+.nw-fm-tree-item.linked, .nw-fm-tree-item.undecryptable {
+    padding-right: 30px;
 }
 .nw-fm-tree-item:hover, .nw-fm-tree-item.hovered {
     background-color: rgba(217,0,7,0.2);
@@ -4274,7 +4239,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-contact-item.selected .nw-contact-name, .selected .contacts-username, .selected .add-contact-username {
     color: white;
 }
-.nw-conversations-header, .nw-tree-panel-header {
+.nw-conversations-header, .nw-tree-panel-header, .nw-tree-panel-filter-tag {
     height: 36px;
     font-size: 15px;
     line-height: 36px;
@@ -4285,6 +4250,11 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+.nw-tree-panel-filter-tag {
+    height: 25px;
+    line-height: 25px;
+    padding: 0 3px 0 12px;
 }
 .fm-left-menu.dashboard + .nw-tree-panel-header {
     display: none;
@@ -5023,6 +4993,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
     z-index: 7;
+}
+.contacts.filled-input .fm-add-user {
+    display: none;
 }
 .nw-fm-tree-header.focused-input:not(.conversations) .button {
     -moz-opacity: 0;
@@ -5791,8 +5764,8 @@ th.grid-first-th {
 .data-block-view.taken-down.linked .data-item-icon {
     background-position: -9px -4852px;
 }
-.undecryptable.nw-fm-tree-item .data-item-icon, .nw-fm-tree-item.selected.linked.undecryptable .data-item-icon, .nw-fm-tree-item.dragover.linked.undecryptable .data-item-icon {
-    background-position: -15px -2639px;
+.undecryptable.nw-fm-tree-item .data-item-icon, .undecryptable.nw-fm-tree-item:hover .data-item-icon, .nw-fm-tree-item.selected.linked.undecryptable .data-item-icon, .nw-fm-tree-item.dragover.linked.undecryptable .data-item-icon {
+    background-position: -14px -2639px;
 }
 .undecryptable .grid-status-icon, .undecryptable .grid-status-icon.star {
     background-repeat: no-repeat;
@@ -6119,10 +6092,6 @@ th.grid-first-th {
 }
 .data-block-view.colour-label .tranfer-filetype-txt {
     padding-right: 12px;
-}
-.colour-label .tranfer-filetype-txt::after {
-    right: 12px;
-    top: 8px;
 }
 .grid-url-arrow, .file-settings-icon, .clear-transfer-icon {
     height: 16px;
@@ -7287,9 +7256,7 @@ table {
     display: none;
 }
 .fm-header-buttons {
-    position: absolute;
-    top: 0;
-    right: 0;
+    float: right;
     font-size: 0;
     white-space: nowrap;
     background-color: #ffffff;
@@ -7317,6 +7284,9 @@ table {
     box-sizing: border-box;
     font-size: 0;
     white-space: nowrap;
+}
+.fm-breadcrumbs-block.deactivated {
+    display: none;
 }
 .fm-breadcrumbs {
     display: block;
@@ -7558,7 +7528,7 @@ table {
     opacity: 0.05;
     cursor: default;
 }
-.fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-messages, .fm-empty-folder, .fm-empty-conversations, .fm-empty-incoming, .fm-invalid-folder, .fm-empty-folder-link {
+.fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-contacts, .fm-empty-messages, .fm-empty-folder, .fm-empty-conversations, .fm-empty-incoming, .fm-invalid-folder, .fm-empty-folder-link, .fm-empty-filter {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -7594,7 +7564,7 @@ table {
     height: 398px;
     margin-top: -199px;
 }
-.fm-empty-search .fm-empty-pad {
+.fm-empty-search .fm-empty-pad, .fm-empty-filter .fm-empty-pad {
     height: 324px;
     margin-top: -162px;
 }
@@ -7636,7 +7606,7 @@ table {
     height: 390px;
     margin-top: -171px;
 }
-.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg {
+.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg, .fm-empty-filter-bg {
     background-image: url(../images/mega/empty-sprite_v5.png);
     background-repeat: no-repeat;
 }
@@ -7648,7 +7618,7 @@ table {
     height: 258px;
     background-position: center -1680px;
 }
-.fm-empty-search-bg {
+.fm-empty-search-bg, .fm-empty-filter-bg {
     height: 244px;
     background-position: center -2350px;
 }
@@ -7735,7 +7705,7 @@ table {
     z-index: 100;
     border: 1px dotted black;
 }
-.context-menu, .nw-sorting-menu, .dialog-sorting-menu {
+.context-menu, .dialog-sorting-menu, .fm-sorting-menu {
     min-width: 160px;
     position: absolute;
     background-color: #333333;
@@ -7754,12 +7724,17 @@ table {
     display: none;
 }
 .nw-sorting-menu {
-    right: -156px;
-    top: 34px;
+    right: -155px;
+    top: 33px;
 }
-.dialog-sorting-menu {
+.dropdown.body.dialog-sorting-menu, .fm-sorting-menu {
+    min-width: 198px;
     left: 590px;
     top: 103px;
+}
+.fm-dialog .dropdown.body.dialog-sorting-menu{
+    left: 176px;
+    top: 202px;
 }
 .context-menu-divider, .pause-item-divider, .sorting-item-divider {
     height: 2px;
@@ -8210,7 +8185,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     -webkit-background-clip: padding;
      background-clip: padding-box;
 }
-
+.fm-dialog.share-dialog {
+    z-index: 1100;
+}
 .fm-dialog.rename-dialog, .fm-dialog.network-testing {
     min-width: 440px;
     margin: -77px 0 0 -220px;
@@ -10460,6 +10437,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     background-image: url(../images/mega/fm-main-sprite_v4.png);
     background-repeat: no-repeat;
     background-position: left -7998px;
+    display: block;
     position: absolute;
     width: 10px;
     height: 17px;
@@ -11272,6 +11250,65 @@ table {
     text-align: right;
     position: relative;
 }
+.fm-account-history .personal-data-container {
+    margin:24px 32px;
+    background-color: #fff;
+}
+.fm-account-history .personal-data-container .message {
+    font-size: 14px;
+    line-height: 20px;
+    color: #333;
+}
+.fm-account-history .personal-data-container .sub-message {
+    font-size: 13px;
+    line-height: 18px;
+    color: #666;
+    margin-top:8px;
+}
+.fm-account-history .personal-data-container .download-button {
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    box-sizing: border-box;
+    box-shadow:0 0.5px 1px 0 rgba(0,0,0,0.05);
+    cursor: pointer;
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    margin-top: 24px;
+    min-width: 100px;
+    padding: 0 16px;
+    position: relative;
+    transition: 0.1s;
+}
+.fm-account-history .personal-data-container .download-button .label {
+    font-size: 14px;
+    font-weight: 400;
+}
+.fm-account-history .personal-data-container .loading-image {
+    display: none;
+}
+.fm-account-history .personal-data-container .download-button.loading .label {
+    display: none;
+}
+.fm-account-history .personal-data-container .download-button.loading .loading-image {
+    display: inline-block;
+    font-size: 0;
+    height: 16px;
+    left: 50%;
+    line-height: 0;
+    margin-left: -8px;
+    margin-top: 6px;
+    position: absolute;
+    width: 16px;
+}
+.fm-account-history .personal-data-container .download-button .loading-image img {
+    width: 16px;
+    height: 16px;
+}
+.fm-account-history .personal-data-container .error-message {
+    color: #d90007;
+    margin-top: 10px;
+}
 .account-history-drop-items {
     line-height: 30px;
 }
@@ -11802,6 +11839,7 @@ table {
     cursor: pointer;
     display: block;
     position: absolute;
+    z-index: 10;
 }
 .top-login-full:hover {
     background-position: 1px -36px;
@@ -11956,6 +11994,7 @@ table {
     background-color: transparent;
     width: 21px;
     height: 21px;
+    margin-top: 17px;
 }
 .top-login-popup .top-login-warning-bott .checkboxOn::before, .top-login-popup .top-login-warning-bott .checkboxOff::before, .top-login-popup .top-login-warning-bott .checkboxOn::after, .top-login-popup .top-login-warning-bott .checkboxOff::after {
     display: none;
@@ -15199,11 +15238,11 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     padding: 0 15px 0 0;
     display: block;
 }
-.arrow.asc {
-    background-position: right -1225px;
-}
 .arrow.desc {
     background-position: right -1285px;
+}
+.arrow.asc {
+    background-position: right -1225px;
 }
 .search-bottom-menu {
     background-color: #EEEEEE;
@@ -18210,7 +18249,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .top-warning-popup.not-activated .warning-popup-body {
     padding-bottom: 8px;
 }
-.tree-item-on-search-hidden {
+.tree-item-on-search-hidden, .tree-item-on-filter-hidden {
     display: none !important;
 }
 /** top header feedback button **/
@@ -30314,6 +30353,11 @@ opacity: 1;
     position: relative;
 }
 
+.fm-picker-dialog .fm-picker-dialog-panel-header .dropdown-color-txt{
+    color: #FFFFFF;
+    padding-left: 0;
+    line-height: 18px;
+}
 
 .fm-picker-dialog .fm-picker-dialog-panel-header .fm-picker-dialog-panel-arrows:not(.hidden) {
     position: relative;
@@ -30426,6 +30470,9 @@ opacity: 1;
 .fm-picker-dialog .nw-fm-tree-item.linked .data-item-icon {
     right: 22px;
     top: 2px;
+}
+.fm-picker-dialog .nw-fm-tree-item .colour-label-ind {
+    right: 47px;
 }
 .fm-picker-dialog .contact-row {
     height: 24px;
@@ -30893,3 +30940,10 @@ opacity: 1;
 }
 /* end of Add Contact block/grid */
 
+.no-trans, .no-trans:before, .no-trans:after {
+    -webkit-transition: none!important;
+    -moz-transition: none!important;
+    -o-transition: none!important;
+    -ms-transition: none!important;
+    transition: none!important;
+}

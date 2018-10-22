@@ -131,7 +131,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             }
             for (var h in subs[k]) {
                 if (subs[k][h] instanceof Object) {
-                    if (!previousSubs[k][h] instanceof Object) {
+                    if (!(previousSubs[k][h] instanceof Object)) {
                         return true;
                     }
                     for (var a in subs[k][h]) {
@@ -239,7 +239,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         //}
 
 
-        /// events handlers
+        /// events handlers   ---- Keep commented for now, as the check box is only hidden
         // 1- check boxes
         // $('.business-sub-checkbox-td, .business-sub-checkbox-th', $usersTable).off('click.subuser');
         // $('.business-sub-checkbox-td, .business-sub-checkbox-th', $usersTable).on('click.subuser',
@@ -441,8 +441,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
             });
 
-
-
     };
 
 
@@ -536,7 +534,11 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
 };
 
-
+/**
+ * get the status string of a sub-user
+ * @param {Number} statusCode       a number represents the status code of a sub-user
+ * @returns {String}                the status string (Active, disabled ...etc)
+ */
 BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
     "use strict";
     if (statusCode === 0) {
@@ -558,7 +560,7 @@ BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
 
 /**
  * show the password dialog for invitation link
- * @param {string} invitationLink :         sub-user invitation link
+ * @param {string} invitationLink       sub-user invitation link
  */
 BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
     "use strict";
@@ -708,8 +710,7 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
     // handler for add users button
     $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
-            var bu = new BusinessAccountUI();
-            mySelf.showAddSubUserDialog(null, bu.viewSubAccountListUI);
+            mySelf.showAddSubUserDialog();
         });
 
     // handler account setting page
@@ -1422,6 +1423,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     this.initUItoRender();
     var mySelf = this;
     this.URLchanger('account');
+    loadingDialog.pshow();
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
@@ -1436,6 +1438,16 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         $accountPageHeader.removeClass('hidden');
         $('.settings-menu-bar .settings-menu-item', $accountContainer).removeClass('selected');
         $('.settings-menu-bar .suba-setting-profile', $accountContainer).addClass('selected');
+        loadingDialog.phide();
+
+        // if we dont find essential business attrs --> get them
+        if (!u_attr['%name'] && !u_attr['%phone']) {
+            mySelf.business.updateSubUserInfo(u_attr.b.bu, ['%name', '%phone',
+                '%email', '%taxnum', '%address1', '%address2', '%city', '%state',
+                '%country', '%zip']);
+            return;
+        }
+        
     };
 
     // event handler for header clicking
@@ -1489,6 +1501,8 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var cState = '';
     var cCountry = '';
     var cZip = '';
+
+    
 
     loadCountries();
 

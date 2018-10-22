@@ -97,12 +97,13 @@ function init_reset() {
     init_reset_pw();
 
     $('.new-registration-checkbox').rebind('click', function(e) {
-        if ($(this).hasClass('checkboxOn')) {
+        if ($(this).find(".register-check").hasClass('checkboxOn')) {
             $('.register-check').removeClass('checkboxOn').addClass('checkboxOff');
         }
         else {
             $('.register-check').addClass('checkboxOn').removeClass('checkboxOff');
         }
+        return false;
     });
 
     $('.login-register-input').rebind('click', function(e) {

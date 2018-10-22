@@ -1,5 +1,6 @@
 {
 	"name": "MEGA",
+	"short_name": "MEGA",
 	"icons": [
 		{
 			"src": "\/images\/favicons\/android-chrome-36x36.png",
@@ -37,5 +38,8 @@
 			"type": "image\/png",
 			"density": 4
 		}
-	]
+	],
+	"start_url": "/",
+	"theme_color": "#dc0000",
+    "background_color": "#ffffff"
 }

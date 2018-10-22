@@ -245,9 +245,6 @@ function init_page() {
         delete localStorage.businessSubAc;
     }
 
-    // Get information about what API flags are enabled e.g. 2FA, New Registration etc
-    mega.getApiMiscFlags();
-
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
 
@@ -808,6 +805,24 @@ function init_page() {
         // Check if they registered using the new registration process (version 2)
         if (decodedConfirmCode.substr(0, 13) === 'ConfirmCodeV2') {
 
+            // If already logged into an account
+            if (u_type === 3) {
+
+                // Ask them to log out and click on the confirmation link again
+                if (is_mobile) {
+                    parsepage(pages['mobile']);
+                    mobile.messageOverlay.show(l[2480], l[12440], function () {
+                        loadSubPage('fm');
+                    });
+                }
+                else {
+                    msgDialog('warningb', l[2480], l[12440], false, function () {
+                        loadSubPage('fm');
+                    });
+                }
+                return false;
+            }
+
             // Verify the confirm code using the new process
             security.register.verifyEmailConfirmCode(confirmcode, function(result, email) {
 
@@ -1244,9 +1259,24 @@ function init_page() {
         parsepage(pages['blog']);
         init_blog();
     }
-    else if (page == 'copyright') {
+    else if (is_mobile && (page === 'copyright' || page === 'copyrightnotice')) {
+
+        // Show message that the copyright takedown should be submitted in a desktop browser
+        parsepage(pages['mobile']);
+        mobile.messageOverlay.show(l[621], l[19628], function() {
+
+            // On clicking OK in the dialog, go to the file manager if logged in, or start page if not
+            loadSubPage(u_type === 3 ? 'fm' : 'start');
+        });
+        return false;
+    }
+    else if (page === 'copyrightnotice') {
+        parsepage(pages['copyrightnotice']);
+        copyright.init_cn();
+    }
+    else if (page === 'copyright') {
         parsepage(pages['copyright']);
-        $('.reg-st5-complete-button').rebind('click', function (e) {
+        $('.reg-st5-complete-button').rebind('click', function () {
             loadSubPage('copyrightnotice');
         });
     }
@@ -1270,9 +1300,19 @@ function init_page() {
         pro.propay.init();
     }
     else if (page.substr(0, 3) === 'pro') {
-        var tmp = page.split('/uao=');
+        /* jshint -W018 */
+        var tmp = page.split(/(\/\w+=)/);
         if (tmp.length > 1) {
-            mega.uaoref = decodeURIComponent(tmp[1]);
+            for (var s = 1; s < tmp.length; s += 2) {
+                tmp[String(tmp[s]).replace(/\W/g, '')] = mURIDecode(tmp[s + 1]);
+            }
+            if (tmp.uao) {
+                mega.uaoref = tmp.uao;
+            }
+            if (tmp.aff && (tmp.aff_time *= 1000) && !(localStorage.affts > tmp.aff_time)) {
+                localStorage.affid = tmp.aff;
+                localStorage.affts = tmp.aff_time;
+            }
             loadSubPage(tmp[0]);
             return;
         }
@@ -1341,10 +1381,6 @@ function init_page() {
     else if (page == 'done') {
         parsepage(pages['done']);
         init_done();
-    }
-    else if (page == 'copyrightnotice') {
-        parsepage(pages['copyrightnotice']);
-        copyright.init_cn();
     }
     else if (dlid) {
         page = 'download';
@@ -1694,7 +1730,10 @@ function topmenuUI() {
         $topMenu.find('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $topMenu.find('.top-menu-item.account').removeClass('hidden');
         $topMenu.find('.upgrade-your-account').removeClass('hidden');
-        $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle));
+        // for top menu, load avatar and show for logged in user
+        useravatar.loadAvatar(u_handle).always(function(){
+            $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle));
+        });
 
         $topHeader.find('.top-login-button').addClass('hidden');
         $topHeader.find('.membership-status').removeClass('hidden');

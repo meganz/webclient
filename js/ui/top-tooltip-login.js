@@ -134,10 +134,6 @@ var tooltiplogin = {
             $dialog.find('.login-notification-icon').removeClass('hidden');
         }
 
-        $('.top-dialog-login-button', $dialog).rebind('click', function() {
-            tooltiplogin.startLogin();
-        });
-
         $('.top-login-full', $dialog).rebind('click', function() {
             tooltiplogin.init(1);
             loadSubPage('login');
@@ -172,6 +168,10 @@ var tooltiplogin = {
             $('.top-login-warning', $dialog).removeClass('hidden');
             $('.top-login-warning', $dialog).addClass('active');
             $(this).addClass('hidden');
+        });
+
+        $('.top-login-forgot-pass', $dialog).rebind('click', function() {
+            loadSubPage('recovery');
         });
 
         $dialog.removeClass('hidden');

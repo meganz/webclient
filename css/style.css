@@ -24854,9 +24854,8 @@ opacity: 1;
 }
 
 .user-management-overview-bar-data{
-    width:990px;
     position: absolute;
-    margin-left: -455px;
+    margin-left: -430px;
     left:50%;
 }
 
@@ -25267,22 +25266,21 @@ opacity: 1;
 .user-management-subuser-profile-container .user-management-subuser-profile{
     padding:32px 0 32px 226px;
     position: relative;
-    max-width: 800px;
+    max-width: 640px;
 }
 
 .user-management-subuser-profile-container .subuser-container {
-    min-width: 220px;
     position: relative;
     display: inline-block;
+    margin-right: 48px;
 }
 
 .user-management-subuser-profile-container .subuser-sec-profile-container {
     display: inline-block;
-    padding: 0 24px;
-    margin-left: 40px;
+    padding-left: 24px;
     position: relative;
     vertical-align: top;
-    min-width: 340px;
+    min-width: 280px;
     box-sizing: border-box;
 }
 
@@ -25340,6 +25338,7 @@ opacity: 1;
     position: relative;
     display: block;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .user-management-subuser-profile-container .user-management-subuser-profile .subuser-email{
@@ -25350,6 +25349,7 @@ opacity: 1;
     position: relative;
     display: block;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .user-management-subaccount-view-container .user-management-subuser-profile-container .view-status-row {
@@ -25392,6 +25392,7 @@ opacity: 1;
     line-height: 28px;
     position: absolute;
     display: inline-block;
+    white-space: nowrap;
 }
 
 .user-management-subuser-profile-container .user-management-subuser-profile .view-status-row .initial-pw-bar {
@@ -25476,15 +25477,19 @@ opacity: 1;
     margin-top: 24px;
 }
 
-.user-management-subuser-profile-container .default-white-button-user-management{
+.user-management-subuser-profile-container .default-white-button-user-management,
+.user-management-subuser-profile-container .user-management-subuser-profile .default-red-button-user-management, 
+.user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
     margin-right: 12px;
     vertical-align: top;
+    margin-bottom: 8px;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .default-red-button-user-management, .user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
-    position: absolute;
-    right: 60px;
+.user-management-subuser-profile-container .user-management-subuser-profile .default-red-button-user-management, 
+.user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
+    float:right;
 }
+
 
 .files-grid-view.user-management-view .user-management-view-data{
     width:100%;
@@ -25748,7 +25753,7 @@ opacity: 1;
     min-width: 695px;
     max-width:1400px;
     width: 90%;
-    height: 221px;
+    height: 240px;
     margin: 24px auto 12px auto;
     box-sizing: border-box;
 }
@@ -25791,7 +25796,7 @@ opacity: 1;
 
 .user-management-overview-container .user-analysis-container .user-segments-container {
     width:25%;
-    height: 164px;
+    height: 184px;
     float: left;
     position: relative; 
 }
@@ -25804,6 +25809,7 @@ opacity: 1;
 
 .user-management-overview-container .user-analysis-container .user-segments-container .user-segment-title{
     width:100%;
+    height: 24px;
     text-align: center;
     color:#666666;
     font-weight: 400;
@@ -25816,9 +25822,9 @@ opacity: 1;
     width:100%;
     text-align: center;
     color:#333333; 
-    font-size: 64px;
+    font-size: 72px;
     font-weight: 300;
-    line-height: 88px;
+    line-height: 100px;
     margin:12px 0;
     font-family: 'source_sans_prolight';
 }
@@ -29614,7 +29620,7 @@ opacity: 1;
 
 
 
-@media only screen and (max-width: 1270px) {
+@media only screen and (max-width: 1200px) {
     .user-management-list-table tr td .user-management-name, .user-management-list-table tr td .user-management-email{
         width: 170px;
     }
@@ -29625,12 +29631,7 @@ opacity: 1;
         width:85px;
     }
 
-    .user-management-subuser-profile-container .user-management-subuser-profile .default-red-button-user-management, .user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
-        right: 24px;
-    }
-
     .user-management-overview-bar-data {
-        width: 640px;
         left: 50%;
         margin-left: -320px;
     }

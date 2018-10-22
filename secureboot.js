@@ -2355,9 +2355,6 @@ else if (!b_u) {
         'browsers': {f:'html/browsers.html', n: 'browsers', j:0},
         'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
         'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
-        'ios': {f:'html/ios.html', n: 'ios', j:0},
-        'android': {f:'html/android.html', n: 'android', j:0},
-        'wp': {f:'html/wp.html', n: 'wp', j:0},
         'uwp': {f:'html/uwp.html', n: 'uwp', j:0},
         'pdfviewer': {f:'html/pdfViewer.html', n: 'pdfviewer', j:0 },
         'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
@@ -2448,7 +2445,9 @@ else if (!b_u) {
         'takedown': ['takedown'],
         'sync': ['sync', 'sync_js'],
         'cmd': ['cmd', 'megacmd_js'],
-        'mobileapp': ['mobileapp'],
+        'mobile': ['mobileapp'],
+        'ios': ['mobileapp'],
+        'android': ['mobileapp'],
         'support': ['support_js', 'support'],
         'contact': ['contact'],
         'dev': ['dev','dev_js','sdkterms'],
@@ -2462,9 +2461,7 @@ else if (!b_u) {
         'plugin': ['browsers', 'browsers_js'],
         'extensions': ['browsers', 'browsers_js'],
         'bird': ['megabird'],
-        'ios': ['ios'],
-        'android': ['android'],
-        'wp': ['wp'],
+        'wp': ['uwp'],
         'uwp': ['uwp']
     };
 

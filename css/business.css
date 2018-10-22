@@ -93,7 +93,7 @@ i.medium-icon.business-sprite {
     content: '';
     left: 0;
     background-image: url(../images/mega/bottom-page/business-bg2@2x.png);
-    background-size: auto 634px;
+    background-size: cover;
     background-repeat: no-repeat;
     background-position: center top;
     background-color: #FAFAFA;

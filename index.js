@@ -1269,14 +1269,14 @@ function init_page() {
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
     }
-    else if (page === 'mobileapp') {
+    else if (page === 'mobile' || page === 'android' || page === 'ios') {
         parsepage(pages['mobileapp']);
     }
     else if (page === 'extensions') {
         parsepage(pages['browsers']);
         browserspage.init();
     }
-    else if (page === 'uwp') {
+    else if (page === 'uwp' || page === 'wp') {
         parsepage(pages['uwp']);
         bottompage.initTabs();
     }
@@ -1285,7 +1285,7 @@ function init_page() {
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
-        init_sync();
+        initMegasync();
         topmenuUI();
     }
     else if (page == 'cmd') {

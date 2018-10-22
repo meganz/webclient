@@ -462,6 +462,9 @@ html.gbot {
 .bottom-page.huge-bott-pad {
     padding-bottom: 134px;
 }
+.bottom-page.overflow-visible {
+    overflow: visible;
+}
 .bottom-page.big-header {
     font-size: 36px;
     line-height: 43px;
@@ -974,7 +977,7 @@ html.gbot {
     text-align: center;
     white-space: nowrap;
 }
-.pages-nav.nav-button:hover .button-label, .pages-nav.nav-button.active .button-label, .pages-nav.nav-button.opened .button-label {
+.pages-nav.nav-button:not(.disabled):hover .button-label, .pages-nav.nav-button.active .button-label, .pages-nav.nav-button.opened .button-label {
     color: #171A22;
     font-family: 'source_sans_prosemibold';
 }
@@ -1388,6 +1391,9 @@ height: 56px;
     -webkit-border-bottom-right-radius: 4px;
     border-bottom-right-radius: 4px;
     background-color: rgba(255,255,255,0.8);
+}
+.very-dark-blue-bg .nav-buttons-bl .pages-nav.nav-button.disabled::after {
+    background-color: rgba(100,100,100,0.2);
 }
 .bottom-page.top-title::before {
     content: '';
@@ -1917,10 +1923,6 @@ height: 56px;
     margin: 0 auto;
     display: table;
 }
-.cropped-page {
-    max-width: 1800px;
-    margin: 0 auto;
-}
 .uwp .advertise-chat .mobile-apps-button.red:hover {
     background-color: #ff444a;
 }
@@ -1939,7 +1941,7 @@ height: 56px;
     content: '';
     left: 0;
     background-image: url(../images/mega/bottom-page/gray-blue-angle@2x.png);
-    background-size: auto 634px;
+    background-size: cover;
     background-repeat: no-repeat;
     background-color: #fff;
     background-position: center top;
@@ -1992,9 +1994,18 @@ height: 56px;
     margin: 32px 0 32px -30px;
     display: block;
 }
-.bottom-page.very-dark-blue-bg .white-text {
+.bottom-page.very-dark-blue-bg .white-text, .very-dark-blue-bg .radio-txt, .very-dark-blue-bg .megaapp-linux-info, .very-dark-blue-bg .megaapp-button-info {
 	color: #fff;
 }
+.very-dark-blue-bg .megaapp-button-info.disabled {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+    -moz-opacity: 0.6;
+    -khtml-opacity: 0.6;
+    opacity: 0.6;
+}
+ .very-dark-blue-bg .megaapp-linux {
+     padding-bottom: 20px;
+ }
 .megasync .bottom-page.top-bl {
 	max-height: 1000px;
 }
@@ -2271,9 +2282,6 @@ height: 56px;
 }
 .megasync .button.download-megasync {
     margin: 18px 0 0 0;
-}
-.megasync .default-select.megaapp-dropdown, .megasync .bottom-page.radio-buttons {
-    margin: 0 auto;
 }
 .megasync .megaapp-button-info {
     padding: 16px 0 61px 0;
@@ -2641,7 +2649,9 @@ height: 56px;
     background-image: url(../images/mega/new-pages-sprite_v2.png);
     background-size: 376px auto;
 }
-
+.mobile-apps-button.no-pad {
+    margin: 0;
+}
 .bottom-page.img.ios2 {
     width: 1256px;
     max-width: 123%;
@@ -2919,7 +2929,7 @@ height: 56px;
 .bottom-page.angle-bg.blue {
     background-image: url(../images/mega/bottom-page/business-bg3@2x.png);
     background-color: transparent;
-    background-size: auto 1343px;
+    background-size: cover;
     bottom: auto;
     height: 1343px;
     top: 0;

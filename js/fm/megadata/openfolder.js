@@ -380,7 +380,7 @@
                         }
                     }
                     else {
-                        // No need to heck if the current object is not the first instance
+                        // No need to check if the current object is not the first instance
                         // because rendering is optimized inside it
                         usersM.viewSubAccountListUI();
                     }

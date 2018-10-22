@@ -710,8 +710,7 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
     // handler for add users button
     $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
-            var bu = new BusinessAccountUI();
-            mySelf.showAddSubUserDialog(null, bu.viewSubAccountListUI);
+            mySelf.showAddSubUserDialog();
         });
 
     // handler account setting page

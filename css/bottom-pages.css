@@ -2789,6 +2789,9 @@ height: 56px;
     font-size: 0;
     line-height: 0;
 }
+.bottom-page.apps-buttons.bott-block {
+    padding: 32px 0;
+}
 .bottom-page.dark-button {
     display: inline-block;
     background-image: url(../images/mega/pages-sprite_v3.png);

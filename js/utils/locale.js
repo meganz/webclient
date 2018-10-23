@@ -616,8 +616,7 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
     l[19514] = l[19514].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>').replace('%1', 2)
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[19661] = l[19661].replace('[A]', '<a href="/help/client/megasync/general/'
-        + 'how-does-syncing-with-mega-work-576c7fae886688e7028b4580" rel="noreferrer">')
+    l[19661] = l[19661].replace('[A]', '<a href="/help/client/megasync/" rel="noreferrer">')
         .replace('[/A]', '</a>');
     l[19685] = l[19685].replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
     l[19691] = l[19691].replace('[S]', '<span class="bold">').replace('[/S]', '</span>');

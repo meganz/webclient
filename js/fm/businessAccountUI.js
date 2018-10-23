@@ -1821,7 +1821,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             return false
         }
         // billed object validate
-        if (!invoice.u.e || !invoice.u.cname || !invoice.u.addr ) {
+        if (!invoice.u.e || !invoice.u.cname /*|| !invoice.u.addr*/ ) {
             return false;
         }
 

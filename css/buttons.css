@@ -383,6 +383,13 @@
     -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
 }
+
+.default-green-button:not(.tiny-button):not(.disabled):not(.no-hover):hover {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.2);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.2);
+    box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.2);
+}
+
 .default-grey-button::after {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);

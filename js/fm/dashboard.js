@@ -204,12 +204,18 @@ function dashboardUI() {
         }
 
         /* Registration date, bandwidth notification link */
-        $('.dashboard .button.upgrade-account, .bandwidth-info a').rebind('click', function() {
+        $('.dashboard .default-green-button.upgrade-account, .bandwidth-info a').rebind('click', function() {
             loadSubPage('pro');
         });
         $('.account.left-pane.reg-date-info').text(l[16128]);
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
 
+        // left-panel responsive contents
+        var $planDateWidth = $('.plan-date-info').width() + $('.plan-date-val').width();
+        var $regDateWidth = $('.reg-date-info').width() + $('.plan-date-val').width();
+        $.leftPaneResizable.options.updateWidth = Math.max($planDateWidth, $regDateWidth);
+
+        $($.leftPaneResizable).trigger('resize');
 
         accountUI.fillCharts(account, true);
 

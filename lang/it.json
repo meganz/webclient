@@ -2935,10 +2935,10 @@
     "19816": "Controlla su tutti i tuoi dispositivi e browser per vedere se hai ancora un accesso a MEGA. Se \u00e8 cos\u00ec, puoi resettare il tuo account.",
     "19817": "S\u00ec, ho un accesso disponibile a MEGA",
     "19818": "No, non ho un accesso disponibile a MEGA",
-    "19819": "A causa del paradigma della nostra criptazione end-to-end, non puoi accedere ai tuoi dati senza la tua password e la tua app di autenticazione, o senza una copia della tua Chiave di Recupero.",
+    "19819": "A causa del paradigma della nostra criptazione end-to-end, non puoi accedere ai tuoi dati senza la tua password e la tua app di autenticazione o senza una copia della tua Chiave di Recupero.",
     "19820": "No, voglio parcheggiare il mio account e crearne uno nuovo",
     "19821": "Grande! Hai una sessione attiva disponibile.[BR]Il prossimo step \u00e8 scaricare la tua Chiave di Recupero.",
-    "19822": "Seleziona il client con una sessione attiva disponibile per vedere le istruzioni su come scaricare la tua Chiave di Recupero.",
+    "19822": "Seleziona il dispositivo con una sessione attiva disponibile per vedere le istruzioni su come scaricare la tua Chiave di Recupero.",
     "19823": "Puoi facilmente recuperare il tuo account",
     "19824": "Per favore, inserisci il tuo indirizzo email qui sotto. Riceverai un link di recupero che ti permetter\u00e0 di inserire la tua Chiave di Recupero e resettare il tuo account",
     "19825": "Step precedente",
@@ -2957,8 +2957,8 @@
     "19838": "Ho aperto mega.nz su tutti i browser dei computer che utilizzo per controllare se ho un accesso disponibile.",
     "19839": "Ho cercato su tutti i miei computer l'app di MEGA.",
     "19840": "Quando ottieni la tua Chiave di Recupero, [A]procedi con il reset dell'account[\/A].",
-    "19841": "Parcheggia il tuo account e creane uno nuovo vuoto utilizzando lo stesso indirizzo email.",
-    "19842": "Sfortunatamente, a causa della criptografia resistente utilizzata da MEGA, la perdita della tua Chiave di Recupero render\u00e0 tutti i tuoi dati illeggibili. Se procedi, creerai un nuovo account vuoto utilizzando lo stesso indirizzo email.",
+    "19841": "Parcheggia il tuo account e creane uno nuovo utilizzando lo stesso indirizzo email.",
+    "19842": "Sfortunatamente, a causa della criptografia resistente utilizzata da MEGA, la perdita della tua Chiave di Recupero render\u00e0 tutti i tuoi dati illeggibili. Se procedi, creerai un nuovo account utilizzando lo stesso indirizzo email.",
     "19843": "Il tuo vecchio account rimarr\u00e0 parcheggiato per almeno 60 giorni e potr\u00e0 essere recuperato contattando [A]support@mega.nz[\/A] nel caso in cui puoi ancora recuperare la tua password.",
     "19844": "Requisiti della password",
     "19845": "Lunga almeno 8 caratteri",
@@ -2971,7 +2971,5 @@
     "19852": "Hai l'autenticazione a due fattori (2FA) attivata e hai perso il tuo dispositivo di autenticazione!",
     "19853": "Non potrai effettuare il login, cambiare l'indirizzo email, cambiare la password o disattivare l'autenticazione a due fattori (2FA).",
     "19854": "Non preoccuparti, puoi effettuare un reset dell'account utilizzando la tua Chiave di Recupero. Ci\u00f2 disattiver\u00e0 l'autenticazione a due fattori (2FA) e ti permetter\u00e0 di effettuare il login e cambiare le impostazioni dell'account. [B]Non perderai alcun file, contatto o messaggio[\/B].",
-    "19855": "Uno spazio vuoto all'inizio o alla fine della password non \u00e8 permesso.",
-    "19856": "Interact with MEGA",
-    "19857": "Double click to download a file or open a folder. [BR] Right click to see all available options."
+    "19855": "Whitespace at the start or end of the password is not permitted."
 }

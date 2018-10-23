@@ -903,6 +903,9 @@ function api_reqfailed(c, e) {
             else if (reasonCode === 300) {
                 reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
             }
+            else if (reasonCode === 400) {
+                reasonText = l[19748];// Your account was terminated due to breach of Mega's Terms of Service...
+            }
             else {// Unknown reasonCode
                 reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
             }

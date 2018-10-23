@@ -677,7 +677,7 @@ html.gbot {
 
 
 .bottom-btn-container {
-    margin: 48px 0;
+    margin: 48px 0 48px -200px;
     display: inline-block;
 }
 
@@ -718,6 +718,9 @@ html.gbot {
     transition: background-color 200ms ease-in-out;
 }
 
+.bottom-btn-container .bus-plan.button-48-height.red:hover {
+    background-color: #D90007;
+}
 
 
 /* end of Bottom pages common styles*/

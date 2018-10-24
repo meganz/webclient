@@ -1695,6 +1695,8 @@ height: 56px;
 }
 .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite {
     background-image: url(../images/mega/pages-sprite_v3.png);
+    background-size:360px auto;
+    background-repeat: no-repeat;
 }
 .bottom-page.large-icon.camera {
     background-position: 14px -3922px;
@@ -2817,10 +2819,10 @@ height: 56px;
     line-height: 24px;
     color: #666666;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-    padding: 139px 0 25px 0;
+    padding: 100px 0 25px 0;
 }
 .bottom-page.big-link {
-    font-size: 20px;
+    font-size: 16px;
     line-height: 24px;
     display: inline-block;
     color: #333333;
@@ -2843,7 +2845,15 @@ height: 56px;
     height: 18px;
     background-image: url(../images/mega/pages-sprite_v3.png);
     background-position: -162px -3401px;
+    background-size: 360px auto;
 }
+.bottom-page.big-link.uwp-windows-scrollto-button i {
+    background-position: -168px -3400px;
+    width: 24px;
+    height: 22px;
+    transform: rotate(90deg);
+}
+
 .bottom-page.img.mobile-top {
     max-width: 655px;
     width: 118%;
@@ -2969,7 +2979,7 @@ height: 56px;
     line-height: 22px;
     color: rgba(255,255,255,0.6);
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-    padding: 12px 0 0 0;
+    padding: 24px 0 0 0;
 }
 .bottom-page.dark-button.win10 {
     width: 217px;

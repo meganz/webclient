@@ -973,6 +973,21 @@ function init_page() {
             $('.contact-new-title.' + link).parent().get(0).scrollIntoView();
         });
     }
+    else if (page == 'mobileapp') {
+        parsepage(pages['mobileapp']);
+
+            console.log('got here 1')
+
+        $('.uwp-windows-scrollto-button').rebind('click', function() {
+
+            console.log('got here 2')
+
+            // Scroll to the element's parent (not the element itself because it's hidden by the header)
+            $('.uwp-windows-section').get(0).scrollIntoView();
+        
+        });
+
+    }
     else if (page.substr(0, 4) == 'help') {
         return Help.render();
     }

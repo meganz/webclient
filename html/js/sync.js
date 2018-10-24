@@ -75,6 +75,11 @@ function initMegasync() {
 
     resetMegasync();
 
+    // Preload linux options if on a linux client
+    if (ua.indexOf('linux') >= 0) {
+        megasync.getLinuxReleases(renderLinuxOptions);
+    }
+
     $content.find('.nav-buttons-bl a').rebind('click', function() {
         var $this = $(this);
         var osData = $this.attr('data-os');

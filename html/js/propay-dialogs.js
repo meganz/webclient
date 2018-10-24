@@ -466,27 +466,34 @@ var astroPayDialog = {
 
         insertEmailToPayResult(this.$pendingOverlay);
 
-        // Add click handlers for 'Go to my account' and Close buttons
-        this.$pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+        if (!u_type || u_type !== 3) {
+            this.$pendingOverlay.find('.payment-result-button, .payment-close').addClass('hidden');
+        }
+        else {
+            this.$pendingOverlay.find('.payment-result-button, .payment-close').removeClass('hidden');
 
-            // Hide the overlay
-            astroPayDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-            astroPayDialog.$pendingOverlay.addClass('hidden');
+            // Add click handlers for 'Go to my account' and Close buttons
+            this.$pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function () {
 
-            // Make sure it fetches new account data on reload
-            if (M.account) {
-                M.account.lastupdate = 0;
-            }
+                // Hide the overlay
+                astroPayDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                astroPayDialog.$pendingOverlay.addClass('hidden');
 
-            // Load file manager on mobile
-            if (is_mobile) {
-                loadSubPage('fm');
-            }
-            else {
-                // Otherwise on desktop, load the payment history section
-                loadSubPage('fm/account/history');
-            }
-        });
+                // Make sure it fetches new account data on reload
+                if (M.account) {
+                    M.account.lastupdate = 0;
+                }
+
+                // Load file manager on mobile
+                if (is_mobile) {
+                    loadSubPage('fm');
+                }
+                else {
+                    // Otherwise on desktop, load the payment history section
+                    loadSubPage('fm/account/history');
+                }
+            });
+        }
     }
 };
 
@@ -1634,28 +1641,34 @@ var addressDialog = {
             $pendingOverlay.removeClass('hidden');
 
             insertEmailToPayResult($pendingOverlay);
+            if (!u_type || u_type !== 3) {
+                $pendingOverlay.find('.payment-result-button, .payment-close').addClass('hidden');
+            }
+            else {
+                $pendingOverlay.find('.payment-result-button, .payment-close').removeClass('hidden');
 
-            // Add click handlers for 'Go to my account' and Close buttons
-            $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+                // Add click handlers for 'Go to my account' and Close buttons
+                $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function () {
 
-                // Hide the overlay
-                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-                $pendingOverlay.addClass('hidden');
+                    // Hide the overlay
+                    $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                    $pendingOverlay.addClass('hidden');
 
-                // Make sure it fetches new account data on reload
-                if (M.account) {
-                    M.account.lastupdate = 0;
-                }
+                    // Make sure it fetches new account data on reload
+                    if (M.account) {
+                        M.account.lastupdate = 0;
+                    }
 
-                // Load file manager on mobile
-                if (is_mobile) {
-                    loadSubPage('fm');
-                }
-                else {
-                    // Otherwise on desktop, load the payment history section
-                    loadSubPage('fm/account/history');
-                }
-            });
+                    // Load file manager on mobile
+                    if (is_mobile) {
+                        loadSubPage('fm');
+                    }
+                    else {
+                        // Otherwise on desktop, load the payment history section
+                        loadSubPage('fm/account/history');
+                    }
+                });
+            }
         }
         else {
             // Show the failure overlay
@@ -2438,7 +2451,7 @@ if (is_chrome_firefox) {
 var insertEmailToPayResult = function($overlay) {
     "use strict";
 
-    if (u_attr.email) {
+    if (u_attr && u_attr.email) {
         $overlay.find('.payment-result-txt .user-email').text(u_attr.email);
     } else if (localStorage.awaitingConfirmationAccount) {
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);

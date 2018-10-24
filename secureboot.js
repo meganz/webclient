@@ -2445,7 +2445,7 @@ else if (!b_u) {
         'takedown': ['takedown'],
         'sync': ['sync', 'sync_js'],
         'cmd': ['cmd', 'megacmd_js'],
-        'mobileapp': ['mobileapp'],
+        'mobile': ['mobileapp'],
         'ios': ['mobileapp'],
         'android': ['mobileapp'],
         'support': ['support_js', 'support'],

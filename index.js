@@ -491,7 +491,7 @@ function init_page() {
         && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
         && (page !== 'contact')
-        && (page !== 'mobileapp')
+        && (page !== 'mobileinfo')
         && (page !== 'uwp')
         && (page !== 'extensions')
         && (page !== 'sync')
@@ -972,21 +972,6 @@ function init_page() {
             // Scroll to the element's parent (not the element itself because it's hidden by the header)
             $('.contact-new-title.' + link).parent().get(0).scrollIntoView();
         });
-    }
-    else if (page == 'mobileapp') {
-        parsepage(pages['mobileapp']);
-
-            console.log('got here 1')
-
-        $('.uwp-windows-scrollto-button').rebind('click', function() {
-
-            console.log('got here 2')
-
-            // Scroll to the element's parent (not the element itself because it's hidden by the header)
-            $('.uwp-windows-section').get(0).scrollIntoView();
-        
-        });
-
     }
     else if (page.substr(0, 4) == 'help') {
         return Help.render();
@@ -1944,7 +1929,7 @@ function topmenuUI() {
             var subPages = [
                 'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
-                'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp', 'privacycompany',
+                'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileinfo', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'start', 'uwp'
             ];
@@ -2262,7 +2247,7 @@ function pagemetadata() {
     if (page == 'uwp') {
         mega_title = 'Windows Phone - MEGA';
     }
-    else if (page == 'mobileapp') {
+    else if (page == 'mobileinfo') {
         mega_title = 'MEGA - Mobile Apps';
         mega_desc = 'Securely manage your files and collaborate everyone from anywhere.';
     }

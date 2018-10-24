@@ -76,7 +76,7 @@ function initMegasync() {
     resetMegasync();
 
     if (pf.indexOf('LINUX') >= 0) {
-        linuxMegasyncDropdown();
+        megasync.UILinuxDropdown();
     }
 
     $content.find('.nav-buttons-bl a').rebind('click', function() {

@@ -491,7 +491,7 @@ function init_page() {
         && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
         && (page !== 'contact')
-        && (page !== 'mobileinfo')
+        && (page !== 'mobileapp')
         && (page !== 'uwp')
         && (page !== 'extensions')
         && (page !== 'sync')
@@ -1944,7 +1944,7 @@ function topmenuUI() {
             var subPages = [
                 'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
-                'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileinfo', 'privacycompany',
+                'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'start', 'uwp'
             ];
@@ -2262,7 +2262,7 @@ function pagemetadata() {
     if (page == 'uwp') {
         mega_title = 'Windows Phone - MEGA';
     }
-    else if (page == 'mobileinfo') {
+    else if (page == 'mobileapp') {
         mega_title = 'MEGA - Mobile Apps';
         mega_desc = 'Securely manage your files and collaborate everyone from anywhere.';
     }

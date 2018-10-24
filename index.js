@@ -2047,7 +2047,7 @@ function topmenuUI() {
     });
 
     $topHeader.find('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
-        if (e.keyCode == 13) {
+        if (e.keyCode === 13) {
 
             if (folderlink) {
                 // Flush cached nodes, if any
@@ -2067,9 +2067,7 @@ function topmenuUI() {
                         M.nn = Object.create(null);
                         var keys = Object.keys(M.d);
                         for (var i = keys.length; i--;) {
-                            if (!M.d[keys[i]].fv) {
-                                M.nn[M.d[keys[i]].h] = M.d[keys[i]].name;
-                            }
+                            M.nn[M.d[keys[i]].h] = M.d[keys[i]].name;
                         }
                     }
 

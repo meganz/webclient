@@ -2035,10 +2035,8 @@ function topmenuUI() {
 
     $topHeader.find('.top-clear-button').rebind('click', function () {
         if (folderlink) {
-            var dn = $(M.viewmode ? '.file-block-scrolling .file-block-title' : 'table.grid-table.fm .tranfer-filetype-txt');
-            var ct = M.viewmode ? 'a' : 'tr';
-            dn.closest(ct).show();
-            $(window).trigger('resize');
+            M.nn = false;
+            M.openFolder();
         }
         $topHeader.find('.top-search-bl').removeClass('contains-value active');
         $topHeader.find('.top-search-input').val('');
@@ -2049,7 +2047,7 @@ function topmenuUI() {
     });
 
     $topHeader.find('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
-        if (e.keyCode == 13 || folderlink) {
+        if (e.keyCode == 13) {
 
             if (folderlink) {
                 // Flush cached nodes, if any
@@ -2065,19 +2063,25 @@ function topmenuUI() {
             var val = $.trim($('.top-search-input').val());
             if (folderlink || val.length > 2 || !asciionly(val)) {
                 if (folderlink) {
-                    var dn = $(M.viewmode ? '.file-block-scrolling .file-block-title' : 'table.grid-table.fm .tranfer-filetype-txt');
-                    var ct = M.viewmode ? 'a' : 'tr';
-                    dn.closest(ct).show();
-
-                    if (val) {
-                        val = val.toLowerCase();
-                        dn.filter(function () {
-                            return !~$(this).text().toLowerCase().indexOf(val);
-                        }).closest(ct).hide();
+                    if (!M.nn) {
+                        M.nn = Object.create(null);
+                        var keys = Object.keys(M.d);
+                        for (var i = keys.length; i--;) {
+                            if (!M.d[keys[i]].fv) {
+                                M.nn[M.d[keys[i]].h] = M.d[keys[i]].name;
+                            }
+                        }
                     }
-                    $(window).trigger('resize');
-                    e.preventDefault();
-                    e.stopPropagation();
+
+                    var filter = M.getFilterBySearchFn(val);
+                    var v = [];
+                    for (var h in M.nn) {
+                        if (filter({ name: M.nn[h] })) {
+                            v.push(M.d[h]);
+                        }
+                    }
+                    M.v = v;
+                    M.renderMain();
                 }
                 else {
                     loadingDialog.show();

@@ -1811,7 +1811,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
     var validateInvoice = function (invoice) {
         // top level validate
         if (!invoice || !invoice.mega || !invoice.u || !invoice.items || !invoice.ts
-            || !invoice.tot || !invoice.taxrate) {
+            || invoice.tot === undefined || invoice.taxrate === undefined) {
             return false;
         }
 

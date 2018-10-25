@@ -505,6 +505,10 @@ mobile.register.old = {
                     u_attr.terms = 1;
                     localStorage.awaitingConfirmationAccount = JSON.stringify(registrationVars);
 
+                    if (mega.affid) {
+                        ops.aff = mega.affid;
+                    }
+
                     api_req(ops);
 
                     // Try getting the plan number they selected on Pro page
@@ -583,6 +587,10 @@ mobile.register.old = {
 
                         u_attr.terms = 1;
                         localStorage.awaitingConfirmationAccount = JSON.stringify(registrationVars);
+
+                        if (mega.affid) {
+                            ops.aff = mega.affid;
+                        }
 
                         api_req(ops);
 

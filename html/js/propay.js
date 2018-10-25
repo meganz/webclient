@@ -793,25 +793,34 @@ pro.propay = {
             }
             else {
                 // Otherwise select the first available payment option because this provider is no longer available
-                pro.propay.preselectFirstPaymentOption();
+                pro.propay.preselectPaymentOption();
             }
         }
         else {
             // Otherwise select the first available payment option
-            pro.propay.preselectFirstPaymentOption();
+            pro.propay.preselectPaymentOption();
         }
     },
 
     /**
-     * Preselects the first payment option in the list of payment providers
+     * Preselects the payment option in the list of payment providers. Pro balance should be selected first if
+     * they have a balance, otherwise the next payment provider should be selected (which is usually Visa)
      */
-    preselectFirstPaymentOption: function() {
+    preselectPaymentOption: function() {
 
-        // Find and select the first payment option
-        var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
-        $paymentOption.find('input').prop('checked', true);
-        $paymentOption.find('.membership-radio').addClass('checked');
-        $paymentOption.find('.provider-details').addClass('checked');
+        'use strict';
+
+        // Find the primary payment options
+        var $payOptions = $('.payment-options-list.primary .payment-method:not(.template)');
+
+        // If on mobile (which currently only has credit card providers) or they have a Pro balance, select the first
+        // option, otherwise select the next payment option (usually API will have it ordered to be Visa)
+        var $option = (is_mobile || parseFloat(pro.propay.proBalance) > 0) ? $payOptions.first() : $payOptions.eq(1);
+
+        // Check the radio button option
+        $option.find('input').prop('checked', true);
+        $option.find('.membership-radio').addClass('checked');
+        $option.find('.provider-details').addClass('checked');
     },
 
     /**
@@ -966,12 +975,6 @@ pro.propay = {
     /* jshint -W074 */  // Old code, refactor another day
     sendPurchaseToApi: function() {
 
-        // Set affiliate ID
-        var affiliateId = 0;
-        if (localStorage.affid && (localStorage.affts > (new Date().getTime() - 86400000))) {
-            affiliateId = localStorage.affid;
-        }
-
         // Show different loading animation text depending on the payment methods
         switch (pro.propay.proPaymentMethod) {
             case 'bitcoin':
@@ -1001,7 +1004,7 @@ pro.propay = {
             si:  apiId,
             p:   price,
             c:   currency,
-            aff: affiliateId,
+            aff: mega.affid,
             m:   m,
             bq:  fromBandwidthDialog,
             pbq: fromPreWarnBandwidthDialog

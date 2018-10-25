@@ -2235,7 +2235,6 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
                 ? UICallTerm.MISSED
                 : UICallTerm.TIMEOUT;
         case Term.kBusy:
-            assert(!isIncoming);
             return UICallTerm.REJECTED;
         case Term.kAppTerminating:
             return (self.predestroyState === CallState.kInProgress && self._hasConnectedSession)
@@ -2290,7 +2289,6 @@ Call.prototype.termCodeToHistCallEndedCode = function(terminationCode) {
         case Term.kAnswerTimeout:
             return CallManager.CALL_END_REMOTE_REASON.NO_ANSWER;
         case Term.kBusy:
-            assert(!isIncoming);
             return CallManager.CALL_END_REMOTE_REASON.REJECTED;
         case Term.kAppTerminating:
             return (self.predestroyState === CallState.kInProgress && self._hasConnectedSession)

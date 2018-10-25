@@ -1058,7 +1058,8 @@ function renameDialog() {
 
                 if (value && n.name && value !== n.name) {
                     if (M.isSafeName(value)) {
-                        if (!duplicated(nodeType, value)) {
+                        var targetFolder = n.p;
+                        if (!duplicated(nodeType, value, targetFolder)) {
                             M.rename(n.h, value);
                         }
                         else {

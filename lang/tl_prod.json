@@ -1595,7 +1595,7 @@
     "16355": "Payo: Ang limit na ito ay dynamic at depende sa dami ng hindi nagagamit na bandwidth na available.",
     "16356": "Ang iyong queued download ay lagpas sa kasalukuyang transfer quota na available sa iyong account at maaaring maputol.",
     "16357": "Ang iyong queued download ay lagpas sa kasalukuyang transfer quota na available sa iyong IP address at maaari itong maputol.",
-    "16358": "[S]Puno na ang iyong account.[\/S] [A]Mag-upgrade na[\/A] at makakuha [S]ng hanggang 4 na TB (4096 GB)[\/S] ng cloud storage space.",
+    "16358": "[S]Ang iyong account ay puno na.[\/S] [A]Mag-upgrade na[\/A] at makakuha ng [S]hanggang 8 TB (8192 GB)[\/S] ng cloud storage space.",
     "16359": "[S]Puno na ang Cloud Drive.[\/S] [A]Mag-upgrade na[\/A] at makakuha ng [S]hanggang 4 TB (4096 GB)[\/S] ng cloud storage space.",
     "16360": "Naabot mo na ang full capacity ng iyong account.",
     "16361": "[A]Mag-upgrade ngayon[\/A] at wag ng mag-alala kung maubusan ng storage.",
@@ -2588,5 +2588,6 @@
     "19598": "Laktawan ang folder:",
     "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for additional transfer quota, which will automatically resume your video.",
     "19616": "Upgrade PRO",
-    "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video."
+    "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video.",
+    "19628": "If you wish to submit a takedown notice through our web form, please visit this page in a desktop browser. Alternatively, you can send us an email at [A]copyright@mega.nz[\/A]."
 }

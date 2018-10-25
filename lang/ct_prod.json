@@ -253,7 +253,7 @@
     "700": "\u8acb\u624b\u52d5\u5c07\u60a8\u7684\u522a\u9664\u901a\u77e5\u4ee5\u96fb\u5b50\u90f5\u4ef6\u63d0\u4ea4\u767c\u9001\u5230[A1] copyright@mega.nz[\/A1]\u4e26\u6839\u64da\u6211\u5011\u7684[A2]\u4e0b\u67b6\u898f\u5b9a[\/A2]\u3002",
     "701": "\u901a\u904e\u96fb\u5b50\u90f5\u4ef6\u767c\u9001\u522a\u9664\u901a\u77e5",
     "703": "\u60a8\u7684\u8a3b\u518a\u9023\u7d50\u7121\u6548\u3002\u8acb\u6aa2\u67e5\u60a8\u7684\u78ba\u8a8d\u4fe1\u4e2d\u4e4b\u539f\u59cb\u9023\u7d50\u662f\u5426\u5b8c\u6574\u3002",
-    "704": "\u5e33\u865f\u5df2\u53ef\u4f7f\u7528\u3002\u8acb\u767b\u5165\u3002",
+    "704": "\u60a8\u7684\u5e33\u6236\u5df2\u901a\u904e\u8a8d\u8b49\u3002\u8acb\u767b\u5165\u5e33\u6236\u4ee5\u958b\u59cb\u4f7f\u7528\u3002",
     "705": "\u53ef\u80fd\u7121\u6cd5\u9032\u884c\u78ba\u8a8d\u3002\u8acb\u91cd\u65b0\u8a3b\u518a\u3002\u932f\u8aa4\u4ee3\u78bc\u70ba:",
     "706": "\u8b8a\u66f4\u5bc6\u78bc",
     "707": "\u66f4\u65b0",
@@ -534,7 +534,7 @@
     "1352": "\u53ef\u4f7f\u7528\u7684",
     "1356": "\u8a55\u5206\u8207\u5efa\u8b70",
     "1364": "\u91cd\u8a66",
-    "1367": "\u7372\u5f9750GB\u7684\u514d\u8cbb\u7a7a\u9593\uff0c\u6216\u5347\u7d1a\u70ba\u6211\u5011\u7684\u5c08\u696d\u7248\u7528\u6236\u4e26\u4eab\u6709\u6700\u9ad84TB\u7684\u52a0\u5bc6\u5132\u5b58\u7a7a\u9593 \u2500 \u50c5\u9700\u6bcf\u67088.33\u6b50\u5143\u8d77\uff01",
+    "1367": "\u60a8\u53ef\u4ee5\u5728\u7372\u5f9750GB\u7684\u514d\u8cbb\u7a7a\u9593\u5f8c\uff0c\u9078\u64c7\u9032\u4e00\u6b65\u5347\u7d1a\u70ba\u5c08\u696d\u7248\u7528\u6236\uff0c\u4ee5\u50c54.99\u6b50\u5143\u8d77\u7684\u512a\u60e0\u50f9\u683c\u4eab\u6709\u6700\u9ad8 8 TB \u7684\u52a0\u5bc6\u5132\u5b58\u7a7a\u9593\uff01",
     "1379": "\u8df3\u904e",
     "1382": "\u512a\u5148\u6392\u5e8f",
     "1383": "\u9078\u64c7\u6392\u5e8f\u6a21\u5f0f\u5957\u7528\u81f3\u4efb\u4e00\u8cc7\u6599\u593e,\u6216\u4f7f\u7528\u540c\u6a23\u7684\u6392\u5e8f\u6a21\u5f0f\u81f3\u6240\u6709\u8cc7\u6599\u593e\u3002",
@@ -2588,5 +2588,6 @@
     "19598": "Skip this folder:",
     "19615": "Your video has stopped playing because it would take you over the current free transfer allowance for your IP address. Please upgrade to PRO for additional transfer quota, which will automatically resume your video.",
     "19616": "Upgrade PRO",
-    "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video."
+    "19617": "Your video has stopped playing because it would take you over the current transfer allowance of your PRO account. Please upgrade to a higher PRO tier, which will automatically resume your video.",
+    "19628": "If you wish to submit a takedown notice through our web form, please visit this page in a desktop browser. Alternatively, you can send us an email at [A]copyright@mega.nz[\/A]."
 }

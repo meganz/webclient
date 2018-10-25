@@ -2284,10 +2284,10 @@ function getTemplate(name) {
 function pagemetadata() {
     var mega_desc = false;
 
-    if (page == 'uwp') {
-        mega_title = 'Windows Phone - MEGA';
+    if (page === 'uwp') {
+        mega_title = 'Windows 10 app - MEGA';
     }
-    else if (page == 'mobileapp') {
+    else if (page === 'mobileapp') {
         mega_title = 'MEGA - Mobile Apps';
         mega_desc = 'Securely manage your files and collaborate everyone from anywhere.';
     }

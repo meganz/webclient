@@ -1261,15 +1261,6 @@ function init_page() {
             loadSubPage('disputenotice');
         });
     }
-    else if (page.substr(0, 6) === 'propay') {
-        if (is_mobile) {
-            parsepage(pages['mobile']);
-        }
-        else {
-            parsepage(pages['propay']);
-        }
-        pro.propay.init();
-    }
     else if (page.substr(0, 3) === 'pro') {
         /* jshint -W018 */
         var tmp = page.split(/(\/\w+=)/);
@@ -1288,8 +1279,14 @@ function init_page() {
             return;
         }
 
-        parsepage(pages['proplan']);
-        pro.proplan.init();
+        if (page.substr(0, 6) === 'propay') {
+            parsepage(pages[is_mobile ? 'mobile' : 'propay']);
+            pro.propay.init();
+        }
+        else {
+            parsepage(pages['proplan']);
+            pro.proplan.init();
+        }
     }
     else if (page.substr(0, 7) === 'payment') {
 

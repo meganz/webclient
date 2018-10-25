@@ -72,7 +72,7 @@ BusinessRegister.prototype.initPage = function () {
         ///
         this.isLoggedIn = true;
     }
-
+    $('.bus-reg-btn', $pageContainer).addClass('disabled');
 
     var fillPaymentGateways = function (st, list) {
         "use strict";
@@ -217,7 +217,7 @@ BusinessRegister.prototype.initPage = function () {
                     passed = false;
                 }
                 else if (typeof zxcvbn !== 'undefined') {
-                    passed = mySelf.ratePasswordStrength($pageContainer, $passInput.val());
+                    passed = passed && mySelf.ratePasswordStrength($pageContainer, $passInput.val());
                     if (!passed) {
                         $passInput.parent().addClass('error').find('.error-message').text(l[1104]);
                         $passInput.focus();

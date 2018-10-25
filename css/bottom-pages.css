@@ -148,6 +148,11 @@ html.gbot {
     height: -moz-calc(100% - 100px);
     height: calc(100% - 100px);
 }
+body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
+    height: -webkit-calc(100% - 118px);
+    height: -moz-calc(100% - 118px);
+    height: calc(100% - 118px);
+}
 .bottom-page.vertical-centered-bl.active {
     height: 73px;
 }
@@ -800,6 +805,10 @@ html.gbot {
     white-space: nowrap;
     position: relative;
 }
+.pages-nav.text-content {
+    display: table;
+    width: 100%;
+}
 .mobile .pages-nav.content-block {
     padding-top: 66px;
 }
@@ -864,6 +873,8 @@ html.gbot {
     display: inline-block;
     position: relative;
     z-index: 2;
+    vertical-align: top;
+    line-height: 0;
 }
 .pages-nav.content {
     display: inline-block;
@@ -972,14 +983,29 @@ html.gbot {
 .pages-nav.button-label, .pages-nav.nav-button.active.greyed-out .button-label {
     display: block;
     font-size: 16px;
+    line-height: 16px;
     color: #333;
     display: inline-block;
     text-align: center;
     white-space: nowrap;
 }
+body:not(.en) .pages-nav.button-label, body:not(.en) .pages-nav.nav-button.active.greyed-out .button-label {
+    display: table-cell;
+    vertical-align: middle;
+    height: 30px;
+    text-align: center;
+    white-space: normal;
+    width: 100%;
+}
+body:not(.en) .pages-nav.nav-icon {
+    display: block;
+    margin: 16px auto 3px auto;
+}
+body:not(.en) .pages-nav.content {
+    height: 82px;
+}
 .pages-nav.nav-button:not(.disabled):hover .button-label, .pages-nav.nav-button.active .button-label, .pages-nav.nav-button.opened .button-label {
     color: #171A22;
-    font-family: 'source_sans_prosemibold';
 }
 .contrast .pages-nav.button-label {
     font-size: 16px;
@@ -2138,6 +2164,13 @@ height: 56px;
     padding-left: 0;
     width: 100%;
     display: block;
+}
+.megacmd .top-bl .top-title {
+    padding-top: 0;
+}
+.megacmd .cmd-top-img.main {
+    margin-top: 40px;
+    margin-bottom: 40px;
 }
 .mobile .cmd-top-img.main {
     display: block;
@@ -3328,6 +3361,9 @@ height: 56px;
 .pages-nav.nav-button {
     width: auto;
     min-width: 25%;
+}
+body:not(.en) .pages-nav.nav-button {
+     width: 25%;
 }
 .top-links-block {
     display: none;

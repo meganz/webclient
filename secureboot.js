@@ -1258,6 +1258,7 @@ function siteLoadError(error, filename) {
     }
     else {
         message.push('Filename: ' + filename + "\nException: " + error);
+        message.push('Stack trace: ' + String(error.stack).split('\n').splice(1, 4).join('\n'));
     }
     message.push('Please click OK to refresh and try again.');
     message.push("If the problem persists, please try disabling all third-party browser extensions,"

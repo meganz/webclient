@@ -75,7 +75,6 @@ function initMegasync() {
 
     'use strict';
 
-    var pf = navigator.platform.toUpperCase();
     var $content = $('.bottom-page.megasync');
 
     resetMegasync();

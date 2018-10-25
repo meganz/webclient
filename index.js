@@ -762,7 +762,7 @@ function init_page() {
                     alert(l[703]);
                 }
                 else if (result === ENOENT) {
-                    login_txt = l[704];
+                    login_txt = l[19788];
                 }
                 else {
                     alert(l[705] + result);

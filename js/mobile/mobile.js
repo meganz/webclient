@@ -307,12 +307,20 @@ var alarm = {
         render: function() {}
     }
 };
+
 /* jshint strict: true */
 
 function accountUI() {
     'use strict';
     loadSubPage('fm/account');
 }
+
+accountUI.updateSessionTable = function() {
+    
+    'use strict';
+
+    mobile.account.history.fetchSessionHistory();
+};
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
     'use strict';

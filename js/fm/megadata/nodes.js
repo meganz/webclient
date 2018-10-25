@@ -732,8 +732,8 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                     var targetHandle = keys[0];
                     var nodeHandle = ctx.handle[targetHandle][0];
 
-                    // A hook for the mobile web to remove the node from the view and close the dialog
-                    mobile.deleteOverlay.completeDeletionProcess(nodeHandle);
+                    // A hook for mobile web to handle node changes.
+                    mobile.cloud.moveFinishedCallback(nodeHandle);
                 }
                 else {
                     renderPromise = M.updFileManagerUI();
@@ -995,9 +995,12 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                             foreach(handles);
                         }
                         else {
-                            msgDialog('warninga', 'Moving Error',
-                                l[17739],
-                                'Error in Merging');
+                            if (is_mobile) {
+                                mobile.showErrorToast(l[17739]);
+                            }
+                            else {
+                                msgDialog('warninga', 'Moving Error', l[17739], 'Error in Merging');
+                            }
                             if (!quiet) {
                                 loadingDialog.phide();
                             }
@@ -1223,6 +1226,18 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
                     }
                     return M.d[h];
                 });
+
+                if (is_mobile) {
+                    loadingDialog.hide();
+
+                    if (error) {
+                        masterPromise.reject(error);
+                    }
+                    else {
+                        masterPromise.resolve(targets);
+                    }
+                    return;
+                }
 
                 // removeUInode may queued another `delay('openfolder', ...)`, let's overwrite it.
                 delay('openfolder', function() {

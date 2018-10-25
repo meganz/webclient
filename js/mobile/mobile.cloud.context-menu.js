@@ -48,6 +48,7 @@ mobile.cloud.contextMenu = {
 
         var $folderContextMenu = $('.context-menu-container.folder');
         var $fileContextMenu = $('.mobile.context-menu-container.file');
+        var $rubbishBinContextMenu = $('.mobile.context-menu-container.rubbishbin');
         var $overlay = $('.dark-overlay');
 
         // Get the node type
@@ -56,8 +57,24 @@ mobile.cloud.contextMenu = {
         // Show overlay
         $overlay.removeClass('hidden');
 
+        // Hide the overlay on overlay tap
+        $overlay.off('tap').on('tap', function() {
+            mobile.cloud.contextMenu.hide();
+            return false;
+        });
+
         // If folder type
-        if (nodeType === 1) {
+        if (M.getNodeRoot(nodeHandle) === M.RubbishID) {
+
+            mobile.cloud.contextMenu.initCloseButton($rubbishBinContextMenu);
+            mobile.cloud.contextMenu.initRestoreButton($rubbishBinContextMenu, nodeHandle);
+            mobile.cloud.contextMenu.initRubbishBinDelete($rubbishBinContextMenu, nodeHandle);
+
+            $fileContextMenu.addClass('hidden');
+            $folderContextMenu.addClass('hidden');
+            $rubbishBinContextMenu.removeClass('hidden');
+        }
+        else if (nodeType === 1) {
 
             // Otherwise inititalise tap handler on the buttons
             mobile.cloud.contextMenu.initFolderOpenButtonHandler($folderContextMenu, nodeHandle);
@@ -95,6 +112,7 @@ mobile.cloud.contextMenu = {
 
         var $folderContextMenu = $('.context-menu-container.folder');
         var $fileContextMenu = $('.mobile.context-menu-container.file');
+        var $rubbishBinContextMenu = $('.mobile.context-menu-container.rubbishbin');
         var $overlay = $('.dark-overlay');
 
         // Hide overlay
@@ -103,6 +121,58 @@ mobile.cloud.contextMenu = {
         // Hide the file context menu if open and show the folder context menu
         $fileContextMenu.addClass('hidden');
         $folderContextMenu.addClass('hidden');
+        $rubbishBinContextMenu.addClass('hidden');
+    },
+
+    /**
+     * Init event handler for rubbish bin context menu restore button.
+     * @param $contextMenu
+     * @param nodeHandle
+     */
+    initRestoreButton: function ($contextMenu, nodeHandle) {
+        'use strict';
+
+        $contextMenu.find(".restore-item").off('tap').on('tap', function() {
+            mobile.rubbishBin.restore(nodeHandle)
+                .always(function() {
+                    // Manually filter out the item we just removed from the current view.
+                    mobile.cloud.removeNodesFromViewIfRemoved();
+                    if (!mobile.cloud.nodeInView(nodeHandle)) {
+                        mobile.showSuccessToast(l[19636] + ". " + l[7224], null, null, function() {
+                            M.openFolder(M.getNodeParent(nodeHandle));
+                            mobile.closeToast();
+                            return false;
+                        });
+                    }
+                    mobile.rubbishBin.renderUpdate();
+                });
+            mobile.cloud.contextMenu.hide();
+            return false;
+        });
+    },
+
+    /**
+     * Init event handler for rubbish bin context menu delete button.
+     * @param $contextMenu
+     * @param nodeHandle
+     */
+    initRubbishBinDelete: function($contextMenu, nodeHandle) {
+        'use strict';
+
+        $contextMenu.find(".delete-item").off('tap').on('tap', function() {
+            $.selected = [nodeHandle];
+            M.clearRubbish(false)
+                .then(function() {
+                    mobile.showSuccessToast(l[19635]);
+                    mobile.cloud.removeNodesFromViewIfRemoved();
+                    mobile.rubbishBin.renderUpdate();
+                })
+                .catch(function() {
+                    mobile.showErrorToast(l[5963]);
+                });
+            mobile.cloud.contextMenu.hide();
+            return false;
+        });
     },
 
     /**

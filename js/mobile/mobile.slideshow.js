@@ -186,9 +186,7 @@ mobile.slideshow = {
         mobile.slideshow.changeSlide(slideClass);
 
         // Initialise buttons
-        mobile.slideshow.initDeleteButton(nodeHandle);
-        mobile.slideshow.initDownloadButton(nodeHandle);
-        mobile.slideshow.initLinkButton(nodeHandle);
+        mobile.slideshow.initActionBarButtons(nodeHandle);
 
         // Show the dialog
         mobile.slideshow.$overlay.removeClass('hidden');
@@ -447,6 +445,21 @@ mobile.slideshow = {
     },
 
     /**
+     * Close the overlay
+     */
+    close: function() {
+        'use strict';
+
+        // Hide the dialog
+        mobile.slideshow.$overlay.addClass('hidden');
+
+        // Cleanup curr....
+        mobile.slideshow.cleanupCurrentlyViewedInstance();
+        mobile.slideshow.$overlay.find('.slides.mid img').remove();
+        mobile.slideshow.$overlay.find('.slides.mid').prepend('<img alt="" /></div>');
+    },
+
+    /**
      * Initialise the close button
      */
     initCloseButton: function() {
@@ -455,15 +468,7 @@ mobile.slideshow = {
 
         // On close button click/tap
         mobile.slideshow.$overlay.find('.fm-dialog-close').off().on('tap', function() {
-
-            // Hide the dialog
-            mobile.slideshow.$overlay.addClass('hidden');
-
-            // Cleanup curr....
-            mobile.slideshow.cleanupCurrentlyViewedInstance();
-            mobile.slideshow.$overlay.find('.slides.mid img').remove();
-            mobile.slideshow.$overlay.find('.slides.mid').prepend('<img alt="" /></div>');
-
+            mobile.slideshow.close();
             // Prevent double taps
             return false;
         });
@@ -521,6 +526,26 @@ mobile.slideshow = {
     },
 
     /**
+     * Init Button to handle delete if node in rubbish bin.
+     * @param nodeHandle
+     */
+    initRubbishBinDeleteButton: function(nodeHandle) {
+        'use strict';
+        mobile.slideshow.$overlay.find(".rubbishbin-delete-button").off('tap').on('tap', function() {
+            $.selected = [nodeHandle];
+            M.clearRubbish(false)
+                .then(function() {
+                    mobile.slideshow.close();
+                    mobile.showSuccessToast(l[19635]);
+                })
+                .catch(function() {
+                    mobile.showErrorToast(l[5963]);
+                });
+            return false;
+        });
+    },
+
+    /**
      * Functionality for downloading a file
      * @param {String} nodeHandle The node handle for this folder/file
      */
@@ -562,5 +587,26 @@ mobile.slideshow = {
             mobile.linkOverlay.show(nodeHandle);
             return false;
         });
+    },
+
+    /**
+     * Init actionbar buttons
+     */
+    initActionBarButtons: function(nodeHandle) {
+        'use strict';
+
+        if (M.getNodeRoot(nodeHandle) !== M.RubbishID) {
+            // Only show link and delete button if the image is not in the rubbish bin.
+            mobile.slideshow.$overlay.find(".manage-link-button, .delete-button").removeClass('hidden');
+            mobile.slideshow.$overlay.find(".rubbishbin-delete-button").addClass("hidden");
+            mobile.slideshow.initDeleteButton(nodeHandle);
+            mobile.slideshow.initLinkButton(nodeHandle);
+        } else {
+            mobile.slideshow.$overlay.find(".manage-link-button, .delete-button").addClass('hidden');
+            mobile.slideshow.$overlay.find(".rubbishbin-delete-button").removeClass("hidden");
+            mobile.slideshow.initRubbishBinDeleteButton(nodeHandle);
+        }
+        mobile.slideshow.initDownloadButton(nodeHandle);
+
     }
 };

@@ -3496,9 +3496,6 @@
     .main-scroll-block .jspPane {
         min-width: 320px;
     }
-    .top-head {
-        display: none;
-    }
     #help2-main {
         min-width: 320px;
         max-width: 376px;

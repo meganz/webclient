@@ -1931,6 +1931,7 @@ else if (!b_u) {
     // Common desktop and mobile, bottom pages
     jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
@@ -2291,6 +2292,7 @@ else if (!b_u) {
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
+        'mobileapp': {f:'html/mobileapp.html', n: 'mobileapp', j:0},
         'megacmd_js': {f:'html/js/megacmd.js', n: 'megacmd_js', j:1},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
@@ -2308,9 +2310,7 @@ else if (!b_u) {
         'browsers': {f:'html/browsers.html', n: 'browsers', j:0},
         'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
         'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
-        'ios': {f:'html/ios.html', n: 'ios', j:0},
-        'android': {f:'html/android.html', n: 'android', j:0},
-        'wp': {f:'html/wp.html', n: 'wp', j:0},
+        'uwp': {f:'html/uwp.html', n: 'uwp', j:0},
         'pdfviewer': {f:'html/pdfViewer.html', n: 'pdfviewer', j:0 },
         'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
@@ -2400,6 +2400,9 @@ else if (!b_u) {
         'takedown': ['takedown'],
         'sync': ['sync', 'sync_js'],
         'cmd': ['cmd', 'megacmd_js'],
+        'mobile': ['mobileapp'],
+        'ios': ['mobileapp'],
+        'android': ['mobileapp'],
         'support': ['support_js', 'support'],
         'contact': ['contact'],
         'dev': ['dev','dev_js','sdkterms'],
@@ -2413,9 +2416,8 @@ else if (!b_u) {
         'plugin': ['browsers', 'browsers_js'],
         'extensions': ['browsers', 'browsers_js'],
         'bird': ['megabird'],
-        'ios': ['ios'],
-        'android': ['android'],
-        'wp': ['wp']
+        'wp': ['uwp'],
+        'uwp': ['uwp']
     };
 
     if (is_mobile) {

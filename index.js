@@ -488,9 +488,8 @@ function init_page() {
         && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
         && (page !== 'contact')
-        && (page !== 'ios')
-        && (page !== 'android')
-        && (page !== 'wp')
+        && (page !== 'mobileapp')
+        && (page !== 'uwp')
         && (page !== 'extensions')
         && (page !== 'sync')
         && (page !== 'bird')
@@ -1307,18 +1306,22 @@ function init_page() {
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
     }
+    else if (page === 'mobile' || page === 'android' || page === 'ios') {
+        parsepage(pages['mobileapp']);
+
+        // On clicking the 'Learn more' button
+        $('.uwp-windows-scrollto-button').rebind('click', function() {
+
+            // Scroll to the Windows Phone section
+            $('.uwp-windows-section').get(0).scrollIntoView();
+        });
+    }
     else if (page === 'extensions') {
         parsepage(pages['browsers']);
         browserspage.init();
     }
-    else if (page === 'ios') {
-        parsepage(pages['ios']);
-    }
-    else if (page === 'android') {
-        parsepage(pages['android']);
-    }
-    else if (page === 'wp') {
-        parsepage(pages['wp']);
+    else if (page === 'uwp' || page === 'wp') {
+        parsepage(pages['uwp']);
         bottompage.initTabs();
     }
     else if (page === 'bird') {
@@ -1326,7 +1329,7 @@ function init_page() {
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
-        init_sync();
+        initMegasync();
         topmenuUI();
     }
     else if (page == 'cmd') {
@@ -1964,11 +1967,11 @@ function topmenuUI() {
 
             var subpage;
             var subPages = [
-                'about', 'account', 'android', 'backup', 'blog', 'cmd', 'contact',
+                'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
-                'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'privacycompany',
+                'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'wp', 'start'
+                'sync', 'takedown', 'terms', 'start', 'uwp'
             ];
             var moveTo = {'account': 'fm/account'};
 
@@ -2176,6 +2179,11 @@ function topmenuUI() {
     });
 
     // If the main Mega M logo in the header is clicked
+    $topHeader.find('.default-white-button.individual').rebind('click', function () {
+        loadSubPage('startpage');
+    });
+
+    // If the main Mega M logo in the header is clicked
     $topHeader.find('.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
             if (folderlink) {
@@ -2276,16 +2284,12 @@ function getTemplate(name) {
 function pagemetadata() {
     var mega_desc = false;
 
-    if (page == 'android') {
-        mega_title = 'Android - MEGA';
-        mega_desc = 'The MEGA Android app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
+    if (page === 'uwp') {
+        mega_title = 'Windows 10 app - MEGA';
     }
-    else if (page == 'ios') {
-        mega_title = 'iOS - MEGA';
-        mega_desc = 'The MEGA iOS app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
-    }
-    else if (page == 'wp') {
-        mega_title = 'Windows Phone - MEGA';
+    else if (page === 'mobileapp') {
+        mega_title = 'MEGA - Mobile Apps';
+        mega_desc = 'Securely manage your files and collaborate everyone from anywhere.';
     }
     else if (page == 'sync') {
         mega_title = 'MEGAsync - Download';

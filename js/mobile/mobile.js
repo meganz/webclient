@@ -7,28 +7,102 @@ var mobile = {
     imagePath: staticpath + 'images/mobile/extensions/',
 
     /**
+     * Toast timer, reset if new toast comes in.
+     */
+    toastTimer: null,
+
+    /**
      * Show a simple toast message and hide it after 3 seconds
      * @param {String} message The message to show
      * @param {String} position Optional flag to show the position at the top, by default it shows at the bottom
+     * @param {int} timeout Optional, optional timeout in miliseconds
      */
-    showToast: function(message, position) {
+    showToast: function(message, position, timeout) {
+        'use strict';
+        mobile.renderToast($('.mobile.toast-notification.info'), message, position, timeout);
+    },
 
+    /**
+     * Show a green success toast.
+     * @param message
+     * @param position
+     * @param timeout Optional, optional timeout in miliseconds
+     */
+    showSuccessToast: function(message, position, timeout, clickCallback) {
         'use strict';
 
-        var $toastNotification = $('.mobile.toast-notification');
+        var $toast = $('.mobile.toast-notification.alert');
+        $toast.removeClass("error").addClass("success");
+        mobile.renderToast($toast, message, position, timeout, clickCallback);
+    },
+
+    /**
+     * Show red error toast.
+     * @param message
+     * @param position
+     * @param {int} timeout Optional, optional timeout in miliseconds
+     */
+    showErrorToast: function(message, position, timeout, clickCallback) {
+        'use strict';
+
+        var $toast = $('.mobile.toast-notification.alert');
+        $toast.removeClass("success").addClass("error");
+        mobile.renderToast($toast, message, position, timeout, clickCallback);
+    },
+
+    /**
+     * Render a specific toast notification.
+     * @param $toastNotification
+     * @param message
+     * @param position
+     * @param timeout int 0 = never close.
+     */
+    renderToast: function($toastNotification, message, position, timeout, clickCallback) {
+        'use strict';
 
         // Set the message and show the notification
-        $toastNotification.text(message).removeClass('hidden').addClass('active');
+        $toastNotification.find(".message-body").text(message);
+        $toastNotification.removeClass('hidden').addClass('active');
 
         // Show the toast notification at the top of the page (useful if the keyboard is open and blocking the bottom)
         if (position === 'top') {
             $toastNotification.addClass('top');
         }
 
-        // After 3 seconds, hide the notification
-        setTimeout(function() {
-            $toastNotification.addClass('hidden').removeClass('active top');
-        }, 3000);
+        if (mobile.toastTimer !== null) {
+            clearTimeout(mobile.toastTimer);
+            mobile.toastTimer = null;
+        }
+
+        if (timeout === undefined || timeout === null || timeout < 0) {
+            timeout = 3000;
+        }
+
+        if (timeout > 0) {
+            // After 3 seconds, hide the notification
+            mobile.toastTimer = setTimeout(function () {
+                mobile.closeToast($toastNotification);
+            }, timeout);
+        }
+
+        $toastNotification.off('tap');
+        if (clickCallback instanceof Function) {
+            $toastNotification.on('tap', clickCallback);
+        }
+    },
+
+    /**
+     * Close a toast notification.
+     * @param $toastNotification (optional, if ommited will close all toasts).
+     */
+    closeToast: function($toastNotification) {
+        'use strict';
+
+        if ($toastNotification === undefined) {
+            $toastNotification = $(".mobile.toast-notification");
+        }
+
+        $toastNotification.addClass('hidden').removeClass('active top');
     },
 
     /**
@@ -47,6 +121,27 @@ var mobile = {
 
             // Open the previous folder/page
             window.history.back();
+            return false;
+        });
+    },
+
+    /**
+     * Shows and initialises the up button on click/tap event handler
+     * @param {Object} $upButton jQuery selector for the up button
+     */
+    showAndInitUpButton: function($upButton) {
+
+        'use strict';
+
+        // Show the button
+        $upButton.removeClass('hidden');
+
+        // On click of the up button
+        $upButton.off('tap').on('tap', function() {
+            // Go up a directory.
+            if (M.currentdirid !== M.RootID && M.currentdirid !== M.RubbishID) {
+                M.openFolder(M.getNodeParent(M.currentdirid));
+            }
             return false;
         });
     },
@@ -288,6 +383,12 @@ mega.megadrop = {
     pufProcessPUH:  function(ap) { mobile.megadrop.processPUH(ap); },
     pufRemove: function(ids) { return mobile.megadrop.pufRemove(ids); },
     processUPHAP: function (ap) { mobile.megadrop.processUPH(ap); },
+    preMoveCheck: function(handles, target) {
+        var sel = Array.isArray(handles) ? handles : [handles];
+        var p = new MegaPromise();
+        p.resolve(sel, target);
+        return p;
+    },
     isDropExist: function (sel) { return mobile.megadrop.isDropExist(sel); }
 };
 

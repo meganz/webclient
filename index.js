@@ -127,7 +127,11 @@ function topMenu(close) {
             });
         }
         else {
-            // If on mobile, show the dark backround overlay behind the menu and if it's clicked, close the menu
+            // Mobile
+            // Close the title menu
+            mobile.titleMenu.close();
+
+            // Show the dark backround overlay behind the menu and if it's clicked, close the menu
             $('html').addClass('overlayed');
             $('.mobile.dark-overlay').removeClass('hidden').addClass('active').off('tap').on('tap', function () {
                 topMenu(true);

@@ -1275,7 +1275,7 @@ function siteLoadError(error, filename) {
 // Add manifest.json so this can be used on latest browsers.
 var tag=document.createElement('link');
 tag.rel = "manifest";
-tag.href = staticpath + "images/favicons/manifest.json";
+tag.href = "/manifest.json";
 document.getElementsByTagName('head')[0].appendChild(tag);
 
 if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))

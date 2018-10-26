@@ -38,7 +38,7 @@ function u_login2(ctx, ks) {
         u_storage = init_storage(ctx.permanent ? localStorage : sessionStorage);
         u_storage.k = JSON.stringify(ks[0]);
         u_storage.sid = ks[1];
-        watchdog.notify('login', ks[1]);
+        watchdog.notify('login', [!ctx.permanent && ks[0], ks[1]]);
         if (ks[2]) {
             u_storage.privk = base64urlencode(crypto_encodeprivkey(ks[2]));
         }
@@ -343,8 +343,8 @@ function u_setrsa(rsakey) {
 
                         watchdog.notify('setrsa', [u_type, u_sid]);
 
-                        // Import welcome pdf at account creation
-                        M.importWelcomePDF();
+                        // Import welcome pdf at account creation -- Removed
+                        // NOT needed, since the file is create on account creation (initial ephemral accoount)
                     }
                     $promise.resolve(rsakey);
                     ui_keycomplete();

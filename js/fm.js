@@ -126,6 +126,8 @@ function addNewContact($addButton, cd) {
             var promises = [];
             var addedEmails = [];
 
+            loadingDialog.pshow();
+
             // Custom text message
             emailText = $textarea.val();
 
@@ -162,13 +164,16 @@ function addNewContact($addButton, cd) {
                         title = l[165] + ' ' + l[5859];
                         msg = l[5899];
                     }
-
-                    if (cd) {
-                        closeDialog();
-                        $('.token-input-token-mega').remove();
-                    }
                     contactsInfoDialog(title, addedEmails[0], msg);
                 }
+
+                if (cd) {
+                    closeDialog();
+                    $('.token-input-token-mega').remove();
+                }
+                
+                loadingDialog.phide();
+
                 promise.resolve();
             });
         }
@@ -1053,7 +1058,8 @@ function renameDialog() {
 
                 if (value && n.name && value !== n.name) {
                     if (M.isSafeName(value)) {
-                        if (!duplicated(nodeType, value)) {
+                        var targetFolder = n.p;
+                        if (!duplicated(nodeType, value, targetFolder)) {
                             M.rename(n.h, value);
                         }
                         else {

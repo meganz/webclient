@@ -55,7 +55,9 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
     }
 
     stype = stype || M.currentTreeType || "cloud-drive";
-    _tf = M.filterTreePanel[stype + '-label'];
+    if (!dialog || rebuild) { // dialog should not be filtered unless it is forced.
+        _tf = M.filterTreePanel[stype + '-label'];
+    }
 
     if (!sDeepIndex) {
         sDeepIndex = 0;
@@ -378,8 +380,7 @@ MegaData.prototype.initTreePanelSorting = function() {
 
     var sections = [
         'folder-link', 'contacts', 'conversations', 'inbox',
-        'shared-with-me', 'cloud-drive', 'rubbish-bin', // Sorting sections for tree parts
-        'fm', 'shares', 'rubbish' // Sorting sections for file manager parts
+        'shared-with-me', 'cloud-drive', 'rubbish-bin' // Sorting sections for tree parts
     ];
     var byType = ['name', 'status', 'last-interaction', 'label'];
 
@@ -417,8 +418,9 @@ MegaData.prototype.treeSearchUI = function() {
     $('.nw-fm-search-icon').off('click');
     $('.nw-fm-tree-header input').off('keyup').off('blur');
 
-    // Items are NOT available in left panel, hide search
-    if (!$('.fm-tree-panel .content-panel.active').find('ul li, .nw-contact-item').length) {
+    // Items are NOT available in left panel and not result of search, hide search
+    if (!$('.fm-tree-panel .content-panel.active').find('ul li, .nw-contact-item').length
+        && !$('.nw-fm-tree-header').hasClass('filled-input')) {
         $('.nw-fm-tree-header input').prop('readonly', true);
         $('.nw-fm-search-icon').hide();
     }
@@ -579,7 +581,6 @@ MegaData.prototype.treeSortUI = function() {
 
             menu = $('.nw-sorting-menu');
             menu.removeClass('hidden');
-            menu.css('right', '-' + (menu.outerWidth() - 3) + 'px');
 
             type = M.currentTreeType;
 
@@ -603,6 +604,8 @@ MegaData.prototype.treeSortUI = function() {
                 menu.find('.dropdown-section.labels').removeClass('hidden');
                 menu.find('.filter-by').removeClass('hidden');
             }
+
+            menu.css('right', '-' + (menu.outerWidth() - 3) + 'px');
 
             sortTreePanel = $.sortTreePanel[type];
 

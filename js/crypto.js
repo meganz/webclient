@@ -382,16 +382,7 @@ function api_setsid(sid) {
 
         if (typeof dlmanager === 'object') {
 
-            if (!dlmanager.onOverquotaWithAchievements) {
-                if (dlmanager.isOverQuota && !dlmanager.isOverFreeQuota) {
-                    dlmanager.uqFastTrack = !Object(u_attr).p;
-                    delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
-                }
-
-                if (typeof dlmanager.onLimitedBandwidth === 'function') {
-                    dlmanager.onLimitedBandwidth();
-                }
-            }
+            dlmanager._onOverQuotaAttemptRetry();
         }
         sid = 'sid=' + sid;
     }
@@ -1100,6 +1091,10 @@ function waitsc() {
                     return;
                 }
                 if ($.isNumeric(delieveredResponse)) {
+                    if (delieveredResponse == ENOENT && apixs[5].sid[0] === 'n') {
+                        // WSC is stopped at the beginning.
+                        return;
+                    }
                     waittimeout = setTimeout(waitsc, waitbackoff);
                     return;
                 }
@@ -1200,6 +1195,10 @@ function api_createuser(ctx, invitecode, invitename, uh) {
         req.uh = uh;
         req.ic = invitecode;
         req.name = invitename;
+    }
+
+    if (mega.affid) {
+        req.aff = mega.affid;
     }
 
     //if (confirmcode) req.c = confirmcode;
@@ -1344,9 +1343,9 @@ function api_getsid(ctx, user, passwordkey, hash, pinCode) {
     ctx.callback = api_getsid2;
     ctx.passwordkey = passwordkey;
 
+    // If previously blocked for too many login attempts, return early and show warning with time they can try again
     if (api_getsid.etoomany + 3600000 > Date.now() || location.host === 'webcache.googleusercontent.com') {
-        api_getsid.warning();
-        return ctx.result(ctx, false);
+        return ctx.checkloginresult(ctx, ETOOMANY);
     }
 
     // Setup the login request
@@ -1510,7 +1509,11 @@ function stringhash(s, aes) {
 function api_updateuser(ctx, newuser) {
     newuser.a = 'up';
 
-    res = api_req(newuser, ctx);
+    if (mega.affid) {
+        newuser.aff = mega.affid;
+    }
+
+    api_req(newuser, ctx);
 }
 
 var u_pubkeys = Object.create(null);

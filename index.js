@@ -127,7 +127,11 @@ function topMenu(close) {
             });
         }
         else {
-            // If on mobile, show the dark backround overlay behind the menu and if it's clicked, close the menu
+            // Mobile
+            // Close the title menu
+            mobile.titleMenu.close();
+
+            // Show the dark backround overlay behind the menu and if it's clicked, close the menu
             $('html').addClass('overlayed');
             $('.mobile.dark-overlay').removeClass('hidden').addClass('active').off('tap').on('tap', function () {
                 topMenu(true);
@@ -241,9 +245,6 @@ function init_page() {
         }
     }
 
-    // Get information about what API flags are enabled e.g. 2FA, New Registration etc
-    mega.getApiMiscFlags();
-
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
 
@@ -255,7 +256,7 @@ function init_page() {
         if (ar[1]) {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
-        $.playbackTimeOffset = parseInt(ar[2]) | 0;
+        $.playbackOptions = ar[2];
 
         if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';
@@ -491,9 +492,8 @@ function init_page() {
         && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
         && (page !== 'contact')
-        && (page !== 'ios')
-        && (page !== 'android')
-        && (page !== 'wp')
+        && (page !== 'mobileapp')
+        && (page !== 'uwp')
         && (page !== 'extensions')
         && (page !== 'sync')
         && (page !== 'bird')
@@ -765,7 +765,7 @@ function init_page() {
                     alert(l[703]);
                 }
                 else if (result === ENOENT) {
-                    login_txt = l[704];
+                    login_txt = l[19788];
                 }
                 else {
                     alert(l[705] + result);
@@ -784,6 +784,24 @@ function init_page() {
 
         // Check if they registered using the new registration process (version 2)
         if (decodedConfirmCode.substr(0, 13) === 'ConfirmCodeV2') {
+
+            // If already logged into an account
+            if (u_type === 3) {
+
+                // Ask them to log out and click on the confirmation link again
+                if (is_mobile) {
+                    parsepage(pages['mobile']);
+                    mobile.messageOverlay.show(l[2480], l[12440], function () {
+                        loadSubPage('fm');
+                    });
+                }
+                else {
+                    msgDialog('warningb', l[2480], l[12440], false, function () {
+                        loadSubPage('fm');
+                    });
+                }
+                return false;
+            }
 
             // Verify the confirm code using the new process
             security.register.verifyEmailConfirmCode(confirmcode, function(result, email) {
@@ -1215,9 +1233,24 @@ function init_page() {
         parsepage(pages['blog']);
         init_blog();
     }
-    else if (page == 'copyright') {
+    else if (is_mobile && (page === 'copyright' || page === 'copyrightnotice')) {
+
+        // Show message that the copyright takedown should be submitted in a desktop browser
+        parsepage(pages['mobile']);
+        mobile.messageOverlay.show(l[621], l[19628], function() {
+
+            // On clicking OK in the dialog, go to the file manager if logged in, or start page if not
+            loadSubPage(u_type === 3 ? 'fm' : 'start');
+        });
+        return false;
+    }
+    else if (page === 'copyrightnotice') {
+        parsepage(pages['copyrightnotice']);
+        copyright.init_cn();
+    }
+    else if (page === 'copyright') {
         parsepage(pages['copyright']);
-        $('.reg-st5-complete-button').rebind('click', function (e) {
+        $('.reg-st5-complete-button').rebind('click', function () {
             loadSubPage('copyrightnotice');
         });
     }
@@ -1231,25 +1264,32 @@ function init_page() {
             loadSubPage('disputenotice');
         });
     }
-    else if (page.substr(0, 6) === 'propay') {
-        if (is_mobile) {
-            parsepage(pages['mobile']);
-        }
-        else {
-            parsepage(pages['propay']);
-        }
-        pro.propay.init();
-    }
     else if (page.substr(0, 3) === 'pro') {
-        var tmp = page.split('/uao=');
+        /* jshint -W018 */
+        var tmp = page.split(/(\/\w+=)/);
         if (tmp.length > 1) {
-            mega.uaoref = decodeURIComponent(tmp[1]);
+            for (var s = 1; s < tmp.length; s += 2) {
+                tmp[String(tmp[s]).replace(/\W/g, '')] = mURIDecode(tmp[s + 1]);
+            }
+            if (tmp.uao) {
+                mega.uaoref = tmp.uao;
+            }
+            if (tmp.aff && (tmp.aff_time *= 1000) && !(localStorage.affts > tmp.aff_time)) {
+                localStorage.affid = tmp.aff;
+                localStorage.affts = tmp.aff_time;
+            }
             loadSubPage(tmp[0]);
             return;
         }
 
-        parsepage(pages['proplan']);
-        pro.proplan.init();
+        if (page.substr(0, 6) === 'propay') {
+            parsepage(pages[is_mobile ? 'mobile' : 'propay']);
+            pro.propay.init();
+        }
+        else {
+            parsepage(pages['proplan']);
+            pro.proplan.init();
+        }
     }
     else if (page.substr(0, 7) === 'payment') {
 
@@ -1270,18 +1310,22 @@ function init_page() {
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
     }
+    else if (page === 'mobile' || page === 'android' || page === 'ios') {
+        parsepage(pages['mobileapp']);
+
+        // On clicking the 'Learn more' button
+        $('.uwp-windows-scrollto-button').rebind('click', function() {
+
+            // Scroll to the Windows Phone section
+            $('.uwp-windows-section').get(0).scrollIntoView();
+        });
+    }
     else if (page === 'extensions') {
         parsepage(pages['browsers']);
         browserspage.init();
     }
-    else if (page === 'ios') {
-        parsepage(pages['ios']);
-    }
-    else if (page === 'android') {
-        parsepage(pages['android']);
-    }
-    else if (page === 'wp') {
-        parsepage(pages['wp']);
+    else if (page === 'uwp' || page === 'wp') {
+        parsepage(pages['uwp']);
         bottompage.initTabs();
     }
     else if (page === 'bird') {
@@ -1289,7 +1333,7 @@ function init_page() {
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
-        init_sync();
+        initMegasync();
         topmenuUI();
     }
     else if (page == 'cmd') {
@@ -1305,10 +1349,6 @@ function init_page() {
     else if (page == 'done') {
         parsepage(pages['done']);
         init_done();
-    }
-    else if (page == 'copyrightnotice') {
-        parsepage(pages['copyrightnotice']);
-        copyright.init_cn();
     }
     else if (dlid) {
         page = 'download';
@@ -1931,11 +1971,11 @@ function topmenuUI() {
 
             var subpage;
             var subPages = [
-                'about', 'account', 'android', 'backup', 'blog', 'cmd', 'contact',
+                'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
-                'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'privacycompany',
+                'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'wp', 'start'
+                'sync', 'takedown', 'terms', 'start', 'uwp'
             ];
             var moveTo = {'account': 'fm/account'};
 
@@ -2143,6 +2183,11 @@ function topmenuUI() {
     });
 
     // If the main Mega M logo in the header is clicked
+    $topHeader.find('.default-white-button.individual').rebind('click', function () {
+        loadSubPage('startpage');
+    });
+
+    // If the main Mega M logo in the header is clicked
     $topHeader.find('.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
             if (folderlink) {
@@ -2243,16 +2288,12 @@ function getTemplate(name) {
 function pagemetadata() {
     var mega_desc = false;
 
-    if (page == 'android') {
-        mega_title = 'Android - MEGA';
-        mega_desc = 'The MEGA Android app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
+    if (page === 'uwp') {
+        mega_title = 'Windows 10 app - MEGA';
     }
-    else if (page == 'ios') {
-        mega_title = 'iOS - MEGA';
-        mega_desc = 'The MEGA iOS app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
-    }
-    else if (page == 'wp') {
-        mega_title = 'Windows Phone - MEGA';
+    else if (page === 'mobileapp') {
+        mega_title = 'MEGA - Mobile Apps';
+        mega_desc = 'Securely manage your files and collaborate everyone from anywhere.';
     }
     else if (page == 'sync') {
         mega_title = 'MEGAsync - Download';

@@ -732,8 +732,8 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                     var targetHandle = keys[0];
                     var nodeHandle = ctx.handle[targetHandle][0];
 
-                    // A hook for the mobile web to remove the node from the view and close the dialog
-                    mobile.deleteOverlay.completeDeletionProcess(nodeHandle);
+                    // A hook for mobile web to handle node changes.
+                    mobile.cloud.moveFinishedCallback(nodeHandle);
                 }
                 else {
                     renderPromise = M.updFileManagerUI();
@@ -995,9 +995,12 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                             foreach(handles);
                         }
                         else {
-                            msgDialog('warninga', 'Moving Error',
-                                l[17739],
-                                'Error in Merging');
+                            if (is_mobile) {
+                                mobile.showErrorToast(l[17739]);
+                            }
+                            else {
+                                msgDialog('warninga', 'Moving Error', l[17739], 'Error in Merging');
+                            }
                             if (!quiet) {
                                 loadingDialog.phide();
                             }
@@ -1223,6 +1226,18 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
                     }
                     return M.d[h];
                 });
+
+                if (is_mobile) {
+                    loadingDialog.hide();
+
+                    if (error) {
+                        masterPromise.reject(error);
+                    }
+                    else {
+                        masterPromise.resolve(targets);
+                    }
+                    return;
+                }
 
                 // removeUInode may queued another `delay('openfolder', ...)`, let's overwrite it.
                 delay('openfolder', function() {
@@ -1728,7 +1743,7 @@ MegaData.prototype.labeling = function(handles, labelId) {
 
             M.labelDomUpdate(handle, newLabelState);
         });
-        
+
         M.initLabelFilter(M.v);
     }
 };
@@ -1802,15 +1817,58 @@ MegaData.prototype.updateLabelInfo = function(e) {
 
     var $t = $(e.target);
     var labelTxt = $t.data('label-txt');
-    var labelInfo;
 
     if ($(e.target).hasClass('active')) {
-        labelInfo = l[19563];
+        switch (labelTxt) {
+            case "Red":
+                labelTxt = l[19571];
+                break;
+            case "Orange":
+                labelTxt = l[19575];
+                break;
+            case "Yellow":
+                labelTxt = l[19579];
+                break;
+            case "Green":
+                labelTxt = l[19583];
+                break;
+            case "Blue":
+                labelTxt = l[19587];
+                break;
+            case "Purple":
+                labelTxt = l[19591];
+                break;
+            case "Grey":
+                labelTxt = l[19595];
+                break;
+        }
     }
     else {
-        labelInfo = l[19564];
+        switch (labelTxt) {
+            case "Red":
+                labelTxt = l[19570];
+                break;
+            case "Orange":
+                labelTxt = l[19574];
+                break;
+            case "Yellow":
+                labelTxt = l[19578];
+                break;
+            case "Green":
+                labelTxt = l[19582];
+                break;
+            case "Blue":
+                labelTxt = l[19586];
+                break;
+            case "Purple":
+                labelTxt = l[19590];
+                break;
+            case "Grey":
+                labelTxt = l[19594];
+                break;
+        }
     }
-    labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
+
     $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
 };
 
@@ -1897,10 +1955,10 @@ MegaData.prototype.initLabelFilter = function(nodelist) {
     if (d){
         console.log('checking label is existing');
     }
-    
+
     var $fmMenu = $('.colour-sorting-menu .dropdown-section .dropdown-item-label')
         .add('.colour-sorting-menu .dropdown-section.filter-by .labels');
-        
+
     if (this.isLabelExistNodeList(nodelist)){
         $fmMenu.removeClass('disabled static');
         if (d){
@@ -3251,25 +3309,12 @@ MegaData.prototype.importWelcomePDF = function() {
             var key = res.k;
             M.req({a: 'g', p: ph}).done(function(res) {
                 if (typeof res.at === 'string') {
-                    M.onFileManagerReady(function() {
-                        var doit = true;
-                        for (var i = M.v.length; i--;) {
-                            if (fileext(M.v[i].name) === 'pdf') {
-                                doit = false;
-                                break;
-                            }
-                        }
-
-                        if (doit) {
-                            if (d) {
-                                console.log('Importing Welcome PDF (%s)', ph, res.at);
-                            }
-                            promise.linkDoneAndFailTo(M.importFileLink(ph, key, res.at));
-                        }
-                        else {
-                            promise.reject(EEXIST);
-                        }
-                    });
+                    // No need to wait for FileManager to be ready, and no need to check anything
+                    // This method is ONLY called when the initial ephemral account is created
+                    if (d) {
+                        console.log('Importing Welcome PDF (%s)', ph, res.at);
+                    }
+                    promise.linkDoneAndFailTo(M.importFileLink(ph, key, res.at));
                 }
                 else {
                     promise.reject(res);
@@ -3361,7 +3406,7 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             });
         }
         else {
-            _import(M.RootID);
+            _import(M.RootID ? M.RootID : undefined);
         }
     });
 };
@@ -3374,15 +3419,18 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
     "use strict";
 
     var _import = function(data) {
-        $.mcImport = true;
-        $.selected = data[0];
-        $.onImportCopyNodes = data[1];
-        $.onImportCopyNodes.opSize = data[2];
+        M.onFileManagerReady(function() {
+            openCopyDialog(function() {
+                $.mcImport = true;
+                $.selected = data[0];
+                $.onImportCopyNodes = data[1];
+                $.onImportCopyNodes.opSize = data[2];
 
-        if (d) {
-            console.log('Importing Nodes...', $.selected, $.onImportCopyNodes, data[2]);
-        }
-        $('.dropdown-item.copy-item').click();
+                if (d) {
+                    console.log('Importing Nodes...', $.selected, $.onImportCopyNodes, data[2]);
+                }
+            });
+        });
     };
 
     if (localStorage.folderLinkImport && !folderlink) {

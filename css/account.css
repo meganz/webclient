@@ -252,6 +252,19 @@
 .sign .big-red-button {
     min-width: 0;
 }
+.big-red-button span {
+    display: inline-block;
+    vertical-align: top;
+}
+.big-red-button .loader {
+    width: 16px;
+    display: none;
+    vertical-align: top;
+    margin: 8px -8px 0 4px;
+}
+.big-red-button.loading .loader {
+    display: inline-block;
+}
 .business-block, .business .personal-block {
     display: none;
 }
@@ -423,7 +436,7 @@
     margin: 0 -30%;
 }
 .top-login-popup .account.checkbox-block {
-    padding: 0 0 16px 0;
+    padding: 7px 0 16px 0;
 }
 .dropdown.body.popup.top-login-popup {
     width: 400px;

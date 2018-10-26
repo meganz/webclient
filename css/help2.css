@@ -382,7 +382,8 @@
     max-width: 1440px;
 }
 #help2-main .client-container-wrapper {
-    max-width: 1548px;
+    overflow: auto;
+    max-width: 100%;
     background-color: #fff;
     margin: 0 auto;
 }

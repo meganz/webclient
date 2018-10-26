@@ -485,7 +485,10 @@ RichpreviewsFilter.syncFromAttribute = function() {
         })
         .always(function() {
             if (M.currentdirid && M.currentdirid.indexOf("account") > -1) {
-                accountUI();
+                // below if statment is to exlude URLs having user-management (Business)
+                if (M.currentdirid.indexOf('user-management') === -1) {
+                    accountUI();
+                }
             }
         });
 };

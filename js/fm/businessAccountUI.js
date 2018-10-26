@@ -710,7 +710,7 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
     // handler for add users button
     $('.landing-sub-container.adding-subuser', $landingContainer).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
-            mySelf.showAddSubUserDialog();
+            mySelf.showAddSubUserDialog(null, function () { });
         });
 
     // handler account setting page
@@ -1811,7 +1811,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
     var validateInvoice = function (invoice) {
         // top level validate
         if (!invoice || !invoice.mega || !invoice.u || !invoice.items || !invoice.ts
-            || !invoice.tot || !invoice.taxrate) {
+            || invoice.tot === undefined || invoice.taxrate === undefined) {
             return false;
         }
 
@@ -1821,7 +1821,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             return false
         }
         // billed object validate
-        if (!invoice.u.e || !invoice.u.cname || !invoice.u.addr ) {
+        if (!invoice.u.e || !invoice.u.cname /*|| !invoice.u.addr*/ ) {
             return false;
         }
 

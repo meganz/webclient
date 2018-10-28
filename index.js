@@ -2083,7 +2083,9 @@ function topmenuUI() {
                         }
                     }
                     M.v = v;
+                    M.currentdirid = 'search/' + val;
                     M.renderMain();
+                    $(this).trigger('blur');
                 }
                 else {
                     loadingDialog.show();

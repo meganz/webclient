@@ -1973,7 +1973,7 @@ function topmenuUI() {
             var subPages = [
                 'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
-                'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp', 'privacycompany',
+                'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'start', 'uwp'
             ];

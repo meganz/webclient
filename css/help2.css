@@ -1,8 +1,16 @@
 .mega-tpl {
     display: none;
 }
+.bottom-page.scroll-block.help-centre-crop {
+    max-width: 1440px;
+    margin: 0 auto;
+}
 .main-mid-pad#help2-main {
     width: 100%;
+    min-width: 1024px;
+}
+.main-pad-block.help-home-page {
+    margin: 0 auto;
 }
 #help2-main {
     padding-bottom: 0;
@@ -82,7 +90,7 @@
     -o-transition-timing-function: ease; /* Opera */
 }
 #help2-main .close-icon {
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 12px;
     background-position: -127px -450px;
@@ -147,11 +155,11 @@
     min-height: 80px;
 }
 #help2-main .block:last-of-type {
-    width: calc((100%/6) - 1px);
+    width: calc((100%/4) - 1px);
 }
 #help2-main .block {
-    width: calc(100%/6);
-    height: 260px;
+    width: calc(100%/4);
+    height: 220px;
     float: left;
     display: inline-block;
     background-color: #fff;
@@ -161,7 +169,7 @@
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
-    font-family: 'source_sans_proregular';
+    font-family: 'latoweb';
     font-size: 16px;
     color: #666;
     cursor: pointer;
@@ -190,7 +198,7 @@
 #help2-main .iOS-mobile-block {
     display: inline-block;
     position: absolute;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 20px;
     background-position: -150px -300px;
@@ -214,7 +222,7 @@
 #help2-main .android-mobile-block {
     display: inline-block;
     position: relative;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 20px;
     background-position: -150px -366px;
@@ -237,7 +245,7 @@
 #help2-main .window-mobile-block {
     display: inline-block;
     position: absolute;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 17px;
     background-position: -150px -336px;
@@ -293,70 +301,91 @@
     -o-transition-timing-function: ease; /* Opera */
 }
 #help2-main .block-webclient, #help2-main .block-web-client, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop {
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     display: block;
     background-position: 0 0;
     width: 100px;
     height: 100px;
-    margin: 60px auto 32px;
+    margin: 38px auto 32px;
 }
 
 #help2-main .block-megasync, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync {
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     display: block;
     background-position: 0 -100px;
     width: 100px;
     height: 100px;
-    margin: 60px auto 32px;
+    margin: 38px auto 32px;
 }
 #help2-main .block-megachat {
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     display: block;
     background-position: 0 -300px;
     width: 100px;
     height: 100px;
-    margin: 60px auto 32px;
+    margin: 38px auto 32px;
 }
 #help2-main .block-business {
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     display: block;
     background-position: 0 -400px;
     width: 100px;
     height: 100px;
-    margin: 60px auto 32px;
+    margin: 38px auto 32px;
 }
 #help2-main .block-android, #help2-main .block-mobile {
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     display: block;
     background-position: 0 -500px;
     width: 100px;
     height: 100px;
-    margin: 60px auto 32px;
+    margin: 38px auto 32px;
 }
 #help2-main .block-ios {
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     display: block;
     background-position: 0 -200px;
     width: 100px;
     height: 100px;
-    margin: 60px auto 32px;
+    margin: 38px auto 32px;
 }
 #help2-main .block-windowsphone {
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     display: block;
     background-position: 0 -600px;
     width: 100px;
     height: 100px;
-    margin: 60px auto 32px;
+    margin: 38px auto 32px;
+}
+#help2-main .block-uwp {
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
+    display: block;
+    background-position: -111px -500px;
+    width: 100px;
+    height: 100px;
+    margin: 38px auto 32px;
+}
+#help2-main .block-cmd {
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
+    display: block;
+    background-position: -111px -600px;
+    width: 100px;
+    height: 100px;
+    margin: 38px auto 32px;
 }
 #help2-main #container {
     width: 100%;
     min-width: 1024px;
-    height: 260px;
     margin: 0 auto;
     position: relative;
     background-color: #fff;
-    border-bottom: 1px solid #eee;
+    max-width: 1440px;
+}
+#help2-main .client-container-wrapper {
+    overflow: auto;
+    max-width: 100%;
+    background-color: #fff;
+    margin: 0 auto;
 }
 #help2-main body {
     background-color: #fafafa;
@@ -382,9 +411,11 @@
     background-color: #f44;
 }
 #help2-main .first-search-section {
-    height: 220px;
-    background-color: #f44;  
-}#help2-main .first-search-section .section-title{
+    height: 240px;
+    background-color: #f44;
+    min-width: 1024px;  
+    }
+#help2-main .first-search-section .section-title{
     font-family: 'source_sans_prolight';
     font-size: 52px;
     color: #fff;
@@ -622,11 +653,11 @@
     margin: 5% auto 2% auto;
 }
 #help2-main .getstart-img {
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-position: -100px 0;
 }
 #help2-main .usemega-img {
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-position: -100px -150px;
 }
 #help2-main .browsearticle-button {
@@ -646,7 +677,7 @@
     margin: 0 auto;
 }
 #help2-main .browsearticle-button .article-arrow {
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     width: 7px;
     display: inline-block;
     height: 12px;
@@ -712,12 +743,14 @@
 }
 #help2-main .popular-question-title, #help2-main .support-block-title {
     margin-top: 48px;
-    color: #f44;
+    color: #262F3B;
     text-align: left;
     flex: 0 0 100%;
-    font-family: 'source_sans_proregular';
-    font-size: 28px;
+    font-family: 'latoweb';
+    font-weight: 300;
+    font-size: 32px;
     margin-bottom: 20px;
+    line-height: 1.5;
 }
 #help2-main .search-section-header .popular-question-block {
     display: none;
@@ -732,8 +765,13 @@
     display: block;
     overflow: hidden;
     background-color: #fff;
-    padding-left: 12.5%;
-    padding-right: 12.5%;
+    margin: 0 auto;
+    padding-left: 54px;
+    padding-right: 54px;
+    max-width: 1440px;
+    border-top: 1px solid #eee;
+    min-width: 960px;
+
 }
 #help2-main .search-section-header .popular-question-title {
     color: #444;
@@ -741,7 +779,7 @@
     padding-bottom: 30px;
 }
 #help2-main .search-section-header .popular-question-items li {
-    font-size: 15px;
+    font-size: 16px;
     letter-spacing: 0.2px;
     line-height: 18px;
     margin-bottom: 8px;
@@ -756,7 +794,7 @@
     display: block;
     margin-top: 0;
     margin-left: 20px;
-    line-height: 22px;
+    line-height: 24px;
     cursor: pointer;
     transition-property: margin-left, color;
     -moz-transition-property: margin-left, color; /* Firefox 4 */
@@ -797,11 +835,13 @@
 }
 #help2-main .first-support-block {
     border-top: 1px solid #eee;
-    height: 220px;
+    height: 272px;
     margin: 0 auto;
     background-color: #fff;
-    padding-left: 12.5%;
-    padding-right: 12.5%;
+    padding-left: 52px;
+    padding-right: 52px;
+    min-width: 960px;
+    max-width: 1440px;
 }
 #help2-main .search-support-block {
     height: 160px;
@@ -874,7 +914,7 @@
     display: inline-block;
     float: right;
     position: relative;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 18px;
     background-position: -100px -428px;
@@ -903,8 +943,6 @@
 }
 #help2-main .support-section-header {
     position: absolute;
-    left: 0;
-    right: 15px;
     width: 100%;
     display: block;
     line-height: 30px;
@@ -1012,7 +1050,7 @@
     display: inline-block;
     float: left;
     position: relative;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 19px;
     background-position: -124px -428px;
@@ -1213,10 +1251,10 @@
 }
 #help2-main .support-article-heading {
     font-family: 'source_sans_prolight';
-    color: #666F75;
+    color: #676D75;
     padding-top: 56px;
-    font-size: 28px;
-    line-height: 40px;
+    font-size: 32px;
+    line-height: 1.5;
 }
 #help2-main .d-section-items li {
     color: #666;
@@ -1474,7 +1512,7 @@
     overflow: hidden;
     visibility: hidden;
     height: 0px;
-    clear: none;
+    clear: all;
 }
 #help2-main .support-article {
     background-color: white;
@@ -1677,7 +1715,7 @@
     margin-bottom: 0;
     margin-left: auto;
     margin-right: auto;
-    margin-top: -50px;
+/*#help2-main .mobile-support-image-container*/
     padding-bottom: 0;
     padding-left: 0;
     padding-right: 0;
@@ -1685,16 +1723,20 @@
     position: relative;
     font-size: 0;
 }
-#help2-main .mobile-support-image-container .nav-dots-container {
+/*#help2-main .mobile-support-image-container .nav-dots-container {
     left: 50%;
     margin-left: -19px;
     position: absolute;
+}*/
+#help2-main .mobile-support-image-container .image-alignment-container {
+    display: inline-block;
+    float: right;
 }
 #help2-main .nav-dots-container {
     text-align: center;
 }
 #help2-main .nav-dots {
-    width: 10px;
+    width: 7px;
     height: 10px;
     border-radius: 10px;
     background-color: #000;
@@ -1724,7 +1766,7 @@
 }
 
 #help2-main .active-nav-dot {
-    width: 4px;
+    width: 1px;
     height: 4px;
     border: 4px solid #f44;
     border-radius: 10px;
@@ -1744,8 +1786,8 @@
     color: #f55;
 }
 #help2-main .mobile-support-images-gallery {
-    width: 42%;
-    max-width: 42%;
+/*    width: 42%;
+    max-width: 42%;*/
     display: inline-block;
     box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.15);
     border-radius: 6px;
@@ -1754,11 +1796,9 @@
 }
 #help2-main .mobile-support-image-container {
     width: 100%;
-    position: relative;
     display: block;
     background-color: #fafafa;
     border: 1px solid #f6f6f6;
-    border-radius: 6px;
     line-height: 30px;
     margin-top: 30px;
     margin-bottom: 30px;
@@ -1769,6 +1809,7 @@
     padding-top: 10px;
     margin-left: -10px;
     padding-bottom: 10px;
+    overflow: auto;
 }
 #help2-main .mobile-support-image-instructions {
     margin: 0 auto;
@@ -2279,7 +2320,7 @@
 #help2-main .ios-icon {
     display: block;
     position: absolute;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 20px;
     background-position: -150px -300px;
@@ -2288,7 +2329,7 @@
 }
 #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon,
 #help2-main .webclient-icon {
-    background-image: url('../images/mega/help2/welcome_icons_v2.png');
+    background-image: url('../images/mega/help2/welcome_icons_v3.png');
     background-position: -148px -430px;
     background-repeat: no-repeat;
     display: block;
@@ -2297,10 +2338,10 @@
     position: absolute;
     width: 18px;
 }
-#help2-main .windowsphone-icon {
+#help2-main .windowsphone-icon, #help2-main .uwp-icon {
     display: block;
     position: absolute;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 17px;
     background-position: -150px -336px;
@@ -2310,7 +2351,7 @@
 #help2-main .android-icon {
     display: block;
     position: absolute;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 20px;
     background-position: -150px -366px;
@@ -2320,7 +2361,7 @@
 #help2-main .megasync-icon {
     display: block;
     position: absolute;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 20px;
     background-position: -178px -302px;
@@ -2328,9 +2369,10 @@
     margin-top: 8px;
     margin-left: -1px;
     left: auto;
+    background-size: 250px auto;
 }
 #help2-main .megachat-icon {
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-position: -178px -333px;
     background-repeat: no-repeat;
     display: block;
@@ -2340,6 +2382,19 @@
     position: absolute;
     width: 20px;
 }
+#help2-main .cmd-icon {
+    display: block;
+    position: absolute;
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
+    background-repeat: no-repeat;
+    height: 20px;
+    background-position: -179px -368px;
+    width: 20px;
+    margin-top: 8px;
+    margin-left: -1px;
+    left: auto;
+}
+
 #help2-main .device-selector {
     background: #fff;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
@@ -2461,7 +2516,7 @@
     display: inline-block;
     float: right;
     position: relative;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 7px;
     background-position: -133px -307px;
@@ -2475,7 +2530,7 @@
     display: inline-block;
     float: left;
     position: relative;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 32px;
     background-position: -100px -300px;
@@ -2486,7 +2541,7 @@
 #help2-main .yes-icon {
     display: inline-block;
     position: relative;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 18px;
     background-position: -100px -332px;
@@ -2499,7 +2554,7 @@
 #help2-main .no-icon {
     display: inline-block;
     position: relative;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 18px;
     background-position: -100px -350px;
@@ -2513,7 +2568,7 @@
     display: inline-block;
     float: left;
     position: relative;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 24px;
     background-position: -100px -368px;
@@ -2529,7 +2584,7 @@
     display: inline-block;
     float: left;
     position: relative;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 24px;
     background-position: -124px -368px;
@@ -2545,7 +2600,7 @@
     display: inline-block;
     float: left;
     position: relative;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 12px;
     background-position: -124px -416px;
@@ -2623,7 +2678,7 @@
     display: inline-block;
     float: left;
     position: relative;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 16px;
     background-position: -97px -471px;
@@ -2696,7 +2751,7 @@
 }
 #help2-main .result-filter-icon {
     position: relative;
-    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3.png);
     background-repeat: no-repeat;
     height: 14px;
     background-position: -133px -332px;
@@ -2822,11 +2877,12 @@
     display: none;
 }
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    #help2-main .getstart-img, #help2-main .usemega-img, #help2-main .browsearticle-button .article-arrow, #help2-main .block-megachat, #help2-main .block-megasync, #help2-main .block-business, #help2-main .feedback-logo, .feedback-logo,#help2-main .yes-icon, #help2-main .no-icon, #help2-main .support-link-icon, #help2-main .support-email-icon, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop, #help2-main .support-search-icon, #help2-main .support-go-back-icon, #help2-main input.submit, #help2-main .device-menu-icon, #help2-main .result-filter-icon, #help2-main .megachat-icon, #help2-main .megasync-icon, #help2-main .ios-icon, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .windowsphone-icon, #help2-main .android-icon, #help2-main .block-webclient, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync, #help2-main .close-icon, #help2-main .iOS-mobile-block, #help2-main .android-mobile-block, #help2-main .window-mobile-block, #help2-main .support-section-header-clone .support-go-back-icon, #help2-main .block-android,  #help2-main .support-section-header-clone .support-search-icon, #help2-main .nav-arrow {
-        background-image: url(../images/mega/help2/welcome_icons_v2@2x.png);
+    #help2-main .getstart-img, #help2-main .usemega-img, #help2-main .browsearticle-button .article-arrow, #help2-main .block-megachat, #help2-main .block-megasync, #help2-main .block-business, #help2-main .feedback-logo, .feedback-logo,#help2-main .yes-icon, #help2-main .no-icon, #help2-main .support-link-icon, #help2-main .support-email-icon, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop, #help2-main .support-search-icon, #help2-main .support-go-back-icon, #help2-main input.submit, #help2-main .device-menu-icon, #help2-main .result-filter-icon, #help2-main .megachat-icon, #help2-main .megasync-icon, #help2-main .ios-icon, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .windowsphone-icon, #help2-main .android-icon, #help2-main .block-webclient, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync, #help2-main .close-icon, #help2-main .iOS-mobile-block, #help2-main .android-mobile-block, #help2-main .window-mobile-block, #help2-main .support-section-header-clone .support-go-back-icon, #help2-main .block-android,  #help2-main .support-section-header-clone .support-search-icon, #help2-main .nav-arrow, #help2-main .cmd-icon, #help2-main .block-cmd, #help2-main .block-uwp, #help2-main .uwp-icon, #help2-main .megasync-icon {
+        background-image: url(../images/mega/help2/welcome_icons_v3@2x.png);
         background-size: 250px 700px;
     }
 }
+
 @media (min-width: 1600px) and (max-width: 2880px) {
     
     #help2-main .popular-question-block {
@@ -3495,9 +3551,6 @@
     }
     .main-scroll-block .jspPane {
         min-width: 320px;
-    }
-    .top-head {
-        display: none;
     }
     #help2-main {
         min-width: 320px;
@@ -4468,7 +4521,6 @@
     }
 
 }
-
 #help2-main img {
     max-width: 100%;
 }
@@ -4526,7 +4578,7 @@
 }
 #help2-main .ui-autocomplete .client {
     background-color: rgba(0, 0, 0, 0);
-    background-image: url("../images/mega/help2/welcome_icons_v2.png");
+    background-image: url("../images/mega/help2/welcome_icons_v3.png");
     background-repeat: no-repeat;
     display: inline-block;
     height: 20px;
@@ -4580,6 +4632,12 @@
 }
 #help2-main .ui-autocomplete .ui-menu-item .megachat.ui-state-active {
     background-position: -230px -333px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .cmd {
+    background-position: -178px -367px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .cmd.ui-state-active {
+    background-position: -230px -367px;
 }
 #help2-main .ui-autocomplete .label-text {
     border-radius: 4px;

@@ -407,7 +407,7 @@ mobile.register = {
             mobile.messageOverlay.show(l[703]);   // Your sign-up link is not valid...
         }
         else if (apiResult === ENOENT) {
-            mobile.messageOverlay.show(l[704]);   // Your account has already been activated. Please log in.
+            mobile.messageOverlay.show(l[19788]); // Your confirm link is no longer valid. Your account may already...
         }
         else {
             mobile.messageOverlay.show(l[705] + ' ' + apiResult);     // Please sign up again. Error code: xx

@@ -37,9 +37,7 @@
 
             <div class="top-menu-item submenu-item">[$961]</div>
             <div class="top-submenu">
-                <div class="top-menu-item ios">[$16538]</div>
-                <div class="top-menu-item android">[$16539]</div>
-                <div class="top-menu-item wp">[$16540]</div>
+                <div class="top-menu-item mobile">[$955]</div>
                 <div class="top-menu-item sync">[$956]</div>
                 <div class="top-menu-item extensions">[$16603]</div>
                 <div class="top-menu-item megabird">MEGAbird</div>
@@ -78,6 +76,7 @@
 
 <!-- Loading overlay -->
 <div class="dark-overlay hidden"></div>
+<div class="titlemenu-overlay hidden"></div>
 <div class="light-overlay hidden"></div>
 <div class="slideshow-overlay hidden"></div>
 <div class="fm-dialog-overlay hidden"></div>
@@ -116,8 +115,14 @@
 
 
 <!-- Toast notification !-->
-<div class="mobile toast-notification hidden">
-    [$7677]
+<div class="mobile toast-notification info hidden">
+    <div class="mobile message-body">[$7677]</div>
+</div>
+
+<!-- Toast alert notification !-->
+<div class="mobile toast-notification alert hidden">
+    <div class="mobile fm-icon toast-alert-icon info-white-nofill left"></div>
+    <div class="mobile message-body">[$18280]</div>
 </div>
 
 
@@ -128,18 +133,29 @@
         <!-- Cloud drive / Folder link header -->
         <div class="mobile fm-header fm-hr folder-link">
             <div class="mobile fm-icon cloud left hidden"></div>
+            <div class="mobile fm-icon top-icon rubbish-bin left hidden"></div>
             <div class="mobile fm-icon top-icon menu right"></div>
             <div class="mobile fm-icon top-icon view-options list-icon right"></div>
+            <div class="mobile fm-icon top-icon dropdown-handle open-title-menu right hidden"></div>
             <div class="mobile fm-icon back left hidden"></div>
+            <div class="mobile fm-icon up left hidden"></div>
             <div class="mobile fm-icon folder"></div>
             <div class="mobile fm-header-txt"><span>[$1456]...</span></div>
             <div class="mobile fm-folder-size"></div>
+
         </div>
     </div>
 
     <!-- File manager footer, showing number of folders/files -->
     <div class="mobile fm-row">
         <div class="mobile fm-content">
+            <div class="mobile alert-banner hidden">
+                <div class="mobile alert-text"><span>Alert!</span></div>
+                <div class="mobile alert-close">
+                    <div class="mobile alert-icon fm-icon close white close-alert-banner"></div>
+                </div>
+
+            </div>
             <div class="mobile fm-scrolling">
                 <div class="mobile folders-files-text"></div>
 
@@ -217,6 +233,12 @@
                     <div class="mobile empty-icon folder"></div>
                     <div class="mobile empty-txt">[$7597]</div>
                 </div>
+
+                <!-- Empty rubbishbin block -->
+                <div class="mobile empty-rubbishbin-block template">
+                    <div class="mobile empty-icon folder"></div>
+                    <div class="mobile empty-txt">[$7740]</div>
+                </div>
             </div>
         </div>
     </div>
@@ -227,6 +249,7 @@
                 <input class="upload-select-file hidden" type="file">
             </div>
             <div class="mobile fm-icon mobile-create-new-folder right"></div>
+            <div class="mobile fm-icon rubbish-bin-highlight empty-rubbish-bin right hidden"></div>
         </div>
     </div>
 </div>
@@ -371,6 +394,45 @@
     </div>
 </div>
 
+<!-- RubbishBin Context Menu -->
+<div class="mobile context-menu-container rubbishbin hidden">
+    <div class="item-info"></div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item restore-item">
+        <div class="mobile fm-icon restore"></div>
+        <span class="mobile text">[$5726]</span>
+    </div>
+    <div class="context-menu-item delete-item">
+        <div class="mobile fm-icon rubbish-bin-highlight"></div>
+        <span class="mobile text">[$1730]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item close-button">
+        <div class="mobile fm-icon close"></div>
+        <span class="mobile text">[$148]</span>
+    </div>
+</div>
+
+<!-- Title DropDown Menu -->
+<div class="mobile title-menu-container hidden closed">
+    <div class="title-menu-item open-cloud-drive">
+        <div class="mobile fm-icon cloud-dark"></div>
+        <span class="mobile text">[$164]</span>
+    </div>
+    <div class="title-menu-item open-my-account">
+        <div class="mobile fm-icon account"></div>
+        <span class="mobile text">[$187]</span>
+    </div>
+    <div class="title-menu-item open-rubbish-bin">
+        <div class="mobile fm-icon rubbish-bin"></div>
+        <span class="mobile text">[$167]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="title-menu-item close-button">
+        <div class="mobile fm-icon close"></div>
+        <span class="mobile text">[$148]</span>
+    </div>
+</div>
 
 <!-- Photo preview overlay !-->
 <div class="mobile main-block slideshow-image-previewer hidden">
@@ -408,6 +470,7 @@
                         <div class="mobile slideshow-buttons">
         <div class="mobile left-buttons">
             <div class="mobile fm-icon delete delete-button"></div>
+            <div class="mobile fm-icon rubbish-bin-highlight rubbishbin-delete-button hidden"></div>
         </div>
         <div class="mobile right-buttons">
             <div class="mobile fm-icon download download-button"></div>
@@ -426,7 +489,9 @@
     <div class="mobile fm-header fm-hr">
         <div class="mobile fm-icon top-icon account left"></div>
         <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon top-icon dropdown-handle open-title-menu right"></div>
         <div class="mobile fm-header-txt"><span>[$187]</span></div>
+
     </div>
     <div class="mobile content-row">
         <div class="mobile content-cell">
@@ -1274,12 +1339,124 @@
                 <div class="mobile buttons">
                     <a class="mobile red-button first delete"> <i></i> <span>[$1730]</span> </a>
                 </div>
-                 <a class="mobile text-button third cancel"><span>Close</span> </a>
+                 <a class="mobile text-button third cancel"><span>[$148]</span> </a>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Empty RubbishBin Overlay !-->
+<div class="mobile main-block hidden" id="mobile-ui-empty-rubbish-bin">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile empty-icon clear-rubbish-bin"></div>
+                <div class="mobile rb-empty-overlay-title dialog-heading-text">[$5599]</div>
+                <div class="mobile">
+                    <div class="mobile rb-empty-overlay-message dialog-body-text">[$15]</div>
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile red-button first empty"> <i></i> <span>[$1018]</span> </a>
+                </div>
+                <a class="mobile text-button third cancel"><span>[$148]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- File Conflict Overlay !-->
+<div class="mobile main-block hidden conflict-resolution-overlay" id="mobile-ui-file-conflict">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile dialog-header">
+                    <div class="mobile dialog-heading-text">[$16485]</div>
+                    <div class="mobile dialog-body-text overlay-description-text"></div>
+                    <div class="mobile dialog-body-text">[$16487]</div>
+                </div>
+                <div class="mobile actions-container">
+                    <div class="mobile action-container action-replace-item">
+                        <div class="mobile action-icon-wrapper">
+                            <img alt="" class="mobile action-icon" src="{staticpath}images/mobile/extensions/image.png" />
+                        </div>
+                        <div class="action-right-container">
+                            <div class="mobile action-title">[$16495]</div>
+                            <div class="mobile action-description">[$16497]</div>
+                        </div>
+                    </div>
+                    <div class="mobile action-container action-skip-item">
+                        <div class="mobile action-icon-wrapper">
+                            <img alt="" class="mobile action-icon" src="{staticpath}images/mobile/extensions/image.png" />
+                        </div>
+                        <div class="action-right-container">
+                            <div class="mobile action-title">[$16499]</div>
+                            <div class="mobile action-description">[$19784]</div>
+                        </div>
+                    </div>
+                    <div class="mobile action-container action-rename-item">
+                        <div class="mobile action-icon-wrapper">
+                            <img alt="" class="mobile action-icon" src="{staticpath}images/mobile/extensions/image.png" />
+                        </div>
+                        <div class="action-right-container">
+                            <div class="mobile action-title">[$17096]</div>
+                            <div class="mobile action-description">[$16514]</div>
+                            <div class="mobile action-description detail-new-item-name"></div>
+                        </div>
+                    </div>
+                    <div class="mobile repeat-action-container hidden">
+                        <div class="checkboxOff square"><i></i><input class="checkbox repeat-action-control" type="checkbox"></div>
+                        <div class="checkbox-label text">
+                            [$16494]
+                        </div>
+                    </div>
+                </div>
+                <a class="mobile text-button third cancel"><span>[$148]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Folder Conflict Overlay !-->
+<div class="mobile main-block hidden conflict-resolution-overlay" id="mobile-ui-folder-conflict">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile dialog-header">
+                    <div class="mobile dialog-heading-text">[$16485]</div>
+                    <div class="mobile dialog-body-text overlay-description-text"></div>
+                    <div class="mobile dialog-body-text">[$17556]</div>
+                </div>
+                <div class="mobile actions-container">
+                    <div class="mobile action-container action-replace-item">
+                        <div class="mobile action-icon-wrapper">
+                            <img alt="" class="mobile action-icon" src="{staticpath}images/mobile/extensions/folder.png" />
+                        </div>
+                        <div class="action-right-container">
+                            <div class="mobile action-title">[$17553]</div>
+                            <div class="mobile action-description">[$17554]</div>
+                        </div>
+                    </div>
+                    <div class="mobile action-container action-skip-item">
+                        <div class="mobile action-icon-wrapper">
+                            <img alt="" class="mobile action-icon" src="{staticpath}images/mobile/extensions/folder.png" />
+                        </div>
+                        <div class="action-right-container">
+                            <div class="mobile action-title">[$16499]</div>
+                            <div class="mobile action-description">[$19785]</div>
+                        </div>
+                    </div>
+                </div>
+                <a class="mobile text-button third cancel"><span>[$148]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- File export overlay !-->
 <div class="mobile main-block hidden" id="mobile-ui-copy-link">
@@ -1298,7 +1475,7 @@
                     <a class="mobile red-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
                     <a class="mobile red-button second remove disabled"> <i></i> <span>[$6821]</span> </a>
                 </div>
-                 <a class="mobile text-button third cancel"><span>Close</span> </a>
+                 <a class="mobile text-button third cancel"><span>[$148]</span> </a>
             </div>
         </div>
     </div>

@@ -450,142 +450,9 @@ function accountUI() {
         $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
         $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
 
-        M.account.sessions.sort(function(a, b) {
-            if (a[0] < b[0]) {
-                return 1;
-            }
-            else {
-                return -1;
-            }
-        });
+        accountUI.renderSessionHistory();
 
-        $('#sessions-table-container').empty();
-        var html =
-            '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sessions">' +
-            '<tr><th>' + l[19303] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
-            '<th class="no-border session-status">' + l[7664] + '</th>' +
-            '<th class="no-border logout-column">&nbsp;</th></tr>';
-        var numActiveSessions = 0;
-
-        for (i = 0; i < account.sessions.length; i++) {
-            var el = account.sessions[i];
-            var currentSession = el[5];
-            var activeSession = el[7];
-
-            // If the current session or active then increment count
-            if (currentSession || activeSession) {
-                numActiveSessions++;
-            }
-
-            if (i >= $.sessionlimit) {
-                continue;
-            }
-
-            var userAgent = el[2];
-            var dateTime = htmlentities(time2date(el[0]));
-            var browser = browserdetails(userAgent);
-            var browserName = browser.nameTrans;
-            var ipAddress = htmlentities(el[3]);
-            var country = countrydetails(el[4]);
-            var sessionId = el[6];
-            var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
-
-            // Show if using an extension e.g. "Firefox on Linux (+Extension)"
-            if (browser.isExtension) {
-                browserName += ' (+' + l[7683] + ')';
-            }
-
-            // If not the current session
-            if (!currentSession) {
-                if (activeSession) {
-                    status = '<span class="active-session-txt">' + l[7666] + '</span>';     // Active
-                }
-                else {
-                    status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
-                }
-            }
-
-            // If unknown country code use question mark gif
-            if (!country.icon || country.icon === '??.gif') {
-                country.icon = 'ud.gif';
-            }
-
-            // Generate row html
-            html += '<tr class="' + (currentSession ? "current" : sessionId) + '">'
-                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent.replace(/\s*megext/i, ''))
-                + '" src="' + staticpath + 'images/browser/' + browser.icon
-                + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
-                + '</span></td>'
-                + '<td>' + ipAddress + '</td>'
-                + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/'
-                + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">'
-                + htmlentities(country.name) + '</span></td>'
-                + '<td>' + dateTime + '</td>'
-                + '<td>' + status + '</td>';
-
-            // If the session is active show logout button
-            if (activeSession) {
-                html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
-            }
-            else {
-                html += '<td>&nbsp;</td>';
-            }
-        }
-
-        $('#sessions-table-container').safeHTML(html + '</table>');
-
-        // Don't show button to close other sessions if there's only the current session
-        if (numActiveSessions === 1) {
-            $('.fm-close-all-sessions').hide();
-        }
-
-        $('.fm-close-all-sessions').rebind('click', function() {
-            msgDialog('confirmation', '', l[18513], false, function(e) {
-                if (e) {
-                    loadingDialog.show();
-                    var $activeSessionsRows = $('.active-session-txt').parents('tr');
-                    // Expire all sessions but not the current one
-                    api_req({a: 'usr', ko: 1}, {
-                        callback: function() {
-                            M.account = null;
-                            /* clear account cache */
-                            $activeSessionsRows.find('.settings-logout').remove();
-                            $activeSessionsRows.find('.active-session-txt')
-                                .removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
-                            $('.fm-close-all-sessions').hide();
-                            loadingDialog.hide();
-                        }
-                    });
-                }
-            });
-        });
-
-        $('.settings-logout').rebind('click', function() {
-
-            var $this = $(this).parents('tr');
-            var sessionId = $this.attr('class');
-
-            if (sessionId === 'current') {
-                mLogout();
-            }
-            else {
-                loadingDialog.show();
-                /* usr - user session remove
-                 * remove a session Id from the current user,
-                 * usually other than the current session
-                 */
-                api_req({a: 'usr', s: [sessionId]}, {
-                    callback: function(res, ctx) {
-                        M.account = null;
-                        /* clear account cache */
-                        $this.find('.settings-logout').remove();
-                        $this.find('.active-session-txt').removeClass('active-session-txt')
-                            .addClass('expired-session-txt').text(l[1664]);
-                        loadingDialog.hide();
-                    }
-                });
-            }
-        });
+        
 
         $('.account-history-dropdown-button.purchases').text(l[469].replace('[X]', $.purchaselimit));
         $('.account-history-drop-items.purchase10-').text(l[469].replace('[X]', 10));
@@ -1815,6 +1682,204 @@ function accountUI() {
     });
     accNotifHandler = undefined;
 }
+
+/**
+ * Update Session History table html.
+ * If there is any new session history found (or forced), re-render session history table.
+ * @param {Boolean} force force update the table.
+ */
+accountUI.updateSessionTable = function(force) {
+    "use strict";
+
+    if (page === 'fm/account/history') {
+        // if first item in sessions list is not match existing Dom list, it need update.
+        if (d) {
+            console.log('Updating session history table');
+        }
+
+        M.refreshSessionList(function() {
+            var fSession = M.account.sessions[0];
+            var DomList =  $('.grid-table.sessions').find('tr');
+            // update table when it has new active session or forced
+            if (($(DomList[1]).hasClass('current') && !fSession[5])
+                || !$(DomList[1]).hasClass(fSession[6]) || force) {
+                if (d) {
+                    console.log('Update session history table');
+                }
+                accountUI.renderSessionHistory();
+            }
+        });
+    }
+};
+
+/**
+ * Rendering session history table.
+ * With session data from M.account.sessions, render table for session history
+ */
+accountUI.renderSessionHistory = function() {
+    "use strict";
+
+    if (d) {
+        console.log('Render session history');
+    }
+
+    M.account.sessions.sort(function(a, b) {
+        if (a[0] < b[0]) {
+            return 1;
+        }
+        else {
+            return -1;
+        }
+    });
+
+    $('#sessions-table-container').empty();
+    var html =
+        '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sessions">' +
+        '<tr><th>' + l[19303] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
+        '<th class="no-border session-status">' + l[7664] + '</th>' +
+        '<th class="no-border logout-column">&nbsp;</th></tr>';
+    var numActiveSessions = 0;
+
+    for (i = 0; i < M.account.sessions.length; i++) {
+        var session = M.account.sessions[i];
+
+        var currentSession = session[5];
+        var activeSession = session[7];
+
+        // If the current session or active then increment count
+        if (currentSession || activeSession) {
+            numActiveSessions++;
+        }
+
+        if (i >= $.sessionlimit) {
+            continue;
+        }
+
+        html += accountUI.getSessionHtml(session);
+    }
+
+    $('#sessions-table-container').safeHTML(html + '</table>');
+
+    // Don't show button to close other sessions if there's only the current session
+    if (numActiveSessions === 1) {
+        $('.fm-close-all-sessions').hide();
+    }
+    else {
+        $('.fm-close-all-sessions').show();
+    }
+
+    $('.fm-close-all-sessions').rebind('click', function() {
+        msgDialog('confirmation', '', l[18513], false, function(e) {
+            if (e) {
+                loadingDialog.show();
+                var $activeSessionsRows = $('.active-session-txt').parents('tr');
+                // Expire all sessions but not the current one
+                api_req({a: 'usr', ko: 1}, {
+                    callback: function() {
+                        M.account = null;
+                        /* clear account cache */
+                        $activeSessionsRows.find('.settings-logout').remove();
+                        $activeSessionsRows.find('.active-session-txt')
+                            .removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
+                        $('.fm-close-all-sessions').hide();
+                        loadingDialog.hide();
+                    }
+                });
+            }
+        });
+    });
+
+    $('.settings-logout').rebind('click', function() {
+
+        var $this = $(this).parents('tr');
+        var sessionId = $this.attr('class');
+
+        if (sessionId === 'current') {
+            mLogout();
+        }
+        else {
+            loadingDialog.show();
+            /* usr - user session remove
+             * remove a session Id from the current user,
+             * usually other than the current session
+             */
+            api_req({a: 'usr', s: [sessionId]}, {
+                callback: function() {
+                    M.account = null;
+                    /* clear account cache */
+                    $this.find('.settings-logout').remove();
+                    $this.find('.active-session-txt').removeClass('active-session-txt')
+                        .addClass('expired-session-txt').text(l[1664]);
+                    loadingDialog.hide();
+                }
+            });
+        }
+    });
+};
+
+/**
+ * Get html of one session data for session history table.
+ * @param {Object} el a session data from M.account.sessions
+ * @return {String} html
+ * When draw session hitory table make html for each session data
+ */
+accountUI.getSessionHtml = function(el) {
+    "use strict";
+    
+    var currentSession = el[5];
+    var activeSession = el[7];
+    var userAgent = el[2];
+    var dateTime = htmlentities(time2date(el[0]));
+    var browser = browserdetails(userAgent);
+    var browserName = browser.nameTrans;
+    var ipAddress = htmlentities(el[3]);
+    var country = countrydetails(el[4]);
+    var sessionId = el[6];
+    var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
+
+    // Show if using an extension e.g. "Firefox on Linux (+Extension)"
+    if (browser.isExtension) {
+        browserName += ' (+' + l[7683] + ')';
+    }
+
+    // If not the current session
+    if (!currentSession) {
+        if (activeSession) {
+            status = '<span class="active-session-txt">' + l[7666] + '</span>';     // Active
+        }
+        else {
+            status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
+        }
+    }
+
+    // If unknown country code use question mark gif
+    if (!country.icon || country.icon === '??.gif') {
+        country.icon = 'ud.gif';
+    }
+
+    // Generate row html
+    var html = '<tr class="' + (currentSession ? "current" : sessionId) + '">'
+        + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent.replace(/\s*megext/i, ''))
+        + '" src="' + staticpath + 'images/browser/' + browser.icon
+        + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
+        + '</span></td>'
+        + '<td>' + ipAddress + '</td>'
+        + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/'
+        + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">'
+        + htmlentities(country.name) + '</span></td>'
+        + '<td>' + dateTime + '</td>'
+        + '<td>' + status + '</td>';
+
+    // If the session is active show logout button
+    if (activeSession) {
+        html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
+    }
+    else {
+        html += '<td>&nbsp;</td></tr>';
+    }
+
+    return html;
+};
 
 /**
  * Update user UI (pro plan, avatar, first/last name, email)

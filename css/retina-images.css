@@ -127,7 +127,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 262px auto;
 }
 #help2-main .ui-autocomplete .client, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .webclient-icon {
-    background-image: url(../images/mega/help2/welcome_icons_v2@2x.png);
+    background-image: url(../images/mega/help2/welcome_icons_v3@2x.png);
     background-size: 250px auto;
 }
 .mid-white-icon, .huge-white-icon.achievement, .account.bonuses-icon, .dropdown.transfer-icon, .huge-icon.storage-icon, .semi-small-icon.rocket, .semi-huge-icon.green-tick, .semi-big-icon.blue-cloud, .semi-big-icon.green-speedometer, .achieved .account.progress-indicator, .achievement-complete::after, .big-104px-icon.speedometer, .big-icon.almost-full-storage, .semi-huge-icon.speedometer, .semi-huge-icon.storage {
@@ -202,6 +202,10 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 .fm-picker-dialog .contact-row.selected .contact-checkboxOn.small12::before, .fm-picker-dialog .contact-row:hover .small12::before {
     background-image: url(../images/mega/fm-main-sprite_v4@2x.png);
     background-size: 48px auto;
+}
+.bottom-page.large-icon, .cropped-page .bottom-page.big-icon, .cropped-page .bottom-page.top-title::before, .mobile-apps-button.uwp,.uwp .advertise-chat .mobile-apps-button.red span::before {
+    background-image: url(../images/mega/new-pages-sprite_v2@2x.png) !important;
+    background-size: 376px auto;
 }
 .auth-app-select-tooltip .app-link-icon, .auth-app-select-tooltip .app-link-arrow {
     background-image: url(../images/mega/2fa-auth-apps@2x.png);

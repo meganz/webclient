@@ -464,6 +464,9 @@
 
                     // Confirm abort registration
                     if (ev) {
+
+                        // Run 'user cancel registration' API command to cleanup the registration API side
+                        api_req({ a: 'ucr' });
                         onCloseCallback();
                     }
                     else {

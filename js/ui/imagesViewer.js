@@ -567,6 +567,7 @@ var slideshowid;
             slideshow_imgControls(1);
             mBroadcaster.sendMessage('slideshow:close');
             slideshow_freemem();
+
             return false;
         }
 

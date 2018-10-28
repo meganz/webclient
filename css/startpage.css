@@ -20,7 +20,7 @@
     background-image: url(../images/mega/startpage-sprite_v7.png);
     background-position: -2px -263px;
     background-repeat: no-repeat;
-    margin: 0 auto;
+    margin: 40px auto 0 auto;
 }
 .startpage .bottom-page.top-header {
     color: rgba(0,0,0,0.7);
@@ -262,7 +262,7 @@
     padding: 0 15px;
     visibility: visible;
     position: absolute;
-    bottom: 83px;
+    bottom: 20px;
     width: 100%;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -311,6 +311,10 @@
 .reg-st3-membership-icon, .membership-icon, .mobile.membership-icon, .pro-icon, div.pro-feature-icon, .startpage.mega-logo, .startpage.upload-cloud-icon, .startpage.white-question, .pages-nav.nav-icon, .bottom-page.big-icon, .startpage.medium-icon, .small-red-link i, .flip-bg, .startpage.quote-icon, .bottom-menu.logo, .loginrequired-dialog .fm-notification-icon, .top-arrow-icon, .mobile.icon {
     background-image: url(../images/mega/startpage-sprite_v7@2x.png) !important;
     background-size: 267px auto;
+}
+.bottom-page.large-icon, .cropped-page .bottom-page.big-icon {
+    background-image: url(../images/mega/new-pages-sprite@2x.png);
+    background-size: 376px auto;
 }
 }
 

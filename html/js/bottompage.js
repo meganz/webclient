@@ -15,6 +15,12 @@ var bottompage = {
         else {
             $('body').removeClass('old');
         }
+
+        // Init Slider for business page
+        if (page === 'business') {
+            bottompage.initSlider();
+        }
+
         if (!is_mobile) {
             bottompage.initFloatingTop();
             $('body').removeClass('mobile');
@@ -119,6 +125,52 @@ var bottompage = {
         });
     },
 
+    initSlider: function() {
+
+        "use strict";
+
+        var $slider = $('.bottom-page.slider-body');
+        
+        $('.slider-button, .slider-dot-button', $slider).rebind('click', function() {
+            var $this = $(this);
+            var $buttons;
+            var activeSlide;
+            var newSlide;
+
+            if (!$this.hasClass('active')) {
+                $buttons = $('.slider-button, .slider-dot-button', $slider);
+                activeSlide = $('.slider-button.active', $slider).attr('data-num');
+                newSlide = $this.attr('data-num');
+
+                $buttons.removeClass('active');
+                $buttons.filter('.slide' + newSlide).addClass('active');
+                $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide);
+            }
+        });
+
+        $('.slider-ctrl-button', $slider).rebind('click', function() {
+            var $this = $(this);
+            var $buttons = $('.slider-button, .slider-dot-button', $slider);
+            var activeSlide = parseInt($('.slider-button.active', $slider).attr('data-num'));
+            var slidesNum = $('.slider-button', $slider).length;
+            var newSlide;
+
+            if ($this.hasClass('prev') && activeSlide > 1) {
+                newSlide = activeSlide - 1;
+            }
+            else if ($this.hasClass('next') && activeSlide < slidesNum) {
+                newSlide = activeSlide + 1;
+            }
+            else {
+                return false;
+            }
+
+            $buttons.removeClass('active');
+            $buttons.filter('.slide' + newSlide).addClass('active');
+            $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide);
+        });
+    },
+
     initTabs: function() {
         $('.bottom-page.tab').rebind('click', function() {
             var $this = $(this);
@@ -183,10 +235,12 @@ var bottompage = {
         "use strict";
 
         var $topBlock = $('.bottom-page.top-bl');
-        var topBlockHeight = $topBlock.parent().height();
+        var $productNav = $topBlock.parent().first('.pages-nav.content-block');
+        var topBlockHeight = $topBlock.parent().length > -1 ? $topBlock.parent().outerHeight() : 0;
+        var productNavHeight = $productNav.length > -1 ? $productNav.outerHeight() : 0;
 
-        if ($topBlock.length > -1) {
-            $topBlock.height(topBlockHeight);
+        if (topBlockHeight - productNavHeight > 0) {
+            $topBlock.height(topBlockHeight - productNavHeight);
         }
     }
 };

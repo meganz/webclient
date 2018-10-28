@@ -67,7 +67,7 @@ function initMegacmd() {
     });
 
     $content.find('.bottom-page.scroll-button').rebind('click', function() {
-        $('html, body').animate({
+        $('html, body, .fmholder').animate({
             scrollTop: $('.bottom-page.full-block').offset().top
         }, 1000);
     });

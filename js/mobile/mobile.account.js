@@ -30,6 +30,7 @@ mobile.account = {
         mobile.account.initCancelAccountButton($page);
         mobile.account.initSessionHistoryButton($page);
         mobile.account.fetchAndDisplayTwoFactorAuthStatus($page);
+        mobile.account.initTitleMenu();
 
         // Initialise the top menu
         topmenuUI();
@@ -64,6 +65,23 @@ mobile.account = {
         $avatar.find('.avatar').addClass('small-rounded-avatar');
         $userName.text(u_attr.name);
         $userEmail.text(u_attr.email);
+    },
+
+    /**
+     * Init the titleMenu for this page.
+     */
+    initTitleMenu: function() {
+        'use strict';
+
+        mobile.titleMenu.init();
+
+        var $titleHeaderTextContainer = $(".fm-header-txt");
+
+        // Attach event handlers local to this page controller.
+        $titleHeaderTextContainer.off('tap').on('tap', function() {
+            mobile.titleMenu.open();
+            return false;
+        });
     },
 
     /**

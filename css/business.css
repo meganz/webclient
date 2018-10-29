@@ -37,14 +37,15 @@
     border-radius: 100%;
 }
 .top-head .default-white-button.individual {
-    display: none;
-}
-.business .bottom-page .default-white-button.individual {
-    display: block;
     margin: 4px 0 0 30px;
     font-size: 16px;
     font-family: 'source_sans_prosemibold', Arial;
 }
+/*.business .bottom-page .default-white-button.individual {
+    margin: 4px 0 0 30px;
+    font-size: 16px;
+    font-family: 'source_sans_prosemibold', Arial;
+}*/
 .business .bottom-page .top-head, .business .bottom-page .top-head.floating {
     background-color: #F0F2F5;
 }

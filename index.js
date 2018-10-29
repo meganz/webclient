@@ -304,7 +304,7 @@ function init_page() {
     $('body').addClass(lang);
     // add business class to affect the top header
     $('body').removeClass('business');
-
+    
     if ('-fa-ar-he-'.indexOf('-' + lang + '-') > -1) {
         $('body').addClass('rtl');
     }
@@ -1661,6 +1661,8 @@ function topmenuUI() {
     $topHeader.find('.activity-status-block .activity-status,.activity-status-block').addClass('hidden');
     $topHeader.find('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
     $topHeader.find('.membership-status, .top-head .user-name, .top-icon.achievements').addClass('hidden');
+    $topHeader.find('.left.individual').text(l[19702]); // try Mega Business
+    $topHeader.find('.left.individual').removeClass('hidden');
 
     if (fminitialized) {
         $topHeader.find('.top-search-bl').removeClass('hidden');
@@ -1671,6 +1673,9 @@ function topmenuUI() {
 
     if (page === 'download') {
         $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
+    }
+    if (page === 'business') {
+        $topHeader.find('.left.individual').text(l[19529]); // try Mega MEGA Indivisual
     }
 
     var avatar = window.useravatar && useravatar.mine();
@@ -1782,6 +1787,7 @@ function topmenuUI() {
 
         if (is_fm()) {
             $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
+            $topHeader.find('.left.individual').addClass('hidden');
         }
 
         // If the chat is disabled don't show the green status icon in the header
@@ -1796,6 +1802,7 @@ function topmenuUI() {
         if (u_attr.b) {
             $topHeader.find('.top-icon.achievements').addClass('hidden');
             $topMenu.find('.upgrade-your-account').addClass('hidden');
+            $topHeader.find('.left.individual').addClass('hidden');
         }
 
         // Show PRO plan expired warning popup (if applicable)
@@ -1948,7 +1955,12 @@ function topmenuUI() {
 
     // try individual button in business mode
     $topHeader.find('.top-centered-margin .individual').rebind('click', function () {
-        loadSubPage('start');
+        if (page === 'business') {
+            loadSubPage('start');
+        }
+        else {
+            loadSubPage('business');
+        }
     });
 
     $('.top-icon.menu, .top-icon.close').rebind('click', function () {

@@ -2050,9 +2050,9 @@ function topmenuUI() {
         $topHeader.find('.top-search-bl').removeClass('contains-value active');
         $topHeader.find('.top-search-input').val('').trigger('blur');
         // if current page is search result reset it.
-        if(page.indexOf('/search/') !== -1) {
+        if (page.indexOf('/search/') !== -1) {
             loadSubPage(page.slice(0, page.indexOf('/search/')));
-        };
+        }
     });
 
     $topHeader.find('.top-search-input').rebind('keyup', function _topSearchHandler(e) {

@@ -440,8 +440,9 @@ FileManager.prototype.initFileManagerUI = function() {
 
     $('.fm-files-view-icon').rebind('click', function() {
         $.hideContextMenu();
-
+        var viewValue;
         if ($(this).hasClass('listing-view')) {
+            viewValue = 0;
             if (fmconfig.uiviewmode) {
                 mega.config.set('viewmode', 0);
             }
@@ -450,6 +451,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
         else {
+            viewValue = 1;
             if (fmconfig.uiviewmode) {
                 mega.config.set('viewmode', 1);
             }
@@ -457,11 +459,16 @@ FileManager.prototype.initFileManagerUI = function() {
                 fmviewmode(M.currentdirid, 1);
             }
         }
-
-        M.openFolder(M.currentdirid, true)
-        .always(function() {
-            reselect();
-        });
+        if (folderlink) {
+            M.viewmode = viewValue;
+            M.renderMain();
+        }
+        else {
+            M.openFolder(M.currentdirid, true)
+            .always(function() {
+                reselect();
+            });
+        }
 
         return false;
     });

@@ -2037,17 +2037,22 @@ function topmenuUI() {
         }
     });
 
-    $topHeader.find('.top-clear-button').rebind('click', function () {
+    $topHeader.find('.top-clear-button').rebind('click', function (e) {
+
+        // stop propaation to not calling .top-search-bl click
+        e.stopPropagation();
+
+        // if this is folderlink, open folderlink root;
         if (folderlink) {
             M.nn = false;
             M.openFolder();
         }
         $topHeader.find('.top-search-bl').removeClass('contains-value active');
-        $topHeader.find('.top-search-input').val('');
+        $topHeader.find('.top-search-input').val('').trigger('blur');
         // if current page is search result reset it.
         if(page.indexOf('/search/') !== -1) {
             loadSubPage(page.slice(0, page.indexOf('/search/')));
-        }
+        };
     });
 
     $topHeader.find('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
@@ -2078,7 +2083,7 @@ function topmenuUI() {
                     var filter = M.getFilterBySearchFn(val);
                     var v = [];
                     for (var h in M.nn) {
-                        if (filter({ name: M.nn[h] })) {
+                        if (filter({ name: M.nn[h] }) && h !== M.currentrootid) {
                             v.push(M.d[h]);
                         }
                     }

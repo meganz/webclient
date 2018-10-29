@@ -491,7 +491,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
 
 MegaData.prototype.searchPath = function() {
     "use strict";
-    console.log(M.currentdirid);
+
     if (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/') {
         var sel;
 

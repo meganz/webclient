@@ -459,7 +459,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 fmviewmode(M.currentdirid, 1);
             }
         }
-        if (folderlink) {
+        if (folderlink && M.currentdirid.substr(0, 6) === 'search') {
             M.viewmode = viewValue;
             M.renderMain();
         }

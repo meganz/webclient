@@ -36,7 +36,7 @@ function init_page() {
 
     var ph = tmp[1];
     var key = tmp[2];
-    $.playbackTimeOffset = parseInt(tmp[3]) | 0;
+    $.playbackOptions = tmp[3];
 
     var init = function(res) {
         init_embed(ph, key, res);

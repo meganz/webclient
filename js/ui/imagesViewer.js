@@ -567,6 +567,7 @@ var slideshowid;
             slideshow_imgControls(1);
             mBroadcaster.sendMessage('slideshow:close');
             slideshow_freemem();
+
             return false;
         }
 
@@ -1063,7 +1064,7 @@ var slideshowid;
         if (n.name) {
             var c = MediaAttribute.getCodecStrings(n);
             if (c) {
-                $overlay.find('.viewer-filename').attr('title', c.join("/"));
+                $overlay.find('.viewer-filename').attr('title', c);
             }
         }
 

@@ -1824,10 +1824,21 @@ var dlmanager = {
             $('.p-after-icon.msg-overquota', $dialog).text(l[120]);
             $('.header-before-icon.exceeded', $dialog).text(l[17]);
 
+            if (dlmanager.isStreaming) {
+                $('.p-after-icon.msg-overquota', $dialog).text(l[19615]);
+            }
+
             if (flags & dlmanager.LMT_ISPRO) {
                 $dialog.addClass('pro');
 
                 asyncTaskID = 'mOverQuota.' + makeUUID();
+
+                if (dlmanager.isStreaming) {
+                    $('.pro-exceeded-txt .msg-overquota', $dialog).text(l[19617]);
+                }
+                else {
+                    $('.pro-exceeded-txt .msg-overquota', $dialog).text(l[17084]);
+                }
 
                 if (M.account) {
                     // Force data retrieval from API
@@ -1882,6 +1893,10 @@ var dlmanager = {
             dlmanager._overquotaClickListeners($dialog, flags);
 
             $('.fm-dialog-overlay').rebind('click.dloverq', doCloseModal);
+
+            if (is_mobile) {
+                $(window).trigger('orientationchange');
+            }
 
             $dialog
                 .addClass('exceeded')

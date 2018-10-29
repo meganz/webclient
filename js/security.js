@@ -188,7 +188,7 @@ var security = {
         'use strict';
 
         // If Web Crypto method supported, use that as it's nearly as fast as native
-        if (window.crypto && window.crypto.subtle) {
+        if (window.crypto && window.crypto.subtle && !is_microsoft) {
             security.deriveKeyWithWebCrypto(saltBytes, passwordBytes, iterations, derivedKeyLength, callback);
         }
         else {
@@ -664,6 +664,10 @@ security.register = {
             lastname: base64urlencode(to8(lastName)),
             name2: base64urlencode(to8(firstName + ' ' + lastName))
         };
+
+        if (mega.affid) {
+            options.aff = mega.affid;
+        }
 
         // Send API request
         api_req(options);

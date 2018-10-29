@@ -1197,6 +1197,10 @@ function api_createuser(ctx, invitecode, invitename, uh) {
         req.name = invitename;
     }
 
+    if (mega.affid) {
+        req.aff = mega.affid;
+    }
+
     //if (confirmcode) req.c = confirmcode;
     logger.debug("Storing key: " + req.k);
 
@@ -1505,7 +1509,11 @@ function stringhash(s, aes) {
 function api_updateuser(ctx, newuser) {
     newuser.a = 'up';
 
-    res = api_req(newuser, ctx);
+    if (mega.affid) {
+        newuser.aff = mega.affid;
+    }
+
+    api_req(newuser, ctx);
 }
 
 var u_pubkeys = Object.create(null);

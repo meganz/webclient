@@ -170,6 +170,10 @@ var tooltiplogin = {
             $(this).addClass('hidden');
         });
 
+        $('.top-login-forgot-pass', $dialog).rebind('click', function() {
+            loadSubPage('recovery');
+        });
+
         $dialog.removeClass('hidden');
 
         if ($('body').hasClass('logged')) {

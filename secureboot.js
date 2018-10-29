@@ -208,20 +208,9 @@ if (is_chrome_firefox) {
 
     ua = navigator.userAgent.toLowerCase();
 }
-else if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
-        && parseInt(String(navigator.appVersion).split('Chrome/').pop()) < 22) {
-    b_u = 1;
-}
-else if (ua.indexOf('firefox') > -1 && typeof DataView === 'undefined') {
-    b_u = 1;
-}
-else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem === 'undefined') {
-    b_u = 1;
-}
-var myURL = URL;
-if (!myURL) {
-    b_u = 1;
-}
+
+var myURL = window.URL;
+b_u = b_u || !myURL || typeof DataView === 'undefined' || (window.chrome && !document.exitPointerLock);
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -546,41 +535,6 @@ var mega = {
         }
 
         return this._urlParams;
-    },
-
-    /**
-     * Fetches information from the API about which features are enabled
-     * @param {Function|undefined} completeCallback Optional function to run when the function has completed
-     */
-    getApiMiscFlags: function(completeCallback) {
-
-        'use strict';
-
-        // If the flags have already been fetched this session, don't fetch again
-        if (Object.keys(mega.apiMiscFlags).length !== 0) {
-
-            // Run the callback if it exists
-            if (typeof completeCallback === 'function') {
-                completeCallback();
-            }
-        }
-        else {
-            // Make Get Miscellaneous Flags (gmf) API request
-            api_req({ a: 'gmf' }, {
-                callback: function(result) {
-                    if (result) {
-
-                        // Cache flags object
-                        mega.apiMiscFlags = result;
-
-                        // Run the callback
-                        if (typeof completeCallback === 'function') {
-                            completeCallback();
-                        }
-                    }
-                }
-            });
-        }
     }
 };
 
@@ -1304,6 +1258,7 @@ function siteLoadError(error, filename) {
     }
     else {
         message.push('Filename: ' + filename + "\nException: " + error);
+        message.push('Stack trace: ' + String(error.stack).split('\n').splice(1, 4).join('\n'));
     }
     message.push('Please click OK to refresh and try again.');
     message.push("If the problem persists, please try disabling all third-party browser extensions,"
@@ -1321,7 +1276,7 @@ function siteLoadError(error, filename) {
 // Add manifest.json so this can be used on latest browsers.
 var tag=document.createElement('link');
 tag.rel = "manifest";
-tag.href = staticpath + "images/favicons/manifest.json";
+tag.href = "/manifest.json";
 document.getElementsByTagName('head')[0].appendChild(tag);
 
 if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
@@ -2221,6 +2176,12 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.twofactor.disabled.js', n: 'mobile_twofactor_disabled_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-action.js', n: 'mobile_twofactor_verify_action_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.titlemenu.js', n: 'mobile_titlemenu_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.rubbish-bin-empty-overlay.js', n: 'mobile_rubbish_bin_empty_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.rubbishbin.js', n: 'mobile_rubbishbin_js', j: 1, w: 1});
+        jsl.push({f:'js/fm/fileconflict.js', n: 'fileconflict_js', j:1});
+        jsl.push({f:'js/mobile/mobile.alertbanner.js', n: 'mobile_alert_banner', j: 1 });
+        jsl.push({f:'js/mobile/mobile.conflict-resolution-overlay.js', n: 'mobile_conflict_resolution_overlay_js', j: 1 });
     }
 
     // We need to keep a consistent order in loaded resources, so that if users
@@ -2787,11 +2748,37 @@ else if (!b_u) {
             xhr_stack[xhri].send(null);
         }
     }
-    window.onload = function ()
-    {
+
+    window.onload = function() {
+        'use strict';
+
         pageLoadTime = Date.now();
         mBroadcaster.once('startMega', function() {
-            pageLoadTime = Date.now() - pageLoadTime;
+            var now = Date.now();
+
+            pageLoadTime = now - pageLoadTime;
+
+            var ph = String(isPublicLink(page)).split('!')[1];
+            if (ph) {
+                localStorage.affid = ph;
+                localStorage.affts = now;
+            }
+
+            Object.defineProperty(mega, 'affid', {
+                get: function() {
+                    return parseInt(localStorage.affts) + 864e5 > Date.now() && localStorage.affid || 0;
+                }
+            });
+
+            // Get information about what API flags are enabled e.g. 2FA, New Registration etc
+            if (!is_iframed) {
+                M.req('gmf').done(function(result) {
+                    if (typeof result === 'object') {
+                        // Cache flags object
+                        mega.apiMiscFlags = result;
+                    }
+                });
+            }
         });
 
         if (!maintenance && !androidsplash && !is_karma) {
@@ -3060,7 +3047,7 @@ else if (!b_u) {
                 var g = {a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': u_sid || ''};
 
                 xhr(false, g, function(response) {
-                    dl_res = response[0] || response;
+                    dl_res = Array.isArray(response) && response[0];
                 });
             }
 

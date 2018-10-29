@@ -25,7 +25,7 @@ mobile.messageOverlay = {
 
         // If there is a second message, set that
         if (typeof optionalSecondMessage !== 'undefined' && optionalSecondMessage) {
-            $optionalSecondMessage.text(optionalSecondMessage);
+            $optionalSecondMessage.safeHTML(optionalSecondMessage);
         }
 
         // Initialise the OK/close button

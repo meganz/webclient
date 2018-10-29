@@ -295,6 +295,42 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
     }
 };
 
+MegaData.prototype.refreshSessionList = function(callback) {
+    "use strict";
+
+    if (d) {
+        console.log('Refreshing session list');
+    }
+    if (M.account) {
+        api_req({a: 'usl', x: 1}, {
+            account: M.account,
+            callback: function(res, ctx) {
+                if (typeof res !== 'object') {
+                    res = [];
+                }
+                else {
+                    res.sort(function(a, b) {
+                        if (a[0] < b[0]) {
+                            return 1;
+                        }
+                        else {
+                            return -1;
+                        }
+                    });
+                }
+
+                ctx.account.sessions = res;
+                M.account = ctx.account;
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            }
+        });
+    }
+    else {
+        M.accountData(callback);
+    }
+};
 
 function voucherData(arr) {
     var vouchers = [];

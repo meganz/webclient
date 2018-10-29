@@ -732,8 +732,8 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                     var targetHandle = keys[0];
                     var nodeHandle = ctx.handle[targetHandle][0];
 
-                    // A hook for the mobile web to remove the node from the view and close the dialog
-                    mobile.deleteOverlay.completeDeletionProcess(nodeHandle);
+                    // A hook for mobile web to handle node changes.
+                    mobile.cloud.moveFinishedCallback(nodeHandle);
                 }
                 else {
                     renderPromise = M.updFileManagerUI();
@@ -995,9 +995,12 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                             foreach(handles);
                         }
                         else {
-                            msgDialog('warninga', 'Moving Error',
-                                l[17739],
-                                'Error in Merging');
+                            if (is_mobile) {
+                                mobile.showErrorToast(l[17739]);
+                            }
+                            else {
+                                msgDialog('warninga', 'Moving Error', l[17739], 'Error in Merging');
+                            }
                             if (!quiet) {
                                 loadingDialog.phide();
                             }
@@ -1223,6 +1226,18 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
                     }
                     return M.d[h];
                 });
+
+                if (is_mobile) {
+                    loadingDialog.hide();
+
+                    if (error) {
+                        masterPromise.reject(error);
+                    }
+                    else {
+                        masterPromise.resolve(targets);
+                    }
+                    return;
+                }
 
                 // removeUInode may queued another `delay('openfolder', ...)`, let's overwrite it.
                 delay('openfolder', function() {
@@ -3294,26 +3309,12 @@ MegaData.prototype.importWelcomePDF = function() {
             var key = res.k;
             M.req({a: 'g', p: ph}).done(function(res) {
                 if (typeof res.at === 'string') {
-                    M.onFileManagerReady(function() {
-                        var doit = true;
-                        var keys = Object.keys(M.d);
-                        for (var i = keys.length; i--;) {
-                            if (fileext(M.d[keys[i]].name) === 'pdf') {
-                                doit = false;
-                                break;
-                            }
-                        }
-
-                        if (doit) {
-                            if (d) {
-                                console.log('Importing Welcome PDF (%s)', ph, res.at);
-                            }
-                            promise.linkDoneAndFailTo(M.importFileLink(ph, key, res.at));
-                        }
-                        else {
-                            promise.reject(EEXIST);
-                        }
-                    });
+                    // No need to wait for FileManager to be ready, and no need to check anything
+                    // This method is ONLY called when the initial ephemral account is created
+                    if (d) {
+                        console.log('Importing Welcome PDF (%s)', ph, res.at);
+                    }
+                    promise.linkDoneAndFailTo(M.importFileLink(ph, key, res.at));
                 }
                 else {
                     promise.reject(res);
@@ -3405,7 +3406,7 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             });
         }
         else {
-            _import(M.RootID);
+            _import(M.RootID ? M.RootID : undefined);
         }
     });
 };

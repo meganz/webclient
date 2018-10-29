@@ -21,7 +21,7 @@ function renderLinuxOptions(linuxsync) {
         $(this).prop('checked', true);
     });
     $content.find('.nav-buttons-bl a.linux')
-        .removeClass('download').addClass('disabled').attr('data-link',syncurl);
+        .removeClass('download').addClass('disabled').attr('data-link', syncurl);
     $content.find('.megasync .megaapp-linux-default').text(l[7086]);
     var ua = navigator.userAgent.toLowerCase();
     if (ua.indexOf('i686') > -1
@@ -54,12 +54,15 @@ function renderLinuxOptions(linuxsync) {
  * Reset MEGAsync to default
  */
 function resetMegasync() {
+
+    'use strict';
+
     var $content = $('.bottom-page.megasync');
     var $linuxBlock = $content.find('.megaapp-linux');
 
     $content.removeClass('linux');
     $content.find('.nav-buttons-bl a.linux').removeClass('download disabled')
-        .attr('data-link','');
+        .attr('data-link', '');
     $linuxBlock.addClass('hidden');
     $linuxBlock.find('.megaapp-linux-default').text(l[7086]);
     $linuxBlock.find('.radio-buttons label, .architecture-checkbox').removeClass('hidden');
@@ -69,14 +72,16 @@ function resetMegasync() {
  * Init MEGAsync functions
  */
 function initMegasync() {
-    var url;
-    var pf = navigator.platform.toUpperCase();
+
+    'use strict';
+
     var $content = $('.bottom-page.megasync');
 
     resetMegasync();
 
-    if (pf.indexOf('LINUX') >= 0) {
-        linuxMegasyncDropdown();
+    // Preload linux options if on a linux client
+    if (ua.indexOf('linux') >= 0) {
+        megasync.getLinuxReleases(renderLinuxOptions);
     }
 
     $content.find('.nav-buttons-bl a').rebind('click', function() {
@@ -116,6 +121,9 @@ function initMegasync() {
 }
 
 function changeLinux(linuxsync, i) {
+
+    'use strict';
+    
     var $content = $('.bottom-page.megasync');
 
     if (linuxsync[i]) {
@@ -140,7 +148,7 @@ function changeLinux(linuxsync, i) {
         nautilusurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform + "n");
         var filename = syncurl.split('/').pop();
         $content.find('.nav-buttons-bl a.linux').addClass('download')
-            .attr('data-link',syncurl);
+            .attr('data-link', syncurl);
         $content.find('.megaapp-button-info.linux-txt a').attr('href', nautilusurl);
         syncsel = i;
     }
@@ -148,7 +156,7 @@ function changeLinux(linuxsync, i) {
         syncurl = false;
         nautilusurl = false;
         $content.find('.nav-buttons-bl a.linux').removeClass('download').addClass('disabled')
-            .attr('data-link','');
+            .attr('data-link', '');
         $content('.megaapp-button-info.linux-txt').addClass('disabled');
         $content('.megaapp-button-info.linux-txt a').removeAttr('href');
         $content('.megaapp-linux-default').text(l[7086]);

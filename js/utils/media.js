@@ -476,8 +476,10 @@ function setImage(n, ab, options) {
  */
 function getID3CoverArt(entry) {
     'use strict';
+    // jscs:disable disallowImplicitTypeConversion
     return new Promise(function(resolve, reject) {
         var parse = tryCatch(function(ab) {
+            var result;
             var u8 = new Uint8Array(ab);
             var getLong = function(offset) {
                 return (((((u8[offset] << 8) + u8[offset + 1]) << 8) + u8[offset + 2]) << 8) + u8[offset + 3];
@@ -489,7 +491,6 @@ function getID3CoverArt(entry) {
                 return {id: id, size: getLong(offset + 4) + 10};
             };
             if (u8[0] === 0x49 && u8[1] === 0x44 && u8[2] === 0x33 && u8[3] === 3) {
-                var result;
                 var offset = 10 + (u8[5] & 128 ? getLong(10) : 0);
                 var size = offset + getLong(6);
 
@@ -505,14 +506,38 @@ function getID3CoverArt(entry) {
                     }
                     offset += frame.size;
                 }
+            }
+            if (u8[0] === 0x66 && u8[1] === 0x4C && u8[2] === 0x61 && u8[3] === 0x43) {
+                var pos = 4;
+                var len = u8.byteLength;
+                var type;
+
+                while (len > pos) {
+                    var hdr = getLong(pos);
+
+                    if ((hdr >>> 24 & ~0x80) === 6) {
+                        var index = getLong(pos + 8);
+                        index += getLong(pos + index + 12) + 32 + pos;
+                        type = getLong(pos + 4);
+
+                        result = u8.slice(index + 4, getLong(index));
+                    }
+
+                    if (type === 3 || (hdr >>> 24 & 0x80)) {
+                        break;
+                    }
+                    pos += 4 + (hdr & 0xffffff);
+                }
+            }
+            if (result && result.byteLength) {
                 if (d) {
                     console.debug('getID3CoverArt', [result]);
                 }
-                if (result) {
-                    return resolve(result);
-                }
+                return resolve(result);
             }
-            reject(Error('Not found.'));
+            onIdle(function() {
+                reject(Error('[getID3CoverArt] None found.'));
+            });
         }, reject);
 
         if (entry instanceof Blob) {
@@ -527,9 +552,7 @@ function getID3CoverArt(entry) {
             reader.readAsArrayBuffer(entry);
         }
         else {
-            onIdle(function() {
-                parse(entry);
-            });
+            parse(entry);
         }
     });
 }
@@ -697,6 +720,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $videoControls = $wrapper.find('.video-controls');
         var $document = $(document);
         var timer;
+        var filters = Object.create(null);
 
         // Hide the default controls
         videoElement.controls = false;
@@ -741,7 +765,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (dlmanager.isStreaming) {
                 clearTimeout(timer);
                 timer = setTimeout(function() {
-                    $wrapper.addClass('mouse-idle');
+                    if (!(videoElement.paused || videoElement.ended)) {
+                        $wrapper.addClass('mouse-idle');
+                    }
                 }, 2600);
             }
         };
@@ -778,6 +804,38 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
             videoElement.volume = Math.min(1.0, Math.max(videoElement.volume + v, 0.1));
             $volumeBar.find('span').css('height', Math.round(videoElement.volume * 100) + '%');
+        };
+
+        // Increase/decrease color filter
+        var setVideoFilter = function(v) {
+            var style = [];
+            var op = v > 0 && v < 4 ? 2 : v > 3 && v < 7 ? 5 : 8;
+            var filter = ({'2': 'saturate', '5': 'contrast', '8': 'brightness'})[op];
+
+            if (!v) {
+                filters = Object.create(null);
+            }
+            else if (v === op) {
+                delete filters[filter];
+            }
+            else {
+                v = '147'.indexOf(v) < 0 ? 0.1 : -0.1;
+                filters[filter] = Number(Math.min(8.0, Math.max((filters[filter] || 1) + v, 0.1)).toFixed(2));
+            }
+
+            Object.keys(filters).forEach(function(k) {
+                style.push(k + '(' + filters[k] + ')');
+            });
+
+            videoElement.style.filter = style.join(' ') || 'none';
+        };
+
+        // Apply specific video filter
+        var applyVideoFilter = function(s, c, b) {
+            filters.saturate = s;
+            filters.contrast = c;
+            filters.brightness = b;
+            videoElement.style.filter = 'saturate(' + s + ') contrast(' + c + ') brightness(' + b + ')';
         };
 
         // Seek by specified number of seconds.
@@ -852,6 +910,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $wrapper.removeClass('mouse-idle');
             $document.off('mousemove.idle');
             // playevent = false;
+        });
+
+        $video.rebind('contextmenu.mvs', function() {
+            if (playevent) {
+                $video.off('contextmenu.mvs');
+            }
+            else {
+                return false;
+            }
         });
 
         // Add events for all buttons
@@ -970,6 +1037,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 onTimeUpdate(options.startTime, playtime);
             }
         }
+
+        if (options.filter) {
+            applyVideoFilter.apply(this, options.filter.map(function(v) { return v / 10; }));
+        }
+
         $video.rebind('timeupdate', function() {
             onTimeUpdate(streamer.currentTime, streamer.duration);
         });
@@ -1093,6 +1165,18 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 case 'Digit9':
                     streamer.currentTime = streamer.duration * key.substr(5) / 10;
                     break;
+                case 'Numpad0':
+                case 'Numpad1':
+                case 'Numpad2':
+                case 'Numpad3':
+                case 'Numpad4':
+                case 'Numpad5':
+                case 'Numpad6':
+                case 'Numpad7':
+                case 'Numpad8':
+                case 'Numpad9':
+                    setVideoFilter(key.substr(6) | 0);
+                    break;
                 default:
                     if (ev.key === '<' || ev.key === '>') {
                         setVideoSpeed(ev.ctrlKey ? null : 0.25 * (ev.key.charCodeAt(0) - 0x3d));
@@ -1123,6 +1207,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $playpause.off();
             $volumeBar.off();
             clearTimeout(timer);
+            videoElement.style.filter = 'none';
             window.removeEventListener('keydown', videoKeyboardHandler, true);
             $wrapper.removeClass('mouse-idle video-theatre-mode video')
                 .off('is-over-quota').find('.viewer-pending').addClass('hidden');
@@ -1151,9 +1236,23 @@ FullScreenManager.prototype.enterFullscreen = function() {
         }
         options = Object.assign(Object.create(null), options);
 
-        if ($.playbackTimeOffset) {
-            options.startTime = $.playbackTimeOffset | 0;
-            $.playbackTimeOffset = null;
+        if ($.playbackOptions) {
+            String($.playbackOptions).replace(/(\d+)(\w)/g, function(m, v, k) {
+                if (k === 's') {
+                    options.startTime = v | 0;
+                }
+                else if (k === 'f') {
+                    v = String(v | 0);
+                    while (v.length < 6) {
+                        if (v.length & 1) {
+                            v = '1' + v;
+                        }
+                        v = '0' + v;
+                    }
+                    options.filter = v.slice(-6).split(/(.{2})/).filter(String);
+                }
+            });
+            $.playbackOptions = null;
         }
 
         if (!options.type) {
@@ -1203,9 +1302,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 eventlog(is_embed ? 99708 : folderlink ? 99709 : fminitialized ? 99710 : 99707);
             }
-            else if (navigator.onLine && this.currentTime < this.duration && this.hasStartedPlaying) {
+            else if (navigator.onLine && this.gotIntoBuffering) {
                 var data = [
-                    2, s.hasVideo, s.hasAudio, ~~s.getProperty('bitrate'), s.getProperty('server'), s.playbackTook
+                    3,
+                    s.hasVideo, s.hasAudio, Math.round(s.getProperty('bitrate')), s.getProperty('server'),
+                    s.playbackTook, node.ph || node.h
                 ];
 
                 if (d) {
@@ -1288,11 +1389,16 @@ FullScreenManager.prototype.enterFullscreen = function() {
         });
 
         s.on('playing', function() {
-            var events = {'WebM': 99681, 'MPEG Audio': 99684, 'M4A ': 99687, 'Wave': 99688, 'Ogg': 99689};
+            var events = {
+                'WebM': 99681, 'MPEG Audio': 99684, 'M4A ': 99687, 'Wave': 99688, 'Ogg': 99689, 'FLAC': 99712
+            };
             var eid = events[s.options.type] || 99668;
 
             if (eid === 99684 && node.s > 41943040) {
                 eid = 99685;
+            }
+            else if (eid === 99712 && node.s > 314572800) {
+                eid = 99713;
             }
 
             console.assert(eid !== 99668 || is_video(node) !== 2, 'This is not a video...');
@@ -1358,10 +1464,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
             MediaAttribute.canPlayMedia(node).then(function(yup) {
                 var c = MediaAttribute.getCodecStrings(node);
                 if (c) {
-                    $fn.attr('title', node.name + ' (' + c.join("/") + ')');
+                    $fn.attr('title', node.name + ' (' + c + ')');
                 }
 
                 if (!yup) {
+                    if (String(node.fa).indexOf(':8*') > 0 && isMediaSourceSupported()) {
+                        eventlog(99714, JSON.stringify([1, node.ph || node.h].concat(c)));
+                    }
                     return resolve(false);
                 }
                 var $video = $wrapper.find('video');
@@ -2517,6 +2626,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             case 'Wave':
                 mime = mime || 'audio/wav';
             /* fallthrough */
+            case 'FLAC':
+                mime = mime || 'audio/flac';
+            /* falls through */
             case 'MPEG Audio':
                 if (!videocodec) {
                     mime = mime || (audiocodec === container ? 'audio/mpeg' : 'doh');
@@ -2583,7 +2695,23 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 audiocodec = fmt[2];
             }
 
-            return [container, videocodec, audiocodec];
+            mc = Object.create(Array.prototype, {
+                toJSON: {
+                    value: function() {
+                        return this.slice();
+                    }
+                },
+                toString: {
+                    value: function() {
+                        return array.unique(this).map(function(k) {
+                            return String(k || '').trim();
+                        }).filter(String).join('/');
+                    }
+                }
+            });
+
+            mc.push(container, videocodec, audiocodec);
+            return mc;
         }
 
         delay('mc:missing', console.warn.bind(console, 'Media codecs list not loaded.'));
@@ -2844,7 +2972,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         console.warn(ex);
                     }
                 }
-                else if (res.container === 'MPEG Audio') {
+                else if (res.container === 'MPEG Audio' || res.container === 'FLAC') {
                     getID3CoverArt(res.entry).then(setImage.bind(null, self)).catch(console.debug.bind(console));
                 }
             }
@@ -2929,13 +3057,16 @@ mBroadcaster.once('startMega', function isAudioContextSupported() {
             stream.connect(ctx.destination);
         }
         catch (ex) {
-            console.debug(ex);
+            console.debug('This browser does not support advanced audio streaming...', ex);
         }
         finally {
             if (ctx && typeof ctx.close === 'function') {
-                ctx.close().then(function() {
-                    mega.fullAudioContextSupport = stream && stream.numberOfOutputs > 0;
-                });
+                var p = ctx.close();
+                if (p instanceof Promise) {
+                    p.then(function() {
+                        mega.fullAudioContextSupport = stream && stream.numberOfOutputs > 0;
+                    });
+                }
             }
         }
     }

@@ -143,7 +143,6 @@
             $('input[name="contact_me"]', self.$dialog)
                 .prop('checked', false)
                 .trigger('change');
-
         });
 
         self.bind("onHide", function() {

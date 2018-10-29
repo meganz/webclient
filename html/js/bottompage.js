@@ -126,6 +126,9 @@ var bottompage = {
     },
 
     initSlider: function() {
+
+        "use strict";
+
         var $slider = $('.bottom-page.slider-body');
         
         $('.slider-button, .slider-dot-button', $slider).rebind('click', function() {
@@ -141,7 +144,7 @@ var bottompage = {
 
                 $buttons.removeClass('active');
                 $buttons.filter('.slide' + newSlide).addClass('active');
-                $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide); 
+                $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide);
             }
         });
 
@@ -164,7 +167,7 @@ var bottompage = {
 
             $buttons.removeClass('active');
             $buttons.filter('.slide' + newSlide).addClass('active');
-            $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide); 
+            $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide);
         });
     },
 
@@ -232,10 +235,12 @@ var bottompage = {
         "use strict";
 
         var $topBlock = $('.bottom-page.top-bl');
-        var topBlockHeight = $topBlock.parent().height();
+        var $productNav = $topBlock.parent().first('.pages-nav.content-block');
+        var topBlockHeight = $topBlock.parent().length > -1 ? $topBlock.parent().outerHeight() : 0;
+        var productNavHeight = $productNav.length > -1 ? $productNav.outerHeight() : 0;
 
-        if ($topBlock.length > -1) {
-            $topBlock.height(topBlockHeight);
+        if (topBlockHeight - productNavHeight > 0) {
+            $topBlock.height(topBlockHeight - productNavHeight);
         }
     }
 };

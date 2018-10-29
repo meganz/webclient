@@ -160,6 +160,30 @@
     background-color: #00BFA5;
     color: #FAFAFA;
 }
+.default-white-button.light.white-border {
+    background-color: transparent;
+    color: #FAFAFA;
+}
+.default-white-button.light.white-border:hover {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
+    box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
+}
+.default-white-button.light.white-border::after {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(255,255,255,1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(255,255,255,1);
+    box-shadow: 0px 0px 0px 1px rgba(255,255,255,1);
+}
+.default-white-button.light.grey-border {
+    font-size: 16px;
+    background-color: transparent;
+    color: #666666;
+}
+.default-white-button.light.grey-border::after {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(102,102,102,1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(102,102,102,1);
+    box-shadow: 0px 0px 0px 1px rgba(102,102,102,1);
+}
 .default-white-button.light.grey {
     background-color: #F5F5F5;
     color: #666666;
@@ -698,6 +722,10 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1
 }
 .default-white-button.grey-txt {
     color: #666;
+}
+.default-white-button.blue-bg {
+    color: #666;
+    background-color: #F3F6F8;
 }
 .default-white-button.small-square-button {
     width: 24px;

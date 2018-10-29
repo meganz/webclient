@@ -146,7 +146,7 @@ var megasync = (function() {
                 $list.addClass('hidden');
             } else {
                 $this.addClass('active');
-                $list.removeClass('hidden');
+                $this.find('.megaapp-dropdown-list').removeClass('hidden');
                 linuxDropdownResizeHandler();
             }
         });
@@ -160,20 +160,17 @@ var megasync = (function() {
      * Handle window-resize events on the Linux Dropdown
      */
     function linuxDropdownResizeHandler() {
-
-        var $main = $('.megaapp-dropdown:visible');
-        var $pane = $main.find('.megaapp-dropdown-scroll');
+        var $list = $('.megaapp-dropdown-list:visible');
+        var $pane = $list.find('.megaapp-dropdown-scroll');
         var jsp   = $pane.data('jsp');
-        var $list = $main.find('.megaapp-dropdown-list');
-        var $arrow = $main.find('.mega-list-arrow');
-        var overlayHeight = $('.megasync-overlay').outerHeight();
-        var listHeight = $main.find('.megaapp-scr-pad').outerHeight() + 72;
+        var $arrow = $list.find('.mega-list-arrow');
+        var overlayHeight = $('body').outerHeight();
+        var listHeight = $list.find('.megaapp-scr-pad').outerHeight() + 72;
         var listPosition;
 
         if ($list.length) {
             listPosition = $list.offset().top;
         }
-
         if (overlayHeight < (listHeight + listPosition)) {
             $arrow.removeClass('hidden inactive');
             $pane.height(overlayHeight - listPosition - 72);

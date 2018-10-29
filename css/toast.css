@@ -279,19 +279,18 @@
 /* Mobile*/
 .mobile.toast-notification {
     font-size: 14px;
-    line-height: 40px;
-    margin-left: -37%;
+    margin-left: -40%;
     margin-bottom: 48px;
     padding: 0;
     text-align: center;
-    width: 75%;
+    width: 80%;
     background-color: rgba(222, 222, 222, 0.8);
     border: 1px solid #ccc;
     color: #555;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
-    border-radius: 3px; 
+    border-radius: 3px;
     max-width: 420px;
 }
 .mobile.toast-notification::before {
@@ -308,6 +307,36 @@
 .mobile.toast-notification .toast-icon {
     display: none;
 }
+.mobile.toast-notification.info .message-body {
+    text-align: center;
+}
+.mobile.toast-notification.success {
+    background-color: rgba(0, 191, 166, 0.9);
+    color: white;
+}
+
+.mobile.toast-notification.error {
+    background-color: #9a1c06;
+    color: white;
+}
+
+.mobile.toast-notification .message-body {
+    margin-left: 5px;
+    padding: 12px 12px;
+    text-align: left;
+}
+
+.mobile.toast-notification .toast-alert-icon {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+@media screen and (min-width: 500px) {
+    .mobile.toast-notification {
+        margin-left: -210px;
+    }
+}
+
 /* end of Mobile*/
 
 /* Desktop Progress bar */

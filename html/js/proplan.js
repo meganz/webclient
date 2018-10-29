@@ -54,12 +54,6 @@ pro.proplan = {
             });
         }
 
-        // Add affiliate information to send with the Pro API calls if they pay later
-        if (getSitePath().indexOf('pro/') > -1) {
-            localStorage.affid = getSitePath().replace('pro/', '');
-            localStorage.affts = new Date().getTime();
-        }
-
         // French language fixes: GB -> Go (Gigaoctet) and TB -> To (Teraoctet)
         if (lang === 'fr') {
             $stepOne.find('.reg-st3-big-txt').each(function(e, o) {

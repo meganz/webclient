@@ -414,4 +414,9 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/2fa-auth-apps@2x.png);
     background-size: 72px auto;
 }
+.user-management-dialog .bus-welcome-logo {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
 }

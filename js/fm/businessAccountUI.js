@@ -2037,6 +2037,27 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
     });
 };
 
+
+/** show Welcome to business account dialog */
+BusinessAccountUI.prototype.showWelcomeDialog = function () {
+
+    var $dialog = $('.bus-welcome-dialog.user-management-dialog');
+
+    $dialog.find('.welcome-ok-btn, .close-x-icon').off('click.subuser')
+        .on('click.subuser', function closeWelcomeDialogHandler() {
+            closeDialog();
+        });
+
+    $dialog.find('.welcome-dlg-options').off('click.subuser')
+        .on('click.subuser', function welcomeDlgGoToUsersManagement() {
+            M.openFolder('user-management', true);
+        });
+
+    M.safeShowDialog('welcome-to-business-dlg', function () {
+        return $dialog;
+    });
+};
+
 /**
  * shows the add sub-user dialog, if result is passed, the result dialog will be shown
  * @param {object} result           an object contain password + sub-user handle

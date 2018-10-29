@@ -764,6 +764,17 @@ function init_page() {
             else {
                 parsepage(pages['login']);
                 login_txt = l[378];
+
+                // I need this event handler to be triggered only in case of coming from confirmation
+                mBroadcaster.once('fm:initialized', function () {
+                    if (u_attr && u_attr.b && u_attr.b.m) {
+                        M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+                            var business = new BusinessAccountUI();
+                            business.showWelcomeDialog();
+                        });
+                    }
+                });
+
                 init_login();
                 $('#login-name2').val(email);
                 $('.register-st2-button').addClass('active');

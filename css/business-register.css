@@ -301,8 +301,9 @@
 }*/
 
 .bus-reg-agreement {
-	width: 95%;
-	margin-top: 16px;
+    width: 95%;
+    margin-top: 16px;
+    cursor: pointer;
 }
 
 .bus-reg-checkbox {

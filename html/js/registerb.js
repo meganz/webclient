@@ -33,7 +33,8 @@ BusinessRegister.prototype.initPage = function () {
     var $passInput = $pageContainer.find('#business-pass').val('');
     var $rPassInput = $pageContainer.find('#business-rpass').val('');
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
-    $pageContainer.find('.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
+    $pageContainer.find('.mega-terms.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
+    $pageContainer.find('.ok-to-auto.bus-reg-agreement .bus-reg-checkbox').addClass('checkOn');
     $pageContainer.find('.bus-reg-agreement .bus-reg-txt a').addClass('terms');
     $pageContainer.find('.bus-reg-input').removeClass('error');
     $pageContainer.find('.bus-reg-plan .business-base-plan .left')
@@ -144,9 +145,9 @@ BusinessRegister.prototype.initPage = function () {
     };
 
     // event handler for check box
-    $('.bus-reg-agreement .bus-reg-checkbox', $pageContainer).off('click.suba').on('click.suba',
+    $('.bus-reg-agreement', $pageContainer).off('click.suba').on('click.suba',
         function businessRegisterationCheckboxClick() {
-            var $me = $(this);
+            var $me = $(this).find('.bus-reg-checkbox');
             if ($me.hasClass('checkOn')) {
                 $me.removeClass('checkOn').addClass('checkOff');
                 $('.bus-reg-btn', $pageContainer).addClass('disabled');

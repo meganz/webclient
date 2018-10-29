@@ -1625,7 +1625,7 @@ a.blog-button:hover {
 }
 .top-chat-notification .notification-num {
     background-color: #2BA6DE;
-} 
+}
 /* Change top language button */
 .top-change-language {
     float: right;
@@ -9540,7 +9540,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     padding: 0;
 }
 .export-link-body {
-    max-height: 138px;
+    max-height: 285px;
     overflow: hidden;
 }
 .export-gradient {

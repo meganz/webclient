@@ -43,7 +43,7 @@ FileManager.prototype.initFileManager = function() {
                 $treesub.addClass('opened');
             }
 
-            M.openFolder(M.currentdirid)
+            M.openFolder($.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid)
                 .always(function() {
                     if (megaChatIsReady) {
                         megaChat.renderMyStatus();

@@ -377,6 +377,11 @@ function init_page() {
     }
 
     if (pageBeginLetters === 'F!' && page.length > 2) {
+        if (page.indexOf('?') > 0) {
+            page = page.split('?');
+            $.autoSelectNode = page[1];
+            page = page[0];
+        }
         var ar = page.substr(2, page.length - 1).split('!');
 
         pfid = false;

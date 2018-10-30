@@ -1242,6 +1242,9 @@ height: 56px;
     margin: 0 auto;
     table-layout: fixed;
 }
+.bottom-page.cols-container.horizontal-centered-bl {
+    padding: 0;
+}
 .bottom-page.cols-container.tabs {
     table-layout: auto;
 }
@@ -2147,10 +2150,6 @@ height: 56px;
     font-size: 18px;
     line-height: 30px;
 }
-.bottom-page.cols-container .col3.light-bg::before {
-    left: auto;
-    right: -19px;
-}
 .bottom-page.tab-body .button {
     margin-top: 18px;
 }
@@ -2170,7 +2169,7 @@ height: 56px;
     display: block;
 }
 .megacmd .top-bl .top-title {
-    padding-top: 0;
+    padding-top: 40px;
 }
 .megacmd .cmd-top-img.main {
     margin-top: 40px;
@@ -3430,7 +3429,7 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
     padding-left: 0;
     padding-right: 0;
 }
-.bottom-page.horizontal-centered-bl, .bottom-page.horizontal-centered-bl.side-paddings, .bottom-page.half-sized-cell, .absolute-pos .bottom-page.half-sized-cell, .top-bl .bottom-page.half-sized-cell, .top-bl .bottom-page .img-description, .android .top-bl .bottom-page.half-sized-cell {
+.bottom-page.horizontal-centered-bl, .bottom-page.horizontal-centered-bl.mid-wide, .bottom-page.horizontal-centered-bl.side-paddings, .bottom-page.half-sized-cell, .absolute-pos .bottom-page.half-sized-cell, .top-bl .bottom-page.half-sized-cell, .top-bl .bottom-page .img-description, .android .top-bl .bottom-page.half-sized-cell {
     padding-left: 20px;
     padding-right: 20px;
 }
@@ -3547,6 +3546,9 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
 }
 }
 @media only screen and (max-width: 495px) {
+.megasync .bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {
+    bottom: -20px;
+}
 .uwp .bottom-page.horizontal-centered-bl.mid-wide {
     padding: 0 28px;
 }
@@ -3791,8 +3793,14 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
 }
 
 @media only screen and (max-width: 783px) and (max-height: 640px) {
-.bottom-page.img.ios-top, .bottom-page.img.android-top, .bottom-page.img.wp-top, .bottom-page.img.sync-top, .bottom-page.img.megabird {
+.bottom-page.img.ios-top, .bottom-page.img.android-top, .bottom-page.img.wp-top, .bottom-page.img.sync-top {
     display: none;
+}
+.bottom-page.img.megabird {
+    margin-bottom: 85px;
+}
+.bird .bottom-page.big-header.top-small-pad {
+    padding-top: 40px;
 }
 .bottom-page.top-links.mb {
     padding-bottom: 60px;
@@ -3867,6 +3875,9 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
 
 /* SE Device Size */
 @media only screen and (max-width: 321px) {
+.megasync .bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {
+    bottom: -80px;
+}
 .uwp .bottom-page.horizontal-centered-bl.mid-wide {
     padding: 0 16px;
 }

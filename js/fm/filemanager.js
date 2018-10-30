@@ -3536,12 +3536,12 @@ FileManager.prototype.onSectionUIOpen = function(id) {
                 $('.fm-import-to-cloudrive, .fm-download-as-zip')
                     .removeClass('hidden')
                     .rebind('click', function() {
-                        var c = '' + $(this).attr('class');
+                        var c = $(this).attr('class');
 
-                        if (~c.indexOf('fm-import-to-cloudrive')) {
+                        if (c.indexOf('fm-import-to-cloudrive') > -1) {
                             M.importFolderLinkNodes([M.currentdirid]);
                         }
-                        else if (~c.indexOf('fm-download-as-zip')) {
+                        else if (c.indexOf('fm-download-as-zip') > -1) {
                             M.addDownload([M.currentdirid], true);
                         }
                     });

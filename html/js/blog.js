@@ -39,17 +39,19 @@ var blogmonth = false;
 var blogsearch = false;
 
 function blog_bind_search() {
-    $('#blog_searchinput').bind('focus', function(e) {
+    'use strict';
+
+    $('#blog_searchinput').rebind('focus.blog', function(e) {
         if (e.target.value === l[102]) {
             e.target.value = '';
         }
-    });
-    $('#blog_searchinput').bind('blur', function(e) {
+    })
+    .rebind('blur.blog', function(e) {
         if (e.target.value === '') {
             e.target.value = l[102];
         }
-    });
-    $('#blog_searchinput').bind('keydown', function(e) {
+    })
+    .rebind('keydown.blog', function(e) {
         if (e.keyCode === 13) {
             blog_search();
         }

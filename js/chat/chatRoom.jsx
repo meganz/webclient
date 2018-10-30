@@ -16,7 +16,7 @@ var ConversationPanelUI = require("./ui/conversationpanel.jsx");
  * @returns {ChatRoom}
  * @constructor
  */
-var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI) {
+var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
     var self = this;
 
     this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -28,7 +28,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         {
             state: null,
             users: [],
-            attachments: null,
             roomId: null,
             type: null,
             messages: [],
@@ -44,7 +43,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             chatShard: undefined,
             members: {},
             membersLoaded: false,
-            topic: ""
+            topic: "",
+            flags: 0x00,
+            archivedSelected: false
         },
         true
     );
@@ -59,21 +60,11 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     this.chatShard = chatShard;
     this.chatdUrl = chatdUrl;
+    this.scrolledToBottom = 1;
 
     this.callRequest = null;
     this.callIsActive = false;
     this.shownMessages = {};
-    this.attachments = new MegaDataMap(this);
-    this.images = new MegaDataSortedMap("id", "orderValue", this);
-    this.images.addChangeListener(function() {
-        if (slideshowid) {
-            self._rebuildAttachments();
-        }
-    });
-
-    this._imagesLoading = Object.create(null);
-    this._imagesToBeLoaded = Object.create(null);
-    this._mediaAttachmentsCache = Object.create(null);
 
     self.members = {};
 
@@ -88,6 +79,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             self.members[userHandle] = 0;
         });
     }
+
     this.options = {
 
         /**
@@ -115,7 +107,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     // Events
     if (d) {
-        this.bind('onStateChange', function(e, oldState, newState) {
+        this.rebind('onStateChange.chatRoom', function(e, oldState, newState) {
             self.logger.debug("Will change state from: ",
                 ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState)
             );
@@ -192,8 +184,16 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
      * Manually proxy contact related data change events, for more optimal UI rerendering.
      */
     var membersSnapshot = {};
-    self.rebind('onMembersUpdated.chatRoomMembersSync', function() {
+    self.rebind('onMembersUpdated.chatRoomMembersSync', function(e, eventData) {
         var roomRequiresUpdate = false;
+
+        if (eventData.userId === u_handle) {
+            self.messagesBuff.joined = true;
+            if (self.state === ChatRoom.STATE.JOINING) {
+                self.setState(ChatRoom.STATE.READY);
+            }
+            roomRequiresUpdate = true;
+        }
 
         Object.keys(membersSnapshot).forEach(function(u_h) {
             var contact = M.u[u_h];
@@ -208,7 +208,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
         Object.keys(self.members).forEach(function(u_h) {
             var contact = M.u[u_h];
-            if (contact) {
+            if (contact && contact.addChangeListener) {
                 membersSnapshot[u_h] = contact.addChangeListener(function() {
                     self.trackDataChange();
                 });
@@ -217,6 +217,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         if (roomRequiresUpdate) {
             self.trackDataChange();
         }
+
     });
 
     self.getParticipantsExceptMe().forEach(function(userHandle) {
@@ -225,9 +226,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             getLastInteractionWith(contact.u);
         }
     });
-    if (!noUI) {
-        self.megaChat.trigger('onRoomCreated', [self]);
-    }
+    // This line of code should always be called, no matter what. Plugins rely on onRoomCreated
+    // so that they can hook/add event listeners to newly created rooms.
+    self.megaChat.trigger('onRoomCreated', [self]);
 
     $(window).rebind("focus." + self.roomId, function() {
         if (self.isCurrentlyActive) {
@@ -237,7 +238,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     self.megaChat.rebind("onRoomDestroy." + self.roomId, function(e, room) {
         if (room.roomId == self.roomId) {
-            $(window).unbind("focus." + self.roomId);
+            $(window).off("focus." + self.roomId);
         }
     });
 
@@ -276,29 +277,28 @@ ChatRoom.STATE = {
 };
 
 ChatRoom.INSTANCE_INDEX = 0;
+ChatRoom.ARCHIVED = 0x01;
 
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
+    'use strict';
+
     var self = this;
-
-    var $promise = new MegaPromise();
-
     var anonId = "";
+    var $promise = new MegaPromise();
 
     if (self.megaChat.rtc && self.megaChat.rtc.ownAnonId) {
         anonId = self.megaChat.rtc.ownAnonId;
     }
-    $.ajax("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId, {
-        method: "GET",
-        timeout: timeout ? timeout : 10000
-    })
-        .done(function(r) {
+
+    M.xhr({
+        timeout: timeout || 10000,
+        url: "https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId
+    }).then(function(ev, r) {
+            r = JSON.parse(r);
             if (r.turn && r.turn.length > 0) {
                 var servers = [];
                 r.turn.forEach(function(v) {
-                    var transport = v.transport;
-                    if (!transport) {
-                        transport = "udp";
-                    }
+                    var transport = v.transport || 'udp';
 
                     servers.push({
                         urls: ['turn:' + v.host + ':' + v.port + '?transport=' + transport],
@@ -307,15 +307,12 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
                     });
                 });
                 self.megaChat.rtc.updateIceServers(servers);
+            }
 
-                $promise.resolve();
-            }
-            else {
-                $promise.resolve();
-            }
+            $promise.resolve();
         })
-        .fail(function() {
-            $promise.reject();
+        .catch(function() {
+            $promise.reject.apply($promise, arguments);
         });
 
     return $promise;
@@ -330,6 +327,97 @@ ChatRoom.prototype._resetCallStateNoCall = function() {
 ChatRoom.prototype._resetCallStateInCall = function() {
 
 };
+
+/**
+ * Check whether a chat is archived or not.
+ *
+ * @returns {Boolen}
+ */
+ChatRoom.prototype.isArchived = function() {
+    var self = this;
+    return (self.flags & ChatRoom.ARCHIVED);
+};
+
+/**
+ * Check whether a chat is displayable.
+ *
+ * @returns {Boolen}
+ */
+ChatRoom.prototype.isDisplayable = function() {
+    var self = this;
+    return ((self.showArchived === true) ||
+            !self.isArchived() ||
+            (self.callManagerCall && self.callManagerCall.isActive()));
+};
+
+/**
+ * Save chat into info fmdb.
+ *
+ */
+ChatRoom.prototype.persistToFmdb = function() {
+    var self = this;
+    if (fmdb) {
+        var users = [];
+        if (self.members) {
+            Object.keys(self.members).forEach(function(user_handle) {
+                users.push({
+                    u: user_handle,
+                    p: self.members[user_handle]
+                });
+            });
+        }
+
+        if (self.chatId && self.chatShard !== undefined) {
+            var roomInfo = {
+                'id': self.chatId,
+                'cs': self.chatShard,
+                'g' : (self.type === "group") ? 1 : 0,
+                'u' : users,
+                'ts': self.ctime,
+                'ct': self.ct,
+                'f' : self.flags
+            };
+            fmdb.add('mcf', {id: roomInfo.id, d: roomInfo});
+        }
+    }
+};
+
+/**
+ * Save the chat info into fmdb.
+ * @param f {binary} new flags
+ * @param updateUI {Boolen} flag to indicate whether to update UI.
+ */
+ChatRoom.prototype.updateFlags = function(f, updateUI) {
+    var self = this;
+    var flagChange = (self.flags !== f);
+    self.flags = f;
+    self.archivedSelected = false;
+    if (self.isArchived()) {
+        megaChat.archivedChatsCount++;
+        self.showArchived = false;
+    }
+    else {
+        megaChat.archivedChatsCount--;
+    }
+    self.persistToFmdb();
+
+
+    if (updateUI && flagChange) {
+        if (megaChat.currentlyOpenedChat &&
+            megaChat.chats[megaChat.currentlyOpenedChat] &&
+            megaChat.chats[megaChat.currentlyOpenedChat].chatId === self.chatId) {
+            loadSubPage('fm/chat/');
+        }
+        else {
+            megaChat.refreshConversations();
+        }
+
+        if (megaChat.$conversationsAppInstance) {
+            megaChat.$conversationsAppInstance.safeForceUpdate();
+        }
+    }
+};
+
 
 /**
  * Convert state to text (helper function)
@@ -450,7 +538,7 @@ ChatRoom.prototype.getParticipantsExceptMe = function(userHandles) {
  *
  * @returns {string}
  */
-ChatRoom.prototype.getRoomTitle = function(ignoreTopic) {
+ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
     var self = this;
     if (this.type == "private") {
         var participants = self.getParticipantsExceptMe();
@@ -458,7 +546,7 @@ ChatRoom.prototype.getRoomTitle = function(ignoreTopic) {
     }
     else {
         if (!ignoreTopic && self.topic && self.topic.substr) {
-            return self.topic.substr(0, 30);
+            return (encapsTopicInQuotes ? '"' : "") + self.topic.substr(0, 30) + (encapsTopicInQuotes ? '"' : "");
         }
 
         var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
@@ -470,7 +558,8 @@ ChatRoom.prototype.getRoomTitle = function(ignoreTopic) {
                 );
             }
         });
-        return names.length > 0 ? names.join(", ") : __(l[8888]);
+        return names.length > 0 ? names.join(", ")
+                                : __(l[19077]).replace('%s1', (new Date(self.ctime * 1000)).toLocaleString());
     }
 };
 
@@ -487,9 +576,6 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
 
     self._leaving = true;
     self._closing = triggerLeaveRequest;
-
-
-    self.members[u_handle] = 0;
 
 
     if (triggerLeaveRequest) {
@@ -515,6 +601,51 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
     else {
         self.setState(ChatRoom.STATE.LEFT);
     }
+};
+
+/**
+ * Archive this chat room
+ *
+ */
+ChatRoom.prototype.archive = function() {
+    var self = this;
+    var mask = 0x01;
+    var flags = ChatRoom.ARCHIVED;
+
+    asyncApiReq({
+        'a' : 'mcsf',
+        'id': self.chatId,
+        'm' : mask,
+        'f' : flags,
+        'v' : Chatd.VERSION}
+        )
+        .done(function(r) {
+            if (r === 0) {
+                self.updateFlags(flags, true);
+            }
+        });
+};
+
+/**
+ * Unarchive this chat room
+ *
+ */
+ChatRoom.prototype.unarchive = function() {
+    var self = this;
+    var mask = 0x01;
+    var flags = 0x00;
+
+    asyncApiReq({
+        'a': 'mcsf',
+        'id': self.chatId,
+        'm':mask, 'f':flags,
+        'v': Chatd.VERSION}
+        )
+        .done(function(r) {
+            if (r === 0) {
+                self.updateFlags(flags, true);
+            }
+        });
 };
 
 /**
@@ -582,9 +713,9 @@ ChatRoom.prototype.show = function() {
 
     M.onSectionUIOpen('conversations');
 
-
     self.megaChat.currentlyOpenedChat = self.roomId;
     self.megaChat.lastOpenedChat = self.roomId;
+    self.megaChat.setAttachments(self.roomId);
 
     self.trigger('activity');
     self.trigger('onChatShown');
@@ -764,7 +895,6 @@ ChatRoom.prototype.arePluginsForcingMessageQueue = function(message) {
 ChatRoom.prototype.sendMessage = function(message) {
     var self = this;
     var megaChat = this.megaChat;
-
     var messageId = megaChat.generateTempMessageId(self.roomId, message);
 
     var msgObject = new Message(
@@ -861,37 +991,62 @@ ChatRoom.prototype.attachNodes = function(ids) {
     ids.forEach(function(nodeId) {
         var proxyPromise = new MegaPromise();
 
-        self._sendNodes(
-                [nodeId],
-                users
-            )
-            .done(function () {
-                var nodesMeta = [];
-                var node = M.d[nodeId];
-                nodesMeta.push({
-                    'h': node.h,
-                    'k': node.k,
-                    't': node.t,
-                    's': node.s,
-                    'name': node.name,
-                    'hash': node.hash,
-                    'fa': node.fa,
-                    'ts': node.ts
+        if (M.d[nodeId] && M.d[nodeId].u !== u_handle) {
+            // I'm not the owner of this file.
+            // can be a d&d to a chat or Send to contact from a share
+            self.megaChat.getMyChatFilesFolder()
+                .then(function(myChatFilesFolderHandle) {
+                    M.copyNodes(
+                            [nodeId],
+                            myChatFilesFolderHandle,
+                            false,
+                            new MegaPromise()
+                        )
+                        .then(function(copyNodesResponse) {
+                            if (copyNodesResponse && copyNodesResponse[0]) {
+                                proxyPromise.linkDoneAndFailTo(self.attachNodes([copyNodesResponse[0]]));
+                            }
+                            else {
+                                proxyPromise.reject();
+                            }
+                        })
+                        .catch(function(err) {
+                            proxyPromise.reject(err);
+                        });
+                })
+                .catch(function(err) {
+                    proxyPromise.reject(err);
                 });
+        }
+        else {
+            self._sendNodes([nodeId], users)
+                .then(function() {
+                    var nodesMeta = [];
+                    var node = M.d[nodeId];
+                    nodesMeta.push({
+                        'h': node.h,
+                        'k': node.k,
+                        't': node.t,
+                        's': node.s,
+                        'name': node.name,
+                        'hash': node.hash,
+                        'fa': node.fa,
+                        'ts': node.ts
+                    });
 
-                // 1b, 1b, JSON
-                self.sendMessage(
-                    Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
-                    Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT +
-                    JSON.stringify(nodesMeta)
-                );
+                    // 1b, 1b, JSON
+                    self.sendMessage(
+                        Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
+                        Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT +
+                        JSON.stringify(nodesMeta)
+                    );
 
-                proxyPromise.resolve([nodeId]);
-            })
-            .fail(function(r) {
-                proxyPromise.reject(r);
-            });
-
+                    proxyPromise.resolve([nodeId]);
+                })
+                .catch(function(r) {
+                    proxyPromise.reject(r);
+                });
+        }
         waitingPromises.push(proxyPromise);
     });
 
@@ -900,177 +1055,11 @@ ChatRoom.prototype.attachNodes = function(ids) {
     return $masterPromise;
 };
 
-
-ChatRoom.prototype.lookupPendingUpload = function(faid, handle) {
-    if (!this.pendingUploads) {
-        return;
-    }
-    assert(faid || handle, 'lookupPendingUpload is missing both faid and handle args.');
-
-    // find pending upload id by faid
-    for (var uid in this.pendingUploads) {
-        if (
-            (faid && this.pendingUploads[uid].faid === faid) ||
-            (handle && this.pendingUploads[uid].h === handle)
-        ) {
-            return uid;
-        }
-    }
-};
-
-ChatRoom.prototype.onUploadError = function(uid, error) {
-    // This upload is never going to succeed...
-    if (d) {
-        var logger = MegaLogger.getLogger('onUploadEvent[' + this.roomId + ']');
-        logger.debug(error === -0xDEADBEEF ? 'upload:abort' : 'upload.error', uid, error);
-    }
-
-    var ul = self.pendingUploads && self.pendingUploads[uid] || false;
-
-    // handle the onUploadError and if no more uploads are queued - clear any listeners
-    if (ul) {
-        delete this.pendingUploads[uid];
-        if (Object.keys(this.pendingUploads).length === 0) {
-            this.clearUploadListeners();
-        }
-    }
-};
-
-
 ChatRoom.prototype.onUploadStart = function(data) {
     var self = this;
-    if (!self.pendingUploads) {
-        self.pendingUploads = Object.create(null);
-    }
 
-    Object.assign(self.pendingUploads, data);
-
-    // perhaps make this more lightweight by just queueing data[].chat entries
-
-    if (!self.uploadListeners) {
-        self.uploadListeners = [];
-    }
-
-    if (self.uploadListeners.length === 0) {
-        var logger = d && MegaLogger.getLogger('onUploadEvent[' + self.roomId + ']');
-
-        self.uploadListeners.push(
-            mBroadcaster.addListener('upload:completion', function(uid, handle, faid, chat) {
-                if (!chat) {
-                    return;
-                }
-                if (chat.indexOf("/" + self.roomId) === -1) {
-                    if (d) {
-                        logger.debug('ignoring upload:completion that is unrelated to this chat.');
-                    }
-                }
-
-                var n = M.d[handle];
-                var ul = self.pendingUploads && self.pendingUploads[uid] || false;
-
-                if (d) {
-                    logger.debug('upload:completion', uid, handle, faid, ul, n);
-                }
-
-                if (!ul || !n) {
-                    // This should not happen...
-                    logger.error('Invalid state error...');
-                }
-                else {
-                    ul.h = handle;
-
-                    if (ul.efa && (!n.fa || String(n.fa).split('/').length < ul.efa)) {
-                        // The fa was not yet attached to the node, wait for fa:* events
-                        ul.faid = faid;
-
-                        if (d) {
-                            logger.debug('Waiting for file attribute to arrive.', handle, ul);
-                        }
-                    }
-                    else {
-                        // this is not a media file or the fa is already set, attach node to chat room
-                        self.onUploadComplete(ul);
-                    }
-                }
-            })
-        );
-
-
-        self.uploadListeners.push(mBroadcaster.addListener('upload:error', self.onUploadError.bind(self)));
-        self.uploadListeners.push(mBroadcaster.addListener('upload:abort', self.onUploadError.bind(self)));
-
-        self.uploadListeners.push(
-            mBroadcaster.addListener('fa:error', function(faid, error, onStorageAPIError, nFAiled) {
-                var uid = self.lookupPendingUpload(faid, faid);
-                var ul = self.pendingUploads && self.pendingUploads[uid] || false;
-
-                if (d) {
-                    logger.debug('fa:error', faid, error, onStorageAPIError, uid, ul);
-                }
-
-                // Attaching some fa to the node failed.
-                if (ul) {
-                    // decrement the number of expected file attributes
-                    ul.efa = Math.max(0, ul.efa - nFAiled) | 0;
-
-                    // has this upload finished?
-                    if (ul.h) {
-                        // Yes, check whether we must attach the node
-                        var n = M.d[ul.h] || false;
-
-                        if (!ul.efa || (n.fa && String(n.fa).split('/').length >= ul.efa)) {
-                            self.onUploadComplete(ul);
-                        }
-                    }
-                }
-            })
-        );
-
-        self.uploadListeners.push(
-            mBroadcaster.addListener('fa:ready', function(handle, fa) {
-                delay('chat:fa-ready:' + handle, function() {
-                    var uid = self.lookupPendingUpload(false, handle);
-                    var ul = self.pendingUploads && self.pendingUploads[uid] || false;
-
-                    if (d) {
-                        logger.debug('fa:ready', handle, fa, uid, ul);
-                    }
-
-                    if (ul.h && String(fa).split('/').length >= ul.efa) {
-                        // The fa is now attached to the node, add it to the chat room
-                        self.onUploadComplete(ul);
-                    }
-                    else if (d) {
-                        logger.debug('Not enough file attributes yet, holding...', ul);
-                    }
-                });
-            })
-        );
-    }
-};
-
-ChatRoom.prototype.onUploadComplete = function(ul) {
-    if (this.pendingUploads && this.pendingUploads[ul.uid]) {
-        if (d) {
-            console.debug('Attaching node to chat room...', ul.h, ul.uid, ul, M.d[ul.h]);
-        }
-        this.attachNodes([ul.h]);
-        delete this.pendingUploads[ul.uid];
-
-        // let's omit this for now...
-        // delete ulmanager.ulEventData[ul.uid];
-    }
-
-    this.clearUploadListeners();
-};
-
-ChatRoom.prototype.clearUploadListeners = function() {
-    if (!this.pendingUploads || Object.keys(this.pendingUploads).length === 0) {
-        for (var i = 0; i < this.uploadListeners.length; i++) {
-            var listenerId = this.uploadListeners[i];
-            mBroadcaster.removeListener(listenerId);
-        }
-        this.uploadListeners = [];
+    if (d) {
+        self.logger.debug('onUploadStart', data);
     }
 };
 
@@ -1172,9 +1161,10 @@ ChatRoom.prototype.recover = function() {
 
     self.callRequest = null;
     if (self.state !== ChatRoom.STATE.LEFT) {
+        self.membersLoaded = false;
         self.setState(ChatRoom.STATE.JOINING, true);
         self.megaChat.trigger("onRoomCreated", [self]); // re-initialise plugins
-        return MegaPromise.resolve();;
+        return MegaPromise.resolve();
     }
     else {
         return MegaPromise.reject();
@@ -1203,8 +1193,16 @@ ChatRoom.prototype._clearChatMessagesFromChatd = function() {
 };
 
 ChatRoom.prototype.isReadOnly = function() {
+    // check if still contacts.
+    if (this.type === "private") {
+        var members = this.getParticipantsExceptMe();
+        if (members[0] && M.u[members[0]].c === 0) {
+            return true;
+        }
+    }
+
     return (
-        (this.members && this.members[u_handle] === 0) ||
+        (this.members && this.members[u_handle] <= 0) ||
         this.privateReadOnlyChat ||
         this.state === ChatRoom.STATE.LEAVING ||
         this.state === ChatRoom.STATE.LEFT
@@ -1280,270 +1278,6 @@ ChatRoom.prototype.truncate = function() {
                 });
         }
     }
-};
-
-ChatRoom.prototype._rebuildAttachmentsImmediate = function() {
-    if (!M.chat) {
-        return;
-    }
-
-    var self = this;
-
-    var imagesList = [];
-    var deleted = [];
-    self.images.values().forEach(function(v) {
-        var msg = self.messagesBuff.getMessageById(v.messageId);
-        if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
-            slideshowid && deleted.push(v.id.substr(-8));
-            self.images.removeByKey(v.id);
-            return;
-        }
-        imagesList.push(v);
-    });
-
-    M.v = imagesList;
-
-
-    var slideshowCalled = false;
-    slideshowid && deleted.forEach(function(currentNodeId) {
-        if (currentNodeId === slideshowid) {
-            var lastNode;
-            var found = false;
-            M.v.forEach(function(node) {
-                if (!found && node.h !== currentNodeId) {
-                    lastNode = node.h;
-                }
-                if (node.h === currentNodeId) {
-                    found = true;
-                }
-
-            });
-
-            if (!lastNode) {
-                for (var i = 0; i < M.v.length; i++) {
-                    if (M.v[i].h !== currentNodeId) {
-                        lastNode = M.v[i].h;
-                        break;
-                    }
-                }
-            }
-
-            if (!lastNode) {
-                // no nodes? close
-                slideshow(undefined, true);
-                slideshowCalled = true;
-            }
-            else {
-                // go back 1 node, since slideshow_steps crashes.
-                slideshow(lastNode, undefined, true);
-                slideshowCalled = true;
-            }
-        }
-    });
-
-    slideshowid && !slideshowCalled && slideshow(slideshowid, undefined, true);
-
-};
-
-ChatRoom.prototype._rebuildAttachments = SoonFc(ChatRoom.prototype._rebuildAttachmentsImmediate, 300);
-
-/**
- * Queue up a load of an image/preview (type 1) for a node.
- *
- * @param node {Object} MegaNode-like (.h) object
- */
-ChatRoom.prototype.loadImage = function(node) {
-    "use strict";
-
-    var self = this;
-
-    if (preqs[node.h] || pfails[node.h] || self.getCachedImageURI(node)) {
-        onIdle(self._doneLoadingImage.bind(self, node));
-    }
-    else if (!self._imagesLoading[node.h]) {
-        self._imagesLoading[node.h] = true;
-        self._imagesToBeLoaded[node.h] = node;
-        delay('ChatRoom[' + self.roomId + ']:doLoadImages', self._doLoadImages.bind(self));
-    }
-};
-
-/**
- * Internal - called when an image is loaded in previews
- *
- * @param node {Object} MegaNode-like object
- * @private
- */
-ChatRoom.prototype._doneLoadingImage = function(node) {
-    "use strict";
-
-    var imgNode = document.getElementById(node.imgId || node.h);
-
-    if (imgNode && (imgNode = imgNode.querySelector('img'))) {
-        var src = this.getCachedImageURI(node);
-        var container = imgNode.parentNode.parentNode;
-
-        if (src) {
-            imgNode.setAttribute('src', src);
-            container.classList.add('thumb');
-            container.classList.remove('thumb-loading');
-        }
-        else {
-            imgNode.setAttribute('src', window.noThumbURIs || '');
-            container.classList.add('thumb-failed');
-            container.classList.remove('thumb-loading');
-        }
-
-        node.seen = 2;
-    }
-
-    // trigger React DOM update if needed, by notifying the message there is data that changed.
-    var self = this;
-    if (self.attachments[node.h]) {
-        self.attachments[node.h].keys().forEach(function(foundInMessageId) {
-            var msg = self.messagesBuff.messages[foundInMessageId];
-            if (msg) {
-                msg.trackDataChange();
-            }
-        });
-    }
-};
-
-/**
- * Returns the cached Blob URI for a media resource, if any
- * @param {Object|String} n An ufs-node or handle
- */
-ChatRoom.prototype.getCachedImageURI = function(n) {
-    var h = n && typeof n === 'object' && n.h || n;
-
-    return this._mediaAttachmentsCache[h] || (previews[h] && (previews[h].poster || previews[h].src));
-};
-
-/**
- * Called when an image starts loading from the preview servers
- *
- * @param node {Object} MegaNode-like object
- * @private
- */
-ChatRoom.prototype._startedLoadingImage = function(node) {
-    "use strict";
-
-    // to be used in the UI with the next design changes.
-    var imgNode = document.getElementById(node.imgId || node.h);
-
-    if (imgNode && (imgNode = imgNode.querySelector('img'))) {
-        imgNode.parentNode.parentNode.classList.add('thumb-loading');
-    }
-};
-
-
-/**
- * Internal method for `_doLoadImages` that dereferences .fa_dups and returns a deduped list of nodes as an array
- *
- * @param imagesToBeLoaded {Object}
- * @param origNodeHandle
- * @returns {*[]}
- * @private
- */
-ChatRoom.prototype._getDedupedNodesForThumbanils = function(imagesToBeLoaded, origNodeHandle) {
-    "use strict";
-
-    var origNode = imagesToBeLoaded[origNodeHandle];
-    var nodes = [origNode];
-    if (origNode.fa_dups) {
-        nodes = nodes.concat(origNode.fa_dups);
-    }
-
-    return nodes;
-};
-
-/**
- * Actual code that is throttled and does load a bunch of queued images
- *
- * @private
- */
-ChatRoom.prototype._doLoadImages = function() {
-    "use strict";
-
-    var self = this;
-    var thumbToLoad = Object.create(null);
-    var imagesToBeLoaded = self._imagesToBeLoaded;
-    self._imagesToBeLoaded = Object.create(null);
-
-    var dups = {};
-    // dedup the same .fa's as in fm_thumbnails
-    for (var k in imagesToBeLoaded) {
-        var node = imagesToBeLoaded[k];
-        if (dups[node.fa]) {
-            dups[node.fa].fa_dups = dups[node.fa].fa_dups || [];
-            dups[node.fa].fa_dups.push(node);
-
-            delete imagesToBeLoaded[k];
-        }
-        else {
-            dups[node.fa] = node;
-        }
-
-        if (String(node.fa).indexOf(':1*') < 0) {
-            if (String(node.fa).indexOf(':0*') > 0) {
-                if (d) {
-                    console.debug('Chat loading thumbnail for %s since it has no preview fa', node.h, node);
-                }
-                thumbToLoad[node.h] = node;
-            }
-            else if (d) {
-                console.warn('Chat cannot load image for %s since it has no suitable file attribute.', node.h, node);
-            }
-            delete imagesToBeLoaded[k];
-        }
-    }
-
-    var chatImageParser = function(h, data) {
-        var isThumbnail = thumbToLoad[h];
-        var nodes = self._getDedupedNodesForThumbanils(isThumbnail ? thumbToLoad : imagesToBeLoaded, h);
-
-        for (var i = nodes.length; i--;) {
-            var n = nodes[i];
-            h = n.h;
-
-            if (data !== 0xDEAD) {
-                if (!isThumbnail && !previews[h] && is_image(n) && fileext(n.name) !== 'pdf') {
-                    preqs[h] = 1;
-                    previewimg(h, data, 'image/jpeg');
-                }
-                else {
-                    self._mediaAttachmentsCache[h] = mObjectURL([data.buffer || data], 'image/jpeg');
-                }
-            }
-            else {
-                if (d) {
-                    console.error('Failed to load image for %s', h);
-                }
-                self._mediaAttachmentsCache[h] = false;
-            }
-            delete self._imagesLoading[h];
-            self._doneLoadingImage(n);
-        }
-    };
-
-    var onSuccess = function(ctx, origNodeHandle, data) {
-        chatImageParser(origNodeHandle, data);
-    };
-
-    var onError = function(origNodeHandle) {
-        chatImageParser(origNodeHandle, 0xDEAD);
-    };
-
-    api_getfileattr(imagesToBeLoaded, 1, onSuccess, onError);
-
-    if ($.len(thumbToLoad)) {
-        api_getfileattr(thumbToLoad, 0, onSuccess, onError);
-    }
-
-    [imagesToBeLoaded, thumbToLoad].forEach(function(obj) {
-        Object.keys(obj).forEach(function(handle) {
-            self._startedLoadingImage(obj[handle]);
-        });
-    });
 };
 
 window.ChatRoom = ChatRoom;

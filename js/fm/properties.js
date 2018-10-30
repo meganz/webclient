@@ -22,7 +22,7 @@
             var status = megaChatIsReady && megaChat.getPresenceAsCssClass(user.u);
 
             shareUsersHtml += '<div class="properties-context-item ustatus ' + escapeHTML(userHandle)
-                + ' ' + (status ? status : '') + ' ' + hidden + '">'
+                + ' ' + (status || '') + ' ' + hidden + '" data-handle="' + escapeHTML(userHandle) + '">'
                 + '<div class="properties-contact-status"></div>'
                 + '<span>' + escapeHTML(M.getNameByHandle(userHandle)) + '</span>'
                 + '</div>';
@@ -44,7 +44,7 @@
         var close = !update && action;
         var $dialog = $('.fm-dialog.properties-dialog');
 
-        $(document).unbind('MegaCloseDialog.Properties');
+        $(document).off('MegaCloseDialog.Properties');
 
         if (close) {
             delete $.propertiesDialog;
@@ -56,7 +56,9 @@
             }
             $('.contact-list-icon').removeClass('active');
             $('.properties-context-menu').fadeOut(200);
-            $.hideContextMenu();
+            if ($.hideContextMenu) {
+                $.hideContextMenu();
+            }
 
             return true;
         }
@@ -80,7 +82,7 @@
         var icons = [];
 
         for (var i = $.selected.length; i--;) {
-            n = M.d[$.selected[i]];
+            n = M.getNodeByHandle($.selected[i]);
             if (!n) {
                 console.error('propertiesDialog: invalid node', $.selected[i]);
                 continue;
@@ -125,7 +127,7 @@
 
         var exportLink = new mega.Share.ExportLink({});
         var isTakenDown = exportLink.isTakenDown($.selected);
-        var isUndecrypted = missingkeys[$.selected[0].h];
+        var isUndecrypted = missingkeys[n.h];
         var notificationText = '';
 
         var p = {};
@@ -138,10 +140,10 @@
                 if (isUndecrypted) {
                     $dialog.addClass('undecryptable');
 
-                    if ($.selected[0].t) {// folder
+                    if (n.t) {
                         notificationText += l[8595];
                     }
-                    else {// file
+                    else {
                         notificationText += l[8602];
                     }
                 }
@@ -194,11 +196,14 @@
             p.t1 = l[86] + ':';
 
             // Hide context menu button
-            if (n.h === M.RootID) {
+            if (n.h === M.RootID || slideshowid || n.h === M.RubbishID) {
                 $dialog.addClass('hidden-context');
             }
 
-            if (n.name) {
+            if (isUndecrypted) {
+                p.t2 = htmlentities(l[8649]);
+            }
+            else if (n.name) {
                 p.t2 = htmlentities(n.name);
             }
             else if (n.h === M.RootID) {
@@ -209,10 +214,6 @@
             }
             else if (n.h === M.RubbishID) {
                 p.t2 = htmlentities(l[167]);
-            }
-            // 'Shared with me' tab, info dialog, undecrypted nodes
-            else if (missingkeys[n.h]) {
-                p.t2 = htmlentities(l[8649]);
             }
 
             if (page.substr(0, 7) === 'fm/chat') {
@@ -266,7 +267,7 @@
                     p.t6 = l[5905];
                     p.t7 = htmlentities(M.getNameByHandle(user.h));
                     p.t8 = l[894] + ':';
-                    p.t9 = bytesToSize(size);
+                    p.t9 = versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
                     p.t10 = l[897] + ':';
                     p.t11 = fm_contains(sfilecnt, sfoldercnt);
                 }
@@ -378,7 +379,7 @@
             return false;
         });
 
-        $(document).bind('MegaCloseDialog.Properties', __fsi_close);
+        $(document).rebind('MegaCloseDialog.Properties', __fsi_close);
 
         if (p.hideContacts) {
             $('.properties-txt-pad .contact-list-icon').hide();
@@ -503,12 +504,12 @@
                     if (String(h).length === 11 && M.c[h]) {
                         shares = shares.concat(Object.keys(M.c[h]));
                     }
-                    else {
+                    else if (!M.getNodeByHandle(h)) {
                         return true;
                     }
                 });
-            $.selected = nodes.concat(shares);
-            var promise = dbfetch.geta($.selected);
+            nodes = nodes.concat(shares);
+            var promise = dbfetch.geta(nodes);
 
             promise.always(function() {
                 _propertiesDialog();

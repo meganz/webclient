@@ -2,8 +2,8 @@ var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
-var Tooltips = require("./tooltips.jsx");
 var ModalDialogsUI = require('./modalDialogs.jsx');
+var Tooltips = require("./tooltips.jsx");
 
 var BrowserCol = React.createClass({
     mixins: [MegaRenderMixin],
@@ -40,6 +40,7 @@ var BrowserEntries = React.createClass({
         }
     },
     getInitialState: function() {
+
         return {
             'highlighted': [],
             'selected': []
@@ -55,7 +56,7 @@ var BrowserEntries = React.createClass({
 
         if (!self.lastCursor || self.lastCursor !== self.state.cursor) {
             self.lastCursor = self.state.cursor;
-            var tr = self.findDOMNode().querySelector('tr.node_' + self.lastCursor);
+            var tr = self.findDOMNode().querySelector('.node_' + self.lastCursor);
             var $jsp = $(tr).parents('.jspScrollable').data('jsp');
             if (tr && $jsp) {
                 $jsp.scrollToElement(tr, undefined, false);
@@ -124,12 +125,105 @@ var BrowserEntries = React.createClass({
         self.setState({'selected': selected});
         self.props.onSelected(selected);
     },
+    _doSelect: function(selectionIncludeShift, currentIndex, targetIndex) {
+        var self = this;
+        if (targetIndex >= self.props.entries.length) {
+            if (selectionIncludeShift) {
+                // shift + select down after the last item in the list was selected? do nothing.
+                return;
+            }
+            else {
+                targetIndex = self.props.entries.length - 1;
+            }
+        }
+
+        if (targetIndex < 0 || !self.props.entries[targetIndex]) {
+            targetIndex = Math.min(0, currentIndex);
+        }
+
+        if (
+            self.props.entries.length === 0 ||
+            !self.props.entries[targetIndex]
+        ) {
+            return;
+        }
+
+        var highlighted;
+
+        if (selectionIncludeShift) {
+            var firstIndex;
+            var lastIndex;
+            if (targetIndex < currentIndex) {
+                // up
+                if (self.state.highlighted && self.state.highlighted.length > 0) {
+                    // more items already selected..append to selection by altering last index
+                    if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
+                        // target is already selected, shrink selection
+                        firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+                        lastIndex = self.getIndexByNodeId(
+                            self.state.highlighted[self.state.highlighted.length - 2],
+                            self.state.highlighted.length - 2
+                        );
+                    }
+                    else {
+                        firstIndex = targetIndex;
+                        lastIndex = self.getIndexByNodeId(
+                            self.state.highlighted[self.state.highlighted.length - 1],
+                            -1
+                        );
+                    }
+                }
+                else {
+                    firstIndex = targetIndex;
+                    lastIndex = currentIndex;
+                }
+            }
+            else {
+                // down
+                if (self.state.highlighted && self.state.highlighted.length > 0) {
+                    // more items are already selected, alter current selection only
+                    if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
+                        // target is already selected, shrink selection
+                        firstIndex = self.getIndexByNodeId(self.state.highlighted[1], 1);
+                        lastIndex = self.getIndexByNodeId(
+                            self.state.highlighted[self.state.highlighted.length - 1],
+                            self.state.highlighted.length - 1
+                        );
+                    }
+                    else {
+                        // more items already selected..append to selection by altering first index
+                        firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+                        lastIndex = targetIndex;
+
+                    }
+                }
+                else {
+                    firstIndex = currentIndex;
+                    lastIndex = targetIndex;
+
+                }
+
+            }
+
+            highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
+
+            self.setSelectedAndHighlighted(highlighted, self.props.entries[targetIndex].h);
+        }
+        else {
+            highlighted = [self.props.entries[targetIndex].h];
+            self.setSelectedAndHighlighted(highlighted, highlighted[0]);
+        }
+    },
     bindEvents: function() {
         var self = this;
 
         var KEY_A = 65;
         var KEY_UP = 38;
         var KEY_DOWN = 40;
+
+        var KEY_LEFT = 37;
+        var KEY_RIGHT = 39;
+
         var KEY_ENTER = 13;
         var KEY_BACKSPACE = 8;
 
@@ -138,6 +232,11 @@ var BrowserEntries = React.createClass({
             var charTyped = false;
             var keyCode = e.which || e.keyCode;
             var selectionIncludeShift = e.shiftKey;
+            if ($('input:focus, textarea:focus').length > 0) {
+                return;
+            }
+
+            var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
             if (keyCode === KEY_A && (e.ctrlKey || e.metaKey)) {
                 // select all
@@ -156,15 +255,22 @@ var BrowserEntries = React.createClass({
                 e.stopPropagation();
             }
             else if (e.metaKey && keyCode === KEY_UP || keyCode === KEY_BACKSPACE) {
-                // back
-                var currentFolder = M.getNode(self.props.currentlyViewedEntry);
-                if (currentFolder.p) {
-                    self.expandFolder(currentFolder.p);
+                if (viewMode === "0") {
+                    // back
+                    var currentFolder = M.getNode(self.props.currentlyViewedEntry);
+                    if (currentFolder.p) {
+                        self.expandFolder(currentFolder.p);
+                    }
                 }
             }
-            else if (!e.metaKey && (keyCode === KEY_UP || keyCode === KEY_DOWN)) {
+            else if (!e.metaKey &&
+                (
+                    viewMode === "0" && (keyCode === KEY_UP || keyCode === KEY_DOWN) ||
+                    viewMode === "1" && (keyCode === KEY_LEFT || keyCode === KEY_RIGHT)
+                )
+            ) {
                 // up/down
-                var dir = keyCode === KEY_UP ? -1 : 1;
+                var dir = keyCode === (viewMode === "1" ? KEY_LEFT : KEY_UP) ? -1 : 1;
 
                 var lastHighlighted = self.state.cursor || false;
                 if (!self.state.cursor && self.state.highlighted && self.state.highlighted.length > 0) {
@@ -189,93 +295,32 @@ var BrowserEntries = React.createClass({
                     }
                 }
 
-                if (targetIndex >= self.props.entries.length) {
-                    if (selectionIncludeShift) {
-                        // shift + select down after the last item in the list was selected? do nothing.
-                        return;
-                    }
-                    else {
-                        targetIndex = self.props.entries.length - 1;
-                    }
+                self._doSelect(selectionIncludeShift, currentIndex, targetIndex);
+            }
+            else if (viewMode === "1" && (keyCode === KEY_UP || keyCode === KEY_DOWN)) {
+                var containerWidth = $('.add-from-cloud .fm-dialog-scroll .content:visible').outerWidth();
+                var itemWidth = $('.add-from-cloud .fm-dialog-scroll .content:visible .data-block-view:first')
+                    .outerWidth();
+                var itemsPerRow = Math.floor(containerWidth/itemWidth);
+
+
+                var dir = keyCode === KEY_UP ? -1 : 1;
+
+                var lastHighlighted = self.state.cursor || false;
+                if (!self.state.cursor && self.state.highlighted && self.state.highlighted.length > 0) {
+                    lastHighlighted = self.state.highlighted[self.state.highlighted.length - 1];
                 }
 
-                if (targetIndex < 0 || !self.props.entries[targetIndex]) {
-                    targetIndex = Math.min(0, currentIndex);
-                }
+                var currentIndex = self.getIndexByNodeId(lastHighlighted, -1);
 
 
-                if (
-                    self.props.entries.length === 0 ||
-                    !self.props.entries[targetIndex]
-                ) {
+                var targetIndex = currentIndex + dir * itemsPerRow;
+                if (self.props.entries.length - 1 < targetIndex || targetIndex < 0) {
+                    // out of range.
                     return;
                 }
 
-                var highlighted;
-
-                if (selectionIncludeShift) {
-                    var firstIndex;
-                    var lastIndex;
-                    if (targetIndex < currentIndex) {
-                        // up
-                        if (self.state.highlighted && self.state.highlighted.length > 0) {
-                            // more items already selected..append to selection by altering last index
-                            if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
-                                // target is already selected, shrink selection
-                                firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
-                                lastIndex = self.getIndexByNodeId(
-                                    self.state.highlighted[self.state.highlighted.length - 2],
-                                    self.state.highlighted.length - 2
-                                );
-                            }
-                            else {
-                                firstIndex = targetIndex;
-                                lastIndex = self.getIndexByNodeId(
-                                    self.state.highlighted[self.state.highlighted.length - 1],
-                                    -1
-                                );
-                            }
-                        }
-                        else {
-                            firstIndex = targetIndex;
-                            lastIndex = currentIndex;
-                        }
-                    }
-                    else {
-                        // down
-                        if (self.state.highlighted && self.state.highlighted.length > 0) {
-                            // more items are already selected, alter current selection only
-                            if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
-                                // target is already selected, shrink selection
-                                firstIndex = self.getIndexByNodeId(self.state.highlighted[1], 1);
-                                lastIndex = self.getIndexByNodeId(
-                                    self.state.highlighted[self.state.highlighted.length - 1],
-                                    self.state.highlighted.length - 1
-                                );
-                            }
-                            else {
-                                // more items already selected..append to selection by altering first index
-                                firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
-                                lastIndex = targetIndex;
-
-                            }
-                        }
-                        else {
-                            firstIndex = currentIndex;
-                            lastIndex = targetIndex;
-
-                        }
-
-                    }
-
-                    highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
-
-                    self.setSelectedAndHighlighted(highlighted, self.props.entries[targetIndex].h);
-                }
-                else {
-                    highlighted = [self.props.entries[targetIndex].h];
-                    self.setSelectedAndHighlighted(highlighted, highlighted[0]);
-                }
+                self._doSelect(selectionIncludeShift, currentIndex, targetIndex);
             }
             else if (
                 (keyCode >= 48 && keyCode <= 57) ||
@@ -358,7 +403,7 @@ var BrowserEntries = React.createClass({
         });
     },
     unbindEvents: function() {
-        $(document.body).unbind('keydown.cloudBrowserModalDialog');
+        $(document.body).off('keydown.cloudBrowserModalDialog');
     },
     onEntryClick: function(e, node) {
         var self = this;
@@ -480,13 +525,15 @@ var BrowserEntries = React.createClass({
         var self = this;
 
         var items = [];
+        var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
-        var entry = self.props.entries;
+        var imagesThatRequireLoading = [];
         self.props.entries.forEach(function(node) {
             if (node.t !== 0 && node.t !== 1) {
                 // continue
                 return;
             }
+
             if (!node.name) {
                 // continue
                 return;
@@ -497,17 +544,20 @@ var BrowserEntries = React.createClass({
 
             var tooltipElement = null;
 
-            var icon = <span
+                var icon = <span
                 className={"transfer-filetype-icon " + (isFolder ? " folder " : "") + fileIcon(node)}> </span>;
 
-            if (is_image(node) && node.fa) {
-                var src = thumbnails[node.h];
+            var image = null;
+            var src = null;
+            if ((is_image(node) || is_video(node)) && node.fa) {
+                src = thumbnails[node.h];
                 if (!src) {
-                    M.v.push(node);
+                    node.imgId = "chat_" + node.h;
+                    imagesThatRequireLoading.push(node);
+
                     if (!node.seen) {
                         node.seen = 1; // HACK
                     }
-                    delay('thumbnails', fm_thumbnails, 90);
                     src = window.noThumbURI || '';
                 }
                 icon = <Tooltips.Tooltip withArrow={true}>
@@ -523,49 +573,139 @@ var BrowserEntries = React.createClass({
                         </div>
                     </Tooltips.Contents>
                 </Tooltips.Tooltip>;
+
+                if (src) {
+                    image = <img alt="" src={src} />;
+                }
+                else {
+                    image = <img alt="" />;
+                }
             }
 
-            items.push(
-                <tr className={
-                        "node_" + node.h + " " + (isFolder ? " folder" :"") + (isHighlighted ? " ui-selected" : "")
-                    }
-                    onClick={(e) => {
-                        self.onEntryClick(e, node);
-                    }}
-                    onDoubleClick={(e) => {
-                        self.onEntryDoubleClick(e, node);
-                    }}
-                    key={node.h}
-                >
-                    <td>
-                        <span className={"grid-status-icon" + (node.fav ? " star" : "")}></span>
-                    </td>
-                    <td>
-                        {icon}
-                        <span className={"tranfer-filetype-txt"}>{node.name}</span>
-                    </td>
-                    <td>{!isFolder ? bytesToSize(node.s) : ""}</td>
-                    <td>{time2date(node.ts)}</td>
-                </tr>
-            )
+
+
+
+            if (viewMode === "0") {
+                items.push(
+                    <tr className={
+                            "node_" + node.h + " " + (isFolder ? " folder" :"") + (isHighlighted ? " ui-selected" : "")
+                        }
+                        onClick={(e) => {
+                            self.onEntryClick(e, node);
+                        }}
+                        onDoubleClick={(e) => {
+                            self.onEntryDoubleClick(e, node);
+                        }}
+                        key={node.h}
+                    >
+                        <td>
+                            <span className={"grid-status-icon" + (node.fav ? " star" : "")}></span>
+                        </td>
+                        <td>
+                            {icon}
+                            <span className={"tranfer-filetype-txt"}>{node.name}</span>
+                        </td>
+                        <td>{!isFolder ? bytesToSize(node.s) : ""}</td>
+                        <td>{time2date(node.ts)}</td>
+                    </tr>
+                );
+            } else {
+                var playtime = MediaAttribute(node).data.playtime;
+                if (playtime) {
+                    playtime = secondsToTimeShort(playtime);
+                }
+                var share = M.getNodeShare(node);
+                var colorLabelClasses = "";
+                if (node.lbl) {
+                    var colourLabel = M.getColourClassFromId(node.lbl);
+                    colorLabelClasses +=  ' colour-label';
+                    colorLabelClasses += ' ' + colourLabel;
+                }
+
+                items.push(
+                    <div className={
+                            "data-block-view node_" + node.h + " " + (isFolder ? " folder" :" file") +
+                            (isHighlighted ? " ui-selected" : "") +
+                            (share ? " linked" : "") +
+                            colorLabelClasses
+                        }
+                        onClick={(e) => {
+                            self.onEntryClick(e, node);
+                        }}
+                        onDoubleClick={(e) => {
+                            self.onEntryDoubleClick(e, node);
+                        }}
+                         id={"chat_" + node.h}
+                         key={"block_" + node.h}
+                    >
+                        <div className={
+                            (src ? "data-block-bg thumb" : "data-block-bg") +
+                            (is_video(node) ? " video" : "")
+                        }>
+                            <div className="data-block-indicators">
+                                <div className={"file-status-icon indicator" + (node.fav ? " star" : "")}></div>
+                                <div className="data-item-icon indicator" />
+                            </div>
+                            <div className={"block-view-file-type " +
+                                (isFolder ? " folder " :" file " + fileIcon(node))
+                            }>
+                                {image}
+                            </div>
+                            {
+                                is_video(node) ? (
+                                    <div className="video-thumb-details">
+                                        <i className="small-icon small-play-icon"></i>
+                                        <span>{
+                                            playtime ? playtime : "00:00"
+                                        }</span>
+                                    </div>
+                                ) : null
+                            }
+                        </div>
+                        <div className="file-block-title">{node.name}</div>
+                    </div>
+                );
+            }
         });
+        if (imagesThatRequireLoading.length > 0) {
+            fm_thumbnails('standalone', imagesThatRequireLoading);
+        }
+
         if (items.length > 0) {
-            return (
-                <utils.JScrollPane className="fm-dialog-grid-scroll"
-                                   selected={this.state.selected}
-                                   highlighted={this.state.highlighted}
-                                   entries={this.props.entries}
-                                   ref={(jsp) => {
-                                        self.jsp = jsp;
-                                   }}
-                >
-                    <table className="grid-table fm-dialog-table">
-                        <tbody>
-                        {items}
-                        </tbody>
-                    </table>
-                </utils.JScrollPane>
-            );
+            if (viewMode === "0") {
+                return (
+                    <utils.JScrollPane className="fm-dialog-scroll grid"
+                                       selected={this.state.selected}
+                                       highlighted={this.state.highlighted}
+                                       entries={this.props.entries}
+                                       ref={(jsp) => {
+                                            self.jsp = jsp;
+                                       }}
+                    >
+                        <table className="grid-table fm-dialog-table">
+                            <tbody>
+                                {items}
+                            </tbody>
+                        </table>
+                    </utils.JScrollPane>
+                );
+            } else {
+                return (
+                    <utils.JScrollPane className="fm-dialog-scroll blocks"
+                                           selected={this.state.selected}
+                                           highlighted={this.state.highlighted}
+                                           entries={this.props.entries}
+                                           ref={(jsp) => {
+                                                self.jsp = jsp;
+                                           }}
+                        >
+                       <div className="content">
+                           {items}
+                           <div className="clear"></div>
+                       </div>
+                    </utils.JScrollPane>
+                );
+            }
         } else if (self.props.isLoading) {
             return (
                 <div className="dialog-empty-block dialog-fm folder">
@@ -581,12 +721,23 @@ var BrowserEntries = React.createClass({
         else {
             return (
                 <div className="dialog-empty-block dialog-fm folder">
-                    <div className="dialog-empty-pad">
-                        <div className="dialog-empty-icon"></div>
-                        <div className="dialog-empty-header">
-                            {self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]}
-                        </div>
-                    </div>
+                    {
+                        self.props.currentlyViewedEntry === 'shares' ? (
+                            <div className="dialog-empty-pad">
+                                <div className="fm-empty-incoming-bg"></div>
+                                <div className="dialog-empty-header">
+                                    {l[6871]}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="dialog-empty-pad">
+                                <div className="fm-empty-folder-bg"></div>
+                                <div className="dialog-empty-header">
+                                    {self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]}
+                                </div>
+                            </div>
+                        )
+                    }
                 </div>
             );
         }
@@ -609,7 +760,9 @@ var CloudBrowserDialog = React.createClass({
             ],
             'selected': [],
             'highlighted': [],
-            'currentlyViewedEntry': M.RootID
+            'currentlyViewedEntry': M.RootID,
+            'selectedTab': 'clouddrive',
+            'searchValue': ''
         }
     },
     toggleSortBy: function(colId) {
@@ -619,6 +772,74 @@ var CloudBrowserDialog = React.createClass({
         else {
             this.setState({'sortBy': [colId, "asc"]});
         }
+    },
+    onViewButtonClick: function(e, node) {
+        var self = this;
+        var $this = $(e.target);
+
+        if ($this.hasClass("active")) {
+            return false;
+        }
+
+        if ($this.hasClass("block-view")) {
+            localStorage.dialogViewMode = "1";
+        } else {
+            localStorage.dialogViewMode = "0";
+        }
+
+        self.setState({entries: self.getEntries()});
+
+        $this.parent().find('.active').removeClass("active");
+        $this.addClass("active");
+    },
+    onSearchIconClick: function(e, node) {
+        var $parentBlock = $(e.target).closest(".fm-header-buttons");
+
+        if ($parentBlock.hasClass("active-search")) {
+            $parentBlock.removeClass("active-search");
+        } else {
+            $parentBlock.addClass("active-search");
+            $('input', $parentBlock).trigger("focus");
+        }
+    },
+    onTabButtonClick: function(e, selectedTab) {
+        var $this = $(e.target);
+
+        $this.parent().find('.active').removeClass("active");
+        $this.addClass("active");
+
+        var newState = {
+            'selectedTab': selectedTab,
+            'searchValue': '',
+        };
+        if (selectedTab === 'shares') {
+            newState['currentlyViewedEntry'] = 'shares';
+        }
+        else {
+            newState['currentlyViewedEntry'] = M.RootID;
+        }
+        this.setState(newState);
+        this.onSelected([]);
+        this.onHighlighted([]);
+    },
+    onSearchChange: function(e) {
+        var searchValue = e.target.value;
+        var newState = {
+            'selectedTab': 'search',
+            'searchValue': searchValue
+        };
+        if (searchValue && searchValue.length >= 3) {
+            newState['currentlyViewedEntry'] = 'search';
+        }
+        else if (this.state.currentlyViewedEntry === 'search') {
+            if (!searchValue || searchValue.length < 3) {
+                newState['currentlyViewedEntry'] = M.RootID;
+            }
+        }
+
+        this.setState(newState);
+        this.onSelected([]);
+        this.onHighlighted([]);
     },
     resizeBreadcrumbs: function() {
         var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud', this.findDOMNode());
@@ -649,11 +870,20 @@ var CloudBrowserDialog = React.createClass({
     },
     componentDidUpdate: function(prevProps, prevState) {
         if (prevState.currentlyViewedEntry !== this.state.currentlyViewedEntry) {
-            this.resizeBreadcrumbs();
+            var self = this;
 
+            this.resizeBreadcrumbs();
             var handle = this.state.currentlyViewedEntry;
+            if (handle === 'shares') {
+                self.setState({'isLoading': true});
+
+                dbfetch.geta(Object.keys(M.c.shares || {}), new MegaPromise())
+                    .done(function() {
+                        self.setState({'isLoading': false});
+                        self.setState({entries: self.getEntries()});
+                    });
+            }
             if (!M.d[handle] || (M.d[handle].t && !M.c[handle])) {
-                var self = this;
                 self.setState({'isLoading': true});
                 dbfetch.get(handle)
                     .always(function() {
@@ -669,7 +899,28 @@ var CloudBrowserDialog = React.createClass({
     getEntries: function() {
         var self = this;
         var order = self.state.sortBy[1] === "asc" ? 1 : -1;
-        var entries = Object.keys(M.c[self.state.currentlyViewedEntry] || {}).map(h => M.d[h]);
+        var entries = [];
+        if (
+            self.state.currentlyViewedEntry === "search" &&
+            self.state.searchValue &&
+            self.state.searchValue.length >= 3
+        ) {
+            M.getFilterBy(M.getFilterBySearchFn(self.state.searchValue))
+                .forEach(function(n) {
+                    // skip contacts and invalid data.
+                    if (!n.h || n.h.length === 11) {
+                        return;
+                    }
+                    entries.push(n);
+                })
+        }
+
+        else {
+            Object.keys(M.c[self.state.currentlyViewedEntry] || {}).forEach((h) => {
+                M.d[h] && entries.push(M.d[h]);
+            });
+        }
+
         var sortFunc;
 
         if (self.state.sortBy[0] === "name") {
@@ -682,14 +933,14 @@ var CloudBrowserDialog = React.createClass({
             sortFunc = M.getSortByDateTimeFn();
         }
         else /*if(self.state.sortBy[0] === "grid-header-star")*/ {
-            sortFunc = M.getSortByFavFn();
+            sortFunc = M.sortByFavFn(order);
         }
 
         // always return first the folders and then the files
         var folders = [];
 
         for (var i = entries.length; i--;) {
-            if (entries[i].t) {
+            if (entries[i] && entries[i].t) {
                 folders.unshift(entries[i]);
                 entries.splice(i, 1);
             }
@@ -726,6 +977,7 @@ var CloudBrowserDialog = React.createClass({
         var self = this;
 
         var entries = self.state.entries || self.getEntries();
+        var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
         var classes = "add-from-cloud " + self.props.className;
 
@@ -733,40 +985,60 @@ var CloudBrowserDialog = React.createClass({
 
         var breadcrumb = [];
 
-        var p = M.d[self.state.currentlyViewedEntry];
-        do {
-            var breadcrumbClasses = "";
-            if (p.h === M.RootID) {
-                breadcrumbClasses += " cloud-drive";
+        M.getPath(self.state.currentlyViewedEntry)
+            .forEach(function(breadcrumbNodeId, k) {
+                // skip [share owner handle] when returned by M.getPath.
+                if (M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].h && M.d[breadcrumbNodeId].h.length === 11) {
+                    return;
+                }
 
-                if (self.state.currentlyViewedEntry !== M.RootID) {
+                var breadcrumbClasses = "";
+                if (breadcrumbNodeId === M.RootID) {
+                    breadcrumbClasses += " cloud-drive";
+
+                    if (self.state.currentlyViewedEntry !== M.RootID) {
+                        breadcrumbClasses += " has-next-button";
+                    }
+                }
+                else {
+                    breadcrumbClasses += " folder";
+                }
+
+                if (k !== 0) {
                     breadcrumbClasses += " has-next-button";
                 }
-            }
-            else {
-                breadcrumbClasses += " folder";
-            }
-
-            (function(p) {
-                if (self.state.currentlyViewedEntry !== p.h) {
-                    breadcrumbClasses += " has-next-button";
+                if (breadcrumbNodeId === "shares") {
+                    breadcrumbClasses += " shared-with-me";
                 }
-                breadcrumb.unshift(
-                    <a className={"fm-breadcrumbs contains-directories " + breadcrumbClasses} key={p.h}
-                       onClick={(e) => {
-                           e.preventDefault();
-                           e.stopPropagation();
-                           self.setState({'currentlyViewedEntry': p.h, 'selected': []});
-                           self.onSelected([]);
-                           self.onHighlighted([]);
-                        }}>
-                        <span className="right-arrow-bg invisible">
-                            <span>{p.h === M.RootID ? __(l[164]) : p.name}</span>
+
+                (function (breadcrumbNodeId) {
+                    breadcrumb.unshift(
+                        <a className={"fm-breadcrumbs contains-directories " + breadcrumbClasses}
+                           key={breadcrumbNodeId}
+                           onClick={(e) => {
+                               e.preventDefault();
+                               e.stopPropagation();
+                               self.setState({
+                                   'currentlyViewedEntry': breadcrumbNodeId,
+                                   'selected': [],
+                                   'searchValue': ''
+                               });
+                               self.onSelected([]);
+                               self.onHighlighted([]);
+                           }}>
+                        <span className="right-arrow-bg">
+                            <span>{breadcrumbNodeId === M.RootID ? __(l[164]) :
+                                (
+                                    breadcrumbNodeId === "shares" ?
+                                        l[5589] :
+                                        M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name
+                                )
+                            }</span>
                         </span>
-                    </a>
-                );
-            })(p);
-        } while (p = M.d[M.d[p.h].p]);
+                        </a>
+                    );
+                })(breadcrumbNodeId);
+            });
 
         self.state.highlighted.forEach(function(nodeId) {
             if (M.d[nodeId] && M.d[nodeId].t === 1) {
@@ -799,13 +1071,12 @@ var CloudBrowserDialog = React.createClass({
                 "className": "default-grey-button",
                 "onClick": function(e) {
                     if (self.state.highlighted.length > 0) {
-                        self.setState({'currentlyViewedEntry':
-                            self.state.highlighted[0]
-                        });
+                        self.setState({'currentlyViewedEntry': self.state.highlighted[0]});
                         self.onSelected([]);
                         self.onHighlighted([]);
                         self.browserEntries.setState({
                             'selected': [],
+                            'searchValue': '',
                             'highlighted': []
                         });
                     }
@@ -825,23 +1096,11 @@ var CloudBrowserDialog = React.createClass({
             }
         });
 
-        return (
-            <ModalDialogsUI.ModalDialog
-                title={__(l[8011])}
-                className={classes}
-                onClose={() => {
-                    self.props.onClose(self);
-                }}
-                popupDidMount={self.onPopupDidMount}
-                buttons={buttons}>
-                <div className="fm-breadcrumbs-block add-from-cloud">
-                    <div className="breadcrumbs-wrapper">
-                        {breadcrumb}
-                        <div className="clear"></div>
-                    </div>
-                </div>
+        var gridHeader = [];
 
-                <table className="grid-table-header fm-dialog-table">
+        if (viewMode === "0") {
+            gridHeader.push(
+                <table className="grid-table-header fm-dialog-table" key={"grid-table-header"}>
                     <tbody>
                     <tr>
                         <BrowserCol id="grid-header-star" sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
@@ -854,7 +1113,67 @@ var CloudBrowserDialog = React.createClass({
                     </tr>
                     </tbody>
                 </table>
+            );
+        }
 
+        return (
+            <ModalDialogsUI.ModalDialog
+                title={__(l[8011])}
+                className={classes}
+                onClose={() => {
+                    self.props.onClose(self);
+                }}
+                popupDidMount={self.onPopupDidMount}
+                buttons={buttons}>
+                <div className="fm-dialog-tabs">
+                    <div className={"fm-dialog-tab cloud active"}
+                        onClick={(e) => {
+                            self.onTabButtonClick(e, 'clouddrive');
+                        }}>
+                            {__(l[164])}
+                        </div>
+                    <div className={"fm-dialog-tab incoming"}
+                        onClick={(e) => {
+                            self.onTabButtonClick(e, 'shares');
+                        }}>
+                            {__(l[5542])}
+                        </div>
+                    <div className="clear"></div>
+                </div>
+                <div className="fm-picker-header">
+                    <div className="fm-header-buttons">
+                        <a className={"fm-files-view-icon block-view" + (viewMode === "1" ? " active" : "")}
+                            title="Thumbnail view"
+                            onClick={(e) => {
+                                self.onViewButtonClick(e);
+                            }}>
+                        </a>
+                        <a className={"fm-files-view-icon listing-view" + (viewMode === "0" ? " active" : "")}
+                            title="List view"
+                            onClick={(e) => {
+                                    self.onViewButtonClick(e);
+                            }}>
+                        </a>
+                        <div className="fm-files-search">
+                            <i className="search"
+                                onClick={(e) => {
+                                    self.onSearchIconClick(e);
+                                }}>
+                            ></i>
+                            <input type="search" placeholder={__(l[102])}  value={self.state.searchValue}
+                                onChange={self.onSearchChange} />
+                        </div>
+                        <div className="clear"></div>
+                    </div>
+                    <div className="fm-breadcrumbs-block add-from-cloud">
+                        <div className="breadcrumbs-wrapper">
+                            {breadcrumb}
+                            <div className="clear"></div>
+                        </div>
+                    </div>
+                </div>
+
+                {gridHeader}
 
                 <BrowserEntries
                     isLoading={self.state.isLoading}
@@ -863,7 +1182,10 @@ var CloudBrowserDialog = React.createClass({
                     onExpand={(node) => {
                         self.onSelected([]);
                         self.onHighlighted([]);
-                        self.setState({'currentlyViewedEntry': node.h});
+                        self.setState({
+                            'currentlyViewedEntry': node.h,
+                            'searchValue': ''
+                        });
                     }}
                     folderSelectNotAllowed={self.props.folderSelectNotAllowed}
                     onSelected={self.onSelected}

@@ -1,43 +1,42 @@
 (function(scope) {
+    'use strict';
 
     var dir_inflight = 0;
     var filedrag_u = [];
     var filedrag_paths = Object.create(null);
     var touchedElement = 0;
-    var startUploading = false;
-    var tempFileDrag = [];
+
+    function addUpload(files, emptyFolders) {
+        var straight = $.doStraightUpload || Object(window.fmconfig).ulddd === 0 || M.currentrootid === M.RubbishID;
+
+        console.assert(page === 'start' || window.fminitialized, 'check this...');
+
+        if (page === 'start' || straight) {
+            M.addUpload(files, false, emptyFolders);
+        }
+        else {
+            openCopyUploadDialog(files, emptyFolders);
+        }
+    }
 
     function pushUpload() {
-        if (!--dir_inflight && startUploading) {
+        if (!--dir_inflight && $.dostart) {
             var emptyFolders = Object.keys(filedrag_paths)
                 .filter(function(p) {
                     return filedrag_paths[p] < 1;
                 });
-            filedrag_u = filedrag_u.concat(tempFileDrag);
-            M.addUpload(filedrag_u, false, emptyFolders);
+
+            addUpload(filedrag_u, emptyFolders);
             filedrag_u = [];
-            tempFileDrag = [];
-            startUploading = false;
             filedrag_paths = Object.create(null);
 
             if (page === 'start') {
                 start_upload();
             }
         }
-        else {
-            if (!dir_inflight && !startUploading) {
-                // This means that the controle flow arrived to FileSystemFileEntry.file()
-                //  success handler before finishing iterating on items at FileSelectHandler(e).
-                // The above behavior found on Edge, discovered on March 2018.
-                // Probably all other browers may chage this at some point, since this API is still experimental.
-                tempFileDrag = tempFileDrag.concat(filedrag_u);
-            }
-        }
     }
 
     function pushFile(file, path) {
-        'use strict';
-
         if (d > 1) {
             console.warn('Adding file %s', file.name, file);
         }
@@ -48,16 +47,20 @@
         pushUpload();
     }
 
-    function traverseFileTree(item, path, symlink) {
-        'use strict';
+    function getFile(entry) {
+        return new Promise(function(resolve, reject) {
+            entry.file(resolve, reject);
+        });
+    }
 
+    function traverseFileTree(item, path, symlink) {
         path = path || "";
 
         if (item.isFile) {
             dir_inflight++;
-            item.file(function(file) {
+            getFile(item).then(function(file) {
                 pushFile(file, path);
-            }, function(error) {
+            }).catch(function(error) {
                 if (d) {
                     var fn = symlink ? 'debug' : 'warn';
 
@@ -107,7 +110,8 @@
                     start_anoupload();
                 }
                 else {
-                    loginDialog();
+                    tooltiplogin.init();
+                    $.awaitingLoginToUpload = true;
 
                     mBroadcaster.once('fm:initialized', function() {
                         ulQueue.resume();
@@ -139,8 +143,17 @@
     }
 
     function FileDragEnter(e) {
-        e.stopPropagation();
+        if (d) {
+            console.log('DragEnter');
+        }
         e.preventDefault();
+        if ($.dialog === 'avatar') {
+            return;
+        }
+        e.stopPropagation();
+        if ((page !== 'start' && !is_fm()) || slideshowid || !$('.feedback-dialog').hasClass('hidden')) {
+            return;
+        }
         if (localStorage.d > 1) {
             console.info('----- ENTER event :' + e.target.className);
         }
@@ -153,8 +166,14 @@
     }
 
     function FileDragHover(e) {
-        e.stopPropagation();
+        if (d) {
+            console.log('DragOver');
+        }
         e.preventDefault();
+        if ((page !== 'start' && !is_fm()) || slideshowid || !$('.feedback-dialog').hasClass('hidden')) {
+            return;
+        }
+        e.stopPropagation();
     }
     var useMegaSync = -1;
     var usageMegaSync = 0;
@@ -198,9 +217,6 @@
                 target = M.lastSeenCloudFolder || M.RootID;
             }
             else {
-                target = M.currentdirid;
-            }
-            if ((onChat = (String(M.currentdirid).substr(0, 4) === 'chat'))) {
                 target = M.currentdirid;
             }
 
@@ -258,8 +274,17 @@
         }
     }
     function FileDragLeave(e) {
-        e.stopPropagation();
+        if (d) {
+            console.log('DragLeave');
+        }
         e.preventDefault();
+        if ($.dialog === 'avatar') {
+            return;
+        }
+        e.stopPropagation();
+        if ((page !== 'start' && !is_fm()) || slideshowid || !$('.feedback-dialog').hasClass('hidden')) {
+            return;
+        }
         if (localStorage.d > 1) {
             console.warn('----- LEAVE event :' + e.target.className + '   ' + e.type);
         }
@@ -274,23 +299,32 @@
 
     // on Drop event
     function FileSelectHandler(e) {
-        useMegaSync = -1;
-        if (e.stopPropagation) {
-            e.stopPropagation();
-        }
         if (e.preventDefault) {
             e.preventDefault();
         }
+        if ($.dialog === 'avatar') {
+            return;
+        }
+        if (e.stopPropagation) {
+            e.stopPropagation();
+        }
+        if ((page !== 'start' && !is_fm()) || slideshowid || !$('.feedback-dialog').hasClass('hidden')) {
+            return;
+        }
+        
+        useMegaSync = -1;
 
         var currentDir = M.currentdirid;
-        startUploading = false;
-        tempFileDrag = [];
 
         // Clear drag element
         touchedElement = 0;
 
         $('.drag-n-drop.overlay').addClass('hidden');
         $('body').removeClass('overlayed');
+
+        if ($.awaitingLoginToUpload) {
+            return tooltiplogin.init();
+        }
 
         if (
             (
@@ -350,7 +384,7 @@
                     if (item) {
                         filedrag_u = [];
                         if (i == items.length - 1) {
-                            startUploading = true;
+                            $.dostart = true;
                         }
                         traverseFileTree(item, '', item.isFile && items[i].getAsFile());
                     }
@@ -364,7 +398,7 @@
                     if (file instanceof Ci.nsIFile) {
                         filedrag_u = [];
                         if (i == m - 1) {
-                            startUploading = true;
+                            $.dostart = true;
                         }
                         traverseFileTree(new mozDirtyGetAsEntry(file /*,e.dataTransfer*/ ));
                     }
@@ -408,9 +442,11 @@
                 start_upload();
             }
             $('.fm-file-upload input').remove();
-            $('.fm-file-upload').append('<input type="file" id="fileselect1" multiple="">');
+            $('.fm-file-upload').append('<input type="file" id="fileselect1" title="' + l[99] + '" multiple="">');
             $('.fm-folder-upload input').remove();
-            $('.fm-folder-upload').append('<input type="file" id="fileselect2" webkitdirectory="" multiple="">');
+            $('.fm-folder-upload').append('<input type="file" id="fileselect2" webkitdirectory="" title="' +
+                l[98]
+                + '" multiple="">');
             $('input#fileselect3').remove();
             $('.files-menu .fileupload-item')
                 .after('<input type="file" id="fileselect3" class="hidden" name="fileselect3" multiple="">');
@@ -438,7 +474,7 @@
             var o = document.getElementById(i ? 'fileselect' + i : 'start-upload');
             if (o) {
                 o.addEventListener("change", FileSelectHandler, false);
-                if (!is_mobile) {
+                if (!is_mobile && i) {
                     o.addEventListener("click", FileSelectHandlerMegaSyncClick, true);
                     o.addEventListener("mouseover", FileSelectHandlerMegaSyncMouse, true);
                 }

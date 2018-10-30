@@ -26,7 +26,7 @@ var ChatdIntegration = function(megaChat) {
                 }
             },
             minLogLevel: function() {
-                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.WARN;
             }
         },
         megaChat.logger
@@ -35,13 +35,13 @@ var ChatdIntegration = function(megaChat) {
     self.megaChat = megaChat;
     self.chatd = new Chatd(u_handle, megaChat);
     self.waitingChatIdPromises = {};
-    self.chatIdToRoomJid = {};
+    self.chatIdToRoomId = {};
     self._cachedHandlers = {};
     self._loadingCount = 0;
 
     // chat events
     megaChat.rebind("onInit.chatdInt", function(e) {
-        megaChat.rebind("onRoomCreated.chatdInt", function(e, chatRoom) {
+        megaChat.rebind("onRoomInitialized.chatdInt", function(e, chatRoom) {
             assert(chatRoom.type, 'missing room type');
             self._attachToChatRoom(chatRoom);
         });
@@ -121,11 +121,12 @@ var ChatdIntegration = function(megaChat) {
         var shard = eventData.shard;
 
         shard.getRelatedChatIds().forEach(function(chatId) {
-            var chatRoomJid = self.chatIdToRoomJid[chatId];
+            var chatRoomJid = self.chatIdToRoomId[chatId];
             if (chatRoomJid) {
                 var chatRoom = self.megaChat.chats[chatRoomJid];
                 if (chatRoom) {
                     if (chatRoom.state !== ChatRoom.STATE.LEFT) {
+                        chatRoom.membersLoaded = false;
                         chatRoom.setState(ChatRoom.STATE.JOINING, true);
                     }
                 }
@@ -150,6 +151,7 @@ var ChatdIntegration = function(megaChat) {
         })
             .done(function(r) {
                 // no need to do anything, the triggered action packet would trigger the code for joining the room.
+                megaChat._chatsAwaitingAps[r.id] = true;
             })
             .fail(function() {
                 self.logger.error(
@@ -262,9 +264,9 @@ ChatdIntegration.prototype.requiresUpdate = function() {
 };
 ChatdIntegration.prototype._getChatRoomFromEventData = function(eventData) {
     var self = this;
-    var chatRoomJid = self.chatIdToRoomJid[eventData.chatId];
-    assert(chatRoomJid, 'chat room not found for chat id: ' + eventData.chatId);
-    return self.megaChat.chats[chatRoomJid];
+    var chatRoomId = self.chatIdToRoomId[eventData.chatId];
+    assert(chatRoomId, 'chat room not found for chat id: ' + eventData.chatId);
+    return self.megaChat.chats[chatRoomId] || self.megaChat.getChatById(eventData.chatId);
 };
 
 ChatdIntegration.prototype._getKarereObjFromChatdObj = function(chatdEventObj) {
@@ -326,7 +328,6 @@ ChatdIntegration._waitForProtocolHandler = function (chatRoom, cb) {
 
 ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missingMcf) {
     var self = this;
-
     var masterPromise = new MegaPromise();
     if (isMcf === false && ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
         // 'mcf'/'f' is still loading..ANY incoming action packets, should be rejected (and never happen...)
@@ -339,18 +340,24 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
         'cs': actionPacket.cs,
         'g': actionPacket.g,
         'u': clone(actionPacket.u),
-        'ct': actionPacket.ct ? actionPacket.ct : null
+        'ct': actionPacket.ct ? actionPacket.ct : null,
+        'f': actionPacket.f
     };
 
     // is isMcf and triggered by a missingMcf in the 'f' treecache, trigger an immediate store in the fmdb
     if (isMcf && missingMcf && fmdb) {
-        fmdb.add('mcf', {
-            g: actionPacket.g,
-            id: actionPacket.id,
-            p: actionPacket.p,
-            ts: actionPacket.ts,
-            u: actionPacket.u
-        });
+        if (actionPacket.id && actionPacket.cs !== undefined) {
+            var roomInfo = {
+                'id': actionPacket.id,
+                'cs': actionPacket.cs,
+                'g' : actionPacket.g,
+                'u' : actionPacket.u,
+                'ts': actionPacket.ts,
+                'ct': actionPacket.ct,
+                'f' : actionPacket.f
+            };
+            fmdb.add('mcf', {id: roomInfo.id, d: roomInfo});
+        }
     }
 
     loadingDialog.hide();
@@ -360,21 +367,22 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
         return MegaPromise.reject();
     }
     var chatParticipants = actionPacket.u;
-    if (!chatParticipants) {
-        // its ok, no participants mean inactive chat, that we woudl skip...for now...
+    if (!chatParticipants && (!actionPacket.f || !(actionPacket.f & ChatRoom.ARCHIVED))) {
+        // its ok, no participants mean inactive chat, that we woudl skip if it is not archived.
         return masterPromise.reject();
     }
     var userHandles = [];
-    Object.keys(chatParticipants).forEach(function(k) {
-        var v = chatParticipants[k];
-        if (v.u) {
-            userHandles.push(v.u);
-        }
-    });
+    if (chatParticipants) {
+        Object.keys(chatParticipants).forEach(function(k) {
+            var v = chatParticipants[k];
+            if (v.u) {
+                userHandles.push(v.u);
+            }
+        });
+    }
+    var chatId = actionPacket.id;
 
-    var roomId = actionPacket.id;
-
-    var chatRoom = self.megaChat.chats[roomId];
+    var chatRoom = self.megaChat.getChatById(chatId);
     var wasActive = chatRoom ? chatRoom.isCurrentlyActive : false;
 
     var finishProcess = function() {
@@ -383,9 +391,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
         // if the found chatRoom is in LEAVING mode...then try to reinitialise it!
 
         if (chatRoom && chatRoom.stateIsLeftOrLeaving() && actionPacket.ou !== u_handle) {
-            self._cachedHandlers[roomId] = chatRoom.protocolHandler;
-            chatRoom.destroy(undefined, true);
-            chatRoom = false;
+            self._cachedHandlers[chatId] = chatRoom.protocolHandler;
 
             if (actionPacket.url) {
                 Soon(finishProcess);
@@ -412,7 +418,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
         }
 
         // try to find the chat room again, it may had been opened while waiting for the mcurl api call...
-        chatRoom = self.megaChat.chats[roomId];
+        chatRoom = self.megaChat.getChatById(chatId);
         if (!chatRoom) {
             // don't try to open a chat, if its not yet opened and the actionPacket consist of me leaving...
             if (actionPacket.n) {
@@ -427,50 +433,56 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                 }
             }
 
+            var setAsActive = megaChat._chatsAwaitingAps[actionPacket.id] === true;
+            delete megaChat._chatsAwaitingAps[actionPacket.id];
+
             var r = self.megaChat.openChat(
                 userHandles,
                 actionPacket.g === 1 ? "group" : "private",
                 actionPacket.id,
                 actionPacket.cs,
                 actionPacket.url,
-                false
+                setAsActive
             );
             chatRoom = r[1];
             if (!chatRoom) {
                 return masterPromise.reject();
             }
+
             if (actionPacket.ct) {
                 chatRoom.ct = actionPacket.ct;
             }
+            if (typeof actionPacket.f !== 'undefined') {
+                chatRoom.flags = actionPacket.f;
+            }
+            // apply the flags if any received during loading.
+            if (loadfm.chatmcfc && typeof loadfm.chatmcfc[actionPacket.id] !== 'undefined') {
+                chatRoom.updateFlags(loadfm.chatmcfc[actionPacket.id]);
+                delete loadfm.chatmcfc[actionPacket.id];
+            }
+
             self.decryptTopic(chatRoom);
             // handler of the same room was cached before, then restore the keys.
-            if (self._cachedHandlers[roomId] && chatRoom.protocolHandler) {
-                chatRoom.protocolHandler.participantKeys = self._cachedHandlers[roomId].participantKeys;
+            if (self._cachedHandlers[chatId] && chatRoom.protocolHandler) {
+                chatRoom.protocolHandler.participantKeys = self._cachedHandlers[chatId].participantKeys;
             }
             if (!isMcf && actionPacket.ou === u_handle && !actionPacket.n) {
                 if (chatRoom.lastActivity === 0) {
                     chatRoom.lastActivity = unixtime();
                 }
-                if (!chatRoom.inCpyDialog) {
+
+                if (chatRoom.showAfterCreation) {
                     loadSubPage(chatRoom.getRoomUrl());
                 }
-                else {
-                    chatRoom.inCpyDialog();
-                    delete chatRoom.inCpyDialog;
-                }
+
+                delete chatRoom.showAfterCreation;
             }
             if (!chatRoom.lastActivity && actionPacket.ts) {
                 chatRoom.lastActivity = actionPacket.ts;
             }
 
             if (wasActive) {
-                if (!chatRoom.inCpyDialog) {
-                    loadSubPage(chatRoom.getRoomUrl());
-                }
-                else {
-                    chatRoom.inCpyDialog();
-                    delete chatRoom.inCpyDialog;
-                }
+                loadSubPage(chatRoom.getRoomUrl());
             }
         }
         else {
@@ -502,6 +514,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                                                 chatRoom
                                             );
                                         }
+                                        delete chatRoom.members[user_handle];
                                     });
                                 }
                                 chatRoom.leave(false);
@@ -852,9 +865,8 @@ ChatdIntegration._ensureNamesAreLoaded = function(users) {
     }
 };
 
-
 ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
-    var textContents = message.textContents ? message.textContents : message.message;
+    var textContents = message.textContents || message.message || false;
 
     // reset any flags for what was processed in this message, since it just changed (was edited, or
     // decrypted).
@@ -862,130 +874,53 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
     message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
     message.decrypted = true;
 
-    if (
-        textContents &&
-        textContents.substr &&
-        textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT
-    ) {
-        if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
-            try {
-                var attachmentMeta = JSON.parse(textContents.substr(2));
-            } catch(e) {
-                // debugger;
-                return null;
-            }
+    if (!textContents || textContents === "") {
+        message.deleted = true;
+        message.trackDataChange();
+    }
+    else if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+        if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
 
-
-            attachmentMeta.forEach(function(v) {
-                var attachmentMetaInfo;
-                // cache ALL current attachments, so that we can revoke them later on in an ordered way.
-                if (message.messageId) {
-                    if (!chatRoom.attachments.exists(v.h)) {
-                        chatRoom.attachments.set(v.h, new MegaDataMap(chatRoom.attachments));
-                    }
-
-                    if (!chatRoom.attachments[v.h].exists(message.messageId)) {
-                        chatRoom.attachments[v.h].set(
-                            message.messageId,
-                            attachmentMetaInfo = new MegaDataObject({
-                                messageId: message.messageId,
-                                revoked: false
-                            })
-                        );
-                        attachmentMetaInfo._parent = chatRoom.attachments;
-                    }
-                    else {
-                        attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
-                    }
-                }
-
-                // generate preview/icon
-                if (!attachmentMetaInfo.revoked && !message.revoked) {
-                    if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
-                        var imagesListKey = message.messageId + "_" + v.h;
-                        if (!chatRoom.images.exists(imagesListKey)) {
-                            v.id = imagesListKey;
-                            v.orderValue = message.orderValue;
-                            v.messageId = message.messageId;
-                            chatRoom.images.push(v);
-                        }
-                    }
-                }
-            });
+            message._onAttachmentReceived(textContents.substr(2));
         }
-        else if (
-            textContents &&
-            textContents.substr &&
-            textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT
-        ) {
-            var foundRevokedNode = null;
-
+        else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
             var revokedNode = textContents.substr(2, textContents.length);
 
-            if (chatRoom.attachments.exists(revokedNode)) {
-                chatRoom.attachments[revokedNode].forEach(function(obj) {
-                    var messageId = obj.messageId;
-                    var attachedMsg = chatRoom.messagesBuff.messages[messageId];
-
-                    var allAttachmentsRevoked = false;
-                    if (!attachedMsg) {
-                        return;
-                    }
-
-                    if (attachedMsg.orderValue < message.orderValue) {
-                        try {
-                            var attc = attachedMsg.textContents;
-                            var attachments = JSON.parse(attc.substr(2, attc.length));
-                            var revokedInSameMessage = 0;
-                            attachments.forEach(function(node) {
-                                if (node.h === revokedNode) {
-                                    foundRevokedNode = node;
-                                }
-                                if (
-                                    chatRoom.attachments[node.h] &&
-                                    chatRoom.attachments[node.h][messageId] &&
-                                    (
-                                        chatRoom.attachments[node.h][messageId].revoked === true ||
-                                        node.h === revokedNode
-                                    )
-                                ) {
-                                    revokedInSameMessage++;
-                                }
-                            });
-                            if (revokedInSameMessage === attachments.length) {
-                                allAttachmentsRevoked = true;
-                            }
-                        } catch(e) {
-                        }
-
-                        obj.revoked = true;
-                        // mark the whole message as revoked if all attachments in it are marked as revoked.
-                        if (allAttachmentsRevoked) {
-                            attachedMsg.revoked = true;
-                        }
-                        else {
-                            // force re-render
-                            attachedMsg.trackDataChange();
-                        }
-
-                        if (!attachedMsg.seen) {
-                            attachedMsg.seen = true;
-                            if (chatRoom.messagesBuff._unreadCountCache > 0) {
-                                chatRoom.messagesBuff._unreadCountCache--;
-                                chatRoom.messagesBuff.trackDataChange();
-                                chatRoom.megaChat.updateSectionUnreadCount();
-                            }
-                        }
-                    }
-                });
-            }
+            message._onAttachmentRevoked(revokedNode);
 
             // don't show anything if this is a 'revoke' message
             return null;
         }
+        else if (
+            textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META &&
+            textContents[2] === Message.MESSAGE_META_TYPE.RICH_PREVIEW
+        ) {
+            var meta = textContents.substr(3, textContents.length);
+            try {
+                meta = JSON.parse(meta);
+                textContents = meta.textMessage;
+                message.textContents = textContents;
+                message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
+                delete meta.textMessage;
+                message.metaType = Message.MESSAGE_META_TYPE.RICH_PREVIEW;
+                message.meta = meta;
+            }
+            catch (e) {
+                message.textContents = "";
+                this.logger.warn("Failed to parse META message:", message);
+            }
+            message.trackDataChange();
+
+        }
         else {
             return null;
         }
+    }
+    else if (message.dialogType === "remoteCallEnded") {
+        message.wrappedChatDialogMessage = chatRoom.megaChat.plugins.callManager.remoteEndCallToDialogMsg(
+            chatRoom,
+            message
+        );
     }
 };
 
@@ -1014,24 +949,11 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         }
     });
 
-    self.chatd.rebind('onRoomConnected.chatdInt' + chatRoomId, function(e, eventData) {
-        var foundChatRoom = self._getChatRoomFromEventData(eventData);
-
-        if (!foundChatRoom) {
-            self.logger.warn("Room not found for: ", e, eventData);
-            return;
-        }
-
-        if (foundChatRoom.roomId === chatRoom.roomId) {
-            if (chatRoom.state === ChatRoom.STATE.JOINING) {
-                chatRoom.setState(
-                    ChatRoom.STATE.READY
-                );
-            }
-        }
-    });
-
     self.chatd.rebind('onRoomDisconnected.chatdInt' + chatRoomId, function(e, eventData) {
+        if (self.megaChat.isLoggingOut) {
+            return;
+        }
+
         var foundChatRoom = self._getChatRoomFromEventData(eventData);
 
         if (!foundChatRoom) {
@@ -1040,9 +962,12 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         }
 
         if (foundChatRoom.roomId === chatRoom.roomId) {
-            chatRoom.chatShard = null;
             chatRoom.chatdUrl = null;
+            if (chatRoom.messagesBuff) {
+                chatRoom.messagesBuff.sendingListFlushed = false;
+            }
             if (chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
+                chatRoom.membersLoaded = false;
                 chatRoom.setState(
                     ChatRoom.STATE.JOINING,
                     true
@@ -1060,6 +985,16 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         }
 
         if (foundChatRoom.roomId === chatRoom.roomId) {
+            if (
+                chatRoom.state === ChatRoom.STATE.LEFT &&
+                eventData.priv >= 0 && eventData.priv < 255
+            ) {
+                // joining
+                chatRoom.membersLoaded = false;
+                chatRoom.setState(ChatRoom.STATE.JOINING, true);
+            }
+
+            var queuedMembersUpdatedEvent = false;
 
             if (chatRoom.membersLoaded === false) {
                 if (eventData.priv < 255) {
@@ -1078,22 +1013,34 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 eventData.userId
                             );
                         }
-                        $(chatRoom).trigger('onMembersUpdated');
-                    }
+                        $(chatRoom).trigger('onMembersUpdated', eventData);
+                    };
+
                     ChatdIntegration._waitForProtocolHandler(chatRoom, addParticipant);
+                    queuedMembersUpdatedEvent = true;
                 }
 
                 if (eventData.userId === u_handle) {
                     chatRoom.membersLoaded = true;
                 }
             }
-            else if (eventData.priv === 255) {
+            else if (eventData.priv === 255 || eventData.priv === -1) {
                 var deleteParticipant = function deleteParticipant() {
-                    // remove group participant in strongvelope
-                    chatRoom.protocolHandler.removeParticipant(eventData.userId);
-                    // also remove from our list
-                    delete chatRoom.members[eventData.userId];
-
+                    if (eventData.userId === u_handle) {
+                        // remove all participants from the room.
+                        Object.keys(chatRoom.members).forEach(function(userId) {
+                            // remove group participant in strongvelope
+                            chatRoom.protocolHandler.removeParticipant(userId);
+                            // also remove from our list
+                            delete chatRoom.members[userId];
+                        });
+                    }
+                    else {
+                        // remove group participant in strongvelope
+                        chatRoom.protocolHandler.removeParticipant(eventData.userId);
+                        // also remove from our list
+                        delete chatRoom.members[eventData.userId];
+                    }
                     if (
                         M.u[eventData.userId].c === 0 &&
                         typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
@@ -1104,9 +1051,16 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         );
                     }
 
-                    $(chatRoom).trigger('onMembersUpdated');
-                }
+                    $(chatRoom).trigger('onMembersUpdated', eventData);
+                };
+
                 ChatdIntegration._waitForProtocolHandler(chatRoom, deleteParticipant);
+                queuedMembersUpdatedEvent = true;
+            }
+
+            if (!queuedMembersUpdatedEvent) {
+                chatRoom.members[eventData.userId] = eventData.priv;
+                $(chatRoom).trigger('onMembersUpdated', eventData);
             }
         }
     });
@@ -1427,7 +1381,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     u_privEd25519,
                     u_pubEd25519
                 );
-
+                Object.keys(chatRoom.members).forEach(function(member) {
+                    chatRoom.protocolHandler.addParticipant(member);
+                });
                 chatRoom.protocolHandler.chatRoom = chatRoom;
                 self.decryptTopic(chatRoom);
                 self.join(chatRoom);
@@ -1507,6 +1463,24 @@ ChatdIntegration.prototype._processDecryptedMessage = function(chatRoom, msgInst
             // this is a system message
             msgInstance.protocol = true;
         }
+        else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.CALL_END) {
+            // this is a system message
+            msgInstance.meta = {
+                userId: decryptedResult.sender,
+                callId: decryptedResult.callId,
+                reason: decryptedResult.reason,
+                duration: decryptedResult.duration,
+                participants: decryptedResult.participants
+            };
+
+            msgInstance.dialogType = "remoteCallEnded";
+            // remove any locally generated FAILEDs
+            chatRoom.messagesBuff.removeMessageBy(function (v) {
+                if (v.type === "call-failed" && !v.meta) {
+                    return true;
+                }
+            });
+        }
         else {
             self.logger.error("Could not decrypt: ", decryptedResult);
             return false;
@@ -1577,10 +1551,10 @@ ChatdIntegration.prototype.join = function(chatRoom) {
 
     assert(
         chatRoom.chatId && chatRoom.chatShard !== undefined && chatRoom.chatdUrl,
-        'missing chatId, chatShard or chadUrl in megaRoom. halting chatd join and code execution.'
+        'missing chatId, chatShard or chadUrl in megaRoom. halting chatd join and code execution.' + chatRoom.chatId
     );
 
-    self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomId;
+    self.chatIdToRoomId[chatRoom.chatId] = chatRoom.roomId;
     self.chatd.join(
         base64urldecode(chatRoom.chatId),
         chatRoom.chatShard,
@@ -1676,9 +1650,21 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
                 messageObject.encryptedMessageContents = [result, keyid];
                 messageObject.msgIdentity = result[result.length - 1].identity;
                 messageObject.references = refids;
+                if (
+                    messageObject.message.charCodeAt(0) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT.charCodeAt(0)
+                    &&
+                    messageObject.message.charCodeAt(1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT.charCodeAt(0)
+                ) {
+                    messageObject.isPostedAttachment = true;
+                }
 
                 tmpPromise.resolve(
-                    self.chatd.submit(base64urldecode(chatRoom.chatId), result, keyid)
+                    self.chatd.submit(
+                        base64urldecode(chatRoom.chatId),
+                        result,
+                        keyid,
+                        messageObject.isPostedAttachment
+                    )
                 );
             }
             else {
@@ -1689,8 +1675,10 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
         }
     };
 
-    MegaPromise.allDone(promises).always(function() {
-        _runEncryption();
+    ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
+        MegaPromise.allDone(promises).always(function() {
+            _runEncryption();
+        });
     });
 
     return tmpPromise;

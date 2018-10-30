@@ -45,6 +45,7 @@ if [ $? -ne 0 ]; then
     rm strings.json
     rm strings_prod.json
     rm error.json
+    rm .ignore
 
     # Add the .json files
     git add *.json
@@ -65,6 +66,7 @@ else
     rm strings.json
     rm strings_prod.json
     rm error.json
+    rm .ignore
 
     exit 1
 fi

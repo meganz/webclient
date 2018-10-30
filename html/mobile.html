@@ -37,9 +37,7 @@
 
             <div class="top-menu-item submenu-item">[$961]</div>
             <div class="top-submenu">
-                <div class="top-menu-item ios">[$16538]</div>
-                <div class="top-menu-item android">[$16539]</div>
-                <div class="top-menu-item wp">[$16540]</div>
+                <div class="top-menu-item mobile">[$955]</div>
                 <div class="top-menu-item sync">[$956]</div>
                 <div class="top-menu-item extensions">[$16603]</div>
                 <div class="top-menu-item megabird">MEGAbird</div>
@@ -60,6 +58,7 @@
                 <div class="top-menu-item copyright not-mobile-ready">[$387]</div>
                 <div class="top-menu-item takedown">[$966]</div>
                 <div class="top-menu-item general">[$1712]</div>
+                <div class="top-menu-item gdpr">[$18501]</div>
             </div>
 
             <div class="top-social-bl">
@@ -77,6 +76,7 @@
 
 <!-- Loading overlay -->
 <div class="dark-overlay hidden"></div>
+<div class="titlemenu-overlay hidden"></div>
 <div class="light-overlay hidden"></div>
 <div class="slideshow-overlay hidden"></div>
 <div class="fm-dialog-overlay hidden"></div>
@@ -115,8 +115,14 @@
 
 
 <!-- Toast notification !-->
-<div class="mobile toast-notification hidden">
-    [$7677]
+<div class="mobile toast-notification info hidden">
+    <div class="mobile message-body">[$7677]</div>
+</div>
+
+<!-- Toast alert notification !-->
+<div class="mobile toast-notification alert hidden">
+    <div class="mobile fm-icon toast-alert-icon info-white-nofill left"></div>
+    <div class="mobile message-body">[$18280]</div>
 </div>
 
 
@@ -127,25 +133,37 @@
         <!-- Cloud drive / Folder link header -->
         <div class="mobile fm-header fm-hr folder-link">
             <div class="mobile fm-icon cloud left hidden"></div>
+            <div class="mobile fm-icon top-icon rubbish-bin left hidden"></div>
             <div class="mobile fm-icon top-icon menu right"></div>
             <div class="mobile fm-icon top-icon view-options list-icon right"></div>
+            <div class="mobile fm-icon top-icon dropdown-handle open-title-menu right hidden"></div>
             <div class="mobile fm-icon back left hidden"></div>
+            <div class="mobile fm-icon up left hidden"></div>
             <div class="mobile fm-icon folder"></div>
             <div class="mobile fm-header-txt"><span>[$1456]...</span></div>
             <div class="mobile fm-folder-size"></div>
+
         </div>
     </div>
 
     <!-- File manager footer, showing number of folders/files -->
     <div class="mobile fm-row">
         <div class="mobile fm-content">
+            <div class="mobile alert-banner hidden">
+                <div class="mobile alert-text"><span>Alert!</span></div>
+                <div class="mobile alert-close">
+                    <div class="mobile alert-icon fm-icon close white close-alert-banner"></div>
+                </div>
+
+            </div>
             <div class="mobile fm-scrolling">
                 <div class="mobile folders-files-text"></div>
 
                 <!-- Template for folders -->
                 <div class="mobile fm-item folder template">
                     <div class="mobile fm-item-img">
-                        <img alt="" src="{staticpath}images/mobile/extensions/folder.png" />
+                        <img class="regular-folder" alt="" src="{staticpath}images/mobile/extensions/folder.png" />
+                        <img class="shared-folder hidden" alt="" src="{staticpath}images/mobile/extensions/outgoing-share-folder.png" />
                     </div>
                     <div class="mobile fm-icon open-context-menu right hidden"></div>
                     <div class="mobile fm-icon link right hidden"></div>
@@ -215,6 +233,12 @@
                     <div class="mobile empty-icon folder"></div>
                     <div class="mobile empty-txt">[$7597]</div>
                 </div>
+
+                <!-- Empty rubbishbin block -->
+                <div class="mobile empty-rubbishbin-block template">
+                    <div class="mobile empty-icon folder"></div>
+                    <div class="mobile empty-txt">[$7740]</div>
+                </div>
             </div>
         </div>
     </div>
@@ -225,6 +249,7 @@
                 <input class="upload-select-file hidden" type="file">
             </div>
             <div class="mobile fm-icon mobile-create-new-folder right"></div>
+            <div class="mobile fm-icon rubbish-bin-highlight empty-rubbish-bin right hidden"></div>
         </div>
     </div>
 </div>
@@ -236,6 +261,7 @@
         <div class="mobile fm-block create-new-folder-dialog">
             <div class="mobile fm-row">
                 <div class="mobile fm-content">
+                    <img class="mobile filetype-img" alt="" src="{staticpath}images/mobile/extensions/folder.png" />
                     <div class="mobile first-message">[$17617]</div>
                     <div class="mobile folder-input-container">
                         <input class="mobile folder-name-input" type="text" maxlength="70" placeholder="[$157]">
@@ -245,9 +271,12 @@
                         </div>
                     </div>
                     <div class="mobile buttons">
-                        <a class="mobile red-button close-button"> <i></i> <span>[$148]</span> </a>
-                        <a class="mobile red-button create-folder confirm-ok-button"> <i></i> <span>[$158]</span> </a>
+                        <a class="mobile red-button first create-folder confirm-ok-button"> <i></i> <span class="label">[$158]</span>
+                        <span class="loading-image">
+                                    <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                                </span></a>
                     </div>
+                    <a class="mobile text-button third close-button"><span>[$148]</span> </a>
                 </div>
             </div>
         </div>
@@ -276,7 +305,7 @@
                     <span class="mobile text">[$6110]</span>
                 </a>
                 <a class="mobile red-button upload-another-file hidden"> <i></i> <span>[$17618]</span> </a>
-
+                <a class="mobile text-button third close-button"><span>[$148]</span> </a>
                 <!-- This remains hidden, only used as a template so the desktop upload code works -->
                 <table class="upload-table hidden">
                     <tr id="ul_8001" class="transfer-queued transfer-upload">
@@ -365,49 +394,91 @@
     </div>
 </div>
 
+<!-- RubbishBin Context Menu -->
+<div class="mobile context-menu-container rubbishbin hidden">
+    <div class="item-info"></div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item restore-item">
+        <div class="mobile fm-icon restore"></div>
+        <span class="mobile text">[$5726]</span>
+    </div>
+    <div class="context-menu-item delete-item">
+        <div class="mobile fm-icon rubbish-bin-highlight"></div>
+        <span class="mobile text">[$1730]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item close-button">
+        <div class="mobile fm-icon close"></div>
+        <span class="mobile text">[$148]</span>
+    </div>
+</div>
+
+<!-- Title DropDown Menu -->
+<div class="mobile title-menu-container hidden closed">
+    <div class="title-menu-item open-cloud-drive">
+        <div class="mobile fm-icon cloud-dark"></div>
+        <span class="mobile text">[$164]</span>
+    </div>
+    <div class="title-menu-item open-my-account">
+        <div class="mobile fm-icon account"></div>
+        <span class="mobile text">[$187]</span>
+    </div>
+    <div class="title-menu-item open-rubbish-bin">
+        <div class="mobile fm-icon rubbish-bin"></div>
+        <span class="mobile text">[$167]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="title-menu-item close-button">
+        <div class="mobile fm-icon close"></div>
+        <span class="mobile text">[$148]</span>
+    </div>
+</div>
 
 <!-- Photo preview overlay !-->
 <div class="mobile main-block slideshow-image-previewer hidden">
-    <div class="mobile slideshow-header">
-        <div class="mobile fm-dialog-close"></div>
-        <div class="mobile slideshow-text-right-block">
-            <div class="mobile slideshow-file-name"></div>
-            <div class="mobile slideshow-file-number-and-total"></div>
-        </div>
-    </div>
     <div class="mobile content-row">
         <div class="mobile content-cell">
-            <div class="mobile slideshow-wrapper">
-                <div class="mobile slide-show-navigation">
-                    <div class="mobile viewer-pending">
-                        <div class="bounce1"></div>
-                        <div class="bounce2"></div>
-                        <div class="bounce3"></div>
+            <div class="mobile bottom-page scroll-block download" id="mobile-gallery-video-block">
+                <div class="mobile slideshow-wrapper">
+                    <div class="mobile slide-show-navigation">
+                        <div class="mobile viewer-pending">
+                            <div class="bounce1"></div>
+                            <div class="bounce2"></div>
+                            <div class="bounce3"></div>
+                        </div>
+                        <div class="mobile slideshow-back-arrow"></div>
+                        <div class="mobile slideshow-forward-arrow"></div>
                     </div>
-                    <div class="mobile slideshow-back-arrow"></div>
-                    <div class="mobile slideshow-forward-arrow"></div>
-                </div>
-                <div class="mobile slides-bl">
-                    <div class="mobile slides left">
-                        <img alt="" />
+                    <div class="mobile slideshow-header">
+                        <div class="mobile fm-dialog-close"></div>
+                        <div class="mobile slideshow-text-right-block">
+                            <div class="mobile slideshow-file-name"></div>
+                            <div class="mobile slideshow-file-number-and-total"></div>
+                        </div>
                     </div>
-                    <div class="mobile slides mid">
-                        <img alt="" />
+                    <div class="mobile slides-bl">
+                        <div class="mobile slides left">
+                            <img alt="" />
+                        </div>
+                        <div class="mobile slides mid">
+                            <img alt="" />
+                        </div>
+                        <div class="mobile slides right">
+                            <img alt="" />
+                        </div>
                     </div>
-                    <div class="mobile slides right">
-                        <img alt="" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="mobile slideshow-buttons">
+                        <div class="mobile slideshow-buttons">
         <div class="mobile left-buttons">
             <div class="mobile fm-icon delete delete-button"></div>
+            <div class="mobile fm-icon rubbish-bin-highlight rubbishbin-delete-button hidden"></div>
         </div>
         <div class="mobile right-buttons">
             <div class="mobile fm-icon download download-button"></div>
             <div class="mobile fm-icon manage-link manage-link-button"></div>
+        </div>
+    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -418,7 +489,9 @@
     <div class="mobile fm-header fm-hr">
         <div class="mobile fm-icon top-icon account left"></div>
         <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon top-icon dropdown-handle open-title-menu right"></div>
         <div class="mobile fm-header-txt"><span>[$187]</span></div>
+
     </div>
     <div class="mobile content-row">
         <div class="mobile content-cell">
@@ -469,6 +542,22 @@
                 <div class="mobile fm-icon recovery-key"></div>
                 <div class="mobile recovery-key-heading">[$8839]</div>
                 <div class="mobile recovery-key-text">[$17688]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="mobile account-twofactor-block hidden"><!-- Add enabled class -->
+                <div class="mobile fm-icon lock"></div>
+                <div class="mobile two-factor-heading enabled">[$19290]</div>
+                <div class="mobile two-factor-heading disabled">[$19289]</div>
+                <div class="mobile two-factor-indication-wrapper">
+                    <span class="mobile two-factor-indicator"></span>
+                    <span class="mobile two-factor-text enabled">[$17601]</span>
+                    <span class="mobile two-factor-text disabled">[$7070]</span>
+                </div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="mobile account-session-history-block">
+                <div class="mobile fm-icon device"></div>
+                <div class="mobile two-factor-heading">[$429]</div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
             <div class="mobile acount-cancellation-block">
@@ -630,6 +719,78 @@
 </div>
 
 
+<!-- Session History page -->
+<div class="mobile main-block session-history-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$429]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile folders-files-text">
+                    <span class="sh-device-header">[$19303]</span>
+                    <span class="sh-status-header">[$89]</span>
+                     <span class="sh-date-header">[$482]</span>
+                    <span class="sh-location-header">[$481] &bull; [$480]</span>
+                </div>
+                <div class="mobile session-history-list">
+
+                    <!-- Template for Session History item - valid classes to add: current, active or expired -->
+                    <div class="mobile fm-item session-history template">
+                        <div class="mobile right sh-round-button">
+                            <span class="confirm-button">[$967]</span>
+                        </div>
+                        <div class="mobile right session-status info-badge">[$7665]</div>
+                        <div class="mobile right session-status inactive-badge">[$1664]</div>
+                        <div class="mobile fm-item-info">
+                            <div class="mobile sh-item-date"></div>
+                            <div class="mobile sh-item-device"></div>
+                            <div class="mobile sh-item-location">
+                                <div class="sh-item-icon">
+                                    <img alt="" />
+                                </div>
+                                <span class="sh-item-country"></span>
+                                <span class="sh-item-ip"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mobile fm-row bottom-action-bar-container">
+        <div class="mobile bottom-action-bar">
+           <div class="mobile sh-round-button close-other-sessions-button">
+            <span>[$7667]</span>
+           </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Session history Close All Other Sessions dialog -->
+<div class="mobile main-block generic-dialog-overlay sh-dialog hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile fm-icon device-history"></div>
+                <div class="mobile dialog-heading-text">[$882]</div>
+                <div class="mobile dialog-body-text">
+                    [$18513]
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile red-button first confirm-close-other-sessions-button"> <i></i> <span>[$7667]</span> </a>
+                </div>
+                 <a class="mobile text-button third cancel"><span>[$82]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- Forgot Password page - Method A-1 & Method B-1 of recovery process -->
 <div class="mobile main-block forgot-password-page hidden">
     <div class="mobile fm-header fm-hr">
@@ -679,7 +840,7 @@
                     </div>
                     <div class="mobile signin-input recover-account">
                         <span></span>
-                        <input class="recover-account-email" type="email" value="" placeholder="[$16343]">
+                        <input class="recover-account-email" type="email" value="" placeholder="[$16343]" maxlength="190">
                     </div>
                     <div class="mobile recover-account-btn-block">
                         <div class="mobile recover-account-email-send-btn">
@@ -809,7 +970,7 @@
                     <div class="mobile recover-account-body-text">[$1942]</div>
                     <div class="mobile signin-input recover-account">
                         <span></span>
-                        <input class="recover-account-email" type="email" value="" placeholder="[$16343]">
+                        <input class="recover-account-email" type="email" value="" placeholder="[$16343]" maxlength="190">
                     </div>
                     <div class="mobile recover-account-btn-block">
                         <div class="mobile recover-account-email-send-btn">
@@ -997,7 +1158,7 @@
                         <div class="mobile invite-friends-text">[$17466]</div>
                     </div>
                     <div class="mobile email-input-container">
-                        <input class="mobile email-input" type="email" placeholder="[$7434]">
+                        <input class="mobile email-input" type="email" placeholder="[$7434]" maxlength="190">
                         <div class="mobile email-warning-block hidden">
                             <div class="mobile fm-icon red-warning"></div>
                             <div class="mobile warning-text">[$1513]</div>
@@ -1049,6 +1210,7 @@
 <div class="mobile main-block hidden" id="mobile-ui-notFound">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
+            <div class="mobile fm-icon top-icon menu right"></div>
             <a class="mobile logo"></a>
             <div class="mobile white-block">
                 <img alt="" src="{staticpath}images/mobile/extensions/na.png" class="mobile filetype-img" />
@@ -1070,7 +1232,7 @@
             <div class="mobile fm-dialog-close hidden"></div>
             <div class="mobile white-block">
                 <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
-                <div class="mobile bottom-page scroll-block download">
+                <div class="mobile bottom-page scroll-block download" id="video-container">
                     <!-- Video player Elements-->
                     <div class="download video-block">
                         <div class="viewer-top-bl">
@@ -1118,8 +1280,10 @@
                         <div class="mobile filesize"></div>
                         <div class="mobile download-percents"></div>
                     </div>
-                    <a class="mobile red-button first dl-browser"> <i></i> <span>[$8947]</span> </a>
-                    <a class="mobile red-button second dl-megaapp"> <i></i> <span>[$8948]</span> </a>
+                    <div class="mobile buttons inline-buttons">
+                        <a class="mobile red-button second dl-browser"> <i></i> <span>[$8947]</span> </a>
+                        <a class="mobile red-button first dl-megaapp"> <i></i> <span>[$8948]</span> </a>
+                    </div>
                     <!-- Progressbar is hidden. "downloading" body class will show it !-->
                     <!-- Set width to ".bar" block !-->
                     <a class="mobile download-progress">
@@ -1140,9 +1304,21 @@
                     <div class="mobile application-txt file-manager-download-message hidden">
                         [$16107]
                     </div>
+                    <a class="mobile text-button third cancel hidden"><span>Close</span> </a>
                     <a class="mobile download-app"></a>
                 </div>
             </div>
+            <a class="mobile app-advertisement-block download-app">
+                <div class="mobile app-advertisement-aligner">
+                    <div class="mobile mega-app-icon">
+                        <i class="mobile white-mega-logo">
+                        </i>
+                    </div>
+                    <div class="mobile app-advertisement-text">
+                        <span>For a better experience, faster downloads and features like chat and sharing, try our app!</span>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
 </div>
@@ -1160,15 +1336,127 @@
                 <div class="mobile file-download-info">
                     <div class="mobile filesize"></div>
                 </div>
-                <div class="mobile buttons inline-buttons">
+                <div class="mobile buttons">
                     <a class="mobile red-button first delete"> <i></i> <span>[$1730]</span> </a>
-                    <a class="mobile red-button second cancel"> <i></i> <span>[$82]</span> </a>
                 </div>
+                 <a class="mobile text-button third cancel"><span>[$148]</span> </a>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Empty RubbishBin Overlay !-->
+<div class="mobile main-block hidden" id="mobile-ui-empty-rubbish-bin">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile empty-icon clear-rubbish-bin"></div>
+                <div class="mobile rb-empty-overlay-title dialog-heading-text">[$5599]</div>
+                <div class="mobile">
+                    <div class="mobile rb-empty-overlay-message dialog-body-text">[$15]</div>
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile red-button first empty"> <i></i> <span>[$1018]</span> </a>
+                </div>
+                <a class="mobile text-button third cancel"><span>[$148]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- File Conflict Overlay !-->
+<div class="mobile main-block hidden conflict-resolution-overlay" id="mobile-ui-file-conflict">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile dialog-header">
+                    <div class="mobile dialog-heading-text">[$16485]</div>
+                    <div class="mobile dialog-body-text overlay-description-text"></div>
+                    <div class="mobile dialog-body-text">[$16487]</div>
+                </div>
+                <div class="mobile actions-container">
+                    <div class="mobile action-container action-replace-item">
+                        <div class="mobile action-icon-wrapper">
+                            <img alt="" class="mobile action-icon" src="{staticpath}images/mobile/extensions/image.png" />
+                        </div>
+                        <div class="action-right-container">
+                            <div class="mobile action-title">[$16495]</div>
+                            <div class="mobile action-description">[$16497]</div>
+                        </div>
+                    </div>
+                    <div class="mobile action-container action-skip-item">
+                        <div class="mobile action-icon-wrapper">
+                            <img alt="" class="mobile action-icon" src="{staticpath}images/mobile/extensions/image.png" />
+                        </div>
+                        <div class="action-right-container">
+                            <div class="mobile action-title">[$16499]</div>
+                            <div class="mobile action-description">[$19784]</div>
+                        </div>
+                    </div>
+                    <div class="mobile action-container action-rename-item">
+                        <div class="mobile action-icon-wrapper">
+                            <img alt="" class="mobile action-icon" src="{staticpath}images/mobile/extensions/image.png" />
+                        </div>
+                        <div class="action-right-container">
+                            <div class="mobile action-title">[$17096]</div>
+                            <div class="mobile action-description">[$16514]</div>
+                            <div class="mobile action-description detail-new-item-name"></div>
+                        </div>
+                    </div>
+                    <div class="mobile repeat-action-container hidden">
+                        <div class="checkboxOff square"><i></i><input class="checkbox repeat-action-control" type="checkbox"></div>
+                        <div class="checkbox-label text">
+                            [$16494]
+                        </div>
+                    </div>
+                </div>
+                <a class="mobile text-button third cancel"><span>[$148]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Folder Conflict Overlay !-->
+<div class="mobile main-block hidden conflict-resolution-overlay" id="mobile-ui-folder-conflict">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile dialog-header">
+                    <div class="mobile dialog-heading-text">[$16485]</div>
+                    <div class="mobile dialog-body-text overlay-description-text"></div>
+                    <div class="mobile dialog-body-text">[$17556]</div>
+                </div>
+                <div class="mobile actions-container">
+                    <div class="mobile action-container action-replace-item">
+                        <div class="mobile action-icon-wrapper">
+                            <img alt="" class="mobile action-icon" src="{staticpath}images/mobile/extensions/folder.png" />
+                        </div>
+                        <div class="action-right-container">
+                            <div class="mobile action-title">[$17553]</div>
+                            <div class="mobile action-description">[$17554]</div>
+                        </div>
+                    </div>
+                    <div class="mobile action-container action-skip-item">
+                        <div class="mobile action-icon-wrapper">
+                            <img alt="" class="mobile action-icon" src="{staticpath}images/mobile/extensions/folder.png" />
+                        </div>
+                        <div class="action-right-container">
+                            <div class="mobile action-title">[$16499]</div>
+                            <div class="mobile action-description">[$19785]</div>
+                        </div>
+                    </div>
+                </div>
+                <a class="mobile text-button third cancel"><span>[$148]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- File export overlay !-->
 <div class="mobile main-block hidden" id="mobile-ui-copy-link">
@@ -1187,7 +1475,7 @@
                     <a class="mobile red-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
                     <a class="mobile red-button second remove disabled"> <i></i> <span>[$6821]</span> </a>
                 </div>
-                 <a class="mobile text-button third cancel"><span>Close</span> </a>
+                 <a class="mobile text-button third cancel"><span>[$148]</span> </a>
             </div>
         </div>
     </div>
@@ -1201,10 +1489,11 @@
             <a class="mobile logo"></a>
             <div class="mobile white-block">
                 <div class="mobile error-messages">
-                    <div class="first-message"></div><br>
-                    <div class="optional-second-message"></div>
+                    <div class="mobile first-message"></div><br>
+                    <div class="mobile optional-second-message"></div>
                 </div>
                 <a class="mobile red-button first confirm-ok-button"> <i></i> <span>[$1596]</span> </a>
+                <a class="mobile text-button third cancel hidden"><span>Close</span> </a>
             </div>
         </div>
     </div>
@@ -1215,6 +1504,7 @@
 <div class="mobile main-block error-overlay hidden" id="mobile-decryption-key-overlay">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
+            <div class="mobile fm-icon top-icon menu right"></div>
             <a href="" class="mobile logo"></a>
             <div class="mobile white-block">
                 <div class="mobile overlay-info initial-message hidden">
@@ -1239,6 +1529,7 @@
 <div class="mobile main-block error-overlay hidden" id="mobile-password-decryption-overlay">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
+            <div class="mobile fm-icon top-icon menu right"></div>
             <a href="" class="mobile logo"></a>
             <div class="mobile white-block">
                 <div class="mobile overlay-info initial-message">
@@ -1278,7 +1569,7 @@
                         <form>
                             <div class="mobile signin-input login">
                                 <span></span>
-                                <input type="email" value="" placeholder="[$16343]" />
+                                <input type="email" value="" placeholder="[$16343]" maxlength="190" />
                             </div>
                             <div class="mobile signin-input password">
                                 <span></span>
@@ -1314,7 +1605,7 @@
                             </div>
                             <div class="mobile signin-input email-address">
                                 <span></span>
-                                <input type="email" value="" placeholder="[$1331]" />
+                                <input type="email" value="" placeholder="[$1331]" maxlength="190" />
                                 <i class="warning-icon"></i>
                             </div>
                             <div class="mobile signin-input password">
@@ -1387,7 +1678,7 @@
                         [$217]
                     </div>
                     <div class="change-email">
-                        <input type="text">
+                        <input type="text" maxlength="190">
                     </div>
                     <div class="instruction-message">
                         [$9029]
@@ -1434,7 +1725,7 @@
 <div class="mobile fm-block membership-step2 hidden">
     <div class="mobile fm-row">
         <div class="mobile fm-header fm-hr">
-            <div class="mobile fm-icon mega left"></div>
+            <div class="mobile fm-icon back left js-back-to-plans"></div>
             <div class="mobile fm-icon top-icon menu right"></div>
             <div class="mobile fm-header-txt"><span>[$16111]</span></div>
         </div>
@@ -1442,10 +1733,6 @@
     <div class="mobile fm-row">
         <div class="mobile fm-content">
             <div class="mobile fm-scrolling">
-                <div class="mobile link-block back js-back-to-plans">
-                    <i class="mobile icon red-back"></i>
-                    Back to plans
-                </div>
                 <div class="mobile page-title">[$6975]</div>
                 <div class="mobile payment-options-container">
                     <div class="mobile payment-options">
@@ -1501,11 +1788,11 @@
                                                         </div>
                                                         <div class="membership-radio-label">
                                                             <span class="duration">[$922]</span>
-                                                            <strong><span class="price">0.00</span> &euro;</strong>
+                                                            <strong><span class="price">0.00</span></strong>
                                                         </div>
                                                         <div class="clear"></div>
                                                         <div class="save-money hidden">
-                                                            [$16649] &euro;
+                                                            [$16649]
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2074,7 +2361,7 @@
                     </p>
                     <p>
                         <span class="number">25</span>
-                        <span class="text">To file a counter-notice with us, you must provide a written communication to <a href="mailto:copyright@mega.nz">copyright@mega.nz</a> that includes substantially the following.</span>
+                        <span class="text">To file a counter-notification with us, you must provide a written communication at <a href="/dispute" class="clickurl">https://mega.nz/dispute</a> that sets forth the items specified below.</span>
                     </p>
                     <p class="list">
                         <span class="number">25.1</span>
@@ -2384,6 +2671,7 @@
     </div>
 </div>
 
+
 <!-- Get Support page -->
 <div class="mobile main-block get-support hidden">
     <div class="mobile fm-header fm-hr">
@@ -2429,3 +2717,322 @@
     </div>
 </div>
 
+
+<!-- Introduction page to setting up Two Factor Authentication -->
+<div class="mobile main-block two-factor-page intro-page hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile fm-icon tfa-lock"></div>
+                <div class="mobile dialog-heading-text">[$19202]</div>
+                <div class="mobile dialog-body-text">
+                    [$19203]
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile red-button first setup-two-factor-button"> <i></i> <span>[$19204]</span> </a>
+                </div>
+                 <a class="mobile text-button third cancel"><span>[$82]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Authentication Setup page  -->
+<div class="mobile main-block two-factor-page setup-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$19194]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="two-factor-qr-block">
+                    <div class="mobile two-factor-heading">[$19204]</div>
+                    <div class="mobile two-factor-body-text">
+                        [$19205]
+                        <span class="no-auth-app-button">[$19565]</span>
+                    </div>
+                    <div class="mobile two-factor-qr-code-wrapper">
+                        <div class="qr-code-img"></div>
+                        <div class="mobile two-factor-qr-seed-container">
+                            <textarea id="two-factor-qr-seed" class="mobile two-factor-qr-seed" readonly></textarea>
+                        </div>
+                        <div class="mobile cta-button red two-factor-next-btn active">[$556]</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Select Authenticator App dialog on the 2FA Setup page -->
+<div class="mobile auth-app-select-dialog hidden">
+    <div class="mobile explanation">[$19566]</div>
+    <div class="mobile app-link authy">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Authy</span>
+        <span class="mobile app-link-arrow"></span>
+    </div>
+    <div class="mobile app-link duomobile">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Duo Mobile</span>
+        <span class="mobile app-link-arrow"></span>
+    </div>
+    <div class="mobile app-link googleauthenticator">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Google Authenticator</span>
+        <span class="mobile app-link-arrow"></span>
+    </div>
+    <div class="mobile app-link microsoftauthenticator">
+        <span class="mobile app-link-icon"></span>
+        <span class="mobile app-link-text">Microsoft Authenticator</span>
+        <span class="mobile app-link-arrow"></span>
+    </div>
+    <div class="mobile separator-line"></div>
+    <div class="mobile cancel-button">
+        <span class="mobile cancel-button-icon"></span>
+        <span class="mobile cancel-button-text">Close</span>
+    </div>
+</div>
+
+
+<!-- Two-Factor Authentication Seed verification page  -->
+<div class="mobile main-block two-factor-page verify-setup-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$19194]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="two-factor-qr-block">
+                    <div class="mobile two-factor-heading">[$19204]</div>
+                    <div class="mobile two-factor-body-text">
+                        [$19212]
+                    </div>
+                    <div class="mobile two-factor-verify-seed-wrapper">
+                        <div class="mobile signin-input two-factor-seed-input">
+                            <input type="number" value="" placeholder="[$19193]" maxlength="6" />
+                        </div>
+                        <div class="mobile warning-text-field hidden">
+                            [$19210]
+                        </div>
+                         <div class="mobile cta-button red two-factor-verify-btn">
+                            <span class="label">[$1960]</span>
+                            <span class="loading-image">
+                                <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Enabled page -->
+<div class="mobile main-block two-factor-page enabled-page hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile white-block">
+                <div class="mobile fm-icon tfa-lock">
+                    <div class="mobile green-check">
+                        <div class="mobile fm-icon check-mark"></div>
+                    </div>
+                </div>
+                <div class="mobile dialog-heading-text">[$19206]</div>
+                <div class="mobile dialog-body-text">
+                    [$19207]
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile red-button first ok-button"> <i></i> <span>[$81]</span> </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Authentication disable page  -->
+<div class="mobile main-block two-factor-page verify-disable-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$19194]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="two-factor-qr-block">
+                    <div class="mobile two-factor-heading">[$19208]</div>
+                    <div class="mobile two-factor-body-text">
+                        [$19209]
+                    </div>
+                    <div class="mobile two-factor-verify-seed-wrapper">
+                        <div class="mobile signin-input two-factor-seed-input">
+                            <input type="number" value="" placeholder="[$19193]" maxlength="6" />
+                        </div>
+                        <div class="mobile warning-text-field hidden">
+                            [$19210]
+                        </div>
+                         <div class="mobile cta-button red two-factor-verify-btn">
+                            <span class="label">[$1960]</span>
+                            <span class="loading-image">
+                                <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Disabled page -->
+<div class="mobile main-block two-factor-page disabled-page hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile white-block">
+                 <div class="mobile fm-icon tfa-lock">
+                    <div class="mobile red-check">
+                        <div class="mobile fm-icon check-mark">+</div>
+                    </div>
+                </div>
+                <div class="mobile dialog-heading-text">[$19211]</div>
+                <div class="mobile buttons">
+                    <a class="mobile red-button first ok-button"> <i></i> <span>[$81]</span> </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Authentication Login verification page  -->
+<div class="mobile main-block two-factor-page verify-login-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon mega left"></div>
+        <div class="mobile fm-header-txt"><span>[$171]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="two-factor-qr-block">
+                    <div class="mobile two-factor-heading">[$19213]</div>
+                    <div class="mobile two-factor-body-text">
+                        [$19214]
+                    </div>
+                    <div class="mobile two-factor-verify-seed-wrapper">
+                        <div class="mobile signin-input two-factor-seed-input">
+                            <input class="two-factor-login-input" type="number" value="" placeholder="[$19193]" maxlength="6" />
+                        </div>
+                        <div class="mobile warning-text-field hidden">
+                            [$19210]
+                        </div>
+                         <div class="mobile cta-button red two-factor-verify-btn">
+                            <span class="label">[$1960]</span>
+                            <span class="loading-image">
+                                <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mobile lost-authenticator-button">[$19215]</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Two-Factor Authentication verify account action -->
+<div class="mobile main-block two-factor-page verify-action-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon mega left"></div>
+        <div class="mobile fm-header-txt"><span>[$1960]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="two-factor-qr-block">
+                    <div class="mobile two-factor-heading">[$19194]</div>
+                    <div class="mobile two-factor-body-text">
+                        [$19214]
+                    </div>
+                    <div class="mobile two-factor-verify-seed-wrapper">
+                        <div class="mobile signin-input two-factor-seed-input">
+                            <input value="" placeholder="[$19193]" class="two-factor-login-input" type="number" maxlength="6">
+                        </div>
+                        <div class="mobile warning-text-field hidden">
+                            [$19210]
+                        </div>
+                         <div class="mobile cta-button red two-factor-verify-btn">
+                            <span class="label">[$1960]</span>
+                            <span class="loading-image">
+                                <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video Block template -->
+<div class="mobile-video-template">
+    <div class="download video-block hidden">
+        <div class="download play-video-button"></div>
+        <video data-autoplayvideo="false" class="mobile-gallery" data-playvideoonclick="false"></video>
+        <div class="viewer-bottom-bl">
+            <div class="video-controls" data-state="hidden">
+                <div data-state="play" class="viewer-button left playpause">
+                    <i class="medium-icon icons-img play"></i>
+                </div>
+                <div class="volume-control left hidden" style="">
+                  <div data-state="mute" class="viewer-button mute">
+                        <i class="medium-icon icons-img volume"></i>
+                    </div>
+                    <div class="video-vol-range">
+                        <div class="volume-bar"><span style="height: 100%;"></span></div>
+                    </div>
+                </div>
+                <div class="video-timing current left">00:00</div>
+                <div data-state="go-fullscreen" class="viewer-button right fs">
+                    <i class="medium-icon icons-img fullscreen"></i>
+                </div>
+                <div class="video-timing duration right">03:09</div>
+                <div class="video-progress-block">
+                   <div class="video-progress-bar">
+                       <div class="video-time-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Public Service Announcement -->
+<div class="mobile bottom-info body public-service-anouncement">
+    <div class="mobile bottom-info content">
+        <div class="mobile bottom-info column">
+            <img class="mobile bottom-info display-icon" />
+        </div>
+        <div class="mobile bottom-info column text-column">
+            <h4 class="mobile bottom-info title"></h4>
+            <div class="mobile bottom-info messageA"></div>
+            <div class="mobile bottom-info button view-more-info" data-continue-link="">
+                <span class="mobile bottom-info text"></span>
+            </div>
+        </div>
+        <div class="mobile bottom-info fm-dialog-close"></div>
+    </div>
+</div>

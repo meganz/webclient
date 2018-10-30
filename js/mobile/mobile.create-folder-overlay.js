@@ -30,11 +30,11 @@ mobile.createFolderOverlay = {
         this.initFolderNameTextFieldKeyup();
 
         // Show the Create Folder overlay and the background white overlay
-        this.$overlay.removeClass('hidden');
+        this.$overlay.removeClass('hidden').addClass('overlay');
         this.$lightBackgroundOverlay.removeClass('hidden');
 
         // Clear the input from old dialog openings and open the keyboard for typing
-        this.$overlay.find('.folder-name-input').val('').focus();
+        this.$overlay.find('.folder-name-input').val('').trigger("focus");
     },
 
     /**
@@ -75,15 +75,17 @@ mobile.createFolderOverlay = {
                 $folderNameWarningText.text(l[5644]);           // Folder already exists
             }
             else {
-                // Show loading dialog
-                loadingDialog.show();
+
+
+                // Hide the text and show a loading spinner
+                $createFolderButton.addClass('loading');
 
                 // Try creating the folder
                 M.createFolder(M.currentdirid, trimmedFolderName, promise)
                     .always(function(result) {
 
-                        // Hide the loading dialog
-                        loadingDialog.hide();
+                        // Hide the loading dialog and loading button
+                        $createFolderButton.removeClass('loading');
 
                         // If there was an error, hide loading dialog and show error message
                         if (typeof result === 'number') {
@@ -98,7 +100,7 @@ mobile.createFolderOverlay = {
 
                             // Click out of the input to hide the on screen keyboard which
                             // is a bug on mobile Firefox with the keyboard not closing
-                            $folderNameInput.blur();
+                            $folderNameInput.trigger("blur");
 
                             // Show message 'Folder created'
                             mobile.showToast(l[5645]);
@@ -140,7 +142,7 @@ mobile.createFolderOverlay = {
 
             // Click out of the input to hide the on screen keyboard which
             // fixes a bug on mobile Firefox with the keyboard not closing
-            $folderNameInput.blur();
+            $folderNameInput.trigger("blur");
 
             // Prevent double taps
             return false;

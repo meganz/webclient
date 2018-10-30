@@ -23,8 +23,19 @@ var redeem = {
         redeem.$backgroundOverlay = $('.fm-dialog-overlay');
         redeem.$successOverlay = $('.payment-result.success');
 
-        // Init functions
-        redeem.addVoucher();
+        // confirm with the user, that this is right account to redeem the code.
+        var rdmConfirmMsg = l[19328].replace('%1', escapeHTML(u_attr.email));
+        msgDialog('confirmation', l[458], rdmConfirmMsg, '', function(e) {
+            if (e) {
+                // Init functions
+                redeem.addVoucher();
+            }
+            else {
+                delete localStorage.voucher;
+                redeem.hideBackgroundOverlay();
+                loadSubPage('contact');
+            }
+        });
     },
 
     /**
@@ -137,7 +148,11 @@ var redeem = {
                         result[i]['m'],  // months
                         result[i]['p'],  // price
                         result[i]['c'],  // currency
-                        result[i]['mbp'] // monthly base price
+                        result[i]['mbp'], // monthly base price
+                        result[i]['lp'], // NEW 'local price'
+                        result[i]['lpc'], // NEW 'local price currency'
+                        result[i]['lps'], // NEW 'local price symbol'
+                        result[i]['lp0']
                     ]);
                 }
 
@@ -368,6 +383,8 @@ var redeem = {
         redeem.showBackgroundOverlay();
         redeem.$successOverlay.removeClass('hidden');
         redeem.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
+
+        insertEmailToPayResult(redeem.$successOverlay);
 
         // Add click handlers for 'Go to my account' and Close buttons
         redeem.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {

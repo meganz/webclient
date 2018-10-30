@@ -5,42 +5,32 @@ var extensions = {
     'audio': [['mp3', 'wav', '3ga', 'aif', 'aiff', 'flac', 'iff', 'm4a', 'wma'], 'Audio'],
     'cad': [['dxf', 'dwg'], 'CAD'],
     'compressed': [['zip', 'rar', 'tgz', 'gz', 'bz2', 'tbz', 'tar', '7z', 'sitx'], 'Compressed'],
-    'database': [['sql', 'accdb', 'db', 'dbf', 'mdb', 'pdb'], 'Database'],
-    'dreamweaver': [['dwt'], 'Database'],
+    'dmg': [['dmg'], 'Disk Image'],
     'excel': [['xls', 'xlsx', 'xlt', 'xltm'], 'Excel'],
-    'executable': [['exe', 'com', 'bin', 'apk', 'app', 'msi', 'cmd', 'gadget', 'dmg'], 'Executable'],
-    'fla-lang': [['as', 'ascs', 'asc'], 'ActionScript'],
-    'flash': [['fla'], 'Flash'],
+    'executable': [['exe', 'com', 'bin', 'apk', 'app', 'msi', 'cmd', 'gadget'], 'Executable'],
     'font': [['fnt', 'otf', 'ttf', 'fon'], 'Font'],
     'generic': [['*'], 'File'],
-    'gis': [['gpx', 'kml', 'kmz'], 'GPS File'],
-    'graphic': [['gif', 'tiff', 'tif', 'bmp', 'png', 'tga'], 'Image'],
-    'html': [['html', 'htm', 'dhtml', 'xhtml'], 'HTML'],
     'illustrator': [['ai', 'ait'], 'Adobe Illustrator'],
-    'image': [['jpg', 'jpeg'], 'Image'],
+    'image': [['gif', 'tiff', 'tif', 'bmp', 'png', 'tga', 'jpg', 'jpeg', 'heic', 'webp'], 'Image'],
     'indesign': [['indd'], 'Adobe InDesign'],
-    'java': [['jar', 'java', 'class'], 'Java'],
-    'midi': [['mid', 'midi'], 'Midi'],
+    'keynote': [['key'], 'Apple Keynote'],
+    'numbers': [['numbers'], 'Apple Numbers'],
+    'openoffice': [['sxw', 'stw', 'sxc', 'stc', 'sxi', 'sti', 'sxd', 'std', 'sxm'], 'OpenOffice'],
+    'pages': [['pages'], 'Apple Pages'],
     'pdf': [['pdf'], 'PDF'],
     'photoshop': [['abr', 'psb', 'psd'], 'Adobe Photoshop'],
-    'playlist': [['pls', 'm3u', 'asx'], 'Playlist'],
-    'podcast': [['pcast'], 'Podcast'],
     'powerpoint': [['pps', 'ppt', 'pptx'], 'Powerpoint'],
     'premiere': [['prproj', 'ppj'], 'Adobe Premiere'],
     'raw': [['3fr', 'arw', 'bay', 'cr2', 'dcr', 'dng', 'fff', 'mef', 'mrw', 'nef', 'pef', 'rw2', 'srf', 'orf', 'rwl'], 'RAW'],
-    'real-audio': [['rm', 'ra', 'ram'], 'Real Audio'],
-    'sourcecode': [['sh', 'c', 'cc', 'cpp', 'cxx', 'h', 'hpp', 'dll', 'iso'], 'Source code'],
-    'spreadsheet': [['ods', 'ots', 'gsheet', 'nb', 'xlr', 'numbers'], 'Spreadsheet'],
-    'swf': [['swf'], 'SWF'],
+    'sketch': [['sketch'], 'Sketch'],
+    'spreadsheet': [['ods', 'ots', 'gsheet', 'nb', 'xlr'], 'Spreadsheet'],
     'torrent': [['torrent'], 'Torrent'],
     'text': [['txt', 'rtf', 'ans', 'ascii', 'log', 'odt', 'wpd'], 'Text', 'pages'],
-    'vcard': [['vcf'], 'Vcard'],
     'vector': [['svgz', 'svg', 'cdr', 'eps'], 'Vector'],
-    'video': [['mkv', 'webm', 'avi', 'mp4', 'm4v', 'mpg', 'mpeg', 'mov', '3g2', '3gp', 'asf', 'wmv'], 'Video'],
-    'flash-video': [['flv'], 'Flash Video'],
-    'video-subtitle': [['srt'], 'Subtitle'],
-    'web-data': [['html', 'xml', 'shtml', 'dhtml', 'js', 'css'], 'Web Client Code'],
-    'web-lang': [['php', 'php3', 'php4', 'php5', 'phtml', 'inc', 'asp', 'pl', 'cgi', 'py'], 'Web Server Code'],
+    'video': [['mkv', 'webm', 'avi', 'mp4', 'm4v', 'mpg', 'mpeg', 'mov', '3g2', '3gp', 'asf', 'wmv', 'vob'], 'Video'],
+    'web-data': [['html', 'xml', 'shtml', 'dhtml', 'js', 'css', 'jar', 'java', 'class'], 'Web Client Code'],
+    'web-lang': [['php', 'php3', 'php4', 'php5', 'phtml', 'inc', 'asp', 'pl', 'cgi', 'py', 'sql',
+        'accdb','db','dbf','mdb','pdb'], 'Web Server Code'],
     'word': [['doc', 'docx', 'dotx', 'wps'], 'MS Word']
 };
 
@@ -90,6 +80,7 @@ var extdesc = {
     'dhtml': 'Dynamic HTML',
     'dll': 'Dynamic Link Library',
     'dng': 'Digital Negative',
+    'dmg': 'Mac OS disk Image',
     'doc': 'MS Word',
     'docx': 'MS Word',
     'dotx': 'MS Word Template',
@@ -110,6 +101,7 @@ var extdesc = {
     'gsheet': 'Spreadsheet',
     'gz': 'Gnu Compressed',
     'h': 'Header',
+    'heic': 'High Efficiency Image',
     'hpp': 'Header',
     'htm': 'HTML Document',
     'html': 'HTML Document',
@@ -122,6 +114,7 @@ var extdesc = {
     'jpeg': 'JPEG Image',
     'jpg': 'JPEG Image',
     'js': 'JavaScript',
+    'key': 'Apple Keynote',
     'kml': 'Keyhole Markup',
     'log': 'Log',
     'm3u': 'Media Playlist',
@@ -180,11 +173,21 @@ var extdesc = {
     'shtml': 'Server HTML',
     'sitx': 'X Compressed',
     'sql': 'SQL Database',
+    'sketch': 'Sketch',
     'srf': 'Sony RAW Image',
     'srt': 'Subtitle',
+    'stc': 'OpenOffice',
+    'std': 'OpenOffice',
+    'sti': 'OpenOffice',
+    'stw': 'OpenOffice',
     'svg': 'Vector Image',
     'svgz': 'Vector Image',
     'swf': 'Flash Movie',
+    'sxc': 'OpenOffice',
+    'sxd': 'OpenOffice',
+    'sxi': 'OpenOffice',
+    'sxm': 'OpenOffice',
+    'sxw': 'OpenOffice',
     'tar': 'Archive',
     'tbz': 'Compressed',
     'tga': 'Targa Graphic',
@@ -195,8 +198,10 @@ var extdesc = {
     'ttf': 'TrueType Font',
     'txt': 'Text Document',
     'vcf': 'vCard',
+    'vob': 'DVD-Video',
     'wav': 'Wave Audio',
     'webm': 'WebM Video',
+    'webp': 'WebP Image',
     'wma': 'WM Audio',
     'wmv': 'WM Video',
     'wpd': 'WordPerfect',
@@ -288,6 +293,8 @@ var extmime = {
     "h261": "video/h261",
     "h263": "video/h263",
     "h264": "video/h264",
+    "heif": "image/heif",
+    "heic": "image/heic",
     "htm": "text/html",
     "html": "text/html",
     "ico": "image/x-icon",
@@ -524,6 +531,10 @@ function fileIcon(node) {
     if (node.t) {
         if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
             icon = 'folder-shared';
+
+            if(is_mobile){
+                icon = 'outgoing-share-folder';
+            }
         }
         else if ( mega.megadrop.pufs[node.h] && mega.megadrop.pufs[node.h].s !== 1) {
             icon = 'puf-folder';
@@ -542,19 +553,19 @@ function fileIcon(node) {
     return icon;
 }
 
-function fileext(name) {
+function fileext(name, upper, iknowwhatimdoing) {
+    'use strict';
 
-    var ext;
-
+    name = String(name || '');
     if (!name) {
         name = 'unknown';
     }
 
-    ext = name.substr(name.lastIndexOf('.') + 1);
+    var ext = name.substr(name.lastIndexOf('.') + 1);
     if (ext === name) {
         ext = '';
     }
-    else {
+    else if (!iknowwhatimdoing) {
         ext = ext
             .replace(/<[^>]*>/g, '')
             .replace(/[^\w+]/g, '');
@@ -564,5 +575,5 @@ function fileext(name) {
         }
     }
 
-    return ext.toLowerCase();
+    return upper ? ext.toUpperCase() : ext.toLowerCase();
 }

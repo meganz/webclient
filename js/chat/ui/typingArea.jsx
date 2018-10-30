@@ -556,7 +556,7 @@ var TypingArea = React.createClass({
         var room = this.props.chatRoom;
 
         if (room.isCurrentlyActive && self.isMounted()) {
-            if ($('textarea:focus,select:focus,input:focus').filter(":visible").size() === 0) {
+            if ($('textarea:focus,select:focus,input:focus').filter(":visible").length === 0) {
                 // no other element is focused...
                 this.focusTypeArea();
             }
@@ -633,7 +633,6 @@ var TypingArea = React.createClass({
         var viewLimitTop = 0;
         var scrPos = 0;
         var viewRatio = 0;
-
 
 
         // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
@@ -726,6 +725,11 @@ var TypingArea = React.createClass({
                 jsp.scrollToY(textareaCloneSpanHeight - self.textareaLineHeight);
             } else if (jsp) {
                 jsp.scrollToY(0);
+
+                // because jScrollPane may think that there is no scrollbar, it would NOT scroll back to 0?!
+                if (scrPos < 0) {
+                    $textareaScrollBlock.find('.jspPane').css('top', 0);
+                }
             }
         }
 
@@ -827,12 +831,13 @@ var TypingArea = React.createClass({
             height: self.state.textareaHeight
         };
 
-        var textareaScrollBlockStyles = {
-            height: Math.min(
-                    self.state.textareaHeight,
-                    self.getTextareaMaxHeight()
-                )
-        };
+        var textareaScrollBlockStyles = {};
+        var newHeight = Math.min(self.state.textareaHeight, self.getTextareaMaxHeight());
+
+        if (newHeight > 0) {
+            textareaScrollBlockStyles['height'] = newHeight;
+        }
+
 
         var emojiAutocomplete = null;
         if (self.state.emojiSearchQuery) {
@@ -899,6 +904,8 @@ var TypingArea = React.createClass({
                 }}
             />;
         }
+        var placeholder = l[18669];
+        placeholder = placeholder.replace("%s", room.getRoomTitle(false, true));
 
         return <div className={"typingarea-component" + self.props.className}>
             <div className={"chat-textarea " + self.props.className}>
@@ -923,7 +930,8 @@ var TypingArea = React.createClass({
                      style={textareaScrollBlockStyles}>
                     <textarea
                         className={messageTextAreaClasses}
-                        placeholder={__(l[8009])}
+                        placeholder={placeholder}
+                        roomTitle={room.getRoomTitle()}
                         onKeyUp={self.onTypeAreaKeyUp}
                         onKeyDown={self.onTypeAreaKeyDown}
                         onBlur={self.onTypeAreaBlur}

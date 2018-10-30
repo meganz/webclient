@@ -2,13 +2,16 @@ var React = require("react");
 var utils = require('./../../../ui/utils.jsx');
 var getMessageString = require('./utils.jsx').getMessageString;
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
+var MetaRichpreview = require('./metaRichpreview.jsx').MetaRichpreview;
+var MetaRichpreviewConfirmation = require('./metaRichpreviewConfirmation.jsx').MetaRichpreviewConfirmation;
+var MetaRichpreviewMegaLinks = require('./metaRichpreviewMegaLinks.jsx').MetaRichpreviewMegaLinks;
 var ContactsUI = require('./../contacts.jsx');
 var TypingAreaUI = require('./../typingArea.jsx');
 
 /* 1h as confirmed by Mathias */
 var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
 
-var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.medium';
+var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.semi-big, .data-block-view.medium';
 
 var NODE_DOESNT_EXISTS_ANYMORE = {};
 
@@ -27,8 +30,8 @@ var GenericConversationMessage = React.createClass({
         if (self.isBeingEdited() && self.isMounted()) {
             var $generic = $(self.findDOMNode());
             var $textarea = $('textarea', $generic);
-            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
-                $textarea.focus();
+            if ($textarea.length > 0 && !$textarea.is(":focus")) {
+                $textarea.trigger("focus");
                 moveCursortoToEnd($textarea[0]);
             }
             if (!oldState.editing) {
@@ -60,18 +63,22 @@ var GenericConversationMessage = React.createClass({
         if (self.isBeingEdited() && self.isMounted()) {
             var $generic = $(self.findDOMNode());
             var $textarea = $('textarea', $generic);
-            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
-                $textarea.focus();
+            if ($textarea.length > 0 && !$textarea.is(":focus")) {
+                $textarea.trigger("focus");
                 moveCursortoToEnd($textarea[0]);
             }
         }
 
-        $node.delegate(
-            CLICKABLE_ATTACHMENT_CLASSES,
+        $node.rebind(
             'click.dropdownShortcut',
+            CLICKABLE_ATTACHMENT_CLASSES,
             function(e){
                 if (e.target.classList.contains('button')) {
                     // prevent recursion
+                    return;
+                }
+                if (e.target.classList.contains('no-thumb-prev')) {
+                    // do now show the dropdown clicking a previeable item without thumbnail
                     return;
                 }
 
@@ -99,8 +106,8 @@ var GenericConversationMessage = React.createClass({
         var self = this;
         var $node = $(self.findDOMNode());
 
-        $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
-        $node.undelegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut');
+        $(self.props.message).off('onChange.GenericConversationMessage' + self.getUniqueId());
+        $node.off('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES);
     },
     _nodeUpdated: function(h) {
         var self = this;
@@ -218,16 +225,67 @@ var GenericConversationMessage = React.createClass({
     _startDownload: function(v) {
         M.addDownload([v]);
     },
-    _addToCloudDrive: function(v) {
-        M.injectNodes(v, M.RootID, function(res) {
-            if (res === 0) {
-                msgDialog(
-                    'info',
-                    __(l[8005]),
-                    __(l[8006])
-                );
+    _addToCloudDrive: function(v, openSendToChat) {
+        openSaveToDialog(v, function(node, target) {
+            if (Array.isArray(target)) {
+                megaChat.getMyChatFilesFolder()
+                    .then(function(myChatFolderId) {
+                        M.injectNodes(node, myChatFolderId, function(res) {
+                            if (!Array.isArray(res)) {
+                                if (d) {
+                                    console.error("Failed to inject nodes. Res:", res);
+                                }
+                                return;
+                            }
+
+                            var lastRoom;
+                            for (var i = target.length; i--;) {
+                                var room = megaChat.chats[target[i]];
+                                if (room) {
+                                    room.attachNodes(res);
+                                    lastRoom = room;
+                                }
+                                else {
+                                    console.warn('Invalid room...', target[i]);
+                                }
+                            }
+
+                            if (lastRoom) {
+                                showToast('send-chat', (res.length > 1) ? l[17767] : l[17766]);
+                                M.openFolder('chat/' + (lastRoom.type === 'group' ? 'g/' : '') + lastRoom.roomId);
+                            }
+                        })
+                    })
+                    .catch(function() {
+                        if (d) {
+                            console.error("Failed to allocate 'My chat files' folder.", arguments);
+                        }
+                    });
+
             }
-        });
+            else {
+                // is a save/copy to
+                target = target || M.RootID;
+                M.injectNodes(node, target, function(res) {
+                    if (!Array.isArray(res)) {
+                        if (d) {
+                            console.error("Failed to inject nodes. Res:", res);
+                        }
+                    }
+                    else {
+                        if (target === M.RootID) {
+                            // since if the user clicks Save without picking, its a bit weird, where the file went
+                            // we show a simple dialog telling him the file is in Cloud Drive.
+                            msgDialog(
+                                'info',
+                                l[8005],
+                                l[8006]
+                            );
+                        }
+                    }
+                });
+            }
+        }, openSendToChat ? "conversations" : false);
     },
 
     _getLink: function(h, e) {
@@ -258,14 +316,16 @@ var GenericConversationMessage = React.createClass({
     },
 
     _startPreview: function(v, e) {
-        var chatRoom = this.props.message.chatRoom;
+        if ($(e && e.target).is('.tiny-button')) {
+            // prevent launching the previewer clicking the dropdown on an previewable item without thumbnail
+            return;
+        }
         assert(M.chat, 'Not in chat.');
-        chatRoom._rebuildAttachmentsImmediate();
 
         if (is_video(v)) {
             $.autoplay = v.h;
         }
-        slideshow(v.h, undefined, true);
+        slideshow(v.ch, undefined, true);
         if (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -282,14 +342,14 @@ var GenericConversationMessage = React.createClass({
         var timestampInt = self.getTimestamp();
         var timestamp = self.getTimestampAsString();
 
-        var textMessage;
-
-
         var additionalClasses = "";
         var buttonsBlock = null;
         var spinnerElement = null;
         var messageNotSendIndicator = null;
         var messageIsNowBeingSent = false;
+        var subMessageComponent = [];
+        var attachmentMeta = false;
+        var extraPreButtons = [];
 
         if (this.props.className) {
             additionalClasses += this.props.className;
@@ -302,7 +362,7 @@ var GenericConversationMessage = React.createClass({
 
         // if this is a text msg.
         if (message instanceof Message) {
-            if (!message.wasRendered) {
+            if (!message.wasRendered || !message.messageHtml) {
                 // Convert ot HTML and pass it to plugins to do their magic on styling the message if needed.
                 message.messageHtml = htmlentities(
                     message.textContents
@@ -327,162 +387,93 @@ var GenericConversationMessage = React.createClass({
                 message.wasRendered = 1;
             }
 
-            textMessage = message.messageHtml;
+            var textMessage = message.messageHtml;
 
+            var state = message.getState();
+            var stateText = message.getStateText(state);
+            var textContents = message.textContents || false;
+            var displayName = contact && generateAvatarMeta(contact.u).fullName || '';
 
-            if (
-                (message instanceof Message) ||
-                (typeof(message.userId) !== 'undefined' && message.userId === u_handle)
-            ) {
-                if (
-                    message.getState() === Message.STATE.NULL
-                ) {
-                    additionalClasses += " error";
-                }
-                else if (
-                    message.getState() === Message.STATE.NOT_SENT
-                ) {
-                    messageIsNowBeingSent = (unixtime() - message.delay < 5);
+            if (state === Message.STATE.NOT_SENT) {
+                messageIsNowBeingSent = (unixtime() - message.delay < 5);
 
+                if (!messageIsNowBeingSent) {
+                    additionalClasses += " not-sent";
 
-                    if (!messageIsNowBeingSent) {
-                        additionalClasses += " not-sent";
+                    if (message.sending === true) {
+                        message.sending = false;
+                        $(message).trigger('onChange', [message, "sending", true, false]);
+                    }
 
-                        if (message.sending === true) {
-                            message.sending = false;
-
-
-                            $(message).trigger(
-                                'onChange',
-                                [
-                                    message,
-                                    "sending",
-                                    true,
-                                    false
-                                ]
-                            );
-                        }
-
-                        if (!message.requiresManualRetry) {
-                            additionalClasses += " retrying";
-                        }
-                        else {
-                            additionalClasses += " retrying requires-manual-retry";
-                        }
-
-                        buttonsBlock = null;
+                    if (!message.requiresManualRetry) {
+                        additionalClasses += " retrying";
                     }
                     else {
-                        additionalClasses += " sending";
-                        spinnerElement = <div className="small-blue-spinner"></div>;
-
-                        if (!message.sending) {
-                            message.sending = true;
-                            if (self._rerenderTimer) {
-                                clearTimeout(self._rerenderTimer);
-                            }
-                            self._rerenderTimer = setTimeout(function () {
-                                if (chatRoom.messagesBuff.messages[message.messageId] && message.sending === true) {
-                                    chatRoom.messagesBuff.trackDataChange();
-                                    if (self.isMounted()) {
-                                        self.forceUpdate();
-                                    }
-                                }
-                            }, (5 - (unixtime() - message.delay)) * 1000);
-                        }
+                        additionalClasses += " retrying requires-manual-retry";
                     }
-                }
-                else if (message.getState() === Message.STATE.SENT) {
-                    additionalClasses += " sent";
-                }
-                else if (message.getState() === Message.STATE.DELIVERED) {
-                    additionalClasses += " delivered";
-                }
-                else if (message.getState() === Message.STATE.NOT_SEEN) {
-                    additionalClasses += " unread";
-                }
-                else if (message.getState() === Message.STATE.SEEN) {
-                    additionalClasses += " seen";
-                }
-                else if (message.getState() === Message.STATE.DELETED) {
-                    additionalClasses += " deleted";
+
+                    buttonsBlock = null;
                 }
                 else {
-                    additionalClasses += " not-sent";
+                    additionalClasses += " sending";
+                    spinnerElement = <div className="small-blue-spinner"></div>;
+
+                    if (!message.sending) {
+                        message.sending = true;
+                        if (self._rerenderTimer) {
+                            clearTimeout(self._rerenderTimer);
+                        }
+                        self._rerenderTimer = setTimeout(function() {
+                            if (chatRoom.messagesBuff.messages[message.messageId] && message.sending === true) {
+                                chatRoom.messagesBuff.trackDataChange();
+                                if (self.isMounted()) {
+                                    self.forceUpdate();
+                                }
+                            }
+                        }, (5 - (unixtime() - message.delay)) * 1000);
+                    }
                 }
             }
-
-            var displayName;
-            if (contact) {
-                displayName = generateAvatarMeta(contact.u).fullName;
-            }
             else {
-                displayName = contact;
+                additionalClasses += ' ' + stateText;
             }
-
-            var textContents = message.textContents || false;
 
             if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
                 if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
                     attachmentMeta = message.getAttachmentMeta() || [];
 
                     var files = [];
-
-                    self.attachments = [];
-
                     attachmentMeta.forEach(function(v, attachmentKey) {
-                        self.attachments.push(v);
 
-                        var attachmentMetaInfo;
-                        // cache ALL current attachments, so that we can revoke them later on in an ordered way.
-                        if (message.messageId) {
-                            if (
-                                chatRoom.attachments &&
-                                chatRoom.attachments[v.h] &&
-                                chatRoom.attachments[v.h][message.messageId]
-                            ) {
-                                attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
-                            }
-                            else {
-                                // if the chatRoom.attachments is not filled in yet, just skip the rendering
-                                // and this attachment would be re-rendered on the next loop.
-                                return;
-                            }
-                        }
-
-                        if (attachmentMetaInfo.revoked) {
+                        if (!M.chd[v.ch] || v.revoked) {
                             // don't show revoked files
                             return;
                         }
 
-
                         // generate preview/icon
                         var icon = fileIcon(v);
-                        var isImage = is_image(v);
-                        var isVideo = is_video(v) > 0;
-                        var showThumbnail = v.fa && isImage || String(v.fa).indexOf(':0*') > 0;
+                        var mediaType = is_video(v);
+                        var isImage = is_image2(v);
+                        var isVideo = mediaType > 0;
+                        var isAudio = mediaType > 1;
+                        var showThumbnail = String(v.fa).indexOf(':1*') > 0;
                         var isPreviewable = isImage || isVideo;
 
                         var dropdown = null;
+                        var noThumbPrev = '';
                         var previewButton = null;
 
-                        if (showThumbnail) {
-                            var imagesListKey = message.messageId + "_" + v.h;
-                            if (!chatRoom.images.exists(imagesListKey)) {
-                                v.id = imagesListKey;
-                                v.orderValue = message.orderValue;
-                                v.messageId = message.messageId;
-                                chatRoom.images.push(v);
+                        if (isPreviewable) {
+                            if (!showThumbnail) {
+                                noThumbPrev = 'no-thumb-prev';
                             }
-                            if (isPreviewable) {
-                                var previewLabel = isVideo ? l[17732] : l[1899];
-                                previewButton = <span key="previewButton">
+                            var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
+                            previewButton = <span key="previewButton">
                                     <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
                                                               onClick={self._startPreview.bind(self, v)}/>
-                                    <hr/>
                                 </span>;
-                            }
                         }
+
                         if (contact.u === u_handle) {
                             dropdown = <ButtonsUI.Button
                                 className="default-white-button tiny-button"
@@ -520,16 +511,17 @@ var GenericConversationMessage = React.createClass({
                                         }
 
                                         if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-                                            dropdown = "<span>" + l[5533] + "</span>";
                                             dbfetch.get(v.h)
                                                 .always(function() {
                                                     if (!M.d[v.h]) {
                                                         NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
-                                                        Soon(function() {
-                                                            self.safeForceUpdate();
-                                                        });
+                                                        dd.doRerender();
+                                                    }
+                                                    else {
+                                                        dd.doRerender();
                                                     }
                                                 });
+                                            return <span>{l[5533]}</span>;
                                         }
                                         else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
                                             downloadButton = <DropdownsUI.DropdownItem
@@ -550,20 +542,53 @@ var GenericConversationMessage = React.createClass({
 
 
                                             self._addFavouriteButtons(v.h, firstGroupOfButtons);
+
+                                            linkButtons.push(
+                                                <DropdownsUI.DropdownItem icon="small-icon conversations"
+                                                                          label={__(l[17764])}
+                                                                          key="sendToChat"
+                                                                          onClick={() => {
+                                                                              $.selected = [v.h];
+                                                                              openCopyDialog('conversations');
+                                                                          }}/>
+                                            );
+
                                         }
 
-                                        return <div>
-                                            {previewButton}
-                                            {firstGroupOfButtons}
-                                            {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr/> : ""}
-                                            {downloadButton}
-                                            {linkButtons}
-                                            {revokeButton && downloadButton ? <hr/> : ""}
-                                            {revokeButton}
-                                        </div>;
-                                    }}
-                                />
-                            </ButtonsUI.Button>;
+                                            if (
+                                                !previewButton &&
+                                                firstGroupOfButtons.length === 0 &&
+                                                !downloadButton &&
+                                                linkButtons.length === 0 &&
+                                                !revokeButton
+                                            ) {
+                                                return null;
+                                            }
+
+                                            if (
+                                                previewButton && (
+                                                    firstGroupOfButtons.length > 0 ||
+                                                    downloadButton ||
+                                                    linkButtons.length > 0 ||
+                                                    revokeButton
+                                                )
+                                            ) {
+                                                previewButton = [previewButton, <hr key="preview-sep"/>];
+                                            }
+
+
+                                            return <div>
+                                                {previewButton}
+                                                {firstGroupOfButtons}
+                                                {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr /> : ""}
+                                                {downloadButton}
+                                                {linkButtons}
+                                                {revokeButton && downloadButton ? <hr /> : ""}
+                                                {revokeButton}
+                                            </div>;
+                                        }}
+                                    />
+                                </ButtonsUI.Button>;
                         }
                         else {
                             dropdown = <ButtonsUI.Button
@@ -578,16 +603,21 @@ var GenericConversationMessage = React.createClass({
                                     vertOffset={3}
                                 >
                                     {previewButton}
+                                    <hr/>
                                     <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                               onClick={self._startDownload.bind(self, v)}/>
-                                    <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
-                                                              onClick={self._addToCloudDrive.bind(self, v)}/>
+                                    <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[1988])}
+                                                              onClick={self._addToCloudDrive.bind(self, v, false)}/>
+                                    <DropdownsUI.DropdownItem icon="conversations" label={__(l[17764])}
+                                                              onClick={self._addToCloudDrive.bind(self, v, true)}/>
                                 </DropdownsUI.Dropdown>
                             </ButtonsUI.Button>;
                         }
 
+
                         var attachmentClasses = "message shared-data";
-                        var preview = <div className="data-block-view medium">
+                        var preview = <div className={"data-block-view medium " + noThumbPrev}
+                                           onClick={isPreviewable && self._startPreview.bind(self, v)}>
                             {dropdown}
 
                             <div className="data-block-bg">
@@ -595,19 +625,9 @@ var GenericConversationMessage = React.createClass({
                             </div>
                         </div>;
 
-                        if (M.chat && showThumbnail && !message.revoked) {
-                            var src = chatRoom.getCachedImageURI(v);
-
-                            if (!src) {
-                                v.seen = 1;
-                                chatRoom.loadImage(v);
-                                src = window.noThumbURI || '';
-                            }
-                            if (!v.imgId) {
-                                v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
-                            }
-
-                            var thumbClass = "";
+                        if (showThumbnail) {
+                            var src = v.src || window.noThumbURI || '';
+                            var thumbClass = v.src ? '' : " no-thumb";
                             var thumbOverlay = null;
 
                             if (isImage) {
@@ -623,28 +643,29 @@ var GenericConversationMessage = React.createClass({
                                                     onClick={isPreviewable && self._startPreview.bind(self, v)}>
                                     {isPreviewable && <div className="play-video-button"></div>}
                                     <div className="video-thumb-details">
-                                        {isPreviewable && <i className="small-icon small-play-icon"></i>}
+                                        {v.playtime && <i className="small-icon small-play-icon"></i>}
                                         <span>{secondsToTimeShort(v.playtime || -1)}</span>
                                     </div>
                                 </div>;
                             }
 
-                            preview = (src ? (<div id={v.imgId} className={"shared-link thumb " + thumbClass}>
+                            preview = (src ? (<div id={v.ch} className={"shared-link thumb " + thumbClass}>
                                 {thumbOverlay}
                                 {dropdown}
 
                                 <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
-                                     key={src === window.noThumbURI ? v.imgId : src}
+                                     key={'thumb-' + v.ch}
                                      onClick={isPreviewable && self._startPreview.bind(self, v)}
                                 />
                             </div>) : preview);
                         }
 
                         files.push(
-                            <div className={attachmentClasses} key={v.h}>
+                            <div className={attachmentClasses} key={'atch-' + v.ch}>
                                 <div className="message shared-info">
                                     <div className="message data-title">
-                                        {v.name}
+                                        {__(l[17669])}
+                                        <span className="file-name">{v.name}</span>
                                     </div>
                                     <div className="message file-size">
                                         {bytesToSize(v.s)}
@@ -666,10 +687,10 @@ var GenericConversationMessage = React.createClass({
                         additionalClasses += " grouped";
                     }
                     else {
-                        avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
+                        avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
                         datetime = <div className="message date-time"
                                         title={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <div className="message user-card-name">{displayName}</div>;
+                        name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
                     }
 
                     return <div className={message.messageId + " message body" + additionalClasses}>
@@ -748,6 +769,16 @@ var GenericConversationMessage = React.createClass({
                                     positionAt="right bottom"
                                     horizOffset={4}
                                 >
+
+                                    <div className="dropdown-avatar rounded">
+                                        <ContactsUI.ContactPresence className="small" contact={contact} />
+                                        <ContactsUI.Avatar className="avatar-wrapper context-avatar" contact={contact} />
+                                        <div className="dropdown-user-name">
+                                            {M.getNameByHandle(contact.u)}
+                                        </div>
+                                    </div>
+                                    <ContactsUI.ContactFingerprint contact={contact} />
+
                                     <DropdownsUI.DropdownItem
                                         icon="human-profile"
                                         label={__(l[5868])}
@@ -786,6 +817,15 @@ var GenericConversationMessage = React.createClass({
                                     positionAt="right bottom"
                                     horizOffset={4}
                                 >
+
+                                    <div className="dropdown-avatar rounded">
+                                        <ContactsUI.ContactPresence className="small" contact={contact} />
+                                        <ContactsUI.Avatar className="avatar-wrapper context-avatar" contact={contact} />
+                                        <div className="dropdown-user-name">
+                                            {M.getNameByHandle(contact.u)}
+                                        </div>
+                                    </div>
+
                                     <DropdownsUI.DropdownItem
                                         icon="rounded-grey-plus"
                                         label={__(l[71])}
@@ -800,7 +840,7 @@ var GenericConversationMessage = React.createClass({
 
                                             if (exists) {
                                                 closeDialog();
-                                                msgDialog('warningb', '', l[7413]);
+                                                msgDialog('warningb', '', l[17545]);
                                             }
                                             else {
                                                 M.inviteContact(M.u[u_handle].m, contactEmail);
@@ -830,23 +870,21 @@ var GenericConversationMessage = React.createClass({
                                     <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
                                     {
                                         M.u[contact.u] ?
-                                            <ContactsUI.ContactVerified className="big" contact={contact} /> :
+                                            <ContactsUI.ContactVerified className="right-align" contact={contact} /> :
                                             null
                                     }
 
                                     <div className="user-card-email">{contactEmail}</div>
                                 </div>
                                 <div className="message shared-data">
-                                    <div className="data-block-view medium">
+                                    <div className="data-block-view semi-big">
                                         {
                                             M.u[contact.u] ?
-                                                <ContactsUI.ContactPresence className="big" contact={contact} /> :
+                                                <ContactsUI.ContactPresence className="small" contact={contact} /> :
                                                 null
                                         }
                                         {dropdown}
-                                        <div className="data-block-bg">
-                                            <ContactsUI.Avatar className="medium-avatar share" contact={contact} />
-                                        </div>
+                                        <ContactsUI.Avatar className="avatar-wrapper medium-avatar" contact={contact} />
                                     </div>
                                     <div className="clear"></div>
                                 </div>
@@ -862,10 +900,10 @@ var GenericConversationMessage = React.createClass({
                         additionalClasses += " grouped";
                     }
                     else {
-                        avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
+                        avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
                         datetime = <div className="message date-time"
                                         title={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <div className="message user-card-name">{displayName}</div>;
+                        name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
                     }
 
                     return <div className={message.messageId + " message body" + additionalClasses}>
@@ -896,8 +934,105 @@ var GenericConversationMessage = React.createClass({
                 if (message.textContents === "" && !message.dialogType) {
                     message.deleted = true;
                 }
+
+                if (!message.deleted) {
+                    if (message.metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW) {
+                        if (!message.meta.requiresConfirmation) {
+                            subMessageComponent.push(<MetaRichpreview
+                                key={"richprev"}
+                                message={message}
+                                chatRoom={chatRoom}
+                            />);
+                            if (message.isEditable()) {
+                                if (!message.meta.isLoading) {
+                                    extraPreButtons.push(
+                                        <DropdownsUI.DropdownItem
+                                            key="remove-link-preview"
+                                            icon="icons-sprite bold-crossed-eye"
+                                            label={l[18684]}
+                                            className=""
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                e.preventDefault();
+
+                                                chatRoom.megaChat.plugins.richpreviewsFilter.revertToText(
+                                                    chatRoom,
+                                                    message
+                                                );
+                                            }}
+                                        />
+                                    );
+                                }
+                                else {
+                                    // still loading, cancel loading?
+                                    extraPreButtons.push(
+                                        <DropdownsUI.DropdownItem
+                                            icon="icons-sprite bold-crossed-eye"
+                                            key="stop-link-preview"
+                                            label={l[18684]}
+                                            className=""
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                e.preventDefault();
+
+                                                chatRoom.megaChat.plugins.richpreviewsFilter.cancelLoading(
+                                                    chatRoom,
+                                                    message
+                                                );
+                                            }}
+                                        />
+                                    );
+                                }
+                            }
+                        }
+                        else if (!self.isBeingEdited()) {
+                            if (
+                                message.source === Message.SOURCE.SENT ||
+                                message.confirmed === true
+                            ) {
+                                additionalClasses += " preview-requires-confirmation-container";
+                                subMessageComponent.push(
+                                    <MetaRichpreviewConfirmation
+                                        key={"confirm"}
+                                        message={message}
+                                        chatRoom={chatRoom}
+                                    />
+                                );
+                            }
+                            else {
+                                extraPreButtons.push(
+                                    <DropdownsUI.DropdownItem
+                                        key="insert-link-preview"
+                                        icon="icons-sprite bold-eye"
+                                        label={l[18683]}
+                                        className=""
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+
+                                            chatRoom.megaChat.plugins.richpreviewsFilter.insertPreview(message);
+                                        }}
+                                    />
+                                );
+                            }
+                        }
+
+
+                    }
+                    if (message.megaLinks) {
+                        subMessageComponent.push(<MetaRichpreviewMegaLinks
+                            key={"richprevml"}
+                            message={message}
+                            chatRoom={chatRoom}
+                        />);
+                    }
+                }
+
                 var messageActionButtons = null;
-                if (message.getState() === Message.STATE.NOT_SENT) {
+                if (
+                    message.getState() === Message.STATE.NOT_SENT ||
+                    message.getState() === Message.STATE.NOT_SENT_EXPIRED
+                ) {
                     messageActionButtons = null;
 
                     if (!spinnerElement) {
@@ -939,10 +1074,10 @@ var GenericConversationMessage = React.createClass({
                     additionalClasses += " grouped";
                 }
                 else {
-                    avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
+                    avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
                     datetime = <div className="message date-time"
                                     title={time2date(timestampInt)}>{timestamp}</div>;
-                    name = <div className="message user-card-name">{displayName}</div>;
+                    name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
                 }
 
                 var messageDisplayBlock;
@@ -985,7 +1120,7 @@ var GenericConversationMessage = React.createClass({
                     return null;
                 }
                 else {
-                    if (message.updated > 0) {
+                    if (message.updated > 0 && !message.metaType) {
                         textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
                     }
                     if (self.props.initTextScrolling) {
@@ -1017,8 +1152,9 @@ var GenericConversationMessage = React.createClass({
                                 positionAt="right bottom"
                                 horizOffset={4}
                             >
+                                {extraPreButtons}
                                 <DropdownsUI.DropdownItem
-                                    icon="writing-pen"
+                                    icon="icons-sprite writing-pencil"
                                     label={__(l[1342])}
                                     className=""
                                     onClick={(e) => {
@@ -1053,6 +1189,7 @@ var GenericConversationMessage = React.createClass({
                             {self.props.hideActionButtons ? null : messageActionButtons}
                             {messageNotSendIndicator}
                             {messageDisplayBlock}
+                            {subMessageComponent}
                             {buttonsBlock}
                             {spinnerElement}
                         </div>
@@ -1071,16 +1208,7 @@ var GenericConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
-
-                if (message.currentCallCounter) {
-                    tmpMsg += " " +
-                        textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
-                }
-                textMessage = tmpMsg;
-                textMessage = textMessage
-                    .replace("[[ ", "<span className=\"grey-color\">")
-                    .replace("]]", "</span>");
+                textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage, true);
             }
             else {
                 textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
@@ -1090,46 +1218,46 @@ var GenericConversationMessage = React.createClass({
 
             // mapping css icons to msg types
             if (message.type === "call-rejected") {
-                message.cssClass = "crossed-handset red";
+                message.cssClass = "handset-with-stop";
             }
             else if (message.type === "call-missed") {
-                message.cssClass = "horizontal-handset yellow"
+                message.cssClass = "handset-with-yellow-arrow"
             }
             else if (message.type === "call-handled-elsewhere") {
-                message.cssClass = "handset-with-arrow green";
+                message.cssClass = "handset-with-up-arrow";
             }
             else if (message.type === "call-failed") {
-                message.cssClass = "horizontal-handset red";
+                message.cssClass = "handset-with-cross";
             }
             else if (message.type === "call-timeout") {
-                message.cssClass = "horizontal-handset yellow";
+                message.cssClass = "horizontal-handset";
             }
             else if (message.type === "call-failed-media") {
-                message.cssClass = "diagonal-handset yellow";
+                message.cssClass = "handset-with-yellow-cross";
             }
             else if (message.type === "call-canceled") {
-                message.cssClass = "horizontal-handset grey";
+                message.cssClass = "crossed-handset";
             }
             else if (message.type === "call-ended") {
-                message.cssClass = "horizontal-handset grey";
+                message.cssClass = "horizontal-handset";
             }
             else if (message.type === "call-feedback") {
-                message.cssClass = "diagonal-handset grey";
+                message.cssClass = "diagonal-handset";
             }
             else if (message.type === "call-starting") {
-                message.cssClass = "diagonal-handset blue";
+                message.cssClass = "diagonal-handset";
             }
             else if (message.type === "call-initialising") {
-                message.cssClass = "diagonal-handset blue";
+                message.cssClass = "diagonal-handset";
             }
             else if (message.type === "call-started") {
-                message.cssClass = "diagonal-handset green";
+                message.cssClass = "diagonal-handset";
             }
             else if (message.type === "incoming-call") {
-                message.cssClass = "diagonal-handset green";
+                message.cssClass = "handset-with-down-arrow";
             }
             else if (message.type === "outgoing-call") {
-                message.cssClass = "diagonal-handset blue";
+                message.cssClass = "handset-with-up-arrow";
             }
             else {
                 message.cssClass = message.type;
@@ -1164,8 +1292,8 @@ var GenericConversationMessage = React.createClass({
             return (
                 <div className={message.messageId + " message body" + additionalClasses}
                      data-id={"id" + message.messageId}>
-                    <div className="feedback round-icon-block">
-                        <i className={"round-icon " + message.cssClass}></i>
+                    <div className="feedback call-status-block">
+                        <i className={"call-icon " + message.cssClass}></i>
                     </div>
 
                     <div className="message content-area">

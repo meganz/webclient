@@ -83,6 +83,7 @@ mobile.deleteOverlay = {
         api_req({ a: 'log', e: 99638, m: 'Deleted a node on the mobile webclient' });
 
         // Update the file/folder count in the footer and show an Empty message and icon if no files
+        mobile.cloud.updateView();
         mobile.cloud.showEmptyCloudIfEmpty();
         mobile.cloud.countAndUpdateSubFolderTotals();
         mobile.cloud.renderFoldersAndFilesSubHeader();
@@ -108,7 +109,7 @@ mobile.deleteOverlay = {
 
         'use strict';
 
-        var $closeAndCancelButtons = this.$overlay.find('.fm-dialog-close, .second.cancel');
+        var $closeAndCancelButtons = this.$overlay.find('.fm-dialog-close, .text-button');
 
         // Add click/tap handler
         $closeAndCancelButtons.off('tap').on('tap', function() {

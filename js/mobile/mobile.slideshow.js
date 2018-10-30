@@ -69,16 +69,18 @@ mobile.slideshow = {
         'use strict';
 
         // Cache selectors
-        var $slideShowBackground = mobile.slideshow.$overlay.find('.slideshow-wrapper');
+        var $slideShowBackground = mobile.slideshow.$overlay.find('.slideshow-wrapper, .fs');
         var $slideShowHeader = mobile.slideshow.$overlay.find('.slideshow-header');
         var $slideShowFooterButtons = mobile.slideshow.$overlay.find('.slideshow-buttons');
         var $slideShowNavButtons = mobile.slideshow.$overlay.find('.slideshow-back-arrow, .slideshow-forward-arrow');
 
         // On clicking the image or black background of the slideshow
-        $slideShowBackground.off().on('tap', function() {
+        $slideShowBackground.off().on('tap', SoonFc(function(ev) {
+            if ($(ev.target).closest('.video-controls').length) {
+                return false;
+            }
 
-            // If the header and footer buttons are hidden already, show them
-            if ($slideShowHeader.hasClass('hidden') && $slideShowFooterButtons.hasClass('hidden')) {
+            if ($slideShowHeader.hasClass('hidden')) {
                 $slideShowHeader.removeClass('hidden');
                 $slideShowFooterButtons.removeClass('hidden');
                 $slideShowNavButtons.removeClass('hidden');
@@ -89,11 +91,9 @@ mobile.slideshow = {
                 $slideShowFooterButtons.addClass('hidden');
                 $slideShowNavButtons.addClass('hidden');
             }
-
-            // Prevent double taps
-            return false;
-        });
+        }));
     },
+
 
     /**
      * Fetch the image data from the API, populate the 'previews' object, then run the callback provided
@@ -127,34 +127,10 @@ mobile.slideshow = {
             return;
         }
 
-        var request = {};
         var node = M.getNodeByHandle(nodeHandle);
-
-        // Setup request parameters
-        request[nodeHandle] = { fa: node.fa, k: node.k };
-
-        // Get the image data which is stored as a file attribute
-        api_getfileattr(request, 1, function(ctx, nodeId, byteArray) {
-
-            var blob = null;
-
-            try {
-                // Create a new Blob
-                blob = new Blob([byteArray], { type: 'image/jpeg' });
-            }
-            catch (error) {}
-
-            // If that failed, try using the buffer
-            if (!blob || blob.size < 25) {
-                blob = new Blob([byteArray.buffer]);
-            }
-
+        var done = function(uri) {
             // Update global object with the image so it's ready for display
-            mobile.slideshow.previews[nodeId] = {
-                blob: blob,
-                src: myURL.createObjectURL(blob),
-                time: new Date().getTime()
-            };
+            mobile.slideshow.previews[nodeHandle] = {src: uri};
 
             // Hide any loading dialogs/animations if visible
             mobile.slideshow.hideLoadingAnimation();
@@ -162,6 +138,13 @@ mobile.slideshow = {
 
             // Call the callback function e.g. to display the image
             callbackFunction(nodeHandle, slideClass);
+        };
+
+        getImage(node, 1).then(done).catch(function(ex) {
+            if (d) {
+                console.warn('Preview image retrieval failed.', nodeHandle, ex);
+            }
+            done(window.noThumbURI);
         });
     },
 
@@ -174,10 +157,13 @@ mobile.slideshow = {
 
         'use strict';
 
+        mobile.slideshow.cleanupCurrentlyViewedInstance();
+
         // Cache selectors
         var $fileName = mobile.slideshow.$overlay.find('.slideshow-file-name');
         var $currentFileNumAndTotal = mobile.slideshow.$overlay.find('.slideshow-file-number-and-total');
         var $image = mobile.slideshow.$overlay.find('.mobile.slides.' + slideClass + ' img');
+        var $videoDiv = mobile.slideshow.$overlay.find('.mobile.slides.' + slideClass + ' .download.video-block');
 
         // Get the node and image data
         var node = M.getNodeByHandle(nodeHandle);
@@ -200,12 +186,34 @@ mobile.slideshow = {
         mobile.slideshow.changeSlide(slideClass);
 
         // Initialise buttons
-        mobile.slideshow.initDeleteButton(nodeHandle);
-        mobile.slideshow.initDownloadButton(nodeHandle);
-        mobile.slideshow.initLinkButton(nodeHandle);
+        mobile.slideshow.initActionBarButtons(nodeHandle);
 
         // Show the dialog
         mobile.slideshow.$overlay.removeClass('hidden');
+
+        if (is_video(node)) {
+            var videoHtmlTemplate = $('.mobile-video-template');
+            var videoHtmlDiv = videoHtmlTemplate.html();
+
+            $image.addClass('hidden');
+            mobile.slideshow.$overlay.find('.slides.mid').html(videoHtmlDiv);
+            $videoDiv.removeClass('hidden');
+            mobile.slideshow.$overlay.addClass('video');
+
+            M.require('videostream').tryCatch(function() {
+                iniVideoStreamLayout(node, mobile.slideshow.$overlay).then(function(ok) {
+                    if (ok) {
+                        mobile.slideshow.$overlay.find('.scroll-block').addClass('video');
+                        $('.video-block, .video-controls', mobile.slideshow.$overlay).removeClass('hidden');
+                    }
+                });
+            });
+        }
+        else {
+            $image.removeClass('hidden');
+            $videoDiv.addClass('hidden');
+            return false;
+        }
     },
 
     /**
@@ -225,8 +233,9 @@ mobile.slideshow = {
             var node = M.v[i];
             var nodeHandle = node.h;
 
-            // If the node is an image, add it to the array and map
-            if (is_image(node)) {
+            // If the node is an image or a video, add it to the array and map
+            if (is_image3(node) || is_video(node)) {
+
                 mobile.slideshow.imagesInCurrentViewArray.push(nodeHandle);
                 mobile.slideshow.imagesInCurrentViewMap[nodeHandle] = imageNumber;
 
@@ -287,6 +296,16 @@ mobile.slideshow = {
             // Prevent double swipe
             return false;
         });
+    },
+
+    /**
+     * What the function name says :-P
+     */
+    cleanupCurrentlyViewedInstance: function() {
+        'use strict';
+
+        // Destroy any streaming instance
+        $(window).trigger('video-destroy');
     },
 
     /**
@@ -401,7 +420,10 @@ mobile.slideshow = {
 
         'use strict';
 
+        mobile.slideshow.$overlay.removeClass('video-theatre-mode');
+
         if (slideClass === 'right') {
+            mobile.slideshow.$overlay.find('.slides.mid .download.video-block').remove();
             mobile.slideshow.$overlay.find('.slides.left').remove();
             mobile.slideshow.$overlay.find('.slides.mid')
                 .removeClass('mid').addClass('left');
@@ -411,6 +433,7 @@ mobile.slideshow = {
                 .append('<div class="mobile slides right"><img alt="" /></div>');
         }
         else if (slideClass === 'left') {
+            mobile.slideshow.$overlay.find('.slides.mid .download.video-block').remove();
             mobile.slideshow.$overlay.find('.slides.right').remove();
             mobile.slideshow.$overlay.find('.slides.mid')
                 .removeClass('mid').addClass('right');
@@ -422,6 +445,21 @@ mobile.slideshow = {
     },
 
     /**
+     * Close the overlay
+     */
+    close: function() {
+        'use strict';
+
+        // Hide the dialog
+        mobile.slideshow.$overlay.addClass('hidden');
+
+        // Cleanup curr....
+        mobile.slideshow.cleanupCurrentlyViewedInstance();
+        mobile.slideshow.$overlay.find('.slides.mid img').remove();
+        mobile.slideshow.$overlay.find('.slides.mid').prepend('<img alt="" /></div>');
+    },
+
+    /**
      * Initialise the close button
      */
     initCloseButton: function() {
@@ -430,10 +468,7 @@ mobile.slideshow = {
 
         // On close button click/tap
         mobile.slideshow.$overlay.find('.fm-dialog-close').off().on('tap', function() {
-
-            // Hide the dialog
-            mobile.slideshow.$overlay.addClass('hidden');
-
+            mobile.slideshow.close();
             // Prevent double taps
             return false;
         });
@@ -450,10 +485,10 @@ mobile.slideshow = {
 
         // If the Preview button is tapped
         $contextMenu.find('.preview-file-button').off('tap').on('tap', function() {
-
             // Show the file preview overlay
             mobile.slideshow.init(nodeHandle);
             return false;
+
         });
     },
 
@@ -486,6 +521,26 @@ mobile.slideshow = {
             });
 
             // Prevent double tap
+            return false;
+        });
+    },
+
+    /**
+     * Init Button to handle delete if node in rubbish bin.
+     * @param nodeHandle
+     */
+    initRubbishBinDeleteButton: function(nodeHandle) {
+        'use strict';
+        mobile.slideshow.$overlay.find(".rubbishbin-delete-button").off('tap').on('tap', function() {
+            $.selected = [nodeHandle];
+            M.clearRubbish(false)
+                .then(function() {
+                    mobile.slideshow.close();
+                    mobile.showSuccessToast(l[19635]);
+                })
+                .catch(function() {
+                    mobile.showErrorToast(l[5963]);
+                });
             return false;
         });
     },
@@ -532,5 +587,26 @@ mobile.slideshow = {
             mobile.linkOverlay.show(nodeHandle);
             return false;
         });
+    },
+
+    /**
+     * Init actionbar buttons
+     */
+    initActionBarButtons: function(nodeHandle) {
+        'use strict';
+
+        if (M.getNodeRoot(nodeHandle) !== M.RubbishID) {
+            // Only show link and delete button if the image is not in the rubbish bin.
+            mobile.slideshow.$overlay.find(".manage-link-button, .delete-button").removeClass('hidden');
+            mobile.slideshow.$overlay.find(".rubbishbin-delete-button").addClass("hidden");
+            mobile.slideshow.initDeleteButton(nodeHandle);
+            mobile.slideshow.initLinkButton(nodeHandle);
+        } else {
+            mobile.slideshow.$overlay.find(".manage-link-button, .delete-button").addClass('hidden');
+            mobile.slideshow.$overlay.find(".rubbishbin-delete-button").removeClass("hidden");
+            mobile.slideshow.initRubbishBinDeleteButton(nodeHandle);
+        }
+        mobile.slideshow.initDownloadButton(nodeHandle);
+
     }
 };

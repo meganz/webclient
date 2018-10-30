@@ -59,7 +59,7 @@ mobile.downloadOverlay = {
         'use strict';
 
         var n = M.d[nodeHandle];
-        var $button = this.$overlay.find('.first.dl-browser');
+        var $button = this.$overlay.find('.second.dl-browser');
         var $label = $button.find('span');
 
         if (dlMethod !== MemoryIO || !dlmanager.openInBrowser(n)) {
@@ -70,13 +70,14 @@ mobile.downloadOverlay = {
         }
 
         // On Open in Browser button click/tap
-        $button.off('tap').on('tap', function() {
-
+        this.$overlay.find('.second.dl-browser').off('tap').on('tap', function() {
+       
             // Start the download
             mobile.downloadOverlay.startFileDownload(nodeHandle);
 
             // Prevent default anchor link behaviour
             return false;
+            
         });
     },
 
@@ -88,7 +89,7 @@ mobile.downloadOverlay = {
 
         'use strict';
 
-        var $downloadButton = this.$overlay.find('.second.dl-megaapp');
+        var $downloadButton = this.$overlay.find('.first.dl-megaapp');
 
         // If the user is logged in, i.e. in the cloud drive, then hide the Open in Mega App button
         // ToDo: remove this block when the app support is available for opening/downloading internal nodes
@@ -133,7 +134,7 @@ mobile.downloadOverlay = {
             var preventDialog = function() {
                 clearTimeout(timeout);
                 timeout = null;
-                $(window).unbind(events.join(ns) + ns);
+                $(window).off(events.join(ns) + ns);
             };
 
             var redirectToStore = function() {
@@ -144,7 +145,7 @@ mobile.downloadOverlay = {
                 var ms = 500;
 
                 preventDialog();
-                $(window).bind(events.join(ns) + ns, preventDialog);
+                $(window).rebind(events.join(ns) + ns, preventDialog);
 
                 window.location = appLink;
 
@@ -245,7 +246,7 @@ mobile.downloadOverlay = {
 
         'use strict';
 
-        var $closeButton = this.$overlay.find('.fm-dialog-close');
+        var $closeButton = this.$overlay.find('.fm-dialog-close, .text-button');
         var $body = $('body');
 
         // Show close button for folder links
@@ -323,6 +324,7 @@ mobile.downloadOverlay = {
                 }
             },
             onDownloadError: function(dl, error) {
+
                 if (d) {
                     dlmanager.logger.error(error, dl);
                 }
@@ -435,7 +437,7 @@ mobile.downloadOverlay = {
         'use strict';
 
         var $body = $('body');
-        var $openInBrowserButton = this.$overlay.find('.first.dl-browser');
+        var $openInBrowserButton = this.$overlay.find('.second.dl-browser');
         var $fileTypeUnsupportedMessage = this.$overlay.find('.file-unsupported');
         var $fileSizeUnsupportedMessage = this.$overlay.find('.file-too-large');
 

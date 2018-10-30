@@ -150,6 +150,7 @@ var DropdownEmojiSelector = React.createClass({
             }
             this._onScrollChanged(0, nextState);
         }
+
         if (nextState.isActive === true) {
             var self = this;
             if (
@@ -528,11 +529,13 @@ var DropdownEmojiSelector = React.createClass({
             popupContents = null;
         }
 
+
         return <DropdownsUI.Dropdown
             className="popup emoji" {...self.props} ref="dropdown"
             isLoading={self.state.isLoading}
             loadFailed={self.state.loadFailed}
             visibleCategories={this.state.visibleCategories}
+            forceShowWhenEmpty={true}
             onActiveChange={(newValue) => {
                 // reset state if the dropdown is hidden
                 if (newValue === false) {

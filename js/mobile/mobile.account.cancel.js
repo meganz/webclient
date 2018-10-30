@@ -120,7 +120,7 @@ mobile.account.cancel = {
         loadingDialog.show();
 
         // Park the current account, then create a new account with a random password
-        api_resetuser({ callback: function(code) {
+        security.resetUser(emailCode, u_attr.email, password, function(code) {
 
             loadingDialog.hide();
 
@@ -141,6 +141,6 @@ mobile.account.cancel = {
                     loadSubPage('fm/account');
                 });
             }
-        }}, emailCode, u_attr.email, password);
+        });
     }
 };

@@ -160,7 +160,7 @@ var strongvelope = {};
         0x0c: 'privilege',
         0x0d: 'identity',
         0x0e: 'reference',
-        0x0f: 'keyBlob'
+        0x0f: 'keyBlob',
     };
 
 
@@ -181,7 +181,8 @@ var strongvelope = {};
         ALTER_PARTICIPANTS: 0x02,
         TRUNCATE:           0x03,
         PRIVILEGE_CHANGE:   0x04,
-        TOPIC_CHANGE:       0x05
+        TOPIC_CHANGE:       0x05,
+        CALL_END:           0x06
     };
     var MESSAGE_TYPES = strongvelope.MESSAGE_TYPES;
     var _KEYED_MESSAGES = [MESSAGE_TYPES.GROUP_KEYED,
@@ -1462,7 +1463,6 @@ var strongvelope = {};
                 return MegaPromise.resolve(result);
             }
             else if (parsedMessage.type === MESSAGE_TYPES.TOPIC_CHANGE) {
-                var cleartext = this.decryptMessage(parsedMessage, parsedMessage.invitor, null);
                 var proxyPromise = new MegaPromise();
                 var decryptPromise = this.decryptMessage(parsedMessage, parsedMessage.invitor, null);
                 decryptPromise.fail(function(arg) {
@@ -1488,6 +1488,27 @@ var strongvelope = {};
                 });
                 return proxyPromise;
 
+            }
+            else if (parsedMessage.type === MESSAGE_TYPES.CALL_END) {
+                var proxyPromise = new MegaPromise();
+                var callId = base64urlencode(parsedMessage.payload.substr(0, 8));
+                var reason = parsedMessage.payload.substr(8, 1).charCodeAt(0);
+                var duration = Chatd.unpack32le(parsedMessage.payload.substr(9, 4));
+
+                var participants = parsedMessage.includeParticipants;
+
+                result = {
+                    sender: parsedMessage.invitor,
+                    type: parsedMessage.type,
+                    callId: callId,
+                    reason: reason,
+                    duration: duration,
+                    participants: participants
+                };
+
+
+                proxyPromise.resolve(result);
+                return proxyPromise;
             }
         }
         return MegaPromise.reject(false);
@@ -1562,7 +1583,7 @@ var strongvelope = {};
             }
             else if (
                 parsedMessage.recipients.length > 0 &&
-                parsedMessage.recipients.indexOf(this.ownHandle) === -1
+                parsedMessage.recipients.indexOf(self.ownHandle) === -1
             ) {
                 logger.info('I am not participating in this chat, cannot read message.');
             }

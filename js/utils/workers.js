@@ -6,10 +6,9 @@
  * @param {String} url Script url/filename
  * @param {Function} message Worker's message dispatcher
  * @param {Number} [size] Number of workers
- * @param {Number} [setTimeoutValue] the setTimeout interval for throttling of the queue processing
  * @returns {MegaQueue}
  */
-function CreateWorkers(url, message, size, setTimeoutValue) {
+function CreateWorkers(url, message, size) {
     "use strict";
 
     var worker = [];
@@ -42,6 +41,9 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
     var handler = function(id) {
         return function(e) {
             message(this.context, e, function(r) {
+                if (d > 1) {
+                    console.debug('[%s] Worker #%s finished...', wid, id);
+                }
                 worker[id].context = null;
                 worker[id].busy = false;
                 worker[id].tts = Date.now();
@@ -116,6 +118,10 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
         instances[i] = done;
         worker[i].busy = true;
 
+        if (d > 1) {
+            console.debug('[%s] Sending task to worker #%s', wid, i, task);
+        }
+
         $.each(task, function(e, t) {
             if (e === 0) {
                 worker[i].context = t;
@@ -124,10 +130,14 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
                 worker[i].postMessage(t.buffer, [t.buffer]);
             }
             else {
+                if (e === 2) {
+                    worker[i].byteOffset = t * 16;
+                }
+
                 worker[i].postMessage(t);
             }
         });
-    }, size, url.split('/').pop().split('.').shift() + '-worker', setTimeoutValue);
+    }, size, url.split('/').pop().split('.').shift() + '-worker');
 }
 
 
@@ -159,9 +169,7 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
                     backgroundNacl.workers = CreateWorkers('naclworker.js',
                         function(ctx, e, release) {
                             release(e.data);
-                        },
-                        0,
-                        0
+                        }
                     );
 
                     backgroundNacl.workers._taggedTasks = {};

@@ -464,6 +464,8 @@ var astroPayDialog = {
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         this.$pendingOverlay.removeClass('hidden');
 
+        insertEmailToPayResult(this.$pendingOverlay);
+
         // Add click handlers for 'Go to my account' and Close buttons
         this.$pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
 
@@ -793,6 +795,8 @@ var voucherDialog = {
         voucherDialog.$successOverlay.removeClass('hidden');
         voucherDialog.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
 
+        insertEmailToPayResult(voucherDialog.$successOverlay);
+
         // Add click handlers for 'Go to my account' and Close buttons
         voucherDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
 
@@ -860,13 +864,19 @@ var wireTransferDialog = {
             wireTransferDialog.$dialog.find('.email-address').text(email);
         }
 
-        // Update plan price in the dialog
-        var proPrice = pro.propay.selectedProPackage[5];
-        if (proPrice) {
-            this.$dialog.find('.amount').text(proPrice).closest('tr').removeClass('hidden');
-        }
-        else {
-            this.$dialog.find('.amount').closest('tr').addClass('hidden');
+        // Check a Pro plan is selected (it might not be if /wiretransfer page is visited directly)
+        if (pro.propay.selectedProPackage !== null) {
+
+            // Get the price of the package
+            var proPrice = pro.propay.selectedProPackage[5];
+
+            // Update plan price in the dialog
+            if (proPrice) {
+                this.$dialog.find('.amount').text(proPrice).closest('tr').removeClass('hidden');
+            }
+            else {
+                this.$dialog.find('.amount').closest('tr').addClass('hidden');
+            }
         }
     }
 };
@@ -952,6 +962,8 @@ var sabadell = {
             // Show the success
             $pendingOverlay.removeClass('hidden');
 
+            insertEmailToPayResult($pendingOverlay);
+
             // Add click handlers for 'Go to my account' and Close buttons
             $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
 
@@ -984,6 +996,7 @@ var sabadell = {
                 // Hide the overlay
                 $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 $failureOverlay.addClass('hidden');
+                loadSubPage('pro');
             });
         }
     }
@@ -1216,7 +1229,7 @@ var addressDialog = {
         var $statesSelect = this.$dialog.find('.states');
 
         // Build options
-        $.each(isoStates, function(isoCode, stateName) {
+        $.each(M.getStates(), function(isoCode, stateName) {
 
             // Create the option and set the ISO code and state name
             var $stateOption = $('<option>').val(isoCode).text(stateName);
@@ -1247,7 +1260,7 @@ var addressDialog = {
         var $countriesSelect = this.$dialog.find('.countries');
 
         // Build options
-        $.each(isoCountries, function(isoCode, countryName) {
+        $.each(M.getCountries(), function(isoCode, countryName) {
 
             // Create the option and set the ISO code and country name
             var $countryOption = $('<option>').val(isoCode).text(countryName);
@@ -1279,6 +1292,7 @@ var addressDialog = {
         var $countriesSelect = this.$dialog.find('.countries');
         var $statesSelect = this.$dialog.find('.states');
         var $stateSelectmenuButton = this.$dialog.find('#address-dialog-states-button');
+        var $postcodeInput = this.$dialog.find(".postcode");
 
         // On dropdown option change
         $countriesSelect.selectmenu({
@@ -1286,6 +1300,28 @@ var addressDialog = {
 
                 // Get the selected country ISO code e.g. CA
                 var selectedCountryCode = ui.item.value;
+
+                // If postcode translations not set, then decalre them.
+                if (addressDialog.localePostalCodeName === undefined || addressDialog.localePostalCodeName === null) {
+                    addressDialog.localePostalCodeName = {
+                        "US": "ZIP code",
+                        "CA": "Postal Code",
+                        "PH": "ZIP code",
+                        "DE": "PLZ",
+                        "AT": "PLZ",
+                        "IN": "Pincode",
+                        "IE": "Eircode",
+                        "BR": "CEP",
+                        "IT": "CAP"
+                    };
+                }
+
+                // If selecting a country whereby the postcode is named differently, update the placeholder value.
+                if (addressDialog.localePostalCodeName.hasOwnProperty(selectedCountryCode)) {
+                    $postcodeInput.attr("placeholder", addressDialog.localePostalCodeName[selectedCountryCode]);
+                } else {
+                    $postcodeInput.attr("placeholder", l[10659]);
+                }
 
                 // Reset states dropdown to default and select first option
                 $statesSelect.find('option:first-child').prop('disabled', false).prop('selected', true);
@@ -1543,6 +1579,8 @@ var addressDialog = {
             // Show the success
             $pendingOverlay.removeClass('hidden');
 
+            insertEmailToPayResult($pendingOverlay);
+
             // Add click handlers for 'Go to my account' and Close buttons
             $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
 
@@ -1575,6 +1613,7 @@ var addressDialog = {
                 // Hide the overlay
                 $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 $failureOverlay.addClass('hidden');
+                loadSubPage('pro');
             });
         }
     }
@@ -1740,7 +1779,7 @@ var cardDialog = {
         var $countriesDropDown = $countriesSelect.find('.default-select-scroll');
 
         // Build options
-        $.each(isoCountries, function(isoCode, countryName) {
+        $.each(M.getCountries(), function(isoCode, countryName) {
             countryOptions += '<div class="default-dropdown-item " data-value="' + isoCode + '">'
                             +     countryName
                             + '</div>';
@@ -1805,12 +1844,13 @@ var cardDialog = {
      * Inputs focused states
      */
     initInputsFocus: function() {
+        'use strict';
 
-        this.$dialog.find('.fm-account-input input').bind('focus', function() {
+        this.$dialog.find('.fm-account-input input').rebind('focus', function() {
             $(this).parent().addClass('focused');
         });
 
-        this.$dialog.find('.fm-account-input input').bind('blur', function() {
+        this.$dialog.find('.fm-account-input input').rebind('blur', function() {
             $(this).parent().removeClass('focused');
         });
     },
@@ -1991,6 +2031,9 @@ var cardDialog = {
         cardDialog.$successOverlay.removeClass('hidden');
         cardDialog.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
 
+        insertEmailToPayResult(cardDialog.$successOverlay);
+
+
         // Add click handlers for 'Go to my account' and Close buttons
         cardDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
 
@@ -2041,6 +2084,8 @@ var cardDialog = {
 
             // Re-open the card dialog
             cardDialog.$dialog.addClass('active').removeClass('hidden');
+
+            loadSubPage('pro');
         });
     },
 
@@ -2335,3 +2380,14 @@ if (is_chrome_firefox) {
             });
     });
 }
+
+var insertEmailToPayResult = function($overlay) {
+    "use strict";
+
+    if (u_attr.email) {
+        $overlay.find('.payment-result-txt .user-email').text(u_attr.email);
+    } else if (localStorage.awaitingConfirmationAccount) {
+        var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
+        $overlay.find('.payment-result-txt .user-email').text(acc.email);
+    }
+};

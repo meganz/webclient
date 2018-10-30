@@ -48,18 +48,33 @@ mobile.cloud.contextMenu = {
 
         var $folderContextMenu = $('.context-menu-container.folder');
         var $fileContextMenu = $('.mobile.context-menu-container.file');
-        var $previewButton = $fileContextMenu.find('.preview-file-button');
-        var $overlay = $('.light-overlay');
+        var $rubbishBinContextMenu = $('.mobile.context-menu-container.rubbishbin');
+        var $overlay = $('.dark-overlay');
 
         // Get the node type
-        var node = M.d[nodeHandle];
-        var nodeType = node.t;
+        var nodeType = M.d[nodeHandle].t;
 
         // Show overlay
         $overlay.removeClass('hidden');
 
+        // Hide the overlay on overlay tap
+        $overlay.off('tap').on('tap', function() {
+            mobile.cloud.contextMenu.hide();
+            return false;
+        });
+
         // If folder type
-        if (nodeType === 1) {
+        if (M.getNodeRoot(nodeHandle) === M.RubbishID) {
+
+            mobile.cloud.contextMenu.initCloseButton($rubbishBinContextMenu);
+            mobile.cloud.contextMenu.initRestoreButton($rubbishBinContextMenu, nodeHandle);
+            mobile.cloud.contextMenu.initRubbishBinDelete($rubbishBinContextMenu, nodeHandle);
+
+            $fileContextMenu.addClass('hidden');
+            $folderContextMenu.addClass('hidden');
+            $rubbishBinContextMenu.removeClass('hidden');
+        }
+        else if (nodeType === 1) {
 
             // Otherwise inititalise tap handler on the buttons
             mobile.cloud.contextMenu.initFolderOpenButtonHandler($folderContextMenu, nodeHandle);
@@ -73,14 +88,6 @@ mobile.cloud.contextMenu = {
             $folderContextMenu.removeClass('hidden');
         }
         else {
-            // If the file is an image, show the image preview button
-            if (is_image(node)) {
-                $previewButton.removeClass('hidden');
-            }
-            else {
-                // Otherwise hide it
-                $previewButton.addClass('hidden');
-            }
 
             // Initialise buttons
             mobile.cloud.contextMenu.initPreviewButton($fileContextMenu, nodeHandle);
@@ -105,7 +112,8 @@ mobile.cloud.contextMenu = {
 
         var $folderContextMenu = $('.context-menu-container.folder');
         var $fileContextMenu = $('.mobile.context-menu-container.file');
-        var $overlay = $('.light-overlay');
+        var $rubbishBinContextMenu = $('.mobile.context-menu-container.rubbishbin');
+        var $overlay = $('.dark-overlay');
 
         // Hide overlay
         $overlay.addClass('hidden');
@@ -113,6 +121,58 @@ mobile.cloud.contextMenu = {
         // Hide the file context menu if open and show the folder context menu
         $fileContextMenu.addClass('hidden');
         $folderContextMenu.addClass('hidden');
+        $rubbishBinContextMenu.addClass('hidden');
+    },
+
+    /**
+     * Init event handler for rubbish bin context menu restore button.
+     * @param $contextMenu
+     * @param nodeHandle
+     */
+    initRestoreButton: function ($contextMenu, nodeHandle) {
+        'use strict';
+
+        $contextMenu.find(".restore-item").off('tap').on('tap', function() {
+            mobile.rubbishBin.restore(nodeHandle)
+                .always(function() {
+                    // Manually filter out the item we just removed from the current view.
+                    mobile.cloud.removeNodesFromViewIfRemoved();
+                    if (!mobile.cloud.nodeInView(nodeHandle)) {
+                        mobile.showSuccessToast(l[19636] + ". " + l[7224], null, null, function() {
+                            M.openFolder(M.getNodeParent(nodeHandle));
+                            mobile.closeToast();
+                            return false;
+                        });
+                    }
+                    mobile.rubbishBin.renderUpdate();
+                });
+            mobile.cloud.contextMenu.hide();
+            return false;
+        });
+    },
+
+    /**
+     * Init event handler for rubbish bin context menu delete button.
+     * @param $contextMenu
+     * @param nodeHandle
+     */
+    initRubbishBinDelete: function($contextMenu, nodeHandle) {
+        'use strict';
+
+        $contextMenu.find(".delete-item").off('tap').on('tap', function() {
+            $.selected = [nodeHandle];
+            M.clearRubbish(false)
+                .then(function() {
+                    mobile.showSuccessToast(l[19635]);
+                    mobile.cloud.removeNodesFromViewIfRemoved();
+                    mobile.rubbishBin.renderUpdate();
+                })
+                .catch(function() {
+                    mobile.showErrorToast(l[5963]);
+                });
+            mobile.cloud.contextMenu.hide();
+            return false;
+        });
     },
 
     /**
@@ -142,6 +202,35 @@ mobile.cloud.contextMenu = {
     initPreviewButton: function($contextMenu, nodeHandle) {
 
         'use strict';
+
+        var $previewButton = $contextMenu.find('.preview-file-button');
+        var node = M.d[nodeHandle];
+
+        // If the file is previewable, show the preview button
+        if (is_image3(node)) {
+            // This is an image file
+            $previewButton.find('.fm-icon').removeClass('playvideo playaudio').addClass('preview');
+            $previewButton.find('.text').text(l[1899]); // Preview
+            $previewButton.removeClass('hidden');
+        }
+        else if (is_video(node)) {
+            // If the file is playable, show play button
+            if (is_video(node) === 2) {
+                // This is an audio file
+                $previewButton.find('.fm-icon').removeClass('playvideo preview').addClass('playaudio');
+                $previewButton.find('.text').text(l[17828]); // Play audio
+            }
+            else {
+                // This is a video file
+                $previewButton.find('.fm-icon').removeClass('preview playaudio').addClass('playvideo');
+                $previewButton.find('.text').text(l[16275]); // Play video
+            }
+            $previewButton.removeClass('hidden');
+        }
+        else {
+            // Otherwise hide it
+            $previewButton.addClass('hidden');
+        }
 
         // If the Preview button is tapped
         $contextMenu.find('.preview-file-button').off('tap').on('tap', function() {
@@ -247,7 +336,7 @@ mobile.cloud.contextMenu = {
 
         'use strict';
 
-        var $overlay = $('.light-overlay');
+        var $overlay = $('.dark-overlay');
 
         // When the Overlay is tapped
         $overlay.off('tap').on('tap', function() {

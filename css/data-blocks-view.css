@@ -21,6 +21,16 @@
     transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
     padding: 2px;
 }
+.data-block-view.semi-big {
+    width: 170px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    padding: 4px;
+}
+.contacts-view .data-block-view {
+    height: 220px;
+}
 .data-block-view.medium {
     width: 128px;
 }
@@ -110,19 +120,17 @@
     -ms-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
     transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
 }
-.data-block-view.medium .default-white-button.tiny-button {
+.data-block-view .default-white-button.tiny-button {
     float: none;
     position: absolute;
     z-index: 100;
-    bottom: 6px;
-    right: 6px;
+    bottom: 8px;
+    right: 8px;
     margin: 0;
 }
-.data-block-view .user-card-presence {
-    position: absolute;
-    z-index: 10;
-    left: 7px;
-    top: 7px;
+.data-block-view .user-card-presence.small {
+    right: 10px;
+    top: 10px;
     margin: 0;
 }
 .shared-blocks-view .shared-folder-info-block {
@@ -195,4 +203,7 @@
 .video.thumb .data-block-indicators, .video.thumb .video-thumb-details {
     background-color: rgba(0,0,0,0.4);
     color: white;
+}
+.video.thumb .data-block-indicators i {
+    opacity: 0.8;
 }

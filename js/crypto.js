@@ -102,7 +102,7 @@ var ERANGE = -7;
 var EEXPIRED = -8;
 
 // FS access errors
-var ENOENT = -9;
+var ENOENT = -9;            // No Entity (does not exist)
 var ECIRCULAR = -10;
 var EACCESS = -11;
 var EEXIST = -12;
@@ -119,8 +119,12 @@ var ETEMPUNAVAIL = -18;
 var ETOOMANYCONNECTIONS = -19;
 var EGOINGOVERQUOTA = -24;
 
+var EROLLEDBACK = -25;
+var EMFAREQUIRED = -26;     // Multi-Factor Authentication Required
+
 // custom errors
 var ETOOERR = -400;
+var ESHAREROVERQUOTA = -401;
 
 function ssl_needed() {
     var ssl_opt = ['Chrome/'];
@@ -222,7 +226,7 @@ function crypto_rsagenkey() {
             ko.oncomplete = function () {
                 var jwk = JSON.parse(asmCrypto.bytes_to_string(new Uint8Array(ko.result)));
                 _done(['n', 'e', 'd', 'p', 'q', 'dp', 'dq', 'qi'].map(function (x) {
-                    return base64urldecode(jwk[x])
+                    return base64urldecode(jwk[x]);
                 }));
             };
         };
@@ -352,6 +356,15 @@ function api_reset() {
                         '[{[f2{'  : tree_node,       // tree node (versioned)
                         '['       : tree_residue,    // tree residue
                         '#'       : api_esplit });   // numeric error code
+    // WSC interface (chunked mode)
+    api_init(5, 'wsc', {
+        '{[a{': sc_packet,     // SC command
+        '{[a{{t[f{': sc_node,       // SC node
+        '{[a{{t[f2{': sc_node,       // SC node (versioned)
+        '{': sc_residue,    // SC residue
+        '#': api_esplit // numeric error code
+    });
+
 }
 
 mBroadcaster.once('boot_done', api_reset);
@@ -369,16 +382,7 @@ function api_setsid(sid) {
 
         if (typeof dlmanager === 'object') {
 
-            if (!dlmanager.onOverquotaWithAchievements) {
-                if (dlmanager.isOverQuota && !dlmanager.isOverFreeQuota) {
-                    dlmanager.uqFastTrack = !Object(u_attr).p;
-                    delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
-                }
-
-                if (typeof dlmanager.onLimitedBandwidth === 'function') {
-                    dlmanager.onLimitedBandwidth();
-                }
-            }
+            dlmanager._onOverQuotaAttemptRetry();
         }
         sid = 'sid=' + sid;
     }
@@ -390,6 +394,7 @@ function api_setsid(sid) {
     apixs[2].sid = sid;
     apixs[3].sid = sid;
     apixs[4].sid = sid;
+    apixs[5].sid = sid;
 }
 
 function api_setfolder(h) {
@@ -404,6 +409,7 @@ function api_setfolder(h) {
     apixs[1].sid = h;
     apixs[2].sid = h;
     apixs[4].sid = h;
+    apixs[5].sid = h;
 }
 
 function stopapi() {
@@ -498,10 +504,17 @@ if (typeof Uint8Array.prototype.indexOf !== 'function' || is_firefox_web_ext) {
 }
 
 // this kludge emulates moz-chunked-arraybuffer with XHR-style callbacks
-function chunkedfetch(xhr, uri, postdata) {
+function chunkedfetch(xhr, uri, postdata, httpMethod) {
     "use strict";
-
-    fetch(uri, { method: 'POST', body: postdata }).then(function(response) {
+    var requestBody = {
+        method: 'POST',
+        body: postdata
+    };
+    if (httpMethod && httpMethod === 'GET') {
+        requestBody.method = 'GET';
+        delete requestBody.body;
+    }
+    fetch(uri, requestBody).then(function (response) {
         var reader = response.body.getReader();
         var evt = { loaded: 0 };
         xhr.status = response.status;
@@ -705,7 +718,6 @@ function api_proc(q) {
               + '?id=' + (q.seqno++)
               + '&' + q.sid
               + (q.split ? '&ec' : '')  // encoding: chunked if splitter attached
-              + '&lang=' + lang         // selected language
               + mega.urlParams();       // additional parameters
 
         if (typeof q.cmdsBuffer[0] === 'string') {
@@ -752,7 +764,7 @@ function api_send(q) {
     if (q.split && chunked_method == 2) {
         // use chunked fetch with JSONSplitter input type Uint8Array
         q.splitter = new JSONSplitter(q.split, q.xhr, true);
-        chunkedfetch(q.xhr, q.url, q.rawreq);
+        chunkedfetch(q.xhr, q.url, q.rawreq, (q.service === 'wsc') ? 'GET' : null);
     }
     else {
         // use legacy XHR API
@@ -962,31 +974,35 @@ var initialscfetch;
 
 // last step of the streamed SC response processing
 function sc_residue(sc) {
+    /*jshint validthis: true */
     "use strict";
 
     if (sc.sn) {
         // enqueue new sn
         currsn = sc.sn;
-        scq[scqhead++] = [{ a : '_sn', sn : currsn }];
-        getsc(true);
+        scq[scqhead++] = [{ a: '_sn', sn: currsn }];
         resumesc();
-    }
-    else if (sc.w) {
+
         if (initialscfetch) {
             // we have concluded the post-load SC fetch, as we have now
             // run out of new actionpackets: show filemanager!
-            scq[scqhead++] = [{ a : '_fm' }];
+            scq[scqhead++] = [{ a: '_fm' }];
             initialscfetch = false;
             resumesc();
         }
 
         // we're done, wait for more
-        gettingsc = false;
-        waiturl = sc.w;
+        if (sc.w) {
+            waiturl = sc.w + '?' + apixs[5].sid + '&sn=' + currsn;
+        }
+        else if (!waiturl) {
+            console.error("Strange error, we dont know WSC url and we didnt get it");
+            return getsc(true);
+        }
         waittimeout = setTimeout(waitsc, waitbackoff);
 
         if ((mega.flags & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
-            mega.loadReport.recvAPs       = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.recvAPs = Date.now() - mega.loadReport.stepTimeStamp;
             mega.loadReport.stepTimeStamp = Date.now();
         }
     }
@@ -998,8 +1014,10 @@ function sc_residue(sc) {
     }
 
     // (mandatory steps at the conclusion of a successful split response)
-    api_ready(this.q);
-    api_proc(this.q);
+    if (this.q) {
+        api_ready(this.q);
+        api_proc(this.q);
+    }
 }
 
 // getsc() serialisation (getsc() can be called anytime from anywhere if
@@ -1011,16 +1029,16 @@ var gettingsc;
 function getsc(force) {
     "use strict";
 
-    if (force || !gettingsc) {
+    if (force) {
         gettingsc = true;
 
         if (waitxhr) {
             waitxhr.abort();
         }
 
-        api_cancel(apixs[2]);   // retire existing XHR that may still be completing the request
-        api_ready(apixs[2]);
-        api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {}, 2);
+        api_cancel(apixs[5]);   // retire existing XHR that may still be completing the request
+        api_ready(apixs[5]);
+        api_req('sn=' + currsn, {}, 5);
 
         if (mega.flags & window.MEGAFLAG_LOADINGCLOUD) {
             mega.loadReport.scSent = Date.now();
@@ -1031,7 +1049,7 @@ function getsc(force) {
 function waitsc() {
     "use strict";
 
-    var MAX_WAIT = 180e3;
+    var MAX_WAIT = 40e3;
     var newid = ++waitid;
 
     stopsc();
@@ -1057,6 +1075,7 @@ function waitsc() {
             else {
                 // Increase backoff if we do keep receiving packets is rapid succession, so that we maintain
                 // smaller number of connections to process more data at once - backoff up to 4 seconds.
+                stopsc();
                 if (Date.now() - waitbegin < 1000) {
                     waitbackoff = Math.min(4e3, waitbackoff << 1);
                 }
@@ -1064,8 +1083,31 @@ function waitsc() {
                     waitbackoff = 250;
                 }
 
-                stopsc();
-                getsc();
+                var delieveredResponse = this.response;
+                if (delieveredResponse === '0') {
+                    // clearTimeout(waittimeout); mo need for clearing, we stopped
+                    // immediately re-connect.
+                    waittimeout = setTimeout(waitsc, 0);
+                    return;
+                }
+                if ($.isNumeric(delieveredResponse)) {
+                    if (delieveredResponse == ENOENT && apixs[5].sid[0] === 'n') {
+                        // WSC is stopped at the beginning.
+                        return;
+                    }
+                    waittimeout = setTimeout(waitsc, waitbackoff);
+                    return;
+                }
+                if (!apixs[5].split) {
+                    console.error('WSC has no splitter !!!!');
+                }
+                else {
+                    var wscSplitter = new JSONSplitter(apixs[5].split, waitxhr, false);
+                    if (!wscSplitter.chunkproc(delieveredResponse, true)) {
+                        fm_fullreload(null, 'onload JSON Syntax Error');
+                        return;
+                    }
+                }
             }
         }
     };
@@ -1155,6 +1197,10 @@ function api_createuser(ctx, invitecode, invitename, uh) {
         req.name = invitename;
     }
 
+    if (mega.affid) {
+        req.aff = mega.affid;
+    }
+
     //if (confirmcode) req.c = confirmcode;
     logger.debug("Storing key: " + req.k);
 
@@ -1169,10 +1215,13 @@ function api_checkconfirmcode(ctx, c) {
     }, ctx);
 }
 
-function api_resetuser(ctx, c, email, pw) {
+/* jshint -W098 */  // It is used in another file
+function api_resetuser(ctx, emailCode, email, password) {
+
     // start fresh account
     api_create_u_k();
-    var pw_aes = new sjcl.cipher.aes(prepare_key_pw(pw));
+
+    var pw_aes = new sjcl.cipher.aes(prepare_key_pw(password));
 
     var ssc = Array(4);
     for (var i = 4; i--;) {
@@ -1180,16 +1229,19 @@ function api_resetuser(ctx, c, email, pw) {
     }
 
     api_req({
-            a: 'erx',
-            c: c,
-            x: a32_to_base64(encrypt_key(pw_aes, u_k)),
-            y: stringhash(email.toLowerCase(), pw_aes),
-            z: base64urlencode(a32_to_str(ssc) + a32_to_str(encrypt_key(new sjcl.cipher.aes(u_k), ssc)))
-        }, ctx);
+        a: 'erx',
+        c: emailCode,
+        x: a32_to_base64(encrypt_key(pw_aes, u_k)),
+        y: stringhash(email.toLowerCase(), pw_aes),
+        z: base64urlencode(a32_to_str(ssc) + a32_to_str(encrypt_key(new sjcl.cipher.aes(u_k), ssc)))
+    }, ctx);
 }
 
-function api_resetkeykey(ctx, c, key, email, pw) {
-    ctx.c = c;
+function api_resetkeykey(ctx, code, key, email, pw) {
+
+    'use strict';
+
+    ctx.c = code;
     ctx.email = email;
     ctx.k = key;
     ctx.pw = pw;
@@ -1198,9 +1250,10 @@ function api_resetkeykey(ctx, c, key, email, pw) {
     api_req({
         a: 'erx',
         r: 'gk',
-        c: c
+        c: code
     }, ctx);
 }
+/* jshint +W098 */
 
 function api_resetkeykey2(res, ctx) {
     try {
@@ -1210,23 +1263,17 @@ function api_resetkeykey2(res, ctx) {
         ctx.result(EKEY);
     }
 }
+
 function api_resetkeykey3(res, ctx) {
+
+    'use strict';
+
     if (typeof res === 'string') {
-        var privk = a32_to_str(decrypt_key(new sjcl.cipher.aes(ctx.k), base64_to_a32(res)));
 
-        // verify the integrity of the decrypted private key
-        for (var i = 0; i < 4; i++) {
-            var l = ((privk.charCodeAt(0) * 256 + privk.charCodeAt(1) + 7) >> 3) + 2;
-            if (privk.substr(0, l).length < 2) {
-                break;
-            }
-            privk = privk.substr(l);
-        }
-
-        if (i !== 4 || privk.length >= 16) {
+        if (!verifyPrivateRsaKeyDecryption(res, ctx.k)) {
             ctx.result(EKEY);
         }
-        else if (ctx.email) {
+        else if (ctx.email && ctx.pw) {
             var pw_aes = new sjcl.cipher.aes(prepare_key_pw(ctx.pw));
 
             ctx.callback = ctx.result;
@@ -1247,26 +1294,69 @@ function api_resetkeykey3(res, ctx) {
     }
 }
 
+/**
+ * Verify that the Private RSA key was decrypted successfully by the Master/Recovery Key
+ * @param {String} encryptedPrivateRsaKeyBase64 The encrypted Private RSA key as a Base64 string
+ * @param {Array} masterKeyArray32 The Master/Recovery Key
+ * @returns {Boolean} Returns true if the decryption succeeded, false if it failed
+ */
+function verifyPrivateRsaKeyDecryption(encryptedPrivateRsaKeyBase64, masterKeyArray32) {
+
+    'use strict';
+
+    try {
+        // Decrypt the RSA key
+        var privateRsaKeyArray32 = base64_to_a32(encryptedPrivateRsaKeyBase64);
+        var cipherObject = new sjcl.cipher.aes(masterKeyArray32);
+        var decryptedPrivateRsaKey = decrypt_key(cipherObject, privateRsaKeyArray32);
+        var privateRsaKeyStr = a32_to_str(decryptedPrivateRsaKey);
+
+        // Verify the integrity of the decrypted private key
+        for (var i = 0; i < 4; i++) {
+            var l = ((privateRsaKeyStr.charCodeAt(0) * 256 + privateRsaKeyStr.charCodeAt(1) + 7) >> 3) + 2;
+
+            if (privateRsaKeyStr.substr(0, l).length < 2) {
+                break;
+            }
+            privateRsaKeyStr = privateRsaKeyStr.substr(l);
+        }
+
+        // If invalid
+        if (i !== 4 || privateRsaKeyStr.length >= 16) {
+            return false;
+        }
+
+        return true;
+    }
+    catch (exception) {
+        return false;
+    }
+}
+
 // We query the sid using the supplied user handle (or entered email address, if already attached)
 // and check the supplied password key.
 // Returns [decrypted master key,verified session ID(,RSA private key)] or false if API error or
 // supplied information incorrect
-function api_getsid(ctx, user, passwordkey, hash) {
+function api_getsid(ctx, user, passwordkey, hash, pinCode) {
     "use strict";
 
     ctx.callback = api_getsid2;
     ctx.passwordkey = passwordkey;
 
+    // If previously blocked for too many login attempts, return early and show warning with time they can try again
     if (api_getsid.etoomany + 3600000 > Date.now() || location.host === 'webcache.googleusercontent.com') {
-        api_getsid.warning();
-        return ctx.result(ctx, false);
+        return ctx.checkloginresult(ctx, ETOOMANY);
     }
 
-    api_req({
-        a: 'us',
-        user: user,
-        uh: hash
-    }, ctx);
+    // Setup the login request
+    var requestVars = { a: 'us', user: user, uh: hash };
+
+    // If the two-factor authentication code was entered by the user, add it to the request as well
+    if (pinCode !== null) {
+        requestVars.mfa = pinCode;
+    }
+
+    api_req(requestVars, ctx);
 }
 
 api_getsid.warning = function() {
@@ -1279,22 +1369,10 @@ function api_getsid2(res, ctx) {
     var t, k;
     var r = false;
 
+    // If the result is an error, pass that back to get an exact error
     if (typeof res === 'number') {
-
-        if (res === ETOOMANY) {
-            api_getsid.etoomany = Date.now();
-            api_getsid.warning();
-        }
-
-        // Check for incomplete registration
-        else if (res === EINCOMPLETE) {
-            if (is_mobile) {
-                mobile.messageOverlay.show(l[882], l[9082]);
-            }
-            else {
-                msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration process...
-            }
-        }
+        ctx.checkloginresult(ctx, res);
+        return false;
     }
     else if (typeof res === 'object') {
         var aes = new sjcl.cipher.aes(ctx.passwordkey);
@@ -1333,6 +1411,11 @@ function api_getsid2(res, ctx) {
                     if (privk) {
                         // TODO: check remaining padding for added early wrong password detection likelihood
                         r = [k, base64urlencode(crypto_rsadecrypt(t, privk).substr(0, 43)), privk];
+                    }
+                    else {
+                        // Bad decryption of RSA is an indication that the password was wrong
+                        ctx.checkloginresult(ctx, false);
+                        return false;
                     }
                 }
             }
@@ -1380,6 +1463,11 @@ function api_setattr(n, idtag) {
         }
     };
 
+    if (!crypto_keyok(n)) {
+        logger.warn('Unable to set node attributes, invalid key on %s', n.h, n);
+        return MegaPromise.reject(EKEY);
+    }
+
     try {
         var at = ab_to_base64(crypto_makeattr(n));
 
@@ -1421,7 +1509,11 @@ function stringhash(s, aes) {
 function api_updateuser(ctx, newuser) {
     newuser.a = 'up';
 
-    res = api_req(newuser, ctx);
+    if (mega.affid) {
+        newuser.aff = mega.affid;
+    }
+
+    api_req(newuser, ctx);
 }
 
 var u_pubkeys = Object.create(null);
@@ -2238,7 +2330,7 @@ fa_handler.prototype = {
                 fa_handler.chunked = false;
             }
 
-            srvlog(this.xhr.fa_host + ' connection interrupted (chunked fa)');
+            console.warn(this.xhr.fa_host + ' connection interrupted (chunked fa)');
         }
 
         oDestroy(this);
@@ -2285,7 +2377,7 @@ function api_faretry(ctx, error, host) {
     }
 
     mBroadcaster.sendMessage('fa:error', ctx.id, error, ctx.p, 2);
-    srvlog("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
+    console.warn("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
 }
 
 function api_faerrlauncher(ctx, host) {
@@ -2296,11 +2388,8 @@ function api_faerrlauncher(ctx, host) {
     if (d) {
         logger.error('FAEOT', id);
     }
-    else {
-        srvlog('api_fareq: eot for ' + host);
-    }
 
-    if (id !== slideshowid) {
+    if (id !== slideshow_handle()) {
         if (id) {
             pfails[id] = 1;
             delete preqs[id];
@@ -2319,11 +2408,6 @@ function api_fareq(res, ctx, xhr) {
 
     if (ctx.startTime && logger) {
         logger.debug('Reply in %dms for %s', (Date.now() - ctx.startTime), xhr.q.url);
-    }
-
-    if (!d && ctx.startTime && (Date.now() - ctx.startTime) > 10000) {
-        var host = (xhr.q && xhr.q.url || '~!').split('//').pop().split('/')[0];
-        srvlog('api_' + (ctx.p ? 'get' : 'store') + 'fileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error);
     }
 
     if (error) {
@@ -2427,19 +2511,12 @@ function api_fareq(res, ctx, xhr) {
             faxhrs[slot].onreadystatechange = function (ev) {
                     this.onprogress(ev);
 
-                    if (this.startTime && this.readyState === 2) {
-                        if (!d && (Date.now() - this.startTime) > 10000) {
-                            srvlog('api_fareq: ' + this.fa_host + ' took +10s');
-                        }
-                        delete this.startTime;
-                    }
-
                     if (this.readyState === 4) {
                         if (this.fart) {
                             clearTimeout(this.fart);
                         }
 
-                        if (this.fah.done(ev) || M.chat) {
+                        if (this.fah.done(ev)) {
                             delay('thumbnails', fm_thumbnails, 200);
                         }
 
@@ -2494,10 +2571,6 @@ function api_fareq(res, ctx, xhr) {
                                     || (Date.now() - faxhrlastgood[this.fa_host]) > this.timeout) {
                                 faxhrfail[this.fa_host] = failtime = 1;
                                 api_reportfailure(this.fa_host, function () {});
-
-                                if (!d) {
-                                    srvlog('api_fareq: 140s timeout for ' + this.fa_host);
-                                }
                             }
                         }
                     };
@@ -3000,6 +3073,8 @@ function api_strerror(errno) {
         return "Connection overflow";
     case EGOINGOVERQUOTA:
         return "Not enough quota";
+    case ESHAREROVERQUOTA:
+        return l[19597] || 'Share owner is over storage quota.';
     default:
         break;
     }

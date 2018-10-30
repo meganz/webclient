@@ -47,7 +47,6 @@ MegaData.prototype.renderMain = function(aUpdate) {
 
     // No need to bind mouse events etc (gridUI/iconUI/selecddUI)
     // if there weren't new rendered nodes (Ie, they were cached)
-
     if (numRenderedNodes) {
         if (!aUpdate) {
             M.addContactUI();
@@ -250,23 +249,38 @@ MegaData.prototype.renderShare = function(h) {
 };
 
 MegaData.prototype.renderTree = function() {
-    var build = function(h) {
-        return M.buildtree({h: h}, M.buildtree.FORCE_REBUILD);
-    };
+    'use strict';
 
-    var promise = MegaPromise.allDone([build('shares'), build(M.RootID), build(M.RubbishID), build(M.InboxID)]);
-
-    promise.done(function() {
-        M.contacts();
-        M.addTreeUIDelayed();
+    var build = tryCatch(function(h) {
+        M.buildtree({h: h}, M.buildtree.FORCE_REBUILD);
     });
 
-    return promise;
+    build('shares');
+    build(M.RootID);
+    build(M.RubbishID);
+    build(M.InboxID);
+
+    M.contacts();
+    M.addTreeUIDelayed();
+
+    // TODO: refactor this back to no-promises
+    return MegaPromise.resolve();
 };
 
 
 MegaData.prototype.pathLength = function() {
-    var length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
+    "use strict";
+
+    var filterLength = 0;
+    var length = 0;
+    var $filter = $('.fm-right-header .filter-block.body:visible');
+
+    if ($filter.length > 0) {
+        filterLength = $filter.outerWidth() + 20;
+    }
+
+    length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
+        + filterLength
         + $('.fm-right-header .fm-header-buttons:visible').outerWidth();
     return length;
 };
@@ -436,9 +450,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
     }
 
     breadcrumbsResize();
-    $(window).bind('resize.fmbreadcrumbs', function() {
-        breadcrumbsResize();
-    });
+    $(window).rebind('resize.fmbreadcrumbs', SoonFc(breadcrumbsResize, 202));
 
     if ($('.fm-right-header .fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
         $('.fm-right-header .fm-breadcrumbs-block').removeClass('deactivated');
@@ -447,8 +459,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
         $('.fm-right-header .fm-breadcrumbs-block').addClass('deactivated');
     }
 
-    $('.fm-right-header .fm-breadcrumbs-block a').unbind('click');
-    $('.fm-right-header .fm-breadcrumbs-block a').bind('click', function() {
+    $('.fm-right-header .fm-breadcrumbs-block a').rebind('click', function() {
         var crumbId = $(this).attr('id');
 
         // When NOT deactivated
@@ -580,7 +591,8 @@ MegaData.prototype.searchPath = function() {
 MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
     'use strict';
 
-    $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud,.fm-invalid-folder').addClass('hidden');
+    $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search')
+        .add('.fm-empty-cloud,.fm-invalid-folder,.fm-empty-filter').addClass('hidden');
     $('.fm-empty-folder,.fm-empty-incoming,.fm-empty-folder-link').addClass('hidden');
     $('.fm-empty-pad.fm-empty-sharef').remove();
 };
@@ -616,6 +628,9 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
             node.classList.remove('ui-selected');
         }
         node.classList.remove('ui-selectee');
+    }
+    else if (selList && selList.length === 0) {
+        node.classList.remove('ui-selected');
     }
 
     if (M.d[aHandle]) {

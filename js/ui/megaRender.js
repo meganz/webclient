@@ -120,6 +120,18 @@
                             '<div class="fm-chat-user-status"></div>' +
                             '<div class="clear"></div>' +
                         '</div>' +
+                        '<div class="contact-chat-buttons">' +
+                            '<div class="default-white-button inline start-conversation">' +
+                                '<i class="small-icon conversations dark"></i>' +
+                                '<span></span>' +
+                            '</div>' +
+                            '<div class="default-white-button inline short start-audio-call">' +
+                                '<i class="small-icon audio-call dark"></i>' +
+                            '</div>' +
+                            '<div class="default-white-button inline short start-video-call">' +
+                                '<i class="small-icon video-call dark"></i>' +
+                            '</div>' +
+                        '</div>' +
                     '</td>' +
                     '<td width="270">' +
                         '<div class="contacts-interation"></div>' +
@@ -131,14 +143,26 @@
             '</table>',
 
             // Icon view mode
-            '<a class="data-block-view ustatus">' +
+            '<a class="data-block-view semi-big ustatus">' +
                 '<span class="file-settings-icon"></span>' +
                 '<span class="shared-folder-info-block">' +
-                    '<span class="u-card-data">' +
+                    '<span class="u-card-data overlayed">' +
                         '<span class="shared-folder-name"></span>' +
                         '<span class="nw-contact-status"></span>' +
                     '</span>' +
-                    '<span class="shared-folder-info"></span>' +
+                    '<span class="shared-folder-info overlayed""></span>' +
+                    '<span class="contact-chat-buttons">' +
+                        '<span class="default-white-button inline start-conversation">' +
+                            '<i class="small-icon conversations dark"></i>' +
+                            '<span></span>' +
+                        '</span>' +
+                        '<span class="default-white-button inline short start-audio-call">' +
+                            '<i class="small-icon audio-call dark"></i>' +
+                        '</span>' +
+                        '<span class="default-white-button inline short start-video-call">' +
+                            '<i class="small-icon video-call dark"></i>' +
+                        '</span>' +
+                    '</span>' +
                 '</span>' +
             '</a>'
         ],
@@ -192,7 +216,7 @@
         ],
         'contacts': [
             '.grid-table.contacts',
-            '.contacts-blocks-scrolling'
+            '.contacts-blocks-scrolling .content'
         ],
         'shares': [
             '.shared-grid-view .grid-table.shared-with-me',
@@ -339,17 +363,18 @@
 
             if (!aUpdate) {
                 sharedFolderUI();
-
                 deleteScrollPanel('.contacts-blocks-scrolling', 'jsp');
                 deleteScrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
                 deleteScrollPanel('.file-block-scrolling', 'jsp');
+                deleteScrollPanel('.shared-blocks-scrolling', 'jsp');
 
                 initOpcGridScrolling();
                 initIpcGridScrolling();
 
-                $('.grid-table tr').remove();
+                $('.grid-table:not(.arc-chat-messages-block) tr').remove();
                 $('.file-block-scrolling a').remove();
-                $('.contacts-blocks-scrolling a').remove();
+                $('.shared-blocks-scrolling a').remove();
+                $('.contacts-blocks-scrolling .content a').remove();
 
                 $(lSel).show().parent().children('table').show();
             }
@@ -365,6 +390,9 @@
                     $('.fm-empty-contacts').removeClass('hidden');
                 }
                 else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
+                    $('.contacts-tab-lnk.ipc[data-folder=' + M.currentdirid+ ']')
+                        .removeClass('filled').find('span').text('');
+                    $('.button.link-button.accept-all').addClass('hidden');
                     $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                     $('.fm-empty-contacts').removeClass('hidden');
                 }
@@ -384,20 +412,27 @@
                         $('.fm-empty-folder-link').removeClass('hidden');
                     }
                 }
-                else if (M.currentdirid === M.RootID) {
-                    $('.fm-empty-cloud').removeClass('hidden');
-                }
                 else if (M.currentdirid === M.InboxID) {
                     $('.fm-empty-messages').removeClass('hidden');
                 }
-                else if (M.currentdirid === 'shares') {
-                    $('.fm-empty-incoming').removeClass('hidden');
-                }
                 else if (M.currentrootid === M.RootID
                         || M.currentrootid === M.RubbishID
-                        || M.currentrootid === M.InboxID) {
+                        || M.currentrootid === M.InboxID
+                        || M.currentrootid === 'shares') {
 
-                    $('.fm-empty-folder').removeClass('hidden');
+                    // If filter is empty show 'Your label filter did not match any documents'
+                    if (M.currentLabelFilter) {
+                        $('.fm-empty-filter').removeClass('hidden');
+                    }
+                    else if (M.currentdirid === M.RootID) {
+                        $('.fm-empty-cloud').removeClass('hidden');
+                    }
+                    else if (M.currentdirid === 'shares') {
+                        $('.fm-empty-incoming').removeClass('hidden');
+                    }
+                    else {
+                        $('.fm-empty-folder').removeClass('hidden');
+                    }
                 }
                 else if (M.currentrootid === 'shares') {
                     M.emptySharefolderUI(lSel);
@@ -702,7 +737,8 @@
                     props.size = bytesToSize(aNode.s);
 
                     if (aNode.fa && aNode.fa.indexOf(':8*') > 0) {
-                        props.playtime = MediaAttribute(aNode).data.playtime;
+                        Object.assign(props, MediaAttribute(aNode).data);
+                        props.codecs = MediaAttribute.getCodecStrings(aNode);
                     }
                 }
                 props.name = aNode.name;
@@ -757,7 +793,7 @@
 
                     // Colour label
                     if (aNode.lbl && !folderlink) {
-                        var colourLabel = M.getColourClassFromId(aNode.lbl);
+                        var colourLabel = M.getLabelClassFromId(aNode.lbl);
                         props.classNames.push('colour-label');
                         props.classNames.push(colourLabel);
                     }
@@ -787,7 +823,7 @@
 
                 if (this.viewmode) {
                     if (aExtendedInfo !== false) {
-                        avatar = useravatar.contact(props.userHandle, 'nw-contact-avatar', 'span');
+                        avatar = useravatar.contact(props.userHandle, '', 'span');
                     }
                 }
                 else {
@@ -810,7 +846,7 @@
                     }
 
                     if (aExtendedInfo !== false) {
-                        avatar = useravatar.contact(props.userHandle, 'nw-contact-avatar');
+                        avatar = useravatar.contact(props.userHandle);
                     }
                 }
 
@@ -820,7 +856,7 @@
 
                 // Colour label
                 if (aNode.lbl && !folderlink && (aNode.su !== u_handle)) {
-                    var colourLabel = M.getColourClassFromId(aNode.lbl);
+                    var colourLabel = M.getLabelClassFromId(aNode.lbl);
                     props.classNames.push('colour-label');
                     props.classNames.push(colourLabel);
                 }
@@ -832,13 +868,21 @@
             },
             'contacts': function(aNode, aHandle, aExtendedInfo) {
                 var props = {classNames: []};
+                var avatar;
+
+                props.conversationText = l[7997];
 
                 if (this.logger) {
                     // We only care about active contacts
                     assert(Object(M.u[aHandle]).c === 1, 'Found non-active contact');
                 }
 
-                var avatar = useravatar.contact(aHandle, 'nw-contact-avatar');
+                if (M.viewmode === 0) {
+                    avatar = useravatar.contact(aHandle);
+                }
+                else {
+                    avatar = useravatar.contact(aHandle, 'medium-avatar');
+                }
 
                 if (avatar) {
                     props.avatar = parseHTML(avatar).firstChild;
@@ -869,14 +913,31 @@
              */
             'cloud-drive': function(aNode, aProperties, aTemplate) {
                 var tmp;
+                var title = [];
 
                 if (aNode.fav && !folderlink) {
                     var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
                     aTemplate.querySelector(selector).classList.add('star');
                 }
+
                 if (!aNode.t && aNode.tvf) {
                     aTemplate.classList.add('versioning');
                 }
+
+                if (this.viewmode || aProperties.name.length > 78 || aProperties.playtime !== undefined) {
+                    if (aProperties.width) {
+                        title.push(aProperties.width + 'x' + aProperties.height + ' @' + aProperties.fps + 'fps');
+                    }
+                    if (aProperties.codecs) {
+                        title.push(aProperties.codecs);
+                    }
+                    if (aNode.s) {
+                        title.push(bytesToSize(aNode.s, 0).replace(' ', ''));
+                    }
+                    title.push(aProperties.name);
+                }
+                title = title.join(' ');
+
                 if (this.viewmode) {
                     tmp = aTemplate.querySelector('.block-view-file-type');
 
@@ -884,13 +945,16 @@
                         tmp.classList.add(aProperties.icon);
                     }
 
-                    if (aProperties.playtime) {
+                    if (aProperties.playtime !== undefined) {
                         aTemplate.querySelector('.data-block-bg').classList.add('video');
                         aTemplate.querySelector('.video-thumb-details span').textContent
                             = secondsToTimeShort(aProperties.playtime);
                     }
 
                     aTemplate.querySelector('.file-block-title').textContent = aProperties.name;
+                    if (title) {
+                        aTemplate.setAttribute('title', title);
+                    }
                 }
                 else {
                     if (aProperties.linked) {
@@ -902,7 +966,12 @@
                     }
                     aTemplate.querySelector('.type').textContent = aProperties.type;
                     aTemplate.querySelector('.time').textContent = aProperties.time;
-                    aTemplate.querySelector('.tranfer-filetype-txt').textContent = aProperties.name;
+
+                    tmp = aTemplate.querySelector('.tranfer-filetype-txt');
+                    tmp.textContent = aProperties.name;
+                    if (title) {
+                        tmp.setAttribute('title', title);
+                    }
 
                     tmp = aTemplate.querySelector('.transfer-filetype-icon');
                     tmp.classList.add(aProperties.icon);
@@ -978,6 +1047,8 @@
                 return aTemplate;
             },
             'contacts': function(aNode, aProperties, aTemplate) {
+
+                aTemplate.querySelector('.start-conversation span').textContent = aProperties.conversationText;
 
                 if (aProperties.avatar) {
                     var avatar = this.viewmode ? '.shared-folder-info-block' : '.fm-chat-user-info';

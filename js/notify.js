@@ -168,20 +168,13 @@ var notify = {
         'use strict';
 
         // Make User Get Email (uge) request to get the user's email address from the user handle
-        api_req({ a: 'uge', 'u': userHandle }, {
-            callback: function(result) {
+        M.req({a: 'uge', 'u': userHandle}).done(function(result) {
 
-                // Exit if there was an API error
-                if (typeof result === 'number' && result < 0) {
-                    return false;
-                }
+            // Update the local state with the user's email
+            notify.userEmails[userHandle] = result;
 
-                // Update the local state with the user's email
-                notify.userEmails[userHandle] = result;
-
-                // Re-call the notify function with the action packet now that the email has been stored
-                notify.notifyFromActionPacket(actionPacket);
-            }
+            // Re-call the notify function with the action packet now that the email has been stored
+            notify.notifyFromActionPacket(actionPacket);
         });
     },
 
@@ -359,6 +352,9 @@ var notify = {
 
         // Update page title
         megatitle();
+
+        // Update IPC indicator
+        delay('updateIpcRequests', updateIpcRequests);
     },
 
     /**
@@ -640,16 +636,18 @@ var notify = {
 
             // Get the folder ID from the HTML5 data attribute
             var folderOrFileId = $(this).attr('data-folder-or-file-id');
-            var parentFolderId = M.d[folderOrFileId].p;
+            var parentFolderId = M.getNodeByHandle(folderOrFileId).p;
 
             // Mark all notifications as seen (because they clicked on a notification within the popup)
             notify.markAllNotificationsAsSeen();
 
-            // Open the folder
-            M.openFolder(parentFolderId)
-                .always(function() {
-                    reselect(true);
-                });
+            if (parentFolderId) {
+                // Open the folder
+                M.openFolder(parentFolderId)
+                    .always(function() {
+                        reselect(true);
+                    });
+            }
         });
     },
 
@@ -704,6 +702,9 @@ var notify = {
 
             // Mark all notifications as seen (because they clicked on a notification within the popup)
             notify.markAllNotificationsAsSeen();
+
+            // Update IPC indicator
+            delay('updateIpcRequests', updateIpcRequests);
         });
     },
 
@@ -792,7 +793,7 @@ var notify = {
             case 'd':
                 return notify.renderRemovedSharedNode($notificationHtml, notification);
             case 'dshare':
-                return notify.renderDeletedShare($notificationHtml, userEmail);
+                return notify.renderDeletedShare($notificationHtml, userEmail, notification);
             case 'put':
                 return notify.renderNewSharedNodes($notificationHtml, notification, userEmail);
             case 'psts':
@@ -1038,19 +1039,73 @@ var notify = {
      * Render a deleted share notification
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
      * @param {String} email The email address
+     * @param {Object} notification notification object
      * @returns {Object} The HTML to be rendered for the notification
      */
-    renderDeletedShare: function($notificationHtml, email) {
+    renderDeletedShare: function ($notificationHtml, email, notification) {
 
         var title = '';
+        var notificationOwner;
+        var notificationTarget;
+        var notificationOrginating;
 
-        // If the email exists use string 'Access to folders shared by [X] was removed'
-        if (email) {
-            title = l[7879].replace('[X]', email);
+        // first we are parsing an action packet.
+        if (notification.data.orig) {
+            notificationOwner = notification.data.u;
+            notificationTarget = notification.data.rece;
+            notificationOrginating = notification.data.orig;
         }
         else {
-            // Otherwise use string 'Access to folders was removed.'
-            title = l[7880];
+            // otherwise we are parsing 'c' api response (initial notifications request)
+            notificationOwner = notification.data.o;
+            notificationOrginating = notification.data.u;
+            if (notificationOwner === u_handle) {
+                if (notificationOrginating === u_handle) {
+                    console.error('receiving a wrong notification, this notification shouldnt be sent to me',
+                        notification
+                    );
+                }
+                else {
+                    notificationTarget = notificationOrginating;
+                }
+            }
+            else {
+                notificationTarget = u_handle;
+            }
+
+            // if we are dealing with old notification which doesnt support the new data
+            if (!notificationOwner || notificationOwner === -1) {
+                // fall back to the old not correct notification
+                notificationOwner = notificationOrginating;
+            }
+            // receiving old action packet
+            // .rece without .orig
+            if (notification.data.rece) {
+                notificationOwner = notificationOrginating;
+            }
+
+        }
+        var sharingRemovedByReciver = notificationOrginating !== notificationOwner;
+
+        if (!sharingRemovedByReciver) {
+            // If the email exists use string 'Access to folders shared by [X] was removed'
+            if (email) {
+                title = l[7879].replace('[X]', email);
+            }
+            else {
+                // Otherwise use string 'Access to folders was removed.'
+                title = l[7880];
+            }
+        }
+        else {
+            var folderName = M.getNameByHandle(notification.data.n) || '';
+            var removerEmail = notify.userEmails[notificationTarget];
+            if (removerEmail) {
+                title = l[19153].replace('{0}', removerEmail).replace('{1}', folderName);
+            }
+            else {
+                title = l[19154].replace('{0}', folderName);
+            }
         }
 
         // Populate other template information

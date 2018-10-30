@@ -298,8 +298,9 @@ var exportPassword = {
                 if (typeof zxcvbn !== 'undefined') {
 
                     // Estimate the password strength
-                    var password = $passwordInput.val();
-                    var passwordStrength = zxcvbn(password);
+                    var password = $.trim($passwordInput.val());
+                    var passwordScore = zxcvbn(password).score;
+                    var passwordLength = password.length;
 
                     // Remove previous strength classes that were added
                     $passwordStrengthField.removeClass().addClass('password-strength');
@@ -308,16 +309,19 @@ var exportPassword = {
                     if (password.length === 0) {
                         $passwordStrengthField.text('');   // No password entered, hide text
                     }
-                    else if (passwordStrength.score > 3 && passwordStrength.entropy > 75) {
+                    else if (passwordLength < 8) {
+                        $passwordStrengthField.addClass('good1').text(l[18700]);    // Too short
+                    }
+                    else if (passwordScore === 4) {
                         $passwordStrengthField.addClass('good5').text(l[1128]);    // Strong
                     }
-                    else if (passwordStrength.score > 2 && passwordStrength.entropy > 50) {
+                    else if (passwordScore === 3) {
                         $passwordStrengthField.addClass('good4').text(l[1127]);    // Good
                     }
-                    else if (passwordStrength.score > 1 && passwordStrength.entropy > 40) {
+                    else if (passwordScore === 2) {
                         $passwordStrengthField.addClass('good3').text(l[1126]);    // Medium
                     }
-                    else if (passwordStrength.score > 0 && passwordStrength.entropy > 15) {
+                    else if (passwordScore === 1) {
                         $passwordStrengthField.addClass('good2').text(l[1125]);    // Weak
                     }
                     else {
@@ -454,7 +458,7 @@ var exportPassword = {
             }
 
             // Check that the password length is sufficient and exclude very weak passwords
-            if ((password.length < 1) || $strengthLabel.hasClass('good1')) {
+            if ((password.length < 8) || $strengthLabel.hasClass('good1')) {
 
                 $errorLabel.text(l[9067]);  // Please use a stronger password
                 return false;
@@ -1314,7 +1318,7 @@ var exportExpiry = {
         var linksNum;
         var centerDialog = function() {
             $linksDialog.css('margin-top',
-                $linksDialog.outerHeight() / 2 * -1 - $('.export-links-warning:visible').outerHeight() / 2);
+                $linksDialog.outerHeight() / 2 * -1 - ($('.export-links-warning:visible').outerHeight() | 0) / 2);
         };
         var getContentsToClip = function() {
             if ($('.fm-tab.tab-embed-link', $linksDialog).hasClass('active')) {
@@ -1396,7 +1400,7 @@ var exportExpiry = {
                     $setting.removeClass('disabled').find('input').prop('readonly', false).rebind('input', setCode);
                 }
                 else {
-                    $setting.addClass('disabled').find('input').prop('readonly', true).unbind('input');
+                    $setting.addClass('disabled').find('input').prop('readonly', true).off('input');
                 }
                 setCode();
             });
@@ -1473,6 +1477,9 @@ var exportExpiry = {
                 $('.export-link-body', $linksDialog).siblings().addClass('hidden');
                 $('.fm-dialog-title', $linksDialog).text('');
             }
+            else if (folderlink) {
+                $('.extra-options, .reveal-feature-toggle-container', $linksDialog).addClass('hidden');
+            }
             else {
                 $('.export-links-warning').removeClass('hidden');
             }
@@ -1491,12 +1498,8 @@ var exportExpiry = {
         });
 
         // Setup toast notification
-        toastTxt = l[7654];
-        linksNum = countNumOfLinks();
-
-        if (linksNum > 1) {
-            toastTxt = l[7655].replace('%d', linksNum);
-        }
+        linksNum = getContentsToClip().split('\n').length;
+        toastTxt = linksNum > 1 ? l[7655].replace('%d', linksNum) : l[7654];
 
         // Setup the copy to clipboard buttons
         $span.text(l[1990]);
@@ -1611,7 +1614,7 @@ var exportExpiry = {
             return false;
         });
 
-        if (page !== 'download') {
+        if (page !== 'download' && !folderlink) {
             // Initialise the Export Link expiry and password protect features
             exportExpiry.init();
             exportPassword.encrypt.init();
@@ -1632,10 +1635,7 @@ var exportExpiry = {
      * @private
      */
     function getClipboardLinks() {
-        var key;
-        var type;
         var links = [];
-        var handles = $.itemExport;
         var $dialog = $('.export-links-dialog .export-content-block');
         var modeFull = $dialog.hasClass('full-link');
         var modePublic = $dialog.hasClass('public-handle');
@@ -1652,70 +1652,24 @@ var exportExpiry = {
         }
         else {
             // Otherwise add all regular links
-            for (var i in handles) {
-                var node = M.d[handles[i]];
+            $('.file-link-info-wrapper', $dialog).each(function() {
+                var nodeUrlWithPublicHandle = $('.file-link-info.url', this).text();
+                var nodeDecryptionKey = $('.file-link-info.key', this).text();
 
-                // Only nodes with public handle
-                if (node && node.ph) {
-                    if (node.t) {
-                        // Folder
-                        type = 'F';
-                        key = u_sharekeys[node.h] && u_sharekeys[node.h][0];
-                    }
-                    else {
-                        // File
-                        type = '';
-                        key = node.k;
-                    }
-
-                    if (key) {
-                        var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + (node.ph);
-                        var nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
-
-                        // Check export/public link dialog drop down list selected option
-                        if (modeFull) {
-                            links.push(nodeUrlWithPublicHandle + nodeDecryptionKey);
-                        }
-                        else if (modePublic) {
-                            links.push(nodeUrlWithPublicHandle);
-                        }
-                        else if (modeDecKey) {
-                            links.push(nodeDecryptionKey);
-                        }
-                    }
-                    else {
-                        srvlog2('export-no-key', node.h, node.t);
-                    }
+                // Check export/public link dialog drop down list selected option
+                if (modeFull) {
+                    links.push(nodeUrlWithPublicHandle + nodeDecryptionKey);
                 }
-            }
+                else if (modePublic) {
+                    links.push(nodeUrlWithPublicHandle);
+                }
+                else if (modeDecKey) {
+                    links.push(nodeDecryptionKey);
+                }
+            });
         }
 
         return links.join("\n");
-    }
-
-    /**
-     * Count the number of links
-     * @return {Number} Returns the number of links
-     */
-    function countNumOfLinks() {
-
-        var handles = $.selected;
-        var numOfLinks = 0;
-
-        // For each selected node
-        for (var i in handles) {
-            if (handles.hasOwnProperty(i)) {
-
-                var node = M.d[handles[i]];
-
-                // Only count nodes with public handles
-                if (node && node.ph) {
-                    numOfLinks++;
-                }
-            }
-        }
-
-        return numOfLinks;
     }
 
     /**
@@ -1733,12 +1687,20 @@ var exportExpiry = {
         var folderClass = '';
         var html = '';
         var nodeHandle = item.h;
+        var fileUrlKey;
+        var fileUrlWithoutKey;
 
         // Add a hover text for the icon
         var expiresTitleText = l[8698].replace('%1', '');   // Expires %1
 
-        // Shared item type is folder
-        if (item.t) {
+        if (folderlink) {
+            var target = (M.currentdirid !== M.RootID ? '!' + M.currentdirid : '') + '?' + item.h;
+            fileUrlWithoutKey = 'https://mega.nz/#F!' + pfid;
+            fileUrlKey = '!' + pfkey + (item.t ? '!' + item.h : target);
+            fileSize = item.s && htmlentities(bytesToSize(item.s)) || '';
+        }
+        else if (item.t) {
+            // Shared item type is folder
             key = u_sharekeys[item.h] && u_sharekeys[item.h][0];
 
             // folder key must exit, otherwise skip
@@ -1750,15 +1712,15 @@ var exportExpiry = {
             fileSize = '';
             folderClass = ' folder-item';
         }
-        // Shared item type is file
         else {
+            // Shared item type is file
             type = '';
             key = item.k;
             fileSize = htmlentities(bytesToSize(item.s));
         }
 
-        var fileUrlWithoutKey = 'https://mega.nz/#' + type + '!' + htmlentities(item.ph);
-        var fileUrlKey = key ? '!' + a32_to_base64(key) : '';
+        fileUrlWithoutKey = fileUrlWithoutKey || ('https://mega.nz/#' + type + '!' + htmlentities(item.ph));
+        fileUrlKey = fileUrlKey || (key ? '!' + a32_to_base64(key) : '');
 
         html = '<div class="export-link-item' + folderClass + '" data-node-handle="' + nodeHandle + '">'
              +      '<div class="export-icon ' + fileIcon(item) + '" ></div>'
@@ -1797,7 +1759,7 @@ var exportExpiry = {
 
         $.each($.itemExport, function(index, value) {
             var node = M.d[value];
-            if (node && node.ph) {
+            if (node && (folderlink || node.ph)) {
                 html += itemExportLinkHtml(node);
             }
         });
@@ -1852,6 +1814,12 @@ var exportExpiry = {
         if (page === 'download') {
             eventlog(99683); // Share public link on downloads page.
         }
+        else if (folderlink) {
+            eventlog(99715); // Share public link from folder-link.
+
+            var exportLinkDialog = new mega.Dialog.ExportLink();
+            return exportLinkDialog.linksDialog();
+        }
         else if (is_mobile) {
             eventlog(99634); // Created public link on mobile webclient
         }
@@ -1883,24 +1851,42 @@ var exportExpiry = {
 
     /**
      * Removes public link for file or folder.
+     * @param {Boolean} [quiet] No loading overlay
+     * @returns {MegaPromise}
      */
-    ExportLink.prototype.removeExportLink = function() {
-
+    ExportLink.prototype.removeExportLink = function(quiet) {
         var self = this;
+        var promises = [];
+        var handles = self.options.nodesToProcess || [];
 
-        if (self.options.nodesToProcess.length) {
-            loadingDialog.show();
+        if (handles.length) {
+            if (!quiet) {
+                loadingDialog.show();
+            }
             self.logger.debug('removeExportLink');
 
-            $.each(self.options.nodesToProcess, function(index, nodeId) {
-                if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
-                    self._removeFolderExportLinkRequest(nodeId);
+            $.each(handles, function(index, h) {
+                var n = M.d[h];
+
+                if (n) {
+                    if (n.t) {
+                        promises.push(self._removeFolderExportLinkRequest(h, quiet));
+                    }
+                    else {
+                        promises.push(self._removeFileExportLinkRequest(h, quiet));
+                    }
                 }
-                else if (M.d[nodeId] && M.d[nodeId].t === 0) {// File
-                    self._removeFileExportLinkRequest(nodeId);
+                else if (d) {
+                    console.warn('removeExportLink: node not found.', h);
                 }
             });
         }
+
+        if (!promises.length) {
+            return MegaPromise.reject(EARGS);
+        }
+
+        return MegaPromise.allDone(promises);
     };
 
     /**
@@ -2017,10 +2003,13 @@ var exportExpiry = {
     /**
      * A 'Private' function, send folder delete public link request.
      * @param {String} nodeId The node ID.
+     * @param {Boolean} [quiet] No loading overlay
+     * @returns {MegaPromise}
      */
-    ExportLink.prototype._removeFolderExportLinkRequest = function(nodeId) {
+    ExportLink.prototype._removeFolderExportLinkRequest = function(nodeId, quiet) {
 
         var self = this;
+        var masterPromise = new MegaPromise();
 
         api_req({ a: 's2', n:  nodeId, s: [{ u: 'EXP', r: ''}], ha: '', i: requesti }, {
             nodeId: nodeId,
@@ -2037,26 +2026,34 @@ var exportExpiry = {
                     if (is_mobile) {
                         mobile.linkOverlay.completeLinkRemovalProcess(this.nodeId);
                     }
+
+                    masterPromise.resolve();
                 }
                 else {
                     // Error
                     self.logger.warn('_removeFolerExportLinkRequest failed for node:', this.nodeId, 'Error: ', result);
+                    masterPromise.reject(result);
                 }
 
-                if (!--self.nodesLeft) {
-                    loadingDialog.hide();
+                if (!--self.nodesLeft && !quiet) {
+                    loadingDialog.phide();
                 }
             }
         });
+
+        return masterPromise;
     };
 
     /**
      * A 'Private' function, send file delete public link request.
      * @param {String} nodeId The node IDs.
+     * @param {Boolean} [quiet] No loading overlay
+     * @returns {MegaPromise}
      */
-    ExportLink.prototype._removeFileExportLinkRequest = function(nodeId) {
+    ExportLink.prototype._removeFileExportLinkRequest = function(nodeId, quiet) {
 
         var self = this;
+        var promise = new MegaPromise();
 
         api_req({ a: 'l', n: nodeId, d: 1, i:requesti }, {
             nodeId: nodeId,
@@ -2073,17 +2070,22 @@ var exportExpiry = {
                     if (is_mobile) {
                         mobile.linkOverlay.completeLinkRemovalProcess(this.nodeId);
                     }
+
+                    promise.resolve();
                 }
                 else {
                     // Error
                     self.logger.warn('_removeFileExportLinkRequest failed for node:', this.nodeId, 'Error: ', result);
+                    promise.reject(result);
                 }
 
-                if (!--self.nodesLeft) {
-                    loadingDialog.hide();
+                if (!--self.nodesLeft && !quiet) {
+                    loadingDialog.phide();
                 }
             }
         });
+
+        return promise;
     };
 
     /**
@@ -2138,7 +2140,7 @@ var exportExpiry = {
         };
 
         // If they've already agreed to the copyright warning (cws = copyright warning shown)
-        if (fmconfig.cws) {
+        if (fmconfig.cws || folderlink) {
             // Go straight to Get Link dialog
             openGetLinkDialog();
             return false;
@@ -2258,7 +2260,7 @@ var exportExpiry = {
         $node.filter('.data-block-view').removeClass('linked');
 
         // Remove link icon from left panel
-        $('#treeli_' + nodeId + ' span').removeClass('linked');
+        $('#treeli_' + nodeId + ' > span').removeClass('linked');
     };
 
     /**

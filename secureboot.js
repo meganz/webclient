@@ -47,8 +47,10 @@ var is_firefox_web_ext = location_sub === 'moz-extension://';
 var is_extension = is_chrome_firefox || is_electron || is_chrome_web_ext || is_firefox_web_ext;
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
+var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
+var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
 
 /**
  * Check if the user is coming from a mobile device
@@ -206,20 +208,9 @@ if (is_chrome_firefox) {
 
     ua = navigator.userAgent.toLowerCase();
 }
-else if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
-        && parseInt(String(navigator.appVersion).split('Chrome/').pop()) < 22) {
-    b_u = 1;
-}
-else if (ua.indexOf('firefox') > -1 && typeof DataView === 'undefined') {
-    b_u = 1;
-}
-else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem === 'undefined') {
-    b_u = 1;
-}
-var myURL = URL;
-if (!myURL) {
-    b_u = 1;
-}
+
+var myURL = window.URL;
+b_u = b_u || !myURL || typeof DataView === 'undefined' || (window.chrome && !document.exitPointerLock);
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -329,6 +320,7 @@ if (!b_u) try
         d = localStorage.d | 0;
         jj = localStorage.jj;
         dd = localStorage.dd;
+
         // Write test
         localStorage['$!--foo'] = Array(100).join(",");
         delete localStorage['$!--foo'];
@@ -463,6 +455,9 @@ var mega = {
 
     maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 12),
 
+    /** An object with flags detailing which features are enabled on the API */
+    apiMiscFlags: {},
+
     /** Get browser brancd internal ID */
     getBrowserBrandID: function() {
         if (Object(window.chrome).torch) {
@@ -535,6 +530,7 @@ var mega = {
             var apiut = localStorage.apiut ? '&ut=' + localStorage.apiut : "";
             params += apiut;
 
+            params += '&lang=' + lang;
             this._urlParams = params;
         }
 
@@ -594,8 +590,12 @@ if (!b_u && is_extension)
     }
     else /* Google Chrome */
     {
-        bootstaticpath = chrome.extension.getURL('mega/');
-        urlrootfile = 'mega/secure.html';
+        tmp = 'mega';
+        if (typeof chrome.runtime.getManifest === 'function' && !Object(chrome.runtime.getManifest()).update_url) {
+            tmp = localStorage.chromextdevpath || tmp;
+        }
+        bootstaticpath = chrome.extension.getURL(tmp + '/');
+        urlrootfile = tmp + '/secure.html';
     }
 
     Object.defineProperty(window, 'eval', {
@@ -1258,6 +1258,7 @@ function siteLoadError(error, filename) {
     }
     else {
         message.push('Filename: ' + filename + "\nException: " + error);
+        message.push('Stack trace: ' + String(error.stack).split('\n').splice(1, 4).join('\n'));
     }
     message.push('Please click OK to refresh and try again.');
     message.push("If the problem persists, please try disabling all third-party browser extensions,"
@@ -1272,6 +1273,11 @@ function siteLoadError(error, filename) {
     }
 }
 
+// Add manifest.json so this can be used on latest browsers.
+var tag=document.createElement('link');
+tag.rel = "manifest";
+tag.href = "/manifest.json";
+document.getElementsByTagName('head')[0].appendChild(tag);
 
 if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
@@ -1290,21 +1296,21 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
     tag.sizes = "144x144";
-    tag.href = staticpath + "images/mobile/App_ipad_144x144.png";
+    tag.href = staticpath + "images/favicons/apple-touch-icon-144x144.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
     tag.sizes = "114x114";
-    tag.href = staticpath + "images/mobile/App_iphone_114x114.png";
+    tag.href = staticpath + "images/favicons/apple-touch-icon-114x114.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
     tag.sizes = "72x72";
-    tag.href = staticpath + "images/mobile/App_ipad_72X72.png";
+    tag.href = staticpath + "images/favicons/apple-touch-icon-72x72.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "apple-touch-icon-precomposed";
-    tag.href = staticpath + "images/mobile/App_iphone_57X57.png"
+    tag.href = staticpath + "images/favicons/apple-touch-icon-57x57.png";
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('link');
     tag.rel = "shortcut icon";
@@ -1351,8 +1357,9 @@ if (is_ios) {
  * app if any cancel, verify, fm/ipc, newsignup, recover or account links are clicked in the app
  * because the new mobile site is not designed for those yet.
  */
-if (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
-    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' || page.substr(0, 4) === 'blog')) {
+if (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' || page.substr(0, 9) === 'newsignup' ||
+    page.substr(0, 7) === 'account' || page.substr(0, 4) === 'blog' ||
+    (is_old_windows_phone && page.substr(0, 7) === 'confirm'))) {
 
     var app;
     var mobileblog;
@@ -1492,6 +1499,7 @@ else if (!b_u) {
 
     // Do not report exceptions if this build is older than 10 days
     var exTimeLeft = ((buildVersion.timestamp + (10 * 86400)) * 1000) > Date.now();
+    window.buildOlderThan10Days = !exTimeLeft;
 
     if (!d && exTimeLeft && (location.host === 'mega.nz' || is_extension || onBetaW))
     {
@@ -1583,19 +1591,6 @@ else if (!b_u) {
                 return false;
             }
 
-            if (~dump.m.indexOf('took +10s'))
-            {
-                var lrc = +localStorage.ttfbReportCount || 0;
-                if (lrc > 20)
-                {
-                    var eid = localStorage.ttfbReport;
-                    localStorage.ttfbReport = sbid;
-                    if (!eid || eid == sbid) return false;
-                    lrc = 1;
-                }
-                localStorage.ttfbReportCount = lrc + 1;
-            }
-
             if (errobj)
             {
                 if (errobj.udata) dump.d = errobj.udata;
@@ -1636,6 +1631,10 @@ else if (!b_u) {
                         console.error(msg, errobj, errobj && errobj.stack, url, ln);
                         return false;
                     }
+                }
+
+                if (typeof eventlog === 'function' && !errobj.udata) {
+                    eventlog(99702, true);
                 }
             }
             if (cn) dump.c = cn;
@@ -1873,13 +1872,14 @@ else if (!b_u) {
     jsl.push({f:langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
     jsl.push({f:'nodedec.js', n: 'nodedec_js', j:1});
-    jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j:1, w:10});
+    jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
     jsl.push({f:'js/jscrollpane.utils.js', n: 'jscrollpane_utils_js', j: 1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
+    jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
 
     jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
     jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
@@ -1901,6 +1901,8 @@ else if (!b_u) {
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
+    jsl.push({f:'js/security.js', n: 'security_js', j: 1, w: 5});
+    jsl.push({f:'js/two-factor-auth.js', n: 'two_factor_auth_js', j: 1, w: 5});
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
@@ -1929,12 +1931,14 @@ else if (!b_u) {
     // Common desktop and mobile, bottom pages
     jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
@@ -1943,17 +1947,16 @@ else if (!b_u) {
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
-    jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
+    jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
+    jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
+    jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
-        jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
-        jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
-        jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
 
         // This is not used anymore, unless we process and store credit card details for renewals again
         // jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
@@ -1977,11 +1980,11 @@ else if (!b_u) {
         jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
         jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
+        jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
         jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
         jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
         jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
@@ -2001,6 +2004,7 @@ else if (!b_u) {
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
     jsl.push({f:'js/transfers/meths.js', n: 'dl_meths', j: 1, w: 3});
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
+    jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
     jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
 
     // Everything else...
@@ -2030,6 +2034,7 @@ else if (!b_u) {
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
     jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
     jsl.push({f:'js/fm/fileversioning.js', n: 'fm_fileversioning_js', j:1});
+    jsl.push({f:'js/ui/gdpr-download.js', n: 'gdpr_download', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2039,40 +2044,44 @@ else if (!b_u) {
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
+        jsl.push({f:'js/fm/account-change-password.js', n: 'fm_account_change_password_js', j:1});
+        jsl.push({f:'js/fm/account-change-email.js', n: 'fm_account_change_email_js', j:1});
         jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
         jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
         jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
-        jsl.push({f:'html/key.html', n: 'key', j:0});
-        jsl.push({f:'html/login.html', n: 'login', j:0});
-        jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
-        jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
+        jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
+        jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
+
+        jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
+        jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
+        jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
+
         jsl.push({f:'css/download.css', n: 'download_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
-
+        jsl.push({f:'css/account.css', n: 'account_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/labels-and-filters.css', n: 'labels-and-filters_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
-
-        jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
 
-        jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-        jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
+        jsl.push({f:'html/key.html', n: 'key', j:0});
+        jsl.push({f:'html/login.html', n: 'login', j:0});
+        jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
+        jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
-        jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
     } // !is_mobile
 
     // do not change the order...
@@ -2093,6 +2102,7 @@ else if (!b_u) {
     jsl.push({f:'js/fm/megadata/transfers.js', n: 'fm_megadata_transfers_js', j: 1});
     jsl.push({f:'js/fm/megadata/tree.js', n: 'fm_megadata_tree_js', j: 1});
     jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
+    jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -2123,7 +2133,8 @@ else if (!b_u) {
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
         jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.js', n: 'mobile_account_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.cancel.js', n: 'mobile_account__cancel_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.cancel.js', n: 'mobile_account_cancel_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.history.js', n: 'mobile_account_history_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.how-it-works.js', n: 'mobile_achieve_how_it_works_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
@@ -2155,6 +2166,22 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.megadrop.js', n: 'mobile_megadrop_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.js', n: 'mobile_twofactor_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.intro.js', n: 'mobile_twofactor_info_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.setup.js', n: 'mobile_twofactor_setup_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.verify-setup.js', n: 'mobile_twofactor_verify_setup_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.enabled.js', n: 'mobile_twofactor_enabled_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.verify-disable.js', n: 'mobile_twofactor_verify_disable_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.disabled.js', n: 'mobile_twofactor_disabled_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.twofactor.verify-action.js', n: 'mobile_twofactor_verify_action_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.titlemenu.js', n: 'mobile_titlemenu_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.rubbish-bin-empty-overlay.js', n: 'mobile_rubbish_bin_empty_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.rubbishbin.js', n: 'mobile_rubbishbin_js', j: 1, w: 1});
+        jsl.push({f:'js/fm/fileconflict.js', n: 'fileconflict_js', j:1});
+        jsl.push({f:'js/mobile/mobile.alertbanner.js', n: 'mobile_alert_banner', j: 1 });
+        jsl.push({f:'js/mobile/mobile.conflict-resolution-overlay.js', n: 'mobile_conflict_resolution_overlay_js', j: 1 });
     }
 
     // We need to keep a consistent order in loaded resources, so that if users
@@ -2166,7 +2193,8 @@ else if (!b_u) {
         jsl = [{f: langFilepath, n: 'lang', j: 3}];
         jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1});
         jsl.push({f:'nodedec.js', n: 'nodedec_js', j: 1});
-        jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j: 1, w: 10});
+        jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j: 1, w: 10});
+        jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
         jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j: 1});
         jsl.push({f:'html/js/embedplayer.js', n: 'embedplayer_js', j: 1, w: 4});
 
@@ -2209,6 +2237,11 @@ else if (!b_u) {
         }
     }
 
+    // If the TextEncoder is not supported natively (IE, Edge) then load the polyfill
+    if (typeof TextEncoder !== 'function') {
+        jsl.push({f:'js/vendor/encoding.js', n: 'encoding_js', j:1});
+    }
+
     // only used on beta
     if (onBetaW) {
         jsl.push({f:'js/betacrashes.js', n: 'betacrashes_js', j: 1});
@@ -2235,11 +2268,12 @@ else if (!b_u) {
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
-        'disputenotice_js': {f:'html/js/disputenotice.js', n: 'disputenotice_js', j:1},
         'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
         'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
-        'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
+        'copyright_js': {f:'html/js/copyright.js', n: 'copyright_js', j:1},
         'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
+        'gdpr': {f:'html/gdpr.html', n: 'gdpr', j:0},
+        'gdpr_js': {f:'html/js/gdpr.js', n: 'gdpr_js', j:1},
         'mega': {f:'html/mega.html', n: 'mega', j:0},
         'terms': {f:'html/terms.html', n: 'terms', j:0},
         'general': {f:'html/general.html', n: 'general', j:0},
@@ -2264,12 +2298,15 @@ else if (!b_u) {
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
+        'mobileapp': {f:'html/mobileapp.html', n: 'mobileapp', j:0},
         'megacmd_js': {f:'html/js/megacmd.js', n: 'megacmd_js', j:1},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
+        'tiffjs': {f:'js/vendor/tiff.js', n: 'tiffjs', j:1},
+        'webpjs': {f:'js/vendor/webp.js', n: 'webpjs', j:1},
         'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
         'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
@@ -2279,9 +2316,7 @@ else if (!b_u) {
         'browsers': {f:'html/browsers.html', n: 'browsers', j:0},
         'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
         'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
-        'ios': {f:'html/ios.html', n: 'ios', j:0},
-        'android': {f:'html/android.html', n: 'android', j:0},
-        'wp': {f:'html/wp.html', n: 'wp', j:0},
+        'uwp': {f:'html/uwp.html', n: 'uwp', j:0},
         'pdfviewer': {f:'html/pdfViewer.html', n: 'pdfviewer', j:0 },
         'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
@@ -2335,14 +2370,12 @@ else if (!b_u) {
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
             'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presInt_js', j:1, w:1},
+            'richpreviewsFilt_js': {f:'js/chat/plugins/richpreviewsFilter.js', n: 'richpreviewsFilt_js', j:1, w:1},
             'chatStats_js': {f:'js/chat/plugins/chatStats.js', n: 'chatStats_js', j:1, w:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
-            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1},
-
-            /* misc */
-            'onboarding_js': {f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1}
+            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
         }
     };
 
@@ -2364,14 +2397,18 @@ else if (!b_u) {
         'resellers': ['resellers'],
         '!': ['download','download_js'],
         'dispute': ['dispute'],
-        'disputenotice': ['disputenotice', 'disputenotice_js'],
+        'disputenotice': ['disputenotice', 'copyright_js'],
         'copyright': ['copyright'],
-        'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
+        'copyrightnotice': ['copyrightnotice','copyright_js'],
         'privacy': ['privacy','privacycompany'],
+        'gdpr': ['gdpr', 'gdpr_js'],
         'mega': ['mega'],
         'takedown': ['takedown'],
         'sync': ['sync', 'sync_js'],
         'cmd': ['cmd', 'megacmd_js'],
+        'mobile': ['mobileapp'],
+        'ios': ['mobileapp'],
+        'android': ['mobileapp'],
         'support': ['support_js', 'support'],
         'contact': ['contact'],
         'dev': ['dev','dev_js','sdkterms'],
@@ -2385,9 +2422,8 @@ else if (!b_u) {
         'plugin': ['browsers', 'browsers_js'],
         'extensions': ['browsers', 'browsers_js'],
         'bird': ['megabird'],
-        'ios': ['ios'],
-        'android': ['android'],
-        'wp': ['wp']
+        'wp': ['uwp'],
+        'uwp': ['uwp']
     };
 
     if (is_mobile) {
@@ -2712,11 +2748,37 @@ else if (!b_u) {
             xhr_stack[xhri].send(null);
         }
     }
-    window.onload = function ()
-    {
+
+    window.onload = function() {
+        'use strict';
+
         pageLoadTime = Date.now();
         mBroadcaster.once('startMega', function() {
-            pageLoadTime = Date.now() - pageLoadTime;
+            var now = Date.now();
+
+            pageLoadTime = now - pageLoadTime;
+
+            var ph = String(isPublicLink(page)).split('!')[1];
+            if (ph) {
+                localStorage.affid = ph;
+                localStorage.affts = now;
+            }
+
+            Object.defineProperty(mega, 'affid', {
+                get: function() {
+                    return parseInt(localStorage.affts) + 864e5 > Date.now() && localStorage.affid || 0;
+                }
+            });
+
+            // Get information about what API flags are enabled e.g. 2FA, New Registration etc
+            if (!is_iframed) {
+                M.req('gmf').done(function(result) {
+                    if (typeof result === 'object') {
+                        // Cache flags object
+                        mega.apiMiscFlags = result;
+                    }
+                });
+            }
         });
 
         if (!maintenance && !androidsplash && !is_karma) {
@@ -2934,36 +2996,133 @@ else if (!b_u) {
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
-    if (!is_drop && (u_sid = u_storage.sid))
-    {
-        loginresponse = true;
-        var lxhr = getxhr();
-        lxhr.onload = function()
-        {
-            loginresponse = false;
-            if (this.status == 200)
-            {
-                try
-                {
-                    loginresponse = this.response || this.responseText;
-                    if (loginresponse && loginresponse[0] == '[') loginresponse = JSON.parse(loginresponse);
-                    else if (parseInt(loginresponse) === -15 /* ESID */) {
+    (function _crossTabSession(u_storage) {
+        'use strict';
+
+        var xhr = function(params, data, callback) {
+            var xhr = getxhr();
+            xhr.onloadend = function() {
+                var response = false;
+
+                if (this.status === 200) {
+                    try {
+                        response = this.response || this.responseText || false;
+                        if (response[0] === '[') {
+                            response = JSON.parse(response);
+                        }
+                    }
+                    catch (ex) {
+                        console.warn(ex);
+                        response = false;
+                    }
+                }
+
+                callback(response);
+                boot_done();
+            };
+
+            xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams() + (params || ''), true);
+            xhr.send(JSON.stringify([data]));
+        };
+
+        var ack = function() {
+            if (!(u_sid = u_storage.sid)) {
+                loginresponse = false;
+            }
+
+            if (loginresponse) {
+                xhr('&sid=' + u_storage.sid, {'a': 'ug'}, function(response) {
+                    loginresponse = false;
+
+                    if (parseInt(response) === -15 /* ESID */) {
                         loginresponse = -15;
                     }
-                    else loginresponse = false;
-                }
-                catch (e) {}
+                    else if (typeof response[0] === 'object') {
+                        loginresponse = response;
+                    }
+                });
             }
+
+            if (dl_res) {
+                var g = {a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': u_sid || ''};
+
+                xhr(false, g, function(response) {
+                    dl_res = Array.isArray(response) && response[0];
+                });
+            }
+
             boot_done();
+            ack = xhr = undefined;
         };
-        lxhr.onerror = function()
-        {
-            loginresponse= false;
-            boot_done();
-        };
-		lxhr.open('POST', apipath + 'cs?id=0&lang=' + lang + '&sid=' + u_storage.sid + mega.urlParams(), true);
-        lxhr.send(JSON.stringify([{'a':'ug'}]));
-    }
+
+        // No session handling needed for
+        if (is_drop) {
+            return;
+        }
+
+        loginresponse = true;
+        dl_res = (page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2;
+
+        if (localStorage === u_storage) {
+            ack();
+        }
+        else {
+            var onStorageEvent = function(ev) {
+                if (ev.key === 'sb!sid') {
+                    var value = JSON.parse(ev.newValue || '""');
+
+                    if (typeof value === 'number') {
+                        // Requesting session storage
+
+                        var data = {};
+
+                        if (sessionStorage.sid) {
+                            data.k = sessionStorage.k;
+                            data.sid = sessionStorage.sid;
+                        }
+
+                        onIdle(function() {
+                            localStorage.setItem('sb!sid', JSON.stringify(data));
+                        });
+                    }
+                    else if (typeof value === 'object') {
+                        // Received session storage
+
+                        if (ack) {
+                            if (value.sid) {
+                                u_storage.k = value.k;
+                                u_storage.sid = value.sid;
+                            }
+                            ack();
+                        }
+                    }
+
+                    delete localStorage[ev.key];
+                }
+            };
+
+            if (window.addEventListener) {
+                window.addEventListener('storage', onStorageEvent, false);
+            }
+            else if (window.attachEvent) {
+                window.attachEvent('onstorage', onStorageEvent);
+            }
+            onStorageEvent = undefined;
+
+            if (u_storage.sid) {
+                ack();
+            }
+            else {
+                setTimeout(function() {
+                    if (ack) {
+                        ack();
+                    }
+                    delete localStorage['sb!sid'];
+                }, 800);
+                localStorage.setItem('sb!sid', JSON.stringify(Math.random()));
+            }
+        }
+    })(u_storage);
 
     function boot_auth(u_ctx,r)
     {
@@ -2982,8 +3141,6 @@ else if (!b_u) {
             makeCache();
             return false;
         }
-
-        lxhr = dlxhr = undefined;
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
@@ -3012,31 +3169,6 @@ else if (!b_u) {
             loginresponse = undefined;
         }
         else u_checklogin({checkloginresult:boot_auth},false);
-    }
-
-    if ((page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2 && !is_drop) {
-        dl_res = true;
-        var dlxhr = getxhr();
-        dlxhr.onload = function() {
-            dl_res = false;
-            if (this.status === 200) {
-                try {
-                    dl_res = this.response || this.responseText;
-                    if (dl_res[0] == '[') dl_res = JSON.parse(dl_res);
-                    if (dl_res[0]) dl_res = dl_res[0];
-                }
-                catch (e) {}
-            }
-            boot_done();
-        };
-        dlxhr.onerror = function() {
-            dl_res= false;
-            boot_done();
-        };
-        var esid='';
-        if (u_storage.sid) esid = u_storage.sid;
-        dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
-        dlxhr.send(JSON.stringify([{a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': esid}]));
     }
 }
 
@@ -3131,6 +3263,15 @@ if (window.requestIdleCallback) {
 
         return window.requestIdleCallback(callback, {timeout: 20});
     };
+}
+
+/** Helper to replace process.nextTick in videostream.js */
+function onIdleA(boundCallBack) {
+    'use strict';
+
+    onIdle(function() {
+        boundCallBack();
+    });
 }
 
 function makeUUID(a) {

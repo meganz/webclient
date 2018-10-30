@@ -5,13 +5,15 @@
     <div class="mobile fm-header-txt"><span class="mobile main-top-header-text"></span></div>
 </div>
 
-<!-- Mobile Recover Account header -->
+<!-- Mobile Recover Account header
+     Remove the hidden class and apply it to the top mobile fm-header block.
+     This block should be fixed in place. -->
 <div class="mobile forgot-password-page hidden">
     <div class="mobile fm-header fm-hr">
         <div class="mobile fm-icon top-icon menu right"></div>
         <div class="mobile fm-icon back left"></div>
-        <div class="mobile fm-header-txt"><span>[$17806]</span></div>
-        <div class="mobile fm-subheader-txt"><span>No, I am not logged into my account on another browser</span></div>
+        <div class="mobile recover-acc-header fm-header-txt"><span>[$17806]</span></div>
+        <div class="mobile recover-acc-subheader fm-subheader-txt"><span></span></div>
     </div>
 </div>
 
@@ -54,9 +56,7 @@
 
             <div class="top-menu-item submenu-item">[$961]</div>
             <div class="top-submenu">
-                <div class="top-menu-item ios">[$16538]</div>
-                <div class="top-menu-item android">[$16539]</div>
-                <div class="top-menu-item wp">[$16540]</div>
+                <div class="top-menu-item mobile">[$955]</div>
                 <div class="top-menu-item sync">[$956]</div>
                 <div class="top-menu-item extensions">[$16603]</div>
                 <div class="top-menu-item megabird">MEGAbird</div>
@@ -77,6 +77,7 @@
                 <div class="top-menu-item copyright not-mobile-ready">[$387]</div>
                 <div class="top-menu-item takedown">[$966]</div>
                 <div class="top-menu-item general">[$1712]</div>
+                <div class="top-menu-item gdpr">[$18501]</div>
             </div>
 
             <div class="top-social-bl">
@@ -109,17 +110,36 @@
         <div class="loader-percents"></div>
     </div>
 </div>
+
+<!-- Public Service Announcement -->
+<div class="mobile bottom-info body public-service-anouncement">
+    <div class="mobile bottom-info content">
+        <div class="mobile bottom-info column">
+            <img class="mobile bottom-info display-icon" />
+        </div>
+        <div class="mobile bottom-info column text-column">
+            <h4 class="mobile bottom-info title"></h4>
+            <div class="mobile bottom-info messageA"></div>
+            <div class="mobile bottom-info button view-more-info" data-continue-link="">
+                <span class="mobile bottom-info text"></span>
+            </div>
+        </div>
+        <div class="mobile bottom-info fm-dialog-close"></div>
+    </div>
+</div>
+
+<!-- Park account dialog
+     this dialog appears at the end of account recovery process -->
 <div class="mobile fm-dialog-container hidden">
     <div class="mobile fm-dialog-aligner">
         <div class="mobile fm-dialog park-account-dialog">
             <div class="fm-dialog-header">
-                <div class="fm-dialog-title">[$18306]</div>
+                <div class="fm-dialog-title">[$18307]</div>
                 <div class="fm-dialog-close"></div>
                 <div class="clear"></div>
             </div>
             <div class="fm-dialog-body improved-recovery-steps">
                 <div class="checkbox-block park-account-checkbox">
-                    <h3 class="main-italic-header">[$18307]</h3>
                     <div class="checkbox-container">
                         <div class="settings-row">
                             <div class="">
@@ -155,7 +175,7 @@
                 </div>
                 <div class="login-register-input email">
 
-                    <input type="text" name="recover-input1" id="recover-input1" value="" placeholder="Your email address">
+                    <input type="text" name="recover-input1" id="recover-input1" value="" placeholder="[$195]" maxlength="190">
                 </div>
                 <!-- Only show this div when all the checkboxes have been ticked and the email field has been filled in. -->
                 <div class="content-highlight warning">
@@ -174,3 +194,47 @@
         </div>
     </div>
 </div>
+<!-- Add Contact Card
+     Display when users scans someones QR code or when a contact URL is entered -->
+<!-- important token to get the below dialog to memory, DONT REMOVE LINE-->
+<div class="mobile fm-dialog main-block hidden" id="mobile-ui-contact-card">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo" href="https://mega.nz"></a>
+            <div class="mobile fm-icon top-icon menu right dl-page"></div>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile avatar-name-block">
+                    <div class="mobile main-avatar">
+                        <!-- Avatar styles need to be applied to the div below
+                             Semi-big-avatar is applied to define the shape and size of the avatar
+                             colorX is used to define the colour
+                             Random string is used to define contact key -->
+                        <!--<div data-color="color7" class="mobile avatar-wrapper avatar XX3wW35s4bc color7 semi-big-avatar"><span><i class="verified_icon"></i>C</span></div>-->
+                        <!-- If user has an avatar img, it is inserted into the img div below, this div should be hidden if the user has not uploaded an image and vice versa, the div main-wrapper should be hidden if there is an image selected -->
+                        <div class="mobile avatar-wrapper avatar">
+                            <img alt="" />
+                        </div>
+                        <!-- Contact verification message should displayed when the contact has been successfully added to their contact list -->
+                        <!--<div class="mobile contact-verification">
+                            <i class=""></i>
+                        </div>-->
+                    </div>
+                </div>
+                <div class="mobile contactname">"Name of contact" added</div>
+                <div class="mobile file-download-info">
+                    <div class="mobile contactemail">To share files or chat with "Insert Name", please use the MEGA app or access MEGA on your desktop.</div>
+                </div>
+                <!-- Add inline-buttons class to div below to show two buttons on the same line.
+                     Add hidden class to the second red-button -->
+                <div class="mobile buttons">
+                    <a class="mobile red-button first add-contact"> <i></i> <span>[$101]</span> </a>
+                    <a class="mobile red-button second login hidden"> <i></i> <span>Login</span> </a>
+                </div>
+                <!-- Close button should be hidden if a user is not logged in. As there are only two available options -->
+                <a class="mobile text-button third cancel"><span>[$148]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- important token to get the above dialog to memory, DONT REMOVE LINE-->

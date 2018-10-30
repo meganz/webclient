@@ -266,7 +266,7 @@ function accountUI() {
         });
 
         // Upgrade Account Button
-        $('.default-white-button.upgrade-to-pro').rebind('click', function() {
+        $('.upgrade-to-pro').rebind('click', function() {
             loadSubPage('pro');
         });
 
@@ -278,17 +278,17 @@ function accountUI() {
         /* Used Storage progressbar */
         var percents = [
             100 * account.stats[M.RootID].bytes / account.space,
-            100 * account.stats[M.RubbishID].bytes / account.space,
+            100 * account.stats[M.InboxID].bytes / account.space,
             100 * account.stats.inshares.bytes / account.space,
-            100 * account.stats[M.InboxID].bytes / account.space
+            100 * account.stats[M.RubbishID].bytes / account.space
         ];
         for (var i = 0; i < 4; i++) {
             var $percBlock = $('.data-block.storage-data .account.pr-item.pr' + i);
             if (percents[i] > 0) {
-                $percBlock.removeClass('empty');
+                $percBlock.removeClass('empty hidden');
             }
             else {
-                $percBlock.addClass('empty');
+                $percBlock.addClass('empty hidden');
             }
         }
 
@@ -450,142 +450,9 @@ function accountUI() {
         $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
         $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
 
-        var $passwords = $('#account-password,#account-new-password,#account-confirm-password');
-        $passwords.unbind('click');
+        accountUI.renderSessionHistory();
 
-        M.account.sessions.sort(function(a, b) {
-            if (a[0] < b[0]) {
-                return 1;
-            }
-            else {
-                return -1;
-            }
-        });
-
-        $('#sessions-table-container').empty();
-        var html =
-            '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sessions">' +
-            '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
-            '<th class="no-border session-status">' + l[7664] + '</th>' +
-            '<th class="no-border logout-column">&nbsp;</th></tr>';
-        var numActiveSessions = 0;
-
-        $(account.sessions).each(function(i, el) {
-
-            if (i == $.sessionlimit) {
-                return false;
-            }
-
-            var userAgent = el[2];
-            var dateTime = htmlentities(time2date(el[0]));
-            var browser = browserdetails(userAgent);
-            var browserName = browser.nameTrans;
-            var ipAddress = htmlentities(el[3]);
-            var country = countrydetails(el[4]);
-            var currentSession = el[5];
-            var sessionId = el[6];
-            var activeSession = el[7];
-            var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
-
-            // Show if using an extension e.g. "Firefox on Linux (+Extension)"
-            if (browser.isExtension) {
-                browserName += ' (+' + l[7683] + ')';
-            }
-
-            // If not the current session
-            if (!currentSession) {
-                if (activeSession) {
-                    status = '<span class="active-session-txt">' + l[7666] + '</span>';     // Active
-                }
-                else {
-                    status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
-                }
-            }
-
-            // If unknown country code use question mark gif
-            if (!country.icon || country.icon === '??.gif') {
-                country.icon = 'ud.gif';
-            }
-
-            // Generate row html
-            html += '<tr class="' + (currentSession ? "current" : sessionId) + '">'
-                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent.replace(/\s*megext/i, ''))
-                + '" src="' + staticpath + 'images/browser/' + browser.icon
-                + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
-                + '</span></td>'
-                + '<td>' + ipAddress + '</td>'
-                + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/'
-                + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">'
-                + htmlentities(country.name) + '</span></td>'
-                + '<td>' + dateTime + '</td>'
-                + '<td>' + status + '</td>';
-
-            // If the session is active show logout button
-            if (activeSession) {
-                html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
-            }
-            else {
-                html += '<td>&nbsp;</td>';
-            }
-
-            // If the current session or active then increment count
-            if (currentSession || activeSession) {
-                numActiveSessions++;
-            }
-        });
-        $('#sessions-table-container').safeHTML(html + '</table>');
-
-        // Don't show button to close other sessions if there's only the current session
-        if (numActiveSessions === 1) {
-            $('.fm-close-all-sessions').hide();
-        }
-
-        $('.fm-close-all-sessions').rebind('click', function() {
-
-            loadingDialog.show();
-            var $this = $(this);
-            var $activeSessionsRows = $('.active-session-txt').parents('tr');
-
-            // Expire all sessions but not the current one
-            api_req({a: 'usr', ko: 1}, {
-                callback: function() {
-                    M.account = null;
-                    /* clear account cache */
-                    $activeSessionsRows.find('.settings-logout').remove();
-                    $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt')
-                        .addClass('expired-session-txt').text(l[1664]);
-                    $this.hide();
-                    loadingDialog.hide();
-                }
-            });
-        });
-
-        $('.settings-logout').rebind('click', function() {
-
-            var $this = $(this).parents('tr');
-            var sessionId = $this.attr('class');
-
-            if (sessionId === 'current') {
-                mLogout();
-            }
-            else {
-                loadingDialog.show();
-                /* usr - user session remove
-                 * remove a session Id from the current user,
-                 * usually other than the current session
-                 */
-                api_req({a: 'usr', s: [sessionId]}, {
-                    callback: function(res, ctx) {
-                        M.account = null;
-                        /* clear account cache */
-                        $this.find('.settings-logout').remove();
-                        $this.find('.active-session-txt').removeClass('active-session-txt')
-                            .addClass('expired-session-txt').text(l[1664]);
-                        loadingDialog.hide();
-                    }
-                });
-            }
-        });
+        
 
         $('.account-history-dropdown-button.purchases').text(l[469].replace('[X]', $.purchaselimit));
         $('.account-history-drop-items.purchase10-').text(l[469].replace('[X]', 10));
@@ -673,7 +540,13 @@ function accountUI() {
         });
 
         $('.grid-table.transactions').html(html);
-        var i = new Date().getFullYear() - 10, html = '', sel = '';
+
+        // Initialise the Download personal data button on the /fm/account/history page
+        gdprDownload.initDownloadDataButton('personal-data-container');
+
+        i = new Date().getFullYear() - 16;
+        html = '';
+        var sel = '';
         $('.default-select.year span').text('YYYY');
 
         while (i >= 1900) {
@@ -725,19 +598,20 @@ function accountUI() {
         var html = '', sel = '';
         $('.default-select.country span').text(l[996]);
 
-        for (var country in isoCountries) {
-            if (!isoCountries.hasOwnProperty(country)) {
+        var countries = M.getCountries();
+        for (var country in countries) {
+            if (!countries.hasOwnProperty(country)) {
                 continue;
             }
             if (u_attr.country && country == u_attr.country) {
                 sel = 'active';
-                $('.default-select.country span').text(isoCountries[country]);
+                $('.default-select.country span').text(countries[country]);
             }
             else {
                 sel = '';
             }
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">'
-                + isoCountries[country]
+                + countries[country]
                 + '</div>';
         }
         $('.default-select.country .default-select-scroll').safeHTML(html);
@@ -745,53 +619,16 @@ function accountUI() {
         // Bind Dropdowns events
         bindDropdownEvents($('.fm-account-main .default-select'), 1, '.account.tab-content');
 
+        // Initialise functionality to change the user's password and email
+        accountChangePassword.init();
+        accountChangeEmail.init();
+
         // Cache selectors
-        var $newEmail = $('#account-email');
-        var $emailInfoMessage = $('.fm-account-change-email');
         var $personalInfoBlock = $('.profile-form.first');
         var $firstNameField = $personalInfoBlock.find('#account-firstname');
         var $saveBlock = $('.fm-account-save-block');
         var $cancelButton = $saveBlock.find('.fm-account-cancel');
         var $saveButton = $saveBlock.find('.fm-account-save');
-
-        $('#account-password').val('');
-        $('#account-new-password').val('');
-        $('#account-confirm-password').val('');
-
-        // Reset change email fields after change
-        $newEmail.val('');
-        $emailInfoMessage.addClass('hidden');
-
-        $passwords.rebind('keyup.em', function() {
-            var texts = [];
-            $passwords.each(function() {
-                texts.push($(this).val());
-            });
-            $newEmail.val('');
-        });
-
-        // On text entry in the new email text field
-        $newEmail.rebind('keyup', function() {
-            var mail = $.trim($newEmail.val());
-
-            $passwords.val('');
-            $saveBlock.find('.fm-account-save').removeClass('disabled');
-            $saveBlock.addClass('hidden');
-
-            // Show information message
-            $emailInfoMessage.removeClass('hidden');
-
-            // If not valid email yet, exit
-            if (checkMail(mail)) {
-                return;
-            }
-
-            // Show save button
-            if (mail !== u_attr.email) {
-                $personalInfoBlock.addClass('email-confirm');
-                $saveBlock.removeClass('hidden');
-            }
-        });
 
         $firstNameField.on('input', function() {
 
@@ -829,7 +666,7 @@ function accountUI() {
             }
 
             $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-            $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+            $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
             var firstName = String($('#account-firstname').val() || '').trim();
             var lastName = String($('#account-lastname').val() || '').trim();
@@ -838,179 +675,60 @@ function accountUI() {
             var bYear = String($('.default-select.year .default-dropdown-item.active').attr('data-value') || '');
             var country = String($('.default-select.country .default-dropdown-item.active').attr('data-value') || '');
 
-            // If any of user attributes is changed then update them
-            if ((u_attr.firstname && u_attr.firstname !== firstName)
-                    || (u_attr.lastname && u_attr.lastname !== lastName)
-                    || (u_attr.birthday && u_attr.birthday !== bDay)
-                    || (u_attr.birthmonth && u_attr.birthmonth !== bMonth)
-                    || (u_attr.birthyear && u_attr.birthyear !== bYear)
-                    || (u_attr.country && u_attr.country !== country)) {
+            var apiCallNeeded = false;
+            var userAttrRequest = { a: 'up' };
+
+            if (u_attr.firstname == null || u_attr.firstname !== firstName) {
+                // we want also to catch the 'undefined' or null and replace with the empty string (or given string)
                 u_attr.firstname = firstName || 'Nobody';
+                userAttrRequest.firstname = base64urlencode(to8(u_attr.firstname));
+                apiCallNeeded = true;
+            }
+            if (u_attr.lastname == null || u_attr.lastname !== lastName) {
+                // we want also to catch the 'undefined' or null and replace with the empty string (or given string)
                 u_attr.lastname = lastName;
+                userAttrRequest.lastname = base64urlencode(to8(u_attr.lastname));
+                apiCallNeeded = true;
+            }
+            if (u_attr.birthday == null || u_attr.birthday !== bDay) {
                 u_attr.birthday = bDay;
+                userAttrRequest.birthday = base64urlencode(u_attr.birthday);
+                apiCallNeeded = true;
+            }
+            if (u_attr.birthmonth == null || u_attr.birthmonth !== bMonth) {
                 u_attr.birthmonth = bMonth;
+                userAttrRequest.birthmonth = base64urlencode(u_attr.birthmonth);
+                apiCallNeeded = true;
+            }
+            if (u_attr.birthyear == null || u_attr.birthyear !== bYear) {
                 u_attr.birthyear = bYear;
+                userAttrRequest.birthyear = base64urlencode(u_attr.birthyear);
+                apiCallNeeded = true;
+            }
+            if (u_attr.country == null || u_attr.country !== country) {
                 u_attr.country = country;
+                userAttrRequest.country = base64urlencode(u_attr.country);
+                apiCallNeeded = true;
+            }
 
-                var req = {
-                    a: 'up',
-                    firstname: base64urlencode(to8(u_attr.firstname)),
-                    lastname: base64urlencode(to8(u_attr.lastname))
-                };
-                var opt = ["country", "birthyear", "birthmonth", "birthday"];
-                for (var i = opt.length; i--;) {
-                    var n = opt[i];
-                    if (u_attr[n]) {
-                        req[n] = base64urlencode(u_attr[n]);
-                    }
-                }
-
-                api_req(req, {
-                    callback: function(res) {
+            if (apiCallNeeded) {
+                api_req(userAttrRequest, {
+                    callback: function (res) {
                         if (res === u_handle) {
                             $('.user-name').text(u_attr.name);
                             showToast('settings', l[7698]);
                             accountUI();
+                            // update megadrop username for existing megadrop
+                            mega.megadrop.updatePUPUserName(u_attr.fullname);
                         }
                     }
                 });
             }
 
-            var pws = zxcvbn($('#account-new-password').val());
-
-            /*if ($('#account-password').val() == ''
-                && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== '')) {
-
-                msgDialog('warninga', l[135], l[719], false, function() {
-                    $('#account-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                    $('#account-password').bind('keyup.accpwd', function() {
-                        if ($('#account-new-password').val() === $('#account-confirm-password').val()) {
-                            $('.fm-account-save').removeClass('disabled');
-                            $('#account-password').unbind('keyup.accpwd');
-                        }
-                    });
-                });
-            }
-            else if ($('#account-password').val() !== '' && !checkMyPassword($('#account-password').val())) {
-                msgDialog('warninga', l[135], l[724], false, function() {
-                    $('#account-password').val('');
-                    $('#account-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                    $('#account-password').bind('keyup.accpwd', function() {
-                        if ($('#account-new-password').val() === $('#account-confirm-password').val()) {
-                            $('.fm-account-save').removeClass('disabled');
-                            $('#account-password').unbind('keyup.accpwd');
-                        }
-                    });
-                });
-            }
-            else*/ if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
-                msgDialog('warninga', l[135], l[715], false, function() {
-                    $('#account-new-password').val('');
-                    $('#account-confirm-password').val('');
-                    $('#account-new-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                });
-            }
-            else if (/*$('#account-password').val() !== ''
-                &&*/ $('#account-confirm-password').val() !== ''
-                && $('#account-new-password').val() !== ''
-                && (pws.score === 0 || pws.entropy < 16)) {
-
-                msgDialog('warninga', l[135], l[1129], false, function() {
-                    $('#account-new-password').val('');
-                    $('#account-confirm-password').val('');
-                    $('#account-new-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                });
-            }
-            else if ($('#account-confirm-password').val() !== '' /*&& $('#account-password').val() !== ''
-                && $('#account-confirm-password').val() !== $('#account-password').val()*/) {
-                loadingDialog.show();
-                changepw($('#account-password').val(), $('#account-confirm-password').val(), {
-                    callback: function(res) {
-                        loadingDialog.hide();
-                        if (res == EACCESS) { // pwd incorrect
-                            msgDialog('warninga', l[135], l[724], false, function() {
-                                $('#account-password').val('');
-                                $('#account-password').focus();
-                                $('#account-password').bind('keyup.accpwd', function() {
-                                    $('.fm-account-save-block').removeClass('hidden');
-                                    $('.fm-account-save').removeClass('disabled');
-                                    $('#account-password').unbind('keyup.accpwd');
-                                });
-                            });
-                        }
-                        else if (typeof res == 'number' && res < 0) { // something went wrong
-                            $passwords.val('');
-                            msgDialog('warninga', l[135], l[6972]);
-                        }
-                        else { // success
-                            showToast('settings', l[725]);
-                            var pw_aes = new sjcl.cipher.aes(prepare_key_pw($('#account-confirm-password').val()));
-                            u_attr.k = a32_to_base64(encrypt_key(pw_aes, u_k));
-                            $passwords.val('');
-                        }
-                        accountUI();
-                    }
-                });
-            }
-            /*else if ($('#account-password').val() !== ''
-                    && $('#account-confirm-password').val() === $('#account-password').val()) {
-                msgDialog('warninga', l[135], l[16664]);
-                $('#account-confirm-password').val('');
-                $('#account-new-password').val('');
-                $('.fm-account-save-block').removeClass('hidden');
-                $('.fm-account-save').addClass('disabled');
-            }*/
-            else {
-                $passwords.val('');
-            }
-
-            // Get the new email address
-            var email = $('#account-email').val().trim().toLowerCase();
-
-            // If there is text in the email field and it doesn't match the existing one
-            if ((email !== '') && (u_attr.email !== email)) {
-
-                loadingDialog.show();
-
-                // Request change of email
-                // e => new email address
-                // i => requesti (Always has the global variable requesti (last request ID))
-                api_req({ a: 'se', aa: 'a', e: email, i: requesti }, {
-                    callback: function(res) {
-
-                        loadingDialog.hide();
-
-                        if (res === -12) {
-                            return msgDialog('warninga', l[135], l[7717]);
-                        }
-
-                        fm_showoverlay();
-                        dialogPositioning('.awaiting-confirmation');
-
-                        $('.awaiting-confirmation').removeClass('hidden');
-                        $('.fm-account-save-block').addClass('hidden');
-                        $('.fm-account-save').removeClass('disabled');
-
-                        localStorage.new_email = email;
-                    }
-                });
-
-                return;
-            }
-
-            $('.fm-account-save-block').addClass('hidden');
-            $('.fm-account-save').removeClass('disabled');
+            $saveBlock.addClass('hidden');
+            $saveButton.removeClass('disabled');
         });
 
-        $('#current-email').val(u_attr.email);
         $('#account-firstname').val(u_attr.firstname);
         $('#account-lastname').val(u_attr.lastname);
 
@@ -1094,8 +812,10 @@ function accountUI() {
 
                             var done = delay.bind(null, 'bandwidthLimit', function() {
                                 api_req({"a": "up", "srvratio": Math.round(bandwidthLimit)});
+                                if (localStorage.bandwidthLimit !== undefined) {
+                                    showToast('settings', l[16168]);
+                                }
                                 localStorage.bandwidthLimit = bandwidthLimit;
-                                showToast('settings', l[16168]);
                             }, 700);
 
                             if (bandwidthLimit > 99) {
@@ -1130,7 +850,7 @@ function accountUI() {
             $('.bandwith-settings').removeClass('hidden');
         }
 
-        $('#slider-range-max').slider({
+        $('#slider-range-max2').slider({
             min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4,
             change: function(e, ui) {
                 if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.dl_maxSlots) {
@@ -1143,10 +863,10 @@ function accountUI() {
                 $('.upload-settings .numbers.val' + ui.value).addClass('active');
             }
         });
-        $('.upload-settings .numbers.active').removeClass('active');
-        $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
+        $('.download-settings .numbers.active').removeClass('active');
+        $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
 
-        $('#slider-range-max2').slider({
+        $('#slider-range-max').slider({
             min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
             change: function(e, ui) {
                 if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
@@ -1159,8 +879,8 @@ function accountUI() {
                 $('.download-settings .numbers.val' + ui.value).addClass('active');
             }
         });
-        $('.download-settings .numbers.active').removeClass('active');
-        $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
+        $('.upload-settings .numbers.active').removeClass('active');
+        $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
 
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
         var i = 3;
@@ -1260,6 +980,25 @@ function accountUI() {
             mega.config.setn('dlThroughMEGAsync', dlThroughMEGAsync);
         });
 
+        $('.ulddd').removeClass('radioOn').addClass('radioOff');
+        i = 22;
+        if (fmconfig.ulddd === 0) {
+            i = 23;
+        }
+        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+        $('.ulddd input').rebind('click', function() {
+            var ulddd = 0;
+            var id = $(this).attr('id');
+            if (id === 'rad22') {
+                ulddd = undefined;
+            }
+            $('.ulddd').removeClass('radioOn').addClass('radioOff');
+            $(this).addClass('radioOn').removeClass('radioOff');
+            $(this).parent().addClass('radioOn').removeClass('radioOff');
+            mega.config.setn('ulddd', ulddd);
+        });
+
         var $cbTpp = $('#transfers-tooltip');// Checkbox transfers popup
         if (fmconfig.tpp) {
 
@@ -1345,9 +1084,45 @@ function accountUI() {
 
         $('.rubsched, .rubschedopt').removeClass('radioOn').addClass('radioOff');
         var i = 13;
-        if (fmconfig.rubsched) {
+        if (u_attr.flags.ssrs > 0) {
+            var value = 90; // days
+            $('.rubsched-options').removeClass('hidden');
+
+            // non-pro users cannot disable it
+            if (!u_attr.p) {
+                // hide on/off switches
+                $('.rubsched').addClass('hidden').next().addClass('hidden');
+                value = 30; // days
+            }
+            $('.rubschedopt-none').addClass('hidden');
+
+            if (M.account.ssrs !== undefined) {
+                value = M.account.ssrs;
+            }
+            i = 14;
+            $('#rad' + i + '_opt').val(value);
+            $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+            $('#rad' + i).removeClass('radioOff').addClass('radioOn');
             i = 12;
-            $('#rubsched_options').removeClass('hidden');
+            if (!value) {
+                i = 13;
+                $('.rubsched-options').addClass('hidden');
+            }
+
+            // show/hide on/off switches
+            if (u_attr.p) {
+                $('.rubbish-desc').text(l[18685]).removeClass('hidden');
+                $('.pro-rubsched-options').removeClass('hidden');
+            }
+            else {
+                $('.rubbish-settings .green-notification').removeClass('hidden');
+                $('.rubbish-desc').text(l[18686]).removeClass('hidden');
+                $('.pro-rubsched-options').addClass('hidden');
+            }
+        }
+        else if (fmconfig.rubsched) {
+            i = 12;
+            $('.rubsched-options').removeClass('hidden');
             var opt = String(fmconfig.rubsched).split(':');
             $('#rad' + opt[0] + '_opt').val(opt[1]);
             $('#rad' + opt[0] + '_div').removeClass('radioOff').addClass('radioOn');
@@ -1362,34 +1137,48 @@ function accountUI() {
             $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            initAccountScroll(1);
+            // initAccountScroll(1);
         });
-        $('.rubsched_textopt').rebind('click keyup', function(e) {
+        $('.rubsched_textopt').rebind('click.rs blur.rs keypress.rs', function(e) {
+            var minVal = 7;
+            var maxVal = u_attr.p ? Math.pow(2, 53) : 30;
+            var curVal = parseInt($(this).val()) | 0;
+
+            // Do not save value until user leave input or click Enter button
+            if (e.which && e.which !== 13) {
+                return;
+            }
+
+            curVal = Math.min(Math.max(curVal, minVal), maxVal);
+            $(this).val(curVal);
+
             var id = String($(this).attr('id')).split('_')[0];
             $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
             $('#' + id + ',#' + id + '_div').addClass('radioOn').removeClass('radioOff');
-            mega.config.setn('rubsched', id.substr(3) + ':' + $(this).val());
-            initAccountScroll(1);
+            mega.config.setn('rubsched', id.substr(3) + ':' + curVal);
+            // initAccountScroll(1);
         });
-        $('.rubsched input').rebind('click', function(e) {
+        $('.rubsched input').rebind('click', function() {
             var id = $(this).attr('id');
-            if (id == 'rad13') {
+            if (id === 'rad13') {
                 mega.config.setn('rubsched', 0);
-                $('#rubsched_options').addClass('hidden');
+                $('.rubsched-options').addClass('hidden');
             }
-            else if (id == 'rad12') {
-                $('#rubsched_options').removeClass('hidden');
+            else if (id === 'rad12') {
+                $('.rubsched-options').removeClass('hidden');
                 if (!fmconfig.rubsched) {
-                    mega.config.setn('rubsched', "14:15");
+                    var defValue = u_attr.p ? 90 : 30;
                     var defOption = 14;
+                    mega.config.setn('rubsched', defOption + ":" + defValue);
                     $('#rad' + defOption + '_div').removeClass('radioOff').addClass('radioOn');
                     $('#rad' + defOption).removeClass('radioOff').addClass('radioOn');
+                    $('#rad' + defOption + '_opt').val(defValue);
                 }
             }
             $('.rubsched').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            initAccountScroll(1);
+            // initAccountScroll(1);
         });
 
         $('.redeem-voucher').rebind('click', function(event) {
@@ -1413,7 +1202,7 @@ function accountUI() {
                 $('.fm-account-overlay').fadeOut(200);
                 $this.removeClass('active');
                 $('.fm-voucher-popup').addClass('hidden');
-                $(window).unbind('resize.voucher');
+                $(window).off('resize.voucher');
             }
         });
 
@@ -1595,7 +1384,7 @@ function accountUI() {
 
                     useravatar.invalidateAvatar(u_handle);
                     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+                    $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
                     $('.fm-account-remove-avatar').hide();
                 }
             });
@@ -1644,31 +1433,80 @@ function accountUI() {
             }
         });
 
+        /**
+         * Finalise the account cancellation process
+         * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
+         */
+        var continueCancelAccount = function(twoFactorPin) {
+
+            // Prepare the request
+            var request = { a: 'erm', m: Object(M.u[u_handle]).m, t: 21 };
+
+            // If 2FA PIN is set, add it to the request
+            if (twoFactorPin !== null) {
+                request.mfa = twoFactorPin;
+            }
+
+            api_req(request, {
+                callback: function(res) {
+                    loadingDialog.hide();
+
+                    // Check for invalid 2FA code
+                    if (res === EFAILED || res === EEXPIRED) {
+                        msgDialog('warninga', l[135], l[19216]);
+                    }
+
+                    // Check for incorrect email
+                    else if (res === ENOENT) {
+                        msgDialog('warningb', l[1513], l[1946]);
+                    }
+                    else if (res === 0) {
+                        handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
+                    }
+                    else {
+                        msgDialog('warningb', l[135], l[200]);
+                    }
+                }
+            });
+        };
+
         // Ask for confirmation
         msgDialog('confirmation', l[6181], confirmMessage, false, function(event) {
             if (event) {
+
                 loadingDialog.show();
-                api_req({a: 'erm', m: Object(M.u[u_handle]).m, t: 21}, {
-                    callback: function(res) {
-                        loadingDialog.hide();
-                        if (res === ENOENT) {
-                            msgDialog('warningb', l[1513], l[1946]);
-                        }
-                        else if (res === 0) {
-                            handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
-                        }
-                        else {
-                            msgDialog('warningb', l[135], l[200]);
-                        }
+
+                // Check if 2FA is enabled on their account
+                twofactor.isEnabledForAccount(function(result) {
+
+                    loadingDialog.hide();
+
+                    // If 2FA is enabled on their account
+                    if (result) {
+
+                        // Show the verify 2FA dialog to collect the user's PIN
+                        twofactor.verifyActionDialog.init(function(twoFactorPin) {
+                            continueCancelAccount(twoFactorPin);
+                        });
+                    }
+                    else {
+                        continueCancelAccount(null);
                     }
                 });
             }
         });
     });
 
+    // Initialise the Two Factor Authentication section and show enabled/disabled state
+    twofactor.account.init();
+
     // Button on main Account page to backup their master key
     $('.backup-master-key').rebind('click', function() {
         loadSubPage('backup');
+    });
+
+    $('.default-grey-button.reviewsessions').rebind('click', function() {
+        loadSubPage('fm/account/history');
     });
 
     $('.fm-account-button').rebind('click', function() {
@@ -1738,46 +1576,7 @@ function accountUI() {
     });
 
     $('.account-pass-lines').attr('class', 'account-pass-lines');
-    $('#account-new-password').rebind('keyup.pwdchg', function(el) {
-        $('.account-pass-lines').attr('class', 'account-pass-lines');
-        if ($(this).val() !== '') {
-            $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-save').addClass('disabled');
-            if ($(this).val() === $('#account-confirm-password').val()) {
-                $('.fm-account-save').removeClass('disabled');
-            }
-            else {
-                $('.fm-account-save').addClass('disabled');
-            }
-            var pws = zxcvbn($(this).val());
-            if (pws.score > 3 && pws.entropy > 75) {
-                $('.account-pass-lines').addClass('good4');
-            }
-            else if (pws.score > 2 && pws.entropy > 50) {
-                $('.account-pass-lines').addClass('good3');
-            }
-            else if (pws.score > 1 && pws.entropy > 40) {
-                $('.account-pass-lines').addClass('good2');
-            }
-            else if (pws.score > 0 && pws.entropy > 15) {
-                $('.account-pass-lines').addClass('good1');
-            }
-            else {
-                $('.account-pass-lines').addClass('weak-password');
-            }
-        }
-    });
 
-    $('#account-confirm-password').rebind('keyup.pwdchg', function(el) {
-
-        $('.fm-account-save-block').removeClass('hidden');
-        if ($(this).val() === $('#account-new-password').val()) {
-            $('.fm-account-save').removeClass('disabled');
-        }
-        else {
-            $('.fm-account-save').addClass('disabled');
-        }
-    });
 
     // Account Notifications settings handling
     var accNotifHandler = function accNotifHandler() {
@@ -1885,6 +1684,204 @@ function accountUI() {
 }
 
 /**
+ * Update Session History table html.
+ * If there is any new session history found (or forced), re-render session history table.
+ * @param {Boolean} force force update the table.
+ */
+accountUI.updateSessionTable = function(force) {
+    "use strict";
+
+    if (page === 'fm/account/history') {
+        // if first item in sessions list is not match existing Dom list, it need update.
+        if (d) {
+            console.log('Updating session history table');
+        }
+
+        M.refreshSessionList(function() {
+            var fSession = M.account.sessions[0];
+            var DomList =  $('.grid-table.sessions').find('tr');
+            // update table when it has new active session or forced
+            if (($(DomList[1]).hasClass('current') && !fSession[5])
+                || !$(DomList[1]).hasClass(fSession[6]) || force) {
+                if (d) {
+                    console.log('Update session history table');
+                }
+                accountUI.renderSessionHistory();
+            }
+        });
+    }
+};
+
+/**
+ * Rendering session history table.
+ * With session data from M.account.sessions, render table for session history
+ */
+accountUI.renderSessionHistory = function() {
+    "use strict";
+
+    if (d) {
+        console.log('Render session history');
+    }
+
+    M.account.sessions.sort(function(a, b) {
+        if (a[0] < b[0]) {
+            return 1;
+        }
+        else {
+            return -1;
+        }
+    });
+
+    $('#sessions-table-container').empty();
+    var html =
+        '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sessions">' +
+        '<tr><th>' + l[19303] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
+        '<th class="no-border session-status">' + l[7664] + '</th>' +
+        '<th class="no-border logout-column">&nbsp;</th></tr>';
+    var numActiveSessions = 0;
+
+    for (i = 0; i < M.account.sessions.length; i++) {
+        var session = M.account.sessions[i];
+
+        var currentSession = session[5];
+        var activeSession = session[7];
+
+        // If the current session or active then increment count
+        if (currentSession || activeSession) {
+            numActiveSessions++;
+        }
+
+        if (i >= $.sessionlimit) {
+            continue;
+        }
+
+        html += accountUI.getSessionHtml(session);
+    }
+
+    $('#sessions-table-container').safeHTML(html + '</table>');
+
+    // Don't show button to close other sessions if there's only the current session
+    if (numActiveSessions === 1) {
+        $('.fm-close-all-sessions').hide();
+    }
+    else {
+        $('.fm-close-all-sessions').show();
+    }
+
+    $('.fm-close-all-sessions').rebind('click', function() {
+        msgDialog('confirmation', '', l[18513], false, function(e) {
+            if (e) {
+                loadingDialog.show();
+                var $activeSessionsRows = $('.active-session-txt').parents('tr');
+                // Expire all sessions but not the current one
+                api_req({a: 'usr', ko: 1}, {
+                    callback: function() {
+                        M.account = null;
+                        /* clear account cache */
+                        $activeSessionsRows.find('.settings-logout').remove();
+                        $activeSessionsRows.find('.active-session-txt')
+                            .removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
+                        $('.fm-close-all-sessions').hide();
+                        loadingDialog.hide();
+                    }
+                });
+            }
+        });
+    });
+
+    $('.settings-logout').rebind('click', function() {
+
+        var $this = $(this).parents('tr');
+        var sessionId = $this.attr('class');
+
+        if (sessionId === 'current') {
+            mLogout();
+        }
+        else {
+            loadingDialog.show();
+            /* usr - user session remove
+             * remove a session Id from the current user,
+             * usually other than the current session
+             */
+            api_req({a: 'usr', s: [sessionId]}, {
+                callback: function() {
+                    M.account = null;
+                    /* clear account cache */
+                    $this.find('.settings-logout').remove();
+                    $this.find('.active-session-txt').removeClass('active-session-txt')
+                        .addClass('expired-session-txt').text(l[1664]);
+                    loadingDialog.hide();
+                }
+            });
+        }
+    });
+};
+
+/**
+ * Get html of one session data for session history table.
+ * @param {Object} el a session data from M.account.sessions
+ * @return {String} html
+ * When draw session hitory table make html for each session data
+ */
+accountUI.getSessionHtml = function(el) {
+    "use strict";
+    
+    var currentSession = el[5];
+    var activeSession = el[7];
+    var userAgent = el[2];
+    var dateTime = htmlentities(time2date(el[0]));
+    var browser = browserdetails(userAgent);
+    var browserName = browser.nameTrans;
+    var ipAddress = htmlentities(el[3]);
+    var country = countrydetails(el[4]);
+    var sessionId = el[6];
+    var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
+
+    // Show if using an extension e.g. "Firefox on Linux (+Extension)"
+    if (browser.isExtension) {
+        browserName += ' (+' + l[7683] + ')';
+    }
+
+    // If not the current session
+    if (!currentSession) {
+        if (activeSession) {
+            status = '<span class="active-session-txt">' + l[7666] + '</span>';     // Active
+        }
+        else {
+            status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
+        }
+    }
+
+    // If unknown country code use question mark gif
+    if (!country.icon || country.icon === '??.gif') {
+        country.icon = 'ud.gif';
+    }
+
+    // Generate row html
+    var html = '<tr class="' + (currentSession ? "current" : sessionId) + '">'
+        + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent.replace(/\s*megext/i, ''))
+        + '" src="' + staticpath + 'images/browser/' + browser.icon
+        + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
+        + '</span></td>'
+        + '<td>' + ipAddress + '</td>'
+        + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/'
+        + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">'
+        + htmlentities(country.name) + '</span></td>'
+        + '<td>' + dateTime + '</td>'
+        + '<td>' + status + '</td>';
+
+    // If the session is active show logout button
+    if (activeSession) {
+        html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
+    }
+    else {
+        html += '<td>&nbsp;</td></tr>';
+    }
+
+    return html;
+};
+
+/**
  * Update user UI (pro plan, avatar, first/last name, email)
  */
 accountUI.userUIUpdate = function() {
@@ -1906,16 +1903,11 @@ accountUI.userUIUpdate = function() {
 
     // update avatar
     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+    $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
 
     // Show first name or last name
-    if (u_attr.firstname) {
-        $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
-    }
-    else {
-        $('.membership-big-txt.name').text(u_attr.name);
-    }
+    $('.membership-big-txt.name').text(u_attr.fullname);
 
     // Show email address
     if (u_attr.email) {
@@ -2212,13 +2204,16 @@ accountUI.cancelSubscriptionDialog = {
 };
 
 accountUI.disableElement = function(element) {
-    $(element).addClass('disabled').attr('disabled', 1);
+    'use strict';
+    $(element).addClass('disabled').prop('disabled', true);
 };
 accountUI.enableElement = function(element) {
-    $(element).removeClass('disabled').removeAttr('disabled');
+    'use strict';
+    $(element).removeClass('disabled').prop('disabled', false);
 };
 
 accountUI.initCheckbox = function(className, $container, currentValue, onChangeCb) {
+    'use strict';
     var $wrapperDiv = $('.' + className, $container);
     var $input = $('input[type="checkbox"]', $wrapperDiv);
 
@@ -2252,19 +2247,23 @@ accountUI.initCheckbox = function(className, $container, currentValue, onChangeC
 };
 
 accountUI.initCheckbox.check = function($input, $wrapperDiv) {
-    $input.removeClass('checkboxOff').addClass('checkboxOn').attr('checked', true);
+    'use strict';
+    $input.removeClass('checkboxOff').addClass('checkboxOn').prop('checked', true);
     $wrapperDiv.removeClass('checkboxOff').addClass('checkboxOn');
 };
 accountUI.initCheckbox.uncheck = function($input, $wrapperDiv) {
-    $input.removeClass('checkboxOn').addClass('checkboxOff').attr('checked', false);
+    'use strict';
+    $input.removeClass('checkboxOn').addClass('checkboxOff').prop('checked', false);
     $wrapperDiv.removeClass('checkboxOn').addClass('checkboxOff');
 };
 
 accountUI.initCheckbox.enable = function(className, $container) {
+    'use strict';
     var $wrapperDiv = $('.' + className, $container);
     $wrapperDiv.removeClass('disabled');
 };
 accountUI.initCheckbox.disable = function(className, $container) {
+    'use strict';
     var $wrapperDiv = $('.' + className, $container);
     $wrapperDiv.addClass('disabled');
 };
@@ -2296,7 +2295,7 @@ accountUI.initRadio.setValue = function(className, newVal, $container) {
 
     $input
         .removeClass('radioOff').addClass('radioOn')
-        .attr('checked', 1);
+        .prop('checked', true);
 
     $input.parent().addClass('radioOn').removeClass('radioOff');
 };
@@ -2305,13 +2304,13 @@ accountUI.initRadio.setValue = function(className, newVal, $container) {
 accountUI.initRadio.disable = function($input) {
     $('input.[value="' + newVal + '"]', $container)
         .addClass('disabled')
-        .attr('disabled', 1);
+        .prop('disabled', true);
 };
 
 accountUI.initRadio.enable = function(value, $container) {
     $('input.[value="' + newVal + '"]', $container)
         .removeClass('disabled')
-        .removeAttr('disabled');
+        .prop('disabled', false);
 };
 
 accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
@@ -2385,6 +2384,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         presenceInt.userPresence.ui_setautoaway(newVal);
     };
 
+
     if (autoawaytimeout !== false) {
 
         accountUI.initCheckbox(
@@ -2456,6 +2456,20 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             .val(lastValidNumber);
     }
 
+    accountUI.initCheckbox(
+        'richpreviews-confirmation',
+        $sectionContainerChat,
+        RichpreviewsFilter.previewGenerationConfirmation === true,
+        function(newVal) {
+            if (newVal) {
+                RichpreviewsFilter.confirmationDoConfirm();
+            }
+            else {
+                RichpreviewsFilter.confirmationDoNever();
+            }
+        }
+    );
+
     $('.versioning-switch')
     .rebind('click', function() {
         var val = $('#versioning-status').prop('checked') ? 1 : 0;
@@ -2469,7 +2483,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             )
             .done(
             function(e) {
-                $('#versioning-status').prop('checked', val ? false : true);
+                $('#versioning-status').prop('checked', !val);
                 $('.label-heading').text(val ? l[7070] : l[17601]);
                 fileversioning.dvState = val;
             });

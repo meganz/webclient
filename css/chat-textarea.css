@@ -56,7 +56,7 @@
     border: 0;
     padding: 0;
     margin: 0;
-    color: #777777;
+    color: #373737;
     overflow: hidden;
     word-wrap: break-word;
     height: 20px;
@@ -84,18 +84,18 @@
     position: relative;
 }
 .chat-textarea-scroll textarea::-webkit-input-placeholder {
- color:#CCCCCC;
+ color:#A8A8A8;
 }
 .chat-textarea-scroll textarea:-moz-placeholder {
- color:#CCCCCC;
+ color:#A8A8A8;
  opacity: 1;
 }
 .chat-textarea-scroll textarea::-moz-placeholder {
- color:#CCCCCC;
+ color:#A8A8A8;
  opacity: 1;
 }
 .chat-textarea-scroll textarea:-ms-input-placeholder {
- color:#CCCCCC;
+ color:#A8A8A8;
 }
 .message.textarea-block {
     border: 1px solid #CCCCCC;

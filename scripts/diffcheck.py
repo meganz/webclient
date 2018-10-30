@@ -43,6 +43,29 @@ PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             os.path.pardir))
 PATH_SPLITTER = re.compile(r'\\|/')
 
+FILELIST = {}
+SPRITE_LIST = {}
+BASE_BRANCH = None
+CURRENT_BRANCH = None
+
+def run_git_command(command, decode=None):
+    """
+    Executes a git command and returns the output from it.
+    """
+    try:
+        output = subprocess.check_output('git {}'.format(command).split())
+    except OSError as ex:
+        if ex.errno == 2:
+            logging.error('Git not installed. Install it first.')
+        else:
+            logging.error('Error calling Git: {}'.format(ex))
+        sys.exit(1)
+
+    if decode is not None:
+        output = output.decode(decode).rstrip().split('\n')
+
+    return output
+
 def get_git_line_sets(base, target):
     """
     Obtains the Git diff between the base and target to identify the lines that
@@ -56,16 +79,7 @@ def get_git_line_sets(base, target):
     """
     # Get the Git output for the desired diff.
     logging.info('Extracting relevant lines from Git diff ...')
-    command = 'git diff -U0 {} {}'.format(base, target)
-    try:
-        output = subprocess.check_output(command.split())
-    except OSError as ex:
-        if ex.errno == 2:
-            logging.error('Git not installed. Install it first.')
-        else:
-            logging.error('Error calling Git: {}'.format(ex))
-        return {}
-    diff = output.decode('latin1').split('\n')
+    diff = run_git_command('diff -U0 {} {}'.format(base, target), 'latin1')
 
     # Hunt down lines of changes for different files.
     file_line_mapping = collections.defaultdict(set)
@@ -88,27 +102,72 @@ def get_git_line_sets(base, target):
 
     return file_line_mapping
 
+def get_git_diff_files(branch=None):
+    """
+    Obtains a list for changed files against current_branch
+
+    :param branch: The branch to compare against.
+    :return: A dictionary of changed files.
+    """
+    if branch is None:
+        branch = BASE_BRANCH
+
+    list = run_git_command('diff --name-only {}'.format(branch), 'latin1')
+
+    return [f.replace('\\', '/') for f in list]
+
+def filter_list(list, filter):
+    return [f for f in list if re.search(filter, f)]
+
+def get_branch_filelist(path=None, filter=None, branch=None):
+    """
+    Obtains file list through git to compare against branches
+
+    :param path: The directory to get a filelist from, non recursively.
+    :param filter: Regex pattern to filter filelist.
+    :param branch: The branch to get the filelist from.
+    :return: A dictionary of changed files.
+    """
+    global FILELIST
+    if branch is None:
+        branch = BASE_BRANCH
+    if branch not in FILELIST:
+        FILELIST[branch] = {}
+    if path not in FILELIST[branch]:
+        FILELIST[branch][path] = {}
+    if filter in FILELIST[branch][path]:
+        return FILELIST[branch][path][filter]
+
+    files = run_git_command('ls-tree --name-only {}:{}'.format(branch, path), 'latin1')
+
+    if filter:
+        files = filter_list(files, filter)
+
+    FILELIST[branch][path][filter] = files;
+    return files
+
+def get_current_branch():
+    global CURRENT_BRANCH
+
+    if CURRENT_BRANCH is None:
+        CURRENT_BRANCH = run_git_command('symbolic-ref --short -q HEAD').decode('utf8').rstrip()
+
+    return CURRENT_BRANCH
+
 def get_commits_in_branch(current_branch=None):
     protected_branches = ['master', 'develop', 'old-design']
 
     if current_branch is None:
-        try:
-            command = 'git symbolic-ref --short -q HEAD'
-            current_branch = subprocess.check_output(command.split()).decode('utf8').rstrip()
-        except CalledProcessError as e:
-            logging.warn('Unable to query current branch.')
-            return -1, 0
+        current_branch = get_current_branch()
 
     if current_branch in protected_branches:
         logging.warn('In protected branch ({})'.format(current_branch))
         return -1, 0
 
-    command = 'git rev-list --no-merges --count develop..{}'.format(current_branch)
-    commits = int(subprocess.check_output(command.split()).decode('utf8'))
+    commits = int(run_git_command('rev-list --no-merges --count {}..{}'.format(BASE_BRANCH, current_branch)).decode('utf8'))
     # logging.info('{} commits in branch {}'.format(commits, current_branch))
 
-    command = 'git shortlog -s --no-merges develop..{}'.format(current_branch)
-    authors = len(subprocess.check_output(command.split()).decode('utf8').rstrip().split('\n'))
+    authors = len(run_git_command('shortlog -s --no-merges {}..{}'.format(BASE_BRANCH, current_branch), 'utf8'))
     # logging.info('{} authors worked in branch {}'.format(authors, current_branch))
 
     return commits, authors
@@ -307,7 +366,7 @@ def reduce_htmlhint(file_line_mapping, **extra):
         return '*** HTMLHint: {} ***'.format(ex), 0
     output = strip_ansi_codes(output.decode('utf8')).rstrip().split('\n')
 
-    if re.search('Scan \d+ files, without errors', output[-1]):
+    if re.search('Scanned \d+ files, no errors found', output[-1]):
         return '', 0
 
     # Go through output and collect only relevant lines to the result.
@@ -321,6 +380,42 @@ def reduce_htmlhint(file_line_mapping, **extra):
     # Add the number of errors and return in a nicely formatted way.
     return re.sub('\n+', '\n', '\n\n'.join(result).rstrip()), 1
 
+def copypaste_detector(file_line_mapping):
+    report = []
+    output = None
+    cwd = os.getcwd()
+
+    try:
+        output = subprocess.check_output('{} {}'.format(config.JSCPD_BIN, config.JSCPD_RULES).split())
+    except OSError as ex:
+        logging.error('Error calling JSCPD: {}'.format(ex))
+        return False
+    output = strip_ansi_codes(output.decode('utf8')).rstrip().split('\n')
+    output = [re.sub(r'\t-? [\\/]', '', f.replace(cwd, '')).strip() for f in output if re.search(r'^\t', f)]
+
+    # Build a list of duplicated blocks per file
+    idx = 0
+    dupes = collections.defaultdict(set)
+    for file in output:
+        x,filename,ln1,ln2,z = re.split(r'^(.*): (\d+)-(\d+)$', file)
+        dupes[filename].update(range(int(ln1), int(ln2) + 1))
+
+    # Check whether changed lines includes copy/paste code
+    for filename, line_set in file_line_mapping.items():
+        file_path = os.path.join(*filename)
+
+        if file_path in dupes:
+            rng = dupes[file_path]
+            its = list(rng.intersection(line_set))
+            if len(its):
+                report.append('copy/paste detector found a duplicated block of code at {} around lines {}-{}'
+                                .format(file_path, its[0], its[-1]))
+
+    if len(report):
+        print('\n' + '\n'.join(report))
+        return True
+
+    return False
 
 def analyse_secureboot(filename, result):
     """
@@ -383,6 +478,19 @@ def inspectcss(file, ln, line, result):
 
     return fatal
 
+def inspecthtml(file, ln, line, result):
+    fatal = 0
+    line = line.strip()
+    indent = ' ' * (len(file)+len(str(ln))+3)
+
+    # check for hidden-less fm-dialogs
+    match = re.search(r'fm-dialog ', line)
+    if match and not re.search(r'hidden[\'"\s]', line):
+        fatal += 1
+        result.append('{}:{}: {}\n{}^ Missing hidden class on fm-dialog.'.format(file, ln, line, indent))
+
+    return fatal
+
 def inspectjs(file, ln, line, result):
     fatal = 0
     line = line.strip()
@@ -411,6 +519,34 @@ def inspectjs(file, ln, line, result):
 
     return fatal
 
+def map_list_to_dict(list):
+    return {key: value for (key, value) in list}
+
+def split_sprite_name(filename):
+    vpat = r'[_-]v(\d+)'
+    version = re.search(vpat, filename)
+    if version:
+        version = int(version.group(1))
+    name = re.sub(vpat, '', os.path.splitext(os.path.basename(filename))[0].replace('@2x', ''))
+
+    return name, version
+
+def get_sprite_images(branch=None):
+    global SPRITE_LIST
+
+    if branch is None:
+        branch = BASE_BRANCH
+
+    if branch not in SPRITE_LIST:
+        list = get_branch_filelist('./images/mega', r'@2x', branch)
+        SPRITE_LIST[branch] = map_list_to_dict([split_sprite_name(f) for f in list])
+
+    return SPRITE_LIST[branch]
+
+def test():
+    print(get_sprite_images())
+    # print(FILELIST)
+
 def reduce_validator(file_line_mapping, **extra):
     """
     Checks changed files for contents and alalyzes them.
@@ -429,6 +565,18 @@ def reduce_validator(file_line_mapping, **extra):
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
     fatal = 0
 
+    # Check for older sprite images in current branch
+    diff_files = get_git_diff_files()
+    if any(['images/mega' in f for f in diff_files]):
+        base_sprites = get_sprite_images()
+        target_sprites = map_list_to_dict([split_sprite_name(f) for f in filter_list(diff_files, r'@2x')])
+        for file, version in target_sprites.iteritems():
+            if file in base_sprites and base_sprites[file] > version:
+                fatal += 1
+                result.append('Base branch {} has a newer sprite file for ~/images/mega/{}* (v{} Vs. v{})'
+                                .format(BASE_BRANCH, file, version, base_sprites[file]))
+
+    # Analise changed lines per modified file
     for filename, line_set in file_line_mapping.items():
         file_path = os.path.join(*filename)
         file_extension = os.path.splitext(file_path)[-1]
@@ -436,7 +584,7 @@ def reduce_validator(file_line_mapping, **extra):
         if not any([n in file_path for n in special_chars_exclude]):
             if analyse_files_for_special_chars(file_path, result):
                 fatal += 1
-                break
+                # break
 
         # Ignore known custom made files
         if file_path in config.VALIDATOR_IGNORE_FILES:
@@ -447,7 +595,7 @@ def reduce_validator(file_line_mapping, **extra):
             continue
 
         # Ignore this specific file types
-        if file_extension in ['.json','.py','.sh', '.svg', '.html']:
+        if file_extension in ['.json','.py','.sh', '.svg']:
             continue
 
         # If .min.js is in the filename (most basic detection), then log it and move onto the next file
@@ -455,12 +603,12 @@ def reduce_validator(file_line_mapping, **extra):
             fatal += 1
             result.append('Minified/obfuscated code found in file {}. {}'
                           .format(file_path, warning))
-            continue
+            # continue
 
-        if os.path.getsize(file_path) > 120000 and file_extension != '.css':
+        if os.path.getsize(file_path) > 131072 and not file_extension in ['.css', '.html']:
             result.append('The file "{}" has turned too big, '
                           'any new functions must be moved elsewhere.'.format(file_path))
-            continue;
+            # continue
 
         lines = []
         with open(file_path, 'r') as fd:
@@ -478,13 +626,18 @@ def reduce_validator(file_line_mapping, **extra):
                     fatal += inspectcss(file_path, line_number, line, result)
                     continue
 
+                # Analyse HTML files...
+                if file_extension == '.html':
+                    fatal += inspecthtml(file_path, line_number, line, result)
+                    continue
+
                 # If line length exceeded, log it and move onto the next file
                 if line_length > config.VALIDATOR_LINELEN_THRESHOLD:
                     fatal += 1
                     result.append('Found line too long in file {}, line {} (length {}). '
                                   'Please keep your lines under 120 characters.'
                                   .format(file_path, line_number, line_length))
-                    break
+                    # break
 
                 lines.append(line.rstrip())
 
@@ -691,7 +844,7 @@ def reduce_verapp(file_line_mapping, **extra):
     return '\n'.join(result), error_count
 
 
-def main(base, target, norules, branch):
+def main(base, target, norules, branch, jscpd):
     """
     Run the JSHint and JSCS tests and present output ont eh console via print.
     """
@@ -702,6 +855,9 @@ def main(base, target, norules, branch):
                        'cppcheck': reduce_cppcheck,
                        'nsiqcppstyle': reduce_nsiqcppstyle,
                        'vera++': reduce_verapp}
+
+    global BASE_BRANCH
+    BASE_BRANCH = base
 
     file_line_mapping = get_git_line_sets(base, target)
     results = []
@@ -720,12 +876,17 @@ def main(base, target, norules, branch):
         total_errors += error_count
 
         # If a fatal issue is found, halt execution and quit
-        if fatal > 0:
-            break
+        # if fatal > 0:
+            # break
 
     if total_errors > 0:
         logging.info('Output of reduced results ...')
         print('\n\n'.join(results).rstrip())
+
+    if jscpd and copypaste_detector(file_line_mapping):
+        total_errors += 1
+
+    if total_errors:
         sys.exit(1)
 
     branch_commits, authors = get_commits_in_branch(branch)
@@ -734,7 +895,7 @@ def main(base, target, norules, branch):
         if authors > 1:
             print('WARNING: {} authors have contributed in this branch, '
                   'consider squashing your commits only\n         by manually running '
-                  '"git rebase -i --autosquash develop", unless they do not care.'.format(authors))
+                  '"git rebase -i --autosquash {}", unless they do not care.'.format(authors, base))
         sys.exit(1)
 
     print('\nEverything seems Ok.')
@@ -754,6 +915,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG)
     parser.add_argument('--norules', default=False, action='store_true',
                         help="Don't show rule names with description (default: show rules names)")
+    parser.add_argument('--jscpd', default=False, action='store_true',
+                        help="Run the nodejs package jscpd to detect copy/paste code.")
     parser.add_argument('--branch', type=str, help='Source branch name.', required=False, default=None)
     parser.add_argument('base',
                         help='base revision or name of base branch')
@@ -763,4 +926,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.base, args.target, args.norules, args.branch)
+    main(args.base, args.target, args.norules, args.branch, args.jscpd)

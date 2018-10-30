@@ -239,7 +239,9 @@ mobile.linkOverlay = {
 
         // Show a toast message, hide the overlay and update the link icon
         mobile.showToast(l[8759]);                                        // Link removed
-        mobile.linkOverlay.$overlay.addClass('hidden');
+        if (mobile.linkOverlay.$overlay) {
+            mobile.linkOverlay.$overlay.addClass('hidden');
+        }
         mobile.cloud.updateLinkIcon(nodeHandle);
 
         // Re-show the file manager and re-enable scrolling
@@ -254,7 +256,7 @@ mobile.linkOverlay = {
         'use strict';
 
         var $closeButton = this.$overlay.find('.fm-dialog-close');
-        var $closeTextButton =this.$overlay.find('.text-button');
+        var $closeTextButton = this.$overlay.find('.text-button');
 
         // Add tap handler
         $closeButton.off('tap').on('tap', function() {

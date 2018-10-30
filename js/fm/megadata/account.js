@@ -2,7 +2,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
     "use strict";
 
     var account = Object(this.account);
-    var reuseData = (account.lastupdate > Date.now() - 30000) && !force;
+    var reuseData = (account.lastupdate > Date.now() - 10000) && !force;
 
     if (reuseData && (!account.stats || !account.stats[M.RootID])) {
         if (d) {
@@ -16,7 +16,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
     }
     else {
         var uqres = false;
-        var pstatus = u_attr.p;
+        var pstatus = Object(window.u_attr).p;
         var mRootID = M.RootID;
 
         if (blockui) {
@@ -72,6 +72,15 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
             callback: function(res, ctx) {
                 if (typeof res === 'object') {
                     ctx.account.maf = res;
+                }
+            }
+        });
+
+        api_req({a: 'uga', u: u_handle, ua: '^!rubbishtime', v: 1}, {
+            account: account,
+            callback: function(res, ctx) {
+                if (typeof res === 'object') {
+                    ctx.account.ssrs = base64urldecode(String(res.av || res)) | 0;
                 }
             }
         });
@@ -141,14 +150,23 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     }
                 }
 
+                if (!ctx.account.downbw_used) {
+                    ctx.account.downbw_used = 0;
+                }
+
                 if (pstatus !== u_attr.p) {
                     ctx.account.justUpgraded = Date.now();
 
                     M.checkStorageQuota(2);
                 }
 
-                if (!u_attr.p && uqres) {
-                    ctx.account.servbw_used = 0;
+                if (uqres) {
+                    if (!u_attr.p) {
+                        if (uqres.tal) {
+                            ctx.account.bw = uqres.tal;
+                        }
+                        ctx.account.servbw_used = 0;
+                    }
 
                     if (uqres.tah) {
                         var bwu = 0;
@@ -157,10 +175,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                             bwu += uqres.tah[w];
                         }
 
-                        ctx.account.downbw_used = bwu;
-                        if (uqres.tal) {
-                            ctx.account.bw = uqres.tal;
-                        }
+                        ctx.account.downbw_used += bwu;
                     }
                 }
 
@@ -262,7 +277,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     }
                 }
 
-                tfsq.left = tfsq.max - tfsq.used;
+                tfsq.left = Math.max(tfsq.max - tfsq.used, 0);
                 tfsq.perc = Math.round(tfsq.used * 100 / tfsq.max);
 
                 M.account.tfsq = tfsq;
@@ -280,6 +295,42 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
     }
 };
 
+MegaData.prototype.refreshSessionList = function(callback) {
+    "use strict";
+
+    if (d) {
+        console.log('Refreshing session list');
+    }
+    if (M.account) {
+        api_req({a: 'usl', x: 1}, {
+            account: M.account,
+            callback: function(res, ctx) {
+                if (typeof res !== 'object') {
+                    res = [];
+                }
+                else {
+                    res.sort(function(a, b) {
+                        if (a[0] < b[0]) {
+                            return 1;
+                        }
+                        else {
+                            return -1;
+                        }
+                    });
+                }
+
+                ctx.account.sessions = res;
+                M.account = ctx.account;
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            }
+        });
+    }
+    else {
+        M.accountData(callback);
+    }
+};
 
 function voucherData(arr) {
     var vouchers = [];

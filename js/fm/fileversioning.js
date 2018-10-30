@@ -343,7 +343,7 @@
                         }
                     }
 
-                    var mostRecentHtml = (i === 0) ? '<span class="red">(current version)</span>' : '';
+                    var mostRecentHtml = (i === 0) ? '<span class="red">(' + l[17149] + ')</span>' : '';
                     var radioClass  = (current_sel_version === v.h) ? 'radioOn' : 'radioOff';
                     var downBtnHtml = '<div class="button download-file" title="' + l[58] +
                             '" id=' + 'vdl_' + v.h + '>' +
@@ -619,9 +619,9 @@
                     // Init scrolling
                     fileversioning.initFileVersioningScrolling();
                 });
-            $(window).bind('resize.fmbreadcrumbs', function() {
+            $(window).rebind('resize.fileversioning', SoonFc(function() {
                 fileversioning.initFileVersioningScrolling();
-            });
+            }));
             $('.fm-versioning .header .button.settings').rebind('click', function() {
                 pd.addClass('hidden');
                 loadSubPage('fm/account/file-management');

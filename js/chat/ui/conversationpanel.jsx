@@ -83,8 +83,6 @@ var ConversationRightArea = React.createClass({
         }
         self._wasAppendedEvenOnce = true;
 
-        var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
-
         var disabledCalls = room.isReadOnly() || !room.chatId || room.callManagerCall;
 
 
@@ -114,13 +112,11 @@ var ConversationRightArea = React.createClass({
                 <i className="small-icon video-call"></i>
                 {__(l[5897])}
             </div>;
-
+        var AVseperator = <div className="chat-button-seperator"></div>;
         var endCallButton =
-                    <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
-                        if (contact.presence && contact.presence !== "offline") {
-                            if (room.callManagerCall) {
-                                room.callManagerCall.endCall();
-                            }
+                    <div className={"link-button red"} onClick={() => {
+                        if (room.callManagerCall) {
+                            room.callManagerCall.endCall();
                         }
                     }}>
             <i className="small-icon horizontal-red-handset"></i>
@@ -148,11 +144,11 @@ var ConversationRightArea = React.createClass({
             )   :
             room.getParticipants();
 
-        array.remove(excludedParticipants, u_handle, false);
-
+        if (excludedParticipants.indexOf(u_handle) >= 0) {
+            array.remove(excludedParticipants, u_handle, false);
+        }
         var dontShowTruncateButton = false;
         if (
-            myPresence === 'offline' ||
             !room.iAmOperator() ||
             room.isReadOnly() ||
             room.messagesBuff.messages.length === 0 ||
@@ -187,7 +183,7 @@ var ConversationRightArea = React.createClass({
         // );
 
         var renameButtonClass = "link-button " + (
-            room.isReadOnly() || !room.iAmOperator() || myPresence === 'offline' ?
+            room.isReadOnly() || !room.iAmOperator() ?
                 "disabled" : ""
             );
 
@@ -202,51 +198,49 @@ var ConversationRightArea = React.createClass({
                         members={room.members}
                         isCurrentlyActive={room.isCurrentlyActive}
                     />
-
+                    <ButtonsUI.Button
+                        className="add-chat-contact"
+                        label={__(l[8007])}
+                        contacts={this.props.contacts}
+                        disabled={
+                            /* Disable in case I don't have any more contacts to add ... */
+                            !(
+                                !self.allContactsInChat(excludedParticipants) &&
+                                !room.isReadOnly() &&
+                                room.iAmOperator()
+                            )
+                        }
+                        >
+                        <DropdownsUI.DropdownContactsSelector
+                            contacts={this.props.contacts}
+                            megaChat={this.props.megaChat}
+                            chatRoom={room}
+                            exclude={
+                                excludedParticipants
+                            }
+                            multiple={true}
+                            className="popup add-participant-selector"
+                            singleSelectedButtonLabel={__(l[8869])}
+                            multipleSelectedButtonLabel={__(l[8869])}
+                            nothingSelectedButtonLabel={__(l[8870])}
+                            onSelectDone={this.props.onAddParticipantSelected}
+                            positionMy="center top"
+                            positionAt="left bottom"
+                            />
+                    </ButtonsUI.Button>
                     <div className="buttons-block">
+                        <div className="chat-right-head-txt">
+                            Options
+                        </div>
                         {room.type !== "group" ? startAudioCallButton : null}
                         {room.type !== "group" ? startVideoCallButton : null}
-
-                        <ButtonsUI.Button
-                            className="link-button dropdown-element"
-                            icon="rounded-grey-plus"
-                            label={__(l[8007])}
-                            contacts={this.props.contacts}
-                            disabled={
-                                /* Disable in case I don't have any more contacts to add ... */
-                                !(
-                                    !self.allContactsInChat(excludedParticipants) &&
-                                    !room.isReadOnly() &&
-                                    room.iAmOperator()
-                                ) ||
-                                myPresence === 'offline'
-                            }
-                            >
-                            <DropdownsUI.DropdownContactsSelector
-                                contacts={this.props.contacts}
-                                megaChat={this.props.megaChat}
-                                chatRoom={room}
-                                exclude={
-                                    excludedParticipants
-                                }
-                                multiple={true}
-                                className="popup add-participant-selector"
-                                singleSelectedButtonLabel={__(l[8869])}
-                                multipleSelectedButtonLabel={__(l[8869])}
-                                nothingSelectedButtonLabel={__(l[8870])}
-                                onSelectDone={this.props.onAddParticipantSelected}
-                                disabled={myPresence === 'offline'}
-                                positionMy="center top"
-                                positionAt="left bottom"
-                                />
-                        </ButtonsUI.Button>
-
+                        {room.type !== "group" ? AVseperator : null}
                         {
                             room.type == "group" ?
                             (
                                 <div className={renameButtonClass}
                                      onClick={(e) => {
-                                         if ($(e.target).closest('.disabled').size() > 0) {
+                                         if ($(e.target).closest('.disabled').length > 0) {
                                              return false;
                                          }
                                          if (self.props.onRenameClicked) {
@@ -263,7 +257,7 @@ var ConversationRightArea = React.createClass({
                             className="link-button dropdown-element"
                             icon="rounded-grey-up-arrow"
                             label={__(l[6834] + "...")}
-                            disabled={room.isReadOnly() || myPresence === 'offline'}
+                            disabled={room.isReadOnly()}
                             >
                             <DropdownsUI.Dropdown
                                 contacts={this.props.contacts}
@@ -285,7 +279,7 @@ var ConversationRightArea = React.createClass({
                         {
                             <div className={"link-button " + (dontShowTruncateButton ? "disabled" : "")}
                                  onClick={(e) => {
-                                     if ($(e.target).closest('.disabled').size() > 0) {
+                                     if ($(e.target).closest('.disabled').length > 0) {
                                          return false;
                                      }
                                      if (self.props.onTruncateClicked) {
@@ -296,12 +290,33 @@ var ConversationRightArea = React.createClass({
                                 {__(l[8871])}
                             </div>
                         }
+                        {<div className="chat-button-seperator"></div>}
+                        {
+                            <div className={"link-button"}
+                                 onClick={(e) => {
+                                    if ($(e.target).closest('.disabled').length > 0) {
+                                        return false;
+                                    }
+                                    if (room.isArchived()) {
+                                        if (self.props.onUnarchiveClicked) {
+                                           self.props.onUnarchiveClicked();
+                                        }
+                                    } else {
+                                        if (self.props.onArchiveClicked) {
+                                           self.props.onArchiveClicked();
+                                        }
+                                    }
+                            }}>
+                                <i className={"small-icon " +  ((room.isArchived()) ? "unarchive" : "archive")}></i>
+                                {room.isArchived() ? __(l[19065]) : __(l[16689])}
+                            </div>
+                        }
                         { room.type === "group" ? (
                             <div className={"link-button red " + (
-                                    myPresence === 'offline' || room.stateIsLeftOrLeaving() ? "disabled" : ""
+                                    room.stateIsLeftOrLeaving() ? "disabled" : ""
                                 )}
                                  onClick={(e) => {
-                                     if ($(e.target).closest('.disabled').size() > 0) {
+                                     if ($(e.target).closest('.disabled').length > 0) {
                                          return false;
                                      }
                                      if (self.props.onLeaveClicked) {
@@ -442,8 +457,7 @@ var ConversationAudioVideoPanel = React.createClass({
 
 
         $(document)
-            .unbind("fullscreenchange.megaChat_" + room.roomId)
-            .bind("fullscreenchange.megaChat_" + room.roomId, function() {
+            .rebind("fullscreenchange.megaChat_" + room.roomId, function() {
                 if (!$(document).fullScreen() && room.isCurrentlyActive) {
                     self.setState({fullScreenModeEnabled: false});
                 }
@@ -561,14 +575,14 @@ var ConversationAudioVideoPanel = React.createClass({
 
         var $container = $(ReactDOM.findDOMNode(self));
         if ($container) {
-            $container.unbind('mouseover.chatUI' + self.props.chatRoom.roomId);
-            $container.unbind('mouseout.chatUI' + self.props.chatRoom.roomId);
-            $container.unbind('mousemove.chatUI' + self.props.chatRoom.roomId);
+            $container.off('mouseover.chatUI' + self.props.chatRoom.roomId);
+            $container.off('mouseout.chatUI' + self.props.chatRoom.roomId);
+            $container.off('mousemove.chatUI' + self.props.chatRoom.roomId);
         }
 
-        $(document).unbind("fullscreenchange.megaChat_" + room.roomId);
-        $(window).unbind('resize.chatUI_' + room.roomId);
-        $(room).unbind('toggleMessages.av');
+        $(document).off("fullscreenchange.megaChat_" + room.roomId);
+        $(window).off('resize.chatUI_' + room.roomId);
+        $(room).off('toggleMessages.av');
     },
     toggleMessages: function(e) {
         if (e) {
@@ -668,7 +682,7 @@ var ConversationAudioVideoPanel = React.createClass({
                     <i className="tiny-icon grey-minus-icon" />
                 </div>
                 <ContactsUI.Avatar
-                    contact={M.u[u_handle]} className="call semi-big-avatar"
+                    contact={M.u[u_handle]} className="call avatar-wrapper semi-big-avatar"
                     style={{display: !this.state.localMediaDisplay ? "none" : ""}}
                 />
             </div>;
@@ -705,7 +719,7 @@ var ConversationAudioVideoPanel = React.createClass({
             // TODO: When rtc is ready
             var contact = M.u[participants[0]];
             remotePlayerElement = <div className="call user-audio">
-                <ContactsUI.Avatar contact={contact}  className="big-avatar" hideVerifiedBadge={true} />
+                <ContactsUI.Avatar contact={contact}  className="avatar-wrapper big-avatar" hideVerifiedBadge={true} />
             </div>;
         }
         else {
@@ -812,7 +826,7 @@ var ConversationPanel = React.createClass({
     },
 
     uploadFromComputer: function() {
-        this.scrolledToBottom = true;
+        this.props.chatRoom.scrolledToBottom = true;
 
         this.props.chatRoom.uploadFromComputer();
     },
@@ -856,10 +870,13 @@ var ConversationPanel = React.createClass({
         });
 
         self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function (e, eventData) {
-            self.scrolledToBottom = true;
+            self.props.chatRoom.scrolledToBottom = true;
             if (self.messagesListScrollable) {
                 self.messagesListScrollable.scrollToBottom();
             }
+        });
+        self.props.chatRoom.rebind('openSendFilesDialog.cpanel', function(e) {
+            self.setState({'attachCloudDialog': true});
         });
 
         self.eventuallyInit();
@@ -899,7 +916,7 @@ var ConversationPanel = React.createClass({
         self.$messages.droppable(droppableConfig);
 
         self.lastScrollPosition = null;
-        self.lastScrolledToBottom = true;
+        self.props.chatRoom.scrolledToBottom = true;
         self.lastScrollHeight = 0;
         self.lastUpdatedScrollHeight = 0;
 
@@ -907,8 +924,7 @@ var ConversationPanel = React.createClass({
 
         // collapse on ESC pressed (exited fullscreen)
         $(document)
-            .unbind("fullscreenchange.megaChat_" + room.roomId)
-            .bind("fullscreenchange.megaChat_" + room.roomId, function() {
+            .rebind("fullscreenchange.megaChat_" + room.roomId, function() {
                 if (!$(document).fullScreen() && room.isCurrentlyActive) {
                     self.setState({isFullscreenModeEnabled: false});
                 }
@@ -938,7 +954,7 @@ var ConversationPanel = React.createClass({
 
         window.removeEventListener('resize', self.handleWindowResize);
         window.removeEventListener('keydown', self.handleKeyDown);
-        $(document).unbind("fullscreenchange.megaChat_" + chatRoom.roomId);
+        $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
     },
     componentDidUpdate: function(prevProps, prevState) {
         var self = this;
@@ -973,14 +989,14 @@ var ConversationPanel = React.createClass({
 
         if (prevProps.isActive === false && self.props.isActive === true) {
             var $typeArea = $('.messages-textarea:visible:first', $node);
-            if ($typeArea.size() === 1) {
-                $typeArea.focus();
+            if ($typeArea.length === 1) {
+                $typeArea.trigger("focus");
                 moveCursortoToEnd($typeArea[0]);
             }
         }
         if (!prevState.renameDialog && self.state.renameDialog === true) {
             var $input = $('.chat-rename-dialog input');
-            $input.focus();
+            $input.trigger("focus");
             $input[0].selectionStart = 0;
             $input[0].selectionEnd = $input.val().length;
         }
@@ -990,7 +1006,7 @@ var ConversationPanel = React.createClass({
                 self.messagesListScrollable.reinitialise(false);
                 // wait for the reinit...
                 Soon(function() {
-                    if (self.editDomElement && self.editDomElement.size() === 1) {
+                    if (self.editDomElement && self.editDomElement.length === 1) {
                         self.messagesListScrollable.scrollToElement(self.editDomElement[0], false);
                     }
                 });
@@ -1020,8 +1036,8 @@ var ConversationPanel = React.createClass({
         // We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
         var scrollBlockHeight = (
             $('.chat-content-block', $container).outerHeight() -
-            $('.chat-topic-block', $container).outerHeight() -
-            $('.call-block', $container).outerHeight() -
+            ($('.chat-topic-block', $container).outerHeight() || 0) -
+            ($('.call-block', $container).outerHeight() || 0) -
             $('.chat-textarea-block', $container).outerHeight()
         );
 
@@ -1055,7 +1071,7 @@ var ConversationPanel = React.createClass({
 
         if (forced) {
             if (!scrollPositionYPerc && !scrollToElement) {
-                if (self.scrolledToBottom && !self.editDomElement) {
+                if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
                     ps.scrollToBottom(true);
                     return true;
                 }
@@ -1067,7 +1083,7 @@ var ConversationPanel = React.createClass({
         }
 
         if (self.isComponentEventuallyVisible()) {
-            if (self.scrolledToBottom && !self.editDomElement) {
+            if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
                 ps.scrollToBottom(true);
                 return true;
             }
@@ -1088,26 +1104,29 @@ var ConversationPanel = React.createClass({
         var scrollPositionY = ps.getScrollPositionY();
         var isAtTop = ps.isAtTop();
         var isAtBottom = ps.isAtBottom();
+        var chatRoom = self.props.chatRoom;
+        var mb = chatRoom.messagesBuff;
 
+        if (mb.messages.length === 0) {
+            self.props.chatRoom.scrolledToBottom = true;
+            return;
+        }
+
+        // console.error(self.getUniqueId(), "is user scroll!");
 
         // turn on/off auto scroll to bottom.
         if (ps.isCloseToBottom(30) === true) {
-            if (!self.scrolledToBottom) {
-                var chatRoom = self.props.chatRoom;
-                var mb = chatRoom.messagesBuff;
+            if (!self.props.chatRoom.scrolledToBottom) {
                 mb.detachMessages();
             }
-            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
+            self.props.chatRoom.scrolledToBottom = true;
         }
         else {
-            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = false;
+            self.props.chatRoom.scrolledToBottom = false;
         }
 
-
         if (isAtTop || (ps.getScrollPositionY() < 5 && ps.getScrollHeight() > 500)) {
-            var chatRoom = self.props.chatRoom;
-            var mb = chatRoom.messagesBuff;
-            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull) {
+            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull && !mb.isRetrievingHistory) {
                 ps.disable();
 
 
@@ -1120,8 +1139,7 @@ var ConversationPanel = React.createClass({
 
 
                 var msgsAppended = 0;
-                $(chatRoom).unbind('onMessagesBuffAppend.pull');
-                $(chatRoom).bind('onMessagesBuffAppend.pull', function() {
+                $(chatRoom).rebind('onMessagesBuffAppend.pull', function() {
                     msgsAppended++;
 
                     // var prevPosY = (
@@ -1138,9 +1156,9 @@ var ConversationPanel = React.createClass({
                     // self.lastScrollPosition = prevPosY;
                 });
 
-                $(chatRoom).unbind('onHistoryDecrypted.pull');
+                $(chatRoom).off('onHistoryDecrypted.pull');
                 $(chatRoom).one('onHistoryDecrypted.pull', function(e) {
-                    $(chatRoom).unbind('onMessagesBuffAppend.pull');
+                    $(chatRoom).off('onMessagesBuffAppend.pull');
                     var prevPosY = (
                         ps.getScrollHeight() - self.lastContentHeightBeforeHist
                     ) + self.lastScrollPosition;
@@ -1167,17 +1185,19 @@ var ConversationPanel = React.createClass({
 
                         delete self.lastContentHeightBeforeHist;
 
+                        setTimeout(function() {
+                            self.isRetrievingHistoryViaScrollPull = false;
+                            // because of mousewheel animation, we would delay the re-enabling of the "pull to load
+                            // history", so that it won't re-trigger another hist retrieval request
+
+                            ps.enable();
+                            self.forceUpdate();
+                        }, 1150);
+
                         return 0xDEAD;
                     });
 
-                    setTimeout(function() {
-                        self.isRetrievingHistoryViaScrollPull = false;
-                        // because of mousewheel animation, we would delay the re-enabling of the "pull to load
-                        // history", so that it won't re-trigger another hist retrieval request
 
-                        ps.enable();
-                        self.forceUpdate();
-                    }, 1150);
 
                 });
 
@@ -1259,7 +1279,8 @@ var ConversationPanel = React.createClass({
         if (
             (
                 ChatdIntegration._loadingChats[room.roomId] &&
-                ChatdIntegration._loadingChats[room.roomId].state() === 'pending'
+                ChatdIntegration._loadingChats[room.roomId].loadingPromise &&
+                ChatdIntegration._loadingChats[room.roomId].loadingPromise.state() === 'pending'
             ) ||
             (self.isRetrievingHistoryViaScrollPull && !self.loadingShown) ||
             room.messagesBuff.messagesHistoryIsLoading() === true ||
@@ -1412,6 +1433,14 @@ var ConversationPanel = React.createClass({
                     }
                 }
 
+                if (
+                    v.dialogType === "remoteCallEnded" &&
+                    v &&
+                    v.wrappedChatDialogMessage
+                ) {
+                    v = v.wrappedChatDialogMessage;
+                }
+
 
                 if (v.dialogType) {
                     var messageInstance = null;
@@ -1469,10 +1498,12 @@ var ConversationPanel = React.createClass({
                             editing={self.state.editing === v.messageId || self.state.editing === v.pendingMessageId}
                             onEditStarted={($domElement) => {
                                 self.editDomElement = $domElement;
+                                self.props.chatRoom.scrolledToBottom = false;
                                 self.setState({'editing': v.messageId});
                                 self.forceUpdate();
                             }}
                             onEditDone={(messageContents) => {
+                                self.props.chatRoom.scrolledToBottom = true;
                                 self.editDomElement = null;
 
                                 var currentContents = v.textContents;
@@ -1484,6 +1515,7 @@ var ConversationPanel = React.createClass({
                                     self.lastScrollPositionPerc = 1;
                                 }
                                 else if (messageContents) {
+                                    $(room).trigger('onMessageUpdating', v);
                                     room.megaChat.plugins.chatdIntegration.updateMessage(
                                         room,
                                         v.internalId ? v.internalId : v.orderValue,
@@ -1491,7 +1523,10 @@ var ConversationPanel = React.createClass({
                                     );
                                     if (
                                         v.getState &&
-                                        v.getState() === Message.STATE.NOT_SENT &&
+                                        (
+                                            v.getState() === Message.STATE.NOT_SENT ||
+                                            v.getState() === Message.STATE.SENT
+                                        ) &&
                                         !v.requiresManualRetry
                                     ) {
                                         if (v.textContents) {
@@ -1517,6 +1552,8 @@ var ConversationPanel = React.createClass({
                                                 messageContents
                                             ]
                                         );
+
+                                        megaChat.plugins.richpreviewsFilter.processMessage({}, v, false, true);
                                     }
 
                                     self.messagesListScrollable.scrollToBottom(true);
@@ -1561,7 +1598,7 @@ var ConversationPanel = React.createClass({
                 onAttachClicked={() => {
                     self.setState({'attachCloudDialog': false});
 
-                    self.scrolledToBottom = true;
+                    self.props.chatRoom.scrolledToBottom = true;
 
                     room.attachNodes(
                         selected
@@ -1621,6 +1658,9 @@ var ConversationPanel = React.createClass({
                         msg.getState() === Message.STATE.DELIVERED ||
                         msg.getState() === Message.STATE.NOT_SENT) {
                         chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
+                        msg.deleted = true;
+                        msg.textContents = "";
+                        room.messagesBuff.removeMessageById(msg.messageId);
                     }
                     else if (
                         msg.getState() === Message.STATE.NOT_SENT_EXPIRED
@@ -1698,7 +1738,7 @@ var ConversationPanel = React.createClass({
                     }
                     catch (e) {}
 
-                    self.scrolledToBottom = true;
+                    self.props.chatRoom.scrolledToBottom = true;
 
                     M.addUpload([meta[0]]);
 
@@ -1744,11 +1784,12 @@ var ConversationPanel = React.createClass({
                 chatRoom={room}
                 title={__(l[8871])}
                 name="truncate-conversation"
+                dontShowAgainCheckbox={false}
                 onClose={() => {
                     self.setState({'truncateDialog': false});
                 }}
                 onConfirmClicked={() => {
-                    self.scrolledToBottom = true;
+                    self.props.chatRoom.scrolledToBottom = true;
 
                     room.truncate();
 
@@ -1765,12 +1806,66 @@ var ConversationPanel = React.createClass({
                 </div>
             </ModalDialogsUI.ConfirmDialog>
         }
+        if (self.state.archiveDialog === true) {
+            confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
+                megaChat={room.megaChat}
+                chatRoom={room}
+                title={__(l[19068])}
+                name="archive-conversation"
+                onClose={() => {
+                    self.setState({'archiveDialog': false});
+                }}
+                onConfirmClicked={() => {
+                    self.props.chatRoom.scrolledToBottom = true;
+
+                    room.archive();
+
+                    self.setState({
+                        'archiveDialog': false
+                    });
+                }}
+            >
+                <div className="fm-dialog-content">
+
+                    <div className="dialog secondary-header">
+                        {__(l[19069])}
+                    </div>
+                </div>
+            </ModalDialogsUI.ConfirmDialog>
+        }
+        if (self.state.unarchiveDialog === true) {
+            confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
+                megaChat={room.megaChat}
+                chatRoom={room}
+                title={__(l[19063])}
+                name="unarchive-conversation"
+                onClose={() => {
+                    self.setState({'unarchiveDialog': false});
+                }}
+                onConfirmClicked={() => {
+                    self.props.chatRoom.scrolledToBottom = true;
+
+                    room.unarchive();
+
+                    self.setState({
+                        'unarchiveDialog': false
+                    });
+                }}
+            >
+                <div className="fm-dialog-content">
+
+                    <div className="dialog secondary-header">
+                        {__(l[19064])}
+                    </div>
+                </div>
+            </ModalDialogsUI.ConfirmDialog>
+        }
         if (self.state.renameDialog === true) {
             var onEditSubmit = function(e) {
                 if ($.trim(self.state.renameDialogValue).length > 0 &&
                     self.state.renameDialogValue !== self.props.chatRoom.getRoomTitle()
                 ) {
-                    self.scrolledToBottom = true;
+                    self.props.chatRoom.scrolledToBottom = true;
 
                     var participants = self.props.chatRoom.protocolHandler.getTrackedParticipants();
                     var promises = [];
@@ -1867,7 +1962,6 @@ var ConversationPanel = React.createClass({
             additionalClass = " small-block";
         }
 
-        var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
 
         return (
             <div className={conversationPanelClasses} onMouseMove={self.onMouseMove}
@@ -1885,6 +1979,12 @@ var ConversationPanel = React.createClass({
                         onTruncateClicked={function() {
                             self.setState({'truncateDialog': true});
                         }}
+                        onArchiveClicked={function() {
+                            self.setState({'archiveDialog': true});
+                        }}
+                        onUnarchiveClicked={function() {
+                            self.setState({'unarchiveDialog': true});
+                        }}
                         onRenameClicked={function() {
                             self.setState({
                                 'renameDialog': true,
@@ -1901,7 +2001,7 @@ var ConversationPanel = React.createClass({
                             self.setState({'attachCloudDialog': true});
                         }}
                         onAddParticipantSelected={function(contactHashes) {
-                            self.scrolledToBottom = true;
+                            self.props.chatRoom.scrolledToBottom = true;
 
                             if (self.props.chatRoom.type == "private") {
                                 var megaChat = self.props.chatRoom.megaChat;
@@ -1980,7 +2080,7 @@ var ConversationPanel = React.createClass({
                             <PerfectScrollbar
                                    onFirstInit={(ps, node) => {
                                         ps.scrollToBottom(true);
-                                        self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = 1;
+                                        self.props.chatRoom.scrolledToBottom = 1;
 
                                     }}
                                    onReinitialise={self.onMessagesScrollReinitialise}
@@ -1994,6 +2094,13 @@ var ConversationPanel = React.createClass({
                                    editingMessageId={self.state.editing}
                                    confirmDeleteDialog={self.state.confirmDeleteDialog}
                                    renderedMessagesCount={messagesList.length}
+                                   isLoading={
+                                       this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() ||
+                                       this.loadingShown
+                                   }
+                                   options={{
+                                       'suppressScrollX': true
+                                   }}
                                 >
                                 <div className="messages main-pad">
                                     <div className="messages content-area">
@@ -2060,7 +2167,7 @@ var ConversationPanel = React.createClass({
                                     }
                                     else {
                                         self.setState({'editing': foundMessage.messageId});
-                                        self.lastScrolledToBottom = false;
+                                        self.props.chatRoom.scrolledToBottom = false;
                                         return true;
                                     }
                                 }}
@@ -2070,15 +2177,15 @@ var ConversationPanel = React.createClass({
                                 }}
                                 onConfirm={(messageContents) => {
                                     if (messageContents && messageContents.length > 0) {
-                                        if (!self.scrolledToBottom) {
-                                            self.scrolledToBottom = true;
+                                        if (!self.props.chatRoom.scrolledToBottom) {
+                                            self.props.chatRoom.scrolledToBottom = true;
                                             self.lastScrollPosition = 0;
                                             // tons of hacks required because of the super weird continuous native
                                             // scroll event under Chrome + OSX, e.g. when the user scrolls up to the
                                             // start of the chat, the event continues to be received event that the
                                             // scrollTop is now 0..and if in that time the user sends a message
                                             // the event triggers a weird "scroll up" animation out of nowhere...
-                                            $(self.props.chatRoom).bind('onMessagesBuffAppend.pull', function() {
+                                            $(self.props.chatRoom).rebind('onMessagesBuffAppend.pull', function() {
                                                 self.messagesListScrollable.scrollToBottom(false);
                                                 setTimeout(function() {
                                                     self.messagesListScrollable.enable();
@@ -2098,7 +2205,7 @@ var ConversationPanel = React.createClass({
                                     <ButtonsUI.Button
                                         className="popup-button"
                                         icon="small-icon grey-medium-plus"
-                                        disabled={room.isReadOnly() || myPresence === 'offline'}
+                                        disabled={room.isReadOnly()}
                                         >
                                         <DropdownsUI.Dropdown
                                             className="wide-dropdown attach-to-chat-popup"
@@ -2184,13 +2291,11 @@ var ConversationPanels = React.createClass({
             var contactsList = [];
             var contactsListOffline = [];
 
-
             if (hadLoaded) {
                 self.props.contacts.forEach(function (contact) {
                     if (contact.u === u_handle) {
                         return;
                     }
-
                     if(contact.c === 1) {
                         var pres = self.props.megaChat.userPresenceToCssClass(contact.presence);
 
@@ -2230,7 +2335,7 @@ var ConversationPanels = React.createClass({
         }
         else {
             return (
-                <div className="conversation-panels">
+                <div className={"conversation-panels " + self.props.className}>
                     {conversations}
                 </div>
             );

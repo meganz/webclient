@@ -41,7 +41,7 @@ function shallowEqual(objA, objB) {
 
 window.shallowEqual = shallowEqual;
 
-var MAX_ALLOWED_DEBOUNCED_UPDATES = 1;
+var MAX_ALLOWED_DEBOUNCED_UPDATES = 5;
 var DEBOUNCED_UPDATE_TIMEOUT = 60;
 var REENABLE_UPDATES_AFTER_TIMEOUT = 300;
 
@@ -72,18 +72,18 @@ var MegaRenderMixin = {
         this._uniqueId = this.getReactId().replace(/[^a-zA-Z0-9]/g, "");
         return this._uniqueId;
     },
-    debouncedForceUpdate: function() {
+    debouncedForceUpdate: function(timeout) {
         var self = this;
         if (typeof(self.skippedUpdates) === 'undefined') {
             self.skippedUpdates = 0;
         }
 
         if (self.debounceTimer) {
-           clearTimeout(self.debounceTimer);
+            clearTimeout(self.debounceTimer);
             // console.error(self.getUniqueId(), self.skippedUpdates + 1);
-           self.skippedUpdates++;
+            self.skippedUpdates++;
         }
-        var TIMEOUT_VAL = DEBOUNCED_UPDATE_TIMEOUT;
+        var TIMEOUT_VAL = timeout || DEBOUNCED_UPDATE_TIMEOUT;
 
         if (self.skippedUpdates > MAX_ALLOWED_DEBOUNCED_UPDATES) {
             TIMEOUT_VAL = 0;
@@ -134,7 +134,7 @@ var MegaRenderMixin = {
     },
     componentWillUnmount: function() {
         if (this.props.requiresUpdateOnResize) {
-            $(window).unbind('resize.megaRenderMixing' + this.getUniqueId());
+            $(window).off('resize.megaRenderMixing' + this.getUniqueId());
         }
 
         // window.removeEventListener('hashchange', this.onHashChangeDoUpdate);

@@ -3,6 +3,16 @@ var achieve_data = false;
 function init_start() {
     "use strict";
 
+    // Load the membership plans
+    pro.loadMembershipPlans(function () {
+
+        // Render the plan details
+        pro.proplan.populateMembershipPlans();
+
+        // Check which plans are applicable or grey them out if not
+        pro.proplan.checkApplicablePlans();
+    });
+
     if (u_type > 0) {
         $('.startpage.register').text(l[164]);
         $('.startpage.register').rebind('click', function () {
@@ -20,15 +30,7 @@ function init_start() {
         });
         $('.startpage.try-mega').text(l[16535]);
 
-        // Load the membership plans
-        pro.loadMembershipPlans(function () {
 
-            // Render the plan details
-            pro.proplan.populateMembershipPlans();
-
-            // Check which plans are applicable or grey them out if not
-            pro.proplan.checkApplicablePlans();
-        });
 
         $('.startpage.try-mega').rebind('click', function () {
             if (u_type === false) {
@@ -78,6 +80,13 @@ function init_start() {
     if (!is_mobile && page === 'start') {
         InitFileDrag();
     } else if (is_mobile && page === 'start') {
+        if (!mega.ui.contactLinkCardDialog) {
+            var contactLinkCardHtml = $('#mobile-ui-contact-card');
+            if (contactLinkCardHtml && contactLinkCardHtml.length) {
+                contactLinkCardHtml = contactLinkCardHtml[0].outerHTML;
+                mega.ui.contactLinkCardDialog = contactLinkCardHtml;
+            }
+        }
         mobile.initMobileAppButton();
     } else if (page === 'download') {
         $('.widget-block').hide();
@@ -131,6 +140,7 @@ function init_start() {
             }
         }, 1000);
     }
+    mBroadcaster.sendMessage('HomeStartPageRendered:mobile');
 }
 
 var start_countLimit = 0;
@@ -275,7 +285,7 @@ function start_countUpdate() {
         if (total.length === startCountRenderData[type].length) {
             for (var i = 0, len = total.length; i < len; i++) {
                 if (startCountRenderData[type][i] !== total[i]) {
-                    document.getElementById(type + '_number_' + i).innerHTML = total[i];
+                    $('#' + type + '_number_' + i).safeHTML(total[i]);
                 }
             }
         }

@@ -5,14 +5,62 @@
             <div class="block-wrapper">
                 <div class="main-left-block">
                     <div class="register-st2-txt-block">
+                        <div class="right-header">
+                            <h2 class="main-italic-header" href="https://mega.nz/recovery">[$1934]</h2>
+                            <div class="nav-header-block">
+                                <div class="nav-back-icon"></div>
+                                <h2 class="main-italic-header">Previous Step</h2>
+                            </div>
+                            <!-- This is the progress breadcrumb navigation block -->
+                            <div class="main-right-block recover-block decision-breadcrumb">
+                                <div class="register-st2-txt-block">
+                                    <div class="vert-container-aligner">
+                                        <div class="content-wrapper">
+                                            <div class="progress-meter">
+                                                <ol class="progress-points" data-current="4">
+                                                    <li class="progress-point step0">
+                                                    </li>
+                                                    <li class="progress-point step1">
+                                                        <div class="progress-track"></div>
+                                                    </li>
+                                                    <li class="progress-point step2">
+                                                        <div class="progress-track"></div>
+                                                    </li>
+                                                    <li class="progress-point step3">
+                                                        <div class="progress-track"></div>
+                                                    </li>
+                                                    <li class="progress-point step4">
+                                                        <div class="progress-track"></div>
+                                                    </li>
+                                                    <li class="progress-point step5">
+                                                        <div class="progress-track"></div>
+                                                    </li>
+                                                    <!-- Add success class to show a green navigation bar -->
+                                                    <li class="progress-point success">
+                                                        <div class="progress-track"></div>
+                                                    </li>
+                                                    <!-- Add warning class to show a orange navigation bar -->
+                                                    <li class="progress-point warning">
+                                                        <div class="progress-track"></div>
+                                                    </li>
+                                                    <!-- Add inactive class to show a grayed out navigation bar -->
+                                                    <li class="progress-point inactive">
+                                                        <div class="progress-track"></div>
+                                                    </li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="vert-container-aligner">
                             <div class="content-wrapper">
-                                <h2 class="main-italic-header">[$1934]</h2>
                                 <div class="warning-icon"></div><h3 class="main-italic-header main-header">Step 1</h3>
                                 <h1 class="step-main-question">You can easily change your password in the app. Select the device you are logged in with to see how.</h1>
                                 <!-- Each section will contain body text of some kind to indicate what the section is about
                                      Hide/Show depending on whether there is content -->
-                                <p class="recover-account-body-text hidden">Please check your browser (Chrome, Firefox, Safari, Edge, etc etc(can’t remember them all) to see if you are still logged into your account.  You might have also logged into MEGA on someone elses computer.</p>
+                                <p class="recover-account-body-text hidden">Please check your browser (Chrome, Firefox, Safari, Edge, etc etc(can't remember them all) to see if you are still logged into your account.  You might have also logged into MEGA on someone elses computer.</p>
                                 <!-- After completing the decision tree, if a user has a logged in device, we show this section.
                                      This section contains the instruction for each client -->
                                 <div class="app-instruction-block hidden">
@@ -49,7 +97,13 @@
                                 <!-- If a user does have their Recovery key, show them this block to allow them to recover their account -->
                                 <div class="recover-account-email-block hidden">
                                     <div class="login-register-input email ">
-                                        <input type="text" name="recover-input1" id="recover-input1" value="" placeholder="Enter your email">
+                                        <input type="text" name="recover-input1" id="recover-input1" value="" placeholder="[$195]" maxlength="190">
+                                    </div>
+                                    <!-- This is the Error message block for email fields -->
+                                    <div class="error-message">
+                                        <span class="">
+                                            Incorrect email, please try again.
+                                        </span>
                                     </div>
                                     <div class="backup-input-button default-grey-button recover-button left hidden">Send</div>
                                 </div>
@@ -118,47 +172,60 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- This is the progress breadcrumb navigation block -->
-                <div class="main-right-block recover-block decision-breadcrumb">
+            </div>
+            <div class="clear"></div>
+                                                        <!-- This is the progress breadcrumb navigation block -->
+                <div class="main-right-block recover-block decision-breadcrumb hidden">
                     <div class="register-st2-txt-block">
                         <div class="vert-container-aligner">
                             <div class="content-wrapper">
+                                <!-- Navigate back block -->
+                                <div class="right-header">
+                                    <h2 class="main-italic-header">[$1934]</h2>
+                                </div>
                                 <div class="progress-meter">
                                     <ol class="progress-points" data-current="4">
+                                        <li class="progress-point step0">
+                                            <div class="progress-content">
+
+                                                <div class="step-label">Email address </div>
+                                                <div class="step-answer"></div>
+                                            </div>
+                                        </li>
                                         <li class="progress-point step1">
+                                            <div class="progress-track"></div>
                                             <div class="progress-content">
 
                                                 <div class="step-label">Step 1 </div>
-                                                <div class="step-answer">Yes, I am logged into my account on another browser</div>
+                                                <div class="step-answer"></div>
                                             </div>
                                         </li>
                                         <li class="progress-point step2">
                                             <div class="progress-track"></div>
                                             <div class="progress-content">
                                                 <div class="step-label">Step 2</div>
-                                                <div class="step-answer">Yes, I am logged into my account on another browser</div>
+                                                <div class="step-answer"></div>
                                             </div>
                                         </li>
                                         <li class="progress-point step3">
                                             <div class="progress-track"></div>
                                             <div class="progress-content">
                                                 <div class="step-label">Step 3</div>
-                                                <div class="step-answer">Yes, I am logged into my account on another browser</div>
+                                                <div class="step-answer"></div>
                                             </div>
                                         </li>
                                         <li class="progress-point step4">
                                             <div class="progress-track"></div>
                                             <div class="progress-content">
                                                 <div class="step-label">Step 4</div>
-                                                <div class="step-answer">Yes, I am logged into my account on another browser</div>
+                                                <div class="step-answer"></div>
                                             </div>
                                         </li>
                                         <li class="progress-point step5">
                                             <div class="progress-track"></div>
                                             <div class="progress-content">
                                                 <div class="step-label">Step 5</div>
-                                                <div class="step-answer">Yes, I am logged into my account on another browser</div>
+                                                <div class="step-answer"></div>
                                             </div>
                                         </li>
                                         <!-- Add success class to show a green navigation bar -->
@@ -191,8 +258,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="clear"></div>
         </div>
     </div>
     <!-- Generic error overlay !-->

@@ -16,6 +16,7 @@ mobile.cloud.actionBar = {
         mobile.cloud.actionBar.initScrollToTopButton();
         mobile.cloud.actionBar.initShowCreateFolderOverlayButton();
         mobile.cloud.actionBar.initShowFilePickerButton();
+        mobile.cloud.actionBar.initRubbishBinControls();
     },
 
     /**
@@ -30,6 +31,7 @@ mobile.cloud.actionBar = {
         var $actionBar = $fileManager.find('.bottom-action-bar-container');
         var $createFolderIcon = $fileManager.find('.fm-icon.mobile-create-new-folder');
         var $uploadFileIcon = $fileManager.find('.fm-icon.upload-file');
+        var $rubbishBinIcon = $fileManager.find('.fm-icon.rubbish-bin-highlight');
 
         // If a public folder link, hide the action bar by default (because this is only shown if the scroll-to-top
         // button is enabled & visible). Also hide the Create Folder and Upload File button as they are not applicable.
@@ -37,13 +39,37 @@ mobile.cloud.actionBar = {
             $actionBar.addClass('hidden');
             $createFolderIcon.addClass('hidden');
             $uploadFileIcon.addClass('hidden');
+            $rubbishBinIcon.addClass('hidden');
         }
         else {
-            // Otherwise show the action bar and enable the Create Folder and Upload File buttons
             $actionBar.removeClass('hidden');
-            $createFolderIcon.removeClass('hidden');
-            $uploadFileIcon.removeClass('hidden');
+            if (M.getNodeRoot(M.currentdirid) === M.RubbishID) {
+                // IF RubbishBin, then show clear all button only.
+                $createFolderIcon.addClass('hidden');
+                $uploadFileIcon.addClass('hidden');
+                if ((M.currentdirid === M.RubbishID && M.v.length === 0)) {
+                    $rubbishBinIcon.addClass('hidden');
+                } else {
+                    $rubbishBinIcon.removeClass('hidden');
+                }
+            } else {
+                // Otherwise show the action bar and enable the Create Folder and Upload File buttons
+                $createFolderIcon.removeClass('hidden');
+                $uploadFileIcon.removeClass('hidden');
+                $rubbishBinIcon.addClass('hidden');
+            }
+
         }
+    },
+
+    /**
+     * Init RubbishBin related controls and Dialogs.
+     */
+    initRubbishBinControls: function() {
+        'use strict';
+        $(".empty-rubbish-bin").off('tap').on('tap', function() {
+            mobile.rubbishBinEmptyOverlay.show();
+        });
     },
 
     /**
@@ -159,6 +185,16 @@ mobile.cloud.actionBar = {
 
         // On the upload icon click/tap
         $uploadIcon.off('tap').on('tap', function() {
+
+            if (ulmanager.ulOverStorageQuota) {
+                ulmanager.ulShowOverStorageQuotaDialog();
+                return false;
+            }
+
+            if (ulmanager.isUploading) {
+                msgDialog('warninga', l[135], l[47], l[1155]);
+                return false;
+            }
 
             // Clear file input so change handler works again in Chrome
             $fileInput.val('');

@@ -22,6 +22,9 @@ pro.propay = {
     /** The gateway name of the selected payment method */
     proPaymentMethod: null,
 
+    /** Whether they selected the PRO plan immediately after completing the registration process */
+    planChosenAfterRegistration: false,
+
     /** Darker background modal overlay */
     $backgroundOverlay: null,
 
@@ -165,6 +168,12 @@ pro.propay = {
                     pro.propay.allGateways = mobile.propay.filterPaymentProviderOptions(pro.propay.allGateways);
                 }
 
+                // Check if the API has some issue and not returning any gateways at all
+                if (pro.propay.allGateways.length === 0) {
+                    console.error('No valid gateways returned from the API');
+                    return false;
+                }
+
                 // Separate into two groups, the first group has 6 providers, the second has the rest
                 var primaryGatewayOptions = gatewayOptions.splice(0, 6);
                 var secondaryGatewayOptions = gatewayOptions;
@@ -224,6 +233,11 @@ pro.propay = {
 
                 // Get the price and number of months duration
                 var price = currentPlan[pro.UTQA_RES_INDEX_PRICE];
+                var currencySymbol = ' \u20ac';
+                if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                    price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+                    currencySymbol = '';
+                }
                 var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
                 var monthsWording = l[922];     // 1 month
 
@@ -243,19 +257,24 @@ pro.propay = {
                 $durationOption.attr('data-plan-index', i);
                 $durationOption.attr('data-plan-months', numOfMonths);
                 $durationOption.find('.duration').text(monthsWording);
-                $durationOption.find('.price').text(price);
+                $durationOption.find('.price').text(price + currencySymbol);
 
                 // Show amount they will save
                 if (numOfMonths === 12) {
-
-                    // Calculate the discount price (the current yearly price is 10 months worth)
-                    var priceOneMonth = (price / 10);
-                    var priceTenMonths = (priceOneMonth * 10);
-                    var priceTwelveMonths = (priceOneMonth * 12);
-                    var discount = (priceTwelveMonths - priceTenMonths).toFixed(2);
+                    var discount;
+                    if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                        discount = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE];
+                    }
+                    else {
+                        // Calculate the discount price (the current yearly price is 10 months worth)
+                        var priceOneMonth = (price / 10);
+                        var priceTenMonths = (priceOneMonth * 10);
+                        var priceTwelveMonths = (priceOneMonth * 12);
+                        discount = (priceTwelveMonths - priceTenMonths).toFixed(2);
+                    }
 
                     $durationOption.find('.save-money').removeClass('hidden');
-                    $durationOption.find('.save-money .amount').text(discount);
+                    $durationOption.find('.save-money .amount').text(discount + currencySymbol);
                 }
 
                 // Update the list of duration options
@@ -326,12 +345,12 @@ pro.propay = {
             // Remove checked state on the other buttons
             $durationOptions.find('.membership-radio').removeClass('checked');
             $durationOptions.find('.membership-radio-label').removeClass('checked');
-            $durationOptions.find('input').removeAttr('checked');
+            $durationOptions.find('input').prop('checked', false);
 
             // Add checked state to just to the clicked one
             $this.find('.membership-radio').addClass('checked');
             $this.find('.membership-radio-label').addClass('checked');
-            $this.find('input').attr('checked', 'checked');
+            $this.find('input').prop('checked', true);
 
             // Update the main price and wording for one-time or recurring
             pro.propay.updateMainPrice(planIndex);
@@ -359,9 +378,10 @@ pro.propay = {
         var price = currentPlan[pro.UTQA_RES_INDEX_PRICE].split('.');
 
         // If less than 12 months is selected, use the monthly base price instead
-        if (numOfMonths !== 12) {
-            price = currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE].split('.');
-        }
+        //if (numOfMonths !== 12) {
+        //    price = currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE].split('.');
+        //}
+
         var dollars = price[0];
         var cents = price[1];
 
@@ -382,7 +402,7 @@ pro.propay = {
         var $chargeAmount = $step2.find('.charge-information .amount');
         var $pricingBox = $step2.find('.membership-pad-bl');
         var $planName = $pricingBox.find('.reg-st3-bott-title.title');
-        var $priceNum = $pricingBox.find('.reg-st3-bott-title.price .num');
+        var $priceNum = $pricingBox.find('.reg-st3-bott-title.price');
         var $priceDollars = $priceNum.find('.big');
         var $priceCents = $priceNum.find('.small');
         var $pricePeriod = $pricingBox.find('.reg-st3-bott-title.price .period');
@@ -390,6 +410,32 @@ pro.propay = {
         var $storageUnit = $pricingBox.find('.storage-unit');
         var $bandwidthAmount = $pricingBox.find('.bandwidth-amount');
         var $bandwidthUnit = $pricingBox.find('.bandwidth-unit');
+        var $euroPrice = $('.euro-price', $priceNum);
+        var $currncyAbbrev = $('.local-currency-code', $priceNum);
+
+        $priceDollars.removeClass('tooBig tooBig2');
+        $priceCents.removeClass('toosmall toosmall2');
+
+        var euroSign = '\u20ac';
+        var localPrice;
+        var localD;
+        var localC;
+        if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+            $pricingBox.addClass('local-currency');
+            $euroPrice.removeClass('hidden');
+            $currncyAbbrev.removeClass('hidden');
+            $currncyAbbrev.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
+            $euroPrice.text(currentPlan[pro.UTQA_RES_INDEX_PRICE] +
+                ' ' + euroSign);
+            localPrice = '' + currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+            $('.reg-st3-txt-localcurrencyprogram').removeClass('hidden');
+        }
+        else {
+            $pricingBox.removeClass('local-currency');
+            $euroPrice.addClass('hidden');
+            $currncyAbbrev.addClass('hidden');
+            $('.reg-st3-txt-localcurrencyprogram').addClass('hidden');
+        }
 
         // If mobile, set the plan icon and name at the top
         if (is_mobile) {
@@ -405,13 +451,44 @@ pro.propay = {
         $pricingBox.attr('data-payment', pro.propay.planNum);
         $planName.text(pro.propay.planName);
 
+        // Update the price of the plan and the /month or /year next to the price box
+        // work for local currency if present
+        if (localPrice) {
+            var localParts = localPrice.split('.');
+            localD = localParts[0];
+            localC = localParts[1] || '00';
+            if (localD.length > 9) {
+                // localD = localD.substr(0, 5);
+                if (localD.length > 11) {
+                    $priceDollars.addClass('tooBig2');
+                    $priceCents.addClass('toosmall2');
+                    localC = '0';
+                }
+                else {
+                    $priceDollars.addClass('tooBig');
+                    $priceCents.addClass('toosmall');
+                    localC = '00';
+                }
+                localD = Number.parseInt(localD) + 1;
+            }
+            else {
+                if (localC.length > 2) {
+                    localC = localC.substr(0, 2);
+                    localC = Number.parseInt(localC) + 1;
+                    localC = (localC + '0').substr(0, 2);
+                }
+            }
+            $priceDollars.text(localPrice);
+            $priceCents.text('');
+        }
+        else {
+            $priceDollars.text(dollars);
+            $priceCents.text('.' + cents + ' ' + euroSign);    // EUR symbol
+        }
+        $pricePeriod.text('/' + monthOrYearWording);
+
         // Update the charge information for question 3
         $chargeAmount.text(dollars + '.' + cents);
-
-        // Update the price of the plan and the /month or /year next to the price box
-        $priceDollars.text(dollars);
-        $priceCents.text('.' + cents + ' \u20ac');    // EUR symbol
-        $pricePeriod.text('/' + monthOrYearWording);
 
         // Update storage
         $storageAmount.text(storageSizeRounded);
@@ -430,6 +507,12 @@ pro.propay = {
      */
     updateTextDependingOnRecurring: function() {
 
+        'use strict';
+
+        if (pro.propay.allGateways.length === 0) {
+            return false;
+        }
+
         var $step2 = $('.membership-step2');
         var $paymentDialog = $('.payment-dialog');
         var $paymentAddressDialog = $('.payment-address-dialog');
@@ -446,6 +529,9 @@ pro.propay = {
         var currentPlan = pro.membershipPlans[planIndex];
         var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
         var price = currentPlan[pro.UTQA_RES_INDEX_PRICE] + ' \u20ac';     // 0.00 EUR symbol
+        if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+            price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+        }
 
         // Get the value for whether the user wants the plan to renew automatically
         var recurringEnabled = false;
@@ -707,25 +793,34 @@ pro.propay = {
             }
             else {
                 // Otherwise select the first available payment option because this provider is no longer available
-                pro.propay.preselectFirstPaymentOption();
+                pro.propay.preselectPaymentOption();
             }
         }
         else {
             // Otherwise select the first available payment option
-            pro.propay.preselectFirstPaymentOption();
+            pro.propay.preselectPaymentOption();
         }
     },
 
     /**
-     * Preselects the first payment option in the list of payment providers
+     * Preselects the payment option in the list of payment providers. Pro balance should be selected first if
+     * they have a balance, otherwise the next payment provider should be selected (which is usually Visa)
      */
-    preselectFirstPaymentOption: function() {
+    preselectPaymentOption: function() {
 
-        // Find and select the first payment option
-        var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
-        $paymentOption.find('input').attr('checked', 'checked');
-        $paymentOption.find('.membership-radio').addClass('checked');
-        $paymentOption.find('.provider-details').addClass('checked');
+        'use strict';
+
+        // Find the primary payment options
+        var $payOptions = $('.payment-options-list.primary .payment-method:not(.template)');
+
+        // If on mobile (which currently only has credit card providers) or they have a Pro balance, select the first
+        // option, otherwise select the next payment option (usually API will have it ordered to be Visa)
+        var $option = (is_mobile || parseFloat(pro.propay.proBalance) > 0) ? $payOptions.first() : $payOptions.eq(1);
+
+        // Check the radio button option
+        $option.find('input').prop('checked', true);
+        $option.find('.membership-radio').addClass('checked');
+        $option.find('.provider-details').addClass('checked');
     },
 
     /**
@@ -747,7 +842,7 @@ pro.propay = {
         $durationOptions.removeClass('hidden');
         $durationOptions.find('.membership-radio').removeClass('checked');
         $durationOptions.find('.membership-radio-label').removeClass('checked');
-        $durationOptions.find('input').removeAttr('checked', 'checked');
+        $durationOptions.find('input').prop('checked', false);
 
         // Loop through renewal period options (1 month, 1 year)
         $.each($durationOptions, function(key, durationOption) {
@@ -782,7 +877,7 @@ pro.propay = {
         }
         $newDurationOption.find('.membership-radio').addClass('checked');
         $newDurationOption.find('.membership-radio-label').addClass('checked');
-        $newDurationOption.find('input').attr('checked', 'checked');
+        $newDurationOption.find('input').prop('checked', true);
 
         // Update the text for one-time or recurring
         pro.propay.updateMainPrice(newPlanIndex);
@@ -880,12 +975,6 @@ pro.propay = {
     /* jshint -W074 */  // Old code, refactor another day
     sendPurchaseToApi: function() {
 
-        // Set affiliate ID
-        var affiliateId = 0;
-        if (localStorage.affid && (localStorage.affts > (new Date().getTime() - 86400000))) {
-            affiliateId = localStorage.affid;
-        }
-
         // Show different loading animation text depending on the payment methods
         switch (pro.propay.proPaymentMethod) {
             case 'bitcoin':
@@ -915,7 +1004,7 @@ pro.propay = {
             si:  apiId,
             p:   price,
             c:   currency,
-            aff: affiliateId,
+            aff: mega.affid,
             m:   m,
             bq:  fromBandwidthDialog,
             pbq: fromPreWarnBandwidthDialog
@@ -923,6 +1012,11 @@ pro.propay = {
 
         if (mega.uaoref) {
             utsRequest.uao = escapeHTML(mega.uaoref);
+        }
+
+        // If the plan was chosen immediately after registration, add an 'fr' (from registration) log to the request
+        if (pro.propay.planChosenAfterRegistration) {
+            utsRequest.fr = 1;
         }
 
         // Setup the 'uts' API request

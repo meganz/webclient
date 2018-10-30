@@ -379,7 +379,7 @@ var authring = (function () {
             u_authring[keyType][userhandle] = { fingerprint: fingerprint,
                                                 method: method,
                                                 confidence: confidence };
-            ns.setContacts(keyType);
+            return ns.setContacts(keyType);
         }
     };
 
@@ -403,6 +403,11 @@ var authring = (function () {
     ns.computeFingerprint = function(key, keyType, format) {
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupported key type: ' + keyType);
+
+            return '';
+        }
+        if (!key) {
+            logger.error('Invalid key for: ' + keyType);
 
             return '';
         }

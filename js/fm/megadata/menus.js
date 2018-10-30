@@ -318,6 +318,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.properties-versions'];
         delete items['.clearprevious-versions'];
         items['.import-item'] = 1;
+        items['.getlink-item'] = 1;
     }
 
     return items;
@@ -1025,11 +1026,11 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
         .filter('*[data-by=' + sorting.n + ']')
         .addClass('active')
         .addClass(dir);
-        
+
     var tmpFn = function() {
         x = event.clientX;
         y = event.clientY;
-        
+
         $menu.css('left', x + 'px');
         $menu.css('top', y + 'px');
     };

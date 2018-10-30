@@ -3644,15 +3644,14 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
     padding-top: 88px;
 }
 .cropped-page .col-3 .bottom-page.big-icon, .cropped-page .col-2 .bottom-page.big-icon {
-    display: table-cell
+    display: block;
 }
 .cropped-page .col-3 .bottom-page.big-icon + .small-txt, .cropped-page .col-2 .bottom-page.big-icon + .small-txt{
-    display: table-cell;
+    display: block;
+    text-align: center;
     vertical-align: middle;
-    text-align: left;
     font-size: 16px;
     line-height: 24px;
-    padding-left: 12px;
 }
 .megasync .bottom-page.img.mobile-view {
 	margin-top: 24px;

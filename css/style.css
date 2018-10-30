@@ -4842,9 +4842,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #666666;
 }
 .top-clear-button {
-    display: none;
-}
-.contains-value .top-clear-button {
     display: block;
     width: 30px;
     height: 24px;
@@ -4865,11 +4862,37 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
 }
-.contains-value .top-clear-button:hover {
+.top-clear-button:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     -moz-opacity: 0.8;
     -khtml-opacity: 0.8;
     opacity: 0.8;
+}
+.top-search-button {
+    display: block;
+    width: 30px;
+    height: 24px;
+    right:0;
+    position: absolute;
+    z-index: 100;
+    cursor: pointer;
+    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-position: 6px -1350px;
+    background-repeat: no-repeat;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+    -moz-opacity: 0.6;
+    -khtml-opacity: 0.6;
+    opacity: 0.6;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
 }
 .top-search-clear {
     height: 24px;

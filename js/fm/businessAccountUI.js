@@ -15,6 +15,8 @@ function BusinessAccountUI() {
         this.initialized = true;
     }
 
+    var mySelf = this;
+
     // private function to hide all business accounts UI divs.
     this.initUItoRender = function () {
         var $businessAccountContianer = $('.files-grid-view.user-management-view');
@@ -50,6 +52,22 @@ function BusinessAccountUI() {
             '.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
         $('.fm-right-header-user-management .user-management-overview-buttons').addClass('hidden');
         $('.user-management-overview-bar').addClass('hidden');
+
+
+        // header events handlers
+        $('.fm-right-header-user-management .user-management-main-page-buttons .ba-overview').off('click.subuser')
+            .on('click.subuser', function overviewHeaderButtonHandler() {
+                mySelf.viewBusinessAccountOverview();
+            });
+        $('.fm-right-header-user-management .user-management-main-page-buttons .add-sub-user').off('click.subuser')
+            .on('click.subuser', function addSubUserHeaderButtonHandler() {
+                mySelf.showAddSubUserDialog();
+            });
+        $('.fm-right-header-user-management .user-management-main-page-buttons .ba-account').off('click.subuser')
+            .on('click.subuser', function addSubUserHeaderButtonHandler() {
+                mySelf.viewBusinessAccountPage();
+            });
+
     };
 }
 
@@ -102,20 +120,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
         loadingDialog.phide();
     };
-
-    // header events handlers
-    $('.fm-right-header-user-management .user-management-main-page-buttons .ba-overview').off('click.subuser')
-        .on('click.subuser', function overviewHeaderButtonHandler() {
-            mySelf.viewBusinessAccountOverview();
-        });
-    $('.fm-right-header-user-management .user-management-main-page-buttons .add-sub-user').off('click.subuser')
-        .on('click.subuser', function addSubUserHeaderButtonHandler() {
-            mySelf.showAddSubUserDialog();
-        });
-    $('.fm-right-header-user-management .user-management-main-page-buttons .ba-account').off('click.subuser')
-        .on('click.subuser', function addSubUserHeaderButtonHandler() {
-            mySelf.viewBusinessAccountPage();
-        });
 
     // private function to check if new drawing is needed
     var isRedrawNeeded = function (subs, previousSubs) {

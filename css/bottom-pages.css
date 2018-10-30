@@ -1236,7 +1236,8 @@ html.gbot {
     border-bottom: 2px solid rgba(235, 68, 68, 0.8);
     display: inline-block;
     position: relative;
-    padding-bottom: 2px
+    padding-bottom: 2px;
+    min-width: 240px;
 }
 .browsers.download-txt.long-line {
     padding-right: 20px;

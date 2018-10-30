@@ -2547,15 +2547,22 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     // event handler for input getting focus
     $('.dialog-input-container input', $dialog).off('focus.suba')
         .on('focus.suba', function inputHasFocusHandler() {
-            $(this).parent().addClass('active');
+            var $me = $(this);
+            $me.parent().addClass('active');
+            if ($me.is($emailInput)) {
+                $('.top-login-warning.edit-email-warning', $dialog).addClass('active').removeClass('hidden');
+            }
         });
 
     // event handler for input losing focus
     $('.dialog-input-container input', $dialog).off('blur.suba')
         .on('blur.suba', function inputHasFocusHandler() {
-            $(this).parent().removeClass('active');
+            var $me = $(this);
+            var $meParent = $me.parent();
+            $meParent.removeClass('active');
+            $meParent.find('.top-login-warning.edit-email-warning').addClass('hidden').removeClass('active');
+            
             if (this.value.trim()) {
-                var $me = $(this);
                 if (!$me.hasClass('edit-sub-name') && !$me.hasClass('edit-sub-lname')) {
                     $me.parent().addClass('correctinput').removeClass('error');
                 }
@@ -2570,7 +2577,7 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
                 }
             }
             else {
-                $(this).parent().removeClass('correctinput');
+                $me.parent().removeClass('correctinput');
             }
         });
 

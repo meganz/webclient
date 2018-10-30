@@ -3531,18 +3531,21 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             $('.nw-fm-left-icon.folder-link').addClass('active');
             $('.fm-left-menu').addClass('folder-link');
             $('.nw-fm-tree-header.folder-link').show();
-            $('.fm-import-to-cloudrive, .fm-download-as-zip')
-                .removeClass('hidden')
-                .rebind('click', function() {
-                    var c = '' + $(this).attr('class');
+            // remove this two buttons from search result.
+            if (M.currentdirid.substr(0, 6) !== 'search') {
+                $('.fm-import-to-cloudrive, .fm-download-as-zip')
+                    .removeClass('hidden')
+                    .rebind('click', function() {
+                        var c = '' + $(this).attr('class');
 
-                    if (~c.indexOf('fm-import-to-cloudrive')) {
-                        M.importFolderLinkNodes([M.currentdirid]);
-                    }
-                    else if (~c.indexOf('fm-download-as-zip')) {
-                        M.addDownload([M.currentdirid], true);
-                    }
-                });
+                        if (~c.indexOf('fm-import-to-cloudrive')) {
+                            M.importFolderLinkNodes([M.currentdirid]);
+                        }
+                        else if (~c.indexOf('fm-download-as-zip')) {
+                            M.addDownload([M.currentdirid], true);
+                        }
+                    });
+            }
             // if (!u_type) {
             // $('.fm-import-to-cloudrive').addClass('hidden');
             // }

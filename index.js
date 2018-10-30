@@ -2072,6 +2072,15 @@ function topmenuUI() {
             var val = $.trim($('.top-search-input').val());
             if (folderlink || val.length > 2 || !asciionly(val)) {
                 if (folderlink) {
+                    if (val === '') {
+                        M.openFolder();
+                        $(this).trigger('blur');
+                        return false;
+                    }
+                    else if (val.length < 2) {
+                        return false;
+                    }
+
                     if (!M.nn) {
                         M.nn = Object.create(null);
                         var keys = Object.keys(M.d);
@@ -2090,6 +2099,7 @@ function topmenuUI() {
                     M.v = v;
                     M.currentdirid = 'search/' + val;
                     M.renderMain();
+                    M.onSectionUIOpen('cloud-drive');
                     $(this).trigger('blur');
                 }
                 else {

@@ -7692,6 +7692,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .mobile .bird .img-description .bottom-page.big-header {
     padding: 0 0 27px 0;
 }
+.mobile .bottom-page.cmd-block {
+    display: none !important;
+}
 .mobile.two-factor-page.setup-page .no-auth-app-button {
     color: #eb4444;
     cursor: pointer;

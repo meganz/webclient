@@ -342,7 +342,15 @@ function pageregister() {
                         else {
                             loadingDialog.hide();
                             u_type = r;
-                            loadSubPage('fm');
+
+                            security.login.checkLoginMethod($email.val().toLowerCase(),
+                                $password.val(), null, false,
+                                signin.old.startLogin,
+                                signin.new.startLogin);
+
+                            // I need this event handler to be triggered only once after successful sub-user login
+                            mBroadcaster.once('fm:initialized', M.importWelcomePDF);
+
                         }
                     },
                     businessUser: $password.val()   // we need the plain enterd password in later stages

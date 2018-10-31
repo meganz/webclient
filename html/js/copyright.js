@@ -85,9 +85,18 @@ copyright.getHandles = function(data) {
  */
 copyright.isFolderWithoutSubHandle = function(url) {
     'use strict';
-    var isFolderLinkCheck = /\#\F\!/;
     var hasSubLinkCheck = /\#\F\!.*\?/;
-    return isFolderLinkCheck.test(url) && !hasSubLinkCheck.test(url);
+    return copyright.isFolderLink(url) && !hasSubLinkCheck.test(url);
+};
+
+/**
+ * Check if a URL is a folder link.
+ * @param url
+ * @return {Boolean}
+ */
+copyright.isFolderLink = function(url) {
+    'use strict';
+    return /\#\F\!/.test(url);
 };
 
 /**
@@ -201,6 +210,12 @@ copyright.step2Submit = function() {
                 proceed = false;
                 msgDialog('warninga', l[135], escapeHTML(l[9056]));
                 wrong(copyrightwork[i]);
+                return false;
+            }
+
+            if (takedownType === "1" && copyright.isFolderLink(eVal) && !copyright.isFolderWithoutSubHandle(eVal)) {
+                proceed = false;
+                msgDialog('warninga', l[135], l[19804]);
                 return false;
             }
 

@@ -2352,7 +2352,7 @@ height: 56px;
     padding-top: 24px;
 }
 .bottom-page.top-links {
-    padding: 36px 0 9px 0;
+    padding: 20px 0 9px 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -2361,11 +2361,17 @@ height: 56px;
 .browsers.icon {
     width: 16px;
     height: 14px;
-    background-image: url(../images/mega/extensions-sprite.png);
+    background-image: url(../images/mega/extensions-sprite-v2.png);
     background-position: 0 0;
 }
 .browsers.icon.ff {
-    background-position: 0 -86px;
+    background-position: -68px -86px;
+}
+.browsers.icon.palemoon {
+    background-position: -216px -87px;
+}
+.browsers.icon.chrome {
+    background-position: -141px -87px;
 }
 .browsers.icon.megabird {
     background-position: -70px 0px;
@@ -2424,7 +2430,8 @@ height: 56px;
     border-bottom: 2px solid rgba(235, 68, 68, 0.8);
     display: inline-block;
     position: relative;
-    padding-bottom: 2px
+    padding-bottom: 2px;
+    min-width: 240px;
 }
 .browsers.download-txt.long-line {
     padding-right: 20px;
@@ -3003,7 +3010,7 @@ height: 56px;
     background-size: 360px auto;
 }
 .browsers.icon {
-    background-image: url(../images/mega/extensions-sprite@2x.png) !important;
+    background-image: url(../images/mega/extensions-sprite-v2@2x.png) !important;
     background-size: 308px auto;
 }
 }
@@ -3741,7 +3748,7 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
     padding-left: 0;
     display: inline-block;
 }
-.bottom-page.top-links:first-child {
+.bottom-page.top-links:nth-child(0) {
     padding-left: 0;
 }
 }
@@ -3776,7 +3783,7 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
 .medium-txt.small-lineheight.info {
     display: none;
 }
-.browsers.download-info.chrome {
+.browsers.download-info.palemoon {
     margin-bottom: 50px;
 }
 }

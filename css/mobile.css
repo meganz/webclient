@@ -573,6 +573,47 @@ ul, li {
     position: relative;
     display: inline-block;
 }
+.mobile.dialog-button {
+    color: white;
+    font-size: 13px;
+    display: block;
+    height: 44px;
+    line-height: 43px;
+    background: #ff4444;
+    background-image: linear-gradient(-179deg, #FF3333 0%, #FF4444 100%);
+    background-color: linear-gradient(-179deg, #FF3333 0%, #FF4444 100%);
+    border: 1px solid #D82928;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 -7px 8px 0 rgba(241,6,6,0.40);
+    margin-top: 8px;
+    border-radius: 4px;
+    position: relative;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    overflow: hidden;
+    box-sizing:border-box;
+}
+.mobile#mobile-ui-over-storage-quota-overlay .dialog-button {
+    color: #676D75;
+    display: inline-block;
+    width: calc(50% - 10px);
+    margin: 5px;
+}
+.mobile#mobile-ui-over-storage-quota-overlay .clickurl {
+    color: #D90007;
+    font-weight: bold;
+}
+.mobile#mobile-ui-over-storage-quota-overlay .dialog-button.action-invite-friends {
+    background: #f2f2f2;
+    border: 1px solid #e3e3e3;
+    box-shadow: 0 1pt 1pt 0 rgba(0,0,0,0.11), inset -1px -1px 1px 0 rgba(0,0,0,0.2);
+}
+.mobile#mobile-ui-over-storage-quota-overlay .dialog-button.action-upgrade-account {
+    background: #00bfa6;
+    border: 1px solid #00a68e;
+    box-shadow: 0 1pt 1pt 0 rgba(0,0,0,0.11), inset -1px -1px 1px 0 rgba(0,0,0,0.2);
+    color: white;
+}
 .mobile.content-row.second {
     display: none;
 }
@@ -874,7 +915,7 @@ ul, li {
     margin-left: -10px;
 }
 .mobile.bottom-action-bar .fm-icon.mobile-create-new-folder {
-    background-position: -40px -1750px;
+    background-position: -240px -1750px;
 }
 .mobile.bottom-action-bar .fm-icon.upload-file {
     background-position: 10px -1749px;
@@ -905,10 +946,10 @@ ul, li {
 .mobile.fm-item.undecrypted .fm-item-details {
     color: #ffa500;
 }
-.mobile.fm-item.folder:nth-child(even) {
+.mobile.fm-item.folder:nth-child(odd) {
     background-color: #fff;
 }
-.mobile.fm-item.file:nth-child(odd) {
+.mobile.fm-item.file:nth-child(even) {
     background-color: #fff;
 }
 .mobile.fm-icon {
@@ -1638,6 +1679,11 @@ ul, li {
     height: 146px;
     margin-bottom: 0;
     transform: scale(0.75);
+}
+.mobile.empty-icon.over-storage-quota {
+    background-position: -167px -706px;
+    height: 102px;
+    width: 102px;
 }
 .mobile.empty-txt span {
     color: #777777;
@@ -3867,7 +3913,7 @@ div.checkboxOn, div.checkboxOff {
     -webkit-border-radius: 4px;
     background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
-    background-position: right -2351px;
+    background-position: right -2354px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -4504,7 +4550,7 @@ div.checkboxOn, div.checkboxOff {
     height: 60px;
 }
 .mobile.slideshow-buttons .fm-icon.delete-button {
-    background-position: -143px -1820px;
+    background-position: -195px -1819px;
 }
 .mobile.slideshow-buttons .fm-icon.download-button {
     background-position: -42px -1616px;
@@ -4610,18 +4656,26 @@ div.checkboxOn, div.checkboxOff {
 }
 /* Alert Banner */
 .mobile.alert-banner {
-    height: 50px;
+    height: 60px;
+    width: 100%;
     background-color: #2ba6de;
-    -webkit-transition: height 200ms ease-in-out, top 200ms ease-in-out;
-    -moz-transition: height 200ms ease-in-out, top 200ms ease-in-out;
-    -o-transition: height 200ms ease-in-out, top 200ms ease-in-out;
-    -ms-transition: height 200ms ease-in-out, top 200ms ease-in-out;
-    transition: height 200ms ease-in-out, top 200ms ease-in-out;
+    display: block;
+    -webkit-transition: margin-top .3s ease-in-out;
+    -moz-transition: margin-top .3s ease-in-out;
+    -o-transition: margin-top .3s ease-in-out;
+    -ms-transition: margin-top .3s ease-in-out;
+    transition: margin-top .3s ease-in-out;
+    margin-top: 0px;
+    z-index: 98; /* 1 Less than titlebar as it needs to slide under when fixed.*/
 }
-.mobile.alert-banner.hidden {
-    display: block !important;
-    overflow: hidden;
-    height: 0px;
+.mobile.fixed-alert-banner .mobile.alert-banner {
+    position: fixed;
+}
+.mobile.fixed-alert-banner .mobile.folders-files-text {
+    margin-top: 60px;
+}
+.mobile.alert-banner.closed {
+    margin-top: -60px;
 }
 .mobile.alert-banner.warning {
     background-color: rgba(0252, 130, 23, 1);
@@ -4630,16 +4684,11 @@ div.checkboxOn, div.checkboxOff {
     background: rgba(255, 69, 69, 1);
 }
 .mobile.alert-banner .alert-close {
-    height: 50px;
+    height: 60px;
     width: 40px;
     float: right;
 }
-.mobile.alert-banner .alert-icon {
-    position: absolute;
-    right: 5px;
-    top: 4px;
-}
-.mobile.alert-banner .alert-text {
+.mobile.alert-banner .alert-text-container {
     position: absolute;
     left: 10px;
     margin-right: 50px;
@@ -4651,18 +4700,21 @@ div.checkboxOn, div.checkboxOff {
     color: white;
     display: table-cell;
     line-height: 50px;
+    padding: 5px;
 }
-
-.mobile.alert-banner .alert-text span {
+.mobile.alert-banner .alert-text-container .alert-text {
     display: inline-block;
     vertical-align: middle;
     line-height: 18px;
 }
+.mobile.alert-banner .alert-text-container .alert-text a{
+    color:white;
+}
 .mobile.alert-banner .alert-icon.close {
     height: 30px;
     width: 30px;
-    top: 10px;
-    right: 5px;
+    margin-top: 15px;
+    margin-right: 5px;
     background-position: -82px -1143px;
     transform: scale(0.8, 0.8);
 }

@@ -149,14 +149,15 @@
     <!-- File manager footer, showing number of folders/files -->
     <div class="mobile fm-row">
         <div class="mobile fm-content">
-            <div class="mobile alert-banner hidden">
-                <div class="mobile alert-text"><span>Alert!</span></div>
-                <div class="mobile alert-close">
-                    <div class="mobile alert-icon fm-icon close white close-alert-banner"></div>
-                </div>
-
-            </div>
             <div class="mobile fm-scrolling">
+                <div class="mobile alert-banner closed" id="alert-banner">
+                    <div class="mobile alert-text-container">
+                        <div class="alert-text"></div>
+                    </div>
+                    <div class="mobile alert-close">
+                        <div class="mobile alert-icon fm-icon close white close-alert-banner"></div>
+                    </div>
+                </div>
                 <div class="mobile folders-files-text"></div>
 
                 <!-- Template for folders -->
@@ -1155,7 +1156,7 @@
                     <div class="mobile invite-friends-block">
                         <div class="mobile fm-icon invite"></div>
                         <div class="mobile invite-friends-heading">[$17465]</div>
-                        <div class="mobile invite-friends-text">[$17466]</div>
+                        <div class="mobile invite-friends-text"></div>
                     </div>
                     <div class="mobile email-input-container">
                         <input class="mobile email-input" type="email" placeholder="[$7434]" maxlength="190">
@@ -1359,6 +1360,28 @@
                 </div>
                 <div class="mobile buttons">
                     <a class="mobile red-button first empty"> <i></i> <span>[$1018]</span> </a>
+                </div>
+                <a class="mobile text-button third cancel"><span>[$148]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Over Storage Quota Overlay. !-->
+<div class="mobile main-block hidden" id="mobile-ui-over-storage-quota-overlay">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile empty-icon over-storage-quota"></div>
+                <div class="mobile rb-empty-overlay-title dialog-heading-text">[$16302]</div>
+                <div class="mobile">
+                    <div class="mobile rb-empty-overlay-message dialog-body-text">[$16358] </div>
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile dialog-button action-invite-friends"> <i></i> <span>[$17465]</span> </a>
+                    <a class="mobile dialog-button action-upgrade-account"> <i></i> <span>[$129]</span> </a>
                 </div>
                 <a class="mobile text-button third cancel"><span>[$148]</span> </a>
             </div>

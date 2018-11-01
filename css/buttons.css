@@ -247,6 +247,9 @@
     font-size: 13px;
     min-width: 132px;
 }
+.default-green-button:hover {
+    background-color:#00AC94;
+}
 .default-grey-button {
     color: white;
     background: rgb(170,170,170);

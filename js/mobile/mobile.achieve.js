@@ -189,7 +189,12 @@ mobile.achieve = {
     updateInviteFriendsText: function($page) {
 
         'use strict';
-        
+
+        if (!M.account.maf) {
+            // If account doesn't have achievements this text is pointless.
+            return;
+        }
+
         // Convert storage and bandwidth to 'x GB'
         var allPossibleBonuses = M.account.maf.u;
         var storage = allPossibleBonuses[mobile.achieve.BONUS_CLASS_REFERRAL][mobile.achieve.AWARD_INDEX_STORAGE];

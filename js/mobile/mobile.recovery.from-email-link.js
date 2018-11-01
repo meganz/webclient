@@ -34,14 +34,6 @@ mobile.recovery.fromEmailLink = {
 
         'use strict';
         
-        // If they're already logged in then they can't proceed
-        if (u_type) {
-            mobile.messageOverlay.show(l[135], l[1971], function() {
-                loadSubPage('help/account');
-            });
-            return false;
-        }
-
         // Get the code from the URL
         this.recoveryCode = page.replace('recover', '');
 

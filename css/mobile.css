@@ -7335,13 +7335,14 @@ body.key .reg-st3-membership-bl.free.hidden {
     outline: none;
 }
 .mobile .improved-recovery-steps .app-instruction-block .app-button-block {
-    margin: 0 auto 24px;
+    margin: 0 auto;
     height: 44px;
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
     float: initial;
     width: 260px;
+    max-width: 100%;
 }
 .mobile .improved-recovery-steps .default-select::before, .mobile .improved-recovery-steps .ui-selectmenu-button::before {
     content: none;

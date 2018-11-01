@@ -875,15 +875,15 @@ html.gbot {
 }
 .pages-nav.compound-items {
     display: inline-block;
-    width: 50%;
+    width: 57.1%;
 }
 .pages-nav.compound-items a {
-    width: 33.333333%;
+    width: 25%;
 }
 .pages-nav.compound-items.active a {
     width: auto;
-    min-width: 90px;
-    padding: 0 10px;
+    min-width: 80px;
+    padding: 0 5px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -898,18 +898,18 @@ html.gbot {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    padding: 0 10px;
+    padding: 0 2px;
     top: 0;
     left: 0;
     display: block;
     width: auto;
 }
 .pages-nav.horizontal-centered-bl {
-    max-width: 900px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 .pages-nav.nav-button {
-    width: 16.666666%;
+    width: 14.2%;
     display: inline-block;
     position: relative;
     z-index: 2;

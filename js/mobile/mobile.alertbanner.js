@@ -6,6 +6,8 @@ mobile.alertBanner = {
     /**
      * Cached jQuery selector.
      */
+    $fileManagerBlock: null,
+    $fmScrolling: null,
     $alertBanner: null,
     $alertBannerText: null,
 
@@ -28,8 +30,10 @@ mobile.alertBanner = {
     init: function() {
         'use strict';
 
+        this.$fileManagerBlock = $(".mobile.file-manager-block");
+        this.$fmScrolling = this.$fileManagerBlock.find(".mobile.fm-scrolling");
         this.$alertBanner = $(".mobile.alert-banner");
-        this.$alertBannerText = this.$alertBanner.find(".alert-text span");
+        this.$alertBannerText = this.$alertBanner.find(".alert-text");
         var $alertBannerCloseButton = this.$alertBanner.find(".alert-close");
 
         // Handle close button click.
@@ -52,14 +56,25 @@ mobile.alertBanner = {
             this.init();
         }
 
-        this.$alertBannerText.text(message);
+        // Decide if should be fixed and if we need to adjust viewport scroll position.
+        var currentScrollOffset = this.$fmScrolling.scrollTop();
+        if (currentScrollOffset > 60 && !this.$fileManagerBlock.hasClass('fixed-alert-banner')) {
+            if (this.$alertBanner.hasClass('closed')) {
+                this.$fmScrolling.scrollTop(currentScrollOffset + 60);
+            } else {
+                this.$alertBanner.addClass('closed');
+            }
+            this.$fileManagerBlock.addClass('fixed-alert-banner');
+            this.attachScrollListener();
+        }
+
+        this.$alertBannerText.safeHTML(message);
 
         this.$alertBanner.removeClass('warning error');
         if (style !== null) {
             this.$alertBanner.addClass(style);
         }
-
-        this.$alertBanner.removeClass('hidden');
+        this.$alertBanner.removeClass('closed hidden');
         this.$alertBanner.off('tap');
 
         this.removeTimeout();
@@ -92,7 +107,7 @@ mobile.alertBanner = {
      */
     close: function() {
         'use strict';
-        this.$alertBanner.addClass('hidden');
+        this.$alertBanner.addClass('closed');
     },
 
     /**
@@ -132,6 +147,8 @@ mobile.alertBanner = {
                 handler();
                 return false;
             });
+        } else {
+            console.warn("mobile.alertBanner.on was passed an invalid event handler");
         }
         return this;
     },
@@ -151,5 +168,23 @@ mobile.alertBanner = {
             }, timeout);
         }
         return this;
+    },
+
+    /**
+     * Attach the scroll event handler to the fm-scrolling.
+     * This is only attached if we use the fixed-alert-banner to avoid
+     * running the event handler when we do not need to.
+     */
+    attachScrollListener: function() {
+        'use strict';
+
+        this.$fmScrolling.off('scroll').on('scroll', SoonFc(function(e) {
+            var toggleHeight = mobile.alertBanner.$alertBanner.hasClass('closed') ? 60 : 0;
+            if ($(e.target).scrollTop() <= toggleHeight) {
+                mobile.alertBanner.$fileManagerBlock.removeClass('fixed-alert-banner');
+                mobile.alertBanner.$fmScrolling.off('scroll');
+                mobile.alertBanner.$fmScrolling.scrollTop(0);
+            }
+        }));
     }
 };

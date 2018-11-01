@@ -892,17 +892,24 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
             return null;
         }
         else if (
-            textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META &&
-            textContents[2] === Message.MESSAGE_META_TYPE.RICH_PREVIEW
+            textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META
         ) {
+
             var meta = textContents.substr(3, textContents.length);
             try {
                 meta = JSON.parse(meta);
+                var origTextContents = textContents;
                 textContents = meta.textMessage;
                 message.textContents = textContents;
                 message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
                 delete meta.textMessage;
-                message.metaType = Message.MESSAGE_META_TYPE.RICH_PREVIEW;
+                if (origTextContents[2] === Message.MESSAGE_META_TYPE.RICH_PREVIEW) {
+                    message.metaType = Message.MESSAGE_META_TYPE.RICH_PREVIEW;
+                }
+                else {
+                    message.metaType = -1;
+                }
+
                 message.meta = meta;
             }
             catch (e) {

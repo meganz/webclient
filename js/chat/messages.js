@@ -565,9 +565,7 @@ Message.prototype.getManagementMessageSummaryText = function() {
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META) {
         var metaType = this.textContents.substr(2, 1);
         var meta = JSON.parse(this.textContents.substr(3, this.textContents.length));
-        if (metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW) {
-            return meta.textMessage;
-        }
+        return meta.textMessage || "";
     }
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
         return __(l[8892]);

@@ -12459,6 +12459,17 @@ React.makeElement = React['createElement'];
 	                }
 	                if (!message.deleted) {
 	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.isBeingEdited() !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
+	                        var editButton = message.metaType !== -1 ? React.makeElement(DropdownsUI.DropdownItem, {
+	                            icon: 'icons-sprite writing-pencil',
+	                            label: __(l[1342]),
+	                            className: '',
+	                            onClick: function onClick(e) {
+	                                e.stopPropagation();
+	                                e.preventDefault();
+
+	                                self.setState({ 'editing': true });
+	                            } }) : null;
+
 	                        messageActionButtons = React.makeElement(
 	                            ButtonsUI.Button,
 	                            {
@@ -12474,18 +12485,8 @@ React.makeElement = React['createElement'];
 	                                    horizOffset: 4
 	                                },
 	                                extraPreButtons,
-	                                React.makeElement(DropdownsUI.DropdownItem, {
-	                                    icon: 'icons-sprite writing-pencil',
-	                                    label: __(l[1342]),
-	                                    className: '',
-	                                    onClick: function onClick(e) {
-	                                        e.stopPropagation();
-	                                        e.preventDefault();
-
-	                                        self.setState({ 'editing': true });
-	                                    }
-	                                }),
-	                                React.makeElement('hr', null),
+	                                editButton,
+	                                editButton ? React.makeElement('hr', null) : null,
 	                                React.makeElement(DropdownsUI.DropdownItem, {
 	                                    icon: 'red-cross',
 	                                    label: __(l[1730]),

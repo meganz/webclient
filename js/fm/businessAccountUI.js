@@ -2882,12 +2882,24 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         return;
     }
 
+    var $usersLeftPanel = $('.fm-tree-panel .content-panel.user-management');
+
     // private function to update left panel
     var updateLeftSubUserPanel = function (subuser) {
-        var $usersLeftPanel = $('.fm-tree-panel .content-panel.user-management');
         var $userRow = $('#' + subuser.u, $usersLeftPanel);
         if (!$userRow.length) {
-            return;
+            if (!subuser.u || !subuser.firstname || !subuser.lastname) {
+                return;
+            }
+            var $userLaeftPanelItems = $('.nw-user-management-item ', $usersLeftPanel);
+            var $userLaeftPanelRow = $($userLaeftPanelItems.get(0)).clone(true);
+            $userRow = $userLaeftPanelRow.clone(true);
+            $userRow.removeClass('hidden selected');
+            $userRow.attr('id', subuser.u);
+            var uName = from8(base64urldecode(subuser.firstname)) + ' ' +
+                from8(base64urldecode(subuser.lastname));
+            $userRow.find('.nw-user-management-name').text(uName);
+            $usersLeftPanel.append($userRow);
         }
         var leftPanelClass = 'enabled-accounts';
         if (subuser.s === 0) {
@@ -2908,13 +2920,17 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         $('.user-management-tree-panel-header.' + leftPanelClass).trigger('click.subuser');
     };
 
+    if (!$usersLeftPanel.hasClass('hidden') && $usersLeftPanel.hasClass('active')) {
+        updateLeftSubUserPanel(subuser);
+    }
+
     // if we are in table view
     if (!$('.user-management-list-table').hasClass('hidden')
         || !$('.user-management-landing-page.user-management-view').hasClass('hidden')) {
         // safe to create new object.
         var busUI = new BusinessAccountUI();
         busUI.viewSubAccountListUI();
-        updateLeftSubUserPanel(subuser);
+        // updateLeftSubUserPanel(subuser);
     }
     // if we are in sub-user view
     else if (!$('.files-grid-view.user-management-view .user-management-subaccount-view-container')
@@ -2927,7 +2943,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
             var busUI = new BusinessAccountUI();
             busUI.viewSubAccountInfoUI(subuser.u);
             // update the left pane
-            updateLeftSubUserPanel(subuser);
+            // updateLeftSubUserPanel(subuser);
         }
     }
     else if (!$('.files-grid-view.user-management-view .user-management-account-settings')

@@ -682,6 +682,7 @@
     font-weight: 800;
     display: inline-block;
     padding: 0 0;
+    max-width: 60%;
 }
 .improved-recovery-steps .recover-paste-block .left-section, .improved-recovery-steps .recover-paste-block .right-section {
     margin: 0 0;

@@ -2601,7 +2601,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
     }
 
-    $('.fm-blocks-view, .shared-blocks-view, .fm-empty-cloud, .fm-empty-folder')
+    $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder')
         .rebind('contextmenu.fm', function(e) {
             $(this).find('.data-block-view').removeClass('ui-selected');
             // is this required? don't we have a support for a multi-selection context menu?

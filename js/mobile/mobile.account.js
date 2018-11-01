@@ -30,6 +30,7 @@ mobile.account = {
         mobile.account.initCancelAccountButton($page);
         mobile.account.initSessionHistoryButton($page);
         mobile.account.fetchAndDisplayTwoFactorAuthStatus($page);
+        mobile.account.initChangePasswordButton($page);
         mobile.account.initTitleMenu();
 
         // Initialise the top menu
@@ -474,6 +475,25 @@ mobile.account = {
 
             // Load the Session History page
             loadSubPage('fm/account/history');
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the button to change the user's password
+     * @param {String} $page The jQuery selector for the current page
+     */
+    initChangePasswordButton: function($page) {
+
+        'use strict';
+
+        var $buttonBlock = $page.find('.account-change-password-block');
+
+        // On clicking/tapping the button
+        $buttonBlock.off('tap').on('tap', function() {
+
+            // Load the Session History page
+            loadSubPage('fm/account/email-and-pass');
             return false;
         });
     },

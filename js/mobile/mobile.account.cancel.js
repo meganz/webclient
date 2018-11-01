@@ -14,32 +14,17 @@ mobile.account.cancel = {
         var $page = $('.mobile.cancel-account');
 
         // Initialise functionality
-        this.initBackButton($page);
         this.initFeedbackRadioButtons($page);
         this.initCancelAccountButton($page);
+
+        // Initialise back button to go back to the My Account page
+        mobile.initBackButton($page, 'fm/account/');
 
         // Initialise the top menu
         topmenuUI();
 
         // Show the account page content
         $page.removeClass('hidden');
-    },
-
-    /**
-     * Initialise the back arrow icon in the header to go back to the main My Account page
-     * @param {String} $page The jQuery selector for the current page
-     */
-    initBackButton: function($page) {
-
-        'use strict';
-
-        // On Back button click/tap
-        $page.find('.fm-icon.back').off('tap').on('tap', function() {
-
-            // Render the Invites page again
-            loadSubPage('fm/account/');
-            return false;
-        });
     },
 
     /**

@@ -256,7 +256,7 @@ ul, li {
     background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-position: center -1955px;
     background-repeat: no-repeat;
-    margin: 0 0 0 0;
+    margin: 0;
 }
 .mobile.homepage .second-message {
     font-size: 20px;
@@ -1133,6 +1133,11 @@ ul, li {
     width: 18px;
     height: 19px;
     background-size: 140px auto;
+}
+.mobile.fm-icon.password {
+    background-position: -157px -2072px;
+    width: 22px;
+    height: 22px;
 }
 .mobile.fm-icon.dropdown-handle {
     background-position: -212px -2062px;
@@ -2203,7 +2208,7 @@ div.checkboxOn, div.checkboxOff {
     box-sizing: border-box;
     font-family: 'source_sans_proregular', sans-serif;
 }
-.mobile.registration-confirm-email .instruction-message,  {
+.mobile.registration-confirm-email .instruction-message {
     opacity: 0.6;
     font-size: 13px;
     text-align: center;
@@ -5055,7 +5060,7 @@ div.checkboxOn, div.checkboxOff {
     margin-left: 60px;
     text-align: left;
 }
-.mobile.my-account-page .account-cancel-subscription-block, .mobile.my-account-page .account-recovery-key-block, .mobile.my-account-page .acount-cancellation-block, .mobile.my-account-page .account-twofactor-block, .mobile.my-account-page .account-achievements-block, .mobile.my-account-page .account-session-history-block, .mobile.my-account-page .account-upgrade-block   {
+.mobile.my-account-page .button-block {
     background-color: #fff;
     margin-top: 6px;
     padding: 17px 0;
@@ -5064,7 +5069,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.my-account-page .account-cancel-subscription-block .fm-icon.cancel-subscription {
     left: 10px;
     position: absolute;
-    top: 18px;
+    top: 10px;
 }
 .mobile.my-account-page .account-cancel-subscription-block .subscription-heading, .mobile.my-account-page .account-recovery-key-block .recovery-key-heading, .mobile.my-account-page .two-factor-heading {
     color: #262F3B;
@@ -5090,7 +5095,7 @@ div.checkboxOn, div.checkboxOff {
     left: 9px;
     top: 7px;
 }
-.mobile.my-account-page .acount-cancellation-block .fm-icon.right-arrow, .mobile.my-account-page .account-cancel-subscription-block .fm-icon.right-arrow, .mobile.my-account-page .account-upgrade-block .fm-icon.right-arrow, .mobile.my-account-page .account-session-history-block .fm-icon.right-arrow {
+.mobile.my-account-page .fm-icon.right-arrow {
     right: 4px;
     position: absolute;
     top: 9px;
@@ -5099,6 +5104,14 @@ div.checkboxOn, div.checkboxOff {
     right: 4px;
     position: absolute;
     top: 18px;
+}
+.mobile.my-account-page .account-change-password-block {
+    position: relative;
+}
+.mobile.my-account-page .account-change-password-block .fm-icon.password {
+    left: 18px;
+    position: absolute;
+    top: 17px;
 }
 
 /* Help centre header */
@@ -5492,6 +5505,21 @@ textarea.mobile.support-text-field {
     -khtml-opacity: 0.8;
     opacity: 0.8;
 }
+
+/* Change password page */
+.mobile.my-account-change-password-page .body-text {
+    color: #818993;
+    font-size: 14px;
+    line-height: 24px;
+    margin: 20px 24px;
+}
+.mobile.my-account-change-password-page .signin-input {
+    margin: 0 24px 4px;
+}
+.mobile.my-account-change-password-page .update-password-button {
+    margin: 8px 24px;
+}
+
 .mobile.recovery-key-page .mobile.recovery-key-block, .two-factor-qr-block {
     background-color: #fff;
     padding: 32px 0 26px 0;
@@ -8980,4 +9008,3 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         -o-transform: rotate(360deg);
     }
 }
-

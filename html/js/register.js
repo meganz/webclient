@@ -260,46 +260,38 @@ function pageregister() {
     var $lastName = $('.input-wrapper.name .l-name', $formWrapper);
     var $email = $('.input-wrapper.email input', $formWrapper);
     var $password = $('.input-wrapper.first input', $formWrapper);
-    var $passwordConfirm = $('.input-wrapper.confirm input', $formWrapper);
+    var $confirmPassword = $('.input-wrapper.confirm input', $formWrapper);
 
     var firstName = $.trim($firstName.val());
     var lastName = $.trim($lastName.val());
     var email = $.trim($email.val());
     var password = $.trim($password.val());
-    var passwordConfirm = $.trim($passwordConfirm.val());
+    var confirmPassword = $.trim($confirmPassword.val());
 
-    if (password !== passwordConfirm) {
-        $password.parent().find('.account.password-stutus').removeClass('checked');
+    // Check that the estimator library is initialised
+    if (typeof zxcvbn === 'undefined') {
+        msgDialog('warninga', l[135], l[1115] + '<br>' + l[1116]);
+        return false;
+    }
+
+    // Check if the entered passwords are valid or strong enough
+    var passwordValidationResult = security.isValidPassword(password, confirmPassword);
+
+    // If bad result
+    if (passwordValidationResult !== true) {
+
+        // Show error for password field, clear the value and refocus it
+        $password.parent().addClass('incorrect');
+        $password.parent().find('.account.password-status').removeClass('checked');
+        $password.parent().find('.account.input-tooltip').safeHTML(l[1102] + '<br>' + passwordValidationResult);
         $password.val('');
-        $passwordConfirm.val('');
-        $passwordConfirm.parent().addClass('incorrect');
         $password.focus();
-        err = 1;
-    }
 
-    if (password === '') {
-        $password.parent().addClass('incorrect');
-        $password.focus();
-        $password.parent().find('.account.input-tooltip')
-            .safeHTML(l[1102] + '<br>' + l[213]);
+        // Show error for confirm password field and clear the value
+        $confirmPassword.parent().addClass('incorrect');
+        $confirmPassword.val('');
+
         err = 1;
-    }
-    else if (password.length < security.minPasswordLength) {
-        $password.parent().addClass('incorrect');
-        $password.focus();
-        $password.parent().find('.account.input-tooltip')
-            .safeHTML(l[1102] + '<br>' + l[18701]);
-        err = 1;
-    }
-    else if (typeof zxcvbn !== 'undefined') {
-        var pw = zxcvbn(password);
-        if (pw.score < 1) {
-            $password.parent().addClass('incorrect');
-            $password.focus();
-            $password.parent().find('.account.input-tooltip')
-                .safeHTML(l[1102] + '<br>' + l[1104]);
-            err = 1;
-        }
     }
 
     if (email === '' || checkMail(email)) {
@@ -316,11 +308,7 @@ function pageregister() {
         err = 1;
     }
 
-    if (!err && typeof zxcvbn === 'undefined') {
-        msgDialog('warninga', l[135], l[1115] + '<br>' + l[1116]);
-        return false;
-    }
-    else if (!err) {
+    if (!err) {
         if ($('.register-check', $formWrapper).hasClass('checkboxOff')) {
             msgDialog('warninga', l[1117], l[1118]);
         }
@@ -413,7 +401,7 @@ function init_register() {
 function registerpwcheck() {
     'use strict';
 
-    $('.account.password-stutus')
+    $('.account.password-status')
         .removeClass('good1 good2 good3 good4 good5 checked');
 
     var trimmedPassword = $.trim($('#register-password-registerpage2').val());

@@ -878,6 +878,11 @@ function init_page() {
         mobile.account.history.init();
         return false;
     }
+    else if (is_mobile && u_type && page === 'fm/account/email-and-pass') {
+        parsepage(pages['mobile']);
+        mobile.account.changePassword.init();
+        return false;
+    }
     else if (page === 'achievements') {
         loadSubPage('fm/account/achievements');
         return false;

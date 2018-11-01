@@ -22,18 +22,20 @@ mobile.twofactor.verifySetup = {
         }
 
         // Cache selector
-        mobile.twofactor.verifySetup.$page = $('.mobile.two-factor-page.verify-setup-page');
+        this.$page = $('.mobile.two-factor-page.verify-setup-page');
 
         // Initialise functionality
-        mobile.twofactor.verifySetup.initKeyupFunctionality();
-        mobile.twofactor.verifySetup.initVerifyButton();
-        mobile.twofactor.verifySetup.initBackButton();
+        this.initKeyupFunctionality();
+        this.initVerifyButton();
+
+        // Initialise back button to go back to the 2FA setup page
+        mobile.initBackButton(this.$page, 'twofactor/setup');
 
         // Show the account page content
-        mobile.twofactor.verifySetup.$page.removeClass('hidden');
+        this.$page.removeClass('hidden');
 
         // Put the focus in the PIN input field after its visible
-        mobile.twofactor.verifySetup.$page.find('.two-factor-seed-input input').trigger('focus');
+        this.$page.find('.two-factor-seed-input input').trigger('focus');
     },
 
     /**
@@ -118,22 +120,6 @@ mobile.twofactor.verifySetup = {
             });
 
             // Prevent double taps
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the back arrow icon in the header to go back to the main My Account page
-     */
-    initBackButton: function() {
-
-        'use strict';
-
-        // On Back click/tap
-        mobile.twofactor.verifySetup.$page.find('.mobile.fm-icon.back').off('tap').on('tap', function() {
-
-            // Render the Account page again
-            loadSubPage('twofactor/setup');
             return false;
         });
     }

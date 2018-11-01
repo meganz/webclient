@@ -238,7 +238,6 @@ mobile.cloud = {
         var $upButton = $fileManagerHeader.find('.fm-icon.up');
         var $cloudIcon = $fileManagerHeader.find('.fm-icon.cloud');
         var $binIcon = $fileManagerHeader.find(".fm-icon.rubbish-bin");
-        var $menuIcon = $fileManagerHeader.find('.fm-icon.menu');
         var $folderIcon = $fileManagerHeader.find('.fm-icon.folder');
         var $headerTitle = $fileManagerHeader.find(".fm-header-txt");
         var $folderName = $fileManagerHeader.find('.fm-header-txt span');
@@ -277,7 +276,7 @@ mobile.cloud = {
             }
             else {
                 // Otherwise show the back button
-                mobile.showAndInitBackButton($backButton);
+                mobile.initBackButton($fileManagerHeader);
             }
 
             // Update the header with the current folder name

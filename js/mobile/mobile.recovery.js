@@ -13,10 +13,9 @@ mobile.recovery = {
 
         // Cache the selectors
         var $screen = $('.forgot-password-page');
-        var $backButton = $screen.find('.fm-icon.back');
 
         // Initialise functionality
-        mobile.showAndInitBackButton($backButton);
+        mobile.initBackButton($screen);
         mobile.recovery.initHaveKeyButton($screen);
         mobile.recovery.initNotHaveKeyButton($screen);
 

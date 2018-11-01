@@ -32,11 +32,8 @@ mobile.recovery.sendEmail = {
             $screen = $('.no-recovery-key-page');
         }
 
-        // Find the back button/icon in the current screen
-        var $backButton = $screen.find('.fm-icon.back');
-
         // Initialise functionality
-        mobile.showAndInitBackButton($backButton);
+        mobile.initBackButton($screen);
         mobile.recovery.sendEmail.initEmailKeyUpHandler($screen);
         mobile.recovery.sendEmail.initSendButton($screen, recoveryType);
 

@@ -22,17 +22,19 @@ mobile.achieve.referrals = {
         }
 
         // Cache selector
-        mobile.achieve.referrals.$page = $('.mobile.achievements-referral-bonuses-page');
+        this.$page = $('.mobile.achievements-referral-bonuses-page');
 
         // Initialise functionality
-        mobile.achieve.referrals.fetchAndDisplayInformation();
-        mobile.achieve.referrals.initBackButton();
+        this.fetchAndDisplayInformation();
+
+        // Initialise back button to go back to the Achievements page
+        mobile.initBackButton(this.$page, 'fm/account/achievements');
 
         // Initialise the top menu
         topmenuUI();
 
         // Show the account page content
-        mobile.achieve.referrals.$page.removeClass('hidden');
+        this.$page.removeClass('hidden');
 
         // Add a server log
         api_req({ a: 'log', e: 99676, m: 'Mobile web Referral Bonuses page accessed' });
@@ -135,21 +137,5 @@ mobile.achieve.referrals = {
         // Clear old HTML and render the referral bonuses
         $referralBlocksContainer.find('.referral-block').not('.template').remove();
         $referralBlocksContainer.append(referalBonusesHtml);
-    },
-
-    /**
-     * Initialise the back arrow icon in the header to go back to the main Achievements page
-     */
-    initBackButton: function() {
-
-        'use strict';
-
-        // On Back button click/tap
-        mobile.achieve.referrals.$page.find('.fm-icon.back').off('tap').on('tap', function() {
-
-            // Render the Achievements page again
-            loadSubPage('fm/account/achievements');
-            return false;
-        });
     }
 };

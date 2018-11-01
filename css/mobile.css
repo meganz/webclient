@@ -7260,6 +7260,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     -webkit-margin-start: 0;
     -webkit-margin-end: 0;
     -webkit-padding-start: 00;
+    padding: 8px 0 0 8px;
 }
 .mobile .improved-recovery-steps li.list-point:before{
     width: 23px;
@@ -7330,6 +7331,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     -webkit-appearance: none;
     appearance: none;
+    -moz-appearance:none;
     outline: none;
 }
 .mobile .improved-recovery-steps .app-instruction-block .app-button-block {

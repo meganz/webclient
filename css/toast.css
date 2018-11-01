@@ -87,7 +87,12 @@
 .warning .toast-icon {
     background-position: -85px -1260px;
 }
-.settings .toast-button {
+.recoveryKey .toast-icon {
+    background-image: url(../images/mega/recover-account-sprite@2x.png);
+    background-size: 360px auto;
+    background-position: -176px -742px;
+}
+.settings .toast-button, .recoveryKey .toast-button {
     display: none;
 }
 .send-chat .toast-icon {

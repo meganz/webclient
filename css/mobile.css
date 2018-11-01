@@ -495,8 +495,8 @@ ul, li {
     line-height: 42px;
 }
 .mobile.fm-dialog-container .mobile.inline-buttons .mobile.red-button  {
-    height: 36px;
-    line-height: 35px;
+    height: 44px;
+    line-height: 43px;
 }
 .mobile.inline-buttons .mobile.red-button.first  {
     float: right;
@@ -2185,12 +2185,15 @@ div.checkboxOn, div.checkboxOff {
     margin: 24px 16px;
     border: 1px solid #eee;
 }
+.recover-account-email-block .account.input-wrapper {
+    margin: 0 auto;
+}
 .mobile.registration-confirm-email .change-email input {
     background-color: #f8f8f8;
     border: 0;
     color: #444;
     display: block;
-    font-size: 15px;
+    font-size: 14px;
     margin: 0;
     padding: 0 20px;
     text-align: center;
@@ -2198,8 +2201,9 @@ div.checkboxOn, div.checkboxOff {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
+    font-family: 'source_sans_proregular', sans-serif;
 }
-.mobile.registration-confirm-email .instruction-message {
+.mobile.registration-confirm-email .instruction-message,  {
     opacity: 0.6;
     font-size: 13px;
     text-align: center;
@@ -6754,33 +6758,81 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .block-wrapper {
     width: 100%;
 }
-.mobile .improved-recovery-steps .main-left-block {
+.mobile .improved-recovery-steps .main-recovery-block {
     width: 100%;
     padding: 0 0;
     height: 100%;
     display: block;
     float: left;
-    max-width: 768px;
+    margin: 0 auto;
 }
 .mobile .improved-recovery-steps .main-right-block {
     display: none;
 }
 .mobile .improved-recovery-steps h3.main-italic-header, .mobile .improved-recovery-steps h2 {
-    font-family: 'source_sans_probold';
-    font-size: 14px;
-    color: #999;
-    letter-spacing: 0.2px;
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 16px;
+    color: #495057;
     padding: 0 0;
-    -webkit-margin-before: 1.2em;
-    -webkit-margin-after: .6em;
-    -webkit-margin-start: 0px;
-    -webkit-margin-end: 0px;
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+    margin: 0 0;
+    text-align: center;
+}
+.mobile .improved-recovery-steps h3.main-italic-header.main-header {
+    color: #999;
+    font-family: 'montserrat', 'source_sans_proregular', Arial;
+}
+.mobile .improved-recovery-steps p, .mobile .improved-recovery-steps h3.main-italic-header {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 14px;
+    color: #495057;
+    letter-spacing: 0;
+    line-height: 22px;
+    padding-bottom: 0;
+    text-align: center;
+    margin-bottom: 24px;
+}
+.mobile .improved-recovery-steps h3.main-italic-header {
+    margin-bottom: 0;
+}
+.mobile .improved-recovery-steps .info-container h3.main-italic-header {
+    text-align: left;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-weight: 800;
+    font-size: 16px;
+}
+.mobile .improved-recovery-steps .container-information {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 14px;
+    line-height: 21px;
+}
+.mobile .improved-recovery-steps .container-information ul {
+    margin: 12px 24px;
+    padding: 0;
+    text-indent: 0;
+    list-style-type: 0;
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 0;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 20px;
+}
+.mobile .improved-recovery-steps .container-information li {
+    margin-bottom: 10px;
+    display: list-item;
+    list-style: disc;
+}
+.mobile .improved-recovery-steps .container-information li:last-of-type {
+    margin-bottom: 0;
+}
+.mobile .improved-recovery-steps .container-information .warning-text {
+    color: #FD8116;
 }
 .mobile .improved-recovery-steps .checkbox-block h3.main-italic-header, .mobile .improved-recovery-steps .app-instruction-block h3.main-italic-header {
     padding: 0 0;
-}
-.mobile .improved-recovery-steps h3.main-italic-header {
-    color: #00BFA5;
 }
 .mobile .improved-recovery-steps h2 {
     top: 0;
@@ -6791,45 +6843,28 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .nav-back-subheading {
     display: none;
 }
-.mobile .improved-recovery-steps h1 {
-    font-family: 'source_sans_proregular';
+.mobile .improved-recovery-steps h1, .mobile.fm-dialog.park-account-dialog .fm-dialog-title  {
     font-size: 20px;
     color: #343A40;
     letter-spacing: 0.2px;
     line-height: 30px;
     -webkit-margin-before: 0.4em;
-    -webkit-margin-after: 0.5em;
+    -webkit-margin-after: 20px;
     -webkit-margin-start: 0px;
     -webkit-margin-end: 0px;
-}
-.mobile.fm-dialog.park-account-dialog .fm-dialog-title {
-    font-family: 'source_sans_prosemibold';
-    font-size: 20px;
-    color: #333;
-    letter-spacing: 0px;
-    line-height: 1.5;
+    text-align: center;
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_prosemibold';
 }
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps h3.main-italic-header {
     font-size: 13px;
 }
-.mobile .improved-recovery-steps .register-st2-txt-block {
-    display: table;
-    width: 100%;
-    margin: 0 0 24px 0;
-}
-.mobile .improved-recovery-steps .vert-container-aligner {
-    width: calc(100% - 64px);
-    margin: 80px auto 24px;
-    background-color: #fff;
-    border-radius: 4px;
-    border: 1px solid rgba(0, 40, 100, 0.12);
-    height: auto;
-}
 .mobile .improved-recovery-steps .content-wrapper {
     position: relative;
-    min-height: 540px;
     margin: 40px 36px 40px 36px;
     padding: 0;
+}
+.mobile .improved-recovery-steps .main-right-block .content-wrapper {
+    padding: 0 0;
 }
 .mobile .improved-recovery-steps .main-right-block .content-wrapper {
     padding: 0 0;
@@ -6840,6 +6875,16 @@ body.key .reg-st3-membership-bl.free.hidden {
     padding-top: 8px;
     display: block;
 }
+.mobile .improved-recovery-steps .recover-state {
+    font-family: 'source_sans_probold', 'LatoWeb', Arial;
+    font-size: 14px;
+    color: #00A58F;
+    letter-spacing: 0;
+    text-align: center;
+}
+.mobile .improved-recovery-steps .recover-state.warning {
+    color: #FD8116;
+}
 .mobile .improved-recovery-steps p {
     font-size: 14px;
     color: #495057;
@@ -6847,6 +6892,17 @@ body.key .reg-st3-membership-bl.free.hidden {
     line-height: 21px;
     padding-bottom: 0;
     margin-bottom: 24px;
+    text-align: center;
+}
+.mobile .improved-recovery-steps .app-instruction-block p, .mobile .improved-recovery-steps .app-instruction-block .main-italic-header{
+    text-align: left;
+    margin-top: 6px;
+}
+.mobile .improved-recovery-steps .app-instruction-block .main-italic-header {
+    font-size: 16px;
+    line-height: 24px;
+    margin-top: 40px;
+
 }
 .mobile .improve-recovery-steps .button-container {
     width: 100%;
@@ -6901,6 +6957,7 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps .button-aligner {
     float: right;
+    width: 100%;
 }
 .mobile .improved-recovery-steps .backup-input-button.recover-button {
     background: #F0373A;
@@ -7073,7 +7130,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     bottom: 14px;
     left: 5px;
 }
-.mobile .improved-recovery-steps .login-register-input  {
+.mobile .improved-recovery-steps .login-register-input, .mobile .recover-account-email-block .account.input-wrapper  {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -7094,7 +7151,7 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .login-register-input:hover {
     border: 1px solid #eee;
 }
-.mobile .improved-recovery-steps .login-register-input input {
+.mobile .improved-recovery-steps .login-register-input input, .mobile .recover-account-email-block .account.input-wrapper input {
     color: #444;
     line-height: 28px;
     width: 100%;
@@ -7103,16 +7160,16 @@ body.key .reg-st3-membership-bl.free.hidden {
     background-color: rgba(0,0,0,0);
     border: none;
 }
-.mobile .improved-recovery-steps .login-register-input input::placeholder {
+.mobile .improved-recovery-steps .login-register-input input::placeholder, .mobile .recover-account-email-block .account.input-wrapper input::placeholder {
     /* Chrome, Firefox, Opera, Safari 10.1+ */
     color: #aaa;
     opacity: 1; /* Firefox */
 }
-.mobile .improved-recovery-steps .login-register-input input:-ms-input-placeholder {
+.mobile .improved-recovery-steps .login-register-input input:-ms-input-placeholder, .mobile .recover-account-email-block .account.input-wrapper input:-ms-input-placeholder {
     /* Internet Explorer 10-11 */
     color: #aaa;
 }
-.mobile .improved-recovery-steps .login-register-input input::-ms-input-placeholder {
+.mobile .improved-recovery-steps .login-register-input input::-ms-input-placeholder, .mobile .recover-account-email-block .account.input-wrapper input::-ms-input-placeholder {
     /* Microsoft Edge */
     color:#aaa;
 }
@@ -7132,13 +7189,15 @@ body.key .reg-st3-membership-bl.free.hidden {
     background-image: linear-gradient(-180deg, rgba(255,255,255,0) 0%, rgba(242,242,242,0) 100%);
     border: 1px solid #d90007;
     color: white;
-    margin: 0 0;
-    line-height: 24px;
+    line-height: 30px;
     text-decoration: none;
     left: 0;
     padding: 8px 28px;
     border-radius: 4px;
     text-align: center;
+    width: 104px; 
+    margin: 0 auto;
+    font-size: 15px;
 }
 .mobile .improved-recovery-steps .app-button {
     background-color: #FFFFFF;
@@ -7166,21 +7225,34 @@ body.key .reg-st3-membership-bl.free.hidden {
     border-radius: 3px;
     color: #fff;
 }
-.improved-recovery-steps .app-button.active:hover {
+.mobile .improved-recovery-steps .app-button.active:hover {
     color: #fff;
 }
-.improved-recovery-steps .app-instruction-block {
+.mobile .improved-recovery-steps .app-instruction-block {
     margin: 0 0 8px 0;
 }
-
+.mobile .improved-recovery-steps .register-st2-txt-block {
+    display: table;
+    min-height: 720px;
+    height: 100%;
+    width: 100%;
+}
+.mobile .improved-recovery-steps .vert-container-aligner {
+    vertical-align: middle;
+    display: table-cell;
+}
+.mobile .improved-recovery-steps .card-container {
+    width: calc(100% - 24px);
+    max-width: 640px;
+    margin: 80px auto 24px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 40, 100, 0.12);
+    height: auto;
+}
 .mobile .improved-recovery-steps .hidden {
     display: none;
 }
-
-.mobile .improved-recovery-steps .button-aligner.no-float {
-    float: initial;
-}
-
 .mobile .improved-recovery-steps ol.app-instructions-list {
     list-style-type: none;
     -webkit-margin-before: 1em;
@@ -7188,6 +7260,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     -webkit-margin-start: 0;
     -webkit-margin-end: 0;
     -webkit-padding-start: 00;
+    padding: 8px 0 0 8px;
 }
 .mobile .improved-recovery-steps li.list-point:before{
     width: 23px;
@@ -7206,23 +7279,28 @@ body.key .reg-st3-membership-bl.free.hidden {
     font-weight: 900;
     display: inline-block;
     content: counter(list);
-    margin-right: 15px;
+    margin-right: 8px;
     font-size: 14px;
 }
 .mobile .improved-recovery-steps .list-point {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     line-height: 22px;
     counter-increment: list;
-    text-indent: -40px;
-    margin-left: 40px;
+    text-indent: -31px;
+    margin-left: 24px;
     font-size: 14px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+
 }
 .mobile .improved-recovery-steps strong {
-    font-family: 'source_sans_probold';
+   font-family: 'LatoWeb', 'source_sans_probold', Arial
     color: #333;
+    font-weight: 800;
 }
 .mobile .improved-recovery-steps  strong.warning-text {
     color: #eb4444;
+    font-family: 'LatoWeb', 'source_sans_probold', Arial;
+    font-weight: 800;
 }
 .mobile .improved-recovery-steps .instruction-block {
     margin-top: 32px;
@@ -7232,18 +7310,51 @@ body.key .reg-st3-membership-bl.free.hidden {
     padding: 0 0;
     margin-top: 26px;
 }
-.mobile .improved-recovery-steps .checkbox-container/*, .improved-recovery-steps .app-button-block  .instruction-block */{
+.mobile .improved-recovery-steps .info-container, .mobile .improved-recovery-steps .app-instruction-block{
     background-color: rgba(250,250,250,0.5);
-    padding:12px 0;
+    padding: 20px 20px;
     margin: 0 0;
     border: 1px solid #eee;
     border-radius: 4px;
 }
-.mobile .improved-recovery-steps .checkbox-container .settings-row {
+.mobile .improved-recovery-steps .app-instruction-block {
+    margin-top: 24px;
+    margin-bottom: 16px;
+}
+.mobile .improved-recovery-steps .app-instruction-block select {
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    height: 44px;
+    padding: 5px 5px 5px 12px;
+    width: 260px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    -webkit-appearance: none;
+    appearance: none;
+    -moz-appearance:none;
+    outline: none;
+}
+.mobile .improved-recovery-steps .app-instruction-block .app-button-block {
+    margin: 0 auto;
+    height: 44px;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
+    float: initial;
+    width: 260px;
+    max-width: 100%;
+}
+.mobile .improved-recovery-steps .default-select::before, .mobile .improved-recovery-steps .ui-selectmenu-button::before {
+    content: none;
+}
+.mobile .improved-recovery-steps .app-instruction-block select::-ms-expand {    
+    display: none; 
+}
+.mobile .improved-recovery-steps .info-container .settings-row {
     margin-bottom: 4px;
 }
-.mobile .improved-recovery-steps .checkbox-container .settings-row div.checkboxOff, .mobile .improved-recovery-steps .checkbox-container .settings-row div.checkboxOn{
-    margin:  16px 14px;
+.mobile .improved-recovery-steps .info-container .settings-row div.checkboxOff, .mobile .improved-recovery-steps .info-container .settings-row div.checkboxOn, .mobile .improved-recovery-steps .checkboxOn, .mobile .improved-recovery-steps .checkboxOff   {
+    margin:  16px 14px 16px 0;
     width: 16px;
     height: 16px;
     -webkit-box-sizing: border-box;
@@ -7262,7 +7373,11 @@ body.key .reg-st3-membership-bl.free.hidden {
     z-index: 1;
     border: 1px solid #ddd;
 }
-.mobile .improved-recovery-steps .checkbox-container .settings-row input.checkboxOn, .mobile .improved-recovery-steps .checkbox-container .settings-row input.checkboxOff {
+.mobile .improved-recovery-steps .check-sessions div.checkboxOn, .mobile .improved-recovery-steps .check-sessions div.checkboxOff   {
+    margin: 16px auto 32px;
+    float: initial;
+}
+.mobile .improved-recovery-steps .info-container .settings-row input.checkboxOn, .mobile .improved-recovery-steps .info-container .settings-row input.checkboxOff {
     margin: 0;
 }
 .mobile .improved-recovery-steps .checkboxOn::before, .mobile .improved-recovery-steps .checkboxOff::before, .mobile .improved-recovery-steps .checkboxOn::after, .mobile .improved-recovery-steps .checkboxOff::after {
@@ -7293,14 +7408,11 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .checkboxOn::after {
     background-position: -35px -446px;
 }
-/*.improved-recovery-steps  .instruction-block {
-    padding: 0 12px;
-}*/
 .mobile .improved-recovery-steps .app-button-block {
     padding: 0 0;
     min-height: initial;
 }
-.mobile .improved-recovery-steps .checkbox-container .settings-row label {
+.mobile .improved-recovery-steps .info-container .settings-row label {
     line-height: 1.6;
     padding-top: 13px;
     color: #333;
@@ -7310,17 +7422,19 @@ body.key .reg-st3-membership-bl.free.hidden {
     margin-top:0;
     float: inherit;
     display: block;
-    margin-left: 44px;
+    margin-left: 32px;
 }
-.mobile .improved-recovery-steps .checkbox-container .settings-row label:last-of-type {
+.mobile .improved-recovery-steps .info-container .settings-row label:last-of-type {
     padding-bottom: 12px;
 }
-.mobile .improved-recovery-steps .checkbox-container .settings-row label strong {
-    font-family: 'source_sans_probold';
+.mobile .improved-recovery-steps .info-container .settings-row label strong {
+    font-family: 'LatoWeb', 'source_sans_probold', Arial;
+    font-weight: 800;
 }
 .mobile .improved-recovery-steps strong {
-    font-family: 'source_sans_probold';
+    font-family: 'LatoWeb', 'source_sans_probold', Arial;
     color: #333;
+    font-weight: 800;
 }
 .mobile .improved-recovery-steps  strong.warning-text {
     color: #eb4444;
@@ -7394,12 +7508,6 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .warning-icon.warning  {
     display: block;
 }
-.mobile .improved-recovery-steps h3.warning {
-    color: #F57223;
-}
-.mobile .improved-recovery-steps h3.success {
-    color: #2AAF5F;
-}
 .mobile .improved-recovery-steps .list-point b.megasync-logo {
     background-position: -6px -773px;
     width: 24px;
@@ -7410,6 +7518,12 @@ body.key .reg-st3-membership-bl.free.hidden {
     margin: -16px 2px 2px 3px;
     padding-bottom: 6px;
     padding-top: 2px;
+}
+.mobile .improved-recovery-steps .recover-image-block {
+    width: 172px;
+    height: 120px;
+    display: block;
+    margin: 0 auto;
 }
 /* Language styles for the MEGAsync icon */
 .mobile.es .improved-recovery-steps .list-point b.megasync-logo {
@@ -7522,7 +7636,8 @@ body.key .reg-st3-membership-bl.free.hidden {
     text-decoration: underline;
 }
 .mobile .improved-recovery-steps .recover-account-email-block {
-    margin-top: 36px;
+    margin: 32px auto 64px;
+    position: relative;
 }
 .mobile .improved-recovery-steps .recover-account-email-block .error-message{
     margin-top: 12px;
@@ -7530,6 +7645,124 @@ body.key .reg-st3-membership-bl.free.hidden {
     font-size: 13px;
     max-width: 400px;
     line-height: 21px;
+}
+.mobile .improved-recovery-steps .account.input-tooltip, .mobile .improved-recovery-steps .account.input-tooltip {
+    text-align: center;
+    background-color: #eb4444;
+    margin-top: 6px;
+    background: rgba(235,68,68,0.05);
+    border: 1px solid rgba(235,68,68,0.20);
+    font-size: 13px;
+    line-height: 21px;
+    padding: 4px 8px;
+    color: #eb4444;
+    max-width: 420px;
+    margin: 0 auto;
+    float: initial;
+}
+.mobile .improved-recovery-steps .recover-image, .improved-recovery-steps .session-image-block {
+    background-image: url(../images/mega/recover-account-sprite.png);
+    background-repeat: no-repeat;
+    background-size: 344px auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.mobile .improved-recovery-steps .recover-image.email {
+    background-position: -4px -360px;
+}
+.mobile .improved-recovery-steps .recover-image.key {
+    background-position: 0 0;
+}
+.mobile .improved-recovery-steps .recover-image.lock {
+    background-position: -172px 0;
+}
+.mobile .improved-recovery-steps .recover-image.gray-device {
+    background-position: 0 -120px;
+}
+.mobile .improved-recovery-steps .recover-image.device-password {
+    background-position: -172px -120px;
+}
+.mobile .improved-recovery-steps .recover-image.device-key {
+    background-position: 0 -240px;
+}
+.mobile .improved-recovery-steps .recover-image.locked-key {
+    background-position: -172px -240px;
+}
+.mobile .improved-recovery-steps .recover-image.unlocked-key {
+    background-position: -172px -360px;
+}
+.mobile .improved-recovery-steps .recover-image.incoming-mail{
+    background-position: 0 -480px;
+}
+.mobile .improved-recovery-steps .recover-image.park-account{
+    background-position: -172px -480px;
+}
+.mobile .improved-recovery-steps .session-image-block {
+    height: 94px;
+    margin: 0 auto 12px;
+    width: 120px;
+}
+.mobile .improved-recovery-steps .check-sessions {
+    margin: 36px auto 40px;
+    display: table;
+}
+.mobile .improved-recovery-steps .check-sessions .col-3 {
+    display: table-cell;
+    border: 2px solid rgba(153, 153, 153, 0.25);
+    border-radius: 4px;
+    position: relative;
+}
+.mobile .improved-recovery-steps .check-sessions .col-3.active {
+    border-color: #2AAF5F;
+}
+.mobile .improved-recovery-steps .col-3 {
+    width: 32.5%;
+    padding: 12px 12px 20px;
+}
+.mobile .improved-recovery-steps .check-sessions .checkboxOn, .mobile .improved-recovery-steps .check-sessions .checkboxOff {
+    position: absolute;
+    right: 10px;
+    top: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+}
+.mobile.improved-recovery-steps .check-sessions .checkdiv, .mobile .improved-recovery-steps .check-sessions .checkdiv::before {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+}
+.mobile .improved-recovery-steps .check-sessions .checkdiv::after {
+    background-position: -25.5px -1850px;
+    display: block;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+.mobile .improved-recovery-steps .check-sessions .checkboxOff {
+    background-color: rgba(153, 153, 153, 0.25);
+}
+.mobile .improved-recovery-steps .check-sessions .checkboxOn {
+    background-color: #2AAF5F;
+}
+.mobile .improved-recovery-steps .session-image-block.desktop {
+    background-position: 0 -611px;
+}
+.mobile .improved-recovery-steps .session-image-block.browser {
+    background-position: -233px -611px;
+}
+.mobile .improved-recovery-steps .session-image-block.mobile {
+    background-position: -123px -611px;
+}
+.mobile .improved-recovery-steps .check-sessions .session-text {
+    text-align: center;
+    font-size: 14px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    line-height: 21px;
+}
+.mobile .improved-recovery-steps .check-sessions .checkdiv {
+    margin: 12px auto 20px;
+    float: initial;
 }
 .bottom-page .forgot-password-page .mobile.fm-header {
     position: fixed;
@@ -8008,10 +8241,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile .improved-recovery-steps .backup-input-button.recover-button {
         max-width: 100px;
     }
-    .mobile .improved-recovery-steps .main-left-block {
-        margin: 0 auto;
-        float: initial;
-    }
     .mobile .improved-recovery-steps .main-right-block {
         width: 25%;
         display: block;
@@ -8022,15 +8251,15 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         left: 0;
         float: left;
     }
-    .mobile .improved-recovery-steps {
-        padding-top: 26px;
+    .mobile .improved-recovery-steps .register-st2-txt-block {
+         min-height: 1024px;
     }
-    .mobile .improved-recovery-steps .content-wrapper {
-        min-height: 560px;
+    .mobile .park-account-dialog .improved-recovery-steps {
+        min-height: initial;
     }
     .mobile .improved-recovery-steps .button-container {
         bottom: 0;
-        position: absolute;
+        position: relative;
     }
     .mobile.fm-dialog.park-account-dialog {
         border-radius: 6px;
@@ -8039,9 +8268,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     }
     .mobile .improved-recovery-steps .login-register-input {
         margin-bottom: 0;
-    }
-    .mobile .improved-recovery-steps .button-aligner.no-float {
-        float: right;
     }
     .mobile.session-history-page .mobile.fm-item {
         height: 48px;
@@ -8304,10 +8530,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .wrong-file .mobile.wrong-file-block, .downloading .mobile.application-txt, .uploading .mobile.application-txt {
         width:calc(100% - 32px);
     }
-    .mobile .improved-recovery-steps .vert-container-aligner {
-        width: calc(100% - 32px);
-        margin: 80px auto 24px;
-    }
     .mobile .improved-recovery-steps .content-wrapper {
         margin: 40px 16px 24px;
         min-height: initial;
@@ -8436,7 +8658,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         min-height: 0;
     }
 }
-@media only screen and (max-width: 400px) {
+@media only screen and (max-width: 414px) {
     .mobile.my-account-page .pro-plan-name {
         display: block;
         line-height: 22px;
@@ -8454,6 +8676,16 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         text-align: left;
         margin-left: 60px;
         margin-top: 8px;
+    }
+    .mobile .improved-recovery-steps .col-3 {
+        width: 100%;
+    }
+    .mobile .improved-recovery-steps .check-sessions {
+        display: block;
+    }
+    .mobile .improved-recovery-steps .check-sessions .checkboxOn, .mobile .improved-recovery-steps .check-sessions .checkboxOff {
+        right: 24px;
+        top: 3px;
     }
 }
 
@@ -8535,14 +8767,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 36px) / 2);
     }
-    .mobile .improved-recovery-steps .main-left-block {
-        width: 100%;
-    }
     .mobile .improved-recovery-steps .main-right-block {
         display: none;
-    }
-    .mobile .improved-recovery-steps .vert-container-aligner {
-        width: calc(100% - 24px);
     }
     .mobile .improved-recovery-steps .content-wrapper {
         margin: 40px 16px;
@@ -8684,6 +8910,10 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         background-image: url(../images/mega/2fa-auth-apps@2x.png);
         background-size: 72px auto;
     }
+    .mobile .improved-recovery-steps .recover-image, .mobile .improved-recovery-steps .session-image-block, .mobile .improved-recovery-steps .recover-button.yes::after, .mobile .improved-recovery-steps .recover-button.no::after   {
+    background-image: url(../images/mega/recover-account-sprite@2x.png);
+    background-size: 344px auto;
+    }
 }
 
 @media screen and (orientation:landscape) {
@@ -8705,10 +8935,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 @media screen and (orientation:portrait) {
     .mobile .improved-recovery-steps .main-right-block {
         display: none;
-    }
-    .mobile .improved-recovery-steps .main-left-block {
-        margin: 0 auto;
-        max-width: 800px;
     }
 }
 

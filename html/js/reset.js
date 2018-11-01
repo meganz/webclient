@@ -3,12 +3,6 @@ var recoveryemail;
 var recoverykey;
 
 function init_reset() {
-    if (u_type) {
-        msgDialog('warningb', l[135], l[1971], false, function(e) {
-            loadSubPage('help/account');
-        });
-        return false;
-    }
     $.tresizer();
     loadingDialog.show();
     recoverycode = page.replace('recover', '');
@@ -46,7 +40,6 @@ function init_reset() {
                     });
 
                     $('#key-upload-field').rebind('change', function(e) {
-                        $('.recover-block.error,.recover-block.success').addClass('hidden');
                         if (e && e.target && e.target.files) {
                             var f = e.target.files[0];
                             if (f && f.size > 100) {
@@ -61,6 +54,10 @@ function init_reset() {
                                 FR.readAsText(f);
                             }
                         }
+                    });
+
+                    $('.park-account-link').rebind('click', function() {
+                        AccountRecoveryControl.showParkWarning();
                     });
                 }
                 else if (res[0] === 10) {
@@ -87,6 +84,9 @@ function init_reset() {
     }
 
     $('.restore-verify-button').rebind('click', function(e) {
+        if (!$(this).hasClass('active')) {
+            return false;
+        }
         if ($(this).hasClass('reset-account')) {
             delete_reset_pw();
         }
@@ -106,7 +106,7 @@ function init_reset() {
         return false;
     });
 
-    $('.login-register-input').rebind('click', function(e) {
+    $('.login-register-input').rebind('click', function() {
         $(this).find('input').trigger("focus");
     });
 }
@@ -223,13 +223,14 @@ function verify_key(key) {
     security.resetKey(recoverycode, base64_to_a32(recoverykey), recoveryemail, null, function(responseCode) {
 
         if (responseCode === 0) {
+            $('.recover-block').addClass('hidden');
             $('.recover-block.success').removeClass('hidden');
         }
 
         // If EKEY - invalid master key
         else if (responseCode === EKEY) {
             msgDialog('warningb', l[1977], l[1978]);
-            $('.recover-block.error').removeClass('hidden');
+            // $('.recover-block.error').removeClass('hidden');
         }
         else if (responseCode === EBLOCKED) {
             msgDialog('warningb', l[1979], l[1980]);
@@ -250,7 +251,9 @@ function verify_key(key) {
 function reset_pwcheck() {
 
     $('.login-register-input.password').removeClass('weak-password strong-password');
-    $('.new-registration').removeClass('good1 good2 good3 good4 good5');
+    $('.account.password-stutus').removeClass('good1 good2 good3 good4 good5 checked');
+    $('.password-advice').empty();
+    $('.minimum-password-block .password-icon').removeClass('success');
 
     if (typeof zxcvbn === 'undefined') {
         return false;
@@ -273,33 +276,63 @@ function reset_pwcheck() {
 
 function init_reset_pw() {
 
-    var a = '';
+    'use strict';
+    
+    var $passwords = $('#withkey-password,#withoutkey-password');
+    var $confirms = $('#withkey-password2,#withoutkey-password2');
 
-    $('#withkey-password,#withoutkey-password').rebind('focus.initresetpw', function() {
-        $('.login-register-input.password.first').removeClass('incorrect');
-        $('.login-register-input.password.confirm').removeClass('incorrect');
-        $(this).parent().addClass('focused');
+    var checkInput = function($input) {
+
+        var $contentWrapper = $input.parents('.content-wrapper');
+        var $firstInput = $contentWrapper.find('.first > input');
+        var $confirmInput = $contentWrapper.find('.confirm > input');
+        var $button = $contentWrapper.find('.restore-verify-button');
+
+        if ($firstInput.val() && $confirmInput.val() && $firstInput.val().length > security.minPasswordLength
+            && $firstInput.val().length === $confirmInput.val().length) {
+            $button.addClass('active').removeClass('disabled');
+        }
+        else {
+            $button.removeClass('active').addClass('disabled');
+        }
+    };
+
+    $passwords.rebind('focus.initresetpw', function() {
+        var $parent = $(this).parent();
+        var $tooltip = $parent.find('.password-tooltip');
+        $parent.removeClass('incorrect').addClass('focused');
+        $tooltip.removeClass('hidden');
+        setTimeout(function() { // Waiting for hidden to be removed for animation
+            $tooltip.addClass('visible');
+        }, 10);
     });
 
-    $('#withkey-password,#withoutkey-password').rebind('blur.initresetpw', function() {
-        $('.login-register-input.password').removeClass('focused');
+    $passwords.rebind('blur.initresetpw', function() {
+        var $parent = $(this).parent();
+        var $tooltip = $parent.find('.password-tooltip');
+        $parent.removeClass('focused');
+        $tooltip.removeClass('visible');
+        setTimeout(function() { // Waiting for animation
+            $tooltip.addClass('hidden');
+        }, 200);
+    });
+
+    $confirms.rebind('focus.initresetpw', function() {
+        $(this).parent().removeClass('incorrect').addClass('focused');
+    });
+
+    $confirms.rebind('blur.initresetpw', function() {
+        $(this).parent().removeClass('focused');
+    });
+
+    $passwords.rebind('keyup.initresetpw', function() {
+        checkInput($(this));
         reset_pwcheck();
     });
 
-    $('#withkey-password2,#withoutkey-password2').rebind('focus.initresetpw', function() {
-        $('.login-register-input.password.confirm').removeClass('incorrect');
-        $(this).parent().addClass('focused');
-    });
-
-    $('#withkey-password2,#withoutkey-password2').rebind('blur.initresetpw', function() {
-        $('.login-register-input.password2').removeClass('focused');
-    });
-
-    $('#withkey-password,#withoutkey-password').rebind('keyup.initresetpw', function() {
-        reset_pwcheck();
-    });
-
-    $('#withkey-password2').rebind('keyup.initresetpw', function(e) {
+    // $('#withkey-password2').rebind('keyup.initresetpw', function(e) {
+    $confirms.rebind('keyup.initresetpw', function(e) {
+        checkInput($(this));
         if (e.keyCode === 13) {
             recovery_reset_pw();
         }

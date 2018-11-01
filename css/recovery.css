@@ -1,0 +1,848 @@
+.improved-recovery-steps .block-wrapper, .backup-recover.withkey .block-wrapper  {
+    width: 100%;
+    min-width: 1024px;
+}
+.improved-recovery-steps .main-recovery-block, .backup-recover.withkey .main-recovery-block{
+    width: 100%;
+    padding: 0 0;
+    height: 100%;
+    display: block;
+    margin: 0 0;
+}
+.improved-recovery-steps h3.main-italic-header, .improved-recovery-steps h2, .improved-recovery-steps.backup-recover h3.main-italic-header  {
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 16px;
+    color: #999;
+    padding: 0 0;
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+    margin: 0 0;
+    text-align: center;
+}
+.park-account-dialog .improved-recovery-steps h3.main-italic-header {
+    width: 560px;
+    margin: 0 auto 24px;
+}
+
+.improved-recovery-steps .info-block h3.main-italic-header, .improved-recovery-steps .app-instruction-block h3.main-italic-header {
+    padding: 0 0;
+}
+.improved-recovery-steps .container-information, .improved-recovery-steps.backup-recover.withkey ul {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 13px;
+    line-height: 21px;
+}
+.improved-recovery-steps .container-information ul, .improved-recovery-steps.backup-recover.withkey ul {
+    margin: 12px 24px 0;
+    padding: 0;
+    text-indent: 0;
+    list-style-type: 0;
+}
+.improved-recovery-steps.backup-recover.withkey li {
+    margin-bottom: 8px;
+}
+.improved-recovery-steps li a.red {
+    color: #eb4444;
+}
+.improved-recovery-steps a.red:hover {
+    text-decoration: underline;
+}
+.improved-recovery-steps h2 {
+    color: #51585D;
+    font-size: 20px;
+    display: inline-block;
+    letter-spacing: 0.2px;
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.improved-recovery-steps h1 {
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 20px;
+    color: #262F3B;
+    line-height: 30px;
+    -webkit-margin-before: 12px;
+    -webkit-margin-after: 16px;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    text-align: center;
+}
+.improved-recovery-steps .recover-image-block {
+    width: 172px;
+    height: 120px;
+    display: block;
+    margin: 0 auto;
+}
+.improved-recovery-steps .register-st2-txt-block, .backup-recover.withkey .register-st2-txt-block {
+    display: table;
+    min-height: 768px;
+    height: 100%;
+    width: 100%;
+}
+.improved-recovery-steps .vert-container-aligner, .backup-recover.withkey .vert-container-aligner {
+    vertical-align: middle;
+    display: table-cell;
+}
+.improved-recovery-steps .card-container, .backup-recover.withkey .card-container {
+    width: 680px;
+    margin: 12px auto 44px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 40, 100, 0.12);
+    height: auto;
+}
+.backup-recover.withkey .card-container, .backup-recover.withoutkey .card-container {
+    margin-top: 54px;
+}
+.improved-recovery-steps .content-wrapper, .backup-recover.withkey .content-wrapper {
+    position: relative;
+    width: 580px;
+    min-height: 420px;
+    margin-bottom: 40px;
+    margin: 24px auto 48px;
+}
+.backup-recover .content-wrapper.hasButton {
+    padding-bottom: 88px;
+}
+
+.improved-recovery-steps .content-wrapper p span {
+    font-family: 'source_sans_probold';
+    color: #F57223;
+}
+.improved-recovery-steps p, .improved-recovery-steps h3.main-italic-header:not(.main-header) {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 14px;
+    color: #495057;
+    letter-spacing: 0;
+    line-height: 22px;
+    padding-bottom: 0;
+    text-align: center;
+    margin-bottom: 12px;
+}
+.improved-recovery-steps .info-container h3.main-italic-header {
+    text-align: left;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: .4px;
+}
+.improved-recovery-steps .app-instruction-block p, .improved-recovery-steps .info-container h3.main-italic-header  {
+    text-align: left;
+    margin-bottom: 16px;
+}
+.improved-recovery-steps .app-instruction-block .main-italic-header {
+    text-align: left;
+    font-family: 'LatoWeb', 'source_sans_prosemibold', Arial;
+    color: #495057;
+    font-weight: 800;
+}
+.improve-recovery-steps .button-container {
+    width: 100%;
+    height: 100px;
+}
+.improved-recovery-steps .recover-button {
+    font-size: 15px;
+    letter-spacing: 0;
+    text-align: right;
+    line-height: 44px;
+    width: auto;
+    height: auto;
+    background-color: #fff;
+    text-align: right;
+    text-transform: none;
+    float: right;
+    margin: 0;
+    display: block;
+    border-radius: 0px;
+    padding: 0px 16px;
+    border: 0px solid rgba(0,0,0,0);
+    -webkit-box-shadow: 0 0 0 0 #6BB219;
+    -moz-box-shadow: 0 0 0 0 #6BB219;
+    box-shadow: 0 0 0 0 #6BB219;
+    border-radius: 4px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.improved-recovery-steps .backup-input-button.default-grey-button.left {
+    right: 0px;
+    font-size: 14px;
+    text-decoration: none;
+    line-height: 36px;
+    text-align: center;
+}
+.improved-recovery-steps .recover-button.yes {
+    color: #2AAF5F;
+}
+.improved-recovery-steps .recover-button.yes.default-grey-button, .improved-recovery-steps .recover-button.yes.red-button, .improved-recovery-steps .restore-verify-button {
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    background: #F0373B;
+    webkit-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    border-radius: 4px;
+    margin: 32px auto 0;
+    float: initial;
+    width: 160px;
+    line-height: 48px;
+}
+.improved-recovery-steps .recover-button.yes.default-grey-button::after, .improved-recovery-steps .recover-button.yes.red-button::after {
+    webkit-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+}
+.improved-recovery-steps .recover-button.yes.default-grey-button::before, .improved-recovery-steps .recover-button.yes.red-button::before {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
+    box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
+}
+.improved-recovery-steps .recover-button.yes.default-grey-button:hover, .improved-recovery-steps .recover-button.yes.red-button:hover {
+    background: #E12124;
+    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+}
+.improved-recovery-steps .big-red-button.height-48 {
+    margin: 0 auto;
+    display: table;
+}
+.improved-recovery-steps .recover-button.yes:hover, .recover-button.yes.active {
+    background: rgba(42,175,95,0.1);
+    -webkit-box-shadow: 0 0 0 0 #6BB219;
+    -moz-box-shadow: 0 0 0 0 #6BB219;
+    box-shadow: 0 0 0 0 #6BB219;
+}
+.improved-recovery-steps .recover-button.no {
+    color: #eb4444;
+}
+.improved-recovery-steps .recover-button.no:hover, .recover-button.no.active {
+    background: rgba(235,68,68,0.10);
+    -webkit-box-shadow: 0 0 0 0 #FDECEC;
+    -moz-box-shadow: 0 0 0 0 #FDECEC;
+    box-shadow: 0 0 0 0 #FDECEC;
+}
+.improved-recovery-steps .button-container {
+    bottom: 0;
+    position: absolute;
+    right: 0;
+    left: 0;
+}
+.improved-recovery-steps .button-aligner {
+    float: right;
+    width: 100%;
+}
+.improved-recovery-steps .progress-meter {
+    margin: 0 auto;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    max-width: 400px;
+    padding-top: 0px;
+    opacity: 0.8;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                       supported by Chrome and Opera */
+}
+.improved-recovery-steps .recover-button.yes.default-grey-button::after, .improved-recovery-steps .recover-button.yes.red-button::after {
+    content: none;
+}
+.improved-recovery-steps .recover-button.yes::after, .improved-recovery-steps .recover-button.no::after {
+    content:'';
+    background-image: url(../images/mega/recover-account-sprite.png);
+    background-repeat: no-repeat;
+    background-size: 344px auto;
+    display: inline-block;
+    width: 20px;
+    height: 11px;
+    margin-left: 8px;
+}
+.improved-recovery-steps .recover-button.yes::after {
+    background-position:-133px -720px;
+}
+.improved-recovery-steps .recover-button.no::after {
+    background-position:-133px -740px;
+}
+.improved-recovery-steps .restore-verify-button {
+    height: 48px;
+    font-size: 16px;
+    margin-top: 64px;
+    background-color: #00BFA5;
+}
+.improved-recovery-steps .restore-verify-button.active {
+    background-color: #00BFA5;
+}
+.improved-recovery-steps .login-register-input {
+    background-color: #F8F9FA;
+    border: 1px solid #EBEEF0;
+    border-radius: 2px;
+    max-width: 400px;
+    margin-bottom: 0;
+}
+.improved-recovery-steps .login-register-input:hover {
+    border: 1px solid #ddd;
+}
+.improved-recovery-steps .login-register-input input {
+    color: #444;
+    line-height: 25px;
+    background-color: rgba(0,0,0,0);
+}
+
+.improved-recovery-steps .login-register-input input::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #aaa;
+    opacity: 1; /* Firefox */
+}
+
+.improved-recovery-steps .login-register-input input:-ms-input-placeholder {
+     /* Internet Explorer 10-11 */
+    color: #aaa;
+}
+
+.improved-recovery-steps .login-register-input input::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color:#aaa;
+}
+.improved-recovery-steps .app-button {
+    border-radius: 3px;
+    padding: 0 8px;
+    display: inline-block;
+    line-height: 24px;
+    margin: 4px 2px;
+    cursor: pointer;
+    color: #555;
+}
+.improved-recovery-steps .app-button:first-of-type {
+    margin-left: 0px;
+}
+.improved-recovery-steps .app-button:last-of-type {
+    margin-right: 0px;
+}
+.improved-recovery-steps .app-button:hover {
+    background-color: #f2f2f2;
+    color: #111;
+    background-image: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(242,242,242,0.80) 100%);
+}
+.improved-recovery-steps .app-button.active {
+    background-color: #eb4444;
+    background-image: linear-gradient(-180deg, rgba(255,255,255,0) 0%, rgba(242,242,242,0) 100%);
+    border: 1px solid #d90007;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 1px 1px 0 rgba(255,255,255,0.20);
+    border-radius: 3px;
+    color: #fff;
+}
+.improved-recovery-steps .app-button.active:hover {
+    color: #fff;
+}
+.improved-recovery-steps .app-instruction-block {
+    margin: 0 0 8px 0;
+}
+.improved-recovery-steps .app-instruction-block select {
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    height: 32px;
+    padding: 5px 5px 5px 12px;
+    width: 260px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.improved-recovery-steps .app-instruction-block select::-ms-expand {    
+    display: none; 
+}
+.improved-recovery-steps .app-instruction-block select{
+    -webkit-appearance: none;
+    appearance: none;
+}
+.improved-recovery-steps ol.app-instructions-list {
+    list-style-type: none;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 0;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    -webkit-padding-start: 00;
+    padding: 0;
+}
+.improved-recovery-steps li.list-point:before {
+    width: 23px;
+    text-indent: 8px;
+    padding-left: 0px;
+    height: 23px;
+    line-height: 22px;
+    vertical-align: top;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 12px;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    color: #333;
+    font-weight: 900;
+    display: inline-block;
+    content: counter(list);
+    margin-right: 10px;
+    font-size: 13px;
+}
+.improved-recovery-steps .list-point {
+    margin-bottom: 12px;
+    line-height: 23px;
+    counter-increment: list;
+    text-indent: -40px;
+    margin-left: 40px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.improved-recovery-steps .list-point b.megasync-logo {
+    background-position: -6px -773px;
+    width: 24px;
+    height: 24px;
+    background-image: url(../images/mega/top-sprite_v5.png);
+    background-repeat: no-repeat;
+    padding-left: 66px;
+    margin: 0 -39px 0 0;
+}
+.improved-recovery-steps .text-link {
+    color: #eb4444;
+}
+.improved-recovery-steps .recovery-text-button {
+    text-align: center;
+    line-height: 21px;
+    font-size: 14px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    margin: 12px auto 24px;
+}
+.improved-recovery-steps .text-link:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+/* Language styles for the MEGAsync icon */
+.es .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 68px;
+    margin: 0 -29px 0 3px;
+}
+.br .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 68px;
+    margin: 0 -12px 0 3px;
+}
+.de .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 68px;
+    margin: 0 -33px 0 4px;
+}
+.fr .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 68px;
+    margin: 0 -31px 0 4px;
+}
+.it .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 68px;
+    margin: 0 -31px 0 4px;
+}
+.tr .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 68px;
+    margin: 0 -15px 0 4px;
+}
+.ru .improved-recovery-steps .list-point b.megasync-logo {
+    margin: 0 -15px 0 4px;
+}
+
+.improved-recovery-steps strong {
+    font-family: 'source_sans_probold';
+    color: #333;
+}
+.improved-recovery-steps  strong.warning-text {
+    color: #eb4444;
+}
+.improved-recovery-steps .instruction-block {
+    margin-top: 24px;
+    font-size: 13px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    color: #495057;
+}
+.improved-recovery-steps .recover-state {
+    font-family: 'source_sans_probold', 'LatoWeb', Arial;
+    font-size: 14px;
+    color: #00A58F;
+    letter-spacing: 0;
+    text-align: center;
+    text-transform: capitalize;
+}
+.improved-recovery-steps .recover-state.warning {
+    color: #FD8116;
+}
+.improved-recovery-steps .container-information .warning-text {
+    color: #FD8116;
+}
+.improved-recovery-steps .container-information li {
+    margin-bottom: 16px;
+}
+.improved-recovery-steps .container-information li:last-of-type {
+    margin-bottom: 0;
+}
+.improved-recovery-steps .content-highlight {
+    background-color: rgba(42,175,95,0.04);
+    border: 1px solid #D4EFDF;
+    border-radius: 2px;
+    line-height: 46px;
+    color: #55BF7F;
+    cursor: pointer;
+    font-size: 14px;
+}
+.improved-recovery-steps .content-highlight-block {
+    position: absolute;
+    width: 100%;
+    bottom: 012px;
+}
+.improved-recovery-steps .content-highlight:hover {
+    background-color: rgba(42,175,95,0.04);
+    border: 1px solid rgba(42,175,95,0.20);
+}
+.improved-recovery-steps .content-highlight.warning {
+    background: rgba(235,68,68,0.03);
+    border: 1px solid rgba(235,68,68,0.10);
+    border-radius: 2px;
+    color: #eb4444;
+}
+.improved-recovery-steps .feedback-logo {
+    margin-top: 7px;
+    margin-right: 16px;
+    margin-left: 12px;
+}
+.improved-recovery-steps .warning-icon.warning {
+    display: block;
+}
+.improved-recovery-steps .nav-back-icon {
+    width: 18px;
+    height: 16px;
+    display: inline-block;
+    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-repeat: no-repeat;
+    background-position: -204px -196px;
+    background-size: 262px auto;
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    margin: 5px 12px  0 0;
+    display: inline-block;
+    opacity: 0.4;
+}
+.improved-recovery-steps .right-header {
+    display: block;
+    position: relative;
+    opacity: 1;
+    margin: 0 auto;
+    width: 680px;
+    height: 30px;
+}
+.improved-recovery-steps .nav-header-block {
+    position: relative;
+    opacity: 1;
+    line-height: 24px;
+}
+.improved-recovery-steps .nav-header-block h2 {
+    font-size: 13px;
+    color: #9a9fa2;
+    line-height: 24px;
+    white-space: nowrap;
+}
+.improved-recovery-steps  .nav-back-subheading {
+    display: none;
+}
+.improved-recovery-steps .nav-header-block:hover {
+    cursor: pointer;
+}
+.improved-recovery-steps .nav-header-block:hover h2 {
+    text-decoration: underline;
+}
+.improved-recovery-steps .recover-account-email-block .error-message{
+    margin-top: 16px;
+    color: #eb4444;
+    font-size: 12px;
+    margin-left: 0px;
+    max-width: 400px;
+    line-height: 1.6;
+}
+.improved-recovery-steps .recover-account-email-block {
+    width: 360px;
+    margin: 64px auto 32px;
+    position: relative;
+}
+.park-account-dialog .recover-account-email-block {
+    margin: 24px auto 56px;
+}
+.improved-recovery-steps .recover-image, .improved-recovery-steps .session-image-block, .backup-recover .recover-image {
+    background-image: url(../images/mega/recover-account-sprite.png);
+    background-repeat: no-repeat;
+    background-size: 344px auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.improved-recovery-steps .recover-image.email {
+    background-position: 0 -360px;
+}
+.improved-recovery-steps .recover-image.key {
+    background-position: 0 0;
+}
+.improved-recovery-steps .recover-image.lock {
+    background-position: -172px 0;
+}
+.improved-recovery-steps .recover-image.gray-device {
+    background-position: 0 -120px;
+}
+.improved-recovery-steps .recover-image.device-password {
+    background-position: -172px -120px;
+}
+.improved-recovery-steps .recover-image.device-key {
+    background-position: -5px -245px;
+}
+.improved-recovery-steps .recover-image.locked-key {
+    background-position: -186px -240px;
+}
+.improved-recovery-steps .recover-image.unlocked-key {
+    background-position: -186px -353px;
+}
+.improved-recovery-steps .recover-image.incoming-mail{
+    background-position: 0 -480px;
+}
+.improved-recovery-steps .recover-image.park-account{
+    background-position: -172px -480px;
+}
+.improved-recovery-steps .session-image-block {
+    height: 94px;
+    margin: 0 auto 12px;
+    width: 120px;
+}
+.improved-recovery-steps .check-sessions {
+    margin: 36px auto 24px;
+    display: table;
+}
+.improved-recovery-steps .check-sessions-text {
+    margin: 0;
+    display: block;
+}
+.improved-recovery-steps .col-3 {
+    width: 32.5%;
+    padding: 0 12px 20px;
+    cursor: pointer;
+    position: relative;
+}
+.improved-recovery-steps .check-sessions .col-3 {
+    display: table-cell;
+    border: 2px solid rgba(153, 153, 153, 0.25);
+    border-radius: 4px;
+}
+.improved-recovery-steps .check-sessions .col-3:hover {
+    border-color: rgba(42,175,95,0.55);
+}
+.improved-recovery-steps .check-sessions .col-3.active {
+    border-color: #2AAF5F;
+}
+.improved-recovery-steps .session-image-block.desktop {
+    background-position: 0 -611px;
+}
+.improved-recovery-steps .session-image-block.browser {
+    background-position: -233px -611px;
+}
+.improved-recovery-steps .session-image-block.mobile {
+    background-position: -123px -611px;
+}
+.improved-recovery-steps .check-sessions .session-text {
+    text-align: center;
+    font-size: 13px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    line-height: 18px;
+}
+.improved-recovery-steps .check-sessions .checkboxOn, .improved-recovery-steps .check-sessions .checkboxOff {
+    position: absolute;
+    right: 0;
+    top: 5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+}
+.improved-recovery-steps .check-sessions .checkdiv, .improved-recovery-steps .check-sessions .checkdiv::before {
+    box-shadow: none;
+    -webkit-box-shadow:none;
+}
+.improved-recovery-steps .check-sessions .checkdiv::after {
+    background-position: -25.5px -1850px;
+    display: block;
+}
+.improved-recovery-steps .check-sessions .checkboxOn {
+    background-color: #2AAF5F;
+}
+.improved-recovery-steps .check-sessions .checkboxOff {
+    background-color: rgba(153, 153, 153, 0.25);
+}
+.improved-recovery-steps .check-sessions .col-3:hover .checkboxOff {
+    background-color: rgba(42,175,95,0.55);
+}
+.improved-recovery-steps  h5.main-italic-header {
+    font-size: 14px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    line-height: 24px;
+    color: #495057;
+    font-weight: 800;
+    display: inline-block;
+    padding: 0 0;
+    max-width: 60%;
+}
+.improved-recovery-steps .recover-paste-block .left-section, .improved-recovery-steps .recover-paste-block .right-section {
+    margin: 0 0;
+    padding: 0;
+    display: inline-block;
+    vertical-align: middle;
+}
+.improved-recovery-steps .recover-paste-block .left-section {
+    width: 50%;
+    text-align: left;
+}
+.improved-recovery-steps .recover-paste-block .right-section {
+    width: 49%;
+    text-align: right;
+}
+.improved-recovery-steps .recover-paste-block .right-section > div{
+    display: inline-block;
+    min-width: 95px;
+    margin-right: 5px;
+}
+.improved-recovery-steps .recover-paste-block .right-section > div.no-hover:hover{
+    background-color: initial;
+}
+.improved-recovery-steps .recover-paste-block .recovery-key.account.input-wrapper .icon{
+    width: 24px;
+    height: 22px;
+    background-position: -172px -715px;
+    display: inline-block;
+    vertical-align: bottom;
+    opacity: 0.7;
+    margin-right: 6px;
+}
+.improved-recovery-steps.withkey .recover-paste-block .recovery-key.account.input-wrapper .icon {
+    margin-bottom: 4px;
+}
+/*.improved-recovery-steps .recover-paste-block .recovery-key.input-wrapper input{
+    width: calc(100% - 24px);
+    padding-left: 22px;
+    background-image: url(../images/mega/recover-account-sprite.png);
+    background-size: 48px auto;
+    background-position: -172px -714px
+    background-repeat: no-repeat;
+}*/
+.improved-recovery-steps .upload-key.default-green-button, .improved-recovery-steps .paste-key.default-green-button {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.improved-recovery-steps .account.input-wrapper {
+    width: 300px;
+    margin: 0;
+}
+ .improved-recovery-steps .recover-block.success .account.input-wrapper {
+    margin: 20px auto 0;
+}
+.improved-recovery-steps .recovery-key.account.input-wrapper {
+    padding: 0;
+    border-bottom: 0px;
+    margin-top: 8px;
+    width: 260px;
+}
+.improved-recovery-steps.withkey .recovery-key.account.input-wrapper {
+    border-bottom: 1px solid #ccc;
+    line-height: 22px;
+}
+
+.improved-recovery-steps .account.input-wrapper #recover-input1 {
+    font-size: 20px;
+    letter-spacing: 0px;
+}
+.improved-recovery-steps strong, .improved-recovery-steps b {
+    font-family: 'LatoWeb', Arial;
+    font-weight: 800;
+}
+.improved-recovery-steps .info-container, .improved-recovery-steps .checkbox-container {
+    overflow: auto;
+    margin-top: 8px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    min-height: 44px;
+}
+.improved-recovery-steps .info-container, .improved-recovery-steps .checkbox-container , .improved-recovery-steps .app-instruction-block, .improved-recovery-steps .recover-upload-block, .improved-recovery-steps .recover-paste-block {
+    background: rgba(244,244,246,0.20);
+    border: 1px solid rgba(38,47,59,0.10);
+    border-radius: 2px;
+    padding: 20px 24px;
+    margin: 32px auto 32px;
+    height: auto;
+    position: relative;
+}
+.improved-recovery-steps .recover-upload-block {
+    margin-bottom: 0;
+}
+.improved-recovery-steps .recover-paste-block {
+    margin-top: 0px;
+    margin-bottom: 32px;
+}
+.park-account-dialog .fm-dialog-body {
+    padding: 0px;
+}
+/*.improved-recovery-steps  .instruction-block {
+    padding: 0 12px;
+}*/
+.improved-recovery-steps .app-button-block {
+    padding: 0 0;
+    min-height: initial;
+    margin: 0 auto;
+    float: initial;
+    width: 260px;
+    cursor: pointer;    
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.improved-recovery-steps .app-button-block:hover {
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.improved-recovery-steps .recover-divider {
+    height: 38px;
+    position: relative;
+}
+.improved-recovery-steps .recover-divider hr{
+    display: inline-block;
+    width: 90%;
+    float: right;
+    border-color: rgba(38,47,59,0.15);
+    border-bottom-width: 0;
+    position: absolute;
+    top: 50%;
+    right: 0;
+    margin: 0;
+}
+.improved-recovery-steps .recover-divider .main-italic-header{
+    line-height: 38px;
+    width: 10%;
+    text-align: center;
+}
+.improved-recovery-steps .hidden {
+    display: none;
+}
+.backup-recover.withoutkey p:last-of-type {
+    margin-bottom: 32px;
+}
+@media only screen and (max-width: 1250px) {
+.improved-recovery-steps .password-tooltip.tooltip-block {
+    right: -200px;
+    top: 45px;
+}
+.improved-recovery-steps .password-tooltip.tooltip-block .triangle-pointer {
+    transform: rotate(135deg);
+    left: 170px;
+    top: -8px;    
+}
+}

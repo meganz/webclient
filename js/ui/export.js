@@ -1597,6 +1597,21 @@ var exportExpiry = {
             $linkButtons.removeClass('selected');
             $this.addClass('selected');
 
+            // we have to deal with the extra '!' since the applied logic relies on CSS !!!
+            var lKey = $linksDialog.find('.file-link-info.key').text();
+            if (!$this.hasClass('link-handle-and-key')) {
+                if (lKey && lKey[0] === '!') {
+                    lKey = lKey.slice(1);
+                    $linksDialog.find('.file-link-info.key').text(lKey);
+                }
+            }
+            else {
+                if (lKey && lKey[0] !== '!') {
+                    lKey = '!' + lKey;
+                    $linksDialog.find('.file-link-info.key').text(lKey);
+                }
+            }
+
             // Show the relevant 'Link without key', 'Decryption key' or 'Link with key'
             $('.export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
             $span.text(l[1990]);

@@ -566,19 +566,6 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[A2]', '<a href="/extensions" class="clickurl">').replace('[/A2]', '</a>')
         .replace('[A3]', '<a class="freeupdiskspace">').replace('[/A3]', '</a>');
 
-    // l[] = escapeHTML(l[]).replace('', '');
-
-    // carefully replace various strings to adhere to the new pro quotas:
-    // note: in the future we should make such strings used variables.
-	l[16393] = l[16393].replace('4','8');
-	l[16385] = l[16385].replace('4','8');
-	l[16359] = l[16359].replace('4096','8192').replace('4','8');
-	l[16358] = l[16358].replace('4096','8192').replace('4','8');
-	l[16316] = l[16316].replace('4096','8192').replace('4','8');
-	l[16315] = l[16315].replace('4096','8192').replace('4','8');
-	l[16304] = l[16304].replace('8','16').replace('4096','8192').replace('4','8');
-	l[1367] = l[1367].replace('4','8');
-
     l[17083] = l[17083]
         .replace('[A]', '<a href="https://www.microsoft.com/store/apps/9nbs1gzzk3zg" target="_blank">')
         .replace('[/A]', '</a>');

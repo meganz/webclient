@@ -67,7 +67,7 @@
         if ($.moveDialog) {
             M.disableCircularTargets('#mctreea_');
         }
-        else {
+        else if (!$.copyToUpload){
             var sel = $.selected || [];
 
             for (var i = sel.length; i--;) {

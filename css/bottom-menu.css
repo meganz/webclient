@@ -11,9 +11,11 @@
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    font-size: 0;
 }
 .bottom-menu.column {
-    float: left;
+    display: inline-block;
+    vertical-align: top;
     padding-left: 15px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -172,5 +174,10 @@
 .mobile .bottom-menu.company-info strong {
     display: block;
 }
+}
+@media only screen and (max-width: 565px) {
+    .bottom-menu.col1-of-6 {
+        width: 100%;
+    }
 }
 /* end */

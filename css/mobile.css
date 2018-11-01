@@ -7685,8 +7685,15 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     margin-top: 2px;
     margin-bottom: 0px;
 }
-.mobile .bird .bottom-page.small-txt {
-    display: none;
+.mobile .pages-nav.content-block .horizontal-centered-bl {
+    max-width: none;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+.mobile .bird .img-description .bottom-page.big-header {
+    padding: 0 0 27px 0;
+}
+.mobile .bottom-page.cmd-block {
+    display: none !important;
 }
 .mobile.two-factor-page.setup-page .no-auth-app-button {
     color: #eb4444;

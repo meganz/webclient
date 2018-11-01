@@ -617,7 +617,7 @@ var BrowserEntries = React.createClass({
                 var share = M.getNodeShare(node);
                 var colorLabelClasses = "";
                 if (node.lbl) {
-                    var colourLabel = M.getColourClassFromId(node.lbl);
+                    var colourLabel = M.getLabelClassFromId(node.lbl);
                     colorLabelClasses +=  ' colour-label';
                     colorLabelClasses += ' ' + colourLabel;
                 }

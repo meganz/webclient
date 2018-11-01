@@ -2182,6 +2182,7 @@ else if (!b_u) {
         jsl.push({f:'js/fm/fileconflict.js', n: 'fileconflict_js', j:1});
         jsl.push({f:'js/mobile/mobile.alertbanner.js', n: 'mobile_alert_banner', j: 1 });
         jsl.push({f:'js/mobile/mobile.conflict-resolution-overlay.js', n: 'mobile_conflict_resolution_overlay_js', j: 1 });
+        jsl.push({f:'js/mobile/mobile.over-storage-quota-overlay.js', n: 'mobile_over_storage_quota_overlay_js', j: 1 });
     }
 
     // We need to keep a consistent order in loaded resources, so that if users

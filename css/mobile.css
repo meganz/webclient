@@ -206,7 +206,7 @@ ul, li {
     width: 38px;
     height: 38px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: -94px -1073px;
     position: absolute;
@@ -253,7 +253,7 @@ ul, li {
 }
 .mobile.homepage .company-logo {
     height: 120px;
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-position: center -1955px;
     background-repeat: no-repeat;
     margin: 0 0 0 0;
@@ -269,7 +269,7 @@ ul, li {
     max-width: 500px;
 }
 .mobile.homepage .feature-icon {
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-position: -2px top;
     background-repeat: no-repeat;
     margin: 0 auto 32px auto;
@@ -322,7 +322,7 @@ ul, li {
 .mobile.homepage .bottom-link {
     cursor: pointer;
     display: inline-block;
-    background: url(../images/mobile/mobile-sprite_v17.png);
+    background: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: left -1190px;
     color: #aaa;
@@ -445,12 +445,12 @@ ul, li {
 .mobile.download-speed, .mobile.upload-speed {
     text-align: right;
     padding: 0 28px 0 0;
-    background: url(../images/mobile/mobile-sprite_v17.png) no-repeat -172px -246px;
+    background: url(../images/mobile/mobile-sprite_v18.png) no-repeat -172px -246px;
 }
 .mobile.download-percents, .mobile.upload-percents {
     text-align: left;
     padding: 0 0 0 28px;
-    background: url(../images/mobile/mobile-sprite_v17.png) no-repeat -247px -246px;
+    background: url(../images/mobile/mobile-sprite_v18.png) no-repeat -247px -246px;
 }
 .mobile.public-link, .mobile.recovery-key-string, .mobile.two-factor-qr-seed {
     background-color: rgba(250,250,250,0.75);
@@ -573,6 +573,47 @@ ul, li {
     position: relative;
     display: inline-block;
 }
+.mobile.dialog-button {
+    color: white;
+    font-size: 13px;
+    display: block;
+    height: 44px;
+    line-height: 43px;
+    background: #ff4444;
+    background-image: linear-gradient(-179deg, #FF3333 0%, #FF4444 100%);
+    background-color: linear-gradient(-179deg, #FF3333 0%, #FF4444 100%);
+    border: 1px solid #D82928;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 -7px 8px 0 rgba(241,6,6,0.40);
+    margin-top: 8px;
+    border-radius: 4px;
+    position: relative;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    overflow: hidden;
+    box-sizing:border-box;
+}
+.mobile#mobile-ui-over-storage-quota-overlay .dialog-button {
+    color: #676D75;
+    display: inline-block;
+    width: calc(50% - 10px);
+    margin: 5px;
+}
+.mobile#mobile-ui-over-storage-quota-overlay .clickurl {
+    color: #D90007;
+    font-weight: bold;
+}
+.mobile#mobile-ui-over-storage-quota-overlay .dialog-button.action-invite-friends {
+    background: #f2f2f2;
+    border: 1px solid #e3e3e3;
+    box-shadow: 0 1pt 1pt 0 rgba(0,0,0,0.11), inset -1px -1px 1px 0 rgba(0,0,0,0.2);
+}
+.mobile#mobile-ui-over-storage-quota-overlay .dialog-button.action-upgrade-account {
+    background: #00bfa6;
+    border: 1px solid #00a68e;
+    box-shadow: 0 1pt 1pt 0 rgba(0,0,0,0.11), inset -1px -1px 1px 0 rgba(0,0,0,0.2);
+    color: white;
+}
 .mobile.content-row.second {
     display: none;
 }
@@ -628,7 +669,7 @@ ul, li {
 .mobile.warning-icon {
     width: 60px;
     height: 62px;
-    background: url(../images/mobile/mobile-sprite_v17.png);
+    background: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: -3px -100px;
     display: inline-block;
@@ -641,7 +682,7 @@ ul, li {
     width: 178px;
     height: 54px;
     margin: 0 auto;
-    background: url(../images/mobile/mobile-sprite_v17.png);
+    background: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: 0 -345px;
     margin-top: 16px;
@@ -874,7 +915,7 @@ ul, li {
     margin-left: -10px;
 }
 .mobile.bottom-action-bar .fm-icon.mobile-create-new-folder {
-    background-position: -40px -1750px;
+    background-position: -240px -1750px;
 }
 .mobile.bottom-action-bar .fm-icon.upload-file {
     background-position: 10px -1749px;
@@ -905,16 +946,16 @@ ul, li {
 .mobile.fm-item.undecrypted .fm-item-details {
     color: #ffa500;
 }
-.mobile.fm-item.folder:nth-child(even) {
+.mobile.fm-item.folder:nth-child(odd) {
     background-color: #fff;
 }
-.mobile.fm-item.file:nth-child(odd) {
+.mobile.fm-item.file:nth-child(even) {
     background-color: #fff;
 }
 .mobile.fm-icon {
     width: 42px;
     height: 40px;
-    background: url(../images/mobile/mobile-sprite_v17.png);
+    background: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
     cursor: pointer;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -1154,7 +1195,7 @@ ul, li {
     display: none;
 }
 .mobile.fm-dialog-close {
-    background: url(../images/mobile/mobile-sprite_v17.png);
+    background: url(../images/mobile/mobile-sprite_v18.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -1277,7 +1318,7 @@ ul, li {
     background-color: #818993;
 }
 .mobile.session-history-page .sh-round-button::before {
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: -264px -1832px;
     width: 16px;
@@ -1475,7 +1516,7 @@ ul, li {
     font-size: 13px;
     line-height: 17px;
     color: #FF5555;
-    background: url(../images/mobile/mobile-sprite_v17.png);
+    background: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: left -1192px;
     text-align: center;
@@ -1619,7 +1660,7 @@ ul, li {
     width: 145px;
     height: 109px;
     margin: 0 auto 20px auto;
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
 }
 .mobile.empty-cloud .empty-icon {
@@ -1638,6 +1679,11 @@ ul, li {
     height: 146px;
     margin-bottom: 0;
     transform: scale(0.75);
+}
+.mobile.empty-icon.over-storage-quota {
+    background-position: -167px -706px;
+    height: 102px;
+    width: 102px;
 }
 .mobile.empty-txt span {
     color: #777777;
@@ -1705,7 +1751,7 @@ ul, li {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: -130px -1149px;
     position: absolute;
@@ -1862,7 +1908,7 @@ input[type='checkbox'] {
     display: block;
     width: 100%;
     height: 100%;
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-position: -49px -1179px;
 }
 .checkboxOn.square input, .checkboxOff.square input {
@@ -2103,7 +2149,7 @@ div.checkboxOn, div.checkboxOff {
     left: 50%;
     top: 50%;
     margin: -29px 0 0 -29px;
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: -7px -1212px;
     -webkit-animation: rotate-loading 0.8s infinite linear;
@@ -3443,7 +3489,7 @@ div.checkboxOn, div.checkboxOff {
     display: block;
     margin: 0 auto;
     margin-top: 20px;
-    background: url(../images/mobile/mobile-sprite_v17@2x.png);
+    background: url(../images/mobile/mobile-sprite_v18@2x.png);
     background-repeat: no-repeat;
     cursor: pointer;
     display: block;
@@ -3861,9 +3907,9 @@ div.checkboxOn, div.checkboxOff {
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
-    background-position: right -2059px;
+    background-position: right -2354px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -4304,7 +4350,7 @@ div.checkboxOn, div.checkboxOff {
     margin: 20px 15px 30px 15px;
 }
 .mobile.top-menu-popup .top-icon.close {
-    background: url(../images/mobile/mobile-sprite_v17.png);
+    background: url(../images/mobile/mobile-sprite_v18.png);
     background-position: -65px -1143px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -4460,7 +4506,7 @@ div.checkboxOn, div.checkboxOff {
     top: 50%;
     width: 36px;
     margin-top: -18px;
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-position: -148px -1897px;
     background-repeat: no-repeat;
     z-index: 10;
@@ -4500,7 +4546,7 @@ div.checkboxOn, div.checkboxOff {
     height: 60px;
 }
 .mobile.slideshow-buttons .fm-icon.delete-button {
-    background-position: -143px -1820px;
+    background-position: -195px -1819px;
 }
 .mobile.slideshow-buttons .fm-icon.download-button {
     background-position: -42px -1616px;
@@ -4606,18 +4652,26 @@ div.checkboxOn, div.checkboxOff {
 }
 /* Alert Banner */
 .mobile.alert-banner {
-    height: 50px;
+    height: 60px;
+    width: 100%;
     background-color: #2ba6de;
-    -webkit-transition: height 200ms ease-in-out, top 200ms ease-in-out;
-    -moz-transition: height 200ms ease-in-out, top 200ms ease-in-out;
-    -o-transition: height 200ms ease-in-out, top 200ms ease-in-out;
-    -ms-transition: height 200ms ease-in-out, top 200ms ease-in-out;
-    transition: height 200ms ease-in-out, top 200ms ease-in-out;
+    display: block;
+    -webkit-transition: margin-top .3s ease-in-out;
+    -moz-transition: margin-top .3s ease-in-out;
+    -o-transition: margin-top .3s ease-in-out;
+    -ms-transition: margin-top .3s ease-in-out;
+    transition: margin-top .3s ease-in-out;
+    margin-top: 0px;
+    z-index: 98; /* 1 Less than titlebar as it needs to slide under when fixed.*/
 }
-.mobile.alert-banner.hidden {
-    display: block !important;
-    overflow: hidden;
-    height: 0px;
+.mobile.fixed-alert-banner .mobile.alert-banner {
+    position: fixed;
+}
+.mobile.fixed-alert-banner .mobile.folders-files-text {
+    margin-top: 60px;
+}
+.mobile.alert-banner.closed {
+    margin-top: -60px;
 }
 .mobile.alert-banner.warning {
     background-color: rgba(0252, 130, 23, 1);
@@ -4626,16 +4680,11 @@ div.checkboxOn, div.checkboxOff {
     background: rgba(255, 69, 69, 1);
 }
 .mobile.alert-banner .alert-close {
-    height: 50px;
+    height: 60px;
     width: 40px;
     float: right;
 }
-.mobile.alert-banner .alert-icon {
-    position: absolute;
-    right: 5px;
-    top: 4px;
-}
-.mobile.alert-banner .alert-text {
+.mobile.alert-banner .alert-text-container {
     position: absolute;
     left: 10px;
     margin-right: 50px;
@@ -4647,18 +4696,21 @@ div.checkboxOn, div.checkboxOff {
     color: white;
     display: table-cell;
     line-height: 50px;
+    padding: 5px;
 }
-
-.mobile.alert-banner .alert-text span {
+.mobile.alert-banner .alert-text-container .alert-text {
     display: inline-block;
     vertical-align: middle;
     line-height: 18px;
 }
+.mobile.alert-banner .alert-text-container .alert-text a{
+    color:white;
+}
 .mobile.alert-banner .alert-icon.close {
     height: 30px;
     width: 30px;
-    top: 10px;
-    right: 5px;
+    margin-top: 15px;
+    margin-right: 5px;
     background-position: -82px -1143px;
     transform: scale(0.8, 0.8);
 }
@@ -4841,7 +4893,7 @@ div.checkboxOn, div.checkboxOff {
 #mobile-ui-contact-card .contact-verification i {
     width: 36px;
     height: 36px;
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
     background-size: -280px -2232px;
     background-position: -50px -2163px;
@@ -5145,7 +5197,7 @@ select.mobile.dropdown-style {
     top: 45px;
     right: 38px;
     background-position: -110px -1972px;
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
     transform: rotate(90deg);
     pointer-events: none;
@@ -5505,7 +5557,7 @@ textarea.mobile.support-text-field {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: -164px -1149px;
     position: absolute;
@@ -6664,7 +6716,7 @@ textarea.mobile.support-text-field {
 .mobile.white-mega-logo {
     width: 24px;
     height: 24px;
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-position: -236px -293px;
     background-repeat: no-repeat;
     background-size: 280px auto;
@@ -7832,7 +7884,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     position: relative;
 }
 .mobile.auth-app-select-dialog .cancel-button-icon {
-    background-image: url(../images/mobile/mobile-sprite_v17.png);
+    background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -8602,7 +8654,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         background-image: url(../images/mobile/android@2x.png);
     }
     .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon {
-        background-image: url(../images/mobile/mobile-sprite_v17@2x.png);
+        background-image: url(../images/mobile/mobile-sprite_v18@2x.png);
         background-size: 280px auto;
     }
     .mobile.registration-confirm-email .email-icon {
@@ -8625,7 +8677,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         background-size: 38px auto;
     }
     .mobile.session-history-page .sh-round-button::before  {
-        background-image: url(../images/mobile/mobile-sprite_v17@2x.png);
+        background-image: url(../images/mobile/mobile-sprite_v18@2x.png);
         background-size: 280px auto;
     }
     .mobile.auth-app-select-dialog .app-link-icon, .mobile.auth-app-select-dialog .app-link-arrow {

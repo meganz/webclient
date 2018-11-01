@@ -152,14 +152,14 @@
     overflow: hidden;
     position: relative;
     width: 100%;
-    width: -webkit-calc(100% - 126x);
-    width: -moz-calc(100% - 126px);
-    width: calc(100% - 126px);
+    width: -webkit-calc(100% - 156x);
+    width: -moz-calc(100% - 156px);
+    width: calc(100% - 156px);
 }
 .fm-dialog .fm-header-buttons.active-search + .fm-breadcrumbs-block {
-    width: -webkit-calc(100% - 310x);
-    width: -moz-calc(100% - 310px);
-    width: calc(100% - 310px);
+    width: -webkit-calc(100% - 320x);
+    width: -moz-calc(100% - 320px);
+    width: calc(100% - 320px);
 }
 .fm-dialog .breadcrumbs-wrapper {
     position: absolute;
@@ -201,7 +201,7 @@
     height: 24px;
     display: block;
     background-position: -6px -474px;
-    background-image: url(../images/mega/top-sprite_v4.png);
+    background-image: url(../images/mega/top-sprite_v5.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;

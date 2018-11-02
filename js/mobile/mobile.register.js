@@ -32,15 +32,13 @@ mobile.register = {
         mobile.initCheckbox('confirm-terms');
         mobile.initHeaderMegaIcon();
         mobile.initMobileAppButton();
+        mobile.initPasswordEstimatorLibrary(this.$screen);
+        mobile.initPasswordStrengthCheck(this.$screen);
 
         // Activate register button when fields are complete
         this.initKeyupEvents();
         this.initRegisterButton();
         this.initBlurEvents();
-
-        // Load password strength estimator
-        this.loadPasswordEstimatorLibrary();
-        this.initPasswordStrengthCheck();
     },
 
     /**
@@ -60,7 +58,7 @@ mobile.register = {
                             .add($passwordField).add($confirmPasswordField);
 
         // Add keyup event to the input fields
-        $allFields.rebind('keyup', function(event) {
+        $allFields.rebind('keyup.registerbuttoncheck', function(event) {
 
             var firstName = $firstNameField.val();
             var lastName = $lastNameField.val();
@@ -125,77 +123,6 @@ mobile.register = {
     },
 
     /**
-     * Load the ZXCVBN password strength estimator library
-     */
-    loadPasswordEstimatorLibrary: function() {
-
-        'use strict';
-
-        // Make sure the library is loaded
-        if (typeof zxcvbn === 'undefined') {
-
-            // Show loading spinner
-            var $loader = this.$registerScreen.find('.estimator-loading-icon').addClass('loading');
-
-            // On completion of loading, hide the loading spinner
-            M.require('zxcvbn_js')
-                .done(function() {
-                    $loader.removeClass('loading');
-                });
-        }
-    },
-
-    /**
-     * Show what strength the currently entered password is on key up
-     */
-    initPasswordStrengthCheck: function() {
-
-        'use strict';
-
-        var $passwordStrengthBar = this.$registerScreen.find('.password-strength');
-        var $passwordInput = this.$registerScreen.find('.signin-input.password input');
-
-        // Add keyup event to the password text field
-        $passwordInput.rebind('keyup', function() {
-
-            // Make sure the ZXCVBN password strength estimator library is loaded first
-            if (typeof zxcvbn !== 'undefined') {
-
-                // Estimate the password strength
-                var password = $.trim($passwordInput.val());
-                var passwordScore = zxcvbn(password).score;
-                var passwordLength = password.length;
-
-                // Remove previous strength classes that were added
-                $passwordStrengthBar.removeClass('good1 good2 good3 good4 good5');
-
-                // Add colour coding
-                if (passwordLength === 0) {
-                    return false;
-                }
-                else if (passwordLength < security.minPasswordLength) {
-                    $passwordStrengthBar.addClass('good1');    // Too short
-                }
-                else if (passwordScore === 4) {
-                    $passwordStrengthBar.addClass('good5');    // Strong
-                }
-                else if (passwordScore === 3) {
-                    $passwordStrengthBar.addClass('good4');    // Good
-                }
-                else if (passwordScore === 2) {
-                    $passwordStrengthBar.addClass('good3');    // Medium
-                }
-                else if (passwordScore === 1) {
-                    $passwordStrengthBar.addClass('good2');    // Weak
-                }
-                else {
-                    $passwordStrengthBar.addClass('good1');    // Very Weak
-                }
-            }
-        });
-    },
-
-    /**
      * Initialise the register button
      */
     initRegisterButton: function() {
@@ -207,7 +134,6 @@ mobile.register = {
         var $emailField = this.$registerScreen.find('.email-address input');
         var $passwordField = this.$registerScreen.find('.password input');
         var $confirmPasswordField = this.$registerScreen.find('.password-confirm input');
-        var $passwordStrengthBar = this.$registerScreen.find('.password-strength');
         var $confirmTermsCheckbox = this.$registerScreen.find('.confirm-terms input');
         var $registerButton = this.$registerScreen.find('.register-button');
         var $containerFields = $emailField.parent().add($passwordField.parent()).add($confirmPasswordField.parent());
@@ -253,38 +179,18 @@ mobile.register = {
                 return false;
             }
 
-            // If the passwords are not the same
-            if (password !== confirmPassword) {
+            // Check if the entered passwords are valid or strong enough
+            var passwordValidationResult = security.isValidPassword(password, confirmPassword);
 
-                // Add red border, red text and show warning icon
+            // If bad result
+            if (passwordValidationResult !== true) {
+
+                // Add red border, red input text and show warning icon
                 $passwordField.parent().addClass('incorrect');
                 $confirmPasswordField.parent().addClass('incorrect');
 
-                // Show an error and don't proceed
-                mobile.messageOverlay.show(l[9066]);        // The passwords are not the same...
-                return false;
-            }
-
-            // Check for minimum length password
-            if (password.length < security.minPasswordLength) {
-
-                // Add red border, red text and show warning icon
-                $passwordField.parent().addClass('incorrect');
-                $confirmPasswordField.parent().addClass('incorrect');
-
-                // Then show an error and don't proceed
-                mobile.messageOverlay.show(l[18701]);        // Your password needs to be at least 8 characters long.
-                return false;
-            }
-
-            // If the password has the 'Very weak' class i.e. it's not strong enough
-            if ($passwordStrengthBar.hasClass('good1')) {
-
-                // Add red border, red text and show warning icon
-                $passwordField.parent().addClass('incorrect');
-
-                // Then show an error and don't proceed
-                mobile.messageOverlay.show(l[1104]);        // Please strengthen your password.
+                // Show error dialog and return early
+                mobile.messageOverlay.show(passwordValidationResult);
                 return false;
             }
 

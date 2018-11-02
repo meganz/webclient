@@ -21,34 +21,26 @@ mobile.account.history = {
 
         'use strict';
 
+        // If not logged in, return to the login page
+        if (typeof u_attr === 'undefined') {
+            loadSubPage('login');
+            return false;
+        }
+
         // Cache selector
         this.$page = $('.mobile.session-history-page');
 
         // Initialise functionality
-        this.initBackButton();
         this.fetchSessionHistory();
+
+        // Initialise back button to go back to My Account page
+        mobile.initBackButton(this.$page, 'fm/account/');
 
         // Initialise the top menu
         topmenuUI();
 
         // Show the account page content
         this.$page.removeClass('hidden');
-    },
-
-    /**
-     * Initialise the back arrow icon in the header to go back to the main My Account page
-     */
-    initBackButton: function() {
-
-        'use strict';
-
-        // On Back button click/tap
-        this.$page.find('.fm-icon.back').off('tap').on('tap', function() {
-
-            // Render the Invites page again
-            loadSubPage('fm/account/');
-            return false;
-        });
     },
 
     /**

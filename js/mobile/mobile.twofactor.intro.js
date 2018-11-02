@@ -26,7 +26,7 @@ mobile.twofactor.intro = {
 
         // Initialise functionality
         mobile.twofactor.intro.initSetupButton();
-        mobile.twofactor.intro.initBackButton();
+        mobile.twofactor.intro.initCloseAndCancelButtons();
 
         // Show the account page content
         mobile.twofactor.intro.$page.removeClass('hidden');
@@ -49,9 +49,9 @@ mobile.twofactor.intro = {
     },
 
     /**
-     * Initialise the back arrow icon in the header to go back to the main My Account page
+     * Initialise the close and cancel buttons to go back to the main My Account page
      */
-    initBackButton: function() {
+    initCloseAndCancelButtons: function() {
 
         'use strict';
 

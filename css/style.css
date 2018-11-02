@@ -452,7 +452,7 @@ a.nlanguage-lnk.language-template {
 .relative {
     position: relative;
 }
-.password-stutus-txt {
+.password-status-txt {
     -moz-text-shadow: 0px 1px 1px #FFF;
     -webkit-text-shadow: 0px 1px 1px #FFF;
     text-shadow: 0px 1px 1px #FFF;
@@ -669,23 +669,23 @@ label span.black {
 .good5 .register-pass-status-line1, .good5 .register-pass-status-line2, .good5 .register-pass-status-line3, .good5 .register-pass-status-line4, .good5 .register-pass-status-line5 {
     background-color: #1DA1E9;
 }
-.good1 .password-stutus-txt {
+.good1 .password-status-txt {
     color: #ff2a0b;
     display: block;
 }
-.good2 .password-stutus-txt {
+.good2 .password-status-txt {
     color: #ffc926;
     display: block;
 }
-.good3 .password-stutus-txt {
+.good3 .password-status-txt {
     color: #7ab148;
     display: block;
 }
-.good4 .password-stutus-txt {
+.good4 .password-status-txt {
     color: #7dd016;
     display: block;
 }
-.good5 .password-stutus-txt {
+.good5 .password-status-txt {
     color: #1DA1E9;
     display: block;
 }
@@ -12438,7 +12438,7 @@ h5.main-italic-header {
 .incorrect .register-name-input-block {
     border-color: #D52600;
 }
-.new-registration .password-stutus-txt {
+.new-registration .password-status-txt {
     padding-top: 10px;
     font-size: 14px;
     float: none;
@@ -12456,7 +12456,7 @@ h5.main-italic-header {
 .new-reg-status-description {
     color: #666666
 }
-.login-register-input.strong-password, .login-register-input.weak-password, .login-register-input.loading {
+.login-register-input.meets-minimum-strength, .login-register-input.insufficient-strength, .login-register-input.loading {
     padding: 0 30px 0 35px;
 }
 .password-status-icon {
@@ -12470,10 +12470,10 @@ h5.main-italic-header {
     right: 0;
     display: none;
 }
-.weak-password .password-status-icon {
+.insufficient-strength .password-status-icon {
     background-position: 2px -939px;
 }
-.strong-password .password-status-icon, .weak-password .password-status-icon {
+.meets-minimum-strength .password-status-icon, .insufficient-strength .password-status-icon {
     display: block;
 }
 .password-status-warning {
@@ -15703,7 +15703,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     cursor: pointer;
     background-color: #D42400;
 }
-.backup-recover .new-registration .password-stutus-txt {
+.backup-recover .new-registration .password-status-txt {
     margin-bottom: -15px;
 }
 .login-register-input.fail {

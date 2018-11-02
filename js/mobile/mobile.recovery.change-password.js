@@ -27,122 +27,16 @@ mobile.recovery.changePassword = {
             this.$screen = $('.park-account-change-password');
         }
 
-        // Initialise functionality
-        this.loadPasswordEstimatorLibrary();
-        this.initKeyupEvents();
-        this.initPasswordStrengthCheck();
+        // Initialise page functionality
         this.initUpdateButton(type);
+
+        // Load password strength estimator
+        mobile.initPasswordFieldsKeyupEvent(this.$screen);
+        mobile.initPasswordEstimatorLibrary(this.$screen);
+        mobile.initPasswordStrengthCheck(this.$screen);
 
         // Show the screen
         this.$screen.removeClass('hidden');
-    },
-
-
-    /**
-     * Load the ZXCVBN password strength estimator library
-     */
-    loadPasswordEstimatorLibrary: function() {
-
-        'use strict';
-
-        // Make sure the library is loaded
-        if (typeof zxcvbn === 'undefined') {
-
-            // Show loading spinner
-            var $loader = this.$screen.find('.estimator-loading-icon').addClass('loading');
-
-            // On completion of loading, hide the loading spinner
-            M.require('zxcvbn_js')
-                .done(function() {
-                    $loader.removeClass('loading');
-                });
-        }
-    },
-
-    /**
-     * Show what strength the currently entered password is on key up
-     */
-    initPasswordStrengthCheck: function() {
-
-        'use strict';
-
-        var $passwordStrengthBar = this.$screen.find('.password-strength');
-        var $passwordInput = this.$screen.find('.recovery-password-input');
-
-        // Add keyup event to the password text field
-        $passwordInput.rebind('keyup', function() {
-
-            // Make sure the ZXCVBN password strength estimator library is loaded first
-            if (typeof zxcvbn !== 'undefined') {
-
-                // Estimate the password strength
-                var password = $.trim($passwordInput.val());
-                var passwordScore = zxcvbn(password).score;
-                var passwordLength = password.length;
-
-                // Remove previous strength classes that were added
-                $passwordStrengthBar.removeClass('good1 good2 good3 good4 good5');
-
-                // Add colour coding
-                if (passwordLength === 0) {
-                    return false;
-                }
-                else if (passwordLength < 8) {
-                    $passwordStrengthBar.addClass('good1');    // Too short
-                }
-                else if (passwordScore === 4) {
-                    $passwordStrengthBar.addClass('good5');    // Strong
-                }
-                else if (passwordScore === 3) {
-                    $passwordStrengthBar.addClass('good4');    // Good
-                }
-                else if (passwordScore === 2) {
-                    $passwordStrengthBar.addClass('good3');    // Medium
-                }
-                else if (passwordScore === 1) {
-                    $passwordStrengthBar.addClass('good2');    // Weak
-                }
-                else {
-                    $passwordStrengthBar.addClass('good1');    // Very Weak
-                }
-            }
-        });
-    },
-
-    /**
-     * Enable the Update button if the fields are complete and correct
-     */
-    initKeyupEvents: function() {
-
-        'use strict';
-
-        var $passwordField = this.$screen.find('.recovery-password-input');
-        var $confirmPasswordField = this.$screen.find('.recovery-password-confirm-input');
-        var $updateButton = this.$screen.find('.update-password-button');
-        var $allFields = $passwordField.add($confirmPasswordField);
-
-        // Add keyup event to the input fields
-        $allFields.rebind('keyup', function(event) {
-
-            var password = $passwordField.val();
-            var confirmPassword = $confirmPasswordField.val();
-
-            // Change the button to red to enable it if they have entered something in all the fields
-            if (password.length > 0 && confirmPassword.length > 0) {
-
-                // Activate the register button
-                $updateButton.addClass('active');
-
-                // If the Enter key is pressed try updating
-                if (event.which === 13) {
-                    $updateButton.trigger('tap');
-                }
-            }
-            else {
-                // Grey it out if they have not completed one of the fields
-                $updateButton.removeClass('active');
-            }
-        });
     },
 
     /**
@@ -155,7 +49,6 @@ mobile.recovery.changePassword = {
 
         var $passwordField = this.$screen.find('.recovery-password-input');
         var $confirmPasswordField = this.$screen.find('.recovery-password-confirm-input');
-        var $passwordStrengthBar = this.$screen.find('.password-strength');
         var $updateButton = this.$screen.find('.update-password-button');
 
         // Add click/tap handler to button
@@ -171,36 +64,20 @@ mobile.recovery.changePassword = {
             }
 
             // Unfocus (blur) the input fields to prevent the cursor showing on iOS and also hide the keyboard
-            $passwordField.add($confirmPasswordField).trigger("blur");
+            $passwordField.add($confirmPasswordField).trigger('blur');
 
-            // If the passwords are not the same
-            if (password !== confirmPassword) {
+            // Check if the entered passwords are valid or strong enough
+            var passwordValidationResult = security.isValidPassword(password, confirmPassword);
 
-                // Add red border, red text and show warning icon
+            // If bad result
+            if (passwordValidationResult !== true) {
+
+                // Add red border, red input text and show warning icon
                 $passwordField.parent().addClass('incorrect');
                 $confirmPasswordField.parent().addClass('incorrect');
 
-                // Show an error and don't proceed
-                mobile.messageOverlay.show(l[9066]);        // The passwords are not the same...
-                return false;
-            }
-
-            // Check for minimum password length
-            if (password.length < 8) {
-
-                // Then show an error and don't proceed
-                mobile.messageOverlay.show(l[18701]);
-                return false;
-            }
-
-            // If the password has the 'Very weak' class i.e. it's not strong enough
-            if ($passwordStrengthBar.hasClass('good1')) {
-
-                // Add red border, red text and show warning icon
-                $passwordField.parent().addClass('incorrect');
-
-                // Then show an error and don't proceed
-                mobile.messageOverlay.show(l[1104]);        // Please strengthen your password
+                // Show error dialog and return early
+                mobile.messageOverlay.show(passwordValidationResult);
                 return false;
             }
 

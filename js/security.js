@@ -7,6 +7,12 @@ var security = {
     /** Minimum password length across the app for registration and password changes */
     minPasswordLength: 8,
 
+    /**
+     * Minimum password score across the app for registration and password changes. The score is calculated
+     * using the score from the ZXCVBN library and the range is from 0 - 4 (very weak, weak, medium, good, strong)
+     */
+    minPasswordScore: 1,
+
     /** The number of iterations for the PPF (1-2 secs computation time) */
     numOfIterations: 100000,
 
@@ -15,6 +21,38 @@ var security = {
 
     /** The desired length of the derived key from the PPF in bits */
     derivedKeyLengthInBits: 256,    // 32 Bytes
+
+    /**
+     * Checks if the password is good enough to be used
+     * @param {String} password The user's password
+     * @param {String} confirmPassword The second password the user typed again as a confirmation to avoid typos
+     * @returns {true|String} Returns true if the password is valid, or the error message if not valid
+     */
+    isValidPassword: function(password, confirmPassword) {
+
+        'use strict';
+
+        // Calculate the length of the password and its score with the ZXCVBN library
+        var passwordLength = password.length;
+        var passwordScore = zxcvbn(password).score;
+
+        // If the passwords are not the same
+        if (password !== confirmPassword) {
+            return l[9066];         // The passwords are not the same...
+        }
+
+        // Check for minimum password length
+        if (passwordLength < security.minPasswordLength) {
+            return l[18701];        // Your password needs to be at least x characters long
+        }
+
+        // If the password has the 'Very weak' class i.e. it's not strong enough
+        if ((passwordScore < security.minPasswordScore)) {
+            return l[1104];         // Please strengthen your password
+        }
+
+        return true;
+    },
 
     /**
      * Converts a UTF-8 string to a byte array
@@ -1069,5 +1107,105 @@ security.login = {
             // Not applicable to this function
             return false;
         }
+    }
+};
+
+
+/**
+ * Common functionality for desktop/mobile webclient for changing the password using the old and new processes
+ */
+security.changePassword = {
+
+    /**
+     * Change the user's password using the old method
+     * @param {String} newPassword The new password
+     * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
+     * @param {Function} completeCallback The function to run when complete (to update the UI)
+     */
+    oldMethod: function(newPassword, twoFactorPin, completeCallback) {
+
+        'use strict';
+
+        // Otherwise change the password using the old method
+        var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newPassword));
+        var encryptedMasterKeyBase64 = a32_to_base64(encrypt_key(pw_aes, u_k));
+        var userHash = stringhash(u_attr.email.toLowerCase(), pw_aes);
+
+        // Prepare the request
+        var requestParams = {
+            a: 'up',
+            k: encryptedMasterKeyBase64,
+            uh: userHash
+        };
+
+        // If the 2FA PIN was entered, send it with the request
+        if (twoFactorPin !== null) {
+            requestParams.mfa = twoFactorPin;
+        }
+
+        // Make API request to change the password
+        api_req(requestParams, {
+            callback: function(result) {
+
+                // If successful, update user attribute key property with the Encrypted Master Key
+                if (result) {
+                    u_attr.k = encryptedMasterKeyBase64;
+                }
+
+                // Update UI
+                completeCallback(result);
+            }
+        });
+    },
+
+    /**
+     * Change the user's password using the new method
+     * @param {String} newPassword The new password
+     * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
+     * @param {Function} completeCallback The function to run when complete (to update the UI)
+     */
+    newMethod: function(newPassword, twoFactorPin, completeCallback) {
+
+        'use strict';
+
+        // Create the Client Random Value, Encrypted Master Key and Hashed Authentication Key
+        security.deriveKeysFromPassword(newPassword, u_k,
+            function(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+
+                // Convert to Base64
+                var encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
+                var hashedAuthenticationKeyBase64 = ab_to_base64(hashedAuthenticationKeyBytes);
+                var clientRandomValueBase64 = ab_to_base64(clientRandomValueBytes);
+                var saltBase64 = ab_to_base64(security.createSalt(clientRandomValueBytes));
+
+                // Prepare the request
+                var requestParams = {
+                    a: 'up',
+                    k: encryptedMasterKeyBase64,
+                    uh: hashedAuthenticationKeyBase64,
+                    crv: clientRandomValueBase64
+                };
+
+                // If the 2FA PIN was entered, send it with the request
+                if (twoFactorPin !== null) {
+                    requestParams.mfa = twoFactorPin;
+                }
+
+                // Send API request to change password
+                api_req(requestParams, {
+                    callback: function(result) {
+
+                        // If successful, update global user attributes key and salt as the 'ug' request is not re-done
+                        if (result) {
+                            u_attr.k = encryptedMasterKeyBase64;
+                            u_attr.aas = saltBase64;
+                        }
+
+                        // Update UI
+                        completeCallback(result);
+                    }
+                });
+            }
+        );
     }
 };

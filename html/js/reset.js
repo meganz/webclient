@@ -113,20 +113,14 @@ function init_reset() {
 
 function delete_reset_pw() {
 
-    var c = $('.register-check').attr('class');
     var password = $('#withoutkey-password').val();
-
-    if (password === l[909]) {
-        msgDialog('warninga', l[135], l[741]);
-        return;
-    }
-    else if ($('#withoutkey-password').val() !== $('#withoutkey-password2').val()) {
-        msgDialog('warninga', l[135], l[715]);
-        return;
-    }
-    else if ($('.login-register-input.password').hasClass('weak-password')) {
-        msgDialog('warninga', l[135], l[1129]);
-        return;
+    var confirmPassword = $('#withoutkey-password2').val();
+    var passwordValidationResult = security.isValidPassword(password, confirmPassword);
+    
+    // If bad result
+    if (passwordValidationResult !== true) {
+        msgDialog('warninga', l[135], passwordValidationResult);
+        return false;
     }
     else if ($('.new-registration-checkbox .register-check').hasClass('checkboxOff')) {
         msgDialog('warninga', l[135], l[1974]);
@@ -165,26 +159,20 @@ function recovery_reset_pw() {
 
     'use strict';
 
-    var newPassword = $('#withkey-password').val();
-    var newPasswordConfirm = $('#withkey-password2').val();
+    var password = $('#withkey-password').val();
+    var confirmPassword = $('#withkey-password2').val();
+    var passwordValidationResult = security.isValidPassword(password, confirmPassword);
 
-    if (newPassword === l[909]) {
-        msgDialog('warninga', l[135], l[741]);
-        return;
-    }
-    else if (newPassword !== newPasswordConfirm) {
-        msgDialog('warninga', l[135], l[715]);
-        return;
-    }
-    else if ($('.login-register-input.password').hasClass('weak-password')) {
-        msgDialog('warninga', l[135], l[1129]);
-        return;
+    // If bad result
+    if (passwordValidationResult !== true) {
+        msgDialog('warninga', l[135], passwordValidationResult);
+        return false;
     }
 
     loadingDialog.show();
 
     // Perform the Master Key re-encryption with a new password
-    security.resetKey(recoverycode, base64_to_a32(recoverykey), recoveryemail, newPassword, function(responseCode) {
+    security.resetKey(recoverycode, base64_to_a32(recoverykey), recoveryemail, password, function(responseCode) {
 
         loadingDialog.hide();
 
@@ -250,8 +238,10 @@ function verify_key(key) {
 
 function reset_pwcheck() {
 
-    $('.login-register-input.password').removeClass('weak-password strong-password');
-    $('.account.password-stutus').removeClass('good1 good2 good3 good4 good5 checked');
+    'use strict';
+
+    $('.login-register-input.password').removeClass('insufficient-strength meets-minimum-strength');
+    $('.account.password-status').removeClass('good1 good2 good3 good4 good5 checked');
     $('.password-advice').empty();
     $('.minimum-password-block .password-icon').removeClass('success');
 
@@ -277,7 +267,7 @@ function reset_pwcheck() {
 function init_reset_pw() {
 
     'use strict';
-    
+
     var $passwords = $('#withkey-password,#withoutkey-password');
     var $confirms = $('#withkey-password2,#withoutkey-password2');
 
@@ -288,7 +278,7 @@ function init_reset_pw() {
         var $confirmInput = $contentWrapper.find('.confirm > input');
         var $button = $contentWrapper.find('.restore-verify-button');
 
-        if ($firstInput.val() && $confirmInput.val() && $firstInput.val().length > security.minPasswordLength
+        if ($firstInput.val() && $confirmInput.val() && $firstInput.val().length >= security.minPasswordLength
             && $firstInput.val().length === $confirmInput.val().length) {
             $button.addClass('active').removeClass('disabled');
         }

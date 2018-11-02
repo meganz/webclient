@@ -44,6 +44,9 @@ mobile.recovery.enterKey = {
 
             // Verify the key
             mobile.recovery.enterKey.verifyKey(recoveryKey);
+
+            // Prevent double tap
+            return false;
         });
     },
 

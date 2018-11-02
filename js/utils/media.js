@@ -765,7 +765,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (dlmanager.isStreaming) {
                 clearTimeout(timer);
                 timer = setTimeout(function() {
-                    if (!(videoElement.paused || videoElement.ended)) {
+                    if (videoElement && !(videoElement.paused || videoElement.ended)) {
                         $wrapper.addClass('mouse-idle');
                     }
                 }, 2600);

@@ -1598,18 +1598,17 @@ var exportExpiry = {
             $this.addClass('selected');
 
             // we have to deal with the extra '!' since the applied logic relies on CSS !!!
-            var lKey = $linksDialog.find('.file-link-info.key').text();
-            if (!$this.hasClass('link-handle-and-key')) {
-                if (lKey && lKey[0] === '!') {
-                    lKey = lKey.slice(1);
-                    $linksDialog.find('.file-link-info.key').text(lKey);
+            var $key = $('.file-link-info.key', $linksDialog);
+            var keyPart = $.trim($key.text());
+            if ($this.hasClass('link-handle-and-key')) {
+                if (keyPart[0] !== '!') {
+                    // Restore key part, containing sub file/folder handles(s), if any
+                    $key.text($key.data('key'));
                 }
             }
-            else {
-                if (lKey && lKey[0] !== '!') {
-                    lKey = '!' + lKey;
-                    $linksDialog.find('.file-link-info.key').text(lKey);
-                }
+            else if (keyPart[0] === '!') {
+                // Remove initial ! separator and subsequent file/folder handler, if any
+                $key.text(keyPart.substr(1).split(/[?!]/)[0]);
             }
 
             // Show the relevant 'Link without key', 'Decryption key' or 'Link with key'
@@ -1752,7 +1751,7 @@ var exportExpiry = {
              +              '<span class="icon"></span>'
              +              '<span class="file-link-info-wrapper">'
              +                  '<span class="file-link-info url">' + fileUrlWithoutKey + '</span>'
-             +                  '<span class="file-link-info key">' + fileUrlKey + '</span>'
+             +                  '<span class="file-link-info key" data-key="' + fileUrlKey + '">' + fileUrlKey + '</span>'
              +                  '<span class="file-link-info password-protected-data hidden"></span>'
              +              '</span>'
              +          '</div>'

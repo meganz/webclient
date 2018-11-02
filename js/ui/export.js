@@ -1602,12 +1602,12 @@ var exportExpiry = {
             var keyPart = $.trim($key.text());
             if ($this.hasClass('link-handle-and-key')) {
                 if (keyPart[0] !== '!') {
-                    // Restore key part, containing sub file/folder handles(s), if any
+                    // Restore key part, containing sub file/folder handle(s), if any
                     $key.text($key.data('key'));
                 }
             }
             else if (keyPart[0] === '!') {
-                // Remove initial ! separator and subsequent file/folder handler, if any
+                // Remove initial ! separator and subsequent file/folder handle, if any
                 $key.text(keyPart.substr(1).split(/[?!]/)[0]);
             }
 

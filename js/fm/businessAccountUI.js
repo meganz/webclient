@@ -164,6 +164,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         var $userLaeftPanelItems = $('.nw-user-management-item ', $usersLeftPanel);
         var $userLaeftPanelRow = $($userLaeftPanelItems.get(0)).clone(true);
         $userLaeftPanelItems.remove();
+        $('.user-management-tree-panel-header.enabled-accounts').addClass('active');
+        $('.user-management-tree-panel-header.disabled-accounts').removeClass('active');
 
         // remove all elements from template on HTML file
         for (var k = 1; k < $tr.length; k++) {
@@ -2905,7 +2907,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         if (subuser.s === 0) {
             $userRow.find('.user-management-status').removeClass('pending disabled')
                 .addClass('enabled');
-            leftPanelClass = 'enabled-accounts';
+            // leftPanelClass = 'enabled-accounts';
         }
         else if (subuser.s === 10) {
             $userRow.find('.user-management-status').removeClass('enabled disabled')

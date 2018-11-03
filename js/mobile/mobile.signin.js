@@ -111,7 +111,7 @@ mobile.signin = {
             }
 
             // If the email is invalid
-            if (checkMail(email)) {
+            if (!isValidEmail(email)) {
 
                 // Add red border, red text and show warning icon
                 $emailField.parent().addClass('incorrect');

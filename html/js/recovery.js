@@ -106,7 +106,7 @@ function AccountRecoveryControl() {
         }
 
         // Entered email is not valid
-        if (enteredEmail && checkMail(enteredEmail)) {
+        if (enteredEmail && !isValidEmail(enteredEmail)) {
             self.$emailBlockError.text(l[1101]).removeClass('hidden');
             self.$emailBlock.addClass('incorrect');
         }
@@ -620,7 +620,7 @@ AccountRecoveryControl.prototype.startRecovery = function _startRecovery(email, 
         t = 9;
     }
 
-    if (checkMail(email)) {
+    if (!isValidEmail(email)) {
         msgDialog('warninga', l[1100], l[1101]);
     } else {
         loadingDialog.show();

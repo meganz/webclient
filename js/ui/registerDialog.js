@@ -198,7 +198,7 @@
             err = 1;
         }
 
-        if (email === '' || checkMail(email)) {
+        if (email === '' || !isValidEmail(email)) {
             $email.parent().addClass('incorrect');
             $email.focus();
             err = 1;

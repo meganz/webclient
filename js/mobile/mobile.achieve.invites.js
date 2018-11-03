@@ -84,8 +84,8 @@ mobile.achieve.invites = {
             var email = $emailInput.val();
             var trimmedEmail = $.trim(email);
 
-            // If empty, grey out the button so it appears unclickable
-            if (trimmedEmail === '' || checkMail(trimmedEmail)) {
+            // If empty or invalid email, grey out the button so it appears unclickable
+            if (trimmedEmail === '' || !isValidEmail(trimmedEmail)) {
                 $inviteButton.removeClass('active');
             }
             else {
@@ -120,7 +120,7 @@ mobile.achieve.invites = {
             var trimmedEmail = $.trim(email);
 
             // If the email is invalid, show the email warning, grey out the button and don't send to the API
-            if (trimmedEmail === '' || checkMail(trimmedEmail)) {
+            if (trimmedEmail === '' || !isValidEmail(trimmedEmail)) {
                 $emailWarning.removeClass('hidden');
                 $inviteButton.removeClass('active');
                 return false;

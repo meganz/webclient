@@ -56,7 +56,7 @@ mobile.recovery.sendEmail = {
             var $button = $screen.find('.recover-account-email-send-btn');
 
             // If the email is not valid, grey out the button
-            if (email.length > 0 && checkMail(email)) {
+            if (email.length > 0 && !isValidEmail(email)) {
                 $button.removeClass('active');
             }
             else {
@@ -83,7 +83,7 @@ mobile.recovery.sendEmail = {
             var trimmedEmail = $.trim(email);
 
             // If the email is not valid, show an error and don't proceed
-            if (checkMail(trimmedEmail)) {
+            if (!isValidEmail(trimmedEmail)) {
                 mobile.messageOverlay.show(l[198]);
                 return false;
             }

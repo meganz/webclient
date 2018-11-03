@@ -145,7 +145,7 @@
         var rememberMe = $rememberMeCheckbox.is('.checkboxOn');  // ToDo check if correct
         var twoFactorPin = null;
 
-        if (email === '' || checkMail(email)) {
+        if (email === '' || !isValidEmail(email)) {
             $emailContainer.addClass('incorrect');
             $emailInput.val('');
             $emailInput.focus();

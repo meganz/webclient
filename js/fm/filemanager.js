@@ -102,6 +102,9 @@ FileManager.prototype.initFileManagerUI = function() {
         loadSubPage('register');
     });
 
+    $('.fm-main').removeClass('l-pane-collapsed');
+    $('.default-white-button.l-pane-visibility').removeClass('active');
+
     $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
         if ($.dialog === 'pro-login-dialog' || localStorage.awaitingConfirmationAccount) {
             return false;
@@ -117,15 +120,59 @@ FileManager.prototype.initFileManagerUI = function() {
             loadSubPage('fm');
         }
     });
+
     if (folderlink) {
+        $('.nw-fm-left-icons-panel .logo').removeClass('hidden');
         $('.fm-main').addClass('active-folder-link');
         $('.activity-status-block').hide();
+
+        var $prodNav = $('.fm-products-nav').text('');
+        if (!u_type) {
+            $prodNav.safeHTML(translate(pages['pagesmenu']));
+            onIdle(clickURLs);
+        }
+
+        $('.default-white-button.l-pane-visibility').rebind('click.leftpane', function() {
+            var $this = $(this);
+            var $breadcrumbs = $('.fm-right-header .fm-breadcrumbs-block');
+
+            if ($this.hasClass('active')) {
+                if (M.currentdirid === M.RootID) {
+                    $breadcrumbs.addClass('deactivated');
+                }
+                $this.removeClass('active');
+                $('.fm-main').removeClass('l-pane-collapsed');
+            }
+            else {
+                $this.addClass('active');
+                $('.fm-main').addClass('l-pane-collapsed');
+
+                M.onFileManagerReady(function() {
+                    if (M.currentdirid === M.RootID) {
+                        $breadcrumbs.removeClass('deactivated')
+                            .find('.folder-link .right-arrow-bg')
+                            .safeHTML('<span>' + M.getNameByHandle(M.RootID) + '</span>');
+                    }
+                });
+            }
+
+            // reposition click hint, if opened
+            if (mega.cttHintTimer) {
+                M.showClickHint(true);
+            }
+            $(window).trigger('resize');
+        });
+
+        if (!M.tree[M.RootID]) {
+            $('.default-white-button.l-pane-visibility').trigger('click');
+        }
     }
     else {
+        $('.nw-fm-left-icons-panel .logo').addClass('hidden');
         $('.fm-tree-header.cloud-drive-item').text(l[164]);
         $('.fm-tree-header').not('.cloud-drive-item').show();
-        $('.fm-left-menu .folderlink').addClass('hidden');
         $('.fm-main').removeClass('active-folder-link');
+        $('.fm-products-nav').text('');
     }
 
     $.doDD = function(e, ui, a, type) {
@@ -2915,6 +2962,64 @@ FileManager.prototype.getDDhelper = function getDDhelper() {
     return $('.dragger-block')[0];
 };
 
+FileManager.prototype.hideClickHint = function() {
+    'use strict';
+
+    if (mega.cttHintTimer) {
+        clearTimeout(mega.cttHintTimer);
+        delete mega.cttHintTimer;
+    }
+
+    // implicitly invoking this function will cause that the hint won't be seen anymore.
+    onIdle(function() {
+        mega.config.set('ctt', 1);
+    });
+
+    $('.show-hints').removeAttr('style');
+    $('.dropdown.click-hint').addClass('hidden').removeAttr('style');
+};
+
+FileManager.prototype.showClickHint = function(force) {
+    'use strict';
+
+    this.hideClickHint();
+
+    // if the click-tooltip was not seen already
+    if (force || !mega.config.get('ctt')) {
+        mega.cttHintTimer = setTimeout(function() {
+            $('.show-hints').fadeIn(300, function() {
+                $(this).removeClass('hidden');
+
+                var $hint = $('.dropdown.click-hint');
+                var $thumb = $('.hint-thumb', $hint);
+                $hint.position({
+                    of: this,
+                    my: 'left top-5px',
+                    at: 'left+27px top'
+                });
+                $hint.fadeIn(450, function() {
+                    $(this).removeClass('hidden');
+                    $('.close-button', $hint).rebind('click', M.hideClickHint.bind(M));
+                });
+
+                var imageSwapTimer = setInterval(function() {
+                    if (!mega.cttHintTimer) {
+                        return clearInterval(imageSwapTimer);
+                    }
+                    if ($thumb.hasClass('left-click')) {
+                        $thumb.switchClass("left-click", "right-click", 1000, "easeInOutQuad");
+                    }
+                    else {
+                        $thumb.switchClass("right-click", "left-click", 1000, "easeInOutQuad");
+                    }
+                }, 5e3);
+            }).rebind('click', M.showClickHint.bind(M, true));
+        }, force || 300);
+    }
+
+    return false;
+};
+
 FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
 
@@ -3064,6 +3169,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
         M.searchPath();
         $.hideTopMenu();
+        M.hideClickHint();
 
         return !!M.contextMenuUI(e, 1);
     });
@@ -3098,6 +3204,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             }
         }
 
+        if (!mega.cttHintTimer) {
+            M.showClickHint();
+        }
         M.searchPath();
         $.hideContextMenu(e);
         if ($.hideTopMenu) {
@@ -3125,6 +3234,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         else {
             M.addDownload([h]);
         }
+        M.hideClickHint();
     });
 
     if ($.rmInitJSP) {
@@ -3525,6 +3635,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     $('.fm-import-to-cloudrive, .fm-download-as-zip').off('click');
 
     $('.fm-main').removeClass('active-folder-link');
+    $('.nw-fm-left-icons-panel .logo').addClass('hidden');
+    $('.fm-products-nav').text('');
     $('.nw-fm-tree-header.folder-link').hide();
     $('.nw-fm-left-icon.folder-link').removeClass('active');
 
@@ -3534,11 +3646,18 @@ FileManager.prototype.onSectionUIOpen = function(id) {
          $('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder');
          } else*/
         if (id === 'cloud-drive' || id === 'transfers') {
+            $('.nw-fm-left-icons-panel .logo').removeClass('hidden');
             $('.fm-main').addClass('active-folder-link');
             $('.fm-right-header').addClass('folder-link');
-            $('.nw-fm-left-icon.folder-link').addClass('active');
             $('.fm-left-menu').addClass('folder-link');
             $('.nw-fm-tree-header.folder-link').show();
+
+            var $prodNav = $('.fm-products-nav').text('');
+            if (!u_type) {
+                $prodNav.safeHTML(translate(pages['pagesmenu']));
+                onIdle(clickURLs);
+            }
+
             // remove this two buttons from search result.
             if (M.currentdirid.substr(0, 6) !== 'search') {
                 $('.fm-import-to-cloudrive, .fm-download-as-zip')

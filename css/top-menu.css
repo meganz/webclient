@@ -368,4 +368,22 @@
 .top-head .default-white-button.semi-small {
     margin: 4px 0 0 14px;
 }
-
+.top-head .default-white-button.rounded {
+    float: left;
+    margin: 8px 0 0 9px;
+    width: 19px;
+    height: 19px;
+}
+.top-head .default-white-button.rounded::before {
+    -webkit-box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.22);
+    -moz-box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.22);
+    box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.22);
+}
+.top-head .default-white-button.rounded::after {
+    -webkit-box-shadow: 0px 0px 0px 0.5px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 0px 0px 0.5px rgba(0,0,0,0.1);
+    box-shadow: 0px 0px 0px 0.5px rgba(0,0,0,0.1);
+}
+.top-head .default-white-button.small-square-button.rounded i {
+    margin: 0 0 0 0;
+}

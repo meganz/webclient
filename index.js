@@ -1460,7 +1460,6 @@ function init_page() {
             fminitialized = false;
             loadfm.loaded = false;
             loadfm.loading = false;
-            fmconfig = Object.create(null);
 
             stopapi();
             api_reset();
@@ -1611,6 +1610,11 @@ function init_page() {
     // Initialise the update check system
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
+    }
+
+    // Hide click-tooltip
+    if (mega.cttHintTimer) {
+        M.hideClickHint();
     }
 
     topmenuUI();
@@ -2242,7 +2246,7 @@ function topmenuUI() {
     });
 
     // If the main Mega M logo in the header is clicked
-    $topHeader.find('.logo').rebind('click', function () {
+    $('a.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
             if (folderlink) {
                 M.openFolder(M.RootID, true);

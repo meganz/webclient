@@ -961,7 +961,7 @@ function FMShortcuts() {
             !isContactRootOrShareRoot
         ) {
             var items = selectionManager.get_selected();
-            if (items.length == 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
+            if (items.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2) {
                 return; // dont do anything.
             }
 

@@ -73,6 +73,9 @@ BusinessRegister.prototype.initPage = function () {
         ///
         this.isLoggedIn = true;
     }
+    else {
+        api_req({ a: 'ucr' });
+    }
     $('.bus-reg-btn', $pageContainer).addClass('disabled');
 
     var fillPaymentGateways = function (st, list) {

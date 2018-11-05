@@ -1990,6 +1990,7 @@
     "17958": "Ung\u00fcltiger Link",
     "18023": "Keine Daten vorhanden",
     "18051": "Cloud Drive",
+    "18132": "Information",
     "18148": "Support kontaktieren",
     "18192": "Geben Sie einen Namen oder einen absoluten Pfad (mit den Wildcards * und ?) ein oder w\u00e4hlen Sie die Datei oder den Ordner, die nicht synchronisiert werden sollen",
     "18213": "Die Gr\u00f6\u00dfe des Downloads sprengt die F\u00e4higkeiten des Browsers. Sie k\u00f6nnen aber MEGAsync verwenden.",
@@ -2520,11 +2521,11 @@
     "19091": "Genutztes Transfervolumen",
     "19092": "Benutzer sperren",
     "19093": "Benutzer ansehen",
-    "19094": "Benutzer reaktivieren",
+    "19094": "Re-activate User",
     "19095": "Datenmigration",
     "19097": "Best\u00e4tigungs-Email erneut senden",
     "19098": "Wollen Sie den Benutzeraccount von [B]{0}[\/B] wirklich sperren?",
-    "19099": "Sie k\u00f6nnen die Sperre jederzeit in der Liste der gesperrten Benutzer r\u00fcckg\u00e4ngig machen.",
+    "19099": "Note: You can re-activate the user at any later stage from the disabled users list.",
     "19100": "Fehler beim Sperren des Benutzers",
     "19101": "Wollen Sie den Benutzeraccount von [B]{0}[\/B] wirklich reaktivieren?",
     "19102": "Hinweis: Dies erh\u00f6ht die Zahl der genutzten Lizenzen.",
@@ -2969,5 +2970,6 @@
     "19851": "Ja, ich bin mir der Tatsache bewusst, dass das Parken meines Accounts [B]zum Verlust aller gespeicherten Dateien f\u00fchrt[\/B].",
     "19852": "Sie haben Zwei-Faktor-Authentifizierung aktiviert und Ihren Authenticator verloren!",
     "19853": "Sie k\u00f6nnen sich derzeit nicht einloggen, Ihre E-Mail-Adresse oder Ihr Passwort \u00e4ndern, oder die Zwei-Faktor-Authentifizierung abschalten.",
-    "19854": "Kein Problem - Sie k\u00f6nnen den Zugriff auf Ihren Account unter Zuhilfenahme Ihres Rettungsschl\u00fcssels wiederherstellen. Die Zwei-Faktor-Authentifizierung wird deaktiviert, und Sie k\u00f6nnen sich einloggen. [B]Alle bestehenden Dateien, Kontakte oder Nachrichten bleiben erhalten.[\/B]."
+    "19854": "Kein Problem - Sie k\u00f6nnen den Zugriff auf Ihren Account unter Zuhilfenahme Ihres Rettungsschl\u00fcssels wiederherstellen. Die Zwei-Faktor-Authentifizierung wird deaktiviert, und Sie k\u00f6nnen sich einloggen. [B]Alle bestehenden Dateien, Kontakte oder Nachrichten bleiben erhalten.[\/B].",
+    "19855": "Whitespace at the start or end of the password is not permitted."
 }

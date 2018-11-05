@@ -1990,6 +1990,7 @@
     "17958": "Link salah",
     "18023": "Kosongkan Cloud Drive",
     "18051": "Cakram Penyimpanan Awan",
+    "18132": "Informasi",
     "18148": "Contact Support",
     "18192": "Masukkan nama, path absolut (wildcard * dan ? Diizinkan) atau pilih file atau folder yang ingin Anda kecualikan dari sinkronisasi",
     "18213": "Ukuran unduhan melebihi ukuran maksimum yang didukung oleh browser. Anda dapat menggunakan MEGAsync untuk melanjutkan unduhan.",
@@ -2520,11 +2521,11 @@
     "19091": "Penggunaan Transfer",
     "19092": "Nonaktifkan Pengguna",
     "19093": "Lihat Pengguna",
-    "19094": "Aktifkan kembali Pengguna",
+    "19094": "Re-activate User",
     "19095": "Pindahkan Data",
     "19097": "Kirim kembali email verifikasi",
     "19098": "Anda yakin ingin mematikan pengguna [B]{0}[\/B]?",
-    "19099": "Catatan: Anda dapat mengaktifkan kembali pengguna di tahap selanjutnya dari daftar pengguna yang dinonaktifkan.",
+    "19099": "Note: You can re-activate the user at any later stage from the disabled users list.",
     "19100": "Menonaktifkan pengguna yang dipilih telah gagal",
     "19101": "Anda yakin ingin menyalakan kembali pengguna [B]{0}[\/B]?",
     "19102": "Catatan: Ini akan meningkatkan jumlah lisensi yang digunakan.",
@@ -2969,5 +2970,6 @@
     "19851": "Yes, I understand there is no way to undo a parked account, [B]all my files will be gone forever[\/B].",
     "19852": "You have 2FA enabled and have lost your authenticator device!",
     "19853": "You will not be able to login, change email, change password or disable 2FA.",
-    "19854": "Don't worry, you can perform an Account reset using your Recovery key. This will disable 2FA and allow you to login and change account settings. [B]You will not lose any files, contacts or messages[\/B]."
+    "19854": "Don't worry, you can perform an Account reset using your Recovery key. This will disable 2FA and allow you to login and change account settings. [B]You will not lose any files, contacts or messages[\/B].",
+    "19855": "Whitespace at the start or end of the password is not permitted."
 }

@@ -1990,6 +1990,7 @@
     "17958": "Maling link",
     "18023": "Bakante ang Cloud Drive",
     "18051": "Cloud Drive",
+    "18132": "Impormasyon",
     "18148": "Contact Support",
     "18192": "Enter a name, an absolute path (wildcards * and? are allowed) or choose which file or folder you want to exclude from the synchronization.",
     "18213": "The download size exceeds the maximum size supported by the browser. You can use MEGAsync to proceed with the download.",
@@ -2526,7 +2527,7 @@
     "19098": "Are you sure you want to disable [B]{0}[\/B]\u2019s user?",
     "19099": "Note: You can re-activate the user at any later stage from the disabled users list.",
     "19100": "Disabling the selected user has failed",
-    "19101": "Are you sure you want to re-enable [B]{0}[\/B]\u2019s user?",
+    "19101": "Are you sure you want to re-activate [B]{0}[\/B]\u2019s user?",
     "19102": "Note: This will increase the number of licences used.",
     "19103": "Magdagdag Pa",
     "19104": "Mag-imbita ng Tao sa Team",
@@ -2969,5 +2970,6 @@
     "19851": "Yes, I understand there is no way to undo a parked account, [B]all my files will be gone forever[\/B].",
     "19852": "You have 2FA enabled and have lost your authenticator device!",
     "19853": "You will not be able to login, change email, change password or disable 2FA.",
-    "19854": "Don't worry, you can perform an Account reset using your Recovery key. This will disable 2FA and allow you to login and change account settings. [B]You will not lose any files, contacts or messages[\/B]."
+    "19854": "Don't worry, you can perform an Account reset using your Recovery key. This will disable 2FA and allow you to login and change account settings. [B]You will not lose any files, contacts or messages[\/B].",
+    "19855": "Whitespace at the start or end of the password is not permitted."
 }

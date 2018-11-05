@@ -1990,6 +1990,7 @@
     "17958": "\uc720\ud6a8\ud558\uc9c0 \uc54a\uc740 \ub9c1\ud06c",
     "18023": "\ube48 \ud074\ub77c\uc6b0\ub4dc \ub4dc\ub77c\uc774\ube0c",
     "18051": "\ud074\ub77c\uc6b0\ub4dc \ub4dc\ub77c\uc774\ube0c",
+    "18132": "\uc815\ubcf4",
     "18148": "\uc9c0\uc6d0 \ubd80\uc11c\uc5d0 \uc5f0\ub77d",
     "18192": "\uc774\ub984\uc744 \uc785\ub825\ud558\uac70\ub098, \uc808\ub300 \uacbd\ub85c(\uc640\uc77c\ub4dc\uce74\ub4dc *\uc640 ?\uac00 \ud5c8\uc6a9\ub429\ub2c8\ub2e4) \ub610\ub294 \ub3d9\uae30\ud654\uc5d0\uc11c \uc81c\uc678\ud560 \ud30c\uc77c \ub610\ub294 \ud3f4\ub354\ub97c \uc120\ud0dd\ud558\uc138\uc694",
     "18213": "\ub2e4\uc6b4\ub85c\ub4dc \ud06c\uae30\uac00 \ube0c\ub77c\uc6b0\uc800\uc5d0 \uc758\ud574 \uc9c0\uc6d0\ub418\ub294 \ucd5c\ub300 \ud06c\uae30\ub97c \ub118\uc2b5\ub2c8\ub2e4. \ub2e4\uc6b4\ub85c\ub4dc\ub97c \uc9c4\ud589\ud558\ub824\uba74 MEGAsync\ub97c \uc774\uc6a9\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.",
@@ -2520,11 +2521,11 @@
     "19091": "\uc804\uc1a1 \uc774\uc6a9\ub7c9",
     "19092": "\uc774\uc6a9\uc790 \ube44\ud65c\uc131\ud654",
     "19093": "\uc774\uc6a9\uc790 \ubcf4\uae30",
-    "19094": "\uc774\uc6a9\uc790 \uc7ac\ud65c\uc131\ud654",
+    "19094": "Re-activate User",
     "19095": "\ub370\uc774\ud130 \uc774\ub3d9",
     "19097": "\ud655\uc778 \uba54\uc77c \uc7ac\ubc1c\uc1a1",
     "19098": "[B]{0}[\/B]\uc758 \uacc4\uc815\uc744 \ube44\ud65c\uc131\ud654\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
-    "19099": "\ucc38\uace0: \ub098\uc911\uc5d0 \ube44\ud65c\uc131\ud654\ub41c \uc774\uc6a9\uc790 \ubaa9\ub85d\uc5d0\uc11c \uc7ac\ud65c\uc131\ud654\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.",
+    "19099": "Note: You can re-activate the user at any later stage from the disabled users list.",
     "19100": "\uc120\ud0dd\ud55c \uc774\uc6a9\uc790 \ube44\ud65c\uc131\ud654\ub97c \uc2e4\ud328\ud558\uc600\uc2b5\ub2c8\ub2e4",
     "19101": "[B]{0}[\/B]\uc758 \uacc4\uc815\uc744 \uc7ac\ud65c\uc131\ud654\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
     "19102": "\ucc38\uace0: \uc774 \ud589\ub3d9\uc740 \uc0ac\uc6a9\ub41c \ub77c\uc774\uc13c\uc2a4 \uc218\ub97c \uc99d\uac00\uc2dc\ud0b5\ub2c8\ub2e4.",
@@ -2969,5 +2970,6 @@
     "19851": "Yes, I understand there is no way to undo a parked account, [B]all my files will be gone forever[\/B].",
     "19852": "You have 2FA enabled and have lost your authenticator device!",
     "19853": "You will not be able to login, change email, change password or disable 2FA.",
-    "19854": "Don't worry, you can perform an Account reset using your Recovery key. This will disable 2FA and allow you to login and change account settings. [B]You will not lose any files, contacts or messages[\/B]."
+    "19854": "Don't worry, you can perform an Account reset using your Recovery key. This will disable 2FA and allow you to login and change account settings. [B]You will not lose any files, contacts or messages[\/B].",
+    "19855": "Whitespace at the start or end of the password is not permitted."
 }

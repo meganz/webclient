@@ -1990,6 +1990,7 @@
     "17958": "Link inv\u00e1lido",
     "18023": "Nuvem de arquivos vazia",
     "18051": "Nuvem de arquivos",
+    "18132": "Informa\u00e7\u00e3o",
     "18148": "Contatar o suporte",
     "18192": "Digite um nome, um caminho completo (os caracteres-curinga * e ? s\u00e3o permitidos) ou escolha qual arquivo ou pasta voc\u00ea deseja excluir da sincroniza\u00e7\u00e3o.",
     "18213": "O tamanho do download excede o tamanho m\u00e1ximo suportado pelo navegador. Voc\u00ea pode usar o MEGAsync para continuar com o download.",
@@ -2520,11 +2521,11 @@
     "19091": "Uso de transfer\u00eancia",
     "19092": "Desativar usu\u00e1rio",
     "19093": "Ver usu\u00e1rio",
-    "19094": "Reativar usu\u00e1rio",
+    "19094": "Re-activate User",
     "19095": "Migrar dados",
     "19097": "Reenviar email de confirma\u00e7\u00e3o",
     "19098": "Voc\u00ea tem certeza de que quer desativar o usu\u00e1rio de [B]{0}[\/B]?",
-    "19099": "Aviso: voc\u00ea pode reativar o usu\u00e1rio posteriormente acessado a lista de usu\u00e1rios desativados.",
+    "19099": "Note: You can re-activate the user at any later stage from the disabled users list.",
     "19100": "N\u00e3o foi poss\u00edvel desativar o usu\u00e1rio.",
     "19101": "Voc\u00ea tem certeza de que quer reativar o usu\u00e1rio de [B]{0}[\/B]?",
     "19102": "Aviso: essa a\u00e7\u00e3o aumentar\u00e1 o n\u00famero de licen\u00e7as usadas.",
@@ -2969,5 +2970,6 @@
     "19851": "Yes, I understand there is no way to undo a parked account, [B]all my files will be gone forever[\/B].",
     "19852": "You have 2FA enabled and have lost your authenticator device!",
     "19853": "You will not be able to login, change email, change password or disable 2FA.",
-    "19854": "Don't worry, you can perform an Account reset using your Recovery key. This will disable 2FA and allow you to login and change account settings. [B]You will not lose any files, contacts or messages[\/B]."
+    "19854": "Don't worry, you can perform an Account reset using your Recovery key. This will disable 2FA and allow you to login and change account settings. [B]You will not lose any files, contacts or messages[\/B].",
+    "19855": "Whitespace at the start or end of the password is not permitted."
 }

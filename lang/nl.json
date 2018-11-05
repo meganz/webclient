@@ -1990,6 +1990,7 @@
     "17958": "Ongeldige koppeling",
     "18023": "Lege Cloud schijf",
     "18051": "Cloud Schijf",
+    "18132": "Informatie",
     "18148": "Contact Ondersteuning",
     "18192": "Een naam invoeren, een absoluut pad (tekens * en ? zijn toegestaan) of kies welk bestand of map u wilt laten uitsluiten van de synchronisatie",
     "18213": "De download grootte overschrijdt de maximale grootte die ondersteund wordt door de browser. U kunt MEGAsync gebruiken om door te gaan met de download.",
@@ -2524,9 +2525,9 @@
     "19095": "Gegevens Migreren",
     "19097": "Verificatie Email Herversturen",
     "19098": "Weet u zeker dat u de gebruiker's [B]{0}[\/B] wilt uitschakelen?",
-    "19099": "Noteer:U kunt de gebruiker heractiveren op elk later moment vanuit de uitgeschakelde gebruikerslijst.",
+    "19099": "Noteer: Dat u de gebruiker kunt Reactiveren op elk later moment van de uitgeschakelde lijst.",
     "19100": "Het uitschakelen van de geselecteerde gebruiker was mislukt",
-    "19101": "Weet u zeker dat u de gebruiker's [B]{0}[\/B] wilt inschakelen?",
+    "19101": "Weet u zeker dat u de gebruiker's wilt [B]{0}[\/B] reactiveren?",
     "19102": "Noteer: Dit verhoogt het aantal gebruikte licenties.",
     "19103": "Meer Toevoegen",
     "19104": "Personen Uitnodigen tot het Team",
@@ -2969,5 +2970,6 @@
     "19851": "Ja, ik begrijp dat er geen manier is om een geparkeerd account ongedaan te maken, [B] al mijn bestanden zijn voor altijd verloren[\/B].",
     "19852": "U heeft 2FA ingeschakeld en u heeft uw authenticatie apparaat verloren!",
     "19853": "U bent niet in staat om in te loggen, email te wijzigen, wachtwoord te wijzigen of 2FA uit te schakelen.",
-    "19854": "Maakt u zich geen zorgen, u kunt een Account herstel uitvoeren door gebruik van uw Herstel Sleutel. Dit schakelt 2FA uit en geeft u toestemming om in te loggen en de account instellingen te wijzigen. [B] U verliest geen enkele bestanden, contacten of berichten[\/B]."
+    "19854": "Maakt u zich geen zorgen, u kunt een Account herstel uitvoeren door gebruik van uw Herstel Sleutel. Dit schakelt 2FA uit en geeft u toestemming om in te loggen en de account instellingen te wijzigen. [B] U verliest geen enkele bestanden, contacten of berichten[\/B].",
+    "19855": "Whitespace at the start or end of the password is not permitted."
 }

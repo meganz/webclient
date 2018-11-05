@@ -321,6 +321,20 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         items['.getlink-item'] = 1;
     }
 
+    // For multiple selections, should check all have the right permission.
+    if ((".remove-item" in items) && (items['.remove-item'] === 1) && ($.selected.length > 1)) {
+        var removeItemFlag = true;
+        for (var g = 1; g < $.selected.length; g++) {
+            if (M.getNodeRights($.selected[g]) <= 1) {
+                removeItemFlag = false;
+            }
+        }
+        if (!removeItemFlag) {
+            delete items['.remove-item'];
+            delete items['.move-item'];
+        }
+    }
+
     return items;
 };
 

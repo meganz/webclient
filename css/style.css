@@ -27437,6 +27437,9 @@ opacity: 1;
     color: #333333;
     cursor: default;
 }
+.user-management-account-settings .settings-menu-bar .settings-menu-item.suba-setting-inv.selected {
+    cursor: pointer;
+}
 
 .user-management-account-settings .settings-menu-bar .settings-menu-item.selected::after {
     content: " ";

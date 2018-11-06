@@ -591,10 +591,13 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                 return false;
             }
             else {
+                closeDialog();
+                loadingDialog.pshow();
                 var business = new BusinessAccount();
 
                 var failureAction = function (st, res, desc) {
-                    closeDialog();
+                    
+                    loadingDialog.phide();
                     var msg = l[17920]; // not valid password
                     if (res) {
                         msg = l[1290]; // not valid link
@@ -619,6 +622,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                             failureAction(1, res, 'uv2 not complete response');
                         }
                         else {
+                            loadingDialog.phide();
                             if (u_type === false) {
                                 res.signupcode = decryptedTokenBase64;
                                 localStorage.businessSubAc = JSON.stringify(res);
@@ -628,7 +632,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                                 var msgTxt = l[18795];
                                 // 'You are currently logged in. ' +
                                 //  'Would you like to log out and proceed with business account registration ? ';
-                                closeDialog();
+                                // closeDialog();
                                 msgDialog('confirmation', l[968], msgTxt, '', function (e) {
                                     if (e) {
                                         mLogout();
@@ -1469,7 +1473,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
             }
             else if ($me.hasClass('suba-setting-inv')) {
                 $me.addClass('selected');
-                if ($invoiceContainer.hasClass('hidden')) {
+                if ($invoiceContainer.hasClass('hidden') || $('.invoice-list', $invoiceContainer).hasClass('hidden')) {
                     mySelf.viewBusinessInvoicesPage();
                 }
             }
@@ -1875,7 +1879,14 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         // billed-to details
         $invoiceDetailContainer.find('.billed-name').text(invoiceDetail.u.cname);
         $invoiceDetailContainer.find('.billed-email').text(invoiceDetail.u.e);
-        $invoiceDetailContainer.find('.billed-address').text(invoiceDetail.u.addr.join(', '));
+
+        var validAddressSentFromApi = [];
+        for (var ad = 0; ad < invoiceDetail.u.addr.length; ad++) {
+            if (invoiceDetail.u.addr[ad]) {
+                validAddressSentFromApi.push(invoiceDetail.u.addr[ad]);
+            }
+        }
+        $invoiceDetailContainer.find('.billed-address').text(validAddressSentFromApi.join(', '));
         $invoiceDetailContainer.find('.billed-country').text(invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]);
         $invoiceDetailContainer.find('.billed-vat').addClass('hidden');
         if (invoiceDetail.u.taxnum) {
@@ -1895,17 +1906,19 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             var $invItem = $invItemContentTemplate.clone(true);
             $invItem.find('.inv-pay-date').text((new Date(invoiceDetail.items[k].ts * 1000).toLocaleDateString()));
             $invItem.find('.inv-pay-desc').text(invoiceDetail.items[k].d);
-            $invItem.find('.inv-pay-amou').text(invoiceDetail.items[k].gross);
+            $invItem.find('.inv-pay-amou').text(new Number(invoiceDetail.items[k].gross).toFixed(2));
             $invItem.insertAfter($invItemHeader);
             taxSum += invoiceDetail.items[k].tax;
         }
 
         if (invoiceDetail.u.taxnum) {
             $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')
-                .text(invoiceDetail.u.taxnum[0] + ': ' + invoiceDetail.taxrate.toFixed(2) + '%');
+                .text(invoiceDetail.u.taxnum[0] + ': ' + new Number(invoiceDetail.taxrate).toFixed(2) + '%');
         }
-        $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val').text('€' + taxSum);
-        $invoiceItemsContainer.find('.inv-payment-price.inv-li-total .inv-total-val').text('€' + invoiceDetail.tot);
+        $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')
+            .text('€' + new Number(taxSum).toFixed(2));
+        $invoiceItemsContainer.find('.inv-payment-price.inv-li-total .inv-total-val')
+            .text('€' + new Number(invoiceDetail.tot).toFixed(2));
 
         // receipt top right items
         if (invoiceDetail.rnum) {
@@ -1933,7 +1946,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         myPage = myPage.replace('{2VATNB}', invoiceDetail.mega.taxnum[1]);
                         myPage = myPage.replace('{3CompanyName}', invoiceDetail.u.cname);
                         myPage = myPage.replace('{4CompanyEmail}', invoiceDetail.u.e);
-                        myPage = myPage.replace('{5CompanyAddress}', invoiceDetail.u.addr.join(', '));
+                        myPage = myPage.replace('{5CompanyAddress}', validAddressSentFromApi.join(', '));
                         myPage = myPage.replace('{6CompanyCountry}', invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]);
                         var cVat = '---';
                         if (invoiceDetail.u.taxnum && invoiceDetail.u.taxnum[1]) {
@@ -1950,10 +1963,10 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         }
                         myPage = myPage.replace('{8itemDate}', itemDate);
                         myPage = myPage.replace('{9itemDesc}', itemDec);
-                        myPage = myPage.replace('{10itemAmount}', itemAmount);
+                        myPage = myPage.replace('{10itemAmount}', new Number(itemAmount).toFixed(2));
 
                         myPage = myPage.replace('{11itemVat}', $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent);
-                        myPage = myPage.replace('{12totalCost}', '€' + invoiceDetail.tot);
+                        myPage = myPage.replace('{12totalCost}', '€' + new Number(invoiceDetail.tot).toFixed(2));
 
                         var pdfPrintIframe = document.getElementById('invoicePdfPrinter');
                         var newPdfPrintIframe = document.createElement('iframe');

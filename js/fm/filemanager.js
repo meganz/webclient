@@ -503,6 +503,7 @@ FileManager.prototype.initFileManagerUI = function() {
         $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
+        $('.data-block-view .file-settings-icon').removeClass('active');
 
         // Set to default
         a = $('.dropdown.body.files-menu,.dropdown.body.download');

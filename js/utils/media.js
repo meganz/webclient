@@ -1399,7 +1399,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (eid === 99684 && node.s > 41943040) {
                 eid = 99685;
             }
-            else if (eid === 99712 && node.s > 314572800) {
+            else if (eid === 99712 && node.s > 134217728) {
                 eid = 99713;
             }
 

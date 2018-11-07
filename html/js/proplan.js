@@ -600,7 +600,7 @@ function showRegisterDialog() {
             if (skipConfirmationStep) {
                 closeDialog();
                 if (!gotLoggedIn) {
-                    localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
+                    security.register.cacheRegistrationData(registerData);
                 }
 
                 // Find the plan they clicked on before the login/register prompt popped up

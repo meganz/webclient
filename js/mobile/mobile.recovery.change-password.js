@@ -55,8 +55,8 @@ mobile.recovery.changePassword = {
         $updateButton.off('tap').on('tap', function() {
 
             // Get the current text field values
-            var password = $.trim($passwordField.val());
-            var confirmPassword = $.trim($confirmPasswordField.val());
+            var password = $passwordField.val();
+            var confirmPassword = $confirmPasswordField.val();
 
             // If the fields are not completed, the button should not do anything and looks disabled anyway
             if (password.length < 1 || confirmPassword.length < 1) {

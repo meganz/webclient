@@ -130,7 +130,7 @@ function registeraccount() {
 
     'use strict';
 
-    rv.password = $.trim($('#register-password-registerpage2').val());
+    rv.password = $('#register-password-registerpage2').val();
     rv.first = $.trim($('#register-firstname-registerpage2').val());
     rv.last = $.trim($('#register-lastname-registerpage2').val());
     rv.email = $.trim($('#register-email-registerpage2').val());
@@ -200,7 +200,7 @@ function continueOldRegistration(result) {
         ops.name2 = base64urlencode(to8(rv.name));
         u_attr.terms = 1;
 
-        localStorage.awaitingConfirmationAccount = JSON.stringify(rv);
+        security.register.cacheRegistrationData(rv);
 
         if (mega.affid) {
             ops.aff = mega.affid;
@@ -236,7 +236,8 @@ function continueNewRegistration(result) {
         mega.ui.sendSignupLinkDialog(rv);
 
         u_attr.terms = 1;
-        localStorage.awaitingConfirmationAccount = JSON.stringify(rv);
+
+        security.register.cacheRegistrationData(rv);
     }
     else if (result === EACCESS || result === EEXIST) {
         loginFromEphemeral.init();
@@ -265,14 +266,8 @@ function pageregister() {
     var firstName = $.trim($firstName.val());
     var lastName = $.trim($lastName.val());
     var email = $.trim($email.val());
-    var password = $.trim($password.val());
-    var confirmPassword = $.trim($confirmPassword.val());
-
-    // Check that the estimator library is initialised
-    if (typeof zxcvbn === 'undefined') {
-        msgDialog('warninga', l[135], l[1115] + '<br>' + l[1116]);
-        return false;
-    }
+    var password = $password.val();
+    var confirmPassword = $confirmPassword.val();
 
     // Check if the entered passwords are valid or strong enough
     var passwordValidationResult = security.isValidPassword(password, confirmPassword);

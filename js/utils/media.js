@@ -1207,7 +1207,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $playpause.off();
             $volumeBar.off();
             clearTimeout(timer);
-            videoElement.style.filter = 'none';
+            if (videoElement) {
+                videoElement.style.filter = 'none';
+            }
             window.removeEventListener('keydown', videoKeyboardHandler, true);
             $wrapper.removeClass('mouse-idle video-theatre-mode video')
                 .off('is-over-quota').find('.viewer-pending').addClass('hidden');

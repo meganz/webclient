@@ -481,7 +481,7 @@
                 M.currentrootid === 'ipc' || // IPC
                 M.currentrootid === 'opc' || // OPC
                 M.currentrootid === M.RubbishID || // Rubbish bin
-                M.currentrootid === undefined // Dashboard and Settings pages
+                (M.currentrootid === undefined && M.currentdirid !== 'transfers') // Dashboard and Settings pages
                 )
             )
         ) {

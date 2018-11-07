@@ -1323,8 +1323,7 @@ FileManager.prototype.initContextUI = function() {
             M.labeling($.selected, labelId);
         }
 
-        // refresh page for filter and sort with new label.
-        M.openFolder(M.currentdirid, true);
+        M.labelDomUpdate();
     });
 
     $('.colour-sorting-menu .filter-by .dropdown-colour-item').rebind('click', function(e) {

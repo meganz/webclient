@@ -3637,7 +3637,7 @@ label.iPhoneCheckLabelOff span {
     box-sizing: border-box;
     min-width: 100%;
 }
-.fm-left-menu.dashboard + .nw-tree-panel-header + .fm-tree-panel {
+.fm-left-menu.dashboard + .nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel {
     height: 100%;
 }
 .fm-tree-panel .jspTrack {
@@ -10815,6 +10815,11 @@ table {
     background: -webkit-linear-gradient(top, rgba(245,245,245,0.7) 0%, rgba(245,245,245,1) 100%);
     background: linear-gradient(to bottom, rgba(245,245,245,0.7) 0%, rgba(245,245,245,1) 100%);
 }
+
+.content-panel.dashboard * {
+   font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+
 .account.user-data-block {
     position: relative;
     padding: 60px 20px 16px 20px;
@@ -11417,6 +11422,25 @@ table {
 .dashboard .account.user-data-block {
     padding: 60px 20px 0 20px;
 }
+.default-green-button.upgrade-account {
+    display: inline-block;
+    font-size: 15px;
+    margin: 24px 0;
+    white-space: normal;
+    height: auto;
+    min-height: 32px;
+    line-height: 1.2;
+    padding: 6px 15px;
+}
+.default-white-button.backup-master-key {
+    display: inline-block;
+    font-size: 15px;
+    margin: 12px 0 0 0;
+    min-width: 140px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
 .account.left-pane.info-block {
     padding: 17px 25px 24px 25px;
 }
@@ -11429,26 +11453,20 @@ table {
 }
 .account.left-pane.info-txt {
     padding: 9px 0 12px 0;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 18px;
-    color: #333333;
+    color: #888;
+    text-align: center;
 }
 .account.left-pane.header {
-    padding: 0 0 0 0;
-    font-size: 14px;
-    line-height: 32px;
-    text-transform: uppercase;
-    color: #999999;
-    white-space: nowrap;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-}
-.account.left-pane.big-txt {
-    padding: 3px 0 13px 0;
-    font-size: 18px;
-    line-height: 31px;
-    color: #333333;
+    width: 100%;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    line-height: 18px;
+    margin:8px 0 16px 0;
+    text-transform: capitalize;
     white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
@@ -11478,20 +11496,36 @@ table {
     text-overflow: ellipsis;
     display: block;
 }
-.account.left-pane.big-txt span {
-    color: #777777;
-    padding-left: 5px;
-}
 .account.left-pane.small-txt {
-    color: #777777;
+    display: inline-block;
     font-size: 14px;
-    line-height: 16px;
-    margin: 0 0 -6px 0;
-    text-transform: uppercase;
-    white-space: nowrap;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 20px;
+    text-align: left;
+    white-space: normal;
+    text-transform: capitalize;
+    overflow: visible;
+    vertical-align: top;
     text-overflow: ellipsis;
+}
+.account.left-pane.big-txt {
+    display: inline-block;
+    font-size: 14px;
+    color: #999;
+    height: 24px;
+    margin-bottom: 4px;
+    line-height: 20px;
+    white-space: normal;
+    text-transform: capitalize;
+    padding: 0;
+    vertical-align: top;
+    float: right;
+    text-align: right;
+}
+.small-left-panel .account.left-pane.small-txt, .small-left-panel .account.left-pane.big-txt {
+    text-align: center;
+    width: 100%;
 }
 .account.widget .fm-account-blocks {
     padding-top: 10px;

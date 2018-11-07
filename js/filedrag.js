@@ -151,7 +151,7 @@
             return;
         }
         e.stopPropagation();
-        if ((page !== 'start' && !is_fm()) || slideshowid || !$('.feedback-dialog').hasClass('hidden')) {
+        if (!isFileDragAllowed()) {
             return;
         }
         if (localStorage.d > 1) {
@@ -170,7 +170,7 @@
             console.log('DragOver');
         }
         e.preventDefault();
-        if ((page !== 'start' && !is_fm()) || slideshowid || !$('.feedback-dialog').hasClass('hidden')) {
+        if (!isFileDragAllowed()) {
             return;
         }
         e.stopPropagation();
@@ -282,7 +282,7 @@
             return;
         }
         e.stopPropagation();
-        if ((page !== 'start' && !is_fm()) || slideshowid || !$('.feedback-dialog').hasClass('hidden')) {
+        if (!isFileDragAllowed()) {
             return;
         }
         if (localStorage.d > 1) {
@@ -308,7 +308,7 @@
         if (e.stopPropagation) {
             e.stopPropagation();
         }
-        if ((page !== 'start' && !is_fm()) || slideshowid || !$('.feedback-dialog').hasClass('hidden')) {
+        if (!isFileDragAllowed()) {
             return;
         }
         
@@ -465,6 +465,29 @@
             e.preventDefault();
             return false;
         }
+    }
+
+    /**
+     * Check current page is allowed on drag and drop to upload file
+     *
+     * @return {Boolean} Is allowed or not
+     */
+    function isFileDragAllowed() {
+        if ((page !== 'start' && !is_fm()) || // If page is not fm, only start page is allowed
+            (is_fm() && // if page is fm,
+                (slideshowid || !$('.feedback-dialog').hasClass('hidden') || // preview and feedback dialog show
+                M.currentdirid === 'shares' || // Share root page
+                M.currentrootid === 'contacts' || // Contacts pages
+                M.currentrootid === 'ipc' || // IPC
+                M.currentrootid === 'opc' || // OPC
+                M.currentrootid === M.RubbishID || // Rubbish bin
+                (M.currentrootid === undefined && M.currentdirid !== 'transfers') // Dashboard and Settings pages
+                )
+            )
+        ) {
+            return false;
+        }
+        return true;
     }
 
     // initialize

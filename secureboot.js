@@ -662,7 +662,7 @@ var languages = {
     'pl': [['pl'], 'Polish', 'Polski'],
     'ro': [['ro', 'ro-'], 'Romanian', 'Română'],
     'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
-    'th': [['||'], 'Thai', 'ภาษาไทย'],
+    'th': [['||'], 'Thai', 'ไทย'],
     'tl': [['en-ph'], 'Tagalog', 'Tagalog'],
     'tr': [['tr', 'tr-'], 'Turkish', 'Türkçe'],
     'uk': [['||'], 'Ukrainian', 'Українська'],

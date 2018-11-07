@@ -751,6 +751,14 @@ FileManager.prototype.initFileManagerUI = function() {
         else {
             $('.left-pane-drag-handle').css('cursor', 'we-resize')
         }
+
+        if ($('.account.left-pane.header').width() < $.leftPaneResizable.options.updateWidth) {
+            $(this.element).addClass('small-left-panel');
+        }
+        else {
+            $(this.element).removeClass('small-left-panel');
+        }
+
         $(window).trigger('resize');
     });
 
@@ -1323,8 +1331,7 @@ FileManager.prototype.initContextUI = function() {
             M.labeling($.selected, labelId);
         }
 
-        // refresh page for filter and sort with new label.
-        M.openFolder(M.currentdirid, true);
+        M.labelDomUpdate();
     });
 
     $('.colour-sorting-menu .filter-by .dropdown-colour-item').rebind('click', function(e) {
@@ -2609,7 +2616,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
     }
 
-    $('.fm-blocks-view, .shared-blocks-view, .fm-empty-cloud, .fm-empty-folder')
+    $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder')
         .rebind('contextmenu.fm', function(e) {
             $(this).find('.data-block-view').removeClass('ui-selected');
             // is this required? don't we have a support for a multi-selection context menu?

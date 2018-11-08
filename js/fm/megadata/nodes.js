@@ -959,6 +959,10 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
             mega.megadrop.preMoveCheck(n, t).done(function(n, t) {
                 fileconflict.check(n, t, 'move')
                     .always(function(files) {
+                        if (files.length === 0) { // user refuse to move all file.
+                            promise.reject(EBLOCKED);
+                            return false;
+                        }
                         if (!quiet) { // closing conflict dialogs is hiding the loading
                             loadingDialog.phide(); // making sure it's not visible.
                             loadingDialog.pshow();
@@ -1155,7 +1159,6 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
     var masterPromise = new MegaPromise();
 
     handles = handles || [];
-
     if (!Array.isArray(handles)) {
         handles = [handles];
     }

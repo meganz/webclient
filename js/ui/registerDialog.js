@@ -139,9 +139,9 @@
         var registeraccount = function() {
 
             rv.password = $('#register-password', $dialog).val();
-            rv.first = $('#register-firstname', $dialog).val();
-            rv.last = $('#register-lastname', $dialog).val();
-            rv.email = $('#register-email', $dialog).val();
+            rv.first = $.trim($('#register-firstname', $dialog).val());
+            rv.last = $.trim($('#register-lastname', $dialog).val());
+            rv.email = $.trim($('#register-email', $dialog).val());
             rv.name = rv.first + ' ' + rv.last;
 
             // Set a flag that the registration came from the Pro page
@@ -169,14 +169,8 @@
         var firstName = $.trim($firstName.val());
         var lastName = $.trim($lastName.val());
         var email = $.trim($email.val());
-        var password = $.trim($password.val());
-        var confirmPassword = $.trim($confirmPassword.val());
-
-        // Check that the estimator library is initialised
-        if (typeof zxcvbn === 'undefined') {
-            msgDialog('warninga', l[135], l[1115] + '<br>' + l[1116]);
-            return false;
-        }
+        var password = $password.val();
+        var confirmPassword = $confirmPassword.val();
 
         // Check if the entered passwords are valid or strong enough
         var passwordValidationResult = security.isValidPassword(password, confirmPassword);
@@ -434,7 +428,7 @@
 
             // If the new registration method is enabled, re-send the signup link using the new method
             if (security.register.newRegistrationEnabled()) {
-                security.register.repeatSendSignupLink(newEmail, ctx.callback);
+                security.register.repeatSendSignupLink(accountData.first, accountData.last, newEmail, ctx.callback);
             }
             else {
                 // Otherwise use the old method

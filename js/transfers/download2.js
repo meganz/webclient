@@ -1577,7 +1577,7 @@ var dlmanager = {
                     api_req({a: 'log', e: 99649, m: 'on overquota logged-in through register dialog.'});
                 }
                 else {
-                    localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
+                    security.register.cacheRegistrationData(accountData);
                     mega.ui.sendSignupLinkDialog(accountData);
 
                     api_req({a: 'log', e: 99650, m: 'on overquota account created.'});
@@ -1606,7 +1606,7 @@ var dlmanager = {
                     dlmanager._onOverquotaDispatchRetry($dialog);
                 }
                 else {
-                    localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
+                    security.register.cacheRegistrationData(accountData);
                     mega.ui.sendSignupLinkDialog(accountData);
                 }
             },

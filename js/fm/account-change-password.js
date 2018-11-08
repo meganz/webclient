@@ -88,8 +88,8 @@ var accountChangePassword = {
         $changePasswordButton.rebind('click', function() {
 
             // Trim the whitespace from the passwords
-            var password = $.trim($newPasswordField.val());
-            var confirmPassword = $.trim($newPasswordConfirmField.val());
+            var password = $newPasswordField.val();
+            var confirmPassword = $newPasswordConfirmField.val();
 
             // Check if the entered passwords are valid or strong enough
             var passwordValidationResult = security.isValidPassword(password, confirmPassword);

@@ -145,8 +145,8 @@ mobile.register = {
             var firstName = $.trim($firstNameField.val());
             var lastName = $.trim($lastNameField.val());
             var email = $.trim($emailField.val());
-            var password = $.trim($passwordField.val());
-            var confirmPassword = $.trim($confirmPasswordField.val());
+            var password = $passwordField.val();
+            var confirmPassword = $confirmPasswordField.val();
 
             // If the fields are not completed, the button should not do anything and looks disabled anyway
             if (firstName.length < 1 || lastName.length < 1 || email.length < 1 ||
@@ -228,9 +228,6 @@ mobile.register = {
         var $changeEmailInput = $confirmScreen.find('.change-email input');
         var $resendButton = $confirmScreen.find('.resend-button');
 
-        // If the flag has been set to use the new registration method
-        var method = (security.register.newRegistrationEnabled()) ? 'new' : 'old';
-
         // Hide the current register screen and show the confirmation one
         $registerScreen.addClass('hidden');
         $confirmScreen.removeClass('hidden');
@@ -242,9 +239,7 @@ mobile.register = {
         mobile.register.initConfirmEmailScreenKeyup($changeEmailInput, $resendButton);
 
         // Initialise the Resend button
-        mobile.register[method].initConfirmEmailScreenResendButton(
-            $changeEmailInput, $resendButton, registrationVars
-        );
+        mobile.register.initConfirmEmailScreenResendButton($changeEmailInput, $resendButton, registrationVars);
     },
 
     /**
@@ -276,6 +271,45 @@ mobile.register = {
                 // Grey it out if they have not completed one of the fields
                 $resendButton.removeClass('active');
             }
+        });
+    },
+
+    /**
+     * Initialises the Resend button on the email confirmation screen to send the confirmation link again
+     * Uses the old registration process. ToDo: Remove in future when old registrations are no longer used.
+     * @param {Object} $changeEmailInput jQuery selector for the email input
+     * @param {Object} $resendButton jQuery selector for the Resend button
+     * @param {Object} registrationVars The registration form variables i.e. name, email etc
+     */
+    initConfirmEmailScreenResendButton: function($changeEmailInput, $resendButton, registrationVars) {
+
+        'use strict';
+
+        // Add click/tap handler to resend button
+        $resendButton.off('tap').on('tap', function() {
+
+            // Make sure the button is enabled
+            if (!$resendButton.hasClass('active')) {
+                return false;
+            }
+
+            // If the flag has been set to use the new registration method
+            var method = (security.register.newRegistrationEnabled()) ? 'new' : 'old';
+
+            // Update the email to the new email address
+            registrationVars.email = $.trim($changeEmailInput.val());
+
+            // Show the loading dialog
+            loadingDialog.show();
+
+            // Resend the email to the new address
+            mobile.register[method].processResendEmail(registrationVars);
+
+            // Only let them send once (until they change email again)
+            $resendButton.removeClass('active');
+
+            // Prevent double taps
+            return false;
         });
     },
 
@@ -409,7 +443,8 @@ mobile.register.old = {
                     };
 
                     u_attr.terms = 1;
-                    localStorage.awaitingConfirmationAccount = JSON.stringify(registrationVars);
+
+                    security.register.cacheRegistrationData(registrationVars);
 
                     if (mega.affid) {
                         ops.aff = mega.affid;
@@ -453,71 +488,46 @@ mobile.register.old = {
     /**
      * Initialises the Resend button on the email confirmation screen to send the confirmation link again
      * Uses the old registration process. ToDo: Remove in future when old registrations are no longer used.
-     * @param {Object} $changeEmailInput jQuery selector for the email input
-     * @param {Object} $resendButton jQuery selector for the Resend button
      * @param {Object} registrationVars The registration form variables i.e. name, email etc
      */
-    initConfirmEmailScreenResendButton: function($changeEmailInput, $resendButton, registrationVars) {
+    processResendEmail: function(registrationVars) {
 
         'use strict';
 
-        // Add click/tap handler to resend button
-        $resendButton.off('tap').on('tap', function() {
+        // Send the confirmation email
+        sendsignuplink(registrationVars.name, registrationVars.email, registrationVars.password, {
+            callback: function(result) {
 
-            // Make sure the button is enabled
-            if (!$resendButton.hasClass('active')) {
-                return false;
-            }
+                loadingDialog.hide();
 
-            // Update the email to the new email address
-            registrationVars.email = $.trim($changeEmailInput.val());
+                // If successful result
+                if (result === 0) {
+                    var ops = {
+                        a: 'up',
+                        terms: 'Mq',
+                        firstname: base64urlencode(to8(registrationVars.first)),
+                        lastname: base64urlencode(to8(registrationVars.last)),
+                        name2: base64urlencode(to8(registrationVars.name))
+                    };
 
-            // Show the loading dialog
-            loadingDialog.show();
+                    u_attr.terms = 1;
 
-            // Setup subsequent API request
-            var context = {
-                callback: function(result) {
+                    security.register.cacheRegistrationData(registrationVars);
 
-                    loadingDialog.hide();
-
-                    // If successful result
-                    if (result === 0) {
-                        var ops = {
-                            a: 'up',
-                            terms: 'Mq',
-                            firstname: base64urlencode(to8(registrationVars.first)),
-                            lastname: base64urlencode(to8(registrationVars.last)),
-                            name2: base64urlencode(to8(registrationVars.name))
-                        };
-
-                        u_attr.terms = 1;
-                        localStorage.awaitingConfirmationAccount = JSON.stringify(registrationVars);
-
-                        if (mega.affid) {
-                            ops.aff = mega.affid;
-                        }
-
-                        api_req(ops);
-
-                        // Show a dialog success
-                        mobile.messageOverlay.show(l[16351]);     // The email was sent successfully.
+                    if (mega.affid) {
+                        ops.aff = mega.affid;
                     }
-                    else {
-                        // Show an error
-                        mobile.messageOverlay.show(l[47]);     // Oops, something went wrong. Sorry about that!
-                    }
+
+                    api_req(ops);
+
+                    // Show a dialog success
+                    mobile.messageOverlay.show(l[16351]);     // The email was sent successfully.
                 }
-            };
-
-            // Send the confirmation email
-            sendsignuplink(registrationVars.name, registrationVars.email, registrationVars.password, context);
-
-            // Only let them send once (until they change email again)
-            $resendButton.removeClass('active');
-
-            // Prevent double taps
-            return false;
+                else {
+                    // Show an error
+                    mobile.messageOverlay.show(l[47]);     // Oops, something went wrong. Sorry about that!
+                }
+            }
         });
     }
 };
@@ -554,30 +564,19 @@ mobile.register.new = {
     /**
      * Initialises the Resend button on the email confirmation screen to send the confirmation link again
      * Uses the new improved registration process.
-     * @param {Object} $changeEmailInput jQuery selector for the email input
-     * @param {Object} $resendButton jQuery selector for the Resend button
+     * @param {Object} registrationVars The registration form variables i.e. name, email etc
      */
-    initConfirmEmailScreenResendButton: function($changeEmailInput, $resendButton) {
+    processResendEmail: function(registrationVars) {
 
         'use strict';
 
-        // Add click/tap handler to resend button
-        $resendButton.off('tap').on('tap', function() {
-
-            // Make sure the button is enabled
-            if (!$resendButton.hasClass('active')) {
-                return false;
-            }
-
-            // Get the new email address entered by the user
-            var newEmail = $.trim($changeEmailInput.val());
-
-            // Re-send signup link email
-            security.register.repeatSendSignupLink(
-                newEmail,
-                mobile.register.new.completeRegistration    // Complete callback
-            );
-        });
+        // Re-send signup link email
+        security.register.repeatSendSignupLink(
+            registrationVars.first,
+            registrationVars.last,
+            registrationVars.email,
+            mobile.register.new.completeRegistration    // Complete callback
+        );
     },
 
     /**
@@ -603,7 +602,8 @@ mobile.register.new = {
         if (result === 0) {
 
             u_attr.terms = 1;
-            localStorage.awaitingConfirmationAccount = JSON.stringify(registrationVars);
+
+            security.register.cacheRegistrationData(registrationVars);
 
             // Try getting the plan number they selected on Pro page
             var planNum = localStorage.getItem('proPageContinuePlanNum');

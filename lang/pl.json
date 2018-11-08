@@ -2938,7 +2938,7 @@
     "19819": "Ze wzgl\u0119du na nasz kompleksowy paradygmat szyfrowania nie b\u0119dziesz mie\u0107 dost\u0119pu do swoich danych bez has\u0142a i dost\u0119pu do aplikacji Authenticator lub kopii zapasowej klucza odzyskiwania.",
     "19820": "Nie, chc\u0119 zaparkowa\u0107 i zacz\u0105\u0107 od nowa.",
     "19821": "\u015awietny! Masz aktywn\u0105 sesj\u0119.[BR]Kolejnym krokiem jest pobranie klucza odzyskiwania.",
-    "19822": "Wybierz urz\u0105dzenie z aktywn\u0105 sesj\u0105, aby wy\u015bwietli\u0107 instrukcje pobierania klucza odzyskiwania.",
+    "19822": "Wybierz klienta z aktywn\u0105 sesj\u0105, aby wy\u015bwietli\u0107 instrukcje pobierania klucza odzyskiwania.",
     "19823": "Mo\u017cesz \u0142atwo odzyska\u0107 swoje konto",
     "19824": "Podaj sw\u00f3j adres e-mail poni\u017cej. Otrzymasz link do odzyskiwania, kt\u00f3ry pozwoli Ci przes\u0142a\u0107 klucz odzyskiwania i zresetowa\u0107 konto",
     "19825": "Poprzedni krok",
@@ -2957,8 +2957,8 @@
     "19838": "Otworzy\u0142em mega.nz we wszystkich przegl\u0105darkach na komputerach, kt\u00f3rych u\u017cywam do sprawdzenia, czy moje konto jest tam zalogowane.",
     "19839": "Sprawdzi\u0142em wszystkie moje komputery w aplikacji MEGA.",
     "19840": "Kiedy masz klucz odzyskiwania, [A]kontynuuj resetowanie konta[\/A].",
-    "19841": "Zaparkuj swoje konto i uruchom nowe przy u\u017cyciu istniej\u0105cego adresu e-mail.",
-    "19842": "Niestety, ze wzgl\u0119du na stosowanie przez MEGA silnej kryptografii, utrata klucza odzyskiwania powoduje, \u017ce wszystkie dane s\u0105 nieczytelne. Je\u015bli przejdziesz dalej, uruchomisz nowe konto pod istniej\u0105cym adresem e-mail.",
+    "19841": "Zaparkuj swoje konto i rozpocznij nowe puste przy u\u017cyciu istniej\u0105cego adresu e-mail.",
+    "19842": "Niestety, ze wzgl\u0119du na stosowanie przez MEGA silnej kryptografii, utrata klucza odzyskiwania powoduje, \u017ce wszystkie dane s\u0105 nieczytelne. Je\u015bli kontynuujesz, uruchomisz nowe puste konto pod swoim dotychczasowym adresem e-mail.",
     "19843": "Twoje stare konto pozostanie zaparkowane przez co najmniej 60 dni i mo\u017cna je odzyska\u0107, kontaktuj\u0105c si\u0119 z [A]support@mega.nz [\/A], je\u015bli nadal pami\u0119tasz swoje has\u0142o.",
     "19844": "Wymagania dotycz\u0105ce has\u0142a",
     "19845": "Co najmniej 8 znak\u00f3w",
@@ -2971,5 +2971,7 @@
     "19852": "Masz w\u0142\u0105czon\u0105 obs\u0142ug\u0119 2FA i utraci\u0142e\u015b swoje urz\u0105dzenie uwierzytelniaj\u0105ce!",
     "19853": "Nie b\u0119dziesz m\u00f3g\u0142 si\u0119 zalogowa\u0107, zmieni\u0107 adresu e-mail, zmieni\u0107 has\u0142a ani wy\u0142\u0105czy\u0107 us\u0142ugi 2FA.",
     "19854": "Nie martw si\u0119, mo\u017cesz zresetowa\u0107 konto za pomoc\u0105 klucza odzyskiwania. Spowoduje to wy\u0142\u0105czenie 2FA i umo\u017cliwi zalogowanie si\u0119 i zmian\u0119 ustawie\u0144 konta. [B]Nie utracisz \u017cadnych plik\u00f3w, kontakt\u00f3w ani wiadomo\u015bci[\/B].",
-    "19855": "Whitespace at the start or end of the password is not permitted."
+    "19855": "Spacja na pocz\u0105tku lub ko\u0144cu has\u0142a jest nie dozwolona.",
+    "19856": "Interact with MEGA",
+    "19857": "Double click to access a file or open a folder. [BR] Right click to see all available options."
 }

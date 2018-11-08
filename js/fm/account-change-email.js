@@ -66,7 +66,7 @@ var accountChangeEmail = {
             var newEmail = $.trim(newEmailRaw).toLowerCase();
 
             // If not a valid email, show an error
-            if (checkMail(newEmail)) {
+            if (!isValidEmail(newEmail)) {
                 msgDialog('warninga', l[135], l[1513]);
                 return false;
             }

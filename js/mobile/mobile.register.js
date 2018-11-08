@@ -67,7 +67,7 @@ mobile.register = {
             var confirmPassword = $confirmPasswordField.val();
 
             // when email was incorrect and it updated as correct, remove incorrect class with keyup
-            if ($emailField.parent().hasClass('incorrect') && !checkMail(email)) {
+            if ($emailField.parent().hasClass('incorrect') && isValidEmail(email)) {
                 $emailField.parent().removeClass('incorrect');
             }
 
@@ -107,7 +107,7 @@ mobile.register = {
             var email = $emailField.val();
 
             // If invalid email, deactivate register button, show toast and add red border to field
-            if (checkMail(email)) {
+            if (!isValidEmail(email)) {
                 $emailField.parent().addClass('incorrect');
                 $registerButton.removeClass('active');
                 mobile.showToast(l[1101]);
@@ -156,7 +156,7 @@ mobile.register = {
             }
 
             // If email is incorrect make button invalid and show toast message.
-            if (checkMail(email)) {
+            if (!isValidEmail(email)) {
                 if (!$emailField.parent().hasClass('incorrect')) {
                     mobile.showToast(l[1101]);
                 }
@@ -257,7 +257,7 @@ mobile.register = {
             var email = $(this).val();
 
             // Change the button to red if the email is valid
-            if (!checkMail(email)) {
+            if (isValidEmail(email)) {
 
                 // Activate the resend button
                 $resendButton.addClass('active');

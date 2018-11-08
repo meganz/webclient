@@ -233,7 +233,7 @@ function pagelogin() {
     var $password = $passwordContainer.find('input');
     
     var e = $email.val();
-    if (e === '' || checkMail(e)) {
+    if (e === '' || !isValidEmail(e)) {
         $emailContainer.addClass('incorrect');
         $email.focus();
     }

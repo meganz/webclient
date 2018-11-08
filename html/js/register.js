@@ -289,7 +289,7 @@ function pageregister() {
         err = 1;
     }
 
-    if (email === '' || checkMail(email)) {
+    if (email === '' || !isValidEmail(email)) {
         $email.parent().addClass('incorrect');
         $email.parent().find('.account.input-tooltip')
             .safeHTML(l[1100] + '<br>' + l[1101]);

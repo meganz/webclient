@@ -101,7 +101,7 @@
 }
 
 .bus-reg-input.num {
-	width: 60%;
+	width: 100%;
 }
 
 .bus-reg-icon {
@@ -139,9 +139,9 @@
 
 .bus-reg-input input {
 	border: none;
-	width: -webkit-calc(100% - 50px);
-    width: -moz-calc(100% - 50px);
-    width: calc(100% - 50px);
+	width: -webkit-calc(100% - 60px);
+    width: -moz-calc(100% - 60px);
+    width: calc(100% - 60px);
 	margin-top:30px;
 	line-height: 22px;
 	color: #333;
@@ -167,7 +167,7 @@
 }
 
 .bus-reg-input.num input {
-	width: 100px;
+	width: 80%;
 }
 
 .bus-reg-input.pw-first input {

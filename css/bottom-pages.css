@@ -148,6 +148,11 @@ html.gbot {
     height: -moz-calc(100% - 100px);
     height: calc(100% - 100px);
 }
+body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
+    height: -webkit-calc(100% - 118px);
+    height: -moz-calc(100% - 118px);
+    height: calc(100% - 118px);
+}
 .bottom-page.vertical-centered-bl.active {
     height: 73px;
 }
@@ -403,6 +408,7 @@ html.gbot {
 }
 .inline-block {
     display: inline-block;
+    float: none !important;
     vertical-align: top;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -849,6 +855,10 @@ html.gbot {
     white-space: nowrap;
     position: relative;
 }
+.pages-nav.text-content {
+    display: table;
+    width: 100%;
+}
 .mobile .pages-nav.content-block {
     padding-top: 66px;
 }
@@ -913,6 +923,8 @@ html.gbot {
     display: inline-block;
     position: relative;
     z-index: 2;
+    vertical-align: top;
+    line-height: 0;
 }
 .pages-nav.content {
     display: inline-block;
@@ -1021,14 +1033,29 @@ html.gbot {
 .pages-nav.button-label, .pages-nav.nav-button.active.greyed-out .button-label {
     display: block;
     font-size: 16px;
+    line-height: 16px;
     color: #333;
     display: inline-block;
     text-align: center;
     white-space: nowrap;
 }
+body:not(.en) .pages-nav.content-block .button-label, body:not(.en) .pages-nav.content-block .nav-button.active.greyed-out .button-label {
+    display: table-cell;
+    vertical-align: middle;
+    height: 30px;
+    text-align: center;
+    white-space: normal;
+    width: 100%;
+}
+body:not(.en) .pages-nav.content-block .pages-nav.nav-icon {
+    display: block;
+    margin: 16px auto 3px auto;
+}
+body:not(.en) .pages-nav.content-block  .pages-nav.content {
+    height: 82px;
+}
 .pages-nav.nav-button:not(.disabled):hover .button-label, .pages-nav.nav-button.active .button-label, .pages-nav.nav-button.opened .button-label {
     color: #171A22;
-    font-family: 'source_sans_prosemibold';
 }
 .contrast .pages-nav.button-label {
     font-size: 16px;
@@ -1268,6 +1295,9 @@ height: 56px;
     margin: 0 auto;
     table-layout: fixed;
 }
+.bottom-page.cols-container.horizontal-centered-bl {
+    padding: 0;
+}
 .bottom-page.cols-container.tabs {
     table-layout: auto;
 }
@@ -1386,6 +1416,9 @@ height: 56px;
     background-image: url(../images/mega/pages-sprite_v3.png);
     background-position: 0 -2709px;
 }
+.bottom-page.cols-container .col3.light-bg::before {
+    background-position: -172px -2709px;
+}
 .bottom-page.cols-container .col3:first-child {
     overflow: visible;
 }
@@ -1489,6 +1522,9 @@ height: 56px;
 }
 .bottom-page.dark-txt.bott-pad {
     padding: 14px 0 54px 0;
+}
+.bottom-page.megacmd .inline-block.col-2.cmd-pad:nth-child(6) {
+    display: block;
 }
 .col-2.cmd-pad {
     padding: 58px 65px 7px 0;
@@ -2170,10 +2206,6 @@ height: 56px;
     font-size: 18px;
     line-height: 30px;
 }
-.bottom-page.cols-container .col3.light-bg::before {
-    left: auto;
-    right: -19px;
-}
 .bottom-page.tab-body .button {
     margin-top: 18px;
 }
@@ -2191,6 +2223,13 @@ height: 56px;
     padding-left: 0;
     width: 100%;
     display: block;
+}
+.megacmd .top-bl .top-title {
+    padding-top: 40px;
+}
+.megacmd .cmd-top-img.main {
+    margin-top: 40px;
+    margin-bottom: 40px;
 }
 .mobile .cmd-top-img.main {
     display: block;
@@ -2420,6 +2459,12 @@ height: 56px;
 .browsers.icon.ff {
     background-position: 0 -86px;
 }
+.browsers.icon.palemoon {
+    background-position: -216px -87px;
+}
+.browsers.icon.chrome {
+    background-position: -141px -87px;
+}
 .browsers.icon.megabird {
     background-position: -70px 0px;
 }
@@ -2478,6 +2523,7 @@ height: 56px;
     display: inline-block;
     position: relative;
     padding-bottom: 2px
+    min-width: 240px;
 }
 .browsers.download-txt.long-line {
     padding-right: 20px;
@@ -2868,10 +2914,10 @@ height: 56px;
     margin-right: 36px;
 }
 .bottom-page.top-description {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 24px;
-    color: #666666;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    color: #333;
+    font-family: 'LatoWebLight', 'source_sans_proregular', Arial;
     padding: 100px 0 25px 0;
 }
 .bottom-page.big-link {
@@ -2904,6 +2950,10 @@ height: 56px;
     background-position: -168px -3400px;
     width: 24px;
     height: 22px;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
     transform: rotate(90deg);
 }
 
@@ -3382,6 +3432,9 @@ height: 56px;
     width: auto;
     min-width: 25%;
 }
+body:not(.en) .pages-nav.content-block .nav-button {
+     width: 25%;
+}
 .top-links-block {
     display: none;
 }
@@ -3556,6 +3609,9 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
 }
 }
 @media only screen and (max-width: 495px) {
+.megasync .bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {
+    bottom: -20px;
+}
 .uwp .bottom-page.horizontal-centered-bl.mid-wide {
     padding: 0 28px;
 }
@@ -3629,7 +3685,7 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
     font-size: 16px;
 }
 .uwp .advertise-chat .mobile-apps-button.red:first-of-type {
-    margin-right: 8px 
+    margin-right: 8px
 }
 .uwp .bottom-page.medium-txt.lato {
     line-height: 28px;
@@ -3651,15 +3707,14 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
     padding-top: 88px;
 }
 .cropped-page .col-3 .bottom-page.big-icon, .cropped-page .col-2 .bottom-page.big-icon {
-    display: table-cell
+    display: block;
 }
 .cropped-page .col-3 .bottom-page.big-icon + .small-txt, .cropped-page .col-2 .bottom-page.big-icon + .small-txt{
-    display: table-cell;
-    vertical-align: middle;
-    text-align: left;
+    display: block;
+    vertical-align: center;
+    text-align: middle;
     font-size: 16px;
     line-height: 24px;
-    padding-left: 12px;
 }
 .megasync .bottom-page.img.mobile-view {
 	margin-top: 24px;
@@ -3803,6 +3858,12 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
 .bottom-page.img.ios-top, .bottom-page.img.android-top, .bottom-page.img.wp-top, .bottom-page.img.sync-top, .bottom-page.img.megabird {
     display: none;
 }
+.bottom-page.img.megabird {
+    margin-bottom: 85px;
+}
+.bird .bottom-page.big-header.top-small-pad {
+    padding-top: 40px;
+}
 .bottom-page.top-links.mb {
     padding-bottom: 60px;
 }
@@ -3876,6 +3937,9 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
 
 /* SE Device Size */
 @media only screen and (max-width: 321px) {
+.megasync .bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {
+    bottom: -80px;
+}
 .uwp .bottom-page.horizontal-centered-bl.mid-wide {
     padding: 0 16px;
 }

@@ -22,18 +22,20 @@ mobile.twofactor.verifyDisable = {
         }
 
         // Cache selector
-        mobile.twofactor.verifyDisable.$page = $('.mobile.two-factor-page.verify-disable-page');
+        this.$page = $('.mobile.two-factor-page.verify-disable-page');
 
         // Initialise functionality
-        mobile.twofactor.verifyDisable.initKeyupFunctionality();
-        mobile.twofactor.verifyDisable.initVerifyButton();
-        mobile.twofactor.verifyDisable.initBackButton();
+        this.initKeyupFunctionality();
+        this.initVerifyButton();
+
+        // Initialise back button to go back to the My Account page
+        mobile.initBackButton(this.$page, 'fm/account');
 
         // Show the account page content
-        mobile.twofactor.verifyDisable.$page.removeClass('hidden');
+        this.$page.removeClass('hidden');
 
         // Put the focus in the PIN input field after its visible
-        mobile.twofactor.verifyDisable.$page.find('.two-factor-seed-input input').trigger('focus');
+        this.$page.find('.two-factor-seed-input input').trigger('focus');
     },
 
     /**
@@ -118,22 +120,6 @@ mobile.twofactor.verifyDisable = {
             });
 
             // Prevent double taps
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the back arrow icon in the header to go back to the main My Account page
-     */
-    initBackButton: function() {
-
-        'use strict';
-
-        // On Back click/tap
-        mobile.twofactor.verifyDisable.$page.find('.mobile.fm-icon.back').off('tap').on('tap', function() {
-
-            // Render the Account page again
-            loadSubPage('fm/account/');
             return false;
         });
     }

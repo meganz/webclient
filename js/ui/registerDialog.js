@@ -139,9 +139,9 @@
         var registeraccount = function() {
 
             rv.password = $('#register-password', $dialog).val();
-            rv.first = $('#register-firstname', $dialog).val();
-            rv.last = $('#register-lastname', $dialog).val();
-            rv.email = $('#register-email', $dialog).val();
+            rv.first = $.trim($('#register-firstname', $dialog).val());
+            rv.last = $.trim($('#register-lastname', $dialog).val());
+            rv.email = $.trim($('#register-email', $dialog).val());
             rv.name = rv.first + ' ' + rv.last;
 
             // Set a flag that the registration came from the Pro page
@@ -164,49 +164,35 @@
         var $lastName = $('.input-wrapper.name .l-name', $formWrapper);
         var $email = $('.input-wrapper.email input', $formWrapper);
         var $password = $('.input-wrapper.first input', $formWrapper);
-        var $passwordConfirm = $('.input-wrapper.confirm input', $formWrapper);
+        var $confirmPassword = $('.input-wrapper.confirm input', $formWrapper);
 
         var firstName = $.trim($firstName.val());
         var lastName = $.trim($lastName.val());
         var email = $.trim($email.val());
-        var password = $.trim($password.val());
-        var passwordConfirm = $.trim($passwordConfirm.val());
+        var password = $password.val();
+        var confirmPassword = $confirmPassword.val();
 
-        if (password !== passwordConfirm) {
-            $password.parent().find('.account.password-stutus').removeClass('checked');
+        // Check if the entered passwords are valid or strong enough
+        var passwordValidationResult = security.isValidPassword(password, confirmPassword);
+
+        // If bad result
+        if (passwordValidationResult !== true) {
+
+            // Show error for password field, clear the value and refocus it
+            $password.parent().addClass('incorrect');
+            $password.parent().find('.account.password-status').removeClass('checked');
+            $password.parent().find('.account.input-tooltip').safeHTML(l[1102] + '<br>' + passwordValidationResult);
             $password.val('');
-            $passwordConfirm.val('');
-            $passwordConfirm.parent().addClass('incorrect');
-            $passwordConfirm.focus();
+            $password.focus();
+
+            // Show error for confirm password field and clear the value
+            $confirmPassword.parent().addClass('incorrect');
+            $confirmPassword.val('');
+
             err = 1;
         }
 
-        if (password === '') {
-            $password.parent().addClass('incorrect');
-            $password.focus();
-            $password.parent().find('.account.input-tooltip')
-                .safeHTML(l[1102] + '<br>' + l[213]);
-            err = 1;
-        }
-        else if (password.length < security.minPasswordLength) {
-            $password.parent().addClass('incorrect');
-            $password.focus();
-            $password.parent().find('.account.input-tooltip')
-                .safeHTML(l[1102] + '<br>' + l[18701]);
-            err = 1;
-        }
-        else if (typeof zxcvbn !== 'undefined') {
-            var pw = zxcvbn(password);
-            if (pw.score < 1) {
-                $password.parent().addClass('incorrect');
-                $password.focus();
-                $password.parent().find('.account.input-tooltip')
-                    .safeHTML(l[1102] + '<br>' + l[1104]);
-                err = 1;
-            }
-        }
-
-        if (email === '' || checkMail(email)) {
+        if (email === '' || !isValidEmail(email)) {
             $email.parent().addClass('incorrect');
             $email.focus();
             err = 1;
@@ -218,11 +204,7 @@
             err = 1;
         }
 
-        if (!err && typeof zxcvbn === 'undefined') {
-            msgDialog('warninga', l[135], l[1115] + '<br>' + l[1116]);
-            return false;
-        }
-        else if (!err) {
+        if (!err) {
             if ($('.register-check', $dialog).hasClass('checkboxOff')) {
                 hideOverlay();
                 msgDialog('warninga', l[1117], l[1118]);
@@ -313,7 +295,7 @@
         });
 
         $inputs.val('');
-        $password.parent().find('.password-stutus').removeClass('checked');
+        $password.parent().find('.password-status').removeClass('checked');
 
         // controls
         $('.fm-dialog-close', $dialog).rebind('click.proDialog', function() {
@@ -333,7 +315,7 @@
         });
 
         var registerpwcheck = function() {
-            $('.account.password-stutus', $dialog)
+            $('.account.password-status', $dialog)
                 .removeClass('good1 good2 good3 good4 good5 checked');
 
             var $passwordInput = $('#register-password', $dialog);
@@ -446,7 +428,7 @@
 
             // If the new registration method is enabled, re-send the signup link using the new method
             if (security.register.newRegistrationEnabled()) {
-                security.register.repeatSendSignupLink(newEmail, ctx.callback);
+                security.register.repeatSendSignupLink(accountData.first, accountData.last, newEmail, ctx.callback);
             }
             else {
                 // Otherwise use the old method

@@ -566,19 +566,6 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[A2]', '<a href="/extensions" class="clickurl">').replace('[/A2]', '</a>')
         .replace('[A3]', '<a class="freeupdiskspace">').replace('[/A3]', '</a>');
 
-    // l[] = escapeHTML(l[]).replace('', '');
-
-    // carefully replace various strings to adhere to the new pro quotas:
-    // note: in the future we should make such strings used variables.
-	l[16393] = l[16393].replace('4','8');
-	l[16385] = l[16385].replace('4','8');
-	l[16359] = l[16359].replace('4096','8192').replace('4','8');
-	l[16358] = l[16358].replace('4096','8192').replace('4','8');
-	l[16316] = l[16316].replace('4096','8192').replace('4','8');
-	l[16315] = l[16315].replace('4096','8192').replace('4','8');
-	l[16304] = l[16304].replace('8','16').replace('4096','8192').replace('4','8');
-	l[1367] = l[1367].replace('4','8');
-
     l[17083] = l[17083]
         .replace('[A]', '<a href="https://www.microsoft.com/store/apps/9nbs1gzzk3zg" target="_blank">')
         .replace('[/A]', '</a>');
@@ -593,8 +580,14 @@ mBroadcaster.once('startMega', function populate_l() {
     if (l[17742]) {
         l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     }
-    l[17805] = l[17805].replace('[A]', '<a class="mobile red-email" href="mailto:support@mega.nz">')
+    l[17805] = l[17805].replace('[A]', '<a class="mobile red-email red" href="mailto:support@mega.nz">')
                        .replace('[/A]', '</a>');
+    l[18301] = l[18301].replace(/\[B\]/g, '<b class="megasync-logo">')
+        .replace(/\[\/B\]/g, '</b>').replace(/\(M\)/g, '').replace(/\[LOGO\]/g, '');
+    l[18311] = l[18311].replace(/\[B1\]/g, '<strong class="warning-text">')
+        .replace(/\[\/B1\]/g, '</strong>');
+    l[18312] = l[18312].replace(/\[B\]/g, '<strong class="warning-text">')
+        .replace(/\[\/B\]/g, '</strong>');
 
     l[18446] = l[18446].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     l[18447] = l[18447].replace(/\[A\]/g, '<a href="/terms" class="clickurl">').replace(/\[\/A\]/g, '</a>');
@@ -603,7 +596,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[18465] = l[18465].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
     l[18490] = l[18490].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
     l[18491] = l[18491].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
-
+    l[18638] = l[18638].replace(/\[+[B1-9]+\]/g, '<b>').replace(/\[\/+[B1-9]+\]/g, '</b>');
     l[18787] = l[18787]
         .replace('[A]', '<a href="https://github.com/meganz/MEGAcmd" rel="noreferrer" target="_blank">')
         .replace('[/A]', '</a>');
@@ -616,16 +609,24 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
     l[19514] = l[19514].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>').replace('%1', 2)
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[19628] = l[19628].replace('[A]', '<a href="mailto:copyright@mega.nz">').replace('[/A]', '</a>');
     l[19661] = l[19661].replace('[A]', '<a href="/help/client/megasync/" rel="noreferrer">')
         .replace('[/A]', '</a>');
     l[19685] = l[19685].replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
     l[19691] = l[19691].replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
-    l[19628] = l[19628].replace('[A]', '<a href="mailto:copyright@mega.nz">').replace('[/A]', '</a>');
-
+    l[19834] = l[19834].replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[19835] = l[19835].replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[19840] = l[19840].replace('[A]', '<a class="red toResetLink">').replace('[/A]', '</a>');
+    l[19843] = l[19843].replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[19849] = l[19849].replace('[A]', '<a class="red" href="/recovery">').replace('[/A]', '</a>');
+    l[19851] = l[19851].replace('[B]', '<strong class="warning-text">').replace('[/B]', '</strong>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
-        16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444
+        16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444,
+        18268, 18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296,
+        18297, 18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812,
+        19813, 19814, 19854, 19821
     ];
     for (i = common.length; i--;) {
         var num = common[i];

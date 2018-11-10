@@ -149,14 +149,15 @@
     <!-- File manager footer, showing number of folders/files -->
     <div class="mobile fm-row">
         <div class="mobile fm-content">
-            <div class="mobile alert-banner hidden">
-                <div class="mobile alert-text"><span>Alert!</span></div>
-                <div class="mobile alert-close">
-                    <div class="mobile alert-icon fm-icon close white close-alert-banner"></div>
-                </div>
-
-            </div>
             <div class="mobile fm-scrolling">
+                <div class="mobile alert-banner closed" id="alert-banner">
+                    <div class="mobile alert-text-container">
+                        <div class="alert-text"></div>
+                    </div>
+                    <div class="mobile alert-close">
+                        <div class="mobile alert-icon fm-icon close white close-alert-banner"></div>
+                    </div>
+                </div>
                 <div class="mobile folders-files-text"></div>
 
                 <!-- Template for folders -->
@@ -521,30 +522,30 @@
                 </div>
                 <div class="over-quota-message">[$16136]</div>
             </div>
-            <div class="mobile account-upgrade-block">
+            <div class="mobile button-block account-upgrade-block">
                 <div class="mobile fm-icon credit-card"></div>
                 <div class="mobile account-upgrade-text">[$5814]</div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
-            <div class="mobile account-achievements-block hidden">
+            <div class="mobile button-block account-achievements-block hidden">
                 <div class="mobile fm-icon rocket"></div>
                 <div class="mobile achievements-heading">[$16117]</div>
                 <div class="mobile achievements-text">[$17464]</div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
-            <div class="mobile account-cancel-subscription-block hidden">
+            <div class="mobile button-block account-cancel-subscription-block hidden">
                 <div class="mobile fm-icon cancel-subscription"></div>
                 <div class="mobile subscription-heading">[$7165]</div>
                 <div class="mobile subscription-text"></div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
-            <div class="mobile account-recovery-key-block">
+            <div class="mobile button-block account-recovery-key-block">
                 <div class="mobile fm-icon recovery-key"></div>
                 <div class="mobile recovery-key-heading">[$8839]</div>
                 <div class="mobile recovery-key-text">[$17688]</div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
-            <div class="mobile account-twofactor-block hidden"><!-- Add enabled class -->
+            <div class="mobile button-block account-twofactor-block hidden"><!-- Add enabled class -->
                 <div class="mobile fm-icon lock"></div>
                 <div class="mobile two-factor-heading enabled">[$19290]</div>
                 <div class="mobile two-factor-heading disabled">[$19289]</div>
@@ -555,12 +556,17 @@
                 </div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
-            <div class="mobile account-session-history-block">
+            <div class="mobile button-block account-session-history-block">
                 <div class="mobile fm-icon device"></div>
                 <div class="mobile two-factor-heading">[$429]</div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
-            <div class="mobile acount-cancellation-block">
+            <div class="mobile button-block account-change-password-block">
+                <div class="mobile fm-icon password"></div>
+                <div class="mobile two-factor-heading">[$706]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="mobile button-block acount-cancellation-block">
                 <div class="mobile fm-icon broken-heart"></div>
                 <div class="mobile account-upgrade-text">[$16115]</div>
                 <div class="mobile fm-icon right-arrow"></div>
@@ -791,6 +797,48 @@
 </div>
 
 
+<!-- My Account Change Password page -->
+<div class="mobile main-block my-account-change-password-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$706]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile update-password">
+                    <div class="mobile body-text">[$741]</div>
+                    <form>
+                        <div class="mobile signin-input password">
+                            <span></span>
+                            <input class="mobile password-input estimator-password-input" type="password" value="" placeholder="[$909]" />
+                            <div class="mobile estimator-loading-icon"></div>
+                            <i class="warning-icon"></i>
+                        </div>
+                        <div class="mobile new-registration password-strength">
+                            <div class="register-pass-status-line1"></div>
+                            <div class="register-pass-status-line2"></div>
+                            <div class="register-pass-status-line3"></div>
+                            <div class="register-pass-status-line4"></div>
+                            <div class="register-pass-status-line5"></div>
+                        </div>
+                        <div class="mobile signin-input password-confirm">
+                            <span></span>
+                            <input class="mobile password-confirm-input" type="password" value="" placeholder="[$1114]" />
+                            <i class="warning-icon"></i>
+                        </div>
+                        <div class="mobile register-button update-password-button">
+                            <span class="label">[$707]</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- Forgot Password page - Method A-1 & Method B-1 of recovery process -->
 <div class="mobile main-block forgot-password-page hidden">
     <div class="mobile fm-header fm-hr">
@@ -928,7 +976,7 @@
                     <form>
                         <div class="mobile signin-input password account-recovery">
                             <span></span>
-                            <input class="mobile recovery-password-input" type="password" value="" placeholder="[$909]" />
+                            <input class="mobile password-input recovery-password-input estimator-password-input" type="password" value="" placeholder="[$909]" />
                             <div class="mobile estimator-loading-icon"></div>
                             <i class="warning-icon"></i>
                         </div>
@@ -941,7 +989,7 @@
                         </div>
                         <div class="mobile signin-input password-confirm account-recovery">
                             <span></span>
-                            <input class="mobile recovery-password-confirm-input" type="password" value="" placeholder="[$1114]" />
+                            <input class="mobile password-confirm-input recovery-password-confirm-input" type="password" value="" placeholder="[$1114]" />
                             <i class="warning-icon"></i>
                         </div>
                         <div class="mobile register-button account-recovery update-password-button">
@@ -1000,7 +1048,7 @@
                     <form>
                         <div class="mobile signin-input password park-account">
                             <span></span>
-                            <input class="mobile recovery-password-input" type="password" value="" placeholder="[$909]" />
+                            <input class="mobile password-input recovery-password-input estimator-password-input" type="password" value="" placeholder="[$909]" />
                             <div class="mobile estimator-loading-icon"></div>
                             <i class="warning-icon"></i>
                         </div>
@@ -1013,7 +1061,7 @@
                         </div>
                         <div class="mobile signin-input password-confirm park-account">
                             <span></span>
-                            <input class="mobile recovery-password-confirm-input" type="password" value="" placeholder="[$1114]" />
+                            <input class="mobile password-confirm-input recovery-password-confirm-input" type="password" value="" placeholder="[$1114]" />
                             <i class="warning-icon"></i>
                         </div>
                         <div class="mobile register-button park-account update-password-button">
@@ -1155,7 +1203,7 @@
                     <div class="mobile invite-friends-block">
                         <div class="mobile fm-icon invite"></div>
                         <div class="mobile invite-friends-heading">[$17465]</div>
-                        <div class="mobile invite-friends-text">[$17466]</div>
+                        <div class="mobile invite-friends-text"></div>
                     </div>
                     <div class="mobile email-input-container">
                         <input class="mobile email-input" type="email" placeholder="[$7434]" maxlength="190">
@@ -1359,6 +1407,28 @@
                 </div>
                 <div class="mobile buttons">
                     <a class="mobile red-button first empty"> <i></i> <span>[$1018]</span> </a>
+                </div>
+                <a class="mobile text-button third cancel"><span>[$148]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Over Storage Quota Overlay. !-->
+<div class="mobile main-block hidden" id="mobile-ui-over-storage-quota-overlay">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile empty-icon over-storage-quota"></div>
+                <div class="mobile rb-empty-overlay-title dialog-heading-text">[$16302]</div>
+                <div class="mobile">
+                    <div class="mobile rb-empty-overlay-message dialog-body-text">[$16358] </div>
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile dialog-button action-invite-friends"> <i></i> <span>[$17465]</span> </a>
+                    <a class="mobile dialog-button action-upgrade-account"> <i></i> <span>[$129]</span> </a>
                 </div>
                 <a class="mobile text-button third cancel"><span>[$148]</span> </a>
             </div>
@@ -1610,7 +1680,7 @@
                             </div>
                             <div class="mobile signin-input password">
                                 <span></span>
-                                <input type="password" value="" placeholder="[$909]" />
+                                <input class="estimator-password-input" type="password" value="" placeholder="[$909]" />
                                 <div class="mobile estimator-loading-icon"></div>
                                 <i class="warning-icon"></i>
                             </div>

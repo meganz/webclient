@@ -79,6 +79,27 @@ copyright.getHandles = function(data) {
 };
 
 /**
+ * Check if the entered URL is a folder link without a subfile link.
+ * @param url
+ * @return {Boolean} If is folder without subfile link.
+ */
+copyright.isFolderWithoutSubHandle = function(url) {
+    'use strict';
+    var hasSubLinkCheck = /\#\F\!.*\?/;
+    return copyright.isFolderLink(url) && !hasSubLinkCheck.test(url);
+};
+
+/**
+ * Check if a URL is a folder link.
+ * @param url
+ * @return {Boolean}
+ */
+copyright.isFolderLink = function(url) {
+    'use strict';
+    return /\#\F\!/.test(url);
+};
+
+/**
  * Iteratively remove any %% stuff from the data
  * @param {String} data The data string to decode
  * @return {String} the decoded data
@@ -147,6 +168,85 @@ copyright.loadCopyrightOwnerValues = function() {
     }
 };
 
+copyright.step2Submit = function() {
+    'use strict';
+
+    if (!$('.select.content').hasClass('selected')) {
+        msgDialog('warninga', l[135], escapeHTML(l[657]));
+    }
+    else if (!$('.select.type').hasClass('selected')) {
+        msgDialog('warninga', l[135], escapeHTML(l[658]));
+    }
+    else {
+        var invalidWords = ['asd', 'asdf', 'copyright'];
+        var copyrightwork = $('.copyrightwork');
+        var proceed = false;
+        var takedownType = $('.select.type select').val();
+        $('.contenturl').each(function(i, e) {
+            proceed = true;
+            var eVal = String($(e).val()).trim();
+            var cVal = String($(copyrightwork[i]).val()).trim();
+            if (eVal !== ''  && cVal === '' || invalidWords.indexOf(cVal.toLowerCase()) !== -1) {
+                proceed = false;
+                msgDialog('warninga', l[135], escapeHTML(l[660]));
+                wrong(copyrightwork[i]);
+                return false;
+            }
+            if (eVal === '' || cVal === '') {
+                proceed = false;
+                msgDialog('warninga', l[135], escapeHTML(l[659]));
+                wrong(eVal ? copyrightwork[i] : e);
+                return false;
+            }
+
+            if (!copyright.validateUrl(eVal)) {
+                proceed = false;
+                msgDialog('warninga', l[135], escapeHTML(l[7686]));
+                wrong(e);
+                return false;
+            }
+
+            if (copyright.validateUrl(cVal)) {
+                proceed = false;
+                msgDialog('warninga', l[135], escapeHTML(l[9056]));
+                wrong(copyrightwork[i]);
+                return false;
+            }
+
+            if (takedownType === "1" && copyright.isFolderLink(eVal) && !copyright.isFolderWithoutSubHandle(eVal)) {
+                proceed = false;
+                msgDialog('warninga', l[135], l[19804]);
+                return false;
+            }
+
+            if ((takedownType === "2" || takedownType === "3")
+                && localStorage.tdFolderlinkWarning !== "1"
+                && copyright.isFolderWithoutSubHandle(eVal)) {
+                localStorage.tdFolderlinkWarning = 1;
+                proceed = false;
+                msgDialog('info', l[621], escapeHTML(l[19802]), null, function() {
+                    copyright.step2Submit();
+                });
+                return false;
+            }
+
+            $(e).removeClass("red");
+
+        });
+
+        if (proceed && !$('.cn_check1 .checkinput').prop('checked')) {
+            msgDialog('warninga', l[135], escapeHTML(l[665]));
+        }
+        else if (proceed) {
+            $('.cn.step1').addClass('hidden');
+            $('.cn.step2').removeClass('hidden');
+
+            // Reload values from local storage if the user has previously been here
+            copyright.loadCopyrightOwnerValues();
+        }
+    }
+};
+
 /**
  * Initialises the copyright form page, binding the events the form requires
  */
@@ -184,62 +284,7 @@ copyright.init_cn = function() {
     });
     copyright.updateUI();
     $('.step2btn').rebind('click', function() {
-        if (!$('.select.content').hasClass('selected')) {
-            msgDialog('warninga', l[135], escapeHTML(l[657]));
-        }
-        else if (!$('.select.type').hasClass('selected')) {
-            msgDialog('warninga', l[135], escapeHTML(l[658]));
-        }
-        else {
-            var invalidWords = ['asd', 'asdf', 'copyright'];
-            var copyrightwork = $('.copyrightwork');
-            var proceed = false;
-            $('.contenturl').each(function(i, e) {
-                proceed = true;
-                var eVal = String($(e).val()).trim();
-                var cVal = String($(copyrightwork[i]).val()).trim();
-                if (eVal !== ''  && cVal === '' || invalidWords.indexOf(cVal.toLowerCase()) !== -1) {
-                    proceed = false;
-                    msgDialog('warninga', l[135], escapeHTML(l[660]));
-                    wrong(copyrightwork[i]);
-                    return false;
-                }
-                if (eVal === '' || cVal === '') {
-                    proceed = false;
-                    msgDialog('warninga', l[135], escapeHTML(l[659]));
-                    wrong(eVal ? copyrightwork[i] : e);
-                    return false;
-                }
-
-                if (!copyright.validateUrl(eVal)) {
-                    proceed = false;
-                    msgDialog('warninga', l[135], escapeHTML(l[7686]));
-                    wrong(e);
-                    return false;
-                }
-
-                if (copyright.validateUrl(cVal)) {
-                    proceed = false;
-                    msgDialog('warninga', l[135], escapeHTML(l[9056]));
-                    wrong(copyrightwork[i]);
-                    return false;
-                }
-
-                $(e).removeClass("red");
-
-            });
-
-            if (proceed && !$('.cn_check1 .checkinput').prop('checked')) {
-                msgDialog('warninga', l[135], escapeHTML(l[665]));
-            }
-            else if (proceed) {
-                $('.cn.step1').addClass('hidden');
-                $('.cn.step2').removeClass('hidden');
-
-                // Reload values from local storage if the user has previously been here
-                copyright.loadCopyrightOwnerValues();
-            }
-        }
+        copyright.step2Submit();
     });
 
     $('.backbtn').rebind('click', function() {

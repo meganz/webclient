@@ -44,9 +44,9 @@ var browserspage = {
                     $('.browsers.chrome .version').text(serverBuildVersion.chrome);
                     $('.browsers.chrome .size').text(chromeFileSize.size + ' ' + chromeFileSize.unit);
 
-                    // Update the Firefox version and file size information
-                    $('.browsers.firefox .version').text(serverBuildVersion.firefox);
-                    $('.browsers.firefox .size').text(firefoxFileSize.size + ' ' + firefoxFileSize.unit);
+                    // Update the Firefox & palemoon version and file size information
+                    $('.browsers.firefox .version, .browsers.palemoon .version').text(serverBuildVersion.firefox);
+                    $('.browsers.firefox .size, .browsers.palemoon .size').text(firefoxFileSize.size + ' ' + firefoxFileSize.unit);
                 }
             });
     },

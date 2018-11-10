@@ -224,6 +224,12 @@
 
             Soon(function() {
                 M.renderPath(fid);
+
+                if ($.autoSelectNode) {
+                    $.selected = [$.autoSelectNode];
+                    delete $.autoSelectNode;
+                    reselect(1);
+                }
             });
         }
 

@@ -325,7 +325,7 @@ function initAddDialogMultiInputPlugin() {
                 var emailList = value.split(/[ ;,]+/);
                 var itemNum = $scope.find('.share-added-contact').length;
 
-                if (checkMail(value) === false) {
+                if (isValidEmail(value)) {
                     itemNum = itemNum + 1;
                 }
 
@@ -961,7 +961,7 @@ function FMShortcuts() {
             !isContactRootOrShareRoot
         ) {
             var items = selectionManager.get_selected();
-            if (items.length == 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
+            if (items.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2) {
                 return; // dont do anything.
             }
 
@@ -1923,9 +1923,9 @@ function initShareDialogMultiInputPlugin() {
                     var value = $.trim($this.val());
                     var emailList = value.split(/[ ;,]+/);
                     var itemNum = $scope.find('.share-added-contact').length +
-                        checkMail(emailList) ? emailList.length : 0;
+                        !isValidEmail(emailList) ? emailList.length : 0;
 
-                    if (itemNum > 1 && checkMail(value) === true) {
+                    if (itemNum > 1 && !isValidEmail(value)) {
                         $addButton.text('Add %1 people'.replace('%1', itemNum));
                     }
                     if (itemNum === 1) {

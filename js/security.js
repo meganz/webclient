@@ -7,6 +7,12 @@ var security = {
     /** Minimum password length across the app for registration and password changes */
     minPasswordLength: 8,
 
+    /**
+     * Minimum password score across the app for registration and password changes. The score is calculated
+     * using the score from the ZXCVBN library and the range is from 0 - 4 (very weak, weak, medium, good, strong)
+     */
+    minPasswordScore: 1,
+
     /** The number of iterations for the PPF (1-2 secs computation time) */
     numOfIterations: 100000,
 
@@ -15,6 +21,44 @@ var security = {
 
     /** The desired length of the derived key from the PPF in bits */
     derivedKeyLengthInBits: 256,    // 32 Bytes
+
+    /**
+     * Checks if the password is valid and meets minimum strength requirements
+     * @param {String} password The user's password
+     * @param {String} confirmPassword The second password the user typed again as a confirmation to avoid typos
+     * @returns {true|String} Returns true if the password is valid, or the error message if not valid
+     */
+    isValidPassword: function(password, confirmPassword) {
+
+        'use strict';
+
+        // Check if the passwords are not the same
+        if (password !== confirmPassword) {
+            return l[9066];         // The passwords are not the same, please check that you entered them correctly.
+        }
+
+        // Check if there is whitespace at the start or end of the password
+        if (password !== password.trim()) {
+            return l[19855];        // Whitespace at the start or end of the password is not permitted.
+        }
+
+        // Check for minimum password length
+        if (password.length < security.minPasswordLength) {
+            return l[18701];        // Your password needs to be at least x characters long.
+        }
+
+        // Check that the estimator library is initialised
+        if (typeof zxcvbn === 'undefined') {
+            return l[1115] + ' ' + l[1116];     // The password strength verifier is still initializing.
+        }                                       // Please try again in a few seconds.
+
+        // Check for minimum password strength score from ZXCVBN library
+        if ((zxcvbn(password).score < security.minPasswordScore)) {
+            return l[1104];         // Please strengthen your password.
+        }
+
+        return true;
+    },
 
     /**
      * Converts a UTF-8 string to a byte array
@@ -606,24 +650,40 @@ security.register = {
     },
 
     /**
-     * Repeat the registration process and send a signup link to the user via the new email address they entered
-     * @param {type} newEmail The user's corrected email
-     * @param {type} completeCallback A function to run when the registration is complete
+     * Cache registration data like name, email etc in case they refresh the page and need to resend the email
+     * @param {Object} registerData An object containing keys 'first', 'last', 'name', 'email' and optional 'password'
+     *                              for old style registrations.
      */
-    repeatSendSignupLink: function(newEmail, completeCallback) {
+    cacheRegistrationData: function(registerData) {
 
         'use strict';
 
-        // Get the previous name used
-        var firstName = security.register.sendEmailRequestParams.firstName;
-        var lastName = security.register.sendEmailRequestParams.lastName;
-        var name = firstName + ' ' + lastName;
+        // If the new registration method is enabled, remove password from the object so it doesn't get saved to
+        // localStorage for the resend process. The old style registrations still requires the password as it is
+        // hashed with the email address.
+        if (security.register.newRegistrationEnabled()) {
+            delete registerData.password;
+        }
+
+        localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
+    },
+
+    /**
+     * Repeat the registration process and send a signup link to the user via the new email address they entered
+     * @param {String} firstName The user's first name
+     * @param {String} lastName The user's last name
+     * @param {String} newEmail The user's corrected email
+     * @param {Function} completeCallback A function to run when the registration is complete
+     */
+    repeatSendSignupLink: function(firstName, lastName, newEmail, completeCallback) {
+
+        'use strict';
 
         // Re-encode the parameters to Base64 before sending to the API
         var sendEmailRequestParams = {
             a: 'uc2',
-            n: base64urlencode(to8(name)),   // Name (used just for the email)
-            m: base64urlencode(newEmail)     // Email
+            n: base64urlencode(to8(firstName + ' ' + lastName)),  // Name (used just for the email)
+            m: base64urlencode(newEmail)                          // Email
         };
 
         // Run the API request
@@ -1069,5 +1129,105 @@ security.login = {
             // Not applicable to this function
             return false;
         }
+    }
+};
+
+
+/**
+ * Common functionality for desktop/mobile webclient for changing the password using the old and new processes
+ */
+security.changePassword = {
+
+    /**
+     * Change the user's password using the old method
+     * @param {String} newPassword The new password
+     * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
+     * @param {Function} completeCallback The function to run when complete (to update the UI)
+     */
+    oldMethod: function(newPassword, twoFactorPin, completeCallback) {
+
+        'use strict';
+
+        // Otherwise change the password using the old method
+        var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newPassword));
+        var encryptedMasterKeyBase64 = a32_to_base64(encrypt_key(pw_aes, u_k));
+        var userHash = stringhash(u_attr.email.toLowerCase(), pw_aes);
+
+        // Prepare the request
+        var requestParams = {
+            a: 'up',
+            k: encryptedMasterKeyBase64,
+            uh: userHash
+        };
+
+        // If the 2FA PIN was entered, send it with the request
+        if (twoFactorPin !== null) {
+            requestParams.mfa = twoFactorPin;
+        }
+
+        // Make API request to change the password
+        api_req(requestParams, {
+            callback: function(result) {
+
+                // If successful, update user attribute key property with the Encrypted Master Key
+                if (result) {
+                    u_attr.k = encryptedMasterKeyBase64;
+                }
+
+                // Update UI
+                completeCallback(result);
+            }
+        });
+    },
+
+    /**
+     * Change the user's password using the new method
+     * @param {String} newPassword The new password
+     * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
+     * @param {Function} completeCallback The function to run when complete (to update the UI)
+     */
+    newMethod: function(newPassword, twoFactorPin, completeCallback) {
+
+        'use strict';
+
+        // Create the Client Random Value, Encrypted Master Key and Hashed Authentication Key
+        security.deriveKeysFromPassword(newPassword, u_k,
+            function(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+
+                // Convert to Base64
+                var encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
+                var hashedAuthenticationKeyBase64 = ab_to_base64(hashedAuthenticationKeyBytes);
+                var clientRandomValueBase64 = ab_to_base64(clientRandomValueBytes);
+                var saltBase64 = ab_to_base64(security.createSalt(clientRandomValueBytes));
+
+                // Prepare the request
+                var requestParams = {
+                    a: 'up',
+                    k: encryptedMasterKeyBase64,
+                    uh: hashedAuthenticationKeyBase64,
+                    crv: clientRandomValueBase64
+                };
+
+                // If the 2FA PIN was entered, send it with the request
+                if (twoFactorPin !== null) {
+                    requestParams.mfa = twoFactorPin;
+                }
+
+                // Send API request to change password
+                api_req(requestParams, {
+                    callback: function(result) {
+
+                        // If successful, update global user attributes key and salt as the 'ug' request is not re-done
+                        if (result) {
+                            u_attr.k = encryptedMasterKeyBase64;
+                            u_attr.aas = saltBase64;
+                        }
+
+                        // Update UI
+                        completeCallback(result);
+                    }
+                });
+            }
+        );
     }
 };

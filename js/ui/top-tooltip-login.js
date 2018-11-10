@@ -216,7 +216,7 @@ var tooltiplogin = {
         var rememberMe = false;
         var twoFactorPin = null;
 
-        if (email === '' || checkMail(email)) {
+        if (email === '' || !isValidEmail(email)) {
             $emailContainer.addClass('incorrect');
             $emailField.val('');
             $emailField.trigger("focus");

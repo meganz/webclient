@@ -18,19 +18,21 @@ mobile.twofactor.verifyAction = {
         'use strict';
 
         // Cache selector
-        mobile.twofactor.verifyAction.$page = $('.mobile.two-factor-page.verify-action-page');
+        this.$page = $('.mobile.two-factor-page.verify-action-page');
 
-        // Initialise functionality
+        // Initialise mega icon and back button functionality
         mobile.initHeaderMegaIcon();
-        mobile.twofactor.verifyAction.initKeyupFunctionality();
-        mobile.twofactor.verifyAction.initVerifyButton(completeCallback);
-        mobile.twofactor.verifyAction.initBackButton();
+        mobile.initBackButton(this.$page, 'twofactor/intro');
+
+        // Init keyup and verify button functionality
+        this.initKeyupFunctionality();
+        this.initVerifyButton(completeCallback);
 
         // Show the account page content
-        mobile.twofactor.verifyAction.$page.removeClass('hidden');
+        this.$page.removeClass('hidden');
 
         // Put the focus in the PIN input field after its visible
-        mobile.twofactor.verifyAction.$page.find('.two-factor-seed-input input').trigger('focus');
+        this.$page.find('.two-factor-seed-input input').trigger('focus');
     },
 
     /**
@@ -88,22 +90,6 @@ mobile.twofactor.verifyAction = {
             completeCallback(pinCode);
 
             // Prevent double taps
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the back arrow icon in the header to go back to the main My Account page
-     */
-    initBackButton: function() {
-
-        'use strict';
-
-        // On Back click/tap
-        mobile.twofactor.verifyAction.$page.find('.mobile.fm-icon.back').off('tap').on('tap', function() {
-
-            // Render the Account page again
-            loadSubPage('fm/account');
             return false;
         });
     },

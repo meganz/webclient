@@ -195,6 +195,14 @@
     top: auto;
     bottom: -40px;
 }
+.incorrect .account.input-tooltip.bottom-center {
+    left: 0;
+    right: 0;
+    top: 100%;
+    bottom: auto;
+    margin-top: 9px;
+    text-align: center;
+}
 .account.checkbox-block {
     padding: 10px 0 64px 1px;
 }
@@ -215,7 +223,7 @@
 .business .big-red-button.register-button {
     margin-top: 30px;
 }
-.account.password-stutus {
+.account.password-status {
     font-size: 12px;
     line-height: 24px;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
@@ -225,19 +233,19 @@
     display: none;
     color: #ff2a0b;
 }
-.account.password-stutus.good2 {
+.account.password-status.good2 {
     color: #ffc926;
 }
-.account.password-stutus.good3 {
+.account.password-status.good3 {
     color: #7ab148;
 }
-.account.password-stutus.good4 {
+.account.password-status.good4 {
     color: #7dd016;
 }
-.account.password-stutus.good5 {
+.account.password-status.good5 {
     color: #1DA1E9;
 }
-.account.password-stutus.checked {
+.account.password-status.checked {
     display: block;
 }
 .account.input-wrapper.password {

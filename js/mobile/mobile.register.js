@@ -32,15 +32,13 @@ mobile.register = {
         mobile.initCheckbox('confirm-terms');
         mobile.initHeaderMegaIcon();
         mobile.initMobileAppButton();
+        mobile.initPasswordEstimatorLibrary(this.$screen);
+        mobile.initPasswordStrengthCheck(this.$screen);
 
         // Activate register button when fields are complete
         this.initKeyupEvents();
         this.initRegisterButton();
         this.initBlurEvents();
-
-        // Load password strength estimator
-        this.loadPasswordEstimatorLibrary();
-        this.initPasswordStrengthCheck();
     },
 
     /**
@@ -60,7 +58,7 @@ mobile.register = {
                             .add($passwordField).add($confirmPasswordField);
 
         // Add keyup event to the input fields
-        $allFields.rebind('keyup', function(event) {
+        $allFields.rebind('keyup.registerbuttoncheck', function(event) {
 
             var firstName = $firstNameField.val();
             var lastName = $lastNameField.val();
@@ -69,7 +67,7 @@ mobile.register = {
             var confirmPassword = $confirmPasswordField.val();
 
             // when email was incorrect and it updated as correct, remove incorrect class with keyup
-            if ($emailField.parent().hasClass('incorrect') && !checkMail(email)) {
+            if ($emailField.parent().hasClass('incorrect') && isValidEmail(email)) {
                 $emailField.parent().removeClass('incorrect');
             }
 
@@ -109,7 +107,7 @@ mobile.register = {
             var email = $emailField.val();
 
             // If invalid email, deactivate register button, show toast and add red border to field
-            if (checkMail(email)) {
+            if (!isValidEmail(email)) {
                 $emailField.parent().addClass('incorrect');
                 $registerButton.removeClass('active');
                 mobile.showToast(l[1101]);
@@ -120,77 +118,6 @@ mobile.register = {
                 $emailField.parent().removeClass('incorrect');
                 $registerButton.addClass('active');
                 $emailField.trigger('keyup');
-            }
-        });
-    },
-
-    /**
-     * Load the ZXCVBN password strength estimator library
-     */
-    loadPasswordEstimatorLibrary: function() {
-
-        'use strict';
-
-        // Make sure the library is loaded
-        if (typeof zxcvbn === 'undefined') {
-
-            // Show loading spinner
-            var $loader = this.$registerScreen.find('.estimator-loading-icon').addClass('loading');
-
-            // On completion of loading, hide the loading spinner
-            M.require('zxcvbn_js')
-                .done(function() {
-                    $loader.removeClass('loading');
-                });
-        }
-    },
-
-    /**
-     * Show what strength the currently entered password is on key up
-     */
-    initPasswordStrengthCheck: function() {
-
-        'use strict';
-
-        var $passwordStrengthBar = this.$registerScreen.find('.password-strength');
-        var $passwordInput = this.$registerScreen.find('.signin-input.password input');
-
-        // Add keyup event to the password text field
-        $passwordInput.rebind('keyup', function() {
-
-            // Make sure the ZXCVBN password strength estimator library is loaded first
-            if (typeof zxcvbn !== 'undefined') {
-
-                // Estimate the password strength
-                var password = $.trim($passwordInput.val());
-                var passwordScore = zxcvbn(password).score;
-                var passwordLength = password.length;
-
-                // Remove previous strength classes that were added
-                $passwordStrengthBar.removeClass('good1 good2 good3 good4 good5');
-
-                // Add colour coding
-                if (passwordLength === 0) {
-                    return false;
-                }
-                else if (passwordLength < security.minPasswordLength) {
-                    $passwordStrengthBar.addClass('good1');    // Too short
-                }
-                else if (passwordScore === 4) {
-                    $passwordStrengthBar.addClass('good5');    // Strong
-                }
-                else if (passwordScore === 3) {
-                    $passwordStrengthBar.addClass('good4');    // Good
-                }
-                else if (passwordScore === 2) {
-                    $passwordStrengthBar.addClass('good3');    // Medium
-                }
-                else if (passwordScore === 1) {
-                    $passwordStrengthBar.addClass('good2');    // Weak
-                }
-                else {
-                    $passwordStrengthBar.addClass('good1');    // Very Weak
-                }
             }
         });
     },
@@ -207,7 +134,6 @@ mobile.register = {
         var $emailField = this.$registerScreen.find('.email-address input');
         var $passwordField = this.$registerScreen.find('.password input');
         var $confirmPasswordField = this.$registerScreen.find('.password-confirm input');
-        var $passwordStrengthBar = this.$registerScreen.find('.password-strength');
         var $confirmTermsCheckbox = this.$registerScreen.find('.confirm-terms input');
         var $registerButton = this.$registerScreen.find('.register-button');
         var $containerFields = $emailField.parent().add($passwordField.parent()).add($confirmPasswordField.parent());
@@ -219,8 +145,8 @@ mobile.register = {
             var firstName = $.trim($firstNameField.val());
             var lastName = $.trim($lastNameField.val());
             var email = $.trim($emailField.val());
-            var password = $.trim($passwordField.val());
-            var confirmPassword = $.trim($confirmPasswordField.val());
+            var password = $passwordField.val();
+            var confirmPassword = $confirmPasswordField.val();
 
             // If the fields are not completed, the button should not do anything and looks disabled anyway
             if (firstName.length < 1 || lastName.length < 1 || email.length < 1 ||
@@ -230,7 +156,7 @@ mobile.register = {
             }
 
             // If email is incorrect make button invalid and show toast message.
-            if (checkMail(email)) {
+            if (!isValidEmail(email)) {
                 if (!$emailField.parent().hasClass('incorrect')) {
                     mobile.showToast(l[1101]);
                 }
@@ -253,38 +179,18 @@ mobile.register = {
                 return false;
             }
 
-            // If the passwords are not the same
-            if (password !== confirmPassword) {
+            // Check if the entered passwords are valid or strong enough
+            var passwordValidationResult = security.isValidPassword(password, confirmPassword);
 
-                // Add red border, red text and show warning icon
+            // If bad result
+            if (passwordValidationResult !== true) {
+
+                // Add red border, red input text and show warning icon
                 $passwordField.parent().addClass('incorrect');
                 $confirmPasswordField.parent().addClass('incorrect');
 
-                // Show an error and don't proceed
-                mobile.messageOverlay.show(l[9066]);        // The passwords are not the same...
-                return false;
-            }
-
-            // Check for minimum length password
-            if (password.length < security.minPasswordLength) {
-
-                // Add red border, red text and show warning icon
-                $passwordField.parent().addClass('incorrect');
-                $confirmPasswordField.parent().addClass('incorrect');
-
-                // Then show an error and don't proceed
-                mobile.messageOverlay.show(l[18701]);        // Your password needs to be at least 8 characters long.
-                return false;
-            }
-
-            // If the password has the 'Very weak' class i.e. it's not strong enough
-            if ($passwordStrengthBar.hasClass('good1')) {
-
-                // Add red border, red text and show warning icon
-                $passwordField.parent().addClass('incorrect');
-
-                // Then show an error and don't proceed
-                mobile.messageOverlay.show(l[1104]);        // Please strengthen your password.
+                // Show error dialog and return early
+                mobile.messageOverlay.show(passwordValidationResult);
                 return false;
             }
 
@@ -322,9 +228,6 @@ mobile.register = {
         var $changeEmailInput = $confirmScreen.find('.change-email input');
         var $resendButton = $confirmScreen.find('.resend-button');
 
-        // If the flag has been set to use the new registration method
-        var method = (security.register.newRegistrationEnabled()) ? 'new' : 'old';
-
         // Hide the current register screen and show the confirmation one
         $registerScreen.addClass('hidden');
         $confirmScreen.removeClass('hidden');
@@ -336,9 +239,7 @@ mobile.register = {
         mobile.register.initConfirmEmailScreenKeyup($changeEmailInput, $resendButton);
 
         // Initialise the Resend button
-        mobile.register[method].initConfirmEmailScreenResendButton(
-            $changeEmailInput, $resendButton, registrationVars
-        );
+        mobile.register.initConfirmEmailScreenResendButton($changeEmailInput, $resendButton, registrationVars);
     },
 
     /**
@@ -356,7 +257,7 @@ mobile.register = {
             var email = $(this).val();
 
             // Change the button to red if the email is valid
-            if (!checkMail(email)) {
+            if (isValidEmail(email)) {
 
                 // Activate the resend button
                 $resendButton.addClass('active');
@@ -370,6 +271,45 @@ mobile.register = {
                 // Grey it out if they have not completed one of the fields
                 $resendButton.removeClass('active');
             }
+        });
+    },
+
+    /**
+     * Initialises the Resend button on the email confirmation screen to send the confirmation link again
+     * Uses the old registration process. ToDo: Remove in future when old registrations are no longer used.
+     * @param {Object} $changeEmailInput jQuery selector for the email input
+     * @param {Object} $resendButton jQuery selector for the Resend button
+     * @param {Object} registrationVars The registration form variables i.e. name, email etc
+     */
+    initConfirmEmailScreenResendButton: function($changeEmailInput, $resendButton, registrationVars) {
+
+        'use strict';
+
+        // Add click/tap handler to resend button
+        $resendButton.off('tap').on('tap', function() {
+
+            // Make sure the button is enabled
+            if (!$resendButton.hasClass('active')) {
+                return false;
+            }
+
+            // If the flag has been set to use the new registration method
+            var method = (security.register.newRegistrationEnabled()) ? 'new' : 'old';
+
+            // Update the email to the new email address
+            registrationVars.email = $.trim($changeEmailInput.val());
+
+            // Show the loading dialog
+            loadingDialog.show();
+
+            // Resend the email to the new address
+            mobile.register[method].processResendEmail(registrationVars);
+
+            // Only let them send once (until they change email again)
+            $resendButton.removeClass('active');
+
+            // Prevent double taps
+            return false;
         });
     },
 
@@ -503,7 +443,8 @@ mobile.register.old = {
                     };
 
                     u_attr.terms = 1;
-                    localStorage.awaitingConfirmationAccount = JSON.stringify(registrationVars);
+
+                    security.register.cacheRegistrationData(registrationVars);
 
                     if (mega.affid) {
                         ops.aff = mega.affid;
@@ -547,71 +488,46 @@ mobile.register.old = {
     /**
      * Initialises the Resend button on the email confirmation screen to send the confirmation link again
      * Uses the old registration process. ToDo: Remove in future when old registrations are no longer used.
-     * @param {Object} $changeEmailInput jQuery selector for the email input
-     * @param {Object} $resendButton jQuery selector for the Resend button
      * @param {Object} registrationVars The registration form variables i.e. name, email etc
      */
-    initConfirmEmailScreenResendButton: function($changeEmailInput, $resendButton, registrationVars) {
+    processResendEmail: function(registrationVars) {
 
         'use strict';
 
-        // Add click/tap handler to resend button
-        $resendButton.off('tap').on('tap', function() {
+        // Send the confirmation email
+        sendsignuplink(registrationVars.name, registrationVars.email, registrationVars.password, {
+            callback: function(result) {
 
-            // Make sure the button is enabled
-            if (!$resendButton.hasClass('active')) {
-                return false;
-            }
+                loadingDialog.hide();
 
-            // Update the email to the new email address
-            registrationVars.email = $.trim($changeEmailInput.val());
+                // If successful result
+                if (result === 0) {
+                    var ops = {
+                        a: 'up',
+                        terms: 'Mq',
+                        firstname: base64urlencode(to8(registrationVars.first)),
+                        lastname: base64urlencode(to8(registrationVars.last)),
+                        name2: base64urlencode(to8(registrationVars.name))
+                    };
 
-            // Show the loading dialog
-            loadingDialog.show();
+                    u_attr.terms = 1;
 
-            // Setup subsequent API request
-            var context = {
-                callback: function(result) {
+                    security.register.cacheRegistrationData(registrationVars);
 
-                    loadingDialog.hide();
-
-                    // If successful result
-                    if (result === 0) {
-                        var ops = {
-                            a: 'up',
-                            terms: 'Mq',
-                            firstname: base64urlencode(to8(registrationVars.first)),
-                            lastname: base64urlencode(to8(registrationVars.last)),
-                            name2: base64urlencode(to8(registrationVars.name))
-                        };
-
-                        u_attr.terms = 1;
-                        localStorage.awaitingConfirmationAccount = JSON.stringify(registrationVars);
-
-                        if (mega.affid) {
-                            ops.aff = mega.affid;
-                        }
-
-                        api_req(ops);
-
-                        // Show a dialog success
-                        mobile.messageOverlay.show(l[16351]);     // The email was sent successfully.
+                    if (mega.affid) {
+                        ops.aff = mega.affid;
                     }
-                    else {
-                        // Show an error
-                        mobile.messageOverlay.show(l[47]);     // Oops, something went wrong. Sorry about that!
-                    }
+
+                    api_req(ops);
+
+                    // Show a dialog success
+                    mobile.messageOverlay.show(l[16351]);     // The email was sent successfully.
                 }
-            };
-
-            // Send the confirmation email
-            sendsignuplink(registrationVars.name, registrationVars.email, registrationVars.password, context);
-
-            // Only let them send once (until they change email again)
-            $resendButton.removeClass('active');
-
-            // Prevent double taps
-            return false;
+                else {
+                    // Show an error
+                    mobile.messageOverlay.show(l[47]);     // Oops, something went wrong. Sorry about that!
+                }
+            }
         });
     }
 };
@@ -648,30 +564,19 @@ mobile.register.new = {
     /**
      * Initialises the Resend button on the email confirmation screen to send the confirmation link again
      * Uses the new improved registration process.
-     * @param {Object} $changeEmailInput jQuery selector for the email input
-     * @param {Object} $resendButton jQuery selector for the Resend button
+     * @param {Object} registrationVars The registration form variables i.e. name, email etc
      */
-    initConfirmEmailScreenResendButton: function($changeEmailInput, $resendButton) {
+    processResendEmail: function(registrationVars) {
 
         'use strict';
 
-        // Add click/tap handler to resend button
-        $resendButton.off('tap').on('tap', function() {
-
-            // Make sure the button is enabled
-            if (!$resendButton.hasClass('active')) {
-                return false;
-            }
-
-            // Get the new email address entered by the user
-            var newEmail = $.trim($changeEmailInput.val());
-
-            // Re-send signup link email
-            security.register.repeatSendSignupLink(
-                newEmail,
-                mobile.register.new.completeRegistration    // Complete callback
-            );
-        });
+        // Re-send signup link email
+        security.register.repeatSendSignupLink(
+            registrationVars.first,
+            registrationVars.last,
+            registrationVars.email,
+            mobile.register.new.completeRegistration    // Complete callback
+        );
     },
 
     /**
@@ -697,7 +602,8 @@ mobile.register.new = {
         if (result === 0) {
 
             u_attr.terms = 1;
-            localStorage.awaitingConfirmationAccount = JSON.stringify(registrationVars);
+
+            security.register.cacheRegistrationData(registrationVars);
 
             // Try getting the plan number they selected on Pro page
             var planNum = localStorage.getItem('proPageContinuePlanNum');

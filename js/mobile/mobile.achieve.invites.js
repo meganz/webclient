@@ -22,16 +22,19 @@ mobile.achieve.invites = {
         }
 
         // Cache selector
-        mobile.achieve.invites.$page = $('.mobile.achievements-invite-friends-page');
+        this.$page = $('.mobile.achievements-invite-friends-page');
 
         // Initialise functionality
-        mobile.achieve.invites.fetchAndDisplayData();
+        this.fetchAndDisplayData();
+
+        // Initialise back button to go back to the Achievements
+        mobile.initBackButton(this.$page, 'fm/account/achievements/');
 
         // Initialise the top menu
         topmenuUI();
 
         // Show the account page content
-        mobile.achieve.invites.$page.removeClass('hidden');
+        this.$page.removeClass('hidden');
 
         // Add a server log
         api_req({ a: 'log', e: 99674, m: 'Mobile web Invite Friends page accessed' });
@@ -57,7 +60,6 @@ mobile.achieve.invites = {
             mobile.achieve.invites.initKeyupFunctionality();
             mobile.achieve.invites.initInviteButton();
             mobile.achieve.invites.initHowItWorksButton();
-            mobile.achieve.invites.initBackButton();
             mobile.achieve.updateInviteFriendsText(mobile.achieve.invites.$page);
         });
     },
@@ -82,8 +84,8 @@ mobile.achieve.invites = {
             var email = $emailInput.val();
             var trimmedEmail = $.trim(email);
 
-            // If empty, grey out the button so it appears unclickable
-            if (trimmedEmail === '' || checkMail(trimmedEmail)) {
+            // If empty or invalid email, grey out the button so it appears unclickable
+            if (trimmedEmail === '' || !isValidEmail(trimmedEmail)) {
                 $inviteButton.removeClass('active');
             }
             else {
@@ -118,7 +120,7 @@ mobile.achieve.invites = {
             var trimmedEmail = $.trim(email);
 
             // If the email is invalid, show the email warning, grey out the button and don't send to the API
-            if (trimmedEmail === '' || checkMail(trimmedEmail)) {
+            if (trimmedEmail === '' || !isValidEmail(trimmedEmail)) {
                 $emailWarning.removeClass('hidden');
                 $inviteButton.removeClass('active');
                 return false;
@@ -174,22 +176,6 @@ mobile.achieve.invites = {
 
             // Render the How it works page
             loadSubPage('fm/account/invites/how-it-works');
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the back arrow icon in the header to go back to the main Achievements page
-     */
-    initBackButton: function() {
-
-        'use strict';
-
-        // On Back button click/tap
-        mobile.achieve.invites.$page.find('.fm-icon.back').off('tap').on('tap', function() {
-
-            // Render the Achievements page again
-            loadSubPage('fm/account/achievements');
             return false;
         });
     }

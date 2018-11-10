@@ -1318,7 +1318,7 @@ var exportExpiry = {
         var linksNum;
         var centerDialog = function() {
             $linksDialog.css('margin-top',
-                $linksDialog.outerHeight() / 2 * -1 - $('.export-links-warning:visible').outerHeight() / 2);
+                $linksDialog.outerHeight() / 2 * -1 - ($('.export-links-warning:visible').outerHeight() | 0) / 2);
         };
         var getContentsToClip = function() {
             if ($('.fm-tab.tab-embed-link', $linksDialog).hasClass('active')) {
@@ -1477,6 +1477,9 @@ var exportExpiry = {
                 $('.export-link-body', $linksDialog).siblings().addClass('hidden');
                 $('.fm-dialog-title', $linksDialog).text('');
             }
+            else if (folderlink) {
+                $('.extra-options, .reveal-feature-toggle-container', $linksDialog).addClass('hidden');
+            }
             else {
                 $('.export-links-warning').removeClass('hidden');
             }
@@ -1495,12 +1498,8 @@ var exportExpiry = {
         });
 
         // Setup toast notification
-        toastTxt = l[7654];
-        linksNum = countNumOfLinks();
-
-        if (linksNum > 1) {
-            toastTxt = l[7655].replace('%d', linksNum);
-        }
+        linksNum = getContentsToClip().split('\n').length;
+        toastTxt = linksNum > 1 ? l[7655].replace('%d', linksNum) : l[7654];
 
         // Setup the copy to clipboard buttons
         $span.text(l[1990]);
@@ -1598,6 +1597,20 @@ var exportExpiry = {
             $linkButtons.removeClass('selected');
             $this.addClass('selected');
 
+            // we have to deal with the extra '!' since the applied logic relies on CSS !!!
+            var $key = $('.file-link-info.key', $linksDialog);
+            var keyPart = $.trim($key.text());
+            if ($this.hasClass('link-handle-and-key')) {
+                if (keyPart[0] !== '!') {
+                    // Restore key part, containing sub file/folder handle(s), if any
+                    $key.text($key.data('key'));
+                }
+            }
+            else if (keyPart[0] === '!') {
+                // Remove initial ! separator and subsequent file/folder handle, if any
+                $key.text(keyPart.substr(1).split(/[?!]/)[0]);
+            }
+
             // Show the relevant 'Link without key', 'Decryption key' or 'Link with key'
             $('.export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
             $span.text(l[1990]);
@@ -1615,7 +1628,7 @@ var exportExpiry = {
             return false;
         });
 
-        if (page !== 'download') {
+        if (page !== 'download' && !folderlink) {
             // Initialise the Export Link expiry and password protect features
             exportExpiry.init();
             exportPassword.encrypt.init();
@@ -1636,10 +1649,7 @@ var exportExpiry = {
      * @private
      */
     function getClipboardLinks() {
-        var key;
-        var type;
         var links = [];
-        var handles = $.itemExport;
         var $dialog = $('.export-links-dialog .export-content-block');
         var modeFull = $dialog.hasClass('full-link');
         var modePublic = $dialog.hasClass('public-handle');
@@ -1656,70 +1666,24 @@ var exportExpiry = {
         }
         else {
             // Otherwise add all regular links
-            for (var i in handles) {
-                var node = M.d[handles[i]];
+            $('.file-link-info-wrapper', $dialog).each(function() {
+                var nodeUrlWithPublicHandle = $('.file-link-info.url', this).text();
+                var nodeDecryptionKey = $('.file-link-info.key', this).text();
 
-                // Only nodes with public handle
-                if (node && node.ph) {
-                    if (node.t) {
-                        // Folder
-                        type = 'F';
-                        key = u_sharekeys[node.h] && u_sharekeys[node.h][0];
-                    }
-                    else {
-                        // File
-                        type = '';
-                        key = node.k;
-                    }
-
-                    if (key) {
-                        var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + (node.ph);
-                        var nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
-
-                        // Check export/public link dialog drop down list selected option
-                        if (modeFull) {
-                            links.push(nodeUrlWithPublicHandle + nodeDecryptionKey);
-                        }
-                        else if (modePublic) {
-                            links.push(nodeUrlWithPublicHandle);
-                        }
-                        else if (modeDecKey) {
-                            links.push(nodeDecryptionKey);
-                        }
-                    }
-                    else {
-                        srvlog2('export-no-key', node.h, node.t);
-                    }
+                // Check export/public link dialog drop down list selected option
+                if (modeFull) {
+                    links.push(nodeUrlWithPublicHandle + nodeDecryptionKey);
                 }
-            }
+                else if (modePublic) {
+                    links.push(nodeUrlWithPublicHandle);
+                }
+                else if (modeDecKey) {
+                    links.push(nodeDecryptionKey);
+                }
+            });
         }
 
         return links.join("\n");
-    }
-
-    /**
-     * Count the number of links
-     * @return {Number} Returns the number of links
-     */
-    function countNumOfLinks() {
-
-        var handles = $.selected;
-        var numOfLinks = 0;
-
-        // For each selected node
-        for (var i in handles) {
-            if (handles.hasOwnProperty(i)) {
-
-                var node = M.d[handles[i]];
-
-                // Only count nodes with public handles
-                if (node && node.ph) {
-                    numOfLinks++;
-                }
-            }
-        }
-
-        return numOfLinks;
     }
 
     /**
@@ -1737,12 +1701,20 @@ var exportExpiry = {
         var folderClass = '';
         var html = '';
         var nodeHandle = item.h;
+        var fileUrlKey;
+        var fileUrlWithoutKey;
 
         // Add a hover text for the icon
         var expiresTitleText = l[8698].replace('%1', '');   // Expires %1
 
-        // Shared item type is folder
-        if (item.t) {
+        if (folderlink) {
+            var target = (M.currentdirid !== M.RootID ? '!' + M.currentdirid : '') + '?' + item.h;
+            fileUrlWithoutKey = 'https://mega.nz/#F!' + pfid;
+            fileUrlKey = '!' + pfkey + (item.t ? '!' + item.h : target);
+            fileSize = item.s && htmlentities(bytesToSize(item.s)) || '';
+        }
+        else if (item.t) {
+            // Shared item type is folder
             key = u_sharekeys[item.h] && u_sharekeys[item.h][0];
 
             // folder key must exit, otherwise skip
@@ -1754,15 +1726,15 @@ var exportExpiry = {
             fileSize = '';
             folderClass = ' folder-item';
         }
-        // Shared item type is file
         else {
+            // Shared item type is file
             type = '';
             key = item.k;
             fileSize = htmlentities(bytesToSize(item.s));
         }
 
-        var fileUrlWithoutKey = 'https://mega.nz/#' + type + '!' + htmlentities(item.ph);
-        var fileUrlKey = key ? '!' + a32_to_base64(key) : '';
+        fileUrlWithoutKey = fileUrlWithoutKey || ('https://mega.nz/#' + type + '!' + htmlentities(item.ph));
+        fileUrlKey = fileUrlKey || (key ? '!' + a32_to_base64(key) : '');
 
         html = '<div class="export-link-item' + folderClass + '" data-node-handle="' + nodeHandle + '">'
              +      '<div class="export-icon ' + fileIcon(item) + '" ></div>'
@@ -1779,7 +1751,7 @@ var exportExpiry = {
              +              '<span class="icon"></span>'
              +              '<span class="file-link-info-wrapper">'
              +                  '<span class="file-link-info url">' + fileUrlWithoutKey + '</span>'
-             +                  '<span class="file-link-info key">' + fileUrlKey + '</span>'
+             +                  '<span class="file-link-info key" data-key="' + fileUrlKey + '">' + fileUrlKey + '</span>'
              +                  '<span class="file-link-info password-protected-data hidden"></span>'
              +              '</span>'
              +          '</div>'
@@ -1801,7 +1773,7 @@ var exportExpiry = {
 
         $.each($.itemExport, function(index, value) {
             var node = M.d[value];
-            if (node && node.ph) {
+            if (node && (folderlink || node.ph)) {
                 html += itemExportLinkHtml(node);
             }
         });
@@ -1855,6 +1827,12 @@ var exportExpiry = {
         // Add some logging for usage comparisons
         if (page === 'download') {
             eventlog(99683); // Share public link on downloads page.
+        }
+        else if (folderlink) {
+            eventlog(99715); // Share public link from folder-link.
+
+            var exportLinkDialog = new mega.Dialog.ExportLink();
+            return exportLinkDialog.linksDialog();
         }
         else if (is_mobile) {
             eventlog(99634); // Created public link on mobile webclient
@@ -2176,7 +2154,7 @@ var exportExpiry = {
         };
 
         // If they've already agreed to the copyright warning (cws = copyright warning shown)
-        if (fmconfig.cws) {
+        if (fmconfig.cws || folderlink) {
             // Go straight to Get Link dialog
             openGetLinkDialog();
             return false;

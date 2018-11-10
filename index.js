@@ -383,6 +383,11 @@ function init_page() {
     }
 
     if (pageBeginLetters === 'F!' && page.length > 2) {
+        if (page.indexOf('?') > 0) {
+            page = page.split('?');
+            $.autoSelectNode = page[1];
+            page = page[0];
+        }
         var ar = page.substr(2, page.length - 1).split('!');
 
         pfid = false;
@@ -904,6 +909,11 @@ function init_page() {
     else if (is_mobile && u_type && page === 'fm/account/history') {
         parsepage(pages['mobile']);
         mobile.account.history.init();
+        return false;
+    }
+    else if (is_mobile && u_type && page === 'fm/account/email-and-pass') {
+        parsepage(pages['mobile']);
+        mobile.account.changePassword.init();
         return false;
     }
     else if (page === 'achievements') {
@@ -2096,107 +2106,151 @@ function topmenuUI() {
     }
 
     $topHeader.find('.top-search-bl').rebind('click', function () {
-        $(this).addClass('active');
-        $('.top-search-input').trigger("focus");
+        if ($.trim($('.top-search-input').val()) === "") {
+            $(this).addClass('active');
+            $('.top-search-input').trigger("focus");
+        }
     });
 
     $topHeader.find('.top-search-input').rebind('blur', function () {
         $(this).closest('.top-search-bl').removeClass('active');
         if ($(this).val() == '') {
             $topHeader.find('.top-search-bl').removeClass('contains-value');
+            $topHeader.find('.top-search-button').addClass('hidden');
+            $topHeader.find('.top-clear-button').addClass('hidden');
         }
         else {
             $topHeader.find('.top-search-bl').addClass('contains-value');
+            $topHeader.find('.top-search-button').addClass('hidden');
+            $topHeader.find('.top-clear-button').removeClass('hidden');
         }
     });
 
-    $topHeader.find('.top-clear-button').rebind('click', function () {
+    $topHeader.find('.top-clear-button').rebind('click', function (e) {
+
+        // stop propaation to not calling .top-search-bl click
+        e.stopPropagation();
+
+        // if this is folderlink, open folderlink root;
         if (folderlink) {
-            var dn = $(M.viewmode ? '.file-block-scrolling .file-block-title' : 'table.grid-table.fm .tranfer-filetype-txt');
-            var ct = M.viewmode ? 'a' : 'tr';
-            dn.closest(ct).show();
-            $(window).trigger('resize');
+            M.nn = false;
+            M.openFolder();
         }
         $topHeader.find('.top-search-bl').removeClass('contains-value active');
-        $topHeader.find('.top-search-input').val('');
+        $topHeader.find('.top-clear-button').removeClass('hidden');
+        $topHeader.find('.top-search-input').val('').trigger('blur');
         // if current page is search result reset it.
-        if(page.indexOf('/search/') !== -1) {
+        if (page.indexOf('/search/') !== -1) {
             loadSubPage(page.slice(0, page.indexOf('/search/')));
         }
     });
 
-    $topHeader.find('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
-        if (e.keyCode == 13 || folderlink) {
+    $topHeader.find('.top-search-input').rebind('focus', function () {
+        $topHeader.find('.top-search-button').removeClass('hidden');
+        $topHeader.find('.top-clear-button').addClass('hidden');
+    });
 
-            if (folderlink) {
-                // Flush cached nodes, if any
-                $(window).trigger('dynlist.flush');
+    var isFolderLink = function(val) {
+        if (val === '') {
+            M.openFolder();
+            $(this).trigger('blur');
+            return false;
+        }
+        else if (val.length < 2) {
+            return false;
+        }
+
+        if (!M.nn) {
+            M.nn = Object.create(null);
+            var keys = Object.keys(M.d);
+            for (var i = keys.length; i--;) {
+                M.nn[M.d[keys[i]].h] = M.d[keys[i]].name;
             }
+        }
 
-            if (!folderlink || !_topSearchHandler.logFired) {
-                // Add log to see how often they use the search
-                api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
-                _topSearchHandler.logFired = true;
+        var filter = M.getFilterBySearchFn(val);
+        var v = [];
+        for (var h in M.nn) {
+            if (filter({ name: M.nn[h] }) && h !== M.currentrootid) {
+                v.push(M.d[h]);
             }
+        }
+        M.v = v;
+        M.currentdirid = 'search/' + val;
+        M.renderMain();
+        M.onSectionUIOpen('cloud-drive');
+        $(this).trigger('blur');
+    };
 
-            var val = $.trim($('.top-search-input').val());
-            if (folderlink || val.length > 2 || !asciionly(val)) {
-                if (folderlink) {
-                    var dn = $(M.viewmode ? '.file-block-scrolling .file-block-title' : 'table.grid-table.fm .tranfer-filetype-txt');
-                    var ct = M.viewmode ? 'a' : 'tr';
-                    dn.closest(ct).show();
+    var isNotFolderLink = function(val) {
+        loadingDialog.show();
+        var promise = new MegaPromise();
 
-                    if (val) {
-                        val = val.toLowerCase();
-                        dn.filter(function () {
-                            return !~$(this).text().toLowerCase().indexOf(val);
-                        }).closest(ct).hide();
-                    }
-                    $(window).trigger('resize');
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                else {
-                    loadingDialog.show();
-                    var promise = new MegaPromise();
+        if (!M.nn) {
+            M.nn = Object.create(null);
 
-                    if (!M.nn) {
-                        M.nn = Object.create(null);
-
-                        promise = fmdb.get('f')
-                            .always(function (r) {
-                                for (var i = r.length; i--;) {
-                                    if (!r[i].fv) {
-                                        M.nn[r[i].h] = r[i].name;
-                                    }
-                                }
-                            });
-                    }
-                    else {
-                        promise.resolve();
-                    }
-
-                    promise.always(function () {
-                        var handles = [];
-                        var filter = M.getFilterBySearchFn(val);
-
-                        for (var h in M.nn) {
-                            if (!M.d[h] && filter({ name: M.nn[h] })) {
-                                handles.push(h);
-                            }
+            promise = fmdb.get('f')
+                .always(function (r) {
+                    for (var i = r.length; i--;) {
+                        if (!r[i].fv) {
+                            M.nn[r[i].h] = r[i].name;
                         }
+                    }
+                });
+        }
+        else {
+            promise.resolve();
+        }
 
-                        dbfetch.geta(handles).always(function () {
-                            loadingDialog.hide();
-                            loadSubPage('fm/search/' + val);
-                        });
-                    });
+        promise.always(function () {
+            var handles = [];
+            var filter = M.getFilterBySearchFn(val);
+
+            for (var h in M.nn) {
+                if (!M.d[h] && filter({ name: M.nn[h] })) {
+                    handles.push(h);
                 }
             }
-            // if current page is search and value is empty result move to root.
-            else if (val === '' && page.indexOf('/search/') !== -1) {
-                loadSubPage(page.slice(0, page.indexOf('/search/')));
+
+            dbfetch.geta(handles).always(function () {
+                loadingDialog.hide();
+                loadSubPage('fm/search/' + val);
+            });
+        });
+    };
+
+    $topHeader.find('.top-search-button').rebind('click mousedown', function _topSearchHandler() {
+        if (folderlink) {
+            // Flush cached nodes, if any
+            $(window).trigger('dynlist.flush');
+        }
+
+        if (!folderlink || !_topSearchHandler.logFired) {
+            // Add log to see how often they use the search
+            api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
+            _topSearchHandler.logFired = true;
+        }
+
+        var val = $.trim($('.top-search-input').val());
+        if (folderlink || val.length > 2 || !asciionly(val)) {
+            if (folderlink) {
+                isFolderLink(val);
             }
+            else {
+                isNotFolderLink(val);
+            }
+        }
+        // if current page is search and value is empty result move to root.
+        else if (val === '' && page.indexOf('/search/') !== -1) {
+            $topHeader.find('.top-clear-button').addClass('hidden');
+            loadSubPage(page.slice(0, page.indexOf('/search/')));
+        }
+    });
+
+    // Press enter to start searching
+    $topHeader.find('.top-search-input').rebind('keyup', function(e) {
+        if (e.keyCode === 13) {
+            $topHeader.find('.top-search-button').click();
         }
     });
 
@@ -2302,6 +2356,7 @@ function topmenuUI() {
 
     if (String(M.currentdirid).substr(0, 7) === 'search/' && M.currentdirid[7] !== '~') {
         $topHeader.find('.top-search-bl').addClass('contains-value');
+        $topHeader.find('.top-clear-button').removeClass("hidden");
         var searchVal = M.currentdirid.substr(7);
         if (hashLogic) {
             searchVal = decodeURIComponent(searchVal);

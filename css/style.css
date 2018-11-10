@@ -452,7 +452,7 @@ a.nlanguage-lnk.language-template {
 .relative {
     position: relative;
 }
-.password-stutus-txt {
+.password-status-txt {
     -moz-text-shadow: 0px 1px 1px #FFF;
     -webkit-text-shadow: 0px 1px 1px #FFF;
     text-shadow: 0px 1px 1px #FFF;
@@ -669,23 +669,23 @@ label span.black {
 .good5 .register-pass-status-line1, .good5 .register-pass-status-line2, .good5 .register-pass-status-line3, .good5 .register-pass-status-line4, .good5 .register-pass-status-line5 {
     background-color: #1DA1E9;
 }
-.good1 .password-stutus-txt {
+.good1 .password-status-txt {
     color: #ff2a0b;
     display: block;
 }
-.good2 .password-stutus-txt {
+.good2 .password-status-txt {
     color: #ffc926;
     display: block;
 }
-.good3 .password-stutus-txt {
+.good3 .password-status-txt {
     color: #7ab148;
     display: block;
 }
-.good4 .password-stutus-txt {
+.good4 .password-status-txt {
     color: #7dd016;
     display: block;
 }
-.good5 .password-stutus-txt {
+.good5 .password-status-txt {
     color: #1DA1E9;
     display: block;
 }
@@ -1625,7 +1625,7 @@ a.blog-button:hover {
 }
 .top-chat-notification .notification-num {
     background-color: #2BA6DE;
-} 
+}
 /* Change top language button */
 .top-change-language {
     float: right;
@@ -3637,7 +3637,7 @@ label.iPhoneCheckLabelOff span {
     box-sizing: border-box;
     min-width: 100%;
 }
-.fm-left-menu.dashboard + .nw-tree-panel-header + .fm-tree-panel {
+.fm-left-menu.dashboard + .nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel {
     height: 100%;
 }
 .fm-tree-panel .jspTrack {
@@ -4842,9 +4842,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #666666;
 }
 .top-clear-button {
-    display: none;
-}
-.contains-value .top-clear-button {
     display: block;
     width: 30px;
     height: 24px;
@@ -4865,11 +4862,37 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
 }
-.contains-value .top-clear-button:hover {
+.top-clear-button:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     -moz-opacity: 0.8;
     -khtml-opacity: 0.8;
     opacity: 0.8;
+}
+.top-search-button {
+    display: block;
+    width: 30px;
+    height: 24px;
+    right:0;
+    position: absolute;
+    z-index: 100;
+    cursor: pointer;
+    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-position: 6px -1350px;
+    background-repeat: no-repeat;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+    -moz-opacity: 0.6;
+    -khtml-opacity: 0.6;
+    opacity: 0.6;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
 }
 .top-search-clear {
     height: 24px;
@@ -8363,7 +8386,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     min-height: 100px;
     margin: -187px 0 0 -310px;
 }
-.fm-dialog.registration-success, .fm-dialog.reset-success, .fm-dialog.reset-success-st2, .fm-dialog.awaiting-confirmation {
+.fm-dialog.registration-success, .fm-dialog.reset-success, .fm-dialog.reset-success-st2, .fm-dialog.awaiting-confirmation, .fm-dialog.account-reset-confirmation {
     width: 393px;
     min-height: 254px;
     margin: -178px 0 0 -196px
@@ -8411,7 +8434,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .payment-confirmation .reg-success-icon.success {
     background-position: center -400px;
 }
-.awaiting-confirmation .reg-success-icon {
+.awaiting-confirmation .reg-success-icon, .account-reset-confirmation .reg-success-icon {
     background-position: center -1021px;
     height: 131px;
     margin-bottom: 23px;
@@ -9264,6 +9287,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     left: 0;
 }
+.improved-recovery-steps .default-select::before {
+    content: none;
+}
 .default-select span, .ui-selectmenu-button span, .fm-share-dropdown span, .share-dialog-permissions span, .share-dialog-icon.permissions-icon span, .fm-dialogs-select span {
     display: block;
     white-space: nowrap;
@@ -9541,7 +9567,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     padding: 0;
 }
 .export-link-body {
-    max-height: 138px;
+    max-height: 285px;
     overflow: hidden;
 }
 .export-gradient {
@@ -10790,6 +10816,11 @@ table {
     background: -webkit-linear-gradient(top, rgba(245,245,245,0.7) 0%, rgba(245,245,245,1) 100%);
     background: linear-gradient(to bottom, rgba(245,245,245,0.7) 0%, rgba(245,245,245,1) 100%);
 }
+
+.content-panel.dashboard * {
+   font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+
 .account.user-data-block {
     position: relative;
     padding: 60px 20px 16px 20px;
@@ -11392,6 +11423,25 @@ table {
 .dashboard .account.user-data-block {
     padding: 60px 20px 0 20px;
 }
+.default-green-button.upgrade-account {
+    display: inline-block;
+    font-size: 15px;
+    margin: 24px 0;
+    white-space: normal;
+    height: auto;
+    min-height: 32px;
+    line-height: 1.2;
+    padding: 6px 15px;
+}
+.default-white-button.backup-master-key {
+    display: inline-block;
+    font-size: 15px;
+    margin: 12px 0 0 0;
+    min-width: 140px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
 .account.left-pane.info-block {
     padding: 17px 25px 24px 25px;
 }
@@ -11409,26 +11459,20 @@ table {
 }
 .account.left-pane.info-txt {
     padding: 9px 0 12px 0;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 18px;
-    color: #333333;
+    color: #888;
+    text-align: center;
 }
 .account.left-pane.header {
-    padding: 0 0 0 0;
-    font-size: 14px;
-    line-height: 32px;
-    text-transform: uppercase;
-    color: #999999;
-    white-space: nowrap;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-}
-.account.left-pane.big-txt {
-    padding: 3px 0 13px 0;
-    font-size: 18px;
-    line-height: 31px;
-    color: #333333;
+    width: 100%;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    line-height: 18px;
+    margin:8px 0 16px 0;
+    text-transform: capitalize;
     white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
@@ -11458,20 +11502,36 @@ table {
     text-overflow: ellipsis;
     display: block;
 }
-.account.left-pane.big-txt span {
-    color: #777777;
-    padding-left: 5px;
-}
 .account.left-pane.small-txt {
-    color: #777777;
+    display: inline-block;
     font-size: 14px;
-    line-height: 16px;
-    margin: 0 0 -6px 0;
-    text-transform: uppercase;
-    white-space: nowrap;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 20px;
+    text-align: left;
+    white-space: normal;
+    text-transform: capitalize;
+    overflow: visible;
+    vertical-align: top;
     text-overflow: ellipsis;
+}
+.account.left-pane.big-txt {
+    display: inline-block;
+    font-size: 14px;
+    color: #999;
+    height: 24px;
+    margin-bottom: 4px;
+    line-height: 20px;
+    white-space: normal;
+    text-transform: capitalize;
+    padding: 0;
+    vertical-align: top;
+    float: right;
+    text-align: right;
+}
+.small-left-panel .account.left-pane.small-txt, .small-left-panel .account.left-pane.big-txt {
+    text-align: center;
+    width: 100%;
 }
 .account.widget .fm-account-blocks {
     padding-top: 10px;
@@ -12238,7 +12298,7 @@ table {
     box-sizing: border-box;
     padding: 0 15px 0 15px;
 }
-.main-mid-pad.improved-recovery-steps {
+.main-mid-pad.improved-recovery-steps, .main-mid-pad.backup-recover.withkey{
     width: 100%;
     padding: 0 0;
     background-color: #F5F7F9;
@@ -12441,7 +12501,7 @@ h5.main-italic-header {
 .incorrect .register-name-input-block {
     border-color: #D52600;
 }
-.new-registration .password-stutus-txt {
+.new-registration .password-status-txt {
     padding-top: 10px;
     font-size: 14px;
     float: none;
@@ -12459,7 +12519,7 @@ h5.main-italic-header {
 .new-reg-status-description {
     color: #666666
 }
-.login-register-input.strong-password, .login-register-input.weak-password, .login-register-input.loading {
+.login-register-input.meets-minimum-strength, .login-register-input.insufficient-strength, .login-register-input.loading {
     padding: 0 30px 0 35px;
 }
 .password-status-icon {
@@ -12473,10 +12533,10 @@ h5.main-italic-header {
     right: 0;
     display: none;
 }
-.weak-password .password-status-icon {
+.insufficient-strength .password-status-icon {
     background-position: 2px -939px;
 }
-.strong-password .password-status-icon, .weak-password .password-status-icon {
+.meets-minimum-strength .password-status-icon, .insufficient-strength .password-status-icon {
     display: block;
 }
 .password-status-warning {
@@ -15706,7 +15766,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     cursor: pointer;
     background-color: #D42400;
 }
-.backup-recover .new-registration .password-stutus-txt {
+.backup-recover .new-registration .password-status-txt {
     margin-bottom: -15px;
 }
 .login-register-input.fail {
@@ -23637,645 +23697,94 @@ opacity: 1;
     line-height: 20px;
     color: #999;
 }
-.improved-recovery-steps .block-wrapper {
-    width: 100%;
-    min-width: 1024px;
-}
-.improved-recovery-steps .main-left-block {
-    width: 100%;
-    padding: 0 0;
-    height: 100%;
-    display: block;
-    float: left;
-}
-.improved-recovery-steps .main-right-block {
-    width: 300px;
-    margin: -12px auto 0;
-    display: block;
-    padding: 0 0;
-    position: relative;
-}
-.improved-recovery-steps h3.main-italic-header, .improved-recovery-steps h2 {
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
-    font-size: 14px;
-    color: #999;
-    letter-spacing: 0.2px;
-    padding: 0 0;
-    -webkit-margin-before: 0em;
-    -webkit-margin-after: 0em;
-    margin: 0 0;
-}
-.improved-recovery-steps .checkbox-block h3.main-italic-header, .improved-recovery-steps .app-instruction-block h3.main-italic-header {
-    padding: 0 0;
-}
-.improved-recovery-steps .checkbox-block h3.main-italic-header {
-    color: #999;
-}
-.improved-recovery-steps h2 {
-    color: #51585D;
-    font-size: 20px;
+.password-tooltip.tooltip-block {
+    position: absolute;
+    width: 390px;
+    right: -406px;
     display: inline-block;
-    letter-spacing: 0.2px;
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    top: -116px;
+    box-shadow: 0 0 20px 5px rgba(0,0,0,0.06);
+    opacity: 0;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    border-radius: 6px;
+    z-index: 10;
 }
-.improved-recovery-steps h1 {
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
-    font-size: 26px;
-    color: #343A40;
-    letter-spacing: 0.2px;
-    line-height: 36px;
-    -webkit-margin-before: 0.2em;
-    -webkit-margin-after: 0.5em;
-    -webkit-margin-start: 0px;
-    -webkit-margin-end: 0px;
+.password-tooltip.tooltip-block.visible {
+    opacity: 1;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
-.improved-recovery-steps .register-st2-txt-block {
-    display: table;
-    min-height: 768px;
-    height: 768px;
-    width: 100%;
+.password-tooltip.tooltip-block .triangle-pointer {
+    width: 20px;
+    height: 20px;
+    transform: rotate(45deg);
+    position:absolute;
+    left: -9px;
+    background-color: #fff;
+    top: 126px;
+    box-shadow: -10px 7px 20px 0px rgba(0,0,0,0.06);
 }
-/*.improved-recovery-steps .vert-container-aligner {
+.password-tooltip.tooltip-block .password-tooltip-card  {
+    background: #FFFFFF;
+    border: 1px solid #F4F4F6;
+    border-radius: 6px;
+    padding: 28px 32px;
+    border-radius: 6px;
+}
+.password-tooltip.tooltip-block p{
+    text-align: left;
+    color: #262F3B;
+    white-space: normal;
+    word-wrap: break-word;
+}
+.tooltip-block .minimum-password-block .password-icon  {
+    background-image: url(../images/mega/recover-account-sprite.png);
+    background-repeat: no-repeat;
+    background-size: 344px auto;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    position: relative;
+    left: 0;
+    background-position: -133px -761px;
+    opacity: 1;
+    top: 0;
+    margin-right: 8px;
     vertical-align: middle;
-    display: table-cell;
-}*/
-.improved-recovery-steps .vert-container-aligner {
-    width: 900px;
-    min-width: 900px;
-    margin: 0 auto 24px;
-    background-color: #fff;
-    border-radius: 4px;
-    border: 1px solid rgba(0, 40, 100, 0.12);
-    height: auto;
 }
-.improved-recovery-steps .main-right-block .vert-container-aligner {
-    width: 300px;
-    min-width: 300px;
-    background-color: rgba(0,0,0,0);
-    border: 1px solid rgba(0, 40, 100, 0);
-    margin: 0 auto;
+.tooltip-block .minimum-password-block .password-icon.success {
+    background-position: -133px -782px;
 }
-.improved-recovery-steps .content-wrapper {
-    width: 100%;
-    margin: 40px auto 0;
-    padding: 0;
-}
-.improved-recovery-steps .main-left-block .content-wrapper {
-    position: relative;
-    width: 750px;
-    min-height: 540px;
-    margin-bottom: 40px;
-}
-.improved-recovery-steps .main-right-block .content-wrapper {
-    width: auto;
-    position: relative;
-    max-width: 340px;
-    margin: 0 auto;
-    padding: 0 40px;
-    min-height: 20px;
-    user-select: none;
-}
-.improved-recovery-steps .content-wrapper p span {
-    font-family: 'source_sans_probold';
-    color: #F57223;
-}
-.improved-recovery-steps p {
-    font-size: 14px;
-    color: #495057;
-    letter-spacing: 0;
-    line-height: 1.7;
-    padding-bottom: 0;
-    margin-bottom: 24px;
-}
-.improve-recovery-steps .button-container {
-    width: 100%;
-    height: 100px;
-}
-.improved-recovery-steps .recover-button {
-    font-size: 14px;
-    letter-spacing: 0;
-    text-align: right;
-    line-height: 44px;
-    text-decoration: underline;
-    width: auto;
-    height: auto;
-    background-color: #fff;
-    text-align: right;
-    text-transform: none;
-    float: left;
-    margin: 0;
-    display: block;
-    border-radius: 0px;
-    padding: 0px 16px;
-    border: 0px solid rgba(0,0,0,0);
-    -webkit-box-shadow: 0 0 0 0 #6BB219;
-    -moz-box-shadow: 0 0 0 0 #6BB219;
-    box-shadow: 0 0 0 0 #6BB219;
-    border-radius: 2px;
-    font-family: 'source_sans_proregular', Arial;
-}
-.improved-recovery-steps .backup-input-button.default-grey-button.left {
-    right: 0px;
-    font-size: 14px;
-    text-decoration: none;
-    line-height: 36px;
-    text-align: center;
-}
-.improved-recovery-steps .recover-button.yes {
-    color: #2AAF5F;
-}
-.improved-recovery-steps .recover-button.yes.default-grey-button {
-    color: #fff;
-    text-align: center;
-    text-decoration: none;
-    background: #F0373B;
-    webkit-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
-    box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
-    border-radius: 4px;
-}
-.improved-recovery-steps .recover-button.yes.default-grey-button::after {
-    webkit-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
-    box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
-}
-.improved-recovery-steps .recover-button.yes.default-grey-button::before {
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
-    box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
-}
-.improved-recovery-steps .recover-button.yes.default-grey-button:hover {
-    background: #E12124;
-    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
-    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
-    box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
-}
-.improved-recovery-steps .recover-button.yes:hover, .recover-button.yes.active {
-    background: rgba(42,175,95,0.1);
-    -webkit-box-shadow: 0 0 0 0 #6BB219;
-    -moz-box-shadow: 0 0 0 0 #6BB219;
-    box-shadow: 0 0 0 0 #6BB219;
-}
-.improved-recovery-steps .recover-button.no {
-    color: #eb4444;
-}
-.improved-recovery-steps .recover-button.no:hover, .recover-button.no.active {
-    background: rgba(235,68,68,0.10);
-    -webkit-box-shadow: 0 0 0 0 #FDECEC;
-    -moz-box-shadow: 0 0 0 0 #FDECEC;
-    box-shadow: 0 0 0 0 #FDECEC;
-}
-.improved-recovery-steps .button-container {
-    bottom: 0;
-    position: absolute;
-    right: 0;
-}
-.improved-recovery-steps .button-aligner {
-    float: right;
-}
-.improved-recovery-steps .progress-meter {
-    margin: 0 auto;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    max-width: 400px;
-    padding-top: 0px;
-    opacity: 0.8;
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Non-prefixed version, currently
-                          supported by Chrome and Opera */
-}
-.improved-recovery-steps .progress-meter .track {
-    position: relative;
-    height: 4px;
-    background: #ddd;
-}
-.improved-recovery-steps .progress-meter .progress-points {
-    position: relative;
-    margin: 0 auto;
-    padding: 0;
-    list-style: none;
-    width: fit-content;
-    line-height: 12px;
-}
-.improved-recovery-steps .progress-meter li.progress-point {
-    -moz-transition: color 1s;
-    -o-transition: color 1s;
-    -webkit-transition: color 1s;
-    transition: color 1s;
-    position: relative;
-    text-align: left;
-    cursor: pointer;
-    color: #aaa;
-    margin-left: 30px;
-    line-height: 12px;
-    display: inline-block;
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Non-prefixed version, currently
-                          supported by Chrome and Opera */
-}
-.improved-recovery-steps .progress-meter .progress-point:first-of-type {
-    margin-left: 0;
-}
-.improved-recovery-steps .progress-meter .progress-point.inactive {
-    cursor: default;
-}
-.improved-recovery-steps .progress-meter .progress-point:last-of-type {
-    margin-bottom: 0px;
-}
-.improved-recovery-steps .progress-meter .progress-point.warning, .improved-recovery-steps .progress-meter .progress-point.success {
-    margin-bottom: 0px;
-}
-
-.improved-recovery-steps .progress-meter .progress-point.completed, .improved-recovery-steps .progress-meter .progress-point.active {
-    color: #777;
-}
-.improved-recovery-steps .progress-meter .progress-meter .progress-points .progress-point:nth-child(1) {
-    left: 0%;
-}
-.improved-recovery-steps .progress-meter .progress-point:before {
-    -moz-transition: all .2s;
-    -o-transition: all .2s;
-    -webkit-transition: all .2s;
-    transition: all .2s;
-    -moz-border-radius: 24px;
-    -webkit-border-radius: 24px;
-    border-radius: 24px;
-    content: "";
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    margin: 0 0;
-    background-color: #777E82;
-    border: 1px solid  #777E82;
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Non-prefixed version, currently
-                          supported by Chrome and Opera */
-
-}
-.improved-recovery-steps .progress-meter ol.progress-points {
-}
-.improved-recovery-steps .progress-meter .progress-point:not(.inactive):hover:before {
-    border: 4px solid  #CBCFD1;
-    margin: -3px -3px;
-    -moz-transition: all .2s;
-    -o-transition: all .2s;
-    -webkit-transition: all .2s;
-    transition: all .2s;
-}
-.improved-recovery-steps .progress-meter .progress-point.active:before {
-    border-color: #777;
-}
-.improved-recovery-steps .progress-meter .progress-point:hover .progress-track {
-    height: 2px;
-    bottom: 6px;
-    -moz-transition: all .2s;
-    -o-transition: all .2s;
-    -webkit-transition: all .2s;
-    transition: all .2s;
-}
-.improved-recovery-steps .progress-meter .progress-point.inactive {
-    opacity: .2;
-}
-.improved-recovery-steps .progress-meter .progress-point.inactive .progress-content {
-    display: none;
-}
-.improved-recovery-steps .progress-meter .progress-point.success:before {
-    background-color: #2AAF5F;
-    border: 1px solid  #2AAF5F;
-    -moz-transition: all .2s;
-    -o-transition: all .2s;
-    -webkit-transition: all .2s;
-    transition: all .2s;
-}
-.improved-recovery-steps .progress-meter .progress-point.success .progress-track {
-    background-color: #2AAF5F;
-    -moz-transition: all .2s;
-    -o-transition: all .2s;
-    -webkit-transition: all .2s;
-    transition: all .2s;
-}
-.improved-recovery-steps .progress-meter .progress-point.success:hover:before {
-    border: 4px solid  #D4EFDF;
-    margin: -3px -3px;
-    -moz-transition: all .2s;
-    -o-transition: all .2s;
-    -webkit-transition: all .2s;
-    transition: all .2s;
-}
-.improved-recovery-steps .progress-meter .progress-point.success .step-label {
-    color:  #2AAF5F;
-}
-.improved-recovery-steps .progress-meter .progress-point.warning:before{
-    background-color: #FF6406;
-    border: 1px solid  #FF6406;
-    -moz-transition: all .2s;
-    -o-transition: all .2s;
-    -webkit-transition: all .2s;
-    transition: all .2s;
-}
-.improved-recovery-steps .progress-meter .progress-point.warning:hover:before {
-    border: 4px solid  #FDE3D3;
-    margin: -3px -3px;
-    -moz-transition: all .2s;
-    -o-transition: all .2s;
-    -webkit-transition: all .2s;
-    transition: all .2s;
-}
-
-.improved-recovery-steps .progress-meter .progress-point.warning .progress-track {
-    background-color: #FF6406;
-    width: 37px;
-}
-.improved-recovery-steps .progress-meter .progress-point.warning .step-label {
-    color: #F57223;
-}
-.improved-recovery-steps .progress-meter .progress-point:hover .step-label {
-    text-decoration: underline;
-}
-.improved-recovery-steps .progress-meter .progress-content {
-    margin: -17px 12px 0 24px;
-    position: absolute;
-    text-align: left;
-    float: left;
-    width: 100%;
-}
-.improved-recovery-steps .progress-meter .progress-content .step-label {
-    font-family: "source_sans_probold";
-    font-size: 13px;
-    color: #777E82;
-    letter-spacing: 0;
-     margin-bottom: 8px;
-}
-.improved-recovery-steps .progress-meter .progress-content .step-answer {
-}
-.improved-recovery-steps .progress-meter .progress-track {
-    width: 36px;
-    height: 2px;
-    display: block;
-    background: #777E82;
-    position: absolute;
-    bottom: 6px;
-    right: 7px;
-}
-.improved-recovery-steps .login-register-input {
-    background-color: #F8F9FA;
-    border: 1px solid #EBEEF0;
-    border-radius: 2px;
-    max-width: 400px;
+.password-tooltip.tooltip-block .minimum-password-block p.minimum-password {
     margin-bottom: 0;
-}
-.improved-recovery-steps .login-register-input:hover {
-    border: 1px solid #ddd;
-}
-.improved-recovery-steps .login-register-input input {
-    color: #444;
-    line-height: 25px;
-    background-color: rgba(0,0,0,0);
-}
-
-.improved-recovery-steps .login-register-input input::placeholder {
-    /* Chrome, Firefox, Opera, Safari 10.1+ */
-    color: #aaa;
-    opacity: 1; /* Firefox */
-}
-
-.improved-recovery-steps .login-register-input input:-ms-input-placeholder {
-     /* Internet Explorer 10-11 */
-    color: #aaa;
-}
-
-.improved-recovery-steps .login-register-input input::-ms-input-placeholder {
-    /* Microsoft Edge */
-    color:#aaa;
-}
-.improved-recovery-steps .app-button {
-    border-radius: 3px;
-    padding: 0 8px;
+    vertical-align: middle;
     display: inline-block;
-    line-height: 24px;
-    margin: 4px 2px;
-    cursor: pointer;
-    color: #555;
 }
-.improved-recovery-steps .app-button:first-of-type {
-    margin-left: 0px;
-}
-.improved-recovery-steps .app-button:last-of-type {
-    margin-right: 0px;
-}
-.improved-recovery-steps .app-button:hover {
-    background-color: #f2f2f2;
-    color: #111;
-    background-image: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(242,242,242,0.80) 100%);
-}
-.improved-recovery-steps .app-button.active {
-    background-color: #eb4444;
-    background-image: linear-gradient(-180deg, rgba(255,255,255,0) 0%, rgba(242,242,242,0) 100%);
-    border: 1px solid #d90007;
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 1px 1px 0 rgba(255,255,255,0.20);
-    border-radius: 3px;
-    color: #fff;
-}
-.improved-recovery-steps .app-button.active:hover {
-    color: #fff;
-}
-.improved-recovery-steps .app-instruction-block {
-    margin: 0 0 8px 0;
-}
-
-.improved-recovery-steps ol.app-instructions-list {
-    list-style-type: none;
-    -webkit-margin-before: 1em;
-    -webkit-margin-after: 0;
-    -webkit-margin-start: 0;
-    -webkit-margin-end: 0;
-    -webkit-padding-start: 00;
-    padding: 0;
-}
-.improved-recovery-steps li.list-point:before {
-    width: 23px;
-    text-indent: 8px;
-    padding-left: 0px;
-    height: 23px;
-    line-height: 22px;
-    vertical-align: top;
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
-    border-radius: 12px;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    color: #333;
-    font-weight: 900;
-    display: inline-block;
-    content: counter(list);
-    margin-right: 15px;
+.password-tooltip.tooltip-block p.minor-gray-header {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 14px;
+    color: #818993;
+    text-align: left;
+    line-height: 21px;
+    margin: 16px 0 12px;
 }
-.improved-recovery-steps .list-point {
-    margin-bottom: 20px;
-    line-height: 23px;
-    counter-increment: list;
-    text-indent: -40px;
-    margin-left: 40px;
+.password-tooltip.tooltip-block h5.main-italic-header {
+    font-size: 16px;
+    margin-bottom: 10px;
 }
-.improved-recovery-steps .list-point b.megasync-logo {
-    background-position: -6px -773px;
-    width: 24px;
-    height: 24px;
-    background-image: url(../images/mega/top-sprite_v5.png);
-    background-repeat: no-repeat;
-    padding-left: 66px;
-    margin: 0 -39px 0 0;
+.withoutkey .new-registration-checkbox.reset-pass {
+    width: 402px;
+    margin: 24px auto;
 }
-/* Language styles for the MEGAsync icon */
-.es .improved-recovery-steps .list-point b.megasync-logo {
-    padding-left: 68px;
-    margin: 0 -29px 0 3px;
-}
-.br .improved-recovery-steps .list-point b.megasync-logo {
-    padding-left: 68px;
-    margin: 0 -12px 0 3px;
-}
-.de .improved-recovery-steps .list-point b.megasync-logo {
-    padding-left: 68px;
-    margin: 0 -33px 0 4px;
-}
-.fr .improved-recovery-steps .list-point b.megasync-logo {
-    padding-left: 68px;
-    margin: 0 -31px 0 4px;
-}
-.it .improved-recovery-steps .list-point b.megasync-logo {
-    padding-left: 68px;
-    margin: 0 -31px 0 4px;
-}
-.tr .improved-recovery-steps .list-point b.megasync-logo {
-    padding-left: 68px;
-    margin: 0 -15px 0 4px;
-}
-.ru .improved-recovery-steps .list-point b.megasync-logo {
-    margin: 0 -15px 0 4px;
-}
-
-.improved-recovery-steps strong {
-    font-family: 'source_sans_probold';
-    color: #333;
-}
-.improved-recovery-steps  strong.warning-text {
-    color: #eb4444;
-}
-.improved-recovery-steps .instruction-block {
-    margin-top: 32px;
-    font-size: 14px;
-}
-.improved-recovery-steps .content-highlight {
-    background-color: rgba(42,175,95,0.04);
-    border: 1px solid #D4EFDF;
-    border-radius: 2px;
-    line-height: 46px;
-    color: #55BF7F;
-    cursor: pointer;
-    font-size: 14px;
-}
-.improved-recovery-steps .content-highlight-block {
-    position: absolute;
-    width: 100%;
-    bottom: 012px;
-}
-.improved-recovery-steps .content-highlight:hover {
-    background-color: rgba(42,175,95,0.04);
-    border: 1px solid rgba(42,175,95,0.20);
-}
-.improved-recovery-steps .content-highlight.warning {
-    background: rgba(235,68,68,0.03);
-    border: 1px solid rgba(235,68,68,0.10);
-    border-radius: 2px;
-    color: #eb4444;
-}
-.improved-recovery-steps .feedback-logo {
-    margin-top: 7px;
-    margin-right: 16px;
-    margin-left: 12px;
-}
-.improved-recovery-steps .warning-icon.warning {
-    display: block;
-}
-.improved-recovery-steps h3.warning {
-    color: #F57223;
-}
-.improved-recovery-steps h3.success {
-    color: #2AAF5F;
-}
-.improved-recovery-steps .nav-back-icon {
-    width: 18px;
-    height: 16px;
-    display: inline-block;
-    background-image: url(../images/mega/icons-sprite_v22.png);
-    background-repeat: no-repeat;
-    background-position: -204px -196px;
-    background-size: 262px auto;
-    -webkit-transform: scaleX(-1);
-    transform: scaleX(-1);
-    margin: 5px 8px  0 -30px;
-    display: inline-block;
-    opacity: 0.4;
-}
-.improved-recovery-steps .right-header {
-    display: block;
-    position: relative;
-    opacity: 1;
-    height: 96px;
-    line-height: 72px;
-    width: 900px;
-    min-width: 900px;
-    margin: 36px auto 0;
-    text-align: center;
-}
-.improved-recovery-steps .nav-header-block {
-    position: absolute;
-    opacity: 1;
-    right: 0;
-    bottom: 16px;
-    line-height: 24px;
-}
-.improved-recovery-steps .nav-header-block h2 {
-    font-size: 13px;
-    color: #9a9fa2;
-    line-height: 24px;
-    white-space: nowrap;
-}
-.improved-recovery-steps  .nav-back-subheading {
-    display: none;
-}
-.improved-recovery-steps .nav-header-block:hover {
-    cursor: pointer;
-}
-.improved-recovery-steps .nav-header-block:hover h2 {
-    text-decoration: underline;
-}
-.improved-recovery-steps .recover-account-email-block .error-message{
-    margin-top: 16px;
-    color: #eb4444;
-    font-size: 12px;
-    margin-left: 0px;
-    max-width: 400px;
-    line-height: 1.6;
-}
-.improved-recovery-steps .hidden {
-    display: none !important /* I will remove important later */;
+.withoutkey .new-registration-checkbox.reset-pass .radio-txt {
+    padding-right: 0;
 }
 
 

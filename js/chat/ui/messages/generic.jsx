@@ -1142,6 +1142,19 @@ var GenericConversationMessage = React.createClass({
                         chatRoom.isReadOnly() === false &&
                         !message.requiresManualRetry
                     ) {
+                        var editButton = message.metaType !== -1 ?
+                            <DropdownsUI.DropdownItem
+                                icon="icons-sprite writing-pencil"
+                                label={__(l[1342])}
+                                className=""
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+
+                                    self.setState({'editing': true});
+                                }} /> :
+                            null;
+
                         messageActionButtons = <ButtonsUI.Button
                             className="default-white-button tiny-button"
                             icon="tiny-icon icons-sprite grey-dots">
@@ -1153,18 +1166,8 @@ var GenericConversationMessage = React.createClass({
                                 horizOffset={4}
                             >
                                 {extraPreButtons}
-                                <DropdownsUI.DropdownItem
-                                    icon="icons-sprite writing-pencil"
-                                    label={__(l[1342])}
-                                    className=""
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        e.preventDefault();
-
-                                        self.setState({'editing': true});
-                                }}
-                                />
-                                <hr/>
+                                {editButton}
+                                {editButton ? <hr/> : null}
                                 <DropdownsUI.DropdownItem
                                     icon="red-cross"
                                     label={__(l[1730])}

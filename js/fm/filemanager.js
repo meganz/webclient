@@ -43,7 +43,7 @@ FileManager.prototype.initFileManager = function() {
                 $treesub.addClass('opened');
             }
 
-            M.openFolder(M.currentdirid)
+            M.openFolder($.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid)
                 .always(function() {
                     if (megaChatIsReady) {
                         megaChat.renderMyStatus();
@@ -440,8 +440,9 @@ FileManager.prototype.initFileManagerUI = function() {
 
     $('.fm-files-view-icon').rebind('click', function() {
         $.hideContextMenu();
-
+        var viewValue;
         if ($(this).hasClass('listing-view')) {
+            viewValue = 0;
             if (fmconfig.uiviewmode) {
                 mega.config.set('viewmode', 0);
             }
@@ -450,6 +451,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
         else {
+            viewValue = 1;
             if (fmconfig.uiviewmode) {
                 mega.config.set('viewmode', 1);
             }
@@ -457,11 +459,16 @@ FileManager.prototype.initFileManagerUI = function() {
                 fmviewmode(M.currentdirid, 1);
             }
         }
-
-        M.openFolder(M.currentdirid, true)
-        .always(function() {
-            reselect();
-        });
+        if (folderlink && M.currentdirid.substr(0, 6) === 'search') {
+            M.viewmode = viewValue;
+            M.renderMain();
+        }
+        else {
+            M.openFolder(M.currentdirid, true)
+            .always(function() {
+                reselect();
+            });
+        }
 
         return false;
     });
@@ -496,6 +503,7 @@ FileManager.prototype.initFileManagerUI = function() {
         $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
+        $('.data-block-view .file-settings-icon').removeClass('active');
 
         // Set to default
         a = $('.dropdown.body.files-menu,.dropdown.body.download');
@@ -744,6 +752,14 @@ FileManager.prototype.initFileManagerUI = function() {
         else {
             $('.left-pane-drag-handle').css('cursor', 'we-resize')
         }
+
+        if ($('.account.left-pane.header').width() < $.leftPaneResizable.options.updateWidth) {
+            $(this.element).addClass('small-left-panel');
+        }
+        else {
+            $(this.element).removeClass('small-left-panel');
+        }
+
         $(window).trigger('resize');
     });
 
@@ -1316,8 +1332,7 @@ FileManager.prototype.initContextUI = function() {
             M.labeling($.selected, labelId);
         }
 
-        // refresh page for filter and sort with new label.
-        M.openFolder(M.currentdirid, true);
+        M.labelDomUpdate();
     });
 
     $('.colour-sorting-menu .filter-by .dropdown-colour-item').rebind('click', function(e) {
@@ -2606,7 +2621,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
     }
 
-    $('.fm-blocks-view, .shared-blocks-view, .fm-empty-cloud, .fm-empty-folder')
+    $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder')
         .rebind('contextmenu.fm', function(e) {
             $(this).find('.data-block-view').removeClass('ui-selected');
             // is this required? don't we have a support for a multi-selection context menu?
@@ -3545,18 +3560,21 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             $('.nw-fm-left-icon.folder-link').addClass('active');
             $('.fm-left-menu').addClass('folder-link');
             $('.nw-fm-tree-header.folder-link').show();
-            $('.fm-import-to-cloudrive, .fm-download-as-zip')
-                .removeClass('hidden')
-                .rebind('click', function() {
-                    var c = '' + $(this).attr('class');
+            // remove this two buttons from search result.
+            if (M.currentdirid.substr(0, 6) !== 'search') {
+                $('.fm-import-to-cloudrive, .fm-download-as-zip')
+                    .removeClass('hidden')
+                    .rebind('click', function() {
+                        var c = $(this).attr('class');
 
-                    if (~c.indexOf('fm-import-to-cloudrive')) {
-                        M.importFolderLinkNodes([M.currentdirid]);
-                    }
-                    else if (~c.indexOf('fm-download-as-zip')) {
-                        M.addDownload([M.currentdirid], true);
-                    }
-                });
+                        if (c.indexOf('fm-import-to-cloudrive') > -1) {
+                            M.importFolderLinkNodes([M.currentdirid]);
+                        }
+                        else if (c.indexOf('fm-download-as-zip') > -1) {
+                            M.addDownload([M.currentdirid], true);
+                        }
+                    });
+            }
             // if (!u_type) {
             // $('.fm-import-to-cloudrive').addClass('hidden');
             // }

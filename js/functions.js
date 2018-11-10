@@ -324,17 +324,14 @@ function makeid(len) {
 /**
  * Checks if the email address is valid
  * @param {String} email The email address to validate
- * @returns {Boolean} Returns true if email is invalid, false if email is fine
+ * @returns {Boolean} Returns true if email is valid, false if email is invalid
  */
-function checkMail(email) {
-    email = email.replace(/\+/g, '');
-    var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-    if (filter.test(email)) {
-        return false;
-    }
-    else {
-        return true;
-    }
+function isValidEmail(email) {
+
+    // Use regex from https://stackoverflow.com/a/1373724
+    var regex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+
+    return regex.test(email);
 }
 
 /**
@@ -2607,7 +2604,7 @@ function invalidLinkError() {
 
 /**
  * Classifies the strength of the password (used on the main Registration, Reset password (key or park) pages and
- * in the Pro Register dialog.
+ * in the Pro Register dialog. The minimum allowed strength is 8 characters in length and password score of 1 (weak).
  * @param {String} password The user's password (should be trimmed for whitespace beforehand)
  */
 function classifyPassword(password) {
@@ -2617,56 +2614,66 @@ function classifyPassword(password) {
     // Calculate the password score using the ZXCVBN library and its length
     var passwordScore = zxcvbn(password).score;
     var passwordLength = password.length;
-    var $passStatus = $('.account.password-stutus');
+    var $passStatus = $('.account.password-status');
     var className = '';
     var string1 = '';
     var string2 = '';
-    var strongWeak = '';
+    var statusClass = '';
 
     if (passwordLength < security.minPasswordLength) {
         string1 = l[18700];
-        string2 = l[18701];
-        className = 'good1';
-        strongWeak = 'strong-password';
+        string2 = l[18701];             // Your password needs to be at least 8 characters long
+        className = 'good1';            // Very weak
+        statusClass = 'insufficient-strength';
     }
     else if (passwordScore === 4) {
         string1 = l[1128];
         string2 = l[1123];
-        className = 'good5';
-        strongWeak = 'strong-password';
+        className = 'good5';            // Strong
+        statusClass = 'meets-minimum-strength';
     }
     else if (passwordScore === 3) {
         string1 = l[1127];
         string2 = l[1122];
-        className = 'good4';
+        className = 'good4';            // Good
+        statusClass = 'meets-minimum-strength';
     }
     else if (passwordScore === 2) {
         string1 = l[1126];
         string2 = l[1121];
-        className = 'good3';
-        strongWeak = 'weak-password';
+        className = 'good3';            // Medium
+        statusClass = 'meets-minimum-strength';
     }
     else if (passwordScore === 1) {
         string1 = l[1125];
         string2 = l[1120];
-        className = 'good2';
-        strongWeak = 'weak-password';
+        className = 'good2';            // Weak
+        statusClass = 'meets-minimum-strength';
     }
     else {
         string1 = l[1124];
         string2 = l[1119];
-        className = 'good1';
-        strongWeak = 'weak-password';
+        className = 'good1';            // Very weak
+        statusClass = 'insufficient-strength';
     }
 
     if ($('.login-register-input.password').length) {
-        $('.login-register-input.password').addClass(strongWeak);
+        $('.login-register-input.password').addClass(statusClass);
         $('.new-registration').addClass(className);
         $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], string1);   // Too short
         $('.new-reg-status-description').text(string2);
     }
     else if ($passStatus.length) {
         $passStatus.addClass(className + ' checked').text(string1);
+
+        if ($('.password-tooltip.visible').length && string2 !== l[18701]) {
+            $('.password-advice').text(string2);
+            $('.minimum-password-block .password-icon').addClass('success');
+        }
+        else {
+            $('.password-advice').empty();
+            $('.minimum-password-block .password-icon').removeClass('success');
+        }
     }
 
     $('.password-status-warning')

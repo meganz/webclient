@@ -106,21 +106,28 @@ var mobile = {
     },
 
     /**
-     * Shows and initialises the back button on click/tap event handler
-     * @param {Object} $backButton jQuery selector for the back button
+     * Initialise the back arrow icon in the header to go back to a specific page
+     * @param {Object} $page The jQuery selector for the current page
+     * @param {String} targetPage Optional strung to specify the previous page to go back to, otherwise it will go back
+     *                            one page in the browser history
      */
-    showAndInitBackButton: function($backButton) {
+    initBackButton: function($page, targetPage) {
 
         'use strict';
 
-        // Show the back button
-        $backButton.removeClass('hidden');
+        // Unhide back button, then add on click/tap handler
+        $page.find('.fm-icon.back').removeClass('hidden').off('tap').on('tap', function() {
 
-        // On click of the back button
-        $backButton.off('tap').on('tap', function() {
+            // If page to go back to is specified, render that
+            if (typeof targetPage !== 'undefined') {
+                loadSubPage(targetPage);
+            }
+            else {
+                // Otherwise open the previous folder/page
+                window.history.back();
+            }
 
-            // Open the previous folder/page
-            window.history.back();
+            // Prevent double taps
             return false;
         });
     },
@@ -318,6 +325,116 @@ var mobile = {
         // Show white background overlay behind the dialog
         $('.light-overlay').removeClass('hidden');
         $('.mobile.common-check-email-dialog').removeClass('hidden');
+    },
+
+    /**
+     * Enable the Password Change/Update button if the fields are complete and correct
+     * @param {Object} $page The jQuery selector for the current page
+     */
+    initPasswordFieldsKeyupEvent: function($page) {
+
+        'use strict';
+
+        var $passwordField = $page.find('.password-input');
+        var $confirmPasswordField = $page.find('.password-confirm-input');
+        var $button = $page.find('.update-password-button');
+        var $allFields = $passwordField.add($confirmPasswordField);
+
+        // Add keyup event to the input fields
+        $allFields.rebind('keyup.buttonenable', function(event) {
+
+            var password = $passwordField.val();
+            var confirmPassword = $confirmPasswordField.val();
+
+            // Change the button to red to enable it if they have entered something in all the fields
+            if (password.length > 0 && confirmPassword.length > 0) {
+
+                // Activate the button
+                $button.addClass('active');
+
+                // If the Enter key is pressed try updating
+                if (event.which === 13) {
+                    $button.trigger('tap');
+                }
+            }
+            else {
+                // Grey it out if they have not completed one of the fields
+                $button.removeClass('active');
+            }
+        });
+    },
+
+    /**
+     * Load the ZXCVBN password strength estimator library
+     * @param {Object} $page The jQuery selector for the current page
+     */
+    initPasswordEstimatorLibrary: function($page) {
+
+        'use strict';
+
+        // Make sure the library is loaded
+        if (typeof zxcvbn === 'undefined') {
+
+            // Show loading spinner
+            var $loader = $page.find('.estimator-loading-icon').addClass('loading');
+
+            // On completion of loading, hide the loading spinner
+            M.require('zxcvbn_js')
+                .done(function() {
+                    $loader.removeClass('loading');
+                });
+        }
+    },
+
+    /**
+     * Show what strength the currently entered password is on keyup
+     * @param {Object} $page The jQuery selector for the current page
+     */
+    initPasswordStrengthCheck: function($page) {
+
+        'use strict';
+
+        var $passwordStrengthBar = $page.find('.password-strength');
+        var $passwordInput = $page.find('.estimator-password-input');
+
+        // Add keyup event to the password text field
+        $passwordInput.rebind('keyup.passwordstrengthcheck', function() {
+
+            // Make sure the ZXCVBN password strength estimator library is loaded first
+            if (typeof zxcvbn !== 'undefined') {
+
+                // Estimate the password strength
+                var password = $.trim($passwordInput.val());
+                var passwordScore = zxcvbn(password).score;
+                var passwordLength = password.length;
+
+                // Remove previous strength classes that were added
+                $passwordStrengthBar.removeClass('good1 good2 good3 good4 good5');
+
+                // Add colour coding
+                if (passwordLength === 0) {
+                    return false;
+                }
+                else if (passwordLength < security.minPasswordLength) {
+                    $passwordStrengthBar.addClass('good1');    // Too short
+                }
+                else if (passwordScore === 4) {
+                    $passwordStrengthBar.addClass('good5');    // Strong
+                }
+                else if (passwordScore === 3) {
+                    $passwordStrengthBar.addClass('good4');    // Good
+                }
+                else if (passwordScore === 2) {
+                    $passwordStrengthBar.addClass('good3');    // Medium
+                }
+                else if (passwordScore === 1) {
+                    $passwordStrengthBar.addClass('good2');    // Weak
+                }
+                else {
+                    $passwordStrengthBar.addClass('good1');    // Very Weak
+                }
+            }
+        });
     }
 };
 
@@ -348,6 +465,32 @@ mBroadcaster.once('startMega:mobile', function() {
     });
 
     mobile.orientation = getOrientation();
+});
+
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    /**
+     * Show storage overquota banner
+     * @param {Number} perc percent
+     */
+    M.showOverStorageQuota = function(perc) {
+        if (perc > 90) {
+            var ab = mobile.alertBanner;
+            var isPro = Object(u_attr).p;
+            if (perc > 99) {
+                ab.showError(isPro ? l[16358] : l[16315]); // Your account is full
+                mobile.overStorageQuotaOverlay.show();
+            } else {
+                ab.showWarning(isPro ? l[16359] : l[19486]); // Your account is almost full.
+            }
+
+            // When the banner is taped, show pro page.
+            ab.onTap(function() {
+                loadSubPage('pro');
+            });
+        }
+    };
 });
 
 
@@ -417,7 +560,7 @@ function accountUI() {
 }
 
 accountUI.updateSessionTable = function() {
-    
+
     'use strict';
 
     mobile.account.history.fetchSessionHistory();

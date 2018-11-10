@@ -959,6 +959,10 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
             mega.megadrop.preMoveCheck(n, t).done(function(n, t) {
                 fileconflict.check(n, t, 'move')
                     .always(function(files) {
+                        if (files.length === 0) { // user refuse to move all file.
+                            promise.reject(EBLOCKED);
+                            return false;
+                        }
                         if (!quiet) { // closing conflict dialogs is hiding the loading
                             loadingDialog.phide(); // making sure it's not visible.
                             loadingDialog.pshow();
@@ -1155,7 +1159,6 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
     var masterPromise = new MegaPromise();
 
     handles = handles || [];
-
     if (!Array.isArray(handles)) {
         handles = [handles];
     }
@@ -1663,6 +1666,8 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
     "use strict";
 
     if (fminitialized) {
+        var n = M.d[handle] || false;
+
         var labelId = parseInt(value);
         var removeClasses = 'colour-label red orange yellow blue green grey purple';
         var color = '<div class="colour-label-ind %1"></div>';
@@ -1704,6 +1709,18 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
                 .add('.dropdown-section.filter-by .labels')
                 .removeClass('disabled static');
         }
+
+        delay('labelDomUpdate:' + n.p, function() {
+            if (n.p === M.currentdirid) {
+                // remember current scroll position and make user not losing it.
+                var $megaContainer = $('.megaListContainer:visible');
+                var currentScrollPosition = $megaContainer.prop('scrollTop');
+
+                M.openFolder(n.p, true).always(function() {
+                    $megaContainer.prop('scrollTop', currentScrollPosition);
+                }).done(reselect);
+            }
+        }, 50);
     }
 };
 

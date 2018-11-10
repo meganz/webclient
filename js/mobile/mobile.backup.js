@@ -11,10 +11,9 @@ mobile.backup = {
         'use strict';
 
         var $page = $('.mobile.recovery-key-page');
-        var $backButton = $page.find('.fm-icon.back');
 
         // Init functionality
-        mobile.showAndInitBackButton($backButton);
+        mobile.initBackButton($page);
         mobile.backup.showKey($page);
         mobile.backup.initCopyKeyButton($page);
         mobile.backup.initDownloadKeyButton($page);

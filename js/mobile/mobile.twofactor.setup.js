@@ -22,18 +22,20 @@ mobile.twofactor.setup = {
         }
 
         // Cache selector
-        mobile.twofactor.setup.$page = $('.mobile.two-factor-page.setup-page');
+        this.$page = $('.mobile.two-factor-page.setup-page');
 
         // Initialise functionality
-        mobile.twofactor.setup.getSharedSecret();
-        mobile.twofactor.setup.initNextButton();
-        mobile.twofactor.setup.initBackButton();
-        mobile.twofactor.setup.initNoAuthenticatorAppButton();
-        mobile.twofactor.setup.initAppLinkButtons();
-        mobile.twofactor.setup.initCloseAuthenticatorAppDialogButton();
+        this.getSharedSecret();
+        this.initNextButton();
+        this.initNoAuthenticatorAppButton();
+        this.initAppLinkButtons();
+        this.initCloseAuthenticatorAppDialogButton();
+
+        // Initialise back button to go back to the My Account page
+        mobile.initBackButton(this.$page, 'fm/account');
 
         // Show the account page content
-        mobile.twofactor.setup.$page.removeClass('hidden');
+        this.$page.removeClass('hidden');
     },
 
     /**
@@ -55,10 +57,9 @@ mobile.twofactor.setup = {
 
                 loadingDialog.hide();
 
-                // The Two-Factor has already been setup
+                // The Two-Factor has already been setup, return to the My Account page to disable
                 if (response === EEXIST) {
-                    mobile.messageOverlay.show('Two-Factor Authentication is already setup.',
-                                               'Return to the My Account page to disable.', function() {
+                    mobile.messageOverlay.show(l[19219] + ' ' + l[19220], function() {
                         loadSubPage('fm/account/');
                     });
 
@@ -97,22 +98,6 @@ mobile.twofactor.setup = {
 
             // Render the Verify Setup page
             loadSubPage('twofactor/verify-setup');
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the back arrow icon in the header to go back to the main My Account page
-     */
-    initBackButton: function() {
-
-        'use strict';
-
-        // On Back click/tap
-        mobile.twofactor.setup.$page.find('.mobile.fm-icon.back').off('tap').on('tap', function() {
-
-            // Render the Intro page again
-            loadSubPage('twofactor/intro');
             return false;
         });
     },

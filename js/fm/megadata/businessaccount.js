@@ -20,7 +20,7 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
     var operationPromise = new MegaPromise();
     var mySelf = this;
 
-    if (checkMail(subEmail)) {
+    if (!isValidEmail(subEmail)) {
         // promise reject/resolve will return: success,errorCode,errorDesc
         return operationPromise.reject(0, 1,'Invalid Email');
     }
@@ -116,7 +116,7 @@ BusinessAccount.prototype.editSubAccount = function (subuserHandle, subEmail, su
     if (!subEmail && !subFName && !subLName && !optionals) {
         return operationPromise.reject(0, 19, 'Empty User attributes. nothing to edit');
     }
-    if (subEmail && checkMail(subEmail)) {
+    if (subEmail && !isValidEmail(subEmail)) {
         return operationPromise.reject(0, 1, 'Invalid Email');
     }
 

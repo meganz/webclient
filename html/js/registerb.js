@@ -207,7 +207,7 @@ BusinessRegister.prototype.initPage = function () {
             }
         }
         if (!$element || $element.is($emailInput)) {
-            if (!$emailInput.val().trim() || checkMail($emailInput.val())) {
+            if (!$emailInput.val().trim() || !isValidEmail($emailInput.val())) {
                 $emailInput.parent().addClass('error').find('.error-message').text(l[7415]);
                 $emailInput.focus();
                 passed = false;

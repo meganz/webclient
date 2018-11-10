@@ -1601,7 +1601,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                 }
             }
             if ($cEmailInput.val().trim() !== cEmail) {
-                if (!$cEmailInput.val().trim() || checkMail($cEmailInput.val())) {
+                if (!$cEmailInput.val().trim() || !isValidEmail($cEmailInput.val())) {
                     $cEmailInput.parent().addClass('error').find('.error-message').text(l[7415]);
                     $cEmailInput.focus();
                     valid = false;
@@ -2299,7 +2299,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
 
                 return;
             }
-            if (checkMail(uEmailTrimed)) {
+            if (!isValidEmail(uEmailTrimed)) {
                 $uEmail.parent().addClass('error');
                 $('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[5705]);
 
@@ -2624,7 +2624,7 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
 
                     return;
                 }
-                if ('email' in changedVals && checkMail(changedVals.email)) {
+                if ('email' in changedVals && !isValidEmail(changedVals.email)) {
                     $emailInput.parent().addClass('error');
                     //$('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[5705]);
 

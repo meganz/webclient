@@ -343,7 +343,7 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
         settingPromise.always(function settingAttrHandler(st, res) {
             if (st === 0) {
                 if (res[1] && res[1] === EEXIST) {
-                    msgDialog('warninga', '', l[7869], '', function () {
+                    msgDialog('warninga', l[1578], l[7869], '', function () {
                         loadingDialog.hide();
                         var $emailInput = $('.bus-reg-body #business-email');
                         $emailInput.parent().addClass('error').find('.error-message').text(l[1297]);
@@ -351,7 +351,7 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
                     });
                 }
                 else {
-                    msgDialog('warninga', '', l[19508], '', function () {
+                    msgDialog('warninga', l[1578], l[19508], '', function () {
                         loadingDialog.hide();
                         mySelf.initPage();
                     });

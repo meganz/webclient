@@ -1401,7 +1401,7 @@ var notify = {
                     return flags;
                 },
 
-                setup: function setup(oldFlags) {
+                setup: function setup(oldFlags, callback) {
                     if (oldFlags === undefined) {
                         // Initialize account notifications to defaults (all enabled)
                         assert(!fmconfig.anf, 'Account notification flags already set');
@@ -1418,6 +1418,10 @@ var notify = {
                     }
                     else {
                         flags = oldFlags;
+                    }
+
+                    if (typeof callback === 'function'){
+                        callback();
                     }
                 },
 

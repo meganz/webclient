@@ -952,7 +952,6 @@ function processEmailChangeActionPacket(ap) {
         }
         throttledSetLastInteractionOps.push([u_h, v, promise]);
 
-
         return promise;
     };
 
@@ -1105,7 +1104,7 @@ function processEmailChangeActionPacket(ap) {
      * Fetch server-side config.
      * @return {MegaPromise}
      */
-    ns.fetch = function _fetchConfig() {
+    ns.fetch = function _fetchConfig(callback) {
         if (!u_handle) {
             return MegaPromise.reject(EINCOMPLETE);
         }
@@ -1191,7 +1190,11 @@ function processEmailChangeActionPacket(ap) {
             .finally(function() {
                 // Initialize account notifications.
                 if (!is_mobile) {
-                    mega.notif.setup(fmconfig.anf);
+                    mega.notif.setup(fmconfig.anf, function() {
+                        if (fminitialized && page.indexOf('fm/account') > -1) {
+                            accountUI.renderAccountPage(M.account);
+                        }
+                    });
                 }
             });
 

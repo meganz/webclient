@@ -641,5 +641,10 @@ function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
 function slideshow_handle() {}
+accountUI.setBirthYear = function() {};
+accountUI.setBirthMonth = function() {};
+accountUI.setBirthDay = function() {};
+accountUI.setCountry = function() {};
+accountUI.setRubsched = function() {};
 /* jshint +W098 */
 /* jshint +W007 */

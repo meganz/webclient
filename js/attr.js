@@ -977,7 +977,38 @@ var attribCache = false;
             crypt.getPubEd25519(userHandle);
         };
         uaPacketParserHandler['*!fmconfig'] = function() { mega.config.fetch(); };
-
+        uaPacketParserHandler['birthday'] = function(userHandle) {
+            mega.attr.get(userHandle, 'birthday', -1, false, function(res) {
+                u_attr['birthday'] = from8(base64urldecode(res));
+                if (fminitialized && page === 'fm/account') {
+                    accountUI.setBirthDay();
+                }
+            });
+        };
+        uaPacketParserHandler['birthmonth'] = function(userHandle) {
+            mega.attr.get(userHandle, 'birthmonth', -1, false, function(res) {
+                u_attr['birthmonth'] = from8(base64urldecode(res));
+                if (fminitialized && page === 'fm/account') {
+                    accountUI.setBirthMonth();
+                }
+            });
+        };
+        uaPacketParserHandler['birthyear'] = function(userHandle) {
+            mega.attr.get(userHandle, 'birthyear', -1, false, function(res) {
+                u_attr['birthyear'] = from8(base64urldecode(res));
+                if (fminitialized && page === 'fm/account') {
+                    accountUI.setBirthYear();
+                }
+            });
+        };
+        uaPacketParserHandler['country'] = function(userHandle) {
+            mega.attr.get(userHandle, 'country', -1, false, function(res) {
+                u_attr['country'] = from8(base64urldecode(res));
+                if (fminitialized && page === 'fm/account') {
+                    accountUI.setCountry();
+                }
+            });
+        };
         uaPacketParserHandler['^!prd'] = function() {
             mBroadcaster.sendMessage('attr:passwordReminderDialog');
             // if page is session history and new password action detected. update session table.
@@ -985,10 +1016,27 @@ var attribCache = false;
                 accountUI.updateSessionTable();
             }
         };
-
         uaPacketParserHandler['^!dv'] = function() {
             if (fminitialized && M.account) {
                 delay('fv:uvi^dv', fileversioning.updateVersionInfo.bind(fileversioning), 4e3);
+            }
+        };
+        uaPacketParserHandler['^clv'] = function(userHandle) {
+            mega.attr.get(userHandle, 'clv', -2, 0, function(res) {
+                u_attr['clv'] = res;
+                if (fminitialized && $.dialog === 'qr-dialog') {
+                    openAccessQRDialog();
+                }
+            });
+        };
+        uaPacketParserHandler['^!rubbishtime'] = function(userHandle) {
+            if (u_attr.flags.ssrs > 0) {
+                mega.attr.get(userHandle, 'rubbishtime', -2, 1, function(res) {
+                    M.account.ssrs = parseInt(res);
+                    if (fminitialized && page === 'fm/account/file-management') {
+                        accountUI.setRubsched();
+                    }
+                });
             }
         };
         uaPacketParserHandler['*!rp'] = function() {

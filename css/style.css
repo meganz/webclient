@@ -27331,6 +27331,10 @@ opacity: 1;
     display:none;
 }
 
+.user-management-dialog .dialog-input-title-ontop .error-message.er-sub-n {
+    left: 5px;
+}
+
 .user-management-account-settings .bus-input.note .error-message {
     top: 80px;
 }

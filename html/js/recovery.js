@@ -629,7 +629,12 @@ AccountRecoveryControl.prototype.startRecovery = function _startRecovery(email, 
                 loadingDialog.hide();
                 if (res === ENOENT) {
                     msgDialog('warningb', l[1513], l[1946]);
-                } else if (res === 0) {
+                }
+                else if (res === -27) {
+                    // as reported by Jon, this is returned when parking is not valid
+                    msgDialog('warningb', l[135], l[19925]);
+                }
+                else if (res === 0) {
                     if (!is_mobile) {
                         handleResetSuccessDialogs('.reset-success', l[735], 'resetsuccess');
                     }

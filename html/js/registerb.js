@@ -62,9 +62,13 @@ BusinessRegister.prototype.initPage = function () {
         $emailInput.val(u_attr['email']);
         $emailInput.prop('disabled', true);
         $fnameInput.val(u_attr['firstname']);
-        $fnameInput.prop('disabled', true);
+        if (u_attr['firstname']) {
+            $fnameInput.prop('disabled', true);
+        }
         $lnameInput.val(u_attr['lastname']);
-        $lnameInput.prop('disabled', true);
+        if (u_attr['lastname']) {
+            $lnameInput.prop('disabled', true);
+        }
 
         ///
         $pageContainer.find('.bus-reg-input.pass-1st').addClass('hidden');

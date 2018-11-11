@@ -227,7 +227,8 @@ function dashboardUI() {
             }
 
             if (u_attr.p === 100 && u_attr.b) {
-                $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden');
+                // someone modified the CSS to overwirte the hidden class !!, therefore .hide() will be used
+                $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();                
                 var $businessLeft = $('.account.left-pane.info-block.business-users').removeClass('hidden');
                 if (u_attr.b.s === 1) {
                     $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
@@ -260,7 +261,7 @@ function dashboardUI() {
             // resetting things might be changed in business account
             $('.fm-right-block.dashboard .business-dashboard').addClass('hidden');
             $('.account.left-pane.info-block.business-users').addClass('hidden');
-            $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').removeClass('hidden');
+            $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').removeClass('hidden').show();
             $('.fm-right-block.dashboard .non-business-dashboard').removeClass('hidden');
         }
 
@@ -382,7 +383,8 @@ function dashboardUI() {
             dashboardUI.updateWidgets();
         }
         else {
-            $('.dashboard .button.upgrade-account').addClass('hidden');
+            // someone modified CSS, hidden class is overwitten --> .hide()
+            $('.dashboard .upgrade-account').addClass('hidden').hide();
             $('.business-dashboard .user-management-storage .storage-transfer-data')
                 .text(bytesToSize(account.space_used));
             $('.business-dashboard .user-management-transfer .storage-transfer-data')

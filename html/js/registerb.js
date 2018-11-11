@@ -317,7 +317,7 @@ BusinessRegister.prototype.initPage = function () {
             ///// end of testing
         });
     });
-    
+
 };
 
 /**

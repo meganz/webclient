@@ -417,9 +417,7 @@
                 }
                 else if (M.currentrootid === M.RootID
                         || M.currentrootid === M.RubbishID
-                        || M.currentrootid === M.InboxID
-                        || M.currentrootid === 'shares') {
-
+                        || M.currentrootid === M.InboxID) {
                     // If filter is empty show 'Your label filter did not match any documents'
                     if (M.currentLabelFilter) {
                         $('.fm-empty-filter').removeClass('hidden');
@@ -427,15 +425,16 @@
                     else if (M.currentdirid === M.RootID) {
                         $('.fm-empty-cloud').removeClass('hidden');
                     }
-                    else if (M.currentdirid === 'shares') {
-                        $('.fm-empty-incoming').removeClass('hidden');
-                    }
                     else {
                         $('.fm-empty-folder').removeClass('hidden');
                     }
                 }
                 else if (M.currentrootid === 'shares') {
-                    M.emptySharefolderUI(lSel);
+                    if (M.currentdirid === 'shares') {
+                        $('.fm-empty-incoming').removeClass('hidden');
+                    } else {
+                        M.emptySharefolderUI(lSel);
+                    }
                 }
                 else if (M.currentrootid === 'contacts') {
                     $('.fm-empty-incoming.contact-details-view').removeClass('hidden');

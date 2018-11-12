@@ -317,9 +317,10 @@ function init_page() {
         });
     }
 
-    // If on the plugin page, show the page with the relevant extension for their current browser
-    if (page == 'plugin') {
-        page = (mega.chrome) ? 'chrome' : 'firefox';
+    // Redirect url to extensions when it tries to go plugin or chrome or firefox
+    if (page === 'plugin' || page === 'chrome' || page === 'firefox') {
+        loadSubPage('extensions');
+        return false;
     }
 
     if (!page.match(/^(blog|help|corporate|page_)/)) {

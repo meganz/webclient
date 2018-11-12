@@ -322,16 +322,22 @@ function makeid(len) {
 }
 
 /**
- * Checks if the email address is valid
+ * Checks if the email address is valid using the inbuilt HTML5
+ * validation method suggested at https://stackoverflow.com/a/13975255
  * @param {String} email The email address to validate
  * @returns {Boolean} Returns true if email is valid, false if email is invalid
  */
 function isValidEmail(email) {
 
-    // Use regex from https://stackoverflow.com/a/1373724
-    var regex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+    'use strict';
 
-    return regex.test(email);
+    var input = document.createElement('input');
+
+    input.type = 'email';
+    input.required = true;
+    input.value = email;
+
+    return input.checkValidity();
 }
 
 /**

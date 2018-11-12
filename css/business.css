@@ -38,8 +38,8 @@
 }
 .top-head .default-white-button.individual {
     margin: 4px 0 0 30px;
-    font-size: 16px;
-    font-family: 'source_sans_prosemibold', Arial;
+    font-size: 14px;
+    font-family: 'source_sans_proregular', Arial;
 }
 /*.business .bottom-page .default-white-button.individual {
     margin: 4px 0 0 30px;
@@ -117,7 +117,8 @@ i.medium-icon.business-sprite {
 }
 .bottom-page.big-header.dark {
     color: #333333;
-    max-width: 457px;
+    max-width: 86%;
+    margin-left: 7%;
 }
 .bottom-page.medium-txt.lato {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
@@ -125,12 +126,12 @@ i.medium-icon.business-sprite {
     line-height: 30px;
     text-align: center;
     color: #666666;
-    padding: 20px 0 47px 0;
-    max-width: 360px;
+    padding: 20px 0 47px 0px;
+    color: #333333;
+    max-width: 86%;
+    margin-left: 7%;
 }
-.bottom-page.big-header.dark + .bottom-page.medium-txt.lato {
-    text-align: left;
-}
+
 .medium-icon.business-sprite.right-arrow {
     background-position: -46px -111px;
     margin: 11px 0 0 2px;

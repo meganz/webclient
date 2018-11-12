@@ -32,6 +32,17 @@
     text-rendering: optimizeLegibility;
 }
 @font-face {
+    font-family: 'LatoWebLight';
+    src: url('../fonts/Lato-Light.eot'); /* IE9 Compat Modes */
+    src: url('../fonts/Lato-Light.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../fonts/Lato-Light.woff2') format('woff2'), /* Modern Browsers */
+         url('../fonts/Lato-Light.woff') format('woff'), /* Modern Browsers */
+         url('../fonts/Lato-Light.ttf') format('truetype');
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
     font-family: 'brandon_textbold_italic';
     src: url('../fonts/brandontext-bolditalic-webfont.eot');
     src: url('../fonts/brandontext-bolditalic-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/brandontext-bolditalic-webfont.woff') format('woff'), url('../fonts/brandontext-bolditalic-webfont.ttf') format('truetype'), url('../fonts/brandontext-bolditalic-webfont_v2.svg#brandon_textbold_italic') format('svg');
@@ -27194,7 +27205,8 @@ opacity: 1;
 
 .user-management-account-settings .bus-input .bus-input-title, 
 .user-management-dialog .dialog-input-title-ontop .title,
-.fm-dialog.sub-account-link-password .dialog-input-title-ontop .title {
+.fm-dialog.sub-account-link-password .dialog-input-title-ontop .title,
+.bus-reg-body .bus-reg-title {
     position: absolute;
     left: 40px;
     top: 4px;
@@ -27210,7 +27222,7 @@ opacity: 1;
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
-    z-index: 1129;
+    z-index: 1;
     visibility: hidden;
 }
 
@@ -27343,7 +27355,8 @@ opacity: 1;
     left: 8px;
 }
 
-.user-management-account-settings .bus-input .note-message {
+.user-management-account-settings .bus-input .note-message,
+.bus-reg-body .bus-reg-input .note-message {
     font-size: 13px;
     padding: 8px 0 0 38px;
     color: #888;
@@ -27353,14 +27366,16 @@ opacity: 1;
     display:none;
 }
 
-.user-management-account-settings .bus-input.note .note-message {
+.user-management-account-settings .bus-input.note .note-message,
+.bus-reg-body .bus-reg-input.num .note-message {
     display: inline-block;
 }
 
 
 /* three extra status for the inputs: error, active, correctinput */
 .user-management-account-settings .bus-input.correctinput .bus-input-title, 
-.user-management-dialog .dialog-input-title-ontop.correctinput .title {
+.user-management-dialog .dialog-input-title-ontop.correctinput .title,
+.bus-reg-input.correctinput .bus-reg-title {
     visibility: visible;
     filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
@@ -27370,18 +27385,25 @@ opacity: 1;
 }
 
 .user-management-account-settings .bus-input.active .bus-input-title, 
-.user-management-dialog .dialog-input-title-ontop.active .title {
+.user-management-dialog .dialog-input-title-ontop.active .title,
+.bus-reg-input.active .bus-reg-title {
     visibility: visible;
     filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
     top: 0;
-
 }
 
 .user-management-account-settings .bus-input.active input::placeholder, 
-.user-management-dialog .dialog-input-title-ontop.active input::placeholder{
+.user-management-dialog .dialog-input-title-ontop.active input::placeholder,
+.bus-reg-input.active input::placeholder,
+.user-management-account-settings .bus-input.correctinput input::placeholder, 
+.user-management-dialog .dialog-input-title-ontop.correctinput input::placeholder,
+.bus-reg-input.correctinput input::placeholder,
+.user-management-account-settings .bus-input.error input::placeholder, 
+.user-management-dialog .dialog-input-title-ontop.error input::placeholder,
+.bus-reg-input.error input::placeholder{
     opacity: 0;
 }
 

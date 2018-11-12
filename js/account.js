@@ -294,6 +294,11 @@ function u_logout(logout) {
             waitxhr.abort();
             waitxhr = undefined;
         }
+        for (i in localStorage) {
+            if (i.indexOf('sort') > -1) {
+                delete localStorage[i];
+            }
+        }
     }
 }
 

@@ -450,6 +450,15 @@
 	margin-right: 8px;
 }
 
+.bus-reg-plan .business-plan-note {
+	line-height: 22px;
+	width: 90%;
+	margin: 4px auto 20px auto;
+	text-align: center;
+	font-size: 16px;
+	color: #999;
+}
+
 .bus-reg-plan .business-plan-info {
 	width: 90%;
 	height: 54px;

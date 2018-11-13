@@ -3074,6 +3074,11 @@ function fm_resize_handler(force) {
                 { enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true }
             );
         }
+        else if (!$('.user-management-account-settings .invoice-detail', $businessAccountContainer)
+            .hasClass('hidden')) {
+            $('.user-management-account-settings .invoice-detail', $businessAccountContainer)
+                .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+        }
     }
 
     if (d) {

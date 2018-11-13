@@ -2115,6 +2115,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             .attr('style', '');
         $('.dialog-button-container .invite-link-option', $dialog).removeClass('hidden');
         $('.dialog-button-container .add-sub-user', $dialog).removeClass('disabled');
+        $('.dialog-button-container .add-more', $dialog).removeClass('disabled');
     };
 
     clearDialog(); // remove any previous data
@@ -2141,13 +2142,16 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     function copyPasswordButtonClickHandler() {
                         copyToClipboard(result.lp, l[19602]);
                         $('.dialog-button-container .add-sub-user', $dialog).removeClass('disabled');
+                        $('.dialog-button-container .add-more', $dialog).removeClass('disabled');
                     }
                 );
             }
             $('.dialog-button-container .add-sub-user', $dialog).addClass('disabled');
+            $('.dialog-button-container .add-more', $dialog).addClass('disabled');
             $('.sub-p', $resultContianer).off('copy.suba').on('copy.suba',
                 function passwordTextTouchHandler() {
                     $('.dialog-button-container .add-sub-user', $dialog).removeClass('disabled');
+                    $('.dialog-button-container .add-more', $dialog).removeClass('disabled');
                 }
             );
             $('.sub-p', $resultContianer).text(result.lp);
@@ -2178,6 +2182,9 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
     // event handler for clicking on "add more"
     $('.dialog-button-container .add-more', $dialog).off('click.subuser')
         .on('click.subuser', function addMoreClickHandler() {
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
             clearDialog();
         });
 
@@ -2362,13 +2369,16 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                                 function copyPasswordButtonClickHandler() {
                                     copyToClipboard(res.lp, l[19602]);
                                     $('.dialog-button-container .add-sub-user', $dialog).removeClass('disabled');
+                                    $('.dialog-button-container .add-more', $dialog).removeClass('disabled');
                                 }
                             );
                         }
                         $('.dialog-button-container .add-sub-user', $dialog).addClass('disabled');
+                        $('.dialog-button-container .add-more', $dialog).addClass('disabled');
                         $('.sub-p', $resultContianer).off('copy.suba').on('copy.suba',
                             function passwordTextTouchHandler() {
                                 $('.dialog-button-container .add-sub-user', $dialog).removeClass('disabled');
+                                $('.dialog-button-container .add-more', $dialog).removeClass('disabled');
                             }
                         );
                         $('.sub-p', $resultContianer).text(res.lp);

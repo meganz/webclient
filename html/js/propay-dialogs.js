@@ -1258,6 +1258,8 @@ var addressDialog = {
             this.$dialog.find('.plan-icon .reg-st3-membership-icon').addClass('hidden');
             this.$dialog.find('input.first-name').val(this.userInfo.fname);
             this.$dialog.find('input.last-name').val(this.userInfo.lname);
+            // auto renew is mandatory in business
+            this.$dialog.find('.payment-buy-now').text(l[6172]);
         }
         monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
         

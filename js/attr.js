@@ -1032,9 +1032,11 @@ var attribCache = false;
         uaPacketParserHandler['^!rubbishtime'] = function(userHandle) {
             if (u_attr.flags.ssrs > 0) {
                 mega.attr.get(userHandle, 'rubbishtime', -2, 1, function(res) {
-                    M.account.ssrs = parseInt(res);
-                    if (fminitialized && page === 'fm/account/file-management') {
-                        accountUI.setRubsched();
+                    if (fminitialized) {
+                        M.account.ssrs = parseInt(res);
+                        if (page === 'fm/account/file-management') {
+                            accountUI.setRubsched();
+                        }
                     }
                 });
             }

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * A UI control Class to perform Business Account related UI
  */
 function BusinessAccountUI() {
@@ -1763,7 +1763,7 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
             $newInvoiceRow.attr('id', invId);
             $newInvoiceRow.find('.inv-date').text(invoiceDate.toLocaleDateString());
             $newInvoiceRow.find('.inv-desc').text(invoicesList[k].d);
-            $newInvoiceRow.find('.inv-total').text('€' + invoicesList[k].tot);
+            $newInvoiceRow.find('.inv-total').text('\u20ac' + invoicesList[k].tot);
             $newInvoiceRow.removeClass('hidden'); // if it was hidden
             $newInvoiceRow.off('click.suba').on('click.suba', function invoiceDetailButtonClick() {
                 var clickedInvoiceId = $(this).closest("tr").attr('id');
@@ -1916,9 +1916,9 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                 .text(invoiceDetail.u.taxnum[0] + ': ' + new Number(invoiceDetail.taxrate).toFixed(2) + '%');
         }
         $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')
-            .text('€' + new Number(taxSum).toFixed(2));
+            .text('\u20ac' + new Number(taxSum).toFixed(2));
         $invoiceItemsContainer.find('.inv-payment-price.inv-li-total .inv-total-val')
-            .text('€' + new Number(invoiceDetail.tot).toFixed(2));
+            .text('\u20ac' + new Number(invoiceDetail.tot).toFixed(2));
 
         // receipt top right items
         if (invoiceDetail.rnum) {
@@ -1966,7 +1966,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         myPage = myPage.replace('{10itemAmount}', new Number(itemAmount).toFixed(2));
 
                         myPage = myPage.replace('{11itemVat}', $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent);
-                        myPage = myPage.replace('{12totalCost}', '€' + new Number(invoiceDetail.tot).toFixed(2));
+                        myPage = myPage.replace('{12totalCost}', '\u20ac' + new Number(invoiceDetail.tot).toFixed(2));
 
                         var pdfPrintIframe = document.getElementById('invoicePdfPrinter');
                         var newPdfPrintIframe = document.createElement('iframe');

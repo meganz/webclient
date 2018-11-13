@@ -1,4 +1,4 @@
-﻿/**
+/**
  * a class to apply actions on business account in collaboration with API
  */
 function BusinessAccount() {

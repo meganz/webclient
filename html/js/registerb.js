@@ -1,4 +1,4 @@
-﻿/** a class contains the code-behind of business register "registerb" page */
+/** a class contains the code-behind of business register "registerb" page */
 function BusinessRegister() {
     this.cacheTimeout = 9e5; // 15 min - default threshold to update payment gateway list
     this.planPrice = 9.99; // initial value
@@ -141,12 +141,12 @@ BusinessRegister.prototype.initPage = function () {
             users = mySelf.minUsers; // minimum val
         }
         var $gadget = $('.bus-reg-plan', $pageContainer);
-        $gadget.find('.business-plan-price span.big').text(mySelf.planPrice.toFixed(2) + ' €');
+        $gadget.find('.business-plan-price span.big').text(mySelf.planPrice.toFixed(2) + ' \u20ac');
         $gadget.find('.business-base-plan span.right')
-            .text((mySelf.planPrice * mySelf.minUsers).toFixed(2) + ' €'); // minimum
+            .text((mySelf.planPrice * mySelf.minUsers).toFixed(2) + ' \u20ac'); // minimum
         $gadget.find('.business-users-plan span.right')
-            .text((mySelf.planPrice * (users - mySelf.minUsers)).toFixed(2) + ' €');
-        $gadget.find('.business-plan-total span.right').text((mySelf.planPrice * users).toFixed(2) + ' €');
+            .text((mySelf.planPrice * (users - mySelf.minUsers)).toFixed(2) + ' \u20ac');
+        $gadget.find('.business-plan-total span.right').text((mySelf.planPrice * users).toFixed(2) + ' \u20ac');
 
         $gadget.find('.business-users-plan .left').text(l[19504].replace('{0}', users - mySelf.minUsers));
     };

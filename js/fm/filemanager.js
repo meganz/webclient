@@ -752,7 +752,7 @@ FileManager.prototype.initFileManagerUI = function() {
             $('.left-pane-drag-handle').css('cursor', 'we-resize')
         }
 
-        if ($('.account.left-pane.header').width() < $.leftPaneResizable.options.updateWidth) {
+        if ($('.account.left-pane.header').width() < $.leftPaneResizable.options.updateWidth + 10) {
             $(this.element).addClass('small-left-panel');
         }
         else {

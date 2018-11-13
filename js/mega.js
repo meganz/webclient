@@ -157,6 +157,7 @@ var scloadtnodes = false;                // if `t` packet requires nodes in memo
 var scinflight = false;                  // don't run more than one execsc() "thread"
 var sccount = 0;                         // number of actionpackets processed at connection loss
 var scfetches = Object.create(null);     // holds pending nodes to be retrieved from fmdb
+var scfsubtree = Object.create(null);    // fetch entire subtree as needed by some action-packets
 var scwaitnodes = Object.create(null);   // supplements scfetches per scqi index
 var nodesinflight = Object.create(null); // number of nodes being processed in the worker for scqi
 var sc_history = [];                     // array holding the history of action-packets
@@ -166,7 +167,7 @@ var nodes_scqi_order = 0;                // variable to count the node arrival o
 function sc_fqueue(handle, packet) {
     "use strict";
 
-    if (handle && !M.c[handle]) {
+    if (handle && (!M.c[handle] || scfsubtree[handle])) {
         if (scwaitnodes[packet.scqi]) {
             scwaitnodes[packet.scqi]++;
         }
@@ -224,7 +225,9 @@ function sc_fetcher() {
 
     var queue   = scfetches;
     var handles = Object.keys(queue);
+    var fsubtree = scfsubtree;
     scfetches = Object.create(null);
+    scfsubtree = Object.create(null);
 
     if (!handles.length) {
         return onIdle(resumesc);
@@ -265,21 +268,29 @@ function sc_fetcher() {
 
             dbfetch.geta(bunch, new MegaPromise())
                 .always(function() {
-                    // Retrieve all file versions, if any, and then finish the bunch processing
-                    // FIXME: this is only needed for (redundant!) `d` packets...
-                    var versions = Object.create(null);
+                    // Retrieve all needed subtrees and file versions if any, and then finish the batch processing
+                    var subtree = Object.create(null);
 
                     for (var i = bunch.length; i--;) {
                         var h = bunch[i];
 
-                        if (M.d[h] && !M.d[h].t && M.d[h].tvf) {
-                            versions[h] = 1;
+                        if (M.d[h]) {
+                            if (M.d[h].t) {
+                                if (fsubtree[h]) {
+                                    // entire subtree
+                                    subtree[h] = 1;
+                                }
+                            }
+                            else if (M.d[h].tvf) {
+                                // file versions
+                                subtree[h] = 1;
+                            }
                         }
                     }
-                    versions = Object.keys(versions);
+                    subtree = Object.keys(subtree);
 
-                    if (versions.length) {
-                        dbfetch.tree(versions, -1, new MegaPromise()).always(finish);
+                    if (subtree.length) {
+                        dbfetch.tree(subtree, -1, new MegaPromise()).always(finish);
                     }
                     else {
                         finish();
@@ -333,11 +344,13 @@ function sc_packet(a) {
         scloadtnodes = true;
 
         switch (a.a) {
+            case 'd':
+                scfsubtree[a.n] = 1;
+            /* falls through */
             case 's':
             case 's2':
             case 'fa':
             case 'u':
-            case 'd':
                 sc_fqueue(a.n, a);
             /* fall-through */
             case 'ph':

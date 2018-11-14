@@ -362,8 +362,8 @@ function u_setrsa(rsakey) {
             u_attr.pubk = u_storage.pubk = publicKeyEncodedB64;
             
             if (buinessMaster) {
-                //u_attr.mu = buinessMaster;
-                //u_attr.b = 1;
+                // u_attr.mu = buinessMaster;
+                // u_attr.b = 1;
                 delete window.businessSubAc; // performance measure, freeup memory since it's not useful (nor harmful)
             }
 

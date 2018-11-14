@@ -3066,7 +3066,10 @@ function fm_resize_handler(force) {
         var $subAccountContainer = $('.user-management-subaccount-view-container', $businessAccountContainer);
         // sub-user info pgae
         if (!$subAccountContainer.hasClass('hidden')) {
-            $subAccountContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+            $subAccountContainer.jScrollPane({
+                enableKeyboardNavigation: false, showArrows: true,
+                arrowSize: 8, animateScroll: true
+            });
         }
         // overview page
         else if (!$('.user-management-overview-container', $businessAccountContainer).hasClass('hidden')) {

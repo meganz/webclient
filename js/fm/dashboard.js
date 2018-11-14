@@ -228,7 +228,7 @@ function dashboardUI() {
 
             if (u_attr.p === 100 && u_attr.b) {
                 // someone modified the CSS to overwirte the hidden class !!, therefore .hide() will be used
-                $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();                
+                $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();
                 var $businessLeft = $('.account.left-pane.info-block.business-users').removeClass('hidden');
                 if (u_attr.b.s === 1) {
                     $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
@@ -424,11 +424,11 @@ function dashboardUI() {
         }
 
         // if this is a business account user (sub or master)
-        //if (u_attr.b) {
+        // if (u_attr.b) {
         //    $('.dashboard .button.upgrade-account').addClass('hidden');
         //    $('.account.widget.bandwidth').addClass('hidden');
         //    $('.account.widget.body.achievements').addClass('hidden');
-        //}
+        // }
 
         
 

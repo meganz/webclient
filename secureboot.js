@@ -2334,9 +2334,7 @@ else if (!b_u) {
         'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j:1 },
         'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
         'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 },
-        'charts_js': {f:'js/vendor/Chart.min.js', n: 'charts_js', j:1},
-        'jspdf_js': {f:'js/vendor/jspdf.min.js', n: 'jspdf_js', j:1},
-        'htmlcanvas_js': {f:'js/vendor/html2canvas.min.js', n: 'htmlcanvas_js', j:1},
+        'charts_js': {f:'js/vendor/Chart.js', n: 'charts_js', j:1},
         'business_invoice': {f:'html/invoicePDF.html', n: 'business_invoice', j:0}
     };
 

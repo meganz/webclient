@@ -4,7 +4,7 @@
 function BusinessAccountUI() {
     "use strict";
     if (!mega.buinsessController) {
-         /**@type {BusinessAccount} */
+        /**@type {BusinessAccount} */
         this.business = new BusinessAccount();
         mega.buinsessController = this.business;
         mBroadcaster.addListener('business:subuserUpdate', this.UIEventsHandler);
@@ -44,9 +44,9 @@ function BusinessAccountUI() {
 
         // headers
         $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden');
-        //$('.fm-right-header-user-management .user-management-breadcrumb.subaccount').addClass('hidden');
-        //$('.fm-right-header-user-management .user-management-breadcrumb.overview').addClass('hidden');
-        //$('.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
+        // $('.fm-right-header-user-management .user-management-breadcrumb.subaccount').addClass('hidden');
+        // $('.fm-right-header-user-management .user-management-breadcrumb.overview').addClass('hidden');
+        // $('.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
         $('.fm-right-header-user-management .user-management-breadcrumb').addClass('hidden');
         $('.inv-det-arrow, .inv-det-id',
             '.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
@@ -73,10 +73,10 @@ function BusinessAccountUI() {
 
 /**
  * Function to view the right pane of "Users Management" used by master users to manage sub-accounts
- * @param {string[]} subAccounts    optional list of subAccount, Default is M.suba
- * @param {boolean} isBlockView     by default "Grid" view will be used, this param when True will change to "Block"
- * @param {boolean} quickWay        by default false, if true method will skip some ui operations
- * @returns {boolean}               true if OK, false if something went wrong
+ * @param {String[]} subAccounts    optional list of subAccount, Default is M.suba
+ * @param {Boolean} isBlockView     by default "Grid" view will be used, this param when True will change to "Block"
+ * @param {Boolean} quickWay        by default false, if true method will skip some ui operations
+ * @returns {Boolean}               true if OK, false if something went wrong
  */
 BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView, quickWay) {
     "use strict";
@@ -116,7 +116,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     var unhideUsersListSection = function () {
         subAccountsView.removeClass('hidden'); // un-hide the container
         $('.user-management-list-table', subAccountsView).removeClass('hidden'); // unhide the list table
-        $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide header
+        $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide head
         $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
         loadingDialog.phide();
     };
@@ -1034,7 +1034,10 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     $businessAccountContainer.removeClass('hidden'); // BA container
     $subAccountContainer.removeClass('hidden').attr('id', 'sub-' + subUserHandle); // sub-info container
     $subHeader.removeClass('hidden');
-    $subAccountContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+    $subAccountContainer.jScrollPane({
+        enableKeyboardNavigation: false, showArrows: true,
+        arrowSize: 8, animateScroll: true
+    });
 };
 
 
@@ -1060,25 +1063,25 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             mySelf.viewSubAccountListUI();
         }
     );
-    $overviewHeaderBtns.find('.pdf-exp').off('click.subuser').on('click.subuser',
-        function overviewHeaderClickHandler() {
-            M.require('jspdf_js').done(
-                function exportOverviewPageToPDF() {
-                    var doc = new jsPDF();
-                    var specialElementHandlers = {
-                        '.hidden': function (element, renderer) {
-                            return true;
-                        }
-                    };
+    // $overviewHeaderBtns.find('.pdf-exp').off('click.subuser').on('click.subuser',
+    //    function overviewHeaderClickHandler() {
+    //        M.require('jspdf_js').done(
+    //            function exportOverviewPageToPDF() {
+    //                var doc = new jsPDF();
+    //                var specialElementHandlers = {
+    //                    '.hidden': function (element, renderer) {
+    //                        return true;
+    //                    }
+    //                };
 
-                    doc.addHTML($overviewContainer[0], function () {
-                        doc.save('accountDashboard.pdf');
-                    });
+    //                doc.addHTML($overviewContainer[0], function () {
+    //                    doc.save('accountDashboard.pdf');
+    //                });
 
-                }
-            );
-        }
-    );
+    //            }
+    //        );
+    //    }
+    // );
 
 
     // private function to populate the dashboard
@@ -1265,7 +1268,10 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             $customCharLegend.removeClass('disabled');
         });
 
-        $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+        $overviewContainer.jScrollPane({
+            enableKeyboardNavigation: false, showArrows: true,
+            arrowSize: 8, animateScroll: true
+        });
     };
 
     // private function to format start and end dates
@@ -1375,7 +1381,10 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                 }
             });
         });
-        $overviewContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+        $overviewContainer.jScrollPane({
+            enableKeyboardNavigation: false, showArrows: true,
+            arrowSize: 8, animateScroll: true
+        });
     };
 
     // getting quotas
@@ -1947,7 +1956,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         myPage = myPage.replace('{3CompanyName}', invoiceDetail.u.cname);
                         myPage = myPage.replace('{4CompanyEmail}', invoiceDetail.u.e);
                         myPage = myPage.replace('{5CompanyAddress}', validAddressSentFromApi.join(', '));
-                        myPage = myPage.replace('{6CompanyCountry}', invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]);
+                        myPage = myPage.replace('{6CompanyCountry}',
+                            invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]);
                         var cVat = '---';
                         if (invoiceDetail.u.taxnum && invoiceDetail.u.taxnum[1]) {
                             cVat = invoiceDetail.u.taxnum[1];
@@ -1965,7 +1975,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         myPage = myPage.replace('{9itemDesc}', itemDec);
                         myPage = myPage.replace('{10itemAmount}', new Number(itemAmount).toFixed(2));
 
-                        myPage = myPage.replace('{11itemVat}', $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent);
+                        myPage = myPage.replace('{11itemVat}',
+                            $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent);
                         myPage = myPage.replace('{12totalCost}', '\u20ac' + new Number(invoiceDetail.tot).toFixed(2));
 
                         var pdfPrintIframe = document.getElementById('invoicePdfPrinter');
@@ -1991,7 +2002,10 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             }
         );
         
-        $invoiceDetailContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+        $invoiceDetailContainer.jScrollPane({
+            enableKeyboardNavigation: false, showArrows: true,
+            arrowSize: 8, animateScroll: true
+        });
     };
 
     $accountPageHeader.find('.acc-acc').off('click.suba').on('click.suba',
@@ -2402,7 +2416,8 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                 else {
                     if (res === -12) {
                         $uEmail.parent().addClass('error');
-                        $('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[1783]);
+                        $('.dialog-input-container .error-message.er-sub-m', $dialog)
+                            .removeClass('hidden').text(l[1783]);
                     }
                     else {
                         $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1679]);
@@ -2624,20 +2639,14 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
             else {
                 if ('fname' in changedVals && !changedVals.fname.length) {
                     $nameInput.parent().addClass('error');
-                    //$('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
-
                     return;
                 }
                 if ('lname' in changedVals && !changedVals.lname.length) {
                     $lnameInput.parent().addClass('error');
-                    //$('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
-
                     return;
                 }
                 if ('email' in changedVals && !isValidEmail(changedVals.email)) {
                     $emailInput.parent().addClass('error');
-                    //$('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[5705]);
-
                     return;
                 }
                 var editPromise = mySelf.business.editSubAccount(subUserHandle, changedVals.email, changedVals.fname, changedVals.lname,
@@ -2814,7 +2823,8 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
                             var folderName = M.suba[subUserHandle].e;
                             folderName += '_' + Date.now();
 
-                            var cpyPromise = mySelf.business.copySubUserTreeToMasterRoot(treeObj.tree, folderName, changePercentage);
+                            var cpyPromise = mySelf.business.copySubUserTreeToMasterRoot(treeObj.tree,
+                                folderName, changePercentage);
                             cpyPromise.fail(
                                 function copySubUserFailHandler(stF, errF, desF) {
                                     if (d) {
@@ -2831,9 +2841,11 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
                                     $migrateDialog.addClass('hidden');
 
                                     M.safeShowDialog('migration-success-dlg', function () {
-                                        var $dialog = $('.user-management-able-user-dialog.mig-success.user-management-dialog');
+                                        var $dialog =
+                                            $('.user-management-able-user-dialog.mig-success.user-management-dialog');
                                         $('.yes-answer', $dialog).off('click.suba').on('click.suba', closeDialog);
-                                        $dialog.find('.dialog-text-one').html(l[19149].replace('{0}', '<b>' + M.suba[subUserHandle].e + '</b>')
+                                        $dialog.find('.dialog-text-one')
+                                            .html(l[19149].replace('{0}', '<b>' + M.suba[subUserHandle].e + '</b>')
                                             .replace('{1}', '<b>' + folderName + '</b>'));
                                         return $dialog;
                                     });

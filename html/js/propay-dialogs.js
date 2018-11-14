@@ -1233,7 +1233,7 @@ var addressDialog = {
         this.$dialog.find('input.first-name').val('');
         this.$dialog.find('input.last-name').val('');
 
-        // in case we are coming from normal users sign ups (PRO) 
+        // in case we are coming from normal users sign ups (PRO)
         if (!this.businessPlan || !this.userInfo) {
             // Get the selected package
             selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');

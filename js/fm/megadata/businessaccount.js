@@ -35,7 +35,8 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
         "a": "sbu", // business sub account operation
         "aa": "a", // add operation
         "m": subEmail, // email address of user to add
-        "firstname": base64urlencode(to8(subFName)), // first name of user to add (not base64 encoded like attributes are)
+        "firstname": base64urlencode(to8(subFName)), // first name of user to add 
+                                                     // (not base64 encoded like attributes are)
         "lastname": base64urlencode(to8(subLName)) // last name of user to add (also not base64 encoded)
     };
 
@@ -106,7 +107,8 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
  * @param {any} optionals               new optionals, or null to don't change
  * @param {Boolean} isProtectLink       true if we want to protect invitation link with a password
  */
-BusinessAccount.prototype.editSubAccount = function (subuserHandle, subEmail, subFName, subLName, optionals, isProtectLink) {
+BusinessAccount.prototype.editSubAccount =
+    function (subuserHandle, subEmail, subFName, subLName, optionals, isProtectLink) {
     "use strict";
     var operationPromise = new MegaPromise();
 
@@ -1222,12 +1224,12 @@ BusinessAccount.prototype.setMasterUserAttributes =
                             // Encode parameters to Base64 before sending to the API
                             var sendEmailRequestParams = {
                                 a: 'uc2',
-                                n: base64urlencode(to8(fname + ' ' + lname)),         // Name (used just for the email)
-                                m: base64urlencode(email),                                   // Email
-                                crv: ab_to_base64(clientRandomValueBytes),                   // Client Random Value
-                                k: a32_to_base64(encryptedMasterKeyArray32),                 // Encrypted Master Key
-                                hak: ab_to_base64(hashedAuthenticationKeyBytes),             // Hashed Authentication Key
-                                v: 2                                                         // Version of this protocol
+                                n: base64urlencode(to8(fname + ' ' + lname)),        // Name (used just for the email)
+                                m: base64urlencode(email),                               // Email
+                                crv: ab_to_base64(clientRandomValueBytes),               // Client Random Value
+                                k: a32_to_base64(encryptedMasterKeyArray32),             // Encrypted Master Key
+                                hak: ab_to_base64(hashedAuthenticationKeyBytes),         // Hashed Authentication Key
+                                v: 2                                                     // Version of this protocol
                             };
 
                             api_req([request_upb, sendEmailRequestParams], {

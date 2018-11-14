@@ -70,11 +70,11 @@ BusinessRegister.prototype.initPage = function () {
             $lnameInput.prop('disabled', true);
         }
 
-        ///
+        /////////
         $pageContainer.find('.bus-reg-input.pass-1st').addClass('hidden');
         $pageContainer.find('.bus-reg-input.pass-2nd').addClass('hidden');
         $pageContainer.find('.new-registration.suba').addClass('hidden');
-        ///
+        /////////
         this.isLoggedIn = true;
     }
     else {
@@ -231,7 +231,8 @@ BusinessRegister.prototype.initPage = function () {
                         $passInput.focus();
                     }
                 }
-                else { // the possibility to get to this else is almost 0 , however it's added to eliminate any chances of problems
+                else { // the possibility to get to this else is almost 0 ,
+                       // however it's added to eliminate any chances of problems
                     M.require('zxcvbn_js').done(function () {
                         inputsValidator($element); // recall me after loading
                     });
@@ -308,20 +309,19 @@ BusinessRegister.prototype.initPage = function () {
             updatePriceGadget(3);
 
             ///// testing
-            //var userInfo = {
+            // var userInfo = {
             //    fname: 'khaled',
             //    lname: 'daif',
             //    nbOfUsers: 4
-            //};
-            //mySelf.goToPayment(userInfo);
+            // };
+            // mySelf.goToPayment(userInfo);
             ///// end of testing
         });
     });
-
 };
 
 /**
- * register new business account, values must be validated 
+ * register new business account, values must be validated
  * @param {Number} nbusers      number of users in this business account
  * @param {String} cname        company name
  * @param {String} fname        first name of account owner
@@ -339,7 +339,8 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
     var afterEmphermalAccountCreation = function (isUpgrade) {
         // at this point i know BusinessAccount Class is required before
         var business = new BusinessAccount();
-        var settingPromise = business.setMasterUserAttributes(nbusers, cname, tel, fname, lname, email, pass, isUpgrade);
+        var settingPromise = business.setMasterUserAttributes(nbusers, cname, tel, fname, lname,
+            email, pass, isUpgrade);
         settingPromise.always(function settingAttrHandler(st, res) {
             if (st === 0) {
                 if (res[1] && res[1] === EEXIST) {

@@ -436,7 +436,7 @@ function init_register() {
     $('.account.top-header.wide', $regInfoContainer).html(l[1095]);
 
     var $tipsContainer = $('.main-mid-pad.big-pad.register1 .main-right-block');
-    $('.dont-forget-pass', $tipsContainer).removeClass('hidden'); //19130
+    $('.dont-forget-pass', $tipsContainer).removeClass('hidden'); // 19130
     $('p.account-sec', $tipsContainer).html(l[1093] + ' ' + l[1094]);
     $('.account-business', $tipsContainer).addClass('hidden');
 

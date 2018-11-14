@@ -482,9 +482,9 @@ function api_init(channel, service, split) {
 
 /**
  * queue request on API channel
- * @param {object} request              request object to be sent to API
- * @param {object} context              context object to be returned with response, has 'callback' func to be called
- * @param {number} channel              optional - channel number to use (default =0) 
+ * @param {Object} request              request object to be sent to API
+ * @param {Object} context              context object to be returned with response, has 'callback' func to be called
+ * @param {Number} channel              optional - channel number to use (default =0)
  */
 function api_req(request, context, channel) {
     "use strict";
@@ -887,38 +887,40 @@ function api_reqfailed(c, e) {
         queue.ctxsBuffer = [];
         queue.setimmediate = false;
 
-        api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reasonCode) {
-            u_logout(true);
+        api_req({ a: 'whyamiblocked' }, {
+            callback: function whyAmIBlocked(reasonCode) {
+                u_logout(true);
 
-            // On clicking OK, log the user out and redirect to contact page
-            loadingDialog.hide();
+                // On clicking OK, log the user out and redirect to contact page
+                loadingDialog.hide();
 
-            var reasonText = '';
-            var dialogTitle = l[17768];// Terminated account
+                var reasonText = '';
+                var dialogTitle = l[17768];// Terminated account
 
-            if (reasonCode === 200) {
-                dialogTitle = l[6789];// Suspended account
-                reasonText = l[17741];// Your account has been suspended due to multiple breaches of Mega's Terms...
-            }
-            else if (reasonCode === 300) {
-                reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
-            }
-            else if (reasonCode === 400) {
-                reasonText = l[19748];// Your account was terminated due to breach of Mega's Terms of Service...
-            }
-            else {// Unknown reasonCode
-                reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
-            }
-
-            msgDialog('warninga', dialogTitle,
-                reasonText,
-                false,
-                function() {
-                    var redirectUrl = getAppBaseUrl() + '#contact';
-                    window.location.replace(redirectUrl);
+                if (reasonCode === 200) {
+                    dialogTitle = l[6789];// Suspended account
+                    reasonText = l[17741];// Your account has been suspended due to multiple breaches of Mega's Terms..
                 }
-            );
-        }});
+                else if (reasonCode === 300) {
+                    reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
+                }
+                else if (reasonCode === 400) {
+                    reasonText = l[19748];// Your account was terminated due to breach of Mega's Terms of Service...
+                }
+                else {// Unknown reasonCode
+                    reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
+                }
+
+                msgDialog('warninga', dialogTitle,
+                    reasonText,
+                    false,
+                    function () {
+                        var redirectUrl = getAppBaseUrl() + '#contact';
+                        window.location.replace(redirectUrl);
+                    }
+                );
+            }
+        });
     }
     else {
         api_reqerror(apixs[c], EAGAIN, 0);
@@ -1232,7 +1234,8 @@ function api_createuser(ctx, invitecode, invitename, uh) {
         req.name = invitename;
 
         security.deriveKeysFromPassword(ctx.businessUser, u_k,
-            function (clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes, derivedAuthenticationKeyBytes) {
+            function (clientRandomValueBytes, encryptedMasterKeyArray32,
+                hashedAuthenticationKeyBytes, derivedAuthenticationKeyBytes) {
                 req.crv = ab_to_base64(clientRandomValueBytes);
                 req.hak = ab_to_base64(hashedAuthenticationKeyBytes);
                 req.v = 2;

@@ -2,7 +2,7 @@
  * a class to apply actions on business account in collaboration with API
  */
 function BusinessAccount() {
-    "use strict"
+    "use strict";
     this.QuotaUpdateFreq = 3e4; // 30 sec - default threshold to update quotas info
     this.invoiceListUpdateFreq = 9e5; // 15 min - default threshold to update invoices list
 }
@@ -349,12 +349,12 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
 
                 request.fd = fromToDate.fromDate;
 
-                var upperDateStr = String(upperDate.getMonth()) + '';
+                var upperDateStr = String(upperDate.getMonth());
                 if (upperDateStr.length < 2) {
                     upperDateStr = '0' + upperDateStr;
                 }
                 upperDateStr = upperDate.getFullYear() + upperDateStr;
-                var tempDay = String(upperDate.getDate()) + '';
+                var tempDay = String(upperDate.getDate());
                 if (tempDay.length < 2) {
                     tempDay = '0' + tempDay;
                 }
@@ -371,12 +371,12 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
 
                 request.td = fromToDate.toDate;
 
-                var lowerDateStr = String(lowerDate.getMonth()) + '';
+                var lowerDateStr = String(lowerDate.getMonth());
                 if (lowerDateStr.length < 2) {
                     lowerDateStr = '0' + lowerDateStr;
                 }
                 lowerDateStr = lowerDate.getFullYear() + lowerDateStr;
-                var tempDay2 = String(lowerDate.getDate()) + '';
+                var tempDay2 = String(lowerDate.getDate());
                 if (tempDay2.length < 2) {
                     tempDay2 = '0' + tempDay2;
                 }
@@ -554,7 +554,7 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
  * @returns {Boolean}   true if the user is a Master B-Account
  */
 BusinessAccount.prototype.isBusinessMasterAcc = function () {
-    "use strict"
+    "use strict";
     if ((u_attr.b && u_attr.b.m) || (M.suba && M.suba.length)) {
         return true;
     }
@@ -568,7 +568,7 @@ BusinessAccount.prototype.isBusinessMasterAcc = function () {
  * @returns {String}            base64 sign-up-code (decryption result)
  */
 BusinessAccount.prototype.decryptSubAccountInvitationLink = function (link, password) {
-    "use strict"
+    "use strict";
     if (!link || !password) {
         return null;
     }
@@ -593,11 +593,11 @@ BusinessAccount.prototype.decryptSubAccountInvitationLink = function (link, pass
 
 /**
  * Get info associated with sign-up code
- * @param {string} signupCode       sign-up code to fetch info for
+ * @param {String} signupCode       sign-up code to fetch info for
  * @returns {Promise}                Promise resolves an object contains fetched info
  */
 BusinessAccount.prototype.getSignupCodeInfo = function (signupCode) {
-    "use strict"
+    "use strict";
     if (!signupCode) {
         return null;
     }
@@ -938,7 +938,6 @@ BusinessAccount.prototype.getSubUserTree = function (subUserHandle) {
     }
 
     // getting sub-user tree
-
     var request = {
         "a": "fsub", // operation - get user tree
         "su": subUserHandle, // sub-user Handle
@@ -1513,7 +1512,7 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
  * @returns {Array}     The key
  */
 BusinessAccount.prototype.creatBusinessAccountMasterKey = function () {
-    "use strict"
+    "use strict";
     var bKey = Array(4);
     for (var i = 4; i--;) {
         bKey[i] = rand(0x100000000);

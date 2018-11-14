@@ -1037,7 +1037,6 @@ scparser.$add('ua', {
                     mega.attr.uaPacketParser(attributeName, actionPacketUserId, true, version);
                 }
             }
-
             // in case of business master
             // first, am i a master?
             if (u_attr && u_attr.b && u_attr.b.m) {
@@ -2990,7 +2989,7 @@ function process_suba(suba, ignoreDB) {
  * @param {Object} packet
  */
 function process_businessAccountSubUsers_SC(packet) {
-    "use strict"
+    "use strict";
     if (!packet) { // no packet
         return;
     }

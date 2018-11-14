@@ -664,7 +664,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
  * @param {String} signupCode       sub-user signup code
  */
 BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
-    "use strict"
+    "use strict";
     var business = new BusinessAccount();
     var getInfoPromise = business.getSignupCodeInfo(signupCode);
 
@@ -1278,7 +1278,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     // private function to format start and end dates
     var getReportDates = function (leadingDate) {
         var today = leadingDate || new Date();
-        var currMonth = '' + String(today.getMonth() + 1);
+        var currMonth = String('' + (today.getMonth() + 1));
         if (currMonth.length < 2) {
             currMonth = '0' + currMonth;
         }
@@ -1290,7 +1290,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         if (!endDate) {
             return;
         }
-        var endDateStr = String(endDate.getFullYear()) + '' + currMonth + endDate.getDate();
+        var endDateStr = String(endDate.getFullYear() + '' + currMonth + endDate.getDate());
         return { fromDate: startDate, toDate: endDateStr };
     };
 
@@ -2074,7 +2074,7 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
 
 /** show Welcome to business account dialog */
 BusinessAccountUI.prototype.showWelcomeDialog = function () {
-    "use strict"
+    "use strict";
 
     var $dialog = $('.bus-welcome-dialog.user-management-dialog');
 

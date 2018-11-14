@@ -1,6 +1,6 @@
 /** a class contains the code-behind of business register "registerb" page */
 function BusinessRegister() {
-    "use strict"
+    "use strict";
     this.cacheTimeout = 9e5; // 15 min - default threshold to update payment gateway list
     this.planPrice = 9.99; // initial value
     this.minUsers = 3; // minimum number of users

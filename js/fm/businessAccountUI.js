@@ -1278,19 +1278,20 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     // private function to format start and end dates
     var getReportDates = function (leadingDate) {
         var today = leadingDate || new Date();
-        var currMonth = String('' + (today.getMonth() + 1));
+        var todayMonth = today.getMonth() + 1;
+        var currMonth = String(todayMonth);
         if (currMonth.length < 2) {
             currMonth = '0' + currMonth;
         }
         var currYear = String(today.getFullYear());
 
-        var startDate = currYear + '' + currMonth + '01';
+        var startDate = currYear + currMonth + '01';
 
         var endDate = getLastDayofTheMonth(today);
         if (!endDate) {
             return;
         }
-        var endDateStr = String(endDate.getFullYear() + '' + currMonth + endDate.getDate());
+        var endDateStr = String(endDate.getFullYear()) + currMonth + String(endDate.getDate()));
         return { fromDate: startDate, toDate: endDateStr };
     };
 

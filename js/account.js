@@ -221,7 +221,7 @@ function u_checklogin3a(res, ctx) {
             });
         }
         // there was a race condition between importing and business accounts creation.
-        // in normal users there's no problem, however in business the user will be disabled 
+        // in normal users there's no problem, however in business the user will be disabled
         // till they pay. therefore, if the importing didnt finish before 'upb' then the importing
         // will fail.
         if ($.createanonuser === u_attr.u) {

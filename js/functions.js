@@ -2689,6 +2689,7 @@ function classifyPassword(password) {
  * @returns {Date}              the result date object with the last day of the month
  */
 function getLastDayofTheMonth(dateObj) {
+    "use strict"
     if (!dateObj) {
         return null;
     }

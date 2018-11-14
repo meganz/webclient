@@ -1194,6 +1194,7 @@ var addressDialog = {
      * Open and setup the dialog
      */
     init: function (plan, userInfo, businessRegisterPage) {
+        "use strict"
         if (plan) {
             this.businessPlan = plan;
             this.userInfo = userInfo;

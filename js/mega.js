@@ -2958,8 +2958,8 @@ function process_u(u, ignoreDB) {
 /**
  * a function to parse the JSON object received holding information about sub-accounts of a business account.
  * This object will exist only in business accounts.
- * @param {string[]} suba    the object to parse, it must contain an array of sub-accounts ids (can be empty)
- * @param {boolean} ignoreDB if we want to skip DB updating
+ * @param {String[]} suba    the object to parse, it must contain an array of sub-accounts ids (can be empty)
+ * @param {Boolean} ignoreDB if we want to skip DB updating
  */
 function process_suba(suba, ignoreDB) {
     "use strict";
@@ -2970,26 +2970,27 @@ function process_suba(suba, ignoreDB) {
         // later-on we need to iterate on all of them. For now we dont know how to treat sub-masters yet
         // --> we will target only current users's subs
         var bAccount = new BusinessAccount();
-        //if (!suba || !suba[u_handle]) {
+        // if (!suba || !suba[u_handle]) {
         //    return;
-        //}
-        //suba = suba[u_handle];
+        // }
+        // suba = suba[u_handle];
         if (suba.length) {
             for (var k = 0; k < suba.length; k++) {
                 bAccount.parseSUBA(suba[k], ignoreDB);
             }
         }
-        //else {
+        // else {
         //    bAccount.parseSUBA(null, true); // dummy call to flag that this is a master B-account
-        //}
+        // }
     });
 }
 
 /**
  * A function to precess the action packets received related to business account sub-users
- * @param {object} packet
+ * @param {Object} packet
  */
 function process_businessAccountSubUsers_SC(packet) {
+    "use strict"
     if (!packet) { // no packet
         return;
     }

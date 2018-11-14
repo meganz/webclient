@@ -204,11 +204,12 @@ function dashboardUI() {
         // Elements for free/pro accounts. Expites date / Registration date
         if (u_attr.p) {
 
+            var timestamp;
             // Subscription
             if (account.stype == 'S') {
 
                 // Get the date their subscription will renew
-                var timestamp = account.srenew[0];
+                timestamp = account.srenew[0];
 
                 // Display the date their subscription will renew
                 if (timestamp > 0) {
@@ -227,6 +228,7 @@ function dashboardUI() {
             }
 
             if (u_attr.p === 100 && u_attr.b) {
+                timestamp = account.srenew[0];
                 // someone modified the CSS to overwirte the hidden class !!, therefore .hide() will be used
                 $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();
                 var $businessLeft = $('.account.left-pane.info-block.business-users').removeClass('hidden');

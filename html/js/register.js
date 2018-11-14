@@ -337,7 +337,7 @@ function pageregister() {
                         }
                     },
                     businessUser: $password.val()   // we need the plain enterd password in later stages
-                                                    // because u_checklogin take the byte array of the password.
+                    // because u_checklogin take the byte array of the password.
                 };
                 var passwordByteArray = prepare_key_pw($password.val());
                 var passwordaes = new sjcl.cipher.aes(passwordByteArray);

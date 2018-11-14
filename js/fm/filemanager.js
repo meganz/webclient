@@ -2610,14 +2610,13 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
             initFileblocksScrolling();
         }
     }
-    else if (this.currentdirid.substr(0, 15) === 'user-management') {
-        // ui update is handled in Business Account classes.
-
-    }
     else {
-        $('.fm-blocks-view.fm').removeClass('hidden');
-        if (!aQuiet) {
-            initFileblocksScrolling();
+        // ui update is handled in Business Account classes.
+        if (this.currentdirid.substr(0, 15) !== 'user-management') {
+            $('.fm-blocks-view.fm').removeClass('hidden');
+            if (!aQuiet) {
+                initFileblocksScrolling();
+            }
         }
     }
 

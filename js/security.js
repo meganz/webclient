@@ -80,7 +80,7 @@ var security = {
      * @param {String} masterKeyArray32 The user's Master Key
      * @param {Function} completeCallback The function to be run after the keys are created which will pass the
      *                                    the clientRandomValueBytes, encryptedMasterKeyArray32,
-     *                                    hashedAuthenticationKeyBytes 
+     *                                    hashedAuthenticationKeyBytes
      *                                    and derivedAuthenticationKeyBytes as the parameters
      */
     deriveKeysFromPassword: function(password, masterKeyArray32, completeCallback) {

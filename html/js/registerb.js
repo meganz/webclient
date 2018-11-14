@@ -1,5 +1,6 @@
 /** a class contains the code-behind of business register "registerb" page */
 function BusinessRegister() {
+    "use strict"
     this.cacheTimeout = 9e5; // 15 min - default threshold to update payment gateway list
     this.planPrice = 9.99; // initial value
     this.minUsers = 3; // minimum number of users
@@ -70,11 +71,11 @@ BusinessRegister.prototype.initPage = function () {
             $lnameInput.prop('disabled', true);
         }
 
-        /////////
+        //
         $pageContainer.find('.bus-reg-input.pass-1st').addClass('hidden');
         $pageContainer.find('.bus-reg-input.pass-2nd').addClass('hidden');
         $pageContainer.find('.new-registration.suba').addClass('hidden');
-        /////////
+        //
         this.isLoggedIn = true;
     }
     else {
@@ -83,7 +84,6 @@ BusinessRegister.prototype.initPage = function () {
     $('.bus-reg-btn', $pageContainer).addClass('disabled');
 
     var fillPaymentGateways = function (st, list) {
-        "use strict";
 
         var failureExit = function () {
             msgDialog('warninga', '', l[19342], '', function () {
@@ -232,7 +232,7 @@ BusinessRegister.prototype.initPage = function () {
                     }
                 }
                 else { // the possibility to get to this else is almost 0 ,
-                       // however it's added to eliminate any chances of problems
+                    // however it's added to eliminate any chances of problems
                     M.require('zxcvbn_js').done(function () {
                         inputsValidator($element); // recall me after loading
                     });
@@ -308,14 +308,14 @@ BusinessRegister.prototype.initPage = function () {
             mySelf.planInfo = info;
             updatePriceGadget(3);
 
-            ///// testing
+            // testing
             // var userInfo = {
             //    fname: 'khaled',
             //    lname: 'daif',
             //    nbOfUsers: 4
             // };
             // mySelf.goToPayment(userInfo);
-            ///// end of testing
+            // end of testing
         });
     });
 };

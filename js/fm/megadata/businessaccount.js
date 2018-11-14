@@ -2,6 +2,7 @@
  * a class to apply actions on business account in collaboration with API
  */
 function BusinessAccount() {
+    "use strict"
     this.QuotaUpdateFreq = 3e4; // 30 sec - default threshold to update quotas info
     this.invoiceListUpdateFreq = 9e5; // 15 min - default threshold to update invoices list
 }
@@ -22,7 +23,7 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
 
     if (!isValidEmail(subEmail)) {
         // promise reject/resolve will return: success,errorCode,errorDesc
-        return operationPromise.reject(0, 1,'Invalid Email');
+        return operationPromise.reject(0, 1, 'Invalid Email');
     }
     if (!subFName) {
         return operationPromise.reject(0, 2, 'Empty First Name');
@@ -35,8 +36,8 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
         "a": "sbu", // business sub account operation
         "aa": "a", // add operation
         "m": subEmail, // email address of user to add
-        "firstname": base64urlencode(to8(subFName)), // first name of user to add 
-                                                     // (not base64 encoded like attributes are)
+        "firstname": base64urlencode(to8(subFName)), // first name of user to add
+        // (not base64 encoded like attributes are)
         "lastname": base64urlencode(to8(subLName)) // last name of user to add (also not base64 encoded)
     };
 
@@ -67,12 +68,12 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
                 // this must be re done
                 // since no action packet will be sent for sub-user adding
                 // and since the return handle + password is a true confirmation of success
-                // we will simulate the effect locally 
+                // we will simulate the effect locally
                 // however, this may introduce theoretical data inconsistency between server and local
                 // as although we know the operation is successful, we are assuming that the server used
                 // the sent email + first-name + last-name without any alternation
 
-                //var usr = {
+                // var usr = {
                 //    u: res.u,
                 //    p: null,
                 //    s: 10, // pending
@@ -83,9 +84,9 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
                 //    idnum: request['%idnum'] || '',
                 //    phonenum: request['%phonenum'] || '',
                 //    location: request['%location'] || ''
-                //};
+                // };
 
-                //mySelf.parseSUBA(usr, false, true);
+                // mySelf.parseSUBA(usr, false, true);
 
                 operationPromise.resolve(1, res, request); // new added user handle
             }
@@ -348,12 +349,12 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
 
                 request.fd = fromToDate.fromDate;
 
-                var upperDateStr = upperDate.getMonth() + '';
+                var upperDateStr = String(upperDate.getMonth()) + '';
                 if (upperDateStr.length < 2) {
                     upperDateStr = '0' + upperDateStr;
                 }
                 upperDateStr = upperDate.getFullYear() + upperDateStr;
-                var tempDay = upperDate.getDate() + '';
+                var tempDay = String(upperDate.getDate()) + '';
                 if (tempDay.length < 2) {
                     tempDay = '0' + tempDay;
                 }
@@ -370,12 +371,12 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
 
                 request.td = fromToDate.toDate;
 
-                var lowerDateStr = lowerDate.getMonth() + '';
+                var lowerDateStr = String(lowerDate.getMonth()) + '';
                 if (lowerDateStr.length < 2) {
                     lowerDateStr = '0' + lowerDateStr;
                 }
                 lowerDateStr = lowerDate.getFullYear() + lowerDateStr;
-                var tempDay2 = lowerDate.getDate() + '';
+                var tempDay2 = String(lowerDate.getDate()) + '';
                 if (tempDay2.length < 2) {
                     tempDay2 = '0' + tempDay2;
                 }
@@ -443,11 +444,11 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
                 }
 
                 // quit if we didnt find the data
-                //if (endIx === orderedDates.length && orderedDates[endIx] !== ctx.context.dates.toDate) {
+                // if (endIx === orderedDates.length && orderedDates[endIx] !== ctx.context.dates.toDate) {
                 //    result = null;
                 //    console.error('Requested report end-date is not found');
                 //    return operationPromise.reject(0, res, 'Requested report end-date is not found');
-                //}
+                // }
 
                 operationPromise.resolve(1, result); // quota info
             }
@@ -510,9 +511,9 @@ BusinessAccount.prototype.getQuotaUsage = function (forceUpdate) {
 
 /**
  * a function to parse the JSON object received holding information about a sub-account of a business account.
- * @param {string} suba    the object to parse, it must contain a sub-account ids
- * @param {boolean} ignoreDB if we want to skip DB updating
- * @param {boolean} fireUIEvent if we want to fire a n event to update ui
+ * @param {String} suba    the object to parse, it must contain a sub-account ids
+ * @param {Boolean} ignoreDB if we want to skip DB updating
+ * @param {Boolean} fireUIEvent if we want to fire a n event to update ui
  */
 BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
     "use strict";
@@ -550,9 +551,10 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
 
 /**
  * Function to check if the current logged in user is a Business Account Master
- * @returns {boolean}   true if the user is a Master B-Account
+ * @returns {Boolean}   true if the user is a Master B-Account
  */
 BusinessAccount.prototype.isBusinessMasterAcc = function () {
+    "use strict"
     if ((u_attr.b && u_attr.b.m) || (M.suba && M.suba.length)) {
         return true;
     }
@@ -560,12 +562,13 @@ BusinessAccount.prototype.isBusinessMasterAcc = function () {
 };
 
 /**
- * Decrypting the link sent to sub-account using a password 
- * @param {string} link         invitation link #businesssignup<link> without #businesssignup prefix
- * @param {string} password     The password which the sub-user entered to decrypt the link
- * @returns {string}            base64 sign-up-code (decryption result)
+ * Decrypting the link sent to sub-account using a password
+ * @param {String} link         invitation link #businesssignup<link> without #businesssignup prefix
+ * @param {String} password     The password which the sub-user entered to decrypt the link
+ * @returns {String}            base64 sign-up-code (decryption result)
  */
 BusinessAccount.prototype.decryptSubAccountInvitationLink = function (link, password) {
+    "use strict"
     if (!link || !password) {
         return null;
     }
@@ -594,6 +597,7 @@ BusinessAccount.prototype.decryptSubAccountInvitationLink = function (link, pass
  * @returns {Promise}                Promise resolves an object contains fetched info
  */
 BusinessAccount.prototype.getSignupCodeInfo = function (signupCode) {
+    "use strict"
     if (!signupCode) {
         return null;
     }
@@ -621,7 +625,7 @@ BusinessAccount.prototype.getSignupCodeInfo = function (signupCode) {
 /**
  * copying the sub-user decrypted tree to master user root
  * @param {Array} treeObj               sub-user tree decrypted
- * @param {string} folderName           name of the folder to create in master's root
+ * @param {String} folderName           name of the folder to create in master's root
  * @param {Function} progressCallback   optional callback function for progress reporting
  * @returns {Promise}                   resolves if operation succeeded
  */
@@ -731,9 +735,9 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
                     newNode.h = originalNode.h;
                     newNode.p = originalNode.p;
                     newNode.t = originalNode.t;
-                    //if (newNode.p === treeObj[0].h) {
+                    // if (newNode.p === treeObj[0].h) {
                     //    delete newNode.p;
-                    //}
+                    // }
                     if (rootParentsMap[newNode.p]) {
                         newNode.newTarget = rootParentsMap[newNode.p];
                         delete newNode.p;
@@ -757,8 +761,8 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
 
 
                 M.copyNodes(treeToCopy, n.h, false, copyPromise, treeToCopy);
-                //treeObj.shift();
-                //M.copyNodes(treeObj, n.h, false, copyPromise, treeObj);
+                // treeObj.shift();
+                // M.copyNodes(treeObj, n.h, false, copyPromise, treeObj);
 
                 copyPromise.fail(function (err) {
                     operationPromise.reject(0, err, 'copying failed');
@@ -783,9 +787,9 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
 
 /**
  * decrypt the sub-user tree using the passed key
- * @param {Array} treeF     sub-user tree as an array of nodes
- * @param {string} key      sub-user's master key
- * @returns {object}        if succeeded, contains .tree attribute and .errors .warn
+ * @param {Array} theTree   sub-user tree as an array of nodes
+ * @param {String} key      sub-user's master key
+ * @returns {Object}        if succeeded, contains .tree attribute and .errors .warn
  */
 BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
     "use strict";
@@ -799,9 +803,9 @@ BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
     if (!treeF || !treeF.length || !key) {
         return null;
     }
-    //if (!u_privk) {
+    // if (!u_privk) {
     //    return null;
-    //}
+    // }
     if (!u_attr.b || !u_attr.b.bprivk) {
         return null;
     }
@@ -809,7 +813,7 @@ BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
     var business_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.b.bprivk))));
 
     var t = base64urldecode(key);
-    //var dKey = crypto_rsadecrypt(t, u_privk);
+    // var dKey = crypto_rsadecrypt(t, u_privk);
     var dKey = crypto_rsadecrypt(t, business_privk);
     var subUserKey = new sjcl.cipher.aes(str_to_a32(dKey.substr(0, 16)));
 
@@ -846,12 +850,12 @@ BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
                 p = 12;
             }
             else {
-                //var dots = treeF[k].k.indexOf(':', 8);
-                //if (dots !== -1) {
+                // var dots = treeF[k].k.indexOf(':', 8);
+                // if (dots !== -1) {
                 //    p = dots + 1;
-                //}
+                // }
                 for (p = 8; (p = treeF[k].k.indexOf(':', p)) >= 0;) {
-                    if (++p == 9 || treeF[k].k[p - 10] == '/') {
+                    if (++p === 9 || treeF[k].k[p - 10] === '/') {
                         sId = treeF[k].k.substr(p - 9, 8);
                         if (subUserShareKeys[sId]) {
                             break;
@@ -919,7 +923,7 @@ BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
 
 /**
  * get the sub-user tree
- * @param {string} subUserHandle    Handle of a sub-user
+ * @param {String} subUserHandle    Handle of a sub-user
  * @returns {Promise}               resolve if the operation succeeded
  */
 BusinessAccount.prototype.getSubUserTree = function (subUserHandle) {
@@ -1196,10 +1200,10 @@ BusinessAccount.prototype.setMasterUserAttributes =
             "a": "upb",                                     // up - business
             "%name": base64urlencode(to8(cname)),    // company name
             "%phone": base64urlencode(to8(tel)),     // company phone
-            //terms: 'Mq',
-            //firstname: base64urlencode(to8(fname)),
-            //lastname: base64urlencode(to8(lname)),
-            //name2: base64urlencode(to8(fname + ' ' + lname))
+            // terms: 'Mq',
+            // firstname: base64urlencode(to8(fname)),
+            // lastname: base64urlencode(to8(lname)),
+            // name2: base64urlencode(to8(fname + ' ' + lname))
         };
 
         if (nbusers) {
@@ -1283,7 +1287,7 @@ BusinessAccount.prototype.setMasterUserAttributes =
  * update the business account attributes (company)
  * @param {Object[]} attrs              array of key,val of attributes to update
  */
-BusinessAccount.prototype.updateBusinessAttrs= function (attrs) {
+BusinessAccount.prototype.updateBusinessAttrs = function (attrs) {
     "use strict";
     var operationPromise = new MegaPromise();
 
@@ -1509,6 +1513,7 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
  * @returns {Array}     The key
  */
 BusinessAccount.prototype.creatBusinessAccountMasterKey = function () {
+    "use strict"
     var bKey = Array(4);
     for (var i = 4; i--;) {
         bKey[i] = rand(0x100000000);

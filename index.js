@@ -999,7 +999,7 @@ function init_page() {
             init_register();
         }
     }
-    else if ((page == 'registerb')) { // business register
+    else if ((page === 'registerb')) { // business register
         parsepage(pages['registerb']);
         $('body').addClass('business');
         var regBusiness = new BusinessRegister();

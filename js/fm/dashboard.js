@@ -211,9 +211,13 @@ function dashboardUI() {
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
 
         // left-panel responsive contents
-        var $planDateWidth = $('.plan-date-info').width() + $('.plan-date-val').width();
-        var $regDateWidth = $('.reg-date-info').width() + $('.plan-date-val').width();
-        $.leftPaneResizable.options.updateWidth = Math.max($planDateWidth, $regDateWidth);
+        var maxwidth = 0;
+        for (var i = 0; i < $('.account.left-pane.small-txt:visible').length; i++){
+            var rowwidth = $('.account.left-pane.small-txt:visible').get(i).offsetWidth
+                + $('.account.left-pane.big-txt:visible').get(i).offsetWidth;
+            maxwidth = Math.max(maxwidth, rowwidth);
+        }
+        $.leftPaneResizable.options.updateWidth = maxwidth;
 
         $($.leftPaneResizable).trigger('resize');
 

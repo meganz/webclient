@@ -1196,7 +1196,7 @@ function processEmailChangeActionPacket(ap) {
                 // Initialize account notifications.
                 if (!is_mobile) {
                     mega.notif.setup(fmconfig.anf);
-                    if (fminitialized && page.indexOf('fm/account') > -1) {
+                    if (fminitialized && page.indexOf('fm/account') > -1 && M.account) {
                         accountUI.renderAccountPage(M.account);
                     }
                 }

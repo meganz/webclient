@@ -2680,5 +2680,7 @@
     "19852": "Hai l'autenticazione a due fattori (2FA) attivata e hai perso il tuo dispositivo di autenticazione!",
     "19853": "Non potrai effettuare il login, cambiare l'indirizzo email, cambiare la password o disattivare l'autenticazione a due fattori (2FA).",
     "19854": "Non preoccuparti, puoi effettuare un reset dell'account utilizzando la tua Chiave di Recupero. Ci\u00f2 disattiver\u00e0 l'autenticazione a due fattori (2FA) e ti permetter\u00e0 di effettuare il login e cambiare le impostazioni dell'account. [B]Non perderai alcun file, contatto o messaggio[\/B].",
-    "19855": "Uno spazio vuoto all'inizio o alla fine della password non \u00e8 permesso."
+    "19855": "Uno spazio vuoto all'inizio o alla fine della password non \u00e8 permesso.",
+    "19856": "Interagisci con MEGA",
+    "19857": "Fai doppio clic per accedere ad un file o aprire una cartella. [BR]Fai clic con il tasto destro per vedere tutte le opzioni disponibili."
 }

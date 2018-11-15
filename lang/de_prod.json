@@ -2680,5 +2680,7 @@
     "19852": "Sie haben Zwei-Faktor-Authentifizierung aktiviert und Ihren Authenticator verloren!",
     "19853": "Sie k\u00f6nnen sich derzeit nicht einloggen, Ihre E-Mail-Adresse oder Ihr Passwort \u00e4ndern, oder die Zwei-Faktor-Authentifizierung abschalten.",
     "19854": "Kein Problem - Sie k\u00f6nnen den Zugriff auf Ihren Account unter Zuhilfenahme Ihres Rettungsschl\u00fcssels wiederherstellen. Die Zwei-Faktor-Authentifizierung wird deaktiviert, und Sie k\u00f6nnen sich einloggen. [B]Alle bestehenden Dateien, Kontakte oder Nachrichten bleiben erhalten.[\/B].",
-    "19855": "Leerzeichen am Anfang oder am Ende des Passworts sind nicht erlaubt."
+    "19855": "Leerzeichen am Anfang oder am Ende des Passworts sind nicht erlaubt.",
+    "19856": "Zugriff auf den Inhalt dieses Ordner-Links",
+    "19857": "Doppelklick: Dateien und Ordner \u00f6ffnen [BR] Weitere Optionen: Rechte Maustaste"
 }

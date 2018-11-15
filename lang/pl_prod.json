@@ -2604,13 +2604,13 @@
     "19676": "Jedna aplikacja, wiele urz\u0105dze\u0144",
     "19677": "Zarz\u0105dzanie zaszyfrowanymi danymi na urz\u0105dzeniach mobilnych, tabletach i komputerach jest szybkie i \u0142atwe.",
     "19678": "Szukasz bezpiecznej aplikacji komunikacyjnej?",
-    "19679": "Nasze aplikacje na system iOS i Android obs\u0142uguj\u0105 wiadomo\u015bci tekstowe oraz po\u0142\u0105czenia g\u0142osowe i wideo, a tak\u017ce szyfrowanie end-to-end, a tak\u017ce wszystkie nasze inne funkcje MEGA.",
+    "19679": "Nasze aplikacje na iOS i Androida obejmuj\u0105 wiadomo\u015bci tekstowe i po\u0142\u0105czenia g\u0142osowe i wideo, z szyfrowaniem end-to-end, a tak\u017ce wszystkie nasze inne funkcje MEGA.",
     "19680": "Funkcje MEGAchat s\u0105 obecnie niedost\u0119pne w naszych aplikacjach dla systemu Windows 10.",
     "19681": "Pobierz nasz\u0105 aplikacj\u0119 MEGA na urz\u0105dzenie z systemem Windows 10",
     "19682": "Aplikacje mobilne MEGA",
     "19683": "Bezpiecznie zarz\u0105dzaj swoimi plikami i wsp\u00f3\u0142pracuj ze wszystkimi z dowolnego miejsca.",
     "19684": "Zapewniamy tak\u017ce wsparcie dla urz\u0105dze\u0144 Windows Phone 8 i Windows 10, w tym telefon\u00f3w kom\u00f3rkowych, tablet\u00f3w i komputer\u00f3w stacjonarnych.",
-    "19685": "[S]Chmura MEGA[\/S] - na wyci\u0105gni\u0119cie r\u0119ki",
+    "19685": "[S]MEGA Cloud[\/S] - na wyci\u0105gni\u0119cie r\u0119ki",
     "19686": "Bezpieczne i \u0142atwe przechowywanie",
     "19687": "Zapisz swoje pliki w chmurze za pomoc\u0105 MEGA, korzystaj\u0105c z naszej hojnej bezp\u0142atnej dop\u0142aty. Wszystkie twoje pliki s\u0105 przesy\u0142ane i bezpiecznie przechowywane z szyfrowaniem end-to-end - nawet MEGA nie mo\u017ce przegl\u0105da\u0107 twoich plik\u00f3w.",
     "19689": "Uzyskaj dost\u0119p do swoich plik\u00f3w, gdziekolwiek jeste\u015b",
@@ -2680,5 +2680,7 @@
     "19852": "Masz w\u0142\u0105czon\u0105 obs\u0142ug\u0119 2FA i utraci\u0142e\u015b swoje urz\u0105dzenie uwierzytelniaj\u0105ce!",
     "19853": "Nie b\u0119dziesz m\u00f3g\u0142 si\u0119 zalogowa\u0107, zmieni\u0107 adresu e-mail, zmieni\u0107 has\u0142a ani wy\u0142\u0105czy\u0107 us\u0142ugi 2FA.",
     "19854": "Nie martw si\u0119, mo\u017cesz zresetowa\u0107 konto za pomoc\u0105 klucza odzyskiwania. Spowoduje to wy\u0142\u0105czenie 2FA i umo\u017cliwi zalogowanie si\u0119 i zmian\u0119 ustawie\u0144 konta. [B]Nie utracisz \u017cadnych plik\u00f3w, kontakt\u00f3w ani wiadomo\u015bci[\/B].",
-    "19855": "Spacja na pocz\u0105tku lub ko\u0144cu has\u0142a jest nie dozwolona."
+    "19855": "Spacja na pocz\u0105tku lub ko\u0144cu has\u0142a jest nie dozwolona.",
+    "19856": "Wejd\u017a w interakcj\u0119 z MEGA",
+    "19857": "Kliknij dwukrotnie, aby uzyska\u0107 dost\u0119p do pliku lub otw\u00f3rz folder. [BR] Kliknij prawym przyciskiem, aby wy\u015bwietli\u0107 wszystkie dost\u0119pne opcje."
 }

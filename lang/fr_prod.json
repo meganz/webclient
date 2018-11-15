@@ -2680,5 +2680,7 @@
     "19852": "Vous avez activ\u00e9 l\u2019A2F et vous avez perdu votre appareil d\u2019authentification\u2009!",
     "19853": "Vous ne pourrez pas vous connecter, changer votre adresse courriel, changer votre mot de passe, ni d\u00e9sactiver l\u2019A2F.",
     "19854": "Ne vous inqui\u00e9tez pas, vous pouvez effectuer une r\u00e9initialisation de compte en utilisant votre cl\u00e9 de r\u00e9cup\u00e9ration. Cela d\u00e9sactivera l\u2019A2F, vous permettra de vous connecter et de changer les param\u00e8tres de votre compte. [B]Vous ne perdrez aucun fichier ni contact ni message[\/B].",
-    "19855": "Les espaces ne sont permises ni d\u00e9but ni \u00e0 la fin du mot de passe."
+    "19855": "Les espaces ne sont permises ni d\u00e9but ni \u00e0 la fin du mot de passe.",
+    "19856": "Interagir avec MEGA",
+    "19857": "Double-cliquez pour acc\u00e9der \u00e0 un fichier ou pour ouvrir un dossier. [BR] Cliquez \u00e0 droite pour voir toutes les options propos\u00e9es."
 }

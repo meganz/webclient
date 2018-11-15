@@ -17553,7 +17553,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     padding-top: 0;
     position: relative;
 }
-.decryption-key .file-link-info.url, .public-handle .file-link-info.key {
+.decryption-key .file-link-info.url, .decryption-key .file-link-info.subhandle, .public-handle .file-link-info.key {
     display: none;
 }
 .file-link-info-wrapper {

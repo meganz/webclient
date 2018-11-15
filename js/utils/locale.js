@@ -620,6 +620,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[19843] = l[19843].replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[19849] = l[19849].replace('[A]', '<a class="red" href="/recovery">').replace('[/A]', '</a>');
     l[19851] = l[19851].replace('[B]', '<strong class="warning-text">').replace('[/B]', '</strong>');
+    l[19857] = l[19857] ? l[19857].replace('[BR]', '<br>') : l[19857];
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

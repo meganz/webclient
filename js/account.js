@@ -1124,7 +1124,7 @@ function processEmailChangeActionPacket(ap) {
         mega.attr.get(u_handle, 'fmconfig', false, true)
             .always(moveLegacySettings)
             .done(function(result) {
-                result = Object(result);
+                result = Object.assign({}, fmconfig, Object(result));
                 for (var key in result) {
                     if (result.hasOwnProperty(key)) {
                         try {

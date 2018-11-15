@@ -505,6 +505,7 @@ mega.ui.tpp = function () {
      * @param {String} bl Download or upload block i.e. ['dl', 'ul']
      */
     var started = function started(bl) {
+
         if (!getIndex(bl) && isEnabled()) {
             resetBlock(bl);
             showBlock(bl);

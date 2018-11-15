@@ -265,6 +265,9 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     font-size: 0;
     overflow: hidden;
 }
+.download .bottom-page.grey-block {
+    overflow: visible;
+}
 .bottom-page.blue-block {
     background-color: #F3F6F8;
     font-size: 0;
@@ -274,7 +277,7 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     table-layout: fixed;
 }
 .bottom-page.dark-grey-block {
-    background-color: #F0F3F5   ;
+    background-color: #F0F3F5;
     font-size: 0;
     overflow: hidden;
 }

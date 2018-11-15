@@ -125,9 +125,9 @@ var psa = {
         var imagePath = staticpath + 'images/mega/psa/' + psa.currentPsa.img + retina + '.png';
 
         // Decode the text from Base64 (there were some issues with some languages)
-        var title = base64urldecode(psa.currentPsa.t);
-        var description = base64urldecode(psa.currentPsa.d);
-        var buttonLabel = base64urldecode(psa.currentPsa.b);
+        var title = from8(base64urldecode(psa.currentPsa.t));
+        var description = from8(base64urldecode(psa.currentPsa.d));
+        var buttonLabel = from8(base64urldecode(psa.currentPsa.b));
 
         // Populate the details
         var $psa = $('.public-service-anouncement');

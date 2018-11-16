@@ -505,7 +505,7 @@
     "1280": "2. A\u015fama",
     "1281": "\u0130\u00e7erik detaylar\u0131",
     "1282": "Telif hakk\u0131 sahibinin detaylar\u0131",
-    "1283": "Ba\u015fka URL ekleyin",
+    "1283": "Ba\u015fka URL ekle",
     "1284": "Telif hakk\u0131 sahibinin ad\u0131",
     "1285": "e\u011fer varsa",
     "1286": "Bildirimi yollayan telif hakk\u0131 sahibi vekilinin ad\u0131:",
@@ -1352,7 +1352,7 @@
     "9038": "Dosya URL'sini yap\u0131\u015ft\u0131r",
     "9039": "Klas\u00f6r ba\u011flant\u0131lar\u0131 hen\u00fcz desteklenmemektedir",
     "9048": "Temin etti\u011finiz anahtar ge\u00e7ersiz. L\u00fctfen anahtar\u0131n do\u011fru oldu\u011funu do\u011frulay\u0131n veya link sahibine tekrar sorun.",
-    "9056": "Please do not enter any MEGA URL into the Copyrighted work field, if you need to add more URLs please click on Add another URL.",
+    "9056": "L\u00fctfen Telifli i\u00e7erik alan\u0131na herhangi bir MEGA URL'si girmeyin, daha fazla URL eklemeniz gerekiyorsa l\u00fctfen Ba\u015fka URL ekle tu\u015funa bas\u0131n.",
     "9061": "\u015eifrele",
     "9062": "PRO ayarlar\u0131n\u0131 g\u00f6r\u00fcnt\u00fcle",
     "9063": "Parola ile koru",
@@ -2983,9 +2983,9 @@
     "19928": "Se\u00e7ti\u011fim dil ve \u00fclkenin zaman bi\u00e7imini kullan",
     "19929": "ISO tarih ve zaman bi\u00e7imi kullan",
     "19930": "Tarih ve zaman tercihlerinizi ISO tarih ve zaman bi\u00e7imi, veya dilinize ve \u00fclkenize g\u00f6re zaman bi\u00e7imi ([B]Ayarlardan[\/B] yap\u0131land\u0131rd\u0131\u011f\u0131n\u0131z dil ve \u00fclke se\u00e7ene\u011fi baz al\u0131narak) olarak se\u00e7ebilirsiniz.",
-    "19931": "File transfers are in progress in this tab. If you continue, they will be aborted.",
-    "19932": "File transfers are in progress in one other tab. If you continue, they will be aborted.",
-    "19933": "File transfers are in progress in other tabs. If you continue, they will be aborted.",
-    "19934": "File transfers are in progress in this and one other tab. If you continue, they will be aborted.",
-    "19935": "File transfers are in progress in this and other tabs. If you continue, they will be aborted."
+    "19931": "Bu sekmede dosya aktarmas\u0131 devam etmektedir. E\u011fer devam ederseniz, iptal edilecektir.",
+    "19932": "Ba\u015fka bir sekmede dosya aktarmas\u0131 devam etmektedir. E\u011fer devam ederseniz, iptal edilecektir.",
+    "19933": "Di\u011fer sekmelerde dosya aktarmas\u0131 devam etmektedir. E\u011fer devam ederseniz, iptal edilecektir.",
+    "19934": "Bu ve ba\u015fka bir sekmede dosya aktarmas\u0131 devam etmektedir. E\u011fer devam ederseniz, iptal edilecektir.",
+    "19935": "Bu ve ba\u015fka sekmelerde dosya aktarmas\u0131 devam etmektedir. E\u011fer devam ederseniz, iptal edilecektir."
 }

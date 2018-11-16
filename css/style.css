@@ -5391,7 +5391,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     display: block;
     margin-top: 12px;
 }
-.l-pane-control {
+.active-folder-link .l-pane-control {
     float: left;
     height: 100%;
     position: relative;

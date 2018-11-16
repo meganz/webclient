@@ -1352,7 +1352,7 @@
     "9038": "Wklej URL",
     "9039": "Linki do katalog\u00f3w nie s\u0105 jeszcze obs\u0142ugiwane",
     "9048": "Podany klucz jest nie prawid\u0142owy. Upewnij si\u0119, \u017ce podany klucz jest poprawny lub zapytaj autora o nowy link.",
-    "9056": "Please do not enter any MEGA URL into the Copyrighted work field, if you need to add more URLs please click on Add another URL.",
+    "9056": "Nie wpisuj adresu URL MEGA w polu Praca chroniona prawem autorskim, je\u015bli chcesz doda\u0107 wi\u0119cej adres\u00f3w URL, kliknij Dodaj kolejny adres URL.",
     "9061": "Zaszyfruj",
     "9062": "Poka\u017c opcje PRO",
     "9063": "Dodaj zabezpieczenie has\u0142em",
@@ -2983,9 +2983,9 @@
     "19928": "U\u017cyj formatu dla mojego j\u0119zyka i kraju",
     "19929": "U\u017cyj formatu daty i czasu ISO",
     "19930": "Mo\u017cesz wybra\u0107 opcj\u0119 formatowania daty i czasu jako format daty i czasu ISO lub u\u017cy\u0107 formatu dla swojego j\u0119zyka i kraju (w oparciu o j\u0119zyk, w kt\u00f3rym u\u017cywasz MEGA i kraj, kt\u00f3ry skonfigurowa\u0142e\u015b w [B]ustawieniach[\/B])",
-    "19931": "File transfers are in progress in this tab. If you continue, they will be aborted.",
-    "19932": "File transfers are in progress in one other tab. If you continue, they will be aborted.",
-    "19933": "File transfers are in progress in other tabs. If you continue, they will be aborted.",
-    "19934": "File transfers are in progress in this and one other tab. If you continue, they will be aborted.",
-    "19935": "File transfers are in progress in this and other tabs. If you continue, they will be aborted."
+    "19931": "Na tej karcie trwa przesy\u0142anie plik\u00f3w. Je\u015bli b\u0119dziesz kontynuowa\u0107, zostan\u0105 one przerwane.",
+    "19932": "Przesy\u0142anie plik\u00f3w jest w toku w jednej innej karcie. Je\u015bli b\u0119dziesz kontynuowa\u0107, zostan\u0105 one przerwane.",
+    "19933": "Przesy\u0142anie plik\u00f3w jest w toku w innych zak\u0142adkach. Je\u015bli b\u0119dziesz kontynuowa\u0107, zostan\u0105 one przerwane.",
+    "19934": "Przesy\u0142anie plik\u00f3w jest w toku w tej i jeszcze jednej zak\u0142adce. Je\u015bli b\u0119dziesz kontynuowa\u0107, zostan\u0105 one przerwane.",
+    "19935": "Przesy\u0142anie plik\u00f3w jest w toku w tej i innych zak\u0142adkach. Je\u015bli b\u0119dziesz kontynuowa\u0107, zostan\u0105 one przerwane."
 }

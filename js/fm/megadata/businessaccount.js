@@ -565,6 +565,7 @@ BusinessAccount.prototype.isBusinessMasterAcc = function () {
  * Decrypting the link sent to sub-account using a password
  * @param {String} link         invitation link #businesssignup<link> without #businesssignup prefix
  * @param {String} password     The password which the sub-user entered to decrypt the link
+ *                              Password is randomly generated and 24 chars / 192 bits
  * @returns {String}            base64 sign-up-code (decryption result)
  */
 BusinessAccount.prototype.decryptSubAccountInvitationLink = function (link, password) {

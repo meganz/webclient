@@ -83,9 +83,10 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     if (!this.business.isBusinessMasterAcc()) {
         return false;
     }
-    if (!subAccounts) {
+    var currSubAccounts = subAccounts;
+    if (!currSubAccounts) {
         if (M.suba) {
-            subAccounts = M.suba;
+            currSubAccounts = M.suba;
         }
         else {
             return false;
@@ -107,7 +108,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
     this.URLchanger('');
 
-    if (!Object.keys(subAccounts).length) { // no subs
+    if (!Object.keys(currSubAccounts).length) { // no subs
         return this.viewLandingPage();
     }
 
@@ -518,12 +519,12 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         unhideUsersListSection();
     };
 
-    var reDraw = isRedrawNeeded(subAccounts, this.business.previousSubList);
+    var reDraw = isRedrawNeeded(currSubAccounts, this.business.previousSubList);
 
     if (reDraw) {
-        fillSubUsersTable(subAccounts, this);
+        fillSubUsersTable(currSubAccounts, this);
         // storing current drawn sub-users to prevent not needed redraw
-        this.business.previousSubList = JSON.parse(JSON.stringify(subAccounts));
+        this.business.previousSubList = JSON.parse(JSON.stringify(currSubAccounts));
     }
     else {
         unhideUsersListSection();
@@ -1291,7 +1292,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         if (!endDate) {
             return;
         }
-        var endDateStr = String(endDate.getFullYear()) + currMonth + String(endDate.getDate()));
+        var endDateStr = String(endDate.getFullYear()) + currMonth + String(endDate.getDate());
         return { fromDate: startDate, toDate: endDateStr };
     };
 

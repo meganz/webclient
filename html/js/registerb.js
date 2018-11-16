@@ -467,13 +467,14 @@ BusinessRegister.prototype.ratePasswordStrength = function ($container, password
         $passStrengthContainer.addClass('good2');
         $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[1125]); // Weak
         $passStrengthDesc.text(l[1120]);
-        overallResult = false;
     }
     else {
         $passInputContianer.addClass('weak-password');
         $passStrengthContainer.addClass('good1');
         $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[1124]); // Very Weak
         $passStrengthDesc.text(l[1119]);
+    }
+    if (passwordScore < security.minPasswordScore) {
         overallResult = false;
     }
 

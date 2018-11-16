@@ -260,6 +260,12 @@ var watchdog = Object.freeze({
                 }
                 break;
 
+            case 'abort_trans':
+                if (M.hasPendingTransfers()) {
+                    M.abortTransfers(true);
+                }
+                break;
+
             case 'chat_event':
                 if (strg.data.state === 'DISCARDED') {
                     var chatRoom = megaChat.plugins.chatdIntegration._getChatRoomFromEventData(strg.data);
@@ -285,6 +291,10 @@ var watchdog = Object.freeze({
 
                         case 'qbqdata':
                             value = dlmanager.getQBQData();
+                            break;
+
+                        case 'transing':
+                            value = M.hasPendingTransfers();
                             break;
                     }
 

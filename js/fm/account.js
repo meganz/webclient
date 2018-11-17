@@ -89,6 +89,10 @@ function accountUI() {
 
                 default:
                     tabSection = 'general';
+                    // for business sub-user the default is email-and-pass
+                    if (u_attr.b && !u_attr.b.m) {
+                        tabSection = 'email-and-pass';
+                    }
             }
         }
 
@@ -1405,7 +1409,11 @@ function accountUI() {
             $('.account-profile.half-sized.second .account.data-block.second.acc-balance').addClass('hidden');
             $('.account-profile.half-sized.second .account.data-block.second.acc-cancel').addClass('hidden');
             $('.account.data-block.storage-data').addClass('hidden');
-            $('.account.tab-content.email-and-pass .account.data-block.acc-change-email').addClass('hidden');
+            if (!u_attr.b.m) {
+                $('.account.tab-content.email-and-pass .account.data-block.acc-change-email').addClass('hidden');
+                $('.account.tab-content.general').addClass('hidden');
+                $(".account.tab-lnk[data-tab='general']").addClass('hidden');
+            }
             $('.account.tabs-bl .account.tab-lnk.payment').attr('style', 'display: none;');
             $('.account.tabs-bl .account.tab-lnk.achievements').attr('style', 'display: none;');
         }

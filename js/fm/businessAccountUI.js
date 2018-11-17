@@ -2078,21 +2078,29 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
 BusinessAccountUI.prototype.showWelcomeDialog = function () {
     "use strict";
 
-    var $dialog = $('.bus-welcome-dialog.user-management-dialog');
+    var showTheDialog = function (isViewed) {
+        if (isViewed === '1') {
+            return;
+        }
+        var $dialog = $('.bus-welcome-dialog.user-management-dialog');
 
-    $dialog.find('.welcome-ok-btn, .close-x-icon').off('click.subuser')
-        .on('click.subuser', function closeWelcomeDialogHandler() {
-            closeDialog();
+        $dialog.find('.welcome-ok-btn, .close-x-icon').off('click.subuser')
+            .on('click.subuser', function closeWelcomeDialogHandler() {
+                closeDialog();
+            });
+
+        $dialog.find('.welcome-dlg-options').off('click.subuser')
+            .on('click.subuser', function welcomeDlgGoToUsersManagement() {
+                M.openFolder('user-management', true);
+            });
+
+        M.safeShowDialog('welcome-to-business-dlg', function () {
+            mega.attr.set('bwelcome', 1, -2, 0);
+            return $dialog;
         });
+    };
 
-    $dialog.find('.welcome-dlg-options').off('click.subuser')
-        .on('click.subuser', function welcomeDlgGoToUsersManagement() {
-            M.openFolder('user-management', true);
-        });
-
-    M.safeShowDialog('welcome-to-business-dlg', function () {
-        return $dialog;
-    });
+    mega.attr.get(u_handle, 'bwelcome', -2, 0).always(showTheDialog);
 };
 
 /**

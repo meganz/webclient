@@ -1523,6 +1523,11 @@ height: 56px;
 .bottom-page.dark-txt.bott-pad {
     padding: 14px 0 54px 0;
 }
+
+.bottom-page.megacmd .inline-block.col-2.cmd-pad:nth-child(6) {
+    display: block;
+}
+
 .col-2.cmd-pad {
     padding: 58px 65px 7px 0;
     float: left;
@@ -2911,10 +2916,10 @@ height: 56px;
     margin-right: 36px;
 }
 .bottom-page.top-description {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 24px;
-    color: #666666;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    color: #333;
+    font-family: 'LatoWebLight', 'source_sans_proregular', Arial;
     padding: 100px 0 25px 0;
 }
 .bottom-page.big-link {

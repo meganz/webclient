@@ -24767,7 +24767,13 @@ opacity: 1;
 }
 
 .user-management-view .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar, 
-.fm-right-header-user-management .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar, 
+.fm-right-header-user-management .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar {
+    width:24px;
+    height: 24px;
+    line-height: 20px;
+    font-size: 16px;
+}
+
 .user-management-dialog .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar{
     width:24px;
     height: 24px;
@@ -27366,11 +27372,18 @@ opacity: 1;
     display:none;
 }
 
+.bus-reg-body .bus-reg-input.num .note-message {
+    padding: 16px 0 0 4px;
+}
+
 .user-management-account-settings .bus-input.note .note-message,
 .bus-reg-body .bus-reg-input.num .note-message {
     display: inline-block;
 }
 
+.bus-reg-body .bus-reg-input.num.error .note-message {
+    display: none;
+}
 
 /* three extra status for the inputs: error, active, correctinput */
 .user-management-account-settings .bus-input.correctinput .bus-input-title, 
@@ -28911,7 +28924,7 @@ opacity: 1;
 .user-management-account-settings .bus-input.short-input.underline-dropdown-input {
     width: calc(84% - 28px);
     margin-left: calc(8% + 28px);
-    height: 45px;
+    height: 56px;
     position: relative;
     overflow: hidden;
 }
@@ -28923,7 +28936,7 @@ opacity: 1;
     background-repeat: no-repeat;
     background-position: -4px -12309px;
     right: 8px;
-    top:20px;
+    bottom:10px;
     position: absolute;
 }
 
@@ -29048,33 +29061,6 @@ opacity: 1;
     line-height: 18px;
     position: absolute;
 }
-
-.content-panel.dashboard .intro-title, .content-panel.dashboard .plan-date-info.intro-title {
-    width: 42%;
-    display: inline-block;
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 12px;
-    line-height: 20px;
-    white-space: normal;
-    text-transform: capitalize;
-    overflow: visible;
-    vertical-align: top;
-}
-
-.content-panel.dashboard .intro-info, .content-panel.dashboard .plan-date-info.intro-info {
-    width: 56%;
-    display: inline-block;
-    font-size: 14px;
-    color: #999;
-    height: 24px;
-    margin-bottom: 4px;
-    line-height: 20px;
-    white-space: normal;
-    text-transform: capitalize;
-    padding: 0;
-}
-
 
 .content-panel.business-dashboard .intro-info.active, .content-panel.dashboard .intro-info.active{
     color:#00BFA5;

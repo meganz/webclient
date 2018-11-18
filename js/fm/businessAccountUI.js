@@ -491,7 +491,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 var activeDate = '--------';
                 if (dd) {
                     activeDate = new Date(dd.substr(0, 4), dd.substr(4, 2) - 1, dd.substr(6, 2));
-                    activeDate = activeDate.toLocaleDateString();
+                    // activeDate = activeDate.toLocaleDateString();
+                    activeDate = time2date(activeDate.getTime() / 1000, 1);
                 }
                 $('.business-sub-last-active span', $subTr).text(activeDate);
             }
@@ -1785,7 +1786,8 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
             var invId = invoicesList[k].n;
 
             $newInvoiceRow.attr('id', invId);
-            $newInvoiceRow.find('.inv-date').text(invoiceDate.toLocaleDateString());
+            // $newInvoiceRow.find('.inv-date').text(invoiceDate.toLocaleDateString());
+            $newInvoiceRow.find('.inv-date').text(time2date(invoicesList[k].ts, 1));
             $newInvoiceRow.find('.inv-desc').text(invoicesList[k].d);
             $newInvoiceRow.find('.inv-total').text('\u20ac' + invoicesList[k].tot);
             $newInvoiceRow.removeClass('hidden'); // if it was hidden
@@ -1898,7 +1900,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         // invoice top details
         var $invoiceTopTitle = $('.inv-title-container .inv-right', $invoiceDetailContainer);
-        $invoiceTopTitle.find('#invoice-date').text((new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
+        // $invoiceTopTitle.find('#invoice-date').text((new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
+        $invoiceTopTitle.find('#invoice-date').text(time2date(invoiceDetail.ts, 1));
         $invoiceTopTitle.find('#invoice-number').text(invoiceDetail.n);
         $invoiceTopTitle.find('.invoice-vat').text(invoiceDetail.mega.taxnum[1]);
         $invoiceTopTitle.find('.inv-vat-label').text(invoiceDetail.mega.taxnum[0]);
@@ -1931,7 +1934,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         var taxSum = 0;
         for (var k = invoiceDetail.items.length - 1; k >= 0; k--) {
             var $invItem = $invItemContentTemplate.clone(true);
-            $invItem.find('.inv-pay-date').text((new Date(invoiceDetail.items[k].ts * 1000).toLocaleDateString()));
+            // $invItem.find('.inv-pay-date').text((new Date(invoiceDetail.items[k].ts * 1000).toLocaleDateString()));
+            $invItem.find('.inv-pay-date').text(time2date(invoiceDetail.items[k].ts, 1));
             $invItem.find('.inv-pay-desc').text(invoiceDetail.items[k].d);
             $invItem.find('.inv-pay-amou').text(Number(invoiceDetail.items[k].gross).toFixed(2));
             $invItem.insertAfter($invItemHeader);
@@ -1949,7 +1953,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         // receipt top right items
         if (invoiceDetail.rnum) {
-            $invoiceTopTitle.find('#rece-date').text((new Date(invoiceDetail.payts * 1000)).toLocaleDateString());
+            // $invoiceTopTitle.find('#rece-date').text((new Date(invoiceDetail.payts * 1000)).toLocaleDateString());
+            $invoiceTopTitle.find('#rece-date').text(time2date(invoiceDetail.payts, 1));
             $invoiceTopTitle.find('#rece-number').text(invoiceDetail.rnum);
             $invoiceDetailContainer.find('.invoice-container.pay-receipt').removeClass('hidden');
         }
@@ -1968,7 +1973,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         myPage = translate(myPage);
 
                         // now prepare the incovice.
-                        myPage = myPage.replace('{0Date}', (new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
+                        // myPage = myPage.replace('{0Date}', (new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
+                        myPage = myPage.replace('{0Date}', time2date(invoiceDetail.ts, 1));
                         myPage = myPage.replace('{1InvoiceNB}', invoiceDetail.n);
                         myPage = myPage.replace('{2VATNB}', invoiceDetail.mega.taxnum[1]);
                         myPage = myPage.replace('{3CompanyName}', invoiceDetail.u.cname);
@@ -1985,7 +1991,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         var itemDec = '---';
                         var itemAmount = '---';
                         if (invoiceDetail.items && invoiceDetail.items.length) {
-                            itemDate = (new Date(invoiceDetail.items[0].ts * 1000).toLocaleDateString());
+                            // itemDate = (new Date(invoiceDetail.items[0].ts * 1000).toLocaleDateString());
+                            itemDate = time2date(invoiceDetail.items[0].ts, 1);
                             itemDec = invoiceDetail.items[0].d;
                             itemAmount = invoiceDetail.items[0].gross;
                         }

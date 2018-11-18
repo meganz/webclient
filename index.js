@@ -1698,7 +1698,7 @@ function topmenuUI() {
     if (page === 'download') {
         $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
     }
-    if (page === 'business') {
+    if (page === 'business' || page ==='registerb') {
         $topHeader.find('.left.individual').text(l[19529]); // try Mega MEGA Indivisual
     }
 
@@ -1979,7 +1979,7 @@ function topmenuUI() {
 
     // try individual button in business mode
     $topHeader.find('.top-centered-margin .individual').rebind('click', function () {
-        if (page === 'business') {
+        if (page === 'business' || page === 'registerb') {
             loadSubPage('start');
         }
         else {

@@ -1439,7 +1439,32 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     
 };
 
+BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContainer) {
+    var mySelf = this;
+    var $profileContainer = $('.profile', $accountContainer);
+    var $invoiceContainer = $('.invoice', $accountContainer);
+    // event handler for header clicking
+    $('.settings-menu-bar .settings-menu-item', $accountContainer).off('click.suba').on('click.suba',
+        function settingHeaderClickHandler() {
+            var $me = $(this);
+            $('.settings-menu-bar .settings-menu-item', $accountContainer).removeClass('selected');
+            if ($me.hasClass('suba-setting-profile')) {
+                $me.addClass('selected');
+                if ($profileContainer.hasClass('hidden')) {
+                    mySelf.viewBusinessAccountPage();
+                }
+            }
+            else if ($me.hasClass('suba-setting-inv')) {
+                $me.addClass('selected');
+                if ($invoiceContainer.hasClass('hidden') || $('.invoice-list', $invoiceContainer).hasClass('hidden')) {
+                    mySelf.viewBusinessInvoicesPage();
+                }
+            }
+        }
+    );
+};
 
+/** view business account page */
 BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     "use strict";
     this.initUItoRender();
@@ -1473,24 +1498,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     };
 
     // event handler for header clicking
-    $('.settings-menu-bar .settings-menu-item', $accountContainer).off('click').on('click.suba',
-        function settingHeaderClickHandler() {
-            var $me = $(this);
-            $('.settings-menu-bar .settings-menu-item', $accountContainer).removeClass('selected');
-            if ($me.hasClass('suba-setting-profile')) {
-                $me.addClass('selected');
-                if ($profileContainer.hasClass('hidden')) {
-                    mySelf.viewBusinessAccountPage();
-                }
-            }
-            else if ($me.hasClass('suba-setting-inv')) {
-                $me.addClass('selected');
-                if ($invoiceContainer.hasClass('hidden') || $('.invoice-list', $invoiceContainer).hasClass('hidden')) {
-                    mySelf.viewBusinessInvoicesPage();
-                }
-            }
-        }
-    );
+    this.initBusinessAccountHeader($accountContainer);
 
     // function to fill dropdown list of countries
     var loadCountries = function () {
@@ -1736,6 +1744,8 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
         return false;
     };
 
+    this.initBusinessAccountHeader($accountContainer);
+
     // private function to fill the list of invoices on UI
     var prepareInvoiceListSection = function (st, invoicesList) {
 
@@ -1745,6 +1755,8 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
             $invoiceContainer.removeClass('hidden');
             $invoiceListContainer.removeClass('hidden');
             $accountPageHeader.removeClass('hidden');
+            $('.settings-menu-bar .settings-menu-item', $accountContainer).removeClass('selected');
+            $('.settings-menu-bar .suba-setting-inv', $accountContainer).addClass('selected');
         };
 
         // check if we need to re-draw
@@ -1819,6 +1831,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
     var $accountPageHeader = $('.fm-right-header-user-management .user-management-breadcrumb.account');
 
     loadingDialog.pshow();
+    this.initBusinessAccountHeader($accountContainer);
 
     var unhideSection = function () {
         $businessAccountContainer.removeClass('hidden');
@@ -1827,6 +1840,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceDetailContainer.removeClass('hidden');
         $accountPageHeader.removeClass('hidden');
         $accountPageHeader.find('.inv-det-arrow, .inv-det-id').removeClass('hidden');
+        $('.settings-menu-bar .settings-menu-item', $accountContainer).removeClass('selected');
+        $('.settings-menu-bar .suba-setting-inv', $accountContainer).addClass('selected');
         loadingDialog.phide();
     };
 

@@ -222,6 +222,10 @@
 	width: 76px;
 }
 
+.bus-reg-body .password-stutus-txt {
+	margin-top: 8px;
+}
+
 .bus-reg-radio-block {
 	margin-top: 32px;
 	margin-bottom: 32px;

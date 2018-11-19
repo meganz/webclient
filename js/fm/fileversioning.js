@@ -539,6 +539,7 @@
             $('.fm-versioning .header .button.close').rebind('click', function() {
                 pd.addClass('hidden');
                 current_sel_version = false;
+                $(document).off('keydown.fileversioningKeydown');
             });
             fileversioning.getAllVersions(fh).done(
                 function(versions) {
@@ -622,6 +623,12 @@
             $(window).rebind('resize.fileversioning', SoonFc(function() {
                 fileversioning.initFileVersioningScrolling();
             }));
+            $(document).rebind('keydown.fileversioningKeydown', function(e) {
+                if (e.keyCode === 8) { // Backspace
+                    e.stopPropagation();
+                    pd.find('.button.close').click();
+                }
+            });
             $('.fm-versioning .header .button.settings').rebind('click', function() {
                 pd.addClass('hidden');
                 loadSubPage('fm/account/file-management');

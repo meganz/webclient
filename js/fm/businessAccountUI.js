@@ -2113,6 +2113,7 @@ BusinessAccountUI.prototype.showWelcomeDialog = function () {
 
         $dialog.find('.welcome-dlg-options').off('click.subuser')
             .on('click.subuser', function welcomeDlgGoToUsersManagement() {
+                closeDialog();
                 M.openFolder('user-management', true);
             });
 

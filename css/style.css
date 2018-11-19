@@ -10846,7 +10846,7 @@ table {
     font-family: 'source_sans_prosemibold', Arial, Helvetica;
     position: relative;
     text-transform: uppercase;
-    margin: -2px 0 0 0;
+    margin: -2px 0 24px 0;
 }
 .account.usename-block {
     position: relative;
@@ -11437,7 +11437,7 @@ table {
 .default-green-button.upgrade-account {
     display: inline-block;
     font-size: 15px;
-    margin: 24px 0;
+    margin: 0 0 24px 0;
     white-space: normal;
     height: auto;
     min-height: 32px;
@@ -11521,10 +11521,14 @@ table {
     line-height: 20px;
     text-align: left;
     white-space: normal;
-    text-transform: capitalize;
+    text-transform: lowercase;
     overflow: visible;
     vertical-align: top;
     text-overflow: ellipsis;
+}
+
+.account.left-pane.small-txt:first-letter {
+    text-transform: uppercase;
 }
 .account.left-pane.big-txt {
     display: inline-block;
@@ -11534,11 +11538,14 @@ table {
     margin-bottom: 4px;
     line-height: 20px;
     white-space: normal;
-    text-transform: capitalize;
+    text-transform: lowercase;
     padding: 0;
     vertical-align: top;
     float: right;
     text-align: right;
+}
+.account.left-pane.big-txt:first-letter {
+    text-transform: uppercase;
 }
 .small-left-panel .account.left-pane.small-txt, .small-left-panel .account.left-pane.big-txt {
     text-align: center;

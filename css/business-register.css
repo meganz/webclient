@@ -164,8 +164,13 @@
 
 .bus-reg-input input::placeholder {
 	font-size: 13px;
+	text-transform: lowercase;
 }
 
+.bus-reg-input input::placeholder:first-letter {
+	text-transform: uppercase;
+}
+ 
 .bus-reg-input.num input {
 	width: 80%;
 }

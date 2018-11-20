@@ -1581,6 +1581,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var $cZipInput = $('input#prof-zip', $profileContainer).val(cZip);
 
     var addCorrectValClass = function ($item) {
+        $item.parent().removeClass('error');
         if ($item.val().trim()) {
             $item.parent().addClass('correctinput');
         }
@@ -1606,7 +1607,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                     valid = false;
                 }
                 else {
-                    $cNameInput.parent().removeClass('error');
+                    $cNameInput.parent().removeClass('error').addClass('correctinput');
                     attrsToChange.push({ key: '%name', val: $cNameInput.val().trim() });
                 }
             }
@@ -1617,7 +1618,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                     valid = false;
                 }
                 else {
-                    $cTelInput.parent().removeClass('error');
+                    $cTelInput.parent().removeClass('error').addClass('correctinput');
                     attrsToChange.push({ key: '%phone', val: $cTelInput.val().trim() });
                 }
             }
@@ -1628,7 +1629,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                     valid = false;
                 }
                 else {
-                    $cEmailInput.parent().removeClass('error');
+                    $cEmailInput.parent().removeClass('error').addClass('correctinput');
                     attrsToChange.push({ key: '%email', val: $cEmailInput.val().trim() });
                 }
             }
@@ -1657,6 +1658,12 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
             var settingResultHandler = function (st) {
                 if (st) {
+                    //var changedKey = [];
+                    //for (var cKey = 0; cKey < attrsToChange.length; cKey++) {
+                    //    changedKey.push(attrsToChange[cKey].key);
+                    //}
+                    //mySelf.business.updateSubUserInfo(u_attr.b.bu, changedKey);
+
                     var $savingNotidication = $('.auto-save', $accountContainer);
                     $savingNotidication.removeClass('hidden');
                     $savingNotidication.show();

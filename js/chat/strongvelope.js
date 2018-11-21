@@ -182,7 +182,8 @@ var strongvelope = {};
         TRUNCATE:           0x03,
         PRIVILEGE_CHANGE:   0x04,
         TOPIC_CHANGE:       0x05,
-        CALL_END:           0x06
+        CALL_END:           0x06,
+        CALL_STARTED:       0x07
     };
     var MESSAGE_TYPES = strongvelope.MESSAGE_TYPES;
     var _KEYED_MESSAGES = [MESSAGE_TYPES.GROUP_KEYED,
@@ -1509,6 +1510,12 @@ var strongvelope = {};
 
                 proxyPromise.resolve(result);
                 return proxyPromise;
+            }
+            else if (parsedMessage.type === MESSAGE_TYPES.CALL_STARTED) {
+                return MegaPromise.resolve({
+                    sender: parsedMessage.invitor,
+                    type: parsedMessage.type
+                });
             }
         }
         return MegaPromise.reject(false);

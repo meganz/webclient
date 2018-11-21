@@ -45,7 +45,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             membersLoaded: false,
             topic: "",
             flags: 0x00,
-            archivedSelected: false
+            archivedSelected: false,
+            callParticipants: false
         },
         true
     );
@@ -160,14 +161,10 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         else if (self.type === "group") {
             var contactHash;
             if (msg.authorContact) {
-                contactHash = msg.authorContact.h;
+                contactHash = msg.authorContact.u;
             }
             else if (msg.userId) {
                 contactHash = msg.userId;
-            }
-            else if (msg.getFromJid) {
-                debugger; // should not happen
-                contactHash = megaChat.getContactHashFromJid(msg.getFromJid());
             }
 
             if (contactHash && M.u[contactHash]) {
@@ -242,6 +239,23 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         }
     });
 
+    self.rebind('onCallParticipantsUpdated.chatRoom', function (e, userid, clientid, participants) {
+        if (participants) {
+            self.callParticipants = participants;
+        }
+        else if (!userid && !clientid && !participants) {
+            self.callParticipants = {};
+        }
+
+        self.callParticipantsUpdated();
+    });
+
+
+    self.rebind('onClientLeftCall.chatRoom', self.callParticipantsUpdated.bind(self));
+    self.rebind('onClientJoinedCall.chatRoom', self.callParticipantsUpdated.bind(self));
+
+
+
     return this;
 };
 
@@ -301,7 +315,7 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
                     var transport = v.transport || 'udp';
 
                     servers.push({
-                        urls: ['turn:' + v.host + ':' + v.port + '?transport=' + transport],
+                        urls: 'turn:' + v.host + ':' + v.port + '?transport=' + transport,
                         username: "inoo20jdnH",
                         credential: '02nNKDBkkS'
                     });
@@ -1177,6 +1191,17 @@ ChatRoom.prototype.startAudioCall = function() {
     return self.megaChat.plugins.callManager.startCall(self, {audio: true, video:false});
 };
 
+ChatRoom.prototype.joinCall = function() {
+    var self = this;
+    assert(self.type === "group", "Can't join non-group chat call.");
+
+    if (self.megaChat.activeCallManagerCall) {
+        self.megaChat.activeCallManagerCall.endCall();
+    }
+
+    return self.megaChat.plugins.callManager.joinCall(self, {audio: true, video:false});
+};
+
 ChatRoom.prototype.startVideoCall = function() {
     var self = this;
     return self.megaChat.plugins.callManager.startCall(self, {audio: true, video: true});
@@ -1278,6 +1303,122 @@ ChatRoom.prototype.truncate = function() {
                 });
         }
     }
+};
+
+/**
+ * Helper tool that iterates all `chatRoom.callParticipants` and returns the sum of sessions
+ *
+ * @returns {number}
+ */
+ChatRoom.prototype.getTotalCallSessionCount = function() {
+    var self = this;
+    if (!self.callParticipants || !Object.keys(self.callParticipants).length) {
+        return 0;
+    }
+    var count = 0;
+    Object.keys(self.callParticipants).forEach(function(k) {
+        if (!self.callParticipants[k]) {
+            return;
+        }
+        var currentCount = Object.keys(self.callParticipants[k]);
+        count += currentCount.length || 0;
+    });
+    return count;
+};
+
+ChatRoom.prototype.haveActiveCall = function() {
+    return this.callManagerCall && this.callManagerCall.isActive() === true;
+};
+
+ChatRoom.prototype.havePendingGroupCall = function() {
+    var self = this;
+    if (
+        self.type === "group" &&
+        (
+            self.callManagerCall && (
+                self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING ||
+                self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING
+            )
+        ) &&
+        self.callParticipants &&
+        Object.keys(self.callParticipants).length > 0
+    ) {
+        return true;
+    }
+    else if (!self.callManagerCall && self.callParticipants && Object.keys(self.callParticipants).length > 0) {
+        return true;
+    }
+    else {
+        return false;
+    }
+};
+
+ChatRoom.prototype.havePendingCall = function() {
+    var self = this;
+    if (
+        self.callManagerCall &&
+        (
+            self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING ||
+            self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING
+        )
+    ) {
+        return true;
+    }
+    else if (self.type === "group") {
+        return self.havePendingGroupCall();
+    }
+    else {
+        return false;
+    }
+};
+
+/**
+ * Returns message id of the call started message that is currently active (optionally).
+ * @param [ignoreActive] {Boolean} if not passed would skip the "active" check and just return last call started
+ * @returns {Boolean}
+ */
+ChatRoom.prototype.getActiveCallMessageId = function(ignoreActive) {
+    var self = this;
+    if (!ignoreActive && !self.havePendingCall() && !self.haveActiveCall()) {
+        return false;
+    }
+
+    var msgs = self.messagesBuff.messages;
+    for (var i = msgs.length - 1; i >= 0; i--) {
+        var msg = msgs.getItem(i);
+        if (msg.dialogType === "remoteCallEnded") {
+            // found remoteCallEnded before a call started...this doesn't make sense, halt.
+            return false;
+        }
+        if (msg.dialogType === "remoteCallStarted") {
+            return msg.messageId;
+        }
+    }
+};
+
+
+ChatRoom.prototype.callParticipantsUpdated = function(
+    /* e, userid, clientid, participants */
+) {
+    var self = this;
+    var msgId = self.getActiveCallMessageId();
+    if (!msgId)  {
+        // force last start call msg id to be retrieved.
+        msgId = self.getActiveCallMessageId(true);
+    }
+
+    var callParts = Object.keys(self.callParticipants);
+    var uniqueCallParts = {};
+    callParts.forEach(function(handleAndSid) {
+        var handle = base64urlencode(handleAndSid.substr(0, 8));
+        uniqueCallParts[handle] = 1;
+    });
+    self.uniqueCallParts = uniqueCallParts;
+
+    var msg = self.messagesBuff.getMessageById(msgId);
+    msg && msg.wrappedChatDialogMessage && msg.wrappedChatDialogMessage.trackDataChange();
+
+    self.trackDataChange();
 };
 
 window.ChatRoom = ChatRoom;

@@ -127,9 +127,7 @@ var GenericConversationMessage = React.createClass({
         e.preventDefault(e);
         e.stopPropagation(e);
 
-        if (
-            msg.getState() === Message.STATE.NOT_SENT_EXPIRED
-        ) {
+        if (msg.getState() === Message.STATE.NOT_SENT_EXPIRED) {
             this.doCancelRetry(e, msg);
         }
         else {
@@ -1201,25 +1199,42 @@ var GenericConversationMessage = React.createClass({
             }
         }
         // if this is an inline dialog
-        else if (
-            message.type
-        ) {
-            textMessage = getMessageString(message.type);
+        else if (message.type) {
+            var avatarsListing = [];
+            textMessage = getMessageString(message.type, message.chatRoom.type === "group");
+
             if (!textMessage) {
                 console.error("Message with type: ", message.type, " - no text string defined. Message: ", message);
                 return;
             }
             // if is an array.
-            if (textMessage.splice) {
-                textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage, true);
-            }
-            else {
-                textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
-            }
 
-            message.textContents = textMessage;
+            textMessage = CallManager._getMultiStringTextContentsForMessage(
+                message,
+                textMessage.splice ? textMessage : [textMessage],
+                true
+            );
+
+            message.textContents = String(textMessage)
+                .replace("[[", "<span class=\"bold\">")
+                .replace("]]", "</span>");
+
+            var avatar = null;
+            var name = null;
 
             // mapping css icons to msg types
+            if (message.showInitiatorAvatar) {
+                if (this.props.grouped) {
+                    additionalClasses += " grouped";
+                }
+                else {
+                    avatar = <ContactsUI.Avatar contact={message.authorContact}
+                                                className="message avatar-wrapper small-rounded-avatar"/>;
+                    displayName = M.getNameByHandle(message.authorContact.u);
+                    name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
+                }
+            }
+
             if (message.type === "call-rejected") {
                 message.cssClass = "handset-with-stop";
             }
@@ -1292,17 +1307,100 @@ var GenericConversationMessage = React.createClass({
                 </div>;
             }
 
+            if (
+                message.chatRoom.type === "group"
+            ) {
+                var participantNames = [];
+                (message.meta && message.meta.participants || []).forEach(function(handle) {
+                    var name = M.getNameByHandle(handle);
+                    name && participantNames.push("[[" + htmlentities(name) + "]]");
+                });
+
+
+                additionalClasses += (
+                    message.type !== "outgoing-call" && message.type != "incoming-call" ? " with-border" : ""
+                );
+                var translationString = "";
+
+                if (participantNames && participantNames.length > 0) {
+                    translationString += mega.utils.trans.listToString(participantNames, "With %s");
+                }
+
+                if (
+                    (message.type === "call-ended" || message.type === "call-failed") &&
+                    message.meta &&
+                    message.meta.duration
+                ) {
+                    translationString += (participantNames && participantNames.length > 0 ? ". " : "") +
+                        l[7208].replace(
+                            "[X]",
+                            "[[" + secToDuration(message.meta.duration) + "]]"
+                        );
+                }
+                translationString = translationString.replace(/\[\[/g, "<span class=\"bold\">")
+                    .replace(/\]\]/g, "</span>");
+
+                if (message.type === "call-started") {
+                    textMessage = '<i class="call-icon diagonal-handset green"></i>' + textMessage;
+                }
+                else if (message.type === "call-ended") {
+                    textMessage = '<i class="call-icon big horizontal-handset grey"></i>' + textMessage;
+                }
+                else if (message.type !== "outgoing-call" && message.type !== "incoming-call") {
+                    textMessage = '<i class="call-icon ' + message.cssClass + '"></i>' + textMessage;
+                }
+
+                textMessage = "<div class=\"bold mainMessage\">" + textMessage + "</div>" +
+                    "<div class=\"extraCallInfo\">" + translationString + "</div>";
+
+                if (
+                    message.type === "call-started" &&
+                    message.messageId === "call-started-" + chatRoom.getActiveCallMessageId()
+                ) {
+                    var callParts = Object.keys(chatRoom.callParticipants);
+                    var unique = {};
+                    callParts.forEach(function(handleAndSid) {
+                        var handle = base64urlencode(handleAndSid.substr(0, 8));
+                        if (!unique[handle]) {
+                            avatarsListing.push(
+                                <ContactsUI.Avatar
+                                    key={handle}
+                                    contact={M.u[handle]}
+                                    className="message avatar-wrapper small-rounded-avatar"
+                                />
+                            );
+                        }
+
+                        unique[handle] = 1;
+                    })
+
+                }
+            }
+
+
             return (
                 <div className={message.messageId + " message body" + additionalClasses}
                      data-id={"id" + message.messageId}>
-                    <div className="feedback call-status-block">
-                        <i className={"call-icon " + message.cssClass}></i>
-                    </div>
+                    {!message.showInitiatorAvatar ? (
+                        <div className="feedback call-status-block">
+                            <i className={"call-icon " + message.cssClass}></i>
+                        </div>
+                        ) : (
+                            avatar
+                        )
+                    }
 
                     <div className="message content-area">
+                        {name}
                         <div className="message date-time">{timestamp}</div>
 
-                        <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}></div>
+                        <div className="message text-block">
+                            <div className="message call-inner-block">
+                                {avatarsListing}
+                                <div dangerouslySetInnerHTML={{__html:textMessage}}/>
+                            </div>
+                        </div>
+
                         {buttonsCode}
                     </div>
                 </div>

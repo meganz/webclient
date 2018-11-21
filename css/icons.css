@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite_v6.png);
+    background-image: url(../images/mega/new-chat-sprite_v8.png);
     background-repeat: no-repeat;
     background-position: -2px -1446px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v6.png);
+    background-image: url(../images/mega/new-chat-sprite_v8.png);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -86,6 +86,9 @@
 }
 .tiny-icon.blue-handset {
     background-position: -6px -2217px;
+}
+.tiny-icon.white-handset {
+    background-position: -46px -2217px;
 }
 .tiny-icon.grey-down-arrow {
     background-position: -8px 4px;
@@ -399,7 +402,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v6.png);
+    background-image: url(../images/mega/new-chat-sprite_v8.png);
     background-repeat: no-repeat;
 }
 .call-icon.handset-with-stop {
@@ -1108,6 +1111,9 @@
 .small-icon.grey-key {
     background-position: -103px -346px;
 }
+.small-icon.icons-sprite.writing-pencil {
+    background-position: -201px -226px;
+}
 .dropdown-item:hover .small-icon.icons-sprite.grey-plus {
     background-position: -240px -391px;
 }
@@ -1117,6 +1123,18 @@
 .small-icon.dark-grey-plus {
     background-image: url(../images/mega/fm-main-sprite_v7.png);
     background-position: -14px -11545px;
+}
+.dropdown-item:hover .small-icon.context.share-folder {
+    background-position: -41px -260px;
+}
+.dropdown-item:hover .small-icon.context.headset, .dropdown-item.opened .small-icon.context.headset {
+    background-position: -42px -179px;
+}
+.dropdown-item:hover .small-icon.context.red-stop {
+    background-position: -41px -299px;
+}
+.dropdown-item:hover .small-icon.context.arrow-in-circle {
+    background-position: -41px -228px;
 }
 .dropdown-item:hover .small-icon.context.share-folder {
     background-position: -41px -260px;
@@ -1573,4 +1591,56 @@ i.account-icon.email {
 }
 i.account-icon.lock {
     background-position: -6px -1740px;
+}
+
+.link-button > .small-icon.colorized, .link-button:hover > .small-icon.colorized, .link-button.active > .small-icon, .link-button.red:hover > .small-icon, .link-button.red.active > .small-icon {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.small-icon.square-profile.colorized {
+    background-position: -131px -934px;
+}
+.dropdown-item.light i.small-icon.square-profile.colorized {
+    background-position: -131px -934px;
+    width: 22px;
+    height: 22px;
+    margin: 4px 0 0 7px;
+}
+.small-icon.audio-call.colorized {
+    background-position: -90px -775px;
+}
+.small-icon.video-call.colorized {
+    background-position: -130px -775px;
+}
+.small-icon.rounded-grey-up-arrow.colorized {
+    background-position: -170px -736px;
+}
+.small-icon.clear-arrow.colorized {
+    background-position: -130px -736px;
+}
+.small-icon.writing-pen.colorized {
+    background-position: -130px -815px;
+}
+.small-icon.rounded-plus.colorized {
+    background-position: -50px -816px;
+}
+.small-icon.rounded-stop.colorized {
+    background-position: -90px -816px;
+}
+.small-icon.horizontal-red-handset.colorized {
+    background-position: -170px -815px;
+    width: 21px;
+}
+.small-icon.archive.colorized {
+    background-position: -90px -736px;
+}
+.small-icon.grey-cloud.colorized {
+    background-position: -50px -934px;
+    width: 22px;
+}
+.dropdown-item.link-button.light i.small-icon.grey-cloud.colorized {
+    background-position: -50px -934px;
+    margin-top: 4px;
 }

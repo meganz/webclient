@@ -82,6 +82,7 @@
     font-size: 0;
     line-height: 0;
     position: relative;
+    min-height: 20px;
 }
 .chat-textarea-scroll textarea::-webkit-input-placeholder {
  color:#A8A8A8;

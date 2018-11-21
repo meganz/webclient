@@ -7,6 +7,7 @@
 function WebrtcApi() {
     if (navigator.mozGetUserMedia) {
         this.browser = 'firefox';
+        this.isFirefox = true;
         if (!MediaStream.prototype.getVideoTracks || !MediaStream.prototype.getAudioTracks) {
             throw new Error('webRTC API missing MediaStream.getXXXTracks');
         }
@@ -30,7 +31,7 @@ function WebrtcApi() {
 
     } else if (navigator.webkitGetUserMedia) {
         this.browser = window.opr ? 'opera' : 'chrome';
-
+        this.isChrome = true;
         if (d) {
             console.log('This appears to be Chrome');
         }
@@ -146,93 +147,25 @@ WebrtcApi.prototype.getBrowserVersion = function getBrowserVersion() {
     return browser;
 };
 
-WebrtcApi.prototype.createUserMediaConstraints = function (um) {
-    var constraints = {audio: false, video: false};
-
-    if (um.video) {
-        constraints.video = {mandatory: {}};// same behaviour as true
-    }
-
-    if (um.audio) {
-        constraints.audio = {};// same behaviour as true
-    }
-
-    if (um.screen) {
-        constraints.video = {
-            "mandatory": {
-                "chromeMediaSource": "screen"
-            }
-        };
-    }
-
-    if (um.resolution && !constraints.video) {
-        constraints.video = {mandatory: {}};// same behaviour as true
-    }
-
+WebrtcApi.prototype.mediaConstraintsResolution = function (res) {
     // see https://code.google.com/p/chromium/issues/detail?id=143631#c9 for list of supported resolutions
-    switch (um.resolution) {
-        // 16:9 first
-        case '1080':
-        case 'fullhd':
-            constraints.video.mandatory.minWidth = 1920;
-            constraints.video.mandatory.minHeight = 1080;
-            constraints.video.mandatory.minAspectRatio = 1.77;
-            break;
-        case '720':
+    switch (res) {
         case 'hd':
-            constraints.video.mandatory.minWidth = 1280;
-            constraints.video.mandatory.minHeight = 720;
-            constraints.video.mandatory.minAspectRatio = 1.77;
-            break;
-        case '360':
-            constraints.video.mandatory.minWidth = 640;
-            constraints.video.mandatory.minHeight = 360;
-            constraints.video.mandatory.minAspectRatio = 1.77;
-            break;
-        case '180':
-            constraints.video.mandatory.minWidth = 320;
-            constraints.video.mandatory.minHeight = 180;
-            constraints.video.mandatory.minAspectRatio = 1.77;
-            break;
-        // 4:3
-        case '960':
-            constraints.video.mandatory.minWidth = 960;
-            constraints.video.mandatory.minHeight = 720;
-            break;
-        case '640':
+            return {
+                width: { min: 1024, ideal: 1280, max: 1920 },
+                height: { min: 576, ideal: 720, max: 1080 }
+            };
+        case 'low':
+            return {
+                width: { exact: 320 },
+                height: { exact: 240 }
+            };
         case 'vga':
-            constraints.video.mandatory.minWidth = 640;
-            constraints.video.mandatory.minHeight = 480;
-            break;
-        case '320':
-            constraints.video.mandatory.minWidth = 320;
-            constraints.video.mandatory.minHeight = 240;
-            break;
-        default:
-            if (navigator.userAgent.indexOf('Android') !== -1) {
-                constraints.video.mandatory.minWidth = 320;
-                constraints.video.mandatory.minHeight = 240;
-                constraints.video.mandatory.maxFrameRate = 15;
-            }
-            break;
+            return {
+                width:  { min: 640, max: 640 },
+                height: { min: 480, max: 480 }
+            };
     }
-
-    if (um.bandwidth) { // doesn't work currently, see webrtc issue 1846
-        if (!constraints.video)  {
-            // same behaviour as true
-            constraints.video = {mandatory: {}};
-        }
-        constraints.video.optional = [{bandwidth: um.bandwidth}];
-    }
-    if (um.fps) { // for some cameras it might be necessary to request 30fps
-        // so they choose 30fps mjpg over 10fps yuy2
-        if (!constraints.video) {
-            // same behaviour as tru;
-            constraints.video = {mandatory: {}};
-        }
-        constraints.video.mandatory.minFrameRate = fps;
-    }
-    return constraints;
 };
 
 WebrtcApi.prototype.getUserMediaWithConstraintsAndCallback = function (um) {

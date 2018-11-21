@@ -1205,6 +1205,9 @@
              * @param {Array}   aNodeList The list of ufs-nodes processed
              * @param {Object}  aUserData  Any data provided by initializers
              */
+            'contacts': function() {
+                M.contactsUI();
+            },
             'contact-shares': function(aUpdate, aNodeList, aUserData) {
                 var contact = M.d[M.currentdirid];
 

@@ -171,7 +171,7 @@ function addNewContact($addButton, cd) {
                     closeDialog();
                     $('.token-input-token-mega').remove();
                 }
-                
+
                 loadingDialog.phide();
 
                 promise.resolve();
@@ -3418,6 +3418,7 @@ function FMResizablePane(element, opts) {
                     if (opts.persistanceKey) {
                         mega.config.set(opts.persistanceKey, ui.size[size_attr]);
                     }
+                    self["current_" + size_attr] = ui.size[size_attr];
                 }
 
                 $self.trigger('resize', [e, ui]);

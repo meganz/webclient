@@ -488,7 +488,7 @@ var TypingArea = React.createClass({
     },
     componentDidMount: function() {
         var self = this;
-        window.addEventListener('resize', self.handleWindowResize);
+        $(window).rebind('resize.typingArea' + self.getUniqueId(), self.handleWindowResize);
 
         var $container = $(ReactDOM.findDOMNode(this));
         // initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
@@ -549,7 +549,8 @@ var TypingArea = React.createClass({
         var self = this;
         var chatRoom = self.props.chatRoom;
         self.triggerOnUpdate();
-        window.removeEventListener('resize', self.handleWindowResize);
+        // window.removeEventListener('resize', self.handleWindowResize);
+        $(window).unbind('resize.typingArea' + self.getUniqueId());
     },
     componentDidUpdate: function () {
         var self = this;
@@ -563,6 +564,7 @@ var TypingArea = React.createClass({
 
             self.handleWindowResize();
         }
+
         if (!this.scrollingInitialised) {
             this.initScrolling();
         }
@@ -641,7 +643,7 @@ var TypingArea = React.createClass({
             self.lastContent === textareaContent &&
             self.lastPosition === cursorPosition
         ) {
-                return;
+            return;
         }
         else {
             self.lastContent = textareaContent;
@@ -771,6 +773,7 @@ var TypingArea = React.createClass({
     },
     handleWindowResize: function (e, scrollToBottom) {
         var self = this;
+
         if(!self.isMounted()) {
             return;
         }

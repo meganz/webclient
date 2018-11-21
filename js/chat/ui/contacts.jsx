@@ -428,7 +428,9 @@ var Avatar = React.createClass({
                         self.props.onClick(e);
                     } : self.onClick}>
                         {verifiedElement}
-                        {avatarMeta.avatar.letters}
+                        <span>
+                            {avatarMeta.avatar.letters}
+                        </span>
                 </div>;
 
         }
@@ -550,6 +552,11 @@ var ContactCard = React.createClass({
                 <div className="user-card-data">
                     {usernameBlock}
                     <ContactPresence contact={contact} className={this.props.presenceClassName}/>
+                    {
+                        this.props.isInCall ?
+                            <i className="small-icon audio-call"></i> :
+                            null
+                    }
                     <div className="user-card-email">{contact.m}</div>
                 </div>
             </div>;

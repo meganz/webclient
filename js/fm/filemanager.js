@@ -1315,6 +1315,7 @@ FileManager.prototype.initContextUI = function() {
         }
     });
 
+
     $(c + '.removeshare-item').rebind('click', function() {
         fmremove();
     });

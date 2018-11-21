@@ -2493,6 +2493,10 @@ function loadSubPage(tpage, event) {
         slideshow(0, 1);
     }
 
+    if (window.versiondialogid) {
+        fileversioning.closeFileVersioningDialog(window.versiondialogid);
+    }
+
     if (folderlink) {
         flhashchange = true;
     }

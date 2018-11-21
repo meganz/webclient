@@ -1,3 +1,4 @@
+var versiondialogid;
 (function _fileversioning(global) {
 
     var current_sel_version = false;
@@ -235,6 +236,7 @@
             if (!f) {
                 return;
             }
+            versiondialogid = fh;
             var nodeData = M.d[M.currentdirid];
             // are we in an inshare?
             while (nodeData && !nodeData.su) {
@@ -541,6 +543,7 @@
                 current_sel_version = false;
                 $(document).off('keydown.fileversioningKeydown');
             });
+
             fileversioning.getAllVersions(fh).done(
                 function(versions) {
                     var vh = fillVersionList(versions);
@@ -626,13 +629,15 @@
             $(document).rebind('keydown.fileversioningKeydown', function(e) {
                 if (e.keyCode === 8) { // Backspace
                     e.stopPropagation();
-                    pd.find('.button.close').click();
+                    fileversioning.closeFileVersioningDialog($.selected[0]);
                 }
             });
             $('.fm-versioning .header .button.settings').rebind('click', function() {
                 pd.addClass('hidden');
                 loadSubPage('fm/account/file-management');
             });
+            history.pushState({subpage: page}, '', '/' + page);
+
         },
 
         /**

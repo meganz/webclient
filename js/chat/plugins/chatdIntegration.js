@@ -929,6 +929,12 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
             message
         );
     }
+    else if (message.dialogType === "remoteCallStarted") {
+        message.wrappedChatDialogMessage = chatRoom.megaChat.plugins.callManager.remoteStartedCallToDialogMsg(
+            chatRoom,
+            message
+        );
+    }
 };
 
 ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
@@ -1486,7 +1492,18 @@ ChatdIntegration.prototype._processDecryptedMessage = function(chatRoom, msgInst
                 if (v.type === "call-failed" && !v.meta) {
                     return true;
                 }
+                else if (v.type === "call-ended" && v.isLocallyGenerated) {
+                    return true;
+                }
             });
+        }
+        else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.CALL_STARTED) {
+            // this is a system message
+            msgInstance.meta = {
+                userId: decryptedResult.sender
+            };
+
+            msgInstance.dialogType = "remoteCallStarted";
         }
         else {
             self.logger.error("Could not decrypt: ", decryptedResult);

@@ -2821,6 +2821,11 @@ function processUPCI(ap) {
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                 $('.button.link-button.accept-all').addClass('hidden');
                 $('.fm-empty-contacts').removeClass('hidden');
+                $('.contacts-tab-lnk.ipc').removeClass('filled').find('span').text('');
+            }
+            else if (M.currentdirid === 'ipc') {
+                $('.contacts-tab-lnk.ipc').addClass('filled').find('span').text(Object.keys(M.ipc).length);
+                $('.button.link-button.accept-all').removeClass('hidden');
             }
             else if (M.currentdirid === 'ipc') {
                 updateIpcRequests();

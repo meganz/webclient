@@ -74,7 +74,7 @@ var AlterParticipantsConversationMessage = React.createClass({
 
             self._ensureNameIsLoaded(otherContact.u);
             messages.push(
-                <div className="message body" data-id={"id" + message.messageId} key={h}>
+                <div className="message body" data-id={"id" + message.messageId} key={message.messageId + "_" + h}>
                     {avatar}
 
                     <div className="message content-area small-info-txt">
@@ -112,7 +112,7 @@ var AlterParticipantsConversationMessage = React.createClass({
             }
 
             messages.push(
-                <div className="message body" data-id={"id" + message.messageId} key={h}>
+                <div className="message body" data-id={"id" + message.messageId} key={message.messageId + "_" + h}>
                     {avatar}
 
                     <div className="message content-area small-info-txt">

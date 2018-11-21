@@ -352,7 +352,7 @@ dashboardUI.updateChatWidget = function() {
     var allChats = 0;
     var privateChats = 0;
     var groupChats = 0;
-    var unreadMessages = $('.nw-fm-left-icon.conversations > .new-messages-indicator:visible').text();
+    var unreadMessages = $('.new-messages-indicator .chat-unread-count:visible').text();
 
     if (!megaChatIsDisabled && typeof megaChat !== 'undefined') {
         megaChat.chats.forEach(function(chatRoom) {

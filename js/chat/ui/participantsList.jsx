@@ -309,6 +309,7 @@ var ParticipantsListInner = React.createClass({
                         }
                         dropdownRemoveButton={dropdownRemoveButton}
                         dropdownIconClasses={dropdownIconClasses}
+                        isInCall={room.uniqueCallParts && room.uniqueCallParts[contactHash]}
                         style={{
                             width: 249,
                             position: 'absolute',

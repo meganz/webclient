@@ -51,7 +51,10 @@ Message._getTextContentsForDialogType = function(message) {
             message.textContents.length === 0
         )
     ) {
-        var textMessage = mega.ui.chat.getMessageString(message.type || message.dialogType) || "";
+        var textMessage = mega.ui.chat.getMessageString(
+                message.type || message.dialogType,
+                message.chatRoom.type === "group"
+            ) || "";
 
         // if is an array.
         var contact = Message.getContactForMessage(message);
@@ -115,32 +118,50 @@ Message._getTextContentsForDialogType = function(message) {
                 '"' + htmlentities(message.meta.topic) + '"'
             );
         }
+        else if (message.dialogType === "remoteCallStarted") {
+            textMessage = mega.ui.chat.getMessageString("call-started", message.chatRoom.type === "group");
+
+            if (textMessage.splice) {
+                textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage);
+            }
+            else {
+                textMessage = textMessage.replace("[X]", contactName);
+                textMessage = textMessage.replace("%s", contactName);
+            }
+        }
         else if (message.dialogType === "remoteCallEnded") {
             var meta = message.meta;
 
-            if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CALL_ENDED) {
-                textMessage = mega.ui.chat.getMessageString("call-ended");
+            if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CALL_ENDED || (
+                    meta.reason === CallManager.CALL_END_REMOTE_REASON.FAILED && meta.duration >= 5
+                )
+            ) {
+                textMessage = mega.ui.chat.getMessageString("call-ended", message.chatRoom.type === "group");
             }
             else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.REJECTED) {
-                textMessage = mega.ui.chat.getMessageString("call-rejected");
+                textMessage = mega.ui.chat.getMessageString("call-rejected", message.chatRoom.type === "group");
             }
-            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED) {
-                textMessage = mega.ui.chat.getMessageString("call-canceled");
+            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED && contact.u === u_handle) {
+                textMessage = mega.ui.chat.getMessageString("call-canceled", message.chatRoom.type === "group");
+            }
+            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED && contact.u !== u_handle) {
+                textMessage = mega.ui.chat.getMessageString("call-missed", message.chatRoom.type === "group");
             }
             else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u !== u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-missed");
+                textMessage = mega.ui.chat.getMessageString("call-missed", message.chatRoom.type === "group");
             }
             else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u === u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-timeout");
+                textMessage = mega.ui.chat.getMessageString("call-timeout", message.chatRoom.type === "group");
             }
             else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.FAILED) {
-                textMessage = mega.ui.chat.getMessageString("call-failed");
+                textMessage = mega.ui.chat.getMessageString("call-failed", message.chatRoom.type === "group");
             }
             else {
                 if (d) {
                     console.error("Unknown (remote) CALL_ENDED reason: ", meta.reason, meta);
                 }
             }
+
 
             if (textMessage.splice) {
                 textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage);
@@ -160,7 +181,9 @@ Message._getTextContentsForDialogType = function(message) {
 
 
         if (textMessage) {
-            return textMessage;
+            return textMessage
+                .replace(/\[\[/g, "")
+                .replace(/\]\]/g, "");
         }
         else {
             return false;
@@ -646,6 +669,7 @@ ChatDialogMessage.DEFAULT_OPTS = {
     'delay': 0,
     'buttons': {},
     'read': false,
+    'showInitiatorAvatar': false,
     'persist': true
 };
 

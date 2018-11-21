@@ -1213,7 +1213,7 @@ function generateAnonymousReport() {
         report.numOpenedChats = Object.keys(megaChat.chats).length;
         report.haveRtc = megaChat.rtc ? true : false;
         if (report.haveRtc) {
-            report.rtcStatsAnonymousId = megaChat.rtc.ownAnonId;
+            report.rtcStatsAnonymousId = base64urlencode(megaChat.rtc.ownAnonId);
         }
     }
 
@@ -1239,7 +1239,6 @@ function generateAnonymousReport() {
             });
 
             var r = {
-                'roomUniqueId': roomUniqueId,
                 'roomState': v.getStateAsText(),
                 'roomParticipants': participants
             };
@@ -1250,31 +1249,20 @@ function generateAnonymousReport() {
         });
 
         if (report.haveRtc) {
-            var callSessions = megaChat.plugins.callManager.callSessions ?
-                megaChat.plugins.callManager.callSessions :
-                megaChat.plugins.callManager._calls;
-
-            Object.keys(callSessions).forEach(function (k) {
-                var v = callSessions[k];
-
-                var r = {
-                    'callStats': v.callStats,
-                    'state': v.state
-                };
-
-                var roomIdx = roomUniqueIdMap[v.room.roomId];
-                if (!roomIdx) {
-                    roomUniqueId += 1; // room which was closed, create new tmp id;
-                    roomIdx = roomUniqueId;
-                }
-                if (!chatStates[roomIdx]) {
-                    chatStates[roomIdx] = {};
-                }
-                if (!chatStates[roomIdx].callSessions) {
-                    chatStates[roomIdx].callSessions = [];
-                }
-                chatStates[roomIdx].callSessions.push(r);
-            });
+            report.calls = [];
+            var calls = megaChat.plugins.callManager._calls;
+            var len = calls.length;
+            for (var i = 0; i < len; i++) {
+                var call = calls[i];
+                var rtcCall = call.rtcCall;
+                report.calls.push({
+                    cid: base64urlencode(rtcCall.id),
+                    chatid: base64urlencode(rtcCall.chatid),
+                    callid: base64urlencode(rtcCall.id),
+                    endReason: call.state,
+                    isJoiner: rtcCall.isJoiner ? 1 : 0
+                });
+            }
         };
 
         report.chatRoomState = chatStates;

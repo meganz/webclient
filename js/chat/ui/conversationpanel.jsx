@@ -23,8 +23,35 @@ var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
 var PrivilegeChange = require('./messages/privilegeChange.jsx').PrivilegeChange;
 var TopicChange = require('./messages/topicChange.jsx').TopicChange;
 
+var ENABLE_GROUP_CALLING_FLAG = (
+    typeof localStorage.enableGroupCalling !== 'undefined' &&
+    localStorage.enableGroupCalling === "1"
+);
 
+var ConversationAudioVideoPanel = require('./conversationaudiovideopanel.jsx').ConversationAudioVideoPanel;
 
+var JoinCallNotification = React.createClass({
+    mixins: [MegaRenderMixin],
+    render: function() {
+        var room = this.props.chatRoom;
+        if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
+            return <div className="in-call-notif yellow join">
+                <i className="small-icon audio-call colorized"/>
+                There is an active group call, but maximum call participants count had been reached.
+            </div>;
+        }
+        else {
+            return <div className="in-call-notif neutral join">
+                <i className="small-icon audio-call colorized"/>
+                There is an active group call. <a href="javascript:;" onClick={((e) => {
+                room.joinCall();
+                e.preventDefault();
+                return false;
+            })}>Join</a>
+            </div>;
+        }
+    }
+});
 
 var ConversationRightArea = React.createClass({
     mixins: [MegaRenderMixin],
@@ -83,19 +110,28 @@ var ConversationRightArea = React.createClass({
         }
         self._wasAppendedEvenOnce = true;
 
-        var disabledCalls = room.isReadOnly() || !room.chatId || room.callManagerCall;
+        var disabledCalls = (
+            room.isReadOnly() ||
+            !room.chatId ||
+            (
+                room.callManagerCall &&
+                room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING
+            )
+        );
 
+
+        var disableStartCalls = disabledCalls || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin);
 
         var startAudioCallButtonClass = "";
         var startVideoCallButtonClass = "";
 
-        if (disabledCalls) {
+        if (disabledCalls || disableStartCalls) {
             startAudioCallButtonClass = startVideoCallButtonClass = "disabled";
         }
 
         var startAudioCallButton =
             <div className={"link-button" + " " + startVideoCallButtonClass} onClick={() => {
-                if (!disabledCalls) {
+                if (!disableStartCalls) {
                     room.startAudioCall();
                 }
             }}>
@@ -105,7 +141,7 @@ var ConversationRightArea = React.createClass({
 
         var startVideoCallButton =
             <div className={"link-button" + " " + startVideoCallButtonClass} onClick={() => {
-                if (!disabledCalls) {
+                if (!disableStartCalls) {
                     room.startVideoCall();
                 }
             }}>
@@ -120,14 +156,39 @@ var ConversationRightArea = React.createClass({
                         }
                     }}>
             <i className="small-icon horizontal-red-handset"></i>
-            {__(l[5884])}
+            {room.type === "group" ? "Leave call" : l[5884]}
         </div>;
 
 
-        if (room.callManagerCall && room.callManagerCall.isActive() === true) {
+        if (
+            room.callManagerCall &&
+            room.callManagerCall.isActive() === true
+        ) {
             startAudioCallButton = startVideoCallButton = null;
         } else {
             endCallButton = null;
+        }
+
+
+
+        if (room.type === "group") {
+            // if its a 1on1
+            if (
+                room.callParticipants &&
+                Object.keys(room.callParticipants).length > 0 &&
+                (
+                    !room.callManagerCall ||
+                    room.callManagerCall.isActive() === false
+                )
+            ) {
+                // call is active, but I'm not in
+                startAudioCallButton = startVideoCallButton = null;
+            }
+        }
+
+
+        if (room.type === "group" && !ENABLE_GROUP_CALLING_FLAG) {
+            startAudioCallButton = startVideoCallButton = null;
         }
 
 
@@ -232,9 +293,9 @@ var ConversationRightArea = React.createClass({
                         <div className="chat-right-head-txt">
                             Options
                         </div>
-                        {room.type !== "group" ? startAudioCallButton : null}
-                        {room.type !== "group" ? startVideoCallButton : null}
-                        {room.type !== "group" ? AVseperator : null}
+                        {startAudioCallButton}
+                        {startVideoCallButton}
+                        {AVseperator}
                         {
                             room.type == "group" ?
                             (
@@ -348,464 +409,7 @@ var ConversationRightArea = React.createClass({
 
 
 
-var ConversationAudioVideoPanel = React.createClass({
-    mixins: [MegaRenderMixin],
-    getInitialState: function() {
-        return {
-            'messagesBlockEnabled': false,
-            'fullScreenModeEnabled': false,
-            'localMediaDisplay': true
-        }
-    },
-    _hideBottomPanel: function() {
-        var self = this;
-        var room = self.props.chatRoom;
-        if (!room.callManagerCall || !room.callManagerCall.isActive()) {
-            return;
-        }
 
-        var $container = $(ReactDOM.findDOMNode(self));
-
-        self.visiblePanel = false;
-        $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
-    },
-    componentDidUpdate: function() {
-        var self = this;
-        var room = self.props.chatRoom;
-        if (!room.callManagerCall || !room.callManagerCall.isActive()) {
-            return;
-        }
-
-        var $container = $(ReactDOM.findDOMNode(self));
-
-
-        var mouseoutThrottling = null;
-        $container.rebind('mouseover.chatUI' + self.props.chatRoom.roomId, function() {
-            var $this = $(this);
-            clearTimeout(mouseoutThrottling);
-            self.visiblePanel = true;
-            $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
-            if ($this.hasClass('full-sized-block')) {
-                $('.call.top-panel', $container).addClass('visible-panel');
-            }
-        });
-
-        $container.rebind('mouseout.chatUI' + self.props.chatRoom.roomId, function() {
-            var $this = $(this);
-            clearTimeout(mouseoutThrottling);
-            mouseoutThrottling = setTimeout(function() {
-                self.visiblePanel = false;
-                self._hideBottomPanel();
-                $('.call.top-panel', $container).removeClass('visible-panel');
-            }, 500);
-        });
-
-
-        // Hidding Control panel if cursor is idle
-        var idleMouseTimer;
-        var forceMouseHide = false;
-        $container.rebind('mousemove.chatUI' + self.props.chatRoom.roomId,function(ev) {
-            var $this = $(this);
-            if (self._bottomPanelMouseOver) {
-                return;
-            }
-            clearTimeout(idleMouseTimer);
-            if (!forceMouseHide) {
-                self.visiblePanel = true;
-                $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
-                $container.removeClass('no-cursor');
-                if ($this.hasClass('full-sized-block')) {
-                    $('.call.top-panel', $container).addClass('visible-panel');
-                }
-                idleMouseTimer = setTimeout(function() {
-                    self.visiblePanel = false;
-
-                    self._hideBottomPanel();
-
-                    $container.addClass('no-cursor');
-                    $('.call.top-panel', $container).removeClass('visible-panel');
-
-                    forceMouseHide = true;
-                    setTimeout(function() {
-                        forceMouseHide = false;
-                    }, 400);
-                }, 2000);
-            }
-        });
-
-        $('.call.bottom-panel', $container).rebind('mouseenter.chatUI' + self.props.chatRoom.roomId,function(ev) {
-            self._bottomPanelMouseOver = true;
-            clearTimeout(idleMouseTimer);
-        });
-        $('.call.bottom-panel', $container).rebind('mouseleave.chatUI' + self.props.chatRoom.roomId,function(ev) {
-            self._bottomPanelMouseOver = false;
-
-            idleMouseTimer = setTimeout(function() {
-                self.visiblePanel = false;
-
-                self._hideBottomPanel();
-
-                $container.addClass('no-cursor');
-                $('.call.top-panel', $container).removeClass('visible-panel');
-
-                forceMouseHide = true;
-                setTimeout(function() {
-                    forceMouseHide = false;
-                }, 400);
-            }, 2000);
-        });
-
-
-        $(document)
-            .rebind("fullscreenchange.megaChat_" + room.roomId, function() {
-                if (!$(document).fullScreen() && room.isCurrentlyActive) {
-                    self.setState({fullScreenModeEnabled: false});
-                }
-                else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
-                    self.setState({fullScreenModeEnabled: true});
-                }
-                self.forceUpdate();
-            });
-
-        var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
-        $localMediaDisplay.draggable({
-            'refreshPositions': true,
-            'containment': $container,
-            'scroll': false,
-            drag: function(event, ui){
-                if ($(this).is(".minimized")) {
-                    return false;
-                }
-
-                var right = Math.max(0, $container.outerWidth() - ui.position.left);
-                var bottom = Math.max(0, $container.outerHeight() - ui.position.top);
-
-
-                // contain in the $container
-                right = Math.min(right, $container.outerWidth() - 8);
-                bottom = Math.min(bottom, $container.outerHeight() - 8);
-
-                right = right - ui.helper.outerWidth();
-                bottom = bottom - ui.helper.outerHeight();
-
-                var minBottom = $(this).is(".minimized") ? 48 : 8;
-
-                if (bottom < minBottom) {
-                    bottom = minBottom;
-                    $(this).addClass('bottom-aligned');
-                }
-                else {
-                    $(this).removeClass('bottom-aligned');
-                }
-
-                if (right < 8) {
-                    right = 8;
-                    $(this).addClass('right-aligned');
-                }
-                else {
-                    $(this).removeClass('right-aligned');
-                }
-
-                ui.offset = {
-                    left: 'auto',
-                    top: 'auto',
-                    right: right,
-                    bottom: bottom,
-                    height: "",
-                    width: ""
-                };
-                ui.position.left = 'auto';
-                ui.position.top = 'auto';
-
-                ui.helper.css(ui.offset);
-                $(this).css(ui.offset);
-            }
-        });
-
-        // REposition the $localMediaDisplay if its OUT of the viewport (in case of dragging -> going back to normal
-        // size mode from full screen...)
-        $(window).rebind('resize.chatUI_' + room.roomId, function(e) {
-            if ($container.is(":visible")) {
-                if (!elementInViewport($localMediaDisplay[0])) {
-                    $localMediaDisplay
-                        .addClass('right-aligned')
-                        .addClass('bottom-aligned')
-                        .css({
-                            'right': 8,
-                            'bottom': 8,
-                        });
-                }
-            }
-        });
-
-
-        if (
-            self.refs.remoteVideo &&
-            self.refs.remoteVideo.src === "" &&
-            self.refs.remoteVideo.currentTime === 0 &&
-            !self.refs.remoteVideo.srcObject
-        ) {
-            var participants = room.getParticipantsExceptMe();
-            var stream = room.callManagerCall._streams[participants[0]];
-            RTC.attachMediaStream(self.refs.remoteVideo, stream);
-            // attachMediaStream would do the .play call
-        }
-
-        if (
-            room.megaChat.rtc &&
-            room.megaChat.rtc.gLocalStream &&
-            self.refs.localViewport &&
-            self.refs.localViewport.src === "" &&
-            self.refs.localViewport.currentTime === 0 &&
-            !self.refs.localViewport.srcObject
-        ) {
-            RTC.attachMediaStream(self.refs.localViewport, room.megaChat.rtc.gLocalStream);
-            // attachMediaStream would do the .play call
-        }
-
-        $(room).rebind('toggleMessages.av', function() {
-            self.toggleMessages();
-        });
-
-        room.messagesBlockEnabled = self.state.messagesBlockEnabled;
-    },
-    componentWillUnmount: function() {
-        var self = this;
-        var room = self.props.chatRoom;
-
-        var $container = $(ReactDOM.findDOMNode(self));
-        if ($container) {
-            $container.off('mouseover.chatUI' + self.props.chatRoom.roomId);
-            $container.off('mouseout.chatUI' + self.props.chatRoom.roomId);
-            $container.off('mousemove.chatUI' + self.props.chatRoom.roomId);
-        }
-
-        $(document).off("fullscreenchange.megaChat_" + room.roomId);
-        $(window).off('resize.chatUI_' + room.roomId);
-        $(room).off('toggleMessages.av');
-    },
-    toggleMessages: function(e) {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-
-        if (this.props.onMessagesToggle) {
-            this.props.onMessagesToggle(
-                !this.state.messagesBlockEnabled
-            );
-        }
-
-        this.setState({
-            'messagesBlockEnabled': !this.state.messagesBlockEnabled
-        });
-    },
-    fullScreenModeToggle: function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        var newVal = !this.state.fullScreenModeEnabled;
-        $(document).fullScreen(newVal);
-
-        this.setState({
-            'fullScreenModeEnabled': newVal,
-            'messagesBlockEnabled': newVal === true ? false : this.state.messagesBlockEnabled
-        });
-    },
-    toggleLocalVideoDisplay: function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        var $container = $(ReactDOM.findDOMNode(this));
-        var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
-
-        $localMediaDisplay
-            .addClass('right-aligned')
-            .addClass('bottom-aligned')
-            .css({
-                'width': '',
-                'height': '',
-                'right': 8,
-                'bottom': !this.state.localMediaDisplay === true ? 8 : 8
-            });
-
-        this.setState({localMediaDisplay: !this.state.localMediaDisplay});
-    },
-    render: function() {
-        var chatRoom = this.props.chatRoom;
-
-        if (!chatRoom.callManagerCall || !chatRoom.callManagerCall.isStarted()) {
-            return null;
-        }
-
-        var participants = chatRoom.getParticipantsExceptMe();
-
-        var displayNames = [];
-
-        participants.forEach(function(v) {
-            displayNames.push(
-                htmlentities(M.getNameByHandle(v))
-            );
-        });
-
-
-        var callManagerCall = chatRoom.callManagerCall;
-
-        var remoteCamEnabled = null;
-
-
-        if (callManagerCall.getRemoteMediaOptions().video) {
-            remoteCamEnabled = <i className="small-icon blue-videocam" />;
-        }
-
-
-        var localPlayerElement = null;
-        var remotePlayerElement = null;
-
-        var visiblePanelClass = "";
-        var localPlayerStream;
-        if (callManagerCall && chatRoom.megaChat.rtc && chatRoom.megaChat.rtc.gLocalStream) {
-            localPlayerStream = chatRoom.megaChat.rtc.gLocalStream;
-        }
-
-        if (this.visiblePanel === true) {
-            visiblePanelClass += " visible-panel";
-        }
-        if (!localPlayerStream || callManagerCall.getMediaOptions().video === false) {
-            localPlayerElement = <div className={
-                "call local-audio right-aligned bottom-aligned" +
-                (this.state.localMediaDisplay ? "" : " minimized ") +
-                visiblePanelClass
-            }>
-                <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
-                    <i className="tiny-icon grey-minus-icon" />
-                </div>
-                <ContactsUI.Avatar
-                    contact={M.u[u_handle]} className="call avatar-wrapper semi-big-avatar"
-                    style={{display: !this.state.localMediaDisplay ? "none" : ""}}
-                />
-            </div>;
-        }
-        else {
-            localPlayerElement = <div
-                className={
-                    "call local-video right-aligned bottom-aligned" +
-                    (this.state.localMediaDisplay ? "" : " minimized ") +
-                    visiblePanelClass
-                }>
-                <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
-                    <i className="tiny-icon grey-minus-icon"/>
-                </div>
-                <video
-                    ref="localViewport"
-                    className="localViewport"
-                    defaultMuted={true}
-                    muted={true}
-                    volume={0}
-                    id={"localvideo_" + callManagerCall.id}
-                    style={{display: !this.state.localMediaDisplay ? "none" : ""}}
-
-                />
-            </div>;
-        }
-
-        var remotePlayerStream = callManagerCall._streams[participants[0]];
-
-        if (
-            !remotePlayerStream ||
-            callManagerCall.getRemoteMediaOptions().video === false
-        ) {
-            // TODO: When rtc is ready
-            var contact = M.u[participants[0]];
-            remotePlayerElement = <div className="call user-audio">
-                <ContactsUI.Avatar contact={contact}  className="avatar-wrapper big-avatar" hideVerifiedBadge={true} />
-            </div>;
-        }
-        else {
-            remotePlayerElement = <div className="call user-video">
-                <video
-                    autoPlay={true}
-                    className="rmtViewport rmtVideo"
-                    id={"remotevideo_" + callManagerCall.id}
-                    ref="remoteVideo"
-                />
-            </div>;
-        }
-
-
-        var unreadDiv = null;
-        var unreadCount = chatRoom.messagesBuff.getUnreadCount();
-        if (unreadCount > 0) {
-            unreadDiv = <div className="unread-messages">{unreadCount > 9 ? "9+" : unreadCount}</div>
-        }
-
-        var additionalClass = "";
-        additionalClass = (this.state.fullScreenModeEnabled === true ? " full-sized-block" : "");
-        if (additionalClass.length === 0) {
-            additionalClass = (this.state.messagesBlockEnabled === true ? " small-block" : "");
-        }
-        return <div className={"call-block" + additionalClass} id="call-block">
-            {remotePlayerElement}
-            {localPlayerElement}
-
-
-            <div className="call top-panel">
-                <div className="call top-user-info">
-                    <span className="user-card-name white">{displayNames.join(", ")}</span>{remoteCamEnabled}
-                </div>
-                <div
-                    className="call-duration medium blue call-counter"
-                    data-room-id={chatRoom.chatId}>{
-                    secondsToTimeShort(chatRoom._currentCallCounter)
-                    }
-                </div>
-            </div>
-
-
-            <div className="call bottom-panel">
-                <div className={"button call left" + (unreadDiv ? " unread" : "")} onClick={this.toggleMessages}>
-                    {unreadDiv}
-                    <i className="big-icon conversations"></i>
-                </div>
-                <div className="button call" onClick={function(e) {
-                    if (callManagerCall.getMediaOptions().audio === true) {
-                        callManagerCall.muteAudio();
-                    }
-                    else {
-                        callManagerCall.unmuteAudio();
-                    }
-                }}>
-                    <i className={
-                        "big-icon " + (callManagerCall.getMediaOptions().audio ? " microphone" : " crossed-microphone")
-                    }></i>
-                </div>
-                <div className="button call" onClick={function(e) {
-                    if (callManagerCall.getMediaOptions().video === true) {
-                        callManagerCall.muteVideo();
-                    }
-                    else {
-                        callManagerCall.unmuteVideo();
-                    }
-                }}>
-                    <i className={
-                        "big-icon " + (callManagerCall.getMediaOptions().video ? " videocam" : " crossed-videocam")
-                    }></i>
-                </div>
-                <div className="button call" onClick={function(e) {
-                        if (chatRoom.callManagerCall) {
-                            chatRoom.callManagerCall.endCall();
-                        }
-                    }}>
-                    <i className="big-icon horizontal-red-handset"></i>
-                </div>
-                <div className="button call right" onClick={this.fullScreenModeToggle}>
-                    <i className="big-icon nwse-resize"></i>
-                </div>
-            </div>
-        </div>;
-    }
-});
 var ConversationPanel = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     lastScrollPositionPerc: 1,
@@ -893,6 +497,13 @@ var ConversationPanel = React.createClass({
         if ($container.length > 0) {
             self.initialised = true;
         }
+        else {
+            return;
+        }
+
+        $(self.findDOMNode()).rebind('resized.convpanel', function() {
+            self.handleWindowResize();
+        });
 
         self.$messages = $('.messages.scroll-area > .perfectScrollbarContainer', $container);
 
@@ -1032,7 +643,7 @@ var ConversationPanel = React.createClass({
             return;
         }
 
-        // Important. Please insure we have correct height detection for Chat messages block.
+        // Important. Please ensure we have correct height detection for Chat messages block.
         // We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
         var scrollBlockHeight = (
             $('.chat-content-block', $container).outerHeight() -
@@ -1045,6 +656,14 @@ var ConversationPanel = React.createClass({
             self.$messages.css('height', scrollBlockHeight);
             $('.messages.main-pad', self.$messages).css('min-height', scrollBlockHeight);
             self.refreshUI(true);
+            if (self.props.chatRoom.callManagerCall) {
+                $('.messages-block', $container).height(
+                    scrollBlockHeight + $('.chat-textarea-block', $container).outerHeight()
+                );
+            }
+            else {
+                $('.messages-block', $container).height('');
+            }
         }
         else {
             self.refreshUI(scrollToBottom);
@@ -1379,7 +998,8 @@ var ConversationPanel = React.createClass({
                 if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
                     lastTimeMarker = curTimeMarker;
                     messagesList.push(
-                        <div className="message date-divider" key={v.messageId + "_marker"}>{curTimeMarker}</div>
+                        <div className="message date-divider" key={v.messageId + "_marker"}
+                        title={time2date(timestamp)}>{curTimeMarker}</div>
                     );
 
                     grouped = false;
@@ -1434,7 +1054,7 @@ var ConversationPanel = React.createClass({
                 }
 
                 if (
-                    v.dialogType === "remoteCallEnded" &&
+                    (v.dialogType === "remoteCallEnded" || v.dialogType === "remoteCallStarted") &&
                     v &&
                     v.wrappedChatDialogMessage
                 ) {
@@ -2022,17 +1642,20 @@ var ConversationPanel = React.createClass({
                             }
                         }}
                     />
-                    <ConversationAudioVideoPanel
-                        chatRoom={this.props.chatRoom}
-                        contacts={self.props.contacts}
-                        megaChat={this.props.chatRoom.megaChat}
-                        unreadCount={this.props.chatRoom.messagesBuff.getUnreadCount()}
-                        onMessagesToggle={function(isActive) {
-                            self.setState({
-                                'messagesToggledInCall': isActive
-                            });
-                        }}
-                    />
+                    {
+                        room.callManagerCall && room.callManagerCall.isStarted() ?
+                            <ConversationAudioVideoPanel
+                                    chatRoom={this.props.chatRoom}
+                                    contacts={self.props.contacts}
+                                    megaChat={this.props.chatRoom.megaChat}
+                                    unreadCount={this.props.chatRoom.messagesBuff.getUnreadCount()}
+                                    onMessagesToggle={function(isActive) {
+                                        self.setState({
+                                            'messagesToggledInCall': isActive
+                                        });
+                                    }}
+                                /> : null
+                    }
 
                     {attachCloudDialog}
                     {sendContactDialog}
@@ -2068,7 +1691,10 @@ var ConversationPanel = React.createClass({
 
                     {
                         self.props.chatRoom.type === "group" ?
-                            <div className="chat-topic-block">
+                            <div className={"chat-topic-block" + (
+                                self.props.chatRoom.havePendingGroupCall() || self.props.chatRoom.haveActiveCall() ?
+                                    " have-pending-group-call" : ""
+                            )}>
                                 <utils.EmojiFormattedContent>{
                                     self.props.chatRoom.getRoomTitle()
                                 }</utils.EmojiFormattedContent>
@@ -2119,6 +1745,14 @@ var ConversationPanel = React.createClass({
                                 </div>
                             </PerfectScrollbar>
                         </div>
+                        {
+                            room.state != ChatRoom.STATE.LEFT &&
+                            room.havePendingGroupCall() && (
+                                !room.callManagerCall ||
+                                room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING
+                            )    ?
+                                <JoinCallNotification chatRoom={room} /> : null
+                        }
 
                         <div className="chat-textarea-block">
                             <WhosTyping chatRoom={room} />

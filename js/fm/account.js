@@ -1248,8 +1248,10 @@ accountUI.renderAccountPage = function(account) {
         });
     });
 
-    // Initialise the Two Factor Authentication section and show enabled/disabled state
-    twofactor.account.init();
+    // On the Account > Security tab, initialise the Two Factor Authentication section and show enabled/disabled state
+    if (page === 'fm/account/email-and-pass') {
+        twofactor.account.init();
+    }
 
     // Button on main Account page to backup their master key
     $('.backup-master-key').rebind('click', function() {

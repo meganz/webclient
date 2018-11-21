@@ -131,6 +131,7 @@ var versiondialogid;
                 if (del && $.selected && ($.selected.length === 0 || del === $.selected[0])) {
                     $('.fm-versioning').addClass('hidden');
                     current_sel_version = false;
+                    versiondialogid = undefined;
                 }
                 else {
                     fileversioning.updateFileVersioningDialog();

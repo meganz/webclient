@@ -138,7 +138,6 @@ function changeLinux(linuxsync, i) {
 
         $content.find('.megaapp-linux-default').text(linuxsync[i].name);
         $content.find('.nav-buttons-bl a.linux').removeClass('download disabled');
-        $content.find('.megaapp-button-info.linux-txt').removeClass('disabled');
         var platform = '64';
         var c = $('.linux32').parent().attr('class');
         if (c && c.indexOf('radioOn') > -1) {
@@ -149,6 +148,14 @@ function changeLinux(linuxsync, i) {
         var filename = syncurl.split('/').pop();
         $content.find('.nav-buttons-bl a.linux').addClass('download')
             .attr('data-link', syncurl);
+
+        var $nautiluslink = $content.find('.megaapp-button-info.linux-txt');
+        if (nautilusurl === "https://mega.nz/MEGAsyncSetup.exe") {
+            nautilusurl = null;
+            $nautiluslink.addClass('disabled');
+        } else {
+            $nautiluslink.removeClass('disabled');
+        }
         $content.find('.megaapp-button-info.linux-txt a').attr('href', nautilusurl);
         syncsel = i;
     }

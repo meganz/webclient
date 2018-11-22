@@ -303,12 +303,17 @@ RtcModule.prototype.updatePeerAvState = function(parsedCallData) {
     var userid = parsedCallData.fromUser;
     var clientid = parsedCallData.fromClient;
     var av = parsedCallData.av;
-    var peerId = userid + clientid;
+    var peerid = userid + clientid;
     var roomCallState = this.offCallStates[chatid];
     if (!roomCallState) {
         roomCallState = this.offCallStates[chatid] = { callId: parsedCallData.callid, peerAv: {} };
     }
-    roomCallState.peerAv[peerId] = av;
+    var peerAvs = roomCallState.peerAv;
+    var oldAv = peerAvs[peerid];
+    if (av === oldAv) {
+        return;
+    }
+    peerAvs[peerid] = av;
     this._fire('onClientAvChange', chatid, userid, clientid, av);
 };
 
@@ -1146,11 +1151,23 @@ Call.prototype._bcastCallData = function(type, uiTermCode) {
         + Chatd.pack16le(payload.length)
         + payload;
 
+    // We don't get our CALLDATA echoed back from chatd, same as with RTCMD broadcast
+    self.updateOwnPeerAvState();
     if (!self.shard.cmd(Chatd.Opcode.CALLDATA, cmd)) {
         setTimeout(function() { self._destroy(Term.kErrNetSignalling, true); }, 0);
         return false;
     }
     return true;
+};
+
+Call.prototype.updateOwnPeerAvState = function() {
+    this.manager.updatePeerAvState({
+        chatid: this.chatid,
+        fromUser: this.manager.chatd.userId,
+        fromClient: this.shard.clientId,
+        av: this.localAv(),
+        callid: this.id
+    });
 };
 
 Call.prototype.msgSession = function(packet) {
@@ -1400,13 +1417,15 @@ Call.prototype._broadcastCallReq = function() {
     if (!self._bcastCallData(CallDataType.kRinging)) {
         return;
     }
-    self.isRingingOut = true;
+    if (self.isGroup) {
+        self.isRingingOutToGroup = true;
+    }
     self._setState(CallState.kReqSent);
     self._startIncallPingTimer();
     assert(!self._callOutTimer);
 
     self._callOutTimer = setTimeout(function() {
-        self.isRingingOut = false;
+        self.isRingingOutToGroup = false;
         if (self.state === CallState.kReqSent) { // nobody answered, abort call request
             self.logger.log("Answer timeout, cancelling call request");
             self._destroy(Term.kAnswerTimeout, true); // TODO: differentiate whether peer has sent us RINGING or not
@@ -1578,8 +1597,7 @@ Call.prototype._startOrJoin = function(av) {
         self._destroy(Term.kErrLocalMedia, true, err);
     });
     pms.then(function() {
-        self.manager._fire('onClientAvChange', self.chatid, self.manager.chatd.userId,
-            self.shard.clientId, self.localAv());
+        self.updateOwnPeerAvState();
         if (self.isJoiner) {
             self._join();
         } else {
@@ -1745,7 +1763,7 @@ Call.prototype._notifySessionConnected = function(sess) {
     this.hasConnectedSession = true;
     // In group calls, we want to keep ringing for some time, so we send a special
     // version of kSession that doesn't suppress ringing.
-    this._bcastCallData(this.isRingingOut
+    this._bcastCallData(this.isRingingOutToGroup
         ? CallDataType.kSessionKeepRinging
         : CallDataType.kSession);
 

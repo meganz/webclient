@@ -132,6 +132,7 @@ var versiondialogid;
                     $('.fm-versioning').addClass('hidden');
                     current_sel_version = false;
                     versiondialogid = undefined;
+                    $(document).off('keydown.fileversioningKeydown');
                 }
                 else {
                     fileversioning.updateFileVersioningDialog();
@@ -540,9 +541,7 @@ var versiondialogid;
             });
 
             $('.fm-versioning .header .button.close').rebind('click', function() {
-                pd.addClass('hidden');
-                current_sel_version = false;
-                $(document).off('keydown.fileversioningKeydown');
+                fileversioning.closeFileVersioningDialog(window.versiondialogid);
             });
 
             fileversioning.getAllVersions(fh).done(

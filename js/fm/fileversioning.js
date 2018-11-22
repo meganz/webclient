@@ -629,7 +629,7 @@ var versiondialogid;
             $(document).rebind('keydown.fileversioningKeydown', function(e) {
                 if (e.keyCode === 8) { // Backspace
                     e.stopPropagation();
-                    fileversioning.closeFileVersioningDialog($.selected[0]);
+                    fileversioning.closeFileVersioningDialog(window.versiondialogid);
                 }
             });
             $('.fm-versioning .header .button.settings').rebind('click', function() {

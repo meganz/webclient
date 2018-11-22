@@ -506,7 +506,7 @@
     "1282": "Detalles del due\u00f1o de los derechos de autor",
     "1283": "A\u00f1adir otro enlace",
     "1284": "Nombre del propietario de los derechos de autor",
-    "1285": "Si se aplica",
+    "1285": "si procede",
     "1286": "Nombre del agente autorizado por los propietarios del copyright que env\u00eda el aviso:",
     "1287": "Notificaci\u00f3n Recibida",
     "1288": "Vamos a revisar y procesar tu notificaci\u00f3n.",
@@ -2679,11 +2679,11 @@
     "19856": "Interact\u00faa con MEGA",
     "19857": "Haz doble clic para acceder a un archivo o abrir una carpeta. [BR] Haz clic derecho para ver todas las opciones disponibles.",
     "19943": "Kosovo",
-    "19964": "[[%s]] is calling...",
-    "19965": "Call ended.",
-    "19966": "Call failed.",
-    "19967": "Group call ended",
-    "19968": "Group call by [[%s]] was handled on some other device",
-    "19969": "Group call canceled",
-    "19970": "Group call started"
+    "19964": "[[%s]] est\u00e1 llamando ...",
+    "19965": "Llamada terminada.",
+    "19966": "Llamada fallida.",
+    "19967": "Llamada de grupo finalizada",
+    "19968": "La llamada de grupo de [[%s]] se est\u00e1 efectuando en otro dispositivo",
+    "19969": "Llamada de grupo cancelada",
+    "19970": "Llamada de grupo iniciada"
 }

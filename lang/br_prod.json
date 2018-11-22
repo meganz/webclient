@@ -1343,7 +1343,7 @@
     "9038": "Colar o link do arquivo",
     "9039": "Links de pastas ainda n\u00e3o s\u00e3o suportados",
     "9048": "A chave digitada \u00e9 inv\u00e1lida. Por favor, verifique que a chave est\u00e1 correta ou solicite novamente ao criador do link.",
-    "9056": "Please do not enter any MEGA URL into the Copyrighted work field, if you need to add more URLs please click on Add another URL.",
+    "9056": "N\u00e3o digite nenhuma URL do MEGA no campo \"Obra cujos direitos autorais teriam sido infringidos\". Se voc\u00ea quiser adicionar mais URLs, clique em \"Adicionar outro link\".",
     "9061": "Criptografar",
     "9062": "Mostrar as op\u00e7\u00f5es PRO",
     "9063": "Estabelecer uma senha de acesso",
@@ -2679,11 +2679,11 @@
     "19856": "Interaja com o MEGA",
     "19857": "Clique duas vezes para acessar um arquivo ou abrir uma pasta. [BR] Clique com o bot\u00e3o direito para ver todas as op\u00e7\u00f5es dispon\u00edveis.",
     "19943": "Kosovo",
-    "19964": "[[%s]] is calling...",
-    "19965": "Call ended.",
-    "19966": "Call failed.",
-    "19967": "Group call ended",
-    "19968": "Group call by [[%s]] was handled on some other device",
-    "19969": "Group call canceled",
-    "19970": "Group call started"
+    "19964": "[[%s]] est\u00e1 chamando...",
+    "19965": "Chamada finalizada",
+    "19966": "N\u00e3o foi poss\u00edvel fazer a chamada.",
+    "19967": "Chamada em grupo finalizada",
+    "19968": "Chamada em grupo de [[%s]] foi gerenciada em outro dispositivo",
+    "19969": "Chamada em grupo cancelada",
+    "19970": "Chamada em grupo iniciada"
 }

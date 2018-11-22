@@ -2678,12 +2678,12 @@
     "19855": "\ube44\ubc00\ubc88\ud638\uc758 \uc2dc\uc791 \ub610\ub294 \ub05d\ubd80\ubd84\uc758 \uacf5\ub780\uc740 \ud5c8\uc6a9\ub418\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4.",
     "19856": "MEGA\uc640 \uc0c1\ud638 \uc791\uc6a9",
     "19857": "\ud30c\uc77c\uc5d0 \uc811\uadfc\ud558\uac70\ub098 \ud3f4\ub354\ub97c \uc5f4\ub824\uba74 \ub354\ube14 \ud074\ub9ad\ud558\uc138\uc694[BR]\uc774\uc6a9 \uac00\ub2a5\ud55c \ubaa8\ub4e0 \uc635\uc158\uc744 \ubcf4\ub824\uba74 \uc624\ub978\ucabd \ud074\ub9ad\ud558\uc138\uc694.",
-    "19943": "Kosovo",
-    "19964": "[[%s]] is calling...",
-    "19965": "Call ended.",
-    "19966": "Call failed.",
-    "19967": "Group call ended",
-    "19968": "Group call by [[%s]] was handled on some other device",
-    "19969": "Group call canceled",
-    "19970": "Group call started"
+    "19943": "\ucf54\uc18c\ubcf4",
+    "19964": "[[%s]]\ub2d8\uc774 \ud1b5\ud654 \uc2dc\ub3c4\uc911...",
+    "19965": "\ud1b5\ud654 \uc885\ub8cc\ub428.",
+    "19966": "\ud1b5\ud654 \uc2e4\ud328\ud568.",
+    "19967": "\uadf8\ub8f9 \ud1b5\ud654 \uc885\ub8cc\ub428",
+    "19968": "[[%s]]\ub2d8\uc758 \uadf8\ub8f9 \ud1b5\ud654\uac00 \ub2e4\ub978 \uae30\uae30\uc5d0\uc11c \ucc98\ub9ac\ub418\uc5c8\uc2b5\ub2c8\ub2e4",
+    "19969": "\uadf8\ub8f9 \ud1b5\ud654 \ucde8\uc18c\ub428",
+    "19970": "\uadf8\ub8f9 \ud1b5\ud654 \uc2dc\uc791\ub428"
 }

@@ -2679,11 +2679,11 @@
     "19856": "Interagisci con MEGA",
     "19857": "Fai doppio clic per accedere ad un file o aprire una cartella. [BR]Fai clic con il tasto destro per vedere tutte le opzioni disponibili.",
     "19943": "Kosovo",
-    "19964": "[[%s]] is calling...",
-    "19965": "Call ended.",
-    "19966": "Call failed.",
-    "19967": "Group call ended",
-    "19968": "Group call by [[%s]] was handled on some other device",
-    "19969": "Group call canceled",
-    "19970": "Group call started"
+    "19964": "[[%s]] sta chiamando...",
+    "19965": "Chiamata terminata.",
+    "19966": "Chiamata fallita.",
+    "19967": "Chiamata di gruppo terminata",
+    "19968": "La chiamata di gruppo iniziata da [[%s]] \u00e8 stata gestita da qualche altro dispositivo",
+    "19969": "Chiamata di gruppo annullata",
+    "19970": "Chiamata di gruppo iniziata"
 }

@@ -2678,12 +2678,12 @@
     "19855": "\u015eifrenin ba\u015f\u0131ndaki veya sonundaki bo\u015fluklara izin verilmez.",
     "19856": "MEGA ile etkile\u015fin",
     "19857": "Dosyaya eri\u015fmek veya klas\u00f6r a\u00e7mak i\u00e7in iki kez t\u0131klay\u0131n. [BR]T\u00fcm se\u00e7enekleri g\u00f6rmek i\u00e7in sa\u011f t\u0131klay\u0131n.",
-    "19943": "Kosovo",
-    "19964": "[[%s]] is calling...",
-    "19965": "Call ended.",
-    "19966": "Call failed.",
-    "19967": "Group call ended",
-    "19968": "Group call by [[%s]] was handled on some other device",
-    "19969": "Group call canceled",
-    "19970": "Group call started"
+    "19943": "Kosova",
+    "19964": "[[%s]] ar\u0131yor...",
+    "19965": "Arama sonland\u0131.",
+    "19966": "Arama ba\u015far\u0131s\u0131z.",
+    "19967": "Toplu arama sonland\u0131r\u0131ld\u0131",
+    "19968": "[[%s]] taraf\u0131ndan olu\u015fturulan toplu arama farkl\u0131 bir cihazdan y\u00fcr\u00fct\u00fclmekte",
+    "19969": "Toplu arama iptal edildi",
+    "19970": "Toplu arama ba\u015flad\u0131"
 }

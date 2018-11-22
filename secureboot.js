@@ -2784,6 +2784,7 @@ else if (!b_u) {
                     }
                 });
             }
+            mega.ipcc = (String(document.cookie).match(/geoip\s*=\s*([A-Z]{2})/) || [])[1];
         });
 
         if (!maintenance && !androidsplash && !is_karma) {

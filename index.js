@@ -2534,6 +2534,9 @@ function loadSubPage(tpage, event) {
     }
 
     if (hashLogic || isPublicLink(page)) {
+        if ((tpage === page) && folderlink) {
+            folderlink = false;
+        }
         document.location.hash = '#' + page;
     }
     else if (!event || event.type !== 'popstate') {

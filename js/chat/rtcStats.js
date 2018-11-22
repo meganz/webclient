@@ -1,8 +1,17 @@
+// jscs: disable validateIndentation
+// jshint -W116
+// jshint -W089
+// jshint -W074
+// jshint -W004
+
 mBroadcaster.once('startMega', function() {
 if (!window.RTC || !window.RTCPeerConnection || !RTCPeerConnection.prototype.getStats
-        || (RTC.browser !== 'chrome' && RTC.browser !== 'opera')) {
+    || (RTC.browser !== 'chrome' && RTC.browser !== 'opera' && RTC.browser !== 'firefox')) {
     return;
 }
+
+var STATFLAG_SEND_CPU_LIMITED_RESOLUTION = 4;
+var STATFLAG_SEND_BANDWIDTH_LIMITED_RESOLUTION = 8;
 
 function prettyNum(v) {
     if (v > 1048576) {
@@ -22,7 +31,8 @@ function mergeObjects(dest, src) {
 }
 
 function addStatToArrays(arrs, s) {
-    // This metod does not do hasOwnProperty() checks, and assumes the objects are simple non-native non-inherited js objects
+    // This method does not do hasOwnProperty() checks, and assumes the objects are simple
+    // non-native non-inherited js objects
     for (var k in arrs) {
         var p = arrs[k];
         var v = s[k];
@@ -40,63 +50,71 @@ function addStatToArrays(arrs, s) {
 function createStatItem(v) {
     return {
         ts: v(),
-        c: {
+        lq: v(),
+        f: v(),
+        v: {
             rtt: v(),
             s: {
                 abps: v(),
-                bt: v(),
-                bps: v()
-            },
-            r: {
-                abps: v(),
-                bt: v(),
-                bps: v()
-            }
-        },
-        v: {
-            s: {
-                abps: v(),
-                gabps: v(),
                 bps: v(),
                 bt: v(),
-                rtt: v(),
                 fps: v(),
                 cfps: v(),
-                cjtr: v(),
                 width: v(),
                 height: v(),
   //            et: v(),
                 el: v(),
-                lcpu: v(),
-                lbw: v(),
                 bwav: v(),
                 gbps: v()
             },
             r: {
                 abps: v(),
                 bps: v(),
-                pl: v(),
                 bt: v(),
+                pl: v(),
+                jtr: v(),
                 fps: v(),
                 dly: v(),
-                jtr: v(),
                 width: v(),
-                height: v()
+                height: v(),
+                firtx: v(),
+                plitx: v(),
+                nacktx: v()
             },
         },
         a: {
             rtt: v(),
-            pl: v(),
-            jtr: v()
+            s: {
+                abps: v(),
+                bt: v(),
+                bps: v()
+            },
+            r: {
+                abps: v(),
+                bt: v(),
+                bps: v(),
+                pl: v(),
+                jtr: v(),
+                dly: v(),
+                al: v()
+            }
         }
     }
 }
 
-function calcBwAverage(s, period, totBytes, totName, bpsName, avgBpsName) {
-	var perBytes = totBytes - s[totName];
-    s[totName] = totBytes;
-    var bps = s[bpsName] = (perBytes/128) / period; //from bytes/s to kbits/s
-    s[avgBpsName] = (s[avgBpsName]*4+bps)/5;
+function calcBwAverage(s, period, totBytes) {
+	var perBytes = totBytes - s.bt;
+    s.bt = totBytes;
+    var kbps = (perBytes / 128) / period; // from bytes/s to kbits/s
+    if (isNaN(kbps)) {
+        kbps = 0;
+    }
+    s.bps = Math.round(kbps * 10) / 10;
+    var akbps = s.abps;
+    if (isNaN(akbps)) {
+        akbps = 0;
+    }
+    s.abps = Math.round(((akbps * 4 + kbps) / 5) * 10) / 10;
 }
 
 function statItemToString(s, name, nest) {
@@ -138,32 +156,56 @@ function statItemToString(s, name, nest) {
 	return ret;
 }
 
-function Recorder(rtcConn, scanPeriod, maxSamplePeriod, handler) {
-    this._rtcConn = rtcConn;
-    this.samples = createStatItem(function() {return []});
-    this.lastSampleIdx = -1;
-    this._stats = createStatItem(function() {return 0;});
-    this._commonStats = {};
-    this._maxSamplePeriod = maxSamplePeriod*1000;
-    this._scanPeriod = scanPeriod*1000;
-    this._handler = handler;
+function Recorder(rtcConn, maxSamplePeriod, handler) {
+    var self = this;
+    self._rtcConn = rtcConn;
+    self._localStream = rtcConn.getLocalStreams()[0]; // need it to determine what we send - audio and/or video
+    //  Note that we may not have a local stream if usermedia access was denied
+    //  or there is no cam and mic
+    self.samples = createStatItem(function() { return []; });
+    self.lastSampleIdx = -1;
+    self._lastSampleTs = Date.now();
+    self._stats = createStatItem(function() {return 0;});
+    self._commonStats = {};
+    self._maxSamplePeriod = maxSamplePeriod * 1000;
+    self._handler = handler;
+
+    if (RTC.isFirefox) {
+        var recvs = rtcConn.getReceivers();
+        for (var i = 0; i < recvs.length; i++) {
+            var rx = recvs[i];
+            if (rx.track.kind === "audio") {
+                self._audioRtpContribSrc = rx.getContributingSources()[0];
+            }
+        }
+    }
 }
 
-Recorder.prototype.start = function() {
+Recorder.prototype.pollStats = function() {
     var self = this;
-    self._timer = setInterval(function() {
-        var pc = self._rtcConn;
-        if (!pc || (pc.state === 'ended'))
-            return;
-    	pc.getStats(
-          self.onStats.bind(self),
-          pc.getRemoteStreams()
+    if (self._waitingForStats) {
+        // If pollStats is called before the stats from the previous call are ready,
+        // ignore the second call
+        return;
+    }
+    if (!self._tsStart) {
+        self._tsStart = Date.now();
+    }
+    var pc = self._rtcConn;
+    if (!pc || (pc.state === 'ended')) {
+        return;
+    }
+    self._waitingForStats = true;
+    if (RTC.isChrome) {
+        pc.getStats(
+            self.onStats.bind(self),
+            pc.getRemoteStreams()
         );
-     }, self._scanPeriod);
-    //we artificially create the first sample with zero values, and assume its
-    //time is right now. The first real sample will be taken after one timer
-    //interval, so the period for the first real sample will be one scanPeriod
-    self._lastSampleTs = Date.now();
+    } else if (RTC.isFirefox) {
+        pc.getStats(null, self.onStats.bind(self));
+    } else {
+        assert(false, "Unsupported browser for webrtc stats");
+    }
 }
 
 function cloneObject(obj) {
@@ -193,25 +235,38 @@ Recorder.prototype.boolStat = function(stat, name) {
     } else {
         return val ? 1 : 0;
     }
-}
+};
 
 Recorder.prototype.onStats = function(rtcStats) {
+  // console.log("stats:", rtcStats);
   try {
     var self = this;
-	var results = rtcStats.result();
     var now = Date.now();
+    delete self._waitingForStats;
     var stats = self._stats;
     stats._hadConnItem = false;
     var samples = self.samples;
     var period = (now - self._lastSampleTs) / 1000;
     self._lastSampleTs = now;
+    var astat = stats.a;
+    var astatr = astat.r;
+    var vstat = stats.v;
+    var vstatr = vstat.r;
+    stats.f = Av.fromStream(self._localStream);
 
-    results.forEach(self.parseStat.bind(self, period));
-    if (!self._tsStart) { //not started recording yet - there was no activity
-        if (stats.c.r || stats.c.s) {
-            self._tsStart = now;
-        } else {
-            return; //no stream yet
+    if (RTC.isChrome) {
+        rtcStats.result().forEach(self.parseChromeStat.bind(self, period));
+    } else if (RTC.isFirefox) {
+        var asrc = self._audioRtpContribSrc;
+        if (asrc) {
+            var level = asrc.audioLevel;
+            if (level != null) {
+                stats.peerAudioLevel = Math.round(level * 100);
+            }
+        }
+        for (var k in rtcStats) {
+            var s = rtcStats[k];
+            self.parseFirefoxStat(period, rtcStats, s);
         }
     }
     stats.ts = now - self._tsStart;
@@ -221,49 +276,84 @@ Recorder.prototype.onStats = function(rtcStats) {
 
     var vs = samples.v;
     var as = samples.a;
-    var astat = stats.a;
-    var vstat = stats.v;
     var addSample = false;
 
     if (isFirstSample) {
         addSample = true;
     } else {
-        var d = {};
-        d.dly = (vs.r.dly[lastSampleIdx] - vstat.r.dly);
-        if (d.dly < 0)
-            d.dly = -d.dly;
-        d.vrtt = (vs.s.rtt[lastSampleIdx] - vstat.s.rtt);
-        if (d.vrtt < 0)
-            d.vrtt = -d.vrtt;
-        d.auRtt = as.rtt[lastSampleIdx] - astat.rtt;
-        if (d.auRtt < 0)
-            d.auRtt = -d.auRtt;
-        d.auJtr = as.jtr[lastSampleIdx] - astat.jtr;
-        if (d.auJtr < 0)
-            d.auJtr = -d.auJtr;
-        d.ts = stats.ts-samples.ts[lastSampleIdx];
-        d.apl = as.pl[lastSampleIdx] - astat.pl;
+        var shouldAddSample = function() {
+            if (stats.ts - samples.ts[lastSampleIdx] >= self._maxSamplePeriod) {
+                return true;
+            }
+            var mask = Av.Mask;
+            if ((stats.f & mask) !== (samples.f[lastSampleIdx] & mask)) {
+                return true;
+            }
+            if (vstatr.dly != null) {
+                var ddly = Math.abs(vstatr.dly - vs.r.dly[lastSampleIdx]);
+                if (ddly >= 100) {
+                    return true;
+                }
+            }
 
-        addSample = ((d.ts >= self._maxSamplePeriod)
-          || (vstat.r.width !== vs.r.width[lastSampleIdx]) || (vstat.s.width !== vs.s.width[lastSampleIdx])
-          || (d.dly > 100) || (d.auRtt > 100) || (d.apl > 0) || (d.vrtt > 150) || (d.auJtr > 40));
+            if (vstat.rtt != null) {
+                var dvrtt = Math.abs(vstat.rtt - vs.rtt[lastSampleIdx]);
+                if (dvrtt >= 50) {
+                    return true;
+                }
+            }
+
+            if (astat.rtt != null) {
+                var dartt = Math.abs(astat.rtt - as.rtt[lastSampleIdx]);
+                if (dartt >= 50) {
+                    return true;
+                }
+            }
+            if (astatr.jtr != null) {
+                var dajtr = Math.abs(astatr.jtr - as.r.jtr[lastSampleIdx]);
+                if (dajtr >= 40) {
+                    return true;
+                }
+            }
+            if (astatr.pl != null) {
+                var pl = stats.d_apl = astatr.pl - as.r.pl[lastSampleIdx];
+                if (pl) {
+                    return true;
+                }
+            }
+
+            if ((vstatr.width != null) && (vstatr.width !== vs.r.width[lastSampleIdx])) {
+                return true;
+            }
+
+            if ((vstat.s.width != null) && (vstat.s.width !== vs.s.width[lastSampleIdx])) {
+                return true;
+            }
+            return false;
+        };
+        addSample = shouldAddSample();
     }
+
     if (addSample) {
-        self.addStat();
-        if (self._handler) {
-            if (isFirstSample)
-                self._handler.onCommonInfo(self._commonStats);
-            self._handler.onSample(stats);
+        if (isFirstSample) {
+            self._handler.onStatCommonInfo(self._commonStats);
         }
+        stats.lq = self._handler.onStatSample(stats, true);
+        astatr.al = (stats.peerAudioLevel >= 10) ? 1 : 0;
+        self.addStat();
+    } else {
+        self._handler.onStatSample(stats, false);
     }
+//  console.log(stats);
   } catch(e) {
       console.error('exception in onStats:', e, e.stack);
   }
 }
 
-Recorder.prototype.parseStat = function(period, res) {
+/* jshint -W004 */
+Recorder.prototype.parseChromeStat = function(period, item) {
     function stat(name, avg) {
-        var val = res.stat(name);
+        var val = item.stat(name);
         if (typeof val === 'string')
             val = parseInt(val);
         if (avg === undefined)
@@ -275,77 +365,175 @@ Recorder.prototype.parseStat = function(period, res) {
     var stats = self._stats;
     var commonStats = self._commonStats;
     var vstat = stats.v;
-    if (res.type === 'ssrc') {
+    var astat = stats.a;
+    if (item.type === 'ssrc') {
         var width;
         if ((width = stat('googFrameWidthReceived'))) {
+            // Video RX
             var r = vstat.r;
-            calcBwAverage(r, period, stat('bytesReceived'), 'bt', 'bps', 'abps');
-            r.fps = stat('googFrameRateReceived', r.fps);
-            r.dly = stat('googCurrentDelayMs', r.dly);
-            r.jtr = stat('googJitterBufferMs', r.jtr);
-//          s['delay+rtt'] = s.dly+stats.c.rtt;
+            calcBwAverage(r, period, stat('bytesReceived'));
+            r.fps = stat('googFrameRateReceived');
+            r.dly = stat('googCurrentDelayMs');
+            r.jtr = stat('googJitterBufferMs');
             r.pl = stat('packetsLost');
-//			vstat.fpsSent = res.stat('googFrameRateOutput'); -- this should be for screen output
+            // vstat.fpsSent = item.stat('googFrameRateOutput'); -- this should be for screen output
             r.width = width;
             r.height = stat('googFrameHeightReceived');
-
-//			res.names().forEach(function(name)
-//			{ console.log('name=', name, 'value=', res.stat(name)); });
+            r.nacktx = stat('googNacksSent');
+            r.plitx = stat('googPlisSent');
+            r.firtx = stat('googFirsSent');
         } else if ((width = stat('googFrameWidthSent'))) {
+            // Video TX
             var s = vstat.s;
-            s.rtt = stat('googRtt', s.rtt);
-            s.fps = stat('googFrameRateSent', s.fps);
-            s.cfps = stat('googFrameRateInput', s.cfps);
-            s.cjtr = stat('googCaptureJitterMs', s.cjtr);
+            vstat.rtt = stat('googRtt');
+            s.fps = stat('googFrameRateSent');
+            s.cfps = stat('googFrameRateInput');
             s.width = width;
             s.height = stat('googFrameHeightSent');
             if (!commonStats.vcodec) {
-                commonStats.vcodec = res.stat('googCodecName');
+                commonStats.vcodec = item.stat('googCodecName');
             }
-//            s.et = stat('googAvgEncodeMs');
-            s.el = stat('googEncodeUsagePercent', s.el); //(s.et*s.fps)/10; // (encTime*fps/1000ms)*100%
-            s.lcpu = self.boolStat(res, 'googCpuLimitedResolution');
-            s.lbw = self.boolStat(res, 'googBandwidthLimitedResolution');
-			calcBwAverage(s, period, stat('bytesSent'), 'bt', 'bps', 'abps');
-//			res.names().forEach(function(name)
-//			{ console.log('name=', name, 'value=', res.stat(name)); });
-        } else if (res.stat('audioInputLevel')) {
-            var a = stats.a;
-            a.rtt = stat('googRtt', a.rtt);
-        } else if (res.stat('audioOutputLevel')) {
-            var a = stats.a;
-            a.jtr = stat('googJitterReceived', a.jtr);
-            a.pl = stat('packetsLost');
+         // s.et = stat('googAvgEncodeMs');
+            s.el = stat('googEncodeUsagePercent'); // (s.et*s.fps)/10; // (encTime*fps/1000ms)*100%
+            if (self.boolStat(item, 'googCpuLimitedResolution')) {
+                stats.f |= STATFLAG_SEND_CPU_LIMITED_RESOLUTION;
+            }
+            if (self.boolStat(item, 'googBandwidthLimitedResolution')) {
+                stats.f |= STATFLAG_SEND_BANDWIDTH_LIMITED_RESOLUTION;
+            }
+			calcBwAverage(s, period, stat('bytesSent'));
+        } else if (item.stat('audioInputLevel')) {
+            // Audio TX
+            var s = astat.s;
+            astat.rtt = stat('googRtt');
+            calcBwAverage(s, period, stat('bytesSent'));
+            // Firefox doesn't support local audio level, so we can't use it for the audio level API
+            s.al = parseInt(item.stat('audioInputLevel'));
+        } else if (item.stat('audioOutputLevel')) {
+            // Audio RX
+            var r = astat.r;
+            calcBwAverage(r, period, stat('bytesReceived'));
+            stats.peerAudioLevel = Math.round(stat('audioOutputLevel') / 327.67);
+            r.jtr = stat('googJitterReceived');
+            r.pl = stat('packetsLost');
+            r.dly = stat('googCurrentDelayMs');
         }
-    } else if ((res.type === 'googCandidatePair') && (res.stat('googActiveConnection') === 'true')) {
+    } else if ((item.type === 'googCandidatePair') && (item.stat('googActiveConnection') === 'true')) {
         if (stats._hadConnItem) { //happens if peer is Firefox
-                return;
+            return;
         }
 
         stats._hadConnItem = true;
-        if (commonStats.rly === undefined) {
-            commonStats.rly = (res.stat('googLocalCandidateType') === 'relay')?1:0;
-            if (commonStats.rly) {
-                commonStats.rlySvr = res.stat('googLocalAddress');
+        if (commonStats.rly == null) {
+            if (item.stat('googLocalCandidateType') === 'relay') {
+                commonStats.rly = 1;
+                commonStats.rlySvr = item.stat('googLocalAddress');
+            } else {
+                commonStats.rly = 0;
             }
         }
-//      if (!commonStats.remoteConn)
-//          commonStats.remoteConn = res.stat('googRemoteCandidateType');
-        var c = stats.c;
-        c.rtt = stat('googRtt', c.rtt);
-        if (!commonStats.proto) {
-                commonStats.proto = res.stat('googTransportType');
+        if (commonStats.rrly == null) {
+            if (item.stat('googRemoteCandidateType') == 'relay') {
+                commonStats.rrly = 1;
+                commonStats.rrlySvr = item.stat('googRemoteAddress');
+            } else {
+                commonStats.rrly = 0;
+            }
         }
-        calcBwAverage(c.r, period, stat('bytesReceived'), 'bt', 'bps', 'abps');
-        calcBwAverage(c.s, period, stat('bytesSent'), 'bt', 'bps', 'abps');
-    } else if (res.type == 'VideoBwe') {
-        vstat.r.bwav = Math.round(stat('googAvailableReceiveBandwidth')/1024);
+        if (!commonStats.proto) {
+                commonStats.proto = item.stat('googTransportType');
+        }
+        /*
+        var c = stats.c;
+        calcBwAverage(c.r, period, stat('bytesReceived'));
+        calcBwAverage(c.s, period, stat('bytesSent'));
+        */
+    } else if (item.type == 'VideoBwe') {
+        vstat.r.bwav = Math.round(stat('googAvailableReceiveBandwidth') / 1024);
         var s = vstat.s;
-        s.bwav = Math.round(stat('googAvailableSendBandwidth')/1024);
-        s.gbps = stat('googTransmitBitrate')/1024; //chrome returns it in bits/s, should be near our calculated bps
-        s.gabps = (s.gabps*4+s.gbps)/5;
+        s.bwav = Math.round(stat('googAvailableSendBandwidth') / 1024);
+        // Chrome returns it in bits/s, should be near our calculated bps
+        s.gbps = Math.round((stat('googTransmitBitrate') / 1024) * 10) / 10;
     }
 };
+// jshint +W004
+
+Recorder.prototype.parseFirefoxStat = function(period, allStats, item) {
+    var self = this;
+    var stats = self._stats;
+    var commonStats = self._commonStats;
+    if (item.type === 'candidatepair' && item.selected) {
+        /*
+        var c = stats.c;
+        calcBwAverage(c.r, period, item.bytesReceived);
+        calcBwAverage(c.s, period, item.bytesSent);
+        */
+        if (stats._hadConnItem) {
+            return;
+        }
+        stats._hadConnItem = true;
+        var cand = allStats.get([item.localCandidateId]);
+        assert(cand);
+        commonStats.rly = (cand.candidateType === 'relayed') ? 1 : 0;
+        if (commonStats.rly) {
+            commonStats.rlySvr = cand.ipAddress + ':' + cand.portNumber;
+        }
+        commonStats.proto = cand.transport;
+
+    } else if (item.ssrc) {
+        if (item.mediaType === 'audio') {
+            var a = stats.a;
+            if (!item.isRemote) {
+                if (item.type === 'outboundrtp') {
+                    calcBwAverage(a.s, period, item.bytesSent);
+                } else if (item.type === 'inboundrtp') {
+                    calcBwAverage(a.r, period, item.bytesReceived);
+                    a.r.jtr = Math.round(item.jitter * 1000);
+                    a.r.pl = item.packetsLost;
+                }
+            } else { // remote stat
+                if (item.roundTripTime != null) {
+                    if (item.type !== 'inboundrtp') {
+                        return;
+                    }
+                    a.rtt = item.roundTripTime;
+                }
+            }
+        } else if (item.mediaType === 'video') {
+            var v = stats.v;
+            if (!item.isRemote) {
+                var x;
+                var bt;
+                if (item.type === 'outboundrtp') {
+                    x = v.s;
+                    bt = item.bytesSent;
+                } else {
+                    if (item.type !== 'inboundrtp') {
+                        return;
+                    }
+                    x = v.r;
+                    bt = item.bytesReceived;
+                    x.jtr = Math.round(item.jitter * 1000);
+                    x.firtx = item.firCount;
+                    x.nacktx = item.nackCount;
+                    x.plitx = item.pliCount;
+                }
+                calcBwAverage(x, period, bt);
+                x.fps = Math.round(item.framerateMean * 10) / 10;
+            } else { // remote stat
+                var rtt = item.roundTripTime;
+                if (rtt != null) {
+                    assert(item.type === 'inboundrtp');
+                    v.rtt = rtt;
+                }
+            }
+        } else {
+            // console.debug("Unexpected ssrc stat media type" + item.mediaType);
+            return;
+        }
+    }
+};
+/* jshint +W004 */
 
 Recorder.prototype.stop = function() {
     if (!this._timer) {
@@ -353,15 +541,15 @@ Recorder.prototype.stop = function() {
     }
     clearInterval(this._timer);
     delete this._timer;
-}
+};
 
-Recorder.prototype.getStats = function(cid) {
+Recorder.prototype.getStats = function(cid, sid) {
     this.stop();
     var stats = {
         cid: cid,
+        sid: sid,
         ts: Math.round(this._tsStart/1000),
         dur: Math.ceil((Date.now()-this._tsStart)/1000),
-        sper: this._scanPeriod,
         samples: this.samples,
         bws: RTC.getBrowserVersion()
     }
@@ -373,7 +561,11 @@ Recorder.prototype.getStats = function(cid) {
             stats[k] = cmn[k];
 
     return stats;
-}
+};
+
+Recorder.prototype.getStartTime = function() {
+    return this._tsStart;
+};
 
 Recorder.prototype.isRelay = function() {
     return this._commonStats.rly;

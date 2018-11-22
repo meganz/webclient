@@ -1098,108 +1098,7 @@ accountUI.renderAccountPage = function(account) {
         }
     });
 
-    $('.vouchercreate').rebind('click..voucherCreateClick', function() {
-        var vouchertype = $('.default-select.vouchertype .default-dropdown-item.active').attr('data-value');
-        var voucheramount = parseInt($('#account-voucheramount').val());
-        var proceed = false;
-        for (i in M.account.prices) {
-            if (M.account.prices[i][0] === vouchertype) {
-                proceed = true;
-            }
-        }
-        if (!proceed) {
-            msgDialog('warninga', l[135], 'Please select the voucher type.');
-            return false;
-        }
-        if (!voucheramount) {
-            msgDialog('warninga', l[135], 'Please enter a valid voucher amount.');
-            return false;
-        }
-        if (vouchertype === '19.99') {
-            vouchertype = '19.991';
-        }
-        loadingDialog.show();
-        api_req({a: 'uavi', d: vouchertype, n: voucheramount, c: 'EUR'},
-            {
-                callback: function() {
-                    M.account.lastupdate = 0;
-                    accountUI();
-                }
-            });
-    });
-
-    if (M.account.reseller) {
-        var email = 'resellers@mega.nz';
-
-        $('.resellerbuy').attr('href', 'mailto:' + email)
-            .find('span').text(l[9106].replace('%1', email));
-
-        // Use 'All' or 'Last 10/100/250' for the dropdown text
-        var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
-
-        $('.account-history-dropdown-button.vouchers').text(buttonText);
-        $('.fm-account-reseller .membership-big-txt.balance').safeHTML('@@ &euro; ', account.balance[0][0]);
-        $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
-        $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));
-        $('.account-history-drop-items.voucher250-').text(l['466a'].replace('[X]', 250));
-
-        // Sort vouchers by most recently created at the top
-        M.account.vouchers.sort(function(a, b) {
-
-            if (a['date'] < b['date']) {
-                return 1;
-            }
-            else {
-                return -1;
-            }
-        });
-
-        $('.grid-table.vouchers tr').remove();
-        $('.fm-account-button.reseller').removeClass('hidden');
-        html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477]
-            + '</th><th>' + l[488] + '</th></tr>';
-
-        $(account.vouchers).each(function(i, el) {
-
-            // Only show the last 10, 100, 250 or if the limit is not set show all vouchers
-            if (($.voucherlimit !== 'all') && (i >= $.voucherlimit)) {
-                return false;
-            }
-
-            var status = l[489];
-            if (el.redeemed > 0 && el.cancelled === 0 && el.revoked === 0) {
-                status = l[490] + ' ' + time2date(el.redeemed);
-            }
-            else if (el.revoked > 0 && el.cancelled > 0) {
-                status = l[491] + ' ' + time2date(el.revoked);
-            }
-            else if (el.cancelled > 0) {
-                status = l[492] + ' ' + time2date(el.cancelled);
-            }
-
-            var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
-
-            html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink
-                + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
-        });
-        $('.grid-table.vouchers').html(html);
-        $('.default-select.vouchertype .default-select-scroll').html('');
-        var prices = [];
-        for (i in M.account.prices) {
-            prices.push(M.account.prices[i][0]);
-        }
-        prices.sort(function(a, b) {
-            return (a - b);
-        });
-
-        var voucheroptions = '';
-        for (i in prices) {
-            voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i])
-                + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
-        }
-        $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
-        bindDropdownEvents($('.default-select.vouchertype'), 0, '.fm-account-reseller');
-    }
+    accountUI.renderReseller(account);
 
     $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function() {
         loadSubPage('resellers');
@@ -1535,6 +1434,115 @@ accountUI.renderAccountPage = function(account) {
     accNotifHandler = undefined;
 };
 /* jshint +W074, +W089 */
+
+accountUI.renderReseller = function(account) {
+
+    'use strict';
+
+    $('.vouchercreate').rebind('click..voucherCreateClick', function() {
+        var vouchertype = $('.default-select.vouchertype .default-dropdown-item.active').attr('data-value');
+        var voucheramount = parseInt($('#account-voucheramount').val());
+        var proceed = false;
+        for (var i in M.account.prices) {
+            if (M.account.prices[i][0] === vouchertype) {
+                proceed = true;
+            }
+        }
+        if (!proceed) {
+            msgDialog('warninga', l[135], 'Please select the voucher type.');
+            return false;
+        }
+        if (!voucheramount) {
+            msgDialog('warninga', l[135], 'Please enter a valid voucher amount.');
+            return false;
+        }
+        if (vouchertype === '19.99') {
+            vouchertype = '19.991';
+        }
+        loadingDialog.show();
+        api_req({a: 'uavi', d: vouchertype, n: voucheramount, c: 'EUR'},
+            {
+                callback: function() {
+                    M.account.lastupdate = 0;
+                    accountUI();
+                }
+            });
+    });
+
+    if (M.account.reseller) {
+        var email = 'resellers@mega.nz';
+
+        $('.resellerbuy').attr('href', 'mailto:' + email)
+            .find('span').text(l[9106].replace('%1', email));
+
+        // Use 'All' or 'Last 10/100/250' for the dropdown text
+        var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
+
+        $('.account-history-dropdown-button.vouchers').text(buttonText);
+        $('.fm-account-reseller .membership-big-txt.balance').safeHTML('@@ &euro; ', account.balance[0][0]);
+        $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
+        $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));
+        $('.account-history-drop-items.voucher250-').text(l['466a'].replace('[X]', 250));
+
+        // Sort vouchers by most recently created at the top
+        M.account.vouchers.sort(function(a, b) {
+
+            if (a['date'] < b['date']) {
+                return 1;
+            }
+            else {
+                return -1;
+            }
+        });
+
+        $('.grid-table.vouchers tr').remove();
+        $('.fm-account-button.reseller').removeClass('hidden');
+        var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477]
+            + '</th><th>' + l[488] + '</th></tr>';
+
+        $(account.vouchers).each(function(i, el) {
+
+            // Only show the last 10, 100, 250 or if the limit is not set show all vouchers
+            if (($.voucherlimit !== 'all') && (i >= $.voucherlimit)) {
+                return false;
+            }
+
+            var status = l[489];
+            if (el.redeemed > 0 && el.cancelled === 0 && el.revoked === 0) {
+                status = l[490] + ' ' + time2date(el.redeemed);
+            }
+            else if (el.revoked > 0 && el.cancelled > 0) {
+                status = l[491] + ' ' + time2date(el.revoked);
+            }
+            else if (el.cancelled > 0) {
+                status = l[492] + ' ' + time2date(el.cancelled);
+            }
+
+            var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
+
+            html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink
+                + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
+        });
+        $('.grid-table.vouchers').html(html);
+        $('.default-select.vouchertype .default-select-scroll').html('');
+        $('.default-select.vouchertype span').text(l[6875]);
+        var prices = [];
+        for (var i = 0; i < M.account.prices.length; i++) {
+            prices.push(M.account.prices[i][0]);
+        }
+        prices.sort(function(a, b) {
+            return (a - b);
+        });
+
+        var voucheroptions = '';
+        for (i = 0; i < prices.length; i++) {
+            voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i])
+                + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
+        }
+        $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
+        bindDropdownEvents($('.default-select.vouchertype'), 0, '.fm-account-reseller');
+    }
+};
 
 accountUI.setRubsched = function() {
 

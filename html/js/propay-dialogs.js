@@ -1440,10 +1440,17 @@ var addressDialog = {
         // Change the class depending on mobile/desktop
         var closeButtonClass = (is_mobile) ? 'fm-dialog-close' : 'btn-close-dialog';
 
+        var mySelf = this;
+
         // Add the click handler to hide the dialog and the black overlay
         this.$dialog.find('.' + closeButtonClass).rebind('click', function() {
 
             addressDialog.closeDialog();
+            // if we are coming from business plan, we need to reset registration
+            if (mySelf.businessPlan && mySelf.userInfo) {
+                var businessReg = new BusinessRegister();
+                businessReg.initPage();
+            }
         });
     },
 

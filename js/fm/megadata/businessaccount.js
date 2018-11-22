@@ -137,16 +137,16 @@ BusinessAccount.prototype.editSubAccount =
         request.lastname = base64urlencode(to8(subLName));
     }
     if (optionals) {
-        if (optionals.position) {
+        if (typeof optionals.position !== 'undefined') {
             request['%position'] = base64urlencode(to8(optionals.position));
         }
-        if (optionals.idnum) {
+        if (typeof optionals.idnum !== 'undefined') {
             request['%idnum'] = base64urlencode(to8(optionals.idnum));
         }
-        if (optionals.phonenum) {
+        if (typeof optionals.phonenum !== 'undefined') {
             request['%phonenum'] = base64urlencode(to8(optionals.phonenum));
         }
-        if (optionals.location) {
+        if (typeof optionals.location !== 'undefined') {
             request['%location'] = base64urlencode(to8(optionals.location));
         }
     }

@@ -33,6 +33,7 @@ BusinessRegister.prototype.initPage = function () {
     var $emailInput = $pageContainer.find('#business-email').val('');
     var $passInput = $pageContainer.find('#business-pass').val('');
     var $rPassInput = $pageContainer.find('#business-rpass').val('');
+    $('.new-registration.suba', $pageContainer).removeClass('good1 good2 good3 good4 good5');
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
     $pageContainer.find('.mega-terms.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
     $pageContainer.find('.ok-to-auto.bus-reg-agreement .bus-reg-checkbox').addClass('checkOn');

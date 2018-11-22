@@ -228,7 +228,6 @@ function dashboardUI() {
             }
 
             if (u_attr.p === 100 && u_attr.b) {
-                timestamp = account.srenew[0];
                 // someone modified the CSS to overwirte the hidden class !!, therefore .hide() will be used
                 $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();
                 var $businessLeft = $('.account.left-pane.info-block.business-users').removeClass('hidden');
@@ -236,6 +235,7 @@ function dashboardUI() {
                     $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
                         .text(l[7666]);
                     if (u_attr.b.m) { // master
+                        timestamp = account.srenew[0];
                         if ((Date.now() / 1000) - timestamp > 0) {
                             $businessLeft.find('.suba-status').addClass('pending').removeClass('disabled active')
                                 .text(l[19609]);

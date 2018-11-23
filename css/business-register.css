@@ -164,8 +164,13 @@
 
 .bus-reg-input input::placeholder {
 	font-size: 13px;
+	text-transform: lowercase;
 }
 
+.bus-reg-input input::placeholder:first-letter {
+	text-transform: uppercase;
+}
+ 
 .bus-reg-input.num input {
 	width: 80%;
 }
@@ -215,6 +220,10 @@
 
 .bus-reg-body .new-registration .register-pass-status-line1, .bus-reg-body .new-registration .register-pass-status-line2, .bus-reg-body .new-registration .register-pass-status-line3, .bus-reg-body .new-registration .register-pass-status-line4, .bus-reg-body .new-registration .register-pass-status-line5 {
 	width: 76px;
+}
+
+.bus-reg-body .password-stutus-txt {
+	margin-top: 8px;
 }
 
 .bus-reg-radio-block {

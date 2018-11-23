@@ -3020,5 +3020,7 @@
     "19967": "\uadf8\ub8f9 \ud1b5\ud654 \uc885\ub8cc\ub428",
     "19968": "[[%s]]\ub2d8\uc758 \uadf8\ub8f9 \ud1b5\ud654\uac00 \ub2e4\ub978 \uae30\uae30\uc5d0\uc11c \ucc98\ub9ac\ub418\uc5c8\uc2b5\ub2c8\ub2e4",
     "19969": "\uadf8\ub8f9 \ud1b5\ud654 \ucde8\uc18c\ub428",
-    "19970": "\uadf8\ub8f9 \ud1b5\ud654 \uc2dc\uc791\ub428"
+    "19970": "\uadf8\ub8f9 \ud1b5\ud654 \uc2dc\uc791\ub428",
+    "19985": "There are currently no shared files in this chat. You can share files by uploading into this chat (including drag & drop) or by selecting files directly from your cloud drive.",
+    "19986": "You currently have no incoming shared folders from this participant. You can share live folders to your contacts on MEGA directly from your cloud drive."
 }

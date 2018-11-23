@@ -3020,5 +3020,7 @@
     "19967": "Llamada de grupo finalizada",
     "19968": "La llamada de grupo de [[%s]] se est\u00e1 efectuando en otro dispositivo",
     "19969": "Llamada de grupo cancelada",
-    "19970": "Llamada de grupo iniciada"
+    "19970": "Llamada de grupo iniciada",
+    "19985": "There are currently no shared files in this chat. You can share files by uploading into this chat (including drag & drop) or by selecting files directly from your cloud drive.",
+    "19986": "You currently have no incoming shared folders from this participant. You can share live folders to your contacts on MEGA directly from your cloud drive."
 }

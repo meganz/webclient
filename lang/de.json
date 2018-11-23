@@ -3020,5 +3020,7 @@
     "19967": "Audio-\/Videokonferenz beendet",
     "19968": "Der Audio-\/Videokonferenzanruf von [[%s]] wurde auf einem anderen Ger\u00e4t angenommen",
     "19969": "Audio-\/Videokonferenzanruf abgebrochen",
-    "19970": "Audio-\/Videokonferenz"
+    "19970": "Audio-\/Videokonferenz",
+    "19985": "There are currently no shared files in this chat. You can share files by uploading into this chat (including drag & drop) or by selecting files directly from your cloud drive.",
+    "19986": "You currently have no incoming shared folders from this participant. You can share live folders to your contacts on MEGA directly from your cloud drive."
 }

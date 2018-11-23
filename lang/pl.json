@@ -3020,5 +3020,7 @@
     "19967": "Zako\u0144czono po\u0142\u0105czenie grupowe",
     "19968": "Wywo\u0142anie grupy przez [[%s]] zosta\u0142o obs\u0142u\u017cone na innym urz\u0105dzeniu",
     "19969": "Po\u0142\u0105czenie grupowe anulowane",
-    "19970": "Rozpocz\u0119to po\u0142\u0105czenie grupowe"
+    "19970": "Rozpocz\u0119to po\u0142\u0105czenie grupowe",
+    "19985": "There are currently no shared files in this chat. You can share files by uploading into this chat (including drag & drop) or by selecting files directly from your cloud drive.",
+    "19986": "You currently have no incoming shared folders from this participant. You can share live folders to your contacts on MEGA directly from your cloud drive."
 }

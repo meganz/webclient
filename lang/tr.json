@@ -3020,5 +3020,7 @@
     "19967": "Toplu arama sonland\u0131r\u0131ld\u0131",
     "19968": "[[%s]] taraf\u0131ndan olu\u015fturulan toplu arama farkl\u0131 bir cihazdan y\u00fcr\u00fct\u00fclmekte",
     "19969": "Toplu arama iptal edildi",
-    "19970": "Toplu arama ba\u015flad\u0131"
+    "19970": "Toplu arama ba\u015flad\u0131",
+    "19985": "There are currently no shared files in this chat. You can share files by uploading into this chat (including drag & drop) or by selecting files directly from your cloud drive.",
+    "19986": "You currently have no incoming shared folders from this participant. You can share live folders to your contacts on MEGA directly from your cloud drive."
 }

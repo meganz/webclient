@@ -3020,5 +3020,7 @@
     "19967": "Group call ended",
     "19968": "Group call by [[%s]] was handled on some other device",
     "19969": "Group call canceled",
-    "19970": "Group call started"
+    "19970": "Group call started",
+    "19985": "There are currently no shared files in this chat. You can share files by uploading into this chat (including drag & drop) or by selecting files directly from your cloud drive.",
+    "19986": "You currently have no incoming shared folders from this participant. You can share live folders to your contacts on MEGA directly from your cloud drive."
 }

@@ -1,3 +1,4 @@
+var versiondialogid;
 (function _fileversioning(global) {
 
     var current_sel_version = false;
@@ -130,6 +131,8 @@
                 if (del && $.selected && ($.selected.length === 0 || del === $.selected[0])) {
                     $('.fm-versioning').addClass('hidden');
                     current_sel_version = false;
+                    versiondialogid = undefined;
+                    $(document).off('keydown.fileversioningKeydown');
                 }
                 else {
                     fileversioning.updateFileVersioningDialog();
@@ -235,6 +238,7 @@
             if (!f) {
                 return;
             }
+            versiondialogid = fh;
             var nodeData = M.d[M.currentdirid];
             // are we in an inshare?
             while (nodeData && !nodeData.su) {
@@ -537,9 +541,9 @@
             });
 
             $('.fm-versioning .header .button.close').rebind('click', function() {
-                pd.addClass('hidden');
-                current_sel_version = false;
+                fileversioning.closeFileVersioningDialog(window.versiondialogid);
             });
+
             fileversioning.getAllVersions(fh).done(
                 function(versions) {
                     var vh = fillVersionList(versions);
@@ -622,10 +626,18 @@
             $(window).rebind('resize.fileversioning', SoonFc(function() {
                 fileversioning.initFileVersioningScrolling();
             }));
+            $(document).rebind('keydown.fileversioningKeydown', function(e) {
+                if (e.keyCode === 8) { // Backspace
+                    e.stopPropagation();
+                    fileversioning.closeFileVersioningDialog(window.versiondialogid);
+                }
+            });
             $('.fm-versioning .header .button.settings').rebind('click', function() {
                 pd.addClass('hidden');
                 loadSubPage('fm/account/file-management');
             });
+            history.pushState({subpage: page}, '', '/' + page);
+
         },
 
         /**

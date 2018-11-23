@@ -36,6 +36,12 @@ pro.propay = {
      */
     init: function() {
 
+        // if business sub-user is trying to get to Pro page redirect to home.
+        if (u_attr && u_attr.b && !u_attr.b.m) {
+            loadSubPage('start');
+            return;
+        }
+
         var $stepTwo = $('.membership-step2');
         var $selectedPlanName = $stepTwo.find('.selected-plan-text .plan-name');
         var $purchaseButton = $stepTwo.find('.membership-bott-button');

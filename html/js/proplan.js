@@ -15,6 +15,12 @@ pro.proplan = {
      */
     init: function() {
 
+        // if business sub-user is trying to get to Pro page redirect to home.
+        if (u_attr && u_attr.b && !u_attr.b.m) {
+            loadSubPage('start');
+            return;
+        }
+
         // Cache selectors
         var $body = $('body');
         var $stepOne = $body.find('.membership-step1');

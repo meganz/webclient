@@ -34,6 +34,7 @@ BusinessRegister.prototype.initPage = function () {
     var $passInput = $pageContainer.find('#business-pass').val('');
     var $rPassInput = $pageContainer.find('#business-rpass').val('');
     $('.new-registration.suba', $pageContainer).removeClass('good1 good2 good3 good4 good5');
+    $('.password-stutus-txt', $pageContainer).addClass('hidden');
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
     $pageContainer.find('.mega-terms.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
     $pageContainer.find('.ok-to-auto.bus-reg-agreement .bus-reg-checkbox').addClass('checkOn');
@@ -220,8 +221,14 @@ BusinessRegister.prototype.initPage = function () {
         }
         if (mySelf.isLoggedIn === false) {
             if (!$element || $element.is($passInput)) {
-                if (!$passInput.val()) {
+                if ($element && !$passInput.val()) {
+                    $('.password-stutus-txt', $pageContainer).addClass('hidden');
+                    $passInput.parent().removeClass('error');
+                    $('.new-registration.suba', $pageContainer).removeClass('good1 good2 good3 good4 good5');
+                }
+                else if (!$passInput.val()) {
                     $passInput.parent().addClass('error').find('.error-message').text(l[1104]);
+                    $('.password-stutus-txt', $pageContainer).removeClass('hidden');
                     $passInput.focus();
                     passed = false;
                 }
@@ -229,6 +236,7 @@ BusinessRegister.prototype.initPage = function () {
                     passed = passed && mySelf.ratePasswordStrength($pageContainer, $passInput.val());
                     if (!passed) {
                         $passInput.parent().addClass('error').find('.error-message').text(l[1104]);
+                        $('.password-stutus-txt', $pageContainer).removeClass('hidden');
                         $passInput.focus();
                     }
                 }

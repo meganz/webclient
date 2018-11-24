@@ -366,6 +366,9 @@
                         // if not, then the fastest way is to render the business home page
                         usersM.viewSubAccountListUI(undefined, undefined, true);
                     }
+                    else if (usersM.isRedrawNeeded(M.suba, usersM.business.previousSubList)) {
+                        usersM.viewSubAccountListUI(undefined, undefined, true);
+                    }
                     var subPage = id.replace('/', '').split('user-management')[1];
                     if (subPage && subPage.length > 2) {
                         if (subPage === 'overview') {

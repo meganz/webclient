@@ -387,7 +387,7 @@ pro.proplan = {
             successPayText = l[19809].replace('{0}', '1');
         }
 
-        $pendingOverlay.find('.payment-result-txt').text(successPayText);
+        $pendingOverlay.find('.payment-result-txt').html(successPayText);
 
         // If returning from an paysafecard payment, do a verification on the sale ID
         if (provider === 'paysafecard') {

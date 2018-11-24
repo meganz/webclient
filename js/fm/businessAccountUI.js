@@ -105,6 +105,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         subAccountsView = $('.fm-blocks-view.user-management-view');
     }
     $('.fm-right-files-block').removeClass('hidden');
+    $('.fm-empty-user-management').addClass('hidden');
 
     this.URLchanger('');
 
@@ -123,35 +124,35 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     };
 
     // private function to check if new drawing is needed
-    var isRedrawNeeded = function (subs, previousSubs) {
-        if (!previousSubs) {
-            return true;
-        }
-        if (Object.keys(subs).length !== Object.keys(previousSubs).length) {
-            return true;
-        }
-        for (var k in subs) {
-            if (!previousSubs[k]) {
-                return true;
-            }
-            for (var h in subs[k]) {
-                if (subs[k][h] instanceof Object) {
-                    if (!(previousSubs[k][h] instanceof Object)) {
-                        return true;
-                    }
-                    for (var a in subs[k][h]) {
-                        if (subs[k][h][a] !== previousSubs[k][h][a]) {
-                            return true;
-                        }
-                    }
-                }
-                else if (subs[k][h] !== previousSubs[k][h]) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    };
+    // var isRedrawNeeded = function (subs, previousSubs) {
+    //    if (!previousSubs) {
+    //        return true;
+    //    }
+    //    if (Object.keys(subs).length !== Object.keys(previousSubs).length) {
+    //        return true;
+    //    }
+    //    for (var k in subs) {
+    //        if (!previousSubs[k]) {
+    //            return true;
+    //        }
+    //        for (var h in subs[k]) {
+    //            if (subs[k][h] instanceof Object) {
+    //                if (!(previousSubs[k][h] instanceof Object)) {
+    //                    return true;
+    //                }
+    //                for (var a in subs[k][h]) {
+    //                    if (subs[k][h][a] !== previousSubs[k][h][a]) {
+    //                        return true;
+    //                    }
+    //                }
+    //            }
+    //            else if (subs[k][h] !== previousSubs[k][h]) {
+    //                return true;
+    //            }
+    //        }
+    //    }
+    //    return false;
+    // };
 
     // private function to fill HTML table for sub users
     var fillSubUsersTable = function (subUsers, uiBusiness) {
@@ -282,6 +283,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
             var $subUsers = $('.fm-tree-panel .content-panel.user-management .nw-user-management-item');
 
+            var disabledFound = false;
+            $('.fm-empty-user-management').addClass('hidden');
+
             for (var k = 0; k < $subUsers.length; k++) {
                 if (me.hasClass('enabled-accounts')) {
                     if (!$($subUsers[k]).find('.user-management-status').hasClass('disabled')) {
@@ -294,6 +298,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 else {
                     if ($($subUsers[k]).find('.user-management-status').hasClass('disabled')) {
                         $($subUsers[k]).removeClass('hidden');
+                        disabledFound = true;
                     }
                     else {
                         $($subUsers[k]).addClass('hidden');
@@ -339,6 +344,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                         $($subUsersTableRow[h]).addClass('hidden');
                     }
                 }
+            }
+            if (!disabledFound && !me.hasClass('enabled-accounts')) {
+                $('.fm-empty-user-management').removeClass('hidden');
             }
 
         });
@@ -520,7 +528,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         unhideUsersListSection();
     };
 
-    var reDraw = isRedrawNeeded(currSubAccounts, this.business.previousSubList);
+    var reDraw = this.isRedrawNeeded(currSubAccounts, this.business.previousSubList);
 
     if (reDraw) {
         fillSubUsersTable(currSubAccounts, this);
@@ -565,6 +573,38 @@ BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
         return l[7381]; // unknown
     }
 };
+
+
+BusinessAccountUI.prototype.isRedrawNeeded = function (subs, previousSubs) {
+    if (!previousSubs) {
+        return true;
+    }
+    if (Object.keys(subs).length !== Object.keys(previousSubs).length) {
+        return true;
+    }
+    for (var k in subs) {
+        if (!previousSubs[k]) {
+            return true;
+        }
+        for (var h in subs[k]) {
+            if (subs[k][h] instanceof Object) {
+                if (!(previousSubs[k][h] instanceof Object)) {
+                    return true;
+                }
+                for (var a in subs[k][h]) {
+                    if (subs[k][h][a] !== previousSubs[k][h][a]) {
+                        return true;
+                    }
+                }
+            }
+            else if (subs[k][h] !== previousSubs[k][h]) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
 
 /**
  * show the password dialog for invitation link
@@ -2045,6 +2085,13 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             var $me = $(this);
             if ($me.hasClass('acc-acc')) {
                 return mySelf.viewBusinessAccountPage();
+            }
+        });
+    $accountPageHeader.find('.acc-home').off('click.suba').on('click.suba',
+        function invoiceListHeaderClick() {
+            var $me = $(this);
+            if ($me.hasClass('acc-home')) {
+                return mySelf.viewSubAccountListUI();
             }
         });
 

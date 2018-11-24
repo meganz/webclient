@@ -7656,6 +7656,9 @@ table {
     top: 50%;
     margin-top: -131px;
 }
+.fm-empty-user-management .fm-empty-pad {
+    z-index: 2;
+}
 .fm-empty-cloud .fm-empty-pad {
     height: 287px;
     margin-top: -143px;

@@ -1984,7 +1984,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             // $invItem.find('.inv-pay-date').text((new Date(invoiceDetail.items[k].ts * 1000).toLocaleDateString()));
             $invItem.find('.inv-pay-date').text(time2date(invoiceDetail.items[k].ts, 1));
             $invItem.find('.inv-pay-desc').text(invoiceDetail.items[k].d);
-            $invItem.find('.inv-pay-amou').text(Number(invoiceDetail.items[k].gross).toFixed(2));
+            $invItem.find('.inv-pay-amou').text(Number(invoiceDetail.items[k].net).toFixed(2));
             $invItem.insertAfter($invItemHeader);
             taxSum += invoiceDetail.items[k].tax;
         }
@@ -2041,7 +2041,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                             // itemDate = (new Date(invoiceDetail.items[0].ts * 1000).toLocaleDateString());
                             itemDate = time2date(invoiceDetail.items[0].ts, 1);
                             itemDec = invoiceDetail.items[0].d;
-                            itemAmount = invoiceDetail.items[0].gross;
+                            itemAmount = invoiceDetail.items[0].net;
                         }
                         myPage = myPage.replace('{8itemDate}', itemDate);
                         myPage = myPage.replace('{9itemDesc}', itemDec);

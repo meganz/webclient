@@ -680,26 +680,39 @@ label span.black {
 .good5 .register-pass-status-line1, .good5 .register-pass-status-line2, .good5 .register-pass-status-line3, .good5 .register-pass-status-line4, .good5 .register-pass-status-line5 {
     background-color: #1DA1E9;
 }
-.good1 .password-status-txt {
+.good1 .password-status-txt,
+.good1 .new-reg-status-pad,
+.good1 .new-reg-status-pad strong{
     color: #ff2a0b;
-    display: block;
 }
-.good2 .password-status-txt {
+.good2 .password-status-txt,
+.good2 .new-reg-status-pad,
+.good2 .new-reg-status-pad strong {
     color: #ffc926;
-    display: block;
 }
-.good3 .password-status-txt {
+.good3 .password-status-txt,
+.good3 .new-reg-status-pad,
+.good3 .new-reg-status-pad strong {
     color: #7ab148;
-    display: block;
 }
-.good4 .password-status-txt {
+.good4 .password-status-txt,
+.good4 .new-reg-status-pad,
+.good4 .new-reg-status-pad strong {
     color: #7dd016;
-    display: block;
 }
-.good5 .password-status-txt {
+.good5 .password-status-txt,
+.good5 .new-reg-status-pad,
+.good5 .new-reg-status-pad strong {
     color: #1DA1E9;
+}
+.good1 .password-status-txt, 
+.good2 .password-status-txt,
+.good3 .password-status-txt,
+.good4 .password-status-txt,
+.good5 .password-status-txt {
     display: block;
 }
+
 .red, a.red, a.red:link, a.red:visited, a.red:hover, a.red:active {
     color: #F0373B;
 }
@@ -1594,6 +1607,10 @@ a.blog-button:hover {
 }
 .new-registration {
     padding-bottom: 20px;
+}
+.bus-reg-body .new-registration {
+    margin-top: -4px;
+    padding-bottom: 12px;
 }
 .change-pass-block .notice-input-block.last {
     margin: 4px 0 0 0;
@@ -12526,13 +12543,22 @@ h5.main-italic-header {
     padding-top: 10px;
     font-size: 14px;
     float: none;
-    line-height: 20px;
+    line-height: 24px;
 }
 .new-reg-status-pad {
-    padding-bottom: 6px;
+    padding: 8px 0;
+    display: none;
 }
+.good1 .new-reg-status-pad,
+.good2 .new-reg-status-pad,
+.good3 .new-reg-status-pad,
+.good4 .new-reg-status-pad,
+.good5 .new-reg-status-pad {
+    display: block;
+}
+
 .new-reg-status-pad strong {
-    color: #333333;
+/*    color: #333333;*/
     font-weight: normal;
     font-family: 'source_sans_prosemibold', Arial;
     padding-right: 5px;
@@ -24093,7 +24119,7 @@ opacity: 1;
     z-index:40;
 }
 
-.default-white-button-user-management, .default-green-button-user-management, .default-red-button-user-management{
+.default-white-button-user-management, .default-green-button-user-management, .default-red-button-user-management, .default-grey-button-user-management{
     height: 36px;
     width: auto;
     box-sizing: border-box;
@@ -24108,30 +24134,31 @@ opacity: 1;
     transition: 0.1s;
     display: inline-block;
 }
-
-.default-white-button-user-management.disabled, .default-green-button-user-management.disabled, .default-red-button-user-management.disabled {
+.default-white-button-user-management.disabled, .default-green-button-user-management.disabled, .default-red-button-user-management.disabled, .default-grey-button-user-management.disabled {
     cursor: default;
 }
-
-.default-white-button-user-management.disabled:hover, .default-green-button-user-management.disabled:hover, .default-red-button-user-management.disabled:hover {
+.default-white-button-user-management.disabled:hover, .default-green-button-user-management.disabled:hover, .default-red-button-user-management.disabled:hover, .default-grey-button-user-management.disabled:hover {
     box-shadow: 0px 0px 0px 0px rgba(0,0,0,0);
 }
-
 .default-white-button-user-management {
     background-color: rgba(255,255,255,1);
     color: #666;
 }
-
 .default-green-button-user-management {
     background-color: rgba(0,191,165,1);
     color: #ffffff;
 }
-
+.default-grey-button-user-management {
+    background-color: rgba(0,191,165,1);background: rgb(170,170,170);
+    background: -moz-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
+    background: linear-gradient(to bottom, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
+    color: #ffffff;
+}
 .default-red-button-user-management {
     background-color: #F0373A;
     color: #ffffff;
 }
-
 .default-white-button-user-management .icon, .default-green-button-user-management .icon, .default-red-button-user-management .icon{
     width: 24px;
     height: 24px;
@@ -24144,7 +24171,7 @@ opacity: 1;
     float: left;
 }
 
-.default-white-button-user-management:hover, .default-red-button-user-management:hover{
+.default-white-button-user-management:hover, .default-red-button-user-management:hover, .default-grey-button-user-management:hover{
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
 }
 
@@ -25271,6 +25298,7 @@ opacity: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-transform: capitalize;
 }
 
 .subaccount-view-used-data .used-storage-info * {
@@ -26451,7 +26479,8 @@ opacity: 1;
 }
 
 .user-management-dialog .dialog-button-container .default-green-button-user-management,
-.user-management-dialog .dialog-button-container .default-red-button-user-management {
+.user-management-dialog .dialog-button-container .default-red-button-user-management,
+.user-management-dialog .dialog-button-container .default-grey-button-user-management {
     padding: 6px 24px;
     float: right;
     line-height: 22px;
@@ -27429,19 +27458,15 @@ opacity: 1;
 .bus-reg-input.error input::placeholder{
     opacity: 0;
 }
-
 .user-management-account-settings .bus-input.active::after, .user-management-dialog .dialog-input-title-ontop.active::after{
     background-color: rgba(0,0,0,0.6);
 }
-
 .user-management-account-settings .bus-input.error::after, .user-management-dialog .dialog-input-title-ontop.error::after{
     background-color: rgba(217,0,7,0.5);
 }
-
 .user-management-account-settings .bus-input.error input, .user-management-dialog .dialog-input-title-ontop.error input{
     color: rgba(217,0,7,1);
 }
-
 .user-management-account-settings .bus-input.error .bus-input-title, 
 .user-management-dialog .dialog-input-title-ontop.error .title {
     visibility: visible;
@@ -27451,7 +27476,6 @@ opacity: 1;
     opacity: 1;
     top:0;
 }
-
 .user-management-account-settings .bus-input.error .error-message, 
 .user-management-dialog .dialog-input-title-ontop.error .error-message{
     display: inline-block;

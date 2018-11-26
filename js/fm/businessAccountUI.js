@@ -2025,6 +2025,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         myPage = myPage.replace('{0Date}', time2date(invoiceDetail.ts, 1));
                         myPage = myPage.replace('{1InvoiceNB}', invoiceDetail.n);
                         myPage = myPage.replace('{2VATNB}', invoiceDetail.mega.taxnum[1]);
+                        myPage = myPage.replace('{2VATTXT}', invoiceDetail.mega.taxnum[0]);
                         myPage = myPage.replace('{3CompanyName}', invoiceDetail.u.cname);
                         myPage = myPage.replace('{4CompanyEmail}', invoiceDetail.u.e);
                         myPage = myPage.replace('{5CompanyAddress}', validAddressSentFromApi.join(', '));

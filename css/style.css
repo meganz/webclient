@@ -11541,14 +11541,10 @@ table {
     line-height: 20px;
     text-align: left;
     white-space: normal;
-    text-transform: lowercase;
+    text-transform: capitalize;
     overflow: visible;
     vertical-align: top;
     text-overflow: ellipsis;
-}
-
-.account.left-pane.small-txt:first-letter {
-    text-transform: uppercase;
 }
 .account.left-pane.big-txt {
     display: inline-block;
@@ -11558,14 +11554,11 @@ table {
     margin-bottom: 4px;
     line-height: 20px;
     white-space: normal;
-    text-transform: lowercase;
+    text-transform: capitalize;
     padding: 0;
     vertical-align: top;
     float: right;
     text-align: right;
-}
-.account.left-pane.big-txt:first-letter {
-    text-transform: uppercase;
 }
 .small-left-panel .account.left-pane.small-txt, .small-left-panel .account.left-pane.big-txt {
     text-align: center;
@@ -25294,17 +25287,16 @@ opacity: 1;
     display: inline-block;
     margin-left: 12px;
     float: left;
-    width: 200px;
+    width: 188px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     text-transform: capitalize;
 }
-
-.subaccount-view-used-data .used-storage-info * {
-    float: left;
+.subaccount-view-used-data .used-storage-info .tiny-icon.cog {
+    margin: 5px 0 5px 6px;
+    cursor: pointer;
 }
-
 .subaccount-view-used-data .used-storage-info .ff-number{
     font-size: 14px;
     color: #999;
@@ -29058,7 +29050,7 @@ opacity: 1;
 }
 
 .business-dashboard .subaccount-view-used-data .used-storage-info .ff-number {
-    width: 220px;
+    width: 190px;
 }
 
 .business-dashboard .qr-container {

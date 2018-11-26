@@ -29,6 +29,7 @@ function BusinessAccountUI() {
         $('.profile', $accountContainer).addClass('hidden');
         $('.invoice .invoice-list', $accountContainer).addClass('hidden');
         $('.invoice .invoice-detail', $accountContainer);
+        $('.fm-empty-user-management').addClass('hidden');
 
         // hide any possible grid or block view.
         $('.files-grid-view, .fm-blocks-view').addClass('hidden');

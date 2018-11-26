@@ -1,4 +1,6 @@
 // chatd interface
+// jshint -W089
+
 var Chatd = function(userId, megaChat, options) {
     var self = this;
 
@@ -51,13 +53,27 @@ var Chatd = function(userId, megaChat, options) {
         }
     });
 
-    // initialize the webrtc message handler to a dummy function
+    // Initialize with a dummy webrtc event handler
+    /* jshint -W098 */
     self.rtcHandler = self.defaultRtcHandler = {
         handleMessage: function(shard, msg, len) {},
-        onUserJoinLeave: function(chatid, userid, priv) {},
-        onUserOffline: function(chatid, userid, clientid) {},
+        onClientLeftCall: function(chat, userid, clientid) {},
+        onClientJoinedCall: function(chat, userid, clientid) {},
+        onKickedFromChatroom: function(chat) {},
+        handleCallData: function(shard, cmd, payloadLen) {
+            var type = cmd.charCodeAt(31);
+            if (type === CallDataType.kRinging) {
+                var chatid = cmd.substr(1, 8);
+                var userid = cmd.substr(9, 8);
+                var clientid = cmd.substr(17, 4);
+                var callid = cmd.substr(23, 8);
+                shard.rtcmd(chatid, userid, clientid, RTCMD.CALL_REQ_DECLINE,
+                    callid + String.fromCharCode(Term.kErrNotSupported));
+            }
+        },
         onShutdown: function() {}
     };
+    /* jshint +W098 */
 
     // load persistent client id, or generate one if none was stored
     //    self.identity = localStorage['chatdIdentity'];
@@ -68,7 +84,7 @@ var Chatd = function(userId, megaChat, options) {
 
     localStorage.setItem('chatdIdentity', base64urlencode(self.identity));
 
-    self.logger.debug("Generated new client identity: 0x" + Chatd.dumpToHex(self.identity, 0, 0, true));
+    self.logger.debug("Generated new client identity: " + Chatd.clientIdToString(self.identity));
     //    } else {
     //        self.identity = base64urldecode(self.identity);
     //        assert(self.identity.length === 8);
@@ -475,8 +491,17 @@ Chatd.Shard.prototype.reconnect = function() {
     if (self.s) {
         self.disconnect();
     }
+    var chats = self.chatd.chatIdMessages;
+    for (var chatid in self.chatIds) {
+        var chat = chats[chatid];
+        if (chat) {
+            // seems at first connect self.chatIds is filled with ids,
+            // but the chat objects in chatd.chatdIdMessages are not there
+            delete chat.isLoggedIn;
+        }
+    }
 
-    var chatdTag = (localStorage.chatdTag ? localStorage.chatdTag : '4');
+    var chatdTag = (localStorage.chatdTag ? localStorage.chatdTag : '5');
     self.s = new WebSocket(this.url + '/' + chatdTag);
     self.s.binaryType = "arraybuffer";
 
@@ -525,57 +550,60 @@ Chatd.Shard.prototype.reconnect = function() {
     };
 
     self.s.onclose = function(e) {
-        self.logger.warn('chatd connection lost, will eventually reconnect...');
-
-        self.keepAlive.stop();
-        self.keepAlivePing.stop();
-
-        self.joinedChatIds = {};
-        self.connectionRetryManager.gotDisconnected();
-        self.mcurlRequests = {};
-        self.triggerEventOnAllChats('onRoomDisconnected');
-
-        self.histRequests = {};
-
-        self.chatd.trigger('onClose', {
-            shard: self
-        });
+        self.handleDisconnect();
     };
+};
+
+Chatd.Shard.prototype.handleDisconnect = function() {
+    var self = this;
+    if (!self.s) {
+        return;
+    }
+    self.s.onclose = null;
+    self.s.onerror = null;
+    self.s.onopen = null;
+    self.s.onmessage = null;
+    self.s = null;
+
+    self.logger.warn('chatd connection to shard ' + self.shard + ' lost, will eventually reconnect...');
+    self.keepAlive.stop();
+    self.keepAlivePing.stop();
+
+    self.joinedChatIds = {};
+    self.mcurlRequests = {};
+    self.triggerEventOnAllChats('onRoomDisconnected');
+    self.histRequests = {};
+    var chatd = self.chatd;
+    var chats = chatd.chatIdMessages;
+    for (var chatid in self.chatIds) {
+        var chat = chats[chatid];
+        assert(chat);
+        chat.callParticipants = {};
+    }
+    chatd.trigger('onClose', {
+        shard: self
+    });
+    self.connectionRetryManager.gotDisconnected();
 };
 
 Chatd.Shard.prototype.disconnect = function() {
     var self = this;
-
-    if (self.s) {
-        self.keepAlive.stop();
-        self.keepAlivePing.stop();
-
-        self.joinedChatIds = {};
-
-        self.triggerEventOnAllChats('onRoomDisconnected');
-
-        self.chatd.trigger('onClose', {
-            shard: self
-        });
-
-        self.s.onclose = null;
-        self.s.onerror = null;
-        self.s.onopen = null;
-        self.s.onmessage = null;
-        self.s.close();
+    if (!self.s) {
+        return;
     }
-    self.s = null;
-
-    self.keepAlive.stop();
-    self.keepAlivePing.stop();
-
-    self.mcurlRequests = {};
-    self.connectionRetryManager.gotDisconnected();
+    self.s.close();
+    if (self.s) {
+        self.handleDisconnect();
+    }
 };
 
 Chatd.Shard.prototype.sendIdentity = function() {
     assert(this.chatd.identity);
     this.cmd(Chatd.Opcode.CLIENTID, this.chatd.identity, true);
+};
+
+Chatd.clientIdToString = function(data, offset) {
+    return '0x' + Chatd.dumpToHex(data, offset ? offset : 0, 4, true);
 };
 
 Chatd.logCmdsToString = function(logger, cmd, tx, prefix) {
@@ -620,12 +648,14 @@ Chatd.cmdsToArrayStrings = function(cmd, tx) {
 
 Chatd.cmdToString = function(cmd, tx) {
     var opCode = cmd.charCodeAt(0);
-    var result = constStateToText(Chatd.Opcode, opCode);
+    var result;
     if (opCode >= Chatd.Opcode.RTMSG_BROADCAST && opCode <= Chatd.Opcode.RTMSG_ENDPOINT) {
-        var rtcmdInfo = RtcModule.rtcmdToString(cmd, tx);
-        result += ": " + rtcmdInfo[0];
+        var rtcmdInfo = RtcModule.rtcmdToString(cmd, tx, opCode);
+        result = rtcmdInfo[0];
         return [result, rtcmdInfo[1]];
-    } else if (opCode === Chatd.Opcode.CALLDATA) {
+    }
+    result = constStateToText(Chatd.Opcode, opCode);
+    if (opCode === Chatd.Opcode.CALLDATA) {
         var ret = RtcModule.callDataToString(cmd, tx);
         result += ret[0];
         return [result, ret[1]];
@@ -672,7 +702,7 @@ Chatd.cmdToString = function(cmd, tx) {
 
         case Chatd.Opcode.CLIENTID:
             var clientId = cmd.substr(1, 4);
-            result += " clientId: 0x" + Chatd.dumpToHex(clientId, 0, 4, true);
+            result += " clientId: " + Chatd.clientIdToString(clientId);
             return [result, 9];
 
         case Chatd.Opcode.HIST:
@@ -684,7 +714,11 @@ Chatd.cmdToString = function(cmd, tx) {
             chatId = base64urlencode(cmd.substr(1, 8));
             var userId = base64urlencode(cmd.substr(9, 8));
             var priv = cmd.charCodeAt(17);
-
+            if (priv > 255) {
+                priv = priv - 65536;
+            } else if (priv > 127) {
+                priv -= 256;
+            }
             result += " chatId: " + chatId + " userId: " + userId +
                       " priv: " + constStateToText(Chatd.Priv, priv) + "(" + priv + ")";
             return [result, 18];
@@ -716,25 +750,40 @@ Chatd.cmdToString = function(cmd, tx) {
             chatId = base64urlencode(cmd.substr(1, 8));
             var msgId = base64urlencode(cmd.substr(17, 8));
             var ts = Chatd.unpack32le(cmd.substr(25, 4));
-            var updated = Chatd.unpack16le(cmd.substr(29, 2));
             var keyid = Chatd.unpack32le(cmd.substr(31, 4));
             var msgLength = Chatd.unpack32le(cmd.substr(35, 4));
             // var msg = cmd.substr(39, msgLength);
 
+            var sender = base64urlencode(cmd.substr(9, 8));
             result += " chatId: " + chatId +
-                      (tx ? " to: " : " from: ") + base64urlencode(cmd.substr(9, 8)) +
+                      (tx ? " to: " : " from: ") + sender +
                       " msgId: " + msgId +
                       " keyId: " + keyid +
                       " ts: (" + new Date(ts * 1000).toLocaleString() +
-                       ") edited: " + updated +
-                       " msgLen: " + msgLength;
+                      ") msgLen: " + msgLength;
+            if (sender === strongvelope.COMMANDER) {
+                var parsed = strongvelope._parseMessageContent(cmd.substr(39));
+                result += " mgmt-type: " + constStateToText(strongvelope.MESSAGE_TYPES, parsed.type);
+                switch (parsed.type) {
+                    case strongvelope.MESSAGE_TYPES.CALL_END:
+                        // call-end management message format is:
+                        // callId.8 endCallReason.1 callDuration.4
+                        var reason = parsed.payload.charCodeAt(8);
+                        result += " callend-type: " + constStateToText(CallManager.CALL_END_REMOTE_REASON, reason) +
+                            " dur: " + Chatd.unpack32le(parsed.payload.substr(9, 4));
+                        break;
+                }
+            } else {
+                var updated = Chatd.unpack16le(cmd.substr(29, 2));
+                result += " edited: " + updated;
+            }
             return [result, 39 + msgLength];
 
         case Chatd.Opcode.INCALL:
         case Chatd.Opcode.ENDCALL:
             result += ' chatId: ' + base64urlencode(cmd.substr(1, 8)) +
                         ' user: ' + base64urlencode(cmd.substr(9, 8)) +
-                        ' clientId: 0x' + Chatd.dumpToHex(cmd, 17, 4, true);
+                        ' clientId: ' + Chatd.clientIdToString(cmd, 17);
             return [result, 21];
 
         case Chatd.Opcode.RETENTION:
@@ -798,15 +847,33 @@ Chatd.Shard.prototype.cmd = function(opCode, cmd, sendFirst) {
     return this.triggerSendIfAble();
 };
 /*
- * Same as .cmd, but checks if the shard has a clientId assigned. It may be
+ * Checks if the shard has a clientId assigned. It may be
  * connected and fully operational for text chat, but not yet assigned a clientId,
  * which is needed for webrtc
  */
-Chatd.Shard.prototype.rtcmd = function(opCode, cmd) {
+Chatd.Shard.prototype.rtcmd = function(chatid, userid, clientid, rtcmdCode, payload) {
     if (!this.clientId) {
         return false;
     }
-    return this.cmd(opCode, cmd);
+    var opcode;
+    if (!userid) {
+        userid = '\0\0\0\0\0\0\0\0';
+        clientid = '\0\0\0\0';
+        opcode = Chatd.Opcode.RTMSG_BROADCAST;
+    } else if (!clientid) {
+        clientid = '\0\0\0\0';
+        opcode = Chatd.Opcode.RTMSG_USER;
+    } else {
+        opcode = Chatd.Opcode.RTMSG_ENDPOINT;
+    }
+
+    var len = payload ? payload.length + 1 : 1;
+    var data = chatid + userid + clientid + Chatd.pack16le(len) + String.fromCharCode(rtcmdCode);
+    if (payload) {
+        data += payload;
+    }
+
+    return this.cmd(opcode, data);
 };
 
 Chatd.Shard.prototype.sendKeepAlive = function(forced) {
@@ -871,14 +938,6 @@ Chatd.Shard.prototype.clearpending = function() {
     }
 };
 
-Chatd.Shard.prototype.restoreIfNeeded = function(chatId) {
-    var self = this;
-    if (self.chatd.chatIdMessages[chatId] && self.chatd.chatIdMessages[chatId].needsRestore) {
-        self.chatd.chatIdMessages[chatId].restore();
-        self.chatd.chatIdMessages[chatId].needsRestore = false;
-    }
-};
-
 // resend all unconfirmed messages (this is mandatory)
 // @deprecated
 Chatd.Shard.prototype.resendpending = function(chatId) {
@@ -894,6 +953,14 @@ Chatd.Shard.prototype.join = function(chatId) {
     var self = this;
     var chat = self.chatd.chatIdMessages[chatId];
     assert(chat);
+    /*
+     Login here means completing the JOIN sequence, till HISTDONE is received
+     isLogged in has 3 states:
+     - undefined - the chat has not initiated the login sequence (shard may be disconnected)
+     - false - login is in progress
+     - true - the chat is logged in
+    */
+    chat.isLoggedIn = false;
 
     var chatRoom = self.chatd.megaChat.getChatById(base64urlencode(chatId));
 
@@ -1136,6 +1203,7 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
 // CHECK: is this assumption correct on all browsers and under all circumstances?
 Chatd.Shard.prototype.exec = function(a) {
     var self = this;
+    var chatd = self.chatd;
 
     // TODO: find more optimised way of doing this...fromCharCode may also cause exceptions if too big array is passed
     var cmd = ab_to_str(a);
@@ -1144,7 +1212,7 @@ Chatd.Shard.prototype.exec = function(a) {
     }
 
     var len;
-
+    // jshint -W004
     while (cmd.length) {
         var opcode = cmd.charCodeAt(0);
         switch (opcode) {
@@ -1161,9 +1229,10 @@ Chatd.Shard.prototype.exec = function(a) {
 
             case Chatd.Opcode.JOIN:
                 self.keepAlive.restart();
-
-                var chatId = base64urlencode(cmd.substr(1, 8));
-                var userId = base64urlencode(cmd.substr(9, 8));
+                var chatIdBin = cmd.substr(1, 8);
+                var chatId = base64urlencode(chatIdBin);
+                var userIdBin = cmd.substr(9, 8);
+                var userId = base64urlencode(userIdBin);
 
                 var priv = cmd.charCodeAt(17);
                 if (priv > 127) {
@@ -1178,11 +1247,23 @@ Chatd.Shard.prototype.exec = function(a) {
                             self.joinedChatIds[base64urldecode(chatId)] = true;
                         }
                     }
-                    else if (priv === -1) {
+                    else if (priv === -1) { // we left the chatroom
                         delete self.joinedChatIds[base64urldecode(chatId)];
+                        var chat = chatd.chatIdMessages[chatIdBin];
+                        if (chat) {
+                            chat.callParticipants = {};
+                            chatd.rtcHandler.onKickedFromChatroom(chat);
+                        }
                     }
                     else {
                         self.logger.error("Not sure how to handle priv: " + priv + ".");
+                    }
+                } else {
+                    if (priv === -1) { // Someone else left the group chat
+                        var chat = chatd.chatIdMessages[chatIdBin];
+                        if (chat) {
+                            chat.onUserLeftRoom(userIdBin);
+                        }
                     }
                 }
 
@@ -1259,7 +1340,7 @@ Chatd.Shard.prototype.exec = function(a) {
                     self.logger.debug("processing RTCMD_" + constStateToText(RTCMD, rtcmd));
                 }
 
-              //self.logger.debug("processing RTCMD_" + constStateToText(RTCMD, rtcmd));
+                // self.logger.debug("processing RTCMD_" + constStateToText(RTCMD, rtcmd));
                 self.chatd.rtcHandler.handleMessage(self, cmd, len);
                 break;
             case Chatd.Opcode.CALLDATA:
@@ -1268,10 +1349,10 @@ Chatd.Shard.prototype.exec = function(a) {
                 var pllen = Chatd.unpack16le(cmd.substr(21, 2));
                 len = 23 + pllen;
                 if (len > cmd.length) {
-                    break; //will be re-checked and cause error
+                    break; // will be re-checked and cause error
                 }
-                //checks if payload spans outside actual cmd.length
-                self.chatd.rtcHandler.handleCallData(self, cmd, pllen);
+                // checks if payload spans outside actual cmd.length
+                chatd.rtcHandler.handleCallData(self, cmd, pllen);
                 break;
             case Chatd.Opcode.INCALL:
             case Chatd.Opcode.ENDCALL:
@@ -1296,7 +1377,6 @@ Chatd.Shard.prototype.exec = function(a) {
                     chat.onInCall(userid, clientid);
                 } else {
                     chat.onEndCall(userid, clientid);
-                    self.chatd.rtcHandler.onUserOffline(chatid, userid, clientid);
                 }
                 break;
             case Chatd.Opcode.CLIENTID:
@@ -1311,7 +1391,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 len = 9;
                 self.clientId = cmd.substr(1, 4);
                 if (self.loggerIsEnabled) {
-                    self.logger.log("Assigned CLIENTID 0x" + Chatd.dumpToHex(self.clientId, 0, 4, true),
+                    self.logger.log("Assigned CLIENTID " + Chatd.clientIdToString(self.clientId),
                         " for shard", self.shard);
                 }
                 break;
@@ -1440,18 +1520,23 @@ Chatd.Shard.prototype.exec = function(a) {
 
             case Chatd.Opcode.HISTDONE:
                 self.keepAlive.restart();
+                var chatid = cmd.substr(1, 8);
                 if (self.loggerIsEnabled) {
-                    self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1, 8)));
+                    self.logger.log("History retrieval finished: " + base64urlencode(chatid));
+                }
+                var chat = chatd.chatIdMessages[chatid];
+                if (chat) {
+                    chat.isLoggedIn = true;
                 }
                 // Resending of pending message should be done via the integration code,
                 // since it have more info and a direct relation with the UI related actions on pending messages
                 // (persistence, user can click resend/cancel/etc).
-                self.resendpending(cmd.substr(1, 8));
-                self.restoreIfNeeded(cmd.substr(1, 8));
+                self.resendpending();
+                chat.restoreIfNeeded(cmd.substr(1, 8));
 
                 self.chatd.trigger('onMessagesHistoryDone',
                     {
-                        chatId: base64urlencode(cmd.substr(1, 8))
+                        chatId: base64urlencode(chatid)
                     }
                 );
                 len = 9;
@@ -1516,11 +1601,19 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
             case Chatd.Opcode.ECHO:
                 len = 1;
-                self.logger.log("Ignoring received "+constStateToText(Chatd.Opcode, opcode));
+                self.logger.log("Ignoring received " + constStateToText(Chatd.Opcode, opcode));
                 break;
             case Chatd.Opcode.CALLTIME:
                 self.keepAlive.restart();
                 len = 13;
+                var chatid = cmd.substr(1, 8);
+                var chat = self.chatd.chatIdMessages[chatid];
+                if (!chat) {
+                    self.logger.warn("CALLTIME received for an unknown chatid", base64urlencode(chatid));
+                    break;
+                }
+                var callTime = Chatd.unpack32le(cmd.substr(9, 4));
+                chat.tsCallStart = Date.now() - (callTime * 1000);
                 break;
             default:
                 self.logger.error(
@@ -2729,6 +2822,14 @@ Chatd.Messages.prototype.removefrompersist = function(messagekey) {
     self.chatd.messagesQueueKvStorage.removeItem(cacheKey);
 };
 
+Chatd.Messages.prototype.restoreIfNeeded = function() {
+    if (!this.needsRestore) {
+        return;
+    }
+    this.restore();
+    this.needsRestore = false;
+};
+
 // restore persisted messages to sending buffer
 Chatd.Messages.prototype.restore = function() {
     var self = this;
@@ -2837,36 +2938,35 @@ Chatd.Messages.prototype.check = function(chatId, msgid) {
 };
 Chatd.Messages.prototype.onInCall = function(userid, clientid) {
     var self = this;
-    var clients = self.callParticipants[userid];
-    if (!clients) {
-        self.callParticipants[userid] = [clientid];
+    var parts = self.callParticipants;
+    var endpointId = userid + clientid;
+    if (parts[endpointId]) {
+        self.chatd.logger.warn("INCALL received for user that is already known to be in the call");
         return;
     }
-    var len = clients.length;
-    for (var i = 0; i < len; i++) {
-        if (clients[i] === clientid) {
-            return;
-        }
-    }
-    clients.push(clientid);
+    parts[endpointId] = -1;
+    self.chatd.rtcHandler.onClientJoinedCall(self, userid, clientid);
 };
 
 Chatd.Messages.prototype.onEndCall = function(userid, clientid) {
     var self = this;
-    var clients = self.callParticipants[userid];
-    if (!clients) {
-        return;
+    var parts = self.callParticipants;
+    var endpointId = userid + clientid;
+    if (!parts[endpointId]) {
+        self.chatd.logger.warn("ENDCALL received for user that is not known to be in the call", JSON.stringify(parts));
+        return; // Don't have it, should not normally happend
     }
-    var len = clients.length;
-    for (var i = 0; i < len; i++) {
-        if (clients[i] === clientid) {
-            var newClients = clients.splice(i, 1);
-            if (newClients.length === 0) {
-                delete self.callParticipants[userid];
-            } else {
-                self.callParticipants = newClients;
-            }
-            return;
+    delete parts[endpointId];
+    self.chatd.rtcHandler.onClientLeftCall(self, userid, clientid);
+};
+
+Chatd.Messages.prototype.onUserLeftRoom = function(userid) {
+    var self = this;
+    var parts = self.callParticipants;
+    for (var k in parts) {
+        if (k.substr(0, 8) === userid) {
+            delete parts[k];
+            self.chatd.rtcHandler.onClientLeftCall(self, userid, k.substr(8, 4));
         }
     }
 };

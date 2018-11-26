@@ -723,7 +723,9 @@
                     ChatdIntegration.mcfHasFinishedPromise &&
                     ChatdIntegration.mcfHasFinishedPromise.state() === "resolved" &&
                     !megaChat.plugins.chatdIntegration.isLoading() &&
-                    Number.isNaN(parseInt($('.new-messages-indicator:visible').text(), 10)) === true &&
+                    Number.isNaN(
+                        parseInt($('.new-messages-indicator .chat-unread-count:visible').text(), 10)
+                    ) === true &&
                     $('.nw-fm-left-icon.conversations.active').length === 0 &&
                     $('.nw-fm-left-icon.conversations:visible').length > 0
                 ) {

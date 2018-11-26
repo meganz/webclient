@@ -1076,7 +1076,7 @@ MegaUtils.prototype.getSafeName = function(name) {
     if (name.length > 250) {
         name = name.substr(0, 250) + '.' + name.split('.').pop();
     }
-    name = name.replace(/\s+/g, ' ').trim();
+    name = name.replace(/[\t\n\r\f\v]+/g, ' ');
     name = name.replace(/\u202E|\u200E|\u200F/g, '');
 
     var end = name.lastIndexOf('.');

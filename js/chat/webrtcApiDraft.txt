@@ -17,8 +17,18 @@ RtcModule:
         chatd - the chatd client instance
         crypto - an object containing all crypto functions needed for the fingerprint
           authentication and random number generation.
-        globalHandler - event handler for global events. See GlobalEventHandler for 
+        globalHandler - event handler for global events. See GlobalEventHandler for
         details
+        peerAvStates - a map of maps, keyed by binary chatid, where each map represents a list of
+        the peers that send audio and/or video in a chatroom. The per-chatroom map is keyed
+        by binary 'userid+clientid', and the value is the current av flags that represent what that
+        peer is sending. Note that the map does not include our own av send state.
+        Example:
+            peerAvStates = {
+                'binChatid1': {
+                    'binUserid1binClientid1': 3
+                }
+            }
     startCall(chatid, av, handler) - Sends a call request in the chatroom specified
           by chatid.
         av - bit flags that determine whether we will send audio and/or video.
@@ -29,7 +39,10 @@ RtcModule:
         returns - a Call object or null if there is already an ongoing call in the room.
     joinCall(chatid, av, handler) - joins an ongoing call in the chatroom specified by
       chatid. The params are the same as in startCall().
-      
+    getOwnNetworkQuality() - returns a number representing the quality of the user's internet
+      connection, from 0 to 5, similar to the number of bars on a phone's signal strength
+      display. If the link quality is unknown (e.g. when there is no call currently), a
+      negative number is returned.
 GlobalEventHandler:
    onCallIncoming(call) - called when an incoming call request is received,
      and a Call object is created
@@ -46,7 +59,7 @@ GlobalEventHandler:
      Return \c true to hang up the existing call (via hangup()) and process the
      incoming call request (onCallIncoming() will be generated), or \c false to
      send a busy signal to the new call request.
-     existingCall - the existing call that is to be replaced. 
+     existingCall - the existing call that is to be replaced.
      callerInfo - object with information about the call request
      NOTE: When a second call is received in another chatroom, onAnotherCall() is not called
      and there is no special handling whatsoever, as the RtcModule supports multiple simultaneous
@@ -62,15 +75,42 @@ GlobalEventHandler:
      - if a p2p session gets broken and the call is a group call, an attempt is made
          to re-establish the p2p session.
      Note that a 1on1 call can still be joined from other devices of any of the
-     2 users. However, the above rules for 1on1 calls would still apply - if a 
+     2 users. However, the above rules for 1on1 calls would still apply - if a
      session gets disconnected and it is not the only session active, it will not
      be retried. If it is the only active session, the call will be destroyed.
+   onClientJoinedCall(chat, userid, clientid, callCreated)
+   onClientLeftCall(chat, userid, clientid, callDestroyed)
+     The specified client has left a call in the chatroom represented by the chat object, which is
+     of type Chatd.Messages.
+     Upon initial join to the chatroom, if there is a call, a series of onClientJoinedCall()
+     will be generated with all participants in the call. Any subsequent joins/leaves will be
+     notified in realtime, as they happen. If this is the first user that joined, callCreated
+     wiil be true. Simuilarly, if the client that left was the last client in the call,
+     callDestroyed will be true.
+     The current list of call participants is maintained by the `Chatd.Messages.callParticipants` object.
+     It is a map of arrays - the key is the userid, and the arrays contain clientids of that user that are
+     in the call. For a given chatid, the list of participants can be obtained via:
+     `chatd.chatIdMessages[chatid].callParticipants`.
+   onClientAvChange(chatid, userid, clientid, av)
+     Called when a call participant in the chatroom identified by `chatid` changes the a/v streams
+     it sends in the chatroom by joining or starting a call, muting/unmuting audio or video, or
+     leaving the call. This event is received both when the client does and does not paritipate
+     in the call. The event is generated also for changes of the client's own a/v send state - when
+     it starts, joins, mutes, unmutes and leaves a call.
+    onOwnNetworkQualityChange(q) - called when a change in the quality of the user's
+     internet connection has been detected. This is similar to an mobile phone's signal
+     strength graph. The parameter `q` is a number from 0 to 5, similar to the number of
+     bars displayed on a phone's signal strength indicator.
+   onNoInputAudioDetected()
+     Called when the no sound was detected from the local mic after the local stream
+     was acquired. Note that the local stream is acquired before the call is answered, so the
+     event may occur before the call is established or after that.
 Call:
   answer() - answers an incoming call
   hangup() - hangs up a call, in any state. If the call is unanswered and
     incoming, rejects it. If the call is unanswered and outgoing, cancels it.
   muteUnmute(av) - mutes/unmutes the audio/video streams sent.
-      av - a bitmask of 2 bits - one for audio, the other for video. The state of 
+      av - a bitmask of 2 bits - one for audio, the other for video. The state of
       the bits specifies whether we send audio/video respectively. Returns the actual
       state of the local stream (i.e. the user may tr y to unmute video on an audio-only
       stream, in which case the returned state will still have video muted).
@@ -83,7 +123,7 @@ CallEventHandler:
   onNewSession(sess) - a new p2p session has just been created on that call.
       sess - the Session object
       returns - a SessionEventHandler that will handle all events specific to that
-          session  
+          session
   onLocalMediaRequest() - called when getUserMedia() is about to be called
      and the user will be asked for permissions for camera/mic access. This can
      be used to display hint on the screen to notify the user that she needs to
@@ -93,20 +133,27 @@ CallEventHandler:
      a new call, this callback will be called and permissions will be asked again.
        call - the Call object for which user media is requested
    onLocalMediaObtained(stream) - called when getUserMedia() completed. This can be used
-       to remove the hint displayed in onUserMediaRequest() 
-   onLocalMediaError(error) - called when there was an error getting user media.     
+       to remove the hint displayed in onUserMediaRequest()
+   onLocalMediaError(error) - called when there was an error getting user media.
        This callback must return a bool specifying whether to continue with the call
        or to hang it up.
-   onRingOut(user) - called when we are initiating a call and a peer user's client receives
-       the request and starts ringing. This is called once per receiving user.
+   onRingOut(user) - called when we are initiating a call and the first acknowledgement is
+       received that a peer client started ringing. This event is fired only once, when the
+       first acknowledgement is received.
+       user - the user handle of the user whose client ack-ed the call request
    onCallStarting() - the call has been answered/joined and is about to start.
    onCallStarted() - called when for the first time a session has its webrtc peer media
    connection established (the session's RTCPeerConnection.iceConnectionState becomes
    'connected')
+    onNoMediaOnBothEnds() - fired when in an 1on1 call neither of the two users send
+   neither audio nor video.
 
 Session:
   peer - the userid of the peer
   peerClient - the clientid of the peer
+  getPeerNetworkQuality() - similar to the global RtcModule.networkQuality(), but reflects the
+    quality of the link with the peer of that session. If the session is being
+    reconnected, the quality would be 0.
 SessionEventHandler:
    onStateChange(SessionState) - the session changed state. See SessionState for
        details.
@@ -118,4 +165,10 @@ SessionEventHandler:
    onRemoteStreamAdded(mediaURL) - The peer will send a stream to us on that stream URL.
    onPeerMute(av) -  the peer changed what to send (audio and/or video)
        av - what will be sent from now on - audio and/or video
+   onPeerNetworkQualityChange(q) - similar to the global onNetworkQualityChange(), but reflects
+   the quality of the link to the peer of the session. When a session gets reconnected/
+   retried, this event will be generated with value of zero, and upon successful
+   reconnect, another event will be fired with a value greater than zero.
+   onAudioLevelChange(level) - called to notify a change in the peer's audio level.
+       level - an int number from 0 to 100
 

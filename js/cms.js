@@ -2,12 +2,10 @@
     /** Our trusted public keys {{{ */
     var signPubKey = {
         "__global": [
-            "O1B2FzarfqzPUDKdOiPJvfEnx3QAc+xHW16CEItjtgg=",
-            "rRHOm8BpMsYsSnSlk1AD2xxm9vKIFd\/tMoKxc35FTXQ=",
-            "yUSKtdxceRbOL6efsWzHviXpggxjYQQ2qedmER7gwA0="      // Hugo's
-        ],
-        "sync": [
-            "J0K5p5rZjOjxli\/uioSP1yneQtoW2QTl3zXN\/Q3H3Mc="
+            "rRHOm8BpMsYsSnSlk1AD2xxm9vKIFd\/tMoKxc35FTXQ=", // Elroy
+            "gKfbvYMQhEamAEb2tIcL0NpslOGbXkHC1opfPXfZIlE=", // Gustavo
+            "WJbsItfJfXhGZlq6D1tz\/Wy\/AVjmvQoK7ZgBSOrrCQE=", // Guy
+            "nJ0DVETXN6Fgd+nK70bsngaPlbM9zedn14Exh\/fAoyU=" // Shuan
         ]
     };
     /** }}} */

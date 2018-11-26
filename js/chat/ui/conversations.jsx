@@ -63,7 +63,18 @@ var renderMessageSummary = function(lastMessage) {
         renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
     }
 
-    var author = Message.getContactForMessage(lastMessage);
+    var author;
+
+    if (lastMessage.dialogType === "privilegeChange" && lastMessage.meta && lastMessage.meta.targetUserId) {
+        author = M.u[lastMessage.meta.targetUserId[0]] || Message.getContactForMessage(lastMessage);
+    }
+    else if (lastMessage.dialogType === "alterParticipants") {
+        author = M.u[lastMessage.meta.included[0] || lastMessage.meta.excluded[0]] ||
+            Message.getContactForMessage(lastMessage);
+    }
+    else {
+        author = Message.getContactForMessage(lastMessage);
+    }
     if (author) {
         if (!lastMessage._contactChangeListener && author.addChangeListener) {
             lastMessage._contactChangeListener = author.addChangeListener(function() {
@@ -217,12 +228,22 @@ var ConversationsListItem = React.createClass({
         }
 
         var unreadCount = chatRoom.messagesBuff.getUnreadCount();
-        var unreadDiv = null;
         var isUnread = false;
+
+        var notificationItems = [];
+        if (chatRoom.havePendingCall() && chatRoom.state != ChatRoom.STATE.LEFT) {
+            notificationItems.push(<i
+                className={"tiny-icon " + (chatRoom.isCurrentlyActive ? "blue" : "white") + "-handset"}
+                key="callIcon"/>);
+        }
         if (unreadCount > 0) {
-            unreadDiv = <div className="unread-messages">{unreadCount > 9 ? "9+" : unreadCount}</div>;
+            notificationItems.push(<span key="unreadCounter">
+                {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+            );
             isUnread = true;
         }
+
 
         var inCallDiv = null;
 
@@ -236,6 +257,10 @@ var ConversationsListItem = React.createClass({
             var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
             lastMessage.renderableSummary = renderableSummary;
 
+            if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
+                lastMsgDivClasses += " call";
+                classString += " call-exists";
+            }
             lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
                     </div>;
 
@@ -318,6 +343,15 @@ var ConversationsListItem = React.createClass({
             archivedDiv = "";
         }
 
+        if (
+            chatRoom.callManagerCall &&
+            (
+                chatRoom.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING ||
+                chatRoom.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING
+            )
+        ) {
+            classString += " have-incoming-ringing-call";
+        }
 
         return (
             <li className={classString} id={id} data-room-id={roomId} data-jid={contactId}
@@ -332,7 +366,9 @@ var ConversationsListItem = React.createClass({
                     }
                 </div>
                 {archivedDiv}
-                {unreadDiv}
+                {notificationItems.length > 0 ? (
+                    <div className={"unread-messages items-" + notificationItems.length}>{notificationItems}</div>
+                    ) : null}
                 {inCallDiv}
                 {lastMessageDiv}
                 {lastMessageDatetimeDiv}
@@ -508,7 +544,6 @@ var ConversationsList = React.createClass({
         if (activeCallSession && activeCallSession.room && megaChat.activeCallSession.isActive()) {
             var room = activeCallSession.room;
             var user = room.getParticipantsExceptMe()[0];
-            user = megaChat.getContactFromJid(user);
 
             if (user) {
                 currentCallingContactStatusProps.className += " " + user.u +

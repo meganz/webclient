@@ -189,27 +189,27 @@ copyright.step2Submit = function() {
             if (eVal !== ''  && cVal === '' || invalidWords.indexOf(cVal.toLowerCase()) !== -1) {
                 proceed = false;
                 msgDialog('warninga', l[135], escapeHTML(l[660]));
-                wrong(copyrightwork[i]);
+                copyright.markInputWrong(copyrightwork[i]);
                 return false;
             }
             if (eVal === '' || cVal === '') {
                 proceed = false;
                 msgDialog('warninga', l[135], escapeHTML(l[659]));
-                wrong(eVal ? copyrightwork[i] : e);
+                copyright.markInputWrong(eVal ? copyrightwork[i] : e);
                 return false;
             }
 
             if (!copyright.validateUrl(eVal)) {
                 proceed = false;
                 msgDialog('warninga', l[135], escapeHTML(l[7686]));
-                wrong(e);
+                copyright.markInputWrong(e);
                 return false;
             }
 
             if (copyright.validateUrl(cVal)) {
                 proceed = false;
                 msgDialog('warninga', l[135], escapeHTML(l[9056]));
-                wrong(copyrightwork[i]);
+                copyright.markInputWrong(copyrightwork[i]);
                 return false;
             }
 
@@ -252,19 +252,6 @@ copyright.step2Submit = function() {
  */
 copyright.init_cn = function() {
     'use strict';
-    var wrong = function(elm) {
-        $(elm)
-            .addClass("red")
-            .css('font-weight', 'bold')
-            .rebind('click', function() {
-                $(this).off('click')
-                    .removeClass("red")
-                    .css('font-weight', 'normal')
-                    .parent()
-                    .css('box-shadow', 'none');
-            })
-            .parent().css('box-shadow', '0px 0px 8px #f00');
-    };
 
     $('.addurlbtn').rebind('click', function() {
         $('#cn_urls').safeAppend('<div class="new-affiliate-label">' +
@@ -527,8 +514,10 @@ copyright.init_cndispute = function() {
 
             // The 'copyright notice dispute' api request. Pull the values straight from the inputs
             // as we have already validated them
-            var handles = copyright.getHandles($('input.contenturl').val());
-            api_req({
+            var url = $('input.contenturl').val();
+            var handles = copyright.getHandles(url);
+
+            var requestParameters = {
                 a: 'cnd',
                 ph: Object.keys(handles)[0],
                 desc: $('input.copyrightwork').val(),
@@ -544,7 +533,15 @@ copyright.init_cndispute = function() {
                 postalcode: $('input.zip').val(),
                 country: $('.select.country select').val(),
                 otherremarks: $('input.otherremarks').val()
-            }, {
+            };
+
+            // If URL has a subnode handle, then also send the ufsh parameter.
+            var subNodeHandle = /\#.*\!.*\?([A-z0-9_-]{8})/.exec(url);
+            if (subNodeHandle && subNodeHandle[1]) {
+                requestParameters.ufsh = subNodeHandle[1];
+            }
+            
+            api_req(requestParameters, {
                 callback: function(response) {
                     loadingDialog.hide();
 
@@ -628,4 +625,23 @@ copyright.initCheckboxListeners = function() {
             $checkboxDiv.removeClass('checkboxOn').addClass('checkboxOff');
         }
     });
+};
+
+/**
+ * Mark input field as wrong.
+ * @param elm
+ */
+copyright.markInputWrong = function(elm) {
+    'use strict';
+    $(elm)
+        .addClass("red")
+        .css('font-weight', 'bold')
+        .rebind('click', function() {
+            $(this).off('click')
+                .removeClass("red")
+                .css('font-weight', 'normal')
+                .parent()
+                .css('box-shadow', 'none');
+        })
+        .parent().css('box-shadow', '0px 0px 8px #f00');
 };

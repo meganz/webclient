@@ -193,13 +193,10 @@
 <div class="main-blur-block">
     <div class="fm-main notifications hidden">
         <div class="nw-fm-left-icons-panel">
+            <a class="logo hidden"></a>
             <div class="nw-fm-left-icon dashboard">
                 <div class="nw-fm-left-border"></div>
                 <div class="dark-tooltip">Dashboard</div>
-            </div>
-            <div class="nw-fm-left-icon folder-link">
-                <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$808]</div>
             </div>
             <div class="nw-fm-left-icon cloud-drive">
                 <div class="nw-fm-left-border"></div>
@@ -220,7 +217,10 @@
             </div>
             <div class="nw-fm-left-icon conversations">
                 <div class="nw-fm-left-border"></div>
-                <div class="new-messages-indicator hidden"></div>
+                <div class="new-messages-indicator hidden">
+                    <span class="chat-pending-call hidden"><i class="tiny-icon white-handset" /></span>
+                    <span class="chat-unread-count hidden"></span>
+                </div>
                 <div class="dark-tooltip">[$5902]</div>
             </div>
 
@@ -288,13 +288,10 @@
     <!-- Please add "fm-notification" class and "full"/"almost-full" class !-->
     <div class="fm-main default">
         <div class="nw-fm-left-icons-panel">
+            <a class="logo hidden"></a>
             <div class="nw-fm-left-icon dashboard">
                 <div class="nw-fm-left-border"></div>
                 <div class="dark-tooltip">Dashboard</div>
-            </div>
-            <div class="nw-fm-left-icon folder-link">
-                <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$808]</div>
             </div>
             <div class="nw-fm-left-icon cloud-drive active">
                 <div class="nw-fm-left-border"></div>
@@ -315,7 +312,10 @@
             </div>
             <div class="nw-fm-left-icon conversations">
                 <div class="nw-fm-left-border"></div>
-                <div class="new-messages-indicator hidden"></div>
+                <div class="new-messages-indicator hidden">
+                    <span class="chat-pending-call hidden"><i class="tiny-icon white-handset" /></span>
+                    <span class="chat-unread-count hidden"></span>
+                </div>
                 <div class="dark-tooltip">[$5902]</div>
                 <div class="beta-text"></div>
             </div>
@@ -367,6 +367,52 @@
                     </ul>
                     <div class="transfer-bar-overlay">
                         <div></div>
+                    </div>
+                </div>
+                <div class="dropdown body popup dropdown-arrow transfer-widget left-arrow hidden">
+                    <i class="dropdown-white-arrow"></i>
+                    <div class="fm-dialog-close small"></div>
+
+                    <div class="transfer-widget body">
+                        <div class="transfer-widget transfer-block download hidden">
+                            <i class="small-icon green-arrow"></i>
+                            <span class="transfer-filetype-icon audio file"></span>
+                            <span class="tranfer-filetype-txt"></span>
+                            <!--file.name-->
+                            <div class="transfer-widget progress">
+                                <span></span>
+                            </div>
+                            <div class="transfer-widget info-block left">
+                                <span class="current dark"></span>
+                                <span class="of">[$5528]</span>
+                                <span class="number dark"></span>
+                            </div>
+                            <div class="transfer-widget info-block right">
+                                <span class="speed dark"></span>
+                                <span class="speed-txt"></span>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+
+                        <div class="transfer-widget transfer-block upload hidden">
+                            <i class="small-icon blue-arrow left"></i>
+                            <span class="transfer-filetype-icon audio file"></span>
+                            <span class="tranfer-filetype-txt"></span>
+                            <!--file.name-->
+                            <div class="transfer-widget progress">
+                                <span></span>
+                            </div>
+                            <div class="transfer-widget info-block left">
+                                <span class="current dark"></span>
+                                <span class="of">[$5528]</span>
+                                <span class="number dark"></span>
+                            </div>
+                            <div class="transfer-widget info-block right">
+                                <span class="speed dark"></span>
+                                <span class="speed-txt"></span>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -609,6 +655,12 @@
                         [$6873]
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="l-pane-control">
+            <div class="default-white-button small-square-button rounded l-pane-visibility">
+                <i class="small-icon fm-s double-l-arrows"></i>
             </div>
         </div>
 
@@ -4096,56 +4148,9 @@
             </div>
         </div>
     </div>
+    <div class="fm-products-nav"></div>
+
     <div class="fm-account-overlay hidden"></div>
-
-    <div class="dropdown body popup dropdown-arrow transfer-widget left-arrow hidden">
-        <i class="dropdown-white-arrow"></i>
-        <div class="fm-dialog-close small"></div>
-
-        <div class="transfer-widget body">
-            <div class="transfer-widget transfer-block download hidden">
-                <i class="small-icon green-arrow"></i>
-                <span class="transfer-filetype-icon audio file"></span>
-                <span class="tranfer-filetype-txt"></span>
-                <!--file.name-->
-                <div class="transfer-widget progress">
-                    <span></span>
-                </div>
-                <div class="transfer-widget info-block left">
-                    <span class="current dark"></span>
-                    <span class="of">[$5528]</span>
-                    <span class="number dark"></span>
-                </div>
-                <div class="transfer-widget info-block right">
-                    <span class="speed dark"></span>
-                    <span class="speed-txt"></span>
-                </div>
-                <div class="clear"></div>
-            </div>
-
-            <div class="transfer-widget transfer-block upload hidden">
-                <i class="small-icon blue-arrow left"></i>
-                <span class="transfer-filetype-icon audio file"></span>
-                <span class="tranfer-filetype-txt"></span>
-                <!--file.name-->
-                <div class="transfer-widget progress">
-                    <span></span>
-                </div>
-                <div class="transfer-widget info-block left">
-                    <span class="current dark"></span>
-                    <span class="of">[$5528]</span>
-                    <span class="number dark"></span>
-                </div>
-                <div class="transfer-widget info-block right">
-                    <span class="speed dark"></span>
-                    <span class="speed-txt"></span>
-                </div>
-                <div class="clear"></div>
-            </div>
-        </div>
-
-    </div>
-
 </div>
 
 <ul id="template-tree-item" class="hidden">

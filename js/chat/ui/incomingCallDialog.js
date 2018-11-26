@@ -35,7 +35,8 @@
             isVideoCall,
             answerAudioFn,
             answerVideoFn,
-            cancelFn
+            cancelFn,
+            isGroupCall
         ) {
         var self = this;
 
@@ -87,6 +88,22 @@
 
         self.$dialog.removeClass('hidden');
         $('.fm-dialog-overlay').removeClass('hidden');
+
+
+        if (isGroupCall) {
+            $('.video-call', self.$dialog).hide();
+            $('.incoming-call-txt, .icoming-call-header', self.$dialog).text(
+                'Incoming group call...'
+            );
+            self.$dialog.addClass('group-call');
+        }
+        else {
+            $('.video-call', self.$dialog).show();
+            $('.incoming-call-txt, .icoming-call-header', self.$dialog).text(
+                'Incoming call...'
+            );
+            self.$dialog.removeClass('group-call');
+        }
     };
 
     /**
@@ -157,9 +174,7 @@
      */
     IncomingCallDialog.DIALOG_TEMPLATE = '<div class="fm-dialog incoming-call-dialog hidden">\n' +
         '<div class="fm-dialog-close"></div>\n' +
-        '<div class="icoming-call-header">\n' +
-        '   Incoming call...\n' +
-        '</div>\n' +
+        '<div class="icoming-call-header"></div>\n' +
         '<div class="incoming-call-avatar">\n' +
         '       <div class="incoming-call-shadow-bl"></div>\n' +
         '       <div class="incoming-call-avatar-bl"></div>\n' +
@@ -167,7 +182,7 @@
         '<div class="incoming-call-username">\n' +
 		  '<span class="incoming-contact-info">\n' +
             '<span class="incoming-call-name"></span>\n' +
-            '<span class="incoming-call-txt">Incoming call...</span>\n' +
+            '<span class="incoming-call-txt"></span>\n' +
           '</span>\n' +
         '</div>\n' +
         '<div class="incoming-call-buttons">\n' +

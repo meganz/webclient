@@ -71,11 +71,6 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     else if (message.authorContact) {
                         fromContact = message.authorContact;
                     }
-                    else if (message.getFromJid) {
-                        fromContact = megaChat.getContactFromJid(
-                            message.getFromJid()
-                        );
-                    }
 
                     var avatarMeta = generateAvatarMeta(fromContact.u);
                     var icon = avatarMeta.avatarUrl;
@@ -220,8 +215,16 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                 .rebind('CallTerminated.chatNotifications', function(e, origEvent, room) {
                     self.notifications.resetCounterGroup(room.chatId, "incoming-voice-video-call");
                     var contact = M.u[room.getParticipantsExceptMe()[0]];
-                    var avatarMeta = generateAvatarMeta(contact.u);
-                    var icon = avatarMeta.avatarUrl;
+                    var icon = false;
+                    var title;
+                    if (contact && contact.u) {
+                        var avatarMeta = generateAvatarMeta(contact.u);
+                        icon = avatarMeta.avatarUrl;
+                        title = avatarMeta.fullName;
+                    }
+                    else {
+                        title = room.getRoomTitle();
+                    }
 
                     var n = self.notifications.notify(
                         'call-terminated',
@@ -232,7 +235,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                             'anfFlag': 'chat_enabled',
                             'icon': icon,
                             'params': {
-                                'from': avatarMeta.fullName
+                                'from': title
                             }
                         },
                         !AppActivityHandler.getGlobalAppActivityHandler()

@@ -273,7 +273,7 @@
                 }
             }
             if (filecnt && versioningFlag) {
-                p.t14 = '<a href ="#" id = "previousversions" class="red" >' + p.t14 + '</a>';
+                p.t14 = '<a id = "previousversions" class="red" >' + p.t14 + '</a>';
             }
         }
         else {

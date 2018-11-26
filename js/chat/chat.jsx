@@ -160,9 +160,24 @@ var Chat = function() {
         'loadbalancerService': 'gelb.karere.mega.nz',
         'rtc': {
             iceServers:[
-                // {urls: ['stun:stun.l.google.com:19302']},
+/*                {
+                    urls: ['turn:trnxxxx.karere.mega.nz:3478?transport=udp'],   // Luxembourg
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
+                }
+*/
                 {
-                    urls: ['turn:trn.karere.mega.nz:3478?transport=udp'],   // Luxembourg
+                    urls: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',   // Luxembourg
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
+                },
+                {
+                    urls: 'turn:trn302n001.karere.mega.nz:3478?transport=udp',   // Luxembourg
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
+                },
+                {
+                    urls: 'turn:trn530n001.karere.mega.nz:3478?transport=udp',   // Luxembourg
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 }
@@ -715,22 +730,40 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
     var unreadCount = 0;
 
 
-    self.chats.forEach(function(megaRoom, k) {
+    var havePendingCall = false;
+    self.haveAnyActiveCall() === false && self.chats.forEach(function(megaRoom, k) {
+        if (megaRoom.state == ChatRoom.STATE.LEFT) {
+            // skip left rooms.
+            return;
+        }
+
         var c = parseInt(megaRoom.messagesBuff.getUnreadCount(), 10);
         unreadCount += c;
+        havePendingCall = havePendingCall || megaRoom.havePendingCall();
     });
 
     unreadCount = unreadCount > 9 ? "9+" : unreadCount;
 
+    var haveContents = false;
     // try NOT to touch the DOM if not needed...
+    if (havePendingCall) {
+        haveContents = true;
+        $('.new-messages-indicator .chat-pending-call')
+            .removeClass('hidden');
+    }
+    else {
+        $('.new-messages-indicator .chat-pending-call')
+            .addClass('hidden');
+    }
+
     if (self._lastUnreadCount != unreadCount) {
         if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
-            $('.new-messages-indicator')
+            $('.new-messages-indicator .chat-unread-count')
+                .removeClass('hidden')
                 .text(unreadCount)
-                .removeClass('hidden');
         }
         else {
-            $('.new-messages-indicator')
+            $('.new-messages-indicator .chat-unread-count')
                 .addClass('hidden');
         }
         self._lastUnreadCount = unreadCount;
@@ -742,6 +775,17 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 
         self.updateDashboard();
     }
+    if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
+        haveContents = true;
+    }
+
+    if (!haveContents) {
+        $('.new-messages-indicator').addClass('hidden');
+    }
+    else {
+        $('.new-messages-indicator').removeClass('hidden');
+    }
+
 }, 100);
 
 /**
@@ -757,7 +801,7 @@ Chat.prototype.destroy = function(isLogout) {
     }
 
     self.isLoggingOut = isLogout;
-
+    self.rtc.logout();
     self.unregisterUploadListeners(true);
     self.trigger('onDestroy', [isLogout]);
 
@@ -2036,6 +2080,51 @@ Chat.prototype.getMyChatFilesFolder = function() {
     return promise;
 };
 
+/**
+ * Returns true if a 'rtc call' is found in .rtc.calls that (optionally) matches chatIdBin
+ * @param [chatIdBin] {String}
+ * @returns {boolean}
+ */
+Chat.prototype.haveAnyIncomingOrOutgoingCall = function(chatIdBin) {
+    if (chatIdBin) {
+        if (!this.rtc || !this.rtc.calls || Object.keys(this.rtc.calls).length === 0) {
+            return false;
+        }
+        else if (this.rtc && this.rtc.calls) {
+            var callIds = Object.keys(this.rtc.calls);
+            for (var i = 0; i < callIds.length; i++) {
+                if (this.rtc.calls[callIds[i]].chatid !== chatIdBin) {
+                    return true;
+                }
+            }
+            // didn't found any chat that doesn't match the current chatdIdBin
+            return false;
+        }
+        else {
+            return false
+        }
+    }
+    else {
+        return this.rtc && this.rtc.calls && Object.keys(this.rtc.calls).length > 0;
+    }
+};
+
+/**
+ * Returns true if there is a chat room with an active (started/starting) call.
+ *
+ * @returns {boolean}
+ */
+Chat.prototype.haveAnyActiveCall = function() {
+   var self = this;
+   var chatIds = self.chats.keys();
+   for (var i = 0; i < chatIds.length; i++) {
+       if (self.chats[chatIds[i]].haveActiveCall()) {
+           return true;
+       }
+   }
+   return false;
+};
+
 
 /**
  * Creates a 1on1 chat room and opens the send files from cloud drive dialog automatically
@@ -2063,6 +2152,7 @@ Chat.prototype.openChatAndSendFilesDialog = function(user_handle) {
         console.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId);
     }
 };
+
 
 window.Chat = Chat;
 window.chatui = chatui;

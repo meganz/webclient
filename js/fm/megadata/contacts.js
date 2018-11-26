@@ -703,6 +703,10 @@ MegaData.prototype.syncUsersFullname = function(userId) {
 
             $('.user-name').text(u_attr.fullname);
             $('.membership-big-txt.name').text(u_attr.fullname);
+            if (M.currentdirid === 'account') {
+                $('.account.tab-content.general #account-firstname').val(firstName);
+                $('.account.tab-content.general #account-lastname').val(lastName);
+            }
         }
         // check if this first name + last belongs to business sub-user
         // we added here to avoid re-calling get attribute + minimize the need of code refactoring

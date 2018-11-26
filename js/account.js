@@ -303,6 +303,11 @@ function u_logout(logout) {
             waitxhr.abort();
             waitxhr = undefined;
         }
+        for (i in localStorage) {
+            if (i.indexOf('sort') > -1) {
+                delete localStorage[i];
+            }
+        }
     }
 }
 
@@ -1029,7 +1034,6 @@ function processEmailChangeActionPacket(ap) {
         }
         throttledSetLastInteractionOps.push([u_h, v, promise]);
 
-
         return promise;
     };
 
@@ -1196,7 +1200,7 @@ function processEmailChangeActionPacket(ap) {
         mega.attr.get(u_handle, 'fmconfig', false, true)
             .always(moveLegacySettings)
             .done(function(result) {
-                result = Object(result);
+                result = Object.assign({}, fmconfig, Object(result));
                 for (var key in result) {
                     if (result.hasOwnProperty(key)) {
                         try {
@@ -1269,6 +1273,9 @@ function processEmailChangeActionPacket(ap) {
                 // Initialize account notifications.
                 if (!is_mobile) {
                     mega.notif.setup(fmconfig.anf);
+                    if (fminitialized && page.indexOf('fm/account') > -1 && M.account) {
+                        accountUI.renderAccountPage(M.account);
+                    }
                 }
             });
 

@@ -275,49 +275,39 @@ function dashboardUI() {
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
 
         // left-panel responsive contents
-        var $planDateWidth = $('.plan-date-info').width() + $('.plan-date-val').width();
-        var $regDateWidth = $('.reg-date-info').width() + $('.plan-date-val').width();
-        $.leftPaneResizable.options.updateWidth = Math.max($planDateWidth, $regDateWidth);
+        var maxwidth = 0;
+        for (var i = 0; i < $('.account.left-pane.small-txt:visible').length; i++){
+            var rowwidth = $('.account.left-pane.small-txt:visible').get(i).offsetWidth
+                + $('.account.left-pane.big-txt:visible').get(i).offsetWidth;
+            maxwidth = Math.max(maxwidth, rowwidth);
+        }
+        $.leftPaneResizable.options.updateWidth = maxwidth;
 
         $($.leftPaneResizable).trigger('resize');
         if (!u_attr.b) {
             accountUI.fillCharts(account, true);
 
-            /* Used Storage progressbar */
-            var percents = [
-                100 * account.stats[M.RootID].bytes / account.space,
-                100 * account.stats[M.RubbishID].bytes / account.space,
-                100 * account.stats.inshares.bytes / account.space,
-                100 * account.stats[M.InboxID].bytes / account.space
-            ];
-            for (var i = 0; i < 4; i++) {
-                var $percBlock = $('.storage .account.progress-perc.pr' + i);
-                if (percents[i] > 0) {
-                    $percBlock.text(Math.round(percents[i]) + ' %');
-                    $percBlock.parent().removeClass('empty hidden');
-                }
-                else {
-                    $percBlock.text('');
-                    $percBlock.parent().addClass('empty hidden');
-                }
+
+        /* Used Storage progressbar */
+        var percents = [
+            100 * account.stats[M.RootID].bytes / account.space,
+            100 * account.stats[M.RubbishID].bytes / account.space,
+            100 * account.stats.inshares.bytes / account.space,
+            100 * account.stats[M.InboxID].bytes / account.space
+        ];
+        for (var i = 0; i < 4; i++) {
+            var $percBlock = $('.storage .account.progress-perc.pr' + i);
+            if (percents[i] > 0) {
+                $percBlock.text(Math.round(percents[i]) + ' %');
+                $percBlock.parent().removeClass('empty hidden');
             }
-            // Cloud drive
-            $('.account.progress-size.cloud-drive').text(
-                account.stats[M.RootID].bytes > 0 ? bytesToSize(account.stats[M.RootID].bytes) : '-'
-            );
-            // Rubbish bin
-            $('.account.progress-size.rubbish-bin').text(
-                account.stats[M.RubbishID].bytes > 0 ? bytesToSize(account.stats[M.RubbishID].bytes) : '-'
-            );
-            // Incoming shares
-            $('.account.progress-size.incoming-shares').text(
-                account.stats.inshares.bytes ? bytesToSize(account.stats.inshares.bytes) : '-'
-            );
-            // Inbox
-            $('.account.progress-size.inbox').text(
-                account.stats[M.InboxID].bytes > 0 ? bytesToSize(account.stats[M.InboxID].bytes) : '-'
-            );
-            /* End of Used Storage progressbar */
+            else {
+                $percBlock.text('');
+                $percBlock.parent().addClass('empty hidden');
+            }
+        }
+        accountUI.renderProgressBar(account);
+        /* End of Used Storage progressbar */
 
 
             /* Used Bandwidth progressbar */
@@ -476,7 +466,7 @@ dashboardUI.updateChatWidget = function() {
     var allChats = 0;
     var privateChats = 0;
     var groupChats = 0;
-    var unreadMessages = $('.nw-fm-left-icon.conversations > .new-messages-indicator:visible').text();
+    var unreadMessages = $('.new-messages-indicator .chat-unread-count:visible').text();
 
     if (!megaChatIsDisabled && typeof megaChat !== 'undefined') {
         megaChat.chats.forEach(function(chatRoom) {

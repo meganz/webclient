@@ -402,14 +402,16 @@ function dashboardUI() {
 
             var verFiles = 0;
             var verBytes = 0;
-            for (var k in account.stats) {
-                if (account.stats[k]['vfiles']) {
-                    verFiles += account.stats[k]['vfiles'];
-                }
-                if (account.stats[k]['vbytes']) {
-                    verBytes += account.stats[k]['vbytes'];
-                }
-            }
+            verFiles = account.stats[M.RootID]['vfiles'];
+            verBytes = account.stats[M.RootID]['vbytes'];
+            // for (var k in account.stats) {
+            //    if (account.stats[k]['vfiles']) {
+            //        verFiles += account.stats[k]['vfiles'];
+            //    }
+            //    if (account.stats[k]['vbytes']) {
+            //        verBytes += account.stats[k]['vbytes'];
+            //    }
+            // }
 
             $dataStats.find('.ba-version .ff-occupy').text(bytesToSize(verBytes));
             $dataStats.find('.ba-version .file-number').text(verFiles + ' ' + l[2034]);

@@ -1958,8 +1958,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceDetailContainer.find('.billed-name').text(invoiceDetail.u.cname);
         $invoiceDetailContainer.find('.billed-email').text(invoiceDetail.u.e);
 
-        var validAddressSentFromApi = [];
-        for (var ad = 0; ad < invoiceDetail.u.addr.length; ad++) {
+        var validAddressSentFromApi = []; // storeing it, and remoing counrty
+        for (var ad = 0; ad < invoiceDetail.u.addr.length - 1; ad++) {
             if (invoiceDetail.u.addr[ad]) {
                 validAddressSentFromApi.push(invoiceDetail.u.addr[ad]);
             }
@@ -1999,6 +1999,10 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceItemsContainer.find('.inv-payment-price.inv-li-total .inv-total-val')
             .text('\u20ac' + Number(invoiceDetail.tot).toFixed(2));
 
+        if (taxSum > 0) {
+            $invoiceTopTitle.find('.inv-title.invv').text(l[19989]);
+        }
+
         // receipt top right items
         if (invoiceDetail.rnum) {
             // $invoiceTopTitle.find('#rece-date').text((new Date(invoiceDetail.payts * 1000)).toLocaleDateString());
@@ -2023,6 +2027,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         // now prepare the incovice.
                         // myPage = myPage.replace('{0Date}', (new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
                         myPage = myPage.replace('{0Date}', time2date(invoiceDetail.ts, 1));
+                        myPage = myPage.replace('{1InvoiceTitle}', $invoiceTopTitle.find('.inv-title.invv').text());
                         myPage = myPage.replace('{1InvoiceNB}', invoiceDetail.n);
                         myPage = myPage.replace('{2VATNB}', invoiceDetail.mega.taxnum[1]);
                         myPage = myPage.replace('{2VATTXT}', invoiceDetail.mega.taxnum[0]);

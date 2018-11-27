@@ -8180,7 +8180,16 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .contact-directory {
     display: none;
 }
-
+/* for business account */
+.bus-reg-body .bus-reg-title,
+.bus-reg-input.correctinput .bus-reg-title,
+.bus-reg-input.active .bus-reg-title,
+.bus-reg-input.error .bus-reg-title {
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    display: none;
+}
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
     .wrong-file .mobile.content-row, .downloading .mobile.content-row, .uploading .mobile.content-row {

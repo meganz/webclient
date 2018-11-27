@@ -220,7 +220,7 @@
 }
 
 .bus-reg-body .new-registration .register-pass-status-line1, .bus-reg-body .new-registration .register-pass-status-line2, .bus-reg-body .new-registration .register-pass-status-line3, .bus-reg-body .new-registration .register-pass-status-line4, .bus-reg-body .new-registration .register-pass-status-line5 {
-	width: 76px;
+	width: calc(20% - 4px);
 }
 
 .bus-reg-body .password-stutus-txt {

@@ -8448,6 +8448,13 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .invoice-container {
     position: relative;
 }
+.de .user-management-account-settings .invoice-detail .invoice-container.pay-receipt .mega-contact-container{
+    width: 55.5%;
+}
+
+.de .user-management-account-settings .invoice-detail .invoice-container.pay-receipt .inv-title-container{
+    width: calc(44% - 56px);
+}
 .bitcoin-invoice-dialog .helper-explanation {
     font-size: 12px;
     margin-top: 10px;
@@ -24807,7 +24814,7 @@ opacity: 1;
 .user-management-dialog .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar{
     width:24px;
     height: 24px;
-    line-height: 20px;
+    line-height: 22px;
     font-size: 16px;
 }
 
@@ -27380,7 +27387,8 @@ opacity: 1;
     display:none;
 }
 
-.user-management-dialog .dialog-input-title-ontop .error-message.er-sub-n {
+.user-management-dialog .dialog-input-title-ontop .error-message.er-sub-n,
+.user-management-dialog .dialog-input-title-ontop .error-message.er-sub-m  {
     left: 5px;
 }
 
@@ -27460,7 +27468,8 @@ opacity: 1;
     color: rgba(217,0,7,1);
 }
 .user-management-account-settings .bus-input.error .bus-input-title, 
-.user-management-dialog .dialog-input-title-ontop.error .title {
+.user-management-dialog .dialog-input-title-ontop.error .title,
+.bus-reg-input.error .bus-reg-title {
     visibility: visible;
     filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;

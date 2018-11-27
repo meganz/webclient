@@ -220,7 +220,7 @@
 }
 
 .bus-reg-body .new-registration .register-pass-status-line1, .bus-reg-body .new-registration .register-pass-status-line2, .bus-reg-body .new-registration .register-pass-status-line3, .bus-reg-body .new-registration .register-pass-status-line4, .bus-reg-body .new-registration .register-pass-status-line5 {
-	width: calc(20% - 4px);
+	width: calc(20% - 5px);
 }
 
 .bus-reg-body .password-stutus-txt {
@@ -623,13 +623,6 @@
 .bus-reg-header {
 	font-size: 30px;
 }
-
-
-.bus-reg-body .provider-icon.ecpMC{
-	margin-right: 10px;
-	background-position: -51px -414px;
-}
-
 .bus-reg-btn {
 	display: none;
 }

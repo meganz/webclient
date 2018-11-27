@@ -452,18 +452,28 @@ MegaData.prototype.renderPath = function(fileHandle) {
     breadcrumbsResize();
     $(window).rebind('resize.fmbreadcrumbs', SoonFc(breadcrumbsResize, 202));
 
-    if ($('.fm-right-header .fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
-        $('.fm-right-header .fm-breadcrumbs-block').removeClass('deactivated');
-    }
-    else {
-        $('.fm-right-header .fm-breadcrumbs-block').addClass('deactivated');
+    if (folderlink) {
+        $('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link');
+        $('.fm-breadcrumbs:first span').empty();
     }
 
-    $('.fm-right-header .fm-breadcrumbs-block a').rebind('click', function() {
+    var $block = $('.fm-right-header .fm-breadcrumbs-block');
+    if ($('.fm-breadcrumbs', $block).length > 1) {
+        $block.removeClass('deactivated');
+    }
+    else if (folderlink && $('.default-white-button.l-pane-visibility').hasClass('active')) {
+        $('.folder-link .right-arrow-bg', $block)
+            .safeHTML('<span>' + M.getNameByHandle(M.RootID) + '</span>');
+    }
+    else {
+        $block.addClass('deactivated');
+    }
+
+    $('a', $block).rebind('click', function() {
         var crumbId = $(this).attr('id');
 
         // When NOT deactivated
-        if (!$('.fm-right-header .fm-breadcrumbs-block').hasClass('deactivated')) {
+        if (!$block.hasClass('deactivated')) {
             if (crumbId === 'path_opc' || crumbId === 'path_ipc') {
                 return false;
             }
@@ -478,10 +488,6 @@ MegaData.prototype.renderPath = function(fileHandle) {
         }
     });
 
-    if (folderlink) {
-        $('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link');
-        $('.fm-breadcrumbs:first span').empty();
-    }
     if (!is_mobile) {
         if (fileHandle) {
             fileversioning.fileVersioningDialog(fileHandle);

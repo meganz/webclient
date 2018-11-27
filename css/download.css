@@ -26,7 +26,7 @@
     padding-top: 0px; 
     width: 100%;
     position: absolute;
-    bottom: 0px;
+    bottom: -10px;
     box-shadow: rgba(0, 0, 0, 0.1) 0px -1px 0px 0px;
     background-color: rgb(255, 255, 255);
 }

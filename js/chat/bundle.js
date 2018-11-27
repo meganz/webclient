@@ -58,7 +58,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var ConversationsUI = __webpack_require__(4);
-	var ChatRoom = __webpack_require__(32);
+	var ChatRoom = __webpack_require__(33);
 
 	var EMOJI_DATASET_VERSION = 2;
 
@@ -185,7 +185,15 @@ React.makeElement = React['createElement'];
 	        'loadbalancerService': 'gelb.karere.mega.nz',
 	        'rtc': {
 	            iceServers: [{
-	                urls: ['turn:trn.karere.mega.nz:3478?transport=udp'],
+	                urls: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',
+	                username: "inoo20jdnH",
+	                credential: '02nNKDBkkS'
+	            }, {
+	                urls: 'turn:trn302n001.karere.mega.nz:3478?transport=udp',
+	                username: "inoo20jdnH",
+	                credential: '02nNKDBkkS'
+	            }, {
+	                urls: 'turn:trn530n001.karere.mega.nz:3478?transport=udp',
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }]
@@ -677,18 +685,34 @@ React.makeElement = React['createElement'];
 
 	    var unreadCount = 0;
 
-	    self.chats.forEach(function (megaRoom, k) {
+	    var havePendingCall = false;
+	    self.haveAnyActiveCall() === false && self.chats.forEach(function (megaRoom, k) {
+	        if (megaRoom.state == ChatRoom.STATE.LEFT) {
+
+	            return;
+	        }
+
 	        var c = parseInt(megaRoom.messagesBuff.getUnreadCount(), 10);
 	        unreadCount += c;
+	        havePendingCall = havePendingCall || megaRoom.havePendingCall();
 	    });
 
 	    unreadCount = unreadCount > 9 ? "9+" : unreadCount;
 
+	    var haveContents = false;
+
+	    if (havePendingCall) {
+	        haveContents = true;
+	        $('.new-messages-indicator .chat-pending-call').removeClass('hidden');
+	    } else {
+	        $('.new-messages-indicator .chat-pending-call').addClass('hidden');
+	    }
+
 	    if (self._lastUnreadCount != unreadCount) {
 	        if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
-	            $('.new-messages-indicator').text(unreadCount).removeClass('hidden');
+	            $('.new-messages-indicator .chat-unread-count').removeClass('hidden').text(unreadCount);
 	        } else {
-	            $('.new-messages-indicator').addClass('hidden');
+	            $('.new-messages-indicator .chat-unread-count').addClass('hidden');
 	        }
 	        self._lastUnreadCount = unreadCount;
 
@@ -698,6 +722,15 @@ React.makeElement = React['createElement'];
 	        });
 
 	        self.updateDashboard();
+	    }
+	    if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
+	        haveContents = true;
+	    }
+
+	    if (!haveContents) {
+	        $('.new-messages-indicator').addClass('hidden');
+	    } else {
+	        $('.new-messages-indicator').removeClass('hidden');
 	    }
 	}, 100);
 
@@ -709,7 +742,7 @@ React.makeElement = React['createElement'];
 	    }
 
 	    self.isLoggingOut = isLogout;
-
+	    self.rtc.logout();
 	    self.unregisterUploadListeners(true);
 	    self.trigger('onDestroy', [isLogout]);
 
@@ -1632,6 +1665,38 @@ React.makeElement = React['createElement'];
 	    return promise;
 	};
 
+	Chat.prototype.haveAnyIncomingOrOutgoingCall = function (chatIdBin) {
+	    if (chatIdBin) {
+	        if (!this.rtc || !this.rtc.calls || Object.keys(this.rtc.calls).length === 0) {
+	            return false;
+	        } else if (this.rtc && this.rtc.calls) {
+	            var callIds = Object.keys(this.rtc.calls);
+	            for (var i = 0; i < callIds.length; i++) {
+	                if (this.rtc.calls[callIds[i]].chatid !== chatIdBin) {
+	                    return true;
+	                }
+	            }
+
+	            return false;
+	        } else {
+	            return false;
+	        }
+	    } else {
+	        return this.rtc && this.rtc.calls && Object.keys(this.rtc.calls).length > 0;
+	    }
+	};
+
+	Chat.prototype.haveAnyActiveCall = function () {
+	    var self = this;
+	    var chatIds = self.chats.keys();
+	    for (var i = 0; i < chatIds.length; i++) {
+	        if (self.chats[chatIds[i]].haveActiveCall()) {
+	            return true;
+	        }
+	    }
+	    return false;
+	};
+
 	Chat.prototype.openChatAndSendFilesDialog = function (user_handle) {
 	    var userHandles = [u_handle, user_handle];
 	    var result = megaChat.openChat(userHandles, "private");
@@ -1727,7 +1792,15 @@ React.makeElement = React['createElement'];
 	        renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
 	    }
 
-	    var author = Message.getContactForMessage(lastMessage);
+	    var author;
+
+	    if (lastMessage.dialogType === "privilegeChange" && lastMessage.meta && lastMessage.meta.targetUserId) {
+	        author = M.u[lastMessage.meta.targetUserId[0]] || Message.getContactForMessage(lastMessage);
+	    } else if (lastMessage.dialogType === "alterParticipants") {
+	        author = M.u[lastMessage.meta.included[0] || lastMessage.meta.excluded[0]] || Message.getContactForMessage(lastMessage);
+	    } else {
+	        author = Message.getContactForMessage(lastMessage);
+	    }
 	    if (author) {
 	        if (!lastMessage._contactChangeListener && author.addChangeListener) {
 	            lastMessage._contactChangeListener = author.addChangeListener(function () {
@@ -1847,14 +1920,20 @@ React.makeElement = React['createElement'];
 	        }
 
 	        var unreadCount = chatRoom.messagesBuff.getUnreadCount();
-	        var unreadDiv = null;
 	        var isUnread = false;
+
+	        var notificationItems = [];
+	        if (chatRoom.havePendingCall() && chatRoom.state != ChatRoom.STATE.LEFT) {
+	            notificationItems.push(React.makeElement("i", {
+	                className: "tiny-icon " + (chatRoom.isCurrentlyActive ? "blue" : "white") + "-handset",
+	                key: "callIcon" }));
+	        }
 	        if (unreadCount > 0) {
-	            unreadDiv = React.makeElement(
-	                "div",
-	                { className: "unread-messages" },
+	            notificationItems.push(React.makeElement(
+	                "span",
+	                { key: "unreadCounter" },
 	                unreadCount > 9 ? "9+" : unreadCount
-	            );
+	            ));
 	            isUnread = true;
 	        }
 
@@ -1870,6 +1949,10 @@ React.makeElement = React['createElement'];
 	            var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
 	            lastMessage.renderableSummary = renderableSummary;
 
+	            if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
+	                lastMsgDivClasses += " call";
+	                classString += " call-exists";
+	            }
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });
 
 	            var timestamp = lastMessage.delay;
@@ -1943,6 +2026,10 @@ React.makeElement = React['createElement'];
 	            archivedDiv = "";
 	        }
 
+	        if (chatRoom.callManagerCall && (chatRoom.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || chatRoom.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING)) {
+	            classString += " have-incoming-ringing-call";
+	        }
+
 	        return React.makeElement(
 	            "li",
 	            { className: classString, id: id, "data-room-id": roomId, "data-jid": contactId,
@@ -1958,7 +2045,11 @@ React.makeElement = React['createElement'];
 	                chatRoom.type === "private" ? React.makeElement("span", { className: "user-card-presence " + presenceClass }) : undefined
 	            ),
 	            archivedDiv,
-	            unreadDiv,
+	            notificationItems.length > 0 ? React.makeElement(
+	                "div",
+	                { className: "unread-messages items-" + notificationItems.length },
+	                notificationItems
+	            ) : null,
 	            inCallDiv,
 	            lastMessageDiv,
 	            lastMessageDatetimeDiv
@@ -2146,7 +2237,6 @@ React.makeElement = React['createElement'];
 	        if (activeCallSession && activeCallSession.room && megaChat.activeCallSession.isActive()) {
 	            var room = activeCallSession.room;
 	            var user = room.getParticipantsExceptMe()[0];
-	            user = megaChat.getContactFromJid(user);
 
 	            if (user) {
 	                currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.userPresenceToCssClass(user.presence);
@@ -3552,36 +3642,67 @@ React.makeElement = React['createElement'];
 /* 7 */
 /***/ (function(module, exports) {
 
-	'use strict';
+	"use strict";
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 	var getMessageString;
 	(function () {
 	    var MESSAGE_STRINGS;
-	    getMessageString = function getMessageString(type) {
+	    var MESSAGE_STRINGS_GROUP;
+	    var _sanitizeStrings = function _sanitizeStrings(arg) {
+	        if (typeof arg === "undefined") {
+	            return arg;
+	        } else if (typeof arg === "string") {
+	            return escapeHTML(arg);
+	        } else if (arg.forEach) {
+	            arg.forEach(function (v, k) {
+	                arg[k] = _sanitizeStrings(v);
+	            });
+	        } else if ((typeof arg === "undefined" ? "undefined" : _typeof(arg)) === "object") {
+	            Object.keys(arg).forEach(function (k) {
+	                arg[k] = _sanitizeStrings(arg[k]);
+	            });
+	        }
+	        return arg;
+	    };
+
+	    getMessageString = function getMessageString(type, isGroupCall) {
 	        if (!MESSAGE_STRINGS) {
 	            MESSAGE_STRINGS = {
-	                'outgoing-call': l[5891],
-	                'incoming-call': l[5893],
-	                'call-timeout': [[l[18698]]],
-	                'call-starting': l[7206],
-	                'call-feedback': l[7998],
-	                'call-initialising': l[7207],
-	                'call-ended': [[l[18689], l[5889]], l[7208]],
-	                'remoteCallEnded': [[l[18689], l[5889]], l[7208]],
+	                'outgoing-call': l[5891].replace("[X]", "[[[X]]]"),
+	                'incoming-call': l[19964] || "[[%s]] is calling...",
+	                'call-timeout': [l[18698].replace("[X]", "[[[X]]]")],
+	                'call-starting': l[7206].replace("[X]", "[[[X]]]"),
+	                'call-feedback': l[7998].replace("[X]", "[[[X]]]"),
+	                'call-initialising': l[7207].replace("[X]", "[[[X]]]"),
+	                'call-ended': [l[19965] || "Call ended.", l[7208]],
+	                'remoteCallEnded': [l[19965] || "Call ended.", l[7208]],
 	                'call-failed-media': l[7204],
-	                'call-failed': [[l[18690], l[7209]], l[7208]],
-	                'call-handled-elsewhere': l[5895],
-	                'call-missed': l[7210],
-	                'call-rejected': [[l[18691], l[5892]]],
-	                'call-canceled': [[l[18692], l[5894]]],
-	                'call-started': l[5888],
+	                'call-failed': [l[19966] || "Call failed.", l[7208]],
+	                'call-handled-elsewhere': l[5895].replace("[X]", "[[[X]]]"),
+	                'call-missed': l[17870],
+	                'call-rejected': l[19040],
+	                'call-canceled': l[19041],
+	                'remoteCallStarted': l[5888],
+	                'call-started': l[5888].replace("[X]", "[[[X]]]"),
 	                'alterParticipants': undefined,
 	                'privilegeChange': l[8915],
 	                'truncated': l[8905]
-
 	            };
+	            _sanitizeStrings(MESSAGE_STRINGS);
 	        }
-	        return MESSAGE_STRINGS[type];
+	        if (isGroupCall && !MESSAGE_STRINGS_GROUP) {
+	            MESSAGE_STRINGS_GROUP = {
+	                'call-ended': [l[19967], l[7208]],
+	                'remoteCallEnded': [l[19967], l[7208]],
+	                'call-handled-elsewhere': l[19968],
+	                'call-canceled': l[19969],
+	                'call-started': l[19970]
+	            };
+	            _sanitizeStrings(MESSAGE_STRINGS_GROUP);
+	        }
+	        return !isGroupCall ? MESSAGE_STRINGS[type] : MESSAGE_STRINGS_GROUP[type] ? MESSAGE_STRINGS_GROUP[type] : MESSAGE_STRINGS[type];
 	    };
 	})();
 
@@ -4878,7 +4999,11 @@ React.makeElement = React['createElement'];
 	                        self.props.onClick(e);
 	                    } : self.onClick },
 	                verifiedElement,
-	                avatarMeta.avatar.letters
+	                React.makeElement(
+	                    "span",
+	                    null,
+	                    avatarMeta.avatar.letters
+	                )
 	            );
 	        }
 
@@ -5003,6 +5128,7 @@ React.makeElement = React['createElement'];
 	                { className: "user-card-data" },
 	                usernameBlock,
 	                React.makeElement(ContactPresence, { contact: contact, className: this.props.presenceClassName }),
+	                this.props.isInCall ? React.makeElement("i", { className: "small-icon audio-call" }) : null,
 	                React.makeElement(
 	                    "div",
 	                    { className: "user-card-email" },
@@ -5401,6 +5527,43 @@ React.makeElement = React['createElement'];
 	var PrivilegeChange = __webpack_require__(30).PrivilegeChange;
 	var TopicChange = __webpack_require__(31).TopicChange;
 
+	var ENABLE_GROUP_CALLING_FLAG = typeof localStorage.enableGroupCalling !== 'undefined' && localStorage.enableGroupCalling === "1";
+
+	var ConversationAudioVideoPanel = __webpack_require__(32).ConversationAudioVideoPanel;
+
+	var JoinCallNotification = React.createClass({
+	    displayName: "JoinCallNotification",
+
+	    mixins: [MegaRenderMixin],
+	    render: function render() {
+	        var room = this.props.chatRoom;
+	        if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
+	            return React.makeElement(
+	                "div",
+	                { className: "in-call-notif yellow join" },
+	                React.makeElement("i", { className: "small-icon audio-call colorized" }),
+	                "There is an active group call, but maximum call participants count had been reached."
+	            );
+	        } else {
+	            return React.makeElement(
+	                "div",
+	                { className: "in-call-notif neutral join" },
+	                React.makeElement("i", { className: "small-icon audio-call colorized" }),
+	                "There is an active group call. ",
+	                React.makeElement(
+	                    "a",
+	                    { href: "javascript:;", onClick: function onClick(e) {
+	                            room.joinCall();
+	                            e.preventDefault();
+	                            return false;
+	                        } },
+	                    "Join"
+	                )
+	            );
+	        }
+	    }
+	});
+
 	var ConversationRightArea = React.createClass({
 	    displayName: "ConversationRightArea",
 
@@ -5455,19 +5618,21 @@ React.makeElement = React['createElement'];
 	        }
 	        self._wasAppendedEvenOnce = true;
 
-	        var disabledCalls = room.isReadOnly() || !room.chatId || room.callManagerCall;
+	        var disabledCalls = room.isReadOnly() || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING;
+
+	        var disableStartCalls = disabledCalls || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin);
 
 	        var startAudioCallButtonClass = "";
 	        var startVideoCallButtonClass = "";
 
-	        if (disabledCalls) {
+	        if (disabledCalls || disableStartCalls) {
 	            startAudioCallButtonClass = startVideoCallButtonClass = "disabled";
 	        }
 
 	        var startAudioCallButton = React.makeElement(
 	            "div",
 	            { className: "link-button" + " " + startVideoCallButtonClass, onClick: function onClick() {
-	                    if (!disabledCalls) {
+	                    if (!disableStartCalls) {
 	                        room.startAudioCall();
 	                    }
 	                } },
@@ -5478,7 +5643,7 @@ React.makeElement = React['createElement'];
 	        var startVideoCallButton = React.makeElement(
 	            "div",
 	            { className: "link-button" + " " + startVideoCallButtonClass, onClick: function onClick() {
-	                    if (!disabledCalls) {
+	                    if (!disableStartCalls) {
 	                        room.startVideoCall();
 	                    }
 	                } },
@@ -5494,13 +5659,25 @@ React.makeElement = React['createElement'];
 	                    }
 	                } },
 	            React.makeElement("i", { className: "small-icon horizontal-red-handset" }),
-	            __(l[5884])
+	            room.type === "group" ? "Leave call" : l[5884]
 	        );
 
 	        if (room.callManagerCall && room.callManagerCall.isActive() === true) {
 	            startAudioCallButton = startVideoCallButton = null;
 	        } else {
 	            endCallButton = null;
+	        }
+
+	        if (room.type === "group") {
+
+	            if (room.callParticipants && Object.keys(room.callParticipants).length > 0 && (!room.callManagerCall || room.callManagerCall.isActive() === false)) {
+
+	                startAudioCallButton = startVideoCallButton = null;
+	            }
+	        }
+
+	        if (room.type === "group" && !ENABLE_GROUP_CALLING_FLAG) {
+	            startAudioCallButton = startVideoCallButton = null;
 	        }
 
 	        var isReadOnlyElement = null;
@@ -5584,9 +5761,9 @@ React.makeElement = React['createElement'];
 	                            { className: "chat-right-head-txt" },
 	                            "Options"
 	                        ),
-	                        room.type !== "group" ? startAudioCallButton : null,
-	                        room.type !== "group" ? startVideoCallButton : null,
-	                        room.type !== "group" ? AVseperator : null,
+	                        startAudioCallButton,
+	                        startVideoCallButton,
+	                        AVseperator,
 	                        room.type == "group" ? React.makeElement(
 	                            "div",
 	                            { className: renameButtonClass,
@@ -5692,441 +5869,6 @@ React.makeElement = React['createElement'];
 	    }
 	});
 
-	var ConversationAudioVideoPanel = React.createClass({
-	    displayName: "ConversationAudioVideoPanel",
-
-	    mixins: [MegaRenderMixin],
-	    getInitialState: function getInitialState() {
-	        return {
-	            'messagesBlockEnabled': false,
-	            'fullScreenModeEnabled': false,
-	            'localMediaDisplay': true
-	        };
-	    },
-	    _hideBottomPanel: function _hideBottomPanel() {
-	        var self = this;
-	        var room = self.props.chatRoom;
-	        if (!room.callManagerCall || !room.callManagerCall.isActive()) {
-	            return;
-	        }
-
-	        var $container = $(ReactDOM.findDOMNode(self));
-
-	        self.visiblePanel = false;
-	        $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
-	    },
-	    componentDidUpdate: function componentDidUpdate() {
-	        var self = this;
-	        var room = self.props.chatRoom;
-	        if (!room.callManagerCall || !room.callManagerCall.isActive()) {
-	            return;
-	        }
-
-	        var $container = $(ReactDOM.findDOMNode(self));
-
-	        var mouseoutThrottling = null;
-	        $container.rebind('mouseover.chatUI' + self.props.chatRoom.roomId, function () {
-	            var $this = $(this);
-	            clearTimeout(mouseoutThrottling);
-	            self.visiblePanel = true;
-	            $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
-	            if ($this.hasClass('full-sized-block')) {
-	                $('.call.top-panel', $container).addClass('visible-panel');
-	            }
-	        });
-
-	        $container.rebind('mouseout.chatUI' + self.props.chatRoom.roomId, function () {
-	            var $this = $(this);
-	            clearTimeout(mouseoutThrottling);
-	            mouseoutThrottling = setTimeout(function () {
-	                self.visiblePanel = false;
-	                self._hideBottomPanel();
-	                $('.call.top-panel', $container).removeClass('visible-panel');
-	            }, 500);
-	        });
-
-	        var idleMouseTimer;
-	        var forceMouseHide = false;
-	        $container.rebind('mousemove.chatUI' + self.props.chatRoom.roomId, function (ev) {
-	            var $this = $(this);
-	            if (self._bottomPanelMouseOver) {
-	                return;
-	            }
-	            clearTimeout(idleMouseTimer);
-	            if (!forceMouseHide) {
-	                self.visiblePanel = true;
-	                $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
-	                $container.removeClass('no-cursor');
-	                if ($this.hasClass('full-sized-block')) {
-	                    $('.call.top-panel', $container).addClass('visible-panel');
-	                }
-	                idleMouseTimer = setTimeout(function () {
-	                    self.visiblePanel = false;
-
-	                    self._hideBottomPanel();
-
-	                    $container.addClass('no-cursor');
-	                    $('.call.top-panel', $container).removeClass('visible-panel');
-
-	                    forceMouseHide = true;
-	                    setTimeout(function () {
-	                        forceMouseHide = false;
-	                    }, 400);
-	                }, 2000);
-	            }
-	        });
-
-	        $('.call.bottom-panel', $container).rebind('mouseenter.chatUI' + self.props.chatRoom.roomId, function (ev) {
-	            self._bottomPanelMouseOver = true;
-	            clearTimeout(idleMouseTimer);
-	        });
-	        $('.call.bottom-panel', $container).rebind('mouseleave.chatUI' + self.props.chatRoom.roomId, function (ev) {
-	            self._bottomPanelMouseOver = false;
-
-	            idleMouseTimer = setTimeout(function () {
-	                self.visiblePanel = false;
-
-	                self._hideBottomPanel();
-
-	                $container.addClass('no-cursor');
-	                $('.call.top-panel', $container).removeClass('visible-panel');
-
-	                forceMouseHide = true;
-	                setTimeout(function () {
-	                    forceMouseHide = false;
-	                }, 400);
-	            }, 2000);
-	        });
-
-	        $(document).rebind("fullscreenchange.megaChat_" + room.roomId, function () {
-	            if (!$(document).fullScreen() && room.isCurrentlyActive) {
-	                self.setState({ fullScreenModeEnabled: false });
-	            } else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
-	                self.setState({ fullScreenModeEnabled: true });
-	            }
-	            self.forceUpdate();
-	        });
-
-	        var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
-	        $localMediaDisplay.draggable({
-	            'refreshPositions': true,
-	            'containment': $container,
-	            'scroll': false,
-	            drag: function drag(event, ui) {
-	                if ($(this).is(".minimized")) {
-	                    return false;
-	                }
-
-	                var right = Math.max(0, $container.outerWidth() - ui.position.left);
-	                var bottom = Math.max(0, $container.outerHeight() - ui.position.top);
-
-	                right = Math.min(right, $container.outerWidth() - 8);
-	                bottom = Math.min(bottom, $container.outerHeight() - 8);
-
-	                right = right - ui.helper.outerWidth();
-	                bottom = bottom - ui.helper.outerHeight();
-
-	                var minBottom = $(this).is(".minimized") ? 48 : 8;
-
-	                if (bottom < minBottom) {
-	                    bottom = minBottom;
-	                    $(this).addClass('bottom-aligned');
-	                } else {
-	                    $(this).removeClass('bottom-aligned');
-	                }
-
-	                if (right < 8) {
-	                    right = 8;
-	                    $(this).addClass('right-aligned');
-	                } else {
-	                    $(this).removeClass('right-aligned');
-	                }
-
-	                ui.offset = {
-	                    left: 'auto',
-	                    top: 'auto',
-	                    right: right,
-	                    bottom: bottom,
-	                    height: "",
-	                    width: ""
-	                };
-	                ui.position.left = 'auto';
-	                ui.position.top = 'auto';
-
-	                ui.helper.css(ui.offset);
-	                $(this).css(ui.offset);
-	            }
-	        });
-
-	        $(window).rebind('resize.chatUI_' + room.roomId, function (e) {
-	            if ($container.is(":visible")) {
-	                if (!elementInViewport($localMediaDisplay[0])) {
-	                    $localMediaDisplay.addClass('right-aligned').addClass('bottom-aligned').css({
-	                        'right': 8,
-	                        'bottom': 8
-	                    });
-	                }
-	            }
-	        });
-
-	        if (self.refs.remoteVideo && self.refs.remoteVideo.src === "" && self.refs.remoteVideo.currentTime === 0 && !self.refs.remoteVideo.srcObject) {
-	            var participants = room.getParticipantsExceptMe();
-	            var stream = room.callManagerCall._streams[participants[0]];
-	            RTC.attachMediaStream(self.refs.remoteVideo, stream);
-	        }
-
-	        if (room.megaChat.rtc && room.megaChat.rtc.gLocalStream && self.refs.localViewport && self.refs.localViewport.src === "" && self.refs.localViewport.currentTime === 0 && !self.refs.localViewport.srcObject) {
-	            RTC.attachMediaStream(self.refs.localViewport, room.megaChat.rtc.gLocalStream);
-	        }
-
-	        $(room).rebind('toggleMessages.av', function () {
-	            self.toggleMessages();
-	        });
-
-	        room.messagesBlockEnabled = self.state.messagesBlockEnabled;
-	    },
-	    componentWillUnmount: function componentWillUnmount() {
-	        var self = this;
-	        var room = self.props.chatRoom;
-
-	        var $container = $(ReactDOM.findDOMNode(self));
-	        if ($container) {
-	            $container.off('mouseover.chatUI' + self.props.chatRoom.roomId);
-	            $container.off('mouseout.chatUI' + self.props.chatRoom.roomId);
-	            $container.off('mousemove.chatUI' + self.props.chatRoom.roomId);
-	        }
-
-	        $(document).off("fullscreenchange.megaChat_" + room.roomId);
-	        $(window).off('resize.chatUI_' + room.roomId);
-	        $(room).off('toggleMessages.av');
-	    },
-	    toggleMessages: function toggleMessages(e) {
-	        if (e) {
-	            e.preventDefault();
-	            e.stopPropagation();
-	        }
-
-	        if (this.props.onMessagesToggle) {
-	            this.props.onMessagesToggle(!this.state.messagesBlockEnabled);
-	        }
-
-	        this.setState({
-	            'messagesBlockEnabled': !this.state.messagesBlockEnabled
-	        });
-	    },
-	    fullScreenModeToggle: function fullScreenModeToggle(e) {
-	        e.preventDefault();
-	        e.stopPropagation();
-
-	        var newVal = !this.state.fullScreenModeEnabled;
-	        $(document).fullScreen(newVal);
-
-	        this.setState({
-	            'fullScreenModeEnabled': newVal,
-	            'messagesBlockEnabled': newVal === true ? false : this.state.messagesBlockEnabled
-	        });
-	    },
-	    toggleLocalVideoDisplay: function toggleLocalVideoDisplay(e) {
-	        e.preventDefault();
-	        e.stopPropagation();
-
-	        var $container = $(ReactDOM.findDOMNode(this));
-	        var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
-
-	        $localMediaDisplay.addClass('right-aligned').addClass('bottom-aligned').css({
-	            'width': '',
-	            'height': '',
-	            'right': 8,
-	            'bottom': !this.state.localMediaDisplay === true ? 8 : 8
-	        });
-
-	        this.setState({ localMediaDisplay: !this.state.localMediaDisplay });
-	    },
-	    render: function render() {
-	        var chatRoom = this.props.chatRoom;
-
-	        if (!chatRoom.callManagerCall || !chatRoom.callManagerCall.isStarted()) {
-	            return null;
-	        }
-
-	        var participants = chatRoom.getParticipantsExceptMe();
-
-	        var displayNames = [];
-
-	        participants.forEach(function (v) {
-	            displayNames.push(htmlentities(M.getNameByHandle(v)));
-	        });
-
-	        var callManagerCall = chatRoom.callManagerCall;
-
-	        var remoteCamEnabled = null;
-
-	        if (callManagerCall.getRemoteMediaOptions().video) {
-	            remoteCamEnabled = React.makeElement("i", { className: "small-icon blue-videocam" });
-	        }
-
-	        var localPlayerElement = null;
-	        var remotePlayerElement = null;
-
-	        var visiblePanelClass = "";
-	        var localPlayerStream;
-	        if (callManagerCall && chatRoom.megaChat.rtc && chatRoom.megaChat.rtc.gLocalStream) {
-	            localPlayerStream = chatRoom.megaChat.rtc.gLocalStream;
-	        }
-
-	        if (this.visiblePanel === true) {
-	            visiblePanelClass += " visible-panel";
-	        }
-	        if (!localPlayerStream || callManagerCall.getMediaOptions().video === false) {
-	            localPlayerElement = React.makeElement(
-	                "div",
-	                { className: "call local-audio right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass },
-	                React.makeElement(
-	                    "div",
-	                    { className: "default-white-button tiny-button call", onClick: this.toggleLocalVideoDisplay },
-	                    React.makeElement("i", { className: "tiny-icon grey-minus-icon" })
-	                ),
-	                React.makeElement(ContactsUI.Avatar, {
-	                    contact: M.u[u_handle], className: "call avatar-wrapper semi-big-avatar",
-	                    style: { display: !this.state.localMediaDisplay ? "none" : "" }
-	                })
-	            );
-	        } else {
-	            localPlayerElement = React.makeElement(
-	                "div",
-	                {
-	                    className: "call local-video right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass },
-	                React.makeElement(
-	                    "div",
-	                    { className: "default-white-button tiny-button call", onClick: this.toggleLocalVideoDisplay },
-	                    React.makeElement("i", { className: "tiny-icon grey-minus-icon" })
-	                ),
-	                React.makeElement("video", {
-	                    ref: "localViewport",
-	                    className: "localViewport",
-	                    defaultMuted: true,
-	                    muted: true,
-	                    volume: 0,
-	                    id: "localvideo_" + callManagerCall.id,
-	                    style: { display: !this.state.localMediaDisplay ? "none" : "" }
-
-	                })
-	            );
-	        }
-
-	        var remotePlayerStream = callManagerCall._streams[participants[0]];
-
-	        if (!remotePlayerStream || callManagerCall.getRemoteMediaOptions().video === false) {
-
-	            var contact = M.u[participants[0]];
-	            remotePlayerElement = React.makeElement(
-	                "div",
-	                { className: "call user-audio" },
-	                React.makeElement(ContactsUI.Avatar, { contact: contact, className: "avatar-wrapper big-avatar", hideVerifiedBadge: true })
-	            );
-	        } else {
-	            remotePlayerElement = React.makeElement(
-	                "div",
-	                { className: "call user-video" },
-	                React.makeElement("video", {
-	                    autoPlay: true,
-	                    className: "rmtViewport rmtVideo",
-	                    id: "remotevideo_" + callManagerCall.id,
-	                    ref: "remoteVideo"
-	                })
-	            );
-	        }
-
-	        var unreadDiv = null;
-	        var unreadCount = chatRoom.messagesBuff.getUnreadCount();
-	        if (unreadCount > 0) {
-	            unreadDiv = React.makeElement(
-	                "div",
-	                { className: "unread-messages" },
-	                unreadCount > 9 ? "9+" : unreadCount
-	            );
-	        }
-
-	        var additionalClass = "";
-	        additionalClass = this.state.fullScreenModeEnabled === true ? " full-sized-block" : "";
-	        if (additionalClass.length === 0) {
-	            additionalClass = this.state.messagesBlockEnabled === true ? " small-block" : "";
-	        }
-	        return React.makeElement(
-	            "div",
-	            { className: "call-block" + additionalClass, id: "call-block" },
-	            remotePlayerElement,
-	            localPlayerElement,
-	            React.makeElement(
-	                "div",
-	                { className: "call top-panel" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "call top-user-info" },
-	                    React.makeElement(
-	                        "span",
-	                        { className: "user-card-name white" },
-	                        displayNames.join(", ")
-	                    ),
-	                    remoteCamEnabled
-	                ),
-	                React.makeElement(
-	                    "div",
-	                    {
-	                        className: "call-duration medium blue call-counter",
-	                        "data-room-id": chatRoom.chatId },
-	                    secondsToTimeShort(chatRoom._currentCallCounter)
-	                )
-	            ),
-	            React.makeElement(
-	                "div",
-	                { className: "call bottom-panel" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "button call left" + (unreadDiv ? " unread" : ""), onClick: this.toggleMessages },
-	                    unreadDiv,
-	                    React.makeElement("i", { className: "big-icon conversations" })
-	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "button call", onClick: function onClick(e) {
-	                            if (callManagerCall.getMediaOptions().audio === true) {
-	                                callManagerCall.muteAudio();
-	                            } else {
-	                                callManagerCall.unmuteAudio();
-	                            }
-	                        } },
-	                    React.makeElement("i", { className: "big-icon " + (callManagerCall.getMediaOptions().audio ? " microphone" : " crossed-microphone") })
-	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "button call", onClick: function onClick(e) {
-	                            if (callManagerCall.getMediaOptions().video === true) {
-	                                callManagerCall.muteVideo();
-	                            } else {
-	                                callManagerCall.unmuteVideo();
-	                            }
-	                        } },
-	                    React.makeElement("i", { className: "big-icon " + (callManagerCall.getMediaOptions().video ? " videocam" : " crossed-videocam") })
-	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "button call", onClick: function onClick(e) {
-	                            if (chatRoom.callManagerCall) {
-	                                chatRoom.callManagerCall.endCall();
-	                            }
-	                        } },
-	                    React.makeElement("i", { className: "big-icon horizontal-red-handset" })
-	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "button call right", onClick: this.fullScreenModeToggle },
-	                    React.makeElement("i", { className: "big-icon nwse-resize" })
-	                )
-	            )
-	        );
-	    }
-	});
 	var ConversationPanel = React.createClass({
 	    displayName: "ConversationPanel",
 
@@ -6214,7 +5956,13 @@ React.makeElement = React['createElement'];
 
 	        if ($container.length > 0) {
 	            self.initialised = true;
+	        } else {
+	            return;
 	        }
+
+	        $(self.findDOMNode()).rebind('resized.convpanel', function () {
+	            self.handleWindowResize();
+	        });
 
 	        self.$messages = $('.messages.scroll-area > .perfectScrollbarContainer', $container);
 
@@ -6349,6 +6097,11 @@ React.makeElement = React['createElement'];
 	            self.$messages.css('height', scrollBlockHeight);
 	            $('.messages.main-pad', self.$messages).css('min-height', scrollBlockHeight);
 	            self.refreshUI(true);
+	            if (self.props.chatRoom.callManagerCall) {
+	                $('.messages-block', $container).height(scrollBlockHeight + $('.chat-textarea-block', $container).outerHeight());
+	            } else {
+	                $('.messages-block', $container).height('');
+	            }
 	        } else {
 	            self.refreshUI(scrollToBottom);
 	        }
@@ -6574,7 +6327,8 @@ React.makeElement = React['createElement'];
 	                    lastTimeMarker = curTimeMarker;
 	                    messagesList.push(React.makeElement(
 	                        "div",
-	                        { className: "message date-divider", key: v.messageId + "_marker" },
+	                        { className: "message date-divider", key: v.messageId + "_marker",
+	                            title: time2date(timestamp) },
 	                        curTimeMarker
 	                    ));
 
@@ -6620,7 +6374,7 @@ React.makeElement = React['createElement'];
 	                    }
 	                }
 
-	                if (v.dialogType === "remoteCallEnded" && v && v.wrappedChatDialogMessage) {
+	                if ((v.dialogType === "remoteCallEnded" || v.dialogType === "remoteCallStarted") && v && v.wrappedChatDialogMessage) {
 	                    v = v.wrappedChatDialogMessage;
 	                }
 
@@ -7154,7 +6908,7 @@ React.makeElement = React['createElement'];
 	                        }
 	                    }
 	                }),
-	                React.makeElement(ConversationAudioVideoPanel, {
+	                room.callManagerCall && room.callManagerCall.isStarted() ? React.makeElement(ConversationAudioVideoPanel, {
 	                    chatRoom: this.props.chatRoom,
 	                    contacts: self.props.contacts,
 	                    megaChat: this.props.chatRoom.megaChat,
@@ -7164,7 +6918,7 @@ React.makeElement = React['createElement'];
 	                            'messagesToggledInCall': isActive
 	                        });
 	                    }
-	                }),
+	                }) : null,
 	                attachCloudDialog,
 	                sendContactDialog,
 	                confirmDeleteDialog,
@@ -7204,7 +6958,7 @@ React.makeElement = React['createElement'];
 	                ),
 	                self.props.chatRoom.type === "group" ? React.makeElement(
 	                    "div",
-	                    { className: "chat-topic-block" },
+	                    { className: "chat-topic-block" + (self.props.chatRoom.havePendingGroupCall() || self.props.chatRoom.haveActiveCall() ? " have-pending-group-call" : "") },
 	                    React.makeElement(
 	                        utils.EmojiFormattedContent,
 	                        null,
@@ -7263,6 +7017,7 @@ React.makeElement = React['createElement'];
 	                            )
 	                        )
 	                    ),
+	                    room.state != ChatRoom.STATE.LEFT && room.havePendingGroupCall() && (!room.callManagerCall || room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) ? React.makeElement(JoinCallNotification, { chatRoom: room }) : null,
 	                    React.makeElement(
 	                        "div",
 	                        { className: "chat-textarea-block" },
@@ -9739,7 +9494,7 @@ React.makeElement = React['createElement'];
 	    },
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
-	        window.addEventListener('resize', self.handleWindowResize);
+	        $(window).rebind('resize.typingArea' + self.getUniqueId(), self.handleWindowResize);
 
 	        var $container = $(ReactDOM.findDOMNode(this));
 
@@ -9788,7 +9543,8 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        var chatRoom = self.props.chatRoom;
 	        self.triggerOnUpdate();
-	        window.removeEventListener('resize', self.handleWindowResize);
+
+	        $(window).unbind('resize.typingArea' + self.getUniqueId());
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        var self = this;
@@ -9802,6 +9558,7 @@ React.makeElement = React['createElement'];
 
 	            self.handleWindowResize();
 	        }
+
 	        if (!this.scrollingInitialised) {
 	            this.initScrolling();
 	        } else {
@@ -9974,6 +9731,7 @@ React.makeElement = React['createElement'];
 	    },
 	    handleWindowResize: function handleWindowResize(e, scrollToBottom) {
 	        var self = this;
+
 	        if (!self.isMounted()) {
 	            return;
 	        }
@@ -11347,6 +11105,7 @@ React.makeElement = React['createElement'];
 	                    dropdownButtonClasses: room.type == "group" ? "button icon-dropdown" : "default-white-button tiny-button",
 	                    dropdownRemoveButton: dropdownRemoveButton,
 	                    dropdownIconClasses: dropdownIconClasses,
+	                    isInCall: room.uniqueCallParts && room.uniqueCallParts[contactHash],
 	                    style: {
 	                        width: 249,
 	                        position: 'absolute',
@@ -12519,19 +12278,31 @@ React.makeElement = React['createElement'];
 	                );
 	            }
 	        } else if (message.type) {
-	            textMessage = getMessageString(message.type);
+	            var avatarsListing = [];
+	            textMessage = getMessageString(message.type, message.chatRoom.type === "group");
+
 	            if (!textMessage) {
 	                console.error("Message with type: ", message.type, " - no text string defined. Message: ", message);
 	                return;
 	            }
 
-	            if (textMessage.splice) {
-	                textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage, true);
-	            } else {
-	                textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
-	            }
+	            textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage.splice ? textMessage : [textMessage], true);
 
-	            message.textContents = textMessage;
+	            message.textContents = String(textMessage).replace("[[", "<span class=\"bold\">").replace("]]", "</span>");
+
+	            var avatar = null;
+	            var name = null;
+
+	            if (message.showInitiatorAvatar) {
+	                if (this.props.grouped) {
+	                    additionalClasses += " grouped";
+	                } else {
+	                    avatar = React.makeElement(ContactsUI.Avatar, { contact: message.authorContact,
+	                        className: 'message avatar-wrapper small-rounded-avatar' });
+	                    displayName = M.getNameByHandle(message.authorContact.u);
+	                    name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: 'message', label: displayName });
+	                }
+	            }
 
 	            if (message.type === "call-rejected") {
 	                message.cssClass = "handset-with-stop";
@@ -12595,24 +12366,81 @@ React.makeElement = React['createElement'];
 	                );
 	            }
 
+	            if (message.chatRoom.type === "group") {
+	                var participantNames = [];
+	                (message.meta && message.meta.participants || []).forEach(function (handle) {
+	                    var name = M.getNameByHandle(handle);
+	                    name && participantNames.push("[[" + htmlentities(name) + "]]");
+	                });
+
+	                additionalClasses += message.type !== "outgoing-call" && message.type != "incoming-call" ? " with-border" : "";
+	                var translationString = "";
+
+	                if (participantNames && participantNames.length > 0) {
+	                    translationString += mega.utils.trans.listToString(participantNames, "With %s");
+	                }
+
+	                if ((message.type === "call-ended" || message.type === "call-failed") && message.meta && message.meta.duration) {
+	                    translationString += (participantNames && participantNames.length > 0 ? ". " : "") + l[7208].replace("[X]", "[[" + secToDuration(message.meta.duration) + "]]");
+	                }
+	                translationString = translationString.replace(/\[\[/g, "<span class=\"bold\">").replace(/\]\]/g, "</span>");
+
+	                if (message.type === "call-started") {
+	                    textMessage = '<i class="call-icon diagonal-handset green"></i>' + textMessage;
+	                } else if (message.type === "call-ended") {
+	                    textMessage = '<i class="call-icon big horizontal-handset grey"></i>' + textMessage;
+	                } else if (message.type !== "outgoing-call" && message.type !== "incoming-call") {
+	                    textMessage = '<i class="call-icon ' + message.cssClass + '"></i>' + textMessage;
+	                }
+
+	                textMessage = "<div class=\"bold mainMessage\">" + textMessage + "</div>" + "<div class=\"extraCallInfo\">" + translationString + "</div>";
+
+	                if (message.type === "call-started" && message.messageId === "call-started-" + chatRoom.getActiveCallMessageId()) {
+	                    var callParts = Object.keys(chatRoom.callParticipants);
+	                    var unique = {};
+	                    callParts.forEach(function (handleAndSid) {
+	                        var handle = base64urlencode(handleAndSid.substr(0, 8));
+	                        if (!unique[handle]) {
+	                            avatarsListing.push(React.makeElement(ContactsUI.Avatar, {
+	                                key: handle,
+	                                contact: M.u[handle],
+	                                className: 'message avatar-wrapper small-rounded-avatar'
+	                            }));
+	                        }
+
+	                        unique[handle] = 1;
+	                    });
+	                }
+	            }
+
 	            return React.makeElement(
 	                'div',
 	                { className: message.messageId + " message body" + additionalClasses,
 	                    'data-id': "id" + message.messageId },
-	                React.makeElement(
+	                !message.showInitiatorAvatar ? React.makeElement(
 	                    'div',
 	                    { className: 'feedback call-status-block' },
 	                    React.makeElement('i', { className: "call-icon " + message.cssClass })
-	                ),
+	                ) : avatar,
 	                React.makeElement(
 	                    'div',
 	                    { className: 'message content-area' },
+	                    name,
 	                    React.makeElement(
 	                        'div',
 	                        { className: 'message date-time' },
 	                        timestamp
 	                    ),
-	                    React.makeElement('div', { className: 'message text-block', dangerouslySetInnerHTML: { __html: textMessage } }),
+	                    React.makeElement(
+	                        'div',
+	                        { className: 'message text-block' },
+	                        React.makeElement(
+	                            'div',
+	                            { className: 'message call-inner-block' },
+	                            avatarsListing,
+	                            React.makeElement('div', { dangerouslySetInnerHTML: { __html: textMessage } })
+	                        )
+	                    ),
 	                    buttonsCode
 	                )
 	            );
@@ -13248,7 +13076,7 @@ React.makeElement = React['createElement'];
 	            self._ensureNameIsLoaded(otherContact.u);
 	            messages.push(React.makeElement(
 	                "div",
-	                { className: "message body", "data-id": "id" + message.messageId, key: h },
+	                { className: "message body", "data-id": "id" + message.messageId, key: message.messageId + "_" + h },
 	                avatar,
 	                React.makeElement(
 	                    "div",
@@ -13282,7 +13110,7 @@ React.makeElement = React['createElement'];
 
 	            messages.push(React.makeElement(
 	                "div",
-	                { className: "message body", "data-id": "id" + message.messageId, key: h },
+	                { className: "message body", "data-id": "id" + message.messageId, key: message.messageId + "_" + h },
 	                avatar,
 	                React.makeElement(
 	                    "div",
@@ -13564,7 +13392,987 @@ React.makeElement = React['createElement'];
 
 	"use strict";
 
-	var utils = __webpack_require__(33);
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(3);
+	var utils = __webpack_require__(5);
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
+	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var ButtonsUI = __webpack_require__(9);
+	var ModalDialogsUI = __webpack_require__(13);
+	var CloudBrowserModalDialog = __webpack_require__(16);
+	var DropdownsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
+	var ConversationsUI = __webpack_require__(4);
+	var TypingAreaUI = __webpack_require__(17);
+	var WhosTyping = __webpack_require__(20).WhosTyping;
+	var getMessageString = __webpack_require__(7).getMessageString;
+	var PerfectScrollbar = __webpack_require__(8).PerfectScrollbar;
+	var ParticipantsList = __webpack_require__(21).ParticipantsList;
+
+	var GenericConversationMessage = __webpack_require__(22).GenericConversationMessage;
+	var AlterParticipantsConversationMessage = __webpack_require__(28).AlterParticipantsConversationMessage;
+	var TruncatedMessage = __webpack_require__(29).TruncatedMessage;
+	var PrivilegeChange = __webpack_require__(30).PrivilegeChange;
+	var TopicChange = __webpack_require__(31).TopicChange;
+
+	var DEBUG_PARTICIPANTS_MULTIPLICATOR = 1;
+
+	var MAX_PARTICIPANTS_FOR_GRID_MODE = 7;
+
+	var VIEW_MODES = {
+	    "GRID": 1,
+	    "CAROUSEL": 2
+	};
+
+	var ConversationAudioVideoPanel = React.createClass({
+	    displayName: "ConversationAudioVideoPanel",
+
+	    mixins: [MegaRenderMixin],
+	    getInitialState: function getInitialState() {
+	        return {
+	            'messagesBlockEnabled': false,
+	            'fullScreenModeEnabled': false,
+	            'localMediaDisplay': true,
+	            'viewMode': VIEW_MODES.GRID,
+	            'selectedStreamSid': false
+	        };
+	    },
+	    specificShouldComponentUpdate: function specificShouldComponentUpdate() {
+	        if (this.state.fullScreenModeEnabled) {
+	            return true;
+	        }
+	    },
+	    getCurrentStreamId: function getCurrentStreamId() {
+	        var self = this;
+	        var chatRoom = self.props.chatRoom;
+	        if (!chatRoom.callManagerCall || !chatRoom.callManagerCall.isActive()) {
+	            return;
+	        }
+
+	        var streams = chatRoom.callManagerCall._streams;
+	        var activeStream = self.state.selectedStreamSid || Object.keys(streams)[0];
+	        return activeStream;
+	    },
+	    getViewMode: function getViewMode() {
+	        var chatRoom = this.props.chatRoom;
+	        var callManagerCall = chatRoom.callManagerCall;
+	        if (callManagerCall) {
+	            var participantsCount = Object.keys(callManagerCall._streams).length * DEBUG_PARTICIPANTS_MULTIPLICATOR;
+	            if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
+	                return VIEW_MODES.CAROUSEL;
+	            }
+	        }
+	        return this.state.viewMode;
+	    },
+	    onPlayerClick: function onPlayerClick(sid) {
+	        if (this.getViewMode() === VIEW_MODES.CAROUSEL) {
+	            this.setState({ 'selectedStreamSid': sid });
+	        }
+	    },
+	    _hideBottomPanel: function _hideBottomPanel() {
+	        var self = this;
+	        var room = self.props.chatRoom;
+	        if (!room.callManagerCall || !room.callManagerCall.isActive()) {
+	            return;
+	        }
+
+	        var $container = $(ReactDOM.findDOMNode(self));
+
+	        self.visiblePanel = false;
+	        $('.call.bottom-panel, .call.local-video, .call.local-audio, .participantsContainer', $container).removeClass('visible-panel');
+	    },
+	    getRemoteSid: function getRemoteSid(sid) {
+	        var fullSid = sid || this.state.selectedStreamSid;
+	        if (!fullSid) {
+	            return false;
+	        }
+	        var sid = fullSid.split(":")[2];
+
+	        if (!sid) {
+	            return false;
+	        }
+	        return sid;
+	    },
+	    resizeVideos: function resizeVideos() {
+	        var self = this;
+	        var chatRoom = self.props.chatRoom;
+
+	        if (!chatRoom.callManagerCall || !chatRoom.callManagerCall.isActive()) {
+	            return;
+	        }
+	        if (chatRoom.type === "private") {
+	            return;
+	        }
+
+	        var $container = $(ReactDOM.findDOMNode(self));
+
+	        var totalWidth = $container.outerWidth();
+	        if (totalWidth > $('.participantsContainer', $container).parent().outerWidth()) {
+
+	            totalWidth = $('.participantsContainer', $container).parent().outerWidth();
+	        }
+
+	        var $streams = $('.user-video, .user-audio', $container);
+	        var totalStreams = $streams.length;
+
+	        if (totalStreams === 1) {
+	            totalWidth = Math.min(totalWidth, $container.outerHeight() - $('.call-header', $container).outerHeight());
+	        }
+	        var newWidth;
+
+	        if (self.state.viewMode === VIEW_MODES.CAROUSEL) {
+	            $('.participantsContainer', $container).height('auto');
+	            var activeStreamHeight = $container.outerHeight() - $('.call-header').outerHeight() - $('.participantsContainer', $container).outerHeight();
+
+	            $('.activeStream', $container).height(activeStreamHeight);
+	            $('.activeStream .user-audio .avatar-wrapper', $container).width(activeStreamHeight - 20).height(activeStreamHeight - 20).css('font-size', 100 / 240 * activeStreamHeight + "px");
+
+	            $('.user-video, .user-audio, .user-video video', $container).width('').height('');
+
+	            var $video;
+	            var $mutedIcon;
+	            $video = $('.activeStream video', $container);
+	            $mutedIcon = $('.activeStream .icon-audio-muted', $container);
+
+	            var callManagerCall = chatRoom.callManagerCall;
+	            var audioIsMuted = false;
+	            if (this.state.selectedStreamSid === "local") {
+	                audioIsMuted = callManagerCall.getMediaOptions().audio;
+	            } else {
+	                audioIsMuted = callManagerCall.getRemoteMediaOptions(self.getRemoteSid()).audio;
+	            }
+
+	            if ($video.length > 0 && $mutedIcon.length > 0) {
+	                if ($video.outerHeight() > 0 && $video[0].videoWidth > 0 && $video[0].videoHeight > 0) {
+	                    var actualWidth = Math.min($video.outerWidth(), $video[0].videoWidth / $video[0].videoHeight * $video.outerHeight());
+	                    if (!audioIsMuted) {
+	                        $mutedIcon.removeClass('hidden');
+	                    } else {
+	                        $mutedIcon.addClass('hidden');
+	                    }
+
+	                    $mutedIcon.css({
+	                        'right': 'auto',
+	                        'top': 24 + 8,
+	                        'left': $video.outerWidth() / 2 + actualWidth / 2 - $mutedIcon.outerWidth() - 24
+	                    });
+	                } else {
+	                    $video.one('loadeddata.cav loadedmetadata.cav', function () {
+	                        self.resizeVideos();
+	                    });
+
+	                    $mutedIcon.addClass('hidden');
+	                }
+	            }
+	        } else {
+	            $('.participantsContainer', $container).height($container.outerHeight() - $('.call-header', $container).outerHeight());
+
+	            newWidth = totalWidth / totalStreams;
+	        }
+
+	        var $resizables = $('.user-video, .user-audio', $('.participantsContainer', $container));
+	        $resizables.width(newWidth);
+
+	        $resizables.each(function (i, elem) {
+	            var $elem = $(elem);
+
+	            $('video', elem).width(newWidth).height(newWidth);
+
+	            $elem.width(newWidth).height(newWidth);
+	        });
+	    },
+	    componentDidMount: function componentDidMount() {
+	        this.resizeVideos();
+	        this.initialRender = false;
+	    },
+	    componentDidUpdate: function componentDidUpdate() {
+	        var self = this;
+	        var room = self.props.chatRoom;
+	        if (!room.callManagerCall || !room.callManagerCall.isActive()) {
+	            return;
+	        }
+
+	        var $container = $(ReactDOM.findDOMNode(self));
+
+	        var mouseoutThrottling = null;
+	        $container.rebind('mouseover.chatUI' + self.props.chatRoom.roomId, function () {
+	            var $this = $(this);
+	            clearTimeout(mouseoutThrottling);
+	            self.visiblePanel = true;
+	            $('.call.bottom-panel, .call.local-video, .call.local-audio, .participantsContainer', $container).addClass('visible-panel');
+
+	            if ($this.hasClass('full-sized-block')) {
+	                $('.call.top-panel', $container).addClass('visible-panel');
+	            }
+	        });
+
+	        $container.rebind('mouseout.chatUI' + self.props.chatRoom.roomId, function () {
+	            var $this = $(this);
+	            clearTimeout(mouseoutThrottling);
+	            mouseoutThrottling = setTimeout(function () {
+	                self.visiblePanel = false;
+	                self._hideBottomPanel();
+	                $('.call.top-panel', $container).removeClass('visible-panel');
+	            }, 500);
+	        });
+
+	        var idleMouseTimer;
+	        var forceMouseHide = false;
+	        $container.rebind('mousemove.chatUI' + self.props.chatRoom.roomId, function (ev) {
+	            var $this = $(this);
+	            if (self._bottomPanelMouseOver) {
+	                return;
+	            }
+	            clearTimeout(idleMouseTimer);
+	            if (!forceMouseHide) {
+	                self.visiblePanel = true;
+	                $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
+	                $container.removeClass('no-cursor');
+	                if ($this.hasClass('full-sized-block')) {
+	                    $('.call.top-panel', $container).addClass('visible-panel');
+	                }
+	                idleMouseTimer = setTimeout(function () {
+	                    self.visiblePanel = false;
+
+	                    self._hideBottomPanel();
+
+	                    $container.addClass('no-cursor');
+	                    $('.call.top-panel', $container).removeClass('visible-panel');
+
+	                    forceMouseHide = true;
+	                    setTimeout(function () {
+	                        forceMouseHide = false;
+	                    }, 400);
+	                }, 2000);
+	            }
+	        });
+
+	        $('.call.bottom-panel', $container).rebind('mouseenter.chatUI' + self.props.chatRoom.roomId, function (ev) {
+	            self._bottomPanelMouseOver = true;
+	            clearTimeout(idleMouseTimer);
+	        });
+	        $('.call.bottom-panel', $container).rebind('mouseleave.chatUI' + self.props.chatRoom.roomId, function (ev) {
+	            self._bottomPanelMouseOver = false;
+
+	            idleMouseTimer = setTimeout(function () {
+	                self.visiblePanel = false;
+
+	                self._hideBottomPanel();
+
+	                $container.addClass('no-cursor');
+	                $('.call.top-panel', $container).removeClass('visible-panel');
+
+	                forceMouseHide = true;
+	                setTimeout(function () {
+	                    forceMouseHide = false;
+	                }, 400);
+	            }, 2000);
+	        });
+
+	        $(document).rebind("fullscreenchange.megaChat_" + room.roomId, function () {
+	            if (!$(document).fullScreen() && room.isCurrentlyActive) {
+	                self.setState({ fullScreenModeEnabled: false });
+	            } else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
+	                self.setState({ fullScreenModeEnabled: true });
+	            }
+	            self.forceUpdate();
+	        });
+
+	        var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
+	        $localMediaDisplay.draggable({
+	            'refreshPositions': true,
+	            'containment': $container,
+	            'scroll': false,
+	            drag: function drag(event, ui) {
+	                if ($(this).is(".minimized")) {
+	                    return false;
+	                }
+
+	                var right = Math.max(0, $container.outerWidth() - ui.position.left);
+	                var bottom = Math.max(0, $container.outerHeight() - ui.position.top);
+
+	                right = Math.min(right, $container.outerWidth() - 8);
+	                bottom = Math.min(bottom, $container.outerHeight() - 8);
+
+	                right = right - ui.helper.outerWidth();
+	                bottom = bottom - ui.helper.outerHeight();
+
+	                var minBottom = $(this).is(".minimized") ? 48 : 8;
+
+	                if (bottom < minBottom) {
+	                    bottom = minBottom;
+	                    $(this).addClass('bottom-aligned');
+	                } else {
+	                    $(this).removeClass('bottom-aligned');
+	                }
+
+	                if (right < 8) {
+	                    right = 8;
+	                    $(this).addClass('right-aligned');
+	                } else {
+	                    $(this).removeClass('right-aligned');
+	                }
+
+	                ui.offset = {
+	                    left: 'auto',
+	                    top: 'auto',
+	                    right: right,
+	                    bottom: bottom,
+	                    height: "",
+	                    width: ""
+	                };
+	                ui.position.left = 'auto';
+	                ui.position.top = 'auto';
+
+	                ui.helper.css(ui.offset);
+	                $(this).css(ui.offset);
+	            }
+	        });
+
+	        $(window).rebind('resize.chatUI_' + room.roomId, function (e) {
+	            if ($container.is(":visible")) {
+	                if (!elementInViewport($localMediaDisplay[0])) {
+	                    $localMediaDisplay.addClass('right-aligned').addClass('bottom-aligned').css({
+	                        'right': 8,
+	                        'bottom': 8
+	                    });
+	                }
+	            }
+	            self.resizePanes();
+	            self.resizeVideos();
+	        });
+
+	        (self.remoteVideoRefs || []).forEach(function (remoteVideo) {
+	            if (remoteVideo && remoteVideo.src === "" && remoteVideo.currentTime === 0 && !remoteVideo.srcObject) {
+	                var stream = room.callManagerCall._streams[remoteVideo.id.split("remotevideo_")[1]];
+	                RTC.attachMediaStream(remoteVideo, stream);
+	            }
+	        });
+
+	        if (room.megaChat.rtc && room.megaChat.rtc.gLocalStream && self.refs.localViewport && self.refs.localViewport.src === "" && self.refs.localViewport.currentTime === 0 && !self.refs.localViewport.srcObject) {
+	            RTC.attachMediaStream(self.refs.localViewport, room.megaChat.rtc.gLocalStream);
+	        }
+
+	        var bigLocalViewport = $('.bigLocalViewport')[0];
+	        var smallLocalViewport = $('.smallLocalViewport')[0];
+
+	        if (smallLocalViewport && bigLocalViewport && !bigLocalViewport.src && !bigLocalViewport.srcObject && room.megaChat.rtc && room.megaChat.rtc.gLocalStream && bigLocalViewport && bigLocalViewport.src === "" && bigLocalViewport.currentTime === 0) {
+	            RTC.attachMediaStream(bigLocalViewport, room.megaChat.rtc.gLocalStream);
+	        }
+
+	        $(room).rebind('toggleMessages.av', function () {
+	            self.toggleMessages();
+	        });
+
+	        room.messagesBlockEnabled = self.state.messagesBlockEnabled;
+
+	        var self = this;
+	        this.props.chatRoom.callManagerCall.rebind('onAudioLevelChange.ui', function (e, sid, level) {
+	            var elm = $(".stream" + sid.replace(/:/g, "_"));
+
+	            if (elm.length === 0) {
+	                return;
+	            }
+
+	            if (level > 10) {
+	                $('.avatar-wrapper', elm).css({
+	                    'box-shadow': '0px 0px 0px 3px rgba(255, 255, 255, ' + Math.min(0.90, level / 100) + ')'
+	                });
+	            } else {
+	                $('.avatar-wrapper', elm).css({
+	                    'box-shadow': '0px 0px 0px 0px rgba(255, 255, 255, 0)'
+	                });
+	            }
+	        });
+
+	        if (self.initialRender === false && ReactDOM.findDOMNode(self)) {
+	            self.bindInitialEvents();
+	        }
+
+	        self.resizePanes();
+	        self.resizeVideos();
+	    },
+	    resizePanes: function resizePanes() {
+	        var self = this;
+	        var $container = $(self.findDOMNode());
+	        var $rootContainer = $container.parents('.conversation-panel');
+	        if (!self.state.messagesBlockEnabled && self.props.chatRoom.callManagerCall) {
+	            $('.call-block', $rootContainer).height('');
+	        }
+	        $rootContainer.trigger('resized');
+	    },
+	    bindInitialEvents: function bindInitialEvents() {
+	        var self = this;
+	        var $container = $(ReactDOM.findDOMNode(self));
+	        self.avResizable = new FMResizablePane($container, {
+	            'direction': 's',
+	            'handle': '.av-resize-handler',
+	            'minHeight': 168,
+	            'persistanceKey': false,
+	            'containment': $container.parent()
+	        });
+
+	        $(self.avResizable).rebind('resize.avp', function (e, e2, ui) {
+	            self.resizePanes();
+	            localStorage.chatAvPaneHeight = ui.size.height;
+	        });
+
+	        self.initialRender = true;
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+	        var room = self.props.chatRoom;
+
+	        var $container = $(ReactDOM.findDOMNode(self));
+	        if ($container) {
+	            $container.off('mouseover.chatUI' + self.props.chatRoom.roomId);
+	            $container.off('mouseout.chatUI' + self.props.chatRoom.roomId);
+	            $container.off('mousemove.chatUI' + self.props.chatRoom.roomId);
+	        }
+
+	        $(document).off("fullscreenchange.megaChat_" + room.roomId);
+	        $(window).off('resize.chatUI_' + room.roomId);
+	        $(room).off('toggleMessages.av');
+
+	        var $rootContainer = $container.parents('.conversation-panel');
+	        $('.call-block', $rootContainer).height('');
+	        self.initialRender = false;
+	    },
+	    toggleMessages: function toggleMessages(e) {
+	        if (e) {
+	            e.preventDefault();
+	            e.stopPropagation();
+	        }
+
+	        if (this.props.onMessagesToggle) {
+	            this.props.onMessagesToggle(!this.state.messagesBlockEnabled);
+	            var $container = $(this.findDOMNode());
+	            var predefHeight = localStorage.chatAvPaneHeight || false;
+	            if (predefHeight) {
+	                $container.height(parseInt(localStorage.chatAvPaneHeight, 10));
+	            }
+	        }
+
+	        this.setState({
+	            'messagesBlockEnabled': !this.state.messagesBlockEnabled
+	        });
+
+	        if (this.state.messagesBlockEnabled === false) {
+	            Soon(function () {
+	                $(window).trigger('resize');
+	            });
+	        }
+	    },
+	    fullScreenModeToggle: function fullScreenModeToggle(e) {
+	        e.preventDefault();
+	        e.stopPropagation();
+
+	        var newVal = !this.state.fullScreenModeEnabled;
+	        $(document).fullScreen(newVal);
+
+	        this.setState({
+	            'fullScreenModeEnabled': newVal,
+	            'messagesBlockEnabled': newVal === true ? false : this.state.messagesBlockEnabled
+	        });
+	    },
+	    toggleLocalVideoDisplay: function toggleLocalVideoDisplay(e) {
+	        e.preventDefault();
+	        e.stopPropagation();
+
+	        var $container = $(ReactDOM.findDOMNode(this));
+	        var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
+
+	        $localMediaDisplay.addClass('right-aligned').addClass('bottom-aligned').css({
+	            'width': '',
+	            'height': '',
+	            'right': 8,
+	            'bottom': !this.state.localMediaDisplay === true ? 8 : 8
+	        });
+
+	        this.setState({ localMediaDisplay: !this.state.localMediaDisplay });
+	    },
+	    render: function render() {
+	        var chatRoom = this.props.chatRoom;
+	        this.remoteVideoRefs = this.remoteVideoRefs || [];
+
+	        var self = this;
+
+	        if (!chatRoom.callManagerCall || !chatRoom.callManagerCall.isStarted()) {
+	            self.initialRender = false;
+	            return null;
+	        }
+
+	        var participants = chatRoom.getParticipantsExceptMe();
+
+	        var displayNames = [];
+
+	        participants.forEach(function (v) {
+	            displayNames.push(htmlentities(M.getNameByHandle(v)));
+	        });
+
+	        var callManagerCall = chatRoom.callManagerCall;
+
+	        var remoteCamEnabled = null;
+
+	        if (callManagerCall.getRemoteMediaOptions().video) {
+	            remoteCamEnabled = React.makeElement("i", { className: "small-icon blue-videocam" });
+	        }
+
+	        var localPlayerElement = null;
+	        var remotePlayerElement = null;
+	        var activeStreamIdOrPlayer = chatRoom.type === "group" && self.getViewMode() === VIEW_MODES.CAROUSEL ? self.getCurrentStreamId() : false;
+
+	        var visiblePanelClass = "";
+	        var localPlayerStream;
+	        if (callManagerCall && chatRoom.megaChat.rtc && chatRoom.megaChat.rtc.gLocalStream) {
+	            localPlayerStream = chatRoom.megaChat.rtc.gLocalStream;
+	        }
+
+	        if (this.visiblePanel === true) {
+	            visiblePanelClass += " visible-panel";
+	        }
+
+	        remotePlayerElement = [];
+
+	        var realStreams = Object.keys(callManagerCall._streams);
+	        var streams = [];
+	        if (!DEBUG_PARTICIPANTS_MULTIPLICATOR) {
+	            streams = realStreams;
+	        } else {
+
+	            var initialCount = realStreams.length;
+	            if (initialCount > 0) {
+	                for (var i = 0; i < initialCount * DEBUG_PARTICIPANTS_MULTIPLICATOR; i++) {
+	                    streams.push(realStreams[(i || 0) % initialCount]);
+	                }
+	            }
+	        }
+
+	        streams.forEach(function (streamId, k) {
+	            var stream = callManagerCall._streams[streamId];
+	            var userId = streamId.split(":")[0];
+	            var clientId = streamId.split(":")[1];
+	            var sessionId = streamId.split(":")[2];
+	            var remotePlayerStream = stream;
+
+	            if (!remotePlayerStream || callManagerCall.getRemoteMediaOptions(sessionId).video === false) {
+
+	                var contact = M.u[userId];
+	                var player = React.makeElement(
+	                    "div",
+	                    {
+	                        className: "call user-audio is-avatar " + (activeStreamIdOrPlayer === streamId ? "active" : "") + " stream" + streamId.replace(/:/g, "_"),
+	                        key: streamId + "_" + k,
+	                        onClick: function onClick(e) {
+	                            self.onPlayerClick(streamId);
+	                        } },
+	                    callManagerCall.peerQuality[streamId] === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
+	                    React.makeElement(
+	                        "div",
+	                        { className: "center-avatar-wrapper" },
+	                        callManagerCall.getRemoteMediaOptions(sessionId).audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
+	                        React.makeElement(ContactsUI.Avatar, { contact: contact, className: "avatar-wrapper",
+	                            hideVerifiedBadge: true })
+	                    )
+	                );
+
+	                if (activeStreamIdOrPlayer === streamId) {
+	                    activeStreamIdOrPlayer = player;
+	                }
+	                remotePlayerElement.push(player);
+	            } else {
+	                player = React.makeElement(
+	                    "div",
+	                    {
+	                        className: "call user-video is-video " + (activeStreamIdOrPlayer === streamId ? "active" : "") + " stream" + streamId.replace(/:/g, "_"),
+	                        key: streamId + "_" + k,
+	                        onClick: function onClick(e) {
+	                            self.onPlayerClick(streamId);
+	                        } },
+	                    callManagerCall.peerQuality[streamId] === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
+	                    callManagerCall.getRemoteMediaOptions(sessionId).audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
+	                    React.makeElement("video", {
+	                        autoPlay: true,
+	                        className: "rmtViewport rmtVideo",
+	                        id: "remotevideo_" + streamId,
+	                        ref: function ref(_ref) {
+	                            if (_ref && self.remoteVideoRefs.indexOf(_ref) === -1) {
+	                                self.remoteVideoRefs.push(_ref);
+	                            }
+	                        }
+	                    })
+	                );
+
+	                if (activeStreamIdOrPlayer === streamId) {
+	                    activeStreamIdOrPlayer = player;
+	                }
+	                remotePlayerElement.push(player);
+	            }
+	        });
+
+	        if (this.getViewMode() === VIEW_MODES.GRID) {
+	            if (!localPlayerStream || callManagerCall.getMediaOptions().video === false) {
+	                localPlayerElement = React.makeElement(
+	                    "div",
+	                    { className: "call local-audio right-aligned bottom-aligned is-avatar" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass },
+	                    chatRoom.megaChat.networkQuality === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
+	                    React.makeElement(
+	                        "div",
+	                        { className: "default-white-button tiny-button call", onClick: this.toggleLocalVideoDisplay },
+	                        React.makeElement("i", { className: "tiny-icon grey-minus-icon" })
+	                    ),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "center-avatar-wrapper " + (this.state.localMediaDisplay ? "" : "hidden") },
+	                        callManagerCall.getMediaOptions().audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
+	                        React.makeElement(ContactsUI.Avatar, {
+	                            contact: M.u[u_handle],
+	                            className: "call avatar-wrapper is-avatar " + (this.state.localMediaDisplay ? "" : "hidden"),
+	                            hideVerifiedBadge: true
+	                        })
+	                    )
+	                );
+	            } else {
+	                localPlayerElement = React.makeElement(
+	                    "div",
+	                    {
+	                        className: "call local-video right-aligned is-video bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass + (activeStreamIdOrPlayer === "local" ? " active " : "") },
+	                    chatRoom.megaChat.networkQuality === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
+	                    React.makeElement(
+	                        "div",
+	                        { className: "default-white-button tiny-button call", onClick: this.toggleLocalVideoDisplay },
+	                        React.makeElement("i", { className: "tiny-icon grey-minus-icon" })
+	                    ),
+	                    callManagerCall.getMediaOptions().audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
+	                    React.makeElement("video", {
+	                        ref: "localViewport",
+	                        className: "localViewport",
+	                        defaultMuted: true,
+	                        muted: true,
+	                        volume: 0,
+	                        id: "localvideo_" + callManagerCall.id,
+	                        style: { display: !this.state.localMediaDisplay ? "none" : "" }
+
+	                    })
+	                );
+	            }
+	        } else {
+
+	            var localPlayer;
+	            if (!localPlayerStream || callManagerCall.getMediaOptions().video === false) {
+	                localPlayer = React.makeElement(
+	                    "div",
+	                    { className: "call user-audio local-carousel is-avatar" + (activeStreamIdOrPlayer === "local" ? " active " : ""), key: "local",
+	                        onClick: function onClick(e) {
+	                            self.onPlayerClick("local");
+	                        } },
+	                    chatRoom.megaChat.networkQuality === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
+	                    React.makeElement(
+	                        "div",
+	                        { className: "center-avatar-wrapper" },
+	                        callManagerCall.getMediaOptions().audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
+	                        React.makeElement(ContactsUI.Avatar, {
+	                            contact: M.u[u_handle], className: "call avatar-wrapper",
+	                            hideVerifiedBadge: true
+	                        })
+	                    )
+	                );
+
+	                remotePlayerElement.push(localPlayer);
+
+	                if (activeStreamIdOrPlayer === "local") {
+	                    activeStreamIdOrPlayer = localPlayer;
+	                }
+	            } else {
+	                localPlayer = React.makeElement(
+	                    "div",
+	                    {
+	                        className: "call user-video local-carousel is-video" + (activeStreamIdOrPlayer === "local" ? " active " : ""),
+	                        key: "local-video",
+	                        onClick: function onClick(e) {
+	                            self.onPlayerClick("local");
+	                        } },
+	                    chatRoom.megaChat.networkQuality === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
+	                    callManagerCall.getMediaOptions().audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
+	                    React.makeElement("video", {
+	                        ref: "localViewport",
+	                        className: "localViewport smallLocalViewport",
+	                        defaultMuted: true,
+	                        muted: true,
+	                        volume: 0,
+	                        id: "localvideo_" + callManagerCall.id
+	                    })
+	                );
+
+	                remotePlayerElement.push(localPlayer);
+
+	                if (activeStreamIdOrPlayer === "local") {
+	                    activeStreamIdOrPlayer = React.makeElement(
+	                        "div",
+	                        {
+	                            className: "call user-video is-video local-carousel local-carousel-big",
+	                            key: "local-video2" },
+	                        chatRoom.megaChat.networkQuality === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
+	                        callManagerCall.getMediaOptions().audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
+	                        React.makeElement("video", {
+	                            className: "localViewport bigLocalViewport",
+	                            defaultMuted: true,
+	                            muted: true,
+	                            volume: 0,
+	                            id: "localvideo_big_" + callManagerCall.id
+	                        })
+	                    );
+	                }
+	            }
+	        }
+
+	        var unreadDiv = null;
+	        var unreadCount = chatRoom.messagesBuff.getUnreadCount();
+	        if (unreadCount > 0) {
+	            unreadDiv = React.makeElement(
+	                "div",
+	                { className: "unread-messages" },
+	                unreadCount > 9 ? "9+" : unreadCount
+	            );
+	        }
+
+	        var additionalClass = "";
+	        additionalClass = this.state.fullScreenModeEnabled === true ? " full-sized-block" : "";
+	        if (additionalClass.length === 0) {
+	            additionalClass = this.state.messagesBlockEnabled === true ? " small-block" : "";
+	        }
+
+	        var participantsCount = Object.keys(callManagerCall._streams).length * DEBUG_PARTICIPANTS_MULTIPLICATOR;
+
+	        additionalClass += " participants-count-" + participantsCount;
+
+	        var header = null;
+
+	        var videoSessionCount = 0;
+	        if (chatRoom.callManagerCall && chatRoom.callManagerCall.getCurrentVideoSlotsUsed) {
+	            videoSessionCount = chatRoom.callManagerCall.getCurrentVideoSlotsUsed();
+	        }
+
+	        if (chatRoom.type === "group") {
+	            header = React.makeElement(
+	                "div",
+	                { className: "call-header" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "call-topic" },
+	                    ellipsis(chatRoom.getRoomTitle(), 'end', 70)
+	                ),
+	                React.makeElement(
+	                    "div",
+	                    { className: "call-participants-count" },
+	                    Object.keys(chatRoom.callParticipants).length
+	                ),
+	                React.makeElement("a", { href: "javascript:;", className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : ""), onClick: function onClick(e) {
+	                        if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
+	                            return;
+	                        }
+
+	                        self.setState({
+	                            'selectedStreamSid': false,
+	                            'viewMode': self.getViewMode() === VIEW_MODES.GRID ? VIEW_MODES.CAROUSEL : VIEW_MODES.GRID
+	                        });
+	                    } }),
+	                React.makeElement(
+	                    "div",
+	                    { className: "call-av-counter" + (videoSessionCount >= RtcModule.kMaxCallVideoSenders ? " limit-reached" : "") },
+	                    videoSessionCount,
+	                    " / ",
+	                    RtcModule.kMaxCallVideoSenders
+	                ),
+	                React.makeElement("div", { className: "call-video-icon" + (chatRoom.callManagerCall.hasVideoSlotLimitReached() ? " call-video-icon-warn" : "") }),
+	                React.makeElement(
+	                    "div",
+	                    { className: "call-header-duration",
+	                        "data-room-id": chatRoom.chatId },
+	                    secondsToTimeShort(chatRoom._currentCallCounter)
+	                )
+	            );
+	        }
+
+	        var notifBar = null;
+
+	        if (chatRoom.type === "group") {
+	            var notif = chatRoom.callManagerCall.callNotificationsEngine.getCurrentNotification();
+
+	            if (!chatRoom.callManagerCall.callNotificationsEngine._bound) {
+	                chatRoom.callManagerCall.callNotificationsEngine.rebind('onChange.cavp', function () {
+	                    if (chatRoom.isCurrentlyActive) {
+	                        self.safeForceUpdate();
+	                        var $notif = $('.in-call-notif:visible');
+	                        $notif.css({ 'opacity': 0.3 }).animate({ 'opacity': 1 }, {
+	                            queue: false,
+	                            duration: 1500
+	                        });
+	                    }
+	                });
+	                chatRoom.callManagerCall.callNotificationsEngine._bound = true;
+	            }
+
+	            if (notif) {
+	                var title = notif.getTitle();
+	                notifBar = React.makeElement(
+	                    "div",
+	                    { className: "in-call-notif " + notif.getClassName() },
+	                    title ? title : null
+	                );
+	            }
+	        }
+	        var networkQualityBar = null;
+
+	        if (chatRoom.megaChat.networkQuality <= 1) {
+	            var networkQualityMessage = "Slow connection.";
+
+	            networkQualityBar = React.makeElement(
+	                "div",
+	                { className: "in-call-notif yellow" + (notifBar ? " after-green-notif" : "") },
+	                networkQualityMessage
+	            );
+	        }
+
+	        additionalClass += self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel";
+
+	        var players = null;
+	        if (self.getViewMode() === VIEW_MODES.GRID) {
+	            players = React.makeElement(
+	                "div",
+	                { className: "participantsWrapper", key: "container" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "participantsContainer", key: "partsContainer" },
+	                    remotePlayerElement
+	                ),
+	                localPlayerElement
+	            );
+	        } else {
+
+	            players = React.makeElement(
+	                "div",
+	                { key: "container" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "activeStream", key: "activeStream" },
+	                    activeStreamIdOrPlayer
+	                ),
+	                React.makeElement(
+	                    "div",
+	                    { className: "participantsContainer", key: "partsContainer" },
+	                    remotePlayerElement,
+	                    localPlayerElement
+	                )
+	            );
+	        }
+
+	        var topPanel = null;
+
+	        if (chatRoom.type !== "group") {
+	            topPanel = React.makeElement(
+	                "div",
+	                { className: "call top-panel" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "call top-user-info" },
+	                    React.makeElement(
+	                        "span",
+	                        { className: "user-card-name white" },
+	                        displayNames.join(", ")
+	                    ),
+	                    remoteCamEnabled
+	                ),
+	                React.makeElement(
+	                    "div",
+	                    { className: "call-duration medium blue call-counter", "data-room-id": chatRoom.chatId },
+	                    secondsToTimeShort(chatRoom._currentCallCounter)
+	                )
+	            );
+	        }
+
+	        if (participantsCount < 4) {
+	            additionalClass = additionalClass + " participants-less-4";
+	        } else if (participantsCount < 8) {
+	            additionalClass = additionalClass + " participants-less-8";
+	        } else if (participantsCount < 16) {
+	            additionalClass = additionalClass + " participants-less-16";
+	        } else {
+	            additionalClass = additionalClass + " participants-a-lot";
+	        }
+
+	        return React.makeElement(
+	            "div",
+	            { className: "call-block" + additionalClass, id: "call-block" },
+	            React.makeElement("div", { className: "av-resize-handler ui-resizable-handle ui-resizable-s " + (this.state.messagesBlockEnabled === true && this.state.fullScreenModeEnabled === false ? "" : "hidden") }),
+	            header,
+	            notifBar,
+	            networkQualityBar,
+	            players,
+	            topPanel,
+	            React.makeElement(
+	                "div",
+	                { className: "call bottom-panel" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "button call left" + (unreadDiv ? " unread" : ""), onClick: this.toggleMessages },
+	                    unreadDiv,
+	                    React.makeElement("i", { className: "big-icon conversations" })
+	                ),
+	                React.makeElement(
+	                    "div",
+	                    { className: "button call", onClick: function onClick(e) {
+	                            if (callManagerCall.getMediaOptions().audio === true) {
+	                                callManagerCall.muteAudio();
+	                            } else {
+	                                callManagerCall.unmuteAudio();
+	                            }
+	                        } },
+	                    React.makeElement("i", { className: "big-icon " + (callManagerCall.getMediaOptions().audio ? " microphone" : " crossed-microphone") })
+	                ),
+	                React.makeElement(
+	                    "div",
+	                    { className: "button call" + (callManagerCall.hasVideoSlotLimitReached() === true && callManagerCall.getMediaOptions().video === false ? " disabled" : ""), onClick: function onClick(e) {
+	                            if (callManagerCall.getMediaOptions().video === true) {
+	                                callManagerCall.muteVideo();
+	                            } else {
+	                                if (!callManagerCall.hasVideoSlotLimitReached()) {
+	                                    callManagerCall.unmuteVideo();
+	                                }
+	                            }
+	                        } },
+	                    React.makeElement("i", { className: "big-icon " + (callManagerCall.getMediaOptions().video ? " videocam" : " crossed-videocam") })
+	                ),
+	                React.makeElement(
+	                    "div",
+	                    { className: "button call", onClick: function onClick(e) {
+	                            if (chatRoom.callManagerCall) {
+	                                chatRoom.callManagerCall.endCall();
+	                            }
+	                        } },
+	                    React.makeElement("i", { className: "big-icon horizontal-red-handset" })
+	                ),
+	                React.makeElement(
+	                    "div",
+	                    { className: "button call right", onClick: this.fullScreenModeToggle },
+	                    React.makeElement("i", { className: "big-icon nwse-resize" })
+	                )
+	            )
+	        );
+	    }
+	});
+
+	module.exports = {
+	    ConversationAudioVideoPanel: ConversationAudioVideoPanel
+	};
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var utils = __webpack_require__(34);
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(12);
 
@@ -13595,7 +14403,8 @@ React.makeElement = React['createElement'];
 	        membersLoaded: false,
 	        topic: "",
 	        flags: 0x00,
-	        archivedSelected: false
+	        archivedSelected: false,
+	        callParticipants: false
 	    }, true);
 
 	    this.roomId = roomId;
@@ -13689,12 +14498,9 @@ React.makeElement = React['createElement'];
 	        } else if (self.type === "group") {
 	            var contactHash;
 	            if (msg.authorContact) {
-	                contactHash = msg.authorContact.h;
+	                contactHash = msg.authorContact.u;
 	            } else if (msg.userId) {
 	                contactHash = msg.userId;
-	            } else if (msg.getFromJid) {
-	                debugger;
-	                contactHash = megaChat.getContactHashFromJid(msg.getFromJid());
 	            }
 
 	            if (contactHash && M.u[contactHash]) {
@@ -13763,6 +14569,19 @@ React.makeElement = React['createElement'];
 	        }
 	    });
 
+	    self.rebind('onCallParticipantsUpdated.chatRoom', function (e, userid, clientid, participants) {
+	        if (participants) {
+	            self.callParticipants = participants;
+	        } else if (!userid && !clientid && !participants) {
+	            self.callParticipants = {};
+	        }
+
+	        self.callParticipantsUpdated();
+	    });
+
+	    self.rebind('onClientLeftCall.chatRoom', self.callParticipantsUpdated.bind(self));
+	    self.rebind('onClientJoinedCall.chatRoom', self.callParticipantsUpdated.bind(self));
+
 	    return this;
 	};
 
@@ -13807,7 +14626,7 @@ React.makeElement = React['createElement'];
 	                var transport = v.transport || 'udp';
 
 	                servers.push({
-	                    urls: ['turn:' + v.host + ':' + v.port + '?transport=' + transport],
+	                    urls: 'turn:' + v.host + ':' + v.port + '?transport=' + transport,
 	                    username: "inoo20jdnH",
 	                    credential: '02nNKDBkkS'
 	                });
@@ -14416,6 +15235,17 @@ React.makeElement = React['createElement'];
 	    return self.megaChat.plugins.callManager.startCall(self, { audio: true, video: false });
 	};
 
+	ChatRoom.prototype.joinCall = function () {
+	    var self = this;
+	    assert(self.type === "group", "Can't join non-group chat call.");
+
+	    if (self.megaChat.activeCallManagerCall) {
+	        self.megaChat.activeCallManagerCall.endCall();
+	    }
+
+	    return self.megaChat.plugins.callManager.joinCall(self, { audio: true, video: false });
+	};
+
 	ChatRoom.prototype.startVideoCall = function () {
 	    var self = this;
 	    return self.megaChat.plugins.callManager.startCall(self, { audio: true, video: true });
@@ -14501,11 +15331,94 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
+	ChatRoom.prototype.getTotalCallSessionCount = function () {
+	    var self = this;
+	    if (!self.callParticipants || !Object.keys(self.callParticipants).length) {
+	        return 0;
+	    }
+	    var count = 0;
+	    Object.keys(self.callParticipants).forEach(function (k) {
+	        if (!self.callParticipants[k]) {
+	            return;
+	        }
+	        var currentCount = Object.keys(self.callParticipants[k]);
+	        count += currentCount.length || 0;
+	    });
+	    return count;
+	};
+
+	ChatRoom.prototype.haveActiveCall = function () {
+	    return this.callManagerCall && this.callManagerCall.isActive() === true;
+	};
+
+	ChatRoom.prototype.havePendingGroupCall = function () {
+	    var self = this;
+	    if (self.type === "group" && self.callManagerCall && (self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) && self.callParticipants && Object.keys(self.callParticipants).length > 0) {
+	        return true;
+	    } else if (!self.callManagerCall && self.callParticipants && Object.keys(self.callParticipants).length > 0) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+	};
+
+	ChatRoom.prototype.havePendingCall = function () {
+	    var self = this;
+	    if (self.callManagerCall && (self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING)) {
+	        return true;
+	    } else if (self.type === "group") {
+	        return self.havePendingGroupCall();
+	    } else {
+	        return false;
+	    }
+	};
+
+	ChatRoom.prototype.getActiveCallMessageId = function (ignoreActive) {
+	    var self = this;
+	    if (!ignoreActive && !self.havePendingCall() && !self.haveActiveCall()) {
+	        return false;
+	    }
+
+	    var msgs = self.messagesBuff.messages;
+	    for (var i = msgs.length - 1; i >= 0; i--) {
+	        var msg = msgs.getItem(i);
+	        if (msg.dialogType === "remoteCallEnded") {
+
+	            return false;
+	        }
+	        if (msg.dialogType === "remoteCallStarted") {
+	            return msg.messageId;
+	        }
+	    }
+	};
+
+	ChatRoom.prototype.callParticipantsUpdated = function () {
+	    var self = this;
+	    var msgId = self.getActiveCallMessageId();
+	    if (!msgId) {
+
+	        msgId = self.getActiveCallMessageId(true);
+	    }
+
+	    var callParts = Object.keys(self.callParticipants);
+	    var uniqueCallParts = {};
+	    callParts.forEach(function (handleAndSid) {
+	        var handle = base64urlencode(handleAndSid.substr(0, 8));
+	        uniqueCallParts[handle] = 1;
+	    });
+	    self.uniqueCallParts = uniqueCallParts;
+
+	    var msg = self.messagesBuff.getMessageById(msgId);
+	    msg && msg.wrappedChatDialogMessage && msg.wrappedChatDialogMessage.trackDataChange();
+
+	    self.trackDataChange();
+	};
+
 	window.ChatRoom = ChatRoom;
 	module.exports = ChatRoom;
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports) {
 
 	'use strict';

@@ -1669,13 +1669,14 @@ var exportExpiry = {
             $('.file-link-info-wrapper', $dialog).each(function() {
                 var nodeUrlWithPublicHandle = $('.file-link-info.url', this).text();
                 var nodeDecryptionKey = $('.file-link-info.key', this).text();
+                var subNodeHandle = $(".file-link-info.subhandle", this).text();
 
                 // Check export/public link dialog drop down list selected option
                 if (modeFull) {
-                    links.push(nodeUrlWithPublicHandle + nodeDecryptionKey);
+                    links.push(nodeUrlWithPublicHandle + nodeDecryptionKey + subNodeHandle);
                 }
                 else if (modePublic) {
-                    links.push(nodeUrlWithPublicHandle);
+                    links.push(nodeUrlWithPublicHandle + subNodeHandle);
                 }
                 else if (modeDecKey) {
                     links.push(nodeDecryptionKey);
@@ -1703,14 +1704,15 @@ var exportExpiry = {
         var nodeHandle = item.h;
         var fileUrlKey;
         var fileUrlWithoutKey;
+        var fileUrlNodeHandle = "";
 
         // Add a hover text for the icon
         var expiresTitleText = l[8698].replace('%1', '');   // Expires %1
 
         if (folderlink) {
-            var target = (M.currentdirid !== M.RootID ? '!' + M.currentdirid : '') + '?' + item.h;
             fileUrlWithoutKey = 'https://mega.nz/#F!' + pfid;
-            fileUrlKey = '!' + pfkey + (item.t ? '!' + item.h : target);
+            fileUrlKey = '!' + pfkey;
+            fileUrlNodeHandle = (item.t ? '!' : '?') + item.h;
             fileSize = item.s && htmlentities(bytesToSize(item.s)) || '';
         }
         else if (item.t) {
@@ -1752,6 +1754,7 @@ var exportExpiry = {
              +              '<span class="file-link-info-wrapper">'
              +                  '<span class="file-link-info url">' + fileUrlWithoutKey + '</span>'
              +                  '<span class="file-link-info key" data-key="' + fileUrlKey + '">' + fileUrlKey + '</span>'
+             +                  '<span class="file-link-info subhandle">' + fileUrlNodeHandle + '</span>'
              +                  '<span class="file-link-info password-protected-data hidden"></span>'
              +              '</span>'
              +          '</div>'

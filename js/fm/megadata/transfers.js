@@ -834,7 +834,9 @@ MegaData.prototype.dlstart = function(dl) {
         if (mega.ui.tpp.getTime('dl') === 0) {
             mega.ui.tpp.setTime(Date.now(), 'dl');
         }
-        mega.ui.tpp.start(dl, 'dl');
+        Soon(function() {
+            mega.ui.tpp.start(dl, 'dl');
+        });
     }
 };
 

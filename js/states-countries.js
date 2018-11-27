@@ -1001,6 +1001,10 @@ function RegionsCollection() {
             {
                 "cc": "SX",
                 "cn": l[19082]
+            },
+            {
+                "cc": "XK",
+                "cn": l[19943]
             }
         ];
         var countries = {};

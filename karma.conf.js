@@ -159,6 +159,7 @@ module.exports = function(config) {
         'js/chat/plugins/callManager.js',
         'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
+        'js/chat/callNotificationsEngine.js',
 
         // Speedmeter
         'js/network-testing.js',

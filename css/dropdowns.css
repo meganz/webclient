@@ -200,6 +200,11 @@
     bottom: auto;
     margin: 0;
 }
+.high-top-pos-arrow .dropdown-white-arrow {
+    top: 3px;
+    bottom: auto;
+    margin: 0;
+}
 .bottom-pos-arrow .dropdown-white-arrow {
     top: auto;
     bottom: 8px;
@@ -777,18 +782,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     width: 180px;
     height: 180px;
     float: left;
-    background-image: url(../images/mega/hints-sprite.png);
+    background-image: url(../images/mega/hints-sprite_v1.png);
     background-position: 0 0;
     background-repeat: no-repeat;
 }
 .es .dropdown.hint-thumb {
-    background-image: url(../images/mega/hints-sprite-es.png);
+    background-image: url(../images/mega/hints-sprite-es_v1.png);
 }
 .br .dropdown.hint-thumb {
-    background-image: url(../images/mega/hints-sprite-pt.png);
+    background-image: url(../images/mega/hints-sprite-pt_v1.png);
 }
 .cn .dropdown.hint-thumb {
-    background-image: url(../images/mega/hints-sprite-cn.png);
+    background-image: url(../images/mega/hints-sprite-cn_v1.png);
 }
 .dropdown.hint-thumb.upload {
     height: 198px;
@@ -813,6 +818,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .dropdown.hint-thumb.rubbish-bin {
     background-position: -420px 0;
 }
+.dropdown.hint-thumb.left-click {
+    background-position: 0px -631px;
+    width: 192px;
+    height: 144px;
+    margin: -11px 0 -11px -15px;
+}
+.dropdown.hint-thumb.right-click {
+    background-position: -250px -631px;
+    width: 192px;
+    height: 144px;
+    margin: -11px 0 -11px -15px;
+}
 .dropdown.hint-thumb.have-notifications {
     background-position: -195px -420px;
     width: 210px;
@@ -821,7 +838,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .dropdown.hint-info-block {
     margin: 0 0 0 204px;
     min-height: 180px;
-    position: relative;
 }
 .dropdown.close-button {
     height:24px;
@@ -854,22 +870,24 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     font-size: 18px;
     line-height: 24px;
     color: #FF333A;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .dropdown.hint-info {
     font-size: 14px;
     line-height: 24px;
     color: #333333;
     padding: 8px 0 40px 0;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .dropdown.hint-info .bold {
-    font-family: 'source_sans_prosemibold';
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
 }
 .dropdown.hint-info .red {
     color: #FF333A;
 }
 .dropdown.hint-info a {
     color: #FF333A;
-    font-family: 'source_sans_prosemibold';
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
 }
 .dropdown.hint-bottom {
     position: absolute;
@@ -881,7 +899,21 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.hint-bottom .checkbox-block {
+.hint.short .dropdown.hint-bottom {
+    display: none;
+}
+.hint.short .dropdown.hint-info-block {
+    margin: 0;
+    min-height: 0;
+    padding: 0 0 0 27px;
+    height: 120px;
+    display: table-cell;
+    vertical-align: middle;
+}
+.hint.short .dropdown.hint-info {
+    padding: 8px 0 0 0;
+}
+.dropdown.hint-bottom .checkbox-block {
     display: table-cell;
     vertical-align: middle;
 }
@@ -951,7 +983,7 @@ z-index: 1;
     -moz-box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
     box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
     margin: -8px -8px 9px -8px;
-    background-image: url(../images/mega/new-chat-sprite_v6.png);
+    background-image: url(../images/mega/new-chat-sprite_v8.png);
     background-position: 0 -3881px;
     background-repeat: repeat-x;
     height: 80px;

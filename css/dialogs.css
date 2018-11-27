@@ -1395,12 +1395,12 @@ li.token-input-token-invite .input-close {
     margin-right: 8px;
 }
 .invitation-dialog.table-cell span.desc {
-    background-image: url(../images/mega/fm-main-sprite_v4.png);
+    background-image: url(../images/mega/fm-main-sprite_v7.png);
     background-position: right -11445px;
     background-repeat: no-repeat;
 }
 .invitation-dialog.table-cell span.asc {
-    background-image: url(../images/mega/fm-main-sprite_v4.png);
+    background-image: url(../images/mega/fm-main-sprite_v7.png);
     background-position: right -11475px;
     background-repeat: no-repeat;
 }

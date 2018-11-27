@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 @font-face {
     font-family: 'source_sans_prolight';
     src: url('../fonts/SourceSansPro-Light.eot');
@@ -5114,6 +5114,18 @@ div.checkboxOn, div.checkboxOff {
     top: 17px;
 }
 
+.user-management-account-settings .bus-input .note-message, .bus-reg-body .bus-reg-input .note-message {
+    font-size: 13px;
+    padding: 16px 0 0 4px;
+    color: #888;
+    width: 90%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.bus-reg-body .bus-reg-input.num.error .note-message {
+    display: none;
+}
 /* Help centre header */
 .help-section.fm-header {
     background-color: #fff;

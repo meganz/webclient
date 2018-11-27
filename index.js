@@ -323,9 +323,10 @@ function init_page() {
         });
     }
 
-    // If on the plugin page, show the page with the relevant extension for their current browser
-    if (page == 'plugin') {
-        page = (mega.chrome) ? 'chrome' : 'firefox';
+    // Redirect url to extensions when it tries to go plugin or chrome or firefox
+    if (page === 'plugin' || page === 'chrome' || page === 'firefox') {
+        loadSubPage('extensions');
+        return false;
     }
 
     if (!page.match(/^(blog|help|corporate|page_)/)) {
@@ -1506,7 +1507,6 @@ function init_page() {
             fminitialized = false;
             loadfm.loaded = false;
             loadfm.loading = false;
-            fmconfig = Object.create(null);
 
             stopapi();
             api_reset();
@@ -1657,6 +1657,11 @@ function init_page() {
     // Initialise the update check system
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
+    }
+
+    // Hide click-tooltip
+    if (mega.cttHintTimer) {
+        M.hideClickHint();
     }
 
     topmenuUI();
@@ -2556,6 +2561,10 @@ function loadSubPage(tpage, event) {
         slideshow(0, 1);
     }
 
+    if (window.versiondialogid) {
+        fileversioning.closeFileVersioningDialog(window.versiondialogid);
+    }
+
     if (folderlink) {
         flhashchange = true;
     }
@@ -2593,6 +2602,9 @@ function loadSubPage(tpage, event) {
     }
 
     if (hashLogic || isPublicLink(page)) {
+        if ((tpage === page) && folderlink) {
+            folderlink = false;
+        }
         document.location.hash = '#' + page;
     }
     else if (!event || event.type !== 'popstate') {

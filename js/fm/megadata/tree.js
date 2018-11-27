@@ -66,14 +66,18 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             console.time('buildtree');
         }
     }
-    if (n.h === M.RootID) {
+    if (n.h === M.RootID && !sDeepIndex) {
+        if (folderlink) {
+            n = {h: ''};
+        }
+        i = escapeHTML(n.h);
         if (typeof dialog === 'undefined') {
             if (rebuild || $('.content-panel.cloud-drive ul').length === 0) {
-                $('.content-panel.cloud-drive').html('<ul id="treesub_' + htmlentities(M.RootID) + '"></ul>');
+                $('.content-panel.cloud-drive').html('<ul id="treesub_' + i + '"></ul>');
             }
         }
         else {
-            $('.' + dialog + ' .cloud-drive .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RootID) + '"></ul>');
+            $('.' + dialog + ' .cloud-drive .dialog-content-block').html('<ul id="mctreesub_' + i + '"></ul>');
         }
     }
     else if (inshares) {
@@ -102,9 +106,6 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             $('.' + dialog + ' .rubbish-bin .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RubbishID) + '"></ul>');
         }
         stype = "rubbish-bin";
-    }
-    else if (folderlink) {
-        stype = "folder-link";
     }
 
     prefix = stype;
@@ -181,7 +182,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             containsc = this.tree[curItemHandle] || '';
             name = folders[idx].name;
 
-            if (Object(fmconfig.treenodes).hasOwnProperty(curItemHandle)) {
+            if (curItemHandle === M.RootID || Object(fmconfig.treenodes).hasOwnProperty(curItemHandle)) {
                 if (containsc) {
                     buildnode = true;
                 }
@@ -572,6 +573,7 @@ MegaData.prototype.treeSortUI = function() {
         var sortTreePanel;
         var $sortMenuItems;
         var dir;
+        var sortMenuPos;
 
         // Show sort menu
         if (!$self.hasClass('active')) {
@@ -604,8 +606,22 @@ MegaData.prototype.treeSortUI = function() {
                 menu.find('.dropdown-section.labels').removeClass('hidden');
                 menu.find('.filter-by').removeClass('hidden');
             }
+            sortMenuPos = $self.position().top - 9;
 
-            menu.css('right', '-' + (menu.outerWidth() - 3) + 'px');
+            if (sortMenuPos < 3) {
+                sortMenuPos = 3;
+                menu.find('.dropdown-dark-arrow').css({
+                    'top': $self.position().top - sortMenuPos + 1
+                });
+            }
+            else {
+                menu.find('.dropdown-dark-arrow').removeAttr('style');
+            }
+
+            menu.css({
+                'top': sortMenuPos,
+                'right': '-' + (menu.outerWidth() - 3) + 'px'
+            });
 
             sortTreePanel = $.sortTreePanel[type];
 

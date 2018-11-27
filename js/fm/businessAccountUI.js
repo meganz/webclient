@@ -3030,11 +3030,13 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
             $userRow = $userLaeftPanelRow.clone(true);
             $userRow.removeClass('hidden selected');
             $userRow.attr('id', subuser.u);
-            var uName = from8(base64urldecode(subuser.firstname)) + ' ' +
-                from8(base64urldecode(subuser.lastname));
-            $userRow.find('.nw-user-management-name').text(uName);
             $usersLeftPanel.append($userRow);
         }
+
+        var uName = from8(base64urldecode(subuser.firstname)) + ' ' +
+            from8(base64urldecode(subuser.lastname));
+        $userRow.find('.nw-user-management-name').text(uName);
+
         var leftPanelClass = 'enabled-accounts';
         if (subuser.s === 0) {
             $userRow.find('.user-management-status').removeClass('pending disabled')

@@ -2453,7 +2453,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             }
 
             loadingDialog.pshow();
-
+            $dialog.addClass('hidden');
             var subName = uNameTrimed;
             var subLastName = uLastNameTrimed;
             var subEmail = uEmailTrimed;
@@ -2521,6 +2521,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                 }
 
                 loadingDialog.phide();
+                $dialog.removeClass('hidden');
             };
 
             subPromise.always(finalizeOperation);

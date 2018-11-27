@@ -1448,7 +1448,7 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
     var totalAttrs = 0;
 
     // if the user is not active, --> it wont be considered in contacts updating mechanisms
-    if (subUser && subUser.s !== 0) {
+    if (subUser && subUser.s !== 0 && !M.u[subuserHandle]) {
         considereAttrs.push('lastname', 'firstname');
     }
 

@@ -29129,6 +29129,7 @@ opacity: 1;
 .user-management-account-settings .bus-input.short-input.underline-dropdown-input select{
     background:transparent;
     border:none;
+    outline: none;
     font-size: 14px;
     color: #333333;
     height: 40px;

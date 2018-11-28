@@ -283,7 +283,7 @@ BusinessRegister.prototype.initPage = function () {
     );
 
     // event handler for register button, validation + basic check
-    $('#business-reg-btn', $pageContainer).off('click.suba').on('click.suba',
+    $('#business-reg-btn, #business-reg-btn-mob', $pageContainer).off('click.suba').on('click.suba',
         function registerBusinessAccButtonClickHandler() {
 
             if ($(this).hasClass('disabled')) {

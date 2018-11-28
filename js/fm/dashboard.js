@@ -389,11 +389,11 @@ function dashboardUI() {
             $dataStats.find('.ba-root .file-number').text(account.stats[M.RootID].files + ' ' + l[2034]);
 
             $dataStats.find('.ba-inshare .ff-occupy').text(bytesToSize(account.stats['inshares'].bytes));
-            $dataStats.find('.ba-inshare .folder-number').text(account.stats['inshares'].folders + ' ' + l[2035]);
+            $dataStats.find('.ba-inshare .folder-number').text(account.stats['inshares'].items + ' ' + l[2035]);
             $dataStats.find('.ba-inshare .file-number').text(account.stats['inshares'].files + ' ' + l[2034]);
 
             $dataStats.find('.ba-outshare .ff-occupy').text(bytesToSize(account.stats['outshares'].bytes));
-            $dataStats.find('.ba-outshare .folder-number').text(account.stats['outshares'].folders + ' ' + l[2035]);
+            $dataStats.find('.ba-outshare .folder-number').text(account.stats['outshares'].items + ' ' + l[2035]);
             $dataStats.find('.ba-outshare .file-number').text(account.stats['outshares'].files + ' ' + l[2034]);
 
             $dataStats.find('.ba-rubbish .ff-occupy').text(bytesToSize(account.stats[M.RubbishID].bytes));

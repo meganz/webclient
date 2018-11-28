@@ -3616,8 +3616,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.nw-fm-left-icon.inbox').addClass('hidden');
     }
 
-    // view or hide left icon for business account
-    if (u_attr && u_attr.b && u_attr.b.m) {
+    // view or hide left icon for business account, confirmed and payed
+    if (u_attr && u_attr.b && u_attr.b.m && u_attr.b.s === 1 && u_privk) {
         $('.nw-fm-left-icon.user-management').removeClass('hidden');
     }
     else {

@@ -19,6 +19,13 @@ function BusinessAccountUI() {
 
     // private function to hide all business accounts UI divs.
     this.initUItoRender = function () {
+
+        // dealing with non-confirmed accounts, and not payed-ones
+        if (u_attr.b.s === -1 || !u_privk) {
+            loadSubPage('fm');
+            return false;
+        }
+
         var $businessAccountContianer = $('.files-grid-view.user-management-view');
         $('.user-management-list-table', $businessAccountContianer).addClass('hidden');
         $('.user-management-subaccount-view-container', $businessAccountContianer).addClass('hidden');
@@ -68,7 +75,7 @@ function BusinessAccountUI() {
             .on('click.subuser', function addSubUserHeaderButtonHandler() {
                 mySelf.viewBusinessAccountPage();
             });
-
+        return true;
     };
 }
 
@@ -94,7 +101,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         }
     }
 
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
 
     var mySelf = this;
 
@@ -758,7 +767,9 @@ BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
 /** Function to show landing page, for admins without sub-users yet */
 BusinessAccountUI.prototype.viewLandingPage = function () {
     "use strict";
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
     var mySelf = this;
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
@@ -789,7 +800,9 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
  */
 BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     "use strict";
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
     var mySelf = this;
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
@@ -1095,7 +1108,9 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     "use strict";
 
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
     var mySelf = this;
     this.URLchanger('overview');
 
@@ -1515,7 +1530,9 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
 /** view business account page */
 BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     "use strict";
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
     var mySelf = this;
     this.URLchanger('account');
     loadingDialog.pshow();
@@ -1764,7 +1781,9 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
     "use strict";
 
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
     var mySelf = this;
     this.URLchanger('invoices');
 
@@ -1870,7 +1889,9 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
 BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
     "use strict";
 
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
     var mySelf = this;
     this.URLchanger('invdet!' + invoiceID);
 
@@ -2164,6 +2185,10 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
 /** show Welcome to business account dialog */
 BusinessAccountUI.prototype.showWelcomeDialog = function () {
     "use strict";
+
+    if (u_attr.b.s === -1 || !u_privk) {
+        return;
+    }
 
     var showTheDialog = function (isViewed) {
         if (isViewed === '1') {

@@ -911,6 +911,7 @@
     "7005": "Gelieve hieronder de reden invoeren",
     "7006": "Laden...",
     "7022": "Aan het opstarten",
+    "7026": "Voorkeur",
     "7039": "Vraag het mij niet opnieuw",
     "7070": "Uitgezet",
     "7086": "Selecteer uw Linux distro",
@@ -3064,5 +3065,10 @@
     "19985": "Er zijn momenteel geen gedeelde bestanden in dit gesprek. U kunt bestanden delen door te uploaden in dit gesprek (inclusief slepen & loslaten) of door de bestanden direct te selecteren vanuit uw cloud schijf.",
     "19986": "U heeft momenteel geen binnenkomende gedeelde mappen van deze deelnemer. U kunt direct live mappen delen met uw contacten bij MEGA vanuit uw cloud schijf.",
     "19987": "No disabled users",
-    "19988": "Page %1"
+    "19988": "Page %1",
+    "19989": "Tax Invoice",
+    "19990": "Enable QR code",
+    "19991": "QR Code link",
+    "19992": "%1 base quota",
+    "19993": "%1 achievements quota"
 }

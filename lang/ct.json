@@ -911,6 +911,7 @@
     "7005": "\u8acb\u65bc\u4e0b\u65b9\u8f38\u5165\u539f\u56e0",
     "7006": "\u8b80\u53d6\u4e2d",
     "7022": "\u958b\u59cb",
+    "7026": "\u504f\u597d",
     "7039": "\u5225\u518d\u554f\u6211",
     "7070": "\u505c\u7528",
     "7086": "\u8acb\u9078\u4e2d\u60a8\u7684Linux\u767c\u884c\u7248",
@@ -2962,7 +2963,7 @@
     "19806": "User management helps you to organize your users and your business settings all in one place.",
     "19807": "Click the [B]Backup Key[\/B] button to proceed to the Recovery Key backup page.",
     "19808": "Tap on the [B]Backup Recovery Key[\/B] button and copy it or save to your device.",
-    "19809": "Thanks! Your account will be ready to use as soon as you confirm your email address. If you have not received your MEGA Business account within {0} hours, please contact us at support@mega.nz",
+    "19809": "Thanks! Your account will be ready to use as soon as you receive the email from us. If you have not received your MEGA Business account within 1 hour, please contact us at support@mega.nz",
     "19810": "Click on the [B]Export Key[\/B] button and save it to a secure location.",
     "19811": "Tap\/Click on the [B]Menu[\/B] icon.",
     "19812": "Tap\/Click on the [B]Settings[\/B] option in the menu.",
@@ -3064,5 +3065,10 @@
     "19985": "There are currently no shared files in this chat. You can share files by uploading into this chat (including drag & drop) or by selecting files directly from your cloud drive.",
     "19986": "You currently have no incoming shared folders from this participant. You can share live folders to your contacts on MEGA directly from your cloud drive.",
     "19987": "No disabled users",
-    "19988": "Page %1"
+    "19988": "Page %1",
+    "19989": "Tax Invoice",
+    "19990": "Enable QR code",
+    "19991": "QR Code link",
+    "19992": "%1 base quota",
+    "19993": "%1 achievements quota"
 }

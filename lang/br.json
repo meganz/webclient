@@ -911,6 +911,7 @@
     "7005": "Por favor, digite o motivo abaixo:",
     "7006": "Carregando...",
     "7022": "Iniciando",
+    "7026": "Prefer\u00eancias",
     "7039": "N\u00e3o me pergunte novamente",
     "7070": "Desativado",
     "7086": "Selecione a sua distribui\u00e7\u00e3o Linux",
@@ -3064,5 +3065,10 @@
     "19985": "Ainda n\u00e3o h\u00e1 arquivos compartilhados neste chat. Voc\u00ea pode compartilhar arquivos fazendo o upload dos mesmos no chat (incluindo arrastar e soltar) ou selecionando arquivos diretamente da sua Nuvem.",
     "19986": "Este participante ainda n\u00e3o compartilhou pastas com voc\u00ea. Voc\u00ea pode compartilhar pastas com os seus contatos no MEGA diretamente da sua Nuvem.",
     "19987": "N\u00e3o h\u00e1 usu\u00e1rios desativados",
-    "19988": "Page %1"
+    "19988": "Page %1",
+    "19989": "Tax Invoice",
+    "19990": "Enable QR code",
+    "19991": "QR Code link",
+    "19992": "%1 base quota",
+    "19993": "%1 achievements quota"
 }

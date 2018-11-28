@@ -911,6 +911,7 @@
     "7005": "Wpisz sw\u00f3j pow\u00f3d poni\u017cej:",
     "7006": "Pobieranie danych...",
     "7022": "Rozpocz\u0119cie",
+    "7026": "Ustawienia",
     "7039": "Nie pytaj ponownie",
     "7070": "Zablokowane",
     "7086": "Wybierz wersj\u0119 Linuxa",
@@ -3064,5 +3065,10 @@
     "19985": "W tym czacie nie ma obecnie udost\u0119pnionych plik\u00f3w. Mo\u017cesz udost\u0119pnia\u0107 pliki, przesy\u0142aj\u0105c je na ten czat (w tym przeci\u0105ganie i upuszczanie) lub wybieraj\u0105c pliki bezpo\u015brednio z dysku w chmurze.",
     "19986": "Obecnie nie masz \u017cadnych przychodz\u0105cych folder\u00f3w wsp\u00f3\u0142dzielonych od tego uczestnika. Mo\u017cesz udost\u0119pni\u0107 foldery na \u017cywo swoim kontaktom w MEGA bezpo\u015brednio z dysku w chmurze.",
     "19987": "No disabled users",
-    "19988": "Page %1"
+    "19988": "Page %1",
+    "19989": "Tax Invoice",
+    "19990": "Enable QR code",
+    "19991": "QR Code link",
+    "19992": "%1 base quota",
+    "19993": "%1 achievements quota"
 }

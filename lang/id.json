@@ -911,6 +911,7 @@
     "7005": "Harap masukan alasan dibawah ini",
     "7006": "Memuat...",
     "7022": "Memulai",
+    "7026": "Pengaturan",
     "7039": "Jangan tanya saya lagi",
     "7070": "Membatalkan",
     "7086": "Harap pilih Linux Distro anda",
@@ -3064,5 +3065,10 @@
     "19985": "Saat ini tidak ada file yang dibagikan dalam obrolan ini. Anda dapat berbagi file dengan mengunggah ke obrolan ini (termasuk drag & drop) atau dengan memilih file langsung dari drive cloud Anda.",
     "19986": "Saat ini Anda tidak memiliki folder bersama yang masuk dari peserta ini. Anda dapat berbagi folder langsung ke kontak Anda di MEGA langsung dari drive cloud Anda.",
     "19987": "No disabled users",
-    "19988": "Page %1"
+    "19988": "Page %1",
+    "19989": "Tax Invoice",
+    "19990": "Enable QR code",
+    "19991": "QR Code link",
+    "19992": "%1 base quota",
+    "19993": "%1 achievements quota"
 }

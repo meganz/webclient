@@ -911,6 +911,7 @@
     "7005": "Geben Sie bitte den Grund ein",
     "7006": "Wird geladen...",
     "7022": "Starte",
+    "7026": "Einstellungen",
     "7039": "Nicht erneut nachfragen",
     "7070": "Deaktiviert",
     "7086": "Linux-Distribution",
@@ -3064,5 +3065,10 @@
     "19985": "There are currently no shared files in this chat. You can share files by uploading into this chat (including drag & drop) or by selecting files directly from your cloud drive.",
     "19986": "You currently have no incoming shared folders from this participant. You can share live folders to your contacts on MEGA directly from your cloud drive.",
     "19987": "No disabled users",
-    "19988": "Page %1"
+    "19988": "Page %1",
+    "19989": "Tax Invoice",
+    "19990": "Enable QR code",
+    "19991": "QR Code link",
+    "19992": "%1 base quota",
+    "19993": "%1 achievements quota"
 }

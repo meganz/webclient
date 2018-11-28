@@ -512,7 +512,7 @@
     "1286": "Name of copyright owner\u2019s authorised agent submitting notice:",
     "1287": "Copyright Notice Received",
     "1288": "We will review and process your notice expeditiously.",
-    "1290": "Oops, this does not seem to be a valid invitation link. Did you already register an account?",
+    "1290": "Oops, this does not seem to be a valid invitation link. Please check with your administrator for a valid link.",
     "1297": "Email address already in use.",
     "1298": "Please log in to your account.",
     "1301": "Today",
@@ -911,6 +911,7 @@
     "7005": "Please enter the reason below",
     "7006": "Loading\u2026",
     "7022": "Starting",
+    "7026": "Preferences",
     "7039": "Do not ask me again",
     "7070": "Disabled",
     "7086": "Please select your Linux Distro",
@@ -2962,7 +2963,7 @@
     "19806": "User management helps you to organize your users and your business settings all in one place.",
     "19807": "Click the [B]Backup Key[\/B] button to proceed to the Recovery Key backup page.",
     "19808": "Tap on the [B]Backup Recovery Key[\/B] button and copy it or save to your device.",
-    "19809": "Thanks! Your account will be ready to use as soon as you confirm your email address. If you have not received your MEGA Business account within {0} hours, please contact us at support@mega.nz",
+    "19809": "Thanks! Your account will be ready to use as soon as you receive the email from us. If you have not received your MEGA Business account within 1 hour, please contact us at support@mega.nz",
     "19810": "Click on the [B]Export Key[\/B] button and save it to a secure location.",
     "19811": "Tap\/Click on the [B]Menu[\/B] icon.",
     "19812": "Tap\/Click on the [B]Settings[\/B] option in the menu.",
@@ -3064,5 +3065,10 @@
     "19985": "There are currently no shared files in this chat. You can share files by uploading into this chat (including drag & drop) or by selecting files directly from your cloud drive.",
     "19986": "You currently have no incoming shared folders from this participant. You can share live folders to your contacts on MEGA directly from your cloud drive.",
     "19987": "No disabled users",
-    "19988": "Page %1"
+    "19988": "Page %1",
+    "19989": "Tax Invoice",
+    "19990": "Enable QR code",
+    "19991": "QR Code link",
+    "19992": "%1 base quota",
+    "19993": "%1 achievements quota"
 }

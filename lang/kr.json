@@ -911,6 +911,7 @@
     "7005": "\uc774\uc720\ub97c \uc785\ub825\ud558\uc138\uc694",
     "7006": "\ubd88\ub7ec\uc624\ub294 \uc911...",
     "7022": "\uc2dc\uc791\uc911",
+    "7026": "\uc124\uc815",
     "7039": "\ub2e4\uc2dc \ubb3b\uc9c0 \ub9c8\uc138\uc694",
     "7070": "\ud574\uc81c\ub428",
     "7086": "\ub2f9\uc2e0\uc758 \ub9ac\ub205\uc2a4 \ubc30\ud3ec\ud310\uc744 \uc120\ud0dd\ud558\uc138\uc694",
@@ -3064,5 +3065,10 @@
     "19985": "There are currently no shared files in this chat. You can share files by uploading into this chat (including drag & drop) or by selecting files directly from your cloud drive.",
     "19986": "You currently have no incoming shared folders from this participant. You can share live folders to your contacts on MEGA directly from your cloud drive.",
     "19987": "No disabled users",
-    "19988": "Page %1"
+    "19988": "Page %1",
+    "19989": "Tax Invoice",
+    "19990": "Enable QR code",
+    "19991": "QR Code link",
+    "19992": "%1 base quota",
+    "19993": "%1 achievements quota"
 }

@@ -911,6 +911,7 @@
     "7005": "Xin nh\u1eadp l\u00fd do \u1edf b\u00ean d\u01b0\u1edbi",
     "7006": "\u0110ang t\u1ea3i...",
     "7022": "\u0110ang kh\u1edfi \u0111\u1ed9ng",
+    "7026": "T\u00f9y Ch\u1ec9nh",
     "7039": "Kh\u00f4ng h\u1ecfi l\u1ea1i n\u1eefa",
     "7070": "\u0110\u00e3 v\u00f4 hi\u1ec7u",
     "7086": "Xin ch\u1ecdn lo\u1ea1i Linux Distro",
@@ -2962,7 +2963,7 @@
     "19806": "User management helps you to organize your users and your business settings all in one place.",
     "19807": "Click the [B]Backup Key[\/B] button to proceed to the Recovery Key backup page.",
     "19808": "Tap on the [B]Backup Recovery Key[\/B] button and copy it or save to your device.",
-    "19809": "Thanks! Your account will be ready to use as soon as you confirm your email address. If you have not received your MEGA Business account within {0} hours, please contact us at support@mega.nz",
+    "19809": "Thanks! Your account will be ready to use as soon as you receive the email from us. If you have not received your MEGA Business account within 1 hour, please contact us at support@mega.nz",
     "19810": "Click on the [B]Export Key[\/B] button and save it to a secure location.",
     "19811": "Tap\/Click on the [B]Menu[\/B] icon.",
     "19812": "Tap\/Click on the [B]Settings[\/B] option in the menu.",
@@ -3064,5 +3065,10 @@
     "19985": "There are currently no shared files in this chat. You can share files by uploading into this chat (including drag & drop) or by selecting files directly from your cloud drive.",
     "19986": "You currently have no incoming shared folders from this participant. You can share live folders to your contacts on MEGA directly from your cloud drive.",
     "19987": "No disabled users",
-    "19988": "Page %1"
+    "19988": "Page %1",
+    "19989": "Tax Invoice",
+    "19990": "Enable QR code",
+    "19991": "QR Code link",
+    "19992": "%1 base quota",
+    "19993": "%1 achievements quota"
 }

@@ -99,7 +99,7 @@ function time2date(unixTime, format) {
         result = isodate.toISOString().split('T')[0];
     }
     else {
-        var locales = locale + '-' + country;
+        var locales = locale;
         result = date.toLocaleDateString(locales, options);
     }
 
@@ -114,11 +114,11 @@ function time2date(unixTime, format) {
 function acc_time2date(unixtime, yearIsOptional) {
 
     var MyDate = new Date(unixtime * 1000);
-    var country = 'NZ';
+    var country;
     if (u_attr) {
-        country = u_attr.country ? u_attr.country : u_attr.ipcc || 'NZ';
+        country = u_attr.country ? u_attr.country : u_attr.ipcc;
     }
-    var locales = locale + '-' + country;
+    var locales = country ? locale : locale + '-' + country;
     var options = {month: 'long', day: 'numeric'};
     var currYear = (new Date()).getFullYear();
     var result;

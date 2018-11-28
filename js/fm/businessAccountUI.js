@@ -1941,6 +1941,10 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         // mega section on the top of the invoice and receipt
         var $megaContainer = $('.mega-contact-container', $invoiceDetailContainer);
+        invoiceDetail.mega.phaddr[invoiceDetail.mega.phaddr.length - 1] =
+            invoiceDetail.mega.phaddr[invoiceDetail.mega.phaddr.length - 1].toUpperCase();
+        invoiceDetail.mega.poaddr[invoiceDetail.mega.poaddr.length - 1] =
+            invoiceDetail.mega.poaddr[invoiceDetail.mega.poaddr.length - 1].toUpperCase();
         $megaContainer.find('.inv-subtitle').text(invoiceDetail.mega.cname);
         $megaContainer.find('.biller-email').text(invoiceDetail.mega.e);
         $megaContainer.find('.biller-address').text(invoiceDetail.mega.phaddr.join(', '));
@@ -2453,7 +2457,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             }
 
             loadingDialog.pshow();
-
+            $dialog.addClass('hidden');
             var subName = uNameTrimed;
             var subLastName = uLastNameTrimed;
             var subEmail = uEmailTrimed;
@@ -2521,6 +2525,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                 }
 
                 loadingDialog.phide();
+                $dialog.removeClass('hidden');
             };
 
             subPromise.always(finalizeOperation);

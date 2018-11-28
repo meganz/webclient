@@ -116,14 +116,14 @@ accountUI.renderAccountPage = function(account) {
                 }
                 break;
 
-                default:
-                    tabSection = 'general';
-                    // for business sub-user the default is email-and-pass
-                    if (u_attr.b && !u_attr.b.m) {
-                        tabSection = 'email-and-pass';
-                    }
-            }
+            default:
+                tabSection = 'general';
+                // for business sub-user the default is email-and-pass
+                if (u_attr.b && !u_attr.b.m) {
+                    tabSection = 'email-and-pass';
+                }
         }
+    }
 
     $('.account.tab-content').addClass('hidden');
     $('.account.tab-lnk.active').removeClass('active');
@@ -384,62 +384,61 @@ accountUI.renderAccountPage = function(account) {
     else {
         $('.fm-right-account-block').addClass('active-achievements');
 
-            mega.achievem.parseAccountAchievements();
-        }
-        /* QR stuff */
-        if (account.contactLink && account.contactLink.length) {
-            $('.qr-settings .qr-settings-acc').removeClass('hidden');
-            $('.qr-settings .dialog-feature-toggle').addClass('toggle-on')
-                .find('.dialog-feature-switch').css('marginLeft', '22px');
-        }
-        else {
-            $('.qr-settings .qr-settings-acc').addClass('hidden');
-            $('.qr-settings .dialog-feature-toggle').removeClass('toggle-on')
-                .find('.dialog-feature-switch').css('marginLeft', '2px');
-        }
-        $('.qr-settings .button.access-qr').rebind('click', function () {
-            openAccessQRDialog();
-        });
-        $('.qr-settings .dialog-feature-toggle').rebind('click', function () {
-            var me = $(this);
-            if (me.hasClass('toggle-on')) {
-                me.find('.dialog-feature-switch').animate({ marginLeft: '2px' }, 150, 'swing', function () {
-                    me.removeClass('toggle-on');
-                    $('.qr-settings .qr-settings-acc').addClass('hidden');
-                    api_req({
-                        a: 'cld',
-                        cl: account.contactLink.substring(2, account.contactLink.length)
-                    }, {
-                            myAccount: account,
-                            callback: function (res, ctx) {
-                                if (res === 0) { // success
-                                    ctx.myAccount.contactLink = '';
-                                }
-                            }
-                        });
-                });
-            }
-            else {
-                me.find('.dialog-feature-switch').animate({ marginLeft: '22px' }, 150, 'swing', function () {
-                    me.addClass('toggle-on');
-                    $('.qr-settings .qr-settings-acc').removeClass('hidden');
-                    api_req({ a: 'clc' }, {
+        mega.achievem.parseAccountAchievements();
+    }
+    /* QR stuff */
+    if (account.contactLink && account.contactLink.length) {
+        $('.qr-settings .qr-settings-acc').removeClass('hidden');
+        $('.qr-settings .dialog-feature-toggle').addClass('toggle-on')
+            .find('.dialog-feature-switch').css('marginLeft', '22px');
+    }
+    else {
+        $('.qr-settings .qr-settings-acc').addClass('hidden');
+        $('.qr-settings .dialog-feature-toggle').removeClass('toggle-on')
+            .find('.dialog-feature-switch').css('marginLeft', '2px');
+    }
+    $('.qr-settings .button.access-qr').rebind('click', function () {
+        openAccessQRDialog();
+    });
+    $('.qr-settings .dialog-feature-toggle').rebind('click', function () {
+        var me = $(this);
+        if (me.hasClass('toggle-on')) {
+            me.find('.dialog-feature-switch').animate({ marginLeft: '2px' }, 150, 'swing', function () {
+                me.removeClass('toggle-on');
+                $('.qr-settings .qr-settings-acc').addClass('hidden');
+                api_req({
+                    a: 'cld',
+                    cl: account.contactLink.substring(2, account.contactLink.length)
+                }, {
                         myAccount: account,
                         callback: function (res, ctx) {
-                            if (typeof res !== 'string') {
-                                res = '';
+                            if (res === 0) { // success
+                                ctx.myAccount.contactLink = '';
                             }
-                            else {
-                                res = 'C!' + res;
-                            }
-                            ctx.myAccount.contactLink = res;
                         }
                     });
+            });
+        }
+        else {
+            me.find('.dialog-feature-switch').animate({ marginLeft: '22px' }, 150, 'swing', function () {
+                me.addClass('toggle-on');
+                $('.qr-settings .qr-settings-acc').removeClass('hidden');
+                api_req({ a: 'clc' }, {
+                    myAccount: account,
+                    callback: function (res, ctx) {
+                        if (typeof res !== 'string') {
+                            res = '';
+                        }
+                        else {
+                            res = 'C!' + res;
+                        }
+                        ctx.myAccount.contactLink = res;
+                    }
                 });
-            }
-        });
-        /* End QR stuff */
-
+            });
+        }
+    });
+    /* End QR stuff */
 
     $('.fm-account-main .pro-upgrade').rebind('click', function() {
         loadSubPage('pro');
@@ -1154,24 +1153,24 @@ accountUI.renderAccountPage = function(account) {
 
     $('#find-duplicate').rebind('click', M.findDupes);
 
-        // if this is a business account
-        if (u_attr.b) {
-            $('#account-country').addClass('hidden');
-            $("label[for='account-country']").attr('style', 'display: none;');
-            $('.account-profile.half-sized.second .account.data-block.second.acc-type').addClass('hidden');
-            $('.account-profile.half-sized.second .account.data-block.second.acc-balance').addClass('hidden');
-            $('.account.data-block.storage-data').addClass('hidden');
-            if (!u_attr.b.m) {
-                $('.account.tab-content.email-and-pass .account.data-block.acc-change-email').addClass('hidden');
-                $('.account.tab-content.general').addClass('hidden');
-                $(".account.tab-lnk[data-tab='general']").addClass('hidden');
-                $('.account-profile.half-sized.second .account.data-block.second.acc-cancel').addClass('hidden');
-            }
-            $('.account.tabs-bl .account.tab-lnk.payment').attr('style', 'display: none;');
-            $('.account.tabs-bl .account.tab-lnk.achievements').attr('style', 'display: none;');
+    // if this is a business account
+    if (u_attr.b) {
+        $('#account-country').addClass('hidden');
+        $("label[for='account-country']").attr('style', 'display: none;');
+        $('.account-profile.half-sized.second .account.data-block.second.acc-type').addClass('hidden');
+        $('.account-profile.half-sized.second .account.data-block.second.acc-balance').addClass('hidden');
+        $('.account.data-block.storage-data').addClass('hidden');
+        if (!u_attr.b.m) {
+            $('.account.tab-content.email-and-pass .account.data-block.acc-change-email').addClass('hidden');
+            $('.account.tab-content.general').addClass('hidden');
+            $(".account.tab-lnk[data-tab='general']").addClass('hidden');
+            $('.account-profile.half-sized.second .account.data-block.second.acc-cancel').addClass('hidden');
         }
+        $('.account.tabs-bl .account.tab-lnk.payment').attr('style', 'display: none;');
+        $('.account.tabs-bl .account.tab-lnk.achievements').attr('style', 'display: none;');
+    }
 
-        $.tresizer();
+    $.tresizer();
 
     clickURLs();
 

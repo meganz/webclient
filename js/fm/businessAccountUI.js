@@ -575,8 +575,13 @@ BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
     }
 };
 
-
+/**
+ * Check if re-rendering of business account users management is needed
+ * @param {Object} subs             New users object
+ * @param {Object} previousSubs     Old users object
+ */
 BusinessAccountUI.prototype.isRedrawNeeded = function (subs, previousSubs) {
+    "use strict";
     if (!previousSubs) {
         return true;
     }
@@ -1482,6 +1487,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 };
 
 BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContainer) {
+    "use strict";
     var mySelf = this;
     var $profileContainer = $('.profile', $accountContainer);
     var $invoiceContainer = $('.invoice', $accountContainer);
@@ -1699,12 +1705,6 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
             var settingResultHandler = function (st) {
                 if (st) {
-                    //var changedKey = [];
-                    //for (var cKey = 0; cKey < attrsToChange.length; cKey++) {
-                    //    changedKey.push(attrsToChange[cKey].key);
-                    //}
-                    //mySelf.business.updateSubUserInfo(u_attr.b.bu, changedKey);
-
                     var $savingNotidication = $('.auto-save', $accountContainer);
                     $savingNotidication.removeClass('hidden');
                     $savingNotidication.show();
@@ -2029,7 +2029,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         myPage = translate(myPage);
 
                         // now prepare the incovice.
-                        // myPage = myPage.replace('{0Date}', (new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
+                        // myPage = myPage.replace('{0Date}',(new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
                         myPage = myPage.replace('{0Date}', time2date(invoiceDetail.ts, 1));
                         myPage = myPage.replace('{1InvoiceTitle}', $invoiceTopTitle.find('.inv-title.invv').text());
                         myPage = myPage.replace('{1InvoiceNB}', invoiceDetail.n);

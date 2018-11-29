@@ -118,7 +118,9 @@ function acc_time2date(unixtime, yearIsOptional) {
     if (u_attr) {
         country = u_attr.country ? u_attr.country : u_attr.ipcc;
     }
-    var locales = country ? locale : locale + '-' + country;
+
+    var locales = country ? locale + '-' + country : locale;
+
     var options = {month: 'long', day: 'numeric'};
     var currYear = (new Date()).getFullYear();
     var result;

@@ -341,7 +341,9 @@ BusinessRegister.prototype.initPage = function () {
  */
 BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, tel, email, pass) {
     "use strict";
-
+    if (is_mobile) {
+        parsepage(pages['mobile']);
+    }
     loadingDialog.show();
     var mySelf = this;
 

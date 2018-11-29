@@ -22,7 +22,7 @@ function BusinessAccountUI() {
 
         // dealing with non-confirmed accounts, and not payed-ones
         if (u_attr.b.s === -1 || !u_privk) {
-            loadSubPage('fm');
+            loadSubPage('start');
             return false;
         }
 

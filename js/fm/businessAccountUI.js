@@ -1341,12 +1341,13 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     // private function to format start and end dates
     var getReportDates = function (leadingDate) {
         var today = leadingDate || new Date();
-        var todayMonth = today.getMonth() + 1;
+
+        var todayMonth = today.getUTCMonth() + 1;
         var currMonth = String(todayMonth);
         if (currMonth.length < 2) {
             currMonth = '0' + currMonth;
         }
-        var currYear = String(today.getFullYear());
+        var currYear = String(today.getUTCFullYear());
 
         var startDate = currYear + currMonth + '01';
 
@@ -1354,7 +1355,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         if (!endDate) {
             return;
         }
-        var endDateStr = String(endDate.getFullYear()) + currMonth + String(endDate.getDate());
+        var endDateStr = String(endDate.getUTCFullYear()) + currMonth + String(endDate.getDate());
         return { fromDate: startDate, toDate: endDateStr };
     };
 
@@ -1477,7 +1478,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         for (var a = 0; a < 12; a++) {
             var $currOprion = $('<option>', {
                 value: nowDate.getTime(),
-                text: monthNames[nowDate.getMonth()] + ' ' + nowDate.getFullYear()
+                text: monthNames[nowDate.getUTCMonth()] + ' ' + nowDate.getUTCFullYear()
             });
             $monthSelector.append($currOprion);
 

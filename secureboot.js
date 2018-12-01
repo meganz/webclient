@@ -1991,6 +1991,11 @@ else if (!b_u) {
         jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
     } // !is_mobile
 
+    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
+        is_chrome_firefox |= 4;
+        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
+    }
+
     // Transfers
     jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});
     jsl.push({f:'js/transfers/queue.js', n: 'queue', j:1,w:4});
@@ -2249,11 +2254,6 @@ else if (!b_u) {
     // only used on beta
     if (onBetaW) {
         jsl.push({f:'js/betacrashes.js', n: 'betacrashes_js', j: 1});
-    }
-
-    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
-        is_chrome_firefox |= 4;
-        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
     }
 
     var jsl2 =

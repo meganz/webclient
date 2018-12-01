@@ -449,7 +449,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
         }
     }
 
-    breadcrumbsResize();
+    M.onFileManagerReady(breadcrumbsResize);
     $(window).rebind('resize.fmbreadcrumbs', SoonFc(breadcrumbsResize, 202));
 
     if (folderlink) {

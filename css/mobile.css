@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 @font-face {
     font-family: 'source_sans_prolight';
     src: url('../fonts/SourceSansPro-Light.eot');
@@ -4977,6 +4977,12 @@ div.checkboxOn, div.checkboxOff {
 }
 .mobile.icon.pro-mini.pro3 {
     background-position: -2px -1960px;
+}
+.mobile.icon.pro-mini.pro100 {
+    background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+    background-position: -149px -415px;
+    height: 22px;
 }
 .mobile.my-account-page .account-usage-block {
     background-color: #fff;

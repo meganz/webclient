@@ -657,7 +657,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                     loadingDialog.phide();
                     var msg = l[17920]; // not valid password
                     if (res) {
-                        msg = l[1290]; // not valid link
+                        msg = l[19567]; // not valid link 19567
                         console.error(st, res, desc);
                     }
                     msgDialog('warninga', '', msg, '', function () {

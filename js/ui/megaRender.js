@@ -74,7 +74,10 @@
                             '<div class="clear"></div>' +
                         '</div>' +
                     '</td>' +
-                    '<td width="270">' +
+                    '<td width="100">' +
+                        '<div class="shared-folder-size"></div>' +
+                    '</td>' +
+                    '<td width="200">' +
                         '<div class="shared-folder-access"></div>' +
                     '</td>' +
                     '<td class="grid-url-header-nw">' +
@@ -806,6 +809,7 @@
 
                 props.userHandle = aNode.su || aNode.p;
                 props.userName = M.getNameByHandle(props.userHandle);
+                props.folderSize = bytesToSize(aNode.tb);
 
                 if (aNode.r === 1) {
                     props.accessRightsText = l[56];
@@ -1024,6 +1028,7 @@
 
                     aTemplate.querySelector('.fm-chat-user').textContent = aProperties.userName;
                     aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
+                    aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
                 }
 
                 return aTemplate;

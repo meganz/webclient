@@ -13520,7 +13520,7 @@ React.makeElement = React['createElement'];
 	        }
 	        var newWidth;
 
-	        if (self.state.viewMode === VIEW_MODES.CAROUSEL) {
+	        if (self.getViewMode() === VIEW_MODES.CAROUSEL) {
 	            $('.participantsContainer', $container).height('auto');
 	            var activeStreamHeight = $container.outerHeight() - $('.call-header').outerHeight() - $('.participantsContainer', $container).outerHeight();
 

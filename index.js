@@ -982,6 +982,10 @@ function init_page() {
             parsepage(pages['mobile']);
             mobile.support.init();
         }
+        else if (u_type === 0) {
+            loadSubPage('register');
+            return false;
+        }
         else {
             parsepage(pages['support']);
             support.initUI();

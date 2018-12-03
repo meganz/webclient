@@ -1360,7 +1360,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     };
 
     // private function to populate the reporting bar chart
-    var populateBarChart = function (st, res) {
+    var populateBarChart = function (st, res, targetDate) {
         M.require('charts_js').done(function () {
             var $charContainer = $("#chartcontainer");
             $charContainer.empty();
@@ -1371,6 +1371,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             availableLabels.sort();
 
             var chartData = [];
+            var chartLabels = [];
             var divider = 1024 * 1024 * 1024;
             var totalMonthTransfer = 0;
             var randVal;
@@ -1382,17 +1383,26 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                     randVal = Math.random() * 100;
                     chartData.push(randVal);
                     availableLabels.push(h2 + 1);
+                    chartLabels.push(h2 + 1);
                     totalMonthTransfer += randVal;
                 }
             }
             // building bars data + total transfer
             else {
+                var lastDayOfThisMonth = getLastDayofTheMonth(targetDate || new Date())
+                    .getDate();
+                for (var v = 0; v < lastDayOfThisMonth; v++) {
+                    chartData.push(0);
+                    chartLabels.push(v + 1);
+                }
                 for (var h = 0; h < availableLabels.length; h++) {
-                    chartData.push(res[availableLabels[h]].tdl / divider);
+                    var index = new Number(availableLabels[h].substr(6, 2));
+                    // chartData.push(res[availableLabels[h]].tdl / divider);
+                    chartData[index - 1] = res[availableLabels[h]].tdl / divider;
                     totalMonthTransfer += res[availableLabels[h]].tdl;
 
                     // keeping the day number only
-                    availableLabels[h] = availableLabels[h].substr(6, 2);
+                    // availableLabels[h] = availableLabels[h].substr(6, 2);
                 }
             }
 
@@ -1403,15 +1413,18 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             var tooltipBarLabeling = function (tooltipItem, data) {
                 var perc = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
 
-                var sizeInfo = numOfBytes(perc);
+                var sizeInfo = numOfBytes(perc * divider);
                 var label = sizeInfo.size + ' ' + sizeInfo.unit;
                 return label;
+            };
+            var tooltipBartiteling = function () {
+                return '';
             };
 
             var myChart = new Chart(chartCanvas, {
                 type: 'bar',
                 data: {
-                    labels: availableLabels,
+                    labels: chartLabels, // availableLabels,
                     datasets: [{
                         label: '',
                         data: chartData,
@@ -1441,8 +1454,10 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                     },
                     tooltips: {
                         callbacks: {
-                            label: tooltipBarLabeling
-                        }
+                            label: tooltipBarLabeling,
+                            title: tooltipBartiteling
+                        },
+                        displayColors: false
                     }
                 }
             });
@@ -1494,7 +1509,9 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             var report = getReportDates(selectedDate);
 
             var reportPromise2 = mySelf.business.getQuotaUsageReport(false, report);
-            reportPromise2.done(populateBarChart);
+            reportPromise2.done(function fillBarChart(st, res) {
+                populateBarChart(st, res, selectedDate);
+            });
         });
     };
 

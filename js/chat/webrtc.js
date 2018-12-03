@@ -71,7 +71,7 @@ RtcModule.kMediaGetTimeout = 20000;
 RtcModule.kSessSetupTimeout = 14000;
 RtcModule.kCallSetupTimeout = 30000;
 
-RtcModule.kMaxCallReceivers = 6;
+RtcModule.kMaxCallReceivers = 16;
 RtcModule.kMaxCallAudioSenders = RtcModule.kMaxCallReceivers;
 RtcModule.kMaxCallVideoSenders = 4;
 

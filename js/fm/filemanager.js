@@ -662,6 +662,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 'transfers':       {root: 'transfers', prev: null},
                 'account':         {root: 'account',   prev: null},
                 'dashboard':       {root: 'dashboard', prev: null},
+                'recents':         {root: 'recents',   prev: null},
                 'inbox':           {root: M.InboxID,   prev: null},
                 'rubbish-bin':     {root: M.RubbishID, prev: null}
             };
@@ -736,6 +737,9 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             return false;
         }
+        // else if (mySelf.hasClass('recents')) {
+        //     loadSubPage('fm/recents');
+        // }
 
         for (var tab in fmTabState) {
             if (~clickedClass.indexOf(tab)) {
@@ -928,6 +932,10 @@ FileManager.prototype.updFileManagerUI = function() {
                 else {
                     renderPromise = M.openFolder(M.currentdirid, true);
                 }
+            }
+
+            if (M.currentdirid === "recents" && M.recentsRender) {
+                M.recentsRender.updateState();
             }
 
             if (UItree) {
@@ -3522,6 +3530,9 @@ FileManager.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     else if (id_s === 'transfers') {
         this.onSectionUIOpen('transfers');
     }
+    else if (id_s === 'recents') {
+        this.onSectionUIOpen('recents');
+    }
 
     if (!fminitialized) {
         return false;
@@ -3630,7 +3641,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     $('.content-panel.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
     $('.fm-left-menu').removeClass(
         'cloud-drive folder-link shared-with-me rubbish-bin contacts ' +
-        'conversations opc ipc inbox account dashboard transfers'
+        'conversations opc ipc inbox account dashboard transfers recents'
     ).addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').off('click');
@@ -3724,6 +3735,11 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.shared-grid-view').addClass('hidden');
     }
 
+    if (id !== "recents") {
+        $(".fm-recents.container").addClass('hidden');
+        $(".fm-left-panel").removeClass('hidden');
+        $('.top-head').find(".recents-tab-link").addClass("hidden").removeClass('active');
+    }
     if (id !== 'transfers') {
         if ($.transferClose) {
             $.transferClose();
@@ -3773,7 +3789,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             $('.fm-left-panel .nw-tree-panel-header').addClass('hidden');
             $('.fm-main.default > .fm-left-panel').addClass('hidden');
         }
-        else {
+        else if (id !== "recents") {
             $('.fm-left-panel .nw-tree-panel-header').removeClass('hidden');
             $('.fm-main.default > .fm-left-panel').removeClass('hidden');
         }

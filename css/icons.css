@@ -97,6 +97,16 @@
     background-position: -160px -831px;
     width: 13px;
 }
+.tiny-icon.icons-sprite.grey-arrow {
+    background-position: -162px -1318px;
+    width: 13px;
+}
+.tiny-icon.icons-sprite.refresh {
+    background-position: -189px -1318px;
+}
+.tiny-icon.icons-sprite.top-arrow {
+    background-position: -217px -1317px;
+}
 .tiny-icon.grey-minus-icon {
     background-position: -11px -3609px;
 }
@@ -592,7 +602,7 @@
     width: 18px;
 }
 .medium-icon.icons-img, .semi-big-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -937,15 +947,15 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     background-position: -148px -634px;
 }
 .thumb .small-icon.small-play-icon {
@@ -953,7 +963,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -1101,6 +1111,11 @@
 }
 .small-icon.icons-sprite.bold-crossed-eye {
     background-position: 1px -1498px;
+}
+.small-icon.icons-sprite.tooltip-arrow {
+    background-position: -165px -1354px;
+    width: 22px;
+    height: 9px;
 }
 .small-icon.icons-sprite.grey-plus {
     background-position: -200px -391px;
@@ -1465,7 +1480,7 @@
     background-position: 1px -1316px;
 }
 i.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;

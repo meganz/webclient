@@ -29,6 +29,9 @@ MegaData.prototype.renderMain = function(aUpdate) {
     // cleanupLayout will render an "empty grid" layout if there
     // are no nodes in the current list (Ie, M.v), if so no need
     // to call renderLayout therefore.
+    if (M.previousdirid && M.previousdirid === "recents" && M.recentsRender) {
+        M.recentsRender.cleanup();
+    }
     if (this.megaRender.cleanupLayout(aUpdate, this.v, this.fsViewSel)) {
 
         if (this.currentdirid === 'opc') {

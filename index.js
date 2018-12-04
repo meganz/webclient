@@ -737,19 +737,37 @@ function init_page() {
         }
     }
     else if (page.length > 14 && page.substr(0, 14) === 'businesssignup') {
-        var signupCodeEncrypted = page.substring(14, page.length);
-        M.require('businessAcc_js', 'businessAccUI_js').done(function () {
-            var business = new BusinessAccountUI();
-            business.showLinkPasswordDialog(signupCodeEncrypted);
-        });
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.messageOverlay.show(null, l[20002],
+                function () {
+                    loadSubPage('start');
+                });
+        }
+        else {
+            var signupCodeEncrypted = page.substring(14, page.length);
+            M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+                var business = new BusinessAccountUI();
+                business.showLinkPasswordDialog(signupCodeEncrypted);
+            });
+        }
 
     }
     else if (page.length > 14 && page.substr(0, 14) === 'businessinvite') {
-        var signupCode = page.substring(14, page.length);
-        M.require('businessAcc_js', 'businessAccUI_js').done(function () {
-            var business = new BusinessAccountUI();
-            business.openInvitationLink(signupCode);
-        });
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.messageOverlay.show(null, l[20002],
+                function () {
+                    loadSubPage('start');
+                });
+        }
+        else {
+            var signupCode = page.substring(14, page.length);
+            M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+                var business = new BusinessAccountUI();
+                business.openInvitationLink(signupCode);
+            });
+        }
 
     }
     else if (page === 'confirm') {

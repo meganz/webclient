@@ -19,6 +19,13 @@ function BusinessAccountUI() {
 
     // private function to hide all business accounts UI divs.
     this.initUItoRender = function () {
+
+        // dealing with non-confirmed accounts, and not payed-ones
+        if (u_attr.b.s === -1 || !u_privk) {
+            loadSubPage('start');
+            return false;
+        }
+
         var $businessAccountContianer = $('.files-grid-view.user-management-view');
         $('.user-management-list-table', $businessAccountContianer).addClass('hidden');
         $('.user-management-subaccount-view-container', $businessAccountContianer).addClass('hidden');
@@ -68,7 +75,7 @@ function BusinessAccountUI() {
             .on('click.subuser', function addSubUserHeaderButtonHandler() {
                 mySelf.viewBusinessAccountPage();
             });
-
+        return true;
     };
 }
 
@@ -94,7 +101,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         }
     }
 
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
 
     var mySelf = this;
 
@@ -575,8 +584,13 @@ BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
     }
 };
 
-
+/**
+ * Check if re-rendering of business account users management is needed
+ * @param {Object} subs             New users object
+ * @param {Object} previousSubs     Old users object
+ */
 BusinessAccountUI.prototype.isRedrawNeeded = function (subs, previousSubs) {
+    "use strict";
     if (!previousSubs) {
         return true;
     }
@@ -643,7 +657,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                     loadingDialog.phide();
                     var msg = l[17920]; // not valid password
                     if (res) {
-                        msg = l[1290]; // not valid link
+                        msg = l[19567]; // not valid link 19567
                         console.error(st, res, desc);
                     }
                     msgDialog('warninga', '', msg, '', function () {
@@ -753,7 +767,9 @@ BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
 /** Function to show landing page, for admins without sub-users yet */
 BusinessAccountUI.prototype.viewLandingPage = function () {
     "use strict";
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
     var mySelf = this;
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
@@ -784,7 +800,9 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
  */
 BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     "use strict";
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
     var mySelf = this;
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
@@ -1090,7 +1108,9 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     "use strict";
 
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
     var mySelf = this;
     this.URLchanger('overview');
 
@@ -1321,12 +1341,13 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     // private function to format start and end dates
     var getReportDates = function (leadingDate) {
         var today = leadingDate || new Date();
-        var todayMonth = today.getMonth() + 1;
+
+        var todayMonth = today.getUTCMonth() + 1;
         var currMonth = String(todayMonth);
         if (currMonth.length < 2) {
             currMonth = '0' + currMonth;
         }
-        var currYear = String(today.getFullYear());
+        var currYear = String(today.getUTCFullYear());
 
         var startDate = currYear + currMonth + '01';
 
@@ -1334,12 +1355,12 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         if (!endDate) {
             return;
         }
-        var endDateStr = String(endDate.getFullYear()) + currMonth + String(endDate.getDate());
+        var endDateStr = String(endDate.getUTCFullYear()) + currMonth + String(endDate.getDate());
         return { fromDate: startDate, toDate: endDateStr };
     };
 
     // private function to populate the reporting bar chart
-    var populateBarChart = function (st, res) {
+    var populateBarChart = function (st, res, targetDate) {
         M.require('charts_js').done(function () {
             var $charContainer = $("#chartcontainer");
             $charContainer.empty();
@@ -1350,6 +1371,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             availableLabels.sort();
 
             var chartData = [];
+            var chartLabels = [];
             var divider = 1024 * 1024 * 1024;
             var totalMonthTransfer = 0;
             var randVal;
@@ -1361,17 +1383,26 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                     randVal = Math.random() * 100;
                     chartData.push(randVal);
                     availableLabels.push(h2 + 1);
+                    chartLabels.push(h2 + 1);
                     totalMonthTransfer += randVal;
                 }
             }
             // building bars data + total transfer
             else {
+                var lastDayOfThisMonth = getLastDayofTheMonth(targetDate || new Date())
+                    .getDate();
+                for (var v = 0; v < lastDayOfThisMonth; v++) {
+                    chartData.push(0);
+                    chartLabels.push(v + 1);
+                }
                 for (var h = 0; h < availableLabels.length; h++) {
-                    chartData.push(res[availableLabels[h]].tdl / divider);
+                    var index = new Number(availableLabels[h].substr(6, 2));
+                    // chartData.push(res[availableLabels[h]].tdl / divider);
+                    chartData[index - 1] = res[availableLabels[h]].tdl / divider;
                     totalMonthTransfer += res[availableLabels[h]].tdl;
 
                     // keeping the day number only
-                    availableLabels[h] = availableLabels[h].substr(6, 2);
+                    // availableLabels[h] = availableLabels[h].substr(6, 2);
                 }
             }
 
@@ -1382,15 +1413,18 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             var tooltipBarLabeling = function (tooltipItem, data) {
                 var perc = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
 
-                var sizeInfo = numOfBytes(perc);
+                var sizeInfo = numOfBytes(perc * divider);
                 var label = sizeInfo.size + ' ' + sizeInfo.unit;
                 return label;
+            };
+            var tooltipBartiteling = function () {
+                return '';
             };
 
             var myChart = new Chart(chartCanvas, {
                 type: 'bar',
                 data: {
-                    labels: availableLabels,
+                    labels: chartLabels, // availableLabels,
                     datasets: [{
                         label: '',
                         data: chartData,
@@ -1420,8 +1454,10 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                     },
                     tooltips: {
                         callbacks: {
-                            label: tooltipBarLabeling
-                        }
+                            label: tooltipBarLabeling,
+                            title: tooltipBartiteling
+                        },
+                        displayColors: false
                     }
                 }
             });
@@ -1457,7 +1493,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         for (var a = 0; a < 12; a++) {
             var $currOprion = $('<option>', {
                 value: nowDate.getTime(),
-                text: monthNames[nowDate.getMonth()] + ' ' + nowDate.getFullYear()
+                text: monthNames[nowDate.getUTCMonth()] + ' ' + nowDate.getUTCFullYear()
             });
             $monthSelector.append($currOprion);
 
@@ -1473,7 +1509,9 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             var report = getReportDates(selectedDate);
 
             var reportPromise2 = mySelf.business.getQuotaUsageReport(false, report);
-            reportPromise2.done(populateBarChart);
+            reportPromise2.done(function fillBarChart(st, res) {
+                populateBarChart(st, res, selectedDate);
+            });
         });
     };
 
@@ -1482,6 +1520,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 };
 
 BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContainer) {
+    "use strict";
     var mySelf = this;
     var $profileContainer = $('.profile', $accountContainer);
     var $invoiceContainer = $('.invoice', $accountContainer);
@@ -1509,7 +1548,9 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
 /** view business account page */
 BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     "use strict";
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
     var mySelf = this;
     this.URLchanger('account');
     loadingDialog.pshow();
@@ -1699,12 +1740,6 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
             var settingResultHandler = function (st) {
                 if (st) {
-                    //var changedKey = [];
-                    //for (var cKey = 0; cKey < attrsToChange.length; cKey++) {
-                    //    changedKey.push(attrsToChange[cKey].key);
-                    //}
-                    //mySelf.business.updateSubUserInfo(u_attr.b.bu, changedKey);
-
                     var $savingNotidication = $('.auto-save', $accountContainer);
                     $savingNotidication.removeClass('hidden');
                     $savingNotidication.show();
@@ -1764,7 +1799,9 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
     "use strict";
 
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
     var mySelf = this;
     this.URLchanger('invoices');
 
@@ -1870,7 +1907,9 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
 BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
     "use strict";
 
-    this.initUItoRender();
+    if (!this.initUItoRender()) {
+        return;
+    }
     var mySelf = this;
     this.URLchanger('invdet!' + invoiceID);
 
@@ -2029,7 +2068,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         myPage = translate(myPage);
 
                         // now prepare the incovice.
-                        // myPage = myPage.replace('{0Date}', (new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
+                        // myPage = myPage.replace('{0Date}',(new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
                         myPage = myPage.replace('{0Date}', time2date(invoiceDetail.ts, 1));
                         myPage = myPage.replace('{1InvoiceTitle}', $invoiceTopTitle.find('.inv-title.invv').text());
                         myPage = myPage.replace('{1InvoiceNB}', invoiceDetail.n);
@@ -2164,6 +2203,10 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
 /** show Welcome to business account dialog */
 BusinessAccountUI.prototype.showWelcomeDialog = function () {
     "use strict";
+
+    if (u_attr.b.s === -1 || !u_privk) {
+        return;
+    }
 
     var showTheDialog = function (isViewed) {
         if (isViewed === '1') {

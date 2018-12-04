@@ -14,7 +14,7 @@ pro.proplan = {
      * Initialises the page and functionality
      */
     init: function() {
-
+        "use strict";
         // if business sub-user is trying to get to Pro page redirect to home.
         if (u_attr && u_attr.b && !u_attr.b.m) {
             loadSubPage('start');

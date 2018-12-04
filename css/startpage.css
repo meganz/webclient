@@ -327,6 +327,10 @@
     background-image: url(../images/mega/startpage-sprite_v7@2x.png) !important;
     background-size: 267px auto;
 }
+.mobile.icon.pro-mini.pro100 {
+    background-image: url(../images/mega/big-icons@2x.png) !important;
+    background-size: 192px auto;
+}
 .bottom-page.large-icon, .cropped-page .bottom-page.big-icon {
     background-image: url(../images/mega/new-pages-sprite@2x.png);
     background-size: 376px auto;

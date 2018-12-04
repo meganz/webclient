@@ -1448,6 +1448,9 @@ var addressDialog = {
             addressDialog.closeDialog();
             // if we are coming from business plan, we need to reset registration
             if (mySelf.businessPlan && mySelf.userInfo) {
+                if (is_mobile) {
+                    parsepage(pages['registerb']);
+                }
                 var businessReg = new BusinessRegister();
                 businessReg.initPage();
             }

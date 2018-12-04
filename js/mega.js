@@ -3008,6 +3008,10 @@ function process_suba(suba, ignoreDB) {
  */
 function process_businessAccountSubUsers_SC(packet) {
     "use strict";
+    // we dont process these action packets on mobile
+    if (is_mobile) {
+        return;
+    }
     if (!packet) { // no packet
         return;
     }

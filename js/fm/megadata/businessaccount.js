@@ -436,7 +436,7 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
                         break;
                     }
 
-                    result[orderedDates[endIx]] = res[orderedDates[endIx]];
+                    result[orderedDates[endIx]] = mega.buinsessAccount.quotaReport[orderedDates[endIx]];
 
                     if (orderedDates[endIx] === ctx.context.dates.toDate) {
                         break;

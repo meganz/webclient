@@ -418,7 +418,8 @@ function dashboardUI() {
             });
 
             $dataStats.find('.ba-version .ff-occupy').text(bytesToSize(verBytes));
-            $dataStats.find('.ba-version .file-number').text(verFiles + ' ' + l[2034]);
+            // $dataStats.find('.ba-version .file-number').text(verFiles + ' ' + l[2034]);
+            $dataStats.find('.ba-version .file-number').text(verFiles);
         }
 
         // if this is a business account user (sub or master)

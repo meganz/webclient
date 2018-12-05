@@ -834,6 +834,7 @@ var exportPassword = {
                 api_req({ a: 'log', e: 99633, m: 'Successfully decrypted password protected link on regular web' });
 
                 // On success, redirect to actual file/folder link
+                folderlink = false;
                 loadSubPage(url);
             });
         }

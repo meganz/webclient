@@ -237,6 +237,10 @@ MegaData.prototype.getSortBySizeFn = function() {
     nameSort['-1'] = this.getSortByNameFn2(-1);
 
     return function(a, b, d) {
+        if (M.currentdirid === "shares" &&
+            a.tb !== undefined && b.tb !== undefined && a.tb !== b.tb) {
+            return (a.tb < b.tb ? -1 : 1) * d;
+        }
         if (a.s !== undefined && b.s !== undefined && a.s !== b.s) {
             return (a.s < b.s ? -1 : 1) * d;
         }

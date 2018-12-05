@@ -3068,11 +3068,13 @@
     "19986": "Obecnie nie masz \u017cadnych przychodz\u0105cych folder\u00f3w wsp\u00f3\u0142dzielonych od tego uczestnika. Mo\u017cesz udost\u0119pni\u0107 foldery na \u017cywo swoim kontaktom w MEGA bezpo\u015brednio z dysku w chmurze.",
     "19987": "Brak zablokowanych u\u017cytkownik\u00f3w",
     "19988": "Strona %1",
-    "19989": "Tax Invoice",
-    "19990": "Enable QR code",
-    "19991": "QR code link",
-    "19992": "%1 base quota",
-    "19993": "%1 achievements quota",
-    "19994": "Last seen %s",
-    "19995": "Incoming group call\u2026"
+    "19989": "Faktura VAT",
+    "19990": "W\u0142\u0105cz kod QR",
+    "19991": "Link do kodu QR",
+    "19992": "%1 limitu",
+    "19993": "%1 osi\u0105gni\u0119tego limitu",
+    "19994": "Mniej ni\u017c %s",
+    "19995": "Przychodz\u0105ce po\u0142\u0105czenie grupowe...",
+    "20002": "Aktywacja konta i pocz\u0105tkowa konfiguracja wymaga przegl\u0105darki na komputerze. Najpierw otw\u00f3rz link do zaproszenia za pomoc\u0105 przegl\u0105darki na komputerze, a nast\u0119pnie u\u017cyj swojego konta na urz\u0105dzeniu mobilnym.",
+    "20003": "Business Email"
 }

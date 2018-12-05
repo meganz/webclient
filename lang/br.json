@@ -3068,11 +3068,13 @@
     "19986": "Este participante ainda n\u00e3o compartilhou pastas com voc\u00ea. Voc\u00ea pode compartilhar pastas com os seus contatos no MEGA diretamente da sua Nuvem.",
     "19987": "N\u00e3o h\u00e1 usu\u00e1rios desativados",
     "19988": "P\u00e1gina %1",
-    "19989": "Tax Invoice",
-    "19990": "Enable QR code",
-    "19991": "QR code link",
-    "19992": "%1 base quota",
-    "19993": "%1 achievements quota",
-    "19994": "Last seen %s",
-    "19995": "Incoming group call\u2026"
+    "19989": "Nota fiscal",
+    "19990": "Ativar c\u00f3digo QR",
+    "19991": "Link do c\u00f3digo QR",
+    "19992": "%1 de cota base",
+    "19993": "%1 de cota por conquistas",
+    "19994": "\u00daltimo acesso %s",
+    "19995": "Chamada de grupo recebida...",
+    "20002": "Para ativar a conta e fazer a configura\u00e7\u00e3o inicial \u00e9 necess\u00e1rio usar um navegador de um computador. Por favor, primeiro clique no link de convite usando um navegador de um computador, e depois voc\u00ea poder\u00e1 usar a sua conta em um dispositivo m\u00f3vel.",
+    "20003": "Business Email"
 }

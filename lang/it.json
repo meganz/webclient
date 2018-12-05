@@ -3068,11 +3068,13 @@
     "19986": "Al momento non hai nessuna cartella condivisa in entrata da questo partecipante. Puoi condividere cartelle in diretta con i tuoi contatti su MEGA direttamente dal tuo Cloud Drive.",
     "19987": "Nessun utente disabilitato",
     "19988": "Pagina %1",
-    "19989": "Tax Invoice",
-    "19990": "Enable QR code",
-    "19991": "QR code link",
-    "19992": "%1 base quota",
-    "19993": "%1 achievements quota",
-    "19994": "Last seen %s",
-    "19995": "Incoming group call\u2026"
+    "19989": "Fattura",
+    "19990": "Attiva QRcode",
+    "19991": "Link QRcode",
+    "19992": "%1 quota base",
+    "19993": "%1 quota obiettivi",
+    "19994": "Ultima visita %s",
+    "19995": "Inizio della chiamata di gruppo...",
+    "20002": "L'attivazione dell'account ed il setup iniziale hanno bisogno di un browser da desktop. Per favore, apri il tuo link di invito prima con un browser desktop, dopodich\u00e9 potrai utilizzare il tuo account con un dispositivo mobile.",
+    "20003": "Business Email"
 }

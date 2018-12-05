@@ -3068,11 +3068,13 @@
     "19986": "No tienes carpetas compartidas entrantes con este contacto. Puede compartir carpetas con tus contactos en MEGA directamente desde tu nube.",
     "19987": "No hay usuarios desactivados",
     "19988": "P\u00e1gina %1",
-    "19989": "Tax Invoice",
-    "19990": "Enable QR code",
-    "19991": "QR code link",
-    "19992": "%1 base quota",
-    "19993": "%1 achievements quota",
-    "19994": "Last seen %s",
-    "19995": "Incoming group call\u2026"
+    "19989": "Factura",
+    "19990": "Activar c\u00f3digo QR",
+    "19991": "Enlace del c\u00f3digo QR",
+    "19992": "%1 de cuota base",
+    "19993": "%1 de cuota por logros",
+    "19994": "\u00daltimo acceso %s",
+    "19995": "Llamada de grupo entrante...",
+    "20002": "La activaci\u00f3n y la configuraci\u00f3n inicial de la cuenta requiere usar el navegador de tu ordenador. Abre primero el enlace de invitaci\u00f3n con el navegador de tu ordenador, luego podr\u00e1s usar tu cuenta con un dispositivo m\u00f3vil.",
+    "20003": "Business Email"
 }

@@ -3068,11 +3068,13 @@
     "19986": "Vous n\u2019avez actuellement aucun dossier partag\u00e9 entrant de ce participant. Vous pouvez partager des dossiers avec vos contacts sur MEGA directement de votre disque nuagique.",
     "19987": "Aucun utilisateur n\u2019est d\u00e9sactiv\u00e9",
     "19988": "Page %1",
-    "19989": "Tax Invoice",
-    "19990": "Enable QR code",
-    "19991": "QR code link",
-    "19992": "%1 base quota",
-    "19993": "%1 achievements quota",
-    "19994": "Last seen %s",
-    "19995": "Incoming group call\u2026"
+    "19989": "Facture tax\u00e9e",
+    "19990": "Activer le code QR",
+    "19991": "Lien du code QR",
+    "19992": "Quota de base de %1",
+    "19993": "Quota d\u2019objectifs de %1",
+    "19994": "Vu pour la derni\u00e8re fois %s",
+    "19995": "Appel de groupe entrant\u2026",
+    "20002": "Un navigateur pour ordinateur est exig\u00e9 pour l\u2019activation du compte et la configuration initiale. Veuillez d\u2019abord ouvrir votre lien d\u2019invitation avec un navigateur pour ordinateur. Vous pourrez ensuite utiliser votre compte avec un appareil mobile.",
+    "20003": "Business Email"
 }

@@ -3068,11 +3068,13 @@
     "19986": "Bu kat\u0131l\u0131mc\u0131dan gelen herhangi bir payla\u015f\u0131m klas\u00f6r\u00fcn\u00fcz yok. Bulut s\u00fcr\u00fcc\u00fcn\u00fczden MEGA'daki ki\u015filerinize canl\u0131 klas\u00f6rler payla\u015fabilirsiniz.",
     "19987": "Engelli kullan\u0131c\u0131 yok",
     "19988": "Sayfa %1",
-    "19989": "Tax Invoice",
-    "19990": "Enable QR code",
-    "19991": "QR code link",
-    "19992": "%1 base quota",
-    "19993": "%1 achievements quota",
-    "19994": "Last seen %s",
-    "19995": "Incoming group call\u2026"
+    "19989": "Vergi Faturas\u0131",
+    "19990": "Karekodu etkinle\u015ftir",
+    "19991": "Karekod ba\u011flant\u0131s\u0131",
+    "19992": "%1 ana kota",
+    "19993": "%1 ba\u015far\u0131m kotas\u0131",
+    "19994": "Son g\u00f6r\u00fclme %s",
+    "19995": "Gelen grup \u00e7a\u011fr\u0131s\u0131...",
+    "20002": "Hesap aktivasyonu ve ba\u015flang\u0131\u00e7 \u200b\u200bkurulumu bir masa\u00fcst\u00fc taray\u0131c\u0131 gerektirir. L\u00fctfen \u00f6nce bir masa\u00fcst\u00fc taray\u0131c\u0131yla davetiye ba\u011flant\u0131n\u0131z\u0131 a\u00e7\u0131n, daha sonra hesab\u0131n\u0131z\u0131 bir mobil cihazla kullanabilirsiniz.",
+    "20003": "Business Email"
 }

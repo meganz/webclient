@@ -1009,7 +1009,12 @@ var sabadell = {
                 // Hide the overlay
                 $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 $failureOverlay.addClass('hidden');
-                loadSubPage('pro');
+                if (u_attr.b) {
+                    loadSubPage('registerb');
+                }
+                else {
+                    loadSubPage('pro');
+                }
             });
         }
     }
@@ -1699,7 +1704,12 @@ var addressDialog = {
                 // Hide the overlay
                 $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 $failureOverlay.addClass('hidden');
-                loadSubPage('pro');
+                if (u_attr.b) {
+                    loadSubPage('registerb');
+                }
+                else {
+                    loadSubPage('pro');
+                }
             });
         }
     }

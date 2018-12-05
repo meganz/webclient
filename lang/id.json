@@ -1008,6 +1008,7 @@
     "7431": "E-mail atau password tidak sah. Harap coba kembali",
     "7434": "Email",
     "7534": "Read only",
+    "7537": "Pilihan",
     "7557": "Semua",
     "7585": "Signature dari %1 key dari pengguna %2 tidak benar.",
     "7597": "Tidak ada file di folder",
@@ -2011,6 +2012,7 @@
     "17836": "Dengan Kode QR Anda diaktifkan Anda dapat berbagi kode unik Anda dengan pengguna lain sehingga mereka dapat menambahkan Anda sebagai kontak, atau Anda dapat menambahkan pengguna lain dengan memindai kode mereka.",
     "17865": "Link kontak tidak valid. Silakan coba dengan link yang valid.",
     "17870": "Panggilan tidak terjawab",
+    "17878": "Panggilan masuk",
     "17879": "%nbFo folder yang berisi total %nbFi file ditambahkan ke manajer transfer",
     "17880": "Folder %nbFo berisi total %nbFi file ditambahkan ke manajer transfer",
     "17881": "%nbFo folder yang berisi total %nbFi file ditambahkan ke manajer transfer",
@@ -3068,7 +3070,11 @@
     "19988": "Page %1",
     "19989": "Tax Invoice",
     "19990": "Enable QR code",
-    "19991": "QR Code link",
+    "19991": "QR code link",
     "19992": "%1 base quota",
-    "19993": "%1 achievements quota"
+    "19993": "%1 achievements quota",
+    "19994": "Last seen %s",
+    "19995": "Incoming group call\u2026",
+    "20002": "Account activation and initial setup requires a desktop browser. Please open your invitation link with a desktop browser first, afterwards you can use your account with a mobile device.",
+    "20003": "Business Email"
 }

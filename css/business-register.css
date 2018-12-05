@@ -1,10 +1,3 @@
-/*.business-register {
-	background-color: rgba(250,250,250,1);
-	overflow: auto;
-	width: 100%;
-	margin:0;
-	height: auto;
-}*/
 
 .business-register * {
 	font-family: 'Lato', sans-serif;
@@ -42,7 +35,6 @@
 	margin:0;
 }
 
-
 .bus-reg-body {
 	min-width: 790px;
 	max-width: 940px;
@@ -50,7 +42,6 @@
 	padding-top: 124px;
 	position: relative;
 }
-
 
 .bus-reg-header {
 	font-size: 40px;
@@ -70,7 +61,6 @@
 	line-height: 30px;
 }
 
-
 .bus-reg-input {
 	height: 64px;
 	width: 100%;
@@ -78,8 +68,6 @@
 	display: inline-block;
 	margin-bottom: 12px;
 }
-
-
 
 .bus-reg-input::after {
 	content: " ";
@@ -167,11 +155,6 @@
 	/*text-transform: lowercase;*/
 }
 
-/*.bus-reg-input input::placeholder:first-letter,
-.bus-reg-input input::-moz-placeholder:first-letter {
-	text-transform: uppercase;
-}*/
- 
 .bus-reg-input.num input {
 	width: 80%;
 }
@@ -188,9 +171,6 @@
 	right: 0;
 	top: 30px;
 }
-
-
-
 
 .bus-reg-input .error-message {
     font-size: 13px;
@@ -290,25 +270,12 @@
 }
 
 .bus-reg-body .provider-icon {
- /*   width: 32px;
-    height: 24px;*/
     vertical-align: top;
-    /*background-image: url(../images/mega/payment-provider-icons-v3.png);*/
-    /*background-size: 192px auto;*/
     display: inline-block;
     margin-left: 4px;
     margin-right: 32px;
     margin-top: 4px;
 }
-
-/*.bus-reg-body .provider-icon.ecpVI{
-	background-position: -11px -414px;
-}
-
-
-.bus-reg-body .provider-icon.ecpMC{
-	background-position: -51px -414px;
-}*/
 
 .bus-reg-agreement {
     width: 95%;

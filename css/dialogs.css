@@ -3514,41 +3514,6 @@ li.token-input-token-invite .input-close {
     margin:8px 172px;
 }
 
-
-/*.fm-dialog.sub-account-link-password .wrapper {
-    margin-bottom: 20px;
-    padding: 10px;
-}
-
-.fm-dialog.sub-account-link-password .instruction-message {
-    color: #777;
-    line-height: 20px;
-    padding: 0 0 20px;
-}
-
-.fm-dialog.sub-account-link-password .decryption-key {
-    position: relative;
-}
-
-.fm-dialog.sub-account-link-password .decryption-key .icon {
-    background-image: url(../images/mega/dialog-sprite.png);
-    background-position: -6px -5510px;
-    background-repeat: no-repeat;
-    height: 22px;
-    left: 13px;
-    opacity: 0.5;
-    position: absolute;
-    top: 5px;
-    width: 24px;
-}
-
-.fm-dialog.sub-account-link-password .decryption-key input {
-    text-indent: 36px;
-}
-.fm-dialog.sub-account-link-password .decryption-key .dialog-link-pwd-empty {
-    color: red;
-}*/
-
 .bus-welcome-dialog {
     width: 596px;
     margin-left: -298px;
@@ -3582,15 +3547,15 @@ li.token-input-token-invite .input-close {
     position: relative;
 }
 
-    .bus-welcome-dialog .dialog-input-container::before {
-        content: " ";
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 1px;
-        position: absolute;
-        background-color: rgba(0,0,0,0.1);
-    }
+.bus-welcome-dialog .dialog-input-container::before {
+    content: " ";
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 1px;
+    position: absolute;
+    background-color: rgba(0,0,0,0.1);
+}
 
 .user-management-dialog .dialog-right-block,
 .user-management-dialog .dialog-left-block {
@@ -3604,12 +3569,12 @@ li.token-input-token-invite .input-close {
     cursor: pointer;
 }
 
-    .user-management-dialog .dialog-right-block:hover,
-    .user-management-dialog .dialog-left-block:hover {
-        background-color: #fff;
-        border: 1px solid rgba(0,0,0,0.1);
-        box-shadow: 0 0.5px 6px 0 rgba(0,0,0,0.07);
-    }
+.user-management-dialog .dialog-right-block:hover,
+.user-management-dialog .dialog-left-block:hover {
+    background-color: #fff;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 0.5px 6px 0 rgba(0,0,0,0.07);
+}
 
 .user-management-dialog .dialog-left-block {
     margin: 16px 0 -24px 40px;

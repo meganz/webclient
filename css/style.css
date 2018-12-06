@@ -28831,9 +28831,9 @@ opacity: 1;
     width: 120px;
     height: 39px;
     display: inline-block;
+    background-image: url(../images/mega/invoice-image_v1.png);
     background-position: 0px 0px;
     background-size: 120px auto;
-    background-image: url(../images/mega/invoice-image_v1.png);
     background-repeat: no-repeat;
     margin:64px auto auto 56px;
 }

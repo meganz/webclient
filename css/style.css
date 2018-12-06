@@ -24268,7 +24268,7 @@ opacity: 1;
     font-size: 15px;
     color: #333333;
     line-height: 20px;
-    padding: 0 12px 1px 0;
+    padding: 0 12px 0 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -24293,7 +24293,7 @@ opacity: 1;
     padding: 0;
     font-size: 14px;
     position: relative;
-    vertical-align: top;
+    vertical-align: middle;
     transition: 0.1s;
 }
 
@@ -24306,7 +24306,7 @@ opacity: 1;
     height: 32px;
     line-height: 31px;
     white-space: nowrap;
-    vertical-align: top;
+    vertical-align: middle;
     overflow: hidden;
     bottom: 0;
 }
@@ -24330,7 +24330,7 @@ opacity: 1;
 .fm-picker-dialog .summary-input .summary-ff-name {
     height: 32px;
     max-width: 340px;
-    line-height: 31px;
+    line-height: 32px;
     margin-left: 36px;
     position: relative;
     display: inline-block;
@@ -24379,11 +24379,14 @@ opacity: 1;
     cursor: pointer;
 }
 .fm-picker-dialog .fm-breadcrumbs {
-    margin: 4px 0;
+    margin: 3px 0 5px;
     cursor: pointer;
 }
+.fm-picker-dialog .fm-breadcrumbs .right-arrow-bg {
+    padding-top: 0;
+}
 .fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg {
-    padding: 1px 0 0 35px;
+    padding: 0 0 0 35px;
     margin: 0 0 0 -3px;
 }
 .fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg span {
@@ -25068,16 +25071,9 @@ opacity: 1;
     bottom: 0;
     left: 8px;
 }
-
-.fm-picker-dialog .summary-row.unfold .summary-title {
-    vertical-align: top;
-    padding-top: 5px;
-}
-
 .fm-picker-dialog .summary-input.unfold .item-row:first-child .summary-ff-name {
     max-width: 340px;
 }
-
 .fm-picker-dialog .summary-input.unfold .item-row:hover .delete-img.icon {
     display: inline-block;
 }
@@ -25101,7 +25097,7 @@ opacity: 1;
 
 .fm-picker-dialog .fm-breadcrumbs .right-arrow-bg {
     font-size: 14px;
-    line-height: 24px;
+    line-height: 25px;
     cursor: pointer;
 }
 .fm-picker-dialog .fm-breadcrumbs.has-next-button {

@@ -11512,7 +11512,8 @@ table {
     cursor: pointer;
     display: inline-block;
     height: 30px;
-    line-height: 30px;
+    line-height: 27px;
+    text-align: center;
     margin-top: 24px;
     min-width: 100px;
     padding: 0 16px;

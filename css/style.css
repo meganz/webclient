@@ -3641,7 +3641,7 @@ label.iPhoneCheckLabelOff span {
     background-color: white;
 }
 /* New FM */
-.fm-left-menu.account + .nw-tree-panel-header + .fm-tree-panel {
+.fm-left-menu.account + .nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel {
     height: 100%;
 }
 .fm-tree-panel {

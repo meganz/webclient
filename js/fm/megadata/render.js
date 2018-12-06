@@ -642,10 +642,8 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
     if (M.d[aHandle]) {
         M.d[aHandle].seen = true;
     }
-    else {
-        if (d) {
-            console.error("megaListRenderNode was called with aHandle:", aHandle, "which was not found in M.d");
-        }
+    else if (d > 1) {
+        console.warn("megaListRenderNode was called with aHandle '%s' which was not found in M.d", aHandle);
     }
 
     return node;

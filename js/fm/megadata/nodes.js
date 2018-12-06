@@ -2374,6 +2374,151 @@ MegaData.prototype.getShareNodesSync = function fm_getsharenodessync(h, root) {
 };
 
 /**
+ * Retrieve a list of recent nodes
+ * @param {Number} [limit] Limit the returned results, defaults to last 10000 nodes.
+ * @param {Number} [until] Get nodes not older than this unix timestamp, defaults to nodes from past month.
+ * @return {Promise}
+ */
+MegaData.prototype.getRecentNodes = function(limit, until) {
+    'use strict';
+
+    return new Promise(function(resolve) {
+        var rubTree = M.getTreeHandles(M.RubbishID);
+        var rubFilter = function(n) {
+            return rubTree.indexOf(n.p) < 0;
+        };
+        var getLocalNodes = function() {
+            rubTree = rubFilter.tree;
+            var nodes = Object.values(M.d)
+                .filter(function(n) {
+                    return !n.t && n.ts > until && rubFilter(n);
+                });
+
+            resolve(nodes, limit);
+        };
+        rubFilter.tree = rubTree;
+        limit = limit | 0 || 1e4;
+        until = until || Math.round((Date.now() - 2592e6) / 1e3);
+
+        resolve = (function(resolve) {
+            return function(nodes, limit) {
+                var sort = M.getSortByDateTimeFn();
+                nodes = nodes.filter(function(n) {
+                    return !n.fv;
+                }).sort(function(a, b) {
+                    return sort(a, b, -1);
+                });
+                resolve(limit ? nodes.slice(0, limit) : nodes);
+            };
+        })(resolve);
+
+        if (fmdb) {
+            rubTree = rubTree.map(function(h) {
+                return ab_to_base64(fmdb.strcrypt(h));
+            });
+            var options = {
+                limit: limit,
+
+                query: function(db) {
+                    return db.orderBy('t').reverse().filter(rubFilter)
+                        .until(function(row) {
+                            return until > row.t;
+                        });
+                },
+                include: function(row) {
+                    return row.t > until;
+                }
+            };
+            fmdb.getbykey('f', options).then(resolve).catch(getLocalNodes);
+        }
+        else {
+            getLocalNodes();
+        }
+    });
+};
+
+/**
+ * Retrieve a list of recent nodes, by date and parent
+ * @param {Number} [limit] Limit the returned results, defaults to last 10000 nodes.
+ * @param {Number} [until] Get nodes not older than this unix timestamp, defaults to nodes from past month.
+ * @return {Promise}
+ */
+MegaData.prototype.getRecentNodeList = function(limit, until) {
+    'use strict';
+
+    var tree = Object.assign.apply(null, [{}].concat(Object.values(M.tree)));
+
+    var getDate = function(ts) {
+        var today = moment().startOf('day');
+        var yesterday = today.clone().subtract(1, 'days');
+        var format = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+
+        getDate = function(ts) {
+            var date = moment(ts * 1e3);
+            return date.isSame(today, 'd') ? l[1301] : date.isSame(yesterday, 'd')
+                ? l[1302] : date._d.toLocaleDateString(undefined, format);
+        };
+        return getDate(ts);
+    };
+
+    return new Promise(function(resolve, reject) {
+        M.getRecentNodes(limit, until).then(function(nodes) {
+            var result = Object.create(null);
+
+            for (var i = 0; i < nodes.length; i++) {
+                var n = new MegaNode(nodes[i]);
+                var date = getDate(n.ts);
+                var p = n.p;
+
+                result[date] = result[date] || Object.create(null);
+                result[date][p] = result[date][p] || [];
+                result[date][p].push(n);
+
+                n.path = [];
+                n.seen = true;
+                n.recent = date;
+
+                while (tree[p]) {
+                    var t = tree[p];
+                    p = t.p;
+                    n.path.push(t.h === M.RootID ? l[164] : t.name || t.h);
+                    if (t.t & M.IS_SHARED) {
+                        n.outshare = true;
+                    }
+                    if (t.su && !tree[p]) {
+                        n.path.push(l[5542]);
+                        n.inshare = true;
+                    }
+                }
+
+                delete n.ar;
+                Object.freeze(n);
+            }
+
+            resolve(result);
+        }).catch(reject);
+    });
+};
+
+/**
+ * Retrieve all folders hierarchy starting from provided handle
+ * @param {String} h The root node handle
+ * @return {Array} node handles
+ */
+MegaData.prototype.getTreeHandles = function _(h) {
+    'use strict';
+
+    var result = [h];
+    var tree = Object.keys(M.tree[h] || {});
+
+    for (var i = tree.length; i--;) {
+        result.push.apply(result, _(tree[i]));
+    }
+
+    return result;
+};
+
+/**
  * Retrieve node rights.
  * @details Former rightsById()
  * @param {String} id The node handle

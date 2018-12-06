@@ -136,6 +136,15 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
+mBroadcaster.once('startMega', function() {
+    'use strict';
+    Promise.prototype.always = function(fc) {
+        this.then(fc).catch(fc);
+        return this;
+    };
+    Promise.prototype.dump = MegaPromise.prototype.dumpToConsole;
+});
+
 mBroadcaster.once('boot_done', function() {
     'use strict';
     var mg;

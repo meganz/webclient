@@ -96,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm22_';
+    var dbpfx = 'fm23_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -667,6 +667,9 @@ FMDB.prototype.stripnode = Object.freeze({
         delete f.t;
         delete f.s;
 
+        t.ts = f.ts;
+        delete f.ts;
+
         if (f.hash) {
             t.hash = f.hash;
             delete f.hash;
@@ -721,6 +724,7 @@ FMDB.prototype.restorenode = Object.freeze({
     f : function(f, index) {
         f.h = index.h;
         f.p = index.p;
+        f.ts = index.t < 0 ? 1262304e3 - index.t : index.t;
         if (index.c) {
             f.hash = index.c;
         }
@@ -784,7 +788,7 @@ FMDB.prototype.add = function fmdb_add(table, row) {
         if (i == 'd') {
             row.d = this.strcrypt(row.d);
         }
-        else {
+        else if (table !== 'f' || i !== 't') {
             row[i] = ab_to_base64(this.strcrypt(row[i]));
         }
     }
@@ -847,7 +851,7 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
             if (this.restorenode[table]) {
                 // restore attributes based on the table's indexes
                 for (var p in r[i]) {
-                    if (p != 'd') {
+                    if (p !== 'd' && (table !== 'f' || p !== 't')) {
                         r[i][p] = this.strdecrypt(base64_to_ab(r[i][p]));
                     }
                 }
@@ -888,6 +892,14 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, lim
 // @private
 FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, limit) {
     "use strict";
+    var options = false;
+    if (typeof index !== 'string') {
+        options = index;
+        index = options.index;
+        anyof = anyof || options.anyof;
+        where = where || options.where;
+        limit = limit || options.limit;
+    }
 
     if (this.crashed > 1 || anyof && !anyof[1].length) {
         return MegaPromise.reject([]);
@@ -903,6 +915,11 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
 
     var t = fmdb.db[table];
     var i = 0;
+
+    if (!index) {
+        // No index provided, fallback to primary key
+        index = t.schema.primKey.keyPath;
+    }
 
     if (anyof) {
         // encrypt all values in the list
@@ -920,6 +937,10 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
         else {
             t = t.where(anyof[0]).equals(anyof[1][0]);
         }
+    }
+    else if (options.query) {
+        // Perform custom user-provided query
+        t = options.query(t);
     }
     else {
         for (var k = where.length; k--; ) {
@@ -999,6 +1020,15 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
                                             continue;
                                         }
                                     }
+                                    else if (options.query) {
+                                        // If a custom query was made, notify there was a
+                                        // pending update and whether if should be included.
+                                        if (!(options.include && options.include(update, index))) {
+                                            // nope - record it as a deletion
+                                            matches[update[index]] = false;
+                                            continue;
+                                        }
+                                    }
                                     else {
                                         // does this update modify a record matched by the
                                         // anyof inclusion list?
@@ -1054,6 +1084,11 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
                     }
                 }
             }
+        }
+
+        // Apply user-provided filtering, if any
+        if (options.filter) {
+            r = options.filter(r);
         }
 
         // limit matches records

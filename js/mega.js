@@ -1891,6 +1891,7 @@ function worker_procmsg(ev) {
                     h : ev.data.h,
                     p : ev.data.p,
                     s : ev.data.s >= 0 ? ev.data.s : -ev.data.t,
+                    t : ev.data.t ? 1262304e3 - ev.data.ts : ev.data.ts,
                     c : ev.data.hash || '',
                     d : ev.data
                 });
@@ -1983,7 +1984,7 @@ function loadfm(force) {
             else {
                 fmdb = FMDB(u_handle, {
                     // channel 0: transactional by _sn update
-                    f      : '&h, p, s, c',    // nodes - handle, parent, size (negative size: type), checksum
+                    f      : '&h, p, s, c, t', // nodes - handle, parent, size (negative size: type), checksum
                     s      : '&o_t',           // shares - origin/target; both incoming & outgoing
                     ok     : '&h',             // ownerkeys for outgoing shares - handle
                     mk     : '&h',             // missing node keys - handle

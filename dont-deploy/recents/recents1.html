@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta http-equiv="Content-Type" content="text/html, charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<link rel="stylesheet" type="text/css" href="../../css/style.css" />
+<link rel="stylesheet" type="text/css" href="../../css/user-card.css" />
+<link rel="stylesheet" type="text/css" href="../../css/avatars.css" />
+<link rel="stylesheet" type="text/css" href="../../css/icons.css" />
+<link rel="stylesheet" type="text/css" href="../../css/buttons.css" />
+<link rel="stylesheet" type="text/css" href="../../css/dropdowns.css" />
+<link rel="stylesheet" type="text/css" href="../../css/top-menu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/data-blocks-view.css" />
+<link rel="stylesheet" type="text/css" href="../../css/retina-images.css" />
+</head>
+<body id="bodyel">
+<script type="text/javascript" src="/secureboot.js" charset="utf-8"></script>
+
+
+<div id="fmholder" class="fmholder" style="">
+    <div class="main-blur-block">
+        <div class="fm-main default">
+            
+            <div class="nw-fm-left-icons-panel">
+                <div class="nw-fm-left-icon dashboard ui-droppable">
+                    <div class="nw-fm-left-border"></div>
+                    <div class="dark-tooltip">Dashboard</div>
+                </div>
+                <div class="nw-fm-left-icon cloud-drive ui-droppable">
+                    <div class="nw-fm-left-border"></div>
+                    <div class="dark-tooltip">Cloud Drive</div>
+                </div>
+                <!-- Recents button, already exists in template !-->
+                <div class="nw-fm-left-icon recents active">
+                    <div class="nw-fm-left-border"></div>
+                    <div class="dark-tooltip">Recents</div>
+                </div>
+                <div class="nw-fm-left-icon inbox ui-droppable hidden">
+                    <div class="nw-fm-left-border"></div>
+                    <div class="dark-tooltip">Inbox</div>
+                </div>
+                <div class="nw-fm-left-icon shared-with-me ui-droppable">
+                    <div class="nw-fm-left-border"></div>
+                    <div class="dark-tooltip">Shared with me</div>
+                </div>
+                <div class="nw-fm-left-icon contacts ui-droppable">
+                    <div class="nw-fm-left-border"></div>
+                    <div class="contacts-indicator hidden"></div>
+                    <div class="dark-tooltip">Contacts</div>
+                </div>
+                <div class="nw-fm-left-icon conversations ui-droppable">
+                    <div class="nw-fm-left-border"></div>
+                    <div class="new-messages-indicator hidden"></div>
+                    <div class="dark-tooltip">Conversations</div>
+                    <div class="beta-text"></div>
+                </div>
+                
+                <div class="nw-fm-left-icon rubbish-bin ui-droppable filled glow">
+                    <div class="nw-fm-left-border"></div>
+                    <div class="dark-tooltip">Rubbish Bin</div>
+                </div>
+                <div class="nw-fm-left-icon account ui-droppable">
+                    <div class="nw-fm-left-border"></div>
+                    <div class="dark-tooltip">Settings</div>
+                </div>
+                <div class="nw-fm-left-icon transfers ui-droppable">
+                    <div class="nw-fm-left-border file-transfer-icon"></div>
+                </div>
+            </div>
+            
+            <!-- Add class "hidden" to left pane !-->
+            <div class="fm-left-panel hidden ui-resizable"></div>
+            
+            <div id="topmenu"><div class="top-head">
+                <div class="top-centered-margin">
+                    
+                    <!-- Recents tab. Please add to real template !-->
+                    <div class="top-tab-lnk active">Recents</div>
+                    
+                    <a class="top-icon menu"></a>
+             
+                    <div class="top-icon notification"></div>
+            
+                    <div class="top-search-bl">
+                        <div class="top-icon search"></div>
+                    </div>
+            
+                    <div class="membership-status-block"><i class="tiny-icon membership-status lite"></i></div>
+            
+                    <a class="user-name">Username</a>
+            
+                    <div class="activity-status-block">
+                        <div class="loading-animation"></div>
+                        <div class="activity-status top online"></div>
+                    </div>
+            
+                    <a class="fm-avatar"><div data-color="color12" class="Brs6-mlb4Mg color12 avatar-wrapper small-rounded-avatar"><i class="verified_icon"></i>A</div></a>
+                </div>
+            </div>
+            
+        </div>
+        
+            <div class="fm-right-files-block hidden"></div>
+            
+            <!-- Recents container !-->
+            <div class="fm-recents container">
+                <!-- We need to init scrolling here !-->
+                <div class="fm-recents scroll">
+                    <div class="fm-recents content">
+                        <div class="fm-recents date"> Today </div>
+                        
+                        <div class="fm-recents content-row">
+                            <div class="medium-file-icon audio"></div>
+                            <div class="fm-recents file-info">
+                                <div class="fm-recents file-name">
+                                    <span class="link">audio_file.mp3</span>
+                                    <span class="grey-txt">and</span>
+                                    <span class="link">14 more</span>
+                                </div>
+                                <div class="fm-recents breadcrumbs">
+                                    <span>Cloud drive</span>
+                                    <i class=" tiny-icon icons-sprite grey-arrow"></i>
+                                    <span>Folder1</span>
+                                </div>
+                            </div>
+                            <div class="fm-recents file-data">
+                                <div class="fm-recents iteration">
+                                    <i class="tiny-icon icons-sprite iteration refresh"></i>
+                                    <span class="time">00:00</span>
+                                </div>
+                                <div class="dark-direct-tooltip">
+                                    <i class="small-icon icons-sprite tooltip-arrow"></i>
+                                    <span>Changed on 20 September at 09:12:16</span>
+                                </div>
+                                <a class="grid-url-arrow"></a>
+                            </div>
+                        </div>
+                        
+                        <div class="fm-recents content-row">
+                            <div class="medium-file-icon pdf"></div>
+                            <div class="fm-recents file-info">
+                                <div class="fm-recents file-name">
+                                    <span class="link">presentation.pdf</span>
+                                </div>
+                                <div class="fm-recents breadcrumbs">
+                                    <span>Cloud drive</span>
+                                    <i class=" tiny-icon icons-sprite grey-arrow"></i>
+                                    <span>Folder1</span>
+                                </div>
+                            </div>
+                            <div class="fm-recents file-data">
+                                <div class="fm-recents iteration">
+                                    <i class="tiny-icon icons-sprite iteration top-arrow"></i>
+                                    <span class="time">00:00</span>
+                                </div>
+                                <div class="dark-direct-tooltip">
+                                    <i class="small-icon icons-sprite tooltip-arrow"></i>
+                                    <span>Uploaded on 20 September at 09:12:16</span>
+                                </div>
+                                <a class="grid-url-arrow"></a>
+                            </div>
+                        </div>
+                        
+                        <div class="fm-recents content-row">
+                            <!-- Please add "double" classname for multiple icons !-->
+                            <div class="medium-file-icon image double">
+                                <div class="medium-file-icon image"></div>
+                            </div>
+                            <div class="fm-recents file-info">
+                                <div class="fm-recents file-name">
+                                    <span class="link">12 Images</span>
+                                </div>
+                                <div class="fm-recents breadcrumbs">
+                                    <span>Cloud drive</span>
+                                    <i class=" tiny-icon icons-sprite grey-arrow"></i>
+                                    <span>Camera Uploads</span>
+                                </div>
+                            </div>
+                            <div class="fm-recents file-data">
+                                <div class="fm-recents iteration">
+                                    <i class="tiny-icon icons-sprite iteration top-arrow"></i>
+                                    <span class="time">00:00</span>
+                                </div>
+                                <div class="dark-direct-tooltip">
+                                    <i class="small-icon icons-sprite tooltip-arrow"></i>
+                                    <span>Uploaded on 20 September at 09:12:16</span>
+                                </div>
+                                <a class="grid-url-arrow"></a>
+                            </div>
+                            <div class="fm-recents previews-wrapper">
+                                <!-- Init vertical scrolling here !-->
+                                <div class="fm-recents previews-scroll">
+                                    <div class="fm-recents previews-body">
+                                        <a class="data-block-view">
+                                            <span class="data-block-bg thumb">
+                                                <img alt="" src="../../images/temp/avatar-img.jpg">
+                                            </span>
+                                        </a>
+                                        <a class="data-block-view">
+                                            <span class="data-block-bg thumb">
+                                                <img alt="" src="../../images/temp/avatar-img.jpg">
+                                            </span>
+                                        </a>
+                                        <a class="data-block-view">
+                                            <span class="data-block-bg thumb">
+                                                <img alt="" src="../../images/temp/avatar-img.jpg">
+                                            </span>
+                                        </a>
+                                        <a class="data-block-view">
+                                            <span class="data-block-bg thumb">
+                                                <img alt="" src="../../images/temp/avatar-img.jpg">
+                                            </span>
+                                        </a>
+                                        <a class="data-block-view">
+                                            <span class="data-block-bg thumb">
+                                                <img alt="" src="../../images/temp/avatar-img.jpg">
+                                            </span>
+                                        </a>
+                                        <a class="data-block-view">
+                                            <span class="data-block-bg thumb">
+                                                <img alt="" src="../../images/temp/avatar-img.jpg">
+                                            </span>
+                                        </a>
+                                        <a class="data-block-view">
+                                            <span class="data-block-bg thumb">
+                                                <img alt="" src="../../images/temp/avatar-img.jpg">
+                                            </span>
+                                        </a>
+                                        <a class="data-block-view">
+                                            <span class="data-block-bg thumb">
+                                                <img alt="" src="../../images/temp/avatar-img.jpg">
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="button link-button lato-semibold" title="Show all">
+                                <i class="small-icon  icons-sprite bold-eye"></i>
+                                <span>Show all</span>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        
+                        <div class="fm-recents date"> Yesterday </div>
+                        
+                        <div class="fm-recents content-row">
+                            <div class="medium-file-icon pages"></div>
+                            <div class="fm-recents file-info">
+                                <div class="fm-recents file-name">
+                                    <span class="link">presentation.pages</span>
+                                    <span class="grey-txt">added by</span>
+                                    <span class="link">Tikhon Yaroslavsky</span>
+                                </div>
+                                <div class="fm-recents breadcrumbs">
+                                    <span>Cloud drive</span>
+                                    <i class=" tiny-icon icons-sprite grey-arrow"></i>
+                                    <span>Outgoing Folder name</span>
+                                </div>
+                            </div>
+                            <div class="fm-recents file-data">
+                                <div class="transfer-filetype-icon folder-shared"></div>
+                                <div class="fm-recents iteration">
+                                    <i class="tiny-icon icons-sprite iteration top-arrow"></i>
+                                    <span class="time">00:00</span>
+                                </div>
+                                <div class="dark-direct-tooltip">
+                                    <i class="small-icon icons-sprite tooltip-arrow"></i>
+                                    <span>Uploaded on 20 September at 09:12:16</span>
+                                </div>
+                                <a class="grid-url-arrow"></a>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -2340,7 +2340,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -3505,7 +3505,7 @@ li.token-input-token-invite .input-close {
     width: 640px;
     height: 620px;
     margin: -310px 0 0 -320px;
-    text-align: center; 
+    text-align: center;
 }
 .fm-dialog.recovery-key-dialog  .fm-dialog-close {
     right: -6px;

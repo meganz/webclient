@@ -48,6 +48,17 @@
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
+.link-button.lato {
+    font-size: 0;
+}
+.link-button.lato-semibold span {
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
+    font-size: 14px;
+    color: #666666;
+}
+.link-button.lato-semibold:hover span {
+    color: #333333;
+}
 .link-button:hover {
     color: #111;
 }

@@ -323,7 +323,7 @@ function init_page() {
         return false;
     }
 
-    if (!page.match(/^(blog|help|corporate|page_)/)) {
+    if (!page.match(/^(blog|help|corporate|fm\/recents|page_)/)) {
         $('.top-head').remove();
     }
     $('#loading').hide();

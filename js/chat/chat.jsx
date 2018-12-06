@@ -801,7 +801,11 @@ Chat.prototype.destroy = function(isLogout) {
     }
 
     self.isLoggingOut = isLogout;
-    self.rtc.logout();
+
+    if (self.rtc && self.rtc.logout) {
+        self.rtc.logout();
+    }
+
     self.unregisterUploadListeners(true);
     self.trigger('onDestroy', [isLogout]);
 

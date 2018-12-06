@@ -3094,7 +3094,7 @@
     "20017": "Eindpunt codering",
     "20018": "MEGA codeert het client apparaat van de gebruiker niet. MEGA beveelt het gebruik van een krachtige schermwachtwoord en apparaat-niveau full-disk encryptie (FDE) aan die nu standaard is ingeschakeld op nieuwe Android \/ iOS-apparaten.",
     "20019": "Eindpunt beveiliging",
-    "20020": "Hoewel het E2EE-paradigma van MEGA de algehele beveiliging met privacy-by-design verbetert in vergelijking met veel van zijn concurrenten die alleen privacy door beleid bieden, is het geen wondermiddel voor alle potenti\u00eble beveiligingsrisico's. Het is van cruciaal belang dat de eindpunt apparaten als veilig worden beschouwd in het E2EE-paradigma. Elke inbreuk op een eindpunt apparaat breekt de E2EE-keten.",
+    "20020": "While MEGA\u2019s end-to-end encryption (E2EE) paradigm does enhance the overall security with privacy by design compared to many of its competitors who only provide privacy by policy, it is not a silver bullet solution to all potential security threats. It is critical that the endpoint devices are deemed secure in the E2EE paradigm. Any breach on an endpoint device breaks the E2EE chain.",
     "20021": "In samenvatting",
     "20022": "Een achterdeur of virus op het besturingssysteem van de gebruiker van het eind puntapparaat zou bijvoorbeeld een bedrieglijke aanvaller in staat kunnen stellen ongecodeerde gegevens te onderscheppen, toetsaanslagen te registreren of rechtstreeks audio \/ video van de microfoon \/ camera van het apparaat te halen. [Br] Het is daarom belangrijk dat de gebruiker vertrouwt niet alleen op MEGA, maar zorgt er ook voor dat hun endpoint-apparaten (waarop de gebruiker de MEGA-clientsoftware draait) veilig zijn.",
     "20023": "Transparantie en Openbare Broncode",

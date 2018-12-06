@@ -138,7 +138,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/big-achievements@2x.png);
     background-size: 436px auto;
 }
-.logo, .languages-dialog .show-more-languages .round-arrow span, .top-head .top-icon::before, .top-menu-popup .top-icon::before, .top-bar .top-icon::before, .main-top.top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.white-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status, .top-menu-item.submenu-item::before, .medium-icon.rocket, .nlanguage-bottom, .tiny-icon.green-tick, .tiny-icon.red-cross, .site-update-available .mega-icon, .megasync-close, .improved-recovery-steps .list-point b.megasync-logo, i.account-icon, .fm-files-search i.search {
+.logo, .languages-dialog .show-more-languages .round-arrow span, .top-head .top-icon::before, .top-menu-popup .top-icon::before, .top-bar .top-icon::before, .main-top.top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.white-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status, .top-menu-item.submenu-item::before, .medium-icon.rocket, .nlanguage-bottom, .tiny-icon.green-tick, .tiny-icon.red-cross, .site-update-available .mega-icon, .megasync-close, .improved-recovery-steps .list-point b.megasync-logo, i.account-icon, .fm-files-search i.search, .send-chat .toast-icon {
     background-image: url(../images/mega/top-sprite_v5@2x.png);
     background-size: 38px auto;
 }

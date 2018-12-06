@@ -3655,7 +3655,7 @@ label.iPhoneCheckLabelOff span {
     background-color: white;
 }
 /* New FM */
-.fm-left-menu.account + .nw-tree-panel-header + .fm-tree-panel {
+.fm-left-menu.account + .nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel {
     height: 100%;
 }
 .fm-tree-panel {
@@ -11531,7 +11531,8 @@ table {
     cursor: pointer;
     display: inline-block;
     height: 30px;
-    line-height: 30px;
+    line-height: 27px;
+    text-align: center;
     margin-top: 24px;
     min-width: 100px;
     padding: 0 16px;
@@ -24287,7 +24288,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     font-size: 15px;
     color: #333333;
     line-height: 20px;
-    padding: 0 12px 1px 0;
+    padding: 0 12px 0 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -24312,7 +24313,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     padding: 0;
     font-size: 14px;
     position: relative;
-    vertical-align: top;
+    vertical-align: middle;
     transition: 0.1s;
 }
 
@@ -24325,7 +24326,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: 32px;
     line-height: 31px;
     white-space: nowrap;
-    vertical-align: top;
+    vertical-align: middle;
     overflow: hidden;
     bottom: 0;
 }
@@ -24349,7 +24350,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .fm-picker-dialog .summary-input .summary-ff-name {
     height: 32px;
     max-width: 340px;
-    line-height: 31px;
+    line-height: 32px;
     margin-left: 36px;
     position: relative;
     display: inline-block;
@@ -24398,11 +24399,14 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     cursor: pointer;
 }
 .fm-picker-dialog .fm-breadcrumbs {
-    margin: 4px 0;
+    margin: 3px 0 5px;
     cursor: pointer;
 }
+.fm-picker-dialog .fm-breadcrumbs .right-arrow-bg {
+    padding-top: 0;
+}
 .fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg {
-    padding: 1px 0 0 35px;
+    padding: 0 0 0 35px;
     margin: 0 0 0 -3px;
 }
 .fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg span {
@@ -25087,16 +25091,9 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     bottom: 0;
     left: 8px;
 }
-
-.fm-picker-dialog .summary-row.unfold .summary-title {
-    vertical-align: top;
-    padding-top: 5px;
-}
-
 .fm-picker-dialog .summary-input.unfold .item-row:first-child .summary-ff-name {
     max-width: 340px;
 }
-
 .fm-picker-dialog .summary-input.unfold .item-row:hover .delete-img.icon {
     display: inline-block;
 }
@@ -25120,7 +25117,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 .fm-picker-dialog .fm-breadcrumbs .right-arrow-bg {
     font-size: 14px;
-    line-height: 24px;
+    line-height: 25px;
     cursor: pointer;
 }
 .fm-picker-dialog .fm-breadcrumbs.has-next-button {

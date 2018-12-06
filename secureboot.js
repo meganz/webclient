@@ -516,9 +516,9 @@ var mega = {
         if (!this._urlParams) {
             var params = '&domain=meganz'; // domain origin
 
-            // If using extension this is passed through to the API for the helpdesk tool
+            // If using an extension, the version is passed through to the API for the helpdesk tool
             if (is_extension) {
-                params += '&ext=1';
+                params += '&ext=' + (is_chrome_web_ext ? buildVersion.chrome : buildVersion.firefox);
             }
 
             // Append browser brand for easier troubleshoting

@@ -69,7 +69,8 @@
     text-decoration: underline;
 }
 .user-card-name.light {
-    color: #222;
+    color: #333;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
     max-width: -webkit-calc(100% - 40px);
     max-width: -moz-calc(100% - 40px);
     max-width: calc(100% - 40px);

@@ -1121,7 +1121,21 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
-            chatRoom.messagesBuff.messagesBatchFromHistory.forEach(function(v, k) {
+            var containerBatchFromHist;
+            var containerMessages;
+            var isSharedFileMessage = false;
+
+            if (chatRoom.messagesBuff.isRetrievingSharedFiles) {
+                containerBatchFromHist = chatRoom.messagesBuff.sharedFilesBatchFromHistory;
+                containerMessages = chatRoom.messagesBuff.sharedFiles;
+                isSharedFileMessage = true;
+            }
+            else {
+                containerBatchFromHist = chatRoom.messagesBuff.messagesBatchFromHistory;
+                containerMessages = chatRoom.messagesBuff.messages;
+            }
+
+            containerBatchFromHist.forEach(function(v, k) {
                 if (v.userId && !v.requiresManualRetry) {
                     if (!v.textContents && v.message && !v.deleted) {
                         var msg = v.message;
@@ -1164,13 +1178,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         var failedToDecrypt = false;
                         var messageId = hist[i]['k'];
 
-                        var msgInstance = chatRoom.messagesBuff.messagesBatchFromHistory[messageId];
+                        var msgInstance = containerBatchFromHist[messageId] || containerMessages[messageId];
 
-                        if (!msgInstance) {
-                            msgInstance = chatRoom.messagesBuff.getMessageById(messageId);
-                        }
-
-                        var succeeded = self._processDecryptedMessage(chatRoom, msgInstance, v);
+                        var succeeded = self._processDecryptedMessage(chatRoom, msgInstance, v, isSharedFileMessage);
                         if (!succeeded) {
                             failedToDecrypt = true;
                             self.logger.error("Could not decrypt: ", v, msgInstance);
@@ -1180,8 +1190,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
                         if (!failedToDecrypt) {
                             self._parseMessage(chatRoom, msgInstance);
-                            chatRoom.messagesBuff.messages.push(msgInstance);
-                            chatRoom.messagesBuff.messagesBatchFromHistory.remove(messageId);
+                            containerMessages.push(msgInstance);
+                            containerBatchFromHist.remove(messageId);
                         }
                     }
 
@@ -1416,8 +1426,15 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
 };
 
-ChatdIntegration.prototype._processDecryptedMessage = function(chatRoom, msgInstance, decryptedResult) {
+ChatdIntegration.prototype._processDecryptedMessage = function(
+    chatRoom,
+    msgInstance,
+    decryptedResult,
+    isSharedFileMessage
+) {
     var self = this;
+    var mb = chatRoom.messagesBuff;
+    var messageOrdersSource = isSharedFileMessage ? mb.sharedFilesMessageOrders : mb.messageOrders;
 
     if (decryptedResult && msgInstance) {
         if (decryptedResult.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
@@ -1426,12 +1443,16 @@ ChatdIntegration.prototype._processDecryptedMessage = function(chatRoom, msgInst
             }
             msgInstance.textContents = decryptedResult.payload;
             if (decryptedResult.identity && decryptedResult.references) {
-                var mb = chatRoom.messagesBuff;
                 msgInstance.references = decryptedResult.references;
                 msgInstance.msgIdentity = decryptedResult.identity;
 
-                mb.messageOrders[decryptedResult.identity] = msgInstance.orderValue;
-                if (mb.verifyMessageOrder(decryptedResult.identity, decryptedResult.references) === false) {
+                messageOrdersSource[decryptedResult.identity] = msgInstance.orderValue;
+
+                if (mb.verifyMessageOrder(
+                        decryptedResult.identity,
+                        decryptedResult.references,
+                        messageOrdersSource
+                    ) === false) {
                     // potential message order tampering detected.
                     self.logger.critical("message order tampering detected: ", chatRoom.chatId, msgInstance.messageId);
                     return false;

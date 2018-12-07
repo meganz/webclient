@@ -97,10 +97,32 @@ var PerfectScrollbar = React.createClass({
             self.onResize(forced, scrollPositionYPerc, scrollToElement);
         });
         self.onResize();
+        this.attachAnimationEvents();
     },
     componentWillUnmount: function() {
         var $elem = $(ReactDOM.findDOMNode(this));
         $elem.off('ps-scroll-y.ps' + this.getUniqueId());
+
+        var ns = '.ps' + this.getUniqueId();
+        $elem.parents('.have-animation')
+            .unbind('animationend' + ns +' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns);
+
+    },
+    attachAnimationEvents: function() {
+        var self = this;
+        if (!self.isMounted()) {
+            return;
+        }
+
+        var $node = $(self.findDOMNode());
+        var ns = '.ps' + self.getUniqueId();
+        $node.parents('.have-animation')
+            .rebind('animationend' + ns +' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns, function(e) {
+                self.safeForceUpdate(true);
+                if (self.props.onAnimationEnd) {
+                    self.props.onAnimationEnd();
+                }
+            });
     },
     eventuallyReinitialise: function(forced, scrollPositionYPerc, scrollToElement) {
         var self = this;
@@ -302,10 +324,17 @@ var PerfectScrollbar = React.createClass({
         if (this.props.requiresUpdateOnResize) {
             this.onResize(true);
         }
+        this.attachAnimationEvents();
     },
     render: function () {
+        var self = this;
         return (
-            <div {...this.props} onResize={this.onResize}>
+            <div {...this.props} onResize={this.onResize} onAnimationEnd={function() {
+                self.onResize();
+                if (this.props.triggerGlobalResize) {
+                    $.tresizer();
+                }
+            }}>
                 {this.props.children}
             </div>
         );

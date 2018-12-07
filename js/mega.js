@@ -3504,7 +3504,7 @@ var fa_reqcnt = 0;
 var fa_addcnt = 8;
 var fa_tnwait = 0;
 
-function fm_thumbnails(mode, nodeList)
+function fm_thumbnails(mode, nodeList, callback)
 {
     var treq = {}, a = 0, max = Math.max($.rmItemsInView || 1, 71) + fa_addcnt, u = max - Math.floor(max / 3), y;
     if (!fa_reqcnt)
@@ -3563,6 +3563,9 @@ function fm_thumbnails(mode, nodeList)
             var cdid = M.currentdirid;
             api_getfileattr(treq, 0, function(ctx, node, uint8arr)
             {
+                if (mode === 'standalone' && typeof callback === 'function') {
+                    onIdle(callback.bind(null, node));
+                }
                 if (uint8arr === 0xDEAD)
                 {
                     if (d)
@@ -3601,6 +3604,9 @@ function fm_thumbnails(mode, nodeList)
                             thumbnails[n.h] = thumbnails[node];
                             if (n.seen && M.currentdirid === cdid)  {
                                 fm_thumbnail_render(n);
+                            }
+                            if (mode === 'standalone' && typeof callback === 'function') {
+                                onIdle(callback.bind(null, n.h));
                             }
                         }
                     }

@@ -913,22 +913,19 @@ var TypingArea = React.createClass({
         return <div className={"typingarea-component" + self.props.className}>
             <div className={"chat-textarea " + self.props.className}>
                 {emojiAutocomplete}
-                <i className={self.props.iconClass ? self.props.iconClass : "small-icon conversations"}></i>
-                <div className="chat-textarea-buttons">
-                    <ButtonsUI.Button
-                        className="popup-button"
-                        icon="smiling-face"
-                        disabled={this.props.disabled}
-                    >
-                        <DropdownEmojiSelector
-                            className="popup emoji"
-                            vertOffset={12}
-                            onClick={self.onEmojiClicked}
-                        />
-                    </ButtonsUI.Button>
-
-                    {self.props.children}
-                </div>
+                {self.props.children}
+                <ButtonsUI.Button
+                    className="popup-button"
+                    icon="smiling-face"
+                    disabled={this.props.disabled}
+                >
+                    <DropdownEmojiSelector
+                        className="popup emoji"
+                        vertOffset={17}
+                        onClick={self.onEmojiClicked}
+                    />
+                </ButtonsUI.Button>
+                <hr />
                 <div className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
                      style={textareaScrollBlockStyles}>
                     <textarea

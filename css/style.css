@@ -10,6 +10,17 @@
     text-rendering: optimizeLegibility;
 }
 @font-face {
+    font-family: 'LatoWebSemibold';
+    src: url('../fonts/Lato-Semibold.eot'); /* IE9 Compat Modes */
+    src: url('../fonts/Lato-Semibold.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../fonts/Lato-Semibold.woff2') format('woff2'), /* Modern Browsers */
+         url('../fonts/Lato-Semibold.woff') format('woff'), /* Modern Browsers */
+         url('../fonts/Lato-Semibold.ttf') format('truetype');
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
     font-family: 'LatoWebBlack';
     src: url('../fonts/Lato-Black.eot'); /* IE9 Compat Modes */
     src: url('../fonts/Lato-Black.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
@@ -186,6 +197,12 @@ body {
 }
 body.mobile.bottom-pages {
     overflow: visible;
+}
+.lato {
+    font-family: 'LatoWeb', 'source_sans_proregular';
+}
+.lato-semibold {
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
 }
 .hidden, div.hidden {
     display: none;
@@ -4043,6 +4060,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     overflow: hidden;
     position:relative;
 }
+.nw-fm-tree-item.labeled.linked {
+    padding-right: 50px;
+}
 .nw-fm-tree-folder::before, .nw-fm-tree-shared-folder::before {
     content:'';
     display:block;
@@ -4064,9 +4084,13 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-position: -337px -717px;
     margin: 0;
 }
+.transfer-filetype-icon.inbound-share {
+    background-position: -337px -877px;
+}
 .transfer-filetype-icon.folder-shared {
     margin: 0;
 }
+
 .nw-fm-tree-item:hover .nw-fm-tree-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder {
     color: white;
 }
@@ -4641,10 +4665,22 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     height: 8px;
     width: 8px;
     display: inline-block;
-    margin: 0px 8px 0 -2px;
+    margin: 12px 12px 0 -2px;
     -webkit-box-shadow: 0px 0px 0px 2px transparent;
     -moz-box-shadow: 0px 0px 0px 2px transparent;
     box-shadow: 0px 0px 0px 2px transparent;
+    vertical-align: top;
+}
+.activity-status-info {
+    font-size: 12px;
+    line-height: 12px;
+    padding: 0 0 0 18px;
+    white-space: normal;
+    margin: -3px 0 8px 0;
+    color: #999999;
+}
+.dropdown-item:hover .activity-status-info {
+    color: white;
 }
 .contact-status {
     float: left;
@@ -5011,9 +5047,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .fm-left-menu.inbox {
     background-color: rgba(255,86,26,1);
 }
-.fm-left-menu.conversations {
-    background-color: rgba(43,166,222,1);
-}
 .fm-left-menu.dashboard {
     background-color: #D90007;
     display: none;
@@ -5106,7 +5139,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     background-color: transparent;
     width: 100%;
     font-size: 15px;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     text-align: center;
     border: 0;
     padding: 0;
@@ -5115,6 +5147,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    font-family: LatoWebSemibold, source_sans_prosemibold;
 }
 .nw-fm-tree-header input:not([readonly]):focus, .nw-fm-tree-header.filled-input input {
     cursor: text;
@@ -5136,7 +5169,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .contacts.filled-input .fm-add-user {
     display: none;
 }
-.nw-fm-tree-header.focused-input:not(.conversations) .button {
+.nw-fm-tree-header:not(.conversations).focused-input .button {
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
@@ -6633,6 +6666,9 @@ table {
 }
 .medium-file-icon.folder-shared {
     background-position: -216px -5039px;
+}
+.medium-file-icon.inbound-share {
+    background-position: -216px -4799px;
 }
 .rubbish-bin .medium-file-icon.folder-shared {
     background-position: -216px -5159px;
@@ -10264,6 +10300,17 @@ span.orange {
 }
 .top-user-status-popup {
     padding: 8px;
+    font-size: 0;
+    width: 240px;
+}
+.top-user-status-popup .dropdown-item.mid-txt {
+    font-size: 0;
+    height: auto;
+    min-height: 32px;
+}
+.top-user-status-popup .dropdown-item span {
+    font-size: 14px;
+    vertical-align: top;
 }
 .dropdown.popup.notification-popup, .dropdown.popup.warning-popup {
     min-width: 402px;
@@ -11049,6 +11096,7 @@ table {
     height: 32px;
     position: relative;
     margin-bottom: -1px;
+    font-family: 'LatoWeb', 'source_sans_proregular';
 }
 .contacts-tab-lnk.filled {
     padding: 4px 5px 0 24px;

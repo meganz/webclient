@@ -1,7 +1,7 @@
 .button {
     display: block;
 }
-.button > i, .button > span {
+.button:not(.disabled) > i, .button:not(.disabled) > span {
     cursor: pointer;
 }
 
@@ -75,6 +75,38 @@
     font-size: inherit;
     line-height: inherit;
 }
+.link-button.light, .dropdown-item.link-button.light {
+    font-family: 'LatoWeb', 'source_sans_proregular';
+    font-size: 13px;
+    line-height: 31px;
+    white-space: normal;
+    height: 32px;
+    color: #333;
+    border-radius: 4px;
+    margin: 2px 0;
+    padding: 0;
+    display: inline-block;
+    width: 100%;
+}
+.link-button.light:not(.disabled):hover, .dropdown-item.link-button.light:not(.disabled):hover {
+    background-color: rgba(0,0,0,0.02);
+    -webkit-box-shadow: inset 0px 0px 0px 1px #ccc;
+    -moz-box-shadow: inset 0px 0px 0px 1px #ccc;
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+    color: #333;
+}
+.link-button.light i, .dropdown-item.link-button.light i.colorized {
+    float: left;
+    margin: 6px 0 0 6px;
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.link-button.light span, .dropdown-item.link-button.light span {
+    padding-left: 37px;
+    padding-right: 20px;
+    display: block;
+}
 .big-button {
     height: 48px;
     font-size: 14px;
@@ -118,7 +150,7 @@
     background-position: -2px -1504px;
 }
 .button:hover .smiling-face, .button.active .smiling-face {
-    background-position: -3px -1586px;
+    background-position: -129px -853px;
 }
 .big-button:hover .dashed-conversation {
     background-position: 1px -1694px;

@@ -132,6 +132,11 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
  */
 var megaChatInstanceId = 0;
 
+
+var CHATUIFLAGS_MAPPING = {
+    'convPanelCollapse': 'cPC'
+};
+
 /**
  * MegaChat - UI component that links XMPP/Strophejs (via Karere) w/ the Mega's UI
  *
@@ -146,6 +151,9 @@ var Chat = function() {
     this.logger = MegaLogger.getLogger("chat");
 
     this.chats = new MegaDataMap();
+    this.chatUIFlags = new MegaDataMap();
+    this.initChatUIFlagsManagement();
+
     this.currentlyOpenedChat = null;
     this.lastOpenedChat = null;
     this.archivedChatsCount = 0;
@@ -202,7 +210,7 @@ var Chat = function() {
             'rtfFilter': RtfFilter,
             'richpreviewsFilter': RichpreviewsFilter
         },
-        'chatNotificationOptions': {
+        'chatNotificationOptions':  {
             'textMessages': {
                 'incoming-chat-message': {
                     'title': "Incoming chat message",
@@ -225,7 +233,7 @@ var Chat = function() {
                     }
                 },
                 'incoming-voice-video-call': {
-                    'title': "Incoming call",
+                    'title': l[17878] || "Incoming call",
                     'icon': function(notificationObj, params) {
                         return notificationObj.options.icon;
                     },
@@ -471,6 +479,81 @@ Chat.prototype.init = function() {
 
     self.registerUploadListeners();
     self.trigger("onInit");
+};
+
+/**
+ * Load chat UI Flags from mega.config
+ *
+ * @param [val] {Object} optional settings, if already received.
+ */
+Chat.prototype.loadChatUIFlagsFromConfig = function(val) {
+    var self = this;
+    var flags = val || mega.config.get("cUIF");
+    if (flags) {
+        if (typeof flags !== 'object') {
+            flags = {};
+        }
+
+        try {
+            Object.keys(CHATUIFLAGS_MAPPING).forEach(function(k) {
+                var v = flags[CHATUIFLAGS_MAPPING[k]];
+                if (v) {
+                    self.chatUIFlags.set(k, v);
+                }
+            });
+        }
+        catch (e) {
+            console.warn("Failed to parse persisted chatUIFlags: ", e);
+        }
+    }
+};
+
+/**
+ * Init chatUIFlags management code
+ */
+Chat.prototype.initChatUIFlagsManagement = function() {
+    var self = this;
+
+    self.loadChatUIFlagsFromConfig();
+
+    this.chatUIFlags.addChangeListener(function(hashmap, extraArg) {
+        var flags = mega.config.get("cUIF") || {};
+        var hadChanged = false;
+        var hadLocalChanged = false;
+        // merge w/ raw, so that we won't replace any new (unknown) flags set by new-version clients
+        Object.keys(CHATUIFLAGS_MAPPING).forEach(function(k) {
+            if (flags[CHATUIFLAGS_MAPPING[k]] !== self.chatUIFlags[k]) {
+                if (extraArg === 0xDEAD) {
+                    self.chatUIFlags._data[k] = flags[CHATUIFLAGS_MAPPING[k]];
+                    hadLocalChanged = true;
+                }
+                else {
+                    flags[CHATUIFLAGS_MAPPING[k]] = self.chatUIFlags[k];
+                    hadChanged = true;
+                }
+            }
+        });
+
+        if (hadLocalChanged) {
+            if (extraArg !== 0xDEAD) {
+                // prevent recursion
+                self.chatUIFlags.trackDataChange(0xDEAD);
+            }
+
+            $.tresizer();
+        }
+        if (extraArg === 0xDEAD) {
+            // don't update the mega.config, it should be updated already by the ap
+            return;
+        }
+        if (hadChanged) {
+            mega.config.set("cUIF", flags);
+        }
+    });
+    mBroadcaster.addListener('fmconfig:cUIF', function(v) {
+        self.loadChatUIFlagsFromConfig(v);
+        self.chatUIFlags.trackDataChange(0xDEAD);
+    });
 };
 
 Chat.prototype.unregisterUploadListeners = function(destroy) {
@@ -2157,6 +2240,9 @@ Chat.prototype.openChatAndSendFilesDialog = function(user_handle) {
     }
 };
 
+Chat.prototype.toggleUIFlag = function(name) {
+    this.chatUIFlags.set(name, this.chatUIFlags[name] ? 0 : 1);
+};
 
 window.Chat = Chat;
 window.chatui = chatui;

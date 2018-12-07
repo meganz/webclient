@@ -1080,6 +1080,7 @@ var ConversationsApp = React.createClass({
                 }
                 <ConversationPanelUI.ConversationPanels
                     {...this.props}
+                    chatUIFlags={megaChat.chatUIFlags}
                     className={megaChat.displayArchivedChats === true ? "hidden" : ""}
                     conversations={this.props.megaChat.chats}
                     />
@@ -1087,7 +1088,8 @@ var ConversationsApp = React.createClass({
         var archivedChatsCount = this.calcArchiveChats();
         var arcBtnClass = megaChat.displayArchivedChats === true ?
                             "arc-conversation-btn-block active" : "arc-conversation-btn-block";
-        var arcIconClass = megaChat.displayArchivedChats === true ? "small-icon archive white" : "small-icon archive";
+        var arcIconClass = megaChat.displayArchivedChats === true ?
+            "small-icon archive white" : "small-icon archive colorized";
         return (
             <div className="conversationsApp" key="conversationsApp">
                 <div className="fm-left-panel chat-left-panel" style={leftPanelStyles}>
@@ -1099,7 +1101,7 @@ var ConversationsApp = React.createClass({
 
                             <ButtonsUI.Button
                                 group="conversationsListing"
-                                icon="white-medium-plus"
+                                icon="chat-with-plus"
                                 contacts={this.props.contacts}
                                 >
                                 <DropdownsUI.DropdownContactsSelector

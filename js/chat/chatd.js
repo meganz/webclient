@@ -805,8 +805,8 @@ Chatd.cmdToString = function(cmd, tx) {
                 count -= 0x100000000;
             }
 
-            result += "chatId: " + base64urlencode(cmd.substr(1, 8)) +
-                      "msgId: " + base64urlencode(cmd.substr(9, 8)) +
+            result += "chatId: " + base64urlencode(cmd.substr(1, 8)) + " " +
+                      "msgId: " + base64urlencode(cmd.substr(9, 8)) + " " +
                       "count: " + count;
             return [result, 21];
 
@@ -1008,6 +1008,17 @@ Chatd.Shard.prototype._sendHist = function(chatId, count) {
     });
 
     this.cmd(Chatd.Opcode.HIST, chatId + Chatd.pack32le(count));
+};
+
+// send NODEHIST
+Chatd.Shard.prototype._sendNodeHist = function(chatId, lastMsgId, count) {
+    this.chatd.trigger('onMessagesHistoryRequest', {
+        count: count,
+        chatId: base64urlencode(chatId),
+        isRetrievingSharedFiles: true,
+    });
+
+    this.cmd(Chatd.Opcode.NODEHIST, chatId + lastMsgId + Chatd.pack32le(count));
 };
 
 Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
@@ -1669,6 +1680,11 @@ Chatd.prototype.nexttransactionid = function() {
     return this.msgTransactionId;
 };
 
+Chatd.prototype._sendNodeHist = function(chatId, lastMsgId, len) {
+    var shard = this.chatIdShard[chatId];
+    assert(shard, 'shard not found');
+    shard._sendNodeHist(chatId, lastMsgId, len);
+};
 Chatd.prototype.join = function(chatId, shard, url) {
     if (!this.chatIdShard[chatId]) {
         var newshard = this.addshard(chatId, shard, url);
@@ -1774,6 +1790,7 @@ Chatd.Messages = function(chatd, chatId) {
     // there is no guarantee as to ordering
     this.lownum = 2 << 28; // oldest message in buf
     this.highnum = 2 << 28; // newest message in buf
+    this.lowSharedFiles = 2 << 28; // newest message in buf
     this.sendingnum = 2 << 30;// reasonly high id for pending messages in buf
 
     this.sentid = false;
@@ -1783,6 +1800,7 @@ Chatd.Messages = function(chatd, chatId) {
     // message format: [msgid/transactionid, userId, timestamp, message]
     // messages in buf are indexed by a numeric id
     this.buf = {};
+    this.sharedBuf = {};
     this.sendingbuf = {};
 
     // mapping of transactionids of messages being sent to the numeric index of this.buf
@@ -2221,7 +2239,9 @@ Chatd.prototype.keyconfirm = function(chatId, keyid) {
 // store a message from chatd to local cache
 Chatd.prototype.msgstore = function(newmsg, chatId, userId, msgid, timestamp, updated, keyid, msg) {
     if (this.chatIdMessages[chatId]) {
-        this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, updated, keyid, msg);
+        var room = this.megaChat.getChatById(base64urlencode(chatId));
+        var isShared = room && room.messagesBuff && room.messagesBuff.isRetrievingSharedFiles;
+        this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, updated, keyid, msg, undefined, isShared);
     }
 };
 
@@ -2297,6 +2317,7 @@ Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
     var chatRoom = self.megaChat.getChatById(base64urlencode(chatIdBin));
     var cdr = self.chatIdMessages[chatIdBin] = new Chatd.Messages(self, chatIdBin);
     chatRoom.messagesBuff.messageOrders = {};
+    chatRoom.messagesBuff.sharedFilesMessageOrders = {};
     chatRoom.notDecryptedBuffer = {};
     if (chatRoom.messagesBuff.messagesBatchFromHistory && chatRoom.messagesBuff.messagesBatchFromHistory.length > 0) {
         chatRoom.messagesBuff.messagesBatchFromHistory.clear();
@@ -2458,18 +2479,39 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
 };
 
 // store message into message buf.
-Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, updated, keyid, msg, skipPersist) {
+Chatd.Messages.prototype.store = function(
+    newmsg,
+    userId,
+    msgid,
+    timestamp,
+    updated,
+    keyid,
+    msg,
+    skipPersist,
+    isSharedFile
+) {
     var id;
 
     if (newmsg) {
         id = ++this.highnum;
+    }
+    else if (isSharedFile) {
+        id = this.lowSharedFiles--;
     }
     else {
         id = this.lownum--;
     }
 
     // store message
-    this.buf[id] = [msgid, userId, timestamp, msg, keyid, updated, Chatd.MsgType.MESSAGE];
+    (isSharedFile ? this.sharedBuf : this.buf)[id] = [
+        msgid,
+        userId,
+        timestamp,
+        msg,
+        keyid,
+        updated,
+        Chatd.MsgType.MESSAGE
+    ];
 
     this.chatd.trigger('onMessageStore', {
         chatId: base64urlencode(this.chatId),
@@ -2480,7 +2522,8 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
         updated: updated,
         keyid : keyid,
         message: msg,
-        isNew: newmsg
+        isNew: newmsg,
+        isSharedFile: !!isSharedFile
     });
 };
 

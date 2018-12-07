@@ -1,3 +1,9 @@
+.conversations .nw-fm-tree-header span {
+    color: #333333;
+}
+.fm-left-menu.conversations {
+    background-color: #FAFAFA;
+}
 .conversations-pane {
     margin: 0;
     padding: 0;
@@ -10,9 +16,8 @@
     margin: -36px 0 0 0;
 }
 .content-panel.conversations, .archived-chats .archive-chat-list {
-    background-image: url(../images/mega/nw-chat-bg_v1.svg);
-    background-repeat: repeat;
     min-height: 100%;
+    background-color: #FAFAFA;
     display: block;
 }
 .archived-chats .archive-chat-list {
@@ -25,21 +30,30 @@
     height:         calc(100% - 37px) !important;
 }
 .conversations-pane li {
-    padding: 8px 12px;
+    padding: 6px 12px;
     display: block;
+    position: relative;
     height: 72px;
+    margin: 0 0 1px 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     cursor: pointer;
 }
-.conversations-pane li:nth-child(even), .arc-chat-messages-block tr.arc-chat-list:nth-child(even) {
-    background-color: #FFFFFF;
+.conversations-pane li::before {
+    content: '';
+    display: block;
+    height: 1px;
+    width: 110%;
+    margin: -7px 0 6px 0;
+    background-color: rgba(0,0,0,0.1);
 }
-.conversations-pane li:nth-child(odd), .arc-chat-messages-block tr.arc-chat-list:nth-child(odd) {
-    background-color: #FAFAFA;
+.conversations-pane li.active::before {
+    background-color: transparent;
 }
 .user-card-name.conversation-name {
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
+    color: #333333;
     padding: 0 26px 0 0;
     float: left;
     line-height: 21px;
@@ -55,14 +69,18 @@
     right: 8px;
 }
 .conversation-message {
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
     font-size: 13px;
     line-height: 18px;
-    color: #555555;
+    color: #666666;
     margin: 0 40px 0 0;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
     clear: both;
+}
+.conversations-pane li .date-time {
+     font-family: 'LatoWeb', 'source_sans_proregular';
 }
 .conversation-message.unread {
     color: #2BA6DE;
@@ -74,11 +92,10 @@
     color: white;
 }
 .conversations-pane li.active .conversation-message {
-    color: rgba(255,255,255,0.8);
+    color: white;
 }
 .conversations-pane li.active .date-time {
-    color: rgba(255,255,255,0.6);
-    line-height: 18px;
+    color: white;
 }
 
 .conversations-pane li.active .user-card-name.conversation-name {
@@ -177,9 +194,9 @@
     position: absolute;
     bottom: 0;
     height: 36px;
-    background-color: #fafafa;
+    background-color: white;
     width: 100%;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
     cursor: pointer;
     -webkit-transition: all 300ms ease;
     -moz-transition: all 300ms ease;
@@ -188,8 +205,7 @@
     transition: all 300ms ease;
 }
 .arc-conversation-btn-block:hover {
-    background-color: #f2f2f2;
-    color: #222;
+    background-color: rgb(248, 233, 177, 0.05);
     -webkit-transition: all 300ms ease;
     -moz-transition: all 300ms ease;
     -ms-transition: all 300ms ease;
@@ -207,7 +223,10 @@
 .arc-conversation-heading {
     display: inline-block;
     float:left;
+    font-size: 13px;
     line-height: 36px;
+    color: #333333;
+    font-family: 'LatoWeb', 'source_sans_proregular';
 }
 .arc-conversation-btn-block.active .arc-conversation-heading {
     color: #fff;
@@ -215,9 +234,11 @@
 .arc-conversation-number {
     float: right;
     font-size: 11px;
-    color: white;
-    padding: 1px 6px;
-    background-color: #777;
+    line-height: 16px;
+    height: 16px;
+    color: #333333;
+    padding: 0 6px;
+    background-color: #F8E9B1;
     border-radius: 4px;
     margin: 10px 12px;
 }

@@ -1892,10 +1892,10 @@ MegaUtils.prototype.checkFolderDrop = function(event) {
     if (event.dataTransfer
         && event.dataTransfer.items
         && event.dataTransfer.items.length > 0 && event.dataTransfer.items[0].webkitGetAsEntry) {
-        checkWebkitItems();
+        return checkWebkitItems();
     }
     else if (is_chrome_firefox && event.dataTransfer) {
-        checkMozItems();
+        return checkMozItems();
     }
     // else {
     // ie does not support DataTransfer.items property.

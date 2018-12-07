@@ -222,6 +222,10 @@ Message.getContactForMessage = function(message) {
     return contact;
 };
 
+Message.prototype.hasAttachments = function() {
+    return !!M.chc[this.messageId];
+};
+
 /**
  * Cached attachment's extracted from the message (if such data is available)
  *
@@ -290,7 +294,13 @@ Message.prototype._onAttachmentReceived = function(data) {
         if (!M.chc[n.p]) {
             M.chc[n.p] = Object.create(null);
         }
-        M.chc[n.p][n.ch] = n;
+
+        if (M.chc[n.p][n.ch]) {
+            Object.assign(n, M.chc[n.p][n.ch]);
+        }
+        else {
+            M.chc[n.p][n.ch] = n;
+        }
 
         // Index of attachments per message
         if (M.chc[n.m]) {
@@ -318,6 +328,15 @@ Message.prototype._onAttachmentReceived = function(data) {
     }
 
     this._onAttachmentUpdated();
+
+    if (
+        this.source === Message.SOURCE.CHATD &&
+        this.hasAttachments() &&
+        !this.chatRoom.messagesBuff.sharedFiles[this.messageId]
+    ) {
+        this.chatRoom.messagesBuff.sharedFiles.push(this);
+        this.chatRoom.messagesBuff.sharedFiles.trackDataChange();
+    }
 };
 
 /**
@@ -377,6 +396,14 @@ Message.prototype._onAttachmentRevoked = function(h, thisMsg) {
             if (!M.chc[mId].length) {
                 delete M.chc[mId];
             }
+        }
+
+        var sharedFiles = chatRoom.messagesBuff.sharedFiles;
+        var sharedMsg = sharedFiles[mId];
+        if (sharedMsg) {
+            sharedMsg.revoked = true;
+            sharedFiles.removeByKey(mId);
+            sharedMsg.trackDataChange();
         }
 
         if (attachedMsg) {
@@ -691,7 +718,11 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     var chatdPersist = self.chatdPersist = self.chatd.chatdPersist;
 
     self.messages = new MegaDataSortedMap("messageId", MessagesBuff.orderFunc, this);
+    self.sharedFiles = new MegaDataSortedMap("messageId", MessagesBuff.orderFunc, this);
     self.messagesBatchFromHistory = new MegaDataSortedMap("messageId", MessagesBuff.orderFunc);
+    self.sharedFilesBatchFromHistory = new MegaDataSortedMap("messageId", MessagesBuff.orderFunc);
+    self.sharedFilesLoadedOnce = false;
+    self.sharedFilesPage = 0;
 
     // because on connect, chatd.js would request hist retrieval automatically, lets simply set a "lock"
     self.isDecrypting = new MegaPromise();
@@ -746,6 +777,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.lastSent = null;
     self.lastDelivered = null;
     self.isRetrievingHistory = false;
+    self.isRetrievingSharedFiles = false;
+    self.haveMoreSharedFiles = true; // by default assume there are shared files left for fetching[
     self.lastDeliveredMessageRetrieved = false;
     self.lastSeenMessageRetrieved = false;
     self.retrievedAllMessages = false;
@@ -759,6 +792,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.joined = false;
     self.sendingListFlushed = false;
     self.messageOrders = {};
+    self.sharedFilesMessageOrders = {};
 
     var loggerIsEnabled = localStorage['messagesBuffLogger'] === '1';
 
@@ -791,14 +825,24 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
     });
 
+    chatRoom.rebind('onRoomDisconnected.mb', function() {
+        self.isRetrievingSharedFiles = false;
+        self.isRetrievingHistory = false;
+        self.chatdIsProcessingHistory = false;
+        self.sendingListFlushed = true;
+        self.expectedMessagesCount = 0;
+    });
+
     chatRoom.rebind('onHistoryDecrypted.mb', function() {
         if (chatRoom.messagesBuff.isDecrypting) {
             chatRoom.messagesBuff.isDecrypting.resolve();
         }
 
-
-
-        if (self.haveMoreHistory() && self.messages.length <= Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL) {
+        if (
+            !self.isRetrievingSharedFiles &&
+            self.haveMoreHistory() &&
+            self.messages.length <= Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL
+        ) {
             // if there are more messages in history, but there is no "renderable text message" (for the left tree
             // pane), we will try to retrieve Chatd.MESSAGE_HISTORY_LOAD_COUNT more messages, so that it won't display
             // an empty chat
@@ -817,6 +861,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.retrieveChatHistory(false);
             }
         }
+        if (self.$isDecryptingSharedFiles && self.$isDecryptingSharedFiles.state() === 'pending') {
+            self.$isDecryptingSharedFiles.resolve();
+        }
+
         chatRoom.trigger('onHistoryDecryptedDone');
     });
 
@@ -853,9 +901,42 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessagesHistoryDone.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (chatRoom.roomId === self.chatRoom.roomId) {
+        var validSameRoom = chatRoom && chatRoom.roomId === self.chatRoom.roomId;
+        var requestedMessagesCount;
+        if (self.isRetrievingSharedFiles) {
+            requestedMessagesCount = self.requestedMessagesCount || Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL;
 
-            var requestedMessagesCount = self.requestedMessagesCount || Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL;
+            $(self).trigger('onHistoryFinished');
+
+            self.isRetrievingSharedFiles = false;
+
+            if (
+                typeof(self.expectedMessagesCount) === 'undefined'
+            ) {
+                self.expectedMessagesCount = 0;
+                self.haveMoreSharedFiles = true;
+            }
+            else if (
+                self.expectedMessagesCount === requestedMessagesCount
+            ) {
+                // this is an empty/new chat.
+                self.expectedMessagesCount = 0;
+                self.haveMoreSharedFiles = false;
+            }
+            else if (
+                self.expectedMessagesCount
+            ) {
+                // if the expectedMessagesCount is not 0 and < requested, then...chatd/idb returned < then the
+                // requested #, which means, that there is no more history.
+                self.haveMoreSharedFiles = !(self.expectedMessagesCount < requestedMessagesCount);
+            }
+
+            if (self.$sharedFilesLoading) {
+                self.$sharedFilesLoading.resolve();
+            }
+        }
+        else if (validSameRoom) {
+            requestedMessagesCount = self.requestedMessagesCount || Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL;
             self.isRetrievingHistory = false;
             self.chatdIsProcessingHistory = false;
             self.sendingListFlushed = true;
@@ -919,7 +1000,12 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
 
         if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
-            self.isRetrievingHistory = true;
+            if (!eventData.isRetrievingSharedFiles) {
+                self.isRetrievingHistory = true;
+            }
+            else {
+                self.isRetrievingSharedFiles = true;
+            }
             self.expectedMessagesCount = eventData.count === 0xDEAD ? null : Math.abs(eventData.count);
             self.trackDataChange();
         }
@@ -942,7 +1028,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessageStore.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
+
+        var validSameRoom = chatRoom && chatRoom.roomId === self.chatRoom.roomId;
+        if (validSameRoom) {
             self.haveMessages = true;
 
             var msgObject = new Message(
@@ -960,11 +1048,13 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 }
             );
 
-            if (eventData.messageId === self.lastSeen) {
-                self.lastSeenMessageRetrieved = true;
-            }
-            if (eventData.messageId === self.lastDelivered) {
-                self.lastDeliveredMessageRetrieved = true;
+            if (!self.isRetrievingSharedFiles) {
+                if (eventData.messageId === self.lastSeen) {
+                    self.lastSeenMessageRetrieved = true;
+                }
+                if (eventData.messageId === self.lastDelivered) {
+                    self.lastDeliveredMessageRetrieved = true;
+                }
             }
 
 
@@ -973,15 +1063,21 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     self.expectedMessagesCount--;
                 }
 
-                if (eventData.userId !== u_handle) {
-                    if (self.lastDeliveredMessageRetrieved === true) {
-                        // received a message from history, which was NOT marked as received, e.g. was sent during
-                        // this user was offline, so -> do proceed and mark it as received automatically
-                        self.setLastReceived(eventData.messageId);
+                if (!self.isRetrievingSharedFiles) {
+                    if (eventData.userId !== u_handle) {
+                        if (self.lastDeliveredMessageRetrieved === true) {
+                            // received a message from history, which was NOT marked as received, e.g. was sent during
+                            // this user was offline, so -> do proceed and mark it as received automatically
+                            self.setLastReceived(eventData.messageId);
 
+                        }
                     }
+                    self.messagesBatchFromHistory.push(msgObject);
                 }
-                self.messagesBatchFromHistory.push(msgObject);
+                else {
+                    // is a shared file entry
+                    self.sharedFilesBatchFromHistory.push(msgObject);
+                }
             }
             else {
                 if (eventData.pendingid) {
@@ -1511,6 +1607,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.chatRoom.megaChat.updateSectionUnreadCount();
         }
     });
+
 };
 
 
@@ -1678,6 +1775,76 @@ MessagesBuff.prototype.messagesHistoryIsLoading = function() {
     return (
             self.$msgsHistoryLoading && self.$msgsHistoryLoading.state() === 'pending'
         ) || self.chatdIsProcessingHistory;
+};
+
+MessagesBuff.prototype.retrieveSharedFilesHistory = function(len) {
+    var self = this;
+    len = typeof len === "undefined" ? 32 : len;
+    if (self.messagesHistoryIsLoading()) {
+        var proxyPromise = new MegaPromise();
+        self.$msgsHistoryLoading.always(function() {
+            proxyPromise.linkDoneAndFailTo(self.retrieveSharedFilesHistory());
+        });
+        return proxyPromise;
+    }
+    else if (self.$isDecryptingSharedFiles) {
+        var proxyPromise = new MegaPromise();
+        self.$isDecryptingSharedFiles.always(function() {
+            proxyPromise.linkDoneAndFailTo(self.retrieveSharedFilesHistory());
+        });
+        return proxyPromise;
+    }
+    else if (self.$sharedFilesLoading) {
+        var proxyPromise = new MegaPromise();
+        self.$sharedFilesLoading.always(function() {
+            proxyPromise.linkDoneAndFailTo(self.retrieveSharedFilesHistory());
+        });
+        return proxyPromise;
+    }
+    else {
+        var lastKnownMessage = self.messages.getItem(self.messages.length - 1);
+        /**
+         * Edge case:
+         * If the last known message was retrieved via HIST e.g. as OLDMSG, it would not be synced in the sharedFiles.
+         * But the request for NODEHIST is using that ID as a "last known message", so NODEHIST won't re-send it
+         * either. To solve that, I'm simply moving that message -> sharedFiles
+         */
+        if (
+            lastKnownMessage &&
+            !self.sharedFilesLoadedOnce &&
+            lastKnownMessage.hasAttachments() &&
+            !lastKnownMessage.source
+        ) {
+            self.sharedFiles.push(lastKnownMessage);
+        }
+        self.sharedFilesLoadedOnce = true;
+        self.$isDecryptingSharedFiles = new MegaPromise();
+        self.$sharedFilesLoading = new MegaPromise();
+        self.requestedMessagesCount = len;
+
+        var lastMsgId = self.sharedFiles.length === 0 ?
+                (lastKnownMessage ? lastKnownMessage.messageId : "") :
+                self.sharedFiles.getItem(0).messageId;
+
+
+
+        if (!lastMsgId) {
+            self.$sharedFilesLoading.reject();
+            self.$isDecryptingSharedFiles.reject();
+        }
+        else {
+            self.chatdInt.chatd._sendNodeHist(self.chatRoom.chatIdBin, base64urldecode(lastMsgId), len * -1);
+
+            self.$sharedFilesLoading.always(function () {
+                delete self.$sharedFilesLoading;
+            });
+            self.$isDecryptingSharedFiles.always(function () {
+                delete self.$isDecryptingSharedFiles;
+            });
+        }
+
+        return self.$isDecryptingSharedFiles;
+    }
 };
 
 MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
@@ -1881,11 +2048,12 @@ MessagesBuff.prototype.getLatestTextMessage = function() {
     }
 };
 
-MessagesBuff.prototype.verifyMessageOrder = function(messageIdentity, references) {
-    var msgOrder = this.messageOrders[messageIdentity];
+MessagesBuff.prototype.verifyMessageOrder = function(messageIdentity, references, messageOrdersSource) {
+    messageOrdersSource = messageOrdersSource || this.messageOrders;
+    var msgOrder = messageOrdersSource[messageIdentity];
 
     for (var i = 0; i < references.length; i++) {
-        if (this.messageOrders[references[i]] && this.messageOrders[references[i]] > msgOrder) {
+        if (messageOrdersSource[references[i]] && messageOrdersSource[references[i]] > msgOrder) {
             // There might be a potential message order tampering.It should raise an event to UI.
             return false;
         }

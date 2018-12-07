@@ -246,8 +246,9 @@
     height: 48px;
 }
 .fm-picker-header .fm-header-buttons {
-    top: 6px;
-    right: 6px;
+    top: 5px;
+    right: 5px;
+    position: absolute;
 }
 .fm-dialog-scroll, .add-from-cloud .dialog-empty-block {
     height: 612px !important;

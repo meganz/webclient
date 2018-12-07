@@ -103,11 +103,16 @@ var ParticipantsList = React.createClass({
                 chatRoom={room}
                 members={room.members}
                 ref="contactsListScroll"
+                disableCheckingVisibility={true}
                 onUserScroll={self.onUserScroll}
                 requiresUpdateOnResize={true}
+                onAnimationEnd={function() {
+                    self.safeForceUpdate();
+                }}
             >
                 <ParticipantsListInner
                     chatRoom={room} members={room.members}
+                    disableCheckingVisibility={true}
                     scrollPositionY={self.state.scrollPositionY}
                     scrollHeight={self.state.scrollHeight}
                 />
@@ -310,11 +315,6 @@ var ParticipantsListInner = React.createClass({
                         dropdownRemoveButton={dropdownRemoveButton}
                         dropdownIconClasses={dropdownIconClasses}
                         isInCall={room.uniqueCallParts && room.uniqueCallParts[contactHash]}
-                        style={{
-                            width: 249,
-                            position: 'absolute',
-                            top: i * self.props.contactCardHeight
-                        }}
                     />
                 );
 

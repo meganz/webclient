@@ -26773,8 +26773,6 @@ opacity: 1;
     margin: 36px 12px 0 32px;
     cursor: pointer;
 }
-
-
 .user-management-edit-profile-dialog .dialog-title {
     text-align: left;
 }
@@ -26845,8 +26843,7 @@ opacity: 1;
 }
 
 .user-management-edit-profile-dialog .top-login-warning.edit-email-warning .checkboxOn, 
-.user-management-edit-profile-dialog .top-login-warning.edit-email-warning .checkboxOff,
-{
+.user-management-edit-profile-dialog .top-login-warning.edit-email-warning .checkboxOff {
     background-color: rgba(0,0,0,0);
     border:1px solid rgba(250,250,250,0.4);
     margin:20px 12px 0 0;
@@ -26858,55 +26855,59 @@ opacity: 1;
     margin-left: -250px;
     margin-top: -112px;
 }
-
-
 .user-management-able-user-dialog .icon64{
     position: relative;
     vertical-align: middle;
-    margin: 44px 32px;
+    margin: 40px 32px;
     display: inline-block;
+    vertical-align: top;
 }
-
 .user-management-able-user-dialog .re-enable-large-icon {
     background-position: -117px -1261px;
 }
-
 .user-management-able-user-dialog .disable-large-icon {
     background-position: -4px -98px;
 }
-
 .user-management-dialog .warning-large-icon {
     background-position: -22px -1261px;
 }
-
 .user-management-able-user-dialog .dialog-text-container {
     display: inline-block;
-    width:348px;
+    width:340px;
     position: relative;
-    vertical-align: middle;
+    margin: 40px 0 24px 0;
 }
-
 .user-management-able-user-dialog .dialog-text-container .dialog-text-one {
     font-size: 15px;
     color: #333;
     line-height: 24px;
     margin-bottom: 12px;
 }
-
 .user-management-able-user-dialog .dialog-text-container .dialog-text-one b {
     font-weight: 600;
 }
-
 .user-management-able-user-dialog .dialog-text-container .dialog-text-two {
     font-size: 13px;
     color: #999999;
     line-height: 20px;
 }
-
 .user-management-dialog.user-management-able-user-dialog .dialog-button-container {
     margin-top:0;
 }
-
+.user-management-dialog.user-management-able-user-dialog .bold-warning {
+    height: 20px;
+    width: auto;
+    padding: 0 4px;
+    display: inline-block;
+    font-weight: 600;
+    line-height: 20px;
+    color: white;
+    background: #D90007;
+    border:1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-right: 6px;
+}
 .files-grid-view.user-management-view {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -26918,14 +26919,12 @@ opacity: 1;
     top: -1px;
     overflow: hidden;
 }
-
 .user-management-landing-page{
     position: relative;
     width: 100%;
     height: 100%;
     background-color: #fff;
 }
-
 .user-management-landing-page .landing-page-container{
     width:632px;
     height: 540px;
@@ -26936,7 +26935,6 @@ opacity: 1;
     display: inline-block;
     position: relative;
 }
-
 .user-management-landing-page .mega-56px-icon{
     background-image: url(../images/mega/big-icons.png);
     background-repeat: no-repeat;
@@ -26948,7 +26946,6 @@ opacity: 1;
     margin: 0 16px 32px -28px;
     position: relative;
 }
-
 .user-management-landing-page .landing-title {
     font-size: 24px;
     line-height: 32px;
@@ -26956,7 +26953,6 @@ opacity: 1;
     font-weight: 600;
     text-align: center;
 }
-
 .user-management-landing-page .landing-sub-title {
     font-size:14px;
     line-height: 24px;
@@ -28834,18 +28830,13 @@ opacity: 1;
 .user-management-account-settings .invoice-detail .mega-logo {
     width: 120px;
     height: 39px;
+    display: inline-block;
+    background-image: url(../images/mega/invoice-image_v1.png);
     background-position: 0px 0px;
     background-size: 120px auto;
-    background-image: url(../images/mega/invoice-image_v1.png);
     background-repeat: no-repeat;
     margin:64px auto auto 56px;
 }
-.user-management-account-settings .invoice-detail .mega-logo2 {
-    width: 120px;
-    height: 40px;
-    margin: 64px auto auto 54px;
-}
-
 .user-management-account-settings .invoice-detail .mega-contact-container .inv-subtitle {
     margin:12px auto 8px 102px;
 }
@@ -29129,6 +29120,7 @@ opacity: 1;
 .user-management-account-settings .bus-input.short-input.underline-dropdown-input select{
     background:transparent;
     border:none;
+    outline: none;
     font-size: 14px;
     color: #333333;
     height: 40px;

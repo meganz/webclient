@@ -256,14 +256,22 @@ function blog_archive() {
             }
         }
     }
+    
     var blogarchive = '';
     for (mm in blogmonths) {
         if (blogmonths.hasOwnProperty(mm)) {
             mm = escapeHTML(mm);
-            var y = ' ' + mm.split('_')[0] + ' ';
+            var y = mm.split('_')[0];
+
+            var date = new Date();
+            date.setMonth(mm.split('_')[1]);
+            date.setYear(y);
+            date.setDate(1);
+            date = date.getTime() / 1000;
+
             blogarchive += '<a href="/blog_' + mm + '" class="blog-new-archive-lnk clickurl">'
-                + date_months[parseInt(mm.split('_')[1]) - 1]
-                + y + ' <span class="blog-archive-number">' + escapeHTML(blogmonths[mm]) + '</span></a>';
+                + time2date(date, 3) + '<span class="blog-archive-number">' 
+                + escapeHTML(blogmonths[mm]) + '</span></a>';
         }
     }
     $('#blog_archive').safeHTML(blogarchive);

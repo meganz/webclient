@@ -7,7 +7,8 @@ var remappedLangLocales = {
     "ct": "zh-Hant",
     "kr": "ko",
     "jp": "ja",
-    "tl": "fil"
+    "tl": "fil",
+    "br": "pt"
 };
 
 if (typeof l === 'undefined') {
@@ -57,65 +58,96 @@ function translate(html) {
 
 /**
  * Converts a timestamp to a readable time format - e.g. 2016-04-17 14:37
+ * If user selected use ISO date formate, short date format will using ISO date format.
+ * If user selected country on the setting using it to find locale.
+ * If user did not selected country, assume country with ip address and apply date format.
+ * e.g. US: mm/dd/yyyy, NZ: dd/mm/yyyy, CN: yyyy/mm/dd
  *
  * @param {Number} unixTime  The UNIX timestamp in seconds e.g. 1464829467
  * @param {Number} [format]  The readable time format to return
  * @returns {String}
  *
- * Formats:
- *       0: yyyy-mm-dd hh:mm
- *       1: yyyy-mm-dd
- *       2: dd fmn yyyy (fmn: Full month name, based on the locale)
+ * Formats (examples are ISO date format):
+ *       0: yyyy-mm-dd hh:mm (Short date format with time)
+ *       1: yyyy-mm-dd (Short date format without time)
+ *       2: yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format)
+ *       3: yyyy fmn (fmn: Full month name, based on the locale) (Long Date format without day)
  */
 function time2date(unixTime, format) {
 
-    var result;
     var date = new Date(unixTime * 1000 || 0);
+    var country = 'ISO';
+    var options = {year: 'numeric', month: 'numeric', day: 'numeric'};
+    var result;
 
-    if (format === 2) {
-        result = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+    if (u_attr) {
+        country = u_attr.country ? u_attr.country : u_attr.ipcc || 'ISO';
+    }
+
+    format = format || 0;
+    options.month = format >= 2 ? 'long' : 'numeric';
+
+    if (format === 3) {
+        delete options.day;
+    }
+
+    // if it is short date format and user selected to use ISO format
+    if ((fmconfig.uidateformat || country === 'ISO') && format < 2) {
+        // print time as ISO date format
+        var timeOffset = date.getTimezoneOffset() * 60;
+        var isodate = new Date((unixTime - timeOffset) * 1000);
+        result = isodate.toISOString().split('T')[0];
     }
     else {
-        result = date.getFullYear() + '-'
-            + ('0' + (date.getMonth() + 1)).slice(-2)
-            + '-' + ('0' + date.getDate()).slice(-2);
+        var locales = locale;
+        result = date.toLocaleDateString(locales, options);
+    }
 
-        if (!format) {
-            result += ' ' + date.toTimeString().substr(0, 5);
-        }
+    // using toLocaleTimeString to support old browser.
+    if (!format) {
+        result += " " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
     }
 
     return result;
 }
 
 function acc_time2date(unixtime, yearIsOptional) {
-    var MyDate = new Date(unixtime * 1000);
-    var th = 'th';
-    if ((parseInt(MyDate.getDate()) === 11) || (parseInt(MyDate.getDate()) === 12)) {
-    }
-    else if (('' + MyDate.getDate()).slice(-1) === '1') {
-        th = 'st';
-    }
-    else if (('' + MyDate.getDate()).slice(-1) === '2') {
-        th = 'nd';
-    }
-    else if (('' + MyDate.getDate()).slice(-1) === '3') {
-        th = 'rd';
-    }
-    if (lang !== 'en') {
-        th = ',';
-    }
-    var result = date_months[MyDate.getMonth()] + ' ' + MyDate.getDate();
 
-    if (yearIsOptional === true) {
-        var currYear = (new Date()).getFullYear();
-        if (currYear !== MyDate.getFullYear()) {
-            result += th + ' ' + MyDate.getFullYear();
+    var MyDate = new Date(unixtime * 1000);
+    var country;
+    if (u_attr) {
+        country = u_attr.country ? u_attr.country : u_attr.ipcc;
+    }
+
+    var locales = country ? locale + '-' + country : locale;
+
+    var options = {month: 'long', day: 'numeric'};
+    var currYear = (new Date()).getFullYear();
+    var result;
+
+    if (!yearIsOptional || (yearIsOptional && currYear !== MyDate.getFullYear())) {
+        options.year = 'numeric';
+    }
+
+    if (locale === 'en') {
+        var date = MyDate.getDate();
+        var th = 'th';
+        if ((date.toString()).slice(-1) === '1' && date !== 11) {
+            th = 'st';
         }
+        else if ((date.toString()).slice(-1) === '2' && date !== 12) {
+            th = 'nd';
+        }
+        else if ((date.toString()).slice(-1) === '3' && date !== 13) {
+            th = 'rd';
+        }
+
+        result = MyDate.toLocaleDateString(locales, options).replace(date, date + th);
     }
     else {
-        result += th + ' ' + MyDate.getFullYear();
+        result = MyDate.toLocaleDateString(locales, options);
     }
+
     return result;
 }
 
@@ -627,7 +659,7 @@ mBroadcaster.once('startMega', function populate_l() {
         16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444,
         18268, 18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296,
         18297, 18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812,
-        19813, 19814, 19854, 19821
+        19813, 19814, 19854, 19821, 19930
     ];
     for (i = common.length; i--;) {
         var num = common[i];

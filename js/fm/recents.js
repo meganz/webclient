@@ -801,40 +801,40 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     var $title = $newRow.find(".file-name");
     var $titleString;
 
-    var makeTitle = function (selfStringId, createdByStringId, modifiedByStringId) {
+    var makeTitle = function (selfString, createdByString, modifiedByString) {
         if (isOtherUser) {
             if (isCreated) {
-                $titleString = l[createdByStringId];
+                $titleString = createdByString;
             } else {
-                $titleString = l[modifiedByStringId];
+                $titleString = modifiedByString;
             }
             $titleString = $titleString
                 .replace("%3", '<span class="link action-user-name"></span>')
                 .replace("[A]", '<span class="link title">')
                 .replace("[/A]", '</span>');
         } else {
-            $titleString = '<span class="link title">' + l[selfStringId] + '</span>';
+            $titleString = '<span class="link title">' + selfString + '</span>';
         }
         return $titleString.replace("%1", images).replace("%2", videos);
     };
 
     if (images > 1 && videos > 1) {
-        $titleString = makeTitle(19947, 19945, 19946);
+        $titleString = makeTitle(l[19947], l[19945], l[19946]);
     }
     else if (images > 1 && videos === 1) {
-        $titleString = makeTitle(19948, 19949, 19950);
+        $titleString = makeTitle(l[19948], l[19949], l[19950]);
     }
     else if (images === 1 && videos > 1) {
-        $titleString = makeTitle(19951, 19952, 19953);
+        $titleString = makeTitle(l[19951], l[19952], l[19953]);
     }
     else if (images === 1 && videos === 1) {
-        $titleString = makeTitle(19954, 19955, 19956);
+        $titleString = makeTitle(l[19954], l[19955], l[19956]);
     }
     else if (images > 0) {
-        $titleString = makeTitle(19960, 19961, 19962);
+        $titleString = makeTitle(l[19960], l[19961], l[19962]);
     }
     else if (videos > 0) {
-        $titleString = makeTitle(19957, 19958, 19959);
+        $titleString = makeTitle(l[19957], l[19958], l[19959]);
     }
     $title.safeHTML($titleString);
 

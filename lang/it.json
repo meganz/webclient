@@ -3098,7 +3098,7 @@
     "20021": "In riepilogo",
     "20022": "Per esempio, una backdoor o un virus sul sistema operativo del dispositivo finale dell'utente potenzialmente potrebbe permettere ad un attaccatore di intercettare dati non criptati, battiture dei log o catturare direttamente audio e\/o video dal microfono\/dalla fotocamera del dispositivo.[Br]\u00c8 quindi importante che l'utente non faccia solo affidamento su MEGA, ma che si assicuri anche che il dispositivo finale (sul quale l'utente avvia il software del client di MEGA) sia sicuro.",
     "20023": "Trasparenza e codice sorgente pubblico",
-    "20024": "Per permettere una verifica indipendente del nostro modello di criptazione e affidabilit\u00e0 del servizio, noi pubblichiamo il design e i processi di sicurezza di MEGA su un libro bianco.",
+    "20024": "To enable independent verification of our crypto model and service reliability, we publish MEGA\u2019s design and security processes in a white paper.",
     "20025": "Vedi il Libro bianco",
     "20026": "Noi permettiamo inoltre una verifica indipendente della correttezza e dell'integrit\u00e0 dell'implementazione attuale pubblicando l'intero codice sorgente delle nostre app client.",
     "20027": "Vedi il codice sorgente",

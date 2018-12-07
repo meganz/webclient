@@ -1188,6 +1188,10 @@ accountUI.renderAccountPage = function(account) {
 
         // Please confirm that all your data will be deleted
         var confirmMessage = l[1974];
+        // if this is a master business user, change the message
+        if (u_attr && u_attr.b && u_attr.b.m) {
+            confirmMessage = l[20030];
+        }
 
         // Search through their Pro plan purchase history
         $(account.purchases).each(function(index, purchaseTransaction) {

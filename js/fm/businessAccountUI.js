@@ -1372,7 +1372,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 
             var chartData = [];
             var chartLabels = [];
-            var divider = 1024 * 1024 * 1024;
+            var divider = 1;
             var totalMonthTransfer = 0;
             var randVal;
 
@@ -1389,6 +1389,43 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             }
             // building bars data + total transfer
             else {
+                // let determine the scale.
+                var scaleKB = 1024;
+                var scaleMB = 1024 * scaleKB;
+                var scaleGB = 1024 * scaleMB;
+                var is_KB = false;
+                var is_MB = false;
+                var is_GB = false;
+                for (var ss = 0; ss < availableLabels.length; ss++) {
+                    var consume = res[availableLabels[ss]].tdl;
+                    if (consume > scaleGB) {
+                        is_GB = true;
+                        break;
+                    }
+                    else if (consume > scaleMB) {
+                        is_MB = true;
+                    }
+                    else if (consume > scaleKB) {
+                        is_KB = true;
+                    }
+                }
+                if (is_GB) {
+                    divider = scaleGB;
+                    $businessAccountContainer.find('#barchart-unit').text(l[20031]);
+                }
+                else if (is_MB) {
+                    divider = scaleMB;
+                    $businessAccountContainer.find('#barchart-unit').text(l[20032]);
+                }
+                else if (is_KB) {
+                    divider = scaleKB;
+                    $businessAccountContainer.find('#barchart-unit').text(l[20033]);
+                }
+                else {
+                    divider = 1;
+                    $businessAccountContainer.find('#barchart-unit').text(l[20034]);
+                }
+
                 var lastDayOfThisMonth = getLastDayofTheMonth(targetDate || new Date())
                     .getDate();
                 for (var v = 0; v < lastDayOfThisMonth; v++) {
@@ -1396,7 +1433,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                     chartLabels.push(v + 1);
                 }
                 for (var h = 0; h < availableLabels.length; h++) {
-                    var index = new Number(availableLabels[h].substr(6, 2));
+                    var index = parseInt(availableLabels[h].substr(6, 2), 10);
                     // chartData.push(res[availableLabels[h]].tdl / divider);
                     chartData[index - 1] = res[availableLabels[h]].tdl / divider;
                     totalMonthTransfer += res[availableLabels[h]].tdl;
@@ -1866,6 +1903,11 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
 
 
         for (var k = 0; k < invoicesList.length; k++) {
+            // if the invoice is non buinsess one
+            if (!invoicesList[k].b) {
+                continue;
+            }
+
             var invoiceDate = new Date(invoicesList[k].ts * 1000);
             var $newInvoiceRow = $invoiceRowTemplate.clone(true);
             var invId = invoicesList[k].n;

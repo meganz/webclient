@@ -91,16 +91,25 @@ function time2date(unixTime, format) {
         delete options.day;
     }
 
-    // if it is short date format and user selected to use ISO format
-    if ((fmconfig.uidateformat || country === 'ISO') && format < 2) {
+    var printISO = function _printISO() {
         // print time as ISO date format
         var timeOffset = date.getTimezoneOffset() * 60;
         var isodate = new Date((unixTime - timeOffset) * 1000);
-        result = isodate.toISOString().split('T')[0];
+        return isodate.toISOString().split('T')[0];
+    }
+
+    // if it is short date format and user selected to use ISO format
+    if ((fmconfig.uidateformat || country === 'ISO') && format < 2) {
+        result = printISO();
     }
     else {
         var locales = locale + '-' + country;
-        result = date.toLocaleDateString(locales, options);
+        try {
+            result = date.toLocaleDateString(locales, options);
+        }
+        catch (e) {
+            result = printISO();
+        }
     }
 
     // using toLocaleTimeString to support old browser.
@@ -142,10 +151,20 @@ function acc_time2date(unixtime, yearIsOptional) {
             th = 'rd';
         }
 
-        result = MyDate.toLocaleDateString(locales, options).replace(date, date + th);
+        try {
+            result = MyDate.toLocaleDateString(locales, options).replace(date, date + th);
+        }
+        catch (e) {
+            result = MyDate.toLocaleDateString(locale, options).replace(date, date + th);
+        }
     }
     else {
-        result = MyDate.toLocaleDateString(locales, options);
+        try {
+            result = MyDate.toLocaleDateString(locales, options);
+        }
+        catch (e) {
+            result = MyDate.toLocaleDateString(locale, options);
+        }
     }
 
     return result;

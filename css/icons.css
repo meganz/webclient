@@ -1511,7 +1511,7 @@
     background-position: 1px -1316px;
 }
 
-i.icons-sprite, i.small-icon.icons-sprite 
+i.icons-sprite, i.small-icon.icons-sprite {
     background-image: url(../images/mega/icons-sprite_v23.png);
 }
 .medium-icon.icons-sprite.mega {

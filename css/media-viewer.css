@@ -698,3 +698,26 @@
     transform-origin: top right;
     transform: translateX(-100%) rotate(270deg);
 }
+.security-page-video-block .download.video-block {
+    margin: 0 auto;
+    height: 360px;
+    position: relative;
+    display: block;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.security-page-video-block {
+    max-width: 640px;
+    position: relative;
+    display: block;
+    margin: 48px auto 32px;
+    background-color: #fff;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 0 0;
+    height: 367px;
+    border: 8px solid #fff;
+     -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}

@@ -21,6 +21,15 @@ var bottompage = {
             bottompage.initSlider();
         }
 
+        // Init Video resizing on security page
+        if (page === 'security' && !is_mobile) {
+            bottompage.videoResizing();
+
+            $(window).rebind('resize.security', function (e) {
+                bottompage.videoResizing();
+            });
+        }
+        
         if (!is_mobile) {
             bottompage.initFloatingTop();
             $('body').removeClass('mobile');
@@ -241,6 +250,20 @@ var bottompage = {
 
         if (topBlockHeight - productNavHeight > 0) {
             $topBlock.height(topBlockHeight - productNavHeight);
+        }
+    },
+
+    videoResizing: function() {
+        "use strict";
+
+        var $videoWrapper = $('.security-page-video-block');
+        var videoWidth = $videoWrapper.outerWidth();
+        
+        if ($videoWrapper.length > 0 && videoWidth < 640) {
+            $videoWrapper.height(Math.round(videoWidth * 0.54));
+        }
+        else {
+            $videoWrapper.removeAttr('style');
         }
     }
 };

@@ -510,6 +510,7 @@ function init_page() {
         && (page !== 'takendown')
         && (page !== 'general')
         && (page !== 'resellers')
+        && (page !== 'security')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -1240,6 +1241,10 @@ function init_page() {
     }
     else if (page === 'general') {
         parsepage(pages['general']);
+    }
+    else if (page === 'security') {
+        parsepage(pages['securitypractice']);
+        securityPractice.init();
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
@@ -1994,7 +1999,7 @@ function topmenuUI() {
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
                 'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'start', 'uwp'
+                'sync', 'takedown', 'terms', 'start', 'uwp', 'security'
             ];
             var moveTo = {'account': 'fm/account'};
 

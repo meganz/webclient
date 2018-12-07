@@ -188,8 +188,8 @@ mobile.cloud = {
         var $initialFolderView = $('.mobile.inital-folder-view');
         var $folderSize = $initialFolderView.find('.filesize');
         var $folderName = $initialFolderView.find('.filename');
-        var $openInBrowserButton = $initialFolderView.find('.red-button.first');
-        var $openInAppButton = $initialFolderView.find('.red-button.second');
+        var $openInBrowserButton = $initialFolderView.find('.red-button.second');
+        var $openInAppButton = $initialFolderView.find('.red-button.first');
 
         // Set the flag so it won't show again
         this.initialFolderOverlayShown = true;

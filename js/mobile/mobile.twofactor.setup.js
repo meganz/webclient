@@ -111,13 +111,13 @@ mobile.twofactor.setup = {
 
         var $noAuthAppButton = mobile.twofactor.setup.$page.find('.no-auth-app-button');
         var $authAppSelectDialog = $('.auth-app-select-dialog');
-        var $lightOverlay = $('.light-overlay');
+        var $darkOverlay = $('.dark-overlay');
 
         // On button click/tap
         $noAuthAppButton.off('tap').on('tap', function() {
 
             // Show an overlay behind the Select Authenticator app dialog
-            $lightOverlay.removeClass('hidden');
+            $darkOverlay.removeClass('hidden');
             $authAppSelectDialog.removeClass('hidden');
         });
     },
@@ -131,13 +131,13 @@ mobile.twofactor.setup = {
 
         var $authAppSelectDialog = $('.auth-app-select-dialog');
         var $cancelButton = $authAppSelectDialog.find('.cancel-button');
-        var $lightOverlay = $('.light-overlay');
+        var $darkOverlay = $('.dark-overlay');
 
         // On button click/tap
         $cancelButton.off('tap').on('tap', function() {
 
             // Hide the overlay and Select Authenticator app dialog
-            $lightOverlay.addClass('hidden');
+            $darkOverlay.addClass('hidden');
             $authAppSelectDialog.addClass('hidden');
         });
     },

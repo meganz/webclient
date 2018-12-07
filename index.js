@@ -1429,7 +1429,7 @@ function init_page() {
     // Load the direct voucher redeem page
     else if (page.substr(0, 6) === 'redeem') {
         loadingDialog.show();
-        parsepage(pages['redeem']);
+        parsepage(pages[is_mobile ? 'mobile' : 'redeem']);
         redeem.init();
     }
 

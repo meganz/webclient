@@ -62,7 +62,7 @@ body.pro:after {
     background-image: url(../images/mega/widjet-progress@2x.png);
     background-size: 40px auto;
 }
-.image-explorer-container .image-explorer-scale-slider-wrapper:before, .image-explorer-container .image-explorer-scale-slider-wrapper:after {
+.image-explorer-container .image-explorer-scale-slider-minus, .image-explorer-container .image-explorer-scale-slider-plus {
     background-image: url(../images/mega/avatar-zoom@2x.png);
     background-size: 367px auto;
 }

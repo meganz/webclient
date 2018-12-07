@@ -787,8 +787,10 @@ function avatarDialog(close) {
                         '<div class="image-explorer-drag-delegate"></div>' +
                     '</div>' +
                     '<div class="image-explorer-scale-slider-wrapper">' +
+                        '<div class="image-explorer-scale-slider-minus"></div>' +
                         '<input class="image-explorer-scale-slider disabled" type="range" ' +
                             'min="0" max="100" step="1" value="0" disabled="" />' +
+                        '<div class="image-explorer-scale-slider-plus"></div>' +
                     '</div>' +
                 '</div>' +
                 '<div class="fm-notifications-bottom">' +

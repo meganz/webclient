@@ -20,11 +20,15 @@ mobile.messageOverlay = {
         var $optionalSecondMessage = $overlay.find('.optional-second-message');
         var $fileManagerHolder = $('.mobile .fmholder');
 
+        // Clear old messages
+        $firstMessage.text('');
+        $optionalSecondMessage.text('');
+
         // Set the first message
         $firstMessage.text(firstMessage);
 
         // If there is a second message, set that
-        if (typeof optionalSecondMessage !== 'undefined' && optionalSecondMessage) {
+        if (typeof optionalSecondMessage !== 'undefined' && optionalSecondMessage !== '') {
             $optionalSecondMessage.safeHTML(optionalSecondMessage);
         }
 
@@ -81,7 +85,16 @@ mobile.messageOverlay = {
 
         'use strict';
 
-        var $closeButton = $overlay.find('.fm-dialog-close, .text-button');
+        var $closeButton = $overlay.find('.fm-dialog-close, .text-button.cancel');
+
+        // If the close button is needed, unhide the button
+        if (typeof optionalFailureCallback === 'function') {
+            $closeButton.removeClass('hidden');
+        }
+        else {
+            // Otherwise set to dummy function
+            optionalFailureCallback = function() {};
+        }
 
         // Add tap handler
         $closeButton.off('tap').on('tap', function() {
@@ -90,10 +103,8 @@ mobile.messageOverlay = {
             $overlay.addClass('hidden');
             $fileManagerHolder.removeClass('no-scroll');
 
-            // Run the failure callback if requested
-            if (typeof optionalFailureCallback === 'function') {
-                optionalFailureCallback();
-            }
+            // Run the callback
+            optionalFailureCallback();
 
             return false;
         });

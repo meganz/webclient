@@ -1,6 +1,7 @@
 /**
  * Code for the direct voucher redeem dialog when users come from
- * a direct link e.g. https://mega.nz/#voucher8RNU1PYPYDQWBE04J67F
+ * a direct link e.g. https://mega.nz/#voucher8RNU1PYPYDQWBE04J67F.
+ * This code is shared for desktop and mobile webclient.
  */
 var redeem = {
 
@@ -23,19 +24,47 @@ var redeem = {
         redeem.$backgroundOverlay = $('.fm-dialog-overlay');
         redeem.$successOverlay = $('.payment-result.success');
 
-        // confirm with the user, that this is right account to redeem the code.
-        var rdmConfirmMsg = l[19328].replace('%1', escapeHTML(u_attr.email));
-        msgDialog('confirmation', l[458], rdmConfirmMsg, '', function(e) {
-            if (e) {
-                // Init functions
-                redeem.addVoucher();
-            }
-            else {
-                delete localStorage.voucher;
-                redeem.hideBackgroundOverlay();
-                loadSubPage('contact');
-            }
-        });
+        // Init functionality
+        redeem.showConfirmAccountDialog();
+    },
+
+    /**
+     * Show a dialog to confirm whether they have the right account for redeeming the voucher
+     */
+    showConfirmAccountDialog: function() {
+
+        'use strict';
+
+        // Are you sure you want to redeem this voucher for the email@domain.com account?
+        var redeemConfirmMessage = l[19328].replace('%1', u_attr.email);
+
+        // OK button callback to redeem the voucher, choose plan etc
+        var okCallback = function() {
+            redeem.addVoucher();
+        };
+
+        // Cancel button callback to go back to their Cloud drive
+        var cancelCallback = function() {
+            delete localStorage.voucher;
+            redeem.hideBackgroundOverlay();
+            loadSubPage('fm');
+        };
+
+        // Confirm with the user, that this is right account to redeem the code
+        if (is_mobile) {
+            mobile.messageOverlay.show(l[458], redeemConfirmMessage, okCallback, cancelCallback);
+        }
+        else {
+            // If confirmed, redeem the voucher and display the balance etc
+            msgDialog('confirmation', l[458], redeemConfirmMessage, '', function(event) {
+                if (event) {
+                    successCallback();
+                }
+                else {
+                    cancelCallback();
+                }
+            });
+        }
     },
 
     /**
@@ -45,6 +74,11 @@ var redeem = {
 
         // Get the voucher code
         redeem.voucherCode = localStorage.getItem('voucher');
+
+        /* TESTING CODE to prevent actually redeeming a voucher
+        redeem.getVoucherValue();
+        return false;
+        //*/
 
         // No longer needed in localStorage
         localStorage.removeItem('voucher');
@@ -131,7 +165,6 @@ var redeem = {
 
         // This call will return an array of arrays. Each array contains this data:
         // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
-
         api_req({ a : 'utqa', nf: 1 }, {
             callback: function (result) {
 
@@ -286,8 +319,11 @@ var redeem = {
      */
     initCloseButton: function() {
 
-        redeem.$dialog.find('.payment-close-icon, .choose-plan-button').rebind('click', function() {
-            // Hide the dialog
+        'use strict';
+
+        redeem.$dialog.find('.payment-close-icon, .choose-plan-button, .fm-dialog-close').rebind('click', function() {
+
+            // Hide the dialog and load the Pro page step 1
             redeem.hideBackgroundOverlay();
             redeem.$dialog.addClass('hidden');
             loadSubPage('pro');
@@ -398,7 +434,9 @@ var redeem = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            loadSubPage('fm/account/history');
+
+            // On mobile just load the main account page as there is no payment history yet
+            loadSubPage(is_mobile ? 'fm/account' : 'fm/account/history');
             return false;
         });
     },

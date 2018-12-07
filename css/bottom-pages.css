@@ -29,6 +29,145 @@
     font-weight: normal;
     font-style: normal;
 }
+/* Old bottom pages stylinng */
+.copyrights-dispute-bottom {
+    background-color: #FAFAFA;
+    margin-top: 24px;
+    padding: 20px;
+}
+#copyrights-dispute-bottom2 {
+    margin-top: 8px;
+}
+.main-mid-pad.new-bottom-pages.copyrights-dispute-bottom {
+    padding: 48px 15px 46px 15px;
+}
+.copyrights-dispute-bottom .new-registration-checkbox .checkboxOn, .copyrights-dispute-bottom .new-registration-checkbox .checkboxOff {
+    margin: 2px 0 0 0;
+}
+.copyrights-dispute-bottom .new-registration-checkbox .radio-txt {
+    margin: -1px 0 0 35px;
+    padding: 0 0 0 0;
+    float: none;
+    text-indent: 0;
+    display: block;
+    line-height: 24px;
+}
+.copyrights-agent-section {
+    width: 980px;
+    margin: 0 auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 20px 10px 20px;
+}
+.new-bottom-pages h1, .bp-main h1 {
+    font-size: 21px;
+    line-height: 31px;
+    font-family: 'source_sans_prosemibold', Arial;
+    margin: 0;
+    padding: 25px 0 0 0;
+    font-weight: normal;
+    color: #333333;
+}
+.new-bottom-pages h2, .bp-main h2 {
+    color: #666666;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: -0.1px;
+    font-family: 'Open Sans Semibold Italic', Arial;
+    padding: 22px 0 0 0;
+    margin: 0;
+    font-weight: normal;
+}
+.new-bottom-pages p, .new-bottom-pages p span.text, .bp-main p {
+    color: #333333;
+    font-size: 14px;
+    line-height: 26px;
+    margin: 0;
+    padding: 25px 0 0 0;
+}
+.new-bottom-pages p span.text {
+    display: block;
+    padding: 0 0 0 34px;
+    color: #666666;
+}
+.new-bottom-pages h2 span.text {
+    display: block;
+    padding: 0 0 0 34px;
+}
+.bottom-page-txt-pad {
+    padding: 0 0 0 34px;
+}
+.new-bottom-pages p.list span.text, .new-bottom-pages h2.list span.text {
+    padding: 0 0 0 75px;
+}
+.new-bottom-pages p.sub-list span.text, .new-bottom-pages h2.sub-list span.text {
+    padding: 0 0 0 125px;
+}
+.new-bottom-pages p span.number, .new-bottom-pages h2 span.number {
+    padding: 0;
+    height: 24px;
+    width: 24px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 2px solid #b2b2b2;
+    color: #999999;
+    text-align: center;
+    font-family: 'source_sans_prosemibold', Arial;
+    font-size: 13px;
+    line-height: 20px;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    border-radius: 100%;
+    float: left;
+    margin: 2px 0 0 0;
+}
+.new-bottom-pages p.list span.number, .new-bottom-pages p.sub-list span.number, .new-bottom-pages h2.list span.number, .new-bottom-pages h2.sub-list span.number {
+    margin: 2px 0 0 30px;
+    width: auto;
+    padding: 0 5px 0 4px;
+    background-color: #b2b2b2;
+    color: white;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+}
+.new-bottom-pages p.sub-list span.number, .new-bottom-pages h2.sub-list span.number {
+    margin: 2px 0 0 70px;
+}
+.new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a, .new-bottom-page li a, .new-bottom-pages li a, .download.error-text a, .bottom-pages-dialog a {
+    color: #F0373B;
+}
+.new-bottom-pages h2 span.number, .new-bottom-pages h2.list span.number, .new-bottom-pages h2.sub-list span.number {
+    margin: 0 10px 0 0;
+}
+.new-bottom-pages h2.list span.text {
+    padding: 0 0 0 44px;
+}
+.new-bottom-pages h2.sub-list span.text {
+    padding: 0 0 0 57px;
+}
+.new-bottom-pages {
+    padding: 46px 15px 73px 15px;
+}
+.new-bottom-pages ul {
+    padding-left: 15px;
+}
+.new-bottom-pages ul li {
+    color: #333333;
+    font-size: 14px;
+    line-height: 26px;
+    padding-left: 3px;
+}
+.new-bottom-pages hr, .bottom-pages-dialog .bp-main hr {
+    height: 1px;
+    background-color: #e5e5e5;
+    margin: 28px -20px 6px -20px;
+    padding: 0;
+    border: 0;
+}
+/* end of Old bottom pages stylinng */
 
 /* Bottom pages common styles*/
 .red {
@@ -607,6 +746,22 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
 .bottom-page.cell-60 {
     width: 60%;
 }
+.bottom-page.left-cell-35 {
+    width: 35%;
+    vertical-align: middle;
+}
+.bottom-page.left-cell-65 {
+    width: 65%;
+    vertical-align: middle;
+}
+.bottom-page.right-cell-35 {
+    width: 35%;
+    vertical-align: middle;
+}
+.bottom-page.right-cell-65 {
+    width: 65%;
+    vertical-align: middle; 
+}
 .bottom-page.cell-40 .half-sized-cell {
     max-width: 388px;
 }
@@ -793,7 +948,37 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     max-width: 1194px;
     padding: 0 40px;
 }
-
+.video-info-block {
+    display: block;
+    width: calc(100% - 36px);
+    text-align: center;
+    margin: 20px auto 12px;
+}
+.video-info-block span.video-duration-badge {
+    background: #00BFA5;
+    padding: 2px 6px;
+    font-size: 14px;
+    color: #fff;
+    border-radius: 4px;
+    position: relative;
+    margin: 0 8px 0 0;
+    vertical-align: middle;
+}
+.video-info-block span.play-video-encouragement {
+    font-size: 14px;
+    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
+    color: #818993;
+    line-height: 1.5;
+    vertical-align: middle;
+}
+iframe.security-video-container {
+    height: calc(100% * 1.3);
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+}
 /* end of Bottom pages common styles*/
 
 
@@ -1406,7 +1591,6 @@ height: 56px;
     font-size: 24px;
     line-height: 36px;
     font-family: 'LatoWebBlack';
-    letter-spacing: 1.56px;
     padding: 0 0 0 0;
     color: #333333;
     background-position: 0 0;
@@ -1454,6 +1638,13 @@ height: 56px;
 }
 .cropped-page.uwp .bottom-page.top-title::before {
     background-position: -0px -2628px;
+}
+.securitypractice .bottom-page.top-title {
+    padding-top: 88px;
+    padding-bottom: 32px;
+}
+.securitypractice .bottom-page.top-title span {
+    margin-bottom: 0;
 }
 .bottom-page.top-title span {
     display: inline-block;
@@ -2189,7 +2380,9 @@ height: 56px;
     margin-top: -5px;
 }
 .mobile .bottom-page.top-title {
-    line-height: 49px;
+    line-height: 1.5;
+    padding-top: 48px;
+    padding-bottom: 36px;
 }
 .bottom-page.top-dark-info.big, .linux .bottom-page.top-dark-info.big {
     font-size: 24px;
@@ -3047,6 +3240,265 @@ height: 56px;
 .mobileapp .bottom-page.big-icon {
     margin: 0 auto 16px;
 }
+.securitypractice .business-info-block {
+    max-width: 620px;
+    text-align: left;
+    padding: 0 20px
+}
+.bottom-page .security-illustration {
+    background-image: url(../images/mega/bottom-page/security-page-v1.png);
+    width: 375px;
+    height: 249px;
+    background-size: 750px auto;
+    margin-left: -187px;
+    position: relative;
+    left: 50%;
+    display: block;
+}
+.bottom-page .security-illustration.root-password {
+    background-position: 0 0;
+}
+.bottom-page .security-illustration.create-password {
+    background-position: -375px 0;
+}
+.bottom-page .security-illustration.store-password {
+    background-position: 0 -259px;
+}
+.bottom-page .security-illustration.backup-password {
+    background-position: -375px -259px;
+}
+.bottom-page .security-illustration.twofactor {
+    background-position: 0px -498px;
+}
+.bottom-page .security-illustration.twofactor {
+    background-position: 0px -498px;
+}
+.bottom-page .security-illustration.device-encrypt {
+    background-position: -375px -498px;
+}
+.bottom-page .security-illustration.endpoint-security {
+    background-position: 0 -747px;
+}
+.bottom-page .security-illustration.transparency-opensource {
+    background-position: -375px -747px;
+}
+.bottom-page .security-illustration.exclamation-triangle {
+    background-position: -392px -1016px;
+    width: 34px;
+    height: 34px;
+    display: inline-block;
+}
+.bottom-page.min-height-400 {
+    min-height: 400px;
+}
+.bottom-page.auth-app-select-tooltip, .bottom-page.password-manager-app-select  {
+    background-color: #fff;
+    border: 1px solid #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 0 0 rgba(0,0,0,0);
+    margin: 12px 0 0 0;
+    position: relative;
+    width: 100%;
+}
+.bottom-page.auth-app-select-tooltip .app-link, .bottom-page.password-manager-app-select .app-link {
+    cursor: pointer;
+    display: inline-block;
+    border-radius: 4px;
+    margin: 8px 0 0 0;
+    position: relative;
+    width: calc((100% - 12px) / 2);
+    background-image: linear-gradient(-180deg, #FFFFFF 0%, #FCFCFC 100%);
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 0 rgba(0,0,0,0.05);
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.bottom-page.auth-app-select-tooltip .app-link:hover {
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+    -webkit-transition: all 100ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.bottom-page.auth-app-select-tooltip .app-link:nth-of-type(odd) {
+    margin-right: 8px;
+}
+.bottom-page.password-manager-app-select .app-link-icon {
+    background: url(../images/mega/bottom-page/security-page-v1.png);
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 32px;
+    position: absolute;
+    left: 14px;
+    top: 12px;
+    width: 32px;
+}
+.bottom-page.password-manager-app-select .onepassword .app-link-icon {
+    background-position: -9px -1016px;
+}
+.bottom-page.password-manager-app-select .keepass .app-link-icon {
+    background-position: -57px -1016px;
+}
+.bottom-page.password-manager-app-select .lastpass .app-link-icon {
+    background-position: -102px -1016px;
+    width: 88px;
+}
+.auth-app-select-tooltip .lastpass .app-link-text {
+    margin-left: 124px;
+}
+.securitypractice .bottom-page.top-title::before {
+    display: none;
+}
+.securitypractice .bottom-page.large-subheader {
+    margin-top: 32px;
+}
+.bottom-page.business-text.password-warning {
+    margin-top: 24px;
+    display: table;
+}
+.bottom-page.business-text.password-warning span {
+    display: table-cell;
+    padding: 0 4px;
+    font-family: 'LatoWebBold';
+    vertical-align: middle;
+    position: static;
+}
+.securitypractice .business-text a.red:hover {
+    text-decoration: underline;
+}
+.securitypractice .improved-recovery-steps h5.main-italic-header  {
+    max-width: 100%;
+}
+.securitypractice .improved-recovery-steps .recover-paste-block .right-section > div {
+    margin-right: 0;
+}
+.securitypractice .auth-app-select-tooltip .app-link-arrow {
+    top: 21px
+}
+.securitypractice .improved-recovery-steps .recover-paste-block .right-section {
+    width: 49.5%;
+}
+
+/* Open source page */
+.main-mid-pad.opensource {
+    padding: 76px 15px 73px 15px;
+}
+.opensource-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+.opensource-bg::after {
+    background-color: white;
+    width: 1024px;
+    height: inherit;
+    margin: 0 auto;
+    content: '';
+    display: block;
+}
+.opensource-top-icon {
+    background-image: url("../images/mega/opensource-v3.png");
+    background-position: -30px 1px;
+    background-repeat: no-repeat;
+    float: left;
+    height: 46px;
+    margin-left: -1px;
+    width: 44px;
+}
+.opensource hr {
+    background-color: rgba(151, 151, 151, 0.2);
+    border: 0 none;
+    float: left;
+    height: 17px;
+    margin: 12px 0 0 15px;
+    padding: 0;
+    width: 1px;
+}
+.opensource h1 {
+    color: rgba(34,34,34,0.75);
+    font-size: 28px;
+    line-height: 40px;
+    font-family: 'source_sans_prosemibold';
+    padding: 0;
+    margin: 0 0 4px 15px;
+    float: left;
+}
+.opensource > p {
+    letter-spacing: 0.2px;
+}
+.opensource-grey-background {
+    background-color: #fafafa;
+}
+.opensource-icons-bl {
+    margin: 0 auto;
+    padding: 51px 0 73px 0;
+}
+.opensource-icon-pad {
+    float: left;
+    padding: 22px 0;
+    text-align: center;
+    width: 33%;
+}
+.opensource-icon {
+    display: block;
+    width: 102px;
+    height: 102px;
+    background-image: url(../images/mega/opensource-v3.png);
+    background-repeat: no-repeat;
+    background-position: center -109px;
+    margin: 0 auto;
+}
+.opensource-icon.webclient {
+    background-position: center -109px;
+}
+.opensource-icon.firefox {
+    background-position: center -249px;
+}
+.opensource-icon.chrome {
+    background-position: center -389px;
+}
+.opensource-icon.thunderbird {
+    background-position: center -1229px;
+}
+.opensource-icon.sdk {
+    background-position: center -809px;
+}
+.opensource-icon.megasync {
+    background-position: center -529px;
+}
+.opensource-icon.android {
+    background-position: center -669px;
+}
+.opensource-icon.ios {
+    background-position: center -950px;
+}
+.opensource-icon.windowsphone {
+    background-position: center -1090px;
+}
+.opensource-icon.coming-soon {
+    cursor: default;
+    opacity: 0.5;
+}
+a.opensource-icon-txt {
+    display: inline-block;
+    color: #444444;
+    font-family: 'source_sans_prosemibold';
+    padding: 20px 0 0 0;
+}
+a.opensource-icon-txt.coming-soon {
+    cursor: default;
+}
+.opensource-icon-txt > span {
+    color: #777;
+}
+/*  end of Open source */
+
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow, .bottom-page.top-title::before, .pages-nav.nav-icon.bott-sprite, .bottom-page.mid-icon, .bottom-page.cols-container .col3::before, .bottom-page.tab-lnk-icon, .cmd-top-img, .bottom-page.scroll-icon, .bottom-page.dark-button, .bottom-page.big-link i, .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite {
     background-image: url(../images/mega/pages-sprite_v4@2x.png) !important;
@@ -3055,6 +3507,10 @@ height: 56px;
 .browsers.icon {
     background-image: url(../images/mega/extensions-sprite-v2@2x.png) !important;
     background-size: 308px auto;
+}
+.bottom-page .security-illustration, .bottom-page.password-manager-app-select .app-link-icon {
+    background-image: url(../images/mega/bottom-page/security-page-v1@2x.png);    
+    background-size: 750px auto;
 }
 }
 .mobile .default-huge-button.inline, .mobile .megaapp-button-info {
@@ -3104,6 +3560,20 @@ height: 56px;
 }
 .dark-blue-bg .bottom-page.dark-button {
     margin: 0;
+}
+.securitypractice .right-cell-65, .securitypractice .right-cell-35, .securitypractice .left-cell-65, .securitypractice .left-cell-35{
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+}
+.securitypractice .business-info-block {
+    max-width: 720px;
+}
+.securitypractice .right-cell-35.order1 {
+    display: none;
+}
+.securitypractice .bottom-page.table.changed-order .right-cell-35.order2 {
+    display: block;
 }
 }
 
@@ -3372,6 +3842,32 @@ height: 56px;
 .pages-nav.nav-button.other {
     display: inline-block;
 }
+.bottom-page.auth-app-select-tooltip .app-link:nth-of-type(odd) {
+    margin-right: auto;
+}
+.bottom-page.auth-app-select-tooltip .app-link, .bottom-page.password-manager-app-select .app-link {
+    width: 100%;
+    max-width: 360px;
+    margin: 12px auto;
+    display: block;
+}
+.securitypractice .improved-recovery-steps .recover-paste-block .left-section {
+    width:  100%;
+    display: block;
+}
+.securitypractice .improved-recovery-steps .recover-paste-block .right-section {
+    width:  100%;
+    display: block;
+}
+.recover-paste-block .default-white-button, .recover-paste-block .default-green-button {
+      margin-top: 20px;
+}
+.improved-recovery-steps .recovery-key.account.input-wrapper.input-key {
+    width: 100%;
+}
+.improved-recovery-steps .recovery-key.account.input-wrapper input {
+    padding: 0 32px 0 0;
+}
 }
 
 @media only screen and (max-width: 590px)  {
@@ -3401,13 +3897,18 @@ body:not(.en) .pages-nav.content-block .nav-button {
     width: 100%;
     margin: 0 0 0 0;
 }
-uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .bottom-page.top-dark-info.medium, .megacmd .bottom-page.top-dark-info.medium, .megasync .bottom-page.big-header, .bottom-page.top-dark-info.medium {
+.uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .bottom-page.top-dark-info.medium, .megacmd .bottom-page.top-dark-info.medium, .megasync .bottom-page.big-header, .bottom-page.top-dark-info.medium {
     font-size: 26px;
     line-height: 40px;
 }
 .bottom-page.large-header {
     font-size: 30px;
     line-height: 42px;
+}
+.securitypractice .bottom-page.large-subheader {
+    font-size: 16px;
+    margin-top: 16px;
+    line-height: 24px;
 }
 }
 
@@ -3553,6 +4054,25 @@ uwp .bottom-page.top-dark-info.medium, .uwp .bottom-page.big-header, .megasync .
 }
 .sync-4 .bottom-page.right-cell, .sync-4 .bottom-page.left-cell {
     width: 100%;
+}
+.opensource hr {
+    display:  none;
+}
+.opensource-header {
+    text-align: center;
+}
+.opensource-top-icon, .opensource h1 {
+    display: block;
+    font-size: 21px;
+    float: none;
+    margin: 0 auto;
+}
+.opensource-icon-pad {
+    width: 50%;
+}
+.opensource-icons-bl {
+    margin: 0 auto;
+    padding: 51px 15px 73px 15px;
 }
 }
 @media only screen and (max-width: 495px) {

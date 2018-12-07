@@ -1153,13 +1153,24 @@ ul, li {
 .mobile.fm-icon.dropdown-handle {
     background-position: -212px -2062px;
     margin: 11px 6px 0 6px;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
     transform: rotate(0deg);
-    transition: transform 100ms linear;
+    -webkit-transition: transform 100ms linear;
+    -moz-transition: transform 100ms linear;
+    -o-transition: transform 100ms linear;
+    -ms-transition: transform 100ms linear;
+    transition:transform 100ms linear;
 }
 .mobile.fm-icon.dropdown-handle.open {
     background-position: -212px -2065px;
+   -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
     transform: rotate(180deg);
-    transition: transform 100ms linear;
 }
 .mobile.fm-icon.rubbish-bin {
     background-position: 0px -1828px;
@@ -1193,6 +1204,10 @@ ul, li {
     font-size: 22px;
     line-height: 19px;
     color: #fff;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
     transform: rotate(45deg);
 }
 .mobile.content-cell .mobile.menu.dl-page, .mobile#mobile-ui-notFound .menu, .mobile.error-overlay .menu  {
@@ -1694,6 +1709,10 @@ ul, li {
     border-radius: 73px;
     height: 146px;
     margin-bottom: 0;
+    -webkit-transform: scale(0.75);
+    -moz-transform: scale(0.75);
+    -ms-transform: scale(0.75);
+    -o-transform: scale(0.75);
     transform: scale(0.75);
 }
 .mobile.empty-icon.over-storage-quota {
@@ -4246,6 +4265,10 @@ div.checkboxOn, div.checkboxOff {
     display: none;
 }
 .exceeded.pro .chart.progressbars span {
+    -webkit-transform: rotate(180deg) !important;
+    -moz-transform: rotate(180deg) !important;
+    -ms-transform: rotate(180deg) !important;
+    -o-transform: rotate(180deg) !important;
     transform: rotate(180deg) !important;
 }
 .exceeded.pro .chart.progressbars span::before {
@@ -4732,6 +4755,10 @@ div.checkboxOn, div.checkboxOff {
     margin-top: 15px;
     margin-right: 5px;
     background-position: -82px -1143px;
+    -webkit-transform: scale(0.8, 0.8);
+    -moz-transform: scale(0.8, 0.8);
+    -ms-transform:scale(0.8, 0.8);
+    -o-transform: scale(0.8, 0.8);
     transform: scale(0.8, 0.8);
 }
 /* Title DropDown Menu */
@@ -5227,6 +5254,10 @@ select.mobile.dropdown-style {
     background-position: -110px -1972px;
     background-image: url(../images/mobile/mobile-sprite_v18.png);
     background-repeat: no-repeat;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
     transform: rotate(90deg);
     pointer-events: none;
 }
@@ -5260,6 +5291,17 @@ select.mobile.dropdown-style {
     opacity: 0.3;
     border-radius: 3px;
     cursor: pointer;
+    max-width: 320px;
+}
+.securitypractice .mobile.cta-button {
+    margin: 0 auto;
+    line-height: 1.5;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    height: auto;
+}
+.securitypractice .mobile.cta-button span{
+    white-space: normal;
 }
 .mobile.support-text-field {
     height: 200px;
@@ -5378,6 +5420,10 @@ textarea.mobile.support-text-field {
     position: absolute;
     top: 50%;
     left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
 }
 .mobile.fm-item-links {
@@ -7651,7 +7697,10 @@ body.key .reg-st3-membership-bl.free.hidden {
     background-repeat: no-repeat;
     background-position: -204px -196px;
     background-size: 262px auto;
-    -webkit-transform: scaleX(-1);
+   -webkit-transform: scaleX(-1);
+    -moz-transform: scaleX(-1);
+    -ms-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
     transform: scaleX(-1);
     margin: 4px 8px  0 -30px;
     display: none;
@@ -8095,6 +8144,15 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     right: 0;
     z-index: 2000;
 }
+.mobile.bottom-page.auth-app-select-dialog {
+    background-color: #fff;
+    border: 1px solid #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 0 0 rgba(0,0,0,0);
+    margin: 12px 0 0 0;
+    position: relative;
+    width: 100%;
+}
 .mobile.auth-app-select-dialog .explanation {
     color: #262f3b;
     font-size: 14px;
@@ -8112,7 +8170,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     height: 32px;
     position: absolute;
     left: 14px;
-    top: 10px;
+    top: 12px;
     width: 32px;
 }
 .mobile.auth-app-select-dialog .authy .app-link-icon {
@@ -8127,14 +8185,14 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .mobile.auth-app-select-dialog .microsoftauthenticator .app-link-icon {
     background-position: -38px -38px;
 }
-.mobile.auth-app-select-dialog .app-link-text {
+.mobile.auth-app-select-dialog .app-link-text,  {
     color: #676d75;
     display: block;
     font-size: 15px;
     line-height: 51px;
     margin-left: 64px;
 }
-.mobile.auth-app-select-dialog .app-link-arrow {
+.mobile.auth-app-select-dialog .app-link-arrow  {
     background-image: url(../images/mega/2fa-auth-apps.png);
     background-position: -14px -77px;
     background-repeat: no-repeat;
@@ -8144,6 +8202,31 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     right: 25px;
     position: absolute;
     top: 19px;
+    width: 8px;
+}
+.mobile .bottom-page.auth-app-select-tooltip .app-link-text {
+    color: #4C5251;
+    display: block;
+    font-size: 14px;
+    line-height: 56px;
+    margin-left: 64px;
+    font-family: 'LatoWeb';
+    font-weight: 500;
+    letter-spacing: .2px;
+}
+.bottom-page.auth-app-select-tooltip .lastpass .app-link-text {
+    margin-left: 122px;
+}
+.bottom-page.auth-app-select-tooltip .app-link-arrow {
+    background-image: url(../images/mega/2fa-auth-apps.png);
+    background-position: -14px -77px;
+    background-repeat: no-repeat;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
+    height: 14px;
+    right: 18px;
+    position: absolute;
+    top: 22px;
     width: 8px;
 }
 .mobile.auth-app-select-dialog .separator-line {
@@ -8175,11 +8258,59 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     line-height: 51px;
     margin-left: 64px;
 }
-
+.business-info-block.improved-recovery-steps .recover-paste-block {
+    display: none;
+}
+.business-info-block.improved-recovery-steps {
+    background-color: transparent;
+}
+.business-info-block.improved-recovery-steps .mobile.business-text.recovery-key-info {
+    display: block;
+}
 .contact-directory {
     display: none;
 }
-
+.security-page-video-block .download.video-block {
+    margin: 0 auto;
+    height: 360px;
+    position: relative;
+    display: block;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.security-page-video-block {
+    width: 100%;
+    max-width: 640px;
+    position: relative;
+    display: block;
+    margin: 48px auto 32px;
+    background-color: #fff;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 0 0;
+    height: 360px;
+    border: 8px solid #fff;
+}
+.securitypractice .security-page-video-block {
+        margin-top: 24px;
+        position: relative;
+        padding-top: 47.5%;
+        border: 8px solid #fff;
+        height: initial;
+    }
+ .bottom-page.scroll-block.securitypractice {
+    min-width: initial;
+}
+@media only screen and (max-width: 970px) {
+    .securitypractice .security-page-video-block {
+        max-width: 640px;
+        width: calc(100% - 64px);
+        min-width: 272px;
+    }
+    .security-page-video-block .download.video-block {
+        height: auto;
+    }
+}
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
     .wrong-file .mobile.content-row, .downloading .mobile.content-row, .uploading .mobile.content-row {
@@ -8262,6 +8393,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile.video .download.video-block {
         height: 236px;
     }
+    .security-page-video-block.mobile.video .download.video-block {
+        height: auto;
+    }
     .slideshow-image-previewer .mobile.video .download.video-block {
         height: fit-content;
     }
@@ -8270,6 +8404,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 @media only screen and (orientation:portrait) and (max-height: 1280px) {
     .mobile.video .download.video-block {
         height: 200px;
+    }
+    .security-page-video-block.mobile.video .download.video-block {
+        height: auto;
     }
     .slideshow-image-previewer .mobile.video .download.video-block {
         height: fit-content;
@@ -8368,6 +8505,10 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         font-family: 'Lato-Regular', 'source_sans_proregular',;
         font-size: 14px;
     }
+    .securitypractice .bottom-page.top-title {
+        padding-top: 32px;
+        padding-bottom: 48px;
+    }
 }
 @media only screen and (orientation:landscape) and (max-width: 800px), only screen and (orientation:portrait) and (max-height: 800px) {
     .mobile.homepage .company-slogan {
@@ -8464,6 +8605,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile.video .download.video-block {
         height: 194px;
     }
+    .security-page-video-block.mobile.video .download.video-block {
+        height: auto;
+    }
     .slideshow-image-previewer .mobile.video .download.video-block {
         height: fit-content;
     }
@@ -8512,6 +8656,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     }
     .mobile.video .download.video-block {
         height: 176px;
+    }
+    .security-page-video-block.mobile.video .download.video-block {
+        height: auto;
     }
     .mobile.filesize, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.upload-percents {
         margin: 3px 0 0 0;
@@ -8680,6 +8827,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile.fm-dialog.park-account-dialog .checkbox-container .settings-row div.checkboxOff, .mobile.fm-dialog.park-account-dialog .checkbox-container .settings-row div.checkboxOn {
         margin: 8px 14px 16px 14px;
     }
+    .video-info-block span.play-video-encouragement {
+        text-align: left;
+    }
 
 }
 
@@ -8726,6 +8876,21 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         right: 24px;
         top: 3px;
     }
+    .mobile .bottom-page .security-illustration {
+        -webkit-transform: scale(0.75);
+        -moz-transform: scale(0.75);
+        -ms-transform: scale(0.75);
+        -o-transform: scale(0.75);
+        transform: scale(0.75);
+    }
+    .securitypractice .business-info-block {
+        padding: 0 0;
+    }
+    .bottom-page.business-text {
+        font-size: 15px;
+        line-height: 26px;
+        text-align: center;
+    } 
 }
 
 /* Adjust the layout of the My Account page for longer screens to push buttons into acceptable range */
@@ -8818,6 +8983,13 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile.grid-view .file .fm-item-img {
         height: 164px;
     }
+    .mobile .bottom-page .security-illustration {
+        -webkit-transform: scale(0.75);
+        -moz-transform: scale(0.75);
+        -ms-transform: scale(0.75);
+        -o-transform: scale(0.75);
+        transform: scale(0.75);
+} 
 }
 /* Devices larger than 400px wide in portrait */
 @media only screen and (orientation:landscape)and (min-width: 412px) and (max-width: 415px), only screen and (orientation:portrait) and (min-height: 810px) and (max-height: 824px) {
@@ -8833,8 +9005,36 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile.video .download.video-block {
         height: 150px;
     }
+        .security-page-video-block .mobile.video .download.video-block {
+        height: auto;
+    }
     .mobile.grid-view .file .fm-item-img {
         height: 132px;
+    }
+    .mobile .bottom-page .security-illustration {
+        -webkit-transform: scale(0.75);
+        -moz-transform: scale(0.75);
+        -ms-transform: scale(0.75);
+        -o-transform: scale(0.75);
+        transform: scale(0.75);
+    }
+    .securitypractice .business-info-block {
+        padding: 0 0;
+    }
+    .bottom-page.horizontal-centered-bl.wide {
+        padding: 0 32px;
+    }
+    .top-blue-bg .bottom-page.angle-bg {
+        top: 10px;
+    }
+    .mobile .bottom-page.top-title {
+        padding-top: 40px;
+        padding-bottom: 20px;
+        line-height: 1.5;
+    }
+    .securitypractice .bottom-page.large-subheader {
+        margin-top: 12px;
+    }
     }
 }
 /*iphone se landscape styles */
@@ -8864,9 +9064,13 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 }
 
 /* Large tablets Portrait styles go here */
-@media only screen and (orientation:landscape) and (min-width:900px) and (max-width: 1025px), only screen and (orientation:portrait) and (min-height: 1281px) and (max-height: 1366px) {
+@media only screen and (orientation:landscape) and (min-width:900px) and (max-width: 1025px), only screen and (orientation:portrait) and (min-height: 1281px) and (max-height: 1367px) {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 72px) / 5);
+    }
+    .securitypractice .security-page-video-block {
+        padding-top: 0;
+        height: 360px;
     }
 }
 /* For screens with larger width than 400px e.g. iPhone 7S etc make the Pro page step 2 items show on the same line */

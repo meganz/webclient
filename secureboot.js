@@ -2329,7 +2329,9 @@ else if (!b_u) {
         'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
         'megadrop': {f:'html/megadrop.html', n: 'megadrop', j: 0 },
         'nomegadrop': {f:'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
-        'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j: 1 }
+        'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j: 1 },
+        'securitypractice': {f:'html/security-practice.html', n: 'securitypractice', j:0},
+        'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1}
     };
 
     var jsl3 = {
@@ -2430,7 +2432,8 @@ else if (!b_u) {
         'extensions': ['browsers', 'browsers_js'],
         'bird': ['megabird'],
         'wp': ['uwp'],
-        'uwp': ['uwp']
+        'uwp': ['uwp'],
+        'security': ['securitypractice', 'securitypractice_js', 'filesaver']
     };
 
     if (is_mobile) {

@@ -286,9 +286,10 @@
 .default-green-button {
     background-color: #00BFA5;
     color: white;
-    font-family: 'source_sans_prosemibold';
+    font-family: 'LatoWeb', 'source_sans_prosemibold';
     font-size: 13px;
     min-width: 132px;
+    font-weight: 600;
 }
 .default-green-button:hover {
     background-color:#00AC94;
@@ -952,4 +953,14 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1
     -webkit-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
     -moz-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
     box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
+}
+.default-green-button.height-48 {
+    height: 48px;
+    line-height: 47px;
+    font-size: 15px;
+    display: inline-block;
+}
+/* This is to override the desktop red class which is used by mobile for changing the backgroudn colour of the button */
+.default-green-button.height-48.red {
+    color: #fff;
 }

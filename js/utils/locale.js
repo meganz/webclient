@@ -99,7 +99,7 @@ function time2date(unixTime, format) {
         result = isodate.toISOString().split('T')[0];
     }
     else {
-        var locales = locale;
+        var locales = locale + '-' + country;
         result = date.toLocaleDateString(locales, options);
     }
 

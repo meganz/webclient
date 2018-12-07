@@ -96,7 +96,7 @@ function time2date(unixTime, format) {
         var timeOffset = date.getTimezoneOffset() * 60;
         var isodate = new Date((unixTime - timeOffset) * 1000);
         return isodate.toISOString().split('T')[0];
-    }
+    };
 
     // if it is short date format and user selected to use ISO format
     if ((fmconfig.uidateformat || country === 'ISO') && format < 2) {

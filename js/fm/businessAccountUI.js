@@ -2364,8 +2364,8 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $resultContianer.removeClass('hidden');
         $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
         $('.dialog-subtitle', $dialog).removeClass('hidden');
-        // $('.dialog-title', $dialog).text(l[18280]);
-        $('.dialog-title', $dialog).addClass('hidden');
+        $('.dialog-title', $dialog).text(l[20035]).removeClass('left-version');
+        // $('.dialog-title', $dialog).addClass('hidden');
         $('.sent-email-logo.dialog-heading-img', $dialog).removeClass('hidden');
         $('.dialog-button-container .invite-link-option', $dialog).addClass('hidden');
 
@@ -2593,8 +2593,8 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
                     $('.licence-bar', $dialog).addClass('hidden');
                     $('.dialog-subtitle', $dialog).removeClass('hidden');
-                    // $('.dialog-title', $dialog).text(l[18280]);
-                    $('.dialog-title', $dialog).addClass('hidden');
+                    $('.dialog-title', $dialog).text(l[20035]).removeClass('left-version');
+                    // $('.dialog-title', $dialog).addClass('hidden');
                     $('.sent-email-logo.dialog-heading-img', $dialog).removeClass('hidden');
                     $('.dialog-button-container .invite-link-option', $dialog).addClass('hidden');
                 }

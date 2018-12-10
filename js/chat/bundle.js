@@ -10116,9 +10116,11 @@ React.makeElement = React['createElement'];
 	        var placeholder = l[18669];
 	        placeholder = placeholder.replace("%s", room.getRoomTitle(false, true));
 
+	        var disabledTextarea = room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false;
+
 	        return React.makeElement(
 	            "div",
-	            { className: "typingarea-component" + self.props.className },
+	            { className: "typingarea-component" + self.props.className + (disabledTextarea ? " disabled" : "") },
 	            React.makeElement(
 	                "div",
 	                { className: "chat-textarea " + self.props.className },
@@ -10154,8 +10156,8 @@ React.makeElement = React['createElement'];
 	                        value: self.state.typedMessage,
 	                        ref: "typearea",
 	                        style: textareaStyles,
-	                        disabled: room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false,
-	                        readOnly: room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false,
+	                        disabled: disabledTextarea ? true : false,
+	                        readOnly: disabledTextarea ? true : false,
 	                        onCopyCapture: self.onCopyCapture,
 	                        onPasteCapture: self.onPasteCapture,
 	                        onCutCapture: self.onCutCapture

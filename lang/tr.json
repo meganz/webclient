@@ -3083,7 +3083,7 @@
     "20017": "U\u00e7 nokta \u015fifrelemesi",
     "20018": "MEGA",
     "20019": "U\u00e7 nokta g\u00fcvenli\u011fi",
-    "20020": "While MEGA\u2019s end-to-end encryption (E2EE) paradigm does enhance the overall security with privacy by design compared to many of its competitors who only provide privacy by policy, it is not a silver bullet solution to all potential security threats. It is critical that the endpoint devices are deemed secure in the E2EE paradigm. Any breach on an endpoint device breaks the E2EE chain.",
+    "20020": "\u0130lkelerle gizlilik sa\u011flayan bir\u00e7o\u011fu rakibine g\u00f6re MEGA'n\u0131n u\u00e7tan uca \u015fifreleme kipi gizlilik i\u00e7in tasarlanmas\u0131yla birlikte genel g\u00fcvenli\u011fini artt\u0131rmaktad\u0131r, elbette olas\u0131 t\u00fcm g\u00fcvenlik tehditlerine kar\u015f\u0131 sihirli \u00e7\u00f6z\u00fcm de\u011fildir. U\u00e7tan uca \u015fifreleme kipinde u\u00e7 nokta cihazlar\u0131n\u0131n g\u00fcvenli olarak varsay\u0131lmas\u0131 \u00f6nemlidir. U\u00e7 nokta cihaz\u0131ndaki herhangi bir s\u0131z\u0131nt\u0131 u\u00e7tan uca \u015fifreleme zincirini k\u0131rar.",
     "20021": "\u00d6zetle",
     "20022": "\u00d6rne\u011fin, kullan\u0131c\u0131n\u0131n u\u00e7 noktadaki cihaz\u0131n\u0131n i\u015fletim sistemindeki bir arka kap\u0131 veya vir\u00fcs d\u00fczenbaz bir sald\u0131rgan taraf\u0131ndan \u015fifresiz verileri yakalamas\u0131na, bas\u0131lan tu\u015flar\u0131 kaydetmesine veya cihaz\u0131n mikrofonundan\/kameras\u0131ndan ses\/g\u00f6r\u00fcnt\u00fc kayd\u0131 yapmas\u0131na olanak tan\u0131r.[Br]Bu y\u00fczden kullan\u0131c\u0131n\u0131n sadece MEGA'n\u0131n de\u011fil, kulland\u0131\u011f\u0131 u\u00e7 nokta cihazlar\u0131n da (kullan\u0131c\u0131n\u0131n MEGA istemci yaz\u0131l\u0131m\u0131n\u0131 \u00e7al\u0131\u015ft\u0131rd\u0131\u011f\u0131) g\u00fcvenli oldu\u011funu do\u011frulamas\u0131 \u00f6nemlidir",
     "20023": "\u015eeffafl\u0131k ve Herkese A\u00e7\u0131k Kaynak kodu",
@@ -3097,5 +3097,6 @@
     "20031": "Unit: GB",
     "20032": "Unit: MB",
     "20033": "Unit: KB",
-    "20034": "Unit: Byte"
+    "20034": "Unit: Byte",
+    "20035": "Invitation email has been sent"
 }

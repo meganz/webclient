@@ -565,7 +565,10 @@ function init_page() {
     // Password protected link decryption dialog
     if (page.substr(0, 2) === 'P!' && page.length > 2) {
         // Check if TextEncoder function is available for the stringToByteArray function
-        if (window.TextEncoder) {
+        // and we need to exclude Edge explicitly, since now it has supported Text Encoder but it doesnt support
+        // SubtleCrypto.importKey() with 'PBKDF2' (the algorithm we are using).
+        // And we need to exclude IE explicitly, since it returns non promise type to SubtleCrypto.importKey() call
+        if (window.TextEncoder && ua.details.browser !== 'Edge' && ua.details.browser !== 'Internet Explorer') {
             // Show the password overlay for mobile
             if (is_mobile) {
                 parsepage(pages['mobile']);

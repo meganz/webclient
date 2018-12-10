@@ -58,7 +58,7 @@ var redeem = {
             // If confirmed, redeem the voucher and display the balance etc
             msgDialog('confirmation', l[458], redeemConfirmMessage, '', function(event) {
                 if (event) {
-                    successCallback();
+                    okCallback();
                 }
                 else {
                     cancelCallback();

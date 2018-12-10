@@ -606,12 +606,12 @@ MegaData.prototype.treeSortUI = function() {
                 menu.find('.dropdown-section.labels').removeClass('hidden');
                 menu.find('.filter-by').removeClass('hidden');
             }
-            sortMenuPos = $self.position().top - 9;
+            sortMenuPos = $self.offset().top - 9;
 
             if (sortMenuPos < 3) {
                 sortMenuPos = 3;
                 menu.find('.dropdown-dark-arrow').css({
-                    'top': $self.position().top - sortMenuPos + 1
+                    'top': $self.offset().top - sortMenuPos + 1
                 });
             }
             else {

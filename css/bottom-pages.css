@@ -148,7 +148,7 @@
 .new-bottom-pages h2.sub-list span.text {
     padding: 0 0 0 57px;
 }
-.new-bottom-pages {
+.new-bottom-pages, .main-mid-pad.new-bottom-pages {
     padding: 46px 15px 73px 15px;
 }
 .new-bottom-pages ul {

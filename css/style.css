@@ -5882,7 +5882,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     -khtml-opacity: 1;
     opacity: 1;
 }
-.files-grid-view, .files-grid-view.shared-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view, .transfer-table-wrapper, .files-grid-view.archived-chat-view {
+.files-grid-view, .files-grid-view.shared-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view, .transfer-table-wrapper {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -5898,6 +5898,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     height: -webkit-calc(100% );
     height: -moz-calc(100%);
     height: calc(100%);
+    top: 0;
 }
 .files-grid-view.contact-details-view {
     height: 100%;

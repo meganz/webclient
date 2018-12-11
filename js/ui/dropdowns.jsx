@@ -43,7 +43,7 @@ var Dropdown = React.createClass({
             this.props.onActiveChange(newVal);
         }
     },
-    componentDidUpdate: function() {
+    onResized: function() {
         var self = this;
 
         if (this.props.active === true) {
@@ -53,7 +53,7 @@ var Dropdown = React.createClass({
                 var offsetLeft = 0;
                 var $container = positionToElement.closest('.messages.scroll-area');
 
-                if ($container.size() == 0) {
+                if ($container.length == 0) {
                     $container = $(document.body);
                 }
 
@@ -87,7 +87,7 @@ var Dropdown = React.createClass({
 
 
                         if (self.props.vertOffset) {
-                           vertOffset += (self.props.vertOffset * (info.vertical == "top" ? 1 : -1));
+                            vertOffset += (self.props.vertOffset * (info.vertical == "top" ? 1 : -1));
                         }
 
                         if (self.props.horizOffset) {
@@ -104,12 +104,31 @@ var Dropdown = React.createClass({
             }
         }
     },
+    componentDidMount: function() {
+        this.onResized();
+    },
+    componentDidUpdate: function() {
+        this.onResized();
+    },
     componentWillUnmount: function() {
         if (this.props.active) {
             // fake an active=false so that any onActiveChange handlers would simply trigger back UI to the state
             // in which this element is not active any more (since it would be removed from the DOM...)
             this.onActiveChange(false);
         }
+    },
+    doRerender: function() {
+        var self = this;
+
+        setTimeout(function() {
+            self.safeForceUpdate();
+        }, 100);
+
+        // idb + DOM updates = delayed update so .onResized won't properly reposition the DOM node using $.position,
+        // so we need to manually call this
+        setTimeout(function() {
+            self.onResized();
+        }, 200);
     },
     renderChildren: function () {
         var self = this;
@@ -127,8 +146,6 @@ var Dropdown = React.createClass({
     },
     render: function() {
         if (this.props.active !== true) {
-
-
             return null;
         }
         else {
@@ -157,8 +174,14 @@ var Dropdown = React.createClass({
             else if (this.props.dropdownItemGenerator) {
                 child = this.props.dropdownItemGenerator(this);
             }
-            else {
-                child = null;
+
+            if (!child && !this.props.forceShowWhenEmpty) {
+                if (this.props.active !== false) {
+                    (window.setImmediate || window.setTimeout)(function () {
+                        self.onActiveChange(false);
+                    });
+                }
+                return null;
             }
 
 
@@ -276,6 +299,35 @@ var DropdownItem = React.createClass({
             e.preventDefault();
         }
     },
+    onMouseOver: function(e) {
+        var self = this;
+
+        if (this.props.className === "contains-submenu") {
+            var $contextItem = $(e.target).closest(".contains-submenu");
+            var $subMenu = $contextItem.next('.submenu');
+            var contextTopPos = $contextItem.position().top;
+            var contextleftPos = 0;
+
+            $contextItem.addClass("opened");
+            $subMenu.addClass("active");
+
+            contextleftPos = $contextItem.offset().left +
+                $contextItem.outerWidth() + $subMenu.outerWidth() +10;
+
+            if (contextleftPos > $(document.body).width()) {
+                $subMenu.addClass("left-position");
+            }
+
+            $subMenu.css({
+                "top": contextTopPos
+            });
+        }
+        else if (!$(e.target).parent('.submenu').length) {
+            var $dropdown = $(e.target).closest(".dropdown.body");
+            $dropdown.find(".contains-submenu").removeClass("opened");
+            $dropdown.find(".submenu").removeClass("active");
+        }
+    },
     render: function() {
         var self = this;
 
@@ -298,8 +350,9 @@ var DropdownItem = React.createClass({
                     className={"dropdown-item " + self.props.className}
                     onClick={self.props.onClick ? (e) => {
                         $(document).trigger('closeDropdowns');
-                        self.props.onClick(e);
+                        !self.props.disabled && self.props.onClick(e);
                     } : self.onClick}
+                    onMouseOver={self.onMouseOver}
                 >
                     {icon}
                     {label}

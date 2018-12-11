@@ -137,12 +137,7 @@
             return;
         }
 
-        self.loading = mega.attr.get(
-            u_handle,
-            'prd',
-            -2,
-            true
-            )
+        self.loading = mega.attr.get(u_handle, 'prd', -2, true)
             .done(function (r) {
                 if (isString(r)) {
                     self.dialog._initFromString(r);
@@ -163,8 +158,8 @@
                     });
                     self._queuedSetPropOps = [];
                 }
-                if (this.changedCb) {
-                    this.changedCb();
+                if (self.changedCb) {
+                    self.changedCb();
                 }
             });
     };
@@ -253,10 +248,32 @@
     };
 
     PasswordReminderDialog.prototype.onConfirmClicked = function(element, evt) {
+
         var enteredPassword = this.passwordField.value;
+        var self = this;
+
         this.resetUI();
 
-        if (checkMyPassword(enteredPassword)) {
+        // If the user's Account Authentication Version is set for the new registration process (version 2)
+        if (u_attr.aav === 2) {
+
+            // Derive the keys from the password
+            security.getDerivedEncryptionKey(enteredPassword, function(derivedEncryptionKeyArray32) {
+                self.completeOnConfirmClicked(derivedEncryptionKeyArray32);
+            });
+        }
+        else {
+            // Derive the key from the password using the old registration method (version 1)
+            var derivedEncryptionKeyArray32 = prepare_key_pw(enteredPassword);
+
+            // Continue the verification
+            self.completeOnConfirmClicked(derivedEncryptionKeyArray32);
+        }
+    };
+
+    PasswordReminderDialog.prototype.completeOnConfirmClicked = function(derivedEncryptionKeyArray32) {
+
+        if (checkMyPassword(derivedEncryptionKeyArray32)) {
             if (this.correctLabel) {
                 this.correctLabel.classList.remove('hidden');
             }
@@ -423,15 +440,13 @@
             unixtime() - self.passwordReminderAttribute.lastSuccess > SHOW_AFTER_LASTSUCCESS &&
             unixtime() - self.passwordReminderAttribute.lastLogin > SHOW_AFTER_LASTLOGIN
         ) {
-            self.showIcon();
-
             // skip recheck in case:
+            // - there is no top-icon, i.e. we are on a custom page
             // - there is a visible .dropdown
             // - the user had a textarea, input or select field focused
             // - there is a visible/active dialog
-            var skipShowingDialog = $(
-                'textarea:focus, input:focus, select:focus, .dropdown:visible, .fm-dialog:visible'
-            ).length > 0;
+            var skipShowingDialog = !self.showIcon()
+                || $('textarea:focus, input:focus, select:focus, .dropdown:visible, .fm-dialog:visible').length > 0;
 
             if (
                 !skipShowingDialog &&
@@ -469,10 +484,12 @@
         if (!this.topIcon || this.topIcon.classList.contains('hidden') || !document.body.contains(this.topIcon)) {
             // because, we have plenty of top menus, that may not be visible/active
             this.topIcon = $('.top-head:visible .top-icon.pass-reminder')[0];
-            assert(this.topIcon, 'topIcon was not found in DOM');
-            this.topIcon.classList.remove('hidden');
-            $(this.topIcon).rebind('click.prd', this.topIconClicked.bind(this));
+            if (this.topIcon) {
+                this.topIcon.classList.remove('hidden');
+                $(this.topIcon).rebind('click.prd', this.topIconClicked.bind(this));
+            }
         }
+        return !!this.topIcon;
     };
 
     PasswordReminderDialog.prototype._initInternals = function() {
@@ -519,7 +536,7 @@
 
         this.dialog.classList.remove('hidden');
 
-        $(document.body).bind('mousedown.prd', this.onGenericClick.bind(this));
+        $(document.body).rebind('mousedown.prd', this.onGenericClick.bind(this));
         this.repositionDialog();
     };
 
@@ -563,8 +580,8 @@
 
         this.dialog.classList.add('hidden');
 
-        $(window).unbind('resize.prd');
-        $(document.body).unbind('mousedown.prd');
+        $(window).off('resize.prd');
+        $(document.body).off('mousedown.prd');
     };
 
     PasswordReminderDialog.prototype.onGenericClick = function(e) {
@@ -574,7 +591,7 @@
         }
 
         if (
-            $(e.target).parents('.pass-reminder').size() === 0 &&
+            $(e.target).parents('.pass-reminder').length === 0 &&
             !$(e.target).is('.pass-reminder')
         ) {
             if (this.isShown) {
@@ -589,7 +606,7 @@
         }
 
         this.topIcon.classList.add('hidden');
-        $(this.topIcon).unbind('click.prd');
+        $(this.topIcon).off('click.prd');
     };
 
     PasswordReminderDialog.prototype.showDialog = function(promise) {
@@ -643,8 +660,8 @@
 
         this.resetUI();
 
-        $(window).unbind('resize.prd');
-        $(document.body).unbind('mousedown.prd');
+        $(window).off('resize.prd');
+        $(document.body).off('mousedown.prd');
     };
 
     PasswordReminderDialog.prototype.recheckLogoutDialog = function() {

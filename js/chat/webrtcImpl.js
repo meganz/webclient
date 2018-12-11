@@ -1,3 +1,4 @@
+// jscs:disable validateIndentation
 (function(scope) {
     "use strict";
 
@@ -54,6 +55,43 @@
 
 
     /**
+     *  Called when network quality for this session changes.
+     *
+     * @param {Number} q
+     */
+    RtcSessionEventHandler.prototype.onPeerNetworkQualityChange = function(q) {
+        var peerId = base64urlencode(this.rtcCallSession.peer);
+        var clientId = base64urlencode(this.rtcCallSession.peerClient);
+        var sid = base64urlencode(this.rtcCallSession.sid);
+        var idx = peerId + ":" + clientId + ":" + sid;
+
+        var callManagerCall = this.chatRoom.callManagerCall;
+        if (callManagerCall) {
+            if (callManagerCall.peerQuality[idx] !== q) {
+                callManagerCall.peerQuality[idx] = q;
+                this.chatRoom.trackDataChange();
+            }
+        }
+    };
+
+    /**
+     * Called on level change of the remote audio level.
+     *
+     * @param {Number} level 0-100
+     */
+    RtcSessionEventHandler.prototype.onAudioLevelChange = function(level) {
+        var peerId = base64urlencode(this.rtcCallSession.peer);
+        var clientId = base64urlencode(this.rtcCallSession.peerClient);
+        var sid = base64urlencode(this.rtcCallSession.sid);
+        var idx = peerId + ":" + clientId + ":" + sid;
+
+        if (this.chatRoom.callManagerCall) {
+            // call ended?
+            this.chatRoom.callManagerCall.trigger('onAudioLevelChange', [idx, level]);
+        }
+    };
+
+    /**
      *
      * @param {ChatRoom} chatRoom
      * @constructor
@@ -78,8 +116,8 @@
         return new RtcSessionEventHandler(this, rtcCallSession);
     };
 
-    RtcCallEventHandler.prototype.onCallStarted = function () {
-        return this.chatRoom.megaChat.plugins.callManager.onCallStarted(this.call);
+    RtcCallEventHandler.prototype.onCallStarted = function (tsCallStart) {
+        return this.chatRoom.megaChat.plugins.callManager.onCallStarted(this.call, tsCallStart);
     };
     RtcCallEventHandler.prototype.onCallStarting = function () {
         return this.chatRoom.megaChat.plugins.callManager.onCallStarting(this.call);
@@ -148,9 +186,10 @@
      * called when an incoming call request is received,
      *
      * @param {Call} call
+     * @param {String} fromUser base64urldecoded user handle of the call initiator
      * @returns {RtcCallEventHandler}
      */
-    RtcGlobalEventHandler.prototype.onCallIncoming = function (call) {
+    RtcGlobalEventHandler.prototype.onCallIncoming = function (call, fromUser) {
         var callManager = this.megaChat.plugins.callManager;
         var chatRoom = self.megaChat.getChatById(base64urlencode(call.chatid));
         if (!chatRoom) {
@@ -163,14 +202,17 @@
         var callHandler = new RtcCallEventHandler(chatRoom, call);
         callHandler.call = call;
         var callManagerCall = callManager.registerCall(chatRoom, call);
+        callManagerCall.initiator = fromUser;
         callManagerCall.setState(CallManagerCall.STATE.WAITING_RESPONSE_INCOMING);
         callManager.trigger('WaitingResponseIncoming', [callManagerCall]);
         return callHandler;
     };
 
-    RtcGlobalEventHandler.prototype.isGroupChat = function () {
-        // TO BE IMPLEMENTED
-        return false;
+    RtcGlobalEventHandler.prototype.isGroupChat = function(chatId) {
+        var chatRoom = this.megaChat.getChatById(base64urlencode(chatId));
+        assert(chatRoom, "RtcGlobalEventHandles.isGroupChat: chatroom with specified chatid not found,",
+            "this should never happen");
+        return (chatRoom.type === "group");
     };
     RtcGlobalEventHandler.prototype.get1on1RoomPeer = function(chatid) {
         chatid = base64urlencode(chatid);
@@ -190,6 +232,53 @@
     RtcGlobalEventHandler.prototype.onLocalMediaFail = function () {
         $('.camera-access').addClass('hidden');
     };
+    RtcGlobalEventHandler.prototype.onClientJoinedCall = function(chatId, userid, clientid, parts) {
+        var self = this;
+        var chatRoom = self.megaChat.getChatById(base64urlencode(chatId));
+        if (chatRoom) {
+            chatRoom.trigger(
+                'onCallParticipantsUpdated',
+                [
+                    base64urlencode(userid),
+                    base64urlencode(clientid),
+                    parts
+                ]
+            );
+            chatRoom.trigger('onClientJoinedCall', {userId: userid, clientId: clientid});
+        }
+    };
+
+    RtcGlobalEventHandler.prototype.onClientLeftCall = function(chatId, userid, clientid, parts) {
+        var self = this;
+        var chatRoom = self.megaChat.getChatById(base64urlencode(chatId));
+        if (chatRoom) {
+            chatRoom.trigger(
+                'onCallParticipantsUpdated',
+                [
+                    base64urlencode(userid),
+                    base64urlencode(clientid),
+                    parts
+                ]
+            );
+            chatRoom.trigger('onClientLeftCall', {userId: userid, clientId: clientid});
+        }
+    };
+    RtcGlobalEventHandler.prototype.onClientAvChange = function() {};
+
+    RtcGlobalEventHandler.prototype.onOwnNetworkQualityChange = function(quality) {
+        this.megaChat.networkQuality = quality;
+        if (this.megaChat.activeCallManagerCall) {
+            this.megaChat.activeCallManagerCall.room.trackDataChange();
+        }
+    };
+
+    /**
+     * Called if there is no audio for > 10s after the call had started.
+     */
+    RtcGlobalEventHandler.prototype.onNoInputAudioDetected = function() {
+        showToast("warning", "We'd detected that your audio is not working. Please check your mic.");
+    };
+
 
     scope.RtcGlobalEventHandler = RtcGlobalEventHandler;
     scope.RtcCallEventHandler = RtcCallEventHandler;

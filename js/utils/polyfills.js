@@ -66,6 +66,84 @@ if (!String.prototype.endsWith) {
     };
 }
 
+mBroadcaster.once('startMega', function() {
+    "use strict";
+
+    // ArrayBuffer & Uint8Array slice polyfill based on:
+    // https://github.com/ttaubert/node-arraybuffer-slice
+    // (c) 2014 Tim Taubert <tim[a]timtaubert.de>
+    // arraybuffer-slice may be freely distributed under the MIT license.
+
+    function clamp(val, length) {
+        val = (val | 0) || 0;
+
+        if (val < 0) {
+            return Math.max(val + length, 0);
+        }
+
+        return Math.min(val, length);
+    }
+
+    if (!ArrayBuffer.prototype.slice) {
+        Object.defineProperty(ArrayBuffer.prototype, 'slice', {
+            writable: true,
+            configurable: true,
+            value: function(from, to) {
+                var length = this.byteLength;
+                var begin = clamp(from, length);
+                var end = length;
+
+                if (to !== undefined) {
+                    end = clamp(to, length);
+                }
+
+                if (begin > end) {
+                    return new ArrayBuffer(0);
+                }
+
+                var num = end - begin;
+                var target = new ArrayBuffer(num);
+                var targetArray = new Uint8Array(target);
+
+                var sourceArray = new Uint8Array(this, begin, num);
+                targetArray.set(sourceArray);
+
+                return target;
+            }
+        });
+    }
+
+    if (!Uint8Array.prototype.slice) {
+        Object.defineProperty(Uint8Array.prototype, 'slice', {
+            writable: true,
+            configurable: true,
+            value: function(from, to) {
+                return new Uint8Array(this.buffer.slice(from, to));
+            }
+        });
+    }
+});
+
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    if (typeof window.devicePixelRatio === 'undefined') {
+        Object.defineProperty(window, 'devicePixelRatio', {
+            get: function() {
+                return (screen.deviceXDPI / screen.logicalXDPI) || 1;
+            }
+        });
+    }
+});
+
+mBroadcaster.once('startMega', function() {
+    'use strict';
+    Promise.prototype.always = function(fc) {
+        this.then(fc).catch(fc);
+        return this;
+    };
+    Promise.prototype.dump = MegaPromise.prototype.dumpToConsole;
+});
 
 mBroadcaster.once('boot_done', function() {
     'use strict';

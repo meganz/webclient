@@ -87,7 +87,7 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
             }
 
             if (invalid) {
-                console.error('Invalid content passed to parseHTML...', [node]);
+                console.warn('Filtered out invalid content passed to parseHTML...', [node]);
             }
             else {
                 fragment.appendChild(node);

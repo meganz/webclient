@@ -33,7 +33,7 @@
 
         var closeSelector = '.toast-close-button';
         var btn1 = $('.common-toast .toast-button.first');
-        btn1.unbind('click');
+        btn1.off('click');
         if (buttonLabel) {
             $('span', btn1).safeHTML(buttonLabel);
             if (firstButtonFunction && typeof firstButtonFunction === 'function') {
@@ -46,7 +46,7 @@
         }
 
         var btn2 = $('.common-toast .toast-button.second');
-        btn2.unbind('click');
+        btn2.off('click');
         btn2.addClass('hidden');
         if (secondButtonLabel) {
             btn2.removeClass('hidden');

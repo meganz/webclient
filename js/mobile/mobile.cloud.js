@@ -36,6 +36,7 @@ mobile.cloud = {
         var $fileManager = $('.mobile.file-manager-block');
 
         // Render the file manager header, folders, files and footer
+        this.initTitleMenu();
         this.renderHeader();
         this.initGridViewToggleHandler();
         this.renderFoldersAndFiles();
@@ -187,8 +188,8 @@ mobile.cloud = {
         var $initialFolderView = $('.mobile.inital-folder-view');
         var $folderSize = $initialFolderView.find('.filesize');
         var $folderName = $initialFolderView.find('.filename');
-        var $openInBrowserButton = $initialFolderView.find('.red-button.first');
-        var $openInAppButton = $initialFolderView.find('.red-button.second');
+        var $openInBrowserButton = $initialFolderView.find('.red-button.second');
+        var $openInAppButton = $initialFolderView.find('.red-button.first');
 
         // Set the flag so it won't show again
         this.initialFolderOverlayShown = true;
@@ -234,15 +235,19 @@ mobile.cloud = {
         // Get selectors
         var $fileManagerHeader = $('.mobile.file-manager-block .fm-header');
         var $backButton = $fileManagerHeader.find('.fm-icon.back');
+        var $upButton = $fileManagerHeader.find('.fm-icon.up');
         var $cloudIcon = $fileManagerHeader.find('.fm-icon.cloud');
-        var $menuIcon = $fileManagerHeader.find('.fm-icon.menu');
+        var $binIcon = $fileManagerHeader.find(".fm-icon.rubbish-bin");
         var $folderIcon = $fileManagerHeader.find('.fm-icon.folder');
+        var $headerTitle = $fileManagerHeader.find(".fm-header-txt");
         var $folderName = $fileManagerHeader.find('.fm-header-txt span');
         var $folderSize = $fileManagerHeader.find('.fm-folder-size');
 
         // Reset header to blank slate so only buttons/items are enabled as needed
         $backButton.addClass('hidden');
+        $upButton.addClass('hidden');
         $cloudIcon.addClass('hidden');
+        $binIcon.addClass('hidden');
         $fileManagerHeader.removeClass('folder-link');
         $folderIcon.addClass('hidden');
         $folderName.text('');
@@ -253,6 +258,10 @@ mobile.cloud = {
 
         // If the user is currently in a public folder link
         if (pfid) {
+
+            // Make changes to accommodate folder icon in header layout.
+            $fileManagerHeader.addClass('pfid-style');
+            $headerTitle.off('tap');
 
             // If this is the root folder link
             if (M.currentdirid === M.RootID) {
@@ -267,21 +276,38 @@ mobile.cloud = {
             }
             else {
                 // Otherwise show the back button
-                mobile.showAndInitBackButton($backButton);
+                mobile.initBackButton($fileManagerHeader);
             }
 
             // Update the header with the current folder name
             $folderName.text(currentFolder.name);
         }
         else {
+            // Revert PFID header changes.
+            $fileManagerHeader.removeClass('pfid-style');
+            $headerTitle.off('tap');
+
             // Otherwise if this is the root folder of the regular cloud drive, show the cloud icon and text
             if (M.currentdirid === M.RootID) {
                 $cloudIcon.removeClass('hidden');
                 $folderName.text(l[164]);               // Cloud Drive
+                $headerTitle.on('tap', function() {
+                    mobile.titleMenu.open();
+                    return false;
+                });
+            }
+            else if (M.currentdirid === M.RubbishID) {
+                $cloudIcon.addClass('hidden');
+                $binIcon.removeClass('hidden');
+                $folderName.text(l[167]);
+                $headerTitle.on('tap', function() {
+                    mobile.titleMenu.open();
+                    return false;
+                });
             }
             else {
-                // If a subfolder of the cloud drive, show the back button
-                mobile.showAndInitBackButton($backButton);
+                // If a subfolder of the cloud drive, show the up button
+                mobile.showAndInitUpButton($upButton);
 
                 // Show the folder name
                 $folderName.text(currentFolder.name);
@@ -384,7 +410,7 @@ mobile.cloud = {
         var $fileManagerRows = $fileManager.find('.fm-row .fm-scrolling');
 
         // Reset
-        $fileManagerRows.removeClass('empty-cloud empty-folder');
+        $fileManagerRows.removeClass('empty-cloud empty-folder empty-rubbishbin');
 
         // If there are no items in the current view
         if (M.v.length === 0) {
@@ -392,6 +418,9 @@ mobile.cloud = {
             // If the root of the cloud add text "No files in your Cloud Drive"
             if (M.currentdirid === M.RootID) {
                 $fileManagerRows.addClass('empty-cloud');
+            }
+            else if (M.currentdirid === M.RubbishID) {
+                $fileManagerRows.addClass('empty-rubbishbin');
             }
             else {
                 // Otherwise add text "Empty folder"
@@ -455,6 +484,9 @@ mobile.cloud = {
         // Clone the template
         var $template = $templateSelector.clone().removeClass('template');
 
+        // Shared folder variable
+        var share = new mega.Share();
+
         // Show the number of files in that folder
         $template.find('.num-files').text(foldersWording + ', ' + filesWording);
 
@@ -470,6 +502,11 @@ mobile.cloud = {
             // Show the link icon if it already has a public link
             if (typeof node.shares !== 'undefined' && typeof node.shares.EXP !== 'undefined') {
                 $template.find('.fm-icon.link').removeClass('hidden');
+            }
+
+            if (share.isShareExist([node.h], true, true, false)) {
+                $template.find('.shared-folder').removeClass('hidden');
+                $template.find('.regular-folder').addClass('hidden');
             }
         }
 
@@ -528,6 +565,32 @@ mobile.cloud = {
     },
 
     /**
+     * Init TitleMenu
+     */
+    initTitleMenu: function() {
+        'use strict';
+
+        // Init the title Menu controller.
+        mobile.titleMenu.init();
+
+        var $titleHeaderTextContainer = $(".fm-header-txt");
+        var $titleMenuHandle = $(".mobile.open-title-menu");
+
+        // Attach event handlers local to this page controller.
+        if (M.currentdirid === M.RootID || M.currentdirid === M.RubbishID) {
+            $titleHeaderTextContainer.off('tap').on('tap', function() {
+                mobile.titleMenu.open();
+                return false;
+            });
+            $titleMenuHandle.removeClass('hidden');
+        } else {
+            $titleHeaderTextContainer.off('tap');
+            $titleMenuHandle.addClass('hidden');
+        }
+
+    },
+
+    /**
      * Functionality for tapping on a file row which expands or hide the file options (Download / Link / Delete)
      */
     initFileRowClickHandler: function() {
@@ -549,7 +612,7 @@ mobile.cloud = {
             var fileName = node.name;
 
             // If this is an image, load the preview slideshow
-            if (is_image(fileName) && fileext(fileName) !== 'pdf') {
+            if (is_image(node) && fileext(fileName) !== 'pdf' || is_video(node)) {
                 mobile.slideshow.init(nodeHandle);
             }
             else {
@@ -560,17 +623,6 @@ mobile.cloud = {
                 $('.mobile.filetype-img').removeClass('hidden');
                 $('.video-block, .video-controls', $overlay).addClass('hidden');
 
-                if (is_video(node)) {
-                    M.require('videostream').tryCatch(function() {
-                        iniVideoStreamLayout(node, $overlay).then(function(ok) {
-                            if (ok) {
-                                $overlay.addClass('video');
-                                $('.mobile.filetype-img').addClass('hidden');
-                                $('.video-block, .video-controls', $overlay).removeClass('hidden');
-                            }
-                        });
-                    });
-                }
             }
 
             // Prevent pre clicking one of the Open in Browser/App buttons
@@ -696,5 +748,61 @@ mobile.cloud = {
             // Otherwise hide it
             $icon.addClass('hidden');
         }
+    },
+
+    /**
+     * Update M.v from M.c
+     */
+    updateView: function () {
+        'use strict';
+
+        M.filterByParent(M.currentdirid);
+        M.doSort('name', 1);
+    },
+
+    /**
+     * Filter nodes from current view if they are no longer in M.c
+     */
+    removeNodesFromViewIfRemoved: function() {
+        'use strict';
+
+        if (M.c[M.currentdirid]) {
+            var curDirContents = Object.keys(M.c[M.currentdirid]);
+            M.v = M.v.filter(function(n) {
+                return curDirContents.indexOf(n.h) >= 0;
+            });
+        } else {
+            M.v = [];
+        }
+
+    },
+
+    /**
+     * Checks if a given node is in the view.
+     * @return boolean
+     */
+    nodeInView: function(nodeHandle) {
+        'use strict';
+
+        for (var i = 0; i < M.v.length; i++) {
+            var n = M.v[i];
+            if (n.h === nodeHandle) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+
+    /**
+     * Hook for nodes.js to call when finished moving a node.
+     * @param nodeHandle
+     */
+    moveFinishedCallback: function(nodeHandle) {
+        'use strict';
+        if (!mobile.rubbishBin.isRestoring) {
+            mobile.deleteOverlay.completeDeletionProcess(nodeHandle);
+        }
     }
+
 };

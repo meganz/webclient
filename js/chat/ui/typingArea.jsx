@@ -488,7 +488,7 @@ var TypingArea = React.createClass({
     },
     componentDidMount: function() {
         var self = this;
-        window.addEventListener('resize', self.handleWindowResize);
+        $(window).rebind('resize.typingArea' + self.getUniqueId(), self.handleWindowResize);
 
         var $container = $(ReactDOM.findDOMNode(this));
         // initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
@@ -549,20 +549,22 @@ var TypingArea = React.createClass({
         var self = this;
         var chatRoom = self.props.chatRoom;
         self.triggerOnUpdate();
-        window.removeEventListener('resize', self.handleWindowResize);
+        // window.removeEventListener('resize', self.handleWindowResize);
+        $(window).unbind('resize.typingArea' + self.getUniqueId());
     },
     componentDidUpdate: function () {
         var self = this;
         var room = this.props.chatRoom;
 
         if (room.isCurrentlyActive && self.isMounted()) {
-            if ($('textarea:focus,select:focus,input:focus').filter(":visible").size() === 0) {
+            if ($('textarea:focus,select:focus,input:focus').filter(":visible").length === 0) {
                 // no other element is focused...
                 this.focusTypeArea();
             }
 
             self.handleWindowResize();
         }
+
         if (!this.scrollingInitialised) {
             this.initScrolling();
         }
@@ -635,14 +637,13 @@ var TypingArea = React.createClass({
         var viewRatio = 0;
 
 
-
         // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
         if (
             keyEvents &&
             self.lastContent === textareaContent &&
             self.lastPosition === cursorPosition
         ) {
-                return;
+            return;
         }
         else {
             self.lastContent = textareaContent;
@@ -726,6 +727,11 @@ var TypingArea = React.createClass({
                 jsp.scrollToY(textareaCloneSpanHeight - self.textareaLineHeight);
             } else if (jsp) {
                 jsp.scrollToY(0);
+
+                // because jScrollPane may think that there is no scrollbar, it would NOT scroll back to 0?!
+                if (scrPos < 0) {
+                    $textareaScrollBlock.find('.jspPane').css('top', 0);
+                }
             }
         }
 
@@ -767,6 +773,7 @@ var TypingArea = React.createClass({
     },
     handleWindowResize: function (e, scrollToBottom) {
         var self = this;
+
         if(!self.isMounted()) {
             return;
         }
@@ -827,12 +834,13 @@ var TypingArea = React.createClass({
             height: self.state.textareaHeight
         };
 
-        var textareaScrollBlockStyles = {
-            height: Math.min(
-                    self.state.textareaHeight,
-                    self.getTextareaMaxHeight()
-                )
-        };
+        var textareaScrollBlockStyles = {};
+        var newHeight = Math.min(self.state.textareaHeight, self.getTextareaMaxHeight());
+
+        if (newHeight > 0) {
+            textareaScrollBlockStyles['height'] = newHeight;
+        }
+
 
         var emojiAutocomplete = null;
         if (self.state.emojiSearchQuery) {
@@ -905,22 +913,19 @@ var TypingArea = React.createClass({
         return <div className={"typingarea-component" + self.props.className}>
             <div className={"chat-textarea " + self.props.className}>
                 {emojiAutocomplete}
-                <i className={self.props.iconClass ? self.props.iconClass : "small-icon conversations"}></i>
-                <div className="chat-textarea-buttons">
-                    <ButtonsUI.Button
-                        className="popup-button"
-                        icon="smiling-face"
-                        disabled={this.props.disabled}
-                    >
-                        <DropdownEmojiSelector
-                            className="popup emoji"
-                            vertOffset={12}
-                            onClick={self.onEmojiClicked}
-                        />
-                    </ButtonsUI.Button>
-
-                    {self.props.children}
-                </div>
+                {self.props.children}
+                <ButtonsUI.Button
+                    className="popup-button"
+                    icon="smiling-face"
+                    disabled={this.props.disabled}
+                >
+                    <DropdownEmojiSelector
+                        className="popup emoji"
+                        vertOffset={17}
+                        onClick={self.onEmojiClicked}
+                    />
+                </ButtonsUI.Button>
+                <hr />
                 <div className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
                      style={textareaScrollBlockStyles}>
                     <textarea

@@ -15,6 +15,21 @@ var bottompage = {
         else {
             $('body').removeClass('old');
         }
+
+        // Init Slider for business page
+        if (page === 'business') {
+            bottompage.initSlider();
+        }
+
+        // Init Video resizing on security page
+        if (page === 'security' && !is_mobile) {
+            bottompage.videoResizing();
+
+            $(window).rebind('resize.security', function (e) {
+                bottompage.videoResizing();
+            });
+        }
+        
         if (!is_mobile) {
             bottompage.initFloatingTop();
             $('body').removeClass('mobile');
@@ -110,12 +125,58 @@ var bottompage = {
             $('.nav-button.compound-lnk.opened').removeClass('opened');
             $('.pages-nav.nav-button.active.greyed-out').removeClass('greyed-out');
             $('.pages-nav.compound-items.active').removeClass('active').removeAttr('style');
-            $('body, html').unbind('touchmove.bodyscroll');
-            $(window).unbind('resize.navdropdown');
+            $('body, html').off('touchmove.bodyscroll');
+            $(window).off('resize.navdropdown');
         }
 
         $('.nav-overlay').rebind('click', function() {
             hiddenNavDropdown();
+        });
+    },
+
+    initSlider: function() {
+
+        "use strict";
+
+        var $slider = $('.bottom-page.slider-body');
+        
+        $('.slider-button, .slider-dot-button', $slider).rebind('click', function() {
+            var $this = $(this);
+            var $buttons;
+            var activeSlide;
+            var newSlide;
+
+            if (!$this.hasClass('active')) {
+                $buttons = $('.slider-button, .slider-dot-button', $slider);
+                activeSlide = $('.slider-button.active', $slider).attr('data-num');
+                newSlide = $this.attr('data-num');
+
+                $buttons.removeClass('active');
+                $buttons.filter('.slide' + newSlide).addClass('active');
+                $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide);
+            }
+        });
+
+        $('.slider-ctrl-button', $slider).rebind('click', function() {
+            var $this = $(this);
+            var $buttons = $('.slider-button, .slider-dot-button', $slider);
+            var activeSlide = parseInt($('.slider-button.active', $slider).attr('data-num'));
+            var slidesNum = $('.slider-button', $slider).length;
+            var newSlide;
+
+            if ($this.hasClass('prev') && activeSlide > 1) {
+                newSlide = activeSlide - 1;
+            }
+            else if ($this.hasClass('next') && activeSlide < slidesNum) {
+                newSlide = activeSlide + 1;
+            }
+            else {
+                return false;
+            }
+
+            $buttons.removeClass('active');
+            $buttons.filter('.slide' + newSlide).addClass('active');
+            $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide);
         });
     },
 
@@ -183,10 +244,26 @@ var bottompage = {
         "use strict";
 
         var $topBlock = $('.bottom-page.top-bl');
-        var topBlockHeight = $topBlock.parent().height();
+        var $productNav = $topBlock.parent().first('.pages-nav.content-block');
+        var topBlockHeight = $topBlock.parent().length > -1 ? $topBlock.parent().outerHeight() : 0;
+        var productNavHeight = $productNav.length > -1 ? $productNav.outerHeight() : 0;
 
-        if ($topBlock.length > -1) {
-            $topBlock.height(topBlockHeight);
+        if (topBlockHeight - productNavHeight > 0) {
+            $topBlock.height(topBlockHeight - productNavHeight);
+        }
+    },
+
+    videoResizing: function() {
+        "use strict";
+
+        var $videoWrapper = $('.security-page-video-block');
+        var videoWidth = $videoWrapper.outerWidth();
+        
+        if ($videoWrapper.length > 0 && videoWidth < 640) {
+            $videoWrapper.height(Math.round(videoWidth * 0.54));
+        }
+        else {
+            $videoWrapper.removeAttr('style');
         }
     }
 };

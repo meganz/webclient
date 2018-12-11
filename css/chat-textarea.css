@@ -2,11 +2,11 @@
     position: absolute;
     width: 100%;
     bottom: 0;
-    min-height: 72px;
+    min-height: 66px;
 }
 .chat-textarea {
-    margin: 0 24px 25px 24px;
-    padding: 15px 78px 13px 48px;
+    margin: 0 18px 18px 18px;
+    padding: 14px 78px 14px 54px;
     min-height: 48px;
     background-color: white;
     -moz-border-radius: 4px;
@@ -31,9 +31,9 @@
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
 }
 .chat-textarea .small-icon.conversations {
     position: absolute;
@@ -42,21 +42,80 @@
 }
 .chat-textarea-buttons {
     position: absolute;
-    right: 14px;
-    top: 14px;
+    right: 13px;
+    top: 13px;
 }
 .chat-textarea .popup-button {
-    float: right;
-    margin: 0 0 0 20px;
+    position: absolute;
+    right: 13px;
+    top: 13px;
+    cursor: pointer;
+}
+.chat-textarea .popup-button.left {
+    left: 0px;
+    right: auto;
+    top: 0px;
+    height: 100%;
+    width: 44px;
+    -webkit-transition: all 100ms ease-in-out;
+    -moz-transition: all 100ms ease-in-out;
+    -o-transition: all 100ms ease-in-out;
+    -ms-transition: all 100ms ease-in-out;
+    transition: all 100ms ease-in-out;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    -webkit-box-shadow: 0 0 0 1px rgba(95,172,207,0);
+    -moz-box-shadow: 0 0 0 1px rgba(95,172,207,0);
+    box-shadow: 0 0 0 1px rgba(95,172,207,0);
+}
+.chat-textarea .popup-button.left:hover {
+    background: #6ac0e7;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzZhYzBlNyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM1NWI4ZTUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top, #6ac0e7 0%, #55b8e5 100%);
+    background: -webkit-linear-gradient(top, #6ac0e7 0%,#55b8e5 100%);
+    background: linear-gradient(to bottom, #6ac0e7 0%,#55b8e5 100%);
+    -webkit-box-shadow: 0 0 0 1px rgba(95,172,207,0.7);
+    -moz-box-shadow: 0 0 0 1px rgba(95,172,207,0.7);
+    box-shadow: 0 0 0 1px rgba(95,172,207,0.7);
+}
+.chat-textarea .popup-button.left i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    margin: -10px 0 0 0;
+}
+.chat-textarea hr {
+    content:'';
+    display: block;
+    position: absolute;
+    width: 1px;
+    left: 44px;
+    top:0;
+    height: 100%;
+    margin: 0;
+    border: 0;
+    background-color: rgba(0,0,0,0.1);
+}
+.chat-textarea .grey-small-plus {
+    -moz-opacity: 0.73;
+    -khtml-opacity: 0.73;
+    opacity: 0.73;
+}
+.chat-textarea .popup-button.left:hover .grey-small-plus {
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    background-position: -82px -1474px;
 }
 .chat-textarea-scroll textarea, .chat-textarea-scroll textarea + div, .message.textarea-scroll textarea,  .message.textarea-block textarea + div {
     font-size: 14px;
     line-height: 20px;
+    font-family: 'LatoWeb', 'source_sans_proregular';
     width: 100%;
     border: 0;
     padding: 0;
     margin: 0;
-    color: #777777;
+    color: #373737;
     overflow: hidden;
     word-wrap: break-word;
     height: 20px;
@@ -82,20 +141,24 @@
     font-size: 0;
     line-height: 0;
     position: relative;
+    min-height: 20px;
+}
+.chat-textarea-scroll .jspPane, .message.textarea-scroll .jspPane, .textarea-scroll .textarea-wrapper .jspPane {
+	margin-left:  0 !important;
 }
 .chat-textarea-scroll textarea::-webkit-input-placeholder {
- color:#CCCCCC;
+ color:#999999;
 }
 .chat-textarea-scroll textarea:-moz-placeholder {
- color:#CCCCCC;
+ color:#999999;
  opacity: 1;
 }
 .chat-textarea-scroll textarea::-moz-placeholder {
- color:#CCCCCC;
+ color:#999999;
  opacity: 1;
 }
 .chat-textarea-scroll textarea:-ms-input-placeholder {
- color:#CCCCCC;
+ color:#999999;
 }
 .message.textarea-block {
     border: 1px solid #CCCCCC;
@@ -117,27 +180,13 @@
     left: 6px;
     top: 6px;
 }
-.message.textarea-buttons {
-    position: absolute;
-    right: 13px;
-    top: 6px;
-}
-.chat-textarea i {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
-    -moz-opacity: 0.73;
-    -khtml-opacity: 0.73;
-    opacity: 0.73;
-}
-.chat-textarea .button > i:hover {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
+.chat-textarea.edit-typing-area .button.popup-button {
+    right: 12px;
+    top: 5px;
 }
 .textarea-scroll.noscroll .jspVerticalBar {
     display: none;
 }
-
 .conversationsApp .fm-tree-panel.manual-tree-panel-scroll-management {
     overflow-x: hidden; /* don't allow child elements to be visible out of this container (happens when left pane is
     resized and the width is not yet updated, because of potential throttling */
@@ -152,7 +201,7 @@
     position: relative;
     top: 4px;
     margin: 0 0 20px 0;
-    padding: 6px 46px 6px 33px;
+    padding: 6px 46px 6px 6px;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
@@ -162,7 +211,7 @@
     left: 7px;
 }
 .edit-typing-area .chat-textarea-buttons {
-    top: 6px;
+    top: 5px;
 }
 
 .textarea-autofill-bl {

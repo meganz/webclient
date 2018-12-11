@@ -7,46 +7,148 @@ var mobile = {
     imagePath: staticpath + 'images/mobile/extensions/',
 
     /**
+     * Toast timer, reset if new toast comes in.
+     */
+    toastTimer: null,
+
+    /**
      * Show a simple toast message and hide it after 3 seconds
      * @param {String} message The message to show
      * @param {String} position Optional flag to show the position at the top, by default it shows at the bottom
+     * @param {int} timeout Optional, optional timeout in miliseconds
      */
-    showToast: function(message, position) {
+    showToast: function(message, position, timeout) {
+        'use strict';
+        mobile.renderToast($('.mobile.toast-notification.info'), message, position, timeout);
+    },
 
+    /**
+     * Show a green success toast.
+     * @param message
+     * @param position
+     * @param timeout Optional, optional timeout in miliseconds
+     */
+    showSuccessToast: function(message, position, timeout, clickCallback) {
         'use strict';
 
-        var $toastNotification = $('.mobile.toast-notification');
+        var $toast = $('.mobile.toast-notification.alert');
+        $toast.removeClass("error").addClass("success");
+        mobile.renderToast($toast, message, position, timeout, clickCallback);
+    },
+
+    /**
+     * Show red error toast.
+     * @param message
+     * @param position
+     * @param {int} timeout Optional, optional timeout in miliseconds
+     */
+    showErrorToast: function(message, position, timeout, clickCallback) {
+        'use strict';
+
+        var $toast = $('.mobile.toast-notification.alert');
+        $toast.removeClass("success").addClass("error");
+        mobile.renderToast($toast, message, position, timeout, clickCallback);
+    },
+
+    /**
+     * Render a specific toast notification.
+     * @param $toastNotification
+     * @param message
+     * @param position
+     * @param timeout int 0 = never close.
+     */
+    renderToast: function($toastNotification, message, position, timeout, clickCallback) {
+        'use strict';
 
         // Set the message and show the notification
-        $toastNotification.text(message).removeClass('hidden').addClass('active');
+        $toastNotification.find(".message-body").text(message);
+        $toastNotification.removeClass('hidden').addClass('active');
 
         // Show the toast notification at the top of the page (useful if the keyboard is open and blocking the bottom)
         if (position === 'top') {
             $toastNotification.addClass('top');
         }
 
-        // After 3 seconds, hide the notification
-        setTimeout(function() {
-            $toastNotification.addClass('hidden').removeClass('active top');
-        }, 3000);
+        if (mobile.toastTimer !== null) {
+            clearTimeout(mobile.toastTimer);
+            mobile.toastTimer = null;
+        }
+
+        if (timeout === undefined || timeout === null || timeout < 0) {
+            timeout = 3000;
+        }
+
+        if (timeout > 0) {
+            // After 3 seconds, hide the notification
+            mobile.toastTimer = setTimeout(function () {
+                mobile.closeToast($toastNotification);
+            }, timeout);
+        }
+
+        $toastNotification.off('tap');
+        if (clickCallback instanceof Function) {
+            $toastNotification.on('tap', clickCallback);
+        }
     },
 
     /**
-     * Shows and initialises the back button on click/tap event handler
-     * @param {Object} $backButton jQuery selector for the back button
+     * Close a toast notification.
+     * @param $toastNotification (optional, if ommited will close all toasts).
      */
-    showAndInitBackButton: function($backButton) {
+    closeToast: function($toastNotification) {
+        'use strict';
+
+        if ($toastNotification === undefined) {
+            $toastNotification = $(".mobile.toast-notification");
+        }
+
+        $toastNotification.addClass('hidden').removeClass('active top');
+    },
+
+    /**
+     * Initialise the back arrow icon in the header to go back to a specific page
+     * @param {Object} $page The jQuery selector for the current page
+     * @param {String} targetPage Optional strung to specify the previous page to go back to, otherwise it will go back
+     *                            one page in the browser history
+     */
+    initBackButton: function($page, targetPage) {
 
         'use strict';
 
-        // Show the back button
-        $backButton.removeClass('hidden');
+        // Unhide back button, then add on click/tap handler
+        $page.find('.fm-icon.back').removeClass('hidden').off('tap').on('tap', function() {
 
-        // On click of the back button
-        $backButton.off('tap').on('tap', function() {
+            // If page to go back to is specified, render that
+            if (typeof targetPage !== 'undefined') {
+                loadSubPage(targetPage);
+            }
+            else {
+                // Otherwise open the previous folder/page
+                window.history.back();
+            }
 
-            // Open the previous folder/page
-            window.history.back();
+            // Prevent double taps
+            return false;
+        });
+    },
+
+    /**
+     * Shows and initialises the up button on click/tap event handler
+     * @param {Object} $upButton jQuery selector for the up button
+     */
+    showAndInitUpButton: function($upButton) {
+
+        'use strict';
+
+        // Show the button
+        $upButton.removeClass('hidden');
+
+        // On click of the up button
+        $upButton.off('tap').on('tap', function() {
+            // Go up a directory.
+            if (M.currentdirid !== M.RootID && M.currentdirid !== M.RubbishID) {
+                M.openFolder(M.getNodeParent(M.currentdirid));
+            }
             return false;
         });
     },
@@ -223,8 +325,173 @@ var mobile = {
         // Show white background overlay behind the dialog
         $('.light-overlay').removeClass('hidden');
         $('.mobile.common-check-email-dialog').removeClass('hidden');
+    },
+
+    /**
+     * Enable the Password Change/Update button if the fields are complete and correct
+     * @param {Object} $page The jQuery selector for the current page
+     */
+    initPasswordFieldsKeyupEvent: function($page) {
+
+        'use strict';
+
+        var $passwordField = $page.find('.password-input');
+        var $confirmPasswordField = $page.find('.password-confirm-input');
+        var $button = $page.find('.update-password-button');
+        var $allFields = $passwordField.add($confirmPasswordField);
+
+        // Add keyup event to the input fields
+        $allFields.rebind('keyup.buttonenable', function(event) {
+
+            var password = $passwordField.val();
+            var confirmPassword = $confirmPasswordField.val();
+
+            // Change the button to red to enable it if they have entered something in all the fields
+            if (password.length > 0 && confirmPassword.length > 0) {
+
+                // Activate the button
+                $button.addClass('active');
+
+                // If the Enter key is pressed try updating
+                if (event.which === 13) {
+                    $button.trigger('tap');
+                }
+            }
+            else {
+                // Grey it out if they have not completed one of the fields
+                $button.removeClass('active');
+            }
+        });
+    },
+
+    /**
+     * Load the ZXCVBN password strength estimator library
+     * @param {Object} $page The jQuery selector for the current page
+     */
+    initPasswordEstimatorLibrary: function($page) {
+
+        'use strict';
+
+        // Make sure the library is loaded
+        if (typeof zxcvbn === 'undefined') {
+
+            // Show loading spinner
+            var $loader = $page.find('.estimator-loading-icon').addClass('loading');
+
+            // On completion of loading, hide the loading spinner
+            M.require('zxcvbn_js')
+                .done(function() {
+                    $loader.removeClass('loading');
+                });
+        }
+    },
+
+    /**
+     * Show what strength the currently entered password is on keyup
+     * @param {Object} $page The jQuery selector for the current page
+     */
+    initPasswordStrengthCheck: function($page) {
+
+        'use strict';
+
+        var $passwordStrengthBar = $page.find('.password-strength');
+        var $passwordInput = $page.find('.estimator-password-input');
+
+        // Add keyup event to the password text field
+        $passwordInput.rebind('keyup.passwordstrengthcheck', function() {
+
+            // Make sure the ZXCVBN password strength estimator library is loaded first
+            if (typeof zxcvbn !== 'undefined') {
+
+                // Estimate the password strength
+                var password = $.trim($passwordInput.val());
+                var passwordScore = zxcvbn(password).score;
+                var passwordLength = password.length;
+
+                // Remove previous strength classes that were added
+                $passwordStrengthBar.removeClass('good1 good2 good3 good4 good5');
+
+                // Add colour coding
+                if (passwordLength === 0) {
+                    return false;
+                }
+                else if (passwordLength < security.minPasswordLength) {
+                    $passwordStrengthBar.addClass('good1');    // Too short
+                }
+                else if (passwordScore === 4) {
+                    $passwordStrengthBar.addClass('good5');    // Strong
+                }
+                else if (passwordScore === 3) {
+                    $passwordStrengthBar.addClass('good4');    // Good
+                }
+                else if (passwordScore === 2) {
+                    $passwordStrengthBar.addClass('good3');    // Medium
+                }
+                else if (passwordScore === 1) {
+                    $passwordStrengthBar.addClass('good2');    // Weak
+                }
+                else {
+                    $passwordStrengthBar.addClass('good1');    // Very Weak
+                }
+            }
+        });
     }
 };
+
+
+mBroadcaster.once('startMega:mobile', function() {
+    'use strict';
+
+    var getOrientation = function() {
+        return !window.orientation || window.orientation === 180 ? 'portrait' : 'landscape';
+    };
+
+    $(window).on('orientationchange.moboc', function(ev) {
+        mobile.orientation = ev.orientation || getOrientation();
+
+        if (dlmanager.isOverQuota) {
+            onIdle(function() {
+                var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
+
+                if (mobile.orientation === 'landscape') {
+                    $('.speedometer.full', $dialog).removeClass('big-104px-icon');
+                }
+                else {
+                    $('.speedometer.full', $dialog).addClass('big-104px-icon');
+                }
+            });
+        }
+        mBroadcaster.sendMessage('orientationchange', mobile.orientation);
+    });
+
+    mobile.orientation = getOrientation();
+});
+
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    /**
+     * Show storage overquota banner
+     * @param {Number} perc percent
+     */
+    M.showOverStorageQuota = function(perc) {
+        if (perc > 90) {
+            var ab = mobile.alertBanner;
+            var isPro = Object(u_attr).p;
+            if (perc > 99) {
+                ab.showError(isPro ? l[16358] : l[16315]); // Your account is full
+                mobile.overStorageQuotaOverlay.show();
+            } else {
+                ab.showWarning(isPro ? l[16359] : l[19486]); // Your account is almost full.
+            }
+
+            // When the banner is taped, show pro page.
+            ab.onTap(function() {
+                loadSubPage('pro');
+            });
+        }
+    };
+});
 
 
 /**
@@ -237,6 +504,7 @@ var mobile = {
 mega.ui.tpp = {
     reset: function() {},
     setTotalProgress: function() {},
+    pause: function() {},
     resume: function() {},
     getTime: function() {},
     start: function() {},
@@ -258,6 +526,12 @@ mega.megadrop = {
     pufProcessPUH:  function(ap) { mobile.megadrop.processPUH(ap); },
     pufRemove: function(ids) { return mobile.megadrop.pufRemove(ids); },
     processUPHAP: function (ap) { mobile.megadrop.processUPH(ap); },
+    preMoveCheck: function(handles, target) {
+        var sel = Array.isArray(handles) ? handles : [handles];
+        var p = new MegaPromise();
+        p.resolve(sel, target);
+        return p;
+    },
     isDropExist: function (sel) { return mobile.megadrop.isDropExist(sel); }
 };
 
@@ -277,18 +551,29 @@ var alarm = {
         render: function() {}
     }
 };
+
 /* jshint strict: true */
 
-function msgDialog(type, title, msg, submsg, callback, checkbox) {
+function accountUI() {
+    'use strict';
+    loadSubPage('fm/account');
+}
+
+accountUI.updateSessionTable = function() {
 
     'use strict';
 
+    mobile.account.history.fetchSessionHistory();
+};
+
+function msgDialog(type, title, msg, submsg, callback, checkbox) {
+    'use strict';
+
     // Call the mobile version
-    mobile.messageOverlay.show(msg, submsg);
+    mobile.messageOverlay.show(msg, submsg, callback);
 }
 
 function fm_showoverlay() {
-
     'use strict';
 
     $('.fm-dialog-overlay').removeClass('hidden');
@@ -296,14 +581,42 @@ function fm_showoverlay() {
 }
 
 function fm_hideoverlay() {
-
     'use strict';
 
     $('.fm-dialog-overlay').addClass('hidden');
     $('html').removeClass('overlayed');
 }
 
+/** slimmed down version adapted from fm.js's (desktop) closeDialog() */
+function closeDialog() {
+    'use strict';
+
+    if (d) {
+        MegaLogger.getLogger('closeDialog').debug($.dialog);
+    }
+
+    fm_hideoverlay();
+    $('.fm-dialog').trigger('dialog-closed').addClass('hidden');
+    $('.fm-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
+
+    delete $.dialog;
+    mBroadcaster.sendMessage('closedialog');
+}
+
 mega.ui.showRegisterDialog = function() {};
+
+/**
+ * Shim for sendSignupLinkDialog, likely called from showOverQuotaRegisterDialog
+ * @param {Object} accountData The registration vars in localStorage.awaitingConfirmationAccount
+ */
+mega.ui.sendSignupLinkDialog = function(accountData) {
+
+    'use strict';
+
+    parsepage(pages['mobile']);
+    mobile.register.showConfirmEmailScreen(accountData);
+    topmenuUI();
+};
 
 mega.loadReport = {};
 var previews = {};
@@ -317,11 +630,21 @@ function removeUInode(nodeHandle, parentHandle) {
     mobile.cloud.renderDelete(nodeHandle, parentHandle);
 }
 
+function showToast(type, msg) {
+    'use strict';
+    mobile.showToast(msg);
+}
+
 // Not required for mobile
 function fmtopUI() {}
 function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
-function closeDialog() {}
+function slideshow_handle() {}
+accountUI.setBirthYear = function() {};
+accountUI.setBirthMonth = function() {};
+accountUI.setBirthDay = function() {};
+accountUI.setCountry = function() {};
+accountUI.setRubsched = function() {};
 /* jshint +W098 */
 /* jshint +W007 */

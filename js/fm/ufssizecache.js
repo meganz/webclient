@@ -117,6 +117,7 @@ UFSSizeCache.prototype.addToDB = function(n) {
             h: n.h,
             p: n.p,
             s: n.s >= 0 ? n.s : -n.t,
+            t: n.t ? 1262304e3 - n.ts : n.ts,
             c: n.hash || '',
             d: n
         });
@@ -149,6 +150,7 @@ UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
     tmp.h = n.h;
     tmp.p = n.p;
     tmp.t = M.IS_TREE;
+    tmp.lbl = n.lbl;
 
     if (ignoreDB) {
         if (n.t & M.IS_TREE) tmp.t = n.t;
@@ -264,8 +266,8 @@ UFSSizeCache.prototype.delNode = function(h, ignoreDB) {
             td = n.td + 1;
             tf = n.tf;
             tb = n.tb;
-            tvf = n.tvf;
-            tvb = n.tvb;
+            tvf = n.tvf || 0;
+            tvb = n.tvb || 0;
 
             this.delTreeNode(n.h, n.p);
         }

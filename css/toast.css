@@ -73,7 +73,10 @@
     background-position: -85px -860px;
 }
 .clipboard .toast-icon {
-    background-position: -85px -1162px;
+    background-position: -196px -128px;
+    background-image: url(../images/mega/icons-sprite_v23@2x.png);
+    background-size: 262px auto;
+    opacity: 0.74;
 }
 .settings .toast-icon {
     background-position: -85px -1212px;
@@ -84,14 +87,18 @@
 .warning .toast-icon {
     background-position: -85px -1260px;
 }
-.settings .toast-button {
+.recoveryKey .toast-icon {
+    background-image: url(../images/mega/recover-account-sprite@2x.png);
+    background-size: 360px auto;
+    background-position: -176px -742px;
+}
+.settings .toast-button, .recoveryKey .toast-button {
     display: none;
 }
 .send-chat .toast-icon {
-    background-image: url(../images/mega/top-sprite_v4@2x.png);
-    background-position:-82px -151px;
-    background-size: 38px 1574px;
-    opacity: 0.8;
+    background-image: url(../images/mega/top-sprite_v5.png);
+    background-position: -82px -151px;
+    opacity: 0.6;
 }
 .toast-body {
     display: table;
@@ -110,8 +117,9 @@
     display: inline-block;
     vertical-align: middle;
 }
-.toast-col:nth-child(1) {
-    padding: 0 0 4px 0;
+.toast-col:nth-child(1) span span {
+    color: #999999;
+    display: block;
 }
 .toast-col:nth-child(2) {
     padding: 0 16px 2px 0;
@@ -119,6 +127,13 @@
     white-space: nowrap;
     width: 0;
     font-size: 0;
+}
+.toast-notification.short {
+    max-width: 358px;
+    margin-left: -177px;
+}
+.short .toast-col:nth-child(2) {
+    display: none;
 }
 .toast-col:nth-child(3) {
     width: 40px;
@@ -209,7 +224,7 @@
     float: left;
 }
 .toast-close-button.qr-toast-close {
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     background-position: -136px -206px;
     margin-top: -4px;
     margin-left: 226px;
@@ -246,7 +261,7 @@
     display: inline-block;
     width: 14px;
     height: 14px;
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     vertical-align: top;
     margin: 2px 9px 0 1px;
     background-position: -198px -1240px;
@@ -266,18 +281,20 @@
 
 /* Mobile*/
 .mobile.toast-notification {
-    font-size: 15px;
-    line-height: 40px;
-    margin-left: -37%;
-    margin-bottom: 0;
+    font-size: 14px;
+    margin-left: -40%;
+    margin-bottom: 48px;
     padding: 0;
     text-align: center;
-    width: 75%;
-    background-color: #565656;
-    color: white;
+    width: 80%;
+    background-color: rgba(222, 222, 222, 0.8);
+    border: 1px solid #ccc;
+    color: #555;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
+    border-radius: 3px;
+    max-width: 420px;
 }
 .mobile.toast-notification::before {
     display: none;
@@ -293,4 +310,34 @@
 .mobile.toast-notification .toast-icon {
     display: none;
 }
+.mobile.toast-notification.info .message-body {
+    text-align: center;
+}
+.mobile.toast-notification.success {
+    background-color: rgba(0, 191, 166, 0.9);
+    color: white;
+}
+
+.mobile.toast-notification.error {
+    background-color: #9a1c06;
+    color: white;
+}
+
+.mobile.toast-notification .message-body {
+    margin-left: 5px;
+    padding: 12px 12px;
+    text-align: left;
+}
+
+.mobile.toast-notification .toast-alert-icon {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+@media screen and (min-width: 500px) {
+    .mobile.toast-notification {
+        margin-left: -210px;
+    }
+}
+
 /* end of Mobile*/

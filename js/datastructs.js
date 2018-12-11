@@ -432,7 +432,6 @@ MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
     assert(typeof(k) !== 'undefined' && k !== false, "missing key");
 
     var self = this;
-
     if (typeof v._dataChangeIndex != 'undefined' &&  !v._parent) {
         v._parent = this;
     }

@@ -26,7 +26,7 @@ var JScrollPane = React.createClass({
         $elem.find('.jspContainer').replaceWith(
             function() {
                 var $children = $elem.find('.jspPane').children();
-                if ($children.size() === 0 || $children.size() > 1) {
+                if ($children.length === 0 || $children.length > 1) {
                     console.error(
                         "JScrollPane on element: ", $elem, "encountered multiple (or zero) children nodes.",
                         "Mean while, JScrollPane should always (!) have 1 children element."
@@ -115,9 +115,9 @@ var JScrollPane = React.createClass({
     },
     componentWillUnmount: function() {
         var $elem = $(ReactDOM.findDOMNode(this));
-        $elem.unbind('jsp-will-scroll-y.jsp' + this.getUniqueId());
+        $elem.off('jsp-will-scroll-y.jsp' + this.getUniqueId());
 
-        $(window).unbind('resize.jsp' + this.getUniqueId());
+        $(window).off('resize.jsp' + this.getUniqueId());
     },
     eventuallyReinitialise: function(forced, scrollPositionYPerc, scrollToElement) {
         var self = this;
@@ -278,7 +278,7 @@ var EmojiFormattedContent = React.createClass({
     },
     render: function() {
         this._eventuallyUpdateInternalState();
-        
+
         return <span dangerouslySetInnerHTML={{__html: this._formattedContent}}></span>;
     }
 });

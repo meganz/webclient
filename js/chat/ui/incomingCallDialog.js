@@ -35,7 +35,8 @@
             isVideoCall,
             answerAudioFn,
             answerVideoFn,
-            cancelFn
+            cancelFn,
+            isGroupCall
         ) {
         var self = this;
 
@@ -62,22 +63,18 @@
         }
 
 
-        $('.cancel-call', self.$dialog).unbind('mouseup');
-        $('.cancel-call', self.$dialog).bind('mouseup', function() {
+        $('.cancel-call', self.$dialog).rebind('mouseup.IncomingCallDialog', function() {
             cancelFn();
         });
 
-        $('.audio-call', self.$dialog).unbind('mouseup');
-        $('.audio-call', self.$dialog).bind('mouseup', function() {
+        $('.audio-call', self.$dialog).rebind('mouseup.IncomingCallDialog', function() {
             answerAudioFn();
         });
 
-        $('.video-call', self.$dialog).unbind('mouseup');
-        $('.video-call', self.$dialog).bind('mouseup', function() {
+        $('.video-call', self.$dialog).rebind('mouseup.IncomingCallDialog', function() {
             answerVideoFn();
         });
-        $('.fm-dialog-close', self.$dialog).unbind('mouseup');
-        $('.fm-dialog-close', self.$dialog).bind('mouseup', function() {
+        $('.fm-dialog-close', self.$dialog).rebind('mouseup.IncomingCallDialog', function() {
             self.hide();
         });
 
@@ -92,13 +89,21 @@
         self.$dialog.removeClass('hidden');
         $('.fm-dialog-overlay').removeClass('hidden');
 
-        // auto hide on click out of the dialog
-        //$(document).unbind('mouseup.IncomingCallDialog');
-        //$(document).bind('mouseup.IncomingCallDialog', function(e) {
-        //    if ($(e.target).parents('.fm-chat-attach-popup').size() == 0 && !$(e.target).is(self.options.buttonElement)) {
-        //        self.hide();
-        //    }
-        //});
+
+        if (isGroupCall) {
+            $('.video-call', self.$dialog).hide();
+            $('.incoming-call-txt, .icoming-call-header', self.$dialog).text(
+                l[19995] || 'Incoming group call...'
+            );
+            self.$dialog.addClass('group-call');
+        }
+        else {
+            $('.video-call', self.$dialog).show();
+            $('.incoming-call-txt, .icoming-call-header', self.$dialog).text(
+                (l[17878] || "Incoming call") + '...'
+            );
+            self.$dialog.removeClass('group-call');
+        }
     };
 
     /**
@@ -111,8 +116,8 @@
             return;
         }
         // auto hide on click out of the dialog - cleanup
-        $(document).unbind('mouseup.IncomingCallDialog');
-        $(document).unbind('keypress.IncomingCallDialog');
+        $(document).off('mouseup.IncomingCallDialog');
+        $(document).off('keypress.IncomingCallDialog');
 
         self.visible = false;
         self.$dialog.addClass('hidden');
@@ -169,9 +174,7 @@
      */
     IncomingCallDialog.DIALOG_TEMPLATE = '<div class="fm-dialog incoming-call-dialog hidden">\n' +
         '<div class="fm-dialog-close"></div>\n' +
-        '<div class="icoming-call-header">\n' +
-        '   Incoming call...\n' +
-        '</div>\n' +
+        '<div class="icoming-call-header"></div>\n' +
         '<div class="incoming-call-avatar">\n' +
         '       <div class="incoming-call-shadow-bl"></div>\n' +
         '       <div class="incoming-call-avatar-bl"></div>\n' +
@@ -179,7 +182,7 @@
         '<div class="incoming-call-username">\n' +
 		  '<span class="incoming-contact-info">\n' +
             '<span class="incoming-call-name"></span>\n' +
-            '<span class="incoming-call-txt">Incoming call...</span>\n' +
+            '<span class="incoming-call-txt"></span>\n' +
           '</span>\n' +
         '</div>\n' +
         '<div class="incoming-call-buttons">\n' +

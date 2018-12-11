@@ -48,14 +48,14 @@
             ]
         };
 
-        mega.ui.Dialog.prototype.constructor.apply(self, [
-            $.extend({}, defaultOptions, opts)
-        ]);
+        mega.ui.Dialog.call(this, Object.assign({}, defaultOptions, opts));
 
         self.bind("onBeforeShow", function() {
             $('.fm-dialog-overlay').addClass('hidden');
         });
     };
+
+    KeySignatureWarningDialog.prototype = Object.create(mega.ui.Dialog.prototype);
 
     KeySignatureWarningDialog.prototype._initGenericEvents = function() {
         var self = this;
@@ -101,9 +101,6 @@
             $dialog.find('.information').addClass('noAvatar');
         }
     };
-
-    KeySignatureWarningDialog.prototype = $.extend({}, mega.ui.Dialog.prototype,
-                                                   KeySignatureWarningDialog.prototype);
 
     /**
      * Initialises the Key Signature Warning Dialog.

@@ -80,10 +80,15 @@ MegaData.prototype.onlineStatusEvent = function(u, status) {
  */
 MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
     if (d) console.debug('Draw received contacts grid.');
-    var html, email, ps, trClass, id,
-        type = '',
-        drawn = false,
-        t = '.grid-table.contact-requests';
+    var html;
+    var email;
+    var ps;
+    var ts;
+    var trClass;
+    var id;
+    var type = '';
+    var drawn = false;
+    var t = '.grid-table.contact-requests';
     var contactName = '';
 
     if (this.currentdirid === 'ipc') {
@@ -105,27 +110,29 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
                 }
                 trClass = (type !== '') ? ' class="' + type + '"' : '';
                 email = ipc[i].m;
-                contactName = this.getNameByHandle(ipc[i].p);
 
-                if (ipc[i].ps && ipc[i].ps !== 0) {
-                    ps = '<span class="contact-request-content">' + ipc[i].ps + ' ' + l[105] + ' ' + l[813] + '</span>';
-                }
-                else {
-                    ps = '<span class="contact-request-content">' + l[5851] + '</span>';
+                if (ipc[i].ts) {
+                    ts = time2last(ipc[i].ts);
                 }
                 html = '<tr id="ipc_' + id + '"' + trClass + '>' +
                     '<td>' +
-                    useravatar.contact(email, 'nw-contact-avatar') +
+                    useravatar.contact(email) +
                     '<div class="fm-chat-user-info">' +
                     '<div class="fm-chat-user">' + htmlentities(contactName) + '</div>' +
                     '<div class="contact-email">' + htmlentities(email) + '</div>' +
                     '</div>' +
                     '</td>' +
-                    '<td>' + ps + '</td>' +
-                    '<td>' +
-                    '<div class="contact-request-button default-white-button grey-txt small right delete"><span>' + l[5858] + '</span></div>' +
-                    '<div class="contact-request-button default-white-button grey-txt small right accept"><span>' + l[5856] + '</span></div>' +
-                    '<div class="contact-request-button default-white-button grey-txt small right ignore"><span>' + l[5860] + '</span></div>' +
+                    '<td>' + ts + '</td>' +
+                    '<td class="right-textalign">' +
+                    '<div class="contact-request-button default-white-button green-txt inline accept">' +
+                    '<i class="small-icon icons-sprite tiny-green-tick"></i>' +
+                    '<span>' + l[5856] + '</span></div>' +
+                    '<div class="contact-request-button default-white-button grey-txt inline ignore">' +
+                    '<i class="small-icon icons-sprite stop dark"></i>' +
+                    '<span>' + l[5860] + '</span></div>' +
+                    '<div class="contact-request-button default-white-button red-txt inline delete">' +
+                    '<i class="small-icon icons-sprite tiny-red-cross"></i>' +
+                    '<span>' + l[5858] + '</span></div>' +
                     '<div class="contact-request-ignored"><span>' + l[5864] + '</span></div>' +
                     '<div class="clear"></div>' +
                     '</td>' +
@@ -140,18 +147,21 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
         // If at least one new item is added then ajust grid
         if (drawn) {
             $('.fm-empty-contacts').addClass('hidden');
+            $('.button.link-button.accept-all').removeClass('hidden');
+
+            // Update IPC indicator
+            delay('updateIpcRequests', updateIpcRequests);
 
             // hide/show sent/received grid
             $('.sent-requests-grid').addClass('hidden');
             $('.contact-requests-grid').removeClass('hidden');
 
-            initIpcGridScrolling();
+            fm_resize_handler(true);
 
             /**
              * Bind actions to Received Pending Conctact Request buttons
              */
             $('.contact-requests-grid .contact-request-button').rebind('click', function() {
-
                 var $self = $(this);
                 var $reqRow = $self.closest('tr');
                 var ipcId = $reqRow.attr('id').replace('ipc_', '');
@@ -171,6 +181,32 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
                         $reqRow.remove();
                     }
                 }
+            });
+
+            $('.contact-requests-grid td').rebind('dblclick.shownewcontact', function(e) {
+                var $this = $(this);
+                var u_handle = $this.parent('tr').attr('id').replace('ipc_', '');
+
+                if ($(e.target).parent('.contact-request-button').length) {
+                    return false;
+                }
+
+                newContactDialog(u_handle);
+
+                return false; // stop propagation!
+            });
+
+            $('.button.link-button.accept-all').rebind('click', function() {
+                var $requestsList= $('.grid-table.contact-requests tr');
+                var ipcId = '';
+
+                $requestsList.each(function() {
+                    ipcId = $(this).attr('id').replace('ipc_', '');
+
+                    if (M.acceptPendingContactRequest(ipcId) === 0) {
+                        $(this).remove();
+                    }
+                });
             });
         }
     }
@@ -210,11 +246,15 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
 
     if (d) console.debug('Draw sent invites.');
 
-    var html, hideCancel, hideReinvite, hideOPC,
-        drawn = false,
-        TIME_FRAME = 60 * 60 * 24 * 14,// 14 days in seconds
-        utcDateNow = Math.floor(Date.now() / 1000),
-        t = '.grid-table.sent-requests';
+    var html;
+    var hideCancel;
+    var hideReinvite;
+    var hideOPC;
+    var drawn = false;
+    var TIME_FRAME = 60 * 60 * 24 * 14;// 14 days in seconds
+    var utcDateNow = Math.floor(Date.now() / 1000);
+    var rts;
+    var t = '.grid-table.sent-requests';
 
     if (this.currentdirid === 'opc') {
 
@@ -238,24 +278,35 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
                     }
                 }
 
+                if (opc[i].rts) {
+                    rts = time2last(opc[i].rts);
+                }
+                else {
+                    // if action packet does not contains rts, it is treated as canceled
+                    rts = l[6112];
+                }
+
                 hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
                 html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +
                     '<td>' +
                     '<div class="left email">' +
-                    '<div class="nw-contact-avatar"></div>' +
+                    '<div class="avatar-wrapper small-rounded-avatar"></div>' +
                     '<div class="fm-chat-user-info">' +
                     '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
                     '</div>' +
                     '</div>' +
                     '</td>' +
-                    '<td>' +
-                    '<div class="default-white-button grey-txt small ' +
-                    'contact-request-button right cancel ' + hideCancel + '">' +
-                    '<span>' + escapeHTML(l[5930]) + '</span>' +
-                    '</div>' +
-                    '<div class="default-white-button grey-txt small ' +
-                    'contact-request-button right reinvite ' + hideReinvite + '">' +
+                    '<td>' + rts + '</td>' +
+                    '<td class="right-textalign">' +
+                    '<div class="default-white-button grey-txt ' +
+                    'contact-request-button inline reinvite ' + hideReinvite + '">' +
+                    '<i class="small-icon icons-sprite reverted dark"></i>' +
                     '<span>' + escapeHTML(l[5861]) + '</span>' +
+                    '</div>' +
+                    '<div class="default-white-button red-txt ' +
+                    'contact-request-button inline cancel ' + hideCancel + '">' +
+                    '<i class="small-icon icons-sprite tiny-red-cross"></i>' +
+                    '<span>' + escapeHTML(l[82]) + '</span>' +
                     '</div>' +
                     '</td></tr>';
 
@@ -272,7 +323,7 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
             $('.contact-requests-grid').addClass('hidden');
             $('.sent-requests-grid').removeClass('hidden');
 
-            initOpcGridScrolling();
+            fm_resize_handler(true);
 
             /**
              * Bind actions to Received pending contacts requests buttons
@@ -285,16 +336,15 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
 
                 if ($self.is('.reinvite')) {
                     M.reinvitePendingContactRequest(M.opc[opcId].m);
+                    $reqRow.addClass('hidden');
                     $reqRow.children().children('.contact-request-button.reinvite').addClass('hidden');
+                    contactsInfoDialog(l[19126], M.opc[opcId].m, l[19127]);
                 }
                 else if ($self.is('.cancel')) {
 
                     // If successfully deleted, grey column and hide buttons
                     if (M.cancelPendingContactRequest(M.opc[opcId].m) === 0) {
-                        $(this).addClass('hidden');
-                        $reqRow.children().children('.contact-request-button.cancel').addClass('hidden');
-                        $reqRow.children().children('.contact-request-button.reinvite').addClass('hidden');
-                        $reqRow.addClass('deleted');
+                        $reqRow.remove();
                     }
                 }
             });
@@ -383,6 +433,7 @@ MegaData.prototype.contacts = function() {
         });
 
     var sortBy = $.sortTreePanel['contacts'].by;
+    var sortDirection = $.sortTreePanel['contacts'].dir;
     var sortFn;
 
     if (sortBy === 'last-interaction') {
@@ -398,15 +449,16 @@ MegaData.prototype.contacts = function() {
         sortFn = this.getSortByDateTimeFn();
     }
     else if (sortBy === 'fav') {
-        sortFn = this.getSortByFavFn();
+        sortFn = this.sortByFavFn(sortDirection);
     }
-
-    var sortDirection = $.sortTreePanel['contacts'].dir;
-    activeContacts.sort(
-        function(a, b) {
-            return sortFn(a, b, sortDirection);
-        }
-    );
+    
+    if (typeof sortFn === 'function') {
+        activeContacts.sort(
+            function(a, b) {
+                return sortFn(a, b, sortDirection);
+            }
+        );
+    }
 
     var html = '';
     var onlinestatus;
@@ -431,7 +483,7 @@ MegaData.prototype.contacts = function() {
                     + onlinestatus[1] + '" id="contact_' + htmlentities(activeContacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(name)
-                    + ' <a class="button start-chat-button"><span></span></a></div></div>';
+                    + '<a class="button start-chat-button"><span></span></a></div></div>';
             }
             $('.fm-start-chat-dropdown').addClass('hidden');
         }
@@ -440,24 +492,31 @@ MegaData.prototype.contacts = function() {
     $('.content-panel.contacts').html(html);
 
     if (megaChatIsReady) {
-        $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
-        $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
-            var m = $('.fm-start-chat-dropdown'),
-                scrollPos = 0;
+        var $dropdown = $('.fm-start-chat-dropdown');
+
+        $('.fm-tree-panel').rebind('click.megaChat', '.start-chat-button', function() {
+            var scrollPos = 0;
 
             var $this = $(this);
             var $userDiv = $this.parent().parent();
 
             $.hideContextMenu();
 
-            if (!$this.is(".active")) {
+            if (!$this.is('.active')) {
+                var docHeight = $(document).height();
+                var dropdownHeight = $dropdown.outerHeight();
+                var buttonPos = $this.offset().top;
+
                 $('.start-chat-button').removeClass('active');
 
-                $('.dropdown-item', m).removeClass("disabled");
-
                 $this.addClass('active');
-                var y = $this.offset().top + 21;
-                m
+                var y = buttonPos + 21;
+
+                if (y + dropdownHeight > docHeight) {
+                    y = buttonPos - dropdownHeight - 5;
+                }
+
+                $dropdown
                     .css('top', y)
                     .removeClass('hidden')
                     .addClass('active')
@@ -465,7 +524,7 @@ MegaData.prototype.contacts = function() {
             }
             else {
                 $this.removeClass('active');
-                m
+                $dropdown
                     .removeClass('active')
                     .addClass('hidden')
                     .removeData("triggeredBy");
@@ -476,7 +535,7 @@ MegaData.prototype.contacts = function() {
             return false; // stop propagation!
         });
 
-        $('.fm-start-chat-dropdown .dropdown-item.startchat-item').rebind('click.treePanel', function() {
+        $dropdown.find('.startchat-item').rebind('click.treePanel', function() {
             var $this = $(this);
 
             if (!$this.is(".disabled")) {
@@ -485,41 +544,40 @@ MegaData.prototype.contacts = function() {
             }
         });
 
-        $('.fm-start-chat-dropdown .dropdown-item.startaudio-item').rebind('click.treePanel', function() {
+        $dropdown.find('.startaudio-item').rebind('click.treePanel', function() {
             var $this = $(this);
             var $triggeredBy = $this.parent().data("triggeredBy");
             var $userDiv = $triggeredBy.parent().parent();
 
-            if (!$this.is(".disabled")) {
-                var user_handle = $userDiv.attr('id').replace("contact_", "");
+            if (!$this.is('.disabled')) {
+                var user_handle = $userDiv.attr('id').replace('contact_', '');
 
-                loadSubPage("fm/chat/" + user_handle);
-                var room = megaChat.createAndShowPrivateRoomFor(user_handle);
-                if (room) {
-                    room.startAudioCall();
-                }
+                megaChat.createAndShowPrivateRoomFor(user_handle)
+                    .then(function(room) {
+                        room.setActive();
+                        room.startAudioCall();
+                    });
             }
         });
 
-        $('.fm-start-chat-dropdown .dropdown-item.startvideo-item').rebind('click.treePanel', function() {
+        $dropdown.find('.startvideo-item').rebind('click.treePanel', function() {
             var $this = $(this);
-            var $triggeredBy = $this.parent().data("triggeredBy");
+            var $triggeredBy = $this.parent().data('triggeredBy');
             var $userDiv = $triggeredBy.parent().parent();
 
-            if (!$this.is(".disabled")) {
-                var user_handle = $userDiv.attr('id').replace("contact_", "");
+            if (!$this.is('.disabled')) {
+                var user_handle = $userDiv.attr('id').replace('contact_', '');
 
-                loadSubPage("fm/chat/" + user_handle);
-                var room = megaChat.createAndShowPrivateRoomFor(user_handle);
-                if (room) {
-                    room.startVideoCall();
-                }
+                megaChat.createAndShowPrivateRoomFor(user_handle)
+                    .then(function(room) {
+                        room.setActive();
+                        room.startVideoCall();
+                    });
             }
         });
     }
 
-    $('.fm-tree-panel').undelegate('.nw-contact-item', 'click');
-    $('.fm-tree-panel').delegate('.nw-contact-item', 'click', function() {
+    $('.fm-tree-panel').rebind('click', '.nw-contact-item', function() {
         var id = $(this).attr('id');
         if (id) {
             id = id.replace('contact_', '');
@@ -530,7 +588,7 @@ MegaData.prototype.contacts = function() {
     });
 
     // On the Contacts screen, initiate a call by double clicking a contact name in the left panel
-    $('.fm-tree-panel').delegate('.nw-contact-item.online', 'dblclick', function() {
+    $('.fm-tree-panel').rebind('dblclick.treepanel', '.nw-contact-item.online', function() {
 
         // Get the element ID
         var $this = $(this);
@@ -540,6 +598,8 @@ MegaData.prototype.contacts = function() {
         var user_handle = id.replace('contact_', '');
         loadSubPage('fm/chat/' + user_handle);
     });
+
+    M.addTreeUI();
 };
 
 MegaData.prototype.getContacts = function(n) {
@@ -636,11 +696,12 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             u_attr.lastname = lastName;
             u_attr.name = self.u[userId].name;
 
-            $('.user-name').text(u_attr.name);
-
-            $('.membership-big-txt.name:visible').text(
-                u_attr.name
-            );
+            $('.user-name').text(u_attr.fullname);
+            $('.membership-big-txt.name').text(u_attr.fullname);
+            if (M.currentdirid === 'account') {
+                $('.account.tab-content.general #account-firstname').val(firstName);
+                $('.account.tab-content.general #account-lastname').val(lastName);
+            }
         }
     });
 };
@@ -694,7 +755,7 @@ MegaData.prototype.syncContactEmail = function(userHash) {
      */
     var onContactChanged = function(contact) {
         if (fminitialized) {
-            if (getSitePath() === "/fm/" + contact.u) {
+            if (getSitePath() === '/fm/' + contact.u) {
                 // re-render the contact view page if the presence had changed
                 M.addContactUI();
             }
@@ -862,6 +923,8 @@ MegaData.prototype.delPS = function(pcrId, nodeId) {
 MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
     "use strict";
 
+    var invitePromise = new MegaPromise();
+
     if (d) {
         console.debug('inviteContact');
     }
@@ -879,13 +942,16 @@ MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
                 // In case of invite-dialog we will use notifications
                 if ($.dialog !== 'invite-friend') {
                     M.inviteContactMessageHandler(resp.p);
+                    invitePromise.resolve(resp.m);
                 }
             }
             if (typeof resp !== 'object' && contactLink) {
                 M.inviteContactMessageHandler(resp);
             }
+            invitePromise.reject(false);
         }
     });
+    return invitePromise;
 };
 
 /**

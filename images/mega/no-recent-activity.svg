@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="102px" height="102px" viewBox="0 0 102 102" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 52.3 (67297) - http://www.bohemiancoding.com/sketch -->
+    <title>C44A3187-4028-4FA9-8CD1-2E82D81DBBCB</title>
+    <desc>Created with sketchtool.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#FCFCFC" offset="100%"></stop>
+        </linearGradient>
+        <path d="M664,422 C637.490332,422 616,400.509668 616,374 C616,347.490332 637.490332,326 664,326 C690.509668,326 712,347.490332 712,374 C712,400.509668 690.509668,422 664,422 Z M663,351 L663,373.585786 L637.292893,399.292893 C636.902369,399.683418 636.902369,400.316582 637.292893,400.707107 C637.683418,401.097631 638.316582,401.097631 638.707107,400.707107 L664.707107,374.707107 C664.894643,374.51957 665,374.265216 665,374 L665,351 C665,350.447715 664.552285,350 664,350 C663.447715,350 663,350.447715 663,351 Z" id="path-2"></path>
+        <filter x="-4.7%" y="-3.6%" width="109.4%" height="109.4%" filterUnits="objectBoundingBox" id="filter-3">
+            <feMorphology radius="1" operator="dilate" in="SourceAlpha" result="shadowSpreadOuter1"></feMorphology>
+            <feOffset dx="0" dy="1" in="shadowSpreadOuter1" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feComposite in="shadowBlurOuter1" in2="SourceAlpha" operator="out" result="shadowBlurOuter1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.15 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Recents" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="00-Recents-init" transform="translate(-613.000000, -324.000000)">
+            <g id="Combined-Shape">
+                <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
+                <path stroke-opacity="0.05" stroke="#000000" stroke-width="1" d="M664,422.5 C637.21419,422.5 615.5,400.78581 615.5,374 C615.5,347.21419 637.21419,325.5 664,325.5 C690.78581,325.5 712.5,347.21419 712.5,374 C712.5,400.78581 690.78581,422.5 664,422.5 Z M663.5,351 L663.5,373.792893 L637.646447,399.646447 C637.451184,399.841709 637.451184,400.158291 637.646447,400.353553 C637.841709,400.548816 638.158291,400.548816 638.353553,400.353553 L664.353553,374.353553 C664.447322,374.259785 664.5,374.132608 664.5,374 L664.5,351 C664.5,350.723858 664.276142,350.5 664,350.5 C663.723858,350.5 663.5,350.723858 663.5,351 Z" fill="url(#linearGradient-1)" fill-rule="evenodd"></path>
+            </g>
+        </g>
+    </g>
+</svg>

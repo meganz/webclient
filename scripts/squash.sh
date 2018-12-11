@@ -33,7 +33,19 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
-if [ "$1" = "p" -o "$1" = "push" ]; then
+for var in "$@"
+do
+    if [ "$var" = "ra" ]; then
+        git commit --amend --no-edit --reset-author
+        echo "Reseting Author."
+    fi
+
+    if [ "$var" = "p" -o "$var" = "push" ]; then
+        pushing=true
+    fi
+done
+
+if [ "$pushing" = true ]; then
     remote=$(git remote -v | grep "@code.developers.mega.co.nz:web/webclient.git (push)" | awk '{print $1}')
     if [ "$remote" = "" ]; then
         remote=origin

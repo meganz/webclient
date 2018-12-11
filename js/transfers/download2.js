@@ -96,7 +96,7 @@ var dlmanager = {
         }
 
         if (typeof dl === 'string') {
-            dl = {ph: dl};
+            dl = {ph: dl, hasResumeSupport: true};
         }
         var promise;
         var tag = this.getResumeInfoTag(dl);
@@ -108,6 +108,9 @@ var dlmanager = {
         if (this.resumeInfoCache[tag]) {
             this.resumeInfoCache[tag].tag = tag;
             promise = MegaPromise.resolve(this.resumeInfoCache[tag]);
+        }
+        else if (!dl.hasResumeSupport) {
+            promise = MegaPromise.resolve(false);
         }
         else {
             promise = M.getPersistentData(tag);
@@ -764,6 +767,20 @@ var dlmanager = {
                 showToast('download', eekey ? l[24] : l[23]);
             }
         }
+
+        if (eekey) {
+            if (String(dl && dl.url).length > 256) {
+                // Decryption error from proxied CloudRAID download
+                eventlog(99706, JSON.stringify([1, dl && dl.id]));
+            }
+            else {
+                eventlog(99711, JSON.stringify([1, dl && dl.id]));
+            }
+        }
+
+        if (code === ETEMPUNAVAIL) {
+            eventlog(99698, true);
+        }
     },
 
     dlClearActiveTransfer: function DM_dlClearActiveTransfer(dl_id) {
@@ -1129,7 +1146,7 @@ var dlmanager = {
             $('.download.in-progress, .video-mode-wrapper', $dlPageTW).removeClass('over-quota');
             $('.download.file-info').removeClass('overquota');
         }
-        else {
+        else if (ids.length) {
             $('#' + ids.join(',#'))
                 .addClass('transfer-queued')
                 .find('.transfer-status')
@@ -1217,10 +1234,25 @@ var dlmanager = {
         }
     },
 
-    _overquotaInfo: function() {
+    _onOverQuotaAttemptRetry: function() {
+        'use strict';
 
-        api_req({a: 'uq', xfer: 1}, {
-            callback: function(res) {
+        if (!this.onOverquotaWithAchievements) {
+            if (this.isOverQuota && !this.isOverFreeQuota) {
+                this.uqFastTrack = !Object(u_attr).p;
+                delay('overquota:uqft', this._overquotaInfo.bind(this), 900);
+            }
+
+            if (typeof this.onLimitedBandwidth === 'function') {
+                this.onLimitedBandwidth();
+            }
+        }
+    },
+
+    _overquotaInfo: function() {
+        'use strict'; /* jshint -W074 */
+
+        var onQuotaInfo = function(res) {
                 if (typeof res === "number") {
                     // Error, just keep retrying
                     Soon(this._overquotaInfo.bind(this));
@@ -1276,6 +1308,11 @@ var dlmanager = {
                     var $countdown = $dialog.find('.countdown').removeClass('hidden');
                     $countdown.safeHTML(secondsToTime(timeLeft, 1));
 
+                    if ($dlPageCountdown) {
+                        var html = '<span class="countdown">' + secondsToTime(timeLeft) + '</span>';
+                        $dlPageCountdown.safeHTML(escapeHTML(l[7100]).replace('%1', html));
+                    }
+
                     this._overQuotaTimeLeftTick =
                         setInterval(function() {
                             var time = secondsToTime(timeLeft--, 1);
@@ -1299,6 +1336,17 @@ var dlmanager = {
                         }, 1000);
                 }
             }.bind(this)
+
+        M.req({a: 'uq', xfer: 1}).then(function(res) {
+            delay('overquotainfo:reply.success', function() {
+                onQuotaInfo(res);
+            });
+        }).catch(function(ex) {
+            if (d) {
+                dlmanager.logger.warn('_overquotaInfo', ex);
+            }
+
+            delay('overquotainfo:reply.error', dlmanager._overquotaInfo.bind(dlmanager));
         });
     },
 
@@ -1312,9 +1360,22 @@ var dlmanager = {
             }
             window.closeDialog();
         };
+        var open = function(url) {
+            if (is_mobile) {
+                location.href = url;
+                return false;
+            }
+            window.open.apply(window, arguments);
+        };
         var onclick = function onProClicked() {
-            self.onOverQuotaProClicked = true;
-            delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
+            if (preWarning) {
+                api_req({a: 'log', e: 99643, m: 'on overquota pre-warning upgrade/pro-plans clicked'});
+            }
+            else {
+                self.onOverQuotaProClicked = true;
+                delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
+                api_req({a: 'log', e: 99640, m: 'on overquota pro-plans clicked'});
+            }
 
             if ($(this).hasClass('reg-st3-membership-bl')) {
                 open(getAppBaseUrl() + '#propay_' + $(this).data('payment'));
@@ -1323,7 +1384,7 @@ var dlmanager = {
                 open(getAppBaseUrl() + '#pro');
             }
 
-            api_req({a: 'log', e: 99640, m: 'on overquota pro-plans clicked'});
+            return false;
         };
         var getMoreBonusesListener = function() {
             closeDialog();
@@ -1352,24 +1413,10 @@ var dlmanager = {
                 .removeAttr('style')
                 .rebind('click', this.onLimitedBandwidth.bind(this));
 
-            $('.upgrade', $dialog).rebind('click', function() {
-                api_req({a: 'log', e: 99643, m: 'on overquota pre-warning upgrade clicked'});
-
-                // closeDialog();
-
-                // if (preWarning > 1) {
-                //     loadingDialog.show();
-                    open(getAppBaseUrl() + '#pro');
-                    return false;
-                // }
-                //
-                // dlmanager.showRegisterDialog4ach($dialog, flags);
-            });
-
-            $('.reg-st3-membership-bl', $dialog).rebind('click', function() {
-                open(getAppBaseUrl() + '#propay_' + $(this).data('payment'));
-                return false;
-            });
+            if (is_mobile) {
+                // desktop has a 'continue' button, on mobile we do treat the close button as such
+                $dialog.find('.fm-dialog-close').rebind('click', this.onLimitedBandwidth.bind(this));
+            }
         }
         else {
             var $dlPageTW = $('.download.transfer-wrapper');
@@ -1382,16 +1429,13 @@ var dlmanager = {
 
             $('.continue', $dialog).attr('style', 'display:none');
 
-            $('.upgrade', $dialog).rebind('click', onclick);
-            $dialog.find('.reg-st3-membership-bl').rebind('click', onclick);
-
             $('.video-theatre-mode:visible').addClass('paused');
 
             if (page === 'download') {
                 var $dtb = $('.download.transfer-buttons, .download.video-transfer-buttons');
 
-                $('.create-account-button', $dtb).addClass('hidden').unbind('click');
-                $('.get-more-bonuses', $dtb).addClass('hidden').unbind('click');
+                $('.create-account-button', $dtb).addClass('hidden').off('click');
+                $('.get-more-bonuses', $dtb).addClass('hidden').off('click');
 
                 if (flags & this.LMT_HASACHIEVEMENTS) {
                     if (flags & this.LMT_ISREGISTERED) {
@@ -1408,10 +1452,12 @@ var dlmanager = {
 
                 $('.see-our-plans', $dtb).removeClass('hidden').rebind('click', onclick);
 
-                $('.download.over-transfer-quota', $dlPageTW).removeClass('hidden');
+                $('.download.video .download.over-transfer-quota').removeClass('hidden');
                 $('.download.in-progress, .video-mode-wrapper', $dlPageTW).addClass('over-quota');
             }
         }
+
+        $('.upgrade, .mobile.upgrade-to-pro, .reg-st3-membership-bl', $dialog).rebind('click', onclick);
 
         $('.bottom-tips a', $dialog).rebind('click', function() {
             open(getAppBaseUrl() +
@@ -1531,7 +1577,7 @@ var dlmanager = {
                     api_req({a: 'log', e: 99649, m: 'on overquota logged-in through register dialog.'});
                 }
                 else {
-                    localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
+                    security.register.cacheRegistrationData(accountData);
                     mega.ui.sendSignupLinkDialog(accountData);
 
                     api_req({a: 'log', e: 99650, m: 'on overquota account created.'});
@@ -1560,7 +1606,7 @@ var dlmanager = {
                     dlmanager._onOverquotaDispatchRetry($dialog);
                 }
                 else {
-                    localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
+                    security.register.cacheRegistrationData(accountData);
                     mega.ui.sendSignupLinkDialog(accountData);
                 }
             },
@@ -1576,19 +1622,111 @@ var dlmanager = {
         });
     },
 
+    prepareLimitedBandwidthDialogPlans: function ($dialog) {
+        var $pricingBoxes = $dialog.find('.reg-st3-membership-bl');
+        for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
+            var currentPlan = pro.membershipPlans[i];
+            var months = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
+            var planNum = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+            var planName = pro.getProPlanName(planNum);
+            if (months !== 12) {
+                var $pricingBox = $pricingBoxes.filter('.pro' + planNum);
+                var $planName = $pricingBox.find('.title span');
+                var $price = $pricingBox.find('.price');
+                var $priceDollars = $price.find('.big');
+                var $priceCents = $price.find('.small');
+                var $storageAmount = $pricingBox.find('.storage-amount');
+                var $storageUnit = $pricingBox.find('.storage-unit');
+                var $bandwidthAmount = $pricingBox.find('.bandwidth-amount');
+                var $bandwidthUnit = $pricingBox.find('.bandwidth-unit');
+                var $euroPrice = $('.euro-price', $price);
+                var $currncyAbbrev = $('.local-currency-code', $price);
+                var monthlyBasePrice;
+                var monthlyBasePriceCurrencySign;
+                var euroSign = '\u20ac';
+                $priceDollars.removeClass('tooBig tooBig2');
+                $priceCents.removeClass('toosmall toosmall2');
+                if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                    $pricingBoxes.addClass('local-currency');
+                    $euroPrice.removeClass('hidden');
+                    $currncyAbbrev.removeClass('hidden');
+                    $currncyAbbrev.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
+                    $euroPrice.text(currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] +
+                        ' ' + euroSign);
+                    // Calculate the monthly base price in local currency
+                    monthlyBasePrice = '' + currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+                    $('.reg-st3-txt-localcurrencyprogram', $dialog).removeClass('hidden');
+                }
+                else {
+                    $pricingBoxes.removeClass('local-currency');
+                    $euroPrice.addClass('hidden');
+                    $currncyAbbrev.addClass('hidden');
+                    monthlyBasePrice = '' + currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE];
+                    monthlyBasePriceCurrencySign = euroSign;
+                    $('.reg-st3-txt-localcurrencyprogram', $dialog).addClass('hidden');
+                }
+                var monthlyBasePriceParts = monthlyBasePrice.split('.');
+                var monthlyBasePriceDollars = monthlyBasePriceParts[0];
+                var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';
+                if (monthlyBasePriceDollars.length > 7) {
+                    if (monthlyBasePriceDollars.length > 9) {
+                        $priceDollars.addClass('tooBig2');
+                        $priceCents.addClass('toosmall2');
+                        monthlyBasePriceCents = '0';
+                    }
+                    else {
+                        $priceDollars.addClass('tooBig');
+                        $priceCents.addClass('toosmall');
+                        monthlyBasePriceCents = '00';
+                    }
+                    monthlyBasePriceDollars = Number.parseInt(monthlyBasePriceDollars) + 1;
+                }
+                else {
+                    if (monthlyBasePriceCents.length > 2) {
+                        monthlyBasePriceCents = monthlyBasePriceCents.substr(0, 2);
+                        monthlyBasePriceCents = Number.parseInt(monthlyBasePriceCents) + 1;
+                        monthlyBasePriceCents = (monthlyBasePriceCents + '0').substr(0, 2);
+                    }
+                }
+                var storageGigabytes = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
+                var storageBytes = storageGigabytes * 1024 * 1024 * 1024;
+                var storageFormatted = numOfBytes(storageBytes, 0);
+                var storageSizeRounded = Math.round(storageFormatted.size);
+                var bandwidthGigabytes = currentPlan[pro.UTQA_RES_INDEX_TRANSFER];
+                var bandwidthBytes = bandwidthGigabytes * 1024 * 1024 * 1024;
+                var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
+                var bandwidthSizeRounded = Math.round(bandwidthFormatted.size);
+                $planName.text(planName);
+                if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                    $priceDollars.text(monthlyBasePrice);
+                    $priceCents.text('');
+                }
+                else {
+                    $priceDollars.text(monthlyBasePriceDollars);
+                    $priceCents.text('.' + monthlyBasePriceCents + ' ' +
+                        monthlyBasePriceCurrencySign);
+                }
+                $storageAmount.text(storageSizeRounded);
+                $storageUnit.text(storageFormatted.unit);
+                $bandwidthAmount.text(bandwidthSizeRounded);
+                $bandwidthUnit.text(bandwidthFormatted.unit);
+            }
+        }
+    },
+
     showLimitedBandwidthDialog: function(res, callback, flags) {
         'use strict';
 
-        var $dialog = $('.limited-bandwidth-dialog').removeClass('exceeded');
+        var $dialog = $('.limited-bandwidth-dialog');
 
         loadingDialog.hide();
         this.onLimitedBandwidth = function() {
             if (callback) {
                 $dialog.removeClass('registered achievements exceeded pro slider');
-                $('.bottom-tips a', $dialog).unbind('click');
-                $('.continue, .continue-download', $dialog).unbind('click');
-                $('.upgrade, .reg-st3-membership-bl', $dialog).unbind('click');
-                $('.get-more-bonuses', $dialog).unbind('click');
+                $('.bottom-tips a', $dialog).off('click');
+                $('.continue, .continue-download, .fm-dialog-close', $dialog).off('click');
+                $('.upgrade, .reg-st3-membership-bl, .mobile.upgrade-to-pro', $dialog).off('click');
+                $('.get-more-bonuses', $dialog).off('click');
                 if ($.dialog === 'download-pre-warning') {
                     $.dialog = false;
                 }
@@ -1597,6 +1735,7 @@ var dlmanager = {
                 callback = $dialog = undefined;
             }
             delete this.onLimitedBandwidth;
+            return false;
         };
 
         flags = flags !== undefined ? flags : this.lmtUserFlags;
@@ -1611,19 +1750,21 @@ var dlmanager = {
             this.lmtUserFlags = flags;
         }
 
-        api_req({a: 'log', e: 99617, m: 'overquota pre-warning shown.'});
+        M.safeShowDialog('download-pre-warning', function() {
+            eventlog(99617);// overquota pre-warning shown.
 
-        uiCheckboxes($dialog, 'ignoreLimitedBandwidth');
-        this._overquotaClickListeners($dialog, flags, res || true);
+            // Load the membership plans
+            pro.loadMembershipPlans(function() {
 
-        if (is_mobile) {
-            $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {
-                $dialog.addClass('hidden');
-                fm_hideoverlay();
+                // Render the plan details
+                dlmanager.prepareLimitedBandwidthDialogPlans($dialog);
             });
-        }
 
-        M.safeShowDialog('download-pre-warning', $dialog);
+            uiCheckboxes($dialog, 'ignoreLimitedBandwidth');
+            dlmanager._overquotaClickListeners($dialog, flags, res || true);
+
+            return $dialog.removeClass('exceeded');
+        });
     },
 
     showOverQuotaDialog: function DM_quotaDialog(dlTask, flags) {
@@ -1651,9 +1792,17 @@ var dlmanager = {
         var asyncTaskID = false;
         var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
 
+        // Load the membership plans
+        pro.loadMembershipPlans(function () {
+
+            // Render the plan details
+            dlmanager.prepareLimitedBandwidthDialogPlans($dialog);
+        });
+
+        $(document).fullScreen(false);
         this._setOverQuotaState(dlTask);
 
-        if ($dialog.is(':visible')) {
+        if ($dialog.is(':visible') && !$dialog.hasClass('uploads')) {
             this.logger.info('showOverQuotaDialog', 'visible already.');
             return;
         }
@@ -1663,71 +1812,80 @@ var dlmanager = {
             return;
         }
 
-        $dialog
-            .removeClass('registered achievements exceeded pro slider')
-            .find('.transfer-overquota-txt')
-            .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
-            .end();
+        M.safeShowDialog('download-overquota', function() {
 
-        if (flags & this.LMT_ISPRO) {
-            $dialog.addClass('pro');
+            $dialog
+                .removeClass('registered achievements exceeded pro slider uploads')
+                .find('.transfer-overquota-txt')
+                .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
+                .end();
 
-            asyncTaskID = 'mOverQuota.' + makeUUID();
+            // restore contents in case they were changed for the uploads over storage quota dialog
+            $('.p-after-icon.msg-overquota', $dialog).text(l[120]);
+            $('.header-before-icon.exceeded', $dialog).text(l[17]);
 
-            if (M.account) {
-                // Force data retrieval from API
-                M.account.lastupdate = 0;
+            if (dlmanager.isStreaming) {
+                $('.p-after-icon.msg-overquota', $dialog).text(l[19615]);
             }
-            M.accountData(function(account) {
-                var tfsQuotaLimit = bytesToSize(account.bw, 0).split(' ');
-                var tfsQuotaUsed = (account.downbw_used + account.servbw_used);
-                var perc = Math.min(100, Math.ceil(tfsQuotaUsed * 100 / account.bw));
 
-                $('.chart.data .size-txt', $dialog).text(bytesToSize(tfsQuotaUsed, 0));
-                $('.chart.data .pecents-txt', $dialog).text(tfsQuotaLimit[0]);
-                $('.chart.data .gb-txt', $dialog).text(tfsQuotaLimit[1]);
-                $('.fm-account-blocks.bandwidth', $dialog).removeClass('no-percs');
-                $('.chart.data .perc-txt', $dialog).text(perc + '%');
+            if (flags & dlmanager.LMT_ISPRO) {
+                $dialog.addClass('pro');
 
-                // if they granted quota to other users
-                if (account.servbw_limit > 0) {
-                    $dialog.addClass('slider');
+                asyncTaskID = 'mOverQuota.' + makeUUID();
 
-                    $('.bandwidth-slider', $dialog).slider({
-                        min: 0, max: 100, range: 'min', value: account.servbw_limit,
-                        change: function(e, ui) {
-                            if (ui.value < account.servbw_limit) {
-                                // retry download if less quota was chosen...
-                                loadingDialog.show();
-                                M.req({a: 'up', srvratio: ui.value})
-                                    .always(function() {
-                                        loadingDialog.hide();
-                                        dlmanager._onQuotaRetry(true);
-                                    });
-                            }
-                        }
-                    });
+                if (dlmanager.isStreaming) {
+                    $('.pro-exceeded-txt .msg-overquota', $dialog).text(l[19617]);
+                }
+                else {
+                    $('.pro-exceeded-txt .msg-overquota', $dialog).text(l[17084]);
                 }
 
-                mBroadcaster.sendMessage(asyncTaskID);
-                asyncTaskID = null;
-            });
-        }
+                if (M.account) {
+                    // Force data retrieval from API
+                    M.account.lastupdate = 0;
+                }
+                M.accountData(function(account) {
+                    var tfsQuotaLimit = bytesToSize(account.bw, 0).split(' ');
+                    var tfsQuotaUsed = (account.downbw_used + account.servbw_used);
+                    var perc = Math.min(100, Math.ceil(tfsQuotaUsed * 100 / account.bw));
 
-        if (is_mobile) {
-            $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {
-                $dialog.addClass('hidden');
-                fm_hideoverlay();
-            });
-        }
+                    $('.chart.data .size-txt', $dialog).text(bytesToSize(tfsQuotaUsed, 0));
+                    $('.chart.data .pecents-txt', $dialog).text(tfsQuotaLimit[0]);
+                    $('.chart.data .gb-txt', $dialog).text(tfsQuotaLimit[1]);
+                    $('.fm-account-blocks.bandwidth', $dialog).removeClass('no-percs');
+                    $('.chart.data .perc-txt', $dialog).text(perc + '%');
 
-        M.safeShowDialog('download-overquota', function() {
+                    // if they granted quota to other users
+                    if (account.servbw_limit > 0) {
+                        $dialog.addClass('slider');
+
+                        $('.bandwidth-slider', $dialog).slider({
+                            min: 0, max: 100, range: 'min', value: account.servbw_limit,
+                            change: function(e, ui) {
+                                if (ui.value < account.servbw_limit) {
+                                    // retry download if less quota was chosen...
+                                    loadingDialog.show();
+                                    M.req({a: 'up', srvratio: ui.value})
+                                        .always(function() {
+                                            loadingDialog.hide();
+                                            dlmanager._onQuotaRetry(true);
+                                        });
+                                }
+                            }
+                        });
+                    }
+
+                    mBroadcaster.sendMessage(asyncTaskID);
+                    asyncTaskID = null;
+                });
+            }
+
             var doCloseModal = function closeModal() {
                 if (!$('.download.transfer-overquota-txt').is(':visible')) {
                     clearInterval(dlmanager._overQuotaTimeLeftTick);
                 }
-                $('.fm-dialog-overlay').unbind('click.dloverq');
-                $dialog.unbind('dialog-closed').find('.fm-dialog-close').unbind('click.quota');
+                $('.fm-dialog-overlay').off('click.dloverq');
+                $dialog.off('dialog-closed').find('.fm-dialog-close').off('click.quota');
                 closeDialog();
                 return false;
             };
@@ -1735,6 +1893,10 @@ var dlmanager = {
             dlmanager._overquotaClickListeners($dialog, flags);
 
             $('.fm-dialog-overlay').rebind('click.dloverq', doCloseModal);
+
+            if (is_mobile) {
+                $(window).trigger('orientationchange');
+            }
 
             $dialog
                 .addClass('exceeded')
@@ -2000,7 +2162,7 @@ var dlmanager = {
         var $body = $('body');
 
         var hideOverlay = function() {
-            $body.unbind('keyup.msd');
+            $body.off('keyup.msd');
             $overlay.addClass('hidden');
             $body.removeClass('overlayed');
         };

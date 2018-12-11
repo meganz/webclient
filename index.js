@@ -111,7 +111,7 @@ function topMenu(close) {
             $('html').removeClass('overlayed');
             $('.mobile.dark-overlay').addClass('hidden').removeClass('active').off('tap');
         }
-        $(window).unbind('resize.topmenu');
+        $(window).off('resize.topmenu');
     }
     else {
         $.topMenu = 'topmenu';
@@ -127,7 +127,11 @@ function topMenu(close) {
             });
         }
         else {
-            // If on mobile, show the dark backround overlay behind the menu and if it's clicked, close the menu
+            // Mobile
+            // Close the title menu
+            mobile.titleMenu.close();
+
+            // Show the dark backround overlay behind the menu and if it's clicked, close the menu
             $('html').addClass('overlayed');
             $('.mobile.dark-overlay').removeClass('hidden').addClass('active').off('tap').on('tap', function () {
                 topMenu(true);
@@ -172,7 +176,7 @@ function topPopupAlign(button, popup, topPos) {
     $.popupAlign = function () {
         var $button = $(button),
             $popup = $(popup),
-            $popupArrow = $popup.find('.dropdown-white-arrow'),
+            $popupArrow = $popup.children('.dropdown-white-arrow'),
             pageWidth,
             popupRightPos,
             arrowRightPos,
@@ -226,6 +230,8 @@ function topPopupAlign(button, popup, topPos) {
 function init_page() {
     page = page || (u_type ? 'fm' : 'start');
 
+    var mobilePageParsed = false;
+
     if (!window.M) {
         return console.warn('Something went wrong, the initialization did not completed...');
     }
@@ -250,7 +256,7 @@ function init_page() {
         if (ar[1]) {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
-        $.playbackTimeOffset = parseInt(ar[2]) | 0;
+        $.playbackOptions = ar[2];
 
         if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';
@@ -311,25 +317,13 @@ function init_page() {
         });
     }
 
-    // If on the plugin page, show the page with the relevant extension for their current browser
-    if (page == 'plugin') {
-        page = (mega.chrome) ? 'chrome' : 'firefox';
-    }
-
-    if (localStorage.signupcode && u_type !== false) {
-        delete localStorage.signupcode;
-    }
-    else if (localStorage.signupcode
-            && page.substr(0, 6) !== 'signup'
-            && page !== 'register'
-            && page !== 'terms'
-            && page !== 'mega'
-            && page !== 'privacy' && page !== 'gdpr' && page !== 'chrome' && page !== 'firefox') {
-        register_txt = l[1291];
-        loadSubPage('signup' + localStorage.signupcode);
+    // Redirect url to extensions when it tries to go plugin or chrome or firefox
+    if (page === 'plugin' || page === 'chrome' || page === 'firefox') {
+        loadSubPage('extensions');
         return false;
     }
-    if (!page.match(/^(blog|help|corporate|page_)/)) {
+
+    if (!page.match(/^(blog|help|corporate|fm\/recents|page_)/)) {
         $('.top-head').remove();
     }
     $('#loading').hide();
@@ -341,19 +335,54 @@ function init_page() {
     var pageBeginLetters = page.substr(0, 2);
     // contact link handling...
     if (pageBeginLetters === 'C!' && page.length > 2) {
+        var ctLink = page.substring(2, page.length);
         if (!is_mobile) {
-            var ctLink = page.substring(2, page.length);
-            mBroadcaster.once('fm:initialized', function () {
+            if (!u_type) {
                 openContactInfoLink(ctLink);
-            });
-            page = 'fm/contacts';
+            }
+            else {
+                page = 'fm/contacts';
+                mBroadcaster.once('fm:initialized', function () {
+                    openContactInfoLink(ctLink);
+                });
+            }
         }
         else {
-            page = (u_type ? 'fm' : 'start');
+            var processContactLink = function () {
+                if (!mega.ui.contactLinkCardDialog) {
+                    // because there's a strange solution applied by someone to clear the top-mobile
+                    // and to re-do everything in the header in mobile.html !!
+                    // --> in order to stop the snow ball of duplication(html code)
+                    // i will get the dialog from memory and store it in memory to be embadded when needed.
+                    var startTokenLine = '<!-- important token to get the below dialog to memory, DONT REMOVE LINE-->';
+                    var endTokenLine = '<!-- important token to get the above dialog to memory, DONT REMOVE LINE-->';
+                    var startPos = pages['top-mobile'].indexOf(startTokenLine) + startTokenLine.length;
+                    var endPos = pages['top-mobile'].indexOf(endTokenLine);
+                    var contactLinkCardHtml = pages['top-mobile'].substring(startPos, endPos);
+                    if (contactLinkCardHtml) {
+                        mega.ui.contactLinkCardDialog = contactLinkCardHtml;
+                    }
+                }
+                var contactInfoCard = new MobileContactLink(ctLink);
+                contactInfoCard.showContactLinkInfo();
+            };
+            if (!u_type) {
+                mBroadcaster.once('HomeStartPageRendered:mobile', processContactLink);
+            }
+            else {
+                loadSubPage('fm');
+                processContactLink();
+                return;
+            }
         }
     }
 
     if (pageBeginLetters === 'F!' && page.length > 2) {
+        if (page.indexOf('?') > 0) {
+            page = page.split('?');
+            $.autoSelectNode = page[1];
+            page = page[0];
+        }
         var ar = page.substr(2, page.length - 1).split('!');
 
         pfid = false;
@@ -452,10 +481,6 @@ function init_page() {
         resetpwcode = page.replace("pwreset", "");
         page = 'resetpassword';
     }
-    if (page.substr(0, 5) == 'newpw') {
-        pwchangecode = page.replace("newpw", "");
-        page = 'newpw';
-    }
 
     if ((pfkey || dlkey) && location.hash[0] !== '#') {
         return location.replace(getAppBaseUrl());
@@ -473,9 +498,8 @@ function init_page() {
         && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
         && (page !== 'contact')
-        && (page !== 'ios')
-        && (page !== 'android')
-        && (page !== 'wp')
+        && (page !== 'mobileapp')
+        && (page !== 'uwp')
         && (page !== 'extensions')
         && (page !== 'sync')
         && (page !== 'bird')
@@ -486,6 +510,7 @@ function init_page() {
         && (page !== 'takendown')
         && (page !== 'general')
         && (page !== 'resellers')
+        && (page !== 'security')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -545,6 +570,7 @@ function init_page() {
             if (is_mobile) {
                 parsepage(pages['mobile']);
                 mobile.decryptionPasswordOverlay.show(page);
+                mobilePageParsed = true;
             }
             else {
                 // Otherwise insert background page, show the password
@@ -555,23 +581,40 @@ function init_page() {
         }
         else { // not supported browser, appologize from user
             var msgToUser = l[18420];
-            if (u_type) {
-                mBroadcaster.once('boot_done', function () {
-                    setTimeout(
-                        msgDialog('info', 'Pwssword protected link not supported', // not visible
-                            msgToUser), 1000);
-                });
-                page = 'fm';
+            if (!is_mobile) {
+                if (u_type) {
+                    mBroadcaster.once('boot_done', function () {
+                        setTimeout(
+                            msgDialog('info', 'Pwssword protected link not supported', // not visible
+                                msgToUser), 1000);
+                    });
+                    page = 'fm';
+                }
+                else {
+                    msgDialog('info', 'Pwssword protected link not supported', // not visible
+                        msgToUser);
+                    page = 'start';
+                }
             }
             else {
+                if (u_type) {
+                    loadSubPage('fm');
+                }
+                else {
+                    parsepage(pages['mobile']);
+                    mobile.signin.show();
+                }
                 msgDialog('info', 'Pwssword protected link not supported', // not visible
                     msgToUser);
-                page = 'start';
+                mobilePageParsed = true;
             }
         }
     }
 
-    if (page.substr(0, 10) == 'blogsearch') {
+    if (mobilePageParsed) {
+        mobilePageParsed = false;
+    }
+    else if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
         if (!blogsearch) {
             loadSubPage('blog');
@@ -688,131 +731,104 @@ function init_page() {
             alert('We can\'t decipher your invite link, please check you copied the link correctly, or sign up manually with the same email address.');
         }
     }
-    else if (page.substr(0, 6) == 'signup') {
-        var signupcode = page.substr(6, page.length - 1);
-        loadingDialog.show();
-        api_req({
-            a: 'uv',
-            c: signupcode
-        }, {
-                callback: function (res) {
-                    loadingDialog.hide();
-                    if (typeof res == 'number' && res < 0) {
-                        if (localStorage.signupcode) {
-                            delete localStorage.signupcode;
-                            delete localStorage.registeremail;
-                        }
-                        else {
-                            msgDialog('warningb', l[135], l[1290]);
-                        }
-                        loadSubPage('start');
-                    }
-                    else if (u_type === false) {
-                        localStorage.signupcode = signupcode;
-                        localStorage.registeremail = res;
-                        loadSubPage('register');
-                        if (!register_txt) {
-                            register_txt = l[1289];
-                        }
-                    }
-                    else {
-                        var confirmtxt = 'You are currently logged in. Would you like to log out and register a new account?';
-                        if (l[1824]) {
-                            confirmtxt = l[1824];
-                        }
-                        msgDialog('confirmation', l[968], confirmtxt, '', function (e) {
-                            if (e) {
-                                mLogout();
-                            }
-                            else {
-                                loadSubPage('');
-                            }
-                        });
-                    }
-                }
-            });
-    }
-    else if (page == 'newpw') {
-        setpwset(pwchangecode, {
-            callback: function (res) {
-                loadingDialog.hide();
-                if (res[0] == EACCESS || res[0] == 0) {
-                    alert(l[727]);
-                }
-                else if (res[0] == EEXPIRED) {
-                    alert(l[728]);
-                }
-                else if (res[0] == ENOENT) {
-                    alert(l[729]);
-                }
-                else {
-                    alert(l[200]);
-                }
-                if (u_type == 3) {
-                    page = 'account';
-                    parsepage(pages['account']);
-                    load_acc();
-                }
-                else {
-                    page = 'login';
-                    parsepage(pages['login']);
-                    init_login();
-                }
-            }
-        });
-    }
     else if (page === 'confirm') {
 
         loadingDialog.show();
 
-        var ctx = {
-            signupcodeok: function (email) {
+        // A callback for when the email confirm code was valid
+        var signUpSucceededCallback = function(email) {
 
-                loadingDialog.hide();
-                confirmok = true;
-                page = 'login';
+            loadingDialog.hide();
+            confirmok = true;
+            page = 'login';
 
-                if (is_mobile) {
-                    parsepage(pages['mobile']);
-                    mobile.register.showConfirmAccountScreen(email);
-                }
-                else {
-                    parsepage(pages['login']);
-                    login_txt = l[378];
-                    init_login();
-                    $('#login-name2').val(email);
-                    $('.register-st2-button').addClass('active');
-                    $('#login-name2').attr('readonly', true);
-                    topmenuUI();
-                }
-            },
-            signupcodebad: function (res) {
-
-                loadingDialog.hide();
-                page = 'login';
-
-                if (is_mobile) {
-                    parsepage(pages['mobile']);
-                    mobile.register.showConfirmAccountFailure(res);
-                }
-                else {
-                    if (res === EINCOMPLETE) {
-                        alert(l[703]);
-                    }
-                    else if (res === ENOENT) {
-                        login_txt = l[704];
-                    }
-                    else {
-                        alert(l[705] + res);
-                    }
-                    parsepage(pages['login']);
-                    init_login();
-                    topmenuUI();
-                }
+            if (is_mobile) {
+                parsepage(pages['mobile']);
+                mobile.register.showConfirmAccountScreen(email);
             }
-        }
+            else {
+                parsepage(pages['login']);
+                login_txt = l[378];
+                init_login();
+                $('#login-name2').val(email);
+                $('.register-st2-button').addClass('active');
+                $('#login-name2').prop('readonly', true);
+                topmenuUI();
+            }
+        };
 
-        verifysignupcode(confirmcode, ctx);
+        // A callback for when the email confirm code was invalid
+        var signUpFailedCallback = function(result) {
+
+            loadingDialog.hide();
+            page = 'login';
+
+            if (is_mobile) {
+                parsepage(pages['mobile']);
+                mobile.register.showConfirmAccountFailure(result);
+            }
+            else {
+                if (result === EINCOMPLETE) {
+                    alert(l[703]);
+                }
+                else if (result === ENOENT) {
+                    login_txt = l[19788];
+                }
+                else {
+                    alert(l[705] + result);
+                }
+
+                parsepage(pages['login']);
+                init_login();
+                $('.register-st2-button').addClass('active');
+                $('#login-name2').prop('readonly', true);
+                topmenuUI();
+            }
+        };
+
+        // Decode the email confirm code
+        var decodedConfirmCode = base64urldecode(confirmcode);
+
+        // Check if they registered using the new registration process (version 2)
+        if (decodedConfirmCode.substr(0, 13) === 'ConfirmCodeV2') {
+
+            // If already logged into an account
+            if (u_type === 3) {
+
+                // Ask them to log out and click on the confirmation link again
+                if (is_mobile) {
+                    parsepage(pages['mobile']);
+                    mobile.messageOverlay.show(l[2480], l[12440], function () {
+                        loadSubPage('fm');
+                    });
+                }
+                else {
+                    msgDialog('warningb', l[2480], l[12440], false, function () {
+                        loadSubPage('fm');
+                    });
+                }
+                return false;
+            }
+
+            // Verify the confirm code using the new process
+            security.register.verifyEmailConfirmCode(confirmcode, function(result, email) {
+
+                // If successful
+                if (typeof email === 'string') {
+                    signUpSucceededCallback(email);
+                }
+                else {
+                    signUpFailedCallback(result);
+                }
+            });
+        }
+        else {
+            // Verify the confirm code using the old process
+            verifysignupcode(confirmcode, {
+                signupcodeok: signUpSucceededCallback,
+                signupcodebad: signUpFailedCallback
+            });
+        }
     }
     else if (u_type == 2) {
         if (is_mobile) {
@@ -839,28 +855,73 @@ function init_page() {
             init_login();
         }
     }
-    else if (is_mobile && page === 'fm/account/invites/how-it-works') {
+    else if (is_mobile && u_type && page === 'fm/account/invites/how-it-works') {
         parsepage(pages['mobile']);
         mobile.achieve.howItWorks.init();
         return false;
     }
-    else if (is_mobile && page === 'fm/account/invites') {
+    else if (is_mobile && u_type && page === 'fm/account/invites') {
         parsepage(pages['mobile']);
         mobile.achieve.invites.init();
         return false;
     }
-    else if (is_mobile && page === 'fm/account/referrals') {
+    else if (is_mobile && u_type && page === 'fm/account/referrals') {
         parsepage(pages['mobile']);
         mobile.achieve.referrals.init();
         return false;
     }
-    else if (is_mobile && page === 'fm/account/achievements') {
+    else if (is_mobile && u_type && page === 'fm/account/achievements') {
         parsepage(pages['mobile']);
         mobile.achieve.init();
         return false;
     }
+    else if (is_mobile && u_type && page === 'fm/account/history') {
+        parsepage(pages['mobile']);
+        mobile.account.history.init();
+        return false;
+    }
+    else if (is_mobile && u_type && page === 'fm/account/email-and-pass') {
+        parsepage(pages['mobile']);
+        mobile.account.changePassword.init();
+        return false;
+    }
     else if (page === 'achievements') {
         loadSubPage('fm/account/achievements');
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/intro') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.intro.init();
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/setup') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.setup.init();
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/verify-setup') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.verifySetup.init();
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/enabled') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.enabled.init();
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/verify-disable') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.verifyDisable.init();
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/disabled') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.disabled.init();
+        return false;
+    }
+    else if (is_mobile && page === 'twofactor/verify-login') {
+        parsepage(pages['mobile']);
+        mobile.twofactor.verifyLogin.init();
         return false;
     }
     else if (page === 'fm/account/profile') {
@@ -908,13 +969,23 @@ function init_page() {
         }
     }
     else if (page == 'key') {
-        parsepage(pages['key']);
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.register.showGeneratingKeysScreen();
+        }
+        else {
+            parsepage(pages['key']);
+        }
         init_key();
     }
     else if (page === 'support') {
         if (is_mobile) {
             parsepage(pages['mobile']);
             mobile.support.init();
+        }
+        else if (u_type === 0) {
+            loadSubPage('register');
+            return false;
         }
         else {
             parsepage(pages['support']);
@@ -926,6 +997,16 @@ function init_page() {
         if (lang == 'ru') {
             $('.account-mid-block').addClass('high');
         }
+
+        // On clicking the directory buttons
+        $('.directory-buttons li').rebind('click', function() {
+
+            // Get the class to the directory title element to scroll to
+            var link = $(this).attr('data-link');
+
+            // Scroll to the element's parent (not the element itself because it's hidden by the header)
+            $('.contact-new-title.' + link).parent().get(0).scrollIntoView();
+        });
     }
     else if (page.substr(0, 4) == 'help') {
         return Help.render();
@@ -1161,6 +1242,10 @@ function init_page() {
     else if (page === 'general') {
         parsepage(pages['general']);
     }
+    else if (page === 'security') {
+        parsepage(pages['securitypractice']);
+        securityPractice.init();
+    }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
     }
@@ -1168,15 +1253,26 @@ function init_page() {
         parsepage(pages['blog']);
         init_blog();
     }
-    else if (page == 'copyright') {
+    else if (is_mobile && (page === 'copyright' || page === 'copyrightnotice')) {
+
+        // Show message that the copyright takedown should be submitted in a desktop browser
+        parsepage(pages['mobile']);
+        mobile.messageOverlay.show(l[621], l[19628], function() {
+
+            // On clicking OK in the dialog, go to the file manager if logged in, or start page if not
+            loadSubPage(u_type === 3 ? 'fm' : 'start');
+        });
+        return false;
+    }
+    else if (page === 'copyrightnotice') {
+        parsepage(pages['copyrightnotice']);
+        copyright.init_cn();
+    }
+    else if (page === 'copyright') {
         parsepage(pages['copyright']);
-        $('.reg-st5-complete-button').rebind('click', function (e) {
+        $('.reg-st5-complete-button').rebind('click', function () {
             loadSubPage('copyrightnotice');
         });
-        if (lang == 'en') {
-            $('#copyright_txt').text($('#copyright_txt').text().split('(i)')[0]);
-            $('#copyright_en').removeClass('hidden');
-        }
     }
     else if (page === 'disputenotice') {
         parsepage(pages['disputenotice']);
@@ -1188,25 +1284,32 @@ function init_page() {
             loadSubPage('disputenotice');
         });
     }
-    else if (page.substr(0, 6) === 'propay') {
-        if (is_mobile) {
-            parsepage(pages['mobile']);
-        }
-        else {
-            parsepage(pages['propay']);
-        }
-        pro.propay.init();
-    }
     else if (page.substr(0, 3) === 'pro') {
-        var tmp = page.split('/uao=');
+        /* jshint -W018 */
+        var tmp = page.split(/(\/\w+=)/);
         if (tmp.length > 1) {
-            mega.uaoref = decodeURIComponent(tmp[1]);
+            for (var s = 1; s < tmp.length; s += 2) {
+                tmp[String(tmp[s]).replace(/\W/g, '')] = mURIDecode(tmp[s + 1]);
+            }
+            if (tmp.uao) {
+                mega.uaoref = tmp.uao;
+            }
+            if (tmp.aff && (tmp.aff_time *= 1000) && !(localStorage.affts > tmp.aff_time)) {
+                localStorage.affid = tmp.aff;
+                localStorage.affts = tmp.aff_time;
+            }
             loadSubPage(tmp[0]);
             return;
         }
 
-        parsepage(pages['proplan']);
-        pro.proplan.init();
+        if (page.substr(0, 6) === 'propay') {
+            parsepage(pages[is_mobile ? 'mobile' : 'propay']);
+            pro.propay.init();
+        }
+        else {
+            parsepage(pages['proplan']);
+            pro.proplan.init();
+        }
     }
     else if (page.substr(0, 7) === 'payment') {
 
@@ -1227,18 +1330,22 @@ function init_page() {
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
     }
+    else if (page === 'mobile' || page === 'android' || page === 'ios') {
+        parsepage(pages['mobileapp']);
+
+        // On clicking the 'Learn more' button
+        $('.uwp-windows-scrollto-button').rebind('click', function() {
+
+            // Scroll to the Windows Phone section
+            $('.uwp-windows-section').get(0).scrollIntoView();
+        });
+    }
     else if (page === 'extensions') {
         parsepage(pages['browsers']);
         browserspage.init();
     }
-    else if (page === 'ios') {
-        parsepage(pages['ios']);
-    }
-    else if (page === 'android') {
-        parsepage(pages['android']);
-    }
-    else if (page === 'wp') {
-        parsepage(pages['wp']);
+    else if (page === 'uwp' || page === 'wp') {
+        parsepage(pages['uwp']);
         bottompage.initTabs();
     }
     else if (page === 'bird') {
@@ -1246,7 +1353,7 @@ function init_page() {
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
-        init_sync();
+        initMegasync();
         topmenuUI();
     }
     else if (page == 'cmd') {
@@ -1262,10 +1369,6 @@ function init_page() {
     else if (page == 'done') {
         parsepage(pages['done']);
         init_done();
-    }
-    else if (page == 'copyrightnotice') {
-        parsepage(pages['copyrightnotice']);
-        copyright.init_cn();
     }
     else if (dlid) {
         page = 'download';
@@ -1326,7 +1429,7 @@ function init_page() {
     // Load the direct voucher redeem page
     else if (page.substr(0, 6) === 'redeem') {
         loadingDialog.show();
-        parsepage(pages['redeem']);
+        parsepage(pages[is_mobile ? 'mobile' : 'redeem']);
         redeem.init();
     }
 
@@ -1450,6 +1553,8 @@ function init_page() {
         $('#startholder').hide();
 
         // Prevent duplicate HTML content breaking things
+        // what a strange solution!  [emptying #startholder!]
+        // we should have fixed duplicated classes, ids in the html..
         if (is_mobile) {
             $('#startholder').empty();
         }
@@ -1507,7 +1612,7 @@ function init_page() {
         location.assign('/');
     }
 
-    // Initialise the Public Service Announcement system
+    // Initialise the Public Service Announcement system if loaded
     if (typeof psa !== 'undefined') {
         psa.init();
     }
@@ -1517,181 +1622,15 @@ function init_page() {
         alarm.siteUpdate.init();
     }
 
-    topmenuUI();
+    // Hide click-tooltip
+    if (mega.cttHintTimer) {
+        M.hideClickHint();
+    }
 
+    topmenuUI();
 
     loggedout = false;
     flhashchange = false;
-}
-
-function loginDialog(close) {
-    var $dialog = $('.dropdown.top-login-popup');
-    if (close) {
-        $dialog.find('form').empty();
-        $dialog.addClass('hidden');
-        $(document).off('keydown.logingpopup');
-        return false;
-    }
-    $dialog.find('form').replaceWith(getTemplate('top-login'));
-    if (localStorage.hideloginwarning || is_extension) {
-        $dialog.find('.top-login-warning').addClass('hidden');
-        $dialog.find('.login-notification-icon').removeClass('hidden');
-    }
-    $dialog.find('.login-checkbox, .radio-txt').rebind('click', function (e) {
-        var c = $dialog.find('.login-checkbox').attr('class');
-        if (c.indexOf('checkboxOff') > -1) {
-            $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOn');
-        }
-        else {
-            $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOff');
-        }
-    });
-
-    $('.top-login-forgot-pass').rebind('click', function (e) {
-        loadSubPage('recovery');
-        loginDialog(1);
-    });
-
-    $('.top-dialog-login-button').rebind('click', function (e) {
-        tooltiplogin();
-    });
-    $('.top-login-full').rebind('click', function (e) {
-        loginDialog(1);
-        loadSubPage('login');
-    });
-    $(document).off('keydown.logingpopup').on('keydown.logingpopup', function (e) {
-        if ($('.dropdown.top-login-popup').hasClass('hidden')) {
-            $(document).off('keydown.logingpopup');
-            return;
-        }
-        if (e.keyCode === 32) { // space
-            if (document.activeElement !== $('#login-name', $dialog)[0]
-                && document.activeElement !== $('#login-password', $dialog)[0]) {
-                var c = $dialog.find('.login-checkbox').attr('class');
-                if (c.indexOf('checkboxOff') > -1) {
-                    $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOn');
-                }
-                else {
-                    $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOff');
-                }
-                return false;
-            }
-        }
-        if (e.keyCode === 13) { // enter
-            tooltiplogin();
-            return false;
-        }
-        
-    });
-    $('#login-password, #login-name', $dialog).rebind('keydown', function (e) {
-        $('.top-login-pad').removeClass('both-incorrect-inputs');
-        $('.top-login-input-tooltip.both-incorrect').removeClass('active');
-        $('.top-login-input-block.password').removeClass('incorrect');
-        $('.top-login-input-block.e-mail').removeClass('incorrect');
-        if (e.keyCode == 13) {
-            tooltiplogin();
-            return false;
-        }
-    });
-
-    $('.top-login-warning-close').rebind('click', function (e) {
-        if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
-            localStorage.hideloginwarning = 1;
-        }
-        $('.top-login-warning').removeClass('active');
-        $('.login-notification-icon').removeClass('hidden');
-    });
-    $('.login-notification-icon').rebind('click', function (e) {
-        $('.top-login-warning').removeClass('hidden');
-        $('.top-login-warning').addClass('active');
-        $(this).addClass('hidden');
-    });
-
-    $('.top-login-input-block').rebind('click', function (e) {
-        $(this).find('input').focus();
-    });
-
-    $('.top-login-input-block.password input,.top-login-input-block.e-mail input').rebind('blur', function () {
-        $(this).parents('.top-login-input-block').removeClass('focused');
-    }).rebind('focus', function () {
-        $(this).parents('.top-login-input-block').addClass('focused');
-    });
-
-
-    $('.loginwarning-checkbox,.top-login-warning .radio-txt').rebind('click', function (e) {
-        var c = '.loginwarning-checkbox',
-            c2 = $(c).attr('class');
-        $(c).removeClass('checkboxOn checkboxOff');
-        if (c2.indexOf('checkboxOff') > -1) {
-            $(c).addClass('checkboxOn');
-        }
-        else {
-            $(c).addClass('checkboxOff');
-        }
-    });
-
-
-    $('.dropdown.top-login-popup').removeClass('hidden');
-    $('#login-name', $dialog).focus();
-    if ($('body').hasClass('logged')) {
-        topPopupAlign('.top-head .user-name', '.dropdown.top-login-popup', 40);
-    }
-    else {
-        topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
-    }
-    if (is_chrome_firefox) {
-        mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header');
-    }
-
-}
-
-function tooltiplogin() {
-    var e = $('#login-name').val();
-    if (e === '' || checkMail(e)) {
-        $('.top-login-input-block.e-mail').addClass('incorrect');
-        $('#login-name').val('');
-        $('#login-name').focus();
-    }
-    else if ($('#login-password').val() === '') {
-        $('.top-login-input-block.password').addClass('incorrect');
-    }
-    else {
-        $('.top-dialog-login-button').addClass('loading');
-        if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
-            localStorage.hideloginwarning = 1;
-        }
-        var remember;
-        if ($('.login-checkbox').attr('class').indexOf('checkboxOn') > -1) {
-            remember = 1;
-        }
-        postLogin($('#login-name').val(), $('#login-password').val(), remember, function (r) {
-            $('.top-dialog-login-button').removeClass('loading');
-            if (r == EBLOCKED) {
-                alert(l[730]);
-            }
-            else if (r) {
-                passwordManager('#form_login_header');
-                u_type = r;
-
-                if (login_next) {
-                    loadSubPage(login_next);
-                }
-                else if (page !== 'login') {
-                    page = getSitePath().substr(1);
-                    init_page();
-                }
-                else {
-                    loadSubPage('fm');
-                }
-                login_next = false;
-            }
-            else {
-                $('.top-login-pad').addClass('both-incorrect-inputs');
-                $('.top-login-input-tooltip.both-incorrect').addClass('active');
-                $('#login-password').select();
-            }
-        });
-    }
 }
 
 function topmenuUI() {
@@ -1726,7 +1665,7 @@ function topmenuUI() {
         $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
     }
 
-    var avatar = window.useravatar && useravatar.my;
+    var avatar = window.useravatar && useravatar.mine();
     if (!avatar) {
         $topHeader.find('.fm-avatar').addClass('hidden');
     }
@@ -1783,7 +1722,10 @@ function topmenuUI() {
         $topMenu.find('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $topMenu.find('.top-menu-item.account').removeClass('hidden');
         $topMenu.find('.upgrade-your-account').removeClass('hidden');
-        $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+        // for top menu, load avatar and show for logged in user
+        useravatar.loadAvatar(u_handle).always(function(){
+            $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle));
+        });
 
         $topHeader.find('.top-login-button').addClass('hidden');
         $topHeader.find('.membership-status').removeClass('hidden');
@@ -1883,10 +1825,10 @@ function topmenuUI() {
             else {
                 var c = $topHeader.find('.dropdown.top-login-popup').attr('class');
                 if (c && c.indexOf('hidden') > -1) {
-                    loginDialog();
+                    tooltiplogin.init();
                 }
                 else {
-                    loginDialog(1);
+                    tooltiplogin.init(1);
                 }
             }
         });
@@ -1971,7 +1913,7 @@ function topmenuUI() {
         if ((!e || $(e.target).parents('.fm-add-user,.add-user-popup').length == 0)
             && (!c || c.indexOf('fm-add-user') == -1)) {
             $('.fm-add-user').removeClass('active');
-            $('.add-user-popup').addClass('dialog hidden');
+            $('.add-user-popup').addClass('hidden');
             $('.add-user-popup').removeAttr('style');
         }
     };
@@ -2053,11 +1995,11 @@ function topmenuUI() {
 
             var subpage;
             var subPages = [
-                'about', 'account', 'android', 'backup', 'blog', 'cmd', 'contact',
+                'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
-                'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'privacycompany',
+                'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'wp', 'start'
+                'sync', 'takedown', 'terms', 'start', 'uwp', 'security'
             ];
             var moveTo = {'account': 'fm/account'};
 
@@ -2095,105 +2037,161 @@ function topmenuUI() {
         return false;
     });
 
+    $topMenu.find('.top-social-bl a').rebind('click', function () {
+        window.open($(this).attr('href'));
+    });
+
     // Initialise the language sub menu for mobile
     if (is_mobile) {
         mobile.languageMenu.init();
     }
 
     $topHeader.find('.top-search-bl').rebind('click', function () {
-        $(this).addClass('active');
-        $('.top-search-input').focus();
+        if ($.trim($('.top-search-input').val()) === "") {
+            $(this).addClass('active');
+            $('.top-search-input').trigger("focus");
+        }
     });
 
     $topHeader.find('.top-search-input').rebind('blur', function () {
         $(this).closest('.top-search-bl').removeClass('active');
         if ($(this).val() == '') {
             $topHeader.find('.top-search-bl').removeClass('contains-value');
+            $topHeader.find('.top-search-button').addClass('hidden');
+            $topHeader.find('.top-clear-button').addClass('hidden');
         }
         else {
             $topHeader.find('.top-search-bl').addClass('contains-value');
+            $topHeader.find('.top-search-button').addClass('hidden');
+            $topHeader.find('.top-clear-button').removeClass('hidden');
         }
     });
 
-    $topHeader.find('.top-clear-button').rebind('click', function () {
+    $topHeader.find('.top-clear-button').rebind('click', function (e) {
+
+        // stop propaation to not calling .top-search-bl click
+        e.stopPropagation();
+
+        // if this is folderlink, open folderlink root;
         if (folderlink) {
-            var dn = $(M.viewmode ? '.file-block-scrolling .file-block-title' : 'table.grid-table.fm .tranfer-filetype-txt');
-            var ct = M.viewmode ? 'a' : 'tr';
-            dn.closest(ct).show();
-            $(window).trigger('resize');
+            M.nn = false;
+            M.openFolder();
         }
         $topHeader.find('.top-search-bl').removeClass('contains-value active');
-        $topHeader.find('.top-search-input').val('');
+        $topHeader.find('.top-clear-button').removeClass('hidden');
+        $topHeader.find('.top-search-input').val('').trigger('blur');
+        // if current page is search result reset it.
+        if (page.indexOf('/search/') !== -1) {
+            loadSubPage(page.slice(0, page.indexOf('/search/')));
+        }
     });
 
-    $topHeader.find('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
-        if (e.keyCode == 13 || folderlink) {
+    $topHeader.find('.top-search-input').rebind('focus', function () {
+        $topHeader.find('.top-search-button').removeClass('hidden');
+        $topHeader.find('.top-clear-button').addClass('hidden');
+    });
 
-            if (folderlink) {
-                // Flush cached nodes, if any
-                $(window).trigger('dynlist.flush');
+    var isFolderLink = function(val) {
+        if (val === '') {
+            M.openFolder();
+            $(this).trigger('blur');
+            return false;
+        }
+        else if (val.length < 2) {
+            return false;
+        }
+
+        if (!M.nn) {
+            M.nn = Object.create(null);
+            var keys = Object.keys(M.d);
+            for (var i = keys.length; i--;) {
+                M.nn[M.d[keys[i]].h] = M.d[keys[i]].name;
             }
+        }
 
-            if (!folderlink || !_topSearchHandler.logFired) {
-                // Add log to see how often they use the search
-                api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
-                _topSearchHandler.logFired = true;
+        var filter = M.getFilterBySearchFn(val);
+        var v = [];
+        for (var h in M.nn) {
+            if (filter({ name: M.nn[h] }) && h !== M.currentrootid) {
+                v.push(M.d[h]);
             }
+        }
+        M.v = v;
+        M.currentdirid = 'search/' + val;
+        M.renderMain();
+        M.onSectionUIOpen('cloud-drive');
+        $(this).trigger('blur');
+    };
 
-            var val = $.trim($('.top-search-input').val());
-            if (folderlink || val.length > 2 || !asciionly(val)) {
-                if (folderlink) {
-                    var dn = $(M.viewmode ? '.file-block-scrolling .file-block-title' : 'table.grid-table.fm .tranfer-filetype-txt');
-                    var ct = M.viewmode ? 'a' : 'tr';
-                    dn.closest(ct).show();
+    var isNotFolderLink = function(val) {
+        loadingDialog.show();
+        var promise = new MegaPromise();
 
-                    if (val) {
-                        val = val.toLowerCase();
-                        dn.filter(function () {
-                            return !~$(this).text().toLowerCase().indexOf(val);
-                        }).closest(ct).hide();
-                    }
-                    $(window).trigger('resize');
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                else {
-                    loadingDialog.show();
-                    var promise = new MegaPromise();
+        if (!M.nn) {
+            M.nn = Object.create(null);
 
-                    if (!M.nn) {
-                        M.nn = Object.create(null);
-
-                        promise = fmdb.get('f')
-                            .always(function (r) {
-                                for (var i = r.length; i--;) {
-                                    if (!r[i].fv) {
-                                        M.nn[r[i].h] = r[i].name;
-                                    }
-                                }
-                            });
-                    }
-                    else {
-                        promise.resolve();
-                    }
-
-                    promise.always(function () {
-                        var handles = [];
-                        var filter = M.getFilterBySearchFn(val);
-
-                        for (var h in M.nn) {
-                            if (!M.d[h] && filter({ name: M.nn[h] })) {
-                                handles.push(h);
-                            }
+            promise = fmdb.get('f')
+                .always(function (r) {
+                    for (var i = r.length; i--;) {
+                        if (!r[i].fv) {
+                            M.nn[r[i].h] = r[i].name;
                         }
+                    }
+                });
+        }
+        else {
+            promise.resolve();
+        }
 
-                        dbfetch.geta(handles).always(function () {
-                            loadingDialog.hide();
-                            loadSubPage('fm/search/' + val);
-                        });
-                    });
+        promise.always(function () {
+            var handles = [];
+            var filter = M.getFilterBySearchFn(val);
+
+            for (var h in M.nn) {
+                if (!M.d[h] && filter({ name: M.nn[h] })) {
+                    handles.push(h);
                 }
             }
+
+            dbfetch.geta(handles).always(function () {
+                loadingDialog.hide();
+                loadSubPage('fm/search/' + val);
+            });
+        });
+    };
+
+    $topHeader.find('.top-search-button').rebind('click mousedown', function _topSearchHandler() {
+        if (folderlink) {
+            // Flush cached nodes, if any
+            $(window).trigger('dynlist.flush');
+        }
+
+        if (!folderlink || !_topSearchHandler.logFired) {
+            // Add log to see how often they use the search
+            api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
+            _topSearchHandler.logFired = true;
+        }
+
+        var val = $.trim($('.top-search-input').val());
+        if (folderlink || val.length > 2 || !asciionly(val)) {
+            if (folderlink) {
+                isFolderLink(val);
+            }
+            else {
+                isNotFolderLink(val);
+            }
+        }
+        // if current page is search and value is empty result move to root.
+        else if (val === '' && page.indexOf('/search/') !== -1) {
+            $topHeader.find('.top-clear-button').addClass('hidden');
+            loadSubPage(page.slice(0, page.indexOf('/search/')));
+        }
+    });
+
+    // Press enter to start searching
+    $topHeader.find('.top-search-input').rebind('keyup', function(e) {
+        if (e.keyCode === 13) {
+            $topHeader.find('.top-search-button').click();
         }
     });
 
@@ -2253,7 +2251,12 @@ function topmenuUI() {
     });
 
     // If the main Mega M logo in the header is clicked
-    $topHeader.find('.logo').rebind('click', function () {
+    $topHeader.find('.default-white-button.individual').rebind('click', function () {
+        loadSubPage('startpage');
+    });
+
+    // If the main Mega M logo in the header is clicked
+    $('a.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
             if (folderlink) {
                 M.openFolder(M.RootID, true);
@@ -2299,6 +2302,7 @@ function topmenuUI() {
 
     if (String(M.currentdirid).substr(0, 7) === 'search/' && M.currentdirid[7] !== '~') {
         $topHeader.find('.top-search-bl').addClass('contains-value');
+        $topHeader.find('.top-clear-button').removeClass("hidden");
         var searchVal = M.currentdirid.substr(7);
         if (hashLogic) {
             searchVal = decodeURIComponent(searchVal);
@@ -2353,16 +2357,12 @@ function getTemplate(name) {
 function pagemetadata() {
     var mega_desc = false;
 
-    if (page == 'android') {
-        mega_title = 'Android - MEGA';
-        mega_desc = 'The MEGA Android app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
+    if (page === 'uwp') {
+        mega_title = 'Windows 10 app - MEGA';
     }
-    else if (page == 'ios') {
-        mega_title = 'iOS - MEGA';
-        mega_desc = 'The MEGA iOS app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
-    }
-    else if (page == 'wp') {
-        mega_title = 'Windows Phone - MEGA';
+    else if (page === 'mobileapp') {
+        mega_title = 'MEGA - Mobile Apps';
+        mega_desc = 'Securely manage your files and collaborate everyone from anywhere.';
     }
     else if (page == 'sync') {
         mega_title = 'MEGAsync - Download';
@@ -2498,8 +2498,12 @@ function loadSubPage(tpage, event) {
         return false;
     }
 
-    if (!is_mobile && slideshowid) {
+    if (window.slideshowid) {
         slideshow(0, 1);
+    }
+
+    if (window.versiondialogid) {
+        fileversioning.closeFileVersioningDialog(window.versiondialogid);
     }
 
     if (folderlink) {
@@ -2598,8 +2602,4 @@ mBroadcaster.once('boot_done', function () {
     M = new MegaData();
     attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
     attribCache.bitMapsManager = new MegaDataBitMapManager();
-
-    $(window).rebind('resize.subpage', function () {
-        M.zoomLevelNotification();
-    });
 });

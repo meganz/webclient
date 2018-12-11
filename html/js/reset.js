@@ -3,12 +3,6 @@ var recoveryemail;
 var recoverykey;
 
 function init_reset() {
-    if (u_type) {
-        msgDialog('warningb', l[135], l[1971], false, function(e) {
-            loadSubPage('help/account');
-        });
-        return false;
-    }
     $.tresizer();
     loadingDialog.show();
     recoverycode = page.replace('recover', '');
@@ -34,14 +28,6 @@ function init_reset() {
                 if (res[0] === 9) {
                     recoveryemail = res[1];
                     $('.main-mid-pad.backup-recover.withkey').removeClass('hidden');
-                    $('.withkey #key-input2').rebind('focus', function() {
-                        $(this).val('');
-                    });
-                    $('.withkey #key-input2').rebind('blur', function() {
-                        if ($(this).val() === '') {
-                            $(this).val(l[1970]);
-                        }
-                    });
 
                     $('.withkey .backup-input-button').rebind('click', function() {
                         verify_key($('#key-input2').val());
@@ -54,7 +40,6 @@ function init_reset() {
                     });
 
                     $('#key-upload-field').rebind('change', function(e) {
-                        $('.recover-block.error,.recover-block.success').addClass('hidden');
                         if (e && e.target && e.target.files) {
                             var f = e.target.files[0];
                             if (f && f.size > 100) {
@@ -69,6 +54,10 @@ function init_reset() {
                                 FR.readAsText(f);
                             }
                         }
+                    });
+
+                    $('.park-account-link').rebind('click', function() {
+                        AccountRecoveryControl.showParkWarning();
                     });
                 }
                 else if (res[0] === 10) {
@@ -95,6 +84,9 @@ function init_reset() {
     }
 
     $('.restore-verify-button').rebind('click', function(e) {
+        if (!$(this).hasClass('active')) {
+            return false;
+        }
         if ($(this).hasClass('reset-account')) {
             delete_reset_pw();
         }
@@ -105,249 +97,242 @@ function init_reset() {
     init_reset_pw();
 
     $('.new-registration-checkbox').rebind('click', function(e) {
-        if ($(this).hasClass('checkboxOn')) {
+        if ($(this).find(".register-check").hasClass('checkboxOn')) {
             $('.register-check').removeClass('checkboxOn').addClass('checkboxOff');
         }
         else {
             $('.register-check').addClass('checkboxOn').removeClass('checkboxOff');
         }
+        return false;
     });
 
-    $('.login-register-input').rebind('click', function(e) {
-        $(this).closest('input').focus();
+    $('.login-register-input').rebind('click', function() {
+        $(this).find('input').trigger("focus");
     });
 }
 
 function delete_reset_pw() {
-    var c = $('.register-check').attr('class');
-    if ($('#withoutkey-password').val() === l[909]) {
-        msgDialog('warninga', l[135], l[741]);
-        return;
-    }
-    else if ($('#withoutkey-password').val() !== $('#withoutkey-password2').val()) {
-        msgDialog('warninga', l[135], l[715]);
-        return;
-    }
-    else if ($('.login-register-input.password').hasClass('weak-password')) {
-        msgDialog('warninga', l[135], l[1129]);
-        return;
+
+    var password = $('#withoutkey-password').val();
+    var confirmPassword = $('#withoutkey-password2').val();
+    var passwordValidationResult = security.isValidPassword(password, confirmPassword);
+    
+    // If bad result
+    if (passwordValidationResult !== true) {
+        msgDialog('warninga', l[135], passwordValidationResult);
+        return false;
     }
     else if ($('.new-registration-checkbox .register-check').hasClass('checkboxOff')) {
         msgDialog('warninga', l[135], l[1974]);
         return;
     }
+
     loadingDialog.show();
-    api_resetuser({
-        callback: function(code) {
-            loadingDialog.hide();
-            if (code === 0) {
-                msgDialog('info', l[1975], l[1976], '', function() {
-                    login_email = recoveryemail;
-                    loadSubPage('login');
-                });
-            }
-            else if (code === EKEY) {
-                msgDialog('warningb', l[1977], l[1978]);
-                $('.recover-block.error').removeClass('hidden');
-            }
-            else if (code === EBLOCKED) {
-                msgDialog('warningb', l[1979], l[1980]);
-            }
-            else if (code === EEXPIRED || code === ENOENT) {
-                msgDialog('warninga', l[1966], l[1967], '', function() {
-                    loadSubPage('recovery');
-                });
-            }
+
+    // Finish the Park Account process
+    security.resetUser(recoverycode, recoveryemail, password, function(code) {
+
+        loadingDialog.hide();
+
+        if (code === 0) {
+            msgDialog('info', l[1975], l[1976], '', function() {
+                login_email = recoveryemail;
+                loadSubPage('login');
+            });
         }
-    }, recoverycode, recoveryemail, $('#withoutkey-password').val());
-
-
+        else if (code === EKEY) {
+            msgDialog('warningb', l[1977], l[1978]);
+            $('.recover-block.error').removeClass('hidden');
+        }
+        else if (code === EBLOCKED) {
+            msgDialog('warningb', l[1979], l[1980]);
+        }
+        else if (code === EEXPIRED || code === ENOENT) {
+            msgDialog('warninga', l[1966], l[1967], '', function() {
+                loadSubPage('recovery');
+            });
+        }
+    });
 }
 
 function recovery_reset_pw() {
-    if ($('#withkey-password').val() === l[909]) {
-        msgDialog('warninga', l[135], l[741]);
-        return;
+
+    'use strict';
+
+    var password = $('#withkey-password').val();
+    var confirmPassword = $('#withkey-password2').val();
+    var passwordValidationResult = security.isValidPassword(password, confirmPassword);
+
+    // If bad result
+    if (passwordValidationResult !== true) {
+        msgDialog('warninga', l[135], passwordValidationResult);
+        return false;
     }
-    else if ($('#withkey-password').val() !== $('#withkey-password2').val()) {
-        msgDialog('warninga', l[135], l[715]);
-        return;
-    }
-    else if ($('.login-register-input.password').hasClass('weak-password')) {
-        msgDialog('warninga', l[135], l[1129]);
-        return;
-    }
+
     loadingDialog.show();
-    api_resetkeykey({
-        result: function(code) {
-            loadingDialog.hide();
-            if (code === 0) {
-                msgDialog('info', l[1955], l[1981], '', function() {
-                    login_email = recoveryemail;
-                    loadSubPage('login');
-                });
-            }
-            else if (code === EKEY) {
-                msgDialog('warningb', l[1977], l[1978]);
-                $('.recover-block.error').removeClass('hidden');
-            }
-            else if (code === EBLOCKED) {
-                msgDialog('warningb', l[1979], l[1980]);
-            }
-            else if (code === EEXPIRED || code === ENOENT) {
-                msgDialog('warninga', l[1966], l[1967], '', function() {
-                    loadSubPage('login');
-                });
-            }
+
+    // Perform the Master Key re-encryption with a new password
+    security.resetKey(recoverycode, base64_to_a32(recoverykey), recoveryemail, password, function(responseCode) {
+
+        loadingDialog.hide();
+
+        if (responseCode === 0) {
+            msgDialog('info', l[1955], l[1981], '', function() {
+                login_email = recoveryemail;
+                loadSubPage('login');
+            });
         }
-    }, recoverycode, base64_to_a32(recoverykey), recoveryemail, $('#withkey-password').val());
+        else if (responseCode === EKEY) {
+            msgDialog('warningb', l[1977], l[1978]);
+            $('.recover-block.error').removeClass('hidden');
+        }
+        else if (responseCode === EBLOCKED) {
+            msgDialog('warningb', l[1979], l[1980]);
+        }
+        else if (responseCode === EEXPIRED || responseCode === ENOENT) {
+            msgDialog('warninga', l[1966], l[1967], '', function() {
+                loadSubPage('login');
+            });
+        }
+    });
 }
 
 
 function verify_key(key) {
+
     $('#key-upload-field').val('');
     $('.recover-block.error,.recover-block.success').addClass('hidden');
-    recoverykey = key;
-    loadingDialog.show();
-    api_resetkeykey({
-        result: function(code) {
-            if (code === 0) {
-                $('.recover-block.success').removeClass('hidden');
-            }
-            else if (code === EKEY) {
-                msgDialog('warningb', l[1977], l[1978]);
-                $('.recover-block.error').removeClass('hidden');
-            }
-            else if (code === EBLOCKED) {
-                msgDialog('warningb', l[1979], l[1980]);
-            }
-            else if (code === EEXPIRED || code === ENOENT) {
-                msgDialog('warninga', l[1966], l[1967], '', function() {
-                    loadSubPage('login');
-                });
-            }
-            loadingDialog.hide();
-        }
-    }, recoverycode, base64_to_a32(key));
 
-    /*
-    result(x) can be called with
-    x === 0 - all good
-    x === EKEY - invalid master key
-    x === ENOENT - invalid or already used code_from_email
-    x === EEXPIRED - valid, but expired code_from_email
-    */
+    recoverykey = key;
+
+    loadingDialog.show();
+
+    // Change the password, re-encrypt the Master Key and send the encrypted key to the server
+    security.resetKey(recoverycode, base64_to_a32(recoverykey), recoveryemail, null, function(responseCode) {
+
+        if (responseCode === 0) {
+            $('.recover-block').addClass('hidden');
+            $('.recover-block.success').removeClass('hidden');
+        }
+
+        // If EKEY - invalid master key
+        else if (responseCode === EKEY) {
+            msgDialog('warningb', l[1977], l[1978]);
+            // $('.recover-block.error').removeClass('hidden');
+        }
+        else if (responseCode === EBLOCKED) {
+            msgDialog('warningb', l[1979], l[1980]);
+        }
+
+        // If ENOENT - invalid or already used code_from_email or if EEXPIRED - valid, but expired code_from_email
+        else if (responseCode === EEXPIRED || responseCode === ENOENT) {
+            msgDialog('warninga', l[1966], l[1967], '', function() {
+                loadSubPage('login');
+            });
+        }
+
+        loadingDialog.hide();
+    });
 }
 
 
-
 function reset_pwcheck() {
-    $('.login-register-input.password').removeClass('weak-password strong-password');
-    $('.new-registration').removeClass('good1 good2 good3 good4 good5');
 
+    'use strict';
+
+    $('.login-register-input.password').removeClass('insufficient-strength meets-minimum-strength');
+    $('.account.password-status').removeClass('good1 good2 good3 good4 good5 checked');
+    $('.password-advice').empty();
+    $('.minimum-password-block .password-icon').removeClass('success');
 
     if (typeof zxcvbn === 'undefined') {
         return false;
     }
-    var pw;
-    if ($('#withkey-password').attr('type') !== 'text'
-            && $('#withkey-password').val() !== '') {
-        pw = zxcvbn($('#withkey-password').val());
+
+    var trimmedWithKeyPassword = $.trim($('#withkey-password').val());
+    var trimmedWithoutKeyPassword = $.trim($('#withoutkey-password').val());
+
+    if (trimmedWithKeyPassword !== '') {
+        classifyPassword(trimmedWithKeyPassword);
     }
-    else if ($('#withoutkey-password').attr('type') !== 'text'
-            && $('#withoutkey-password').val() !== '') {
-        pw = zxcvbn($('#withoutkey-password').val());
+    else if (trimmedWithoutKeyPassword !== '') {
+        classifyPassword(trimmedWithoutKeyPassword);
     }
     else {
         return false;
     }
-
-    if (pw.score > 3 && pw.entropy > 75) {
-        $('.login-register-input.password').addClass('strong-password');
-        $('.new-registration').addClass('good5');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1128]);
-        $('.new-reg-status-description').text(l[1123]);
-    }
-    else if (pw.score > 2 && pw.entropy > 50) {
-        $('.login-register-input.password').addClass('strong-password');
-        $('.new-registration').addClass('good4');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1127]);
-        $('.new-reg-status-description').text(l[1122]);
-    }
-    else if (pw.score > 1 && pw.entropy > 40) {
-        $('.login-register-input.password').addClass('strong-password');
-        $('.new-registration').addClass('good3');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1126]);
-        $('.new-reg-status-description').text(l[1121]);
-    }
-    else if (pw.score > 0 && pw.entropy > 15) {
-        $('.new-registration').addClass('good2');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1125]);
-        $('.new-reg-status-description').text(l[1120]);
-    }
-    else {
-        $('.login-register-input.password').addClass('weak-password');
-        $('.new-registration').addClass('good1');
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], l[1124]);
-        $('.new-reg-status-description').text(l[1119]);
-    }
-    $('.password-status-warning')
-        .safeHTML('<span class="password-warning-txt">@@</span> ' +
-            '@@<div class="password-tooltip-arrow"></div>', l[34], l[1129]);
-    $('.password-status-warning').css('margin-left', ($('.password-status-warning').width() / 2 * -1) - 13);
 }
 
 
 function init_reset_pw() {
-    var a = '';
-    $('#withkey-password,#withoutkey-password').rebind('focus', function(e) {
-        $('.login-register-input.password.first').removeClass('incorrect');
-        $('.login-register-input.password.confirm').removeClass('incorrect');
-        $('.login-register-input.password').addClass('focused');
-        if ($(this).val() === l[909]) {
-            $(this).val('');
-            $(this)[0].type = 'password';
+
+    'use strict';
+
+    var $passwords = $('#withkey-password,#withoutkey-password');
+    var $confirms = $('#withkey-password2,#withoutkey-password2');
+
+    var checkInput = function($input) {
+
+        var $contentWrapper = $input.parents('.content-wrapper');
+        var $firstInput = $contentWrapper.find('.first > input');
+        var $confirmInput = $contentWrapper.find('.confirm > input');
+        var $button = $contentWrapper.find('.restore-verify-button');
+
+        if ($firstInput.val() && $confirmInput.val() && $firstInput.val().length >= security.minPasswordLength
+            && $firstInput.val().length === $confirmInput.val().length) {
+            $button.addClass('active').removeClass('disabled');
         }
-    });
-    $('#withkey-password,#withoutkey-password').rebind('blur', function(e) {
-        $('.login-register-input.password').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[909]);
-            $(this)[0].type = 'text';
+        else {
+            $button.removeClass('active').addClass('disabled');
         }
-        reset_pwcheck();
-    });
-    $('#withkey-password2,#withoutkey-password2').rebind('focus', function(e) {
-        $('.login-register-input.password.confirm').removeClass('incorrect');
-        $('.login-register-input.password2').addClass('focused');
-        if ($(this).val() === l[1114]) {
-            $(this).val('');
-            $(this)[0].type = 'password';
-        }
-    });
-    $('#withkey-password2,#withoutkey-password2').rebind('blur', function(e) {
-        $('.login-register-input.password2').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[1114]);
-            $(this)[0].type = 'text';
-        }
+    };
+
+    $passwords.rebind('focus.initresetpw', function() {
+        var $parent = $(this).parent();
+        var $tooltip = $parent.find('.password-tooltip');
+        $parent.removeClass('incorrect').addClass('focused');
+        $tooltip.removeClass('hidden');
+        setTimeout(function() { // Waiting for hidden to be removed for animation
+            $tooltip.addClass('visible');
+        }, 10);
     });
 
-    $('#withkey-password,#withoutkey-password').rebind('keyup', function(e) {
+    $passwords.rebind('blur.initresetpw', function() {
+        var $parent = $(this).parent();
+        var $tooltip = $parent.find('.password-tooltip');
+        $parent.removeClass('focused');
+        $tooltip.removeClass('visible');
+        setTimeout(function() { // Waiting for animation
+            $tooltip.addClass('hidden');
+        }, 200);
+    });
+
+    $confirms.rebind('focus.initresetpw', function() {
+        $(this).parent().removeClass('incorrect').addClass('focused');
+    });
+
+    $confirms.rebind('blur.initresetpw', function() {
+        $(this).parent().removeClass('focused');
+    });
+
+    $passwords.rebind('keyup.initresetpw', function() {
+        checkInput($(this));
         reset_pwcheck();
     });
 
-    $('#withkey-password2').rebind('keyup', function(e) {
+    // $('#withkey-password2').rebind('keyup.initresetpw', function(e) {
+    $confirms.rebind('keyup.initresetpw', function(e) {
+        checkInput($(this));
         if (e.keyCode === 13) {
             recovery_reset_pw();
         }
     });
 
-    $('.password-status-icon').rebind('mouseover', function(e) {
+    $('.password-status-icon').rebind('mouseover.initresetpw', function() {
         $('.password-status-warning').removeClass('hidden');
-
     });
-    $('.password-status-icon').rebind('mouseout', function(e) {
+
+    $('.password-status-icon').rebind('mouseout.initresetpw', function() {
         $('.password-status-warning').addClass('hidden');
     });
 }

@@ -1,6 +1,6 @@
 function isMediaSourceSupported() {
     'use strict';
-    return 'MediaSource' in window && (!window.safari || d);
+    return window.MediaSource && typeof MediaSource.isTypeSupported === 'function' && (!window.safari || d);
 }
 
 function is_video(n) {
@@ -11,7 +11,7 @@ function is_video(n) {
         return MediaAttribute.getMediaType(n);
     }
 
-    var ext = String(n && n.name || n).split('.').pop().toUpperCase();
+    var ext = fileext(n && n.name || n, true, true);
 
     return is_video.ext[ext];
 }
@@ -28,25 +28,56 @@ if (!isMediaSourceSupported()) {
     };
 }
 
-function is_image(name) {
+/**
+ * Returns a truthy value whenever we can get a previewable image for a file/node.
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function}
+ *      {Number}: Build-in support in browsers,
+ *      {String}: RAW Image file type
+ *      {Function}: Handler we can use to get a preview image out of the file/node data
+ */
+function is_image(n, ext) {
     'use strict';
-
-    if (name) {
-        if (typeof name === 'object') {
-            name = name.name;
-        }
-        var ext = String(name).split('.').pop().toUpperCase();
-
-        return is_image.def[ext] || is_rawimage(null, ext) || mThumbHandler.has(0, ext);
-    }
-
-    return false;
+    ext = ext || fileext(n && n.name || n, true, true);
+    return is_image.def[ext] || is_rawimage(null, ext) || mThumbHandler.has(0, ext);
 }
 
+/**
+ * Same as is_image(), additionally checking whether the node has an image file attribute we can preview
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function|Boolean}
+ */
+function is_image2(n, ext) {
+    'use strict';
+    ext = ext || fileext(n && n.name || n, true, true);
+    return (is_image(n, ext) && (!mega.chrome || !n || n.s < 6e8))
+        || (filemime(n).startsWith('image') && String(n.fa).indexOf(':1*') > 0);
+}
+
+/**
+ * Same as is_image2(), additionally skipping non-image files regardless of file attributes or generation handlers
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function|Boolean}
+ */
+function is_image3(n, ext) {
+    'use strict';
+    ext = ext || fileext(n && n.name || n, true, true);
+    return ext !== 'PDF' && is_image2(n, ext);
+}
+
+/**
+ * Check whether a file/node is a RAW image.
+ * @param {String|MegaNode|Object} name An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {String}
+ */
 function is_rawimage(name, ext) {
     'use strict';
 
-    ext = ext || String(name).split('.').pop().toUpperCase();
+    ext = ext || fileext(name, true, true);
 
     return is_image.raw[ext] && ext;
 }
@@ -56,8 +87,7 @@ is_image.def = {
     'JPEG': 1,
     'GIF': 1,
     'BMP': 1,
-    'PNG': 1,
-    'HEIC': -1
+    'PNG': 1
 };
 
 is_image.raw = {
@@ -112,7 +142,7 @@ var mThumbHandler = {
     has: function(name, ext) {
         'use strict';
 
-        ext = ext || String(name).split('.').pop().toUpperCase();
+        ext = ext || fileext(name, true, true);
 
         return this.sup[ext];
     }
@@ -176,14 +206,15 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
             if (d) {
                 console.debug('Holding tiff thumb creation...', ab && ab.byteLength);
             }
-            onIdle(function() {
-                mBroadcaster.once('TIFThumbHandler.ready', makeTIF);
-            });
+            mBroadcaster.once('TIFThumbHandler.ready', makeTIF);
             return;
         }
         TIFThumbHandler.working = true;
 
         onIdle(function() {
+            if (d) {
+                console.debug('...unholding tiff thumb creation.', mBroadcaster.hasListener('TIFThumbHandler.ready'));
+            }
             TIFThumbHandler.working = false;
             mBroadcaster.sendMessage('TIFThumbHandler.ready');
         });
@@ -195,26 +226,117 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
             console.time(timeTag);
         }
 
-        var tiff = new Tiff(new Uint8Array(ab));
-        ab = dataURLToAB(tiff.toDataURL());
+        var dv = new DataView(ab.buffer || ab);
+        switch (dv.byteLength > 16 && dv.getUint16(0)) {
+            case 0x4D4D: // TIFF, big-endian
+            case 0x4949: // TIFF, little-endian
+                // XXX: libtiff is unable to handle images with 32-bit samples.
+                var tiff = false;
+
+                try {
+                    Tiff.initialize({TOTAL_MEMORY: 134217728});
+                    tiff = new Tiff(new Uint8Array(ab));
+
+                    ab = dataURLToAB(tiff.toDataURL());
+
+                    if (d) {
+                        console.log('tif2png %sx%s (%s bytes)', tiff.width(), tiff.height(), ab.byteLength);
+                    }
+                }
+                catch (ex) {
+                    if (d) {
+                        console.warn('Caught tiff.js exception, aborting...', ex);
+                    }
+                    ab = false;
+
+                    if (!tiff) {
+                        break;
+                    }
+                }
+
+                try {
+                    tiff.close();
+                    Tiff.Module.FS_unlink(tiff._filename);
+                }
+                catch (ex) {
+                    if (d) {
+                        console.debug(ex);
+                    }
+                }
+
+                if (ab) {
+                    eventlog(99692);
+                }
+                break;
+
+            default:
+                if (d) {
+                    console.debug('This does not seems a TIFF...', [ab]);
+                }
+        }
 
         if (d) {
             console.timeEnd(timeTag);
-            console.log('tif2png %sx%s (%s bytes)', tiff.width(), tiff.height(), ab.byteLength);
         }
 
-        try {
-            tiff.close();
-            Tiff.Module.FS_unlink(tiff._filename);
+        cb(ab);
+    });
+});
+
+mThumbHandler.add('WEBP', function WEBPThumbHandler(ab, cb) {
+    'use strict';
+
+    M.require('webpjs').tryCatch(function() {
+        var timeTag = 'webpjs.' + makeUUID();
+
+        if (d) {
+            console.debug('Creating WEBP thumbnail...', ab && ab.byteLength);
+            console.time(timeTag);
         }
-        catch (ex) {
+
+        var canvas = webpToCanvas(new Uint8Array(ab), ab.byteLength);
+
+        if (d) {
+            console.timeEnd(timeTag);
+        }
+
+        if (canvas) {
+            ab = dataURLToAB(canvas.toDataURL());
+
             if (d) {
-                console.debug(ex);
+                console.log('webp2png %sx%s (%s bytes)', canvas.width, canvas.height, ab.byteLength);
             }
         }
+        else {
+            if (d) {
+                console.debug('WebP thumbnail creation failed.');
+            }
+            ab = null;
+        }
         cb(ab);
-        eventlog(99692);
     });
+});
+
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    var img = new Image();
+    img.onload = function() {
+        // This browser does natively support WebP
+        delete mThumbHandler.sup.WEBP;
+        is_image.def.WEBP = 1;
+
+        if (d) {
+            console.debug('Using build in WebP support...');
+        }
+    };
+    img.onerror = function() {
+        if (d) {
+            console.debug('This browser does not support WebP, we will use libwebp...', ua);
+        }
+    };
+    img.src = 'data:image/webp;base64,' +
+        'UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
 });
 
 mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
@@ -354,8 +476,10 @@ function setImage(n, ab, options) {
  */
 function getID3CoverArt(entry) {
     'use strict';
+    // jscs:disable disallowImplicitTypeConversion
     return new Promise(function(resolve, reject) {
         var parse = tryCatch(function(ab) {
+            var result;
             var u8 = new Uint8Array(ab);
             var getLong = function(offset) {
                 return (((((u8[offset] << 8) + u8[offset + 1]) << 8) + u8[offset + 2]) << 8) + u8[offset + 3];
@@ -367,7 +491,6 @@ function getID3CoverArt(entry) {
                 return {id: id, size: getLong(offset + 4) + 10};
             };
             if (u8[0] === 0x49 && u8[1] === 0x44 && u8[2] === 0x33 && u8[3] === 3) {
-                var result;
                 var offset = 10 + (u8[5] & 128 ? getLong(10) : 0);
                 var size = offset + getLong(6);
 
@@ -383,14 +506,38 @@ function getID3CoverArt(entry) {
                     }
                     offset += frame.size;
                 }
+            }
+            if (u8[0] === 0x66 && u8[1] === 0x4C && u8[2] === 0x61 && u8[3] === 0x43) {
+                var pos = 4;
+                var len = u8.byteLength;
+                var type;
+
+                while (len > pos) {
+                    var hdr = getLong(pos);
+
+                    if ((hdr >>> 24 & ~0x80) === 6) {
+                        var index = getLong(pos + 8);
+                        index += getLong(pos + index + 12) + 32 + pos;
+                        type = getLong(pos + 4);
+
+                        result = u8.slice(index + 4, getLong(index));
+                    }
+
+                    if (type === 3 || (hdr >>> 24 & 0x80)) {
+                        break;
+                    }
+                    pos += 4 + (hdr & 0xffffff);
+                }
+            }
+            if (result && result.byteLength) {
                 if (d) {
                     console.debug('getID3CoverArt', [result]);
                 }
-                if (result) {
-                    return resolve(result);
-                }
+                return resolve(result);
             }
-            reject(Error('Not found.'));
+            onIdle(function() {
+                reject(Error('[getID3CoverArt] None found.'));
+            });
         }, reject);
 
         if (entry instanceof Blob) {
@@ -405,9 +552,7 @@ function getID3CoverArt(entry) {
             reader.readAsArrayBuffer(entry);
         }
         else {
-            onIdle(function() {
-                parse(entry);
-            });
+            parse(entry);
         }
     });
 }
@@ -442,6 +587,7 @@ function FullScreenManager($button, $element) {
         else {
             $element.fullScreen(true);
         }
+        return false;
     };
 
     if (state === null) {
@@ -484,8 +630,8 @@ FullScreenManager.prototype.destroy = function() {
 
     if (!this.destroyed) {
         this.destroyed = true;
-        this.$button.unbind('click.' + this.iid);
-        this.$document.unbind('fullscreenchange.' + this.iid);
+        this.$button.off('click.' + this.iid);
+        this.$document.off('fullscreenchange.' + this.iid);
         this.exitFullscreen();
     }
 };
@@ -495,6 +641,18 @@ FullScreenManager.prototype.change = function(cb) {
     'use strict';
     this.listeners.push(tryCatch(cb.bind(this)));
     return this;
+};
+
+// switch full screen
+FullScreenManager.prototype.switchFullscreen = function() {
+    'use strict';
+
+    if (this.state) {
+        this.exitFullscreen();
+    }
+    else {
+        this.enterFullscreen();
+    }
 };
 
 // exit full screen
@@ -562,6 +720,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $videoControls = $wrapper.find('.video-controls');
         var $document = $(document);
         var timer;
+        var filters = Object.create(null);
 
         // Hide the default controls
         videoElement.controls = false;
@@ -606,7 +765,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (dlmanager.isStreaming) {
                 clearTimeout(timer);
                 timer = setTimeout(function() {
-                    $wrapper.addClass('mouse-idle');
+                    if (videoElement && !(videoElement.paused || videoElement.ended)) {
+                        $wrapper.addClass('mouse-idle');
+                    }
                 }, 2600);
             }
         };
@@ -619,8 +780,67 @@ FullScreenManager.prototype.enterFullscreen = function() {
             return {time: selectedTime | 0, percent: percentage};
         };
 
+        // Set video duration in progress bar
         var setDuration = function(value) {
             $wrapper.find('.video-timing.duration').text(secondsToTimeShort(value, 1));
+        };
+
+        // Increase/decrease video speed
+        var setVideoSpeed = function(rate) {
+            if (!rate) {
+                videoElement.playbackRate = 1.0;
+            }
+            else {
+                var r = videoElement.playbackRate;
+                videoElement.playbackRate = Math.min(Math.max(r + rate, 0.25), 4);
+            }
+        };
+
+        // Increase/decrease video volume.
+        var setVideoVolume = function(v) {
+            if (videoElement.muted) {
+                videoElement.muted = false;
+                changeButtonState('mute');
+            }
+            videoElement.volume = Math.min(1.0, Math.max(videoElement.volume + v, 0.1));
+            $volumeBar.find('span').css('height', Math.round(videoElement.volume * 100) + '%');
+        };
+
+        // Increase/decrease color filter
+        var setVideoFilter = function(v) {
+            var style = [];
+            var op = v > 0 && v < 4 ? 2 : v > 3 && v < 7 ? 5 : 8;
+            var filter = ({'2': 'saturate', '5': 'contrast', '8': 'brightness'})[op];
+
+            if (!v) {
+                filters = Object.create(null);
+            }
+            else if (v === op) {
+                delete filters[filter];
+            }
+            else {
+                v = '147'.indexOf(v) < 0 ? 0.1 : -0.1;
+                filters[filter] = Number(Math.min(8.0, Math.max((filters[filter] || 1) + v, 0.1)).toFixed(2));
+            }
+
+            Object.keys(filters).forEach(function(k) {
+                style.push(k + '(' + filters[k] + ')');
+            });
+
+            videoElement.style.filter = style.join(' ') || 'none';
+        };
+
+        // Apply specific video filter
+        var applyVideoFilter = function(s, c, b) {
+            filters.saturate = s;
+            filters.contrast = c;
+            filters.brightness = b;
+            videoElement.style.filter = 'saturate(' + s + ') contrast(' + c + ') brightness(' + b + ')';
+        };
+
+        // Seek by specified number of seconds.
+        var seekBy = function(sec) {
+            streamer.currentTime = Math.min(streamer.duration, Math.max(0, streamer.currentTime + sec));
         };
 
         // Set Init Values
@@ -659,16 +879,23 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     });
 
                     if (!streamer.hasAudio) {
-                        $('.volume-control', $wrapper).addClass('no-audio');
-                    }
+                        var $vc = $('.volume-control', $wrapper).addClass('no-audio');
+                        var title = l[19061];
 
-                    hideControls();
-                    $document.rebind('mousemove.idle', hideControls);
+                        if (streamer.hasUnsupportedAudio) {
+                            eventlog(99693, streamer.hasUnsupportedAudio);
+                            title = escapeHTML(l[19060]).replace('%1', streamer.hasUnsupportedAudio);
+                        }
+                        $vc.attr('title', title);
+                    }
 
                     streamer._megaNode = node;
                     dlmanager.isStreaming = streamer;
                     pagemetadata();
                 }
+
+                hideControls();
+                $document.rebind('mousemove.idle', hideControls);
             }
         });
 
@@ -681,14 +908,24 @@ FullScreenManager.prototype.enterFullscreen = function() {
         $video.rebind('ended.idle pause.idle', function() {
             clearTimeout(timer);
             $wrapper.removeClass('mouse-idle');
-            $document.unbind('mousemove.idle');
-            playevent = false;
+            $document.off('mousemove.idle');
+            // playevent = false;
+        });
+
+        $video.rebind('contextmenu.mvs', function() {
+            if (playevent) {
+                $video.off('contextmenu.mvs');
+            }
+            else {
+                return false;
+            }
         });
 
         // Add events for all buttons
         $playpause.rebind('click', function() {
             if (videoElement.paused || videoElement.ended) {
                 if (dlmanager.isOverQuota) {
+                    $wrapper.trigger('is-over-quota');
                     dlmanager.showOverQuotaDialog();
                 }
                 else {
@@ -704,6 +941,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             else {
                 videoElement.pause();
             }
+            return false;
         });
 
         // Volume Bar control
@@ -729,14 +967,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         $('.volume-control', $wrapper).rebind('mousewheel.volumecontrol', function(e) {
             var delta = Math.max(-1, Math.min(1, (e.wheelDelta || e.deltaY || -e.detail)));
-
-            if (delta > 0 && videoElement.volume < 1.0) {
-                videoElement.volume += 0.1;
-            }
-            if (delta < 0 && videoElement.volume > 0.1) {
-                videoElement.volume -= 0.1;
-            }
-            $volumeBar.find('span').css('height', Math.round(videoElement.volume * 100) + '%');
+            setVideoVolume(0.1 * delta);
             return false;
         });
 
@@ -783,6 +1014,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 changeButtonState('mute');
                 updateVolumeBar();
             }
+            return false;
         });
 
         var progressBarElementStyle = $progressBar.get(0).style;
@@ -805,6 +1037,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 onTimeUpdate(options.startTime, playtime);
             }
         }
+
+        if (options.filter) {
+            applyVideoFilter.apply(this, options.filter.map(function(v) { return v / 10; }));
+        }
+
         $video.rebind('timeupdate', function() {
             onTimeUpdate(streamer.currentTime, streamer.duration);
         });
@@ -875,6 +1112,88 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $element = page === 'download' ? $wrapper.find('.video-block') : $wrapper;
         var fullScreenManager = FullScreenManager($fullscreen, $element).change(setFullscreenData);
 
+        // Video playback keyboard event handler.
+        var videoKeyboardHandler = function(ev) {
+            var bubble = false;
+            var key = playevent && (ev.code || ev.key);
+
+            switch (key) {
+                case 'KeyK':
+                case 'Space':
+                case 'MediaPlayPause':
+                    $playpause.trigger('click');
+                    break;
+                case 'ArrowUp':
+                    setVideoVolume(0.1);
+                    break;
+                case 'ArrowDown':
+                    setVideoVolume(-0.1);
+                    break;
+                case 'ArrowLeft':
+                    seekBy(-5);
+                    break;
+                case 'ArrowRight':
+                    seekBy(5);
+                    break;
+                case 'KeyJ':
+                    seekBy(-10);
+                    break;
+                case 'KeyL':
+                    seekBy(10);
+                    break;
+                case 'KeyF':
+                    fullScreenManager.switchFullscreen();
+                    break;
+                case 'KeyM':
+                    $mute.trigger('click');
+                    break;
+                case 'Home':
+                case 'Digit0':
+                    streamer.currentTime = 0;
+                    break;
+                case 'End':
+                    streamer.currentTime = streamer.duration - 0.2;
+                    break;
+                case 'Digit1':
+                case 'Digit2':
+                case 'Digit3':
+                case 'Digit4':
+                case 'Digit5':
+                case 'Digit6':
+                case 'Digit7':
+                case 'Digit8':
+                case 'Digit9':
+                    streamer.currentTime = streamer.duration * key.substr(5) / 10;
+                    break;
+                case 'Numpad0':
+                case 'Numpad1':
+                case 'Numpad2':
+                case 'Numpad3':
+                case 'Numpad4':
+                case 'Numpad5':
+                case 'Numpad6':
+                case 'Numpad7':
+                case 'Numpad8':
+                case 'Numpad9':
+                    setVideoFilter(key.substr(6) | 0);
+                    break;
+                default:
+                    if (ev.key === '<' || ev.key === '>') {
+                        setVideoSpeed(ev.ctrlKey ? null : 0.25 * (ev.key.charCodeAt(0) - 0x3d));
+                    }
+                    else {
+                        bubble = true;
+                    }
+                    break;
+            }
+
+            if (!bubble) {
+                ev.preventDefault();
+                ev.stopPropagation();
+            }
+        };
+        window.addEventListener('keydown', videoKeyboardHandler, true);
+
         $wrapper.rebind('is-over-quota', function() {
             fullScreenManager.exitFullscreen();
             videoElement.pause();
@@ -882,16 +1201,24 @@ FullScreenManager.prototype.enterFullscreen = function() {
         });
 
         $wrapper.rebind('video-destroy', function() {
+            $mute.off();
+            $video.off();
+            $progress.off();
+            $playpause.off();
+            $volumeBar.off();
             clearTimeout(timer);
+            if (videoElement) {
+                videoElement.style.filter = 'none';
+            }
+            window.removeEventListener('keydown', videoKeyboardHandler, true);
             $wrapper.removeClass('mouse-idle video-theatre-mode video')
-                .unbind('is-over-quota')
-                .find('.viewer-pending').addClass('hidden');
-            $video.unbind('mousemove.idle');
-            $document.unbind('mousemove.videoprogress');
-            $document.unbind('mouseup.videoprogress');
-            $document.unbind('mousemove.volumecontrol');
-            $document.unbind('mouseup.volumecontrol');
-            $(window).unbind('video-destroy.main');
+                .off('is-over-quota').find('.viewer-pending').addClass('hidden');
+            $document.off('mousemove.videoprogress');
+            $document.off('mouseup.videoprogress');
+            $document.off('mousemove.volumecontrol');
+            $document.off('mouseup.volumecontrol');
+            $(window).off('video-destroy.main');
+            videoElement = streamer = null;
             dlmanager.isStreaming = false;
             fullScreenManager.destroy();
             pagemetadata();
@@ -903,15 +1230,31 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
     // @private Launch video streaming
     var _initVideoStream = function(node, $wrapper, destroy, options) {
+        var onOverQuotaCT;
+
         if (typeof destroy === 'object') {
             options = destroy;
             destroy = null;
         }
         options = Object.assign(Object.create(null), options);
 
-        if ($.playbackTimeOffset) {
-            options.startTime = $.playbackTimeOffset | 0;
-            $.playbackTimeOffset = null;
+        if ($.playbackOptions) {
+            String($.playbackOptions).replace(/(\d+)(\w)/g, function(m, v, k) {
+                if (k === 's') {
+                    options.startTime = v | 0;
+                }
+                else if (k === 'f') {
+                    v = String(v | 0);
+                    while (v.length < 6) {
+                        if (v.length & 1) {
+                            v = '1' + v;
+                        }
+                        v = '0' + v;
+                    }
+                    options.filter = v.slice(-6).split(/(.{2})/).filter(String);
+                }
+            });
+            $.playbackOptions = null;
         }
 
         if (!options.type) {
@@ -940,14 +1283,38 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $pinner.removeClass('hidden');
             $pinner.find('span').text(navigator.onLine === false ? 'No internet access.' : '');
 
-            if (this.file.overquota) {
-                var videoFile = this.file;
+            if (this.isOverQuota) {
+                var self = this;
+                var file = this.file;
+                var video = this.video;
 
                 $wrapper.trigger('is-over-quota');
                 dlmanager.showOverQuotaDialog(function() {
                     dlmanager.onNolongerOverquota();
-                    videoFile.flushRetryQueue();
+                    file.flushRetryQueue();
+
+                    if (video.paused) {
+                        $wrapper.removeClass('paused');
+                        $pinner.removeClass('hidden');
+                        onIdle(self.play.bind(self));
+                    }
                 });
+
+                onOverQuotaCT = (s.currentTime | 0) + 1;
+
+                eventlog(is_embed ? 99708 : folderlink ? 99709 : fminitialized ? 99710 : 99707);
+            }
+            else if (navigator.onLine && this.gotIntoBuffering) {
+                var data = [
+                    3,
+                    s.hasVideo, s.hasAudio, Math.round(s.getProperty('bitrate')), s.getProperty('server'),
+                    s.playbackTook, node.ph || node.h
+                ];
+
+                if (d) {
+                    console.log(ev.type, data, this);
+                }
+                eventlog(99694, JSON.stringify(data), true);
             }
 
             return true; // continue listening
@@ -965,6 +1332,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 $pinner.addClass('hidden');
             }
             $pinner.find('span').text('');
+
+            // if resumed from over bandwidth quota state.
+            if (onOverQuotaCT && s.currentTime > onOverQuotaCT) {
+                onOverQuotaCT = false;
+                eventlog(99705);
+            }
 
             return true; // continue listening
         });
@@ -984,8 +1357,18 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     hint = l[16151] + ' ' + l[242];
                 }
 
-                emsg = String(hint) === 'The provided type is not supported' ? l[17743]
-                     : String(hint) === 'Access denied' ? l[23] : hint;
+                switch (String(hint)) {
+                    case 'Blocked':
+                    case 'Not found':
+                    case 'Access denied':
+                        emsg = l[23];
+                        break;
+                    case 'The provided type is not supported':
+                        emsg = l[17743];
+                        break;
+                    default:
+                        emsg = hint;
+                }
 
                 if (s.options.autoplay) {
                     msgDialog('warninga', l[135], l[47], emsg);
@@ -1000,24 +1383,33 @@ FullScreenManager.prototype.enterFullscreen = function() {
             destroy();
             s.error = emsg;
 
-            if (!d && String(Object.entries).indexOf('native') > 0) {
+            if (!d && String(Object.entries).indexOf('native') > 0
+                && !window.buildOlderThan10Days && emsg && emsg !== l[23]) {
+
                 eventlog(99669, JSON.stringify(info));
             }
         });
 
         s.on('playing', function() {
-            var events = {'WebM': 99681, 'MPEG Audio': 99684, 'M4A ': 99687, 'Wave': 99688, 'Ogg': 99689};
+            var events = {
+                'WebM': 99681, 'MPEG Audio': 99684, 'M4A ': 99687, 'Wave': 99688, 'Ogg': 99689, 'FLAC': 99712
+            };
             var eid = events[s.options.type] || 99668;
 
             if (eid === 99684 && node.s > 41943040) {
                 eid = 99685;
+            }
+            else if (eid === 99712 && node.s > 134217728) {
+                eid = 99713;
             }
 
             console.assert(eid !== 99668 || is_video(node) !== 2, 'This is not a video...');
             eventlog(eid);
         });
 
-        _makethumb(node, s);
+        if (typeof dataURLToAB === 'function') {
+            _makethumb(node, s);
+        }
 
         $(window).rebind('video-destroy.main', function() {
             $('.mobile.filetype-img').removeClass('hidden');
@@ -1074,10 +1466,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
             MediaAttribute.canPlayMedia(node).then(function(yup) {
                 var c = MediaAttribute.getCodecStrings(node);
                 if (c) {
-                    $fn.attr('title', node.name + ' (' + c.join("/") + ')');
+                    $fn.attr('title', node.name + ' (' + c + ')');
                 }
 
                 if (!yup) {
+                    if (String(node.fa).indexOf(':8*') > 0 && isMediaSourceSupported()) {
+                        eventlog(99714, JSON.stringify([1, node.ph || node.h].concat(c)));
+                    }
                     return resolve(false);
                 }
                 var $video = $wrapper.find('video');
@@ -1098,6 +1493,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 $('.play-video-button', $wrapper).rebind('click', function() {
                     if (dlmanager.isOverQuota) {
+                        $wrapper.trigger('is-over-quota');
                         return dlmanager.showOverQuotaDialog();
                     }
 
@@ -1123,7 +1519,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         }
 
                         // _makethumb(node, stream);
-                        node.stream = stream;
+                        if (is_embed) {
+                            node.stream = stream;
+                        }
                         stream.play();
                     }).fail(console.warn.bind(console));
 
@@ -1245,6 +1643,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
         get: function() {
             var v = Object(this.Video && this.Video[0]);
             return v.Height | 0;
+        }
+    });
+    Object.defineProperty(MediaInfoReport.prototype, 'rotation', {
+        get: function() {
+            var v = Object(this.Video && this.Video[0]);
+            return v.Rotation | 0;
         }
     });
     Object.defineProperty(MediaInfoReport.prototype, 'shortformat', {
@@ -1981,7 +2385,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
     var miCollectedBytes = 0;
     var miCollectRunning = 0;
     var miCollectProcess = function() {
-        if (localStorage.noMediaCollect || miCollectedBytes > 0x1000000) {
+        if (localStorage.noMediaCollect || miCollectedBytes > 0x1000000 || M.chat) {
             return 0xDEAD;
         }
 
@@ -2224,6 +2628,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             case 'Wave':
                 mime = mime || 'audio/wav';
             /* fallthrough */
+            case 'FLAC':
+                mime = mime || 'audio/flac';
+            /* falls through */
             case 'MPEG Audio':
                 if (!videocodec) {
                     mime = mime || (audiocodec === container ? 'audio/mpeg' : 'doh');
@@ -2290,7 +2697,23 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 audiocodec = fmt[2];
             }
 
-            return [container, videocodec, audiocodec];
+            mc = Object.create(Array.prototype, {
+                toJSON: {
+                    value: function() {
+                        return this.slice();
+                    }
+                },
+                toString: {
+                    value: function() {
+                        return array.unique(this).map(function(k) {
+                            return String(k || '').trim();
+                        }).filter(String).join('/');
+                    }
+                }
+            });
+
+            mc.push(container, videocodec, audiocodec);
+            return mc;
         }
 
         delay('mc:missing', console.warn.bind(console, 'Media codecs list not loaded.'));
@@ -2364,6 +2787,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
             fps = MediaInfoLib.build;
             width = MediaInfoLib.version;
             playtime = this.avflv;
+        }
+        else {
+            var r = res.rotation;
+
+            if (r === 90 || r === 270) {
+                r = width;
+                width = height;
+                height = r;
+            }
         }
 
         width <<= 1;
@@ -2542,7 +2974,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         console.warn(ex);
                     }
                 }
-                else if (res.container === 'MPEG Audio') {
+                else if (res.container === 'MPEG Audio' || res.container === 'FLAC') {
                     getID3CoverArt(res.entry).then(setImage.bind(null, self)).catch(console.debug.bind(console));
                 }
             }
@@ -2627,13 +3059,16 @@ mBroadcaster.once('startMega', function isAudioContextSupported() {
             stream.connect(ctx.destination);
         }
         catch (ex) {
-            console.debug(ex);
+            console.debug('This browser does not support advanced audio streaming...', ex);
         }
         finally {
             if (ctx && typeof ctx.close === 'function') {
-                ctx.close().then(function() {
-                    mega.fullAudioContextSupport = stream && stream.numberOfOutputs > 0;
-                });
+                var p = ctx.close();
+                if (p instanceof Promise) {
+                    p.then(function() {
+                        mega.fullAudioContextSupport = stream && stream.numberOfOutputs > 0;
+                    });
+                }
             }
         }
     }

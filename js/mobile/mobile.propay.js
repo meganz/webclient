@@ -27,6 +27,8 @@ mobile.propay = {
             return false;
         });
 
+        M.accountData();
+
         // Show the page for mobile
         $stepTwo.removeClass('hidden');
     },
@@ -40,9 +42,9 @@ mobile.propay = {
 
         'use strict';
 
-        // Enabled payment providers for mobile so far are the credit card options and direct resellers
+        // Enabled payment providers for mobile so far are vouchers, the credit card options and direct resellers
         var mobileEnabledGateways = [
-            'astropayVI', 'astropayMC', 'ecpVI', 'ecpMC', 'sabadellVI', 'sabadellMC', 'directreseller'
+            'voucher', 'astropayVI', 'astropayMC', 'ecpVI', 'ecpMC', 'sabadellVI', 'sabadellMC', 'directreseller'
         ];
 
         // Filter out anything else

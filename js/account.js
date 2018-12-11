@@ -3,10 +3,11 @@
 var u_p; // prepared password
 var u_attr; // attributes
 
+/* jshint -W098 */  // It is used in another file
 // log in
 // returns user type if successful, false if not
 // valid user types are: 0 - anonymous, 1 - email set, 2 - confirmed, but no RSA, 3 - complete
-function u_login(ctx, email, password, uh, permanent) {
+function u_login(ctx, email, password, uh, pinCode, permanent) {
     var keypw;
 
     ctx.result = u_login2;
@@ -26,8 +27,9 @@ function u_login(ctx, email, password, uh, permanent) {
         keypw = prepare_key_pw(password);
     }
 
-    api_getsid(ctx, email, keypw, uh);
+    api_getsid(ctx, email, keypw, uh, pinCode);
 }
+/* jshint +W098 */
 
 function u_login2(ctx, ks) {
     if (ks !== false) {
@@ -36,7 +38,7 @@ function u_login2(ctx, ks) {
         u_storage = init_storage(ctx.permanent ? localStorage : sessionStorage);
         u_storage.k = JSON.stringify(ks[0]);
         u_storage.sid = ks[1];
-        watchdog.notify('login', ks[1]);
+        watchdog.notify('login', [!ctx.permanent && ks[0], ks[1]]);
         if (ks[2]) {
             u_storage.privk = base64urlencode(crypto_encodeprivkey(ks[2]));
         }
@@ -59,8 +61,8 @@ function u_login2(ctx, ks) {
     }
 }
 
-// if no valid session present, return false if force == false, otherwise create anonymous account and return 0 if successful or false if error;
-// if valid session present, return user type
+// if no valid session present, return ENOENT if force == false, otherwise create anonymous account and return 0 if
+// successful or ENOENT if error; if valid session present, return user type
 function u_checklogin(ctx, force, passwordkey, invitecode, invitename, uh) {
     if ((u_sid = u_storage.sid)) {
         api_setsid(u_sid);
@@ -93,6 +95,7 @@ function u_checklogin2(ctx, u) {
 }
 
 function u_checklogin2a(ctx, ks) {
+
     if (ks === false) {
         ctx.checkloginresult(ctx, false);
     }
@@ -121,12 +124,12 @@ function u_checklogin3a(res, ctx) {
     else {
         u_attr = res;
         var exclude = [
-            'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
-            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup', 'since', 'ut'
+            'aav', 'aas', 'c', 'currk', 'email', 'flags', 'k', 'lup', 'name',
+            'p', 'privk', 'pubk', 's', 'since', 'ts', 'u', 'ut', 'ipcc'
         ];
 
         for (var n in u_attr) {
-            if (exclude.indexOf(n) == -1) {
+            if (exclude.indexOf(n) === -1) {
                 try {
                     u_attr[n] = from8(base64urldecode(u_attr[n]));
                 } catch (e) {
@@ -169,17 +172,6 @@ function u_checklogin3a(res, ctx) {
         // Flags is a generic object for various things
         if (typeof u_attr.flags !== 'undefined') {
 
-            // If the 'psa' Public Service Announcement flag is set, this is the current announcement being sent out
-            if (typeof u_attr.flags.psa !== 'undefined') {
-
-                // Get the last seen announcement private attribute
-                var currentAnnounceNum = u_attr.flags.psa;
-                var lastSeenAttr = (typeof u_attr['*!lastPsaSeen'] !== 'undefined') ? u_attr['*!lastPsaSeen'] : null;
-
-                // Set the values we need to know if the PSA should be shown, then show the announcement
-                psa.setInitialValues(currentAnnounceNum, lastSeenAttr);
-            }
-
             // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
             if (typeof u_attr.flags.mcs !== 'undefined') {
                 localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
@@ -187,14 +179,18 @@ function u_checklogin3a(res, ctx) {
         }
         u_attr.flags = Object(u_attr.flags);
 
-        var name = u_attr.firstname || '';
-        if (u_attr.lastname) {
-            name += (name.length ? ' ' : '') + u_attr.lastname;
-        }
-        u_attr.fullname = String(name || u_attr.name || '').trim();
+        Object.defineProperty(u_attr, 'fullname', {
+            get: function() {
+                var name = this.firstname || '';
+                if (this.lastname) {
+                    name += (name.length ? ' ' : '') + this.lastname;
+                }
+                return String(name || this.name || '').trim();
+            }
+        });
 
         // If their PRO plan has expired and Last User Payment info is set, configure the dialog
-        if ((typeof u_attr.lup !== 'undefined') && !is_mobile) {
+        if (typeof alarm !== 'undefined' && u_attr.lup !== undefined && !is_mobile) {
             alarm.planExpired.lastPayment = u_attr.lup;
         }
 
@@ -209,6 +205,13 @@ function u_checklogin3a(res, ctx) {
         }
         else {
             r = 3;      // Fully registered
+        }
+
+        // If they have seen some Public Service Announcement before logging in and saved that in localStorage, now
+        // after logging in, send that to the API so that they don't see the same PSA again. The API will retain the
+        // highest PSA number if there is a difference.
+        if (typeof psa !== 'undefined') {
+            psa.updateApiWithLastPsaSeen(u_attr['^!lastPsa']);
         }
 
         if (r > 2 && !is_embed) {
@@ -291,6 +294,11 @@ function u_logout(logout) {
             waitxhr.abort();
             waitxhr = undefined;
         }
+        for (i in localStorage) {
+            if (i.indexOf('sort') > -1) {
+                delete localStorage[i];
+            }
+        }
     }
 }
 
@@ -310,6 +318,13 @@ function u_setrsa(rsakey) {
             }
 
             u_privk = rsakey;
+
+            // If coming from a #confirm link in the new registration process and logging in from a clean browser
+            // session the u_attr might not be set to an object yet, this will prevent an exception below
+            if (typeof u_attr === 'undefined') {
+                u_attr = {};
+            }
+
             u_attr.privk = u_storage.privk = base64urlencode(crypto_encodeprivkey(rsakey));
             u_attr.pubk = u_storage.pubk = base64urlencode(crypto_encodepubkey(rsakey));
 
@@ -333,8 +348,8 @@ function u_setrsa(rsakey) {
 
                         watchdog.notify('setrsa', [u_type, u_sid]);
 
-                        // Import welcome pdf at account creation
-                        M.importWelcomePDF();
+                        // Import welcome pdf at account creation -- Removed
+                        // NOT needed, since the file is create on account creation (initial ephemral accoount)
                     }
                     $promise.resolve(rsakey);
                     ui_keycomplete();
@@ -371,53 +386,29 @@ function createanonuser2(u, ctx) {
     ctx.createanonuserresult(ctx, u);
 }
 
-function setpwreq(newpw, ctx) {
-    var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newpw));
-
-    api_req({
-        a: 'upkm',
-        k: a32_to_base64(encrypt_key(pw_aes, u_k)),
-        uh: stringhash(u_attr['email'].toLowerCase(), pw_aes)
-    }, ctx);
-}
-
-function setpwset(confstring, ctx) {
-    api_req({
-        a: 'up',
-        uk: confstring
-    }, ctx);
-}
-
 /**
- *  checkMyPassword
+ * Check if the password is the user's password without doing any API call. It tries to decrypt the user's key.
  *
- *  Check if the password is the user's password without doing
- *  any API call, it tries to decrypt the user's private key.
- *
- *  @param string|AES   password
- *  @param array        encrypted private key (optional)
- *  @param array        private key (optional)
- *
- *
- *  @return bool
+ * @param {Array} derivedEncryptionKeyArray32 The derived encryption key from the Password Processing Function
+ * @returns {Boolean} Whether the password is correct or not
  */
-function checkMyPassword(password, k1, k2) {
-    if (typeof password === "string") {
-        password = new sjcl.cipher.aes(prepare_key_pw(password));
-    }
+function checkMyPassword(derivedEncryptionKeyArray32) {
 
-    return decrypt_key(password, base64_to_a32(k1 || u_attr.k)).join(",")  === (k2||u_k).join(",");
-}
+    'use strict';
 
-function changepw(currentpw, newpw, ctx) {
-    var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newpw));
+    // Create SJCL cipher object
+    var derivedEncryptionKeyCipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
 
-    api_req({
-        a: 'up',
-        // currk: a32_to_base64(encrypt_key(new sjcl.cipher.aes(prepare_key_pw(currentpw)), u_k)),
-        k: a32_to_base64(encrypt_key(pw_aes, u_k)),
-        uh: stringhash(u_attr['email'].toLowerCase(), pw_aes)
-    }, ctx);
+    // Decrypt the Master Key using the Derived Encryption Key
+    var encryptedMasterKeyArray32 = base64_to_a32(u_attr.k);
+    var decryptedMasterKeyArray32 = decrypt_key(derivedEncryptionKeyCipherObject, encryptedMasterKeyArray32);
+    var decryptedMasterKeyString = decryptedMasterKeyArray32.join(',');
+
+    // Convert the in memory copy of the unencrypted Master Key to string for comparison
+    var masterKeyStringToCompare = u_k.join(',');
+
+    // Compare the decrypted Master Key to the stored unencrypted Master Key
+    return decryptedMasterKeyString === masterKeyStringToCompare;
 }
 
 /**
@@ -638,8 +629,10 @@ function processEmailChangeActionPacket(ap) {
 }
 
 (function(exportScope) {
-    var _lastUserInteractionCache = window._lastUserInteractionCache = {};
-    var _lastUserInteractionPromiseCache = window._lastUserInteractionPromiseCache = {};
+    "use strict";
+    var _lastUserInteractionCache = {};
+    var _lastUserInteractionCacheInFlight = {};
+    var _lastUserInteractionPromiseCache = {};
 
     /**
      * Compare and return `true` if:
@@ -656,17 +649,183 @@ function processEmailChangeActionPacket(ap) {
         return timestampA > timestampB;
     };
 
+    var throttledSetLastInteractionOps = [];
+    var timerSetLastInteraction = null;
+    var SET_LAST_INTERACTION_TIMER = 1 * 60 * 1000;
 
     /**
-     * Set the last interaction for a contact
+     * Returns a promise which will be resolved with a string, formatted like this "$typeOfInteraction:$timestamp"
+     * Where $typeOfInteraction can be:
+     *  - 0 - cloud drive/sharing
+     *  - 1 - chat
+     *
+     * @param u_h {String}
+     * @param triggeredBySet {boolean}
+     * @returns {MegaPromise}
+     */
+    var getLastInteractionWith = function (u_h, triggeredBySet) {
+        console.assert(u_handle, "missing u_handle, can't proceed");
+        console.assert(u_h, "missing argument u_h, can't proceed");
+
+        if (!u_handle || !u_h) {
+            return MegaPromise.reject(EARGS);
+        }
+
+        var _renderLastInteractionDone = function (r) {
+            r = r.split(":");
+
+            var ts = parseInt(r[1], 10);
+
+            if (M.u[u_h]) {
+                M.u[u_h].ts = ts;
+            }
+
+            if (triggeredBySet) {
+                return;
+            }
+
+            var $elem = $('.li_' + u_h);
+
+            $elem
+                .removeClass('never')
+                .removeClass('cloud-drive')
+                .removeClass('conversations')
+                .removeClass('unread-conversations');
+
+
+            if (r[0] === "0") {
+                $elem.addClass('cloud-drive');
+            }
+            else if (r[0] === "1" && megaChatIsReady) {
+                var room = megaChat.getPrivateRoom(u_h);
+                if (room && megaChat.plugins && megaChat.plugins.chatNotifications) {
+                    if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomId) > 0) {
+                        $elem.addClass('unread-conversations');
+                    }
+                    else {
+                        $elem.addClass('conversations');
+                    }
+                }
+                else {
+                    $elem.addClass('conversations');
+                }
+            }
+            else {
+                $elem.addClass('never');
+            }
+            if (time2last(ts)) {
+                $elem.text(
+                    time2last(ts)
+                );
+            }
+            else {
+                $elem.text(l[1051]);
+            }
+
+            if ($.sortTreePanel && $.sortTreePanel.contacts.by === 'last-interaction') {
+                // we need to resort
+                M.contacts();
+            }
+        };
+
+        var _renderLastInteractionFail = function (r) {
+            var $elem = $('.li_' + u_h);
+
+            $elem
+                .removeClass('never')
+                .removeClass('cloud-drive')
+                .removeClass('conversations')
+                .removeClass('unread-conversations');
+
+
+            $elem.addClass('never');
+            $elem.text(l[1051]);
+        };
+
+        var $promise = new MegaPromise();
+
+        $promise
+            .done(_renderLastInteractionDone)
+            .fail(_renderLastInteractionFail);
+
+        if (_lastUserInteractionCacheInFlight[u_h] && _lastUserInteractionCacheInFlight[u_h] !== -1) {
+            $promise.resolve(_lastUserInteractionCacheInFlight[u_h]);
+        }
+        else if (
+            _lastUserInteractionPromiseCache[u_h] &&
+            _lastUserInteractionPromiseCache[u_h].state() === 'pending'
+        ) {
+            return _lastUserInteractionPromiseCache[u_h];
+        }
+        else if (_lastUserInteractionCache[u_h] && _lastUserInteractionCacheInFlight[u_h] !== -1) {
+            $promise.resolve(_lastUserInteractionCache[u_h]);
+        }
+        else if (
+            (!_lastUserInteractionCache[u_h] || _lastUserInteractionCacheInFlight[u_h] === -1) &&
+            (
+                !_lastUserInteractionPromiseCache[u_h] ||
+                _lastUserInteractionPromiseCache[u_h].state() !== 'pending'
+            )
+        ) {
+            if (_lastUserInteractionCacheInFlight[u_h] === -1) {
+                delete _lastUserInteractionCacheInFlight[u_h];
+            }
+            _lastUserInteractionPromiseCache[u_h] = mega.attr.getArrayAttribute(
+                u_handle,
+                'lstint',
+                u_h,
+                false,
+                true
+                )
+                .always(function() {
+                    _lastUserInteractionPromiseCache[u_h] = false;
+                })
+                .done(function (res) {
+                    if (typeof res !== 'number') {
+                        if (typeof res === 'undefined') {
+                            // detected legacy value which was not unserialised properly....should re-initialise as
+                            // empty value, e.g. no last interaction with that user (would be rebuilt by chat messages
+                            // and stuff)
+                            $promise.reject(false);
+                        }
+                        else {
+                            if (!triggeredBySet) {
+                                _lastUserInteractionCache[u_h] = res;
+                            }
+                            $promise.resolve(res);
+                        }
+                    }
+                    else {
+                        $promise.reject(false);
+                        console.error("Failed to retrieve last interaction cache from attrib, response: ", res);
+                    }
+                })
+                .fail(function(res) {
+                    $promise.reject(res);
+                });
+        }
+        else {
+            throw new Error("This should not happen.");
+        }
+
+        return $promise;
+    };
+
+    /**
+     * Set the last interaction for a contact (throttled internally)
      *
      * @param u_h {String} user handle
      * @param v {String} "$typeOfInteraction:$unixTimestamp" (see getLastInteractionWith for the types of int...)
      * @returns {Deferred}
      */
-    var setLastInteractionWith = function (u_h, v) {
-        assert(u_handle, "missing u_handle, can't proceed");
-        assert(u_h, "missing argument u_h, can't proceed");
+    var _realSetLastInteractionWith = function (u_h, v) {
+
+        console.assert(u_handle, "missing u_handle, can't proceed");
+        console.assert(u_h, "missing argument u_h, can't proceed");
+
+        if (!u_handle || !u_h) {
+            return MegaPromise.reject(EARGS);
+        }
 
         var isDone = false;
         var $promise = createTimeoutPromise(
@@ -682,7 +841,7 @@ function processEmailChangeActionPacket(ap) {
         });
 
 
-        getLastInteractionWith(u_h)
+        getLastInteractionWith(u_h, true)
             .done(function (timestamp) {
                 if (_compareLastInteractionStamp(v, timestamp) === false) {
                     // older timestamp found in `v`, resolve the promise with the latest timestamp
@@ -740,143 +899,67 @@ function processEmailChangeActionPacket(ap) {
     };
 
     /**
-     * Returns a promise which will be resolved with a string, formatted like this "$typeOfInteraction:$timestamp"
-     * Where $typeOfInteraction can be:
-     *  - 0 - cloud drive/sharing
-     *  - 1 - chat
+     * Internal method that flushes all queued setLastInteraction operations in one go.
+     * Usually triggered by `setLastInteractionWith`
      *
-     * @param u_h
-     * @returns {MegaPromise}
+     * @private
      */
-    var getLastInteractionWith = function (u_h) {
-        assert(u_handle, "missing u_handle, can't proceed");
-        assert(u_h, "missing argument u_h, can't proceed");
+    var _flushSetLastInteractionWith = function() {
+        timerSetLastInteraction = null;
+
+        for (var i = throttledSetLastInteractionOps.length - 1; i >= 0; i--) {
+            var op = throttledSetLastInteractionOps[i];
+            throttledSetLastInteractionOps.splice(i, 1);
+            _lastUserInteractionCacheInFlight[op[0]] = -1;
+            op[2].linkDoneAndFailTo(_realSetLastInteractionWith(op[0], op[1]));
+        }
+    };
 
 
-        var _renderLastInteractionDone = function (r) {
+    /**
+     * Set the last interaction for a contact (throttled internally)
+     *
+     * @param u_h {String} user handle
+     * @param v {String} "$typeOfInteraction:$unixTimestamp" (see getLastInteractionWith for the types of int...)
+     * @returns {Deferred|MegaPromise}
+     */
+    var setLastInteractionWith = function(u_h, v) {
+        var promise = new MegaPromise();
 
-            r = r.split(":");
+        // set on client side, to simulate a real commit
+        var ts = Object(M.u[u_h]).ts;
+        var newTs = parseInt(v.split(":")[1], 10);
+        if (ts < newTs) {
+            Object(M.u[u_h]).ts = newTs;
+            _lastUserInteractionCacheInFlight[u_h] = v;
+        }
 
-            var $elem = $('.li_' + u_h);
+        if (timerSetLastInteraction) {
+            clearTimeout(timerSetLastInteraction);
+        }
+        timerSetLastInteraction = setTimeout(_flushSetLastInteractionWith, SET_LAST_INTERACTION_TIMER);
 
-            $elem
-                .removeClass('never')
-                .removeClass('cloud-drive')
-                .removeClass('conversations')
-                .removeClass('unread-conversations');
+        for (var i = 0; i < throttledSetLastInteractionOps.length; i++) {
+            var entry = throttledSetLastInteractionOps[i];
+            var u_h2 = entry[0];
+            var ts2 = parseInt(entry[1].split(":")[1], 10);
 
-            var ts = parseInt(r[1], 10);
-
-            if (M.u[u_h]) {
-                M.u[u_h].ts = ts;
-            }
-
-            if (r[0] === "0") {
-                $elem.addClass('cloud-drive');
-            }
-            else if (r[0] === "1" && megaChatIsReady) {
-                var room = megaChat.getPrivateRoom(u_h);
-                if (room && megaChat.plugins && megaChat.plugins.chatNotifications) {
-                    if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomId) > 0) {
-                        $elem.addClass('unread-conversations');
-                    }
-                    else {
-                        $elem.addClass('conversations');
-                    }
+            if (u_h2 === u_h) {
+                if (newTs < ts2) {
+                    return MegaPromise.resolve(entry[1]);
                 }
                 else {
-                    $elem.addClass('conversations');
+                    entry[1] = v;
+                    return entry[2];
                 }
+
             }
-            else {
-                $elem.addClass('never');
-            }
-            if (time2last(ts)) {
-                $elem.text(
-                    time2last(ts)
-                );
-            }
-            else {
-                $elem.text(l[1051]);
-            }
-
-            if ($.sortTreePanel && $.sortTreePanel.contacts.by === 'last-interaction') {
-                // we need to resort
-                M.contacts();
-            }
-        };
-
-        var _renderLastInteractionFail = function (r) {
-            var $elem = $('.li_' + u_h);
-
-            $elem
-                .removeClass('never')
-                .removeClass('cloud-drive')
-                .removeClass('conversations')
-                .removeClass('unread-conversations');
-
-
-            $elem.addClass('never');
-            $elem.text(l[1051]);
-        };
-
-        var $promise = new MegaPromise();
-
-        $promise
-            .done(_renderLastInteractionDone)
-            .fail(_renderLastInteractionFail);
-
-        if (_lastUserInteractionPromiseCache[u_h] && _lastUserInteractionPromiseCache[u_h].state() === 'pending') {
-            return _lastUserInteractionPromiseCache[u_h];
         }
-        else if (_lastUserInteractionCache[u_h]) {
-            $promise.resolve(_lastUserInteractionCache[u_h]);
-        }
-        else if (
-                !_lastUserInteractionCache[u_h] &&
-                (
-                    !_lastUserInteractionPromiseCache[u_h] ||
-                    _lastUserInteractionPromiseCache[u_h].state() !== 'pending'
-                )
-            ) {
-            _lastUserInteractionPromiseCache[u_h] = mega.attr.getArrayAttribute(
-                u_handle,
-                'lstint',
-                u_h,
-                false,
-                true
-            )
-                .always(function() {
-                    _lastUserInteractionPromiseCache[u_h] = false;
-                })
-                .done(function (res) {
-                    if (typeof res !== 'number') {
-                        if (typeof res === 'undefined') {
-                            // detected legacy value which was not unserialised properly....should re-initialise as
-                            // empty value, e.g. no last interaction with that user (would be rebuilt by chat messages
-                            // and stuff)
-                            $promise.reject(false);
-                        }
-                        else {
-                            _lastUserInteractionCache[u_h] = res;
-                            $promise.resolve(res);
-                        }
-                    }
-                    else {
-                        $promise.reject(false);
-                        console.error("Failed to retrieve last interaction cache from attrib, response: ", res);
-                    }
-                })
-                .fail(function(res) {
-                    $promise.reject(res);
-                });
-        }
-        else {
-            throw new Error("This should not happen.");
-        }
+        throttledSetLastInteractionOps.push([u_h, v, promise]);
 
-        return $promise;
+        return promise;
     };
+
     exportScope.setLastInteractionWith = setLastInteractionWith;
     exportScope.getLastInteractionWith = getLastInteractionWith;
 })(window);
@@ -1040,7 +1123,7 @@ function processEmailChangeActionPacket(ap) {
         mega.attr.get(u_handle, 'fmconfig', false, true)
             .always(moveLegacySettings)
             .done(function(result) {
-                result = Object(result);
+                result = Object.assign({}, fmconfig, Object(result));
                 for (var key in result) {
                     if (result.hasOwnProperty(key)) {
                         try {
@@ -1048,6 +1131,15 @@ function processEmailChangeActionPacket(ap) {
                         }
                         catch (ex) {}
                     }
+                }
+
+                if (localStorage.testServerSideRubbishScheduler) {
+                    u_attr.flags.ssrs = 1;
+                }
+
+                // disable client-side rubbish scheduler
+                if (u_attr.flags.ssrs > 0) {
+                    mega.config.set('rubsched', undefined);
                 }
 
                 if (fminitialized) {
@@ -1104,6 +1196,9 @@ function processEmailChangeActionPacket(ap) {
                 // Initialize account notifications.
                 if (!is_mobile) {
                     mega.notif.setup(fmconfig.anf);
+                    if (fminitialized && page.indexOf('fm/account') > -1 && M.account) {
+                        accountUI.renderAccountPage(M.account);
+                    }
                 }
             });
 
@@ -1192,7 +1287,16 @@ function processEmailChangeActionPacket(ap) {
         delay('fmconfig:setn.' + key, function() {
             var toast = false;
 
-            if (mega.config.get(key) !== value) {
+            if (key === 'rubsched' && u_attr.flags.ssrs > 0) {
+                value = String(value).split(':').pop() | 0;
+
+                if (M.account.ssrs !== value) {
+                    M.account.ssrs = value;
+                    mega.attr.set('rubbishtime', String(value), -2, 1);
+                    toast = true;
+                }
+            }
+            else if (mega.config.get(key) !== value) {
                 mega.config.set(key, value);
                 toast = true;
             }

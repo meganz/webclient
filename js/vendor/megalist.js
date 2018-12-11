@@ -43,8 +43,14 @@
         // target is what you want it to go after. Look for this elements parent.
         var parent = targetElement.parentNode;
 
+        if (!parent) {
+            // TODO: fix me properly...
+            console.warn('The target element got detached from the DOM...', [targetElement]);
+            return false;
+        }
+
         // if the parents lastchild is the targetElement...
-        if (parent.lastElementChild == targetElement) {
+        if (parent.lastElementChild === targetElement) {
             // add the newElement after the target element.
             parent.appendChild(newElement);
         } else {
@@ -292,11 +298,13 @@
      */
     MegaList.prototype._bindEvents = function () {
         var self = this;
-        $(window).bind("resize." + this._generateEventNamespace(), function() {
+        var ns = self._generateEventNamespace();
+
+        $(window).rebind("resize." + ns, function() {
             self.resized();
         });
 
-        $(document).bind('ps-scroll-y.ps' + this._generateEventNamespace(), self.throttledOnScroll.bind(self));
+        $(document).rebind('ps-scroll-y.ps' + ns, self.throttledOnScroll.bind(self));
     };
 
     /**
@@ -305,8 +313,10 @@
      * @private
      */
     MegaList.prototype._unbindEvents = function () {
-        $(window).unbind("resize." + this._generateEventNamespace());
-        $(document).unbind('ps-scroll-y.ps' + this._generateEventNamespace());
+        var ns = this._generateEventNamespace();
+
+        $(window).off("resize." + ns);
+        $(document).off('ps-scroll-y.ps' + ns);
     };
 
     /**
@@ -442,7 +452,7 @@
      * @param cb {Function}
      */
     MegaList.prototype.bind = function (eventName, cb) {
-        $(this).bind(eventName, cb);
+        $(this).on(eventName, cb);
     };
 
     /**
@@ -459,8 +469,7 @@
             }
             return;
         }
-        $(this).unbind(eventName);
-        $(this).bind(eventName, cb);
+        $(this).rebind(eventName, cb);
     };
 
     /**

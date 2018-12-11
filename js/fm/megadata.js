@@ -40,6 +40,9 @@
  * @property {Number} ts
  *     UNIX epoch time stamp as an integer in seconds to record last change of
  *     parameters values.
+  * @property {Number} rTimeStamp
+ *     UNIX epoch time stamp as an integer in seconds to record last change of
+ *     time stamp.
  * @property {Number} lastChatActivity
  *     UNIX epoch time stamp as an integer in seconds for the last chat
  *     activity.
@@ -62,6 +65,7 @@ Object.defineProperty(this, 'MEGA_USER_STRUCT', {
         "firstName": "",
         "lastName": "",
         "ts": undefined,
+        "rTimeStamp": undefined,
         "avatar": undefined
     })
 });
@@ -105,6 +109,7 @@ function MegaData() {
         'type': this.sortByType.bind(this),
         'date': this.sortByDateTime.bind(this),
         'ts': this.sortByDateTime.bind(this),
+        'rTimeStamp': this.sortByRts.bind(this),
         'owner': this.sortByOwner.bind(this),
         'modified': this.sortByModTime.bind(this),
         'mtime': this.sortByModTime.bind(this),
@@ -123,7 +128,7 @@ function MegaData() {
         }
 
         var ttl;
-        if (ev.type === 'ps-y-reach-end') {
+        if (ev.type === 'ps-y-reach-end' && !$.isTfsPsUpdate) {
             ttl = M.getTransferTableLengths();
             if (ttl.left > -100) {
                 this.doFlushTransfersDynList(ttl.size);
@@ -141,7 +146,7 @@ function MegaData() {
         var dummy = function() {
             return MegaPromise.resolve();
         };
-        this['check' + 'StorageQuota'] = dummy;
+        // this['check' + 'StorageQuota'] = dummy;
         this['show' + 'OverStorageQuota'] = dummy;
         this['init' + 'UIKeyEvents'] = dummy;
         this['abort' + 'Transfers'] = dummy;
@@ -162,13 +167,30 @@ function MegaData() {
         };
 
         var tf = [
-            "renderTree", "buildtree", "initTreePanelSorting", "treeSearchUI", "treePanelType", "addTreeUI",
-            "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen"
+            "renderTree", "buildtree", "initTreePanelSorting", "treeSearchUI",
+            "treePanelType", "addTreeUI", "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen",
+            "treeSortUI", "treeFilterUI"
         ];
 
         for (var i = tf.length; i--;) {
             this[tf[i]] = dummy;
         }
+    }
+    else if (page.substr(0, 8) === 'megadrop') {
+        this['ul' + 'progress'] = function(ul, perc, bl, bt, bps) {
+            if (!bl || !ul.starttime || uldl_hold) {
+                return false;
+            }
+            if (d) {
+                console.assert(mega.megadrop.isInit(), 'Check this...');
+            }
+            var id = ul.id;
+            var retime = bps > 1000 ? (bt - bl) / bps : -1;
+
+            $.transferprogress['ul_' + id] = [bl, bt, bps];
+            delay('percent_megatitle', percent_megatitle, 50);
+            mega.megadrop.uiUpdateItem(id, bps, retime, perc, bl);
+        };
     }
 
     /** @name M.IS_TREE */

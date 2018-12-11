@@ -1,5 +1,16 @@
 var date_months = [];
 
+var locale = "en";
+
+var remappedLangLocales = {
+    "cn": "zh-Hans",
+    "ct": "zh-Hant",
+    "kr": "ko",
+    "jp": "ja",
+    "tl": "fil",
+    "br": "pt"
+};
+
 if (typeof l === 'undefined') {
     l = [];
 }
@@ -47,65 +58,115 @@ function translate(html) {
 
 /**
  * Converts a timestamp to a readable time format - e.g. 2016-04-17 14:37
+ * If user selected use ISO date formate, short date format will using ISO date format.
+ * If user selected country on the setting using it to find locale.
+ * If user did not selected country, assume country with ip address and apply date format.
+ * e.g. US: mm/dd/yyyy, NZ: dd/mm/yyyy, CN: yyyy/mm/dd
  *
  * @param {Number} unixTime  The UNIX timestamp in seconds e.g. 1464829467
  * @param {Number} [format]  The readable time format to return
  * @returns {String}
  *
- * Formats:
- *       0: yyyy-mm-dd hh:mm
- *       1: yyyy-mm-dd
- *       2: dd fmn yyyy (fmn: Full month name, based on the locale)
+ * Formats (examples are ISO date format):
+ *       0: yyyy-mm-dd hh:mm (Short date format with time)
+ *       1: yyyy-mm-dd (Short date format without time)
+ *       2: yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format)
+ *       3: yyyy fmn (fmn: Full month name, based on the locale) (Long Date format without day)
  */
 function time2date(unixTime, format) {
 
-    var result;
     var date = new Date(unixTime * 1000 || 0);
+    var country = 'ISO';
+    var options = {year: 'numeric', month: 'numeric', day: 'numeric'};
+    var result;
 
-    if (format === 2) {
-        result = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+    if (u_attr) {
+        country = u_attr.country ? u_attr.country : u_attr.ipcc || 'ISO';
+    }
+
+    format = format || 0;
+    options.month = format >= 2 ? 'long' : 'numeric';
+
+    if (format === 3) {
+        delete options.day;
+    }
+
+    var printISO = function _printISO() {
+        // print time as ISO date format
+        var timeOffset = date.getTimezoneOffset() * 60;
+        var isodate = new Date((unixTime - timeOffset) * 1000);
+        return isodate.toISOString().split('T')[0];
+    };
+
+    // if it is short date format and user selected to use ISO format
+    if ((fmconfig.uidateformat || country === 'ISO') && format < 2) {
+        result = printISO();
     }
     else {
-        result = date.getFullYear() + '-'
-            + ('0' + (date.getMonth() + 1)).slice(-2)
-            + '-' + ('0' + date.getDate()).slice(-2);
-
-        if (!format) {
-            result += ' ' + date.toTimeString().substr(0, 5);
+        var locales = locale + '-' + country;
+        try {
+            result = date.toLocaleDateString(locales, options);
         }
+        catch (e) {
+            result = printISO();
+        }
+    }
+
+    // using toLocaleTimeString to support old browser.
+    if (!format) {
+        result += " " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
     }
 
     return result;
 }
 
 function acc_time2date(unixtime, yearIsOptional) {
-    var MyDate = new Date(unixtime * 1000);
-    var th = 'th';
-    if ((parseInt(MyDate.getDate()) === 11) || (parseInt(MyDate.getDate()) === 12)) {
-    }
-    else if (('' + MyDate.getDate()).slice(-1) === '1') {
-        th = 'st';
-    }
-    else if (('' + MyDate.getDate()).slice(-1) === '2') {
-        th = 'nd';
-    }
-    else if (('' + MyDate.getDate()).slice(-1) === '3') {
-        th = 'rd';
-    }
-    if (lang !== 'en') {
-        th = ',';
-    }
-    var result = date_months[MyDate.getMonth()] + ' ' + MyDate.getDate();
 
-    if (yearIsOptional === true) {
-        var currYear = (new Date()).getFullYear();
-        if (currYear !== MyDate.getFullYear()) {
-            result += th + ' ' + MyDate.getFullYear();
+    var MyDate = new Date(unixtime * 1000);
+    var country;
+    if (u_attr) {
+        country = u_attr.country ? u_attr.country : u_attr.ipcc;
+    }
+
+    var locales = country ? locale + '-' + country : locale;
+
+    var options = {month: 'long', day: 'numeric'};
+    var currYear = (new Date()).getFullYear();
+    var result;
+
+    if (!yearIsOptional || (yearIsOptional && currYear !== MyDate.getFullYear())) {
+        options.year = 'numeric';
+    }
+
+    if (locale === 'en') {
+        var date = MyDate.getDate();
+        var th = 'th';
+        if ((date.toString()).slice(-1) === '1' && date !== 11) {
+            th = 'st';
+        }
+        else if ((date.toString()).slice(-1) === '2' && date !== 12) {
+            th = 'nd';
+        }
+        else if ((date.toString()).slice(-1) === '3' && date !== 13) {
+            th = 'rd';
+        }
+
+        try {
+            result = MyDate.toLocaleDateString(locales, options).replace(date, date + th);
+        }
+        catch (e) {
+            result = MyDate.toLocaleDateString(locale, options).replace(date, date + th);
         }
     }
     else {
-        result += th + ' ' + MyDate.getFullYear();
+        try {
+            result = MyDate.toLocaleDateString(locales, options);
+        }
+        catch (e) {
+            result = MyDate.toLocaleDateString(locale, options);
+        }
     }
+
     return result;
 }
 
@@ -372,9 +433,11 @@ mBroadcaster.once('startMega', function populate_l() {
     l['472a'] = l[472].replace('[X]', 10);
     l['472b'] = l[472].replace('[X]', 100);
     l['472c'] = l[472].replace('[X]', 250);
-    l['208a'] = l[208].replace('[A]', '<a href="/terms" class="red clickurl">');
+    l['208a'] = l[208].replace('[A]', '<a href="/terms" class="red clickurl" tabindex="-1">');
     l['208a'] = l['208a'].replace('[/A]', '</a>');
-    l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl">');
+    l['208s'] = l[208].replace('[A]', '<span class="red">');
+    l['208s'] = l['208s'].replace('[/A]', '</span>');
+    l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl" tabindex="-1">');
     l[208] = l[208].replace('[/A]', '</a>');
     l[517] = l[517].replace('[A]', '<a href="/help" class="help-center-link clickurl">').replace('[/A]', '</a>');
     l[521] = l[521].replace('[A]', '<a href="/copyright" class="clickurl">').replace('[/A]', '</a>');
@@ -422,11 +485,10 @@ mBroadcaster.once('startMega', function populate_l() {
     l[1948] = l[1948].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[1957] = l[1957].replace('[A]', '<a href="/recovery" class="clickurl">').replace('[/A]', '</a>');
     l[1965] = l[1965].replace('[A]', '<a href="/recovery" class="clickurl">').replace('[/A]', '</a>');
-    l[1982] = l[1982].replace('[A]', '<font style="color:#D21F00;">').replace('[/A]', '</font>');
-    l[1993] = l[1993].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[1982] = l[1982].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[1993] = l[1993].replace('[A]', '<a href="/register" class="clickurl">').replace('[/A]', '</a>');
 
     l[5931] = l[5931].replace('[A]', '<a class="red" href="/fm/account" class="clickurl">').replace('[/A]', '</a>');
-    l[6962] = l[6962].replace('%1', '<span class="plan-name"></span>');
     l[6976] = l[6976].replace('%1', '<span class="plan-name"></span>');
     l[7156] = l[7156].replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>');
     l[7002] = l[7002].replace('[A]', '<a href="/contact" class="clickurl">').replace('[/A]', '</a>');
@@ -443,6 +505,8 @@ mBroadcaster.once('startMega', function populate_l() {
     l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
     l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/blog_8">').replace('[/A2]', '</a>');
+    l[19310] = l[19310].replace('[A]', '<a href="https://mega.nz/blog_6" target="_blank">').replace('[/A]', '</a>');
+
 
     l[8644] = l[8644].replace('[S]', '<span class="green">').replace('[/S]', '</span>');
     l[8651] = l[8651].replace('%1', '<span class="header-pro-plan"></span>');
@@ -479,7 +543,6 @@ mBroadcaster.once('startMega', function populate_l() {
                        .replace('[/A]', '</a>');
 
     l[10635] = l[10635].replace('[B]', '"<b>').replace('[/B]', '</b>"');
-    l[10636] = l[10636].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>').replace('%1', 2);
     l[10644] = l[10644].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[10646] = l[10646].replace('[A]', '<a href="/account" class="clickurl">').replace('[/A]', '</a>');
     l[10650] = l[10650].replace('[A]', '<a href="/account" class="clickurl">').replace('[/A]', '</a>');
@@ -487,8 +550,6 @@ mBroadcaster.once('startMega', function populate_l() {
     l[10658] = l[10658].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
 
     l[12482] = l[12482].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[12439] = l[12439].replace('[A1]', '<b>').replace('[/A1]', '</b>')
-                       .replace('[A2]', '<b>').replace('[/A2]', '</b>');
     l[12483] = l[12483].replace('[BR]', '<br>');
     l[12485] = l[12485].replace('[A1]', '<a href="" class="red mac">').replace('[/A1]', '</a>');
     l[12485] = l[12485].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
@@ -536,12 +597,13 @@ mBroadcaster.once('startMega', function populate_l() {
     l[16596] = escapeHTML(l[16596])
         .replace('[A]', '<a class="red" href="mailto:uwp.alpha@mega.nz">').replace('[/A]', '</a>').replace('uwp@', 'uwp.alpha@');
 	l[16598] = escapeHTML(l[16598])
-        .replace('[A]', '<a href="https://github.com/meganz/sdk/tree/master/examples/megacmd" target="_blank" class="red">')
+        .replace('[A]', '<a href="https://github.com/meganz/megacmd" target="_blank" class="red">')
         .replace('[/A]', '</a>')
-        .replace('[B]', '<a href="https://github.com/meganz/sdk/blob/master/examples/megacmd/README.md" target="_blank" class="red">')
+        .replace('[B]', '<a href="https://github.com/meganz/MEGAcmd/blob/master/README.md" target="_blank" class="red">')
         .replace('[/B]', '</a>');
-	l[16614] = escapeHTML(l[16614])
-        .replace('[A]', '<a href="https://www.mozilla.org/thunderbird" target="_blank">')
+    l[16609] = escapeHTML(l[16609]).replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[16614] = escapeHTML(l[16614])
+        .replace('[A]', '<a href="https://thunderbird.net/" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');
 
     l[12439] = l[12439].replace('[A1]', '').replace('[/A1]', '').replace('[A2]', '').replace('[/A2]', '');
@@ -555,19 +617,6 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[A2]', '<a href="/extensions" class="clickurl">').replace('[/A2]', '</a>')
         .replace('[A3]', '<a class="freeupdiskspace">').replace('[/A3]', '</a>');
 
-    // l[] = escapeHTML(l[]).replace('', '');
-
-    // carefully replace various strings to adhere to the new pro quotas:
-    // note: in the future we should make such strings used variables.
-	l[16393] = l[16393].replace('4','8');
-	l[16385] = l[16385].replace('4','8');
-	l[16359] = l[16359].replace('4096','8192').replace('4','8');
-	l[16358] = l[16358].replace('4096','8192').replace('4','8');
-	l[16316] = l[16316].replace('4096','8192').replace('4','8');
-	l[16315] = l[16315].replace('4096','8192').replace('4','8');
-	l[16304] = l[16304].replace('8','16').replace('4096','8192').replace('4','8');
-	l[1367] = l[1367].replace('4','8');
-
     l[17083] = l[17083]
         .replace('[A]', '<a href="https://www.microsoft.com/store/apps/9nbs1gzzk3zg" target="_blank">')
         .replace('[/A]', '</a>');
@@ -578,11 +627,18 @@ mBroadcaster.once('startMega', function populate_l() {
                 .replace('[/A]', '</a>');
     l[17690] = l[17690].replace('[A]', '<a href="https://mega.nz/recovery" target="_blank" class="red">')
                        .replace('[/A]', '</a>');
+    l[17701] = l[17701].replace('[B]', '<b>').replace('[/B]', '</b>');
     if (l[17742]) {
         l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     }
-    l[17805] = l[17805].replace('[A]', '<a class="mobile red-email" href="mailto:support@mega.nz">')
+    l[17805] = l[17805].replace('[A]', '<a class="mobile red-email red" href="mailto:support@mega.nz">')
                        .replace('[/A]', '</a>');
+    l[18301] = l[18301].replace(/\[B\]/g, '<b class="megasync-logo">')
+        .replace(/\[\/B\]/g, '</b>').replace(/\(M\)/g, '').replace(/\[LOGO\]/g, '');
+    l[18311] = l[18311].replace(/\[B1\]/g, '<strong class="warning-text">')
+        .replace(/\[\/B1\]/g, '</strong>');
+    l[18312] = l[18312].replace(/\[B\]/g, '<strong class="warning-text">')
+        .replace(/\[\/B\]/g, '</strong>');
 
     l[18446] = l[18446].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     l[18447] = l[18447].replace(/\[A\]/g, '<a href="/terms" class="clickurl">').replace(/\[\/A\]/g, '</a>');
@@ -591,10 +647,51 @@ mBroadcaster.once('startMega', function populate_l() {
     l[18465] = l[18465].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
     l[18490] = l[18490].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
     l[18491] = l[18491].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
+    l[18638] = l[18638].replace(/\[+[B1-9]+\]/g, '<b>').replace(/\[\/+[B1-9]+\]/g, '</b>');
+    l[18787] = l[18787]
+        .replace('[A]', '<a href="https://github.com/meganz/MEGAcmd" rel="noreferrer" target="_blank">')
+        .replace('[/A]', '</a>');
+    l[19111] = l[19111].replace('[A]', '<a class="public-contact-link">').replace('[/A]', '</a>');
+    l[19328] = l[19328].replace('[B]', '<b>').replace('[/B]', '</b>');
+
+    l[19512] = l[19512].replace('%1', '<span class="plan-name"></span>')
+        .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[19513] = l[19513].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>').replace('%1', 2)
+        .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[19514] = l[19514].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>').replace('%1', 2)
+        .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[19628] = l[19628].replace('[A]', '<a href="mailto:copyright@mega.nz">').replace('[/A]', '</a>');
+    l[19661] = l[19661].replace('[A]', '<a href="/help/client/megasync/" rel="noreferrer">')
+        .replace('[/A]', '</a>');
+    l[19685] = l[19685].replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
+    l[19691] = l[19691].replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
+    l[19834] = l[19834].replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[19835] = l[19835].replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[19840] = l[19840].replace('[A]', '<a class="red toResetLink">').replace('[/A]', '</a>');
+    l[19843] = l[19843].replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[19849] = l[19849].replace('[A]', '<a class="red" href="/recovery">').replace('[/A]', '</a>');
+    l[19851] = l[19851].replace('[B]', '<strong class="warning-text">').replace('[/B]', '</strong>');
+    l[19857] = l[19857] ? l[19857].replace('[BR]', '<br>') : l[19857];
+    l[20011] = l[20011]
+        .replace('[A]', '<a class="red" target="_blank" rel="noopener noreferrer"  href="https://www.lastpass.com/'
+            + 'password-generator">')
+        .replace('[/A]', '</a>');
+    l[20013] = l[20013].replace('[Br]', '<br><br>');
+    l[20015] = l[20015].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
+        + '/backup">')
+        .replace('[/A]', '</a>');
+    l[20016] = l[20016].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
+        + '/blog_48" >')
+        .replace('[/A]', '</a>')
+        .replace('[Br]', '<br><br>');
+    l[20022] = l[20022].replace('[Br]', '<br><br>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
-        16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444
+        16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444,
+        18268, 18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296,
+        18297, 18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812,
+        19813, 19814, 19854, 19821, 19930
     ];
     for (i = common.length; i--;) {
         var num = common[i];
@@ -613,4 +710,11 @@ mBroadcaster.once('startMega', function populate_l() {
         l[408], l[409], l[410], l[411], l[412], l[413],
         l[414], l[415], l[416], l[417], l[418], l[419]
     ].map(escapeHTML);
+
+    // Set the Locale based the language that is selected. (Required for accurate string comparisons).
+    // If the locale has been remapped, apply the remap.
+    locale = lang;
+    if (remappedLangLocales.hasOwnProperty(locale)) {
+        locale = remappedLangLocales[locale];
+    }
 });

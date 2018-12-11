@@ -1,5 +1,5 @@
 /**
- * Simple class which will show +/- type of rating after a call had finished and will integrate that with the 
+ * Simple class which will show +/- type of rating after a call had finished and will integrate that with the
  * "Feedback" dialog
  *
  * @param megaChat
@@ -14,8 +14,7 @@ var CallFeedback = function(megaChat, options) {
 
     options.parentLogger = megaChat.logger;
 
-    megaChat.unbind("onInit.CallFeedback");
-    megaChat.bind("onInit.CallFeedback", function(e) {
+    megaChat.rebind("onInit.CallFeedback", function() {
         self.attachToChat(megaChat)
     });
 
@@ -31,52 +30,53 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
     var self = this;
 
     megaChat
-        .unbind('onRoomCreated.CallFeedback')
-        .bind('onRoomCreated.CallFeedback', function(e, megaRoom) {
+        .rebind('onRoomInitialized.CallFeedback', function(e, megaRoom) {
             megaRoom
-                .unbind('call-ended.CallFeedback')
-                .bind('call-ended.CallFeedback', function(e, eventData) {
-                    var msgId = 'call-feedback' + unixtime();
-                    megaRoom.appendMessage(
-                        new ChatDialogMessage({
-                            messageId: msgId,
-                            type: 'call-feedback',
-                            authorContact: megaChat.getContactFromJid(eventData.peer),
-                            delay: unixtime(),
-                            buttons: {
-                                'sendFeedback': {
-                                    'type': 'primary',
-                                    'classes': 'default-white-button small-text left',
-                                    'icon': 'refresh-circle',
-                                    'text': __(l[1403]),
-                                    'callback': function() {
-                                        var feedbackDialog = mega.ui.FeedbackDialog.singleton(
-                                            $(this),
-                                            undefined,
-                                            "call-ended"
-                                        );
-                                        feedbackDialog._type = "call-ended";
-                                        feedbackDialog.bind('onHide.callEnded', function() {
+                .rebind('call-ended.CallFeedback', function(e, eventData) {
+                    // do append this after a while, so that the remote call ended would be shown first.
+                    setTimeout(function () {
+                        var msgId = 'call-feedback' + unixtime();
+                        megaRoom.appendMessage(
+                            new ChatDialogMessage({
+                                messageId: msgId,
+                                type: 'call-feedback',
+                                authorContact: eventData.getPeer(),
+                                delay: unixtime(),
+                                buttons: {
+                                    'sendFeedback': {
+                                        'type': 'primary',
+                                        'classes': 'default-white-button small-text left',
+                                        'icon': 'refresh-circle',
+                                        'text': __(l[1403]),
+                                        'callback': function () {
+                                            var feedbackDialog = mega.ui.FeedbackDialog.singleton(
+                                                $(this),
+                                                undefined,
+                                                "call-ended"
+                                            );
+                                            feedbackDialog._type = "call-ended";
+                                            feedbackDialog.on('onHide.callEnded', function () {
 
+                                                megaRoom.messagesBuff.removeMessageById(msgId);
+                                                megaRoom.trigger('resize');
+
+                                                feedbackDialog.off('onHide.callEnded');
+                                            });
+                                        }
+                                    },
+                                    'noThanks': {
+                                        'type': 'secondary',
+                                        'classes': 'default-white-button small-text left red',
+                                        'text': __(l[8898]),
+                                        'callback': function () {
                                             megaRoom.messagesBuff.removeMessageById(msgId);
                                             megaRoom.trigger('resize');
-
-                                            feedbackDialog.unbind('onHide.callEnded');
-                                        });
-                                    }
-                                },
-                                'noThanks': {
-                                    'type': 'secondary',
-                                    'classes': 'default-white-button small-text left red',
-                                    'text': __(l[8898]),
-                                    'callback': function() {
-                                        megaRoom.messagesBuff.removeMessageById(msgId);
-                                        megaRoom.trigger('resize');
+                                        }
                                     }
                                 }
-                            }
-                        })
-                    );
-                });
+                            })
+                        );
+                    });
+                }, 1000);
         });
 };

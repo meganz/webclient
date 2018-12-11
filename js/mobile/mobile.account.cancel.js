@@ -14,32 +14,17 @@ mobile.account.cancel = {
         var $page = $('.mobile.cancel-account');
 
         // Initialise functionality
-        this.initBackButton($page);
         this.initFeedbackRadioButtons($page);
         this.initCancelAccountButton($page);
+
+        // Initialise back button to go back to the My Account page
+        mobile.initBackButton($page, 'fm/account/');
 
         // Initialise the top menu
         topmenuUI();
 
         // Show the account page content
         $page.removeClass('hidden');
-    },
-
-    /**
-     * Initialise the back arrow icon in the header to go back to the main My Account page
-     * @param {String} $page The jQuery selector for the current page
-     */
-    initBackButton: function($page) {
-
-        'use strict';
-
-        // On Back button click/tap
-        $page.find('.fm-icon.back').off('tap').on('tap', function() {
-
-            // Render the Invites page again
-            loadSubPage('fm/account/');
-            return false;
-        });
     },
 
     /**
@@ -120,7 +105,7 @@ mobile.account.cancel = {
         loadingDialog.show();
 
         // Park the current account, then create a new account with a random password
-        api_resetuser({ callback: function(code) {
+        security.resetUser(emailCode, u_attr.email, password, function(code) {
 
             loadingDialog.hide();
 
@@ -141,6 +126,6 @@ mobile.account.cancel = {
                     loadSubPage('fm/account');
                 });
             }
-        }}, emailCode, u_attr.email, password);
+        });
     }
 };

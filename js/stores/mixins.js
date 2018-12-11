@@ -134,7 +134,7 @@ var MegaRenderMixin = {
     },
     componentWillUnmount: function() {
         if (this.props.requiresUpdateOnResize) {
-            $(window).unbind('resize.megaRenderMixing' + this.getUniqueId());
+            $(window).off('resize.megaRenderMixing' + this.getUniqueId());
         }
 
         // window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
@@ -170,6 +170,9 @@ var MegaRenderMixin = {
         // ._isMounted is faster then .isMounted() or any other operation
         if (!this._isMounted) {
             return false;
+        }
+        if (this.props.isVisible) {
+            return true;
         }
         // offsetParent should NOT trigger a reflow/repaint
         if (!this.props.hideable && (!domNode || domNode.offsetParent === null)) {
@@ -334,8 +337,8 @@ var MegaRenderMixin = {
         ) {
             // found a list of children nodes
             if (map.map && referenceMap.map) {
-                var oldKeys = map.map(function(child) { return child.key; });
-                var newKeys = referenceMap.map(function(child) { return child.key; });
+                var oldKeys = map.map(function(child) { return child ? child.key : child; });
+                var newKeys = referenceMap.map(function(child) { return child ? child.key : child; });
                 if (!shallowEqual(oldKeys, newKeys)) {
                     return true;
                 }

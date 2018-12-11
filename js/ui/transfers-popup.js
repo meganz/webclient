@@ -139,8 +139,10 @@ mega.ui.tpp = function () {
     var show = function show() {
         var visible = isVisible();
         var enabled = isEnabled();
+        var overquota = dlmanager.isOverQuota || ulmanager.ulOverStorageQuota;
+        var hasTransfers = M.currentdirid !== 'transfers' && M.hasPendingTransfers();
 
-        if (isCached() && enabled && !visible && M.currentdirid !== 'transfers' && M.hasPendingTransfers()) {
+        if (isCached() && enabled && !visible && hasTransfers && !overquota) {
             if (getTotal('ul') > 0 || getTotal('dl') > 0) {
                 opts.dlg.$.show(opts.duration);
                 setStatus(true);
@@ -503,6 +505,7 @@ mega.ui.tpp = function () {
      * @param {String} bl Download or upload block i.e. ['dl', 'ul']
      */
     var started = function started(bl) {
+
         if (!getIndex(bl) && isEnabled()) {
             resetBlock(bl);
             showBlock(bl);
@@ -612,6 +615,10 @@ mega.ui.tpp = function () {
     });
 
     return {
+        shouldProcessData: function() {
+            // TODO: This damn thing needs an huge rewrite!
+            return this.isVisible() && this.isCached() && this.isEnabled();
+        },
         isCached: isCached,
         isEnabled: isEnabled,
         show: show,

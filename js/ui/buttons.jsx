@@ -70,7 +70,7 @@ var Button = React.createClass({
                 onActiveChange: function(newVal) {
                     var $element = $(self.findDOMNode());
                     var $scrollables = $element.parents('.jScrollPaneContainer, .perfectScrollbarContainer');
-                    if ($scrollables.size() > 0) {
+                    if ($scrollables.length > 0) {
                         if (newVal === true) {
                             // disable scrolling
                             $scrollables.attr('data-scroll-disabled', true);
@@ -103,8 +103,8 @@ var Button = React.createClass({
             (!e || !$(e.target).closest(".button").is($element))
         ) {
             this.setState({focused: false});
-            $(document).unbind('keyup.button' + this.getUniqueId());
-            $(document).unbind('closeDropdowns.' + this.getUniqueId());
+            $(document).off('keyup.button' + this.getUniqueId());
+            $(document).off('closeDropdowns.' + this.getUniqueId());
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
 
             if (this._pageChangeListener) {

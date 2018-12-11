@@ -22,6 +22,21 @@
     transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
     overflow: hidden;
 }
+.download .pages-nav.content-block {
+    padding-top: 0px; 
+    width: 100%;
+    position: absolute;
+    bottom: -10px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px -1px 0px 0px;
+    background-color: rgb(255, 255, 255);
+}
+.download .bottom-page.vertical-centered-bl.top-bl {
+    height: 100%;
+    height: -webkit-calc(100%);
+    height: -moz-calc(100%);
+    height: calc(100%);
+    max-height: 800px;
+}
 .download.top-bar.floating {
     position: fixed;
     background: rgba(255, 255, 255,1);
@@ -295,16 +310,6 @@
 .progress-cell .download.progress-block {
     margin: 16px 0 0 30px;
 }
-.download.file-icon-wrap {
-    width: 68px;
-    height: 82px;
-    float: left;
-    position: relative;
-    margin: 1px 0 0 7px;
-    background-image: url(../images/mega/download-sprite-v8.png);
-    background-repeat: no-repeat;
-    background-position: 0 0;
-}
 .download.file-map {
     width: 62px;
     height: 57px;
@@ -528,8 +533,10 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     text-align: left;
 }
 .download .block-view-file-type {
-    position: absolute;
-    margin: -50px 0 0 -41px;
+    position: static;
+    float: left;
+    top: auto;
+    margin: -2px 0 -2px -1px;
 }
 .download.file-info {
     margin-left: 104px;
@@ -717,7 +724,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 .not-available-user .main-pad, .temporary-na .main-pad, .na-some-reason .main-pad {
     padding-bottom: 78px;
 }
-.megasync-close, .megasync-close-txt, .megasync-overlay .megasync-dropdown, .thumb .download.file-icon-wrap {
+.megasync-close, .megasync-close-txt, .megasync-overlay .megasync-dropdown, .download.info-block.thumb .block-view-file-type {
     display: none;
 }
 .downloading .megasync-close, .downloading .megasync-close-txt, .megasync-overlay.linux .megasync-dropdown, .thumb .download.thumb-block {
@@ -789,14 +796,11 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 .video .download.checkbox-bl {
     padding: 8px 15px 0 15px;
 }
-.video .download.file-icon-wrap {
+.video .download.info-block .block-view-file-type {
     height: 43px;
     width: 32px;
-    background-position: 0 -2299px;
+    background-position: -219px -356px;
     margin: 15px 0 0 15px;
-}
-.video .download.file-icon-wrap div {
-    display: none;
 }
 .video .download.file-info {
     margin-left: 66px;
@@ -872,6 +876,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 .video .bottom-page.top-bl {
     min-height: 704px;
 }
+
 .video .download.transfer-buttons {
     display: none;
 }
@@ -1056,7 +1061,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 .video-theatre-mode .download .pause-transfer.square {
     width: 48px;
 }
-.download.in-progress.over-quota, .video-theatre-mode .video-mode-wrapper.over-quota {
+.download.video .download.in-progress.over-quota, .video-theatre-mode .video-mode-wrapper.over-quota {
     display: none;
 }
 .download.over-transfer-quota {
@@ -1124,7 +1129,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     height: 34px;
     margin-left: 12px;
 }
-.video-mode-wrapper .share.big-button::after, .share.big-button::after {  
+.video-mode-wrapper .share.big-button::after, .share.big-button::after {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);

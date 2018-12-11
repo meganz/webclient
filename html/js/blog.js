@@ -39,17 +39,19 @@ var blogmonth = false;
 var blogsearch = false;
 
 function blog_bind_search() {
-    $('#blog_searchinput').bind('focus', function(e) {
+    'use strict';
+
+    $('#blog_searchinput').rebind('focus.blog', function(e) {
         if (e.target.value === l[102]) {
             e.target.value = '';
         }
-    });
-    $('#blog_searchinput').bind('blur', function(e) {
+    })
+    .rebind('blur.blog', function(e) {
         if (e.target.value === '') {
             e.target.value = l[102];
         }
-    });
-    $('#blog_searchinput').bind('keydown', function(e) {
+    })
+    .rebind('keydown.blog', function(e) {
         if (e.keyCode === 13) {
             blog_search();
         }
@@ -254,14 +256,22 @@ function blog_archive() {
             }
         }
     }
+    
     var blogarchive = '';
     for (mm in blogmonths) {
         if (blogmonths.hasOwnProperty(mm)) {
             mm = escapeHTML(mm);
-            var y = ' ' + mm.split('_')[0] + ' ';
+            var y = mm.split('_')[0];
+
+            var date = new Date();
+            date.setMonth(mm.split('_')[1]);
+            date.setYear(y);
+            date.setDate(1);
+            date = date.getTime() / 1000;
+
             blogarchive += '<a href="/blog_' + mm + '" class="blog-new-archive-lnk clickurl">'
-                + date_months[parseInt(mm.split('_')[1]) - 1]
-                + y + ' <span class="blog-archive-number">' + escapeHTML(blogmonths[mm]) + '</span></a>';
+                + time2date(date, 3) + '<span class="blog-archive-number">' 
+                + escapeHTML(blogmonths[mm]) + '</span></a>';
         }
     }
     $('#blog_archive').safeHTML(blogarchive);

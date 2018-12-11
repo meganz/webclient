@@ -96,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm19_';
+    var dbpfx = 'fm23_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -118,9 +118,6 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                         fmdb.db = false;
                     });
                 }
-
-                // force no-treecache gettree
-                localStorage.force = 1;
             }
 
             result(sn);
@@ -184,7 +181,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     }
                     resolve(r[0]);
                 }
-                else if (slave) {
+                else if (slave || fmdb.crashed) {
                     fmdb.crashed = 2;
                     resolve(false);
                 }
@@ -325,6 +322,7 @@ FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
         db.delete().then(function() {
             // Remove the DB name from localStorage so that our getDatabaseNames polyfill doesn't keep returning them
             delete localStorage['_$mdb$' + db.name];
+            delete localStorage[db.name];
 
             fmdb.logger.log("Deleted IndexedDB " + db.name);
         }).catch(function(err){
@@ -356,6 +354,10 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
         // even indexes hold additions, odd indexes hold deletions
         c[table] = { t : -1, h : type };
         c = c[table];
+
+        if (table === 'f') {
+            c.r = Object.create(null);
+        }
     }
     else {
         // (we continue to use the highest index if it is of the requested type
@@ -366,7 +368,18 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
     }
 
     if (!c[c.h]) c[c.h] = [row];
-    else c[c.h].push(row);    // add row to the highest index (we want big IndexedDB bulkPut()s)
+    else {
+        // add row to the highest index (we want big IndexedDB bulkPut()s)
+        if (type || table !== 'f' || !window.safari) {
+            c[c.h].push(row);
+        }
+        else if (c.r[row.h]) {
+            c[c.h][c.r[row.h]] = row;
+        }
+        else {
+            c.r[row.h] = c[c.h].push(row) - 1;
+        }
+    }
 
     // force a flush when a lot of data is pending or the _sn was updated
     // also, force a flush for non-transactional channels (> 0)
@@ -654,6 +667,9 @@ FMDB.prototype.stripnode = Object.freeze({
         delete f.t;
         delete f.s;
 
+        t.ts = f.ts;
+        delete f.ts;
+
         if (f.hash) {
             t.hash = f.hash;
             delete f.hash;
@@ -708,6 +724,7 @@ FMDB.prototype.restorenode = Object.freeze({
     f : function(f, index) {
         f.h = index.h;
         f.p = index.p;
+        f.ts = index.t < 0 ? 1262304e3 - index.t : index.t;
         if (index.c) {
             f.hash = index.c;
         }
@@ -771,7 +788,7 @@ FMDB.prototype.add = function fmdb_add(table, row) {
         if (i == 'd') {
             row.d = this.strcrypt(row.d);
         }
-        else {
+        else if (table !== 'f' || i !== 't') {
             row[i] = ab_to_base64(this.strcrypt(row[i]));
         }
     }
@@ -834,7 +851,7 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
             if (this.restorenode[table]) {
                 // restore attributes based on the table's indexes
                 for (var p in r[i]) {
-                    if (p != 'd') {
+                    if (p !== 'd' && (table !== 'f' || p !== 't')) {
                         r[i][p] = this.strdecrypt(base64_to_ab(r[i][p]));
                     }
                 }
@@ -875,6 +892,14 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, lim
 // @private
 FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, limit) {
     "use strict";
+    var options = false;
+    if (typeof index !== 'string') {
+        options = index;
+        index = options.index;
+        anyof = anyof || options.anyof;
+        where = where || options.where;
+        limit = limit || options.limit;
+    }
 
     if (this.crashed > 1 || anyof && !anyof[1].length) {
         return MegaPromise.reject([]);
@@ -890,6 +915,11 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
 
     var t = fmdb.db[table];
     var i = 0;
+
+    if (!index) {
+        // No index provided, fallback to primary key
+        index = t.schema.primKey.keyPath;
+    }
 
     if (anyof) {
         // encrypt all values in the list
@@ -907,6 +937,10 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
         else {
             t = t.where(anyof[0]).equals(anyof[1][0]);
         }
+    }
+    else if (options.query) {
+        // Perform custom user-provided query
+        t = options.query(t);
     }
     else {
         for (var k = where.length; k--; ) {
@@ -986,6 +1020,15 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
                                             continue;
                                         }
                                     }
+                                    else if (options.query) {
+                                        // If a custom query was made, notify there was a
+                                        // pending update and whether if should be included.
+                                        if (!(options.include && options.include(update, index))) {
+                                            // nope - record it as a deletion
+                                            matches[update[index]] = false;
+                                            continue;
+                                        }
+                                    }
                                     else {
                                         // does this update modify a record matched by the
                                         // anyof inclusion list?
@@ -1041,6 +1084,11 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
                     }
                 }
             }
+        }
+
+        // Apply user-provided filtering, if any
+        if (options.filter) {
+            r = options.filter(r);
         }
 
         // limit matches records
@@ -1586,6 +1634,13 @@ Object.defineProperty(self, 'dbfetch', (function() {
             // setup promise
             promise = promise || MegaPromise.busy();
 
+            if (!fmdb) {
+                if (d) {
+                    console.debug('No fmdb available...', folderlink, pfid);
+                }
+                return promise.reject(EFAILED);
+            }
+
             // first round: replace undefined handles with the parents
             if (!handles) {
                 handles = parents;
@@ -1774,7 +1829,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     var folders = [];
                     for (var i = handles.length; i--;) {
                         var h = handles[i];
-                        if (M.d[h] && (M.d[h].t || M.d[h].tf)) {
+                        if (M.d[h] && (M.d[h].t || M.d[h].tvf)) {
                             folders.push(h);
                         }
                     }

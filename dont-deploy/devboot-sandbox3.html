@@ -9,29 +9,29 @@
          * "dont-deploy" folder, it contains stuff which are used for
          * development/debugging/internal demo purposes and it should
          * not be deployed to production.
-         * 
+         *
          * The devboot.html also setups the localStorage so that:
-         * 
+         *
          * 0) Clear the localStorage
-         * 
+         *
          * 1) Debug mode is enabled - e.g. a lot of stuff will be
          *    printed in the dev console, via console.* and the
          *    MegaLogger.
-         * 
+         *
          * 2) Static path is dynamically set to ../../ (relative to
          *    dont-deploy/devboot.html). This means that the staticPath
          *    should be correctly set even if you have your project
          *    running in localhost/meganz-webclient/ or customVhost/ +
          *    it will work with http OR https.
-         * 
+         *
          * 3) Will enable the megaChat (<-- major thing, may change a
          *    lot of stuff)
-         * 
+         *
          * 4) Will force the secureboot to load the actual .js files
          *    instead of just pushing ALL javascript files into a single
          *    blog: (this was really helpful for debugging the JS code
          *    using the Chrome debugger).
-         * 
+         *
          * 5) Will enable stopOnAssertFail, which in case of assertion
          *    fail (mainly in the chat.js code) will run a debugger;
          *    (something pretty handy during development)
@@ -62,7 +62,7 @@
 
         localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
 
-        window.location = '../index.html';
+        window.location = '../';
     </script>
 </head>
 <body>

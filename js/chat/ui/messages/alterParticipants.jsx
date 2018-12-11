@@ -63,7 +63,8 @@ var AlterParticipantsConversationMessage = React.createClass({
                 'c': 0,
             };
 
-            var avatar = <ContactsUI.Avatar contact={otherContact} className="message small-rounded-avatar"/>;
+            var avatar = <ContactsUI.Avatar contact={otherContact}
+                                            className="message avatar-wrapper small-rounded-avatar"/>;
             var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
             var text = __(l[8907]).replace(
@@ -73,11 +74,11 @@ var AlterParticipantsConversationMessage = React.createClass({
 
             self._ensureNameIsLoaded(otherContact.u);
             messages.push(
-                <div className="message body" data-id={"id" + message.messageId} key={h}>
+                <div className="message body" data-id={"id" + message.messageId} key={message.messageId + "_" + h}>
                     {avatar}
 
                     <div className="message content-area small-info-txt">
-                        <div className="message user-card-name">{otherDisplayName}</div>
+                        <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName} />
                         {datetime}
 
                         <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>
@@ -93,7 +94,8 @@ var AlterParticipantsConversationMessage = React.createClass({
                 'c': 0,
             };
 
-            var avatar = <ContactsUI.Avatar contact={otherContact} className="message small-rounded-avatar"/>;
+            var avatar = <ContactsUI.Avatar contact={otherContact}
+                                            className="message avatar-wrapper small-rounded-avatar"/>;
             var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
             self._ensureNameIsLoaded(otherContact.u);
@@ -110,11 +112,11 @@ var AlterParticipantsConversationMessage = React.createClass({
             }
 
             messages.push(
-                <div className="message body" data-id={"id" + message.messageId} key={h}>
+                <div className="message body" data-id={"id" + message.messageId} key={message.messageId + "_" + h}>
                     {avatar}
 
                     <div className="message content-area small-info-txt">
-                        <div className="message user-card-name">{otherDisplayName}</div>
+                        <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName} />
                         {datetime}
 
                         <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>

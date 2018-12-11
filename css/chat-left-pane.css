@@ -1,3 +1,9 @@
+.conversations .nw-fm-tree-header span {
+    color: #333333;
+}
+.fm-left-menu.conversations {
+    background-color: #FAFAFA;
+}
 .conversations-pane {
     margin: 0;
     padding: 0;
@@ -9,28 +15,45 @@
     height: calc(100% + 36px);
     margin: -36px 0 0 0;
 }
-.content-panel.conversations {
-    background-image: url(../images/mega/nw-chat-bg_v1.svg);
-    background-repeat: repeat;
+.content-panel.conversations, .archived-chats .archive-chat-list {
     min-height: 100%;
+    background-color: #FAFAFA;
     display: block;
 }
+.archived-chats .archive-chat-list {
+    min-height: initial;
+}
+.conversation-reduce-height {
+    position: relative;
+    height: -webkit-calc(100% - 37px) !important;
+    height:    -moz-calc(100% - 37px) !important;
+    height:         calc(100% - 37px) !important;
+}
 .conversations-pane li {
-    padding: 8px 12px;
+    padding: 6px 12px;
     display: block;
+    position: relative;
     height: 72px;
+    margin: 0 0 1px 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     cursor: pointer;
 }
-.conversations-pane li:nth-child(even) {
-    background-color: #FFFFFF;
+.conversations-pane li::before {
+    content: '';
+    display: block;
+    height: 1px;
+    width: 110%;
+    margin: -7px 0 6px 0;
+    background-color: rgba(0,0,0,0.1);
 }
-.conversations-pane li:nth-child(odd) {
-    background-color: #FAFAFA;
+.conversations-pane li.active::before {
+    background-color: transparent;
 }
 .user-card-name.conversation-name {
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
+    color: #333333;
     padding: 0 26px 0 0;
     float: left;
     line-height: 21px;
@@ -46,14 +69,18 @@
     right: 8px;
 }
 .conversation-message {
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
     font-size: 13px;
     line-height: 18px;
-    color: #555555;
+    color: #666666;
     margin: 0 40px 0 0;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
     clear: both;
+}
+.conversations-pane li .date-time {
+     font-family: 'LatoWeb', 'source_sans_proregular';
 }
 .conversation-message.unread {
     color: #2BA6DE;
@@ -65,11 +92,10 @@
     color: white;
 }
 .conversations-pane li.active .conversation-message {
-    color: rgba(255,255,255,0.8);
+    color: white;
 }
 .conversations-pane li.active .date-time {
-    color: rgba(255,255,255,0.6);
-    line-height: 18px;
+    color: white;
 }
 
 .conversations-pane li.active .user-card-name.conversation-name {
@@ -121,6 +147,13 @@
     background-color: white;
     color: #2BA6DE;
 }
+.conversations-pane li .items-2 .tiny-icon.white-handset,
+.conversations-pane li .items-2 .tiny-icon.blue-handset {
+    margin-right: 4px;
+}
+.conversations-pane li .unread-messages {
+    min-width: 6px;
+}
 .call-duration {
     position: absolute;
     right: 12px;
@@ -155,4 +188,119 @@
 }
 .unread-messages + .call-duration + .conversation-message {
     margin-right: 150px;
+}
+
+.arc-conversation-btn-block {
+    position: absolute;
+    bottom: 0;
+    height: 36px;
+    background-color: white;
+    width: 100%;
+    box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
+    cursor: pointer;
+    -webkit-transition: all 300ms ease;
+    -moz-transition: all 300ms ease;
+    -ms-transition: all 300ms ease;
+    -o-transition: all 300ms ease;
+    transition: all 300ms ease;
+}
+.arc-conversation-btn-block:hover {
+    background-color: rgb(248, 233, 177, 0.05);
+    -webkit-transition: all 300ms ease;
+    -moz-transition: all 300ms ease;
+    -ms-transition: all 300ms ease;
+    -o-transition: all 300ms ease;
+    transition: all 300ms ease;
+}
+.arc-conversation-btn-block.active {
+    background-color: #66BCE3;
+}
+.arc-conversation-icon {
+    display: inline-block;
+    margin: 8px 12px;
+    float:left;
+}
+.arc-conversation-heading {
+    display: inline-block;
+    float:left;
+    font-size: 13px;
+    line-height: 36px;
+    color: #333333;
+    font-family: 'LatoWeb', 'source_sans_proregular';
+}
+.arc-conversation-btn-block.active .arc-conversation-heading {
+    color: #fff;
+}
+.arc-conversation-number {
+    float: right;
+    font-size: 11px;
+    line-height: 16px;
+    height: 16px;
+    color: #333333;
+    padding: 0 6px;
+    background-color: #F8E9B1;
+    border-radius: 4px;
+    margin: 10px 12px;
+}
+.arc-conversation-btn-block.active .arc-conversation-number {
+    color: #66BCE3;
+    background-color: #fff;
+}
+
+
+
+@keyframes fadein-slow-loop {
+    from { opacity: 0.6; }
+    to   { opacity: 1; }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadeinout-looped {
+    from { opacity: 0.6; }
+    to   { opacity: 1; }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadeinout-looped {
+    from { opacity: 0.6; }
+    to   { opacity: 1; }
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadeinout-looped {
+    from { opacity: 0.6; }
+    to   { opacity: 1; }
+}
+
+/* Opera < 12.1 */
+@-o-keyframes fadeinout-looped {
+    from { opacity: 0.6; }
+    to   { opacity: 1; }
+}
+
+
+@keyframes ring {
+    10%, 90% {
+        transform: translate3d(0, -1px, 0);
+    }
+
+    20%, 80% {
+        transform: translate3d(0, 2px, 0);
+    }
+
+    30%, 50%, 70% {
+        transform: translate3d(0, -2px, 0);
+    }
+
+    40%, 60% {
+        transform: translate3d(0, 2px, 0);
+    }
+}
+.have-incoming-ringing-call .unread-messages .tiny-icon,
+.new-messages-indicator .tiny-icon {
+    -webkit-animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite; /* Safari, Chrome and Opera > 12.1 */
+    -moz-animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite; /* Firefox < 16 */
+    -ms-animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite; /* Internet Explorer */
+    -o-animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite; /* Opera < 12.1 */
+    animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite;
 }

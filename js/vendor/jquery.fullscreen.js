@@ -1,12 +1,12 @@
 /**
- * @preserve jquery.fullscreen 1.1.5
+ * @preserve jquery.fullscreen 1.1.6
  * https://github.com/kayahr/jquery-fullscreen-plugin
  * Copyright (C) 2012-2013 Klaus Reimer <k@ailis.de>
  * Licensed under the MIT license
  * (See http://www.opensource.org/licenses/mit-license)
  */
  
-(function() {
+(function(jQuery) {
 
 /**
  * Sets or gets the fullscreen state.
@@ -61,10 +61,7 @@ function fullScreen(state)
         }
         
         // Check fullscreen state
-        state = !!doc["fullscreenElement"]
-            || !!doc["msFullscreenElement"]
-            || !!doc["webkitIsFullScreen"]
-            || !!doc["mozFullScreen"];
+        state = fullScreenState(doc);
         if (!state) return state;
         
         // Return current fullscreen element or "true" if browser doesn't
@@ -100,9 +97,19 @@ function fullScreen(state)
             || (/** @type {?Function} */ doc["webkitCancelFullScreen"])
             || (/** @type {?Function} */ doc["msExitFullscreen"])
             || (/** @type {?Function} */ doc["mozCancelFullScreen"]);
-        if (func) func.call(doc);
+        if (func && fullScreenState(doc)) func.call(doc);
         return this;
     }
+}
+
+/**
+ * Check fullscreen state
+ *
+ * @param {Document} doc The content document
+ * @return {Boolean}
+ */
+function fullScreenState(doc) {
+    return !!(doc["fullscreenElement"] || doc["msFullscreenElement"] || doc["webkitIsFullScreen"] || doc["mozFullScreen"]);
 }
 
 /**
@@ -181,4 +188,4 @@ jQuery.fn["fullScreen"] = fullScreen;
 jQuery.fn["toggleFullScreen"] = toggleFullScreen;
 installFullScreenHandlers();
 
-})();
+})(jQuery);

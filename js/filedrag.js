@@ -1,9 +1,23 @@
 (function(scope) {
+    'use strict';
 
     var dir_inflight = 0;
     var filedrag_u = [];
     var filedrag_paths = Object.create(null);
     var touchedElement = 0;
+
+    function addUpload(files, emptyFolders) {
+        var straight = $.doStraightUpload || Object(window.fmconfig).ulddd === 0 || M.currentrootid === M.RubbishID;
+
+        console.assert(page === 'start' || window.fminitialized, 'check this...');
+
+        if (page === 'start' || straight) {
+            M.addUpload(files, false, emptyFolders);
+        }
+        else {
+            openCopyUploadDialog(files, emptyFolders);
+        }
+    }
 
     function pushUpload() {
         if (!--dir_inflight && $.dostart) {
@@ -12,7 +26,7 @@
                     return filedrag_paths[p] < 1;
                 });
 
-            M.addUpload(filedrag_u, false, emptyFolders);
+            addUpload(filedrag_u, emptyFolders);
             filedrag_u = [];
             filedrag_paths = Object.create(null);
 
@@ -23,8 +37,6 @@
     }
 
     function pushFile(file, path) {
-        'use strict';
-
         if (d > 1) {
             console.warn('Adding file %s', file.name, file);
         }
@@ -42,8 +54,6 @@
     }
 
     function traverseFileTree(item, path, symlink) {
-        'use strict';
-
         path = path || "";
 
         if (item.isFile) {
@@ -100,7 +110,8 @@
                     start_anoupload();
                 }
                 else {
-                    loginDialog();
+                    tooltiplogin.init();
+                    $.awaitingLoginToUpload = true;
 
                     mBroadcaster.once('fm:initialized', function() {
                         ulQueue.resume();
@@ -132,11 +143,17 @@
     }
 
     function FileDragEnter(e) {
+        if (d) {
+            console.log('DragEnter');
+        }
+        e.preventDefault();
         if ($.dialog === 'avatar') {
             return;
         }
         e.stopPropagation();
-        e.preventDefault();
+        if (!isFileDragAllowed()) {
+            return;
+        }
         if (localStorage.d > 1) {
             console.info('----- ENTER event :' + e.target.className);
         }
@@ -149,8 +166,14 @@
     }
 
     function FileDragHover(e) {
-        e.stopPropagation();
+        if (d) {
+            console.log('DragOver');
+        }
         e.preventDefault();
+        if (!isFileDragAllowed()) {
+            return;
+        }
+        e.stopPropagation();
     }
     var useMegaSync = -1;
     var usageMegaSync = 0;
@@ -194,9 +217,6 @@
                 target = M.lastSeenCloudFolder || M.RootID;
             }
             else {
-                target = M.currentdirid;
-            }
-            if ((onChat = (String(M.currentdirid).substr(0, 4) === 'chat'))) {
                 target = M.currentdirid;
             }
 
@@ -254,11 +274,17 @@
         }
     }
     function FileDragLeave(e) {
+        if (d) {
+            console.log('DragLeave');
+        }
+        e.preventDefault();
         if ($.dialog === 'avatar') {
             return;
         }
         e.stopPropagation();
-        e.preventDefault();
+        if (!isFileDragAllowed()) {
+            return;
+        }
         if (localStorage.d > 1) {
             console.warn('----- LEAVE event :' + e.target.className + '   ' + e.type);
         }
@@ -273,16 +299,20 @@
 
     // on Drop event
     function FileSelectHandler(e) {
-        if ($.dialog === 'avatar') {
-            return;
-        }
-        useMegaSync = -1;
-        if (e.stopPropagation) {
-            e.stopPropagation();
-        }
         if (e.preventDefault) {
             e.preventDefault();
         }
+        if ($.dialog === 'avatar') {
+            return;
+        }
+        if (e.stopPropagation) {
+            e.stopPropagation();
+        }
+        if (!isFileDragAllowed()) {
+            return;
+        }
+        
+        useMegaSync = -1;
 
         var currentDir = M.currentdirid;
 
@@ -291,6 +321,10 @@
 
         $('.drag-n-drop.overlay').addClass('hidden');
         $('body').removeClass('overlayed');
+
+        if ($.awaitingLoginToUpload) {
+            return tooltiplogin.init();
+        }
 
         if (
             (
@@ -408,9 +442,11 @@
                 start_upload();
             }
             $('.fm-file-upload input').remove();
-            $('.fm-file-upload').append('<input type="file" id="fileselect1" multiple="">');
+            $('.fm-file-upload').append('<input type="file" id="fileselect1" title="' + l[99] + '" multiple="">');
             $('.fm-folder-upload input').remove();
-            $('.fm-folder-upload').append('<input type="file" id="fileselect2" webkitdirectory="" multiple="">');
+            $('.fm-folder-upload').append('<input type="file" id="fileselect2" webkitdirectory="" title="' +
+                l[98]
+                + '" multiple="">');
             $('input#fileselect3').remove();
             $('.files-menu .fileupload-item')
                 .after('<input type="file" id="fileselect3" class="hidden" name="fileselect3" multiple="">');
@@ -429,6 +465,29 @@
             e.preventDefault();
             return false;
         }
+    }
+
+    /**
+     * Check current page is allowed on drag and drop to upload file
+     *
+     * @return {Boolean} Is allowed or not
+     */
+    function isFileDragAllowed() {
+        if ((page !== 'start' && !is_fm()) || // If page is not fm, only start page is allowed
+            (is_fm() && // if page is fm,
+                (slideshowid || !$('.feedback-dialog').hasClass('hidden') || // preview and feedback dialog show
+                M.currentdirid === 'shares' || // Share root page
+                M.currentrootid === 'contacts' || // Contacts pages
+                M.currentrootid === 'ipc' || // IPC
+                M.currentrootid === 'opc' || // OPC
+                M.currentrootid === M.RubbishID || // Rubbish bin
+                (M.currentrootid === undefined && M.currentdirid !== 'transfers') // Dashboard and Settings pages
+                )
+            )
+        ) {
+            return false;
+        }
+        return true;
     }
 
     // initialize

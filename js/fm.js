@@ -53,13 +53,13 @@ function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
             $textareaScrollBlock.jScrollPane(
                 {enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
             if (!jsp && keyEvents) {
-                $textarea.focus();
+                $textarea.trigger("focus");
             }
         }
         else if (jsp) {
             jsp.destroy();
             if (keyEvents) {
-                $textarea.focus();
+                $textarea.trigger("focus");
             }
         }
 
@@ -88,7 +88,7 @@ function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
     // Bind window resize if textarea is resizeable
     if (resizeEvent) {
         var eventName = textareaWrapperClass.replace(/[_\s]/g, '');
-        $(window).bind('resize.' + eventName, function () {
+        $(window).rebind('resize.' + eventName, function () {
             textareaScrolling();
         });
     }
@@ -100,8 +100,9 @@ function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
  *
  * User adding new contact/s from add contact dialog.
  * @param {String} $addBtnClass, contact dialog add button class, i.e. .add-user-popup-button.
+ * @param {Boolean} cd close dialog or not. default: true
  */
-function addNewContact($addButton) {
+function addNewContact($addButton, cd) {
 
     var mailNum;
     var msg;
@@ -110,21 +111,28 @@ function addNewContact($addButton) {
     var emailText;
     var $mails;
     var $textarea = $('.add-user-textarea textarea');
+    var promise = new MegaPromise();
+    cd = cd === undefined ? true : cd;
 
     // Add button is enabled
-    if (!$addButton.is('.disabled') && $addButton.is('.add')) {
+    if (!$addButton.hasClass('disabled')) {
 
         // Check user type
         if (u_type === 0) {
             ephemeralDialog(l[997]);
+            promise.resolve();
         }
         else {
+            var promises = [];
+            var addedEmails = [];
+
+            loadingDialog.pshow();
 
             // Custom text message
             emailText = $textarea.val();
 
             if (emailText === '') {
-                emailText = $textarea.attr('placeholder');
+                emailText = l[17738];
             }
 
             // List of email address planned for addition
@@ -133,36 +141,48 @@ function addNewContact($addButton) {
             mailNum = $mails.length;
 
             if (mailNum) {
-
                 // Loop through new email list
                 $mails.each(function(index, value) {
-
                     // Extract email addresses one by one
                     email = $(value).contents().eq(1).text();
-                    M.inviteContact(M.u[u_handle].m, email, emailText);
+                    // if invitation is sent, push as added Emails.
+                    promises.push(M.inviteContact(M.u[u_handle].m, email, emailText).done(function(res) {
+                        addedEmails.push(res);
+                    }));
                 });
-
-                // Singular or plural
-                if (mailNum === 1) {
-                    title = l[150];
-                    msg = l[5898].replace('[X]', email);
-                }
-                else {
-                    title = l[165] + ' ' + l[5859];
-                    msg = l[5899];
-                }
-
-                closeDialog();
-                msgDialog('info', title, msg);
-                $('.token-input-token-mega').remove();
             }
+
+            // after all process is done, and there is added email(s), show invitation sent dialog.
+            MegaPromise.allDone(promises).always(function() {
+                if (addedEmails.length > 0) {
+                    // Singular or plural
+                    if (addedEmails.length === 1) {
+                        title = l[150];
+                        msg = l[5898];
+                    }
+                    else {
+                        title = l[165] + ' ' + l[5859];
+                        msg = l[5899];
+                    }
+                    contactsInfoDialog(title, addedEmails[0], msg);
+                }
+
+                if (cd) {
+                    closeDialog();
+                    $('.token-input-token-mega').remove();
+                }
+
+                loadingDialog.phide();
+
+                promise.resolve();
+            });
         }
     }
-
-    // Cancel button clicked, close dialog
-    else if ($addButton.is('.cancel')) {
-        closeDialog();
+    else {
+        promise.reject();
     }
+
+    return promise;
 }
 
 /**
@@ -257,11 +277,12 @@ function initAddDialogMultiInputPlugin() {
     // Plugin configuration
     var contacts = M.getContactsEMails();
     var $this  = $('.add-contact-multiple-input');
-    var $scope = $this.parents('.add-user-popup');
+    var $scope = $this.closest('.add-user-popup');
+    var $addButton = $scope.find('.add-user-popup-button');
 
     $this.tokenInput(contacts, {
         theme: 'mega',
-        placeholder: l[16528],// Enter an email or MEGA contact name
+        placeholder: l[19108],// Enter one or more email address
         searchingText: '',
         noResultsText: '',
         addAvatar: true,
@@ -298,34 +319,44 @@ function initAddDialogMultiInputPlugin() {
         },
         onReady: function() {
             var $input = $this.parent().find('li input').eq(0);
+
             $input.rebind('keyup', function() {
                 var value = $.trim($input.val());
                 var emailList = value.split(/[ ;,]+/);
-                if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false || emailList.length > 1) {
-                    $scope.find('.add-user-popup-button.add').removeClass('disabled');
-                } else {
-                    $scope.find('.add-user-popup-button.add').addClass('disabled');
+                var itemNum = $scope.find('.share-added-contact').length;
+
+                if (isValidEmail(value)) {
+                    itemNum = itemNum + 1;
                 }
+
+                if (itemNum > 1) {
+                    $addButton.text(l[19113].replace('%1', itemNum)).removeClass('disabled');
+                }
+                else if (itemNum === 1) {
+                    $addButton.text(l[19112]).removeClass('disabled');
+                }
+                else {
+                    $addButton.text(l[19112]).addClass('disabled');
+                }
+
             });
         },
         onAdd: function() {
+            var $inputTokens = $scope.find('.share-added-contact');
+            var itemNum = $inputTokens.length;
 
-            var itemNum = $('.token-input-list-mega .token-input-token-mega').length,
-                $addUserPopup = $('.add-user-popup');
-
-            $('.add-user-popup-button.add').removeClass('disabled');
-
-            // In case of 1 contact use singular
-            if (itemNum === 1) {
-                $addUserPopup.find('.nw-fm-dialog-title').text(l[101]); // Add Contact
+            if (itemNum === 0) {
+                $addButton.text(l[19112]).addClass('disabled');
             }
-            else { // Use plural
-                $addUserPopup.find('.nw-fm-dialog-title').text(l[5911]); // Add Contacts
+            else if (itemNum === 1) {
+                $addButton.text(l[19112]).removeClass('disabled');
+            }
+            else {
+                var $multiInput = $scope.find('.multiple-input');
+                var h1 = $inputTokens.outerHeight(true); // margin included
+                var h2 = $multiInput.height();
 
-                var $inputTokens = $addUserPopup.find('.share-added-contact.token-input-token-mega'),
-                    $multiInput = $addUserPopup.find('.multiple-input'),
-                    h1 = $inputTokens.outerHeight(true),// margin included
-                    h2 = $multiInput.height();
+                $addButton.text(l[19113].replace('%1', itemNum)).removeClass('disabled');
 
                 // show/hide scroll box
                 if ((5 <= h2 / h1) && (h2 / h1 < 6)) {
@@ -336,43 +367,35 @@ function initAddDialogMultiInputPlugin() {
                         animateScroll: true
                     });
                     setTimeout(function() {
-                        $addUserPopup.find('.token-input-input-token-mega input').focus();
+                        $scope.find('.token-input-input-token-mega input').trigger("focus");
                     }, 0);
                 }
             }
         },
         onDelete: function() {
-
-            var itemNum,
-                $addUserPopup = $('.add-user-popup');
+            var $inputTokens = $scope.find('.token-input-list-mega .token-input-token-mega');
+            var itemNum;
 
             setTimeout(function() {
-                $addUserPopup.find('.token-input-input-token-mega input').blur();
+                $inputTokens.find('input').trigger("blur");
             }, 0);
 
             // Get number of emails
-            itemNum = $('.token-input-list-mega .token-input-token-mega').length;
-
+            itemNum = $inputTokens.length;
 
             if (itemNum === 0) {
-                $('.add-user-popup-button.add').addClass('disabled');
-                $addUserPopup.find('.nw-fm-dialog-title').text(l[101]); // Add Contact
-
+                $addButton.text(l[148]).addClass('disabled');
             }
             else if (itemNum === 1) {
-                $('.add-user-popup-button.add').removeClass('disabled');
-                $('.add-user-popup .nw-fm-dialog-title').text(l[101]); // Add Contact
-
+                $addButton.text(l[19112]).removeClass('disabled');
             }
             else {
-                $('.add-user-popup-button.add').removeClass('disabled');
-                $('.add-user-popup .nw-fm-dialog-title').text(l[101]);
+                var $multiInput = $scope.find('.multiple-input');
+                var $scrollBox = $scope.find('.multiple-input .jspPane')[0];
+                var h1 = $inputTokens.outerHeight(true); // margin included
+                var h2 = 0;
 
-                var $inputTokens = $addUserPopup.find('.share-added-contact.token-input-token-mega'),
-                    $multiInput = $addUserPopup.find('.multiple-input'),
-                    $scrollBox = $('.multiple-input .jspPane')[0],
-                    h1 = $inputTokens.outerHeight(true),// margin included
-                    h2 = 0;
+                $addButton.text(l[19113].replace('%1', itemNum)).removeClass('disabled');
 
                 // Calculate complete scroll box height
                 if ($scrollBox) {
@@ -410,38 +433,155 @@ function initAddDialogMultiInputPlugin() {
 }
 
 /**
+ * newContactDialog
+ *
+ * Handle add new contact dialog UI
+ * @param {String} ipcid ipc user id
+ * @param {Boolean} close dialog parameter
+ */
+function newContactDialog(ipcId, close) {
+    var $d = $('.fm-dialog.new-contact');
+    var $msg = $d.find('.new-user-message');
+    var ipc = M.ipc[ipcId];
+    var username = ipc.m;
+
+    // Hide
+    if (close) {
+        closeDialog();
+        return true;
+    }
+
+    M.safeShowDialog('new-contact', $d);
+
+    // Set default
+    $msg.addClass('hidden').find('span').text('');
+
+    $d.find('.new-contact-info span').text(username);
+
+    $d.find('.new-contact-avatar')
+        .safeHTML(useravatar.contact(username, 'semi-mid-avatar'));
+
+    if (ipc.msg) {
+        $msg.removeClass('hidden').find('span').text(ipc.msg);
+    }
+
+    $d.find('.contact-request-button').rebind('click', function() {
+        var $self = $(this);
+        var $reqRow = $('tr#ipc_' + ipcId);
+
+        if ($self.is('.accept')) {
+            if (M.acceptPendingContactRequest(ipcId) === 0) {
+                $reqRow.remove();
+            }
+        }
+        else if ($self.is('.delete')) {
+            if (M.denyPendingContactRequest(ipcId) === 0) {
+                $reqRow.remove();
+            }
+        }
+        else if ($self.is('.ignore')) {
+            if (M.ignorePendingContactRequest(ipcId) === 0) {
+                $reqRow.remove();
+            }
+        }
+
+        newContactDialog(ipcId, 1);
+    });
+
+    $d.find('.fm-dialog-close').rebind('click', function() {
+        newContactDialog(ipcId, 1);
+    });
+}
+
+/**
+ * contactsInfoDialog
+ *
+ * Handle add new contact dialog UI
+ * @param {String} title Dialog title
+ * @param {String} username User name/email
+ * @param {Boolean} close Dialog parameter
+ */
+function contactsInfoDialog(title, username, msg, close) {
+    var $d = $('.fm-dialog.contact-info');
+    var $msg = $d.find('.new-contact-info');
+
+    // Hide
+    if (close) {
+        closeDialog();
+        return true;
+    }
+
+    if (title) {
+        $d.find('.nw-fm-dialog-title').text(title);
+    }
+    else {
+        $d.find('.nw-fm-dialog-title').text('');
+    }
+
+    if (username && msg) {
+        $msg.safeHTML(msg.replace(/%1|\[X\]/g, '<span>' + username + '</span>'));
+    }
+    else if (msg) {
+        $msg.text(msg);
+    }
+
+    M.safeShowDialog('contact-info', $d);
+
+    $d.find('.fm-dialog-close, .default-white-button.ok').rebind('click', function() {
+        contactsInfoDialog(undefined, undefined, undefined, 1);
+    });
+}
+
+/**
  * addContactUI
  *
  * Handle add contact dialog UI
+ * @param {Boolean} dropdown dialog parameter. Shows dropdown instead dialog
+ * @param {Boolean} close dialog parameter
  */
-function contactAddDialog() {
+function contactAddDialog(close) {
+    var $d = $('.add-user-popup');
+
     // not for ephemeral
     if (!u_type) {
         return;
     }
 
-    function iconSize(par) {
-
-        // full size icon, popup at bottom of Add contact button
-        if (par) {
-            $('.add-user-size-icon')
-                .removeClass('short-size')
-                .addClass('full-size');
-        }
-
-        // short size icon, centered dialog
-        else {
-            $('.add-user-size-icon')
-                .removeClass('full-size')
-                .addClass('short-size');
-        }
+    // Hide
+    if (close) {
+        closeDialog();
+        return true;
     }
+
+    // Init default states
+    $.sharedTokens = [];
+    $d.removeClass('private achievements');
+
+    M.safeShowDialog('add-user-popup', $d);
+
+    var $textarea = $d.find('.add-user-textarea textarea');
+
+    mega.achievem.enabled().done(function () {
+        $d.addClass('achievements');
+    });
+
+    $textarea.val('');
+    clearScrollPanel('.add-user-popup');
+    $d.find('.multiple-input .token-input-token-mega').remove();
+    $d.find('.add-user-popup-button').text(l[19112]).addClass('disabled');
+
+    initTextareaScrolling($textarea, 72);
+    $d.find('.token-input-input-token-mega input').trigger("focus");
+    focusOnInput();
+
+    $d.find('.hidden-textarea-info span').rebind('click', function() {
+        $d.addClass('private');
+    });
 
     function focusOnInput() {
         var $tokenInput = $('#token-input-');
 
-        $tokenInput
-            .focus();
+        $tokenInput.trigger("focus");
     }
 
     $('.add-user-notification textarea').rebind('focus.add-user-n', function() {
@@ -456,221 +596,14 @@ function contactAddDialog() {
         initAddDialogMultiInputPlugin();
     }
 
-    $('.fm-empty-contacts .fm-empty-button').rebind('mouseover', function() {
-        $('.fm-empty-contacts').addClass('hovered');
-    });
-
-    $('.fm-empty-contacts .fm-empty-button').rebind('mouseout', function() {
-        $('.fm-empty-contacts').removeClass('hovered');
-    });
-
-    $('.fm-empty-contacts .fm-empty-button').rebind('click', function(event) {
-
-        $.hideContextMenu();
-        $.dialog = 'add-contact-popup';
-        $.sharedTokens = []; // Holds items currently visible in share folder contet (above input)
-
-        // Just in case hide import links
-        $('.add-user-popup .import-contacts-dialog').fadeOut(0);
-        $('.import-contacts-link').removeClass('active');
-
-        // Prepare multi-input and dialog
-        $('.add-user-popup .multiple-input .token-input-token-mega').remove();
-        $('.add-user-popup-button.add').addClass('disabled');
-        $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
-        $('.fm-add-user').removeClass('active');
-
-        iconSize(false);
-
-        $('.add-user-popup')
-            .addClass('dialog')
-            .removeClass('hidden');
-
-        fm_showoverlay();
-
-        event.stopPropagation();
-
-        // Focus the input after everything else is done or it won't work
-        focusOnInput();
-    });
-
-    $('.fm-add-user').rebind('click', function() {
-
-        var $this = $(this);
-        var $d = $('.add-user-popup');
-
-        $.hideContextMenu();
-        $.dialog = 'add-contact-popup';
-
-        // Holds items currently visible in share folder content (above input)
-        $.sharedTokens = [];
-
-        // Hide
-        if ($this.is('.active')) {
-            $this.removeClass('active');
-            $d.addClass('hidden');
-        }
-
-        // Show
-        else {
-            var $textarea = $('.add-user-popup .add-user-textarea textarea');
-
-            $textarea.val('');
-            $('.add-user-popup .import-contacts-dialog').fadeOut(0);
-            $('.import-contacts-link').removeClass('active');
-            clearScrollPanel('.add-user-popup');
-            $this.addClass('active');
-            $d.removeClass('hidden dialog');
-            $('.add-user-popup .multiple-input .token-input-token-mega').remove();
-
-            $('.add-user-popup-button.add').addClass('disabled');
-            $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
-
-            topPopupAlign(this, '.add-user-popup');
-
-            initTextareaScrolling($textarea, 39);
-            $('.add-user-popup .token-input-input-token-mega input').focus();
-            focusOnInput();
-        }
-
-        iconSize(true);
-        return false;
-    });
-
-    // List of elements related to pending contacts
-    //
-    // Received requests:
-    // empty grid: fm-empty-contacts (have button on it, .empty-contact-requests-button with label 'View sent requests')
-    // full grid: contact-requests-grid (have action buttons,
-    //  'Accept': .contact-request-button.accept
-    //  'Delete': .contact-request-button.delete
-    //  'Ignore': .contact-request-button.ignore
-    //
-    // Sent requests:
-    // empty grid: fm-empty-contacts (have button on it, .empty-sent-request-button with label 'View received requests')
-    // full grid: sent-requests-grid (have action buttons,
-    //  'ReInvite': .contact-request-button.reinvite
-    //  'Cancel Reques': .contact-request-button.cancel
-    //
-    // Header buttons:
-    // fm-contact-requests 'View sent requests'
-    // fm-received-requests 'View received requests'
-
-    // View received contact requests, M.ipc
-    $('.fm-received-requests, .empty-sent-requests-button').rebind('click', function() {
-        M.openFolder('ipc');
-        $('.fm-contact-requests').removeClass('active');
-        $(this).addClass('active');
-    });
-
-    // View sent contact requests, M.opc
-    $('.fm-contact-requests, .empty-contact-requests-button').rebind('click', function() {
-        M.openFolder('opc');
-        $('.fm-received-requests').removeClass('active');
-        $(this).addClass('active');
-    });
-
-    $('.add-user-size-icon').rebind('click', function() {
-
-        var iPos = 0;
-
-        $('.add-user-popup .import-contacts-dialog').fadeOut(0);
-        $('.import-contacts-link').removeClass('active');
-
-        if ($(this).is('.full-size')) {
-
-            $('.add-user-popup').addClass('dialog');
-            fm_showoverlay();
-            iconSize(false);
-            $('.fm-add-user').removeClass('active');
-            focusOnInput();
-        }
-
-        // .short-size
-        else {
-
-            fm_hideoverlay();
-            $('.add-user-popup').removeClass('dialog');
-            iconSize(true);
-            $('.fm-add-user').addClass('active');
-
-            iPos = $(window).width() - $('.fm-add-user').offset().left - $('.add-user-popup').outerWidth() + 2;
-
-            if (iPos > 8) {
-                $('.add-user-popup').css('right', iPos + 'px');
-            }
-            else {
-                $('.add-user-popup').css('right', 8 + 'px');
-            }
-            focusOnInput();
-        }
-    });
-
     $('.add-user-popup-button').rebind('click', function() {
-
         addNewContact($(this));
     });
 
     $('.add-user-popup .fm-dialog-close').rebind('click', function() {
-
-        fm_hideoverlay();
-        $('.add-user-popup').addClass('hidden');
-        $('.fm-add-user').removeClass('active');
-        clearScrollPanel('.add-user-popup');
-    });
-
-    $('.add-user-popup .import-contacts-service').rebind('click', function() {
-
-        // NOT imported
-        if (!$(this).is('.imported')) {
-            var contacts = new mega.GContacts({'where': 'contacts'});
-
-            // NOT failed
-            if (!contacts.options.failed) {
-                contacts.importGoogleContacts();
-            }
-            else {
-                closeImportContactNotification('.add-user-popup');
-            }
-        }
-        else {
-            var n = $('.imported-contacts-notification');
-            n.css('margin-left', '-' + n.outerWidth() / 2 + 'px');
-            n.fadeIn(200);
-            $('.share-dialog .import-contacts-dialog').fadeOut(200);
-        }
-    });
-
-    $('.add-user-popup .import-contacts-link').rebind('click', function(e) {
-
-        if (!$(this).is('.active')) {
-            $('.add-user-popup .import-contacts-link').addClass('active');// Do not use this, because of doubled class
-            $('.add-user-popup .import-contacts-dialog').fadeIn(200);
-
-            $('.imported-notification-close').rebind('click', function() {
-                $('.imported-contacts-notification').fadeOut(200);
-            });
-        }
-        else {
-            $('.add-user-popup .import-contacts-link').removeClass('active');
-            $('.add-user-popup .import-contacts-dialog').fadeOut(200);
-            $('.imported-contacts-notification').fadeOut(200);
-        }
-
-        e.stopPropagation();
-        e.preventDefault();
-    });
-
-    $('.add-user-popup .import-contacts-info').rebind('mouseover.add-user-p', function() {
-        $('.add-user-popup .import-contacts-info-txt').fadeIn(200);
-    });
-
-    $('.add-user-popup .import-contacts-info').rebind('mouseout.add-user-p', function() {
-        $('.add-user-popup .import-contacts-info-txt').fadeOut(200);
+        contactAddDialog(1);
     });
 }
-
-
 
 function ephemeralDialog(msg) {
 
@@ -684,10 +617,16 @@ function ephemeralDialog(msg) {
 function fmtopUI() {
     "use strict";
 
+    var $tabBlock = $('.contacts-tabs-bl');
+
+    $tabBlock.addClass('hidden');
+    $tabBlock.find('.contacts-tab-lnk.active').removeClass('active');
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload').addClass('hidden');
-    $('.fm-contact-requests,.fm-received-requests').removeClass('active');
     $('.fm-new-folder').removeClass('filled-input');
     $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
+    $('.fm-right-header').removeClass('requests-panel');
+    $('.fm-breadcrumbs-block').removeClass('hidden');
+    $('.button.link-button.accept-all').addClass('hidden');
 
     if (M.currentrootid === M.RubbishID) {
         $('.fm-clearbin-button').removeClass('hidden');
@@ -705,20 +644,36 @@ function fmtopUI() {
                 || (String(M.currentdirid).length === 11
                     && M.currentdirid.substr(0, 6) !== 'search')) {
 
+            M.contactsUI();
+
+            // Update IPC indicator
+            delay('updateIpcRequests', updateIpcRequests);
+
             $('.fm-add-user').removeClass('hidden');
+            $tabBlock.removeClass('hidden');
 
+            // Show Accept All button
+            if (M.currentdirid === 'ipc' && Object.keys(M.ipc).length > 0) {
+                $('.button.link-button.accept-all').removeClass('hidden');
+            }
 
-            // don't add .contacts-panel to ALL .fm-left-panel's
-            $('.fm-left-panel:visible').addClass('contacts-panel');
-
+            // Show set active tab, Hide grid/blocks/view buttons
             if (M.currentdirid === 'ipc') {
-                $('.fm-received-requests').addClass('active');
                 $('.fm-right-header').addClass('requests-panel');
+                $tabBlock.find('.ipc').addClass('active');
             }
             else if (M.currentdirid === 'opc') {
-                $('.fm-contact-requests').addClass('active');
                 $('.fm-right-header').addClass('requests-panel');
+                $tabBlock.find('.opc').addClass('active');
             }
+            else if (M.currentdirid === 'contacts') {
+                $tabBlock.find('.contacts').addClass('active');
+            }
+            else {
+                $('.fm-breadcrumbs-block').addClass('hidden');
+                $tabBlock.find('.contacts').addClass('active');
+            }
+
         }
         else if (String(M.currentdirid).length === 8
             && M.getNodeRights(M.currentdirid) > 0) {
@@ -832,8 +787,10 @@ function avatarDialog(close) {
                         '<div class="image-explorer-drag-delegate"></div>' +
                     '</div>' +
                     '<div class="image-explorer-scale-slider-wrapper">' +
+                        '<div class="image-explorer-scale-slider-minus"></div>' +
                         '<input class="image-explorer-scale-slider disabled" type="range" ' +
                             'min="0" max="100" step="1" value="0" disabled="" />' +
+                        '<div class="image-explorer-scale-slider-plus"></div>' +
                     '</div>' +
                 '</div>' +
                 '<div class="fm-notifications-bottom">' +
@@ -849,12 +806,25 @@ function avatarDialog(close) {
                     '<div  class="default-white-button right" id="fm-cancel-avatar">' +
                         '<span>@@</span>' +
                     '</div>' +
+                    '<div  class="default-white-button right" id="fm-remove-avatar">' +
+                    '<span>@@</span>' +
+                    '</div>' +
                     '<div class="clear"></div>' +
                 '</div>' +
             '</div>' +
-        '</div>', l[1016], l[1017], l[82]);
+        '</div>', l[1016], l[1017], l[82], l[6974]);
     $('#fm-change-avatar').hide();
     $('#fm-cancel-avatar').hide();
+    $('#fm-remove-avatar').hide();
+
+    mega.attr.get(u_handle, 'a', true, false)
+        .fail()
+        .done(function(res) {
+            if (res !== null && res !== undefined && res !== "none"){
+                $('#fm-remove-avatar').show();
+            }
+        });
+
     var imageCrop = new ImageUploadAndCrop($("#avatarcrop").find('.image-upload-and-crop-container'),
         {
             cropButton: $('#fm-change-avatar'),
@@ -871,7 +841,7 @@ function avatarDialog(close) {
                 useravatar.setUserAvatar(u_handle, data, this.outputFormat);
 
                 $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+                $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
                 avatarDialog(1);
             },
             onImageUpload: function()
@@ -879,6 +849,7 @@ function avatarDialog(close) {
                 $('.image-upload-field-replacement.fm-account-change-avatar').hide();
                 $('#fm-change-avatar').show();
                 $('#fm-cancel-avatar').show();
+                $('#fm-remove-avatar').hide();
             },
             onImageUploadError: function()
             {
@@ -889,11 +860,22 @@ function avatarDialog(close) {
     {
         avatarDialog(1);
     });
+
+    $("#fm-remove-avatar").rebind('click', function()
+    {
+        msgDialog('confirmation', "confirm-remove-avatar", l[18699], l[6973], function(response) {
+            if (response){
+                mega.attr.set('a', "none", true, false);
+                avatarDialog(1);
+            }
+        });
+    });
 }
 
 
 /**
  * Really simple shortcut logic for select all, copy, paste, delete
+ * Note: there is another key binding on initUIKeyEvents() for filemanager.
  *
  * @constructor
  */
@@ -902,14 +884,17 @@ function FMShortcuts() {
     var current_operation = null;
 
     $(window).rebind('keydown.fmshortcuts', function(e) {
-
+        var isContactRootOrShareRoot = false;
         if (
             !is_fm() ||
             !selectionManager ||
-            window.location.toString().indexOf('fm/account') !== -1 ||
-            window.location.toString().indexOf('fm/transfers') !== -1
+            M.currentrootid === 'chat' || // prevent shortcut for chat
+            M.currentrootid === undefined // prevent shortcut for file transfer, dashboard, settings
         ) {
             return true;
+        }
+        else if (M.currentdirid === 'contacts' || M.currentdirid === 'shares') {
+            isContactRootOrShareRoot = true;
         }
 
         e = e || window.event;
@@ -923,7 +908,7 @@ function FMShortcuts() {
         var charCode = e.which || e.keyCode; // ff
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
-        if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
+        if (charTyped === "a" && (e.ctrlKey || e.metaKey)) {
             if (typeof selectionManager != 'undefined' && selectionManager) {
                 if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                     return;
@@ -931,12 +916,14 @@ function FMShortcuts() {
                 selectionManager.select_all();
             }
             return false; // stop prop.
-        } else if (
-            (charTyped == "c" || charTyped == "x") &&
-            (e.ctrlKey || e.metaKey)
+        }
+        else if (
+            (charTyped === "c" || charTyped === "x") &&
+            (e.ctrlKey || e.metaKey) &&
+            !isContactRootOrShareRoot
         ) {
             var items = selectionManager.get_selected();
-            if (items.length == 0) {
+            if (items.length === 0 || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                 return; // dont do anything.
             }
 
@@ -946,8 +933,14 @@ function FMShortcuts() {
             };
 
             return false; // stop prop.
-        } else if (charTyped == "v" && (e.ctrlKey || e.metaKey)) {
-            if (!current_operation) {
+        }
+        else if (
+            charTyped === "v" &&
+            (e.ctrlKey || e.metaKey) &&
+            !isContactRootOrShareRoot
+        ) {
+            if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1
+                || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                 return false; // stop prop.
             }
 
@@ -964,9 +957,13 @@ function FMShortcuts() {
             }
 
             return false; // stop prop.
-        } else if (charCode == 8) {
+        }
+        else if (
+            charCode === 8 &&
+            !isContactRootOrShareRoot
+        ) {
             var items = selectionManager.get_selected();
-            if (items.length == 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
+            if (items.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2) {
                 return; // dont do anything.
             }
 
@@ -1001,7 +998,13 @@ function fm_showoverlay() {
     "use strict";
 
     $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+
+    if (is_mobile) {
+        $('body').addClass('overlayed');
+    }
+    else if (!$('body').hasClass('bottom-pages')) {
+        $('body').addClass('overlayed');
+    }
 }
 
 /**
@@ -1045,7 +1048,7 @@ function renameDialog() {
 
         M.safeShowDialog('rename', function() {
             $dialog.removeClass('hidden').addClass('active');
-            $input.focus();
+            $input.trigger("focus");
             return $dialog;
         });
 
@@ -1057,7 +1060,8 @@ function renameDialog() {
 
                 if (value && n.name && value !== n.name) {
                     if (M.isSafeName(value)) {
-                        if (!duplicated(nodeType, value)) {
+                        var targetFolder = n.p;
+                        if (!duplicated(nodeType, value, targetFolder)) {
                             M.rename(n.h, value);
                         }
                         else {
@@ -1070,7 +1074,7 @@ function renameDialog() {
                                     $dialog.removeClass('duplicate');
                                     $input.removeClass('error');
 
-                                    $input.focus();
+                                    $input.trigger("focus");
                                 }, 2000);
 
                             return;
@@ -1178,13 +1182,13 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', extraButton || l[1018], l[82]);
 
-        $('#msgDialog .default-white-button').eq(0).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-        $('#msgDialog .default-white-button').eq(1).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -1198,13 +1202,13 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[78], l[79]);
 
-        $('#msgDialog .default-white-button').eq(0).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-        $('#msgDialog .default-white-button').eq(1).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -1218,13 +1222,13 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                     '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                     '<div class="clear"></div>', doneButton, extraButton);
 
-            $('#msgDialog .default-white-button').eq(0).bind('click', function() {
+            $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(false);
                 }
             });
-            $('#msgDialog .default-white-button').eq(1).bind('click', function() {
+            $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
@@ -1236,7 +1240,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 .safeHTML('<div class="default-white-button right notification-button"><span>@@</span></div>' +
                     '<div class="clear"></div>', l[81]);
 
-            $('#msgDialog .default-white-button').bind('click', function() {
+            $('#msgDialog .default-white-button').rebind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
@@ -1267,14 +1271,14 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[229], l[78], l[79]);
 
-        $('#msgDialog .default-white-button').eq(0).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
 
-        $('#msgDialog .default-white-button').eq(1).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -1314,7 +1318,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             .addClass('hidden')
             .html('');
 
-        $('#msgDialog .default-white-button').bind('click', function() {
+        $('#msgDialog .default-white-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
@@ -1392,44 +1396,53 @@ function dialogPositioning(s) {
  */
 function openContactInfoLink(contactLink) {
     var $dialog = $('.fm-dialog.qr-contact');
-    var QRContactDialogPrepare = function QRContactDialogPrepare(avatar, em, fullname, ctHandle) {
+    var QRContactDialogPrepare = function QRContactDialogPrepare(em, fullname, ctHandle) {
         $('.qr-contact-name', $dialog).text(fullname);
         $('.qr-contact-email', $dialog).text(em);
-        if (avatar) {
 
-            var ab = base64_to_ab(avatar);
-            var blob = new Blob([ab], { type: 'image/jpeg' });
-            $('.avatar-wrapper.avatar img', $dialog).attr('src', myURL.createObjectURL(blob))
-                .removeClass('hidden');
-        }
-        else {
-            var curAvatar = useravatar.contact(em);
-            $('.avatar-container-qr-contact', $dialog).html(curAvatar);
-        }
+        var curAvatar = useravatar.contact(em);
+        $('.avatar-container-qr-contact', $dialog).html(curAvatar);
+
         var contactStatus = 1;
-        if (ctHandle === u_handle) {
-            $('#qr-ctn-add', $dialog).addClass('disabled');
-            $('#qr-ctn-add', $dialog).off('click');
-            $('.qr-ct-exist', $dialog).text(l[18514]).removeClass('hidden');
-        }
-        else if (M.u[ctHandle] && M.u[ctHandle]._data.c) {
-            contactStatus = 2;
-            $('#qr-ctn-add', $dialog).addClass('disabled');
-            $('.qr-ct-exist', $dialog).text(l[17886]).removeClass('hidden');
-            $('#qr-ctn-add', $dialog).off('click');
+        if (u_handle) {
+            if (ctHandle === u_handle) {
+                $('#qr-ctn-add', $dialog).addClass('disabled');
+                $('#qr-ctn-add', $dialog).off('click');
+                $('.qr-ct-exist', $dialog).text(l[18514]).removeClass('hidden');
+            }
+            else if (M.u[ctHandle] && M.u[ctHandle]._data.c) {
+                contactStatus = 2;
+                $('#qr-ctn-add', $dialog).addClass('disabled');
+                $('.qr-ct-exist', $dialog).text(l[17886]).removeClass('hidden');
+                $('#qr-ctn-add', $dialog).off('click');
+            }
+            else {
+                $('.big-btn-txt', $dialog).text(l[101]);
+                $('#qr-ctn-add', $dialog).removeClass('disabled');
+                $('.qr-ct-exist', $dialog).addClass('hidden');
+                $('#qr-ctn-add', $dialog).rebind('click', function () {
+                    if (contactStatus === 1) {
+                        M.inviteContact(u_attr.email, em, null, contactLink);
+                    }
+                    $('#qr-ctn-add', $dialog).off('click');
+                    closeDialog();
+
+                    return false;
+                });
+            }
         }
         else {
             $('.big-btn-txt', $dialog).text(l[101]);
             $('#qr-ctn-add', $dialog).removeClass('disabled');
             $('.qr-ct-exist', $dialog).addClass('hidden');
             $('#qr-ctn-add', $dialog).rebind('click', function () {
-                if (contactStatus === 1) {
-                    M.inviteContact(u_attr.email, em, null, contactLink)
-                }
-                $('#qr-ctn-add', $dialog).off('click');
                 closeDialog();
+                var page = 'fm/contacts';
+                mBroadcaster.once('fm:initialized', function () {
+                    openContactInfoLink(contactLink);
+                });
 
-                return false;
+                return loadSubPage(page);
             });
         }
         $dialog.removeClass('hidden');
@@ -1444,7 +1457,7 @@ function openContactInfoLink(contactLink) {
         callback: function (res, ctx) {
             if (typeof res === 'object') {
                 M.safeShowDialog('qr-contact', function () {
-                    QRContactDialogPrepare(res['+a'], res.e, res.fn + ' ' + res.ln, res.h);
+                    QRContactDialogPrepare(res.e, res.fn + ' ' + res.ln, res.h);
                     return $dialog;
                 });
 
@@ -1486,16 +1499,16 @@ function openAccessQRDialog() {
             var curAvatar = useravatar.contact(u_handle);
             $('.avatar-container-qr', $dialog).html(curAvatar);
             var handleAutoAccept = function _handleAutoAccept(autoAcc) {
-                if (autoAcc === '1') {
-                    $dialog.find('.qr-dialog-label .dialog-feature-toggle').addClass('toggle-on')
-                        .find('.dialog-feature-switch').css('marginLeft', '22px');
-                }
-                else {
+                if (autoAcc === '0') {
                     $dialog.find('.qr-dialog-label .dialog-feature-toggle').removeClass('toggle-on')
                         .find('.dialog-feature-switch').css('marginLeft', '2px');
                 }
+                else { // if  it's 1 or not set
+                    $dialog.find('.qr-dialog-label .dialog-feature-toggle').addClass('toggle-on')
+                        .find('.dialog-feature-switch').css('marginLeft', '22px');
+                }
             };
-            mega.attr.get(u_handle, 'clv', -2, 0).done(handleAutoAccept);
+            mega.attr.get(u_handle, 'clv', -2, 0).always(handleAutoAccept);
 
         }
     };
@@ -1731,7 +1744,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
 
     var rowId = '',
         html = '',
-        av =  useravatar.contact(email, 'nw-contact-avatar'),
+        av =  useravatar.contact(email),
         perm = '',
         permissionLevel = 0;
 
@@ -1882,11 +1895,11 @@ function initShareDialogMultiInputPlugin() {
         };
 
         var $input = $('.share-multiple-input');
-        var $scope = $input.parents('.share-dialog');
+        var $scope = $input.parent('.share-dialog');
 
         $input.tokenInput(contacts, {
             theme: "mega",
-            placeholder: l[16528],// Enter an email or MEGA contact name
+            placeholder: l[19108],// Enter one or more email address
             searchingText: "",
             noResultsText: "",
             addAvatar: true,
@@ -1907,16 +1920,23 @@ function initShareDialogMultiInputPlugin() {
                 errorMsg(l[7415]); // Looks like there's a malformed email
             },
             onReady: function() {
-                var $this = $scope.find('li input');
+                var $this = $scope.find('li input').eq(0);
                 $this.rebind('keyup', function() {
                     var value = $.trim($this.val());
                     var emailList = value.split(/[ ;,]+/);
-                    if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false || emailList.length > 1) {
-                        $scope.find('.dialog-share-button').removeClass('disabled');
-                    } else {
-                        $scope.find('.dialog-share-button').addClass('disabled');
+                    var itemNum = $scope.find('.share-added-contact').length +
+                        !isValidEmail(emailList) ? emailList.length : 0;
+
+                    if (itemNum > 1 && !isValidEmail(value)) {
+                        $addButton.text('Add %1 people'.replace('%1', itemNum));
                     }
-                });
+                    if (itemNum === 1) {
+                        $addButton.text(l[19113]);
+                    }
+                    else {
+                        $addButton.text(l[148]);
+                    }
+              });
             },
             onDoublet: function(u) {
                 errorMsg(l[7413]); // You already have a contact with that email
@@ -1930,7 +1950,7 @@ function initShareDialogMultiInputPlugin() {
                 // where they can add a custom message to the pending share request
                 if (checkIfContactExists(item.id) === false) {
                     $('.share-message').show();
-                    initTextareaScrolling($('.share-message-textarea textarea'), 39);
+                    initTextareaScrolling($('.share-message-textarea textarea'), 72);
                 }
 
                 $('.dialog-share-button').removeClass('disabled');
@@ -1953,7 +1973,7 @@ function initShareDialogMultiInputPlugin() {
                         animateScroll: true
                     });
                     setTimeout(function() {
-                        $shareDialog.find('.token-input-input-token-mega input').focus();
+                        $shareDialog.find('.token-input-input-token-mega input').trigger("focus");
                     }, 0);
                 }
 
@@ -1970,7 +1990,7 @@ function initShareDialogMultiInputPlugin() {
                     iNewItemsNum, iItemsNum;
 
                 setTimeout(function() {
-                    $shareDialog.find('.token-input-input-token-mega input').blur();
+                    $shareDialog.find('.token-input-input-token-mega input').trigger("blur");
                 }, 0);
 
                 iNewItemsNum = $shareDialog.find('.token-input-list-mega .token-input-token-mega').length;
@@ -2100,9 +2120,11 @@ function initShareDialog() {
      * Adding new contacts to shared item
      */
     $('.share-dialog .dialog-share-button').rebind('click', function() {
-
-        var share = new mega.Share();
-        share.updateNodeShares();
+        addNewContact($(this), false).done(function(){
+            var share = new mega.Share();
+            share.updateNodeShares();
+            $('.token-input-token-mega').remove();
+        });
     });
 
     $('.share-dialog').off('click', '.share-dialog-remove-button');
@@ -2359,7 +2381,7 @@ function closeImportContactNotification(c) {
     $('.import-contacts-link').removeClass('active');
 
     // Remove focus from input element, related to tokeninput plugin
-    $(c + ' input#token-input-').blur();
+    $(c + ' input#token-input-').trigger("blur");
 }
 
 function closeDialog(ev) {
@@ -2392,7 +2414,10 @@ function closeDialog(ev) {
         return;
     }
 
-    if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
+    if ($.dialog === 'terms' && $.registerDialog) {
+        $('.fm-dialog.bottom-pages-dialog').addClass('hidden');
+    }
+    else if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
     }
@@ -2436,26 +2461,47 @@ function closeDialog(ev) {
         delete $.copyDialog;
         delete $.moveDialog;
         delete $.copyToShare;
+        delete $.copyToUpload;
+        delete $.shareToContactId;
         delete $.copyrightsDialog;
 
-        /* copy/move dialog - chat - save to */
+        /* copy/move dialog - save to */
         delete $.saveToDialogCb;
         delete $.saveToDialogNode;
-        delete $.dialogIsChatSave;
+        delete $.saveToDialog;
+
+        if ($.saveToDialogPromise) {
+            if (typeof $.saveToDialogPromise === 'function') {
+                $.saveToDialogPromise(EEXPIRED);
+            }
+            else {
+                $.saveToDialogPromise.reject(EEXPIRED);
+            }
+            delete $.saveToDialogPromise;
+        }
 
         if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button, .fm-dialog-close')) {
             delete $.onImportCopyNodes;
         }
     }
     $('.fm-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
+    // $('.fm-dialog .dialog-sorting-menu').remove();
 
     $('.export-links-warning').addClass('hidden');
     if ($.dialog === 'terms' && $.termsAgree) {
         delete $.termsAgree;
     }
 
+    if ($.dialog === 'createfolder') {
+        if ($.cfpromise) {
+            $.cfpromise.reject();
+            delete $.cfpromise;
+        }
+    }
+
     delete $.dialog;
     delete $.mcImport;
+    treesearch = false;
 
     if ($.propertiesDialog) {
         // if the dialog was close from the properties dialog
@@ -2467,13 +2513,7 @@ function closeDialog(ev) {
         $.dialog = $.copyDialog || $.moveDialog;
 
         $('.fm-dialog').addClass('arrange-to-back');
-        $('.fm-dialog.' + $.dialog + '-dialog').removeClass('arrange-to-back');
-    }
-    if ($.copyDialogContactsChangeToken) {
-        // a listner for contacts changes is added at copy dialog
-        // we need to remove it on dialog close
-        M.u.removeChangeListener($.copyDialogContactsChangeToken);
-        $.copyDialogContactsChangeToken = 0;
+        $('.fm-dialog.fm-picker-dialog').removeClass('arrange-to-back');
     }
 
     mBroadcaster.sendMessage('closedialog');
@@ -2515,7 +2555,7 @@ function createFolderDialog(close) {
                     $dialog.removeClass('duplicate');
                     $input.removeClass('error');
 
-                    $input.focus();
+                    $input.trigger("focus");
                 }, 2000);
 
                 return;
@@ -2523,16 +2563,23 @@ function createFolderDialog(close) {
         }
 
         loadingDialog.pshow();
+        $dialog.addClass('hidden');
+
         M.createFolder(target, v, new MegaPromise())
             .done(function(h) {
                 if (d) {
                     console.log('Created new folder %s->%s', target, h);
                 }
                 loadingDialog.phide();
+                if ($.cfpromise) {
+                    $.cfpromise.resolve(h);
+                    delete $.cfpromise;
+                }
                 createFolderDialog(1);
             })
             .fail(function(error) {
                 loadingDialog.phide();
+                $dialog.removeClass('hidden');
                 msgDialog('warninga', l[135], l[47], api_strerror(error));
             });
     };
@@ -2586,7 +2633,7 @@ function createFolderDialog(close) {
 
     M.safeShowDialog('createfolder', function() {
         $dialog.removeClass('hidden');
-        $('.create-folder-input-bl input').focus();
+        $('.create-folder-input-bl input').trigger("focus");
         $dialog.removeClass('active');
         return $dialog;
     });
@@ -2614,14 +2661,14 @@ function chromeDialog(close) {
             localStorage.chromeDialog = 1;
             $(this).attr('class', 'checkboxOn');
             $(this).parent().attr('class', 'checkboxOn');
-            $(this).attr('checked', true);
+            $(this).prop('checked', true);
         }
         else
         {
             delete localStorage.chromeDialog;
             $(this).attr('class', 'checkboxOff');
             $(this).parent().attr('class', 'checkboxOff');
-            $(this).attr('checked', false);
+            $(this).prop('checked', false);
         }
     });
 }
@@ -2650,13 +2697,13 @@ function browserDialog(close) {
             localStorage.browserDialog = 1;
             $(this).attr('class', 'checkboxOn');
             $(this).parent().attr('class', 'checkboxOn');
-            $(this).attr('checked', true);
+            $(this).prop('checked', true);
         }
         else {
             delete localStorage.chromeDialog;
             $(this).attr('class', 'checkboxOff');
             $(this).parent().attr('class', 'checkboxOff');
-            $(this).attr('checked', false);
+            $(this).prop('checked', false);
         }
     });
 
@@ -2727,13 +2774,19 @@ browserDialog.isWeak = function() {
  * @param {Boolean} close dialog parameter
  * @param {String} bottom page title
  * @param {String} dialog header
+ * @param {Boolean} tickbox tickbox existency to let user agree this dialog
  */
-function bottomPageDialog(close, pp, hh) {
+function bottomPageDialog(close, pp, hh, tickbox) {
     "use strict";
 
     var $dialog = $('.fm-dialog.bottom-pages-dialog');
     var closeDialog = function() {
-        $dialog.unbind('dialog-closed');
+        $dialog.off('dialog-closed');
+        // reset scroll position to top for re-open
+        var jsp = $dialog.find('.bp-body').data('jsp');
+        if (jsp) {
+            jsp.scrollToY(0);
+        }
         window.closeDialog();
         delete $.termsAgree;
         delete $.termsDeny;
@@ -2749,8 +2802,8 @@ function bottomPageDialog(close, pp, hh) {
         pp = 'terms';
     }
 
-    // Show Agree/Cancel buttons for Terms dialogs
-    if (pp === 'terms' || pp === 'sdkterms') {
+    // Show Agree/Cancel buttons for Terms dialogs if it does not have tickbox to agree=
+    if ((pp === 'terms' && !tickbox) || pp === 'sdkterms') {
         $('.fm-bp-cancel, .fm-bp-agree', $dialog).removeClass('hidden');
         $('.fm-bp-close', $dialog).addClass('hidden');
         $('.fm-dialog-title', $dialog).text(l[385]);
@@ -2878,8 +2931,6 @@ function fm_resize_handler(force) {
         console.time('fm_resize_handler');
     }
 
-    M.zoomLevelNotification();
-
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         var tfse = M.getTransferElements();
 
@@ -2911,6 +2962,20 @@ function fm_resize_handler(force) {
                 $.contactGridHeader();
             }
             initContactsGridScrolling();
+        }
+    }
+    else if (M.currentdirid === 'ipc') {
+        initIpcGridScrolling();
+        M.addGridUIDelayed(true);
+        if ($.ipcGridHeader) {
+            $.ipcGridHeader();
+        }
+    }
+    else if (M.currentdirid === 'opc') {
+        initOpcGridScrolling();
+        M.addGridUIDelayed(true);
+        if ($.opcGridHeader) {
+            $.opcGridHeader();
         }
     }
     else if (M.currentdirid === 'shares') {
@@ -3027,7 +3092,7 @@ function sharedFolderUI() {
         var ownersHandle = nodeData.su;
         var folderName = (M.d[M.currentdirid] || nodeData).name;
         var displayName = htmlentities(M.getNameByHandle(ownersHandle));
-        var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
+        var avatar = useravatar.contact(M.d[ownersHandle]);
 
         if (Object(M.u[ownersHandle]).m) {
             displayName += ' &nbsp;&lt;' + htmlentities(M.u[ownersHandle].m) + '&gt;';
@@ -3111,10 +3176,12 @@ function userFingerprint(userid, callback) {
 /**
  * Get and display the fingerprint
  * @param {Object} user The user object e.g. same as M.u[userHandle]
+ * @param {Selector} $wrapper Container of fingerprint block
  */
-function showAuthenticityCredentials(user) {
+function showAuthenticityCredentials(user, $wrapper) {
 
-    var $fingerprintContainer = $('.contact-fingerprint-txt');
+    var $fingerprintContainer = $wrapper.length ?
+        $wrapper.find('.contact-fingerprint-txt') : $('.contact-fingerprint-txt');
 
     // Compute the fingerprint
     userFingerprint(user, function(fingerprints) {
@@ -3124,9 +3191,7 @@ function showAuthenticityCredentials(user) {
 
         // Render the fingerprint into 10 groups of 4 hex digits
         $.each(fingerprints, function(key, value) {
-            $('<span>').text(value).appendTo(
-                $fingerprintContainer.filter(key <= 4 ? ':first' : ':last')
-            );
+            $('<span>').text(value).appendTo($fingerprintContainer);
         });
     });
 }
@@ -3157,12 +3222,14 @@ function fingerprintDialog(userid) {
     var $dialog = $('.fingerprint-dialog');
     var closeFngrPrntDialog = function() {
         closeDialog();
-        $('.fm-dialog-close', $dialog).unbind('click');
-        $('.dialog-approve-button').unbind('click');
-        $('.dialog-skip-button').unbind('click');
+        $('.fm-dialog-close', $dialog).off('click');
+        $('.dialog-approve-button').off('click');
+        $('.dialog-skip-button').off('click');
+        mega.ui.CredentialsWarningDialog.rendernext();
     };
 
-    $dialog.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
+    $dialog.find('.fingerprint-avatar').empty()
+        .append($(useravatar.contact(userid, 'semi-mid-avatar')));
 
     $dialog.find('.contact-details-user-name')
         .text(M.getNameByHandle(user.u)) // escape HTML things
@@ -3204,7 +3271,7 @@ function fingerprintDialog(userid) {
             .done(function(fingerprint) {
 
                 // Authenticate the contact
-                authring.setContactAuthenticated(
+                var result = authring.setContactAuthenticated(
                     userid,
                     fingerprint,
                     'Ed25519',
@@ -3213,9 +3280,18 @@ function fingerprintDialog(userid) {
                 );
 
                 // Change button state to 'Verified'
-                $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
+                $('.fm-verify').off('click').addClass('verified').find('span').text(l[6776]);
 
                 closeFngrPrntDialog();
+
+                M.u[userid] && M.u[userid].trackDataChange();
+
+                if (result && result.always) {
+                    // wait for the setContactAuthenticated to finish and then trigger re-rendering.
+                    result.always(function() {
+                        M.u[userid] && M.u[userid].trackDataChange();
+                    });
+                }
             })
             .always(function() {
                 loadingDialog.hide();
@@ -3344,6 +3420,7 @@ function FMResizablePane(element, opts) {
                     if (opts.persistanceKey) {
                         mega.config.set(opts.persistanceKey, ui.size[size_attr]);
                     }
+                    self["current_" + size_attr] = ui.size[size_attr];
                 }
 
                 $self.trigger('resize', [e, ui]);
@@ -3445,11 +3522,13 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
             $this.addClass('active');
             $select.find('span').text($this.text());
 
-            var nameLen = $('#account-firstname').val().trim().length;
+            if (saveOption) {
+                var nameLen = String($('#account-firstname').val() || '').trim().length;
 
-            // Save changes for account page
-            if (saveOption && nameLen) {
-                $('.fm-account-save-block').removeClass('hidden');
+                // Save changes for account page
+                if (nameLen) {
+                    $('.fm-account-save-block').removeClass('hidden');
+                }
             }
         }
     });

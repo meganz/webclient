@@ -21,10 +21,10 @@ var EmoticonsFilter = function(megaChat) {
     self.reservedEmotions = {};
     self.reservedEmotions["tm"] = '\u2122';
 
-    megaChat.bind("onBeforeRenderMessage", function(e, eventData) {
+    megaChat.on("onBeforeRenderMessage", function(e, eventData) {
         self.processMessage(e, eventData);
     });
-    megaChat.bind("onBeforeSendMessage", function(e, messageObject) {
+    megaChat.on("onBeforeSendMessage", function(e, messageObject) {
         self.processOutgoingMessage(e, messageObject);
     });
 

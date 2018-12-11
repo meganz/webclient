@@ -8,6 +8,7 @@ var fetcher = null;
 var workerstate;
 
 var fmconfig = Object.create(null);
+
 if (localStorage.fmconfig) {
     fmconfig = JSON.parse(localStorage.fmconfig);
 }
@@ -112,7 +113,7 @@ if (typeof loadingInitDialog === 'undefined') {
             mega.loadReport.stepTimeStamp = Date.now();
 
             // If the PSA is visible reposition the account loading bar
-            if (!is_mobile) {
+            if (typeof psa !== 'undefined') {
                 psa.repositionAccountLoadingBar();
             }
         }
@@ -156,15 +157,17 @@ var scloadtnodes = false;                // if `t` packet requires nodes in memo
 var scinflight = false;                  // don't run more than one execsc() "thread"
 var sccount = 0;                         // number of actionpackets processed at connection loss
 var scfetches = Object.create(null);     // holds pending nodes to be retrieved from fmdb
+var scfsubtree = Object.create(null);    // fetch entire subtree as needed by some action-packets
 var scwaitnodes = Object.create(null);   // supplements scfetches per scqi index
 var nodesinflight = Object.create(null); // number of nodes being processed in the worker for scqi
 var sc_history = [];                     // array holding the history of action-packets
+var nodes_scqi_order = 0;                // variable to count the node arrival order before sending to workers
 
 // enqueue nodes needed to process packets
 function sc_fqueue(handle, packet) {
     "use strict";
 
-    if (handle && !M.c[handle]) {
+    if (handle && (!M.c[handle] || scfsubtree[handle])) {
         if (scwaitnodes[packet.scqi]) {
             scwaitnodes[packet.scqi]++;
         }
@@ -222,7 +225,9 @@ function sc_fetcher() {
 
     var queue   = scfetches;
     var handles = Object.keys(queue);
+    var fsubtree = scfsubtree;
     scfetches = Object.create(null);
+    scfsubtree = Object.create(null);
 
     if (!handles.length) {
         return onIdle(resumesc);
@@ -263,21 +268,29 @@ function sc_fetcher() {
 
             dbfetch.geta(bunch, new MegaPromise())
                 .always(function() {
-                    // Retrieve all file versions, if any, and then finish the bunch processing
-                    // FIXME: this is only needed for (redundant!) `d` packets...
-                    var versions = Object.create(null);
+                    // Retrieve all needed subtrees and file versions if any, and then finish the batch processing
+                    var subtree = Object.create(null);
 
                     for (var i = bunch.length; i--;) {
                         var h = bunch[i];
 
-                        if (M.d[h] && !M.d[h].t && M.d[h].tf) {
-                            versions[h] = 1;
+                        if (M.d[h]) {
+                            if (M.d[h].t) {
+                                if (fsubtree[h]) {
+                                    // entire subtree
+                                    subtree[h] = 1;
+                                }
+                            }
+                            else if (M.d[h].tvf) {
+                                // file versions
+                                subtree[h] = 1;
+                            }
                         }
                     }
-                    versions = Object.keys(versions);
+                    subtree = Object.keys(subtree);
 
-                    if (versions.length) {
-                        dbfetch.tree(versions, -1, new MegaPromise()).always(finish);
+                    if (subtree.length) {
+                        dbfetch.tree(subtree, -1, new MegaPromise()).always(finish);
                     }
                     else {
                         finish();
@@ -285,6 +298,26 @@ function sc_fetcher() {
                 });
         }
     })();
+}
+
+/**
+ * function to start fetching nodes needed for the action packets
+ * @param {Number} scni         id of action packe in scq
+ */
+function startNodesFetching(scni) {
+    "use strict";
+    if (!--nodesinflight[scni]) {
+        delete nodesinflight[scni];
+
+        if (scloadtnodes && scq[scni][0] && sc_fqueuet(scni)) {
+            // fetch required nodes from db
+            sc_fetcher();
+        }
+        else {
+            // resume processing, if appropriate and needed
+            resumesc();
+        }
+    }
 }
 
 // enqueue parsed actionpacket
@@ -311,11 +344,13 @@ function sc_packet(a) {
         scloadtnodes = true;
 
         switch (a.a) {
+            case 'd':
+                scfsubtree[a.n] = 1;
+            /* falls through */
             case 's':
             case 's2':
             case 'fa':
             case 'u':
-            case 'd':
                 sc_fqueue(a.n, a);
             /* fall-through */
             case 'ph':
@@ -388,6 +423,10 @@ function sc_packet(a) {
         }
     }
 
+    if (a.a === 't') {
+        startNodesFetching(scqhead);
+    }
+
     // other packet types do not warrant the worker detour
     if (scq[scqhead]) scq[scqhead++][0] = a;
     else scq[scqhead++] = [a, []];
@@ -455,10 +494,16 @@ function sc_node(n) {
         p = scqhead % workers.length;
     }
 
-    if (nodesinflight[scqhead]) nodesinflight[scqhead]++;
-    else nodesinflight[scqhead] = 1;
+    if (nodesinflight[scqhead]) {
+        nodesinflight[scqhead]++;
+    }
+    else {
+        nodesinflight[scqhead] = 2;
+        nodes_scqi_order = 0; // reset the order var
+    }
 
     n.scni = scqhead;       // set scq slot number (sc_packet() call will follow)
+    n.arrivalOrder = nodes_scqi_order++; // storing arrival order
     workers[p].postMessage(n);
 }
 
@@ -559,6 +604,17 @@ scparser.$add('s', {
             // if access right are undefined, then share is deleted
             if (typeof a.r === 'undefined') {
                 M.delNodeShare(a.n, a.u, a.okd);
+                if (!folderlink && a.u !== 'EXP' && fminitialized) {
+                    if (a.ou !== u_handle) {
+                        notify.notifyFromActionPacket({
+                            a: 'dshare',
+                            n: a.n,
+                            u: a.o,
+                            orig: a.ou,
+                            rece: a.u
+                        });
+                    }
+                }
             }
             else {
                 var handle = a.n;
@@ -658,11 +714,15 @@ scparser.$add('s', {
                     }
 
                     if (!folderlink && a.u !== 'EXP' && fminitialized) {
-                        notify.notifyFromActionPacket({
-                            a: 'dshare',
-                            n: a.n,
-                            u: a.o
-                        });
+                        if (a.ou !== u_handle) {
+                            notify.notifyFromActionPacket({
+                                a: 'dshare',
+                                n: a.n,
+                                u: a.o,
+                                orig: a.ou,
+                                rece: a.u
+                            });
+                        }
                     }
                 }
                 else {
@@ -832,6 +892,7 @@ scparser.$add('t', function(a, scnodes) {
         if (scnodes[i]) {
             delete scnodes[i].i;
             delete scnodes[i].scni;
+            delete scnodes[i].arrivalOrder;
             M.addNode(scnodes[i]);
             ufsc.feednode(scnodes[i]);
         }
@@ -862,8 +923,7 @@ scparser.$add('opc', {
         // outgoing pending contact
         processOPC([a]);
 
-        // don't append to sent grid on deletion
-        if (!a.dts) {
+        if (fminitialized) {
             M.drawSentContactRequests([a]);
         }
     }
@@ -982,6 +1042,19 @@ scparser.$add('ua', {
     }
 });
 
+scparser.$add('sd', {
+    b: function() {
+        "use strict";
+
+        if (fminitialized && page === 'fm/account/history') {
+            // need to wait until session history is refreshed.
+            setTimeout(function() {
+                accountUI.updateSessionTable(true);
+            }, 3000);
+        }
+    }
+});
+
 scparser.$add('e', function(a) {
     // CMS update
     var str = hex2bin(a.c || "");
@@ -1086,7 +1159,7 @@ scparser.$add('u', function(a) {
                         M.favouriteDomUpdate(n, n.fav);
                     }
                     if (n.lbl !== oldlbl) {
-                        M.colourLabelDomUpdate(n.h, n.lbl);
+                        M.labelDomUpdate(n.h, n.lbl);
                     }
                 }
             }
@@ -1113,8 +1186,8 @@ scparser.$add('d', function(a) {
     if (!pfid) {
         scparser.$notify(a);
 
-        if (u_type) {
-            M.checkStorageQuota();
+        if (fminitialized && u_type) {
+            M.checkStorageQuota(ulmanager.ulOverStorageQuota ? 2000 : 0);
         }
     }
     if (!is_mobile) {
@@ -1139,11 +1212,33 @@ scparser.$add('usc', function() {
     fm_forcerefresh();
 });
 
+// Payment received
 scparser.$add('psts', function(a) {
     if (!pfid && u_type) {
         M.checkStorageQuota(2000);
     }
     pro.processPaymentReceived(a);
+
+    if (ulmanager.ulOverStorageQuota) {
+        eventlog(99701);
+        onIdle(function() {
+            ulmanager.ulResumeOverStorageQuotaState();
+        });
+    }
+
+    onIdle(function() {
+        dlmanager._onOverQuotaAttemptRetry();
+    });
+
+    onIdle(function() {
+        watchdog.notify('psts', (a.r === 's' && a.p) | 0);
+    });
+});
+
+// Payment reminder
+scparser.$add('pses', function(a) {
+    'use strict';
+    notify.notifyFromActionPacket(a);
 });
 
 scparser.$add('mcc', function(a) {
@@ -1166,6 +1261,23 @@ scparser.$add('mcc', function(a) {
         delete a.a;
         fmdb.add('mcf', {id: a.id, d: a});
     }
+});
+
+// MEGAchat archive/unarchive
+scparser.$add('mcfc', function(a) {
+    'use strict';
+
+    if (window.megaChatIsReady) {
+        var room = megaChat.getChatById(a.id);
+        if (room) {
+            return room.updateFlags(a.f, true);
+        }
+    }
+
+    if (!loadfm.chatmcfc) {
+        loadfm.chatmcfc = {};
+    }
+    loadfm.chatmcfc[a.id] = a.f;
 });
 
 scparser.$add('_sn', function(a) {
@@ -1754,21 +1866,16 @@ function worker_procmsg(ev) {
 
         if (ev.data.scni >= 0) {
             // enqueue processed node
-            if (scq[ev.data.scni]) scq[ev.data.scni][1].push(ev.data);
-            else scq[ev.data.scni] = [null, [ev.data]];
-
-            if (!--nodesinflight[ev.data.scni]) {
-                delete nodesinflight[ev.data.scni];
-
-                if (scloadtnodes && scq[ev.data.scni][0] && sc_fqueuet(ev.data.scni)) {
-                    // fetch required nodes from db
-                    sc_fetcher();
-                }
-                else {
-                    // resume processing, if appropriate and needed
-                    resumesc();
-                }
+            if (scq[ev.data.scni]) {
+                scq[ev.data.scni][1][ev.data.arrivalOrder] = ev.data;
             }
+            else {
+                var initArray = [];
+                initArray[ev.data.arrivalOrder] = ev.data;
+                scq[ev.data.scni] = [null, initArray];
+            }
+
+            startNodesFetching(ev.data.scni);
         }
         else {
             // maintain special incoming shares index
@@ -1785,6 +1892,7 @@ function worker_procmsg(ev) {
                     h : ev.data.h,
                     p : ev.data.p,
                     s : ev.data.s >= 0 ? ev.data.s : -ev.data.t,
+                    t : ev.data.t ? 1262304e3 - ev.data.ts : ev.data.ts,
                     c : ev.data.hash || '',
                     d : ev.data
                 });
@@ -1877,7 +1985,7 @@ function loadfm(force) {
             else {
                 fmdb = FMDB(u_handle, {
                     // channel 0: transactional by _sn update
-                    f      : '&h, p, s, c',    // nodes - handle, parent, size (negative size: type), checksum
+                    f      : '&h, p, s, c, t', // nodes - handle, parent, size (negative size: type), checksum
                     s      : '&o_t',           // shares - origin/target; both incoming & outgoing
                     ok     : '&h',             // ownerkeys for outgoing shares - handle
                     mk     : '&h',             // missing node keys - handle
@@ -2489,9 +2597,14 @@ function processIPC(ipc, ignoreDB) {
                 $('#ipc_' + ipc[i].p).remove();
                 delete M.ipc[ipc[i].p];
                 if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
+                    updateIpcRequests();
                     $('.contact-requests-grid').addClass('hidden');
                     $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                     $('.fm-empty-contacts').removeClass('hidden');
+                    $('.button.link-button.accept-all').addClass('hidden');
+                }
+                else if (Object.keys(M.ipc).length) {
+                    updateIpcRequests();
                 }
 
                 // Update token.input plugin
@@ -2522,6 +2635,7 @@ function processOPC(opc, ignoreDB) {
         M.addOPC(opc[i], ignoreDB);
         if (opc[i].dts) {
             M.delOPC(opc[i].p);
+            $('#opc_' + opc[i].p).remove();
 
             // Update tokenInput plugin
             removeFromMultiInputDDL('.share-multiple-input', {id: opc[i].m, name: opc[i].m});
@@ -2717,9 +2831,19 @@ function processUPCI(ap) {
             M.delIPC(ap[i].p);// Remove from localStorage
             $('#ipc_' + ap[i].p).remove();
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
+                updateIpcRequests();
                 $('.contact-requests-grid').addClass('hidden');
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
+                $('.button.link-button.accept-all').addClass('hidden');
                 $('.fm-empty-contacts').removeClass('hidden');
+                $('.contacts-tab-lnk.ipc').removeClass('filled').find('span').text('');
+            }
+            else if (M.currentdirid === 'ipc') {
+                $('.contacts-tab-lnk.ipc').addClass('filled').find('span').text(Object.keys(M.ipc).length);
+                $('.button.link-button.accept-all').removeClass('hidden');
+            }
+            else if (M.currentdirid === 'ipc') {
+                updateIpcRequests();
             }
         }
     }
@@ -2849,6 +2973,16 @@ function processMCF(mcfResponse, ignoreDB) {
             if (chatRoomInfo.active === 0) {
                 // skip non active chats for now...
                 return;
+            }
+
+            if (chatRoomInfo.n) {
+                for (var i = 0; i < chatRoomInfo.n.length; i++) {
+                    var member = chatRoomInfo.n[i];
+                    // was removed from the chat.
+                    if (member.u === u_handle && member.p === -1) {
+                        return;
+                    }
+                }
             }
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });
@@ -2982,11 +3116,23 @@ function loadfm_callback(res) {
     if (res.mcf) {
         // save the response to be processed later once chat files were loaded
         loadfm.chatmcf = res.mcf.c || res.mcf;
+        // cf will include the flags (like whether it is archived) and chatid,
+        // so it needs to combine it before processing it.
+        if (res.mcf.cf) {
+            for (var i = 0; i < res.mcf.cf.length; i++) {
+                loadfm.chatmcf[i].f = res.mcf.cf[i].f;
+            }
+        }
         // ensure the response is saved in fmdb, even if the chat is disabled or not loaded yet
         processMCF(loadfm.chatmcf);
     }
     M.avatars();
     loadfm.fromapi = true;
+
+    if (localStorage['treefixup$' + u_handle]) {
+        // We found inconsistent tree nodes and forced a reload, log it.
+        eventlog(99695);
+    }
 
     process_f(res.f, function onLoadFMDone(hasMissingKeys) {
 
@@ -3041,11 +3187,6 @@ function loadfm_callback(res) {
         // decrypt hitherto undecrypted nodes
         crypto_fixmissingkeys(missingkeys);
 
-        // commit transaction and set sn
-        setsn(res.sn);
-        currsn = res.sn;
-        mega.fcv_fsn = res.sn;
-
         if (res.cr) {
             crypto_procmcr(res.cr);
         }
@@ -3060,7 +3201,14 @@ function loadfm_callback(res) {
 
         // Time to save the ufs-size-cache, from which M.tree nodes will be created and being
         // those dependant on in-memory-nodes from the initial load to set flags such SHARED.
-        ufsc.save();
+        console.assert(ufsc, 'check this...');
+        if (ufsc) {
+            ufsc.save();
+        }
+
+        // commit transaction and set sn
+        setsn(res.sn);
+        currsn = res.sn;
 
         // retrieve initial batch of action packets, if any
         // we'll then complete the process using loadfm_done
@@ -3096,11 +3244,38 @@ function loadfm_done(mDBload) {
 
     if (!pfid && u_type == 3) {
 
+        // Ensure tree nodes consistency...
+        var tlen = Object.keys(M.tree[M.RootID] || {}).length;
+        var clen = Object.keys(M.c[M.RootID] || {}).filter(function(h) { return M.c[M.RootID][h] > 1 }).length;
+
+        if (tlen < clen) {
+            if (localStorage['treefixup$' + u_handle]) {
+                // The force reload attempt did not helped on getting tree nodes consistency back (?!)
+                eventlog(99696);
+            }
+            else if ((Date.now() - parseInt(localStorage['treeic$' + u_handle] || 0)) < 864e6) {
+                // The user suffered again from inconsistent tree nodes within the
+                // last 10 days, we are not force reloading his account on this case.
+                eventlog(99697);
+            }
+            else {
+                // Force reload the account to get tree nodes consistency back...
+                localStorage['treeic$' + u_handle] = Date.now();
+                localStorage['treefixup$' + u_handle] = 1;
+                return fm_forcerefresh();
+            }
+        }
+        delete localStorage['treefixup$' + u_handle];
+
         // load/initialise the authentication system
         mega.config.fetch()
             .always(function() {
                 authring.initAuthenticationSystem();
             });
+    }
+    else if (pfid && u_type == 3) {
+        // logged in user opening a folder link
+        mega.config.fetch();
     }
 
     // This function is invoked once the M.openFolder()'s promise (through renderfm()) is fulfilled.
@@ -3249,7 +3424,23 @@ function loadfm_done(mDBload) {
     };
 
     mega.config.ready(function() {
-        mclp.then(_onConfigReady).catch(_onConfigReady);
+        mclp.then(_onConfigReady)
+            .catch(function() {
+                try {
+                    _onConfigReady();
+                }
+                catch (ex) {
+                    onIdle(function() {
+                        // give time for window.onerror to fire 'cd2' before showing the blocking confirm-dialog
+                        setTimeout(function() {
+                            siteLoadError(ex, 'loadfm');
+                        }, 2e3);
+
+                        // reach window.onerror
+                        throw ex;
+                    });
+                }
+            });
     });
 }
 
@@ -3313,18 +3504,20 @@ var fa_reqcnt = 0;
 var fa_addcnt = 8;
 var fa_tnwait = 0;
 
-function fm_thumbnails()
+function fm_thumbnails(mode, nodeList, callback)
 {
     var treq = {}, a = 0, max = Math.max($.rmItemsInView || 1, 71) + fa_addcnt, u = max - Math.floor(max / 3), y;
     if (!fa_reqcnt)
         fa_tnwait = y;
     if (d)
         console.time('fm_thumbnails');
-    if (M.viewmode || M.chat)
+
+    nodeList = (mode === 'standalone' ? nodeList : false) || M.v;
+
+    if ((M.viewmode && !M.chat) || mode === 'standalone')
     {
-        for (var i in M.v)
-        {
-            var n = M.v[i];
+        for (var i = 0; i < nodeList.length; i++) {
+            var n = nodeList[i];
             if (n && !missingkeys[n.h] && n.fa && String(n.fa).indexOf(':0') > 0)
             {
                 if (fa_tnwait == n.h && n.seen)
@@ -3370,6 +3563,9 @@ function fm_thumbnails()
             var cdid = M.currentdirid;
             api_getfileattr(treq, 0, function(ctx, node, uint8arr)
             {
+                if (mode === 'standalone' && typeof callback === 'function') {
+                    onIdle(callback.bind(null, node));
+                }
                 if (uint8arr === 0xDEAD)
                 {
                     if (d)
@@ -3400,13 +3596,18 @@ function fm_thumbnails()
                 // deduplicate in view when there is a duplicate fa:
                 if (targetNode && fa_duplicates[targetNode.fa] > 0)
                 {
-                    for (var i in M.v)
+                    for (var i = 0; i < nodeList.length; i++)
                     {
-                        if (M.v[i].h !== node && M.v[i].fa === targetNode.fa && !thumbnails[M.v[i].h])
+                        var n = nodeList[i];
+                        if (n.h !== node && n.fa === targetNode.fa && !thumbnails[n.h])
                         {
-                            thumbnails[M.v[i].h] = thumbnails[node];
-                            if (M.v[i].seen && M.currentdirid === cdid)
-                                fm_thumbnail_render(M.v[i]);
+                            thumbnails[n.h] = thumbnails[node];
+                            if (n.seen && M.currentdirid === cdid)  {
+                                fm_thumbnail_render(n);
+                            }
+                            if (mode === 'standalone' && typeof callback === 'function') {
+                                onIdle(callback.bind(null, n.h));
+                            }
                         }
                     }
                 }
@@ -3433,11 +3634,13 @@ function fm_thumbnail_render(n) {
 mBroadcaster.once('boot_done', function() {
     "use strict";
 
-    if (
-        ua.details.browser === "Safari" ||
-        ua.details.browser === "Edge" ||
-        ua.details.browser === "Internet Explorer"
-    ) {
+    var uad = ua.details || false;
+    var browser = String(uad.browser || '');
+
+    if (!browser || browser === "Safari" || /edge|explorer/i.test(browser)) {
+        if (d) {
+            console.info('Disabling paste proxy on this browser...', browser, [uad]);
+        }
         return;
     }
 
@@ -3445,18 +3648,6 @@ mBroadcaster.once('boot_done', function() {
     // This is basically a proxy of on paste, that would trigger a new event, which would receive the actual
     // File object, name, etc.
     $(document).on('paste', function(event) {
-        if (ua.details.browser === "Safari") {
-            // Safari is not supported
-            return;
-        }
-        else if (
-            ua.details.browser.toLowerCase().indexOf("explorer") !== -1 ||
-            ua.details.browser.toLowerCase().indexOf("edge") !== -1
-        ) {
-            // IE is not supported
-            return;
-        }
-
         var items = (event.clipboardData || event.originalEvent.clipboardData).items;
         if (!items && event.originalEvent.clipboardData && event.originalEvent.clipboardData.files) {
             // safari

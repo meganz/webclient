@@ -18,7 +18,7 @@
             'fbDlgName': 'resetsuccessst3',
             'passwordInputId': '#reset_success_st2_pass',
             'inputWrapperClass': '.fm-account-input',
-            'tOut': 1000,
+            'tOut': 3000,
             'fbDlgClass': '.reset-success-st3',
             'feedbackText': '',
             'fbType': 'accClosureUserFeedback'
@@ -28,87 +28,41 @@
     };
 
     AccountClosure.prototype._initAccountClosure = function(_accountClosureCallback, obj) {
-        $(obj.opt.passwordInputId).val('');
+
+        $('body').removeClass('overlayed');
         $('.fm-dialog').removeClass('error active');
-        $('.fm-dialog-overlay').removeClass('hidden');
-        $('body').addClass('overlayed');
-        $('.fm-dialog' + obj.opt.dialogClass)
-            .removeClass('hidden')
-            .addClass('active');
-        $(obj.opt.passwordInputId).focus();
         $('.fm-dialog' + obj.opt.fbDlgClass)
             .addClass('hidden')
             .removeClass('active');
 
-        $.dialog = obj.opt.dlgName;
+        // Get the email cancel code
+        obj.opt.code = page.replace(obj.opt.prefix, '');
 
-        // Close account, password confimation dialog
-        $(obj.opt.dialogClass + ' .close-account').rebind('click', function(e) {
-
-            loadingDialog.show();
-
-            obj.opt.code = page.replace(obj.opt.prefix, '');
-
-            // Check is entered password correct
-            postLogin(u_attr.email, $(obj.opt.passwordInputId).val(), false, function(r) {
-
-                loadingDialog.hide();
-
-                if (r) {// Password is matched
-                    if (_accountClosureCallback) {
-                        _accountClosureCallback(obj.opt.code, obj.opt.email, obj.opt.secret.toString());
-                    }
-                }
-                else {// Password is wrong
-                    $(obj.opt.passwordInputId).val('');
-                    $('.fm-dialog').addClass('error');
-                    setTimeout(function() {
-                        $('.fm-dialog').removeClass('error');
-                    }, obj.opt.tOut);
-                    $(obj.opt.passwordInputId).focus();
-                }
-            });
-        });
-
-        // Cancel button listener
-        $(obj.opt.dialogClass + ' .cancel').rebind('click', function() {
-            loadingDialog.hide();
-            loadSubPage('fm/account');
-        });
-
-        // Keyboard button listener <Enter key> or  <Esc>
-        $(obj.opt.passwordInputId).rebind('keypress.st2_kp', function(e) {
-
-            var key = e.wich || e.keyCode;
-
-            // Return/Enter
-            if (key === 13) {
-                $(obj.opt.dialogClass + ' .close-account').click();
-            }
-
-            // Esc
-            if (key === 27) {
-                $(obj.opt.dialogClass + ' .cancel').click();
-            }
-        });
+        _accountClosureCallback(obj.opt.code, u_attr.email, obj.opt.secret.toString());
     };
 
     /**
-     * _accountClosure, closes account
+     * Closes the user's account
      *
-     * @param {string} url code
-     * @param {string} email
-     * @param {string} hash
+     * @param {String} code Email confirm code
+     * @param {String} email The user's email address
+     * @param {String} password The user's password
      *
      */
-    AccountClosure.prototype._accountClosure = function(code, email, hash) {
+    AccountClosure.prototype._accountClosure = function(code, email, password) {
+
         localStorage.beingAccountCancellation = 1;
 
-        api_resetuser({callback: function(code) {
+        loadingDialog.show();
+
+        // Park the current account, then create a new account with a random password
+        security.resetUser(code, email, password, function(code) {
+
             closeDialog();
             $('.reset-success-st2')
                 .removeClass('active')
                 .addClass('hidden');
+
             loadingDialog.hide();
 
             if (code === 0) {
@@ -123,7 +77,7 @@
                     loadSubPage('fm/account');
                 });
             }
-        }}, code, email, hash);
+        });
     };
 
     /**

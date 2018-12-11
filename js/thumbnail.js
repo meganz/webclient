@@ -1,3 +1,5 @@
+/* jshint -W003 */// 'noThumbURI' was used before it was defined.
+
 function createnodethumbnail(node, aes, id, imagedata, opt, ph, file) {
     storedattr[id] = Object.assign(Object.create(null), {'$ph': ph, target: node});
     createthumbnail(file || false, aes, id, imagedata, node, opt);
@@ -21,6 +23,11 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     var isRawImage;
     var thumbHandler;
     var onPreviewRetry;
+
+    if (window.omitthumb) {
+        console.warn('Omitting thumb creation on purpose...', arguments);
+        return;
+    }
 
     if (typeof opt === 'object') {
         isRawImage = opt.raw;
@@ -76,7 +83,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var imageType = 'image/jpeg';
         var canStoreAttr = !n || !n.u || (n.u === u_handle && n.f !== u_handle);
 
-        if (img.isPNG) {
+        if (img.doesSupportAlpha) {
             var transparent;
 
             canvas = document.createElement('canvas');
@@ -127,6 +134,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 }
             }
             else {
+                imageType = 'image/png';
+
                 ctx.drawImage(this,
                     (options.width / 2) - (this.naturalWidth / 2),
                     (options.height / 2) - (this.naturalHeight / 2));
@@ -139,6 +148,12 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             if (len < 0) {
                 console.warn('All pixels are black, aborting thumbnail creation...', ab.byteLength);
                 return img.onerror('Unsupported image type/format.');
+            }
+            len = ab.byteLength;
+            while (len-- && ab[len] === 0xff) {}
+            if (len < 0) {
+                console.warn('All pixels are white, aborting thumbnail creation...', ab.byteLength);
+                return img.onerror('...potentially tainted canvas');
             }
 
             dataURI = canvas.toDataURL(imageType, 0.80);
@@ -218,6 +233,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var loader = function() {
             var ThumbFR = new FileReader();
             ThumbFR.onload = function(e) {
+                var thumbData;
                 var orientation;
                 var u8 = new Uint8Array(ThumbFR.result);
 
@@ -243,13 +259,18 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                         if (ab) {
                             __render_thumb(img, ab);
                         }
+                        else {
+                            if (d) {
+                                console.debug('%s failed to process the resource...', thumbHandler.name);
+                            }
+                            img.src = 'data:text/xml,decoderror';
+                        }
                     });
                 }
 
                 if (isRawImage) {
-                    var FS = dcraw.FS,
-                        run = dcraw.run,
-                        thumbData;
+                    var FS = dcraw.FS;
+                    var run = dcraw.run;
                     var filename = file.name || (Math.random() * Date.now()).toString(36) + '.' + isRawImage;
 
                     try {
@@ -331,7 +352,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     }
 
                     if (thumbData) {
-                        file = new Blob([thumbData], {type: 'image/jpg'});
                         api_req({a: 'log', e: 99663, m: 'RAW image processed.'});
                     }
                     else {
@@ -362,7 +382,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     }
                 }
 
-                __render_thumb(img, u8, orientation, file, isRawImage);
+                __render_thumb(img, thumbData || u8, orientation, isRawImage);
                 file = imagedata = undefined;
             };
             if (!file) {
@@ -370,6 +390,11 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 var curMime = MediaInfoLib.isFileSupported(node) ? defMime : filemime(M.d[node], defMime);
                 file = new Blob([new Uint8Array(imagedata)], {type: curMime});
                 M.neuterArrayBuffer(imagedata);
+            }
+            if (mega.chrome && file.size > 6e8) {
+                console.warn('Aborting thumbnail creation due https://crbug.com/536816 ...');
+                img.src = 'data:text/xml,overflow';
+                return;
             }
             ThumbFR.readAsArrayBuffer(file);
         };
@@ -391,7 +416,14 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
         else if (isVideo && file) {
             M.require('videostream').tryCatch(function() {
-                Streamer.getThumbnail(file).then(__render_thumb.bind(null, img)).catch(console.debug.bind(console));
+                Streamer.getThumbnail(file)
+                    .then(__render_thumb.bind(null, img))
+                    .catch(function(ex) {
+                        if (d) {
+                            console.warn('Aborting thumbnail creation for video file...', ex);
+                        }
+                        img.src = 'data:text/xml,streamerror';
+                    });
             });
         }
         else {
@@ -400,7 +432,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     }
 }
 
-function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
+function __render_thumb(img, u8, orientation, noMagicNumCheck) {
     'use strict';
 
     if (u8 && !noMagicNumCheck) {
@@ -418,10 +450,14 @@ function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
                 if (dv.byteLength > 24 && dv.getUint32(20) === 0x68656963) { // HEIC
                     break;
                 }
+                if (dv.byteLength > 12 && dv.getUint32(8) === 0x57454250) { // WEBP
+                    img.doesSupportAlpha = true;
+                    break;
+                }
                 switch (dv.getUint32(0)) {
                     case 0x89504e47: // PNG
-                        img.isPNG = true;
-                    /* fallthrough */
+                        img.doesSupportAlpha = true;
+                        break;
                     case 0x47494638: // GIF8
                     case 0x47494639: // GIF9
                         break;
@@ -449,30 +485,128 @@ function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
             }
             exif = undefined;
         }
-        if (!blob) {
-            blob = new Blob([u8], {
-                type: 'image/jpg'
-            });
-        }
-        M.neuterArrayBuffer(u8);
     }
 
-    if (!u8 || (img.huge && img.dataSize === blob.size)) {
+    if (!u8 || (img.huge && img.dataSize === u8.byteLength)) {
         if (d) {
             console.warn('Unable to generate thumbnail...');
         }
         img.src = noThumbURI;
     }
     else {
-        var mpImg = new MegaPixImage(blob);
-        mpImg.render(img, {
-            maxWidth: 1000,
-            maxHeight: 1000,
-            quality: 0.96,
-            imageType: 'image/png',
-            orientation: orientation
-        });
+        exifImageRotation(img, u8, orientation);
     }
+}
+
+/**
+ * Rotate images as per the extracted EXIF orientation
+ * @param {Image|Object} target Image element where to render the result
+ * @param {ArrayBuffer} buffer The image file data
+ * @param {Number} orientation The EXIF rotation value
+ */
+function exifImageRotation(target, buffer, orientation) {
+    'use strict';
+    var blobURI = mObjectURL([buffer], 'image/jpeg');
+
+    orientation |= 0;
+    if (orientation < 2) {
+        // No rotation needed.
+        target.src = blobURI;
+    }
+    else {
+        var signalError = function() {
+            // let the target reach its onerror...
+            target.src = 'data:text/xml,error';
+        };
+
+        var img = new Image();
+        img.onload = tryCatch(function() {
+            var width = this.naturalWidth;
+            var height = this.naturalHeight;
+
+            if (!width || !height) {
+                if (d) {
+                    console.error('exifImageRotation found invalid width/height values...', width, height);
+                }
+
+                return signalError();
+            }
+
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+
+            ctx.save();
+            switch (orientation) {
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                    canvas.width = height;
+                    canvas.height = width;
+                    break;
+                default:
+                    canvas.width = width;
+                    canvas.height = height;
+            }
+
+            switch (orientation) {
+                case 2:
+                    // horizontal flip
+                    ctx.translate(width, 0);
+                    ctx.scale(-1, 1);
+                    break;
+                case 3:
+                    // 180 rotate left
+                    ctx.translate(width, height);
+                    ctx.rotate(Math.PI);
+                    break;
+                case 4:
+                    // vertical flip
+                    ctx.translate(0, height);
+                    ctx.scale(1, -1);
+                    break;
+                case 5:
+                    // vertical flip + 90 rotate right
+                    ctx.rotate(0.5 * Math.PI);
+                    ctx.scale(1, -1);
+                    break;
+                case 6:
+                    // 90 rotate right
+                    ctx.rotate(0.5 * Math.PI);
+                    ctx.translate(0, -height);
+                    break;
+                case 7:
+                    // horizontal flip + 90 rotate right
+                    ctx.rotate(0.5 * Math.PI);
+                    ctx.translate(width, -height);
+                    ctx.scale(-1, 1);
+                    break;
+                case 8:
+                    // 90 rotate left
+                    ctx.rotate(-0.5 * Math.PI);
+                    ctx.translate(-width, 0);
+                    break;
+                default:
+                    break;
+            }
+
+            ctx.drawImage(img, 0, 0);
+            ctx.restore();
+            target.src = canvas.toDataURL();
+
+        }, img.onerror = function(ev) {
+            if (d) {
+                console.error('exifImageRotation failed...', ev);
+            }
+            signalError();
+        });
+        img.src = blobURI;
+    }
+
+    setTimeout(function() {
+        URL.revokeObjectURL(blobURI);
+        M.neuterArrayBuffer(buffer);
+    }, 1e4);
 }
 
 function ppmtojpeg(ppm) {
@@ -633,22 +767,15 @@ function benchmarkireq() {
 }
 
 // Do not change this to a remote URL since it'll cause a CORS issue (tainted canvas)
-var noThumbURI = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXR' +
-'mLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxOS4wLjAsIFNWRyBFeHBvcnQgUG' +
-'x1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0' +
-'i0KHQu9C+0LlfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0ia' +
-'HR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiDQoJIHdpZHRoPSIyNDBweCI' +
-'gaGVpZ2h0PSIyNDBweCIgdmlld0JveD0iLTE4NSAyNzcgMjQwIDI0MCIgc3R5bGU9ImVuYWJsZS' +
-'1iYWNrZ3JvdW5kOm5ldyAtMTg1IDI3NyAyNDAgMjQwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+D' +
-'Qo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7b3BhY2l0eTowLjE4O30NCjwvc3R5bGU+' +
-'DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNLTY1LDQwOWM2LjYsMCwxMi01LjQsMTItMTJjMC0yLjM' +
-'tMC42LTQuNC0xLjgtNi4ybC0xNi41LDE2LjVDLTY5LjQsNDA4LjMtNjcuMyw0MDktNjUsNDA5ei' +
-'BNLTg2LjcsNDE0LjcNCgljLTMuOS00LjgtNi4zLTExLTYuMy0xNy43YzAtMTUuNSwxMi41LTI4L' +
-'DI4LTI4YzYuNywwLDEyLjksMi40LDE3LjcsNi4zbDEwLjUtMTAuNUMtNDUsMzYwLjItNTQuNCwz' +
-'NTctNjUsMzU3DQoJYy0zMiwwLTUyLjQsMjguNi02NCw0MGM3LDYuOCwxNy4xLDE5LjgsMzAuOSw' +
-'yOS4xTC04Ni43LDQxNC43eiBNLTMxLjksMzY3LjlsLTExLjQsMTEuNGMzLjksNC44LDYuMywxMS' +
-'w2LjMsMTcuNw0KCWMwLDE1LjUtMTIuNSwyOC0yOCwyOGMtNi43LDAtMTIuOS0yLjQtMTcuNy02L' +
-'jNsLTEwLjUsMTAuNWM4LjIsNC42LDE3LjUsNy44LDI4LjIsNy44YzMyLDAsNTIuNC0yOC42LDY0' +
-'LTQwDQoJQy04LDM5MC4yLTE4LjEsMzc3LjItMzEuOSwzNjcuOUwtMzEuOSwzNjcuOXogTS02NSw' +
-'zODVjLTYuNiwwLTEyLDUuNC0xMiwxMmMwLDIuMywwLjcsNC40LDEuOCw2LjJsMTYuNS0xNi41DQ' +
-'oJQy02MC42LDM4NS43LTYyLjcsMzg1LTY1LDM4NXoiLz4NCjwvc3ZnPg0K';
+// Neither change it to base64, just a URL-encoded Data URI
+var noThumbURI =
+    'data:image/svg+xml;charset-utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22240' +
+    'pt%22%20height%3D%22240pt%22%20viewBox%3D%220%200%20240%20240%22%3E%3Cpath%20fill%3D%22rgb(80%25,79.607843%25' +
+    ',79.607843%25)%22%20fill-rule%3D%22evenodd%22%20d%3D%22M120%20132c6.63%200%2012-5.37%2012-12%200-2.3-.65-4.42' +
+    '-1.76-6.24l-16.48%2016.48c1.82%201.1%203.95%201.76%206.24%201.76zm-21.7%205.7c-3.93-4.83-6.3-11-6.3-17.7%200-' +
+    '15.47%2012.54-28%2028-28%206.7%200%2012.87%202.37%2017.7%206.3l10.48-10.48C140%2083.18%20130.65%2080%20120%20' +
+    '80c-32%200-52.37%2028.57-64%2040%206.96%206.84%2017.05%2019.8%2030.88%2029.13zm54.83-46.82L141.7%20102.3c3.93' +
+    '%204.83%206.3%2011%206.3%2017.7%200%2015.47-12.54%2028-28%2028-6.7%200-12.87-2.37-17.7-6.3l-10.48%2010.48C100' +
+    '%20156.82%20109.35%20160%20120%20160c32%200%2052.37-28.57%2064-40-6.96-6.84-17.05-19.8-30.88-29.13zM120%20108' +
+    'c-6.63%200-12%205.37-12%2012%200%202.3.65%204.42%201.76%206.24l16.48-16.48c-1.82-1.1-3.95-1.76-6.24-1.76zm0%2' +
+    '00%22%2F%3E%3C%2Fsvg%3E';

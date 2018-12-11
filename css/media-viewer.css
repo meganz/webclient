@@ -59,7 +59,6 @@
     color: white;
     font-size: 16px;
     line-height: 24px;
-    text-align: center;
     width: -webkit-calc(50% - 120px);
     width: -moz-calc(50% - 120px);
     width: calc(50% - 120px);
@@ -69,6 +68,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-align: left;
+    z-index: 1;
 }
 .viewer-button {
     margin: 10px;
@@ -227,7 +227,7 @@
     height: 28px;
     display: inline-block;
     vertical-align: top;
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     background-position: 2px -1393px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
@@ -697,4 +697,27 @@
 .exif-rotation-8 {
     transform-origin: top right;
     transform: translateX(-100%) rotate(270deg);
+}
+.security-page-video-block .download.video-block {
+    margin: 0 auto;
+    height: 360px;
+    position: relative;
+    display: block;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.security-page-video-block {
+    max-width: 640px;
+    position: relative;
+    display: block;
+    margin: 48px auto 32px;
+    background-color: #fff;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 0 0;
+    height: 367px;
+    border: 8px solid #fff;
+     -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }

@@ -29,6 +29,9 @@ MegaData.prototype.renderMain = function(aUpdate) {
     // cleanupLayout will render an "empty grid" layout if there
     // are no nodes in the current list (Ie, M.v), if so no need
     // to call renderLayout therefore.
+    if (M.previousdirid && M.previousdirid === "recents" && M.recentsRender) {
+        M.recentsRender.cleanup();
+    }
     if (this.megaRender.cleanupLayout(aUpdate, this.v, this.fsViewSel)) {
 
         if (this.currentdirid === 'opc') {
@@ -47,7 +50,6 @@ MegaData.prototype.renderMain = function(aUpdate) {
 
     // No need to bind mouse events etc (gridUI/iconUI/selecddUI)
     // if there weren't new rendered nodes (Ie, they were cached)
-
     if (numRenderedNodes) {
         if (!aUpdate) {
             M.addContactUI();
@@ -250,23 +252,38 @@ MegaData.prototype.renderShare = function(h) {
 };
 
 MegaData.prototype.renderTree = function() {
-    var build = function(h) {
-        return M.buildtree({h: h}, M.buildtree.FORCE_REBUILD);
-    };
+    'use strict';
 
-    var promise = MegaPromise.allDone([build('shares'), build(M.RootID), build(M.RubbishID), build(M.InboxID)]);
-
-    promise.done(function() {
-        M.contacts();
-        M.addTreeUIDelayed();
+    var build = tryCatch(function(h) {
+        M.buildtree({h: h}, M.buildtree.FORCE_REBUILD);
     });
 
-    return promise;
+    build('shares');
+    build(M.RootID);
+    build(M.RubbishID);
+    build(M.InboxID);
+
+    M.contacts();
+    M.addTreeUIDelayed();
+
+    // TODO: refactor this back to no-promises
+    return MegaPromise.resolve();
 };
 
 
 MegaData.prototype.pathLength = function() {
-    var length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
+    "use strict";
+
+    var filterLength = 0;
+    var length = 0;
+    var $filter = $('.fm-right-header .filter-block.body:visible');
+
+    if ($filter.length > 0) {
+        filterLength = $filter.outerWidth() + 20;
+    }
+
+    length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
+        + filterLength
         + $('.fm-right-header .fm-header-buttons:visible').outerWidth();
     return length;
 };
@@ -435,24 +452,31 @@ MegaData.prototype.renderPath = function(fileHandle) {
         }
     }
 
-    breadcrumbsResize();
-    $(window).bind('resize.fmbreadcrumbs', function() {
-        breadcrumbsResize();
-    });
+    M.onFileManagerReady(breadcrumbsResize);
+    $(window).rebind('resize.fmbreadcrumbs', SoonFc(breadcrumbsResize, 202));
 
-    if ($('.fm-right-header .fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
-        $('.fm-right-header .fm-breadcrumbs-block').removeClass('deactivated');
+    if (folderlink) {
+        $('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link');
+        $('.fm-breadcrumbs:first span').empty();
+    }
+
+    var $block = $('.fm-right-header .fm-breadcrumbs-block');
+    if ($('.fm-breadcrumbs', $block).length > 1) {
+        $block.removeClass('deactivated');
+    }
+    else if (folderlink && $('.default-white-button.l-pane-visibility').hasClass('active')) {
+        $('.folder-link .right-arrow-bg', $block)
+            .safeHTML('<span>' + M.getNameByHandle(M.RootID) + '</span>');
     }
     else {
-        $('.fm-right-header .fm-breadcrumbs-block').addClass('deactivated');
+        $block.addClass('deactivated');
     }
 
-    $('.fm-right-header .fm-breadcrumbs-block a').unbind('click');
-    $('.fm-right-header .fm-breadcrumbs-block a').bind('click', function() {
+    $('a', $block).rebind('click', function() {
         var crumbId = $(this).attr('id');
 
         // When NOT deactivated
-        if (!$('.fm-right-header .fm-breadcrumbs-block').hasClass('deactivated')) {
+        if (!$block.hasClass('deactivated')) {
             if (crumbId === 'path_opc' || crumbId === 'path_ipc') {
                 return false;
             }
@@ -467,10 +491,6 @@ MegaData.prototype.renderPath = function(fileHandle) {
         }
     });
 
-    if (folderlink) {
-        $('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link');
-        $('.fm-breadcrumbs:first span').empty();
-    }
     if (!is_mobile) {
         if (fileHandle) {
             fileversioning.fileVersioningDialog(fileHandle);
@@ -580,7 +600,8 @@ MegaData.prototype.searchPath = function() {
 MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
     'use strict';
 
-    $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud,.fm-invalid-folder').addClass('hidden');
+    $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search')
+        .add('.fm-empty-cloud,.fm-invalid-folder,.fm-empty-filter').addClass('hidden');
     $('.fm-empty-folder,.fm-empty-incoming,.fm-empty-folder-link').addClass('hidden');
     $('.fm-empty-pad.fm-empty-sharef').remove();
 };
@@ -617,14 +638,15 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
         }
         node.classList.remove('ui-selectee');
     }
+    else if (selList && selList.length === 0) {
+        node.classList.remove('ui-selected');
+    }
 
     if (M.d[aHandle]) {
         M.d[aHandle].seen = true;
     }
-    else {
-        if (d) {
-            console.error("megaListRenderNode was called with aHandle:", aHandle, "which was not found in M.d");
-        }
+    else if (d > 1) {
+        console.warn("megaListRenderNode was called with aHandle '%s' which was not found in M.d", aHandle);
     }
 
     return node;

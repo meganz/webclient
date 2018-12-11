@@ -69,7 +69,7 @@ describe("chat.rtf_filter unit test", function() {
             megaChat.plugins[plName] = new megaChat.plugins[plName](megaChat);
         });
 
-        rtf = new RtfFilter({'bind': function(){}});
+        rtf = new RtfFilter(megaChat);
     });
 
     afterEach(function() {

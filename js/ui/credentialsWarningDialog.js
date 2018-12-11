@@ -48,19 +48,20 @@
                     'callback': function() {
                         this.hide();
                         this._hideOverlay();
+                        mega.ui.CredentialsWarningDialog.rendernext();
                     }
                 }
             ]
         };
 
-        mega.ui.Dialog.prototype.constructor.apply(self, [
-            $.extend({}, defaultOptions, opts)
-        ]);
+        mega.ui.Dialog.call(this, Object.assign({}, defaultOptions, opts));
 
         self.bind("onBeforeShow", function() {
             $('.fm-dialog-overlay').addClass('hidden');
         });
     };
+
+    CredentialsWarningDialog.prototype = Object.create(mega.ui.Dialog.prototype);
 
     CredentialsWarningDialog.prototype._initGenericEvents = function() {
         var self = this;
@@ -161,6 +162,15 @@
      * Renders the previous and new fingerprints showing the differences in red
      */
     CredentialsWarningDialog.prototype._renderFingerprints = function() {
+        var userHandle = CredentialsWarningDialog.contactHandle;
+        var keyType = CredentialsWarningDialog.keyType;
+        warnedFingerprint[userHandle][keyType] = 1;
+        // Log occurrence of this dialog.
+        api_req({
+            a: 'log',
+            e: 99606,
+            m: 'Fingerprint dialog shown to user for key ' + keyType + ' for user ' + userHandle
+        });
 
         var previousFingerprint = CredentialsWarningDialog.previousFingerprint;
         var newFingerprint = CredentialsWarningDialog.newFingerprint;
@@ -208,8 +218,31 @@
         $dialog.find('.newCredentials .fingerprint').html(newFingerprintHtml);
     };
 
-    CredentialsWarningDialog.prototype = $.extend({}, mega.ui.Dialog.prototype, CredentialsWarningDialog.prototype);
+    /**
+     * Render next warning in the waiting list.
+     */
+    CredentialsWarningDialog.rendernext = function() {
 
+        if (mega.ui.CredentialsWarningDialog.waitingList) {
+            var key = mega.ui.CredentialsWarningDialog.currentKey;
+            if (key) {
+                delete mega.ui.CredentialsWarningDialog.waitingList[key];
+            }
+            var keys = Object.keys(mega.ui.CredentialsWarningDialog.waitingList);
+            if (keys.length > 0) {
+                key = keys[0];
+                mega.ui.CredentialsWarningDialog.singleton(
+                        mega.ui.CredentialsWarningDialog.waitingList[key].contactHandle,
+                        mega.ui.CredentialsWarningDialog.waitingList[key].keyType,
+                        mega.ui.CredentialsWarningDialog.waitingList[key].prevFingerprint,
+                        mega.ui.CredentialsWarningDialog.waitingList[key].newFingerprint);
+
+                mega.ui.CredentialsWarningDialog._instance._renderDetails();
+                mega.ui.CredentialsWarningDialog._instance._renderFingerprints();
+                CredentialsWarningDialog.currentKey = key;
+            }
+        }
+    };
     /**
      * Initialises the Credentials Warning Dialog
      * @param {String} contactHandle The contact's user handle
@@ -222,20 +255,39 @@
 
         // Set to object so can be used later
         CredentialsWarningDialog.contactHandle = contactHandle;
+        CredentialsWarningDialog.keyType = keyType;
         CredentialsWarningDialog.contactEmail = M.u[contactHandle].m;
         CredentialsWarningDialog.seenOrVerified = u_authring[keyType][contactHandle].method;
-        CredentialsWarningDialog.seenOrVerified = (CredentialsWarningDialog.seenOrVerified === authring.AUTHENTICATION_METHOD.SEEN) ? 'seen' : 'verified';
+        CredentialsWarningDialog.seenOrVerified =
+            (CredentialsWarningDialog.seenOrVerified === authring.AUTHENTICATION_METHOD.SEEN) ? 'seen' : 'verified';
         CredentialsWarningDialog.previousFingerprint = prevFingerprint;
         CredentialsWarningDialog.newFingerprint = newFingerprint;
+        if (!CredentialsWarningDialog.waitingList) {
+            CredentialsWarningDialog.waitingList = {};
+        }
+        var key = contactHandle + keyType;
+        CredentialsWarningDialog.waitingList[key] = {
+            'contactHandle' : contactHandle,
+            'keyType' : keyType,
+            'prevFingerprint' : prevFingerprint,
+            'newFingerprint' : newFingerprint
+        };
 
         if (!CredentialsWarningDialog._instance) {
             CredentialsWarningDialog._instance = new CredentialsWarningDialog();
+            CredentialsWarningDialog.currentKey = key;
         }
         else {
             CredentialsWarningDialog._instance._resetToDefaultState();
+            if (key !== CredentialsWarningDialog.currentKey) {
+                mega.ui.CredentialsWarningDialog._instance._renderDetails();
+                mega.ui.CredentialsWarningDialog._instance._renderFingerprints();
+                CredentialsWarningDialog.currentKey = key;
+            }
         }
 
         CredentialsWarningDialog._instance.show();
+
 
         return CredentialsWarningDialog._instance;
     };

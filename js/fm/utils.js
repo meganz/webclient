@@ -34,14 +34,30 @@ MegaApi.prototype.prod = function(aSave) {
     this.setDomain('eu.api.mega.co.nz', aSave);
 };
 
+MegaApi.prototype._apiReqInflight = Object.create(null);
+
 MegaApi.prototype.req = function(params) {
     'use strict';
-
-    var promise = new MegaPromise();
 
     if (typeof params === 'string') {
         params = {a: params};
     }
+
+    var key = JSON.stringify(params);
+
+    if (this._apiReqInflight[key]) {
+        if (d) {
+            console.info('Reusing pending api request...', params);
+        }
+        return this._apiReqInflight[key];
+    }
+
+    var promise = new MegaPromise();
+    this._apiReqInflight[key] = promise;
+
+    promise.always(function() {
+        delete M._apiReqInflight[key];
+    });
 
     api_req(params, {
         callback: tryCatch(function(res) {
@@ -92,24 +108,27 @@ MegaUtils.prototype.execCommandUsable = function() {
  * @returns {Function}
  */
 MegaUtils.prototype.sortObjFn = function(key, order, alternativeFn) {
+    'use strict';
+
     if (!order) {
         order = 1;
+    }
+
+    if (typeof key !== 'function') {
+        var k = key;
+        key = function(o) {
+            return o[k];
+        };
     }
 
     return function(a, b, tmpOrder) {
         var currentOrder = tmpOrder ? tmpOrder : order;
 
-        if ($.isFunction(key)) {
-            aVal = key(a);
-            bVal = key(b);
-        }
-        else {
-            aVal = a[key];
-            bVal = b[key];
-        }
+        var aVal = key(a);
+        var bVal = key(b);
 
         if (typeof aVal === 'string' && typeof bVal === 'string') {
-            return aVal.localeCompare(bVal) * currentOrder;
+            return aVal.localeCompare(bVal, locale) * currentOrder;
         }
         else if (typeof aVal === 'string' && typeof bVal === 'undefined') {
             return 1 * currentOrder;
@@ -783,8 +802,8 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                 }
                 else {
                     var myHost;
-                    if (location.href.indexOf('search') > -1) {
-                        myHost = location.href.substr(0, location.href.lastIndexOf('search') - 1);
+                    if (location.href.indexOf('/fm/search/') > -1) {
+                        myHost = location.href.substr(0, location.href.lastIndexOf('/fm/search/'));
                         location.replace(myHost);
                     }
                     else if (location.href.indexOf('/fm/chat/') > -1){
@@ -894,92 +913,6 @@ MegaUtils.prototype.getSiteVersion = function() {
     return version;
 };
 
-/*
- * Alert about broken layout caused by zoom level
- */
-/* jshint -W074 */
-MegaUtils.prototype.zoomLevelNotification = function() {
-    "use strict";
-
-    var dpr = window.devicePixelRatio;
-    var pf = navigator.platform.toUpperCase();
-    var brokenRatios = [
-        2.200000047683716,// 110% retina
-        1.100000023841858,// 110% non-retina
-        1.3320000171661377,// 67% retina
-        0.6660000085830688,// 67% non-retian, 33% retina
-        0.3330000042915344// 33% non-retina
-    ];
-    var $menu = $('.top-icon.menu');
-    var WIDTH = 24;// .top-icon.menu width in px
-    var pos = $menu.length ? $menu.position().left + WIDTH : 0 ;
-    var $exc = {};
-    var $over = {};
-
-    $exc = $('.nw-dark-overlay.zoom-exceeded-overlay');
-    $over = $('.nw-dark-overlay.zoom-overlay');
-
-    // Alert about broken layout, main (hamburger) menu is displaced and exceeding window width
-    if (window.innerWidth < pos) {
-        $('.nw-dark-overlay').removeClass('mac');
-        $exc.removeClass('zoom-67 zoom-33');
-
-        if (pf.indexOf('MAC') >= 0) {
-            $('.nw-dark-overlay').addClass('mac');
-        }
-
-        if ($exc.not(':visible')) {
-            $exc.fadeIn(400);
-        }
-
-        return;
-    }
-    else if ($exc.is(':visible')) {
-        $exc.fadeOut(200);
-    }
-
-    // Chrome specific broken layout tested on versions <= 62
-    if (mega.chrome && dpr === 2.200000047683716 || dpr === 1.100000023841858
-        || dpr === 1.3320000171661377 || dpr === 0.6660000085830688 || dpr === 0.3330000042915344) {
-
-        $('.nw-dark-overlay').removeClass('mac');
-        $over.removeClass('zoom-67 zoom-33');
-
-        if (pf.indexOf('MAC') >= 0) {
-            $('.nw-dark-overlay').addClass('mac');
-        }
-
-        // zoom level110%
-        if (dpr === 2.200000047683716 || dpr === 1.100000023841858) {
-            $over.fadeIn(400);
-        }
-
-        // 67% both or 33% retina
-        if (dpr === 1.3320000171661377 || dpr === 0.6660000085830688) {
-            $over
-                .addClass('zoom-67')
-                .fadeIn(400);
-        }
-
-        // 33% non-retina
-        if (dpr === 0.3330000042915344) {
-            $over
-                .addClass('zoom-33')
-                .fadeIn(400);
-        }
-
-    }
-    else if (brokenRatios.indexOf(dpr) === -1 && $over.is(':visible')) {
-        $over.fadeOut(200);
-    }
-};
-/* jshint +W074 */
-
-mBroadcaster.once('startMega', function() {
-    "use strict";
-    onIdle(M.zoomLevelNotification);
-});
-
 /**
  * Fire "find duplicates"
  */
@@ -1028,6 +961,10 @@ MegaUtils.prototype.transferFromMegaCoNz = function() {
                 }
                 else {
                     loadSubPage(urlParts[2]);
+                    // if user click MEGAsync pro upgrade button and logged in as different account on webclient.
+                    if (urlParts[2].substr(0, 4) === "pro/") {
+                        msgDialog('warninga', l[882], l[19341]);
+                    }
                     return false;
                 }
             }
@@ -1139,7 +1076,7 @@ MegaUtils.prototype.getSafeName = function(name) {
     if (name.length > 250) {
         name = name.substr(0, 250) + '.' + name.split('.').pop();
     }
-    name = name.replace(/\s+/g, ' ').trim();
+    name = name.replace(/[\t\n\r\f\v]+/g, ' ');
     name = name.replace(/\u202E|\u200E|\u200F/g, '');
 
     var end = name.lastIndexOf('.');
@@ -1199,6 +1136,12 @@ MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
     delay('checkStorageQuota', function _csq() {
         M.req({a: 'uq', strg: 1, qc: 1}).done(function(data) {
             var perc = Math.floor(data.cstrg / data.mstrg * 100);
+
+            if (ulmanager.ulOverStorageQuota && perc < 100) {
+                onIdle(function() {
+                    ulmanager.ulResumeOverStorageQuotaState();
+                });
+            }
 
             M.showOverStorageQuota(perc, data.cstrg, data.mstrg);
         });
@@ -1841,4 +1784,123 @@ MegaUtils.prototype.getPersistentDataEntries = function(aPrefix, aReadContents) 
     }
 
     return promise;
+};
+
+/**
+ * Returns the name of a country given a country code in the users current language.
+ * Will return Null if the requested countrycode does not exist.
+ * @param {String} countryCode The countrycode of the country to get the name of
+ * @returns {Null|String}.
+ */
+MegaUtils.prototype.getCountryName = function(countryCode) {
+    'use strict';
+
+    if (!this._countries) {
+        this.getCountries();
+    }
+
+    // Get the stringid for the country code specified.
+    if (this._countries.hasOwnProperty(countryCode)) {
+        return this._countries[countryCode];
+    } else {
+        return null;
+    }
+};
+
+/**
+ * Returns an object with all countryCodes:countryNames in the user set language.
+ * @returns Object
+ */
+MegaUtils.prototype.getCountries = function() {
+    'use strict';
+
+    if (!this._countries) {
+        this._countries = (new RegionsCollection()).countries;
+    }
+    return this._countries;
+};
+
+/**
+ * Returns an object with all the stateCodes:stateNames.
+ * @returns Object
+ */
+MegaUtils.prototype.getStates = function() {
+    'use strict';
+
+    if (!this._states) {
+        this._states = (new RegionsCollection()).states;
+    }
+    return this._states;
+};
+
+/**
+ * Check user trying to upload folder by drag and drop.
+ * @param {Event} event
+ * @returns {Boolean}
+ */
+MegaUtils.prototype.checkFolderDrop = function(event) {
+
+    'use strict';
+
+    /**
+     * Check user trying to upload folder.
+     */
+    if (d) {
+        console.log('Checking user uploading folder.');
+    }
+
+    var checkWebkitItems = function _checkWebkitItems() {
+        var items = event.dataTransfer.items;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].webkitGetAsEntry) {
+                var item = items[i].webkitGetAsEntry();
+                if (item && item.isDirectory) {
+                    return true;
+                }
+            }
+        }
+    };
+
+    var checkMozItems = function _checkMozItems() {
+        try {
+            var m = event.dataTransfer.mozItemCount;
+            for (var j = 0; j < m; ++j) {
+                file = event.dataTransfer.mozGetDataAt("application/x-moz-file", j);
+                if (file instanceof Ci.nsIFile) {
+                    filedrag_u = [];
+                    if (j === m - 1) {
+                        $.dostart = true;
+                    }
+                    var mozitem = new mozDirtyGetAsEntry(file); /*,e.dataTransfer*/
+                    if (mozitem.isDirectory) {
+                        return true;
+                    }
+                }
+                else {
+                    if (d) {
+                        console.log('FileSelectHandler: Not a nsIFile', file);
+                    }
+                }
+            }
+        }
+        catch (e) {
+            alert(e);
+            Cu.reportError(e);
+        }
+    };
+
+    if (event.dataTransfer
+        && event.dataTransfer.items
+        && event.dataTransfer.items.length > 0 && event.dataTransfer.items[0].webkitGetAsEntry) {
+        return checkWebkitItems();
+    }
+    else if (is_chrome_firefox && event.dataTransfer) {
+        return checkMozItems();
+    }
+    // else {
+    // ie does not support DataTransfer.items property.
+    // Therefore cannot recognise what user upload is folder or not.
+    // }
+
+    return false;
 };

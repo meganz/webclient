@@ -38,7 +38,7 @@ VERAPP_BIN = 'vera++'
 
 NSIQCPPSTYLE_BIN = '/usr/local/nsiqcppstyle/nsiqcppstyle.py'
 JSHINT_RULES = '--verbose'
-JSCS_RULES = '--verbose'
+JSCS_RULES = ''
 JSCPD_RULES = '--skip-comments -l 13'
 HTMLHINT_RULES = '--config ./.htmlhintrc'
 VALIDATOR_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/chat/bundle.js', 'nacl-fast.js', 'makecache.js']

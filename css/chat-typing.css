@@ -1,7 +1,7 @@
 .typing-block {
 	position: absolute;
-    padding: 0 0 0 71px;
-    bottom: 6px;
+    padding: 0 0 0 72px;
+    bottom: 1px;
     width: 100%;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -10,7 +10,7 @@
 .typing-text {
 	ont-size: 12px;
     line-height: 15px;
-    color: #999999;
+    color: #777777;
     display: inline-block;
     max-width: 100%;
     white-space: nowrap;
@@ -32,7 +32,7 @@
 .typing-bounce div {
 	width: 4px;
 	height: 4px;
-	background-color: #999999;
+	background-color: #777777;
 	border-radius: 100%;
 	display: inline-block;
 	-webkit-animation: typing-bounce 1.4s ease-in-out 0s infinite both;

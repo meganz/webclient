@@ -6,18 +6,22 @@
 
     function closeRegisterDialog($dialog, isUserTriggered) {
         closeDialog();
-        $(window).unbind('resize.proregdialog');
-        $('.fm-dialog-overlay').unbind('click.proDialog');
-        $('.fm-dialog-close', $dialog).unbind('click.proDialog');
+        $(window).off('resize.proregdialog');
+        $('.fm-dialog-overlay').off('click.proDialog');
+        $('.fm-dialog-close', $dialog).off('click.proDialog');
 
         if (isUserTriggered && options.onDialogClosed) {
             options.onDialogClosed($dialog);
         }
 
+        delete $.registerDialog;
+
         options = {};
     }
 
     function doProRegister($dialog) {
+
+        var rv = {};
         var hideOverlay = function() {
             loadingDialog.hide();
             $dialog.removeClass('arrange-to-back');
@@ -35,186 +39,178 @@
             return false;
         }
 
-        var registeraccount = function() {
-            var rv = {};
-            var done = function(login) {
-                var onAccountCreated = options.onAccountCreated;
+        var registrationDone = function(login) {
 
-                hideOverlay();
-                closeRegisterDialog($dialog);
-                $('.fm-dialog.registration-page-success').unbind('click');
+            var onAccountCreated = options.onAccountCreated;
 
-                if (login) {
-                    Soon(function() {
-                        showToast('megasync', l[8745]);
-                        $('.fm-avatar img').attr('src', useravatar.mine());
-                    });
-                }
-                onIdle(topmenuUI);
+            hideOverlay();
+            closeRegisterDialog($dialog);
+            $('.fm-dialog.registration-page-success').off('click');
 
-                if (typeof onAccountCreated === 'function') {
-                    onAccountCreated(login, rv);
-                }
-                else {
-                    // $('.fm-dialog.registration-page-success').removeClass('hidden');
-                    // fm_showoverlay();
-                    // ^ legacy confirmation dialog, with no email change option
-                    sendSignupLinkDialog(rv);
-                }
-            };
+            if (login) {
+                Soon(function() {
+                    showToast('megasync', l[8745]);
+                    $('.fm-avatar img').attr('src', useravatar.mine());
+                });
+            }
+            onIdle(topmenuUI);
 
-            var ctx = {
-                callback: function(res) {
-                    if (res === 0) {
-                        var ops = {
-                            a: 'up'
-                        };
-
-                        ops.terms = 'Mq';
-                        ops.firstname = base64urlencode(to8(rv.first));
-                        ops.lastname = base64urlencode(to8(rv.last));
-                        ops.name2 = base64urlencode(to8(rv.name));
-                        u_attr.terms = 1;
-
-                        api_req(ops);
-                        done();
-                    }
-                    else if (res === EACCESS || res === EEXIST) {
-
-                        var passwordaes = new sjcl.cipher.aes(prepare_key_pw(rv.password));
-                        var uh = stringhash(rv.email.toLowerCase(), passwordaes);
-                        var ctx = {
-                            checkloginresult: function(ctx, r) {
-                                hideOverlay();
-
-                                if (!r) {
-                                    $('.login-register-input.email', $dialog).addClass('incorrect');
-                                    $('.login-register-input.email .top-loginp-tooltip-txt', $dialog)
-                                        .safeHTML('@@<div class="white-txt">@@</div>', l[1297], l[1298]);
-
-                                    if (options.onLoginAttemptFailed) {
-                                        options.onLoginAttemptFailed(rv);
-                                    }
-                                    else {
-                                        msgDialog('warninga', l[1578], l[218]);
-                                    }
-                                }
-                                else if (r === EBLOCKED) {
-                                    alert(l[730]);
-                                }
-                                else {
-                                    u_type = r;
-                                    u_checked = true;
-                                    done(true);
-                                }
-                            }
-                        };
-                        u_login(ctx, rv.email, rv.password, uh, true);
-                    }
-                    else {
-                        hideOverlay();
-                        msgDialog('warninga', 'Error', l[200], res);
-                    }
-                }
-            };
-
-
-            rv.password = $('#register-password', $dialog).val();
-            rv.first = $('#register-firstname', $dialog).val();
-            rv.last = $('#register-lastname', $dialog).val();
-            rv.email = $('#register-email', $dialog).val();
-            rv.name = rv.first + ' ' + rv.last;
-
-            sendsignuplink(rv.name, rv.email, rv.password, ctx, true);
+            if (typeof onAccountCreated === 'function') {
+                onAccountCreated(login, rv);
+            }
+            else {
+                // $('.fm-dialog.registration-page-success').removeClass('hidden');
+                // fm_showoverlay();
+                // ^ legacy confirmation dialog, with no email change option
+                sendSignupLinkDialog(rv);
+            }
         };
 
+        /**
+         * When the user has an account already, show them the Pro Login dialog instead so they can log in
+         */
+        var redirectToProLoginForExistingAccount = function() {
+
+            // Log out the ephemeral account that was created
+            u_logout();
+
+            // Close the Pro register dialog, pre-set email and password into the Pro login dialog
+            closeRegisterDialog($dialog, false);
+            showLoginDialog(rv.email, rv.password);
+
+            // Show a message dialog telling them to log in
+            msgDialog('warninga', l[882], l[1783], l[1768]);
+        };
+
+        /**
+         * Continue the old method Pro registration
+         * @param {Number} result The result of the 'uc' API request
+         */
+        var continueOldProRegistration = function(result) {
+
+            if (result === 0) {
+                var ops = {
+                    a: 'up'
+                };
+
+                ops.terms = 'Mq';
+                ops.firstname = base64urlencode(to8(rv.first));
+                ops.lastname = base64urlencode(to8(rv.last));
+                ops.name2 = base64urlencode(to8(rv.name));
+                u_attr.terms = 1;
+
+                if (mega.affid) {
+                    ops.aff = mega.affid;
+                }
+
+                api_req(ops);
+                registrationDone();
+            }
+            else if (result === EACCESS || result === EEXIST) {
+                redirectToProLoginForExistingAccount();
+            }
+            else {
+                hideOverlay();
+                msgDialog('warninga', 'Error', l[200], result);
+            }
+        };
+
+        /**
+         * Continue the new method registration
+         * @param {Number} result The result of the 'uc2' API request
+         */
+        var continueNewProRegistration = function(result) {
+
+            if (result === 0) {
+                registrationDone();
+            }
+            else if (result === EACCESS || result === EEXIST) {
+                redirectToProLoginForExistingAccount();
+            }
+            else {
+                loadingDialog.hide();
+                msgDialog('warninga', l[1578], l[200], result);
+            }
+        };
+
+        /**
+         * The main function to register the account
+         */
+        var registeraccount = function() {
+
+            rv.password = $('#register-password', $dialog).val();
+            rv.first = $.trim($('#register-firstname', $dialog).val());
+            rv.last = $.trim($('#register-lastname', $dialog).val());
+            rv.email = $.trim($('#register-email', $dialog).val());
+            rv.name = rv.first + ' ' + rv.last;
+
+            // Set a flag that the registration came from the Pro page
+            var fromProPage = true;
+
+            // Set the signup function to start the new secure registration process
+            if (security.register.newRegistrationEnabled()) {
+                security.register.startRegistration(rv.first, rv.last, rv.email, rv.password,
+                                                    fromProPage, continueNewProRegistration);
+            }
+            else {
+                // Set the signup function to use the legacy registration process
+                sendsignuplink(rv.name, rv.email, rv.password, { callback: continueOldProRegistration }, fromProPage);
+            }
+        };
 
         var err = false;
+        var $formWrapper = $dialog.find('form');
+        var $firstName = $('.input-wrapper.name .f-name', $formWrapper);
+        var $lastName = $('.input-wrapper.name .l-name', $formWrapper);
+        var $email = $('.input-wrapper.email input', $formWrapper);
+        var $password = $('.input-wrapper.first input', $formWrapper);
+        var $confirmPassword = $('.input-wrapper.confirm input', $formWrapper);
 
-        if ($('#register-firstname', $dialog).val() === ''
-                || $('#register-firstname', $dialog).val() === l[1096]
-                || $('#register-lastname', $dialog).val() === ''
-                || $('#register-lastname', $dialog).val() === l[1097]) {
+        var firstName = $.trim($firstName.val());
+        var lastName = $.trim($lastName.val());
+        var email = $.trim($email.val());
+        var password = $password.val();
+        var confirmPassword = $confirmPassword.val();
 
-            $('.login-register-input.name', $dialog).addClass('incorrect');
-            err = 1;
-        }
-        if ($('#register-email', $dialog).val() === ''
-                || $('#register-email', $dialog).val() === l[1096]
-                || checkMail($('#register-email', $dialog).val())) {
+        // Check if the entered passwords are valid or strong enough
+        var passwordValidationResult = security.isValidPassword(password, confirmPassword);
 
-            $('.login-register-input.email', $dialog).addClass('incorrect');
-            err = 1;
-        }
+        // If bad result
+        if (passwordValidationResult !== true) {
 
-        if ($('#register-email', $dialog).val() === ''
-                || $('#register-email', $dialog).val() === l[1096]
-                || checkMail($('#register-email', $dialog).val())) {
+            // Show error for password field, clear the value and refocus it
+            $password.parent().addClass('incorrect');
+            $password.parent().find('.account.password-status').removeClass('checked');
+            $password.parent().find('.account.input-tooltip').safeHTML(l[1102] + '<br>' + passwordValidationResult);
+            $password.val('');
+            $password.focus();
 
-            $('.login-register-input.email', $dialog).addClass('incorrect');
-            err = 1;
-        }
+            // Show error for confirm password field and clear the value
+            $confirmPassword.parent().addClass('incorrect');
+            $confirmPassword.val('');
 
-        var pw = {};
-        if (typeof zxcvbn !== 'undefined') {
-            pw = zxcvbn($('#register-password', $dialog).val());
-        }
-        if ($('#register-password', $dialog).attr('type') === 'text') {
-            $('.login-register-input.password.first', $dialog).addClass('incorrect');
-            $('.white-txt.password', $dialog).text(l[213]);
-            err = 1;
-        }
-        else if (pw.score === 0 || pw.entropy < 16) {
-            $('.login-register-input.password.first', $dialog).addClass('incorrect');
-            $('.white-txt.password', $dialog).text(l[1104]);
             err = 1;
         }
 
-        if ($('#register-password', $dialog).val() !== $('#register-password2', $dialog).val()) {
-            $('#register-password', $dialog)[0].type = 'password';
-            $('#register-password2', $dialog)[0].type = 'password';
-            $('#register-password', $dialog).val('');
-            $('#register-password2', $dialog).val('');
-            $('.login-register-input.password.confirm', $dialog).addClass('incorrect');
+        if (email === '' || !isValidEmail(email)) {
+            $email.parent().addClass('incorrect');
+            $email.focus();
             err = 1;
         }
 
-        if (!err && typeof zxcvbn === 'undefined') {
-            hideOverlay();
-            msgDialog('warninga', l[135], l[1115] + '<br>' + l[1116]);
-            return false;
+        if (firstName === '' || lastName === '') {
+            $firstName.parent().addClass('incorrect');
+            $firstName.focus();
+            err = 1;
         }
-        else if (!err) {
+
+        if (!err) {
             if ($('.register-check', $dialog).hasClass('checkboxOff')) {
                 hideOverlay();
                 msgDialog('warninga', l[1117], l[1118]);
             }
             else {
-                if (localStorage.signupcode) {
-                    u_storage = init_storage(localStorage);
-                    var ctx = {
-                        checkloginresult: function(u_ctx, r) {
-                            hideOverlay();
-
-                            if (typeof r[0] === 'number' && r[0] < 0) {
-                                msgDialog('warningb', l[135], l[200]);
-                            }
-                            else {
-                                u_type = r;
-                                loadSubPage('fm');
-                            }
-                        }
-                    };
-                    var passwordaes = new sjcl.cipher.aes(prepare_key_pw($('#register-password', $dialog).val()));
-                    var uh = stringhash($('#register-email', $dialog).val().toLowerCase(), passwordaes);
-                    u_checklogin(ctx,
-                        true,
-                        prepare_key_pw($('#register-password', $dialog).val()),
-                        localStorage.signupcode,
-                        $('#register-firstname', $dialog).val() + ' ' + $('#register-lastname', $dialog).val(), uh);
-                    delete localStorage.signupcode;
-                }
-                else if (u_type === false) {
+                if (u_type === false) {
                     hideOverlay();
                     u_storage = init_storage(localStorage);
                     u_checklogin({
@@ -234,13 +230,15 @@
         }
     }
 
-
     function showRegisterDialog(opts) {
         var $dialog = $('.fm-dialog.pro-register-dialog');
+        var $inputs = $dialog.find('.account.input-wrapper input');
+        var $button = $dialog.find('.big-red-button');
+        var $password = $dialog.find('.account.input-wrapper.password input');
 
         var dialogBodyScroll = function() {
             var bodyHeight = $('body').height();
-            var $scrollBlock =  $('.pro-register-scroll');
+            var $scrollBlock =  $('.pro-register-scroll', $dialog);
             var scrollBlockHeight = $scrollBlock.height();
             $scrollBlock.css({
                 'max-height': bodyHeight - 100
@@ -274,167 +272,109 @@
             });
         };
 
-        M.safeShowDialog('pro-register-dialog', function() {
+        M.safeShowDialog('register', function() {
             options = Object(opts);
 
             $('.fm-dialog-title', $dialog).text(options.title || l[5840]);
 
             if (options.body) {
-                $('.fm-dialog-body', $dialog).removeClass('hidden').safeHTML(options.body);
+                $('.fm-dialog-body', $dialog).safeHTML(options.body);
             }
-            else {
-                $('.fm-dialog-body', $dialog).addClass('hidden');
-            }
-            $dialog.removeClass('hidden').addClass('active');
 
             redraw();
-            $('.pro-register-scroll').removeAttr('style');
+            $('.pro-register-scroll', $dialog).removeAttr('style');
             $(window).rebind('resize.proregdialog', redraw);
             deleteScrollPanel('.pro-register-scroll', 'jsp');
+
+            // Init inputs events
+            accountinputs.init($dialog);
+
+            $.registerDialog = 'register';
 
             return $dialog;
         });
 
-        $('*', $dialog).removeClass('incorrect'); // <- how bad idea is that "*" there?
-
-        // this might gets binded from init_page() which will conflict here..
-        $('.login-register-input').unbind('click');
+        $inputs.val('');
+        $password.parent().find('.password-status').removeClass('checked');
 
         // controls
-        $('.fm-dialog-close', $dialog)
-            .rebind('click.proDialog', function() {
+        $('.fm-dialog-close', $dialog).rebind('click.proDialog', function() {
+            closeRegisterDialog($dialog, true);
+            return false;
+        });
+
+        // close dialog by click on overlay
+        $('.fm-dialog-overlay').rebind('click.proDialog', function() {
+            if ($.registerDialog === $.dialog) {
                 closeRegisterDialog($dialog, true);
-                return false;
-            });
-
-        $('.fm-dialog-overlay')
-            .rebind('click.proDialog', function() {
-                closeRegisterDialog($dialog, true);
-                return false;
-            });
-
-        $('#register-email', $dialog)
-            .data('placeholder', l[95])
-            .val(l[95]);
-
-        $('#register-firstname', $dialog)
-            .data('placeholder', l[1096])
-            .val(l[1096]);
-
-        $('#register-lastname', $dialog)
-            .data('placeholder', l[1097])
-            .val(l[1097]);
-
-        $('#register-password', $dialog)
-            .addClass('input-password')
-            .data('placeholder', l[909])
-            .val(l[909]);
-
-        $('#register-password2', $dialog)
-            .addClass('input-password')
-            .data('placeholder', l[1114])
-            .val(l[1114]);
-
-        uiPlaceholders($dialog);
-        uiCheckboxes($dialog);
-
-        var registerpwcheck = function() {
-            $('.login-register-input.password', $dialog)
-                .removeClass('weak-password strong-password');
-            $('.new-registration', $dialog)
-                .removeClass('good1 good2 good3 good4 good5');
-
-            if (typeof zxcvbn === 'undefined'
-                    || $('#register-password', $dialog).attr('type') === 'text'
-                    || $('#register-password', $dialog).val() === '') {
-                return false;
-            }
-
-            var pw = zxcvbn($('#register-password', $dialog).val());
-            if (pw.score > 3 && pw.entropy > 75) {
-                $('.login-register-input.password', $dialog).addClass('strong-password');
-                $('.new-registration', $dialog).addClass('good5');
-                $('.new-reg-status-pad', $dialog).safeHTML('<strong>@@</strong>@@', l[1105], l[1128]);
-                $('.new-reg-status-description', $dialog).text(l[1123]);
-            }
-            else if (pw.score > 2 && pw.entropy > 50) {
-                $('.login-register-input.password', $dialog).addClass('strong-password');
-                $('.new-registration', $dialog).addClass('good4');
-                $('.new-reg-status-pad', $dialog).safeHTML('<strong>@@</strong>@@', l[1105], l[1127]);
-                $('.new-reg-status-description', $dialog).text(l[1122]);
-            }
-            else if (pw.score > 1 && pw.entropy > 40) {
-                $('.login-register-input.password', $dialog).addClass('strong-password');
-                $('.new-registration', $dialog).addClass('good3');
-                $('.new-reg-status-pad', $dialog).safeHTML('<strong>@@</strong>@@', l[1105], l[1126]);
-                $('.new-reg-status-description', $dialog).text(l[1121]);
-            }
-            else if (pw.score > 0 && pw.entropy > 15) {
-                $('.new-registration', $dialog).addClass('good2');
-                $('.new-reg-status-pad', $dialog).safeHTML('<strong>@@</strong>@@', l[1105], l[1125]);
-                $('.new-reg-status-description', $dialog).text(l[1120]);
             }
             else {
-                $('.login-register-input.password', $dialog).addClass('weak-password');
-                $('.new-registration', $dialog).addClass('good1');
-                $('.new-reg-status-pad', $dialog).safeHTML('<strong>@@</strong> @@', l[1105], l[1124]);
-                $('.new-reg-status-description', $dialog).text(l[1119]);
+                closeDialog();
             }
-            $('.password-status-warning', $dialog)
-                .safeHTML('<span class="password-warning-txt">@@</span> '
-                        + '@@<div class="password-tooltip-arrow"></div>', l[34], l[1129]);
-            $('.password-status-warning', $dialog).css('margin-left',
-                ($('.password-status-warning', $dialog).width() / 2 * -1) - 13);
+            return false;
+        });
+
+        var registerpwcheck = function() {
+            $('.account.password-status', $dialog)
+                .removeClass('good1 good2 good3 good4 good5 checked');
+
+            var $passwordInput = $('#register-password', $dialog);
+            var password = $.trim($passwordInput.val());
+
+            if (typeof zxcvbn === 'undefined'
+                    || $passwordInput.attr('type') === 'text'
+                    || password === '') {
+                return false;
+            }
+
+            classifyPassword(password);
             reposition();
             dialogBodyScroll();
         };
 
         if (typeof zxcvbn === 'undefined') {
-            $('.login-register-input.password', $dialog).addClass('loading');
+            $('.account.input-wrapper.password', $dialog).addClass('loading');
 
             M.require('zxcvbn_js')
                 .done(function() {
-                    $('.login-register-input.password', $dialog).removeClass('loading');
+                    $('.account.input-wrapper.password', $dialog).removeClass('loading');
                     registerpwcheck();
                 });
         }
 
-        $('#register-password', $dialog).rebind('keyup.proRegister', function(e) {
+        $password.first().rebind('keyup.proRegister', function(e) {
             registerpwcheck();
         });
 
-        $('.password-status-icon', $dialog).rebind('mouseover.proRegister', function(e) {
-            if ($(this).parents('.strong-password').length === 0) {
-                $('.password-status-warning', $dialog).removeClass('hidden');
-            }
-        });
-
-        $('.password-status-icon', $dialog).rebind('mouseout.proRegister', function(e) {
-            if ($(this).parents('.strong-password').length === 0) {
-                $('.password-status-warning', $dialog).addClass('hidden');
-            }
-        });
-
-        $('input', $dialog).rebind('keydown.proRegister', function(e) {
+        $inputs.rebind('keydown.proRegister', function(e) {
             if (e.keyCode === 13) {
                 doProRegister($dialog);
             }
         });
 
-        $('.register-st2-button', $dialog).rebind('click', function(e) {
+        $button.rebind('click.proRegister', function(e) {
             doProRegister($dialog);
             return false;
         });
 
-        $('.new-registration-checkbox a', $dialog)
-            .rebind('click.proRegisterDialog', function(e) {
-                $.termsAgree = function() {
-                    $('.register-check').removeClass('checkboxOff');
-                    $('.register-check').addClass('checkboxOn');
-                };
-                bottomPageDialog(false, 'terms'); // show terms dialog
+        $button.rebind('keydown.proRegister', function (e) {
+            if (e.keyCode === 13) {
+                doProRegister($dialog);
                 return false;
-            });
+            }
+        });
+
+        $('.checkbox-block.register .radio-txt', $dialog).safeHTML(l['208s']);
+
+        $('.checkbox-block.register span', $dialog).rebind('click', function(e) {
+            e.preventDefault();
+            $.termsAgree = function() {
+                $('.register-check', $dialog).removeClass('checkboxOff')
+                    .addClass('checkboxOn');
+            };
+            bottomPageDialog(false, 'terms', false, true); // show terms dialog
+            return false;
+        });
     }
 
     /**
@@ -457,7 +397,7 @@
                         console.error('sendsignuplink failed', res);
 
                         $button.addClass('disabled');
-                        $button.unbind('click');
+                        $button.off('click');
 
                         var tick = 26;
                         var timer = setInterval(function() {
@@ -484,8 +424,16 @@
             };
             loadingDialog.show();
 
-            var email = $('input', $dialog).val().trim() || accountData.email;
-            sendsignuplink(accountData.name, email, accountData.password, ctx, true);
+            var newEmail = $.trim($('input', $dialog).val()) || accountData.email;
+
+            // If the new registration method is enabled, re-send the signup link using the new method
+            if (security.register.newRegistrationEnabled()) {
+                security.register.repeatSendSignupLink(accountData.first, accountData.last, newEmail, ctx.callback);
+            }
+            else {
+                // Otherwise use the old method
+                sendsignuplink(accountData.name, newEmail, accountData.password, ctx, true);
+            }
         });
 
         if (typeof onCloseCallback === 'function') {
@@ -498,6 +446,9 @@
 
                     // Confirm abort registration
                     if (ev) {
+
+                        // Run 'user cancel registration' API command to cleanup the registration API side
+                        api_req({ a: 'ucr' });
                         onCloseCallback();
                     }
                     else {

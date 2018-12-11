@@ -32,11 +32,8 @@ mobile.recovery.sendEmail = {
             $screen = $('.no-recovery-key-page');
         }
 
-        // Find the back button/icon in the current screen
-        var $backButton = $screen.find('.fm-icon.back');
-
         // Initialise functionality
-        mobile.showAndInitBackButton($backButton);
+        mobile.initBackButton($screen);
         mobile.recovery.sendEmail.initEmailKeyUpHandler($screen);
         mobile.recovery.sendEmail.initSendButton($screen, recoveryType);
 
@@ -59,7 +56,7 @@ mobile.recovery.sendEmail = {
             var $button = $screen.find('.recover-account-email-send-btn');
 
             // If the email is not valid, grey out the button
-            if (email.length > 0 && checkMail(email)) {
+            if (email.length > 0 && !isValidEmail(email)) {
                 $button.removeClass('active');
             }
             else {
@@ -86,7 +83,7 @@ mobile.recovery.sendEmail = {
             var trimmedEmail = $.trim(email);
 
             // If the email is not valid, show an error and don't proceed
-            if (checkMail(trimmedEmail)) {
+            if (!isValidEmail(trimmedEmail)) {
                 mobile.messageOverlay.show(l[198]);
                 return false;
             }

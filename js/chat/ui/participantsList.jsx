@@ -13,14 +13,14 @@ var ParticipantsList = React.createClass({
     getDefaultProps: function() {
         return {
             'requiresUpdateOnResize': true,
-            'contactCardHeight': 49
+            'contactCardHeight': 36
 
         }
     },
     getInitialState: function() {
         return {
             'scrollPositionY': 0,
-            'scrollHeight': 49*4
+            'scrollHeight': 36*4
         };
     },
     onUserScroll: function() {
@@ -53,14 +53,14 @@ var ParticipantsList = React.createClass({
         var $parentContainer = $node.closest('.chat-right-pad');
         var maxHeight = (
             $parentContainer.outerHeight(true) - $('.buttons-block', $parentContainer).outerHeight(true) -
-                $('.chat-right-head', $parentContainer).outerHeight(true)
+                $('.chat-right-head', $parentContainer).outerHeight(true) - 72
         );
 
         if (fitHeight  < $('.buttons-block', $parentContainer).outerHeight(true)) {
-            fitHeight = Math.max(fitHeight /* margin! */, 48);
+            fitHeight = Math.max(fitHeight /* margin! */, 53);
         }
         else if (maxHeight < fitHeight) {
-            fitHeight = Math.max(maxHeight, 48);
+            fitHeight = Math.max(maxHeight, 53);
         }
 
         var $contactsList = $('.chat-contacts-list', $parentContainer);
@@ -103,11 +103,16 @@ var ParticipantsList = React.createClass({
                 chatRoom={room}
                 members={room.members}
                 ref="contactsListScroll"
+                disableCheckingVisibility={true}
                 onUserScroll={self.onUserScroll}
                 requiresUpdateOnResize={true}
+                onAnimationEnd={function() {
+                    self.safeForceUpdate();
+                }}
             >
                 <ParticipantsListInner
                     chatRoom={room} members={room.members}
+                    disableCheckingVisibility={true}
                     scrollPositionY={self.state.scrollPositionY}
                     scrollHeight={self.state.scrollHeight}
                 />
@@ -123,9 +128,9 @@ var ParticipantsListInner = React.createClass({
     getDefaultProps: function() {
         return {
             'requiresUpdateOnResize': true,
-            'contactCardHeight': 49,
+            'contactCardHeight': 32,
             'scrollPositionY': 0,
-            'scrollHeight': 49*4
+            'scrollHeight': 32*4
 
         }
     },
@@ -167,9 +172,9 @@ var ParticipantsListInner = React.createClass({
                     room.getParticipantsExceptMe()
             )   :
             room.getParticipantsExceptMe();
-
-        array.remove(contacts, u_handle, true);
-
+        if (contacts.indexOf(u_handle) >= 0) {
+            array.remove(contacts, u_handle, true);
+        }
         var firstVisibleUserNum = Math.floor(self.props.scrollPositionY/self.props.contactCardHeight);
         var visibleUsers = Math.ceil(self.props.scrollHeight/self.props.contactCardHeight);
         var lastVisibleUserNum = firstVisibleUserNum + visibleUsers;
@@ -201,14 +206,16 @@ var ParticipantsListInner = React.createClass({
 
                 var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
 
-                if (room.type === "group" && room.members && myPresence !== 'offline') {
-                    var removeParticipantButton = null;
+                if (room.type === "group" && room.members) {
+                    var dropdownRemoveButton = [];
 
                     if (room.iAmOperator() && contactHash !== u_handle) {
-                        removeParticipantButton = <DropdownsUI.DropdownItem
-                            key="remove" icon="rounded-stop" label={__(l[8867])} onClick={() => {
-                            $(room).trigger('onRemoveUserRequest', [contactHash]);
-                        }}/>;
+                        dropdownRemoveButton.push(
+                            <DropdownsUI.DropdownItem className="red"
+                                key="remove" icon="rounded-stop" label={__(l[8867])} onClick={() => {
+                                $(room).trigger('onRemoveUserRequest', [contactHash]);
+                            }}/>
+                       );
                     }
 
 
@@ -223,10 +230,10 @@ var ParticipantsListInner = React.createClass({
 
                         dropdowns.push(
                             <DropdownsUI.DropdownItem
-                                key="privOperator" icon="cogwheel-icon"
+                                key="privOperator" icon="gentleman"
                                 label={__(l[8875])}
                                 className={"tick-item " + (room.members[contactHash] === 3 ? "active" : "")}
-                                disabled={myPresence === 'offline' || contactHash === u_handle}
+                                disabled={contactHash === u_handle}
                                 onClick={() => {
                                     if (room.members[contactHash] !== 3) {
                                         $(room).trigger('alterUserPrivilege', [contactHash, 3]);
@@ -238,7 +245,7 @@ var ParticipantsListInner = React.createClass({
                             <DropdownsUI.DropdownItem
                                 key="privFullAcc" icon="conversation-icon"
                                 className={"tick-item " + (room.members[contactHash] === 2 ? "active" : "")}
-                                disabled={myPresence === 'offline' || contactHash === u_handle}
+                                disabled={contactHash === u_handle}
                                 label={__(l[8874])} onClick={() => {
                                 if (room.members[contactHash] !== 2) {
                                     $(room).trigger('alterUserPrivilege', [contactHash, 2]);
@@ -250,7 +257,7 @@ var ParticipantsListInner = React.createClass({
                             <DropdownsUI.DropdownItem
                                 key="privReadOnly" icon="eye-icon"
                                 className={"tick-item " + (room.members[contactHash] === 0 ? "active" : "")}
-                                disabled={myPresence === 'offline' || contactHash === u_handle}
+                                disabled={contactHash === u_handle}
                                 label={__(l[8873])} onClick={() => {
                                 if (room.members[contactHash] !== 0) {
                                     $(room).trigger('alterUserPrivilege', [contactHash, 0]);
@@ -279,7 +286,7 @@ var ParticipantsListInner = React.createClass({
 
                     // other user privilege
                     if (room.members[contactHash] === 3) {
-                        dropdownIconClasses = "small-icon cogwheel-icon";
+                        dropdownIconClasses = "small-icon gentleman";
                     }
                     else if (room.members[contactHash] === 2) {
                         dropdownIconClasses = "small-icon conversation-icon";
@@ -290,13 +297,7 @@ var ParticipantsListInner = React.createClass({
                         // should not happen.
                     }
 
-                    if (contactHash !== u_handle && room.iAmOperator()) {
-                        dropdowns.push(
-                            removeParticipantButton
-                        );
-                    }
                 }
-
 
                 contactsList.push(
                     <ContactsUI.ContactCard
@@ -304,20 +305,16 @@ var ParticipantsListInner = React.createClass({
                         contact={contact}
                         megaChat={room.megaChat}
                         className="right-chat-contact-card"
-                        dropdownPositionMy="right top"
-                        dropdownPositionAt="right bottom"
+                        dropdownPositionMy="left top"
+                        dropdownPositionAt="left top"
                         dropdowns={dropdowns}
                         dropdownDisabled={contactHash === u_handle}
                         dropdownButtonClasses={
-                            room.type == "group" &&
-                            myPresence !== 'offline' ? "button icon-dropdown" : "default-white-button tiny-button"
+                            room.type == "group" ? "button icon-dropdown" : "default-white-button tiny-button"
                         }
+                        dropdownRemoveButton={dropdownRemoveButton}
                         dropdownIconClasses={dropdownIconClasses}
-                        style={{
-                            width: 234,
-                            position: 'absolute',
-                            top: i * self.props.contactCardHeight
-                        }}
+                        isInCall={room.uniqueCallParts && room.uniqueCallParts[contactHash]}
                     />
                 );
 

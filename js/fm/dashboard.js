@@ -36,8 +36,6 @@ function dashboardUI() {
     // Add-contact plus
     $('.dashboard .contacts-widget .add-contacts').rebind('click', function() {
         contactAddDialog();
-        $('.fm-add-user').trigger('click');
-        $('.add-user-size-icon').trigger('click');
         return false;
     });
 
@@ -206,12 +204,22 @@ function dashboardUI() {
         }
 
         /* Registration date, bandwidth notification link */
-        $('.dashboard .button.upgrade-account, .bandwidth-info a').rebind('click', function() {
+        $('.dashboard .default-green-button.upgrade-account, .bandwidth-info a').rebind('click', function() {
             loadSubPage('pro');
         });
         $('.account.left-pane.reg-date-info').text(l[16128]);
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
 
+        // left-panel responsive contents
+        var maxwidth = 0;
+        for (var i = 0; i < $('.account.left-pane.small-txt:visible').length; i++){
+            var rowwidth = $('.account.left-pane.small-txt:visible').get(i).offsetWidth
+                + $('.account.left-pane.big-txt:visible').get(i).offsetWidth;
+            maxwidth = Math.max(maxwidth, rowwidth);
+        }
+        $.leftPaneResizable.options.updateWidth = maxwidth;
+
+        $($.leftPaneResizable).trigger('resize');
 
         accountUI.fillCharts(account, true);
 
@@ -234,22 +242,7 @@ function dashboardUI() {
                 $percBlock.parent().addClass('empty hidden');
             }
         }
-        // Cloud drive
-        $('.account.progress-size.cloud-drive').text(
-            account.stats[M.RootID].bytes > 0 ? bytesToSize(account.stats[M.RootID].bytes) : '-'
-        );
-        // Rubbish bin
-        $('.account.progress-size.rubbish-bin').text(
-            account.stats[M.RubbishID].bytes > 0 ? bytesToSize(account.stats[M.RubbishID].bytes) : '-'
-        );
-        // Incoming shares
-        $('.account.progress-size.incoming-shares').text(
-            account.stats.inshares.bytes ? bytesToSize(account.stats.inshares.bytes) : '-'
-        );
-        // Inbox
-        $('.account.progress-size.inbox').text(
-            account.stats[M.InboxID].bytes > 0 ? bytesToSize(account.stats[M.InboxID].bytes) : '-'
-        );
+        accountUI.renderProgressBar(account);
         /* End of Used Storage progressbar */
 
 
@@ -359,7 +352,7 @@ dashboardUI.updateChatWidget = function() {
     var allChats = 0;
     var privateChats = 0;
     var groupChats = 0;
-    var unreadMessages = $('.nw-fm-left-icon.conversations > .new-messages-indicator:visible').text();
+    var unreadMessages = $('.new-messages-indicator .chat-unread-count:visible').text();
 
     if (!megaChatIsDisabled && typeof megaChat !== 'undefined') {
         megaChat.chats.forEach(function(chatRoom) {

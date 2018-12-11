@@ -37,21 +37,23 @@ mobile.achieve = {
         }
 
         // Cache selector
-        mobile.achieve.$page = $('.mobile.achievements-page');
+        this.$page = $('.mobile.achievements-page');
 
         // Initialise functionality
-        mobile.achieve.fetchAndDisplayBonusInformation();
-        mobile.achieve.initInviteFriendsButton();
-        mobile.achieve.initReferralBonusesButton();
-        mobile.achieve.initMobileAppButton();
-        mobile.achieve.initMegaSyncButton();
-        mobile.achieve.initBackButton();
+        this.fetchAndDisplayBonusInformation();
+        this.initInviteFriendsButton();
+        this.initReferralBonusesButton();
+        this.initMobileAppButton();
+        this.initMegaSyncButton();
+
+        // Initialise back button to go back to the My Account page
+        mobile.initBackButton(this.$page, 'fm/account/');
 
         // Initialise the top menu
         topmenuUI();
 
         // Show the account page content
-        mobile.achieve.$page.removeClass('hidden');
+        this.$page.removeClass('hidden');
 
         // Add a server log
         api_req({ a: 'log', e: 99673, m: 'Mobile web main Achievements page accessed' });
@@ -189,7 +191,12 @@ mobile.achieve = {
     updateInviteFriendsText: function($page) {
 
         'use strict';
-        
+
+        if (!M.account.maf) {
+            // If account doesn't have achievements this text is pointless.
+            return;
+        }
+
         // Convert storage and bandwidth to 'x GB'
         var allPossibleBonuses = M.account.maf.u;
         var storage = allPossibleBonuses[mobile.achieve.BONUS_CLASS_REFERRAL][mobile.achieve.AWARD_INDEX_STORAGE];
@@ -363,22 +370,6 @@ mobile.achieve = {
 
             // Load the page
             loadSubPage('sync');
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the back arrow icon in the header to go back to the main My Account page
-     */
-    initBackButton: function() {
-
-        'use strict';
-
-        // On Back button click/tap
-        mobile.achieve.$page.find('.fm-icon.back').off('tap').on('tap', function() {
-
-            // Render the account page again
-            loadSubPage('fm/account');
             return false;
         });
     }

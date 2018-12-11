@@ -2331,7 +2331,8 @@ else if (!b_u) {
         'nomegadrop': {f:'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
         'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j: 1 },
         'securitypractice': {f:'html/security-practice.html', n: 'securitypractice', j:0},
-        'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1}
+        'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1},
+        'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0}
     };
 
     var jsl3 = {
@@ -2423,6 +2424,7 @@ else if (!b_u) {
         'dev': ['dev','dev_js','sdkterms'],
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
+        'downloadapp': ['downloadapp'],
         'help': [
             'lunr_js', 'help_js'
         ],

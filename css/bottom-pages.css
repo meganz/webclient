@@ -3383,6 +3383,9 @@ height: 56px;
 .securitypractice .improved-recovery-steps .recover-paste-block .right-section {
     width: 49.5%;
 }
+.securitypractice .default-green-button {
+    font-weight: 600;
+}
 
 /* Open source page */
 .main-mid-pad.opensource {
@@ -3499,6 +3502,124 @@ a.opensource-icon-txt.coming-soon {
 /*  end of Open source */
 
 
+/* Desktop download during onboarding phase */
+.onboarding-suggestions .top-buttons, .desktop-download .top-icon.menu {
+    display: none;
+}
+.onboarding-suggestions .bottom-page.top-description {
+    margin: 30px auto 32px;
+    padding: 0;
+}
+ .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
+    background-color: #F3F6F8;
+    height: 100%;
+    height: -webkit-calc(100%);
+    height: -moz-calc(100%);
+    height: calc(100%);
+}
+.onboarding-suggestions .bottom-page.bottom-bar {
+    bottom: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 130px;
+    color: #A1A7AF;
+    background-color: white;
+    display: table;
+    width: 100%;
+    font-size: 15px
+}
+.onboarding-suggestions .bottom-page.bottom-bar.border {
+    border-top: 2px solid #ddd;
+}
+.onboarding-suggestions .button-wrappers {
+    margin: 0 auto;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+.onboarding-suggestions .text-button:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+.default-green-button.height-48.redirect-clouddrive, .default-green-button.height-48.download-app {
+    font-size: 16px;
+    padding: 0 24px;
+}
+.default-green-button.redirect-clouddrive.hidden, .default-green-button.download-app.hidden {
+    display: none;
+}
+.onboarding-suggestions .bottom-page.horizontal-centered-bl {
+    min-height: 620px;
+    z-index: 999;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+.onboarding-suggestions .download-app {
+    min-width: 250px;
+}
+.onboarding-suggestions .onboard-image-wrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 130px;
+    top: 0;
+    z-index: 0;
+    text-align: center;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after {
+    width: 102px;
+    height: 102px;
+    background-image: url(../images/mega/onboarding_download_v1.png);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: 600px auto;
+    margin: 0 auto;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.desktop-active {
+    background-position: 0 0;
+    width: 227px;
+    height: 138px;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.desktop-inactive {
+    background-position: -373px 0;
+    width: 227px;
+    height: 138px;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.clouds {
+    background-position: center -163px;
+    max-width: 505px;
+    width: 100%;
+    height: 98px;
+    bottom: -10px;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-arrow {
+    background-position: -259px -0px;
+    width: 80px;
+    height: 138px;
+    bottom: 180px;
+}
+.onboarding-suggestions .badge {
+    padding: 2px 6px 3px;
+    border-radius: 5px;
+    color: #fff;
+    background-color: #00BFA5;
+    font-family: 'LatoWebBold', 'source_sans_probold', sans-serif;
+}
+.onboarding-suggestions .default-green-button.redirect-clouddrive::after{
+    width: 26px;
+    height: 24px;
+    background-position: -571px -170px;
+    content: '';
+    margin: 0 0 -10px 9px;
+    display: inline-block;
+    position: relative;
+}
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow, .bottom-page.top-title::before, .pages-nav.nav-icon.bott-sprite, .bottom-page.mid-icon, .bottom-page.cols-container .col3::before, .bottom-page.tab-lnk-icon, .cmd-top-img, .bottom-page.scroll-icon, .bottom-page.dark-button, .bottom-page.big-link i, .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite {
     background-image: url(../images/mega/pages-sprite_v4@2x.png) !important;
@@ -3511,6 +3632,10 @@ a.opensource-icon-txt.coming-soon {
 .bottom-page .security-illustration, .bottom-page.password-manager-app-select .app-link-icon {
     background-image: url(../images/mega/bottom-page/security-page-v1@2x.png);    
     background-size: 750px auto;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after  {
+    background-image: url(../images/mega/onboarding_download_v1@2x.png);
+    background-size: 600px auto;
 }
 }
 .mobile .default-huge-button.inline, .mobile .megaapp-button-info {
@@ -3574,6 +3699,9 @@ a.opensource-icon-txt.coming-soon {
 }
 .securitypractice .bottom-page.table.changed-order .right-cell-35.order2 {
     display: block;
+}
+.onboarding-suggestions .bottom-page.horizontal-centered-bl {
+    max-width: 720px;
 }
 }
 

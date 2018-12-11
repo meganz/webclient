@@ -3042,11 +3042,8 @@ a.blog-new-archive-lnk {
     font-weight: normal;
     font-family: 'source_sans_prosemibold', Arial;
     color: #3F4646;
-    padding-top: 22px;
-    padding-bottom: 25px
-}
-.new-bottom-pages .blog-new-full p.strong-paragraph + p {
     padding-top: 0;
+    padding-bottom: 30px
 }
 strong.small-header {
     display: block;
@@ -3060,7 +3057,7 @@ strong.small-header {
 }
 .new-bottom-pages .blog-new-full p.small-pad-paragraph {
     padding-top: 0;
-    padding-bottom: 28px;
+    padding-bottom: 20px
 }
 .new-bottom-pages .blog-new-full ul.ul-small-pad {
     padding-top: 0;
@@ -3260,7 +3257,7 @@ img.blog-new-logos {
     line-height: 32px;
 }
 .blog-jobs-icon {
-    padding: 4px 0 10px 40px;
+    padding: 7px 0 10px 40px;
     background-image: url(../images/mega/blogs/jobs-sprite.png);
     background-repeat: no-repeat;
     background-size: 31px 438px;
@@ -15415,21 +15412,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .blog-new-full ul.small-pad li {
     padding-bottom: 0;
-}
-.blog-new-full ul + .blog-new-full-div {
-    margin-top: 33px;
-}
- .blog-new-full ul + .blog-new-full-div2 {
-    margin-top: 53px;
-}
-.small-pad-paragraph + .blog-new-full-div2 {
-    margin-top: 35px;
-}
-.blog-browser-title + .clear + ul {
-    padding: 15px 0 10px 0;
-}
-.small-pad-paragraph .blog-new-num-txt.strong-header {
-    padding-bottom:  5px;
 }
 .register-game-txt {
     width: 589px;

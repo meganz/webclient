@@ -23931,8 +23931,8 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: none;
 }
 .local-currency .reg-st3-bott-title.price .local-currency-code {
-    font-size: 10px;
-    color: #888;
+    font-size: 13px;
+    color: #000;
     line-height: 16px;
     margin-top: -5px;
     margin-bottom: 4px;

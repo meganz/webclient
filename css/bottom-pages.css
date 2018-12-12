@@ -3567,7 +3567,7 @@ a.opensource-icon-txt.coming-soon {
     z-index: 0;
     text-align: center;
 }
-.onboarding-suggestions .onboard-image-wrapper .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after {
+.onboarding-suggestions .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after {
     width: 102px;
     height: 102px;
     background-image: url(../images/mega/onboarding_download_v1.png);
@@ -3603,12 +3603,22 @@ a.opensource-icon-txt.coming-soon {
     height: 138px;
     bottom: 180px;
 }
+.onboarding-suggestions .onboard-image.mobile-apps {
+    background-position: -35px -292px;
+    width: 154px;
+    height: 160px;
+    bottom: 0;
+    position: relative;
+    display: none;
+    margin: 0 auto 20px;
+}
 .onboarding-suggestions .badge {
     padding: 2px 6px 3px;
     border-radius: 5px;
     color: #fff;
+    font-size: 14px;
     background-color: #00BFA5;
-    font-family: 'LatoWebBold', 'source_sans_probold', sans-serif;
+    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
 }
 .onboarding-suggestions .default-green-button.redirect-clouddrive::after{
     width: 26px;
@@ -3618,6 +3628,13 @@ a.opensource-icon-txt.coming-soon {
     margin: 0 0 -10px 9px;
     display: inline-block;
     position: relative;
+}
+.bottom-page.download-container.linux-only {
+    display: inline-block;
+    padding: 16px 16px;
+    background-color: #fff;
+    border:1px solid #ddd;
+    border-radius: 8px;
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
@@ -3633,7 +3650,7 @@ a.opensource-icon-txt.coming-soon {
     background-image: url(../images/mega/bottom-page/security-page-v1@2x.png);    
     background-size: 750px auto;
 }
-.onboarding-suggestions .onboard-image-wrapper .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after  {
+.onboarding-suggestions .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after  {
     background-image: url(../images/mega/onboarding_download_v1@2x.png);
     background-size: 600px auto;
 }
@@ -4021,6 +4038,9 @@ body:not(.en) .pages-nav.content-block .nav-button {
 .bottom-page.top-description {
     padding: 40px 0 25px 0;
 }
+.onboarding-suggestions .bottom-page.top-description {
+    font-size: 15px;
+}
 .bottom-page.img.mobile-top {
     width: 100%;
     margin: 0 0 0 0;
@@ -4313,6 +4333,9 @@ body:not(.en) .pages-nav.content-block .nav-button {
 }
 .megasync .bottom-page.img.mobile-view {
 	margin-top: 24px;
+}
+.onboarding-suggestions .bottom-page.horizontal-centered-bl {
+    min-height: 720px;
 }
 
 }

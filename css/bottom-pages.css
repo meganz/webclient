@@ -1708,10 +1708,26 @@ height: 56px;
     margin: 13px auto 12px auto;
     color: #333333;
     width: 250px;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
+    box-shadow: 0 0 0  0 rgba(0,0,0,0.15);
+    -webkit-box-shadow: 0 0 0 0 rgba(0,0,0,0.15);
+    -moz-box-shadow: 0 0 0 0 rgba(0,0,0,0.15);
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
+.cmd .default-select.megaapp-dropdown:hover {
+    box-shadow: 0 0 0  4px rgba(0,0,0,0.15);
+    -webkit-box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+
 .cmd .default-select.megaapp-dropdown::before {
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
@@ -3507,7 +3523,7 @@ a.opensource-icon-txt.coming-soon {
     display: none;
 }
 .onboarding-suggestions .bottom-page.top-description {
-    margin: 30px auto 32px;
+    margin: 30px auto 28px;
     padding: 0;
 }
  .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
@@ -3597,11 +3613,43 @@ a.opensource-icon-txt.coming-soon {
     height: 98px;
     bottom: -10px;
 }
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-arrow {
-    background-position: -259px -0px;
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-mega {
+    background-position: -260px -7px;
     width: 80px;
-    height: 138px;
-    bottom: 180px;
+    height: 80px;
+    bottom: 222px;
+    opacity: 0;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-mega.visible {
+    opacity: 1;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow {
+    background-position: -260px -80px;
+    width: 80px;
+    height: 80px;
+    bottom: 147px;
+    opacity: 0;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow.visible { 
+    -webkit-animation: downward-arrow 1s infinite ease-in-out; /* Safari 4+ */
+    -moz-animation:    downward-arrow 2s infinite ease-in-out; /* Fx 5+ */
+    -o-animation:      downward-arrow 2s infinite ease-in-out; /* Opera 12+ */
+    animation:         downward-arrow 1s infinite ease-in-out; /* IE 10+, Fx 29+ */
 }
 .onboarding-suggestions .onboard-image.mobile-apps {
     background-position: -35px -292px;
@@ -3628,13 +3676,17 @@ a.opensource-icon-txt.coming-soon {
     margin: 0 0 -10px 9px;
     display: inline-block;
     position: relative;
-}
+}/*
 .bottom-page.download-container.linux-only {
     display: inline-block;
-    padding: 16px 16px;
+    padding: 16px 16px 10px 16px;
     background-color: #fff;
     border:1px solid #ddd;
     border-radius: 8px;
+}*/
+.onboarding-suggestions .radioOn .radio-txt {
+    color: #333;
+    font-family: 'LatoWebBold', 'source_sans_probold', sans-serif;
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {

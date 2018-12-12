@@ -3523,7 +3523,7 @@ a.opensource-icon-txt.coming-soon {
     display: none;
 }
 .onboarding-suggestions .bottom-page.top-description {
-    margin: 30px auto 28px;
+    margin: 30px auto 44px;
     padding: 0;
 }
  .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
@@ -3647,8 +3647,8 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow.visible { 
     -webkit-animation: downward-arrow 1s infinite ease-in-out; /* Safari 4+ */
-    -moz-animation:    downward-arrow 2s infinite ease-in-out; /* Fx 5+ */
-    -o-animation:      downward-arrow 2s infinite ease-in-out; /* Opera 12+ */
+    -moz-animation:    downward-arrow 1s infinite ease-in-out; /* Fx 5+ */
+    -o-animation:      downward-arrow 1s infinite ease-in-out; /* Opera 12+ */
     animation:         downward-arrow 1s infinite ease-in-out; /* IE 10+, Fx 29+ */
 }
 .onboarding-suggestions .onboard-image.mobile-apps {

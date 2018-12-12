@@ -721,22 +721,22 @@ background-color:#1DA2E9
 }
 
 @-webkit-keyframes downward-arrow {
-  0%   { bottom: 147px; opacity:1; }
-  50%   { bottom: 128px; opacity:0;}
-  100% { bottom: 147px; opacity:1;}
+    0%   { bottom: 152px; opacity:0.4;  }
+    58%   { bottom: 120px; opacity:1; }
+    100% { bottom: 152px; opacity:0.4; }
 }
 @-moz-keyframes downward-arrow {
-  0%   { bottom: 147px; }
-  65%   { bottom: 128px; }
-  100% { bottom: 147px; }
+    0%   { bottom: 152px; opacity:0.4;  }
+    58%   { bottom: 120px; opacity:1; }
+    100% { bottom: 152px; opacity:0.4; }
 }
 @-o-keyframes downward-arrow {
-  0%   { bottom: 147px; }
-  65%   { bottom: 128px; }
-  100% { bottom: 147px; }
+    0%   { bottom: 152px; opacity:0.4;  }
+    58%   { bottom: 120px; opacity:1; }
+    100% { bottom: 152px; opacity:0.4; }
 }
 @keyframes downward-arrow {
-  0%   { bottom: 147px; }
-  65%   { bottom: 147px; }
-  100% { bottom: 128px; }
+    0%   { bottom: 152px; opacity:0.4;  }
+    58%   { bottom: 120px; opacity:1; }
+    100% { bottom: 152px; opacity:0.4; }
 }

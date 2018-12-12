@@ -1682,7 +1682,7 @@ height: 56px;
 .bottom-page.top-dark-info.medium {
     font-size: 36px;
     line-height: 48px;
-    font-family: 'montserrat-light', 'source_sans_prolight', arial;
+    font-family: 'montserrat_light', 'source_sans_prolight', arial;
     z-index: 99;
 }
 .bottom-page.top-dark-info.small {

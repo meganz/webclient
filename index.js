@@ -2290,9 +2290,9 @@ function topmenuUI() {
             loadSubPage($.dlhash);
         }
         else if (folderlink && M.lastSeenFolderLink) {
-            mBroadcaster.once('mega:openfolder', function () {
+            mBroadcaster.once('mega:openfolder', SoonFc(function () {
                 $('.nw-fm-left-icon.transfers').click();
-            });
+            }));
             loadSubPage(M.lastSeenFolderLink);
         }
         else {

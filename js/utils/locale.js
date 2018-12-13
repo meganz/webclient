@@ -11,6 +11,9 @@ var remappedLangLocales = {
     "br": "pt"
 };
 
+$.dateTimeFormat = Object.create(null);
+$.acc_dateTimeFormat = Object.create(null);
+
 if (typeof l === 'undefined') {
     l = [];
 }
@@ -55,6 +58,37 @@ function translate(html) {
     return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, replacer);
 }
 
+/**
+ * Set Date time object for time2date
+ * @param {String} locales Locale string
+ * @param {Number} format format number for the case.
+ */
+function setDateTimeFormat(locales, format) {
+
+    "use strict";
+
+    // Set date format
+    var options = {year: 'numeric'};
+    options.month = format >= 2 ? 'long' : 'numeric';
+    options.day = format === 3 ? undefined : 'numeric';
+
+    // Create new DateTimeFormat object if it is not exist
+    try {
+        $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat(locales, options);
+    }
+    catch (e) {
+        if (format < 2) {
+            $.dateTimeFormat[locales + '-' + format] = 'ISO';
+        }
+        else {
+            $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat(locale, options);
+        }
+    }
+
+    // Create new DateTimeFormat object if it is not exist
+    var timeOptions = {hour: '2-digit', minute:'2-digit', hour12: false};
+    $.dateTimeFormat[locales + '-time'] = new Intl.DateTimeFormat([], timeOptions);
+}
 
 /**
  * Converts a timestamp to a readable time format - e.g. 2016-04-17 14:37
@@ -76,50 +110,79 @@ function translate(html) {
 function time2date(unixTime, format) {
 
     var date = new Date(unixTime * 1000 || 0);
-    var country = 'ISO';
-    var options = {year: 'numeric', month: 'numeric', day: 'numeric'};
     var result;
-
+    var dateFunc;
+    var timeFunc;
+    var country = 'ISO';
+    format = format || 0;
     if (u_attr) {
         country = u_attr.country ? u_attr.country : u_attr.ipcc || 'ISO';
     }
+    var locales = locale + '-' + country;
 
-    format = format || 0;
-    options.month = format >= 2 ? 'long' : 'numeric';
-
-    if (format === 3) {
-        delete options.day;
+    // If dateTimeFormat is not set with the current locale set it.
+    if ($.dateTimeFormat[locales + '-' + format] === undefined) {
+        setDateTimeFormat(locales, format);
     }
 
+    var $dFObj = $.dateTimeFormat[locales + '-' + format];
+    var $tfObj = $.dateTimeFormat[locales + '-time'];
+
+    // print time as ISO date format
     var printISO = function _printISO() {
-        // print time as ISO date format
         var timeOffset = date.getTimezoneOffset() * 60;
         var isodate = new Date((unixTime - timeOffset) * 1000);
         return isodate.toISOString().split('T')[0];
     };
+
+    dateFunc = $dFObj === 'ISO' ? printISO : $dFObj.format;
+    timeFunc = $tfObj.format;
 
     // if it is short date format and user selected to use ISO format
     if ((fmconfig.uidateformat || country === 'ISO') && format < 2) {
         result = printISO();
     }
     else {
-        var locales = locale + '-' + country;
-        try {
-            result = date.toLocaleDateString(locales, options);
-        }
-        catch (e) {
-            result = printISO();
-        }
+        result = dateFunc(date);
     }
 
-    // using toLocaleTimeString to support old browser.
-    if (!format) {
-        result += " " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+    // Add Time format
+    if (format === 0) {
+        result += " " + timeFunc(date);
     }
 
     return result;
 }
 
+/**
+ * Set Date time object for acc_time2date
+ * @param {String} locales Locale string
+ */
+function setAccDateTimeFormat(locales) {
+
+    "use strict";
+    
+    // Set acc date format
+    var options = {month: 'long', day: 'numeric', year: 'numeric'};
+    var nYOptions = {month: 'long', day: 'numeric'};
+
+    // Create new DateTimeFormat object if it is not exist
+    try {
+        $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat(locales, options);
+        $.acc_dateTimeFormat[locales + '-noY'] = new Intl.DateTimeFormat(locales, nYOptions);
+    }
+    catch (e) {
+        $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat(locale, options);
+        $.acc_dateTimeFormat[locales + '-noY'] = new Intl.DateTimeFormat(locale, nYOptions);
+    }
+}
+
+/**
+ * Function to create long date format for current locales.
+ * @param {Number} unixtime The UNIX timestamp in seconds e.g. 1464829467
+ * @param {Boolean} yearIsOptional Optional, set year for the date format as optional
+ * @returns {String} result Formatted date.
+ */
 function acc_time2date(unixtime, yearIsOptional) {
 
     var MyDate = new Date(unixtime * 1000);
@@ -127,16 +190,20 @@ function acc_time2date(unixtime, yearIsOptional) {
     if (u_attr) {
         country = u_attr.country ? u_attr.country : u_attr.ipcc;
     }
-
     var locales = country ? locale + '-' + country : locale;
-
-    var options = {month: 'long', day: 'numeric'};
     var currYear = (new Date()).getFullYear();
-    var result;
 
-    if (!yearIsOptional || (yearIsOptional && currYear !== MyDate.getFullYear())) {
-        options.year = 'numeric';
+    // If dateTimeFormat is already set with the current locale using it.
+    if (!$.acc_dateTimeFormat[locales]) {
+        setAccDateTimeFormat(locales);
     }
+
+    if (yearIsOptional && currYear === MyDate.getFullYear()) {
+        locales += '-noY';
+    }
+
+    var dateFunc = $.acc_dateTimeFormat[locales].format;
+    var result = dateFunc(MyDate);
 
     if (locale === 'en') {
         var date = MyDate.getDate();
@@ -151,20 +218,7 @@ function acc_time2date(unixtime, yearIsOptional) {
             th = 'rd';
         }
 
-        try {
-            result = MyDate.toLocaleDateString(locales, options).replace(date, date + th);
-        }
-        catch (e) {
-            result = MyDate.toLocaleDateString(locale, options).replace(date, date + th);
-        }
-    }
-    else {
-        try {
-            result = MyDate.toLocaleDateString(locales, options);
-        }
-        catch (e) {
-            result = MyDate.toLocaleDateString(locale, options);
-        }
+        result = result.replace(date, date + th);
     }
 
     return result;

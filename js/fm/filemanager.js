@@ -348,20 +348,21 @@ FileManager.prototype.initFileManagerUI = function() {
             else if (dd === 'nw-fm-left-icon') {
                 var c = '' + $(e.target).attr('class');
 
-                if (~c.indexOf('rubbish-bin')) {
+                $.draggingClass = ('dndc-warning');
+                if (c.indexOf('rubbish-bin') > -1) {
                     $.draggingClass = ('dndc-to-rubbish');
                 }
-                else if (~c.indexOf('shared-with-me')) {
+                else if (c.indexOf('conversations') > -1) {
+                    $.draggingClass = ('dndc-to-conversations');
+                }
+                else if (c.indexOf('shared-with-me') > -1) {
                     $.draggingClass = ('dndc-to-shared');
                 }
-                else if (~c.indexOf('contacts')) {
-                    $.draggingClass = ('dndc-to-contacts');
+                else if (c.indexOf('transfers') > -1) {
+                    $.draggingClass = ('dndc-download');
                 }
-                else if (~c.indexOf('conversations')) {
-                    $.draggingClass = ('dndc-to-conversations');
-                }
-                else if (~c.indexOf('cloud-drive')) {
-                    $.draggingClass = ('dndc-to-conversations');
+                else if (c.indexOf('cloud-drive') > -1) {
+                    $.draggingClass = ('dndc-move');
                 }
                 else {
                     c = null;

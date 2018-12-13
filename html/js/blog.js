@@ -264,7 +264,7 @@ function blog_archive() {
             var y = mm.split('_')[0];
 
             var date = new Date();
-            date.setMonth(mm.split('_')[1]);
+            date.setMonth(parseInt(mm.split('_')[1]) - 1);
             date.setYear(y);
             date.setDate(1);
             date = date.getTime() / 1000;

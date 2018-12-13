@@ -938,7 +938,16 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
 
             for (var dd in opsArr) {
                 for (var nn = 0; nn < opsArr[dd].length; nn++) {
-                    var objj = {a: 'm', t: dd, n: opsArr[dd][nn], i: requesti};
+                    var h = opsArr[dd][nn];
+                    var n = M.d[h] || false;
+                    var objj = {a: 'm', t: dd, n: h, i: requesti};
+
+                    // Rename nodes before performing the move to prevent race conditions from other clients...
+                    if (names[h] && n.name !== names[h]) {
+                        M.rename(h, names[h]);
+                        delete names[h];
+                    }
+
                     processmove(objj);
                     ops.push(objj);
                 }

@@ -869,35 +869,38 @@ function api_reqfailed(c, e) {
         queue.ctxsBuffer = [];
         queue.setimmediate = false;
 
-        api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reasonCode) {
-            u_logout(true);
+        api_req({ a: 'whyamiblocked' }, {
+            callback: function whyAmIBlocked(reasonCode) {
+                u_logout(true);
 
-            // On clicking OK, log the user out and redirect to contact page
-            loadingDialog.hide();
+                // On clicking OK, log the user out and redirect to contact page
+                loadingDialog.hide();
 
-            var reasonText = '';
-            var dialogTitle = l[17768];// Terminated account
+                var reasonText = '';
+                var dialogTitle = l[17768];// Terminated account
 
-            if (reasonCode === 200) {
-                dialogTitle = l[6789];// Suspended account
-                reasonText = l[17741];// Your account has been suspended due to multiple breaches of Mega's Terms...
-            }
-            else if (reasonCode === 300) {
-                reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
-            }
-            else {// Unknown reasonCode
-                reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
-            }
-
-            msgDialog('warninga', dialogTitle,
-                reasonText,
-                false,
-                function() {
-                    var redirectUrl = getAppBaseUrl() + '#contact';
-                    window.location.replace(redirectUrl);
+                if (reasonCode === 200) {
+                    dialogTitle = l[6789];// Suspended account
+                    reasonText = l[17741];// Your account has been suspended due to multiple breaches of Mega's Terms..
                 }
-            );
-        }});
+                else if (reasonCode === 300) {
+                    reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
+                }
+                else {// Unknown reasonCode
+                    reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
+                }
+                // if fm-overlay click handler was initialized, we remove the handler to prevent dialog skip
+                $('.fm-dialog-overlay').off('click.fm');
+                msgDialog('warninga', dialogTitle,
+                    reasonText,
+                    false,
+                    function () {
+                        var redirectUrl = getAppBaseUrl() + '#contact';
+                        window.location.replace(redirectUrl);
+                    }
+                );
+            }
+        });
     }
     else {
         api_reqerror(apixs[c], EAGAIN, 0);

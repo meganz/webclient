@@ -1021,7 +1021,7 @@ FileManager.prototype.initContextUI = function() {
             menuPos,
             currentId;
 
-        if ($this.hasClass('disabled')){
+        if ($this.hasClass('disabled') && $this.parents('#sm_move').length === 0) {
             return false;
         }
 

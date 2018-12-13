@@ -561,18 +561,19 @@ var voucherDialog = {
         this.$dialog.find('.voucher-plan-price .price').text(proPrice);
         this.$dialog.find('#voucher-code-input input').val('');
         this.changeColourIfSufficientBalance();
+        
+        var $voucherAccountBalance = this.$dialog.find('.voucher-account-balance');
+        var $balanceAmount = $voucherAccountBalance.find('.balance-amount');
+        $balanceAmount.text(balance);
 
         // Mobile specific dialog enhancements
         if (is_mobile) {
-            var $voucherAccountBalance = this.$dialog.find('.voucher-account-balance');
-            var $balanceAmount = $voucherAccountBalance.find('.balance-amount');
             var $newBalanceAmount = $voucherAccountBalance.find('.new-balance-amount');
             var $storageAmount = $voucherAccountBalance.find('.storage-amount');
             var $newStorageAmount = $voucherAccountBalance.find('.new-storage-amount');
             var $transferAmount = $voucherAccountBalance.find('.transfer-amount');
             var $newTransferAmount = $voucherAccountBalance.find('.new-transfer-amount');
 
-            $balanceAmount.text(balance);
             $newBalanceAmount.text(newBalance);
 
             if (newBalance < 0) {

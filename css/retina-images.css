@@ -70,7 +70,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/new-affiliate-sprite_v1@2x.png);
     background-size: 1500px auto;
 }
-.contact-us .contact-new-title::before, .contact-us-revamp .main-mid-pad h1 {
+.contact-us .contact-new-title::before, .contact-us-revamp h1 {
     background-image: url(../images/mega/contact-us-sprite@2x.png);
     background-size: 80px auto;
 }

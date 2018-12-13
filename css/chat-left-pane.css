@@ -22,6 +22,7 @@
 }
 .archived-chats .archive-chat-list {
     min-height: initial;
+    background-color: white;
 }
 .conversation-reduce-height {
     position: relative;

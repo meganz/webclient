@@ -167,6 +167,10 @@ var MegaRenderMixin = {
     isComponentEventuallyVisible: function() {
         var domNode = this.findDOMNode();
 
+        if (this.componentSpecificIsComponentEventuallyVisible) {
+            return this.componentSpecificIsComponentEventuallyVisible();
+        }
+
         // ._isMounted is faster then .isMounted() or any other operation
         if (!this._isMounted) {
             return false;
@@ -294,18 +298,21 @@ var MegaRenderMixin = {
                         "changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v
                     );
                 }
+
                 foundChanges = true;
                 dataChangeHistory[cacheKey] = v._dataChangeIndex;
             } else {
                 // console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
             }
-        } else if (typeof v === "object" && v !== null && depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
+        } else if (
+            !(v instanceof Uint8Array) && typeof v === "object" && v !== null &&
+            depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
             if (self._recursiveSearchForDataChanges(idx, v, rv, depth + 1) === true) {
                 foundChanges = true;
             } else {
                 // console.error("NOT (recursive) changed: ", k, v);
             }
-        } else if (v && v.forEach && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
+        } else if (!(v instanceof Uint8Array) && v && v.forEach && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
             v.forEach(function(v, k) {
                 if (self._recursiveSearchForDataChanges(idx, v[k], rv[k], depth + 1) === true) {
                     foundChanges = true;
@@ -395,6 +402,16 @@ var MegaRenderMixin = {
                 );
             }
             return false;
+        }
+        if (this.componentSpecificIsComponentEventuallyVisible) {
+            // we asume `componentSpecificIsComponentEventuallyVisible` is super quick/does have low CPU usage
+            if (!this._queueUpdateWhenVisible && !this.componentSpecificIsComponentEventuallyVisible()) {
+                this._queueUpdateWhenVisible = true;
+            }
+            else if (this._queueUpdateWhenVisible && this.componentSpecificIsComponentEventuallyVisible()) {
+                delete this._queueUpdateWhenVisible;
+                return true;
+            }
         }
 
         // component specific control of the React lifecycle
@@ -521,7 +538,7 @@ var RenderDebugger = {
             };
 
             console.error(
-                "rendered: ", getElementName(),
+                "renderedX: ", getElementName(),
                 "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
                 "props:", this.props,
                 "state:", this.state
@@ -529,6 +546,79 @@ var RenderDebugger = {
         }
     }
 };
+if (localStorage.profileRenderFns) {
+    window.REACT_RENDER_CALLS = {};
+    var FUNCTIONS = [
+        'render',
+        'shouldComponentUpdate',
+        'doProgramaticScroll',
+        'componentDidMount',
+        'componentDidUpdate',
+        'componentWillUnmount',
+        'refreshUI',
+        'eventuallyInit',
+        'handleWindowResize',
+        'isActive',
+        'onMessagesScrollReinitialise',
+        'specificShouldComponentUpdate',
+        'attachAnimationEvents',
+        'eventuallyReinitialise',
+        'reinitialise',
+        'getContentHeight',
+        'onResize',
+        'isComponentEventuallyVisible'
+    ];
+
+    RenderDebugger.componentWillReceiveProps = function(nextProps, nextContext) {
+        // since this is not used in our app, we can use it as a pre-call hook to wrap render() fn's for performance
+        // logging
+        var self = this;
+        var componentName = self.constructor ? self.constructor.displayName : "unknown";
+        if (!this._wrappedRender) {
+            FUNCTIONS.forEach(function(fnName) {
+                var _origFn = self[fnName];
+                if (_origFn) {
+                    self[fnName] = function() {
+                        var start = performance.now();
+                        var res = _origFn.apply(this, arguments);
+                        REACT_RENDER_CALLS[componentName + "." + fnName] = REACT_RENDER_CALLS[componentName + "." + fnName]
+                            || 0;
+                        REACT_RENDER_CALLS[componentName + "." + fnName] += performance.now() - start;
+                        return res;
+                    };
+                }
+            });
+            self._wrappedRender = true;
+        }
+        REACT_RENDER_CALLS.sorted = function() {
+            var sorted = [];
+            Object.keys(REACT_RENDER_CALLS).sort(function(a, b) {
+                if (REACT_RENDER_CALLS[a] < REACT_RENDER_CALLS[b]) {
+                    return 1;
+                }
+                else if (REACT_RENDER_CALLS[a] > REACT_RENDER_CALLS[b]) {
+                    return -1;
+                }
+                else {
+                    return 0;
+                }
+            }).forEach(function(k) {
+                if (typeof REACT_RENDER_CALLS[k] !== 'function') {
+                    sorted.push([k, REACT_RENDER_CALLS[k]]);
+                }
+            });
+
+            return sorted;
+        };
+        REACT_RENDER_CALLS.clear = function() {
+            Object.keys(REACT_RENDER_CALLS).forEach(function(k) {
+                if (typeof REACT_RENDER_CALLS[k] !== 'function') {
+                    delete REACT_RENDER_CALLS[k];
+                }
+            });
+        };
+    }
+}
 
 window.MegaRenderMixin = MegaRenderMixin;
 

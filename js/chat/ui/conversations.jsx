@@ -605,7 +605,6 @@ var ConversationsList = React.createClass({
                     chatRoom={chatRoom}
                     contact={contact}
                     messages={chatRoom.messagesBuff}
-                    megaChat={megaChat}
                     onConversationClicked={(e) => {
                         self.conversationClicked(chatRoom, e);
                 }} />

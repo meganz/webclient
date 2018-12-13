@@ -2374,7 +2374,6 @@ React.makeElement = React['createElement'];
 	                chatRoom: chatRoom,
 	                contact: contact,
 	                messages: chatRoom.messagesBuff,
-	                megaChat: megaChat,
 	                onConversationClicked: function onConversationClicked(e) {
 	                    self.conversationClicked(chatRoom, e);
 	                } }));
@@ -2956,7 +2955,7 @@ React.makeElement = React['createElement'];
 	var JScrollPane = React.createClass({
 	    displayName: "JScrollPane",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            className: "jScrollPaneContainer",
@@ -3353,6 +3352,10 @@ React.makeElement = React['createElement'];
 	    isComponentEventuallyVisible: function() {
 	        var domNode = this.findDOMNode();
 
+	        if (this.componentSpecificIsComponentEventuallyVisible) {
+	            return this.componentSpecificIsComponentEventuallyVisible();
+	        }
+
 	        // ._isMounted is faster then .isMounted() or any other operation
 	        if (!this._isMounted) {
 	            return false;
@@ -3480,18 +3483,21 @@ React.makeElement = React['createElement'];
 	                        "changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v
 	                    );
 	                }
+
 	                foundChanges = true;
 	                dataChangeHistory[cacheKey] = v._dataChangeIndex;
 	            } else {
 	                // console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
 	            }
-	        } else if (typeof v === "object" && v !== null && depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
+	        } else if (
+	            !(v instanceof Uint8Array) && typeof v === "object" && v !== null &&
+	            depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
 	            if (self._recursiveSearchForDataChanges(idx, v, rv, depth + 1) === true) {
 	                foundChanges = true;
 	            } else {
 	                // console.error("NOT (recursive) changed: ", k, v);
 	            }
-	        } else if (v && v.forEach && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
+	        } else if (!(v instanceof Uint8Array) && v && v.forEach && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
 	            v.forEach(function(v, k) {
 	                if (self._recursiveSearchForDataChanges(idx, v[k], rv[k], depth + 1) === true) {
 	                    foundChanges = true;
@@ -3581,6 +3587,16 @@ React.makeElement = React['createElement'];
 	                );
 	            }
 	            return false;
+	        }
+	        if (this.componentSpecificIsComponentEventuallyVisible) {
+	            // we asume `componentSpecificIsComponentEventuallyVisible` is super quick/does have low CPU usage
+	            if (!this._queueUpdateWhenVisible && !this.componentSpecificIsComponentEventuallyVisible()) {
+	                this._queueUpdateWhenVisible = true;
+	            }
+	            else if (this._queueUpdateWhenVisible && this.componentSpecificIsComponentEventuallyVisible()) {
+	                delete this._queueUpdateWhenVisible;
+	                return true;
+	            }
 	        }
 
 	        // component specific control of the React lifecycle
@@ -3707,7 +3723,7 @@ React.makeElement = React['createElement'];
 	            };
 
 	            console.error(
-	                "rendered: ", getElementName(),
+	                "renderedX: ", getElementName(),
 	                "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
 	                "props:", this.props,
 	                "state:", this.state
@@ -3715,6 +3731,79 @@ React.makeElement = React['createElement'];
 	        }
 	    }
 	};
+	if (localStorage.profileRenderFns) {
+	    window.REACT_RENDER_CALLS = {};
+	    var FUNCTIONS = [
+	        'render',
+	        'shouldComponentUpdate',
+	        'doProgramaticScroll',
+	        'componentDidMount',
+	        'componentDidUpdate',
+	        'componentWillUnmount',
+	        'refreshUI',
+	        'eventuallyInit',
+	        'handleWindowResize',
+	        'isActive',
+	        'onMessagesScrollReinitialise',
+	        'specificShouldComponentUpdate',
+	        'attachAnimationEvents',
+	        'eventuallyReinitialise',
+	        'reinitialise',
+	        'getContentHeight',
+	        'onResize',
+	        'isComponentEventuallyVisible'
+	    ];
+
+	    RenderDebugger.componentWillReceiveProps = function(nextProps, nextContext) {
+	        // since this is not used in our app, we can use it as a pre-call hook to wrap render() fn's for performance
+	        // logging
+	        var self = this;
+	        var componentName = self.constructor ? self.constructor.displayName : "unknown";
+	        if (!this._wrappedRender) {
+	            FUNCTIONS.forEach(function(fnName) {
+	                var _origFn = self[fnName];
+	                if (_origFn) {
+	                    self[fnName] = function() {
+	                        var start = performance.now();
+	                        var res = _origFn.apply(this, arguments);
+	                        REACT_RENDER_CALLS[componentName + "." + fnName] = REACT_RENDER_CALLS[componentName + "." + fnName]
+	                            || 0;
+	                        REACT_RENDER_CALLS[componentName + "." + fnName] += performance.now() - start;
+	                        return res;
+	                    };
+	                }
+	            });
+	            self._wrappedRender = true;
+	        }
+	        REACT_RENDER_CALLS.sorted = function() {
+	            var sorted = [];
+	            Object.keys(REACT_RENDER_CALLS).sort(function(a, b) {
+	                if (REACT_RENDER_CALLS[a] < REACT_RENDER_CALLS[b]) {
+	                    return 1;
+	                }
+	                else if (REACT_RENDER_CALLS[a] > REACT_RENDER_CALLS[b]) {
+	                    return -1;
+	                }
+	                else {
+	                    return 0;
+	                }
+	            }).forEach(function(k) {
+	                if (typeof REACT_RENDER_CALLS[k] !== 'function') {
+	                    sorted.push([k, REACT_RENDER_CALLS[k]]);
+	                }
+	            });
+
+	            return sorted;
+	        };
+	        REACT_RENDER_CALLS.clear = function() {
+	            Object.keys(REACT_RENDER_CALLS).forEach(function(k) {
+	                if (typeof REACT_RENDER_CALLS[k] !== 'function') {
+	                    delete REACT_RENDER_CALLS[k];
+	                }
+	            });
+	        };
+	    }
+	}
 
 	window.MegaRenderMixin = MegaRenderMixin;
 
@@ -3810,11 +3899,12 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var x = 0;
 	var PerfectScrollbar = React.createClass({
 	    displayName: "PerfectScrollbar",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    isUserScroll: true,
 	    scrollEventIncId: 0,
 	    getDefaultProps: function getDefaultProps() {
@@ -3910,16 +4000,22 @@ React.makeElement = React['createElement'];
 	            return;
 	        }
 
-	        var $node = $(self.findDOMNode());
-	        var ns = '.ps' + self.getUniqueId();
-	        $node.parents('.have-animation').rebind('animationend' + ns + ' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns, function (e) {
+	        var $haveAnimationNode = self._haveAnimNode;
+
+	        if (!$haveAnimationNode) {
+	            var $node = $(self.findDOMNode());
+	            var ns = '.ps' + self.getUniqueId();
+	            $haveAnimationNode = self._haveAnimNode = $node.parents('.have-animation');
+	        }
+
+	        $haveAnimationNode.rebind('animationend' + ns + ' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns, function (e) {
 	            self.safeForceUpdate(true);
 	            if (self.props.onAnimationEnd) {
 	                self.props.onAnimationEnd();
 	            }
 	        });
 	    },
-	    eventuallyReinitialise: function eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
+	    eventuallyReinitialise: SoonFc(function (forced, scrollPositionYPerc, scrollToElement) {
 	        var self = this;
 
 	        if (!self.isMounted()) {
@@ -3935,7 +4031,7 @@ React.makeElement = React['createElement'];
 	            self._currHeight = self.getContentHeight();
 	            self._doReinit(scrollPositionYPerc, scrollToElement, forced, $elem);
 	        }
-	    },
+	    }, 75),
 	    _doReinit: function _doReinit(scrollPositionYPerc, scrollToElement, forced, $elem) {
 	        var self = this;
 
@@ -4143,7 +4239,7 @@ React.makeElement = React['createElement'];
 	var Button = React.createClass({
 	    displayName: "Button",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getInitialState: function getInitialState() {
 	        return { 'focused': false };
 	    },
@@ -4322,7 +4418,7 @@ React.makeElement = React['createElement'];
 	var Dropdown = React.createClass({
 	    displayName: "Dropdown",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getInitialState: function getInitialState() {
 	        return {};
 	    },
@@ -4508,7 +4604,7 @@ React.makeElement = React['createElement'];
 	var DropdownContactsSelector = React.createClass({
 	    displayName: "DropdownContactsSelector",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            requiresUpdateOnResize: true
@@ -4574,7 +4670,7 @@ React.makeElement = React['createElement'];
 	var DropdownItem = React.createClass({
 	    displayName: "DropdownItem",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            requiresUpdateOnResize: true
@@ -4918,7 +5014,7 @@ React.makeElement = React['createElement'];
 	var ContactVerified = React.createClass({
 	    displayName: "ContactVerified",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    componentWillMount: function componentWillMount() {
 	        var self = this;
 
@@ -4967,7 +5063,7 @@ React.makeElement = React['createElement'];
 	var ContactPresence = React.createClass({
 	    displayName: "ContactPresence",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    render: function render() {
 	        var self = this;
 	        var contact = this.props.contact;
@@ -4984,7 +5080,7 @@ React.makeElement = React['createElement'];
 	var ContactFingerprint = React.createClass({
 	    displayName: "ContactFingerprint",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    render: function render() {
 	        var self = this;
 	        var contact = this.props.contact;
@@ -5308,7 +5404,7 @@ React.makeElement = React['createElement'];
 	var ContactPickerWidget = React.createClass({
 	    displayName: "ContactPickerWidget",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getInitialState: function getInitialState() {
 	        return {
 	            'searchValue': '',
@@ -5667,7 +5763,7 @@ React.makeElement = React['createElement'];
 	var JoinCallNotification = React.createClass({
 	    displayName: "JoinCallNotification",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    render: function render() {
 	        var room = this.props.chatRoom;
 	        if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
@@ -5700,11 +5796,14 @@ React.makeElement = React['createElement'];
 	var ConversationRightArea = React.createClass({
 	    displayName: "ConversationRightArea",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'requiresUpdateOnResize': true
 	        };
+	    },
+	    componentSpecificIsComponentEventuallyVisible: function componentSpecificIsComponentEventuallyVisible() {
+	        return this.props.chatRoom.isCurrentlyActive;
 	    },
 	    allContactsInChat: function allContactsInChat(participants) {
 	        var self = this;
@@ -6043,6 +6142,9 @@ React.makeElement = React['createElement'];
 
 	    mixins: [MegaRenderMixin, RenderDebugger],
 	    lastScrollPositionPerc: 1,
+	    componentSpecificIsComponentEventuallyVisible: function componentSpecificIsComponentEventuallyVisible() {
+	        return this.props.chatRoom.isCurrentlyActive;
+	    },
 	    getInitialState: function getInitialState() {
 	        return {
 	            startCallPopupIsActive: false,
@@ -6254,8 +6356,6 @@ React.makeElement = React['createElement'];
 	                    e.preventDefault();
 	                }
 	            });
-
-	            $.tresizer();
 	        }
 	    },
 	    handleWindowResize: function handleWindowResize(e, scrollToBottom) {
@@ -7512,6 +7612,7 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var Tooltips = __webpack_require__(14);
 	var Forms = __webpack_require__(15);
 
@@ -7527,7 +7628,7 @@ React.makeElement = React['createElement'];
 	var ModalDialog = React.createClass({
 	    displayName: "ModalDialog",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'hideable': true
@@ -7673,7 +7774,7 @@ React.makeElement = React['createElement'];
 	var SelectContactDialog = React.createClass({
 	    displayName: "SelectContactDialog",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    clickTime: 0,
 	    getDefaultProps: function getDefaultProps() {
 	        return {
@@ -7749,7 +7850,7 @@ React.makeElement = React['createElement'];
 	var ConfirmDialog = React.createClass({
 	    displayName: "ConfirmDialog",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'confirmLabel': __(l[6826]),
@@ -7890,11 +7991,12 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 
 	var Handler = React.createClass({
 	    displayName: "Handler",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'hideable': true
@@ -7913,7 +8015,7 @@ React.makeElement = React['createElement'];
 	var Contents = React.createClass({
 	    displayName: "Contents",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'hideable': true
@@ -7940,7 +8042,7 @@ React.makeElement = React['createElement'];
 	var Tooltip = React.createClass({
 	    displayName: "Tooltip",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getInitialState: function getInitialState() {
 	        return {
 	            'active': false
@@ -8087,11 +8189,12 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 
 	var Checkbox = React.createClass({
 	    displayName: "Checkbox",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getInitialState: function getInitialState() {
 	        return {
 	            checked: this.props.checked ? this.props.checked : false
@@ -8156,13 +8259,14 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var ModalDialogsUI = __webpack_require__(13);
 	var Tooltips = __webpack_require__(14);
 
 	var BrowserCol = React.createClass({
 	    displayName: "BrowserCol",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'hideable': true
@@ -8195,7 +8299,7 @@ React.makeElement = React['createElement'];
 	var BrowserEntries = React.createClass({
 	    displayName: "BrowserEntries",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'hideable': true
@@ -8872,7 +8976,7 @@ React.makeElement = React['createElement'];
 	var CloudBrowserDialog = React.createClass({
 	    displayName: "CloudBrowserDialog",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'selectLabel': __(l[8023]),
@@ -10183,6 +10287,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var DropdownsUI = __webpack_require__(10);
 	var PerfectScrollbar = __webpack_require__(8).PerfectScrollbar;
 
@@ -10194,7 +10299,7 @@ React.makeElement = React['createElement'];
 	    data_emojiByCategory: null,
 	    customCategoriesOrder: ["frequently_used", "people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"],
 	    frequentlyUsedEmojis: ['slight_smile', 'grinning', 'smile', 'wink', 'yum', 'rolling_eyes', 'stuck_out_tongue'],
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    heightDefs: {
 	        'categoryTitleHeight': 55,
 	        'emojiRowHeight': 35,
@@ -10686,12 +10791,13 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var ButtonsUI = __webpack_require__(9);
 
 	var EmojiAutocomplete = React.createClass({
 	    displayName: "EmojiAutocomplete",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    data_emojis: null,
 	    getDefaultProps: function getDefaultProps() {
 	        return {
@@ -10972,11 +11078,12 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 
 	var WhosTyping = React.createClass({
 	    displayName: "WhosTyping",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getInitialState: function getInitialState() {
 	        return {
 	            currentlyTyping: {}
@@ -11114,6 +11221,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 
 	var AccordionPanel = React.createClass({
 	    displayName: "AccordionPanel",
@@ -11150,7 +11258,7 @@ React.makeElement = React['createElement'];
 	var Accordion = React.createClass({
 	    displayName: "Accordion",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getInitialState: function getInitialState() {
 	        return {
 	            'expandedPanel': this.props.expandedPanel
@@ -11225,6 +11333,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var ButtonsUI = __webpack_require__(9);
 	var ModalDialogsUI = __webpack_require__(13);
 	var DropdownsUI = __webpack_require__(10);
@@ -11234,7 +11343,7 @@ React.makeElement = React['createElement'];
 	var ParticipantsList = React.createClass({
 	    displayName: "ParticipantsList",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'requiresUpdateOnResize': true,
@@ -11344,7 +11453,7 @@ React.makeElement = React['createElement'];
 	var ParticipantsListInner = React.createClass({
 	    displayName: "ParticipantsListInner",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'requiresUpdateOnResize': true,
@@ -12836,9 +12945,10 @@ React.makeElement = React['createElement'];
 
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 
 	var ConversationMessageMixin = {
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    onAfterRenderWasTriggered: false,
 	    componentWillMount: function componentWillMount() {
 	        var self = this;
@@ -13769,11 +13879,12 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 
 	var SharedFileItem = React.createClass({
 	    displayName: "SharedFileItem",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    render: function render() {
 	        var self = this;
 	        var message = this.props.message;
@@ -13833,7 +13944,7 @@ React.makeElement = React['createElement'];
 	var SharedFilesAccordionPanel = React.createClass({
 	    displayName: "SharedFilesAccordionPanel",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    eventuallyRenderThumbnails: SoonFc(function () {
 	        if (this.allShownNodes) {
 	            var pending = [];
@@ -14071,11 +14182,12 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 
 	var SharedFolderItem = React.createClass({
 	    displayName: "SharedFolderItem",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    render: function render() {
 	        var self = this;
 	        var node = this.props.node;
@@ -14113,7 +14225,7 @@ React.makeElement = React['createElement'];
 	var IncomingSharesAccordionPanel = React.createClass({
 	    displayName: "IncomingSharesAccordionPanel",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    componentWillMount: function componentWillMount() {
 	        this.hadLoaded = false;
 	    },
@@ -14290,7 +14402,7 @@ React.makeElement = React['createElement'];
 	var ConversationAudioVideoPanel = React.createClass({
 	    displayName: "ConversationAudioVideoPanel",
 
-	    mixins: [MegaRenderMixin],
+	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getInitialState: function getInitialState() {
 	        return {
 	            'messagesBlockEnabled': false,

@@ -8,7 +8,7 @@ var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 var _buttonGroups = {};
 
 var Button = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getInitialState: function() {
         return {'focused': false};
     },

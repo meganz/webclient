@@ -161,7 +161,7 @@ function time2date(unixTime, format) {
 function setAccDateTimeFormat(locales) {
 
     "use strict";
-    
+
     // Set acc date format
     var options = {month: 'long', day: 'numeric', year: 'numeric'};
     var nYOptions = {month: 'long', day: 'numeric'};

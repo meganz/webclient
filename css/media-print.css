@@ -1,47 +1,63 @@
 /* frienldy printing */
 @media print {
 /* remove all single page styles */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    .bottom-page .top-head {
+        position: absolute !important;
+    }
+    /* FM */
     body, body * {
-        visibility: hidden;
-        overflow: visible !important;
         max-width: 100% !important;
     }
-
-    .top-head, .nw-bottom-block .nw-bottom-pad, .nw-bottom-block .nw-bottom-social {
-        display: none;
-        height: 0px;
+    .data-block-view {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
     }
-
-    .new-left-menu-block {
-        padding-top: 0px !important;
+    /* Bottom Pages */
+        body.bottom-page, body.bottom-pages .fmholder {
+        overflow:  visible !important;
     }
-
-    .main-pad-block {
-        padding-bottom: 0px !important;
-    }
-
-    .nw-bottom-block {
-        height: 48px;
-        position: relative !important;
-    }
-
-    .jspPane * {
-        visibility: visible;
-    }
-
-    .jspPane {
-        visibility: visible;
-        float: none !important;
-        left: 0px;
-        top: 0px !important;
-        width: 100% !important;
+    #help2-main .support-section-header {
         position: absolute !important;
-        overflow: visible !important;
-        min-height: auto !important;
     }
-
-    .jspContainer {
-        height: auto !important;
+    #help2-main .sidebar-menu-container.fixed {
+        position: absolute !important;
     }
-
+    .contact-us-revamp h1 {
+        margin-bottom: 0;
+    }
+    .bottom-page.img.mobile-top {
+        margin: 0 0 0 38px;
+    }
+    .bottom-page.img.megasync {
+        padding: 0;
+    }
+    .bottom-page.img.mobile-app {
+        padding: 0;
+    }
+    .bottom-page.full-block {
+        overflow: hidden;
+    }
+    .megasync .bottom-page img {
+        width: 60%;
+    }
+    .bottom-page.img-wrap::before {
+        display: none;
+    }
+    .bottom-page .security-illustration {
+        margin-left: auto;
+        position: static; 
+        left: auto;
+    }
+    .bottom-page.table {
+        table-layout: auto;
+    }
+}
+@page {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
 }

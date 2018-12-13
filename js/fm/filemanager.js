@@ -2378,32 +2378,6 @@ FileManager.prototype.contactsUI = function() {
     var $contactBlocks = $container.find('.data-block-view, .contacts tr');
     var $buttons = $contactBlocks.find('.default-white-button');
     var $addContact = $contactBlocks.find('.add-new-contact');
-    var $publicLink = $('.public-contact-link');
-
-    var setContactLink = function() {
-        var linkData = $publicLink.attr('data-lnk');
-        var account = M.account || false;
-
-        // Exit if link exists
-        if (linkData) {
-            return false;
-        }
-
-        // Check data exists in M.account
-        if (account.contactLink && account.contactLink.length) {
-            $publicLink.attr('data-lnk', 'https://mega.nz/C!' + M.account.contactLink);
-        }
-        else {
-            api_req({ a: 'clc' }, {
-                callback: function (res, ctx) {
-                    if (typeof res === 'string') {
-                        res = 'https://mega.nz/C!' + res;
-                        $publicLink.attr('data-lnk', res);
-                    }
-                }
-            });
-        }
-    };
 
     setContactLink();
 
@@ -2492,29 +2466,6 @@ FileManager.prototype.contactsUI = function() {
             e.stopPropagation();
     });
 
-    $publicLink.rebind('mouseover.publiclnk', function() {
-        var $this = $(this);
-        var $tooltip = $('.dropdown.tooltip.small');
-        var leftPos = $this.offset().left + $this.width()/2 - $tooltip.outerWidth()/2;
-        var topPos = $this.offset().top - $tooltip.outerHeight() - 10;
-
-        $tooltip.addClass('visible').css({
-            'left': leftPos,
-            'top': topPos
-        });
-    });
-
-    $publicLink.rebind('mouseout.publiclnk', function() {
-        $('.dropdown.tooltip.small').removeClass('visible');
-    });
-
-    $publicLink.rebind('click', function() {
-        var linkData = $(this).attr('data-lnk') || '';
-
-        if (linkData.length) {
-            copyToClipboard(linkData, l[371] + '<span>' + linkData + '</span>', 'short');
-        }
-    });
 };
 
 FileManager.prototype.addContactUI = function() {

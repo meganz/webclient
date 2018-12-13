@@ -1,9 +1,10 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
+var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 
 var WhosTyping = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getInitialState: function() {
         return {
             currentlyTyping: {}

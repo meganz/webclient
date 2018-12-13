@@ -35,7 +35,7 @@ var ENABLE_GROUP_CALLING_FLAG = (
 var ConversationAudioVideoPanel = require('./conversationaudiovideopanel.jsx').ConversationAudioVideoPanel;
 
 var JoinCallNotification = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     render: function() {
         var room = this.props.chatRoom;
         if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
@@ -58,11 +58,14 @@ var JoinCallNotification = React.createClass({
 });
 
 var ConversationRightArea = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             'requiresUpdateOnResize': true
         }
+    },
+    componentSpecificIsComponentEventuallyVisible: function() {
+        return this.props.chatRoom.isCurrentlyActive;
     },
     allContactsInChat: function(participants) {
         var self = this;
@@ -456,6 +459,9 @@ var ConversationRightArea = React.createClass({
 var ConversationPanel = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     lastScrollPositionPerc: 1,
+    componentSpecificIsComponentEventuallyVisible: function() {
+        return this.props.chatRoom.isCurrentlyActive;
+    },
     getInitialState: function() {
         return {
             startCallPopupIsActive: false,
@@ -681,8 +687,6 @@ var ConversationPanel = React.createClass({
                     e.preventDefault();
                 }
             });
-
-            $.tresizer();
         }
     },
     handleWindowResize: function(e, scrollToBottom) {

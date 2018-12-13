@@ -9,7 +9,7 @@ var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
  * @type {*|Function}
  */
 var JScrollPane = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             className: "jScrollPaneContainer",

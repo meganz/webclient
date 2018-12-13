@@ -2,9 +2,10 @@ var React = require("react");
 
 var utils = require('./../../../ui/utils.jsx');
 var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
+var RenderDebugger = require('./../../../stores/mixins.js').RenderDebugger;
 
 var ConversationMessageMixin = {
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     onAfterRenderWasTriggered: false,
     componentWillMount: function() {
         var self = this;

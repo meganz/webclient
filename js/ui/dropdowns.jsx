@@ -6,7 +6,7 @@ var ContactsUI = require('./../chat/ui/contacts.jsx');
 var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
 
 var Dropdown = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getInitialState: function() {
         return {}
     },
@@ -203,7 +203,7 @@ var Dropdown = React.createClass({
 
 
 var DropdownContactsSelector = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             requiresUpdateOnResize: true
@@ -269,7 +269,7 @@ var DropdownContactsSelector = React.createClass({
 });
 
 var DropdownItem = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             requiresUpdateOnResize: true

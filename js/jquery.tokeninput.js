@@ -935,6 +935,16 @@
                         break;
                     }
                 }
+                if ((Object.keys(M.opc).length > 0) && (typeof itemFoundType === "undefined")) {
+                    Object.keys(M.opc).forEach(function (g) {
+                        if (M.opc[g].m.toLowerCase() === item[tokenValue].toLowerCase()
+                            && !M.opc[g].hasOwnProperty('dts')) {
+                            itemFoundType = "opc";
+                            return false;
+                        }
+                    });
+                }
+
                 // Prevent further execution if email is duplicated
                 if (itemFoundType) {
                     select_token(item);

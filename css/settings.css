@@ -92,6 +92,9 @@
     transition: all 200ms ease-in-out;
 }
 .fm-account-button.active .settings-menu-arrow, .fm-account-button:not(.closed) .settings-menu-arrow {
+    -o-transform: rotateZ(90deg);
+    -ms-transform: rotateZ(90deg);
+    -webkit-transform: rotateZ(90deg);
     transform: rotateZ(90deg);
 }
 .fm-account-button.account-s .head-title::before {
@@ -152,6 +155,10 @@
     font-family: 'LatoWeb','source_sans_proregular', Arial;
     background-color: #fff;
 }
+.fm-right-account-block .default-select-dropdown {
+    top: -8px;
+    left: -9px;
+}
 .fm-right-account-block .txt-center {
     text-align: center;
     display: block;
@@ -170,12 +177,17 @@
     margin: 16px auto;
     width: calc(100% - 32px);
     max-width: 1020px;
-    border-radius: 8px;
+    border-radius: 5px;
     border: 1px solid rgba(0,0,0,0.1);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.05);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.05);
     display:block;
     background-color: #fafafa;
     z-index: 9;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .first-block {
     width: 20%;
@@ -243,7 +255,7 @@
     color: #333;
     line-height: 24px;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
     max-width: 370px;
     text-overflow: ellipsis;
     position: relative;
@@ -414,15 +426,13 @@
     vertical-align: top;
 }
 .fm-account-sections{
-    display: inline-block;
     position: relative;
     width: 802px;
-    left: 50%;
-    -webkit-transform: translateX(-50%);
-    -ms-transform: translateX(-50%);
-    transform: translateX(-50%);
+    margin:  0 auto;
     margin-top: 16px;
     padding: 0 16px 64px 16px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
 .account.data-block {
@@ -453,7 +463,7 @@
 }
 .settings-right-block {
     width: 536px;
-    padding: 8px 0 16px 56px;
+    padding: 9px 0 16px 56px;
     box-sizing: border-box;
     display: inline-block;
     vertical-align: top;
@@ -507,10 +517,7 @@
 }
 .fm-right-account-block .default-white-button.avatar {
     top: 50%;
-    -o-transform: translateY(-50%);
-    -ms-transform: translateY(-50%); /* IE 9 */
-    -webkit-transform: translateY(-50%); /* Safari */
-    transform: translateY(-50%);
+    margin-top: -16px;
 }
 .fm-right-account-block .default-white-button.right, .fm-right-account-block .default-green-button.right {
     position: relative;
@@ -681,6 +688,7 @@
     background-repeat: no-repeat;
     background-position: 0px -12311px;
     opacity: 0.4;
+    -o-transform: rotate(180deg);
     -ms-transform: rotate(180deg); /* IE 9 */
     -webkit-transform: rotate(180deg); /* Safari */
     transform: rotate(180deg);
@@ -722,10 +730,13 @@
     cursor: pointer;
     display: inline-block;
     position: absolute;
-    height: 20px;
-    width: 36px;
+    height: 22px;
+    width: 38px;
     right: 0;
-    top: 24px;
+    top: 22px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .fm-right-account-block .dialog-feature-toggle.toggle-on {
     background-color: #00BFA5;
@@ -825,7 +836,6 @@
     overflow: hidden;
 }
 .fm-right-account-block .grid-table{
-    border-spacing: 1;
     border-collapse: collapse;
     background: white;
     border-radius: 4px;
@@ -834,6 +844,7 @@
     width: 99.5%;
     margin: 0 auto;
     position: relative;
+    overflow: hidden;
 }
 .fm-right-account-block .grid-table tr:hover {
     background-color: #fff;
@@ -843,6 +854,12 @@
     position: relative;
     transition: 0.3s;
     border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.fm-right-account-block .grid-table tr:last-child {
+    border: 0;
+}
+.fm-right-account-block .grid-table tr:not(:first-child):hover {
+    background-color: #fafafa;
 }
 .fm-right-account-block .grid-table tr:first-child {
     background-color: rgba(245,245,245,1);
@@ -954,7 +971,7 @@
 .fm-right-account-block .account.rubbish-inputs .account-counter-number {
     float: none;
     display: inline-block;
-    margin:0 16px;
+    margin: -4px 16px;
 }
 .fm-right-account-block .account-counter-block {
     margin: 0;

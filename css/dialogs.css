@@ -4,6 +4,57 @@
     display: block;
     background-color: rgba(0,0,0,0.1);
 }
+.fm-dialog.rename-dialog {
+    min-width: 480px;
+    margin: -96px 0 0 -240px;
+}
+.fm-dialog.fingerprint-dialog {
+    width: 600px;
+    margin: -237px 0 0 -300px;
+}
+.fingerprint-dialog .default-dialog-bottom {
+    margin: 0;
+}
+.fm-dialog.fm-picker-dialog, .fm-dialog.fm-picker-dialog {
+    width: 604px;
+    margin: -220px 0 0 -302px;
+}
+.fm-dialog.arrange-to-back, div.overlay.arrange-to-back {
+    z-index: 900;
+}
+.arrange-to-front, .dropdown.context.arrange-to-front {
+    z-index: 1300;
+}
+.fm-dialog.download-dialog {
+    width: 504px;
+    min-height: 100px;
+    margin: -116px 0 0 -252px;
+}
+.fm-dialog.firefox-dialog {
+    width: 620px;
+    min-height: 100px;
+    margin: -187px 0 0 -310px;
+}
+.fm-dialog.registration-success, .fm-dialog.reset-success, .fm-dialog.reset-success-st2, .fm-dialog.awaiting-confirmation, .fm-dialog.account-reset-confirmation {
+    width: 393px;
+    margin: -190px 0 0 -196px
+}
+.fm-dialog.reset-success {
+    margin-top: -166px;
+}
+.fm-dialog.registration-page-success {
+    width: 360px;
+    margin: -160px 0 0 -180px;
+}
+.fm-dialog.registration-page-success.special {
+    width: 480px;
+    margin: -160px 0 0 -240px;
+}
+.fm-dialog.bandwidth-dialog {
+    width: 964px;
+    min-height: 657px;
+    margin: -329px 0 0 -482px;
+}
 
 .big-padding .fm-dialog-title {
     padding-top: 22px;
@@ -31,7 +82,7 @@
     line-height: 18px;
     padding-left: 35px;
 }
-.fm-dialog-footer, .fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom, .top-login-bott-gray-block, .fm-mega-dialog-bottom, .create-folder-bottom, .default-dialog-bottom {
+.fm-dialog-footer, .fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom, .top-login-bott-gray-block, .fm-mega-dialog-bottom,  .default-dialog-bottom {
     height: 57px;
     background-color: white;
     -webkit-box-sizing: border-box;
@@ -59,7 +110,7 @@
 .fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom {
     padding: 0 12px 0 12px;
 }
-.fm-mega-dialog-bottom, .create-folder-bottom, .default-dialog-bottom {
+.default-dialog-bottom {
     margin: 12px -12px -12px -12px;
     padding: 0 12px 0 0;
 }
@@ -1781,8 +1832,8 @@ li.token-input-token-invite .input-close {
 /* End of Invitation status dialog */
 
 .fm-dialog.create-folder-dialog {
-    width: 360px;
-    margin: -67px 0 0 -180px;
+    width: 402px;
+    margin: -96px 0 0 -201px;
 }
 .fm-dialog.chat-rename-dialog {
     left: 50%;
@@ -1795,6 +1846,135 @@ li.token-input-token-invite .input-close {
 }
 .chat-rename-dialog .rename-input-bl {
     margin-bottom: 10px;
+}
+.dropdown.body.create-folder-dialog {
+    min-width: 334px;
+    min-height: 154px;
+    left: 50%;
+    top: 50%;
+    margin: -77px 0 0 -167px;
+}
+.fm-dialog-body.mid-pad {
+    padding: 28px;
+    position: relative;
+}
+ .default-dialog-bottom .default-white-button, .default-dialog-bottom .default-grey-button, .default-dialog-bottom .default-green-button {
+    margin-top: 12px;
+}
+.create-folder-size-icon, .add-user-size-icon {
+    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-position: center -5509px;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+    cursor: pointer;
+    z-index: 40;
+}
+.create-folder-size-icon:hover, .add-user-size-icon:hover {
+    -moz-opacity: 0.6;
+    -khtml-opacity: 0.6;
+    opacity: 0.6;
+}
+.create-folder-size-icon.short-size, .add-user-size-icon.short-size {
+    background-position: center -5559px;
+    top: 14px;
+    right: 40px;
+    z-index: 30;
+}
+.create-folder-input-bl, .add-user-popup-input-bl, .fm-account-input, .rename-input-bl {
+    width: 100%;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 0px 0px 1px gba(0,0,0,0.15);
+    box-shadow: 0px 0px 0px 1px gba(0,0,0,0.15);
+    background-color: rgba(0,0,0,0.02);
+    height: 36px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    position: relative;
+    -webkit-transition: box-shadow 200ms ease-in-out;
+    -moz-transition: box-shadow 200ms ease-in-out;
+    -o-transition: box-shadow 200ms ease-in-out;
+    -ms-transition: box-shadow 200ms ease-in-out;
+    transition: box-shadow 200ms ease-in-out;
+}
+.fm-account-input {
+    height:  32px;
+}
+.fm-account-input::before {
+    content: '';
+    position: absolute;
+    width: 19px;
+    height: 18px;
+    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-repeat: no-repeat;
+    background-position: -14px -10610px;
+    right: 6px;
+    top: 7px;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
+.fm-account-input:hover::before {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.create-folder-input-bl input, .add-user-popup-input-bl input, .fm-account-input input, .rename-input-bl input {
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: white;
+    line-height: 35px;
+    margin-top: 0;
+    font-size: 13px;
+    height: 35px;
+    color: #333333;
+    padding: 0 10px 0 42px;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: 0;
+    -webkit-transition: color 200ms ease-in-out;
+    -moz-transition: color 200ms ease-in-out;
+    -o-transition: color 200ms ease-in-out;
+    -ms-transition: color 200ms ease-in-out;
+    transition: color 200ms ease-in-out;
+    font-family: 'LatoWeb', 'source_sans_proregular';
+}
+.fm-account-input input {
+    font-size: 14px;
+    line-height: 32px;
+    height: 32px;
+    padding: 0 10px;
+}
+.active .fm-account-input, .fm-account-input.focused, .fm-account-input:hover {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
+}
+.error .fm-account-input {
+    color: #D90007;
 }
 /* Storage dialog */
 .fm-dialog.storage-dialog, .fm-dialog.drop-quota-dialog {
@@ -3229,7 +3409,6 @@ li.token-input-token-invite .input-close {
     margin: -270px 0 0 -320px;
 }
 .park-account-dialog .fm-dialog-title {
-    font-family: Montserrat-Regular;
     font-size: 20px;
     color: #262F3B;
     letter-spacing: 0;
@@ -3398,6 +3577,7 @@ li.token-input-token-invite .input-close {
 .fm-dialog.two-factor-dialog .middle-button-wrapper {
     margin: 24px auto 48px;
     width: 300px;
+    text-align: center;
 }
 .fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button {
     width: 136px;
@@ -3407,6 +3587,7 @@ li.token-input-token-invite .input-close {
 }
 .fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button:first-of-type {
     margin-left: 0;
+    display: inline-block;
 }
 .fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button.hidden {
     display: none;
@@ -3685,7 +3866,7 @@ li.token-input-token-invite .input-close {
 .add-user-popup .multiple-input i {
     opacity: 0.74;
     position: absolute;
-    margin: 8px 0 0 7px;
+    margin: 8px 0 0 10px;
     left: 0;
 }
 .hidden-textarea-info {
@@ -3810,7 +3991,7 @@ li.token-input-token-invite .input-close {
 }
 .new-contact-buttons {
     text-align: center;
-    padding: 36px 0 12px 0;
+    padding: 36px 0 16px 0;
     font-size: 0;
 }
 .new-contact-avatar {
@@ -3859,20 +4040,16 @@ li.token-input-token-invite .input-close {
 .fm-dialog.recovery-key-dialog, .fm-dialog.recovery-key-info {
     width: 640px;
     height: 620px;
-    margin: -310px 0 0 -320px;
+    margin: -306px 0 0 -320px;
     text-align: center;
 }
 .fm-dialog.recovery-key-info {
     height: initial;
-}
-.fm-dialog.recovery-key-dialog  .fm-dialog-close {
-    right: -6px;
-    top: -6px;
 }
 .fm-dialog.improved-recovery-steps .recover-paste-block h5.main-italic-header {
     display: block;
     text-align: left;
 }
 .fm-dialog.improved-recovery-steps .recover-paste-block {
-    margin: 32px auto 48px;
+    margin: 32px auto 40px;
 }

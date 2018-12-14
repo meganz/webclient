@@ -52,7 +52,6 @@
     font-size: 0;
 }
 .link-button.lato-semibold span {
-    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
     font-size: 14px;
     color: #666666;
 }
@@ -76,7 +75,6 @@
     line-height: inherit;
 }
 .link-button.light, .dropdown-item.link-button.light {
-    font-family: 'LatoWeb', 'source_sans_proregular';
     font-size: 13px;
     line-height: 31px;
     white-space: normal;
@@ -157,11 +155,12 @@
 }
 .default-white-button, .default-grey-button, .default-red-button, .default-green-button, .default-light-green-button {
     display: block;
+    font-family: 'LatoWeb', 'source_sans_proregular';
     font-size: 14px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    line-height: 31px;
+    line-height: 32px;
     color: #333333;
     padding: 0 15px;
     min-width: 102px;
@@ -283,24 +282,14 @@
 .default-white-button .red {
     color: #F0373A;
 }
-.default-green-button {
+.default-grey-button {
     background-color: #00BFA5;
     color: white;
-    font-family: 'LatoWeb', 'source_sans_prosemibold';
-    font-size: 13px;
-    min-width: 132px;
 }
-.default-green-button:hover {
+.default-grey-button:hover {
     background-color:#00AC94;
 }
-.default-grey-button {
-    color: white;
-    background: rgb(170,170,170);
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2FhYWFhYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5OTk5OTkiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-    background: -moz-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
-    background: -webkit-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
-    background: linear-gradient(to bottom, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
-}
+
 .default-light-green-button {
     background-color: rgba(0,191,165,1);
     color: #ffffff;
@@ -352,7 +341,6 @@
 .default-white-button.small, .default-grey-button.small {
     font-size: 14px;
     line-height: 24px;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     height: 24px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
@@ -388,17 +376,17 @@
     -webkit-border-radius: inherit;
     border-radius: inherit;
 }
-.default-green-button::before {
+.default-grey-button::before {
     -webkit-box-shadow: 0 0 0 1px #00B098;
     -moz-box-shadow: 0 0 0 1px #00B098;
     box-shadow: 0 0 0 1px #00B098;
 }
-.default-light-green-button::after {
+.default-light-grey-button::after {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,145,125,0.5);
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,145,125,0.5);
     box-shadow: 0px 0px 0px 1px rgba(0,145,125,0.5);
 }
-.default-light-green-button:not(.disabled):hover {
+.default-light-grey-button:not(.disabled):hover {
     -webkit-box-shadow: 0 0 0 4px rgba(62,136,126,0.4);
     -moz-box-shadow: 0 0 0 4px rgba(62,136,126,0.4);
     box-shadow: 0 0 0 4px rgba(62,136,126,0.4);
@@ -428,16 +416,12 @@
 }
 
 .default-green-button:not(.tiny-button):not(.disabled):not(.no-hover):hover {
-    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.2);
-    -moz-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.2);
-    box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.2);
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
+    box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
 }
 
-.default-grey-button::after {
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
-    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
-}
+
 .default-red-button::after {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
@@ -588,7 +572,7 @@
 .default-white-button.left, .default-grey-button.left, .default-light-green-button.left {
     margin-right: 12px;
 }
-.default-white-button.right, .default-grey-button.right, .default-light-green-button.right {
+.default-white-button.right, .default-grey-button.right, .default-light-green-button.right, .default-green-button.right {
     margin-left: 12px;
 }
 .button.overlay-button {

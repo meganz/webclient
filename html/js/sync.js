@@ -121,9 +121,8 @@ function initMegasync() {
 }
 
 function changeLinux(linuxsync, i) {
-
     'use strict';
-    
+
     var $content = $('.bottom-page.megasync');
 
     if (linuxsync[i]) {
@@ -146,8 +145,8 @@ function changeLinux(linuxsync, i) {
         syncurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform);
         nautilusurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform + "n");
         var filename = syncurl.split('/').pop();
-        $content.find('.nav-buttons-bl a.linux').addClass('download')
-            .attr('data-link', syncurl);
+        $content.find('.nav-buttons-bl a.linux').addClass('download').attr('data-link', syncurl);
+        mBroadcaster.sendMessage('megasync-linux-distro-selected', syncurl);
 
         var $nautiluslink = $content.find('.megaapp-button-info.linux-txt');
         if (nautilusurl === "https://mega.nz/MEGAsyncSetup.exe") {
@@ -164,8 +163,8 @@ function changeLinux(linuxsync, i) {
         nautilusurl = false;
         $content.find('.nav-buttons-bl a.linux').removeClass('download').addClass('disabled')
             .attr('data-link', '');
-        $content('.megaapp-button-info.linux-txt').addClass('disabled');
-        $content('.megaapp-button-info.linux-txt a').removeAttr('href');
-        $content('.megaapp-linux-default').text(l[7086]);
+        $content.find('.megaapp-button-info.linux-txt').addClass('disabled');
+        $content.find('.megaapp-button-info.linux-txt a').removeAttr('href');
+        $content.find('.megaapp-linux-default').text(l[7086]);
     }
 }

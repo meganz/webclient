@@ -236,6 +236,11 @@ function init_page() {
         return console.warn('Something went wrong, the initialization did not completed...');
     }
 
+    if (page === 'fm' && localStorage.justGotRegistered) {
+        delete localStorage.justGotRegistered;
+        page = 'downloadapp';
+    }
+
     // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
 
@@ -1365,7 +1370,7 @@ function init_page() {
         parsepage(pages['resellers']);
     }
     else if (page == 'downloadapp') {
-        parsepage(pages['downloadapp']);
+        desktopOnboarding();
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);

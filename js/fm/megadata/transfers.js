@@ -1476,7 +1476,7 @@ MegaData.prototype.ulerror = function(ul, error) {
             mega.megadrop.overQuota();
         }
         else {
-            M.showOverStorageQuota(100, 1, 2, {custom: 1});
+            M.showOverStorageQuota(-1);
         }
     }
     else if (error === EGOINGOVERQUOTA) {

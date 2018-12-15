@@ -1224,21 +1224,84 @@ MegaUtils.prototype.getSafePath = function(path, file) {
 };
 
 /**
+ * Get the state of the storage
+ * @param {Number|Boolean} [force] Do not use the cached u_attr value
+ * @return {MegaPromise} 0: Green, 1: Orange (almost full), 2: Red (full)
+ */
+MegaUtils.prototype.getStorageState = function(force) {
+    'use strict';
+    var promise = new MegaPromise();
+
+    if (!force && Object(u_attr).hasOwnProperty('^!usl')) {
+        return promise.resolve(u_attr['^!usl'] | 0);
+    }
+
+    // XXX: Not using mega.attr.get since we don't want the result indexedDB-cached.
+    M.req({'a': 'uga', 'u': u_handle, 'ua': '^!usl', 'v': 1}).then(function(res) {
+        if (d) {
+            console.debug('getStorageState', res);
+            console.assert(res.av, 'Unexpected response...');
+        }
+        var value = base64urldecode(res.av || '');
+
+        if (typeof u_attr === 'object') {
+            u_attr['^!usl'] = value;
+        }
+        promise.resolve(value | 0);
+    }).catch(function(ex) {
+        if (d) {
+            console.warn(ex);
+        }
+        promise.reject(ex);
+    });
+
+    return promise;
+};
+
+/**
+ * Retrieve storage quota details, i.e. by firing an uq request.
+ */
+MegaUtils.prototype.getStorageQuota = function() {
+    'use strict';
+    var promise = new MegaPromise();
+
+    M.req({a: 'uq', strg: 1, qc: 1})
+        .then(function(res) {
+            if (res.uslw === undefined) {
+                res.uslw = 9000;
+            }
+            var data = Object.assign(Object.create(null), res, {
+                max: res.mstrg,
+                used: res.cstrg,
+                isFull: res.cstrg / res.mstrg >= 1,
+                percent: Math.floor(res.cstrg / res.mstrg * 100),
+                isAlmostFull: res.cstrg / res.mstrg >= res.uslw / 10000
+            });
+            promise.resolve(data);
+        })
+        .catch(function(ex) {
+            if (d) {
+                console.warn(ex);
+            }
+            promise.reject(ex);
+        });
+
+    return promise;
+};
+
+/**
  * Check Storage quota.
  * @param {Number} timeout in milliseconds, defaults to 30 seconds
  */
 MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
     delay('checkStorageQuota', function _csq() {
-        M.req({a: 'uq', strg: 1, qc: 1}).done(function(data) {
-            var perc = Math.floor(data.cstrg / data.mstrg * 100);
-
-            if (ulmanager.ulOverStorageQuota && perc < 100) {
+        M.getStorageQuota().done(function(data) {
+            if (ulmanager.ulOverStorageQuota && data.percent < 100) {
                 onIdle(function() {
                     ulmanager.ulResumeOverStorageQuotaState();
                 });
             }
-
-            M.showOverStorageQuota(perc, data.cstrg, data.mstrg);
+            M.showOverStorageQuota(data);
         });
     }, timeout || 30000);
 };
@@ -1254,7 +1317,7 @@ MegaUtils.prototype.checkGoingOverStorageQuota = function(opSize) {
     var promise = new MegaPromise();
     loadingDialog.pshow();
 
-    M.req({a: 'uq', strg: 1, qc: 1})
+    M.getStorageQuota()
         .always(function() {
             loadingDialog.phide();
         })
@@ -1266,10 +1329,9 @@ MegaUtils.prototype.checkGoingOverStorageQuota = function(opSize) {
             }
 
             if (opSize > data.mstrg - data.cstrg) {
-                var perc = Math.floor(data.cstrg / data.mstrg * 100);
                 var options = {custom: 1, title: l[882], body: l[16927]};
 
-                M.showOverStorageQuota(perc, data.cstrg, data.mstrg, options)
+                M.showOverStorageQuota(data, options)
                     .always(function() {
                         promise.reject();
                     });

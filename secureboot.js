@@ -2041,6 +2041,7 @@ else if (!b_u) {
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
     jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
     jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
+    jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
@@ -2257,6 +2258,7 @@ else if (!b_u) {
         jsl.push({f:'js/transfers/queue.js', n: 'queue', j: 1, w: 4});
         jsl.push({f:'js/transfers/decrypter.js', n: 'dl_downloader', j: 1, w: 3});
         jsl.push({f:'js/vendor/videostream.js', n: 'videostream', j: 1, w: 3});
+        jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
 
         jsl.push({f:'html/embedplayer.html', n: 'index', j: 0});
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});

@@ -649,6 +649,7 @@ var dlmanager = {
         var req = {
             a: 'g',
             g: 1,
+            v: 2,
             ssl: use_ssl
         };
         var ctx = {
@@ -687,6 +688,14 @@ var dlmanager = {
             }
             else {
                 delete dlmanager.efq;
+            }
+            if (res.g && typeof res.g === 'object') {
+                // API may gives a fake array...
+                res.g = Object.values(res.g);
+
+                if (res.g[0] < 0) {
+                    res.e = res.e || res.g[0];
+                }
             }
             if (res.d) {
                 error = (res.d ? 2 : 1); // XXX: ???

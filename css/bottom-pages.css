@@ -3519,7 +3519,7 @@ a.opensource-icon-txt.coming-soon {
 
 
 /* Desktop download during onboarding phase */
-.onboarding-suggestions .top-buttons, .desktop-download .top-icon.menu {
+.onboarding-suggestions .top-buttons, .onboarding-suggestions .top-icon.menu, .onboarding-suggestions .top-icon.notification, .onboarding-suggestions .top-icon.achievements, .onboarding-suggestions .membership-status-block {
     display: none;
 }
 .onboarding-suggestions .bottom-page.top-description {

@@ -7310,7 +7310,7 @@ React.makeElement = React['createElement'];
 	                                disabled: room.isReadOnly(),
 	                                onClick: function onClick() {
 	                                    if (!disabledCalls) {
-	                                        room.startVideoCall();
+	                                        room.startAudioCall();
 	                                    }
 	                                }
 	                            })

@@ -3845,6 +3845,9 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions.linux .download-app {
     margin-top: 0px;
+}
+.onboarding-suggestions .top-description.mobile-download, .onboarding-suggestions .top-dark-info.medium.mobile-download {
+    display: none;
 } 
 /*
 .bottom-page.download-container.linux-only {

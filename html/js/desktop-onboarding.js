@@ -52,7 +52,7 @@
 
             if (is_mobile) {
                 syncurl = mobile.downloadOverlay.getStoreLink();
-                $('.desktop-redirection', $wrapper).addClass('hidden');
+                $('.bottom-page.onboard-image-wrapper', $wrapper).addClass('hidden');
             }
         }
         else {

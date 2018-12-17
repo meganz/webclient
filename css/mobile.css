@@ -8914,7 +8914,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 /* Download app during onboarding styles goes here */
 .mobile .onboarding-suggestions .bottom-page.bottom-bar {
     background-color: transparent;
-    height: 56px;
+    height: 72px;
+    position: relative;
 }
 .mobile .onboarding-suggestions .bottom-page.bottom-bar.border {
     border-top: 0px solid transparent;
@@ -8938,7 +8939,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .mobile .onboarding-suggestions .onboard-image.mobile-apps {
     display: block;
 }
-.mobile .onboarding-suggestions .default-green-button.height-48.download-app {
+.mobile .onboarding-suggestions .default-green-button.height-48.download-app, .mobile .onboarding-suggestions .default-green-button.height-48.redirect-clouddrive  {
     width: 100%;
     max-width: 420px;
     height: 48px;
@@ -8956,6 +8957,15 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .mobile .onboarding-suggestions .bottom-page.horizontal-centered-bl {
     max-width: 480px;
     margin: 0 auto;
+}
+.mobile .onboarding-suggestions .top-description.pre-download, .mobile .onboarding-suggestions .top-description.post-download, .mobile .onboarding-suggestions .top-dark-info.medium.pre-download, .mobile .onboarding-suggestions .top-dark-info.medium.post-download {
+    display: none;
+}
+.mobile .onboarding-suggestions .top-description.mobile-download, .mobile .onboarding-suggestions .top-dark-info.medium.mobile-download {
+    display: block;
+}
+.mobile .onboarding-suggestions .button-wrappers {
+    padding: 0 24px;
 }
 /* Only media queries after here */
 @media only screen and (max-width: 970px) {

@@ -2950,7 +2950,6 @@
     "19870": "Twoje konto zosta\u0142o zablokowane. Skontaktuj si\u0119 z support@mega.nz",
     "19871": "Wprowad\u017a adres e-mail",
     "19872": "Wprowad\u017a poprawny adres e-mail",
-    "19876": "Powoli zaczyna brakowa\u0107 wolnego miejsca!",
     "19907": "Synchronizuj wybrane katalogi na dysku",
     "19908": "Synchronizacja wybranych katalog\u00f3w",
     "19913": "Wybierz lokalny katalog",
@@ -3049,5 +3048,6 @@
     "20032": "Jednostka: MB",
     "20033": "Jednostka: KB",
     "20034": "Jednostka: Bajt",
-    "20035": "E-mail z zaproszeniem zosta\u0142 wys\u0142any"
+    "20035": "E-mail z zaproszeniem zosta\u0142 wys\u0142any",
+    "20120": "Twoje konto MEGA jest pe\u0142ne."
 }

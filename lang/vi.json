@@ -4,7 +4,7 @@
     "12": "Kh\u00f4ng m\u1ed9t ai b\u1ecb x\u00e2m ph\u1ea1m m\u1ed9t c\u00e1ch \u0111\u1ed9c \u0111o\u00e1n v\u1ec1 t\u00ednh ri\u00eang t\u01b0 c\u1ee7a m\u00ecnh, gia \u0111\u00ecnh, hay th\u01b0 t\u00edn, c\u0169ng kh\u00f4ng b\u1ecb x\u00fac ph\u1ea1m danh d\u1ef1 v\u00e0 uy t\u00edn c\u1ee7a m\u00ecnh. M\u1ecdi ng\u01b0\u1eddi \u0111\u1ec1u c\u00f3 quy\u1ec1n b\u1ea3o v\u1ec7 c\u1ee7a ph\u00e1p lu\u1eadt \u0111\u1ed1i v\u1edbi nh\u1eefng s\u1ef1 x\u00e2m h\u1ea1i.",
     "13": "Tuy\u00ean ng\u00f4n v\u1ec1 nh\u00e2n quy\u1ec1n.",
     "14": "X\u00e1c nh\u1eadn x\u00f3a",
-    "15": "B\u1ea1n c\u00f3 ch\u1eafc ch\u1eafn b\u1ea1n mu\u1ed1n xo\u00e1 v\u0129nh vi\u1ec5n t\u1ea5t c\u1ea3 c\u00e1c m\u1ee5c t\u1eeb th\u00f9ng r\u00e1c c\u1ee7a b\u1ea1n?",
+    "15": "B\u1ea1n c\u00f3 ch\u1eafc mu\u1ed1n x\u00f3a v\u0129nh vi\u1ec5n c\u00e1c m\u1ee5c \u1edf trong Th\u00f9ng R\u00e1c kh\u00f4ng?",
     "16": "L\u1ed7i n\u1ed9i b\u1ed9",
     "17": "Qu\u00e1 h\u1ea1n m\u1ee9c truy\u1ec1n t\u1ea3i",
     "18": "Qu\u00e1 nhi\u1ec1u k\u1ebft n\u1ed1i \u0111\u1ebfn t\u1ec7p t\u1ea3i xu\u1ed1ng n\u00e0y",
@@ -2177,7 +2177,7 @@
     "18561": "Enter your contact's email address and click [B]Add[\/B] to send them a contact request. The recipient(s) will be notified of your request through notification (if they already have a MEGA account) or by email invitation.",
     "18562": "The number of folders a contact has shared with you will be displayed under each contact's email. If you tap on the contact, you will see the individual folders and their contents.",
     "18563": "Go to your [B1]new[\/B1] email inbox and find the email [B2]Confirm new email[\/B2] and click on the [B3]Red[\/B3] button. You will be re-directed to the MEGA app and asked to confirm your account's password and click [B4]Change[\/B4].",
-    "18638": "Tap on [B1]Recovery key[\/B1], then tap the [B2]Save[\/B2] button[B3].[\/B3]",
+    "18638": "Ch\u1ea1m v\u00e0o [B1]M\u00e3 kho\u00e1 ph\u1ee5c h\u1ed3i[\/B1], r\u1ed3i ch\u1ea1m v\u00e0o n\u00fat [B2]L\u01b0u[\/B2][B3].[\/B3]",
     "18667": "Ch\u1ee9ng t\u1eeb SSL b\u1ecb l\u1ed7i",
     "18668": "Kh\u00f4ng t\u00ecm th\u1ea5y \u0111\u1ecba ch\u1ec9 email, xin th\u1eed l\u1ea1i. N\u1ebfu kh\u00f4ng nh\u1edb \u0111\u1ecba ch\u1ec9 email \u0111\u00e3 d\u00f9ng cho t\u00e0i kho\u1ea3n MEGA, xo\u00e1 v\u00e0 \u0111\u1ec3 khung tr\u1ed1ng v\u00e0 click B\u1eaft \u0110\u1ea7u \u0111\u1ec3 b\u1ecf qua b\u01b0\u1edbc n\u00e0y.",
     "18669": "Vi\u00ea\u0301t tin nh\u0103\u0301n cho nho\u0301m %s\u2026",
@@ -2497,7 +2497,7 @@
     "19084": "Th\u00eam Nh\u00e2n Vi\u00ean",
     "19085": "H\u00e0nh Ch\u00ednh",
     "19086": "\u0110\u00ecnh Ch\u1ec9",
-    "19087": "S\u1ed1 Nh\u00e2n Vi\u00ean",
+    "19087": "S\u1ed1 l\u01b0\u1ee3ng nh\u00e2n vi\u00ean",
     "19088": "T\u1ed5ng L\u01b0\u1ee3ng L\u01b0u",
     "19089": "T\u1ed5ng L\u01b0\u1ee3ng Truy\u1ec1n",
     "19090": "Xem G\u00f3i C\u01b0\u1edbc",
@@ -2950,7 +2950,6 @@
     "19870": "T\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n b\u1ecb kh\u00f3a. Vui l\u00f2ng li\u00ean h\u1ec7 support@mega.nz",
     "19871": "Xin nh\u1eadp \u0111\u1ecba ch\u1ec9 email c\u1ee7a b\u1ea1n",
     "19872": "Xin nh\u1eadp m\u1ed9t \u0111\u1ecba ch\u1ec9 email h\u1ee3p l\u1ec7",
-    "19876": "B\u1ea1n s\u1eafp h\u1ebft kh\u00f4ng gian l\u01b0u tr\u1eef!",
     "19907": "Ch\u1ecdn \u0111\u1ed3ng b\u1ed9 th\u01b0 m\u1ee5c ri\u00eang bi\u1ec7t t\u1eeb \u1ed5 m\u00e2y",
     "19908": "\u0110\u1ed3ng b\u1ed9 c\u00f3 ch\u1ecdn l\u1ecdc",
     "19913": "Ch\u1ecdn th\u01b0 m\u1ee5c tr\u00ean m\u00e1y",
@@ -3049,5 +3048,6 @@
     "20032": "Unit: MB",
     "20033": "Unit: KB",
     "20034": "Unit: Byte",
-    "20035": "Invitation email has been sent"
+    "20035": "Invitation email has been sent",
+    "20120": "Your MEGA account is full."
 }

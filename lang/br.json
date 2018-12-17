@@ -2950,7 +2950,6 @@
     "19870": "Sua conta foi bloqueada. Por favor, entre em contato com support@mega.nz",
     "19871": "Por favor, digite seu e-mail",
     "19872": "Por favor, digite um endere\u00e7o de e-mail v\u00e1lido",
-    "19876": "Voc\u00ea  're funcionando fora do espa\u00e7o!",
     "19907": "Sincronizar pastas espec\u00edficas na sua nuvem de arquivos",
     "19908": "Sincroniza\u00e7\u00e3o seletiva",
     "19913": "Selecionar pasta local",
@@ -3049,5 +3048,6 @@
     "20032": "Unidade: MB",
     "20033": "Unidade: KB",
     "20034": "Unidade: Byte",
-    "20035": "O email de convite foi enviado"
+    "20035": "O email de convite foi enviado",
+    "20120": "A sua conta no MEGA est\u00e1 cheia."
 }

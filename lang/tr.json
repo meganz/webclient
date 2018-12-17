@@ -2641,7 +2641,7 @@
     "19300": "TOPLAM",
     "19301": "GST",
     "19302": "Fatura ayr\u0131nt\u0131lar\u0131n\u0131 almaya \u00e7al\u0131\u015f\u0131rken sorun olu\u015ftu, fatura ayr\u0131nt\u0131lar\u0131 ge\u00e7ersiz g\u00f6r\u00fcn\u00fcyor",
-    "19303": "M\u00fc\u015fteriler",
+    "19303": "\u0130stemci",
     "19309": "Bir dahaki sefere hesab\u0131n\u0131za giri\u015f yapt\u0131\u011f\u0131n\u0131zda, Kimlik Do\u011frulay\u0131c\u0131 uygulaman\u0131z taraf\u0131ndan sa\u011flanan 6 basamakl\u0131 bir kod girmeniz istenecektir.",
     "19310": "Kar\u015f\u0131la\u015ft\u0131\u011f\u0131n\u0131z g\u00fcvenlik sorunlar\u0131 i\u00e7in l\u00fctfen bizimle ileti\u015fime ge\u00e7in. MEGA bir [A]g\u00fcvenlik a\u00e7\u0131\u011f\u0131 \u00f6d\u00fcl program\u0131[\/A]na sahiptir ve sorumlu if\u015falar i\u00e7in \u00f6deme yapar.",
     "19311": "Thunderbird ve Thunderbird logosu, Mozilla Vakf\u0131'n\u0131n ticari markalar\u0131d\u0131r.",
@@ -2950,7 +2950,6 @@
     "19870": "Hesab\u0131n\u0131z bloke edilmi\u015ftir.  L\u00fctfen support@mega.nz ile irtibata ge\u00e7iniz",
     "19871": "L\u00fctfen e-posta adresinizi girin",
     "19872": "L\u00fctfen ge\u00e7erli bir e-posta adresi girin",
-    "19876": "Alan\u0131n\u0131z t\u00fckeniyor!",
     "19907": "Bulut s\u00fcr\u00fcc\u00fcn\u00fczde belirli klas\u00f6rleri senkronize edin",
     "19908": "Se\u00e7meli senkronizasyon",
     "19913": "Yerel klas\u00f6r\u00fc se\u00e7",
@@ -3049,5 +3048,6 @@
     "20032": "Birim: MB",
     "20033": "Birim: KB",
     "20034": "Birim: Bayt",
-    "20035": "Davetiye epostas\u0131 g\u00f6nderildi"
+    "20035": "Davetiye epostas\u0131 g\u00f6nderildi",
+    "20120": "MEGA hesab\u0131n\u0131z dolu."
 }

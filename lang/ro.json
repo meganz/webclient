@@ -2582,7 +2582,7 @@
     "19193": "Enter 6-digit code",
     "19194": "Two-Factor Authentication",
     "19195": "This will enable or disable two-factor authentication on your account.",
-    "19196": "Enter your code to enable 2FA",
+    "19196": "Enter your code to enable 2FA:",
     "19197": "Failed to enable 2FA",
     "19198": "2FA enabled",
     "19199": "Please save your Recovery Key in a safe location",
@@ -2950,7 +2950,6 @@
     "19870": "Contul t\u0103u a fost blocat. Te rug\u0103m s\u0103 contactezi support@mega.nz",
     "19871": "Te rug\u0103m s\u0103 introduci adresa de e-mail",
     "19872": "Te rug\u0103m s\u0103 introduci o adres\u0103 de e-mail valid\u0103",
-    "19876": "Ai r\u0103mas f\u0103r\u0103 spa\u0163iu!",
     "19907": "Sincronizeaz\u0103 foldere specifice \u00een unitatea ta cloud",
     "19908": "Sincronizare selectiv\u0103",
     "19913": "Selecteaz\u0103 folderul local",
@@ -3049,5 +3048,6 @@
     "20032": "Unit: MB",
     "20033": "Unit: KB",
     "20034": "Unit: Byte",
-    "20035": "Invitation email has been sent"
+    "20035": "Invitation email has been sent",
+    "20120": "Your MEGA account is full."
 }

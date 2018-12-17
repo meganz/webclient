@@ -2950,7 +2950,6 @@
     "19870": "Il tuo account \u00e8 stato bloccato. Si prega di contattare support@mega.nz",
     "19871": "Inserisci il tuo indirizzo e-mail",
     "19872": "Per favore inserisci un indirizzo email valido",
-    "19876": "Stai finendo lo spazio!",
     "19907": "Sincronizzazione cartelle specifiche nel tuo cloud drive",
     "19908": "Sincronizzazione selettiva",
     "19913": "Seleziona cartella locale",
@@ -3044,10 +3043,11 @@
     "20027": "Vedi il codice sorgente",
     "20028": "App di Windows 10",
     "20029": "Nascondi",
-    "20030": "Warning: This will remove access to all users and data for this business account. Please ensure you have taken a copy of all data before proceeding with this action.",
-    "20031": "Unit: GB",
-    "20032": "Unit: MB",
-    "20033": "Unit: KB",
-    "20034": "Unit: Byte",
-    "20035": "Invitation email has been sent"
+    "20030": "Attenzione: Questa azione toglier\u00e0 accesso a tutti gli utenti e i dati per questo account Business. Per favore, assicurati di aver fatto una copia di tutti i dati prima di procedere con questa azione.",
+    "20031": "Unit\u00e0: GB",
+    "20032": "Unit\u00e0: MB",
+    "20033": "Unit\u00e0: KB",
+    "20034": "Unit\u00e0: Byte",
+    "20035": "La mail di invito \u00e8 stata spedita",
+    "20120": "Il tuo account MEGA \u00e8 pieno."
 }

@@ -2950,7 +2950,6 @@
     "19870": "Uw account is geblokkeerd. Neem alstublieft contact op met support@mega.nz",
     "19871": "Voer alstublieft uw e-mail adres in.",
     "19872": "Gelieve een geldig e-mailadres invoeren",
-    "19876": "U heeft bijna geen ruimte meer!",
     "19907": "Synchroniseer specifieke mappen in uw cloud schijf",
     "19908": "Selectieve synchronisatie",
     "19913": "Selecteer lokale map",
@@ -3044,10 +3043,11 @@
     "20027": "Bron Code Weergeven",
     "20028": "Windows 10 Applicatie",
     "20029": "Verbergen",
-    "20030": "Waarschuwing: Dit verwijderd toegang voor alle gebruikers en gegevens voor deze zakelijke account. Zorg ervoor dat u een kopie heeft van alle gegevens voordat u doorgaat met deze actie.",
+    "20030": "Waarschuwing: Dit verwijderd toegang voor alle gebruikers en gegevens voor deze zakelijke account. Zorg ervoor dat u een kopie van alle gegevens heeft voordat u doorgaat met deze actie.",
     "20031": "Eenheid: GB",
     "20032": "Eenheid: MB",
     "20033": "Eenheid: KB",
     "20034": "Eenheid: Byte",
-    "20035": "Uitnodiging email werd verzonden"
+    "20035": "Uitnodiging email werd verzonden",
+    "20120": "Uw MEGA account is vol."
 }

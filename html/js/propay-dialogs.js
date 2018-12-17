@@ -473,19 +473,7 @@ var astroPayDialog = {
             astroPayDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             astroPayDialog.$pendingOverlay.addClass('hidden');
 
-            // Make sure it fetches new account data on reload
-            if (M.account) {
-                M.account.lastupdate = 0;
-            }
-
-            // Load file manager on mobile
-            if (is_mobile) {
-                loadSubPage('fm');
-            }
-            else {
-                // Otherwise on desktop, load the payment history section
-                loadSubPage('fm/account/history');
-            }
+            pro.redirectToSite();
         });
     }
 };
@@ -852,14 +840,7 @@ var voucherDialog = {
             voucherDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             voucherDialog.$successOverlay.addClass('hidden');
 
-            // Make sure it fetches new account data on reload
-            // and redirect to account page to show purchase
-            if (M.account) {
-                M.account.lastupdate = 0;
-            }
-
-            // On mobile just load the main account page as there is no payment history yet
-            loadSubPage(is_mobile ? 'fm/account' : 'fm/account/history');
+            pro.redirectToSite();
         });
     }
 };
@@ -1021,19 +1002,7 @@ var sabadell = {
                 $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 $pendingOverlay.addClass('hidden');
 
-                // Make sure it fetches new account data on reload
-                if (M.account) {
-                    M.account.lastupdate = 0;
-                }
-
-                // Load file manager on mobile
-                if (is_mobile) {
-                    loadSubPage('fm');
-                }
-                else {
-                    // Otherwise on desktop, load the payment history section
-                    loadSubPage('fm/account/history');
-                }
+                pro.redirectToSite();
             });
         }
         else {
@@ -1640,19 +1609,7 @@ var addressDialog = {
                 $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 $pendingOverlay.addClass('hidden');
 
-                // Make sure it fetches new account data on reload
-                if (M.account) {
-                    M.account.lastupdate = 0;
-                }
-
-                // Load file manager on mobile
-                if (is_mobile) {
-                    loadSubPage('fm');
-                }
-                else {
-                    // Otherwise on desktop, load the payment history section
-                    loadSubPage('fm/account/history');
-                }
+                pro.redirectToSite();
             });
         }
         else {
@@ -2099,11 +2056,7 @@ var cardDialog = {
             // Reset flag so they can try paying again
             cardDialog.paymentInProcess = false;
 
-            // Make sure it fetches new account data on reload
-            if (M.account) {
-                M.account.lastupdate = 0;
-            }
-            loadSubPage('fm/account/history');
+            pro.redirectToSite();
         });
     },
 

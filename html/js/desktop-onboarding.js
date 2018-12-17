@@ -21,20 +21,34 @@
 
             $('.onboard-image.clouds', $oiw).removeClass('hidden');
             $('.onboard-image.logo-mega', $oiw).addClass('visible');
-            $('.onboard-image.down-array', $oiw).addClass('visible');
+            $('.onboard-image.down-arrow', $oiw).addClass('visible');
             $('.onboard-image.desktop-inactive', $oiw).addClass('hidden');
             $('.onboard-image.desktop-active', $oiw).removeClass('hidden');
+            $('.default-green-button.download-app', $oiw).addClass('hidden');
+            
+            //Hide the download buttons and MEGAcmd dropdown
+            $('.default-green-button.download-app', $wrapper).addClass('hidden');
+            $('.megaapp-linux.cmd', $wrapper).addClass('hidden');
 
+            //Swap between pre/post download body text
             $('.pre-download', $wrapper).addClass('hidden');
             $('.post-download', $wrapper).removeClass('hidden');
+
+            //Swap between text button and green button for cloud drive redirection
+            $('.text-button.redirect-clouddrive-link', $wrapper).addClass('hidden');
+            $('.default-green-button.redirect-clouddrive', $wrapper).removeClass('hidden');
+            $('.bottom-bar.desktop-redirection', $wrapper).addClass('border');
+
+            //Resize the height of the container to align items 
+            $('.bottom-page.horizontal-centered-bl', $wrapper).addClass('resize');
 
             window.location = syncurl;
             return false;
         });
 
-        ua += ' linux ';
         if (is_mobile || ua.indexOf('linux') < 0) {
             $('.download-app', $wrapper).removeClass('hidden');
+            $('.bottom-page.horizontal-centered-bl', $wrapper).addClass('resize');
 
             if (is_mobile) {
                 $('.desktop-redirection', $wrapper).addClass('hidden');
@@ -42,6 +56,7 @@
         }
         else {
             $('.megaapp-linux', $wrapper).removeClass('hidden');
+            $('.bottom-page.horizontal-centered-bl', $wrapper).removeClass('resize');
 
             initMegasync();
             mBroadcaster.addListener('megasync-linux-distro-selected', function(url) {

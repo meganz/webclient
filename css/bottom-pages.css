@@ -1702,7 +1702,7 @@ height: 56px;
     line-height: 24px;
     color: #333333;
     padding: 28px 0 0px 0;
-    font-family: 'source_sans_prosemibold';
+    font-family: 'LatoWebBold', 'source_sans_prosemibold';
 }
 .cmd .default-select.megaapp-dropdown {
     margin: 13px auto 12px auto;
@@ -3523,11 +3523,11 @@ a.opensource-icon-txt.coming-soon {
     display: none;
 }
 .onboarding-suggestions .bottom-page.top-description {
-    margin: 30px auto 44px;
+    margin: 40px auto 44px;
     padding: 0;
 }
  .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
-    background-color: #F3F6F8;
+    background-color: #F4F4F6;
     height: 100%;
     height: -webkit-calc(100%);
     height: -moz-calc(100%);
@@ -3566,13 +3566,20 @@ a.opensource-icon-txt.coming-soon {
     display: none;
 }
 .onboarding-suggestions .bottom-page.horizontal-centered-bl {
-    min-height: 620px;
+    min-height: 720px;
     z-index: 999;
     padding: 0 24px;
     box-sizing: border-box;
 }
+.onboarding-suggestions .bottom-page.horizontal-centered-bl.resize {
+    min-height: 600px;
+}
 .onboarding-suggestions .download-app {
     min-width: 250px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-top: 40px;
 }
 .onboarding-suggestions .onboard-image-wrapper {
     position: absolute;
@@ -3612,13 +3619,29 @@ a.opensource-icon-txt.coming-soon {
     width: 100%;
     height: 98px;
     bottom: -10px;
+    opacity: 1;
+    -webkit-transition: all 100ms ease-in-out;
+    -moz-transition: all 100ms ease-in-out;
+    -o-transition: all 100ms ease-in-out;
+    -ms-transition: all 100ms ease-in-out;
+    transition: all 100ms ease-in-out;
 }
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.clouds.hidden, .onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-mega.hidden, .onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow.hidden {
+    opacity: 0;
+    display: block;
+    -webkit-transition: all 100ms ease-in-out;
+    -moz-transition: all 100ms ease-in-out;
+    -o-transition: all 100ms ease-in-out;
+    -ms-transition: all 100ms ease-in-out;
+    transition: all 100ms ease-in-out;
+} 
 .onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-mega {
     background-position: -260px -7px;
     width: 80px;
     height: 80px;
     bottom: 222px;
     opacity: 0;
+    display: none;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
     -o-transition: all 200ms ease-in-out;
@@ -3627,6 +3650,7 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-mega.visible {
     opacity: 1;
+    display: block;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
     -o-transition: all 200ms ease-in-out;
@@ -3646,10 +3670,10 @@ a.opensource-icon-txt.coming-soon {
     transition: all 200ms ease-in-out;
 }
 .onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow.visible { 
-    -webkit-animation: downward-arrow 1s infinite ease-in-out; /* Safari 4+ */
-    -moz-animation:    downward-arrow 1s infinite ease-in-out; /* Fx 5+ */
-    -o-animation:      downward-arrow 1s infinite ease-in-out; /* Opera 12+ */
-    animation:         downward-arrow 1s infinite ease-in-out; /* IE 10+, Fx 29+ */
+    -webkit-animation: downward-arrow 2s infinite ease-in-out; /* Safari 4+ */
+    -moz-animation:    downward-arrow 2s infinite ease-in-out; /* Fx 5+ */
+    -o-animation:      downward-arrow 2s infinite ease-in-out; /* Opera 12+ */
+    animation:         downward-arrow 2s infinite ease-in-out; /* IE 10+, Fx 29+ */
 }
 .onboarding-suggestions .onboard-image.mobile-apps {
     background-position: -35px -292px;
@@ -3661,12 +3685,7 @@ a.opensource-icon-txt.coming-soon {
     margin: 0 auto 20px;
 }
 .onboarding-suggestions .badge {
-    padding: 2px 6px 3px;
-    border-radius: 5px;
-    color: #fff;
-    font-size: 14px;
-    background-color: #00BFA5;
-    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
+    font-family: 'LatoWebBold', 'source_sans_proregular', sans-serif;
 }
 .onboarding-suggestions .default-green-button.redirect-clouddrive::after{
     width: 26px;
@@ -3676,7 +3695,158 @@ a.opensource-icon-txt.coming-soon {
     margin: 0 0 -10px 9px;
     display: inline-block;
     position: relative;
-}/*
+}
+.onboarding-suggestions .text-button.redirect-clouddrive-link {
+    display: inline-block;
+    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
+}
+.onboarding-suggestions .text-button.redirect-clouddrive-link.hidden {
+    display: none;
+}
+.onboarding-suggestions .cmd .default-select.megaapp-dropdown {
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    -moz-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    height: 40px;
+    line-height: 39px;
+    background-position: right -8356px;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    width: 250px;
+    margin-top: 20px;
+}
+.onboarding-suggestions .cmd .default-select.megaapp-dropdown:hover {
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+    -webkit-box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.onboarding-suggestions .cmd .default-select::before {
+    height: 40px;
+}
+.onboarding-suggestions .cmd.megaapp-linux .bottom-page.split-buttons {
+    width: 250px;
+    white-space: nowrap;
+    margin: 0 auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0;
+}
+.split-buttons div.radioOn, .split-buttons div.radioOff {
+    float: left;
+    width: calc((100% - 8px ) / 2 );
+    height: 36px;
+    margin-right:0;
+    margin-top: 0;
+    cursor: pointer;
+    background-color: white;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    position: relative;
+    -webkit-box-shadow: 0 0 0 0 rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 0 0 0 rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 0 rgba(0,0,0,0.1);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    border: 1px solid #ddd;
+}
+.onboarding-suggestions .split-buttons div:first-of-type {
+    margin-right: 8px;
+}
+.split-buttons div.radioOn::before, .split-buttons div.radioOff::before {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    content:none;
+    left: 0;
+    top: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius:0;
+    border-radius: 0;
+    -webkit-box-shadow: 0 0 0 0 rgba(0,0,0,0.15);
+    -moz-box-shadow: 0 0 0 0 rgba(0,0,0,0.15);
+    box-shadow: 0 0 0 0 rgba(0,0,0,0.15);
+}
+.split-buttons div.radioOn::after, .split-buttons div.radioOff::after {
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+    content: none;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background-color: rgba(0,0,0,0);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 0px solid transparent;
+}
+.split-buttons .radio-txt {
+    float: initial;
+    font-size: 14px;
+    line-height: 34px;
+    color: #777777;
+    padding-right: 0;
+    padding-top: 0;
+    max-width: -webkit-calc(100%);
+    max-width: -moz-calc(100%);
+    max-width: calc(100%);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: block;
+    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
+}
+.split-buttons div.radioOff:hover {
+    background-color: #E5F8F6;
+    border: 1px solid #5BC6B8;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.split-buttons div.radioOn {
+    background-color: #E5F8F6;
+    border: 1px solid #5BC6B8;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.split-buttons div.radioOn .radio-txt {
+    color: #495057;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
+}
+.onboarding-suggestions .megaapp-linux-info {
+    padding: 0;
+}
+.onboarding-suggestions .megaapp-linux.cmd {
+    margin-bottom: 12px;
+}
+.onboarding-suggestions.linux .cmd .default-select.megaapp-dropdown, .onboarding-suggestions.linux .cmd.megaapp-linux .bottom-page.split-buttons, .onboarding-suggestions.linux .download-app {
+    width: 300px;
+}
+.onboarding-suggestions.linux .download-app {
+    margin-top: 0px;
+} 
+/*
 .bottom-page.download-container.linux-only {
     display: inline-block;
     padding: 16px 16px 10px 16px;
@@ -3684,11 +3854,6 @@ a.opensource-icon-txt.coming-soon {
     border:1px solid #ddd;
     border-radius: 8px;
 }*/
-.onboarding-suggestions .radioOn .radio-txt {
-    color: #333;
-    font-family: 'LatoWebBold', 'source_sans_probold', sans-serif;
-}
-
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow, .bottom-page.top-title::before, .pages-nav.nav-icon.bott-sprite, .bottom-page.mid-icon, .bottom-page.cols-container .col3::before, .bottom-page.tab-lnk-icon, .cmd-top-img, .bottom-page.scroll-icon, .bottom-page.dark-button, .bottom-page.big-link i, .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite {
     background-image: url(../images/mega/pages-sprite_v4@2x.png) !important;

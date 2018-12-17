@@ -77,6 +77,29 @@ var pro = {
     },
 
     /**
+     * Redirect to the site.
+     * @param {String} [topage] Redirect to this page of our site.
+     */
+    redirectToSite: function(topage) {
+        // On mobile just load the main account page as there is no payment history yet
+        topage = topage || (is_mobile ? 'fm/account' : 'fm/account/history');
+
+        // Make sure it fetches new account data on reload
+        // and redirect to account page to show purchase
+        if (M.account) {
+            M.account.lastupdate = 0;
+        }
+
+        if (localStorage.justGotRegistered) {
+            delete localStorage.justGotRegistered;
+            sessionStorage.onDesktopOnboardingRedirectTo = topage;
+            topage = 'downloadapp';
+        }
+
+        loadSubPage(topage);
+    },
+
+    /**
     * Update the state when a payment has been received to show their new Pro Level
     * @param {Object} actionPacket The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
     */

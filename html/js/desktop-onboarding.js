@@ -2,7 +2,7 @@
     'use strict';
 
     function goToCloud() {
-        loadSubPage('fm');
+        loadSubPage(sessionStorage.onDesktopOnboardingRedirectTo || 'fm');
         return false;
     }
 
@@ -25,7 +25,7 @@
             $('.onboard-image.desktop-inactive', $oiw).addClass('hidden');
             $('.onboard-image.desktop-active', $oiw).removeClass('hidden');
             $('.default-green-button.download-app', $oiw).addClass('hidden');
-            
+
             //Hide the download buttons and MEGAcmd dropdown
             $('.default-green-button.download-app', $wrapper).addClass('hidden');
             $('.megaapp-linux.cmd', $wrapper).addClass('hidden');
@@ -39,7 +39,7 @@
             $('.default-green-button.redirect-clouddrive', $wrapper).removeClass('hidden');
             $('.bottom-bar.desktop-redirection', $wrapper).addClass('border');
 
-            //Resize the height of the container to align items 
+            //Resize the height of the container to align items
             $('.bottom-page.horizontal-centered-bl', $wrapper).addClass('resize');
 
             window.location = syncurl;
@@ -51,6 +51,7 @@
             $('.bottom-page.horizontal-centered-bl', $wrapper).addClass('resize');
 
             if (is_mobile) {
+                syncurl = mobile.downloadOverlay.getStoreLink();
                 $('.desktop-redirection', $wrapper).addClass('hidden');
             }
         }

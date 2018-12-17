@@ -93,12 +93,8 @@ pro.proplan = {
 
             // If coming from the process key step and they click on the Free plan
             if (planNum === '0') {
-                if (page === 'fm') {
-                    loadSubPage('start');
-                }
-                else {
-                    loadSubPage('fm');
-                }
+                pro.redirectToSite(page === 'fm' ? 'start' : 'fm');
+
                 if (localStorage.gotOverquotaWithAchievements) {
                     onIdle(function() {
                         mega.achievem.achievementsListDialog();

@@ -570,7 +570,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     'use strict';
 
     // Call the mobile version
-    mobile.messageOverlay.show(msg, submsg);
+    mobile.messageOverlay.show(msg, submsg, callback);
 }
 
 function fm_showoverlay() {

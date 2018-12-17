@@ -7,8 +7,12 @@ var remappedLangLocales = {
     "ct": "zh-Hant",
     "kr": "ko",
     "jp": "ja",
-    "tl": "fil"
+    "tl": "fil",
+    "br": "pt"
 };
+
+$.dateTimeFormat = Object.create(null);
+$.acc_dateTimeFormat = Object.create(null);
 
 if (typeof l === 'undefined') {
     l = [];
@@ -54,68 +58,169 @@ function translate(html) {
     return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, replacer);
 }
 
+/**
+ * Set Date time object for time2date
+ * @param {String} locales Locale string
+ * @param {Number} format format number for the case.
+ */
+function setDateTimeFormat(locales, format) {
+
+    "use strict";
+
+    // Set date format
+    var options = {year: 'numeric'};
+    options.month = format >= 2 ? 'long' : 'numeric';
+    options.day = format === 3 ? undefined : 'numeric';
+
+    // Create new DateTimeFormat object if it is not exist
+    try {
+        $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat(locales, options);
+    }
+    catch (e) {
+        if (format < 2) {
+            $.dateTimeFormat[locales + '-' + format] = 'ISO';
+        }
+        else {
+            $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat(locale, options);
+        }
+    }
+
+    // Create new DateTimeFormat object if it is not exist
+    var timeOptions = {hour: '2-digit', minute:'2-digit', hour12: false};
+    $.dateTimeFormat[locales + '-time'] = new Intl.DateTimeFormat([], timeOptions);
+}
 
 /**
  * Converts a timestamp to a readable time format - e.g. 2016-04-17 14:37
+ * If user selected use ISO date formate, short date format will using ISO date format.
+ * If user selected country on the setting using it to find locale.
+ * If user did not selected country, assume country with ip address and apply date format.
+ * e.g. US: mm/dd/yyyy, NZ: dd/mm/yyyy, CN: yyyy/mm/dd
  *
  * @param {Number} unixTime  The UNIX timestamp in seconds e.g. 1464829467
  * @param {Number} [format]  The readable time format to return
  * @returns {String}
  *
- * Formats:
- *       0: yyyy-mm-dd hh:mm
- *       1: yyyy-mm-dd
- *       2: dd fmn yyyy (fmn: Full month name, based on the locale)
+ * Formats (examples are ISO date format):
+ *       0: yyyy-mm-dd hh:mm (Short date format with time)
+ *       1: yyyy-mm-dd (Short date format without time)
+ *       2: yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format)
+ *       3: yyyy fmn (fmn: Full month name, based on the locale) (Long Date format without day)
  */
 function time2date(unixTime, format) {
 
-    var result;
     var date = new Date(unixTime * 1000 || 0);
+    var result;
+    var dateFunc;
+    var timeFunc;
+    var country = 'ISO';
+    format = format || 0;
+    if (u_attr) {
+        country = u_attr.country ? u_attr.country : u_attr.ipcc || 'ISO';
+    }
+    var locales = locale + '-' + country;
 
-    if (format === 2) {
-        result = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+    // If dateTimeFormat is not set with the current locale set it.
+    if ($.dateTimeFormat[locales + '-' + format] === undefined) {
+        setDateTimeFormat(locales, format);
+    }
+
+    var $dFObj = $.dateTimeFormat[locales + '-' + format];
+    var $tfObj = $.dateTimeFormat[locales + '-time'];
+
+    // print time as ISO date format
+    var printISO = function _printISO() {
+        var timeOffset = date.getTimezoneOffset() * 60;
+        var isodate = new Date((unixTime - timeOffset) * 1000);
+        return isodate.toISOString().split('T')[0];
+    };
+
+    dateFunc = $dFObj === 'ISO' ? printISO : $dFObj.format;
+    timeFunc = $tfObj.format;
+
+    // if it is short date format and user selected to use ISO format
+    if ((fmconfig.uidateformat || country === 'ISO') && format < 2) {
+        result = printISO();
     }
     else {
-        result = date.getFullYear() + '-'
-            + ('0' + (date.getMonth() + 1)).slice(-2)
-            + '-' + ('0' + date.getDate()).slice(-2);
+        result = dateFunc(date);
+    }
 
-        if (!format) {
-            result += ' ' + date.toTimeString().substr(0, 5);
-        }
+    // Add Time format
+    if (format === 0) {
+        result += " " + timeFunc(date);
     }
 
     return result;
 }
 
-function acc_time2date(unixtime, yearIsOptional) {
-    var MyDate = new Date(unixtime * 1000);
-    var th = 'th';
-    if ((parseInt(MyDate.getDate()) === 11) || (parseInt(MyDate.getDate()) === 12)) {
-    }
-    else if (('' + MyDate.getDate()).slice(-1) === '1') {
-        th = 'st';
-    }
-    else if (('' + MyDate.getDate()).slice(-1) === '2') {
-        th = 'nd';
-    }
-    else if (('' + MyDate.getDate()).slice(-1) === '3') {
-        th = 'rd';
-    }
-    if (lang !== 'en') {
-        th = ',';
-    }
-    var result = date_months[MyDate.getMonth()] + ' ' + MyDate.getDate();
+/**
+ * Set Date time object for acc_time2date
+ * @param {String} locales Locale string
+ */
+function setAccDateTimeFormat(locales) {
 
-    if (yearIsOptional === true) {
-        var currYear = (new Date()).getFullYear();
-        if (currYear !== MyDate.getFullYear()) {
-            result += th + ' ' + MyDate.getFullYear();
+    "use strict";
+
+    // Set acc date format
+    var options = {month: 'long', day: 'numeric', year: 'numeric'};
+    var nYOptions = {month: 'long', day: 'numeric'};
+
+    // Create new DateTimeFormat object if it is not exist
+    try {
+        $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat(locales, options);
+        $.acc_dateTimeFormat[locales + '-noY'] = new Intl.DateTimeFormat(locales, nYOptions);
+    }
+    catch (e) {
+        $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat(locale, options);
+        $.acc_dateTimeFormat[locales + '-noY'] = new Intl.DateTimeFormat(locale, nYOptions);
+    }
+}
+
+/**
+ * Function to create long date format for current locales.
+ * @param {Number} unixtime The UNIX timestamp in seconds e.g. 1464829467
+ * @param {Boolean} yearIsOptional Optional, set year for the date format as optional
+ * @returns {String} result Formatted date.
+ */
+function acc_time2date(unixtime, yearIsOptional) {
+
+    var MyDate = new Date(unixtime * 1000);
+    var country;
+    if (u_attr) {
+        country = u_attr.country ? u_attr.country : u_attr.ipcc;
+    }
+    var locales = country ? locale + '-' + country : locale;
+    var currYear = (new Date()).getFullYear();
+
+    // If dateTimeFormat is already set with the current locale using it.
+    if (!$.acc_dateTimeFormat[locales]) {
+        setAccDateTimeFormat(locales);
+    }
+
+    if (yearIsOptional && currYear === MyDate.getFullYear()) {
+        locales += '-noY';
+    }
+
+    var dateFunc = $.acc_dateTimeFormat[locales].format;
+    var result = dateFunc(MyDate);
+
+    if (locale === 'en') {
+        var date = MyDate.getDate();
+        var th = 'th';
+        if ((date.toString()).slice(-1) === '1' && date !== 11) {
+            th = 'st';
         }
+        else if ((date.toString()).slice(-1) === '2' && date !== 12) {
+            th = 'nd';
+        }
+        else if ((date.toString()).slice(-1) === '3' && date !== 13) {
+            th = 'rd';
+        }
+
+        result = result.replace(date, date + th);
     }
-    else {
-        result += th + ' ' + MyDate.getFullYear();
-    }
+
     return result;
 }
 
@@ -621,13 +726,26 @@ mBroadcaster.once('startMega', function populate_l() {
     l[19849] = l[19849].replace('[A]', '<a class="red" href="/recovery">').replace('[/A]', '</a>');
     l[19851] = l[19851].replace('[B]', '<strong class="warning-text">').replace('[/B]', '</strong>');
     l[19857] = l[19857] ? l[19857].replace('[BR]', '<br>') : l[19857];
+    l[20011] = l[20011]
+        .replace('[A]', '<a class="red" target="_blank" rel="noopener noreferrer"  href="https://www.lastpass.com/'
+            + 'password-generator">')
+        .replace('[/A]', '</a>');
+    l[20013] = l[20013].replace('[Br]', '<br><br>');
+    l[20015] = l[20015].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
+        + '/backup">')
+        .replace('[/A]', '</a>');
+    l[20016] = l[20016].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
+        + '/blog_48" >')
+        .replace('[/A]', '</a>')
+        .replace('[Br]', '<br><br>');
+    l[20022] = l[20022].replace('[Br]', '<br><br>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
         16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444,
         18268, 18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296,
         18297, 18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812,
-        19813, 19814, 19854, 19821
+        19813, 19814, 19854, 19821, 19930
     ];
     for (i = common.length; i--;) {
         var num = common[i];

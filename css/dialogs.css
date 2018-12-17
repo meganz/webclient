@@ -246,8 +246,9 @@
     height: 48px;
 }
 .fm-picker-header .fm-header-buttons {
-    top: 6px;
-    right: 6px;
+    top: 5px;
+    right: 5px;
+    position: absolute;
 }
 .fm-dialog-scroll, .add-from-cloud .dialog-empty-block {
     height: 612px !important;
@@ -2340,7 +2341,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -3208,9 +3209,20 @@ li.token-input-token-invite .input-close {
     border-radius: 4px;
     margin: 4px 20px 0 20px;
     position: relative;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
 .auth-app-select-tooltip .app-link:hover {
-    border: 1px solid #00bfa5;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+    -webkit-transition: all 100ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
 .auth-app-select-tooltip .app-link:last-child {
     margin-bottom: 20px;
@@ -3222,7 +3234,7 @@ li.token-input-token-invite .input-close {
     height: 32px;
     position: absolute;
     left: 14px;
-    top: 10px;
+    top: 12px;
     width: 32px;
 }
 .auth-app-select-tooltip .authy .app-link-icon {
@@ -3238,11 +3250,14 @@ li.token-input-token-invite .input-close {
     background-position: -38px -38px;
 }
 .auth-app-select-tooltip .app-link-text {
-    color: #676d75;
+    color: #4C5251;
     display: block;
-    font-size: 15px;
-    line-height: 51px;
+    font-size: 14px;
+    line-height: 56px;
     margin-left: 64px;
+    font-family: 'LatoWeb';
+    font-weight: 500;
+    letter-spacing: .2px;
 }
 .auth-app-select-tooltip .app-link-arrow {
     background-image: url(../images/mega/2fa-auth-apps.png);
@@ -3613,7 +3628,7 @@ li.token-input-token-invite .input-close {
     width: 640px;
     height: 620px;
     margin: -310px 0 0 -320px;
-    text-align: center; 
+    text-align: center;
 }
 .fm-dialog.recovery-key-dialog  .fm-dialog-close {
     right: -6px;

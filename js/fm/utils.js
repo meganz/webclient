@@ -1832,3 +1832,75 @@ MegaUtils.prototype.getStates = function() {
     }
     return this._states;
 };
+
+/**
+ * Check user trying to upload folder by drag and drop.
+ * @param {Event} event
+ * @returns {Boolean}
+ */
+MegaUtils.prototype.checkFolderDrop = function(event) {
+
+    'use strict';
+
+    /**
+     * Check user trying to upload folder.
+     */
+    if (d) {
+        console.log('Checking user uploading folder.');
+    }
+
+    var checkWebkitItems = function _checkWebkitItems() {
+        var items = event.dataTransfer.items;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].webkitGetAsEntry) {
+                var item = items[i].webkitGetAsEntry();
+                if (item && item.isDirectory) {
+                    return true;
+                }
+            }
+        }
+    };
+
+    var checkMozItems = function _checkMozItems() {
+        try {
+            var m = event.dataTransfer.mozItemCount;
+            for (var j = 0; j < m; ++j) {
+                file = event.dataTransfer.mozGetDataAt("application/x-moz-file", j);
+                if (file instanceof Ci.nsIFile) {
+                    filedrag_u = [];
+                    if (j === m - 1) {
+                        $.dostart = true;
+                    }
+                    var mozitem = new mozDirtyGetAsEntry(file); /*,e.dataTransfer*/
+                    if (mozitem.isDirectory) {
+                        return true;
+                    }
+                }
+                else {
+                    if (d) {
+                        console.log('FileSelectHandler: Not a nsIFile', file);
+                    }
+                }
+            }
+        }
+        catch (e) {
+            alert(e);
+            Cu.reportError(e);
+        }
+    };
+
+    if (event.dataTransfer
+        && event.dataTransfer.items
+        && event.dataTransfer.items.length > 0 && event.dataTransfer.items[0].webkitGetAsEntry) {
+        return checkWebkitItems();
+    }
+    else if (is_chrome_firefox && event.dataTransfer) {
+        return checkMozItems();
+    }
+    // else {
+    // ie does not support DataTransfer.items property.
+    // Therefore cannot recognise what user upload is folder or not.
+    // }
+
+    return false;
+};

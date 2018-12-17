@@ -27,6 +27,7 @@ mobile.signin = {
         this.$screen.find('.tab-block.register').addClass('hidden');
 
         // Init functionality
+        this.prefillLoginMessage();
         this.prefillEmailField();
         this.initLoginButton();
         this.initForgotPasswordButton();
@@ -36,6 +37,25 @@ mobile.signin = {
         mobile.initTabs('login');
         mobile.initCheckbox('remember-me');
         mobile.initHeaderMegaIcon();
+    },
+
+    /**
+     * Shows a custom message on the login page if they got redirected from somewhere else
+     */
+    prefillLoginMessage: function() {
+
+        'use strict';
+
+        // If the custom message is set
+        if (login_txt) {
+
+            // Unhide the block and show the message
+            this.$screen.find('.custom-login-message-block').removeClass('hidden');
+            this.$screen.find('.custom-login-text').text(login_txt);
+
+            // Clear the message so it's only shown once
+            login_txt = false;
+        }
     },
 
     /**

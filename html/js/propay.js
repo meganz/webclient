@@ -819,9 +819,9 @@ pro.propay = {
         // Find the primary payment options
         var $payOptions = $('.payment-options-list.primary .payment-method:not(.template)');
 
-        // If on mobile (which currently only has credit card providers) or they have a Pro balance, select the first
-        // option, otherwise select the next payment option (usually API will have it ordered to be Visa)
-        var $option = (is_mobile || parseFloat(pro.propay.proBalance) > 0) ? $payOptions.first() : $payOptions.eq(1);
+        // If they have a Pro balance, select the first option, otherwise select
+        // the next payment option (usually API will have it ordered to be Visa)
+        var $option = (parseFloat(pro.propay.proBalance) > 0) ? $payOptions.first() : $payOptions.eq(1);
 
         // Check the radio button option
         $option.find('input').prop('checked', true);

@@ -280,6 +280,8 @@ var megasync = (function() {
 
     function megaSyncIsNotResponding(nextIfYes) {
         if (lastCheckStatus && lastCheckTime) {
+            api_req({ a: 'log', e: 99800, m: 'MEGASync is not responding' });
+
             msgDialog('confirmation', 'MEGASync is not responding',
                 l[17795],
                 // 'MEGASync stopped responding, it could be closed or too busy',

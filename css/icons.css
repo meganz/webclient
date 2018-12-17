@@ -40,12 +40,6 @@
     -khtml-opacity: 0.9;
     opacity: 0.9;
 }
-.link-button.active > .small-icon, .link-button.red:hover > .small-icon, .link-button.red.active > .small-icon {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-}
 .tiny-icon {
     width: 12px;
     height: 16px;
@@ -81,8 +75,13 @@
 .grey-medium-plus {
     background-position: -2px -1474px;
 }
+.grey-small-plus {
+    background-position: -42px -1474px;
+}
 .smiling-face {
-    background-position: -3px -1546px;
+    background-position: -89px -853px;
+    width: 22px;
+    height: 22px;
 }
 .tiny-icon.blue-handset {
     background-position: -6px -2217px;
@@ -96,6 +95,16 @@
 .tiny-icon.icons-sprite.grey-dots {
     background-position: -160px -831px;
     width: 13px;
+}
+.tiny-icon.icons-sprite.grey-arrow {
+    background-position: -162px -1318px;
+    width: 13px;
+}
+.tiny-icon.icons-sprite.refresh {
+    background-position: -189px -1318px;
+}
+.tiny-icon.icons-sprite.top-arrow {
+    background-position: -217px -1317px;
 }
 .tiny-icon.grey-minus-icon {
     background-position: -11px -3609px;
@@ -178,6 +187,12 @@
 .small-icon.square-profile {
     background-position: -3px -663px;
 }
+.dropdown-item .small-icon.square-profile.colorized {
+    background-position: -131px -934px;
+    width: 22px;
+    height: 22px;
+    margin-top: 5px;
+}
 .small-icon.play-icon {
     background-position: -2px -703px;
 }
@@ -258,7 +273,25 @@
 .small-icon.enter-icon {
     background-position: -43px -3829px;
 }
-
+.small-icon.chat-with-plus {
+    background-position: -50px -736px;
+    width: 21px;
+}
+.small-icon.arrow-in-square {
+    background-position: -170px -775px;
+}
+.small-icon.arrow-in-square.active {
+    background-position: -50px -855px;
+}
+.tiny-icon.right-arrow {
+    background-position: -205px -898px;
+}
+.tiny-icon.down-arrow, .expanded .tiny-icon.right-arrow {
+    background-position: -205px -898px;
+    -webkit-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
 /* Icons for archived chat */
 .small-icon.archive {
     background-position: -54px -262px;
@@ -302,6 +335,14 @@
 }
 .dropdown-item .small-icon.grey-computer {
     background-position: -3px -2501px;
+}
+.small-icon.grey-computer.colorized {
+    background-position: -89px -934px;
+}
+.dropdown-item.light i.small-icon.grey-computer.colorized {
+    background-position: -89px -934px;
+    width: 23px;
+    margin: 4px 0 0 5px;
 }
 .dropdown-item .small-icon.rounded-grey-up-arrow {
     background-position: -3px -620px;
@@ -602,7 +643,7 @@
     width: 18px;
 }
 .medium-icon.icons-img, .semi-big-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -954,15 +995,15 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     background-position: -148px -634px;
 }
 .thumb .small-icon.small-play-icon {
@@ -970,7 +1011,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -1118,6 +1159,11 @@
 }
 .small-icon.icons-sprite.bold-crossed-eye {
     background-position: 1px -1498px;
+}
+.small-icon.icons-sprite.tooltip-arrow {
+    background-position: -165px -1354px;
+    width: 22px;
+    height: 9px;
 }
 .small-icon.icons-sprite.grey-plus {
     background-position: -200px -391px;
@@ -1481,8 +1527,9 @@
 .small-icon.icons-sprite.small-cross {
     background-position: 1px -1316px;
 }
-i.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+
+i.icons-sprite, i.small-icon.icons-sprite {
+    background-image: url(../images/mega/icons-sprite_v23.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;
@@ -1608,6 +1655,58 @@ i.account-icon.email {
 }
 i.account-icon.lock {
     background-position: -6px -1740px;
+}
+
+.link-button > .small-icon.colorized, .link-button:hover > .small-icon.colorized, .link-button.active > .small-icon, .link-button.red:hover > .small-icon, .link-button.red.active > .small-icon {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.small-icon.square-profile.colorized {
+    background-position: -131px -934px;
+}
+.dropdown-item.light i.small-icon.square-profile.colorized {
+    background-position: -131px -934px;
+    width: 22px;
+    height: 22px;
+    margin: 4px 0 0 7px;
+}
+.small-icon.audio-call.colorized {
+    background-position: -90px -775px;
+}
+.small-icon.video-call.colorized {
+    background-position: -130px -775px;
+}
+.small-icon.rounded-grey-up-arrow.colorized {
+    background-position: -170px -736px;
+}
+.small-icon.clear-arrow.colorized {
+    background-position: -130px -736px;
+}
+.small-icon.writing-pen.colorized {
+    background-position: -130px -815px;
+}
+.small-icon.rounded-plus.colorized {
+    background-position: -50px -816px;
+}
+.small-icon.rounded-stop.colorized {
+    background-position: -90px -816px;
+}
+.small-icon.horizontal-red-handset.colorized {
+    background-position: -170px -815px;
+    width: 21px;
+}
+.small-icon.archive.colorized {
+    background-position: -90px -736px;
+}
+.small-icon.grey-cloud.colorized {
+    background-position: -50px -934px;
+    width: 22px;
+}
+.dropdown-item.link-button.light i.small-icon.grey-cloud.colorized {
+    background-position: -50px -934px;
+    margin-top: 4px;
 }
 
 .link-button > .small-icon.colorized, .link-button:hover > .small-icon.colorized, .link-button.active > .small-icon, .link-button.red:hover > .small-icon, .link-button.red.active > .small-icon {

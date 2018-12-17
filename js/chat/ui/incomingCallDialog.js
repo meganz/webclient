@@ -93,14 +93,14 @@
         if (isGroupCall) {
             $('.video-call', self.$dialog).hide();
             $('.incoming-call-txt, .icoming-call-header', self.$dialog).text(
-                'Incoming group call...'
+                l[19995] || 'Incoming group call...'
             );
             self.$dialog.addClass('group-call');
         }
         else {
             $('.video-call', self.$dialog).show();
             $('.incoming-call-txt, .icoming-call-header', self.$dialog).text(
-                'Incoming call...'
+                (l[17878] || "Incoming call") + '...'
             );
             self.$dialog.removeClass('group-call');
         }

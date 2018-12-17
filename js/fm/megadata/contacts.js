@@ -521,6 +521,47 @@ MegaData.prototype.contacts = function() {
                     .removeClass('hidden')
                     .addClass('active')
                     .data("triggeredBy", $this);
+
+                $dropdown.find('.startchat-item').rebind('click.treePanel', function() {
+                    var $this = $(this);
+
+                    if (!$this.is(".disabled")) {
+                        var user_handle = $.selected && $.selected[0];
+                        loadSubPage("fm/chat/" + user_handle);
+                    }
+                });
+
+                $dropdown.find('.startaudio-item').rebind('click.treePanel', function() {
+                    var $this = $(this);
+                    var $triggeredBy = $this.parent().data("triggeredBy");
+                    var $userDiv = $triggeredBy.parent().parent();
+
+                    if (!$this.is('.disabled')) {
+                        var user_handle = $userDiv.attr('id').replace('contact_', '');
+
+                        megaChat.createAndShowPrivateRoomFor(user_handle)
+                            .then(function(room) {
+                                room.setActive();
+                                room.startAudioCall();
+                            });
+                    }
+                });
+
+                $dropdown.find('.startvideo-item').rebind('click.treePanel', function() {
+                    var $this = $(this);
+                    var $triggeredBy = $this.parent().data('triggeredBy');
+                    var $userDiv = $triggeredBy.parent().parent();
+
+                    if (!$this.is('.disabled')) {
+                        var user_handle = $userDiv.attr('id').replace('contact_', '');
+
+                        megaChat.createAndShowPrivateRoomFor(user_handle)
+                            .then(function(room) {
+                                room.setActive();
+                                room.startVideoCall();
+                            });
+                    }
+                });
             }
             else {
                 $this.removeClass('active');
@@ -535,46 +576,6 @@ MegaData.prototype.contacts = function() {
             return false; // stop propagation!
         });
 
-        $dropdown.find('.startchat-item').rebind('click.treePanel', function() {
-            var $this = $(this);
-
-            if (!$this.is(".disabled")) {
-                var user_handle = $.selected && $.selected[0];
-                loadSubPage("fm/chat/" + user_handle);
-            }
-        });
-
-        $dropdown.find('.startaudio-item').rebind('click.treePanel', function() {
-            var $this = $(this);
-            var $triggeredBy = $this.parent().data("triggeredBy");
-            var $userDiv = $triggeredBy.parent().parent();
-
-            if (!$this.is('.disabled')) {
-                var user_handle = $userDiv.attr('id').replace('contact_', '');
-
-                megaChat.createAndShowPrivateRoomFor(user_handle)
-                    .then(function(room) {
-                        room.setActive();
-                        room.startAudioCall();
-                    });
-            }
-        });
-
-        $dropdown.find('.startvideo-item').rebind('click.treePanel', function() {
-            var $this = $(this);
-            var $triggeredBy = $this.parent().data('triggeredBy');
-            var $userDiv = $triggeredBy.parent().parent();
-
-            if (!$this.is('.disabled')) {
-                var user_handle = $userDiv.attr('id').replace('contact_', '');
-
-                megaChat.createAndShowPrivateRoomFor(user_handle)
-                    .then(function(room) {
-                        room.setActive();
-                        room.startVideoCall();
-                    });
-            }
-        });
     }
 
     $('.fm-tree-panel').rebind('click', '.nw-contact-item', function() {

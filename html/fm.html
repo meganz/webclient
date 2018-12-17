@@ -196,11 +196,15 @@
             <a class="logo hidden"></a>
             <div class="nw-fm-left-icon dashboard">
                 <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">Dashboard</div>
+                <div class="dark-tooltip">[$16668]</div>
             </div>
             <div class="nw-fm-left-icon cloud-drive">
                 <div class="nw-fm-left-border"></div>
                 <div class="dark-tooltip">[$164]</div>
+            </div>
+            <div class="nw-fm-left-icon recents">
+                <div class="nw-fm-left-border"></div>
+                <div class="dark-tooltip">Recents</div>
             </div>
             <div class="nw-fm-left-icon inbox">
                 <div class="nw-fm-left-border"></div>
@@ -291,11 +295,15 @@
             <a class="logo hidden"></a>
             <div class="nw-fm-left-icon dashboard">
                 <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">Dashboard</div>
+                <div class="dark-tooltip">[$16668]</div>
             </div>
             <div class="nw-fm-left-icon cloud-drive active">
                 <div class="nw-fm-left-border"></div>
                 <div class="dark-tooltip">[$1687]</div>
+            </div>
+            <div class="nw-fm-left-icon recents">
+                <div class="nw-fm-left-border"></div>
+                <div class="dark-tooltip">Recents</div>
             </div>
             <div class="nw-fm-left-icon inbox">
                 <div class="nw-fm-left-border"></div>
@@ -1820,6 +1828,9 @@
                             <div class="arrow owner">[$5905]</div>
                         </th>
                         <th>
+                            <div class="arrow size">[$87]</div>
+                        </th>
+                        <th>
                             <div class="arrow access">[$5906]</div>
                         </th>
                         <th class="grid-url-header-nw"></th>
@@ -2956,10 +2967,22 @@
                                 <div class="account-italic-txt tips">[$16152]</div>
                                 <a href="" class="account red-lnk reset-tips">[$16153]</a>
                                 -->
+                                <div class="fm-account-header">[$19927]</div>
+                                <div class="account radio-buttons bottom-pad">
+                                    <div class="uidateformat radioOn" id="rad16_div">
+                                        <input type="radio" id="rad16" class="uidateformat radioOn" value="1">
+                                    </div>
+                                    <div class="radio-txt">[$19928]</div>
+                                    <div class="uidateformat radioOff" id="rad17_div">
+                                        <input type="radio" id="rad17" class="uidateformat radioOff" value="2">
+                                    </div>
+                                    <div class="radio-txt">[$19929]</div>
+                                    <div class="clear"></div>
+                                    <div class="account-italic-txt">[$19930]</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
                     <div class="account tab-content transfers hidden">
                         <div class="account max-width-bl">
                             <div class="account data-block transfers-form left">
@@ -4151,6 +4174,92 @@
             </div>
             </div>
         </div>
+
+        <div class="fm-recents container hidden">
+            <div class="fm-recents scroll"></div>
+            <!--<div class="fm-recents content"></div>-->
+            <div class="fm-recents no-content hidden">
+                <div class="fm-empty-recents-bg"></div>
+                <div class="empty-text">No recent activity</div>
+            </div>
+            <!-- Templates for recents list -->
+            <div class="fm-recents date title-template template"></div>
+            <div class="fm-recents content-row single content-row-template template">
+                <div class="content">
+                    <div class="medium-file-icon"></div>
+                    <div class="fm-recents file-info">
+                        <div class="fm-recents file-name"></div>
+                        <div class="fm-recents breadcrumbs"></div>
+                    </div>
+                    <div class="fm-recents file-data">
+                        <div class="transfer-filetype-icon hidden in-out-share-icon"></div>
+                        <div class="dark-direct-tooltip in-out-tooltip">
+                            <i class="small-icon icons-sprite tooltip-arrow"></i>
+                            <span></span>
+                        </div>
+                        <div class="fm-recents iteration">
+                            <i class="tiny-icon icons-sprite iteration top-arrow action-icon"></i>
+                            <span class="time">00:00</span>
+                        </div>
+                        <div class="dark-direct-tooltip uploaded-on-message">
+                            <i class="small-icon icons-sprite tooltip-arrow"></i>
+                            <span></span>
+                        </div>
+                        <a class="grid-url-arrow context-menu-button"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="fm-recents content-row single images-content-row-template template">
+                <div class="content">
+                    <div class="medium-file-icon image double">
+                        <div class="medium-file-icon image"></div>
+                    </div>
+                    <div class="fm-recents file-info">
+                        <div class="fm-recents file-name"></div>
+                        <div class="fm-recents breadcrumbs"></div>
+                    </div>
+                    <div class="fm-recents file-data">
+                        <div class="transfer-filetype-icon hidden in-out-share-icon"></div>
+                        <div class="dark-direct-tooltip in-out-tooltip">
+                            <i class="small-icon icons-sprite tooltip-arrow"></i>
+                            <span>Outshare</span>
+                        </div>
+                        <div class="fm-recents iteration">
+                            <i class="action-icon tiny-icon icons-sprite iteration top-arrow"></i>
+                            <span class="time">00:00</span>
+                        </div>
+                        <div class="dark-direct-tooltip uploaded-on-message">
+                            <i class="small-icon icons-sprite tooltip-arrow"></i>
+                            <span></span>
+                        </div>
+                        <a class="grid-url-arrow context-menu-button"></a>
+                    </div>
+                    <div class="fm-recents previews-wrapper">
+                        <div class="fm-recents previews-scroll">
+                            <div class="fm-recents previews-body">
+                                <a class="data-block-view template">
+                                    <span class="data-block-bg">
+                                        <span class="block-view-file-type image file"><img/></span>
+                                        <span class="file-settings-icon active"></span>
+                                        <div class="video-thumb-details">
+                                            <i class="small-icon small-play-icon"></i>
+                                            <span>00:00</span>
+                                        </div>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="button link-button lato-semibold toggle-expanded-state hidden">
+                        <i class="small-icon  icons-sprite bold-eye"></i>
+                        <span>[$19797]</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <!-- END Templates for recents list -->
+        </div>
+
     </div>
     <div class="fm-products-nav"></div>
 

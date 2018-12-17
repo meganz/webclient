@@ -1611,6 +1611,10 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
             }, 50);
         }
     }
+
+    if (M.recentsRender) {
+        M.recentsRender.nodeChanged(itemHandle);
+    }
 };
 
 MegaData.prototype.rename = function(itemHandle, newItemName) {
@@ -1953,7 +1957,7 @@ MegaData.prototype.isLabelExistNodeList = function(nodelist) {
     for (var i = 0; i < nodelist.length; i++) {
         if (typeof nodelist[i] !== 'undefined'
             && (typeof nodelist[i].lbl !== 'undefined'
-            && nodelist[i].lbl !== 0)){
+                && nodelist[i].lbl !== 0)){
             return true;
         }
     }
@@ -2371,6 +2375,202 @@ MegaData.prototype.getShareNodesSync = function fm_getsharenodessync(h, root) {
     }
 
     return sn;
+};
+
+/**
+ * Retrieve a list of recent nodes
+ * @param {Number} [limit] Limit the returned results, defaults to last 10000 nodes.
+ * @param {Number} [until] Get nodes not older than this unix timestamp, defaults to nodes from past month.
+ * @return {Promise}
+ */
+MegaData.prototype.getRecentNodes = function(limit, until) {
+    'use strict';
+    console.time("recents:collectNodes");
+
+    return new Promise(function(resolve) {
+        var rubTree = M.getTreeHandles(M.RubbishID);
+        var rubFilter = function(n) {
+            return rubTree.indexOf(n.p) < 0;
+        };
+        var getLocalNodes = function() {
+            rubTree = rubFilter.tree;
+            var nodes = Object.values(M.d)
+                .filter(function(n) {
+                    return !n.t && n.ts > until && rubFilter(n);
+                });
+
+            resolve(nodes, limit);
+        };
+        rubFilter.tree = rubTree;
+        limit = limit | 0 || 1e4;
+        until = until || Math.round((Date.now() - 7776e6) / 1e3);
+
+        resolve = (function(resolve) {
+            return function(nodes, limit) {
+                var sort = M.getSortByDateTimeFn();
+                nodes = nodes.filter(function(n) {
+                    return !n.fv;
+                }).sort(function(a, b) {
+                    return sort(a, b, -1);
+                });
+                console.timeEnd("recents:collectNodes");
+                resolve(limit ? nodes.slice(0, limit) : nodes);
+            };
+        })(resolve);
+
+        if (fmdb) {
+            rubTree = rubTree.map(function(h) {
+                return ab_to_base64(fmdb.strcrypt(h));
+            });
+            var options = {
+                limit: limit,
+
+                query: function(db) {
+                    return db.orderBy('t').reverse().filter(rubFilter)
+                        .until(function(row) {
+                            return until > row.t;
+                        });
+                },
+                include: function(row) {
+                    return row.t > until;
+                }
+            };
+            fmdb.getbykey('f', options).then(resolve).catch(getLocalNodes);
+        }
+        else {
+            getLocalNodes();
+        }
+    });
+};
+
+/**
+ * Get Recent Actions
+ * @param {Number} [limit] Limit the returned nodes in the interactions results, defaults to last 10000 nodes.
+ * @param {Number} [until] Get nodes not older than this unix timestamp, defaults to nodes from past month.
+ * @return {Promise}
+ */
+MegaData.prototype.getRecentActionsList = function(limit, until) {
+    'use strict';
+
+    var tree = Object.assign.apply(null, [{}].concat(Object.values(M.tree)));
+
+    // Get date from timestamp with Today & Yesterday titles.
+    var getDate = function(ts) {
+        var today = moment().startOf('day');
+        var yesterday = today.clone().subtract(1, 'days');
+        var format = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+
+        getDate = function(ts) {
+            var date = moment(ts * 1e3);
+            return date.isSame(today, 'd') ? l[1301] : date.isSame(yesterday, 'd')
+                ? l[1302] : date._d.toLocaleDateString(undefined, format);
+        };
+        return getDate(ts);
+    };
+
+    // Sort array of objects by ts, most recent first.
+    var byTimeDesc = function(a, b) {
+        if (a.ts === b.ts) {
+            return 0;
+        }
+        return a.ts > b.ts ? -1 : 1;
+    };
+
+    // Create a new action object based off first node in group.
+    var newActionBucket = function(n, actionType, blockType) {
+        var b = [];
+        b.ts = n.ts;
+        b.date = getDate(b.ts);
+        b.path = [];
+        b.user = n.u;
+        b.action = actionType;
+        b.type = blockType;
+        var p = n.p;
+
+        while (tree[p]) {
+            var t = tree[p];
+            p = t.p;
+            b.path.push({
+                name: t.h === M.RootID ? l[164] : t.name || t.h,
+                h: t.h,
+                pathPart: true
+            });
+            if (t.t & M.IS_SHARED) {
+                b.outshare = true;
+            }
+            if (t.su && !tree[p]) {
+                b.path.push({
+                    name: l[5542],
+                    h: 'shares',
+                    pathPart: true
+                });
+                b.inshare = true;
+            }
+        }
+        return b;
+    };
+
+    return new Promise(function(resolve, reject) {
+        M.getRecentNodes(limit, until).then(function(nodes) {
+            console.time("recents:collateActions");
+            nodes.sort(byTimeDesc);
+
+            // Index is used for finding correct bucket for node.
+            var index = {};
+
+            // Action list to return to caller.
+            var recentActions = [];
+            recentActions.nodeCount = nodes.length;
+
+            // Radix sort nodes into buckets.
+            for (var i = 0; i < nodes.length; i++) {
+                var n = new MegaNode(nodes[i]);
+                var actionType = n.tvf ? "updated" : "added";
+                var blockType = (is_image3(n) || is_video(n) === 1) ? 'media' : 'files';
+                index[n.u] = index[n.u] || Object.create(null);
+                index[n.u][n.p] = index[n.u][n.p] || Object.create(null);
+                index[n.u][n.p][actionType] = index[n.u][n.p][actionType] || Object.create(null);
+                index[n.u][n.p][actionType][blockType] = index[n.u][n.p][actionType][blockType] || { endts: 0 };
+
+                // Split nodes into groups based on time separation.
+                var bucket = index[n.u][n.p][actionType][blockType];
+                if (bucket.endts === 0 || n.ts < bucket.endts) {
+                    bucket.endts = n.ts - 21600; // 6 Hours
+                    bucket.group = newActionBucket(n, actionType, blockType);
+                    recentActions.push(bucket.group);
+                }
+
+                // Populate node properties.
+                n.recent = true;
+                delete n.ar;
+
+                // Add node to bucket.
+                bucket.group.push(n);
+            }
+
+            console.timeEnd("recents:collateActions");
+            M.recentActions = recentActions;
+            resolve(recentActions);
+        }).catch(reject);
+    });
+};
+
+/**
+ * Retrieve all folders hierarchy starting from provided handle
+ * @param {String} h The root node handle
+ * @return {Array} node handles
+ */
+MegaData.prototype.getTreeHandles = function _(h) {
+    'use strict';
+
+    var result = [h];
+    var tree = Object.keys(M.tree[h] || {});
+
+    for (var i = tree.length; i--;) {
+        result.push.apply(result, _(tree[i]));
+    }
+
+    return result;
 };
 
 /**

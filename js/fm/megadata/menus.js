@@ -224,7 +224,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 if (mediaType) {
                     items['.play-item'] = 1;
 
-                    if (mediaType === 1 && sourceRoot !== M.RubbishID) {
+                    if (mediaType === 1 && sourceRoot !== M.RubbishID && sourceRoot !== "shares") {
                         items['.embedcode-item'] = 1;
                     }
                 }
@@ -403,6 +403,15 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
     // Used when right click is occured outside item, on empty canvas
     if (ll === 2) {
+        // to init megaSync, as the user may click of file/folder upload
+        // the below event handler will setup the communication with MEGASYNC
+        var fupload = document.getElementById('fileselect1');
+        var mEvent = new MouseEvent('mouseover', {
+            view: window,
+            bubbles: true,
+            cancelable: true
+        });
+        fupload.dispatchEvent(mEvent);
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
         if (M.getNodeRights(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {

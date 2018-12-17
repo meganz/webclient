@@ -516,9 +516,9 @@ var mega = {
         if (!this._urlParams) {
             var params = '&domain=meganz'; // domain origin
 
-            // If using extension this is passed through to the API for the helpdesk tool
+            // If using an extension, the version is passed through to the API for the helpdesk tool
             if (is_extension) {
-                params += '&ext=1';
+                params += '&ext=' + (is_chrome_web_ext ? buildVersion.chrome : buildVersion.firefox);
             }
 
             // Append browser brand for easier troubleshoting
@@ -1996,6 +1996,11 @@ else if (!b_u) {
         jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
     } // !is_mobile
 
+    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
+        is_chrome_firefox |= 4;
+        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
+    }
+
     // Transfers
     jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});
     jsl.push({f:'js/transfers/queue.js', n: 'queue', j:1,w:4});
@@ -2045,10 +2050,12 @@ else if (!b_u) {
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
+        jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
         jsl.push({f:'js/fm/selectionmanager.js', n: 'fm_selectionmanager_js', j:1, w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
+        jsl.push({f:'js/fm/recents.js', n: 'fmrecents_js', j:1, w:5});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/fm/account-change-password.js', n: 'fm_account_change_password_js', j:1});
         jsl.push({f:'js/fm/account-change-email.js', n: 'fm_account_change_email_js', j:1});
@@ -2256,11 +2263,6 @@ else if (!b_u) {
         jsl.push({f:'js/betacrashes.js', n: 'betacrashes_js', j: 1});
     }
 
-    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
-        is_chrome_firefox |= 4;
-        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
-    }
-
     var jsl2 =
     {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
@@ -2336,7 +2338,9 @@ else if (!b_u) {
         'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
         'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 },
         'charts_js': {f:'js/vendor/Chart.js', n: 'charts_js', j:1},
-        'business_invoice': {f:'html/invoicePDF.html', n: 'business_invoice', j:0}
+        'business_invoice': {f:'html/invoicePDF.html', n: 'business_invoice', j:0},
+        'securitypractice': {f:'html/security-practice.html', n: 'securitypractice', j:0},
+        'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1}
     };
 
     var jsl3 = {
@@ -2437,7 +2441,8 @@ else if (!b_u) {
         'extensions': ['browsers', 'browsers_js'],
         'bird': ['megabird'],
         'wp': ['uwp'],
-        'uwp': ['uwp']
+        'uwp': ['uwp'],
+        'security': ['securitypractice', 'securitypractice_js', 'filesaver']
     };
 
     if (is_mobile) {

@@ -512,7 +512,7 @@
     width: 18px;
     height: 16px;
     display: inline-block;
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     background-repeat: no-repeat;
     background-position: -204px -196px;
     background-size: 262px auto;
@@ -703,6 +703,9 @@
     min-width: 95px;
     margin-right: 5px;
 }
+.securitypractice .improved-recovery-steps .recover-paste-block .right-section > div {
+    margin-left: 8px;
+}
 .improved-recovery-steps .recover-paste-block .right-section > div.no-hover:hover{
     background-color: initial;
 }
@@ -766,14 +769,19 @@
     border-radius: 3px;
     min-height: 44px;
 }
-.improved-recovery-steps .info-container, .improved-recovery-steps .checkbox-container , .improved-recovery-steps .app-instruction-block, .improved-recovery-steps .recover-upload-block, .improved-recovery-steps .recover-paste-block {
+.improved-recovery-steps .info-container, .improved-recovery-steps .checkbox-container, .improved-recovery-steps .app-instruction-block, .improved-recovery-steps .recover-upload-block, .improved-recovery-steps .recover-paste-block {
     background: rgba(244,244,246,0.20);
     border: 1px solid rgba(38,47,59,0.10);
-    border-radius: 2px;
+    border-radius: 6px;
     padding: 20px 24px;
     margin: 32px auto 32px;
     height: auto;
     position: relative;
+}
+.securitypractice .improved-recovery-steps .recover-paste-block {
+    background: #fff;
+    border: 1px solid rgba(38,47,59,0.10);
+    margin-top: 24px;
 }
 .improved-recovery-steps .recover-upload-block {
     margin-bottom: 0;

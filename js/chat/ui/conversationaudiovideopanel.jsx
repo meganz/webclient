@@ -34,7 +34,7 @@ var VIEW_MODES = {
 };
 
 var ConversationAudioVideoPanel = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getInitialState: function() {
         return {
             'messagesBlockEnabled': false,
@@ -129,7 +129,7 @@ var ConversationAudioVideoPanel = React.createClass({
         }
         var newWidth;
 
-        if (self.state.viewMode === VIEW_MODES.CAROUSEL) {
+        if (self.getViewMode() === VIEW_MODES.CAROUSEL) {
             $('.participantsContainer', $container).height('auto');
             var activeStreamHeight = (
                 $container.outerHeight() - $('.call-header').outerHeight() -

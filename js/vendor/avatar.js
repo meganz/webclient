@@ -241,11 +241,12 @@ window.ClientFileHandler = (function(){
      * Takes in an array of files, processes them, and fires the onSuccess handler if any are valid, or the onError handler
      * otherwise. These handlers can be specified on the options object passed to the constructor.
      * @param fileList array of objects like { size:Number, type:String }
-     * @param fileSourceElem - Unused. Matches IframeUploader interface
+     * @param fileSourceElem - Unused. Matches IframeUploader interface\
+     * @param event - event to check user drop a folder
      */
-    ClientFileHandler.prototype.handleFiles = function(fileList, fileSourceElem){
+    ClientFileHandler.prototype.handleFiles = function(fileList, fileSourceElem, event){
         //Assumes any number of files > 0 is a success, else it's an error
-        var filteredFiles = this.filterFiles(fileList);
+        var filteredFiles = this.filterFiles(fileList, event);
 
         if (filteredFiles.valid.length > 0) {
             //There was at least one valid file
@@ -256,7 +257,7 @@ window.ClientFileHandler = (function(){
         }
     };
 
-    ClientFileHandler.prototype.filterFiles = function(fileList){
+    ClientFileHandler.prototype.filterFiles = function(fileList, event){
         var fileTypeFilter = _.isRegExp(this.options.fileTypeFilter) ? this.options.fileTypeFilter : this.defaults.fileTypeFilter,
             fileSizeLimit = this.options.fileSizeLimit,
             invalid = {
@@ -265,6 +266,11 @@ window.ClientFileHandler = (function(){
                 byCount: []
             },
             valid = _.filter(fileList, function(file){
+
+                if (M.checkFolderDrop(event)) {
+                    invalid.byType.push(file);
+                    return false;
+                }
 
                 if (!fileTypeFilter.test(file.type)) {
                     invalid.byType.push(file);
@@ -407,7 +413,7 @@ window.DragDropFileTarget = (function(){
         this.$target.removeClass(this.options.activeDropTargetClass);
 
         if (this.options.clientFileHandler) {
-            this.options.clientFileHandler.handleFiles(e.originalEvent.dataTransfer.files, e.originalEvent.target);
+            this.options.clientFileHandler.handleFiles(e.originalEvent.dataTransfer.files, e.originalEvent.target, e);
         }
     };
 
@@ -455,7 +461,7 @@ window.UploadInterceptor = (function(){
 
     UploadInterceptor.prototype.onSelectFile = function(e){
         if ($(e.target).val() && this.options.clientFileHandler) {
-            this.options.clientFileHandler.handleFiles(e.target.files, this.$el);
+            this.options.clientFileHandler.handleFiles(e.target.files, this.$el, e);
         }
     };
 
@@ -489,7 +495,7 @@ window.ImageExplorer = (function(){
     };
 
     ImageExplorer.prototype.defaults = {
-        initialScaleMode: ImageExplorer.scaleModes.containAndFill,
+        initialScaleMode: ImageExplorer.scaleModes.fill,
         zoomMode: ImageExplorer.zoomModes.localZoom,
         emptyClass: 'empty',
         scaleMax: 1 //Maximum image size is 100% (is overridden by whatever the initial scale is calculated to be)
@@ -525,8 +531,8 @@ window.ImageExplorer = (function(){
 
         this.$sourceImage.on('load', this.initImage);
 
-        this.initDragDelegate();
         this.initScaleSlider();
+        this.initDragDelegate();
     };
 
     ImageExplorer.prototype.getImageSrc = function(){
@@ -561,15 +567,21 @@ window.ImageExplorer = (function(){
                     top: imageOffset.top + ui.position.top - ui.originalPosition.top,
                     left: imageOffset.left + ui.position.left - ui.originalPosition.left
                 });
-            }, this),
-            revert: true,
-            revertDuration: 0
+            }, this)
         });
     };
 
-    ImageExplorer.prototype.initScaleSlider = function(){
-        this.$scaleSlider.on('change', _.bind(function(e){
+    ImageExplorer.prototype.initScaleSlider = function() {
+        this.$scaleSlider.on('change', _.bind(function(e) {
             this.updateImageScale(this.sliderValToScale(e.target.value));
+        }, this));
+        this.$scaleSlider.prev().on('click', _.bind(function() {
+            this.$scaleSlider.val(parseInt(this.$scaleSlider.val()) - 10);
+            this.updateImageScale(this.sliderValToScale(this.$scaleSlider.val()));
+        }, this));
+        this.$scaleSlider.next().on('click', _.bind(function() {
+            this.$scaleSlider.val(parseInt(this.$scaleSlider.val()) + 10);
+            this.updateImageScale(this.sliderValToScale(this.$scaleSlider.val()));
         }, this));
     };
 
@@ -683,18 +695,24 @@ window.ImageExplorer = (function(){
             break;
         }
 
-        this.$sourceImage
+        this.$sourceImage.add(this.$dragDelegate)
             .width(newWidth)
             .height(newHeight)
             .css({
                 'margin-left': Math.round(newMarginLeft) +'px',
                 'margin-top': Math.round(newMarginTop) +'px'
             });
+            var x1 = this.$mask.offset().left + this.$mask.width() - newMarginLeft - newWidth;
+            var y1 = this.$mask.offset().top + this.$mask.height() - newMarginTop - newHeight;
+            var x2 = this.$mask.offset().left - newMarginLeft;
+            var y2 = this.$mask.offset().top - newMarginTop;
+
+        this.$dragDelegate.draggable('option', 'containment', [x1, y1, x2, y2]);
     };
 
 
     ImageExplorer.prototype.resetImagePosition = function(){
-        this.$sourceImage.css({
+        this.$sourceImage.add(this.$dragDelegate).css({
             top: '50%',
             left: '50%'
         });
@@ -750,7 +768,6 @@ window.ImageExplorer = (function(){
     ImageExplorer.prototype.showError = function(title, contents) {
         this._removeError();
         this.toggleEmpty(true);
-        this.$container.addClass('error');
 
         alert(title + ' ' + contents);
     };
@@ -801,7 +818,7 @@ window.ImageUploadAndCrop = (function(){
         onCrop: $.noop,
         outputFormat: 'image/png',
         fallbackUploadOptions: {},
-        initialScaleMode: ImageExplorer.scaleModes.containAndFill,
+        initialScaleMode: ImageExplorer.scaleModes.fill,
         scaleMax: 1,
         fileSizeLimit: 15 * 1024 * 1024, //5MB
         maxImageDimension: 5000 //In pixels

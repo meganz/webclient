@@ -71,6 +71,13 @@ function init_embed(ph, key, g) {
     if (node) {
         var link = '#!' + ph + '!' + key;
 
+        // Remove header and logo on embed player when viewing the security video on /security page
+        if (under('security')) {
+            $('.viewer-top-bl, .logo-container').remove();
+            $('.viewer-bottom-bl').addClass('no-grad');
+            $('.download.video-block').addClass('no-bg-color');
+        }
+
         $('.play-video-button, .viewonmega-item, .filename').rebind('click', function() {
             open(getAppBaseUrl() + link);
             return false;
@@ -444,6 +451,17 @@ function getAppBaseUrl() {
         base += l.pathname;
     }
     return base;
+}
+
+function under(page) {
+    'use strict';
+
+    try {
+        return (top !== self && top.location.host === 'mega.nz' || d) && top.getCleanSitePath() === page;
+    }
+    catch (ex) {}
+
+    return false;
 }
 
 function showToast() {

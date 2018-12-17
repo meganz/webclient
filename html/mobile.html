@@ -17,6 +17,7 @@
 
             <div class="top-menu-item blog blogarticle not-mobile-ready">[$389]</div>
             <div class="top-menu-item help">[$384]</div>
+            <div class="top-menu-item security">Security</div>
             <div class="top-menu-item support not-mobile-ready">[$516]</div>
             <div class="top-menu-item upgrade-your-account pro">[$16111]</div>
             <div class="top-menu-item resellers not-mobile-ready">[$391]</div>
@@ -106,8 +107,10 @@
                 <img alt="" src="{staticpath}images/mobile/extensions/folder.png" class="mobile filetype-img" />
                 <div class="mobile filename"></div>
                 <div class="mobile filesize"></div>
-                <a href="" class="mobile red-button first"> <i></i> <span>[$8947]</span> </a>
-                <a href="" class="mobile red-button second"> <i></i> <span>[$8948]</span> </a>
+                <div class="mobile buttons inline-buttons">
+                    <a href="" class="mobile red-button first"> <i></i> <span>[$8948]</span> </a>
+                    <a href="" class="mobile red-button second"> <i></i> <span>[$8947]</span> </a>
+                </div>
             </div>
         </div>
     </div>
@@ -831,7 +834,7 @@
                             <input class="mobile password-confirm-input" type="password" value="" placeholder="[$1114]" />
                             <i class="warning-icon"></i>
                         </div>
-                        <div class="mobile register-button update-password-button">
+                        <div class="mobile cta-button green update-password-button">
                             <span class="label">[$707]</span>
                         </div>
                     </form>
@@ -1640,6 +1643,10 @@
                     <!-- Sign in Tab !-->
                     <div class="mobile tab-block sign-in hidden">
                         <form>
+                            <div class="mobile custom-login-message-block hidden">
+                                <div class="mobile empty-icon custom-login-icon"></div>
+                                <div class="mobile custom-login-text"></div>
+                            </div>
                             <div class="mobile signin-input login">
                                 <span></span>
                                 <input type="email" value="" placeholder="[$16343]" maxlength="190" />
@@ -2021,13 +2028,13 @@
 
 
 <!-- Credit card payment dialog for ECP -->
-<div class="mobile fm-block full-page-scrollable payment-address-dialog hidden">
+<div class="mobile fm-block main-block full-page-scrollable payment-address-dialog hidden">
+    <div class="mobile header-scroll-suggester"></div>
     <div class="mobile fm-row">
         <div class="mobile fm-content">
             <div class="mobile fm-scrolling">
                 <div class="mobile content-row first">
                     <div class="mobile content-cell">
-                        <div class="mobile fm-dialog-close"></div>
                         <div class="payment-address-dialog-body">
                             <div class="main-title">[$6963]</div>
                             <div class="payment-note-first recurring">
@@ -2080,6 +2087,9 @@
                                 <div class="error-message hidden">[$10633]</div>
                             </div>
                         </div>
+                        <div class="mobile footer-block">
+                             <a class="mobile text-button third close-payment-dialog"><span>[$82]</span> </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2089,10 +2099,164 @@
 
 
 <!-- Pending processing -->
-<div class="payment-processing hidden">
+<div class="mobile main-block payment-processing hidden">
     <div class="payment-animation-pad">
         <img class="payment-animation" alt="" />
         <div class="payment-animation-txt">[$6960]</div>
+    </div>
+</div>
+
+
+<!-- Direct Voucher Redemption screen -->
+<div class="mobile fm-block full-page-scrollable voucher-redeem-dialog hidden">
+    <div class="mobile content-row">
+        <div class="mobile content-cell">
+            <div class="mobile white-block">
+                <div class="mobile fm-dialog-close"></div>
+
+                <div class="mobile fm-icon voucher"></div>
+                <div class="title-text">[$7706]</div>
+                <div class="balance-text">[$7707]</div>
+
+                <div class="reg-st3-membership-bl">
+                    <div class="membership-pad-bl">
+                        <div class="left-pricing-block">
+                            <div class="reg-st3-membership-icon"></div>
+                            <div class="reg-st3-bott-title plan-name"></div>
+                        </div>
+                        <div class="right-pricing-block">
+                            <div class="reg-st3-bott-title price">
+                                <span class="num">
+                                    <span class="dollars"></span>
+                                    <span class="small">
+                                        <span class="cents"></span> &euro;
+                                    </span>
+                                </span>
+                                <span class="period"> / [$913]</span>
+                            </div>
+                            <div class="reg-st3-storage">
+                                <span class="quota-amount"></span> <span class="quota-unit"></span> <span class="reg-st3-mid-txt">[$495]</span>
+                            </div>
+                            <div class="reg-st3-bandwidth">
+                                <span class="quota-amount"></span> <span class="quota-unit"></span> <span class="reg-st3-mid-txt">Transfer</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="complete-upgrade-text">
+                        [$7708]
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <div class="choose-plan-button">[$7711]</div>
+                    <div class="complete-upgrade-button" data-plan-id="">[$7710]</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Balance/Voucher dialog on the Pro page step 2 -->
+<div class="mobile voucher-dialog hidden">
+
+    <div class="pro-plan-details">
+        <div class="plan-icon pro1">
+            <div class="reg-st3-membership-icon"></div>
+        </div>
+        <div class="voucher-plan-info">
+            <div class="voucher-plan-title"></div>
+            <div class="voucher-plan-txt">
+                <span class="duration"></span> <span>[$6941]</span>
+            </div>
+        </div>
+        <div class="voucher-plan-price">
+            <span class="price"></span>
+            <span class="payment-eurosign">&euro;</span>
+        </div>
+    </div>
+
+    <div class="mobile separator-line"></div>
+
+    <div class="mobile voucher-account-balance">
+        <div class="mobile fm-icon currency-sign-filled"></div>
+        <div class="mobile right-block">
+            <div class="mobile voucher-sub-title">[$7201]:</div>
+            <span class="mobile balance-amount">0.00</span><span class="mobile payment-eurosign">&nbsp; &euro;</span>
+            <span class="mobile right-span">
+                    <span class="mobile fm-icon small-gray-arrow"></span>
+                    <span class="mobile new-balance-amount">0.00</span><span class="mobile payment-eurosign">&nbsp; &euro;</span>
+                </span>
+        </div>
+    </div>
+    <div class="mobile upgrade-items-block">
+        <div class="mobile separator-line"></div>
+        <div class="mobile voucher-account-balance">
+            <div class="mobile fm-icon storage-icon"></div>
+            <div class="mobile right-block">
+                <div class="mobile voucher-sub-title">Storage quota:</div>
+                <span class="mobile storage-amount">0.00</span>
+                <span class="mobile right-span">
+                    <span class="mobile fm-icon small-gray-arrow"></span>
+                    <span class="mobile new-storage-amount">0.00</span>
+                </span>
+            </div>
+        </div>
+        <div class="mobile separator-line"></div>
+        <div class="mobile voucher-account-balance">
+            <div class="mobile fm-icon transfer-quota-icon"></div>
+            <div class="mobile right-block">
+                <div class="mobile voucher-sub-title">Transfer quota:</div>
+                <span class="mobile transfer-amount">0.00</span>
+                <span class="mobile right-span">
+                    <span class="mobile fm-icon small-gray-arrow"></span>
+                    <span class="mobile new-transfer-amount">0.00</span>
+                </span>
+            </div>
+        </div>
+        <div class="mobile separator-line"></div>
+    </div>
+    <div class="mobile voucher-block">
+        <div class="voucher-information-help">[$7202]
+        <div class="voucher-input-container">
+            <div id="voucher-code-input" class="fm-account-input">
+                <input type="text" placeholder="[$1015]" value="" />
+            </div>
+            <div class="voucher-redeem-now">[$7160]</div>
+        </div></div>
+        <div class="voucher-dialog-buttons">
+            <div class="voucher-dialog-td voucher-redeem-container">
+                <div class="voucher-redeem">[$7160]</div>
+            </div>
+            <div class="voucher-dialog-td purchase-now-container">
+                <div class="voucher-buy-now">[$6190]</div>
+            </div>
+        </div>
+
+        <div class="btn-close-dialog">[$82]</div>
+    </div>
+</div>
+
+
+<!-- Payment success dialog -->
+<div class="mobile payment-result main-block success hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="payment-close">
+            <div class="payment-close-icon"></div>
+            <span></span>
+            </div>
+            <div class="mobile white-block">
+                <div class="mobile empty-icon big-green-tick"></div>
+                <div class="payment-result-pad">
+                    <div class="payment-result-header">[$6961]!</div>
+                    <div class="payment-result-txt">[$19512]</div>
+                    <div class="payment-result-icon"></div>
+                    <div class="mobile payment-result-button"> <i></i> <span>[$6690]</span> </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -2854,9 +3018,7 @@
                 <div class="mobile dialog-body-text">
                     [$19203]
                 </div>
-                <div class="mobile buttons">
-                    <a class="mobile red-button first setup-two-factor-button"> <i></i> <span>[$19204]</span> </a>
-                </div>
+                    <div class="mobile cta-button green setup-two-factor-button active">[$556]</div>
                  <a class="mobile text-button third cancel"><span>[$82]</span> </a>
             </div>
         </div>
@@ -2885,7 +3047,7 @@
                         <div class="mobile two-factor-qr-seed-container">
                             <textarea id="two-factor-qr-seed" class="mobile two-factor-qr-seed" readonly></textarea>
                         </div>
-                        <div class="mobile cta-button red two-factor-next-btn active">[$556]</div>
+                        <div class="mobile cta-button green two-factor-next-btn active">[$556]</div>
                     </div>
                 </div>
             </div>
@@ -2947,7 +3109,7 @@
                         <div class="mobile warning-text-field hidden">
                             [$19210]
                         </div>
-                         <div class="mobile cta-button red two-factor-verify-btn">
+                         <div class="mobile cta-button green two-factor-verify-btn">
                             <span class="label">[$1960]</span>
                             <span class="loading-image">
                                 <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
@@ -3006,7 +3168,7 @@
                         <div class="mobile warning-text-field hidden">
                             [$19210]
                         </div>
-                         <div class="mobile cta-button red two-factor-verify-btn">
+                         <div class="mobile cta-button green two-factor-verify-btn">
                             <span class="label">[$1960]</span>
                             <span class="loading-image">
                                 <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
@@ -3112,6 +3274,7 @@
     </div>
 </div>
 
+
 <!-- Video Block template -->
 <div class="mobile-video-template">
     <div class="download video-block hidden">
@@ -3144,6 +3307,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Public Service Announcement -->
 <div class="mobile bottom-info body public-service-anouncement">

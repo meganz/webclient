@@ -1,6 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
+var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var ButtonsUI = require('./../../ui/buttons.jsx');
 var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
 var DropdownsUI = require('./../../ui/dropdowns.jsx');
@@ -9,7 +10,7 @@ var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollb
 
 
 var ParticipantsList = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             'requiresUpdateOnResize': true,
@@ -103,11 +104,16 @@ var ParticipantsList = React.createClass({
                 chatRoom={room}
                 members={room.members}
                 ref="contactsListScroll"
+                disableCheckingVisibility={true}
                 onUserScroll={self.onUserScroll}
                 requiresUpdateOnResize={true}
+                onAnimationEnd={function() {
+                    self.safeForceUpdate();
+                }}
             >
                 <ParticipantsListInner
                     chatRoom={room} members={room.members}
+                    disableCheckingVisibility={true}
                     scrollPositionY={self.state.scrollPositionY}
                     scrollHeight={self.state.scrollHeight}
                 />
@@ -119,7 +125,7 @@ var ParticipantsList = React.createClass({
 
 
 var ParticipantsListInner = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             'requiresUpdateOnResize': true,
@@ -310,11 +316,6 @@ var ParticipantsListInner = React.createClass({
                         dropdownRemoveButton={dropdownRemoveButton}
                         dropdownIconClasses={dropdownIconClasses}
                         isInCall={room.uniqueCallParts && room.uniqueCallParts[contactHash]}
-                        style={{
-                            width: 249,
-                            position: 'absolute',
-                            top: i * self.props.contactCardHeight
-                        }}
                     />
                 );
 

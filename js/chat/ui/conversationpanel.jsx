@@ -14,6 +14,8 @@ var TypingAreaUI = require('./../ui/typingArea.jsx');
 var WhosTyping = require('./whosTyping.jsx').WhosTyping;
 var getMessageString = require('./messages/utils.jsx').getMessageString;
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
+var Accordion = require('./../../ui/accordion.jsx').Accordion;
+var AccordionPanel = require('./../../ui/accordion.jsx').AccordionPanel;
 var ParticipantsList = require('./participantsList.jsx').ParticipantsList;
 
 var GenericConversationMessage = require('./messages/generic.jsx').GenericConversationMessage;
@@ -22,6 +24,8 @@ var AlterParticipantsConversationMessage =
 var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
 var PrivilegeChange = require('./messages/privilegeChange.jsx').PrivilegeChange;
 var TopicChange = require('./messages/topicChange.jsx').TopicChange;
+var SharedFilesAccordionPanel = require('./sharedFilesAccordionPanel.jsx').SharedFilesAccordionPanel;
+var IncomingSharesAccordionPanel = require('./incomingSharesAccordionPanel.jsx').IncomingSharesAccordionPanel;
 
 var ENABLE_GROUP_CALLING_FLAG = (
     typeof localStorage.enableGroupCalling !== 'undefined' &&
@@ -31,7 +35,7 @@ var ENABLE_GROUP_CALLING_FLAG = (
 var ConversationAudioVideoPanel = require('./conversationaudiovideopanel.jsx').ConversationAudioVideoPanel;
 
 var JoinCallNotification = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     render: function() {
         var room = this.props.chatRoom;
         if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
@@ -54,11 +58,14 @@ var JoinCallNotification = React.createClass({
 });
 
 var ConversationRightArea = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             'requiresUpdateOnResize': true
         }
+    },
+    componentSpecificIsComponentEventuallyVisible: function() {
+        return this.props.chatRoom.isCurrentlyActive;
     },
     allContactsInChat: function(participants) {
         var self = this;
@@ -120,7 +127,9 @@ var ConversationRightArea = React.createClass({
         );
 
 
-        var disableStartCalls = disabledCalls || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin);
+        var disableStartCalls = disabledCalls || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) || (
+            room.type === "group" && !ENABLE_GROUP_CALLING_FLAG
+        );
 
         var startAudioCallButtonClass = "";
         var startVideoCallButtonClass = "";
@@ -130,32 +139,32 @@ var ConversationRightArea = React.createClass({
         }
 
         var startAudioCallButton =
-            <div className={"link-button" + " " + startVideoCallButtonClass} onClick={() => {
+            <div className={"link-button light" + " " + startVideoCallButtonClass} onClick={() => {
                 if (!disableStartCalls) {
                     room.startAudioCall();
                 }
             }}>
-                <i className="small-icon audio-call"></i>
+                <i className="small-icon colorized audio-call"></i>
                 {__(l[5896])}
             </div>;
 
         var startVideoCallButton =
-            <div className={"link-button" + " " + startVideoCallButtonClass} onClick={() => {
+            <div className={"link-button light" + " " + startVideoCallButtonClass} onClick={() => {
                 if (!disableStartCalls) {
                     room.startVideoCall();
                 }
             }}>
-                <i className="small-icon video-call"></i>
+                <i className="small-icon colorized video-call"></i>
                 {__(l[5897])}
             </div>;
         var AVseperator = <div className="chat-button-seperator"></div>;
         var endCallButton =
-                    <div className={"link-button red"} onClick={() => {
+                    <div className={"link-button light red"} onClick={() => {
                         if (room.callManagerCall) {
                             room.callManagerCall.endCall();
                         }
                     }}>
-            <i className="small-icon horizontal-red-handset"></i>
+            <i className="small-icon colorized horizontal-red-handset"></i>
             {room.type === "group" ? "Leave call" : l[5884]}
         </div>;
 
@@ -223,17 +232,6 @@ var ConversationRightArea = React.createClass({
 
         var membersHeader = null;
 
-        if (room.type === "group") {
-            membersHeader = <div className="chat-right-head">
-                <div className="chat-grey-counter">
-                    {Object.keys(room.members).length}
-                </div>
-                <div className="chat-right-head-txt">
-                    {__(l[8876])}
-                </div>
-            </div>
-        }
-
         // console.error(
         //     self.findDOMNode(),
         //     excludedParticipants,
@@ -243,176 +241,227 @@ var ConversationRightArea = React.createClass({
         //     myPresence === 'offline'
         // );
 
-        var renameButtonClass = "link-button " + (
+        var renameButtonClass = "link-button light " + (
             room.isReadOnly() || !room.iAmOperator() ?
                 "disabled" : ""
             );
 
-        return <div className="chat-right-area">
-            <div className="chat-right-area conversation-details-scroll">
-                <div className="chat-right-pad">
-
-                    {isReadOnlyElement}
-                    {membersHeader}
-                    <ParticipantsList
-                        chatRoom={room}
-                        members={room.members}
-                        isCurrentlyActive={room.isCurrentlyActive}
-                    />
-                    <ButtonsUI.Button
-                        className="add-chat-contact"
-                        label={__(l[8007])}
+        var participantsList = null;
+        if (room.type === "group") {
+            participantsList = <div>
+                {isReadOnlyElement}
+                <ParticipantsList
+                    chatRoom={room}
+                    members={room.members}
+                    isCurrentlyActive={room.isCurrentlyActive}
+                />
+                <ButtonsUI.Button
+                    className="link-button green light"
+                    icon="rounded-plus colorized"
+                    label={__(l[8007])}
+                    contacts={this.props.contacts}
+                    disabled={
+                        /* Disable in case I don't have any more contacts to add ... */
+                        !(
+                            !self.allContactsInChat(excludedParticipants) &&
+                            !room.isReadOnly() &&
+                            room.iAmOperator()
+                        )
+                    }
+                >
+                    <DropdownsUI.DropdownContactsSelector
                         contacts={this.props.contacts}
-                        disabled={
-                            /* Disable in case I don't have any more contacts to add ... */
-                            !(
-                                !self.allContactsInChat(excludedParticipants) &&
-                                !room.isReadOnly() &&
-                                room.iAmOperator()
-                            )
+                        megaChat={this.props.megaChat}
+                        chatRoom={room}
+                        exclude={
+                            excludedParticipants
                         }
-                        >
-                        <DropdownsUI.DropdownContactsSelector
-                            contacts={this.props.contacts}
-                            megaChat={this.props.megaChat}
-                            chatRoom={room}
-                            exclude={
-                                excludedParticipants
+                        multiple={true}
+                        className="popup add-participant-selector"
+                        singleSelectedButtonLabel={__(l[8869])}
+                        multipleSelectedButtonLabel={__(l[8869])}
+                        nothingSelectedButtonLabel={__(l[8870])}
+                        onSelectDone={this.props.onAddParticipantSelected}
+                        positionMy="center top"
+                        positionAt="left bottom"
+                    />
+                </ButtonsUI.Button>
+            </div>;
+        }
+
+        return <div className="chat-right-area">
+            <PerfectScrollbar
+                className="chat-right-area conversation-details-scroll"
+                options={{
+                    'suppressScrollX': true
+                }}
+                ref={function(ref) {
+                    self.rightScroll = ref;
+                }}
+                triggerGlobalResize={true}
+                chatRoom={self.props.chatRoom}>
+                <div className="chat-right-pad">
+                    <Accordion
+                        onToggle={function() {
+                            // wait for animations.
+                            setTimeout(function() {
+                                if (self.rightScroll) {
+                                    self.rightScroll.reinitialise();
+                                }
+                            }, 250);
+                        }}
+                        expandedPanel={room.type === "group" ? "participants" : "options"}>
+                        {participantsList ? <AccordionPanel className="small-pad" title={l[8876]} key="participants">
+                            {participantsList}
+                        </AccordionPanel> : null}
+
+                        <AccordionPanel className="have-animation buttons" title={l[7537]} key="options">
+                            <div>
+                            {startAudioCallButton}
+                            {startVideoCallButton}
+                            {AVseperator}
+                            {
+                                room.type == "group" ?
+                                (
+                                    <div className={renameButtonClass}
+                                         onClick={(e) => {
+                                             if ($(e.target).closest('.disabled').length > 0) {
+                                                 return false;
+                                             }
+                                             if (self.props.onRenameClicked) {
+                                                self.props.onRenameClicked();
+                                             }
+                                    }}>
+                                        <i className="small-icon colorized writing-pen"></i>
+                                        {__(l[9080])}
+                                    </div>
+                                ) : null
                             }
-                            multiple={true}
-                            className="popup add-participant-selector"
-                            singleSelectedButtonLabel={__(l[8869])}
-                            multipleSelectedButtonLabel={__(l[8869])}
-                            nothingSelectedButtonLabel={__(l[8870])}
-                            onSelectDone={this.props.onAddParticipantSelected}
-                            positionMy="center top"
-                            positionAt="left bottom"
-                            />
-                    </ButtonsUI.Button>
-                    <div className="buttons-block">
-                        <div className="chat-right-head-txt">
-                            Options
-                        </div>
-                        {startAudioCallButton}
-                        {startVideoCallButton}
-                        {AVseperator}
-                        {
-                            room.type == "group" ?
-                            (
-                                <div className={renameButtonClass}
+
+                            <ButtonsUI.Button
+                                className="link-button light dropdown-element"
+                                icon="rounded-grey-up-arrow colorized"
+                                label={__(l[6834] + "...")}
+                                disabled={room.isReadOnly()}
+                                >
+                                <DropdownsUI.Dropdown
+                                    contacts={this.props.contacts}
+                                    megaChat={this.props.megaChat}
+                                    className="wide-dropdown send-files-selector light"
+                                    noArrow="true"
+                                    vertOffset={4}
+                                    onClick={() => {}}
+                                >
+                                    <div className="dropdown info-txt">
+                                        {__(l[19793]) ? __(l[19793]) : "Send files from..."}
+                                    </div>
+                                    <DropdownsUI.DropdownItem
+                                        className="link-button light"
+                                        icon="grey-cloud colorized"
+                                        label={__(l[19794]) ? __(l[19794]) : "My Cloud Drive"}
+                                        onClick={() => {
+                                            self.props.onAttachFromCloudClicked();
+                                        }} />
+                                    <DropdownsUI.DropdownItem
+                                        className="link-button light"
+                                        icon="grey-computer colorized"
+                                        label={__(l[19795]) ? __(l[19795]) : "My computer"}
+                                        onClick={() => {
+                                            self.props.onAttachFromComputerClicked();
+                                        }} />
+                                </DropdownsUI.Dropdown>
+                            </ButtonsUI.Button>
+
+                            {endCallButton}
+
+                            {
+                                <div className={"link-button light " + (dontShowTruncateButton ? "disabled" : "")}
                                      onClick={(e) => {
                                          if ($(e.target).closest('.disabled').length > 0) {
                                              return false;
                                          }
-                                         if (self.props.onRenameClicked) {
-                                            self.props.onRenameClicked();
+                                         if (self.props.onTruncateClicked) {
+                                            self.props.onTruncateClicked();
                                          }
                                 }}>
-                                    <i className="small-icon writing-pen"></i>
-                                    {__(l[9080])}
+                                    <i className="small-icon colorized clear-arrow"></i>
+                                    {__(l[8871])}
+                                </div>
+                            }
+                            {<div className="chat-button-seperator"></div>}
+                            {
+                                <div className={"link-button light"}
+                                     onClick={(e) => {
+                                        if ($(e.target).closest('.disabled').length > 0) {
+                                            return false;
+                                        }
+                                        if (room.isArchived()) {
+                                            if (self.props.onUnarchiveClicked) {
+                                               self.props.onUnarchiveClicked();
+                                            }
+                                        } else {
+                                            if (self.props.onArchiveClicked) {
+                                               self.props.onArchiveClicked();
+                                            }
+                                        }
+                                }}>
+                                    <i className={"small-icon colorized " +  ((room.isArchived()) ? "unarchive" :
+                                        "archive")}></i>
+                                    {room.isArchived() ? __(l[19065]) : __(l[16689])}
+                                </div>
+                            }
+                            { room.type === "group" ? (
+                                <div className={"link-button light red " + (
+                                        room.stateIsLeftOrLeaving() ? "disabled" : ""
+                                    )}
+                                     onClick={(e) => {
+                                         if ($(e.target).closest('.disabled').length > 0) {
+                                             return false;
+                                         }
+                                         if (self.props.onLeaveClicked) {
+                                            self.props.onLeaveClicked();
+                                         }
+                                }}>
+                                    <i className="small-icon colorized rounded-stop"></i>
+                                    {l[8633]}
                                 </div>
                             ) : null
-                        }
-
-                        <ButtonsUI.Button
-                            className="link-button dropdown-element"
-                            icon="rounded-grey-up-arrow"
-                            label={__(l[6834] + "...")}
-                            disabled={room.isReadOnly()}
-                            >
-                            <DropdownsUI.Dropdown
-                                contacts={this.props.contacts}
-                                megaChat={this.props.megaChat}
-                                className="wide-dropdown send-files-selector"
-                                onClick={() => {}}
-                            >
-                                <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8013])} onClick={() => {
-                                    self.props.onAttachFromCloudClicked();
-                                }} />
-                                <DropdownsUI.DropdownItem icon="grey-computer" label={__(l[8014])} onClick={() => {
-                                    self.props.onAttachFromComputerClicked();
-                                }} />
-                            </DropdownsUI.Dropdown>
-                        </ButtonsUI.Button>
-
-                        {endCallButton}
-
-                        {
-                            <div className={"link-button " + (dontShowTruncateButton ? "disabled" : "")}
-                                 onClick={(e) => {
-                                     if ($(e.target).closest('.disabled').length > 0) {
-                                         return false;
-                                     }
-                                     if (self.props.onTruncateClicked) {
-                                        self.props.onTruncateClicked();
-                                     }
-                            }}>
-                                <i className="small-icon clear-arrow"></i>
-                                {__(l[8871])}
-                            </div>
-                        }
-                        {<div className="chat-button-seperator"></div>}
-                        {
-                            <div className={"link-button"}
-                                 onClick={(e) => {
-                                    if ($(e.target).closest('.disabled').length > 0) {
-                                        return false;
+                            }
+                            { room._closing !== true && room.type === "group" && room.stateIsLeftOrLeaving() ? (
+                                <div className="link-button light red" onClick={() => {
+                                    if (self.props.onCloseClicked) {
+                                        self.props.onCloseClicked();
                                     }
-                                    if (room.isArchived()) {
-                                        if (self.props.onUnarchiveClicked) {
-                                           self.props.onUnarchiveClicked();
-                                        }
-                                    } else {
-                                        if (self.props.onArchiveClicked) {
-                                           self.props.onArchiveClicked();
-                                        }
-                                    }
-                            }}>
-                                <i className={"small-icon " +  ((room.isArchived()) ? "unarchive" : "archive")}></i>
-                                {room.isArchived() ? __(l[19065]) : __(l[16689])}
+                                }}>
+                                    <i className="small-icon colorized rounded-stop"></i>
+                                    {l[148]}
+                                </div>
+                            ) : null
+                            }
                             </div>
+                        </AccordionPanel>
+                        <SharedFilesAccordionPanel key="sharedFiles" title={l[19796] ? l[19796] : "Shared Files"}
+                                                   chatRoom={room}
+                                                   sharedFiles={room.messagesBuff.sharedFiles} />
+                        {room.type === "private" ?
+                            <IncomingSharesAccordionPanel key="incomingShares" title={l[5542]} chatRoom={room} /> :
+                            null
                         }
-                        { room.type === "group" ? (
-                            <div className={"link-button red " + (
-                                    room.stateIsLeftOrLeaving() ? "disabled" : ""
-                                )}
-                                 onClick={(e) => {
-                                     if ($(e.target).closest('.disabled').length > 0) {
-                                         return false;
-                                     }
-                                     if (self.props.onLeaveClicked) {
-                                        self.props.onLeaveClicked();
-                                     }
-                            }}>
-                                <i className="small-icon rounded-stop"></i>
-                                {l[8633]}
-                            </div>
-                        ) : null
-                        }
-                        { room._closing !== true && room.type === "group" && room.stateIsLeftOrLeaving() ? (
-                            <div className="link-button red" onClick={() => {
-                                if (self.props.onCloseClicked) {
-                                    self.props.onCloseClicked();
-                                }
-                            }}>
-                                <i className="small-icon rounded-stop"></i>
-                                {l[148]}
-                            </div>
-                        ) : null
-                        }
-                    </div>
+                    </Accordion>
                 </div>
-            </div>
-        </div>
+            </PerfectScrollbar>
+        </div>;
     }
 });
-
 
 
 
 var ConversationPanel = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     lastScrollPositionPerc: 1,
+    componentSpecificIsComponentEventuallyVisible: function() {
+        return this.props.chatRoom.isCurrentlyActive;
+    },
     getInitialState: function() {
         return {
             startCallPopupIsActive: false,
@@ -548,6 +597,13 @@ var ConversationPanel = React.createClass({
         if (doResize !== false) {
             self.handleWindowResize();
         }
+
+        var ns = ".convPanel";
+        $container
+            .rebind('animationend' + ns +' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns, function(e) {
+                self.safeForceUpdate(true);
+                $.tresizer();
+            });
     },
     componentWillMount: function() {
         var self = this;
@@ -1582,12 +1638,58 @@ var ConversationPanel = React.createClass({
             additionalClass = " small-block";
         }
 
+        var topicInfo = null;
+        if (self.props.chatRoom.type === "group") {
+            topicInfo = <div className="chat-topic-info">
+                <div className="chat-topic-icon"></div>
+                <div className="chat-topic-text">
+                    <span className="txt">
+                        <utils.EmojiFormattedContent>{
+                            self.props.chatRoom.getRoomTitle()
+                        }</utils.EmojiFormattedContent>
+                    </span>
+                    <span className="txt small">
+                        {Object.keys(self.props.chatRoom.members).length}
+                        Members
+                    </span>
+                </div>
+            </div>;
+        }
+        else {
+            var contacts = room.getParticipantsExceptMe();
+            var contactHandle = contacts[0];
+            var contact = M.u[contactHandle];
+
+            topicInfo = <ContactsUI.ContactCard
+                    className="short"
+                    noContextButton="true"
+                    contact={contact}
+                    megaChat={self.props.chatRoom.megaChat}
+                    key={contact.u}/>
+        }
+
+        var disabledCalls = (
+            room.isReadOnly() ||
+            !room.chatId ||
+            (
+                room.callManagerCall &&
+                room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING
+            )
+        );
+
+
+        var disableStartCalls = disabledCalls || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) || (
+            room.type === "group" && !ENABLE_GROUP_CALLING_FLAG
+        );
 
         return (
             <div className={conversationPanelClasses} onMouseMove={self.onMouseMove}
                  data-room-id={self.props.chatRoom.chatId}>
-                <div className="chat-content-block">
-                    <ConversationRightArea
+                <div className={"chat-content-block " +
+                    (!room.megaChat.chatUIFlags['convPanelCollapse'] ?
+                    "with-pane" : "no-pane")}>
+                    {!room.megaChat.chatUIFlags['convPanelCollapse'] ? <ConversationRightArea
+                        isVisible={this.props.chatRoom.isCurrentlyActive}
                         chatRoom={this.props.chatRoom}
                         members={this.props.chatRoom.members}
                         contacts={self.props.contacts}
@@ -1641,20 +1743,20 @@ var ConversationPanel = React.createClass({
                                 self.props.chatRoom.trigger('onAddUserRequest', [contactHashes]);
                             }
                         }}
-                    />
+                    /> : null}
                     {
                         room.callManagerCall && room.callManagerCall.isStarted() ?
                             <ConversationAudioVideoPanel
-                                    chatRoom={this.props.chatRoom}
-                                    contacts={self.props.contacts}
-                                    megaChat={this.props.chatRoom.megaChat}
-                                    unreadCount={this.props.chatRoom.messagesBuff.getUnreadCount()}
-                                    onMessagesToggle={function(isActive) {
-                                        self.setState({
-                                            'messagesToggledInCall': isActive
-                                        });
-                                    }}
-                                /> : null
+                                chatRoom={this.props.chatRoom}
+                                contacts={self.props.contacts}
+                                megaChat={this.props.chatRoom.megaChat}
+                                unreadCount={this.props.chatRoom.messagesBuff.getUnreadCount()}
+                                onMessagesToggle={function(isActive) {
+                                    self.setState({
+                                        'messagesToggledInCall': isActive
+                                    });
+                                }}
+                            /> : null
                     }
 
                     {attachCloudDialog}
@@ -1689,18 +1791,52 @@ var ConversationPanel = React.createClass({
                         </div>
                     </div>
 
-                    {
-                        self.props.chatRoom.type === "group" ?
-                            <div className={"chat-topic-block" + (
-                                self.props.chatRoom.havePendingGroupCall() || self.props.chatRoom.haveActiveCall() ?
-                                    " have-pending-group-call" : ""
-                            )}>
-                                <utils.EmojiFormattedContent>{
-                                    self.props.chatRoom.getRoomTitle()
-                                }</utils.EmojiFormattedContent>
-                            </div> :
-                            undefined
-                    }
+                    <div className={"chat-topic-block " + (
+                        self.props.chatRoom.havePendingGroupCall() || self.props.chatRoom.haveActiveCall() ?
+                            " have-pending-group-call" : ""
+                    )}>
+                        <div className="chat-topic-buttons">
+                            <ButtonsUI.Button
+                                className="right"
+                                disableCheckingVisibility={true}
+                                icon={"small-icon " + (
+                                    !room.megaChat.chatUIFlags['convPanelCollapse'] ?
+                                        "arrow-in-square" :
+                                        "arrow-in-square active"
+                                )}
+                                onClick={function() {
+                                    room.megaChat.toggleUIFlag('convPanelCollapse');
+                                }}
+                            >
+                            </ButtonsUI.Button>
+                            {!disableStartCalls ? (
+                                <span>
+                                    <ButtonsUI.Button
+                                        className="right"
+                                        icon="small-icon video-call colorized"
+                                        disabled={room.isReadOnly()}
+                                        onClick={function() {
+                                            if (!disabledCalls) {
+                                                room.startVideoCall();
+                                            }
+                                        }}
+                                    >
+                                    </ButtonsUI.Button>
+                                    <ButtonsUI.Button
+                                        className="right"
+                                        icon="small-icon audio-call colorized"
+                                        disabled={room.isReadOnly()}
+                                        onClick={function() {
+                                            if (!disabledCalls) {
+                                                room.startVideoCall();
+                                            }
+                                        }}
+                                        >
+                                    </ButtonsUI.Button>
+                                </span>) : null}
+                        </div>
+                         {topicInfo}
+                    </div>
                     <div className={"messages-block " + additionalClass}>
                         <div className="messages scroll-area">
                             <PerfectScrollbar
@@ -1837,28 +1973,38 @@ var ConversationPanel = React.createClass({
                                 }}
                             >
                                     <ButtonsUI.Button
-                                        className="popup-button"
-                                        icon="small-icon grey-medium-plus"
+                                        className="popup-button left"
+                                        icon="small-icon grey-small-plus"
                                         disabled={room.isReadOnly()}
                                         >
                                         <DropdownsUI.Dropdown
-                                            className="wide-dropdown attach-to-chat-popup"
-                                            vertOffset={10}
+                                            className="wide-dropdown attach-to-chat-popup light"
+                                            noArrow="true"
+                                            positionMy="left top"
+                                            positionAt="left bottom"
+                                            vertOffset={4}
                                         >
+                                            <div className="dropdown info-txt">
+                                                {__(l[19793]) ? __(l[19793]) : "Send files from..."}
+                                            </div>
                                             <DropdownsUI.DropdownItem
-                                                icon="grey-cloud"
-                                                label={__(l[8011])}
+                                                className="link-button light"
+                                                icon="grey-cloud colorized"
+                                                label={__(l[19794]) ? __(l[19794]) : "My Cloud Drive"}
                                                 onClick={(e) => {
                                                     self.setState({'attachCloudDialog': true});
                                             }} />
                                             <DropdownsUI.DropdownItem
-                                                icon="grey-computer"
-                                                label={__(l[8014])}
+                                                className="link-button light"
+                                                icon="grey-computer colorized"
+                                                label={__(l[19795]) ? __(l[19795]) : "My computer"}
                                                 onClick={(e) => {
                                                     self.uploadFromComputer();
                                             }} />
+                                            <div className="chat-button-seperator"></div>
                                             <DropdownsUI.DropdownItem
-                                                icon="square-profile"
+                                                className="link-button light"
+                                                icon="square-profile colorized"
                                                 label={__(l[8628])}
                                                 onClick={(e) => {
                                                     self.setState({'sendContactDialog': true});
@@ -1911,6 +2057,8 @@ var ConversationPanels = React.createClass({
 
             conversations.push(
                 <ConversationPanel
+                    chatUIFlags={self.props.chatUIFlags}
+                    isExpanded={chatRoom.megaChat.chatUIFlags['convPanelCollapse']}
                     chatRoom={chatRoom}
                     isActive={chatRoom.isCurrentlyActive}
                     messagesBuff={chatRoom.messagesBuff}

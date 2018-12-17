@@ -892,6 +892,7 @@ scparser.$add('t', function(a, scnodes) {
         if (scnodes[i]) {
             delete scnodes[i].i;
             delete scnodes[i].scni;
+            delete scnodes[i].arrivalOrder;
             M.addNode(scnodes[i]);
             ufsc.feednode(scnodes[i]);
         }
@@ -1920,6 +1921,7 @@ function worker_procmsg(ev) {
                     h : ev.data.h,
                     p : ev.data.p,
                     s : ev.data.s >= 0 ? ev.data.s : -ev.data.t,
+                    t : ev.data.t ? 1262304e3 - ev.data.ts : ev.data.ts,
                     c : ev.data.hash || '',
                     d : ev.data
                 });
@@ -2012,7 +2014,7 @@ function loadfm(force) {
             else {
                 fmdb = FMDB(u_handle, {
                     // channel 0: transactional by _sn update
-                    f      : '&h, p, s, c',    // nodes - handle, parent, size (negative size: type), checksum
+                    f      : '&h, p, s, c, t', // nodes - handle, parent, size (negative size: type), checksum
                     s      : '&o_t',           // shares - origin/target; both incoming & outgoing
                     ok     : '&h',             // ownerkeys for outgoing shares - handle
                     mk     : '&h',             // missing node keys - handle
@@ -3638,7 +3640,7 @@ var fa_reqcnt = 0;
 var fa_addcnt = 8;
 var fa_tnwait = 0;
 
-function fm_thumbnails(mode, nodeList)
+function fm_thumbnails(mode, nodeList, callback)
 {
     var treq = {}, a = 0, max = Math.max($.rmItemsInView || 1, 71) + fa_addcnt, u = max - Math.floor(max / 3), y;
     if (!fa_reqcnt)
@@ -3697,6 +3699,9 @@ function fm_thumbnails(mode, nodeList)
             var cdid = M.currentdirid;
             api_getfileattr(treq, 0, function(ctx, node, uint8arr)
             {
+                if (mode === 'standalone' && typeof callback === 'function') {
+                    onIdle(callback.bind(null, node));
+                }
                 if (uint8arr === 0xDEAD)
                 {
                     if (d)
@@ -3735,6 +3740,9 @@ function fm_thumbnails(mode, nodeList)
                             thumbnails[n.h] = thumbnails[node];
                             if (n.seen && M.currentdirid === cdid)  {
                                 fm_thumbnail_render(n);
+                            }
+                            if (mode === 'standalone' && typeof callback === 'function') {
+                                onIdle(callback.bind(null, n.h));
                             }
                         }
                     }

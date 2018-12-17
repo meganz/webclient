@@ -910,25 +910,24 @@ var TypingArea = React.createClass({
         var placeholder = l[18669];
         placeholder = placeholder.replace("%s", room.getRoomTitle(false, true));
 
-        return <div className={"typingarea-component" + self.props.className}>
+        var disabledTextarea = room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false;
+
+        return <div className={"typingarea-component" + self.props.className + (disabledTextarea ? " disabled" : "")}>
             <div className={"chat-textarea " + self.props.className}>
                 {emojiAutocomplete}
-                <i className={self.props.iconClass ? self.props.iconClass : "small-icon conversations"}></i>
-                <div className="chat-textarea-buttons">
-                    <ButtonsUI.Button
-                        className="popup-button"
-                        icon="smiling-face"
-                        disabled={this.props.disabled}
-                    >
-                        <DropdownEmojiSelector
-                            className="popup emoji"
-                            vertOffset={12}
-                            onClick={self.onEmojiClicked}
-                        />
-                    </ButtonsUI.Button>
-
-                    {self.props.children}
-                </div>
+                {self.props.children}
+                <ButtonsUI.Button
+                    className="popup-button"
+                    icon="smiling-face"
+                    disabled={this.props.disabled}
+                >
+                    <DropdownEmojiSelector
+                        className="popup emoji"
+                        vertOffset={17}
+                        onClick={self.onEmojiClicked}
+                    />
+                </ButtonsUI.Button>
+                <hr />
                 <div className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
                      style={textareaScrollBlockStyles}>
                     <textarea
@@ -943,8 +942,8 @@ var TypingArea = React.createClass({
                         value={self.state.typedMessage}
                         ref="typearea"
                         style={textareaStyles}
-                        disabled={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
-                        readOnly={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
+                        disabled={disabledTextarea ? true : false}
+                        readOnly={disabledTextarea ? true : false}
                         onCopyCapture={self.onCopyCapture}
                         onPasteCapture={self.onPasteCapture}
                         onCutCapture={self.onCutCapture}

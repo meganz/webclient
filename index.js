@@ -329,7 +329,7 @@ function init_page() {
         return false;
     }
 
-    if (!page.match(/^(blog|help|corporate|page_)/)) {
+    if (!page.match(/^(blog|help|corporate|fm\/recents|page_)/)) {
         $('.top-head').remove();
     }
     $('#loading').hide();
@@ -516,6 +516,7 @@ function init_page() {
         && (page !== 'takendown')
         && (page !== 'general')
         && (page !== 'resellers')
+        && (page !== 'security')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -570,7 +571,10 @@ function init_page() {
     // Password protected link decryption dialog
     if (page.substr(0, 2) === 'P!' && page.length > 2) {
         // Check if TextEncoder function is available for the stringToByteArray function
-        if (window.TextEncoder) {
+        // and we need to exclude Edge explicitly, since now it has supported Text Encoder but it doesnt support
+        // SubtleCrypto.importKey() with 'PBKDF2' (the algorithm we are using).
+        // And we need to exclude IE explicitly, since it returns non promise type to SubtleCrypto.importKey() call
+        if (window.TextEncoder && ua.details.browser !== 'Edge' && ua.details.browser !== 'Internet Explorer') {
             // Show the password overlay for mobile
             if (is_mobile) {
                 parsepage(pages['mobile']);
@@ -1039,6 +1043,10 @@ function init_page() {
             parsepage(pages['mobile']);
             mobile.support.init();
         }
+        else if (u_type === 0) {
+            loadSubPage('register');
+            return false;
+        }
         else {
             parsepage(pages['support']);
             support.initUI();
@@ -1294,6 +1302,10 @@ function init_page() {
     else if (page === 'general') {
         parsepage(pages['general']);
     }
+    else if (page === 'security') {
+        parsepage(pages['securitypractice']);
+        securityPractice.init();
+    }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
     }
@@ -1484,7 +1496,7 @@ function init_page() {
     // Load the direct voucher redeem page
     else if (page.substr(0, 6) === 'redeem') {
         loadingDialog.show();
-        parsepage(pages['redeem']);
+        parsepage(pages[is_mobile ? 'mobile' : 'redeem']);
         redeem.init();
     }
 
@@ -2081,7 +2093,7 @@ function topmenuUI() {
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
                 'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'start', 'uwp'
+                'sync', 'takedown', 'terms', 'start', 'uwp', 'security'
             ];
             var moveTo = {'account': 'fm/account'};
 
@@ -2367,9 +2379,9 @@ function topmenuUI() {
             loadSubPage($.dlhash);
         }
         else if (folderlink && M.lastSeenFolderLink) {
-            mBroadcaster.once('mega:openfolder', function () {
+            mBroadcaster.once('mega:openfolder', SoonFc(function () {
                 $('.nw-fm-left-icon.transfers').click();
-            });
+            }));
             loadSubPage(M.lastSeenFolderLink);
         }
         else {
@@ -2620,9 +2632,6 @@ function loadSubPage(tpage, event) {
     }
 
     if (hashLogic || isPublicLink(page)) {
-        if ((tpage === page) && folderlink) {
-            folderlink = false;
-        }
         document.location.hash = '#' + page;
     }
     else if (!event || event.type !== 'popstate') {

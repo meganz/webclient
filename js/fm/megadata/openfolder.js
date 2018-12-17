@@ -1,5 +1,5 @@
 (function(global) {
-    "use strict";
+    "use strict"; /* jshint -W089 */
 
     // map handle to root name
     var maph = function(h) {
@@ -82,7 +82,8 @@
         else if (id && (id.substr(0, 7) !== 'account')
             && (id.substr(0, 9) !== 'dashboard')
             && (id.substr(0, 15) !== 'user-management')
-            && (id.substr(0, 13) !== 'notifications')) {
+            && (id.substr(0, 13) !== 'notifications')
+            && (id.substring(0, 7) !== 'recents')) {
 
             $('.fm-right-files-block').removeClass('hidden');
 
@@ -331,6 +332,7 @@
 
         this.chat = false;
         this.search = false;
+        this.recents = false;
 
         if (id === 'rubbish') {
             id = this.RubbishID;
@@ -425,6 +427,9 @@
         }
         else if (id && id.substr(0, 9) === 'dashboard') {
             M.onFileManagerReady(dashboardUI);
+        }
+        else if (id && id.substr(0, 7) === 'recents') {
+            M.onFileManagerReady(openRecents);
         }
         else if (id && id.substr(0, 13) === 'notifications') {
             M.addNotificationsUI();

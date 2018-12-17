@@ -817,7 +817,7 @@ img.bottom-page.business4 {
     .business-page .bottom-page.vertical-centered-cell {
         vertical-align: top;
     }
-    .top-bl .bottom-page.table {
+    .top-bl .bottom-page.tabl, .top-bl .bottom-page.table .bottom-page.vertical-centered-cell {
         display: block;
     }
     .business-page .bottom-page.big-header.dark {
@@ -1084,6 +1084,15 @@ img.bottom-page.business4 {
     }
     .business .bottom-page .default-white-button.individual, .bottom-page .top-change-language, .bottom-page .top-buttons, .bottom-page .activity-status-block, .bottom-page .fm-avatar, .bottom-page .user-name, .bottom-page .membership-status-block, .business .top-buttons.business {
         display: none;
+    }
+    .bottom-page.business-text.password-warning {
+        display: block;
+        margin: 24px auto 0;
+    }
+    .bottom-page.business-text.password-warning span{
+        display: block;
+        margin: 8px auto;
+        left: auto;
     }
  }
 

@@ -2,11 +2,12 @@ var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
+var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 var ModalDialogsUI = require('./modalDialogs.jsx');
 var Tooltips = require("./tooltips.jsx");
 
 var BrowserCol = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             'hideable': true
@@ -33,7 +34,7 @@ var BrowserCol = React.createClass({
     }
 });
 var BrowserEntries = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             'hideable': true
@@ -744,7 +745,7 @@ var BrowserEntries = React.createClass({
     }
 });
 var CloudBrowserDialog = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             'selectLabel': __(l[8023]),

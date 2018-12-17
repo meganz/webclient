@@ -533,6 +533,67 @@ function contactsInfoDialog(title, username, msg, close) {
 }
 
 /**
+ * publicLinkInit
+  *
+ * Set piublick link and init CopyToClipboard events
+ *
+ */
+function setContactLink() {
+    "use strict";
+
+    var $publicLink = $('.public-contact-link');
+    var linkData = $publicLink.attr('data-lnk');
+    var account = M.account || false;
+    var contactPrefix = '';
+
+    // Exit if link exists
+    if (linkData) {
+        return false;
+    }
+
+    // Check data exists in M.account
+    if (account.contactLink && account.contactLink.length) {
+        contactPrefix =  M.account.contactLink.match('^C!') ? '' : 'C!';
+        $publicLink.attr('data-lnk', 'https://mega.nz/' + contactPrefix + M.account.contactLink);
+    }
+    else {
+        api_req({ a: 'clc' }, {
+            callback: function (res, ctx) {
+                if (typeof res === 'string') {
+                    contactPrefix =  res.match('^C!') ? '' : 'C!';
+                    res = 'https://mega.nz/' + contactPrefix + res;
+                    $publicLink.attr('data-lnk', res);
+                }
+            }
+        });
+    }
+
+    $publicLink.rebind('mouseover.publiclnk', function() {
+        var $this = $(this);
+        var $tooltip = $('.dropdown.tooltip.small');
+        var leftPos = $this.offset().left + $this.width() / 2 - $tooltip.outerWidth() / 2;
+        var topPos = $this.offset().top - $tooltip.outerHeight() - 10;
+
+        $tooltip.addClass('visible').css({
+            'left': leftPos,
+            'top': topPos
+        });
+    });
+
+    $publicLink.rebind('mouseout.publiclnk', function() {
+        $('.dropdown.tooltip.small').removeClass('visible');
+    });
+
+    $publicLink.rebind('click', function() {
+        var linkData = $(this).attr('data-lnk') || '';
+
+        if (linkData.length) {
+            copyToClipboard(linkData, l[371] + '<span>' + linkData + '</span>', 'short');
+        }
+    });
+}
+
+/**
  * addContactUI
  *
  * Handle add contact dialog UI
@@ -558,6 +619,8 @@ function contactAddDialog(close) {
     $d.removeClass('private achievements');
 
     M.safeShowDialog('add-user-popup', $d);
+
+    setContactLink();
 
     var $textarea = $d.find('.add-user-textarea textarea');
 
@@ -787,8 +850,10 @@ function avatarDialog(close) {
                         '<div class="image-explorer-drag-delegate"></div>' +
                     '</div>' +
                     '<div class="image-explorer-scale-slider-wrapper">' +
+                        '<div class="image-explorer-scale-slider-minus"></div>' +
                         '<input class="image-explorer-scale-slider disabled" type="range" ' +
                             'min="0" max="100" step="1" value="0" disabled="" />' +
+                        '<div class="image-explorer-scale-slider-plus"></div>' +
                     '</div>' +
                 '</div>' +
                 '<div class="fm-notifications-bottom">' +

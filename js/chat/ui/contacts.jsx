@@ -243,7 +243,7 @@ var ContactButton = React.createClass({
 });
 
 var ContactVerified = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     componentWillMount:function() {
         var self = this;
 
@@ -296,7 +296,7 @@ var ContactVerified = React.createClass({
     }
 });
 var ContactPresence = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     render: function() {
         var self = this;
         var contact = this.props.contact;
@@ -311,7 +311,7 @@ var ContactPresence = React.createClass({
 });
 
 var ContactFingerprint = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     render: function() {
         var self = this;
         var contact = this.props.contact;
@@ -502,6 +502,7 @@ var ContactCard = React.createClass({
         var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
         var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
         var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
+        var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
         var dropdownRemoveButton = self.props.dropdownRemoveButton ? self.props.dropdownRemoveButton : [];
 
         var usernameBlock;
@@ -516,6 +517,24 @@ var ContactCard = React.createClass({
         }
         else {
             usernameBlock = <div className="user-card-name light">{username}</div>
+        }
+
+        var userCard = null;
+        if (this.props.className === "short") {
+            userCard = <div className="user-card-data">
+                    {usernameBlock}
+                    <div className="user-card-status">
+                        <ContactPresence contact={contact} className={this.props.presenceClassName}/>
+                        {M.onlineStatusClass(contact.presence)[0]}
+                    </div>
+                </div>
+        }
+        else {
+            userCard = <div className="user-card-data">
+                    {usernameBlock}
+                    <ContactPresence contact={contact} className={this.props.presenceClassName}/>
+                    <div className="user-card-email">{contact.m}</div>
+                </div>
         }
 
         return <div
@@ -538,27 +557,21 @@ var ContactCard = React.createClass({
                     >
                 <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar" />
 
-                <ContactButton key="button"
-                        dropdowns={dropdowns}
-                        dropdownIconClasses={self.props.dropdownIconClasses ? self.props.dropdownIconClasses : ""}
-                        disabled={self.props.dropdownDisabled}
-                        noContextMenu={noContextMenu}
-                        contact={contact}
-                        className={self.props.dropdownButtonClasses}
-                        dropdownRemoveButton={dropdownRemoveButton}
-                        megaChat={self.props.megaChat ? this.props.megaChat : window.megaChat}
-                />
+                {
+                    noContextButton? null : <ContactButton key="button"
+                                dropdowns={dropdowns}
+                                dropdownIconClasses={self.props.dropdownIconClasses ?
+                                    self.props.dropdownIconClasses : ""}
+                                disabled={self.props.dropdownDisabled}
+                                noContextMenu={noContextMenu}
+                                contact={contact}
+                                className={self.props.dropdownButtonClasses}
+                                dropdownRemoveButton={dropdownRemoveButton}
+                                megaChat={self.props.megaChat ? this.props.megaChat : window.megaChat}
+                        />
+                }
 
-                <div className="user-card-data">
-                    {usernameBlock}
-                    <ContactPresence contact={contact} className={this.props.presenceClassName}/>
-                    {
-                        this.props.isInCall ?
-                            <i className="small-icon audio-call"></i> :
-                            null
-                    }
-                    <div className="user-card-email">{contact.m}</div>
-                </div>
+            {userCard}
             </div>;
     }
 });
@@ -594,7 +607,7 @@ var ContactItem = React.createClass({
 });
 
 var ContactPickerWidget = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getInitialState: function() {
         return {
             'searchValue': '',

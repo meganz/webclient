@@ -1032,6 +1032,26 @@ accountUI.renderAccountPage = function(account) {
     });
 
     accountUI.setRubsched();
+    
+    // date/time format setting
+    $('.uidateformat').removeClass('radioOn').addClass('radioOff');
+    i = 16;
+    if (fmconfig.uidateformat) {
+        i = 17;
+    }
+    $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+    $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+    $('.uidateformat input').rebind('click', function() {
+        var uidateformat = 0;
+        var id = $(this).attr('id');
+        if (id === 'rad17') {
+            uidateformat = 1;
+        }
+        $('.uidateformat').removeClass('radioOn').addClass('radioOff');
+        $(this).addClass('radioOn').removeClass('radioOff');
+        $(this).parent().addClass('radioOn').removeClass('radioOff');
+        mega.config.setn('uidateformat', uidateformat);
+    });
 
     $('.redeem-voucher').rebind('click', function() {
         var $this = $(this);

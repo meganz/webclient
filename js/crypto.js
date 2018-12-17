@@ -910,7 +910,8 @@ function api_reqfailed(c, e) {
                 else {// Unknown reasonCode
                     reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
                 }
-
+                // if fm-overlay click handler was initialized, we remove the handler to prevent dialog skip
+                $('.fm-dialog-overlay').off('click.fm');
                 msgDialog('warninga', dialogTitle,
                     reasonText,
                     false,

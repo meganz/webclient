@@ -29,6 +29,9 @@ MegaData.prototype.renderMain = function(aUpdate) {
     // cleanupLayout will render an "empty grid" layout if there
     // are no nodes in the current list (Ie, M.v), if so no need
     // to call renderLayout therefore.
+    if (M.previousdirid && M.previousdirid === "recents" && M.recentsRender) {
+        M.recentsRender.cleanup();
+    }
     if (this.megaRender.cleanupLayout(aUpdate, this.v, this.fsViewSel)) {
 
         if (this.currentdirid === 'opc') {
@@ -449,7 +452,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
         }
     }
 
-    breadcrumbsResize();
+    M.onFileManagerReady(breadcrumbsResize);
     $(window).rebind('resize.fmbreadcrumbs', SoonFc(breadcrumbsResize, 202));
 
     if (folderlink) {
@@ -642,10 +645,8 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
     if (M.d[aHandle]) {
         M.d[aHandle].seen = true;
     }
-    else {
-        if (d) {
-            console.error("megaListRenderNode was called with aHandle:", aHandle, "which was not found in M.d");
-        }
+    else if (d > 1) {
+        console.warn("megaListRenderNode was called with aHandle '%s' which was not found in M.d", aHandle);
     }
 
     return node;

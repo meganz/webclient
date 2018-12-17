@@ -75,7 +75,7 @@
 }
 .clipboard .toast-icon {
     background-position: -196px -128px;
-    background-image: url(../images/mega/icons-sprite_v22@2x.png);
+    background-image: url(../images/mega/icons-sprite_v23@2x.png);
     background-size: 262px auto;
     opacity: 0.74;
 }
@@ -97,10 +97,9 @@
     display: none;
 }
 .send-chat .toast-icon {
-    background-image: url(../images/mega/top-sprite_v5@2x.png);
-    background-position:-82px -151px;
-    background-size: 38px 1574px;
-    opacity: 0.8;
+    background-image: url(../images/mega/top-sprite_v5.png);
+    background-position: -82px -151px;
+    opacity: 0.6;
 }
 .toast-body {
     display: table;
@@ -226,7 +225,7 @@
     float: left;
 }
 .toast-close-button.qr-toast-close {
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     background-position: -136px -206px;
     margin-top: -4px;
     margin-left: 226px;
@@ -263,7 +262,7 @@
     display: inline-block;
     width: 14px;
     height: 14px;
-    background-image: url(../images/mega/icons-sprite_v22.png);
+    background-image: url(../images/mega/icons-sprite_v23.png);
     vertical-align: top;
     margin: 2px 9px 0 1px;
     background-position: -198px -1240px;

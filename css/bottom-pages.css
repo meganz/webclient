@@ -63,7 +63,7 @@
 .new-bottom-pages h1, .bp-main h1 {
     font-size: 21px;
     line-height: 31px;
-    font-family: 'source_sans_prosemibold', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     margin: 0;
     padding: 25px 0 0 0;
     font-weight: normal;
@@ -311,6 +311,8 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
 }
 .bottom-page.horizontal-centered-bl {
     max-width: 970px;
+    display: table;
+    width: 100%;
     margin: 0 auto;
     text-align: center;
     -webkit-box-sizing: border-box;
@@ -3152,8 +3154,7 @@ height: 56px;
 }
 .bottom-page.img.mobile03 {
     width: 100%;
-    max-width: 479px;   
-    margin-left: 9%;
+    max-width: 479px;
 }
 .bottom-page.img.mobile04 {
     width: 100%;

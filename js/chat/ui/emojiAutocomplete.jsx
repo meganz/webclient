@@ -1,11 +1,12 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
+var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var ButtonsUI = require('./../../ui/buttons.jsx');
 
 
 var EmojiAutocomplete = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     data_emojis: null,
     getDefaultProps: function() {
         return {

@@ -1,9 +1,10 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var MegaRenderMixin = require("../../stores/mixins.js").MegaRenderMixin;
+var RenderDebugger = require("../../stores/mixins.js").RenderDebugger;
 
 var SharedFolderItem = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     render: function () {
         var self = this;
         var node = this.props.node;
@@ -28,7 +29,7 @@ var SharedFolderItem = React.createClass({
 });
 
 var IncomingSharesAccordionPanel = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     componentWillMount: function() {
         this.hadLoaded = false;
     },

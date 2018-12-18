@@ -247,6 +247,9 @@
     box-sizing: border-box;
     position: relative;
 }
+.dropdown-item.contains-submenu {
+    padding-right: 18px;
+}
 .dropdown-item.static {
     cursor: default;
 }

@@ -2,10 +2,11 @@ var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
+var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 
 
 var Handler = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps() {
         return {
             'hideable': true
@@ -20,7 +21,7 @@ var Handler = React.createClass({
 });
 
 var Contents = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps() {
         return {
             'hideable': true
@@ -47,7 +48,7 @@ var Contents = React.createClass({
 
 
 var Tooltip = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getInitialState() {
         return {
             'active': false

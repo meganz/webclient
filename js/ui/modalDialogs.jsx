@@ -2,6 +2,7 @@ var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
+var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 var Tooltips = require("./tooltips.jsx");
 var Forms = require("./forms.jsx");
 
@@ -14,7 +15,7 @@ var ExtraFooterElement = React.createClass({
 });
 
 var ModalDialog = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps() {
         return {
             'hideable': true
@@ -169,7 +170,7 @@ var ModalDialog = React.createClass({
 
 
 var SelectContactDialog = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     clickTime: 0,
     getDefaultProps: function() {
         return {
@@ -247,7 +248,7 @@ var SelectContactDialog = React.createClass({
 });
 
 var ConfirmDialog = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             'confirmLabel': __(l[6826]),

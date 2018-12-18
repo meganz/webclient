@@ -34,7 +34,7 @@ var VIEW_MODES = {
 };
 
 var ConversationAudioVideoPanel = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getInitialState: function() {
         return {
             'messagesBlockEnabled': false,

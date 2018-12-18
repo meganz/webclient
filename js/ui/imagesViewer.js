@@ -204,7 +204,7 @@ var slideshowid;
         if ($overlay) {
             var root = M.getNodeRoot(n && n.h || false);
 
-            if (!n || !n.p || root === 'shares' || root === M.RubbishID || folderlink) {
+            if (!n || !n.p || root === 'shares' || root === M.RubbishID || folderlink || M.chat) {
                 $overlay.find('.viewer-button.getlink').addClass('hidden');
             }
             else {

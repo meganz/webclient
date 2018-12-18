@@ -1,6 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
+var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var ButtonsUI = require('./../../ui/buttons.jsx');
 var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
 var DropdownsUI = require('./../../ui/dropdowns.jsx');
@@ -9,7 +10,7 @@ var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollb
 
 
 var ParticipantsList = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             'requiresUpdateOnResize': true,
@@ -124,7 +125,7 @@ var ParticipantsList = React.createClass({
 
 
 var ParticipantsListInner = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
             'requiresUpdateOnResize': true,

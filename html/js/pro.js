@@ -81,6 +81,8 @@ var pro = {
      * @param {String} [topage] Redirect to this page of our site.
      */
     redirectToSite: function(topage) {
+        'use strict';
+
         // On mobile just load the main account page as there is no payment history yet
         topage = topage || (is_mobile ? 'fm/account' : 'fm/account/history');
 
@@ -90,13 +92,60 @@ var pro = {
             M.account.lastupdate = 0;
         }
 
-        if (localStorage.justGotRegistered) {
-            delete localStorage.justGotRegistered;
-            sessionStorage.onDesktopOnboardingRedirectTo = topage;
-            topage = 'downloadapp';
-        }
+        // if (localStorage.justGotRegistered) {
+        //     delete localStorage.justGotRegistered;
+        //     sessionStorage.onDesktopOnboardingRedirectTo = topage;
+        //     topage = 'downloadapp';
+        // }
 
         loadSubPage(topage);
+    },
+
+    /**
+     * Show the payment result of success or failure after coming back from a provider
+     * @param {String} verifyUrlParam The URL parameter e.g. 'success' or 'failure'
+     */
+    showPaymentResult: function(verifyUrlParam) {
+        'use strict';
+
+        var $backgroundOverlay = $('.fm-dialog-overlay');
+        var $pendingOverlay = $('.payment-result.pending.alternate');
+        var $failureOverlay = $('.payment-result.failed');
+
+        // Show the overlay
+        $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+        // On successful payment
+        if (verifyUrlParam === 'success') {
+
+            // Show the success
+            $pendingOverlay.removeClass('hidden');
+
+            insertEmailToPayResult($pendingOverlay);
+
+            // Add click handlers for 'Go to my account' and Close buttons
+            $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $pendingOverlay.addClass('hidden');
+
+                pro.redirectToSite();
+            });
+        }
+        else {
+            // Show the failure overlay
+            $failureOverlay.removeClass('hidden');
+
+            // On click of the 'Try again' or Close buttons, hide the overlay
+            $failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $failureOverlay.addClass('hidden');
+                loadSubPage('pro');
+            });
+        }
     },
 
     /**

@@ -243,7 +243,7 @@ var ContactButton = React.createClass({
 });
 
 var ContactVerified = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     componentWillMount:function() {
         var self = this;
 
@@ -296,7 +296,7 @@ var ContactVerified = React.createClass({
     }
 });
 var ContactPresence = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     render: function() {
         var self = this;
         var contact = this.props.contact;
@@ -311,7 +311,7 @@ var ContactPresence = React.createClass({
 });
 
 var ContactFingerprint = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     render: function() {
         var self = this;
         var contact = this.props.contact;
@@ -607,7 +607,7 @@ var ContactItem = React.createClass({
 });
 
 var ContactPickerWidget = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     getInitialState: function() {
         return {
             'searchValue': '',

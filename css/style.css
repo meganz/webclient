@@ -3042,8 +3042,11 @@ a.blog-new-archive-lnk {
     font-weight: normal;
     font-family: 'source_sans_prosemibold', Arial;
     color: #3F4646;
+    padding-top: 22px;
+    padding-bottom: 25px
+}
+.new-bottom-pages .blog-new-full p.strong-paragraph + p {
     padding-top: 0;
-    padding-bottom: 30px
 }
 strong.small-header {
     display: block;
@@ -3057,7 +3060,7 @@ strong.small-header {
 }
 .new-bottom-pages .blog-new-full p.small-pad-paragraph {
     padding-top: 0;
-    padding-bottom: 20px
+    padding-bottom: 28px;
 }
 .new-bottom-pages .blog-new-full ul.ul-small-pad {
     padding-top: 0;
@@ -3257,7 +3260,7 @@ img.blog-new-logos {
     line-height: 32px;
 }
 .blog-jobs-icon {
-    padding: 7px 0 10px 40px;
+    padding: 4px 0 10px 40px;
     background-image: url(../images/mega/blogs/jobs-sprite.png);
     background-repeat: no-repeat;
     background-size: 31px 438px;
@@ -5882,7 +5885,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     -khtml-opacity: 1;
     opacity: 1;
 }
-.files-grid-view, .files-grid-view.shared-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view, .transfer-table-wrapper, .files-grid-view.archived-chat-view {
+.files-grid-view, .files-grid-view.shared-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view, .transfer-table-wrapper {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -5898,6 +5901,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     height: -webkit-calc(100% );
     height: -moz-calc(100%);
     height: calc(100%);
+    top: 0;
 }
 .files-grid-view.contact-details-view {
     height: 100%;
@@ -13365,18 +13369,21 @@ p.privacy-list {
     background-position: -2px -406px;
     background-repeat: no-repeat;
 }
-.team-person-block {
-    float: left;
-    height: 267px;
-    margin: 30px 0 10px 100px;
-    width: 160px;
+.new-bottom-pages.about {
+    font-size: 0;
+    width: 1070px;
 }
-.team-person-block.first {
-    margin-left: 0;
+.team-person-block {
+    display: inline-block;
+    vertical-align: top;
+    height: 267px;
+    margin: 30px 0 10px 0;
+    width: 25%;
 }
 .team-person-avatar {
     width: 160px;
     height: 160px;
+    margin:  0 auto;
     border: 2px solid #d9d9d9;
     -webkit-border-radius: 100%;
     -moz-border-radius: 100%;
@@ -13910,14 +13917,18 @@ strong, b {
     background-position: 0 -1000px;
 }
 .resellers-main-block {
-    margin: 0 -3px
+    margin: 0 -25px;
+    font-size: 0;
 }
 .resellers-link {
-    width: 280px;
-    height: 160px;
-    display: block;
-    float: left;
-    margin: 25px 3px 25px 47px;
+    width: 33.333333%;
+    width: -webkit-calc(33.333333% - 50px);
+    width: -moz-calc(33.333333% - 50px);
+    width: calc(33.333333% - 50px);
+    min-height: 160px;
+    display: inline-block;
+    vertical-align: top;
+    margin: 25px 25px 25px 25px;
     border: 2px solid #d9d9d9;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -13932,9 +13943,6 @@ strong, b {
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
-.resellers-link.first {
-    margin: 25px 3px 25px 3px;
-}
 .resellers-link:hover {
     border-color: #D42400;
 }
@@ -13943,7 +13951,7 @@ strong, b {
 }
 .resellers-logo {
     display: block;
-    margin: 25px auto 29px auto;
+    margin: 48px auto 29px auto;
     width: 220px;
 }
 .resellers-payment {
@@ -15411,6 +15419,21 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .blog-new-full ul.small-pad li {
     padding-bottom: 0;
+}
+.blog-new-full ul + .blog-new-full-div {
+    margin-top: 33px;
+}
+ .blog-new-full ul + .blog-new-full-div2 {
+    margin-top: 53px;
+}
+.small-pad-paragraph + .blog-new-full-div2 {
+    margin-top: 35px;
+}
+.blog-browser-title + .clear + ul {
+    padding: 15px 0 10px 0;
+}
+.small-pad-paragraph .blog-new-num-txt.strong-header {
+    padding-bottom:  5px;
 }
 .register-game-txt {
     width: 589px;
@@ -21667,21 +21690,17 @@ body.kr .account.chart.data {
 
 /* New Contact Us Page styles */
 .contact-us-revamp .main-mid-pad {
-    width: 1280px;
+    max-width: 1280px;
+    width: auto;
 }
 .contact-us-revamp .about-top-block .new-bottom-pages {
-    padding: 46px 15px 32px 15px;
+    padding: 46px 0 32px 0;
 }
 .contact-us-revamp .contact-new-row .main-mid-pad {
     width: 100%;
     position: relative;
     padding: 0 0;
     overflow: auto;
-}
-.contact-us-revamp .main-mid-pad h1 {
-    font-family: 'montserrat_semibold', 'source_sans_prosemibold', Arial;
-    font-size: 36px;
-    color: #262F3B;
 }
 .contact-us-revamp .about-top-block {
     background-color: white;
@@ -21756,16 +21775,22 @@ body.kr .account.chart.data {
 .contact-new-title.eu-representative::before, .contact-new-title.gdpr::before {
     background-position: -4px -505px;
 }
-
-.contact-us-revamp .main-mid-pad h1 {
+.contact-us-revamp h1 {
     background-image: url(../images/mega/contact-us-sprite.png);
-    background-size: 80px auto;
     background-repeat: no-repeat;
-    padding-left: 96px;
-    line-height: 72px;
-    padding-top: 0px;
-    margin-top: 36px;
     background-position: 0 -6px;
+    line-height: 72px;
+    margin: 36px 0 32px 0;
+    padding: 0 0 0 96px;
+    font-family: 'montserrat_semibold', 'source_sans_prosemibold', Arial;
+    font-size: 36px;
+    color: #262F3B;
+}
+.contact-us-revamp p {
+    padding: 8px 0 10px 0;
+    color: #333333;
+    font-size: 14px;
+    line-height: 26px;
 }
 .contact-us-revamp .contact-directory .contact-new-title {
     background-image: none;
@@ -21802,9 +21827,13 @@ body.kr .account.chart.data {
     min-height: initial;
 }
 .contact-us-revamp .contact-body-wrapper {
-    width: 1280px;
+    max-width: 1280px;
     margin: 0 auto;
     overflow: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 46px 25px 0 25px;
 }
 .contact-us-revamp .contact-directory {
     display: inline-block;
@@ -21925,8 +21954,9 @@ body.kr .account.chart.data {
         width: 1024px;
     }
     .contact-us-revamp .contact-right-body {
-        float: initial;
-        width: 100%;
+        float: none;
+        width: auto;
+        margin: 0 -15px;
     }
     .transfer-table td:nth-child(6), .transfer-table-header th:nth-child(6) {
         width: 162px;
@@ -23931,8 +23961,8 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: none;
 }
 .local-currency .reg-st3-bott-title.price .local-currency-code {
-    font-size: 10px;
-    color: #888;
+    font-size: 13px;
+    color: #000;
     line-height: 16px;
     margin-top: -5px;
     margin-bottom: 4px;
@@ -25280,3 +25310,33 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     -ms-transition: none!important;
     transition: none!important;
 }
+
+.takedown-guidance p.first, .privacy-policy p.first {
+    padding-top: 5px;
+}
+
+.privacy-policy h3 {
+    margin-top: 25px;
+}
+
+.new-bottom-pages.privacy-policy span.text.list-item {
+    display: list-item;
+    list-style-type: disc;
+    list-style-position: inside;
+}
+
+/* Terms page index table */
+.new-bottom-pages.terms .index-table {
+    margin:24px auto;
+    width: 100%;
+}
+
+.new-bottom-pages.terms .index-table td {
+    font-family: 'latoWeb', 'source_sans_proregular', sans-serif;
+    padding: 8px 8px 8px 0;
+}
+
+.new-bottom-pages.terms .index-table td:not(:first-child) {
+    text-align: right;
+}
+/* end terms page index table */

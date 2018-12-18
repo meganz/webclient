@@ -1,6 +1,7 @@
 var React = require("react");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
+var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 var DropdownsUI = require('./dropdowns.jsx');
 var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
 
@@ -28,7 +29,7 @@ var DropdownEmojiSelector = React.createClass({
         'rolling_eyes',
         'stuck_out_tongue',
     ],
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     heightDefs: {
         'categoryTitleHeight': 55,
         'emojiRowHeight': 35,

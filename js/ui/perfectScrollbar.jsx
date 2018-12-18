@@ -2,13 +2,14 @@ var React = require("react");
 var ReactDOM = require("react-dom");
 
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
+var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 var x = 0;
 /**
  * perfect-scrollbar React helper
  * @type {*|Function}
  */
 var PerfectScrollbar = React.createClass({
-    mixins: [MegaRenderMixin],
+    mixins: [MegaRenderMixin, RenderDebugger],
     isUserScroll: true,
     scrollEventIncId: 0,
     getDefaultProps: function() {
@@ -114,17 +115,23 @@ var PerfectScrollbar = React.createClass({
             return;
         }
 
-        var $node = $(self.findDOMNode());
-        var ns = '.ps' + self.getUniqueId();
-        $node.parents('.have-animation')
-            .rebind('animationend' + ns +' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns, function(e) {
+        var $haveAnimationNode = self._haveAnimNode;
+
+        if (!$haveAnimationNode) {
+            var $node = $(self.findDOMNode());
+            var ns = '.ps' + self.getUniqueId();
+            $haveAnimationNode = self._haveAnimNode = $node.parents('.have-animation');
+        }
+
+        $haveAnimationNode.rebind('animationend' + ns +' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns,
+            function(e) {
                 self.safeForceUpdate(true);
                 if (self.props.onAnimationEnd) {
                     self.props.onAnimationEnd();
                 }
             });
     },
-    eventuallyReinitialise: function(forced, scrollPositionYPerc, scrollToElement) {
+    eventuallyReinitialise: SoonFc(function(forced, scrollPositionYPerc, scrollToElement) {
         var self = this;
 
         if (!self.isMounted()) {
@@ -140,7 +147,7 @@ var PerfectScrollbar = React.createClass({
             self._currHeight = self.getContentHeight();
             self._doReinit(scrollPositionYPerc, scrollToElement, forced, $elem);
         }
-    },
+    }, 75),
     _doReinit: function(scrollPositionYPerc, scrollToElement, forced, $elem) {
         var self = this;
 

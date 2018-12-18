@@ -313,7 +313,8 @@ var megasync = (function() {
      * @return {MegaPromise}
      */
     function megaSyncRequest(args, resolve, reject) {
-        var timeout = (args.a === 'v') ? 250 : 0;
+        // var timeout = (args.a === 'v') ? 250 : 0;
+        var timeout = 0;
         try {
             args = JSON.stringify(args);
         }

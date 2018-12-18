@@ -74,15 +74,11 @@ function setDateTimeFormat(locales, format) {
 
     // Create new DateTimeFormat object if it is not exist
     try {
-        $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat(locales, options);
+        $.dateTimeFormat[locales + '-' + format] = typeof Intl !== 'undefined' ?
+            new Intl.DateTimeFormat(locales, options) : 'ISO';
     }
     catch (e) {
-        if (format < 2) {
-            $.dateTimeFormat[locales + '-' + format] = 'ISO';
-        }
-        else {
-            $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat(locale, options);
-        }
+        $.dateTimeFormat[locales + '-' + format] = format > 1 ? new Intl.DateTimeFormat(locale, options) : 'ISO';
     }
 
     // Create new DateTimeFormat object if it is not exist
@@ -168,8 +164,9 @@ function setAccDateTimeFormat(locales) {
 
     // Create new DateTimeFormat object if it is not exist
     try {
-        $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat(locales, options);
-        $.acc_dateTimeFormat[locales + '-noY'] = new Intl.DateTimeFormat(locales, nYOptions);
+        $.acc_dateTimeFormat[locales] = typeof Intl !== 'undefined' ?
+            new Intl.DateTimeFormat(locales, options) : 'fallback';
+        $.acc_dateTimeFormat[locales + '-noY'] = Intl ? new Intl.DateTimeFormat(locales, nYOptions) : 'fallback';
     }
     catch (e) {
         $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat(locale, options);
@@ -192,6 +189,7 @@ function acc_time2date(unixtime, yearIsOptional) {
     }
     var locales = country ? locale + '-' + country : locale;
     var currYear = (new Date()).getFullYear();
+    var result;
 
     // If dateTimeFormat is already set with the current locale using it.
     if (!$.acc_dateTimeFormat[locales]) {
@@ -202,8 +200,16 @@ function acc_time2date(unixtime, yearIsOptional) {
         locales += '-noY';
     }
 
-    var dateFunc = $.acc_dateTimeFormat[locales].format;
-    var result = dateFunc(MyDate);
+    if ($.acc_dateTimeFormat[locales] === 'fallback') {
+        result = date_months[MyDate.getMonth()] + ' ' + MyDate.getDate();
+        if (yearIsOptional && currYear === MyDate.getFullYear()) {
+            result += MyDate.getFullYear();
+        }
+    }
+    else {
+        var dateFunc = $.acc_dateTimeFormat[locales].format;
+        result = dateFunc(MyDate);
+    }
 
     if (locale === 'en') {
         var date = MyDate.getDate();

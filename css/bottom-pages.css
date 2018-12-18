@@ -3575,7 +3575,7 @@ a.opensource-icon-txt.coming-soon {
     min-height: 600px;
 }
 .onboarding-suggestions .download-app {
-    min-width: 250px;
+    min-width: 240px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -3849,6 +3849,9 @@ a.opensource-icon-txt.coming-soon {
 .onboarding-suggestions .top-description.mobile-download, .onboarding-suggestions .top-dark-info.medium.mobile-download {
     display: none;
 } 
+.onboarding-suggestions a.logo {
+    cursor: default;
+}
 /*
 .bottom-page.download-container.linux-only {
     display: inline-block;

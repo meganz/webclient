@@ -8967,6 +8967,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .mobile .onboarding-suggestions .button-wrappers {
     padding: 0 24px;
 }
+
+
 /* Only media queries after here */
 @media only screen and (max-width: 970px) {
     .securitypractice .security-page-video-block {

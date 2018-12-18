@@ -2469,6 +2469,7 @@ function parsepage(pagehtml, pp) {
         M.initUIKeyEvents();
     }
     clickURLs();
+    scrollToURLs();
 }
 
 function parsetopmenu() {

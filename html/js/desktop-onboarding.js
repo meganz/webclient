@@ -26,20 +26,20 @@
             $('.onboard-image.desktop-active', $oiw).removeClass('hidden');
             $('.default-green-button.download-app', $oiw).addClass('hidden');
 
-            //Hide the download buttons and MEGAcmd dropdown
+            // Hide the download buttons and MEGAcmd dropdown
             $('.default-green-button.download-app', $wrapper).addClass('hidden');
             $('.megaapp-linux.cmd', $wrapper).addClass('hidden');
 
-            //Swap between pre/post download body text
+            // Swap between pre/post download body text
             $('.pre-download', $wrapper).addClass('hidden');
             $('.post-download', $wrapper).removeClass('hidden');
 
-            //Swap between text button and green button for cloud drive redirection
+            // Swap between text button and green button for cloud drive redirection
             $('.text-button.redirect-clouddrive-link', $wrapper).addClass('hidden');
             $('.default-green-button.redirect-clouddrive', $wrapper).removeClass('hidden');
             $('.bottom-bar.desktop-redirection', $wrapper).addClass('border');
 
-            //Resize the height of the container to align items
+            // Resize the height of the container to align items
             $('.bottom-page.horizontal-centered-bl', $wrapper).addClass('resize');
 
             window.location = syncurl;

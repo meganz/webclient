@@ -1367,7 +1367,7 @@ function init_page() {
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
     }
-    else if (page == 'downloadapp') {
+    else if (page === 'downloadapp') {
         desktopOnboarding();
     }
     else if (page == 'takedown') {
@@ -2385,7 +2385,7 @@ function pagemetadata() {
         mega_title = 'MEGAcmd - Download';
         mega_desc = 'MEGAcmd is an interactive, text console based, scriptable MEGA client.';
     }
-    else if (page == 'downloadapp') {
+    else if (page === 'downloadapp') {
         mega_title = 'Download our App';
         mega_desc = 'MEGAcmd is an interactive, text console based, scriptable MEGA client.';
     }

@@ -81,6 +81,8 @@ var pro = {
      * @param {String} [topage] Redirect to this page of our site.
      */
     redirectToSite: function(topage) {
+        'use strict';
+
         // On mobile just load the main account page as there is no payment history yet
         topage = topage || (is_mobile ? 'fm/account' : 'fm/account/history');
 
@@ -90,11 +92,11 @@ var pro = {
             M.account.lastupdate = 0;
         }
 
-        if (localStorage.justGotRegistered) {
-            delete localStorage.justGotRegistered;
-            sessionStorage.onDesktopOnboardingRedirectTo = topage;
-            topage = 'downloadapp';
-        }
+        // if (localStorage.justGotRegistered) {
+        //     delete localStorage.justGotRegistered;
+        //     sessionStorage.onDesktopOnboardingRedirectTo = topage;
+        //     topage = 'downloadapp';
+        // }
 
         loadSubPage(topage);
     },

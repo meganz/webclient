@@ -316,9 +316,10 @@ mobile.register = {
     /**
      * Shows the login screen with a few things changed so they know they are
      * confirming their account and about to proceed to the key creation step
-     * @param {String} email The user's email address from the confirm code
+     * @param {String} email                The user's email address from the confirm code
+     * @param {Boolean} isBusinessSubUser   are we confirming a business sub-user
      */
-    showConfirmAccountScreen: function(email) {
+    showConfirmAccountScreen: function (email, isBusinessSubUser) {
 
         'use strict';
 
@@ -328,7 +329,7 @@ mobile.register = {
         // Change the header text, hide the registration and preinput the email
         var $loginScreen = $('.signin-register-block');
         $loginScreen.find('.fm-header-txt.sign-in').text(l[812]);            // Confirm Account
-        $loginScreen.find('.signin-input.login input').val(email);
+        $loginScreen.find('.signin-input.login input').val(isBusinessSubUser ? email.e : email);
     },
 
     /**

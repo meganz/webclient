@@ -744,7 +744,13 @@ BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
             if (u_type === false) {
                 res.signupcode = signupCode;
                 localStorage.businessSubAc = JSON.stringify(res);
-                loadSubPage('register');
+                if (is_mobile) {
+                    parsepage(pages['mobile']);
+                    mobile.register.showConfirmAccountScreen(res, true);
+                }
+                else {
+                    loadSubPage('register');
+                }
             }
             else {
                 var msgTxt = l[18795];

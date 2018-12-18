@@ -106,6 +106,7 @@ var pro = {
      * @param {String} verifyUrlParam The URL parameter e.g. 'success' or 'failure'
      */
     showPaymentResult: function(verifyUrlParam) {
+        'use strict';
 
         var $backgroundOverlay = $('.fm-dialog-overlay');
         var $pendingOverlay = $('.payment-result.pending.alternate');

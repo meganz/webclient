@@ -3049,5 +3049,7 @@
     "20033": "Unit: KB",
     "20034": "Unit: Byte",
     "20035": "Invitation email has been sent",
-    "20120": "Your MEGA account is full."
+    "20120": "Your MEGA account is full.",
+    "20121": "[A]Google Pay[\/A] (subscription)",
+    "20122": "[A]From[\/A] %s \/ [A]month[\/A] *"
 }

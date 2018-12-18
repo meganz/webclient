@@ -2582,7 +2582,7 @@
     "19193": "Saisir un code \u00e0 6 chiffres",
     "19194": "Authentification \u00e0 deux facteurs",
     "19195": "Ceci activera ou d\u00e9sactivera l\u2019authentification \u00e0 deux facteurs sur votre compte.",
-    "19196": "Saisissez votre code pour activer l\u2019A2F\u00a0",
+    "19196": "Saisissez votre code pour activer l\u2019A2F\u00a0:",
     "19197": "\u00c9chec d\u2019activation de l\u2019A2F",
     "19198": "L\u2019A2F est activ\u00e9e",
     "19199": "Veuillez enregistrer votre cl\u00e9 de r\u00e9cup\u00e9ration en lieu s\u00fbr",
@@ -3049,5 +3049,7 @@
     "20033": "Unit\u00e9\u00a0: Ko",
     "20034": "Unit\u00e9\u00a0: octet",
     "20035": "Un courriel d\u2019invitation a \u00e9t\u00e9 envoy\u00e9",
-    "20120": "L\u2019espace de stockage de votre compte MEGA est plein."
+    "20120": "L\u2019espace de stockage de votre compte MEGA est plein.",
+    "20121": "[A]Google Pay[\/A] (abonnement)",
+    "20122": "[A]From[\/A] %s \/ [A]month[\/A] *"
 }

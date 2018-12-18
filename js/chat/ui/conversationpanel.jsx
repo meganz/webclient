@@ -1828,7 +1828,7 @@ var ConversationPanel = React.createClass({
                                         disabled={room.isReadOnly()}
                                         onClick={function() {
                                             if (!disabledCalls) {
-                                                room.startVideoCall();
+                                                room.startAudioCall();
                                             }
                                         }}
                                         >

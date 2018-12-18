@@ -8912,6 +8912,35 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     min-width: initial;
 }
 
+.takedown-guidance p.first, .privacy-policy p.first {
+    padding-top: 5px;
+}
+
+.privacy-policy h3 {
+    margin-top: 25px;
+}
+
+.new-bottom-pages.privacy-policy span.text.list-item {
+    display: list-item;
+    list-style-type: disc;
+    list-style-position: inside;
+}
+
+/* Terms page index table */
+.new-bottom-pages.terms .index-table {
+    margin:24px auto;
+    width: 100%;
+}
+
+.new-bottom-pages.terms .index-table td {
+    font-family: 'latoWeb', 'source_sans_proregular', sans-serif;
+    padding: 8px 8px 8px 0;
+}
+
+.new-bottom-pages.terms .index-table td:not(:first-child) {
+    text-align: right;
+}
+
 
 /* Only media queries after here */
 @media only screen and (max-width: 970px) {

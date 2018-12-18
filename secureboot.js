@@ -150,6 +150,35 @@ function clickURLs() {
     });
 }
 
+/**
+ * Handler that deals with scroll to element links.
+ */
+function scrollToURLs() {
+    'use strict';
+    $('a.scroll_to').on("click", function() {
+        var $scrollTo = $($(this).data("scrollto"));
+        if ($scrollTo.length) {
+            var newOffset =  $scrollTo[0].offsetTop - 40;
+            var $toScroll;
+            if (is_mobile) {
+                if (page === "privacy") {
+                    $toScroll = $('html');
+                }
+                else if (page === "terms") {
+                    $toScroll = $('.fm-block.terms-of-service .mobile.fm-scrolling');
+                }
+            } else {
+                $toScroll = $('.fmholder');
+            }
+
+            if ($toScroll) {
+                $toScroll.animate({scrollTop: newOffset}, 400);
+            }
+
+        }
+    });
+}
+
 function geoStaticpath(eu)
 {
     if (!eu) {

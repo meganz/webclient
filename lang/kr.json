@@ -2982,5 +2982,6 @@
     "20035": "\ucd08\ub300 \uba54\uc77c\uc774 \ubc1c\uc1a1\ub418\uc5c8\uc2b5\ub2c8\ub2e4.",
     "20120": "\ub2f9\uc2e0\uc758 MEGA \uacc4\uc815\uc774 \uac00\ub4dd \ucc3c\uc2b5\ub2c8\ub2e4.",
     "20121": "[A]Google Pay[\/A] (\uad6c\ub3c5)",
-    "20122": "%s \/ [A]\uc6d4[\/A]* [A]\ubd80\ud130[\/A]"
+    "20122": "%s \/ [A]\uc6d4[\/A]* [A]\ubd80\ud130[\/A]",
+    "20128": "You are about to disable your QR code. This will delete your current QR code and invitation link."
 }

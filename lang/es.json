@@ -2982,5 +2982,6 @@
     "20035": "Se ha enviado un correo electr\u00f3nico de invitaci\u00f3n",
     "20120": "Tu cuenta de MEGA est\u00e1 llena.",
     "20121": "[A]Google Pay[\/A] (suscripci\u00f3n)",
-    "20122": "[A]Desde[\/A] %s \/ [A]mes[\/A] *"
+    "20122": "[A]Desde[\/A] %s \/ [A]mes[\/A] *",
+    "20128": "You are about to disable your QR code. This will delete your current QR code and invitation link."
 }

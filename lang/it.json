@@ -2982,5 +2982,6 @@
     "20035": "La mail di invito \u00e8 stata spedita",
     "20120": "Il tuo account MEGA \u00e8 pieno.",
     "20121": "[A]Google Wallet[\/A] (abbonamento)",
-    "20122": "[A]Da[\/A] %s \/ [A]mese[\/A] *"
+    "20122": "[A]Da[\/A] %s \/ [A]mese[\/A] *",
+    "20128": "You are about to disable your QR code. This will delete your current QR code and invitation link."
 }

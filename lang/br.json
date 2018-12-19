@@ -2982,5 +2982,6 @@
     "20035": "O email de convite foi enviado",
     "20120": "A sua conta no MEGA est\u00e1 cheia.",
     "20121": "[A]Google Wallet[\/A] (assinatura)",
-    "20122": "[A]A partir de[\/A] %s [A]mensais[\/A] *"
+    "20122": "[A]A partir de[\/A] %s [A]mensais[\/A] *",
+    "20128": "You are about to disable your QR code. This will delete your current QR code and invitation link."
 }

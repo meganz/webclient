@@ -2982,5 +2982,6 @@
     "20035": "Davetiye epostas\u0131 g\u00f6nderildi",
     "20120": "MEGA hesab\u0131n\u0131z dolu.",
     "20121": "[A]Google Pay[\/A] (abonelik)",
-    "20122": "[A]Ayl\u0131k[\/A] %s [A]'dan ba\u015flayan fiyatlarla[\/A] *"
+    "20122": "[A]Ayl\u0131k[\/A] %s [A]'dan ba\u015flayan fiyatlarla[\/A] *",
+    "20128": "You are about to disable your QR code. This will delete your current QR code and invitation link."
 }

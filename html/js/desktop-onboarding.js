@@ -19,7 +19,6 @@
         $('.download-app', $wrapper).addClass('hidden').rebind('click', function() {
             var $oiw = $('.onboard-image-wrapper', $wrapper);
 
-            $('.onboard-image.clouds', $oiw).removeClass('hidden');
             $('.onboard-image.logo-mega', $oiw).addClass('visible');
             $('.onboard-image.down-arrow', $oiw).addClass('visible');
             $('.onboard-image.desktop-inactive', $oiw).addClass('hidden');
@@ -37,7 +36,6 @@
             // Swap between text button and green button for cloud drive redirection
             $('.text-button.redirect-clouddrive-link', $wrapper).addClass('hidden');
             $('.default-green-button.redirect-clouddrive', $wrapper).removeClass('hidden');
-            $('.bottom-bar.desktop-redirection', $wrapper).addClass('border');
 
             // Resize the height of the container to align items
             $('.bottom-page.horizontal-centered-bl', $wrapper).addClass('resize');

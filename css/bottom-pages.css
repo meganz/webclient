@@ -3524,7 +3524,7 @@ a.opensource-icon-txt.coming-soon {
     display: none;
 }
 .onboarding-suggestions .bottom-page.top-description {
-    margin: 40px auto 44px;
+    margin: 24px auto 44px;
     padding: 0;
 }
  .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
@@ -3580,7 +3580,6 @@ a.opensource-icon-txt.coming-soon {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    margin-top: 40px;
 }
 .onboarding-suggestions .onboard-image-wrapper {
     position: absolute;
@@ -3847,11 +3846,18 @@ a.opensource-icon-txt.coming-soon {
 .onboarding-suggestions.linux .download-app {
     margin-top: 0px;
 }
-.onboarding-suggestions .top-description.mobile-download, .onboarding-suggestions .top-dark-info.medium.mobile-download {
+.onboarding-suggestions .top-description.mobile-download, .onboarding-suggestions .top-dark-info.medium.mobile-download, .onboarding-suggestions a.fm-avatar {
     display: none;
 } 
 .onboarding-suggestions a.logo {
     cursor: default;
+}
+.onboarding-suggestions .bottom-page.big-icon.sync-icon {
+    transform: scale(.75);
+}
+.onboarding-suggestions .bottom-page.top-dark-info.medium {
+    font-size: 28px;
+    line-height: 42px;
 }
 /*
 .bottom-page.download-container.linux-only {

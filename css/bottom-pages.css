@@ -2508,7 +2508,6 @@ height: 56px;
     line-height: 38px;
     font-size: 34px;
 }
-}
 /* end of MEGAcmd */
 
 
@@ -3900,14 +3899,8 @@ a.opensource-icon-txt.coming-soon {
 .onboarding-suggestions .os-mac-windows-toggle, .onboarding-suggestions .os-linux-toggle  {
     font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
 }
-/*
-.bottom-page.download-container.linux-only {
-    display: inline-block;
-    padding: 16px 16px 10px 16px;
-    background-color: #fff;
-    border:1px solid #ddd;
-    border-radius: 8px;
-}*/
+
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow, .bottom-page.top-title::before, .pages-nav.nav-icon.bott-sprite, .bottom-page.mid-icon, .bottom-page.cols-container .col3::before, .bottom-page.tab-lnk-icon, .cmd-top-img, .bottom-page.scroll-icon, .bottom-page.dark-button, .bottom-page.big-link i, .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite {
     background-image: url(../images/mega/pages-sprite_v4@2x.png) !important;
@@ -4605,10 +4598,9 @@ body:not(.en) .pages-nav.content-block .nav-button {
 .megasync .bottom-page.img.mobile-view {
 	margin-top: 24px;
 }
-.onboarding-suggestions .bottom-page.horizontal-centered-bl {
-    min-height: 720px;
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select, .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-progress, .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed {
+    display: none;
 }
-
 }
 @media only screen and (max-width: 1260px) and (min-height: 750px) {
 .bottom-page.img.ios-top {
@@ -4822,8 +4814,14 @@ body:not(.en) .pages-nav.content-block .nav-button {
     width: 100%;
     margin: 0 0 0 0;
 }
+.onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
+    max-height: initial;
+    min-height: 680px;
 }
-
+.onboarding-suggestions .bottom-page.horizontal-centered-bl.resize {
+    min-height: 640px;
+}
+}
 /* SE Device Size */
 @media only screen and (max-width: 321px) {
 .megasync .bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {

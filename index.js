@@ -743,10 +743,7 @@ function init_page() {
     else if (page.length > 14 && page.substr(0, 14) === 'businesssignup') {
         if (is_mobile) {
             parsepage(pages['mobile']);
-            mobile.messageOverlay.show(null, l[20002],
-                function () {
-                    loadSubPage('start');
-                });
+            mobile.decryptionPasswordOverlay.show(page, true);
         }
         else {
             var signupCodeEncrypted = page.substring(14, page.length);

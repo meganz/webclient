@@ -134,6 +134,9 @@ function mURIDecode(path) {
 }
 
 function clickURLs() {
+    
+    'use strict';
+
     $('a.clickurl').rebind('click', function() {
         var $this = $(this);
         var url = $this.attr('href') || $this.data('fxhref');

@@ -1813,6 +1813,12 @@ height: 56px;
     line-height: 24px;
     padding: 28px 0 62px 0;
 }
+.bottom-page.megasync.linux .megaapp-button-info {
+    padding-bottom: 0;
+}
+.bottom-page.megasync.linux .default-select.megaapp-dropdown {
+    margin-top: 20px;
+}
 .megaapp-button-info a.red {
     cursor: pointer;
     color: #FF333A;

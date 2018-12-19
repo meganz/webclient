@@ -23,7 +23,9 @@
             $('.onboard-image.down-arrow', $oiw).addClass('visible');
             $('.onboard-image.desktop-inactive', $oiw).addClass('hidden');
             $('.onboard-image.desktop-active', $oiw).removeClass('hidden');
-            $('.default-green-button.download-app', $oiw).addClass('hidden');
+            $('.onboard-image.folder-select', $oiw).addClass('hidden');
+            $('.onboard-image.transfer-progress', $oiw).addClass('hidden');
+            $('.onboard-image.transfer-speed', $oiw).addClass('hidden');
 
             // Hide the download buttons and MEGAcmd dropdown
             $('.default-green-button.download-app', $wrapper).addClass('hidden');

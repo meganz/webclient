@@ -3539,7 +3539,7 @@ a.opensource-icon-txt.coming-soon {
     position: absolute;
     left: 0;
     right: 0;
-    height: 130px;
+    height: 120px;
     color: #A1A7AF;
     background-color: white;
     display: table;
@@ -3683,6 +3683,30 @@ a.opensource-icon-txt.coming-soon {
     position: relative;
     display: none;
     margin: 0 auto 20px;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-progress {
+    background-position: -237px -320px;
+    width: 126px;
+    height: 114px;
+    bottom: 147px;
+    transform: scale(.75);
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed {
+    background-position: -421px -326px;
+    width: 167px;
+    height: 104px;
+    bottom: 102px;
+    left: 358px;
+    z-index: -1;
+    transform: scale(.75);
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select {
+    background-position: -441px -468px;
+    width: 128px;
+    height: 104px;
+    left: -338px;
+    bottom: 84px;
+    transform: scale(.75);
 }
 .onboarding-suggestions .badge {
     font-family: 'LatoWebBold', 'source_sans_proregular', sans-serif;
@@ -3858,6 +3882,17 @@ a.opensource-icon-txt.coming-soon {
 .onboarding-suggestions .bottom-page.top-dark-info.medium {
     font-size: 28px;
     line-height: 42px;
+}
+.onboarding-suggestions .bottom-page.top-dark-info.medium {
+    font-size: 28px;
+    line-height: 42px;
+}
+.onboarding-suggestions .bottom-page.top-dark-info.medium {
+    font-size: 28px;
+    line-height: 42px;
+}
+.bottom-page.onboarding-suggestions {
+    min-height: 640px;
 }
 /*
 .bottom-page.download-container.linux-only {

@@ -46,6 +46,8 @@
             return false;
         });
 
+        ua +='linux'
+        
         if (is_mobile || ua.indexOf('linux') < 0) {
             $('.download-app', $wrapper).removeClass('hidden');
             $('.bottom-page.horizontal-centered-bl', $wrapper).addClass('resize');

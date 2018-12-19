@@ -1817,7 +1817,7 @@ height: 56px;
     padding-bottom: 0;
 }
 .bottom-page.megasync.linux .default-select.megaapp-dropdown {
-    margin-top: 20px;
+    margin-top: 20px;No 
 }
 .megaapp-button-info a.red {
     cursor: pointer;
@@ -3567,7 +3567,7 @@ a.opensource-icon-txt.coming-soon {
 .default-green-button.height-48.redirect-clouddrive, .default-green-button.height-48.download-app {
     font-size: 16px;
     padding: 0 24px;
-    z-index: 9999;
+    z-index: 999;
 }
 .default-green-button.redirect-clouddrive.hidden, .default-green-button.download-app.hidden {
     display: none;
@@ -3905,7 +3905,9 @@ a.opensource-icon-txt.coming-soon {
 .onboarding-suggestions .os-mac-windows-toggle, .onboarding-suggestions .os-linux-toggle  {
     font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
 }
-
+.onboarding-suggestions .megaapp-linux .megaapp-dropdown-list {
+    z-index: 9999;
+}
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow, .bottom-page.top-title::before, .pages-nav.nav-icon.bott-sprite, .bottom-page.mid-icon, .bottom-page.cols-container .col3::before, .bottom-page.tab-lnk-icon, .cmd-top-img, .bottom-page.scroll-icon, .bottom-page.dark-button, .bottom-page.big-link i, .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite {

@@ -1397,11 +1397,11 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
         }
 
         domElement._elmStatus = domElement.querySelector('.transfer-status');
-        domElement._elmSentSize = document.querySelector('.uploaded-size');
+        domElement._elmSentSize = domElement.querySelector('.uploaded-size');
         domElement._elmRProgress = domElement.querySelector('.right-c p');
         domElement._elmLProgress = domElement.querySelector('.left-c p');
-        domElement._elmTimeLeft = document.querySelector('.eta');
-        domElement._elmSpeed = document.querySelector('.speed');
+        domElement._elmTimeLeft = domElement.querySelector('.eta');
+        domElement._elmSpeed = domElement.querySelector('.speed');
     }
 
     if (!bl || !ul.starttime || uldl_hold) {

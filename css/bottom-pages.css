@@ -3864,6 +3864,8 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .megaapp-linux.cmd {
     margin-bottom: 12px;
+    z-index: 9999;
+    position: relative;
 }
 .onboarding-suggestions.linux .cmd .default-select.megaapp-dropdown, .onboarding-suggestions.linux .cmd.megaapp-linux .bottom-page.split-buttons, .onboarding-suggestions.linux .download-app {
     width: 300px;
@@ -3894,6 +3896,9 @@ a.opensource-icon-txt.coming-soon {
 }
 .bottom-page.onboarding-suggestions {
     min-height: 640px;
+}
+.onboarding-suggestions .os-mac-windows-toggle, .onboarding-suggestions .os-linux-toggle  {
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
 }
 /*
 .bottom-page.download-container.linux-only {

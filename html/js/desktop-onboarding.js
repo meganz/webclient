@@ -66,6 +66,21 @@
                 console.debug('megasync-linux-distro-selected', url);
             });
         }
+
+        // Change the download text
+        if (ua.indexOf('linux') > -1) {
+            $('.os-mac-windows-toggle').text('Windows');
+            $('.os-linux-toggle').text('MacOS');
+        }
+        else if (ua.indexOf('mac') > -1) {
+            $('.os-mac-windows-toggle').text('Windows');
+            $('.os-linux-toggle').text('Linux');
+        }
+        else {
+            // Otherwise if on Windows
+            $('.os-mac-windows-toggle').text('Linux');
+            $('.os-linux-toggle').text('MacOS');
+        }
     }
 
     global.desktopOnboarding = function() {

@@ -745,6 +745,11 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[/A]', '</a>')
         .replace('[Br]', '<br><br>');
     l[20022] = l[20022].replace('[Br]', '<br><br>');
+    l[20022] = l[20022].replace('[Br]', '<br><br>');
+    l[20132] = l[20132].replace('[A]', '<span class="os-mac-windows-toggle">').replace('[/A]', '</span>')
+                       .replace('[B]', '<span class="os-linux-toggle">').replace('[/B]', '</span>');
+    l[20137] = l[20137].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
+        + '/mobile">').replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

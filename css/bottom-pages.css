@@ -3528,7 +3528,7 @@ a.opensource-icon-txt.coming-soon {
     padding: 0;
 }
  .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
-    background-color: #F4F4F6;
+    background-color: #fafafa;
     height: 100%;
     height: -webkit-calc(100%);
     height: -moz-calc(100%);
@@ -3562,6 +3562,7 @@ a.opensource-icon-txt.coming-soon {
 .default-green-button.height-48.redirect-clouddrive, .default-green-button.height-48.download-app {
     font-size: 16px;
     padding: 0 24px;
+    z-index: 9999;
 }
 .default-green-button.redirect-clouddrive.hidden, .default-green-button.download-app.hidden {
     display: none;

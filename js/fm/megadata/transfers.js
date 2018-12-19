@@ -324,6 +324,10 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     if (!$.totalDL) {
         $.totalDL = 0;
     }
+    // a variable to store the current download batch size. as $.totalDL wont be cleared on failure
+    // due to MaxDownloadSize exceeding (and it should not be cleared). We need only to subtract the
+    // current batch size.
+    var currDownloadSize = 0;
 
     var p = '';
     var pauseTxt = '';
@@ -348,6 +352,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         }
         path = paths[nodes[k]] || '';
         $.totalDL += n.s;
+        currDownloadSize += n.s;
 
         var $tr = $('.transfer-table #dl_' + htmlentities(n.h));
         if ($tr.length) {
@@ -394,6 +399,8 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         if (d) {
             console.log('Downloads exceed max size', entries.length, entries);
         }
+        // subtract the current batch size from the stored total
+        $.totalDL -= currDownloadSize;
         if (!fmconfig.dlThroughMEGAsync) {
             var msgMsg = l[18213]; // 'Download size exceeds the maximum size supported by the browser. '
             //    + 'You can use MEGASync to proceed with the download.'; // 18213

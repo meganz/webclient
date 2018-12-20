@@ -37,7 +37,7 @@ function scrollToURLs() {
 
             if ($scrollTo.length) {
                 var $toScroll;
-                var newOffset = $scrollTo[0].offsetTop - 40;
+                var newOffset = $scrollTo[0].offsetTop;
 
                 if (is_mobile) {
                     if (page === "privacy") {
@@ -48,11 +48,20 @@ function scrollToURLs() {
                     }
                 }
                 else {
-                    $toScroll = $('.fmholder');
+                    $toScroll = $scrollTo.closest(".jspScrollable");
+                    if ($toScroll.length) {
+                        var jspInstance = $toScroll.data('jsp');
+                        if (jspInstance) {
+                            jspInstance.scrollToY(newOffset);
+                        }
+                        return false;
+                    } else {
+                        $toScroll = $('.fmholder');
+                    }
                 }
 
                 if ($toScroll) {
-                    $toScroll.animate({scrollTop: newOffset}, 400);
+                    $toScroll.animate({scrollTop: newOffset - 40}, 400);
                 }
 
             }

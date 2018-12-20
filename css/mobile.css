@@ -8922,9 +8922,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     position: relative;
     margin-top: 12px;
 }
-.mobile .onboarding-suggestions .bottom-page.horizontal-centered-bl {
-    min-height: initial;
-}
 .mobile .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
     background-color: #fff;
 }
@@ -8957,6 +8954,11 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .mobile .onboarding-suggestions .bottom-page.horizontal-centered-bl {
     max-width: 480px;
     margin: 0 auto;
+    min-height: initial;
+    height: auto;
+}
+.mobile .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
+    min-height: initial;
 }
 .mobile .onboarding-suggestions .top-description.pre-download, .mobile .onboarding-suggestions .top-description.post-download, .mobile .onboarding-suggestions .top-dark-info.medium.pre-download, .mobile .onboarding-suggestions .top-dark-info.medium.post-download {
     display: none;

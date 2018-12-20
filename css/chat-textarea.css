@@ -124,6 +124,7 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     display: block;
+    white-space: pre-wrap;
 }
 .chat-textarea-scroll textarea[disabled="disabled"], .disabled .chat-textarea-scroll textarea {
     background-color: white;

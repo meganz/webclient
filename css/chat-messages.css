@@ -190,6 +190,7 @@
     word-wrap: break-word;
     min-height: 20px;
     position: relative;
+    white-space: pre-wrap;
 }
 .message.text-block.scroll {
     max-height: 60px;

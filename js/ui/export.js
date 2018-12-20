@@ -290,9 +290,10 @@ var exportPassword = {
             var $passwordStrengthField = this.$dialog.find('.password-strength');
             var $encryptButtonText = this.$dialog.find('.encrypt-link-button .encrypt-text');
             var $passwordInput = this.$dialog.find('.password-protect-input');
+            var $encryptButton = this.$dialog.find('.encrypt-link-button');
 
             // Add keyup event to the password text field
-            $passwordInput.rebind('keyup', function() {
+            $passwordInput.rebind('keyup', function(event) {
 
                 // Make sure the ZXCVBN password strength estimator library is loaded first
                 if (typeof zxcvbn !== 'undefined') {
@@ -332,6 +333,11 @@ var exportPassword = {
                     if ($encryptButtonText.hasClass('encrypted')) {
                         $encryptButtonText.removeClass('encrypted').text(l[9061]);  // Encrypt
                     }
+                }
+
+                // If Enter key is pressed, trigger encryption button clicking
+                if (event.keyCode === 13) {
+                    $encryptButton.trigger('click');
                 }
             });
         },

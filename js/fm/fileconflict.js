@@ -91,6 +91,7 @@
                 }
                 else {
                     setName(file, nodeName);
+                    saveKeepBothState(nodeTarget, file, nodeName);
                     result.push(file);
                 }
             }

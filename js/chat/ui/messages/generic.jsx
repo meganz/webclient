@@ -364,7 +364,7 @@ var GenericConversationMessage = React.createClass({
                 // Convert ot HTML and pass it to plugins to do their magic on styling the message if needed.
                 message.messageHtml = htmlentities(
                     message.textContents
-                ).replace(/\n/gi, "<br/>");
+                ).replace(/\n/gi, "<br/>").replace(/\t/g, '    ');
 
                 message.processedBy = {};
 

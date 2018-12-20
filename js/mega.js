@@ -3663,7 +3663,12 @@ mBroadcaster.once('boot_done', function() {
                 return;
             }
             for (var i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf("image") === 0) {
+                if (items[i].type.indexOf("text/rtf") === 0) {
+                    // halt execution, this is a Rich text formatted clipboard data, which may also contain an image,
+                    // so we need to halt here, otherwise it may be threated as image, instead of text
+                    return;
+                }
+                else if (items[i].type.indexOf("image") === 0) {
                     if (items[i] instanceof File) {
                         // Safari, using .files
                         blob = items[i];

@@ -699,12 +699,18 @@ twofactor.verifySetupDialog = {
         // Cache selectors
         var $pinCodeInput = this.$dialog.find('.pin-input');
         var $warningText = this.$dialog.find('.information-highlight.warning');
+        var $verifyButton = this.$dialog.find('.next-button');
 
         // On keyup or clicking out of the text field
-        $pinCodeInput.rebind('keyup blur', function() {
+        $pinCodeInput.rebind('keyup blur', function(event) {
 
             // Hide previous warnings for incorrect PIN codes
             $warningText.addClass('hidden');
+
+            // If Enter key is pressed, verify the code
+            if (event.keyCode === 13) {
+                $verifyButton.trigger('click');
+            }
         });
     },
 

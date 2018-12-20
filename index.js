@@ -754,9 +754,11 @@ function init_page() {
                 parsepage(pages['login']);
                 login_txt = l[378];
                 init_login();
-                $('#login-name2').val(email);
-                $('.register-st2-button').addClass('active');
-                $('#login-name2').prop('readonly', true);
+                if (email) {
+                    $('#login-name2').val(email);
+                    $('.register-st2-button').addClass('active');
+                    $('#login-name2').prop('readonly', true);
+                }
                 topmenuUI();
             }
         };
@@ -784,8 +786,6 @@ function init_page() {
 
                 parsepage(pages['login']);
                 init_login();
-                $('.register-st2-button').addClass('active');
-                $('#login-name2').prop('readonly', true);
                 topmenuUI();
             }
         };

@@ -14,7 +14,11 @@
         $('.post-download', $wrapper).addClass('hidden');
         $('.pre-download', $wrapper).removeClass('hidden');
 
-        $('.redirect-clouddrive-link, .redirect-clouddrive', $wrapper).rebind('click', goToCloud);
+        $('.redirect-clouddrive', $wrapper).rebind('click', goToCloud);
+        $('.redirect-clouddrive-link', $wrapper).rebind('click', function() {
+            eventlog(99717);
+            goToCloud();
+        });
 
         $('.download-app', $wrapper).addClass('hidden').rebind('click', function() {
             var $oiw = $('.onboard-image-wrapper', $wrapper);
@@ -42,12 +46,14 @@
             // Resize the height of the container to align items
             $('.bottom-page.horizontal-centered-bl', $wrapper).addClass('resize');
 
-            window.location = syncurl;
+            eventlog(99716);
+            setTimeout(function() {
+                window.location = syncurl;
+            }, 950);
             return false;
         });
 
-        ua +='linux'
-        
+        // ua +='linux'
         if (is_mobile || ua.indexOf('linux') < 0) {
             $('.download-app', $wrapper).removeClass('hidden');
             $('.bottom-page.horizontal-centered-bl', $wrapper).addClass('resize');

@@ -18482,10 +18482,10 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     background-position: center -846px;
 }
 /* Logged in PRO account, but not activated by email */
-.top-warning-popup.not-activated {
+.top-warning-popup.non-activated-account {
     padding-bottom: 15px;
 }
-.top-warning-popup.not-activated .mailbox-icon {
+.top-warning-popup.non-activated-account .mailbox-icon {
     background: url(../images/mega/email-confirmation.png) 0 0 no-repeat;
     background-size: 100px 100px;
     float: left;
@@ -18494,11 +18494,11 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     margin-top: -10px;
     width: 100px;
 }
-.top-warning-popup.not-activated p {
+.top-warning-popup.non-activated-account p {
     margin-top: 10px;
     padding-top: 9px;
 }
-.top-warning-popup.not-activated .warning-popup-body {
+.top-warning-popup.non-activated-account .warning-popup-body {
     padding-bottom: 8px;
 }
 .tree-item-on-search-hidden, .tree-item-on-filter-hidden {

@@ -48,17 +48,12 @@ Local webclient setup instructions for Ubuntu (for MEGAchat see INSTALL.md)
 sudo apt-get install apache2
 ```
 
-2. Create a new virtual host configuration file:
+2. Create a new virtual host configuration file and edit it:
 ```
 sudo nano /etc/apache2/sites-available/webclient.conf
 ```
 
-3. Edit the configuration file:
-```
-sudo nano /etc/apache2/sites-available/webclient.conf
-```
-
-4. Add the following and save the file:
+3. Add the following and save the file:
 
 ```
 <VirtualHost *:80>
@@ -75,40 +70,40 @@ sudo nano /etc/apache2/sites-available/webclient.conf
 </VirtualHost>
 ```
 
-5. Enable the config, also the rewrite and headers modules:
+4. Enable the config, also the rewrite and headers modules:
 ```
 sudo a2ensite webclient.conf
 sudo a2enmod rewrite
 ```
 
-6. Edit the hosts file:
+5. Edit the hosts file:
 ```
 sudo nano /etc/hosts
 ```
 
-7. Add the following and save the file:
+6. Add the following and save the file:
 ```
 127.0.0.1       webclient.local
 ```
 
-8. Restart the web server:
+7. Restart the web server:
 ```
 sudo systemctl restart apache2
 ```
 
-9. Clone the repository:
+8. Clone the repository:
 ```
 cd /var/www/html/
 git clone git@code.developers.mega.co.nz:web/webclient.git webclient.local
 ```
 
-10. Set permissions:
+9. Set permissions:
 ```
 sudo chgrp -R www-data /var/www/html/
 sudo chown -R <your-username> /var/www/html/
 ```
 
-11. Visit http://webclient.local in your browser.
+10. Visit http://webclient.local in your browser.
 
 
 Directories

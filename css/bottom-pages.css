@@ -3382,6 +3382,10 @@ height: 56px;
 .bottom-page.business-text.password-warning {
     margin-top: 24px;
     display: table;
+    background-color: #fff3f3;
+    padding: 4px 12px 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #f88b96;
 }
 .bottom-page.business-text.password-warning span {
     display: table-cell;
@@ -3389,6 +3393,7 @@ height: 56px;
     font-family: 'LatoWebBold';
     vertical-align: middle;
     position: static;
+    color: #333;
 }
 .securitypractice .business-text a.red:hover {
     text-decoration: underline;

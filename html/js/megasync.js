@@ -613,7 +613,9 @@ var megasync = (function() {
     }
 
     ns.getLinuxReleases = function(next) {
-        if (linuxClients) next(linuxClients);
+        if (linuxClients) {
+            return next(linuxClients);
+        }
 
         // Talk to the CMS server and get information
         // about the `sync` (expect a JSON)

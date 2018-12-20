@@ -899,10 +899,6 @@ scparser.$add('t', function(a, scnodes) {
     }
     ufsc.save(rootNode);
 
-    if (!pfid && u_type) {
-        M.checkStorageQuota();
-    }
-
     if (d) {
         // f2 if set must be empty since the nodes must have been processed through workers.
         console.assert(!a.t || !a.t.f2 || !a.t.f2.length, 'Check this...');
@@ -1185,10 +1181,6 @@ scparser.$add('d', function(a) {
     }
     if (!pfid) {
         scparser.$notify(a);
-
-        if (fminitialized && u_type) {
-            M.checkStorageQuota(ulmanager.ulOverStorageQuota ? 2000 : 0);
-        }
     }
     if (!is_mobile) {
         if (fileDeletion && !a.v) {// this is a deletion of file.
@@ -3411,7 +3403,12 @@ function loadfm_done(mDBload) {
 
             // setup fm-notifications such as 'full' or 'almost-full' if needed.
             if (!pfid && u_type) {
-                M.checkStorageQuota(50);
+                M.getStorageState().then(function(res) {
+                    // 0: Green, 1: Orange (almost full), 2: Red (full)
+                    if (res >= 1) {
+                        M.checkStorageQuota(50);
+                    }
+                });
             }
         }
         else {

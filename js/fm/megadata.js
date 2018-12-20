@@ -146,11 +146,30 @@ function MegaData() {
         var dummy = function() {
             return MegaPromise.resolve();
         };
-        // this['check' + 'StorageQuota'] = dummy;
-        this['show' + 'OverStorageQuota'] = dummy;
         this['init' + 'UIKeyEvents'] = dummy;
         this['abort' + 'Transfers'] = dummy;
         this['search' + 'Path'] = dummy;
+
+        // this['check' + 'StorageQuota'] = dummy;
+        this['show' + 'OverStorageQuota'] = function(data) {
+            if (data.isAlmostFull) {
+                var ab = mobile.alertBanner;
+                var isPro = Object(u_attr).p;
+
+                if (data.isFull) {
+                    ab.showError(isPro ? l[16358] : l[16315]); // Your account is full
+                    mobile.overStorageQuotaOverlay.show();
+                }
+                else {
+                    ab.showWarning(isPro ? l[16359] : l[19486]); // Your account is almost full.
+                }
+
+                // When the banner is taped, show pro page.
+                ab.onTap(function() {
+                    loadSubPage('pro');
+                });
+            }
+        };
 
         this['render' + 'Main'] = function(aUpdate) {
             if (aUpdate) {

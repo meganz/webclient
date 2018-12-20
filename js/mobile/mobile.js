@@ -467,33 +467,6 @@ mBroadcaster.once('startMega:mobile', function() {
     mobile.orientation = getOrientation();
 });
 
-mBroadcaster.once('startMega', function() {
-    'use strict';
-
-    /**
-     * Show storage overquota banner
-     * @param {Number} perc percent
-     */
-    M.showOverStorageQuota = function(perc) {
-        if (perc > 90) {
-            var ab = mobile.alertBanner;
-            var isPro = Object(u_attr).p;
-            if (perc > 99) {
-                ab.showError(isPro ? l[16358] : l[16315]); // Your account is full
-                mobile.overStorageQuotaOverlay.show();
-            } else {
-                ab.showWarning(isPro ? l[16359] : l[19486]); // Your account is almost full.
-            }
-
-            // When the banner is taped, show pro page.
-            ab.onTap(function() {
-                loadSubPage('pro');
-            });
-        }
-    };
-});
-
-
 /**
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */

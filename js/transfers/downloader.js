@@ -238,8 +238,7 @@ ClassChunk.prototype.onXHRerror = function(args, xhr) {
         dlmanager.logger.error('ClassChunk.onXHRerror', this.task && this.task.chunk_id, args, xhr, this);
     }
     if (this.isCancelled()) {
-        ASSERT(0, 'This chunk should have been destroyed before reaching XHR.onerror..');
-        return;
+        return console.warn('This chunk should have been destroyed before reaching onerror...');
     }
 
     this.Progress.data[this.xid][0] = 0; /* reset progress */
@@ -285,7 +284,7 @@ ClassChunk.prototype.onXHRready = function(xhrEvent) {
     else if (!this.dl.cancelled) {
         if (d) {
             dlmanager.logger.error("HTTP FAILED",
-                this.dl.n, xhr.status, "am i done? " + this.done, r && r.bytesLength, this.size);
+                this.dl.n, xhr.status, "am i done? " + this.done, r && r.byteLength, this.size);
         }
         if (dlMethod === MemoryIO) {
             try {

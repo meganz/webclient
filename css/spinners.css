@@ -700,8 +700,6 @@ background-color:#1DA2E9
  transform: scale(1.0);
 }
 }
-
-
 .loading-spinner.light.small .main-loader {
     background-image: url(../images/mega/loader-light-small.gif);
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
@@ -720,4 +718,25 @@ background-color:#1DA2E9
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+}
+
+@-webkit-keyframes downward-arrow {
+    0%   { bottom: 152px; opacity:0.4;  }
+    58%   { bottom: 120px; opacity:1; }
+    100% { bottom: 152px; opacity:0.4; }
+}
+@-moz-keyframes downward-arrow {
+    0%   { bottom: 152px; opacity:0.4;  }
+    58%   { bottom: 120px; opacity:1; }
+    100% { bottom: 152px; opacity:0.4; }
+}
+@-o-keyframes downward-arrow {
+    0%   { bottom: 152px; opacity:0.4;  }
+    58%   { bottom: 120px; opacity:1; }
+    100% { bottom: 152px; opacity:0.4; }
+}
+@keyframes downward-arrow {
+    0%   { bottom: 152px; opacity:0.4;  }
+    58%   { bottom: 120px; opacity:1; }
+    100% { bottom: 152px; opacity:0.4; }
 }

@@ -473,19 +473,7 @@ var astroPayDialog = {
             astroPayDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             astroPayDialog.$pendingOverlay.addClass('hidden');
 
-            // Make sure it fetches new account data on reload
-            if (M.account) {
-                M.account.lastupdate = 0;
-            }
-
-            // Load file manager on mobile
-            if (is_mobile) {
-                loadSubPage('fm');
-            }
-            else {
-                // Otherwise on desktop, load the payment history section
-                loadSubPage('fm/account/history');
-            }
+            pro.redirectToSite();
         });
     }
 };
@@ -853,14 +841,7 @@ var voucherDialog = {
             voucherDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             voucherDialog.$successOverlay.addClass('hidden');
 
-            // Make sure it fetches new account data on reload
-            // and redirect to account page to show purchase
-            if (M.account) {
-                M.account.lastupdate = 0;
-            }
-
-            // On mobile just load the main account page as there is no payment history yet
-            loadSubPage(is_mobile ? 'fm/account' : 'fm/account/history');
+            pro.redirectToSite();
         });
     }
 };
@@ -999,57 +980,8 @@ var sabadell = {
      * @param {String} verifyUrlParam The URL parameter e.g. 'success' or 'failure'
      */
     showPaymentResult: function(verifyUrlParam) {
-
-        var $backgroundOverlay = $('.fm-dialog-overlay');
-        var $pendingOverlay = $('.payment-result.pending.alternate');
-        var $failureOverlay = $('.payment-result.failed');
-
-        // Show the overlay
-        $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-
-        // On successful payment
-        if (verifyUrlParam === 'success') {
-
-            // Show the success
-            $pendingOverlay.removeClass('hidden');
-
-            insertEmailToPayResult($pendingOverlay);
-
-            // Add click handlers for 'Go to my account' and Close buttons
-            $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
-
-                // Hide the overlay
-                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-                $pendingOverlay.addClass('hidden');
-
-                // Make sure it fetches new account data on reload
-                if (M.account) {
-                    M.account.lastupdate = 0;
-                }
-
-                // Load file manager on mobile
-                if (is_mobile) {
-                    loadSubPage('fm');
-                }
-                else {
-                    // Otherwise on desktop, load the payment history section
-                    loadSubPage('fm/account/history');
-                }
-            });
-        }
-        else {
-            // Show the failure overlay
-            $failureOverlay.removeClass('hidden');
-
-            // On click of the 'Try again' or Close buttons, hide the overlay
-            $failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
-
-                // Hide the overlay
-                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-                $failureOverlay.addClass('hidden');
-                loadSubPage('pro');
-            });
-        }
+        'use strict';
+        return pro.showPaymentResult(verifyUrlParam);
     }
 };
 
@@ -1618,57 +1550,8 @@ var addressDialog = {
      * @param {String} verifyUrlParam The URL parameter e.g. 'success' or 'failure'
      */
     showPaymentResult: function(verifyUrlParam) {
-
-        var $backgroundOverlay = $('.fm-dialog-overlay');
-        var $pendingOverlay = $('.payment-result.pending.alternate');
-        var $failureOverlay = $('.payment-result.failed');
-
-        // Show the overlay
-        $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-
-        // On successful payment
-        if (verifyUrlParam === 'success') {
-
-            // Show the success
-            $pendingOverlay.removeClass('hidden');
-
-            insertEmailToPayResult($pendingOverlay);
-
-            // Add click handlers for 'Go to my account' and Close buttons
-            $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
-
-                // Hide the overlay
-                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-                $pendingOverlay.addClass('hidden');
-
-                // Make sure it fetches new account data on reload
-                if (M.account) {
-                    M.account.lastupdate = 0;
-                }
-
-                // Load file manager on mobile
-                if (is_mobile) {
-                    loadSubPage('fm');
-                }
-                else {
-                    // Otherwise on desktop, load the payment history section
-                    loadSubPage('fm/account/history');
-                }
-            });
-        }
-        else {
-            // Show the failure overlay
-            $failureOverlay.removeClass('hidden');
-
-            // On click of the 'Try again' or Close buttons, hide the overlay
-            $failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
-
-                // Hide the overlay
-                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-                $failureOverlay.addClass('hidden');
-                loadSubPage('pro');
-            });
-        }
+        'use strict';
+        return pro.showPaymentResult(verifyUrlParam);
     }
 };
 
@@ -2100,11 +1983,7 @@ var cardDialog = {
             // Reset flag so they can try paying again
             cardDialog.paymentInProcess = false;
 
-            // Make sure it fetches new account data on reload
-            if (M.account) {
-                M.account.lastupdate = 0;
-            }
-            loadSubPage('fm/account/history');
+            pro.redirectToSite();
         });
     },
 

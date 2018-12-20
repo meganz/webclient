@@ -121,12 +121,16 @@ function initMegasync() {
 }
 
 function changeLinux(linuxsync, i) {
-
     'use strict';
-    
+
     var $content = $('.bottom-page.megasync');
 
     if (linuxsync[i]) {
+        var platform = '64';
+        if ($('.linux32', $content).parent().hasClass('radioOn')) {
+            platform = '32';
+        }
+
         if (linuxsync[i]['32']) {
             $content.find('.linux32').parent().show();
             $content.find('.radio-txt.32').show();
@@ -134,20 +138,20 @@ function changeLinux(linuxsync, i) {
         else {
             $content.find('.linux32').parent().hide();
             $content.find('.radio-txt.32').hide();
+
+            if (platform === '32') {
+                platform = '64';
+                $('.architecture-checkbox input.linux64', $content).trigger('click');
+            }
         }
 
         $content.find('.megaapp-linux-default').text(linuxsync[i].name);
         $content.find('.nav-buttons-bl a.linux').removeClass('download disabled');
-        var platform = '64';
-        var c = $('.linux32').parent().attr('class');
-        if (c && c.indexOf('radioOn') > -1) {
-            platform = '32';
-        }
+
         syncurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform);
         nautilusurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform + "n");
-        var filename = syncurl.split('/').pop();
-        $content.find('.nav-buttons-bl a.linux').addClass('download')
-            .attr('data-link', syncurl);
+        $content.find('.nav-buttons-bl a.linux').addClass('download').attr('data-link', syncurl);
+        mBroadcaster.sendMessage('megasync-linux-distro-selected', syncurl);
 
         var $nautiluslink = $content.find('.megaapp-button-info.linux-txt');
         if (nautilusurl === "https://mega.nz/MEGAsyncSetup.exe") {
@@ -164,8 +168,8 @@ function changeLinux(linuxsync, i) {
         nautilusurl = false;
         $content.find('.nav-buttons-bl a.linux').removeClass('download').addClass('disabled')
             .attr('data-link', '');
-        $content('.megaapp-button-info.linux-txt').addClass('disabled');
-        $content('.megaapp-button-info.linux-txt a').removeAttr('href');
-        $content('.megaapp-linux-default').text(l[7086]);
+        $content.find('.megaapp-button-info.linux-txt').addClass('disabled');
+        $content.find('.megaapp-button-info.linux-txt a').removeAttr('href');
+        $content.find('.megaapp-linux-default').text(l[7086]);
     }
 }

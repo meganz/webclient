@@ -1684,7 +1684,7 @@ height: 56px;
 .bottom-page.top-dark-info.medium {
     font-size: 36px;
     line-height: 48px;
-    font-family: 'montserrat-light', 'source_sans_prolight', arial;
+    font-family: 'montserrat_light', 'source_sans_prolight', arial;
     z-index: 99;
 }
 .bottom-page.top-dark-info.small {
@@ -1704,16 +1704,32 @@ height: 56px;
     line-height: 24px;
     color: #333333;
     padding: 28px 0 0px 0;
-    font-family: 'source_sans_prosemibold';
+    font-family: 'LatoWebBold', 'source_sans_prosemibold';
 }
 .cmd .default-select.megaapp-dropdown {
     margin: 13px auto 12px auto;
     color: #333333;
     width: 250px;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
+    -webkit-box-shadow: 0 0 0 0 rgba(0,0,0,0.15);
+    -moz-box-shadow: 0 0 0 0 rgba(0,0,0,0.15);
+    box-shadow: 0 0 0  0 rgba(0,0,0,0.15);
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
+.cmd .default-select.megaapp-dropdown:hover {
+    box-shadow: 0 0 0  4px rgba(0,0,0,0.15);
+    -webkit-box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+
 .cmd .default-select.megaapp-dropdown::before {
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
@@ -1796,6 +1812,12 @@ height: 56px;
     font-size: 14px;
     line-height: 24px;
     padding: 28px 0 62px 0;
+}
+.bottom-page.megasync.linux .megaapp-button-info {
+    padding-bottom: 0;
+}
+.bottom-page.megasync.linux .default-select.megaapp-dropdown {
+    margin-top: 20px;No 
 }
 .megaapp-button-info a.red {
     cursor: pointer;
@@ -2491,7 +2513,6 @@ height: 56px;
 .mobile .bottom-page.top-title {
     line-height: 38px;
     font-size: 34px;
-}
 }
 /* end of MEGAcmd */
 
@@ -3384,6 +3405,9 @@ height: 56px;
 .securitypractice .improved-recovery-steps .recover-paste-block .right-section {
     width: 49.5%;
 }
+.securitypractice .default-green-button {
+    font-weight: 600;
+}
 
 /* Open source page */
 .main-mid-pad.opensource {
@@ -3500,6 +3524,393 @@ a.opensource-icon-txt.coming-soon {
 /*  end of Open source */
 
 
+/* Desktop download during onboarding phase */
+.onboarding-suggestions .top-buttons, .onboarding-suggestions .top-icon.menu, .onboarding-suggestions .top-icon.notification, .onboarding-suggestions .top-icon.achievements, .onboarding-suggestions .membership-status-block {
+    display: none;
+}
+.onboarding-suggestions .bottom-page.top-description {
+    margin: 24px auto 36px;
+    padding: 0;
+}
+ .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
+    background-color: #fafafa;
+    height: 100%;
+    height: -webkit-calc(100%);
+    height: -moz-calc(100%);
+    height: calc(100%);
+}
+.onboarding-suggestions .bottom-page.bottom-bar {
+    bottom: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 120px;
+    color: #A1A7AF;
+    background-color: white;
+    display: table;
+    width: 100%;
+    font-size: 15px
+}
+.onboarding-suggestions .bottom-page.bottom-bar.border {
+    border-top: 2px solid #ddd;
+}
+.onboarding-suggestions .button-wrappers {
+    margin: 0 auto;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+.onboarding-suggestions .text-button:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+.default-green-button.height-48.redirect-clouddrive, .default-green-button.height-48.download-app {
+    font-size: 16px;
+    padding: 0 24px;
+    z-index: 999;
+}
+.default-green-button.redirect-clouddrive.hidden, .default-green-button.download-app.hidden {
+    display: none;
+}
+.onboarding-suggestions .bottom-page.horizontal-centered-bl {
+    min-height: 680px;
+    z-index: 999;
+    padding: 0 24px;
+    box-sizing: border-box;
+    height: 680px;
+    padding-top: 24px;
+}
+.onboarding-suggestions .bottom-page.horizontal-centered-bl.resize {
+    min-height: 560px;
+}
+.onboarding-suggestions .download-app {
+    min-width: 240px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.onboarding-suggestions .onboard-image-wrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 130px;
+    top: 0;
+    z-index: 0;
+    text-align: center;
+}
+.onboarding-suggestions .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after {
+    width: 102px;
+    height: 102px;
+    background-image: url(../images/mega/onboarding_download_v1.png);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: 600px auto;
+    margin: 0 auto;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.desktop-active {
+    background-position: 0 0;
+    width: 227px;
+    height: 138px;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.desktop-inactive {
+    background-position: -373px 0;
+    width: 227px;
+    height: 138px;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.clouds {
+    background-position: center -163px;
+    max-width: 505px;
+    width: 100%;
+    height: 98px;
+    bottom: -10px;
+    opacity: 1;
+    -webkit-transition: all 100ms ease-in-out;
+    -moz-transition: all 100ms ease-in-out;
+    -o-transition: all 100ms ease-in-out;
+    -ms-transition: all 100ms ease-in-out;
+    transition: all 100ms ease-in-out;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.clouds.hidden, .onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-mega.hidden, .onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow.hidden {
+    opacity: 0;
+    display: block;
+    -webkit-transition: all 100ms ease-in-out;
+    -moz-transition: all 100ms ease-in-out;
+    -o-transition: all 100ms ease-in-out;
+    -ms-transition: all 100ms ease-in-out;
+    transition: all 100ms ease-in-out;
+} 
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-mega {
+    background-position: -260px -7px;
+    width: 80px;
+    height: 80px;
+    bottom: 222px;
+    opacity: 0;
+    display: none;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-mega.visible {
+    opacity: 1;
+    display: block;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow {
+    background-position: -260px -80px;
+    width: 80px;
+    height: 80px;
+    bottom: 147px;
+    opacity: 0;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow.visible { 
+    -webkit-animation: downward-arrow 2s infinite ease-in-out; /* Safari 4+ */
+    -moz-animation:    downward-arrow 2s infinite ease-in-out; /* Fx 5+ */
+    -o-animation:      downward-arrow 2s infinite ease-in-out; /* Opera 12+ */
+    animation:         downward-arrow 2s infinite ease-in-out; /* IE 10+, Fx 29+ */
+}
+.onboarding-suggestions .onboard-image.mobile-apps {
+    background-position: -35px -292px;
+    width: 154px;
+    height: 160px;
+    bottom: 0;
+    position: relative;
+    display: none;
+    margin: 0 auto 20px;
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-progress {
+    background-position: -237px -320px;
+    width: 126px;
+    height: 114px;
+    bottom: 132px;
+    transform: scale(.75);
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed {
+    background-position: -421px -326px;
+    width: 167px;
+    height: 104px;
+    bottom: 83px;
+    left: 348px;
+    z-index: -1;
+    transform: scale(.75);
+}
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select {
+    background-position: -441px -468px;
+    width: 128px;
+    height: 104px;
+    left: -347px;
+    bottom: 68px;
+    transform: scale(.75);
+}
+.onboarding-suggestions .badge {
+    font-family: 'LatoWebBold', 'source_sans_proregular', sans-serif;
+}
+.onboarding-suggestions .default-green-button.redirect-clouddrive::after{
+    width: 26px;
+    height: 24px;
+    background-position: -571px -170px;
+    content: '';
+    margin: 0 0 -10px 9px;
+    display: inline-block;
+    position: relative;
+}
+.onboarding-suggestions .text-button.redirect-clouddrive-link {
+    display: inline-block;
+    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
+}
+.onboarding-suggestions .text-button.redirect-clouddrive-link.hidden {
+    display: none;
+}
+.onboarding-suggestions .cmd .default-select.megaapp-dropdown {
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    -moz-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    height: 40px;
+    line-height: 39px;
+    background-position: right -8356px;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    width: 250px;
+    margin-top: 20px;
+}
+.onboarding-suggestions .cmd .default-select.megaapp-dropdown:hover {
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+    -webkit-box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.onboarding-suggestions .cmd .default-select::before {
+    height: 40px;
+}
+.onboarding-suggestions .cmd.megaapp-linux .bottom-page.split-buttons {
+    width: 250px;
+    white-space: nowrap;
+    margin: 0 auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0;
+}
+.split-buttons div.radioOn, .split-buttons div.radioOff {
+    float: left;
+    width: calc((100% - 8px ) / 2 );
+    height: 36px;
+    margin-right:0;
+    margin-top: 0;
+    cursor: pointer;
+    background-color: white;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    position: relative;
+    -webkit-box-shadow: 0 0 0 0 rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 0 0 0 rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 0 rgba(0,0,0,0.1);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    border: 1px solid #ddd;
+}
+.onboarding-suggestions .split-buttons div:first-of-type {
+    margin-right: 8px;
+}
+.split-buttons div.radioOn::before, .split-buttons div.radioOff::before {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    content:none;
+    left: 0;
+    top: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius:0;
+    border-radius: 0;
+    -webkit-box-shadow: 0 0 0 0 rgba(0,0,0,0.15);
+    -moz-box-shadow: 0 0 0 0 rgba(0,0,0,0.15);
+    box-shadow: 0 0 0 0 rgba(0,0,0,0.15);
+}
+.split-buttons div.radioOn::after, .split-buttons div.radioOff::after {
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+    content: none;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background-color: rgba(0,0,0,0);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 0px solid transparent;
+}
+.split-buttons .radio-txt {
+    float: initial;
+    font-size: 14px;
+    line-height: 34px;
+    color: #777777;
+    padding-right: 0;
+    padding-top: 0;
+    max-width: -webkit-calc(100%);
+    max-width: -moz-calc(100%);
+    max-width: calc(100%);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: block;
+    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
+}
+.split-buttons div.radioOff:hover {
+    background-color: #E5F8F6;
+    border: 1px solid #5BC6B8;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.split-buttons div.radioOn {
+    background-color: #E5F8F6;
+    border: 1px solid #5BC6B8;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.split-buttons div.radioOn .radio-txt {
+    color: #495057;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
+}
+.onboarding-suggestions .megaapp-linux-info {
+    padding: 0;
+}
+.onboarding-suggestions .megaapp-linux.cmd {
+    margin-bottom: 8px;
+    z-index: 9999;
+    position: relative;
+}
+.onboarding-suggestions.linux .cmd .default-select.megaapp-dropdown, .onboarding-suggestions.linux .cmd.megaapp-linux .bottom-page.split-buttons, .onboarding-suggestions.linux .download-app {
+    width: 300px;
+}
+.onboarding-suggestions.linux .download-app {
+    margin-top: 0px;
+}
+.onboarding-suggestions .top-description.mobile-download, .onboarding-suggestions .top-dark-info.medium.mobile-download, .onboarding-suggestions a.fm-avatar {
+    display: none;
+} 
+.onboarding-suggestions a.logo {
+    cursor: default;
+}
+.onboarding-suggestions .bottom-page.big-icon.sync-icon {
+    transform: scale(.75);
+}
+.onboarding-suggestions .bottom-page.top-dark-info.medium {
+    font-size: 28px;
+    line-height: 42px;
+}
+.onboarding-suggestions .bottom-page.top-dark-info.medium {
+    font-size: 28px;
+    line-height: 42px;
+}
+.onboarding-suggestions .bottom-page.top-dark-info.medium {
+    font-size: 28px;
+    line-height: 42px;
+}
+.bottom-page.onboarding-suggestions {
+    min-height: 640px;
+}
+.onboarding-suggestions .os-mac-windows-toggle, .onboarding-suggestions .os-linux-toggle  {
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
+}
+.onboarding-suggestions .megaapp-linux .megaapp-dropdown-list {
+    z-index: 9999;
+}
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow, .bottom-page.top-title::before, .pages-nav.nav-icon.bott-sprite, .bottom-page.mid-icon, .bottom-page.cols-container .col3::before, .bottom-page.tab-lnk-icon, .cmd-top-img, .bottom-page.scroll-icon, .bottom-page.dark-button, .bottom-page.big-link i, .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite {
     background-image: url(../images/mega/pages-sprite_v4@2x.png) !important;
@@ -3512,6 +3923,10 @@ a.opensource-icon-txt.coming-soon {
 .bottom-page .security-illustration, .bottom-page.password-manager-app-select .app-link-icon {
     background-image: url(../images/mega/bottom-page/security-page-v1@2x.png);    
     background-size: 750px auto;
+}
+.onboarding-suggestions .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after  {
+    background-image: url(../images/mega/onboarding_download_v1@2x.png);
+    background-size: 600px auto;
 }
 }
 .mobile .default-huge-button.inline, .mobile .megaapp-button-info {
@@ -3575,6 +3990,9 @@ a.opensource-icon-txt.coming-soon {
 }
 .securitypractice .bottom-page.table.changed-order .right-cell-35.order2 {
     display: block;
+}
+.onboarding-suggestions .bottom-page.horizontal-centered-bl {
+    max-width: 720px;
 }
 }
 
@@ -3894,6 +4312,9 @@ body:not(.en) .pages-nav.content-block .nav-button {
 .bottom-page.top-description {
     padding: 40px 0 25px 0;
 }
+.onboarding-suggestions .bottom-page.top-description {
+    font-size: 15px;
+}
 .bottom-page.img.mobile-top {
     width: 100%;
     margin: 0 0 0 0;
@@ -4187,7 +4608,9 @@ body:not(.en) .pages-nav.content-block .nav-button {
 .megasync .bottom-page.img.mobile-view {
 	margin-top: 24px;
 }
-
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select, .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-progress, .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed {
+    display: none;
+}
 }
 @media only screen and (max-width: 1260px) and (min-height: 750px) {
 .bottom-page.img.ios-top {
@@ -4401,8 +4824,14 @@ body:not(.en) .pages-nav.content-block .nav-button {
     width: 100%;
     margin: 0 0 0 0;
 }
+.onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
+    max-height: initial;
+    min-height: 680px;
 }
-
+.onboarding-suggestions .bottom-page.horizontal-centered-bl.resize {
+    min-height: 640px;
+}
+}
 /* SE Device Size */
 @media only screen and (max-width: 321px) {
 .megasync .bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {

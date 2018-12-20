@@ -3529,7 +3529,7 @@ a.opensource-icon-txt.coming-soon {
     display: none;
 }
 .onboarding-suggestions .bottom-page.top-description {
-    margin: 24px auto 44px;
+    margin: 24px auto 36px;
     padding: 0;
 }
  .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
@@ -3573,10 +3573,12 @@ a.opensource-icon-txt.coming-soon {
     display: none;
 }
 .onboarding-suggestions .bottom-page.horizontal-centered-bl {
-    min-height: 720px;
+    min-height: 680px;
     z-index: 999;
     padding: 0 24px;
     box-sizing: border-box;
+    height: 680px;
+    padding-top: 24px;
 }
 .onboarding-suggestions .bottom-page.horizontal-centered-bl.resize {
     min-height: 560px;
@@ -3694,15 +3696,15 @@ a.opensource-icon-txt.coming-soon {
     background-position: -237px -320px;
     width: 126px;
     height: 114px;
-    bottom: 147px;
+    bottom: 132px;
     transform: scale(.75);
 }
 .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed {
     background-position: -421px -326px;
     width: 167px;
     height: 104px;
-    bottom: 102px;
-    left: 358px;
+    bottom: 83px;
+    left: 348px;
     z-index: -1;
     transform: scale(.75);
 }
@@ -3710,8 +3712,8 @@ a.opensource-icon-txt.coming-soon {
     background-position: -441px -468px;
     width: 128px;
     height: 104px;
-    left: -338px;
-    bottom: 84px;
+    left: -347px;
+    bottom: 68px;
     transform: scale(.75);
 }
 .onboarding-suggestions .badge {
@@ -3868,7 +3870,7 @@ a.opensource-icon-txt.coming-soon {
     padding: 0;
 }
 .onboarding-suggestions .megaapp-linux.cmd {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     z-index: 9999;
     position: relative;
 }

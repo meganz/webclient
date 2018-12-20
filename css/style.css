@@ -25319,24 +25319,24 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin-top: 25px;
 }
 
-.new-bottom-pages.privacy-policy span.text.list-item {
+.terms-page-content.privacy-policy span.text.list-item {
     display: list-item;
     list-style-type: disc;
     list-style-position: inside;
 }
 
 /* Terms page index table */
-.new-bottom-pages.terms .index-table {
+.terms-page-content.terms .index-table {
     margin:24px auto;
     width: 100%;
 }
 
-.new-bottom-pages.terms .index-table td {
+.terms-page-content.terms .index-table td {
     font-family: 'latoWeb', 'source_sans_proregular', sans-serif;
     padding: 8px 8px 8px 0;
 }
 
-.new-bottom-pages.terms .index-table td:not(:first-child) {
+.terms-page-content.terms .index-table td:not(:first-child) {
     text-align: right;
 }
 /* end terms page index table */

@@ -5138,10 +5138,12 @@ div.checkboxOn, div.checkboxOff {
     color: #00A58F;
 }
 .mobile.my-account-page .account-usage-block.warning,
+.mobile.my-account-page .account-usage-block.warning .storage-usage,
 .mobile.my-account-page .account-usage-block.warning .account-usage-text {
     color: #ff971e;
 }
 .mobile.my-account-page .account-usage-block.over-quota,
+.mobile.my-account-page .account-usage-block.over-quota .storage-usage,
 .mobile.my-account-page .account-usage-block.over-quota .account-usage-text {
     color: #eb4444;
 }

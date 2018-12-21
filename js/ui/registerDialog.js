@@ -147,6 +147,9 @@
             // Set a flag that the registration came from the Pro page
             var fromProPage = true;
 
+            // Set a flag indicating the registration came from the webclient.
+            localStorage.signUpStartedInWebclient = '1';
+
             // Set the signup function to start the new secure registration process
             if (security.register.newRegistrationEnabled()) {
                 security.register.startRegistration(rv.first, rv.last, rv.email, rv.password,

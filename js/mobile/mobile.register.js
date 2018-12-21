@@ -194,6 +194,9 @@ mobile.register = {
                 return false;
             }
 
+            // Set a flag indicating the registration came from the webclient.
+            localStorage.signUpStartedInWebclient = '1';
+
             // If they came from the Pro page, set the flag
             var fromProPage = (localStorage.getItem('proPageContinuePlanNum') !== null) ? true : false;
 

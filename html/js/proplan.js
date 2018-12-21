@@ -86,6 +86,8 @@ pro.proplan = {
 
             var $selectedPlan = $(this);
             var planNum = $selectedPlan.attr('data-payment');
+            var signUpStartedInWebclient = localStorage.signUpStartedInWebclient;
+            delete localStorage.signUpStartedInWebclient;
 
             // Select the plan
             $planBlocks.removeClass('selected');
@@ -94,7 +96,7 @@ pro.proplan = {
             // If coming from the process key step and they click on the Free plan
             if (planNum === '0') {
                 // pro.redirectToSite(page === 'fm' ? 'start' : 'fm');
-                loadSubPage('downloadapp');
+                loadSubPage(signUpStartedInWebclient ? 'downloadapp' : 'fm');
 
                 if (localStorage.gotOverquotaWithAchievements) {
                     onIdle(function() {

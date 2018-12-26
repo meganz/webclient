@@ -4015,7 +4015,7 @@ React.makeElement = React['createElement'];
 	            }
 	        });
 	    },
-	    eventuallyReinitialise: SoonFc(function (forced, scrollPositionYPerc, scrollToElement) {
+	    eventuallyReinitialise: function eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
 	        var self = this;
 
 	        if (!self.isMounted()) {
@@ -4031,7 +4031,7 @@ React.makeElement = React['createElement'];
 	            self._currHeight = self.getContentHeight();
 	            self._doReinit(scrollPositionYPerc, scrollToElement, forced, $elem);
 	        }
-	    }, 75),
+	    },
 	    _doReinit: function _doReinit(scrollPositionYPerc, scrollToElement, forced, $elem) {
 	        var self = this;
 

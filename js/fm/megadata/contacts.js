@@ -616,10 +616,11 @@ MegaData.prototype.getContacts = function(n) {
 MegaData.prototype.syncUsersFullname = function(userId) {
     "use strict";
     var self = this;
+    var syncPromise = new MegaPromise();
 
     if (this.u[userId].firstName || this.u[userId].lastName) {
         // already loaded.
-        return;
+        return syncPromise.reject();
     }
 
     var lastName = {name: 'lastname', value: null};
@@ -636,7 +637,7 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             })
     ]).done(function() {
         if (!self.u[userId]) {
-            return;
+            return syncPromise.reject();
         }
 
         [firstName, lastName].forEach(function(obj) {
@@ -704,7 +705,9 @@ MegaData.prototype.syncUsersFullname = function(userId) {
                 $('.account.tab-content.general #account-lastname').val(lastName);
             }
         }
-    });
+        syncPromise.resolve();
+        });
+    return syncPromise;
 };
 
 
@@ -769,8 +772,10 @@ MegaData.prototype.syncContactEmail = function(userHash) {
      *
      * @param {object} u, user object data
      * @param {boolean} ignoreDB, don't write to indexedDB
+     * @returns {MegaPromise}   for callers to wait for the process if they want to
      */
-    MegaData.prototype.addUser = function(u, ignoreDB) {
+    MegaData.prototype.addUser = function (u, ignoreDB) {
+        var addPromise = new MegaPromise();
         if (u && u.u) {
             var userId = u.u;
 
@@ -802,12 +807,19 @@ MegaData.prototype.syncContactEmail = function(userHash) {
                 delete cleanedUpUserData.lastName;
                 delete cleanedUpUserData.name;
                 delete cleanedUpUserData.avatar;
-                fmdb.add('u', {u: u.u, d: cleanedUpUserData});
+                fmdb.add('u', { u: u.u, d: cleanedUpUserData });
                 M.u[userId].firstName = '';
                 M.u[userId].lastName = '';
             }
 
-            this.syncUsersFullname(userId);
+            var syncPromise = this.syncUsersFullname(userId);
+            syncPromise.always(function () {
+                addPromise.resolve(u);
+            });
+            return addPromise;
+        }
+        else {
+            return addPromise.reject();
         }
     };
 })(this);
@@ -925,6 +937,32 @@ MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
     "use strict";
 
     var invitePromise = new MegaPromise();
+
+    // since we have the possibility of having cached attributes of the user we are inviting
+    // we will remove the cached attrs to allow API request.
+    // this was done due to cases when a user changes his name, then we invite him
+    // in other cases when the user is in contacts list, it will be updated with APs.
+    // 1- check if we have cache
+    if (attribCache) {
+        var userHandle = null;
+        // 2- check if we cache this user. then get his handle
+        for (var us in M.u) {
+            if (M.u[us] && M.u[us].m && M.u[us].m === target) {
+                userHandle = us;
+                break;
+            }
+        }
+        // 3- if we found the user, remove the cached attrs.
+        if (userHandle) {
+            var userKeys = [userHandle + '_lastname', userHandle + '_firstname'];
+            for (var k = 0; k < userKeys.length; k++) {
+                attribCache.removeItem(userKeys[k]);
+                //attribCache.setItem(userKeys[k], JSON.stringify([undefined, undefined]));
+            }
+            M.u[userHandle].firstName = '';
+            M.u[userHandle].lastName = '';
+        }
+    }
 
     if (d) {
         console.debug('inviteContact');

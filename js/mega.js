@@ -2922,12 +2922,13 @@ function process_u(u, ignoreDB) {
         }
 
         // Update user attributes M.u
-        M.addUser(u[i], ignoreDB);
+        M.addUser(u[i], ignoreDB).done(function (uElement) {
 
-        if (u[i].c === 1) {
-            // sync data objs M.u <-> M.d
-            M.d[u[i].u] = M.u[u[i].u];
-        }
+            if (uElement.c === 1) {
+                // sync data objs M.u <-> M.d
+                M.d[uElement.u] = M.u[uElement.u];
+            }
+        });
     }
 
     /*if (M.currentdirid === 'dashboard') {

@@ -627,19 +627,19 @@ MegaData.prototype.syncUsersFullname = function(userId) {
 
     MegaPromise.allDone([
         mega.attr.get(userId, 'firstname', -1)
-            .done(function(r) {
+            .done(function (r) {
                 firstName.value = r;
             }),
         mega.attr.get(userId, 'lastname', -1)
-            .done(function(r) {
+            .done(function (r) {
                 lastName.value = r;
             })
-    ]).done(function() {
+    ]).done(function () {
         if (!self.u[userId]) {
             return;
         }
 
-        [firstName, lastName].forEach(function(obj) {
+        [firstName, lastName].forEach(function (obj) {
 
             // -1, -9, -2, etc...
             if (typeof obj.value === 'string') {
@@ -704,7 +704,7 @@ MegaData.prototype.syncUsersFullname = function(userId) {
                 $('.account.tab-content.general #account-lastname').val(lastName);
             }
         }
-        });
+    });
 };
 
 

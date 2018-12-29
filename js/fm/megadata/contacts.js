@@ -616,11 +616,10 @@ MegaData.prototype.getContacts = function(n) {
 MegaData.prototype.syncUsersFullname = function(userId) {
     "use strict";
     var self = this;
-    var syncPromise = new MegaPromise();
 
     if (this.u[userId].firstName || this.u[userId].lastName) {
         // already loaded.
-        return syncPromise.reject();
+        return;
     }
 
     var lastName = {name: 'lastname', value: null};
@@ -637,7 +636,7 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             })
     ]).done(function() {
         if (!self.u[userId]) {
-            return syncPromise.reject();
+            return;
         }
 
         [firstName, lastName].forEach(function(obj) {
@@ -705,9 +704,7 @@ MegaData.prototype.syncUsersFullname = function(userId) {
                 $('.account.tab-content.general #account-lastname').val(lastName);
             }
         }
-        syncPromise.resolve();
         });
-    return syncPromise;
 };
 
 
@@ -763,6 +760,9 @@ MegaData.prototype.syncContactEmail = function(userHash) {
                 // re-render the contact view page if the presence had changed
                 M.addContactUI();
             }
+            if (M.currentdirid === 'contacts') {
+                M.openFolder(M.currentdirid, true);
+            }
         }
     };
 
@@ -772,10 +772,8 @@ MegaData.prototype.syncContactEmail = function(userHash) {
      *
      * @param {object} u, user object data
      * @param {boolean} ignoreDB, don't write to indexedDB
-     * @returns {MegaPromise}   for callers to wait for the process if they want to
      */
-    MegaData.prototype.addUser = function (u, ignoreDB) {
-        var addPromise = new MegaPromise();
+    MegaData.prototype.addUser = function(u, ignoreDB) {
         if (u && u.u) {
             var userId = u.u;
 
@@ -807,19 +805,12 @@ MegaData.prototype.syncContactEmail = function(userHash) {
                 delete cleanedUpUserData.lastName;
                 delete cleanedUpUserData.name;
                 delete cleanedUpUserData.avatar;
-                fmdb.add('u', { u: u.u, d: cleanedUpUserData });
+                fmdb.add('u', {u: u.u, d: cleanedUpUserData});
                 M.u[userId].firstName = '';
                 M.u[userId].lastName = '';
             }
 
-            var syncPromise = this.syncUsersFullname(userId);
-            syncPromise.always(function () {
-                addPromise.resolve(u);
-            });
-            return addPromise;
-        }
-        else {
-            return addPromise.reject();
+            this.syncUsersFullname(userId);
         }
     };
 })(this);

@@ -893,14 +893,12 @@
      * Refresh copy/move dialog content with newly created directory.
      */
     global.refreshDialogContent = function refreshDialogContent() {
-        var b = $('.content-panel.cloud-drive').html();
+        var tab = $.cfsection || 'cloud-drive';
 
-        if ($.copyDialog) {
-            handleDialogTabContent('cloud-drive', 'ul', b);
-        }
-        else {
-            handleDialogTabContent('cloud-drive', 'ul', b);
-        }
+        var b = $('.content-panel.' + tab).html();
+       
+        handleDialogTabContent(tab, 'ul', b);
+        delete $.cfsection; // safe deleting
 
         disableFolders($.moveDialog && 'move');
         dialogScroll('.dialog-tree-panel-scroll');
@@ -1198,6 +1196,7 @@
 
             $.cfpromise = new MegaPromise();
             $.cftarget = $.mcselected || (section === 'cloud-drive' ? M.RootID : M.RubbishID);
+            $.cfsection = section;
 
             createFolderDialog();
 

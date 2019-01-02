@@ -948,7 +948,6 @@ MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
             var userKeys = [userHandle + '_lastname', userHandle + '_firstname'];
             for (var k = 0; k < userKeys.length; k++) {
                 attribCache.removeItem(userKeys[k]);
-                //attribCache.setItem(userKeys[k], JSON.stringify([undefined, undefined]));
             }
             M.u[userHandle].firstName = '';
             M.u[userHandle].lastName = '';

@@ -390,7 +390,7 @@
             sumFails += this.part[i].failCount;
         }
 
-        if (sumFails > 2 || status !== 200) {
+        if (sumFails > 2 || status > 200) {
             // three fails across all channels, when any data received would reset the count on that channel
             if (d) {
                 this.logger.error("%s, aborting chunk download and retrying...",
@@ -825,7 +825,9 @@
                 }
 
                 if (mia !== -1) {
-                    self.logger.info("Slowest channel was %s, closing it.", mia);
+                    if (d) {
+                        self.logger.info("Slowest channel was %s, closing it.", mia);
+                    }
                     self.cloudRaidSettings.lastFailedChannel = mia;
 
                     self.part[mia].abort();
@@ -845,7 +847,7 @@
             }
         };
 
-        xhr.onloadend = function(ev) {
+        xhr.onloadend = tryCatch(function(ev) {
             var xhr = ev.target;
             var buffer = xhr.response || false;
 
@@ -898,7 +900,12 @@
                     ? skipchunkcount
                     : ((skipchunkcount + numChunks * (self.RAIDPARTS - 1)) % self.RAIDPARTS)
             );
-        };
+        }, function(ex) {
+            if (d) {
+                self.logger.error(ex);
+            }
+            self.onFailure($.Event('error', {target: self, message: ex}), partNum);
+        });
 
         var pieceUrl = part.baseUrl + "/" + pos + "-" + (pos + chunksize - 1);
 
@@ -911,7 +918,7 @@
         this.channelReplyState = 0;
 
         xhr.open("GET", pieceUrl);
-        xhr.timeout = this.XHRTIMEOUT;
+        // xhr.timeout = this.XHRTIMEOUT;
         xhr.responseType = "arraybuffer";
         xhr.send();
     };

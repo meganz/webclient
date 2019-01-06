@@ -125,6 +125,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
     loadingDialog.pshow();
 
+    currSubAccounts = mySelf.sortSubusers(currSubAccounts);
+
     var unhideUsersListSection = function () {
         subAccountsView.removeClass('hidden'); // un-hide the container
         $('.user-management-list-table', subAccountsView).removeClass('hidden'); // unhide the list table
@@ -3067,6 +3069,41 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
 
         }
     );
+};
+
+/**
+ * Sorting subusers for viewing
+ * @param {Object} subusers     Subusers list
+ * @param {Number} field        the field to sort with (0 or null means by name)
+ */
+BusinessAccountUI.prototype.sortSubusers = function (subusers, field) {
+    if (!field) { // by name
+        var tempArray = [];
+        for (var sub in subusers) {
+            tempArray.push({ key: sub, val: subusers[sub] });
+        }
+        tempArray.sort(function (a, b) {
+            if (a.val.firstname > b.val.firstname) {
+                return 1;
+            }
+            else if (a.val.firstname < b.val.firstname) {
+                return -1;
+            }
+            else {
+                if (a.val.lastname > b.val.lastname) {
+                    return 1;
+                }
+                else {
+                    return -1;
+                }
+            }
+        });
+        var sortedSubList = [];
+        for (var k = 0; k < tempArray.length; k++) {
+            sortedSubList[tempArray[k].key] = tempArray[k].val;
+        }
+        return sortedSubList;
+    }
 };
 
 

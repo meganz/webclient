@@ -20,6 +20,14 @@ var bottompage = {
         if (page === 'business') {
             bottompage.initSlider();
         }
+        if (u_attr && u_attr.b) {
+            $('.bottom-menu.body .resellerlink').hide(); // hidden class is overwritten
+            $('.bottom-menu.body .pro-link').hide(); // hidden class is overwritten
+        }
+        else {
+            $('.bottom-menu.body .resellerlink').show();
+            $('.bottom-menu.body .pro-link').show();
+        }
 
         // Init Video resizing on security page
         if (page === 'security' && !is_mobile) {

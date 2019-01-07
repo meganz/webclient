@@ -80,9 +80,7 @@ BusinessRegister.prototype.initPage = function () {
         //
         this.isLoggedIn = true;
     }
-    else {
-        api_req({ a: 'ucr' });
-    }
+
     $('.bus-reg-btn', $pageContainer).addClass('disabled');
 
     var fillPaymentGateways = function (st, list) {
@@ -292,6 +290,10 @@ BusinessRegister.prototype.initPage = function () {
             if (!inputsValidator()) {
                 return false;
             }
+            if (!u_type) {
+                api_req({ a: 'ucr' });
+            }
+
             mySelf.doRegister($nbUsersInput.val().trim(), $cnameInput.val().trim(),
                 $fnameInput.val().trim(), $lnameInput.val().trim(), $telInput.val().trim(), $emailInput.val().trim(),
                 $passInput.val());

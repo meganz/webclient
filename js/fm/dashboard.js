@@ -189,7 +189,7 @@ function dashboardUI() {
                 // Display the date their subscription will renew
                 if (timestamp > 0) {
                     $('.account.left-pane.plan-date-val').text(time2date(timestamp, 2));
-                    $('.account.left-pane.plan-date-info').text(l[7354]);
+                    $('.account.left-pane.plan-date-info').text(l[20154]);
                 }
                 else {
                     // Otherwise hide info blocks
@@ -198,7 +198,7 @@ function dashboardUI() {
             }
             else if (account.stype == 'O') {
                 // one-time or cancelled subscription
-                $('.account.left-pane.plan-date-info').text(l[16175]);
+                $('.account.left-pane.plan-date-info').text(l[20153]);
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
             }
         }

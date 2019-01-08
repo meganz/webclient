@@ -74,15 +74,11 @@ function setDateTimeFormat(locales, format) {
 
     // Create new DateTimeFormat object if it is not exist
     try {
-        $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat(locales, options);
+        $.dateTimeFormat[locales + '-' + format] = typeof Intl !== 'undefined' ?
+            new Intl.DateTimeFormat(locales, options) : 'ISO';
     }
     catch (e) {
-        if (format < 2) {
-            $.dateTimeFormat[locales + '-' + format] = 'ISO';
-        }
-        else {
-            $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat(locale, options);
-        }
+        $.dateTimeFormat[locales + '-' + format] = format > 1 ? new Intl.DateTimeFormat(locale, options) : 'ISO';
     }
 
     // Create new DateTimeFormat object if it is not exist
@@ -168,8 +164,9 @@ function setAccDateTimeFormat(locales) {
 
     // Create new DateTimeFormat object if it is not exist
     try {
-        $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat(locales, options);
-        $.acc_dateTimeFormat[locales + '-noY'] = new Intl.DateTimeFormat(locales, nYOptions);
+        $.acc_dateTimeFormat[locales] = typeof Intl !== 'undefined' ?
+            new Intl.DateTimeFormat(locales, options) : 'fallback';
+        $.acc_dateTimeFormat[locales + '-noY'] = Intl ? new Intl.DateTimeFormat(locales, nYOptions) : 'fallback';
     }
     catch (e) {
         $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat(locale, options);
@@ -192,6 +189,7 @@ function acc_time2date(unixtime, yearIsOptional) {
     }
     var locales = country ? locale + '-' + country : locale;
     var currYear = (new Date()).getFullYear();
+    var result;
 
     // If dateTimeFormat is already set with the current locale using it.
     if (!$.acc_dateTimeFormat[locales]) {
@@ -202,8 +200,16 @@ function acc_time2date(unixtime, yearIsOptional) {
         locales += '-noY';
     }
 
-    var dateFunc = $.acc_dateTimeFormat[locales].format;
-    var result = dateFunc(MyDate);
+    if ($.acc_dateTimeFormat[locales] === 'fallback') {
+        result = date_months[MyDate.getMonth()] + ' ' + MyDate.getDate();
+        if (yearIsOptional && currYear === MyDate.getFullYear()) {
+            result += MyDate.getFullYear();
+        }
+    }
+    else {
+        var dateFunc = $.acc_dateTimeFormat[locales].format;
+        result = dateFunc(MyDate);
+    }
 
     if (locale === 'en') {
         var date = MyDate.getDate();
@@ -739,6 +745,11 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[/A]', '</a>')
         .replace('[Br]', '<br><br>');
     l[20022] = l[20022].replace('[Br]', '<br><br>');
+    l[20022] = l[20022].replace('[Br]', '<br><br>');
+    l[20132] = l[20132].replace('[A]', '<span class="os-mac-windows-toggle">').replace('[/A]', '</span>')
+                       .replace('[B]', '<span class="os-linux-toggle">').replace('[/B]', '</span>');
+    l[20137] = l[20137].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
+        + '/mobile">').replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

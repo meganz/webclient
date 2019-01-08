@@ -899,10 +899,6 @@ scparser.$add('t', function(a, scnodes) {
     }
     ufsc.save(rootNode);
 
-    if (!pfid && u_type) {
-        M.checkStorageQuota();
-    }
-
     if (d) {
         // f2 if set must be empty since the nodes must have been processed through workers.
         console.assert(!a.t || !a.t.f2 || !a.t.f2.length, 'Check this...');
@@ -1211,10 +1207,6 @@ scparser.$add('d', function(a) {
     }
     if (!pfid) {
         scparser.$notify(a);
-
-        if (fminitialized && u_type) {
-            M.checkStorageQuota(ulmanager.ulOverStorageQuota ? 2000 : 0);
-        }
     }
     if (!is_mobile) {
         if (fileDeletion && !a.v) {// this is a deletion of file.
@@ -3547,7 +3539,12 @@ function loadfm_done(mDBload) {
 
             // setup fm-notifications such as 'full' or 'almost-full' if needed.
             if (!pfid && u_type) {
-                M.checkStorageQuota(50);
+                M.getStorageState().then(function(res) {
+                    // 0: Green, 1: Orange (almost full), 2: Red (full)
+                    if (res >= 1) {
+                        M.checkStorageQuota(50);
+                    }
+                });
             }
         }
         else {
@@ -3799,7 +3796,12 @@ mBroadcaster.once('boot_done', function() {
                 return;
             }
             for (var i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf("image") === 0) {
+                if (items[i].type.indexOf("text/rtf") === 0) {
+                    // halt execution, this is a Rich text formatted clipboard data, which may also contain an image,
+                    // so we need to halt here, otherwise it may be threated as image, instead of text
+                    return;
+                }
+                else if (items[i].type.indexOf("image") === 0) {
                     if (items[i] instanceof File) {
                         // Safari, using .files
                         blob = items[i];

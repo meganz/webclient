@@ -40,7 +40,7 @@
 (function _xhrTransfersLogic(global) {
     "use strict";
 
-    var xhrTimeout = parseInt(localStorage.xhrTimeout) || (2 * 60 * 1000);
+    var xhrTimeout = parseInt(localStorage.xhrTimeout) || 40000;
     var logger = MegaLogger.getLogger('xhr2');
     var debug = global.d && parseInt(localStorage.xhr2debug);
     var xhrStack = [];
@@ -156,6 +156,11 @@
 
         var self = this;
         var xhr = getXMLHttpRequest();
+
+        if (listener instanceof ClassChunk && Array.isArray(listener.dl.url)) {
+            var bytes = listener.url.match(/(\d+)-(\d+)$/).map(Number);
+            xhr = new CloudRaidRequest(listener.dl, bytes[1], ++bytes[2]);
+        }
 
         xhr.onerror = function(ev) {
             self.abort(ev);

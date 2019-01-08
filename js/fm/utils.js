@@ -325,6 +325,7 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
 
 /**
  *  Abort all pending transfers.
+ *  @param force {boolean} Force to abort transfers or not
  *
  *  @return {MegaPromise}
  *          Resolved: Transfers were aborted
@@ -333,53 +334,48 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
  *  @details This needs to be used when an operation requires that
  *           there are no pending transfers, such as a logout.
  */
-MegaUtils.prototype.abortTransfers = function megaUtilsAbortTransfers() {
+MegaUtils.prototype.abortTransfers = function megaUtilsAbortTransfers(force) {
+    "use strict";
     var promise = new MegaPromise();
+    force = force || false;
 
-    var abort = function() {
-        // if (mBroadcaster.crossTab.master || page === 'download' || u_type !== 3) {
+    var abort = function () {
+        if (dlmanager.isDownloading) {
+            dlmanager.abort(null);
+        }
+        if (ulmanager.isUploading) {
+            ulmanager.abort(null);
+        }
+        if (typeof dlmanager.isStreaming === 'object') {
+            dlmanager.isStreaming.abort();
+        }
+        dlmanager.isStreaming = false;
+
+        M.resetUploadDownload();
+        loadingDialog.show();
+        var timer = setInterval(function() {
             if (!M.hasPendingTransfers()) {
+                clearInterval(timer);
                 promise.resolve();
             }
-            else {
-                msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function(doIt) {
-                    if (doIt) {
-                        if (dlmanager.isDownloading) {
-                            dlmanager.abort(null);
-                        }
-                        if (ulmanager.isUploading) {
-                            ulmanager.abort(null);
-                        }
-                        if (typeof dlmanager.isStreaming === 'object') {
-                            dlmanager.isStreaming.abort();
-                        }
-                        dlmanager.isStreaming = false;
-
-                        M.resetUploadDownload();
-                        loadingDialog.show();
-                        var timer = setInterval(function() {
-                            if (!M.hasPendingTransfers()) {
-                                clearInterval(timer);
-                                promise.resolve();
-                            }
-                        }, 350);
-                    }
-                    else {
-                        promise.reject();
-                    }
-                });
-            }
-        /*}
-        else {
-            promise.reject();
-        }*/
+        }, 350);
     };
 
-    if (u_type > 2 && (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length)) {
-        msgDialog('warningb', l[882], l[7157], 0, abort);
-    }
-    else {
-        abort();
+    if (!M.hasPendingTransfers()) {
+        promise.resolve();
+    } else {
+        if (force) {
+            abort();
+        } else {
+            msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function(doIt) {
+                if (doIt) {
+                    abort();
+                }
+                else {
+                    promise.reject();
+                }
+            });
+        }
     }
 
     return promise;
@@ -789,10 +785,109 @@ MegaUtils.prototype.require = function megaUtilsRequire() {
 };
 
 /**
+ *  Check single tab or multiple tabs and there are any active transfers.
+ *  Show a proper message in the warning dialog before logging out.
+ */
+MegaUtils.prototype.logoutAbortTransfers = function megaUtilsLogoutAbortTransfers() {
+    "use strict";
+    var promise = new MegaPromise();
+    var singleTab = true;
+
+
+    var logoutAbort = function (htCase) {
+        if (!M.hasPendingTransfers() && singleTab) {
+            promise.resolve();
+        }
+        else {
+            var hasTransferMsg = "";
+            if (M.hasPendingTransfers() && singleTab) {
+                hasTransferMsg = l[19931];
+            }
+            switch (htCase) {
+                case "this":
+                    hasTransferMsg = l[19931];
+                    break;
+                case "other":
+                    hasTransferMsg = l[19932];
+                    break;
+                case "others":
+                    hasTransferMsg = l[19933];
+                    break;
+                case "this+other":
+                    hasTransferMsg = l[19934];
+                    break;
+                case "this+others":
+                    hasTransferMsg = l[19935];
+                    break;
+            }
+
+            msgDialog('confirmation', l[967], hasTransferMsg + ' ' + l[507] + '?', false, function(doIt) {
+                if (doIt) {
+                    watchdog.notify("abort_trans");
+                    var targetPromise = M.abortTransfers(true);
+                    promise.linkDoneAndFailTo(targetPromise);
+                }
+                else {
+                    promise.reject();
+                }
+            });
+        }
+    };
+
+    if (u_type === 0) {
+        // if it's in ephemeral session
+        watchdog.notify("abort_trans");
+        var targetPromise = M.abortTransfers(true);
+        promise.linkDoneAndFailTo(targetPromise);
+    } else {
+        watchdog.query("transing").always(function (res) {
+            if (!res.length) {
+                // if it's in normal session with a single tab
+                logoutAbort();
+            } else {
+                // if it's in normal session with multiple tabs
+                singleTab = false;
+
+                // Watch all tabs and check hasPendingTransfers in each tab
+                var hasTransferTabNum = 0;
+                res.forEach(function (i) {
+                    if (i) {
+                        hasTransferTabNum++;
+                    }
+                });
+
+                if ((hasTransferTabNum > 0) || M.hasPendingTransfers()) {
+                    if (M.hasPendingTransfers()) {
+                        if (hasTransferTabNum === 0) {
+                            logoutAbort("this");
+                        } else if (hasTransferTabNum === 1) {
+                            logoutAbort("this+other");
+                        } else {
+                            logoutAbort("this+others");
+                        }
+                    } else {
+                        if (hasTransferTabNum === 1) {
+                            logoutAbort("other");
+                        } else {
+                            logoutAbort("others");
+                        }
+                    }
+                } else {
+                    promise.resolve();
+                }
+            }
+        });
+    }
+
+    return promise;
+};
+
+/**
  *  Kill session and Logout
  */
 MegaUtils.prototype.logout = function megaUtilsLogout() {
-    M.abortTransfers().then(function() {
+    "use strict";
+    M.logoutAbortTransfers().then(function() {
         var step = 2;
         var finishLogout = function() {
             if (--step === 0) {
@@ -1129,21 +1224,84 @@ MegaUtils.prototype.getSafePath = function(path, file) {
 };
 
 /**
+ * Get the state of the storage
+ * @param {Number|Boolean} [force] Do not use the cached u_attr value
+ * @return {MegaPromise} 0: Green, 1: Orange (almost full), 2: Red (full)
+ */
+MegaUtils.prototype.getStorageState = function(force) {
+    'use strict';
+    var promise = new MegaPromise();
+
+    if (!force && Object(u_attr).hasOwnProperty('^!usl')) {
+        return promise.resolve(u_attr['^!usl'] | 0);
+    }
+
+    // XXX: Not using mega.attr.get since we don't want the result indexedDB-cached.
+    M.req({'a': 'uga', 'u': u_handle, 'ua': '^!usl', 'v': 1}).then(function(res) {
+        if (d) {
+            console.debug('getStorageState', res);
+            console.assert(res.av, 'Unexpected response...');
+        }
+        var value = base64urldecode(res.av || '');
+
+        if (typeof u_attr === 'object') {
+            u_attr['^!usl'] = value;
+        }
+        promise.resolve(value | 0);
+    }).catch(function(ex) {
+        if (d) {
+            console.warn(ex);
+        }
+        promise.reject(ex);
+    });
+
+    return promise;
+};
+
+/**
+ * Retrieve storage quota details, i.e. by firing an uq request.
+ */
+MegaUtils.prototype.getStorageQuota = function() {
+    'use strict';
+    var promise = new MegaPromise();
+
+    M.req({a: 'uq', strg: 1, qc: 1})
+        .then(function(res) {
+            if (res.uslw === undefined) {
+                res.uslw = 9000;
+            }
+            var data = Object.assign(Object.create(null), res, {
+                max: res.mstrg,
+                used: res.cstrg,
+                isFull: res.cstrg / res.mstrg >= 1,
+                percent: Math.floor(res.cstrg / res.mstrg * 100),
+                isAlmostFull: res.cstrg / res.mstrg >= res.uslw / 10000
+            });
+            promise.resolve(data);
+        })
+        .catch(function(ex) {
+            if (d) {
+                console.warn(ex);
+            }
+            promise.reject(ex);
+        });
+
+    return promise;
+};
+
+/**
  * Check Storage quota.
  * @param {Number} timeout in milliseconds, defaults to 30 seconds
  */
 MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
     delay('checkStorageQuota', function _csq() {
-        M.req({a: 'uq', strg: 1, qc: 1}).done(function(data) {
-            var perc = Math.floor(data.cstrg / data.mstrg * 100);
-
-            if (ulmanager.ulOverStorageQuota && perc < 100) {
+        M.getStorageQuota().done(function(data) {
+            if (ulmanager.ulOverStorageQuota && data.percent < 100) {
                 onIdle(function() {
                     ulmanager.ulResumeOverStorageQuotaState();
                 });
             }
-
-            M.showOverStorageQuota(perc, data.cstrg, data.mstrg);
+            M.showOverStorageQuota(data);
         });
     }, timeout || 30000);
 };
@@ -1159,7 +1317,7 @@ MegaUtils.prototype.checkGoingOverStorageQuota = function(opSize) {
     var promise = new MegaPromise();
     loadingDialog.pshow();
 
-    M.req({a: 'uq', strg: 1, qc: 1})
+    M.getStorageQuota()
         .always(function() {
             loadingDialog.phide();
         })
@@ -1171,10 +1329,9 @@ MegaUtils.prototype.checkGoingOverStorageQuota = function(opSize) {
             }
 
             if (opSize > data.mstrg - data.cstrg) {
-                var perc = Math.floor(data.cstrg / data.mstrg * 100);
                 var options = {custom: 1, title: l[882], body: l[16927]};
 
-                M.showOverStorageQuota(perc, data.cstrg, data.mstrg, options)
+                M.showOverStorageQuota(data, options)
                     .always(function() {
                         promise.reject();
                     });

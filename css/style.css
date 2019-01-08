@@ -18535,10 +18535,10 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     background-position: center -846px;
 }
 /* Logged in PRO account, but not activated by email */
-.top-warning-popup.not-activated {
+.top-warning-popup.non-activated-account {
     padding-bottom: 15px;
 }
-.top-warning-popup.not-activated .mailbox-icon {
+.top-warning-popup.non-activated-account .mailbox-icon {
     background: url(../images/mega/email-confirmation.png) 0 0 no-repeat;
     background-size: 100px 100px;
     float: left;
@@ -18547,11 +18547,11 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     margin-top: -10px;
     width: 100px;
 }
-.top-warning-popup.not-activated p {
+.top-warning-popup.non-activated-account p {
     margin-top: 10px;
     padding-top: 9px;
 }
-.top-warning-popup.not-activated .warning-popup-body {
+.top-warning-popup.non-activated-account .warning-popup-body {
     padding-bottom: 8px;
 }
 .tree-item-on-search-hidden, .tree-item-on-filter-hidden {
@@ -30857,3 +30857,33 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     -ms-transition: none!important;
     transition: none!important;
 }
+
+.takedown-guidance p.first, .privacy-policy p.first {
+    padding-top: 5px;
+}
+
+.privacy-policy h3 {
+    margin-top: 25px;
+}
+
+.terms-page-content.privacy-policy span.text.list-item {
+    display: list-item;
+    list-style-type: disc;
+    list-style-position: inside;
+}
+
+/* Terms page index table */
+.terms-page-content.terms .index-table {
+    margin:24px auto;
+    width: 100%;
+}
+
+.terms-page-content.terms .index-table td {
+    font-family: 'latoWeb', 'source_sans_proregular', sans-serif;
+    padding: 8px 8px 8px 0;
+}
+
+.terms-page-content.terms .index-table td:not(:first-child) {
+    text-align: right;
+}
+/* end terms page index table */

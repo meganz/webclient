@@ -33,6 +33,9 @@ pro.proplan = {
             // Remove the flag so next page visit (or on refresh) they will go straight to Cloud Drive
             localStorage.removeItem('keycomplete');
 
+            // Set a flag to redirect any loadSubPage('fm') to the downloadapp (desktop onboarding) page.
+            // localStorage.justGotRegistered = 1;
+
             // Show the Free plan
             $body.addClass('key');
 
@@ -102,12 +105,9 @@ pro.proplan = {
 
             // If coming from the process key step and they click on the Free plan
             if (planNum === '0') {
-                if (page === 'fm') {
-                    loadSubPage('start');
-                }
-                else {
-                    loadSubPage('fm');
-                }
+                // pro.redirectToSite(page === 'fm' ? 'start' : 'fm');
+                loadSubPage('downloadapp');
+
                 if (localStorage.gotOverquotaWithAchievements) {
                     onIdle(function() {
                         mega.achievem.achievementsListDialog();

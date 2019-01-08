@@ -2955,7 +2955,7 @@ function bottomPageDialog(close, pp, hh, tickbox) {
         });
         jScrollFade('.bp-body');
         clickURLs();
-
+        scrollToURLs();
         return $dialog;
     });
 }

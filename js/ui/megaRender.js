@@ -528,6 +528,12 @@
                 initData = this.initialize(aUpdate, aNodeList);
                 if (initData && initData.newNodeList) {
                     aNodeList = initData.newNodeList;
+
+                    // Got a new nodeList, cleanup cached DOM nodes.
+                    var nodes = Object.values(aNodeList);
+                    for (var i = nodes.length; i--;) {
+                        delete this.nodeMap[nodes[i].h];
+                    }
                 }
             }
 

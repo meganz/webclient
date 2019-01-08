@@ -133,23 +133,6 @@ function mURIDecode(path) {
     return path;
 }
 
-function clickURLs() {
-    $('a.clickurl').rebind('click', function() {
-        var $this = $(this);
-        var url = $this.attr('href') || $this.data('fxhref');
-        if (url) {
-            if (window.loadingDialog && $this.hasClass('pages-nav')) {
-                loadingDialog.quiet = true;
-                onIdle(function() {
-                    loadingDialog.quiet = false;
-                });
-            }
-            loadSubPage(url.substr(1));
-            return false;
-        }
-    });
-}
-
 function geoStaticpath(eu)
 {
     if (!eu) {
@@ -2017,6 +2000,7 @@ else if (!b_u) {
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
     jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
     jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
+    jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
@@ -2233,6 +2217,7 @@ else if (!b_u) {
         jsl.push({f:'js/transfers/queue.js', n: 'queue', j: 1, w: 4});
         jsl.push({f:'js/transfers/decrypter.js', n: 'dl_downloader', j: 1, w: 3});
         jsl.push({f:'js/vendor/videostream.js', n: 'videostream', j: 1, w: 3});
+        jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
 
         jsl.push({f:'html/embedplayer.html', n: 'index', j: 0});
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
@@ -2340,7 +2325,9 @@ else if (!b_u) {
         'charts_js': {f:'js/vendor/Chart.js', n: 'charts_js', j:1},
         'business_invoice': {f:'html/invoicePDF.html', n: 'business_invoice', j:0},
         'securitypractice': {f:'html/security-practice.html', n: 'securitypractice', j:0},
-        'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1}
+        'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1},
+        'downloadapp_js': {f:'html/js/desktop-onboarding.js', n: 'downloadapp_js', j:1},
+        'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0}
     };
 
     var jsl3 = {
@@ -2432,6 +2419,7 @@ else if (!b_u) {
         'dev': ['dev','dev_js','sdkterms'],
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
+        'downloadapp': ['downloadapp_js', 'downloadapp', 'sync_js'],
         'help': [
             'lunr_js', 'help_js'
         ],

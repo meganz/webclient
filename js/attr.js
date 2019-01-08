@@ -1041,6 +1041,11 @@ var attribCache = false;
                 });
             }
         };
+        uaPacketParserHandler['^!usl'] = function() {
+            if (fminitialized && u_type) {
+                M.getStorageState(true).always(M.checkStorageQuota.bind(M, 2e3));
+            }
+        };
         uaPacketParserHandler['*!rp'] = function() {
             if (fminitialized) {
                 mBroadcaster.sendMessage('attr:rp');

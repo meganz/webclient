@@ -7310,7 +7310,7 @@ React.makeElement = React['createElement'];
 	                                disabled: room.isReadOnly(),
 	                                onClick: function onClick() {
 	                                    if (!disabledCalls) {
-	                                        room.startVideoCall();
+	                                        room.startAudioCall();
 	                                    }
 	                                }
 	                            })
@@ -11943,7 +11943,7 @@ React.makeElement = React['createElement'];
 	        if (message instanceof Message) {
 	            if (!message.wasRendered || !message.messageHtml) {
 
-	                message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
+	                message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>").replace(/\t/g, '    ');
 
 	                message.processedBy = {};
 

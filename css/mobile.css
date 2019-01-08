@@ -8940,6 +8940,93 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .bottom-page.scroll-block.securitypractice {
     min-width: initial;
 }
+/* Download app during onboarding styles goes here */
+.mobile .onboarding-suggestions .bottom-page.bottom-bar {
+    background-color: transparent;
+    height: 72px;
+    position: relative;
+}
+.mobile .onboarding-suggestions .bottom-page.bottom-bar.border {
+    border-top: 0px solid transparent;
+    position: relative;
+    margin-top: 12px;
+}
+.mobile .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
+    background-color: #fff;
+}
+.mobile .onboarding-suggestions .bottom-page.download-container.linux-only {
+    display: block;
+    padding: 0 0;
+    background-color: #fff;
+    border: 0 solid transparent;
+    border-radius: 0;
+    margin: 0 auto;
+}
+.mobile .onboarding-suggestions .onboard-image.mobile-apps {
+    display: block;
+}
+.mobile .onboarding-suggestions .default-green-button.height-48.download-app, .mobile .onboarding-suggestions .default-green-button.height-48.redirect-clouddrive  {
+    width: 100%;
+    max-width: 420px;
+    height: 48px;
+    line-height: 47px;
+    background: #00BFA5;
+    border: 1px solid #00AC94;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    color: #fff;
+    margin: 0 auto;
+}
+.mobile .onboarding-suggestions .bottom-page.top-dark-info.medium {
+    font-size: 28px;
+    line-height: 42px;
+}
+.mobile .onboarding-suggestions .bottom-page.horizontal-centered-bl {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: initial;
+    height: auto;
+}
+.mobile .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
+    min-height: initial;
+}
+.mobile .onboarding-suggestions .top-description.pre-download, .mobile .onboarding-suggestions .top-description.post-download, .mobile .onboarding-suggestions .top-dark-info.medium.pre-download, .mobile .onboarding-suggestions .top-dark-info.medium.post-download {
+    display: none;
+}
+.mobile .onboarding-suggestions .top-description.mobile-download, .mobile .onboarding-suggestions .top-dark-info.medium.mobile-download {
+    display: block;
+}
+.mobile .onboarding-suggestions .button-wrappers {
+    padding: 0 24px;
+}
+
+.takedown-guidance p.first, .privacy-policy p.first {
+    padding-top: 5px;
+}
+
+.privacy-policy h3 {
+    margin-top: 25px;
+}
+
+.new-bottom-pages.privacy-policy span.text.list-item {
+    display: list-item;
+    list-style-type: disc;
+    list-style-position: inside;
+}
+
+/* Terms page index table */
+.new-bottom-pages.terms .index-table {
+    margin:24px auto;
+    width: 100%;
+}
+
+.new-bottom-pages.terms .index-table td {
+    font-family: 'latoWeb', 'source_sans_proregular', sans-serif;
+    padding: 8px 8px 8px 0;
+}
+
+.new-bottom-pages.terms .index-table td:not(:first-child) {
+    text-align: right;
+}
 .business-page .big-red-button.height-48 {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -9565,6 +9652,13 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         font-size: 15px;
         line-height: 26px;
         text-align: center;
+    }
+    .mobile .onboarding-suggestions .bottom-page.top-description {
+        margin: 12px auto 32px;
+    }
+    .mobile .onboarding-suggestions .bottom-page.top-dark-info.medium {
+        font-size: 24px;
+        line-height: 36px;
     } 
 }
 

@@ -517,6 +517,7 @@ function init_page() {
         && (page !== 'general')
         && (page !== 'resellers')
         && (page !== 'security')
+        && (page !== 'downloadapp')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -791,9 +792,11 @@ function init_page() {
                 });
 
                 init_login();
-                $('#login-name2').val(email);
-                $('.register-st2-button').addClass('active');
-                $('#login-name2').prop('readonly', true);
+                if (email) {
+                    $('#login-name2').val(email);
+                    $('.register-st2-button').addClass('active');
+                    $('#login-name2').prop('readonly', true);
+                }
                 topmenuUI();
             }
         };
@@ -821,8 +824,6 @@ function init_page() {
 
                 parsepage(pages['login']);
                 init_login();
-                $('.register-st2-button').addClass('active');
-                $('#login-name2').prop('readonly', true);
                 topmenuUI();
             }
         };
@@ -1416,6 +1417,9 @@ function init_page() {
     }
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
+    }
+    else if (page === 'downloadapp') {
+        desktopOnboarding();
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
@@ -2080,7 +2084,7 @@ function topmenuUI() {
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
                 'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'start', 'uwp', 'security'
+                'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp',
             ];
             var moveTo = {'account': 'fm/account'};
 
@@ -2454,6 +2458,10 @@ function pagemetadata() {
         mega_title = 'MEGAcmd - Download';
         mega_desc = 'MEGAcmd is an interactive, text console based, scriptable MEGA client.';
     }
+    else if (page === 'downloadapp') {
+        mega_title = 'Download our App';
+        mega_desc = 'MEGAcmd is an interactive, text console based, scriptable MEGA client.';
+    }
     else if (page == 'pro') {
         mega_title = 'Plans & pricing - MEGA';
         mega_desc = 'Upgrade to a MEGA PRO account for additional storage and transfer quota. MEGA provides one the cheapest cloud storage deals on the Internet.';
@@ -2542,6 +2550,7 @@ function parsepage(pagehtml, pp) {
         M.initUIKeyEvents();
     }
     clickURLs();
+    scrollToURLs();
 }
 
 function parsetopmenu() {

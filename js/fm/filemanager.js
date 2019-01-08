@@ -3802,13 +3802,11 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
 /**
  * Show storage overquota dialog
- * @param {Number} perc percent
- * @param {Number} [cstrg] Current storage usage
- * @param {Number} [mstrg] Maximum storage.
+ * @param {*} quota Storage quota data, as returned from M.getStorageQuota()
  * @param {Object} [options] Additional options
  */
-FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, options) {
-    'use strict';
+FileManager.prototype.showOverStorageQuota = function(quota, options) {
+    'use strict'; /* jshint -W074 */
 
     var promise = new MegaPromise();
     var prevState = $('.fm-main').is('.almost-full, .full');
@@ -3818,6 +3816,12 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
         promise = this.showOverStorageQuotaPromise;
     }
     this.showOverStorageQuotaPromise = promise;
+
+    if (quota === -1) {
+        quota = {percent: 100};
+        quota.isFull = quota.isAlmostFull = true;
+        options = {custom: 1};
+    }
 
     if (Object(u_attr).p) {
         // update texts with "for free accounts" sentences removed.
@@ -3836,10 +3840,10 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
             .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()) + ' ' + l[16314]);
     }
 
-    if (perc > 90 || Object(options).custom) {
+    if (quota.isAlmostFull || Object(options).custom) {
         var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('full almost-full');
 
-        if (perc > 99) {
+        if (quota.isFull) {
             $('.fm-main').addClass('fm-notification full');
             $strgdlg.addClass('full')
                 .find('.fm-dialog-body.full')
@@ -3850,7 +3854,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
                 .safeHTML(Object(options).body || l[16360]);
         }
         else {
-            if (perc >90) {
+            if (quota.isAlmostFull) {
                 $('.fm-main').addClass('fm-notification almost-full');
             }
             $strgdlg.addClass('almost-full')
@@ -3862,9 +3866,9 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
                 .safeHTML(Object(options).body || l[16312]);
 
             // Storage chart and info
-            var strQuotaLimit = bytesToSize(mstrg, 0).split(' ');
-            var strQuotaUsed = bytesToSize(cstrg);
-            var deg = 230 * perc / 100;
+            var strQuotaLimit = bytesToSize(quota.mstrg, 0).split(' ');
+            var strQuotaUsed = bytesToSize(quota.cstrg);
+            var deg = 230 * quota.percent / 100;
             var $storageChart = $('.fm-account-blocks.storage', $strgdlg);
 
             // Storage space chart
@@ -3880,7 +3884,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
             $('.chart.data .size-txt', $strgdlg).text(strQuotaUsed);
             $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
             $('.chart.data .gb-txt', $strgdlg).text(strQuotaLimit[1]);
-            $('.chart.data .perc-txt', $strgdlg).text(perc + '%');
+            $('.chart.data .perc-txt', $strgdlg).text(quota.percent + '%');
         }
 
         var closeDialog = function() {

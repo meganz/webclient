@@ -324,6 +324,10 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     if (!$.totalDL) {
         $.totalDL = 0;
     }
+    // a variable to store the current download batch size. as $.totalDL wont be cleared on failure
+    // due to MaxDownloadSize exceeding (and it should not be cleared). We need only to subtract the
+    // current batch size.
+    var currDownloadSize = 0;
 
     var p = '';
     var pauseTxt = '';
@@ -348,6 +352,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         }
         path = paths[nodes[k]] || '';
         $.totalDL += n.s;
+        currDownloadSize += n.s;
 
         var $tr = $('.transfer-table #dl_' + htmlentities(n.h));
         if ($tr.length) {
@@ -394,6 +399,8 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         if (d) {
             console.log('Downloads exceed max size', entries.length, entries);
         }
+        // subtract the current batch size from the stored total
+        $.totalDL -= currDownloadSize;
         if (!fmconfig.dlThroughMEGAsync) {
             var msgMsg = l[18213]; // 'Download size exceeds the maximum size supported by the browser. '
             //    + 'You can use MEGASync to proceed with the download.'; // 18213
@@ -1390,11 +1397,11 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
         }
 
         domElement._elmStatus = domElement.querySelector('.transfer-status');
-        domElement._elmSentSize = document.querySelector('.uploaded-size');
+        domElement._elmSentSize = domElement.querySelector('.uploaded-size');
         domElement._elmRProgress = domElement.querySelector('.right-c p');
         domElement._elmLProgress = domElement.querySelector('.left-c p');
-        domElement._elmTimeLeft = document.querySelector('.eta');
-        domElement._elmSpeed = document.querySelector('.speed');
+        domElement._elmTimeLeft = domElement.querySelector('.eta');
+        domElement._elmSpeed = domElement.querySelector('.speed');
     }
 
     if (!bl || !ul.starttime || uldl_hold) {
@@ -1476,7 +1483,7 @@ MegaData.prototype.ulerror = function(ul, error) {
             mega.megadrop.overQuota();
         }
         else {
-            M.showOverStorageQuota(100, 1, 2, {custom: 1});
+            M.showOverStorageQuota(-1);
         }
     }
     else if (error === EGOINGOVERQUOTA) {

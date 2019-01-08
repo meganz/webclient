@@ -71,6 +71,7 @@ function setDateTimeFormat(locales, format) {
     var options = {year: 'numeric'};
     options.month = format >= 2 ? 'long' : 'numeric';
     options.day = format === 3 ? undefined : 'numeric';
+    options.weekday = format === 4 ? 'long' : undefined;
 
     // Create new DateTimeFormat object if it is not exist
     try {
@@ -102,6 +103,7 @@ function setDateTimeFormat(locales, format) {
  *       1: yyyy-mm-dd (Short date format without time)
  *       2: yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format)
  *       3: yyyy fmn (fmn: Full month name, based on the locale) (Long Date format without day)
+ *       4: Monday, yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format with weekday)
  */
 function time2date(unixTime, format) {
 

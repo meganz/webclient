@@ -1852,6 +1852,7 @@ function topmenuUI() {
         if (u_attr.b) {
             $topHeader.find('.top-icon.achievements').addClass('hidden');
             $topMenu.find('.upgrade-your-account').addClass('hidden');
+            $topMenu.find('.resellers').addClass('hidden');
             $topHeader.find('.left.individual').addClass('hidden');
         }
 

@@ -26231,12 +26231,13 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-dialog .dialog-title {
     font-size: 26px;
     color: #333333;
-    line-height: 32px;
+    line-height: 36px;
     font-weight: 300;
     position: relative;
     margin:0 auto 16px auto;
     text-align: center;
     font-family: 'montserrat';
+    max-width: 90%;
 }
 
 .user-management-dialog .dialog-title.left-version {
@@ -26421,6 +26422,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-dialog .dialog-heading-img {
+    background-image: url(../images/mega/big-icons.png);
     margin:40px auto 24px auto;
 }
 
@@ -29111,7 +29113,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     left: 50%;
     margin-left: -280px;
     top: 50%;
-    margin-top: -98px;
+    margin-top: -170px;
 }
 
 .user-management-migrate-process-dialog .heading-text{
@@ -29160,7 +29162,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .process-arrow {
-    background-position: -124px 1088px;
+    background-position: -124px -1088px;
 }
 
 .user-management-migrate-process-dialog .process-arrow {
@@ -29181,6 +29183,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-color: rgba(250,250,250,1);
     position: relative;
     box-sizing: border-box;
+    border-radius: 0 0 8px 8px;
 }
 
 .user-management-migrate-process-dialog .bottom-container::before {

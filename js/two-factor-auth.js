@@ -996,7 +996,6 @@ twofactor.verifyActionDialog = {
 
         // On button click
         $lostDeviceButton.rebind('click', function() {
-
             twofactor.lostAuthenicatorDialog.init();
         });
     },
@@ -1122,12 +1121,26 @@ twofactor.lostAuthenicatorDialog = {
                 // On button click
                 $saveButton.rebind('click', function() {
 
+                    if ($('.fm-dialog.recovery-key-dialog').hasClass('post-register')) {
+                        
+                        // Show user recovery key infor warning
+                        $('.fm-dialog.recovery-key-dialog').addClass('hidden').removeClass('post-register');
+                        $('.fm-dialog.recovery-key-info').removeClass('hidden');
+
+                        // On button click close dialog
+                        $('.fm-dialog.recovery-key-info .close-dialog').rebind('click', function() {
+                            $('.fm-dialog.recovery-key-info').addClass('hidden');
+                            fm_hideoverlay();
+                        });
+                    };
+
                     twofactor.account.downloadRecoveryKey();
 
                     // show toast message
                     showToast('recoveryKey', l[8922]);
                 });
             });
+
     },
     /**
      * Initialise the button to copy the Recovery Key to clipboard

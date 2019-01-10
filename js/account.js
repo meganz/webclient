@@ -350,7 +350,25 @@ function u_setrsa(rsakey) {
 
                         // Import welcome pdf at account creation -- Removed
                         // NOT needed, since the file is create on account creation (initial ephemral accoount)
+
+                        // Recovery Key Onboarding improvements
+                        // Show newly registered user the download recovery key dialog.
+                        M.onFileManagerReady(function() {
+
+                            twofactor.lostAuthenicatorDialog.init();
+                            fm_showoverlay();
+                            $('.recovery-key-dialog').removeClass('hidden').addClass('post-register');
+                            $('.recover-image').removeClass('device-key').addClass('key');
+                            $('.fm-dialog-close').addClass('hidden');
+
+                            $('.recovery-key-dialog .skip-button').rebind('click', function() {
+                                $('.recovery-key-dialog').addClass('hidden').removeClass('.post-register');
+                                fm_hideoverlay();
+                            })
+
+                        });
                     }
+
                     $promise.resolve(rsakey);
                     ui_keycomplete();
                 }

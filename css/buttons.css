@@ -963,3 +963,6 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1
 .default-green-button.height-48.red {
     color: #fff;
 }
+.default-56px-button.default-green-button {
+    background-color: #00BFA5;
+}

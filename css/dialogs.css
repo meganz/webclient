@@ -3516,11 +3516,14 @@ li.token-input-token-invite .input-close {
 /* end of Contact info dialog*/
 
 /* Recover account */
-.fm-dialog.recovery-key-dialog {
+.fm-dialog.recovery-key-dialog, .fm-dialog.recovery-key-info {
     width: 640px;
     height: 620px;
     margin: -310px 0 0 -320px;
     text-align: center;
+}
+.fm-dialog.recovery-key-info {
+    height: initial;
 }
 .fm-dialog.recovery-key-dialog  .fm-dialog-close {
     right: -6px;
@@ -3531,6 +3534,6 @@ li.token-input-token-invite .input-close {
     text-align: left;
 }
 .fm-dialog.improved-recovery-steps .recover-paste-block {
-    margin: 32px auto 48px;
+    margin: 32px auto 40px;;
 }
 

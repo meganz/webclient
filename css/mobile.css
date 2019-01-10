@@ -8999,6 +8999,25 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     text-align: right;
 }
 
+.mobile.payment-result.pending.alternate {
+    position: fixed;
+    z-index: 99999;
+    background-color: rgba(255, 255, 255, 1);
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    display: block;
+}
+.mobile .payment-result-pad {
+    width: calc(100% - 48px);
+    margin: -127px auto;
+    top: 50%;
+    position: relative;
+}
+.mobile .payment-result.pending .payment-result-txt > a {
+    color: #eb4444;
+}
 
 /* Only media queries after here */
 @media only screen and (max-width: 970px) {

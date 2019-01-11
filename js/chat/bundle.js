@@ -6754,6 +6754,10 @@ React.makeElement = React['createElement'];
 	                            }
 
 	                            self.setState({ 'editing': false });
+
+	                            Soon(function () {
+	                                $('.chat-textarea-block:visible textarea').focus();
+	                            }, 300);
 	                        },
 	                        onDeleteClicked: function onDeleteClicked(e, msg) {
 	                            self.setState({

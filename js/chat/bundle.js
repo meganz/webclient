@@ -62,7 +62,7 @@ React.makeElement = React['createElement'];
 	var ConversationsUI = __webpack_require__(4);
 	var ChatRoom = __webpack_require__(36);
 
-	var EMOJI_DATASET_VERSION = 2;
+	var EMOJI_DATASET_VERSION = 3;
 
 	var _chatui;
 	var webSocketsSupport = typeof WebSocket !== 'undefined';
@@ -1616,7 +1616,7 @@ React.makeElement = React['createElement'];
 	        return self._emojiDataLoading[name];
 	    } else if (name === "categories") {
 
-	        self._emojiData[name] = ["people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
+	        self._emojiData[name] = ["symbols", "activity", "objects", "nature", "food", "people", "travel", "flags"];
 
 	        return MegaPromise.resolve(self._emojiData[name]);
 	    } else {

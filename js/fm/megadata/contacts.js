@@ -760,6 +760,9 @@ MegaData.prototype.syncContactEmail = function(userHash) {
                 // re-render the contact view page if the presence had changed
                 M.addContactUI();
             }
+            if (M.currentdirid === 'contacts') {
+                M.openFolder(M.currentdirid, true);
+            }
         }
     };
 
@@ -925,6 +928,31 @@ MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
     "use strict";
 
     var invitePromise = new MegaPromise();
+
+    // since we have the possibility of having cached attributes of the user we are inviting
+    // we will remove the cached attrs to allow API request.
+    // this was done due to cases when a user changes his name, then we invite him
+    // in other cases when the user is in contacts list, it will be updated with APs.
+    // 1- check if we have cache
+    if (attribCache) {
+        var userHandle = null;
+        // 2- check if we cache this user. then get his handle
+        for (var us in M.u) {
+            if (M.u[us] && M.u[us].m && M.u[us].m === target) {
+                userHandle = us;
+                break;
+            }
+        }
+        // 3- if we found the user, remove the cached attrs.
+        if (userHandle) {
+            var userKeys = [userHandle + '_lastname', userHandle + '_firstname'];
+            for (var k = 0; k < userKeys.length; k++) {
+                attribCache.removeItem(userKeys[k]);
+            }
+            M.u[userHandle].firstName = '';
+            M.u[userHandle].lastName = '';
+        }
+    }
 
     if (d) {
         console.debug('inviteContact');

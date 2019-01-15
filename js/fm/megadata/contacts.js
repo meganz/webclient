@@ -451,7 +451,7 @@ MegaData.prototype.contacts = function() {
     else if (sortBy === 'fav') {
         sortFn = this.sortByFavFn(sortDirection);
     }
-    
+
     if (typeof sortFn === 'function') {
         activeContacts.sort(
             function(a, b) {
@@ -805,12 +805,16 @@ MegaData.prototype.syncContactEmail = function(userHash) {
                 delete cleanedUpUserData.lastName;
                 delete cleanedUpUserData.name;
                 delete cleanedUpUserData.avatar;
+                delete cleanedUpUserData.ats;
                 fmdb.add('u', {u: u.u, d: cleanedUpUserData});
                 M.u[userId].firstName = '';
                 M.u[userId].lastName = '';
             }
 
             this.syncUsersFullname(userId);
+            if (!megaChatIsDisabled && typeof megaChat !== 'undefined' && megaChat.plugins.presencedIntegration) {
+                megaChat.plugins.presencedIntegration.eventuallyAddPeer(userId);
+            }
         }
     };
 })(this);

@@ -112,8 +112,8 @@ var ChatdIntegration = function(megaChat) {
         self.chatd.destroyed = true;
     });
 
-    $(window).rebind('onChatdChatUpdatedActionPacket.chatdInt', function(e, actionPacket) {
-        self.openChatFromApi(actionPacket, false);
+    mBroadcaster.addListener('onChatdChatUpdatedActionPacket', function(actionPacket) {
+        self.openChatFromApi(actionPacket, false, false);
     });
 
 
@@ -508,7 +508,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                                 if (typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined') {
                                     Object.keys(chatRoom.members).forEach(function(user_handle) {
                                         // not a real contact?
-                                        if (M.u[user_handle].c === 0) {
+                                        if (!M.u[user_handle].c) {
                                             chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
                                                 user_handle,
                                                 chatRoom
@@ -531,7 +531,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                             else {
                                 // someone else left the room
                                 if (
-                                    M.u[v.u].c === 0 &&
+                                    !M.u[v.u].c &&
                                     typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
                                 ) {
                                     chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
@@ -549,11 +549,12 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                             }
                             if (
                                 M.u[v.u] &&
-                                M.u[v.u].c === 0 &&
+                                !M.u[v.u].c &&
                                 typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
                             ) {
                                 chatRoom.megaChat.plugins.presencedIntegration.eventuallyAddPeer(
-                                    v.u
+                                    v.u,
+                                    undefined
                                 );
                             }
                         }
@@ -564,7 +565,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                             ChatdIntegration._ensureKeysAreLoaded([], included);
                             ChatdIntegration._ensureNamesAreLoaded(included);
                             included.forEach(function(handle) {
-                                if (M.u[handle] && M.u[handle].c === 0) {
+                                if (M.u[handle] && !M.u[handle].c) {
                                     megaChat.processNewUser(handle);
                                 }
                             });
@@ -849,7 +850,7 @@ ChatdIntegration._ensureNamesAreLoaded = function(users) {
                         'h': userId,
                         'u': userId,
                         'm': '',
-                        'c': 0
+                        'c': undefined
                     })
                 );
                 M.syncUsersFullname(userId);
@@ -1017,15 +1018,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         // also add to our list
                         chatRoom.members[eventData.userId] = eventData.priv;
 
-                        if (
-                            M.u[eventData.userId] &&
-                            M.u[eventData.userId].c === 0 &&
-                            typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
-                        ) {
-                            chatRoom.megaChat.plugins.presencedIntegration.eventuallyAddPeer(
-                                eventData.userId
-                            );
-                        }
                         $(chatRoom).trigger('onMembersUpdated', eventData);
                     };
 
@@ -1053,15 +1045,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         chatRoom.protocolHandler.removeParticipant(eventData.userId);
                         // also remove from our list
                         delete chatRoom.members[eventData.userId];
-                    }
-                    if (
-                        M.u[eventData.userId].c === 0 &&
-                        typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
-                    ) {
-                        chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
-                            eventData.userId,
-                            chatRoom
-                        );
                     }
 
                     $(chatRoom).trigger('onMembersUpdated', eventData);

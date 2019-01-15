@@ -188,6 +188,7 @@ React.makeElement = React['createElement'];
 	    this._imageLoadCache = Object.create(null);
 	    this._imagesToBeLoaded = Object.create(null);
 	    this._imageAttributeCache = Object.create(null);
+	    this._queuedMccPackets = [];
 
 	    this.options = {
 	        'delaySendMessageIfRoomNotAvailableTimeout': 3000,
@@ -998,10 +999,10 @@ React.makeElement = React['createElement'];
 	                    'h': contactHash,
 	                    'u': contactHash,
 	                    'm': '',
-	                    'c': 0
+	                    'c': undefined
 	                }));
 	                M.syncUsersFullname(contactHash);
-	                self.processNewUser(contactHash);
+	                self.processNewUser(contactHash, true);
 	                M.syncContactEmail(contactHash);
 	            }
 	        });
@@ -1133,13 +1134,13 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-	Chat.prototype.processNewUser = function (u) {
+	Chat.prototype.processNewUser = function (u, isNewChat) {
 	    var self = this;
 
 	    self.logger.debug("added: ", u);
 
 	    if (self.plugins.presencedIntegration) {
-	        self.plugins.presencedIntegration.addContact(u);
+	        self.plugins.presencedIntegration.addContact(u, isNewChat);
 	    }
 	    self.chats.forEach(function (chatRoom) {
 	        if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
@@ -1800,6 +1801,16 @@ React.makeElement = React['createElement'];
 	    this.chatUIFlags.set(name, this.chatUIFlags[name] ? 0 : 1);
 	};
 
+	Chat.prototype.onSnActionPacketReceived = function () {
+	    if (this._queuedMccPackets.length > 0) {
+	        var aps = this._queuedMccPackets;
+	        this._queuedMccPackets = [];
+	        for (var i = 0; i < aps.length; i++) {
+	            mBroadcaster.sendMessage('onChatdChatUpdatedActionPacket', aps[i]);
+	        }
+	    }
+	};
+
 	window.Chat = Chat;
 	window.chatui = _chatui;
 
@@ -2355,12 +2366,12 @@ React.makeElement = React['createElement'];
 	                contact = M.u[contact];
 
 	                if (contact) {
-	                    if (!chatRoom.privateReadOnlyChat && contact.c === 0) {
+	                    if (!chatRoom.privateReadOnlyChat && !contact.c) {
 
 	                        Soon(function () {
 	                            chatRoom.privateReadOnlyChat = true;
 	                        });
-	                    } else if (chatRoom.privateReadOnlyChat && contact.c !== 0) {
+	                    } else if (chatRoom.privateReadOnlyChat && contact.c) {
 
 	                        Soon(function () {
 	                            chatRoom.privateReadOnlyChat = false;
@@ -2502,12 +2513,12 @@ React.makeElement = React['createElement'];
 	                contact = M.u[contact];
 
 	                if (contact) {
-	                    if (!chatRoom.privateReadOnlyChat && contact.c === 0) {
+	                    if (!chatRoom.privateReadOnlyChat && !contact.c) {
 
 	                        Soon(function () {
 	                            chatRoom.privateReadOnlyChat = true;
 	                        });
-	                    } else if (chatRoom.privateReadOnlyChat && contact.c !== 0) {
+	                    } else if (chatRoom.privateReadOnlyChat && contact.c) {
 
 	                        Soon(function () {
 	                            chatRoom.privateReadOnlyChat = false;
@@ -4946,7 +4957,7 @@ React.makeElement = React['createElement'];
 	                    key: "share-item", icon: "context share-folder", label: __(l[6775]), onClick: function onClick() {
 	                        openCopyShareDialog(contact.u);
 	                    } }));
-	            } else if (contact.c === 0) {
+	            } else if (!contact.c) {
 	                moreDropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
 	                    key: "view2", icon: "small-icon icons-sprite grey-plus", label: __(l[101]), onClick: function onClick() {
 	                        loadingDialog.show();
@@ -5307,6 +5318,14 @@ React.makeElement = React['createElement'];
 
 	        var userCard = null;
 	        if (this.props.className === "short") {
+	            var presenceRow;
+	            var lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
+	            if (this.props.showLastGreen && contact.presence <= 2 && lastActivity) {
+	                presenceRow = (l[19994] || "Last seen %s").replace("%s", time2last(lastActivity));
+	            } else {
+	                presenceRow = M.onlineStatusClass(contact.presence)[0];
+	            }
+
 	            userCard = React.makeElement(
 	                "div",
 	                { className: "user-card-data" },
@@ -5315,7 +5334,7 @@ React.makeElement = React['createElement'];
 	                    "div",
 	                    { className: "user-card-status" },
 	                    React.makeElement(ContactPresence, { contact: contact, className: this.props.presenceClassName }),
-	                    M.onlineStatusClass(contact.presence)[0]
+	                    presenceRow
 	                )
 	            );
 	        } else {
@@ -7167,6 +7186,7 @@ React.makeElement = React['createElement'];
 	                noContextButton: "true",
 	                contact: contact,
 	                megaChat: self.props.chatRoom.megaChat,
+	                showLastGreen: true,
 	                key: contact.u });
 	        }
 
@@ -12326,7 +12346,7 @@ React.makeElement = React['createElement'];
 	                                'u': contact.u,
 	                                'name': contact.name,
 	                                'm': contact.email ? contact.email : contactEmail,
-	                                'c': 0
+	                                'c': undefined
 	                            }));
 	                        } else if (M.u[contact.u] && !M.u[contact.u].m) {
 
@@ -12381,7 +12401,7 @@ React.makeElement = React['createElement'];
 	                                    deleteButtonOptional
 	                                )
 	                            );
-	                        } else if (M.u[contact.u] && M.u[contact.u].c === 0) {
+	                        } else if (M.u[contact.u] && !M.u[contact.u].c) {
 	                            dropdown = React.makeElement(
 	                                ButtonsUI.Button,
 	                                {
@@ -15441,6 +15461,13 @@ React.makeElement = React['createElement'];
 	            return;
 	        }
 
+	        var contactForMessage = msg && Message.getContactForMessage(msg);
+	        if (contactForMessage && contactForMessage.u !== u_handle) {
+	            if (!contactForMessage.ats || contactForMessage.ats < ts) {
+	                contactForMessage.ats = ts;
+	            }
+	        }
+
 	        if (self.lastActivity && self.lastActivity >= ts) {
 
 	            return;
@@ -16240,7 +16267,7 @@ React.makeElement = React['createElement'];
 
 	    if (this.type === "private") {
 	        var members = this.getParticipantsExceptMe();
-	        if (members[0] && M.u[members[0]].c === 0) {
+	        if (members[0] && !M.u[members[0]].c) {
 	            return true;
 	        }
 	    }
@@ -16253,19 +16280,19 @@ React.makeElement = React['createElement'];
 
 	ChatRoom.prototype.didInteraction = function (user_handle, ts) {
 	    var self = this;
-	    ts = ts || unixtime();
+	    var newTs = ts || unixtime();
 
 	    if (user_handle === u_handle) {
 	        Object.keys(self.members).forEach(function (user_handle) {
 	            var contact = M.u[user_handle];
 	            if (contact && user_handle !== u_handle) {
-	                setLastInteractionWith(contact.u, "1:" + ts);
+	                setLastInteractionWith(contact.u, "1:" + newTs);
 	            }
 	        });
 	    } else {
 	        var contact = M.u[user_handle];
 	        if (contact && user_handle !== u_handle) {
-	            setLastInteractionWith(contact.u, "1:" + ts);
+	            setLastInteractionWith(contact.u, "1:" + newTs);
 	        }
 	    }
 	};

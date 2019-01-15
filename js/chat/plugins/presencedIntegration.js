@@ -135,11 +135,18 @@ PresencedIntegration.prototype.init = function() {
             megaChat.renderMyStatus();
         },
         self._peerstatuscb.bind(self),
-        self._updateuicb.bind(self)
+        self._updateuicb.bind(self),
+        null, // prefschangedcb
+        function(user, minutes) {
+            if (M.u[user]) {
+                M.u[user].lastGreen = unixtime() - (minutes * 60);
+            }
+
+            if (PRESENCE2_DEBUG) {
+                console.log("User", user, "last seen", minutes, "minutes ago");
+            }
+        }
     );
-
-
-
 
     /**
      *
@@ -161,23 +168,7 @@ PresencedIntegration.prototype.init = function() {
         }
 
         // set my own presence
-
-        var contactHashes = [];
-        M.u.forEach(function(v, k) {
-            if (k === u_handle || !v) {
-                return;
-            }
-
-            if (v.c !== 0) {
-                contactHashes.push(k);
-            }
-
-            v.presence = 'unavailable';
-        });
-
         M.u[u_handle].presence = self.getMyPresenceSetting();
-
-        userPresence.addremovepeers(contactHashes);
     });
 
     $(userPresence).rebind('onDisconnected.presencedIntegration', function(e) {
@@ -192,6 +183,19 @@ PresencedIntegration.prototype.init = function() {
 
 
     userPresence.connectionRetryManager.requiresConnection();
+
+    // init .peers
+    M.u.forEach(function(v, k) {
+        if (k === u_handle || !v) {
+            return;
+        }
+
+        if (v.c !== 0) {
+            self.eventuallyAddPeer(k);
+        }
+
+        v.presence = 'unavailable';
+    });
 };
 
 PresencedIntegration.prototype._updateuicb = function presencedIntegration_updateuicb(
@@ -200,7 +204,8 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
     autoawaylock,
     autoawaytimeout,
     persist,
-    persistlock
+    persistlock,
+    lastSeen
 ) {
     if (!u_handle) {
         // u_handle was cleared by menu reload / logout
@@ -208,7 +213,7 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
     }
     var self = this;
 
-    self.logger.debug("updateuicb", presence, autoaway, autoawaylock, autoawaytimeout, persist, persistlock);
+    self.logger.debug("updateuicb", presence, autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
 
     self._presence[u_handle] = presence;
 
@@ -219,7 +224,7 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
         self._destroyAutoawayEvents();
     }
 
-    $(self).trigger('settingsUIUpdated', [autoaway, autoawaylock, autoawaytimeout, persist, persistlock]);
+    $(self).trigger('settingsUIUpdated', [autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen]);
 
     $(self).trigger(
         'onPeerStatus',
@@ -254,7 +259,7 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
                 'h': user_hash,
                 'u': user_hash,
                 'm': '',
-                'c': 0
+                'c': undefined
             })
         );
         contact = M.u[user_hash];
@@ -321,13 +326,13 @@ PresencedIntegration.prototype.setPresence = function(presence) {
     }
 };
 
-PresencedIntegration.prototype.addContact = function(u_h) {
+PresencedIntegration.prototype.addContact = function(u_h, isNewChat) {
     this.logger.debug("addContact", u_h);
 
     if (this.userPresence) {
         // can happen in case there is a queued/cached action packet that triggers add contact, before the chat had
         // fully loaded and initialised
-        this.userPresence.addremovepeers([u_h]);
+        this.eventuallyAddPeer(u_h, isNewChat);
     }
 };
 
@@ -352,7 +357,7 @@ PresencedIntegration.prototype.getPresence = function(u_h) {
     if (!u_h) {
         u_h = u_handle;
     }
-    this.logger.debug("getPresence", u_h, this._presence[u_h]);
+    // this.logger.debug("getPresence", u_h, this._presence[u_h]);
     return this._presence[u_h];
 };
 
@@ -413,25 +418,48 @@ PresencedIntegration.prototype.getMyPresence = function() {
 
 
 PresencedIntegration.prototype.eventuallyRemovePeer = function(user_handle, chatRoom) {
-    var foundInOtherChatRooms = false;
+    var self = this;
+    var skipRemoving = false;
     var megaChat = self.megaChat;
-    megaChat.chats.forEach(function(testChatRoom) {
+    if (M.u[user_handle] && M.u[user_handle].c === 1) {
+        return;
+    }
+    if (M.u[user_handle] && M.u[user_handle].c === -1) {
+        skipRemoving = true;
+    }
+
+    !skipRemoving && megaChat.chats.forEach(function(testChatRoom) {
         if (testChatRoom !== chatRoom && typeof(testChatRoom.members[user_handle]) !== 'undefined') {
-            foundInOtherChatRooms = true;
+            skipRemoving = true;
         }
     });
-
     var binUserHandle = base64urldecode(user_handle);
 
-    if (!foundInOtherChatRooms && megaChat.userPresence.peers[binUserHandle]) {
+    if (!skipRemoving && megaChat.userPresence.peers[binUserHandle]) {
         megaChat.userPresence.addremovepeers([user_handle], true);
     }
 };
 
-PresencedIntegration.prototype.eventuallyAddPeer = function(user_handle) {
-    var binUserHandle = base64urldecode(user_handle);
+PresencedIntegration.prototype.eventuallyAddPeer = function(user_handle, isNewChat) {
+    // .c === 0 means "removed contact"
+    if (!M.u[user_handle] || M.u[user_handle].c === 0) {
+        return;
+    }
 
-    if (!megaChat.userPresence.peers[binUserHandle]) {
-        megaChat.userPresence.addremovepeers([user_handle]);
+    var foundInGroupChat = isNewChat || false;
+    var self = this;
+    var megaChat = self.megaChat;
+
+    if (!foundInGroupChat && typeof M.u[user_handle].c === "undefined") {
+        megaChat.chats.forEach(function(testChatRoom) {
+            if (typeof(testChatRoom.members[user_handle]) !== 'undefined') {
+                foundInGroupChat = true;
+            }
+        });
+    }
+
+    var binUserHandle = base64urldecode(user_handle);
+    if ((M.u[user_handle].c === 1 || foundInGroupChat) && !megaChat.userPresence.peers[binUserHandle]) {
+        megaChat.userPresence.addremovepeers([user_handle], false);
     }
 };

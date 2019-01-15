@@ -123,6 +123,14 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             return;
         }
 
+        // set last seen/active/green
+        var contactForMessage = msg && Message.getContactForMessage(msg);
+        if (contactForMessage && contactForMessage.u !== u_handle) {
+            if (!contactForMessage.ats || contactForMessage.ats < ts) {
+                contactForMessage.ats = ts;
+            }
+        }
+
         if (self.lastActivity && self.lastActivity >= ts) {
             // this is an old message, DON'T update the lastActivity.
             return;
@@ -175,6 +183,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         else {
             throw new Error("Not implemented");
         }
+
+
     });
 
     /**
@@ -1221,7 +1231,7 @@ ChatRoom.prototype.isReadOnly = function() {
     // check if still contacts.
     if (this.type === "private") {
         var members = this.getParticipantsExceptMe();
-        if (members[0] && M.u[members[0]].c === 0) {
+        if (members[0] && !M.u[members[0]].c) {
             return true;
         }
     }
@@ -1243,20 +1253,20 @@ ChatRoom.prototype.iAmOperator = function() {
  */
 ChatRoom.prototype.didInteraction = function(user_handle, ts) {
     var self = this;
-    ts = ts || unixtime();
+    var newTs = ts || unixtime();
 
     if (user_handle === u_handle) {
         Object.keys(self.members).forEach(function (user_handle) {
             var contact = M.u[user_handle];
             if (contact && user_handle !== u_handle) {
-                setLastInteractionWith(contact.u, "1:" + ts);
+                setLastInteractionWith(contact.u, "1:" + newTs);
             }
         });
     }
     else {
         var contact = M.u[user_handle];
         if (contact && user_handle !== u_handle) {
-            setLastInteractionWith(contact.u, "1:" + ts);
+            setLastInteractionWith(contact.u, "1:" + newTs);
         }
     }
 };

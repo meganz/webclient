@@ -353,23 +353,8 @@ function initAddDialogMultiInputPlugin() {
             }
             else {
                 var $multiInput = $scope.find('.multiple-input');
-                var h1 = $inputTokens.outerHeight(true); // margin included
-                var h2 = $multiInput.height();
 
                 $addButton.text(l[19113].replace('%1', itemNum)).removeClass('disabled');
-
-                // show/hide scroll box
-                if ((5 <= h2 / h1) && (h2 / h1 < 6)) {
-                    $multiInput.jScrollPane({
-                        enableKeyboardNavigation: false,
-                        showArrows: true,
-                        arrowSize: 8,
-                        animateScroll: true
-                    });
-                    setTimeout(function() {
-                        $scope.find('.token-input-input-token-mega input').trigger("focus");
-                    }, 0);
-                }
             }
         },
         onDelete: function() {
@@ -390,24 +375,7 @@ function initAddDialogMultiInputPlugin() {
                 $addButton.text(l[19112]).removeClass('disabled');
             }
             else {
-                var $multiInput = $scope.find('.multiple-input');
-                var $scrollBox = $scope.find('.multiple-input .jspPane')[0];
-                var h1 = $inputTokens.outerHeight(true); // margin included
-                var h2 = 0;
-
                 $addButton.text(l[19113].replace('%1', itemNum)).removeClass('disabled');
-
-                // Calculate complete scroll box height
-                if ($scrollBox) {
-                    h2 = $scrollBox.scrollHeight;
-                }
-                else { // Just multi input height
-                    h2 = $multiInput.height();
-                }
-
-                if (h2 / h1 < 6) {
-                    clearScrollPanel('.add-user-popup');
-                }
             }
         }
     });
@@ -629,8 +597,12 @@ function contactAddDialog(close) {
     });
 
     $textarea.val('');
-    clearScrollPanel('.add-user-popup');
     $d.find('.multiple-input .token-input-token-mega').remove();
+    initTokenInputsScroll($('.multiple-input', $d));
+    Soon(function() {
+        $('.token-input-input-token-mega input', $d).trigger("focus");
+    },);
+
     $d.find('.add-user-popup-button').text(l[19112]).addClass('disabled');
 
     initTextareaScrolling($textarea, 72);
@@ -1999,7 +1971,7 @@ function initShareDialogMultiInputPlugin() {
                     else {
                         $addButton.text(l[148]);
                     }
-              });
+                });
             },
             onDoublet: function(u) {
                 errorMsg(l[7413]); // You already have a contact with that email
@@ -2020,25 +1992,6 @@ function initShareDialogMultiInputPlugin() {
 
                 // Enable group permission change drop down list
                 $('.share-dialog .permissions-icon').removeClass('disabled');
-
-                var $shareDialog = $('.share-dialog');
-                var $inputToken = $('.share-added-contact.token-input-token-mega');
-                var $multiInput = $shareDialog.find('.multiple-input');
-                var h1 = $inputToken.outerHeight(true);// margin
-                var h2 = $multiInput.height();
-
-                // Add scroll box if there's enough items available
-                if (5 <= h2 / h1 && h2 / h1 < 6) {
-                    $multiInput.jScrollPane({
-                        enableKeyboardNavigation: false,
-                        showArrows: true,
-                        arrowSize: 8,
-                        animateScroll: true
-                    });
-                    setTimeout(function() {
-                        $shareDialog.find('.token-input-input-token-mega input').trigger("focus");
-                    }, 0);
-                }
 
                 $('.fm-dialog.share-dialog').position({
                     'my': 'center center',
@@ -2068,27 +2021,7 @@ function initShareDialogMultiInputPlugin() {
                     $btn.addClass('disabled');
                 }
 
-                if (iNewItemsNum) {
-
-                    var inputToken = $shareDialog.find('.share-added-contact.token-input-token-mega'),
-                        $multiInput = $shareDialog.find('.multiple-input'),
-                        $c = $shareDialog.find('.multiple-input .jspPane')[0],
-                        h1 = inputToken.outerHeight(),// margin excluded
-                        h2 = 0;
-
-                    if ($c) {
-                        h2 = $c.scrollHeight;
-                    }
-                    else {
-                        h2 = $multiInput.height();
-                    }
-
-                    // If there's less items then necessary remove scroll box
-                    if (h2 / h1 < 6) {
-                        clearScrollPanel('.share-dialog');
-                    }
-                }
-                else {
+                if (!iNewItemsNum) {
 
                     // Disable group permission change drop down list
                     $('.share-dialog .permissions-icon').addClass('disabled');

@@ -7850,7 +7850,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     float: initial;
 }
 .mobile .improved-recovery-steps .recover-image, .improved-recovery-steps .session-image-block {
-    background-image: url(../images/mega/recover-account-sprite.png);
+    background-image: url(../images/mega/recover-account-sprite_v1.png);
     background-repeat: no-repeat;
     background-size: 344px auto;
     display: block;
@@ -9851,7 +9851,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         background-size: 72px auto;
     }
     .mobile .improved-recovery-steps .recover-image, .mobile .improved-recovery-steps .session-image-block, .mobile .improved-recovery-steps .recover-button.yes::after, .mobile .improved-recovery-steps .recover-button.no::after   {
-    background-image: url(../images/mega/recover-account-sprite@2x.png);
+    background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
     background-size: 344px auto;
     }
 }

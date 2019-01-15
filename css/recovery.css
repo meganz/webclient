@@ -608,6 +608,9 @@
 .improved-recovery-steps .recover-image.safe-vault {
      background-position: 23px -811px;
 }
+.improved-recovery-steps .recover-image.shiny-key {
+     background-position: -172px -799px;
+}
 .improved-recovery-steps .session-image-block {
     height: 94px;
     margin: 0 auto 12px;

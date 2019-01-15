@@ -352,7 +352,7 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
             case 1:
                 $('.fm-dialog-close', $dialog).addClass('hidden');
                 $('.copy-recovery-key-button', $dialog).addClass('hidden');
-                $('.recover-image', $dialog).removeClass('device-key').addClass('shiny-key');
+                $('.recover-image.icon', $dialog).removeClass('device-key').addClass('shiny-key');
                 $dialog.addClass('post-register').rebind('dialog-closed', function() {
                     eventlog(localStorage.recoverykey ? 99718 : 99719);
                     $dialog.unbind('dialog-closed');

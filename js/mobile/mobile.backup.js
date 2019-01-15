@@ -108,16 +108,6 @@ mobile.backup = {
         $downloadToFileButton.removeClass('hidden');
 
         // Add click/tap handler to the button
-        $downloadToFileButton.off('tap').on('tap', function() {
-
-            // Convert the Master/Recovery Key to Base64 and then create a Blob object
-            var recoveryKeyBase64 = a32_to_base64(u_k);
-            var blob = new Blob([recoveryKeyBase64], {
-                type: "text/plain;charset=utf-8"
-            });
-
-            // Use the SaveAs library to pop up a save dialog (file download) for the user
-            saveAs(blob, 'MEGA-RECOVERYKEY.txt');
-        });
+        $downloadToFileButton.rebind('tap', u_savekey);
     }
 };

@@ -3919,6 +3919,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
 
     // Define what dialogs can be opened from other dialogs
     var diagInheritance = {
+        'recovery-key-dialog': ['recovery-key-info'],
         properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share'],
         copy: ['createfolder'],
         move: ['createfolder'],

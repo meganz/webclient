@@ -347,8 +347,9 @@
     width: 260px;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
-.improved-recovery-steps .app-instruction-block select::-ms-expand {    
-    display: none; 
+
+.improved-recovery-steps .app-instruction-block select::-ms-expand {
+    display: none;
 }
 .improved-recovery-steps .app-instruction-block select{
     -webkit-appearance: none;
@@ -712,7 +713,7 @@
     width: 49%;
     text-align: right;
 }
-.improved-recovery-steps .recover-paste-block .right-section > div{
+.improved-recovery-steps .recover-paste-block .right-section > div:not(.hidden) {
     display: inline-block;
     min-width: 95px;
     margin-right: 5px;
@@ -815,7 +816,7 @@
     margin: 0 auto;
     float: initial;
     width: 260px;
-    cursor: pointer;    
+    cursor: pointer;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
     -o-transition: all 200ms ease-in-out;
@@ -891,6 +892,6 @@
 .improved-recovery-steps .password-tooltip.tooltip-block .triangle-pointer {
     transform: rotate(135deg);
     left: 170px;
-    top: -8px;    
+    top: -8px;
 }
 }

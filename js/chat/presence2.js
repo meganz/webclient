@@ -62,7 +62,8 @@ var UserPresence = function userpresence(
     connectedcb,
     peerstatuscb,
     updateuicb,
-    prefschangedcb
+    prefschangedcb,
+    lastseencb
 ) {
     if (!(this instanceof userpresence)) {
         return new userpresence(userhandle);
@@ -86,7 +87,7 @@ var UserPresence = function userpresence(
     // fixed client capability flags
     // 0x80 - client can be called with WebRTC
     // 0x40 - client can be woken up with push notifications
-    this.capabilities = String.fromCharCode(((can_webrtc && 0x80) | (can_mobilepush && 0x40)));
+    this.capabilities = (can_webrtc ? 0x80 : 0) | (can_mobilepush ? 0x40 : 0) | 0x20;
 
     // desired appearance
     this.presence = UserPresence.PRESENCE.ONLINE;
@@ -201,6 +202,7 @@ var UserPresence = function userpresence(
     this.peerstatuscb = peerstatuscb; // called when any peer's status changes (including for self)
     this.updateuicb = updateuicb;     // called when the UI needs to be updated
     this.prefschangedcb = prefschangedcb;  // called when the user sets new prefs and when presenced confirms them
+    this.lastseencb = lastseencb;          // called when info is received when a user was last seen (OPCODE_LASTGREEN)
 };
 
 UserPresence.PRESENCE = {
@@ -209,6 +211,18 @@ UserPresence.PRESENCE = {
     ONLINE:  3, // green
     DND:     4  // red
 };
+UserPresence.Opcode = {
+    KEEPALIVE: 0,
+    PEERSTATUS: 6,
+    PREFS: 7,
+    ADDPEERS: 4,
+    DELPEERS: 5,
+    SN_ADDPEERS: 8,
+    SN_DELPEERS: 9,
+    LASTGREEN: 10,
+    SN_SETPEERS: 12,
+};
+
 
 UserPresence.prototype.reconnect = function presence_reconnect(self) {
     if (!self) {
@@ -250,37 +264,38 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
 
         self.s.onopen = function () {
             if (!self.canceled) {
-                this.up.retrytimeout = 0;
-                this.up.open = true;
+                self.retrytimeout = 0;
+                self.open = true;
+                self.setPeersWasSent = false;
 
                 // reinitialise remote state
                 // HELLO version 1 with fixed client capability flags
-                this.up.sendstring("\1\1" + this.up.capabilities);
+                self.sendstring("\1\1" + String.fromCharCode(self.capabilities));
 
-                this.up.connectedcb(true);
+                self.connectedcb(true);
 
                 // only update override if user made a change that is not yet confirmed
-                if (this.up.prefschanged) {
-                    this.up.sendprefs();
+                if (self.prefschanged) {
+                    self.sendprefs();
                 }
 
                 // ...and then restore the dynamic status flags
-                if (this.up.lastflagscmd) {
-                    this.up.sendstring(this.up.lastflagscmd);
+                if (self.lastflagscmd) {
+                    self.sendstring(self.lastflagscmd);
                 }
 
                 // (re)send current peers
-                this.up.sendpeerupdate(Object.keys(this.up.peers).join(''));
+                self.sendpeerupdate(self.peers, false);
 
                 // start pinging
-                this.up.sendkeepalive();
+                self.sendkeepalive();
 
-                this.up.connectionRetryManager.gotConnected();
+                self.connectionRetryManager.gotConnected();
                 $(self).trigger('onConnected');
             }
             else {
                 // if canceled while trying to connect, drop the connection or it would stay idle.
-                this.up.disconnect(true);
+                self.disconnect(true);
             }
         };
 
@@ -332,11 +347,10 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                 if (PRESENCE2_DEBUG) {
                     console.error(
                         (new Date()).toISOString(),
-                        "PRESENCE INCOMING:",
+                        "PRES recv:",
                         UserPresence.commandDebugDataAsPrettyString(
-                            self.incomingDataAsReadableCommand(m.data)
-                        ),
-                        "b64:", ab_to_base64(m.data)
+                            self.commandsToString(m.data)
+                        )
                     );
                 }
 
@@ -344,73 +358,93 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                 var p = 0;
 
                 while (p < u.length) {
-                    switch (u[p]) {
+                    var op = u[p];
+                    switch (op) {
                         case 0: // OPCODE_KEEPALIVE
-                            if (this.up.keepalivechecktimer) {
-                                clearTimeout(this.up.keepalivechecktimer);
-                                this.up.keepalivechecktimer = false;
+                            if (self.keepalivechecktimer) {
+                                clearTimeout(self.keepalivechecktimer);
+                                self.keepalivechecktimer = false;
                             }
                             p++;
                             break;
 
                         case 6: // OPCODE_PEERSTATUS
-                            var user = ab_to_base64(new Uint8Array(u.buffer, p + 2, 8));
+                            var arrUser = new Uint8Array(u.buffer, p + 2, 8);
+                            var user = ab_to_base64(arrUser);
                             var presence = u[p + 1] & 0xf;
                             var isWebrtcFlag = u[p + 1] & 0x80;
 
-                            if (this.up.peerstatuscb) {
-                                this.up.peerstatuscb(
+                            if (self.peerstatuscb) {
+                                self.peerstatuscb(
                                     user,
                                     presence,
                                     isWebrtcFlag
                                 );
                             }
+
                             p += 10;
+
+                            /*
+                            TODO: Maybe notify the app if peer status goes from green to something else
+                            that now is the last-seen timestamp. For that, we need to know
+                            the previous status. Then we can simply do the lastseencb() without asking
+                            the server again for last seen time.
+                                self.lastseencb(user, 0);
+                            */
+                            if (presence !== UserPresence.PRESENCE.ONLINE) { // if not green, query last seen time
+                                self.sendstring('\x0a' + ab_to_str(arrUser));
+                            }
                             break;
 
                         case 7: // OPCODE_PREFS
                             var newprefs = u[p + 1] + (u[p + 2] << 8);
 
-                            if (newprefs == this.up.prefs()) {
-                                if (this.prefschangedcb) {
-                                    this.prefschangedcb(false);
+                            if (newprefs === self.prefs()) {
+                                if (self.prefschangedcb) {
+                                    self.prefschangedcb(false);
                                 }
 
-                                this.up.prefschanged = false;
+                                self.prefschanged = false;
                             }
                             else {
-                                this.up.presence = (newprefs & 3) + UserPresence.PRESENCE.OFFLINE;
-                                this.up.persist = !!(newprefs & 4);
-                                this.up.autoawayactive = !(newprefs & 8);
-                                this.up.autoawaytimeout = newprefs >> 4;
+                                self.presence = (newprefs & 3) + UserPresence.PRESENCE.OFFLINE;
+                                self.persist = !!(newprefs & 4);
+                                self.autoawayactive = !(newprefs & 8);
+                                self.autoawaytimeout = newprefs >> 4;
 
-                                if (this.up.autoawaytimeout > 600) {
-                                    this.up.autoawaytimeout = Math.floor((this.up.autoawaytimeout - 600) * 60) + 600;
+                                if (self.autoawaytimeout > 600) {
+                                    self.autoawaytimeout = Math.floor((self.autoawaytimeout - 600) * 60) + 600;
                                 }
+                                self._sendLastSeen = ((u[p + 2] & 0x80) === 0);
 
-                                this.up.ui_signalactivity(true);
-                                this.up.updateui();
+                                self.ui_signalactivity(true);
+                                self.updateui();
                             }
 
                             // set up things according to the user's prefs if we're a fresh client
-                            if (this.up.starting) {
-                                this.up.starting = false;
-                                this.up.ui_signalactivity();
+                            if (self.starting) {
+                                self.starting = false;
+                                self.ui_signalactivity();
                             }
 
                             p += 3;
                             break;
-
+                        case 10: // OPCODE_LASTGREEN
+                            var user = ab_to_base64(new Uint8Array(u.buffer, p + 1, 8));
+                            var minutes = u[p + 9] + (u[p + 10] << 8);
+                            self.lastseencb(user, minutes);
+                            p += 11;
+                            break;
                         default:
-                            console.error("Fatal - unknown opcode: " + u[p]);
+                            console.error("Fatal - unknown opcode: " + op);
                             // reload forcefully, as we are probably out of date
-                            return this.up.reload();
+                            return self.reload();
                     }
                 }
 
                 if (p != u.length) {
                     console.error("Fatal - bad framing");
-                    this.up.reload();
+                    self.reload(); //FIXME: There is no reload() methed
                 }
             }
         };
@@ -467,17 +501,17 @@ UserPresence.prototype.disconnect = function(userForced) {
 };
 
 UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, del) {
-    var delta = '';
+    var delta = {};
 
     for (var i = peers.length; i--;) {
         var u = base64urldecode(peers[i]);
         if (del && this.peers[u]) {
             delete this.peers[u];
-            delta += u;
+            delta[u] = true;
         }
         else if (!del && !this.peers[u]) {
             this.peers[u] = true;
-            delta += u;
+            delta[u] = true;
         }
         else {
             // this.logger.warn("not sure how to handle addremovepeers(", peers, del, ");");
@@ -505,11 +539,10 @@ UserPresence.prototype.sendstring = function presence_sendstring(s) {
     if (PRESENCE2_DEBUG) {
         console.error(
             (new Date()).toISOString(),
-            "PRESENCE OUTGOING:",
+            "PRES send:",
             UserPresence.commandDebugDataAsPrettyString(
-                this.outgoingDataAsReadableCommand(u.buffer)
-            ),
-            "b64:", ab_to_base64(u.buffer)
+                this.commandsToString(u.buffer, true)
+            )
         );
     }
 
@@ -525,21 +558,33 @@ UserPresence.prototype.sendstring = function presence_sendstring(s) {
 };
 
 // must be called with the binary representation of the userid delta
-UserPresence.prototype.sendpeerupdate = function presence_sendpeerupdate(peerstring, del) {
-    if (peerstring === '') {
+UserPresence.prototype.sendpeerupdate = function(peers, del) {
+    // peers is a Map of binary user handles
+    var num = Object.keys(peers).length;
+    if (!num) {
         return;
     }
 
-    var num = peerstring.length / 8;
+    var cmd = (del ? "\x09" : "\x08"); // SN_DELPEERS : SN_ADDPEERS;
+    if (!this.setPeersWasSent && !del) {
+        this.setPeersWasSent = true;
+        cmd = String.fromCharCode(UserPresence.Opcode.SN_SETPEERS);
+    }
 
-    peerstring = (del ? "\5" : "\4") // opcode
+    cmd += base64urldecode(currsn)
         + String.fromCharCode(num & 0xff)
         + String.fromCharCode((num >> 8) & 0xff)
         + String.fromCharCode((num >> 16) & 0xff)
         + String.fromCharCode((num >> 24) & 0xff)
-        + peerstring;
+        + Object.keys(peers).join('');
+    this.sendstring(cmd);
 
-    this.sendstring(peerstring);
+    // query LASTGREEN for each peer
+    if (!del) {
+        for (var k in peers) {
+            this.sendstring('\x0a' + k);
+        }
+    }
 };
 
 UserPresence.prototype.sendprefs = function presence_sendprefs() {
@@ -599,9 +644,13 @@ UserPresence.prototype.prefs = function presence_prefs() {
     if (t > 600) {
         t = 600 + Math.floor((t - 600) / 60);
     }
-
-    return (t << 4) + (this.autoawayactive ? 0 : 8) + (this.persist ? 4 : 0) + this.presence
-        - UserPresence.PRESENCE.OFFLINE;
+    t <<= 4;
+    if (t & 0x8000) {
+        t = 0x7ffc; // all autoaway bits to 1, free up bit 15, cap the autoaway timeout, keeping lowest 2 bits 0
+    }
+    return t | (this.autoawayactive ? 0 : 8) | (this.persist ? 4 : 0) |
+        (this._sendLastSeen ? 0 : 0x8000) |
+        (this.presence - UserPresence.PRESENCE.OFFLINE);
 };
 
 UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(active, timeout) {
@@ -634,6 +683,26 @@ UserPresence.prototype.ui_setpersist = function presence_ui_setpersist(persist) 
         this.sendprefs();
         this.updateui();
     }
+};
+
+/**
+    Enables or disables sending of last seen information about us to others via
+    the LASTGREEN command. This state is persisted on the presenced server.
+    Upon login, this state is synced up from the presenced server
+*/
+UserPresence.prototype.ui_enableLastSeen = function(enable) {
+    if (enable === this._sendLastSeen) {
+        return;
+    }
+    this._sendLastSeen = enable;
+    this.sendprefs();
+};
+
+/**
+ * Returns the current state of sending last seen information to others.
+ */
+UserPresence.prototype.lastSeenEnabled = function() {
+    return this._sendLastSeen;
 };
 
 // signal user activity (reset auto-away timer and set ONLINE/DND flags)
@@ -696,7 +765,9 @@ UserPresence.prototype.updateui = function presence_updateui() {
                     false,
                     this.autoawaytimeout,
                     this.persist || this.presence == UserPresence.PRESENCE.OFFLINE,
-                    this.presence == UserPresence.PRESENCE.OFFLINE);
+                    this.presence == UserPresence.PRESENCE.OFFLINE,
+                    this.lastSeenEnabled()
+    );
 };
 
 if (false && PRESENCE2_DEBUG) {
@@ -716,15 +787,20 @@ if (false && PRESENCE2_DEBUG) {
 
 UserPresence.commandDebugDataAsPrettyString = function(arr) {
     var out = "";
-    arr.forEach(function(cmd) {
-        var cmdName = cmd.shift();
-        out += cmdName + " => (";
-        out += cmd.map(function(args) {
-            return JSON.stringify(args);
-        }).join(",");
+    var len = arr.length;
+    for (var i = 0; i < len; i++) {
+        var cmd = arr[i];
+        out += cmd[0] + "(";
+        var cmdLen = cmd.length;
+        for (var k = 1; k < cmdLen; k++) {
+            out += cmd[k];
+            out += ', ';
+        }
+        if (cmdLen > 1) {
+            out = out.slice(0, -2);
+        }
         out += ")\n";
-    });
-
+    }
     return out;
 };
 
@@ -734,88 +810,7 @@ UserPresence.commandDebugDataAsPrettyString = function(arr) {
  *
  * @param ab
  */
-UserPresence.prototype.incomingDataAsReadableCommand = function(ab) {
-    // copy the 'ab' instead of modifying it
-    var u = new Uint8Array(ab.slice(0));
-    var p = 0;
-
-    var output = [];
-    while (p < u.length) {
-
-        switch (u[p]) {
-            case 0: // OPCODE_KEEPALIVE
-                output.push([
-                    "OPCODE_KEEPALIVE"
-                ]);
-                p++;
-                break;
-
-            case 6: // OPCODE_PEERSTATUS
-                var userhash = ab_to_base64(new Uint8Array(u.buffer, p + 2, 8));
-                var presence = u[p + 1] & 0xf;
-                var isWebrtcFlag = u[p + 1] & 0x80;
-
-                output.push([
-                    "OPCODE_PEERSTATUS",
-                    "userhash = " + userhash,
-                    "presence = " + constStateToText(UserPresence.PRESENCE, presence),
-                    "isWebrtcFlag = " + isWebrtcFlag
-                ]);
-
-
-                p += 10;
-                break;
-
-            case 7: // OPCODE_PREFS
-                var newprefs = u[p + 1] + (u[p + 2] << 8);
-
-                if (newprefs == this.prefs()) {
-                    output.push([
-                        "OPCODE_PREFS",
-                        "prefs unchanged"
-                    ]);
-                }
-                else {
-                    var presence = (newprefs & 3) + UserPresence.PRESENCE.OFFLINE;
-                    var persist = !!(newprefs & 4);
-                    var autoawayactive = !(newprefs & 8);
-                    var autoawaytimeout = newprefs >> 4;
-                    if (autoawaytimeout > 600) {
-                        autoawaytimeout = Math.floor((autoawaytimeout - 600) / 60) + 600;
-                    }
-
-                    output.push([
-                        "OPCODE_PREFS",
-                        "presence = " + constStateToText(UserPresence.PRESENCE, presence),
-                        "persist = " + persist,
-                        "autoawayactive = " + autoawayactive,
-                        "autoawaytimeout = " + autoawaytimeout,
-                    ]);
-                }
-
-                p += 3;
-                break;
-
-            default:
-                output.push("Fatal - unknown opcode: " + u[p]);
-                // kill the loop.
-                return output;
-        }
-    }
-
-    if (p != u.length) {
-        output.put("Fatal - bad framing");
-    }
-    return output;
-};
-
-/**
- * This is a development-only method that is used for converting the binary commands to readable strings (array/list of
- * strings)
- *
- * @param ab
- */
-UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
+UserPresence.prototype.commandsToString = function(ab, tx) {
     // copy the 'ab' instead of modifying it
     var u = new Uint8Array(ab.slice(0));
     var p = 0;
@@ -831,8 +826,8 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
      */
     var output = [];
     while (p < u.length) {
-
-        switch (u[p]) {
+        var op = u[p];
+        switch (op) {
             case 0: // KEEPALIVE
                 output.push([
                     "KEEPALIVE"
@@ -841,10 +836,13 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
                 break;
 
             case 1: // HELLO
+                var flags = u[p + 2];
                 output.push([
                     "HELLO",
-                    "webrtc = " + (u[p + 2] & 0x80 ? "true" : "false"),
-                    "can_mobilepush = " + (u[p + 2] & 0x40 ? "true" : "false"),
+                    "flags = 0x" + flags.toString(16),
+                    "webrtc = " + (flags & 0x80 ? "true" : "false"),
+                    "can_mobilepush = " + (flags & 0x40 ? "true" : "false"),
+                    "control_bit15 = " + (flags & 0x20 ? "true" : "false")
                 ]);
                 p += 3;
                 break;
@@ -859,15 +857,22 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
                 p += 2;
                 break;
 
-            case 4: // FLAGS
-            case 5:
+            case 8: // SN_ADDPEERS
+            case 9: // SN_DELPEERS
+            case 12: // SN_SETPEERS
+                var sn = ab_to_base64(new Uint8Array(u.buffer, p + 1, 8));
+                p += 8;
+                // Fallthrough to the simple commands
+            case 4: // ADDPEERS
+            case 5: // DELPEERS
+                var line = [ constStateToText(UserPresence.Opcode, op) ];
                 var numpeers = (
                     u[p + 1]
                     + (u[p + 2] << 8)
                     + (u[p + 3] << 16)
                     + (u[p + 4] << 24)
                 );
-
+                assert(!isNaN(numpeers));
                 var peers = [];
                 for (var i = 0; i < numpeers; i++) {
                     peers.push(
@@ -880,21 +885,39 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
                         )
                     );
                 }
-                output.push([
-                    "PEERUPDATE",
-                    u[p] === 4 ? "add" : "delete",
-                    "peers:", peers.join(", ")
-                ]);
-
-
+                if (sn != null) {
+                    line.push("sn = " + sn);
+                }
+                line.push("peers = ", peers.join(", "));
+                output.push(line);
                 p += 5 + numpeers * 8;
                 break;
 
+            case 6: // OPCODE_PEERSTATUS
+                var userhash = ab_to_base64(new Uint8Array(u.buffer, p + 2, 8));
+                var presence = u[p + 1] & 0xf;
+                var isWebrtcFlag = u[p + 1] & 0x80;
+                output.push([
+                    "PEERSTATUS",
+                    "userhash = " + userhash,
+                    "presence = " + constStateToText(UserPresence.PRESENCE, presence),
+                    "isWebrtcFlag = " + isWebrtcFlag
+                ]);
+                p += 10;
+                break;
+
             case 7: // PREFS
-                var newprefs = u[p + 1] + (u[p + 2] << 8);
-
-                var flags = newprefs & 15;
-
+                var highByte = u[p + 2];
+                var lowByte = u[p + 1];
+                var newprefs = lowByte + (highByte << 8);
+                p += 3;
+                if (!tx && (newprefs === this.prefs())) {
+                    output.push([
+                        "PREFS",
+                        "prefs unchanged"
+                    ]);
+                    break;
+                }
                 var presence = (newprefs & 3) + UserPresence.PRESENCE.OFFLINE;
                 var persist = !!(newprefs & 4);
                 var autoawayactive = !(newprefs & 8);
@@ -903,28 +926,36 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
                     autoawaytimeout = Math.floor((autoawaytimeout - 600) / 60) + 600;
                 }
 
-
                 output.push([
                     "PREFS",
-                    "prefs flags = " + flags,
+                    "prefs flags = 0x" + (newprefs & 0x800f).toString(16),
                     "presence = " + constStateToText(UserPresence.PRESENCE, presence),
                     "persist = " + persist,
                     "autoawayactive = " + autoawayactive,
                     "autoawaytimeout = " + autoawaytimeout,
+                    "send_lastseen = " + ((highByte & 0x80) ? "false" : "true")
                 ]);
-
-                p += 3;
                 break;
-
+            case 10:
+                var user = ab_to_base64(new Uint8Array(u.buffer, p + 1, 8));
+                var line = ["LASTGREEN", "user = " + user];
+                if (!tx) {
+                    var minutes = u[p + 9] + (u[p + 10] << 8);
+                    line.push("minutes = " + minutes);
+                    p += 2;
+                }
+                p += 9;
+                output.push(line);
+                break;
             default:
-                output.push("Fatal - unknown opcode: " + u[p]);
+                output.push(["Fatal - unknown opcode: " + u[p]]);
                 // kill the loop.
                 return output;
         }
     }
 
     if (p != u.length) {
-        output.put("Fatal - bad framing");
+        output.push(["Fatal - bad framing"]);
     }
     return output;
 };

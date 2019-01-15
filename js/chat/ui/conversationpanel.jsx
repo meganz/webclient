@@ -1665,6 +1665,7 @@ var ConversationPanel = React.createClass({
                     noContextButton="true"
                     contact={contact}
                     megaChat={self.props.chatRoom.megaChat}
+                    showLastGreen={true}
                     key={contact.u}/>
         }
 

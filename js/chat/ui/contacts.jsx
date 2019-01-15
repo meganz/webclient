@@ -173,7 +173,7 @@ var ContactButton = React.createClass({
                     }} />
                 );
             }
-            else if (contact.c === 0) {
+            else if (!contact.c) {
                 moreDropdowns.push(
                     <DropdownsUI.DropdownItem
                         key="view2" icon="small-icon icons-sprite grey-plus" label={__(l[101])} onClick={() => {
@@ -521,11 +521,20 @@ var ContactCard = React.createClass({
 
         var userCard = null;
         if (this.props.className === "short") {
+            var presenceRow;
+            var lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
+            if (this.props.showLastGreen && contact.presence <= 2 && lastActivity) {
+                presenceRow = (l[19994] || "Last seen %s").replace("%s", time2last(lastActivity));
+            }
+            else {
+                presenceRow = M.onlineStatusClass(contact.presence)[0];
+            }
+
             userCard = <div className="user-card-data">
                     {usernameBlock}
                     <div className="user-card-status">
                         <ContactPresence contact={contact} className={this.props.presenceClassName}/>
-                        {M.onlineStatusClass(contact.presence)[0]}
+                        {presenceRow}
                     </div>
                 </div>
         }

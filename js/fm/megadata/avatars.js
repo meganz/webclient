@@ -24,7 +24,7 @@ MegaData.prototype.avatars = function(userPurgeList) {
 
     var waitingPromises = [];
     M.u.forEach(function(c, u) {
-        if (!avatars[u] && (M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0)) {
+        if (!avatars[u] && (M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0 || M.u[u].c === undefined)) {
 
             waitingPromises.push(useravatar.loadAvatar(u));
         }

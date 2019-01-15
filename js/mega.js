@@ -1237,7 +1237,7 @@ scparser.$add('mcc', function(a) {
     // MEGAchat
     if (!megaChatIsDisabled) {
         if (megaChatIsReady) {
-            $(window).trigger('onChatdChatUpdatedActionPacket', a);
+            megaChat._queuedMccPackets.push(a);
         }
         else if (typeof ChatdIntegration !== 'undefined') {
             ChatdIntegration._queuedChats[a.id] = a;
@@ -1287,6 +1287,10 @@ scparser.$add('_sn', function(a) {
 
     // reset state
     scinshare = Object.create(null);
+
+    if (!megaChatIsDisabled && megaChatIsReady) {
+        megaChat.onSnActionPacketReceived();
+    }
 });
 
 scparser.$add('_fm', function() {

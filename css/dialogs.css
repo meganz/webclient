@@ -1106,7 +1106,6 @@
 .fm-dialog.invite-dialog {
     width: 644px;
     margin: -353px 0 0 -322px;
-    background-color: #FAFAFA;
 }
 .fm-dialog.invite-dialog.success {
     margin: -326px 0 0 -322px;
@@ -1174,40 +1173,50 @@
 .achievement-dialog.input-field {
     max-height: 64px;
     min-height: 32px;
-    background-color: rgba(0,0,0,0.05);
-    border: 1px solid transparent;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
-    padding: 0 10px 0 10px;
+    padding: 0 10px 0 0;
     height: auto !important;
     cursor: text;
     text-align: center;
     overflow: hidden;
+    line-height: 0;
+    min-width: 100%;
 }
 .active .achievement-dialog.input-field {
     background-color: white;
-    border: 1px solid rgba(0,0,0,0.2);
+}
+.achievement-dialog.input-field .jspContainer, .achievement-dialog.input-field .jspPane {
+    min-height: 32px;
+    min-width: 100%;
 }
 .achievement-dialog.input-field ul {
     padding: 0 10px 0 10px;
     font-size: 0;
     line-height: 0;
+    clear: left;
+    overflow: hidden;
+    -webkit-transition: all 0ms ease-in-out;
+    -moz-transition: all 0ms ease-in-out;
+    -o-transition: all 0ms ease-in-out;
+    -ms-transition: all 0ms ease-in-out;
+    transition: all 0ms ease-in-out;
 }
 .achievement-dialog.input-field li {
     overflow: hidden;
-    height: 30px;
+    height: 32px;
     line-height: 18px;
     margin: 0;
     padding: 0;
     cursor: default;
     font-size: 14px;
     color: #333333;
-    padding: 6px 18px 0 4px;
-    display: inline-block;
+    padding: 7px 18px 7px 4px;
+    float: left;
     white-space: nowrap;
     position: relative;
     max-width: 100%;
@@ -1229,14 +1238,23 @@ li.token-input-token-invite .input-close {
     background-color: transparent;
     font-size: 14px;
     line-height: 18px;
+    height:  32px;
+    float: left;
     color: #333333;
     margin: 0;
     padding: 0;
     -webkit-appearance: caret;
     font-family: 'source_sans_proregular', Arial;
 }
-.achievement-dialog.input-field input.tiny {
+.achievement-dialog.input-field input.tiny, ul.token-input-list-mega li input.tiny, .multiple-input input.tiny {
     width: 0 !important;
+}
+.achievement-dialog li.token-input-input-token-invite {
+    float: left;
+    margin: 0;
+    padding: 0 4px;
+    list-style-type: none;
+    max-width: 100%;
 }
 .achievement-dialog.input-info.red, .achievement-dialog.input-field input.red {
     color: #E54C51;
@@ -1281,7 +1299,7 @@ li.token-input-token-invite .input-close {
     margin-top: 6px;
 }
 .achievement-dialog.links-block .input-field {
-    margin: 16px 0 0 0;
+    margin: 10px 0 0 0;
     padding: 0 14px 0 14px;
 }
 .achievement-dialog.links-block .input-label {

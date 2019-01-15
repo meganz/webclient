@@ -185,18 +185,17 @@ function handleDialogScroll(num, dc) {
 }
 
 
-function clearScrollPanel(from) {
-    var j = $(from + ' .multiple-input').jScrollPane().data();
+function initTokenInputsScroll($on) {
+    $on.jScrollPane({
+        enableKeyboardNavigation: false,
+        showArrows: true,
+        arrowSize: 8,
+        animateScroll: true
+    });
+}
 
-    if (j && j.jsp) {
-        j.jsp.destroy();
-    }
-
-    $(from + ' .multiple-input .jspPane').unwrap();
-    $(from + ' .multiple-input .jspPane:first-child').unwrap();
-
-    // remove share dialog contacts, jScrollPane
-    j = $(from + ' .share-dialog-contacts').jScrollPane().data();
+function clearScrollPanel($from) {
+    var j = $from.jScrollPane().data();
 
     if (j && j.jsp) {
         j.jsp.destroy();

@@ -330,6 +330,10 @@ RichpreviewsFilter._updateMessageToPreview = function(chatRoom, msgObj, response
 RichpreviewsFilter.prototype.onPendingMessageConfirmed = function(chatRoom, msgObj) {
     "use strict";
 
+    if (msgObj.textContents && msgObj.textContents.charCodeAt && msgObj.textContents.charCodeAt(0) === 0) {
+        // not a text message.
+        return;
+    }
     var keys = [
         chatRoom.roomId + "_" + msgObj.pendingMessageId,
         chatRoom.roomId + "_" + msgObj.messageId

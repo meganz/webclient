@@ -368,7 +368,7 @@ function setupTransferAnalysis() {
 
         function Finish(crc) {
             onTimeout(1);
-            var modtime = (uq_entry.lastModifiedDate || 0) / 1000;
+            var modtime = (uq_entry.lastModifiedDate || uq_entry.lastModified || 0) / 1000;
             callback(base64urlencode(crc + serialize(modtime)), modtime);
             callback = null;
         }

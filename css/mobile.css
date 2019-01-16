@@ -4263,16 +4263,28 @@ div.checkboxOn, div.checkboxOff {
 .fm-dialog.limited-bandwidth-dialog.exceeded:not(.achievements):not(.pro) {
 
 }
+.fm-dialog.limited-bandwidth-dialog .dialog-icon {
+    margin: 25px auto 0 auto;
+}
+.fm-dialog.limited-bandwidth-dialog .storage-icon.full {
+    display: none;
+}
+.fm-dialog.limited-bandwidth-dialog.uploads.exceeded .storage-icon.full {
+    display: block;
+}
+.fm-dialog.limited-bandwidth-dialog.uploads.exceeded .msg-prewarning, .fm-dialog.limited-bandwidth-dialog.uploads.exceeded .speedometer {
+    display: none;
+}
 .fm-dialog.limited-bandwidth-dialog.exceeded.pro.slider {
     margin-top: -282px;
 }
-.limited-bandwidth-dialog .plan-blocks, .exceeded:not(.achievements):not(.pro) .limited-bl, .big-104px-icon.full, .exceeded .big-104px-icon.almost-full, .dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog.pro-exceeded-slider {
+.limited-bandwidth-dialog .plan-blocks, .exceeded:not(.achievements):not(.pro) .limited-bl, .limited-bandwidth-dialog:not(.exceeded) .big-104px-icon.full, .exceeded .big-104px-icon.almost-full, .dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog.pro-exceeded-slider {
     display: none;
 }
 .exceeded:not(.achievements):not(.pro) .plan-blocks, .exceeded .dialog.header-before-icon.exceeded, .exceeded:not(.achievements):not(.pro) .fm-dialog-close, .pro.exceeded .dialog.pro-exceeded-bl, .slider .dialog.pro-exceeded-slider {
     display: block;
 }
-.exceeded:not(.pro) .big-104px-icon.full, .exceeded:not(.achievements):not(.pro) .dialog.bottom-tips span, .exceeded.pro .default-big-button.upgrade.pro {
+.fm-dialog:not(.uploads) .exceeded:not(.pro) .big-104px-icon.full, .exceeded:not(.achievements):not(.pro) .dialog.bottom-tips span, .exceeded.pro .default-big-button.upgrade.pro {
     display: block;
 }
 .dialog.transfer-overquota-txt {

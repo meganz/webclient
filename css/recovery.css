@@ -630,6 +630,9 @@
     cursor: pointer;
     position: relative;
 }
+.recovery-key-info.improved-recovery-steps .col-3 {
+    cursor: auto;
+}
 .improved-recovery-steps .check-sessions .col-3 {
     display: table-cell;
     border: 2px solid rgba(153, 153, 153, 0.25);

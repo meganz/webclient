@@ -1244,6 +1244,10 @@ var ConversationPanel = React.createClass({
                                 }
 
                                 self.setState({'editing': false});
+
+                                Soon(function() {
+                                    $('.chat-textarea-block:visible textarea').focus();
+                                }, 300);
                             }}
                             onDeleteClicked={(e, msg) => {
                                 self.setState({

@@ -601,7 +601,7 @@ function contactAddDialog(close) {
     initTokenInputsScroll($('.multiple-input', $d));
     Soon(function() {
         $('.token-input-input-token-mega input', $d).trigger("focus");
-    },);
+    });
 
     $d.find('.add-user-popup-button').text(l[19112]).addClass('disabled');
 

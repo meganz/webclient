@@ -877,7 +877,7 @@ ul, li {
     position: fixed;
     width: 100%;
 }
-.mobile.full-page-scrollable .mobile.fm-header .mobile.fm-header-txt {
+.mobile.full-page-scrollable:not(.registration-confirm-email):not(.registration-generating-keys) .mobile.fm-header .mobile.fm-header-txt {
     margin: 0 20px 0;
 }
 .mobile.fm-header.pfid-style .open-title-menu {

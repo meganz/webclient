@@ -148,18 +148,66 @@ pro.proplan = {
     },
 
     /**
-     * Populate the monthly plans across the main /pro page
+     * Update each pricing block with details from the API
      */
-    populateMembershipPlans: function() {
+    updateEachPriceBlock: function(pageType, $pricingBoxes, $dialog) {
         "use strict";
 
-        // Cache selectors
-        var $stepOne = $('.plans-block');
-        var $pricingBoxes = $stepOne.find('.reg-st3-membership-bl');
-        var oneLocalPriceFound = false;
         var euroSign = '\u20ac';
+        var oneLocalPriceFound = false;
+        var zeroPrice;
+        var classType = 1;
 
-        // Update each pricing block with details from the API
+        var setPriceFont = function _setPriceFunction(_pageType,
+                                                      _monthlyBasePriceDollars,
+                                                      _monthlyBasePriceCents,
+                                                      _$priceDollars,
+                                                      _$priceCents,
+                                                      _classType) {
+            if (_pageType === "P") {
+                if (_monthlyBasePriceDollars.length > 9) {
+                    if (_monthlyBasePriceDollars.length > 11) {
+                        _$priceDollars.addClass('tooBig2');
+                        _$priceCents.addClass('toosmall2');
+                        _monthlyBasePriceCents = '0';
+                    }
+                    else {
+                        _$priceDollars.addClass('tooBig');
+                        _$priceCents.addClass('toosmall');
+                        _monthlyBasePriceCents = '00';
+                    }
+                    _monthlyBasePriceDollars = Number.parseInt(_monthlyBasePriceDollars) + 1;
+                }
+                else {
+                    if (_monthlyBasePriceCents.length > 2) {
+                        _monthlyBasePriceCents = _monthlyBasePriceCents.substr(0, 2);
+                        _monthlyBasePriceCents = Number.parseInt(_monthlyBasePriceCents) + 1;
+                        _monthlyBasePriceCents = (_monthlyBasePriceCents + '0').substr(0, 2);
+                    }
+                }
+                return [_monthlyBasePriceDollars,_monthlyBasePriceCents];
+            }
+            else {
+                if (_monthlyBasePriceDollars.length > 7) {
+                    _classType = 1;
+                    _monthlyBasePriceCents = '00';
+                    if (_monthlyBasePriceDollars.length > 9) {
+                        _classType = 2;
+                        _monthlyBasePriceCents = '0';
+                    }
+                    _monthlyBasePriceDollars = Number.parseInt(_monthlyBasePriceDollars) + 1;
+                }
+                else {
+                    if (_monthlyBasePriceCents.length > 2) {
+                        _monthlyBasePriceCents = _monthlyBasePriceCents.substr(0, 2);
+                        _monthlyBasePriceCents = Number.parseInt(_monthlyBasePriceCents) + 1;
+                        _monthlyBasePriceCents = (_monthlyBasePriceCents + '0').substr(0, 2);
+                    }
+                }
+                return [_monthlyBasePriceDollars,_monthlyBasePriceCents,_classType];
+            }
+        };
+
         for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
 
             // Get plan details
@@ -170,10 +218,7 @@ pro.proplan = {
 
             // Show only monthly prices in the boxes
             if (months !== 12) {
-
-                // Cache selectors
                 var $pricingBox = $pricingBoxes.filter('.pro' + planNum);
-                var $planName = $pricingBox.find('.title');
                 var $price = $pricingBox.find('.price');
                 var $priceDollars = $price.find('.big');
                 var $priceCents = $price.find('.small');
@@ -183,13 +228,18 @@ pro.proplan = {
                 var $bandwidthUnit = $pricingBox.find('.bandwidth-unit');
                 var $euroPrice = $('.euro-price', $price);
                 var $currncyAbbrev = $('.local-currency-code', $price);
-
-                $priceDollars.removeClass('tooBig tooBig2');
-                $priceCents.removeClass('toosmall toosmall2');
-
                 var monthlyBasePrice;
                 var monthlyBasePriceCurrencySign;
-                var zeroPrice;
+                var $planName;
+
+                if (pageType === "P") {
+                    $planName = $pricingBox.find('.title');
+                    $priceDollars.removeClass('tooBig tooBig2');
+                    $priceCents.removeClass('toosmall toosmall2');
+                }
+                else {
+                    $planName = $pricingBox.find('.title span');
+                }
 
                 if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
                     $euroPrice.removeClass('hidden');
@@ -198,52 +248,58 @@ pro.proplan = {
                     $euroPrice.text(currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] +
                         ' ' + euroSign);
                     // Calculate the monthly base price in local currency
-                    monthlyBasePrice = '' + currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-                    zeroPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICEZERO];
-                    oneLocalPriceFound = true;
+                    monthlyBasePrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE].toString();
+                    if (pageType === "P") {
+                        zeroPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICEZERO];
+                        oneLocalPriceFound = true;
+                    }
+                    else {
+                        $pricingBoxes.addClass('local-currency');
+                        $('.reg-st3-txt-localcurrencyprogram', $dialog).removeClass('hidden');
+                    }
                 }
                 else {
                     $euroPrice.addClass('hidden');
                     $currncyAbbrev.addClass('hidden');
-
                     // Calculate the monthly base price
-                    monthlyBasePrice = '' + currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE];
+                    monthlyBasePrice = currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE].toString();
                     monthlyBasePriceCurrencySign = euroSign;
+                    if (pageType === "D") {
+                        $pricingBoxes.removeClass('local-currency');
+                        $('.reg-st3-txt-localcurrencyprogram', $dialog).addClass('hidden');
+                    }
                 }
 
                 // Calculate the monthly base price
                 var monthlyBasePriceParts = monthlyBasePrice.split('.');
                 var monthlyBasePriceDollars = monthlyBasePriceParts[0];
                 var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';
-                // if (monthlyBasePrice.length > 10) {
-                    if (monthlyBasePriceDollars.length > 9) {
-                        if (monthlyBasePriceDollars.length > 11) {
-                            $priceDollars.addClass('tooBig2');
-                            $priceCents.addClass('toosmall2');
-                            monthlyBasePriceCents = '0';
-                        }
-                        else {
-                            $priceDollars.addClass('tooBig');
-                            $priceCents.addClass('toosmall');
-                            monthlyBasePriceCents = '00';
-                        }
-                        monthlyBasePriceDollars = Number.parseInt(monthlyBasePriceDollars) + 1;
-                    }
-                    else {
-                        if (monthlyBasePriceCents.length > 2) {
-                            monthlyBasePriceCents = monthlyBasePriceCents.substr(0, 2);
-                            monthlyBasePriceCents = Number.parseInt(monthlyBasePriceCents) + 1;
-                            monthlyBasePriceCents = (monthlyBasePriceCents + '0').substr(0, 2);
-                        }
-                    }
-                // }
-                // Get the current plan's bandwidth, then convert the number to 'x GBs' or 'x TBs'
+
+                var setPriceFontResults;
+                if (pageType === "P") {
+                    setPriceFontResults = setPriceFont(pageType,
+                        monthlyBasePriceDollars,
+                        monthlyBasePriceCents,
+                        $priceDollars,
+                        $priceCents);
+                }
+                else {
+                    setPriceFontResults = setPriceFont(pageType,
+                        monthlyBasePriceDollars,
+                        monthlyBasePriceCents,
+                        $priceDollars,
+                        $priceCents,
+                        classType);
+                    classType = setPriceFontResults[2];
+                }
+                monthlyBasePriceDollars = setPriceFontResults[0];
+                monthlyBasePriceCents = setPriceFontResults[1];
+
                 var storageGigabytes = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
                 var storageBytes = storageGigabytes * 1024 * 1024 * 1024;
                 var storageFormatted = numOfBytes(storageBytes, 0);
                 var storageSizeRounded = Math.round(storageFormatted.size);
 
-                // Get the current plan's bandwidth, then convert the number to 'x GBs' or 'x TBs'
                 var bandwidthGigabytes = currentPlan[pro.UTQA_RES_INDEX_TRANSFER];
                 var bandwidthBytes = bandwidthGigabytes * 1024 * 1024 * 1024;
                 var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
@@ -270,6 +326,28 @@ pro.proplan = {
                 $bandwidthUnit.text(bandwidthFormatted.unit);
             }
         }
+        if (pageType === "P") {
+            return [oneLocalPriceFound, zeroPrice];
+        }
+        else {
+            return classType;
+        }
+    },
+
+    /**
+     * Populate the monthly plans across the main /pro page
+     */
+    populateMembershipPlans: function() {
+        "use strict";
+
+        var $stepOne = $('.plans-block');
+        var $pricingBoxes = $stepOne.find('.reg-st3-membership-bl');
+        var euroSign = '\u20ac';
+
+        var updatePriceBlockResults = pro.proplan.updateEachPriceBlock("P", $pricingBoxes);
+        var oneLocalPriceFound = updatePriceBlockResults[0];
+        var zeroPrice = updatePriceBlockResults[1];
+
         var $pricingBoxFree = $pricingBoxes.filter('.free');
         var $priceFree = $pricingBoxFree.find('.price');
         var $priceCentsFree = $priceFree.find('.small');

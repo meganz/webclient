@@ -23949,7 +23949,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .local-currency .membership-gray-block {
-    height: 124px;
+    height: 160px;
 }
 
 .local-currency .num .big {
@@ -23998,7 +23998,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 .limited-bandwidth-dialog .local-currency .reg-st3-bott-title.price .local-currency-code {
     margin-top: 2px;
-    margin-bottom: 0px;
+    margin-bottom: 6px;
 }
 .information-highlight {
     box-sizing: border-box;

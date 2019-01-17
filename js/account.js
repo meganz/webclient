@@ -350,9 +350,13 @@ function u_setrsa(rsakey) {
 
                         watchdog.notify('setrsa', [u_type, u_sid]);
 
-                        // Import welcome pdf at account creation -- Removed
-                        // NOT needed, since the file is create on account creation (initial ephemral accoount)
+                        // Recovery Key Onboarding improvements
+                        // Show newly registered user the download recovery key dialog.
+                        M.onFileManagerReady(function() {
+                            M.showRecoveryKeyDialog(1);
+                        });
                     }
+
                     $promise.resolve(rsakey);
                     ui_keycomplete();
                 }
@@ -368,6 +372,35 @@ function u_setrsa(rsakey) {
     }, ctx);
 
     return $promise;
+}
+
+// Save user's Recovery/Master key to disk
+function u_savekey() {
+    'use strict';
+    return u_exportkey(true);
+}
+
+/**
+ * Copy/Save user's Recovery/Master key
+ * @param {Boolean|String} action save to disk if true, otherwise copy to clipboard - if string show a toast
+ */
+function u_exportkey(action) {
+    'use strict';
+    var key = a32_to_base64(window.u_k || '');
+
+    if (action === true) {
+        M.saveAs(key, 'MEGA-RECOVERYKEY.txt');
+    }
+    else {
+        copyToClipboard(key, typeof action === 'string' && action);
+    }
+
+    mBroadcaster.sendMessage('keyexported');
+
+    if (!localStorage.recoverykey) {
+        localStorage.recoverykey = 1;
+        $('body').addClass('rk-saved');
+    }
 }
 
 // ensures that a user identity exists, also sets sid

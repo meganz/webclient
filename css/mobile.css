@@ -7884,7 +7884,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     float: initial;
 }
 .mobile .improved-recovery-steps .recover-image, .improved-recovery-steps .session-image-block {
-    background-image: url(../images/mega/recover-account-sprite.png);
+    background-image: url(../images/mega/recover-account-sprite_v1.png);
     background-repeat: no-repeat;
     background-size: 344px auto;
     display: block;
@@ -8989,6 +8989,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 }
 .mobile .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
     background-color: #fff;
+    height: -webkit-calc(100% - 12px);
+    height: -moz-calc(100% - 12px);
+    height: calc(100% - 12px);
 }
 .mobile .onboarding-suggestions .bottom-page.download-container.linux-only {
     display: block;
@@ -9034,7 +9037,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .mobile .onboarding-suggestions .button-wrappers {
     padding: 0 24px;
 }
-
 .takedown-guidance p.first, .privacy-policy p.first {
     padding-top: 5px;
 }
@@ -10270,7 +10272,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         background-size: 72px auto;
     }
     .mobile .improved-recovery-steps .recover-image, .mobile .improved-recovery-steps .session-image-block, .mobile .improved-recovery-steps .recover-button.yes::after, .mobile .improved-recovery-steps .recover-button.no::after   {
-    background-image: url(../images/mega/recover-account-sprite@2x.png);
+    background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
     background-size: 344px auto;
     }
 }

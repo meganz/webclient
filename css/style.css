@@ -23761,7 +23761,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     word-wrap: break-word;
 }
 .tooltip-block .minimum-password-block .password-icon  {
-    background-image: url(../images/mega/recover-account-sprite.png);
+    background-image: url(../images/mega/recover-account-sprite_v1.png);
     background-repeat: no-repeat;
     background-size: 344px auto;
     width: 20px;

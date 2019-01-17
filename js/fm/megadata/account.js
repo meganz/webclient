@@ -344,7 +344,7 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
     // TODO: Implement this on mobile
     if (!$dialog.length) {
         if (d) {
-            console.debug('recovery-key-dialog not available...')
+            console.debug('recovery-key-dialog not available...');
         }
         return;
     }

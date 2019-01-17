@@ -8938,6 +8938,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 }
 .mobile .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
     background-color: #fff;
+    height: -webkit-calc(100% - 12px);
+    height: -moz-calc(100% - 12px);
+    height: calc(100% - 12px);
 }
 .mobile .onboarding-suggestions .bottom-page.download-container.linux-only {
     display: block;
@@ -8983,7 +8986,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .mobile .onboarding-suggestions .button-wrappers {
     padding: 0 24px;
 }
-
 .takedown-guidance p.first, .privacy-policy p.first {
     padding-top: 5px;
 }

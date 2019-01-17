@@ -3561,7 +3561,7 @@ li.token-input-token-invite .input-close {
 }
 .user-management-dialog .dialog-right-block,
 .user-management-dialog .dialog-left-block {
-    width: 260px;
+    width: 272px;
     display: inline-block;
     vertical-align: top;
     box-sizing: border-box;
@@ -3578,12 +3578,12 @@ li.token-input-token-invite .input-close {
 }
 
 .user-management-dialog .dialog-left-block {
-    margin: 16px 0 -24px 40px;
+    margin: 16px 0 -24px 32px;
     padding: 24px;
 }
 
 .user-management-dialog .dialog-right-block {
-    margin: 16px 40px -24px 0px;
+    margin: 16px 32px -24px 0px;
     padding: 24px;
 }
 

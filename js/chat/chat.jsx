@@ -162,6 +162,7 @@ var Chat = function() {
     this._imageLoadCache = Object.create(null);
     this._imagesToBeLoaded = Object.create(null);
     this._imageAttributeCache = Object.create(null);
+    this._queuedMccPackets = [];
 
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
@@ -1154,11 +1155,11 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                         'h': contactHash,
                         'u': contactHash,
                         'm': '',
-                        'c': 0
+                        'c': undefined
                     })
                 );
                 M.syncUsersFullname(contactHash);
-                self.processNewUser(contactHash);
+                self.processNewUser(contactHash, true);
                 M.syncContactEmail(contactHash);
             }
         });
@@ -1377,19 +1378,20 @@ Chat.prototype.sendMessage = function(roomJid, val) {
 };
 
 
-
 /**
  * Called when a new user is added into MEGA
  *
  * @param u {Object} object containing user information (u.u is required)
+ * @param [isNewChat] {boolean} optional - pass true if this is called API that opens OR creates a new chat (new, from
+ * in memory perspective)
  */
-Chat.prototype.processNewUser = function(u) {
+Chat.prototype.processNewUser = function(u, isNewChat) {
     var self = this;
 
     self.logger.debug("added: ", u);
 
     if (self.plugins.presencedIntegration) {
-        self.plugins.presencedIntegration.addContact(u);
+        self.plugins.presencedIntegration.addContact(u, isNewChat);
     }
     self.chats.forEach(function(chatRoom) {
         if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
@@ -2242,6 +2244,16 @@ Chat.prototype.openChatAndSendFilesDialog = function(user_handle) {
 
 Chat.prototype.toggleUIFlag = function(name) {
     this.chatUIFlags.set(name, this.chatUIFlags[name] ? 0 : 1);
+};
+
+Chat.prototype.onSnActionPacketReceived = function() {
+    if (this._queuedMccPackets.length > 0) {
+        var aps = this._queuedMccPackets;
+        this._queuedMccPackets = [];
+        for (var i = 0; i < aps.length; i++) {
+            mBroadcaster.sendMessage('onChatdChatUpdatedActionPacket', aps[i]);
+        }
+    }
 };
 
 window.Chat = Chat;

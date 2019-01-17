@@ -508,6 +508,19 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
         if (!$('.achievement-dialog.input').tokenInput("getSettings")) {
             mega.achievem.initInviteDialogMultiInputPlugin();
         }
+        else {
+            $('.jspContainer', $dialog).removeAttr('style');
+            initTokenInputsScroll($('.multiple-input', $dialog));
+            Soon(function() {
+                $('.token-input-input-token-mega input', $dialog).trigger("focus");
+            });
+        }
+
+        $dialog.position({
+            'my': 'center center',
+            'at': 'center center',
+            'of': $(window)
+        });
 
         return $dialog;
     });
@@ -540,6 +553,13 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
     var $inputWrapper = $('.achievement-dialog.multiple-input');
     var $sendButton = $dialog.find('.default-grey-button.send');
     var contacts = M.getContactsEMails();
+    var errorTimer = null;
+
+    $dialog.position({
+        'my': 'center center',
+        'at': 'center center',
+        'of': $(window)
+    });
 
     $this.tokenInput(contacts, {
         theme: "invite",
@@ -564,18 +584,18 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
         visibleComma: false,
         enableHTML: true,
         onEmailCheck: function() {
-            $('.achievement-dialog.input-info').addClass('red').text(l[7415]);
-            $('.achievement-dialog.multiple-input').find('li input').eq(0).addClass('red');
+            $('.achievement-dialog.input-info', $dialog).addClass('red').text(l[7415]);
+            $('.achievement-dialog.multiple-input', $dialog).find('li input').eq(0).addClass('red');
             resetInfoText();
         },
         onDoublet: function(u) {
-            $('.achievement-dialog.input-info').addClass('red').text(l[7413]);
-            $('.achievement-dialog.multiple-input').find('li input').eq(0).addClass('red');
+            $('.achievement-dialog.input-info', $dialog).addClass('red').text(l[7413]);
+            $('.achievement-dialog.multiple-input', $dialog).find('li input').eq(0).addClass('red');
             resetInfoText();
         },
         onHolder: function() {
-            $('.achievement-dialog.input-info').addClass('red').text(l[7414]);
-            $('.achievement-dialog.multiple-input').find('li input').eq(0).addClass('red');
+            $('.achievement-dialog.input-info', $dialog).addClass('red').text(l[7414]);
+            $('.achievement-dialog.multiple-input', $dialog).find('li input').eq(0).addClass('red');
             resetInfoText();
         },
         onReady: function() {// Called once on dialog initialization
@@ -585,93 +605,83 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
                 var value = $.trim($input.val());
                 var emailList = value.split(/[ ;,]+/);
                 var $wrapper = $('.multiple-input', $dialog);
-                if ($wrapper.find('.share-added-contact').length > 0 || isValidEmail(value) ||
-                        emailList.length > 1) {
 
-                    $input.removeClass('red');
-                    $('.input-info',$dialog).removeClass('red').text(l[9093]);
+                if (isValidEmail(value)) {
+                    resetInfoText(0);
+                    $('.default-grey-button.send', $dialog).removeClass('disabled');
+                }
+                else if ($wrapper.find('.share-added-contact').length > 0 || emailList.length > 1) {
                     $('.default-grey-button.send', $dialog).removeClass('disabled');
                 }
                 else {
                     $('.default-grey-button.send', $dialog).addClass('disabled');
                 }
-                // TODO: scroll more then 64px of .input-field block
             });
             resetInfoText(0);
+            setTimeout(function() {
+                $('.token-input-input-token-invite input', $dialog).trigger("focus");
+            }, 0);
         },
         onAdd: function() {
-            var $inviteDialog = $('.invite-dialog');
+            $('.invite-dialog .default-grey-button.send', $dialog).removeClass('disabled');
 
-            $('.invite-dialog .default-grey-button.send').removeClass('disabled');
-
-            var $inputTokens = $inviteDialog.find('.share-added-contact.token-input-token-invite');
-            var itemNum = $inputTokens.length;
-            var $multiInput = $inviteDialog.find('.achievement-dialog.multiple-input');
-            var h1 = $inputTokens.outerHeight(true);// margin included
-            var h2 = $multiInput.height();
-
-            // show scroll box when we have more then 2 rows
-            if ((2 <= h2 / h1) && (h2 / h1 < 3)) {
-                $multiInput.jScrollPane({
-                    enableKeyboardNavigation: false,
-                    showArrows: true,
-                    arrowSize: 8,
-                    animateScroll: true
-                });
-            }
+            $dialog.position({
+                'my': 'center center',
+                'at': 'center center',
+                'of': $(window)
+            });
 
             resetInfoText(0);
         },
         onDelete: function(item) {
             var $inviteDialog = $('.invite-dialog');
-            var $inputTokens = $inviteDialog.find('.share-added-contact.token-input-token-invite');
+            var $inputTokens = $('.share-added-contact.token-input-token-invite', $dialog);
             var itemNum = $inputTokens.length;
-            var $multiInput = $inviteDialog.find('.achievement-dialog.multiple-input');
-            var $scrollBox = $('.achievement-dialog.multiple-input .jspPane')[0];
-            var h1 = $inputTokens.outerHeight(true);// margin included
-            var h2 = 0;
+
+            setTimeout(function() {
+                $('.token-input-input-token-mega input', $inviteDialog).trigger("blur");
+            }, 0);
 
             // Get number of emails
             if (itemNum === 0) {
-                $('.invite-dialog .default-grey-button.send').addClass('disabled');
+                $('.default-grey-button.send', $inviteDialog).addClass('disabled');
             }
             else {
-                $('.invite-dialog .default-grey-button.send').removeClass('disabled');
-
-                // Calculate complete scroll box height
-                if ($scrollBox) {
-                    h2 = $scrollBox.scrollHeight;
-                }
-                else { // Just multi input height
-                    h2 = $multiInput.height();
-                }
-
-                // Remove scroll when we have less then 3 rows
-                if (h2 / h1 < 3) {
-                    clearScrollPanel('.invite-dialog');
-                }
+                $('.default-grey-button.send', $inviteDialog).removeClass('disabled');
             }
+
+            $dialog.position({
+                'my': 'center center',
+                'at': 'center center',
+                'of': $(window)
+            });
         }
     });
 
     // Rest input info text and color
     function resetInfoText(timeOut) {
+        if (!$.isNumeric(timeOut)) {
+            timeOut = 3000;
+        }
 
-        timeOut = timeOut || 3000;
+        if (errorTimer) {
+            clearTimeout(errorTimer);
+            errorTimer = null;
+        }
 
-        setTimeout(function() {
+        errorTimer = setTimeout(function() {
             // Rest input info text and color
             $('.achievement-dialog.input-info')
                 .removeClass('red')
                 .text(l[9093]);
 
-            $('.achievement-dialog.multiple-input').find('li input').eq(0).removeClass('red');
+            $('.achievement-dialog.multiple-input').find('li input').eq(0)
+                .removeClass('red').trigger('focus');
         }, timeOut);
     }
-
+    
     // Invite dialog back button click event handler
     $('.fm-dialog.invite-dialog .button.back').rebind('click', function() {
-
         var $dialog = $('.fm-dialog.invite-dialog');
 
         // Remove all previously added emails
@@ -680,10 +690,18 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
         // Disable Send button
         $('.button.send', $dialog).addClass('disabled');
 
-        // Set focus on input so user can type asap
-        $('.multiple-input .token-input-list-invite', $dialog).click();
+        initTokenInputsScroll($('.multiple-input', $dialog));
+        Soon(function() {
+            $('.token-input-input-token-mega input', $dialog).trigger("focus");
+        });
 
         $dialog.removeClass('success');
+
+        $dialog.position({
+            'my': 'center center',
+            'at': 'center center',
+            'of': $(window)
+        });
     });
 
     // Invite dialog send button click event handler

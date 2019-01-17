@@ -116,7 +116,7 @@
         },
         // Tokenization settings
         tokenLimit: null,
-        tokenDelimiter: ",",
+        tokenDelimiter: /[ ,;]+/,
         preventDoublet: true,
         tokenValue: "id",
         // Behavioral settings
@@ -397,19 +397,19 @@
         }
 
         // Save the tokens
-        var saved_tokens = [],
+        var saved_tokens = [];
 
-            // Keep track of the number of tokens in the list
-            token_count = 0,
+        // Keep track of the number of tokens in the list
+        var token_count = 0;
 
-            // Basic cache to save on db hits
-            cache = new $.TokenList.Cache(),
+        // Basic cache to save on db hits
+        var cache = new $.TokenList.Cache();
 
-            // Keep track of the timeout, old vals
-            timeout,
-            input_val;
+        // Keep track of the timeout, old vals
+        var timeout;
+        var input_val;
 
-            // Create a new text input an attach keyup events
+        // Create a new text input an attach keyup events
         var input_box = $('<input type="text" autocomplete="off" autocapitalize="off"/>')
             .css({
                 outline: "none"
@@ -425,7 +425,6 @@
                         $prevItem.text($prevItem.text() + ',');
                     }
                 }
-                $(this).removeClass('tiny');
                 token_list.addClass($(input).data("settings").classes.focused);
                 $('.multiple-input').parent().addClass('active');
                 $('.permissions-menu').fadeOut(200);
@@ -444,12 +443,11 @@
                         $prevItem.text($prevItem.text().replace(',', ''));
                     }
                 }
-                $(this).addClass('tiny');
                 $(this).val('');
                 $('.multiple-input').parent().removeClass('active');
                 $('.multiple-input *').removeClass('red');
             })
-            .on("keyup keydown blur update", resize_input)
+            .on("keyup keydown blur update paste", resize_input)
             // Fix of paste issue. These is bug in tokenInut lib.
             .rebind("input.testerresize", function() {
                 $(this).trigger("keydown");
@@ -813,23 +811,33 @@
             }
         }
 
+        function initScroll() {
+            var $wrapper = $(input).closest('.multiple-input');
+
+            initTokenInputsScroll($wrapper);
+
+            focus_with_timeout(input_box);
+        }
+        
         function resize_input() {
             if (input_val === (input_val = input_box.val())) {
                 return;
             }
             // Get width left on the current line
-            var width_left = token_list.width() - input_box.offset().left - token_list.offset().left;
+            var width_left = token_list.outerWidth() - input_box.offset().left - token_list.offset().left;
             // Enter new content into resizer and resize input accordingly
-            input_resizer.html(_escapeHTML(input_val) || _escapeHTML(settings.placeholder));
+            input_resizer.html(_escapeHTML(input_val));
             // Get maximum width, minimum the size of input and maximum the widget's width
-            input_box.width(Math.min(token_list.width() || 30,
-                Math.max(width_left, input_resizer.width() + 30)));
+            input_box.width(Math.min(token_list.outerWidth() || 30,
+                Math.max(width_left, input_resizer.outerWidth() + 30)));
+
+            initScroll();
         }
 
         function add_freetagging_tokens() {
 
-            var value = $.trim(input_box.val()).replace(/\s|\n/gi, ''),
-                tokens = value.split($(input).data("settings").tokenDelimiter);
+            var value = $.trim(input_box.val()).replace(/\s|\n/gi, '');
+            var tokens = value.split($(input).data("settings").tokenDelimiter);
 
             $.each(tokens, function(i, token) {
                 if (!token) {
@@ -864,6 +872,7 @@
                         if (!$(input).data("settings").disabled && $(input).data("settings").something !== '') {
                             delete_token($(this).parent());
                             hidden_input.change();
+                             initScroll();
                             return false;
                         }
                     });
@@ -898,10 +907,10 @@
 
             if ($(input).data("settings").emailCheck) {
 
-                var isValidEmail = IsEmail(item[$(input).data("settings").tokenValue]);
+                var isEmail =  isValidEmail(item[$(input).data("settings").tokenValue]);
 
                 // Prevent further execution if email format is wrong
-                if (!isValidEmail) {
+                if (!isEmail) {
                     var cb = $(input).data("settings").onEmailCheck;
                     if ($.isFunction(cb)) {
                         cb.call(hidden_input, item);
@@ -994,7 +1003,7 @@
             input_box.width(1);
 
             // Insert the new tokens
-            if ($(input).data("settings").tokenLimit == null || token_count < $(input).data("settings").tokenLimit && isValidEmail) {
+            if ($(input).data("settings").tokenLimit == null || token_count < $(input).data("settings").tokenLimit && isEmail) {
                 insert_token(item);
 
                 // Remove the placeholder so it's not seen after you've added a token
@@ -1017,6 +1026,8 @@
                 id: item[$(input).data("settings").tokenValue],
                 name: item[$(input).data("settings").propertyToSearch]
             });
+
+            initScroll();
         }// END of function add_token
 
         // Select a token in the token list
@@ -1117,6 +1128,8 @@
                     }
                 }
             }
+
+            initScroll();
         }
 
         // Delete a token from the token list
@@ -1165,12 +1178,6 @@
                     break;
                 }
             }
-        }
-
-        // Email validation
-        function IsEmail(email) {
-            var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-            return regex.test(email);
         }
 
         // Update the hidden input box value

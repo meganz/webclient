@@ -2471,8 +2471,11 @@ MegaData.prototype.getRecentActionsList = function(limit, until) {
 
         getDate = function(ts) {
             var date = moment(ts * 1e3);
-            return date.isSame(today, 'd') ? l[1301] : date.isSame(yesterday, 'd')
-                ? l[1302] : date._d.toLocaleDateString(undefined, format);
+            return date.isSame(today, 'd')
+                ? l[1301]
+                : date.isSame(yesterday, 'd')
+                    ? l[1302]
+                    : time2date(ts, 4);
         };
         return getDate(ts);
     };

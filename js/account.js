@@ -299,6 +299,8 @@ function u_logout(logout) {
                 delete localStorage[i];
             }
         }
+
+        loadfm.loaded = false;
     }
 }
 

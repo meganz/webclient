@@ -877,7 +877,7 @@ ul, li {
     position: fixed;
     width: 100%;
 }
-.mobile.full-page-scrollable .mobile.fm-header .mobile.fm-header-txt {
+.mobile.full-page-scrollable:not(.registration-confirm-email):not(.registration-generating-keys) .mobile.fm-header .mobile.fm-header-txt {
     margin: 0 20px 0;
 }
 .mobile.fm-header.pfid-style .open-title-menu {
@@ -4263,16 +4263,28 @@ div.checkboxOn, div.checkboxOff {
 .fm-dialog.limited-bandwidth-dialog.exceeded:not(.achievements):not(.pro) {
 
 }
+.fm-dialog.limited-bandwidth-dialog .dialog-icon {
+    margin: 25px auto 0 auto;
+}
+.fm-dialog.limited-bandwidth-dialog .storage-icon.full {
+    display: none;
+}
+.fm-dialog.limited-bandwidth-dialog.uploads.exceeded .storage-icon.full {
+    display: block;
+}
+.fm-dialog.limited-bandwidth-dialog.uploads.exceeded .msg-prewarning, .fm-dialog.limited-bandwidth-dialog.uploads.exceeded .speedometer {
+    display: none;
+}
 .fm-dialog.limited-bandwidth-dialog.exceeded.pro.slider {
     margin-top: -282px;
 }
-.limited-bandwidth-dialog .plan-blocks, .exceeded:not(.achievements):not(.pro) .limited-bl, .big-104px-icon.full, .exceeded .big-104px-icon.almost-full, .dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog.pro-exceeded-slider {
+.limited-bandwidth-dialog .plan-blocks, .exceeded:not(.achievements):not(.pro) .limited-bl, .limited-bandwidth-dialog:not(.exceeded) .big-104px-icon.full, .exceeded .big-104px-icon.almost-full, .dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog.pro-exceeded-slider {
     display: none;
 }
 .exceeded:not(.achievements):not(.pro) .plan-blocks, .exceeded .dialog.header-before-icon.exceeded, .exceeded:not(.achievements):not(.pro) .fm-dialog-close, .pro.exceeded .dialog.pro-exceeded-bl, .slider .dialog.pro-exceeded-slider {
     display: block;
 }
-.exceeded:not(.pro) .big-104px-icon.full, .exceeded:not(.achievements):not(.pro) .dialog.bottom-tips span, .exceeded.pro .default-big-button.upgrade.pro {
+.fm-dialog:not(.uploads) .exceeded:not(.pro) .big-104px-icon.full, .exceeded:not(.achievements):not(.pro) .dialog.bottom-tips span, .exceeded.pro .default-big-button.upgrade.pro {
     display: block;
 }
 .dialog.transfer-overquota-txt {
@@ -5138,10 +5150,12 @@ div.checkboxOn, div.checkboxOff {
     color: #00A58F;
 }
 .mobile.my-account-page .account-usage-block.warning,
+.mobile.my-account-page .account-usage-block.warning .storage-usage,
 .mobile.my-account-page .account-usage-block.warning .account-usage-text {
     color: #ff971e;
 }
 .mobile.my-account-page .account-usage-block.over-quota,
+.mobile.my-account-page .account-usage-block.over-quota .storage-usage,
 .mobile.my-account-page .account-usage-block.over-quota .account-usage-text {
     color: #eb4444;
 }
@@ -8999,6 +9013,25 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     text-align: right;
 }
 
+.mobile.payment-result.pending.alternate {
+    position: fixed;
+    z-index: 99999;
+    background-color: rgba(255, 255, 255, 1);
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    display: block;
+}
+.mobile .payment-result-pad {
+    width: calc(100% - 48px);
+    margin: -127px auto;
+    top: 50%;
+    position: relative;
+}
+.mobile .payment-result.pending .payment-result-txt > a {
+    color: #eb4444;
+}
 
 /* Only media queries after here */
 @media only screen and (max-width: 970px) {

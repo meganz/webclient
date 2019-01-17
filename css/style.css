@@ -21,6 +21,17 @@
     text-rendering: optimizeLegibility;
 }
 @font-face {
+    font-family: 'LatoWebSemibold';
+    src: url('../fonts/Lato-Semibold.eot'); /* IE9 Compat Modes */
+    src: url('../fonts/Lato-Semibold.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../fonts/Lato-Semibold.woff2') format('woff2'), /* Modern Browsers */
+         url('../fonts/Lato-Semibold.woff') format('woff'), /* Modern Browsers */
+         url('../fonts/Lato-Semibold.ttf') format('truetype');
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
     font-family: 'LatoWebBlack';
     src: url('../fonts/Lato-Black.eot'); /* IE9 Compat Modes */
     src: url('../fonts/Lato-Black.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
@@ -8926,10 +8937,10 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     width: 730px;
 }
 .fm-dialog.share-dialog, .fm-dialog.share-with-contact-dialog {
-    width: 480px;
+    width: 600px;
     height: auto;
     min-height: 10px;
-    margin: -119px 0 0 -240px;
+    margin: -119px 0 0 -300px;
 }
 .fm-dialog.share-dialog .fm-dialog-body, .fm-dialog.share-with-contact-dialog .fm-dialog-body {
     position: relative;
@@ -16760,11 +16771,11 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 ul.token-input-list-mega {
     height: auto !important;
-    width: 100%;
+    display: block;
     border: 0;
     cursor: text;
     font-size: 14px;
-    min-height: 1px;
+    min-height: 36px;
     z-index: 999;
     margin: 0;
     list-style-type: none;
@@ -16772,7 +16783,7 @@ ul.token-input-list-mega {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 0 35px 0 40px;
+    padding: 0 15px 0 40px;
     overflow: hidden;
 }
 .add-user-popup-pad ul.token-input-list-mega {
@@ -16788,6 +16799,7 @@ ul.token-input-list-mega {
     background-color: rgba(0,0,0,0.02);
     max-height: 144px;
     min-height: 36px;
+    min-width: 100%;
     -webkit-transition: box-shadow 200ms ease-in-out;
     -moz-transition: box-shadow 200ms ease-in-out;
     -o-transition: box-shadow 200ms ease-in-out;
@@ -16820,15 +16832,20 @@ ul.token-input-list-mega {
 .error .multiple-input-warning, .duplicate .duplicated-input-warning {
     display: block;
 }
+.multiple-input .jspContainer, .multiple-input .jspPane {
+    min-height: 36px;
+    min-width: 100%;
+}
 ul.token-input-list-mega li input, .multiple-input input {
     border: 0;
-    width: auto !important;
-    min-width: 100%;
+    width: 100px;
     padding: 0;
+    float: left;
     color: #333333;
     background-color: transparent;
     font-size: 14px;
     line-height: 18px;
+    max-width: 100%;
     height: 36px;
     margin: 0;
     padding: 0 3px 0 3px;
@@ -16839,6 +16856,9 @@ ul.token-input-list-mega li input, .multiple-input input {
     -o-transition: color 200ms ease-in-out;
     -ms-transition: color 200ms ease-in-out;
     transition: color 200ms ease-in-out;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 input#token-input- {
     color: #666666;
@@ -16919,8 +16939,9 @@ li.token-input-input-token-mega {
     padding: 0;
     list-style-type: none;
     max-width: 100%;
+    text-align: left;
 }
-li.token-input-input-token-mega:first-child {
+li.token-input-input-token-mega:first-child, li.token-input-input-token-mega:first-child input {
     min-width: 100%;
 }
 .active li.token-input-input-token-mega:first-child {
@@ -17232,9 +17253,6 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 .error .multiple-input input {
     color: #D90007;
-}
-.active ul.token-input-list-mega li input, .multiple-input:hover ul.token-input-list-mega li input {
-    min-width: none;
 }
 .import-contacts-link {
     line-height: 24px;
@@ -23931,7 +23949,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .local-currency .membership-gray-block {
-    height: 124px;
+    height: 160px;
 }
 
 .local-currency .num .big {
@@ -23980,7 +23998,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 .limited-bandwidth-dialog .local-currency .reg-st3-bott-title.price .local-currency-code {
     margin-top: 2px;
-    margin-bottom: 0px;
+    margin-bottom: 6px;
 }
 .information-highlight {
     box-sizing: border-box;

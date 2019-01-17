@@ -65,8 +65,10 @@ Object.defineProperty(this, 'MEGA_USER_STRUCT', {
         "firstName": "",
         "lastName": "",
         "ts": undefined,
+        "ats": undefined,
         "rTimeStamp": undefined,
-        "avatar": undefined
+        "avatar": undefined,
+        "lastGreen": undefined
     })
 });
 

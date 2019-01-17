@@ -1927,7 +1927,7 @@ accountUI.renderSessionHistory = function() {
  */
 accountUI.getSessionHtml = function(el) {
     "use strict";
-    
+
     var currentSession = el[5];
     var activeSession = el[7];
     var userAgent = el[2];
@@ -2415,7 +2415,7 @@ accountUI.initRadio.enable = function(value, $container) {
         .prop('disabled', false);
 };
 
-accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
+accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen) {
     // TODO: FIXME, make accountUI elements not dependant!
     if (!megaChatIsReady) {
         // accountUI.advanced section was called too early, e.g. before chat's initialisation...delay the init.
@@ -2443,8 +2443,9 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
                                                                      autoawaylock,
                                                                      autoawaytimeout,
                                                                      persist,
-                                                                     persistlock) {
-            accountUI.advancedSection(autoaway, autoawaylock, autoawaytimeout, persist, persistlock);
+                                                                     persistlock,
+                                                                     lastSeen) {
+            accountUI.advancedSection(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
         });
 
         presenceInt.userPresence.updateui();
@@ -2471,8 +2472,9 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
                                                                      autoawaylock,
                                                                      autoawaytimeout,
                                                                      persist,
-                                                                     persistlock) {
-            accountUI.advancedSection(autoaway, autoawaylock, autoawaytimeout, persist, persistlock);
+                                                                     persistlock,
+                                                                     lastSeen) {
+            accountUI.advancedSection(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
         });
     }
 
@@ -2486,6 +2488,19 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         presenceInt.userPresence.ui_setautoaway(newVal);
     };
 
+    var lastSeenChangeRequestedHandler = function(newVal) {
+        presenceInt.userPresence.ui_enableLastSeen(newVal);
+    };
+
+    accountUI.initCheckbox(
+        'last-seen',
+        $sectionContainerChat,
+        lastSeen,
+        lastSeenChangeRequestedHandler
+    );
+
+
+    $('.last-seen-wrapper', $sectionContainerChat).removeClass('hidden');
 
     if (autoawaytimeout !== false) {
 

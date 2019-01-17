@@ -3144,5 +3144,6 @@
     "20193": "[B]Ausdrucken[\/B] und aufbewahren.",
     "20194": "In den Passwortmanager [B]kopieren[\/B]",
     "20195": "Auf USB-Stick oder externer Festplatte [B]speichern[\/B]",
-    "20196": "%1 cleaning scheduler"
+    "20196": "%1 cleaning scheduler",
+    "20197": "[S1]$1[\/S1][S2]of[\/S2][S3]$2[\/S3]"
 }

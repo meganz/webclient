@@ -3144,5 +3144,6 @@
     "20193": "[B]Print it[\/B] and keep it secure.",
     "20194": "[B]Save it[\/B] in your password manager",
     "20195": "[B]Store it[\/B] on a USB key or back up drive",
-    "20196": "%1 \u0e17\u0e33\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e30\u0e2d\u0e32\u0e14\u0e15\u0e32\u0e21\u0e01\u0e33\u0e2b\u0e19\u0e14\u0e01\u0e32\u0e23"
+    "20196": "%1 \u0e17\u0e33\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e30\u0e2d\u0e32\u0e14\u0e15\u0e32\u0e21\u0e01\u0e33\u0e2b\u0e19\u0e14\u0e01\u0e32\u0e23",
+    "20197": "[S1]$1[\/S1][S2]of[\/S2][S3]$2[\/S3]"
 }

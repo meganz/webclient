@@ -532,7 +532,6 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     font-size: 14px;
     line-height: 24px;
     color: #666666;
-    letter-spacing: 0.5px;
     padding-bottom: 10px;
 }
 .bottom-page.small-txt a, .bottom-page.small-txt span {

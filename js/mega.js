@@ -3013,7 +3013,7 @@ function processMCF(mcfResponse, ignoreDB) {
     }
 }
 
-function folderreqerr()
+function folderreqerr(c, e)
 {
     loadingDialog.hide();
     loadingInitDialog.hide();
@@ -3023,8 +3023,16 @@ function folderreqerr()
 
     // If desktop site show "Folder link unavailable" dialog
     if (!is_mobile) {
-        var title = l[1043];
-        var message = l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>';
+        var title;
+        var message;
+        if (parseInt(e) === EARGS) {
+            title = l[20198];
+            message = l[20199];
+        }
+        else {
+            title = l[1043];
+            message = l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>';
+        }
 
         msgDialog('warninga', title, message, false, function() {
 
@@ -3037,7 +3045,7 @@ function folderreqerr()
     }
     else {
         // Show file/folder not found overlay
-        mobile.notFoundOverlay.show();
+        mobile.notFoundOverlay.show(e);
     }
 }
 

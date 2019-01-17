@@ -417,7 +417,13 @@ function init_page() {
         }
 
         n_h = pfid;
-        if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22) {
+        if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22 || pfid.length !== 8) {
+
+            if (pfid.length !== 8) {
+                folderreqerr(false, EARGS);
+                return;
+            }
+
             if (pfkey.length === 22) {
                 api_setfolder(n_h);
                 if (waitxhr) {

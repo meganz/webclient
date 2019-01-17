@@ -71,6 +71,74 @@ pro.proplan = {
         $contactUsButton.rebind('click', function() {
             loadSubPage('contact');
         });
+
+        // If Mobile add some specific styling
+        if (is_mobile) {
+            $body.find('.mobile.fm-header-txt').text(l[16111]);
+
+            if ($body.hasClass('key')) {
+                $body.find('.pro4 .cta-button').removeClass('secondary').addClass('green');
+                $body.find('.pro1 .cta-button').addClass('secondary').removeClass('green');
+            }
+
+            this.initMobilePlanDots();
+        }
+    },
+
+    /**
+     * Pro page plans side scroll on mobile snap scroll to elements.
+     */
+    initMobilePlanDots: function() {
+
+        'use strict';
+
+        // The box which gets scroll and contains all the child content.
+        var $scrollParent = $('.bottom-page.horizontal-centered-bl.centered-txt.plans.horizontal-plans');
+        var $dots = $(".mobile .horizontal-plans.nav-dots-container li");
+
+        /** An ordered array of scroll offsets to snap to. **/
+        var snapToOffsets = [];
+
+        // Calculate the snapTo offsets based on pro plan box positions.
+        var blocks = $scrollParent.find('.reg-st3-membership-bl:not(.hidden)');
+        for (var i = 0; i < blocks.length; i++) {
+            snapToOffsets.push(blocks[i].offsetLeft);
+        }
+
+        var closestSnapPointIndex = function() {
+            var currentScrollPosition = $scrollParent.scrollLeft();
+
+            var i = 0;
+            while (snapToOffsets[i] < currentScrollPosition && i < snapToOffsets.length) {
+                i += 1;
+            }
+
+            if (i !== 0 && i !== snapToOffsets.length - 1) {
+                // Try see if i-1 is closer.
+                var lower = snapToOffsets[i - 1];
+                if (currentScrollPosition - lower < snapToOffsets[i] - currentScrollPosition) {
+                    return i - 1;
+                }
+            }
+            return i;
+        };
+
+        var lastCheck = 0;
+        var lastClosestIndex = 0;
+
+        $scrollParent.rebind('scroll', function() {
+            var now = Date.now();
+            if (now - lastCheck > 5) {
+                var closestIndex = closestSnapPointIndex();
+                if (closestIndex !== lastClosestIndex) {
+                    $dots.removeClass('current');
+                    $($dots[closestIndex]).addClass('current');
+                    lastClosestIndex = closestIndex;
+                }
+                lastCheck = now;
+            }
+        });
+
     },
 
     /**

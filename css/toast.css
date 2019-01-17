@@ -314,8 +314,9 @@
     text-align: center;
 }
 .mobile.toast-notification.success {
-    background-color: rgba(0, 191, 166, 0.9);
-    color: white;
+    background-color: rgba(222, 222, 222, 0.8);
+    border: 1px solid #ccc;
+    color: #555;
 }
 
 .mobile.toast-notification.error {

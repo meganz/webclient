@@ -3144,5 +3144,6 @@
     "20193": "[B]Print het[\/B] en houd het veilig.",
     "20194": "[B]Opslaan[\/B] in uw wachtwoord beheer",
     "20195": "[B]Opslaan[\/B] op een USB sleutel of reserve schijf",
-    "20196": "%1 planner schoonmaken"
+    "20196": "%1 planner schoonmaken",
+    "20197": "[S1]$1[\/S1][S2]of[\/S2][S3]$2[\/S3]"
 }

@@ -3144,5 +3144,6 @@
     "20193": "[B]Imprimez-la[\/B] et gardez-la \u00e0 l\u2019abri.",
     "20194": "[B]Enregistrez-la[\/B] dans votre gestionnaire de mots de passe",
     "20195": "[B]Stockez-la[\/B] sur une cl\u00e9 USB ou un disque de sauvegarde",
-    "20196": "Programmateur de nettoyage de %1"
+    "20196": "Programmateur de nettoyage de %1",
+    "20197": "[S1]$1[\/S1][S2]of[\/S2][S3]$2[\/S3]"
 }

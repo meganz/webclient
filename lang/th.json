@@ -275,7 +275,7 @@
     "779": "\u0e2a\u0e21\u0e31\u0e04\u0e23\u0e2a\u0e21\u0e32\u0e0a\u0e34\u0e01\u0e40\u0e14\u0e35\u0e4b\u0e22\u0e27\u0e19\u0e35\u0e49",
     "782": "\u0e42\u0e1f\u0e25\u0e4c\u0e40\u0e14\u0e2d\u0e23\u0e4c\u0e27\u0e48\u0e32\u0e07",
     "784": "\u0e44\u0e21\u0e48\u0e21\u0e35\u0e1c\u0e39\u0e49\u0e15\u0e34\u0e14\u0e15\u0e48\u0e2d\u0e43\u0e14\u0e46",
-    "798": "\u0e1e\u0e37\u0e49\u0e19\u0e17\u0e35\u0e48\u0e08\u0e31\u0e14\u0e40\u0e01\u0e47\u0e1a",
+    "798": "\u0e1e\u0e37\u0e49\u0e19\u0e17\u0e35\u0e48\u0e40\u0e01\u0e47\u0e1a\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25",
     "799": "\u0e1e\u0e37\u0e49\u0e19\u0e17\u0e35\u0e48\u0e17\u0e35\u0e48\u0e43\u0e0a\u0e49\u0e44\u0e1b",
     "808": "\u0e25\u0e34\u0e07\u0e01\u0e4c\u0e21\u0e32\u0e22\u0e31\u0e07\u0e42\u0e1f\u0e25\u0e4c\u0e40\u0e14\u0e2d\u0e23\u0e4c",
     "812": "\u0e22\u0e37\u0e19\u0e22\u0e31\u0e19\u0e1a\u0e31\u0e0d\u0e0a\u0e35",
@@ -3137,11 +3137,12 @@
     "20186": "Number of invitees",
     "20187": "Here is your Recovery Key!",
     "20188": "You will need this if you have forgotten your password or lost your Authenticator.",
-    "20189": "If you lose this Recovery key and forget your password, [B]all your files, folders and messages will be inaccessible, even from us[\/B].",
+    "20189": "If you lose this Recovery key and forget your password, [B]all your files, folders and messages will be inaccessible, even by MEGA[\/B].",
     "20190": "No thanks, I can remember my password.",
     "20191": "Keep it safe",
     "20192": "Your [B]MEGA-RECOVERYKEY.txt[\/B] is in your downloads folder. Store it somewhere safe to ensure you can always access your account and never lose your files, folders and messages.",
     "20193": "[B]Print it[\/B] and keep it secure.",
     "20194": "[B]Save it[\/B] in your password manager",
-    "20195": "[B]Store it[\/B] on a USB key or back up drive"
+    "20195": "[B]Store it[\/B] on a USB key or back up drive",
+    "20196": "%1 \u0e17\u0e33\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e30\u0e2d\u0e32\u0e14\u0e15\u0e32\u0e21\u0e01\u0e33\u0e2b\u0e19\u0e14\u0e01\u0e32\u0e23"
 }

@@ -1163,6 +1163,10 @@ FileManager.prototype.initContextUI = function() {
         }
     });
 
+    $(c + '.dispute-item').rebind('click', function() {
+        loadSubPage('dispute');
+    });
+
     $(c + '.rename-item').rebind('click', function() {
         renameDialog();
     });

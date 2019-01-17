@@ -4972,7 +4972,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     position: absolute;
     z-index: 100;
     cursor: pointer;
-    background-image: url(../images/mega/icons-sprite_v23.png);
+    background-image: url(../images/mega/icons-sprite_v25.png);
     background-position: 6px -1350px;
     background-repeat: no-repeat;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
@@ -5666,7 +5666,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v23.png);
+    background-image: url(../images/mega/icons-sprite_v25.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -6452,7 +6452,7 @@ th.grid-first-th {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/icons-sprite_v23.png);
+    background-image: url(../images/mega/icons-sprite_v25.png);
     background-repeat: no-repeat;
     background-position: -160px -831px;
     display: block;
@@ -7386,11 +7386,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v23.png);
+    background-image: url(../images/mega/icons-sprite_v25.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v23.png);
+    background-image: url(../images/mega/icons-sprite_v25.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {
@@ -20785,7 +20785,7 @@ div.camera-bottom-txt {
     background-position: -11px -10569px;
 }
 .fm-account-button.megadrop::before {
-    background-image: url(../images/mega/icons-sprite_v23.png);
+    background-image: url(../images/mega/icons-sprite_v25.png);
     background-position: -78px -1109px;
 }
 .fm-account-button.megadrop.active::before {

@@ -275,7 +275,7 @@
     "779": "\uc9c0\uae08 \uac00\uc785\ud558\uc138\uc694",
     "782": "\ud3f4\ub354\uc5d0 \ud30c\uc77c\uc774 \uc5c6\uc74c",
     "784": "\uc5f0\ub77d\ucc98\uac00 \uc5c6\uc2b5\ub2c8\ub2e4",
-    "798": "\uc800\uc7a5 \uacf5\uac04",
+    "798": "\uc800\uc7a5\uc18c \uacf5\uac04",
     "799": "\uc0ac\uc6a9\ub41c \uacf5\uac04",
     "808": "\ud3f4\ub354 \ub9c1\ud06c",
     "812": "\uacc4\uc815 \ud655\uc778",
@@ -3137,11 +3137,12 @@
     "20186": "Number of invitees",
     "20187": "Here is your Recovery Key!",
     "20188": "You will need this if you have forgotten your password or lost your Authenticator.",
-    "20189": "If you lose this Recovery key and forget your password, [B]all your files, folders and messages will be inaccessible, even from us[\/B].",
+    "20189": "If you lose this Recovery key and forget your password, [B]all your files, folders and messages will be inaccessible, even by MEGA[\/B].",
     "20190": "No thanks, I can remember my password.",
     "20191": "Keep it safe",
     "20192": "Your [B]MEGA-RECOVERYKEY.txt[\/B] is in your downloads folder. Store it somewhere safe to ensure you can always access your account and never lose your files, folders and messages.",
     "20193": "[B]Print it[\/B] and keep it secure.",
     "20194": "[B]Save it[\/B] in your password manager",
-    "20195": "[B]Store it[\/B] on a USB key or back up drive"
+    "20195": "[B]Store it[\/B] on a USB key or back up drive",
+    "20196": "%1 \ube44\uc6b0\uae30 \uc77c\uc815"
 }

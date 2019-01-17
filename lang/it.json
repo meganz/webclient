@@ -131,7 +131,7 @@
     "425": "Rinomina Cartella",
     "426": "Rinomina File",
     "429": "Cronologia Sessione",
-    "430": "Storico acquisti",
+    "430": "Storico Acquisti",
     "431": "Cronologia transazioni",
     "432": "Tipo account:",
     "433": "Passa a PRO",
@@ -275,7 +275,7 @@
     "779": "Registrati ora",
     "782": "Cartella vuota",
     "784": "Nessun contatto",
-    "798": "Spazio archiviazione",
+    "798": "Spazio di archiviazione",
     "799": "Spazio Usato",
     "808": "Link cartella",
     "812": "Conferma account",
@@ -3143,5 +3143,6 @@
     "20192": "Your [B]MEGA-RECOVERYKEY.txt[\/B] is in your downloads folder. Store it somewhere safe to ensure you can always access your account and never lose your files, folders and messages.",
     "20193": "[B]Print it[\/B] and keep it secure.",
     "20194": "[B]Save it[\/B] in your password manager",
-    "20195": "[B]Store it[\/B] on a USB key or back up drive"
+    "20195": "[B]Store it[\/B] on a USB key or back up drive",
+    "20196": "Pulisci %1"
 }

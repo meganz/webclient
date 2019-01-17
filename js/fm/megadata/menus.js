@@ -284,6 +284,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             delete items['.sh4r1ng-item'];
             delete items['.add-star-item'];
             delete items['.colour-label-items'];
+            items['.dispute-item'] = 1;
         }
     }
     else if (sourceRoot === M.RubbishID && !folderlink) {

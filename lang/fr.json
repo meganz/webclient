@@ -3135,13 +3135,14 @@
     "20184": "Achieved transfer quota",
     "20185": "Dispute Takedown",
     "20186": "Number of invitees",
-    "20187": "Here is your Recovery Key!",
-    "20188": "You will need this if you have forgotten your password or lost your Authenticator.",
-    "20189": "If you lose this Recovery key and forget your password, [B]all your files, folders and messages will be inaccessible, even from us[\/B].",
-    "20190": "No thanks, I can remember my password.",
-    "20191": "Keep it safe",
-    "20192": "Your [B]MEGA-RECOVERYKEY.txt[\/B] is in your downloads folder. Store it somewhere safe to ensure you can always access your account and never lose your files, folders and messages.",
-    "20193": "[B]Print it[\/B] and keep it secure.",
-    "20194": "[B]Save it[\/B] in your password manager",
-    "20195": "[B]Store it[\/B] on a USB key or back up drive"
+    "20187": "Voici votre cl\u00e9 de r\u00e9cup\u00e9ration\u2009!",
+    "20188": "Vous en aurez besoin si vous perdez votre mot de passe ou votre appli d\u2019authentification.",
+    "20189": "Si vous perdez votre cl\u00e9 de r\u00e9cup\u00e9ration et oubliez votre mot de passe, [B]tous vos fichiers, dossiers et messages seront inaccessibles, m\u00eame pour nous[\/B].",
+    "20190": "Non merci, je peux me souvenir de mon mot de passe.",
+    "20191": "Conservez-la en lieu s\u00fbr",
+    "20192": "Votre fichier [B]MEGA-RECOVERYKEY.txt[\/B] se trouve dans votre dossier de t\u00e9l\u00e9chargement. Conservez-le en lieu s\u00fbr pour vous assurer de toujours pouvoir acc\u00e9der \u00e0 votre compte et de ne jamais perdre ni vos fichiers, ni vos dossiers, ni vos messages.",
+    "20193": "[B]Imprimez-la[\/B] et gardez-la \u00e0 l\u2019abri.",
+    "20194": "[B]Enregistrez-la[\/B] dans votre gestionnaire de mots de passe",
+    "20195": "[B]Stockez-la[\/B] sur une cl\u00e9 USB ou un disque de sauvegarde",
+    "20196": "Programmateur de nettoyage de %1"
 }

@@ -339,8 +339,17 @@ MegaData.prototype.refreshSessionList = function(callback) {
 MegaData.prototype.showRecoveryKeyDialog = function(version) {
     'use strict';
 
+    var $dialog = $('.fm-dialog.recovery-key-dialog').removeClass('post-register');
+
+    // TODO: Implement this on mobile
+    if (!$dialog.length) {
+        if (d) {
+            console.debug('recovery-key-dialog not available...')
+        }
+        return;
+    }
+
     M.safeShowDialog('recovery-key-dialog', function() {
-        var $dialog = $('.fm-dialog.recovery-key-dialog').removeClass('post-register');
 
         $('.skip-button, .fm-dialog-close', $dialog).removeClass('hidden').rebind('click', closeDialog);
         $('.copy-recovery-key-button', $dialog).removeClass('hidden').rebind('click', function() {

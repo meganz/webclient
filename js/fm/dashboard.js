@@ -31,7 +31,7 @@ function dashboardUI() {
     }
 
     M.onSectionUIOpen('dashboard');
-    accountUI.userUIUpdate();
+    accountUI.general.userUIUpdate();
 
     // Add-contact plus
     $('.dashboard .contacts-widget .add-contacts').rebind('click', function() {
@@ -221,7 +221,7 @@ function dashboardUI() {
 
         $($.leftPaneResizable).trigger('resize');
 
-        accountUI.fillCharts(account, true);
+        accountUI.general.charts.init(account, true);
 
 
         /* Used Storage progressbar */
@@ -242,7 +242,22 @@ function dashboardUI() {
                 $percBlock.parent().addClass('empty hidden');
             }
         }
-        accountUI.renderProgressBar(account);
+
+        $('.account.progress-size.cloud-drive').text(
+            account.stats[M.RootID].bytes > 0 ? bytesToSize(account.stats[M.RootID].bytes) : '-'
+        );
+        // Rubbish bin
+        $('.account.progress-size.rubbish-bin').text(
+            account.stats[M.RubbishID].bytes > 0 ? bytesToSize(account.stats[M.RubbishID].bytes) : '-'
+        );
+        // Incoming shares
+        $('.account.progress-size.incoming-shares').text(
+            account.stats.inshares.bytes ? bytesToSize(account.stats.inshares.bytes) : '-'
+        );
+        // Inbox
+        $('.account.progress-size.inbox').text(
+            account.stats[M.InboxID].bytes > 0 ? bytesToSize(account.stats[M.InboxID].bytes) : '-'
+        );
         /* End of Used Storage progressbar */
 
 

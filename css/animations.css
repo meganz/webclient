@@ -1,0 +1,33 @@
+/* Slide In / Out animation */
+.slide-in-out .slide-item {
+    transition: max-height 300ms ease-in-out;
+    -webkit-transition: max-height 300ms ease-in-out;
+    -moz-transition: max-height 300ms ease-in-out;
+    -o-transition: max-height 300ms ease-in-out;
+    -ms-transition: max-height 300ms ease-in-out;
+    overflow-y: hidden;
+    /* To use this animation, please set max-height to element that has slideItem class */
+}
+.slide-in-out.closed .slide-item {
+    max-height: 0;
+    padding: 0;
+}
+/* End of slide In / Out animation */
+
+.no-trans, .no-trans::before, .no-trans::after, .no-trans-init, .no-trans-init::before, .no-trans-init::after {
+    -webkit-transition: none!important;
+    -moz-transition: none!important;
+    -o-transition: none!important;
+    -ms-transition: none!important;
+    transition: none!important;
+}
+
+/* Transition speeds */
+.ts-500 {
+    transition-duration: 500ms;
+    -webkit-transition-duration: 500ms;
+    -moz-transition-duration: 500ms;
+    -o-transition-duration: 500ms;
+    -ms-transition-duration: 500ms;
+}
+/* End of transition speeds */

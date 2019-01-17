@@ -38,12 +38,23 @@ var accountChangeEmail = {
         // Cache selectors
         var $newEmail = $('#account-email');
         var $emailInfoMessage = $('.fm-account-change-email');
+        var $changeEmailButton = $('.account .change-email-button');
 
         // On text entry in the new email text field
         $newEmail.rebind('keyup', function() {
 
-            // Show information message
-            $emailInfoMessage.removeClass('hidden');
+            if ($newEmail.val()) {
+                // Show information message
+                $emailInfoMessage.slideDown();
+                $changeEmailButton.parent().removeClass('closed');
+            }
+            else {
+                // Show information message
+                $emailInfoMessage.slideUp();
+                $changeEmailButton.parent().addClass('closed');
+            }
+
+            $newEmail.parent().removeClass('error');
         });
     },
 
@@ -60,14 +71,17 @@ var accountChangeEmail = {
 
         // On Change Email button click
         $changeEmailButton.rebind('click', function() {
-
+            
+            if ($(this).hasClass('disabled')) {
+                return false;
+            }
             // Get the new email address
             var newEmailRaw = $newEmail.val();
             var newEmail = $.trim(newEmailRaw).toLowerCase();
 
             // If not a valid email, show an error
             if (!isValidEmail(newEmail)) {
-                msgDialog('warninga', l[135], l[1513]);
+                $newEmail.parent().addClass('error').find('.error-message').text(l[1513]);
                 return false;
             }
 

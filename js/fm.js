@@ -875,13 +875,12 @@ function avatarDialog(close) {
                 mega.attr.set('a', ab_to_base64(data), true, false);
                 useravatar.setUserAvatar(u_handle, data, this.outputFormat);
 
-                $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
+                $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', false));
                 $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
                 avatarDialog(1);
             },
             onImageUpload: function()
             {
-                $('.image-upload-field-replacement.fm-account-change-avatar').hide();
                 $('#fm-change-avatar').show();
                 $('#fm-cancel-avatar').show();
                 $('#fm-remove-avatar').hide();
@@ -1528,7 +1527,6 @@ function openAccessQRDialog() {
                 text: myHost
             };
             $('.qr-icon-big', $dialog).text('').qrcode(QRoptions);
-
 
             $('.qr-http-link', $dialog).text(myHost);
             var curAvatar = useravatar.contact(u_handle);
@@ -2990,12 +2988,13 @@ function fm_resize_handler(force) {
     }
     else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
         var $mainBlock = $('.fm-account-main');
+
         $mainBlock.removeClass('low-width hi-width');
 
         if ($mainBlock.width() > 1675) {
             $mainBlock.addClass('hi-width');
         }
-        else if ($mainBlock.width() < 880) {
+        else if ($mainBlock.width() < 920) {
             $mainBlock.addClass('low-width');
         }
         initAccountScroll();
@@ -3451,10 +3450,18 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
 
     var $dropdownsItem = $dropdown.find('.default-dropdown-item');
     var $contentBlock = contentBlock ? $(contentBlock) : $(window);
+    var $hiddenInput = $dropdown.find('.dropdown-hidden-input');
 
-    $($dropdown).rebind('click', function(e)
-    {
+    // hidden input for keyboard search
+    if (!$hiddenInput.length) {
+        $hiddenInput = $('<input class="dropdown-hidden-input">');
+        $dropdown.prepend($hiddenInput);
+    }
+
+    $dropdown.rebind('click', function(e) {
+
         var $this = $(this);
+
         if (!$this.hasClass('active')) {
             var jsp;
             var scrollBlock = '#' + $this.attr('id') + ' .default-select-scroll';
@@ -3488,7 +3495,7 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
                     'margin-top': '-' + (10 - dropdownBottPos) + 'px'
                 });
             }
-
+            
             //Dropdown scrolling initialization
             initSelectScrolling(scrollBlock);
             jsp = $(scrollBlock).data('jsp');
@@ -3501,6 +3508,8 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
             if (jsp && $activeDropdownItem.length) {
                 jsp.scrollToElement($activeDropdownItem);
             }
+
+            $hiddenInput.trigger('focus');
         }
         else if (!$(e.target).parents('.jspVerticalBar').length) {
             $this.find('.default-select-dropdown').addClass('hidden');
@@ -3510,32 +3519,71 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
 
     $dropdownsItem.rebind('click.settingsGeneral', function() {
         var $this = $(this);
-        if (!$this.hasClass('active')) {
-            var $select = $(this).closest('.default-select');
 
-            //Select dropdown item
-            $select.find('.default-dropdown-item').removeClass('active');
-            $this.addClass('active');
-            $select.find('span').text($this.text());
+        var $select = $(this).closest('.default-select');
 
-            if (saveOption) {
-                var nameLen = String($('#account-firstname').val() || '').trim().length;
+        // Select dropdown item
+        $select.find('.default-dropdown-item').removeClass('active');
+        $this.addClass('active');
+        $select.find('span').text($this.text());
+        $hiddenInput.trigger('focus');
 
-                // Save changes for account page
-                if (nameLen) {
-                    $('.fm-account-save-block').removeClass('hidden');
-                }
+        if (saveOption) {
+            var nameLen = String($('#account-firstname').val() || '').trim().length;
+
+            // Save changes for account page
+            if (nameLen) {
+                $this.parents('.settings-right-block').find('.save-block').removeClass('hidden');
             }
         }
     });
 
+    // Typing search and arrow key up and down features for dropdowns
+    $hiddenInput.rebind('keyup', function(e) {
+        var charCode = e.which || e.keyCode; // ff
+        if ((charCode > 64 && charCode < 91) || (charCode > 96 && charCode < 123)) {
+            var inputValue = $hiddenInput.val();
+            var $filteredItem = $dropdownsItem.filter(function() {
+                return $(this).text().slice(0, inputValue.length).toLowerCase() === inputValue.toLowerCase();
+            });
+
+            if ($filteredItem[0]) {
+                var jsp = $dropdown.find('.default-select-scroll').data('jsp');
+                $dropdown.find('.default-dropdown-item.active').removeClass('active');
+                jsp.scrollToElement($($filteredItem[0]), 1);
+                $($filteredItem[0]).addClass('active');
+            }
+        }
+        else {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var $current = $(this).closest('.default-select').find('.default-dropdown-item.active');
+
+            if (charCode === 38) { // Up key
+                $current.removeClass('active').prev().addClass('active');
+            }
+            else if (charCode === 40) { // Down key
+                $current.removeClass('active').next().addClass('active');
+            }
+            else if (charCode === 13) {// Enter
+                $current.trigger('click');
+            }
+        }
+    });
+
+    $hiddenInput.rebind('keydown', function() {
+        delay('dropbox:clearHidden', function() {
+            // Combination language bug fixs for MacOS.
+            $hiddenInput.val('').trigger('blur').trigger('focus');
+        }, 750);
+    });
+    // End of typing search for dropdowns
+
     $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e) {
 
-        // ToDo: Narrow this condition and find main reason why it's made
-        if (!$(e.target).parents('.default-select').length && !$(e.target).hasClass('default-select')) {
-            $selectBlock = $('.default-select.active');
-            $selectBlock.find('.default-select-dropdown').addClass('hidden');
-            $selectBlock.removeClass('active');
+        if (!$dropdown.has($(e.target)).length && !$dropdown.is(e.target)) {
+            $dropdown.removeClass('active').find('.default-select-dropdown').addClass('hidden');
         }
     });
 }

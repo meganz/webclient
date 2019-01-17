@@ -436,7 +436,7 @@ var redeem = {
             }
 
             // On mobile just load the main account page as there is no payment history yet
-            loadSubPage(is_mobile ? 'fm/account' : 'fm/account/history');
+            loadSubPage(is_mobile ? 'fm/account' : 'fm/account/plan');
             return false;
         });
     },

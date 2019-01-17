@@ -33,11 +33,12 @@ var accountChangePassword = {
 
         'use strict';
 
-        var $passwordStrengthBar = $('.account-pass-lines');
+        var $changePasswordStrengthBar = $('.account-pass-lines');
         var $newPasswordField = $('#account-new-password');
+        var $changePasswordButton = $('.account.change-password .button-container');
 
         // On keyup of the password field
-        $newPasswordField.rebind('keyup.pwdchg', function() {
+        $newPasswordField.rebind('keyup.pwdchg input change', function() {
 
             // Estimate the password strength
             var password = $.trim($(this).val());
@@ -45,31 +46,36 @@ var accountChangePassword = {
             var passwordLength = password.length;
 
             // Remove previous strength classes that were added
-            $passwordStrengthBar.removeClass('good1 good2 good3 good4 good5');
+            $changePasswordStrengthBar.removeClass('good1 good2 good3 good4 good5');
+            $changePasswordButton.removeClass('closed');
 
             // Add colour coding
             if (passwordLength === 0) {
+                $changePasswordButton.addClass('closed');
                 return false;
             }
             else if (passwordLength < security.minPasswordLength) {
-                $passwordStrengthBar.addClass('good1');    // Too short
+                $changePasswordStrengthBar.addClass('good1');    // Too short
             }
             else if (passwordScore === 4) {
-                $passwordStrengthBar.addClass('good5');    // Strong
+                $changePasswordStrengthBar.addClass('good5');    // Strong
             }
             else if (passwordScore === 3) {
-                $passwordStrengthBar.addClass('good4');    // Good
+                $changePasswordStrengthBar.addClass('good4');    // Good
             }
             else if (passwordScore === 2) {
-                $passwordStrengthBar.addClass('good3');    // Medium
+                $changePasswordStrengthBar.addClass('good3');    // Medium
             }
             else if (passwordScore === 1) {
-                $passwordStrengthBar.addClass('good2');    // Weak
+                $changePasswordStrengthBar.addClass('good2');    // Weak
             }
             else {
-                $passwordStrengthBar.addClass('good1');    // Very Weak
+                $changePasswordStrengthBar.addClass('good1');    // Very Weak
             }
         });
+
+        // Reset strength after re-rendering.
+        $newPasswordField.trigger('keyup.pwdchg');
     },
 
     /**
@@ -87,6 +93,9 @@ var accountChangePassword = {
 
         $changePasswordButton.rebind('click', function() {
 
+            if ($(this).hasClass('disabled')) {
+                return false;
+            }
             // Trim the whitespace from the passwords
             var password = $newPasswordField.val();
             var confirmPassword = $newPasswordConfirmField.val();
@@ -102,6 +111,7 @@ var accountChangePassword = {
                     $newPasswordField.val('');
                     $newPasswordConfirmField.val('');
                     $newPasswordField.trigger('focus');
+                    $newPasswordConfirmField.trigger('blur');
                     $passwordStrengthBar.removeClass('good1 good2 good3 good4 good5');
                 });
 

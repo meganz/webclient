@@ -47,9 +47,13 @@ var twofactor = {
 
         'use strict';
 
+        loadingDialog.show();
+
         // Make Multi-Factor Auth Get request
         api_req({ a: 'mfag', e: u_attr.email }, {
             callback: function(result) {
+                
+                loadingDialog.hide();
 
                 // Pass the result to the callback
                 if (result === 1) {
@@ -291,6 +295,7 @@ twofactor.account = {
         'use strict';
 
         var $twoFactorSection = $('.account.two-factor-authentication');
+        var $button = $twoFactorSection.find('.enable-disable-2fa-button');
 
         // Check if 2FA is actually enabled on the API for everyone
         if (twofactor.isEnabledGlobally()) {
@@ -300,14 +305,13 @@ twofactor.account = {
 
             // Check if 2FA is enabled on their account
             twofactor.isEnabledForAccount(function(result) {
-
                 // If enabled, show red button, disable PIN entry text box and Deactivate text
                 if (result) {
-                    $twoFactorSection.addClass('enabled');
+                    $button.addClass('toggle-on enabled');
                 }
                 else {
                     // Otherwise show green button and Enable text
-                    $twoFactorSection.removeClass('enabled');
+                    $button.removeClass('toggle-on enabled');
                 }
 
                 // Init the click handler now for the button now that the enabled/disabled status has been retrieved
@@ -330,10 +334,12 @@ twofactor.account = {
         $button.rebind('click', function() {
 
             // If 2FA is enabled
-            if ($accountPageTwoFactorSection.hasClass('enabled')) {
-
-                // Disable 2FA
-                twofactor.account.disableTwoFactorAuthentication();
+            if ($button.hasClass('enabled')) {
+                // Show the verify 2FA dialog to collect the user's PIN
+                twofactor.verifyActionDialog.init(function(twoFactorPin) {
+                    // Disable 2FA
+                    twofactor.account.disableTwoFactorAuthentication(twoFactorPin);
+                });
             }
             else {
                 // Setup 2FA
@@ -345,24 +351,17 @@ twofactor.account = {
     /**
      * Disable the Two Factor Authentication
      */
-    disableTwoFactorAuthentication: function() {
+    disableTwoFactorAuthentication: function(twoFactorPin) {
 
         'use strict';
-
-        // Get the Google Authenticator PIN code from the user
-        var $disablePinCodeField = $('.account.two-factor-authentication .two-factor-disable-pin');
-        var pinCode = $.trim($disablePinCodeField.val());
 
         loadingDialog.show();
 
         // Run Multi-Factor Auth Disable (mfad) request
-        api_req({ a: 'mfad', mfa: pinCode }, {
+        api_req({ a: 'mfad', mfa: twoFactorPin }, {
             callback: function(response) {
 
                 loadingDialog.hide();
-
-                // Clear the text field
-                $disablePinCodeField.val('');
 
                 // The Two-Factor has already been disabled
                 if (response === ENOENT) {

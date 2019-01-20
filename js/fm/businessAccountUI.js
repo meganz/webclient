@@ -1696,6 +1696,15 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         cZip = u_attr['%zip'];
     }
 
+    var setTaxName = function(st, taxName) {
+        if (st && taxName) {
+            $('.tax-code-name', $profileContainer).text(taxName);
+            $('input#prof-vat', $profileContainer).attr("placeholder", taxName);
+        }
+    };
+
+    mySelf.business.getTaxCodeName().always(setTaxName);
+
     var $cNameInput = $('input#prof-cname', $profileContainer).val(cName);
     var $cTelInput = $('input#prof-phone', $profileContainer).val(cTel);
     var $cEmailInput = $('input#prof-email', $profileContainer).val(cEmail);

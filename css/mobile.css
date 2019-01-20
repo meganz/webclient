@@ -7012,15 +7012,15 @@ body.key .reg-st3-membership-bl.free.hidden {
     padding-bottom: 0;
     text-align: center;
     margin-bottom: 24px;
+    font-weight: initial;
 }
 .mobile .improved-recovery-steps h3.main-italic-header {
     margin-bottom: 0;
 }
 .mobile .improved-recovery-steps .info-container h3.main-italic-header {
     text-align: left;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-    font-weight: 800;
-    font-size: 16px;
+    font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+    font-size: 15px;
 }
 .mobile .improved-recovery-steps .container-information {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
@@ -7028,7 +7028,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     line-height: 21px;
 }
 .mobile .improved-recovery-steps .container-information ul {
-    margin: 12px 24px;
+    margin: 20px 24px;
     padding: 0;
     text-indent: 0;
     list-style-type: 0;
@@ -7041,7 +7041,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     padding-inline-start: 20px;
 }
 .mobile .improved-recovery-steps .container-information li {
-    margin-bottom: 10px;
+    margin-bottom: 16px;
     display: list-item;
     list-style: disc;
 }
@@ -7066,14 +7066,15 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps h1, .mobile.fm-dialog.park-account-dialog .fm-dialog-title  {
     font-size: 20px;
     color: #343A40;
-    letter-spacing: 0.2px;
+    letter-spacing: 0px;
     line-height: 30px;
     -webkit-margin-before: 0.4em;
-    -webkit-margin-after: 20px;
+    -webkit-margin-after: 26px;
     -webkit-margin-start: 0px;
     -webkit-margin-end: 0px;
     text-align: center;
     font-family: 'montserrat', 'LatoWeb', 'source_sans_prosemibold';
+    font-weight: initial;
 }
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps h3.main-italic-header {
     font-size: 13px;

@@ -51,21 +51,19 @@
     color: #51585D;
     font-size: 20px;
     display: inline-block;
-    letter-spacing: 0px;
+    letter-spacing: 0.2px;
     font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
-    font-weight: initial;
 }
 .improved-recovery-steps h1 {
-    font-family: 'Montserrat-regular', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 20px;
     color: #262F3B;
     line-height: 30px;
     -webkit-margin-before: 12px;
-    -webkit-margin-after: 24px;
+    -webkit-margin-after: 16px;
     -webkit-margin-start: 0px;
     -webkit-margin-end: 0px;
     text-align: center;
-    font-weight: initial;
 }
 .improved-recovery-steps .recover-image-block {
     width: 172px;
@@ -121,9 +119,10 @@
 }
 .improved-recovery-steps .info-container h3.main-italic-header {
     text-align: left;
-    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
-    font-size: 15px;
-    letter-spacing: 0;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: .4px;
 }
 .improved-recovery-steps .app-instruction-block p, .improved-recovery-steps .info-container h3.main-italic-header  {
     text-align: left;
@@ -699,9 +698,10 @@
 }
 .improved-recovery-steps h5.main-italic-header {
     font-size: 14px;
-    font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     line-height: 24px;
     color: #495057;
+    font-weight: 800;
     display: inline-block;
     padding: 0 0;
 }
@@ -775,7 +775,7 @@
 }
 
 .improved-recovery-steps .account.input-wrapper #recover-input1 {
-    font-size: 16px;
+    font-size: 20px;
     letter-spacing: 0px;
 }
 .improved-recovery-steps strong, .improved-recovery-steps b {

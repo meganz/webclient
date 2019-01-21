@@ -1392,6 +1392,35 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
     return operationPromise;
 };
 
+/** Get Tax name to be viewed on UI */
+BusinessAccount.prototype.getTaxCodeName = function() {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    if (mega.buinsessAccount && mega.buinsessAccount.invoicesTaxName) {
+        return operationPromise.resolve(1, mega.buinsessAccount.invoicesTaxName);
+    }
+
+    var request = {
+        "a": "tn",
+    };
+
+    api_req(request, {
+        callback: function(res) {
+            if (typeof res === 'string') {
+                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                mega.buinsessAccount.invoicesTaxName = res;
+                operationPromise.resolve(1, res); // user activated successfully, object contain lp + u
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+    });
+
+    return operationPromise;
+};
+
 /**
  * resend invitation link to sub-user with new password
  * @param {String} subuserHandle        sub-user handle

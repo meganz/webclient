@@ -74,6 +74,8 @@ pro.proplan = {
 
         // If Mobile add some specific styling
         if (is_mobile) {
+            // Set title just for the Pro page
+            $('#startholder .mobile.fm-header-txt').text(l[16111]);
             
             if ($body.hasClass('key')) {
                 $body.find('.pro4 .cta-button').removeClass('secondary').addClass('green');

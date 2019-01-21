@@ -34,6 +34,7 @@ mobile.cloud = {
 
         // jQuery selectors
         var $fileManager = $('.mobile.file-manager-block');
+        
 
         // Render the file manager header, folders, files and footer
         this.initTitleMenu();

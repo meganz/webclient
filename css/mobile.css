@@ -2985,17 +2985,18 @@ div.checkboxOn, div.checkboxOff {
     margin-bottom: 24px;
 }
 .mobile.membership-step2 .duration-options-list .membership-radio-label.checked strong {
-    font-family: 'LatoWeb', "source_sans_proregular", sans-serif;
-    font-weight: 800;
+    font-family: 'LatoWebBold', "source_sans_proregular", sans-serif;
     color: #262F3B;
+    font-weight: initial;
 }
 .mobile.membership-step2 .duration-options-list .membership-radio-label strong {
     color: #667;
     display: block;
-    font-family: 'LatoWeb', "source_sans_proregular", sans-serif;;
+    font-family: 'LatoWebBold', "source_sans_proregular", sans-serif;;
     font-size: 13px;
     margin-top: 4px;
     width: 100%;
+    font-weight: initial;
     text-align: center;
 }
 .mobile.membership-step2 .duration-options-list .save-money {
@@ -3280,7 +3281,11 @@ div.checkboxOn, div.checkboxOff {
 }
 .mobile.membership-step2 .provider-details.checked {
     color: #495057;
-    font-weight: 800;
+    font-weight: initial;
+    font-family: 'LatoWebBold', "source_sans_proregular", Helvetica, Arial, sans-serif;
+}
+.mobile.membership-step2 .provider-details.checked .provider-name {
+    font-family: 'LatoWebBold';
 }
 .mobile.membership-step2 .provider-details .provider-name {
     display: inline-block;
@@ -8626,7 +8631,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 
 /* Pro page step 2 voucher dialog */
 .mobile.voucher-dialog.hidden {
-    display: block !important;
+    display: hidden;
     bottom: -100%;
     overflow: hidden;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
@@ -9645,6 +9650,14 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile.key .horizontal-plans .bottom-page .reg-st3-membership-bl {
         width: 222px;
     }
+    .mobile.pro-card-container {
+        margin-left: -48px;
+        width: calc(100% + 60px);
+    }
+    .mobile.my-account-page .avatar-name-block {
+        margin-top: -128px;
+    }
+
 }
 @media only screen and (orientation:landscape) and (max-width: 800px), only screen and (orientation:portrait) and (max-height: 800px) {
     .mobile.homepage .company-slogan {

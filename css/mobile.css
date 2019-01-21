@@ -6990,7 +6990,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     display: none;
 }
 .mobile .improved-recovery-steps h3.main-italic-header, .mobile .improved-recovery-steps h2 {
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-family: 'Montserrat-Regular', 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 16px;
     color: #495057;
     padding: 0 0;
@@ -7074,7 +7074,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     -webkit-margin-start: 0px;
     -webkit-margin-end: 0px;
     text-align: center;
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_prosemibold';
+    font-family: 'Montserrat-Regular', 'LatoWeb', 'source_sans_prosemibold';
     font-weight: initial;
 }
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps h3.main-italic-header {

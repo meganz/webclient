@@ -56,7 +56,7 @@
     font-weight: initial;
 }
 .improved-recovery-steps h1 {
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-family: 'Montserrat-regular', 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 20px;
     color: #262F3B;
     line-height: 30px;
@@ -699,10 +699,9 @@
 }
 .improved-recovery-steps h5.main-italic-header {
     font-size: 14px;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
     line-height: 24px;
     color: #495057;
-    font-weight: 800;
     display: inline-block;
     padding: 0 0;
 }

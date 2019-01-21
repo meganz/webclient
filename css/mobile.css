@@ -6995,7 +6995,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     display: none;
 }
 .mobile .improved-recovery-steps h3.main-italic-header, .mobile .improved-recovery-steps h2 {
-    font-family: 'Montserrat-Regular', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 16px;
     color: #495057;
     padding: 0 0;
@@ -7011,21 +7011,21 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps p, .mobile .improved-recovery-steps h3.main-italic-header {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 14px;
-    color: #676D75;
+    color: #495057;
     letter-spacing: 0;
     line-height: 22px;
     padding-bottom: 0;
     text-align: center;
     margin-bottom: 24px;
-    font-weight: initial;
 }
 .mobile .improved-recovery-steps h3.main-italic-header {
     margin-bottom: 0;
 }
 .mobile .improved-recovery-steps .info-container h3.main-italic-header {
     text-align: left;
-    font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
-    font-size: 15px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-weight: 800;
+    font-size: 16px;
 }
 .mobile .improved-recovery-steps .container-information {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
@@ -7033,7 +7033,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     line-height: 21px;
 }
 .mobile .improved-recovery-steps .container-information ul {
-    margin: 24px 24px;
+    margin: 12px 24px;
     padding: 0;
     text-indent: 0;
     list-style-type: 0;
@@ -7046,10 +7046,9 @@ body.key .reg-st3-membership-bl.free.hidden {
     padding-inline-start: 20px;
 }
 .mobile .improved-recovery-steps .container-information li {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     display: list-item;
     list-style: disc;
-    color: #676D75;
 }
 .mobile .improved-recovery-steps .container-information li:last-of-type {
     margin-bottom: 0;
@@ -7072,15 +7071,14 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps h1, .mobile.fm-dialog.park-account-dialog .fm-dialog-title  {
     font-size: 20px;
     color: #343A40;
-    letter-spacing: 0px;
+    letter-spacing: 0.2px;
     line-height: 30px;
     -webkit-margin-before: 0.4em;
-    -webkit-margin-after: 26px;
+    -webkit-margin-after: 20px;
     -webkit-margin-start: 0px;
     -webkit-margin-end: 0px;
     text-align: center;
-    font-family: 'Montserrat-Regular', 'LatoWeb', 'source_sans_prosemibold';
-    font-weight: initial;
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_prosemibold';
 }
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps h3.main-italic-header {
     font-size: 13px;
@@ -7114,9 +7112,9 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps p {
     font-size: 14px;
-    color: #676D75;
+    color: #495057;
     letter-spacing: 0;
-    line-height: 22px;
+    line-height: 21px;
     padding-bottom: 0;
     margin-bottom: 24px;
     text-align: center;

@@ -7006,7 +7006,7 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps p, .mobile .improved-recovery-steps h3.main-italic-header {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 14px;
-    color: #495057;
+    color: #676D75;
     letter-spacing: 0;
     line-height: 22px;
     padding-bottom: 0;
@@ -7028,7 +7028,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     line-height: 21px;
 }
 .mobile .improved-recovery-steps .container-information ul {
-    margin: 20px 24px;
+    margin: 24px 24px;
     padding: 0;
     text-indent: 0;
     list-style-type: 0;
@@ -7041,9 +7041,10 @@ body.key .reg-st3-membership-bl.free.hidden {
     padding-inline-start: 20px;
 }
 .mobile .improved-recovery-steps .container-information li {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     display: list-item;
     list-style: disc;
+    color: #676D75;
 }
 .mobile .improved-recovery-steps .container-information li:last-of-type {
     margin-bottom: 0;
@@ -7108,9 +7109,9 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps p {
     font-size: 14px;
-    color: #495057;
+    color: #676D75;
     letter-spacing: 0;
-    line-height: 21px;
+    line-height: 22px;
     padding-bottom: 0;
     margin-bottom: 24px;
     text-align: center;

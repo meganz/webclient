@@ -85,7 +85,7 @@ def _build_chat_bundle(target_dir):
 
 
 @task
-def dev(build_bundle=False, branch_name=''):
+def dev(build_bundle=False, branch_name='', del_exist=False):
     """
     Clones a branch and deploys it to beta.developers.mega.co.nz.
     It will then output a test link which can be pasted into a Redmine
@@ -108,6 +108,9 @@ def dev(build_bundle=False, branch_name=''):
 
     # Get the remote path e.g. /var/www/xxx-branch-name
     remote_branch_path = os.path.join(env.target_dir, branch_name)
+
+    if del_exist:
+        run('rm -rf {}'.format(remote_branch_path))
 
     # Clone the repo into /var/www/xxx-branch-name
     # but not the full git history to save on storage space

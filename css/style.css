@@ -26591,7 +26591,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .pending-email-note{
     height: auto;
     width: auto;
-    max-width: 300px;
     background-color: #FFA500;
     border:1px solid rgba(0,0,0,0.1);
     border-radius: 4px;
@@ -26618,6 +26617,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin-bottom: 4px;
     z-index: 998;
     transition: 0.1s;
+    max-width: 300px;
 }
 
 .user-management-subaccount-view-container .pending-email-note:hover .top-login-warning.edit-email-warning {

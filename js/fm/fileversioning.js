@@ -317,6 +317,7 @@ var versiondialogid;
                 api_req(req, {
                     callback: function(res) {
                         if (typeof res === 'object' && res.f) {
+                            selectionManager.clear_selection();
                             selectionManager.add_to_selection(res.f[0].h);
                         }
                     }

@@ -1788,8 +1788,7 @@ ul, li {
     cursor: pointer;
     width: 100%;
     font-size: 15px;
-    letter-spacing: 0.2px;
-    color: #8B9FAA;
+    color: #aaa;
     text-align: center;
     display: inline-block;
 }
@@ -2040,7 +2039,7 @@ input[type='checkbox'] {
     margin: 15px auto 0 auto;
 }
 .mobile.sign-in .forgot-password-button, .mobile.verify-login-page .lost-authenticator-button {
-    color: #8B9FAA;
+    color: #aaa;
     cursor: pointer;
     display: inline-block;
     font-size: 15px;

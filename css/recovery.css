@@ -478,7 +478,7 @@
 }
 .improved-recovery-steps .container-information li {
     margin-bottom: 16px;
-    color: #495057;
+    color: #676D75;
 }
 .improved-recovery-steps .container-information li:last-of-type {
     margin-bottom: 0;
@@ -799,7 +799,7 @@
     min-height: 44px;
 }
 .improved-recovery-steps .info-container, .improved-recovery-steps .checkbox-container, .improved-recovery-steps .app-instruction-block, .improved-recovery-steps .recover-upload-block, .improved-recovery-steps .recover-paste-block {
-    background: rgba(244,244,246,0.20);
+    background: #fafafa;
     border: 1px solid rgba(38,47,59,0.10);
     border-radius: 6px;
     padding: 20px 20px;

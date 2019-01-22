@@ -1571,10 +1571,12 @@ function initworkerpool() {
 // if it isn't up, reload directly
 // the server-side treecache is wiped (otherwise, we could run into
 // an endless loop)
-function fm_forcerefresh() {
+function fm_forcerefresh(light) {
     "use strict";
 
-    localStorage.force = 1;
+    if (light !== true) {
+        localStorage.force = 1;
+    }
 
     if (fmdb && !fmdb.crashed) {
         execsc = function() {}; // stop further SC processing

@@ -2705,14 +2705,14 @@
     "20152": "Nessuna attivit\u00e0 recente",
     "20153": "Il piano PRO scade il",
     "20154": "Rinnovi dell'abbonamento attivi",
-    "20185": "Dispute Takedown",
+    "20185": "Contesta chiusura",
     "20187": "Ecco qui la tua Chiave di Recupero!",
     "20188": "Avrai bisogno di questa se dimentichi la tua password o perdi il tuo autenticatore.",
-    "20189": "Se perdi questa Chiave di Recupero e dimentichi la tua password, [B]tutti i tuoi file, le tue cartelle e i tuoi messaggi saranno inaccessibili, persino a noi[\/B].",
-    "20190": "No thanks, I can remember my password.",
-    "20191": "Keep it safe",
-    "20192": "Your [B]MEGA-RECOVERYKEY.txt[\/B] is in your downloads folder. Store it somewhere safe to ensure you can always access your account and never lose your files, folders and messages.",
-    "20193": "[B]Print it[\/B] and keep it secure.",
-    "20194": "[B]Save it[\/B] in your password manager",
-    "20195": "[B]Store it[\/B] on a USB key or back up drive"
+    "20189": "Se perdi questa Chiave di Recupero e dimentichi la tua password, [B]tutti i tuoi file, le tue cartelle e i tuoi messaggi saranno inaccessibili, persino a MEGA[\/B].",
+    "20190": "No grazie, ricordo la mia password.",
+    "20191": "Tienila al sicuro",
+    "20192": "Il tuo  [B]MEGA-RECOVERYKEY.txt[\/B] \u00e8 nella tua cartella dei download. Archiviala da qualche parte per assicurarti di poter sempre accedere al tuo account e non perdere mai i tuoi file, le tue cartelle e i tuoi messaggi.",
+    "20193": "[B]Stampala[\/B] e tienila al sicuro.",
+    "20194": "[B]Salvala[\/B] nel tuo gestore delle password",
+    "20195": "[B]Archiviala[\/B] su una chiavetta USB o su un disco di backup"
 }

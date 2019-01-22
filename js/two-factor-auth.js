@@ -387,29 +387,6 @@ twofactor.account = {
                 }
             }
         });
-    },
-    /**
-     * Download recovery key for current user as a text file.
-     */
-    downloadRecoveryKey: function() {
-
-        'use strict';
-
-        // Convert the key to Base64 and prompt a file save dialog
-        var recoveryKeyBase64 = a32_to_base64(u_k);
-        var blob = new Blob([recoveryKeyBase64], {
-            type: "text/plain;charset=utf-8"
-        });
-        saveAs(blob, 'MEGA-RECOVERYKEY.txt');
-
-        // Update other tabs
-        mBroadcaster.sendMessage('keyexported');
-
-        // Update UI
-        if (!localStorage.recoverykey) {
-            localStorage.recoverykey = 1;
-            $('body').addClass('rk-saved');
-        }
     }
 };
 
@@ -838,21 +815,8 @@ twofactor.backupKeyDialog = {
      * Initialise the button to save the Recovery Key to a file
      */
     initSaveRecoveryKeyButton: function() {
-
         'use strict';
-
-        var $saveButton = this.$dialog.find('.recovery-key-button');
-
-        // Load the FileSaver.js library
-        M.require('filesaver')
-            .done(function() {
-
-                // On button click
-                $saveButton.rebind('click', function() {
-
-                    twofactor.account.downloadRecoveryKey();
-                });
-            });
+        this.$dialog.find('.recovery-key-button').rebind('click', u_savekey);
     },
 
     /**
@@ -996,8 +960,7 @@ twofactor.verifyActionDialog = {
 
         // On button click
         $lostDeviceButton.rebind('click', function() {
-
-            twofactor.lostAuthenicatorDialog.init();
+            M.showRecoveryKeyDialog();
         });
     },
 
@@ -1044,146 +1007,5 @@ twofactor.verifyActionDialog = {
         // Hide loading spinner and clear the text input
         $submitButton.removeClass('active');
         $pinCodeInput.val('');
-    }
-};
-
-/**
- * Logic for the dialog where user lost authenticator
- */
-twofactor.lostAuthenicatorDialog = {
-    /** jQuery selector for this dialog */
-    $dialog: null,
-
-    /**
-     * Intialise the dialog
-     */
-    init: function() {
-
-        'use strict';
-
-        // Cache selectors
-        this.$dialog = $('.fm-dialog.recovery-key-dialog');
-
-        // Initialise functionality
-        this.initCopyRecoveryKeyButton();
-        this.initDownloadRecoveryKeyButton();
-        this.initProceedToResetAccount();
-        this.initCloseButton();
-
-        // Convert the key to Base64 and fill up the input box with it
-        var recoveryKeyBase64 = a32_to_base64(u_k);
-        this.$dialog.find('.recovery-key.input-wrapper input').val(recoveryKeyBase64);
-
-        // Show the modal dialog
-        this.$dialog.removeClass('hidden');
-    },
-
-    /**
-     * Initialise the Close buttons to close the overlay
-     */
-    initCloseButton: function() {
-
-        'use strict';
-
-        var $closeButton = this.$dialog.find('.fm-dialog-close');
-
-        // On click of the close and back buttons
-        $closeButton.rebind('click', function() {
-
-            // Close the modal dialog
-            twofactor.lostAuthenicatorDialog.closeDialog();
-        });
-    },
-
-    /**
-     * Closes the dialog
-     */
-    closeDialog: function() {
-
-        'use strict';
-
-        // Hide the dialog
-        this.$dialog.addClass('hidden');
-    },
-
-    /**
-     * Initialise the button to save the Recovery Key to a file
-     */
-    initDownloadRecoveryKeyButton: function() {
-
-        'use strict';
-
-        var $saveButton = this.$dialog.find('.save-recovery-key-button');
-
-        // Load the FileSaver.js library
-        M.require('filesaver')
-            .done(function() {
-
-                // On button click
-                $saveButton.rebind('click', function() {
-
-                    twofactor.account.downloadRecoveryKey();
-
-                    // show toast message
-                    showToast('recoveryKey', l[8922]);
-                });
-            });
-    },
-    /**
-     * Initialise the button to copy the Recovery Key to clipboard
-     */
-    initCopyRecoveryKeyButton: function() {
-
-        'use strict';
-
-        // On button click
-        $('.copy-recovery-key-button').rebind('click', function() {
-            if (is_chrome_firefox) {
-                mozSetClipboard(a32_to_base64(u_k));
-            }
-            else {
-                $('#backup_keyinput_2fa').select();
-                document.execCommand('copy');
-            }
-
-            // Update other tabs
-            mBroadcaster.sendMessage('keyexported');
-
-            // Update UI
-            if (!localStorage.recoverykey) {
-                localStorage.recoverykey = 1;
-                $('body').addClass('rk-saved');
-            }
-
-            // show toast message
-            showToast('recoveryKey', l[6040]);
-        });
-    },
-    initProceedToResetAccount: function() {
-
-        'use strict';
-
-        $('a.toResetLink').rebind('click', function() {
-            loadingDialog.show();
-            api_req({ a: 'erm', m: u_attr.email, t: 9 }, {
-                callback: function (res) {
-                    loadingDialog.hide();
-                    closeDialog();
-                    fm_showoverlay();
-                    if (res === ENOENT) {
-                        msgDialog('warningb', l[1513], l[1946]);
-                    } else if (res === 0) {
-                        if (!is_mobile) {
-                            $('.fm-dialog.account-reset-confirmation').removeClass('hidden');
-                        }
-                        else {
-                            msgDialog('info', '', l[735]);
-                        }
-                    } else {
-                        msgDialog('warningb', l[135], l[200]);
-                    }
-                }
-            });
-        });
     }
 };

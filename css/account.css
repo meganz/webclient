@@ -102,6 +102,9 @@
     -ms-transition: color 200ms ease-in-out;
     transition: color 200ms ease-in-out;
 }
+.account.input-wrapper.recovery-key input {
+    letter-spacing: 0px;
+}
 .account.input-wrapper input[type='number'] {
     font-size: 20px;
 }

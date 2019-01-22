@@ -239,7 +239,7 @@ var versiondialogid;
                 return;
             }
             versiondialogid = fh;
-            var nodeData = M.d[M.currentdirid];
+            var nodeData = M.d[fh];
             // are we in an inshare?
             while (nodeData && !nodeData.su) {
                 nodeData = M.d[nodeData.p];
@@ -444,7 +444,7 @@ var versiondialogid;
                     name = l[5863];
                 }
                 else if (a2[i] === 'shares') {
-                    name = '';
+                    name = l[5542];
                 }
                 else if (a2[i] === M.RubbishID) {
                     name = l[167];

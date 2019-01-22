@@ -570,9 +570,9 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
         autocomplete: null,
         searchDropdown: false,
         emailCheck: true,
-        preventDoublet: false,
+        preventDoublet: true,
         tokenValue: "id",
-        propertyToSearch: "name",
+        propertyToSearch: "id",
         resultsLimit: 5,
         // Prevent showing of drop down list with contacts email addresses
         // Max allowed email address is 254 chars
@@ -588,9 +588,18 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
             $('.achievement-dialog.multiple-input', $dialog).find('li input').eq(0).addClass('red');
             resetInfoText();
         },
-        onDoublet: function(u) {
-            $('.achievement-dialog.input-info', $dialog).addClass('red').text(l[7413]);
+        onDoublet: function (u, iType) {
+            if (iType === 'opc') {
+                $('.achievement-dialog.input-info', $dialog).addClass('red').text(l[17545]);
+            }
+            else if (iType === 'ipc') {
+                $('.achievement-dialog.input-info', $dialog).addClass('red').text(l[17546]);
+            }
+            else {
+                $('.achievement-dialog.input-info', $dialog).addClass('red').text(l[7413]);
+            }
             $('.achievement-dialog.multiple-input', $dialog).find('li input').eq(0).addClass('red');
+
             resetInfoText();
         },
         onHolder: function() {

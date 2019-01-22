@@ -1637,94 +1637,13 @@ var dlmanager = {
 
     prepareLimitedBandwidthDialogPlans: function ($dialog) {
         var $pricingBoxes = $dialog.find('.reg-st3-membership-bl');
-        for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
-            var currentPlan = pro.membershipPlans[i];
-            var months = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
-            var planNum = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
-            var planName = pro.getProPlanName(planNum);
-            if (months !== 12) {
-                var $pricingBox = $pricingBoxes.filter('.pro' + planNum);
-                var $planName = $pricingBox.find('.title span');
-                var $price = $pricingBox.find('.price');
-                var $priceDollars = $price.find('.big');
-                var $priceCents = $price.find('.small');
-                var $storageAmount = $pricingBox.find('.storage-amount');
-                var $storageUnit = $pricingBox.find('.storage-unit');
-                var $bandwidthAmount = $pricingBox.find('.bandwidth-amount');
-                var $bandwidthUnit = $pricingBox.find('.bandwidth-unit');
-                var $euroPrice = $('.euro-price', $price);
-                var $currncyAbbrev = $('.local-currency-code', $price);
-                var monthlyBasePrice;
-                var monthlyBasePriceCurrencySign;
-                var euroSign = '\u20ac';
-                $priceDollars.removeClass('tooBig tooBig2');
-                $priceCents.removeClass('toosmall toosmall2');
-                if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-                    $pricingBoxes.addClass('local-currency');
-                    $euroPrice.removeClass('hidden');
-                    $currncyAbbrev.removeClass('hidden');
-                    $currncyAbbrev.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
-                    $euroPrice.text(currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] +
-                        ' ' + euroSign);
-                    // Calculate the monthly base price in local currency
-                    monthlyBasePrice = '' + currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-                    $('.reg-st3-txt-localcurrencyprogram', $dialog).removeClass('hidden');
-                }
-                else {
-                    $pricingBoxes.removeClass('local-currency');
-                    $euroPrice.addClass('hidden');
-                    $currncyAbbrev.addClass('hidden');
-                    monthlyBasePrice = '' + currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE];
-                    monthlyBasePriceCurrencySign = euroSign;
-                    $('.reg-st3-txt-localcurrencyprogram', $dialog).addClass('hidden');
-                }
-                var monthlyBasePriceParts = monthlyBasePrice.split('.');
-                var monthlyBasePriceDollars = monthlyBasePriceParts[0];
-                var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';
-                if (monthlyBasePriceDollars.length > 7) {
-                    if (monthlyBasePriceDollars.length > 9) {
-                        $priceDollars.addClass('tooBig2');
-                        $priceCents.addClass('toosmall2');
-                        monthlyBasePriceCents = '0';
-                    }
-                    else {
-                        $priceDollars.addClass('tooBig');
-                        $priceCents.addClass('toosmall');
-                        monthlyBasePriceCents = '00';
-                    }
-                    monthlyBasePriceDollars = Number.parseInt(monthlyBasePriceDollars) + 1;
-                }
-                else {
-                    if (monthlyBasePriceCents.length > 2) {
-                        monthlyBasePriceCents = monthlyBasePriceCents.substr(0, 2);
-                        monthlyBasePriceCents = Number.parseInt(monthlyBasePriceCents) + 1;
-                        monthlyBasePriceCents = (monthlyBasePriceCents + '0').substr(0, 2);
-                    }
-                }
-                var storageGigabytes = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
-                var storageBytes = storageGigabytes * 1024 * 1024 * 1024;
-                var storageFormatted = numOfBytes(storageBytes, 0);
-                var storageSizeRounded = Math.round(storageFormatted.size);
-                var bandwidthGigabytes = currentPlan[pro.UTQA_RES_INDEX_TRANSFER];
-                var bandwidthBytes = bandwidthGigabytes * 1024 * 1024 * 1024;
-                var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
-                var bandwidthSizeRounded = Math.round(bandwidthFormatted.size);
-                $planName.text(planName);
-                if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-                    $priceDollars.text(monthlyBasePrice);
-                    $priceCents.text('');
-                }
-                else {
-                    $priceDollars.text(monthlyBasePriceDollars);
-                    $priceCents.text('.' + monthlyBasePriceCents + ' ' +
-                        monthlyBasePriceCurrencySign);
-                }
-                $storageAmount.text(storageSizeRounded);
-                $storageUnit.text(storageFormatted.unit);
-                $bandwidthAmount.text(bandwidthSizeRounded);
-                $bandwidthUnit.text(bandwidthFormatted.unit);
-            }
-        }
+        var classType;
+
+        classType = pro.proplan.updateEachPriceBlock("D", $pricingBoxes, $dialog);
+
+        classType = (classType === 1) ? "" : "2";
+        $pricingBoxes.find('.big').removeClass('tooBig tooBig2').addClass('tooBig' + classType);
+        $pricingBoxes.find('.small').removeClass('toosmall toosmall2').addClass('toosmall' + classType);
     },
 
     showLimitedBandwidthDialog: function(res, callback, flags) {

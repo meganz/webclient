@@ -71,6 +71,7 @@ function setDateTimeFormat(locales, format) {
     var options = {year: 'numeric'};
     options.month = format >= 2 ? 'long' : 'numeric';
     options.day = format === 3 ? undefined : 'numeric';
+    options.weekday = format === 4 ? 'long' : undefined;
 
     // Create new DateTimeFormat object if it is not exist
     try {
@@ -102,6 +103,7 @@ function setDateTimeFormat(locales, format) {
  *       1: yyyy-mm-dd (Short date format without time)
  *       2: yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format)
  *       3: yyyy fmn (fmn: Full month name, based on the locale) (Long Date format without day)
+ *       4: Monday, yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format with weekday)
  */
 function time2date(unixTime, format) {
 
@@ -750,6 +752,13 @@ mBroadcaster.once('startMega', function populate_l() {
                        .replace('[B]', '<span class="os-linux-toggle">').replace('[/B]', '</span>');
     l[20137] = l[20137].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
         + '/mobile">').replace('[/A]', '</a>');
+    l[20189] = l[20189].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[20192] = l[20192].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[20193] = l[20193].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[20194] = l[20194].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[20195] = l[20195].replace('[B]', '<b>').replace('[/B]', '</b>');
+
+
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

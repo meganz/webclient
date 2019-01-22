@@ -1163,6 +1163,10 @@ FileManager.prototype.initContextUI = function() {
         }
     });
 
+    $(c + '.dispute-item').rebind('click', function() {
+        loadSubPage('dispute');
+    });
+
     $(c + '.rename-item').rebind('click', function() {
         renameDialog();
     });
@@ -3923,6 +3927,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
 
     // Define what dialogs can be opened from other dialogs
     var diagInheritance = {
+        'recovery-key-dialog': ['recovery-key-info'],
         properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share'],
         copy: ['createfolder'],
         move: ['createfolder'],

@@ -52,7 +52,17 @@ function RecentsRender() {
     this._view = [];
     this.recentActions = [];
     this.actionIdMap = {};
-
+    this._shortTimeFormatter = new Intl.DateTimeFormat([], {
+        hour: '2-digit',
+        minute:'2-digit',
+        hour12: false
+    });
+    this._fullTimeFormatter = new Intl.DateTimeFormat([], {
+        hour: '2-digit',
+        minute:'2-digit',
+        second: '2-digit',
+        hour12: false
+    });
     this._expandedStates = {};
 
     this._initScrollPosition = false;
@@ -432,12 +442,11 @@ RecentsRender.prototype.generateRow = function (action, actionId) {
     this.populateBreadCrumb($newRow.find(".breadcrumbs"), action);
 
     // Render the date/time views.
-    var actionDate = moment(action.ts * 1e3);
-    $newRow.find(".file-data .time").text(actionDate.format("HH:mm"));
+    $newRow.find(".file-data .time").text(this._shortTimeFormatter.format(action.ts));
     $newRow.find(".file-data .uploaded-on-message.dark-direct-tooltip span").text(
         (action.action !== "added" ? l[19942] : l[19941])
-            .replace('%1', actionDate.format("D MMMM"))
-            .replace('%2', actionDate.format("HH:mm:ss"))
+            .replace('%1', acc_time2date(action.ts, true))
+            .replace('%2', this._fullTimeFormatter.format(action.ts))
     );
 
     // Render in/out share icons.

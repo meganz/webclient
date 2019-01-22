@@ -14,6 +14,9 @@ Fabfile for deploying the Mega Web Client.
 * To build bundle.js and deploy to a specific branch:
   fab dev:build_bundle=True,branch_name=1657-simple-translations
 
+* To delete previously deployed beta and re-deploy the current branch on beta.developers.mega.co.nz:
+  fab dev:del_exist=True
+
 * To deploy/update a branch on sandbox3.developers.mega.co.nz:
   fab sandbox dev:branch_name=1657-simple-translations
 
@@ -85,7 +88,7 @@ def _build_chat_bundle(target_dir):
 
 
 @task
-def dev(build_bundle=False, branch_name=''):
+def dev(build_bundle=False, branch_name='', del_exist=False):
     """
     Clones a branch and deploys it to beta.developers.mega.co.nz.
     It will then output a test link which can be pasted into a Redmine
@@ -95,6 +98,8 @@ def dev(build_bundle=False, branch_name=''):
         1) Enter your code directory and run: Fab dev
         2) Alternatively to clone any branch run:
            Fab dev:xxx-branch-name
+        3) Delete existing branch on beta and clone new one:
+           Fab dev:del_exist=True
     """
 
     # If none other given, use beta.developers server
@@ -108,6 +113,11 @@ def dev(build_bundle=False, branch_name=''):
 
     # Get the remote path e.g. /var/www/xxx-branch-name
     remote_branch_path = os.path.join(env.target_dir, branch_name)
+
+    # Delete existing branch.
+    if del_exist:
+        print('deleting existing {} branch.\n').format(branch_name)
+        run('rm -rf {}'.format(remote_branch_path))
 
     # Clone the repo into /var/www/xxx-branch-name
     # but not the full git history to save on storage space

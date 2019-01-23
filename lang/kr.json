@@ -3013,5 +3013,11 @@
     "20205": "Configuring an FTP server will let you access your MEGA files as if they were located in your computer. All major platforms support access to FTP server.",
     "20206": "%1[S2]\ubd84\uac04 \ub3d9\uc791\uc774 \uc5c6\uc73c\uba74[\/S2] [S1]\ubd80\uc7ac\uc911\uc73c\ub85c \uc0c1\ud0dc\ub97c \uc124\uc815\ud569\ub2c8\ub2e4.[\/S1]",
     "20207": "\ucd5c\uadfc \uc5f0\ub77d \uc2dc\uac04 \ubcf4\uae30",
-    "20208": "\ub2f9\uc2e0\uc774 \uc774\uc6a9\uc790\uac00 \uc628\ub77c\uc778\uc778 \uac83\uc744 \ub9c8\uc9c0\ub9c9\uc73c\ub85c \ubcf8 \uc2dc\uac04\uc744 \ubcf4\uc5ec\uc90d\ub2c8\ub2e4."
+    "20208": "\ub2f9\uc2e0\uc774 \uc774\uc6a9\uc790\uac00 \uc628\ub77c\uc778\uc778 \uac83\uc744 \ub9c8\uc9c0\ub9c9\uc73c\ub85c \ubcf8 \uc2dc\uac04\uc744 \ubcf4\uc5ec\uc90d\ub2c8\ub2e4.",
+    "20209": "Your account has been temporarily suspended due to potential abuse. Please verify your phone number to unlock your account.",
+    "20210": "Get %1 GB storage and %2 GB bandwidth for free when you add your phone number. This makes it easier for your contacts to find you on MEGA.",
+    "20211": "Add your phone",
+    "20212": "Verify your account",
+    "20213": "Verify phone number",
+    "20214": "Your phone number"
 }

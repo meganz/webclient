@@ -2980,9 +2980,9 @@
     "20165": "Dil ve \u00fclkemin bi\u00e7imi (MEGA'y\u0131 kulland\u0131\u011f\u0131n\u0131z dil ve se\u00e7ti\u011finiz \u00fclkeye g\u00f6re)",
     "20167": "\u00dcst veri",
     "20168": "Dosya s\u00fcr\u00fcmlendirmeyi etkinle\u015ftir",
-    "20169": "Diyalog se\u00e7enekleri",
-    "20170": "Y\u00fckleme ve indirme",
-    "20171": "Aktarma ara\u00e7lar\u0131",
+    "20169": "Diyalog Se\u00e7enekleri",
+    "20170": "Y\u00fckleme ve \u0130ndirme",
+    "20171": "Aktarma Ara\u00e7lar\u0131",
     "20172": "Geni\u015flet",
     "20174": "Ki\u015filer ve Sohbetler",
     "20175": "\u015eu s\u00fcreden sonra biter",
@@ -3013,5 +3013,11 @@
     "20205": "Configuring an FTP server will let you access your MEGA files as if they were located in your computer. All major platforms support access to FTP server.",
     "20206": "%1 [S1][S2]dakika etkinlik g\u00f6sterilmedi\u011finde durumumu d\u0131\u015far\u0131da olarak g\u00f6ster.[\/S1][\/S2]",
     "20207": "Son g\u00f6r\u00fclmeyi g\u00f6ster",
-    "20208": "Bir kullan\u0131c\u0131y\u0131 son \u00e7evrimi\u00e7i g\u00f6rd\u00fc\u011f\u00fcn\u00fcz zaman\u0131 g\u00f6sterir."
+    "20208": "Bir kullan\u0131c\u0131y\u0131 son \u00e7evrimi\u00e7i g\u00f6rd\u00fc\u011f\u00fcn\u00fcz zaman\u0131 g\u00f6sterir.",
+    "20209": "Your account has been temporarily suspended due to potential abuse. Please verify your phone number to unlock your account.",
+    "20210": "Get %1 GB storage and %2 GB bandwidth for free when you add your phone number. This makes it easier for your contacts to find you on MEGA.",
+    "20211": "Add your phone",
+    "20212": "Verify your account",
+    "20213": "Verify phone number",
+    "20214": "Your phone number"
 }

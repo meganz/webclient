@@ -2980,9 +2980,9 @@
     "20165": "Formato per la mia lingua e la mia nazione (basato dul linguaggio che utilizzi in MEGA e la nazione di appartenenza che hai selezionato)",
     "20167": "Metadati",
     "20168": "Attiva il salvataggio delle versioni dei file",
-    "20169": "Opzioni finestre",
-    "20170": "Upload e download",
-    "20171": "Strumenti di trasferimento",
+    "20169": "Opzioni Finestre",
+    "20170": "Upload e Download",
+    "20171": "Strumenti di Trasferimento",
     "20172": "Espandi",
     "20174": "Contatti e chat",
     "20175": "Scade dopo",
@@ -3013,5 +3013,11 @@
     "20205": "Configuring an FTP server will let you access your MEGA files as if they were located in your computer. All major platforms support access to FTP server.",
     "20206": "[S1]Imposta lo status su Lontano dopo[\/S1] %1 [S2]minuti di inattivit\u00e0.[\/S2]",
     "20207": "Mostra l'ultima visita",
-    "20208": "Mostra l'ultima volta che sei stato online."
+    "20208": "Mostra l'ultima volta che sei stato online.",
+    "20209": "Your account has been temporarily suspended due to potential abuse. Please verify your phone number to unlock your account.",
+    "20210": "Get %1 GB storage and %2 GB bandwidth for free when you add your phone number. This makes it easier for your contacts to find you on MEGA.",
+    "20211": "Add your phone",
+    "20212": "Verify your account",
+    "20213": "Verify phone number",
+    "20214": "Your phone number"
 }

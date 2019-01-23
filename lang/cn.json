@@ -3013,5 +3013,11 @@
     "20205": "Configuring an FTP server will let you access your MEGA files as if they were located in your computer. All major platforms support access to FTP server.",
     "20206": "[S1]Set status to Away after[\/S1] %1 [S2]minutes of inactivity.[\/S2]",
     "20207": "Show last seen",
-    "20208": "Displays the last time you saw a user online."
+    "20208": "Displays the last time you saw a user online.",
+    "20209": "Your account has been temporarily suspended due to potential abuse. Please verify your phone number to unlock your account.",
+    "20210": "Get %1 GB storage and %2 GB bandwidth for free when you add your phone number. This makes it easier for your contacts to find you on MEGA.",
+    "20211": "Add your phone",
+    "20212": "Verify your account",
+    "20213": "Verify phone number",
+    "20214": "Your phone number"
 }

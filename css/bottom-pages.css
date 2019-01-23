@@ -3518,7 +3518,8 @@ a.opensource-icon-txt {
     display: inline-block;
     color: #444444;
     font-family: 'source_sans_prosemibold';
-    padding: 20px 0 0 0;
+    padding: 20px 4px 0 4px;
+    height: 60px;
 }
 a.opensource-icon-txt.coming-soon {
     cursor: default;

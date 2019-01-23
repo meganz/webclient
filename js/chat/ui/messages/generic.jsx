@@ -745,7 +745,7 @@ var GenericConversationMessage = React.createClass({
                                 'u': contact.u,
                                 'name': contact.name,
                                 'm': contact.email ? contact.email : contactEmail,
-                                'c': 0
+                                'c': undefined
                             }));
                         }
                         else if (M.u[contact.u] && !M.u[contact.u].m) {
@@ -804,7 +804,7 @@ var GenericConversationMessage = React.createClass({
                                 </DropdownsUI.Dropdown>
                             </ButtonsUI.Button>;
                         }
-                        else if (M.u[contact.u] && M.u[contact.u].c === 0) {
+                        else if (M.u[contact.u] && !M.u[contact.u].c) {
                             dropdown = <ButtonsUI.Button
                                 className="default-white-button tiny-button"
                                 icon="tiny-icon icons-sprite grey-dots">

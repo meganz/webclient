@@ -126,6 +126,7 @@ var signin = {
         else {
             // Show a failed login
             $('.account.login-form').addClass('both-incorrect-inputs');
+            $('#login-password2').blur();
 
             // Close the 2FA dialog for a generic error
             twofactor.loginDialog.closeDialog();

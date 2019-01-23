@@ -332,6 +332,96 @@ MegaData.prototype.refreshSessionList = function(callback) {
     }
 };
 
+/**
+ * Show the Master/Recovery Key dialog
+ * @param {Number} [version] Dialog version, 1: post-register, otherwise default one.
+ */
+MegaData.prototype.showRecoveryKeyDialog = function(version) {
+    'use strict';
+
+    var $dialog = $('.fm-dialog.recovery-key-dialog').removeClass('post-register');
+
+    // TODO: Implement this on mobile
+    if (!$dialog.length) {
+        if (d) {
+            console.debug('recovery-key-dialog not available...');
+        }
+        return;
+    }
+
+    M.safeShowDialog('recovery-key-dialog', function() {
+
+        $('.skip-button, .fm-dialog-close', $dialog).removeClass('hidden').rebind('click', closeDialog);
+        $('.copy-recovery-key-button', $dialog).removeClass('hidden').rebind('click', function() {
+            // Export key showing a toast message
+            u_exportkey(l[6040]);
+        });
+
+        switch (version) {
+            case 1:
+                $('.fm-dialog-close', $dialog).addClass('hidden');
+                $('.copy-recovery-key-button', $dialog).addClass('hidden');
+                $('.recover-image.icon', $dialog).removeClass('device-key').addClass('shiny-key');
+                $dialog.addClass('post-register').rebind('dialog-closed', function() {
+                    eventlog(localStorage.recoverykey ? 99718 : 99719);
+                    $dialog.unbind('dialog-closed');
+                });
+                break;
+        }
+
+        $('.save-recovery-key-button', $dialog).rebind('click', function() {
+            if ($dialog.hasClass('post-register')) {
+                M.safeShowDialog('recovery-key-info', function() {
+                    // Show user recovery key info warning
+                    $dialog.addClass('hidden').removeClass('post-register');
+                    $dialog = $('.fm-dialog.recovery-key-info');
+
+                    // On button click close dialog
+                    $('.close-dialog', $dialog).rebind('click', closeDialog);
+
+                    return $dialog;
+                });
+            }
+
+            // Save Recovery Key to disk.
+            u_savekey();
+
+            // Show toast message.
+            showToast('recoveryKey', l[8922]);
+        });
+
+        $('a.toResetLink', $dialog).rebind('click', function() {
+            loadingDialog.show();
+
+            M.req({a: 'erm', m: u_attr.email, t: 9}).always(function(res) {
+                closeDialog();
+                loadingDialog.hide();
+
+                if (res === ENOENT) {
+                    msgDialog('warningb', l[1513], l[1946]);
+                }
+                else if (res === 0) {
+                    if (!is_mobile) {
+                        $('.fm-dialog.account-reset-confirmation').removeClass('hidden');
+                    }
+                    else {
+                        msgDialog('info', '', l[735]);
+                    }
+                }
+                else {
+                    msgDialog('warningb', l[135], l[200]);
+                }
+            });
+
+            return false;
+        });
+
+        $('.recovery-key.input-wrapper input', $dialog).val(a32_to_base64(u_k));
+
+        return $dialog;
+    });
+};
+
 function voucherData(arr) {
     var vouchers = [];
     var varr = arr[0];

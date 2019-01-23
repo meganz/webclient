@@ -238,6 +238,14 @@
         }
     };
 
+    MegaNotifications.prototype.isBusy = function() {
+        if (!u_handle || !M.u[u_handle]) {
+            // should never happen.
+            return;
+        }
+        return M.u[u_handle].presence === UserPresence.PRESENCE.DND;
+    };
+
 
     /**
      * Represents a single notification
@@ -263,7 +271,7 @@
             self.setUnread(unread);
         }
 
-        if (unread === true || self.options.alwaysPlaySound === true) {
+        if (!self.megaNotifications.isBusy() && (unread === true || self.options.alwaysPlaySound === true)) {
             if (self.options.anfFlag && mega.notif.has(self.options.anfFlag) !== 0) {
                 if (self.options.sound) {
                     var playSound = function() {
@@ -292,7 +300,7 @@
         }
 
         if (unread === true) {
-            if (self.options.anfFlag && mega.notif.has(self.options.anfFlag) !== 0) {
+            if (!self.megaNotifications.isBusy() && self.options.anfFlag && mega.notif.has(self.options.anfFlag) !== 0) {
                 self._showDesktopNotification();
             }
         }

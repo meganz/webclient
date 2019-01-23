@@ -131,7 +131,7 @@ var PerfectScrollbar = React.createClass({
                 }
             });
     },
-    eventuallyReinitialise: SoonFc(function(forced, scrollPositionYPerc, scrollToElement) {
+    eventuallyReinitialise: function(forced, scrollPositionYPerc, scrollToElement) {
         var self = this;
 
         if (!self.isMounted()) {
@@ -147,7 +147,7 @@ var PerfectScrollbar = React.createClass({
             self._currHeight = self.getContentHeight();
             self._doReinit(scrollPositionYPerc, scrollToElement, forced, $elem);
         }
-    }, 75),
+    },
     _doReinit: function(scrollPositionYPerc, scrollToElement, forced, $elem) {
         var self = this;
 

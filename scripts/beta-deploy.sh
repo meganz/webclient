@@ -22,4 +22,4 @@ git push
 cd "$pathOfScript"
 
 # Run the main Fabric deploy script
-fab dev
+fab dev:del_exist=True

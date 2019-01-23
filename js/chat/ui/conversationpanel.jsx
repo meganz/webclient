@@ -1244,6 +1244,10 @@ var ConversationPanel = React.createClass({
                                 }
 
                                 self.setState({'editing': false});
+
+                                Soon(function() {
+                                    $('.chat-textarea-block:visible textarea').focus();
+                                }, 300);
                             }}
                             onDeleteClicked={(e, msg) => {
                                 self.setState({
@@ -1665,6 +1669,7 @@ var ConversationPanel = React.createClass({
                     noContextButton="true"
                     contact={contact}
                     megaChat={self.props.chatRoom.megaChat}
+                    showLastGreen={true}
                     key={contact.u}/>
         }
 

@@ -532,7 +532,6 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     font-size: 14px;
     line-height: 24px;
     color: #666666;
-    letter-spacing: 0.5px;
     padding-bottom: 10px;
 }
 .bottom-page.small-txt a, .bottom-page.small-txt span {
@@ -3640,7 +3639,7 @@ a.opensource-icon-txt.coming-soon {
     z-index: 999;
     padding: 0 24px;
     box-sizing: border-box;
-    height: 680px;
+    height: 640px;
     padding-top: 24px;
 }
 .onboarding-suggestions .bottom-page.horizontal-centered-bl.resize {

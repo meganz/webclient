@@ -1164,6 +1164,10 @@ FileManager.prototype.initContextUI = function() {
         }
     });
 
+    $(c + '.dispute-item').rebind('click', function() {
+        loadSubPage('dispute');
+    });
+
     $(c + '.rename-item').rebind('click', function() {
         renameDialog();
     });
@@ -1176,7 +1180,7 @@ FileManager.prototype.initContextUI = function() {
 
         var showShareDlg = function() {
             $.hideContextMenu();
-            clearScrollPanel('.share-dialog');
+            clearScrollPanel($('.share-dialog-contacts', $dialog));
 
             // Show the share dialog
             $dialog.removeClass('hidden');
@@ -1204,8 +1208,12 @@ FileManager.prototype.initContextUI = function() {
             // Update dialog title text
             $('.fm-dialog-title', $dialog).text(l[5631] + ' "' + M.d[$.selected].name + '"');
             $('.multiple-input .token-input-token-mega', $dialog).remove();
+            initTokenInputsScroll($('.multiple-input', $dialog));
+            Soon(function() {
+                $('.token-input-input-token-mega input', $dialog).trigger("focus");
+            });
+
             dialogPositioning($dialog);
-            $('.token-input-input-token-mega input', $dialog).trigger("focus");
 
             return $dialog;
         };
@@ -3960,6 +3968,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
 
     // Define what dialogs can be opened from other dialogs
     var diagInheritance = {
+        'recovery-key-dialog': ['recovery-key-info'],
         properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share'],
         copy: ['createfolder'],
         move: ['createfolder'],

@@ -66,8 +66,6 @@ var securityPractice = {
             }
         });
 
-        $('.save-recovery-key-button').rebind('click', function() {
-            twofactor.account.downloadRecoveryKey();
-        });
+        $('.save-recovery-key-button').rebind('click', u_savekey);
     }
 };

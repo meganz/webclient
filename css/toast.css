@@ -75,7 +75,7 @@
 }
 .clipboard .toast-icon {
     background-position: -196px -128px;
-    background-image: url(../images/mega/icons-sprite_v23@2x.png);
+    background-image: url(../images/mega/icons-sprite_v25@2x.png);
     background-size: 262px auto;
     opacity: 0.74;
 }
@@ -89,7 +89,7 @@
     background-position: -85px -1260px;
 }
 .recoveryKey .toast-icon {
-    background-image: url(../images/mega/recover-account-sprite@2x.png);
+    background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
     background-size: 360px auto;
     background-position: -176px -742px;
 }
@@ -225,7 +225,7 @@
     float: left;
 }
 .toast-close-button.qr-toast-close {
-    background-image: url(../images/mega/icons-sprite_v23.png);
+    background-image: url(../images/mega/icons-sprite_v25.png);
     background-position: -136px -206px;
     margin-top: -4px;
     margin-left: 226px;
@@ -262,7 +262,7 @@
     display: inline-block;
     width: 14px;
     height: 14px;
-    background-image: url(../images/mega/icons-sprite_v23.png);
+    background-image: url(../images/mega/icons-sprite_v25.png);
     vertical-align: top;
     margin: 2px 9px 0 1px;
     background-position: -198px -1240px;
@@ -315,8 +315,9 @@
     text-align: center;
 }
 .mobile.toast-notification.success {
-    background-color: rgba(0, 191, 166, 0.9);
-    color: white;
+    background-color: rgba(222, 222, 222, 0.8);
+    border: 1px solid #ccc;
+    color: #555;
 }
 
 .mobile.toast-notification.error {

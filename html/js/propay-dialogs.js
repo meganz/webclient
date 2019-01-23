@@ -1338,9 +1338,9 @@ var addressDialog = {
                 // If postcode translations not set, then decalre them.
                 if (addressDialog.localePostalCodeName === undefined || addressDialog.localePostalCodeName === null) {
                     addressDialog.localePostalCodeName = {
-                        "US": "ZIP code",
+                        "US": "ZIP Code",
                         "CA": "Postal Code",
-                        "PH": "ZIP code",
+                        "PH": "ZIP Code",
                         "DE": "PLZ",
                         "AT": "PLZ",
                         "IN": "Pincode",

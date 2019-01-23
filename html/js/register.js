@@ -139,6 +139,9 @@ function registeraccount() {
     var signup = null;
     var fromProPage = false;
 
+    // Set a flag indicating the registration came from the webclient.
+    localStorage.signUpStartedInWebclient = '1';
+
     // Set the signup function to start the new secure registration process
     if (security.register.newRegistrationEnabled()) {
         signup = function() {

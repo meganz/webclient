@@ -516,12 +516,21 @@ var notify = {
 };
 
 var alarm = {
-    siteUpdate: {
-        init: function() {}
+    overQuota: {
+        render: function() {}
+    },
+    ephemeralSession: {
+        render: function() {}
+    },
+    nonActivatedAccount: {
+        render: function() {}
     },
     planExpired: {
         lastPayment: null,
         render: function() {}
+    },
+    siteUpdate: {
+        init: function() {}
     }
 };
 

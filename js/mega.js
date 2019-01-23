@@ -1263,7 +1263,7 @@ scparser.$add('mcc', function(a) {
     // MEGAchat
     if (!megaChatIsDisabled) {
         if (megaChatIsReady) {
-            $(window).trigger('onChatdChatUpdatedActionPacket', a);
+            megaChat._queuedMccPackets.push(a);
         }
         else if (typeof ChatdIntegration !== 'undefined') {
             ChatdIntegration._queuedChats[a.id] = a;
@@ -1313,6 +1313,10 @@ scparser.$add('_sn', function(a) {
 
     // reset state
     scinshare = Object.create(null);
+
+    if (!megaChatIsDisabled && megaChatIsReady) {
+        megaChat.onSnActionPacketReceived();
+    }
 });
 
 scparser.$add('_fm', function() {
@@ -1596,10 +1600,12 @@ function initworkerpool() {
 // if it isn't up, reload directly
 // the server-side treecache is wiped (otherwise, we could run into
 // an endless loop)
-function fm_forcerefresh() {
+function fm_forcerefresh(light) {
     "use strict";
 
-    localStorage.force = 1;
+    if (light !== true) {
+        localStorage.force = 1;
+    }
 
     if (fmdb && !fmdb.crashed) {
         execsc = function() {}; // stop further SC processing

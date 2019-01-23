@@ -129,7 +129,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 68px auto;
 }
 .small-icon.context, .dropdown-item.contains-submenu:not(.disabled-submenu)::before, .labels:not(.disabled) .dropdown-colour-item::after, .download.thumb-hover-icon, .small-icon.red-lens, .small-icon.red-play, .small-icon.small-play-icon, .medium-icon.icons-img, .semi-big-icon.icons-img, .viewer-mid-button, .small-icon.clock, i.icons-sprite, i.small-icon.icons-sprite, .fm-versioning.file-path span:not(:first-child)::before, .fm-account-button.megadrop::before, .transfer-panel-title span::before, .transfer-type.upload::before, .transfer-type.download::before, .megasync-transfer .toast-col:nth-child(1) span::before, .megasync-transfer .toast-col:nth-child(1) span::before, .grid-url-arrow::after, .file-settings-icon::after, .improved-recovery-steps .nav-back-icon, .clipboard .toast-icon, .small-icon.icons-sprite.grey-plus .dropdown-dark-arrow, .dropdown-item.asc i::after, .dropdown-item.desc i::after, .improved-recovery-steps .nav-back-icon, .top-search-button {
-    background-image: url(../images/mega/icons-sprite_v23@2x.png);
+    background-image: url(../images/mega/icons-sprite_v25@2x.png);
     background-size: 262px auto;
 }
 #help2-main .ui-autocomplete .client, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .webclient-icon {
@@ -418,7 +418,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 
 
 .improved-recovery-steps .recover-image, .improved-recovery-steps .session-image-block, .improved-recovery-steps .recover-button.yes::after, .improved-recovery-steps .recover-button.no::after, .tooltip-block .minimum-password-block .password-icon    {
-    background-image: url(../images/mega/recover-account-sprite@2x.png);
+    background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
     background-size: 344px auto;
 }
 }

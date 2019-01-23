@@ -92,12 +92,12 @@
 .backup-recover.withkey .card-container, .backup-recover.withoutkey .card-container {
     margin-top: 54px;
 }
-.improved-recovery-steps .content-wrapper, .backup-recover.withkey .content-wrapper {
+.improved-recovery-steps .content-wrapper, .backup-recover.withkey .content-wrapper  {
     position: relative;
     width: 580px;
     min-height: 420px;
     margin-bottom: 40px;
-    margin: 24px auto 48px;
+    margin: 24px auto 40px;
 }
 .backup-recover .content-wrapper.hasButton {
     padding-bottom: 88px;
@@ -250,7 +250,7 @@
 }
 .improved-recovery-steps .recover-button.yes::after, .improved-recovery-steps .recover-button.no::after {
     content:'';
-    background-image: url(../images/mega/recover-account-sprite.png);
+    background-image: url(../images/mega/recover-account-sprite_v1.png);
     background-repeat: no-repeat;
     background-size: 344px auto;
     display: inline-block;
@@ -347,8 +347,9 @@
     width: 260px;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
-.improved-recovery-steps .app-instruction-block select::-ms-expand {    
-    display: none; 
+
+.improved-recovery-steps .app-instruction-block select::-ms-expand {
+    display: none;
 }
 .improved-recovery-steps .app-instruction-block select{
     -webkit-appearance: none;
@@ -512,7 +513,7 @@
     width: 18px;
     height: 16px;
     display: inline-block;
-    background-image: url(../images/mega/icons-sprite_v23.png);
+    background-image: url(../images/mega/icons-sprite_v25.png);
     background-repeat: no-repeat;
     background-position: -204px -196px;
     background-size: 262px auto;
@@ -567,7 +568,7 @@
     margin: 24px auto 56px;
 }
 .improved-recovery-steps .recover-image, .improved-recovery-steps .session-image-block, .backup-recover .recover-image {
-    background-image: url(../images/mega/recover-account-sprite.png);
+    background-image: url(../images/mega/recover-account-sprite_v1.png);
     background-repeat: no-repeat;
     background-size: 344px auto;
     display: block;
@@ -604,16 +605,22 @@
 .improved-recovery-steps .recover-image.park-account{
     background-position: -172px -480px;
 }
+.improved-recovery-steps .recover-image.safe-vault {
+     background-position: 23px -811px;
+}
+.improved-recovery-steps .recover-image.shiny-key {
+     background-position: -172px -799px;
+}
 .improved-recovery-steps .session-image-block {
     height: 94px;
     margin: 0 auto 12px;
     width: 120px;
 }
-.improved-recovery-steps .check-sessions {
+.improved-recovery-steps .check-sessions, .improved-recovery-steps .backup-key-info {
     margin: 36px auto 24px;
     display: table;
 }
-.improved-recovery-steps .check-sessions-text {
+.improved-recovery-steps .check-sessions-text, .improved-recovery-steps .backup-key-info-text {
     margin: 0;
     display: block;
 }
@@ -623,10 +630,16 @@
     cursor: pointer;
     position: relative;
 }
+.recovery-key-info.improved-recovery-steps .col-3 {
+    cursor: auto;
+}
 .improved-recovery-steps .check-sessions .col-3 {
     display: table-cell;
     border: 2px solid rgba(153, 153, 153, 0.25);
     border-radius: 4px;
+}
+.improved-recovery-steps .backup-key-info .col-3 {
+    display: table-cell;
 }
 .improved-recovery-steps .check-sessions .col-3:hover {
     border-color: rgba(42,175,95,0.55);
@@ -643,7 +656,16 @@
 .improved-recovery-steps .session-image-block.mobile {
     background-position: -123px -611px;
 }
-.improved-recovery-steps .check-sessions .session-text {
+.improved-recovery-steps .session-image-block.printer {
+    background-position: -2px -926px;
+}
+.improved-recovery-steps .session-image-block.password-manager {
+    background-position: -118px -926px;
+}
+.improved-recovery-steps .session-image-block.usb-stick {
+    background-position: -232px -926px;
+}
+.improved-recovery-steps .check-sessions .session-text, .improved-recovery-steps .backup-key-info .backup-key-info-text {
     text-align: center;
     font-size: 13px;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
@@ -674,7 +696,7 @@
 .improved-recovery-steps .check-sessions .col-3:hover .checkboxOff {
     background-color: rgba(42,175,95,0.55);
 }
-.improved-recovery-steps  h5.main-italic-header {
+.improved-recovery-steps h5.main-italic-header {
     font-size: 14px;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     line-height: 24px;
@@ -682,7 +704,6 @@
     font-weight: 800;
     display: inline-block;
     padding: 0 0;
-    max-width: 60%;
 }
 .improved-recovery-steps .recover-paste-block .left-section, .improved-recovery-steps .recover-paste-block .right-section {
     margin: 0 0;
@@ -698,7 +719,7 @@
     width: 49%;
     text-align: right;
 }
-.improved-recovery-steps .recover-paste-block .right-section > div{
+.improved-recovery-steps .recover-paste-block .right-section > div:not(.hidden) {
     display: inline-block;
     min-width: 95px;
     margin-right: 5px;
@@ -724,7 +745,7 @@
 /*.improved-recovery-steps .recover-paste-block .recovery-key.input-wrapper input{
     width: calc(100% - 24px);
     padding-left: 22px;
-    background-image: url(../images/mega/recover-account-sprite.png);
+    background-image: url(../images/mega/recover-account-sprite_v1.png);
     background-size: 48px auto;
     background-position: -172px -714px
     background-repeat: no-repeat;
@@ -758,8 +779,7 @@
     letter-spacing: 0px;
 }
 .improved-recovery-steps strong, .improved-recovery-steps b {
-    font-family: 'LatoWeb', Arial;
-    font-weight: 800;
+    font-family: 'LatoWebBlack', 'source_sans_probold', Arial;
 }
 .improved-recovery-steps .info-container, .improved-recovery-steps .checkbox-container {
     overflow: auto;
@@ -773,7 +793,7 @@
     background: rgba(244,244,246,0.20);
     border: 1px solid rgba(38,47,59,0.10);
     border-radius: 6px;
-    padding: 20px 24px;
+    padding: 20px 20px;
     margin: 32px auto 32px;
     height: auto;
     position: relative;
@@ -802,7 +822,7 @@
     margin: 0 auto;
     float: initial;
     width: 260px;
-    cursor: pointer;    
+    cursor: pointer;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
     -o-transition: all 200ms ease-in-out;
@@ -843,6 +863,33 @@
 .backup-recover.withoutkey p:last-of-type {
     margin-bottom: 32px;
 }
+
+/* Post register recovery key dialog */
+.step-main-question.post-register, .first-paragraph.post-register, .second-paragraph.post-register, .post-register .step-main-question, .post-register .first-paragraph, .post-register .second-paragraph {
+    display: none;
+}
+.post-register .step-main-question.post-register, .post-register .first-paragraph.post-register, .post-register .second-paragraph.post-register {
+    display: block;
+}
+.step-main-question.post-register, .first-paragraph.post-register, .second-paragraph.post-register, .recovery-key-dialog.post-register .reset-account {
+    display: none;
+}
+.improved-recovery-steps.recovery-key-dialog .skip-button {
+    display: none;
+}
+.improved-recovery-steps.recovery-key-dialog.post-register .skip-button {
+    display: block;
+    color: #aaa;
+    cursor: pointer;
+}
+.improved-recovery-steps.post-register .skip-button:hover {
+    text-decoration: underline;
+}
+.fm-dialog.recovery-key-dialog.post-register {
+    height: auto;
+    margin: -280px 0 0 -320px;
+}
+
 @media only screen and (max-width: 1250px) {
 .improved-recovery-steps .password-tooltip.tooltip-block {
     right: -200px;
@@ -851,6 +898,6 @@
 .improved-recovery-steps .password-tooltip.tooltip-block .triangle-pointer {
     transform: rotate(135deg);
     left: 170px;
-    top: -8px;    
+    top: -8px;
 }
 }

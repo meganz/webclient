@@ -103,7 +103,7 @@
             };
 
             if (conflicts.length) {
-                var repeat;
+                var repeat = [];
                 var self = this;
                 var save = function(file, name, action, node) {
                     var stop = false;
@@ -146,7 +146,7 @@
                     case ns.REPLACE:
                     case ns.DONTCOPY:
                     case ns.KEEPBOTH:
-                        repeat = defaultAction;
+                        repeat[0] = defaultAction;
                 }
 
                 var applyCheck = function _prompt(a) {
@@ -159,17 +159,18 @@
                             var node = file[1];
                             file = file[0];
 
-                            if (repeat) {
+                            var action = repeat[file.t | 0];
+                            if (action) {
                                 var name = file.name;
 
-                                switch (repeat) {
+                                switch (action) {
                                     case ns.DONTCOPY:
                                         break;
                                     case ns.KEEPBOTH:
                                         name = self.findNewName(name, node.p || target);
                                         /* falls through */
                                     case ns.REPLACE:
-                                        save(file, name, repeat, node);
+                                        save(file, name, action, node);
                                         break;
                                 }
                                 promptRecursion(a);
@@ -183,7 +184,7 @@
                                         }
                                         else {
                                             if (checked) {
-                                                repeat = action;
+                                                repeat[file.t | 0] = action;
                                             }
                                             if (action !== ns.DONTCOPY) {
                                                 if (!save(file, name, action, node)) {
@@ -216,7 +217,7 @@
                         }
                         result = result.concat(okNodes);
 
-                        repeat = ns.REPLACE; // per specifications, merge all internal folders
+                        repeat[1] = ns.REPLACE; // per specifications, merge all internal folders
                         applyCheck(conflictedNodes).always(resolve);
                     }
                     else {

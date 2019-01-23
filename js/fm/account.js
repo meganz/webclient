@@ -286,8 +286,6 @@ accountUI.general = {
             $storageChart.find('.chart.data .gb-txt').text(b2[1]);
             $storageChart.find('.chart.data .perc-txt').text(this.perc_c_s + '%');
             $storageChart.find('.chart.data .size-txt').text(bytesToSize(account.space_used));
-            $('.account.quota-txt.used-space')
-                .safeHTML('<span>@@</span> @@ @@', bytesToSize(account.space_used), l[5528], b2.join(' '));
             /** End New Used Storage chart */
         },
 

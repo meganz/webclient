@@ -232,18 +232,19 @@ function fmremovesync(selectedNodes) {
 
         var c = selectedNodes.length;
         var replaceString = '';
-        var contact = '';
+        var sharedFoldersAlertMessage = l[7872];
 
         if (c > 1) {
             replaceString = c + ' ' + l[5569];
-            contact = 'contacts';
+            sharedFoldersAlertMessage = l[17974];
         }
         else {
-            replaceString = '<strong>' + escapeHTML(M.getNameByHandle(selectedNodes[0]) || '') + '</strong>';
-            contact = 'contact';
+            var contactName = escapeHTML(M.getNameByHandle(selectedNodes[0]) || '');
+            replaceString = '<strong>' + contactName + '</strong>';
+            sharedFoldersAlertMessage = sharedFoldersAlertMessage.replace('[X]', contactName);
         }
 
-        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), l[7872].replace('[X]', contact),
+        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), sharedFoldersAlertMessage,
             function(e) {
                 if (e) {
                     for (i = 0; i < selectedNodes.length; i++) {

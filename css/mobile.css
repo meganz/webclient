@@ -6976,12 +6976,12 @@ textarea.mobile.support-text-field {
 }
 
 /* Show selected state on Pro cards for mobile when the card is clicked */
-.mobile.pro .reg-st3-membership-bl.selected .membership-pad-bl {
+.mobile .reg-st3-membership-bl.selected .membership-pad-bl {
     -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
     -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
 }
-.mobile.pro .reg-st3-membership-bl .purchase-plan-button {
+.mobile .reg-st3-membership-bl .purchase-plan-button {
     z-index: 2;
 }
 

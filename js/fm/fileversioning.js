@@ -314,7 +314,14 @@ var versiondialogid;
                     revertedNode.t = n.t;
                     req.cr = crypto_makecr([revertedNode], share, false);
                 }
-                api_req(req);
+                api_req(req, {
+                    callback: function(res) {
+                        if (typeof res === 'object' && res.f) {
+                            selectionManager.clear_selection();
+                            selectionManager.add_to_selection(res.f[0].h);
+                        }
+                    }
+                });
             };
             var fillVersionList = function(versionList) {
 

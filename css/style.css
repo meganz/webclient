@@ -21838,11 +21838,13 @@ body.kr .account.chart.data {
     font-size: 14px;
     font-family: 'source_sans_prosemibold';
     margin: 16px 0 0 0;
+    margin-left: 40px;
 }
 .contact-us-revamp .contact-new-txt {
     font-size: 15px;
     color: #676D75;
     min-height: initial;
+    margin-left: 40px;
 }
 .contact-us-revamp .contact-body-wrapper {
     max-width: 1280px;

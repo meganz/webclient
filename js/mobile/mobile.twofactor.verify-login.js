@@ -30,7 +30,6 @@ mobile.twofactor.verifyLogin = {
         mobile.initBackButton(this.$page, 'twofactor/setup');
 
         // Initialise functionality
-        this.initKeyupFunctionality();
         this.initVerifyButton();
         this.initLostAuthenticatorButton();
 
@@ -39,39 +38,6 @@ mobile.twofactor.verifyLogin = {
 
         // Put the focus in the PIN input field after its visible
         this.$page.find('.two-factor-seed-input input').trigger('focus');
-    },
-
-    /**
-     * Initialises keyup/blur functionality on the input field to check the PIN as it's being entered
-     */
-    initKeyupFunctionality: function() {
-
-        'use strict';
-
-        // Cache selectors
-        var $pinCodeInput = mobile.twofactor.verifyLogin.$page.find('.two-factor-seed-input input');
-        var $verifyButton = mobile.twofactor.verifyLogin.$page.find('.two-factor-verify-btn');
-        var $warningText = mobile.twofactor.verifyLogin.$page.find('.warning-text-field');
-
-        // On keyup or clicking out of the text field
-        $pinCodeInput.off('keyup blur').on('keyup blur', function() {
-
-            // Hide previous warnings for incorrect PIN codes
-            $warningText.addClass('hidden');
-
-            // Trim whitespace from the ends of the PIN entered
-            var pinCode = $pinCodeInput.val();
-            var trimmedPinCode = $.trim(pinCode);
-
-            // If empty, grey out the button so it appears unclickable
-            if (trimmedPinCode === '' || trimmedPinCode.length !== 6 || Number.isInteger(trimmedPinCode)) {
-                $verifyButton.removeClass('active');
-            }
-            else {
-                // Otherwise how the button as red/clickable
-                $verifyButton.addClass('active');
-            }
-        });
     },
 
     /**

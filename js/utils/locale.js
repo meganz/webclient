@@ -11,6 +11,10 @@ var remappedLangLocales = {
     "br": "pt"
 };
 
+// Arabic speaking countries
+var arabics = ['DZ', 'BH', 'TD', 'KM', 'DJ', 'EG', 'ER', 'IQ', 'JO', 'KW', 'LB', 'LY',
+    'MR', 'MA', 'OM', 'PS', 'QA','SA', 'SO', 'SS', 'SY', 'TZ', 'TN', 'AE', 'YE'];
+
 $.dateTimeFormat = Object.create(null);
 $.acc_dateTimeFormat = Object.create(null);
 
@@ -68,23 +72,30 @@ function setDateTimeFormat(locales, format) {
     "use strict";
 
     // Set date format
-    var options = {year: 'numeric'};
+    var options = {year: 'numeric', hour12: false};
     options.month = format >= 2 ? 'long' : 'numeric';
     options.day = format === 3 ? undefined : 'numeric';
     options.weekday = format === 4 ? 'long' : undefined;
+
+    if (format === 0) {
+        options.minute = 'numeric';
+        options.hour = 'numeric';
+    }
 
     // Create new DateTimeFormat object if it is not exist
     try {
         $.dateTimeFormat[locales + '-' + format] = typeof Intl !== 'undefined' ?
             new Intl.DateTimeFormat(locales, options) : 'ISO';
+
+        // If locale is Arabic and country is non-Arabic country, not set, or not logged in
+        if (locale === 'ar' && (!u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0)) {
+            // To avoid Chrome bug, set Egypt as default country.
+            $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat('ar-EG', options);
+        }
     }
     catch (e) {
         $.dateTimeFormat[locales + '-' + format] = format > 1 ? new Intl.DateTimeFormat(locale, options) : 'ISO';
     }
-
-    // Create new DateTimeFormat object if it is not exist
-    var timeOptions = {hour: '2-digit', minute:'2-digit', hour12: false};
-    $.dateTimeFormat[locales + '-time'] = new Intl.DateTimeFormat([], timeOptions);
 }
 
 /**
@@ -110,31 +121,30 @@ function time2date(unixTime, format) {
     var date = new Date(unixTime * 1000 || 0);
     var result;
     var dateFunc;
-    var timeFunc;
-    var country = 'ISO';
+    var country = '';
+
     format = format || 0;
     if (u_attr) {
         country = u_attr.country ? u_attr.country : u_attr.ipcc || 'ISO';
     }
-    var locales = locale + '-' + country;
+
+    var locales = country ? locale + '-' + country : locale;
 
     // If dateTimeFormat is not set with the current locale set it.
     if ($.dateTimeFormat[locales + '-' + format] === undefined) {
         setDateTimeFormat(locales, format);
     }
 
-    var $dFObj = $.dateTimeFormat[locales + '-' + format];
-    var $tfObj = $.dateTimeFormat[locales + '-time'];
+    var dFObj = $.dateTimeFormat[locales + '-' + format];
 
     // print time as ISO date format
     var printISO = function _printISO() {
         var timeOffset = date.getTimezoneOffset() * 60;
         var isodate = new Date((unixTime - timeOffset) * 1000);
-        return isodate.toISOString().split('T')[0];
+        return isodate.toISOString().replace('T', ' ').substr(0 ,16);
     };
 
-    dateFunc = $dFObj === 'ISO' ? printISO : $dFObj.format;
-    timeFunc = $tfObj.format;
+    dateFunc = dFObj === 'ISO' ? printISO : dFObj.format;
 
     // if it is short date format and user selected to use ISO format
     if ((fmconfig.uidateformat || country === 'ISO') && format < 2) {
@@ -142,11 +152,6 @@ function time2date(unixTime, format) {
     }
     else {
         result = dateFunc(date);
-    }
-
-    // Add Time format
-    if (format === 0) {
-        result += " " + timeFunc(date);
     }
 
     return result;
@@ -169,6 +174,13 @@ function setAccDateTimeFormat(locales) {
         $.acc_dateTimeFormat[locales] = typeof Intl !== 'undefined' ?
             new Intl.DateTimeFormat(locales, options) : 'fallback';
         $.acc_dateTimeFormat[locales + '-noY'] = Intl ? new Intl.DateTimeFormat(locales, nYOptions) : 'fallback';
+
+        // If locale is Arabic and country is non-Arabic country or non set,
+        if (locale === 'ar' && (!u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0)) {
+            // To avoid Chrome bug, set Egypt as default country.
+            $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat('ar-EG', options);
+            $.acc_dateTimeFormat[locales + '-noY'] = new Intl.DateTimeFormat('ar-EG', nYOptions);
+        }
     }
     catch (e) {
         $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat(locale, options);

@@ -3034,5 +3034,10 @@
     "20226": "Keine SMS-Verifikation aktiv. Bitte fordern Sie einen neuen Code an.",
     "20227": "[S1]$1[\/S1][S2]von[\/S2][S3]$2[\/S3]",
     "20228": "Not accessible",
-    "20229": "Rubbish Bin Cleaning Scheduler"
+    "20229": "Rubbish Bin Cleaning Scheduler",
+    "20230": "Vouchers",
+    "20231": "Voucher History",
+    "20232": "Account balance",
+    "20233": "%s Members",
+    "20234": "With %s"
 }

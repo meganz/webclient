@@ -3034,5 +3034,10 @@
     "20226": "Nessuna verifica \u00e8 in corso. Per favore, prova ad inviare nuovamente il codice.",
     "20227": "[S1]$1[\/S1] [S2]di[\/S2] [S3]$2[\/S3]",
     "20228": "Non accessibile",
-    "20229": "Rubbish Bin Cleaning Scheduler"
+    "20229": "Rubbish Bin Cleaning Scheduler",
+    "20230": "Vouchers",
+    "20231": "Voucher History",
+    "20232": "Account balance",
+    "20233": "%s Members",
+    "20234": "With %s"
 }

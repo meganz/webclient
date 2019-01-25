@@ -3034,5 +3034,10 @@
     "20226": "Il n\u2019y a aucune v\u00e9rification en attente. Veuillez essayer de renvoyer le code.",
     "20227": "[S1]$1[\/S1][S2]de[\/S2][S3]$2[\/S3]",
     "20228": "Inaccessible",
-    "20229": "Rubbish Bin Cleaning Scheduler"
+    "20229": "Rubbish Bin Cleaning Scheduler",
+    "20230": "Vouchers",
+    "20231": "Voucher History",
+    "20232": "Account balance",
+    "20233": "%s Members",
+    "20234": "With %s"
 }

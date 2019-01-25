@@ -3034,5 +3034,10 @@
     "20226": "Weryfikacja nie jest w toku. Spr\u00f3buj ponownie wys\u0142a\u0107 kod.",
     "20227": "[S1]$1[\/S1][S2]z[\/S2][S3]$2[\/S3]",
     "20228": "Niedost\u0119pne",
-    "20229": "Rubbish Bin Cleaning Scheduler"
+    "20229": "Rubbish Bin Cleaning Scheduler",
+    "20230": "Vouchers",
+    "20231": "Voucher History",
+    "20232": "Account balance",
+    "20233": "%s Members",
+    "20234": "With %s"
 }

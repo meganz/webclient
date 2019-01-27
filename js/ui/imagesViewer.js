@@ -616,7 +616,13 @@ var slideshowid;
                 if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey) {
                     slideshow_prev();
                 }
+                else if (e.keyCode === 33 && slideshowid) { // PageUp
+                    slideshow_prev();
+                }
                 else if (e.keyCode === 39 && slideshowid) {
+                    slideshow_next();
+                }
+                else if (e.keyCode === 34 && slideshowid) { // PageDown
                     slideshow_next();
                 }
                 else if (e.keyCode === 46 && fullScreenManager) {

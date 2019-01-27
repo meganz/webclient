@@ -174,8 +174,8 @@
      */
     array.filterNonMatching = function(arr, val) {
         "use strict";
-        var arrWithoutVal = clone(arr);
-        arrWithoutVal.splice($.inArray(val, arrWithoutVal), 1);
+        var arrWithoutVal = [].concat(arr);
+        this.remove(arrWithoutVal, val, 1);
         return arrWithoutVal;
     };
 

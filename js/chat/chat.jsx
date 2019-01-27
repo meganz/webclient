@@ -79,22 +79,14 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
                 u_handle,
                 userHandle
             ];
-            var $promise;
 
-            var resp = megaChat.openChat(userHandles, "private", undefined, undefined, undefined, true);
-
-            if (resp instanceof MegaPromise) {
-                if (resp.state() === 'rejected') {
-                    console.warn("openChat failed. Maybe tried to start a private chat with a non contact?");
-                    return;
-                }
-            }
-            else {
-                $promise = resp[2];
-                if (resp[1]) {
-                    resp[1].show();
-                }
-            }
+            megaChat.smartOpenChat(userHandles, "private", undefined, undefined, undefined, true)
+                .then(function(room) {
+                    room.show();
+                })
+                .catch(function(ex) {
+                    console.warn("openChat failed. Maybe tried to start a private chat with a non contact?", ex);
+                });
         }
         else if(roomType === "group") {
             if (megaChat.chats[roomOrUserHash].isArchived()) {
@@ -1212,6 +1204,7 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                         && (roomId === megaChat.currentlyOpenedChat)) {
                         self.chats[roomId].showArchived = true;
                     }
+                    $promise.resolve(roomId, self.chats[roomId]);
                     return;
                 }
                 var res = self.openChat(
@@ -1301,6 +1294,88 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
     return [roomId, room, MegaPromise.resolve(roomId, self.chats[roomId])];
 };
 
+/**
+ * Wrapper around openChat() that does wait for the chat to be ready.
+ * @see Chat.openChat
+ */
+Chat.prototype.smartOpenChat = function() {
+    'use strict';
+    var self = this;
+    var args = toArray.apply(null, arguments);
+
+    if (typeof args[0] === 'string') {
+        // Allow to provide a single argument which defaults to opening a private chat with such user
+        args[0] = [u_handle, args[0]];
+        if (args.length < 2) {
+            args.push('private');
+        }
+    }
+
+    return new MegaPromise(function(resolve, reject) {
+
+        // Helper function to actually wait for a room to be ready once we've got it.
+        var waitForReadyState = function(aRoom, aShow) {
+            var verify = function() {
+                return aRoom.state === ChatRoom.STATE.READY;
+            };
+
+            var ready = function() {
+                if (aShow) {
+                    aRoom.show();
+                }
+                resolve(aRoom);
+            };
+
+            if (verify()) {
+                return ready();
+            }
+
+            createTimeoutPromise(verify, 300, 3e4).then(ready).catch(reject);
+        };
+
+        // Check whether we can prevent the actual call to openChat()
+        if (args[0].length === 2 && args[1] === 'private') {
+            var chatRoom = self.chats[array.filterNonMatching(args[0], u_handle)[0]];
+            if (chatRoom) {
+                return waitForReadyState(chatRoom, args[5]);
+            }
+        }
+
+        var result = self.openChat.apply(self, args);
+
+        if (result instanceof MegaPromise) {
+            // if an straight promise is returned, the operation got rejected
+            result.then(reject).catch(reject);
+        }
+        else if (!Array.isArray(result)) {
+            // The function should return an array at all other times...
+            reject(EINTERNAL);
+        }
+        else {
+            var room = result[1];
+            var roomId = result[0];
+            var promise = result[2];
+
+            if (!(promise instanceof MegaPromise)) {
+                // Something went really wrong...
+                self.logger.error('Unexpected openChat() response...');
+                return reject(EINTERNAL);
+            }
+
+            self.logger.debug('Waiting for chat "%s" to be ready...', roomId, [room]);
+
+            promise.then(function(aRoomId, aRoom) {
+                if (aRoomId !== roomId || (room && room !== aRoom) || !(aRoom instanceof ChatRoom)) {
+                    self.logger.error('Unexpected openChat() procedure...', aRoomId, [aRoom]);
+                    return reject(EINTERNAL);
+                }
+
+                waitForReadyState(aRoom);
+
+            }).catch(reject);
+        }
+    });
+};
 
 /**
  * Utility func to hide all visible chats
@@ -1862,52 +1937,28 @@ Chat.prototype.allChatsHadLoadedHistory = function() {
  * @returns {false|ChatRoom}
  */
 Chat.prototype.getPrivateRoom = function(h) {
-    var self = this;
+    'use strict';
 
-    if (self.chats[h]) {
-        return self.chats[h];
-    }
-    else {
-        return false;
-    }
+    return this.chats[h] || false;
 };
 
 
 Chat.prototype.createAndShowPrivateRoomFor = function(h) {
-    var self = this;
+    'use strict';
+    var room = this.getPrivateRoom(h);
 
-    if (self.chats[h]) {
+    if (room) {
         chatui(h);
-        return MegaPromise.resolve(this.getPrivateRoom(h));
+        return MegaPromise.resolve(room);
     }
-    else {
-        var userHandles = [u_handle, h];
-        var result = megaChat.openChat(userHandles, "private");
-        var roomId = result[1] && result[1].roomId ? result[1].roomId : '';
-        var promise = new MegaPromise();
 
-        if (result && result[1] && result[2]) {
-            var room = result[1];
-            var chatInitDonePromise = result[2];
-            chatInitDonePromise.done(function() {
-                createTimeoutPromise(function() {
-                    return room.state === ChatRoom.STATE.READY;
-                }, 300, 30000).done(function() {
-                    room.setActive();
-                    promise.resolve(room);
-                })
-                    .fail(function(e) {
-                        promise.reject(e);
-                    });
-            });
-        }
-        else if (d) {
-            console.warn('Cannot openChat for %s.', roomId);
-            promise.reject();
-        }
+    var promise = megaChat.smartOpenChat(h);
 
-        return promise;
-    }
+    promise.done(function(room) {
+        room.setActive();
+    });
+
+    return promise;
 };
 
 Chat.prototype.createAndShowGroupRoomFor = function(contactHashes) {
@@ -2221,25 +2272,83 @@ Chat.prototype.haveAnyActiveCall = function() {
  * @param {string} user_handle
  */
 Chat.prototype.openChatAndSendFilesDialog = function(user_handle) {
-    var userHandles = [u_handle, user_handle];
-    var result = megaChat.openChat(userHandles, "private");
-    var roomId = result[1] && result[1].roomId ? result[1].roomId : '';
+    'use strict';
 
-    if (result && result[1] && result[2]) {
-        var room = result[1];
-        var chatInitDonePromise = result[2];
-        chatInitDonePromise.done(function() {
-            createTimeoutPromise(function() {
-                return room.state === ChatRoom.STATE.READY;
-            }, 300, 30000).done(function() {
-                room.setActive();
-                $(room).trigger('openSendFilesDialog');
+    this.smartOpenChat(user_handle)
+        .then(function(room) {
+            room.setActive();
+            $(room).trigger('openSendFilesDialog');
+        })
+        .catch(this.logger.error.bind(this.logger));
+};
+
+/**
+ * Wrapper around Chat.openChat and ChatRoom.attachNodes as a single helper function
+ * @param {Array|String} targets Where to send the nodes
+ * @param {Array} nodes The list of nodes to attach into the room(s)
+ * @returns {MegaPromise}
+ * @see Chat.openChat
+ * @see ChatRoom.attachNodes
+ */
+Chat.prototype.openChatAndAttachNodes = function(targets, nodes) {
+    'use strict';
+    var self = this;
+
+    if (d) {
+        console.group('Attaching nodes to chat room(s)...', targets, nodes);
+    }
+
+    return new MegaPromise(function(resolve, reject) {
+        var promises = [];
+        var attachNodes = function(roomId) {
+            return new MegaPromise(function(resolve, reject) {
+                self.smartOpenChat(roomId)
+                    .then(function(room) {
+                        room.attachNodes(nodes).then(resolve.bind(self, room)).catch(reject);
+                    })
+                    .catch(function(ex) {
+                        if (d) {
+                            self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
+                        }
+                        reject(ex);
+                    });
             });
+        };
+
+        if (!Array.isArray(targets)) {
+            targets = [targets];
+        }
+
+        for (var i = targets.length; i--;) {
+            promises.push(attachNodes(targets[i]));
+        }
+
+        MegaPromise.allDone(promises).unpack(function(result) {
+            var room;
+
+            for (var i = result.length; i--;) {
+                if (result[i] instanceof ChatRoom) {
+                    room = result[i];
+                    break;
+                }
+            }
+
+            if (room) {
+                showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
+                M.openFolder('chat/' + (room.type === 'group' ? 'g/' : '') + room.roomId).always(resolve);
+            }
+            else {
+                if (d) {
+                    self.logger.warn('openChatAndAttachNodes failed in whole...', result);
+                }
+                reject(result);
+            }
+
+            if (d) {
+                console.groupEnd();
+            }
         });
-    }
-    else if (d) {
-        console.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId);
-    }
+    });
 };
 
 Chat.prototype.toggleUIFlag = function(name) {

@@ -957,7 +957,7 @@
     "7223": "Un t\u00e9l\u00e9versement a \u00e9t\u00e9 ajout\u00e9 \u00e0 la file d'attente des transferts",
     "7224": "Montrez-moi",
     "7225": "Voulez-vous vraiment annuler tous les transferts\u2009?",
-    "7226": "Programmateur de vidage de la corbeille\u00a0:",
+    "7226": "Programmateur de vidage de la corbeille",
     "7227": "En attente",
     "7228": "Taille de la police",
     "7229": "Petite",
@@ -3039,5 +3039,6 @@
     "20231": "Voucher History",
     "20232": "Account balance",
     "20233": "%s Members",
-    "20234": "With %s"
+    "20234": "With %s",
+    "20235": "Easy automated synchronisation between your computer and your MEGA cloud."
 }

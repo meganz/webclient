@@ -957,7 +957,7 @@
     "7223": "One upload was added to the transfers queue",
     "7224": "Show me",
     "7225": "Are you sure you want to cancel all transfers?",
-    "7226": "Rubbish-Bin Cleaning Scheduler:",
+    "7226": "Rubbish Bin Clearing Scheduler",
     "7227": "Queued",
     "7228": "Font size",
     "7229": "Small",
@@ -3039,5 +3039,6 @@
     "20231": "Voucher History",
     "20232": "Account balance",
     "20233": "%s Members",
-    "20234": "With %s"
+    "20234": "With %s",
+    "20235": "Easy automated synchronisation between your computer and your MEGA cloud."
 }

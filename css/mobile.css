@@ -175,6 +175,9 @@ ul, li {
 .left {
     float: left;
 }
+.mobile.stop-inertia {
+    overflow: hidden;
+}
 .mobile.main-block {
     width: 100%;
     height: 100%;

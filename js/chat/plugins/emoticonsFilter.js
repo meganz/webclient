@@ -8,7 +8,7 @@
 var EmoticonsFilter = function(megaChat) {
     var self = this;
 
-    self.emoticonsRegExp = /((^|\W?)(:[a-zA-Z0-9\-_]+:)(?=(\s|$)))/gi;
+    self.emoticonsRegExp = /((^|\W?)(:[a-zA-Z0-9\-_]+:)((\s|\.|\?|,|\/|!|:|$)))/gi;
     self.map = {};
 
     self.emoticonsLoading = megaChat.getEmojiDataSet('emojis')

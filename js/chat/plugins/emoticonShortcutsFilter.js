@@ -33,7 +33,7 @@ var EmoticonShortcutsFilter = function(megaChat) {
     $.each(self.shortcuts, function(shortcut, expanded) {
 
         escapedRegExps.push(
-            "(^|\\W)(" + RegExpEscape(shortcut) + ")(?=(\\s|$))"
+            "(^|\\W)(" + RegExpEscape(shortcut) + ")(?=(\\s|\\.|\\?|,|\\/|!|:|$))"
         );
     });
 

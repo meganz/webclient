@@ -5572,6 +5572,12 @@ React.makeElement = React['createElement'];
 	                    }));
 	                });
 
+	                var buttonLabel = self.props.multipleSelectedButtonLabel;
+
+	                if (!buttonLabel) {
+	                    buttonLabel = self.state.selected.length === 1 ? __(l[5885]) : __(l[8890]);
+	                }
+
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
@@ -5600,7 +5606,7 @@ React.makeElement = React['createElement'];
 	                        React.makeElement(
 	                            "a",
 	                            { href: "javascript:;", className: "default-grey-button right", onClick: onSelectDoneCb },
-	                            self.props.multipleSelectedButtonLabel ? self.props.multipleSelectedButtonLabel : __(l[8890])
+	                            buttonLabel
 	                        )
 	                    )
 	                );

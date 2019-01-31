@@ -7534,6 +7534,7 @@ table {
     white-space: nowrap;
     background-color: #ffffff;
     position: relative;
+    overflow: hidden;
 }
 .fm-right-header .link-button, .fm-transfers-header .link-button {
     margin-top: 8px;
@@ -8384,7 +8385,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     background-color: rgba(238,238,238,0.7);
 }
 .grid-scrolling-table, .contacts-grid-scrolling-table, .grid-scrolling-table .jspContainer, .contacts-grid-scrolling-table .jspContainer, .grid-scrolling-table .jspPane, .contacts-grid-scrolling-table .jspPane {
-    width: 100% !important;
+    min-width: 100%;
+    max-width: 100%;
 }
 .grid-share-table tr td:nth-child(1) {
     padding-left: 12px;

@@ -168,6 +168,7 @@
     "491": "\u041e\u0442\u043e\u0437\u0432\u0430\u043d",
     "492": "\u041e\u0442\u043c\u0435\u043d\u0435\u043d",
     "495": "\u0441\u0432\u043e\u0431\u043e\u0434\u043d\u043e\u0433\u043e \u043c\u0435\u0441\u0442\u0430",
+    "496": "\u0442\u0440\u0430\u0444\u0438\u043a\u0430",
     "501": "\u044d\u043a\u043e\u043d\u043e\u043c\u0438\u044f 17%",
     "507": "\u041f\u0440\u043e\u0434\u043e\u043b\u0436\u0438\u0442\u044c",
     "509": "\u041a\u041e\u041c\u041f\u0410\u041d\u0418\u042f \u041a\u041e\u041d\u0424\u0418\u0414\u0415\u041d\u0426\u0418\u0410\u041b\u042c\u041d\u041e\u0421\u0422\u0418",
@@ -3040,5 +3041,6 @@
     "20232": "Account balance",
     "20233": "%s Members",
     "20234": "With %s",
-    "20235": "Easy automated synchronisation between your computer and your MEGA cloud."
+    "20235": "Easy automated synchronisation between your computer and your MEGA cloud.",
+    "20237": "Remember my billing address"
 }

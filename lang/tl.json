@@ -168,6 +168,7 @@
     "491": "Binawi noong",
     "492": "kinansela noong",
     "495": "Lagayan",
+    "496": "Transfer quota",
     "501": "makakatipid ka ng 17%",
     "507": "Magpatuloy",
     "509": "Ang Pribadong Kompanya",
@@ -3040,5 +3041,6 @@
     "20232": "Account balance",
     "20233": "%s Members",
     "20234": "With %s",
-    "20235": "Easy automated synchronisation between your computer and your MEGA cloud."
+    "20235": "Easy automated synchronisation between your computer and your MEGA cloud.",
+    "20237": "Remember my billing address"
 }

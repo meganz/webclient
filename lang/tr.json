@@ -168,6 +168,7 @@
     "491": "Ge\u00e7ersiz k\u0131l\u0131nd\u0131\u011f\u0131 tarih",
     "492": "\u0130ptal edildi\u011fi tarih",
     "495": "Saklama alan\u0131",
+    "496": "Aktarma kotas\u0131",
     "501": "save 17%",
     "507": "Devam et",
     "509": "B\u0130R G\u0130ZL\u0130L\u0130K KURULU\u015eU",
@@ -3035,10 +3036,11 @@
     "20227": "[S1]$1[\/S1][S2] \/ [\/S2][S3]$2[\/S3]",
     "20228": "Eri\u015filemez",
     "20229": "Rubbish Bin Cleaning Scheduler",
-    "20230": "Vouchers",
-    "20231": "Voucher History",
+    "20230": "Kuponlar",
+    "20231": "Kupon Ge\u00e7mi\u015fi",
     "20232": "Account balance",
-    "20233": "%s Members",
-    "20234": "With %s",
-    "20235": "Easy automated synchronisation between your computer and your MEGA cloud."
+    "20233": "%s \u00dcye",
+    "20234": "%s ile",
+    "20235": "Bilgisayar\u0131n\u0131z ve MEGA bulutunuz aras\u0131nda kolay otomatik senkronizasyon",
+    "20237": "Remember my billing address"
 }

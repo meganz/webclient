@@ -168,6 +168,7 @@
     "491": "Odwo\u0142ano",
     "492": "Skasowano",
     "495": "Pojemno\u015bci",
+    "496": "Limit transferu",
     "501": "oszcz\u0119d\u017a 17%",
     "507": "Kontynuuj",
     "509": "FIRMA STRZEG\u0104CA TWOJEJ PRYWATNO\u015aCI",
@@ -3040,5 +3041,6 @@
     "20232": "Account balance",
     "20233": "%s Members",
     "20234": "With %s",
-    "20235": "Easy automated synchronisation between your computer and your MEGA cloud."
+    "20235": "Easy automated synchronisation between your computer and your MEGA cloud.",
+    "20237": "Remember my billing address"
 }

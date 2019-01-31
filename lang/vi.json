@@ -168,6 +168,7 @@
     "491": "B\u1ecb thu h\u1ed3i l\u00fac",
     "492": "H\u1ee7y l\u00fac",
     "495": "L\u01b0u tr\u1eef",
+    "496": "B\u0103ng th\u00f4ng truy\u1ec1n t\u1ea3i",
     "501": "ti\u1ebft ki\u1ec7m 17%",
     "507": "Ti\u1ebfp t\u1ee5c",
     "509": "C\u00d4NG TY B\u1ea2O M\u1eacT",
@@ -3040,5 +3041,6 @@
     "20232": "Account balance",
     "20233": "%s Members",
     "20234": "With %s",
-    "20235": "Easy automated synchronisation between your computer and your MEGA cloud."
+    "20235": "Easy automated synchronisation between your computer and your MEGA cloud.",
+    "20237": "Remember my billing address"
 }

@@ -168,6 +168,7 @@
     "491": "Revocado el",
     "492": "Cancelado el",
     "495": "Almacenamiento",
+    "496": "Cuota de transferencia",
     "501": "Ahorre un 17%",
     "507": "Continuar",
     "509": "THE PRIVACY COMPANY",
@@ -957,7 +958,7 @@
     "7223": "Has a\u00f1adido una subida a la cola de transferencia",
     "7224": "Mostrar",
     "7225": "\u00bfSeguro que quieres cancelar todas las transferencias?",
-    "7226": "Limpieza autom\u00e1tica de la papelera:",
+    "7226": "Limpieza autom\u00e1tica de la papelera",
     "7227": "En cola",
     "7228": "Tama\u00f1o de fuente",
     "7229": "Peque\u00f1o",
@@ -3035,10 +3036,11 @@
     "20227": "[S1]$1[\/S1][S2]de[\/S2][S3]$2[\/S3]",
     "20228": "Inaccesible",
     "20229": "Rubbish Bin Cleaning Scheduler",
-    "20230": "Vouchers",
-    "20231": "Voucher History",
+    "20230": "Cupones",
+    "20231": "Historial de cupones",
     "20232": "Account balance",
-    "20233": "%s Members",
-    "20234": "With %s",
-    "20235": "Easy automated synchronisation between your computer and your MEGA cloud."
+    "20233": "%s miembros",
+    "20234": "con %s",
+    "20235": "Sincronizaci\u00f3n autom\u00e1tica y f\u00e1cil entre tu ordenador y tu nube MEGA.",
+    "20237": "Remember my billing address"
 }

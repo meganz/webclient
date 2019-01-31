@@ -168,6 +168,7 @@
     "491": "Ingetrokken op",
     "492": "Geannuleerd op",
     "495": "Opslag",
+    "496": "Overdracht tegoed",
     "501": "bespaar 17%",
     "507": "Ga verder",
     "509": "DE PRIVACY COMPANY",
@@ -957,7 +958,7 @@
     "7223": "\u00c9\u00e9n upload werd toegevoegd aan de wachtrij",
     "7224": "Toon mij",
     "7225": "Weet u zeker dat u alle overdrachten wilt annuleren?",
-    "7226": "Vuilnisbak Schoonmaak Rooster:",
+    "7226": "Prullenbak Legen Rooster",
     "7227": "Wachtrij",
     "7228": "Lettergrootte",
     "7229": "Klein",
@@ -3035,10 +3036,11 @@
     "20227": "[S1]$1[\/S1][S2]van[\/S2][S3]$2[\/S3]",
     "20228": "Niet toegangelijk",
     "20229": "Rubbish Bin Cleaning Scheduler",
-    "20230": "Vouchers",
-    "20231": "Voucher History",
+    "20230": "Bonnen",
+    "20231": "Bon Geschiedenis",
     "20232": "Account balance",
-    "20233": "%s Members",
-    "20234": "With %s",
-    "20235": "Easy automated synchronisation between your computer and your MEGA cloud."
+    "20233": "%s Leden",
+    "20234": "Met %s",
+    "20235": "Gemakkelijke geautomatiseerde synchronisatie tussen uw computer en uw MEGA cloud.",
+    "20237": "Remember my billing address"
 }

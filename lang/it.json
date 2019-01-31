@@ -168,6 +168,7 @@
     "491": "Revocato il",
     "492": "Cancellato il",
     "495": "Archivio",
+    "496": "Banda di trasferimento",
     "501": "risparmia il 17%",
     "507": "Continua",
     "509": "L'AZIENDA DELLA PRIVACY",
@@ -3035,10 +3036,11 @@
     "20227": "[S1]$1[\/S1] [S2]di[\/S2] [S3]$2[\/S3]",
     "20228": "Non accessibile",
     "20229": "Rubbish Bin Cleaning Scheduler",
-    "20230": "Vouchers",
-    "20231": "Voucher History",
+    "20230": "Voucher",
+    "20231": "Cronologia dei voucher",
     "20232": "Account balance",
-    "20233": "%s Members",
-    "20234": "With %s",
-    "20235": "Easy automated synchronisation between your computer and your MEGA cloud."
+    "20233": "%s membri",
+    "20234": "Con %s",
+    "20235": "Sincronizzazione automatizzata tra il tuo computer e il tuo Cloud di MEGA.",
+    "20237": "Remember my billing address"
 }

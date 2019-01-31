@@ -168,6 +168,7 @@
     "491": "\ucca0\ud68c\uc77c",
     "492": "\ucde8\uc18c\uc77c",
     "495": "\uc800\uc7a5\uc18c",
+    "496": "\uc804\uc1a1 \ud560\ub2f9\ub7c9",
     "501": "17% \uc808\uc57d",
     "507": "\uacc4\uc18d",
     "509": "\uac1c\uc778 \uc815\ubcf4 \ubcf4\ud638 \uae30\uc5c5",
@@ -3040,5 +3041,6 @@
     "20232": "Account balance",
     "20233": "%s Members",
     "20234": "With %s",
-    "20235": "Easy automated synchronisation between your computer and your MEGA cloud."
+    "20235": "Easy automated synchronisation between your computer and your MEGA cloud.",
+    "20237": "Remember my billing address"
 }

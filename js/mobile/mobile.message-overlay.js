@@ -28,7 +28,7 @@ mobile.messageOverlay = {
         $firstMessage.text(firstMessage);
 
         // If there is a second message, set that
-        if (typeof optionalSecondMessage !== 'undefined' && optionalSecondMessage !== '') {
+        if (typeof optionalSecondMessage === 'string' && optionalSecondMessage.length) {
             $optionalSecondMessage.safeHTML(optionalSecondMessage);
         }
 

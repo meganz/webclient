@@ -184,8 +184,8 @@ MegaData.prototype.getSortByRtsFn = function() {
     var sortfn;
 
     sortfn = function(a, b, d) {
-        var time1 = a.rts - a.rts % 60;
-        var time2 = b.rts - b.rts % 60;
+        var time1 = a.rts - a.rts % 60 || 0;
+        var time2 = b.rts - b.rts % 60 || 0;
         if (time1 !== time2) {
             return (time1 < time2 ? -1 : 1) * d;
         }

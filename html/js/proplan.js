@@ -65,7 +65,15 @@ pro.proplan = {
         }
 
         // Add click handlers for the pricing boxes
-        pro.proplan.initPricingBoxesClickHandlers();
+        if (is_mobile) {
+            this.initMobilePricingBoxesClickHandlers();
+        }
+        else {
+            this.initDesktopPricingBoxClickHandlers();
+        }
+
+        // Load pricing data from the API
+        this.loadPricingPlans();
 
         // Add click handler for the contact button
         $contactUsButton.rebind('click', function() {
@@ -84,6 +92,134 @@ pro.proplan = {
 
             this.initMobilePlanDots();
         }
+    },
+
+    /**
+     * Initialise the click handler for the pricing boxes to add a selected style
+     * and initialise the mobile Purchase buttons to continue to step two
+     */
+    initMobilePricingBoxesClickHandlers: function() {
+
+        'use strict';
+
+        var $planBlocks = $('.membership-step1 .reg-st3-membership-bl');
+        var $purchaseButtons = $planBlocks.find('.purchase-plan-button');
+
+        // Initialise click handler for all the pricing plan blocks to select them
+        $planBlocks.rebind('click', function() {
+
+            // Add styling to the clicked on block
+            $planBlocks.removeClass('selected');
+            $(this).addClass('selected');
+
+            return false;
+        });
+
+        // Initialise click handler for all the Purchase buttons within the pricing blocks
+        $purchaseButtons.rebind('click', function() {
+
+            var $selectedPlan = $(this).closest('.reg-st3-membership-bl');
+
+            // Continue to Step 2
+            pro.proplan.continueToStepTwo($selectedPlan);
+
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the click handler for the desktop pricing boxes to continue straight to step two
+     */
+    initDesktopPricingBoxClickHandlers: function() {
+
+        'use strict';
+
+        var $planBlocks = $('.membership-step1 .reg-st3-membership-bl');
+
+        // Initialise click handler for all the plan blocks
+        $planBlocks.rebind('click', function() {
+
+            var $selectedPlan = $(this);
+
+            // Continue to Step 2
+            pro.proplan.continueToStepTwo($selectedPlan);
+        });
+    },
+
+    /**
+     * Continues the flow to step two of the Pro payment process
+     * @param {Object} $selectedPlan The selected Pro card container which has the data-payment attribute
+     */
+    continueToStepTwo: function($selectedPlan) {
+
+        'use strict';
+
+        var $planBlocks = $('.membership-step1 .reg-st3-membership-bl');
+        var planNum = $selectedPlan.attr('data-payment');
+        var signUpStartedInWebclient = localStorage.signUpStartedInWebclient;
+        delete localStorage.signUpStartedInWebclient;
+
+        // Select the plan
+        $planBlocks.removeClass('selected');
+        $selectedPlan.addClass('selected');
+
+        // If coming from the process key step and they click on the Free plan
+        if (planNum === '0') {
+            loadSubPage(signUpStartedInWebclient ? 'downloadapp' : 'fm');
+
+            if (localStorage.gotOverquotaWithAchievements) {
+                onIdle(function() {
+                    mega.achievem.achievementsListDialog();
+                });
+                delete localStorage.gotOverquotaWithAchievements;
+            }
+            return false;
+        }
+
+        // If not logged in, show the login/register prompt
+        if (!u_handle) {
+            megaAnalytics.log('pro', 'loginreq');
+            showSignupPromptDialog();
+            return false;
+        }
+
+        // If they're ephemeral but awaiting email confirmation, still let them continue to choose a plan and pay
+        else if (isEphemeral() && !localStorage.awaitingConfirmationAccount) {
+            showRegisterDialog();
+            return false;
+        }
+
+        // If they clicked the plan immediately after completing registration, set the flag so it can be logged
+        if ($('body').hasClass('key')) {
+            pro.propay.planChosenAfterRegistration = true;
+        }
+
+        // Load the Pro page step 2 where they can make payment
+        loadSubPage('propay_' + planNum);
+    },
+
+    /**
+     * Load the pricing plans
+     */
+    loadPricingPlans: function() {
+
+        'use strict';
+
+        // Show loading spinner because some stuff may not be rendered properly yet
+        loadingDialog.show();
+
+        // Load the membership plans
+        pro.loadMembershipPlans(function() {
+
+            // Render the plan details
+            pro.proplan.populateMembershipPlans();
+
+            // Check which plans are applicable or grey them out if not
+            pro.proplan.checkApplicablePlans();
+
+            // Close loading spinner
+            loadingDialog.hide();
+        });
     },
 
     /**
@@ -138,81 +274,6 @@ pro.proplan = {
                 }
                 lastCheck = now;
             }
-        });
-
-    },
-
-    /**
-     * Initialise click handler for all the pricing plan blocks
-     */
-    initPricingBoxesClickHandlers: function() {
-
-        var $stepOne = $('.membership-step1');
-        var $planBlocks = $stepOne.find('.reg-st3-membership-bl');
-
-        // Initialise click handler for all the plan blocks
-        $planBlocks.rebind('click', function() {
-
-            var $selectedPlan = $(this);
-            var planNum = $selectedPlan.attr('data-payment');
-            var signUpStartedInWebclient = localStorage.signUpStartedInWebclient;
-            delete localStorage.signUpStartedInWebclient;
-
-            // Select the plan
-            $planBlocks.removeClass('selected');
-            $selectedPlan.addClass('selected');
-
-            // If coming from the process key step and they click on the Free plan
-            if (planNum === '0') {
-                // pro.redirectToSite(page === 'fm' ? 'start' : 'fm');
-                loadSubPage(signUpStartedInWebclient ? 'downloadapp' : 'fm');
-
-                if (localStorage.gotOverquotaWithAchievements) {
-                    onIdle(function() {
-                        mega.achievem.achievementsListDialog();
-                    });
-                    delete localStorage.gotOverquotaWithAchievements;
-                }
-                return false;
-            }
-
-            // If not logged in, show the login/register prompt
-            if (!u_handle) {
-                megaAnalytics.log('pro', 'loginreq');
-                showSignupPromptDialog();
-                return false;
-            }
-
-            // If they're ephemeral but awaiting email confirmation, still let them continue to choose a plan and pay
-            else if (isEphemeral() && !localStorage.awaitingConfirmationAccount) {
-                showRegisterDialog();
-                return false;
-            }
-
-            // If they clicked the plan immediately after completing registration, set the flag so it can be logged
-            if ($('body').hasClass('key')) {
-                pro.propay.planChosenAfterRegistration = true;
-            }
-
-            // Load the Pro page step 2 where they can make payment
-            loadSubPage('propay_' + planNum);
-            return false;
-        });
-
-        // Show loading spinner because some stuff may not be rendered properly yet
-        loadingDialog.show();
-
-        // Load the membership plans
-        pro.loadMembershipPlans(function() {
-
-            // Render the plan details
-            pro.proplan.populateMembershipPlans();
-
-            // Check which plans are applicable or grey them out if not
-            pro.proplan.checkApplicablePlans();
-
-            // Close loading spinner
-            loadingDialog.hide();
         });
     },
 
@@ -318,6 +379,7 @@ pro.proplan = {
                         ' ' + euroSign);
                     // Calculate the monthly base price in local currency
                     monthlyBasePrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE].toString();
+
                     if (pageType === "P") {
                         zeroPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICEZERO];
                         oneLocalPriceFound = true;
@@ -333,6 +395,7 @@ pro.proplan = {
                     // Calculate the monthly base price
                     monthlyBasePrice = currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE].toString();
                     monthlyBasePriceCurrencySign = euroSign;
+
                     if (pageType === "D") {
                         $pricingBoxes.removeClass('local-currency');
                         $('.reg-st3-txt-localcurrencyprogram', $dialog).addClass('hidden');
@@ -345,6 +408,7 @@ pro.proplan = {
                 var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';
 
                 var setPriceFontResults;
+
                 if (pageType === "P") {
                     setPriceFontResults = setPriceFont(pageType,
                         monthlyBasePriceDollars,
@@ -376,6 +440,7 @@ pro.proplan = {
 
                 // Update the plan name and price
                 $planName.text(planName);
+
                 if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
                     $priceDollars.text(monthlyBasePrice);
                     $priceCents.text('');
@@ -421,6 +486,7 @@ pro.proplan = {
         var $priceFree = $pricingBoxFree.find('.price');
         var $priceCentsFree = $priceFree.find('.small');
         var $priceDollarsFree = $priceFree.find('.big');
+
         if (oneLocalPriceFound) {
             $('.reg-st3-txt-localcurrencyprogram').removeClass('hidden');
             $pricingBoxes.addClass('local-currency');

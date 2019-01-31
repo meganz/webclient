@@ -25,7 +25,7 @@ else
 fi
 
 
-SED_ARGS=' -i "2,\$s/pick/squash/"'
+SED_ARGS=' -i "2,\$s/pick/fixup/"'
 GIT_EDITOR="$SED_BINARY$SED_ARGS"  git rebase -i --autosquash $target_branch
 
 if [ $? -ne 0 ]; then

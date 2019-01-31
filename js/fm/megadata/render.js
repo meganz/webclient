@@ -279,12 +279,12 @@ MegaData.prototype.pathLength = function() {
     var $filter = $('.fm-right-header .filter-block.body:visible');
 
     if ($filter.length > 0) {
-        filterLength = $filter.outerWidth() + 20;
+        filterLength = $filter.outerWidth(true) + 20;
     }
 
-    length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
+    length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth(true)
         + filterLength
-        + $('.fm-right-header .fm-header-buttons:visible').outerWidth();
+        + $('.fm-right-header .fm-header-buttons:visible').outerWidth(true);
     return length;
 };
 
@@ -421,7 +421,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
     // Resizing breadcrumbs items
     function breadcrumbsResize() {
         var $fmHeader = $('.fm-right-header:visible');
-        var headerWidth = $fmHeader.outerWidth();
+        var headerWidth = $fmHeader.width();
 
         $fmHeader.removeClass('long-path short-foldernames');
         if (M.pathLength() > headerWidth) {

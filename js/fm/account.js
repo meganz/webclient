@@ -919,16 +919,17 @@ accountUI.account = {
                 var userAttrRequest = { a: 'up' };
 
                 var checkUpdated = function() {
-
+                    var result = false;
                     for (var i in checklist) {
                         if (u_attr[i] === null || u_attr[i] !== checklist[i]) {
                             // we want also to catch the 'undefined' or null
                             // and replace with the empty string (or given string)
                             u_attr[i] = i === 'firstName' ? checklist[i] || 'Nobody' : checklist[i];
                             userAttrRequest[i] = base64urlencode(to8(u_attr[i]));
-                            return true;
+                            result = true;
                         }
                     }
+                    return result;
                 };
 
                 if (checkUpdated()) {

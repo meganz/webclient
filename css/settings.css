@@ -1,0 +1,1370 @@
+/* New settings and Dashboard*/
+
+.fm-right-account-block, .fm-right-block.dashboard {
+    height: 100%;
+    height: -webkit-calc(100% - 35px);
+    height: -moz-calc(100% - 35px);
+    height: calc(100% - 35px);
+    position: relative;
+}
+.fm-right-block.dashboard, .fm-right-block.dashboard .jspContainer, .fm-right-block.dashboard .jspPane {
+    width: auto !important;
+}
+.fm-right-block.dashboard {
+    background-color: #fafafa;
+    margin-top: -1px;
+}
+.fm-right-block.dashboard .jspContainer::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 8px;
+    left: 0;
+    top: 0;
+    position: absolute;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZhZmFmYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmYWZhZmEiIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top, rgba(250,250,250,1) 0%, rgba(250,250,250,0) 100%);
+    background: -webkit-linear-gradient(top, rgba(250,250,250,1) 0%, rgba(250,250,250,0) 100%);
+    background: linear-gradient(to bottom, rgba(250,250,250,1) 0%, rgba(250,250,250,0) 100%);
+    z-index: 10;
+}
+.content-panel.account {
+    font-family: 'LatoWeb','source_sans_proregular', Arial;
+}
+.head-title {
+    display: block;
+    line-height: 24px;
+    padding: 8px 40px 8px 44px;
+    font-size: 17px;
+    color: #333;
+    position: relative;
+    cursor: pointer;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.head-title::before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 16px;
+    top: 12px;
+    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-repeat: no-repeat;
+    opacity: 0.4;
+}
+.settings-menu-arrow {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    right: 16px;
+    top: 8px;
+    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-repeat: no-repeat;
+    background-position: -98px -249px;
+    opacity: 0;
+}
+.fm-account-button.active .settings-menu-arrow:hover, .head-title:hover .settings-menu-arrow:hover {
+    opacity: 1;
+}
+.head-title:hover {
+    background-color: #eee;
+}
+.fm-account-button.active .head-title::before, .head-title:hover::before {
+    opacity: 0.8;
+}
+.fm-account-button.active .head-title {
+    background-color: #eee;
+    font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+}
+.head-title .settings-menu-arrow {
+    opacity: 0.4;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.fm-account-button.active .settings-menu-arrow, .fm-account-button:not(.closed) .settings-menu-arrow {
+    transform: rotateZ(90deg);
+}
+.fm-account-button.account-s .head-title::before {
+    background-position: -10px -1671px;
+}
+.fm-account-button.plan .head-title::before {
+    background-position: -35px -1670px;
+}
+.fm-account-button.notifications .head-title::before {
+    background-position: -63px -1670px;
+}
+.fm-account-button.security .head-title::before {
+    background-position: -90px -1671px;
+}
+.fm-account-button.file-management .head-title::before {
+    background-position: -120px -1670px;
+}
+.content-panel.dashboard * {
+   font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.account.user-data-block {
+    position: relative;
+    padding: 60px 20px 16px 20px;
+    text-align: center;
+    font-size: 0;
+    line-height: 0;
+}
+.fm-account-button.transfers .head-title::before {
+    background-position: -150px -1671px;
+}
+.fm-account-button.contact-chats .head-title::before {
+    background-position: -179px -1670px;
+}
+.fm-account-button.reseller .head-title::before {
+    background-position: -210px -1670px;
+}
+.fm-account-button .sub-title-container {
+    display: block;
+    max-height: 250px;
+}
+.fm-account-button .sub-title {
+    font-size: 15px;
+    color: #888;
+    line-height: 20px;
+    padding: 8px 8px 8px 44px;
+    position: relative;
+    cursor: pointer;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.fm-account-button .sub-title:hover {
+    color: #000;
+}
+.fm-right-account-block {
+    font-family: 'LatoWeb','source_sans_proregular', Arial;
+    background-color: #fff;
+}
+.fm-right-account-block .txt-center {
+    text-align: center;
+    display: block;
+}
+.fm-right-account-block .txt-center.default-green-button {
+    height: auto;
+    white-space: normal;
+    line-height: 20px;
+    padding:7px 0;
+}
+.fm-right-account-block .default-white-button,
+.fm-right-account-block .default-green-button {
+    text-transform: capitalize;
+}
+.settings-banner {
+    margin: 16px auto;
+    width: calc(100% - 32px);
+    max-width: 1020px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+    display:block;
+    background-color: #fafafa;
+    z-index: 9;
+}
+.first-block {
+    width: 20%;
+    min-width: 90px;
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    line-height: 130px;
+    text-align: center;
+}
+.first-block .title-txt {
+    padding: 16px 8px;
+    vertical-align: middle;
+}
+.second-block {
+    width: 58.5%;
+    min-width: 518px;
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+}
+.last-block {
+    width: 20%;
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    padding: 16px 2px;
+    vertical-align: middle;
+}
+.last-block .default-green-button {
+    font-size: 15px;
+    height: auto;
+    min-height: 40px;
+    padding:10px 16px;
+    line-height: 20px;
+    white-space: normal;
+    max-width: 94%;
+    margin-right: 3%;
+    display: inline-block;
+}
+.second-block .dashboard-container {
+    margin: 22px 0;
+    text-align: center;
+}
+.fm-account-main .green {
+    background-color: #00BFA5;
+    color: #fff;
+}
+.fm-account-main .grid-table.transactions .green {
+    background-color: initial;
+    color: #00BFA5;
+}
+.fm-account-main .white {
+    color: #fff;
+}
+.title-txt {
+    font-size: 20px;
+    color: #333;
+    line-height: 24px;
+    display: inline-block;
+    transition: 0.3s;
+}
+.subtitle-txt {
+    font-size: 16px;
+    color: #333;
+    line-height: 18px;
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 370px;
+    text-overflow: ellipsis;
+    position: relative;
+    transition: 0.3s;
+}
+.settings-sub-section.avatar .subtitle-txt {
+    line-height: 64px;
+    margin-right: 16px;
+    vertical-align: top;
+}
+.settings-sub-section .uidateformat {
+    margin-bottom: 8px;
+}
+.settings-sub-section .status-container {
+    position: relative;
+    padding-top: 24px;
+}
+.settings-sub-section .status-container .content-txt {
+    padding: 0;
+}
+.settings-sub-section .status-container .dialog-feature-toggle {
+    margin-top: 10px;
+}
+.fm-account-notifications .subtitle-txt {
+    display: block;
+    line-height: 22px;
+    margin-bottom: 8px;
+    margin-top: 24px;
+}
+.subtitle-txt.short-title {
+    width: 140px;
+}
+.content-txt {
+    font-size: 15px;
+    line-height: 20px;
+    padding-top: 24px;
+    color: #999;
+    vertical-align:top;
+    max-width: 340px;
+    transition: 0.3s;
+}
+.settings-sub-section .radio-txt {
+    font-size: 15px;
+    line-height: 20px;
+    color: #999;
+    vertical-align:top;
+    max-width: 340px;
+    transition: 0.3s;
+    max-width: 224px;
+}
+.settings-sub-section .radio-txt.big {
+    font-size: 18px;
+}
+.settings-sub-section .radio-txt.small {
+    font-size: 15px;
+}
+.fm-account-notifications .content-txt {
+    padding: 0px;
+    display: inline-block;
+}
+.slider-percentage-bl .content-txt {
+    font-size: 12px;
+    line-height: 17px;
+    display: table-cell;
+    color: #999999;
+    vertical-align: middle;
+    padding: 0 0 0 10px;
+}
+.account.data-block.test-network .content-txt,
+.account.qr-settings .settings-left-block .content-txt {
+    margin-bottom: 40px;
+}
+.account.qr-settings .settings-right-block .qr-http-link {
+    max-width: 100%;
+    min-height: 24px;
+}
+.content-container.auto-away {
+    padding: 16px 0;
+}
+.content-container.auto-away .content-txt {
+    display: inline-block;
+    vertical-align: middle;
+    padding-top: 0;
+}
+.fm-right-account-block .content-txt.resellerbuy {
+    text-decoration: underline;
+    margin-right: 16px;
+    padding-top: 6px;
+    cursor: pointer;
+    max-width: none;
+}
+.achievements-block .title-txt {
+    margin-bottom: 24px;
+}
+.achievements-block .content-txt {
+    max-width: 100%;
+}
+.achievements-block .card-container {
+    margin-top: 24px;
+}
+.content-container.auto-away .account-counter-number {
+    float: none;
+    display: inline-block;
+    margin: 0 12px;
+    vertical-align: middle;
+}
+.settings-banner .fm-account-blocks {
+    display: inline-block;
+    max-width: 56%;
+    text-align: left;
+}
+.settings-banner .fm-account-blocks:first-child {
+    padding: 0 4% 0 1%;
+}
+.settings-banner .fm-account-blocks:last-child {
+    padding: 0 1% 0 4%;
+}
+.settings-banner .account.chart-block {
+    padding:0;
+}
+.settings-banner .tiny-chart .account.chart.data {
+    margin: 0px 0 0 92px;
+}
+.settings-banner .tiny-chart .chart.icon {
+    left: 22px;
+    top: 18px;
+}
+.fm-right-account-block .icon.chart {
+    width: 32px;
+    height: 32px;
+    opacity: 1;
+}
+.settings-banner .account.chart.overlay {
+    background-color: #fafafa;
+}
+.settings-banner .account.chart.body::after {
+    background-color: #fafafa;
+}
+.settings-banner .fm-account-header {
+    font-size: 14px;
+    line-height: 18px;
+    color: #333;
+    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+}
+.settings-banner .chart.data .perc-txt {
+    font-size: 26px;
+    font-family: 'LatoWebLight', 'source_sans_proregular', Arial;
+    line-height: 38px;
+    color: #666;
+    display: block;
+}
+.settings-banner .tiny-chart .chart.data .size-txt {
+    font-size: 14px;
+    line-height: 22px;
+    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    display: inline-block;
+    vertical-align: top;
+}
+.settings-banner .chart.data .pecents-txt, 
+.settings-banner .chart.data .gb-txt {
+    font-family: 'LatoWebLight', 'source_sans_proregular', Arial;
+    display: inline-block;
+    vertical-align: top;
+}
+.fm-account-sections{
+    display: inline-block;
+    position: relative;
+    width: 802px;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+    margin-top: 16px;
+    padding: 0 16px 64px 16px;
+    box-sizing: border-box;
+}
+.account.data-block {
+    position: relative;
+}
+.account.achievements-block {
+    margin: 48px;
+}
+.achievements-block .account.data-block {
+    margin-bottom: 32px;
+}
+.account.data-block:not(:last-child)::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    left: : 0px;
+    bottom: 0px;
+    background-color: rgba(0,0,0,0.1);
+}
+.settings-left-block {
+    display: inline-block;
+    vertical-align: top;
+    width: 230px;
+    padding-top: 28px;
+    box-sizing: border-box;
+}
+.settings-right-block {
+    width: 536px;
+    padding: 8px 0 16px 56px;
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: top;
+}
+.settings-right-block div.radioOn, .settings-right-block div.radioOff {
+    margin-left: 2px;
+}
+.account.data-block.table-block .settings-left-block {
+    width: 100%;
+    padding-bottom: 0;
+}
+.account.data-block.table-block .settings-right-block {
+    width: 100%;
+    padding: 24px 0 40px 0;
+}
+.settings-sub-section {
+    padding: 24px 0;
+    position: relative;
+}
+.settings-sub-section.no-padding {
+    padding: 0;
+}
+.settings-sub-section.button-container {
+    padding-top: 0;
+}
+.settings-sub-section.border::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    left: : 0px;
+    bottom: 0px;
+    background-color: rgba(0,0,0,0.1);
+}
+.fm-right-account-block .default-white-button {
+    position: absolute;
+    margin-left: 12px;
+    display: inline-block;
+    top: 24px;
+    right: 0px;
+}
+.fm-right-account-block .default-green-button {
+    margin-left: 12px;
+}
+.fm-right-account-block .access-qr-container .default-white-button {
+    right: 4px;
+}
+.fm-right-account-block .default-white-button.btn-cancel-sub {
+    margin-top: 24px;
+}
+.fm-right-account-block .default-white-button.avatar {
+    top: 50%;
+    -o-transform: translateY(-50%);
+    -ms-transform: translateY(-50%); /* IE 9 */
+    -webkit-transform: translateY(-50%); /* Safari */
+    transform: translateY(-50%);
+}
+.fm-right-account-block .default-white-button.right, .fm-right-account-block .default-green-button.right {
+    position: relative;
+    float: right;
+    top: 0;
+    -o-transform: none;
+    -ms-transform: none; /* IE 9 */
+    -webkit-transform: none; /* Safari */
+    transform: none;
+    max-height: 40px;
+}
+.dialog-input-title-ontop {
+    height: 56px;
+    position: relative;
+    width:222px;
+    margin:0px;
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: 16px;
+}
+.fm-right-account-block .dialog-input-title-ontop:nth-child(odd) {
+    margin-right: 32px;
+}
+.dialog-input-title-ontop::after {
+    content: " ";
+    width: 100%;
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.2);
+    position: absolute;
+    transition: background-color 0.2s linear;
+}
+.dialog-input-title-ontop .title {
+    position: absolute;
+    left: 0px;
+    top: 30px;
+    font-size: 14px;
+    color: #888;
+    line-height: 18px;
+    -webkit-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+    -moz-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+    -o-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+    -ms-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+    transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+    z-index: 1129;
+}
+.dialog-input-title-ontop input {
+    font-family: 'LatoWeb','source_sans_proregular', Arial;
+}
+.fm-right-account-block .dialog-input-title-ontop .dialog-input, .fm-voucher-popup .dialog-input-title-ontop .dialog-input {
+    border: none;
+    width: 210px;
+    height: 24px;
+    margin-top:24px;
+    margin-right: 0;
+    line-height: 24px;
+    color: #333;
+    font-family: 'LatoWeb','source_sans_proregular', Arial;
+    font-size: 17px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background-color: none;
+    cursor: text;
+}
+.fm-right-account-block .dialog-input-title-ontop.underline-dropdown-input .dialog-input {
+    cursor: pointer;
+}
+.fm-right-account-block .dialog-input-title-ontop .dialog-input.default-select {
+    box-shadow: none;
+    padding: 0;
+    background: transparent;
+    min-width: auto;
+    width: 100%;
+}
+.dialog-input-title-ontop .dialog-input::placeholder{
+    font-size: 14px;
+}
+.fm-right-account-block .dialog-input-title-ontop .dialog-input.short-input {
+    width: 50px;
+    display: inline-block;
+    padding: 0;
+}
+.fm-right-account-block .dialog-input-title-ontop .dialog-input.short-input:not(:nth-child(2)) {
+    width: 35px;
+    display: inline-block;
+    padding: 0;
+}
+/* three extra status for the inputs: error, active, correctinput */
+.dialog-input-title-ontop.correctinput .title {
+    visibility: visible;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    top:0;
+}
+.dialog-input-title-ontop.active .title, .dialog-input-title-ontop.valued .title, .dialog-input-title-ontop.birth .title, .dialog-input-title-ontop.underline-dropdown-input .title {
+    top: 0;
+    color: #aaa;
+}
+.dialog-input-title-ontop:not(.birth).active input::placeholder{
+    opacity: 0;
+}
+.dialog-input-title-ontop.active::after{
+    background-color: rgba(0,0,0,0.6);
+}
+ 
+.dialog-input-title-ontop.error::after{
+    background-color: rgba(217,0,7,0.5);
+}
+.dialog-input-title-ontop.error input.dialog-input.errored{
+    color: rgba(217,0,7,1);
+}
+.dialog-input-title-ontop.error .title {
+    visibility: visible;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    top:0;
+}
+.fm-right-account-block .dialog-input-title-ontop .error-message{
+    font-size: 13px;
+    padding: 4px 0 0 0px;
+    color: rgba(229,76,81,1);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: absolute;
+    top: 56px;
+    left: 0px;
+    width: -webkit-calc(100% - 40px);
+    width: -moz-calc(100% - 40px);
+    width: calc(100% - 40px);
+    display:none;
+}
+.dialog-input-title-ontop.error .error-message{
+    display: inline-block;
+}
+.dialog-input-title-ontop.active:not(.birth) input.dialog-input::placeholder,
+.dialog-input-title-ontop.correctinput:not(.birth) input.dialog-input::placeholder,
+.dialog-input-title-ontop.error:not(.birth) input.dialog-input::placeholder {
+    opacity: 0;
+}
+.fm-right-account-block .underline-dropdown-input .list-arrow {
+    width: 16px;
+    height: 16px;
+    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-repeat: no-repeat;
+    background-position: -4px -12309px;
+    right: 8px;
+    bottom:10px;
+    position: absolute;
+}
+.fm-right-account-block .dialog-input-title-ontop .birth-arrow-container {
+    width: 24px;
+    height: 32px;
+    position: relative;
+    display: inline-block;
+    bottom: -10px;
+    cursor: pointer;
+    margin-right: 4px;
+}
+.fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .up-control {
+    width: 24px;
+    height: 16px;
+    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-repeat: no-repeat;
+    background-position: 0px -12311px;
+    opacity: 0.4;
+    -ms-transform: rotate(180deg); /* IE 9 */
+    -webkit-transform: rotate(180deg); /* Safari */
+    transform: rotate(180deg);
+    transition: 0.3s;
+}
+.fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .down-control {
+    width: 24px;
+    height: 16px;
+    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-repeat: no-repeat;
+    background-position: 0px -12311px;
+    opacity: 0.4;
+    transition: 0.3s;
+}
+.fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .up-control:hover, .fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .down-control:hover {
+    opacity: 1;
+}
+.fm-right-account-block .underline-dropdown-input select{
+    background:transparent;
+    border:none;
+    font-size: 14px;
+    color: #333333;
+    height: 40px;
+    width: calc(100% + 16px);
+    margin-top:-4px;
+    padding: 8px 8px 8px 0;
+    position: absolute;
+    right: -16px;
+    bottom: 0;
+}
+.settings-sub-section.profile .default-green-button,
+.settings-sub-section.preference .default-green-button {
+    margin-top: 24px;
+}
+.fm-right-account-block .dialog-feature-toggle {
+    border: solid 1px rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 40px;
+    cursor: pointer;
+    display: inline-block;
+    position: absolute;
+    height: 20px;
+    width: 36px;
+    right: 0;
+    top: 24px;
+}
+.fm-right-account-block .dialog-feature-toggle.toggle-on {
+    background-color: #00BFA5;
+    background: -moz-linear-gradient(180deg, rgba(0,191,165,1) 0%, rgba(0,172,148,1) 100%);
+    background: -webkit-linear-gradient(180deg, rgba(0,191,165,1) 0%, rgba(0,172,148,1) 100%);
+    background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,172,148,1) 100%);
+}
+.fm-right-account-block .dialog-feature-switch {
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    height: 14px;
+    margin-left: 2px;
+    margin-top: 2px;
+    width: 14px;
+    transition: margin 0.15s linear;
+}
+.fm-account-main .fm-account-profile .settings-left-block .account.qr-block {
+    margin-bottom: 0px;
+}
+.settings-bar {
+    height: 8px;
+    width: 334px;
+    border-radius: 4px;
+    margin-top: 8px;
+    position: relative;
+}
+.settings-bar .settings-sub-bar {
+    position: absolute;
+    border-radius: 0px 8px 8px 0px;
+    width: 30%;
+    height: 100%;
+    right: 0;
+    top: 0;
+    content: "";
+}
+.settings-bar.light-blue .settings-sub-bar {
+    background-color: #4DA8CC;
+}
+.settings-bar.light-green .settings-sub-bar {
+    background-color: #279000;
+}
+.fm-right-account-block .account.plan-info {
+    padding:0;
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+    /*float: right;*/
+}
+.quota-note {
+    padding-left: 16px;
+    font-size: 13px;
+    line-height: 16px;
+    font-family: 'LatoWebLight', 'source_sans_proregular', Arial;
+    color: #aaa;
+    display: inline-block;
+    position: relative;
+}
+.quota-note:first-child {
+    margin-right: 24px;
+}
+.quota-note-container.storage .quota-note::before {
+    background-color: #4DA8CC;
+    width: 8px;
+    height: 8px;
+    border-radius: 100%;
+    position: absolute;
+    content: "";
+    top: 4px;
+    left: 0;
+}
+.quota-note-container.storage .quota-note:first-child::before {
+    background-color: #61D2FF;
+}
+.quota-note-container.bandwidth .quota-note::before {
+    background-color: #279000;
+    width: 8px;
+    height: 8px;
+    border-radius: 100%;
+    position: absolute;
+    content: "";
+    top: 4px;
+    left: 0;
+}
+.quota-note-container.bandwidth .quota-note:first-child::before {
+    background-color: #31B500;
+}
+.fm-account-main .light-blue {
+    background-color: #61D2FF;
+    color:#fff;
+}
+.fm-account-main .light-green {
+    background-color: #31B500;
+    color:#fff;
+    overflow: hidden;
+}
+.fm-right-account-block .grid-table{
+    border-spacing: 1;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 4px;
+    box-sizing: border-box;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    width: 99.5%;
+    margin: 0 auto;
+    position: relative;
+}
+.fm-right-account-block .grid-table tr {
+    font-family: 'LatoWeb','source_sans_proregular', Arial;
+    position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.fm-right-account-block .grid-table tr:not(:first-child):hover {
+    background-color: #fafafa;
+}
+.fm-right-account-block .grid-table tr:first-child {
+    background-color: rgba(245,245,245,1);
+    border-radius: 8px 8px 0 0;
+    padding: 0;
+    line-height: 31px;
+}
+.fm-right-account-block .grid-table th {
+    font-family: 'LatoWeb','source_sans_proregular', Arial;
+    padding: 8px 12px 8px 12px;
+    font-size: 14px;
+    line-height: 18px;
+    color:#333;
+    font-weight: normal;
+    text-align: left;
+    position: relative;
+}
+.fm-right-account-block .grid-table th:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    top: 8px;
+    right: 0;
+    width: 1px;
+    background-color: rgba(0,0,0,0.1);
+}
+.fm-right-account-block .grid-table td {
+    padding:12px;
+    line-height: 18px;
+    font-size: 14px;
+    color: #888;
+    position: relative;
+    text-align: left;
+    box-sizing: border-box;
+}
+.fm-right-account-block .grid-table.megadrop td {
+    padding: 0;
+}
+.fm-right-account-block .grid-table td.ip-addr {
+    max-width: 165px;
+    word-wrap: break-word;
+    line-height: 1.4;
+    vertical-align: top;
+}
+.fm-right-account-block .grid-table tr th:first-child, 
+.fm-right-account-block .grid-table tr td:first-child {
+    padding-left: 12px;
+}
+.fm-right-account-block .grid-table.megadrop tr th:first-child {
+    line-height: 24px;
+}
+.fm-right-account-block .grid-table.megadrop tr th:first-child, 
+.fm-right-account-block .grid-table.megadrop tr td:first-child {
+    width: 124px;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    position: relative;
+} 
+.fm-right-account-block .grid-table.megadrop tr th:nth-child(3), 
+.fm-right-account-block .grid-table.megadrop tr td:nth-child(3) {
+    width: 80px;
+    overflow: visible;
+    line-height: 0;
+} 
+.fm-right-account-block .grid-table .grid-table-empty {
+    text-align: center;
+}
+.fm-right-account-block .checkboxOff,
+.fm-right-account-block .checkboxOn {
+    margin:0;
+}
+.fm-account-security .register-pass-status-line1, 
+.fm-account-security .register-pass-status-line2, 
+.fm-account-security .register-pass-status-line3, 
+.fm-account-security .register-pass-status-line4, 
+.fm-account-security .register-pass-status-line5 {
+    width: 41px;
+    height: 4px;
+    float: left;
+    margin-top: 6px;
+    margin-right: 4px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    transition: background-color 0.15s linear;
+}
+.fm-account-security .register-pass-status-line5 {
+    margin-right: 0px;
+}
+.fm-account-security .fm-browsers-icon img {
+    margin: 0;
+}
+.fm-account-security .fm-flags-icon img {
+    margin: 0;
+}
+.fm-account-security .active-session-txt, 
+.fm-account-security .current-session-txt, 
+.fm-account-security .expired-session-txt, 
+.fm-account-security .settings-logout {
+    margin: 0;
+}
+.fm-account-security .tranfer-filetype-txt, .fm-account-security .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
+    height: auto;
+}
+.fm-right-account-block .account.rubbish-inputs .account-counter-number {
+    float: none;
+    display: inline-block;
+    margin:0 16px;
+}
+.fm-right-account-block .account-counter-block {
+    margin: 0;
+}
+.fm-right-account-block .fm-picker-breadcrumbs {
+    white-space: nowrap;
+    max-width: 520px;
+    overflow: hidden;
+}
+.fm-right-account-block .icon {
+    width: 24px;
+    height: 24px;
+    margin:6px 8px 4px 0px;
+    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    display: inline-block;
+    opacity: 0.3;
+    overflow: visible;
+}
+.dashboard .account.user-data-block {
+    padding: 60px 20px 0 20px;
+}
+.content-panel .default-green-button.upgrade-account {
+    display: inline-block;
+    font-size: 15px;
+    margin: 24px 0;
+    white-space: normal;
+    height: auto;
+    min-height: 40px;
+    line-height: 1.2;
+    padding: 10px 20px;
+}
+.content-panel .default-white-button.backup-master-key {
+    display: inline-block;
+    font-size: 15px;
+    margin: 12px 0 0 0;
+    min-width: 140px;
+    left: 50%;
+    -o-transform: translateX(-50%);
+    -ms-transform: translateX(-50%); /* IE 9 */
+    -webkit-transform: translateX(-50%); /* Safari */
+    transform: translateX(-50%);
+}
+.account.left-pane.info-block {
+    padding: 17px 25px 24px 25px;
+}
+.account.left-pane.divider {
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+}
+.fm-right-account-block .grid-table.megadrop .icon {
+    position: relative;
+}
+.fm-right-account-block .grid-table.megadrop .megadrop-row:hover .icon {
+    display: inline-block;
+}
+.fm-right-account-block .icon:hover {
+    opacity: 0.8;
+}
+.fm-right-account-block .icon .tooltips {
+    height: 20px;
+    padding: 0 8px;
+    background-color: rgba(0,0,0,1);
+    line-height: 20px;
+    color: #CCCCCC;
+    font-size: 13px;
+    position: absolute;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    white-space: nowrap;
+    left: 50%;
+    -o-transform: translateX(-50%);
+    -ms-transform: translateX(-50%); /* IE 9 */
+    -webkit-transform: translateX(-50%); /* Safari */
+    transform: translateX(-50%);
+    bottom: -15px;
+    -webkit-transition: bottom 1s ease-in, top 1s ease-in, visibility 0.5s, opacity 1s ease-in;
+    -moz-transition: bottom 1s ease-in, top 1s ease-in, visibility 0.5s, opacity 1s ease-in;
+    -o-transition: bottom 1s ease-in, top 1s ease-in, visibility 0.5s, opacity 1s ease-in;
+    -ms-transition: bottom 1s ease-in, top 1s ease-in, visibility 0.5s, opacity 1s ease-in;
+    transition: bottom 1s ease-in, top 1s ease-in, visibility 0.5s, opacity 1s ease-in;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=1);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    z-index: 1129;
+    visibility: hidden;
+}
+.fm-right-account-block .icon:hover .tooltips {
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    visibility: visible;
+    bottom: -20px;
+}
+.fm-right-account-block .delete-img {
+    background-position: 0px -12400px;
+    opacity: 0.3;
+    cursor: pointer;
+}
+.fm-right-account-block .delete-img.icon{
+    display: none;
+}
+.fm-right-account-block .close-icon{
+    background-position: -24px -12569px;
+    display: none;
+}
+.fm-right-account-block .megadrop-row.closed .close-icon {
+    -o-transform: rotateZ(180deg);
+    -ms-transform: rotateZ(180deg); /* IE 9 */
+    -webkit-transform: rotateZ(180deg); /* Safari */
+    transform: rotateZ(180deg);
+}
+.fm-right-account-block .megadrop-row.closed .close-icon .tooltips {
+    top: -15px;
+    bottom: auto;
+    -o-transform: rotateZ(180deg) translateX(50%);
+    -ms-transform: rotateZ(180deg) translateX(50%); /* IE 9 */
+    -webkit-transform: rotateZ(180deg) translateX(50%); /* Safari */
+    transform: rotateZ(180deg) translateX(50%);
+}
+.fm-right-account-block .megadrop-row.closed .close-icon:hover .tooltips {
+    top: -20px;
+}
+.fm-right-account-block .quick-edit-icon {
+    background-position: -0px -12568px;
+}
+.grid-table.megadrop .megafolder-name {
+    padding-top: 8px;
+    font-size: 14px;
+    line-height: 24px;
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.fm-right-account-block .fm-breadcrumbs {
+    margin: 8px 0;
+    cursor: pointer;
+}
+.fm-right-account-block .megadrop-row .fm-breadcrumbs:hover > span {
+    text-decoration: underline;
+}
+.fm-right-account-block .widget-card.expanded-widget {
+    max-height: 365px;
+}
+.fm-right-account-block .widget-card:hover {
+    box-shadow: none;
+}
+.fm-right-account-block .widget-card::before {
+    box-shadow: none;
+}
+.fm-right-account-block .widget-card .widget-dialog-buttons {
+    position: relative;
+    padding:16px 0 24px 0;
+}
+.fm-right-account-block .widget-card .widget-dialog-buttons .default-white-button,
+.fm-right-account-block .widget-card .widget-dialog-buttons .default-green-button {
+    position: relative;
+    float: right;
+    margin: 0 6px;
+}
+.fm-right-account-block .widget-card .fm-dialog-tab {
+    border-top:none;
+}
+.fm-right-account-block .jspPane.shrink{
+    transition: top 300ms ease-in-out;
+}
+.list-2col {
+    display: block;
+    position: relative;
+    width: auto;
+    height: auto;
+    border: 1px solid rgba(0,0,0,0.15);
+    background-color: white;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.list-2col-heading{
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 32px;
+    background-color: rgba(250,250,250,1);
+    border-radius: 8px 8px 0 0;
+}
+.list-2col-heading::after {
+    content: " ";
+    width: 100%;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    display: block;
+    bottom: 0;
+}
+.list-2col-row{
+    display: block;
+    position: relative;
+    width: auto;
+    height: 40px;
+    padding: 0 24px;
+    transition: 0.1s;
+}
+.list-2col-row::after{
+    content: " ";
+    width: -webkit-calc(100% - 48px);
+    width: -moz-calc(100% - 48px);
+    width: calc(100% - 48px);
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    display: block;
+    bottom: 0;
+    left: 24px;
+}
+.list-2col-row:last-child::after{
+    display: none;
+}
+.list-2col-row:hover {
+    background-color: rgba(250,250,250,1);
+}
+.list-2col-row:hover .icon,
+.list-2col-row:hover .delete-img.icon{
+    display: inline-block;
+}
+.list-2col-row .list-email {
+    color: #666666;
+    line-height: 40px;
+    font-size: 14px;
+    display: inline-block;
+    position: relative;
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.list-2col-row .icon{
+    float: right;
+    margin:8px 0 8px 12px;
+    display: none;
+}
+.list-2col-heading .default-button-no-border {
+    float: right;
+    padding-right: 24px; 
+    display: inline-block;
+}
+.list-2col-heading .default-button-no-border .icon {
+    margin: 0 4px 0 0;
+}
+.fm-right-account-block div.radioOn {
+    -webkit-box-shadow: 0 0 0 1px rgba(0,191,165, 0.5);
+    -moz-box-shadow: 0 0 0 rgba(0,191,165, 0.5);
+    box-shadow: 0 0 0 1px rgba(0,191,165, 0.5);
+}
+.fm-right-account-block div.radioOn::after {
+    background:rgb(0,191,165);
+    background: -moz-linear-gradient(top, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 100%);
+    background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 100%);
+}
+
+/*when its width is smaller than 992px, add class `half-size`*/
+.fm-account-main.low-width .settings-banner {
+    width: 566px;
+}
+.fm-account-main.low-width .first-block {
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+.fm-account-main.low-width .first-block .title-txt {
+    display: block;
+}
+.fm-account-main.low-width .second-block {
+    width: 100%;
+    display: block;
+    height: 124px;
+}
+.fm-account-main.low-width .last-block {
+    width: 100%;
+    display: block;
+    position: relative;
+    border-radius: 0 0px 8px 8px;
+}
+.fm-account-main.low-width .last-block .content-txt {
+        display: none;
+    }
+.fm-account-main.low-width .fm-right-account-block .txt-center.default-green-button {
+    width: auto;
+    margin: auto;
+    padding: 7px 16px;
+    position: absolute;
+    right: 24px;
+    top: 14px;
+}
+.fm-account-main.low-width .fm-account-sections {
+    width: 572px;
+}
+.fm-account-main.low-width .settings-left-block {
+    display: block;
+    width: 100%;
+}
+.fm-account-main.low-width .settings-left-block .content-txt {
+    width: 100%;
+}
+.fm-account-main.low-width .settings-right-block {
+    display: block;
+    width: 100%;
+    padding-left: 0;
+}
+.fm-account-main.low-width .fm-account-sections.fm-account-sections, .fm-account-main.low-width .fm-account-transfers.fm-account-sections {
+    overflow: visible;
+}
+.fm-account-main.low-width .fm-account-sections.fm-account-sections .settings-right-block, .fm-account-main.low-width .fm-account-transfers.fm-account-sections .account.data-block.table-block {
+    overflow: visible;
+}
+.fm-account-main.low-width .grid-table.sessions, .fm-account-main.low-width .grid-table.megadrop {
+    margin: 0 -64px;
+    width: calc(100% + 128px);
+}
+.fm-account-main.low-width .fm-right-account-block .fm-picker-breadcrumbs {
+    max-width: 340px;
+}
+.fm-account-main.low-width .settings-right-block .dialog-input-title-ontop {
+    width: 250px;
+}
+.fm-account-main.low-width .fm-account-security .register-pass-status-line1, 
+.fm-account-main.low-width .fm-account-security .register-pass-status-line2, 
+.fm-account-main.low-width .fm-account-security .register-pass-status-line3, 
+.fm-account-main.low-width .fm-account-security .register-pass-status-line4, 
+.fm-account-main.low-width .fm-account-security .register-pass-status-line5 {
+    width: 46px;
+}
+
+
+/* Small rounded chart */
+.tiny-chart .account.chart.body {
+    width: 76px;
+    height: 76px;
+}
+.tiny-chart .account.chart.overlay {
+    width: 68px;
+    height: 68px;
+    margin: 15px 0 0 40px;
+}
+.tiny-chart .account.chart.overlay span {
+    top: 53px;
+    left: -3px;
+}
+.tiny-chart .account.chart.overlay span:first-child {
+    top: -6px;
+    left: 22px;
+    -o-transform: rotate(48deg);
+    -ms-transform: rotate(48deg); /* IE 9 */
+    -webkit-transform: rotate(48deg); /* Safari */
+    transform: rotate(48deg);
+}
+.tiny-chart .chart.progressbars .right-chart {
+    clip: rect(0, 76px, 76px, 38px);
+}
+.tiny-chart .chart.progressbars .left-chart {
+    clip: rect(0, 38px, 76px, 0);
+}
+.tiny-chart .account.chart.body::after {
+    width: 68px;
+    height: 68px;
+}
+.tiny-chart .chart.icon {
+    left: 22px;
+    top: 35px;
+}
+.tiny-chart .account.chart.data {
+    margin: 6px 0 0 84px;
+}
+.tiny-chart .chart.data .perc-txt {
+    font-size: 24px;
+    line-height: 32px;
+}
+.tiny-chart .chart.data .size-txt {
+    font-size: 14px;
+    line-height: 18px;
+}
+.tiny-chart .chart.data .of-txt, .tiny-chart .chart.data .pecents-txt, .tiny-chart .chart.data .gb-txt {
+    font-size: 14px;
+    line-height: 22px;
+}
+.tiny-chart .chart-indicator {
+    left: 150px;
+    top: 24px;
+    width: 6px;
+    height: 6px;
+}
+.tiny-chart .chart-warning {
+    display: none;
+    font-size: 12px;
+}
+.exceeded .tiny-chart .chart-warning, .going-out .tiny-chart .chart-warning {
+    display: block;
+}
+.going-out .chart-warning a {
+    color: #333333;
+}
+.access-qr-container {
+    max-height: 370px;
+}
+.fm-right-account-block:not(.active-achievements) .btn-achievement {
+    display: none;
+}
+.fm-right-account-block .hidden {
+    display: none;
+}

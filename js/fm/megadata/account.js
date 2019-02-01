@@ -340,6 +340,7 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
     'use strict';
 
     var $dialog = $('.fm-dialog.recovery-key-dialog').removeClass('post-register');
+    $('.recover-image.icon', $dialog).addClass('device-key').removeClass('shiny-key');
 
     // TODO: Implement this on mobile
     if (!$dialog.length) {
@@ -356,9 +357,10 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
             // Export key showing a toast message
             u_exportkey(l[6040]);
         });
-
+        
         switch (version) {
             case 1:
+                $('.skip-button', $dialog).removeClass('hidden');
                 $('.fm-dialog-close', $dialog).addClass('hidden');
                 $('.copy-recovery-key-button', $dialog).addClass('hidden');
                 $('.recover-image.icon', $dialog).removeClass('device-key').addClass('shiny-key');
@@ -366,6 +368,13 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
                     eventlog(localStorage.recoverykey ? 99718 : 99719);
                     $dialog.unbind('dialog-closed');
                 });
+                break;
+            case 2:
+                $('.skip-button', $dialog).addClass('hidden');
+                $('.fm-dialog-close', $dialog).removeClass('hidden');
+                $('.copy-recovery-key-button', $dialog).addClass('hidden');
+                $('.recover-image.icon', $dialog).removeClass('device-key').addClass('shiny-key');
+                $dialog.addClass('post-register');
                 break;
         }
 

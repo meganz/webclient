@@ -51,12 +51,15 @@ function deleteScrollPanel(from, data) {
 }
 
 function initAccountScroll(scroll) {
-    $('.account.tab-content:visible').jScrollPane({
+
+    "use strict";
+
+    $('.fm-account-main:visible').jScrollPane({
         enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true
     });
-    jScrollFade('.account.tab-content:visible');
+    jScrollFade('.fm-account-main:visible');
     if (scroll) {
-        var jsp = $('.account.tab-content:visible').data('jsp');
+        var jsp = $('.fm-account-main:visible').data('jsp');
         if (jsp) {
             jsp.scrollToBottom();
         }
@@ -72,6 +75,10 @@ function initGridScrolling() {
 }
 
 function initSelectScrolling(scrollBlock) {
+
+    "use strict";
+
+    deleteScrollPanel(scrollBlock, 'jsp');
     $(scrollBlock).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     jScrollFade(scrollBlock);
 }

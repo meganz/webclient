@@ -541,11 +541,13 @@ function accountUI() {
     loadSubPage('fm/account');
 }
 
-accountUI.updateSessionTable = function() {
+accountUI.session = {
+    update: function() {
 
-    'use strict';
+        'use strict';
 
-    mobile.account.history.fetchSessionHistory();
+        mobile.account.history.fetchSessionHistory();
+    }
 };
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
@@ -623,10 +625,12 @@ function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
 function slideshow_handle() {}
-accountUI.setBirthYear = function() {};
-accountUI.setBirthMonth = function() {};
-accountUI.setBirthDay = function() {};
-accountUI.setCountry = function() {};
-accountUI.setRubsched = function() {};
+accountUI.account = {
+    renderBirthYear: function() {},
+    renderBirthMonth: function() {},
+    renderBirthDay: function() {},
+    renderCountry: function() {},
+    renderRubsched: function() {},
+};
 /* jshint +W098 */
 /* jshint +W007 */

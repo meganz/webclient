@@ -4883,7 +4883,14 @@ React.makeElement = React['createElement'];
 	                    } }),
 	                React.makeElement(
 	                    "div",
-	                    { className: "dropdown-user-name" },
+	                    { className: "dropdown-user-name", onClick: function onClick() {
+	                            if (contact.c === 2) {
+	                                loadSubPage('fm/account');
+	                            }
+	                            if (contact.c === 1) {
+	                                loadSubPage('fm/' + contact.u);
+	                            }
+	                        } },
 	                    username,
 	                    React.makeElement(ContactPresence, { className: "small", contact: contact })
 	                )

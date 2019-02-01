@@ -1135,7 +1135,7 @@ accountUI.account = {
             accountUI.inputs.radio.init(
                 '.uidateformat',
                 $('.uidateformat').parent(),
-                fmconfig.uidateformat,
+                fmconfig.uidateformat || 0,
                 function (val) {
                     showToast('settings', l[16168]);
                     mega.config.setn('uidateformat', parseInt(val));
@@ -1146,7 +1146,7 @@ accountUI.account = {
             accountUI.inputs.radio.init(
                 '.uifontsize',
                 $('.uifontsize').parent(),
-                fmconfig.font_size,
+                fmconfig.font_size || 2,
                 function (val) {
                     showToast('settings', l[16168]);
                     $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + val);
@@ -2395,7 +2395,7 @@ accountUI.fileManagement = {
             accountUI.inputs.radio.init(
                 '.uisorting',
                 $('.uisorting').parent(),
-                fmconfig.uisorting,
+                fmconfig.uisorting || 0,
                 function (val) {
                     showToast('settings', l[16168]);
                     mega.config.setn('uisorting', parseInt(val));
@@ -2405,7 +2405,7 @@ accountUI.fileManagement = {
             accountUI.inputs.radio.init(
                 '.uiviewmode',
                 $('.uiviewmode').parent(),
-                fmconfig.uiviewmode,
+                fmconfig.uiviewmode || 0,
                 function (val) {
                     showToast('settings', l[16168]);
                     mega.config.setn('uiviewmode', parseInt(val));

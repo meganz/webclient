@@ -1087,7 +1087,7 @@ mega.megadrop = (function() {
             var path = M.getPath(nodeHandle).map(function(h, k) {
                 var title = h === M.RootID ? l[1687] : M.d[h].name;
 
-                var html = title ? '<a class="fm-breadcrumbs folder ' + k !== 0 ? 'has-next-button' : '' +
+                var html = title ? '<a class="fm-breadcrumbs folder ' + (k !== 0 ? 'has-next-button' : '') +
                     '" title="' +  escapeHTML(title) + '" data-node="' + h + '">' + '<span class="right-arrow-bg">' +
                     '<span>' + escapeHTML(title) + '</span></span></a>' : '';
 

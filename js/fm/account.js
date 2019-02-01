@@ -2550,6 +2550,7 @@ accountUI.transfers = {
                 $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
 
                 // Speed limit
+                fmconfig.ul_maxSpeed = fmconfig.ul_maxSpeed || 0;
                 var currentVal = parseInt(fmconfig.ul_maxSpeed) < 1 ? fmconfig.ul_maxSpeed : 1;
 
                 if (currentVal === 1) {

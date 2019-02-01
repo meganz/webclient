@@ -21349,9 +21349,9 @@ body.kr .account.chart.data {
     }
     .transfer-table td:nth-child(2), .transfer-table-header th:nth-child(2) {
         width: 100%;
-        width: -webkit-calc(100% - 776px);
-        width: -moz-calc(100% - 776px);
-        width: calc(100% - 776px);
+        width: -webkit-calc(100% - 876px);
+        width: -moz-calc(100% - 876px);
+        width: calc(100% - 876px);
     }
 }
 
@@ -21381,9 +21381,9 @@ body.kr .account.chart.data {
     }
     .transfer-table td:nth-child(2), .transfer-table-header th:nth-child(2) {
         width: 100%;
-        width: -webkit-calc(100% - 746px);
-        width: -moz-calc(100% - 746px);
-        width: calc(100% - 746px);
+        width: -webkit-calc(100% - 846px);
+        width: -moz-calc(100% - 846px);
+        width: calc(100% - 846px);
     }
 }
 

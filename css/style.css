@@ -21284,16 +21284,13 @@ body.kr .account.chart.data {
 .fontsize1 .nw-fm-tree-folder, .fontsize1 .nw-conversations-name, .fontsize1 .fm-tree-panel .nw-contact-name, .fontsize1 .nw-conversations-header, .fontsize1 .nw-tree-panel-header, .fontsize1 .fm-picker-dialog-panel-header, .fontsize1 .fm-picker-dialog-panel-header, .fontsize1 .share-dialog-panel-header, .fontsize1 .top-user-status-item, .fontsize1 .sorting-menu-item, .fontsize1 .permissions-menu-item, .fontsize1 .dropdown.body.submenu, .fontsize1 .tranfer-filetype-txt, .fontsize1 .fm-browsers-txt, .fontsize1 .fm-flags-txt, .fontsize1 .fm-member-icon-txt, .fontsize1 .transfer-table td, .fontsize1 .grid-table td, .fontsize1 .grid-share-table td, .fontsize1 .contacts-grid-table td, .fontsize1 .file-block-title, .fontsize1 .contact-block-view-name, .fontsize1 .shared-folder-info-block, .fontsize1 .fm-chat-user, .fontsize1 .fm-chat-user-status, .fontsize1 .fm-chat-user-email, .fontsize1 .shared-folder-access, .fontsize1 .contacts-interation, .fontsize1 .transfer-table th, .fontsize1 .transfer-table td, .fontsize1 .transfer-table-header th, .fontsize1 .grid-table th, .fontsize1 .grid-table td, .fontsize1 .grid-share-table th, .fontsize1 .grid-share-table td, .fontsize1 .grid-table-header th, .fontsize1 .contacts-grid-header th, .fontsize1 .contacts-grid-table th, .fontsize1 .contacts-grid-table td, .fontsize1 .membership-status, .fontsize1 .new-notification-txt, .fontsize1 .dark-tooltip, .fontsize1 .new-notification-info {
     font-size: 12px;
 }
-.fontsize1 .nlanguage-bottom, .fontsize1 .nlanguage-lnk, .fontsize1 a.nlanguage-lnk, .fontsize1 a.nlanguage-lnk:link, .fontsize1 a.nlanguage-lnk:visited, .fontsize1 a.nlanguage-lnk:hover, .fontsize1 a.nlanguage-lnk:active, .fontsize1 .share-dialog-permissions, .fontsize1 .share-dialog-icon.permissions-icon, .fontsize1 .transfer-panel-title, .fontsize1 .fm-breadcrumbs .right-arrow-bg, .fontsize1 .toast-notification, .fontsize1 .fm-notification-info p, .content-txt-container li a, .fontsize1 .dialog-input-title-ontop .dialog-input::placeholder, .fontsize1 .dialog-input-title-ontop .title, .fontsize1 .content-txt, .fontsize1 .settings-sub-section .radio-txt, .fontsize1 .fm-right-account-block .grid-table td, .fontsize1 .fm-right-account-block .grid-table th {
+.fontsize1 .nlanguage-bottom, .fontsize1 .nlanguage-lnk, .fontsize1 a.nlanguage-lnk, .fontsize1 a.nlanguage-lnk:link, .fontsize1 a.nlanguage-lnk:visited, .fontsize1 a.nlanguage-lnk:hover, .fontsize1 a.nlanguage-lnk:active, .fontsize1 .share-dialog-permissions, .fontsize1 .share-dialog-icon.permissions-icon, .fontsize1 .transfer-panel-title, .fontsize1 .fm-breadcrumbs .right-arrow-bg, .fontsize1 .toast-notification, .fontsize1 .fm-notification-info p, .content-txt-container li a, .fontsize1 .dialog-input-title-ontop .dialog-input::placeholder, .fontsize1 .dialog-input-title-ontop .title, .fontsize1 .content-txt, .fontsize1 .settings-sub-section .radio-txt, .fontsize1 .fm-right-account-block .grid-table td, .fontsize1 .fm-right-account-block .grid-table th, .fontsize1 .fm-account-button .sub-title {
     font-size: 13px;
 }
- .fontsize1 .fm-account-button .sub-title {
-    font-size: 14px;
- }
-.fontsize1 .subtitle-txt {
+.fontsize1 .subtitle-txt, .fontsize1 .fm-account-button .head-title {
     font-size: 15px;
 }
-.fontsize1 .nw-fm-dialog-title, .fontsize1 .fm-dialog-title, .fontsize1 .fm-right-account-block .dialog-input-title-ontop .dialog-input, .fontsize1 .fm-account-button .head-title  {
+.fontsize1 .nw-fm-dialog-title, .fontsize1 .fm-dialog-title, .fontsize1 .fm-right-account-block .dialog-input-title-ontop .dialog-input {
     font-size: 16px;
 }
 .fontsize1 .nw-fm-tree-header input, .fontsize1 .nw-fm-tree-header span {
@@ -23123,68 +23120,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     font-size: 11px;
     line-height: 13px;
     display: none;
-}
-/* Account settings-rubbish bin notification */
-.rubbish-settings {
-    display: inline-block;
-}
-.green-notification.body {
-    display: table;
-    background-color: rgba(0,191,165,0.05);
-    -webkit-box-shadow: 0 0 0 1px rgba(0,191,165,0.2);
-    -moz-box-shadow: 0 0 0 1px rgba(0,191,165,0.2);
-    box-shadow: 0 0 0 1px rgba(0,191,165,0.2);
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    padding: 0 16px 0 12px;
-}
-.green-notification.with-btn {
-    text-align: left;
-    margin-top: 24px;
-}
-.green-notification.with-btn .text-cell {
-    padding: 7px 0;
-}
-.green-notification.body .versioning-body-text{
-    max-width: 370px;
-    padding-left: 4px;
-}
-.green-notification.body.with-btn .versioning-body-text{
-    max-width: none;
-}
-.free .green-notification.body:not(.hidden) {
-    position: relative;
-}
-.green-notification.cell {
-    display: table-cell;
-    vertical-align: middle;
-    color: #00B79E;
-    font-size: 13px;
-    line-height: 18px;
-}
-.green-notification.cell .button {
-    position: relative;
-    -o-transform: none;
-    -ms-transform: none; /* IE 9 */
-    -webkit-transform: none; /* Safari */
-    transform: none;
-}
-.green-notification.cell:nth-child(2) {
-    width: auto;
-}
-.green-notification .xscheduler {
-    margin: 0 11px 0 3px;
-}
-.green-notification .button {
-    margin: 12px 0px 12px 24px;
-}
-.green-notification .fvnotice {
-    background-position: -233px -1666px;
-    width: 24px;
-    height: 24px;
-    display: inline-block;
-    margin-top: 4px;
 }
 .account-italic-txt.bottom-pad {
     padding: 0 0 20px 0;

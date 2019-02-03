@@ -381,7 +381,7 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     height: 20px;
     display: inline-block;
     margin: 10px 6px 0 0;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: 2px -3330px;
     background-repeat: no-repeat;
     vertical-align: top;
@@ -798,15 +798,15 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
 }
 .bottom-page.big-icon.folders {
     background-position: -119px -1270px;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
 }
 .bottom-page.big-icon.arrows {
     background-position: -119px -1400px;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
 }
 .bottom-page.big-icon.up-down {
     background-position: -119px -1530px;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
 }
 .bottom-page.big-icon.safe {
     background-position: -160px -383px;
@@ -899,7 +899,7 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
 .bottom-page.tab-icon {
     width: 34px;
     height: 32px;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: 1px -1941px;
     display: inline-block;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
@@ -1103,7 +1103,7 @@ iframe.security-video-container {
     opacity: 0.3;
 }
 .nav-buttons-bl .pages-nav.nav-icon.bott-sprite {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     width: 26px;
     height: 26px;
     margin: 8px auto 3px auto;
@@ -1344,7 +1344,7 @@ height: 56px;
     width: 8px;
     height: 5px;
     margin: 5px 0 0 4px;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: -215px -203px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=67);
     -moz-opacity: 0.67;
@@ -1519,7 +1519,7 @@ height: 56px;
     height: 26px;
     display: inline-block;
     vertical-align: top;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: -12px -3039px;
     margin: 15px 12px 0 0;
 }
@@ -1549,7 +1549,7 @@ height: 56px;
     top: 0;
     width: 225px;
     height: 245px;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: 0 -2709px;
 }
 .bottom-page.cols-container .col3.light-bg::before {
@@ -1623,7 +1623,7 @@ height: 56px;
     width: 48px;
     height: 48px;
     margin: -6px 13px 0 0px;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: -6px -2127px;
     background-repeat: no-repeat;
 }
@@ -1745,13 +1745,16 @@ height: 56px;
     padding: 0 40px;
 }
 .bottom-page.mid-icon {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     width: 80px;
     height: 80px;
     float: left;
 }
 .bottom-page.mid-icon.dav {
     background-position: -10px -2575px;
+}
+.bottom-page.mid-icon.ftp {
+    background-position: -143px -2577px
 }
 .bottom-page.mid-icon.config {
     width: 81px;
@@ -1837,43 +1840,43 @@ height: 56px;
     color: #333333;
 }
 .bottom-page.big-icon.target {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: 1px -310px;
 }
 .bottom-page.big-icon.charts {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: 1px -190px;
 }
 .bottom-page.big-icon.mobile-cloud {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: 1px -1400px;
 }
 .bottom-page.big-icon.chat {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: 1px -1270px;
 }
 .bottom-page.big-icon.photos {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: 1px -1530px;
 }
 .bottom-page.big-icon.cloud {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: 1px -1660px;
 }
 .bottom-page.big-icon.wp {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: 1px -1790px;
 }
 .bottom-page.big-icon.camera {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: -119px -1660px;
 }
 .bottom-page.big-icon.player {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: -119px -1790px;
 }
 .bottom-page.big-icon.mobile-arrow {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: -119px -1920px;
 }
 .megaapp-linux .bottom-page.radio-buttons {
@@ -1921,7 +1924,7 @@ height: 56px;
 }
 .cmd-top-img {
     height: 180px;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: center -3114px;
     background-repeat: no-repeat;
     display: none;
@@ -1944,7 +1947,7 @@ height: 56px;
     padding: 0;
 }
 .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-size:360px auto;
     background-repeat: no-repeat;
 }
@@ -2334,6 +2337,9 @@ height: 56px;
 .bottom-page.mid-icon.live {
     background-position: -6px -1657px;
 }
+.bottom-page.mid-icon.ftp {
+    background-position: -96px -1745px;
+}
 .bottom-page.icon-info {
     margin: 0 0 0 82px;
 }
@@ -2518,7 +2524,7 @@ height: 56px;
 
 /* MEGAsync */
 .small-megasync-logo {
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-repeat: no-repeat;
     background-position: 0 0;
     width: 185px;
@@ -2877,7 +2883,7 @@ height: 56px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-repeat: no-repeat;
     background-position: 0 -887px;
     margin: 38px 0 77px 0;
@@ -3057,7 +3063,7 @@ height: 56px;
 }
 .bottom-page.dark-button {
     display: inline-block;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     width: 169px;
     height: 57px;
     background-position: -2px -3512px;
@@ -3104,7 +3110,7 @@ height: 56px;
     margin: 4px 0 0 12px;
     width: 25px;
     height: 18px;
-    background-image: url(../images/mega/pages-sprite_v4.png);
+    background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: -162px -3401px;
     background-size: 360px auto;
 }
@@ -3918,7 +3924,7 @@ a.opensource-icon-txt.coming-soon {
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow, .bottom-page.top-title::before, .pages-nav.nav-icon.bott-sprite, .bottom-page.mid-icon, .bottom-page.cols-container .col3::before, .bottom-page.tab-lnk-icon, .cmd-top-img, .bottom-page.scroll-icon, .bottom-page.dark-button, .bottom-page.big-link i, .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite {
-    background-image: url(../images/mega/pages-sprite_v4@2x.png) !important;
+    background-image: url(../images/mega/pages-sprite_v5@2x.png) !important;
     background-size: 360px auto;
 }
 .browsers.icon {

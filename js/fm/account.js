@@ -1953,8 +1953,13 @@ accountUI.security = {
             $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
 
             M.account.sessions.sort(function(a, b) {
-                var ret = a[0] < b[0] ? 1 : -1;
-                return ret;
+                if (a[7] !== b[7]) {
+                    return a[7] > b[7] ? -1 : 1;
+                }
+                if (a[5] !== b[5]) {
+                    return a[5] > b[5] ? -1 : 1;
+                }
+                return a[0] < b[0] ? 1 : -1;
             });
 
             $('#sessions-table-container').empty();

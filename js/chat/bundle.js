@@ -62,7 +62,7 @@ React.makeElement = React['createElement'];
 	var ConversationsUI = __webpack_require__(4);
 	var ChatRoom = __webpack_require__(36);
 
-	var EMOJI_DATASET_VERSION = 2;
+	var EMOJI_DATASET_VERSION = 3;
 
 	var _chatui;
 	var webSocketsSupport = typeof WebSocket !== 'undefined';
@@ -1617,7 +1617,7 @@ React.makeElement = React['createElement'];
 	        return self._emojiDataLoading[name];
 	    } else if (name === "categories") {
 
-	        self._emojiData[name] = ["people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
+	        self._emojiData[name] = ["symbols", "activity", "objects", "nature", "food", "people", "travel", "flags"];
 
 	        return MegaPromise.resolve(self._emojiData[name]);
 	    } else {
@@ -4883,7 +4883,14 @@ React.makeElement = React['createElement'];
 	                    } }),
 	                React.makeElement(
 	                    "div",
-	                    { className: "dropdown-user-name" },
+	                    { className: "dropdown-user-name", onClick: function onClick() {
+	                            if (contact.c === 2) {
+	                                loadSubPage('fm/account');
+	                            }
+	                            if (contact.c === 1) {
+	                                loadSubPage('fm/' + contact.u);
+	                            }
+	                        } },
 	                    username,
 	                    React.makeElement(ContactPresence, { className: "small", contact: contact })
 	                )
@@ -5572,6 +5579,12 @@ React.makeElement = React['createElement'];
 	                    }));
 	                });
 
+	                var buttonLabel = self.props.multipleSelectedButtonLabel;
+
+	                if (!buttonLabel) {
+	                    buttonLabel = self.state.selected.length === 1 ? __(l[5885]) : __(l[8890]);
+	                }
+
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
@@ -5600,7 +5613,7 @@ React.makeElement = React['createElement'];
 	                        React.makeElement(
 	                            "a",
 	                            { href: "javascript:;", className: "default-grey-button right", onClick: onSelectDoneCb },
-	                            self.props.multipleSelectedButtonLabel ? self.props.multipleSelectedButtonLabel : __(l[8890])
+	                            buttonLabel
 	                        )
 	                    )
 	                );

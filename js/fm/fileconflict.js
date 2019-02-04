@@ -133,7 +133,7 @@
                             result.push(file);
                         }
                     }
-                    saveKeepBothState(target, node, name);
+                    saveKeepBothState(node.p || target, node, name);
                     if (stop) {
                         resolve();
                         breakOP = true;
@@ -266,6 +266,7 @@
                 }
                 else {
                     setName(currNode, nodeName);
+                    saveKeepBothState(target, currNode, nodeName);
                     okNodes.push(currNode);
                 }
             }

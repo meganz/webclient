@@ -3,7 +3,7 @@ var ReactDOM = require("react-dom");
 var ConversationsUI = require("./ui/conversations.jsx");
 var ChatRoom = require('./chatRoom.jsx');
 
-var EMOJI_DATASET_VERSION = 2;
+var EMOJI_DATASET_VERSION = 3;
 
 var chatui;
 var webSocketsSupport = typeof(WebSocket) !== 'undefined';
@@ -2000,7 +2000,7 @@ Chat.prototype.getEmojiDataSet = function(name) {
     }
     else if (name === "categories") {
         // reduce the XHRs by one, by simply moving the categories_v2.json to be embedded inline here:
-        self._emojiData[name] = ["people","nature","food","activity","travel","objects","symbols","flags"];
+        self._emojiData[name] = ["symbols","activity","objects","nature","food","people","travel","flags"];
         // note, when updating categories_vX.json, please update this ^^ manually.
 
         return MegaPromise.resolve(self._emojiData[name]);

@@ -11,6 +11,10 @@ var remappedLangLocales = {
     "br": "pt"
 };
 
+// Arabic speaking countries
+var arabics = ['DZ', 'BH', 'TD', 'KM', 'DJ', 'EG', 'ER', 'IQ', 'JO', 'KW', 'LB', 'LY',
+    'MR', 'MA', 'OM', 'PS', 'QA','SA', 'SO', 'SS', 'SY', 'TZ', 'TN', 'AE', 'YE'];
+
 $.dateTimeFormat = Object.create(null);
 $.acc_dateTimeFormat = Object.create(null);
 
@@ -68,23 +72,30 @@ function setDateTimeFormat(locales, format) {
     "use strict";
 
     // Set date format
-    var options = {year: 'numeric'};
+    var options = {year: 'numeric', hour12: false};
     options.month = format >= 2 ? 'long' : 'numeric';
     options.day = format === 3 ? undefined : 'numeric';
     options.weekday = format === 4 ? 'long' : undefined;
+
+    if (format === 0) {
+        options.minute = 'numeric';
+        options.hour = 'numeric';
+    }
 
     // Create new DateTimeFormat object if it is not exist
     try {
         $.dateTimeFormat[locales + '-' + format] = typeof Intl !== 'undefined' ?
             new Intl.DateTimeFormat(locales, options) : 'ISO';
+
+        // If locale is Arabic and country is non-Arabic country, not set, or not logged in
+        if (locale === 'ar' && (!u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0)) {
+            // To avoid Chrome bug, set Egypt as default country.
+            $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat('ar-EG', options);
+        }
     }
     catch (e) {
         $.dateTimeFormat[locales + '-' + format] = format > 1 ? new Intl.DateTimeFormat(locale, options) : 'ISO';
     }
-
-    // Create new DateTimeFormat object if it is not exist
-    var timeOptions = {hour: '2-digit', minute:'2-digit', hour12: false};
-    $.dateTimeFormat[locales + '-time'] = new Intl.DateTimeFormat([], timeOptions);
 }
 
 /**
@@ -110,31 +121,30 @@ function time2date(unixTime, format) {
     var date = new Date(unixTime * 1000 || 0);
     var result;
     var dateFunc;
-    var timeFunc;
-    var country = 'ISO';
+    var country = '';
+
     format = format || 0;
     if (u_attr) {
         country = u_attr.country ? u_attr.country : u_attr.ipcc || 'ISO';
     }
-    var locales = locale + '-' + country;
+
+    var locales = country ? locale + '-' + country : locale;
 
     // If dateTimeFormat is not set with the current locale set it.
     if ($.dateTimeFormat[locales + '-' + format] === undefined) {
         setDateTimeFormat(locales, format);
     }
 
-    var $dFObj = $.dateTimeFormat[locales + '-' + format];
-    var $tfObj = $.dateTimeFormat[locales + '-time'];
+    var dFObj = $.dateTimeFormat[locales + '-' + format];
 
     // print time as ISO date format
     var printISO = function _printISO() {
         var timeOffset = date.getTimezoneOffset() * 60;
         var isodate = new Date((unixTime - timeOffset) * 1000);
-        return isodate.toISOString().split('T')[0];
+        return isodate.toISOString().replace('T', ' ').substr(0 ,16);
     };
 
-    dateFunc = $dFObj === 'ISO' ? printISO : $dFObj.format;
-    timeFunc = $tfObj.format;
+    dateFunc = dFObj === 'ISO' ? printISO : dFObj.format;
 
     // if it is short date format and user selected to use ISO format
     if ((fmconfig.uidateformat || country === 'ISO') && format < 2) {
@@ -142,11 +152,6 @@ function time2date(unixTime, format) {
     }
     else {
         result = dateFunc(date);
-    }
-
-    // Add Time format
-    if (format === 0) {
-        result += " " + timeFunc(date);
     }
 
     return result;
@@ -169,6 +174,13 @@ function setAccDateTimeFormat(locales) {
         $.acc_dateTimeFormat[locales] = typeof Intl !== 'undefined' ?
             new Intl.DateTimeFormat(locales, options) : 'fallback';
         $.acc_dateTimeFormat[locales + '-noY'] = Intl ? new Intl.DateTimeFormat(locales, nYOptions) : 'fallback';
+
+        // If locale is Arabic and country is non-Arabic country or non set,
+        if (locale === 'ar' && (!u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0)) {
+            // To avoid Chrome bug, set Egypt as default country.
+            $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat('ar-EG', options);
+            $.acc_dateTimeFormat[locales + '-noY'] = new Intl.DateTimeFormat('ar-EG', nYOptions);
+        }
     }
     catch (e) {
         $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat(locale, options);
@@ -622,6 +634,8 @@ mBroadcaster.once('startMega', function populate_l() {
     l[12488] = l[12488].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
     l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
 
+    l[16116] = l[16116].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+
     l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>');
     l[16306] = escapeHTML(l[16306])
@@ -757,15 +771,18 @@ mBroadcaster.once('startMega', function populate_l() {
     l[20193] = l[20193].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20194] = l[20194].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20195] = l[20195].replace('[B]', '<b>').replace('[/B]', '</b>');
-
+    l[20206] = l[20206].replace('[S1]', '<span class="content-txt">').replace('[/S1]', '</span>')
+        .replace('[S2]', '<span class="content-txt">').replace('[/S2]', '</span>')
+        .replace('%1',
+            '<span class="account-counter-number short"><input type="text" value="100" id="autoaway"></span>');
 
 
     var common = [
-        15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
-        16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444,
-        18268, 18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296,
-        18297, 18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812,
-        19813, 19814, 19854, 19821, 19930
+        15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
+        16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444, 18268,
+        18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296, 18297,
+        18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813,
+        19814, 19854, 19821, 19930
     ];
     for (i = common.length; i--;) {
         var num = common[i];

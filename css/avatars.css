@@ -33,8 +33,7 @@
 .token-input-dropdown-mega .small-rounded-avatar {
     margin: 6px 0 6px 8px;
 }
-
-.small-rounded-avatar::before {
+.small-rounded-avatar::before, .semi-small-rounded-avatar::before {
     content: '';
     display: block;
     width: -webkit-calc(100% + 4px);
@@ -58,6 +57,26 @@
     width: 32px;
     height: 32px;
 }
+
+.semi-small-rounded-avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 36px;
+    line-height: 64px;
+    border: 0;
+    background-color: red;
+}
+
+.semi-small-rounded-avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 36px;
+    line-height: 64px;
+    border: 0;
+    background-color: red;
+    font-family: 'source_sans_proregular';
+}
+
 .medium-avatar {
     width: 162px;
     height: 162px;
@@ -321,4 +340,59 @@
     background: -webkit-linear-gradient(45deg, rgba(136,14,79,1) 0%, rgba(188,32,134,1) 100%);
     background: linear-gradient(45deg, rgba(136,14,79,1) 0%, rgba(188,32,134,1) 100%);
 }
-
+.fm-account-avatar {
+    width: 136px;
+    height: 136px;
+    margin: 0 auto;
+}
+.fm-account-avatar .avatar-wrapper {
+    width: 136px;
+    height: 136px;
+    margin: 0 auto;
+    font-size: 46px;
+    line-height: 126px;
+    font-family: 'source_sans_proregular';
+}
+.fm-account-avatar .avatar-wrapper img {
+    width: 128px;
+    height: 128px;
+}
+.fm-account-avatar .avatar-wrapper {
+    border: 4px solid white;
+    padding: 0;
+}
+.fm-account-avatar .avatar-wrapper::before {
+    width: 136px;
+    height: 136px;
+    margin: -4px 0 0 -4px;
+}
+.fm-right-account-block .fm-account-avatar {
+    width: 64px;
+    height: 64px;
+    margin-left: 16px;
+    display: inline-block;
+}
+.fm-right-account-block .fm-account-avatar .avatar-wrapper {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto;
+    font-size: 36px;
+    line-height: 60px;
+    font-family: 'LatoWeb','source_sans_proregular', Arial;
+}
+.fm-right-account-block .fm-account-avatar .avatar-wrapper img {
+    width: 60px;
+    height: 60px;
+}
+.fm-right-account-block .avatar-wrapper {
+    border: 2px solid white;
+    padding: 0;
+}
+.fm-right-account-block .avatar-wrapper::before {
+    width: 64px;
+    height: 64px;
+    margin: -2px 0 0 -2px;
+}
+.fm-right-account-block .avatar-bg.colorized::after {
+    background:none;
+}

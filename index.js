@@ -1016,6 +1016,10 @@ function init_page() {
         var regBusiness = new BusinessRegister();
         regBusiness.initPage();
     }
+    else if (page === 'fm/account/history') {
+        loadSubPage('fm/account/security');
+        return false;
+    }
     else if (page == 'key') {
         if (is_mobile) {
             parsepage(pages['mobile']);
@@ -1177,7 +1181,7 @@ function init_page() {
         }
         else {
             if (u_type) {
-                loadSubPage('fm/account/email-and-pass');
+                loadSubPage('fm/account/security');
                 return false;
             }
             else {
@@ -2101,6 +2105,9 @@ function topmenuUI() {
             }
             else if (is_mobile && className.indexOf('fm') > -1) {
                 mobile.loadCloudDrivePage();
+            }
+            else if (subpage === 'backup') {
+                M.showRecoveryKeyDialog(2);
             }
             else if (subpage) {
                 loadSubPage(moveTo[subpage] || subpage);

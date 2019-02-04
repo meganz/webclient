@@ -705,8 +705,8 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             $('.user-name').text(u_attr.fullname);
             $('.membership-big-txt.name').text(u_attr.fullname);
             if (M.currentdirid === 'account') {
-                $('.account.tab-content.general #account-firstname').val(firstName);
-                $('.account.tab-content.general #account-lastname').val(lastName);
+                accountUI.account.profiles.renderFirstName();
+                accountUI.account.profiles.renderLastName();
             }
         }
         // check if this first name + last belongs to business sub-user

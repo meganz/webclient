@@ -2814,405 +2814,259 @@
         </div>
     </div>
 </div>
-
+<!-- New achievement dialog, please hide and show block when need !-->
 <div class="fm-dialog achievements-list-dialog hidden">
     <div class="fm-dialog-close"></div>
     <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$16365]</div>
+        <div class="account top-header small">[$16365]</div>
     </div>
-
-    <div class="achievements-list-head">
-        [$16363]
-    </div>
-
     <div class="achievements-list-info">
         [$16364]
     </div>
-
+    <!-- Add scroll  -->
     <div class="achievements-scroll">
-
-        <div class="achievements-list">
-
-            <!-- Add class "achieved", "one-reward" !-->
-            <div class="achievements-cell ach-create-account">
-                <div class="achievements-cell-body">
-                    <div class="achievement-dialog left-icon">
-                        <i class="huge-icon achievement"></i>
-                    </div>
-                    <div class="achievement-full info">
-                        <div class="achievement-full title">
-                            [$16401]
-                        </div>
-                        <div class="achievement-full description">
-                            [$16277]
-                        </div>
-                        <div class="achievement-dialog expires-txt red">
-                            <!-- do NOT translate this, it's on the JS side -->
-                            (Expires in <span>2</span> months)
-                        </div>
-                    </div>
-
-                    <div class="achievement-dialog right-block">
-                        <div class="achievement-dialog reward storage">
-                            <i class="semi-big-icon blue-cloud"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                storage space
-                            </div>
-                        </div>
-                        <div class="achievement-dialog reward bandwidth">
-                            <i class="semi-big-icon green-speedometer"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                Transfer
-                            </div>
-                        </div>
-                        <div class="achievement-dialog status-block">
-                            <div class="button default-grey-button">
-                                [$170]
-                            </div>
-                        </div>
-                        <div class="achievement-dialog achieved-icon">
-                            <i class="semi-huge-icon green-tick"></i>
-                        </div>
-                    </div>
-
+        <div class="achievement-banner">
+            <div class="achieved-block storage-quota">
+                <div class="big-icon achievements-icon"></div>
+                <div class="fm-account-header">
+                    <span>[$20183]</span>
                 </div>
+                <span class="quota-txt">XX GB</span>
             </div>
-
-            <!-- Add class "achieved", "one-reward" !-->
-            <div class="achievements-cell ach-install-megasync">
-                <div class="achievements-cell-body">
-                    <div class="achievement-dialog left-icon">
-                        <i class="huge-icon achievement"></i>
-                    </div>
-                    <div class="achievement-full info">
-                        <div class="achievement-full title">
-                            [$16278]
-                        </div>
-                        <div class="achievement-full description">
-                            [$16279]
-                        </div>
-                        <div class="achievement-dialog expires-txt">
-                            <!-- do NOT translate this, it's on the JS side -->
-                            (Expires after <span>12</span> months)
-                        </div>
-                    </div>
-                    <div class="achievement-dialog right-block">
-                        <div class="achievement-dialog reward storage">
-                            <i class="semi-big-icon blue-cloud"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                storage space
-                            </div>
-                        </div>
-                        <div class="achievement-dialog reward bandwidth">
-                            <i class="semi-big-icon green-speedometer"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                Transfer
-                            </div>
-                        </div>
-                        <div class="achievement-dialog status-block">
-                            <div class="button default-grey-button">
-                                [$16295]
-                            </div>
-                        </div>
-                        <div class="achievement-dialog achieved-icon">
-                            <i class="semi-huge-icon green-tick"></i>
-                        </div>
-                    </div>
+            <div class="achieved-block transfer-quota">
+                <div class="big-icon achievements-icon"></div>
+                <div class="fm-account-header">
+                    <span>[$20184]</span>
                 </div>
+                <span class="quota-txt">XX GB</span>
             </div>
-
-            <!-- Add class "achieved", "one-reward" !-->
-            <div class="achievements-cell ach-install-mobile-app">
-                <div class="achievements-cell-body">
-                    <div class="achievement-dialog left-icon">
-                        <i class="huge-icon achievement"></i>
-                    </div>
-                    <div class="achievement-full info">
-                        <div class="achievement-full title">
-                            [$16280]
-                        </div>
-                        <div class="achievement-full description">
-                            [$16281]
-                        </div>
-                        <div class="achievement-dialog expires-txt">
-                            <!-- do NOT translate this, it's on the JS side -->
-                            (Expires after <span>12</span> months)
-                        </div>
-                    </div>
-                    <div class="achievement-dialog right-block">
-                        <div class="achievement-dialog reward storage">
-                            <i class="semi-big-icon blue-cloud"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                storage space
-                            </div>
-                        </div>
-                        <div class="achievement-dialog reward bandwidth">
-                            <i class="semi-big-icon green-speedometer"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                Transfer
-                            </div>
-                        </div>
-                        <div class="achievement-dialog status-block">
-                            <div class="button default-grey-button">
-                                [$16295]
-                            </div>
-                        </div>
-                        <div class="achievement-dialog achieved-icon">
-                            <i class="semi-huge-icon green-tick"></i>
-                        </div>
-                    </div>
-                </div>
+            <div class="achieved-block invitees">
+                <div class="big-icon achievements-icon"></div>
+                <div class="fm-account-header">
+                    <span>[$20186]</span>
+                    <div class="medium-icon new-dialog-icon"></div></div>
+                <span class="quota-txt">0</span>
             </div>
-
-            <!-- Add class "achieved", "one-reward" !-->
-            <div class="achievements-cell ach-take-tour">
-                <div class="achievements-cell-body">
-                    <div class="achievement-dialog left-icon">
-                        <i class="huge-icon achievement"></i>
-                    </div>
-                    <div class="achievement-full info">
-                        <div class="achievement-full title">
-                            Take the MEGA tour
-                        </div>
-                        <div class="achievement-full description">
-                            Dada
-                        </div>
-                        <div class="achievement-dialog expires-txt">
-                            <!-- do NOT translate this, it's on the JS side -->
-                            (Expires after <span>12</span> months)
-                        </div>
-                    </div>
-                    <div class="achievement-dialog right-block">
-                        <div class="achievement-dialog reward storage">
-                            <i class="semi-big-icon blue-cloud"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                storage space
-                            </div>
-                        </div>
-                        <div class="achievement-dialog reward bandwidth">
-                            <i class="semi-big-icon green-speedometer"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                Transfer
-                            </div>
-                        </div>
-                        <div class="achievement-dialog status-block">
-                            <div class="button default-grey-button">
-                                Action
-                            </div>
-                        </div>
-                        <div class="achievement-dialog achieved-icon">
-                            <i class="semi-huge-icon green-tick"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Add class "achieved", "one-reward" !-->
-            <div class="achievements-cell ach-invite-friend">
-                <div class="achievements-cell-body">
-                    <div class="achievement-dialog left-icon">
-                        <i class="huge-icon achievement"></i>
-                    </div>
-                    <div class="achievement-full info">
-                        <div class="achievement-full title">
-                            [$16282]
-                        </div>
-                        <div class="achievement-full description">
-                            [$16283]
-                        </div>
-                        <div class="achievement-dialog expires-txt">
-                            <!-- do NOT translate this, it's on the JS side -->
-                            (Expires after <span>12</span> months)
-                        </div>
-                    </div>
-                    <div class="achievement-dialog right-block">
-                        <div class="achievement-dialog reward storage">
-                            <i class="semi-big-icon blue-cloud"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                storage space
-                            </div>
-                        </div>
-                        <div class="achievement-dialog reward bandwidth">
-                            <i class="semi-big-icon green-speedometer"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                Transfer
-                            </div>
-                        </div>
-                        <div class="achievement-dialog status-block">
-                            <div class="button default-grey-button">
-                                [$8726]
-                            </div>
-                        </div>
-                        <div class="achievement-dialog achieved-icon">
-                            <i class="semi-huge-icon green-tick"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Add class "achieved", "one-reward" !-->
-            <div class="achievements-cell ach-verify-number">
-                <div class="achievements-cell-body">
-                    <div class="achievement-dialog left-icon">
-                        <i class="huge-icon achievement"></i>
-                    </div>
-                    <div class="achievement-full info">
-                        <div class="achievement-full title">
-                            Create an account in MEGA
-                        </div>
-                        <div class="achievement-full description">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                        </div>
-                        <div class="achievement-dialog expires-txt">
-                            <!-- do NOT translate this, it's on the JS side -->
-                            (Expires after <span>12</span> months)
-                        </div>
-                    </div>
-                    <div class="achievement-dialog right-block">
-                        <div class="achievement-dialog reward storage">
-                            <i class="semi-big-icon blue-cloud"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                storage space
-                            </div>
-                        </div>
-                        <div class="achievement-dialog reward bandwidth">
-                            <i class="semi-big-icon green-speedometer"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                Transfer
-                            </div>
-                        </div>
-                        <div class="achievement-dialog status-block">
-                            <div class="button default-grey-button">
-                                Action
-                            </div>
-                        </div>
-                        <div class="achievement-dialog achieved-icon">
-                            <i class="semi-huge-icon green-tick"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Add class "achieved", "one-reward" !-->
-            <div class="achievements-cell ach-group-chat">
-                <div class="achievements-cell-body">
-                    <div class="achievement-dialog left-icon">
-                        <i class="huge-icon achievement"></i>
-                    </div>
-                    <div class="achievement-full info">
-                        <div class="achievement-full title">
-                            Create an account in MEGA
-                        </div>
-                        <div class="achievement-full description">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                        </div>
-                        <div class="achievement-dialog expires-txt">
-                            <!-- do NOT translate this, it's on the JS side -->
-                            (Expires after <span>12</span> months)
-                        </div>
-                    </div>
-                    <div class="achievement-dialog right-block">
-                        <div class="achievement-dialog reward storage">
-                            <i class="semi-big-icon blue-cloud"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                storage space
-                            </div>
-                        </div>
-                        <div class="achievement-dialog reward bandwidth">
-                            <i class="semi-big-icon green-speedometer"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                Transfer
-                            </div>
-                        </div>
-                        <div class="achievement-dialog status-block">
-                            <div class="button default-grey-button">
-                                Action
-                            </div>
-                        </div>
-                        <div class="achievement-dialog achieved-icon">
-                            <i class="semi-huge-icon green-tick"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Add class "achieved", "one-reward" !-->
-            <div class="achievements-cell ach-share-folder">
-                <div class="achievements-cell-body">
-                    <div class="achievement-dialog left-icon">
-                        <i class="huge-icon achievement"></i>
-                    </div>
-                    <div class="achievement-full info">
-                        <div class="achievement-full title">
-                            Create an account in MEGA
-                        </div>
-                        <div class="achievement-full description">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                        </div>
-                        <div class="achievement-dialog expires-txt">
-                            <!-- do NOT translate this, it's on the JS side -->
-                            (Expires after <span>12</span> months)
-                        </div>
-                    </div>
-                    <div class="achievement-dialog right-block">
-                        <div class="achievement-dialog reward storage">
-                            <i class="semi-big-icon blue-cloud"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                storage space
-                            </div>
-                        </div>
-                        <div class="achievement-dialog reward bandwidth">
-                            <i class="semi-big-icon green-speedometer"></i>
-                            <div class="achievement-dialog reward-txt">
-                                <!-- do NOT translate this, it's on the JS side -->
-                                <span>XX GB</span>
-                                Transfer
-                            </div>
-                        </div>
-                        <div class="achievement-dialog status-block">
-                            <div class="button default-grey-button">
-                                Action
-                            </div>
-                        </div>
-                        <div class="achievement-dialog achieved-icon">
-                            <i class="semi-huge-icon green-tick"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
+        <div class="achievements-list">
+            <!-- please place the achieved card to the end -->
+            <!-- Add class "achieved", "one-reward" !-->
+            <div class="achievements-cell ach-install-megasync">
+                <div class="image-container">
+                    <i class="semi-huge-icon80 achievements-icon"></i>
+                    <i class="semi-huge-icon80 green-tick"></i>
+                </div>
+                <div class="achievement-full info">
+                    <div class="subtitle-txt">
+                        [$16278]
+                    </div>
+                    <div class="content-txt">
+                        [$20235]
+                    </div>
+                    <div class="achievement-dialog expires-txt">
+                        <!-- do NOT translate this, it's on the JS side -->
+                        (Expires in <span>X</span> months)
+                    </div>
+                    <div class="default-green-button">[$16295]</div>
+                </div>
+                <div class="achievement-dialog bottom-block">
+                    <div class="achievement-dialog reward storage">
+                        <i class="medium-icon cloud-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$18322]
+                        </div>
+                        <span>XX GB</span>
+                    </div>
+                    <div class="achievement-dialog reward bandwidth">
+                        <i class="medium-icon speedometer-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$18323]
+                        </div>
+                        <span>XX GB</span>
+                    </div>
+                    <div class="achievement-dialog reward valid-period">
+                        <i class="medium-icon clock-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$20175]
+                        </div>
+                        <span>XX</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Add class "achieved", "one-reward" !-->
+            <div class="achievements-cell ach-install-mobile-app">
+                <div class="image-container">
+                    <i class="semi-huge-icon80 achievements-icon"></i>
+                    <i class="semi-huge-icon80 green-tick"></i>
+                </div>
+                <div class="achievement-full info">
+                    <div class="subtitle-txt">
+                        [$16280]
+                    </div>
+                    <div class="content-txt">
+                        [$20176]
+                    </div>
+                    <div class="achievement-dialog expires-txt">
+                        <!-- do NOT translate this, it's on the JS side -->
+                        (Expires in <span>X</span> months)
+                    </div>
+                    <div class="default-green-button">[$16295]</div>
+                </div>
+                <div class="achievement-dialog bottom-block">
+                    <div class="achievement-dialog reward storage">
+                        <i class="medium-icon cloud-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$18322]
+                        </div>
+                        <span>XX GB</span>
+                    </div>
+                    <div class="achievement-dialog reward bandwidth">
+                        <i class="medium-icon speedometer-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$18323]
+                        </div>
+                        <span>XX GB</span>
+                    </div>
+                    <div class="achievement-dialog reward valid-period">
+                        <i class="medium-icon clock-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$20175]
+                        </div>
+                        <span>XX</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Add class "achieved", "one-reward" !-->
+            <div class="achievements-cell ach-invite-friend">
+                <div class="image-container">
+                    <i class="semi-huge-icon80 achievements-icon"></i>
+                    <i class="semi-huge-icon80 green-tick"></i>
+                </div>
+                <div class="achievement-full info">
+                    <div class="subtitle-txt">
+                        [$16282]
+                    </div>
+                    <div class="icon-container">
+                        <div class="medium-icon remind-icon"></div>
+                        <div class="invitee-remind-pad">
+                            <div class="top-login-warning-arrow"></div>
+                            <div class="content-txt tooltip-content">[$20179]</div>
+                        </div>
+                    </div>
+                    <div class="content-txt-container">                             
+                        <ol>
+                            <li class="no-red-dot"><a>[$20177]</a></li>
+                            <li class="no-red-dot"><a>[$20178]</a></li>
+                        </ol>                   
+                    </div>
+                    <div class="achievement-dialog expires-txt"></div>
+                    <div class="default-green-button">[$8726]</div>
+                </div>
+                <div class="achievement-dialog bottom-block">
+                    <div class="achievement-dialog reward storage">
+                        <i class="medium-icon cloud-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$18322]
+                        </div>
+                        <span>XX GB</span>
+                    </div>
+                    <div class="achievement-dialog reward bandwidth">
+                        <i class="medium-icon speedometer-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$18323]
+                        </div>
+                        <span>XX GB</span>
+                    </div>
+                    <div class="achievement-dialog reward valid-period">
+                        <i class="medium-icon clock-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$20175]
+                        </div>
+                        <span>XX</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Add class "achieved", "one-reward" !-->
+            <div class="achievements-cell ach-sms-verification">
+                <div class="image-container">
+                    <i class="semi-huge-icon80 achievements-icon"></i>
+                    <i class="semi-huge-icon80 green-tick"></i>
+                </div>
+                <div class="achievement-full info">
+                    <div class="subtitle-txt">
+                        SMS verification
+                    </div>
+                    <div class="content-txt">
+                        Verify your mobile device as an additional security feature for your MEGA account. Added bonus: verifying your mobile number will allow your approved contacts to connect via MEGAChat.
+                    </div>
+                    <div class="achievement-dialog expires-txt">
+                        <!-- do NOT translate this, it's on the JS side -->
+                        Expires in <span>X</span> months
+                    </div>
+                    <div class="default-green-button">[$16295]</div>
+                </div>
+                <div class="achievement-dialog bottom-block">
+                    <div class="achievement-dialog reward storage">
+                        <i class="medium-icon cloud-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$18322]
+                        </div>
+                        <span>XX GB</span>
+                    </div>
+                    <div class="achievement-dialog reward valid-period">
+                        <i class="medium-icon clock-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$20175]
+                        </div>
+                        <span>XX</span>
+                    </div>
+                </div>
+            </div> 
+            <!-- Add class "achieved", "one-reward" !-->
+            <div class="achievements-cell ach-create-account achieved">
+                <div class="image-container">
+                    <i class="semi-huge-icon80 achievements-icon"></i>
+                    <i class="semi-huge-icon80 green-tick"></i>
+                </div>
+                <div class="achievement-full info">
+                    <div class="subtitle-txt">
+                        [$16401]
+                    </div>
+                    <div class="content-txt">
+                        [$16395]
+                    </div>
+                    <div class="achievement-dialog expires-txt">
+                        <!-- do NOT translate this, it's on the JS side -->
+                        Expires in <span>X</span> months
+                    </div>
+                    <div class="default-green-button">[$16295]</div>
+                </div>
+                <div class="achievement-dialog bottom-block">
+                    <div class="achievement-dialog reward storage">
+                        <i class="medium-icon cloud-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$18322]
+                        </div>
+                        <span>XX GB</span>
+                    </div>
+                    <div class="achievement-dialog reward bandwidth">
+                        <i class="medium-icon speedometer-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$18323]
+                        </div>
+                        <span>&#8212</span>
+                    </div>
+                    <div class="achievement-dialog reward valid-period">
+                        <i class="medium-icon clock-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$20175]
+                        </div>
+                        <span>XX</span>
+                    </div>
+                </div>
+            </div>                        
+        </div>
     </div>
 </div>
 
@@ -3229,7 +3083,7 @@
             </div>
             <div class="achievement-dialog header default">
                 <!-- do NOT translate this, it's on the JS side -->
-                Get <span>X GB</span>  free storage and <span>X GB</span> of Transfer for each friend that installs a MEGA app
+                Easy automated synchronisation between your computer and your MEGA cloud.
             </div>
             <div class="achievement-dialog green-header">
                 [$1070]
@@ -3314,7 +3168,7 @@
     </div>
 </div>
 
-<div class="fm-dialog invitation-dialog hidden">
+<div class="fm-dialog invitation-dialog hidden"> 
     <div class="fm-dialog-close"></div>
     <div class="fm-dialog-header">
         <div class="fm-dialog-title"><!--Invitation Status-->[$16101]</div>
@@ -3604,14 +3458,16 @@
 </div>
 
 <div class="dropdown body popup dropdown-arrow down-arrow fm-voucher-popup hidden">
+    <div class="fm-picker-dialog-title">[$7160]</div>
     <div class="fm-voucher-body">
-        <div class="fm-dialog-new-folder-input active">
-            <div class="fm-dialog-new-folder-pad"><input name="dialog-voucher" type="text" value="[$487]" /></div>
+        <div class="dialog-input-title-ontop">
+            <div class="title">[$487] </div>
+            <input class="dialog-input" type="text" value="" name="dialog-voucher" />
         </div>
-        <div class="fm-voucher-button default-white-button"><span>[$458]</span></div>
+        <div class="fm-voucher-button default-green-button semi-big right"><span>[$458]</span></div>
     </div>
-    <div class="fm-notifications-bottom">
-        <div class="fm-purchase-voucher default-grey-button"><span>[$457]</span></div>
+    <div class="fm-notifications-bottom voucher-container">
+        <div class="fm-purchase-voucher default-white-button semi-big right"><span>[$457]</span></div>
     </div>
 </div>
 
@@ -4907,7 +4763,7 @@
             <div class="clear"></div>
         </div>
         <div class="recover-image-block">
-            <div class="recover-image device-key">
+            <div class="recover-image device-key icon">
             </div>
         </div>
         <h1 class="step-main-question">[$19852]</h1>

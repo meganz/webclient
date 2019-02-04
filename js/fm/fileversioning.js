@@ -199,20 +199,17 @@ var versiondialogid;
             )
             .done(function(r) {
                 if (r === "0") {
-                    $('#versioning-status').prop('checked', true)
-                    $('.label-heading').text(l[17601]);
+                    $('#versioning-status').addClass('toggle-on');
                     fileversioning.dvState = 0;
                 }
                 else if (r === "1") {
-                    $('#versioning-status').prop('checked', false)
-                    $('.label-heading').text(l[7070]);
+                    $('#versioning-status').removeClass('toggle-on');
                     fileversioning.dvState = 1;
                 }
             })
             .fail(function (e) {
                 if (e === ENOENT) {
-                    $('#versioning-status').prop('checked', true)
-                    $('.label-heading').text(l[17601]);
+                    $('#versioning-status').addClass('toggle-on');
                     fileversioning.dvState = 0;
                 }
             });
@@ -226,6 +223,7 @@ var versiondialogid;
 
             $('.versioning-body-text').safeHTML(verionInfo);
         },
+
         /**
          * Open file versioning dialog and render file history versions list.
          * @param {hanlde} handle hanle of the file to render history versioning list.
@@ -314,7 +312,14 @@ var versiondialogid;
                     revertedNode.t = n.t;
                     req.cr = crypto_makecr([revertedNode], share, false);
                 }
-                api_req(req);
+                api_req(req, {
+                    callback: function(res) {
+                        if (typeof res === 'object' && res.f) {
+                            selectionManager.clear_selection();
+                            selectionManager.add_to_selection(res.f[0].h);
+                        }
+                    }
+                });
             };
             var fillVersionList = function(versionList) {
 

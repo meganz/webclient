@@ -31,7 +31,7 @@ function dashboardUI() {
     }
 
     M.onSectionUIOpen('dashboard');
-    accountUI.userUIUpdate();
+    accountUI.general.userUIUpdate();
 
     if (u_attr.b) {
         $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
@@ -292,27 +292,44 @@ function dashboardUI() {
         if (!u_attr.b || u_attr.b.s === -1) {
             accountUI.fillCharts(account, true);
 
+        accountUI.general.charts.init(account, true);
 
-            /* Used Storage progressbar */
-            var percents = [
-                100 * account.stats[M.RootID].bytes / account.space,
-                100 * account.stats[M.RubbishID].bytes / account.space,
-                100 * account.stats.inshares.bytes / account.space,
-                100 * account.stats[M.InboxID].bytes / account.space
-            ];
-            for (var i = 0; i < 4; i++) {
-                var $percBlock = $('.storage .account.progress-perc.pr' + i);
-                if (percents[i] > 0) {
-                    $percBlock.text(Math.round(percents[i]) + ' %');
-                    $percBlock.parent().removeClass('empty hidden');
-                }
-                else {
-                    $percBlock.text('');
-                    $percBlock.parent().addClass('empty hidden');
-                }
+
+        /* Used Storage progressbar */
+        var percents = [
+            100 * account.stats[M.RootID].bytes / account.space,
+            100 * account.stats[M.RubbishID].bytes / account.space,
+            100 * account.stats.inshares.bytes / account.space,
+            100 * account.stats[M.InboxID].bytes / account.space
+        ];
+        for (var i = 0; i < 4; i++) {
+            var $percBlock = $('.storage .account.progress-perc.pr' + i);
+            if (percents[i] > 0) {
+                $percBlock.text(Math.round(percents[i]) + ' %');
+                $percBlock.parent().removeClass('empty hidden');
             }
-            accountUI.renderProgressBar(account);
-            /* End of Used Storage progressbar */
+            else {
+                $percBlock.text('');
+                $percBlock.parent().addClass('empty hidden');
+            }
+        }
+
+        $('.account.progress-size.cloud-drive').text(
+            account.stats[M.RootID].bytes > 0 ? bytesToSize(account.stats[M.RootID].bytes) : '-'
+        );
+        // Rubbish bin
+        $('.account.progress-size.rubbish-bin').text(
+            account.stats[M.RubbishID].bytes > 0 ? bytesToSize(account.stats[M.RubbishID].bytes) : '-'
+        );
+        // Incoming shares
+        $('.account.progress-size.incoming-shares').text(
+            account.stats.inshares.bytes ? bytesToSize(account.stats.inshares.bytes) : '-'
+        );
+        // Inbox
+        $('.account.progress-size.inbox').text(
+            account.stats[M.InboxID].bytes > 0 ? bytesToSize(account.stats[M.InboxID].bytes) : '-'
+        );
+        /* End of Used Storage progressbar */
 
 
             /* Used Bandwidth progressbar */

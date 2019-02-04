@@ -1,6 +1,6 @@
 /*
  * Functionality for the General Data Protection Regulation (GDPR) data download functionality
- * Used on the /gdpr page and the /fm/account/history page
+ * Used on the /gdpr page and the /fm/account/security page
  */
 var gdprDownload = {
 

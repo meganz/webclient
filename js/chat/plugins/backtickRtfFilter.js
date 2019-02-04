@@ -134,6 +134,21 @@ BacktickRtfFilter.PARSER_STATE = {
 
 BacktickRtfFilter.PARSER_VALID_PREV_CHAR_MATCH = new RegExp(/\n|\s|\r/);
 
+BacktickRtfFilter.processUrlsInTickStrings = function(s) {
+    return Autolinker.link(s, {
+        truncate: 80,
+        className: 'chatlink',
+        newWindow: true,
+        stripPrefix: false,
+        twitter: false,
+        urls:{
+            schemeMatches: true,
+            wwwMatches: false,
+            tldMatches: false
+        }
+    });
+};
+
 BacktickRtfFilter.prototype.processBackticks = function(msgString, replaceGenCb) {
     var self = this;
     msgString = String(msgString);
@@ -155,9 +170,13 @@ BacktickRtfFilter.prototype.processBackticks = function(msgString, replaceGenCb)
         ) {
             if (state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_MULTI) {
                 state = BacktickRtfFilter.PARSER_STATE.REGULAR;
+                // linkify http(s?):// ONLY urls
+
+                var newPlaceHolderString = BacktickRtfFilter.processUrlsInTickStrings(placeholderString);
+
                 newString += replaceGenCb(
                     "```" + placeholderString + "```",
-                    '<pre class="rtf-multi">' + placeholderString + '</pre>',
+                    '<pre class="rtf-multi">' + newPlaceHolderString + '</pre>',
                     placeholderString
                 );
                 placeholderString = "";
@@ -198,9 +217,10 @@ BacktickRtfFilter.prototype.processBackticks = function(msgString, replaceGenCb)
                 }
                 else {
                     state = BacktickRtfFilter.PARSER_STATE.REGULAR;
+                    var newPlaceHolderString = BacktickRtfFilter.processUrlsInTickStrings(placeholderString);
                     newString += replaceGenCb(
                         "`" + placeholderString + "`",
-                        '<pre class="rtf-single">' + placeholderString + '</pre>',
+                        '<pre class="rtf-single">' + newPlaceHolderString + '</pre>',
                         placeholderString
                     );
                     placeholderString = "";

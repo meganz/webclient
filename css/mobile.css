@@ -477,7 +477,12 @@ ul, li {
     vertical-align: middle;
     width: 100%;
     font-size: 15px;
-    max-width: 420px;
+}
+.mobile.two-factor-qr-seed {
+    text-align: center;
+}
+.mobile.recovery-key-string {
+    margin: 8px 0;
 }
 .mobile.text-button, .upload-overlay .upload-another-file.hidden + .mobile.text-button  {
     color: #8B9FAA;
@@ -3761,6 +3766,7 @@ div.checkboxOn, div.checkboxOff {
     color: #eb4444;
     margin-top: -24px;
     padding-left: 0;
+    text-align: center;
 }
 .mobile .two-factor-page.verify-login-page .warning-text-field {
     text-align: center;
@@ -5448,8 +5454,8 @@ select.mobile.dropdown-style {
     border-radius: 4px;
     cursor: pointer;
     letter-spacing: .1px;
-    max-width: 360px;
-    font-family: 'LatoWebBold', 'source_sans_proregular', sans-serif;
+    margin: 0 auto;
+    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
 }
 .securitypractice .mobile.cta-button {
     margin: 0 auto;
@@ -6987,6 +6993,17 @@ textarea.mobile.support-text-field {
     font-size: 0.8em;
     line-height: 1.5;
 }
+
+/* Show selected state on Pro cards for mobile when the card is clicked */
+.mobile .reg-st3-membership-bl.selected .membership-pad-bl {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
+}
+.mobile .reg-st3-membership-bl .purchase-plan-button {
+    z-index: 2;
+}
+
 /* Make sure Free plan is shown after registration */
 body.key .reg-st3-membership-bl.free.hidden {
     display: inline-block !important;
@@ -7534,10 +7551,9 @@ body.key .reg-st3-membership-bl.free.hidden {
     margin-left: 24px;
     font-size: 14px;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-
 }
 .mobile .improved-recovery-steps strong {
-   font-family: 'LatoWeb', 'source_sans_probold', Arial
+    font-family: 'LatoWeb', 'source_sans_probold', Arial;
     color: #333;
     font-weight: 800;
 }
@@ -8285,7 +8301,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 }
 .mobile.dialog-heading-text {
     font-size: 17px;
-    margin: 0 auto;
+    margin: 0 auto 12px;
     word-break: break-word;
 }
 .mobile.dialog-body-text, .mobile.payment-result .payment-result-txt {
@@ -8897,6 +8913,10 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     top: initial;
     margin: 0 0;
 }
+.mobile.main-block.payment-result.success .payment-result-pad {
+    width: calc(100%);
+    margin: 0 auto;
+}
 .mobile.footer-block {
     position: fixed;
     width: calc(100% - 16px);
@@ -9447,6 +9467,22 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     display: none;
 }
 
+.mobile .contact-us-revamp .main-mid-pad.new-bottom-pages {
+    padding-bottom: 0;
+    padding-top: 0;
+}
+.mobile .contact-us-revamp .contact-new-txt {
+    margin-left: 40px;
+}
+.mobile .contact-us-revamp .contact-new-button, .mobile a.contact-new-button {
+    margin-left: 40px;
+}
+.mobile .contact-us .contact-new-column {
+    margin-bottom: 56px;
+    margin-top: 56px;
+}
+
+
 /* Only media queries after here */
 @media only screen and (max-width: 970px) {
     .securitypractice .security-page-video-block {
@@ -9458,6 +9494,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         height: auto;
     }
 }
+
+
 @media only screen and (orientation:portrait) {
     .wrong-file .mobile.content-row, .downloading .mobile.content-row, .uploading .mobile.content-row {
         width: 100%;
@@ -9471,6 +9509,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         background-image: none;
     }
 }
+
 
 @media only screen and (orientation:landscape) and (max-width: 1280px), only screen and (orientation:portrait) and (max-height: 1280px) {
     .mobile.tablet-img {
@@ -9547,6 +9586,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     }
 }
 
+
 @media only screen and (orientation:portrait) and (max-height: 1280px) {
     .mobile.video .download.video-block {
         height: 200px;
@@ -9558,6 +9598,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         height: fit-content;
     }
 }
+
 
 @media only screen and (orientation:landscape) and (min-width: 768px) and (min-height: 768px), only screen and (orientation:portrait) and (min-height: 768px) and (min-width: 768px) {
     .mobile .improved-recovery-steps .backup-input-button.recover-button {
@@ -9690,6 +9731,13 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile.key .horizontal-plans .bottom-page .reg-st3-membership-bl {
         width: 222px;
     }
+    .mobile.recovery-key-page .mobile.recovery-key-block, .two-factor-qr-block, .mobile.my-account-change-password-page .update-password {
+        margin: 26px 38px 0 38px;
+    }
+    .mobile.verify-login-page .two-factor-qr-block {
+        margin: 0 auto;
+        padding: 36px 38px;
+    }
     .mobile.pro-card-container {
         margin-left: -48px;
         width: calc(100% + 60px);
@@ -9697,8 +9745,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile.my-account-page .avatar-name-block {
         margin-top: -128px;
     }
-
 }
+
+
 @media only screen and (orientation:landscape) and (max-width: 800px), only screen and (orientation:portrait) and (max-height: 800px) {
     .mobile.homepage .company-slogan {
         font-size: 24px;
@@ -9802,6 +9851,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     }
 }
 
+
 @media only screen and (orientation:landscape) and (max-width: 800px) {
     .mobile.white-block {
         margin: 0;
@@ -9829,6 +9879,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         margin: 0 0;
     }
 }
+
 
 @media only screen and (orientation:landscape) and (max-width: 670px), only screen and (orientation:portrait) and (max-height: 670px) {
     .mobile.white-block {
@@ -9913,6 +9964,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         font-size: 20px;
     }
 }
+
+
 @media only screen and (orientation:landscape) and (max-width: 670px) {
     .mobile.white-block {
         margin: 0;
@@ -9921,6 +9974,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         margin: 0 0 ;
     }
 }
+
+
 @media only screen and (orientation:landscape) and (max-width: 570px), only screen and (orientation:portrait) and (max-height: 570px) {
     .mobile.filetype-img, .downloaidng .mobile.filetype-img, .wrong-file .mobile.filetype-img {
         width: 54px;
@@ -10017,8 +10072,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .video-info-block span.play-video-encouragement {
         text-align: left;
     }
-
 }
+
+
 @media only screen and (orientation:landscape) and (max-width: 570px) {
     .mobile.white-block {
         margin: 0;
@@ -10033,6 +10089,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         min-height: 0;
     }
 }
+
+
 @media only screen and (max-width: 414px) {
     .mobile.my-account-page .pro-plan-name {
         display: block;
@@ -10086,6 +10144,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     }
 
 }
+
 
 /* Adjust the layout of the My Account page for longer screens to push buttons into acceptable range */
 @media only screen and (min-height: 668px) {
@@ -10150,6 +10209,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     }
 }
 
+
 /* Specific styles for showing grid view on devices in landscape and portrait*/
 @media only screen and (orientation:landscape) and (min-width: 813px) and (max-width: 1025px), only screen and (orientation:portrait) and (min-height: 740px) and (max-height: 800px) {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
@@ -10159,11 +10219,15 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         padding: 0 0;
     }
 }
+
+
 @media only screen and (orientation:landscape) and (max-width: 825px), only screen and (orientation:portrait) and (max-height: 420px) {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 60px) / 4);
     }
 }
+
+
 /* iPhone X Portrait styles go here */
 @media only screen and (orientation:landscape) and (max-width: 376px), only screen and (orientation:portrait) and (min-height: 801px) and (max-height: 813px) {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
@@ -10187,14 +10251,18 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         -ms-transform: scale(0.75);
         -o-transform: scale(0.75);
         transform: scale(0.75);
-} 
+    } 
 }
+
+
 /* Devices larger than 400px wide in portrait */
 @media only screen and (orientation:landscape)and (min-width: 412px) and (max-width: 415px), only screen and (orientation:portrait) and (min-height: 810px) and (max-height: 824px) {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 36px) / 2);
     }
 }
+
+
 /*iphone se portrait styles */
 @media only screen and (orientation:landscape) and (max-width: 321px), only screen and (orientation:portrait) and (max-height: 569px) {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
@@ -10233,14 +10301,16 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .securitypractice .bottom-page.large-subheader {
         margin-top: 12px;
     }
-    }
 }
+
+
 /*iphone se landscape styles */
 @media only screen and (orientation:portrait) and (max-height: 321px), only screen and (orientation:landscape) and (max-width: 569px) {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 60px) / 3);
     }
 }
+
 
 /* Large tablets Landscape styles go here */
 @media only screen and (orientation:landscape) and (min-width: 1280px) and (max-width: 1440px), only screen and (orientation:portrait) and (min-height: 1025px) and (max-height: 1025px) {
@@ -10261,6 +10331,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     }
 }
 
+
 /* Large tablets Portrait styles go here */
 @media only screen and (orientation:landscape) and (min-width:900px) and (max-width: 1025px), only screen and (orientation:portrait) and (min-height: 1281px) and (max-height: 1367px) {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
@@ -10271,6 +10342,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         height: 360px;
     }
 }
+
+
 /* For screens with larger width than 400px e.g. iPhone 7S etc make the Pro page step 2 items show on the same line */
 @media only screen and (min-width: 400px) and (max-width: 500px) {
     .mobile .improved-recovery-steps .vert-container-aligner {
@@ -10291,6 +10364,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         width: calc(252px * 5);
     }
 }
+
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
     .mobile.tablet-img {
         background-image: url(../images/mobile/ipad-big@2x.png);
@@ -10332,6 +10407,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     }
 }
 
+
 @media screen and (orientation:landscape) {
     .app-info-block .mobile.download-app {
         display: none;
@@ -10348,11 +10424,14 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         max-width: 100px;
     }
 }
+
+
 @media screen and (orientation:portrait) {
     .mobile .improved-recovery-steps .main-right-block {
         display: none;
     }
 }
+
 
 @keyframes rotate-loading {
     0% {

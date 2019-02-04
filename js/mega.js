@@ -920,6 +920,17 @@ scparser.$add('opc', {
         processOPC([a]);
 
         if (fminitialized) {
+            if (M.currentdirid === 'opc') {
+                for (var g = 0; g < M.v.length; g++) {
+                    if (M.v[g].p === a.p) {
+                        M.v[g] = a;
+                        break;
+                    }
+                    else if (g === (M.v.length - 1)) {
+                        M.v.push(a);
+                    }
+                }
+            }
             M.drawSentContactRequests([a]);
         }
     }
@@ -1068,10 +1079,10 @@ scparser.$add('sd', {
     b: function() {
         "use strict";
 
-        if (fminitialized && page === 'fm/account/history') {
+        if (fminitialized && page === 'fm/account/security') {
             // need to wait until session history is refreshed.
             setTimeout(function() {
-                accountUI.updateSessionTable(true);
+                accountUI.security.session.update(true);
             }, 3000);
         }
     }

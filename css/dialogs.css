@@ -3548,8 +3548,8 @@ li.token-input-token-invite .input-close {
 }
 
 .bus-welcome-dialog {
-    width: 596px;
-    margin-left: -298px;
+    width: 612px;
+    margin-left: -306px;
     margin-top: -270px;
 }
 
@@ -3566,9 +3566,7 @@ li.token-input-token-invite .input-close {
     margin: auto;
     display: block;
 }
-
 .user-management-dialog .bus-welcome-logo {
-    background-image: url(../images/mega/big-icons.png);
     background-position: -8px -1420px;
     width: 102px;
     height: 75px;
@@ -3579,20 +3577,9 @@ li.token-input-token-invite .input-close {
     width: 100%;
     position: relative;
 }
-
-.bus-welcome-dialog .dialog-input-container::before {
-    content: " ";
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 1px;
-    position: absolute;
-    background-color: rgba(0,0,0,0.1);
-}
-
 .user-management-dialog .dialog-right-block,
 .user-management-dialog .dialog-left-block {
-    width: 256px;
+    width: 272px;
     display: inline-block;
     vertical-align: top;
     box-sizing: border-box;
@@ -3601,7 +3588,6 @@ li.token-input-token-invite .input-close {
     transition: 0.5s;
     cursor: pointer;
 }
-
 .user-management-dialog .dialog-right-block:hover,
 .user-management-dialog .dialog-left-block:hover {
     background-color: #fff;
@@ -3610,12 +3596,12 @@ li.token-input-token-invite .input-close {
 }
 
 .user-management-dialog .dialog-left-block {
-    margin: 16px 0 -24px 40px;
+    margin: 16px 0 -24px 32px;
     padding: 24px;
 }
 
 .user-management-dialog .dialog-right-block {
-    margin: 16px 40px -24px 0px;
+    margin: 16px 32px -24px 0px;
     padding: 24px;
 }
 
@@ -3639,6 +3625,22 @@ li.token-input-token-invite .input-close {
 
 .bus-welcome-dialog .default-white-button-user-management {
     margin-right: 32px;
+}
+.user-management-dialog.payment-reminder {
+    width: 596px;
+    margin-left: -298px;
+    margin-top: -190px;
+    padding-bottom: 40px;
+    text-align: center;
+}
+.user-management-dialog.payment-reminder .payment-reminder-logo {
+    background-position: -20px -969px;
+    width: 80px;
+    height: 80px;
+    display: block;
+}
+.user-management-dialog.payment-reminder .big-red-button {
+    margin: 0;
 }
 
 /* Recover account */

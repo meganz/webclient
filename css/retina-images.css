@@ -309,44 +309,14 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 48px auto;
 }
 
-.user-management-view .icon48, .user-management-dialog .icon48{
+.user-management-view .icon48, .user-management-dialog .icon48, .user-management-view .icon56, .user-management-dialog .icon56, .user-management-view-data .user-management-view-overall-usage .user-management-storage .img, .user-management-view-data .user-management-view-overall-usage .user-management-transfer .img, .user-management-landing-page .mega-56px-icon,  .user-management-view .icon64, .user-management-dialog .icon64, .user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon, .user-management-dialog .dialog-heading-img, .user-management-dialog .sent-email-logo, .bus-reg-btn .next-arrow, .bus-reg-btn-2 .next-arrow, .bus-plan-icon64, .bus-reg-featureImg100, .bus-confirm-body .bus-confirmImg, .user-management-account-settings .setting-icon24 {
     background-image: url(../images/mega/big-icons@2x.png);
     background-size: 192px auto;
 }
-
-.user-management-view .icon56, .user-management-dialog .icon56 {
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
-.user-management-view-data .user-management-view-overall-usage .user-management-storage .img, .user-management-view-data .user-management-view-overall-usage .user-management-transfer .img{
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
-.user-management-landing-page .mega-56px-icon{
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
-.user-management-view .icon64, .user-management-dialog .icon64 {
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-.user-management-account-settings .invoice-detail .mega-logo {
+.user-management-account-settings .invoice-detail .mega-logo, .user-management-account-settings .icon12 {
     background-image: url(../images/mega/invoice-image_v1@2x.png);
     background-size: 120px auto;
 }
-.user-management-account-settings .icon12{
-    background-image: url(../images/mega/invoice-image_v1@2x.png);
-    background-size: 120px auto;
-}
-
-.user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon{
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
 .user-management-view .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-out-share, 
 .fm-right-header-user-management .folder-small-icon.ex-out-share, 
 .user-management-dialog .folder-small-icon.ex-out-share,
@@ -362,12 +332,6 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/top-sprite_v5@2x.png);
      background-size: 38px auto;
 }
-
-.user-management-dialog .sent-email-logo {
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
 .bus-reg-icon {
     background-image: url(../images/mega/top-sprite_v5@2x.png);
      background-size: 38px auto;
@@ -375,34 +339,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 
 .bus-reg-checkbox.checkOn::before {
     background-image: url(../images/mega/top-login-sprite_v11@2x.png);
-
 }
-
-.bus-reg-btn .next-arrow, .bus-reg-btn-2 .next-arrow {
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
-.bus-plan-icon64 {
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
-.bus-reg-featureImg100 {
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
-.bus-confirm-body .bus-confirmImg {
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-} 
-
-.user-management-account-settings .setting-icon24 {
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
 .bottom-page.large-icon, .cropped-page .bottom-page.big-icon, .cropped-page .bottom-page.top-title::before, .mobile-apps-button.uwp,.uwp .advertise-chat .mobile-apps-button.red span::before {
     background-image: url(../images/mega/new-pages-sprite_v2@2x.png) !important;
     background-size: 376px auto;
@@ -411,12 +348,6 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/2fa-auth-apps@2x.png);
     background-size: 72px auto;
 }
-.user-management-dialog .bus-welcome-logo {
-    background-image: url(../images/mega/big-icons@2x.png);
-    background-size: 192px auto;
-}
-
-
 .improved-recovery-steps .recover-image, .improved-recovery-steps .session-image-block, .improved-recovery-steps .recover-button.yes::after, .improved-recovery-steps .recover-button.no::after, .tooltip-block .minimum-password-block .password-icon    {
     background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
     background-size: 344px auto;

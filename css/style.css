@@ -24143,7 +24143,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 .default-white-button-user-management, .default-green-button-user-management, .default-red-button-user-management, .default-grey-button-user-management{
     height: 36px;
-    width: auto;
     box-sizing: border-box;
     border: 1px solid rgba(0,0,0,0.1);
     border-radius: 4px;
@@ -24151,7 +24150,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
     font-size: 15px;
     line-height: 34px;
-    padding: 0 16px;
+    padding: 0px 16px;
     cursor: pointer;
     transition: 0.1s;
     display: inline-block;
@@ -24463,8 +24462,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .business-dashboard .folder-small-icon.ex-out-share{
     background-position: -11px -1981px;
     opacity: 0.4;
-
-
 }
 
 .user-management-view .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-in-share, 
@@ -24474,7 +24471,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: -12px -2011px;
     opacity: 0.4;
 }
-
 
 .fm-right-files-block {
     margin-left: 304px;
@@ -24489,7 +24485,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     z-index: 102;
     cursor: pointer;
 }
-
 .user-management-overview-bar::before{
     content: '';
     display: block;
@@ -24497,24 +24492,22 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: 1px;
     background-color: rgba(0,0,0,0.1)
 }
-
 .user-management-overview-bar-data{
     position: absolute;
     margin-left: -430px;
     left:50%;
 }
-
-
 .user-management-overview-bar-data .info-block {
-    margin:16px 0px;
-    float: left;
+    display: inline-block;
+    position: relative;
+    padding: 0 32px;
 }
-
-
-.user-management-overview-bar-data .info-block:not(:nth-child(3))::after{
+.user-management-overview-bar-data .info-block:not(:nth-child(3))::after {
     content: '';
     display: inline-block;
-    margin:6px 32px 0 32px;
+    position: absolute;
+    top: 22px;
+    right: 0;
     width:2px;
     height: 24px;
     background-color: rgba(0,0,0,0.1)
@@ -24524,7 +24517,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:20px;
     height:20px;
     padding:0;
-    margin:6px 8px 6px 0;
+    margin:22px 8px 20px 0;
     background-image: url(../images/mega/fm-main-sprite_v7.png);
     background-repeat: no-repeat;
     float: left;
@@ -24546,25 +24539,24 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     color: #666666;
     font-size: 14px;
     line-height: 18px;
-    padding: 7px 8px 0 0;
-    float: left;
+    padding-right: 8px;
     max-width: 180px;
 }
 
 .user-management-overview-bar-data .info-block .title2 {
     color: #666666;
     font-size: 14px;
-    line-height: 32px;
+    line-height: 60px;
+    height: 60px;
     padding-left: 8px;
-    float: left;
 }
 
 .user-management-overview-bar-data .info-block .number {
     color: #333333;
     font-size: 24px;
     font-weight: 300;
-    line-height: 32px;
-    float: left;
+    line-height: 60px;
+    height: 60px;
     font-family: source_sans_prolight;
 }
 
@@ -24917,13 +24909,13 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-subuser-profile-container .user-management-subuser-profile{
     padding:32px 0 32px 226px;
     position: relative;
-    max-width: 640px;
+    max-width: 740px;
 }
 
 .user-management-subuser-profile-container .subuser-container {
     position: relative;
     display: inline-block;
-    margin-right: 48px;
+    margin-right: 80px;
 }
 
 .user-management-subuser-profile-container .subuser-sec-profile-container {
@@ -25256,7 +25248,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .subaccount-view-used-data .used-storage-info{
-    width:70%;
+    width:90%;
     height: 24px;
     margin-bottom: 16px;
     max-width: 800px;
@@ -25316,7 +25308,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: inline-block;
     margin-left: 12px;
     float: left;
-    width: 188px;
+    width: 260px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -25332,7 +25324,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     line-height: 24px;
     position: relative;
     display: inline-block;
-    width:200px;
+    width:190px;
 }
 
 .subaccount-view-used-data .used-storage-info .file-number,
@@ -25775,6 +25767,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: 32px;
     width: 166px;
     padding: 8px;
+    outline: none;
     font-family: 'Source Sans Pro', sans-serif; 
 }
 
@@ -26249,12 +26242,13 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-dialog .dialog-title {
     font-size: 26px;
     color: #333333;
-    line-height: 32px;
+    line-height: 36px;
     font-weight: 300;
     position: relative;
     margin:0 auto 16px auto;
     text-align: center;
     font-family: 'montserrat';
+    max-width: 90%;
 }
 
 .user-management-dialog .dialog-title.left-version {
@@ -26337,18 +26331,19 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-add-user-dialog .invite-link-option {
-    height: 24px;
-    margin: 24px 32px;
-    float: left;
+    margin: 18px 0px 18px 32px;
+    display: inline-block;
     position: relative;
 }
 
-.user-management-add-user-dialog .invite-link-option span{
+.user-management-add-user-dialog .invite-link-option .enable-pw-txt{
     font-size: 13px;
     line-height: 24px;
     color:#888;
-    height: 24px;
+    max-width: 220px;
     vertical-align: top;
+    margin-right: 16px;
+    display: inline-block;
 }
 
 .user-management-add-user-dialog .dialog-feature-toggle {
@@ -26358,8 +26353,8 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     cursor: pointer;
     display: inline-block;
     height: 20px;
-    margin-left: 16px;
     width: 40px;
+    margin-top: 2px;
 }
 
 .user-management-add-user-dialog .dialog-feature-toggle .dialog-feature-switch {
@@ -26439,6 +26434,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-dialog .dialog-heading-img {
+    background-image: url(../images/mega/big-icons.png);
     margin:40px auto 24px auto;
 }
 
@@ -26478,14 +26474,12 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 .user-management-dialog .dialog-button-container,
 .fm-dialog.sub-account-link-password .dialog-button-container{
-    height: 72px;
+    min-height: 60px;
     background-color: rgba(250,250,250,1);
     position: relative;
     border-radius: 0 0 8px 8px;
     margin-top:40px;
 }
-
-
 
 .user-management-dialog .dialog-button-container::before,
 .fm-dialog.sub-account-link-password .dialog-button-container::before {
@@ -26502,60 +26496,21 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-dialog .dialog-button-container .default-green-button-user-management,
 .user-management-dialog .dialog-button-container .default-red-button-user-management,
 .user-management-dialog .dialog-button-container .default-grey-button-user-management {
-    padding: 6px 24px;
+    height: 36px;
+    padding: 0px 20px;
     float: right;
-    line-height: 22px;
+    line-height: 34px;
     font-size: 16px;
-    margin:18px 32px 0 12px;
+    margin:12px 32px 0 12px;
 }
 
 .user-management-dialog .default-white-button-user-management {
     height: 36px;
     float: right;
-    margin:18px 0px 0 32px;
+    margin:12px 0px 0 32px;
     line-height: 34px;
     font-size: 16px;
 }
-
-
-/*.user-management-add-user-dialog .licence-bar {
-    width: 100%;
-    height: 56px;
-    background-color: rgba(250,250,250,1);
-    position: relative;
-    border-radius: 0px 0 8px 8px;
-    box-sizing: border-box;
-    padding: 0;
-    color: #333333;
-    font-size: 14px;
-    line-height: 56px;
-
-}
-
-.user-management-add-user-dialog .licence-bar::before {
-    content: " ";
-    width: 100%;
-    height: 1px;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.user-management-add-user-dialog .licence-bar .icon{
-    opacity: 0.8;
-    float: left;
-    margin: 16px 4px 16px 24px;
-}
-
-.user-management-dialog .licence-bar .default-white-button-user-management {
-    position: absolute;
-    right: 0px;
-    top:12px;
-    color: #666;
-    margin-right: 24px;
-}*/
-
 .user-management-dialog .delete-img.icon {
     position: absolute;
     width: 24px;
@@ -26575,7 +26530,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     border-radius: 4px;
     border:1px solid rgba(0,0,0,0.1);
 }
-
 
 .user-management-add-user-dialog .verification-container .verification-user-info {
     width: auto;
@@ -26641,7 +26595,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 .user-management-edit-profile-dialog .user-management-subuser-avatars {
     float: left;
-    margin: 36px 12px 0 32px;
+    margin: 40px 12px 0 32px;
     cursor: pointer;
 }
 .user-management-edit-profile-dialog .dialog-title {
@@ -26681,6 +26635,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin-bottom: 4px;
     z-index: 998;
     transition: 0.1s;
+    max-width: 300px;
 }
 
 .user-management-subaccount-view-container .pending-email-note:hover .top-login-warning.edit-email-warning {
@@ -26722,9 +26677,8 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 .user-management-able-user-dialog {
     width: 500px;
-    height: 224px;
     margin-left: -250px;
-    margin-top: -112px;
+    margin-top: -102px;
 }
 .user-management-able-user-dialog .icon64{
     position: relative;
@@ -29071,11 +29025,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     float: right;
     width: 100px;
 }
-
-.business-dashboard .subaccount-view-used-data .used-storage-info .ff-number {
-    width: 190px;
-}
-
 .business-dashboard .qr-container {
     width:calc(34% - 42px);
     height: 352px;
@@ -29129,7 +29078,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     left: 50%;
     margin-left: -280px;
     top: 50%;
-    margin-top: -98px;
+    margin-top: -170px;
 }
 
 .user-management-migrate-process-dialog .heading-text{
@@ -29178,7 +29127,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .process-arrow {
-    background-position: -124px 1088px;
+    background-position: -124px -1088px;
 }
 
 .user-management-migrate-process-dialog .process-arrow {
@@ -29199,6 +29148,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-color: rgba(250,250,250,1);
     position: relative;
     box-sizing: border-box;
+    border-radius: 0 0 8px 8px;
 }
 
 .user-management-migrate-process-dialog .bottom-container::before {
@@ -29272,7 +29222,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
     .user-management-overview-bar-data {
         left: 50%;
-        margin-left: -320px;
+        margin-left: -400px;
     }
 
     .user-management-overview-bar-data .info-block .title {
@@ -29283,11 +29233,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     .user-management-overview-bar-data .info-block .icon, .user-management-overview-bar-data .default-white-button-user-management {
         display: none;
     }
-
-    .user-management-overview-bar-data .info-block:not(:nth-child(3))::after{
-    margin:6px 20px 0 20px;
-    }
-
     .user-management-overview-container .data-analysis-container .storage-analysis-container, .user-management-overview-container .data-analysis-container .transfer-analysis-container {
         width: 99.5%;
         margin:0px 0.25% 12px 0.25%;

@@ -173,7 +173,7 @@ mobile.account = {
         'use strict';
 
         // if this is business dont show
-        if (u_attr.b) {
+        if (u_attr.b && u_attr.b.s !== -1) {
             $page.find('.account-upgrade-block').addClass('hidden');
         }
         else {

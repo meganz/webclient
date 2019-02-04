@@ -60,7 +60,30 @@ BusinessRegister.prototype.initPage = function () {
     // check if this is logged in user
     if (u_type) {
         if (u_attr.b) {
-            return loadSubPage("start");
+            if (u_attr.b.s !== -1) {
+                return loadSubPage("start");
+            }
+            else {
+                $nbUsersInput.val(Object.keys(M.suba).length);
+                $nbUsersInput.prop('disabled', true);
+                /////
+                $cnameInput.prop('disabled', true);
+                $telInput.prop('disabled', true);
+                mega.attr.get(u_attr.b.bu, '%name', -1, undefined,
+                    function(res, ctx) {
+                        $cnameInput.prop('disabled', false);
+                        if (typeof res !== 'number' && ctx.ua === "%name") {
+                            $cnameInput.val(from8(base64urldecode(res)));
+                        }
+                    });
+                mega.attr.get(u_attr.b.bu, '%phone', -1, undefined,
+                    function(res, ctx) {
+                        $telInput.prop('disabled', false);
+                        if (typeof res !== 'number' && ctx.ua === "%phone") {
+                            $telInput.val(from8(base64urldecode(res)));
+                        }
+                    });
+            }
         }
         $emailInput.val(u_attr['email']);
         $emailInput.prop('disabled', true);
@@ -317,7 +340,7 @@ BusinessRegister.prototype.initPage = function () {
         business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
             mySelf.planPrice = Number.parseFloat(info.p);
             mySelf.planInfo = info;
-            updatePriceGadget(3);
+            updatePriceGadget($nbUsersInput.val() || 3);
 
             // testing
             // var userInfo = {

@@ -36,7 +36,12 @@ function dashboardUI() {
     if (u_attr.b) {
         $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
         $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
-        $('.dashboard .button.upgrade-account').addClass('hidden');
+        if (u_attr.b.s !== -1) {
+            $('.dashboard .button.upgrade-account').addClass('hidden');
+        }
+        else {
+            $('.dashboard .button.upgrade-account').removeClass('hidden');
+        }
         if (u_attr.b.m) {
             $('.business-dashboard .go-to-usermanagement-btn').removeClass('hidden');
 
@@ -243,7 +248,7 @@ function dashboardUI() {
                     }
                 }
                 else {
-                    $businessLeft.find('.suba-status').removeClass('disabled').removeClass('pending active')
+                    $businessLeft.find('.suba-status').addClass('disabled').removeClass('pending active')
                         .text(l[19608]);
                 }
 
@@ -284,30 +289,30 @@ function dashboardUI() {
         $.leftPaneResizable.options.updateWidth = maxwidth;
 
         $($.leftPaneResizable).trigger('resize');
-        if (!u_attr.b) {
+        if (!u_attr.b || u_attr.b.s === -1) {
             accountUI.fillCharts(account, true);
 
 
-        /* Used Storage progressbar */
-        var percents = [
-            100 * account.stats[M.RootID].bytes / account.space,
-            100 * account.stats[M.RubbishID].bytes / account.space,
-            100 * account.stats.inshares.bytes / account.space,
-            100 * account.stats[M.InboxID].bytes / account.space
-        ];
-        for (var i = 0; i < 4; i++) {
-            var $percBlock = $('.storage .account.progress-perc.pr' + i);
-            if (percents[i] > 0) {
-                $percBlock.text(Math.round(percents[i]) + ' %');
-                $percBlock.parent().removeClass('empty hidden');
+            /* Used Storage progressbar */
+            var percents = [
+                100 * account.stats[M.RootID].bytes / account.space,
+                100 * account.stats[M.RubbishID].bytes / account.space,
+                100 * account.stats.inshares.bytes / account.space,
+                100 * account.stats[M.InboxID].bytes / account.space
+            ];
+            for (var i = 0; i < 4; i++) {
+                var $percBlock = $('.storage .account.progress-perc.pr' + i);
+                if (percents[i] > 0) {
+                    $percBlock.text(Math.round(percents[i]) + ' %');
+                    $percBlock.parent().removeClass('empty hidden');
+                }
+                else {
+                    $percBlock.text('');
+                    $percBlock.parent().addClass('empty hidden');
+                }
             }
-            else {
-                $percBlock.text('');
-                $percBlock.parent().addClass('empty hidden');
-            }
-        }
-        accountUI.renderProgressBar(account);
-        /* End of Used Storage progressbar */
+            accountUI.renderProgressBar(account);
+            /* End of Used Storage progressbar */
 
 
             /* Used Bandwidth progressbar */

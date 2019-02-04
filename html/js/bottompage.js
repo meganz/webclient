@@ -20,7 +20,7 @@ var bottompage = {
         if (page === 'business') {
             bottompage.initSlider();
         }
-        if (u_attr && u_attr.b) {
+        if (u_attr && u_attr.b && u_attr.b.s !== -1) {
             $('.bottom-menu.body .resellerlink').hide(); // hidden class is overwritten
             $('.bottom-menu.body .pro-link').hide(); // hidden class is overwritten
         }

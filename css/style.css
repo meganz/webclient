@@ -9038,6 +9038,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .versioning .versioning-indicator {
     display: block;
 }
+.taken-down .dialog.versioning-indicator {
+    display: none;
+}
 .file-status-icon.star + .dialog.versioning-indicator {
     left: 44px;
 }

@@ -840,7 +840,7 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
     maf = maf[ach.ACH_INVITE];
 
     var locFmt = l[16283].replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
-    $('.hint', $dialog).safeHTML('%n', locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+    $('.hint', $dialog).safeHTML('%n', locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0), maf.expiry.value);
 
     // Due specific M.maf.rwds structure sorting must be done respecting it
     var getSortByMafEmailFn = function() {

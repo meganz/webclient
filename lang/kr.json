@@ -1880,6 +1880,9 @@
     "17694": "\ud0a4 \ub2e4\uc6b4\ub85c\ub4dc",
     "17695": "\uc77c",
     "17696": "GB",
+    "17697": "YYYY",
+    "17698": "MM",
+    "17699": "DD",
     "17700": "\uc5ec\uae30\uc5d0 \uba54\uc2dc\uc9c0\ub97c \uc785\ub825\ud558\uc138\uc694 (\uc120\ud0dd\uc801)",
     "17701": "\uc6b0\ub9ac \uc11c\ubc84\ub85c \uc804\uc1a1\ub420 [B]\uc815\ud655\ud55c \uc815\ubcf4[\/B]\ub97c \ubcf4\ub824\uba74 \uc5ec\uae30\ub97c \ud074\ub9ad\ud558\uc138\uc694",
     "17703": "\uae43\ubc1c",
@@ -3148,5 +3151,8 @@
     "20388": "Microsoft Works \uc2a4\ud504\ub808\ub4dc\uc2dc\ud2b8",
     "20389": "Microsoft Excel \uc2a4\ud504\ub808\ub4dc\uc2dc\ud2b8",
     "20390": "Microsoft Excel \ud15c\ud50c\ub9bf",
-    "20391": "Microsoft Excel \ub9e4\ud06c\ub85c \uc801\uc6a9 \uc2a4\ud504\ub808\ub4dc\uc2dc\ud2b8"
+    "20391": "Microsoft Excel \ub9e4\ud06c\ub85c \uc801\uc6a9 \uc2a4\ud504\ub808\ub4dc\uc2dc\ud2b8",
+    "20392": "Please log in to continue.",
+    "20393": "Your phone number is already verified.",
+    "20394": "That phone number is already in use by another account."
 }

@@ -1880,6 +1880,9 @@
     "17694": "Unduh kunci",
     "17695": "hari",
     "17696": "GB",
+    "17697": "YYYY",
+    "17698": "MM",
+    "17699": "DD",
     "17700": "Pesan Anda di sini ... (opsional)",
     "17701": "Klik di sini untuk melihat [B]informasi persis[\/B] yang akan dikirim ke server kami.",
     "17703": "Bendera",
@@ -3148,5 +3151,8 @@
     "20388": "Microsoft Works Spreadsheet",
     "20389": "Microsoft Excel Spreadsheet",
     "20390": "Microsoft Excel Template",
-    "20391": "Microsoft Excel Macro-Enabled Spreadsheet"
+    "20391": "Microsoft Excel Macro-Enabled Spreadsheet",
+    "20392": "Please log in to continue.",
+    "20393": "Your phone number is already verified.",
+    "20394": "That phone number is already in use by another account."
 }

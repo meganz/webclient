@@ -1880,6 +1880,9 @@
     "17694": "Anahtar\u0131 indir",
     "17695": "g\u00fcn",
     "17696": "GB",
+    "17697": "YYYY",
+    "17698": "AA",
+    "17699": "GG",
     "17700": "Mesaj\u0131n\u0131z buraya... (iste\u011fe ba\u011fl\u0131)",
     "17701": "Sunucular\u0131m\u0131za g\u00f6nderilecek olan [B]kesin bilgileri[\/B] g\u00f6rmek i\u00e7in buraya t\u0131klay\u0131n.",
     "17703": "Bayraklar",
@@ -2498,7 +2501,7 @@
     "19303": "\u0130stemci",
     "19309": "Bir dahaki sefere hesab\u0131n\u0131za giri\u015f yapt\u0131\u011f\u0131n\u0131zda, Kimlik Do\u011frulay\u0131c\u0131 uygulaman\u0131z taraf\u0131ndan sa\u011flanan 6 basamakl\u0131 bir kod girmeniz istenecektir.",
     "19310": "Kar\u015f\u0131la\u015ft\u0131\u011f\u0131n\u0131z g\u00fcvenlik sorunlar\u0131 i\u00e7in l\u00fctfen bizimle ileti\u015fime ge\u00e7in. MEGA bir [A]g\u00fcvenlik a\u00e7\u0131\u011f\u0131 \u00f6d\u00fcl program\u0131[\/A]na sahiptir ve sorumlu if\u015falar i\u00e7in \u00f6deme yapar.",
-    "19311": "Thunderbird ve Thunderbird logosu, Mozilla Vakf\u0131'n\u0131n ticari markalar\u0131d\u0131r.",
+    "19311": "Thunderbird ve Thunderbird logosu, Mozilla Foundation\u2019\u0131n ticari markalar\u0131d\u0131r.",
     "19312": "Gizlilik",
     "19313": "Rehber",
     "19314": "Uygunsuz materyali bildirin",
@@ -3045,7 +3048,7 @@
     "20285": "Grafik De\u011fi\u015fim Format\u0131",
     "20286": "GPS eXchange Format\u0131",
     "20287": "Google Sayfalar\u0131",
-    "20288": "GNU Gzip S\u0131k\u0131\u015ft\u0131r\u0131lm\u0131\u015f",
+    "20288": "Gzip S\u0131k\u0131\u015ft\u0131r\u0131lm\u0131\u015f",
     "20289": "Ba\u015fl\u0131k",
     "20290": "Y\u00fcksek Verimli G\u00f6r\u00fcnt\u00fc",
     "20291": "HTML Belgesi",
@@ -3148,5 +3151,8 @@
     "20388": "Microsoft Works Tablosu",
     "20389": "Microsoft Excel Tablosu",
     "20390": "Microsoft Excel Tasla\u011f\u0131",
-    "20391": "Microsoft Excel Makro Etkinle\u015ftirilmi\u015f Tablosu"
+    "20391": "Microsoft Excel Makro Etkinle\u015ftirilmi\u015f Tablosu",
+    "20392": "Please log in to continue.",
+    "20393": "Your phone number is already verified.",
+    "20394": "That phone number is already in use by another account."
 }

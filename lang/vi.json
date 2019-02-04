@@ -1880,6 +1880,9 @@
     "17694": "T\u1ea3i xu\u1ed1ng m\u00e3",
     "17695": "ng\u00e0y",
     "17696": "GB",
+    "17697": "NI\u00caN",
+    "17698": "TH",
+    "17699": "NG",
     "17700": "\u0110i\u1ec1n tin nh\u1eafn \u1edf \u0111\u00e2y\u2026 (n\u1ebfu mu\u1ed1n)",
     "17701": "Click v\u00e0o \u0111\u00e2y \u0111\u1ec3 xem [B]chi ti\u1ebft v\u1ec1 th\u00f4ng tin[\/B] m\u00e0 ch\u00fang t\u00f4i s\u1ebd g\u1eedi \u0111i t\u1edbi m\u00e1y ch\u1ee7.",
     "17703": "Qu\u1ed1c k\u1ef3",
@@ -3148,5 +3151,8 @@
     "20388": "Microsoft Works Spreadsheet",
     "20389": "Microsoft Excel Spreadsheet",
     "20390": "Microsoft Excel Template",
-    "20391": "Microsoft Excel Macro-Enabled Spreadsheet"
+    "20391": "Microsoft Excel Macro-Enabled Spreadsheet",
+    "20392": "Please log in to continue.",
+    "20393": "Your phone number is already verified.",
+    "20394": "That phone number is already in use by another account."
 }

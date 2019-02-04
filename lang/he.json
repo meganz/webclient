@@ -1880,6 +1880,9 @@
     "17694": "\u05de\u05e4\u05ea\u05d7 \u05d4\u05d5\u05e8\u05d3\u05d4",
     "17695": "\u05d9\u05de\u05d9\u05dd",
     "17696": "GB",
+    "17697": "YYYY",
+    "17698": "MM",
+    "17699": "DD",
     "17700": "Your message here\u2026 (optional)",
     "17701": "Click here to see [B]the exact information[\/B] that will be sent to our servers.",
     "17703": "Flags",
@@ -3148,5 +3151,8 @@
     "20388": "Microsoft Works Spreadsheet",
     "20389": "Microsoft Excel Spreadsheet",
     "20390": "Microsoft Excel Template",
-    "20391": "Microsoft Excel Macro-Enabled Spreadsheet"
+    "20391": "Microsoft Excel Macro-Enabled Spreadsheet",
+    "20392": "Please log in to continue.",
+    "20393": "Your phone number is already verified.",
+    "20394": "That phone number is already in use by another account."
 }

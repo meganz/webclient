@@ -1880,6 +1880,9 @@
     "17694": "\u4e0b\u8f7d\u91d1\u94a5",
     "17695": "\u5929",
     "17696": "GB",
+    "17697": "YYYY",
+    "17698": "MM",
+    "17699": "DD",
     "17700": "\u8bf7\u5728\u8fd9\u91cc\u586b\u5199...\uff08\u53ef\u9009\uff09",
     "17701": "\u70b9\u51fb\u8fd9\u91cc\u67e5\u770b\u5c06\u53d1\u9001\u5230\u6211\u4eec\u7684\u670d\u52a1\u5668\u7684[B]\u786e\u5207\u4fe1\u606f[\/B]\u3002",
     "17703": "\u65d7",
@@ -3148,5 +3151,8 @@
     "20388": "Microsoft Works\u8868\u683c",
     "20389": "Microsoft Excel\u8868\u683c",
     "20390": "Microsoft Excel\u6a21\u677f",
-    "20391": "Microsoft Excel\u542f\u7528\u5b8f\u7684\u8868\u683c"
+    "20391": "Microsoft Excel\u542f\u7528\u5b8f\u7684\u8868\u683c",
+    "20392": "Please log in to continue.",
+    "20393": "Your phone number is already verified.",
+    "20394": "That phone number is already in use by another account."
 }

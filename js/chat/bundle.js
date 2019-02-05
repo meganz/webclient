@@ -15467,10 +15467,23 @@ React.makeElement = React['createElement'];
 	    this.isCurrentlyActive = false;
 
 	    if (d) {
-	        this.rebind('onStateChange.chatRoom', function (e, oldState, newState) {
+	        this.rebind('onStateChange.chatRoomDebug', function (e, oldState, newState) {
 	            self.logger.debug("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
 	        });
 	    }
+
+	    self.rebind('onStateChange.chatRoom', function (e, oldState, newState) {
+	        if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
+	            var cd = self.megaChat.plugins.chatdIntegration.chatd;
+	            if (self.chatIdBin && cd && cd.chatIdMessages[self.chatIdBin]) {
+	                var cid = cd.chatIdMessages[self.chatIdBin];
+	                if (cd.chatIdShard[self.chatIdBin].isOnline()) {
+
+	                    cd.chatIdMessages[self.chatIdBin].resend();
+	                }
+	            }
+	        }
+	    });
 
 	    self.rebind('onMessagesBuffAppend.lastActivity', function (e, msg) {
 	        var ts = msg.delay ? msg.delay : msg.ts;

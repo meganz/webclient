@@ -1460,3 +1460,53 @@
 .rubsched-options {
     max-height: 250px;
 }
+.fm-right-account-block .tooltip-icon.icon-container {
+    display: inline-block;
+    vertical-align: top;
+    overflow: visible;
+    margin-top: -4px;
+    margin-left: -6px;
+    position: relative;
+}
+.fm-right-account-block .tooltip-icon .medium-icon.info-icon {
+    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-repeat: no-repeat;
+    background-position: -22px -12374px;
+    background-size: 48px auto;
+    display: inline-block;
+    opacity: 0.4;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.fm-right-account-block .tooltip-icon .medium-icon.info-icon:hover {
+    opacity: 0.8;
+}
+.fm-right-account-block .tooltip-icon .tooltip-top-arrow {
+    position: absolute;
+    top: -8px;
+    right: 136px;
+    background-image: url(../images/mega/top-sprite_v5.png);
+    background-position: -10px -420px;
+    background-repeat: no-repeat;
+    width: 17px;
+    height: 8px;
+}
+.fm-right-account-block .tooltip-icon .tooltip-pad {
+    position: absolute;
+    width: 200px;
+    padding: 12px;
+    right: -130px;
+    top: 36px;
+    background-color: rgba(51, 51, 51, 1);
+    border-radius: 6px;
+    z-index: 6;
+    display: none;
+}
+.fm-right-account-block .tooltip-icon .medium-icon.info-icon:hover~.tooltip-pad, .fm-right-account-block .tooltip-icon .medium-icon.info-icon:hover~.tooltip-top-arrow {
+    display: block;
+}
+.fm-right-account-block .tooltip-icon .tooltip-pad .content-txt {
+    color: #eee;
+    padding-top: 0;
+    height: auto;
+}

@@ -966,3 +966,71 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1
 .default-56px-button.default-green-button {
     background-color: #00BFA5;
 }
+/* buttons for business account */
+
+.default-white-button-user-management, .default-green-button-user-management, .default-red-button-user-management, .default-grey-button-user-management{
+    height: 36px;
+    min-width: 60px;
+    display: inline-block;
+    text-align: center;
+    border: 1px solid rgba(0,0,0,0.1);
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    box-shadow:0 0.5px 1px 0 rgba(0,0,0,0.05);
+    position: relative;
+    font-size: 14px;
+    line-height: 35px;
+    padding: 0px 15px; 
+    cursor: pointer;
+    -webkit-transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    -moz-transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    -o-transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    -ms-transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.default-white-button-user-management.disabled, .default-green-button-user-management.disabled, .default-red-button-user-management.disabled, .default-grey-button-user-management.disabled {
+    cursor: default;
+}
+.default-white-button-user-management.disabled:hover, .default-green-button-user-management.disabled:hover, .default-red-button-user-management.disabled:hover, .default-grey-button-user-management.disabled:hover {
+    box-shadow: 0px 0px 0px 0px rgba(0,0,0,0);
+}
+.default-white-button-user-management {
+    background-color: rgba(255,255,255,1);
+    color: #666;
+}
+.default-green-button-user-management {
+    background-color: rgba(0,191,165,1);
+    color: #ffffff;
+}
+.default-grey-button-user-management {
+    background-color: rgba(0,191,165,1);background: rgb(170,170,170);
+    background: -moz-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
+    background: linear-gradient(to bottom, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
+    color: #ffffff;
+}
+.default-red-button-user-management {
+    background-color: #F0373A;
+    color: #ffffff;
+}
+.default-white-button-user-management .icon, .default-green-button-user-management .icon, .default-red-button-user-management .icon{
+    width: 24px;
+    height: 24px;
+    margin:3px 8px 4px 0px;
+    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    float: left;
+}
+.default-white-button-user-management:hover, .default-red-button-user-management:hover, .default-grey-button-user-management:hover{
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+}
+.default-green-button-user-management:hover {
+    box-shadow: 0px 0px 0px 4px rgba(0,100,87,0.2);
+}

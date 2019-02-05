@@ -3913,12 +3913,12 @@ li.token-input-token-invite .input-close {
 }
 
 .user-management-dialog .dialog-left-block {
-    margin: 16px 0 -24px 32px;
+    margin: 0 0 -24px 32px;
     padding: 24px;
 }
 
 .user-management-dialog .dialog-right-block {
-    margin: 16px 32px -24px 0px;
+    margin: 0 32px -24px 0px;
     padding: 24px;
 }
 
@@ -3935,7 +3935,7 @@ li.token-input-token-invite .input-close {
 .user-management-dialog .dialog-txt {
     width: 100%;
     text-align: center;
-    font-size: 14px;
+    font-size: 13px;
     color: #999;
     line-height: 20px;
 }

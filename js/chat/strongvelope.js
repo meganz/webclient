@@ -766,7 +766,7 @@ var strongvelope = {};
 
                 var proxyPromise = new MegaPromise();
 
-                verifyPromise.done(function() {
+                verifyPromise.always(function() {
                     var isOwnMessage = message.userId === self.ownHandle;
                     var myIndex = parsedMessage.recipients.indexOf(self.ownHandle);
 
@@ -808,7 +808,7 @@ var strongvelope = {};
                             + message.userId + ' on ' + message.ts);
                     }
 
-                    proxyPromise.reject(arg);
+                    // proxyPromise.resolve(arg);
                 });
 
                 return proxyPromise;
@@ -1693,27 +1693,25 @@ var strongvelope = {};
                     logger.critical('Signature invalid for message from *** on ***');
                     logger.error('Signature invalid for message from ' + sender);
                 }
-                proxyPromise.reject(false);
             });
 
-            verifyPromise.done(function(arg) {
+            verifyPromise.always(function(arg) {
                 if (!arg) {
                     // signature verification failed.
                     logger.error('Signature invalid for message from ' + sender);
-                    proxyPromise.reject(false);
-                } else {
-
-                    // Decrypt message payload.
-                    var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
-                        senderKey,
-                        parsedMessage.nonce);
-                    // Bail out if decryption failed.
-                    if (cleartext === false) {
-                        logger.warn("Decryption failed [1]: ", sender, keyId);
-                        proxyPromise.reject(false);
-                    }
-                    proxyPromise.resolve(cleartext);
                 }
+
+                // Decrypt message payload.
+                var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
+                    senderKey,
+                    parsedMessage.nonce);
+
+                // Bail out if decryption failed.
+                if (cleartext === false) {
+                    logger.warn("Decryption failed [1]: ", sender, keyId);
+                    proxyPromise.reject(false);
+                }
+                proxyPromise.resolve(cleartext);
             });
             return proxyPromise;
         }

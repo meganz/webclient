@@ -151,8 +151,7 @@
 }
 
 .bus-reg-input input::placeholder {
-	font-size: 13px;
-	/*text-transform: lowercase;*/
+	font-size: 14px;
 }
 
 .bus-reg-input.num input {
@@ -476,7 +475,8 @@
 	font-size: 24px;
 	color:#000;
 	line-height: 64px;
-	padding: 0 24px;
+	padding: 0 16px;
+	margin: 0 5%;
 }
 
 .bus-reg-bottom-page {
@@ -573,7 +573,7 @@
 
 @media only screen and (max-width: 790px) {
     .bus-reg-body {
-	width:95%;
+	width:90%;
 	min-width: 0;
 }
 

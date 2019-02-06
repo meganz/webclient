@@ -657,7 +657,36 @@ accountUI.account = {
         this.profiles.renderBirthYear();
         this.profiles.renderBirthMonth();
         this.profiles.renderBirthDay();
-        this.profiles.renderCountry();
+
+        // if this is a business user, we want to hide some parts in profile page :)
+        var hideOrViewCancelSection = function(setToHidden) {
+            if (setToHidden) {
+                $('.fm-account-main .fm-account-sections .cancel-account-block').addClass('hidden');
+                $('.content-panel.account .acc-setting-menu-cancel-acc').addClass('hidden');
+            }
+            else {
+                $('.fm-account-main .fm-account-sections .cancel-account-block').removeClass('hidden');
+                $('.content-panel.account .acc-setting-menu-cancel-acc').removeClass('hidden');
+            }
+        };
+
+        if (u_attr.b) {
+            $('.fm-account-main .settings-sub-section.profile .acc-setting-country-sec').addClass('hidden');
+            if (!u_attr.b.m) {
+                hideOrViewCancelSection(true);
+
+            }
+            else {
+                hideOrViewCancelSection(false);
+            }
+        }
+        else {
+            // user can set country only in non-business accounts
+            $('.fm-account-main .settings-sub-section.profile .acc-setting-country-sec').removeClass('hidden');
+            this.profiles.renderCountry();
+            // we allow cancel for only non-business account + master users.
+            hideOrViewCancelSection(false);
+        }
         this.profiles.bindEvents();
 
         // QR Code

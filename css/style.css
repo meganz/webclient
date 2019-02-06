@@ -7162,7 +7162,7 @@ table {
 }
 .fm-browsers-icon img {
     margin: 5px 0 0 0px;
-    width: auto;
+    width: 16px;
 }
 .tranfer-filetype-txt, .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
     height: 40px;

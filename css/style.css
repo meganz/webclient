@@ -1277,7 +1277,7 @@ body.kr .chart.data .size-txt {
     display: table-cell;
     color: #EEEEEE;
     font-size: 13px;
-    line-height: 18px;
+    line-height: 20px;
     vertical-align: middle;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -1285,14 +1285,13 @@ body.kr .chart.data .size-txt {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 0 10px;
+    padding: 4px 8px;
     width: 10px;
-    white-space: nowrap;
     min-width: 127px;
     text-align: center;
 }
 .slider-percentage span {
-    font-size: 17px;
+    font-size: 15px;
     color: white;
 }
 .slider-percentage span.warn {
@@ -1410,6 +1409,10 @@ input.radioOn, input.radioOff {
 }
 .fm-account-sections .radio-txt {
     cursor: pointer;
+    padding-right: 24px;
+}
+.fm-account-sections.fm-account-transfers .account-counter-number{
+    margin: 0 12px 0 -16px;
 }
 .fm-dialog-footer .radio-txt {
     padding-right: 0;

@@ -2350,6 +2350,12 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
             n.name = M.getSafeName(names[n.h]);
         }
 
+        // check it need to clear node attribute
+        if ($.clearCopyNodeAttr) {
+            n.lbl = 0;
+            n.fav = 0;
+        }
+
         // new node inherits all attributes
         nn.a = ab_to_base64(crypto_makeattr(n, nn));
 
@@ -3639,6 +3645,12 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             $.mcImport = true;
             $.saveToDialogPromise = reject;
 
+            // Remove original fav and lbl for new node.
+            srcNode.fav = 0;
+            srcNode.lbl = 0;
+
+            n.a = ab_to_base64(crypto_makeattr(srcNode));
+
             openSaveToDialog(srcNode, function(srcNode, target) {
                 dbfetch.get(target).always(function() {
                     var name = srcNode.name;
@@ -3729,12 +3741,16 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
     }
 
     var sel = [].concat(nodes || []);
+
     if (sel.length) {
         var FLRootID = M.RootID;
 
         mega.ui.showLoginRequiredDialog().done(function() {
             loadingDialog.show();
             localStorage.folderLinkImport = FLRootID;
+
+            // It is import so need to clear existing attribute for new node.
+            $.clearCopyNodeAttr = true;
 
             M.getCopyNodes(sel)
                 .done(function(nodes) {
@@ -3761,6 +3777,8 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
                                 fallback();
                             });
                     }
+                }).always(function() {
+                    delete $.clearCopyNodeAttr;
                 });
         }).fail(function(aError) {
             // If no aError, it was canceled

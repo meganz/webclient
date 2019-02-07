@@ -895,8 +895,16 @@ accountUI.account = {
                 e.which = $this.hasClass('up-control') ? 38 : 40;
                 $target.trigger(e);
             });
+
             $('#account-country .default-dropdown-item', $personalInfoBlock).rebind('click.showSave', function() {
-                $saveBlock.removeClass('closed');
+                
+                if ($firstNameField.val() && $firstNameField.val().trim().length > 0
+                    && !$personalInfoBlock.find('.errored').length) {
+                    $saveBlock.removeClass('closed');
+                }
+                else {
+                    $saveBlock.addClass('closed');
+                }
             });
 
             $saveButton.rebind('click', function() {

@@ -62,11 +62,26 @@ accountUI.renderAccountPage = function(account) {
     accountUI.general.init(account);
     accountUI.inputs.text.init();
 
+    var showOrHideBanner = function(sectionName) {
+        if (u_attr.b) {
+            $('.settings-banner').addClass('hidden');
+            return;
+        }
+        if (sectionName === '/fm/account' || sectionName === '/fm/account/plan'
+            || sectionName === '/fm/account/transfers') {
+            $('.settings-banner').removeClass('hidden');
+        }
+        else {
+            $('.settings-banner').addClass('hidden');
+        }
+    };
+
+    showOrHideBanner(id);
+
     switch (id) {
 
         case '/fm/account':
             $('.fm-account-profile').removeClass('hidden');
-            $('.settings-banner').removeClass('hidden');
             sectionClass = 'account-s';
 
             accountUI.account.init(account);
@@ -74,7 +89,6 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/plan':
             $('.fm-account-plan').removeClass('hidden');
-            $('.settings-banner').removeClass('hidden');
             sectionClass = 'plan';
 
             accountUI.plan.init(account);
@@ -82,7 +96,6 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/security':
             $('.fm-account-security').removeClass('hidden');
-            $('.settings-banner').addClass('hidden');
             sectionClass = 'security';
 
             accountUI.security.init();
@@ -90,7 +103,6 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/file-management':
             $('.fm-account-file-management').removeClass('hidden');
-            $('.settings-banner').addClass('hidden');
             sectionClass = 'file-management';
 
             accountUI.fileManagement.init();
@@ -98,7 +110,6 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/transfers':
             $('.fm-account-transfers').removeClass('hidden');
-            $('.settings-banner').removeClass('hidden');
             sectionClass = 'transfers';
 
             accountUI.transfers.init(account);
@@ -106,7 +117,6 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/contact-chats':
             $('.fm-account-contact-chats').removeClass('hidden');
-            $('.settings-banner').addClass('hidden');
             sectionClass = 'contact-chats';
 
             accountUI.contactAndChat.init();
@@ -114,7 +124,6 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/reseller' /** && M.account.reseller **/:
             $('.fm-account-reseller').removeClass('hidden');
-            $('.settings-banner').addClass('hidden');
             sectionClass = 'reseller';
 
             accountUI.reseller.init(account);
@@ -657,7 +666,36 @@ accountUI.account = {
         this.profiles.renderBirthYear();
         this.profiles.renderBirthMonth();
         this.profiles.renderBirthDay();
-        this.profiles.renderCountry();
+
+        // if this is a business user, we want to hide some parts in profile page :)
+        var hideOrViewCancelSection = function(setToHidden) {
+            if (setToHidden) {
+                $('.fm-account-main .fm-account-sections .cancel-account-block').addClass('hidden');
+                $('.content-panel.account .acc-setting-menu-cancel-acc').addClass('hidden');
+            }
+            else {
+                $('.fm-account-main .fm-account-sections .cancel-account-block').removeClass('hidden');
+                $('.content-panel.account .acc-setting-menu-cancel-acc').removeClass('hidden');
+            }
+        };
+
+        if (u_attr.b) {
+            $('.fm-account-main .settings-sub-section.profile .acc-setting-country-sec').addClass('hidden');
+            if (!u_attr.b.m) {
+                hideOrViewCancelSection(true);
+
+            }
+            else {
+                hideOrViewCancelSection(false);
+            }
+        }
+        else {
+            // user can set country only in non-business accounts
+            $('.fm-account-main .settings-sub-section.profile .acc-setting-country-sec').removeClass('hidden');
+            this.profiles.renderCountry();
+            // we allow cancel for only non-business account + master users.
+            hideOrViewCancelSection(false);
+        }
         this.profiles.bindEvents();
 
         // QR Code
@@ -1271,6 +1309,18 @@ accountUI.plan = {
         this.history.renderPurchase(account);
         this.history.renderTransaction(account);
         this.history.bindEvents(account);
+
+        // check if business account
+        if (u_attr.b) {
+            $('.fm-account-plan.fm-account-sections .acc-storage-space').addClass('hidden');
+            $('.fm-account-plan.fm-account-sections .acc-bandwidth-vol').addClass('hidden');
+            $('.fm-account-plan.fm-account-sections .btn-achievements').addClass('hidden');
+            $('.fm-account-plan.fm-account-sections .data-block.account-balance').addClass('hidden');
+            $('.content-panel.account .acc-setting-menu-balance-acc').addClass('hidden');
+            if (!u_attr.b.m || u_attr.b.s !== -1) {
+                $('.fm-account-plan.fm-account-sections .upgrade-to-pro').addClass('hidden');
+            }
+        }
     },
 
     accountType: {
@@ -1880,7 +1930,16 @@ accountUI.security = {
         accountChangePassword.init();
 
         // Change Email
-        accountChangeEmail.init();
+        if (!u_attr.b || u_attr.b.m) {
+            $('.fm-account-security.fm-account-sections .data-block.change-email').removeClass('hidden');
+            $('.content-panel.account .acc-setting-menu-change-em').removeClass('hidden');
+
+            accountChangeEmail.init();
+        }
+        else {
+            $('.fm-account-security.fm-account-sections .data-block.change-email').addClass('hidden');
+            $('.content-panel.account .acc-setting-menu-change-em').addClass('hidden');
+        }
 
         // Recovery Key
         this.recoveryKey.bindEvents();
@@ -2473,7 +2532,7 @@ accountUI.transfers = {
                 'use strict';
 
                 // LITE/PRO account
-                if (u_attr.p) {
+                if (u_attr.p && !u_attr.b) {
                     var bandwidthLimit = Math.round(account.servbw_limit | 0);
 
                     $('#bandwidth-slider').slider({

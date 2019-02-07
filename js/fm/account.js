@@ -62,11 +62,26 @@ accountUI.renderAccountPage = function(account) {
     accountUI.general.init(account);
     accountUI.inputs.text.init();
 
+    var showOrHideBanner = function(sectionName) {
+        if (u_attr.b) {
+            $('.settings-banner').addClass('hidden');
+            return;
+        }
+        if (sectionName === '/fm/account' || sectionName === '/fm/account/plan'
+            || sectionName === '/fm/account/transfers') {
+            $('.settings-banner').removeClass('hidden');
+        }
+        else {
+            $('.settings-banner').addClass('hidden');
+        }
+    };
+
+    showOrHideBanner(id);
+
     switch (id) {
 
         case '/fm/account':
             $('.fm-account-profile').removeClass('hidden');
-            $('.settings-banner').removeClass('hidden');
             sectionClass = 'account-s';
 
             accountUI.account.init(account);
@@ -74,7 +89,6 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/plan':
             $('.fm-account-plan').removeClass('hidden');
-            $('.settings-banner').removeClass('hidden');
             sectionClass = 'plan';
 
             accountUI.plan.init(account);
@@ -82,7 +96,6 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/security':
             $('.fm-account-security').removeClass('hidden');
-            $('.settings-banner').addClass('hidden');
             sectionClass = 'security';
 
             accountUI.security.init();
@@ -90,7 +103,6 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/file-management':
             $('.fm-account-file-management').removeClass('hidden');
-            $('.settings-banner').addClass('hidden');
             sectionClass = 'file-management';
 
             accountUI.fileManagement.init();
@@ -98,7 +110,6 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/transfers':
             $('.fm-account-transfers').removeClass('hidden');
-            $('.settings-banner').removeClass('hidden');
             sectionClass = 'transfers';
 
             accountUI.transfers.init(account);
@@ -106,7 +117,6 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/contact-chats':
             $('.fm-account-contact-chats').removeClass('hidden');
-            $('.settings-banner').addClass('hidden');
             sectionClass = 'contact-chats';
 
             accountUI.contactAndChat.init();
@@ -114,7 +124,6 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/reseller' /** && M.account.reseller **/:
             $('.fm-account-reseller').removeClass('hidden');
-            $('.settings-banner').addClass('hidden');
             sectionClass = 'reseller';
 
             accountUI.reseller.init(account);
@@ -1300,6 +1309,18 @@ accountUI.plan = {
         this.history.renderPurchase(account);
         this.history.renderTransaction(account);
         this.history.bindEvents(account);
+
+        // check if business account
+        if (u_attr.b) {
+            $('.fm-account-plan.fm-account-sections .acc-storage-space').addClass('hidden');
+            $('.fm-account-plan.fm-account-sections .acc-bandwidth-vol').addClass('hidden');
+            $('.fm-account-plan.fm-account-sections .btn-achievements').addClass('hidden');
+            $('.fm-account-plan.fm-account-sections .data-block.account-balance').addClass('hidden');
+            $('.content-panel.account .acc-setting-menu-balance-acc').addClass('hidden');
+            if (!u_attr.b.m || u_attr.b.s !== -1) {
+                $('.fm-account-plan.fm-account-sections .upgrade-to-pro').addClass('hidden');
+            }
+        }
     },
 
     accountType: {

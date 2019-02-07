@@ -1648,6 +1648,24 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         }
     };
 
+    var getPostCodeName = function(countryCode) {
+        if (!countryCode) {
+            return "Postcode";
+        }
+        switch (countryCode) {
+            case "US": return "ZIP code";
+            case "CA": return "Postal Code";
+            case "PH": return "ZIP code";
+            case "DE": return "PLZ";
+            case "AT": return "PLZ";
+            case "IN": return "Pincode";
+            case "IE": return "Eircode";
+            case "BR": return "CEP";
+            case "IT": return "CAP";
+            default: return "Postcode";
+        }
+    };
+
     // collecting info
     var cName = '';
     var cTel = '';
@@ -1695,6 +1713,14 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     if (u_attr['%zip']) {
         cZip = u_attr['%zip'];
     }
+
+    var setPostCodeOnUI = function(countryCode) {
+        var postCode = getPostCodeName(countryCode);
+        $profileContainer.find('.bus-input-title.zip').text(postCode);
+        $profileContainer.find('input#prof-zip').prop('placeholder', postCode);
+    };
+
+    setPostCodeOnUI(cCountry);
 
     var setTaxName = function(st, taxName) {
         if (st && taxName) {
@@ -1841,7 +1867,11 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
             }
         });
 
-
+    // event handler for country select changing
+    $('select#cnt-ddl', $profileContainer).off('change.suba').on('change.suba',
+        function countrySelectChangingHandler(se) {
+            setPostCodeOnUI(this.value);
+        });
 
     unhideSection();
     

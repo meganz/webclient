@@ -758,3 +758,10 @@
 .message.richpreview.container.is-loading {
     border-color: rgba(237, 237, 237, 1);
 }
+
+.message.text-block::selection, .message.user-card-name::selection {
+    background-color: #D9D9D9;
+}
+.message.text-block::-moz-selection, .message.user-card-name::-moz-selection {
+    background-color: #D9D9D9;
+}

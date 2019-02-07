@@ -108,12 +108,25 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     // Events
     if (d) {
-        this.rebind('onStateChange.chatRoom', function(e, oldState, newState) {
+        this.rebind('onStateChange.chatRoomDebug', function(e, oldState, newState) {
             self.logger.debug("Will change state from: ",
                 ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState)
             );
         });
     }
+
+    self.rebind('onStateChange.chatRoom', function(e, oldState, newState) {
+        if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
+            var cd = self.megaChat.plugins.chatdIntegration.chatd;
+            if (self.chatIdBin && cd && cd.chatIdMessages[self.chatIdBin]) {
+                var cid = cd.chatIdMessages[self.chatIdBin];
+                if (cd.chatIdShard[self.chatIdBin].isOnline()) {
+                    // this should never happen, but just in case...
+                    cd.chatIdMessages[self.chatIdBin].resend();
+                }
+            }
+        }
+    });
 
 
     // activity on a specific room (show, hidden, got new message, etc)

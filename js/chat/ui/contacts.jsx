@@ -81,7 +81,13 @@ var ContactButton = React.createClass({
                                     loadSubPage('fm/' + contact.u);
                                 }
                     }} />
-                    <div className="dropdown-user-name">
+                        <div className="dropdown-user-name" onClick={() => {
+                            if (contact.c === 2) {
+                                loadSubPage('fm/account');
+                            }
+                            if (contact.c === 1) {
+                                loadSubPage('fm/' + contact.u);
+                            }}}>
                         {username}
                         <ContactPresence className="small" contact={contact} />
                     </div>
@@ -769,6 +775,11 @@ var ContactPickerWidget = React.createClass({
                     />);
                 });
 
+                var buttonLabel = self.props.multipleSelectedButtonLabel;
+
+                if (!buttonLabel) {
+                    buttonLabel = self.state.selected.length === 1 ? __(l[5885]) : __(l[8890]);
+                }
 
                 footer =
                     <div className="contacts-search-footer">
@@ -786,12 +797,7 @@ var ContactPickerWidget = React.createClass({
                                 {self.state.selected.length} contacts selected
                             </span>
                             <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
-                                {
-                                    self.props.multipleSelectedButtonLabel ?
-                                        self.props.multipleSelectedButtonLabel
-                                        :
-                                        __(l[8890])
-                                }
+                                {buttonLabel}
                             </a>
                         </div>
                     </div>;

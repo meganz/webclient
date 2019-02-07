@@ -777,7 +777,7 @@
             }
         }
 
-        if (allowConversationTab || $.copyToUpload) {
+        if (allowConversationTab || $.copyToUpload || $.saveToDialogNode) {
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
             $('.fm-picker-dialog-button.conversations', $dialog).removeClass('hidden');
         }
@@ -896,7 +896,7 @@
         var tab = $.cfsection || 'cloud-drive';
 
         var b = $('.content-panel.' + tab).html();
-       
+
         handleDialogTabContent(tab, 'ul', b);
         delete $.cfsection; // safe deleting
 
@@ -976,7 +976,7 @@
         M.safeShowDialog('copy', function() {
             $.saveToDialogCb = cb;
             $.saveToDialogNode = node;
-            handleOpenDialog(activeTab, M.RootID, 'saveToDialog');
+            handleOpenDialog(activeTab, M.RootID, activeTab !== 'conversations' && 'saveToDialog');
             return $dialog;
         });
 
@@ -1392,7 +1392,7 @@
             // closeDialog would cleanup some $.* variables, so we need them cloned here
             var saveToDialogNode = $.saveToDialogNode;
             var saveToDialogCb = $.saveToDialogCb;
-            var saveToDialog = $.saveToDialog;
+            var saveToDialog = $.saveToDialog || saveToDialogNode;
             var shareToContactId = $.shareToContactId;
             delete $.saveToDialogPromise;
 
@@ -1459,46 +1459,11 @@
                 M.copyNodes(getNonCircularNodes(selectedNodes), $.mcselected);
             }
             else if (section === 'conversations') {
-                if (!window.megaChatIsReady) {
-                    console.error('MEGAchat is not ready');
+                if (window.megaChatIsReady) {
+                    megaChat.openChatAndAttachNodes(chats, selectedNodes).dump();
                 }
-                else {
-                    var attachNodes = function(room) {
-                        delay('copydialog:chatattachnodes', function() {
-                            showToast('send-chat', (selectedNodes.length > 1) ? l[17767] : l[17766]);
-                            M.openFolder('chat/' + (room.type === 'group' ? 'g/' : '') + room.roomId);
-                        });
-                        room.attachNodes(selectedNodes);
-                    };
-
-                    var openChat = function(roomId) {
-                        if (megaChat.chats[roomId]) {
-                            attachNodes(megaChat.chats[roomId]);
-                        }
-                        else {
-                            var userHandles = [u_handle, roomId];
-                            var result = megaChat.openChat(userHandles, "private");
-
-                            if (result && result[1] && result[2]) {
-                                var room = result[1];
-                                var chatInitDonePromise = result[2];
-                                chatInitDonePromise.done(function() {
-                                    createTimeoutPromise(function() {
-                                        return room.state === ChatRoom.STATE.READY;
-                                    }, 300, 30000).done(function() {
-                                        attachNodes(room);
-                                    });
-                                });
-                            }
-                            else if (d) {
-                                console.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId);
-                            }
-                        }
-                    };
-
-                    for (var i = chats.length; i--;) {
-                        openChat(chats[i]);
-                    }
+                else if (d) {
+                    console.error('MEGAchat is not ready');
                 }
             }
 

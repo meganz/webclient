@@ -895,6 +895,9 @@
     color: #aaa;
     cursor: pointer;
 }
+.improved-recovery-steps.recovery-key-dialog.post-register .skip-button.hidden {
+    display: none;
+}
 .improved-recovery-steps.post-register .skip-button:hover {
     text-decoration: underline;
 }

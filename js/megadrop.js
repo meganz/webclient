@@ -974,7 +974,6 @@ mega.megadrop = (function() {
                         onRename(folderId, M.d[folderId].name);
                     }
                     settings.add(pupId, folderId);
-                    settings.drawPupCard(pupId);// Add to DOM widget->settings
                     $('.fm-account-button.megadrop').removeClass('hidden');
 
                     // Don't show dialog if PUP data is updated
@@ -1069,9 +1068,7 @@ mega.megadrop = (function() {
         var settingsOpts = {
             initialized: false,
             card: {
-                wrapperClass: '.fm-account-widget .widget-container',
-                cardClass: '.widget-card',
-                expandedClass: '.expanded-widget',
+                wrapperClass: '.grid-table.megadrop tbody',
                 code: '',
                 url: '',
                 expanded: []// Handle of expanded card
@@ -1086,76 +1083,46 @@ mega.megadrop = (function() {
             settingsOpts.initialized = value;
         };
 
-        var setExpanded = function settingsSetExpanded(handle) {
-            settingsOpts.card.expanded.push(handle);
-        };
-
-        var delExpanded = function settingsDelExpanded(handle) {
-            var index = settingsOpts.card.expanded.indexOf(handle);
-
-            if (index !== -1) {
-                settingsOpts.card.expanded.splice(index, 1);
-            }
-        };
-
         var _getPath = function _settingsGetPath(nodeHandle) {
-            var path = M.getPath(nodeHandle).map(function(h) {
-                    return M.d[h].name || '';
-                }).reverse().join('/');
+            var path = M.getPath(nodeHandle).map(function(h, k) {
+                var title = h === M.RootID ? l[1687] : M.d[h].name;
+
+                var html = title ? '<a class="fm-breadcrumbs folder ' + (k !== 0 ? 'has-next-button' : '') +
+                    '" title="' +  escapeHTML(title) + '" data-node="' + h + '">' + '<span class="right-arrow-bg">' +
+                    '<span>' + escapeHTML(title) + '</span></span></a>' : '';
+
+                return html;
+
+            }).reverse().join('') + '<div class="clear"></div>';
 
             return path;
         };
 
         var drawPupCard = function settingsDrawPupCard(pupHandle) {
-            var item = {};
-            var name = '';
-            var nodeHandle = '';
-            var handle = '';
-            var pupPath = l[1687];
-            var $domElem = $('#stngs_pup_tmpl').clone();
 
-            if (pupHandle && !$('#pup_' + pupHandle).length) {
-                item = pup.items[pupHandle];
-                name = item.fn;
-                nodeHandle = item.h;
-                handle = item.p;
-                pupPath += _getPath(nodeHandle);
-
-                $domElem.attr('id', 'pup_' + handle);
-                $domElem.removeClass('hidden');
-                $domElem.find('.widget-location-url').attr('data-node', nodeHandle);
-                $domElem.find('.widget-location-url span').text(pupPath);
-                $domElem.find('.widget-card-left span').text(name);
-
-                $(settingsOpts.card.wrapperClass).append($domElem);
+            if (M.currentdirid !== 'account/transfers' || !pupHandle || $('#pup_' + pupHandle).length) {
+                return false;
             }
-        };
 
-        /**
-         *
-         * @param {String} handle PUP handle
-         * @param {Object} elem After this DOM element .expanded-widget will be inserted
-         */
-        var drawExpandedCard = function settingsDrawExpandedCard(handle, elem) {
-            var nodeHandle = pup.items[handle].h;
-            var name = pup.items[handle].fn;
-            var path = l[1687];
-            path += _getPath(nodeHandle);
+            var item = pup.items[pupHandle];
+            var name = item.fn;
+            var nodeHandle = item.h;
+            var handle = item.p;
+            var pupPath = _getPath(nodeHandle);
+            var $domElem = $('#megadrop-row-template').clone();
             var url = ui.generateUrl(handle);
             var code = ui.generateCode(handle);
             settingsOpts.card.code = code;
             settingsOpts.card.url = url;
-            var $domElem = $('#stngs_pupexp_tmpl').clone();
 
-            $domElem.attr('id', 'ew_' + handle);
+            $domElem.attr('id', 'pup_' + handle);
             $domElem.removeClass('hidden');
-            $domElem.find('.widget-location-url').attr('data-node', nodeHandle);
-            $domElem.find('.widget-card-left span').text(name);
-            $domElem.find('.widget-location-url span').text(path);
+            $domElem.find('.fm-picker-breadcrumbs').safeHTML(pupPath);
+            $domElem.find('.megafolder-name').text(name);
             $domElem.find('.widget-code-wrapper.widget-url').text(url);
+            $domElem.find('.embed-link .widget-code-wrapper').text(code);
 
-            $(elem).after($domElem);
-            $('#ew_' + handle).find('.embed-link .widget-code-wrapper').text(code);
+            $(settingsOpts.card.wrapperClass).append($domElem);
         };
 
         /**
@@ -1163,58 +1130,69 @@ mega.megadrop = (function() {
          */
         var _eventListeners = function _settingsEventListeners() {
 
-            // Click on PUP basic info, show full PUP informations .expanded-widget
-            $('.widget-container').on('click.WS_clickcard', '.widget-card', function() {
-                if (!$(this).hasClass("expanded-widget")) {
-                    var $this = $(this).closest('div[id^=pup_]');
-                    var pupHandle = $this.attr('id').replace('pup_', '');
-                    var expHandle = $('div[id^=ew_]').attr('id');
+            var $wrapper = $(settingsOpts.card.wrapperClass);
 
-                    // Close expanded PUP
-                    if (expHandle) {
-                        $('#' + expHandle).addClass('hidden').remove();
-                        $('#pup_' + expHandle.replace('ew_', '')).removeClass('hidden');
-                        delExpanded(expHandle);
-                    }
+            // Click on PUP basic info, show full PUP informations
+            $('.megadrop-row', $wrapper).rebind('click', function() {
 
-                    drawExpandedCard(pupHandle, $this);
-                    $this.addClass('hidden');
-                    $('#ew_' + pupHandle).removeClass('hidden');
-                    setExpanded(pupHandle);
-                    initAccountScroll();
-                    $(window).trigger('resize');
-                }
+                var $this = $(this);
+
+                $this.removeClass('closed');
+                $this.find('.close-icon > .tooltips').text('Fold');
+
+                // Waiting for css animation to be finished
+                setTimeout(function() {
+                    initAccountScroll(1);
+                }, 301);
             });
 
             // Click on minimise of PUP expanded informations, replace it  with basic info .widget-card
-            $('.widget-container').on('click.WS_minimise', 'div.widget-minimise', function() {
+            $('.close-icon', $wrapper).rebind('click', function(e) {
 
-                // Find first parent with id attrbute starting with ew_
-                var id = $(this).closest('div[id^=ew_]').attr('id');
-                var pupHandle = id.replace('ew_', '');
+                e.stopPropagation();
 
-                // un-bind all events related to .expanded-widget
-                $('.widget-container .expanded-widget').off();
+                var $this = $(this).parents('.megadrop-row');
 
-                $('#' + id).addClass('hidden').remove();
-                $('#pup_' + pupHandle).removeClass('hidden');
-                delExpanded(pupHandle);
+                if (!$this.hasClass('closed')) {
+                    $this.addClass('closed');
+                    $(this).find('.tooltips').text(l[20172]);
+                    var $jspPane = $this.parents('.jspPane');
+
+                    // Waiting for css animation to be finished
+                    $jspPane.removeClass('shrink');
+                    setTimeout(function() {
+                        initAccountScroll();
+                        setTimeout(function() {
+                            $jspPane.removeClass('shrink');
+                        }, 301);
+                    }, 301);
+                }
+                else {
+                    $this.removeClass('closed');
+                    $(this).find('.tooltips').text(l[148]);
+                }
+
+                // Waiting for css animation to be finished
+                setTimeout(function() {
+                    initAccountScroll(1);
+                }, 301);
             });
 
             // Remove PUP
-            $('.widget-container').on('click.WS_remove', '.delete-widget-dialog.button', function() {
+            $('.delete-megadrop', $wrapper).rebind('click', function(e) {
 
-                // Find first parent with id attrbute starting with ew_
-                var id = $(this).closest('div[id^=ew_]').attr('id');
-                var pupHandle = id.replace('ew_', '');
+                e.stopPropagation();
+
+                var id = $(this).parents('.megadrop-row').attr('id');
+                var pupHandle = id.replace('pup_', '');
                 var nodeHandle = pup.items[pupHandle].h;
 
                 puf.remove([nodeHandle]);
             });
 
             // Widget expanded go to folder
-            $('.widget-container').on('click.WS_folder', '.widget-location-url span', function () {
-                var nodeId = $(this).parent().data('node');
+            $('.fm-breadcrumbs', $wrapper).rebind('click', function () {
+                var nodeId = $(this).data('node');
 
                 M.openFolder(nodeId, true);
 
@@ -1222,44 +1200,41 @@ mega.megadrop = (function() {
             });
 
             // Widget expanded embed link tab
-            $('.widget-container').on('click.WS_embedTab', 'div.tab-embed-link', function () {
+            $('.tab-embed-link', $wrapper).rebind('click', function () {
 
                 // Find first parent with id attrbute starting with ew_
-                var id = $(this).closest('div[id^=ew_]').attr('id');
-                var $tmp = $('#' + id);
+                var $parent = $(this).parents('.megadrop-row');
 
-                $tmp.find('.tab-embed-link').addClass('active');
-                $tmp.find('.tab-url-link').removeClass('active');
-                $tmp.find('.embed-link').removeClass('hidden');
-                $tmp.find('.url-link').addClass('hidden');
-                $(window).trigger('resize');
+                $parent.find('.fm-tab').removeClass('active');
+                $(this).addClass('active');
+                $parent.find('.embed-link').removeClass('hidden');
+                $parent.find('.url-link').addClass('hidden');
             });
 
             // Widget expanded url tab
-            $('.widget-container').on('click.WS_urlTab', 'div.tab-url-link', function () {
+            $('.tab-url-link', $wrapper).rebind('click', function () {
 
                 // Find first parent with id attrbute starting with ew_
-                var id = $(this).closest('div[id^=ew_]').attr('id');
-                var $tmp = $('#' + id);
+                var $parent = $(this).parents('.megadrop-row');
 
-                $tmp.find('.tab-embed-link').removeClass('active');
-                $tmp.find('.tab-url-link').addClass('active');
-                $tmp.find('.embed-link').addClass('hidden');
-                $tmp.find('.url-link').removeClass('hidden');
+                $parent.find('.fm-tab').removeClass('active');
+                $(this).addClass('active');
+                $parent.find('.embed-link').addClass('hidden');
+                $parent.find('.url-link').removeClass('hidden');
             });
 
             // Widget expanded copy link
-            $('.widget-container').on('click.WS_copyUrl', '.url-link .copy-widget-dialog.button', function() {
+            $('.copy-url', $wrapper).rebind('click', function() {
                 copyToClipboard(settingsOpts.card.url, l[17619]);
             });
 
             // Widget expanded copy source code
-            $('.widget-container').on('click.WS_copyCode', '.embed-link .copy-widget-dialog.button', function() {
+            $('.copy-code', $wrapper).rebind('click', function() {
                 copyToClipboard(settingsOpts.card.code, l[17620]);
             });
 
             // Widget expanded  Preview upload page
-            $('.widget-container').on('click.WS_preview', '.expanded-widget .preview-widget.button', function () {
+            $('.preview-widget', $wrapper).rebind('click', function () {
                 window.open(settingsOpts.card.url, '_blank', wopts.widgetParams[0].slice(1, -1), true);
             });
         };
@@ -1268,24 +1243,31 @@ mega.megadrop = (function() {
          * Draw all public upload pages, show path and PUP name
          * @param {Function} cb Callback
          */
-        var drawPups = function settingsDrawPups(cb) {
+        var drawPups = function settingsDrawPups() {
             if (d) {
                 console.log('settings.drawPups');
             }
             var list = pup.items;
             var item = {};
 
-            if (cb) {
-                for (var key in list) {
-                    if (list.hasOwnProperty(key)) {
-                        item = list[key];
-                        if (item.p && item.s === 2) {
-                            cb(item.p);
-                        }
-                        else {
-                            if (d) {
-                                console.warn('settings.drawPups: non-active PUP: ', item.fn);
-                            }
+            if (!$(settingsOpts.card.wrapperClass).find('.megadrop-header').length) {
+                var $headElem = $('#megadrop-header-template').clone().removeAttr('id');
+                $(settingsOpts.card.wrapperClass).append($headElem);
+                if (Object.keys(list).length === 0) {
+                    $(settingsOpts.card.wrapperClass)
+                        .append('<tr><td colspan="3" class="grid-table-empty">' + l[20139] + '</td></tr>');
+                }
+            }
+
+            for (var key in list) {
+                if (list.hasOwnProperty(key)) {
+                    item = list[key];
+                    if (item.p && item.s === 2) {
+                        drawPupCard(item.p);
+                    }
+                    else {
+                        if (d) {
+                            console.warn('settings.drawPups: non-active PUP: ', item.fn);
                         }
                     }
                 }
@@ -1296,39 +1278,30 @@ mega.megadrop = (function() {
          * Handles settings->widget elements
          */
         var widget = function settingsWidget() {
+            loadingDialog.show();
 
-            if (!isInit()) {
-                loadingDialog.show();
+            drawPups();
+            initAccountScroll();
+            _eventListeners();
+            setInitialized(true);
 
-                drawPups(drawPupCard);
-                initAccountScroll();
-                _eventListeners();
-                setInitialized(true);
-
-                loadingDialog.hide();
-            }
+            loadingDialog.hide();
         };
 
         /**
          * Remove upload page card and expanded card on PUF/PUP removal
          * @param {String} pupHandle Public upload page handle
          * @param {String} nodeHandle Folder id
-         *          */
+         */
         var remove = function settingsRemove(pupHandle, nodeHandle) {
             if (d) {
                 console.log('settings.remove');
             }
-            // un-bind all events related to .expanded-widget
-            $('.widget-container .expanded-widget').off();
 
-            $('#ew_' + pupHandle).remove();// Remove expanded-card
-            $('#pup_' + pupHandle).remove();// Remove widget-card
-            delExpanded(pupHandle);
-            ui.nodeIcon(nodeHandle);
-            if ((Object.keys(puf.items).length === 0 || Object.keys(pup.items).length === 0)
-                && M.currentdirid === 'account/megadrop') {
-                M.openFolder(M.RootID);
+            if (M.currentdirid === "account/transfers") {
+                $('#pup_' + pupHandle).remove();// Remove widget-card
             }
+            ui.nodeIcon(nodeHandle);
         };
 
         /**
@@ -1337,11 +1310,13 @@ mega.megadrop = (function() {
          * @param {String} nodeHandle Folder id
          */
         var add = function settingsAdd(pupHandle, nodeHandle) {
+            if (d) {
+                console.log('settings.add');
+            }
 
-            // Draw only enabled PUP, disregard disabled
             if (pupHandle && !$('#pup_' + pupHandle).length) {
-                drawPupCard(pupHandle);
                 ui.nodeIcon(nodeHandle, true);
+                drawPupCard(pupHandle);
             }
         };
 
@@ -1475,6 +1450,7 @@ mega.megadrop = (function() {
                     localStorage.skipPUFCreationInfo = true;
                 }
                 closeDialog();
+
                 puf.create($.selected[0]);
             });
             /*** END '.create-info-widget-dialog */
@@ -2214,7 +2190,6 @@ mega.megadrop = (function() {
         uiUpdateTotalProgress: ui.updateTotalProgress,
 
         // Settings
-        stngsAdd: settings.add,
         stngsDraw: settings.widget
     };
 

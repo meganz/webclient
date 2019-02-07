@@ -773,7 +773,7 @@ var dlmanager = {
 
             if (M.chat) {
                 $('.toast-notification').removeClass('visible');
-                showToast('download', eekey ? l[24] : l[23]);
+                showToast('download', eekey ? l[24] : l[20228]);
             }
         }
 

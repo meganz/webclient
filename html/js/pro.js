@@ -84,12 +84,14 @@ var pro = {
         'use strict';
 
         // On mobile just load the main account page as there is no payment history yet
-        topage = topage || (is_mobile ? 'fm/account' : 'fm/account/history');
+        topage = topage || (is_mobile ? 'fm/account' : 'fm/account/plan');
 
         // Make sure it fetches new account data on reload
         // and redirect to account page to show purchase
         if (M.account) {
             M.account.lastupdate = 0;
+            // If pro page is opened from account/plan update M.currentdirid to force call openfolder
+            M.currentdirid = M.currentdirid.substr(0, 7) === 'account' ? false : M.currentdirid;
         }
 
         // if (localStorage.justGotRegistered) {
@@ -173,7 +175,7 @@ var pro = {
 
             // If last payment was Bitcoin, we need to redirect to the account page
             if (pro.lastPaymentProviderId === bitcoinDialog.gatewayId) {
-                loadSubPage('fm/account/history');
+                loadSubPage('fm/account/plan');
             }
         }
     },

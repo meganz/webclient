@@ -26,12 +26,12 @@ function dashboardUI() {
         $('.account.widget.recovery-key').removeClass('hidden');
         // Button on dashboard to backup their master key
         $('.backup-master-key').rebind('click', function() {
-            loadSubPage('backup');
+            M.showRecoveryKeyDialog(2);
         });
     }
 
     M.onSectionUIOpen('dashboard');
-    accountUI.userUIUpdate();
+    accountUI.general.userUIUpdate();
 
     // Add-contact plus
     $('.dashboard .contacts-widget .add-contacts').rebind('click', function() {
@@ -221,7 +221,7 @@ function dashboardUI() {
 
         $($.leftPaneResizable).trigger('resize');
 
-        accountUI.fillCharts(account, true);
+        accountUI.general.charts.init(account, true);
 
 
         /* Used Storage progressbar */
@@ -229,9 +229,10 @@ function dashboardUI() {
             100 * account.stats[M.RootID].bytes / account.space,
             100 * account.stats[M.RubbishID].bytes / account.space,
             100 * account.stats.inshares.bytes / account.space,
-            100 * account.stats[M.InboxID].bytes / account.space
+            100 * account.stats[M.InboxID].bytes / account.space,
+            100 * (account.space - account.space_used) / account.space,
         ];
-        for (var i = 0; i < 4; i++) {
+        for (i = 0; i < 5; i++) {
             var $percBlock = $('.storage .account.progress-perc.pr' + i);
             if (percents[i] > 0) {
                 $percBlock.text(Math.round(percents[i]) + ' %');
@@ -242,7 +243,27 @@ function dashboardUI() {
                 $percBlock.parent().addClass('empty hidden');
             }
         }
-        accountUI.renderProgressBar(account);
+
+        // Cloud drive
+        $('.account.progress-size.cloud-drive').text(
+            account.stats[M.RootID].bytes > 0 ? bytesToSize(account.stats[M.RootID].bytes) : '-'
+        );
+        // Rubbish bin
+        $('.account.progress-size.rubbish-bin').text(
+            account.stats[M.RubbishID].bytes > 0 ? bytesToSize(account.stats[M.RubbishID].bytes) : '-'
+        );
+        // Incoming shares
+        $('.account.progress-size.incoming-shares').text(
+            account.stats.inshares.bytes ? bytesToSize(account.stats.inshares.bytes) : '-'
+        );
+        // Inbox
+        $('.account.progress-size.inbox').text(
+            account.stats[M.InboxID].bytes > 0 ? bytesToSize(account.stats[M.InboxID].bytes) : '-'
+        );
+        // Available
+        $('.account.progress-size.available').text(
+            account.space - account.space_used > 0 ? bytesToSize(account.space - account.space_used) : '-'
+        );
         /* End of Used Storage progressbar */
 
 

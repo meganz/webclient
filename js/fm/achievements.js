@@ -359,6 +359,9 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
 
     var ach = mega.achievem;
     var maf = M.maf;
+    var totalStorage = 0;
+    var totalTransfer = 0;
+    var totalInviteeCount = 0;
     for (var idx in maf) {
         if (maf.hasOwnProperty(idx)) {
             idx |= 0;
@@ -367,23 +370,23 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
             if (selector) {
                 var $cell = $('.achievements-cell.' + selector, $dialog).removeClass('hidden');
 
-                var locFmt = l[16287].replace('[S]', '<span>').replace('[/S]', '</span>');
-                $('.reward.storage .reward-txt', $cell)
-                    .safeHTML('%n', locFmt, bytesToSize(data[0], 0));
+                $('.reward.storage .reward-txt', $cell).next()
+                    .safeHTML(bytesToSize(data[0], 0));
 
                 if (!data[1]) {
                     $cell.addClass('one-reward');
                 }
                 else {
-                    locFmt = l[16288].replace('[S]', '<span>').replace('[/S]', '</span>');
-                    $('.reward.bandwidth .reward-txt', $cell)
-                        .safeHTML('%n', locFmt, bytesToSize(data[1], 0));
+                    $('.reward.bandwidth .reward-txt', $cell).next()
+                        .safeHTML(bytesToSize(data[1], 0));
                 }
+                $('.reward.valid-period .reward-txt', $cell).next()
+                    .safeHTML(l[19775].replace('%d', data['expiry']['value']));
 
                 if (!$cell.hasClass('localized')) {
                     $cell.addClass('localized');
 
-                    var $desc = $cell.find('.description');
+                    var $desc = $cell.find('.achi-content-txt');
                     var text = String($desc.text()).trim().replace('[%3]', '%3');
 
                     if (!data[1]) {
@@ -396,10 +399,19 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
                     }
                 }
 
-                if (data.rwd && idx !== ach.ACH_INVITE) {
-                    $cell.addClass('achieved');
-
+                if (data.rwds) {
+                    for (var i = data.rwds.length - 1; i >= 0; i--) {
+                        totalStorage += data.rwds[i].left > 0 ? data[0] : 0;
+                        totalTransfer += data.rwds[i].left > 0 ? data[1] : 0;
+                        totalInviteeCount += data.rwds[i].left > 0 ? 1 : 0;
+                    }
+                }
+                else if (data.rwd) {
                     locFmt = l[16336].replace('[S]', '<span>').replace('[/S]', '</span>');
+
+                    totalStorage += data[0];
+                    totalTransfer += data[1];
+
                     if (!data.rwd.e) {
                         // this reward do not expires
                         locFmt = '&nbsp;';
@@ -407,35 +419,58 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
                     else if (data.rwd.left < 1) {
                         // show "Expired"
                         locFmt = l[1664];
-                    }
-                    $('.expires-txt', $cell).addClass('red').safeHTML('%n', locFmt, data.rwd.left, l[16290]);
-
-                    locFmt = '';
-                    switch (idx) {
-                        case ach.ACH_WELCOME:     locFmt = l[16395]; break;
-                        case ach.ACH_SYNCINSTALL: locFmt = l[16396]; break;
-                        case ach.ACH_APPINSTALL:  locFmt = l[16397]; break;
+                        totalStorage -= data[0];
+                        totalTransfer -= data[1];
                     }
 
-                    $('.description', $cell)
+                    if (idx !== ach.ACH_INVITE) {
+                        $cell.addClass('achieved');
+
+                        $('.expires-txt', $cell).addClass('red').safeHTML('%n', locFmt, data.rwd.left, l[16290]);
+
+                        locFmt = '';
+                        switch (idx) {
+                            case ach.ACH_WELCOME:     locFmt = l[16395]; break;
+                            case ach.ACH_SYNCINSTALL: locFmt = l[16396]; break;
+                            case ach.ACH_APPINSTALL:  locFmt = l[16397]; break;
+                        }
+                    }
+
+                    $('.content-txt:not(.tooltip-content)', $cell)
                         .text(locFmt
                             .replace('%1', bytesToSize(data[0], 0))
                             .replace('%2', bytesToSize(data[1], 0))
                         );
                 }
                 else {
-                    ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
-
                     locFmt = l[16291].replace('[S]', '<span>').replace('[/S]', '</span>');
                     $('.expires-txt', $cell)
                         .removeClass('red')
                         .safeHTML('%n', locFmt, data.expiry.value, data.expiry.utxt);
                 }
-
+                
+                ach.bind.call($('.default-green-button', $cell), ach.mapToAction[idx]);
                 $cell.removeClass('hidden');
             }
         }
     }
+
+    $('.storage-quota .quota-txt', $dialog).text(bytesToSize(totalStorage, 0));
+    $('.transfer-quota .quota-txt', $dialog).text(bytesToSize(totalTransfer, 0));
+
+    if (maf[3].rwds) {
+        $('.invitees .quota-txt', $dialog).text(totalInviteeCount);
+        $('.invitees .new-dialog-icon', $dialog).removeClass('hidden');
+    }
+    else if (maf[3].rwd && maf[3].rwd.left > 0) {
+        $('.invitees .quota-txt', $dialog).text(1);
+        $('.invitees .new-dialog-icon', $dialog).addClass('hidden');
+    }
+    else {
+        $('.invitees .quota-txt', $dialog).text(0);
+        $('.invitees .new-dialog-icon', $dialog).addClass('hidden');
+    }
+
     maf = ach = undefined;
 
     // Show dialog
@@ -462,6 +497,12 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
         $dialog.css('margin-top', '-' + $dialog.outerHeight() / 2 + 'px');
 
         return $dialog;
+    });
+
+    $('.invitees .new-dialog-icon', $dialog).rebind('click', function() {
+        closeDialog();
+        fm_showoverlay();
+        mega.achievem.invitationStatusDialog();
     });
 };
 
@@ -1028,16 +1069,6 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
  */
 mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
     // hide everything until seen on the api reply (maf)
-    $('.achievements-table .achievements-cell').addClass('hidden');
-    var $items = $('.account.progress-list.achievem .progress-item')
-        .not('.baseq').addClass('hidden');
-    $items.removeClass('achieved');
-    $('.data-block.achievements-data').removeClass('has-completed');
-    $('.progress-title span', $items).remove();
-
-    var $achStorage = $('.account.progress-list.achievem.storage');
-    var $achTransfer = $('.account.progress-list.achievem.transfer');
-    var $achTable = $('.account.data-block .achievements-table');
     var storageMaxValue = 0;
     var storageCurrentValue = 0;
     var transferMaxValue = 0;
@@ -1051,8 +1082,7 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
         if (maf.hasOwnProperty(idx)) {
             idx |= 0;
             var data = maf[idx];
-            var selector = ach.mapToElement[idx];
-            if (selector) {
+            if (ach.mapToElement[idx]) {
                 var base = 0;
                 var rwds = data.rwds || [data.rwd];
                 for (i = rwds.length; i--;) {
@@ -1061,208 +1091,57 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
                     }
                 }
                 var storageValue = (data[0] * base);
-                var $cell = $('.' + selector, $achTable).closest('.achievements-cell');
-                var $storageItem = $('.progress-item.' + selector, $achStorage).removeClass('hidden');
-                var $transferItem = $('.progress-item.' + selector, $achTransfer).removeClass('hidden');
-                var $achievementsBl = $('.account.achievements-data');
-                $storageItem.parent().removeClass('hidden');
-                $transferItem.parent().removeClass('hidden');
-
                 storageMaxValue += storageValue;
-                $('.progress-txt', $storageItem).text(bytesToSize(data[0] * (base || 1), 0));
-
-                $('.rewards .reward:first-child .reward-txt', $cell).safeHTML(bytesToSize(data[0], 0, 2));
                 if (data[1]) {
                     var transferValue = (data[1] * base);
-
                     transferMaxValue += transferValue;
-                    $('.progress-txt', $transferItem).text(bytesToSize(data[1] * (base || 1), 0));
 
-                    if (data.rwd) {
-                        if (data.rwd.left > 0) {
-                            transferCurrentValue += transferValue;
-                            $transferItem.addClass('achieved');
-                            $achievementsBl.addClass('has-completed');
-                        }
-
-
-                        if (idx !== ach.ACH_INVITE) {
-                            if (data.rwd.e) {
-                                $('.progress-title', $transferItem)
-                                    .safeAppend('<span class="red-txt">&nbsp;(@@)</span>',
-                                        data.rwd.left > 0
-                                            ? l[16284].replace('%1', data.rwd.left)
-                                            : l[1664]
-                                    );
-                            }
-                        }
-                        else {
-                            if (base) {
-                                ach.bind.call($transferItem, '~invitationStatusDialog');
-                                 /* re-enable once the invite status dialog is brought back
-                                  $transferItem
-                                  .css('cursor', 'pointer')
-                                  .attr('title',
-                                  l[16285].replace('%1', base));
-                                  */
-                            }
-                        }
-                    }
-
-                    $('.rewards .reward:last-child', $cell)
-                        .removeClass('hidden')
-                        .find('.reward-txt')
-                        .safeHTML(bytesToSize(data[1], 0, 2));
-                }
-                else {
-                    $transferItem.addClass('disabled');
-                    $('.rewards .reward:last-child', $cell).addClass('hidden');
-                }
-
-                if (!$cell.hasClass('localized')) {
-                    $cell.addClass('localized');
-
-                    var $desc = $cell.find('.description');
-                    var text = String($desc.text()).trim().replace('[%3]', '%3');
-
-                    if (!data[1]) {
-                        // one-reward
-                        $desc.safeHTML('%n', text, bytesToSize(data[0], 0), data.expiry.value);
-                    }
-                    else {
-                        $desc.safeHTML('%n', text, bytesToSize(data[0], 0),
-                            bytesToSize(data[1], 0), data.expiry.value);
+                    if (data.rwd && data.rwd.left > 0) {
+                        transferCurrentValue += transferValue;
                     }
                 }
 
                 if (idx === ach.ACH_INVITE) {
-                    ach.bind.call($('.button, .achievement-full.title', $cell), ach.mapToAction[idx]);
-
-                    if (data.rwd) {
-                        if (storageValue) {
-                            storageCurrentValue += storageValue;
-                            $storageItem.addClass('achieved');
-                        }
-
-                        if (base) {
-                            ach.bind.call($storageItem, '~invitationStatusDialog');
-                             /* re-enable once the invite status dialog is brought back
-                              $storageItem
-                              .css('cursor', 'pointer')
-                              .attr('title',
-                              l[16285].replace('%1', base));
-                              */
-                        }
-                    }
-                }
-                else if (data.rwd) {
-                    // Achieved
-                    if (data.rwd.left > 0) {
+                    if (data.rwd && storageValue) {
                         storageCurrentValue += storageValue;
-                        $storageItem.addClass('achieved');
-
-                        if ($cell.parent('.available-achievements').length > 0) {
-                            $cell.addClass('achieved');
-                            $('.completed-achievements').append($cell);
-                        }
-                    }
-
-                    if (data.rwd.e) {
-                        $('.progress-title', $storageItem)
-                            .safeAppend('<span class="red-txt">&nbsp;(@@)</span>',
-                                data.rwd.left > 0
-                                    ? l[16284].replace('%1', data.rwd.left)
-                                    : l[1664]
-                            );
-                    }
-
-                    $('.status', $cell)
-                        .safeHTML(
-                            '<div class="achievement-complete">@@</div>' +
-                            '<div class="achievement-date">@@ <span class="red-txt">(@@)</span></div>' +
-                            '<div class="clear"></div>',
-                            l[16286], data.rwd.date.toLocaleDateString(),
-                            data.rwd.left > 0
-                                ? l[16284].replace('%1', data.rwd.left)
-                                : l[1664]
-                        );
-
-
-                    if (!data.rwd.e) {
-                        $('.status .achievement-date .red-txt', $cell).addClass('hidden');
-                    }
-
-                    if (data.rwd.left < 1) {
-                        $storageItem.addClass('disabled');
-                        $transferItem.addClass('disabled');
                     }
                 }
-                else {
-                    ach.bind.call($('.button, .achievement-full.title', $cell), ach.mapToAction[idx]);
+                // Achieved
+                else if (data.rwd && data.rwd.left > 0) {
+                    storageCurrentValue += storageValue;
                 }
-                $cell.removeClass('hidden');
             }
         }
     }
 
     // For free users only show base quota for storage and remove it for bandwidth.
     // For pro users replace base quota by pro quota
-    var $baseq = $('.achievements-block .data-block.storage .baseq').addClass('achieved');
-    storageBaseQuota = maf.storage.base;
-    $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
+    storageBaseQuota = maf.storage.base ;
 
     if (u_attr.p) {
-        $('.progress-title', $baseq).text(l[16299]);
-
         transferBaseQuota = maf.transfer.base;
-        $baseq = $('.achievements-block .data-block.transfer .baseq').addClass('achieved');
-        $('.progress-txt', $baseq).text(bytesToSize(transferBaseQuota, 0));
-        $('.progress-title', $baseq).text(l[16299]);
-    }
-    else {
-        storageBaseQuota = maf.storage.base;
-        $('.achievements-block .data-block.transfer .baseq').addClass('hidden');
     }
 
-    $('.account.data-block .btn-achievements')
-        .removeClass('hidden')
-        .rebind('click', function() {
-            $('.account.tab-lnk.achievements').trigger('click');
-            return false;
-        });
-
-    $('.account.plan-info.bandwidth .plan-comment')
-        .text(l[16300]
-            .replace('%1', bytesToSize(transferBaseQuota, 0))
-            .replace('%2', bytesToSize(transferCurrentValue, 0))
-        );
-    $('.account.plan-info.storage .plan-comment')
-        .text(l[16300]
-            .replace('%1', bytesToSize(storageBaseQuota, 0))
-            .replace('%2', bytesToSize(storageCurrentValue, 0))
-        );
-
+    var storageProportion = storageCurrentValue / (storageBaseQuota + storageCurrentValue) * 100;
+    var transferProportion = transferCurrentValue / (transferBaseQuota + transferCurrentValue) * 100;
+    var storageAchieveValue = storageCurrentValue;
+    var transferAchieveValue = transferCurrentValue;
     storageCurrentValue += storageBaseQuota;
     transferCurrentValue += transferBaseQuota;
 
-    $('.account.plan-info.bandwidth span').text(bytesToSize(transferCurrentValue, 0));
-    $('.account.plan-info.storage span').text(bytesToSize(storageCurrentValue, 0));
+    $('.account.plan-info.bandwidth > span').text(bytesToSize(transferCurrentValue, 0));
+    $('.account.plan-info.bandwidth .settings-sub-bar').css('width', transferProportion + '%');
+    $('.account.plan-info.bandwidth .base-quota-note').text(l[19992]
+        .replace('%1', bytesToSize(transferBaseQuota, 0)));
+    $('.account.plan-info.bandwidth .achieve-quota-note').text(l[19993]
+        .replace('%1', bytesToSize(transferAchieveValue, 0)));
 
-    var $achBlock = $('.account.achievements-block');
-    if (storageCurrentValue) {
-        $('.account.quota-txt.storage', $achBlock).removeClass('hidden')
-            .text(bytesToSize(storageCurrentValue, 0));
-    }
-    else {
-        $('.account.quota-txt.storage', $achBlock).addClass('hidden');
-    }
-    if (transferCurrentValue) {
-        $('.account.quota-txt.transfer', $achBlock).removeClass('hidden')
-            .text(bytesToSize(transferCurrentValue, 0));
-    }
-    else {
-        $('.account.quota-txt.transfer', $achBlock).addClass('hidden');
-    }
+    $('.account.plan-info.storage > span').text(bytesToSize(storageCurrentValue, 0));
+    $('.account.plan-info.storage .settings-sub-bar').css('width', storageProportion + '%');
+    $('.account.plan-info.storage .base-quota-note').text(l[19992]
+        .replace('%1', bytesToSize(storageBaseQuota, 0)));
+    $('.account.plan-info.storage .achieve-quota-note').text(l[19993]
+        .replace('%1', bytesToSize(storageAchieveValue, 0)));
 };
 
 // No one needs to mess with this externally

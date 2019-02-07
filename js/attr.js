@@ -976,12 +976,17 @@ var attribCache = false;
             delete pubEd25519[userHandle];
             crypt.getPubEd25519(userHandle);
         };
-        uaPacketParserHandler['*!fmconfig'] = function() { mega.config.fetch(); };
+        uaPacketParserHandler['*!fmconfig'] = function() {
+            mega.config.fetch();
+            if (fminitialized && page === 'fm/account/transfers') {
+                accountUI.transfers.transferTools.megasync.render();
+            }
+        };
         uaPacketParserHandler['birthday'] = function(userHandle) {
             mega.attr.get(userHandle, 'birthday', -1, false, function(res) {
                 u_attr['birthday'] = from8(base64urldecode(res));
                 if (fminitialized && page === 'fm/account') {
-                    accountUI.setBirthDay();
+                    accountUI.account.profiles.renderBirthDay();
                 }
             });
         };
@@ -989,7 +994,7 @@ var attribCache = false;
             mega.attr.get(userHandle, 'birthmonth', -1, false, function(res) {
                 u_attr['birthmonth'] = from8(base64urldecode(res));
                 if (fminitialized && page === 'fm/account') {
-                    accountUI.setBirthMonth();
+                    accountUI.account.profiles.renderBirthMonth();
                 }
             });
         };
@@ -997,7 +1002,7 @@ var attribCache = false;
             mega.attr.get(userHandle, 'birthyear', -1, false, function(res) {
                 u_attr['birthyear'] = from8(base64urldecode(res));
                 if (fminitialized && page === 'fm/account') {
-                    accountUI.setBirthYear();
+                    accountUI.account.profiles.renderBirthYear();
                 }
             });
         };
@@ -1005,15 +1010,16 @@ var attribCache = false;
             mega.attr.get(userHandle, 'country', -1, false, function(res) {
                 u_attr['country'] = from8(base64urldecode(res));
                 if (fminitialized && page === 'fm/account') {
-                    accountUI.setCountry();
+                    accountUI.account.profiles.renderCountry();
+                    accountUI.account.profiles.bindEvents();
                 }
             });
         };
         uaPacketParserHandler['^!prd'] = function() {
             mBroadcaster.sendMessage('attr:passwordReminderDialog');
             // if page is session history and new password action detected. update session table.
-            if (fminitialized && page === 'fm/account/history') {
-                accountUI.updateSessionTable();
+            if (fminitialized && page === 'fm/account/security') {
+                accountUI.security.session.update(1);
             }
         };
         uaPacketParserHandler['^!dv'] = function() {
@@ -1027,6 +1033,9 @@ var attribCache = false;
                 if (fminitialized && $.dialog === 'qr-dialog') {
                     openAccessQRDialog();
                 }
+                if (fminitialized && page === 'fm/account') {
+                    accountUI.account.qrcode.render(M.account, res);
+                }
             });
         };
         uaPacketParserHandler['^!rubbishtime'] = function(userHandle) {
@@ -1035,7 +1044,7 @@ var attribCache = false;
                     if (fminitialized) {
                         M.account.ssrs = parseInt(res);
                         if (page === 'fm/account/file-management') {
-                            accountUI.setRubsched();
+                            accountUI.fileManagement.rubsched.render();
                         }
                     }
                 });

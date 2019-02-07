@@ -330,7 +330,7 @@
     -khtml-opacity: 0.3;
     opacity: 0.3;
 }
-.default-white-button.semi-big, .default-grey-button.semi-big {
+.default-white-button.semi-big, .default-grey-button.semi-big, .default-green-button.semi-big {
     line-height: 35px;
     height: 36px;
 }

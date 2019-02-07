@@ -1098,6 +1098,11 @@ function waitsc() {
                         // WSC is stopped at the beginning.
                         return;
                     }
+                    if (delieveredResponse == ETOOMANY) {
+                        // WSC is stopped at the beginning.
+                        fm_fullreload(null, 'ETOOMANY');
+                        return;
+                    }
                     waittimeout = setTimeout(waitsc, waitbackoff);
                     return;
                 }

@@ -661,9 +661,13 @@ var notify = {
 
             // Mark all notifications as seen (because they clicked on a notification within the popup)
             notify.markAllNotificationsAsSeen();
+            var $target = $('.data-block.account-balance');
 
             // Redirect to payment history
-            loadSubPage('fm/account/history');
+            loadSubPage('fm/account/plan');
+            mBroadcaster.once('settingPageReady', function () {
+                $('.fm-account-main').data('jsp').scrollToElement($target, true, false);
+            });
         });
     },
 

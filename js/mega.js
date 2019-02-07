@@ -309,7 +309,7 @@ function startNodesFetching(scni) {
     if (!--nodesinflight[scni]) {
         delete nodesinflight[scni];
 
-        if (scloadtnodes && scq[scni][0] && sc_fqueuet(scni)) {
+        if (scloadtnodes && scq[scni] && scq[scni][0] && sc_fqueuet(scni)) {
             // fetch required nodes from db
             sc_fetcher();
         }
@@ -1053,10 +1053,10 @@ scparser.$add('sd', {
     b: function() {
         "use strict";
 
-        if (fminitialized && page === 'fm/account/history') {
+        if (fminitialized && page === 'fm/account/security') {
             // need to wait until session history is refreshed.
             setTimeout(function() {
-                accountUI.updateSessionTable(true);
+                accountUI.security.session.update(true);
             }, 3000);
         }
     }

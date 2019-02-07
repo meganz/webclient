@@ -1,4 +1,5 @@
 function accountUI() {
+
     "use strict";
 
     // Prevent ephemeral session to access account settings via url
@@ -26,7 +27,6 @@ function accountUI() {
     $('.fm-account-save-block').addClass('hidden');
     $('.fm-account-save').removeClass('disabled');
 
-
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();
     }
@@ -49,2614 +49,3011 @@ function accountUI() {
     M.accountData(accountUI.renderAccountPage, 1);
 }
 
-accountUI.renderProgressBar = function(account) {
-
-    'use strict';
-
-    // Cloud drive
-    $('.account.progress-size.cloud-drive').text(
-        account.stats[M.RootID].bytes > 0 ? bytesToSize(account.stats[M.RootID].bytes) : '-'
-    );
-    // Rubbish bin
-    $('.account.progress-size.rubbish-bin').text(
-        account.stats[M.RubbishID].bytes > 0 ? bytesToSize(account.stats[M.RubbishID].bytes) : '-'
-    );
-    // Incoming shares
-    $('.account.progress-size.incoming-shares').text(
-        account.stats.inshares.bytes ? bytesToSize(account.stats.inshares.bytes) : '-'
-    );
-    // Inbox
-    $('.account.progress-size.inbox').text(
-        account.stats[M.InboxID].bytes > 0 ? bytesToSize(account.stats[M.InboxID].bytes) : '-'
-    );
-};
-
 accountUI.renderAccountPage = function(account) {
 
-    'use strict'; /* jshint -W074, -W089 */
+    'use strict';
 
     if (d) {
         console.log('Rendering account pages');
     }
-    accountUI.userUIUpdate();
-    var perc_c;
+
     var id = getSitePath();
-    var pid = String(id).replace('/fm/account/', '');
     var sectionClass;
-    var tabSection;
+    accountUI.general.init(account);
+    accountUI.inputs.text.init();
 
-    if (pid.indexOf('-notifications') > 0) {
-        tabSection = pid.split('-').shift();
-    }
-    else {
-        switch (pid) {
-            case 'payment':
-            case 'achievements':
-            case 'email-and-pass':
-                id = '/fm/account';
-                tabSection = pid;
+    switch (id) {
+
+        case '/fm/account':
+            $('.fm-account-profile').removeClass('hidden');
+            $('.settings-banner').removeClass('hidden');
+            sectionClass = 'account-s';
+
+            accountUI.account.init(account);
+            break;
+
+        case '/fm/account/plan':
+            $('.fm-account-plan').removeClass('hidden');
+            $('.settings-banner').removeClass('hidden');
+            sectionClass = 'plan';
+
+            accountUI.plan.init(account);
+            break;
+
+        case '/fm/account/security':
+            $('.fm-account-security').removeClass('hidden');
+            $('.settings-banner').addClass('hidden');
+            sectionClass = 'security';
+
+            accountUI.security.init();
+            break;
+
+        case '/fm/account/file-management':
+            $('.fm-account-file-management').removeClass('hidden');
+            $('.settings-banner').addClass('hidden');
+            sectionClass = 'file-management';
+
+            accountUI.fileManagement.init();
+            break;
+
+        case '/fm/account/transfers':
+            $('.fm-account-transfers').removeClass('hidden');
+            $('.settings-banner').removeClass('hidden');
+            sectionClass = 'transfers';
+
+            accountUI.transfers.init(account);
+            break;
+
+        case '/fm/account/contact-chats':
+            $('.fm-account-contact-chats').removeClass('hidden');
+            $('.settings-banner').addClass('hidden');
+            sectionClass = 'contact-chats';
+
+            accountUI.contactAndChat.init();
+            break;
+
+        case '/fm/account/reseller' /** && M.account.reseller **/:
+            $('.fm-account-reseller').removeClass('hidden');
+            $('.settings-banner').addClass('hidden');
+            sectionClass = 'reseller';
+
+            accountUI.reseller.init(account);
+            break;
+
+        case '/fm/account/notifications' /** && M.account.reseller **/:
+            $('.fm-account-notifications').removeClass('hidden');
+            $('.settings-banner').addClass('hidden');
+            sectionClass = 'notifications';
+
+            accountUI.notifications.init(account);
+            break;
+
+        default:
+            // This is the main entry point for users who just had upgraded their accounts
+            if (isNonActivatedAccount()) {
+                alarm.nonActivatedAccount.render(true);
                 break;
-
-            case 'notifications':
-                tabSection = 'cloud-drive';
-                break;
-
-            case 'chat':
-            case 'advanced':
-            case 'transfers':
-            case 'file-management':
-                id = '/fm/account/advanced';
-                tabSection = pid;
-
-                if (pid === 'file-management') {
-                    tabSection = 'fm';
-                }
-                else if (pid === 'advanced') {
-                    tabSection = 'ui';
-                }
-                break;
-
-            default:
-                tabSection = 'general';
-        }
-    }
-
-    $('.account.tab-content').addClass('hidden');
-    $('.account.tab-lnk.active').removeClass('active');
-
-    if (tabSection) {
-        tabSection = tabSection.replace(/[^\w-]/g, '');
-
-        if (tabSection === 'achievements' && !account.maf) {
-            tabSection = 'general';
-        }
-
-        $('.account.tab-content.' + tabSection).removeClass('hidden');
-        $('.account.tab-lnk[data-tab="' + tabSection + '"]').addClass('active');
-    }
-
-    if (id === '/fm/account/advanced') {
-        $('.fm-account-settings').removeClass('hidden');
-        sectionClass = 'advanced';
-
-        accountUI.advancedSection();
-
-        if (is_chrome_firefox) {
-            if (!$('#acc_dls_folder').length) {
-                $('.transfer-settings').safeAppend(
-                    '<div id="acc_dls_folder">' +
-                    '<div class="fm-account-header">Downloads folder:</div>' +
-                    '<input type="button" value="Browse..." style="-moz-appearance:' +
-                    'button;margin-right:12px;cursor:pointer" />' +
-                    '</div>');
-                var fld = mozGetDownloadsFolder();
-                $('#acc_dls_folder').append($('<span/>').text(fld && fld.path));
-                $('#acc_dls_folder input').click(function() {
-                    var fs = mozFilePicker(0, 2);
-                    if (fs) {
-                        mozSetDownloadsFolder(fs);
-                        $(this).next().text(fs.path);
-                    }
-                });
             }
-        }
-    }
-    else if (id === '/fm/account') {
-        $('.fm-account-profile').removeClass('hidden');
-        sectionClass = 'account-s';
-    }
-    else if (id === '/fm/account/history') {
-        $('.fm-account-history').removeClass('hidden').find('.account.tab-content').removeClass('hidden');
-        sectionClass = 'history';
-    }
-    else if (id === '/fm/account/reseller' && M.account.reseller) {
-        $('.fm-account-reseller').removeClass('hidden').find('.account.tab-content').removeClass('hidden');
-        sectionClass = 'reseller';
-    }
-    else if (id === '/fm/account/megadrop') {
-        $('.fm-account-widget').removeClass('hidden').find('.account.tab-content').removeClass('hidden');
-        mega.megadrop.stngsDraw();
-        sectionClass = 'megadrop';
-    }
-    else {
-        // This is the main entry point for users who just had upgraded their accounts
-        if (isNonActivatedAccount()) {
-            alarm.nonActivatedAccount.render(true);
-        }
 
-        $('.fm-account-notifications').removeClass('hidden');
-        sectionClass = 'notifications';
+            // If user trying to use wrong url within account page, redirect them to account page.
+            loadSubPage('fm/account');
+            break;
     }
 
-    $('.fm-account-button.' + sectionClass).addClass('active');
+    accountUI.leftPane.init(sectionClass);
 
-    if (u_attr.p) {
+    // Reinitialize Scroll bar
+    initAccountScroll();
+    mBroadcaster.sendMessage('settingPageReady');
+    loadingDialog.hide();
+};
 
-        // LITE/PRO account
-        var planNum = u_attr.p;
-        var planText = pro.getProPlanName(planNum);
+accountUI.general = {
 
-        $('.account.plan-info.accounttype span').text(planText);
-        $('.small-icon.membership').addClass('pro' + planNum);
+    init: function(account) {
 
-        // Subscription
-        if (account.stype === 'S') {
+        'use strict';
 
-            // Get the date their subscription will renew
-            var timestamp = (account.srenew.length > 0) ? account.srenew[0] : 0;    // Timestamp e.g. 1493337569
-            var paymentType = (account.sgw.length > 0) ? account.sgw[0] : '';       // Credit Card etc
-            var gatewayId = (account.sgwids.length > 0) ? account.sgwids[0] : null; // Gateway ID e.g. 15, 16 etc
+        $.tresizer();
+        clickURLs();
 
-            // Display the date their subscription will renew if known
-            if (timestamp > 0) {
-                var dateString = time2date(timestamp, 2);
+        this.charts.init(account);
+        this.userUIUpdate();
+        this.bindEvents();
+    },
 
-                // Use format: 14 March 2015 - Credit Card
-                paymentType = dateString + ' - ' + paymentType;
+    bindEvents: function() {
 
-                // Change placeholder 'Expires on' to 'Renews'
-                $('.account.plan-info.expiry-txt').text(l[6971]);
-                $('.account.plan-info.expiry').text(paymentType);
+        'use strict';
+
+        // Upgrade Account Button
+        $('.upgrade-to-pro').rebind('click', function() {
+            loadSubPage('pro');
+        });
+    },
+
+    /**
+     * Helper function to fill common charts into the dashboard and account sections
+     * @param {Object}  account       User account data (I.e. same as M.account)
+     * @param {Boolean} [onDashboard] Whether invoked from the dashboard
+     */
+    charts: {
+
+        perc_c_s : 0,
+        perc_c_b : 0,
+
+        init: function(account, onDashboard) {
+
+            'use strict';
+
+            this.bandwidthChart(account);
+            this.usedStorageChart(account);
+            this.chartWarningNoti(onDashboard);
+        },
+
+        bandwidthChart: function(account) {
+
+            'use strict';
+
+            /* New Used Bandwidth chart */
+            this.perc_c_b = account.tfsq.perc > 100 ? 100 : account.tfsq.perc;
+
+            var $bandwidthChart = $('.fm-account-blocks.bandwidth');
+            var deg = 230 * this.perc_c_b / 100;
+
+            // Used Bandwidth chart
+            if (deg <= 180) {
+                $bandwidthChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+                $bandwidthChart.find('.right-chart span').removeAttr('style');
             }
             else {
-                // Otherwise show nothing
-                $('.account.plan-info.expiry').text('');
-                $('.account.plan-info.expiry-txt').text('');
+                $bandwidthChart.find('.left-chart span').css('transform', 'rotate(180deg)');
+                $bandwidthChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
             }
 
-            var $buttons = $('.account.buttons');
-            var $cancelSubscriptionButton = $buttons.find('.btn-cancel-sub');
-            var $achievementsButton = $buttons.find('.btn-achievements').addClass('hidden');
+            if (this.perc_c_b > 99 || dlmanager.isOverQuota) {
+                $bandwidthChart.addClass('exceeded');
+            }
 
-            // If Apple or Google subscription (see pro.getPaymentGatewayName function for codes)
-            if ((gatewayId === 2) || (gatewayId === 3)) {
+            // Maximum bandwidth
+            var b2 = bytesToSize(account.tfsq.max, 0).split(' ');
+            var usedB = bytesToSize(account.tfsq.used);
+            $bandwidthChart.find('.chart.data .size-txt').text(usedB);
+            $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
+            $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
+            $bandwidthChart.find('.chart.data .content-txt').text('/');
+            if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
+                if (this.perc_c_b > 0) {
+                    $bandwidthChart.removeClass('no-percs');
+                    $bandwidthChart.find('.chart.data .perc-txt').text(this.perc_c_b + '%');
+                }
+                else {
+                    $bandwidthChart.addClass('no-percs');
+                }
+            }
+            else {
+                $bandwidthChart.addClass('no-percs');
+                $bandwidthChart.find('.chart.data > span:not(.size-txt)').text('');
+                var usedW;
+                if (usedB[0] === '1') {
+                    usedW = l[17524].toLowerCase().replace('%tq1', '').trim();
+                }
+                else if (usedB[0] === '2') {
+                    usedW = l[17525].toLowerCase().replace('%tq2', '').trim();
+                }
+                else {
+                    usedW = l[17517].toLowerCase().replace('%tq', '').trim();
+                }
+                $bandwidthChart.find('.chart.data .pecents-txt').text(usedW);
+            }
+            /* End of New Used Bandwidth chart */
+        },
 
-                // Tell them they need to cancel their plan off-site and don't show the feedback dialog
-                $cancelSubscriptionButton.removeClass('hidden').rebind('click', function() {
-                    msgDialog('warninga', l[7179], l[16501]);
+        usedStorageChart: function(account) {
+
+            'use strict';
+
+            /* New Used Storage chart */
+            var $storageChart = $('.fm-account-blocks.storage');
+            this.perc_c_s = Math.floor(account.space_used / account.space * 100);
+            if (this.perc_c_s > 100) {
+                this.perc_c_s = 100;
+            }
+            $storageChart.removeClass('exceeded going-out');
+
+            if (this.perc_c_s === 100) {
+                $storageChart.addClass('exceeded');
+            }
+            else if (this.perc_c_s > 80) {
+                $storageChart.addClass('going-out');
+            }
+
+            var deg = 230 * this.perc_c_s / 100;
+
+            // Used space chart
+            if (deg <= 180) {
+                $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+                $storageChart.find('.right-chart span').removeAttr('style');
+            }
+            else {
+                $storageChart.find('.left-chart span').css('transform', 'rotate(180deg)');
+                $storageChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+            }
+
+            // Maximum disk space
+            var b2 = bytesToSize(account.space, 0).split(' ');
+            $storageChart.find('.chart.data .pecents-txt').text(b2[0]);
+            $storageChart.find('.chart.data .gb-txt').text(b2[1]);
+            $storageChart.find('.chart.data .perc-txt').text(this.perc_c_s + '%');
+            $storageChart.find('.chart.data .size-txt').text(bytesToSize(account.space_used));
+            $('.account.quota-txt.used-space')
+                .safeHTML('<span>@@</span> @@ @@', bytesToSize(account.space_used), l[5528], b2.join(' '));
+            /** End New Used Storage chart */
+        },
+
+        chartWarningNoti: function(onDashboard) {
+
+            'use strict';
+
+            var b_exceeded = (this.perc_c_t > 99 || dlmanager.isOverQuota) ? true : false;
+            var s_exceeded = this.perc_c_s === 100 ? true : false;
+
+            // Charts warning notifications
+            var $chartsBlock = $('.account' + (onDashboard ? '.widget.content' : '.data-block.charts'));
+            $chartsBlock.find('.chart-warning:not(.hidden)').addClass('hidden');
+            if (b_exceeded && s_exceeded) {
+                // Bandwidth and Storage quota exceeded
+                $chartsBlock.find('.chart-warning.storage-and-bandwidth').removeClass('hidden');
+            }
+            else if (s_exceeded) {
+                // Storage quota exceeded
+                $chartsBlock.find('.chart-warning.storage').removeClass('hidden');
+            }
+            else if (b_exceeded) {
+                // Bandwidth quota exceeded
+                $chartsBlock.find('.chart-warning.bandwidth').removeClass('hidden');
+            }
+            else if (this.perc_c_s > 80) {
+                // Running out of cloud space
+                $chartsBlock.find('.chart-warning.out-of-space').removeClass('hidden');
+            }
+            if (b_exceeded || s_exceeded || this.perc_c_s > 80) {
+                $chartsBlock.find('.chart-warning').rebind('click', function() {
+                    loadSubPage('pro');
                 });
             }
-
-            // Otherwise if ECP or Sabadell
-            else if ((gatewayId === 16) || (gatewayId === 17)) {
-
-                // Check if there are any active subscriptions
-                // ccqns = Credit Card Query Number of Subscriptions
-                api_req({a: 'ccqns'}, {
-                    callback: function(numOfSubscriptions) {
-
-                        // If there is an active subscription
-                        if (numOfSubscriptions > 0) {
-
-                            // Show cancel button and show cancellation dialog
-                            $cancelSubscriptionButton.removeClass('hidden').rebind('click', function() {
-                                accountUI.cancelSubscriptionDialog.init();
-                            });
-                            $achievementsButton.addClass('hidden');
-                        }
-                    }
-                });
-            }
+            /* End of Charts warning notifications */
         }
-        else if (account.stype === 'O') {
+    },
 
-            // one-time or cancelled subscription
-            $('.account.plan-info.expiry a').rebind('click', function() {
-                document.location = $(this).attr('href');
-            });
-            $('.account.plan-info.expiry-txt').text(l[987]);
-            $('.account.plan-info.expiry a').text(time2date(account.expiry, 2));
-            $('.account.data-block .btn-cancel-sub').addClass('hidden');
-        }
+    /**
+     * Update user UI (pro plan, avatar, first/last name, email)
+     */
+    userUIUpdate: function() {
+        'use strict';
 
-        // Maximum bandwidth
-        $('.account.plan-info.bandwidth span').text(bytesToSize(account.bw, 0));
-        $('.account.plan-info-row.bandwidth').show();
-    }
-    else {
-        // free account:
-        $('.account.plan-info.accounttype span').text(l[435]);
-        $('.account.plan-info.expiry').text(l[436]);
-        $('.btn-cancel-sub').addClass('hidden');
-        $('.account.plan-info-row.bandwidth').hide();
-    }
+        // Show Membership plan
+        $('.small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
 
-    // Bind Inpust Focus/Blur events
-    $('.fm-account-input input').rebind('focus.accountInputFocus', function() {
-        var $wrapper = $(this).parent();
+        if (u_attr.p) {
+            // LITE/PRO account
+            var planNum = u_attr.p;
+            var planText = pro.getProPlanName(planNum);
 
-        if (!$wrapper.hasClass('disabled')) {
-            $wrapper.addClass('focused');
-        }
-    });
-
-    $('.fm-account-input input').rebind('blur.accountInputBlur', function() {
-        $(this).parent().removeClass('focused');
-    });
-
-    // Upgrade Account Button
-    $('.upgrade-to-pro').rebind('click', function() {
-        loadSubPage('pro');
-    });
-
-    // Maximum disk space
-    $('.account.plan-info.storage span').text(bytesToSize(account.space, 0));
-
-    accountUI.fillCharts(account);
-
-    /* Used Storage progressbar */
-    var percents = [
-        100 * account.stats[M.RootID].bytes / account.space,
-        100 * account.stats[M.InboxID].bytes / account.space,
-        100 * account.stats.inshares.bytes / account.space,
-        100 * account.stats[M.RubbishID].bytes / account.space
-    ];
-    for (var i = 0; i < 4; i++) {
-        var $percBlock = $('.data-block.storage-data .account.pr-item.pr' + i);
-        if (percents[i] > 0) {
-            $percBlock.removeClass('empty hidden');
+            $('.account.membership-plan').text(planText);
+            $('.small-icon.membership').addClass('pro' + planNum);
         }
         else {
-            $percBlock.addClass('empty hidden');
-        }
-    }
-
-    // Storage usage clickable sections
-    $('.account.storage-data .pr-item')
-        .rebind('click', function() {
-            var section = String($(this).attr('class')).replace(/account|pr-item|empty/g, '').trim();
-            switch (section) {
-                case 'pr0':
-                    section = M.RootID;
-                    break;
-                case 'pr1':
-                    section = M.InboxID;
-                    break;
-                case 'pr2':
-                    section = 'shares';
-                    break;
-                case 'pr3':
-                    section = M.RubbishID;
-                    break;
-                default:
-                    section = null;
-                    break;
-            }
-
-            if (section) {
-                M.openFolder(section);
-            }
-
-            return false;
-        });
-
-    perc_c = Math.floor(account.space_used / account.space * 100);
-    if (perc_c > 100) {
-        perc_c = 100;
-    }
-
-    accountUI.renderProgressBar(account);
-    // Available
-    $('.tab-content .account.progress-size.available').text(
-        account.space - account.space_used > 0 ?
-            bytesToSize(account.space - account.space_used) : '-'
-    );
-    // Progressbar
-    $('.tab-content .account.progress-bar').css('width', perc_c + '%');
-    // Versioning
-    $('.tab-content .account.progress-size.versioning').text(
-        bytesToSize(account.stats[M.RootID].vbytes)
-    );
-
-    // Go to versioning settings.
-    $('.tab-content .version-settings-button').rebind('click', function() {
-        loadSubPage('fm/account/file-management');
-    });
-
-    /* achievements */
-    if (!account.maf) {
-        $('.fm-right-account-block').removeClass('active-achievements');
-    }
-    else {
-        $('.fm-right-account-block').addClass('active-achievements');
-
-        mega.achievem.parseAccountAchievements();
-    }
-    /* QR stuff */
-    if (account.contactLink && account.contactLink.length) {
-        $('.qr-settings .qr-settings-acc').removeClass('hidden');
-        $('.qr-settings .dialog-feature-toggle').addClass('toggle-on')
-            .find('.dialog-feature-switch').css('marginLeft', '22px');
-    }
-    else {
-        $('.qr-settings .qr-settings-acc').addClass('hidden');
-        $('.qr-settings .dialog-feature-toggle').removeClass('toggle-on')
-            .find('.dialog-feature-switch').css('marginLeft', '2px');
-    }
-    $('.qr-settings .button.access-qr').rebind('click', function () {
-        openAccessQRDialog();
-    });
-    $('.qr-settings .dialog-feature-toggle').rebind('click', function () {
-        var me = $(this);
-        if (me.hasClass('toggle-on')) {
-            me.find('.dialog-feature-switch').animate({ marginLeft: '2px' }, 150, 'swing', function () {
-                me.removeClass('toggle-on');
-                $('.qr-settings .qr-settings-acc').addClass('hidden');
-                api_req({
-                    a: 'cld',
-                    cl: account.contactLink.substring(2, account.contactLink.length)
-                }, {
-                    myAccount: account,
-                    callback: function (res, ctx) {
-                        if (res === 0) { // success
-                            ctx.myAccount.contactLink = '';
-                        }
-                    }
-                });
-            });
-        }
-        else {
-            me.find('.dialog-feature-switch').animate({ marginLeft: '22px' }, 150, 'swing', function () {
-                me.addClass('toggle-on');
-                $('.qr-settings .qr-settings-acc').removeClass('hidden');
-                api_req({ a: 'clc' }, {
-                    myAccount: account,
-                    callback: function (res, ctx) {
-                        if (typeof res !== 'string') {
-                            res = '';
-                        }
-                        else {
-                            res = 'C!' + res;
-                        }
-                        ctx.myAccount.contactLink = res;
-                    }
-                });
-            });
-        }
-    });
-    /* End QR stuff */
-
-
-    $('.fm-account-main .pro-upgrade').rebind('click', function() {
-        loadSubPage('pro');
-    });
-    $('.account.plan-info.balance span').safeHTML('&euro; @@', account.balance[0][0]);
-    var a = 0;
-    if (M.c['contacts']) {
-        for (i in M.c['contacts']) {
-            a++;
-        }
-    }
-    if (!$.sessionlimit) {
-        $.sessionlimit = 10;
-    }
-    if (!$.purchaselimit) {
-        $.purchaselimit = 10;
-    }
-    if (!$.transactionlimit) {
-        $.transactionlimit = 10;
-    }
-    if (!$.voucherlimit) {
-        $.voucherlimit = 10;
-    }
-
-    $('.account-history-dropdown-button.sessions').text(l[472].replace('[X]', $.sessionlimit));
-    $('.account-history-drop-items.session10-').text(l[472].replace('[X]', 10));
-    $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
-    $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
-
-    accountUI.renderSessionHistory();
-
-    $('.account-history-dropdown-button.purchases').text(l[469].replace('[X]', $.purchaselimit));
-    $('.account-history-drop-items.purchase10-').text(l[469].replace('[X]', 10));
-    $('.account-history-drop-items.purchase100-').text(l[469].replace('[X]', 100));
-    $('.account-history-drop-items.purchase250-').text(l[469].replace('[X]', 250));
-
-    M.account.purchases.sort(function(a, b) {
-        if (a[1] < b[1]) {
-            return 1;
-        }
-        else {
-            return -1;
-        }
-    });
-
-    $('.grid-table.purchases tr').remove();
-    var html = '<tr><th>' + l[475] + '</th><th>' + l[476] + '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
-
-    // Render every purchase made into Purchase History on Account page
-    $(account.purchases).each(function(index, purchaseTransaction) {
-
-        if (index === $.purchaselimit) {
-            return false;// Break the loop
+            $('.account.membership-plan').text(l[435]);
         }
 
-        // Set payment method
-        var paymentMethodId = purchaseTransaction[4];
-        var paymentMethod = pro.getPaymentGatewayName(paymentMethodId).displayName;
-
-        // Set Date/Time, Item (plan purchased), Amount, Payment Method
-        var dateTime = time2date(purchaseTransaction[1]);
-        var price = purchaseTransaction[2];
-        var proNum = purchaseTransaction[5];
-        var numOfMonths = purchaseTransaction[6];
-        var monthWording = (numOfMonths === 1) ? l[931] : 'months';  // Todo: l[6788] when generated
-        var item = pro.getProPlanName(proNum) + ' (' + numOfMonths + ' ' + monthWording + ')';
-
-        // Render table row
-        html += '<tr>'
-            + '<td>' + dateTime + '</td>'
-            + '<td>'
-            + '<span class="fm-member-icon">'
-            + '<i class="small-icon membership pro' + proNum + '"></i>'
-            + '</span>'
-            + '<span class="fm-member-icon-txt"> ' + item + '</span>'
-            + '</td>'
-            + '<td>&euro;' + htmlentities(price) + '</td>'
-            + '<td>' + paymentMethod + '</td>'
-            + '</tr>';
-    });
-
-    $('.grid-table.purchases').html(html);
-    $('.account-history-dropdown-button.transactions').text(l[471].replace('[X]', $.transactionlimit));
-    $('.account-history-drop-items.transaction10-').text(l[471].replace('[X]', 10));
-    $('.account-history-drop-items.transaction100-').text(l[471].replace('[X]', 100));
-    $('.account-history-drop-items.transaction250-').text(l[471].replace('[X]', 250));
-
-    M.account.transactions.sort(function(a, b) {
-        if (a[1] < b[1]) {
-            return 1;
-        }
-        else {
-            return -1;
-        }
-    });
-
-    $('.grid-table.transactions tr').remove();
-    html = '<tr><th>' + l[475] + '</th><th>' + l[484] + '</th><th>' + l[485] + '</th><th>' + l[486] + '</th></tr>';
-
-    $(account.transactions).each(function(i, el) {
-
-        if (i === $.transactionlimit) {
-            return false;
-        }
-
-        var credit = '';
-        var debit = '';
-
-        if (el[2] > 0) {
-            credit = '<span class="green">&euro;' + htmlentities(el[2]) + '</span>';
-        }
-        else {
-            debit = '<span class="red">&euro;' + htmlentities(el[2]) + '</span>';
-        }
-        html += '<tr><td>' + time2date(el[1]) + '</td><td>' + htmlentities(el[0]) + '</td><td>'
-            + credit + '</td><td>' + debit + '</td></tr>';
-    });
-
-    $('.grid-table.transactions').html(html);
-
-    // Initialise the Download personal data button on the /fm/account/history page
-    gdprDownload.initDownloadDataButton('personal-data-container');
-
-    accountUI.setBirthYear();
-    accountUI.setBirthMonth();
-    accountUI.setBirthDay();
-    accountUI.setCountry();
-
-    // Initialise functionality to change the user's password and email
-    accountChangePassword.init();
-    accountChangeEmail.init();
-
-    // Cache selectors
-    var $personalInfoBlock = $('.profile-form.first');
-    var $firstNameField = $personalInfoBlock.find('#account-firstname');
-    var $saveBlock = $('.fm-account-save-block');
-    var $cancelButton = $saveBlock.find('.fm-account-cancel');
-    var $saveButton = $saveBlock.find('.fm-account-save');
-
-    $firstNameField.on('input', function() {
-
-        if ($(this).val().trim().length > 0) {
-            $saveBlock.removeClass('hidden');
-        }
-        else {
-            $saveBlock.addClass('hidden');
-        }
-    });
-
-    $('#account-lastname, #account-phonenumber').rebind('keyup.settingsGeneral', function() {
-
-        if ($firstNameField.val().trim().length > 0) {
-            $saveBlock.removeClass('hidden');
-        }
-        else {
-            $saveBlock.addClass('hidden');
-        }
-    });
-
-    $cancelButton.rebind('click', function() {
-        $saveBlock.addClass('hidden');
-        $saveBlock.find('.fm-account-save').removeClass('disabled');
-        $personalInfoBlock.removeClass('email-confirm');
-        $('#account-password').val('');
-        $('#account-new-password').val('');
-        $('#account-confirm-password').val('');
-        accountUI();
-    });
-
-    $saveButton.rebind('click', function() {
-        if ($(this).hasClass('disabled')) {
-            return false;
-        }
-
-        $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
+        // update avatar
+        $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', false));
         $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
-        var firstName = String($('#account-firstname').val() || '').trim();
-        var lastName = String($('#account-lastname').val() || '').trim();
-        var bDay = String($('.default-select.day .default-dropdown-item.active').attr('data-value') || '');
-        var bMonth = String($('.default-select.month .default-dropdown-item.active').attr('data-value') || '');
-        var bYear = String($('.default-select.year .default-dropdown-item.active').attr('data-value') || '');
-        var country = String($('.default-select.country .default-dropdown-item.active').attr('data-value') || '');
+        // Show first name or last name
+        $('.membership-big-txt.name').text(u_attr.fullname);
 
-        var apiCallNeeded = false;
-        var userAttrRequest = { a: 'up' };
+        // Show email address
+        if (u_attr.email) {
+            $('.membership-big-txt.email').text(u_attr.email);
+        }
+        else {
+            $('.membership-big-txt.email').hide();
+        }
+    },
+};
 
-        if (u_attr.firstname === null || u_attr.firstname !== firstName) {
-            // we want also to catch the 'undefined' or null and replace with the empty string (or given string)
-            u_attr.firstname = firstName || 'Nobody';
-            userAttrRequest.firstname = base64urlencode(to8(u_attr.firstname));
-            apiCallNeeded = true;
-        }
-        if (u_attr.lastname === null || u_attr.lastname !== lastName) {
-            // we want also to catch the 'undefined' or null and replace with the empty string (or given string)
-            u_attr.lastname = lastName;
-            userAttrRequest.lastname = base64urlencode(to8(u_attr.lastname));
-            apiCallNeeded = true;
-        }
-        if (u_attr.birthday === null || u_attr.birthday !== bDay) {
-            u_attr.birthday = bDay;
-            userAttrRequest.birthday = base64urlencode(u_attr.birthday);
-            apiCallNeeded = true;
-        }
-        if (u_attr.birthmonth === null || u_attr.birthmonth !== bMonth) {
-            u_attr.birthmonth = bMonth;
-            userAttrRequest.birthmonth = base64urlencode(u_attr.birthmonth);
-            apiCallNeeded = true;
-        }
-        if (u_attr.birthyear === null || u_attr.birthyear !== bYear) {
-            u_attr.birthyear = bYear;
-            userAttrRequest.birthyear = base64urlencode(u_attr.birthyear);
-            apiCallNeeded = true;
-        }
-        if (u_attr.country === null || u_attr.country !== country) {
-            u_attr.country = country;
-            userAttrRequest.country = base64urlencode(u_attr.country);
-            apiCallNeeded = true;
-        }
+accountUI.controls = {
 
-        if (apiCallNeeded) {
-            api_req(userAttrRequest, {
-                callback: function (res) {
-                    if (res === u_handle) {
-                        $('.user-name').text(u_attr.name);
-                        showToast('settings', l[7698]);
-                        accountUI();
-                        // update megadrop username for existing megadrop
-                        mega.megadrop.updatePUPUserName(u_attr.fullname);
+    disableElement: function(element) {
+
+        'use strict';
+
+        $(element).addClass('disabled').prop('disabled', true);
+    },
+
+    enableElement: function(element) {
+
+        'use strict';
+
+        $(element).removeClass('disabled').prop('disabled', false);
+    },
+};
+
+accountUI.inputs = {
+
+    text: {
+
+        init: function() {
+
+            'use strict';
+
+            var $inputs = $('.fm-account-main input').add('.fm-voucher-popup input');
+
+            $inputs.rebind('focus', function() {
+                $(this).parent().addClass('active');
+            });
+
+            $inputs.rebind('blur', function() {
+
+                if ($(this).val()) {
+                    $(this).parent().addClass('valued');
+                }
+                else {
+                    $(this).parent().removeClass('valued');
+                }
+                $(this).parent().removeClass('active');
+            });
+
+            $inputs.prev('.title').rebind('click', function() {
+
+                if (!$(this).parent().hasClass('active')) {
+                    $(this).next('input').trigger('focus');
+                }
+            });
+
+            $inputs.prev('.title').noTransition(function() {
+
+                $(this).next('input').trigger('blur');
+            });
+        }
+    },
+
+    radio: {
+
+        init: function(identifier, $container, currentValue, onChangeCb) {
+
+            'use strict';
+
+            var self = this;
+            var $radio = $(identifier, $container);
+            var $labels = $('.radio-txt', $container);
+
+            if (String(currentValue)) {
+                this.set(identifier, $container, currentValue);
+            }
+
+            $('input', $radio).rebind('click.radio', function() {
+
+                var newVal = $(this).val();
+                self.set(identifier, $container, newVal, onChangeCb);
+            });
+
+            $labels.rebind('click.radioLabel', function() {
+                $(this).prev(identifier).find('input', $radio).trigger('click');
+            });
+        },
+
+        set: function(identifier, $container, newVal, onChangeCb) {
+
+            'use strict';
+
+            var $input = $('input' + identifier + '[value="' + newVal + '"]', $container);
+
+            if ($input.is('.disabled')) {
+                return;
+            }
+
+            $(identifier + '.radioOn', $container).addClass('radioOff').removeClass('radioOn');
+            $input.removeClass('radioOff').addClass('radioOn').prop('checked', true);
+            $input.parent().addClass('radioOn').removeClass('radioOff');
+
+            if (typeof onChangeCb === 'function') {
+                onChangeCb(newVal);
+            }
+        },
+
+        disable: function(value, $container) {
+
+            'use strict';
+
+            $('input.[value="' + value + '"]', $container).addClass('disabled').prop('disabled', true);
+        },
+
+        enable: function(value, $container) {
+
+            'use strict';
+
+            $('input.[value="' + value + '"]', $container).removeClass('disabled').prop('disabled', false);
+        },
+    },
+
+    switch: {
+
+        init: function(identifier, $container, currentValue, onChangeCb, onClickCb) {
+
+            'use strict';
+
+            var self = this;
+            var $switch = $(identifier, $container);
+
+            if ((currentValue && !$switch.hasClass('toggle-on'))
+                || (!currentValue && $switch.hasClass('toggle-on'))) {
+                this.toggle(identifier, $container);
+            }
+
+            Soon(function() {
+                $('.no-trans-init', $switch).removeClass('no-trans-init');
+            });
+
+            $switch.rebind('click.switch', function() {
+
+                var val = $switch.hasClass('toggle-on');
+
+                if (typeof onClickCb === 'function') {
+                    onClickCb(val).done(function() {
+                        self.toggle(identifier, $container, onChangeCb);
+                    });
+                }
+                else {
+                    self.toggle(identifier, $container, onChangeCb);
+                }
+            });
+        },
+
+        toggle: function(identifier, $container, onChangeCb) {
+
+            'use strict';
+
+            var $switch = $(identifier, $container);
+            var newVal;
+
+            if ($switch.hasClass('toggle-on')) {
+                $switch.removeClass('toggle-on');
+                newVal = 0;
+            }
+            else {
+                $switch.addClass('toggle-on');
+                newVal = 1;
+            }
+
+            if (typeof onChangeCb === 'function') {
+                onChangeCb(newVal);
+            }
+        }
+    }
+};
+
+accountUI.leftPane = {
+
+    init: function(sectionClass) {
+
+        'use strict';
+
+        this.render(sectionClass);
+        this.bindEvents();
+    },
+
+    render: function(sectionClass) {
+
+        'use strict';
+
+        $.each($('.fm-account-button'), function() {
+
+            var $this = $(this);
+
+            if ($this.hasClass(sectionClass)) {
+                $this.addClass('active');
+                setTimeout(function() {
+                    $this.removeClass('closed');
+                }, 600);
+            }
+            else {
+                $this.addClass('closed');
+            }
+
+            if (!$this.is(':has(.sub-title)')) {
+                $this.find('.settings-menu-arrow').remove();
+            }
+
+            initTreeScroll();
+        });
+
+        if (M.account.reseller) {
+            // Show reseller button on naviation
+            $('.fm-account-button.reseller').removeClass('hidden');
+        }
+    },
+
+    bindEvents: function() {
+
+        'use strict';
+
+        $('.fm-account-button').rebind('click', function() {
+
+            if ($(this).attr('class').indexOf('active') === -1) {
+                $('.fm-account-main').data('jsp').scrollToY(0, false);
+                switch (true) {
+                    case $(this).hasClass('account-s'):
+                        loadSubPage('fm/account');
+                        break;
+                    case $(this).hasClass('plan'):
+                        loadSubPage('fm/account/plan');
+                        break;
+                    case $(this).hasClass('notifications'):
+                        loadSubPage('fm/account/notifications');
+                        break;
+                    case $(this).hasClass('security'):
+                        loadSubPage('fm/account/security');
+                        break;
+                    case $(this).hasClass('file-management'):
+                        loadSubPage('fm/account/file-management');
+                        break;
+                    case $(this).hasClass('transfers'):
+                        loadSubPage('fm/account/transfers');
+                        break;
+                    case $(this).hasClass('contact-chats'):
+                        loadSubPage('fm/account/contact-chats');
+                        break;
+                    case $(this).hasClass('reseller'):
+                        loadSubPage('fm/account/reseller');
+                        break;
+                }
+            }
+        });
+
+        $('.fm-account-button .settings-menu-arrow').rebind('click', function(e) {
+
+            var $button = $(this).parents('.fm-account-button');
+
+            if ($button.hasClass('active')) {
+                return false;
+            }
+
+            e.stopPropagation();
+            $button.toggleClass('closed');
+            setTimeout(initTreeScroll, 600);
+        });
+
+        $('.fm-account-button .sub-title').rebind('click', function() {
+
+            var $parentBtn = $(this).parents('.fm-account-button');
+            var $target = $('.data-block.' + $(this).data('scrollto'));
+
+            if ($parentBtn.hasClass('active')) {
+                $('.fm-account-main').data('jsp').scrollToElement($target, true);
+            }
+            else {
+                $parentBtn.trigger('click');
+                mBroadcaster.once('settingPageReady', function () {
+                    $('.fm-account-main').data('jsp').scrollToElement($target, true, false);
+                });
+            }
+        });
+    }
+};
+
+accountUI.account = {
+
+    init: function(account) {
+
+        'use strict';
+
+        // Profile
+        this.profiles.resetProfileForm();
+        this.profiles.renderFirstName();
+        this.profiles.renderLastName();
+        this.profiles.renderBirthYear();
+        this.profiles.renderBirthMonth();
+        this.profiles.renderBirthDay();
+        this.profiles.renderCountry();
+        this.profiles.bindEvents();
+
+        // QR Code
+        this.qrcode.render(account);
+        this.qrcode.bindEvents();
+
+        // Preference
+        this.preference.render();
+
+        // Cancel Account
+        this.cancelAccount.bindEvents();
+    },
+
+    profiles: {
+
+        renderFirstName: function() {
+
+            'use strict';
+
+            $('#account-firstname').val(u_attr.firstname).trigger('blur');
+        },
+
+        renderLastName: function() {
+
+            'use strict';
+
+            $('#account-lastname').val(u_attr.lastname).trigger('blur');
+        },
+
+        renderBirthYear: function() {
+
+            'use strict';
+
+            var i = new Date().getFullYear() - 16;
+            var $input = $('.dialog-input-title-ontop.birth .byear').attr('max', i);
+
+            if (u_attr.birthyear) {
+                $input.val(u_attr.birthyear);
+            }
+        },
+
+        renderBirthMonth: function() {
+
+            'use strict';
+
+            if (u_attr.birthmonth) {
+                var $input = $('.dialog-input-title-ontop.birth .bmonth');
+                $input.val(u_attr.birthmonth);
+                this.zerofill($input[0]);
+            }
+        },
+
+        renderBirthDay: function() {
+
+            'use strict';
+
+            if (u_attr.birthday) {
+                var $input = $('.dialog-input-title-ontop.birth .bdate');
+                $input.val(u_attr.birthday);
+                this.zerofill($input[0]);
+            }
+        },
+
+        renderCountry: function() {
+
+            'use strict';
+
+            var html = '';
+            var sel = '';
+            var $country = $('.fm-account-main .default-select.country');
+            $('span', $country).text(l[996]);
+            var countries = M.getCountries();
+            for (var country in countries) {
+                if (!countries.hasOwnProperty(country)) {
+                    continue;
+                }
+                if (u_attr.country && country === u_attr.country) {
+                    sel = 'active';
+                    $('span', $country).text(countries[country]);
+                }
+                else {
+                    sel = '';
+                }
+                html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">'
+                     +      countries[country]
+                     +  '</div>';
+            }
+            $('.default-select-scroll', $country).safeHTML(html);
+            // Initialize scrolling. This is to prevent scroll losing bug with action packet.
+            initSelectScrolling('#account-country .default-select-scroll');
+            // Bind Dropdowns events
+            bindDropdownEvents($country, 1, '.fm-account-main');
+        },
+
+        zerofill: function(elem) {
+
+            'use strict';
+
+            if (elem.value.length === 1) {
+                elem.value = '0' + elem.value;
+            }
+        },
+
+        resetProfileForm: function() {
+
+            'use strict';
+
+            var $personalInfoBlock = $('.profile-form');
+            var $saveBlock = $('.fm-account-sections .save-block');
+
+            $('input', $personalInfoBlock).val('');
+            $('.error, .errored', $personalInfoBlock).removeClass('error errored');
+            $saveBlock.addClass('closed');
+        },
+
+        bindEvents: function() {
+
+            'use strict';
+
+            // Cache selectors
+            var self = this;
+            var $personalInfoBlock = $('.profile-form');
+            var $firstNameField = $personalInfoBlock.find('#account-firstname');
+            var $saveBlock = $('.fm-account-sections .save-block');
+            var $saveButton = $saveBlock.find('.fm-account-save');
+
+            // Avatar
+            $('.fm-account-avatar, .settings-sub-section.avatar .avatar', $personalInfoBlock)
+                .rebind('click', function() {
+                    avatarDialog();
+                });
+
+            // All profile text inputs
+            $firstNameField.add('#account-lastname, .byear, .bmonth, .bdate', $personalInfoBlock)
+                .rebind('input.settingsGeneral, change.settingsGeneral', function() {
+
+                    var $this = $(this);
+                    var $parent = $this.parent();
+                    var errorMsg;
+                    var max = parseInt($this.attr('max'));
+                    var min = parseInt($this.attr('min'));
+
+                    if ($this.is('.byear, .bmonth, .bdate')) {
+                        if (this.value > max) {
+                            errorMsg = '$1 should be smaller than $2'.replace('$1', $this.data('title'))
+                                .replace('$2', $this.attr('max'));
+                            $this.addClass('errored');
+                            $parent.addClass('error').find('.error-message').text(errorMsg);
+                            $saveBlock.addClass('closed');
+                            return false;
+                        }
+                        else if (this.value < min) {
+                            errorMsg = '$1 should be bigger than $2'.replace('$1', $this.data('title'))
+                                .replace('$2', $this.attr('min'));
+                            $this.addClass('errored');
+                            $parent.addClass('error').find('.error-message').text(errorMsg);
+                            $saveBlock.addClass('closed');
+                            return false;
+                        }
+                        else {
+                            $this.removeClass('errored');
+                            var $erroredInput = $parent.find('.errored');
+                            if ($erroredInput.length){
+                                $($erroredInput[0]).trigger('change');
+                            }
+                            else {
+                                $parent.removeClass('error');
+                            }
+                        }
                     }
+
+                    if ($firstNameField.val() && $firstNameField.val().trim().length > 0
+                        && !$personalInfoBlock.find('.errored').length) {
+                        $saveBlock.removeClass('closed');
+                    }
+                    else {
+                        $saveBlock.addClass('closed');
+                    }
+                });
+
+            $('.byear, .bmonth, .bdate', $personalInfoBlock).rebind('keydown.settingsGeneral', function(e) {
+
+                var $this = $(this);
+                var charCode = e.which || e.keyCode; // ff
+                var $parent = $this.parent();
+                var max = parseInt($this.attr('max'));
+                var min = parseInt($this.attr('min'));
+
+                if (!e.shiftkey &&
+                    !((charCode >= 48 && charCode <= 57) || (charCode >= 96 && charCode <= 105)) &&
+                    (charCode !== 8 && charCode !== 9 && charCode !== 37 && charCode !== 39)){
+                    e.preventDefault();
+                }
+
+                if (charCode === 38) {
+                    if (!this.value || parseInt(this.value) < parseInt(min)) {
+                        this.value = min;
+                    }
+                    else if (parseInt(this.value) >= parseInt(max)) {
+                        this.value = max;
+                    }
+                    else {
+                        this.value++;
+                    }
+                    $this.removeClass('errored').trigger('change');
+                    $parent.removeClass('error');
+                    self.zerofill(this);
+                }
+
+                if (charCode === 40) {
+                    if (parseInt(this.value) <= parseInt(min)) {
+                        this.value = min;
+                    }
+                    else if (!this.value || parseInt(this.value) > parseInt(max)) {
+                        this.value = max;
+                    }
+                    else {
+                        this.value--;
+                    }
+                    $this.removeClass('errored').trigger('change');
+                    $parent.removeClass('error');
+                    self.zerofill(this);
+                }
+            });
+
+            $('.bmonth, .bdate', $personalInfoBlock).rebind('blur.settingsGeneral', function() {
+                self.zerofill(this);
+            });
+
+            $('.birth-arrow', $personalInfoBlock).rebind('click', function() {
+
+                var $this = $(this);
+                var $target = $this.parent('.birth-arrow-container').prev('input');
+                var e = $.Event('keydown.settingsGeneral');
+                e.which = $this.hasClass('up-control') ? 38 : 40;
+                $target.trigger(e);
+            });
+            $('#account-country .default-dropdown-item', $personalInfoBlock).rebind('click.showSave', function() {
+                $saveBlock.removeClass('closed');
+            });
+
+            $saveButton.rebind('click', function() {
+
+                if ($(this).hasClass('disabled')) {
+                    return false;
+                }
+
+                $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', false));
+                $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
+
+                var checklist = {
+                    firstname: String($('#account-firstname').val() || '').trim(),
+                    lastname: String($('#account-lastname').val() || '').trim(),
+                    birthday: String($('.birth .bdate').val() || ''),
+                    birthmonth: String($('.birth .bmonth').val() || ''),
+                    birthyear: String($('.birth .byear').val() || ''),
+                    country: String($('#account-country .default-dropdown-item.active').attr('data-value') || '')
+                };
+                var userAttrRequest = { a: 'up' };
+
+                var checkUpdated = function() {
+                    var result = false;
+                    for (var i in checklist) {
+                        if (u_attr[i] === null || u_attr[i] !== checklist[i]) {
+                            // we want also to catch the 'undefined' or null
+                            // and replace with the empty string (or given string)
+                            u_attr[i] = i === 'firstName' ? checklist[i] || 'Nobody' : checklist[i];
+                            userAttrRequest[i] = base64urlencode(to8(u_attr[i]));
+                            result = true;
+                        }
+                    }
+                    return result;
+                };
+
+                if (checkUpdated()) {
+                    api_req(userAttrRequest, {
+                        callback: function (res) {
+                            if (res === u_handle) {
+                                $('.user-name').text(u_attr.name);
+                                showToast('settings', l[7698]);
+                                accountUI.account.profiles.bindEvents();
+                                // update megadrop username for existing megadrop
+                                mega.megadrop.updatePUPUserName(u_attr.fullname);
+                            }
+                        }
+                    });
+                }
+
+                $saveBlock.addClass('closed');
+                $saveButton.removeClass('disabled');
+            });
+        },
+    },
+
+    qrcode: {
+
+        $QRSettings: null,
+
+        render: function(account) {
+
+            'use strict';
+
+            this.$QRSettings =  $('.qr-settings');
+
+            var cutPlace = location.href.indexOf('/fm/');
+            var myHost = location.href.substr(0, cutPlace) + '/' + account.contactLink;
+            var QRoptions = {
+                width: 106,
+                height: 106,
+                correctLevel: QRErrorCorrectLevel.H,    // high
+                foreground: '#dc0000',
+                text: myHost
+            };
+
+            var defaultValue = (account.contactLink && account.contactLink.length);
+
+            $('.qr-http-link', this.$QRSettings).text(QRoptions.text);
+
+            var $container = $('.enable-qr-container');
+
+            if (defaultValue) {
+                // Render the QR code
+                $('.account.qr-icon').text('').qrcode(QRoptions);
+                $('.dialog-feature-toggle.enable-qr', this.$QRSettings).addClass('toggle-on');
+                $('.access-qr-container').parent().removeClass('closed');
+                $('.qr-block', this.$QRSettings).removeClass('hidden');
+                $('.settings-sub-section.enable-qr-container').addClass('border');
+            }
+            else {
+                $('.account.qr-icon').text('');
+                $('.dialog-feature-toggle.enable-qr', this.$QRSettings).removeClass('toggle-on');
+                $('.access-qr-container').parent().addClass('closed');
+                $('.qr-block', this.$QRSettings).addClass('hidden');
+                $('.settings-sub-section.enable-qr-container').removeClass('border');
+            }
+
+            // Enable QR code
+            accountUI.inputs.switch.init(
+                '.enable-qr',
+                $container,
+                defaultValue,
+                function(val) {
+
+                    if (val) {
+                        $('.access-qr-container').add('.qr-block', self.$QRSettings).parent().removeClass('closed');
+                        $container.addClass('border');
+                        api_req({ a: 'clc' }, {
+                            myAccount: account,
+                            callback: function (res, ctx) {
+                                ctx.myAccount.contactLink = typeof res === 'string' ? 'C!' + res : '';
+                                accountUI.account.qrcode.render(M.account);
+                            }
+                        });
+                    }
+                    else {
+                        $('.access-qr-container').add('.qr-settings .qr-block').parent().addClass('closed');
+                        $container.removeClass('border');
+                        api_req({
+                            a: 'cld',
+                            cl: account.contactLink.substring(2, account.contactLink.length)
+                        }, {
+                            myAccount: account,
+                            callback: function (res, ctx) {
+
+                                if (res === 0) { // success
+                                    ctx.myAccount.contactLink = '';
+                                }
+                            }
+                        });
+                    }
+                },
+                function(val) {
+
+                    var promise = new MegaPromise();
+
+                    // If it is toggle off, warn user.
+                    if (val) {
+                        msgDialog('confirmation', l[19990], l[20128], l[18229], function (answer) {
+                            if (answer) {
+                                promise.resolve();
+                            }
+                            else {
+                                promise.reject();
+                            }
+                        });
+                    }
+                    else {
+                        // It is toggle on, just proceed;
+                        promise.resolve();
+                    }
+                    return promise;
+                });
+
+            // Automatic accept section
+            mega.attr.get(u_handle, 'clv', -2, 0).always(function(res) {
+
+                accountUI.inputs.switch.init(
+                    '.auto-qr',
+                    $('.access-qr-container'),
+                    parseInt(res),
+                    function(val) {
+                        mega.attr.set('clv', val, -2, 0);
+                    });
+            });
+        },
+
+        bindEvents: function() {
+
+            'use strict';
+
+            // Reset Section
+            $('.reset-qr-label', this.$QRSettings).rebind('click', accountUI.account.qrcode.reset);
+
+            // Copy link Section
+            if (is_extension || M.execCommandUsable()) {
+                $('.copy-qr-link', this.$QRSettings).removeClass('hidden');
+                $('.qr-dlg-cpy-lnk', this.$QRSettings).rebind('click', function () {
+                    var links = $.trim($(this).prev('.qr-http-link').text());
+                    var toastTxt = l[7654];
+                    copyToClipboard(links, toastTxt);
+                });
+            }
+            else {
+                $('.copy-qr-link', this.$QRSettings).addClass('hidden');
+            }
+        },
+
+        reset: function() {
+
+            'use strict';
+
+            msgDialog('confirmation', l[18227], l[18228], l[18229], function (regenQR) {
+
+                if (regenQR) {
+                    loadingDialog.show();
+                    var delQR = {
+                        a: 'cld',
+                        cl: M.account.contactLink.substring(2, M.account.contactLink.length)
+                    };
+                    var reGenQR = { a: 'clc' };
+
+                    api_req(delQR, {
+                        callback: function (res) {
+                            if (res === 0) { // success
+                                api_req(reGenQR, {
+                                    callback: function (res2) {
+                                        if (typeof res2 !== 'string') {
+                                            res2 = '';
+                                        }
+                                        else {
+                                            res2 = 'C!' + res2;
+                                        }
+                                        M.account.contactLink = res2;
+                                        accountUI.account.qrcode.render(M.account);
+                                        loadingDialog.hide();
+                                    }
+                                });
+                            }
+                            else {
+                                loadingDialog.hide();
+                            }
+                        }
+                    });
                 }
             });
         }
+    },
 
-        $saveBlock.addClass('hidden');
-        $saveButton.removeClass('disabled');
-    });
+    preference: {
 
-    $('#account-firstname').val(u_attr.firstname);
-    $('#account-lastname').val(u_attr.lastname);
+        render: function() {
 
-    $('.account-history-dropdown-button').rebind('click', function() {
-        $(this).addClass('active');
-        $('.account-history-dropdown').addClass('hidden');
-        $(this).next().removeClass('hidden');
-    });
+            'use strict';
 
-    $('.account-history-drop-items').rebind('click', function() {
+            // Date/time format setting
+            accountUI.inputs.radio.init(
+                '.uidateformat',
+                $('.uidateformat').parent(),
+                fmconfig.uidateformat || 0,
+                function (val) {
+                    showToast('settings', l[16168]);
+                    mega.config.setn('uidateformat', parseInt(val));
+                }
+            );
 
-        $(this).parent().prev().removeClass('active');
-        $(this).parent().find('.account-history-drop-items').removeClass('active');
-        $(this).parent().parent().find('.account-history-dropdown-button').text($(this).text());
-
-        var c = $(this).attr('class');
-
-        if (!c) {
-            c = '';
+            // Font size
+            accountUI.inputs.radio.init(
+                '.uifontsize',
+                $('.uifontsize').parent(),
+                fmconfig.font_size || 2,
+                function (val) {
+                    showToast('settings', l[16168]);
+                    $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + val);
+                    mega.config.setn('font_size', parseInt(val));
+                }
+            );
         }
+    },
 
-        if (c.indexOf('session10-') > -1) {
-            $.sessionlimit = 10;
-        }
-        else if (c.indexOf('session100-') > -1) {
-            $.sessionlimit = 100;
-        }
-        else if (c.indexOf('session250-') > -1) {
-            $.sessionlimit = 250;
-        }
+    cancelAccount: {
+        
+        bindEvents: function() {
 
-        if (c.indexOf('purchase10-') > -1) {
-            $.purchaselimit = 10;
-        }
-        else if (c.indexOf('purchase100-') > -1) {
-            $.purchaselimit = 100;
-        }
-        else if (c.indexOf('purchase250-') > -1) {
-            $.purchaselimit = 250;
-        }
+            'use strict';
 
-        if (c.indexOf('transaction10-') > -1) {
-            $.transactionlimit = 10;
-        }
-        else if (c.indexOf('transaction100-') > -1) {
-            $.transactionlimit = 100;
-        }
-        else if (c.indexOf('transaction250-') > -1) {
-            $.transactionlimit = 250;
-        }
+            // Cancel account button on main Account page
+            $('.cancel-account').rebind('click', function() {
 
-        if (c.indexOf('voucher10-') > -1) {
-            $.voucherlimit = 10;
-        }
-        else if (c.indexOf('voucher100-') > -1) {
-            $.voucherlimit = 100;
-        }
-        else if (c.indexOf('voucher250-') > -1) {
-            $.voucherlimit = 250;
-        }
-        else if (c.indexOf('voucherAll-') > -1) {
-            $.voucherlimit = 'all';
-        }
+                // Please confirm that all your data will be deleted
+                var confirmMessage = l[1974];
 
-        $(this).addClass('active');
-        $(this).closest('.account-history-dropdown').addClass('hidden');
-        accountUI();
-    });
+                // Search through their Pro plan purchase history
+                $(account.purchases).each(function(index, purchaseTransaction) {
 
-    // LITE/PRO account
-    if (u_attr.p) {
-        var bandwidthLimit = Math.round(account.servbw_limit | 0);
+                    // Get payment method name
+                    var paymentMethodId = purchaseTransaction[4];
+                    var paymentMethod = pro.getPaymentGatewayName(paymentMethodId).name;
 
-        $('#bandwidth-slider').slider({
-            min: 0, max: 100, range: 'min', value: bandwidthLimit,
-            change: function(e, ui) {
-                if (M.currentdirid === 'account/transfers') {
-                    bandwidthLimit = ui.value;
+                    // If they have paid with iTunes or Google Play in the past
+                    if ((paymentMethod === 'apple') || (paymentMethod === 'google')) {
 
-                    if (parseInt(localStorage.bandwidthLimit) !== bandwidthLimit) {
+                        // Update confirmation message to remind them to cancel iTunes or Google Play
+                        confirmMessage += ' ' + l[8854];
+                        return false;
+                    }
+                });
 
-                        var done = delay.bind(null, 'bandwidthLimit', function() {
-                            api_req({"a": "up", "srvratio": Math.round(bandwidthLimit)});
-                            if (localStorage.bandwidthLimit !== undefined) {
-                                showToast('settings', l[16168]);
+                /**
+                 * Finalise the account cancellation process
+                 * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
+                 */
+                var continueCancelAccount = function(twoFactorPin) {
+
+                    // Prepare the request
+                    var request = { a: 'erm', m: Object(M.u[u_handle]).m, t: 21 };
+
+                    // If 2FA PIN is set, add it to the request
+                    if (twoFactorPin !== null) {
+                        request.mfa = twoFactorPin;
+                    }
+
+                    api_req(request, {
+                        callback: function(res) {
+
+                            loadingDialog.hide();
+
+                            // Check for invalid 2FA code
+                            if (res === EFAILED || res === EEXPIRED) {
+                                msgDialog('warninga', l[135], l[19216]);
                             }
-                            localStorage.bandwidthLimit = bandwidthLimit;
-                        }, 700);
 
-                        if (bandwidthLimit > 99) {
-                            msgDialog('warningb:!' + l[776], l[882], l[12689], 0, function(e) {
-                                if (e) {
-                                    done();
+                            // Check for incorrect email
+                            else if (res === ENOENT) {
+                                msgDialog('warningb', l[1513], l[1946]);
+                            }
+                            else if (res === 0) {
+                                handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
+                            }
+                            else {
+                                msgDialog('warningb', l[135], l[200]);
+                            }
+                        }
+                    });
+                };
+
+                // Ask for confirmation
+                msgDialog('confirmation', l[6181], confirmMessage, false, function(event) {
+                    if (event) {
+
+                        loadingDialog.show();
+
+                        // Check if 2FA is enabled on their account
+                        twofactor.isEnabledForAccount(function(result) {
+
+                            loadingDialog.hide();
+
+                            // If 2FA is enabled on their account
+                            if (result) {
+
+                                // Show the verify 2FA dialog to collect the user's PIN
+                                twofactor.verifyActionDialog.init(function(twoFactorPin) {
+                                    continueCancelAccount(twoFactorPin);
+                                });
+                            }
+                            else {
+                                continueCancelAccount(null);
+                            }
+                        });
+                    }
+                });
+            });
+        }
+    }
+};
+
+accountUI.plan = {
+
+    init: function(account) {
+
+        "use strict";
+
+        // Plan - Account type
+        this.accountType.render(account);
+        this.accountType.bindEvents();
+
+        // Plan - Account Balance
+        this.balance.render(account);
+        this.balance.bindEvents();
+
+        // Plan - History
+        this.history.renderPurchase(account);
+        this.history.renderTransaction(account);
+        this.history.bindEvents(account);
+    },
+
+    accountType: {
+
+        render: function(account) {
+
+            'use strict';
+
+            var renderSubscription = function _renderSubscription() {
+                // Get the date their subscription will renew
+                var timestamp = (account.srenew.length > 0) ? account.srenew[0] : 0; // Timestamp e.g. 1493337569
+                var paymentType = (account.sgw.length > 0) ? account.sgw[0] : ''; // Credit Card etc
+                var gatewayId = (account.sgwids.length > 0) ? account.sgwids[0] : null; // Gateway ID e.g. 15, etc
+
+                // Display the date their subscription will renew if known
+                if (timestamp > 0) {
+                    var dateString = time2date(timestamp, 2);
+
+                    // Use format: 14 March 2015 - Credit Card
+                    paymentType = dateString + ' - ' + paymentType;
+
+                    // Change placeholder 'Expires on' to 'Renews'
+                    $('.account.plan-info.expiry-txt').text(l[6971]);
+                    $('.account.plan-info.expiry').text(paymentType);
+                }
+                else {
+                    // Otherwise show nothing
+                    $('.account.plan-info.expiry').text('');
+                    $('.account.plan-info.expiry-txt').text('');
+                }
+
+                var $buttons = $('.account.account-type');
+                var $cancelSubscriptionButton = $buttons.find('.btn-cancel-sub');
+                var $achievementsButton = $buttons.find('.btn-achievements');
+
+                if (!M.maf){
+                    $achievementsButton.addClass('hidden');
+                }
+
+                // If Apple or Google subscription (see pro.getPaymentGatewayName function for codes)
+                if ((gatewayId === 2) || (gatewayId === 3)) {
+
+                    // Tell them they need to cancel their plan off-site and don't show the feedback dialog
+                    $cancelSubscriptionButton.removeClass('hidden').rebind('click', function() {
+                        msgDialog('warninga', l[7179], l[16501]);
+                    });
+                }
+
+                // Otherwise if ECP or Sabadell
+                else if ((gatewayId === 16) || (gatewayId === 17)) {
+
+                    // Check if there are any active subscriptions
+                    // ccqns = Credit Card Query Number of Subscriptions
+                    api_req({a: 'ccqns'}, {
+                        callback: function(numOfSubscriptions) {
+
+                            // If there is an active subscription
+                            if (numOfSubscriptions > 0) {
+
+                                // Show cancel button and show cancellation dialog
+                                $cancelSubscriptionButton.removeClass('hidden')
+                                    .rebind('click', function() {
+                                        accountUI.plan.accountType.cancelSubscriptionDialog.init();
+                                    });
+                            }
+                        }
+                    });
+                }
+            };
+
+            if (u_attr.p) {
+
+                // LITE/PRO account
+                var planNum = u_attr.p;
+                var planText = pro.getProPlanName(planNum);
+
+                // Account type
+                $('.account.plan-info.accounttype span').text(planText);
+                $('.small-icon.membership').addClass('pro' + planNum);
+
+                // Subscription
+                if (account.stype === 'S') {
+                    renderSubscription();
+                }
+                else if (account.stype === 'O') {
+
+                    // one-time or cancelled subscription
+                    $('.account.plan-info.expiry-txt').text(l[987]);
+                    $('.account.plan-info.expiry span').text(time2date(account.expiry, 2));
+                    $('.account.data-block .btn-cancel-sub').addClass('hidden');
+                }
+
+                $('.account.plan-info.bandwidth').parent().removeClass('hidden');
+            }
+            else {
+                // free account:
+                $('.account.plan-info.accounttype span').text(l[435]);
+                $('.account.plan-info.expiry').text(l[436]);
+                $('.btn-cancel-sub').addClass('hidden');
+                if (account.mxfer) {
+                    $('.account.plan-info.bandwidth').parent().removeClass('hidden');
+                }
+                else {
+                    $('.account.plan-info.bandwidth').parent().addClass('hidden');
+                }
+            }
+
+            /* achievements */
+            if (!account.maf) {
+                $('.fm-right-account-block').removeClass('active-achievements');
+                $('.account.plan-info.storage > span').text(bytesToSize(M.account.space, 0));
+                $('.account.plan-info.bandwidth > span').text(bytesToSize(M.account.tfsq.max, 0));
+                $('.account.plan-info .quota-note-container, .account.plan-info .settings-bar, .btn-achievements')
+                    .addClass('hidden');
+            }
+            else {
+                $('.fm-right-account-block').addClass('active-achievements');
+                mega.achievem.parseAccountAchievements();
+            }
+        },
+
+        bindEvents: function() {
+
+            "use strict";
+
+            $('.btn-achievements').rebind('click', function() {
+                mega.achievem.achievementsListDialog();
+            });
+        },
+
+        /**
+         * Dialog to cancel subscriptions
+         */
+        cancelSubscriptionDialog: {
+
+            $backgroundOverlay: null,
+            $dialog: null,
+            $dialogSuccess: null,
+            $accountPageCancelButton: null,
+            $continueButton: null,
+            $cancelReason: null,
+            $expiryTextBlock: null,
+            $expiryDateBlock: null,
+
+            /**
+             * Initialise the dialog
+             */
+            init: function() {
+
+                'use strict';
+
+                // Cache some selectors
+                this.$dialog = $('.cancel-subscription-st1');
+                this.$dialogSuccess = $('.cancel-subscription-st2');
+                this.$accountPageCancelButton = $('.btn-cancel-sub');
+                this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
+                this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
+                this.$backgroundOverlay = $('.fm-dialog-overlay');
+                this.$expiryTextBlock = $('.account.plan-info.expiry-txt');
+                this.$expiryDateBlock = $('.account.plan-info.expiry');
+
+                // Show the dialog
+                this.$dialog.removeClass('hidden');
+                this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+                // Init textarea scrolling
+                initTextareaScrolling($('.cancel-textarea textarea'), 126);
+
+                // Init functionality
+                this.enableButtonWhenReasonEntered();
+                this.initSendingReasonToApi();
+                this.initCloseAndBackButtons();
+            },
+
+            /**
+             * Close the dialog when either the close or back buttons are clicked
+             */
+            initCloseAndBackButtons: function() {
+
+                'use strict';
+
+                var self = this;
+
+                // Close main dialog
+                this.$dialog.find('.default-white-button.cancel, .fm-dialog-close').rebind('click', function() {
+                    self.$dialog.addClass('hidden');
+                    self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                });
+
+                // Prevent clicking on the background overlay which closes it unintentionally
+                self.$backgroundOverlay.rebind('click', function(event) {
+                    event.stopPropagation();
+                });
+            },
+
+            /**
+             * Close success dialog
+             */
+            initCloseButtonSuccessDialog: function() {
+
+                'use strict';
+
+                var self = this;
+
+                this.$dialogSuccess.find('.fm-dialog-close').rebind('click', function() {
+                    self.$dialogSuccess.addClass('hidden');
+                    self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                });
+            },
+
+            /**
+             * Make sure text has been entered before making the button available
+             */
+            enableButtonWhenReasonEntered: function() {
+
+                'use strict';
+
+                var self = this;
+
+                this.$cancelReason.rebind('keyup', function() {
+
+                    // Trim for spaces
+                    var reason = $(this).val();
+                    reason = $.trim(reason);
+
+                    // Make sure at least 1 character
+                    if (reason.length > 0) {
+                        self.$continueButton.removeClass('disabled');
+                    }
+                    else {
+                        self.$continueButton.addClass('disabled');
+                    }
+                });
+            },
+
+            /**
+             * Send the cancellation reason
+             */
+            initSendingReasonToApi: function() {
+
+                'use strict';
+
+                var self = this;
+
+                this.$continueButton.rebind('click', function() {
+
+                    // Get the cancellation reason
+                    var reason = self.$cancelReason.val();
+
+                    // Hide the dialog and show loading spinner
+                    self.$dialog.addClass('hidden');
+                    self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                    loadingDialog.show();
+
+                    // Cancel the subscription/s
+                    // cccs = Credit Card Cancel Subscriptions, r = reason
+                    api_req({a: 'cccs', r: reason}, {
+                        callback: function() {
+
+                            // Hide loading dialog and cancel subscription button on account page, set exiry date
+                            loadingDialog.hide();
+                            self.$accountPageCancelButton.addClass('hidden');
+                            self.$expiryTextBlock.text(l[987]);
+                            self.$expiryDateBlock
+                                .safeHTML('<span class="red">@@</span>',
+                                    time2date(account.expiry, 2));
+
+                            // Show success dialog and refresh UI
+                            self.$dialogSuccess.removeClass('hidden');
+                            self.$backgroundOverlay.removeClass('hidden');
+                            self.$backgroundOverlay.addClass('payment-dialog-overlay');
+                            self.initCloseButtonSuccessDialog();
+
+                            // Reset account cache so all account data will be refetched
+                            // and re-render the account page UI
+                            M.account.lastupdate = 0;
+                            accountUI();
+                        }
+                    });
+                });
+            }
+        }
+    },
+
+    balance: {
+
+        render: function(account) {
+
+            "use strict";
+
+            $('.account.plan-info.balance span').safeHTML('&euro; @@', account.balance[0][0]);
+        },
+
+        bindEvents: function() {
+
+            "use strict";
+
+            var self = this;
+
+            $('.redeem-voucher').rebind('click', function() {
+                var $this = $(this);
+                if ($this.attr('class').indexOf('active') === -1) {
+                    $('.fm-account-overlay').fadeIn(100);
+                    $this.addClass('active');
+                    $('.fm-voucher-popup').removeClass('hidden');
+                    self.voucherCentering($this);
+                    $(window).rebind('resize.voucher', function() {
+                        self.voucherCentering($this);
+                    });
+
+                    $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button')
+                        .add('.fm-voucher-popup .fm-dialog-close')
+                        .rebind('click.closeDialog', function() {
+                            $('.fm-account-overlay').fadeOut(100);
+                            $('.redeem-voucher').removeClass('active');
+                            $('.fm-voucher-popup').addClass('hidden');
+                        });
+                }
+                else {
+                    $('.fm-account-overlay').fadeOut(200);
+                    $this.removeClass('active');
+                    $('.fm-voucher-popup').addClass('hidden');
+                    $(window).off('resize.voucher');
+                }
+            });
+
+            $('.fm-voucher-button').rebind('click.voucherBtnClick', function() {
+                loadingDialog.show();
+                api_req({a: 'uavr', v: $('.fm-voucher-body input').val()},
+                    {
+                        callback: function(res) {
+                            loadingDialog.hide();
+                            $('.fm-voucher-popup').addClass('hidden');
+                            $('.fm-voucher-body input').val('');
+                            if (typeof res === 'number') {
+                                if (res === -11) {
+                                    msgDialog('warninga', l[135], l[714]);
+                                }
+                                else if (res < 0) {
+                                    msgDialog('warninga', l[135], l[473]);
                                 }
                                 else {
-                                    $('.slider-percentage span').text('0 %').removeClass('bold warn');
-                                    $('#bandwidth-slider').slider('value', 0);
+                                    if (M.account) {
+                                        M.account.lastupdate = 0;
+                                    }
+                                    accountUI();
+                                }
+                            }
+                        }
+                    });
+            });
+
+            $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function() {
+                loadSubPage('resellers');
+            });
+        },
+
+        voucherCentering: function voucherCentering($button) {
+            'use strict';
+
+            var $popupBlock = $('.fm-voucher-popup');
+            var popupHeight = $popupBlock.outerHeight();
+
+            $popupBlock.css({
+                'top': $button.offset().top - popupHeight - 10,
+                'right': $('body').outerWidth() - $button.outerWidth() - $button.offset().left
+            });
+
+            if ($button.offset().top + 10 > popupHeight) {
+                $popupBlock.css('top', $button.offset().top - popupHeight - 10);
+            }
+            else {
+                $popupBlock.css('top', $button.offset().top + $button.outerHeight() + 10);
+            }
+        }
+    },
+
+    history: {
+
+        renderPurchase: function(account) {
+
+            'use strict';
+
+            if (!$.purchaselimit) {
+                $.purchaselimit = 10;
+            }
+
+            $('.account-history-dropdown-button.purchases').text(l[469].replace('[X]', $.purchaselimit));
+            $('.account-history-drop-items.purchase10-').text(l[469].replace('[X]', 10));
+            $('.account-history-drop-items.purchase100-').text(l[469].replace('[X]', 100));
+            $('.account-history-drop-items.purchase250-').text(l[469].replace('[X]', 250));
+
+            M.account.purchases.sort(function(a, b) {
+                if (a[1] < b[1]) {
+                    return 1;
+                }
+                else {
+                    return -1;
+                }
+            });
+
+            $('.grid-table.purchases tr').remove();
+            var html = '<tr><th>' + l[475] + '</th><th>' + l[476] +
+                '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
+            if (account.purchases.length) {
+                // Render every purchase made into Purchase History on Account page
+                $(account.purchases).each(function(index, purchaseTransaction) {
+
+                    if (index === $.purchaselimit) {
+                        return false;// Break the loop
+                    }
+
+                    // Set payment method
+                    var paymentMethodId = purchaseTransaction[4];
+                    var paymentMethod = pro.getPaymentGatewayName(paymentMethodId).displayName;
+
+                    // Set Date/Time, Item (plan purchased), Amount, Payment Method
+                    var dateTime = time2date(purchaseTransaction[1]);
+                    var price = purchaseTransaction[2];
+                    var proNum = purchaseTransaction[5];
+                    var numOfMonths = purchaseTransaction[6];
+                    var monthWording = (numOfMonths === 1) ? l[931] : 'months';  // Todo: l[6788] when generated
+                    var item = pro.getProPlanName(proNum) + ' (' + numOfMonths + ' ' + monthWording + ')';
+
+                    // Render table row
+                    html += '<tr>'
+                        + '<td>' + dateTime + '</td>'
+                        + '<td>'
+                        + '<span class="fm-member-icon">'
+                        + '<i class="small-icon membership pro' + proNum + '"></i>'
+                        + '</span>'
+                        + '<span class="fm-member-icon-txt"> ' + item + '</span>'
+                        + '</td>'
+                        + '<td>&euro;' + htmlentities(price) + '</td>'
+                        + '<td>' + paymentMethod + '</td>'
+                        + '</tr>';
+                });
+            }
+            else {
+                html += '<tr><td colspan="4" class="grid-table-empty">' + l[20140] + '</td></tr>';
+            }
+
+            $('.grid-table.purchases').safeHTML(html);
+        },
+
+        renderTransaction: function(account) {
+
+            'use strict';
+
+            if (!$.transactionlimit) {
+                $.transactionlimit = 10;
+            }
+
+            $('.account-history-dropdown-button.transactions').text(l[471].replace('[X]', $.transactionlimit));
+            $('.account-history-drop-items.transaction10-').text(l[471].replace('[X]', 10));
+            $('.account-history-drop-items.transaction100-').text(l[471].replace('[X]', 100));
+            $('.account-history-drop-items.transaction250-').text(l[471].replace('[X]', 250));
+
+            M.account.transactions.sort(function(a, b) {
+                if (a[1] < b[1]) {
+                    return 1;
+                }
+                else {
+                    return -1;
+                }
+            });
+
+            $('.grid-table.transactions tr').remove();
+            var html = '<tr><th>' + l[475] + '</th><th>' + l[484] +
+                '</th><th>' + l[485] + '</th><th>' + l[486] + '</th></tr>';
+            if (account.transactions.length) {
+                $(account.transactions).each(function(i, el) {
+
+                    if (i === $.transactionlimit) {
+                        return false;
+                    }
+
+                    var credit = '';
+                    var debit = '';
+
+                    if (el[2] > 0) {
+                        credit = '<span class="green">&euro;' + htmlentities(el[2]) + '</span>';
+                    }
+                    else {
+                        debit = '<span class="red">&euro;' + htmlentities(el[2]) + '</span>';
+                    }
+                    html += '<tr><td>' + time2date(el[1]) + '</td><td>' + htmlentities(el[0]) + '</td><td>'
+                        + credit + '</td><td>' + debit + '</td></tr>';
+                });
+            }
+            else {
+                html += '<tr><td colspan="4" class="grid-table-empty">' + l[20140] + '</td></tr>';
+            }
+
+            $('.grid-table.transactions').safeHTML(html);
+        },
+
+        bindEvents: function() {
+
+            'use strict';
+
+            $('.fm-account-plan .account-history-dropdown-button').rebind('click', function() {
+
+                $(this).addClass('active');
+                $('.account-history-dropdown').addClass('hidden');
+                $(this).next().removeClass('hidden');
+            });
+
+            $('.fm-account-plan .account-history-drop-items').rebind('click', function() {
+
+                var $parent = $(this).parent();
+                $parent.find('.account-history-drop-items').removeClass('active');
+                $parent.prev('.account-history-dropdown-button').text($(this).text()).removeClass('active');
+
+                var c = $(this).attr('class') ? $(this).attr('class') : '';
+
+                if (c.indexOf('purchase10-') > -1) {
+                    $.purchaselimit = 10;
+                }
+                else if (c.indexOf('purchase100-') > -1) {
+                    $.purchaselimit = 100;
+                }
+                else if (c.indexOf('purchase250-') > -1) {
+                    $.purchaselimit = 250;
+                }
+
+                if (c.indexOf('transaction10-') > -1) {
+                    $.transactionlimit = 10;
+                }
+                else if (c.indexOf('transaction100-') > -1) {
+                    $.transactionlimit = 100;
+                }
+                else if (c.indexOf('transaction250-') > -1) {
+                    $.transactionlimit = 250;
+                }
+
+                $(this).addClass('active');
+                $(this).closest('.account-history-dropdown').addClass('hidden');
+                accountUI();
+            });
+        }
+    }
+};
+
+accountUI.notifications = {
+
+    init: function() {
+
+        'use strict';
+
+        this.render();
+    },
+
+    render: function() {
+
+        'use strict';
+
+        // New setting need to force cloud and contacts notification available.
+        if (!mega.notif.has('enabled', 'cloud')) {
+            mega.notif.set('enabled', 'cloud');
+        }
+
+        if (!mega.notif.has('enabled', 'contacts')) {
+            mega.notif.set('enabled', 'contacts');
+        }
+
+        $('.fm-account-notifications .dialog-feature-toggle').each(function() {
+
+            var $this = $(this);
+            var $section = $this.parents('.switch-container');
+            var sectionName = accountUI.notifications.getSectionName($section);
+
+            accountUI.inputs.switch.init(
+                '#' + this.id,
+                $section,
+                mega.notif.has($this.attr('name'), sectionName),
+                function(val) {
+
+                    var notifChange = val ? mega.notif.set : mega.notif.unset;
+                    notifChange($this.attr('name'), sectionName);
+                });
+        });
+    },
+
+    getSectionName: function($section) {
+
+        'use strict';
+
+        var section = String($section.attr('class')).split(" ").filter(function(c) {
+            return ({
+                'chat': 1,
+                'contacts': 1,
+                'cloud-drive': 1
+            })[c];
+        });
+        return String(section).split('-').shift();
+
+    }
+};
+
+accountUI.security = {
+
+    init: function() {
+
+        "use strict";
+      
+        // Change Password
+        accountChangePassword.init();
+
+        // Change Email
+        accountChangeEmail.init();
+
+        // Recovery Key
+        this.recoveryKey.bindEvents();
+
+        // Metadata
+        this.metadata.render();
+
+        // Session
+        this.session.render();
+        this.session.bindEvents();
+
+        // 2fa
+        twofactor.account.init();
+    },
+
+    recoveryKey: {
+
+        bindEvents: function() {
+            
+            'use strict';
+
+            // Button on main Account page to backup their master key
+            $('.backup-master-key').rebind('click', function() {
+                M.showRecoveryKeyDialog(2);
+            });
+        }
+    },
+
+    metadata: {
+
+        render: function() {
+
+            'use strict';
+
+            accountUI.inputs.switch.init(
+                '.dbDropOnLogout',
+                $('.personal-data-container'),
+                fmconfig.dbDropOnLogout,
+                function(val) {
+                    mega.config.setn('dbDropOnLogout', val);
+                });
+
+            // Initialise the Download personal data button on the /fm/account/security page
+            gdprDownload.initDownloadDataButton('personal-data-container');
+        }
+    },
+
+    session: {
+
+        /**
+         * Rendering session history table.
+         * With session data from M.account.sessions, render table for session history
+         */
+        render: function() {
+
+            "use strict";
+
+            if (d) {
+                console.log('Render session history');
+            }
+
+            if (!$.sessionlimit) {
+                $.sessionlimit = 10;
+            }
+
+            $('.account-history-dropdown-button.sessions').text(l[472].replace('[X]', $.sessionlimit));
+            $('.account-history-drop-items.session10-').text(l[472].replace('[X]', 10));
+            $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
+            $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
+
+            M.account.sessions.sort(function(a, b) {
+                var ret = a[0] < b[0] ? 1 : -1;
+                return ret;
+            });
+
+            $('#sessions-table-container').empty();
+            var html =
+                '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sessions">' +
+                '<tr><th>' + l[19303] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
+                '<th class="no-border session-status">' + l[7664] + '</th>' +
+                '<th class="no-border logout-column">&nbsp;</th></tr>';
+            var numActiveSessions = 0;
+
+            for (i = 0; i < M.account.sessions.length; i++) {
+                var session = M.account.sessions[i];
+
+                var currentSession = session[5];
+                var activeSession = session[7];
+
+                // If the current session or active then increment count
+                if (currentSession || activeSession) {
+                    numActiveSessions++;
+                }
+
+                if (i >= $.sessionlimit) {
+                    continue;
+                }
+
+                html += this.getHtml(session);
+            }
+
+            $('#sessions-table-container').safeHTML(html + '</table>');
+
+            // Don't show button to close other sessions if there's only the current session
+            if (numActiveSessions === 1) {
+                $('.fm-close-all-sessions').hide();
+            }
+            else {
+                $('.fm-close-all-sessions').show();
+            }
+        },
+
+        bindEvents: function() {
+
+            'use strict';
+
+            $('.fm-close-all-sessions').rebind('click', function() {
+                msgDialog('confirmation', '', l[18513], false, function(e) {
+                    if (e) {
+                        loadingDialog.show();
+                        var $activeSessionsRows = $('.active-session-txt').parents('tr');
+                        // Expire all sessions but not the current one
+                        api_req({a: 'usr', ko: 1}, {
+                            callback: function() {
+                                M.account = null;
+                                /* clear account cache */
+                                $activeSessionsRows.find('.settings-logout').remove();
+                                $activeSessionsRows.find('.active-session-txt')
+                                    .removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
+                                $('.fm-close-all-sessions').hide();
+                                loadingDialog.hide();
+                            }
+                        });
+                    }
+                });
+            });
+
+            $('.settings-logout').rebind('click', function() {
+
+                var $this = $(this).parents('tr');
+                var sessionId = $this.attr('class');
+
+                if (sessionId === 'current') {
+                    mLogout();
+                }
+                else {
+                    loadingDialog.show();
+                    /* usr - user session remove
+                     * remove a session Id from the current user,
+                     * usually other than the current session
+                     */
+                    api_req({a: 'usr', s: [sessionId]}, {
+                        callback: function() {
+                            M.account = null;
+                            /* clear account cache */
+                            $this.find('.settings-logout').remove();
+                            $this.find('.active-session-txt').removeClass('active-session-txt')
+                                .addClass('expired-session-txt').text(l[1664]);
+                            loadingDialog.hide();
+                        }
+                    });
+                }
+            });
+
+            $('.fm-account-security .account-history-dropdown-button').rebind('click', function() {
+
+                $(this).addClass('active');
+                $('.account-history-dropdown').addClass('hidden');
+                $(this).next().removeClass('hidden');
+            });
+
+            $('.fm-account-security .account-history-drop-items').rebind('click', function() {
+
+                $(this).parent().prev().removeClass('active');
+                $(this).parent().find('.account-history-drop-items').removeClass('active');
+                $(this).parent().parent().find('.account-history-dropdown-button').text($(this).text());
+
+                var c = $(this).attr('class') ? $(this).attr('class') : '';
+
+                if (c.indexOf('session10-') > -1) {
+                    $.sessionlimit = 10;
+                }
+                else if (c.indexOf('session100-') > -1) {
+                    $.sessionlimit = 100;
+                }
+                else if (c.indexOf('session250-') > -1) {
+                    $.sessionlimit = 250;
+                }
+
+                $(this).addClass('active');
+                $(this).closest('.account-history-dropdown').addClass('hidden');
+                accountUI();
+            });
+        },
+
+        /**
+         * Get html of one session data for session history table.
+         * @param {Object} el a session data from M.account.sessions
+         * @return {String} html
+         * When draw session hitory table make html for each session data
+         */
+        getHtml: function(el) {
+
+            "use strict";
+            
+            var currentSession = el[5];
+            var activeSession = el[7];
+            var userAgent = el[2];
+            var dateTime = htmlentities(time2date(el[0]));
+            var browser = browserdetails(userAgent);
+            var browserName = browser.nameTrans;
+            var ipAddress = htmlentities(el[3]);
+            var country = countrydetails(el[4]);
+            var sessionId = el[6];
+            var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
+
+            // Show if using an extension e.g. "Firefox on Linux (+Extension)"
+            if (browser.isExtension) {
+                browserName += ' (+' + l[7683] + ')';
+            }
+
+            // If not the current session
+            if (!currentSession) {
+                if (activeSession) {
+                    status = '<span class="active-session-txt">' + l[7666] + '</span>';     // Active
+                }
+                else {
+                    status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
+                }
+            }
+
+            // If unknown country code use question mark gif
+            if (!country.icon || country.icon === '??.gif') {
+                country.icon = 'ud.gif';
+            }
+
+            // Generate row html
+            var html = '<tr class="' + (currentSession ? "current" : sessionId) + '">'
+                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent.replace(/\s*megext/i, ''))
+                + '" src="' + staticpath + 'images/browser/' + browser.icon
+                + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
+                + '</span></td>'
+                + '<td class="ip-addr">' + ipAddress + '</td>'
+                + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/'
+                + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">'
+                + htmlentities(country.name) + '</span></td>'
+                + '<td>' + dateTime + '</td>'
+                + '<td>' + status + '</td>';
+
+            // If the session is active show logout button
+            if (activeSession) {
+                html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
+            }
+            else {
+                html += '<td>&nbsp;</td></tr>';
+            }
+
+            return html;
+        },
+
+        /**
+         * Update Session History table html.
+         * If there is any new session history found (or forced), re-render session history table.
+         * @param {Boolean} force force update the table.
+         */
+        update: function(force) {
+
+            "use strict";
+
+            if (page === 'fm/account/security') {
+                // if first item in sessions list is not match existing Dom list, it need update.
+                if (d) {
+                    console.log('Updating session history table');
+                }
+
+                M.refreshSessionList(function() {
+                    var fSession = M.account.sessions[0];
+                    var DomList =  $('.grid-table.sessions').find('tr');
+                    // update table when it has new active session or forced
+                    if (($(DomList[1]).hasClass('current') && !fSession[5])
+                        || !$(DomList[1]).hasClass(fSession[6]) || force) {
+                        if (d) {
+                            console.log('Update session history table');
+                        }
+                        accountUI.security.session.render();
+                        accountUI.security.session.bindEvents();
+                    }
+                });
+            }
+        }
+    }
+};
+
+accountUI.fileManagement = {
+
+    init: function() {
+
+        'use strict';
+
+        // File versioning
+        this.versioning.render();
+        this.versioning.bindEvents();
+
+        // Rubbish cleaning schedule
+        this.rubsched.render();
+        this.rubsched.bindEvents();
+
+        // User Interface
+        this.userInterface.render();
+
+        // Drag and Drop
+        this.dragAndDrop.render();
+    },
+
+    versioning: {
+
+        render: function() {
+
+            'use strict';
+
+            // Update versioning info
+            var setVersioningAttr = function(val) {
+                showToast('settings', l[16168]);
+                val = val === 1 ? 0 : 1;
+                mega.attr.set('dv', val, -2, true).done(function() {
+                    fileversioning.dvState = val;
+                });
+            };
+
+            fileversioning.updateVersionInfo();
+
+            accountUI.inputs.switch.init(
+                '#versioning-status',
+                $('#versioning-status').parent(),
+                !fileversioning.dvState,
+                setVersioningAttr,
+                function(val) {
+
+                    var promise = new MegaPromise();
+
+                    if (val) {
+                        msgDialog('confirmation', l[882], l[17595], false, function(e) {
+                            
+                            if (e) {
+                                promise.resolve();
+                            }
+                            else {
+                                promise.reject();
+                            }
+                        });
+                    }
+                    else {
+                        promise.resolve();
+                    }
+                    return promise;
+                });
+        },
+
+        bindEvents: function() {
+
+            'use strict';
+            
+            $('#delete-all-versions').rebind('click', function() {
+
+                if (!$(this).hasClass('disabled')) {
+                    msgDialog('remove', l[1003], l[17581], l[1007], function(e) {
+
+                        if (e) {
+                            loadingDialog.show();
+                            var req = {a: 'dv'};
+                            api_req(req, {
+                                callback: function(res) {
+                                    if (res === 0) {
+                                        M.accountData(function() {
+                                            fileversioning.updateVersionInfo();
+                                        }, false, true);
+                                    }
                                 }
                             });
                         }
-                        else {
-                            done();
-                        }
-                    }
+                    });
                 }
-            },
-            slide: function(e, ui) {
-                $('.slider-percentage span').text(ui.value + ' %');
+            });
+        }
+    },
 
-                if (ui.value > 90) {
-                    $('.slider-percentage span').addClass('warn bold');
+    rubsched: {
+
+        render: function() {
+
+            'use strict';
+
+            if (d) {
+                console.log('Render rubbish bin schedule');
+            }
+
+            $('.rubsched, .rubschedopt').removeClass('radioOn').addClass('radioOff');
+            i = 13;
+            if (u_attr.flags.ssrs > 0) {
+                var value = 90; // days
+                $('.rubsched-options').removeClass('hidden');
+
+                // non-pro users cannot disable it
+                if (!u_attr.p) {
+                    // hide on/off switches
+                    $('.rubsched').addClass('hidden').next().addClass('hidden');
+                    value = 30; // days
+                }
+                $('.rubschedopt-none').addClass('hidden');
+
+                if (M.account.ssrs !== undefined) {
+                    value = M.account.ssrs;
+                }
+                i = 14;
+                $('#rad' + i + '_opt').val(value);
+                $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+                $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+                i = 12;
+                if (!value) {
+                    i = 13;
+                    $('.rubsched-options').addClass('hidden');
+                }
+
+                // show/hide on/off switches
+                if (u_attr.p) {
+                    $('.rubbish-desc').text(l[18685]).removeClass('hidden');
+                    $('.pro-rubsched-options').removeClass('hidden');
                 }
                 else {
-                    $('.slider-percentage span').removeClass('bold warn');
+                    $('.rubbish-settings .green-notification').removeClass('hidden');
+                    $('.rubbish-desc').text(l[18686]).removeClass('hidden');
+                    $('.pro-rubsched-options').addClass('hidden');
                 }
             }
-        });
-        $('.slider-percentage span').text(bandwidthLimit + ' %');
-        $('.bandwith-settings').removeClass('hidden');
-    }
-
-    $('#slider-range-max2').slider({
-        min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4,
-        change: function(e, ui) {
-            if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.dl_maxSlots) {
-                mega.config.setn('dl_maxSlots', ui.value);
-                dlQueue.setSize(fmconfig.dl_maxSlots);
+            else if (fmconfig.rubsched) {
+                i = 12;
+                $('.rubsched-options').removeClass('hidden');
+                var opt = String(fmconfig.rubsched).split(':');
+                $('#rad' + opt[0] + '_opt').val(opt[1]);
+                $('#rad' + opt[0] + '_div').removeClass('radioOff').addClass('radioOn');
+                $('#rad' + opt[0]).removeClass('radioOff').addClass('radioOn');
             }
-        },
-        slide: function(e, ui) {
-            $('.upload-settings .numbers.active').removeClass('active');
-            $('.upload-settings .numbers.val' + ui.value).addClass('active');
-        }
-    });
-    $('.download-settings .numbers.active').removeClass('active');
-    $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
-
-    $('#slider-range-max').slider({
-        min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
-        change: function(e, ui) {
-            if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
-                mega.config.setn('ul_maxSlots', ui.value);
-                ulQueue.setSize(fmconfig.ul_maxSlots);
-            }
-        },
-        slide: function(e, ui) {
-            $('.download-settings .numbers.active').removeClass('active');
-            $('.download-settings .numbers.val' + ui.value).addClass('active');
-        }
-    });
-    $('.upload-settings .numbers.active').removeClass('active');
-    $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
-
-    $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
-    i = 3;
-    if ((fmconfig.ul_maxSpeed | 0) === 0) {
-        i = 1;
-    }
-    else if (fmconfig.ul_maxSpeed === -1) {
-        i = 2;
-    }
-    else {
-        $('#ulspeedvalue').val(Math.floor(fmconfig.ul_maxSpeed / 1024));
-    }
-    $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-    $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-    if (fmconfig.font_size) {
-        $('.uifontsize input')
-            .removeClass('radioOn').addClass('radioOff')
-            .parent()
-            .removeClass('radioOn').addClass('radioOff');
-        $('#fontsize' + fmconfig.font_size)
-            .removeClass('radioOff').addClass('radioOn')
-            .parent()
-            .removeClass('radioOff').addClass('radioOn');
-    }
-    $('.ulspeedradio input').rebind('click', function() {
-        var ul_maxSpeed;
-        var id = $(this).attr('id');
-        if (id === 'rad2') {
-            ul_maxSpeed = -1;
-        }
-        else if (id === 'rad1') {
-            ul_maxSpeed = 0;
-        }
-        else {
-            if (parseInt($('#ulspeedvalue').val()) > 0) {
-                ul_maxSpeed = parseInt($('#ulspeedvalue').val()) * 1024;
-            }
-            else {
-                ul_maxSpeed = 100 * 1024;
-            }
-        }
-        $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
-        $(this).addClass('radioOn').removeClass('radioOff');
-        $(this).parent().addClass('radioOn').removeClass('radioOff');
-        mega.config.setn('ul_maxSpeed', ul_maxSpeed);
-    });
-    $('#ulspeedvalue').rebind('click.speedValueClick keyup.speedValueKeyup', function() {
-        $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
-        $('#rad3,#rad3_div').addClass('radioOn').removeClass('radioOff');
-        $('#rad3').trigger('click');
-    });
-
-    $('.uifontsize input').rebind('click.fontsizeInputClick', function() {
-        $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + $(this).val());
-        $('.uifontsize input').removeClass('radioOn').addClass('radioOff')
-            .parent().removeClass('radioOn').addClass('radioOff');
-        $(this).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
-        mega.config.setn('font_size', $(this).val());
-    });
-
-    $('.ulskip').removeClass('radioOn').addClass('radioOff');
-    i = 5;
-    if (fmconfig.ul_skipIdentical) {
-        i = 4;
-    }
-    $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-    $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-    $('.ulskip input').rebind('click', function() {
-        var ul_skipIdentical = 0;
-        var id = $(this).attr('id');
-        if (id === 'rad4') {
-            ul_skipIdentical = 1;
-        }
-
-        $('.ulskip').removeClass('radioOn').addClass('radioOff');
-        $(this).addClass('radioOn').removeClass('radioOff');
-        $(this).parent().addClass('radioOn').removeClass('radioOff');
-        mega.config.setn('ul_skipIdentical', ul_skipIdentical);
-    });
-
-    $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
-    i = 19;
-    if (fmconfig.dlThroughMEGAsync) {
-        i = 18;
-    }
-    $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-    $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-    $('.dlThroughMEGAsync input').rebind('click', function() {
-        var dlThroughMEGAsync = 0;
-        var id = $(this).attr('id');
-        if (id === 'rad18') {
-            dlThroughMEGAsync = 1;
-        }
-
-        $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
-        $(this).addClass('radioOn').removeClass('radioOff');
-        $(this).parent().addClass('radioOn').removeClass('radioOff');
-        mega.config.setn('dlThroughMEGAsync', dlThroughMEGAsync);
-    });
-
-    $('.ulddd').removeClass('radioOn').addClass('radioOff');
-    i = 22;
-    if (fmconfig.ulddd === 0) {
-        i = 23;
-    }
-    $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-    $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-    $('.ulddd input').rebind('click', function() {
-        var ulddd = 0;
-        var id = $(this).attr('id');
-        if (id === 'rad22') {
-            ulddd = undefined;
-        }
-        $('.ulddd').removeClass('radioOn').addClass('radioOff');
-        $(this).addClass('radioOn').removeClass('radioOff');
-        $(this).parent().addClass('radioOn').removeClass('radioOff');
-        mega.config.setn('ulddd', ulddd);
-    });
-
-    var $cbTpp = $('#transfers-tooltip');// Checkbox transfers popup
-    if (fmconfig.tpp) {
-
-        $cbTpp.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
-        $cbTpp.parent().switchClass('checkboxOff', 'checkboxOn');
-    }
-    else {
-        $cbTpp.switchClass('checkboxOn', 'checkboxOff').prop('checked', false);
-        $cbTpp.parent().switchClass('checkboxOn', 'checkboxOff');
-    }
-
-    $('#transfers-tooltip').rebind('click.tpp_enable_disable', function() {
-        var $this = $(this);
-
-        if (fmconfig.tpp) {
-            $this.switchClass('checkboxOn', 'checkboxOff');
-            $this.parent().switchClass('checkboxOn', 'checkboxOff');
-            mega.config.setn('tpp', 0);
-        }
-        else {
-            $this.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
-            $this.parent().switchClass('checkboxOff', 'checkboxOn');
-            mega.config.setn('tpp', 1);
-        }
-    });
-
-    $('.dbDropOnLogout').removeClass('radioOn').addClass('radioOff');
-    i = 21;
-    if (fmconfig.dbDropOnLogout) {
-        i = 20;
-    }
-    $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-    $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-    $('.dbDropOnLogout input').rebind('click', function() {
-        var id = $(this).attr('id');
-        var dbDropOnLogout = 0;
-        if (id === 'rad20') {
-            dbDropOnLogout = 1;
-        }
-        mega.config.setn('dbDropOnLogout', dbDropOnLogout);
-        $('.dbDropOnLogout').removeClass('radioOn').addClass('radioOff');
-        $(this).addClass('radioOn').removeClass('radioOff');
-        $(this).parent().addClass('radioOn').removeClass('radioOff');
-    });
-
-    $('.uisorting').removeClass('radioOn').addClass('radioOff');
-    i = 8;
-    if (fmconfig.uisorting) {
-        i = 9;
-    }
-    $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-    $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-    $('.uisorting input').rebind('click', function() {
-        var uisorting = 0;
-        var id = $(this).attr('id');
-        if (id === 'rad9') {
-            uisorting = 1;
-        }
-        $('.uisorting').removeClass('radioOn').addClass('radioOff');
-        $(this).addClass('radioOn').removeClass('radioOff');
-        $(this).parent().addClass('radioOn').removeClass('radioOff');
-        mega.config.setn('uisorting', uisorting);
-    });
-
-    $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
-    i = 10;
-    if (fmconfig.uiviewmode) {
-        i = 11;
-    }
-    $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-    $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-    $('.uiviewmode input').rebind('click', function() {
-        var uiviewmode = 0;
-        var id = $(this).attr('id');
-        if (id === 'rad11') {
-            uiviewmode = 1;
-        }
-        $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
-        $(this).addClass('radioOn').removeClass('radioOff');
-        $(this).parent().addClass('radioOn').removeClass('radioOff');
-        mega.config.setn('uiviewmode', uiviewmode);
-    });
-
-    accountUI.setRubsched();
-    
-    // date/time format setting
-    $('.uidateformat').removeClass('radioOn').addClass('radioOff');
-    i = 16;
-    if (fmconfig.uidateformat) {
-        i = 17;
-    }
-    $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-    $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-    $('.uidateformat input').rebind('click', function() {
-        var uidateformat = 0;
-        var id = $(this).attr('id');
-        if (id === 'rad17') {
-            uidateformat = 1;
-        }
-        $('.uidateformat').removeClass('radioOn').addClass('radioOff');
-        $(this).addClass('radioOn').removeClass('radioOff');
-        $(this).parent().addClass('radioOn').removeClass('radioOff');
-        mega.config.setn('uidateformat', uidateformat);
-    });
-
-    $('.redeem-voucher').rebind('click', function() {
-        var $this = $(this);
-        if ($this.attr('class').indexOf('active') === -1) {
-            $('.fm-account-overlay').fadeIn(100);
-            $this.addClass('active');
-            $('.fm-voucher-popup').removeClass('hidden');
-            accountUI.voucherCentering($this);
-            $(window).rebind('resize.voucher', function() {
-                accountUI.voucherCentering($this);
+            $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+            $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+            $('.rubschedopt input').rebind('click', function() {
+                var id = $(this).attr('id');
+                var opt = $('#' + id + '_opt').val();
+                mega.config.setn('rubsched', id.substr(3) + ':' + opt);
+                $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
+                $(this).addClass('radioOn').removeClass('radioOff');
+                $(this).parent().addClass('radioOn').removeClass('radioOff');
+                // initAccountScroll(1);
             });
 
-            $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button').rebind('click.closeDialog', function() {
-                $('.fm-account-overlay').fadeOut(100);
-                $('.redeem-voucher').removeClass('active');
-                $('.fm-voucher-popup').addClass('hidden');
+            if (u_attr.p) {
+                $('.rub-grn-noti').addClass('hidden');
+            }
+        },
+        bindEvents: function() {
+
+            'use strict';
+
+            $('.rubsched_textopt').rebind('click.rs blur.rs keypress.rs', function(e) {
+                var minVal = 7;
+                var maxVal = u_attr.p ? Math.pow(2, 53) : 30;
+                var curVal = parseInt($(this).val()) | 0;
+
+                // Do not save value until user leave input or click Enter button
+                if (e.which && e.which !== 13) {
+                    return;
+                }
+
+                curVal = Math.min(Math.max(curVal, minVal), maxVal);
+                $(this).val(curVal);
+
+                var id = String($(this).attr('id')).split('_')[0];
+                $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
+                $('#' + id + ',#' + id + '_div').addClass('radioOn').removeClass('radioOff');
+                mega.config.setn('rubsched', id.substr(3) + ':' + curVal);
+                // initAccountScroll(1);
+            });
+            $('.rubsched input').rebind('click', function() {
+                var id = $(this).attr('id');
+                if (id === 'rad13') {
+                    mega.config.setn('rubsched', 0);
+                    $('.rubsched-options').addClass('hidden');
+                }
+                else if (id === 'rad12') {
+                    $('.rubsched-options').removeClass('hidden');
+                    if (!fmconfig.rubsched) {
+                        var defValue = u_attr.p ? 90 : 30;
+                        var defOption = 14;
+                        mega.config.setn('rubsched', defOption + ":" + defValue);
+                        $('#rad' + defOption + '_div').removeClass('radioOff').addClass('radioOn');
+                        $('#rad' + defOption).removeClass('radioOff').addClass('radioOn');
+                        $('#rad' + defOption + '_opt').val(defValue);
+                    }
+                }
+                $('.rubsched').removeClass('radioOn').addClass('radioOff');
+                $(this).addClass('radioOn').removeClass('radioOff');
+                $(this).parent().addClass('radioOn').removeClass('radioOff');
+                // initAccountScroll(1);
             });
         }
-        else {
-            $('.fm-account-overlay').fadeOut(200);
-            $this.removeClass('active');
-            $('.fm-voucher-popup').addClass('hidden');
-            $(window).off('resize.voucher');
-        }
-    });
+    },
 
-    $('.fm-voucher-body input').rebind('focus.voucherInputFocus', function() {
-        if ($(this).val() === l[487]) {
-            $(this).val('');
-        }
-    });
+    userInterface: {
 
-    $('.fm-voucher-body input').rebind('blur.voucherInputBlur', function() {
-        if ($(this).val() === '') {
-            $(this).val(l[487]);
-        }
-    });
+        render: function() {
 
-    $('.fm-voucher-button').rebind('click.voucherBtnClick', function() {
-        if ($('.fm-voucher-body input').val() === l[487]) {
-            msgDialog('warninga', l[135], l[1015]);
+            'use strict';
+
+            accountUI.inputs.radio.init(
+                '.uisorting',
+                $('.uisorting').parent(),
+                fmconfig.uisorting || 0,
+                function (val) {
+                    showToast('settings', l[16168]);
+                    mega.config.setn('uisorting', parseInt(val));
+                }
+            );
+
+            accountUI.inputs.radio.init(
+                '.uiviewmode',
+                $('.uiviewmode').parent(),
+                fmconfig.uiviewmode || 0,
+                function (val) {
+                    showToast('settings', l[16168]);
+                    mega.config.setn('uiviewmode', parseInt(val));
+                }
+            );
         }
-        else {
-            loadingDialog.show();
-            api_req({a: 'uavr', v: $('.fm-voucher-body input').val()},
-                {
-                    callback: function(res) {
-                        loadingDialog.hide();
-                        $('.fm-voucher-popup').addClass('hidden');
-                        $('.fm-voucher-body input').val(l[487]);
-                        if (typeof res === 'number') {
-                            if (res === -11) {
-                                msgDialog('warninga', l[135], l[714]);
+    },
+
+    dragAndDrop: {
+
+        render: function() {
+
+            'use strict';
+
+            var initVal = fmconfig.ulddd === undefined ? 1 : 0;
+
+            accountUI.inputs.switch.init(
+                '#ulddd',
+                $('#ulddd').parent(),
+                initVal,
+                function(val) {
+                    val = val === 1 ? undefined : val;
+                    mega.config.setn('ulddd', val);
+                });
+        }
+    }
+};
+
+accountUI.transfers = {
+
+    init: function(account) {
+
+        'use strict';
+
+        // Upload and Download - Bandwidth
+        this.uploadAndDownload.bandwidth.render(account);
+
+        // Upload and Download - Upload
+        this.uploadAndDownload.upload.render();
+        this.uploadAndDownload.upload.bindEvents();
+
+        // Upload and Download - Download
+        this.uploadAndDownload.download.render();
+
+        // Transfer Tools - Megasync
+        this.transferTools.megasync.render();
+
+        // Transfer Tools - Tooltip
+        this.transferTools.tooltip.render();
+
+        // MEGAdrop folders table
+        mega.megadrop.stngsDraw();
+
+        // Download folder setting for PaleMoon ext
+        this.addDownloadFolderSetting();
+    },
+
+    uploadAndDownload: {
+
+        bandwidth: {
+
+            render: function(account) {
+
+                'use strict';
+
+                // LITE/PRO account
+                if (u_attr.p) {
+                    var bandwidthLimit = Math.round(account.servbw_limit | 0);
+
+                    $('#bandwidth-slider').slider({
+                        min: 0, max: 100, range: 'min', value: bandwidthLimit,
+                        change: function(e, ui) {
+                            if (M.currentdirid === 'account/transfers') {
+                                bandwidthLimit = ui.value;
+
+                                if (parseInt(localStorage.bandwidthLimit) !== bandwidthLimit) {
+
+                                    var done = delay.bind(null, 'bandwidthLimit', function() {
+                                        api_req({"a": "up", "srvratio": Math.round(bandwidthLimit)});
+                                        if (localStorage.bandwidthLimit !== undefined) {
+                                            showToast('settings', l[16168]);
+                                        }
+                                        localStorage.bandwidthLimit = bandwidthLimit;
+                                    }, 700);
+
+                                    if (bandwidthLimit > 99) {
+                                        msgDialog('warningb:!' + l[776], l[882], l[12689], 0, function(e) {
+                                            if (e) {
+                                                done();
+                                            }
+                                            else {
+                                                $('.slider-percentage span').text('0 %').removeClass('bold warn');
+                                                $('#bandwidth-slider').slider('value', 0);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        done();
+                                    }
+                                }
                             }
-                            else if (res < 0) {
-                                msgDialog('warninga', l[135], l[473]);
+                        },
+                        slide: function(e, ui) {
+                            $('.slider-percentage span').text(ui.value + ' %');
+
+                            if (ui.value > 90) {
+                                $('.slider-percentage span').addClass('warn bold');
                             }
                             else {
-                                if (M.account) {
-                                    M.account.lastupdate = 0;
-                                }
-                                accountUI();
+                                $('.slider-percentage span').removeClass('bold warn');
                             }
                         }
+                    });
+                    $('.slider-percentage span').text(bandwidthLimit + ' %');
+                    $('.bandwith-settings').removeClass('hidden');
+                }
+            }
+        },
+
+        upload: {
+
+            render: function() {
+
+                'use strict';
+
+                // Parallel upload slider
+                $('#slider-range-max').slider({
+                    min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
+                    change: function(e, ui) {
+                        if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
+                            mega.config.setn('ul_maxSlots', ui.value);
+                            ulQueue.setSize(fmconfig.ul_maxSlots);
+                        }
+                    },
+                    slide: function(e, ui) {
+                        $('.download-settings .numbers.active').removeClass('active');
+                        $('.download-settings .numbers.val' + ui.value).addClass('active');
                     }
                 });
-        }
-    });
 
-    accountUI.renderReseller(account);
+                $('.upload-settings .numbers.active').removeClass('active');
+                $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
 
-    $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function() {
-        loadSubPage('resellers');
-    });
+                // Speed limit
+                fmconfig.ul_maxSpeed = fmconfig.ul_maxSpeed || 0;
+                var currentVal = parseInt(fmconfig.ul_maxSpeed) < 1 ? fmconfig.ul_maxSpeed : 1;
 
-    if (is_extension || ssl_needed()) {
-        $('#acc_use_ssl').hide();
-    }
-
-    $('.usessl').removeClass('radioOn').addClass('radioOff');
-    i = 7;
-    if (use_ssl) {
-        i = 6;
-    }
-    $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-    $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-    $('.usessl input').rebind('click', function() {
-        var id = $(this).attr('id');
-        if (id === 'rad7') {
-            use_ssl = 0;
-        }
-        else if (id === 'rad6') {
-            use_ssl = 1;
-        }
-        $('.usessl').removeClass('radioOn').addClass('radioOff');
-        $(this).addClass('radioOn').removeClass('radioOff');
-        $(this).parent().addClass('radioOn').removeClass('radioOff');
-        mega.config.setn('use_ssl', use_ssl | 0);
-        localStorage.use_ssl = fmconfig.use_ssl;
-    });
-
-    $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {
-        msgDialog('confirmation', l[1756], l[6973], false, function(e) {
-            if (e) {
-                mega.attr.set('a', 'none', true, false);
-
-                useravatar.invalidateAvatar(u_handle);
-                $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
-                $('.fm-account-remove-avatar').hide();
-            }
-        });
-    });
-
-    $('.fm-account-change-avatar,.fm-account-avatar').rebind('click', function() {
-        avatarDialog();
-    });
-    $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-
-    $('#find-duplicate').rebind('click', M.findDupes);
-
-    $.tresizer();
-
-    clickURLs();
-
-    $('.editprofile').rebind('click', function() {
-        loadSubPage('fm/account');
-    });
-
-    $('.rubbish-bin-link').rebind('click', function() {
-        loadSubPage('fm/rubbish');
-    });
-
-    // Cancel account button on main Account page
-    $('.cancel-account').rebind('click', function() {
-
-        // Please confirm that all your data will be deleted
-        var confirmMessage = l[1974];
-
-        // Search through their Pro plan purchase history
-        $(account.purchases).each(function(index, purchaseTransaction) {
-
-            // Get payment method name
-            var paymentMethodId = purchaseTransaction[4];
-            var paymentMethod = pro.getPaymentGatewayName(paymentMethodId).name;
-
-            // If they have paid with iTunes or Google Play in the past
-            if ((paymentMethod === 'apple') || (paymentMethod === 'google')) {
-
-                // Update confirmation message to remind them to cancel iTunes or Google Play
-                confirmMessage += ' ' + l[8854];
-                return false;
-            }
-        });
-
-        /**
-         * Finalise the account cancellation process
-         * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
-         */
-        var continueCancelAccount = function(twoFactorPin) {
-
-            // Prepare the request
-            var request = { a: 'erm', m: Object(M.u[u_handle]).m, t: 21 };
-
-            // If 2FA PIN is set, add it to the request
-            if (twoFactorPin !== null) {
-                request.mfa = twoFactorPin;
-            }
-
-            api_req(request, {
-                callback: function(res) {
-                    loadingDialog.hide();
-
-                    // Check for invalid 2FA code
-                    if (res === EFAILED || res === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19216]);
-                    }
-
-                    // Check for incorrect email
-                    else if (res === ENOENT) {
-                        msgDialog('warningb', l[1513], l[1946]);
-                    }
-                    else if (res === 0) {
-                        handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
-                    }
-                    else {
-                        msgDialog('warningb', l[135], l[200]);
-                    }
+                if (currentVal === 1) {
+                    $('#ulspeedvalue').val(fmconfig.ul_maxSpeed / 1024);
                 }
-            });
-        };
+                else if (!$('#ulspeedvalue').val()){
+                    $('#ulspeedvalue').val(100);
+                }
 
-        // Ask for confirmation
-        msgDialog('confirmation', l[6181], confirmMessage, false, function(event) {
-            if (event) {
+                accountUI.inputs.radio.init(
+                    '.ulspeedradio',
+                    $('.ulspeedradio').parent(),
+                    currentVal,
+                    function (val) {
+                        val = parseInt(val);
+                        var ul_maxSpeed = val;
 
-                loadingDialog.show();
+                        if (val === 1) {
+                            if (parseInt($('#ulspeedvalue').val()) > 0) {
+                                ul_maxSpeed = parseInt($('#ulspeedvalue').val()) * 1024;
+                            }
+                            else {
+                                ul_maxSpeed = 100 * 1024;
+                            }
+                        }
 
-                // Check if 2FA is enabled on their account
-                twofactor.isEnabledForAccount(function(result) {
-
-                    loadingDialog.hide();
-
-                    // If 2FA is enabled on their account
-                    if (result) {
-
-                        // Show the verify 2FA dialog to collect the user's PIN
-                        twofactor.verifyActionDialog.init(function(twoFactorPin) {
-                            continueCancelAccount(twoFactorPin);
-                        });
+                        showToast('settings', l[16168]);
+                        mega.config.setn('ul_maxSpeed', ul_maxSpeed);
                     }
-                    else {
-                        continueCancelAccount(null);
-                    }
+                );
+            },
+
+            bindEvents: function() {
+
+                'use strict';
+
+                $('#ulspeedvalue').rebind('click.speedValueClick keyup.speedValueKeyup', function() {
+
+                    $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
+                    $('#rad3,#rad3_div').addClass('radioOn').removeClass('radioOff');
+                    $('#rad3').trigger('click');
                 });
             }
-        });
-    });
+        },
 
-    // On the Account > Security tab, initialise the Two Factor Authentication section and show enabled/disabled state
-    if (page === 'fm/account/email-and-pass') {
-        twofactor.account.init();
-    }
+        download: {
 
-    // Button on main Account page to backup their master key
-    $('.backup-master-key').rebind('click', function() {
-        loadSubPage('backup');
-    });
+            render: function() {
 
-    $('.default-grey-button.reviewsessions').rebind('click', function() {
-        loadSubPage('fm/account/history');
-    });
+                'use strict';
 
-    $('.fm-account-button').rebind('click', function() {
-        if ($(this).attr('class').indexOf('active') === -1) {
-            switch (true) {
-                case $(this).hasClass('account-s'):
-                    loadSubPage('fm/account');
-                    break;
-                case $(this).hasClass('advanced'):
-                    loadSubPage('fm/account/advanced');
-                    break;
-                case $(this).hasClass('notifications'):
-                    loadSubPage('fm/account/notifications');
-                    break;
-                case $(this).hasClass('history'):
-                    loadSubPage('fm/account/history');
-                    break;
-                case $(this).hasClass('reseller'):
-                    loadSubPage('fm/account/reseller');
-                    break;
-                case $(this).hasClass('megadrop'):
-                    loadSubPage('fm/account/megadrop');
-                    break;
+                // Parallel download slider
+                $('#slider-range-max2').slider({
+                    min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4,
+                    change: function(e, ui) {
+                        if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.dl_maxSlots) {
+                            mega.config.setn('dl_maxSlots', ui.value);
+                            dlQueue.setSize(fmconfig.dl_maxSlots);
+                        }
+                    },
+                    slide: function(e, ui) {
+                        $('.upload-settings .numbers.active').removeClass('active');
+                        $('.upload-settings .numbers.val' + ui.value).addClass('active');
+                    }
+                });
+                
+                $('.download-settings .numbers.active').removeClass('active');
+                $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
             }
         }
-    });
+    },
 
-    $('.account.tab-lnk').rebind('click', function() {
-        if (!$(this).hasClass('active')) {
-            $('.fm-account-save-block').addClass('hidden');
-            $('.fm-account-save').removeClass('disabled');
-            var $this = $(this);
-            var $sectionBlock = $this.closest('.fm-account-sections');
-            var currentTab = $this.attr('data-tab');
-            var page = 'fm/account/' + currentTab;
+    transferTools: {
 
-            if ($sectionBlock.hasClass('fm-account-settings')) {
-                if (currentTab === 'ui') {
-                    page = 'fm/account/advanced';
-                }
-                else if (currentTab === 'fm') {
-                    page = 'fm/account/file-management';
-                }
+        megasync: {
+
+            render : function() {
+
+                'use strict';
+
+                accountUI.inputs.switch.init(
+                    '#dlThroughMEGAsync',
+                    $('#dlThroughMEGAsync').parent(),
+                    fmconfig.dlThroughMEGAsync,
+                    function(val) {
+                        mega.config.setn('dlThroughMEGAsync', val);
+                    });
             }
-            else if ($sectionBlock.hasClass('fm-account-notifications')) {
-                if (currentTab === 'cloud-drive') {
-                    page = 'fm/account/notifications';
-                }
-                else {
-                    page = 'fm/account/' + currentTab + '-notifications';
-                }
-            }
-            else if ($sectionBlock.hasClass('fm-account-profile')) {
-                if (currentTab === 'general') {
-                    page = 'fm/account';
-                }
-            }
-            loadSubPage(page);
-            return false;
+        },
 
-            // $sectionBlock.find('.account.tab-content:not(.hidden)').addClass('hidden');
-            // $sectionBlock.find('.account.tab-content.' + currentTab).removeClass('hidden');
-            // $sectionBlock.find('.account.tab-lnk.active').removeClass('active');
-            // $this.addClass('active');
-            // $(window).trigger('resize');
-        }
-    });
+        tooltip: {
 
-    $('.account-pass-lines').attr('class', 'account-pass-lines');
+            render: function() {
 
+                'use strict';
 
-    // Account Notifications settings handling
-    var accNotifHandler = function accNotifHandler() {
-        var $parent = $(this);
-        var $input = $parent.find('input');
-        var $tab = $parent.closest('.tab-content');
-        var type = $input.attr('type');
-        var tab = accNotifHandler.getTabName($tab);
-
-        if (type === 'radio') {
-            var RADIO_ENABLE = "1";
-            var RADIO_DISABLE = "2";
-
-            var $container = $parent.closest('.radio-buttons');
-
-            $('.radioOn', $container)
-                .removeClass('radioOn').addClass('radioOff');
-
-            $input.removeClass('radioOff').addClass('radioOn');
-            $parent.removeClass('radioOff').addClass('radioOn');
-
-            switch ($input.val()) {
-                case RADIO_ENABLE:
-                    mega.notif.set('enabled', tab);
-                    break;
-                case RADIO_DISABLE:
-                    mega.notif.unset('enabled', tab);
-                    break;
-                default:
-                    console.error('Invalid radio value...', tab, $input);
-                    break;
+                accountUI.inputs.switch.init(
+                    '#transfers-tooltip',
+                    $('#transfers-tooltip').parent(),
+                    fmconfig.tpp,
+                    function(val) {
+                        mega.config.setn('tpp', val);
+                    });
             }
         }
-        else if (type === 'checkbox') {
+    },
 
-            if ($input.hasClass('checkboxOn')) {
-                $input.removeClass('checkboxOn').addClass('checkboxOff').prop('checked', false);
-                $parent.removeClass('checkboxOn').addClass('checkboxOff');
-                mega.notif.unset($input.attr('name'), tab);
-            }
-            else {
-                $input.removeClass('checkboxOff').addClass('checkboxOn').prop('checked', true);
-                $parent.removeClass('checkboxOff').addClass('checkboxOn');
-                mega.notif.set($input.attr('name'), tab);
-            }
-        }
-        else {
-            console.error('Unknown type.', type, $input);
-        }
+    addDownloadFolderSetting: function() {
 
-        return false;
-    };
-    accNotifHandler.getTabName = function($tab) {
-        var tab = String($tab.attr('class'))
-            .split(" ").filter(function(c) {
-                return ({
-                    'chat': 1,
-                    'contacts': 1,
-                    'cloud-drive': 1
-                })[c];
-            });
-        return String(tab).split('-').shift();
-    };
-    $('.fm-account-notifications input').each(function(i, e) {
-        $(e).parent().rebind('click', accNotifHandler);
-    });
-    $('.fm-account-notifications .tab-content').each(function(i, e) {
-        var $input;
-        var $tab = $(e);
-        var $radios = $('.radio-buttons', $tab);
-        var tab = accNotifHandler.getTabName($tab);
+        'use strict';
 
-        $('.radioOn', $radios)
-            .removeClass('radioOn').addClass('radioOff');
+        if (is_chrome_firefox && !$('#acc_dls_folder').length) {
+            $('.fm-account-transfers').safeAppend(
+                '<div class="account data-block">' +
+                '<div class="settings-left-block">' +
+                '<div id="acc_dls_folder">' +
+                '<div class="fm-account-header">Downloads folder:</div></div></div>' +
+                '<div class="settings-right-block"><div class="settings-sub-section">' +
+                '<input type="button" value="Browse..." style="-moz-appearance:' +
+                'button;margin-right:12px;cursor:pointer" />' +
+                '</div></div></div>');
+            var fld = mozGetDownloadsFolder();
+            $('#acc_dls_folder').append($('<span/>').text(fld && fld.path));
+            $('#acc_dls_folder input').click(function() {
 
-        if (mega.notif.has('enabled', tab)) {
-            $input = $('input:first', $radios);
-        }
-        else {
-            $input = $('input:last', $radios);
-        }
-
-        $input.removeClass('radioOff').addClass('radioOn');
-        $input.parent().removeClass('radioOff').addClass('radioOn');
-
-        var $checkboxes = $('.checkbox-buttons', $tab);
-        if ($checkboxes.length) {
-            $('input', $checkboxes).each(function(i, e) {
-                var $input = $(e);
-                var $item = $input.closest('.checkbox-item');
-
-                $('.checkboxOn', $item)
-                    .removeClass('checkboxOn')
-                    .addClass('checkboxOff')
-                    .prop('checked', false);
-
-                if (mega.notif.has($input.attr('name'), tab)) {
-                    $input.removeClass('checkboxOff').addClass('checkboxOn').prop('checked', true);
-                    $input.parent().removeClass('checkboxOff').addClass('checkboxOn');
+                var fs = mozFilePicker(0, 2);
+                if (fs) {
+                    mozSetDownloadsFolder(fs);
+                    $(this).next().text(fs.path);
                 }
             });
         }
-    });
-    accNotifHandler = undefined;
-};
-/* jshint +W074, +W089 */
-
-accountUI.renderReseller = function(account) {
-
-    'use strict';
-
-    $('.vouchercreate').rebind('click..voucherCreateClick', function() {
-        var vouchertype = $('.default-select.vouchertype .default-dropdown-item.active').attr('data-value');
-        var voucheramount = parseInt($('#account-voucheramount').val());
-        var proceed = false;
-        for (var i in M.account.prices) {
-            if (M.account.prices[i][0] === vouchertype) {
-                proceed = true;
-            }
-        }
-        if (!proceed) {
-            msgDialog('warninga', l[135], 'Please select the voucher type.');
-            return false;
-        }
-        if (!voucheramount) {
-            msgDialog('warninga', l[135], 'Please enter a valid voucher amount.');
-            return false;
-        }
-        if (vouchertype === '19.99') {
-            vouchertype = '19.991';
-        }
-        loadingDialog.show();
-        api_req({a: 'uavi', d: vouchertype, n: voucheramount, c: 'EUR'},
-            {
-                callback: function() {
-                    M.account.lastupdate = 0;
-                    accountUI();
-                }
-            });
-    });
-
-    if (M.account.reseller) {
-        var email = 'resellers@mega.nz';
-
-        $('.resellerbuy').attr('href', 'mailto:' + email)
-            .find('span').text(l[9106].replace('%1', email));
-
-        // Use 'All' or 'Last 10/100/250' for the dropdown text
-        var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
-
-        $('.account-history-dropdown-button.vouchers').text(buttonText);
-        $('.fm-account-reseller .membership-big-txt.balance').safeHTML('@@ &euro; ', account.balance[0][0]);
-        $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
-        $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));
-        $('.account-history-drop-items.voucher250-').text(l['466a'].replace('[X]', 250));
-
-        // Sort vouchers by most recently created at the top
-        M.account.vouchers.sort(function(a, b) {
-
-            if (a['date'] < b['date']) {
-                return 1;
-            }
-            else {
-                return -1;
-            }
-        });
-
-        $('.grid-table.vouchers tr').remove();
-        $('.fm-account-button.reseller').removeClass('hidden');
-        var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477]
-            + '</th><th>' + l[488] + '</th></tr>';
-
-        $(account.vouchers).each(function(i, el) {
-
-            // Only show the last 10, 100, 250 or if the limit is not set show all vouchers
-            if (($.voucherlimit !== 'all') && (i >= $.voucherlimit)) {
-                return false;
-            }
-
-            var status = l[489];
-            if (el.redeemed > 0 && el.cancelled === 0 && el.revoked === 0) {
-                status = l[490] + ' ' + time2date(el.redeemed);
-            }
-            else if (el.revoked > 0 && el.cancelled > 0) {
-                status = l[491] + ' ' + time2date(el.revoked);
-            }
-            else if (el.cancelled > 0) {
-                status = l[492] + ' ' + time2date(el.cancelled);
-            }
-
-            var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
-
-            html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink
-                + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
-        });
-        $('.grid-table.vouchers').html(html);
-        $('.default-select.vouchertype .default-select-scroll').html('');
-        $('.default-select.vouchertype span').text(l[6875]);
-        var prices = [];
-        for (var i = 0; i < M.account.prices.length; i++) {
-            prices.push(M.account.prices[i][0]);
-        }
-        prices.sort(function(a, b) {
-            return (a - b);
-        });
-
-        var voucheroptions = '';
-        for (i = 0; i < prices.length; i++) {
-            voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i])
-                + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
-        }
-        $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
-        bindDropdownEvents($('.default-select.vouchertype'), 0, '.fm-account-reseller');
     }
 };
 
-accountUI.setRubsched = function() {
+accountUI.contactAndChat = {
 
-    'use strict';
+    init: function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen) {
 
-    if (d) {
-        console.log('Render rubbish bin schedule');
-    }
+        'use strict';
 
-    $('.rubsched, .rubschedopt').removeClass('radioOn').addClass('radioOff');
-    i = 13;
-    if (u_attr.flags.ssrs > 0) {
-        var value = 90; // days
-        $('.rubsched-options').removeClass('hidden');
+        var presenceInt = megaChat.plugins.presencedIntegration;
+        var delaying = this.delayRender(presenceInt, autoaway);
 
-        // non-pro users cannot disable it
-        if (!u_attr.p) {
-            // hide on/off switches
-            $('.rubsched').addClass('hidden').next().addClass('hidden');
-            value = 30; // days
-        }
-        $('.rubschedopt-none').addClass('hidden');
-
-        if (M.account.ssrs !== undefined) {
-            value = M.account.ssrs;
-        }
-        i = 14;
-        $('#rad' + i + '_opt').val(value);
-        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        i = 12;
-        if (!value) {
-            i = 13;
-            $('.rubsched-options').addClass('hidden');
-        }
-
-        // show/hide on/off switches
-        if (u_attr.p) {
-            $('.rubbish-desc').text(l[18685]).removeClass('hidden');
-            $('.pro-rubsched-options').removeClass('hidden');
-        }
-        else {
-            $('.rubbish-settings .green-notification').removeClass('hidden');
-            $('.rubbish-desc').text(l[18686]).removeClass('hidden');
-            $('.pro-rubsched-options').addClass('hidden');
-        }
-    }
-    else if (fmconfig.rubsched) {
-        i = 12;
-        $('.rubsched-options').removeClass('hidden');
-        var opt = String(fmconfig.rubsched).split(':');
-        $('#rad' + opt[0] + '_opt').val(opt[1]);
-        $('#rad' + opt[0] + '_div').removeClass('radioOff').addClass('radioOn');
-        $('#rad' + opt[0]).removeClass('radioOff').addClass('radioOn');
-    }
-    $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-    $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-    $('.rubschedopt input').rebind('click', function() {
-        var id = $(this).attr('id');
-        var opt = $('#' + id + '_opt').val();
-        mega.config.setn('rubsched', id.substr(3) + ':' + opt);
-        $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
-        $(this).addClass('radioOn').removeClass('radioOff');
-        $(this).parent().addClass('radioOn').removeClass('radioOff');
-        // initAccountScroll(1);
-    });
-    $('.rubsched_textopt').rebind('click.rs blur.rs keypress.rs', function(e) {
-        var minVal = 7;
-        var maxVal = u_attr.p ? Math.pow(2, 53) : 30;
-        var curVal = parseInt($(this).val()) | 0;
-
-        // Do not save value until user leave input or click Enter button
-        if (e.which && e.which !== 13) {
+        if (delaying) {
             return;
         }
 
-        curVal = Math.min(Math.max(curVal, minVal), maxVal);
-        $(this).val(curVal);
+        this.status.render(presenceInt, autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
+        this.status.bindEvents(presenceInt, autoawaytimeout);
 
-        var id = String($(this).attr('id')).split('_')[0];
-        $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
-        $('#' + id + ',#' + id + '_div').addClass('radioOn').removeClass('radioOff');
-        mega.config.setn('rubsched', id.substr(3) + ':' + curVal);
-        // initAccountScroll(1);
-    });
-    $('.rubsched input').rebind('click', function() {
-        var id = $(this).attr('id');
-        if (id === 'rad13') {
-            mega.config.setn('rubsched', 0);
-            $('.rubsched-options').addClass('hidden');
-        }
-        else if (id === 'rad12') {
-            $('.rubsched-options').removeClass('hidden');
-            if (!fmconfig.rubsched) {
-                var defValue = u_attr.p ? 90 : 30;
-                var defOption = 14;
-                mega.config.setn('rubsched', defOption + ":" + defValue);
-                $('#rad' + defOption + '_div').removeClass('radioOff').addClass('radioOn');
-                $('#rad' + defOption).removeClass('radioOff').addClass('radioOn');
-                $('#rad' + defOption + '_opt').val(defValue);
-            }
-        }
-        $('.rubsched').removeClass('radioOn').addClass('radioOff');
-        $(this).addClass('radioOn').removeClass('radioOff');
-        $(this).parent().addClass('radioOn').removeClass('radioOff');
-        // initAccountScroll(1);
-    });
-}
+        this.richURL.render();
+    },
 
-accountUI.setBirthYear = function() {
+    status: {
 
-    'use strict';
+        render: function(presenceInt, autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen) {
 
-    i = new Date().getFullYear() - 16;
-    var html = '';
-    var sel = '';
-    $('.default-select.year span').text('YYYY');
+            'use strict';
 
-    while (i >= 1900) {
-        if (u_attr.birthyear && i === parseInt(u_attr.birthyear)) {
-            sel = 'active';
-            $('.default-select.year span').text(u_attr.birthyear);
-        }
-        else {
-            sel = '';
-        }
-
-        html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
-        i--;
-    }
-
-    $('.default-select.year .default-select-scroll').html(html);
-
-    // Bind Dropdowns events
-    bindDropdownEvents($('.fm-account-main .default-select.year'), 1, '.account.tab-content');
-};
-accountUI.setBirthMonth = function() {
-
-    'use strict';
-
-    var i = 1;
-    var html = '';
-    var sel = '';
-    $('.default-select.month span').text('MM');
-
-    while (i < 13) {
-        if (u_attr.birthmonth && i === parseInt(u_attr.birthmonth)) {
-            sel = 'active';
-            $('.default-select.month span').text(u_attr.birthmonth);
-        }
-        else {
-            sel = '';
-        }
-        html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
-        i++;
-    }
-
-    $('.default-select.month .default-select-scroll').html(html);
-
-    // Bind Dropdowns events
-    bindDropdownEvents($('.fm-account-main .default-select.month'), 1, '.account.tab-content');
-};
-accountUI.setBirthDay = function() {
-
-    'use strict';
-
-    var i = 1;
-    var html = '';
-    var sel = '';
-    $('.default-select.day span').text('DD');
-
-    while (i < 32) {
-        if (u_attr.birthday && i === parseInt(u_attr.birthday)) {
-            sel = 'active';
-            $('.default-select.day span').text(u_attr.birthday);
-        }
-        else {
-            sel = '';
-        }
-        html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
-        i++;
-    }
-
-    $('.default-select.day .default-select-scroll').html(html);
-
-    // Bind Dropdowns events
-    bindDropdownEvents($('.fm-account-main .default-select.day'), 1, '.account.tab-content');
-};
-
-accountUI.setCountry = function() {
-
-    'use strict';
-
-    var html = '';
-    var sel = '';
-    $('.default-select.country span').text(l[996]);
-    var countries = M.getCountries();
-    for (var country in countries) {
-        if (!countries.hasOwnProperty(country)) {
-            continue;
-        }
-        if (u_attr.country && country === u_attr.country) {
-            sel = 'active';
-            $('.default-select.country span').text(countries[country]);
-        }
-        else {
-            sel = '';
-        }
-        html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">'
-            + countries[country]
-            + '</div>';
-    }
-    $('.default-select.country .default-select-scroll').safeHTML(html);
-
-    // Bind Dropdowns events
-    bindDropdownEvents($('.fm-account-main .default-select.country'), 1, '.account.tab-content');
-};
-
-/**
- * Update Session History table html.
- * If there is any new session history found (or forced), re-render session history table.
- * @param {Boolean} force force update the table.
- */
-accountUI.updateSessionTable = function(force) {
-
-    "use strict";
-
-    if (page === 'fm/account/history') {
-        // if first item in sessions list is not match existing Dom list, it need update.
-        if (d) {
-            console.log('Updating session history table');
-        }
-
-        M.refreshSessionList(function() {
-            var fSession = M.account.sessions[0];
-            var DomList =  $('.grid-table.sessions').find('tr');
-            // update table when it has new active session or forced
-            if (($(DomList[1]).hasClass('current') && !fSession[5])
-                || !$(DomList[1]).hasClass(fSession[6]) || force) {
-                if (d) {
-                    console.log('Update session history table');
-                }
-                accountUI.renderSessionHistory();
-            }
-        });
-    }
-};
-
-/**
- * Rendering session history table.
- * With session data from M.account.sessions, render table for session history
- */
-accountUI.renderSessionHistory = function() {
-
-    "use strict";
-
-    if (d) {
-        console.log('Render session history');
-    }
-
-    M.account.sessions.sort(function(a, b) {
-        if (a[0] < b[0]) {
-            return 1;
-        }
-        else {
-            return -1;
-        }
-    });
-
-    $('#sessions-table-container').empty();
-    var html =
-        '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sessions">' +
-        '<tr><th>' + l[19303] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
-        '<th class="no-border session-status">' + l[7664] + '</th>' +
-        '<th class="no-border logout-column">&nbsp;</th></tr>';
-    var numActiveSessions = 0;
-
-    for (i = 0; i < M.account.sessions.length; i++) {
-        var session = M.account.sessions[i];
-
-        var currentSession = session[5];
-        var activeSession = session[7];
-
-        // If the current session or active then increment count
-        if (currentSession || activeSession) {
-            numActiveSessions++;
-        }
-
-        if (i >= $.sessionlimit) {
-            continue;
-        }
-
-        html += accountUI.getSessionHtml(session);
-    }
-
-    $('#sessions-table-container').safeHTML(html + '</table>');
-
-    // Don't show button to close other sessions if there's only the current session
-    if (numActiveSessions === 1) {
-        $('.fm-close-all-sessions').hide();
-    }
-    else {
-        $('.fm-close-all-sessions').show();
-    }
-
-    $('.fm-close-all-sessions').rebind('click', function() {
-        msgDialog('confirmation', '', l[18513], false, function(e) {
-            if (e) {
-                loadingDialog.show();
-                var $activeSessionsRows = $('.active-session-txt').parents('tr');
-                // Expire all sessions but not the current one
-                api_req({a: 'usr', ko: 1}, {
-                    callback: function() {
-                        M.account = null;
-                        /* clear account cache */
-                        $activeSessionsRows.find('.settings-logout').remove();
-                        $activeSessionsRows.find('.active-session-txt')
-                            .removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
-                        $('.fm-close-all-sessions').hide();
-                        loadingDialog.hide();
-                    }
+            // Chat
+            var $sectionContainerChat = $('.fm-account-contact-chats');
+            // Status appearance radio buttons
+            accountUI.inputs.radio.init(
+                '.chatstatus',
+                $('.chatstatus').parent(),
+                presenceInt.getPresence(u_handle),
+                function(newVal) {
+                    presenceInt.setPresence(parseInt(newVal));
                 });
-            }
-        });
-    });
 
-    $('.settings-logout').rebind('click', function() {
+            // Last seen switch
+            accountUI.inputs.switch.init(
+                '#last-seen',
+                $sectionContainerChat,
+                lastSeen,
+                function(val) {
+                    presenceInt.userPresence.ui_enableLastSeen(Boolean(val));
+                });
 
-        var $this = $(this).parents('tr');
-        var sessionId = $this.attr('class');
-
-        if (sessionId === 'current') {
-            mLogout();
-        }
-        else {
-            loadingDialog.show();
-            /* usr - user session remove
-             * remove a session Id from the current user,
-             * usually other than the current session
-             */
-            api_req({a: 'usr', s: [sessionId]}, {
-                callback: function() {
-                    M.account = null;
-                    /* clear account cache */
-                    $this.find('.settings-logout').remove();
-                    $this.find('.active-session-txt').removeClass('active-session-txt')
-                        .addClass('expired-session-txt').text(l[1664]);
-                    loadingDialog.hide();
-                }
-            });
-        }
-    });
-};
-
-/**
- * Get html of one session data for session history table.
- * @param {Object} el a session data from M.account.sessions
- * @return {String} html
- * When draw session hitory table make html for each session data
- */
-accountUI.getSessionHtml = function(el) {
-    "use strict";
-
-    var currentSession = el[5];
-    var activeSession = el[7];
-    var userAgent = el[2];
-    var dateTime = htmlentities(time2date(el[0]));
-    var browser = browserdetails(userAgent);
-    var browserName = browser.nameTrans;
-    var ipAddress = htmlentities(el[3]);
-    var country = countrydetails(el[4]);
-    var sessionId = el[6];
-    var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
-
-    // Show if using an extension e.g. "Firefox on Linux (+Extension)"
-    if (browser.isExtension) {
-        browserName += ' (+' + l[7683] + ')';
-    }
-
-    // If not the current session
-    if (!currentSession) {
-        if (activeSession) {
-            status = '<span class="active-session-txt">' + l[7666] + '</span>';     // Active
-        }
-        else {
-            status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
-        }
-    }
-
-    // If unknown country code use question mark gif
-    if (!country.icon || country.icon === '??.gif') {
-        country.icon = 'ud.gif';
-    }
-
-    // Generate row html
-    var html = '<tr class="' + (currentSession ? "current" : sessionId) + '">'
-        + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent.replace(/\s*megext/i, ''))
-        + '" src="' + staticpath + 'images/browser/' + browser.icon
-        + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
-        + '</span></td>'
-        + '<td>' + ipAddress + '</td>'
-        + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/'
-        + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">'
-        + htmlentities(country.name) + '</span></td>'
-        + '<td>' + dateTime + '</td>'
-        + '<td>' + status + '</td>';
-
-    // If the session is active show logout button
-    if (activeSession) {
-        html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
-    }
-    else {
-        html += '<td>&nbsp;</td></tr>';
-    }
-
-    return html;
-};
-
-/**
- * Update user UI (pro plan, avatar, first/last name, email)
- */
-accountUI.userUIUpdate = function() {
-    'use strict';
-
-    // Show Membership plan
-    $('.small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
-    if (u_attr.p) {
-        // LITE/PRO account
-        var planNum = u_attr.p;
-        var planText = pro.getProPlanName(planNum);
-
-        $('.account.membership-plan').text(planText);
-        $('.small-icon.membership').addClass('pro' + planNum);
-    }
-    else {
-        $('.account.membership-plan').text(l[435]);
-    }
-
-    // update avatar
-    $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-    $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
-
-
-    // Show first name or last name
-    $('.membership-big-txt.name').text(u_attr.fullname);
-
-    // Show email address
-    if (u_attr.email) {
-        $('.membership-big-txt.email').text(u_attr.email);
-    }
-    else {
-        $('.membership-big-txt.email').hide();
-    }
-};
-
-/**
- * Helper function to fill common charts into the dashboard and account sections
- * @param {Object}  account       User account data (I.e. same as M.account)
- * @param {Boolean} [onDashboard] Whether invoked from the dashboard
- */
-accountUI.fillCharts = function(account, onDashboard) {
-    var b2;
-    var deg;
-    var perc;
-    var perc_c;
-    var b_exceeded;
-    var s_exceeded;
-
-    /* New Used Bandwidth chart */
-    var $bandwidthChart = $('.fm-account-blocks.bandwidth');
-
-    perc_c = account.tfsq.perc;
-    if (perc_c > 100) {
-        perc_c = 100;
-    }
-    if (perc_c > 99 || dlmanager.isOverQuota) {
-        $bandwidthChart.addClass('exceeded');
-        b_exceeded = 1;
-    }
-
-    deg = 230 * perc_c / 100;
-
-    // Used Bandwidth chart
-    if (deg <= 180) {
-        $bandwidthChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-        $bandwidthChart.find('.right-chart span').removeAttr('style');
-    }
-    else {
-        $bandwidthChart.find('.left-chart span').css('transform', 'rotate(180deg)');
-        $bandwidthChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
-    }
-
-    // Maximum bandwidth
-    b2 = bytesToSize(account.tfsq.max, 0).split(' ');
-    var usedB = bytesToSize(account.tfsq.used);
-    $bandwidthChart.find('.chart.data .size-txt').text(usedB);
-    $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
-    $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-    if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
-        if (perc_c > 0) {
-            $bandwidthChart.removeClass('no-percs');
-            $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
-        }
-        else {
-            $bandwidthChart.addClass('no-percs');
-        }
-    }
-    else {
-        $bandwidthChart.addClass('no-percs');
-        $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
-        var usedW;
-        if (usedB[0] === '1') {
-            usedW = l[17524].toLowerCase().replace('%tq1', '').trim();
-        }
-        else if (usedB[0] === '2') {
-            usedW = l[17525].toLowerCase().replace('%tq2', '').trim();
-        }
-        else {
-            usedW = l[17517].toLowerCase().replace('%tq', '').trim();
-        }
-        $bandwidthChart.find('.chart.data .pecents-txt').text(usedW);
-    }
-    /* End of New Used Bandwidth chart */
-
-
-    /* New Used Storage chart */
-    var $storageChart = $('.fm-account-blocks.storage');
-    var $storageData = $('.account.data-block.storage-data');
-    $storageData.removeClass('exceeded');
-    perc = Math.floor(account.space_used / account.space * 100);
-    perc_c = perc;
-    if (perc_c > 100) {
-        perc_c = 100;
-    }
-    if (perc_c === 100) {
-        s_exceeded = 1;
-        $storageChart.addClass('exceeded');
-        $storageData.addClass('exceeded');
-    }
-    else if (perc_c > 80) {
-        $storageChart.addClass('going-out');
-    }
-
-    deg = 230 * perc_c / 100;
-
-    // Used space chart
-    if (deg <= 180) {
-        $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-        $storageChart.find('.right-chart span').removeAttr('style');
-    }
-    else {
-        $storageChart.find('.left-chart span').css('transform', 'rotate(180deg)');
-        $storageChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
-    }
-
-    // Maximum disk space
-    b2 = bytesToSize(account.space, 0).split(' ');
-    $storageChart.find('.chart.data .pecents-txt').text(b2[0]);
-    $storageChart.find('.chart.data .gb-txt').text(b2[1]);
-    $storageChart.find('.chart.data .perc-txt').text(perc_c + '%');
-    $storageChart.find('.chart.data .size-txt').text(bytesToSize(account.space_used));
-    $('.account.quota-txt.used-space')
-        .safeHTML('<span>@@</span> @@ @@',
-            bytesToSize(account.space_used), l[5528], b2.join(' '));
-
-    /** End New Used Storage chart */
-
-
-    // Charts warning notifications
-    var $chartsBlock = $('.account' + (onDashboard ? '.widget.content' : '.data-block.charts'));
-    $chartsBlock.find('.chart-warning:not(.hidden)').addClass('hidden');
-    if (b_exceeded && s_exceeded) {
-        // Bandwidth and Storage quota exceeded
-        $chartsBlock.find('.chart-warning.storage-and-bandwidth').removeClass('hidden');
-    }
-    else if (s_exceeded) {
-        // Storage quota exceeded
-        $chartsBlock.find('.chart-warning.storage').removeClass('hidden');
-    }
-    else if (b_exceeded) {
-        // Bandwidth quota exceeded
-        $chartsBlock.find('.chart-warning.bandwidth').removeClass('hidden');
-    }
-    else if (perc_c > 80) {
-        // Running out of cloud space
-        $chartsBlock.find('.chart-warning.out-of-space').removeClass('hidden');
-    }
-    if (b_exceeded || s_exceeded || perc_c > 80) {
-        $chartsBlock.find('.chart-warning').rebind('click', function() {
-            loadSubPage('pro');
-        });
-        $storageData.find('.chart-warning, .upgrade-account.button').rebind('click', function() {
-            loadSubPage('pro');
-        });
-    }
-    /* End of Charts warning notifications */
-};
-
-/**
- * Dialog to cancel subscriptions
- */
-accountUI.cancelSubscriptionDialog = {
-
-    $backgroundOverlay: null,
-    $dialog: null,
-    $dialogSuccess: null,
-    $accountPageCancelButton: null,
-    $continueButton: null,
-    $cancelReason: null,
-    $expiryTextBlock: null,
-    $expiryDateBlock: null,
-
-    /**
-     * Initialise the dialog
-     */
-    init: function() {
-
-        // Cache some selectors
-        this.$dialog = $('.cancel-subscription-st1');
-        this.$dialogSuccess = $('.cancel-subscription-st2');
-        this.$accountPageCancelButton = $('.btn-cancel-sub');
-        this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
-        this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
-        this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$expiryTextBlock = $('.account.plan-info.expiry-txt');
-        this.$expiryDateBlock = $('.account.plan-info.expiry');
-
-        // Show the dialog
-        this.$dialog.removeClass('hidden');
-        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-
-        // Init textarea scrolling
-        initTextareaScrolling($('.cancel-textarea textarea'), 126);
-
-        // Init functionality
-        this.enableButtonWhenReasonEntered();
-        this.initSendingReasonToApi();
-        this.initCloseAndBackButtons();
-    },
-
-    /**
-     * Close the dialog when either the close or back buttons are clicked
-     */
-    initCloseAndBackButtons: function() {
-        var self = this;
-
-        // Close main dialog
-        this.$dialog.find('.default-white-button.cancel, .fm-dialog-close').rebind('click', function() {
-            self.$dialog.addClass('hidden');
-            self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-        });
-
-        // Prevent clicking on the background overlay which closes it unintentionally
-        self.$backgroundOverlay.rebind('click', function(event) {
-            event.stopPropagation();
-        });
-    },
-
-    /**
-     * Close success dialog
-     */
-    initCloseButtonSuccessDialog: function() {
-        var self = this;
-
-        this.$dialogSuccess.find('.fm-dialog-close').rebind('click', function() {
-            self.$dialogSuccess.addClass('hidden');
-            self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-        });
-    },
-
-    /**
-     * Make sure text has been entered before making the button available
-     */
-    enableButtonWhenReasonEntered: function() {
-        var self = this;
-
-        this.$cancelReason.rebind('keyup', function() {
-
-            // Trim for spaces
-            var reason = $(this).val();
-            reason = $.trim(reason);
-
-            // Make sure at least 1 character
-            if (reason.length > 0) {
-                self.$continueButton.removeClass('disabled');
-            }
-            else {
-                self.$continueButton.addClass('disabled');
-            }
-        });
-    },
-
-    /**
-     * Send the cancellation reason
-     */
-    initSendingReasonToApi: function() {
-        var self = this;
-
-        this.$continueButton.rebind('click', function() {
-
-            // Get the cancellation reason
-            var reason = self.$cancelReason.val();
-
-            // Hide the dialog and show loading spinner
-            self.$dialog.addClass('hidden');
-            self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-            loadingDialog.show();
-
-            // Cancel the subscription/s
-            // cccs = Credit Card Cancel Subscriptions, r = reason
-            api_req({a: 'cccs', r: reason}, {
-                callback: function() {
-
-                    // Hide loading dialog and cancel subscription button on account page, set exiry date
-                    loadingDialog.hide();
-                    self.$accountPageCancelButton.addClass('hidden');
-                    self.$expiryTextBlock.text(l[987]);
-                    self.$expiryDateBlock
-                        .safeHTML('<a href="/fm/account/history" class="clickurl">@@</a>',
-                            time2date(account.expiry, 2));
-                    clickURLs();
-                    self.$expiryDateBlock.find('a').rebind('click', function() {
-                        document.location = $(this).attr('href');
+            if (autoawaytimeout !== false) {
+                // Auto-away switch
+                accountUI.inputs.switch.init(
+                    '#auto-away-switch',
+                    $sectionContainerChat,
+                    autoaway,
+                    function(val) {
+                        presenceInt.userPresence.ui_setautoaway(Boolean(val));
                     });
 
-                    // Show success dialog and refresh UI
-                    self.$dialogSuccess.removeClass('hidden');
-                    self.$backgroundOverlay.removeClass('hidden');
-                    self.$backgroundOverlay.addClass('payment-dialog-overlay');
-                    self.initCloseButtonSuccessDialog();
-
-                    // Reset account cache so all account data will be refetched and re-render the account page UI
-                    M.account.lastupdate = 0;
-                    accountUI();
+                // Prevent changes to autoaway if autoawaylock is set
+                if (autoawaylock === true) {
+                    $('#auto-away-switch').addClass('diabled').parent().addClass('hidden');
                 }
+                else {
+                    $('#auto-away-switch').removeClass('diabled').parent().removeClass('hidden');
+                }
+
+                // Auto-away input box
+                $('input#autoaway').val(autoawaytimeout / 60);
+
+                // Always editable for user comfort -
+                accountUI.controls.enableElement($('input#autoaway', $sectionContainerChat));
+
+                // Persist switch
+                accountUI.inputs.switch.init(
+                    '#persist-presence-switch',
+                    $sectionContainerChat,
+                    persist,
+                    function(val) {
+                        presenceInt.userPresence.ui_setpersist(Boolean(val));
+                    });
+
+                // Prevent changes to autoaway if autoawaylock is set
+                if (persistlock === true) {
+                    $('#persist-presence-switch', $sectionContainerChat).addClass('diabled')
+                        .parent().addClass('hidden');
+                }
+                else {
+                    $('#persist-presence-switch', $sectionContainerChat).removeClass('diabled')
+                        .parent().removeClass('hidden');
+                }
+            }
+        },
+
+        bindEvents: function(presenceInt, autoawaytimeout) {
+
+            'use strict';
+
+            if (autoawaytimeout !== false) {
+                var $sectionContainerChat = $('.fm-account-contact-chats');
+                var lastValidNumber = Math.floor(autoawaytimeout / 60);
+
+                // when value is changed, set checkmark
+                $('input#autoaway', $sectionContainerChat).rebind('change.dashboard', function() {
+
+                    var val = parseInt($(this).val());
+
+                    if (val > 3505) {
+                        val = 3505;
+                    }
+                    else if (val < 0) {
+                        val = 5;
+                    }
+
+                    if (val > 0) {
+                        presenceInt.userPresence.ui_setautoaway(true, val * 60);
+                        lastValidNumber = val;
+                    }
+                }).rebind('blur.dashboard', function() {
+
+                    // the goal of the following line is to reset the value of the field if the entered data is invalid
+                    // after the user removes focus from it (and set the internally set value)
+                    $(this).val(presenceInt.userPresence.autoawaytimeout / 60);
+                }).val(lastValidNumber);
+            }
+        }
+    },
+
+    richURL: {
+
+        render: function() {
+
+            'use strict';
+
+            // Auto-away switch
+            accountUI.inputs.switch.init(
+                '#richpreviews',
+                $('#richpreviews').parent(),
+                RichpreviewsFilter.previewGenerationConfirmation,
+                function(val) {
+                    if (val) {
+                        RichpreviewsFilter.confirmationDoConfirm();
+                    }
+                    else {
+                        RichpreviewsFilter.confirmationDoNever();
+                    }
+                });
+        }
+    },
+
+    delayRender: function(presenceInt, autoaway) {
+
+        'use strict';
+
+        var self = this;
+
+        // TODO: FIXME, make accountUI elements not dependant!
+        if (!megaChatIsReady) {
+            // notification section was called too early, e.g. before chat's initialisation...delay the init.
+            var args = toArray.apply(null, arguments);
+            setTimeout(function() {
+                self.init.apply(self, args);
+            }, 700);
+            return true;
+        }
+
+        if (!presenceInt || !presenceInt.userPresence) {
+            setTimeout(function() {
+                throw new Error('presenceInt is not ready...');
             });
-        });
-    }
-};
-
-accountUI.disableElement = function(element) {
-    'use strict';
-    $(element).addClass('disabled').prop('disabled', true);
-};
-accountUI.enableElement = function(element) {
-    'use strict';
-    $(element).removeClass('disabled').prop('disabled', false);
-};
-
-accountUI.initCheckbox = function(className, $container, currentValue, onChangeCb) {
-    'use strict';
-    var $wrapperDiv = $('.' + className, $container);
-    var $input = $('input[type="checkbox"]', $wrapperDiv);
-
-    $wrapperDiv.rebind('click.checkbox', function() {
-        if ($wrapperDiv.is('.disabled')) {
-            return;
+            return true;
+            // ^ FIXME too..!
         }
 
-        var res;
-
-        if ($input.hasClass('checkboxOn')) {
-            res = onChangeCb(false);
-            if (res !== false) {
-                accountUI.initCheckbox.uncheck($input, $wrapperDiv);
-            }
-        }
-        else {
-            res = onChangeCb(true);
-            if (res !== false) {
-                accountUI.initCheckbox.check($input, $wrapperDiv);
-            }
-        }
-    });
-    if (currentValue === true || currentValue === 1) {
-        accountUI.initCheckbox.check($input, $wrapperDiv);
-    }
-    else {
-        accountUI.initCheckbox.uncheck($input, $wrapperDiv);
-    }
-
-};
-
-accountUI.initCheckbox.check = function($input, $wrapperDiv) {
-    'use strict';
-    $input.removeClass('checkboxOff').addClass('checkboxOn').prop('checked', true);
-    $wrapperDiv.removeClass('checkboxOff').addClass('checkboxOn');
-};
-accountUI.initCheckbox.uncheck = function($input, $wrapperDiv) {
-    'use strict';
-    $input.removeClass('checkboxOn').addClass('checkboxOff').prop('checked', false);
-    $wrapperDiv.removeClass('checkboxOn').addClass('checkboxOff');
-};
-
-accountUI.initCheckbox.enable = function(className, $container) {
-    'use strict';
-    var $wrapperDiv = $('.' + className, $container);
-    $wrapperDiv.removeClass('disabled');
-};
-accountUI.initCheckbox.disable = function(className, $container) {
-    'use strict';
-    var $wrapperDiv = $('.' + className, $container);
-    $wrapperDiv.addClass('disabled');
-};
-
-accountUI.initRadio = function(className, $container, currentValue, onChangeCb) {
-    $('.' + className, $container).removeClass('radioOn').addClass('radioOff');
-
-    $('input.' + className + '[value="' + currentValue + '"]', $container)
-        .removeClass('radioOff').addClass('radioOn');
-
-    $('.' + className + ' input', $container).rebind('click.radio', function(e) {
-        var newVal = $(this).val();
-
-        accountUI.initRadio.setValue(className, newVal, $container);
-        onChangeCb(newVal);
-    });
-
-    accountUI.initRadio.setValue(className, currentValue, $container);
-};
-accountUI.initRadio.setValue = function(className, newVal, $container) {
-    var $input = $('input.' + className + '[value="' + newVal + '"]', $container);
-    if ($input.is('.disabled')) {
-        return;
-    }
-
-    $('.' + className + '.radioOn', $container)
-        .addClass('radioOff').removeClass('radioOn');
-
-
-    $input
-        .removeClass('radioOff').addClass('radioOn')
-        .prop('checked', true);
-
-    $input.parent().addClass('radioOn').removeClass('radioOff');
-};
-
-
-accountUI.initRadio.disable = function($input) {
-    $('input.[value="' + newVal + '"]', $container)
-        .addClass('disabled')
-        .prop('disabled', true);
-};
-
-accountUI.initRadio.enable = function(value, $container) {
-    $('input.[value="' + newVal + '"]', $container)
-        .removeClass('disabled')
-        .prop('disabled', false);
-};
-
-accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen) {
-    // TODO: FIXME, make accountUI elements not dependant!
-    if (!megaChatIsReady) {
-        // accountUI.advanced section was called too early, e.g. before chat's initialisation...delay the init.
-        var args = toArray.apply(null, arguments);
-        setTimeout(function() {
-            accountUI.advancedSection.apply(accountUI, args);
-        }, 700);
-        return;
-    }
-
-    var presenceInt = megaChat.plugins.presencedIntegration;
-
-    if (!presenceInt || !presenceInt.userPresence) {
-        setTimeout(function() {
-            throw new Error('presenceInt is not ready...');
-        });
-        return;
-        // ^ FIXME too..!
-    }
-
-    // Only call this if the call of this function is the first one, made by fm.js -> accountUI
-    if (autoaway === undefined) {
-        $(presenceInt).rebind('settingsUIUpdated.settings', function(e,
-                                                                     autoaway,
-                                                                     autoawaylock,
-                                                                     autoawaytimeout,
-                                                                     persist,
-                                                                     persistlock,
-                                                                     lastSeen) {
-            accountUI.advancedSection(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
-        });
-
-        presenceInt.userPresence.updateui();
-        return;
-    }
-
-    // chat
-    var $sectionContainerChat = $('.account.tab-content.chat');
-
-    var _initPresenceRadio = function(presence) {
-        accountUI.initRadio(
-            'chatstatus',
-            $sectionContainerChat,
-            presence,
-            function(newVal) {
-                presenceInt.setPresence(parseInt(newVal));
-            }
-        );
-    };
-
-    if (typeof (megaChat) !== 'undefined' && typeof(presenceInt) !== 'undefined') {
-        $(presenceInt).rebind('settingsUIUpdated.settings', function(e,
-                                                                     autoaway,
-                                                                     autoawaylock,
-                                                                     autoawaytimeout,
-                                                                     persist,
-                                                                     persistlock,
-                                                                     lastSeen) {
-            accountUI.advancedSection(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
-        });
-    }
-
-    _initPresenceRadio(presenceInt.getPresence(u_handle));
-
-    var persistChangeRequestedHandler = function(newVal) {
-        presenceInt.userPresence.ui_setpersist(newVal);
-    };
-
-    var autoawayChangeRequestHandler = function(newVal) {
-        presenceInt.userPresence.ui_setautoaway(newVal);
-    };
-
-    var lastSeenChangeRequestedHandler = function(newVal) {
-        presenceInt.userPresence.ui_enableLastSeen(newVal);
-    };
-
-    accountUI.initCheckbox(
-        'last-seen',
-        $sectionContainerChat,
-        lastSeen,
-        lastSeenChangeRequestedHandler
-    );
-
-
-    $('.last-seen-wrapper', $sectionContainerChat).removeClass('hidden');
-
-    if (autoawaytimeout !== false) {
-
-        accountUI.initCheckbox(
-            'persist-presence',
-            $sectionContainerChat,
-            persist,
-            persistChangeRequestedHandler
-        );
-
-
-        // prevent changes to persist-presence if persistlock is set
-        accountUI.initCheckbox[persistlock ? "disable" : "enable"](
-            'persist-presence',
-            $sectionContainerChat
-        );
-
-        if (persistlock === true) {
-            $('.persist-presence-wrapper', $sectionContainerChat).addClass('hidden');
-        }
-        else {
-            $('.persist-presence-wrapper', $sectionContainerChat).removeClass('hidden');
-        }
-
-        accountUI.initCheckbox(
-            'autoaway',
-            $sectionContainerChat,
-            autoaway,
-            autoawayChangeRequestHandler
-        );
-
-        // prevent changes to autoaway if autoawaylock is set
-        accountUI.initCheckbox[autoawaylock ? "disable" : "enable"](
-            'autoaway',
-            $sectionContainerChat
-        );
-
-        if (autoawaylock === true) {
-            $('.autoaway-wrapper', $sectionContainerChat).addClass('hidden');
-        }
-        else {
-            $('.autoaway-wrapper', $sectionContainerChat).removeClass('hidden');
-        }
-
-        // always editable for user comfort -
-        accountUI.enableElement($('input#autoaway', $sectionContainerChat));
-
-        var lastValidNumber = Math.floor(autoawaytimeout / 60);
-        // when value is changed, set checkmark
-        $('input#autoaway', $sectionContainerChat)
-            .rebind('change.dashboard', function() {
-                var val = parseInt($(this).val());
-                if (val > 3505) {
-                    val = 3505;
-                }
-                else if (val < 0) {
-                    val = 5;
-                }
-
-                if (val > 0) {
-                    presenceInt.userPresence.ui_setautoaway(true, val * 60);
-                    lastValidNumber = val;
-                }
-            })
-            .rebind('blur.dashboard', function() {
-                // the goal of the following line is to reset the value of the field if the entered data is invalid
-                // after the user removes focus from it (and set the internally set value)
-                $(this).val(presenceInt.userPresence.autoawaytimeout / 60);
-            })
-            .val(lastValidNumber);
-    }
-
-    accountUI.initCheckbox(
-        'richpreviews-confirmation',
-        $sectionContainerChat,
-        RichpreviewsFilter.previewGenerationConfirmation === true,
-        function(newVal) {
-            if (newVal) {
-                RichpreviewsFilter.confirmationDoConfirm();
-            }
-            else {
-                RichpreviewsFilter.confirmationDoNever();
-            }
-        }
-    );
-
-    $('.versioning-switch')
-    .rebind('click', function() {
-        var val = $('#versioning-status').prop('checked') ? 1 : 0;
-        var setVersioningAttr = function(val) {
-            showToast('settings', l[16168]);
-            mega.attr.set(
-                'dv',
-                val,
-                -2,
-                true
-            )
-            .done(
-            function(e) {
-                $('#versioning-status').prop('checked', !val);
-                $('.label-heading').text(val ? l[7070] : l[17601]);
-                fileversioning.dvState = val;
+        // Only call this if the call of this function is the first one, made by fm.js -> accountUI
+        if (autoaway === undefined) {
+            $(presenceInt).rebind('settingsUIUpdated.settings', function(e,
+                                                                              autoaway,
+                                                                              autoawaylock,
+                                                                              autoawaytimeout,
+                                                                              persist,
+                                                                              persistlock,
+                                                                              lastSeen) {
+                self.init(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
             });
-        };
-        if ($('#versioning-status').prop('checked')) {
-            msgDialog('confirmation', l[882], l[17595], false, function(e) {
-                if (e) {
-                    setVersioningAttr(val);
-                }
+
+            presenceInt.userPresence.updateui();
+            return true;
+        }
+
+        if (typeof (megaChat) !== 'undefined' && typeof(presenceInt) !== 'undefined') {
+            $(presenceInt).rebind('settingsUIUpdated.settings', function(e,
+                                                                              autoaway,
+                                                                              autoawaylock,
+                                                                              autoawaytimeout,
+                                                                              persist,
+                                                                              persistlock,
+                                                                              lastSeen) {
+                self.init(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
             });
         }
-        else {
-            setVersioningAttr(val);
-        }
-    });
-    //update versioning info
-    fileversioning.updateVersionInfo();
-    $('.delete-all-versions')
-    .rebind('click', function() {
-
-        if (!$(this).hasClass('disabled')) {
-            msgDialog('remove', l[1003], l[17581], l[1007], function(e) {
-                if (e) {
-                    loadingDialog.show();
-                    api_req({
-                            a: 'dv'
-                            }, {
-                            callback: function(res, ctx) {
-                                if (res === 0) {
-                                    M.accountData(function() {
-                                        fileversioning.updateVersionInfo();
-                                    }, false, true);
-                                }
-                            }
-                        });
-                }
-            });
-        }
-    });
+    },
 };
 
-accountUI.voucherCentering = function voucherCentering($button) {
-    'use strict';
+accountUI.reseller = {
 
-    var $popupBlock = $('.fm-voucher-popup');
-    var popupHeight = $popupBlock.outerHeight();
+    init: function(account) {
 
-    $popupBlock.css({
-        'top': $button.offset().top - popupHeight - 10,
-        'right': $('body').outerWidth() - $button.outerWidth() - $button.offset().left
-    });
+        'use strict';
 
-    if ($button.offset().top + 10 > popupHeight) {
-        $popupBlock.css('top', $button.offset().top - popupHeight - 10);
-    }
-    else {
-        $popupBlock.css('top', $button.offset().top + $button.outerHeight() + 10);
+        if (M.account.reseller) {
+            this.voucher.render(account);
+            this.voucher.bindEvents();
+        }
+    },
+
+    voucher: {
+
+        render: function(account) {
+
+            'use strict';
+
+            if (!$.voucherlimit) {
+                $.voucherlimit = 10;
+            }
+
+            var email = 'resellers@mega.nz';
+
+            $('.resellerbuy').attr('href', 'mailto:' + email)
+                .find('span').text(l[9106].replace('%1', email));
+
+            // Use 'All' or 'Last 10/100/250' for the dropdown text
+            var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
+
+            $('.account-history-dropdown-button.vouchers').text(buttonText);
+            $('.fm-account-reseller .balance span').safeHTML('@@ &euro; ', account.balance[0][0]);
+            $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
+            $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));
+            $('.account-history-drop-items.voucher250-').text(l['466a'].replace('[X]', 250));
+
+            // Sort vouchers by most recently created at the top
+            M.account.vouchers.sort(function(a, b) {
+
+                if (a['date'] < b['date']) {
+                    return 1;
+                }
+                else {
+                    return -1;
+                }
+            });
+
+            $('.grid-table.vouchers tr').remove();
+
+            var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477]
+                + '</th><th>' + l[488] + '</th></tr>';
+
+            $(account.vouchers).each(function(i, el) {
+
+                // Only show the last 10, 100, 250 or if the limit is not set show all vouchers
+                if (($.voucherlimit !== 'all') && (i >= $.voucherlimit)) {
+                    return false;
+                }
+
+                var status = l[489];
+                if (el.redeemed > 0 && el.cancelled === 0 && el.revoked === 0) {
+                    status = l[490] + ' ' + time2date(el.redeemed);
+                }
+                else if (el.revoked > 0 && el.cancelled > 0) {
+                    status = l[491] + ' ' + time2date(el.revoked);
+                }
+                else if (el.cancelled > 0) {
+                    status = l[492] + ' ' + time2date(el.cancelled);
+                }
+
+                var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
+
+                html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink
+                    + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
+            });
+
+            $('.grid-table.vouchers').safeHTML(html);
+            $('.default-select.vouchertype .default-select-scroll').text('');
+            $('.default-select.vouchertype span').text(l[6875]);
+
+            var prices = [];
+            for (var i = 0; i < M.account.prices.length; i++) {
+                if (M.account.prices[i]) {
+                    prices.push(M.account.prices[i][0]);
+                }
+            }
+            prices.sort(function(a, b) {
+                return (a - b);
+            });
+
+            var voucheroptions = '';
+            for (i = 0; i < prices.length; i++) {
+                voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i])
+                    + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
+            }
+            $('.default-select.vouchertype .default-select-scroll').safeHTML(voucheroptions);
+        },
+
+        bindEvents: function() {
+
+            'use strict';
+
+            $('.vouchercreate').rebind('click..voucherCreateClick', function() {
+                var vouchertype = $('.default-select.vouchertype .default-dropdown-item.active').attr('data-value');
+                var voucheramount = parseInt($('#account-voucheramount').val());
+                var proceed = false;
+                for (var i in M.account.prices) {
+                    if (M.account.prices[i][0] === vouchertype) {
+                        proceed = true;
+                    }
+                }
+                if (!proceed) {
+                    msgDialog('warninga', l[135], 'Please select the voucher type.');
+                    return false;
+                }
+                if (!voucheramount) {
+                    msgDialog('warninga', l[135], 'Please enter a valid voucher amount.');
+                    return false;
+                }
+                if (vouchertype === '19.99') {
+                    vouchertype = '19.991';
+                }
+                loadingDialog.show();
+                api_req({a: 'uavi', d: vouchertype, n: voucheramount, c: 'EUR'},
+                    {
+                        callback: function() {
+                            M.account.lastupdate = 0;
+                            accountUI();
+                        }
+                    });
+            });
+
+            $('.fm-account-reseller .account-history-dropdown-button').rebind('click', function() {
+
+                $(this).addClass('active');
+                $('.account-history-dropdown').addClass('hidden');
+                $(this).next().removeClass('hidden');
+            });
+
+            $('.fm-account-reseller .account-history-drop-items').rebind('click', function() {
+
+                var $parent = $(this).parent();
+                $parent.find('.account-history-drop-items').removeClass('active');
+                $parent.prev('.default-select.vouchers').text($(this).text()).removeClass('active');
+
+                var c = $(this).attr('class') ? $(this).attr('class') : '';
+
+                if (c.indexOf('voucher10-') > -1) {
+                    $.voucherlimit = 10;
+                }
+                else if (c.indexOf('voucher100-') > -1) {
+                    $.voucherlimit = 100;
+                }
+                else if (c.indexOf('voucher250-') > -1) {
+                    $.voucherlimit = 250;
+                }
+                else if (c.indexOf('voucherAll-') > -1) {
+                    $.voucherlimit = 'all';
+                }
+
+                $(this).addClass('active');
+                $(this).closest('.account-history-dropdown').addClass('hidden');
+                accountUI();
+            });
+
+            bindDropdownEvents($('.default-select.vouchertype'), 0, '.fm-account-reseller');
+        }
     }
 };

@@ -1996,6 +1996,7 @@
     "17974": "L\u2019acc\u00e8s \u00e0 tout dossier partag\u00e9 avec vous par les contacts s\u00e9lectionn\u00e9s sera perdu.\r\n",
     "18023": "Le disque nuagique est vide",
     "18051": "Disque nuagique",
+    "18055": "Fichier",
     "18057": "Transf\u00e9rer",
     "18076": "Utilisation globale",
     "18082": "Espace de stockage total",
@@ -3192,7 +3193,7 @@
     "20341": "Image RAW Sony",
     "20342": "Sous-titres",
     "20343": "Mod\u00e8le Calc d\u2019OpenOffice",
-    "20344": "Image vectorielle dynamique",
+    "20344": "SVG Image",
     "20345": "Animation Flash d\u2019Adobe",
     "20346": "Fichier TAR compress\u00e9 au format bzip2",
     "20347": "Image en mode point Targa",
@@ -3240,7 +3241,8 @@
     "20389": "Feuille de calcul Excel de Microsoft",
     "20390": "Mod\u00e8le Excel de Microsoft",
     "20391": "Feuille de calcul Excel de Microsoft, avec macros",
-    "20392": "Please log in to continue.",
-    "20393": "Your phone number is already verified.",
-    "20394": "That phone number is already in use by another account."
+    "20392": "Veuillez vous connecter pour continuer.",
+    "20393": "Votre num\u00e9ro de t\u00e9l\u00e9phone est d\u00e9j\u00e0 v\u00e9rifi\u00e9.",
+    "20394": "Ce num\u00e9ro de t\u00e9l\u00e9phone est d\u00e9j\u00e0 utilis\u00e9 pour un autre compte.",
+    "20395": "Measure your available outbound bandwidth during the initial ten seconds of an upload, and then keep at least 10% of it unused."
 }

@@ -1996,6 +1996,7 @@
     "17974": "Dost\u0119p do folder\u00f3w udost\u0119pnionych Tobie.",
     "18023": "Dysk jest pusty",
     "18051": "Cloud Dysk",
+    "18055": "Plik",
     "18057": "Przesy\u0142anie",
     "18076": "Og\u00f3lne wykorzystanie",
     "18082": "Ca\u0142kowita pami\u0119\u0107",
@@ -3192,7 +3193,7 @@
     "20341": "Sony RAW Image",
     "20342": "Subtitles",
     "20343": "OpenOffice Calc Template",
-    "20344": "Scalable Vector Graphics",
+    "20344": "SVG Image",
     "20345": "Adobe Flash Animation",
     "20346": "bzip2 Compressed TAR",
     "20347": "Targa Bitmap",
@@ -3240,7 +3241,8 @@
     "20389": "Microsoft Excel Spreadsheet",
     "20390": "Microsoft Excel Template",
     "20391": "Microsoft Excel Macro-Enabled Spreadsheet",
-    "20392": "Please log in to continue.",
-    "20393": "Your phone number is already verified.",
-    "20394": "That phone number is already in use by another account."
+    "20392": "Prosz\u0119 si\u0119 zalogowa\u0107, aby kontynuowa\u0107.",
+    "20393": "Tw\u00f3j numer telefonu jest ju\u017c zweryfikowany.",
+    "20394": "Ten numer telefonu jest ju\u017c u\u017cywany przez inne konto.",
+    "20395": "Measure your available outbound bandwidth during the initial ten seconds of an upload, and then keep at least 10% of it unused."
 }

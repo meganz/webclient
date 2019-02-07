@@ -1650,7 +1650,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
     var getPostCodeName = function(countryCode) {
         if (!countryCode) {
-            return "Postcode";
+            return l[10659]; // "Postcode";
         }
         switch (countryCode) {
             case "US": return "ZIP code";
@@ -1662,7 +1662,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
             case "IE": return "Eircode";
             case "BR": return "CEP";
             case "IT": return "CAP";
-            default: return "Postcode";
+            default: return l[10659]; // "Postcode";
         }
     };
 

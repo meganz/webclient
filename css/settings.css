@@ -33,10 +33,10 @@
 }
 .head-title {
     display: block;
-    line-height: 24px;
+    line-height: 20px;
     padding: 8px 40px 8px 44px;
-    font-size: 17px;
-    color: #333;
+    font-size: 16px;
+    color: #555;
     position: relative;
     cursor: pointer;
     -webkit-transition: all 200ms ease-in-out;
@@ -55,7 +55,7 @@
     top: 12px;
     background-image: url(../images/mega/icons-sprite_v25.png);
     background-repeat: no-repeat;
-    opacity: 0.4;
+    opacity: 0.3;
 }
 .settings-menu-arrow {
     content: '';
@@ -81,7 +81,7 @@
 }
 .fm-account-button.active .head-title {
     background-color: #eee;
-    font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+    font-family: 'LatoWebSemibold', 'source_sans_proregular', Arial;
 }
 .head-title .settings-menu-arrow {
     opacity: 0.4;
@@ -133,9 +133,9 @@
     max-height: 250px;
 }
 .fm-account-button .sub-title {
-    font-size: 15px;
+    font-size: 14px;
     color: #888;
-    line-height: 20px;
+    line-height: 18px;
     padding: 8px 8px 8px 44px;
     position: relative;
     cursor: pointer;
@@ -241,13 +241,16 @@
 .subtitle-txt {
     font-size: 16px;
     color: #333;
-    line-height: 18px;
+    line-height: 24px;
     display: inline-block;
     vertical-align: middle;
     max-width: 370px;
     text-overflow: ellipsis;
     position: relative;
     transition: 0.3s;
+}
+.settings-sub-section.no-button .subtitle-txt, .settings-sub-section.no-button .content-txt {
+    max-width: none;
 }
 .settings-sub-section.avatar .subtitle-txt {
     line-height: 64px;
@@ -264,9 +267,6 @@
 .settings-sub-section .status-container .content-txt {
     padding: 0;
 }
-.settings-sub-section .status-container .dialog-feature-toggle {
-    margin-top: 10px;
-}
 .fm-account-notifications .subtitle-txt {
     display: block;
     line-height: 22px;
@@ -279,11 +279,16 @@
 .content-txt {
     font-size: 15px;
     line-height: 20px;
-    padding-top: 24px;
+    padding-top: 22px;
     color: #999;
     vertical-align:top;
-    max-width: 340px;
     transition: 0.3s;
+}
+.fm-account-notifications.fm-account-sections .content-txt {
+    max-width: 400px;
+}
+.status-container .content-txt {
+    max-width: 340px;
 }
 .settings-sub-section .radio-txt {
     font-size: 15px;
@@ -585,12 +590,12 @@
     font-size: 14px;
 }
 .fm-right-account-block .dialog-input-title-ontop .dialog-input.short-input {
-    width: 50px;
+    width: calc(38% - 28px);
     display: inline-block;
     padding: 0;
 }
 .fm-right-account-block .dialog-input-title-ontop .dialog-input.short-input:not(:nth-child(2)) {
-    width: 35px;
+    width: calc(27% - 28px);
     display: inline-block;
     padding: 0;
 }
@@ -830,13 +835,14 @@
     margin: 0 auto;
     position: relative;
 }
+.fm-right-account-block .grid-table tr:hover {
+    background-color: #fff;
+}
 .fm-right-account-block .grid-table tr {
     font-family: 'LatoWeb','source_sans_proregular', Arial;
     position: relative;
+    transition: 0.3s;
     border-bottom: 1px solid rgba(0,0,0,0.1);
-}
-.fm-right-account-block .grid-table tr:not(:first-child):hover {
-    background-color: #fafafa;
 }
 .fm-right-account-block .grid-table tr:first-child {
     background-color: rgba(245,245,245,1);
@@ -864,8 +870,8 @@
     background-color: rgba(0,0,0,0.1);
 }
 .fm-right-account-block .grid-table td {
-    padding:12px;
-    line-height: 18px;
+    padding:8px;
+    line-height: 24px;
     font-size: 14px;
     color: #888;
     position: relative;
@@ -874,6 +880,7 @@
 }
 .fm-right-account-block .grid-table.megadrop td {
     padding: 0;
+    cursor: pointer;
 }
 .fm-right-account-block .grid-table td.ip-addr {
     max-width: 165px;
@@ -902,8 +909,10 @@
     overflow: visible;
     line-height: 0;
 } 
-.fm-right-account-block .grid-table .grid-table-empty {
+.fm-right-account-block .grid-table .grid-table-empty, .fm-right-account-block .grid-table.megadrop td.grid-table-empty {
     text-align: center;
+    padding:8px;
+    cursor: default;
 }
 .fm-right-account-block .checkboxOff,
 .fm-right-account-block .checkboxOn {
@@ -1175,9 +1184,9 @@
 .list-2col-row:last-child::after{
     display: none;
 }
-.list-2col-row:hover {
+/*.list-2col-row:hover {
     background-color: rgba(250,250,250,1);
-}
+}*/
 .list-2col-row:hover .icon,
 .list-2col-row:hover .delete-img.icon{
     display: inline-block;
@@ -1217,7 +1226,71 @@
     background: -webkit-linear-gradient(top, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 100%);
     background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 100%);
 }
-
+/* Account settings-rubbish bin notification */
+.rubbish-settings {
+    display: inline-block;
+}
+.green-notification.body {
+    display: table;
+    background-color: rgba(0,191,165,0.05);
+    -webkit-box-shadow: 0 0 0 1px rgba(0,191,165,0.2);
+    -moz-box-shadow: 0 0 0 1px rgba(0,191,165,0.2);
+    box-shadow: 0 0 0 1px rgba(0,191,165,0.2);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 0 16px 0 12px;
+}
+.settings-sub-section.rub-grn-noti {
+    margin-bottom: 24px;
+}
+.green-notification.with-btn {
+    text-align: left;
+    margin-top: 20px;
+}
+.green-notification.with-btn .text-cell {
+    padding: 7px 0;
+}
+.green-notification.body .versioning-body-text{
+    max-width: 370px;
+    padding-left: 4px;
+}
+.green-notification.body.with-btn .versioning-body-text{
+    max-width: none;
+}
+.free .green-notification.body:not(.hidden) {
+    position: relative;
+}
+.green-notification.cell {
+    display: table-cell;
+    vertical-align: middle;
+    color: #00B79E;
+    font-size: 13px;
+    line-height: 18px;
+}
+.green-notification.cell .button {
+    position: relative;
+    -o-transform: none;
+    -ms-transform: none; /* IE 9 */
+    -webkit-transform: none; /* Safari */
+    transform: none;
+}
+.green-notification.cell:nth-child(2) {
+    width: auto;
+}
+.green-notification .xscheduler {
+    margin: 0 11px 0 3px;
+}
+.green-notification .button {
+    margin: 12px 0px 12px 24px;
+}
+.green-notification .fvnotice {
+    background-position: -233px -1666px;
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    margin-top: 4px;
+}
 /*when its width is smaller than 992px, add class `half-size`*/
 .fm-account-main.low-width .settings-banner {
     width: 566px;
@@ -1242,8 +1315,8 @@
     border-radius: 0 0px 8px 8px;
 }
 .fm-account-main.low-width .last-block .content-txt {
-        display: none;
-    }
+    display: none;
+}
 .fm-account-main.low-width .fm-right-account-block .txt-center.default-green-button {
     width: auto;
     margin: auto;

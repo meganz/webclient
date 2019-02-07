@@ -26,7 +26,7 @@ function dashboardUI() {
         $('.account.widget.recovery-key').removeClass('hidden');
         // Button on dashboard to backup their master key
         $('.backup-master-key').rebind('click', function() {
-            loadSubPage('backup');
+            M.showRecoveryKeyDialog(2);
         });
     }
 

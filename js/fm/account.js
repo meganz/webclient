@@ -1930,7 +1930,16 @@ accountUI.security = {
         accountChangePassword.init();
 
         // Change Email
-        accountChangeEmail.init();
+        if (!u_attr.b || u_attr.b.m) {
+            $('.fm-account-security.fm-account-sections .data-block.change-email').removeClass('hidden');
+            $('.content-panel.account .acc-setting-menu-change-em').removeClass('hidden');
+
+            accountChangeEmail.init();
+        }
+        else {
+            $('.fm-account-security.fm-account-sections .data-block.change-email').addClass('hidden');
+            $('.content-panel.account .acc-setting-menu-change-em').addClass('hidden');
+        }
 
         // Recovery Key
         this.recoveryKey.bindEvents();
@@ -2523,7 +2532,7 @@ accountUI.transfers = {
                 'use strict';
 
                 // LITE/PRO account
-                if (u_attr.p) {
+                if (u_attr.p && !u_attr.b) {
                     var bandwidthLimit = Math.round(account.servbw_limit | 0);
 
                     $('#bandwidth-slider').slider({

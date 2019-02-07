@@ -1996,6 +1996,7 @@
     "17974": "Toegang tot alle mappen gedeeld met u door de geselecteerde contacten gaan verloren.",
     "18023": "Lege Cloud schijf",
     "18051": "Cloud Schijf",
+    "18055": "Bestand",
     "18057": "Overdracht",
     "18076": "Totaal gebruik",
     "18082": "Totale opslag",
@@ -3192,7 +3193,7 @@
     "20341": "Sony RAW Afbeelding",
     "20342": "Ondertiteling",
     "20343": "OpenOffice Calc Template",
-    "20344": "Schaalbare Vector Graphics",
+    "20344": "SVG Image",
     "20345": "Adobe Flash Animatie",
     "20346": "bzip2 Compressed TAR",
     "20347": "Targa Bitmap",
@@ -3242,5 +3243,6 @@
     "20391": "Microsoft Excel Macro-Enabled Spreadsheet",
     "20392": "Please log in to continue.",
     "20393": "Your phone number is already verified.",
-    "20394": "That phone number is already in use by another account."
+    "20394": "That phone number is already in use by another account.",
+    "20395": "Measure your available outbound bandwidth during the initial ten seconds of an upload, and then keep at least 10% of it unused."
 }

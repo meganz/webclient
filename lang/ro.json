@@ -1996,6 +1996,7 @@
     "17974": "Accesul la orice folder partajat cu tine prin contactele selectate va fi pierdut.",
     "18023": "Unitate cloud goal\u0103",
     "18051": "Unitate cloud",
+    "18055": "Fi\u0219ier",
     "18057": "Transfer",
     "18076": "Utilizare general\u0103",
     "18082": "Stocare total\u0103",
@@ -3192,7 +3193,7 @@
     "20341": "Imagine RAW Sony",
     "20342": "Subtitr\u0103ri",
     "20343": "\u0218ablon OpenOffice Calc",
-    "20344": "Grafic\u0103 vectorial\u0103 scalabil\u0103",
+    "20344": "SVG Image",
     "20345": "Anima\u021bie Adobe Flash",
     "20346": "Fi\u0219ier TAR comprimat \u00een bzip2",
     "20347": "Targa Bitmap",
@@ -3242,5 +3243,6 @@
     "20391": "Foaie de calcul Macro-Enabled Microsoft Excel",
     "20392": "Please log in to continue.",
     "20393": "Your phone number is already verified.",
-    "20394": "That phone number is already in use by another account."
+    "20394": "That phone number is already in use by another account.",
+    "20395": "Measure your available outbound bandwidth during the initial ten seconds of an upload, and then keep at least 10% of it unused."
 }

@@ -1996,6 +1996,7 @@
     "17974": "\u0e01\u0e32\u0e23\u0e40\u0e02\u0e49\u0e32\u0e16\u0e36\u0e07\u0e42\u0e1f\u0e25\u0e40\u0e14\u0e2d\u0e23\u0e4c\u0e17\u0e35\u0e48\u0e41\u0e0a\u0e23\u0e4c\u0e01\u0e31\u0e1a\u0e04\u0e38\u0e13\u0e42\u0e14\u0e22\u0e1c\u0e39\u0e49\u0e15\u0e34\u0e14\u0e15\u0e48\u0e2d\u0e17\u0e35\u0e48\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e44\u0e27\u0e49\u0e08\u0e30\u0e2a\u0e39\u0e0d\u0e2b\u0e32\u0e22\u0e44\u0e1b",
     "18023": "\u0e44\u0e21\u0e48\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e43\u0e19\u0e04\u0e25\u0e32\u0e27\u0e14\u0e4c\u0e44\u0e14\u0e23\u0e1f\u0e4c",
     "18051": "\u0e04\u0e25\u0e32\u0e27\u0e14\u0e4c\u0e44\u0e14\u0e23\u0e4c\u0e1f",
+    "18055": "\u0e44\u0e1f\u0e25\u0e4c",
     "18057": "\u0e16\u0e48\u0e32\u0e22\u0e42\u0e2d\u0e19",
     "18076": "\u0e01\u0e32\u0e23\u0e43\u0e0a\u0e49\u0e07\u0e32\u0e19\u0e42\u0e14\u0e22\u0e23\u0e27\u0e21",
     "18082": "\u0e1e\u0e37\u0e49\u0e19\u0e17\u0e35\u0e48\u0e40\u0e01\u0e47\u0e1a\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14",
@@ -3192,7 +3193,7 @@
     "20341": "Sony RAW Image",
     "20342": "\u0e44\u0e1f\u0e25\u0e4c\u0e04\u0e33\u0e1a\u0e23\u0e23\u0e22\u0e32\u0e22",
     "20343": "OpenOffice Calc Template",
-    "20344": "Scalable Vector Graphics",
+    "20344": "SVG Image",
     "20345": "Adobe Flash Animation",
     "20346": "bzip2 Compressed TAR",
     "20347": "Targa Bitmap",
@@ -3242,5 +3243,6 @@
     "20391": "Microsoft Excel Macro-Enabled Spreadsheet",
     "20392": "Please log in to continue.",
     "20393": "Your phone number is already verified.",
-    "20394": "That phone number is already in use by another account."
+    "20394": "That phone number is already in use by another account.",
+    "20395": "Measure your available outbound bandwidth during the initial ten seconds of an upload, and then keep at least 10% of it unused."
 }

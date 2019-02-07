@@ -1996,6 +1996,7 @@
     "17974": "\u6240\u9009\u8054\u7cfb\u4eba\u4e0e\u60a8\u5171\u4eab\u7684\u4efb\u4f55\u6587\u4ef6\u5939\u90fd\u5c06\u4e22\u5931\u3002",
     "18023": "\u7a7a\u7684\u4e91\u76d8",
     "18051": "\u4e91\u76d8",
+    "18055": "\u6587\u4ef6",
     "18057": "\u4f20\u8f93",
     "18076": "\u4f7f\u7528\u60c5\u51b5\u603b\u89c8",
     "18082": "\u603b\u5bb9\u91cf",
@@ -3192,7 +3193,7 @@
     "20341": "\u7d22\u5c3cRAW\u56fe\u50cf",
     "20342": "\u5b57\u5e55",
     "20343": "OpenOffice Calc\u6a21\u677f",
-    "20344": "Scalable Vector Graphics",
+    "20344": "SVG Image",
     "20345": "Adobe Flash\u52a8\u753b",
     "20346": "bzip2 Compressed TAR",
     "20347": "Targa Bitmap",
@@ -3242,5 +3243,6 @@
     "20391": "Microsoft Excel\u542f\u7528\u5b8f\u7684\u8868\u683c",
     "20392": "Please log in to continue.",
     "20393": "Your phone number is already verified.",
-    "20394": "That phone number is already in use by another account."
+    "20394": "That phone number is already in use by another account.",
+    "20395": "Measure your available outbound bandwidth during the initial ten seconds of an upload, and then keep at least 10% of it unused."
 }

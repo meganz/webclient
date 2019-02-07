@@ -1996,6 +1996,7 @@
     "17974": "\uc120\ud0dd\ub41c \uc5f0\ub77d\ucc98\uc5d0 \uc758\ud574 \ub2f9\uc2e0\uacfc \uacf5\uc720\ub41c \ubaa8\ub4e0 \ud3f4\ub354\uc5d0 \ub300\ud55c \uc811\uadfc\uc774 \uc0c1\uc2e4\ub429\ub2c8\ub2e4.",
     "18023": "\ube48 \ud074\ub77c\uc6b0\ub4dc \ub4dc\ub77c\uc774\ube0c",
     "18051": "\ud074\ub77c\uc6b0\ub4dc \ub4dc\ub77c\uc774\ube0c",
+    "18055": "\ud30c\uc77c",
     "18057": "\uc804\uc1a1",
     "18076": "\uc804\uccb4 \uc0ac\uc6a9\ub7c9",
     "18082": "\uc804\uccb4 \uc800\uc7a5 \uacf5\uac04",
@@ -3192,7 +3193,7 @@
     "20341": "Sony RAW \uc774\ubbf8\uc9c0",
     "20342": "\uc790\ub9c9",
     "20343": "OpenOffice Calc \ud15c\ud50c\ub9bf",
-    "20344": "\uc2a4\ucf00\uc77c\ub7ec\ube14 \ubca1\ud130 \uadf8\ub798\ud53d\uc2a4",
+    "20344": "SVG Image",
     "20345": "Adobe Flash \uc560\ub2c8\uba54\uc774\uc158",
     "20346": "bzip2 \uc555\ucd95 TAR",
     "20347": "Targa \ube44\ud2b8\ub9f5",
@@ -3242,5 +3243,6 @@
     "20391": "Microsoft Excel \ub9e4\ud06c\ub85c \uc801\uc6a9 \uc2a4\ud504\ub808\ub4dc\uc2dc\ud2b8",
     "20392": "Please log in to continue.",
     "20393": "Your phone number is already verified.",
-    "20394": "That phone number is already in use by another account."
+    "20394": "That phone number is already in use by another account.",
+    "20395": "Measure your available outbound bandwidth during the initial ten seconds of an upload, and then keep at least 10% of it unused."
 }

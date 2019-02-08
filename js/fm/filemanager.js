@@ -584,6 +584,9 @@ FileManager.prototype.initFileManagerUI = function() {
         var $target = $(e.target);
         var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red';
 
+        if (!$target.is('.account-history-dropdown-button')) {
+            $('.account-history-dropdown').addClass('hidden');
+        }
         if ($target.attr('data-reactid') || $target.is('.chatlink')) {
             // chat can handle its own links..no need to return false on every "click" and "element" :O
             return;

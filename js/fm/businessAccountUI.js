@@ -1590,6 +1590,17 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
     );
 };
 
+/** Show UI elements if the account got expired  */
+BusinessAccountUI.prototype.showExpiredUIElements = function() {
+    if (!u_attr.b || !u_attr.b.m || u_attr.b.s !== -1) {
+        return;
+    }
+    var msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+        .replace(/\[A\]/g, '<a href="/registerb" class="clickurl">').replace(/\[\/A\]/g, '</a>');
+    $('.fm-notification-block.expired-business').safeHTML(msg).show();
+};
+
+
 /** view business account page */
 BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     "use strict";

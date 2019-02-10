@@ -809,6 +809,8 @@
                 M.require('businessAcc_js', 'businessAccUI_js').done(function () {
                     var business_ui = new BusinessAccountUI();
                     business_ui.showWelcomeDialog();
+                    // the function will check if the account is expired
+                    business_ui.showExpiredUIElements();
                 });
             }
 

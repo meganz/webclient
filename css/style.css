@@ -6036,7 +6036,7 @@ th.grid-first-th {
 .fm-notification-block.almost-full a {
     color: #333333;
 }
-.fm-notification-block.full a {
+.fm-notification-block.full a, .fm-notification-block.expired-business {
     color: #FFFFFF;
 }
 .fm-notification-close {

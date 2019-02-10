@@ -64,7 +64,13 @@ BusinessRegister.prototype.initPage = function () {
                 return loadSubPage("start");
             }
             else {
-                $nbUsersInput.val(Object.keys(M.suba).length);
+                var totalActiveSubUsers = 0;
+                for (var subb in M.suba) {
+                    if (M.suba[subb].s === 0) {
+                        totalActiveSubUsers++;
+                    }
+                }
+                $nbUsersInput.val(Math.max(totalActiveSubUsers, this.minUsers));
                 $nbUsersInput.prop('disabled', true);
                 /////
                 $cnameInput.prop('disabled', true);

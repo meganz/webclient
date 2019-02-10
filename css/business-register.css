@@ -1,8 +1,6 @@
 
-.business-register * {
-	font-family: 'Lato', sans-serif;
-}
 
+/*
 .business-register .left {
 	float: left;
 }
@@ -18,7 +16,7 @@
 .business-register .hidden {
 	display: none;
 }
-
+*/
 .business-register .top-head {
 	width: 100%;
 	height: 36px;
@@ -41,6 +39,9 @@
 	margin:0 auto;
 	padding-top: 124px;
 	position: relative;
+}
+.bus-reg-body * {
+	font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 
 .bus-reg-header {
@@ -138,6 +139,7 @@
 	white-space: nowrap;
     text-overflow: ellipsis;
     background-color: rgba(255,255,255,0.01);
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 
 .bus-reg-input input.fir-name {
@@ -151,7 +153,9 @@
 }
 
 .bus-reg-input input::placeholder {
-	font-size: 14px;
+	font-size: 13px;
+	color: #ccc;
+	font-family: 'LatoWeb','source_sans_proregular', Arial;
 }
 
 .bus-reg-input.num input {
@@ -342,7 +346,6 @@
 	margin-bottom: 88px;
 	float: right;
 	transition: 0.2s;
-
 }
 
 .bus-reg-btn:hover, .bus-reg-btn-2:hover {
@@ -431,7 +434,7 @@
 	width: 90%;
 	margin: 4px auto 20px auto;
 	text-align: center;
-	font-size: 16px;
+	font-size: 14px;
 	color: #999;
 }
 
@@ -450,7 +453,7 @@
 }
 
 .bus-reg-plan .business-plan-info .left, .bus-reg-plan .business-plan-info .right {
-	font-size: 16px;
+	font-size: 15px;
 	color: #333;
 	line-height: 54px;
 	padding: 0 16px;
@@ -575,36 +578,36 @@
     .bus-reg-body {
 	width:90%;
 	min-width: 0;
-}
+	}
 
-.bus-reg-info-block {
-	width:100%;
-}
+	.bus-reg-info-block {
+		width:100%;
+	}
 
-.bus-reg-plan {
-	width:100%;
-	top: 48px;
-	position: relative;
-}
+	.bus-reg-plan {
+		width:100%;
+		top: 48px;
+		position: relative;
+	}
 
-.bus-reg-header {
-	font-size: 30px;
-}
-.bus-reg-btn {
-	display: none;
-}
+	.bus-reg-header {
+		font-size: 30px;
+	}
+	.bus-reg-btn {
+		display: none;
+	}
 
-.bus-confirm-body .bus-reg-btn {
-	display: inline-block;
-}
+	.bus-confirm-body .bus-reg-btn {
+		display: inline-block;
+	}
 
-.bus-reg-btn-2 {
-	display: inline-block;
-	margin-top: 80px;
-}
+	.bus-reg-btn-2 {
+		display: inline-block;
+		margin-top: 80px;
+	}
 
-.bus-reg-featureBlock {
-	width:100%;
+	.bus-reg-featureBlock {
+		width:100%;
 }
 
 }

@@ -1917,9 +1917,6 @@
     "17694": "\ud0a4 \ub2e4\uc6b4\ub85c\ub4dc",
     "17695": "\uc77c",
     "17696": "GB",
-    "17697": "YYYY",
-    "17698": "MM",
-    "17699": "DD",
     "17700": "\uc5ec\uae30\uc5d0 \uba54\uc2dc\uc9c0\ub97c \uc785\ub825\ud558\uc138\uc694 (\uc120\ud0dd\uc801)",
     "17701": "\uc6b0\ub9ac \uc11c\ubc84\ub85c \uc804\uc1a1\ub420 [B]\uc815\ud655\ud55c \uc815\ubcf4[\/B]\ub97c \ubcf4\ub824\uba74 \uc5ec\uae30\ub97c \ud074\ub9ad\ud558\uc138\uc694",
     "17703": "\uae43\ubc1c",
@@ -2123,7 +2120,6 @@
     "18562": "The number of folders a contact has shared with you will be displayed under each contact's email. If you tap on the contact, you will see the individual folders and their contents.",
     "18563": "Go to your [B1]new[\/B1] email inbox and find the email [B2]Confirm new email[\/B2] and click on the [B3]Red[\/B3] button. You will be re-directed to the MEGA app and asked to confirm your account's password and click [B4]Change[\/B4].",
     "18638": "[B1]\ubcf5\uad6c \ud0a4[\/B1]\ub97c \ud0ed\ud55c \ud6c4, [B2]\uc800\uc7a5[\/B2]\uc744 \ud0ed\ud558\uc138\uc694.",
-    "18667": "SSL \uc778\uc99d\uc11c \uc624\ub958",
     "18668": "Is this 'Start again' means 'Start' again or 'Start again' button?",
     "18669": "%s\uc5d0 \uba54\uc2dc\uc9c0 \uc791\uc131...",
     "18677": "\uc774\uc6a9\uc790 \uad00\ub9ac",
@@ -3244,5 +3240,10 @@
     "20392": "Please log in to continue.",
     "20393": "Your phone number is already verified.",
     "20394": "That phone number is already in use by another account.",
-    "20395": "Measure your available outbound bandwidth during the initial ten seconds of an upload, and then keep at least 10% of it unused."
+    "20395": "Measures your available outbound bandwidth during the initial ten seconds of an upload, and then keeps at least 10% of it unused.",
+    "20399": "Enable the rubbish bin clearing scheduler",
+    "20400": "[S]Your Business account is expired.[\/S] [A]Reactivate your account now[\/A] and enjoy the [S]unlimited storage and bandwidth[\/S] along with other business account features",
+    "20401": "Your business account is expired",
+    "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
+    "20403": "Pay & Reactivate Account"
 }

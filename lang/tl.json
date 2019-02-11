@@ -1917,9 +1917,6 @@
     "17694": "Download key",
     "17695": "araw",
     "17696": "GB",
-    "17697": "YYYY",
-    "17698": "MM",
-    "17699": "DD",
     "17700": "Your message here\u2026 (optional)",
     "17701": "Click here to see [B]the exact information[\/B] that will be sent to our servers.",
     "17703": "Flags",
@@ -2123,7 +2120,6 @@
     "18562": "The number of folders a contact has shared with you will be displayed under each contact's email. If you tap on the contact, you will see the individual folders and their contents.",
     "18563": "Go to your [B1]new[\/B1] email inbox and find the email [B2]Confirm new email[\/B2] and click on the [B3]Red[\/B3] button. You will be re-directed to the MEGA app and asked to confirm your account's password and click [B4]Change[\/B4].",
     "18638": "Tap on [B1]Recovery key[\/B1], then tap the [B2]Save[\/B2] button[B3].[\/B3]",
-    "18667": "SSL certificate error",
     "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
     "18669": "Write a message to %s\u2026",
     "18677": "User Management",
@@ -3158,7 +3154,7 @@
     "20306": "Microsoft Access 97 Database",
     "20307": "MIDI Audio",
     "20308": "Matroska Multimedia Container",
-    "20309": "QuickTime Movie",
+    "20309": "QuickTime Video",
     "20310": "MP3 Audio",
     "20311": "MPEG Video",
     "20312": "Windows Installer",
@@ -3244,5 +3240,10 @@
     "20392": "Please log in to continue.",
     "20393": "Your phone number is already verified.",
     "20394": "That phone number is already in use by another account.",
-    "20395": "Measure your available outbound bandwidth during the initial ten seconds of an upload, and then keep at least 10% of it unused."
+    "20395": "Measures your available outbound bandwidth during the initial ten seconds of an upload, and then keeps at least 10% of it unused.",
+    "20399": "Enable the rubbish bin clearing scheduler",
+    "20400": "[S]Your Business account is expired.[\/S] [A]Reactivate your account now[\/A] and enjoy the [S]unlimited storage and bandwidth[\/S] along with other business account features",
+    "20401": "Your business account is expired",
+    "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
+    "20403": "Pay & Reactivate Account"
 }

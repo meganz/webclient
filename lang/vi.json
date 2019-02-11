@@ -1917,9 +1917,6 @@
     "17694": "T\u1ea3i xu\u1ed1ng m\u00e3",
     "17695": "ng\u00e0y",
     "17696": "GB",
-    "17697": "NI\u00caN",
-    "17698": "TH",
-    "17699": "NG",
     "17700": "\u0110i\u1ec1n tin nh\u1eafn \u1edf \u0111\u00e2y\u2026 (n\u1ebfu mu\u1ed1n)",
     "17701": "Click v\u00e0o \u0111\u00e2y \u0111\u1ec3 xem [B]chi ti\u1ebft v\u1ec1 th\u00f4ng tin[\/B] m\u00e0 ch\u00fang t\u00f4i s\u1ebd g\u1eedi \u0111i t\u1edbi m\u00e1y ch\u1ee7.",
     "17703": "Qu\u1ed1c k\u1ef3",
@@ -2123,7 +2120,6 @@
     "18562": "The number of folders a contact has shared with you will be displayed under each contact's email. If you tap on the contact, you will see the individual folders and their contents.",
     "18563": "Go to your [B1]new[\/B1] email inbox and find the email [B2]Confirm new email[\/B2] and click on the [B3]Red[\/B3] button. You will be re-directed to the MEGA app and asked to confirm your account's password and click [B4]Change[\/B4].",
     "18638": "Ch\u1ea1m v\u00e0o [B1]M\u00e3 kho\u00e1 ph\u1ee5c h\u1ed3i[\/B1], r\u1ed3i ch\u1ea1m v\u00e0o n\u00fat [B2]L\u01b0u[\/B2][B3].[\/B3]",
-    "18667": "Ch\u1ee9ng t\u1eeb SSL b\u1ecb l\u1ed7i",
     "18668": "Kh\u00f4ng t\u00ecm th\u1ea5y \u0111\u1ecba ch\u1ec9 email, xin th\u1eed l\u1ea1i. N\u1ebfu kh\u00f4ng nh\u1edb \u0111\u1ecba ch\u1ec9 email \u0111\u00e3 d\u00f9ng cho t\u00e0i kho\u1ea3n MEGA, xo\u00e1 v\u00e0 \u0111\u1ec3 khung tr\u1ed1ng v\u00e0 click B\u1eaft \u0110\u1ea7u \u0111\u1ec3 b\u1ecf qua b\u01b0\u1edbc n\u00e0y.",
     "18669": "Vi\u00ea\u0301t tin nh\u0103\u0301n cho nho\u0301m %s\u2026",
     "18677": "B\u1ed9 Qu\u1ea3n L\u00fd Nh\u00e2n Vi\u00ean",
@@ -3158,7 +3154,7 @@
     "20306": "Microsoft Access 97 Database",
     "20307": "MIDI Audio",
     "20308": "Matroska Multimedia Container",
-    "20309": "QuickTime Movie",
+    "20309": "QuickTime Video",
     "20310": "MP3 Audio",
     "20311": "MPEG Video",
     "20312": "Windows Installer",
@@ -3244,5 +3240,10 @@
     "20392": "Please log in to continue.",
     "20393": "Your phone number is already verified.",
     "20394": "That phone number is already in use by another account.",
-    "20395": "Measure your available outbound bandwidth during the initial ten seconds of an upload, and then keep at least 10% of it unused."
+    "20395": "Measures your available outbound bandwidth during the initial ten seconds of an upload, and then keeps at least 10% of it unused.",
+    "20399": "Enable the rubbish bin clearing scheduler",
+    "20400": "[S]Your Business account is expired.[\/S] [A]Reactivate your account now[\/A] and enjoy the [S]unlimited storage and bandwidth[\/S] along with other business account features",
+    "20401": "Your business account is expired",
+    "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
+    "20403": "Pay & Reactivate Account"
 }

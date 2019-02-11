@@ -1936,6 +1936,7 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
     var $invoiceContainer = $('.invoice', $accountContainer);
     var $invoiceListContainer = $('.invoice-list', $invoiceContainer);
     var $accountPageHeader = $('.fm-right-header-user-management .user-management-breadcrumb.account');
+    var $invoicesTableContainer = $('.invoice-table-list-container', $invoiceListContainer);
 
     // private function to determine if we need to re-draw
     var isInvoiceRedrawNeeded = function (invoiceList, savedList) {
@@ -2020,6 +2021,11 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
         }
 
         unhideSection();
+
+        $invoicesTableContainer.jScrollPane({
+            enableKeyboardNavigation: false, showArrows: true,
+            arrowSize: 8, animateScroll: true
+        });
     };
 
     $accountPageHeader.find('.acc-home').off('click.suba').on('click.suba',

@@ -42,7 +42,7 @@ function dashboardUI() {
         else {
             $('.dashboard .button.upgrade-account').removeClass('hidden');
         }
-        if (u_attr.b.m) {
+        if (u_attr.b.m && u_attr.b.s !== -1) {
             $('.business-dashboard .go-to-usermanagement-btn').removeClass('hidden');
 
             // event handler for clicking on user-management button in dashboard.
@@ -289,7 +289,7 @@ function dashboardUI() {
         $.leftPaneResizable.options.updateWidth = maxwidth;
 
         $($.leftPaneResizable).trigger('resize');
-        if (!u_attr.b || u_attr.b.s === -1) {
+        if (!u_attr.b) {
             accountUI.general.charts.init(account, true);
 
 
@@ -402,7 +402,9 @@ function dashboardUI() {
         }
         else {
             // someone modified CSS, hidden class is overwitten --> .hide()
-            $('.dashboard .upgrade-account').addClass('hidden').hide();
+            if (u_attr.b.s !== -1) {
+                $('.dashboard .upgrade-account').addClass('hidden').hide();
+            }
             $('.business-dashboard .user-management-storage .storage-transfer-data')
                 .text(bytesToSize(account.space_used));
             $('.business-dashboard .user-management-transfer .storage-transfer-data')

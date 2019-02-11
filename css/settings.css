@@ -52,7 +52,7 @@
     width: 16px;
     height: 16px;
     left: 16px;
-    top: 12px;
+    top: 10px;
     background-image: url(../images/mega/icons-sprite_v25.png);
     background-repeat: no-repeat;
     opacity: 0.3;
@@ -64,7 +64,7 @@
     width: 24px;
     height: 24px;
     right: 16px;
-    top: 8px;
+    top: 6px;
     background-image: url(../images/mega/icons-sprite_v25.png);
     background-repeat: no-repeat;
     background-position: -98px -249px;
@@ -104,13 +104,13 @@
     background-position: -35px -1670px;
 }
 .fm-account-button.notifications .head-title::before {
-    background-position: -63px -1670px;
+    background-position: -63px -1671px;
 }
 .fm-account-button.security .head-title::before {
     background-position: -90px -1671px;
 }
 .fm-account-button.file-management .head-title::before {
-    background-position: -120px -1670px;
+    background-position: -120px -1671px;
 }
 .content-panel.dashboard * {
    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
@@ -126,7 +126,7 @@
     background-position: -150px -1671px;
 }
 .fm-account-button.contact-chats .head-title::before {
-    background-position: -179px -1670px;
+    background-position: -179px -1671px;
 }
 .fm-account-button.reseller .head-title::before {
     background-position: -210px -1670px;
@@ -253,7 +253,7 @@
 .subtitle-txt {
     font-size: 16px;
     color: #333;
-    line-height: 24px;
+    line-height: 18px;
     display: inline-block;
     vertical-align: top;
     max-width: 370px;
@@ -386,7 +386,7 @@
 }
 .settings-banner .tiny-chart .chart.icon {
     left: 22px;
-    top: 18px;
+    top: 16px;
 }
 .fm-right-account-block .icon.chart {
     width: 32px;
@@ -488,6 +488,9 @@
 }
 .settings-sub-section.button-container {
     padding-top: 0;
+}
+.settings-sub-section.border {
+    padding-bottom: 25px;
 }
 .settings-sub-section.border::after {
     content: '';
@@ -733,10 +736,13 @@
     height: 22px;
     width: 38px;
     right: 0;
-    top: 22px;
+    top: 23px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+}
+.fm-right-account-block .content-txt + .dialog-feature-toggle {
+    top: 26px;
 }
 .fm-right-account-block .dialog-feature-toggle.toggle-on {
     background-color: #00BFA5;
@@ -782,7 +788,8 @@
     background-color: #279000;
 }
 .fm-right-account-block .account.plan-info {
-    padding:0;
+    padding: 0;
+    line-height: 18px;
     display: inline-block;
     position: relative;
     vertical-align: top;
@@ -887,7 +894,7 @@
     background-color: rgba(0,0,0,0.1);
 }
 .fm-right-account-block .grid-table td {
-    padding:8px;
+    padding: 8px 12px;
     line-height: 24px;
     font-size: 14px;
     color: #888;
@@ -902,7 +909,6 @@
 .fm-right-account-block .grid-table td.ip-addr {
     max-width: 165px;
     word-wrap: break-word;
-    line-height: 1.4;
     vertical-align: top;
 }
 .fm-right-account-block .grid-table tr th:first-child, 
@@ -954,15 +960,9 @@
     margin-right: 0px;
 }
 .fm-account-security .fm-browsers-icon img {
-    margin: 0;
+    margin: 4px 0 0 0;
 }
 .fm-account-security .fm-flags-icon img {
-    margin: 0;
-}
-.fm-account-security .active-session-txt, 
-.fm-account-security .current-session-txt, 
-.fm-account-security .expired-session-txt, 
-.fm-account-security .settings-logout {
     margin: 0;
 }
 .fm-account-security .tranfer-filetype-txt, .fm-account-security .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {

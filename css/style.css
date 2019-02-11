@@ -4299,7 +4299,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .grid-scrolling-table.archive-chat-list .jspPane {
     background-image: initial;
 }
-.files-grid-view.fm .grid-scrolling-table, .files-grid-view.fm .grid-scrolling-table .jspPane, .transfer-scrolling-table, .transfer-scrolling-table .jspPane {
+.files-grid-view.fm .grid-scrolling-table, .files-grid-view.fm .grid-table, .files-grid-view.fm .grid-scrolling-table .jspPane, .transfer-scrolling-table, .transfer-scrolling-table .jspPane {
     background-image: url(../images/mega/grid-bg.svg);
 }
 .grid-table td, .grid-table-header th {
@@ -11091,7 +11091,7 @@ table {
     margin: -7px 0 0 0;
 }
 .fm-right-account-block .account-history-dropdown-button {
-    margin:0 2px 0 0;
+    margin: -4px 2px 0 0;
     color: #333;
 }
 .account-widget-dropdown-button {
@@ -11189,7 +11189,7 @@ table {
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    margin: 4px 0 0 0;
+    margin: 3px 0 0 0;
     -webkit-transition: background-color 200ms ease-in-out;
     -moz-transition: background-color 200ms ease-in-out;
     -o-transition: background-color 200ms ease-in-out;
@@ -11225,7 +11225,6 @@ table {
     background: #ccc url(../images/mega/fm-main-sprite_v7.png) no-repeat scroll 5px -8423px;
     cursor: pointer;
     float: right;
-    margin-right: 26px;
     padding-left: 19px;
 }
 .settings-logout:hover {
@@ -23990,8 +23989,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .fm-picker-dialog .fm-breadcrumbs .right-arrow-bg,
 .fm-right-account-block .fm-breadcrumbs .right-arrow-bg{
     font-size: 14px;
-    line-height: 25px;
+    line-height: 24px;
     cursor: pointer;
+}
+.fm-picker-dialog .fm-breadcrumbs .right-arrow-bg {
+     line-height: 26px;
 }
 .fm-picker-dialog .fm-breadcrumbs.has-next-button,
 .fm-right-account-block .fm-breadcrumbs.has-next-button {

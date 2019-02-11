@@ -142,7 +142,16 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
     }
 };
 
-MegaData.prototype.addDownload = function (n, z, preview) {
+MegaData.prototype.addDownload = function(n, z, preview) {
+    // check if this is a business expired account
+    if (u_attr.b && u_attr.b.s === -1) {
+        M.require('businessAcc_js', 'businessAccUI_js').done(function() {
+            var business_ui = new BusinessAccountUI();
+            business_ui.showExpiredDialog(u_attr.b.m);
+        });
+        return;
+    }
+
     var args = toArray.apply(null, arguments);
     // fetch all nodes needed by M.getNodesSync
     dbfetch.coll(n)
@@ -1002,6 +1011,16 @@ MegaData.prototype.addToTransferTable = function(gid, ttl, elem) {
 var __ul_id = 8000;
 MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) {
     'use strict'; /* jshint -W074 */
+
+    // check if this is a business expired account
+    if (u_attr.b && u_attr.b.s === -1) {
+        M.require('businessAcc_js', 'businessAccUI_js').done(function() {
+            var business_ui = new BusinessAccountUI();
+            business_ui.showExpiredDialog(u_attr.b.m);
+        });
+        return;
+    }
+
     var flag = 'ulMegaSyncAD';
 
     if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {

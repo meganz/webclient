@@ -1598,6 +1598,37 @@ BusinessAccountUI.prototype.showExpiredUIElements = function() {
     var msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
         .replace(/\[A\]/g, '<a href="/registerb" class="clickurl">').replace(/\[\/A\]/g, '</a>');
     $('.fm-notification-block.expired-business').safeHTML(msg).show();
+    this.showExpiredDialog(true);
+};
+
+/**
+ * Show a dialog to the user telling that the account is expired
+ * @param {Boolean} isMaster
+ */
+BusinessAccountUI.prototype.showExpiredDialog = function(isMaster) {
+    var $dialog;
+
+    if (isMaster) {
+        $dialog = $('.payment-reminder.user-management-dialog');
+
+        $dialog.find('.close-x-icon.close-exp-dlg').off('click.subuser')
+            .on('click.subuser', function closeExpiredAccountDialog() {
+                closeDialog();
+            });
+
+        $dialog.find('.pay-reactive-acc').off('click.subuser')
+            .on('click.subuser', function payReactivateAccountButtonClickHandler() {
+                closeDialog();
+                loadSubPage('registerb');
+            });
+
+        M.safeShowDialog('expired-business-dialog', function() {
+            return $dialog;
+        });
+    }
+    else {
+        $dialog = $('.user-management-able-user-dialog.warning.user-management-dialog');
+    }
 };
 
 

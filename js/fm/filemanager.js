@@ -1061,6 +1061,14 @@ FileManager.prototype.initContextUI = function() {
         }
         return false;
     };
+
+    var showExpiredBusiness = function() {
+        M.require('businessAcc_js', 'businessAccUI_js').done(function() {
+            var business_ui = new BusinessAccountUI();
+            business_ui.showExpiredDialog(u_attr.b.m);
+        });
+    };
+
     $(c + '.cloud-item').rebind('click', safeMoveNodes);
 
     $('.dropdown.body.files-menu').off('click', '.folder-item');
@@ -1084,7 +1092,13 @@ FileManager.prototype.initContextUI = function() {
 
 
     $(c + '.syncmegasync-item').rebind('click', function () {
-        //M.addDownload($.selected, true);
+        // check if this is a business expired account
+        if (u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
+
         megasync.isInstalled(function (err, is) {
             if (!err || is) {
                 if (megasync.currUser === u_handle) {
@@ -1099,6 +1113,13 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.getlink-item, ' + c + '.embedcode-item').rebind('click', function() {
+        // check if this is a business expired account
+        if (u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
+
         // ToDo: Selected can be more than one folder $.selected
         // Avoid multiple referencing $.selected instead use event
         // add new translation message '... for multiple folders.'
@@ -1132,6 +1153,12 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.removelink-item').rebind('click', function() {
+        // check if this is a business expired account
+        if (u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
 
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
@@ -1169,10 +1196,22 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.rename-item').rebind('click', function() {
+        // check if this is a business expired account
+        if (u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         renameDialog();
     });
 
     $(c + '.sh4r1ng-item').rebind('click', function() {
+        // check if this is a business expired account
+        if (u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         if (u_type === 0) {
             return ephemeralDialog(l[1006]);
         }
@@ -1240,29 +1279,65 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.import-item').rebind('click', function() {
+        // check if this is a business expired account
+        if (u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         ASSERT(folderlink, 'Import needs to be used in folder links.');
 
         M.importFolderLinkNodes($.selected);
     });
 
     $(c + '.newfolder-item').rebind('click', function() {
+        // check if this is a business expired account
+        if (u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         createFolderDialog();
     });
 
     $(c + '.fileupload-item').rebind('click', function() {
+        // check if this is a business expired account
+        if (u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         $('#fileselect3').click();
     });
 
     $(c + '.folderupload-item').rebind('click', function() {
+        // check if this is a business expired account
+        if (u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         $('#fileselect4').click();
     });
 
-    $(c + '.remove-item').rebind('click', function () {
+    $(c + '.remove-item').rebind('click', function() {
+        // check if this is a business expired account
+        if (u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         closeDialog();// added by khaled
         fmremove();
     });
 
     $(c + '.addcontact-item').rebind('click', function() {
+        // check if this is a business expired account
+        if (u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         contactAddDialog();
     });
 
@@ -1335,6 +1410,12 @@ FileManager.prototype.initContextUI = function() {
 
 
     $(c + '.removeshare-item').rebind('click', function() {
+        // check if this is a business expired account
+        if (u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         fmremove();
     });
 

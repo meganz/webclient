@@ -556,6 +556,9 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
 BusinessAccount.prototype.isBusinessMasterAcc = function () {
     "use strict";
     if ((u_attr.b && u_attr.b.m) || (M.suba && M.suba.length)) {
+        if (u_attr.b.s === -1) { // expired
+            return false;
+        }
         return true;
     }
     return false;

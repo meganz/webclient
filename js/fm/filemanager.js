@@ -736,6 +736,9 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             else {
                 loadSubPage('fm/account');
+                if ($('.fm-account-main').data('jsp')) {
+                    $('.fm-account-main').data('jsp').scrollToY(0, false);
+                }
             }
             return false;
         }

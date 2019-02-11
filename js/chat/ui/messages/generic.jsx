@@ -224,50 +224,33 @@ var GenericConversationMessage = React.createClass({
         M.addDownload([v]);
     },
     _addToCloudDrive: function(v, openSendToChat) {
+        $.selected = [v.h];
         openSaveToDialog(v, function(node, target) {
             if (Array.isArray(target)) {
                 megaChat.getMyChatFilesFolder()
                     .then(function(myChatFolderId) {
                         M.injectNodes(node, myChatFolderId, function(res) {
-                            if (!Array.isArray(res)) {
-                                if (d) {
-                                    console.error("Failed to inject nodes. Res:", res);
-                                }
-                                return;
+                            if (Array.isArray(res) && res.length) {
+                                megaChat.openChatAndAttachNodes(target, res).dump();
                             }
-
-                            var lastRoom;
-                            for (var i = target.length; i--;) {
-                                var room = megaChat.chats[target[i]];
-                                if (room) {
-                                    room.attachNodes(res);
-                                    lastRoom = room;
-                                }
-                                else {
-                                    console.warn('Invalid room...', target[i]);
-                                }
+                            else if (d) {
+                                console.warn('Unable to inject nodes... no longer existing?', res);
                             }
-
-                            if (lastRoom) {
-                                showToast('send-chat', (res.length > 1) ? l[17767] : l[17766]);
-                                M.openFolder('chat/' + (lastRoom.type === 'group' ? 'g/' : '') + lastRoom.roomId);
-                            }
-                        })
+                        });
                     })
                     .catch(function() {
                         if (d) {
                             console.error("Failed to allocate 'My chat files' folder.", arguments);
                         }
                     });
-
             }
             else {
                 // is a save/copy to
                 target = target || M.RootID;
                 M.injectNodes(node, target, function(res) {
-                    if (!Array.isArray(res)) {
+                    if (!Array.isArray(res) || !res.length) {
                         if (d) {
-                            console.error("Failed to inject nodes. Res:", res);
+                            console.warn('Unable to inject nodes... no longer existing?', res);
                         }
                     }
                     else {

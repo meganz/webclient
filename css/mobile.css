@@ -10072,6 +10072,12 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .video-info-block span.play-video-encouragement {
         text-align: left;
     }
+    .mobile.fm-dialog-viewport {
+        display: block;
+        height: 100%;
+        max-height: 550px;
+        overflow-y: scroll;
+    }
 }
 
 

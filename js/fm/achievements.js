@@ -386,7 +386,7 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
                 if (!$cell.hasClass('localized')) {
                     $cell.addClass('localized');
 
-                    var $desc = $cell.find('.content-txt');
+                    var $desc = $cell.find('.achi-content-txt');
                     var text = String($desc.text()).trim().replace('[%3]', '%3');
 
                     if (!data[1]) {

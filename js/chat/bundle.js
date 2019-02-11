@@ -128,21 +128,12 @@ React.makeElement = React['createElement'];
 	        if (roomType === "private") {
 	            var userHandle = id.split("chat/").pop();
 	            var userHandles = [u_handle, userHandle];
-	            var $promise;
 
-	            var resp = megaChat.openChat(userHandles, "private", undefined, undefined, undefined, true);
-
-	            if (resp instanceof MegaPromise) {
-	                if (resp.state() === 'rejected') {
-	                    console.warn("openChat failed. Maybe tried to start a private chat with a non contact?");
-	                    return;
-	                }
-	            } else {
-	                $promise = resp[2];
-	                if (resp[1]) {
-	                    resp[1].show();
-	                }
-	            }
+	            megaChat.smartOpenChat(userHandles, "private", undefined, undefined, undefined, true).then(function (room) {
+	                room.show();
+	            }).catch(function (ex) {
+	                console.warn("openChat failed. Maybe tried to start a private chat with a non contact?", ex);
+	            });
 	        } else if (roomType === "group") {
 	            if (megaChat.chats[roomOrUserHash].isArchived()) {
 	                megaChat.chats[roomOrUserHash].showArchived = true;
@@ -1041,6 +1032,7 @@ React.makeElement = React['createElement'];
 	                if (self.chats[roomId].isArchived() && roomId === megaChat.currentlyOpenedChat) {
 	                    self.chats[roomId].showArchived = true;
 	                }
+	                $promise.resolve(roomId, self.chats[roomId]);
 	                return;
 	            }
 	            var res = self.openChat(userHandles, ap.g === 1 ? "group" : "private", ap.id, ap.cs, ap.url, setAsActive);
@@ -1088,6 +1080,81 @@ React.makeElement = React['createElement'];
 	    this.trigger('onRoomInitialized', [room]);
 	    room.setState(ChatRoom.STATE.JOINING);
 	    return [roomId, room, MegaPromise.resolve(roomId, self.chats[roomId])];
+	};
+
+	Chat.prototype.smartOpenChat = function () {
+	    'use strict';
+
+	    var self = this;
+	    var args = toArray.apply(null, arguments);
+
+	    if (typeof args[0] === 'string') {
+
+	        args[0] = [u_handle, args[0]];
+	        if (args.length < 2) {
+	            args.push('private');
+	        }
+	    }
+
+	    return new MegaPromise(function (resolve, reject) {
+
+	        var waitForReadyState = function waitForReadyState(aRoom, aShow) {
+	            var verify = function verify() {
+	                return aRoom.state === ChatRoom.STATE.READY;
+	            };
+
+	            var ready = function ready() {
+	                if (aShow) {
+	                    aRoom.show();
+	                }
+	                resolve(aRoom);
+	            };
+
+	            if (verify()) {
+	                return ready();
+	            }
+
+	            createTimeoutPromise(verify, 300, 3e4).then(ready).catch(reject);
+	        };
+
+	        if (args[0].length === 2 && args[1] === 'private') {
+	            var chatRoom = self.chats[array.filterNonMatching(args[0], u_handle)[0]];
+	            if (chatRoom) {
+	                return waitForReadyState(chatRoom, args[5]);
+	            }
+	        }
+
+	        var result = self.openChat.apply(self, args);
+
+	        if (result instanceof MegaPromise) {
+
+	            result.then(reject).catch(reject);
+	        } else if (!Array.isArray(result)) {
+
+	            reject(EINTERNAL);
+	        } else {
+	            var room = result[1];
+	            var roomId = result[0];
+	            var promise = result[2];
+
+	            if (!(promise instanceof MegaPromise)) {
+
+	                self.logger.error('Unexpected openChat() response...');
+	                return reject(EINTERNAL);
+	            }
+
+	            self.logger.debug('Waiting for chat "%s" to be ready...', roomId, [room]);
+
+	            promise.then(function (aRoomId, aRoom) {
+	                if (aRoomId !== roomId || room && room !== aRoom || !(aRoom instanceof ChatRoom)) {
+	                    self.logger.error('Unexpected openChat() procedure...', aRoomId, [aRoom]);
+	                    return reject(EINTERNAL);
+	                }
+
+	                waitForReadyState(aRoom);
+	            }).catch(reject);
+	        }
+	    });
 	};
 
 	Chat.prototype.hideAllChats = function () {
@@ -1506,47 +1573,28 @@ React.makeElement = React['createElement'];
 	};
 
 	Chat.prototype.getPrivateRoom = function (h) {
-	    var self = this;
+	    'use strict';
 
-	    if (self.chats[h]) {
-	        return self.chats[h];
-	    } else {
-	        return false;
-	    }
+	    return this.chats[h] || false;
 	};
 
 	Chat.prototype.createAndShowPrivateRoomFor = function (h) {
-	    var self = this;
+	    'use strict';
 
-	    if (self.chats[h]) {
+	    var room = this.getPrivateRoom(h);
+
+	    if (room) {
 	        _chatui(h);
-	        return MegaPromise.resolve(this.getPrivateRoom(h));
-	    } else {
-	        var userHandles = [u_handle, h];
-	        var result = megaChat.openChat(userHandles, "private");
-	        var roomId = result[1] && result[1].roomId ? result[1].roomId : '';
-	        var promise = new MegaPromise();
-
-	        if (result && result[1] && result[2]) {
-	            var room = result[1];
-	            var chatInitDonePromise = result[2];
-	            chatInitDonePromise.done(function () {
-	                createTimeoutPromise(function () {
-	                    return room.state === ChatRoom.STATE.READY;
-	                }, 300, 30000).done(function () {
-	                    room.setActive();
-	                    promise.resolve(room);
-	                }).fail(function (e) {
-	                    promise.reject(e);
-	                });
-	            });
-	        } else if (d) {
-	            console.warn('Cannot openChat for %s.', roomId);
-	            promise.reject();
-	        }
-
-	        return promise;
+	        return MegaPromise.resolve(room);
 	    }
+
+	    var promise = megaChat.smartOpenChat(h);
+
+	    promise.done(function (room) {
+	        room.setActive();
+	    });
+
+	    return promise;
 	};
 
 	Chat.prototype.createAndShowGroupRoomFor = function (contactHashes) {
@@ -1777,24 +1825,71 @@ React.makeElement = React['createElement'];
 	};
 
 	Chat.prototype.openChatAndSendFilesDialog = function (user_handle) {
-	    var userHandles = [u_handle, user_handle];
-	    var result = megaChat.openChat(userHandles, "private");
-	    var roomId = result[1] && result[1].roomId ? result[1].roomId : '';
+	    'use strict';
 
-	    if (result && result[1] && result[2]) {
-	        var room = result[1];
-	        var chatInitDonePromise = result[2];
-	        chatInitDonePromise.done(function () {
-	            createTimeoutPromise(function () {
-	                return room.state === ChatRoom.STATE.READY;
-	            }, 300, 30000).done(function () {
-	                room.setActive();
-	                $(room).trigger('openSendFilesDialog');
-	            });
-	        });
-	    } else if (d) {
-	        console.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId);
+	    this.smartOpenChat(user_handle).then(function (room) {
+	        room.setActive();
+	        $(room).trigger('openSendFilesDialog');
+	    }).catch(this.logger.error.bind(this.logger));
+	};
+
+	Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
+	    'use strict';
+
+	    var self = this;
+
+	    if (d) {
+	        console.group('Attaching nodes to chat room(s)...', targets, nodes);
 	    }
+
+	    return new MegaPromise(function (resolve, reject) {
+	        var promises = [];
+	        var attachNodes = function attachNodes(roomId) {
+	            return new MegaPromise(function (resolve, reject) {
+	                self.smartOpenChat(roomId).then(function (room) {
+	                    room.attachNodes(nodes).then(resolve.bind(self, room)).catch(reject);
+	                }).catch(function (ex) {
+	                    if (d) {
+	                        self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
+	                    }
+	                    reject(ex);
+	                });
+	            });
+	        };
+
+	        if (!Array.isArray(targets)) {
+	            targets = [targets];
+	        }
+
+	        for (var i = targets.length; i--;) {
+	            promises.push(attachNodes(targets[i]));
+	        }
+
+	        MegaPromise.allDone(promises).unpack(function (result) {
+	            var room;
+
+	            for (var i = result.length; i--;) {
+	                if (result[i] instanceof ChatRoom) {
+	                    room = result[i];
+	                    break;
+	                }
+	            }
+
+	            if (room) {
+	                showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
+	                M.openFolder('chat/' + (room.type === 'group' ? 'g/' : '') + room.roomId).always(resolve);
+	            } else {
+	                if (d) {
+	                    self.logger.warn('openChatAndAttachNodes failed in whole...', result);
+	                }
+	                reject(result);
+	            }
+
+	            if (d) {
+	                console.groupEnd();
+	            }
+	        });
+	    });
 	};
 
 	Chat.prototype.toggleUIFlag = function (name) {
@@ -11856,31 +11951,15 @@ React.makeElement = React['createElement'];
 	        M.addDownload([v]);
 	    },
 	    _addToCloudDrive: function _addToCloudDrive(v, openSendToChat) {
+	        $.selected = [v.h];
 	        openSaveToDialog(v, function (node, target) {
 	            if (Array.isArray(target)) {
 	                megaChat.getMyChatFilesFolder().then(function (myChatFolderId) {
 	                    M.injectNodes(node, myChatFolderId, function (res) {
-	                        if (!Array.isArray(res)) {
-	                            if (d) {
-	                                console.error("Failed to inject nodes. Res:", res);
-	                            }
-	                            return;
-	                        }
-
-	                        var lastRoom;
-	                        for (var i = target.length; i--;) {
-	                            var room = megaChat.chats[target[i]];
-	                            if (room) {
-	                                room.attachNodes(res);
-	                                lastRoom = room;
-	                            } else {
-	                                console.warn('Invalid room...', target[i]);
-	                            }
-	                        }
-
-	                        if (lastRoom) {
-	                            showToast('send-chat', res.length > 1 ? l[17767] : l[17766]);
-	                            M.openFolder('chat/' + (lastRoom.type === 'group' ? 'g/' : '') + lastRoom.roomId);
+	                        if (Array.isArray(res) && res.length) {
+	                            megaChat.openChatAndAttachNodes(target, res).dump();
+	                        } else if (d) {
+	                            console.warn('Unable to inject nodes... no longer existing?', res);
 	                        }
 	                    });
 	                }).catch(function () {
@@ -11892,9 +11971,9 @@ React.makeElement = React['createElement'];
 
 	                target = target || M.RootID;
 	                M.injectNodes(node, target, function (res) {
-	                    if (!Array.isArray(res)) {
+	                    if (!Array.isArray(res) || !res.length) {
 	                        if (d) {
-	                            console.error("Failed to inject nodes. Res:", res);
+	                            console.warn('Unable to inject nodes... no longer existing?', res);
 	                        }
 	                    } else {
 	                        if (target === M.RootID) {
@@ -15467,10 +15546,23 @@ React.makeElement = React['createElement'];
 	    this.isCurrentlyActive = false;
 
 	    if (d) {
-	        this.rebind('onStateChange.chatRoom', function (e, oldState, newState) {
+	        this.rebind('onStateChange.chatRoomDebug', function (e, oldState, newState) {
 	            self.logger.debug("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
 	        });
 	    }
+
+	    self.rebind('onStateChange.chatRoom', function (e, oldState, newState) {
+	        if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
+	            var cd = self.megaChat.plugins.chatdIntegration.chatd;
+	            if (self.chatIdBin && cd && cd.chatIdMessages[self.chatIdBin]) {
+	                var cid = cd.chatIdMessages[self.chatIdBin];
+	                if (cd.chatIdShard[self.chatIdBin].isOnline()) {
+
+	                    cd.chatIdMessages[self.chatIdBin].resend();
+	                }
+	            }
+	        }
+	    });
 
 	    self.rebind('onMessagesBuffAppend.lastActivity', function (e, msg) {
 	        var ts = msg.delay ? msg.delay : msg.ts;

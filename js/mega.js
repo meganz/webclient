@@ -1339,6 +1339,11 @@ scparser.$add('_fm', function() {
 // sub-user status change in business account
 scparser.$add('ssc', process_businessAccountSubUsers_SC);
 
+// business account change which requires reload (such as payment against expired account)
+scparser.$add('ub', function() {
+    fm_fullreload(null, 'ub-business');
+});
+
 scparser.$notify = function(a) {
     // only show a notification if we did not trigger the action ourselves
     if (!pfid && u_attr && a.ou !== u_attr.u) {

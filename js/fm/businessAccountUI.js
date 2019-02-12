@@ -2218,7 +2218,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                             invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]);
                         var cVat = '---';
                         if (invoiceDetail.u.taxnum && invoiceDetail.u.taxnum[1]) {
-                            cVat = invoiceDetail.u.taxnum[1];
+                            cVat = invoiceDetail.u.taxnum[0] + ': ' + invoiceDetail.u.taxnum[1];
                         }
                         myPage = myPage.replace('{7CompanyVat}', cVat);
                         var itemDate = '---';
@@ -2234,6 +2234,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         myPage = myPage.replace('{9itemDesc}', itemDec);
                         myPage = myPage.replace('{10itemAmount}', Number(itemAmount).toFixed(2));
 
+                        myPage = myPage.replace('{15totalVal}',
+                            $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')[0].textContent);
                         myPage = myPage.replace('{11itemVat}',
                             $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent);
                         myPage = myPage.replace('{12totalCost}', '\u20ac' + Number(invoiceDetail.tot).toFixed(2));

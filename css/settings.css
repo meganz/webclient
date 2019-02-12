@@ -52,7 +52,7 @@
     width: 16px;
     height: 16px;
     left: 16px;
-    top: 12px;
+    top: 9px;
     background-image: url(../images/mega/icons-sprite_v25.png);
     background-repeat: no-repeat;
     opacity: 0.3;
@@ -135,7 +135,7 @@
 .fm-account-button .sub-title {
     font-size: 14px;
     color: #888;
-    line-height: 18px;
+    line-height: 16px;
     padding: 8px 8px 8px 44px;
     position: relative;
     cursor: pointer;
@@ -273,9 +273,9 @@
     width: 140px;
 }
 .content-txt {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 20px;
-    padding-top: 22px;
+    padding-top: 18px;
     color: #999;
     vertical-align:top;
     transition: 0.3s;
@@ -287,7 +287,7 @@
     max-width: 340px;
 }
 .settings-sub-section .radio-txt {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 20px;
     color: #999;
     vertical-align:top;
@@ -299,7 +299,7 @@
     font-size: 18px;
 }
 .settings-sub-section .radio-txt.small {
-    font-size: 15px;
+    font-size: 14px;
 }
 .fm-account-notifications .content-txt {
     padding: 0px;
@@ -489,7 +489,7 @@
     position: absolute;
     margin-left: 12px;
     display: inline-block;
-    top: 24px;
+    top: 20px;
     right: 0px;
 }
 .fm-right-account-block .default-green-button {
@@ -539,6 +539,9 @@
     background-color: rgba(0,0,0,0.2);
     position: absolute;
     transition: background-color 0.2s linear;
+}
+.dialog-input-title-ontop:hover::after {
+    background-color: rgba(0,0,0,0.5);
 }
 .dialog-input-title-ontop .title {
     position: absolute;
@@ -933,7 +936,7 @@
     margin-right: 0px;
 }
 .fm-account-security .fm-browsers-icon img {
-    margin: 0;
+    margin: 4px 0;
 }
 .fm-account-security .fm-flags-icon img {
     margin: 0;
@@ -942,7 +945,7 @@
 .fm-account-security .current-session-txt, 
 .fm-account-security .expired-session-txt, 
 .fm-account-security .settings-logout {
-    margin: 0;
+    margin: 2px 0;
 }
 .fm-account-security .tranfer-filetype-txt, .fm-account-security .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
     height: auto;
@@ -1436,4 +1439,7 @@
 }
 .fm-right-account-block .hidden {
     display: none;
+}
+.rubsched-options {
+    max-height: 250px;
 }

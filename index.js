@@ -859,6 +859,10 @@ function init_page() {
             init_login();
         }
     }
+    else if (is_mobile && u_type && page === 'fm/dashboard') {
+        loadSubPage('fm');
+        return false;
+    }
     else if (is_mobile && u_type && page === 'fm/account/invites/how-it-works') {
         parsepage(pages['mobile']);
         mobile.achieve.howItWorks.init();

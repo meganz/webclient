@@ -4,6 +4,7 @@
 function BusinessAccount() {
     "use strict";
     this.QuotaUpdateFreq = 3e4; // 30 sec - default threshold to update quotas info
+    this.DashboardUpdateFreq = 6e4; // 60 sec - default threshold to update dashboard info
     this.invoiceListUpdateFreq = 9e5; // 15 min - default threshold to update invoices list
 }
 
@@ -496,6 +497,13 @@ BusinessAccount.prototype.getQuotaUsage = function (forceUpdate) {
                 res.timestamp = currTime;
                 mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
                 mega.buinsessAccount.quotas = res;
+
+                // update reports in the way...
+                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                mega.buinsessAccount.quotaReport = mega.buinsessAccount.quotaReport || Object.create(null);
+                var todayKey = Object.keys(res)[0];
+                mega.buinsessAccount.quotaReport[todayKey] = res[todayKey];
+
                 operationPromise.resolve(1, res); // quota info
             }
             else {

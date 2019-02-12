@@ -1644,6 +1644,7 @@ accountUI.plan = {
                     });
 
                     $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button')
+                        .add('.fm-voucher-popup .fm-dialog-close')
                         .rebind('click.closeDialog', function() {
                             $('.fm-account-overlay').fadeOut(100);
                             $('.redeem-voucher').removeClass('active');
@@ -2804,7 +2805,6 @@ accountUI.contactAndChat = {
                 });
 
             if (autoawaytimeout !== false) {
-                console.log(autoaway);
                 // Auto-away switch
                 accountUI.inputs.switch.init(
                     '#auto-away-switch',

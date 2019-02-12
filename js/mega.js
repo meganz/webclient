@@ -309,7 +309,7 @@ function startNodesFetching(scni) {
     if (!--nodesinflight[scni]) {
         delete nodesinflight[scni];
 
-        if (scloadtnodes && scq[scni][0] && sc_fqueuet(scni)) {
+        if (scloadtnodes && scq[scni] && scq[scni][0] && sc_fqueuet(scni)) {
             // fetch required nodes from db
             sc_fetcher();
         }

@@ -26077,9 +26077,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     font-weight: 600;
     color: #333;
     line-height: 24px;
-
 }
-
 .user-management-landing-page .landing-sub-container .landing-container-subtitle {
     position: absolute;
     top: 46px;
@@ -26088,7 +26086,68 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     color: #999;
     line-height: 24px;
 }
+.user-management-landing-page .licence-bar {
+    width:680px;
+    height: 48px;
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    margin-left: -340px;
+    background-color: #333;
+    border-radius: 8px;
+    padding:12px 60px 12px 0;
+    box-sizing: border-box;
+}
+.user-management-landing-page .licence-bar .icon{
+    float: left;
+    margin: 0px 4px 0px 24px;
+    position: relative;
+}
 
+.user-management-landing-page .licence-bar span {
+    color: #fafafa;
+    font-size: 14px;
+    line-height: 24px;
+    position: relative;
+    vertical-align: top;
+}
+
+.user-management-landing-page .licence-bar .default-white-button-user-management {
+    position: absolute;
+    right: 24px;
+    top: 8px;
+    opacity: 1;
+    background-color: #fafafa;
+}
+
+.user-management-account-settings .auto-save {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    margin-left: -10px;
+    width: auto;
+    height: auto;
+    z-index: 999;
+    line-height: 24px;
+    font-size: 16px;
+    color: #ffffff;
+    padding:8px 64px;
+    border-radius: 4px;
+    border:1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+    background-color: #00BFA5;
+    transition:0.3s;
+}
+
+.user-management-account-settings .auto-save:hover {
+    top:50px;
+    opacity: 0.9;
+}
+
+.user-management-account-settings .auto-save .icon {
+    float: left;
+    margin-right: 12px;
+}
 .user-management-landing-page .landing-sub-container .default-white-button-user-management{
     position: absolute;
     right: 16px;

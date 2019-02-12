@@ -2612,11 +2612,14 @@ div.checkboxOn, div.checkboxOff {
 .mobile.overlay-info p {
     padding: 3px 0 18px 0;
     margin: 0;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 21px;
     color: #555;
     white-space: normal;
-    text-align: left;
+/*    text-align: left;*/
+}
+.mobile.overlay-info p.error-message {
+    color: #d90007;
 }
 .mobile.overlay-info p.bold {
     font-family: 'source_sans_prosemibold';
@@ -5752,18 +5755,21 @@ textarea.mobile.support-text-field {
 .mobile.main-block.forgot-password-page, .mobile.main-block.recover-account-page, .mobile.main-block.enter-recovery-key-page {
     background-color: #fff;
 }
-.mobile.recovery-key-page .mobile.recovery-key-heading, .mobile.forgot-password-page .mobile.forgot-password-heading, .mobile.r-a-heading, .mobile.two-factor-page .two-factor-heading {
+.mobile.recovery-key-page .mobile.recovery-key-heading, .mobile.forgot-password-page .mobile.forgot-password-heading, .mobile.r-a-heading, .mobile.two-factor-page .two-factor-heading, .mobile.main-block.error-overlay .password-decryption-heading {
     color: #262F3B;
     font-family: 'LatoWebbold', 'source_sans_prosemibold';
     font-size: 17px;
     line-height: 1.5;
     margin: 0 24px 0 24px;
 }
-.mobile.recovery-key-page .mobile.recovery-key-body-text, .mobile.forgot-password-page .mobile.forgot-password-body-text, .mobile.recover-account-page .mobile.recover-account-body-text, .two-factor-body-text {
+.mobile.recovery-key-page .mobile.recovery-key-body-text, .mobile.forgot-password-page .mobile.forgot-password-body-text, .mobile.recover-account-page .mobile.recover-account-body-text, .two-factor-body-text, .mobile.main-block.error-overlay .password-decryption-body-text {
     color: #676D75;
     font-size: 14px;
     line-height: 24px;
     margin: 20px 24px;
+}
+.mobile.main-block.error-overlay .password-decryption-body-text {
+    white-space: normal;
 }
 .mobile.recover-account-body-text a {
     color: #eb4444;

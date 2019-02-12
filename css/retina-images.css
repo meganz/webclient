@@ -218,7 +218,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 
 
 /*business icon start from here*/
-.content-panel.user-management .user-management-status, .user-management-view .user-management-status {
+.content-panel.user-management .user-management-status::before, .user-management-view .user-management-status::before {
     background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
     background-size: 48px auto;
 }

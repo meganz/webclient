@@ -207,7 +207,7 @@ function dashboardUI() {
         }
 
         // Elements for free/pro accounts. Expites date / Registration date
-        if (u_attr.p) {
+        if (u_attr.p || (u_attr.b && u_attr.b.s === -1)) {
 
             var timestamp;
             // Subscription
@@ -232,7 +232,7 @@ function dashboardUI() {
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
             }
 
-            if (u_attr.p === 100 && u_attr.b) {
+            if (u_attr.b && (u_attr.p === 100 || u_attr.b.s === -1)) {
                 // someone modified the CSS to overwirte the hidden class !!, therefore .hide() will be used
                 $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();
                 var $businessLeft = $('.account.left-pane.info-block.business-users').removeClass('hidden');

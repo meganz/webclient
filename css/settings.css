@@ -169,10 +169,6 @@
     line-height: 20px;
     padding:7px 0;
 }
-.fm-right-account-block .default-white-button,
-.fm-right-account-block .default-green-button {
-    text-transform: capitalize;
-}
 .settings-banner {
     margin: 16px auto;
     width: calc(100% - 32px);

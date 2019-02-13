@@ -10,9 +10,9 @@
     margin: 0 0;
 }
 .improved-recovery-steps h3.main-italic-header, .improved-recovery-steps h2, .improved-recovery-steps.backup-recover h3.main-italic-header  {
-    font-family: 'source_sans_proregular', Arial;
-    color: #666;
-    padding: 20px 48px 20px 48px;
+    font-family:'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 16px;
+    color: #aaa;
     text-align: center;
     min-height: 38px;
     -webkit-box-sizing: border-box;
@@ -57,13 +57,12 @@
     color: #51585D;
     font-size: 20px;
     display: inline-block;
-    letter-spacing: 0.2px;
-    font-family: 'source_sans_proregular', Arial;
+    font-family: 'LatoWebSemibold', 'source_sans_proregular', Arial;
 }
 .improved-recovery-steps h1 {
-    font-family: 'source_sans_proregular', Arial;
+    font-family:'LatoWebSemibold', 'source_sans_proregular', Arial;
     font-size: 20px;
-    color: #262F3B;
+    color: #495057;
     line-height: 30px;
     margin: 0;
     padding: 20px 0;
@@ -77,7 +76,7 @@
 }
 .improved-recovery-steps .register-st2-txt-block, .backup-recover.withkey .register-st2-txt-block {
     display: table;
-    min-height: 768px;
+    min-height: 720px;
     height: 100%;
     width: 100%;
 }
@@ -112,19 +111,22 @@
 .improved-recovery-steps p, .improved-recovery-steps h3.main-italic-header:not(.main-header) {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 14px;
-    color: #495057;
+    color: #676D75;
     letter-spacing: 0;
-    line-height: 22px;
+    line-height: 23px;
     padding-bottom: 0;
     text-align: center;
     margin-bottom: 12px;
 }
-.improved-recovery-steps .info-container h3.main-italic-header {
+.improved-recovery-steps .info-container h3.main-italic-header, .improved-recovery-steps .check-sessions-text {
     text-align: left;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-    font-weight: 800;
-    font-size: 16px;
-    letter-spacing: .4px;
+    font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+    font-size: 15px;
+    color: #495057;
+}
+.improved-recovery-steps .check-sessions-text {
+    text-align: center;
+    margin-top: 24px;
 }
 .improved-recovery-steps .app-instruction-block p, .improved-recovery-steps .info-container h3.main-italic-header  {
     text-align: left;
@@ -141,7 +143,7 @@
     height: 100px;
 }
 .improved-recovery-steps .recover-button {
-    font-size: 15px;
+    font-size: 13px;
     letter-spacing: 0;
     text-align: right;
     line-height: 44px;
@@ -471,10 +473,12 @@
     color: #FD8116;
 }
 .improved-recovery-steps .container-information .warning-text {
-    color: #FD8116;
+    color: #eb4444;
+    font-family: 'source_sans_prosemibold';
 }
 .improved-recovery-steps .container-information li {
     margin-bottom: 16px;
+    color: #676D75;
 }
 .improved-recovery-steps .container-information li:last-of-type {
     margin-bottom: 0;
@@ -543,6 +547,9 @@
     color: #9a9fa2;
     line-height: 24px;
     white-space: nowrap;
+    font-family: 'LatoWeb';
+    letter-spacing: 0;
+    font-weight: initial;
 }
 .improved-recovery-steps  .nav-back-subheading {
     display: none;
@@ -777,11 +784,11 @@
 }
 
 .improved-recovery-steps .account.input-wrapper #recover-input1 {
-    font-size: 20px;
+    font-size: 14px;
     letter-spacing: 0px;
 }
 .improved-recovery-steps strong, .improved-recovery-steps b {
-    font-family: 'LatoWebBlack', 'source_sans_probold', Arial;
+    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
 }
 .improved-recovery-steps .info-container, .improved-recovery-steps .checkbox-container {
     overflow: auto;
@@ -792,11 +799,11 @@
     min-height: 44px;
 }
 .improved-recovery-steps .info-container, .improved-recovery-steps .checkbox-container, .improved-recovery-steps .app-instruction-block, .improved-recovery-steps .recover-upload-block, .improved-recovery-steps .recover-paste-block {
-    background: rgba(244,244,246,0.20);
+    background: #fafafa;
     border: 1px solid rgba(38,47,59,0.10);
     border-radius: 6px;
     padding: 20px 20px;
-    margin: 32px auto 32px;
+    margin: 36px auto 32px;
     height: auto;
     position: relative;
 }
@@ -864,6 +871,12 @@
 }
 .backup-recover.withoutkey p:last-of-type {
     margin-bottom: 32px;
+}
+.improved-recovery-steps .check-sessions {
+    margin-top: 16px;
+}
+.improved-recovery-steps .check-sessions-text {
+    margin-top: 32px;
 }
 
 /* Post register recovery key dialog */

@@ -1091,32 +1091,37 @@ function renameDialog() {
         $('.rename-dialog-button.rename').rebind('click', function() {
             if ($dialog.hasClass('active')) {
                 var value = $input.val();
+                errMsg = '';
 
-                if (value && n.name && value !== n.name) {
-                    if (M.isSafeName(value)) {
+                if (n.name && value !== n.name) {
+                    if (!value) {
+                        errMsg = l[5744];
+                    }
+                    else if (M.isSafeName(value)) {
                         var targetFolder = n.p;
                         if (!duplicated(nodeType, value, targetFolder)) {
                             M.rename(n.h, value);
                         }
                         else {
                             errMsg = nodeType ? l[17579] : l[17578];
-                            $dialog.find('.duplicated-input-warning span').text(errMsg);
-                            $dialog.addClass('duplicate');
-                            $input.addClass('error');
-
-                            setTimeout(function() {
-                                    $dialog.removeClass('duplicate');
-                                    $input.removeClass('error');
-
-                                    $input.trigger("focus");
-                                }, 2000);
-
-                            return;
                         }
                     }
                     else {
-                        $dialog.removeClass('active');
+                        errMsg = l[7436];
+                    }
+
+                    if (errMsg) {
+                        $dialog.find('.duplicated-input-warning span').text(errMsg);
+                        $dialog.addClass('duplicate');
                         $input.addClass('error');
+
+                        setTimeout(function() {
+                            $dialog.removeClass('duplicate');
+                            $input.removeClass('error');
+
+                            $input.trigger("focus");
+                        }, 2000);
+
                         return;
                     }
                 }
@@ -1154,24 +1159,17 @@ function renameDialog() {
             $dialog.removeClass('focused');
         });
 
-        $input.rebind('click keydown', function (event) {
+        $input.rebind('keydown', function (event) {
             // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
-            if (event.type === 'keydown') {
-                if (event.keyCode === 13) { // Enter
-                    $('.rename-dialog-button.rename').click();
-                    return;
-                }
-                else if (event.keyCode === 27){ // ESC
-                    closeDialog();
-                }
+            if (event.keyCode === 13) { // Enter
+                $('.rename-dialog-button.rename').click();
+                return;
             }
-            var value = $(this).val();
-
-            if (!value) {
-                $dialog.removeClass('active');
+            else if (event.keyCode === 27){ // ESC
+                closeDialog();
             }
             else {
-                $dialog.addClass('active');
+                $dialog.removeClass('duplicate').addClass('active');
                 $input.removeClass('error');
             }
         });

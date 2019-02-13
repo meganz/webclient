@@ -6972,7 +6972,6 @@ React.makeElement = React['createElement'];
 	                            chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
 	                            msg.deleted = true;
 	                            msg.textContents = "";
-	                            room.messagesBuff.removeMessageById(msg.messageId);
 	                        } else if (msg.getState() === Message.STATE.NOT_SENT_EXPIRED) {
 	                            chatdint.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
 	                        }

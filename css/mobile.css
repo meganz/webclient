@@ -1793,8 +1793,7 @@ ul, li {
     cursor: pointer;
     width: 100%;
     font-size: 15px;
-    letter-spacing: 0.2px;
-    color: #8B9FAA;
+    color: #aaa;
     text-align: center;
     display: inline-block;
 }
@@ -2045,7 +2044,7 @@ input[type='checkbox'] {
     margin: 15px auto 0 auto;
 }
 .mobile.sign-in .forgot-password-button, .mobile.verify-login-page .lost-authenticator-button {
-    color: #8B9FAA;
+    color: #aaa;
     cursor: pointer;
     display: inline-block;
     font-size: 15px;
@@ -7023,7 +7022,8 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps h3.main-italic-header.main-header {
     color: #999;
-    font-family: 'montserrat', 'source_sans_proregular', Arial;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-weight: initial;
 }
 .mobile .improved-recovery-steps p, .mobile .improved-recovery-steps h3.main-italic-header {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
@@ -7040,9 +7040,9 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps .info-container h3.main-italic-header {
     text-align: left;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-    font-weight: 800;
-    font-size: 16px;
+    font-family: 'LatoWebSemibold', 'source_sans_proregular', Arial;
+    font-weight: initial;
+    font-size: 14px;
 }
 .mobile .improved-recovery-steps .container-information {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
@@ -7050,7 +7050,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     line-height: 21px;
 }
 .mobile .improved-recovery-steps .container-information ul {
-    margin: 12px 24px;
+    margin: 12px 8px 12px 24px;
     padding: 0;
     text-indent: 0;
     list-style-type: 0;
@@ -7066,6 +7066,8 @@ body.key .reg-st3-membership-bl.free.hidden {
     margin-bottom: 10px;
     display: list-item;
     list-style: disc;
+    color: #676D75;
+    font-size: 13px;
 }
 .mobile .improved-recovery-steps .container-information li:last-of-type {
     margin-bottom: 0;
@@ -7087,22 +7089,22 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps h1, .mobile.fm-dialog.park-account-dialog .fm-dialog-title  {
     font-size: 20px;
-    color: #343A40;
-    letter-spacing: 0.2px;
+    color: #495057;
     line-height: 30px;
     -webkit-margin-before: 0.4em;
     -webkit-margin-after: 20px;
     -webkit-margin-start: 0px;
     -webkit-margin-end: 0px;
     text-align: center;
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_prosemibold';
+    font-family:'LatoWebSemibold', 'source_sans_prosemibold';
+    font-weight: initial;
 }
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps h3.main-italic-header {
     font-size: 13px;
 }
 .mobile .improved-recovery-steps .content-wrapper {
     position: relative;
-    margin: 40px 36px 40px 36px;
+    margin: 40px 28px 40px 28px;
     padding: 0;
 }
 .mobile .improved-recovery-steps .main-right-block .content-wrapper {
@@ -7131,7 +7133,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     font-size: 14px;
     color: #495057;
     letter-spacing: 0;
-    line-height: 21px;
+    line-height: 23px;
     padding-bottom: 0;
     margin-bottom: 24px;
     text-align: center;
@@ -7532,16 +7534,23 @@ body.key .reg-st3-membership-bl.free.hidden {
     margin-left: 24px;
     font-size: 14px;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-weight: initial;
+    font-size: 13px;
+    color: #676D75;
+}
+.mobile .improved-recovery-steps .list-point b {
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial;
+    font-weight: initial;
+    color: #495057;
 }
 .mobile .improved-recovery-steps strong {
-    font-family: 'LatoWeb', 'source_sans_probold', Arial;
+    font-family: 'LatoWebSemibold', 'source_sans_probold', Arial
     color: #333;
-    font-weight: 800;
+    font-weight: initial;
 }
 .mobile .improved-recovery-steps  strong.warning-text {
     color: #eb4444;
     font-family: 'LatoWeb', 'source_sans_probold', Arial;
-    font-weight: 800;
 }
 .mobile .improved-recovery-steps .instruction-block {
     margin-top: 32px;
@@ -7553,7 +7562,7 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps .info-container, .mobile .improved-recovery-steps .app-instruction-block{
     background-color: rgba(250,250,250,0.5);
-    padding: 20px 20px;
+    padding: 24px 16px 16px;
     margin: 0 0;
     border: 1px solid #eee;
     border-radius: 4px;
@@ -7617,7 +7626,15 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .check-sessions div.checkboxOn, .mobile .improved-recovery-steps .check-sessions div.checkboxOff   {
     margin: 16px auto 32px;
     float: initial;
+    box-shadow: none;
+    border: 0px solid rgba(0,0,0,0);
 }
+.mobile .improved-recovery-steps .check-sessions-text {
+    font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+    font-size: 14px;
+    color: #495057;
+}
+
 .mobile .improved-recovery-steps .info-container .settings-row input.checkboxOn, .mobile .improved-recovery-steps .info-container .settings-row input.checkboxOff {
     margin: 0;
 }
@@ -7669,13 +7686,11 @@ body.key .reg-st3-membership-bl.free.hidden {
     padding-bottom: 12px;
 }
 .mobile .improved-recovery-steps .info-container .settings-row label strong {
-    font-family: 'LatoWeb', 'source_sans_probold', Arial;
-    font-weight: 800;
+    font-family: 'LatoWebSemibold', 'source_sans_probold', Arial;
 }
 .mobile .improved-recovery-steps strong {
-    font-family: 'LatoWeb', 'source_sans_probold', Arial;
+    font-family: 'LatoWebSemibold', 'source_sans_probold', Arial;
     color: #333;
-    font-weight: 800;
 }
 .mobile .improved-recovery-steps  strong.warning-text {
     color: #eb4444;
@@ -7948,8 +7963,11 @@ body.key .reg-st3-membership-bl.free.hidden {
     width: 120px;
 }
 .mobile .improved-recovery-steps .check-sessions {
-    margin: 36px auto 40px;
+    margin: 16px auto 40px;
     display: table;
+}
+.mobile .improved-recovery-steps .check-sessions-text {
+    margin-bottom: 16px;
 }
 .mobile .improved-recovery-steps .check-sessions .col-3 {
     display: table-cell;
@@ -8003,6 +8021,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     font-size: 14px;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     line-height: 21px;
+    color: #495057;
 }
 .mobile .improved-recovery-steps .check-sessions .checkdiv {
     margin: 12px auto 20px;
@@ -9915,11 +9934,12 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         width:calc(100% - 32px);
     }
     .mobile .improved-recovery-steps .content-wrapper {
-        margin: 40px 16px 24px;
+        margin: 24px 16px 32px;
         min-height: initial;
     }
-    .mobile .improved-recovery-steps h1 {
-        font-size: 20px;
+    .mobile .improved-recovery-steps h1, .mobile.fm-dialog.park-account-dialog .fm-dialog-title {
+        font-size: 18px;
+        line-height: 27px;
     }
 }
 

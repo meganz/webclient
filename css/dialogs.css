@@ -3199,7 +3199,7 @@ li.token-input-token-invite .input-close {
     display: block;
 }
 .improved-recovery-steps .checkbox-container .settings-row label strong {
-    font-family: 'source_sans_probold';
+    font-family: 'source_sans_prosemibold';
 }
 .export-links-dialog .embed-setting.disabled {
     cursor: none !important;
@@ -3229,7 +3229,7 @@ li.token-input-token-invite .input-close {
     margin: -270px 0 0 -320px;
 }
 .park-account-dialog .fm-dialog-title {
-    font-family: Montserrat-Regular;
+    font-family: 'LatoWebSemibold';
     font-size: 20px;
     color: #262F3B;
     letter-spacing: 0;
@@ -3237,7 +3237,7 @@ li.token-input-token-invite .input-close {
     line-height: 30px;
     margin: 50px auto 16px;
     width: 560px;
-    overflow: initial
+    overflow: initial;
     padding: 0 0;
 }
 .improved-recovery-steps .park-account-dialog h3.main-italic-header {

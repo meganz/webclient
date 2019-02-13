@@ -1119,7 +1119,7 @@ var exportExpiry = {
 
         // Initialise expiry date picker
         $dialog.find('.expiry-date-select').datepicker({
-            dateFormat: 'yy-mm-dd',     // 25.05.2019
+            dateFormat: 'yy-mm-dd',     // 2019-05-25
             dayNamesMin: [
                 l[8763], l[8764], l[8765], l[8766], l[8767], l[8768], l[8769]   // Sun - Sat
             ],

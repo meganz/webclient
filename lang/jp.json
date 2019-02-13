@@ -147,6 +147,7 @@
     "458": "\u4f7f\u3046",
     "459": "\u3042\u306a\u305f\u306e\u30af\u30fc\u30dd\u30f3",
     "466": "\u6700\u5f8c\u306e[X]",
+    "468": "\u8cfc\u5165\u5c65\u6b74",
     "469": "\u904e\u53bb[X]\u56de\u306e\u8cfc\u5165",
     "471": "\u904e\u53bb[X]\u56de\u306e\u53d6\u5f15",
     "472": "\u904e\u53bb[X]\u56de\u306e\u30bb\u30c3\u30b7\u30e7\u30f3",
@@ -3247,5 +3248,9 @@
     "20400": "[S]\u3042\u306a\u305f\u306e\u30d3\u30b8\u30cd\u30b9\u30a2\u30ab\u30a6\u30f3\u30c8\u306f\u671f\u9650\u5207\u308c\u3067\u3059\u3002[\/S] [A]\u4eca\u3059\u3050\u30a2\u30ab\u30a6\u30f3\u30c8\u3092\u518d\u5ea6\u6709\u52b9[\/A]\u306b\u3057\u3066\u3001[S]\u7121\u5236\u9650\u306e\u30b9\u30c8\u30ec\u30fc\u30b8\u3068\u5e2f\u57df\u5e45[\/S]\u304a\u3088\u3073\u4ed6\u306e\u30d3\u30b8\u30cd\u30b9\u30a2\u30ab\u30a6\u30f3\u30c8\u6a5f\u80fd\u3092\u4e00\u7dd2\u306b\u304a\u697d\u3057\u307f\u304f\u3060\u3055\u3044",
     "20401": "\u3042\u306a\u305f\u306e\u30d3\u30b8\u30cd\u30b9\u30a2\u30ab\u30a6\u30f3\u30c8\u306f\u671f\u9650\u5207\u308c\u3067\u3059",
     "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
-    "20403": "\u30a2\u30ab\u30a6\u30f3\u30c8\u306e\u304a\u652f\u6255\u3044\uff06\u518d\u6709\u52b9\u5316"
+    "20403": "\u30a2\u30ab\u30a6\u30f3\u30c8\u306e\u304a\u652f\u6255\u3044\uff06\u518d\u6709\u52b9\u5316",
+    "20404": "Congratulations! You\u2019ve just unlocked:",
+    "20405": "storage bonus",
+    "20406": "transfer bonus",
+    "20407": "Valid days:"
 }

@@ -147,6 +147,7 @@
     "458": "Valider",
     "459": "Vos bons",
     "466": "Les [X] derniers",
+    "468": "Historique des achats",
     "469": "Les [X] derniers achats",
     "471": "Les [X] derni\u00e8res transactions",
     "472": "Les [X] derni\u00e8res sessions",
@@ -3247,5 +3248,9 @@
     "20400": "[S]Votre compte d\u2019entreprise est expir\u00e9.[\/S] [A]R\u00e9activez-le maintenant[\/A] et profitez [S]de l\u2019espace de stockage et de la bande passante illimit\u00e9s[\/S] ainsi que d\u2019autres fonctions propres au compte d\u2019entreprise.",
     "20401": "Votre compte d\u2019entreprise est expir\u00e9",
     "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
-    "20403": "Payer et r\u00e9activer le compte"
+    "20403": "Payer et r\u00e9activer le compte",
+    "20404": "Congratulations! You\u2019ve just unlocked:",
+    "20405": "storage bonus",
+    "20406": "transfer bonus",
+    "20407": "Valid days:"
 }

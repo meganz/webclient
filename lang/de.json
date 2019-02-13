@@ -147,6 +147,7 @@
     "458": "Einl\u00f6sen",
     "459": "Ihre Voucher",
     "466": "Die letzten [X]",
+    "468": "Einkaufsverlauf",
     "469": "Die letzten [X] Eink\u00e4ufe",
     "471": "Die letzten [X] Transaktionen",
     "472": "Die letzten [X] Sitzungen",
@@ -3247,5 +3248,9 @@
     "20400": "[S]Your Business account is expired.[\/S] [A]Reactivate your account now[\/A] and enjoy the [S]unlimited storage and bandwidth[\/S] along with other business account features",
     "20401": "Your business account is expired",
     "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
-    "20403": "Pay & Reactivate Account"
+    "20403": "Pay & Reactivate Account",
+    "20404": "Congratulations! You\u2019ve just unlocked:",
+    "20405": "storage bonus",
+    "20406": "transfer bonus",
+    "20407": "Valid days:"
 }

@@ -147,6 +147,7 @@
     "458": "Quy \u0111\u1ed5i",
     "459": "Voucher c\u1ee7a b\u1ea1n",
     "466": "[X] Cu\u1ed1i",
+    "468": "L\u1ecbch s\u1eed thanh to\u00e1n",
     "469": "[X] phi\u00ean mua h\u00e0ng cu\u1ed1i",
     "471": "[X] phi\u00ean giao d\u1ecbch cu\u1ed1i",
     "472": "[X] phi\u00ean ho\u1ea1t \u0111\u1ed9ng cu\u1ed1i",
@@ -3247,5 +3248,9 @@
     "20400": "[S]Your Business account is expired.[\/S] [A]Reactivate your account now[\/A] and enjoy the [S]unlimited storage and bandwidth[\/S] along with other business account features",
     "20401": "Your business account is expired",
     "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
-    "20403": "Pay & Reactivate Account"
+    "20403": "Pay & Reactivate Account",
+    "20404": "Congratulations! You\u2019ve just unlocked:",
+    "20405": "storage bonus",
+    "20406": "transfer bonus",
+    "20407": "Valid days:"
 }

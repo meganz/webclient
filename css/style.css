@@ -28135,11 +28135,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     font-size: 14px;
     color: #333333;
     height: 40px;
-    width: calc(100% + 16px);
+    width: calc(100% + 22px);
     margin-top:-4px;
     padding: 8px;
     position: absolute;
-    right: -16px;
+    right: -22px;
     bottom: 0;
 }
 

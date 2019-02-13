@@ -1440,10 +1440,13 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
     return operationPromise;
 };
 
-/** Get Tax name to be viewed on UI */
-BusinessAccount.prototype.getTaxCodeName = function() {
+/**
+ * Get Tax name to be viewed on UI
+ * @param {String} countryCode      country code to get Tax code abbreviation for
+ */
+BusinessAccount.prototype.getTaxCodeName = function(countryCode) {
     "use strict";
-    var operationPromise = new MegaPromise();
+    /* var operationPromise = new MegaPromise();
 
     if (mega.buinsessAccount && mega.buinsessAccount.invoicesTaxName) {
         return operationPromise.resolve(1, mega.buinsessAccount.invoicesTaxName);
@@ -1466,7 +1469,80 @@ BusinessAccount.prototype.getTaxCodeName = function() {
         }
     });
 
-    return operationPromise;
+    return operationPromise; */
+    switch (countryCode) {
+        case "AT": return "USt";
+        case "BE": return "TVA";
+        case "HR": return "PDV";
+        case "CZ": return "DPH";
+        case "DK": return "moms";
+        case "EE": return "km";
+        case "FI": return "ALV";
+        case "FR": return "TVA";
+        case "DE": return "USt";
+        case "HU": return "AFA";
+        case "IT": return "IVA";
+        case "LV": return "PVN";
+        case "LT": return "PVM";
+        case "LU": return "TVA";
+        case "NL": return "BTW";
+        case "PL": return "PTU";
+        case "PT": return "IVA";
+        case "RO": return "TVA";
+        case "SK": return "DPH";
+        case "SI": return "DDV";
+        case "SE": return "MOMS";
+        case "AL": return "TVSH";
+        case "AD": return "IGI";
+        case "AR": return "IVA";
+        case "AM": return "AAH";
+        case "AU": return "GST";
+        case "BO": return "IVA";
+        case "BA": return "PDV";
+        case "BR": return "ICMS";
+        case "CA": return "GST";
+        case "CL": return "IVA";
+        case "CO": return "IVA";
+        case "DO": return "ITBIS";
+        case "EC": return "IVA";
+        case "SV": return "IVA";
+        case "FO": return "MVG";
+        case "GT": return "IVA";
+        case "IS": return "VSK";
+        case "ID": return "PPN";
+        case "JE": return "GST";
+        case "JO": return "GST";
+        case "LB": return "TVA";
+        case "LI": return "MWST";
+        case "MK": return "DDV";
+        case "MY": return "GST";
+        case "MV": return "GST";
+        case "MX": return "IVA";
+        case "MD": return "TVA";
+        case "MC": return "TVA";
+        case "ME": return "PDV";
+        case "MA": return "GST";
+        case "NZ": return "GST";
+        case "NO": return "MVA";
+        case "PK": return "GST";
+        case "PA": return "ITBMS";
+        case "PY": return "IVA";
+        case "PE": return "IGV";
+        case "PH": return "RVAT";
+        case "RU": return "NDS";
+        case "SG": return "GST";
+        case "CH": return "MWST";
+        case "TN": return "TVA";
+        case "TR": return "KDV";
+        case "UA": return "PDV";
+        case "UY": return "IVA";
+        case "UZ": return "QQS";
+        case "VN": return "GTGT";
+        case "VE": return "IVA";
+
+        default: return "VAT";
+    }
+
 };
 
 /**

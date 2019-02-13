@@ -1765,14 +1765,15 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
     setPostCodeOnUI(cCountry);
 
-    var setTaxName = function(st, taxName) {
-        if (st && taxName) {
+    var setTaxName = function(countryCode) {
+        var taxName = mySelf.business.getTaxCodeName(countryCode);
+        if (taxName) {
             $('.tax-code-name', $profileContainer).text(taxName);
             $('input#prof-vat', $profileContainer).attr("placeholder", taxName);
         }
     };
 
-    mySelf.business.getTaxCodeName().always(setTaxName);
+    setTaxName(cCountry);
 
     var $cNameInput = $('input#prof-cname', $profileContainer).val(cName);
     var $cTelInput = $('input#prof-phone', $profileContainer).val(cTel);
@@ -1914,6 +1915,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     $('select#cnt-ddl', $profileContainer).off('change.suba').on('change.suba',
         function countrySelectChangingHandler(se) {
             setPostCodeOnUI(this.value);
+            setTaxName(this.value);
         });
 
     unhideSection();

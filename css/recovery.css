@@ -11,7 +11,6 @@
 }
 .improved-recovery-steps h3.main-italic-header, .improved-recovery-steps h2, .improved-recovery-steps.backup-recover h3.main-italic-header  {
     font-family:'LatoWeb', 'source_sans_proregular', Arial;
-    font-size: 16px;
     color: #aaa;
     text-align: center;
     min-height: 38px;
@@ -24,12 +23,10 @@
     text-overflow: ellipsis;
     line-height: 24px;
 }
-}
 .park-account-dialog .improved-recovery-steps h3.main-italic-header {
     width: 560px;
     margin: 0 auto 24px;
 }
-
 .improved-recovery-steps .info-block h3.main-italic-header, .improved-recovery-steps .app-instruction-block h3.main-italic-header {
     padding: 0 0;
 }
@@ -103,7 +100,6 @@
 .backup-recover .content-wrapper.hasButton {
     padding-bottom: 88px;
 }
-
 .improved-recovery-steps .content-wrapper p span {
     font-family: 'source_sans_probold';
     color: #F57223;

@@ -1405,7 +1405,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                 var is_MB = false;
                 var is_GB = false;
                 for (var ss = 0; ss < availableLabels.length; ss++) {
-                    var consume = res[availableLabels[ss]].tdl;
+                    var consume = res[availableLabels[ss]].tdl || 0;
                     if (consume > scaleGB) {
                         is_GB = true;
                         break;
@@ -1442,9 +1442,10 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                 }
                 for (var h = 0; h < availableLabels.length; h++) {
                     var index = parseInt(availableLabels[h].substr(6, 2), 10);
+                    var dayConsume = res[availableLabels[h]].tdl || 0;
                     // chartData.push(res[availableLabels[h]].tdl / divider);
-                    chartData[index - 1] = res[availableLabels[h]].tdl / divider;
-                    totalMonthTransfer += res[availableLabels[h]].tdl;
+                    chartData[index - 1] = dayConsume / divider;
+                    totalMonthTransfer += dayConsume;
 
                     // keeping the day number only
                     // availableLabels[h] = availableLabels[h].substr(6, 2);

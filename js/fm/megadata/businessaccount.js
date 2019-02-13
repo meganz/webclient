@@ -334,8 +334,29 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
             // best case scenario, the period we want is inside the saved
             if (fromToDate.fromDate >= oldestStoredDate && fromToDate.toDate <= newestStoredDate) {
                 var result = Object.create(null);
+
                 var start = storedDates.indexOf(fromToDate.fromDate);
+
+                if (start === -1) {
+                    for (var s1 = 0; s1 < storedDates.length; s1++) {
+                        if (storedDates[s1] > fromToDate.fromDate) {
+                            start = s1;
+                            break;
+                        }
+                    }
+                }
+
                 var end = storedDates.indexOf(fromToDate.toDate);
+
+                if (end === -1) {
+                    for (var s2 = storedDates.length-1; s2 >= 0; s2--) {
+                        if (storedDates[s2] < fromToDate.toDate) {
+                            end = s2;
+                            break;
+                        }
+                    }
+                }
+
                 for (var k = start; k <= end; k++) {
                     result[storedDates[k]] = mega.buinsessAccount.quotaReport[storedDates[k]];
                 }

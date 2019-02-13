@@ -147,6 +147,7 @@
     "458": "Kunin",
     "459": "Ang iyong mga voucher",
     "466": "Huli  [X]",
+    "468": "history ng pag-purchase",
     "469": "huling pang-[X] na purchase",
     "471": "huling  [X] transactions",
     "472": "Huling  [X] sesyon",
@@ -3247,5 +3248,9 @@
     "20400": "[S]Your Business account is expired.[\/S] [A]Reactivate your account now[\/A] and enjoy the [S]unlimited storage and bandwidth[\/S] along with other business account features",
     "20401": "Your business account is expired",
     "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
-    "20403": "Pay & Reactivate Account"
+    "20403": "Pay & Reactivate Account",
+    "20404": "Congratulations! You\u2019ve just unlocked:",
+    "20405": "storage bonus",
+    "20406": "transfer bonus",
+    "20407": "Valid days:"
 }

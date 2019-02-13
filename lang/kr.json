@@ -147,6 +147,7 @@
     "458": "\uad50\ud658",
     "459": "\ub2f9\uc2e0\uc758 \ubc14\uc6b0\ucc98",
     "466": "\ucd5c\uadfc [X]",
+    "468": "\uacb0\uc81c \uae30\ub85d",
     "469": "\ucd5c\uadfc [X] \uacb0\uc81c",
     "471": "\ucd5c\uadfc [X] \uac70\ub798",
     "472": "\ucd5c\uadfc [X] \uc138\uc158",
@@ -3247,5 +3248,9 @@
     "20400": "[S]\ub2f9\uc2e0\uc758 \ube44\uc988\ub2c8\uc2a4 \uacc4\uc815\uc774 \ub9cc\ub8cc\ub418\uc5c8\uc2b5\ub2c8\ub2e4.[\/S][A]\uc9c0\uae08 \uacc4\uc815\uc744 \uc7ac\ud65c\uc131\ud654[\/A]\ud558\uace0 \ub2e4\ub978 \ube44\uc988\ub2c8\uc2a4 \uacc4\uc815 \uae30\ub2a5\uacfc \ud568\uaed8 [S]\ubb34\uc81c\ud55c \uc800\uc7a5\uc18c\uc640 \ub300\uc5ed\ud3ed[\/S]\uc744 \uc990\uae30\uc138\uc694",
     "20401": "\ub2f9\uc2e0\uc758 \ube44\uc988\ub2c8\uc2a4 \uacc4\uc815\uc774 \ub9cc\ub8cc\ub418\uc5c8\uc2b5\ub2c8\ub2e4",
     "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
-    "20403": "\uc9c0\ubd88 & \uacc4\uc815 \uc7ac\ud65c\uc131\ud654"
+    "20403": "\uc9c0\ubd88 & \uacc4\uc815 \uc7ac\ud65c\uc131\ud654",
+    "20404": "Congratulations! You\u2019ve just unlocked:",
+    "20405": "storage bonus",
+    "20406": "transfer bonus",
+    "20407": "Valid days:"
 }

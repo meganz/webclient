@@ -147,6 +147,7 @@
     "458": "\u05e4\u05d3\u05d4",
     "459": "\u05d4\u05e9\u05d5\u05d1\u05e8\u05d9\u05dd \u05e9\u05dc\u05da",
     "466": "[X] \u05d4\u05d0\u05d7\u05e8\u05d5\u05e0\u05d9\u05dd",
+    "468": "\u05d4\u05d9\u05e1\u05d8\u05d5\u05e8\u05d9\u05ea \u05e7\u05e0\u05d9\u05d9\u05d4",
     "469": "[X] \u05e7\u05e0\u05d9\u05d5\u05ea \u05d0\u05d7\u05e8\u05d5\u05e0\u05d5\u05ea",
     "471": "[X] \u05d4\u05e2\u05e1\u05e7\u05d0\u05d5\u05ea \u05d0\u05d7\u05e8\u05d5\u05e0\u05d5\u05ea",
     "472": "[X] \u05ea\u05d4\u05dc\u05d9\u05db\u05d9\u05dd \u05d0\u05d7\u05e8\u05d5\u05e0\u05d9\u05dd",
@@ -3247,5 +3248,9 @@
     "20400": "[S]Your Business account is expired.[\/S] [A]Reactivate your account now[\/A] and enjoy the [S]unlimited storage and bandwidth[\/S] along with other business account features",
     "20401": "Your business account is expired",
     "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
-    "20403": "Pay & Reactivate Account"
+    "20403": "Pay & Reactivate Account",
+    "20404": "Congratulations! You\u2019ve just unlocked:",
+    "20405": "storage bonus",
+    "20406": "transfer bonus",
+    "20407": "Valid days:"
 }

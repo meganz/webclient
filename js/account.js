@@ -1158,6 +1158,8 @@ function processEmailChangeActionPacket(ap) {
         mega.attr.get(u_handle, 'fmconfig', false, true)
             .always(moveLegacySettings)
             .done(function(result) {
+                // Special escape by direct update for ulddd, which has true as undefined
+                fmconfig.ulddd = result.ulddd;
                 result = Object.assign({}, fmconfig, Object(result));
                 for (var key in result) {
                     if (result.hasOwnProperty(key)) {

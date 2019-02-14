@@ -9126,6 +9126,12 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     text-align: right;
 }
 .business-page .big-red-button.height-48 {
+    height: 48px;
+    line-height: 47px;
+    font-size: 18px;
+    min-width: 0;
+    width: 100%;
+    max-width: 360px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
@@ -9138,7 +9144,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     margin-left: 50%;
     transform: translateX(-50%);
 }
-
 .mobile.payment-result.pending.alternate {
     position: fixed;
     z-index: 99999;

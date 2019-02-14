@@ -419,6 +419,8 @@ function init_page() {
         n_h = pfid;
         if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22 || pfid.length !== 8) {
 
+            closeDialog();
+            
             if (pfid.length !== 8) {
                 folderreqerr(false, EARGS);
                 return;

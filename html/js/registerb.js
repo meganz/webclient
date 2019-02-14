@@ -72,7 +72,7 @@ BusinessRegister.prototype.initPage = function () {
                 }
                 $nbUsersInput.val(Math.max(totalActiveSubUsers, this.minUsers));
                 $nbUsersInput.prop('disabled', true);
-                /////
+                // ///
                 $cnameInput.prop('disabled', true);
                 $telInput.prop('disabled', true);
                 mega.attr.get(u_attr.b.bu, '%name', -1, undefined,

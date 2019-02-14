@@ -1341,6 +1341,7 @@ scparser.$add('ssc', process_businessAccountSubUsers_SC);
 
 // business account change which requires reload (such as payment against expired account)
 scparser.$add('ub', function() {
+    "use strict";
     fm_fullreload(null, 'ub-business');
 });
 

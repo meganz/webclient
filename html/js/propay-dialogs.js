@@ -140,7 +140,7 @@ var astroPayDialog = {
      * Functionality for the close button
      */
     initCloseButton: function () {
-
+        "use strict";
         // Initialise the close and cancel buttons
         this.$dialog.find('.fm-dialog-close, .cancel').rebind('click', function () {
 
@@ -158,7 +158,7 @@ var astroPayDialog = {
      * Get the details entered by the user and redirect to AstroPay
      */
     initConfirmButton: function () {
-
+        "use strict";
         this.$dialog.find('.accept').rebind('click', function () {
 
             // Store the full name and tax number entered

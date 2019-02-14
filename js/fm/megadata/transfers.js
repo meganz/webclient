@@ -143,6 +143,7 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
 };
 
 MegaData.prototype.addDownload = function(n, z, preview) {
+    "use strict";
     // check if this is a business expired account
     if (u_attr.b && u_attr.b.s === -1) {
         M.require('businessAcc_js', 'businessAccUI_js').done(function() {

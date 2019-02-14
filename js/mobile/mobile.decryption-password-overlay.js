@@ -63,7 +63,7 @@ mobile.decryptionPasswordOverlay = {
         // View animation and change text
         $decryptButton.addClass('decrypting');
 
-        // similar to decryptLink function below, 
+        // similar to decryptLink function below,
         if (is_ios) {
             $decryptButton.addClass('ios').text(l[8579] + '...');   // Decrypting
         }

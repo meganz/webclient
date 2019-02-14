@@ -1593,6 +1593,7 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
 
 /** Show UI elements if the account got expired  */
 BusinessAccountUI.prototype.showExpiredUIElements = function() {
+    "use strict";
     if (!u_attr.b || !u_attr.b.m || u_attr.b.s !== -1) {
         return;
     }
@@ -1607,6 +1608,7 @@ BusinessAccountUI.prototype.showExpiredUIElements = function() {
  * @param {Boolean} isMaster
  */
 BusinessAccountUI.prototype.showExpiredDialog = function(isMaster) {
+    "use strict";
     var $dialog;
 
     if (isMaster) {
@@ -3168,7 +3170,8 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
  * @param {Object} subusers     Subusers list
  * @param {Number} field        the field to sort with (0 or null means by name)
  */
-BusinessAccountUI.prototype.sortSubusers = function (subusers, field) {
+BusinessAccountUI.prototype.sortSubusers = function(subusers, field) {
+    "use strict";
     if (!field) { // by name
         var tempArray = [];
         for (var sub in subusers) {

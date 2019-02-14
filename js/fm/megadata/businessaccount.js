@@ -349,7 +349,7 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
                 var end = storedDates.indexOf(fromToDate.toDate);
 
                 if (end === -1) {
-                    for (var s2 = storedDates.length-1; s2 >= 0; s2--) {
+                    for (var s2 = storedDates.length - 1; s2 >= 0; s2--) {
                         if (storedDates[s2] < fromToDate.toDate) {
                             end = s2;
                             break;
@@ -1275,12 +1275,12 @@ BusinessAccount.prototype.setMasterUserAttributes =
                                 // Encode parameters to Base64 before sending to the API
                                 var sendEmailRequestParams = {
                                     a: 'uc2',
-                                    n: base64urlencode(to8(fname + ' ' + lname)),        // Name (used just for the email)
+                                    n: base64urlencode(to8(fname + ' ' + lname)),    // Name (used just for the email)
                                     m: base64urlencode(email),                               // Email
                                     crv: ab_to_base64(clientRandomValueBytes),               // Client Random Value
                                     k: a32_to_base64(encryptedMasterKeyArray32),             // Encrypted Master Key
-                                    hak: ab_to_base64(hashedAuthenticationKeyBytes),         // Hashed Authentication Key
-                                    v: 2                                                     // Version of this protocol
+                                    hak: ab_to_base64(hashedAuthenticationKeyBytes),      // Hashed Authentication Key
+                                    v: 2                                                  // Version of this protocol
                                 };
 
                                 api_req([request_upb, sendEmailRequestParams], {

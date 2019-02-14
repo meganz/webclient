@@ -4780,6 +4780,10 @@ body:not(.en) .pages-nav.content-block .nav-button {
 .browsers .bottom-page.left-cell, .browsers .bottom-page.right-cell {
     width: 100%;
     display: block;
+    text-align: center;
+}
+.bottom-page.left-cell.right-txt-align {
+    text-align: center;
 }
 .img.browsers-top {
     left: 0;

@@ -175,6 +175,8 @@ i.medium-icon.business-sprite {
 .business-page .bottom-page.horizontal-centered-bl {
     max-width: 1230px;
     padding: 0 30px;
+    width: 100%;
+    display: block;
 }
 .bottom-page.content-table {
     display: table;
@@ -848,7 +850,7 @@ img.bottom-page.business4 {
     .bottom-page.content-cell {
         display: block;
         width: 100%;
-        padding: 22px 26px;
+        padding: 18px 20px;
     }
     .bottom-page.content-cell .business-price {
         font-size: 18px;
@@ -883,6 +885,9 @@ img.bottom-page.business4 {
     .slider-body .bottom-page.business-text {
         font-size: 14px;
         line-height: 24px;
+    }
+    .bottom-page.business-text.top-pad {
+    padding-top: 32px;
     }
     .business-page .cell-60, .business-page .cell-40, .business-page .cell-55, .business-page .cell-45 {
         width: 100%;
@@ -924,6 +929,7 @@ img.bottom-page.business4 {
     .business-big-header {
         font-size: 24px;
         line-height: 32px;
+        padding-top:48px;
         text-align: center;
     }
     .business-txt-block {
@@ -955,7 +961,6 @@ img.bottom-page.business4 {
         padding: 0;
         margin: 0 0 28px 0;
         max-width: 300px;
-        
     }
     .business-row.company {
         display: block;
@@ -986,9 +991,9 @@ img.bottom-page.business4 {
     .business-info.mobile .business-cell.cell-icon {
         min-height: 48px;
         display: block;
-        padding: 15px 20px 13px 36px;
-        font-size: 12px;
-        line-height: 20px;
+        padding: 15px 16px 13px 36px;
+        font-size: 14px;
+        line-height: 21px;
         color: #333333;
         font-family: 'LatoWeb', 'source_sans_proregular', Arial;
         position: relative;
@@ -1021,7 +1026,7 @@ img.bottom-page.business4 {
         font-size: 24px;
         line-height: 32px;
         text-align: center;
-        padding: 0px 0 49px 0;
+        padding: 36px 0;
     }
     .business-icon.red-icons {
         margin: 0 auto -10px auto;
@@ -1093,6 +1098,13 @@ img.bottom-page.business4 {
         display: block;
         margin: 8px auto;
         left: auto;
+    }
+    .business-page .bottom-page.horizontal-centered-bl {
+        padding: 16px 24px;
+    }
+    .business-tick-txt {
+        line-height: 24px;
+        padding: 8px 16px 8px 24px;
     }
  }
 

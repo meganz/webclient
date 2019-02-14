@@ -11351,8 +11351,11 @@ table {
     box-sizing: border-box;
 }
 .account-history-dropdown {
-    margin: 2px 9px 0 0;
+    margin: 20px 9px 0 0;
     background-image: none;
+}
+.account.voucher-history .account-history-dropdown {
+    margin: 44px 9px 0 0;
 }
 .account-widget-dropdown {
     margin: 2px 9px 0 0;

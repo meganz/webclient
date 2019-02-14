@@ -6,7 +6,7 @@ mobile.notFoundOverlay = {
     /**
      * Initialise the overlay
      */
-    show: function() {
+    show: function(e) {
 
         'use strict';
 
@@ -15,8 +15,12 @@ mobile.notFoundOverlay = {
         var $errorText = $overlay.find('.na-file-txt');
         var $image = $overlay.find('.filetype-img');
 
+        if (parseInt(e) === EARGS) {
+            $errorText.text(l[20199]);
+            $image.attr('src', mobile.imagePath + 'na.png');
+        }
         // If a folder link show 'The folder you are trying to view is no longer available.'
-        if (pfid) {
+        else if (pfid) {
             $errorText.text(l[16346]);
             $image.attr('src', mobile.imagePath + 'folder.png');
         }

@@ -357,7 +357,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     }
                 }
             }
-            if (!disabledFound && !me.hasClass('enabled-accounts')) {
+            if (!disabledFound && !me.hasClass('enabled-accounts') && $usersTable.is(":visible ")) {
                 $('.fm-empty-user-management').removeClass('hidden');
             }
 

@@ -2061,7 +2061,7 @@
     "18315": "Tap on the three horizontal dots at the bottom right.",
     "18316": "Type your new password, confirm it and tap [B]Done[\/B].",
     "18322": "Bonus storage",
-    "18323": "Bonus transfer quota",
+    "18323": "Bonus transfer",
     "18340": "Backup Recovery Key",
     "18347": "Check all boxes to continue",
     "18419": "Type your new password, confirm it and click [B]OK[\/B].",
@@ -3252,5 +3252,11 @@
     "20404": "Congratulations! You\u2019ve just unlocked:",
     "20405": "storage bonus",
     "20406": "transfer bonus",
-    "20407": "Valid days:"
+    "20407": "Valid days:",
+    "20408": "We have upgraded your account %1 to the [B]%2 plan for %3[\/B]!",
+    "20409": "SMS verification",
+    "20410": "To get the most out of MEGA, we recommend you download our mobile app. [A]Learn more[\/A].",
+    "20411": "Verifying your mobile number will make it easier for your contacts to find you on MEGA.",
+    "20412": "Redeem Promo Code",
+    "20413": "Enter your %1 code below:"
 }

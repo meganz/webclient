@@ -3034,6 +3034,7 @@ function folderreqerr(c, e)
             message = l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>';
         }
 
+        parsepage(pages['placeholder']);
         msgDialog('warninga', title, message, false, function() {
 
             // If the user is logged-in, he'll be redirected to the cloud
@@ -3045,6 +3046,7 @@ function folderreqerr(c, e)
     }
     else {
         // Show file/folder not found overlay
+        parsepage(pages['mobile']);
         mobile.notFoundOverlay.show(e);
     }
 }

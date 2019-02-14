@@ -389,7 +389,6 @@ i.medium-icon.business-sprite {
     font-size: 0;
     line-height: 0;
     position: relative;
-    overflow: hidden;
      -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
     -o-transition: all 200ms ease-in-out;

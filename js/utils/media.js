@@ -342,47 +342,97 @@ mBroadcaster.once('startMega', function() {
 mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
     'use strict';
 
-    M.require('pdfjs').tryCatch(function() {
-        var timeTag = 'pdfjs.' + makeUUID();
-
-        if (d) {
-            console.debug('Using pdf.js %s (%s)', PDFJS.version, PDFJS.build);
-            console.time(timeTag);
-        }
-
-        PDFJS.verbosity = d ? 10 : 0;
-        PDFJS.isEvalSupported = false;
-        PDFJS.workerSrc = (is_extension ? '' : '/') + 'pdf.worker.js';
-
-        PDFJS.getDocument(ab).then(function(pdf) {
-            pdf.getPage(1).then(function(page) {
-                var scale = 2.5;
-                var viewport = page.getViewport(scale);
-
-                // Prepare canvas using PDF page dimensions
-                var canvas = document.createElement('canvas');
-                var context = canvas.getContext('2d');
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-
-                // Render PDF page into canvas context
-                var renderContext = {
-                    canvasContext: context,
-                    viewport: viewport
-                };
-                var renderTask = page.render(renderContext);
-                renderTask.then(function() {
-                    ab = dataURLToAB(canvas.toDataURL('image/png'));
+    M.require('pdfjs').then(function() {
+        if (!PDFThumbHandler.q) {
+            PDFThumbHandler.q = function PDFThumbQueueHandler(task, done) {
+                var canvas;
+                var pdfTask;
+                var buffer = task[0];
+                var callback = task[1];
+                var tag = 'pdf-thumber.' + makeUUID();
+                var logger = PDFThumbHandler.q.logger;
+                var finish = function(buf) {
+                    if (done) {
+                        pdfTask.destroy().then(done).catch(done);
+                        done = null;
+                    }
 
                     if (d) {
-                        console.timeEnd(timeTag);
-                        console.log('pdf2img %sx%s (%s bytes)', canvas.width, canvas.height, ab.byteLength);
+                        console.timeEnd(tag);
                     }
-                    cb(ab);
-                    api_req({a: 'log', e: 99661, m: 'Generated PDF thumbnail.'});
+                    callback(buf);
+                };
+
+                if (d) {
+                    logger.info('[%s] Starting pdf thumbnail creation...', tag, buffer.byteLength);
+                    console.time(tag);
+                }
+
+                pdfTask = PDFJS.getDocument(buffer);
+                buffer = null;
+
+                pdfTask.then(function(pdf) {
+                    return pdf.getPage(1);
+                }).then(function(page) {
+                    var scale = 2.5;
+                    var viewport = page.getViewport(scale);
+
+                    // Prepare canvas using PDF page dimensions
+                    canvas = document.createElement('canvas');
+                    var context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    // Render PDF page into canvas context
+                    var renderContext = {
+                        viewport: viewport,
+                        canvasContext: context
+                    };
+
+                    return page.render(renderContext);
+                }).then(function() {
+                    var buffer = dataURLToAB(canvas.toDataURL('image/png'));
+
+                    if (d) {
+                        logger.log('[%s] pdf2img %sx%s (%s bytes)',
+                            tag, canvas.width, canvas.height, buffer.byteLength);
+                    }
+
+                    finish(buffer);
+                    eventlog(99661);// Generated PDF thumbnail.
+                }).catch(function(ex) {
+                    if (d) {
+                        logger.warn('[%s] Failed to create PDF thumbnail.', tag, ex);
+                    }
+                    finish();
                 });
-            });
-        });
+            };
+            PDFThumbHandler.q = new MegaQueue(PDFThumbHandler.q, mega.maxWorkers, 'pdf-thumber');
+
+            if (d) {
+                console.info('Using pdf.js %s (%s)', PDFJS.version, PDFJS.build);
+            }
+
+            PDFJS.verbosity = d ? 10 : 0;
+            PDFJS.isEvalSupported = false;
+            PDFJS.workerSrc = (is_extension ? '' : '/') + 'pdf.worker.js';
+        }
+        var q = PDFThumbHandler.q;
+
+        if (d) {
+            var bytes = q._queue.reduce(function(r, v) {
+                r += v[0][0].byteLength;
+                return r;
+            }, 0);
+            q.logger.debug('Queueing pdf thumbnail creation (%s waiting, %s bytes)', q._queue.length, bytes);
+        }
+        q.push([ab, cb]);
+        ab = cb = undefined;
+    }).catch(function(ex) {
+        if (d) {
+            console.warn(ex);
+        }
+        cb(null);
     });
 });
 

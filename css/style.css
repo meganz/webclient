@@ -1152,24 +1152,6 @@ a.account-manage-button:hover {
     text-overflow: ellipsis;
     overflow: hidden;
 }
-body.kr .chart.data .of-txt, body.kr .chart.data .pecents-txt, body.kr .chart.data .gb-txt {
-    font-size: 14px;
-    display: inline-block;
-    line-height: 20px;
-    float: left;
-}
-body.kr .chart.data .pecents-txt, body.kr .chart.data .gb-txt {
-    display: block;
-    margin-right: 4px;
-}
-body.kr .settings-banner .chart.data .pecents-txt, body.kr .settings-banner .chart.data .gb-txt {
-    display: inline-block;
-    margin-right: 0;
-}
-body.kr .settings-banner .chart.data .of-txt, body.kr .settings-banner .chart.data .pecents-txt, body.kr .settings-banner .chart.data .gb-txt {
-    float: none;
-    line-height: 22px;
-}
 .chart.data .perc-txt {
     font-size: 34px;
     line-height: 40px;
@@ -1208,9 +1190,6 @@ body.kr .settings-banner .chart.data .of-txt, body.kr .settings-banner .chart.da
     font-size: 18px;
     line-height: 26px;
     color: #333333;
-}
-body.kr .chart.data .size-txt {
-    font-size: 17px;
 }
 .chart.icon {
     position: absolute;
@@ -20899,6 +20878,21 @@ div.camera-bottom-txt {
     min-width: 84px;
     white-space: nowrap;
     left: -3px;
+}
+body.kr .chart.data .perc-txt {
+    display: block;
+    background-position-x: 15px;
+    background-repeat: no-repeat;
+    width: auto;
+}
+body.kr .fm-account-main .chart.data .perc-txt {
+    background-position-x: -10px;
+}
+body.kr .chart.data .of-txt {
+    margin-left: 3px;
+}
+body.kr .chart.data .size-txt {
+    font-size: 17px;
 }
 body.kr .account.chart.data {
     margin: 9px 0 0 74px;

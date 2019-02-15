@@ -771,11 +771,20 @@ mBroadcaster.once('startMega', function populate_l() {
     l[20193] = l[20193].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20194] = l[20194].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20195] = l[20195].replace('[B]', '<b>').replace('[/B]', '</b>');
+    if (is_mobile) {
+        l[20197] = l[20197].replace('[S1]', '<span class="used">').replace('[/S1]', '</span>\n').replace('[S2]', '')
+            .replace('[/S2]', '\n').replace('[S3]', '<span class="total">').replace('[/S3]', '</span>\n') + '<br>';
+    }
+    else {
+        l[20197] = l[20197].replace('[S1]', '<span class="size-txt">').replace('[/S1]', '</span>')
+            .replace('[S2]', '<span class="of-txt">').replace('[/S2]', '</span>\n')
+            .replace('[S3]', '<span class="pecents-txt">').replace('[/S3]', '</span>\n<span class="gb-txt">GB</span>')
+            .replace('$1', '0 MB').replace('$2', '0');
+    }
     l[20206] = l[20206].replace('[S1]', '<span class="content-txt">').replace('[/S1]', '</span>')
         .replace('[S2]', '<span class="content-txt">').replace('[/S2]', '</span>')
         .replace('%1',
             '<span class="account-counter-number short"><input type="text" value="100" id="autoaway"></span>');
-
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

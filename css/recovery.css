@@ -11,19 +11,22 @@
 }
 .improved-recovery-steps h3.main-italic-header, .improved-recovery-steps h2, .improved-recovery-steps.backup-recover h3.main-italic-header  {
     font-family:'LatoWeb', 'source_sans_proregular', Arial;
-    font-size: 16px;
     color: #aaa;
-    padding: 0 0;
-    -webkit-margin-before: 0em;
-    -webkit-margin-after: 0em;
-    margin: 0 0;
     text-align: center;
+    min-height: 38px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    line-height: 24px;
 }
 .park-account-dialog .improved-recovery-steps h3.main-italic-header {
     width: 560px;
     margin: 0 auto 24px;
 }
-
 .improved-recovery-steps .info-block h3.main-italic-header, .improved-recovery-steps .app-instruction-block h3.main-italic-header {
     padding: 0 0;
 }
@@ -58,10 +61,8 @@
     font-size: 20px;
     color: #495057;
     line-height: 30px;
-    -webkit-margin-before: 12px;
-    -webkit-margin-after: 20px;
-    -webkit-margin-start: 0px;
-    -webkit-margin-end: 0px;
+    margin: 0;
+    padding: 20px 0;
     text-align: center;
 }
 .improved-recovery-steps .recover-image-block {
@@ -94,14 +95,11 @@
 .improved-recovery-steps .content-wrapper, .backup-recover.withkey .content-wrapper  {
     position: relative;
     width: 580px;
-    min-height: 420px;
-    margin-bottom: 40px;
-    margin: 24px auto 40px;
+    margin: 0 auto 42px auto;
 }
 .backup-recover .content-wrapper.hasButton {
     padding-bottom: 88px;
 }
-
 .improved-recovery-steps .content-wrapper p span {
     font-family: 'source_sans_probold';
     color: #F57223;

@@ -7572,7 +7572,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     color: #495057;
 }
 .mobile .improved-recovery-steps strong {
-    font-family: 'LatoWebSemibold', 'source_sans_probold', Arial
+    font-family: 'LatoWebSemibold', 'source_sans_probold', Arial;
     color: #333;
     font-weight: initial;
 }
@@ -9260,8 +9260,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     -ms-overflow-style: none;
     overflow: -moz-scrollbars-none;
 }
-.mobile .horizontal-plans.bottom-page.horizontal-centered-bl::-webkit-scrollbar { 
-    width: 0 !important 
+.mobile .horizontal-plans.bottom-page.horizontal-centered-bl::-webkit-scrollbar {
+    width: 0 !important
 }
 /* End */
 
@@ -10291,7 +10291,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         -ms-transform: scale(0.75);
         -o-transform: scale(0.75);
         transform: scale(0.75);
-    } 
+    }
 }
 
 

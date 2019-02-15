@@ -423,7 +423,7 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     overflow: hidden;
 }
 .bottom-page.grey-blue-block {
-    background: #F0F3F5; 
+    background: #F0F3F5;
     background-image: linear-gradient(to bottom, #F0F3F5 0%, #FFFFFF 100%);
     background: -moz-linear-gradient(top, #F0F3F5 0%, #FFFFFF 100%);
     background: -webkit-linear-gradient(top, #F0F3F5 0%, #FFFFFF 100%);
@@ -761,7 +761,7 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
 }
 .bottom-page.right-cell-65 {
     width: 65%;
-    vertical-align: middle; 
+    vertical-align: middle;
 }
 .bottom-page.cell-40 .half-sized-cell {
     max-width: 388px;
@@ -2239,7 +2239,7 @@ height: 56px;
     text-align: left;
     max-width: none;
     padding: 0 0;
-} 
+}
 .uwp .bottom-page.half-sized-cell {
     max-width: none;
 }
@@ -3209,7 +3209,7 @@ height: 56px;
 }
 .bottom-page.img.mobile01 {
     width: 100%;
-    max-width: 515px;   
+    max-width: 515px;
 }
 .bottom-page.img.mobile02 {
     width: 100%;
@@ -3222,11 +3222,11 @@ height: 56px;
 }
 .bottom-page.img.mobile04 {
     width: 100%;
-    max-width: 613px;   
+    max-width: 613px;
 }
 .bottom-page.img.mobile05 {
     width: 188%;
-    max-width: 1092px;   
+    max-width: 1092px;
 }
 .bottom-page.big-icon.green-mobile {
 	background-position: -70px -3394px;
@@ -3707,7 +3707,7 @@ a.opensource-icon-txt.coming-soon {
     -o-transition: all 100ms ease-in-out;
     -ms-transition: all 100ms ease-in-out;
     transition: all 100ms ease-in-out;
-} 
+}
 .onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-mega {
     background-position: -260px -7px;
     width: 80px;
@@ -3742,7 +3742,7 @@ a.opensource-icon-txt.coming-soon {
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow.visible { 
+.onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow.visible {
     -webkit-animation: downward-arrow 2s infinite ease-in-out; /* Safari 4+ */
     -moz-animation:    downward-arrow 2s infinite ease-in-out; /* Fx 5+ */
     -o-animation:      downward-arrow 2s infinite ease-in-out; /* Opera 12+ */
@@ -3947,7 +3947,7 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .top-description.mobile-download, .onboarding-suggestions .top-dark-info.medium.mobile-download, .onboarding-suggestions a.fm-avatar {
     display: none;
-} 
+}
 .onboarding-suggestions a.logo {
     cursor: default;
 }
@@ -3986,7 +3986,7 @@ a.opensource-icon-txt.coming-soon {
     background-size: 308px auto;
 }
 .bottom-page .security-illustration, .bottom-page.password-manager-app-select .app-link-icon {
-    background-image: url(../images/mega/bottom-page/security-page-v1@2x.png);    
+    background-image: url(../images/mega/bottom-page/security-page-v1@2x.png);
     background-size: 750px auto;
 }
 .onboarding-suggestions .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after  {
@@ -4639,7 +4639,7 @@ body:not(.en) .pages-nav.content-block .nav-button {
     font-size: 16px;
 }
 .uwp .advertise-chat .mobile-apps-button.red:first-of-type {
-    margin-right: 8px 
+    margin-right: 8px;
 }
 .uwp .bottom-page.medium-txt.lato {
     line-height: 28px;

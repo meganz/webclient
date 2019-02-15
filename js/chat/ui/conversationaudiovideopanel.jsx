@@ -680,7 +680,10 @@ var ConversationAudioVideoPanel = React.createClass({
                                 <div className="small-icon icon-audio-muted hidden"></div>
 
                         }
-                        <ContactsUI.Avatar contact={contact}  className="avatar-wrapper"
+                        <ContactsUI.Avatar contact={contact}  className="avatar-wrapper" simpletip={contact.name}
+                                           simpletipWrapper="#call-block"
+                                           simpletipOffset={8}
+                                           simpletipPosition="top"
                                            hideVerifiedBadge={true} />
                     </div>
                 </div>;

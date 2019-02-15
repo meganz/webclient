@@ -669,8 +669,8 @@ var GenericConversationMessage = React.createClass({
                     }
                     else {
                         avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
-                        datetime = <div className="message date-time"
-                                        title={time2date(timestampInt)}>{timestamp}</div>;
+                        datetime = <div className="message date-time simpletip"
+                                        data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
                         name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
                     }
 
@@ -884,8 +884,8 @@ var GenericConversationMessage = React.createClass({
                     }
                     else {
                         avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
-                        datetime = <div className="message date-time"
-                                        title={time2date(timestampInt)}>{timestamp}</div>;
+                        datetime = <div className="message date-time simpletip"
+                                        data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
                         name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
                     }
 
@@ -1058,8 +1058,8 @@ var GenericConversationMessage = React.createClass({
                 }
                 else {
                     avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
-                    datetime = <div className="message date-time"
-                                    title={time2date(timestampInt)}>{timestamp}</div>;
+                    datetime = <div className="message date-time simpletip"
+                                    data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
                     name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
                 }
 
@@ -1351,6 +1351,7 @@ var GenericConversationMessage = React.createClass({
                                 <ContactsUI.Avatar
                                     key={handle}
                                     contact={M.u[handle]}
+                                    simpletip={M.u[handle] && M.u[handle].name}
                                     className="message avatar-wrapper small-rounded-avatar"
                                 />
                             );
@@ -1377,7 +1378,9 @@ var GenericConversationMessage = React.createClass({
 
                     <div className="message content-area">
                         {name}
-                        <div className="message date-time">{timestamp}</div>
+                        <div className="message date-time simpletip" data-simpletip={time2date(timestampInt)}>
+                            {timestamp}
+                        </div>
 
                         <div className="message text-block">
                             <div className="message call-inner-block">

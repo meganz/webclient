@@ -289,3 +289,19 @@
     min-height: 312px;
 }
 /* End of Emoji one popup */
+
+/* simpletip */
+.dark-direct-tooltip.simpletip-tooltip {
+    display: block;
+    position: absolute;
+    z-index: 1;
+}
+.dark-direct-tooltip.simpletip-tooltip.simpletip-v-b {
+    margin-top: 5px;
+}
+.dark-direct-tooltip.simpletip-tooltip.simpletip-v-b i {
+    bottom: 34px;
+    -webkit-transform: rotate(180deg) !important;
+    transform: rotate(180deg) !important;
+}
+

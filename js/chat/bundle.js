@@ -4882,6 +4882,8 @@ React.makeElement = React['createElement'];
 
 	"use strict";
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var React = __webpack_require__(2);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var RenderDebugger = __webpack_require__(6).RenderDebugger;
@@ -5298,14 +5300,29 @@ React.makeElement = React['createElement'];
 	            });
 	        }
 
+	        var extraProps = {};
+	        if (this.props.simpletip) {
+	            classes += " simpletip";
+	            extraProps['data-simpletip'] = this.props.simpletip;
+	            if (this.props.simpletipWrapper) {
+	                extraProps['data-simpletipwrapper'] = this.props.simpletipWrapper;
+	            }
+	            if (this.props.simpletipOffset) {
+	                extraProps['data-simpletipoffset'] = this.props.simpletipOffset;
+	            }
+	            if (this.props.simpletipPosition) {
+	                extraProps['data-simpletipposition'] = this.props.simpletipPosition;
+	            }
+	        }
 	        if (avatarMeta.type === "image") {
 	            displayedAvatar = React.makeElement(
 	                "div",
-	                { className: classes, style: this.props.style,
+	                _extends({ className: classes, style: this.props.style
+	                }, extraProps, {
 	                    onClick: self.props.onClick ? function (e) {
 	                        $(document).trigger('closeDropdowns');
 	                        self.props.onClick(e);
-	                    } : self.onClick },
+	                    } : self.onClick }),
 	                verifiedElement,
 	                React.makeElement("img", { src: avatarMeta.avatar, style: this.props.imgStyles })
 	            );
@@ -5314,11 +5331,12 @@ React.makeElement = React['createElement'];
 
 	            displayedAvatar = React.makeElement(
 	                "div",
-	                { className: classes, style: this.props.style,
+	                _extends({ className: classes, style: this.props.style
+	                }, extraProps, {
 	                    onClick: self.props.onClick ? function (e) {
 	                        $(document).trigger('closeDropdowns');
 	                        self.props.onClick(e);
-	                    } : self.onClick },
+	                    } : self.onClick }),
 	                verifiedElement,
 	                React.makeElement(
 	                    "span",
@@ -12380,8 +12398,8 @@ React.makeElement = React['createElement'];
 	                        avatar = React.makeElement(ContactsUI.Avatar, { contact: contact, className: 'message avatar-wrapper small-rounded-avatar' });
 	                        datetime = React.makeElement(
 	                            'div',
-	                            { className: 'message date-time',
-	                                title: time2date(timestampInt) },
+	                            { className: 'message date-time simpletip',
+	                                'data-simpletip': time2date(timestampInt) },
 	                            timestamp
 	                        );
 	                        name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: 'message', label: displayName });
@@ -12597,8 +12615,8 @@ React.makeElement = React['createElement'];
 	                        avatar = React.makeElement(ContactsUI.Avatar, { contact: contact, className: 'message avatar-wrapper small-rounded-avatar' });
 	                        datetime = React.makeElement(
 	                            'div',
-	                            { className: 'message date-time',
-	                                title: time2date(timestampInt) },
+	                            { className: 'message date-time simpletip',
+	                                'data-simpletip': time2date(timestampInt) },
 	                            timestamp
 	                        );
 	                        name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: 'message', label: displayName });
@@ -12758,8 +12776,8 @@ React.makeElement = React['createElement'];
 	                    avatar = React.makeElement(ContactsUI.Avatar, { contact: contact, className: 'message avatar-wrapper small-rounded-avatar' });
 	                    datetime = React.makeElement(
 	                        'div',
-	                        { className: 'message date-time',
-	                            title: time2date(timestampInt) },
+	                        { className: 'message date-time simpletip',
+	                            'data-simpletip': time2date(timestampInt) },
 	                        timestamp
 	                    );
 	                    name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: 'message', label: displayName });
@@ -13004,6 +13022,7 @@ React.makeElement = React['createElement'];
 	                            avatarsListing.push(React.makeElement(ContactsUI.Avatar, {
 	                                key: handle,
 	                                contact: M.u[handle],
+	                                simpletip: M.u[handle] && M.u[handle].name,
 	                                className: 'message avatar-wrapper small-rounded-avatar'
 	                            }));
 	                        }
@@ -13028,7 +13047,7 @@ React.makeElement = React['createElement'];
 	                    name,
 	                    React.makeElement(
 	                        'div',
-	                        { className: 'message date-time' },
+	                        { className: 'message date-time simpletip', 'data-simpletip': time2date(timestampInt) },
 	                        timestamp
 	                    ),
 	                    React.makeElement(
@@ -13647,8 +13666,8 @@ React.makeElement = React['createElement'];
 
 	        var datetime = React.makeElement(
 	            "div",
-	            { className: "message date-time",
-	                title: time2date(timestampInt) },
+	            { className: "message date-time simpletip",
+	                "data-simpletip": time2date(timestampInt) },
 	            timestamp
 	        );
 
@@ -13767,8 +13786,8 @@ React.makeElement = React['createElement'];
 
 	        var datetime = React.makeElement(
 	            "div",
-	            { className: "message date-time",
-	                title: time2date(timestampInt) },
+	            { className: "message date-time simpletip",
+	                "data-simpletip": time2date(timestampInt) },
 	            timestamp
 	        );
 
@@ -13787,8 +13806,8 @@ React.makeElement = React['createElement'];
 	                className: "message avatar-wrapper small-rounded-avatar" });
 	            datetime = React.makeElement(
 	                "div",
-	                { className: "message date-time",
-	                    title: time2date(timestampInt) },
+	                { className: "message date-time simpletip",
+	                    "data-simpletip": time2date(timestampInt) },
 	                timestamp
 	            );
 	            name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: "message", label: displayName });
@@ -13849,8 +13868,8 @@ React.makeElement = React['createElement'];
 
 	        var datetime = React.makeElement(
 	            "div",
-	            { className: "message date-time",
-	                title: time2date(timestampInt) },
+	            { className: "message date-time simpletip",
+	                "data-simpletip": time2date(timestampInt) },
 	            timestamp
 	        );
 
@@ -13941,8 +13960,8 @@ React.makeElement = React['createElement'];
 
 	        var datetime = React.makeElement(
 	            "div",
-	            { className: "message date-time",
-	                title: time2date(timestampInt) },
+	            { className: "message date-time simpletip",
+	                "data-simpletip": time2date(timestampInt) },
 	            timestamp
 	        );
 
@@ -15063,7 +15082,10 @@ React.makeElement = React['createElement'];
 	                        "div",
 	                        { className: "center-avatar-wrapper" },
 	                        callManagerCall.getRemoteMediaOptions(sessionId).audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
-	                        React.makeElement(ContactsUI.Avatar, { contact: contact, className: "avatar-wrapper",
+	                        React.makeElement(ContactsUI.Avatar, { contact: contact, className: "avatar-wrapper", simpletip: contact.name,
+	                            simpletipWrapper: "#call-block",
+	                            simpletipOffset: 8,
+	                            simpletipPosition: "top",
 	                            hideVerifiedBadge: true })
 	                    )
 	                );

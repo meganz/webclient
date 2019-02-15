@@ -14,10 +14,14 @@ function init_start() {
     });
 
     if (u_type > 0) {
-        $('.startpage.register').text(l[164]);
+        $('.startpage.register:not(.business-reg)').text(l[164]);
         $('.startpage.register').rebind('click', function () {
             loadSubPage('fm');
         });
+
+        if (u_type === 3) {
+            $('.business-reg').addClass('hidden').off('click');
+        }
 
         $('.startpage.try-mega').text(l[187]);
         $('.startpage.try-mega').rebind('click', function () {

@@ -80,8 +80,8 @@
     -ms-transition: background-color 200ms ease-in-out;
     transition: background-color 200ms ease-in-out;
 }
-.startpage.button-48-height {
-
+.startpage.button-48-height.hidden {
+    display: none;
 }
 .startpage.button-48-height:hover {
     background-color: #666666;

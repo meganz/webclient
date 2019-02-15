@@ -416,8 +416,23 @@ var Avatar = React.createClass({
                 });
         }
 
+        var extraProps = {};
+        if (this.props.simpletip) {
+            classes += " simpletip";
+            extraProps['data-simpletip'] = this.props.simpletip;
+            if (this.props.simpletipWrapper) {
+                extraProps['data-simpletipwrapper'] = this.props.simpletipWrapper;
+            }
+            if (this.props.simpletipOffset) {
+                extraProps['data-simpletipoffset'] = this.props.simpletipOffset;
+            }
+            if (this.props.simpletipPosition) {
+                extraProps['data-simpletipposition'] = this.props.simpletipPosition;
+            }
+        }
         if(avatarMeta.type === "image") {
             displayedAvatar = <div className={classes} style={this.props.style}
+                    {...extraProps}
                     onClick={self.props.onClick ? (e) => {
                         $(document).trigger('closeDropdowns');
                         self.props.onClick(e);
@@ -429,6 +444,7 @@ var Avatar = React.createClass({
             classes += " color" + avatarMeta.avatar.colorIndex;
 
             displayedAvatar = <div className={classes} style={this.props.style}
+                    {...extraProps}
                     onClick={self.props.onClick ? (e) => {
                         $(document).trigger('closeDropdowns');
                         self.props.onClick(e);

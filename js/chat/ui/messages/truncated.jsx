@@ -22,8 +22,8 @@ var TruncatedMessage = React.createClass({
 
 
 
-        var datetime = <div className="message date-time"
-                                       title={time2date(timestampInt)}>{timestamp}</div>;
+        var datetime = <div className="message date-time simpletip"
+                            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
 
         var displayName;
         if (contact) {
@@ -40,8 +40,8 @@ var TruncatedMessage = React.createClass({
         else {
             avatar = <ContactsUI.Avatar contact={contact}
                                         className="message avatar-wrapper small-rounded-avatar"/>;
-            datetime = <div className="message date-time"
-                            title={time2date(timestampInt)}>{timestamp}</div>;
+            datetime = <div className="message date-time simpletip"
+                            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
             name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
         }
 

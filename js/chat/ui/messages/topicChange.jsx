@@ -22,8 +22,8 @@ var TopicChange = React.createClass({
 
 
 
-        var datetime = <div className="message date-time"
-                                       title={time2date(timestampInt)}>{timestamp}</div>;
+        var datetime = <div className="message date-time simpletip"
+                            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
 
         var displayName;
         if (contact) {

@@ -1918,6 +1918,8 @@ else if (!b_u) {
     jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
     jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
 
+    jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
+
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});

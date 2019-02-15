@@ -414,7 +414,7 @@
 #help2-main .first-search-section {
     height: 240px;
     background-color: #f44;
-    min-width: 1024px;  
+    min-width: 1024px;
     }
 #help2-main .first-search-section .section-title{
     font-family: 'source_sans_prolight';
@@ -2885,7 +2885,7 @@
 }
 
 @media (min-width: 1600px) and (max-width: 2880px) {
-    
+
     #help2-main .popular-question-block {
         padding-left: 20%;
         padding-right: 20%;
@@ -3100,7 +3100,7 @@
         margin: 24px auto 16px;
     }
 }
-@media (min-width: 376px) and (max-width: 480px) { 
+@media (min-width: 376px) and (max-width: 480px) {
     body {
         min-width: 376px;
     }
@@ -3272,7 +3272,7 @@
         margin: auto;
         text-align: center;
         color: #fff;
-        opacity: 0.6
+        opacity: 0.6;
         font-size: 15px;
         cursor: pointer;
     }
@@ -3319,7 +3319,7 @@
         width: inherit;
     }
     #help2-main .main-content-pad {
-        margin-left:0px; 
+        margin-left:0px;
         min-width: 376px;
         max-width: 480px;
         width: 100%;
@@ -3336,7 +3336,7 @@
         max-width: 480px;
         padding-left: 0px;
         padding-right: 0px;
-        margin: 0 auto 16px;   
+        margin: 0 auto 16px;
         padding-bottom: 0px;
         border-top: 1px solid #eee;
     }
@@ -3440,7 +3440,7 @@
         margin: 0px auto 0px;
     }
     #help2-main .support-interaction {
-    float: right;   
+    float: right;
     margin: -12px 32px 24px 32px;
     }
     #help2-main .support-link-icon {
@@ -3504,7 +3504,7 @@
         font-family: 'source_sans_proregular';
     }
     #help2-main .selected-bullet {
-        
+
     }
     #help2-main .support-article-info li {
         line-height: 26px;
@@ -4292,7 +4292,7 @@
         display: block;
     }
     #help2-main .block-webclient, #help2-main .block-megasync, #help2-main .block-megachat, #help2-main .block-mobile {
-        margin: 26px 20px 12px 24px; 
+        margin: 26px 20px 12px 24px;
         width: 50px;
         height: 50px;
         display: none;

@@ -415,7 +415,7 @@
     display: inline-block;
     vertical-align: top;
 }
-.settings-banner .chart.data .pecents-txt, 
+.settings-banner .chart.data .pecents-txt,
 .settings-banner .chart.data .gb-txt {
     font-family: 'LatoWebLight', 'source_sans_proregular', Arial;
     display: inline-block;
@@ -446,8 +446,8 @@
     position: absolute;
     width: 100%;
     height: 1px;
-    left: : 0px;
-    bottom: 0px;
+    left: 0;
+    bottom: 0;
     background-color: rgba(0,0,0,0.1);
 }
 .settings-left-block {
@@ -494,8 +494,8 @@
     position: absolute;
     width: 100%;
     height: 1px;
-    left: : 0px;
-    bottom: 0px;
+    left: 0;
+    bottom: 0;
     background-color: rgba(0,0,0,0.1);
 }
 .fm-right-account-block .default-white-button {
@@ -627,7 +627,7 @@
 .dialog-input-title-ontop.active::after{
     background-color: rgba(0,0,0,0.6);
 }
- 
+
 .dialog-input-title-ontop.error::after{
     background-color: rgba(217,0,7,0.5);
 }
@@ -910,27 +910,27 @@
     word-wrap: break-word;
     vertical-align: top;
 }
-.fm-right-account-block .grid-table tr th:first-child, 
+.fm-right-account-block .grid-table tr th:first-child,
 .fm-right-account-block .grid-table tr td:first-child {
     padding-left: 12px;
 }
 .fm-right-account-block .grid-table.megadrop tr th:first-child {
     line-height: 24px;
 }
-.fm-right-account-block .grid-table.megadrop tr th:first-child, 
+.fm-right-account-block .grid-table.megadrop tr th:first-child,
 .fm-right-account-block .grid-table.megadrop tr td:first-child {
     width: 124px;
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
     box-sizing: content-box;
     position: relative;
-} 
-.fm-right-account-block .grid-table.megadrop tr th:nth-child(3), 
+}
+.fm-right-account-block .grid-table.megadrop tr th:nth-child(3),
 .fm-right-account-block .grid-table.megadrop tr td:nth-child(3) {
     width: 80px;
     overflow: visible;
     line-height: 0;
-} 
+}
 .fm-right-account-block .grid-table .grid-table-empty, .fm-right-account-block .grid-table.megadrop td.grid-table-empty {
     text-align: center;
     padding:8px;
@@ -940,10 +940,10 @@
 .fm-right-account-block .checkboxOn {
     margin:0;
 }
-.fm-account-security .register-pass-status-line1, 
-.fm-account-security .register-pass-status-line2, 
-.fm-account-security .register-pass-status-line3, 
-.fm-account-security .register-pass-status-line4, 
+.fm-account-security .register-pass-status-line1,
+.fm-account-security .register-pass-status-line2,
+.fm-account-security .register-pass-status-line3,
+.fm-account-security .register-pass-status-line4,
 .fm-account-security .register-pass-status-line5 {
     width: 41px;
     height: 4px;
@@ -1225,7 +1225,7 @@
 }
 .list-2col-heading .default-button-no-border {
     float: right;
-    padding-right: 24px; 
+    padding-right: 24px;
     display: inline-block;
 }
 .list-2col-heading .default-button-no-border .icon {
@@ -1372,10 +1372,10 @@
 .fm-account-main.low-width .settings-right-block .dialog-input-title-ontop {
     width: 250px;
 }
-.fm-account-main.low-width .fm-account-security .register-pass-status-line1, 
-.fm-account-main.low-width .fm-account-security .register-pass-status-line2, 
-.fm-account-main.low-width .fm-account-security .register-pass-status-line3, 
-.fm-account-main.low-width .fm-account-security .register-pass-status-line4, 
+.fm-account-main.low-width .fm-account-security .register-pass-status-line1,
+.fm-account-main.low-width .fm-account-security .register-pass-status-line2,
+.fm-account-main.low-width .fm-account-security .register-pass-status-line3,
+.fm-account-main.low-width .fm-account-security .register-pass-status-line4,
 .fm-account-main.low-width .fm-account-security .register-pass-status-line5 {
     width: 46px;
 }

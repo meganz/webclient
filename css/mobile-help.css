@@ -9,34 +9,16 @@
 
 .help-home-page .main-mid-pad {
     width:100%;
-    position: relative; 
+    position: relative;
     padding-top: 0px;
 }
-/* Scrollable Search 
-.search-section{
-    display: none;
-    position: fixed;
-    width: 100%;
-    top: 0px;
-    left: 0;
-    height: 240px;
-    /* Rectangle 2567: 
-    background-image: linear-gradient(0deg, rgba(250,250,250,0.88) 0%, #FAFAFA 10%);
-    z-index: 99;
-}*/
-/*
-.search-section .section-title{
-    margin-top: 130px;
-}
-*/
-/*Colins CSS changes*/
+
 /* fixed sidebar applied dynamtically with JS */
 .help-home-page .help-background-block {
     position: absolute;
     display: block;
     width: 100%;
     background-color: #f44;
-    /*background-image: linear-gradient(-180deg, #f4f4f4 70%, #fafafa 100%);*/
     height: 240px;
 }
 #help2-main .first-search-section {
@@ -58,13 +40,7 @@
     left: 0;
     right: 0;
     background-color: #fff;
-    /*background-image: linear-gradient(0deg, rgba(250,250,250,0.36) 0%, #FAFAFA 24%);*/
     bottom: 0;
-    /*
-    position: fixed;
-    background-image: linear-gradient(-180deg, #f4f4f4 70%, #fafafa 100%);
-    background-image: linear-gradient(0deg, rgba(250,250,250,0.00) 100%, #F2F2F2 80%);
-    */
 }
 #help2-main .search-close {
     height: 48px;
@@ -1910,8 +1886,8 @@
     color: #666;
     cursor: pointer;
     margin-bottom: 24px;
-    letter-spacing: 0.1px
-    transition-property:color, textDecoration;
+    letter-spacing: 0.1px;
+    transition-property: color, textDecoration;
     -moz-transition-property: color, textDecoration; /* Firefox 4 */
     -webkit-transition-property: color, textDecoration; /* Safari and Chrome */
     -o-transition-property: color, textDecoration; /* Opera */
@@ -2844,7 +2820,7 @@
         }
         #help2-main .section-title {
             font-size: 44px;
-            padding-top:0px; 
+            padding-top:0px;
         }
         #help2-main .search-section-header .popular-question-list:nth-child(2), #help2-main .popular-question-list:nth-child(2) {
             float: right;
@@ -2939,7 +2915,7 @@
     }
     #help2-main .section-title {
         font-size: 44px;
-        padding-top:0px; 
+        padding-top:0px;
     }
     #help2-main .main-title-section {
         margin-bottom: 0px;
@@ -3031,12 +3007,12 @@
         margin-top: 0px;
     }
     #help2-main .support-interaction {
-        float: right;   
+        float: right;
         margin: -12px 32px 24px 32px;
         display: none;
     }
     #help2-main .support-interaction {
-        float: right;   
+        float: right;
         margin: -12px 32px 24px 32px;
         display: none;
     }
@@ -3114,7 +3090,7 @@
     }
     #help2-main .section-title {
         font-size: 44px;
-        padding-top:0px; 
+        padding-top:0px;
     }
     #help2-main .support-article, #help2-main .d-section-container {
         width: calc(100% - 136px);
@@ -3165,7 +3141,7 @@
         width: 100%;
     }
     #help2-main .support-interaction {
-        float: right;   
+        float: right;
         margin: -12px 32px 24px 32px;
         display: none;
     }
@@ -3256,7 +3232,7 @@
         margin: 24px auto 16px;
     }
 }
-@media (min-width: 376px) and (max-width: 480px) { 
+@media (min-width: 376px) and (max-width: 480px) {
     body {
         min-width: 376px;
     }
@@ -3361,7 +3337,7 @@
     }
     #help2-main .block:nth-child(odd) {
         border-right: 1px solid #eee;
-    } 
+    }
     #help2-main .block-webclient, #help2-main .block-megasync, #help2-main .block-megachat, #help2-main .block-mobile, #help2-main .block-webclient, #help2-main .block-web-client, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop, #help2-main .block-android, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone, #help2-main .block-uwp, #help2-main .block-cmd {
         margin: 24px auto -6px;
     }
@@ -3421,7 +3397,7 @@
         margin: auto;
         text-align: center;
         color: #fff;
-        opacity: 0.6
+        opacity: 0.6;
         font-size: 15px;
         cursor: pointer;
     }
@@ -3450,7 +3426,7 @@
     }
     #help2-main .popular-question-items li {
         font-size: 15px;
-        margin: 0 0 16 0;
+        margin: 0 0 16px 0;
     }
     #help2-main .popular-question-list:nth-child(2) {
         display: none;
@@ -3468,7 +3444,7 @@
         width: inherit;
     }
     #help2-main .main-content-pad {
-        margin-left:0px; 
+        margin-left:0px;
         min-width: 376px;
         max-width: 480px;
         width: 100%;
@@ -3484,7 +3460,7 @@
         max-width: 480px;
         padding-left: 0px;
         padding-right: 0px;
-        margin: -12px auto 30px auto;   
+        margin: -12px auto 30px auto;
         padding-bottom: 20px;
         border-top: 1px solid #eee;
     }
@@ -3581,7 +3557,7 @@
         margin: 0px auto 0px;
     }
     #help2-main .support-interaction {
-        float: right;   
+        float: right;
         margin: -12px 32px 24px 32px;
         display: none;
     }
@@ -3646,7 +3622,7 @@
         font-family: 'source_sans_proregular';
     }
     #help2-main .selected-bullet {
-        
+
     }
     #help2-main .support-article-info li {
         line-height: 26px;
@@ -3878,7 +3854,7 @@
         max-width: 390px;
         padding-left: 0px;
         padding-right: 0px;
-        margin: -12px auto 30px auto;   
+        margin: -12px auto 30px auto;
         padding-bottom: 20px;
         border-top: 1px solid #eee;
         box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.08);
@@ -4436,14 +4412,14 @@
     }
     #help2-main .block:nth-child(odd) {
         border-right: 1px solid #eee;
-    } 
+    }
     #help2-main .block-heading {
         font-size: 15px;
         color: #939DA3;
         display: block;
     }
     #help2-main .block-webclient, #help2-main .block-megasync, #help2-main .block-megachat, #help2-main .block-mobile, #help2-main .block-webclient, #help2-main .block-web-client, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop, #help2-main .block-android, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone, #help2-main .block-uwp, #help2-main .block-cmd {
-        margin: 26px auto -6px; 
+        margin: 26px auto -6px;
         width: 100px;
         height: 100px;
         background-size: 250px 700px;
@@ -4664,7 +4640,7 @@
     }
 
 }
-@media (min-width: 768px) and (max-width: 2000px) and (orientation: landscape) { 
+@media (min-width: 768px) and (max-width: 2000px) and (orientation: landscape) {
     #help2-main .mobile-support-image-container .nav-dots-container {
     width: 100%;
     position: absolute;
@@ -4736,8 +4712,8 @@
     display: block;
     line-height: 20px;
     background-image: none;
-    border-radius: 0
-    transition-property:border-radius, box-shadow, background-image, background-color;
+    border-radius: 0;
+    transition-property: border-radius, box-shadow, background-image, background-color;
     -moz-transition-property: border-radius, box-shadow, background-image, background-color; /* Firefox 4 */
     -webkit-transition-property: border-radius, box-shadow, background-image, background-color; /* Safari and Chrome */
     -o-transition-property: border-radius, box-shadow, background-image, background-color; /* Opera */

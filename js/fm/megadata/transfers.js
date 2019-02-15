@@ -1014,7 +1014,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
     'use strict'; /* jshint -W074 */
 
     // check if this is a business expired account
-    if (u_attr.b && u_attr.b.s === -1) {
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
         M.require('businessAcc_js', 'businessAccUI_js').done(function() {
             var business_ui = new BusinessAccountUI();
             business_ui.showExpiredDialog(u_attr.b.m);

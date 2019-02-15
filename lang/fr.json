@@ -2061,7 +2061,7 @@
     "18315": "Toquez sur les trois points horizontaux en bas \u00e0 droite.",
     "18316": "Saisissez votre nouveau mot de passe, confirmez-le et toquez sur [B]Termin\u00e9[\/B].",
     "18322": "Espace de stockage en prime",
-    "18323": "Quota de transfert en prime",
+    "18323": "Transfert en prime",
     "18340": "Sauvegarder la cl\u00e9 de r\u00e9cup\u00e9ration",
     "18347": "Cochez toutes les cases pour continuer",
     "18419": "Saisissez votre nouveau mot de passe, confirmez-le et cliquez sur [B]Valider[\/B].",
@@ -3249,8 +3249,14 @@
     "20401": "Votre compte d\u2019entreprise est expir\u00e9",
     "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
     "20403": "Payer et r\u00e9activer le compte",
-    "20404": "Congratulations! You\u2019ve just unlocked:",
-    "20405": "storage bonus",
-    "20406": "transfer bonus",
-    "20407": "Valid days:"
+    "20404": "F\u00e9licitations\u2009! Vous venez de d\u00e9verrouiller\u00a0:",
+    "20405": "d\u2019espace de stockage en prime",
+    "20406": "de transfert en prime",
+    "20407": "Jours de validit\u00e9\u00a0:",
+    "20408": "Nous avons surclass\u00e9 votre compte %1 vers l\u2019[B]abonnement %2 pour %3[\/B]\u2009!",
+    "20409": "V\u00e9rification par texto",
+    "20410": "Pour profiter de MEGA au maximum, nous vous recommandons de t\u00e9l\u00e9charger notre appli mobile. [A]Apprenez-en davantage[\/A].",
+    "20411": "Une fois votre num\u00e9ro de t\u00e9l\u00e9phone mobile v\u00e9rifi\u00e9, vos contacts pourront plus facilement vous trouver sur MEGA.",
+    "20412": "Redeem Promo Code",
+    "20413": "Enter your %1 code below:"
 }

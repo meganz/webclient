@@ -2061,7 +2061,7 @@
     "18315": "Sa\u011f alttaki \u00fc\u00e7 yatay noktaya bas\u0131n.",
     "18316": "Yeni parolan\u0131z\u0131 girin, onaylay\u0131n ve [B]Tamamland\u0131[\/B] tu\u015funa bas\u0131n.",
     "18322": "Bonus depolama",
-    "18323": "Bonus aktarma kotas\u0131",
+    "18323": "Bonus aktar\u0131m\u0131",
     "18340": "Kurtarma Anahtar\u0131n\u0131 yedekle",
     "18347": "Devam etmek i\u00e7in her kutuyu i\u015faretleyin",
     "18419": "Yeni parolan\u0131z\u0131 girin, onaylay\u0131n ve [B]TAMAM[\/B] tu\u015funa bas\u0131n.",
@@ -3249,8 +3249,14 @@
     "20401": "\u0130\u015fletme hesab\u0131n\u0131z\u0131n s\u00fcresi doldu",
     "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
     "20403": "\u00d6de ve Hesab\u0131 Yeniden Etkinle\u015ftir",
-    "20404": "Congratulations! You\u2019ve just unlocked:",
-    "20405": "storage bonus",
-    "20406": "transfer bonus",
-    "20407": "Valid days:"
+    "20404": "Tebrikler! Az \u00f6nce kazand\u0131n\u0131z:",
+    "20405": "depolama bonusu",
+    "20406": "aktarma bonusu",
+    "20407": "\u015eu kadar g\u00fcn ge\u00e7erli:",
+    "20408": "%1 hesab\u0131n\u0131z\u0131 [B]%3 i\u00e7in %2 plan\u0131na[\/B] y\u00fckselttik!",
+    "20409": "SMS Do\u011frulamas\u0131",
+    "20410": "MEGA'dan en iyi \u015fekilde yararlanmak i\u00e7in mobil uygulamam\u0131z\u0131 indirmenizi \u00f6neririz. [A]Daha fazla bilgi edinin[\/A].",
+    "20411": "Cep numaran\u0131z\u0131n do\u011frulanmas\u0131, ki\u015filerinizin sizi MEGA'da bulmas\u0131n\u0131 kolayla\u015ft\u0131racakt\u0131r.",
+    "20412": "Redeem Promo Code",
+    "20413": "Enter your %1 code below:"
 }

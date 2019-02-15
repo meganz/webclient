@@ -52,7 +52,7 @@
     width: 16px;
     height: 16px;
     left: 16px;
-    top: 12px;
+    top: 10px;
     background-image: url(../images/mega/icons-sprite_v25.png);
     background-repeat: no-repeat;
     opacity: 0.3;
@@ -64,7 +64,7 @@
     width: 24px;
     height: 24px;
     right: 16px;
-    top: 8px;
+    top: 6px;
     background-image: url(../images/mega/icons-sprite_v25.png);
     background-repeat: no-repeat;
     background-position: -98px -249px;
@@ -92,6 +92,9 @@
     transition: all 200ms ease-in-out;
 }
 .fm-account-button.active .settings-menu-arrow, .fm-account-button:not(.closed) .settings-menu-arrow {
+    -o-transform: rotateZ(90deg);
+    -ms-transform: rotateZ(90deg);
+    -webkit-transform: rotateZ(90deg);
     transform: rotateZ(90deg);
 }
 .fm-account-button.account-s .head-title::before {
@@ -101,13 +104,13 @@
     background-position: -35px -1670px;
 }
 .fm-account-button.notifications .head-title::before {
-    background-position: -63px -1670px;
+    background-position: -63px -1671px;
 }
 .fm-account-button.security .head-title::before {
     background-position: -90px -1671px;
 }
 .fm-account-button.file-management .head-title::before {
-    background-position: -120px -1670px;
+    background-position: -120px -1671px;
 }
 .content-panel.dashboard * {
    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
@@ -123,7 +126,7 @@
     background-position: -150px -1671px;
 }
 .fm-account-button.contact-chats .head-title::before {
-    background-position: -179px -1670px;
+    background-position: -179px -1671px;
 }
 .fm-account-button.reseller .head-title::before {
     background-position: -210px -1670px;
@@ -135,7 +138,7 @@
 .fm-account-button .sub-title {
     font-size: 14px;
     color: #888;
-    line-height: 18px;
+    line-height: 16px;
     padding: 8px 8px 8px 44px;
     position: relative;
     cursor: pointer;
@@ -152,6 +155,10 @@
     font-family: 'LatoWeb','source_sans_proregular', Arial;
     background-color: #fff;
 }
+.fm-right-account-block .default-select-dropdown {
+    top: -8px;
+    left: -9px;
+}
 .fm-right-account-block .txt-center {
     text-align: center;
     display: block;
@@ -166,12 +173,17 @@
     margin: 16px auto;
     width: calc(100% - 32px);
     max-width: 1020px;
-    border-radius: 8px;
+    border-radius: 5px;
     border: 1px solid rgba(0,0,0,0.1);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.05);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.05);
     display:block;
     background-color: #fafafa;
     z-index: 9;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .first-block {
     width: 20%;
@@ -237,9 +249,9 @@
 .subtitle-txt {
     font-size: 16px;
     color: #333;
-    line-height: 24px;
+    line-height: 18px;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
     max-width: 370px;
     text-overflow: ellipsis;
     position: relative;
@@ -273,9 +285,9 @@
     width: 140px;
 }
 .content-txt {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 20px;
-    padding-top: 22px;
+    padding-top: 18px;
     color: #999;
     vertical-align:top;
     transition: 0.3s;
@@ -287,7 +299,7 @@
     max-width: 340px;
 }
 .settings-sub-section .radio-txt {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 20px;
     color: #999;
     vertical-align:top;
@@ -299,7 +311,7 @@
     font-size: 18px;
 }
 .settings-sub-section .radio-txt.small {
-    font-size: 15px;
+    font-size: 14px;
 }
 .fm-account-notifications .content-txt {
     padding: 0px;
@@ -370,7 +382,7 @@
 }
 .settings-banner .tiny-chart .chart.icon {
     left: 22px;
-    top: 18px;
+    top: 16px;
 }
 .fm-right-account-block .icon.chart {
     width: 32px;
@@ -410,15 +422,13 @@
     vertical-align: top;
 }
 .fm-account-sections{
-    display: inline-block;
     position: relative;
     width: 802px;
-    left: 50%;
-    -webkit-transform: translateX(-50%);
-    -ms-transform: translateX(-50%);
-    transform: translateX(-50%);
+    margin:  0 auto;
     margin-top: 16px;
     padding: 0 16px 64px 16px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
 .account.data-block {
@@ -449,7 +459,7 @@
 }
 .settings-right-block {
     width: 536px;
-    padding: 8px 0 16px 56px;
+    padding: 9px 0 16px 56px;
     box-sizing: border-box;
     display: inline-block;
     vertical-align: top;
@@ -475,6 +485,9 @@
 .settings-sub-section.button-container {
     padding-top: 0;
 }
+.settings-sub-section.border {
+    padding-bottom: 25px;
+}
 .settings-sub-section.border::after {
     content: '';
     display: block;
@@ -489,7 +502,7 @@
     position: absolute;
     margin-left: 12px;
     display: inline-block;
-    top: 24px;
+    top: 20px;
     right: 0px;
 }
 .fm-right-account-block .default-green-button {
@@ -503,10 +516,7 @@
 }
 .fm-right-account-block .default-white-button.avatar {
     top: 50%;
-    -o-transform: translateY(-50%);
-    -ms-transform: translateY(-50%); /* IE 9 */
-    -webkit-transform: translateY(-50%); /* Safari */
-    transform: translateY(-50%);
+    margin-top: -16px;
 }
 .fm-right-account-block .default-white-button.right, .fm-right-account-block .default-green-button.right {
     position: relative;
@@ -539,6 +549,9 @@
     background-color: rgba(0,0,0,0.2);
     position: absolute;
     transition: background-color 0.2s linear;
+}
+.dialog-input-title-ontop:hover::after {
+    background-color: rgba(0,0,0,0.5);
 }
 .dialog-input-title-ontop .title {
     position: absolute;
@@ -677,6 +690,7 @@
     background-repeat: no-repeat;
     background-position: 0px -12311px;
     opacity: 0.4;
+    -o-transform: rotate(180deg);
     -ms-transform: rotate(180deg); /* IE 9 */
     -webkit-transform: rotate(180deg); /* Safari */
     transform: rotate(180deg);
@@ -718,10 +732,16 @@
     cursor: pointer;
     display: inline-block;
     position: absolute;
-    height: 20px;
-    width: 36px;
+    height: 22px;
+    width: 38px;
     right: 0;
-    top: 24px;
+    top: 23px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.fm-right-account-block .content-txt + .dialog-feature-toggle {
+    top: 26px;
 }
 .fm-right-account-block .dialog-feature-toggle.toggle-on {
     background-color: #00BFA5;
@@ -767,7 +787,8 @@
     background-color: #279000;
 }
 .fm-right-account-block .account.plan-info {
-    padding:0;
+    padding: 0;
+    line-height: 18px;
     display: inline-block;
     position: relative;
     vertical-align: top;
@@ -821,7 +842,6 @@
     overflow: hidden;
 }
 .fm-right-account-block .grid-table{
-    border-spacing: 1;
     border-collapse: collapse;
     background: white;
     border-radius: 4px;
@@ -830,6 +850,7 @@
     width: 99.5%;
     margin: 0 auto;
     position: relative;
+    overflow: hidden;
 }
 .fm-right-account-block .grid-table tr:hover {
     background-color: #fff;
@@ -839,6 +860,12 @@
     position: relative;
     transition: 0.3s;
     border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.fm-right-account-block .grid-table tr:last-child {
+    border: 0;
+}
+.fm-right-account-block .grid-table tr:not(:first-child):hover {
+    background-color: #fafafa;
 }
 .fm-right-account-block .grid-table tr:first-child {
     background-color: rgba(245,245,245,1);
@@ -866,7 +893,7 @@
     background-color: rgba(0,0,0,0.1);
 }
 .fm-right-account-block .grid-table td {
-    padding:8px;
+    padding: 8px 12px;
     line-height: 24px;
     font-size: 14px;
     color: #888;
@@ -881,7 +908,6 @@
 .fm-right-account-block .grid-table td.ip-addr {
     max-width: 165px;
     word-wrap: break-word;
-    line-height: 1.4;
     vertical-align: top;
 }
 .fm-right-account-block .grid-table tr th:first-child, 
@@ -933,15 +959,9 @@
     margin-right: 0px;
 }
 .fm-account-security .fm-browsers-icon img {
-    margin: 0;
+    margin: 4px 0 0 0;
 }
 .fm-account-security .fm-flags-icon img {
-    margin: 0;
-}
-.fm-account-security .active-session-txt, 
-.fm-account-security .current-session-txt, 
-.fm-account-security .expired-session-txt, 
-.fm-account-security .settings-logout {
     margin: 0;
 }
 .fm-account-security .tranfer-filetype-txt, .fm-account-security .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
@@ -950,7 +970,7 @@
 .fm-right-account-block .account.rubbish-inputs .account-counter-number {
     float: none;
     display: inline-block;
-    margin:0 16px;
+    margin: -4px 16px;
 }
 .fm-right-account-block .account-counter-block {
     margin: 0;
@@ -1436,4 +1456,57 @@
 }
 .fm-right-account-block .hidden {
     display: none;
+}
+.rubsched-options {
+    max-height: 250px;
+}
+.fm-right-account-block .tooltip-icon.icon-container {
+    display: inline-block;
+    vertical-align: top;
+    overflow: visible;
+    margin-top: -4px;
+    margin-left: -6px;
+    position: relative;
+}
+.fm-right-account-block .tooltip-icon .medium-icon.info-icon {
+    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-repeat: no-repeat;
+    background-position: -22px -12374px;
+    background-size: 48px auto;
+    display: inline-block;
+    opacity: 0.4;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.fm-right-account-block .tooltip-icon .medium-icon.info-icon:hover {
+    opacity: 0.8;
+}
+.fm-right-account-block .tooltip-icon .tooltip-top-arrow {
+    position: absolute;
+    top: -8px;
+    right: 136px;
+    background-image: url(../images/mega/top-sprite_v5.png);
+    background-position: -10px -420px;
+    background-repeat: no-repeat;
+    width: 17px;
+    height: 8px;
+}
+.fm-right-account-block .tooltip-icon .tooltip-pad {
+    position: absolute;
+    width: 200px;
+    padding: 12px;
+    right: -130px;
+    top: 36px;
+    background-color: rgba(51, 51, 51, 1);
+    border-radius: 6px;
+    z-index: 6;
+    display: none;
+}
+.fm-right-account-block .tooltip-icon .medium-icon.info-icon:hover~.tooltip-pad, .fm-right-account-block .tooltip-icon .medium-icon.info-icon:hover~.tooltip-top-arrow {
+    display: block;
+}
+.fm-right-account-block .tooltip-icon .tooltip-pad .content-txt {
+    color: #eee;
+    padding-top: 0;
+    height: auto;
 }

@@ -233,7 +233,8 @@ var notify = {
 
             case 'c':
                 action = (typeof notification.c !== 'undefined') ? notification.c : notification.u[0].c;
-                if (action === 0 && !mega.notif.has('contacts_fcrdel')) {
+                if ((action === 0 && !mega.notif.has('contacts_fcrdel')) ||
+                    (action === 1 && !mega.notif.has('contacts_fcracpt'))) {
                     return true;
                 }
                 break;

@@ -53,10 +53,11 @@ mobile.overStorageQuotaOverlay = {
      */
     close: function () {
         'use strict';
-
-        // Hide overlay with download button options, re-show the file manager and re-enable scrolling
-        this.$overlay.addClass('hidden');
-        this.$fileManagerBlock.removeClass('hidden disable-scroll');
+        if (this.$overlay !== null) {
+            // Hide overlay with download button options, re-show the file manager and re-enable scrolling
+            this.$overlay.addClass('hidden');
+            this.$fileManagerBlock.removeClass('hidden disable-scroll');
+        }
     },
 
     /**

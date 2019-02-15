@@ -2297,7 +2297,7 @@
                             <div class="content-txt">[$16116]
                             </div>
                         </div>
-                        <div class="settings-right-block">
+                        <div class="right">
                             <div class="settings-sub-section">
                                 <div class="default-white-button cancel-account">[$16115]</div>
                             </div>  
@@ -2663,17 +2663,29 @@
                         <div class="settings-left-block">
                             <div class="title-txt">[$7226]</div>
                         </div>
-                        <div class="settings-right-block">
-                            <div class="settings-sub-section no-button">
+                        <div class="settings-right-block slide-in-out closed">
+                            <div class="settings-sub-section border">
+                                <div class="subtitle-txt">[$20399]</div>
+                                <div class="dialog-feature-toggle" id="rubsched">
+                                    <div class="dialog-feature-switch"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section no-button rubsched-options slide-item">
                                 <div class="account rubbish-inputs">
+                                    <div class="rubschedopt radioOn" id="rad14_div">
+                                        <input type="radio" id="rad14" class="rubschedopt radioOn" value="14">
+                                    </div>
                                     <div class="subtitle-txt">[$16154]</div>
                                     <div class="account-counter-number">
-                                        <input type="number" value="15" id="rad14_opt" class="rubsched_textopt">
+                                        <input type="number" value="30" id="rad14_opt" class="rubsched_textopt">
                                     </div>
                                     <div class="subtitle-txt">[$17695]</div>
                                 </div>
                                 <div class="clear"></div>
                                 <div class="account rubbish-inputs rubschedopt-none">
+                                    <div class="rubschedopt radioOff" id="rad15_div"> 
+                                        <input type="radio" id="rad15" class="rubschedopt radioOff" value="15">
+                                    </div>
                                     <div class="subtitle-txt">[$16155]</div>
                                     <div class="account-counter-number">
                                         <input type="number" value="2" id="rad15_opt" class="rubsched_textopt"/>
@@ -2809,7 +2821,18 @@
                                     <div class="ulspeedradio radioOff" id="rad2_div">
                                         <input type="radio" id="rad2" class="ulspeedradio radioOff" value="-1">
                                     </div>
-                                    <div class="radio-txt">[$574]</div>
+                                    <div class="radio-txt txt-with-tooltip">
+                                        [$574]
+                                        <div class="icon-container tooltip-icon">
+                                            <div class="medium-icon info-icon"></div>
+                                            <div class="tooltip-pad">
+                                                <div class="tooltip-top-arrow"></div>
+                                                <div class="content-txt tooltip-content">
+                                                    [$20395]
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="ulspeedradio radioOff" id="rad3_div">
                                         <input type="radio" id="rad3" class="ulspeedradio radioOff" value="1">
                                     </div>
@@ -3066,6 +3089,7 @@
                                 </div> 
                             </div>
                             <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$6876]</div>
                                 <div class="resellers-voucher-bl">
                                     <div class="fm-account-input voucheramount">
                                         <input type="text" value="1" name="account-voucheramount" id="account-voucheramount">
@@ -3090,14 +3114,12 @@
                     <div class="account data-block voucher-history table-block">  
                         <div class="settings-left-block">
                             <div class="title-txt">[$20231]</div>
-                            <div>
-                                <div class="account-history-dropdown-button default-select vouchers"></div>
-                                <div class="account-history-dropdown hidden">
-                                    <div class="account-history-drop-items voucher10- active">Last 10 Vouchers</div>
-                                    <div class="account-history-drop-items voucher100-">Last 100 Vouchers</div>
-                                    <div class="account-history-drop-items voucher250-">Last 250 Vouchers</div>
-                                    <div class="account-history-drop-items voucherAll-">[$7557]</div>
-                                </div>
+                            <div class="account-history-dropdown-button default-select vouchers"></div>
+                            <div class="account-history-dropdown hidden">
+                                <div class="account-history-drop-items voucher10- active">Last 10 Vouchers</div>
+                                <div class="account-history-drop-items voucher100-">Last 100 Vouchers</div>
+                                <div class="account-history-drop-items voucher250-">Last 250 Vouchers</div>
+                                <div class="account-history-drop-items voucherAll-">[$7557]</div>
                             </div>
                             <div class="clear"></div>
                         </div>
@@ -3256,10 +3278,7 @@
                                     </div>
                                     <div class="account chart data">
                                         <span class="perc-txt"></span>
-                                        <span class="size-txt">0%</span>
-                                        <span class="of-txt">[$5528]</span>
-                                        <span class="pecents-txt">0</span>
-                                        <span class="gb-txt">GB</span>
+                                        [$20197]
                                     </div>
                                 </div>
                             </div>
@@ -3278,10 +3297,7 @@
                                     </div>
                                     <div class="account chart data">
                                         <span class="perc-txt"></span>
-                                        <span class="size-txt">0%</span>
-                                        <span class="of-txt">[$5528]</span>
-                                        <span class="pecents-txt">0</span>
-                                        <span class="gb-txt">GB</span>
+                                        [$20197]
                                     </div>
                                 </div>
                             </div>
@@ -3468,6 +3484,7 @@
                             <div class="account widget text">
                                 [$16308]
                             </div>
+                            <div class="clear"></div>
                             <div class="widget buttons">
                                 <div class="button default-white-button semi-big more-bonuses right">
                                     <span>[$16309]</span>

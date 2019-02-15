@@ -423,7 +423,15 @@ function init_page() {
         }
 
         n_h = pfid;
-        if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22) {
+        if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22 || pfid.length !== 8) {
+
+            closeDialog();
+            
+            if (pfid.length !== 8) {
+                folderreqerr(false, EARGS);
+                return;
+            }
+
             if (pfkey.length === 22) {
                 api_setfolder(n_h);
                 if (waitxhr) {
@@ -896,6 +904,10 @@ function init_page() {
             parsepage(pages['login']);
             init_login();
         }
+    }
+    else if (is_mobile && u_type && page === 'fm/dashboard') {
+        loadSubPage('fm');
+        return false;
     }
     else if (is_mobile && u_type && page === 'fm/account/invites/how-it-works') {
         parsepage(pages['mobile']);

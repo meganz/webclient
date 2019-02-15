@@ -1234,13 +1234,15 @@ FileManager.prototype.initContextUI = function() {
             // This gets enabled if user want to share
             $dialog.find('.share-message').hide();
 
+            $dialog.find('.dialog-share-button').addClass('disabled');
+
             fillShareDialogWithContent();
 
             // Taking care about share dialog button 'Done'/share and scroll
             shareDialogContentCheck();
 
             // Clear text area message
-            $('.share-message textarea').val(l[6853]);
+            $('.share-message textarea', $dialog).val(l[6853]);
 
             // Maintain drop down list updated
             updateDialogDropDownList('.share-multiple-input');
@@ -1711,7 +1713,7 @@ FileManager.prototype.createFolderUI = function() {
     "use strict";
 
     var doCreateFolder = function() {
-        var $inputWrapper = $('.create-new-folder.popup .create-folder-pad');
+        var $inputWrapper = $('.create-new-folder.popup .fm-dialog-body');
         var $input = $inputWrapper.find('input');
         var name = $input.val();
 

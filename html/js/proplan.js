@@ -220,6 +220,10 @@ pro.proplan = {
         // Show loading spinner because some stuff may not be rendered properly yet
         loadingDialog.show();
 
+        // Hide the payment processing/transferring/loading overlay if click back from the payment page
+        pro.propay.preloadAnimation();
+        pro.propay.hideLoadingOverlay();
+
         // Load the membership plans
         pro.loadMembershipPlans(function() {
 

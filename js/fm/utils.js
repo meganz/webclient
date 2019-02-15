@@ -1296,10 +1296,15 @@ MegaUtils.prototype.getStorageQuota = function() {
 MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
     delay('checkStorageQuota', function _csq() {
         M.getStorageQuota().done(function(data) {
-            if (ulmanager.ulOverStorageQuota && data.percent < 100) {
-                onIdle(function() {
-                    ulmanager.ulResumeOverStorageQuotaState();
-                });
+            if (data.percent < 100) {
+                if (ulmanager.ulOverStorageQuota) {
+                    onIdle(function() {
+                        ulmanager.ulResumeOverStorageQuotaState();
+                    });
+                }
+                if (is_mobile) {
+                    mobile.overStorageQuotaOverlay.close();
+                }
             }
             M.showOverStorageQuota(data);
         });

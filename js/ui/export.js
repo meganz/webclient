@@ -1119,7 +1119,7 @@ var exportExpiry = {
 
         // Initialise expiry date picker
         $dialog.find('.expiry-date-select').datepicker({
-            dateFormat: 'yy-mm-dd',     // 2016-05-25
+            dateFormat: 'yy-mm-dd',     // 2019-05-25
             dayNamesMin: [
                 l[8763], l[8764], l[8765], l[8766], l[8767], l[8768], l[8769]   // Sun - Sat
             ],
@@ -1582,8 +1582,21 @@ var exportExpiry = {
         }
 
         // Click anywhere on export link dialog will hide export link dropdown
-        $('.export-links-dialog').rebind('click', function() {
+        $('.export-links-dialog').rebind('click', function(e) {
             $('.export-link-dropdown').fadeOut(200);
+
+            if ($('.ui-datepicker .ui-state-active').length && !$(e.target).is('.expiry-date-select')) {
+                $('.ui-datepicker .ui-state-active').trigger('click');
+            }
+        });
+
+        // Press Enter key if datepicker dropdown is opened
+        $('.export-links-dialog .expiry-date-select').rebind('keydown.date', function (event) {
+            // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
+            if (event.keyCode === 13 && $('.ui-datepicker .ui-state-active').length) { // Enter
+                $('.ui-datepicker .ui-state-active').trigger('click');
+                return;
+            }
         });
 
         $('.export-links-dialog .fm-dialog-close').rebind('click', function() {

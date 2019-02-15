@@ -2273,7 +2273,7 @@ function initShareDialog() {
         }
 
         if ($.changedPermissions.length > 0) {// Enable Done button
-            $dialog.find('.default-white-button.dialog-share-button').removeClass('disabled');
+            $dialog.find('.default-green-button.dialog-share-button').removeClass('disabled');
         }
 
         $dialog.find('.permissions-icon.active').removeClass('active');

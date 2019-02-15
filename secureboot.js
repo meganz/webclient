@@ -1627,7 +1627,7 @@ else if (!b_u) {
                 }
 
                 if (typeof eventlog === 'function' && !errobj.udata) {
-                    eventlog(99702, true);
+                    eventlog(99702, String(dump.m || 'n0nE'), true);
                 }
             }
             if (cn) dump.c = cn;

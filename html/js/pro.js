@@ -125,15 +125,22 @@ var pro = {
 
             insertEmailToPayResult($pendingOverlay);
 
-            // Add click handlers for 'Go to my account' and Close buttons
-            $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+            if (!u_type || u_type !== 3) {
+                $pendingOverlay.find('.payment-result-button, .payment-close').addClass('hidden');
+            }
+            else {
+                $pendingOverlay.find('.payment-result-button, .payment-close').removeClass('hidden');
 
-                // Hide the overlay
-                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-                $pendingOverlay.addClass('hidden');
+                // Add click handlers for 'Go to my account' and Close buttons
+                $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function () {
 
-                pro.redirectToSite();
-            });
+                    // Hide the overlay
+                    $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                    $pendingOverlay.addClass('hidden');
+
+                    pro.redirectToSite();
+                });
+            }
         }
         else {
             // Show the failure overlay
@@ -145,7 +152,12 @@ var pro = {
                 // Hide the overlay
                 $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 $failureOverlay.addClass('hidden');
-                loadSubPage('pro');
+                if (u_attr.b) {
+                    loadSubPage('registerb');
+                }
+                else {
+                    loadSubPage('pro');
+                }
             });
         }
     },
@@ -196,6 +208,8 @@ var pro = {
                 return l[6126];     // PRO III
             case 4:
                 return l[8413];     // PRO LITE
+            case 100:
+                return l[19530];    // business
             default:
                 return l[435];      // FREE
         }

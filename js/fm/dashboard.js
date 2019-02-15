@@ -17,7 +17,7 @@ function dashboardUI() {
 
     $('.fm-right-files-block, .section.conversations, .fm-right-account-block').addClass('hidden');
     $('.fm-right-block.dashboard').removeClass('hidden');
-
+    
     // Hide backup widget is user already saved recovery key before
     if (localStorage.recoverykey) {
         $('.account.widget.recovery-key').addClass('hidden');
@@ -32,6 +32,35 @@ function dashboardUI() {
 
     M.onSectionUIOpen('dashboard');
     accountUI.general.userUIUpdate();
+
+    if (u_attr.b) {
+        $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
+        $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
+        if (u_attr.b.s !== -1) {
+            $('.dashboard .button.upgrade-account').addClass('hidden');
+        }
+        else {
+            $('.dashboard .button.upgrade-account').removeClass('hidden');
+        }
+        if (u_attr.b.m && u_attr.b.s !== -1) {
+            $('.business-dashboard .go-to-usermanagement-btn').removeClass('hidden');
+
+            // event handler for clicking on user-management button in dashboard.
+            $('.business-dashboard .go-to-usermanagement-btn').off('click').on('click',
+                function userManagementBtnClickHandler() {
+                    M.openFolder('user-management', true);
+                }
+            );
+        }
+        else {
+            $('.business-dashboard .go-to-usermanagement-btn').addClass('hidden');
+        }
+    }
+    else {
+        $('.fm-right-block.dashboard .non-business-dashboard').removeClass('hidden');
+        $('.fm-right-block.dashboard .business-dashboard').addClass('hidden');
+        $('.dashboard .button.upgrade-account').removeClass('hidden');
+    }
 
     // Add-contact plus
     $('.dashboard .contacts-widget .add-contacts').rebind('click', function() {
@@ -104,7 +133,7 @@ function dashboardUI() {
         };
         drawQRCanvas();
 
-        $('.qr-widget-w .button.access-qr').rebind('click', function () {
+        $('.qr-widget-w .access-qr').rebind('click', function () {
             if (account.contactLink && account.contactLink.length) {
                 openAccessQRDialog();
             }
@@ -139,7 +168,7 @@ function dashboardUI() {
         $('.fm-account-blocks.storage, .fm-account-blocks.bandwidth').removeClass('exceeded going-out');
 
         // Achievements Widget
-        if (account.maf) {
+        if (account.maf && !u_attr.b) {
             $('.fm-right-block.dashboard').addClass('active-achievements');
             var $achWidget = $('.account.widget.achievements');
             var maf = M.maf;
@@ -178,13 +207,14 @@ function dashboardUI() {
         }
 
         // Elements for free/pro accounts. Expites date / Registration date
-        if (u_attr.p) {
+        if (u_attr.p || (u_attr.b && u_attr.b.s === -1)) {
 
+            var timestamp;
             // Subscription
             if (account.stype == 'S') {
 
                 // Get the date their subscription will renew
-                var timestamp = account.srenew[0];
+                timestamp = account.srenew[0];
 
                 // Display the date their subscription will renew
                 if (timestamp > 0) {
@@ -201,6 +231,45 @@ function dashboardUI() {
                 $('.account.left-pane.plan-date-info').text(l[20153]);
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
             }
+
+            if (u_attr.b && (u_attr.p === 100 || u_attr.b.s === -1)) {
+                // someone modified the CSS to overwirte the hidden class !!, therefore .hide() will be used
+                $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();
+                var $businessLeft = $('.account.left-pane.info-block.business-users').removeClass('hidden');
+                if (u_attr.b.s === 1) {
+                    $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
+                        .text(l[7666]);
+                    if (u_attr.b.m) { // master
+                        timestamp = account.srenew[0];
+                        if ((Date.now() / 1000) - timestamp > 0) {
+                            $businessLeft.find('.suba-status').addClass('pending').removeClass('disabled active')
+                                .text(l[19609]);
+                        }
+                    }
+                }
+                else {
+                    $businessLeft.find('.suba-status').addClass('disabled').removeClass('pending active')
+                        .text(l[19608]);
+                }
+
+                if (u_attr.b.m) { // master
+                    $businessLeft.find('.suba-role').text(l[19610]);
+                }
+                else {
+                    $businessLeft.find('.suba-role').text(l[5568]);
+                }
+
+                var $businessDashboard = $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
+                $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
+
+            }
+        }
+        else {
+            // resetting things might be changed in business account
+            $('.fm-right-block.dashboard .business-dashboard').addClass('hidden');
+            $('.account.left-pane.info-block.business-users').addClass('hidden');
+            $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').removeClass('hidden').show();
+            $('.fm-right-block.dashboard .non-business-dashboard').removeClass('hidden');
         }
 
         /* Registration date, bandwidth notification link */
@@ -220,8 +289,8 @@ function dashboardUI() {
         $.leftPaneResizable.options.updateWidth = maxwidth;
 
         $($.leftPaneResizable).trigger('resize');
-
-        accountUI.general.charts.init(account, true);
+        if (!u_attr.b) {
+            accountUI.general.charts.init(account, true);
 
 
         /* Used Storage progressbar */
@@ -267,69 +336,128 @@ function dashboardUI() {
         /* End of Used Storage progressbar */
 
 
-        /* Used Bandwidth progressbar */
-        $('.bandwidth .account.progress-bar.green').css('width', account.tfsq.perc + '%');
-        $('.bandwidth .account.progress-size.available-quota').text(bytesToSize(account.tfsq.left, 0));
+            /* Used Bandwidth progressbar */
+            $('.bandwidth .account.progress-bar.green').css('width', account.tfsq.perc + '%');
+            $('.bandwidth .account.progress-size.available-quota').text(bytesToSize(account.tfsq.left, 0));
 
-        if (u_attr.p) {
-            $('.account.widget.bandwidth').addClass('enabled-pr-bar');
-            $('.dashboard .account.rounded-icon.right').addClass('hidden');
-        }
-        else {
-
-            // Show available bandwith for FREE accounts with enabled achievements
-            if (account.tfsq.ach) {
+            if (u_attr.p) {
                 $('.account.widget.bandwidth').addClass('enabled-pr-bar');
+                $('.dashboard .account.rounded-icon.right').addClass('hidden');
             }
             else {
-                $('.account.widget.bandwidth').removeClass('enabled-pr-bar');
+
+                // Show available bandwith for FREE accounts with enabled achievements
+                if (account.tfsq.ach) {
+                    $('.account.widget.bandwidth').addClass('enabled-pr-bar');
+                }
+                else {
+                    $('.account.widget.bandwidth').removeClass('enabled-pr-bar');
+                }
+
+                $('.dashboard .account.rounded-icon.right').removeClass('hidden');
+                $('.dashboard .account.rounded-icon.right').rebind('click', function() {
+                    if (!$(this).hasClass('active')) {
+                        $(this).addClass('active');
+                        $(this).find('.dropdown').removeClass('hidden');
+                    }
+                    else {
+                        $(this).removeClass('active');
+                        $(this).find('.dropdown').addClass('hidden');
+                    }
+                });
+                $('.fm-right-block.dashboard').rebind('click', function(e) {
+                    if (!$(e.target).hasClass('rounded-icon') && $('.account.rounded-icon.info').hasClass('active')) {
+                        $('.account.rounded-icon.info').removeClass('active');
+                        $('.dropdown.body.bandwidth-info').addClass('hidden');
+                    }
+                });
+
+                // Get more transfer quota button
+                $('.account.widget.bandwidth .free .more-quota').rebind('click', function() {
+                    // if the account have achievements, show them, otherwise #pro
+                    if (M.maf) {
+                        mega.achievem.achievementsListDialog();
+                    }
+                    else {
+                        loadSubPage('pro');
+                    }
+                    return false;
+                });
             }
 
-            $('.dashboard .account.rounded-icon.right').removeClass('hidden');
-            $('.dashboard .account.rounded-icon.right').rebind('click', function() {
-                if (!$(this).hasClass('active')) {
-                    $(this).addClass('active');
-                    $(this).find('.dropdown').removeClass('hidden');
-                }
-                else {
-                    $(this).removeClass('active');
-                    $(this).find('.dropdown').addClass('hidden');
-                }
-            });
-            $('.fm-right-block.dashboard').rebind('click', function(e) {
-                if (!$(e.target).hasClass('rounded-icon') && $('.account.rounded-icon.info').hasClass('active')) {
-                    $('.account.rounded-icon.info').removeClass('active');
-                    $('.dropdown.body.bandwidth-info').addClass('hidden');
-                }
-            });
+            if (account.tfsq.used > 0 || Object(u_attr).p || account.tfsq.ach) {
+                $('.account.widget.bandwidth').removeClass('hidden');
+                $('.fm-account-blocks.bandwidth.right').removeClass('hidden');
+                $('.bandwidth .account.progress-size.base-quota').text(bytesToSize(account.tfsq.used, 0));
+            }
+            else {
+                $('.account.widget.bandwidth').addClass('hidden');
+                $('.fm-account-blocks.bandwidth.right').addClass('hidden');
+            }
 
-            // Get more transfer quota button
-            $('.account.widget.bandwidth .free .more-quota').rebind('click', function() {
-                // if the account have achievements, show them, otherwise #pro
-                if (M.maf) {
-                    mega.achievem.achievementsListDialog();
-                }
-                else {
-                    loadSubPage('pro');
-                }
-                return false;
-            });
-        }
-
-        if (account.tfsq.used > 0 || Object(u_attr).p || account.tfsq.ach) {
-            $('.account.widget.bandwidth').removeClass('hidden');
-            $('.fm-account-blocks.bandwidth.right').removeClass('hidden');
-            $('.bandwidth .account.progress-size.base-quota').text(bytesToSize(account.tfsq.used, 0));
+            /* End of Used Bandwidth progressbar */
+            // $('.dashboard .button.upgrade-account').removeClass('hidden');
+            // Fill rest of widgets
+            dashboardUI.updateWidgets();
         }
         else {
-            $('.account.widget.bandwidth').addClass('hidden');
-            $('.fm-account-blocks.bandwidth.right').addClass('hidden');
+            // someone modified CSS, hidden class is overwitten --> .hide()
+            if (u_attr.b.s !== -1) {
+                $('.dashboard .upgrade-account').addClass('hidden').hide();
+            }
+            $('.business-dashboard .user-management-storage .storage-transfer-data')
+                .text(bytesToSize(account.space_used));
+            $('.business-dashboard .user-management-transfer .storage-transfer-data')
+                .text(bytesToSize(account.tfsq.used));
+
+            var $dataStats = $('.business-dashboard .subaccount-view-used-data');
+
+            $dataStats.find('.ba-root .ff-occupy').text(bytesToSize(account.stats[M.RootID].bytes));
+            $dataStats.find('.ba-root .folder-number').text(account.stats[M.RootID].folders + ' ' + l[2035]);
+            $dataStats.find('.ba-root .file-number').text(account.stats[M.RootID].files + ' ' + l[2034]);
+
+            $dataStats.find('.ba-inshare .ff-occupy').text(bytesToSize(account.stats['inshares'].bytes));
+            $dataStats.find('.ba-inshare .folder-number').text(account.stats['inshares'].items + ' ' + l[2035]);
+            $dataStats.find('.ba-inshare .file-number').text(account.stats['inshares'].files + ' ' + l[2034]);
+
+            $dataStats.find('.ba-outshare .ff-occupy').text(bytesToSize(account.stats['outshares'].bytes));
+            $dataStats.find('.ba-outshare .folder-number').text(account.stats['outshares'].items + ' ' + l[2035]);
+            $dataStats.find('.ba-outshare .file-number').text(account.stats['outshares'].files + ' ' + l[2034]);
+
+            $dataStats.find('.ba-rubbish .ff-occupy').text(bytesToSize(account.stats[M.RubbishID].bytes));
+            $dataStats.find('.ba-rubbish .folder-number').text(account.stats[M.RubbishID].folders + ' ' + l[2035]);
+            $dataStats.find('.ba-rubbish .file-number').text(account.stats[M.RubbishID].files + ' ' + l[2034]);
+
+            var verFiles = 0;
+            var verBytes = 0;
+            verFiles = account.stats[M.RootID]['vfiles'];
+            verBytes = account.stats[M.RootID]['vbytes'];
+            // for (var k in account.stats) {
+            //    if (account.stats[k]['vfiles']) {
+            //        verFiles += account.stats[k]['vfiles'];
+            //    }
+            //    if (account.stats[k]['vbytes']) {
+            //        verBytes += account.stats[k]['vbytes'];
+            //    }
+            // }
+
+            $('.ba-version .tiny-icon.cog.versioning-settings').rebind('click', function () {
+                loadSubPage('fm/account/file-management');
+            });
+
+            $dataStats.find('.ba-version .ff-occupy').text(bytesToSize(verBytes));
+            // $dataStats.find('.ba-version .file-number').text(verFiles + ' ' + l[2034]);
+            $dataStats.find('.ba-version .file-number').text(verFiles);
         }
 
-        /* End of Used Bandwidth progressbar */
+        // if this is a business account user (sub or master)
+        // if (u_attr.b) {
+        //    $('.dashboard .button.upgrade-account').addClass('hidden');
+        //    $('.account.widget.bandwidth').addClass('hidden');
+        //    $('.account.widget.body.achievements').addClass('hidden');
+        // }
 
-        // Fill rest of widgets
-        dashboardUI.updateWidgets();
+        
 
         onIdle(fm_resize_handler);
         initTreeScroll();

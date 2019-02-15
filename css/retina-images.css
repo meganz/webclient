@@ -34,6 +34,12 @@ body.pro:after {
     background-image: url(../images/mega/top-login-sprite_v11@2x.png);
     background-size: 48px auto;
 }
+
+.small-icon.membership.pro100, .tiny-icon.membership-status.pro100 {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+
 .reg-success-icon, .reg-st3-save-icon, .toast-icon, .resend-email-button, .reg-st3-storage::before, .reg-st3-bandwidth::before, .pro-icon, .pro-bottom-info-header::before, .toast-close-button, .small-icon.green-arrow, .small-icon.blue-arrow, .fm-dialog-close.small, .reg-st5-info-icon {
     background-image: url(../images/mega/register-big-sprite-v15@2x.png);
     background-size: 200px auto;
@@ -207,6 +213,137 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 .fm-picker-dialog .contact-row.selected .contact-checkboxOn.small12::before, .fm-picker-dialog .contact-row:hover .small12::before {
     background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
     background-size: 48px auto;
+}
+
+
+
+/*business icon start from here*/
+.content-panel.user-management .user-management-status::before, .user-management-view .user-management-status::before {
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-tree-panel-header .img{
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-tree-panel-arrows {
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.default-white-button-user-management .icon, .default-green-button-user-management .icon, .default-red-button-user-management .icon{
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.fm-files-view-icon-user-management {
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-overview-bar-data .info-block .icon{
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-sorting-menu .sort-icon{
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.up-arrow-icon {
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-breadcrumb .user-management-icon {
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-breadcrumb .user-management-next-arrow {
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-view-status.enabled, .user-management-view-status.disabled, .user-management-view-status.pending{
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.subaccount-view-used-data .used-storage-info .folder-small-icon{
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.subaccount-view-used-data .used-storage-info .folder-small-icon.ex-out-share, 
+.subaccount-view-used-data .used-storage-info .folder-small-icon.ex-in-share{
+    background-image: url(../images/mega/top-sprite_v5@2x.png);
+    background-size: 38px auto;
+}
+
+.user-management-breadcrumbs-img {
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-view .default-white-drop-box .list-arrow, .user-management-dialog .list-arrow {
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-overview-container .daily-transfer-flow-bar .tooltip::after {
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-grid-table .subaccount-img-big .subaccount-selection-button::before {
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-view .icon, .fm-right-header-user-management .icon, .user-management-dialog .icon, .user-management-overview-bar .icon{
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-view .admin-icon{
+    background-image: url(../images/mega/fm-main-sprite_v7@2x.png);
+    background-size: 48px auto;
+}
+
+.user-management-view .icon48, .user-management-dialog .icon48, .user-management-view .icon56, .user-management-dialog .icon56, .user-management-view-data .user-management-view-overall-usage .user-management-storage .img, .user-management-view-data .user-management-view-overall-usage .user-management-transfer .img, .user-management-landing-page .mega-56px-icon,  .user-management-view .icon64, .user-management-dialog .icon64, .user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon, .user-management-dialog .dialog-heading-img, .user-management-dialog .sent-email-logo, .bus-reg-btn .next-arrow, .bus-reg-btn-2 .next-arrow, .bus-plan-icon64, .bus-reg-featureImg100, .bus-confirm-body .bus-confirmImg, .user-management-account-settings .setting-icon24 {
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
+}
+.user-management-account-settings .invoice-detail .mega-logo, .user-management-account-settings .icon12 {
+    background-image: url(../images/mega/invoice-image_v1@2x.png);
+    background-size: 120px auto;
+}
+.user-management-view .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-out-share, 
+.fm-right-header-user-management .folder-small-icon.ex-out-share, 
+.user-management-dialog .folder-small-icon.ex-out-share,
+.business-dashboard .folder-small-icon.ex-out-share{
+    background-image: url(../images/mega/top-sprite_v5@2x.png);
+     background-size: 38px auto;
+}
+
+.user-management-view .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-in-share, 
+.fm-right-header-user-management .folder-small-icon.ex-in-share, 
+.user-management-dialog .folder-small-icon.ex-in-share,
+.business-dashboard .folder-small-icon.ex-in-share{
+    background-image: url(../images/mega/top-sprite_v5@2x.png);
+     background-size: 38px auto;
+}
+.bus-reg-icon {
+    background-image: url(../images/mega/top-sprite_v5@2x.png);
+     background-size: 38px auto;
+}
+
+.bus-reg-checkbox.checkOn::before {
+    background-image: url(../images/mega/top-login-sprite_v11@2x.png);
 }
 .bottom-page.large-icon, .cropped-page .bottom-page.big-icon, .cropped-page .bottom-page.top-title::before, .mobile-apps-button.uwp,.uwp .advertise-chat .mobile-apps-button.red span::before {
     background-image: url(../images/mega/new-pages-sprite_v2@2x.png) !important;

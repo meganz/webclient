@@ -805,6 +805,15 @@
 
             mega.ui.onboarding = new mega.ui.Onboarding({});
 
+            if (u_attr && u_attr.b && u_attr.b.m) {
+                M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+                    var business_ui = new BusinessAccountUI();
+                    business_ui.showWelcomeDialog();
+                    // the function will check if the account is expired
+                    business_ui.showExpiredUIElements();
+                });
+            }
+
             // we reached our goal, stop listening for fminitialized
             return 0xDEAD;
         }

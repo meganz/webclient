@@ -14,6 +14,12 @@ pro.proplan = {
      * Initialises the page and functionality
      */
     init: function() {
+        "use strict";
+        // if business sub-user is trying to get to Pro page redirect to home.
+        if (u_attr && u_attr.b && !u_attr.b.m) {
+            loadSubPage('start');
+            return;
+        }
 
         // Cache selectors
         var $body = $('body');
@@ -92,6 +98,12 @@ pro.proplan = {
 
             this.initMobilePlanDots();
         }
+
+        // Handler for Try Business Account
+        $('.try-business-button-plan-btn').off('click.suba').on('click.suba', function
+            tryBusinessAccountButtonClickHandler() {
+            loadSubPage('business');
+        });
     },
 
     /**
@@ -584,6 +596,17 @@ pro.proplan = {
         var pageParts = page.split('-');
         var provider = pageParts[1];
         var status = pageParts[2];
+        
+        var successPayText = l[19514];
+        var $pendingOverlay = $('.payment-result.pending.alternate');
+        
+
+        // manipulate the texts if business account
+        if (status === 'success' && pageParts && pageParts[3] === 'b') {
+            successPayText = l[19809].replace('{0}', '1');
+        }
+
+        $pendingOverlay.find('.payment-result-txt').safeHTML(successPayText);
 
         // If returning from an paysafecard payment, do a verification on the sale ID
         if (provider === 'paysafecard') {

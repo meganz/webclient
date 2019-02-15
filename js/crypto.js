@@ -210,7 +210,13 @@ function rand(n) {
     return r[0] % n; // <- oops, it's uniformly distributed only when `n` divides 0x100000000
 }
 
-function crypto_rsagenkey() {
+
+/**
+ * generate RSA key
+ * @param {Function} callBack   optional callback function to be called.
+ *                              if not specified the standard set_RSA will be called
+ */
+function crypto_rsagenkey(callBack) {
     var $promise = new MegaPromise();
     var logger = MegaLogger.getLogger('crypt');
 
@@ -249,12 +255,18 @@ function crypto_rsagenkey() {
         var endTime = new Date();
         logger.debug("Key generation took "
                      + (endTime.getTime() - startTime.getTime()) / 1000.0
-                     + " seconds!");
+            + " seconds!");
 
-        u_setrsa(k)
-            .done(function () {
-                $promise.resolve(k);
-            });
+        if (callBack && typeof callBack === 'function') {
+            callBack(k);
+            $promise.resolve(); // release the promise
+        }
+        else {
+            u_setrsa(k)
+                .done(function () {
+                    $promise.resolve(k);
+                });
+        }
     }
 
     return $promise;
@@ -467,7 +479,13 @@ function api_init(channel, service, split) {
     };
 }
 
-// queue request on API channel
+
+/**
+ * queue request on API channel
+ * @param {Object} request              request object to be sent to API
+ * @param {Object} context              context object to be returned with response, has 'callback' func to be called
+ * @param {Number} channel              optional - channel number to use (default =0)
+ */
 function api_req(request, context, channel) {
     "use strict";
 
@@ -693,7 +711,7 @@ function api_proc(q) {
                         var ctx = ctxs[i];
 
                         if (typeof ctx.callback === 'function') {
-                            ctx.callback(t[i], ctx, this);
+                            ctx.callback(t[i], ctx, this, t);
                         }
                     }
 
@@ -885,6 +903,9 @@ function api_reqfailed(c, e) {
                 }
                 else if (reasonCode === 300) {
                     reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
+                }
+                else if (reasonCode === 400) {
+                    reasonText = l[19748];// Your account was terminated due to breach of Mega's Terms of Service...
                 }
                 else {// Unknown reasonCode
                     reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
@@ -1193,27 +1214,49 @@ function api_createuser(ctx, invitecode, invitename, uh) {
 
     logger.debug("api_createuser - masterkey: " + u_k + " passwordkey: " + ctx.passwordkey);
 
+    // in business sub-users API team decided to hack "UP" command to include "UC2" new arguments.
+    // so now. we will check if this is a business sub-user --> we will add extra arguments to "UP" (crv,hak,v)
+
+    var doApiRequest = function (request) {
+        if (mega.affid) {
+            req.aff = mega.affid;
+        }
+        logger.debug("Storing key: " + request.k);
+
+        api_req(request, ctx);
+        watchdog.notify('createuser');
+    };
+
     req = {
             a: 'up',
             k: a32_to_base64(encrypt_key(new sjcl.cipher.aes(ctx.passwordkey), u_k)),
             ts: base64urlencode(a32_to_str(ssc) + a32_to_str(encrypt_key(new sjcl.cipher.aes(u_k), ssc)))
         };
 
+    // invite code usage is obsolete. it's only used in case of business sub-users
+    // therefore, if it exists --> we are registering a business sub-user
     if (invitecode) {
-        req.uh = uh;
         req.ic = invitecode;
         req.name = invitename;
+
+        security.deriveKeysFromPassword(ctx.businessUser, u_k,
+            function (clientRandomValueBytes, encryptedMasterKeyArray32,
+                hashedAuthenticationKeyBytes, derivedAuthenticationKeyBytes) {
+                req.crv = ab_to_base64(clientRandomValueBytes);
+                req.hak = ab_to_base64(hashedAuthenticationKeyBytes);
+                req.v = 2;
+                req.k = a32_to_base64(encryptedMasterKeyArray32);
+                ctx.uh = ab_to_base64(derivedAuthenticationKeyBytes);
+
+                doApiRequest(req);
+            }
+        );
+
+    }
+    else {
+        doApiRequest(req);
     }
 
-    if (mega.affid) {
-        req.aff = mega.affid;
-    }
-
-    //if (confirmcode) req.c = confirmcode;
-    logger.debug("Storing key: " + req.k);
-
-    api_req(req, ctx);
-    watchdog.notify('createuser');
 }
 
 function api_checkconfirmcode(ctx, c) {

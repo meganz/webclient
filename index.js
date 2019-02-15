@@ -244,6 +244,10 @@ function init_page() {
             return false;
         }
     }
+    // cleaning local-storage used attr for business signup
+    if (localStorage.businessSubAc && page !== 'register') {
+        delete localStorage.businessSubAc;
+    }
 
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
@@ -302,7 +306,9 @@ function init_page() {
 
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
-
+    // add business class to affect the top header
+    $('body').removeClass('business');
+    
     if ('-fa-ar-he-'.indexOf('-' + lang + '-') > -1) {
         $('body').addClass('rtl');
     }
@@ -743,6 +749,27 @@ function init_page() {
             alert('We can\'t decipher your invite link, please check you copied the link correctly, or sign up manually with the same email address.');
         }
     }
+    else if (page.length > 14 && page.substr(0, 14) === 'businesssignup') {
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.decryptionPasswordOverlay.show(page, true);
+        }
+        else {
+            var signupCodeEncrypted = page.substring(14, page.length);
+            M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+                var business = new BusinessAccountUI();
+                business.showLinkPasswordDialog(signupCodeEncrypted);
+            });
+        }
+
+    }
+    else if (page.length > 14 && page.substr(0, 14) === 'businessinvite') {
+        var signupCode = page.substring(14, page.length);
+        M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+            var business = new BusinessAccountUI();
+            business.openInvitationLink(signupCode);
+        });
+    }
     else if (page === 'confirm') {
 
         loadingDialog.show();
@@ -761,6 +788,17 @@ function init_page() {
             else {
                 parsepage(pages['login']);
                 login_txt = l[378];
+
+                // I need this event handler to be triggered only in case of coming from confirmation
+                mBroadcaster.once('fm:initialized', function () {
+                    if (u_attr && u_attr.b && u_attr.b.m) {
+                        M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+                            var business = new BusinessAccountUI();
+                            business.showWelcomeDialog();
+                        });
+                    }
+                });
+
                 init_login();
                 if (email) {
                     $('#login-name2').val(email);
@@ -983,6 +1021,12 @@ function init_page() {
             parsepage(pages['register']);
             init_register();
         }
+    }
+    else if ((page === 'registerb')) { // business register
+        parsepage(pages['registerb']);
+        $('body').addClass('business');
+        var regBusiness = new BusinessRegister();
+        regBusiness.initPage();
     }
     else if (page === 'fm/account/history') {
         loadSubPage('fm/account/security');
@@ -1368,6 +1412,13 @@ function init_page() {
         parsepage(pages['uwp']);
         bottompage.initTabs();
     }
+    else if (page === 'business') {
+        parsepage(pages['business']);
+        $('body').addClass('business');
+        var businessP = new BusinessProductPage();
+        businessP.init();
+
+    }
     else if (page === 'bird') {
         parsepage(pages['megabird']);
     }
@@ -1676,6 +1727,8 @@ function topmenuUI() {
     $topHeader.find('.activity-status-block .activity-status,.activity-status-block').addClass('hidden');
     $topHeader.find('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
     $topHeader.find('.membership-status, .top-head .user-name, .top-icon.achievements').addClass('hidden');
+    $topHeader.find('.left.individual').text(l[19702]); // try Mega Business
+    $topHeader.find('.left.individual').removeClass('hidden');
 
     if (fminitialized) {
         $topHeader.find('.top-search-bl').removeClass('hidden');
@@ -1686,6 +1739,9 @@ function topmenuUI() {
 
     if (page === 'download') {
         $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
+    }
+    if (page === 'business' || page ==='registerb') {
+        $topHeader.find('.left.individual').text(l[19529]); // try Mega MEGA Indivisual
     }
 
     var avatar = window.useravatar && useravatar.mine();
@@ -1797,6 +1853,7 @@ function topmenuUI() {
 
         if (is_fm()) {
             $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
+            $topHeader.find('.left.individual').addClass('hidden');
         }
 
         // If the chat is disabled don't show the green status icon in the header
@@ -1805,6 +1862,14 @@ function topmenuUI() {
             if (megaChatIsReady) {
                 megaChat.renderMyStatus();
             }
+        }
+
+        // if this is a business account sub-user
+        if (u_attr.b && u_attr.b.s !== -1) {
+            $topHeader.find('.top-icon.achievements').addClass('hidden');
+            $topMenu.find('.upgrade-your-account').addClass('hidden');
+            $topMenu.find('.resellers').addClass('hidden');
+            $topHeader.find('.left.individual').addClass('hidden');
         }
 
         // Show PRO plan expired warning popup (if applicable)
@@ -1838,7 +1903,12 @@ function topmenuUI() {
         $topHeader.find('.create-account-button').removeClass('hidden');
 
         $('.create-account-button').rebind('click', function () {
-            loadSubPage('register');
+            if ($(this).hasClass('business-reg')) {
+                loadSubPage('registerb');
+            }
+            else {
+                loadSubPage('register');
+            }
         });
         $topHeader.find('.top-login-button').removeClass('hidden');
         $('.top-login-button').rebind('click', function () {
@@ -1885,7 +1955,6 @@ function topmenuUI() {
             $topMenu.find('.top-menu-item.login').addClass('hidden');
             $topMenu.find('.top-menu-item.logout').removeClass('hidden');
         }
-
     }
 
     $.hideTopMenu = function (e) {
@@ -1949,6 +2018,16 @@ function topmenuUI() {
 
     $topHeader.find('.top-icon.achievements').rebind('click', function () {
         mega.achievem.achievementsListDialog();
+    });
+
+    // try individual button in business mode
+    $topHeader.find('.top-centered-margin .individual').rebind('click', function () {
+        if (page === 'business' || page === 'registerb') {
+            loadSubPage('start');
+        }
+        else {
+            loadSubPage('business');
+        }
     });
 
     $('.top-icon.menu, .top-icon.close').rebind('click', function () {
@@ -2277,12 +2356,7 @@ function topmenuUI() {
     });
 
     // If the main Mega M logo in the header is clicked
-    $topHeader.find('.default-white-button.individual').rebind('click', function () {
-        loadSubPage('startpage');
-    });
-
-    // If the main Mega M logo in the header is clicked
-    $('a.logo').rebind('click', function () {
+    $topHeader.find('.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
             if (folderlink) {
                 M.openFolder(M.RootID, true);

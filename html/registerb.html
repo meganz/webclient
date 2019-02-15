@@ -1,0 +1,167 @@
+<div class="bottom-page scroll-block">
+
+    ((TOP))
+
+    <div class="bus-reg-body">
+        <div class="bus-reg-header">[$19517]</div>
+        <div class="bus-reg-info-block">
+
+            <div class="bus-reg-subheader">[$19789]</div>
+            <div class="bus-reg-input num"> <!-- add correctinput/active/error to this class -->
+                <div class="bus-reg-title">[$19087]</div>
+                <div class="bus-reg-icon number-of-user"></div>
+                <input type="number" id="business-nbusrs" placeholder="[$19087]" autofocus>
+                <div class="note-message">*[$19501]</div>
+                <div class="error-message"> </div>
+            </div>
+
+            <div class="bus-reg-subheader">[$19790]</div>
+            <div class="bus-reg-input error">
+                <div class="bus-reg-icon company-name"></div>
+                <input type="text" id="business-cname" placeholder="[$19603]">
+                <div class="error-message"> </div>
+            </div>
+            <div class="bus-reg-input">
+                <div class="bus-reg-icon phone"></div>
+                <input type="tel" id="business-tel" placeholder="[$19152]">
+                <div class="error-message"> </div>
+            </div>
+            <div class="bus-reg-input">
+                <div class="bus-reg-icon number-of-user"></div>
+                <input type="text" id="business-fname" placeholder="[$7342]" class="fir-name">
+                <input type="text" id="business-lname" placeholder="[$7345]" class="las-name">
+                <div class="error-message"> </div>
+            </div>
+            <div class="bus-reg-input">
+                <div class="bus-reg-icon email"></div>
+                <input autocomplete="off" type="email" id="business-email" placeholder="[$7434]">
+                <div class="error-message"> </div>
+            </div>
+            <div class="bus-reg-input pass-1st">
+                <div class="bus-reg-icon pw"></div>
+                <input autocomplete="off" type="password" id="business-pass" placeholder="[$909]">
+            </div>
+            <div class="new-registration suba">
+                <div class="register-pass-status-line1"></div>
+                <div class="register-pass-status-line2"></div>
+                <div class="register-pass-status-line3"></div>
+                <div class="register-pass-status-line4"></div>
+                <div class="register-pass-status-line5"></div>
+                <div class="clear"></div>
+                <div class="password-stutus-txt hidden">
+                    <div class="new-reg-status-pad"><strong>[$1105]</strong> Strong</div>
+                    <div class="new-reg-status-description"></div>
+                </div>
+            </div>
+
+            <div class="bus-reg-input pass-2nd">
+                <div class="bus-reg-icon pw"></div>
+                <input autocomplete="off" type="password" id="business-rpass" placeholder="[$1114]">
+                <div class="error-message"> </div>
+            </div>
+
+            <div class="bus-reg-subheader">[$478]</div>
+            <div class="bus-reg-radio-block">
+                <div class="bus-reg-radio payment-typ1 checkOn"></div>
+                <div class="provider">[$7111]</div>
+                <div class="provider-icon ecpVI"></div>
+                <div class="bus-reg-radio payment-typ2 checkOff"></div>
+                <div class="provider">Direct Debit</div>
+                <div class="provider-icon ecpMC"></div>
+            </div>
+            <div class="bus-reg-agreement ok-to-auto">
+                <div class="bus-reg-checkbox"></div>
+                <div class="bus-reg-txt">[$19509]</div>
+            </div>
+
+            <div class="bus-reg-agreement mega-terms">
+                <div class="bus-reg-checkbox"></div>
+                <div class="bus-reg-txt">
+                    [$208]
+                    <!--<a href="/terms" class="terms">Terms of Service &#8827;</a>-->
+                </div>
+            </div>
+            <div id="business-reg-btn" class="bus-reg-btn disabled">
+                <span>[$170]</span>
+                <div class="next-arrow"></div>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+        <div class="bus-reg-plan">
+            <div class="bus-plan-icon64"></div>
+            <div class="business-plan-title">
+                BUSINESS
+            </div>
+            <div class="business-plan-price">
+                <span class="big">10 &euro;</span><span class="sub-unit">[$19533]</span>
+            </div>
+            <div class="business-plan-note">Unlimited Storage / Unlimited Transfer</div>
+            <div class="business-plan-info grey business-base-plan">
+                <span class="left">Base Plan (3 Licences)</span>
+                <span class="right">30 &euro;</span>
+            </div>
+            <div class="business-plan-info business-users-plan">
+                <span class="left">7x additional licences</span>
+                <span class="right">70 &euro;</span>
+            </div>
+            <div class="business-plan-info grey hidden">
+                <span class="left">[$19791]</span>
+                <span class="right">100 &euro;</span>
+            </div>
+            <div class="business-plan-info hidden">
+                <span class="left">[$19792]</span>
+                <span class="right">0 &euro;</span>
+            </div>
+            <div class="business-plan-total">
+                <span class="left">[$16464]</span>
+                <span class="right">100 &euro;</span>
+            </div>
+        </div>
+
+        <div id="business-reg-btn-mob" class="bus-reg-btn-2">
+            <span>[$170] </span>
+            <div class="next-arrow"></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <!--<div class="bus-confirm-body confirm hidden">
+        <div class="bus-reg-header">Comfirm your account</div>
+        <div class="bus-reg-input error">
+            <div class="bus-reg-icon email"></div>
+            <input type="email" name=" " placeholder="Email">
+            <div class="error-message">Doesn't match registered email.</div>
+        </div>
+        <div class="bus-reg-btn" id="ddd">
+            <span>Confirm Account </span>
+            <div class="next-arrow"></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div class="bus-confirm-body verfication hidden">
+        <div class="bus-confirmImg"></div>
+        <div class="bus-reg-header">Verification emails have been sent</div>
+        <div class="bus-reg-featureTxt">New accounts will be activated after the link in the verification emails has been confirmed and the user sets their own password.</div>
+    </div>-->
+
+    <div class="bus-reg-bottom-page">
+        <div class="page-header">Your password is your master encryption key</div>
+        <div class="bus-reg-featureBlock">
+            <div class="bus-reg-featureImg100 ky-icon"></div>
+            <div class="bus-reg-featureTxt">Never enter your password on a device you do not fully trust.</div>
+        </div>
+        <div class="bus-reg-featureBlock">
+            <div class="bus-reg-featureImg100 forbit-icon"></div>
+            <div class="bus-reg-featureTxt">There is no recovery procedure for lost passwords, make sure you can remember your password at all times</div>
+        </div>
+        <div class="bus-reg-featureBlock">
+            <div class="bus-reg-featureImg100 extension-icon"></div>
+            <div class="bus-reg-featureTxt">For enhanced security, install our browser extension and load MEGA from your computer rather than from our servers.</div>
+        </div>
+    </div>
+
+    ((BOTTOM))
+
+</div>

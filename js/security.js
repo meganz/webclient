@@ -79,8 +79,9 @@ var security = {
      * @param {String} password The password from the user
      * @param {String} masterKeyArray32 The user's Master Key
      * @param {Function} completeCallback The function to be run after the keys are created which will pass the
-     *                                    the clientRandomValueBytes, encryptedMasterKeyArray32 and
-     *                                    hashedAuthenticationKeyBytes as the parameters
+     *                                    the clientRandomValueBytes, encryptedMasterKeyArray32,
+     *                                    hashedAuthenticationKeyBytes
+     *                                    and derivedAuthenticationKeyBytes as the parameters
      */
     deriveKeysFromPassword: function(password, masterKeyArray32, completeCallback) {
 
@@ -118,7 +119,8 @@ var security = {
             var encryptedMasterKeyArray32 = encrypt_key(cipherObject, masterKeyArray32);
 
             // Pass the Client Random Value, Encrypted Master Key and Hashed Authentication Key to the calling function
-            completeCallback(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes);
+            completeCallback(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes,
+                derivedAuthenticationKeyBytes);
         });
     },
 

@@ -4036,6 +4036,116 @@ li.token-input-token-invite .input-close {
 }
 /* end of Contact info dialog*/
 
+/* invitation link password dialog */
+
+.fm-dialog.sub-account-link-password {
+    left: 50%;
+    margin-left: -297px;
+    top: 50%;
+    margin-top: -275px;
+    width: 594px;
+}
+
+.fm-dialog.sub-account-link-password.user-management-dialog .dialog-input-title-ontop {
+    margin:8px 172px;
+}
+
+.bus-welcome-dialog {
+    width: 612px;
+    margin-left: -306px;
+    margin-top: -270px;
+}
+
+.user-management-dialog .add-user64 {
+    background-position: -4px -1347px;
+}
+
+.user-management-dialog .user-management64 {
+    background-position: -73px -1347px;
+}
+
+.user-management-dialog .add-user64,
+.user-management-dialog .user-management64 {
+    margin: auto;
+    display: block;
+}
+.user-management-dialog .bus-welcome-logo {
+    background-position: -8px -1420px;
+    width: 102px;
+    height: 75px;
+    display: block;
+}
+
+.bus-welcome-dialog .dialog-input-container {
+    width: 100%;
+    position: relative;
+}
+.user-management-dialog .dialog-right-block,
+.user-management-dialog .dialog-left-block {
+    width: 272px;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,0);
+    border-radius: 8px;
+    transition: 0.5s;
+    cursor: pointer;
+}
+.user-management-dialog .dialog-right-block:hover,
+.user-management-dialog .dialog-left-block:hover {
+    background-color: #fff;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 0.5px 6px 0 rgba(0,0,0,0.07);
+}
+
+.user-management-dialog .dialog-left-block {
+    margin: 0 0 -24px 32px;
+    padding: 24px;
+}
+
+.user-management-dialog .dialog-right-block {
+    margin: 0 32px -24px 0px;
+    padding: 24px;
+}
+
+.user-management-dialog .dialog-sub-title {
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+    line-height: 20px;
+    color: #333;
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+.user-management-dialog .dialog-txt {
+    width: 100%;
+    text-align: center;
+    font-size: 13px;
+    color: #999;
+    line-height: 20px;
+}
+
+.bus-welcome-dialog .default-white-button-user-management {
+    margin-right: 32px;
+}
+.user-management-dialog.payment-reminder {
+    width: 596px;
+    margin-left: -298px;
+    margin-top: -190px;
+    padding-bottom: 40px;
+    text-align: center;
+}
+.user-management-dialog.payment-reminder .payment-reminder-logo {
+    background-position: -20px -969px;
+    width: 80px;
+    height: 80px;
+    display: block;
+}
+.user-management-dialog.payment-reminder .big-red-button {
+    margin: 0;
+}
+
 /* Recover account */
 .fm-dialog.recovery-key-dialog, .fm-dialog.recovery-key-info {
     width: 640px;

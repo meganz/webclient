@@ -90,7 +90,7 @@ function u_checklogin2(ctx, u) {
     }
     else {
         ctx.result = u_checklogin2a;
-        api_getsid(ctx, u, ctx.passwordkey);
+        api_getsid(ctx, u, ctx.passwordkey, ctx.uh); // if ctx.uh is defined --> we need it fo "us"
     }
 }
 
@@ -120,12 +120,13 @@ function u_checklogin3a(res, ctx) {
     if (typeof res !== 'object') {
         u_logout();
         r = res;
+        ctx.checkloginresult(ctx, r);
     }
     else {
         u_attr = res;
         var exclude = [
             'aav', 'aas', 'c', 'currk', 'email', 'flags', 'k', 'lup', 'name',
-            'p', 'privk', 'pubk', 's', 'since', 'ts', 'u', 'ut', 'ipcc'
+            'p', 'privk', 'pubk', 's', 'since', 'ts', 'u', 'ut', 'ipcc', 'b'
         ];
 
         for (var n in u_attr) {
@@ -219,13 +220,21 @@ function u_checklogin3a(res, ctx) {
                 ctx.checkloginresult(ctx, r);
             });
         }
-
+        // there was a race condition between importing and business accounts creation.
+        // in normal users there's no problem, however in business the user will be disabled
+        // till they pay. therefore, if the importing didnt finish before 'upb' then the importing
+        // will fail.
         if ($.createanonuser === u_attr.u) {
-            M.importWelcomePDF().dump();
+            M.importWelcomePDF().always(function imprtingFinishedCallback() {
+                ctx.checkloginresult(ctx, r);
+            });
             delete $.createanonuser;
         }
+        else {
+            ctx.checkloginresult(ctx, r);
+        }
     }
-    ctx.checkloginresult(ctx, r);
+    
 }
 
 // erase all local user/session information
@@ -313,6 +322,37 @@ function u_wasloggedin() {
 function u_setrsa(rsakey) {
     var $promise = new MegaPromise();
 
+    // performance optimization. encode keys once
+    var privateKeyEncoded = crypto_encodeprivkey(rsakey);
+    var publicKeyEncodedB64 = base64urlencode(crypto_encodepubkey(rsakey));
+    var buinessMaster;
+    var buinsesPubKey;
+
+    var request = {
+        a: 'up',
+        privk: a32_to_base64(encrypt_key(u_k_aes,
+            str_to_a32(privateKeyEncoded))),
+        pubk: publicKeyEncodedB64
+    };
+
+    // checking if we are creating keys for a business sub-user
+    if (window.businessSubAc) {
+        // we get current user's master user + its public key (master user pubkey)
+        buinessMaster = window.businessSubAc.bu;
+        buinsesPubKey = window.businessSubAc.bpubk;
+        
+
+        // now we will encrypt the current user master-key using master-user public key. and include it in 'up' request
+        // because master-user must be aware of evey sub-user's master-key.
+        var subUserMasterKey = a32_to_str(u_k);
+        var masterAccountRSA_keyPub = crypto_decodepubkey(base64urldecode(buinsesPubKey));
+        var subUserMasterKeyEncRSA = crypto_rsaencrypt(subUserMasterKey, masterAccountRSA_keyPub);
+        var subUserMasterKeyEncRSA_B64 = base64urlencode(subUserMasterKeyEncRSA);
+
+        request.mk = subUserMasterKeyEncRSA_B64;
+
+    }
+
     var ctx = {
         callback: function (res, ctx) {
             if (window.d) {
@@ -320,15 +360,19 @@ function u_setrsa(rsakey) {
             }
 
             u_privk = rsakey;
-
             // If coming from a #confirm link in the new registration process and logging in from a clean browser
             // session the u_attr might not be set to an object yet, this will prevent an exception below
             if (typeof u_attr === 'undefined') {
                 u_attr = {};
             }
-
-            u_attr.privk = u_storage.privk = base64urlencode(crypto_encodeprivkey(rsakey));
-            u_attr.pubk = u_storage.pubk = base64urlencode(crypto_encodepubkey(rsakey));
+            u_attr.privk = u_storage.privk = base64urlencode(privateKeyEncoded);
+            u_attr.pubk = u_storage.pubk = publicKeyEncodedB64;
+            
+            if (buinessMaster) {
+                // u_attr.mu = buinessMaster;
+                // u_attr.b = 1;
+                delete window.businessSubAc; // performance measure, freeup memory since it's not useful (nor harmful)
+            }
 
             // Update u_attr and store user data on account activation
             u_checklogin({
@@ -363,13 +407,8 @@ function u_setrsa(rsakey) {
             });
         }
     };
-
-    api_req({
-        a: 'up',
-        privk: a32_to_base64(encrypt_key(u_k_aes,
-            str_to_a32(crypto_encodeprivkey(rsakey)))),
-        pubk: base64urlencode(crypto_encodepubkey(rsakey))
-    }, ctx);
+    
+    api_req(request, ctx);
 
     return $promise;
 }
@@ -660,6 +699,44 @@ function processEmailChangeActionPacket(ap) {
         }
         // update the underlying fmdb cache
         M.addUser(user);
+
+        // in case of business master
+        // first, am i a master?
+        if (u_attr && u_attr.b && u_attr.b.m) {
+            // then, do i have this user as sub-user?
+            if (M.suba && M.suba[ap.u]) {
+                M.require('businessAcc_js', 'businessAccUI_js').done(
+                    function () {
+                        var business = new BusinessAccount();
+                        var sub = M.suba[ap.u];
+                        sub.e = ap.e;
+                        if (sub.pe) {
+                            delete sub.pe;
+                        }
+                        business.parseSUBA(sub, false, true);
+                    }
+                );
+            }
+        }
+    }
+    else {
+        // if the is business master we might accept other cases
+        if (u_attr && u_attr.b && u_attr.b.m) {
+            // then, do i have this user as sub-user?
+            if (M.suba && M.suba[ap.u]) {
+                var stillOkEmail = (ap.s === 2 && typeof ap.e === 'string' && ap.e.indexOf('@') !== -1);
+                if (stillOkEmail) {
+                    M.require('businessAcc_js', 'businessAccUI_js').done(
+                        function () {
+                            var business = new BusinessAccount();
+                            var sub = M.suba[ap.u];
+                            sub.pe = { e: ap.e, ts: ap.ts };
+                            business.parseSUBA(sub, false, true);
+                        }
+                    );
+                }
+            }
+        }
     }
 }
 

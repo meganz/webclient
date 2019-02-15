@@ -147,10 +147,47 @@ mobile.signin = {
             // Hide the text and show a loading spinner
             $signInButton.addClass('loading');
 
-            // Start the login flow and set different callbacks for the old and new registration types
-            security.login.checkLoginMethod(email, password, twoFactorPin, rememberMe,
-                                            mobile.signin.old.startLogin,
-                                            mobile.signin.new.startLogin);
+            // now if this is a business sub-user, we have a different workflow
+            if (localStorage.businessSubAc) {
+                var signupcode = '';
+                window.businessSubAc = JSON.parse(localStorage.businessSubAc);
+                signupcode = window.businessSubAc.signupcode;
+                var ctx = {
+                    checkloginresult: function (u_ctx, r) {
+                        if (typeof r[0] === 'number' && r[0] < 0) {
+                            msgDialog('warningb', l[135], l[200]);
+                        }
+                        else {
+                            loadingDialog.hide();
+                            u_type = r;
+
+                            security.login.checkLoginMethod(email, password, twoFactorPin, rememberMe,
+                                mobile.signin.old.startLogin,
+                                mobile.signin.new.startLogin);
+
+                            // I need this event handler to be triggered only once after successful sub-user login
+                            mBroadcaster.once('fm:initialized', M.importWelcomePDF);
+
+                        }
+                    },
+                    businessUser: password   // we need the plain enterd password in later stages
+                    // because u_checklogin take the byte array of the password.
+                };
+                var fname = from8(base64urldecode(window.businessSubAc.firstname));
+                var lname = from8(base64urldecode(window.businessSubAc.lastname));
+                u_checklogin(ctx,
+                    true,
+                    null,
+                    signupcode,
+                    fname + ' ' + lname);
+                delete localStorage.businessSubAc;
+            }
+            else {
+                // Start the login flow and set different callbacks for the old and new registration types
+                security.login.checkLoginMethod(email, password, twoFactorPin, rememberMe,
+                    mobile.signin.old.startLogin,
+                    mobile.signin.new.startLogin);
+            }
 
             // Prevent double clicks/taps
             return false;

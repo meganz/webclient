@@ -582,7 +582,7 @@
     font-size: 17px;
     white-space: nowrap;
     text-overflow: ellipsis;
-    background-color: none;
+    background-color: rgba(255,255,255,0.1);
     cursor: text;
 }
 .fm-right-account-block .dialog-input-title-ontop.underline-dropdown-input .dialog-input {

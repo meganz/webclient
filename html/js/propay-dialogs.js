@@ -25,7 +25,7 @@ var astroPayDialog = {
      * Initialise
      * @param {Object} selectedProvider
      */
-    init: function(selectedProvider) {
+    init: function (selectedProvider) {
 
         /* Testing stub for different AstroPay tax validation
         selectedProvider = {
@@ -62,7 +62,7 @@ var astroPayDialog = {
     /**
      * Update the dialog details
      */
-    updateDialogDetails: function() {
+    updateDialogDetails: function () {
 
         // Get the gateway name
         var gatewayName = this.selectedProvider.gatewayName;
@@ -100,7 +100,7 @@ var astroPayDialog = {
     /**
      * Display the dialog
      */
-    showDialog: function() {
+    showDialog: function () {
 
         this.$dialog.removeClass('hidden');
         this.showBackgroundOverlay();
@@ -114,7 +114,7 @@ var astroPayDialog = {
     /**
      * Hide the overlay and dialog
      */
-    hideDialog: function() {
+    hideDialog: function () {
 
         this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         this.$dialog.addClass('hidden');
@@ -128,7 +128,7 @@ var astroPayDialog = {
     /**
      * Shows the background overlay
      */
-    showBackgroundOverlay: function() {
+    showBackgroundOverlay: function () {
 
         // Show the background overlay only for desktop
         if (!is_mobile) {
@@ -139,17 +139,17 @@ var astroPayDialog = {
     /**
      * Functionality for the close button
      */
-    initCloseButton: function() {
-
+    initCloseButton: function () {
+        "use strict";
         // Initialise the close and cancel buttons
-        this.$dialog.find('.fm-dialog-close, .cancel').rebind('click', function() {
+        this.$dialog.find('.fm-dialog-close, .cancel').rebind('click', function () {
 
             // Hide the overlay and dialog
             astroPayDialog.hideDialog();
         });
 
         // Prevent close of dialog from clicking outside the dialog
-        $('.fm-dialog-overlay.payment-dialog-overlay').rebind('click', function(event) {
+        $('.fm-dialog-overlay.payment-dialog-overlay').rebind('click', function (event) {
             event.stopPropagation();
         });
     },
@@ -157,9 +157,9 @@ var astroPayDialog = {
     /**
      * Get the details entered by the user and redirect to AstroPay
      */
-    initConfirmButton: function() {
-
-        this.$dialog.find('.accept').rebind('click', function() {
+    initConfirmButton: function () {
+        "use strict";
+        this.$dialog.find('.accept').rebind('click', function () {
 
             // Store the full name and tax number entered
             astroPayDialog.fullName = $.trim(astroPayDialog.$dialog.find('#astropay-name-field').val());
@@ -169,7 +169,7 @@ var astroPayDialog = {
             if ((astroPayDialog.fullName === '') || (astroPayDialog.fullName === '')) {
 
                 // Show error dialog with Missing payment details
-                msgDialog('warninga', l[6958], l[6959], '', function() {
+                msgDialog('warninga', l[6958], l[6959], '', function () {
                     astroPayDialog.showBackgroundOverlay();
                 });
 
@@ -179,7 +179,7 @@ var astroPayDialog = {
             // If the tax number is invalid, show an error dialog
             if (!astroPayDialog.taxNumberIsValid()) {
 
-                msgDialog('warninga', l[6958], l[17789], '', function() {
+                msgDialog('warninga', l[6958], l[17789], '', function () {
                     astroPayDialog.showBackgroundOverlay();
                 });
 
@@ -196,7 +196,7 @@ var astroPayDialog = {
      * Checks if the tax number provided is valid for that tax label
      * @returns {Boolean} Returns true if valid, false if not
      */
-    taxNumberIsValid: function() {
+    taxNumberIsValid: function () {
 
         'use strict';
 
@@ -235,7 +235,7 @@ var astroPayDialog = {
 
         // Check for Brazil (CPF and CPNJ)
         else if (taxLabel === 'CPF' &&
-                (astroPayDialog.cpfIsValid(taxNumCleaned) || astroPayDialog.cpnjIsValid(taxNumCleaned))) {
+            (astroPayDialog.cpfIsValid(taxNumCleaned) || astroPayDialog.cpnjIsValid(taxNumCleaned))) {
             return true;
         }
         else {
@@ -252,7 +252,7 @@ var astroPayDialog = {
      * @param {String} taxNum The tax number entered by the user (which contains only numbers, no hyphens etc)
      * @returns {Boolean} Returns true if the CPF is valid
      */
-    cpfIsValid: function(taxNum) {
+    cpfIsValid: function (taxNum) {
 
         'use strict';
 
@@ -264,7 +264,7 @@ var astroPayDialog = {
         var firstCheckNum = parseInt(taxNum.substring(9, 10), 10);
         var secondCheckNum = parseInt(taxNum.substring(10, 11), 10);
 
-        var checkResult = function(sum, checkNum) {
+        var checkResult = function (sum, checkNum) {
             var result = (sum * 10) % 11;
             if ((result === 10) || (result === 11)) {
                 result = 0;
@@ -274,17 +274,17 @@ var astroPayDialog = {
 
         // Checking for dump data
         if (taxNum === '' ||
-                taxNum === '00000000000' ||
-                taxNum === '11111111111' ||
-                taxNum === '22222222222' ||
-                taxNum === '33333333333' ||
-                taxNum === '44444444444' ||
-                taxNum === '55555555555' ||
-                taxNum === '66666666666' ||
-                taxNum === '77777777777' ||
-                taxNum === '88888888888' ||
-                taxNum === '99999999999'
-                ) {
+            taxNum === '00000000000' ||
+            taxNum === '11111111111' ||
+            taxNum === '22222222222' ||
+            taxNum === '33333333333' ||
+            taxNum === '44444444444' ||
+            taxNum === '55555555555' ||
+            taxNum === '66666666666' ||
+            taxNum === '77777777777' ||
+            taxNum === '88888888888' ||
+            taxNum === '99999999999'
+        ) {
 
             return false;
         }
@@ -319,7 +319,7 @@ var astroPayDialog = {
      * @param {String} taxNum The tax number entered by the user (which contains only numbers, no hyphens etc)
      * @returns {Boolean} Returns true if the CPNJ is valid
      */
-    cpnjIsValid: function(taxNum) {
+    cpnjIsValid: function (taxNum) {
 
         'use strict';
 
@@ -343,11 +343,11 @@ var astroPayDialog = {
         var verifierDigit = function (numbers) {
 
             var index = 2;
-            var reverse = numbers.split("").reduce(function(buffer, number) {
+            var reverse = numbers.split("").reduce(function (buffer, number) {
                 return [parseInt(number, 10)].concat(buffer);
             }, []);
 
-            var sum = reverse.reduce(function(buffer, number) {
+            var sum = reverse.reduce(function (buffer, number) {
                 buffer += number * index;
                 index = (index === 9 ? 2 : index + 1);
                 return buffer;
@@ -358,14 +358,14 @@ var astroPayDialog = {
             return (mod < 2 ? 0 : 11 - mod);
         };
 
-        var strip = function(number, strict) {
+        var strip = function (number, strict) {
 
             var regex = strict ? STRICT_STRIP_REGEX : LOOSE_STRIP_REGEX;
 
             return (number || "").toString().replace(regex, "");
         };
 
-        var isValid = function(number, strict) {
+        var isValid = function (number, strict) {
 
             var stripped = strip(number, strict);
 
@@ -398,7 +398,7 @@ var astroPayDialog = {
      * Redirect to the site
      * @param {String} utcResult containing the url to redirect to
      */
-    redirectToSite: function(utcResult) {
+    redirectToSite: function (utcResult) {
 
         var url = utcResult.EUR['url'];
         window.location = url;
@@ -408,7 +408,7 @@ var astroPayDialog = {
      * Process the result from the API User Transaction Complete call
      * @param {Object} utcResult The results from the UTC call
      */
-    processUtcResult: function(utcResult) {
+    processUtcResult: function (utcResult) {
 
         // If successful AstroPay result, redirect
         if (utcResult.EUR.url) {
@@ -425,7 +425,7 @@ var astroPayDialog = {
      * Something has gone wrong just talking to AstroPay
      * @param {Object} utcResult The result from the UTC API call with error codes
      */
-    showError: function(utcResult) {
+    showError: function (utcResult) {
 
         // Generic error: Oops, something went wrong...
         var message = l[47];
@@ -446,7 +446,7 @@ var astroPayDialog = {
         }
 
         // Show error dialog
-        msgDialog('warninga', l[7235], message, '', function() {
+        msgDialog('warninga', l[7235], message, '', function () {
             astroPayDialog.showBackgroundOverlay();
             astroPayDialog.showDialog();
         });
@@ -455,7 +455,7 @@ var astroPayDialog = {
     /**
      * Shows a modal dialog that their payment is pending
      */
-    showPendingPayment: function() {
+    showPendingPayment: function () {
 
         this.$backgroundOverlay = $('.fm-dialog-overlay');
         this.$pendingOverlay = $('.payment-result.pending.original');
@@ -466,15 +466,22 @@ var astroPayDialog = {
 
         insertEmailToPayResult(this.$pendingOverlay);
 
-        // Add click handlers for 'Go to my account' and Close buttons
-        this.$pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+        if (!u_type || u_type !== 3) {
+            this.$pendingOverlay.find('.payment-result-button, .payment-close').addClass('hidden');
+        }
+        else {
+            this.$pendingOverlay.find('.payment-result-button, .payment-close').removeClass('hidden');
 
-            // Hide the overlay
-            astroPayDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-            astroPayDialog.$pendingOverlay.addClass('hidden');
+            // Add click handlers for 'Go to my account' and Close buttons
+            this.$pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function () {
 
-            pro.redirectToSite();
-        });
+                // Hide the overlay
+                astroPayDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                astroPayDialog.$pendingOverlay.addClass('hidden');
+
+                pro.redirectToSite();
+            });
+        }
     }
 };
 
@@ -1163,7 +1170,18 @@ var addressDialog = {
     /**
      * Open and setup the dialog
      */
-    init: function() {
+    init: function (plan, userInfo, businessRegisterPage) {
+        "use strict";
+        if (plan) {
+            this.businessPlan = plan;
+            this.userInfo = userInfo;
+            this.businessRegPage = businessRegisterPage;
+        }
+        else {
+            delete this.businessPlan;
+            delete this.userInfo;
+            delete this.businessRegPage;
+        }
         this.showDialog();
         this.initStateDropDown();
         this.initCountryDropDown();
@@ -1181,19 +1199,52 @@ var addressDialog = {
         this.$dialog = $('.payment-address-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
 
-        // Get the selected package
-        var selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
-        var selectedPackage = pro.membershipPlans[selectedPlanIndex];
+        var selectedPlanIndex;
+        var selectedPackage;
+        var proNum;
+        var proPlan;
+        var proPrice;
+        var numOfMonths;
+        var monthsWording;
 
-        // Get the selected Pro plan details
-        var proNum = selectedPackage[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
-        var proPlan = pro.getProPlanName(proNum);
-        var proPrice = selectedPackage[pro.UTQA_RES_INDEX_PRICE];
-        var numOfMonths = selectedPackage[pro.UTQA_RES_INDEX_MONTHS];
-        var monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
+        this.$dialog.find('.plan-icon .reg-st3-membership-icon').removeClass('hidden');
+        this.$dialog.find('input.first-name').val('');
+        this.$dialog.find('input.last-name').val('');
+
+        // in case we are coming from normal users sign ups (PRO)
+        if (!this.businessPlan || !this.userInfo) {
+            // Get the selected package
+            selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
+            selectedPackage = pro.membershipPlans[selectedPlanIndex];
+
+            // Get the selected Pro plan details
+            proNum = selectedPackage[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+            proPlan = pro.getProPlanName(proNum);
+            proPrice = selectedPackage[pro.UTQA_RES_INDEX_PRICE];
+            numOfMonths = selectedPackage[pro.UTQA_RES_INDEX_MONTHS];
+            proNum = 'pro' + proNum;
+        }
+        else {
+            // here it means we are coming from business account register page
+            proNum = 'bus-plan-icon64'; // business account Plan icon
+            proPlan = l[19510];
+            proPrice = (this.userInfo.nbOfUsers * this.businessPlan.p).toFixed(2);
+            this.businessPlan.totalPrice = proPrice;
+            this.businessPlan.totalUsers = this.userInfo.nbOfUsers;
+            numOfMonths = this.businessPlan.m;
+
+            this.$dialog.find('.plan-icon .reg-st3-membership-icon').addClass('hidden');
+            this.$dialog.find('input.first-name').val(this.userInfo.fname);
+            this.$dialog.find('input.last-name').val(this.userInfo.lname);
+            // auto renew is mandatory in business
+            this.$dialog.find('.payment-buy-now').text(l[6172]);
+        }
+        monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
+        
 
         // Update template
-        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
+        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 bus-plan-icon64')
+            .addClass(proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
         this.$dialog.find('.payment-plan-price .price').text(proPrice);
@@ -1368,10 +1419,20 @@ var addressDialog = {
         // Change the class depending on mobile/desktop
         var closeButtonClass = (is_mobile) ? 'close-payment-dialog' : 'btn-close-dialog';
 
+        var mySelf = this;
+
         // Add the click handler to hide the dialog and the black overlay
         this.$dialog.find('.' + closeButtonClass).rebind('click', function() {
 
             addressDialog.closeDialog();
+            // if we are coming from business plan, we need to reset registration
+            if (mySelf.businessPlan && mySelf.userInfo) {
+                if (is_mobile) {
+                    parsepage(pages['registerb']);
+                }
+                var businessReg = new BusinessRegister();
+                businessReg.initPage();
+            }
         });
     },
 
@@ -1477,17 +1538,30 @@ var addressDialog = {
             this.extraDetails.state = state.substr(3);
         }
 
-        // Get the value for whether the user wants the plan to renew automatically
-        var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
+        // check if we are coming from business account register
+        if (!this.businessPlan || !this.userInfo) {
+            // Get the value for whether the user wants the plan to renew automatically
+            var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
 
-        // If the provider supports recurring payments and the user wants the plan to renew automatically
-        if (autoRenewCheckedValue === 'yes') {
+            // If the provider supports recurring payments and the user wants the plan to renew automatically
+            if (autoRenewCheckedValue === 'yes') {
+                this.extraDetails.recurring = true;
+            }
+        }
+        else {
+            // in business accounts recurring is mandatory
             this.extraDetails.recurring = true;
         }
 
         // Hide the dialog so the loading one will show, then proceed to pay
         this.$dialog.addClass('hidden');
-        pro.propay.sendPurchaseToApi();
+
+        if (!this.businessPlan || !this.userInfo || !this.businessRegPage) {
+            pro.propay.sendPurchaseToApi();
+        }
+        else {
+            this.businessRegPage.processPayment(this.extraDetails, this.businessPlan);
+        }
     },
 
     /**
@@ -2316,7 +2390,7 @@ if (is_chrome_firefox) {
 var insertEmailToPayResult = function($overlay) {
     "use strict";
 
-    if (u_attr.email) {
+    if (u_attr && u_attr.email) {
         $overlay.find('.payment-result-txt .user-email').text(u_attr.email);
     } else if (localStorage.awaitingConfirmationAccount) {
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);

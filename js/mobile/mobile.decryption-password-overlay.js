@@ -8,7 +8,7 @@ mobile.decryptionPasswordOverlay = {
 
     /**
      * Initialise and show the overlay
-     * @param {String} page The public file/folder handle e.g. P!AQG4iTLFFJuL1...
+     * @param {String} page The public file/folder handle e.g. P!AQG4iTLFFJuL1, or subuser invitation link
      */
     show: function(page) {
 
@@ -35,10 +35,105 @@ mobile.decryptionPasswordOverlay = {
         // Add click/tap handler
         this.$overlay.find('.decrypt-button').off('tap').on('tap', function() {
 
-            // Decrypt the link
-            mobile.decryptionPasswordOverlay.decryptLink(page);
+            // is this a subuser invitation link
+            if (page.substr(0, 14) === 'businesssignup') {
+                mobile.decryptionPasswordOverlay.decryptBusinessSubuserInvitationLink(page);
+            }
+            else { // it's a password protected link (file/folder)
+                // Decrypt the link
+                mobile.decryptionPasswordOverlay.decryptLink(page);
+            }
             return false;
         });
+    },
+
+    /**
+     * Decrypts the invitation link and redirects if successful
+     * @param {String} link sub-user invitation link
+     */
+    decryptBusinessSubuserInvitationLink: function (link) {
+        'use strict';
+
+        var mySelf = this;
+        link = page.substring(14, link.length);
+        var $errorMessage = this.$overlay.find('.error-message');
+        var $password = this.$overlay.find('.decryption-password');
+        var $decryptButton = this.$overlay.find('.decrypt-button');
+
+        // View animation and change text
+        $decryptButton.addClass('decrypting');
+
+        // similar to decryptLink function below,
+        if (is_ios) {
+            $decryptButton.addClass('ios').text(l[8579] + '...');   // Decrypting
+        }
+
+        var enteredPassword = $password.val();
+        if (!enteredPassword.length) {
+            $errorMessage.addClass('bold').text(l[970]);  // Please enter a valid password...
+            $decryptButton.removeClass('decrypting ios').text(l[1027]);   // Decrypt
+            return false;
+        }
+        else {
+            M.require('businessAcc_js').done(function () {
+
+                var business = new BusinessAccount();
+                var failureAction = function (st, res, desc) {
+                    mySelf.$overlay.addClass('hidden');
+                    var msg = l[17920]; // not valid password
+                    if (res) {
+                        msg = l[19567]; // not valid link 19567
+                        console.error(st, res, desc);
+                    }
+                    msgDialog('warninga', '', msg, '', function () {
+                        loadSubPage('start');
+                    });
+                };
+
+                var decryptedTokenBase64 = business.decryptSubAccountInvitationLink(link, enteredPassword);
+
+                if (decryptedTokenBase64) {
+                    var getInfoPromise = business.getSignupCodeInfo(decryptedTokenBase64);
+
+                    getInfoPromise.fail(failureAction);
+
+                    getInfoPromise.done(function signupCodeGettingSuccessHandler(status, res) {
+                        mySelf.$overlay.addClass('hidden');
+                        if (localStorage.d) {
+                            console.log(res);
+                        }
+                        if (!res.e || !res.firstname || !res.bpubk || !res.bu) {
+                            failureAction(1, res, 'uv2 not complete response');
+                        }
+                        else {
+                            if (u_type === false) {
+                                res.signupcode = decryptedTokenBase64;
+                                localStorage.businessSubAc = JSON.stringify(res);
+                                mobile.register.showConfirmAccountScreen(res, true);
+                            }
+                            else {
+                                var msgTxt = l[18795];
+                                // 'You are currently logged in. ' +
+                                //  'Would you like to log out and proceed with business account registration ? ';
+                                // closeDialog();
+                                msgDialog('confirmation', l[968], msgTxt, '', function (e) {
+                                    if (e) {
+                                        mLogout();
+                                    }
+                                    else {
+                                        loadSubPage('');
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                }
+                else {
+                    failureAction();
+                }
+            });
+        }
     },
 
     /**

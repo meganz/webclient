@@ -26,7 +26,12 @@ function init_start() {
     }
     else {
         $('.button-48-height.register').rebind('click', function () {
-            loadSubPage('register');
+            if ($(this).hasClass('business-reg')) {
+                loadSubPage('registerb');
+            }
+            else {
+                loadSubPage('register');
+            }
         });
         $('.startpage.try-mega').text(l[16535]);
 
@@ -75,6 +80,12 @@ function init_start() {
             // directed to the Pro payment page with the plan already selected
             showSignupPromptDialog();
         }
+    });
+
+    // Handler for Try Business Account
+    $('.try-business-button-plan-btn').off('click.suba').on('click.suba', function
+        tryBusinessAccountButtonClickHandler() {
+        loadSubPage('business');
     });
 
     if (!is_mobile && page === 'start') {

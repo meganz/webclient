@@ -37,14 +37,15 @@
     border-radius: 100%;
 }
 .top-head .default-white-button.individual {
-    display: none;
+    margin: 4px 0 0 30px;
+    font-size: 14px;
+    font-family: 'source_sans_proregular', Arial;
 }
-.business .bottom-page .default-white-button.individual {
-    display: block;
+/*.business .bottom-page .default-white-button.individual {
     margin: 4px 0 0 30px;
     font-size: 16px;
     font-family: 'source_sans_prosemibold', Arial;
-}
+}*/
 .business-page.bottom-page .top-head, .business-page.bottom-page .top-head.floating {
     background-color: #F0F2F5;
     box-shadow: 0 1px 0 0 rgba(0,0,0,0.15);
@@ -116,7 +117,8 @@ i.medium-icon.business-sprite {
 }
 .bottom-page.big-header.dark {
     color: #333333;
-    max-width: 457px;
+    max-width: 86%;
+    margin-left: 7%;
 }
 .bottom-page.medium-txt.lato {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
@@ -124,12 +126,12 @@ i.medium-icon.business-sprite {
     line-height: 30px;
     text-align: center;
     color: #666666;
-    padding: 20px 0 47px 0;
-    max-width: 360px;
+    padding: 20px 0 47px 0px;
+    color: #333333;
+    max-width: 86%;
+    margin-left: 7%;
 }
-.bottom-page.big-header.dark + .bottom-page.medium-txt.lato {
-    text-align: left;
-}
+
 .medium-icon.business-sprite.right-arrow {
     background-position: -46px -111px;
     margin: 11px 0 0 2px;
@@ -173,6 +175,8 @@ i.medium-icon.business-sprite {
 .business-page .bottom-page.horizontal-centered-bl {
     max-width: 1230px;
     padding: 0 30px;
+    width: 100%;
+    display: block;
 }
 .bottom-page.content-table {
     display: table;
@@ -846,7 +850,7 @@ img.bottom-page.business4 {
     .bottom-page.content-cell {
         display: block;
         width: 100%;
-        padding: 22px 26px;
+        padding: 18px 20px;
     }
     .bottom-page.content-cell .business-price {
         font-size: 18px;
@@ -881,6 +885,9 @@ img.bottom-page.business4 {
     .slider-body .bottom-page.business-text {
         font-size: 14px;
         line-height: 24px;
+    }
+    .bottom-page.business-text.top-pad {
+    padding-top: 32px;
     }
     .business-page .cell-60, .business-page .cell-40, .business-page .cell-55, .business-page .cell-45 {
         width: 100%;
@@ -922,6 +929,7 @@ img.bottom-page.business4 {
     .business-big-header {
         font-size: 24px;
         line-height: 32px;
+        padding-top:48px;
         text-align: center;
     }
     .business-txt-block {
@@ -953,7 +961,6 @@ img.bottom-page.business4 {
         padding: 0;
         margin: 0 0 28px 0;
         max-width: 300px;
-        
     }
     .business-row.company {
         display: block;
@@ -984,9 +991,9 @@ img.bottom-page.business4 {
     .business-info.mobile .business-cell.cell-icon {
         min-height: 48px;
         display: block;
-        padding: 15px 20px 13px 36px;
-        font-size: 12px;
-        line-height: 20px;
+        padding: 15px 16px 13px 36px;
+        font-size: 14px;
+        line-height: 21px;
         color: #333333;
         font-family: 'LatoWeb', 'source_sans_proregular', Arial;
         position: relative;
@@ -1019,7 +1026,7 @@ img.bottom-page.business4 {
         font-size: 24px;
         line-height: 32px;
         text-align: center;
-        padding: 0px 0 49px 0;
+        padding: 36px 0;
     }
     .business-icon.red-icons {
         margin: 0 auto -10px auto;
@@ -1091,6 +1098,13 @@ img.bottom-page.business4 {
         display: block;
         margin: 8px auto;
         left: auto;
+    }
+    .business-page .bottom-page.horizontal-centered-bl {
+        padding: 16px 24px;
+    }
+    .business-tick-txt {
+        line-height: 24px;
+        padding: 8px 16px 8px 24px;
     }
  }
 

@@ -832,7 +832,7 @@ ul, li {
 .download-complete .mobile.download-progress .bar, .upload-complete .mobile.upload-progress .bar {
     width: 100%;
 }
-.mobile.fm-block, .mobile.signin-register-block, .mobile.registration-confirm-email {
+.mobile.fm-block, .mobile.signin-register-block, .mobile.registration-confirm-email, .mobile.bus-pw-confirm-block {
     width: 100%;
     height: 100%;
     background-color: white;
@@ -842,7 +842,8 @@ ul, li {
 .mobile.fm-block.create-new-folder-dialog {
     background-color: rgba(0,0,0,0);
 }
-.mobile.signin-register-block .mobile.fm-block {
+.mobile.signin-register-block .mobile.fm-block,
+.mobile.bus-pw-confirm-block .mobile.fm-block {
     background-color: #F8F9FA;
 }
 .mobile.registration-confirm-email{
@@ -1958,7 +1959,7 @@ ul, li {
 .signin-register-block .tab-block.register .signin-input.password {
     position: relative;
 }
-.signin-register-block .estimator-loading-icon, .recover-account-page .estimator-loading-icon {
+.signin-register-block .estimator-loading-icon, .recover-account-page .estimator-loading-icon, .bus-pw-confirm-block .estimator-loading-icon {
     background: rgba(0, 0, 0, 0) url("../images/mega/ajax-loader-gray.gif") no-repeat scroll 0 0 / 16px 16px;
     display: none;
     height: 16px;
@@ -1968,7 +1969,7 @@ ul, li {
     width: 16px;
     z-index: 1;
 }
-.signin-register-block .estimator-loading-icon.loading, .recover-account-page .estimator-loading-icon.loading, .mobile.create-new-folder-dialog .red-button.confirm-ok-button  {
+.signin-register-block .estimator-loading-icon.loading, .recover-account-page .estimator-loading-icon.loading, .mobile.create-new-folder-dialog .red-button.confirm-ok-button, .bus-pw-confirm-block .estimator-loading-icon.loading {
     display: block;
 }
 /* Prevent Chrome displaying the default checkbox */
@@ -2091,7 +2092,7 @@ input[type='checkbox'] {
 .mobile.confirm-terms .text a {
     color: #eb4444;
 }
-.mobile.signin-button, .mobile.register-button, .mobile.resend-button {
+.mobile.signin-button, .mobile.register-button, .mobile.resend-button, .mobile.create-account-botton {
     background-color: #eb4444;
     background: #eb4444;
     background-image: linear-gradient(-180deg, rgba(255,255,255,0) 0%, rgba(242,242,242,0) 100%);
@@ -2113,7 +2114,7 @@ input[type='checkbox'] {
     opacity: 0.3;
     border-radius: 3px;
 }
-.mobile.signin-button.active, .mobile.register-button.active, .mobile.resend-button.active {
+.mobile.signin-button.active, .mobile.register-button.active, .mobile.resend-button.active, .mobile.create-account-botton.active {
     background-color: #eb4444;
     background: #eb4444;
     color: #fff;
@@ -2613,11 +2614,14 @@ div.checkboxOn, div.checkboxOff {
 .mobile.overlay-info p {
     padding: 3px 0 18px 0;
     margin: 0;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 21px;
     color: #555;
     white-space: normal;
-    text-align: left;
+/*    text-align: left;*/
+}
+.mobile.overlay-info p.error-message {
+    color: #d90007;
 }
 .mobile.overlay-info p.bold {
     font-family: 'source_sans_prosemibold';
@@ -5151,6 +5155,12 @@ div.checkboxOn, div.checkboxOff {
 .mobile.icon.pro-mini.pro3 {
     background-position: -2px -1960px;
 }
+.mobile.icon.pro-mini.pro100 {
+    background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+    background-position: -149px -415px;
+    height: 22px;
+}
 .mobile.my-account-page .account-usage-block {
     background-color: #fff;
     padding: 21px 0;
@@ -5289,6 +5299,18 @@ div.checkboxOn, div.checkboxOff {
     top: 17px;
 }
 
+.user-management-account-settings .bus-input .note-message, .bus-reg-body .bus-reg-input .note-message {
+    font-size: 13px;
+    padding: 16px 0 0 4px;
+    color: #888;
+    width: 90%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.bus-reg-body .bus-reg-input.num.error .note-message {
+    display: none;
+}
 /* Help centre header */
 .help-section.fm-header {
     background-color: #fff;
@@ -5735,18 +5757,21 @@ textarea.mobile.support-text-field {
 .mobile.main-block.forgot-password-page, .mobile.main-block.recover-account-page, .mobile.main-block.enter-recovery-key-page {
     background-color: #fff;
 }
-.mobile.recovery-key-page .mobile.recovery-key-heading, .mobile.forgot-password-page .mobile.forgot-password-heading, .mobile.r-a-heading, .mobile.two-factor-page .two-factor-heading {
+.mobile.recovery-key-page .mobile.recovery-key-heading, .mobile.forgot-password-page .mobile.forgot-password-heading, .mobile.r-a-heading, .mobile.two-factor-page .two-factor-heading, .mobile.main-block.error-overlay .password-decryption-heading {
     color: #262F3B;
     font-family: 'LatoWebbold', 'source_sans_prosemibold';
     font-size: 17px;
     line-height: 1.5;
     margin: 0 24px 0 24px;
 }
-.mobile.recovery-key-page .mobile.recovery-key-body-text, .mobile.forgot-password-page .mobile.forgot-password-body-text, .mobile.recover-account-page .mobile.recover-account-body-text, .two-factor-body-text {
+.mobile.recovery-key-page .mobile.recovery-key-body-text, .mobile.forgot-password-page .mobile.forgot-password-body-text, .mobile.recover-account-page .mobile.recover-account-body-text, .two-factor-body-text, .mobile.main-block.error-overlay .password-decryption-body-text {
     color: #676D75;
     font-size: 14px;
     line-height: 24px;
     margin: 20px 24px;
+}
+.mobile.main-block.error-overlay .password-decryption-body-text {
+    white-space: normal;
 }
 .mobile.recover-account-body-text a {
     color: #eb4444;
@@ -8992,6 +9017,16 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .contact-directory {
     display: none;
 }
+/* for business account */
+.bus-reg-body .bus-reg-title,
+.bus-reg-input.correctinput .bus-reg-title,
+.bus-reg-input.active .bus-reg-title,
+.bus-reg-input.error .bus-reg-title {
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    display: none;
+}
 .security-page-video-block .download.video-block {
     margin: 0 auto;
     height: 360px;
@@ -9112,7 +9147,25 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .new-bottom-pages.terms .index-table td:not(:first-child) {
     text-align: right;
 }
-
+.business-page .big-red-button.height-48 {
+    height: 48px;
+    line-height: 47px;
+    font-size: 18px;
+    min-width: 0;
+    width: 100%;
+    max-width: 360px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+    background: #F0373A;
+    color: white;
+    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
 .mobile.payment-result.pending.alternate {
     position: fixed;
     z-index: 99999;
@@ -10173,7 +10226,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         margin-left: 24px;
         margin-right: 19px;
     }
-    .mobile.signin-button, .mobile.register-button, .mobile.resend-button {
+    .mobile.signin-button, .mobile.register-button, .mobile.resend-button, .mobile.create-account-button {
         height: 48px;
         line-height: 47px;
         margin-left: 24px;

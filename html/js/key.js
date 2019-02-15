@@ -44,7 +44,20 @@ function ui_keycomplete() {
             api_req({ a: 'log', e: 99628, m: 'Completed registration on regular webclient' });
         }
 
-        // Load the Pro page to choose plan
-        loadSubPage('pro');
+        // if this is a sub-user in a business account.
+        // either This is the master  --> wont get the confirmation link until we receive successful payment
+        // or, this is a sub-user --> no need to ask them anything after this point
+        if (u_attr.b) {
+            if (page === 'fm') {
+                loadSubPage('start');
+            }
+            else {
+                loadSubPage('fm');
+            }
+        }
+        else {
+            // Load the Pro page to choose plan
+            loadSubPage('pro');
+        }
     }
 }

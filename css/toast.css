@@ -35,6 +35,7 @@
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
     visibility: hidden;
 }
+
 .toast-notification::before {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
@@ -342,3 +343,38 @@
 }
 
 /* end of Mobile*/
+
+/* Desktop Progress bar */
+
+/*.toast-notification.progress-bar-notification {
+    max-width: 520px;
+    height: 72px;
+    margin: 0 0 -72px -260px;
+}
+
+.toast-heading-info {
+    width: 40px;
+    height: 20px;
+    display: inline-block;
+    position: absolute;
+    left: 20px;
+    top: 26px;
+    background-color: #666;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 20px;
+    text-align: center;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}*/
+
+
+
+
+
+
+
+
+
+
+

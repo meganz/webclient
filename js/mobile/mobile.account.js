@@ -91,13 +91,20 @@ mobile.account = {
 
         'use strict';
 
-        // On clicking/tapping the Upgrade Account button
-        $page.find('.account-upgrade-block').off('tap').on('tap', function() {
+        // if this is business dont show
+        if (u_attr.b && u_attr.b.s !== -1) {
+            $page.find('.account-upgrade-block').addClass('hidden');
+        }
+        else {
+            var upgradeBtn = $page.find('.account-upgrade-block').removeClass('hidden');
+            // On clicking/tapping the Upgrade Account button
+            upgradeBtn.off('tap').on('tap', function() {
 
-            // Load the Pro page
-            loadSubPage('pro');
-            return false;
-        });
+                // Load the Pro page
+                loadSubPage('pro');
+                return false;
+            });
+        }
     },
 
     /**
@@ -135,6 +142,16 @@ mobile.account = {
 
         'use strict';
 
+        // if this is business no limit for storage and no percentage
+        var $accountUsageBlockExternal = $('.mobile.account-usage-block');
+        if (u_attr.b) {
+            $accountUsageBlockExternal.find('.mobile.storage-usage').addClass('hidden');
+            $accountUsageBlockExternal.find('.mobile.storage-usage.business').removeClass('hidden');
+        }
+        else {
+            $accountUsageBlockExternal.find('.mobile.storage-usage').removeClass('hidden');
+            $accountUsageBlockExternal.find('.mobile.storage-usage.business').addClass('hidden');
+        }
         // Fetch all account data from the API
         M.accountData(
             function() {
@@ -493,38 +510,45 @@ mobile.account = {
 
         'use strict';
 
-        // On clicking/tapping the Upgrade Account button
-        $page.find('.acount-cancellation-block').off('tap').on('tap', function() {
+        // if this is business sub-user hide
+        if (u_attr.b && !u_attr.b.m) {
+            $page.find('.acount-cancellation-block').addClass('hidden');
+        }
+        else {
+            var cancelBlock = $page.find('.acount-cancellation-block').removeClass('hidden');
+            // On clicking/tapping the Upgrade Account button
+            cancelBlock.off('tap').on('tap', function() {
 
-            // Please confirm that all your data will be deleted
-            var confirmMessage = l[1974];
-            var $cancelAccountOverlay = $('#mobile-ui-error');
+                // Please confirm that all your data will be deleted
+                var confirmMessage = l[1974];
+                var $cancelAccountOverlay = $('#mobile-ui-error');
 
-            // Search through their Pro plan purchase history
-            $(account.purchases).each(function(index, purchaseTransaction) {
+                // Search through their Pro plan purchase history
+                $(account.purchases).each(function(index, purchaseTransaction) {
 
-                // Get payment method name
-                var paymentMethodId = purchaseTransaction[4];
-                var paymentMethod = pro.getPaymentGatewayName(paymentMethodId).name;
+                    // Get payment method name
+                    var paymentMethodId = purchaseTransaction[4];
+                    var paymentMethod = pro.getPaymentGatewayName(paymentMethodId).name;
 
-                // If they have paid with iTunes or Google Play in the past
-                if ((paymentMethod === 'apple') || (paymentMethod === 'google')) {
+                    // If they have paid with iTunes or Google Play in the past
+                    if ((paymentMethod === 'apple') || (paymentMethod === 'google')) {
 
-                    // Update confirmation message to remind them to cancel iTunes or Google Play
-                    confirmMessage += ' ' + l[8854];
-                    return false;
-                }
+                        // Update confirmation message to remind them to cancel iTunes or Google Play
+                        confirmMessage += ' ' + l[8854];
+                        return false;
+                    }
+                });
+
+                // Show a confirm dialog
+                mobile.account.showAccountCancelConfirmDialog($page, confirmMessage);
+
+                // Show close button
+                $cancelAccountOverlay.find('.text-button').removeClass('hidden');
+
+                // Prevent double tap
+                return false;
             });
-
-            // Show a confirm dialog
-            mobile.account.showAccountCancelConfirmDialog($page, confirmMessage);
-
-            // Show close button
-            $cancelAccountOverlay.find('.text-button').removeClass('hidden');
-
-            // Prevent double tap
-            return false;
-        });
+        }
     },
 
     /**

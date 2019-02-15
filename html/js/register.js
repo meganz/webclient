@@ -311,7 +311,48 @@ function pageregister() {
             msgDialog('warninga', l[1117], l[1118]);
         }
         else {
-            if (u_type === false) {
+            // for business sub-users signup we are still using signup code.
+            // and business sub-users registration flow is different and more direct than normal users
+            // as it doesnt contain "uc2" due to the implied email confirmation (because the user is coming
+            // from invitation email)
+            // Note: for business no backward compatibility is needed and V2 registration is mandatory
+            if (localStorage.businessSubAc) {
+                var signupcode = '';
+                window.businessSubAc = JSON.parse(localStorage.businessSubAc);
+                signupcode = window.businessSubAc.signupcode;
+                var ctx = {
+                    checkloginresult: function (u_ctx, r) {
+                        if (typeof r[0] === 'number' && r[0] < 0) {
+                            msgDialog('warningb', l[135], l[200]);
+                        }
+                        else {
+                            loadingDialog.hide();
+                            u_type = r;
+
+                            security.login.checkLoginMethod($email.val().toLowerCase(),
+                                $password.val(), null, false,
+                                signin.old.startLogin,
+                                signin.new.startLogin);
+
+                            // I need this event handler to be triggered only once after successful sub-user login
+                            mBroadcaster.once('fm:initialized', M.importWelcomePDF);
+
+                        }
+                    },
+                    businessUser: $password.val()   // we need the plain enterd password in later stages
+                    // because u_checklogin take the byte array of the password.
+                };
+                // var passwordByteArray = prepare_key_pw($password.val());
+                // var passwordaes = new sjcl.cipher.aes(passwordByteArray);
+                // var uh = stringhash($email.val().toLowerCase(), passwordaes);
+                u_checklogin(ctx,
+                    true,
+                    null,
+                    signupcode,
+                    $firstName.val() + ' ' + $lastName.val());
+                delete localStorage.businessSubAc;
+            }
+            else if (u_type === false) {
                 loadingDialog.show();
                 u_storage = init_storage(localStorage);
                 u_checklogin({
@@ -390,6 +431,38 @@ function init_register() {
         bottomPageDialog(false, 'terms', false, true);
         return false;
     });
+    
+
+    var $regInfoContainer = $('.main-mid-pad.big-pad.register1 .main-left-block');
+    $('.input-wrapper.name', $regInfoContainer).removeClass('hidden');
+    $('.input-wrapper.email', $regInfoContainer).removeClass('hidden');
+    $('.account.top-header.wide', $regInfoContainer).safeHTML(l[1095]);
+
+    var $tipsContainer = $('.main-mid-pad.big-pad.register1 .main-right-block');
+    $('.dont-forget-pass', $tipsContainer).removeClass('hidden'); // 19130
+    $('p.account-sec', $tipsContainer).safeHTML(l[1093] + ' ' + l[1094]);
+    $('.account-business', $tipsContainer).addClass('hidden');
+
+    // business sub-account registration
+    if (localStorage.businessSubAc) {
+        var userInfo = JSON.parse(localStorage.businessSubAc);
+        // we know here that userInfo contain all needed attr, otherwise higher layers wont allow us
+        // to get here.
+        $('.input-wrapper.email input').val(userInfo.e);
+        // $('#register-email').attr('readonly', true);
+        $('.input-wrapper.name .l-name').val(from8(base64urldecode(userInfo.lastname)));
+        // $('#register-lastname').attr('readonly', true);
+        $('.input-wrapper.name .f-name').val(from8(base64urldecode(userInfo.firstname)));
+        // $('#register-firstname').attr('readonly', true);
+        var headerText = l[19129].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+        $('.account.top-header.wide', $regInfoContainer).safeHTML(headerText);
+
+        $('.input-wrapper.name', $regInfoContainer).addClass('hidden');
+        $('.input-wrapper.email', $regInfoContainer).addClass('hidden');
+        $('.dont-forget-pass', $tipsContainer).addClass('hidden');
+        $('p.account-sec', $tipsContainer).text(l[19131]);
+        $('.account-business', $tipsContainer).removeClass('hidden');
+    }
 
     // Init inputs events
     accountinputs.init($formWrapper);

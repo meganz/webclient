@@ -619,6 +619,16 @@
 .small-icon.membership.pro3 {
     background-position: center -2214px;
 }
+
+.small-icon.membership.pro100 {
+    background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+    background-position: -149px -415px;
+    position: relative;
+    height: 22px;
+}
+
+
 .tiny-icon.cog {
     background-image: url(../images/mega/fm-main-sprite_v7.png);
     background-position: -17px -10463px;
@@ -921,6 +931,13 @@
 .tiny-icon.membership-status.pro3 {
     background-position: -10px -1059px;
 }
+.tiny-icon.membership-status.pro100{
+    background-image: url(../images/mega/big-icons.png);
+    background-position: -127px -418px;
+    width: 16px;
+    height: 16px;
+}
+
 .semi-small-icon.grey-mega {
     background-image: url(../images/mega/top-sprite_v5.png);
     background-position: -10px -326px;

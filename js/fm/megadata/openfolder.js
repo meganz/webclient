@@ -81,6 +81,7 @@
         }
         else if (id && (id.substr(0, 7) !== 'account')
             && (id.substr(0, 9) !== 'dashboard')
+            && (id.substr(0, 15) !== 'user-management')
             && (id.substr(0, 13) !== 'notifications')
             && (id.substring(0, 7) !== 'recents')) {
 
@@ -289,7 +290,7 @@
      * @param {String}  id      The folder id
      * @param {Boolean} [force] If that folder is already open, re-render it
      * @param {Boolean} [chat]  Some chat flag..
-     * @returns {MegaPromise}
+     * @returns {MegaPromise} revoked when opening finishes
      */
     MegaData.prototype.openFolder = function(id, force, chat) {
         var newHashLocation;
@@ -350,6 +351,52 @@
         }
         else if (id === 'ipc') {
             id = 'ipc';
+        }
+        else if (id && id.substr(0, 15) === 'user-management') {
+            // id = 'user-management';
+            M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+                M.onFileManagerReady(function () {
+                    if (!new BusinessAccount().isBusinessMasterAcc()) {
+                        return M.openFolder('cloudroot');
+                    }
+
+                    var usersM = new BusinessAccountUI();
+                    
+                    M.onSectionUIOpen('user-management');
+                    // checking if we loaded sub-users and drew them
+                    if (!usersM.initialized) {
+                        // if not, then the fastest way is to render the business home page
+                        usersM.viewSubAccountListUI(undefined, undefined, true);
+                    }
+                    else if (usersM.isRedrawNeeded(M.suba, usersM.business.previousSubList)) {
+                        usersM.viewSubAccountListUI(undefined, undefined, true);
+                    }
+                    var subPage = id.replace('/', '').split('user-management')[1];
+                    if (subPage && subPage.length > 2) {
+                        if (subPage === 'overview') {
+                            usersM.viewBusinessAccountOverview();
+                        }
+                        else if (subPage === 'account') {
+                            usersM.viewBusinessAccountPage();
+                        }
+                        else if (subPage === 'invoices') {
+                            usersM.viewBusinessInvoicesPage();
+                        }
+                        else if (subPage.indexOf('invdet!') > -1) {
+                            var invId = subPage.split('!')[1];
+                            usersM.viewInvoiceDetail(invId);
+                        }
+                        else if (subPage.length === 11) {
+                            usersM.viewSubAccountInfoUI(subPage);
+                        }
+                    }
+                    else {
+                        // No need to check if the current object is not the first instance
+                        // because rendering is optimized inside it
+                        usersM.viewSubAccountListUI();
+                    }
+                });
+            });
         }
         else if (id === 'shares') {
             id = 'shares';

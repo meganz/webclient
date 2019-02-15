@@ -338,7 +338,7 @@ MegaData.prototype.injectNodes = function(nodes, target, callback) {
 
 /**
  * @param {Array}       cn            Array of nodes that needs to be copied
- * @param {String}      t             Destination node
+ * @param {String}      t             Destination node handle
  * @param {Boolean}     [del]         Should we delete the node after copying? (Like a move operation)
  * @param {MegaPromise} [promise]     promise to notify completion on (Optional)
  * @param {Array}       [tree]        optional tree from M.getCopyNodes
@@ -350,6 +350,12 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         var tmp = promise;
         promise = new MegaPromise();
         promise.always(tmp);
+    }
+    // check if this is a business expired account
+    if (u_attr.b && u_attr.b.s === -1) {
+        $.hideContextMenu();
+        showExpiredBusiness();
+        return;
     }
 
     loadingDialog.pshow();
@@ -644,7 +650,12 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
 MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
     'use strict'; /* jshint -W089, -W074 */
     var promise = new MegaPromise();
-
+    // check if this is a business expired account
+    if (u_attr.b && u_attr.b.s === -1) {
+        $.hideContextMenu();
+        showExpiredBusiness();
+        return;
+    }
     if (!quiet) {
         loadingDialog.pshow();
     }
@@ -1043,6 +1054,12 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
  */
 MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
     var promise = new MegaPromise();
+    // check if this is a business expired account
+    if (u_attr.b && u_attr.b.s === -1) {
+        $.hideContextMenu();
+        showExpiredBusiness();
+        return;
+    }
 
     nodes = nodes || $.selected || [];
 
@@ -1106,6 +1123,12 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
  */
 MegaData.prototype.safeRemoveNodes = function(handles) {
     'use strict';
+    // check if this is a business expired account
+    if (u_attr.b && u_attr.b.s === -1) {
+        $.hideContextMenu();
+        showExpiredBusiness();
+        return;
+    }
     var masterPromise = new MegaPromise();
 
     handles = handles || [];
@@ -1166,6 +1189,12 @@ MegaData.prototype.safeRemoveNodes = function(handles) {
 MegaData.prototype.revertRubbishNodes = function(handles) {
     'use strict'; /* jshint -W089 */
     var masterPromise = new MegaPromise();
+    // check if this is a business expired account
+    if (u_attr.b && u_attr.b.s === -1) {
+        $.hideContextMenu();
+        showExpiredBusiness();
+        return;
+    }
 
     handles = handles || [];
     if (!Array.isArray(handles)) {
@@ -1342,6 +1371,12 @@ MegaData.prototype.moveToRubbish = function(handles) {
 MegaData.prototype.revokeShares = function(handles) {
     'use strict'; /* jshint -W089, -W074 */
     var promise = new MegaPromise();
+    // check if this is a business expired account
+    if (u_attr.b && u_attr.b.s === -1) {
+        $.hideContextMenu();
+        showExpiredBusiness();
+        return;
+    }
 
     if (!Array.isArray(handles)) {
         handles = [handles];
@@ -1449,6 +1484,12 @@ MegaData.prototype.revokeShares = function(handles) {
 MegaData.prototype.revokeFolderShare = function(h, usr, isps) {
     'use strict';
     var promise = new MegaPromise();
+    // check if this is a business expired account
+    if (u_attr.b && u_attr.b.s === -1) {
+        $.hideContextMenu();
+        showExpiredBusiness();
+        return;
+    }
 
     if (String(h).length !== 8 || String(usr).length !== 11) {
         if (d) {

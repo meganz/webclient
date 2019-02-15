@@ -625,6 +625,7 @@ function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
 function slideshow_handle() {}
+function dashboardUI() {}
 accountUI.account = {
     renderBirthYear: function() {},
     renderBirthMonth: function() {},

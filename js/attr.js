@@ -1044,7 +1044,7 @@ var attribCache = false;
                     if (fminitialized) {
                         M.account.ssrs = parseInt(res);
                         if (page === 'fm/account/file-management') {
-                            accountUI.fileManagement.rubsched.render();
+                            accountUI.fileManagement.rubsched.render(M.account);
                         }
                     }
                 });

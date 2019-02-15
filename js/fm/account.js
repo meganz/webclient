@@ -93,7 +93,7 @@ accountUI.renderAccountPage = function(account) {
             $('.settings-banner').addClass('hidden');
             sectionClass = 'file-management';
 
-            accountUI.fileManagement.init();
+            accountUI.fileManagement.init(account);
             break;
 
         case '/fm/account/transfers':
@@ -1012,6 +1012,8 @@ accountUI.account = {
                     if (val) {
                         $('.access-qr-container').add('.qr-block', self.$QRSettings).parent().removeClass('closed');
                         $container.addClass('border');
+                        setTimeout(initAccountScroll, 301);
+
                         api_req({ a: 'clc' }, {
                             myAccount: account,
                             callback: function (res, ctx) {
@@ -2190,7 +2192,7 @@ accountUI.security = {
 
 accountUI.fileManagement = {
 
-    init: function() {
+    init: function(account) {
 
         'use strict';
 
@@ -2199,7 +2201,7 @@ accountUI.fileManagement = {
         this.versioning.bindEvents();
 
         // Rubbish cleaning schedule
-        this.rubsched.render();
+        this.rubsched.render(account);
         this.rubsched.bindEvents();
 
         // User Interface
@@ -2283,7 +2285,7 @@ accountUI.fileManagement = {
 
     rubsched: {
 
-        render: function() {
+        render: function(account) {
 
             'use strict';
 
@@ -2291,66 +2293,102 @@ accountUI.fileManagement = {
                 console.log('Render rubbish bin schedule');
             }
 
-            $('.rubsched, .rubschedopt').removeClass('radioOn').addClass('radioOff');
-            i = 13;
-            if (u_attr.flags.ssrs > 0) {
-                var value = 90; // days
-                $('.rubsched-options').removeClass('hidden');
+            var $rubschedParent = $('#rubsched').parent();
+            var $rubschedGreenNoti = $('.rub-grn-noti');
+            var $rubschedOptions = $('.rubsched-options');
 
-                // non-pro users cannot disable it
-                if (!u_attr.p) {
-                    // hide on/off switches
-                    $('.rubsched').addClass('hidden').next().addClass('hidden');
-                    value = 30; // days
-                }
+            var initRubschedSwitch = function(defaultValue) {
+                accountUI.inputs.switch.init(
+                    '#rubsched',
+                    $('#rubsched').parent(),
+                    defaultValue,
+                    function(val) {
+                        if (val) {
+                            $('#rubsched').parents('.slide-in-out').removeClass('closed');
+                            $rubschedParent.addClass('border');
+                            setTimeout(initAccountScroll, 301);
+
+                            if (!fmconfig.rubsched) {
+                                var defValue = u_attr.p ? 90 : 30;
+                                var defOption = 14;
+                                mega.config.setn('rubsched', defOption + ":" + defValue);
+                                $('#rad' + defOption + '_opt').val(defValue);
+                            }
+                        }
+                        else {
+                            mega.config.setn('rubsched', 0);
+                            $('#rubsched').parents('.slide-in-out').addClass('closed');
+                            $rubschedParent.removeClass('border');
+                        }
+                    });
+            };
+
+            if (u_attr.flags.ssrs > 0) { // Server side scheduler - new
+                $rubschedOptions.removeClass('hidden');
+                $('.rubschedopt').addClass('hidden');
                 $('.rubschedopt-none').addClass('hidden');
 
-                if (M.account.ssrs !== undefined) {
-                    value = M.account.ssrs;
-                }
-                i = 14;
-                $('#rad' + i + '_opt').val(value);
-                $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-                $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-                i = 12;
+                var value = account.ssrs ? account.ssrs : (u_attr.p ? 90 : 30);
+
+                $('#rad14_opt').val(value);
+
                 if (!value) {
-                    i = 13;
-                    $('.rubsched-options').addClass('hidden');
+                    $rubschedOptions.addClass('hidden');
                 }
 
                 // show/hide on/off switches
                 if (u_attr.p) {
+                    $rubschedParent.removeClass('hidden');
+                    $rubschedGreenNoti.addClass('hidden');
                     $('.rubbish-desc').text(l[18685]).removeClass('hidden');
-                    $('.pro-rubsched-options').removeClass('hidden');
+                    $('.account.rubbish-cleaning .settings-right-block').addClass('slide-in-out');
+
+                    if (account.ssrs) {
+                        $rubschedParent.addClass('border').parent().removeClass('closed');
+                    }
+                    else {
+                        $rubschedParent.removeClass('border').parent().addClass('closed');
+                    }
+
+                    initRubschedSwitch(account.ssrs);
                 }
                 else {
-                    $('.rubbish-settings .green-notification').removeClass('hidden');
+                    $rubschedParent.addClass('hidden');
+                    $rubschedGreenNoti.removeClass('hidden');
                     $('.rubbish-desc').text(l[18686]).removeClass('hidden');
-                    $('.pro-rubsched-options').addClass('hidden');
-                }
+                    $('.account.rubbish-cleaning .settings-right-block').removeClass('slide-in-out');
+                }                
             }
-            else if (fmconfig.rubsched) {
-                i = 12;
-                $('.rubsched-options').removeClass('hidden');
-                var opt = String(fmconfig.rubsched).split(':');
-                $('#rad' + opt[0] + '_opt').val(opt[1]);
-                $('#rad' + opt[0] + '_div').removeClass('radioOff').addClass('radioOn');
-                $('#rad' + opt[0]).removeClass('radioOff').addClass('radioOn');
-            }
-            $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-            $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-            $('.rubschedopt input').rebind('click', function() {
-                var id = $(this).attr('id');
-                var opt = $('#' + id + '_opt').val();
-                mega.config.setn('rubsched', id.substr(3) + ':' + opt);
-                $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
-                $(this).addClass('radioOn').removeClass('radioOff');
-                $(this).parent().addClass('radioOn').removeClass('radioOff');
-                // initAccountScroll(1);
-            });
+            else { // Client side scheduler - old
+                initRubschedSwitch(fmconfig.rubsched);
 
-            if (u_attr.p) {
-                $('.rub-grn-noti').addClass('hidden');
+                if (u_attr.p) {
+                    $rubschedGreenNoti.addClass('hidden');
+                }
+                else {
+                    $rubschedGreenNoti.removeClass('hidden');
+                }
+
+                if (fmconfig.rubsched) {
+                    $rubschedParent.addClass('border').parent().removeClass('closed');
+                    $rubschedOptions.removeClass('hidden');
+                    $('.rubschedopt').removeClass('hidden');
+
+                    var opt = String(fmconfig.rubsched).split(':');
+                    $('#rad' + opt[0] + '_opt').val(opt[1]);
+
+                    accountUI.inputs.radio.init(
+                        '.rubschedopt',
+                        $('.rubschedopt').parent(),
+                        opt[0],
+                        function (val) {
+                            mega.config.setn('rubsched', val + ":" + $('#rad' + val + '_opt').val());
+                        }
+                    );
+                }
+                else {
+                    $rubschedParent.removeClass('border').parent().addClass('closed');
+                }
             }
         },
         bindEvents: function() {
@@ -2358,45 +2396,24 @@ accountUI.fileManagement = {
             'use strict';
 
             $('.rubsched_textopt').rebind('click.rs blur.rs keypress.rs', function(e) {
-                var minVal = 7;
-                var maxVal = u_attr.p ? Math.pow(2, 53) : 30;
-                var curVal = parseInt($(this).val()) | 0;
 
                 // Do not save value until user leave input or click Enter button
                 if (e.which && e.which !== 13) {
                     return;
                 }
 
-                curVal = Math.min(Math.max(curVal, minVal), maxVal);
+                var curVal = parseInt($(this).val()) | 0;
+
+                if (this.id === 'rad14_opt') { // for days option
+                    var minVal = 7;
+                    var maxVal = u_attr.p ? Math.pow(2, 53) : 30;
+                    curVal = Math.min(Math.max(curVal, minVal), maxVal);
+                }
+
                 $(this).val(curVal);
 
                 var id = String($(this).attr('id')).split('_')[0];
-                $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
-                $('#' + id + ',#' + id + '_div').addClass('radioOn').removeClass('radioOff');
                 mega.config.setn('rubsched', id.substr(3) + ':' + curVal);
-                // initAccountScroll(1);
-            });
-            $('.rubsched input').rebind('click', function() {
-                var id = $(this).attr('id');
-                if (id === 'rad13') {
-                    mega.config.setn('rubsched', 0);
-                    $('.rubsched-options').addClass('hidden');
-                }
-                else if (id === 'rad12') {
-                    $('.rubsched-options').removeClass('hidden');
-                    if (!fmconfig.rubsched) {
-                        var defValue = u_attr.p ? 90 : 30;
-                        var defOption = 14;
-                        mega.config.setn('rubsched', defOption + ":" + defValue);
-                        $('#rad' + defOption + '_div').removeClass('radioOff').addClass('radioOn');
-                        $('#rad' + defOption).removeClass('radioOff').addClass('radioOn');
-                        $('#rad' + defOption + '_opt').val(defValue);
-                    }
-                }
-                $('.rubsched').removeClass('radioOn').addClass('radioOff');
-                $(this).addClass('radioOn').removeClass('radioOff');
-                $(this).parent().addClass('radioOn').removeClass('radioOff');
-                // initAccountScroll(1);
             });
         }
     },

@@ -454,7 +454,7 @@ function dl_g(res) {
                 if (is_image(filename) || isVideo) {
                     var $ipb = $infoBlock.find('.img-preview-button');
 
-                    if (filetype(filename) === 'PDF Document') {
+                    if (fileext(filename) === 'pdf') {
                         $ipb.find('span').text(l[17489]);
                     }
                     else if (isVideo) {

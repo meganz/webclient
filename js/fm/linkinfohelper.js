@@ -205,7 +205,7 @@ LinkInfoHelper.prototype.getInfo = function() {
             if (is_image(filename) || is_video(filename)) {
                 this.info['preview_text'] = l[16274];
 
-                if (filetype(filename) === 'PDF Document') {
+                if (fileext(filename) === 'pdf') {
                     this.info['preview_text'] = l[17489];
                 }
                 else if (is_video(filename)) {

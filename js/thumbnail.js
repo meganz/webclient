@@ -63,7 +63,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     var sendToPreview = function(h, ab) {
         var n = h && M.getNodeByHandle(h);
 
-        if (n && filetype(n) !== 'PDF Document' && !is_video(n)) {
+        if (n && fileext(n.name) !== 'pdf' && !is_video(n)) {
             previewimg(h, ab || dataURLToAB(noThumbURI));
         }
     };

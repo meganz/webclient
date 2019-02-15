@@ -147,6 +147,7 @@
     "458": "\u0627\u0633\u062a\u0628\u062f\u0627\u0644",
     "459": "\u0642\u0633\u0627\u0626\u0645 \u0627\u0644\u0634\u0631\u0627\u0621 \u0627\u0644\u062e\u0627\u0635\u0629 \u0628\u0643",
     "466": "\u0622\u062e\u0631 [X]",
+    "468": "\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0634\u0631\u0627\u0621",
     "469": "\u0622\u062e\u0631 [X] \u0645\u0634\u062a\u0631\u064a\u0627\u062a",
     "471": "\u0622\u062e\u0631 [X] \u0645\u0639\u0627\u0645\u0644\u0627\u062a",
     "472": "\u0622\u062e\u0631 [X] \u062c\u0644\u0633\u0627\u062a",
@@ -3247,5 +3248,15 @@
     "20400": "[S]Your Business account is expired.[\/S] [A]Reactivate your account now[\/A] and enjoy the [S]unlimited storage and bandwidth[\/S] along with other business account features",
     "20401": "Your business account is expired",
     "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
-    "20403": "Pay & Reactivate Account"
+    "20403": "Pay & Reactivate Account",
+    "20404": "Congratulations! You\u2019ve just unlocked:",
+    "20405": "storage bonus",
+    "20406": "transfer bonus",
+    "20407": "Valid days:",
+    "20408": "We have upgraded your account %1 to the [B]%2 plan for %3[\/B]!",
+    "20409": "SMS verification",
+    "20410": "To get the most out of MEGA, we recommend you download our mobile app. [A]Learn more[\/A].",
+    "20411": "Verifying your mobile number will make it easier for your contacts to find you on MEGA.",
+    "20412": "Redeem Promo Code",
+    "20413": "Enter your %1 code below:"
 }

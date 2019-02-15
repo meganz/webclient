@@ -40,7 +40,7 @@
 (function _xhrTransfersLogic(global) {
     "use strict";
 
-    var xhrTimeout = parseInt(localStorage.xhrTimeout) || 40000;
+    var xhrTimeout = parseInt(localStorage.xhrTimeout) || 12e4;
     var logger = MegaLogger.getLogger('xhr2');
     var debug = global.d && parseInt(localStorage.xhr2debug);
     var xhrStack = [];

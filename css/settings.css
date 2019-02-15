@@ -138,7 +138,7 @@
 .fm-account-button .sub-title {
     font-size: 14px;
     color: #888;
-    line-height: 18px;
+    line-height: 16px;
     padding: 8px 8px 8px 44px;
     position: relative;
     cursor: pointer;
@@ -285,9 +285,9 @@
     width: 140px;
 }
 .content-txt {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 20px;
-    padding-top: 22px;
+    padding-top: 18px;
     color: #999;
     vertical-align:top;
     transition: 0.3s;
@@ -299,7 +299,7 @@
     max-width: 340px;
 }
 .settings-sub-section .radio-txt {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 20px;
     color: #999;
     vertical-align:top;
@@ -311,7 +311,7 @@
     font-size: 18px;
 }
 .settings-sub-section .radio-txt.small {
-    font-size: 15px;
+    font-size: 14px;
 }
 .fm-account-notifications .content-txt {
     padding: 0px;
@@ -502,7 +502,7 @@
     position: absolute;
     margin-left: 12px;
     display: inline-block;
-    top: 24px;
+    top: 20px;
     right: 0px;
 }
 .fm-right-account-block .default-green-button {
@@ -549,6 +549,9 @@
     background-color: rgba(0,0,0,0.2);
     position: absolute;
     transition: background-color 0.2s linear;
+}
+.dialog-input-title-ontop:hover::after {
+    background-color: rgba(0,0,0,0.5);
 }
 .dialog-input-title-ontop .title {
     position: absolute;
@@ -1453,4 +1456,7 @@
 }
 .fm-right-account-block .hidden {
     display: none;
+}
+.rubsched-options {
+    max-height: 250px;
 }

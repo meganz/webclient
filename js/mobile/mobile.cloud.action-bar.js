@@ -102,7 +102,9 @@ mobile.cloud.actionBar = {
             var topOfScrollableCloudDrive = $filesFoldersText.position().top;
 
             // Scroll to the top of the cloud drive
+            $fileManagerScrollingBlock.addClass("stop-inertia");
             $fileManagerScrollingBlock.scrollTop(topOfScrollableCloudDrive);
+            $fileManagerScrollingBlock.removeClass("stop-inertia");
 
             // Prevent double taps
             return false;

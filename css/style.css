@@ -1430,7 +1430,9 @@ input.radioOn, input.radioOff {
     font-size: 18px;
 }
 .resellers-voucher-bl {
-    padding: 18px 0;
+    padding-bottom:24px;
+    display: inline-block;
+    float: right;
 }
 .reset-pass .radio-txt {
     display: block;
@@ -10904,7 +10906,7 @@ table {
 }
 .account.radio-buttons.bottom-pad {
     margin-right: -30px;
-    padding: 24px 0 0 0;
+    padding: 18px 0 0 0;
 }
 .account.checkbox-buttons.bottom-pad {
     padding-bottom: 41px;

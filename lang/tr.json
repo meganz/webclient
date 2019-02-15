@@ -147,6 +147,7 @@
     "458": "Kullan",
     "459": "Kuponlar\u0131n\u0131z",
     "466": "Son [X]",
+    "468": "Sat\u0131n Alma Ge\u00e7mi\u015fi",
     "469": "Son [X] sat\u0131\u015f",
     "471": "Son [X] i\u015flem",
     "472": "Son [X] oturum",
@@ -3247,5 +3248,15 @@
     "20400": "[S]\u0130\u015fletme hesab\u0131n\u0131z\u0131n s\u00fcresi doldu.[\/S] [A]Hesab\u0131n\u0131z\u0131 \u015fimdi yeniden etkinle\u015ftirin[\/A] ve di\u011fer i\u015fletme hesap \u00f6zellikleriyle birlikte [S]s\u0131n\u0131rs\u0131z saklama ve bant geni\u015fli\u011finin[\/S] tad\u0131n\u0131 \u00e7\u0131kar\u0131n",
     "20401": "\u0130\u015fletme hesab\u0131n\u0131z\u0131n s\u00fcresi doldu",
     "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
-    "20403": "\u00d6de ve Hesab\u0131 Yeniden Etkinle\u015ftir"
+    "20403": "\u00d6de ve Hesab\u0131 Yeniden Etkinle\u015ftir",
+    "20404": "Tebrikler! Az \u00f6nce kazand\u0131n\u0131z:",
+    "20405": "depolama bonusu",
+    "20406": "aktarma bonusu",
+    "20407": "\u015eu kadar g\u00fcn ge\u00e7erli:",
+    "20408": "We have upgraded your account %1 to the [B]%2 plan for %3[\/B]!",
+    "20409": "SMS verification",
+    "20410": "To get the most out of MEGA, we recommend you download our mobile app. [A]Learn more[\/A].",
+    "20411": "Verifying your mobile number will make it easier for your contacts to find you on MEGA.",
+    "20412": "Redeem Promo Code",
+    "20413": "Enter your %1 code below:"
 }

@@ -81,12 +81,16 @@ function dl_g(res) {
     $('.widget-block').addClass('hidden');
     $('.download.top-bar').addClass('hidden');
 
-
     if (res === ETOOMANY) {
         $('.download.scroll-block').addClass('not-available-user');
     }
     else if (typeof res === 'number' && res < 0) {
-        $('.download.scroll-block').addClass('na-some-reason');
+        if (res === -2) {
+            $('.download.scroll-block').addClass('invalid-url');
+        }
+        else {
+            $('.download.scroll-block').addClass('na-some-reason');
+        }
     }
     else if (res.e === ETEMPUNAVAIL) {
         $('.download.scroll-block').addClass('temporary-na');

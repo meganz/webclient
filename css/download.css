@@ -721,7 +721,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 .download .img-preview-button {
     text-transform: lowercase;
 }
-.not-available-user .main-pad, .temporary-na .main-pad, .na-some-reason .main-pad {
+.not-available-user .main-pad, .temporary-na .main-pad, .na-some-reason .main-pad, .invalid-url .main-pad {
     padding-bottom: 78px;
 }
 .megasync-close, .megasync-close-txt, .megasync-overlay .megasync-dropdown, .download.info-block.thumb .block-view-file-type {
@@ -739,13 +739,13 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 .downloading .download.progress-cell, .download-complete .download.progress-cell {
     display: table-cell;
 }
-.download.in-progress, .download.some-reason, .download.deleted-user, .download.temporarty-error, .not-available-user .download.info-block, .not-available-user .download.buttons-block, .not-available-user .download checkbox-bl, .temporary-na .download.info-block, .temporary-na .download.buttons-block, .temporary-na .download checkbox-bl, .na-some-reason .download.info-block, .na-some-reason .download.buttons-block, .na-some-reason .download checkbox-bl, .megasync-content.features, .not-available-user .download.checkbox-bl, .temporary-na .download.checkbox-bl, .na-some-reason .download.checkbox-bl, .download.deleted-user .download.checkbox-bl, .download.temporarty-error .download.checkbox-bl .not-available-user .download.checkbox-bl, .temporary-na .download.checkbox-bl, .na-some-reason .download.checkbox-bl {
+.download.in-progress, .download.some-reason, .download.invalid-error, .download.deleted-user, .download.temporarty-error, .not-available-user .download.info-block, .not-available-user .download.buttons-block, .not-available-user .download checkbox-bl, .temporary-na .download.info-block, .temporary-na .download.buttons-block, .temporary-na .download checkbox-bl, .na-some-reason .download.info-block, .na-some-reason .download.buttons-block, .na-some-reason .download checkbox-bl, .invalid-url .download.info-block, .invalid-url .download.buttons-block, .invalid-url .download checkbox-bl, .megasync-content.features, .not-available-user .download.checkbox-bl, .temporary-na .download.checkbox-bl, .na-some-reason .download.checkbox-bl, .invalid-url .download.checkbox-bl, .download.deleted-user .download.checkbox-bl, .download.temporarty-error .download.checkbox-bl .not-available-user .download.checkbox-bl, .temporary-na .download.checkbox-bl, .na-some-reason .download.checkbox-bl, .invalid-url .download.checkbox-bl  {
     display: none;
 }
-.not-available-user .download.main-pad, .temporary-na .download.main-pad, .na-some-reason .download.main-pad {
+.not-available-user .download.main-pad, .temporary-na .download.main-pad, .na-some-reason .download.main-pad, .invalid-url .download.main-pad {
     height: auto;
 }
-.downloading .download.in-progress, .download-complete .download.download.in-progress, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason, .downloading .megasync-content.features {
+.downloading .download.in-progress, .download-complete .download.download.in-progress, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason, .invalid-url .download.invalid-error, .downloading .megasync-content.features {
     display: block;
 }
 /* Video dl page */

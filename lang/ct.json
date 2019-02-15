@@ -147,6 +147,7 @@
     "458": "\u514c\u63db",
     "459": "\u4f60\u7684\u512a\u60e0\u5238",
     "466": "\u524d[X]\u4ee5\u5167",
+    "468": "\u8cfc\u8cb7\u8a18\u9304",
     "469": "\u524d[X]\u6b21\u8cfc\u8cb7",
     "471": "\u524d[X]\u6b21\u4ea4\u6613",
     "472": "\u524d[X]\u6b21\u767b\u5165",
@@ -3247,5 +3248,15 @@
     "20400": "[S]Your Business account is expired.[\/S] [A]Reactivate your account now[\/A] and enjoy the [S]unlimited storage and bandwidth[\/S] along with other business account features",
     "20401": "Your business account is expired",
     "20402": "It seems the automatic monthly payment for your business account subscription has failed. Therefore, your account is suspended until you proceed with the needed payments.You will only be able to view your data without any further actions such as uploading\/downloading\/sharing\/copying\/removing...To re-activate your account please click the button below.",
-    "20403": "Pay & Reactivate Account"
+    "20403": "Pay & Reactivate Account",
+    "20404": "Congratulations! You\u2019ve just unlocked:",
+    "20405": "storage bonus",
+    "20406": "transfer bonus",
+    "20407": "Valid days:",
+    "20408": "We have upgraded your account %1 to the [B]%2 plan for %3[\/B]!",
+    "20409": "SMS verification",
+    "20410": "To get the most out of MEGA, we recommend you download our mobile app. [A]Learn more[\/A].",
+    "20411": "Verifying your mobile number will make it easier for your contacts to find you on MEGA.",
+    "20412": "Redeem Promo Code",
+    "20413": "Enter your %1 code below:"
 }

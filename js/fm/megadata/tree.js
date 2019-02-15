@@ -754,7 +754,7 @@ MegaData.prototype.redrawTree = function(f) {
         force = undefined;
     }
 
-    if (M.currentrootid === M.RootID || M.currentdirid.match("^search/")) {
+    if (M.currentrootid === M.RootID || String(M.currentdirid).match("^search/")) {
         M.buildtree(M.d[M.RootID], force);
     }
     if (M.currentrootid === M.InboxID) {

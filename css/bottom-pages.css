@@ -1719,10 +1719,6 @@ height: 56px;
     padding: 14px 0 54px 0;
 }
 
-.bottom-page.megacmd .inline-block.col-2.cmd-pad:nth-child(6) {
-    display: block;
-}
-
 .col-2.cmd-pad {
     padding: 58px 65px 7px 0;
     float: left;

@@ -1516,6 +1516,7 @@ BusinessAccountUI.prototype.showExpiredUIElements = function() {
     var msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
         .replace(/\[A\]/g, '<a href="/registerb" class="clickurl">').replace(/\[\/A\]/g, '</a>');
     $('.fm-notification-block.expired-business').safeHTML(msg).show();
+    clickURLs();
     this.showExpiredDialog(true);
 };
 

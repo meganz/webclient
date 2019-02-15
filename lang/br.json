@@ -2061,7 +2061,7 @@
     "18315": "Toque nos tr\u00eas pontos horizontais no canto inferior direito.",
     "18316": "Digite a sua nova senha, confirme e toque em [B]OK[\/B].",
     "18322": "B\u00f4nus de armazenamento",
-    "18323": "B\u00f4nus de cota de transfer\u00eancia",
+    "18323": "B\u00f4nus de transfer\u00eancia",
     "18340": "Salvar chave de recupera\u00e7\u00e3o",
     "18347": "Selecione todas as op\u00e7\u00f5es para continuar",
     "18419": "Digite a sua nova senha, confirme-a e clique em [B]OK[\/B].",
@@ -3253,10 +3253,10 @@
     "20405": "b\u00f4nus de armazenamento",
     "20406": "b\u00f4nus de transfer\u00eancia",
     "20407": "Dias de validade:",
-    "20408": "We have upgraded your account %1 to the [B]%2 plan for %3[\/B]!",
-    "20409": "SMS verification",
-    "20410": "To get the most out of MEGA, we recommend you download our mobile app. [A]Learn more[\/A].",
-    "20411": "Verifying your mobile number will make it easier for your contacts to find you on MEGA.",
+    "20408": "A sua conta %1 agora \u00e9 [B]%2 durante %3[\/B]!",
+    "20409": "Verifica\u00e7\u00e3o por SMS",
+    "20410": "Para aproveitar o MEGA ao m\u00e1ximo, recomendamos que voc\u00ea fa\u00e7a o download do nosso aplicativo para dispositivos m\u00f3veis. [A]Mais informa\u00e7\u00f5es[\/A].",
+    "20411": "Verificar o seu n\u00famero de celular facilitar\u00e1 que os seus contatos o encontrem no MEGA.",
     "20412": "Redeem Promo Code",
     "20413": "Enter your %1 code below:"
 }

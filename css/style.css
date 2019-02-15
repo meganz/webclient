@@ -17727,7 +17727,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 .fm-picker-dialog-button::before {
     content: " ";
-    background-image: url(../images/mega/big-icons.png);
+    background-image: url(../images/mega/big-icons_v2.png);
     background-repeat: no-repeat;
     width: 56px;
     height: 56px;
@@ -23532,7 +23532,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 .user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon{
     background-position: -157px -736px;
-    background-image: url(../images/mega/big-icons.png);
+    background-image: url(../images/mega/big-icons_v2.png);
     background-size: 192px auto;
     width:24px;
     height: 24px;
@@ -24291,7 +24291,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 .user-management-storage .img, 
 .user-management-transfer .img{
-    background-image: url(../images/mega/big-icons.png);
+    background-image: url(../images/mega/big-icons_v2.png);
     background-size: 192px auto;
     background-repeat: no-repeat;
     width: 86px;
@@ -25476,7 +25476,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height:24px;
 }
 .user-management-view .icon48, .user-management-dialog .icon48 {
-    background-image: url(../images/mega/big-icons.png);
+    background-image: url(../images/mega/big-icons_v2.png);
     background-repeat: no-repeat;
     display: inline-block;
     width:48px;
@@ -25485,7 +25485,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-view .icon56, .user-management-dialog .icon56 {
-    background-image: url(../images/mega/big-icons.png);
+    background-image: url(../images/mega/big-icons_v2.png);
     background-repeat: no-repeat;
     width:56px;
     height: 56px;
@@ -25493,7 +25493,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-view .icon64, .user-management-dialog .icon64 {
-    background-image: url(../images/mega/big-icons.png);
+    background-image: url(../images/mega/big-icons_v2.png);
     background-repeat: no-repeat;
     width:64px;
     height: 64px;
@@ -25517,12 +25517,12 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-dialog .dialog-heading-img {
-    background-image: url(../images/mega/big-icons.png);
+    background-image: url(../images/mega/big-icons_v2.png);
     margin:40px auto 24px auto;
 }
 
 .user-management-dialog .sent-email-logo {
-    background-image: url(../images/mega/big-icons.png);
+    background-image: url(../images/mega/big-icons_v2.png);
     background-repeat: no-repeat;
     width:86px;
     height: 44px;
@@ -25840,7 +25840,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
 }
 .user-management-landing-page .mega-56px-icon{
-    background-image: url(../images/mega/big-icons.png);
+    background-image: url(../images/mega/big-icons_v2.png);
     background-repeat: no-repeat;
     width: 56px;
     height: 56px;
@@ -26204,7 +26204,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-account-settings .setting-icon24, .user-management-dialog .setting-icon24{
-    background-image: url(../images/mega/big-icons.png);
+    background-image: url(../images/mega/big-icons_v2.png);
     background-repeat: no-repeat;
     width: 24px;
     height: 24px;

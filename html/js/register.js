@@ -436,11 +436,11 @@ function init_register() {
     var $regInfoContainer = $('.main-mid-pad.big-pad.register1 .main-left-block');
     $('.input-wrapper.name', $regInfoContainer).removeClass('hidden');
     $('.input-wrapper.email', $regInfoContainer).removeClass('hidden');
-    $('.account.top-header.wide', $regInfoContainer).html(l[1095]);
+    $('.account.top-header.wide', $regInfoContainer).safeHTML(l[1095]);
 
     var $tipsContainer = $('.main-mid-pad.big-pad.register1 .main-right-block');
     $('.dont-forget-pass', $tipsContainer).removeClass('hidden'); // 19130
-    $('p.account-sec', $tipsContainer).html(l[1093] + ' ' + l[1094]);
+    $('p.account-sec', $tipsContainer).safeHTML(l[1093] + ' ' + l[1094]);
     $('.account-business', $tipsContainer).addClass('hidden');
 
     // business sub-account registration
@@ -455,7 +455,7 @@ function init_register() {
         $('.input-wrapper.name .f-name').val(from8(base64urldecode(userInfo.firstname)));
         // $('#register-firstname').attr('readonly', true);
         var headerText = l[19129].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-        $('.account.top-header.wide', $regInfoContainer).html(headerText);
+        $('.account.top-header.wide', $regInfoContainer).safeHTML(headerText);
 
         $('.input-wrapper.name', $regInfoContainer).addClass('hidden');
         $('.input-wrapper.email', $regInfoContainer).addClass('hidden');

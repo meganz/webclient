@@ -52,9 +52,6 @@ function BusinessAccountUI() {
 
         // headers
         $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden');
-        // $('.fm-right-header-user-management .user-management-breadcrumb.subaccount').addClass('hidden');
-        // $('.fm-right-header-user-management .user-management-breadcrumb.overview').addClass('hidden');
-        // $('.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
         $('.fm-right-header-user-management .user-management-breadcrumb').addClass('hidden');
         $('.inv-det-arrow, .inv-det-id',
             '.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
@@ -134,37 +131,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
         loadingDialog.phide();
     };
-
-    // private function to check if new drawing is needed
-    // var isRedrawNeeded = function (subs, previousSubs) {
-    //    if (!previousSubs) {
-    //        return true;
-    //    }
-    //    if (Object.keys(subs).length !== Object.keys(previousSubs).length) {
-    //        return true;
-    //    }
-    //    for (var k in subs) {
-    //        if (!previousSubs[k]) {
-    //            return true;
-    //        }
-    //        for (var h in subs[k]) {
-    //            if (subs[k][h] instanceof Object) {
-    //                if (!(previousSubs[k][h] instanceof Object)) {
-    //                    return true;
-    //                }
-    //                for (var a in subs[k][h]) {
-    //                    if (subs[k][h][a] !== previousSubs[k][h][a]) {
-    //                        return true;
-    //                    }
-    //                }
-    //            }
-    //            else if (subs[k][h] !== previousSubs[k][h]) {
-    //                return true;
-    //            }
-    //        }
-    //    }
-    //    return false;
-    // };
 
     // private function to fill HTML table for sub users
     var fillSubUsersTable = function (subUsers, uiBusiness) {
@@ -256,47 +222,18 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             // left pane part
             $usersLeftPanel.append($currUserLeftPane);
         }
-        // }
-
-
-        // events handlers   ---- Keep commented for now, as the check box is only hidden
-        // 1- check boxes
-        // $('.business-sub-checkbox-td, .business-sub-checkbox-th', $usersTable).off('click.subuser');
-        // $('.business-sub-checkbox-td, .business-sub-checkbox-th', $usersTable).on('click.subuser',
-        //    function subUserCheckBoxHandler() {
-        //        var $me = $(this).find('.checkdiv');
-        //        if ($me.hasClass('checkboxOff-user-management')) {
-        //            $me.removeClass('checkboxOff-user-management').addClass('checkboxOn-user-management');
-        //            if ($(this).hasClass('business-sub-checkbox-th')) {
-        //                $('.business-sub-checkbox-td .checkdiv', $usersTable).
-        //                    removeClass('checkboxOff-user-management').addClass('checkboxOn-user-management');
-        //            }
-        //        }
-        //        else {
-        //            $me.addClass('checkboxOff-user-management').removeClass('checkboxOn-user-management');
-        //            if ($(this).hasClass('business-sub-checkbox-th')) {
-        //                $('.business-sub-checkbox-td .checkdiv', $usersTable).
-        //                    addClass('checkboxOff-user-management').removeClass('checkboxOn-user-management');
-        //            }
-        //            else {
-        //                $('.business-sub-checkbox-th .checkdiv', $usersTable).
-        //                    addClass('checkboxOff-user-management').removeClass('checkboxOn-user-management');
-        //            }
-        //        }
-        //    });
 
         // 2- left pane headers (enabled,disabled) sub-users
         $('.user-management-tree-panel-header').off('click.subuser');
         $('.user-management-tree-panel-header').on('click.subuser', function subUserLeftPanelHeaderClickHandler() {
             var me = $(this);
-
-            $('.user-management-tree-panel-header').removeClass('active');
-            me.addClass('active');
-
+            var disabledFound = false;
             var $subUsers = $('.fm-tree-panel .content-panel.user-management .nw-user-management-item');
 
-            var disabledFound = false;
+            $('.user-management-tree-panel-header').removeClass('active');
             $('.fm-empty-user-management').addClass('hidden');
+
+            me.addClass('active');
 
             for (var k = 0; k < $subUsers.length; k++) {
                 if (me.hasClass('enabled-accounts')) {
@@ -559,7 +496,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     else {
         loadingDialog.phide();
     }
-
 };
 
 /**
@@ -894,8 +830,8 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     $subAccountContainer.find('.user-management-view-status.text').text(this.subUserStatus(subUser.s));
     
     var subUserDefaultAvatar = useravatar.contact(subUserHandle);
-    $('.subaccount-img-big', $subAccountContainer).html(subUserDefaultAvatar);
-    $('.user-management-subuser-avatars', $subHeader).html(subUserDefaultAvatar);
+    $('.subaccount-img-big', $subAccountContainer).safeHTML(subUserDefaultAvatar);
+    $('.user-management-subuser-avatars', $subHeader).safeHTML(subUserDefaultAvatar);
 
     // event handler for clicking on the header
     $('.user-management-icon', $subHeader).off('click.subuser')
@@ -1135,26 +1071,6 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             mySelf.viewSubAccountListUI();
         }
     );
-    // $overviewHeaderBtns.find('.pdf-exp').off('click.subuser').on('click.subuser',
-    //    function overviewHeaderClickHandler() {
-    //        M.require('jspdf_js').done(
-    //            function exportOverviewPageToPDF() {
-    //                var doc = new jsPDF();
-    //                var specialElementHandlers = {
-    //                    '.hidden': function (element, renderer) {
-    //                        return true;
-    //                    }
-    //                };
-
-    //                doc.addHTML($overviewContainer[0], function () {
-    //                    doc.save('accountDashboard.pdf');
-    //                });
-
-    //            }
-    //        );
-    //    }
-    // );
-
 
     // private function to populate the dashboard
     var populateDashboard = function (st, quotas) {
@@ -1723,10 +1639,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var cCountry = '';
     var cZip = '';
 
-    
-
     loadCountries();
-
     
     if (u_attr['%name']) {
         cName = u_attr['%name'];
@@ -2133,7 +2046,6 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         // invoice top details
         var $invoiceTopTitle = $('.inv-title-container .inv-right', $invoiceDetailContainer);
-        // $invoiceTopTitle.find('#invoice-date').text((new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
         $invoiceTopTitle.find('#invoice-date').text(time2date(invoiceDetail.ts, 1));
         $invoiceTopTitle.find('#invoice-number').text(invoiceDetail.n);
         $invoiceTopTitle.find('.invoice-vat').text(invoiceDetail.mega.taxnum[1]);
@@ -2143,7 +2055,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceDetailContainer.find('.billed-name').text(invoiceDetail.u.cname);
         $invoiceDetailContainer.find('.billed-email').text(invoiceDetail.u.e);
 
-        var validAddressSentFromApi = []; // storeing it, and remoing counrty
+        var validAddressSentFromApi = []; // storing it, and removing country
         for (var ad = 0; ad < invoiceDetail.u.addr.length - 1; ad++) {
             if (invoiceDetail.u.addr[ad]) {
                 validAddressSentFromApi.push(invoiceDetail.u.addr[ad]);
@@ -2167,7 +2079,6 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         var taxSum = 0;
         for (var k = invoiceDetail.items.length - 1; k >= 0; k--) {
             var $invItem = $invItemContentTemplate.clone(true);
-            // $invItem.find('.inv-pay-date').text((new Date(invoiceDetail.items[k].ts * 1000).toLocaleDateString()));
             $invItem.find('.inv-pay-date').text(time2date(invoiceDetail.items[k].ts, 1));
             $invItem.find('.inv-pay-desc').text(invoiceDetail.items[k].d);
             $invItem.find('.inv-pay-amou').text(Number(invoiceDetail.items[k].net).toFixed(2));
@@ -2190,7 +2101,6 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         // receipt top right items
         if (invoiceDetail.rnum) {
-            // $invoiceTopTitle.find('#rece-date').text((new Date(invoiceDetail.payts * 1000)).toLocaleDateString());
             $invoiceTopTitle.find('#rece-date').text(time2date(invoiceDetail.payts, 1));
             $invoiceTopTitle.find('#rece-number').text(invoiceDetail.rnum);
             $invoiceDetailContainer.find('.invoice-container.pay-receipt').removeClass('hidden');
@@ -2209,8 +2119,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         var myPage = pages['business_invoice'];
                         myPage = translate(myPage);
 
-                        // now prepare the incovice.
-                        // myPage = myPage.replace('{0Date}',(new Date(invoiceDetail.ts * 1000)).toLocaleDateString());
+                        // now prepare the invoice.
                         myPage = myPage.replace('{0Date}', time2date(invoiceDetail.ts, 1));
                         myPage = myPage.replace('{1InvoiceTitle}', $invoiceTopTitle.find('.inv-title.invv').text());
                         myPage = myPage.replace('{1InvoiceNB}', invoiceDetail.n);
@@ -2230,7 +2139,6 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         var itemDec = '---';
                         var itemAmount = '---';
                         if (invoiceDetail.items && invoiceDetail.items.length) {
-                            // itemDate = (new Date(invoiceDetail.items[0].ts * 1000).toLocaleDateString());
                             itemDate = time2date(invoiceDetail.items[0].ts, 1);
                             itemDec = invoiceDetail.items[0].d;
                             itemAmount = invoiceDetail.items[0].net;
@@ -2262,7 +2170,6 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         doc.open();
                         doc.write(myPage);
                         doc.close();
-                        
                     }
                 );
             }
@@ -2389,22 +2296,12 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
     var $dialog = $('.user-management-add-user-dialog.user-management-dialog');
     var mySelf = this;
 
-    // set the "Add User" button to disabled
-    // $('.default-green-button-user-management', $dialog).addClass('disabled');
-
     var clearDialog = function () {
         var $adduserContianer = $('.dialog-input-container', $dialog);
-        // if (usersRows.length > 1) {
-        //    for (var k = 1; k < usersRows.length; k++) {
-        //        usersRows.get(k).remove();
-        //    }
-        // }
         $('input', $adduserContianer).val('');
         $adduserContianer.removeClass('hidden');
-        // $('.error-message', $adduserContianer).addClass('hidden');
         $('.verification-container', $dialog).addClass('hidden');
         $('.dialog-subtitle', $dialog).addClass('hidden');
-        // $('.dialog-title', $dialog).text(l[19104]);
         $('.dialog-title', $dialog).text(l[19084]).addClass('left-version').removeClass('hidden');
         $('.dialog-button-container .add-more', $dialog).addClass('hidden');
         $('.dialog-button-container .add-sub-user', $dialog).text(l[19084]).removeClass('a-ok-btn');
@@ -2433,7 +2330,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         var $resultContianer = $('.verification-container', $dialog);
 
         var subUserDefaultAvatar = useravatar.contact(result.u);
-        $('.new-sub-user', $resultContianer).html(subUserDefaultAvatar);
+        $('.new-sub-user', $resultContianer).safeHTML(subUserDefaultAvatar);
         $('.sub-e', $resultContianer).text(result.m);
         if (result.lp) {
             $('.verification-user-pw', $resultContianer).removeClass('hidden');
@@ -2467,12 +2364,10 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
         $('.dialog-subtitle', $dialog).removeClass('hidden');
         $('.dialog-title', $dialog).text(l[20035]).removeClass('left-version');
-        // $('.dialog-title', $dialog).addClass('hidden');
         $('.sent-email-logo.dialog-heading-img', $dialog).removeClass('hidden');
         $('.dialog-button-container .invite-link-option', $dialog).addClass('hidden');
 
     }
-
 
     // event handler for "X" icon to close the dialog
     $('.delete-img.icon', $dialog).off('click.subuser')
@@ -2551,22 +2446,6 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             }
         });
 
-    // generic keydown monitoring function. - will be injected only when needed
-    // var keyDownEventHandler = function (target) {
-    //    var $element = $(target.target);
-    //    var $targetParent = $element.parent();
-    //    if ($targetParent && $targetParent.length) {
-    //        var $errorDiv = $targetParent.find('.error-message');
-    //        if ($errorDiv && $errorDiv.length && !$errorDiv.hasClass('hidden')) {
-    //            $errorDiv.addClass('hidden');
-    //        }
-    //        $element.off('keydown.suba');
-    //    }
-    //    else {
-    //        console.error('not allowed, not panned change of HTML is business account - add user dialog');
-    //    }
-    // };
-
 
     // event handler for adding sub-users
     $('.dialog-button-container .add-sub-user', $dialog).off('click.subuser')
@@ -2593,26 +2472,17 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                 $uName.parent().addClass('error');
                 $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
 
-                // monitoring input
-                // $uName.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
-
                 return;
             }
             if (!uLastNameTrimed) {
                 $uLastName.parent().addClass('error');
                 $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
 
-                // monitoring input
-                // $uLastName.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
-
                 return;
             }
             if (!isValidEmail(uEmailTrimed)) {
                 $uEmail.parent().addClass('error');
                 $('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[5705]);
-
-                // monitoring input
-                // $uEmail.off('keydown.suba').on('keydown.suba', keyDownEventHandler);
 
                 return;
             }
@@ -2660,7 +2530,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
 
                 if (st === 1) {
                     var subUserDefaultAvatar = useravatar.contact(res.u);
-                    $('.new-sub-user', $resultContianer).html(subUserDefaultAvatar);
+                    $('.new-sub-user', $resultContianer).safeHTML(subUserDefaultAvatar);
                     $('.sub-e', $resultContianer).text(req.m);
                     if (res.lp) {
                         $('.verification-user-pw', $resultContianer).removeClass('hidden');
@@ -2760,9 +2630,6 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
 
     clearDialog();
 
-    // var uName = from8(base64urldecode(subUser.firstname)) + ' ' +
-    //    from8(base64urldecode(subUser.lastname));
-    // uName = uName.trim();
     var subUserDefaultAvatar = useravatar.contact(subUserHandle);
 
     userAttrs.fname = from8(base64urldecode(subUser.firstname));
@@ -2874,7 +2741,7 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
         }
     };
 
-    $('.user-management-subuser-avatars', $dialog).html(subUserDefaultAvatar);
+    $('.user-management-subuser-avatars', $dialog).safeHTML(subUserDefaultAvatar);
 
     // event handler for input getting focus
     $('.dialog-input-container input', $dialog).off('focus.suba')
@@ -2983,7 +2850,7 @@ BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
         var $currSubUser = $userTemplate.clone(true);
         if (results[k].status === 1) {
             var subUserDefaultAvatar = useravatar.contact(results[k].handle);
-            $('.new-sub-user.avatar', $currSubUser).html(subUserDefaultAvatar);
+            $('.new-sub-user.avatar', $currSubUser).safeHTML(subUserDefaultAvatar);
             $('.sub-e', $currSubUser).text(results[k].email);
             $('.sub-p', $currSubUser).text(results[k].initPass);
         }

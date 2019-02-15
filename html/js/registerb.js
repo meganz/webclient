@@ -70,11 +70,12 @@ BusinessRegister.prototype.initPage = function () {
                         totalActiveSubUsers++;
                     }
                 }
+
                 $nbUsersInput.val(Math.max(totalActiveSubUsers, this.minUsers));
                 $nbUsersInput.prop('disabled', true);
-                // ///
                 $cnameInput.prop('disabled', true);
                 $telInput.prop('disabled', true);
+
                 mega.attr.get(u_attr.b.bu, '%name', -1, undefined,
                     function(res, ctx) {
                         $cnameInput.prop('disabled', false);
@@ -82,6 +83,7 @@ BusinessRegister.prototype.initPage = function () {
                             $cnameInput.val(from8(base64urldecode(res)));
                         }
                     });
+
                 mega.attr.get(u_attr.b.bu, '%phone', -1, undefined,
                     function(res, ctx) {
                         $telInput.prop('disabled', false);
@@ -102,17 +104,17 @@ BusinessRegister.prototype.initPage = function () {
             $lnameInput.prop('disabled', true);
         }
 
-        //
+        // hiding element we dont need for logged-in users
         $pageContainer.find('.bus-reg-input.pass-1st').addClass('hidden');
         $pageContainer.find('.bus-reg-input.pass-2nd').addClass('hidden');
         $pageContainer.find('.new-registration.suba').addClass('hidden');
-        //
+
         this.isLoggedIn = true;
     }
 
     $('.bus-reg-btn', $pageContainer).addClass('disabled');
 
-    var fillPaymentGateways = function (st, list) {
+    var fillPaymentGateways = function (status, list) {
 
         var failureExit = function () {
             msgDialog('warninga', '', l[19342], '', function () {
@@ -120,7 +122,7 @@ BusinessRegister.prototype.initPage = function () {
             });
         };
 
-        if (!st) { // failed result from API
+        if (!status) { // failed result from API
             return failureExit();
         }
 
@@ -137,12 +139,17 @@ BusinessRegister.prototype.initPage = function () {
             return failureExit();
         }
 
+        var paymentGatewayToAdd = '';
         for (var k = 0; k < list.length; k++) {
             var payRadio = radioHtml.replace('[x]', list[k].gatewayName);
             var payText = textHtml.replace('[x]', list[k].displayName);
             var payIcon = iconHtml.replace('[x]', list[k].gatewayName);
-            $paymentBlock.append(payRadio + payText + payIcon);
+            paymentGatewayToAdd += payRadio + payText + payIcon;
         }
+        if (paymentGatewayToAdd) {
+            $paymentBlock.append(paymentGatewayToAdd);
+        }
+
 
         // setting the first payment provider as chosen
         $($pageContainer.find('.bus-reg-radio-block .bus-reg-radio')[0]).removeClass('checkOff')

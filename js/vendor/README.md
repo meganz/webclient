@@ -152,7 +152,7 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [Chart.js]: Charts drawing class in JavaScript. V2.7.3
 
-> https://github.com/chartjs/Chart.js/releases/tag/v2.7.3
+> **This is a fork**, [Compare the changes](https://github.com/chartjs/Chart.js/compare/master...meganz:master)
 
 ---
 [react-dom.js, react.js]: A declarative, efficient, and flexible JavaScript library for building user interfaces.

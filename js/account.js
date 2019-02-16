@@ -33,6 +33,7 @@ function u_login(ctx, email, password, uh, pinCode, permanent) {
 
 function u_login2(ctx, ks) {
     if (ks !== false) {
+        sessionStorage.signinorup = 1;
         localStorage.wasloggedin = true;
         u_logout();
         u_storage = init_storage(ctx.permanent ? localStorage : sessionStorage);
@@ -267,6 +268,7 @@ function u_logout(logout) {
             }
         }
 
+        delete sessionStorage.signinorup;
         localStorage.removeItem('signupcode');
         localStorage.removeItem('registeremail');
 

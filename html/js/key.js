@@ -23,6 +23,7 @@ function ui_keycomplete() {
     }
     else {
         localStorage.keycomplete = true;
+        sessionStorage.signinorup = 2;
 
         // If mobile, log to see how many registrations are completed on mobile and load the cloud drive
         if (is_mobile) {
@@ -56,8 +57,8 @@ function ui_keycomplete() {
             }
         }
         else {
-            // Load the Pro page to choose plan
-            loadSubPage('pro');
+            // Load the Pro page to choose plan, or the redeem page if a pending voucher is found.
+            loadSubPage(localStorage.voucher ? 'redeem' : 'pro');
         }
     }
 }

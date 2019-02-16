@@ -2451,7 +2451,11 @@ else if (!b_u) {
         // Page specific
         subpages['!'] = ['download_js'];
     }
-	if (page == 'megacmd') page = 'cmd';
+
+    page = ({
+        'megacmd': 'cmd',
+        'computerbild2019': 'redeem'
+    })[page] || page;
 
     if (page && !is_iframed)
     {
@@ -3015,7 +3019,7 @@ else if (!b_u) {
         catch (ex) {}
     }
 
-    var u_storage, loginresponse, u_sid, dl_res;
+    var u_storage, loginresponse, u_sid, dl_res, voucher;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
     (function _crossTabSession(u_storage) {
@@ -3044,7 +3048,7 @@ else if (!b_u) {
             };
 
             xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams() + (params || ''), true);
-            xhr.send(JSON.stringify([data]));
+            xhr.send(JSON.stringify([].concat(data)));
         };
 
         var ack = function() {
@@ -3073,6 +3077,31 @@ else if (!b_u) {
                 });
             }
 
+            if (voucher) {
+                var code = localStorage.voucher || page.substr(7);
+                var request = [
+                    {a: 'uavq', f: 1, v: code},
+                    {a: 'uq', pro: 1, gc: 1},
+                    {a: 'utqa', nf: 1}
+                ];
+
+                xhr(u_sid ? ('&sid=' + u_sid) : false, request, function(res) {
+                    voucher = false;
+
+                    if (Array.isArray(res) && typeof res[0] === 'object') {
+                        var v = res[0];
+                        v.balance = parseFloat((((res[1] || []).balance || [])[0] || [])[0]) || 0;
+                        v.plans = Array.isArray(res[2]) && res[2].length && res[2];
+                        v.value = parseFloat(v.value);
+                        v.code = code;
+
+                        if (v.plans && v.value) {
+                            mega.voucher = v;
+                        }
+                    }
+                });
+            }
+
             boot_done();
             ack = xhr = undefined;
         };
@@ -3083,6 +3112,7 @@ else if (!b_u) {
         }
 
         loginresponse = true;
+        voucher = localStorage.voucher !== undefined || page.substr(0, 7) === 'voucher';
         dl_res = (page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2;
 
         if (localStorage === u_storage) {
@@ -3166,7 +3196,9 @@ else if (!b_u) {
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
-        if (loginresponse === true || dl_res === true || !jsl_done || !jj_done) return;
+        if (loginresponse === true || dl_res === true || voucher === true || !jsl_done || !jj_done) {
+            return;
+        }
 
         // turn the `ua` (userAgent) string into an object which holds the browser details
         try {

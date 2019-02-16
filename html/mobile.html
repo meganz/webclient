@@ -514,7 +514,10 @@
             <div class="mobile account-type-block">
                 <div class="mobile icon pro-mini"></div>
                 <div class="mobile account-type-text">[$17022]</div>
-                <div class="mobile pro-plan-name"></div>
+                <div class=" pro-plan-block">
+                    <span class="mobile pro-plan-name"></span>
+                    <span class="mobile promo-voucher-badge hidden">Promotion</span>
+                </div>
             </div>
             <div class="mobile account-usage-block">
                 <div class="mobile fm-icon cloud"></div>
@@ -1335,7 +1338,7 @@
                         <div class="mobile download-percents"></div>
                     </div>
                     <div class="mobile buttons inline-buttons">
-                        <a class="mobile red-button second dl-browser"> <i></i> <span>[$8947]</span> </a>
+                        <a class="mobile red-button second dl-browser"> <i></i> <span>[$58]</span> </a>
                         <a class="mobile red-button first dl-megaapp"> <i></i> <span>[$8948]</span> </a>
                     </div>
                     <!-- Progressbar is hidden. "downloading" body class will show it !-->
@@ -1358,7 +1361,7 @@
                     <div class="mobile application-txt file-manager-download-message hidden">
                         [$16107]
                     </div>
-                    <a class="mobile text-button third cancel hidden"><span>Close</span> </a>
+                    <a class="mobile text-button third cancel hidden"><span>[$148]</span> </a>
                     <a class="mobile download-app"></a>
                 </div>
             </div>
@@ -1565,11 +1568,19 @@
             <a class="mobile logo"></a>
             <div class="mobile white-block">
                 <div class="mobile error-messages">
-                    <div class="mobile first-message"></div><br>
+                 <!-- If the dialog requires an icon, remove the hidden class from empty-icon and add another class, empty-icon classes can be found in mobile.css. Search for empty-icon to show the available icons -->
+                <div class="mobile empty-icon clear-rubbish-bin hidden"></div>
+                    <div class="mobile first-message"></div>
                     <div class="mobile optional-second-message"></div>
                 </div>
-                <a class="mobile red-button first confirm-ok-button"> <i></i> <span>[$1596]</span> </a>
-                <a class="mobile text-button third cancel hidden"><span>Close</span> </a>
+                <!-- Add inline-buttons to the div below, when the dialog contains two actions -->
+                <div class="mobile buttons">
+                    <!-- If the main action is a positive action, change red-button to green-button -->
+                    <a class="mobile red-button first confirm-ok-button"> <i></i> <span>[$1596]</span> </a>
+                    <!-- If the dialog has another action, unhide the second red-button-->
+                    <a class="mobile red-button second hidden"> <i></i> <span>[$6821]</span> </a>
+                </div>
+                <a class="mobile text-button third cancel hidden"><span>[$148]</span> </a>
             </div>
         </div>
     </div>
@@ -2133,10 +2144,7 @@
                         <div class="right-pricing-block">
                             <div class="reg-st3-bott-title price">
                                 <span class="num">
-                                    <span class="dollars"></span>
-                                    <span class="small">
-                                        <span class="cents"></span> &euro;
-                                    </span>
+                                    <span class="dollars"></span><span class="small"><span class="cents"></span>&euro;</span>
                                 </span>
                                 <span class="period"> / [$913]</span>
                             </div>
@@ -2245,7 +2253,7 @@
 </div>
 
 
-<!-- Payment success dialog -->
+<!-- Payment success dialog, this dialog should also be used for confirm voucher redemptions to users, if they have already have the app -->
 <div class="mobile payment-result main-block success hidden">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
@@ -2258,6 +2266,31 @@
                 <div class="payment-result-pad">
                     <div class="payment-result-header">[$6961]!</div>
                     <div class="payment-result-txt">[$19512]</div>
+                        <div class="mobile promo-voucher-block onboarding-suggestions hidden">
+                            <div class="mobile promo-voucher-card yellow-block">
+                                <div class="mobile promo-voucher-inner-wrapper">
+                                    <div class="mobile pro-crest-container">
+                                        <div class="mobile pro-crest">
+                                            <div class="mobile membership-icon"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mobile pro-detail-wrapper">
+                                        <div class="mobile storage-block">
+                                            <div class="mobile pro-detail-aligners">
+                                                <div class="mobile storage-amount">XXX GB</div>
+                                                <div class="mobile storage-text">[$19923]</div>
+                                            </div>
+                                        </div>
+                                        <div class="mobile transfer-block">
+                                            <div class="mobile pro-detail-aligners">
+                                                <div class="mobile transfer-amount">XX TB</div>
+                                                <div class="mobile transfer-text">[$19924]</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     <div class="payment-result-icon"></div>
                     <div class="mobile payment-result-button"> <i></i> <span>[$6690]</span> </div>
                 </div>
@@ -3179,7 +3212,7 @@
     <div class="mobile separator-line"></div>
     <div class="mobile cancel-button">
         <span class="mobile cancel-button-icon"></span>
-        <span class="mobile cancel-button-text">Close</span>
+        <span class="mobile cancel-button-text">[$148]</span>
     </div>
 </div>
 

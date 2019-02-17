@@ -242,6 +242,9 @@ html.gbot {
     min-height: 455px;
     table-layout: fixed;
 }
+.bottom-page.top-bl .table {
+    overflow: hidden;
+}
 .bottom-page.img-wrap::before {
     content: '';
     display: block;

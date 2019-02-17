@@ -1865,7 +1865,7 @@ function topmenuUI() {
         }
 
         // if this is a business account sub-user
-        if (u_attr.b && u_attr.b.s !== -1) {
+        if (u_attr && u_attr.b && u_attr.b.s !== -1) {
             $topHeader.find('.top-icon.achievements').addClass('hidden');
             $topMenu.find('.upgrade-your-account').addClass('hidden');
             $topMenu.find('.resellers').addClass('hidden');

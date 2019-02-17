@@ -33,7 +33,7 @@ function dashboardUI() {
     M.onSectionUIOpen('dashboard');
     accountUI.general.userUIUpdate();
 
-    if (u_attr.b) {
+    if (u_attr && u_attr.b) {
         $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
         $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
         if (u_attr.b.s !== -1) {
@@ -293,47 +293,47 @@ function dashboardUI() {
             accountUI.general.charts.init(account, true);
 
 
-        /* Used Storage progressbar */
-        var percents = [
-            100 * account.stats[M.RootID].bytes / account.space,
-            100 * account.stats[M.RubbishID].bytes / account.space,
-            100 * account.stats.inshares.bytes / account.space,
-            100 * account.stats[M.InboxID].bytes / account.space,
-            100 * (account.space - account.space_used) / account.space,
-        ];
-        for (i = 0; i < 5; i++) {
-            var $percBlock = $('.storage .account.progress-perc.pr' + i);
-            if (percents[i] > 0) {
-                $percBlock.text(Math.round(percents[i]) + ' %');
-                $percBlock.parent().removeClass('empty hidden');
+            /* Used Storage progressbar */
+            var percents = [
+                100 * account.stats[M.RootID].bytes / account.space,
+                100 * account.stats[M.RubbishID].bytes / account.space,
+                100 * account.stats.inshares.bytes / account.space,
+                100 * account.stats[M.InboxID].bytes / account.space,
+                100 * (account.space - account.space_used) / account.space,
+            ];
+            for (i = 0; i < 5; i++) {
+                var $percBlock = $('.storage .account.progress-perc.pr' + i);
+                if (percents[i] > 0) {
+                    $percBlock.text(Math.round(percents[i]) + ' %');
+                    $percBlock.parent().removeClass('empty hidden');
+                }
+                else {
+                    $percBlock.text('');
+                    $percBlock.parent().addClass('empty hidden');
+                }
             }
-            else {
-                $percBlock.text('');
-                $percBlock.parent().addClass('empty hidden');
-            }
-        }
 
-        // Cloud drive
-        $('.account.progress-size.cloud-drive').text(
-            account.stats[M.RootID].bytes > 0 ? bytesToSize(account.stats[M.RootID].bytes) : '-'
-        );
-        // Rubbish bin
-        $('.account.progress-size.rubbish-bin').text(
-            account.stats[M.RubbishID].bytes > 0 ? bytesToSize(account.stats[M.RubbishID].bytes) : '-'
-        );
-        // Incoming shares
-        $('.account.progress-size.incoming-shares').text(
-            account.stats.inshares.bytes ? bytesToSize(account.stats.inshares.bytes) : '-'
-        );
-        // Inbox
-        $('.account.progress-size.inbox').text(
-            account.stats[M.InboxID].bytes > 0 ? bytesToSize(account.stats[M.InboxID].bytes) : '-'
-        );
-        // Available
-        $('.account.progress-size.available').text(
-            account.space - account.space_used > 0 ? bytesToSize(account.space - account.space_used) : '-'
-        );
-        /* End of Used Storage progressbar */
+            // Cloud drive
+            $('.account.progress-size.cloud-drive').text(
+                account.stats[M.RootID].bytes > 0 ? bytesToSize(account.stats[M.RootID].bytes) : '-'
+            );
+            // Rubbish bin
+            $('.account.progress-size.rubbish-bin').text(
+                account.stats[M.RubbishID].bytes > 0 ? bytesToSize(account.stats[M.RubbishID].bytes) : '-'
+            );
+            // Incoming shares
+            $('.account.progress-size.incoming-shares').text(
+                account.stats.inshares.bytes ? bytesToSize(account.stats.inshares.bytes) : '-'
+            );
+            // Inbox
+            $('.account.progress-size.inbox').text(
+                account.stats[M.InboxID].bytes > 0 ? bytesToSize(account.stats[M.InboxID].bytes) : '-'
+            );
+            // Available
+            $('.account.progress-size.available').text(
+                account.space - account.space_used > 0 ? bytesToSize(account.space - account.space_used) : '-'
+            );
+            /* End of Used Storage progressbar */
 
 
             /* Used Bandwidth progressbar */

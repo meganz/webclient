@@ -21,7 +21,7 @@ function BusinessAccountUI() {
     this.initUItoRender = function () {
 
         // dealing with non-confirmed accounts, and not payed-ones
-        if (u_attr.b.s === -1 || !u_privk) {
+        if (!u_attr || !u_attr.b || u_attr.b.s === -1 || !u_privk) {
             loadSubPage('start');
             return false;
         }
@@ -1510,7 +1510,7 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
 /** Show UI elements if the account got expired  */
 BusinessAccountUI.prototype.showExpiredUIElements = function() {
     "use strict";
-    if (!u_attr.b || !u_attr.b.m || u_attr.b.s !== -1) {
+    if (!u_attr || !u_attr.b || !u_attr.b.m || u_attr.b.s !== -1) {
         return;
     }
     var msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
@@ -2256,7 +2256,7 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
 BusinessAccountUI.prototype.showWelcomeDialog = function () {
     "use strict";
 
-    if (u_attr.b.s === -1 || !u_privk) {
+    if (!u_attr || !u_attr.b || u_attr.b.s === -1 || !u_privk) {
         return;
     }
 

@@ -584,7 +584,7 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
  */
 BusinessAccount.prototype.isBusinessMasterAcc = function () {
     "use strict";
-    if ((u_attr.b && u_attr.b.m) || (M.suba && M.suba.length)) {
+    if ((u_attr && u_attr.b && u_attr.b.m) || (M.suba && M.suba.length)) {
         if (u_attr.b.s === -1) { // expired
             return false;
         }
@@ -839,7 +839,7 @@ BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
     // if (!u_privk) {
     //    return null;
     // }
-    if (!u_attr.b || !u_attr.b.bprivk) {
+    if (!u_attr || !u_attr.b || !u_attr.b.bprivk) {
         return null;
     }
 
@@ -1241,7 +1241,7 @@ BusinessAccount.prototype.setMasterUserAttributes =
         if (nbusers) {
             request_upb['%nbusers'] = base64urlencode(to8(nbusers)); // nb of users
         }
-        if (isUpgrade && u_attr.b && u_attr.b.m && u_attr.b.bu && u_attr.b.s === -1) {
+        if (isUpgrade && u_attr && u_attr.b && u_attr.b.m && u_attr.b.bu && u_attr.b.s === -1) {
             api_req(request_upb, {
                 callback: function(res) {
                     if ($.isNumeric(res)) {

@@ -152,7 +152,7 @@ var pro = {
                 // Hide the overlay
                 $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 $failureOverlay.addClass('hidden');
-                if (u_attr.b) {
+                if (u_attr && u_attr.b) {
                     loadSubPage('registerb');
                 }
                 else {

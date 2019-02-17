@@ -46,7 +46,7 @@ function accountUI() {
             });
     }
 
-    if (u_attr.b && !u_attr.b.m) {
+    if (u_attr && u_attr.b && !u_attr.b.m) {
         $('.content-panel.account .fm-account-button.slide-in-out.plan').addClass('hidden');
     }
     else {
@@ -64,7 +64,7 @@ accountUI.renderAccountPage = function(account) {
     }
 
     var id = getSitePath();
-    if (u_attr.b && !u_attr.b.m && id === '/fm/account/plan') {
+    if (u_attr && u_attr.b && !u_attr.b.m && id === '/fm/account/plan') {
         id = '/fm/account';
     }
     
@@ -73,7 +73,7 @@ accountUI.renderAccountPage = function(account) {
     accountUI.inputs.text.init();
 
     var showOrHideBanner = function(sectionName) {
-        if (u_attr.b) {
+        if (u_attr && u_attr.b) {
             $('.settings-banner').addClass('hidden');
             return;
         }
@@ -689,7 +689,7 @@ accountUI.account = {
             }
         };
 
-        if (u_attr.b) {
+        if (u_attr && u_attr.b) {
             $('.fm-account-main .settings-sub-section.profile .acc-setting-country-sec').addClass('hidden');
             if (!u_attr.b.m) {
                 hideOrViewCancelSection(true);
@@ -1331,7 +1331,7 @@ accountUI.plan = {
         this.history.bindEvents(account);
 
         // check if business account
-        if (u_attr.b) {
+        if (u_attr && u_attr.b) {
             $('.fm-account-plan.fm-account-sections .acc-storage-space').addClass('hidden');
             $('.fm-account-plan.fm-account-sections .acc-bandwidth-vol').addClass('hidden');
             $('.fm-account-plan.fm-account-sections .btn-achievements').addClass('hidden');

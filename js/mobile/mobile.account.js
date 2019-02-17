@@ -92,7 +92,7 @@ mobile.account = {
         'use strict';
 
         // if this is business dont show
-        if (u_attr.b && u_attr.b.s !== -1) {
+        if (u_attr && u_attr.b && u_attr.b.s !== -1) {
             $page.find('.account-upgrade-block').addClass('hidden');
         }
         else {
@@ -144,7 +144,7 @@ mobile.account = {
 
         // if this is business no limit for storage and no percentage
         var $accountUsageBlockExternal = $('.mobile.account-usage-block');
-        if (u_attr.b) {
+        if (u_attr && u_attr.b) {
             $accountUsageBlockExternal.find('.mobile.storage-usage').addClass('hidden');
             $accountUsageBlockExternal.find('.mobile.storage-usage.business').removeClass('hidden');
         }
@@ -511,7 +511,7 @@ mobile.account = {
         'use strict';
 
         // if this is business sub-user hide
-        if (u_attr.b && !u_attr.b.m) {
+        if (u_attr && u_attr.b && !u_attr.b.m) {
             $page.find('.acount-cancellation-block').addClass('hidden');
         }
         else {

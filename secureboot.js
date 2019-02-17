@@ -1584,6 +1584,17 @@ else if (!b_u) {
                 return false;
             }
 
+            var version = buildVersion.website;
+
+            if (is_extension) {
+                if (is_chrome_firefox || is_firefox_web_ext) {
+                    version = buildVersion.firefox;
+                }
+                else if (mega.chrome) {
+                    version = buildVersion.chrome;
+                }
+            }
+
             if (errobj)
             {
                 if (errobj.udata) dump.d = errobj.udata;
@@ -1626,8 +1637,8 @@ else if (!b_u) {
                     }
                 }
 
-                if (typeof eventlog === 'function' && !errobj.udata) {
-                    eventlog(99702, String(dump.m || 'n0nE'), true);
+                if (typeof eventlog === 'function' && !errobj.udata && /\w/.test(msg || '')) {
+                    eventlog(99702, JSON.stringify([version, ln, msg]), true);
                 }
             }
             if (cn) dump.c = cn;
@@ -1714,25 +1725,16 @@ else if (!b_u) {
                 }
                 report = JSON.stringify(r? report:{});
 
-                var version = buildVersion.website;
-
-                if (is_extension) {
-                    if (is_chrome_firefox || is_firefox_web_ext) {
-                        version = buildVersion.firefox;
-                    }
-                    else if (window.chrome) {
-                        version = buildVersion.chrome;
-                    }
-                }
-
-                for (var i in __cdumps)
+                for (var i = __cdumps.length; i--;)
                 {
+                    if (!/\w/.test(__cdumps[i].m || '')) continue;
+
                     api_req({
                         a: 'cd2',
                         c: JSON.stringify(__cdumps[i]),
-                        v: report,
-                        t: version,
-                        s: window.location.host
+                        // v: report,
+                        // s: window.location.host,
+                        t: version
                     }, ctx(ids[i]));
                 }
                 __cd_t = 0;

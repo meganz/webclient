@@ -1983,7 +1983,7 @@ accountUI.security = {
             'use strict';
 
             // Button on main Account page to backup their master key
-            $('.backup-master-key').rebind('click', function() {
+            $('.fm-account-security .backup-master-key').rebind('click', function() {
                 M.showRecoveryKeyDialog(2);
             });
         }

@@ -1099,7 +1099,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.syncmegasync-item').rebind('click', function () {
         // check if this is a business expired account
-        if (u_attr.b && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             showExpiredBusiness();
             return;
@@ -1120,7 +1120,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.getlink-item, ' + c + '.embedcode-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr.b && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             showExpiredBusiness();
             return;
@@ -1160,7 +1160,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.removelink-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr.b && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             showExpiredBusiness();
             return;
@@ -1203,7 +1203,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.rename-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr.b && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             showExpiredBusiness();
             return;
@@ -1213,7 +1213,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.sh4r1ng-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr.b && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             showExpiredBusiness();
             return;
@@ -1288,7 +1288,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.import-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr.b && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             showExpiredBusiness();
             return;
@@ -1300,7 +1300,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.newfolder-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr.b && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             showExpiredBusiness();
             return;
@@ -1310,7 +1310,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.fileupload-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr.b && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             showExpiredBusiness();
             return;
@@ -1320,7 +1320,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.folderupload-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr.b && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             showExpiredBusiness();
             return;
@@ -1330,7 +1330,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.remove-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr.b && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             showExpiredBusiness();
             return;
@@ -1341,7 +1341,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.addcontact-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr.b && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             showExpiredBusiness();
             return;
@@ -1419,7 +1419,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.removeshare-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr.b && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             showExpiredBusiness();
             return;

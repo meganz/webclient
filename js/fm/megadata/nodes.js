@@ -352,7 +352,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         promise.always(tmp);
     }
     // check if this is a business expired account
-    if (u_attr.b && u_attr.b.s === -1) {
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
         showExpiredBusiness();
         return;
@@ -651,7 +651,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
     'use strict'; /* jshint -W089, -W074 */
     var promise = new MegaPromise();
     // check if this is a business expired account
-    if (u_attr.b && u_attr.b.s === -1) {
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
         showExpiredBusiness();
         return;
@@ -1055,7 +1055,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
 MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
     var promise = new MegaPromise();
     // check if this is a business expired account
-    if (u_attr.b && u_attr.b.s === -1) {
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
         showExpiredBusiness();
         return;
@@ -1124,7 +1124,7 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
 MegaData.prototype.safeRemoveNodes = function(handles) {
     'use strict';
     // check if this is a business expired account
-    if (u_attr.b && u_attr.b.s === -1) {
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
         showExpiredBusiness();
         return;
@@ -1190,7 +1190,7 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
     'use strict'; /* jshint -W089 */
     var masterPromise = new MegaPromise();
     // check if this is a business expired account
-    if (u_attr.b && u_attr.b.s === -1) {
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
         showExpiredBusiness();
         return;
@@ -1372,7 +1372,7 @@ MegaData.prototype.revokeShares = function(handles) {
     'use strict'; /* jshint -W089, -W074 */
     var promise = new MegaPromise();
     // check if this is a business expired account
-    if (u_attr.b && u_attr.b.s === -1) {
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
         showExpiredBusiness();
         return;
@@ -1485,7 +1485,7 @@ MegaData.prototype.revokeFolderShare = function(h, usr, isps) {
     'use strict';
     var promise = new MegaPromise();
     // check if this is a business expired account
-    if (u_attr.b && u_attr.b.s === -1) {
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
         showExpiredBusiness();
         return;

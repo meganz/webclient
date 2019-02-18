@@ -59,7 +59,7 @@ BusinessRegister.prototype.initPage = function () {
 
     // check if this is logged in user
     if (u_type) {
-        if (u_attr.b) {
+        if (u_attr && u_attr.b) {
             if (u_attr.b.s !== -1) {
                 return loadSubPage("start");
             }

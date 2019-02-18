@@ -126,7 +126,8 @@
                                 }
                             }
                             else {
-                                file._replaces = node.h;
+                                // node.id if it's for an upload queue entry
+                                file._replaces = node.h || node.id;
                             }
                         }
                         if (isAddNode) {
@@ -542,7 +543,13 @@
                 var q = ul_queue[i] || false;
 
                 if (q.target === target && q.name === name) {
-                    return q;
+                    var r = Object.create(null);
+                    r.id = q.id;
+                    r.name = q.name;
+                    r.size = q.size;
+                    r.target = r.p = q.target;
+                    r.ts = Math.floor(q.lastModified / 1e3);
+                    return r;
                 }
             }
         },

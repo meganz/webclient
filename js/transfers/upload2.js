@@ -183,6 +183,98 @@ var ulmanager = {
         return false;
     },
 
+    /**
+     * Wait for an upload to finish.
+     * @param {Number} aUploadID The unique upload identifier.
+     * @return {MegaPromise}
+     */
+    onUploadFinished: function(aUploadID) {
+        'use strict';
+
+        if (typeof aUploadID !== 'number' || aUploadID < 8001) {
+            return MegaPromise.reject(EARGS);
+        }
+
+        return new MegaPromise(function(resolve, reject) {
+            var _ev1;
+            var _ev2;
+            var _ev3;
+            var queue = ul_queue.filter(isQueueActive);
+            var i = queue.length;
+
+            while (i--) {
+                if (queue[i].id === aUploadID) {
+                    break;
+                }
+            }
+
+            if (i < 0) {
+                // there is no such upload in the queue
+                return reject(ENOENT);
+            }
+
+            var done = function(id, result) {
+                if (id === aUploadID) {
+                    mBroadcaster.removeListener(_ev1);
+                    mBroadcaster.removeListener(_ev2);
+                    mBroadcaster.removeListener(_ev3);
+
+                    // result will be either the node handle for the new uploaded file or an error
+                    resolve(result);
+                }
+            };
+
+            _ev1 = mBroadcaster.addListener('upload:error', done);
+            _ev2 = mBroadcaster.addListener('upload:abort', done);
+            _ev3 = mBroadcaster.addListener('upload:completion', done);
+        });
+    },
+
+    /**
+     * Hold up an upload until another have finished, i.e. because we have to upload it as a version
+     * @param {File} aFile The upload file instance
+     * @param {Number} aUploadID The upload ID to wait to finish.
+     * @param {Boolean} [aVersion] Whether we're actually creating a version.
+     */
+    holdUntilUploadFinished: function(aFile, aUploadID, aVersion) {
+        'use strict';
+        var promise = new MegaPromise();
+        var logger = d && new MegaLogger('ulhold[' + aUploadID + '>' + aFile.id + ']', null, this.logger);
+
+        if (d) {
+            logger.debug('Waiting for upload %d to finish...', aUploadID, [aFile]);
+        }
+
+        this.onUploadFinished(aUploadID).wait(function(h) {
+            if (d) {
+                logger.debug('Upload %s finished...', aUploadID, h);
+            }
+
+            if (aVersion) {
+                if (typeof h !== 'string' || !M.d[h]) {
+                    var n = fileconflict.getNodeByName(aFile.target, aFile.name);
+                    h = n && n.h;
+
+                    if (d) {
+                        logger.debug('Seek node gave %s', h, M.getNodeByHandle(h));
+                    }
+                }
+
+                if (h) {
+                    aFile._replaces = h;
+                }
+            }
+
+            if (d) {
+                logger.debug('Starting upload %s...', aFile.id, aFile._replaces, [aFile]);
+            }
+            ul_queue.push(aFile);
+            promise.resolve(aFile, h);
+        });
+
+        return promise;
+    },
+
     abort: function UM_abort(gid) {
         if (gid === null || Array.isArray(gid)) {
             this._multiAbort = 1;
@@ -418,6 +510,11 @@ var ulmanager = {
             hash: file.hash,
             k: file.filekey
         };
+
+        if (d) {
+            // if it's set but undefined, the file-conflict dialog failed to properly locate a file/node...
+            console.assert(file._replaces || !("_replaces" in file), 'Unexpected file versioning state...');
+        }
 
         if (file._replaces) {
             if (M.d[file._replaces].fav) {
@@ -974,7 +1071,7 @@ var ulmanager = {
             promises.push(dbfetch.get(aFile.target, new MegaPromise()));
         }
 
-        if ((!M.h[hash] || !M.d[M.h[hash].substr(0, 8)]) && !mega.megadrop.isInit()) {
+        if ((!M.h[aFile.hash] || !M.d[M.h[aFile.hash].substr(0, 8)]) && !mega.megadrop.isInit()) {
             promises.push(
                 dbfetch.hash(aFile.hash)
                     .always(function(node) {

@@ -1138,7 +1138,14 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 + '<td><span class="row-number"></span></td>'
                 + '</tr>');
 
-            ul_queue.push(f);
+            if (typeof f._replaces === 'number') {
+                // We need to create a version for a pending upload, hold it up until it finishes.
+                ulmanager.holdUntilUploadFinished(f, f._replaces, true);
+                delete f._replaces;
+            }
+            else {
+                ul_queue.push(f);
+            }
             ttl.left--;
             added++;
             mega.ui.tpp.setTotal(1, 'ul');

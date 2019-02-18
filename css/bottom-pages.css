@@ -242,6 +242,9 @@ html.gbot {
     min-height: 455px;
     table-layout: fixed;
 }
+.bottom-page.top-bl .table {
+    overflow: hidden;
+}
 .bottom-page.img-wrap::before {
     content: '';
     display: block;
@@ -3138,8 +3141,8 @@ height: 56px;
 .bottom-page.top-description {
     font-size: 14px;
     line-height: 24px;
-    color: #333;
-    font-family: 'LatoWebLight', 'source_sans_proregular', Arial;
+    color: #676D75;
+    font-family: 'LatoWebLight';
     padding: 100px 0 25px 0;
 }
 .bottom-page.big-link {
@@ -3594,8 +3597,10 @@ a.opensource-icon-txt.coming-soon {
     display: none;
 }
 .onboarding-suggestions .bottom-page.top-description {
-    margin: 24px auto 36px;
+    margin: 26px auto 26px;
     padding: 0;
+    font-size: 15px;
+    line-height: 24px;
 }
  .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
     background-color: #fafafa;
@@ -3615,9 +3620,6 @@ a.opensource-icon-txt.coming-soon {
     display: table;
     width: 100%;
     font-size: 15px
-}
-.onboarding-suggestions .bottom-page.bottom-bar.border {
-    border-top: 2px solid #ddd;
 }
 .onboarding-suggestions .button-wrappers {
     margin: 0 auto;
@@ -3640,13 +3642,13 @@ a.opensource-icon-txt.coming-soon {
 .onboarding-suggestions .bottom-page.horizontal-centered-bl {
     min-height: 680px;
     z-index: 999;
-    padding: 0 24px;
+    padding: 0 20px;
     box-sizing: border-box;
     height: 640px;
     padding-top: 24px;
 }
 .onboarding-suggestions .bottom-page.horizontal-centered-bl.resize {
-    min-height: 560px;
+    min-height: 600px;
 }
 .onboarding-suggestions .download-app {
     min-width: 240px;
@@ -3666,7 +3668,7 @@ a.opensource-icon-txt.coming-soon {
 .onboarding-suggestions .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after {
     width: 102px;
     height: 102px;
-    background-image: url(../images/mega/onboarding_download_v1.png);
+    background-image: url(../images/mega/onboarding_download_v2.png);
     background-repeat: no-repeat;
     background-position: 0 0;
     background-size: 600px auto;
@@ -3677,7 +3679,7 @@ a.opensource-icon-txt.coming-soon {
     left: 0;
 }
 .onboarding-suggestions .onboard-image-wrapper .onboard-image.desktop-active {
-    background-position: 0 0;
+    background-position: 0 -457px;
     width: 227px;
     height: 138px;
 }
@@ -3761,17 +3763,15 @@ a.opensource-icon-txt.coming-soon {
     background-position: -237px -320px;
     width: 126px;
     height: 114px;
-    bottom: 132px;
-    transform: scale(.75);
+    bottom: 168px;
 }
 .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed {
     background-position: -421px -326px;
     width: 167px;
     height: 104px;
     bottom: 83px;
-    left: 348px;
+    left: 362px;
     z-index: -1;
-    transform: scale(.75);
 }
 .onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select {
     background-position: -441px -468px;
@@ -3779,7 +3779,6 @@ a.opensource-icon-txt.coming-soon {
     height: 104px;
     left: -347px;
     bottom: 68px;
-    transform: scale(.75);
 }
 .onboarding-suggestions .badge {
     font-family: 'LatoWebBold', 'source_sans_proregular', sans-serif;
@@ -3796,6 +3795,9 @@ a.opensource-icon-txt.coming-soon {
 .onboarding-suggestions .text-button.redirect-clouddrive-link {
     display: inline-block;
     font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
+    font-size: 15px;
+    color: #818993;
+    margin-top: 64px;
 }
 .onboarding-suggestions .text-button.redirect-clouddrive-link.hidden {
     display: none;
@@ -3920,7 +3922,7 @@ a.opensource-icon-txt.coming-soon {
 }
 .split-buttons div.radioOn {
     background-color: #E5F8F6;
-    border: 1px solid #5BC6B8;
+    border: 1px solid #a0e8de;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
     -o-transition: all 200ms ease-in-out;
@@ -3961,13 +3963,11 @@ a.opensource-icon-txt.coming-soon {
 .onboarding-suggestions .bottom-page.top-dark-info.medium {
     font-size: 28px;
     line-height: 42px;
-}
-.onboarding-suggestions .bottom-page.top-dark-info.medium {
-    font-size: 28px;
-    line-height: 42px;
+    color: #495057;
 }
 .bottom-page.onboarding-suggestions {
-    min-height: 640px;
+    min-height: 680px;
+    min-width: 1024px;
 }
 .onboarding-suggestions .os-mac-windows-toggle, .onboarding-suggestions .os-linux-toggle  {
     font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
@@ -3975,7 +3975,150 @@ a.opensource-icon-txt.coming-soon {
 .onboarding-suggestions .megaapp-linux .megaapp-dropdown-list {
     z-index: 9999;
 }
-
+.onboarding-suggestions .promo-voucher-card {
+    height: 62px;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 4px;
+    box-sizing: border-box;
+    max-width: 420px;
+    margin: 0 auto;
+    border:1px solid #eee;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.15);
+}
+.onboarding-suggestions .promo-voucher-card.yellow-block {
+    background-color: #FFAF00;
+    border: 1px solid #FD8116;
+    color: #fff;
+}
+.onboarding-suggestions .promo-voucher-card.red-block {
+    background-color: #eb4444;
+    border: 1px solid #d90007;
+    color: #fff;
+}
+.onboarding-suggestions .promo-voucher-block {
+    margin: 0 auto 36px;
+}
+.onboarding-suggestions .pro-crest-container {
+    width: 60px;
+    box-sizing: border-box;
+    position: absolute;
+    height: 100%;
+    display: inline-block;
+    top: 0;
+    left: 0;
+}
+.onboarding-suggestions .pro-crest-container::after, .onboarding-suggestions .storage-block::after {
+    content: '';
+    border-right: 1px solid #ddd;
+    position: absolute;
+    height: 24px;
+    right: 0;
+    top: 18px;
+}
+.onboarding-suggestions .promo-voucher-inner-wrapper {
+    position: relative;
+    height: 100%;
+}
+.onboarding-suggestions .pro-detail-wrapper {
+    width: calc(100% - 60px);
+    position: relative;
+    height: 100%;
+    box-sizing: border-box;
+    left: 60px;
+}
+.onboarding-suggestions .storage-block, .onboarding-suggestions .transfer-block {
+    width: 49%;
+    box-sizing: border-box;
+    position: relative;
+    height: 100%;
+    display: table;
+    text-align: center;
+    float: left;
+}
+.onboarding-suggestions .storage-amount, .onboarding-suggestions .transfer-amount {
+    font-family: 'LatoWebBold';
+    color: #495057;
+    font-size: 17px;
+    line-height: 25px
+}
+.onboarding-suggestions .promo-voucher-card.yellow-block .storage-amount, .onboarding-suggestions .promo-voucher-card.yellow-block .transfer-amount {
+    color: #fff;
+}
+.onboarding-suggestions .promo-voucher-card.yellow-block .transfer-text, .onboarding-suggestions .promo-voucher-card.yellow-block .storage-text {
+    color: #fff;
+    opacity: .8;
+}
+.onboarding-suggestions .storage-text, .onboarding-suggestions .transfer-text {
+    font-size: 14px;
+    color: #FDA416;
+    margin-top: 4px;
+    text-transform: uppercase;
+    line-height: 20px;
+}
+.onboarding-suggestions .pro-detail-aligners {
+    display: table-cell;
+    vertical-align: middle;
+}
+.onboarding-suggestions .promo-voucher-background {
+    display: none;
+}
+.onboarding-suggestions.promo-vouchers .bottom-page.half-page {
+    width: 50%;
+    display: table;
+    position: relative;
+    float: left;
+    height: 100%;
+}
+.onboarding-suggestions.promo-vouchers .bottom-page.half-page.right-side {
+    background-color: #F4F4F6;
+    box-sizing: border-box;
+}
+.onboarding-suggestions.promo-vouchers .bottom-page.horizontal-centered-bl {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 0 110px;
+}
+.onboarding-suggestions .bottom-page.section-border {
+    width: 36px;
+    height: 2px;
+    border-radius: 4px;
+    background-color: #eee;
+    margin: 0 auto 24px;
+}
+/*.onboarding-suggestions.promo-vouchers .bottom-page.top-dark-info.medium, .onboarding-suggestions.promo-vouchers .bottom-page.top-description {
+    text-align: left;
+}
+.onboarding-suggestions.promo-vouchers .promo-voucher-card, .onboarding-suggestions.promo-vouchers .default-green-button.height-48.redirect-clouddrive, .onboarding-suggestions.promo-vouchers .default-green-button.height-48.download-app {
+    margin: 0 0;
+}
+.onboarding-suggestions.promo-vouchers .default-green-button.height-48.redirect-clouddrive, .onboarding-suggestions.promo-vouchers .default-green-button.height-48.download-app {
+    float: left;
+}*/
+.onboarding-suggestions.promo-vouchers .text-button.redirect-clouddrive-link {
+    color: #bbb;
+    margin-top: 80px;
+}
+.onboarding-suggestions.promo-vouchers .bottom-page.bottom-bar {
+    height: 200px;
+}
+.onboarding-suggestions.promo-vouchers .onboard-image-wrapper {
+    bottom: 200px
+}
+.onboarding-suggestions.promo-vouchers .button-wrappers {
+    width: 100%;
+    position: relative;
+    display: block;
+}
+.onboarding-suggestions.promo-vouchers .bottom-page.vertical-centered-bl.top-bl {
+    background-color: #fff;
+}
+.onboarding-suggestions.promo-vouchers .promo-voucher-card {
+    max-width: 360px;
+}
+.onboarding-suggestions a.red:hover {
+    text-decoration: underline;
+}
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow, .bottom-page.top-title::before, .pages-nav.nav-icon.bott-sprite, .bottom-page.mid-icon, .bottom-page.cols-container .col3::before, .bottom-page.tab-lnk-icon, .cmd-top-img, .bottom-page.scroll-icon, .bottom-page.dark-button, .bottom-page.big-link i, .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite {
     background-image: url(../images/mega/pages-sprite_v5@2x.png) !important;
@@ -3989,8 +4132,8 @@ a.opensource-icon-txt.coming-soon {
     background-image: url(../images/mega/bottom-page/security-page-v1@2x.png);
     background-size: 750px auto;
 }
-.onboarding-suggestions .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after  {
-    background-image: url(../images/mega/onboarding_download_v1@2x.png);
+.onboarding-suggestions .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after, .redeem-promo-page .onboard-image  {
+    background-image: url(../images/mega/onboarding_download_v2@2x.png);
     background-size: 600px auto;
 }
 }
@@ -4016,11 +4159,54 @@ a.opensource-icon-txt.coming-soon {
 }
 }
 @media only screen and (max-width: 970px) {
-.bottom-page.img.tm {
-    padding: 120px 0 0 0;
+    .bottom-page.img.tm {
+        padding: 120px 0 0 0;
+    }
 }
+@media only screen and (max-width: 1280px) {
+    .onboarding-suggestions.promo-vouchers .bottom-page.horizontal-centered-bl {
+    padding: 0 72px;
+    }
 }
-
+@media only screen and (max-width: 1180px) {
+    .onboarding-suggestions.promo-vouchers .bottom-page.horizontal-centered-bl {
+    padding: 0 40px;
+    }
+    .onboarding-suggestions .bottom-page.top-dark-info.medium {
+        font-size: 24px;
+        line-height: 36px;
+    }
+    .onboarding-suggestions .bottom-page.top-description {
+        font-size: 13px;
+        line-height: 22px;
+    }
+    .onboarding-suggestions .text-button.redirect-clouddrive-link {
+        font-size: 13px;
+        line-height: 22px;
+    }
+    .onboarding-suggestions.promo-vouchers .promo-voucher-card {
+        width: 320px;
+    }
+    .onboarding-suggestions .storage-amount, .onboarding-suggestions .transfer-amount {
+        font-size: 16px;
+        line-height: 24px;
+    }
+    .default-green-button.height-48.redirect-clouddrive, .default-green-button.height-48.download-app {
+        font-size: 15px;
+    }
+    .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-progress, .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed, .onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select {
+        transform: scale(.75);
+    }
+    .onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select {
+        left: -310px;
+    }
+    .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-progress {
+        bottom: 148px;
+    }
+    .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed {
+        left: 340px;
+    }
+}
 @media only screen and (max-width: 970px) {
 .bottom-page .reg-st3-membership-bl {
     width: 252px;
@@ -4378,7 +4564,8 @@ body:not(.en) .pages-nav.content-block .nav-button {
     padding: 40px 0 25px 0;
 }
 .onboarding-suggestions .bottom-page.top-description {
-    font-size: 15px;
+    font-size: 14px;
+    line-height: 22px;
 }
 .bottom-page.img.mobile-top {
     width: 100%;

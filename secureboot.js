@@ -1584,6 +1584,17 @@ else if (!b_u) {
                 return false;
             }
 
+            var version = buildVersion.website;
+
+            if (is_extension) {
+                if (is_chrome_firefox || is_firefox_web_ext) {
+                    version = buildVersion.firefox;
+                }
+                else if (mega.chrome) {
+                    version = buildVersion.chrome;
+                }
+            }
+
             if (errobj)
             {
                 if (errobj.udata) dump.d = errobj.udata;
@@ -1626,8 +1637,8 @@ else if (!b_u) {
                     }
                 }
 
-                if (typeof eventlog === 'function' && !errobj.udata) {
-                    eventlog(99702, true);
+                if (typeof eventlog === 'function' && !errobj.udata && /\w/.test(msg || '')) {
+                    eventlog(99702, JSON.stringify([version, ln, msg]), true);
                 }
             }
             if (cn) dump.c = cn;
@@ -1714,25 +1725,16 @@ else if (!b_u) {
                 }
                 report = JSON.stringify(r? report:{});
 
-                var version = buildVersion.website;
-
-                if (is_extension) {
-                    if (is_chrome_firefox || is_firefox_web_ext) {
-                        version = buildVersion.firefox;
-                    }
-                    else if (window.chrome) {
-                        version = buildVersion.chrome;
-                    }
-                }
-
-                for (var i in __cdumps)
+                for (var i = __cdumps.length; i--;)
                 {
+                    if (!/\w/.test(__cdumps[i].m || '')) continue;
+
                     api_req({
                         a: 'cd2',
                         c: JSON.stringify(__cdumps[i]),
-                        v: report,
-                        t: version,
-                        s: window.location.host
+                        // v: report,
+                        // s: window.location.host,
+                        t: version
                     }, ctx(ids[i]));
                 }
                 __cd_t = 0;
@@ -2451,7 +2453,11 @@ else if (!b_u) {
         // Page specific
         subpages['!'] = ['download_js'];
     }
-	if (page == 'megacmd') page = 'cmd';
+
+    page = ({
+        'megacmd': 'cmd',
+        'computerbild2019': 'redeem'
+    })[page] || page;
 
     if (page && !is_iframed)
     {
@@ -3015,7 +3021,7 @@ else if (!b_u) {
         catch (ex) {}
     }
 
-    var u_storage, loginresponse, u_sid, dl_res;
+    var u_storage, loginresponse, u_sid, dl_res, voucher;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
     (function _crossTabSession(u_storage) {
@@ -3044,7 +3050,7 @@ else if (!b_u) {
             };
 
             xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams() + (params || ''), true);
-            xhr.send(JSON.stringify([data]));
+            xhr.send(JSON.stringify([].concat(data)));
         };
 
         var ack = function() {
@@ -3073,6 +3079,31 @@ else if (!b_u) {
                 });
             }
 
+            if (voucher) {
+                var code = localStorage.voucher || page.substr(7);
+                var request = [
+                    {a: 'uavq', f: 1, v: code},
+                    {a: 'uq', pro: 1, gc: 1},
+                    {a: 'utqa', nf: 1}
+                ];
+
+                xhr(u_sid ? ('&sid=' + u_sid) : false, request, function(res) {
+                    voucher = false;
+
+                    if (Array.isArray(res) && typeof res[0] === 'object') {
+                        var v = res[0];
+                        v.balance = parseFloat((((res[1] || []).balance || [])[0] || [])[0]) || 0;
+                        v.plans = Array.isArray(res[2]) && res[2].length && res[2];
+                        v.value = parseFloat(v.value);
+                        v.code = code;
+
+                        if (v.plans && v.value) {
+                            mega.voucher = v;
+                        }
+                    }
+                });
+            }
+
             boot_done();
             ack = xhr = undefined;
         };
@@ -3083,6 +3114,7 @@ else if (!b_u) {
         }
 
         loginresponse = true;
+        voucher = localStorage.voucher !== undefined || page.substr(0, 7) === 'voucher';
         dl_res = (page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2;
 
         if (localStorage === u_storage) {
@@ -3166,7 +3198,9 @@ else if (!b_u) {
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
-        if (loginresponse === true || dl_res === true || !jsl_done || !jj_done) return;
+        if (loginresponse === true || dl_res === true || voucher === true || !jsl_done || !jj_done) {
+            return;
+        }
 
         // turn the `ua` (userAgent) string into an object which holds the browser details
         try {

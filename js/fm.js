@@ -1292,6 +1292,9 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         }
     }
     else if (type === 'confirmation' || type === 'remove') {
+        if (doneButton === l[81]) {
+            doneButton = false;
+        }
         $('#msgDialog .fm-notifications-bottom')
             .safeHTML('<div class="left checkbox-block hidden">' +
                 '<div class="checkdiv checkboxOff">' +
@@ -1301,7 +1304,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 '<label for="export-checkbox" class="radio-txt">@@</label></div>' +
                 '<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
                 '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
-                '<div class="clear"></div>', l[229], l[78], l[79]);
+                '<div class="clear"></div>', l[229], doneButton || l[78], extraButton || l[79]);
 
         $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
             closeMsg();

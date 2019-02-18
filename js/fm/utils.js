@@ -73,6 +73,15 @@ MegaApi.prototype.req = function(params) {
     return promise;
 };
 
+MegaApi.prototype.reqA = function(params) {
+    'use strict';
+
+    var promise = new MegaPromise();
+    MegaPromise.allDone(params.map(this.req.bind(this))).unpack(promise.resolve.bind(promise));
+
+    return promise;
+};
+
 /**
  * execCommandUsable
  *

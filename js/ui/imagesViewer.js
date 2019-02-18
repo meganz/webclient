@@ -849,7 +849,7 @@ var slideshowid;
             console.debug('slideshow.fetchsrc', id, n, n.h);
         }
 
-        if (filetype(n) === 'PDF Document') {
+        if (fileext(n.name) === 'pdf') {
             if (!preqs[n.h]) {
                 preqs[n.h] = 1;
 

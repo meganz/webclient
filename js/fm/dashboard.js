@@ -24,11 +24,12 @@ function dashboardUI() {
     }
     else {
         $('.account.widget.recovery-key').removeClass('hidden');
-        // Button on dashboard to backup their master key
-        $('.backup-master-key').rebind('click', function() {
-            M.showRecoveryKeyDialog(2);
-        });
     }
+
+    // Button on dashboard to backup their master key
+    $('.dashboard .backup-master-key').rebind('click', function() {
+        M.showRecoveryKeyDialog(2);
+    });
 
     M.onSectionUIOpen('dashboard');
     accountUI.general.userUIUpdate();

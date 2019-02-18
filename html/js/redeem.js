@@ -10,6 +10,7 @@ var redeem = {
     $successOverlay: null,
 
     voucherCode: '',
+    voucherData: false,
     accountBalance: 0,
     voucherAmount: 0,
     bestPlan: null,
@@ -18,6 +19,7 @@ var redeem = {
      * Initialisation of the dialog
      */
     init: function() {
+        'use strict';
 
         // Cache DOM reference for lookup in other functions
         redeem.$dialog = $('.voucher-redeem-dialog');
@@ -25,46 +27,143 @@ var redeem = {
         redeem.$successOverlay = $('.payment-result.success');
 
         // Init functionality
-        redeem.showConfirmAccountDialog();
+        if (localStorage.oldRedeemFlow) {
+            return this.showConfirmAccountDialog().then(this.addVoucher.bind(this)).catch(this.goToCloud.bind(this));
+        }
+
+        this.getVoucherData().then(function(data) {
+            var promise;
+
+            redeem.voucherData = data;
+
+            // Was the user already logged-in?
+            if (!sessionStorage.signinorup) {
+                // Show confirm dialog asking the user if he wants to redeem the voucher for this account.
+                promise = redeem.showConfirmAccountDialog();
+            }
+            else {
+                // The user just signed in/up, no confirm needed.
+                promise = MegaPromise.resolve();
+            }
+
+            var addVoucher = function() {
+                // Make API call to redeem voucher
+                // MegaPromise.resolve()
+                M.req({a: 'promoter' in data ? 'epcr' : 'uavr', v: data.code, p: data.promoter})
+                    .then(function() {
+                        if (data.promotional) {
+                            // A promotional voucher gets auto-redeem into quota
+                            redeem.$dialog.addClass('hidden');
+                            redeem.showSuccessfulPayment();
+                        }
+                        else {
+                            // non-promotional voucher, proceed with confirm dialog.
+                            redeem.displayDialog();
+                        }
+                    })
+                    .catch(function(ex) {
+                        console.error('uavr failed...', ex);
+                        redeem.showErrorDialog();
+                    });
+
+                // No longer needed in localStorage
+                localStorage.removeItem('voucher');
+            };
+
+            promise.then(addVoucher).catch(redeem.goToCloud.bind(redeem));
+
+        }).catch(function(ex) {
+            console.error('Redemption error.', ex);
+            redeem.showErrorDialog();
+        });
     },
 
     /**
      * Show a dialog to confirm whether they have the right account for redeeming the voucher
      */
     showConfirmAccountDialog: function() {
-
         'use strict';
 
-        // Are you sure you want to redeem this voucher for the email@domain.com account?
-        var redeemConfirmMessage = l[19328].replace('%1', u_attr.email);
+        return new MegaPromise(function(resolve, reject) {
+            // Are you sure you want to redeem this voucher for the email@domain.com account?
+            var message = String(l[19328]).replace('%1', window.u_attr && u_attr.email || '');
 
-        // OK button callback to redeem the voucher, choose plan etc
-        var okCallback = function() {
-            redeem.addVoucher();
-        };
+            // Confirm with the user, that this is right account to redeem the code
+            redeem.showDialog(l[7160], message).then(resolve).catch(reject);
 
-        // Cancel button callback to go back to their Cloud drive
-        var cancelCallback = function() {
-            delete localStorage.voucher;
-            redeem.hideBackgroundOverlay();
-            loadSubPage('fm');
-        };
+            if (is_mobile) {
+                var $overlay = $('#mobile-ui-error .white-block');
+                $('.third span', $overlay).text(l[20131]);
+                $('.first', $overlay).addClass('green-button');
+            }
+        });
+    },
 
-        // Confirm with the user, that this is right account to redeem the code
-        if (is_mobile) {
-            mobile.messageOverlay.show(l[458], redeemConfirmMessage, okCallback, cancelCallback);
+    /**
+     * Redirect the user to the fm, for whatever reason.
+     */
+    goToCloud: function() {
+        'use strict';
+        delete localStorage.voucher;
+        redeem.hideBackgroundOverlay();
+        loadSubPage('fm');
+    },
+
+    /**
+     * Show dialog to the user to confirm something...
+     * @param {String} title
+     * @param {String} message
+     * @param {String|Array} [buttons]
+     * @param {Boolean} [error]
+     * @returns {MegaPromise}
+     */
+    showDialog: function(title, message, buttons, error) {
+        'use strict';
+
+        if (buttons && !Array.isArray(buttons)) {
+            buttons = [buttons /* CANCEL */, l[81] /* OK */];
         }
-        else {
-            // If confirmed, redeem the voucher and display the balance etc
-            msgDialog('confirmation', l[458], redeemConfirmMessage, '', function(event) {
-                if (event) {
-                    okCallback();
+
+        return new MegaPromise(function(resolve, reject) {
+            if (is_mobile) {
+                var icon = (error ? 'invalid-' : '') + 'voucher';
+                return mobile.messageOverlay.show(title, message, icon, buttons).then(resolve).catch(reject);
+            }
+
+            var type = error ? 'warninga' : 'confirmation';
+
+            if (buttons) {
+                type += ':!^' + buttons[0] + '!' + buttons[1];
+            }
+
+            msgDialog(type, title, message, false, function(yup) {
+                if (yup) {
+                    return resolve();
                 }
-                else {
-                    cancelCallback();
-                }
+                reject();
             });
-        }
+        });
+    },
+
+    /**
+     * Show error dialog.
+     * @param {String} [message]
+     */
+    showErrorDialog: function(message) {
+        'use strict';
+
+        // Show 'Oops, that does not seem to be a valid voucher code.' if none given
+        message = message || l[473];
+
+        // With buttons, 'Contact Support' & 'Cloud Drive'
+        this.showDialog(l[20416], message, [l[18148], l[19266]], true)
+            .then(function() {
+                redeem.goToCloud();
+            })
+            .catch(function() {
+                redeem.hideBackgroundOverlay();
+                loadSubPage('contact');
+            });
     },
 
     /**
@@ -162,49 +261,64 @@ var redeem = {
      * Get the Pro membership plans
      */
     getProPlans: function() {
+        'use strict';
 
         // This call will return an array of arrays. Each array contains this data:
         // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
         api_req({ a : 'utqa', nf: 1 }, {
             callback: function (result) {
-
-                // The rest of the webclient expects this data in an array format
-                // [api_id, account_level, storage, transfer, months, price, currency, monthlybaseprice]
-                var results = [];
-                for (var i = 0; i < result.length; i++)
-                {
-                    results.push([
-                        result[i]['id'],
-                        result[i]['al'], // account level
-                        result[i]['s'],  // storage
-                        result[i]['t'],  // transfer
-                        result[i]['m'],  // months
-                        result[i]['p'],  // price
-                        result[i]['c'],  // currency
-                        result[i]['mbp'], // monthly base price
-                        result[i]['lp'], // NEW 'local price'
-                        result[i]['lpc'], // NEW 'local price currency'
-                        result[i]['lps'], // NEW 'local price symbol'
-                        result[i]['lp0']
-                    ]);
-                }
-
                 // Update the list of plans
-                redeem.membershipPlans = results;
+                redeem.membershipPlans = redeem.parseProPlans(result);
 
                 // Get all the available pro plans
-                redeem.calculateBestProPlan();
+                var bestPlan = redeem.calculateBestProPlan(redeem.membershipPlans, redeem.accountBalance);
+
+                // Set the best plan for the user
+                redeem.bestPlan = bestPlan;
+
+                // Display the dialog
+                redeem.displayDialog();
             }
         });
     },
 
     /**
+     * Get the Pro membership plans
+     */
+    parseProPlans: function(result) {
+        'use strict';
+
+        // The rest of the webclient expects this data in an array format
+        // [api_id, account_level, storage, transfer, months, price, currency, monthlybaseprice]
+        var results = [];
+        for (var i = 0; i < result.length; i++) {
+            results.push([
+                result[i]['id'],
+                result[i]['al'],  // account level
+                result[i]['s'],   // storage
+                result[i]['t'],   // transfer
+                result[i]['m'],   // months
+                result[i]['p'],   // price
+                result[i]['c'],   // currency
+                result[i]['mbp'], // monthly base price
+                result[i]['lp'],  // NEW 'local price'
+                result[i]['lpc'], // NEW 'local price currency'
+                result[i]['lps'], // NEW 'local price symbol'
+                result[i]['lp0']
+            ]);
+        }
+
+        return results;
+    },
+
+    /**
      * Calculates the best plan for
      */
-    calculateBestProPlan: function() {
+    calculateBestProPlan: function(plans, balance) {
+        'use strict';
 
         // Sort plans by lowest price first
-        redeem.membershipPlans.sort(function(planA, planB) {
+        plans.sort(function(planA, planB) {
 
             // Convert from string for proper comparison
             var pricePlanA = parseFloat(planA[5]);
@@ -223,14 +337,13 @@ var redeem = {
         var selectedPlanIndex = 0;
 
         // Find the most expensive plan that they can purchase with their current account balance
-        for (var i = 0; i < redeem.membershipPlans.length; i++) {
+        for (var i = 0; i < plans.length; i++) {
 
             // Convert string price to float for correct comparison
-            var planPrice = redeem.membershipPlans[i][5];
-                planPrice = parseFloat(planPrice);
+            var planPrice = parseFloat(plans[i][5]);
 
             // If their account balance is equal or more than the plan price, update
-            if (planPrice <= redeem.accountBalance) {
+            if (planPrice <= balance) {
                 selectedPlanIndex = i;
             }
             else {
@@ -240,24 +353,23 @@ var redeem = {
         }
 
         // Set the best plan for the user
-        redeem.bestPlan = redeem.membershipPlans[selectedPlanIndex];
-
-        // Display the dialog
-        redeem.displayDialog();
+        return plans[selectedPlanIndex];
     },
 
     /**
      * Displays the details on the dialog
      */
     displayDialog: function() {
+        'use strict';
 
-        var balance2dp = redeem.accountBalance.toFixed(2);
-        var planId = redeem.bestPlan[0];
-        var proNum = redeem.bestPlan[1];
-        var storage = redeem.bestPlan[2];
-        var bandwidth = redeem.bestPlan[3];
-        var numOfMonths = redeem.bestPlan[4];
-        var planPrice = redeem.bestPlan[5].split('.');
+        var vd = this.voucherData;
+        var balance2dp = vd.balance.toFixed(2);
+        var planId = vd.planId;
+        var proNum = vd.proNum;
+        var storage = vd.storage;
+        var bandwidth = vd.bandwidth;
+        var numOfMonths = vd.months;
+        var planPrice = vd.price.split('.');
         var proName = pro.getProPlanName(proNum);
 
         // Get dollars and cents
@@ -275,7 +387,7 @@ var redeem = {
 
         // "Your MEGA voucher for 4.99 &euro; was redeemed successfully"
         var titleText = redeem.$dialog.find('.title-text').html();
-            titleText = titleText.replace('%1', redeem.voucherAmount);
+        titleText = titleText.replace('%1', vd.value);
 
         // "Your balance is now 18.00 &euro;."
         var balanceText = redeem.$dialog.find('.balance-text').html();
@@ -303,6 +415,7 @@ var redeem = {
         redeem.$dialog.find('.complete-upgrade-text').html(upgradeText);
         redeem.$dialog.find('.pro-plan').text(proName);
         redeem.$dialog.find('.complete-upgrade-button').attr('data-plan-id', planId);
+        redeem.$dialog.find('.choose-plan-button').addClass('hidden');
 
         // Button functionality
         redeem.initCloseButton();
@@ -351,11 +464,13 @@ var redeem = {
      * Complete the Pro purchase using their balance and the relevant plan
      */
     processProPurchaseWithBalance: function() {
+        'use strict';
 
         // Data for API request
-        var apiId = redeem.bestPlan[0];
-        var price = redeem.bestPlan[5];
-        var currency = redeem.bestPlan[6];
+        var vd = this.voucherData;
+        var apiId = vd.planId;
+        var price = vd.price;
+        var currency = vd.currency;
         var gatewayId = 0;                                  // Prepay / account balance
 
         // Start loading spinner
@@ -410,10 +525,22 @@ var redeem = {
      * Shows a successful payment modal dialog
      */
     showSuccessfulPayment: function() {
+        'use strict';
+        var vd = redeem.voucherData;
+        var signup = parseInt(sessionStorage.signinorup) === 2;
+        delete sessionStorage.signinorup;
+
+        if (signup) {
+            // The user just signed up, redirect to the app onboarding
+            sessionStorage.voucherData = JSON.stringify(vd);
+            loadSubPage('downloadapp');
+            return false;
+        }
 
         // Get the selected Pro plan details
-        var proNum = redeem.bestPlan[1];
+        var proNum = vd.proNum;
         var proPlanName = pro.getProPlanName(proNum);
+        var $voucherBlock = $('.promo-voucher-block', redeem.$successOverlay).removeClass('hidden');
 
         // Show the success
         redeem.showBackgroundOverlay();
@@ -421,6 +548,10 @@ var redeem = {
         redeem.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
 
         insertEmailToPayResult(redeem.$successOverlay);
+
+        // Show PRO plan details
+        $('.storage-amount', $voucherBlock).text(bytesToSize(vd.storage * 0x40000000, 0));
+        $('.transfer-amount', $voucherBlock).text(bytesToSize(vd.bandwidth * 0x40000000, 0));
 
         // Add click handlers for 'Go to my account' and Close buttons
         redeem.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
@@ -438,6 +569,125 @@ var redeem = {
             // On mobile just load the main account page as there is no payment history yet
             loadSubPage(is_mobile ? 'fm/account' : 'fm/account/plan');
             return false;
+        });
+    },
+
+    /**
+     * Function used when accessing '/reddem' without a voucher code in 'localStorage.voucher'
+     */
+    setupVoucherInputbox: function() {
+        'use strict';
+        var promoter;
+        var path = getSitePath();
+        var $overlay = $('.main-pad-block.redeem-promo-page').removeClass('hidden');
+        var $button = $('.redeem-voucher', $overlay);
+        var $inputo = $('.dialog-input-title-ontop', $overlay);
+        var $input = $('input', $inputo);
+
+        if (path.indexOf('computerbild') > 0) {
+            promoter = 0;
+
+            $('.pre-download', $overlay).text(l[20412]);
+            $('.top-description', $overlay).text(l[20417]);
+            $input.attr('placeholder', l[20418]);
+        }
+
+        $input.rebind('keyup.vib', function() {
+            var value = $(this).val() || false;
+
+            if (value.length > 11) {
+                $button.addClass('active');
+            }
+            else {
+                $button.removeClass('active');
+            }
+            $inputo.removeClass('error');
+        });
+
+        $button.rebind('click', function() {
+            loadingDialog.show();
+
+            redeem.getVoucherData($input.val(), promoter)
+                .then(function(data) {
+                    mega.voucher = data;
+                    loadSubPage('voucher' + data.code);
+                })
+                .catch(function() {
+                    $input.val('');
+                    $inputo.addClass('error');
+                    loadingDialog.hide();
+                });
+
+            return false;
+        });
+    },
+
+    /**
+     * Retrieve API data needed for the voucher handling.
+     * @param {String} [code] Voucher code
+     * @param {Number} [promo] Promoter identifier
+     * @returns {MegaPromise}
+     */
+    getVoucherData: function(code, promo) {
+        'use strict';
+
+        return new MegaPromise(function(resolve, reject) {
+            var parse = function(v) {
+                var b = v.promotional ? v.value : v.balance;
+                var p = redeem.calculateBestProPlan(redeem.parseProPlans(v.plans), b);
+                v.planId = p[0];
+                v.proNum = p[1];
+                v.storage = p[2];
+                v.bandwidth = p[3];
+                v.months = p[4];
+                v.price = p[5];
+
+                if (v.available && v.proNum) {
+                    return resolve(v);
+                }
+                reject(v);
+            };
+
+            code = code || localStorage.voucher;
+            if (mega.voucher && mega.voucher.code === code) {
+                return parse(mega.voucher);
+            }
+
+            var request = [
+                {a: 'uavq', f: 1, v: code},
+                {a: 'uq', pro: 1, gc: 1},
+                {a: 'utqa', nf: 1}
+            ];
+
+            if (promo === undefined) {
+                promo = sessionStorage[code];
+            }
+            if (promo !== undefined) {
+                request[0].p = promo;
+                request[0].a = 'epcq';
+            }
+
+            M.reqA(request).then(function(res) {
+                if (Array.isArray(res) && typeof res[0] === 'object') {
+                    var v = res[0];
+                    v.balance = parseFloat((((res[1] || []).balance || [])[0] || [])[0]) || 0;
+                    v.value = parseFloat(v.value);
+                    v.plans = res.slice(2);
+                    v.code = code;
+
+                    if (promo !== undefined) {
+                        v.promotional = 1;
+                        v.promoter = promo;
+                        v.available = v.valid;
+                        sessionStorage[code] = promo;
+                    }
+
+                    if (v.value) {
+                        return parse(v);
+                    }
+                }
+                reject(ENOENT);
+            }).catch(reject);
         });
     },
 

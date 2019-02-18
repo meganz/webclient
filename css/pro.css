@@ -1770,6 +1770,166 @@ div.pro-feature-icon {
 
 /* end of New PRO page styles */
 
+
+/* onboarding page PRO cards*/
+
+.onboarding-suggestions .mobile.membership-icon {
+    background-position: -0px -1620px;
+    left: 50%;
+    top: 50%;
+    margin: -16px 0 0 -15px;
+    height: 32px;
+    width: 32px;
+    position: absolute;
+}
+.onboarding-suggestions .pro1 .mobile.membership-icon {
+    background-position: -0px -1669px;
+}
+.onboarding-suggestions .pro2 .mobile.membership-icon {
+    background-position: -0px -1720px;
+}
+.onboarding-suggestions .pro3 .mobile.membership-icon {
+    background-position: -0px -1770px;
+}
+/* Promotion Voucher code, I will remove once I have more time */
+.redeem-promo-page .dialog-input-title-ontop .dialog-input {
+    border: none;
+   width: 320px;
+   height: 24px;
+   margin-top: 24px;
+   margin-right: 0;
+   line-height: 24px;
+   color: #333;
+   font-family: 'LatoWeb','source_sans_proregular', Arial;
+   font-size: 17px;
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   background-color: none;
+   cursor: text;
+}
+.redeem-promo-page .dialog-input-title-ontop {
+    width: 320px;
+}
+.redeem-promo-page .dialog-input-title-ontop.active .title {
+    top: 0;
+    color: #aaa;
+}
+.redeem-promo-page .dialog-input-title-ontop .title {
+   position: absolute;
+   left: 0px;
+   top: 30px;
+   font-size: 14px;
+   color: #888;
+   line-height: 18px;
+   -webkit-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+   -moz-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+   -o-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+   -ms-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+   transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+   z-index: 1129;
+}
+.redeem-promo-page .onboard-image {
+    background-image: url(../images/mega/onboarding_download_v2@2x.png);
+    background-size: 600px auto;
+}
+.redeem-promo-page .onboard-image.voucher {
+    background-position: 0 -635px;
+    width: 224px;
+    height: 150px;
+    margin: 0 auto 10px;
+}
+.redeem-promo-page .bottom-page.top-description {
+    padding: 24px 0 40px 0;
+    margin: 0 auto;
+}
+.bottom-page.redeem-promo-container, .main-pad-block.redeem-promo-page  {
+    height: 100%;
+}
+.main-pad-block.redeem-promo-page {
+    background-color: #fafafa;
+}
+.redeem-promo-page .white-block {
+    background-color: #fff;
+    border: 1px solid #eee;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.10);
+    max-width: 620px;
+    margin: 0 auto;
+    border-radius: 12px;
+    padding: 24px 24px;
+    box-sizing: border-box;
+    min-height: 540px;
+}
+.redeem-promo-page .bottom-page.top-dark-info.medium {
+    font-size: 28px;
+    line-height: 40px;
+}
+.redeem-promo-page .voucher-input-container {
+    margin-bottom: 36px;
+}
+.redeem-promo-page .button-block .default-green-button {
+    min-width: 180px;
+}
+.redeem-promo-page .button-block {
+    display: block;
+    margin-top: 40px;
+}
+/* three extra status for the inputs: error, active, correctinput */
+.dialog-input-title-ontop.correctinput .title {
+   visibility: visible;
+   filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+   -moz-opacity: 1;
+   -khtml-opacity: 1;
+   opacity: 1;
+   top:0;
+}
+.dialog-input-title-ontop.active .title, .dialog-input-title-ontop.valued .title, .dialog-input-title-ontop.birth .title, .dialog-input-title-ontop.underline-dropdown-input .title {
+   top: 0;
+   color: #aaa;
+}
+.dialog-input-title-ontop:not(.birth).active input::placeholder{
+   opacity: 0;
+}
+.dialog-input-title-ontop.active::after{
+   background-color: rgba(0,0,0,0.6);
+}
+
+.dialog-input-title-ontop.error::after{
+   background-color: rgba(217,0,7,0.5);
+}
+.dialog-input-title-ontop.error input.dialog-input.errored{
+   color: rgba(217,0,7,1);
+}
+.dialog-input-title-ontop.error .title {
+   visibility: visible;
+   filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+   -moz-opacity: 1;
+   -khtml-opacity: 1;
+   opacity: 1;
+   top:0;
+}
+.dialog-input-title-ontop .error-message{
+   font-size: 13px;
+   padding: 4px 0 0 0px;
+   color: rgba(229,76,81,1);
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   position: absolute;
+   top: 56px;
+   left: 0px;
+   display:none;
+   text-align: left;
+}
+.dialog-input-title-ontop.error .error-message{
+   display: inline-block;
+}
+.dialog-input-title-ontop.active:not(.birth) input.dialog-input::placeholder,
+.dialog-input-title-ontop.correctinput:not(.birth) input.dialog-input::placeholder,
+.dialog-input-title-ontop.error:not(.birth) input.dialog-input::placeholder {
+   opacity: 0;
+}
+.dialog-input-title-ontop:hover::after {
+   background-color: rgba(0,0,0,0.5);
+} /
 @media only screen and (max-width: 1133px) {
 .key .reg-st3-membership-bl {
     padding: 4px;

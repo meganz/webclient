@@ -1539,6 +1539,7 @@ BusinessAccount.prototype.getTaxCodeName = function(countryCode) {
         case "UZ": return "QQS";
         case "VN": return "GTGT";
         case "VE": return "IVA";
+        case "ES": return "NIF";
 
         default: return "VAT";
     }

@@ -1603,7 +1603,7 @@ var exportExpiry = {
                 $(this).blur();
 
                 // Trigger click If date is selected in datepicker
-                if($('.ui-datepicker .ui-state-active').length) {
+                if ($('.ui-datepicker .ui-state-active').length) {
                     $('.ui-datepicker .ui-state-active').trigger('click');
                     return;
                 }

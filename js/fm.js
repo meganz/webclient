@@ -2439,7 +2439,6 @@ function closeDialog(ev) {
         closeImportContactNotification('.add-user-popup');
 
         $('.copyrights-dialog').addClass('hidden');
-        $('.export-link-dropdown').hide();
 
         delete $.copyDialog;
         delete $.moveDialog;

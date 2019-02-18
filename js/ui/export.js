@@ -1583,19 +1583,30 @@ var exportExpiry = {
 
         // Click anywhere on export link dialog will hide export link dropdown
         $('.export-links-dialog').rebind('click', function(e) {
-            $('.export-link-dropdown').fadeOut(200);
+            var $this = $(this);
 
-            if ($('.ui-datepicker .ui-state-active').length && !$(e.target).is('.expiry-date-select')) {
-                $('.ui-datepicker .ui-state-active').trigger('click');
+            // Trigger click If Datepicker is opened, Date selected, Switch off expiry date wasn't cliked
+            if ($('.ui-datepicker .ui-state-active:visible').length
+                    && !$(e.target).is('.expiry-date-select')
+                    && !$(e.target).is('.dialog-feature-toggle.expiry')
+                    && !$(e.target).parent().is('.dialog-feature-toggle.expiry')) {
+
+                $('.ui-datepicker .ui-state-active:visible').trigger('click');
             }
         });
 
         // Press Enter key if datepicker dropdown is opened
         $('.export-links-dialog .expiry-date-select').rebind('keydown.date', function (event) {
-            // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
-            if (event.keyCode === 13 && $('.ui-datepicker .ui-state-active').length) { // Enter
-                $('.ui-datepicker .ui-state-active').trigger('click');
-                return;
+
+            // If Enter key is pressed
+            if (event.keyCode === 13) {
+                $(this).blur();
+
+                // Trigger click If date is selected in datepicker
+                if($('.ui-datepicker .ui-state-active').length) {
+                    $('.ui-datepicker .ui-state-active').trigger('click');
+                    return;
+                }
             }
         });
 

@@ -1663,7 +1663,7 @@ function shareDialogContentCheck() {
     var dc = '.share-dialog',
         itemsNum = 0,
         newItemsNum = 0,
-        $btn = $('.default-white-button.dialog-share-button');
+        $btn = $('.default-green-button.dialog-share-button');
     var $groupPermissionDropDown = $('.share-dialog .permissions-icon');
 
     newItemsNum = $(dc + ' .token-input-token-mega').length;

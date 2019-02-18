@@ -2459,6 +2459,7 @@
     "19224": "Transfer Analytics",
     "19225": "Jumlah Terkirim",
     "19226": "Volume Transfer Harian",
+    "19266": "Cakram Penyimpanan Awan",
     "19282": "Faktur",
     "19283": "Daftar Faktur",
     "19284": "Melihat rincian",
@@ -2777,6 +2778,8 @@
     "19855": "Spasi di awal atau akhir kata sandi tidak diizinkan.",
     "19856": "Berinteraksi dengan MEGA",
     "19857": "Klik dua kali untuk mengakses file atau membuka folder. [BR] Klik kanan untuk melihat semua opsi yang tersedia.",
+    "19923": "Gudang",
+    "19924": "Transfer",
     "19925": "Memarkir akun Anda tidak berhasil, jika Anda adalah pengguna bisnis, silakan hubungi administrator Anda.",
     "19926": "Shares Eksternal Keluar",
     "19927": "Preferensi Pemformatan Tanggal dan Waktu:",
@@ -3084,5 +3087,13 @@
     "20400": "[S]Your Business account is expired.[\/S] [A]Reactivate your account now[\/A] and enjoy the [S]unlimited storage and transfer quota[\/S] along with other business account features",
     "20401": "Your business account is expired",
     "20402": "It seems that the automatic monthly payment for your Business Account subscription has failed. Therefore, your account is suspended until you proceed with the required payment.[BR][BR]You will only be able to view your account without performing any further actions such as uploading, downloading or sharing your files or folders.[BR][BR]To re-activate your account please click the button below.",
-    "20403": "Pay & Reactivate Account"
+    "20403": "Pay & Reactivate Account",
+    "20412": "Redeem Promo Code",
+    "20414": "To get the most out of MEGA, we recommend you download our mobile app.",
+    "20415": "Welcome to MEGA!",
+    "20416": "This voucher can't be redeemed.",
+    "20417": "Enter your COMPUTER BILD code below:",
+    "20418": "Enter promo code",
+    "20419": "Enter the code below to redeem your voucher",
+    "20420": "Kode salah. Silakan coba lagi."
 }

@@ -2459,6 +2459,7 @@
     "19224": "Statistiche di trasferimento",
     "19225": "Totale trasferito",
     "19226": "Volume di trasferimento giornaliero",
+    "19266": "Partizione Cloud",
     "19282": "Fatture",
     "19283": "Lista fatture",
     "19284": "Visualizza dettagli",
@@ -2777,6 +2778,8 @@
     "19855": "Uno spazio vuoto all'inizio o alla fine della password non \u00e8 permesso.",
     "19856": "Interagisci con MEGA",
     "19857": "Fai doppio clic per accedere ad un file o aprire una cartella. [BR]Fai clic con il tasto destro per vedere tutte le opzioni disponibili.",
+    "19923": "Archivio",
+    "19924": "Trasferisci",
     "19925": "Il parcheggio del tuo account non \u00e8 stato completato con successo, se sei un utente business per favore contatta il tuo amministratore.",
     "19926": "Condivisioni in uscita esterne",
     "19927": "Formato di data e ora preferito",
@@ -3084,5 +3087,13 @@
     "20400": "[S]Il tuo account Business \u00e8 scaduto.[\/S] [A]Riattiva il tuo account adesso[\/A] e goditi a pieno lo [S]spazio di archiviazione e la banda di trasferimento illimitate[\/S], insieme ad altre caratteristiche uniche degli account Business.",
     "20401": "Il tuo account business \u00e8 scaduto",
     "20402": "Sembra che il pagamento automatico mensile per il tuo account Business sia fallito. Quindi, il tuo account \u00e8 sospeso finch\u00e9 non procederai con il pagamento necessario.\r\n[BR][BR]\r\nPotrai solamente vedere il tuo account, senza effettuare altre azioni, come caricare, scaricare o condividere i tuoi file e le tue cartelle.\r\n[BR][BR]\r\nPer riattivare il tuo account, per favore clicca il pulsante sottostante.",
-    "20403": "Paga e riattiva l'account"
+    "20403": "Paga e riattiva l'account",
+    "20412": "Riscatta codice promo",
+    "20414": "Per ottenere il meglio da MEGA, ti raccomandiamo di scaricare la nostra app mobile.",
+    "20415": "Benvenuto su MEGA!",
+    "20416": "Questo voucher non pu\u00f2 essere riscattato.",
+    "20417": "Inserisci il tuo codice COMPUTER BILD qui sotto:",
+    "20418": "Inserisci codice promo",
+    "20419": "Inserisci il codice qui sotto per riscattare il tuo voucher",
+    "20420": "Codice non valido. Per favore, riprova."
 }

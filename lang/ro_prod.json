@@ -2459,6 +2459,7 @@
     "19224": "Date analitice privind transferurile",
     "19225": "Transferuri totale",
     "19226": "Volumul zilnic de transfer",
+    "19266": "Unitate cloud",
     "19282": "Facturi",
     "19283": "List\u0103 cu facturi",
     "19284": "Vezi detaliile",
@@ -2777,6 +2778,8 @@
     "19855": "Nu este permis spa\u021biu gol la \u00eenceputul sau sf\u00e2r\u0219itul parolei.",
     "19856": "Interac\u021bioneaz\u0103 cu MEGA",
     "19857": "Dublu clic pentru a accesa un fi\u0219ier sau pentru a deschide un folder. [BR] Clic dreapta pentru a vedea toate op\u021biunile disponibile.",
+    "19923": "Spa\u021biu de stocare",
+    "19924": "Transfer",
     "19925": "Parcarea contului t\u0103u a e\u0219uat, dac\u0103 e\u0219ti un utilizator business, te rug\u0103m s\u0103 contactezi administratorul.",
     "19926": "Partaj\u0103ri externe trimise",
     "19927": "Preferin\u021be de formatare a datei \u0219i orei",
@@ -3084,5 +3087,13 @@
     "20400": "[S]Your Business account is expired.[\/S] [A]Reactivate your account now[\/A] and enjoy the [S]unlimited storage and transfer quota[\/S] along with other business account features",
     "20401": "Your business account is expired",
     "20402": "It seems that the automatic monthly payment for your Business Account subscription has failed. Therefore, your account is suspended until you proceed with the required payment.[BR][BR]You will only be able to view your account without performing any further actions such as uploading, downloading or sharing your files or folders.[BR][BR]To re-activate your account please click the button below.",
-    "20403": "Pay & Reactivate Account"
+    "20403": "Pay & Reactivate Account",
+    "20412": "Redeem Promo Code",
+    "20414": "To get the most out of MEGA, we recommend you download our mobile app.",
+    "20415": "Welcome to MEGA!",
+    "20416": "This voucher can't be redeemed.",
+    "20417": "Enter your COMPUTER BILD code below:",
+    "20418": "Enter promo code",
+    "20419": "Enter the code below to redeem your voucher",
+    "20420": "Cod nevalid. Te rug\u0103m s\u0103 \u00eencerci din nou."
 }

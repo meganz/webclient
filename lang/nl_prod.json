@@ -2459,6 +2459,7 @@
     "19224": "Analytiek Overdragen",
     "19225": "Totaal Overgedragen",
     "19226": "Dagelijkse Overdracht Hoeveelheid",
+    "19266": "Cloud Schijf",
     "19282": "Facturen",
     "19283": "Factuurlijst",
     "19284": "Details Weergeven",
@@ -2777,6 +2778,8 @@
     "19855": "Witte ruimte bij het begin of eind van een wachtwoord is niet toegestaan.",
     "19856": "Werken met MEGA",
     "19857": "Dubbelklikken om toegang te krijgen tot een bestand of een map te openen. [BR]Rechtermuisknop om alle beschikbare opties te zien.",
+    "19923": "Opslag",
+    "19924": "Overdracht",
     "19925": "Het parkeren van uw account was succesvol, als u een zakelijke gebruiker bent neem dan contact op met uw administratie.",
     "19926": "Externe Uitgaande Delingen",
     "19927": "Datum en tijd formaat voorkeuren",
@@ -3084,5 +3087,13 @@
     "20400": "[S]Uw zakelijke account is verlopen.[\/S] [A]Activeer uw account nu opnieuw [\/A] en geniet van het[S] onbeperkte opslag- en overdrachttegoed[\/S] samen met andere zakelijke account functies",
     "20401": "Uw zakelijke account is verlopen",
     "20402": "Het lijkt erop dat de automatische maandelijkse betaling voor uw Zakelijke Account-abonnement is mislukt. Daarom is uw account gechorst totdat u doorgaat met de vereiste betaling.\r\n[BR][BR]\r\nU kunt uw account alleen bekijken zonder verdere acties uit te voeren, zoals het uploaden, downloaden of delen van uw bestanden of mappen.\r\n[BR][BR]\r\nKlik op de onderstaande knop om uw account opnieuw te activeren.",
-    "20403": "Betaal & Heractiveer Account"
+    "20403": "Betaal & Heractiveer Account",
+    "20412": "Wissel de promotiecode in",
+    "20414": "Om het maximale uit MEGA te halen, raden we u aan onze mobiele app te downloaden.",
+    "20415": "Welkom bij MEGA!",
+    "20416": "Deze tegoedbon kan niet worden ingewisseld.",
+    "20417": "Voer hieronder uw COMPUTER BILD-code in:",
+    "20418": "Voer promotiecode in",
+    "20419": "Voer de onderstaande code in om uw voucher in te wisselen",
+    "20420": "Ongeldige code. Probeer nogmaals."
 }

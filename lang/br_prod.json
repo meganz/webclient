@@ -2459,6 +2459,7 @@
     "19224": "Dados das transfer\u00eancias",
     "19225": "Transfer\u00eancias totais",
     "19226": "Transfer\u00eancias di\u00e1rias",
+    "19266": "Nuvem de arquivos",
     "19282": "Faturas",
     "19283": "Lista de faturas",
     "19284": "Ver informa\u00e7\u00f5es",
@@ -2777,6 +2778,8 @@
     "19855": "Espa\u00e7os em branco no in\u00edcio ou no final da senha n\u00e3o s\u00e3o permitidos.",
     "19856": "Interaja com o MEGA",
     "19857": "Clique duas vezes para acessar um arquivo ou abrir uma pasta. [BR] Clique com o bot\u00e3o direito para ver todas as op\u00e7\u00f5es dispon\u00edveis.",
+    "19923": "Armazenamento",
+    "19924": "Transfer\u00eancia",
     "19925": "N\u00e3o foi poss\u00edvel estacionar a sua conta. Se voc\u00ea for um usu\u00e1rio business, entre em contato com o administrador da sua conta.",
     "19926": "Compartilhamentos externos enviados",
     "19927": "Prefer\u00eancias de data e hora",
@@ -3084,5 +3087,13 @@
     "20400": "[S]A sua conta business expirou.[\/S] [A]Reative sua conta agora[\/A] e tenha [S]armazenamento cota de transfer\u00eancia ilimitados[\/S], al\u00e9m de outros recursos business",
     "20401": "A sua conta business expirou",
     "20402": "It seems that the automatic monthly payment for your Business Account subscription has failed. Therefore, your account is suspended until you proceed with the required payment.[BR][BR]You will only be able to view your account without performing any further actions such as uploading, downloading or sharing your files or folders.[BR][BR]To re-activate your account please click the button below.",
-    "20403": "Pagar e reativar conta"
+    "20403": "Pagar e reativar conta",
+    "20412": "Redeem Promo Code",
+    "20414": "To get the most out of MEGA, we recommend you download our mobile app.",
+    "20415": "Welcome to MEGA!",
+    "20416": "This voucher can't be redeemed.",
+    "20417": "Enter your COMPUTER BILD code below:",
+    "20418": "Enter promo code",
+    "20419": "Enter the code below to redeem your voucher",
+    "20420": "C\u00f3digo incorreto. Por favor, tente novamente."
 }

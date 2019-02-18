@@ -2459,6 +2459,7 @@
     "19224": "Donn\u00e9es analytiques des transferts",
     "19225": "Total transf\u00e9r\u00e9",
     "19226": "Volume de transfert quotidien",
+    "19266": "Disque nuagique",
     "19282": "Factures",
     "19283": "Liste des factures",
     "19284": "Visualiser les d\u00e9tails",
@@ -2777,6 +2778,8 @@
     "19855": "Les espaces ne sont permises ni d\u00e9but ni \u00e0 la fin du mot de passe.",
     "19856": "Interagir avec MEGA",
     "19857": "Double-cliquez pour acc\u00e9der \u00e0 un fichier ou pour ouvrir un dossier. [BR] Cliquez \u00e0 droite pour voir toutes les options propos\u00e9es.",
+    "19923": "Espace de stockage",
+    "19924": "Transf\u00e9rer",
     "19925": "Il n\u2019a pas \u00e9t\u00e9 possible de remiser votre compte. Si vous d\u00e9tenez un compte d\u2019entreprise, veuillez contacter votre administrateur.",
     "19926": "Partages sortants externes",
     "19927": "Pr\u00e9f\u00e9rences de formatage de la date et de l\u2019heure",
@@ -3084,5 +3087,13 @@
     "20400": "[S]Votre compte d\u2019entreprise est expir\u00e9.[\/S] [A]R\u00e9activez-le maintenant[\/A] et profitez [S]de l\u2019espace de stockage et du quota de transfert illimit\u00e9s[\/S], ainsi que d\u2019autres fonctions propres au compte d\u2019entreprise.",
     "20401": "Votre compte d\u2019entreprise est expir\u00e9",
     "20402": "Il semble que le paiement mensuel automatique pour l\u2019abonnement de votre compte d\u2019entreprise a \u00e9chou\u00e9. Par cons\u00e9quent, votre compte est d\u00e9sactiv\u00e9 jusqu\u2019\u00e0 ce que vous effectuiez le paiement exig\u00e9.\r\n[BR][BR]\r\nVous ne pourrez que visualiser votre compte sans effectuer d\u2019autres actions tels le t\u00e9l\u00e9versement, le t\u00e9l\u00e9chargement ou le partage de vos fichiers ou dossiers.\r\n[BR][BR]\r\nPour r\u00e9activer votre compte, veuillez cliquer sur le bouton ci-dessous.",
-    "20403": "Payer et r\u00e9activer le compte"
+    "20403": "Payer et r\u00e9activer le compte",
+    "20412": "Valider un code promotionnel",
+    "20414": "Pour tirer le maximum de MEGA, nous vous recommandons de t\u00e9l\u00e9charger notre appli mobile.",
+    "20415": "Bienvenue sur MEGA\u2009!",
+    "20416": "Ce bon ne peut pas \u00eatre valid\u00e9.",
+    "20417": "Saisissez votre code COMPUTER BILD ci-dessous\u00a0:",
+    "20418": "Saisissez le code promotionnel",
+    "20419": "Saisissez le code ci-dessous pour valider votre bon",
+    "20420": "Le code est invalide. Veuillez ressayer."
 }

@@ -2459,6 +2459,7 @@
     "19224": "Estad\u00edsticas de transferencias",
     "19225": "Transferencias totales",
     "19226": "Transferencias diarias",
+    "19266": "Mi nube",
     "19282": "Facturas",
     "19283": "Lista de facturas",
     "19284": "Ver detalles",
@@ -2777,6 +2778,8 @@
     "19855": "No se permiten espacios en blanco al principio o al final de la contrase\u00f1a.",
     "19856": "Interact\u00faa con MEGA",
     "19857": "Haz doble clic para acceder a un archivo o abrir una carpeta. [BR] Haz clic derecho para ver todas las opciones disponibles.",
+    "19923": "Almacenamiento",
+    "19924": "Transferencia",
     "19925": "No se ha podido aparcar la cuenta. Si eres usuario business, contacta a tu administrador.",
     "19926": "Carpetas compartidas salientes externas",
     "19927": "Formato de fecha y hora",
@@ -3084,5 +3087,13 @@
     "20400": "[S]Tu cuenta Business ha caducado.[\/S] [A] Reactiva tu cuenta ahora[\/A] y disfruta de [S]almacenamiento y transferencia ilimitados[\/S] junto con otras funciones de la cuenta Business.",
     "20401": "Tu cuenta Business ha caducado",
     "20402": "It seems that the automatic monthly payment for your Business Account subscription has failed. Therefore, your account is suspended until you proceed with the required payment.[BR][BR]You will only be able to view your account without performing any further actions such as uploading, downloading or sharing your files or folders.[BR][BR]To re-activate your account please click the button below.",
-    "20403": "Paga y reactiva tu cuenta"
+    "20403": "Paga y reactiva tu cuenta",
+    "20412": "Redeem Promo Code",
+    "20414": "To get the most out of MEGA, we recommend you download our mobile app.",
+    "20415": "Welcome to MEGA!",
+    "20416": "This voucher can't be redeemed.",
+    "20417": "Enter your COMPUTER BILD code below:",
+    "20418": "Enter promo code",
+    "20419": "Enter the code below to redeem your voucher",
+    "20420": "C\u00f3digo invalido. Int\u00e9ntalo de nuevo."
 }

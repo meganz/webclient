@@ -2459,6 +2459,7 @@
     "19224": "Statystyka transfer\u00f3w",
     "19225": "Suma transfer\u00f3w",
     "19226": "Dzienny limit",
+    "19266": "Cloud Dysk",
     "19282": "Faktury",
     "19283": "Lista faktur",
     "19284": "Poka\u017c szczeg\u00f3\u0142y",
@@ -2777,6 +2778,8 @@
     "19855": "Spacja na pocz\u0105tku lub ko\u0144cu has\u0142a jest nie dozwolona.",
     "19856": "Wejd\u017a w interakcj\u0119 z MEGA",
     "19857": "Kliknij dwukrotnie, aby uzyska\u0107 dost\u0119p do pliku lub otw\u00f3rz folder. [BR] Kliknij prawym przyciskiem, aby wy\u015bwietli\u0107 wszystkie dost\u0119pne opcje.",
+    "19923": "Pojemno\u015bci",
+    "19924": "Przesy\u0142anie",
     "19925": "Parkowanie konta nie powiod\u0142o si\u0119, je\u015bli jeste\u015b u\u017cytkownikiem biznesowym, skontaktuj si\u0119 z administratorem.",
     "19926": "Zewn\u0119trzne udost\u0119pnienia wychodz\u0105ce",
     "19927": "Preferencje formatowania daty i czasu",
@@ -3084,5 +3087,13 @@
     "20400": "[S]Twoje konto biznesowe wygas\u0142o.[\/S] [A]Ponownie aktywuj swoje konto teraz[\/A] i ciesz si\u0119 [S]nieograniczon\u0105 przestrzeni\u0105 dyskow\u0105 i przepustowo\u015bci\u0105[\/S] oraz innymi funkcjami konta biznesowego",
     "20401": "Twoje konto biznesowe wygas\u0142o",
     "20402": "It seems that the automatic monthly payment for your Business Account subscription has failed. Therefore, your account is suspended until you proceed with the required payment.[BR][BR]You will only be able to view your account without performing any further actions such as uploading, downloading or sharing your files or folders.[BR][BR]To re-activate your account please click the button below.",
-    "20403": "Zap\u0142a\u0107 i ponownie aktywuj konto"
+    "20403": "Zap\u0142a\u0107 i ponownie aktywuj konto",
+    "20412": "Redeem Promo Code",
+    "20414": "To get the most out of MEGA, we recommend you download our mobile app.",
+    "20415": "Welcome to MEGA!",
+    "20416": "This voucher can't be redeemed.",
+    "20417": "Enter your COMPUTER BILD code below:",
+    "20418": "Enter promo code",
+    "20419": "Enter the code below to redeem your voucher",
+    "20420": "Z\u0142y kod. Prosz\u0119 spr\u00f3buj ponownie."
 }

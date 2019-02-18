@@ -308,7 +308,7 @@ function init_page() {
     $('body').addClass(lang);
     // add business class to affect the top header
     $('body').removeClass('business');
-    
+
     if ('-fa-ar-he-'.indexOf('-' + lang + '-') > -1) {
         $('body').addClass('rtl');
     }
@@ -426,7 +426,7 @@ function init_page() {
         if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22 || pfid.length !== 8) {
 
             closeDialog();
-            
+
             if (pfid.length !== 8) {
                 folderreqerr(false, EARGS);
                 return;
@@ -1474,8 +1474,8 @@ function init_page() {
      */
     else if (page.substr(0, 7) === 'voucher') {
 
-        // Get the voucher code from the URL which is 20 characters in length
-        var voucherCode = page.substr(7, 20);
+        // Get the voucher code from the URL.
+        var voucherCode = page.substr(7);
 
         // Store in localStorage to be used by the Pro page or when returning from login
         localStorage.setItem('voucher', voucherCode);
@@ -1483,7 +1483,7 @@ function init_page() {
         // If not logged in, direct them to login or register first
         if (u_type === false) {
             login_txt = l[7712];
-            loadSubPage('login');
+            loadSubPage(u_wasloggedin() ? 'login' : 'register');
             return false;
         }
         else if (u_type < 3) {
@@ -1502,9 +1502,15 @@ function init_page() {
 
     // Load the direct voucher redeem page
     else if (page.substr(0, 6) === 'redeem') {
-        loadingDialog.show();
-        parsepage(pages[is_mobile ? 'mobile' : 'redeem']);
-        redeem.init();
+        if (localStorage.voucher) {
+            parsepage(pages[is_mobile ? 'mobile' : 'redeem']);
+            redeem.init();
+        }
+        else {
+            // No voucher found, ask to enter it.
+            parsepage(pages.redeem);
+            redeem.setupVoucherInputbox();
+        }
     }
 
     // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the
@@ -2101,7 +2107,7 @@ function topmenuUI() {
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
                 'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp',
+                'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp'
             ];
             var moveTo = {'account': 'fm/account'};
 

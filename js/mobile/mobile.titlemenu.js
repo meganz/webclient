@@ -72,6 +72,7 @@ mobile.titleMenu = {
         $overlay.removeClass("hidden");
         $titleMenuOpenHandle.addClass("open");
         $titleMenuContainer.removeClass("hidden closed");
+        
 
         $titleMenuOpenHandle.off('tap').on('tap', function() {
             mobile.titleMenu.close();

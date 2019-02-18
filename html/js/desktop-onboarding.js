@@ -14,6 +14,26 @@
         $('.post-download', $wrapper).addClass('hidden');
         $('.pre-download', $wrapper).removeClass('hidden');
 
+        // Check if the user came from a voucher redemption.
+        if (sessionStorage.voucherData) {
+            var $voucherBlock = $('.promo-voucher-section', $wrapper).removeClass('hidden');
+            var vd = JSON.parse(sessionStorage.voucherData);
+            delete sessionStorage.voucherData;
+
+            // Change texts accordingly.
+            $('.top-dark-info.' + (is_mobile ? 'mobile-download' : 'pre-download')).text(l[20415]);
+            $('.top-description.' + (is_mobile ? 'mobile-download' : 'pre-download')).safeHTML(l[19512]);
+            $('.plan-name', $wrapper).text(pro.getProPlanName(vd.proNum));
+
+            if (!is_mobile) {
+                $('.voucher-message', $wrapper).text(l[20133]);
+            }
+
+            // Show PRO plan details
+            $('.storage-amount', $voucherBlock).text(bytesToSize(vd.storage * 0x40000000, 0));
+            $('.transfer-amount', $voucherBlock).text(bytesToSize(vd.bandwidth * 0x40000000, 0));
+        }
+
         $('.redirect-clouddrive', $wrapper).rebind('click', goToCloud);
         $('.redirect-clouddrive-link', $wrapper).rebind('click', function() {
             eventlog(99717);

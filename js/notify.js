@@ -599,9 +599,13 @@ var notify = {
 
         // Add click handler for the 'Contact relationship established' notification
         this.$popup.find('.nt-contact-accepted').rebind('click', function() {
-            // Redirect to the contact's page
-            loadSubPage('fm/' + $(this).attr('data-contact-handle'));
-            notify.closePopup();
+            // Redirect to the contact's page only if it's still a contact
+            if (M.c.contacts && $(this).attr('data-contact-handle') in M.c.contacts) {
+                loadSubPage('fm/' + $(this).attr('data-contact-handle'));
+                notify.closePopup();
+            } else {
+                msgDialog('info', '', l[20427]);
+            }
         });
     },
 

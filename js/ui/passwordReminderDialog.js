@@ -695,10 +695,10 @@
         if (
             u_type === 3 &&
             !self.passwordReminderAttribute.masterKeyExported &&
-            !self.passwordReminderAttribute.dontShowAgain &&
+            !self.passwordReminderAttribute.dontShowAgain/* &&
             unixtime() - u_attr.since > SHOW_AFTER_ACCOUNT_AGE &&
             unixtime() - self.passwordReminderAttribute.lastSuccess > SHOW_AFTER_LASTSUCCESS &&
-            unixtime() - self.passwordReminderAttribute.lastLogin > SHOW_AFTER_LASTLOGIN
+            unixtime() - self.passwordReminderAttribute.lastLogin > SHOW_AFTER_LASTLOGIN*/
         ) {
             // skip recheck in case:
             // - there is a visible .dropdown
@@ -711,11 +711,11 @@
             if (
                 !skipShowingDialog &&
                 is_fm() &&
-                !pfid &&
+                !pfid/* &&
                 (
                     !self.passwordReminderAttribute.lastSkipped ||
                     unixtime() - self.passwordReminderAttribute.lastSkipped > SHOW_AFTER_LASTSKIP_LOGOUT
-                )
+                )*/
             ) {
                 self.showDialog(returnedPromise);
             }

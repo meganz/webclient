@@ -410,7 +410,7 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                                 self.presence = (newprefs & 3) + UserPresence.PRESENCE.OFFLINE;
                                 self.persist = !!(newprefs & 4);
                                 self.autoawayactive = !(newprefs & 8);
-                                self.autoawaytimeout = newprefs >> 4;
+                                self.autoawaytimeout = (newprefs >> 4) & 0x7ff;
 
                                 if (self.autoawaytimeout > 600) {
                                     self.autoawaytimeout = Math.floor((self.autoawaytimeout - 600) * 60) + 600;
@@ -921,7 +921,7 @@ UserPresence.prototype.commandsToString = function(ab, tx) {
                 var presence = (newprefs & 3) + UserPresence.PRESENCE.OFFLINE;
                 var persist = !!(newprefs & 4);
                 var autoawayactive = !(newprefs & 8);
-                var autoawaytimeout = newprefs >> 4;
+                var autoawaytimeout = (newprefs >> 4) & 0x7ff;
                 if (autoawaytimeout > 600) {
                     autoawaytimeout = Math.floor((autoawaytimeout - 600) / 60) + 600;
                 }

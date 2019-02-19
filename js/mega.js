@@ -1262,6 +1262,18 @@ scparser.$add('psts', function(a) {
     onIdle(function() {
         watchdog.notify('psts', (a.r === 's' && a.p) | 0);
     });
+
+    // If user is on FM, update account status with this packet.
+    if (fminitialized) {
+        onIdle(function() {
+            if (page.indexOf('fm/account') === 0) {
+                accountUI();
+            }
+            else {
+                M.accountData();
+            }
+        });
+    }
 });
 
 // Payment reminder

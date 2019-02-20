@@ -60,6 +60,8 @@ var redeem = {
                             // non-promotional voucher, proceed with confirm dialog.
                             redeem.displayDialog();
                         }
+
+                        delete localStorage[data.code];
                     })
                     .catch(function(ex) {
                         console.error('uavr failed...', ex);
@@ -660,7 +662,7 @@ var redeem = {
             ];
 
             if (promo === undefined) {
-                promo = sessionStorage[code];
+                promo = localStorage[code];
             }
             if (promo !== undefined) {
                 request[0].p = promo;
@@ -679,7 +681,7 @@ var redeem = {
                         v.promotional = 1;
                         v.promoter = promo;
                         v.available = v.valid;
-                        sessionStorage[code] = promo;
+                        localStorage[code] = promo;
                     }
 
                     if (v.value) {

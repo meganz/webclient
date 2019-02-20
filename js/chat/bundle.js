@@ -8271,7 +8271,7 @@ React.makeElement = React['createElement'];
 
 	            $tooltip.css({
 	                'left': tooltipLeftPos,
-	                'top': tooltipTopPos
+	                'top': tooltipTopPos - 5
 	            });
 	            $tooltip.addClass(arrowClass);
 	        }
@@ -8995,7 +8995,8 @@ React.makeElement = React['createElement'];
 
 	                items.push(React.makeElement(
 	                    "div",
-	                    { className: "data-block-view node_" + node.h + " " + (isFolder ? " folder" : " file") + (isHighlighted ? " ui-selected" : "") + (share ? " linked" : "") + colorLabelClasses,
+	                    {
+	                        className: "data-block-view node_" + node.h + " " + (isFolder ? " folder" : " file") + (isHighlighted ? " ui-selected" : "") + (share ? " linked" : "") + colorLabelClasses,
 	                        onClick: function onClick(e) {
 	                            self.onEntryClick(e, node);
 	                        },
@@ -9003,7 +9004,8 @@ React.makeElement = React['createElement'];
 	                            self.onEntryDoubleClick(e, node);
 	                        },
 	                        id: "chat_" + node.h,
-	                        key: "block_" + node.h
+	                        key: "block_" + node.h,
+	                        title: node.name
 	                    },
 	                    React.makeElement(
 	                        "div",

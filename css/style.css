@@ -3709,7 +3709,7 @@ label.iPhoneCheckLabelOff span {
     box-sizing: border-box;
     min-width: 100%;
 }
-.fm-left-menu.dashboard + .nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel {
+.fm-left-menu.dashboard + div + div + .nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel {
     height: 100%;
 }
 .fm-tree-panel .jspTrack {
@@ -3739,7 +3739,7 @@ label.iPhoneCheckLabelOff span {
     height: -moz-calc(100% - 72px);
     height: calc(100% - 72px);
 }
-.active-folder-link .nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel, .fm-left-menu.account + .nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel  {
+.active-folder-link .nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel, .fm-left-menu.account + div + div + .nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel  {
     height: -webkit-calc(100% - 39px);
     height: -moz-calc(100% - 39px);
     height: calc(100% - 39px);
@@ -4414,7 +4414,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .active-folder-link .nw-tree-panel-filter-tag {
     padding: 2px 25px 0 12px;
 }
-.fm-left-menu.dashboard + .nw-tree-panel-header {
+.fm-left-menu.dashboard + div + div + .nw-tree-panel-header {
     display: none;
 }
 .nw-tree-panel-arrows, .fm-picker-dialog-panel-arrows, .fm-picker-dialog-panel-arrows, .share-dialog-panel-arrows {
@@ -5144,7 +5144,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     float: left;
     height: 100%;
     position: relative;
-    min-height: 398px;
+    min-height: 480px;
     z-index: 21;
 }
 .nw-fm-tree-header {
@@ -5239,7 +5239,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .nw-fm-tree-header input:not([readonly]):focus:-ms-input-placeholder {
     color:rgba(255,255,255,0.3);
 }
-.fm-left-menu.account + .nw-tree-panel-header {
+.fm-left-menu.account + div + div + .nw-tree-panel-header {
     display: none;
 }
 .cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications, .inbox .nw-fm-tree-header.inbox, .account .nw-fm-tree-header.account, .dashboard .nw-fm-tree-header.dashboard, .user-management .nw-fm-tree-header.user-management {
@@ -23678,10 +23678,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin:4px 8px 4px 0px;
 }
 
-.fm-left-panel.user-management .fm-tree-panel{
-    height: -webkit-calc(100% - 132px);
-    height: -moz-calc(100% - 132px);
-    height: calc(100% - 132px);
+.fm-left-panel.user-management .fm-tree-panel {
+    height: -webkit-calc(100% - 132px) !important;
+    height: -moz-calc(100% - 132px) !important;
+    height: calc(100% - 132px) !important;
     min-height: auto;
     overflow: auto;
 }
@@ -29539,14 +29539,14 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin: 0 0 0 0;
     position: absolute;
     left: 24px;
-    top: 4px;
+    top: 5px;
 }
 .fm-recents .medium-file-icon.double {
-    left: 17px;
+    left: 21px;
     top: 8px;
 }
 .fm-recents.content-row.group .medium-file-icon {
-    top: 12px;
+    top: 13px;
 }
 .fm-recents .medium-file-icon .medium-file-icon {
     left: 6px;
@@ -29554,7 +29554,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .fm-recents.file-info {
     margin: 0 130px 0 44px;
-    padding: 3px 0 0 0;
+    padding: 5px 0 0 0;
 }
 .fm-recents.file-name {
     white-space: nowrap;
@@ -29602,7 +29602,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .fm-recents.breadcrumbs span {
     font-size: 13px;
-    line-height: 16px;
+    line-height: 18px;
     color: #666666;
     display: inline-block;
     vertical-align: top;
@@ -29615,7 +29615,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .fm-recents.breadcrumbs i {
     display: inline-block;
     vertical-align: top;
-    margin: 2px 3px;
+    margin: 2px 3px 0 3px;
 }
 .fm-recents.file-data {
     position: absolute;

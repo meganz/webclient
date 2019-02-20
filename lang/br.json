@@ -422,7 +422,6 @@
     "1117": "Acordo de termos de servi\u00e7o",
     "1118": "Voc\u00ea precisa aceitar os termos de servi\u00e7o para criar uma conta no MEGA.",
     "1119": "A sua senha \u00e9 muito f\u00e1cil de adivinhar. Tente deix\u00e1-la mais longa, incluir mai\u00fasculas e min\u00fasculas e adicionar caracteres especiais. N\u00e3o utilize nomes ou palavras do dicion\u00e1rio",
-    "1120": "A sua senha \u00e9 muito f\u00e1cil de adivinhar. Tente deix\u00e1-la mais longa, incluir mai\u00fasculas e min\u00fasculas e adicionar caracteres especiais. N\u00e3o utilize nomes ou palavras do dicion\u00e1rio.",
     "1121": "A sua senha \u00e9 suficientemente boa para prosseguir, mas recomendamos uma senha mais forte no futuro.",
     "1122": "Esta senha vai resistir aos ataques de for\u00e7a-bruta mais comuns. Por favor, certifique-se de que voc\u00ea vai lembrar dela.",
     "1123": "Esta senha vai resistir aos ataques de for\u00e7a-bruta mais sofisticados. Por favor, certifique-se de que voc\u00ea vai lembrar dela.",
@@ -1969,6 +1968,8 @@
     "17883": "%nbFi arquivos foram adicionados ao gestor de transfer\u00eancias",
     "17884": "%nbFi arquivo foi adicionado ao gestor de transfer\u00eancias",
     "17886": "Voc\u00ea j\u00e1 adicionou este contato",
+    "17900": "Falha ao limpar o caixote do lixo. Por favor, tente novamente.",
+    "17901": "A lixeira foi esvaziada corretamente.",
     "17920": "Senha incorreta. Por favor, tente novamente.",
     "17938": "A chave de recupera\u00e7\u00e3o foi copiada para a \u00e1rea de transfer\u00eancia. Guarde a sua chave em um lugar seguro.",
     "17958": "Link inv\u00e1lido",
@@ -3244,5 +3245,6 @@
     "20419": "Digite o c\u00f3digo abaixo para resgatar o seu voucher",
     "20420": "C\u00f3digo incorreto. Por favor, tente novamente.",
     "20425": "Entre em contato com a equipe de suporte para criar uma conta business com mais de 100 usu\u00e1rios.",
-    "20427": "The account is no longer one of your contacts."
+    "20427": "The account is no longer one of your contacts.",
+    "20428": "Unlimited Storage \/ Unlimited Transfer"
 }

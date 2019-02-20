@@ -422,7 +422,6 @@
     "1117": "Condizioni Generali dei Termini di Servizio",
     "1118": "Devi accettare i termini di servizio per registrare un account su MEGA.",
     "1119": "La tua password \u00e8 facilmente intuibile. Rendi la tua password pi\u00f9 lunga. Combina lettere maiuscole e minuscole. Aggiungi caratteri speciali. Non utilizzare nomi o parole del dizionario",
-    "1120": "La tua password \u00e8 facilmente intuibile. Rendi la tua password pi\u00f9 lunga. Combina lettere maiuscole e minuscole. Aggiungi caratteri speciali. Non utilizzare nomi o parole del dizionario",
     "1121": "La tua password \u00e8 abbastanza sicura per procedere, ma ti raccomandiamo di rafforzarla ulteriormente in futuro.",
     "1122": "Questa password pu\u00f2 resistere agli attacchi pi\u00f9 tipici di brute-force. Assicurati di ricordarla.",
     "1123": "Questa password pu\u00f2 resistere agli attacchi pi\u00f9 tipici di brute-force. Assicurati di ricordarla.",
@@ -1969,6 +1968,8 @@
     "17883": "%nbFi file sono stati aggiunti al gestore dei trasferimenti",
     "17884": "%nbFi file \u00e8 stato aggiunto al gestore dei trasferimenti",
     "17886": "Questo utente \u00e8 gi\u00e0 presente nella tua lista dei contatti",
+    "17900": "Pulizia del Cestino fallita. Per favore, riprova.",
+    "17901": "Il Cestino \u00e8 stato pulito con successo.",
     "17920": "Password non corretta. Per favore, riprova.",
     "17938": "La Chiave di Recupero \u00e8 stata copiata negli appunti. Per favore, archiviala in un posto sicuro.",
     "17958": "Link non valido",
@@ -3244,5 +3245,6 @@
     "20419": "Inserisci il codice qui sotto per riscattare il tuo voucher",
     "20420": "Codice non valido. Per favore, riprova.",
     "20425": "Per favore, contatta il supporto per creare un account Business con pi\u00f9 di 100 utenti.",
-    "20427": "The account is no longer one of your contacts."
+    "20427": "The account is no longer one of your contacts.",
+    "20428": "Unlimited Storage \/ Unlimited Transfer"
 }

@@ -422,7 +422,6 @@
     "1117": "Acordul privind termenii de utilizare a serviciului",
     "1118": "Trebuie s\u0103 fii de-acord cu Termenii de utilizare a serviciului pentru a \u00eenregistra un cont pe MEGA.",
     "1119": "Parola ta e u\u0219or de ghicit. \u00cencearc\u0103 s\u0103 faci parola mai lung\u0103. Combin\u0103 litere mari \u0219i litere mici. Adaug\u0103 caractere speciale. Nu folosi nume sau cuvinte din dic\u021bionar",
-    "1120": "Parola ta e u\u0219or de ghicit. \u00cencearc\u0103 s\u0103 faci parola mai lung\u0103. Combin\u0103 litere mari \u0219i litere mici. Adaug\u0103 caractere speciale. Nu folosi nume sau cuvinte din dic\u021bionar.",
     "1121": "Parola ta este suficient\u0103 de bun\u0103 pentru a continua, dar este recomandat s\u0103 o faci mai puternic\u0103 parola pe viitor.",
     "1122": "Aceast\u0103 parol\u0103 va rezista \u00een fa\u021ba celor mai tipice atacuri de tip \u201ebrute-force\u201d. Te rug\u0103m s\u0103 te asiguri c\u0103 o vei re\u021bine.",
     "1123": "Aceast\u0103 parol\u0103 va rezista \u00een fa\u021ba celor mai sofisticate atacuri de tip \u201ebrute-force\u201d. Te rug\u0103m s\u0103 te asiguri c\u0103 o vei re\u021bine.",
@@ -1969,6 +1968,8 @@
     "17883": "%nbFi fi\u0219iere au fost ad\u0103ugate \u00een managerul de transferuri",
     "17884": "%nbFi fi\u0219iere a fost ad\u0103ugat \u00een managerul de transferuri",
     "17886": "Acest utilizator exist\u0103 deja \u00een lista de contacte",
+    "17900": "E\u0219ec la golirea co\u0219ului de gunoi. Te rug\u0103m s\u0103 \u00eencerci din nou.",
+    "17901": "Co\u0219ul de gunoi a fost golit cu succes.",
     "17920": "Parol\u0103 incorect\u0103. Te rug\u0103m s\u0103 \u00eencerci din nou.",
     "17938": "Cheia de recuperare a fost copiat\u0103 \u00een clipboard. Te rug\u0103m s\u0103 o stochezi \u00eentr-un loc sigur.",
     "17958": "Link nevalid",
@@ -3221,7 +3222,7 @@
     "20393": "Your phone number is already verified.",
     "20394": "That phone number is already in use by another account.",
     "20395": "Measures your available outbound bandwidth during the initial ten seconds of an upload, and then keeps at least 10% of it unused.",
-    "20399": "Enable the rubbish bin clearing scheduler",
+    "20399": "Enable the Rubbish Bin clearing scheduler",
     "20400": "[S]Your Business account is expired.[\/S] [A]Reactivate your account now[\/A] and enjoy the [S]unlimited storage and transfer quota[\/S] along with other business account features",
     "20401": "Your business account is expired",
     "20402": "It seems that the automatic monthly payment for your Business Account subscription has failed. Therefore, your account is suspended until you proceed with the required payment.[BR][BR]You will only be able to view your account without performing any further actions such as uploading, downloading or sharing your files or folders.[BR][BR]To re-activate your account please click the button below.",
@@ -3244,5 +3245,6 @@
     "20419": "Enter the code below to redeem your voucher",
     "20420": "Cod nevalid. Te rug\u0103m s\u0103 \u00eencerci din nou.",
     "20425": "Please contact support to create a business account with more than 100 users.",
-    "20427": "The account is no longer one of your contacts."
+    "20427": "The account is no longer one of your contacts.",
+    "20428": "Unlimited Storage \/ Unlimited Transfer"
 }

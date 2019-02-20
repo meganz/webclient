@@ -15,7 +15,7 @@
     "34": "Achtung:",
     "47": "Es ist leider ein Fehler aufgetreten.",
     "55": "Nur lesen",
-    "56": "Lesen & hinzuf\u00fcgen",
+    "56": "Lese- und Schreibzugriff",
     "57": "Vollzugriff",
     "58": "Download",
     "59": "Link exportieren",
@@ -422,7 +422,6 @@
     "1117": "Allgemeine Gesch\u00e4ftsbedingungen",
     "1118": "Bitte stimmen Sie den Allgemeinen Gesch\u00e4ftsbedingungen zu, um ein MEGA-Konto zu erstellen.",
     "1119": "Ihr Passwort ist zu einfach. Versuchen Sie ein l\u00e4ngeres Passwort, kombinieren Sie Gro\u00df- und Kleinbuchstaben. F\u00fcgen Sie Sonderzeichen und Zahlen hinzu. Benutzen Sie keine Namen oder gebr\u00e4uchliche W\u00f6rter.",
-    "1120": "Ihr Passwort ist zu einfach. Verl\u00e4ngern Sie Ihr Passwort. Kombinieren Sie Gro\u00df- und Kleinschreibung, f\u00fcgen Sie Sonderzeichen und Zahlen hinzu. Verwenden Sie keine Namen oder allgemein gebr\u00e4uchliche W\u00f6rter.",
     "1121": "Ihr Passwort ist ausreichend, wir empfehlen jedoch, Ihr Passwort noch weiter zu verbessern.",
     "1122": "Dieses Passwort wird den \u00fcblichen Angriffen von au\u00dfen standhalten. Bitte stellen Sie sicher, dass Sie es nicht vergessen.",
     "1123": "Dieses Passwort wird auch gut ausgestatteten Angreifern standhalten. Bitte stellen Sie sicher, dass Sie es nicht vergessen.",
@@ -1969,6 +1968,8 @@
     "17883": "%nbFi Dateien neu im Transfer Manager",
     "17884": "%nbFi Datei neu im Transfer Manager",
     "17886": "Dieser Benutzer ist bereits Ihr Kontakt",
+    "17900": "Fehler beim Leeren des Papierkorbs. Bitte versuchen Sie es erneut.",
+    "17901": "Der Papierkorb wurde geleert.",
     "17920": "Incorrect password. Please try again.",
     "17938": "Der Rettungsschl\u00fcssel wurde in die Zwischenablage kopiert. Bewahren Sie ihn an einem sicheren Ort auf.",
     "17958": "Ung\u00fcltiger Link",
@@ -3244,5 +3245,6 @@
     "20419": "Geben Sie den Voucher-Code ein",
     "20420": "Ung\u00fcltige Eingabe. Bitte versuchen Sie es noch einmal.",
     "20425": "F\u00fcr Business-Accounts mit mehr als 100 Benutzern setzen Sie sich bitte mit unserem Kundendienst in Verbindung.",
-    "20427": "The account is no longer one of your contacts."
+    "20427": "The account is no longer one of your contacts.",
+    "20428": "Unbegrenzter Speicherplatz \/ Unbegrenztes Transfervolumen"
 }

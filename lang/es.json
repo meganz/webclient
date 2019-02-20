@@ -422,7 +422,6 @@
     "1117": "T\u00e9rminos de servicio",
     "1118": "Necesitas aceptar los T\u00e9rminos de servicio para poder crear una cuenta en MEGA.",
     "1119": "Tu contrase\u00f1a es f\u00e1cil de adivinar. Trata de hacerla m\u00e1s larga. Combina may\u00fasculas y min\u00fasculas. Agrega caracteres especiales. No utilices nombres o palabras del diccionario.",
-    "1120": "Tu contrase\u00f1a es f\u00e1cil de adivinar. Trata de hacerla m\u00e1s larga. Combina may\u00fasculas y min\u00fasculas. Agrega caracteres especiales. No utilices nombres o palabras del diccionario.",
     "1121": "Tu contrase\u00f1a es lo suficientemente buena para continuar, pero te recomendamos elegir una m\u00e1s dificil.",
     "1122": "Esta contrase\u00f1a podr\u00e1 soportar los ataques m\u00e1s comunes de fuerza bruta. Por favor, aseg\u00farate de recordarla.",
     "1123": "Esta contrase\u00f1a podr\u00e1 soportar los ataques m\u00e1s sofisticados de fuerza bruta. Por favor, aseg\u00farate de recordarla.",
@@ -1969,6 +1968,8 @@
     "17883": "%nbFi archivos se han a\u00f1adido al gestor de transferencia",
     "17884": "%nbFi archivo se ha a\u00f1adido al gestor de transferencia",
     "17886": "Este usuario ya existe en tu lista de contactos",
+    "17900": "No se ha podido vaciar la papelera.  Int\u00e9ntalo de nuevo.",
+    "17901": "La papelera se ha vaciado correctamente.",
     "17920": "Contrase\u00f1a incorrecta. Int\u00e9ntalo de nuevo.",
     "17938": "Clave de recuperaci\u00f3n copiada al portapapeles. Gu\u00e1rdala en un lugar seguro.",
     "17958": "Enlace no v\u00e1lido",
@@ -3244,5 +3245,6 @@
     "20419": "Introduce el c\u00f3digo para canjear tu cup\u00f3n",
     "20420": "C\u00f3digo invalido. Int\u00e9ntalo de nuevo.",
     "20425": "Ponte en contacto con soporte para crear una cuenta Business de m\u00e1s de 100 usuarios.",
-    "20427": "The account is no longer one of your contacts."
+    "20427": "The account is no longer one of your contacts.",
+    "20428": "Unlimited Storage \/ Unlimited Transfer"
 }

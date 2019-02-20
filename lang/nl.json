@@ -422,7 +422,6 @@
     "1117": "Algemene Voorwaarden",
     "1118": "U dient akkoord te gaan met de Algemene Voorwaarden om een account te registreren bij MEGA.",
     "1119": "Uw wachtwoord is gemakkelijk te raden. Probeer uw wachtwoord langer te maken. Combineer hoofdletters & kleine letters. Voeg speciale tekens toe. Gebruik geen namen of woorden uit een woordenboek.",
-    "1120": "Uw wachtwoord is gemakkelijk te raden. Probeer uw wachtwoord langer te maken. Combineer hoofdletters & kleine letters. Voeg speciale tekens toe. Gebruik geen namen of woorden uit een woordenboek.",
     "1121": "Uw wachtwoord is sterk genoeg om door te gaan, echter raden wij u aan uw wachtwoord sterker te maken.",
     "1122": "Dit wachtwoord zal de meest gebruikelijke brute-force aanvallen weerstaan. Zorg ervoor dat u deze goed onthoudt.",
     "1123": "Dit wachtwoord zal de meest geavanceerde brute-force aanvallen weerstaan. Zorg ervoor dat u deze goed onthoudt.",
@@ -1969,6 +1968,8 @@
     "17883": "%nbFi bestanden waren toegevoegd tot het overdracht beheer",
     "17884": "%nbFi bestand was toegevoegd tot het overdracht beheer",
     "17886": "Deze gebruiker bestaat al in uw contactlijst",
+    "17900": "Het legen van de prullenbak is mislukt. Probeer alstublieft opnieuw.",
+    "17901": "De prullenbak is met succes geleegd.",
     "17920": "Onjuist wachtwoord. Probeer nogmaals.",
     "17938": "De Herstelsleutel is gekopieerd naar het klembord. Bewaar het op een veilige plaats.",
     "17958": "Ongeldige koppeling",
@@ -3244,5 +3245,6 @@
     "20419": "Voer de onderstaande code in om uw voucher in te wisselen",
     "20420": "Ongeldige code. Probeer nogmaals.",
     "20425": "Please contact support to create a business account with more than 100 users.",
-    "20427": "The account is no longer one of your contacts."
+    "20427": "The account is no longer one of your contacts.",
+    "20428": "Unlimited Storage \/ Unlimited Transfer"
 }

@@ -8172,6 +8172,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     text-overflow: ellipsis;
     line-height: 24px;
 }
+.fm-dialog-title.top-pad {
+    padding-top: 30px;
+}
 .fm-tree-folder.contact .avatar-wrapper .fm-chat-verified {
     background-image: url(../images/mega/chat-sprite.png?v=2);
     background-position: 0 0;

@@ -2,33 +2,28 @@
     width: 100%;
     min-width: 1024px;
 }
-.improved-recovery-steps .main-recovery-block, .backup-recover.withkey .main-recovery-block{
+.improved-recovery-steps .main-recovery-block, .backup-recover.withkey .main-recovery-block {
     width: 100%;
     padding: 0 0;
     height: 100%;
     display: block;
     margin: 0 0;
 }
-.improved-recovery-steps h3.main-italic-header, .improved-recovery-steps h2, .improved-recovery-steps.backup-recover h3.main-italic-header  {
+.improved-recovery-steps h3.main-italic-header, .improved-recovery-steps h2  {
     font-family:'LatoWeb', 'source_sans_proregular', Arial;
     color: #aaa;
     text-align: center;
-    min-height: 38px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     overflow: hidden;
-    white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     line-height: 24px;
+    margin: 0;
 }
 .park-account-dialog .improved-recovery-steps h3.main-italic-header {
-    width: 560px;
-    margin: 0 auto 24px;
-}
-.improved-recovery-steps .info-block h3.main-italic-header, .improved-recovery-steps .app-instruction-block h3.main-italic-header {
-    padding: 0 0;
+    margin: 0 0 24px;
 }
 .improved-recovery-steps .container-information, .improved-recovery-steps.backup-recover.withkey ul {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
@@ -62,18 +57,22 @@
     color: #495057;
     line-height: 30px;
     margin: 0;
-    padding: 20px 0;
+    padding: 20px 0 0 0;
     text-align: center;
 }
 .improved-recovery-steps .recover-image-block {
     width: 172px;
-    height: 120px;
     display: block;
     margin: 0 auto;
 }
+.fm-dialog.improved-recovery-steps .recover-image-block {
+    margin: 30px auto 10px auto;
+}
+.fm-dialog.improved-recovery-steps .default-green-button.height-48:last-child {
+    margin: 20px 0 10px 0;
+}
 .improved-recovery-steps .register-st2-txt-block, .backup-recover.withkey .register-st2-txt-block {
     display: table;
-    min-height: 720px;
     height: 100%;
     width: 100%;
 }
@@ -83,7 +82,7 @@
 }
 .improved-recovery-steps .card-container, .backup-recover.withkey .card-container {
     width: 680px;
-    margin: 12px auto 44px;
+    margin: 0 auto 80px;
     background-color: #fff;
     border-radius: 4px;
     border: 1px solid rgba(0, 40, 100, 0.12);
@@ -94,11 +93,8 @@
 }
 .improved-recovery-steps .content-wrapper, .backup-recover.withkey .content-wrapper  {
     position: relative;
-    width: 580px;
-    margin: 0 auto 42px auto;
-}
-.backup-recover .content-wrapper.hasButton {
-    padding-bottom: 88px;
+    margin: 0;
+    padding: 0 30px 30px 30px;
 }
 .improved-recovery-steps .content-wrapper p span {
     font-family: 'source_sans_probold';
@@ -110,9 +106,12 @@
     color: #676D75;
     letter-spacing: 0;
     line-height: 23px;
-    padding-bottom: 0;
+    padding: 20px 0 0 0;
     text-align: center;
-    margin-bottom: 12px;
+    margin: 0;
+}
+.improved-recovery-steps p.top-pad {
+    padding-top: 30px;
 }
 .improved-recovery-steps .info-container h3.main-italic-header, .improved-recovery-steps .check-sessions-text {
     text-align: left;
@@ -179,7 +178,7 @@
     -moz-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
     box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
     border-radius: 4px;
-    margin: 32px auto 0;
+    margin: 0 auto 0;
     float: initial;
     width: 160px;
     line-height: 48px;
@@ -220,10 +219,7 @@
     box-shadow: 0 0 0 0 #FDECEC;
 }
 .improved-recovery-steps .button-container {
-    bottom: 0;
-    position: absolute;
-    right: 0;
-    left: 0;
+    padding-top: 30px;
 }
 .improved-recovery-steps .button-aligner {
     float: right;
@@ -521,9 +517,10 @@
     background-size: 262px auto;
     -webkit-transform: scaleX(-1);
     transform: scaleX(-1);
-    margin: 5px 12px  0 0;
+    margin: 2px 12px  0 0;
     display: inline-block;
     opacity: 0.4;
+    vertical-align: top;
 }
 .improved-recovery-steps .right-header {
     display: block;
@@ -531,7 +528,6 @@
     opacity: 1;
     margin: 0 auto;
     width: 680px;
-    height: 30px;
 }
 .improved-recovery-steps .nav-header-block {
     position: relative;
@@ -546,6 +542,8 @@
     font-family: 'LatoWeb';
     letter-spacing: 0;
     font-weight: initial;
+    padding: 0;
+    margin: 0;
 }
 .improved-recovery-steps  .nav-back-subheading {
     display: none;
@@ -578,43 +576,43 @@
     background-size: 344px auto;
     display: block;
     width: 100%;
-    height: 100%;
+    height: 95px;
 }
 .improved-recovery-steps .recover-image.email {
-    background-position: 0 -360px;
+    background-position: 0px -372px;
 }
 .improved-recovery-steps .recover-image.key {
-    background-position: 0 0;
+    background-position: 0 -11px;
 }
 .improved-recovery-steps .recover-image.lock {
-    background-position: -172px 0;
+    background-position: -172px -13px;
 }
 .improved-recovery-steps .recover-image.gray-device {
-    background-position: 0 -120px;
+    background-position: 0 -140px;
 }
 .improved-recovery-steps .recover-image.device-password {
-    background-position: -172px -120px;
+    background-position: -172px -138px;
 }
 .improved-recovery-steps .recover-image.device-key {
-    background-position: -5px -245px;
+    background-position: -5px -258px;
 }
 .improved-recovery-steps .recover-image.locked-key {
-    background-position: -186px -240px;
+    background-position: -186px -251px;
 }
 .improved-recovery-steps .recover-image.unlocked-key {
-    background-position: -186px -353px;
+    background-position: -186px -372px;
 }
-.improved-recovery-steps .recover-image.incoming-mail{
-    background-position: 0 -480px;
+.improved-recovery-steps .recover-image.incoming-mail {
+    background-position: 0 -491px;
 }
-.improved-recovery-steps .recover-image.park-account{
-    background-position: -172px -480px;
+.improved-recovery-steps .recover-image.park-account {
+    background-position: -172px -491px;
 }
 .improved-recovery-steps .recover-image.safe-vault {
-     background-position: 23px -811px;
+    background-position: 23px -823px;
 }
 .improved-recovery-steps .recover-image.shiny-key {
-     background-position: -172px -799px;
+    background-position: -172px -816px;
 }
 .improved-recovery-steps .session-image-block {
     height: 94px;
@@ -622,7 +620,7 @@
     width: 120px;
 }
 .improved-recovery-steps .check-sessions, .improved-recovery-steps .backup-key-info {
-    margin: 36px auto 24px;
+    margin: 30px auto 0;
     display: table;
 }
 .improved-recovery-steps .check-sessions-text, .improved-recovery-steps .backup-key-info-text {
@@ -727,7 +725,7 @@
 .improved-recovery-steps .recover-paste-block .right-section > div:not(.hidden) {
     display: inline-block;
     min-width: 95px;
-    margin-right: 5px;
+    margin: 5px 5px 5px 0;
 }
 .securitypractice .improved-recovery-steps .recover-paste-block .right-section > div {
     margin-left: 8px;
@@ -799,7 +797,7 @@
     border: 1px solid rgba(38,47,59,0.10);
     border-radius: 6px;
     padding: 20px 20px;
-    margin: 36px auto 32px;
+    margin: 30px auto 0;
     height: auto;
     position: relative;
 }
@@ -816,7 +814,7 @@
     margin-bottom: 32px;
 }
 .park-account-dialog .fm-dialog-body {
-    padding: 0px;
+    padding: 0 30px;
 }
 /*.improved-recovery-steps  .instruction-block {
     padding: 0 12px;

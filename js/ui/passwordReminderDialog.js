@@ -245,6 +245,9 @@
         else if (element.classList.contains('button-prd-backup')) {
             this.onBackupClicked(element, evt);
         }
+        else if (element.classList.contains('change-pass')) {
+            this.onChangePassClicked(element, evt);
+        }
     };
 
     PasswordReminderDialog.prototype.onConfirmClicked = function(element, evt) {
@@ -351,6 +354,21 @@
         }
 
         loadSubPage('/backup');
+    };
+
+    PasswordReminderDialog.prototype.onChangePassClicked = function(element, evt) {
+        this.hide();
+
+        if (this._dialogActionPromise && this._dialogActionPromise.state() === 'pending') {
+            this._dialogActionPromise.reject();
+        }
+
+        if (this.passwordField) {
+            // clear the password field, so that if it was filled in the dialog would hide
+            this.passwordField.value = "";
+        }
+
+        loadSubPage('/fm/account/security');
     };
 
     PasswordReminderDialog.prototype.init = function() {
@@ -627,12 +645,6 @@
         var skipButton = this.dialog.querySelector('.button-prd-skip');
         var backupButton = this.dialog.querySelector('.button-prd-backup');
 
-        if (backupButton) {
-            backupButton.classList.remove('grey-gradient');
-        }
-        if (skipButton) {
-            skipButton.classList.add('grey-gradient');
-        }
         if (promise) {
             this._dialogActionPromise = promise;
         }
@@ -650,13 +662,6 @@
 
         var skipButton = this.dialog.querySelector('.button-prd-skip');
         var backupButton = this.dialog.querySelector('.button-prd-backup');
-
-        if (backupButton) {
-            backupButton.classList.add('grey-gradient');
-        }
-        if (skipButton) {
-            skipButton.classList.remove('grey-gradient');
-        }
 
         this.resetUI();
 

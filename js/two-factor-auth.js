@@ -421,6 +421,8 @@ twofactor.setupDialog = {
         // Show the dialog
         this.$dialog.removeClass('hidden');
         this.$overlay.removeClass('hidden');
+
+        dialogPositioning('.two-factor-dialog.setup-two-factor');
     },
 
     /**

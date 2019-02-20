@@ -2538,11 +2538,11 @@ li.token-input-token-invite .input-close {
     width: 560px;
     z-index: 1120;
 }
-.de .dropdown.body.pass-reminder, .nl .dropdown.body.pass-reminder, .it .dropdown.body.pass-reminder, .es .dropdown.body.pass-reminder, .jp .dropdown.body.pass-reminder {
-    width: 630px;
+.de .dropdown.body.pass-reminder, .nl .dropdown.body.pass-reminder, .br .dropdown.body.pass-reminder, .it .dropdown.body.pass-reminder, .es .dropdown.body.pass-reminder, .jp .dropdown.body.pass-reminder {
+    width: 640px;
 }
 .fr .dropdown.body.pass-reminder, .ru .dropdown.body.pass-reminder {
-    width: 680px;
+    width: 690px;
 }
 .dropdown.body.fm-dialog.pass-reminder {
     margin: 0;
@@ -3470,12 +3470,6 @@ li.token-input-token-invite .input-close {
 .fm-dialog.two-factor-dialog {
     width: 482px;
     margin: -172px 0 0 -240px;
-    box-sizing: border-box;
-    width: 482px;
-    border: 1px solid rgba(0,0,0,0.05);
-    border-radius: 4px;
-    background-color: #FFFFFF;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
 }
 .fm-dialog.two-factor-dialog.verify-two-factor-login {
     background-color: #f6f6f6;
@@ -3522,7 +3516,7 @@ li.token-input-token-invite .input-close {
     padding: 24px 30px 0 30px;
 }
 .fm-dialog.two-factor-dialog .two-factor-content-block.verify-tfactor {
-    margin: 48px auto 60px;
+    margin: 10px 18px 0;
 }
 .fm-dialog.two-factor-dialog .two-factor-qr-code {
     width: 224px;
@@ -3540,7 +3534,7 @@ li.token-input-token-invite .input-close {
     height: 38px;
 }
 .fm-dialog.two-factor-dialog .fm-account-input::before {
-    top: 9px;
+    display: none;
 }
 .fm-dialog.two-factor-dialog.setup-two-factor-verify .pin-input {
     color: #333;
@@ -3552,18 +3546,14 @@ li.token-input-token-invite .input-close {
     height: 38px;
     margin: 24px auto 16px;
 }
-.fm-dialog.two-factor-dialog .verify-tfactor .fm-account-input {
-    width: 300px;
-}
 .fm-dialog.two-factor-dialog .middle-button-wrapper {
-    margin: 24px auto 48px;
-    width: 300px;
+    margin: 24px -1px 48px;
     text-align: center;
+    font-size: 0;
 }
 .fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button {
-    width: 136px;
+    min-width: 181px;
     display: inline-block;
-    min-width: 136px;
     margin-left: 24px
 }
 .fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button:first-of-type {

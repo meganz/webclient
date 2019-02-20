@@ -24429,7 +24429,8 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     line-height: 24px;
     position: relative;
     display: inline-block;
-    width:190px;
+    width: 190px;
+    white-space: nowrap;
 }
 
 .subaccount-view-used-data .used-storage-info .file-number,

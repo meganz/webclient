@@ -4,6 +4,7 @@ function BusinessRegister() {
     this.cacheTimeout = 9e5; // 15 min - default threshold to update payment gateway list
     this.planPrice = 9.99; // initial value
     this.minUsers = 3; // minimum number of users
+    this.maxUsers = 100; // maximum number of users
     this.isLoggedIn = false;
     if (mega) {
         if (!mega.cachedBusinessGateways) {
@@ -212,8 +213,14 @@ BusinessRegister.prototype.initPage = function () {
     var inputsValidator = function ($element) {
         var passed = true;
         if (!$element || $element.is($nbUsersInput)) {
-            if (!$nbUsersInput.val().trim() || $nbUsersInput.val() < mySelf.minUsers) {
+            var nbUsersTrimmed = $nbUsersInput.val().trim();
+            if (!nbUsersTrimmed || nbUsersTrimmed < mySelf.minUsers) {
                 $nbUsersInput.parent().addClass('error').find('.error-message').text(l[19501]);
+                $nbUsersInput.focus();
+                passed = false;
+            }
+            else if (nbUsersTrimmed && nbUsersTrimmed > mySelf.maxUsers) {
+                $nbUsersInput.parent().addClass('error').find('.error-message').text(l[20425]);
                 $nbUsersInput.focus();
                 passed = false;
             }

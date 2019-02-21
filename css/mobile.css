@@ -9312,7 +9312,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     margin-top: 18px;
 }
 .mobile.key .horizontal-plans .bottom-page.plans-block.no-pad {
-    width: calc(198px * 5);
+    width: calc(225px * 5);
 }
 .mobile .horizontal-plans .reg-st3-storage div.pro-feature-icon, .mobile .horizontal-plans .reg-st3-bandwidth div.pro-feature-icon{
     display: none;

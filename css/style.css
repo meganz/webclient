@@ -18613,9 +18613,6 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     color: #31B500;
     font-weight: bold;
 }
-.credentials-warning-dialog .default-white-button.right.red {
-    margin-top: 12px;
-}
 /* Key signature mismatch warning dialog */
 .key-signature-warning-button {
     left: 50%;

@@ -37,7 +37,7 @@ fi
 cd $(dirname $BASH_SOURCE)/../lang
 
 # Fetch the latest translations from Babel
-wget 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -O lang.tar.gz
+wget 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -O lang.tar.gz || curl -# 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -o lang.tar.gz
 
 # Check if the fetch failed
 if [ $? -ne 0 ]; then

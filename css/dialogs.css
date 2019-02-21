@@ -2538,55 +2538,31 @@ li.token-input-token-invite .input-close {
     width: 560px;
     z-index: 1120;
 }
+.de .dropdown.body.pass-reminder, .nl .dropdown.body.pass-reminder, .br .dropdown.body.pass-reminder, .it .dropdown.body.pass-reminder, .es .dropdown.body.pass-reminder, .jp .dropdown.body.pass-reminder {
+    width: 640px;
+}
+.fr .dropdown.body.pass-reminder, .ru .dropdown.body.pass-reminder {
+    width: 690px;
+}
 .dropdown.body.fm-dialog.pass-reminder {
     margin: 0;
     z-index: 1101;
 }
 .fm-dialog.pass-reminder .dropdown.content-block {
-    padding: 0;
+    padding: 0 0 12px 0;
 }
 .fm-dialog.pass-reminder .content-body {
     padding: 12px 48px 12px 48px;
 }
+.fm-dialog.pass-reminder .centered-checkbox .radio-txt {
+    padding-top: 6px;
+}
+.fm-dialog.pass-reminder .centered-checkbox .checkboxOff, .fm-dialog.pass-reminder .centered-checkbox .checkboxOn {
+    margin-top: 8px;
+}
 .dropdown.content-block {
     position: relative;
     padding: 12px 48px 12px 48px;
-}
-
-.fm-dialog.pass-reminder .dark-dialog-bottom {
-    background-color: white;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    -webkit-border-bottom-left-radius: 8px;
-    -moz-border-radius-bottomleft: 8px;
-    border-bottom-left-radius: 8px;
-    -webkit-border-bottom-right-radius: 8px;
-    -moz-border-radius-bottomright: 8px;
-    border-bottom-right-radius: 8px;
-    padding: 0 8px 12px 12px;
-    border-top: 1px solid rgba(0,0,0,0.1);
-}
-.fm-dialog.pass-reminder .dark-dialog-bottom .big-buttons {
-    padding: 12px 0 0 0;
-    text-align: right;
-    float: right;
-}
-.fm-dialog.pass-reminder .dark-dialog-bottom .default-big-button,
-.fm-dialog.pass-reminder .dark-dialog-bottom .default-big-button span {
-    line-height: 35px;
-    height: 36px;
-}
-
-.fm-dialog.pass-reminder .centered-checkbox.dialog-bottom {
-    float: left;
-    text-align: left;
-    margin-top: 1px;
-    padding-bottom: 8px;
-    clear: none;
-}
-.fm-dialog.pass-reminder .centered-checkbox .checkboxOff, .fm-dialog.pass-reminder .centered-checkbox .checkboxOn {
-    margin: 20px 12px 0 7px;
 }
 .nw-fm-dialog-title.big {
     font-size: 20px;
@@ -2658,6 +2634,9 @@ li.token-input-token-invite .input-close {
 .wrong .dialog.big-input-bg input {
     color: #D90007;
 }
+.wrong .button-prd-backup {
+    background: rgb(255,102,107);
+}
 .wrong .button-prd-backup span {
     background: rgb(255,102,107);
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmNjY2YiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlYzUyNTciIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
@@ -2696,6 +2675,7 @@ li.token-input-token-invite .input-close {
 .pass-reminder.big-buttons {
     text-align: center;
     padding: 0 0 15px 0;
+    font-size: 0;
 }
 .pass-reminder.result-block {
     margin: 8px 0 0 0;
@@ -2720,7 +2700,15 @@ li.token-input-token-invite .input-close {
 }
 .pass-reminder .default-white-button span:first-letter {
     text-transform: uppercase !important;
-
+}
+.dropdown.body.pass-reminder .radio-txt.medium {
+    font-size: 14px;
+}
+.default-big-button.change-pass {
+    display: none;
+}
+.wrong .default-big-button.change-pass {
+    display: inline-block;
 }
 /* end of Password remider */
 
@@ -3406,7 +3394,7 @@ li.token-input-token-invite .input-close {
 /*  Park account warning styles */
 .park-account-dialog.fm-dialog {
     width: 640px;
-    margin: -270px 0 0 -320px;
+    margin: -281px 0 0 -320px;
 }
 .park-account-dialog .fm-dialog-title {
     font-size: 20px;
@@ -3461,10 +3449,6 @@ li.token-input-token-invite .input-close {
     margin: 1px 11px 0 0;
     display: none;
 }
-.park-account-dialog .park-account-checkbox {
-    width: 560px;
-    margin: 0 auto;
-}
 .park-account-dialog .improved-recovery-steps .login-register-input {
     margin-top: 12px;
 }
@@ -3486,17 +3470,10 @@ li.token-input-token-invite .input-close {
 .fm-dialog.two-factor-dialog {
     width: 482px;
     margin: -172px 0 0 -240px;
-    box-sizing: border-box;
-    width: 482px;
-    border: 1px solid rgba(0,0,0,0.05);
-    border-radius: 4px;
-    background-color: #FFFFFF;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
 }
 .fm-dialog.two-factor-dialog.verify-two-factor-login {
     background-color: #f6f6f6;
-    height: 344px;
-    margin: -172px 0 0 -240px;
+    margin: -175px 0 0 -240px;
     width: 480px;
 }
 .fm-dialog.two-factor-dialog.verify-two-factor-login .middle-button-wrapper {
@@ -3533,17 +3510,13 @@ li.token-input-token-invite .input-close {
     visibility: hidden;
 }
 .fm-dialog.two-factor-dialog .two-factor-content-block {
-    width: 400px;
+
     position: relative;
     height: auto;
-    margin: 24px auto 24px;
+    padding: 24px 30px 0 30px;
 }
 .fm-dialog.two-factor-dialog .two-factor-content-block.verify-tfactor {
-    margin: 48px auto 60px;
-}
-.fm-dialog.two-factor-dialog .tf-container {
-    width: 386px;
-    margin: 0 auto;
+    margin: 10px 18px 0;
 }
 .fm-dialog.two-factor-dialog .two-factor-qr-code {
     width: 224px;
@@ -3554,12 +3527,14 @@ li.token-input-token-invite .input-close {
 }
 .fm-dialog.two-factor-dialog .fm-account-input input {
     box-sizing: border-box;
-    height: 38px;
-    border: 1px solid rgba(0,0,0,0.15);
     border-radius: 2px;
     background-color: rgba(0,0,0,0.02);
     padding: 0;
     text-align: center;
+    height: 38px;
+}
+.fm-dialog.two-factor-dialog .fm-account-input::before {
+    display: none;
 }
 .fm-dialog.two-factor-dialog.setup-two-factor-verify .pin-input {
     color: #333;
@@ -3571,18 +3546,14 @@ li.token-input-token-invite .input-close {
     height: 38px;
     margin: 24px auto 16px;
 }
-.fm-dialog.two-factor-dialog .verify-tfactor .fm-account-input {
-    width: 300px;
-}
 .fm-dialog.two-factor-dialog .middle-button-wrapper {
-    margin: 24px auto 48px;
-    width: 300px;
+    margin: 24px -1px 48px;
     text-align: center;
+    font-size: 0;
 }
 .fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button {
-    width: 136px;
+    min-width: 181px;
     display: inline-block;
-    min-width: 136px;
     margin-left: 24px
 }
 .fm-dialog.two-factor-dialog .middle-button-wrapper.inline-buttons .default-56px-button:first-of-type {
@@ -3643,7 +3614,7 @@ li.token-input-token-invite .input-close {
     color: #333;
     cursor: pointer;
     font-size: 14px;
-    margin-top: 15px;
+    margin: 30px 0;
     text-align: center;
 }
 .fm-dialog.verify-two-factor-login .lost-authenticator-button:hover, .fm-dialog.two-factor-verify-action .lost-authenticator-button:hover {
@@ -4149,7 +4120,6 @@ li.token-input-token-invite .input-close {
 /* Recover account */
 .fm-dialog.recovery-key-dialog, .fm-dialog.recovery-key-info {
     width: 640px;
-    height: 620px;
     margin: -306px 0 0 -320px;
     text-align: center;
 }
@@ -4161,5 +4131,5 @@ li.token-input-token-invite .input-close {
     text-align: left;
 }
 .fm-dialog.improved-recovery-steps .recover-paste-block {
-    margin: 32px auto 40px;
+    margin: 30px auto 0;
 }

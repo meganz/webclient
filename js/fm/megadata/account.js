@@ -427,6 +427,8 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
 
         $('.recovery-key.input-wrapper input', $dialog).val(a32_to_base64(u_k));
 
+        dialogPositioning('.recovery-key-dialog');
+
         return $dialog;
     });
 };

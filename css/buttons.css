@@ -628,8 +628,7 @@
 }
 .default-big-button {
     display: block;
-    font-size: 14px;
-    line-height: 47px;
+    font-size: 0;
     height: 48px;
     text-align: center;
     cursor: pointer;
@@ -647,9 +646,13 @@
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
+    background-color: white;
 }
 .default-big-button span {
     display: block;
+    font-size: 14px;
+    line-height: 47px;
+    font-family: 'LatoWeb', 'source_sans_proregular';
     height: 48px;
     background-color: white;
     -moz-border-radius: 4px;
@@ -661,11 +664,6 @@
     left: 0;
     top: 0;
     padding: 0 24px;
-    background: rgb(255,255,255);
-background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmY2ZjZmMiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(252,252,252,1) 100%);
-background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(252,252,252,1) 100%);
-background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1) 100%);
 }
 .default-big-button span::before {
     content: '';
@@ -705,6 +703,22 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1
 }
 .default-big-button.grey-gradient {
     color: white;
+    background: rgb(184,184,184);
+}
+.default-big-button.green {
+    color: white;
+    background: #00BFA5;
+}
+.default-big-button.green span {
+    background: #00BFA5;
+    -webkit-box-shadow: 0 0 0 1px #00B098;
+    -moz-box-shadow: 0 0 0 1px #00B098;
+    box-shadow: 0 0 0 1px #00B098;
+}
+.default-big-button.green span::before {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,145,125,0.5);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,145,125,0.5);
+    box-shadow: 0px 0px 0px 1px rgba(0,145,125,0.5);
 }
 .default-big-button.grey-gradient:hover {
     webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);

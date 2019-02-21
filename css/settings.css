@@ -565,7 +565,7 @@
     -o-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
     -ms-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
     transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
-    z-index: 1129;
+    z-index: 10;
 }
 .dialog-input-title-ontop input {
     font-family: 'LatoWeb','source_sans_proregular', Arial;

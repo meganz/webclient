@@ -938,28 +938,23 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     text-align: center;
     padding: 34px 15px 34px 15px;
 }
-
-
 .bottom-btn-container {
-    margin: 48px 0 48px -200px;
-    display: inline-block;
+    margin: 24px 0 48px 0;
+    display: block;
+    text-align: center;
 }
-
 .bottom-btn-container p {
-    font-size: 16px;
+    font-size: 18px;
     line-height: 48px;
-    display: inline-block;
+    display: block;
     color: #666;
-    padding-right: 32px;
     margin:0;
 }
-
 .bottom-btn-container .bus-plan.button-48-height.red{
     height: 48px;
     font-size: 16px;
     line-height: 47px;
     min-width: 220px;
-    max-width: 260px;
     padding: 0 15px;
     display: inline-block;
     background-color: #F0373A;
@@ -981,12 +976,9 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     -ms-transition: background-color 200ms ease-in-out;
     transition: background-color 200ms ease-in-out;
 }
-
 .bottom-btn-container .bus-plan.button-48-height.red:hover {
     background-color: #D90007;
 }
-
-
 .bottom-page.horizontal-centered-bl.wide {
     max-width: 1246px;
     padding: 0 40px;
@@ -1419,6 +1411,10 @@ height: 56px;
 }
 .bottom-page.plans-block.no-pad {
     padding: 0;
+}
+.bottom-page.plans-block .reg-st3-txt-localcurrencyprogram {
+    font-size: 14px;
+    color: #999;
 }
 .bottom-page .reg-st3-membership-bl {
     width: 230px;

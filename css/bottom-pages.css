@@ -939,22 +939,28 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     padding: 34px 15px 34px 15px;
 }
 .bottom-btn-container {
-    margin: 24px 0 48px 0;
-    display: block;
+    margin: 50px 0 0 0;
     text-align: center;
+    position: relative;
+    display: inline-block;
+    white-space: nowrap;
 }
 .bottom-btn-container p {
-    font-size: 18px;
+    font-size: 16px;
     line-height: 48px;
-    display: block;
+    display: inline-block;
     color: #666;
-    margin:0;
+    padding-right: 32px;
+    margin: 0;
+    position: absolute;
+    right: 100%;
 }
+
 .bottom-btn-container .bus-plan.button-48-height.red{
     height: 48px;
     font-size: 16px;
     line-height: 47px;
-    min-width: 220px;
+    min-width: 100%;
     padding: 0 15px;
     display: inline-block;
     background-color: #F0373A;
@@ -968,6 +974,9 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     color: white;
     letter-spacing: 1px;
     white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
     cursor: pointer;
     font-family: 'montserrat', sans-serif;
     -webkit-transition: background-color 200ms ease-in-out;
@@ -976,9 +985,12 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     -ms-transition: background-color 200ms ease-in-out;
     transition: background-color 200ms ease-in-out;
 }
+
 .bottom-btn-container .bus-plan.button-48-height.red:hover {
     background-color: #D90007;
 }
+
+
 .bottom-page.horizontal-centered-bl.wide {
     max-width: 1246px;
     padding: 0 40px;
@@ -1405,16 +1417,12 @@ height: 56px;
 
 /* Plans block */
 .bottom-page.plans-block {
-    padding: 10px 0 0 0;
+    padding: 10px 0 68px 0;
     overflow: hidden;
     font-size: 0;
 }
 .bottom-page.plans-block.no-pad {
     padding: 0;
-}
-.bottom-page.plans-block .reg-st3-txt-localcurrencyprogram {
-    font-size: 14px;
-    color: #999;
 }
 .bottom-page .reg-st3-membership-bl {
     width: 230px;
@@ -2321,6 +2329,17 @@ height: 56px;
     max-width: 464px;
     margin: 0 auto;
     text-align: center;
+}
+@media only screen and (max-width: 870px) {
+    .bottom-btn-container p {
+        display: block;
+        position: static;
+        padding: 0 0 5px 0;
+    }
+    .bottom-btn-container {
+        margin: 30px 0 0 0;
+        white-space: normal;
+    }
 }
 @media only screen and (max-height: 685px) {
 .bottom-page.top-dark-info.big {

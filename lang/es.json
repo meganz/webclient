@@ -1851,7 +1851,7 @@
     "17567": "Comun\u00edcate de forma segura con tu familia, amigos y colaboradores utilizando MEGAchat. Los chats y las llamadas est\u00e1n cifrados punto a punto, [B]ni siquiera MEGA puede leer o escuchar tus conversaciones[\/B].",
     "17568": "Sube archivos a tu cuenta usando el bot\u00f3n [B]Subir archivo o Subir carpeta[\/B] o simplemente [B]arr\u00e1stralos[\/B] desde tu ordenador a MEGA en el navegador.",
     "17569": "Sube archivos a tu cuenta usando el bot\u00f3n [B]Subir archivo[\/B] o simplemente [B]arr\u00e1stralos[\/B] desde tu ordenador a MEGA en el navegador.",
-    "17570": "Los elementos movidos a la Papelera permanecer\u00e1n all\u00ed temporalmente. La Papelera [B]se limpiar\u00e1 periodicamente de forma autom\u00e1tica[\/B] y podr\u00e1s gestionar su configuraci\u00f3n en Ajustes.",
+    "17570": "Los elementos movidos a la Papelera permanecer\u00e1n all\u00ed temporalmente. La Papelera [B]se vaciar\u00e1 peri\u00f3dicamente de forma autom\u00e1tica[\/B] y podr\u00e1s gestionar su configuraci\u00f3n en Ajustes.",
     "17571": "Gestionar transferencias",
     "17572": "Puedes ver el progreso de tus transferencias al colocar el rat\u00f3n sobre la pesta\u00f1a Transferencias. Si quieres tener m\u00e1s control sobre tus transferencias, haz clic en el \u00edcono para ir al Gestor de transferencias.",
     "17573": "Las notificaciones te mantendr\u00e1n informado sobre todo lo que sucede en tu cuenta. Puedes gestionar las notificaciones en Ajustes.",
@@ -3247,6 +3247,6 @@
     "20420": "C\u00f3digo invalido. Int\u00e9ntalo de nuevo.",
     "20425": "Ponte en contacto con soporte para crear una cuenta Business de m\u00e1s de 100 usuarios.",
     "20427": "The account is no longer one of your contacts.",
-    "20428": "Unlimited Storage \/ Unlimited Transfer",
+    "20428": "Unlimited Storage \/ Unlimited Transfers",
     "20429": "After you finish upgrading to a Business account, please ensure you cancel your {0} subscription if you have not already."
 }

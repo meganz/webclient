@@ -81,6 +81,8 @@ function FMDB(plainname, schema, channelmap) {
         'INFO':  '#2ca100',
         'LOG':   '#8e8da7'
     };
+
+    // if (d) Dexie.debug = "dexie";
 }
 
 // initialise cross-tab access arbitration identity
@@ -518,6 +520,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
         var tablesremaining = false;
 
+        // jshint -W083
         // this entirely relies on non-numeric hash keys being iterated
         // in the order they were added. FIXME: check if always true
         for (var table in fmdb.pending[ch][fmdb.tail[ch]]) { // iterate through pending tables, _sn last
@@ -587,15 +590,23 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     // loop back to write more pending data (or to commit the transaction)
                     fmdb.inflight = false;
                     dispatchputs();
-                }).catch(Dexie.BulkError, function(e) {
+                }).catch(function(e) {
                     // TODO: retry instead?
+
+                    if (e instanceof Dexie.BulkError) {
+                        fmdb.logger.error('Bulk operation error, %s records failed.', e.failures.length, e);
+                    }
+                    else {
+                        fmdb.logger.error('Unexpected error in bulk operation...', e);
+                    }
 
                     fmdb.state = -1;
                     fmdb.inflight = false;
                     fmdb.invalidate();
 
-                    fmdb.logger.error('Bulk operation error, %s records failed. '
-                        + 'Marking DB as crashed.', e.failures.length, e);
+                    if (d) {
+                        fmdb.logger.warn('Marked DB as crashed...', e.name);
+                    }
                 });
 
                 // we don't send more than one transaction (looking at you, Microsoft!)

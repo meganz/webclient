@@ -1438,7 +1438,8 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
                     ) === false) {
                     // potential message order tampering detected.
                     self.logger.critical("message order tampering detected: ", chatRoom.chatId, msgInstance.messageId);
-                    return false;
+                    // intentionally return true.
+                    return true;
                 }
                 else {
                     return true;

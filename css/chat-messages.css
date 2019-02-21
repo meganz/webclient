@@ -478,10 +478,6 @@
     color: #d72b3f;
 }
 
-.ps-container .message.body {
-    will-change: transform;
-}
-
 .message.content-area .buttons-block {
     padding: 10px 0 0 0;
 }

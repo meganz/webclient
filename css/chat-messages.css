@@ -631,7 +631,6 @@
     display: table;
     table-layout: fixed;
     position: relative;
-    z-index: 1000 /* temp */;
     width: 100%;
     padding: 0;
     margin: 0;

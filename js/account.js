@@ -235,7 +235,7 @@ function u_checklogin3a(res, ctx) {
             ctx.checkloginresult(ctx, r);
         }
     }
-    
+
 }
 
 // erase all local user/session information
@@ -342,7 +342,7 @@ function u_setrsa(rsakey) {
         // we get current user's master user + its public key (master user pubkey)
         buinessMaster = window.businessSubAc.bu;
         buinsesPubKey = window.businessSubAc.bpubk;
-        
+
 
         // now we will encrypt the current user master-key using master-user public key. and include it in 'up' request
         // because master-user must be aware of evey sub-user's master-key.
@@ -369,7 +369,7 @@ function u_setrsa(rsakey) {
             }
             u_attr.privk = u_storage.privk = base64urlencode(privateKeyEncoded);
             u_attr.pubk = u_storage.pubk = publicKeyEncodedB64;
-            
+
             if (buinessMaster) {
                 // u_attr.mu = buinessMaster;
                 // u_attr.b = 1;
@@ -409,7 +409,7 @@ function u_setrsa(rsakey) {
             });
         }
     };
-    
+
     api_req(request, ctx);
 
     return $promise;
@@ -1118,57 +1118,93 @@ function processEmailChangeActionPacket(ap) {
      * @private
      */
     var getConfig = function() {
-        var result = {};
-        var config = Object(fmconfig);
-        var nodes = { viewmodes: 1, sortmodes: 1, treenodes: 1 };
-
-        var isValid = function(handle) {
-            return handle.length !== 8 || M.d[handle] || handle === 'contacts';
-        };
-
-        for (var key in config) {
-            var value = config[key];
-
-            if (!value && value !== 0) {
-                logger.info('Skipping empty value for "%s"', key);
-                continue;
-            }
-
-            // Dont save no longer existing nodes
-            if (nodes[key]) {
-                if (typeof value !== 'object') {
-                    logger.warn('Unexpected type for ' + key);
-                    continue;
-                }
-
-                var modes = {};
-                for (var handle in value) {
-                    if (value.hasOwnProperty(handle)
-                            && handle.substr(0, 7) !== 'search/'
-                            && isValid(handle)) {
-                        modes[handle] = value[handle];
-                    }
-                    else {
-                        logger.info('Skipping non-existant node "%s"', handle);
-                    }
-                }
-                value = modes;
-            }
-
-            if (typeof value === 'object' && !$.len(value)) {
-                logger.info('Skipping empty object "%s"', key);
-                continue;
-            }
-
-            try {
-                result[key] = JSON.stringify(value);
-            }
-            catch (ex) {
-                logger.error(ex);
-            }
+        if (getConfig.promise) {
+            logger.debug('getConfig: another instance is running...');
+            return getConfig.promise;
         }
 
-        return result;
+        if (d) {
+            logger.debug('getConfig...begin', JSON.stringify(window.fmconfig));
+        }
+
+        var promise = new MegaPromise(function(resolve, reject) {
+            var result = {};
+            var config = Object(window.fmconfig);
+            var nodeType = {viewmodes: 1, sortmodes: 1, treenodes: 1};
+            var handles = array.unique(
+                Object.keys(nodeType).reduce(function(s, v) {
+                    return Object.keys(config[v] || {}).concat(s);
+                }, []).filter(function(s) {
+                    return s.length === 8 && s !== 'contacts';
+                })
+            );
+
+            dbfetch.node(handles).then(function(nodes) {
+                for (var i = nodes.length; i--;) {
+                    nodes[nodes[i].h] = true;
+                }
+
+                var isValid = function(handle) {
+                    return handle.length !== 8 || nodes[handle] || handle === 'contacts';
+                };
+
+                for (var key in config) {
+                    if (typeof config.hasOwnProperty !== 'function' || config.hasOwnProperty(key)) {
+                        var value = config[key];
+
+                        if (!value && value !== 0) {
+                            logger.info('Skipping empty value for "%s"', key);
+                            continue;
+                        }
+
+                        // Dont save no longer existing nodes
+                        if (nodeType[key]) {
+                            if (typeof value !== 'object') {
+                                logger.warn('Unexpected type for ' + key);
+                                continue;
+                            }
+
+                            var modes = {};
+                            for (var handle in value) {
+                                if (value.hasOwnProperty(handle)
+                                    && handle.substr(0, 7) !== 'search/'
+                                    && isValid(handle)) {
+
+                                    modes[handle] = value[handle];
+                                }
+                                else {
+                                    logger.info('Skipping non-existing node "%s"', handle);
+                                }
+                            }
+                            value = modes;
+                        }
+
+                        if (typeof value === 'object' && !$.len(value)) {
+                            logger.info('Skipping empty object "%s"', key);
+                            continue;
+                        }
+
+                        try {
+                            result[key] = JSON.stringify(value);
+                        }
+                        catch (ex) {
+                            logger.error(ex);
+                        }
+                    }
+                }
+
+                logger.debug('getConfig...result', d && JSON.stringify(result));
+                resolve(result);
+
+            }).catch(reject);
+        });
+
+        getConfig.promise = promise;
+        promise.always(function() {
+            getConfig.promise = null;
+            logger.debug('getConfig...end');
+        });
+        return promise;
     };
 
     /**
@@ -1180,43 +1216,46 @@ function processEmailChangeActionPacket(ap) {
             return MegaPromise.reject(EINCOMPLETE);
         }
 
-        var config = getConfig();
-        if (!$.len(config)) {
-            return MegaPromise.reject(ENOENT);
-        }
+        return new MegaPromise(function(resolve, reject) {
+            getConfig().then(function(config) {
+                if (typeof config !== 'object' || !$.len(config)) {
+                    logger.debug('Not saving fmconfig, invalid...');
+                    return reject(ENOENT);
+                }
 
-        var hash = JSON.stringify(config);
-        var len = hash.length;
+                var hash = JSON.stringify(config);
+                var len = hash.length;
 
-        // generate checkum/hash for the config
-        hash = MurmurHash3(hash, MMH_SEED);
+                // generate checksum/hash for the config
+                hash = MurmurHash3(hash, MMH_SEED);
 
-        // dont store it unless it has changed
-        if (hash === parseInt(localStorage[u_handle + '_fmchash'])) {
-            return MegaPromise.resolve(EEXIST);
-        }
-        localStorage[u_handle + '_fmchash'] = hash;
+                // dont store it unless it has changed
+                if (hash === parseInt(localStorage[u_handle + '_fmchash'])) {
+                    logger.debug('Not saving fmconfig, unchanged...');
+                    return resolve(EEXIST);
+                }
 
-        var promise;
-        timer = false;
+                timer = false;
+                localStorage[u_handle + '_fmchash'] = hash;
 
-        if (len < 8) {
-            srvlog('config.set: invalid data');
-            promise = MegaPromise.reject(EARGS);
-        }
-        else if (len > 12000) {
-            srvlog('config.set: over quota');
-            promise = MegaPromise.reject(EOVERQUOTA);
-        }
-        else {
-            promise = mega.attr.set('fmconfig', config, false, true);
-            timer = promise;
-            promise.always(function() {
-                timer = 0;
+                if (len < 8) {
+                    srvlog('config.set: invalid data');
+                    reject(EARGS);
+                }
+                else if (len > 12000) {
+                    srvlog('config.set: over quota');
+                    reject(EOVERQUOTA);
+                }
+                else {
+                    var promise = mega.attr.set('fmconfig', config, false, true);
+                    timer = promise;
+                    promise.always(function() {
+                        timer = 0;
+                    });
+                    promise.then(resolve).catch(reject);
+                }
             });
-        }
-
-        return promise;
+        });
     };
 
     /**
@@ -1279,8 +1318,9 @@ function processEmailChangeActionPacket(ap) {
                         }
                     }
 
-                    localStorage[u_handle + '_fmchash'] =
-                        MurmurHash3(JSON.stringify(getConfig()), MMH_SEED);
+                    // getConfig().then(function(config) {
+                    //     localStorage[u_handle + '_fmchash'] = MurmurHash3(JSON.stringify(config), MMH_SEED);
+                    // });
                 }
 
                 if (fmconfig.ul_maxSlots) {

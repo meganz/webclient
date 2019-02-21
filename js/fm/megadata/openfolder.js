@@ -38,7 +38,7 @@
         this.currentrootid = this.chat ? "chat" : this.getNodeRoot(id);
         this.currentLabelType = M.labelType();
         this.currentLabelFilter = M.filterLabel[this.currentLabelType];
-        this.fmsorting = (id === 'contacts' || id === 'shares') ? 0 : fmconfig.uisorting;
+        this.fmsorting = (id === 'contacts' || id === 'shares') ? 0 : fmconfig.uisorting | 0;
 
         if (first) {
             fminitialized = true;
@@ -150,10 +150,8 @@
                 viewmode = this.overrideViewMode;
                 delete this.overrideViewMode;
             }
-            else if (typeof fmconfig.uiviewmode !== 'undefined' && fmconfig.uiviewmode) {
-                if (fmconfig.viewmode) {
-                    viewmode = fmconfig.viewmode;
-                }
+            else if (fmconfig.uiviewmode | 0) {
+                viewmode = fmconfig.viewmode | 0;
             }
             else if (typeof fmconfig.viewmodes !== 'undefined' && typeof fmconfig.viewmodes[id] !== 'undefined') {
                 viewmode = fmconfig.viewmodes[id];
@@ -361,7 +359,7 @@
                     }
 
                     var usersM = new BusinessAccountUI();
-                    
+
                     M.onSectionUIOpen('user-management');
                     // checking if we loaded sub-users and drew them
                     if (!usersM.initialized) {

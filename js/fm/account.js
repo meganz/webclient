@@ -67,7 +67,7 @@ accountUI.renderAccountPage = function(account) {
     if (u_attr && u_attr.b && !u_attr.b.m && id === '/fm/account/plan') {
         id = '/fm/account';
     }
-    
+
     var sectionClass;
     accountUI.general.init(account);
     accountUI.inputs.text.init();
@@ -945,7 +945,7 @@ accountUI.account = {
             });
 
             $('#account-country .default-dropdown-item', $personalInfoBlock).rebind('click.showSave', function() {
-                
+
                 if ($firstNameField.val() && $firstNameField.val().trim().length > 0
                     && !$personalInfoBlock.find('.errored').length) {
                     $saveBlock.removeClass('closed');
@@ -1216,7 +1216,7 @@ accountUI.account = {
     },
 
     cancelAccount: {
-        
+
         bindEvents: function() {
 
             'use strict';
@@ -1946,7 +1946,7 @@ accountUI.security = {
     init: function() {
 
         "use strict";
-      
+
         // Change Password
         accountChangePassword.init();
 
@@ -1979,7 +1979,7 @@ accountUI.security = {
     recoveryKey: {
 
         bindEvents: function() {
-            
+
             'use strict';
 
             // Button on main Account page to backup their master key
@@ -2170,7 +2170,7 @@ accountUI.security = {
         getHtml: function(el) {
 
             "use strict";
-            
+
             var currentSession = el[5];
             var activeSession = el[7];
             var userAgent = el[2];
@@ -2308,7 +2308,7 @@ accountUI.fileManagement = {
 
                     if (val) {
                         msgDialog('confirmation', l[882], l[17595], false, function(e) {
-                            
+
                             if (e) {
                                 promise.resolve();
                             }
@@ -2327,7 +2327,7 @@ accountUI.fileManagement = {
         bindEvents: function() {
 
             'use strict';
-            
+
             $('#delete-all-versions').rebind('click', function() {
 
                 if (!$(this).hasClass('disabled')) {
@@ -2426,7 +2426,7 @@ accountUI.fileManagement = {
                     $rubschedGreenNoti.removeClass('hidden');
                     $('.rubbish-desc').text(l[18686]).removeClass('hidden');
                     $('.account.rubbish-cleaning .settings-right-block').removeClass('slide-in-out');
-                }                
+                }
             }
             else { // Client side scheduler - old
                 initRubschedSwitch(fmconfig.rubsched);
@@ -2489,29 +2489,22 @@ accountUI.fileManagement = {
 
     userInterface: {
 
-        render: function() {
+        _initOption: function(name) {
+            'use strict';
+            var selector = '.' + name;
 
+            accountUI.inputs.radio.init(selector, $(selector).parent(), fmconfig[name] | 0,
+                function(val) {
+                    mega.config.setn(name, parseInt(val) | 0, l[16168]);
+                }
+            );
+        },
+
+        render: function() {
             'use strict';
 
-            accountUI.inputs.radio.init(
-                '.uisorting',
-                $('.uisorting').parent(),
-                fmconfig.uisorting || 0,
-                function (val) {
-                    showToast('settings', l[16168]);
-                    mega.config.setn('uisorting', parseInt(val));
-                }
-            );
-
-            accountUI.inputs.radio.init(
-                '.uiviewmode',
-                $('.uiviewmode').parent(),
-                fmconfig.uiviewmode || 0,
-                function (val) {
-                    showToast('settings', l[16168]);
-                    mega.config.setn('uiviewmode', parseInt(val));
-                }
-            );
+            this._initOption('uisorting');
+            this._initOption('uiviewmode');
         }
     },
 
@@ -2717,7 +2710,7 @@ accountUI.transfers = {
                         $('.upload-settings .numbers.val' + ui.value).addClass('active');
                     }
                 });
-                
+
                 $('.download-settings .numbers.active').removeClass('active');
                 $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
             }

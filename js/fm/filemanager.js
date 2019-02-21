@@ -488,34 +488,21 @@ FileManager.prototype.initFileManagerUI = function() {
 
     $('.fm-files-view-icon').rebind('click', function() {
         $.hideContextMenu();
-        var viewValue;
-        if ($(this).hasClass('listing-view')) {
-            viewValue = 0;
-            if (fmconfig.uiviewmode) {
-                mega.config.set('viewmode', 0);
-            }
-            else {
-                fmviewmode(M.currentdirid, 0);
-            }
+        var viewValue = $(this).hasClass('listing-view') ? 0 : 1;
+
+        if (fmconfig.uiviewmode | 0) {
+            mega.config.set('viewmode', viewValue);
         }
         else {
-            viewValue = 1;
-            if (fmconfig.uiviewmode) {
-                mega.config.set('viewmode', 1);
-            }
-            else {
-                fmviewmode(M.currentdirid, 1);
-            }
+            fmviewmode(M.currentdirid, viewValue);
         }
+
         if (folderlink && M.currentdirid.substr(0, 6) === 'search') {
             M.viewmode = viewValue;
             M.renderMain();
         }
         else {
-            M.openFolder(M.currentdirid, true)
-            .always(function() {
-                reselect();
-            });
+            M.openFolder(M.currentdirid, true).then(reselect.bind(null, null));
         }
 
         return false;

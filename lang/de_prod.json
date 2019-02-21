@@ -15,7 +15,7 @@
     "34": "Achtung:",
     "47": "Es ist leider ein Fehler aufgetreten.",
     "55": "Nur lesen",
-    "56": "Lesen & hinzuf\u00fcgen",
+    "56": "Lese- und Schreibzugriff",
     "57": "Vollzugriff",
     "58": "Download",
     "59": "Link exportieren",
@@ -421,7 +421,7 @@
     "1117": "Allgemeine Gesch\u00e4ftsbedingungen",
     "1118": "Bitte stimmen Sie den Allgemeinen Gesch\u00e4ftsbedingungen zu, um ein MEGA-Konto zu erstellen.",
     "1119": "Ihr Passwort ist zu einfach. Versuchen Sie ein l\u00e4ngeres Passwort, kombinieren Sie Gro\u00df- und Kleinbuchstaben. F\u00fcgen Sie Sonderzeichen und Zahlen hinzu. Benutzen Sie keine Namen oder gebr\u00e4uchliche W\u00f6rter.",
-    "1120": "Ihr Passwort ist zu einfach. Verl\u00e4ngern Sie Ihr Passwort. Kombinieren Sie Gro\u00df- und Kleinschreibung, f\u00fcgen Sie Sonderzeichen und Zahlen hinzu. Verwenden Sie keine Namen oder allgemein gebr\u00e4uchliche W\u00f6rter.",
+    "1120": "Ihr Passwort ist zu einfach. Versuchen Sie ein l\u00e4ngeres Passwort, kombinieren Sie Gro\u00df- und Kleinbuchstaben. F\u00fcgen Sie Sonderzeichen und Zahlen hinzu. Benutzen Sie keine Namen oder gebr\u00e4uchliche W\u00f6rter.",
     "1121": "Ihr Passwort ist ausreichend, wir empfehlen jedoch, Ihr Passwort noch weiter zu verbessern.",
     "1122": "Dieses Passwort wird den \u00fcblichen Angriffen von au\u00dfen standhalten. Bitte stellen Sie sicher, dass Sie es nicht vergessen.",
     "1123": "Dieses Passwort wird auch gut ausgestatteten Angreifern standhalten. Bitte stellen Sie sicher, dass Sie es nicht vergessen.",
@@ -3095,5 +3095,7 @@
     "20417": "Geben Sie Ihren COMPUTER BILD-Code ein:",
     "20418": "Promo-Code eingeben",
     "20419": "Geben Sie den Voucher-Code ein",
-    "20420": "Ung\u00fcltige Eingabe. Bitte versuchen Sie es noch einmal."
+    "20420": "Ung\u00fcltige Eingabe. Bitte versuchen Sie es noch einmal.",
+    "20425": "F\u00fcr Business-Accounts mit mehr als 100 Benutzern setzen Sie sich bitte mit unserem Kundendienst in Verbindung.",
+    "20428": "Unbegrenzter Speicherplatz \/ Unbegrenztes Transfervolumen"
 }

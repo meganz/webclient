@@ -3498,9 +3498,7 @@ function loadfm_done(mDBload) {
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
         if (mDBload !== -0x800e0fff && !is_mobile) {
             onIdle(function _initialNotify() {
-                // After the first SC request all subsequent requests can generate notifications
-                notify.initialLoadComplete = true;
-
+                
                 // If this was called from the initial fm load via gettree or db load, we should request the
                 // latest notifications. These must be done after the first getSC call.
                 if (!folderlink) {

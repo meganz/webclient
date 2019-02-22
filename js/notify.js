@@ -102,8 +102,17 @@ var notify = {
                     }
                 }
 
+                // After the first SC request all subsequent requests can generate notifications
+                notify.initialLoadComplete = true;
+
                 // Show the notifications
                 notify.countAndShowNewNotifications();
+
+                // If the popup is already open (they opened it while the notifications were being fetched) then render
+                // the notifications. If the popup is not open, then clicking the icon will render the notifications.
+                if (!notify.$popup.hasClass('hidden')) {
+                    notify.renderNotifications();
+                }
             }
         }, 3);  // Channel 3
     },
@@ -498,8 +507,12 @@ var notify = {
         var allNotificationsHtml = '';
 
         // If no notifications, show empty
-        if (numOfNotifications === 0) {
+        if (notify.initialLoadComplete && numOfNotifications === 0) {
+            notify.$popup.removeClass('loading');
             notify.$popup.addClass('empty');
+            return false;
+        }
+        else if (!notify.initialLoadComplete) {
             return false;
         }
 
@@ -536,7 +549,7 @@ var notify = {
 
         // Update the list of notifications
         notify.$popup.find('.notification-scr-list').append(allNotificationsHtml);
-        notify.$popup.removeClass('empty');
+        notify.$popup.removeClass('empty loading');
 
         // Add scrolling for the notifications
         notify.setHeightForNotifications();
@@ -727,7 +740,7 @@ var notify = {
         var date = time2last(notification.timestamp);
         var userHandle = notification.userHandle;
         var customIconNotifications = ['psts', 'pses', 'ph'];   // Payment & Takedown notification types
-        var userEmail = '';
+        var userEmail = l[7381];    // Unknown
         var avatar = '';
 
         // If a contact action packet
@@ -770,7 +783,7 @@ var notify = {
             $notificationHtml.find('.notification-icon').removeClass('hidden');
         }
 
-        // Get the user's name if we have it, otherwise user their email
+        // Get the user's name if we have it, otherwise use their email
         var displayNameOrEmail = notify.getDisplayName(userEmail);
 
         // Update common template variables

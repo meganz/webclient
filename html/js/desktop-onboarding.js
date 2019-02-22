@@ -112,7 +112,7 @@
     }
 
     global.desktopOnboarding = function() {
-        if (is_mobile) {
+        if (is_mobile || sessionStorage.voucherData) {
             return renderPage();
         }
         megasync.megaSyncRequest({a: 'v'}).then(goToCloud).catch(renderPage);

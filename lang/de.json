@@ -3246,7 +3246,8 @@
     "20419": "Geben Sie den Voucher-Code ein",
     "20420": "Ung\u00fcltige Eingabe. Bitte versuchen Sie es noch einmal.",
     "20425": "F\u00fcr Business-Accounts mit mehr als 100 Benutzern setzen Sie sich bitte mit unserem Kundendienst in Verbindung.",
-    "20427": "The account is no longer one of your contacts.",
+    "20427": "Der Benutzer z\u00e4hlt nicht mehr zu Ihren Kontakten",
     "20428": "Unbegrenzter Speicherplatz \/ Unbegrenztes Transfervolumen",
-    "20429": "After you finish upgrading to a Business account, please ensure you cancel your {0} subscription if you have not already."
+    "20429": "Nach erfolgtem Upgrade auf Business vergessen Sie bitte nicht die Stornierung Ihres bestehenden {0}-Abonnements, sollten Sie das nicht bereits erledigt haben.",
+    "20430": "Ihr neuer Status ist nun aktiv"
 }

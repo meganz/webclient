@@ -39,7 +39,7 @@ BusinessRegister.prototype.initPage = function () {
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
     $pageContainer.find('.mega-terms.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
     $pageContainer.find('.ok-to-auto.bus-reg-agreement .bus-reg-checkbox').addClass('checkOn');
-    $pageContainer.find('.bus-reg-agreement .bus-reg-txt a').addClass('terms');
+    $pageContainer.find('.bus-reg-agreement.mega-terms .bus-reg-txt').safeHTML(l['208s']);
     $pageContainer.find('.bus-reg-input').removeClass('error');
     $pageContainer.find('.bus-reg-plan .business-base-plan .left')
         .text(l[19503].replace('[0]', this.minUsers));
@@ -187,6 +187,13 @@ BusinessRegister.prototype.initPage = function () {
 
         $gadget.find('.business-users-plan .left').text(l[19504].replace('{0}', users - mySelf.minUsers));
     };
+
+    // event handler for clicking on terms anchor
+    $pageContainer.find('.bus-reg-agreement.mega-terms .bus-reg-txt span').off('click')
+        .on('click', function termsClickHandler() {
+            bottomPageDialog(false, 'terms', false, true);
+            return false;
+        });
 
     // event handler for check box
     $('.bus-reg-agreement', $pageContainer).off('click.suba').on('click.suba',

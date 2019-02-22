@@ -54,7 +54,7 @@ var redeem = {
                         if (data.promotional) {
                             // A promotional voucher gets auto-redeem into quota
                             redeem.$dialog.addClass('hidden');
-                            redeem.showSuccessfulPayment();
+                            redeem.showSuccessfulPayment(true);
                         }
                         else {
                             // non-promotional voucher, proceed with confirm dialog.
@@ -526,7 +526,7 @@ var redeem = {
     /**
      * Shows a successful payment modal dialog
      */
-    showSuccessfulPayment: function() {
+    showSuccessfulPayment: function(promo) {
         'use strict';
         var vd = redeem.voucherData;
         var signup = parseInt(sessionStorage.signinorup) === 2;
@@ -548,6 +548,8 @@ var redeem = {
         redeem.showBackgroundOverlay();
         redeem.$successOverlay.removeClass('hidden');
         redeem.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
+
+        $('.payment-result-header', redeem.$successOverlay).text((promo ? l[20430] : l[6961]) + '!');
 
         insertEmailToPayResult(redeem.$successOverlay);
 

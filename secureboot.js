@@ -3113,6 +3113,10 @@ else if (!b_u) {
             return;
         }
 
+        if (!(parseInt(localStorage.voucherExpiry) > Date.now())) {
+            delete localStorage.voucher;
+        }
+
         loginresponse = true;
         voucher = localStorage.voucher !== undefined || page.substr(0, 7) === 'voucher';
         dl_res = (page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2;

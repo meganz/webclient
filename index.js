@@ -1468,6 +1468,18 @@ function init_page() {
         dlinfo(dlid, dlkey, false);
         topmenuUI();
     }
+    else if (page.substr(0, 5) === 'reset') {
+        localStorage.clear();
+        sessionStorage.clear();
+        loadSubPage(page.substr(6) || 'fm');
+        return location.reload(true);
+    }
+    else if (page.substr(0, 5) === 'debug') {
+        localStorage.d = 1;
+        localStorage.minLogLevel = 0;
+        loadSubPage(page.substr(6) || 'fm');
+        return location.reload(true);
+    }
 
     /**
      * If voucher code from url e.g. #voucherZUSA63A8WEYTPSXU4985
@@ -1479,6 +1491,7 @@ function init_page() {
 
         // Store in localStorage to be used by the Pro page or when returning from login
         localStorage.setItem('voucher', voucherCode);
+        localStorage.setItem('voucherExpiry', Date.now() + 36e5);
 
         // If not logged in, direct them to login or register first
         if (u_type === false) {

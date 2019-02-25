@@ -403,6 +403,20 @@ function u_setrsa(rsakey) {
                         });
                     }
 
+                    if (u_attr['^!promocode']) {
+                        try {
+                            var data = JSON.parse(u_attr['^!promocode']);
+
+                            if (data[1] !== -1) {
+                                localStorage[data[0]] = data[1];
+                            }
+                            localStorage.voucher = data[0];
+                        }
+                        catch (ex) {
+                            console.error(ex);
+                        }
+                    }
+
                     $promise.resolve(rsakey);
                     ui_keycomplete();
                 }

@@ -60,16 +60,16 @@ var redeem = {
                             // non-promotional voucher, proceed with confirm dialog.
                             redeem.displayDialog();
                         }
-
-                        delete localStorage[data.code];
                     })
                     .catch(function(ex) {
                         console.error('uavr failed...', ex);
                         redeem.showErrorDialog();
                     });
 
-                // No longer needed in localStorage
-                localStorage.removeItem('voucher');
+                // No longer needed.
+                delete localStorage.voucher;
+                delete localStorage[data.code];
+                mega.attr.remove('promocode', -2, true).dump();
             };
 
             promise.then(addVoucher).catch(redeem.goToCloud.bind(redeem));
@@ -531,6 +531,11 @@ var redeem = {
         var vd = redeem.voucherData;
         var signup = parseInt(sessionStorage.signinorup) === 2;
         delete sessionStorage.signinorup;
+
+        // we may fired `ug` previously and it hence may does have an outdated PRO plan, let's patch it...
+        if (typeof u_attr === 'object') {
+            u_attr.p = vd.proNum;
+        }
 
         if (signup) {
             // The user just signed up, redirect to the app onboarding

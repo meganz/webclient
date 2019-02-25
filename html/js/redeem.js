@@ -58,6 +58,7 @@ var redeem = {
                         }
                         else {
                             // non-promotional voucher, proceed with confirm dialog.
+                            data.balance += data.value;
                             redeem.displayDialog();
                         }
                     })
@@ -642,7 +643,7 @@ var redeem = {
 
         return new MegaPromise(function(resolve, reject) {
             var parse = function(v) {
-                var b = v.promotional ? v.value : v.balance;
+                var b = v.promotional ? v.value : (v.balance + v.value);
                 var p = redeem.calculateBestProPlan(redeem.parseProPlans(v.plans), b);
                 v.planId = p[0];
                 v.proNum = p[1];

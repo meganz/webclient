@@ -668,6 +668,11 @@ security.register = {
         }
 
         localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
+
+        if (localStorage.voucher) {
+            var data = [localStorage.voucher, localStorage[localStorage.voucher] || -1];
+            mega.attr.set('promocode', JSON.stringify(data), -2, true).dump();
+        }
     },
 
     /**

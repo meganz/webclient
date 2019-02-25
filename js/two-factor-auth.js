@@ -699,8 +699,10 @@ twofactor.verifySetupDialog = {
 
         'use strict';
 
+        var $backButton = this.$dialog.find('.back-button');
+
         // On button click
-        this.$dialog.find('.back-button').rebind('click', function() {
+        $backButton.removeClass('disabled').rebind('click', function() {
 
             // Don't let them go back if they already activated 2FA, they need to go forward
             if ($(this).hasClass('disabled')) {

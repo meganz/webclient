@@ -3272,5 +3272,7 @@
     "20428": "Unbegrenzter Speicherplatz \/ Unbegrenztes Transfervolumen",
     "20429": "Nach erfolgtem Upgrade auf Business vergessen Sie bitte nicht die Stornierung Ihres bestehenden {0}-Abonnements, sollten Sie das nicht bereits erledigt haben.",
     "20430": "Ihr neuer Status ist nun aktiv",
-    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration."
+    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times"
 }

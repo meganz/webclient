@@ -3272,5 +3272,7 @@
     "20428": "Onbeperkte opslag \/ Onbeperkte overdrachten",
     "20429": "Nadat u klaar bent met het upgraden naar een zakelijk account, moet u ervoor zorgen dat u uw abonnement op {0} annuleert als u dat nog niet hebt gedaan.",
     "20430": "Upgrade Succesvol",
-    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration."
+    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times"
 }

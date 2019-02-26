@@ -3272,5 +3272,7 @@
     "20428": "Korl\u00e1tlan T\u00e1rhely \/ Korl\u00e1tlan Adatforgalom",
     "20429": "Miut\u00e1n v\u00e9gzett az \u00dczleti fi\u00f3kra v\u00e1lt\u00e1ssal, ha m\u00e9g nem tette meg, ellen\u0151rizze, hogy a {0} el\u0151fizet\u00e9st lemondta.",
     "20430": "Sikeres Csomagv\u00e1lt\u00e1s",
-    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration."
+    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times"
 }

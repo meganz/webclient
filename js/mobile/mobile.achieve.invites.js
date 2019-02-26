@@ -7,6 +7,10 @@ mobile.achieve.invites = {
      * jQuery selector for this page
      */
     $page: null,
+    successful: [],
+    alreadySent: [],
+    alreadyReceived: [],
+    existOrOwn: [],
 
     /**
      * Initialise the page
@@ -74,28 +78,76 @@ mobile.achieve.invites = {
         // Cache selectors
         var $emailInput = mobile.achieve.invites.$page.find('.email-input');
         var $emailWarning = mobile.achieve.invites.$page.find('.email-warning-block');
+        var $emailWarningInvalid = mobile.achieve.invites.$page.find('.email-warning-block.invalid');
+        var $emailWarningOwnEmail = mobile.achieve.invites.$page.find('.email-warning-block.own-email');
         var $successMessageBlock = mobile.achieve.invites.$page.find('.success-message-block');
         var $inviteButton = mobile.achieve.invites.$page.find('.invite-button');
 
         // On keyup or clicking out of the email text field
         $emailInput.off('keyup blur').on('keyup blur', function() {
 
-            // Trim whitespace from the ends of the email entered
-            var email = $emailInput.val();
-            var trimmedEmail = $.trim(email);
+            var ownEmail = false;
+            var invalidEmails = [];
+            var emailInputValue = $.trim($emailInput.val());
 
-            // If empty or invalid email, grey out the button so it appears unclickable
-            if (trimmedEmail === '' || !isValidEmail(trimmedEmail)) {
+            $emailWarning.addClass('hidden');
+            $successMessageBlock.addClass('hidden');
+
+            if (emailInputValue === '') {
+                $inviteButton.removeClass('active');
+                return false;
+            }
+
+            // Ignore ',' if it is last character.
+            if (emailInputValue.slice(-1) === ',') {
+                emailInputValue = emailInputValue.slice(0, -1);
+            }
+
+            var emails = emailInputValue.split(',');
+
+            $.each(emails, function(index, email) {
+
+                // Trim whitespace from the ends of the email entered
+                var trimmedEmail = $.trim(email);
+
+                if (trimmedEmail === '' || !isValidEmail(trimmedEmail)) {
+                    invalidEmails.push(email);
+                }
+
+                if (u_attr.email.toLowerCase() === trimmedEmail.toLowerCase()) {
+                    ownEmail = true;
+                }
+            });
+
+            $inviteButton.addClass('active');
+
+            if (invalidEmails.length > 0) {
+                var $emailWarningInvalidColon = $emailWarningInvalid.find('.multi');
+                var $emailWarningInvalidContents = $emailWarningInvalid.find('.warning-contents');
+
+                $emailWarningInvalid.removeClass('hidden');
+                $inviteButton.removeClass('active');
+
+                if (emails.length > 1) {
+                    $emailWarningInvalidColon.removeClass('hidden');
+                    $emailWarningInvalidContents.safeHTML(invalidEmails.join(',<br>'));
+                }
+                else if (emails.length === 1) {
+                    $emailWarningInvalidColon.addClass('hidden');
+                    $emailWarningInvalidContents.text('');
+                }
+            }
+            else {
+                $emailWarningInvalid.addClass('hidden');
+            }
+
+            if (ownEmail) {
+                $emailWarningOwnEmail.removeClass('hidden');
                 $inviteButton.removeClass('active');
             }
             else {
-                // Otherwise how the button as red/clickable
-                $inviteButton.addClass('active');
+                $emailWarningOwnEmail.addClass('hidden');
             }
-
-            // If they've sent an email successfully and start typing again, hide the previous error/success messages
-            $emailWarning.addClass('hidden');
-            $successMessageBlock.addClass('hidden');
         });
     },
 
@@ -107,61 +159,116 @@ mobile.achieve.invites = {
         'use strict';
 
         // Cache selectors
+        var self = this;
         var $emailInput = mobile.achieve.invites.$page.find('.email-input');
         var $emailWarning = mobile.achieve.invites.$page.find('.email-warning-block');
+        var $emailWarningSent = mobile.achieve.invites.$page.find('.email-warning-block.already-sent');
+        var $emailWarningReceived = mobile.achieve.invites.$page.find('.email-warning-block.already-received');
+        var $emailWarningExist = mobile.achieve.invites.$page.find('.email-warning-block.already-exist');
         var $successMessageBlock = mobile.achieve.invites.$page.find('.success-message-block');
         var $inviteButton = mobile.achieve.invites.$page.find('.invite-button');
 
         // On clicking/tapping the Invite button
         $inviteButton.off('tap').on('tap', function() {
 
-            // Trim whitespace from the ends of the email entered
-            var email = $emailInput.val();
-            var trimmedEmail = $.trim(email);
-
-            // If the email is invalid, show the email warning, grey out the button and don't send to the API
-            if (trimmedEmail === '' || !isValidEmail(trimmedEmail)) {
-                $emailWarning.removeClass('hidden');
-                $inviteButton.removeClass('active');
+            // Ignore taping on loading.
+            if ($(this).hasClass('loading') || !$(this).hasClass('active')) {
                 return false;
             }
 
-            // Hide the button text and show a loading spinner instead
-            $inviteButton.addClass('loading');
+            // Trim whitespace from the ends of the email entered
+            var emails = $emailInput.val().split(',');
+            var emailPromises = [];
 
-            // Make an invite API request
-            api_req({ a: 'upc', e: u_attr.email, u: trimmedEmail, msg: l[5878], aa: 'a', i: requesti }, {
-                callback: function(response) {
+            $.each(emails, function(index, email) {
 
-                    // Hide the loading spinner
-                    $inviteButton.removeClass('loading');
+                var trimmedEmail = $.trim(email);
 
-                    // Check for error codes
-                    if (response === -12) {
-
-                        // Invite already sent to that user
-                        msgDialog('info', '', l[17545]);
-                    }
-                    else if (response === -10) {
-
-                        // User already sent you an invitation
-                        msgDialog('info', '', l[17546]);
-                    }
-                    else if (response === -2) {
-
-                        // User already exists or owner
-                        msgDialog('info', '', l[1783]);
-                    }
-                    else if (typeof response === 'object' && response.p) {
-
-                        // If successful, show success, hide errors and clear the email
-                        $successMessageBlock.removeClass('hidden');
-                        $emailWarning.addClass('hidden');
-                        $emailInput.val('');
-                    }
+                // If the email is invalid, show the email warning, grey out the button and don't send to the API
+                if (trimmedEmail === '' || !isValidEmail(trimmedEmail)) {
+                    $emailWarning.removeClass('hidden');
+                    $inviteButton.removeClass('active');
+                    return false;
                 }
+
+                // Hide the button text and show a loading spinner instead
+                $inviteButton.addClass('loading');
+
+                // Send email request
+                emailPromises.push(self.requestSendEmail(trimmedEmail));
+            });
+
+            MegaPromise.allDone(emailPromises).done(function() {
+
+                // Hide the loading spinner
+                $inviteButton.removeClass('loading');
+
+                // Invite already sent to that user
+                if (self.alreadySent.length > 0) {
+                    $emailWarningSent.removeClass('hidden');
+                    $emailWarningSent.find('.warning-contents').safeHTML(self.alreadySent.join(',<br>'));
+                }
+
+                // User already sent you an invitation
+                if (self.alreadyReceived.length > 0) {
+                    $emailWarningReceived.removeClass('hidden');
+                    $emailWarningReceived.find('.warning-contents').safeHTML(self.alreadyReceived.join(',<br>'));
+                }
+
+                // User already exists or owner
+                if (self.existOrOwn.length > 0) {
+                    $emailWarningExist.removeClass('hidden');
+                    $emailWarningExist.find('.warning-contents').safeHTML(self.existOrOwn.join(',<br>'));
+                }
+
+                // If successful, show success, and clear the email
+                if (self.successful.length > 0) {
+                    $successMessageBlock.removeClass('hidden');
+                    $emailInput.val('');
+                }
+
+                self.successful = [];
+                self.alreadySent = [];
+                self.alreadyReceived = [];
+                self.existOrOwn = [];
             });
         });
+    },
+
+    /**
+     * Request api to sending invitation email.
+     * @param {String} trimmedEmail Trimmed email to send invitation email.
+     * @return {MegaPromise}
+     */
+    requestSendEmail: function(trimmedEmail) {
+
+        'use strict';
+
+        var self = this;
+        var promise = new MegaPromise();
+
+        // Make an invite API request
+        api_req({ a: 'upc', e: u_attr.email, u: trimmedEmail, msg: l[5878], aa: 'a', i: requesti }, {
+            callback: function(response) {
+
+                // Check for error codes
+                if (response === -12) {
+                    self.alreadySent.push(trimmedEmail);
+                }
+                else if (response === -10) {
+                    self.alreadyReceived.push(trimmedEmail);
+                }
+                else if (response === -2) {
+                    self.existOrOwn.push(trimmedEmail);
+                }
+                else if (response === 0 || typeof response === 'object' && response.p) {
+                    self.successful.push(trimmedEmail);
+                }
+                promise.resolve();
+            }
+        });
+
+        return promise;
     },
 
     /**

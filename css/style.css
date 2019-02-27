@@ -1789,6 +1789,41 @@ a.blog-button:hover {
 .no-new-notifications .fm-dialog-button.notifications-button.clear-button {
     display: none;
 }
+.notification-popup-loading {
+    display: none;
+}
+.loading .notification-popup-loading {
+    display: block;
+    height: 298px;
+    text-align: center;
+}
+.loading .notification-header, .loading .notification-popup-empty, .loading .fm-notifications-bottom {
+    display: none;
+}
+.notification-loading-icon {
+    background-image: url(../images/mega/dialog-sprite_v3.png);
+    background-position: center -3245px;
+    background-repeat: no-repeat;
+    height: 225px;
+}
+.notification-popup-loading-txt {
+    color: #999;
+    font-size: 19px;
+    line-height: 34px;
+    margin-top: 12px;
+    position: relative;
+    display: inline-block;
+}
+.notification-loading-spinner {
+    background-image: url(../images/mega/ajax-loader-gray.gif);
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    height: 32px;
+    right: -43px;
+    position: absolute;
+    top: 1px;
+    width: 32px;
+}
 .notification-popup-empty {
     display: none;
 }

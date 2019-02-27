@@ -2089,7 +2089,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         if (invoiceDetail.u.taxnum) {
             $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')
-                .text(invoiceDetail.u.taxnum[0] + ': ' + Number(invoiceDetail.taxrate).toFixed(2) + '%');
+                .text((invoiceDetail.taxname || invoiceDetail.u.taxnum[0])
+                    + ': ' + Number(invoiceDetail.taxrate).toFixed(2) + '%');
         }
         $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')
             .text('\u20ac' + Number(taxSum).toFixed(2));

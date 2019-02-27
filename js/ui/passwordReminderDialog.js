@@ -699,7 +699,7 @@
         // account is older then > SHOW_AFTER_ACCOUNT_AGE and lastLogin > SHOW_AFTER_LASTLOGIN
         if (
             u_type === 3 &&
-            !self.passwordReminderAttribute.masterKeyExported &&
+            /*!self.passwordReminderAttribute.masterKeyExported &&*/
             !self.passwordReminderAttribute.dontShowAgain/* &&
             unixtime() - u_attr.since > SHOW_AFTER_ACCOUNT_AGE &&
             unixtime() - self.passwordReminderAttribute.lastSuccess > SHOW_AFTER_LASTSUCCESS &&

@@ -1901,7 +1901,6 @@
     "17604": "Download via MEGAsync beendet",
     "17605": "Download via MEGAsync fehlgeschlagen",
     "17606": "MEGAsync antwortet nicht",
-    "17607": "%1 clearing scheduler",
     "17617": "Neuer Ordner",
     "17618": "WEITERE DATEI(EN) HOCHLADEN",
     "17619": "Der MEGAdrop-URL wurde in die Zwischenablage kopiert.",
@@ -3272,5 +3271,8 @@
     "20428": "Unbegrenzter Speicherplatz \/ Unbegrenztes Transfervolumen",
     "20429": "Nach erfolgtem Upgrade auf Business vergessen Sie bitte nicht die Stornierung Ihres bestehenden {0}-Abonnements, sollten Sie das nicht bereits erledigt haben.",
     "20430": "Ihr neuer Status ist nun aktiv",
-    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration."
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
+    "20435": "%1 shared the following folders with you:"
 }

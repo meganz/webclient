@@ -1901,7 +1901,6 @@
     "17604": "Se \u00eencheie desc\u0103rcarea \u00een MEGAsync",
     "17605": "Desc\u0103rcare e\u0219uat\u0103 \u00een MEGAsync",
     "17606": "Niciun r\u0103spuns de la MEGAsync",
-    "17607": "Planificatorul de golire %1",
     "17617": "Creeaz\u0103 un folder",
     "17618": "\u00ceNCARC\u0102 UN ALT FI\u0218IER",
     "17619": "URL-ul MEGAdrop a fost copiat cu succes \u00een clipboard.",
@@ -3272,5 +3271,8 @@
     "20428": "Unlimited Storage \/ Unlimited Transfers",
     "20429": "After you finish upgrading to a Business account, please ensure you cancel your {0} subscription if you have not already.",
     "20430": "Upgrade Successful",
-    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration."
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
+    "20435": "%1 shared the following folders with you:"
 }

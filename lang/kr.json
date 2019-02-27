@@ -1901,7 +1901,6 @@
     "17604": "MEGAsync\uc5d0\uc11c \ub2e4\uc6b4\ub85c\ub4dc \uc644\ub8cc\uc911",
     "17605": "MEGAsync\uc5d0\uc11c \ub2e4\uc6b4\ub85c\ub4dc \uc2e4\ud328\ud568",
     "17606": "MEGAsync\uc5d0\uc11c \uc751\ub2f5 \uc5c6\uc74c",
-    "17607": "%1 \uc815\ub9ac \uc2a4\ucf00\uc904\ub7ec",
     "17617": "\ud3f4\ub354 \uc0dd\uc131",
     "17618": "\ub2e4\ub978 \ud30c\uc77c \uc5c5\ub85c\ub4dc",
     "17619": "MEGAdrop URL\uc774 \uc131\uacf5\uc801\uc73c\ub85c \ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub418\uc5c8\uc2b5\ub2c8\ub2e4.",
@@ -3272,5 +3271,8 @@
     "20428": "\ubb34\uc81c\ud55c \uc800\uc7a5\uc18c \/ \ubb34\uc81c\ud55c \uc804\uc1a1",
     "20429": "\ube44\uc988\ub2c8\uc2a4 \uacc4\uc815\uc73c\ub85c \uc5c5\uadf8\ub808\uc774\ub4dc \ud55c \ud6c4, \ub9cc\uc57d \ud558\uc9c0 \uc54a\uc558\ub2e4\uba74 \ub2f9\uc2e0\uc758 {0} \uad6c\ub3c5\uc744 \ucde8\uc18c\ud558\uc138\uc694.",
     "20430": "\uc5c5\uadf8\ub808\uc774\ub4dc \uc131\uacf5",
-    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration."
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
+    "20435": "%1 shared the following folders with you:"
 }

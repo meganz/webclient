@@ -1901,7 +1901,6 @@
     "17604": "Completando la descarga en MEGAsync",
     "17605": "La descarga ha fallado en MEGAsync",
     "17606": "MEGAsync no responde",
-    "17607": "Autolimpieza de %1",
     "17617": "Crear carpeta",
     "17618": "SUBIR OTRO ARCHIVO",
     "17619": "El enlace de MEGAdrop se ha copiado con \u00e9xito al portapapeles.",
@@ -3272,5 +3271,8 @@
     "20428": "Almacenamiento ilimitado\/Transferencias ilimitadas",
     "20429": "Despu\u00e9s de pasarte a Business, aseg\u00farate de cancelar tu suscripci\u00f3n {0} si a\u00fan no lo has hecho.",
     "20430": "Actualizado correctamente",
-    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration."
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
+    "20435": "%1 shared the following folders with you:"
 }

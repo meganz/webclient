@@ -1901,7 +1901,6 @@
     "17604": "\u6587\u4ef6\u5728 MEGAsync \u4e0b\u8f7d\u5b8c\u6210\u4e2d...",
     "17605": "\u6587\u4ef6\u5728 MEGAsync \u4e2d\u4e0b\u8f7d\u5931\u8d25",
     "17606": "MEGAsyc \u4e2d\u6ca1\u6709\u54cd\u5e94",
-    "17607": "%1 \u5b9a\u65f6\u6e05\u7406",
     "17617": "\u521b\u5efa\u6587\u4ef6\u5939",
     "17618": "\u4e0a\u4f20\u53e6\u4e00\u4e2a\u6587\u4ef6",
     "17619": "MEGAdrop\u7f51\u5740\u5df2\u6210\u529f\u590d\u5236\u5230\u526a\u8d34\u677f\u3002",
@@ -3272,5 +3271,8 @@
     "20428": "Unlimited Storage \/ Unlimited Transfers",
     "20429": "After you finish upgrading to a Business account, please ensure you cancel your {0} subscription if you have not already.",
     "20430": "Upgrade Successful",
-    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration."
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
+    "20435": "%1 shared the following folders with you:"
 }

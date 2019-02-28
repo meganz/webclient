@@ -10743,7 +10743,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 
 
 /* Specific styles for showing grid view on devices in landscape and portrait*/
-@media only screen and (orientation:landscape) and (min-width: 813px) and (max-width: 1025px), only screen and (orientation:portrait) and (min-height: 740px) and (max-height: 800px) {
+@media only screen and (orientation:landscape) and (min-width: 813px) and (max-width: 1025px), only screen and (orientation:portrait) and (min-height: 781px) and (max-height: 800px) {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: -webkit-calc((100% - 60px) / 5);
         width: -moz-calc((100% - 60px) / 5);

@@ -1901,7 +1901,6 @@
     "17604": "Finalizando o download no MEGAsync",
     "17605": "O download falhou no MEGAsync",
     "17606": "O MEGAsync n\u00e3o est\u00e1 respondendo",
-    "17607": "%1 - Planejador de limpeza",
     "17617": "Criar pasta",
     "17618": "FAZER UPLOAD DE OUTRO ARQUIVO",
     "17619": "O link da pasta MEGAdrop foi copiado para a \u00e1rea de transfer\u00eancia.",
@@ -2767,7 +2766,7 @@
     "19698": "Os recursos do MEGAchat atualmente n\u00e3o est\u00e3o dispon\u00edveis nos nossos aplicativos para Windows Phone 8 e do Windows 10.",
     "19700": "Fa\u00e7a o download dos aplicativos m\u00f3veis do MEGA para a sua plataforma",
     "19701": "Quer trabalhar em equipe?",
-    "19702": "Experimente MEGA Business",
+    "19702": "MEGA Business",
     "19703": "Ferramentas de gerenciamento de usu\u00e1rios",
     "19704": "Criptografia de ponta a ponta para toda a sua empresa",
     "19705": "Comunica\u00e7\u00e3o com a sua equipe usando texto ou chamadas",
@@ -2960,7 +2959,7 @@
     "19991": "Link do c\u00f3digo QR",
     "19992": "%1 de cota base",
     "19993": "%1 de cota por conquistas",
-    "19994": "\u00daltimo acesso %s",
+    "19994": "\u00daltimo acesso: %s",
     "19995": "Chamada de grupo recebida...",
     "20001": "Mostrar",
     "20002": "Para ativar a conta e fazer a configura\u00e7\u00e3o inicial \u00e9 necess\u00e1rio usar um navegador de um computador. Por favor, primeiro clique no link de convite usando um navegador de um computador, e depois voc\u00ea poder\u00e1 usar a sua conta em um dispositivo m\u00f3vel.",
@@ -3272,7 +3271,8 @@
     "20428": "Armazenamento ilimitado \/ Transfer\u00eancias ilimitadas",
     "20429": "Depois de finalizar o upgrade para uma conta Business, certifique-se de cancelar sua assinatura na {0}, se ainda n\u00e3o tiver feito isso.",
     "20430": "Upgrade realizado",
-    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
     "20432": "Never enter your password on a device you do not fully trust.",
-    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times"
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
+    "20435": "%1 shared the following folders with you:"
 }

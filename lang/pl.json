@@ -1901,7 +1901,6 @@
     "17604": "Pobieranie zako\u0144czone w MEGAsync",
     "17605": "Pobierz nieprzetworzone w MEGAsync",
     "17606": "Brak odpowiedzi od MEGAsyc",
-    "17607": "%1 harmonogramu",
     "17617": "Utw\u00f3rz katalog",
     "17618": "WGRAJ INNY PLIK",
     "17619": "Link MEGAdrop zosta\u0142 skopiowany do schowka.",
@@ -3272,7 +3271,8 @@
     "20428": "Nieograniczone przechowywanie \/ nieograniczone transfery",
     "20429": "Po przej\u015bciu na konto firmowe upewnij si\u0119, \u017ce anulujesz subskrypcj\u0119 {0}, je\u015bli jeszcze tego nie zrobi\u0142e\u015b.",
     "20430": "Zmiana planu powiod\u0142a si\u0119",
-    "20431": "Sorry, no payment method is supported in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
     "20432": "Never enter your password on a device you do not fully trust.",
-    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times"
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
+    "20435": "%1 shared the following folders with you:"
 }

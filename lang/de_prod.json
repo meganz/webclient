@@ -3097,6 +3097,11 @@
     "20419": "Geben Sie den Voucher-Code ein",
     "20420": "Ung\u00fcltige Eingabe. Bitte versuchen Sie es noch einmal.",
     "20425": "F\u00fcr Business-Accounts mit mehr als 100 Benutzern setzen Sie sich bitte mit unserem Kundendienst in Verbindung.",
+    "20427": "Der Benutzer z\u00e4hlt nicht mehr zu Ihren Kontakten",
     "20428": "Unbegrenzter Speicherplatz \/ Unbegrenztes Transfervolumen",
-    "20430": "Ihr neuer Status ist nun aktiv"
+    "20429": "Nach erfolgtem Upgrade auf Business vergessen Sie bitte nicht die Stornierung Ihres bestehenden {0}-Abonnements, sollten Sie das nicht bereits erledigt haben.",
+    "20430": "Ihr neuer Status ist nun aktiv",
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times"
 }

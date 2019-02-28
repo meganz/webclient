@@ -247,7 +247,7 @@
     "701": "Lev\u00e9teli elj\u00e1r\u00e1s k\u00fcld\u00e9se e-mailben",
     "703": "A bejelentkez\u00e9si link nem \u00e9rv\u00e9nyes. K\u00e9rj\u00fck, ellen\u0151rizze, hogy van-e lehets\u00e9ges sort\u00f6r\u00e9s az aktiv\u00e1ci\u00f3s e-mailben.",
     "705": "A meger\u0151s\u00edt\u00e9s nem t\u00f6rt\u00e9nt meg. K\u00e9rj\u00fck, jelentkezz be \u00fajra. Hiba k\u00f3d:",
-    "706": "Change Password",
+    "706": "Change password",
     "707": "Friss\u00edt\u00e9s",
     "714": "Ez az utalv\u00e1ny m\u00e1r be lett v\u00e1ltva.",
     "717": "New password",
@@ -3097,6 +3097,11 @@
     "20419": "Utalv\u00e1ny bev\u00e1lt\u00e1s\u00e1hoz \u00edrja be al\u00e1bb a k\u00f3dot",
     "20420": "Helytelen k\u00f3d. Pr\u00f3b\u00e1lja \u00fajra.",
     "20425": "T\u00f6bb, mint 100 felhaszn\u00e1l\u00f3s \u00fczleti fi\u00f3k l\u00e9trehoz\u00e1s\u00e1hoz l\u00e9pjen kapcsolatba a term\u00e9kt\u00e1mogat\u00e1ssal.",
+    "20427": "A fi\u00f3k m\u00e1r nem tartozik a kapcsolatai k\u00f6z\u00e9.",
     "20428": "Korl\u00e1tlan T\u00e1rhely \/ Korl\u00e1tlan Adatforgalom",
-    "20430": "Sikeres Csomagv\u00e1lt\u00e1s"
+    "20429": "Miut\u00e1n v\u00e9gzett az \u00dczleti fi\u00f3kra v\u00e1lt\u00e1ssal, ha m\u00e9g nem tette meg, ellen\u0151rizze, hogy a {0} el\u0151fizet\u00e9st lemondta.",
+    "20430": "Sikeres Csomagv\u00e1lt\u00e1s",
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times"
 }

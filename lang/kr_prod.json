@@ -3097,6 +3097,11 @@
     "20419": "\ubc14\uc6b0\ucc98\ub97c \uad50\ud658\ud558\ub824\uba74 \uc544\ub798\uc5d0 \ucf54\ub4dc\ub97c \uc785\ub825\ud558\uc138\uc694",
     "20420": "\uc798\ubabb\ub41c \ucf54\ub4dc. \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uc138\uc694.",
     "20425": "100\uba85 \uc774\uc0c1 \uc774\uc6a9\uc790\uac00 \uc788\ub294 \ube44\uc988\ub2c8\uc2a4 \uacc4\uc815\uc744 \uc0dd\uc131\ud558\ub824\uba74 \uc9c0\uc6d0\uc5d0 \uc5f0\ub77d\ud558\uc138\uc694.",
+    "20427": "\uc774 \uacc4\uc815\uc740 \ub354 \uc774\uc0c1 \ub2f9\uc2e0\uc758 \uc5f0\ub77d\ucc98\uac00 \uc544\ub2d9\ub2c8\ub2e4.",
     "20428": "\ubb34\uc81c\ud55c \uc800\uc7a5\uc18c \/ \ubb34\uc81c\ud55c \uc804\uc1a1",
-    "20430": "\uc5c5\uadf8\ub808\uc774\ub4dc \uc131\uacf5"
+    "20429": "\ube44\uc988\ub2c8\uc2a4 \uacc4\uc815\uc73c\ub85c \uc5c5\uadf8\ub808\uc774\ub4dc \ud55c \ud6c4, \ub9cc\uc57d \ud558\uc9c0 \uc54a\uc558\ub2e4\uba74 \ub2f9\uc2e0\uc758 {0} \uad6c\ub3c5\uc744 \ucde8\uc18c\ud558\uc138\uc694.",
+    "20430": "\uc5c5\uadf8\ub808\uc774\ub4dc \uc131\uacf5",
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times"
 }

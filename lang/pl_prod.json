@@ -3097,6 +3097,11 @@
     "20419": "Wpisz poni\u017cszy kod, aby zrealizowa\u0107 sw\u00f3j kupon",
     "20420": "Z\u0142y kod. Prosz\u0119 spr\u00f3buj ponownie.",
     "20425": "Skontaktuj si\u0119 z pomoc\u0105 techniczn\u0105, aby utworzy\u0107 konto biznesowe z ponad 100 u\u017cytkownikami.",
+    "20427": "Konto nie jest ju\u017c jednym z twoich kontakt\u00f3w.",
     "20428": "Nieograniczone przechowywanie \/ nieograniczone transfery",
-    "20430": "Zmiana planu powiod\u0142a si\u0119"
+    "20429": "Po przej\u015bciu na konto firmowe upewnij si\u0119, \u017ce anulujesz subskrypcj\u0119 {0}, je\u015bli jeszcze tego nie zrobi\u0142e\u015b.",
+    "20430": "Zmiana planu powiod\u0142a si\u0119",
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times"
 }

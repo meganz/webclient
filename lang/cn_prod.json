@@ -3097,6 +3097,11 @@
     "20419": "Enter the code below to redeem your voucher",
     "20420": "\u9a8c\u8bc1\u7801\u65e0\u6548\u3002\u8bf7\u518d\u8bd5\u4e00\u6b21\u3002",
     "20425": "Please contact support to create a business account with more than 100 users.",
+    "20427": "The account is no longer one of your contacts.",
     "20428": "Unlimited Storage \/ Unlimited Transfers",
-    "20430": "Upgrade Successful"
+    "20429": "After you finish upgrading to a Business account, please ensure you cancel your {0} subscription if you have not already.",
+    "20430": "Upgrade Successful",
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times"
 }

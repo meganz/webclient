@@ -3097,6 +3097,11 @@
     "20419": "Introduce el c\u00f3digo para canjear tu cup\u00f3n",
     "20420": "C\u00f3digo invalido. Int\u00e9ntalo de nuevo.",
     "20425": "Ponte en contacto con soporte para crear una cuenta Business de m\u00e1s de 100 usuarios.",
+    "20427": "Esta cuenta ya no es uno de tus contactos.",
     "20428": "Almacenamiento ilimitado\/Transferencias ilimitadas",
-    "20430": "Actualizado correctamente"
+    "20429": "Despu\u00e9s de pasarte a Business, aseg\u00farate de cancelar tu suscripci\u00f3n {0} si a\u00fan no lo has hecho.",
+    "20430": "Actualizado correctamente",
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20432": "Never enter your password on a device you do not fully trust.",
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times"
 }

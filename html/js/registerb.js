@@ -6,6 +6,7 @@ function BusinessRegister() {
     this.minUsers = 3; // minimum number of users
     this.maxUsers = 100; // maximum number of users
     this.isLoggedIn = false;
+    this.hasAppleOrGooglePay = false;
     if (mega) {
         if (!mega.cachedBusinessGateways) {
             mega.cachedBusinessGateways = Object.create(null);
@@ -92,6 +93,12 @@ BusinessRegister.prototype.initPage = function () {
                             $telInput.val(from8(base64urldecode(res)));
                         }
                     });
+            }
+        }
+        else if (u_attr && u_attr.p && u_attr.p !== 100) {
+            mySelf.hasAppleOrGooglePay = true;
+            if (!M.account) {
+                M.accountData();
             }
         }
         $emailInput.val(u_attr['email']);
@@ -464,6 +471,8 @@ BusinessRegister.prototype.processPayment = function (payDetails, businessPlan) 
     "use strict";
     loadingDialog.show();
 
+    var mySelf = this;
+
     var finalizePayment = function (st, res) {
         if (st === 0) {
             msgDialog('warninga', '', l[19511], '', function () {
@@ -472,8 +481,47 @@ BusinessRegister.prototype.processPayment = function (payDetails, businessPlan) 
             });
             return;
         }
-        var url = res.EUR['url'];
-        window.location = url + '?lang=' + lang;
+
+        var redirectToPaymentGateway = function() {
+            var url = res.EUR['url'];
+            window.location = url + '?lang=' + lang;
+        };
+
+        var showWarnDialog = false;
+        var payMethod = '';
+
+        if (mySelf.hasAppleOrGooglePay) {
+
+            var purchases = M.account.purchases;
+            for (var p in purchases) {
+                if (purchases[p][4] === 2) {
+                    showWarnDialog = true;
+                    payMethod = 'Apple';
+                    break;
+                }
+                else if (purchases[p][4] === 3) {
+                    showWarnDialog = true;
+                    payMethod = 'Google';
+                    break;
+                }
+                else if (purchases[p][4] === 13) {
+                    showWarnDialog = true;
+                    payMethod = 'Windows Phone';
+                    break;
+                }
+            }
+
+            
+        }
+
+        if (showWarnDialog) {
+            msgDialog('warninga', l[6859], l[20429].replace('{0}', payMethod), '', redirectToPaymentGateway);
+        }
+        else {
+            redirectToPaymentGateway();
+        }
+
+        
     };
 
     // at this point i know BusinessAccount class is required before

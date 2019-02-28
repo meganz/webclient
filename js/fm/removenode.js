@@ -361,7 +361,12 @@ function fmremovesync(selectedNodes) {
     else {
         var moveToRubbish = function() {
             loadingDialog.pshow();
-            M.moveToRubbish(selectedNodes).always(loadingDialog.phide.bind(loadingDialog));
+            M.moveToRubbish(selectedNodes).always(loadingDialog.phide.bind(loadingDialog)).done(function () {
+                // Re-render the search result page after files being removed
+                if (M.currentdirid.split("/")[0] === "search") {
+                    M.openFolder(M.currentdirid, true);
+                }
+            });
         };
 
         if (localStorage.skipDelWarning) {

@@ -166,6 +166,16 @@ pro.propay = {
                     return false;
                 }
 
+                // clean options we shouldn't show for individual signups
+                var tempGatewayOptions = [];
+                for (var ix = 0; ix < gatewayOptions.length; ix++) {
+                    if (typeof gatewayOptions[ix].supportsIndividualPlans === 'undefined'
+                        || gatewayOptions[ix].supportsIndividualPlans) {
+                        tempGatewayOptions.push(gatewayOptions[ix]);
+                    }
+                }
+                gatewayOptions = tempGatewayOptions;
+
                 // Make a clone of the array so it can be modified
                 pro.propay.allGateways = JSON.parse(JSON.stringify(gatewayOptions));
 

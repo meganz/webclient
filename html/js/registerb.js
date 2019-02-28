@@ -117,8 +117,9 @@ BusinessRegister.prototype.initPage = function () {
 
     var fillPaymentGateways = function (status, list) {
 
-        var failureExit = function () {
-            msgDialog('warninga', '', l[19342], '', function () {
+        var failureExit = function(msg) {
+
+            msgDialog('warninga', '', msg || l[19342], '', function() {
                 loadSubPage('start');
             });
         };
@@ -137,7 +138,7 @@ BusinessRegister.prototype.initPage = function () {
         var iconHtml = '<div class="provider-icon [x]"></div>';
 
         if (!list.length) {
-            return failureExit();
+            return failureExit(l[20431]);
         }
 
         var paymentGatewayToAdd = '';

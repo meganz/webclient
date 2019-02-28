@@ -509,6 +509,7 @@ function sc_node(n) {
 
 // inter-actionpacket state, gets reset in getsc()
 var scsharesuiupd;
+var scContactsSharesUIUpdate;
 var loadavatars = [];
 var scinshare = Object.create(null);
 
@@ -775,6 +776,7 @@ scparser.$add('s', {
             onIdle(sharedUInode.bind(null, a.n));
         }
         scsharesuiupd = true;
+        scContactsSharesUIUpdate = a.o ? a.o : false;
     },
     l: function(a) {
         // share modification
@@ -1434,6 +1436,14 @@ scparser.$finalize = function() {
                 });
 
                 scsharesuiupd = false;
+            }
+
+            if (scContactsSharesUIUpdate === M.currentdirid) {
+                onIdle(function() {
+                    M.openFolder(M.currentdirid, true);
+                });
+
+                scContactsSharesUIUpdate = false;
             }
 
             sccount = 0;

@@ -9782,7 +9782,6 @@ React.makeElement = React['createElement'];
 	            return;
 	        }
 	        if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
-
 	            if (e.isPropagationStopped() || e.isDefaultPrevented()) {
 	                return;
 	            }
@@ -9853,91 +9852,41 @@ React.makeElement = React['createElement'];
 	                return;
 	            }
 	        } else {
-	            if (self.prefillMode && (key === 8 || key === 32 || key === 13)) {
+	            if (self.prefillMode && (key === 8 || key === 32 || key === 186 || key === 13)) {
 
 	                self.prefillMode = false;
 	            }
+
+	            var currentContent = element.value;
+	            var currentCursorPos = self.getCursorPosition(element) - 1;
+	            if (self.prefillMode && (currentCursorPos > self.state.emojiEndPos || currentCursorPos < self.state.emojiStartPos)) {
+
+	                self.prefillMode = false;
+
+	                self.setState({
+	                    'emojiSearchQuery': false,
+	                    'emojiStartPos': false,
+	                    'emojiEndPos': false
+	                });
+	                return;
+	            }
+
 	            var char = String.fromCharCode(key);
 	            if (self.prefillMode) {
 	                return;
 	            }
 
 	            if (key === 16 || key === 17 || key === 18 || key === 91 || key === 8 || key === 37 || key === 39 || key === 40 || key === 38 || key === 9 || char.match(self.validEmojiCharacters)) {
-	                var currentContent = element.value;
-	                var currentCursorPos = self.getCursorPosition(element) - 1;
 
-	                var startPos = false;
-	                var endPos = false;
+	                var parsedResult = mega.utils.emojiCodeParser(currentContent, currentCursorPos);
 
-	                var matchedWord = "";
-	                var currentChar;
-	                for (var x = currentCursorPos; x >= 0; x--) {
-	                    currentChar = currentContent.substr(x, 1);
-	                    if (currentChar && currentChar.match(self.validEmojiCharacters)) {
-	                        matchedWord = currentChar + matchedWord;
-	                    } else {
-	                        startPos = x + 1;
-	                        break;
-	                    }
-	                }
+	                self.setState({
+	                    'emojiSearchQuery': parsedResult[0],
+	                    'emojiStartPos': parsedResult[1],
+	                    'emojiEndPos': parsedResult[2]
+	                });
 
-	                for (var x = currentCursorPos + 1; x < currentContent.length; x++) {
-	                    currentChar = currentContent.substr(x, 1);
-	                    if (currentChar && currentChar.match(self.validEmojiCharacters)) {
-	                        matchedWord = matchedWord + currentChar;
-	                    } else {
-	                        endPos = x;
-	                        break;
-	                    }
-	                }
-
-	                if (matchedWord && matchedWord.length > 2 && matchedWord.substr(0, 1) === ":") {
-	                    endPos = endPos ? endPos : startPos + matchedWord.length;
-
-	                    if (matchedWord.substr(-1) === ":") {
-	                        matchedWord = matchedWord.substr(0, matchedWord.length - 1);
-	                    }
-
-	                    var strictMatch = currentContent.substr(startPos, endPos - startPos);
-
-	                    if (strictMatch.substr(0, 1) === ":" && strictMatch.substr(-1) === ":") {
-	                        strictMatch = strictMatch.substr(1, strictMatch.length - 2);
-	                    } else {
-	                        strictMatch = false;
-	                    }
-
-	                    if (strictMatch && megaChat.isValidEmojiSlug(strictMatch)) {
-
-	                        if (self.state.emojiSearchQuery) {
-	                            self.setState({
-	                                'emojiSearchQuery': false,
-	                                'emojiStartPos': false,
-	                                'emojiEndPos': false
-	                            });
-	                        }
-	                        return;
-	                    }
-
-	                    self.setState({
-	                        'emojiSearchQuery': matchedWord,
-	                        'emojiStartPos': startPos ? startPos : 0,
-	                        'emojiEndPos': endPos
-	                    });
-	                    return;
-	                } else {
-	                    if (!matchedWord && self.state.emojiStartPos !== false && self.state.emojiEndPos !== false) {
-	                        matchedWord = element.value.substr(self.state.emojiStartPos, self.state.emojiEndPos);
-	                    }
-
-	                    if (!element.value || element.value.length <= 2 || matchedWord.length === 1) {
-	                        self.setState({
-	                            'emojiSearchQuery': false,
-	                            'emojiStartPos': false,
-	                            'emojiEndPos': false
-	                        });
-	                    }
-	                    return;
-	                }
+	                return;
 	            }
 	            if (self.state.emojiSearchQuery) {
 	                self.setState({ 'emojiSearchQuery': false });
@@ -10023,7 +9972,6 @@ React.makeElement = React['createElement'];
 	            self.lastTypedMessage = this.props.initialText;
 	        }
 
-	        var $container = $(self.findDOMNode());
 	        $('.jScrollPaneContainer', $container).rebind('forceResize.typingArea' + self.getUniqueId(), function () {
 	            self.updateScroll(false);
 	        });
@@ -10325,14 +10273,26 @@ React.makeElement = React['createElement'];
 	                    if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
 	                        var msg = self.state.typedMessage;
 	                        var pre = msg.substr(0, self.state.emojiStartPos);
-	                        var post = msg.substr(self.state.emojiEndPos, msg.length);
+	                        var post = msg.substr(self.state.emojiEndPos + 1, msg.length);
+	                        var startPos = self.state.emojiStartPos;
+	                        var fwdPos = startPos + emojiAlias.length;
+	                        var endPos = fwdPos;
 
-	                        self.onUpdateCursorPosition = self.state.emojiStartPos + emojiAlias.length;
+	                        self.onUpdateCursorPosition = fwdPos;
 
 	                        self.prefillMode = true;
+
+	                        if (post.substr(0, 2) == "::" && emojiAlias.substr(-1) == ":") {
+	                            emojiAlias = emojiAlias.substr(0, emojiAlias.length - 1);
+	                            endPos -= 1;
+	                        } else {
+	                            post = post ? post.substr(0, 1) !== " " ? " " + post : post : " ";
+	                            self.onUpdateCursorPosition++;
+	                        }
+
 	                        self.setState({
-	                            'typedMessage': pre + emojiAlias + (post ? post.substr(0, 1) !== " " ? " " + post : post : " "),
-	                            'emojiEndPos': self.state.emojiStartPos + emojiAlias.length + (post ? post.substr(0, 1) !== " " ? 1 : 0 : 1)
+	                            'typedMessage': pre + emojiAlias + post,
+	                            'emojiEndPos': endPos
 	                        });
 	                    }
 	                },
@@ -10340,9 +10300,18 @@ React.makeElement = React['createElement'];
 	                    if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
 	                        var msg = self.state.typedMessage;
 	                        var pre = msg.substr(0, self.state.emojiStartPos);
-	                        var post = msg.substr(self.state.emojiEndPos, msg.length);
-	                        var val = pre + emojiAlias + (post ? post.substr(0, 1) !== " " ? " " + post : post : " ");
+	                        var post = msg.substr(self.state.emojiEndPos + 1, msg.length);
+
+	                        if (post.substr(0, 2) == "::" && emojiAlias.substr(-1) == ":") {
+	                            emojiAlias = emojiAlias.substr(0, emojiAlias.length - 1);
+	                        } else {
+	                            post = post ? post.substr(0, 1) !== " " ? " " + post : post : " ";
+	                        }
+
+	                        var val = pre + emojiAlias + post;
+
 	                        self.prefillMode = false;
+
 	                        self.setState({
 	                            'typedMessage': val,
 	                            'emojiSearchQuery': false,
@@ -11040,7 +11009,7 @@ React.makeElement = React['createElement'];
 	                        for (var i = 0; i < self.found.length; i++) {
 	                            if (":" + self.found[i].n + ":" === self.props.emojiSearchQuery + ":") {
 
-	                                self.props.onSelect(false, ":" + self.found[0].n + ":", self.state.prefilled);
+	                                self.props.onSelect(false, ":" + self.found[0].n + ":");
 	                                handled = true;
 	                            }
 	                        }
@@ -11051,7 +11020,7 @@ React.makeElement = React['createElement'];
 	                    }
 	                    return;
 	                } else if (self.found.length > 0 && self.found[selected]) {
-	                    self.props.onSelect(false, ":" + self.found[selected].n + ":", self.state.prefilled);
+	                    self.props.onSelect(false, ":" + self.found[selected].n + ":");
 	                    handled = true;
 	                } else {
 	                    self.props.onCancel();

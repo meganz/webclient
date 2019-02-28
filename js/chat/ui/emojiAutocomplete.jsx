@@ -109,7 +109,7 @@ var EmojiAutocomplete = React.createClass({
                             if (":" + self.found[i].n + ":" === self.props.emojiSearchQuery + ":") {
                                 // if only 1 found and it matches almost the search query
                                 // e.g. support for :smiley$ENTER$
-                                self.props.onSelect(false, ":" + self.found[0].n + ":", self.state.prefilled);
+                                self.props.onSelect(false, ":" + self.found[0].n + ":");
                                 handled = true;
                             }
                         }
@@ -122,7 +122,7 @@ var EmojiAutocomplete = React.createClass({
                     return;
                 }
                 else if (self.found.length > 0 && self.found[selected]) {
-                    self.props.onSelect(false, ":" + self.found[selected].n + ":", self.state.prefilled);
+                    self.props.onSelect(false, ":" + self.found[selected].n + ":");
                     handled = true;
                 }
                 else {

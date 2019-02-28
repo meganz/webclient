@@ -160,6 +160,7 @@ module.exports = function(config) {
         'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
         'js/chat/callNotificationsEngine.js',
+        'js/utils/emoji.js',
 
         // Speedmeter
         'js/network-testing.js',

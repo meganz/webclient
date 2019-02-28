@@ -3112,6 +3112,12 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
     var $ddUIgrid = $($.selectddUIgrid);
     $ddUIitem.draggable({
         start: function(e, u) {
+            // Make the content under contacts, opc, ipc be non draggable
+            if (M.currentrootid === "contacts"
+            || M.currentrootid === "opc"
+            || M.currentrootid === "ipc") {
+                return false;
+            }
             if (d) {
                 console.log('draggable.start');
             }

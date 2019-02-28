@@ -2245,8 +2245,8 @@ accountUI.security = {
                     var fSession = M.account.sessions[0];
                     var DomList =  $('.grid-table.sessions').find('tr');
                     // update table when it has new active session or forced
-                    if (($(DomList[1]).hasClass('current') && !fSession[5])
-                        || !$(DomList[1]).hasClass(fSession[6]) || force) {
+                    if (fSession && (($(DomList[1]).hasClass('current') && !fSession[5])
+                        || !$(DomList[1]).hasClass(fSession[6])) || force) {
                         if (d) {
                             console.log('Update session history table');
                         }

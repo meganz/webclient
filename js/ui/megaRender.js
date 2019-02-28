@@ -1137,14 +1137,13 @@
 
                 if (DYNLIST_ENABLED) {
                     if (!aUpdate || !this.megaList) {
-                        var isFF = ua.details.engine === "Gecko";
 
                         var megaListOptions = {
                             'itemRenderFunction': M.megaListRenderNode,
                             'preserveOrderInDOM': true,
-                            'extraRows': isFF ? 10 : 4,
-                            'batchPages': isFF ? 1 : 0,
-                            'appendOnly': isFF,
+                            'extraRows': 4,
+                            'batchPages': 0,
+                            'appendOnly': false,
                             'onContentUpdated': function () {
                                 M.rmSetupUIDelayed();
                             },

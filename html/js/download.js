@@ -347,7 +347,7 @@ function dl_g(res) {
             });
 
             $('.big-button.share, .viewer-button.right.share').rebind('click', function() {
-                document.exitFullscreen();
+                $(document).fullScreen(false);
                 $.itemExport = [dlpage_ph];
                 var exportLink = new mega.Share.ExportLink({
                     'showExportLinkDialog': true,

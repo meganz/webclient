@@ -1605,8 +1605,8 @@ function init_page() {
             mega.initLoadReport();
             loadfm();
         }
-        else if ((!pfid || flhashchange) && id && id !== M.currentdirid) {
-            M.openFolder(id);
+        else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start')) {
+            M.openFolder(id, true);
         }
         else {
             if (ul_queue.length > 0) {

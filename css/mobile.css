@@ -6432,13 +6432,16 @@ textarea.mobile.support-text-field {
     position: absolute;
     top: -3px;
 }
-.mobile.achievements-invite-friends-page .email-warning-block .warning-text {
+.mobile.achievements-invite-friends-page .email-warning-block .warning-text, .mobile.achievements-invite-friends-page .email-warning-block .warning-contents {
     opacity: 0.6;
     color: #131313;
     font-size: 12px;
     line-height: 15px;
     padding: 9px 0 9px 31px;
 }
+ .mobile.achievements-invite-friends-page .email-warning-block .warning-contents {
+    padding-left: 40px;
+ }
 .mobile.achievements-invite-friends-page .success-message-block {
     color: #2aaf5f;
     font-size: 12px;

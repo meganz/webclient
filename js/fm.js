@@ -1402,7 +1402,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     fm_showoverlay();
 
     if ($.dialog) {
-        $('.fm-dialog').addClass('arrange-to-back');
+        $('.fm-dialog:not(#msgDialog)').addClass('arrange-to-back');
     }
 }
 

@@ -445,7 +445,12 @@
             }
         }
         else if (String(id).length === 11) {
-            fetchshares = !M.c[id];
+            if (M.u[id]) {
+                fetchshares = !M.c[id];
+            }
+            else {
+                id = 'contacts';
+            }
         }
         else if (id !== 'transfers' && id !== 'links') {
             if (id && id.substr(0, 9) === 'versions/') {

@@ -6442,7 +6442,7 @@ th.grid-first-th {
 .grid-table {
     width: 100%;
 }
-.contacts-view .grid-table {
+.contacts-view .grid-table, .shared-grid-view .grid-table, .contact-details-view .grid-table {
     table-layout: fixed;
 }
 .transfer-table td, .grid-table td, .grid-share-table td, .contacts-grid-table td {

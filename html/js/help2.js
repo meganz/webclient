@@ -555,7 +555,7 @@ var Help = (function() {
             });
 
             $('.support-link-icon').rebind('click', function() {
-                var parts = getUrlParts($(this).parents('.support-article').attr('id'));
+                var parts = getShortUrl($(this).parents('.support-article').attr('id'));
 
                 var link = 'https://mega.nz/' + parts.join('/');
                 var $input = $('.share-help').removeClass('hidden')
@@ -582,6 +582,20 @@ var Help = (function() {
         },
         'welcome': function welcome() {
             parsepage(Data.help_index.html);
+        },
+        // Routing for short url help
+        's': function shorturl(args) {
+            if (args[1].length !== 24) {
+                loadSubPage('help');
+                return;
+            }
+
+            var article = idx.all.filter(function(doc) {
+                return doc.id.indexOf(args[1]) !== -1;
+            });
+
+            var redirect = article[0] ? article[0].url : 'help';
+            loadSubPage(redirect);
         }
     };
 
@@ -596,6 +610,22 @@ var Help = (function() {
         return parts;
     }
 
+    /**
+     * Create short version of url for current article's share.
+     * @param {String} section section id of current article.
+     * @return {Array} newParts Array that contains all parts of shorturl
+     */
+    function getShortUrl(section) {
+        var parts = getSitePath().split('/').map(String.trim).filter(String);
+        var newParts = [];
+        if (section) {
+            newParts.push(parts[0]);
+            newParts.push('s');
+            newParts.push(section);
+        }
+
+        return newParts;
+    }
 
     function doRouting() {
         var parts = getUrlParts();

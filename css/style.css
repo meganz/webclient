@@ -14271,7 +14271,10 @@ ul.cannt-ul li span {
     border-radius: 5px;
 }
 a.contact-new-button:hover {
-    background-color: #ff3333;
+    background-color: #D90007;
+    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
+    box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
 }
 .contact-new-row.bottom {
     margin-bottom: -2px;
@@ -21184,10 +21187,9 @@ body.kr .account.chart.data {
     padding-right: 15px;
 }
 .contact-us-revamp .contact-new-button, a.contact-new-button {
-    background: #F30C14;
-    border: 1px solid #D90007;
+    background: #F0373A;
     border-radius: 3px;
-    padding: 0px 20px 0 20px;
+    padding: 1px 21px;
     line-height: 32px;
     height: 32px;
     border-radius: 4px;
@@ -21195,6 +21197,10 @@ body.kr .account.chart.data {
     font-family: 'source_sans_prosemibold';
     margin: 16px 0 0 0;
     margin-left: 40px;
+    transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    webkit-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
 }
 .contact-us-revamp .contact-new-txt {
     font-size: 15px;

@@ -429,6 +429,13 @@
 
             var newEmail = $.trim($('input', $dialog).val()) || accountData.email;
 
+            // Verify the new email address is in valid format
+            if (!isValidEmail(newEmail)) {
+                $('input', $dialog).parent().addClass('error');
+                $('input', $dialog).focus();
+                return false;
+            }
+
             // If the new registration method is enabled, re-send the signup link using the new method
             if (security.register.newRegistrationEnabled()) {
                 security.register.repeatSendSignupLink(accountData.first, accountData.last, newEmail, ctx.callback);

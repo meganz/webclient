@@ -1223,7 +1223,7 @@
 
                 if (contact) {
                     $('.contact-share-notification')
-                        .text(contact.name + ' shared the following folders with you:')
+                        .text(l[20435].replace('%1', contact.name))
                         .removeClass('hidden');
                 }
             },

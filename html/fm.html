@@ -2552,23 +2552,26 @@
                         </div>
                         <div class="settings-right-block">
                             <div class="settings-sub-section">
-                                <div class="dialog-input-title-ontop">
-                                    <div class="title">[$717]</div>
-                                    <input class="dialog-input" type="password" value="" name="account-new-password" id="account-new-password" />
-                                    <div class="account-pass-lines">
-                                         <div class="register-pass-status-line1"></div>
-                                         <div class="register-pass-status-line2"></div>
-                                         <div class="register-pass-status-line3"></div>
-                                         <div class="register-pass-status-line4"></div>
-                                         <div class="register-pass-status-line5"></div>
-                                         <div class="clear"></div>
+                                <!-- Cover with form to prevent autofilling -->
+                                <form autocomplete="off">
+                                    <div class="dialog-input-title-ontop">
+                                        <div class="title">[$717]</div>
+                                        <input class="dialog-input" type="password" value="" autocomplete="new-password" name="account-new-password" id="account-new-password" />
+                                        <div class="account-pass-lines">
+                                             <div class="register-pass-status-line1"></div>
+                                             <div class="register-pass-status-line2"></div>
+                                             <div class="register-pass-status-line3"></div>
+                                             <div class="register-pass-status-line4"></div>
+                                             <div class="register-pass-status-line5"></div>
+                                             <div class="clear"></div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="dialog-input-title-ontop">
-                                     <div class="title">[$718]</div>
-                                    <input class="dialog-input" type="password" value="" name="account-confirm-password" id="account-confirm-password" />
-                                    <div class="error-message"></div>
-                                </div>
+                                    <div class="dialog-input-title-ontop">
+                                        <div class="title">[$718]</div>
+                                        <input class="dialog-input" type="password" value="" autocomplete="new-password" name="account-confirm-password" id="account-confirm-password" />
+                                        <div class="error-message"></div>
+                                    </div>
+                                </form>
                             </div>
                             <div class="settings-sub-section button-container slide-in-out closed">
                                 <div class="default-green-button right change-password-button slide-item">[$706]</div>
@@ -2589,7 +2592,7 @@
                                 </div>
                                 <div class="dialog-input-title-ontop">
                                      <div class="title">[$7745]</div>
-                                    <input class="dialog-input" type="text" value="" name="account-email" id="account-email" maxlength="190" />
+                                    <input class="dialog-input" type="text" value="" autocomplete="disabled" name="account-email" id="account-email" maxlength="190" />
                                     <div class="error-message"></div>
                                 </div>
                             </div>

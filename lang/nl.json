@@ -3032,6 +3032,7 @@
     "20197": "[S1]$1[\/S1][S2]van[\/S2][S3]$2[\/S3]",
     "20198": "Ongeldige URL",
     "20199": "Deze URL is corrupt of misvormd. De koppeling die u wilt bereiken bestaat niet.",
+    "20200": "U mag niet deelnemen aan deze oproep omdat deze het maximale aantal deelnemers heeft bereikt.",
     "20204": "FTP Oplossing",
     "20205": "Het instellen van een FTP server geeft u toegang tot uw MEGA bestanden makkelijk vanuit uw lokale computer. Alle grote platformen ondersteunen toegang tot een FTP server.",
     "20206": "[S1]Status als Afwezig instellen na[\/S1] %1 [S2]minuten aan inactiviteit.[\/S2]",
@@ -3252,5 +3253,12 @@
     "20431": "Sorry, geen betaling methode is ondersteund voor Zakelijke accounts in uw land. Neem contact op met support@mega.nz om u te helpen met Zakelijke account registratie.",
     "20432": "Voer nooit uw wachtwoord in op een apparaat dat u niet volledig vertrouwd",
     "20433": "Er is geen herstelprocedure voor verloren wachtwoorden, zorg ervoor dat u uw wachtwoord altijd kan onthouden",
-    "20435": "%1 shared the following folders with you:"
+    "20435": "%1 shared the following folders with you:",
+    "20437": "Oproep Gestart",
+    "20440": "U mag niet deelnemen aan deze oproep omdat deze het maximale aantal deelnemers heeft bereikt.",
+    "20441": "U mag geen video inschakelen omdat deze oproep het maximale aantal deelnemers heeft bereikt dat video gebruikt.",
+    "20445": "Lopend Gesprek",
+    "20449": "Antwoord",
+    "20450": "Genegeerd",
+    "20460": "There is an active call. [A]Join[\/A]"
 }

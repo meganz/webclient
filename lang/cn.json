@@ -3032,6 +3032,7 @@
     "20197": "[S1]$1[\/S1][S2]\u7684[\/S2][S3]$2[\/S3]",
     "20198": "\u65e0\u6548\u7f51\u5740",
     "20199": "\u8be5\u7f51\u5740\u4e0d\u53ef\u7528\u3002\u60a8\u5c1d\u8bd5\u8bbf\u95ee\u7684\u94fe\u63a5\u4e0d\u5b58\u5728\u3002",
+    "20200": "\u53c2\u4e0e\u4eba\u6570\u5df2\u8fbe\u4e0a\u9650\uff0c\u60a8\u65e0\u6cd5\u52a0\u5165\u6b64\u901a\u8bdd\u3002",
     "20204": "FTP\u89e3\u51b3\u65b9\u6848",
     "20205": "\u914d\u7f6eFTP\u670d\u52a1\u5668\u5c06\u53ef\u8ba9\u60a8\u4ece\u672c\u5730\u8ba1\u7b97\u673a\u8f7b\u677e\u8bbf\u95eeMEGA\u6587\u4ef6\u3002 \u6240\u6709\u4e3b\u8981\u5e73\u53f0\u5747\u5df2\u652f\u6301\u8bbf\u95eeFTP\u670d\u52a1\u5668\u3002",
     "20206": "[S1]\u8bbe\u7f6e\u72b6\u6001\u4e3a\u201c\u79bb\u5f00\u201d\u5728[\/S1]%1[S2]\u5206\u949f\u65e0\u52a8\u4f5c\u540e\u3002[\/S2]",
@@ -3252,5 +3253,12 @@
     "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
     "20432": "Never enter your password on a device you do not fully trust.",
     "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
-    "20435": "%1 shared the following folders with you:"
+    "20435": "%1 shared the following folders with you:",
+    "20437": "Call Started",
+    "20440": "\u53c2\u4e0e\u4eba\u6570\u5df2\u8fbe\u4e0a\u9650\uff0c\u60a8\u65e0\u6cd5\u52a0\u5165\u6b64\u901a\u8bdd\u3002",
+    "20441": "\u5df2\u4f7f\u7528\u89c6\u9891\u7684\u53c2\u4e0e\u4eba\u6570\u5df2\u8fbe\u4e0a\u9650\uff0c\u60a8\u65e0\u6cd5\u5f00\u542f\u89c6\u9891\u3002",
+    "20445": "Ongoing Call",
+    "20449": "\u5e94\u7b54",
+    "20450": "\u5ffd\u89c6",
+    "20460": "There is an active call. [A]Join[\/A]"
 }

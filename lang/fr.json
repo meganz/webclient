@@ -3032,6 +3032,7 @@
     "20197": "[S1]$1[\/S1][S2]sur[\/S2][S3]$2[\/S3]",
     "20198": "Cette URL est invalide",
     "20199": "Cette URL est corrompue ou mal form\u00e9e. Le lien auquel vous essayez d\u2019acc\u00e9der n\u2019existe pas.",
+    "20200": "Vous n\u2019\u00eates pas autoris\u00e9 \u00e0 vous joindre \u00e0 cet appel, car le nombre maximal de participants a \u00e9t\u00e9 atteint.",
     "20204": "Solution FTP",
     "20205": "La configuration d\u2019un serveur FTP vous permettra d\u2019acc\u00e9der facilement \u00e0 vos fichiers sur MEGA \u00e0 partir de votre ordinateur local. Toutes les grandes plateformes prennent en charge les serveurs FTP.",
     "20206": "[S1]D\u00e9finir l\u2019\u00e9tat \u00e0 Absent apr\u00e8s[\/S1] %1 [S2]minutes d\u2019inactivit\u00e9.[\/S2]",
@@ -3252,5 +3253,12 @@
     "20431": "D\u00e9sol\u00e9, aucun mode de paiement n\u2019est pris en charge pour les comptes d\u2019entreprise dans votre pays. Veuillez contacter support@mega.nz pour obtenir de l\u2019aide au sujet de l\u2019inscription de votre compte d\u2019entreprise.",
     "20432": "Ne saisissez jamais votre mot de passe sur un appareil en lequel vous n\u2019avez pas pleinement confiance.",
     "20433": "Il n\u2019y a aucune proc\u00e9dure de r\u00e9cup\u00e9ration de mot de passe perdu, assurez-vous de vous souvenir de votre mot de passe en tout temps.",
-    "20435": "%1 shared the following folders with you:"
+    "20435": "%1 a partag\u00e9 les dossiers suivants avec vous\u00a0:",
+    "20437": "Un appel a commenc\u00e9",
+    "20440": "Vous n\u2019\u00eates pas autoris\u00e9 \u00e0 vous joindre \u00e0 cet appel, car le nombre maximal de participants a \u00e9t\u00e9 atteint.",
+    "20441": "Vous n\u2019\u00eates pas autoris\u00e9 \u00e0 activer la vid\u00e9o pour cet appel, car le nombre maximal de participants qui utilisent la vid\u00e9o a \u00e9t\u00e9 atteint.",
+    "20445": "Appel en cours",
+    "20449": "R\u00e9ponse",
+    "20450": "Ignor\u00e9s",
+    "20460": "There is an active call. [A]Join[\/A]"
 }

@@ -3032,6 +3032,7 @@
     "20197": "[S1]$1[\/S1][S2]of[\/S2][S3]$2[\/S3]",
     "20198": "Invalid URL",
     "20199": "This URL is corrupt or deformed. The link you are trying to access does not exist.",
+    "20200": "You are not allowed to join this call as it has reached the maximum number of participants.",
     "20204": "FTP solution",
     "20205": "Configuring an FTP server will let you access your MEGA files easily from your local computer. All major platforms support access to an FTP server.",
     "20206": "[S1]Set status to Away after[\/S1] %1 [S2]minutes of inactivity.[\/S2]",
@@ -3252,5 +3253,12 @@
     "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
     "20432": "Never enter your password on a device you do not fully trust.",
     "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
-    "20435": "%1 shared the following folders with you:"
+    "20435": "%1 shared the following folders with you:",
+    "20437": "Call Started",
+    "20440": "You are not allowed to join this call as it has reached the maximum number of participants.",
+    "20441": "You are not allowed to enable video as this call has reached the maximum number of participants using video.",
+    "20445": "Ongoing Call",
+    "20449": "\u61c9\u7b54",
+    "20450": "\u5ffd\u8996",
+    "20460": "There is an active call. [A]Join[\/A]"
 }

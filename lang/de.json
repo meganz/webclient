@@ -3032,6 +3032,7 @@
     "20197": "[S1]$1[\/S1][S2] von [\/S2][S3]$2[\/S3]",
     "20198": "URL ung\u00fcltig",
     "20199": "Ung\u00fcltiges URL-Format. Der eingegebene Link existiert nicht.",
+    "20200": "You are not allowed to join this call as it has reached the maximum number of participants.",
     "20204": "FTP-Zugang",
     "20205": "Ein FTP-Server erlaubt Ihnen den Zugang zu Ihrem MEGA-Account mit jedem FTP-Client. Das FTP-Protokoll erfreut sich breiter Unterst\u00fctzung.",
     "20206": "[S1]Status nach[\/S1] %1 [S2] Minuten Inaktivit\u00e4t auf Abwesend setzen.[\/S2]",
@@ -3252,5 +3253,12 @@
     "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
     "20432": "Never enter your password on a device you do not fully trust.",
     "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
-    "20435": "%1 shared the following folders with you:"
+    "20435": "%1 shared the following folders with you:",
+    "20437": "Call Started",
+    "20440": "You are not allowed to join this call as it has reached the maximum number of participants.",
+    "20441": "You are not allowed to enable video as this call has reached the maximum number of participants using video.",
+    "20445": "Ongoing Call",
+    "20449": "Annehmen",
+    "20450": "Ignoriert",
+    "20460": "There is an active call. [A]Join[\/A]"
 }

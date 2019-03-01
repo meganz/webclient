@@ -3032,6 +3032,7 @@
     "20197": "[S1]$1[\/S1][S2]din[\/S2][S3]$2[\/S3]",
     "20198": "URL nevalid",
     "20199": "Acest URL este corupt sau deformat. Linkul pe care \u00eencerci s\u0103 \u00eel accesezi nu exist\u0103.",
+    "20200": "Nu \u021bi se permite s\u0103 te al\u0103turi acestui apel deoarece acesta a atins num\u0103rul maxim de participan\u021bi.",
     "20204": "Solu\u021bie FTP",
     "20205": "Configurarea unui server FTP \u00ee\u021bi va permite s\u0103 accesezi cu u\u0219urin\u021b\u0103 fi\u0219ierele MEGA de pe calculatorul local. Toate platformele majore suport\u0103 accesul la un server FTP.",
     "20206": "[S1]Seteaz\u0103 statusul pe Plecat dup\u0103[\/S1] %1 [S2]minute de inactivitate.[\/S2]",
@@ -3252,5 +3253,12 @@
     "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
     "20432": "Never enter your password on a device you do not fully trust.",
     "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
-    "20435": "%1 shared the following folders with you:"
+    "20435": "%1 shared the following folders with you:",
+    "20437": "Call Started",
+    "20440": "Nu \u021bi se permite s\u0103 te al\u0103turi acestui apel deoarece acesta a atins num\u0103rul maxim de participan\u021bi.",
+    "20441": "Nu \u021bi se permite s\u0103 activezi func\u021bia video deoarece acest apel a atins num\u0103rul maxim de participan\u021bi care folosesc func\u021bia video.",
+    "20445": "Ongoing Call",
+    "20449": "R\u0103spunde",
+    "20450": "Ignorat",
+    "20460": "There is an active call. [A]Join[\/A]"
 }

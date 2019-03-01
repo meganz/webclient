@@ -2744,7 +2744,7 @@
     "19698": "MEGA sohbet \u00f6zellikleri \u015fu anda Windows Phone 8 ve Windows 10 uygulamalar\u0131m\u0131zda mevcut de\u011fildir.",
     "19700": "Platformunuz i\u00e7in MEGA Mobil Uygulamalar\u0131n\u0131 indirin",
     "19701": "Tak\u0131m olarak \u00e7al\u0131\u015fmak ister misininiz?",
-    "19702": "MEGA Business",
+    "19702": "\u0130\u015f i\u00e7in MEGA",
     "19703": "Kullan\u0131c\u0131 y\u00f6netimi ara\u00e7lar\u0131",
     "19704": "\u0130\u015fletmeniz genelinde u\u00e7tan uca \u015fifreleme",
     "19705": "Metin veya aramalar\u0131 kullanarak ekibinizle ileti\u015fim kurun",
@@ -3032,6 +3032,7 @@
     "20197": "[S1]$1[\/S1][S2]\/[\/S2][S3]$2[\/S3]",
     "20198": "Ge\u00e7ersiz Ba\u011flant\u0131",
     "20199": "Bu ba\u011flant\u0131 bozulmu\u015f. Eri\u015fmeye \u00e7al\u0131\u015ft\u0131\u011f\u0131n\u0131z ba\u011flant\u0131 bulunmamaktad\u0131r.",
+    "20200": "Bu arama azami kat\u0131l\u0131mc\u0131 say\u0131s\u0131na eri\u015fti\u011fi i\u00e7in kat\u0131lman\u0131za izin verilmiyor.",
     "20204": "FTP \u00e7\u00f6z\u00fcm\u00fc",
     "20205": "FTP sunucusu yap\u0131land\u0131rmak MEGA dosyalar\u0131n\u0131za yerel bilgisayar\u0131n\u0131zdan kolayca eri\u015fmenize olanak tan\u0131r. T\u00fcm bilinen platformlar FTP sunucular\u0131na eri\u015fimi destekler.",
     "20206": "%1 [S1][S2]dakika etkinlik g\u00f6sterilmedi\u011finde durumumu d\u0131\u015far\u0131da olarak g\u00f6ster.[\/S1][\/S2]",
@@ -3252,5 +3253,12 @@
     "20431": "\u00dczg\u00fcn\u00fcz, MEGA \u0130\u015f Hesab\u0131 i\u00e7in \u00fclkenizde desteklenen \u00f6deme y\u00f6ntemi yoktur. \u0130\u015f hesab\u0131 kayd\u0131nda yard\u0131m almak i\u00e7in l\u00fctfen support@mega.nz adresi ile ileti\u015fime ge\u00e7in.",
     "20432": "Tamamen g\u00fcvenmedi\u011finiz bir cihazda parolan\u0131z\u0131 girmeyin.",
     "20433": "Kay\u0131p parolalar\u0131 kurtarman\u0131n bir yolu yoktur, her zaman hat\u0131rlad\u0131\u011f\u0131n\u0131zdan emin olun.",
-    "20435": "%1 shared the following folders with you:"
+    "20435": "%1 sizle \u015fu klas\u00f6rleri payla\u015ft\u0131:",
+    "20437": "\u00c7a\u011fr\u0131 Ba\u015flad\u0131",
+    "20440": "Bu arama azami kat\u0131l\u0131mc\u0131 say\u0131s\u0131na eri\u015fti\u011fi i\u00e7in kat\u0131lman\u0131za izin verilmiyor.",
+    "20441": "Bu arama azami g\u00f6r\u00fcnt\u00fcl\u00fc kat\u0131l\u0131mc\u0131 say\u0131s\u0131na eri\u015fti\u011fi i\u00e7in g\u00f6r\u00fcnt\u00fcn\u00fcz\u00fc a\u00e7man\u0131za izin verilmiyor.",
+    "20445": "Devam eden \u00c7a\u011fr\u0131",
+    "20449": "Cevapla",
+    "20450": "Yok say\u0131ld\u0131",
+    "20460": "Aktif bir arama var. [A]Kat\u0131l[\/A]"
 }

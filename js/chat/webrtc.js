@@ -506,9 +506,9 @@ RtcModule.prototype._removeCall = function(call) {
             delete this.gLocalStream;
             delete this.localMediaPromise;
         }
-        if (this._statTimer) {
-            clearInterval(this._statTimer);
-            delete this._statTimer;
+        if (this._statsTimer) {
+            clearInterval(this._statsTimer);
+            delete this._statsTimer;
         }
     }
 };

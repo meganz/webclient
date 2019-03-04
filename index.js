@@ -1495,8 +1495,14 @@ function init_page() {
 
         // If not logged in, direct them to login or register first
         if (u_type === false) {
-            login_txt = l[7712];
-            loadSubPage(u_wasloggedin() ? 'login' : 'register');
+            if (u_wasloggedin()) {
+                login_txt = l[7712];
+                loadSubPage('login');
+            }
+            else {
+                register_txt = l[7712];
+                loadSubPage('register');
+            }
             return false;
         }
         else if (u_type < 3) {

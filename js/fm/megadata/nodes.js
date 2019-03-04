@@ -633,7 +633,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             // accelerate arrival of SC-conveyed new nodes by directly
             // issuing a fetch
             // (instead of waiting for waitxhr's connection to drop)
-            getsc();
+            getsc(true);
         }
     });
 

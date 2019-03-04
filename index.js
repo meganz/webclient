@@ -2094,9 +2094,8 @@ function topmenuUI() {
                     localStorage.megaChatPresence = presence;
                     localStorage.megaChatPresenceMtime = unixtime();
 
-                    mega.initLoadReport();
-                    loadfm();
                     $topHeader.find('.activity-status-block').addClass("fadeinout");
+                    loadSubPage('fm/chat');
                 }
             }
         });

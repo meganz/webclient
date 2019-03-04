@@ -146,6 +146,7 @@ accountUI.renderAccountPage = function(account) {
             break;
 
         default:
+        
             // This is the main entry point for users who just had upgraded their accounts
             if (isNonActivatedAccount()) {
                 alarm.nonActivatedAccount.render(true);
@@ -351,6 +352,7 @@ accountUI.general = {
         $('.small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
 
         if (u_attr.p) {
+
             // LITE/PRO account
             var planNum = u_attr.p;
             var planText = pro.getProPlanName(planNum);
@@ -599,6 +601,7 @@ accountUI.leftPane = {
 
             if ($(this).attr('class').indexOf('active') === -1) {
                 $('.fm-account-main').data('jsp').scrollToY(0, false);
+
                 switch (true) {
                     case $(this).hasClass('account-s'):
                         loadSubPage('fm/account');
@@ -669,12 +672,11 @@ accountUI.account = {
         this.profiles.resetProfileForm();
         this.profiles.renderFirstName();
         this.profiles.renderLastName();
-        this.profiles.renderBirthYear();
-        this.profiles.renderBirthMonth();
-        this.profiles.renderBirthDay();
+        this.profiles.renderBirth();
 
         // if this is a business user, we want to hide some parts in profile page :)
         var hideOrViewCancelSection = function(setToHidden) {
+
             if (setToHidden) {
                 $('.fm-account-main .fm-account-sections .cancel-account-block').addClass('hidden');
                 $('.content-panel.account .acc-setting-menu-cancel-acc').addClass('hidden');
@@ -700,9 +702,12 @@ accountUI.account = {
             }
         }
         else {
+
             // user can set country only in non-business accounts
             $('.fm-account-main .settings-sub-section.profile .acc-setting-country-sec').removeClass('hidden');
+
             this.profiles.renderCountry();
+
             // we allow cancel for only non-business account + master users.
             hideOrViewCancelSection(false);
         }
@@ -735,12 +740,31 @@ accountUI.account = {
             $('#account-lastname').val(u_attr.lastname).trigger('blur');
         },
 
+        renderBirth: function () {
+
+            'use strict';
+
+            // If $.dateTimeFormat['stucture'] is not set, prepare it for birthday
+            if (!$.dateTimeFormat['structure']) {
+                $.dateTimeFormat['structure'] = getDateStructure() || 'ymd';
+            }
+
+            // Display only date format that is correct with current locale.
+            $('.dialog-input-title-ontop.birth').addClass('hidden');
+            $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure']).removeClass('hidden');
+
+            this.renderBirthYear();
+            this.renderBirthMonth();
+            this.renderBirthDay();
+        },
+
         renderBirthYear: function() {
 
             'use strict';
 
             var i = new Date().getFullYear() - 16;
-            var $input = $('.dialog-input-title-ontop.birth .byear').attr('max', i);
+            var $input = $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .byear')
+                .attr('max', i);
 
             if (u_attr.birthyear) {
                 $input.val(u_attr.birthyear);
@@ -752,7 +776,7 @@ accountUI.account = {
             'use strict';
 
             if (u_attr.birthmonth) {
-                var $input = $('.dialog-input-title-ontop.birth .bmonth');
+                var $input = $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bmonth');
                 $input.val(u_attr.birthmonth);
                 this.zerofill($input[0]);
             }
@@ -763,7 +787,7 @@ accountUI.account = {
             'use strict';
 
             if (u_attr.birthday) {
-                var $input = $('.dialog-input-title-ontop.birth .bdate');
+                var $input = $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bdate');
                 $input.val(u_attr.birthday);
                 this.zerofill($input[0]);
             }
@@ -794,8 +818,10 @@ accountUI.account = {
                      +  '</div>';
             }
             $('.default-select-scroll', $country).safeHTML(html);
+
             // Initialize scrolling. This is to prevent scroll losing bug with action packet.
             initSelectScrolling('#account-country .default-select-scroll');
+
             // Bind Dropdowns events
             bindDropdownEvents($country, 1, '.fm-account-main');
         },
@@ -828,6 +854,8 @@ accountUI.account = {
             // Cache selectors
             var self = this;
             var $personalInfoBlock = $('.profile-form');
+            var $birthdayBlock = $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure'],
+                $personalInfoBlock);
             var $firstNameField = $personalInfoBlock.find('#account-firstname');
             var $saveBlock = $('.fm-account-sections .save-block');
             var $saveButton = $saveBlock.find('.fm-account-save');
@@ -839,7 +867,7 @@ accountUI.account = {
                 });
 
             // All profile text inputs
-            $firstNameField.add('#account-lastname, .byear, .bmonth, .bdate', $personalInfoBlock)
+            $firstNameField.add('#account-lastname', $personalInfoBlock).add('.byear, .bmonth, .bdate', $birthdayBlock)
                 .rebind('input.settingsGeneral, change.settingsGeneral', function() {
 
                     var $this = $(this);
@@ -886,7 +914,7 @@ accountUI.account = {
                     }
                 });
 
-            $('.byear, .bmonth, .bdate', $personalInfoBlock).rebind('keydown.settingsGeneral', function(e) {
+            $('.byear, .bmonth, .bdate', $birthdayBlock).rebind('keydown.settingsGeneral', function(e) {
 
                 var $this = $(this);
                 var charCode = e.which || e.keyCode; // ff
@@ -931,7 +959,7 @@ accountUI.account = {
                 }
             });
 
-            $('.bmonth, .bdate', $personalInfoBlock).rebind('blur.settingsGeneral', function() {
+            $('.bmonth, .bdate', $birthdayBlock).rebind('blur.settingsGeneral', function() {
                 self.zerofill(this);
             });
 
@@ -967,9 +995,9 @@ accountUI.account = {
                 var checklist = {
                     firstname: String($('#account-firstname').val() || '').trim(),
                     lastname: String($('#account-lastname').val() || '').trim(),
-                    birthday: String($('.birth .bdate').val() || ''),
-                    birthmonth: String($('.birth .bmonth').val() || ''),
-                    birthyear: String($('.birth .byear').val() || ''),
+                    birthday: String($('.bdate', $birthdayBlock).val() || ''),
+                    birthmonth: String($('.bmonth', $birthdayBlock).val() || ''),
+                    birthyear: String($('.byear', $birthdayBlock).val() || ''),
                     country: String($('#account-country .default-dropdown-item.active').attr('data-value') || '')
                 };
                 var userAttrRequest = { a: 'up' };

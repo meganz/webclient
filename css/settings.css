@@ -537,7 +537,7 @@
     vertical-align: bottom;
     margin-bottom: 16px;
 }
-.fm-right-account-block .dialog-input-title-ontop:nth-child(odd) {
+.fm-right-account-block .dialog-input-title-ontop:nth-child(odd), .fm-right-account-block .dialog-input-title-ontop.birth {
     margin-right: 32px;
 }
 .dialog-input-title-ontop::after {
@@ -598,12 +598,12 @@
 .dialog-input-title-ontop .dialog-input::placeholder{
     font-size: 14px;
 }
-.fm-right-account-block .dialog-input-title-ontop .dialog-input.short-input {
+.fm-right-account-block .dialog-input-title-ontop .dialog-input.short-input.byear {
     width: calc(38% - 28px);
     display: inline-block;
     padding: 0;
 }
-.fm-right-account-block .dialog-input-title-ontop .dialog-input.short-input:not(:nth-child(2)) {
+.fm-right-account-block .dialog-input-title-ontop .dialog-input.short-input:not(.byear) {
     width: calc(27% - 28px);
     display: inline-block;
     padding: 0;

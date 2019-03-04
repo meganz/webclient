@@ -1619,20 +1619,26 @@ var ConversationPanel = React.createClass({
                     },
                 ]}>
                 <div className="fm-dialog-content">
-
                     <div className="dialog secondary-header">
                         <div className="rename-input-bl">
-                            <input type="text" name="newTopic"
-                                   defaultValue={self.props.chatRoom.getRoomTitle()}
-                                   value={self.state.renameDialogValue}
-                                   maxLength="30"
-                                   onChange={(e) => {
-                                self.setState({'renameDialogValue': e.target.value.substr(0, 30)});
-                            }} onKeyUp={(e) => {
-                                if (e.which === 13) {
-                                    onEditSubmit(e);
-                                }
-                            }} />
+                            <input 
+                                type="text" 
+                                className="chat-rename-group-dialog"
+                                name="newTopic"
+                                defaultValue={self.props.chatRoom.getRoomTitle()}
+                                value={self.state.renameDialogValue}
+                                maxLength="30"
+                                onChange={(e) => {
+                                    self.setState({
+                                        'renameDialogValue': e.target.value.substr(0, 30)
+                                    });
+                                }}
+                                onKeyUp={(e) => {
+                                    if (e.which === 13) {
+                                        onEditSubmit(e);
+                                    }
+                                }}
+                            />
                         </div>
                     </div>
                 </div>

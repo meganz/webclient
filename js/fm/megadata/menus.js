@@ -458,6 +458,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                     $(menuCMI).filter(item).show();
                 }
 
+                // Hide Info item if properties dialog is opened
+                if ($.dialog === 'properties') {
+                    delete items['.properties-item'];
+                }
+
                 onIdle(showContextMenu);
             });
     }
@@ -654,16 +659,16 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                         }
                     }
 
+                    // Hide Info item if properties dialog is opened
+                    if ($.dialog === 'properties') {
+                        $menuCMI.filter('.properties-item').hide();
+                    }
+
                     onIdle(showContextMenu);
                 });
         }
         else {
             return false;
-        }
-
-        //Hide Info item if properties dialog is opened
-        if ($.dialog === 'properties') {
-            $(menuCMI).filter('.properties-item').hide();
         }
     }
 

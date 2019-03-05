@@ -2050,7 +2050,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceTopTitle.find('#invoice-date').text(time2date(invoiceDetail.ts, 1));
         $invoiceTopTitle.find('#invoice-number').text(invoiceDetail.n);
         $invoiceTopTitle.find('.invoice-vat').text(invoiceDetail.mega.taxnum[1]);
-        $invoiceTopTitle.find('.inv-vat-label').text(invoiceDetail.mega.taxnum[0]);
+        $invoiceTopTitle.find('.inv-vat-label').text(invoiceDetail.mega.taxnum[0] + ':');
 
         // billed-to details
         $invoiceDetailContainer.find('.billed-name').text(invoiceDetail.u.cname);

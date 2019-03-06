@@ -268,6 +268,7 @@ function u_logout(logout) {
             }
         }
 
+        delete localStorage.voucher;
         delete sessionStorage.signinorup;
         localStorage.removeItem('signupcode');
         localStorage.removeItem('registeremail');

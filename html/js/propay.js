@@ -37,8 +37,12 @@ pro.propay = {
     init: function() {
         "use strict";
         // if business sub-user is trying to get to Pro page redirect to home.
-        if (u_attr && u_attr.b && !u_attr.b.m) {
+        if (u_attr && u_attr.b && (!u_attr.b.m || (u_attr.b.m && u_attr.b.s !== -1))) {
             loadSubPage('start');
+            return;
+        }
+        if (u_attr && u_attr.b && u_attr.b.m && u_attr.b.s === -1) {
+            loadSubPage('registerb');
             return;
         }
 

@@ -16509,7 +16509,7 @@ ul.token-input-list-mega {
     -ms-transition: box-shadow 200ms ease-in-out;
     transition: box-shadow 200ms ease-in-out;
 }
-.multiple-input-warning, .duplicated-input-warning {
+.multiple-input-warning, .duplicated-input-warning, .reg-resend-email-meg {
     min-height: 24px;
     position: relative;
     background-color: #fdebeb;
@@ -16532,7 +16532,7 @@ ul.token-input-list-mega {
     z-index: 100;
     display: none;
 }
-.error .multiple-input-warning, .duplicate .duplicated-input-warning {
+.error .multiple-input-warning, .duplicate .duplicated-input-warning, .error .reg-resend-email-meg {
     display: block;
 }
 .multiple-input .jspContainer, .multiple-input .jspPane {

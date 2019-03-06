@@ -17830,6 +17830,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     opacity: 0;
     z-index: 1129;
     visibility: hidden;
+    pointer-events: none;
 }
 .fm-picker-dialog .side-pane .fm-picker-dialog-button:hover .tooltip {
     visibility: visible;

@@ -233,7 +233,7 @@
     "666": "Veuillez confirmer que vous pouvez \u00eatre tenu responsable des dommages, y compris les frais et honoraires d'avocat, si vous pr\u00e9tendez sciemment et \u00e0 tort que le contenu signal\u00e9, les URL ou les fichiers sont illicites.",
     "667": "Veuillez confirmer que cette notification est exacte et affirmer, sous peine de parjure, que vous \u00eates autoris\u00e9 \u00e0 agir au nom du d\u00e9tenteur du droit d'auteur.",
     "670": "Langue",
-    "676": "MEGA, le service de stockage nuagique qui prot\u00e8ge vos donn\u00e9es personnelles en tout temps",
+    "676": "MEGA, le service de stockage nuagique qui prot\u00e8ge vos donn\u00e9es personnelles en tout temps.",
     "677": "MEGA fournit des services de stockage nuagique robustes qui offrent une protection des donn\u00e9es personnelles pratique et puissante, en tout temps. MEGA croit en votre droit \u00e0 la vie priv\u00e9e et vous offre les outils technologiques qui vous permettent de la prot\u00e9ger. C\u2019est ce que nous appelons le chiffrement contr\u00f4l\u00e9 par l\u2019utilisateur, ou CCU, et ce chiffrement est automatique.",
     "678": "Qu\u2019est-ce que le chiffrement contr\u00f4l\u00e9 par l\u2019utilisateur de MEGA\u2009?",
     "679": "Tous les fichiers stock\u00e9s sur MEGA sont chiffr\u00e9s. Toutes les donn\u00e9es qui transf\u00e8rent de et vers MEGA sont chiffr\u00e9es. Et bien que la plupart des fournisseurs de services de stockage nuagique peuvent en faire autant et pr\u00e9tendent le faire, MEGA est diff\u00e9rent. Contrairement \u00e0 la norme de l\u2019industrie qui veut que le fournisseur de services de stockage nuagique d\u00e9tienne la cl\u00e9 de chiffrement, avec MEGA vous contr\u00f4lez le chiffrement, vous d\u00e9tenez les cl\u00e9s et vous d\u00e9cidez \u00e0 qui vous donner ou retirer l\u2019acc\u00e8s \u00e0 vos fichiers, sans avoir \u00e0 installer des logiciels risqu\u00e9s. Tout s\u2019effectue dans votre navigateur Web\u2009!",
@@ -655,6 +655,7 @@
     "2042": "Vous n\u2019avez pas le droit d\u2019\u00e9criture sur ce dossier.",
     "2480": "\u00c9chec de confirmation du compte",
     "2507": "\u00c9chec d\u2019importation d\u2019un fichier",
+    "5527": "MEGA, le service de stockage nuagique qui prot\u00e8ge vos donn\u00e9es personnelles en tout temps.",
     "5528": "de",
     "5533": "Chargement\u2026",
     "5542": "Partages entrants",
@@ -2114,7 +2115,7 @@
     "18683": "Ins\u00e9rer l\u2019aper\u00e7u",
     "18684": "Supprimer l\u2019aper\u00e7u",
     "18685": "La corbeille peut \u00eatre vid\u00e9e pour vous automatiquement. La p\u00e9riode minimale est de 7 jours.",
-    "18686": "La corbeille est vid\u00e9e pour vous automatiquement. La p\u00e9riode minimale est de 7 jours et votre p\u00e9riode maximale est de 30 jours.",
+    "18686": "La corbeille est vid\u00e9e pour vous automatiquement, au minimum tous les 7 jours et au maximum tous les 30 jours.",
     "18687": "Vous \u00eates sur le point de d\u00e9sactiver les aper\u00e7us d\u2019URL enrichis en permanence. Vous pourrez r\u00e9activer les aper\u00e7us d\u2019URL enrichis dans vos param\u00e8tres. Souhaitez-vous poursuivre\u2009?",
     "18694": "Le mot de passe est accept\u00e9. Nous vous recommandons quand m\u00eame de sauvegarder votre cl\u00e9 de r\u00e9cup\u00e9ration.",
     "18696": "Aper\u00e7us d\u2019URL enrichis",
@@ -3250,7 +3251,7 @@
     "20428": "Espace de stockage illimit\u00e9 \/ Transferts illimit\u00e9s",
     "20429": "Apr\u00e8s avoir compl\u00e9t\u00e9 votre surclassement vers un compte d\u2019entreprise, veuillez vous assurer d\u2019annuler votre abonnement {0} si ce n\u2019est pas d\u00e9j\u00e0 fait.",
     "20430": "Le compte a \u00e9t\u00e9 surclass\u00e9 avec succ\u00e8s",
-    "20431": "D\u00e9sol\u00e9, aucun mode de paiement n\u2019est pris en charge pour les comptes d\u2019entreprise dans votre pays. Veuillez contacter support@mega.nz pour obtenir de l\u2019aide au sujet de l\u2019inscription de votre compte d\u2019entreprise.",
+    "20431": "D\u00e9sol\u00e9, aucun mode de paiement n\u2019est pris en charge pour les comptes d\u2019entreprise dans votre pays. Veuillez contacter business@mega.nz pour obtenir de l\u2019aide au sujet de l\u2019inscription de votre compte d\u2019entreprise.",
     "20432": "Ne saisissez jamais votre mot de passe sur un appareil en lequel vous n\u2019avez pas pleinement confiance.",
     "20433": "Il n\u2019y a aucune proc\u00e9dure de r\u00e9cup\u00e9ration de mot de passe perdu, assurez-vous de vous souvenir de votre mot de passe en tout temps.",
     "20435": "%1 a partag\u00e9 les dossiers suivants avec vous\u00a0:",
@@ -3260,5 +3261,5 @@
     "20445": "Appel en cours",
     "20449": "R\u00e9ponse",
     "20450": "Ignor\u00e9s",
-    "20460": "There is an active call. [A]Join[\/A]"
+    "20460": "Un appel est en cours. [A]Vous y joindre[\/A]"
 }

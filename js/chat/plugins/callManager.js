@@ -1458,7 +1458,7 @@ CallManagerCall.prototype.getPeer = function () {
 CallManagerCall.prototype.getMediaOptions = function () {
     var localAv = this.rtcCall.localAv();
     if (typeof localAv === 'undefined') {
-        this.logger.error(".getMediaOptions: rtcCall.localAv() returned undefined");
+        this.logger.log(".getMediaOptions: rtcCall.localAv() returned undefined");
         return {audio: false, video: false};
     }
     return {audio: !!(localAv & Av.Audio), video: !!(localAv & Av.Video)};// jscs:ignore disallowImplicitTypeConversion

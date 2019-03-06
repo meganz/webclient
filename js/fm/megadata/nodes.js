@@ -354,7 +354,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
     // check if this is a business expired account
     if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
-        showExpiredBusiness();
+        M.showExpiredBusiness();
         return;
     }
 
@@ -653,7 +653,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
     // check if this is a business expired account
     if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
-        showExpiredBusiness();
+        M.showExpiredBusiness();
         return;
     }
     if (!quiet) {
@@ -1057,7 +1057,7 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
     // check if this is a business expired account
     if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
-        showExpiredBusiness();
+        M.showExpiredBusiness();
         return;
     }
 
@@ -1126,7 +1126,7 @@ MegaData.prototype.safeRemoveNodes = function(handles) {
     // check if this is a business expired account
     if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
-        showExpiredBusiness();
+        M.showExpiredBusiness();
         return;
     }
     var masterPromise = new MegaPromise();
@@ -1192,7 +1192,7 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
     // check if this is a business expired account
     if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
-        showExpiredBusiness();
+        M.showExpiredBusiness();
         return;
     }
 
@@ -1374,7 +1374,7 @@ MegaData.prototype.revokeShares = function(handles) {
     // check if this is a business expired account
     if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
-        showExpiredBusiness();
+        M.showExpiredBusiness();
         return;
     }
 
@@ -1487,7 +1487,7 @@ MegaData.prototype.revokeFolderShare = function(h, usr, isps) {
     // check if this is a business expired account
     if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
-        showExpiredBusiness();
+        M.showExpiredBusiness();
         return;
     }
 

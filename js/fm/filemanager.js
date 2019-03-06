@@ -1061,6 +1061,7 @@ FileManager.prototype.initContextUI = function() {
             business_ui.showExpiredDialog(u_attr.b.m);
         });
     };
+    M.showExpiredBusiness = showExpiredBusiness;
 
     $(c + '.cloud-item').rebind('click', safeMoveNodes);
 

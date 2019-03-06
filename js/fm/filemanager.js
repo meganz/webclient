@@ -1747,6 +1747,12 @@ FileManager.prototype.createFolderUI = function() {
 
     $('.fm-new-folder').rebind('click', function(e) {
 
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
+
         var c = $('.fm-new-folder').attr('class'),
             c2 = $(e.target).attr('class'),
             c3 = $(e.target).parent().attr('class'),

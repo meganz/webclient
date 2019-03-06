@@ -180,6 +180,14 @@
 
 
     function FileSelectHandlerMegaSyncClick(e) {
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            e.preventDefault();
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return false;
+        }
+
         if (page.indexOf('/chat/') > -1) {
             return true;
         }
@@ -299,9 +307,17 @@
 
     // on Drop event
     function FileSelectHandler(e) {
+
         if (e.preventDefault) {
             e.preventDefault();
         }
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return false;
+        }
+
         if ($.dialog === 'avatar') {
             return;
         }

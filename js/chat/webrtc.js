@@ -81,9 +81,9 @@ RtcModule.kCallSetupTimeout = 35000;
 // till the timeout is more than this, then fail the session with kErrIceTimeout
 RtcModule.kIceTimeout = 18000;
 
-RtcModule.kMaxCallReceivers = 16;
+RtcModule.kMaxCallReceivers = 20;
 RtcModule.kMaxCallAudioSenders = RtcModule.kMaxCallReceivers;
-RtcModule.kMaxCallVideoSenders = 4;
+RtcModule.kMaxCallVideoSenders = 6;
 
 RtcModule.prototype.logToServer = function(type, data) {
     if (typeof data !== 'object') {

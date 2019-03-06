@@ -1062,6 +1062,17 @@ function init_page() {
             $('.account-mid-block').addClass('high');
         }
 
+        // if this is a business user
+        var $supportLink = $('#contact-email-support-btn');
+        if (u_attr && u_attr.b) {
+            $supportLink.text('business@mega.nz');
+            $supportLink.prop('href', 'mailto:business@mega.nz');
+        }
+        else {
+            $supportLink.text('support@mega.nz');
+            $supportLink.prop('href', 'mailto:support@mega.nz');
+        }
+
         // On clicking the directory buttons
         $('.directory-buttons li').rebind('click', function() {
 

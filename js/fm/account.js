@@ -38,13 +38,8 @@ function accountUI() {
     });
 
     M.onSectionUIOpen('account');
-    if (typeof zxcvbn === 'undefined') {
-        loadingDialog.show();
-        return M.require('zxcvbn_js')
-            .done(function() {
-                delay(accountUI);
-            });
-    }
+
+    M.require('zxcvbn_js');
 
     if (u_attr && u_attr.b && !u_attr.b.m) {
         $('.content-panel.account .fm-account-button.slide-in-out.plan').addClass('hidden');

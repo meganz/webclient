@@ -27,31 +27,39 @@ var TopicChange = require('./messages/topicChange.jsx').TopicChange;
 var SharedFilesAccordionPanel = require('./sharedFilesAccordionPanel.jsx').SharedFilesAccordionPanel;
 var IncomingSharesAccordionPanel = require('./incomingSharesAccordionPanel.jsx').IncomingSharesAccordionPanel;
 
-var ENABLE_GROUP_CALLING_FLAG = (
-    typeof localStorage.enableGroupCalling !== 'undefined' &&
-    localStorage.enableGroupCalling === "1"
-);
+var ENABLE_GROUP_CALLING_FLAG = true;
 
 var ConversationAudioVideoPanel = require('./conversationaudiovideopanel.jsx').ConversationAudioVideoPanel;
 
 var JoinCallNotification = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
+    componentDidUpdate: function() {
+        var $node = $(this.findDOMNode());
+        var room = this.props.chatRoom;
+        $('a.joinActiveCall', $node)
+            .rebind('click.joinCall', function(e) {
+                room.joinCall();
+                e.preventDefault();
+                return false;
+            });
+    },
     render: function() {
         var room = this.props.chatRoom;
         if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
             return <div className="in-call-notif yellow join">
                 <i className="small-icon audio-call colorized"/>
-                There is an active group call, but maximum call participants count had been reached.
+                {l[20200]}
             </div>;
         }
         else {
+            var translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
+            translatedCode = translatedCode
+                .replace("[A]", '<a href="javascript:;" class="joinActiveCall">')
+                .replace('[/A]', '</a>');
+
             return <div className="in-call-notif neutral join">
                 <i className="small-icon audio-call colorized"/>
-                There is an active group call. <a href="javascript:;" onClick={((e) => {
-                room.joinCall();
-                e.preventDefault();
-                return false;
-            })}>Join</a>
+                <span dangerouslySetInnerHTML={{__html: translatedCode}}></span>
             </div>;
         }
     }

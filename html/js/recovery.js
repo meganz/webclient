@@ -309,7 +309,7 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         this.prepareInstruction();
         recoveryImg = 'device-password';
         infoBlock = '';
-        status = 'success';
+        status = '';
 
         // If twoFactor is on the account show different message.
         if (this.twoFactor) {
@@ -327,7 +327,7 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         noAnswer = '';
         recoveryImg = 'key';
         infoBlock = '';
-        status = 'success';
+        status = '';
 
         // If twoFactor is on the account show different message.
         if (this.twoFactor) {

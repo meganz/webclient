@@ -17,7 +17,7 @@ function dashboardUI() {
 
     $('.fm-right-files-block, .section.conversations, .fm-right-account-block').addClass('hidden');
     $('.fm-right-block.dashboard').removeClass('hidden');
-    
+
     // Hide backup widget is user already saved recovery key before
     if (localStorage.recoverykey) {
         $('.account.widget.recovery-key').addClass('hidden');
@@ -25,11 +25,6 @@ function dashboardUI() {
     else {
         $('.account.widget.recovery-key').removeClass('hidden');
     }
-
-    // Button on dashboard to backup their master key
-    $('.dashboard .backup-master-key').rebind('click', function() {
-        M.showRecoveryKeyDialog(2);
-    });
 
     M.onSectionUIOpen('dashboard');
     accountUI.general.userUIUpdate();
@@ -458,10 +453,13 @@ function dashboardUI() {
         //    $('.account.widget.body.achievements').addClass('hidden');
         // }
 
-        
-
         onIdle(fm_resize_handler);
         initTreeScroll();
+
+        // Button on dashboard to backup their master key
+        $('.dashboard .backup-master-key').rebind('click', function() {
+            M.showRecoveryKeyDialog(2);
+        });
     });
 }
 dashboardUI.updateWidgets = function(widget) {

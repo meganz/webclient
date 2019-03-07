@@ -1505,7 +1505,7 @@ function init_page() {
         localStorage.setItem('voucherExpiry', Date.now() + 36e5);
 
         // If not logged in, direct them to login or register first
-        if (u_type === false) {
+        if (!u_type) {
             if (u_wasloggedin()) {
                 login_txt = l[7712];
                 loadSubPage('login');

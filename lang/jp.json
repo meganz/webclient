@@ -3261,5 +3261,9 @@
     "20445": "\u7d99\u7d9a\u4e2d\u306e\u901a\u8a71",
     "20449": "\u5fdc\u7b54\u3059\u308b",
     "20450": "\u7121\u8996",
-    "20460": "\u6709\u52b9\u306a\u901a\u8a71\u304c\u3042\u308a\u307e\u3059\u3002[A]\u53c2\u52a0\u3059\u308b[\/A]"
+    "20460": "\u6709\u52b9\u306a\u901a\u8a71\u304c\u3042\u308a\u307e\u3059\u3002[A]\u53c2\u52a0\u3059\u308b[\/A]",
+    "20461": "No folders in Cloud Drive",
+    "20462": "Your account is on [B]suspended[\/B] status. You can browse your data only.",
+    "20463": "Contact your business account administrator to resolve the issue and activate your account.",
+    "20464": "IMPORTANT"
 }

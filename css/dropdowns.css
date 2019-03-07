@@ -179,6 +179,10 @@
     bottom: -11px;
     background-position: -24px -2256px;
 }
+.dropdown.body.popup.astropay-payment-reminder {
+    width: auto;
+    max-width: 464px;
+}
 .left-arrow .dropdown-white-arrow {
     width: 11px;
     height: 24px;

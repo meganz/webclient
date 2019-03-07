@@ -1002,6 +1002,15 @@ MegaData.prototype.addToTransferTable = function(gid, ttl, elem) {
                 addToTransferTable(gid, elem);
             }
         }
+        else {
+            // Keep inserting uploads as long downloads are overquota...
+            // XXX: Check whether there is a noticeable performance degradation...
+
+            if (document.querySelector('.transfer-table tr.transfer-download .transfer-status.overquota')) {
+                fit = true;
+                addToTransferTable(gid, elem);
+            }
+        }
 
         if (!fit) {
             M.tfsdomqueue[gid] = elem;

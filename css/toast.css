@@ -90,8 +90,8 @@
 }
 .recoveryKey .toast-icon {
     background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
-    background-size: 360px auto;
-    background-position: -176px -742px;
+    background-size: 344px auto;
+    background-position: -168px -708px;
 }
 .settings .toast-button, .recoveryKey .toast-button {
     display: none;

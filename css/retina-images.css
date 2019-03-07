@@ -327,7 +327,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 .user-management-dialog .folder-small-icon.ex-out-share,
 .business-dashboard .folder-small-icon.ex-out-share{
     background-image: url(../images/mega/top-sprite_v5@2x.png);
-     background-size: 38px auto;
+    background-size: 38px auto;
 }
 
 .user-management-view .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-in-share, 
@@ -335,11 +335,11 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 .user-management-dialog .folder-small-icon.ex-in-share,
 .business-dashboard .folder-small-icon.ex-in-share{
     background-image: url(../images/mega/top-sprite_v5@2x.png);
-     background-size: 38px auto;
+    background-size: 38px auto;
 }
 .bus-reg-icon {
     background-image: url(../images/mega/top-sprite_v5@2x.png);
-     background-size: 38px auto;
+    background-size: 38px auto;
 }
 
 .bus-reg-checkbox.checkOn::before {
@@ -353,7 +353,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/2fa-auth-apps@2x.png);
     background-size: 72px auto;
 }
-.improved-recovery-steps .recover-image, .improved-recovery-steps .session-image-block, .improved-recovery-steps .recover-button.yes::after, .improved-recovery-steps .recover-button.no::after, .tooltip-block .minimum-password-block .password-icon    {
+.improved-recovery-steps .recover-image, .improved-recovery-steps .session-image-block, .improved-recovery-steps .recover-button.yes::after, .improved-recovery-steps .recover-button.no::after, .tooltip-block .minimum-password-block .password-icon, .recoveryKey .toast-icon {
     background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
     background-size: 344px auto;
 }

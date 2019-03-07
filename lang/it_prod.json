@@ -232,7 +232,7 @@
     "666": "Si prega di confermare che potresti essere ritenuto responsabile per danni, compresi i costi e le spese legali, se consapevolmente dichiari erroneamente che i contenuti segnalati, URL (s), o file violano un copyright.",
     "667": "Si prega di confermare che le informazioni in questa notifica sono accurate, e che si dichiara sotto pena di spergiuro che si \u00e8 autorizzati ad agire per conto del titolare del copyright.",
     "670": "Lingua",
-    "676": "MEGA \u00e8 Archiviazione Cloud con la Privacy Potente sempre accesa",
+    "676": "MEGA \u00e8 Cloud con potente Privacy sempre attiva.",
     "677": "MEGA fornisce archiviazione cloud robusta con la privacy conveniente e potentemente sempre accesa. MEGA crede nel tuo diritto alla privacy e vi fornisce gli strumenti tecnologici per proteggerla. Noi la chiamiamo Crittografia Controllata dall'Utente, o UCE (User Controlled Encryption), e succede automaticamente.",
     "678": "Cos'\u00e8 la Crittografia Controllata dall'Utente di MEGA?",
     "679": "Tutti i file depositati su MEGA sono crittografati. Tutti i trasferimenti dati da e verso MEGA sono crittografati. E mentre la maggioranza dei fornitori di archiviazione cloud sosterranno la stessa cosa, MEGA \u00e8 diverso - diversamente dalla norma dell'industria dove il fornitore \u00e8 in possesso della chiave di decrittazione, con MEGA, tu controlli la crittografia, tu sei in possesso delle chiavi, e tu decidi a chi dare accesso ai tuoi file, senza richiedere nessuna istallazione di software rischioso. Succede tutto nel tuo browser!",
@@ -2654,7 +2654,7 @@
     "19698": "Le caratteristiche di MEGAchat sono al momento non disponibili per le nostre app per Windows Phone 8 e Windows 10.",
     "19700": "Scarica le app mobili di MEGA per la tua piattaforma",
     "19701": "Vuoi lavorare come un team?",
-    "19702": "MEGA Business",
+    "19702": "MEGA per Business",
     "19703": "Strumenti di gestione dell'utente",
     "19704": "Criptazione end-to-end su tutta la tua attivit\u00e0",
     "19705": "Comunica con il tuo team usando messaggi o chiamate",
@@ -2917,6 +2917,7 @@
     "20197": "[S1]$1[\/S1] [S2]di[\/S2] [S3]$2[\/S3]",
     "20198": "URL invalido",
     "20199": "Questo URL \u00e8 corrotto o deformato. Il link a cui stai cercando di accedere non esiste.",
+    "20200": "Non ti \u00e8 permesso di partecipare a questa chiamata in quanto ha raggiunto il massimo numero di partecipanti.",
     "20204": "Soluzione FTP",
     "20205": "Configurare un server FTP ti permetter\u00e0 di accedere ai tuoi file su MEGA facilmente dal tuo computer locale. Tutte le maggiori piattaforme supportano l'accesso ad un server FTP.",
     "20206": "[S1]Imposta lo status su Lontano dopo[\/S1] %1 [S2]minuti di inattivit\u00e0.[\/S2]",
@@ -3101,7 +3102,9 @@
     "20428": "Spazio di archiviazione illimitato \/ Banda di trasferimento illimitata",
     "20429": "Dopo aver finito di passare ad un account Business, per favore assicurati di annullare il tuo abbonamento {0} se non l'hai gi\u00e0 fatto.",
     "20430": "Miglioramento effettuato con successo",
-    "20431": "Spiacenti, nessun metodo di pagamento \u00e8 supportato per gli account Business nella tua nazione. Per favore, contatta support@mega.nz per farti aiutare nella registrazione di un account Business.",
+    "20431": "Spiacenti, nessun metodo di pagamento \u00e8 supportato per gli account Business nella tua nazione. Per favore, contatta business@mega.nz per farti aiutare nella registrazione di un account Business.",
     "20432": "Non inserire mai la tua password su un dispositivo di cui non ti fidi appieno.",
-    "20433": "Non c'\u00e8 nessuna procedura di recupero per le password perse o dimenticate, sii sicuro di poter ricordare la tua password ogni volta"
+    "20433": "Non c'\u00e8 nessuna procedura di recupero per le password perse o dimenticate, sii sicuro di poter ricordare la tua password ogni volta",
+    "20435": "%1 ha condiviso la seguente cartella condivisa te:",
+    "20460": "C'\u00e8 una chiamata attiva in corso. [A]Unisciti[\/A]"
 }

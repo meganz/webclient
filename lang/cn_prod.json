@@ -2057,7 +2057,7 @@
     "18683": "\u63d2\u5165\u9884\u89c8",
     "18684": "\u5220\u9664\u9884\u89c8",
     "18685": "\u5783\u573e\u7bb1\u53ef\u4ee5\u81ea\u52a8\u6e05\u6d01\u3002\u6700\u77ed\u671f\u9650\u4e3a7\u5929\u3002",
-    "18686": "\u5783\u573e\u7bb1\u4f1a\u81ea\u52a8\u6e05\u7406\u3002\u6700\u77ed\u671f\u9650\u4e3a7\u5929\uff0c\u6700\u957f\u671f\u9650\u4e3a30\u5929\u3002",
+    "18686": "The Rubbish Bin is cleared for you automatically. The minimum period is 7 days and the maximum period is 30 days.",
     "18687": "\u60a8\u6b63\u5728\u6c38\u4e45\u7981\u7528\u6269\u5c55\u7f51\u5740\u9884\u89c8\u3002\u60a8\u53ef\u4ee5\u5728\u8bbe\u7f6e\u4e2d\u91cd\u65b0\u542f\u7528\u6269\u5c55\u7f51\u5740\u9884\u89c8\u3002\u4f60\u60f3\u7ee7\u7eed\u5417\uff1f",
     "18696": "\u4e30\u5bcc\u7684\u7f51\u5740\u9884\u89c8",
     "18698": "\u81f4\u7535[X]\u6ca1\u6709\u53ca\u65f6\u5e94\u7b54\u3002",
@@ -2824,7 +2824,7 @@
     "19969": "\u7fa4\u7ec4\u547c\u53eb\u5df2\u53d6\u6d88",
     "19970": "\u7fa4\u7ec4\u547c\u53eb\u5df2\u5f00\u59cb",
     "19985": "\u6b64\u804a\u5929\u4e2d\u76ee\u524d\u65e0\u5171\u4eab\u6587\u4ef6\u3002 \u60a8\u53ef\u4ee5\u901a\u8fc7\u4e0a\u4f20\u81f3\u6b64\u804a\u5929\u4e2d\uff08\u5305\u62ec\u62d6\u62fd\u4e0a\u4f20\uff09\u6216\u76f4\u63a5\u4ece\u60a8\u7684\u4e91\u76d8\u4e2d\u9009\u62e9\u6587\u4ef6\u8fdb\u884c\u5171\u4eab\u3002",
-    "19986": "\u60a8\u76ee\u524d\u6ca1\u6709\u6765\u81ea\u6b64\u6210\u5458\u4f20\u5165\u7684\u5171\u4eab\u6587\u4ef6\u5939\u3002 \u60a8\u53ef\u4ee5\u76f4\u63a5\u4ece\u60a8\u7684\u4e91\u76d8\u5c06\u5b9e\u65f6\u6587\u4ef6\u5939\u5171\u4eab\u5230\u60a8\u7684MEGA\u8054\u7cfb\u4eba\u3002",
+    "19986": "You currently have no incoming shared folders from this participant. You can share folders to your contacts on MEGA directly from your Cloud Drive.",
     "19987": "\u65e0\u5df2\u7981\u7528\u7528\u6237",
     "19988": "\u7b2c%1\u9875",
     "19989": "\u53d1\u7968",
@@ -2917,6 +2917,7 @@
     "20197": "[S1]$1[\/S1][S2]\u7684[\/S2][S3]$2[\/S3]",
     "20198": "\u65e0\u6548\u7f51\u5740",
     "20199": "\u8be5\u7f51\u5740\u4e0d\u53ef\u7528\u3002\u60a8\u5c1d\u8bd5\u8bbf\u95ee\u7684\u94fe\u63a5\u4e0d\u5b58\u5728\u3002",
+    "20200": "\u53c2\u4e0e\u4eba\u6570\u5df2\u8fbe\u4e0a\u9650\uff0c\u60a8\u65e0\u6cd5\u52a0\u5165\u6b64\u901a\u8bdd\u3002",
     "20204": "FTP\u89e3\u51b3\u65b9\u6848",
     "20205": "\u914d\u7f6eFTP\u670d\u52a1\u5668\u5c06\u53ef\u8ba9\u60a8\u4ece\u672c\u5730\u8ba1\u7b97\u673a\u8f7b\u677e\u8bbf\u95eeMEGA\u6587\u4ef6\u3002 \u6240\u6709\u4e3b\u8981\u5e73\u53f0\u5747\u5df2\u652f\u6301\u8bbf\u95eeFTP\u670d\u52a1\u5668\u3002",
     "20206": "[S1]\u8bbe\u7f6e\u72b6\u6001\u4e3a\u201c\u79bb\u5f00\u201d\u5728[\/S1]%1[S2]\u5206\u949f\u65e0\u52a8\u4f5c\u540e\u3002[\/S2]",
@@ -3101,7 +3102,9 @@
     "20428": "Unlimited Storage \/ Unlimited Transfers",
     "20429": "After you finish upgrading to a Business account, please ensure you cancel your {0} subscription if you have not already.",
     "20430": "Upgrade Successful",
-    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact support@mega.nz to help you with Business account registration.",
+    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact business@mega.nz to help you with Business account registration.",
     "20432": "Never enter your password on a device you do not fully trust.",
-    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times"
+    "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
+    "20435": "%1 shared the following folders with you:",
+    "20460": "There is an active call. [A]Join[\/A]"
 }

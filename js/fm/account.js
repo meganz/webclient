@@ -2294,7 +2294,7 @@ accountUI.fileManagement = {
 
         // Rubbish cleaning schedule
         this.rubsched.render(account);
-        this.rubsched.bindEvents();
+        this.rubsched.bindEvents(account);
 
         // User Interface
         this.userInterface.render();
@@ -2447,7 +2447,7 @@ accountUI.fileManagement = {
                 else {
                     $rubschedParent.addClass('hidden');
                     $rubschedGreenNoti.removeClass('hidden');
-                    $('.rubbish-desc').text(l[18686]).removeClass('hidden');
+                    $('.rubbish-desc').text(l[19772]).removeClass('hidden');
                     $('.account.rubbish-cleaning .settings-right-block').removeClass('slide-in-out');
                 }
             }
@@ -2482,8 +2482,21 @@ accountUI.fileManagement = {
                     $rubschedParent.removeClass('border').parent().addClass('closed');
                 }
             }
+
+            var curVal = $('#rad14_opt').val();
+            if (curVal < 7) {
+                var warningMsg = parseInt(curVal) === 1 ? l[20476] : l[20475].replace('%1', curVal);
+                $('.rub-warn').removeClass('hidden').find('.text').text(warningMsg);
+            }
+
+            if (u_attr.p) {
+                $('.rub-free-range').addClass('hidden');
+            }
+            else {
+                $('.rub-free-range').removeClass('hidden');
+            }
         },
-        bindEvents: function() {
+        bindEvents: function(account) {
 
             'use strict';
 
@@ -2495,16 +2508,32 @@ accountUI.fileManagement = {
                 }
 
                 var curVal = parseInt($(this).val()) | 0;
+                var maxVal;
 
-                if (this.id === 'rad14_opt') { // for days option
-                    var minVal = 7;
-                    var maxVal = u_attr.p ? Math.pow(2, 53) : 30;
+                if (this.id === 'rad14_opt') { // For days option
+                    var minVal = u_attr.p ? 1 : 7;
+                    maxVal = u_attr.p ? Math.pow(2, 53) : 30;
                     curVal = Math.min(Math.max(curVal, minVal), maxVal);
+                    var $warningBlock = $('.rub-warn');
+
+                    if (curVal < 7) {
+                        var warningMsg = curVal === 1 ? l[20476] : l[20475].replace('%1', curVal);
+                        $warningBlock.removeClass('hidden').find('.text').text(warningMsg);
+                    }
+                    else {
+                        $warningBlock.addClass('hidden');
+                    }
+                }
+
+                if (this.id === 'rad15_opt') { // For size option
+                    // Max value cannot be over current account's total storage space.
+                    maxVal = account.space / Math.pow(1024, 3);
+                    curVal = Math.min(curVal, maxVal);
                 }
 
                 $(this).val(curVal);
 
-                var id = String($(this).attr('id')).split('_')[0];
+                var id = String(this.id).split('_')[0];
                 mega.config.setn('rubsched', id.substr(3) + ':' + curVal);
             });
         }

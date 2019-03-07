@@ -2793,6 +2793,8 @@
     "19748": "Akun Anda telah dinonaktifkan oleh administrator Anda. Anda dapat menghubungi administrator akun bisnis Anda untuk rincian lebih lanjut.",
     "19749": "Aktif Terakhir",
     "19750": "Migrasi Data Pengguna",
+    "19772": "Sampah dibersihkan untuk Anda secara otomatis.",
+    "19774": "Jangka waktu minimum adalah 7 hari dan periode maksimum Anda adalah 30 hari.",
     "19775": "%d hari",
     "19779": "GitHub berisi informasi tentang fitur Aplikasi Desktop MEGA dan petunjuk penggunaan untuk setiap platform, dan menjelaskan cara membangunnya dari repositori GitHub sumber publik kami.",
     "19780": "Menjelaskan fitur Aplikasi Desktop MEGA dan menjawab pertanyaan yang sering diajukan.",
@@ -3262,7 +3264,13 @@
     "20450": "Diabaikan",
     "20460": "Ada panggilan aktif. [A]Bergabunglah[\/A]",
     "20461": "No folders in Cloud Drive",
-    "20462": "Your account is on [B]suspended[\/B] status. You can browse your data only.",
+    "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
     "20463": "Contact your business account administrator to resolve the issue and activate your account.",
-    "20464": "IMPORTANT"
+    "20464": "IMPORTANT",
+    "20471": "Pembayaran lewat jatuh tempo",
+    "20472": "To reactivate your Business account, you need to pay any overdue subscription payments.",
+    "20473": "Payment breakdown",
+    "20474": "You are about to close the dialog. All data entered will be lost.",
+    "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
+    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
 }

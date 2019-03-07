@@ -2395,6 +2395,15 @@ FileManager.prototype.addTransferPanelUI = function() {
                 ulmanager.abort(null);
 
                 $.removeTransferItems($('.transfer-table tr'));
+
+                later(function() {
+                    if (uldl_hold) {
+                        uldl_hold = false;
+                        ulQueue.resume();
+                        dlQueue.resume();
+                        $('.transfer-pause-icon').removeClass('active').find('span').text(l[6993]);
+                    }
+                });
             });
         }
     });

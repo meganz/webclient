@@ -231,6 +231,7 @@ function init_page() {
     page = page || (u_type ? 'fm' : 'start');
 
     var mobilePageParsed = false;
+    var ar;
 
     if (!window.M) {
         return console.warn('Something went wrong, the initialization did not completed...');
@@ -252,7 +253,7 @@ function init_page() {
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
 
-        var ar = page.substr(1, page.length - 1).split('!');
+        ar = page.substr(1, page.length - 1).split('!');
         if (ar[0]) {
             dlid = ar[0].replace(/[^\w-]+/g, "");
         }
@@ -389,7 +390,7 @@ function init_page() {
             $.autoSelectNode = page[1];
             page = page[0];
         }
-        var ar = page.substr(2, page.length - 1).split('!');
+        ar = page.substr(2, page.length - 1).split(/[^!\w-]/, 1)[0].split('!');
 
         pfid = false;
         if (ar[0]) {

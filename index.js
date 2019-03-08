@@ -1389,9 +1389,15 @@ function init_page() {
     }
     else if (page.substr(0, 7) === 'payment') {
 
-        // Load the Pro page in the background
-        parsepage(pages['proplan']);
-        pro.proplan.init();
+        if (page.indexOf('-b') === -1) {
+            // Load the Pro page in the background
+            parsepage(pages['proplan']);
+            pro.proplan.init();
+        }
+        else {
+            parsepage(pages['business']);
+            $('body').addClass('business');
+        }
 
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
         pro.proplan.processReturnUrlFromProvider(page);

@@ -4107,7 +4107,7 @@ li.token-input-token-invite .input-close {
     padding-bottom: 40px;
     text-align: center;
 }
-.user-management-dialog.payment-reminder .payment-reminder-logo {
+.payment-reminder-logo {
     background-position: -20px -969px;
     width: 80px;
     height: 80px;

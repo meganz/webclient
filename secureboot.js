@@ -2293,6 +2293,8 @@ else if (!b_u) {
     {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
+        'repay': {f:'html/repay.html', n: 'repay', j:0},
+        'repay_js': {f:'html/js/repay.js', n: 'repay_js', j:1},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'blog': {f:'html/blog.html', n: 'blog', j:0},
         'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
@@ -2442,6 +2444,7 @@ else if (!b_u) {
         'register': ['register','register_js', 'zxcvbn_js'],
         'newsignup': ['register','register_js', 'zxcvbn_js'],
         'resellers': ['resellers'],
+        'repay': ['repay','repay_js'],
         '!': ['download','download_js'],
         'dispute': ['dispute'],
         'disputenotice': ['disputenotice', 'copyright_js'],

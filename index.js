@@ -708,6 +708,9 @@ function init_page() {
         parsepage(pages['blog']);
         init_blog();
     }
+    else if(page.substr(0, 5) == 'repay' ) {
+        parsepage(pages['repay']);
+    }
 
     // If user has been invited to join MEGA and they are not already registered
     else if (page.substr(0, 9) == 'newsignup') {

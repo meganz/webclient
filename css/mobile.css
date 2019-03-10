@@ -2185,7 +2185,7 @@ input[type='checkbox'] {
     opacity: 0.3;
 }
 .mobile.signin-button.active, .mobile.register-button.active, .mobile.resend-button.active, .mobile.create-account-botton.active {
-    background-image: linear-gradient(-180deg, #07BEB1 0%, #00BFA5 100%);
+    background: #00bfa5;
     border: 1px solid #00A58F;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 2px 1px 0 rgba(255,255,255,0.20);
     color: #fff;

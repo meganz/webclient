@@ -3034,7 +3034,8 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
                         };
 
                         if (treeObj.errors.length || treeObj.warns.length) {
-                            var msgMsg = l[19147].replace('[Br]', '<br/>'); // operation contains errors and/or warning
+                            // operation contains errors and/or warning
+                            var msgMsg = l[19147].replace(/\[Br\]/g, '<br/>');
                             var msgQuestion = l[18229]; // Do you want to proceed?
                             msgMsg = msgMsg.replace('{0}', M.suba[subUserHandle].e)
                                 .replace('{1}', treeObj.errors.length).replace('{2}', treeObj.warns.length);

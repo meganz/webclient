@@ -2402,6 +2402,15 @@ FileManager.prototype.addTransferPanelUI = function() {
                 ulmanager.abort(null);
 
                 $.removeTransferItems($('.transfer-table tr'));
+
+                later(function() {
+                    if (uldl_hold) {
+                        uldl_hold = false;
+                        ulQueue.resume();
+                        dlQueue.resume();
+                        $('.transfer-pause-icon').removeClass('active').find('span').text(l[6993]);
+                    }
+                });
             });
         }
     });
@@ -2584,6 +2593,7 @@ FileManager.prototype.addContactUI = function() {
         $container.find('.fm-chat-user-status').text(onlinestatus[0]);
         $container.find('.contact-details-user-name').text(this.getNameByHandle(user.u));
         $container.find('.contact-details-email').text(user.m);
+        $('.contact-share-notification').text(l[20435].replace('%1', this.getNameByHandle(user.u)));
 
         // Display the current fingerpring
         showAuthenticityCredentials(user, $container);

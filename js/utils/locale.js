@@ -273,6 +273,69 @@ function time2last(timestamp) {
 }
 
 /**
+ * Function to get date time structure for current locale.
+ * @returns {String|Boolean} result Date structure as 'ymd', 'dmy', or 'mdy' or false if errored.
+ */
+function getDateStructure() {
+
+    'use strict';
+
+    // Date made with unique number 1987-04-23.
+    var uniqTime = new Date(1987, 3, 23);
+    var uniqUnix = uniqTime.getTime() / 1000 | 0;
+    var index = [];
+    var localeTime = time2date(uniqUnix, 1);
+    var result;
+    if (locale !== 'ar') {
+        index['y'] = localeTime.indexOf(1987);
+        index['m'] = localeTime.indexOf(4);
+        index['d'] = localeTime.indexOf(23);
+
+        result = Object.keys(index).sort(function(a, b) {
+            return index[a] - index[b];
+        }).join('');
+    }
+    else {
+        // Arabic special
+        var country;
+        if (u_attr) {
+            country = u_attr.country ? u_attr.country : u_attr.ipcc;
+        }
+        var locales = country ? locale + '-' + country : locale;
+
+        var options_y = {year: 'numeric'}; // Format only Day
+        var options_m = {month: 'numeric'}; // Format only Month
+        var options_d = {day: 'numeric'}; // Format only Year
+
+        locales = !u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0 ? 'ar-EG' : locales;
+
+        try {
+            if (typeof Intl !== 'undefined') {
+                var locale_y = new Intl.DateTimeFormat(locales, options_y).format(uniqTime);
+                var locale_m = new Intl.DateTimeFormat(locales, options_m).format(uniqTime);
+                var locale_d = new Intl.DateTimeFormat(locales, options_d).format(uniqTime);
+
+                index['y'] = localeTime.indexOf(locale_y);
+                index['m'] = localeTime.indexOf(locale_m);
+                index['d'] = localeTime.indexOf(locale_d);
+
+                result = Object.keys(index).sort(function(a, b) {
+                    return index[b] - index[a];
+                }).join('');
+            }
+            else {
+                return false;
+            }
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+    return result;
+}
+
+/**
  * Basic calendar math function (using moment.js) to return true or false if the date passed in is either
  * the same day or the previous day.
  *

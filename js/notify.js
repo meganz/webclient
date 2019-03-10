@@ -547,6 +547,13 @@ var notify = {
             allNotificationsHtml += $notificationHtml.prop('outerHTML');
         }
 
+        // If all notifications are not recognised, show empty
+        if (allNotificationsHtml === "") {
+            notify.$popup.removeClass('loading');
+            notify.$popup.addClass('empty');
+            return false;
+        }
+
         // Update the list of notifications
         notify.$popup.find('.notification-scr-list').append(allNotificationsHtml);
         notify.$popup.removeClass('empty loading');

@@ -655,6 +655,7 @@
     "2042": "Voc\u00ea n\u00e3o possui permiss\u00f5es de escrita nesta pasta.",
     "2480": "Confirma\u00e7\u00e3o de conta falhou",
     "2507": "Erro ao importar o arquivo",
+    "5527": "MEGA \u00e9 Armazenamento em Nuvem (Cloud Storage) com Poderoso Sistema de Privacidade",
     "5528": "de",
     "5533": "Carregando...",
     "5542": "Compartilhado comigo",
@@ -2587,7 +2588,6 @@
     "19341": "Voc\u00ea est\u00e1 logado no navegador com uma conta diferente. Fa\u00e7a logout desta conta e fa\u00e7a login na conta na qual voc\u00ea quer fazer o upgrade.",
     "19342": "N\u00e3o foi poss\u00edvel obter op\u00e7\u00f5es de pagamento para o registro da conta Business. Por favor, tente novamente mais tarde.",
     "19475": "Controle de vers\u00f5es de arquivos",
-    "19483": "Novo chat de grupo",
     "19486": "A sua Nuvem de arquivos est\u00e1 quase cheia. Fa\u00e7a upgrade a PRO e obtenha at\u00e9 8 TB de espa\u00e7o de armazenamento e 16 TB de cota de transfer\u00eancia.",
     "19501": "O m\u00ednimo s\u00e3o 3 usu\u00e1rios",
     "19503": "Plano base ([0] usu\u00e1rios)",
@@ -3260,5 +3260,9 @@
     "20445": "Chamada em andamento",
     "20449": "Responder",
     "20450": "Ignorado",
-    "20460": "H\u00e1 uma chamada ativa. [A]Entrar[\/A]"
+    "20460": "H\u00e1 uma chamada ativa. [A]Entrar[\/A]",
+    "20461": "No folders in Cloud Drive",
+    "20462": "Your account is on [B]suspended[\/B] status. You can browse your data only.",
+    "20463": "Contact your business account administrator to resolve the issue and activate your account.",
+    "20464": "IMPORTANT"
 }

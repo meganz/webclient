@@ -5906,7 +5906,7 @@ React.makeElement = React['createElement'];
 	var SharedFilesAccordionPanel = __webpack_require__(33).SharedFilesAccordionPanel;
 	var IncomingSharesAccordionPanel = __webpack_require__(34).IncomingSharesAccordionPanel;
 
-	var ENABLE_GROUP_CALLING_FLAG = typeof localStorage.enableGroupCalling !== 'undefined' && localStorage.enableGroupCalling === "1";
+	var ENABLE_GROUP_CALLING_FLAG = true;
 
 	var ConversationAudioVideoPanel = __webpack_require__(35).ConversationAudioVideoPanel;
 
@@ -5914,6 +5914,15 @@ React.makeElement = React['createElement'];
 	    displayName: "JoinCallNotification",
 
 	    mixins: [MegaRenderMixin, RenderDebugger],
+	    componentDidUpdate: function componentDidUpdate() {
+	        var $node = $(this.findDOMNode());
+	        var room = this.props.chatRoom;
+	        $('a.joinActiveCall', $node).rebind('click.joinCall', function (e) {
+	            room.joinCall();
+	            e.preventDefault();
+	            return false;
+	        });
+	    },
 	    render: function render() {
 	        var room = this.props.chatRoom;
 	        if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
@@ -5921,23 +5930,17 @@ React.makeElement = React['createElement'];
 	                "div",
 	                { className: "in-call-notif yellow join" },
 	                React.makeElement("i", { className: "small-icon audio-call colorized" }),
-	                "There is an active group call, but maximum call participants count had been reached."
+	                l[20200]
 	            );
 	        } else {
+	            var translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
+	            translatedCode = translatedCode.replace("[A]", '<a href="javascript:;" class="joinActiveCall">').replace('[/A]', '</a>');
+
 	            return React.makeElement(
 	                "div",
 	                { className: "in-call-notif neutral join" },
 	                React.makeElement("i", { className: "small-icon audio-call colorized" }),
-	                "There is an active group call. ",
-	                React.makeElement(
-	                    "a",
-	                    { href: "javascript:;", onClick: function onClick(e) {
-	                            room.joinCall();
-	                            e.preventDefault();
-	                            return false;
-	                        } },
-	                    "Join"
-	                )
+	                React.makeElement("span", { dangerouslySetInnerHTML: { __html: translatedCode } })
 	            );
 	        }
 	    }

@@ -1239,10 +1239,22 @@ else {
 
 function siteLoadError(error, filename) {
     'use strict';
+
+    if (!window.buildOlderThan10Days && !window.log99723) {
+        onIdle(function() {
+            var xhr = getxhr();
+            xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
+            xhr.send(JSON.stringify([{a: 'log', e: 99723, m: JSON.stringify([1, error, filename, staticpath])}]));
+        });
+
+        window.log99723 = true;
+    }
+
     var message = ['MEGA failed to load because of '];
     if (location.host !== 'mega.nz') {
         message[0] += '..';
     }
+
     if (error === 1) {
         message.push('The file "' + filename + '" is corrupt.');
     }
@@ -1253,17 +1265,30 @@ function siteLoadError(error, filename) {
         message.push('Filename: ' + filename + "\nException: " + error);
         message.push('Stack trace: ' + String(error.stack).split('\n').splice(1, 4).join('\n'));
     }
+
     message.push('Please click OK to refresh and try again.');
-    message.push("If the problem persists, please try disabling all third-party browser extensions,"
-        + " update your browser and MEGA browser extension to the latest version.If that does not help, "
-        + "contact support@mega.nz");
+    message.push("If the problem persists, please try disabling all third-party browser extensions, " +
+                 "update your browser and MEGA browser extension to the latest version. " +
+                 "If that does not help, contact support@mega.nz");
+
     message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
     message.push('Static server: ' + staticpath);
+
+    message = message.join("\n\n");
+    console.error(message);
     contenterror = 1;
-    // showing a confirm dialog containing the message, and if 'OK' pressed it will reload
-    if (confirm(message.join("\n\n")) === true) {
-        location.reload(true);
+
+    if (window.sleTick) {
+        return;
     }
+
+    window.sleTick = setTimeout(function() {
+        // showing a confirm dialog containing the message, and if 'OK' pressed it will reload
+        if (confirm(message) === true) {
+            location.reload(true);
+        }
+        window.sleTick = null;
+    }, 2e3);
 }
 
 // Add manifest.json so this can be used on latest browsers.

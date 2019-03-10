@@ -231,6 +231,7 @@ function init_page() {
     page = page || (u_type ? 'fm' : 'start');
 
     var mobilePageParsed = false;
+    var ar;
 
     if (!window.M) {
         return console.warn('Something went wrong, the initialization did not completed...');
@@ -252,7 +253,7 @@ function init_page() {
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
 
-        var ar = page.substr(1, page.length - 1).split('!');
+        ar = page.substr(1, page.length - 1).split('!');
         if (ar[0]) {
             dlid = ar[0].replace(/[^\w-]+/g, "");
         }
@@ -389,7 +390,7 @@ function init_page() {
             $.autoSelectNode = page[1];
             page = page[0];
         }
-        var ar = page.substr(2, page.length - 1).split('!');
+        ar = page.substr(2, page.length - 1).split(/[^!\w-]/, 1)[0].split('!');
 
         pfid = false;
         if (ar[0]) {
@@ -1062,6 +1063,17 @@ function init_page() {
             $('.account-mid-block').addClass('high');
         }
 
+        // if this is a business user
+        var $supportLink = $('#contact-email-support-btn');
+        if (u_attr && u_attr.b) {
+            $supportLink.text('business@mega.nz');
+            $supportLink.prop('href', 'mailto:business@mega.nz');
+        }
+        else {
+            $supportLink.text('support@mega.nz');
+            $supportLink.prop('href', 'mailto:support@mega.nz');
+        }
+
         // On clicking the directory buttons
         $('.directory-buttons li').rebind('click', function() {
 
@@ -1377,9 +1389,15 @@ function init_page() {
     }
     else if (page.substr(0, 7) === 'payment') {
 
-        // Load the Pro page in the background
-        parsepage(pages['proplan']);
-        pro.proplan.init();
+        if (page.indexOf('-b') === -1) {
+            // Load the Pro page in the background
+            parsepage(pages['proplan']);
+            pro.proplan.init();
+        }
+        else {
+            parsepage(pages['business']);
+            $('body').addClass('business');
+        }
 
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
         pro.proplan.processReturnUrlFromProvider(page);
@@ -1494,7 +1512,7 @@ function init_page() {
         localStorage.setItem('voucherExpiry', Date.now() + 36e5);
 
         // If not logged in, direct them to login or register first
-        if (u_type === false) {
+        if (!u_type) {
             if (u_wasloggedin()) {
                 login_txt = l[7712];
                 loadSubPage('login');
@@ -1605,8 +1623,8 @@ function init_page() {
             mega.initLoadReport();
             loadfm();
         }
-        else if ((!pfid || flhashchange) && id && id !== M.currentdirid) {
-            M.openFolder(id);
+        else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start')) {
+            M.openFolder(id, true);
         }
         else {
             if (ul_queue.length > 0) {
@@ -2380,14 +2398,9 @@ function topmenuUI() {
     });
 
     // If the main Mega M logo in the header is clicked
-    $topHeader.find('.logo').rebind('click', function () {
+    $('.top-head, .fm-main').find('.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
-            if (folderlink) {
-                M.openFolder(M.RootID, true);
-            }
-            else {
-                loadSubPage(typeof u_type !== 'undefined' && +u_type > 2 ? 'fm/dashboard' : 'start');
-            }
+            loadSubPage('start');
         }
     });
 

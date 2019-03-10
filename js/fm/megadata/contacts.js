@@ -831,6 +831,8 @@ MegaData.prototype.syncContactEmail = function(userHash) {
                 fmdb.add('u', {u: u.u, d: cleanedUpUserData});
                 M.u[userId].firstName = '';
                 M.u[userId].lastName = '';
+                attribCache.removeItem(userId + "_firstname");
+                attribCache.removeItem(userId + "_lastname");
             }
 
             this.syncUsersFullname(userId);

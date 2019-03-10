@@ -2504,6 +2504,12 @@ function closeDialog(ev) {
 function createFolderDialog(close) {
     "use strict";
 
+    // Checking if this a business user with expired status
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
+        M.showExpiredBusiness();
+        return;
+    }
+
     var $dialog = $('.fm-dialog.create-folder-dialog');
     var $input = $('input', $dialog);
     $input.val('');

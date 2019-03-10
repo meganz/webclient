@@ -885,6 +885,14 @@
         console.assert($dialog, 'The dialogs subsystem is not yet initialized!...');
     };
 
+    /** Checks if the user can access dialogs copy/move/share */
+    var isUserAllowedToOpenDialogs = function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            M.showExpiredBusiness();
+            return false;
+        }
+        return true;
+    };
 
     // ------------------------------------------------------------------------
     // ---- Public Functions --------------------------------------------------
@@ -910,11 +918,13 @@
      * @global
      */
     global.openCopyShareDialog = function openCopyShareDialog(u_id) {
-        M.safeShowDialog('copy', function() {
-            $.shareToContactId = u_id;
-            handleOpenDialog('cloud-drive', false, 'copyToShare');
-            return $dialog;
-        });
+        if (isUserAllowedToOpenDialogs()) {
+            M.safeShowDialog('copy', function() {
+                $.shareToContactId = u_id;
+                handleOpenDialog('cloud-drive', false, 'copyToShare');
+                return $dialog;
+            });
+        }
 
         return false;
     };
@@ -926,11 +936,13 @@
      * @global
      */
     global.openCopyUploadDialog = function openCopyUploadDialog(files, emptyFolders) {
-        M.safeShowDialog('copy', function() {
-            var tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ? 'shared-with-me' : 'cloud-drive';
-            handleOpenDialog(tab, M.currentdirid, {key: 'copyToUpload', value: [files, emptyFolders]});
-            return uiCheckboxes($dialog);
-        });
+        if (isUserAllowedToOpenDialogs()) {
+            M.safeShowDialog('copy', function() {
+                var tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ? 'shared-with-me' : 'cloud-drive';
+                handleOpenDialog(tab, M.currentdirid, { key: 'copyToUpload', value: [files, emptyFolders] });
+                return uiCheckboxes($dialog);
+            });
+        }
 
         return false;
     };
@@ -940,17 +952,19 @@
      * @global
      */
     global.openCopyDialog = function openCopyDialog(activeTab, onBeforeShown) {
-        M.safeShowDialog('copy', function() {
-            if (typeof activeTab === 'function') {
-                onBeforeShown = activeTab;
-                activeTab = false;
-            }
-            if (typeof onBeforeShown === 'function') {
-                onBeforeShown($dialog);
-            }
-            handleOpenDialog(activeTab, M.RootID);
-            return $dialog;
-        });
+        if (isUserAllowedToOpenDialogs()) {
+            M.safeShowDialog('copy', function() {
+                if (typeof activeTab === 'function') {
+                    onBeforeShown = activeTab;
+                    activeTab = false;
+                }
+                if (typeof onBeforeShown === 'function') {
+                    onBeforeShown($dialog);
+                }
+                handleOpenDialog(activeTab, M.RootID);
+                return $dialog;
+            });
+        }
 
         return false;
     };
@@ -960,10 +974,12 @@
      * @global
      */
     global.openMoveDialog = function openMoveDialog() {
-        M.safeShowDialog('move', function() {
-            handleOpenDialog(0, M.RootID);
-            return $dialog;
-        });
+        if (isUserAllowedToOpenDialogs()) {
+            M.safeShowDialog('move', function() {
+                handleOpenDialog(0, M.RootID);
+                return $dialog;
+            });
+        }
 
         return false;
     };
@@ -973,12 +989,14 @@
      * @global
      */
     global.openSaveToDialog = function openSaveToDialog(node, cb, activeTab) {
-        M.safeShowDialog('copy', function() {
-            $.saveToDialogCb = cb;
-            $.saveToDialogNode = node;
-            handleOpenDialog(activeTab, M.RootID, activeTab !== 'conversations' && 'saveToDialog');
-            return $dialog;
-        });
+        if (isUserAllowedToOpenDialogs()) {
+            M.safeShowDialog('copy', function() {
+                $.saveToDialogCb = cb;
+                $.saveToDialogNode = node;
+                handleOpenDialog(activeTab, M.RootID, activeTab !== 'conversations' && 'saveToDialog');
+                return $dialog;
+            });
+        }
 
         return false;
     };

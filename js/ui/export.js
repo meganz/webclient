@@ -1312,6 +1312,12 @@ var exportExpiry = {
      */
     ExportLinkDialog.prototype.linksDialog = function(close) {
 
+        // Checking if this a business user with expired status
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            M.showExpiredBusiness();
+            return;
+        }
+
         /* jshint -W074 */
         var self = this;
         var $linksDialog = $('.fm-dialog.export-links-dialog');

@@ -805,8 +805,8 @@
 
             mega.ui.onboarding = new mega.ui.Onboarding({});
 
-            if (u_attr && u_attr.b ) {
-                M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+            if (u_attr && u_attr.b) {
+                M.require('businessAcc_js', 'businessAccUI_js').done(function() {
                     var business_ui = new BusinessAccountUI();
                     if (u_attr.b.m) {
                         business_ui.showWelcomeDialog();

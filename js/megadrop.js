@@ -1247,7 +1247,7 @@ mega.megadrop = (function() {
             if (d) {
                 console.log('settings.drawPups');
             }
-            var list = pup.items;
+            var list = Object.values(pup.items);
             var item = {};
 
             if (!$(settingsOpts.card.wrapperClass).find('.megadrop-header').length) {
@@ -1259,16 +1259,19 @@ mega.megadrop = (function() {
                 }
             }
 
-            for (var key in list) {
-                if (list.hasOwnProperty(key)) {
-                    item = list[key];
-                    if (item.p && item.s === 2) {
-                        drawPupCard(item.p);
-                    }
-                    else {
-                        if (d) {
-                            console.warn('settings.drawPups: non-active PUP: ', item.fn);
-                        }
+            // Sort the MEGADrop folders by name alphabetically before rendering
+            list.sort(function (a, b) {
+                return a.fn.localeCompare(b.fn);
+            });
+
+            for (var g = 0; g < list.length; g++) {
+                item = list[g];
+                if (item.p && item.s === 2) {
+                    drawPupCard(item.p);
+                }
+                else {
+                    if (d) {
+                        console.warn('settings.drawPups: non-active PUP: ', item.fn);
                     }
                 }
             }

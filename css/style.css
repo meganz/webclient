@@ -12214,7 +12214,7 @@ table {
     box-sizing: border-box;
     padding: 0 15px 0 15px;
 }
-.main-mid-pad.improved-recovery-steps, .main-mid-pad.backup-recover.withkey{
+.main-mid-pad.improved-recovery-steps, .main-mid-pad.backup-recover.withkey, .main-mid-pad.bus-repay {
     width: 100%;
     padding: 0 0;
     background-color: #F5F7F9;
@@ -25372,7 +25372,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-dialog * {
     font-family: 'LatoWeb';
 }
-
 .user-management-dialog .dialog-tree-panel-scroll {
     overflow:hidden;
 }
@@ -25380,7 +25379,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin:32px auto 8px 40px;
     text-align: left;
 }
-
 .user-management-dialog .dialog-subtitle {
     font-size: 14px;
     color: #999;
@@ -25398,13 +25396,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
     padding: 0;
 }
-
 .user-management-dialog .dialog-input-container .input-user .confirm-img.icon {
     position: absolute;
     bottom: 36px;
     left: 220px;
 }
-
 .toggle-optional-inputs-container{
     text-align: center;
     display: block;
@@ -25563,7 +25559,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: -129px -98px;
 }
 
-.user-management-dialog .dialog-heading-img {
+.user-management-dialog .dialog-heading-img, .card-container .dialog-heading-img {
     background-image: url(../images/mega/big-icons_v2.png);
     margin:40px auto 24px auto;
 }
@@ -26198,8 +26194,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-account-settings .setting-block .title .icon48 {
     margin:16px 40px 0px 40px;
 }
-
-
 .user-management-account-settings .contact-icon48.icon48 {
     background-position: 0 -172px;
     opacity: 0.2;
@@ -26224,32 +26218,21 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: -144px -458px;
      opacity: 0.2;
 }
-
-.user-management-account-settings .number-of-user, .user-management-dialog .number-of-user {
+.bus-reg-icon.number-of-user {
     background-position: center -1582px;
-
 }
-
-.user-management-account-settings .company-name, .user-management-dialog .company-name{
+.bus-reg-icon.company-name{
     background-position: center -1661px;
-
 }
-
-.user-management-account-settings .phone, .user-management-dialog .phone {
+.bus-reg-icon.phone {
     background-position: center -1621px;
-
 }
-
-.user-management-account-settings .email, .user-management-dialog .email{
+.bus-reg-icon.email{
     background-position: center -1701px;
-
 }
-
-.user-management-account-settings .pw, .user-management-dialog .pw{
+.bus-reg-icon.pw{
     background-position: center -1741px;
-
 }
-
 .user-management-account-settings .setting-icon24, .user-management-dialog .setting-icon24{
     background-image: url(../images/mega/big-icons_v2.png);
     background-repeat: no-repeat;
@@ -26384,18 +26367,18 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-account-settings .bus-input.short-input .bus-input-title.zip {
     left: calc(56% + 12px);
 }
-
-
-.user-management-account-settings .bus-input .bus-reg-icon,
-.user-management-dialog .bus-reg-icon{
+.bus-reg-icon{
     margin: 24px 12px 0 6px;
-    opacity: 0.7;
+    opacity: 0.6;
     float: left;
     display: inline-block;
 }
-
+.card-container.bus-repay .bus-reg-icon {
+    margin: 0;
+    float: none;
+}
 .user-management-account-settings .bus-input input,
-.user-management-dialog .dialog-input-title-ontop input{
+.user-management-dialog .dialog-input-title-ontop input {
     border: none;
     width: -webkit-calc(100% - 56px);
     width: -moz-calc(100% - 56px);
@@ -29131,41 +29114,46 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .fm-picker-dialog .contact24-icon{
     background-position: -1px -8135px;
 }
-.fm-picker-dialog .chat24-icon{
+.fm-picker-dialog .chat24-icon {
     background-position: -0px -12640px;
     opacity: 0.4;
 }
-.fm-picker-dialog .search-icon{
+.fm-picker-dialog .search-icon {
     background-position: -14px -2971px;
     opacity: 0.4;
     height: 22px;
 }
-.fm-picker-dialog .add-more-img,
-.fm-right-account-block .add-more-img
- {
+.fm-picker-dialog .add-more-img, .fm-right-account-block .add-more-img {
     background-position: 0 -12376px;
 }
-.fm-picker-dialog-title, .user-management-dialog .dialog-title {
+.fm-picker-dialog-title, .dialog-title {
     font-size: 20px;
     color: #333333;
-    line-height: 24px;
+    line-height: 30px;
     position: relative;
-    margin:20px auto;
+    margin: 20px auto 16px;
     text-align: center;
     display: block;
 }
-.fm-picker-dialog .dialog-subtitle {
+.dialog-subtitle {
     font-size: 14px;
-    color: #999999;
-    line-height: 24px;
+    color: #999;
+    line-height: 21px;
+    height: auto;
+    text-align: center;
+    position: relative;
+}
+.fm-picker-dialog .dialog-subtitle {
     width: 380px;
     left: 50%;
     margin-left: -190px;
     margin-bottom: 24px;
     height: auto;
-    text-align: center;
-    position: relative;
     display: block;
+}
+.user-management-dialog .dialog-subtitle {
+    width: 500px;
+    margin:0 auto 40px auto;
 }
 .fm-picker-dialog .dialog-button-container {
     height: 56px;

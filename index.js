@@ -1402,6 +1402,17 @@ function init_page() {
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
         pro.proplan.processReturnUrlFromProvider(page);
     }
+    else if (page === 'repay') {
+        if (u_attr && u_attr.b && u_attr.b.m && u_attr.b.s === -1) {
+            var repayPage = new RepayPage();
+            repayPage.init();
+        }
+        else {
+            loadSubPage('start');
+            return;
+        }
+
+    }
     else if (page == 'credits') {
         parsepage(pages['credits']);
         var html = '';

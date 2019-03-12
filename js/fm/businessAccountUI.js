@@ -2229,7 +2229,7 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
     }
 
     dialogQuestion = dialogQuestion.replace('[B]', '<b>').replace('[/B]', '</b>')
-        .replace('{0}', userName);
+        .replace('{0}', escapeHTML(userName));
     $dialog.find('.dialog-text-one').html(dialogQuestion);
     $dialog.find('.dialog-text-two').text(note);
 
@@ -3004,7 +3004,7 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
                                         $('.yes-answer', $dialog).off('click.suba').on('click.suba', closeDialog);
                                         $dialog.find('.dialog-text-one')
                                             .html(l[19149].replace('{0}', '<b>' + M.suba[subUserHandle].e + '</b>')
-                                            .replace('{1}', '<b>' + folderName + '</b>'));
+                                                .replace('{1}', '<b>' + escapeHTML(folderName) + '</b>'));
                                         return $dialog;
                                     });
                                     return;

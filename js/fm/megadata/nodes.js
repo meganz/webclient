@@ -236,6 +236,11 @@ MegaData.prototype.getPath = function(id) {
 MegaData.prototype.clearRubbish = function(all) {
     "use strict";
 
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
+        M.showExpiredBusiness();
+        return;
+    }
+
     if (M.account) {
         // reset cached account data
         M.account.lastupdate = 0;
@@ -1188,6 +1193,11 @@ MegaData.prototype.safeRemoveNodes = function(handles) {
  */
 MegaData.prototype.revertRubbishNodes = function(handles) {
     'use strict'; /* jshint -W089 */
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
+        M.showExpiredBusiness();
+        return;
+    }
+
     var masterPromise = new MegaPromise();
     // check if this is a business expired account
     if (u_attr && u_attr.b && u_attr.b.s === -1) {

@@ -1270,6 +1270,11 @@ FileManager.prototype.initContextUI = function() {
     $(c + '.copy-item').rebind('click', openCopyDialog);
 
     $(c + '.revert-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         loadingDialog.pshow();
         M.revertRubbishNodes($.selected).always(loadingDialog.phide.bind(loadingDialog));
     });
@@ -1338,6 +1343,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.startchat-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var $this = $(this);
         var user_handle = $.selected;
 
@@ -1351,7 +1361,12 @@ FileManager.prototype.initContextUI = function() {
         }
     });
 
-    $(c + '.startaudio-item,'+ c + '.startaudiovideo-item').rebind('click', function() {
+    $(c + '.startaudio-item,' + c + '.startaudiovideo-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var $this = $(this);
         var user_handle = $.selected && $.selected[0];
 
@@ -1365,6 +1380,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.startvideo-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var $this = $(this);
         var user_handle = $.selected && $.selected[0];
 
@@ -1387,6 +1407,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.send-files-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var $this = $(this);
         var user_handle = $.selected && $.selected[0];
 
@@ -1396,6 +1421,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.share-folder-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var $this = $(this);
         var user_handle = $.selected && $.selected[0];
 
@@ -1416,6 +1446,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.remove-contact').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var user_handle = $.selected && $.selected[0];
 
         user_handle =user_handle .replace('contact_', '');
@@ -1597,11 +1632,21 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.preview-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         closeDialog();
         slideshow($.selected[0]);
     });
 
     $(c + '.play-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var n = $.selected[0];
 
         closeDialog();
@@ -1611,6 +1656,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.clearbin-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         doClearbin(false);
     });
 

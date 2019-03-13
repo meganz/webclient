@@ -624,7 +624,8 @@ var BrowserEntries = React.createClass({
                 }
 
                 items.push(
-                    <div className={
+                    <div 
+                        className={
                             "data-block-view node_" + node.h + " " + (isFolder ? " folder" :" file") +
                             (isHighlighted ? " ui-selected" : "") +
                             (share ? " linked" : "") +
@@ -636,8 +637,9 @@ var BrowserEntries = React.createClass({
                         onDoubleClick={(e) => {
                             self.onEntryDoubleClick(e, node);
                         }}
-                         id={"chat_" + node.h}
-                         key={"block_" + node.h}
+                        id={"chat_" + node.h}
+                        key={"block_" + node.h}
+                        title={node.name}
                     >
                         <div className={
                             (src ? "data-block-bg thumb" : "data-block-bg") +

@@ -448,7 +448,11 @@ function u_exportkey(action) {
         M.saveAs(key, 'MEGA-RECOVERYKEY.txt');
     }
     else {
-        copyToClipboard(key, typeof action === 'string' && action);
+        if (page === 'backup') {
+            copyToClipboard(key, l[8836], 'recoveryKey');
+        } else {
+            copyToClipboard(key, typeof action === 'string' && action);
+        }
     }
 
     mBroadcaster.sendMessage('keyexported');

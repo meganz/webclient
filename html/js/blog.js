@@ -393,6 +393,13 @@ if (typeof mobileblog !== 'undefined') {
         // Prevent blog breaking on mobile due to missing jQuery
         if (!is_mobile) {
             clickURLs();
+        } else {
+            // Record blog post visit.
+            onIdle(function() {
+                var xhr = getxhr();
+                xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
+                xhr.send(JSON.stringify([{a: 'log', e: 99801, m: blogid}]));
+            });
         }
 
         if (window.android) {

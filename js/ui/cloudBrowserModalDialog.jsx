@@ -721,29 +721,40 @@ var BrowserEntries = React.createClass({
                 </div>
             );
         }
-        else {
+        else if (!self.props.entries.length && self.props.currentlyViewedEntry === 'search') {
             return (
                 <div className="dialog-empty-block dialog-fm folder">
-                    {
-                        self.props.currentlyViewedEntry === 'shares' ? (
-                            <div className="dialog-empty-pad">
-                                <div className="fm-empty-incoming-bg"></div>
-                                <div className="dialog-empty-header">
-                                    {l[6871]}
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="dialog-empty-pad">
-                                <div className="fm-empty-folder-bg"></div>
-                                <div className="dialog-empty-header">
-                                    {self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]}
-                                </div>
-                            </div>
-                        )
-                    }
+                    <div className="dialog-empty-pad">
+                        <div className="fm-empty-search-bg"></div>
+                        <div className="dialog-empty-header">
+                            {l[978]}
+                        </div>
+                    </div>
                 </div>
             );
         }
+
+        return (
+            <div className="dialog-empty-block dialog-fm folder">
+                {
+                    self.props.currentlyViewedEntry === 'shares' ? (
+                        <div className="dialog-empty-pad">
+                            <div className="fm-empty-incoming-bg"></div>
+                            <div className="dialog-empty-header">
+                                {l[6871]}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="dialog-empty-pad">
+                            <div className="fm-empty-folder-bg"></div>
+                            <div className="dialog-empty-header">
+                                {self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]}
+                            </div>
+                        </div>
+                    )
+                }
+            </div>
+        );
     }
 });
 var CloudBrowserDialog = React.createClass({

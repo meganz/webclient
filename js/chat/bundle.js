@@ -9991,31 +9991,46 @@ React.makeElement = React['createElement'];
 	                    )
 	                )
 	            );
-	        } else {
+	        } else if (!self.props.entries.length && self.props.currentlyViewedEntry === 'search') {
 	            return React.makeElement(
 	                "div",
 	                { className: "dialog-empty-block dialog-fm folder" },
-	                self.props.currentlyViewedEntry === 'shares' ? React.makeElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "dialog-empty-pad" },
-	                    React.makeElement("div", { className: "fm-empty-incoming-bg" }),
+	                    React.makeElement("div", { className: "fm-empty-search-bg" }),
 	                    React.makeElement(
 	                        "div",
 	                        { className: "dialog-empty-header" },
-	                        l[6871]
-	                    )
-	                ) : React.makeElement(
-	                    "div",
-	                    { className: "dialog-empty-pad" },
-	                    React.makeElement("div", { className: "fm-empty-folder-bg" }),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "dialog-empty-header" },
-	                        self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]
+	                        l[978]
 	                    )
 	                )
 	            );
 	        }
+
+	        return React.makeElement(
+	            "div",
+	            { className: "dialog-empty-block dialog-fm folder" },
+	            self.props.currentlyViewedEntry === 'shares' ? React.makeElement(
+	                "div",
+	                { className: "dialog-empty-pad" },
+	                React.makeElement("div", { className: "fm-empty-incoming-bg" }),
+	                React.makeElement(
+	                    "div",
+	                    { className: "dialog-empty-header" },
+	                    l[6871]
+	                )
+	            ) : React.makeElement(
+	                "div",
+	                { className: "dialog-empty-pad" },
+	                React.makeElement("div", { className: "fm-empty-folder-bg" }),
+	                React.makeElement(
+	                    "div",
+	                    { className: "dialog-empty-header" },
+	                    self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]
+	                )
+	            )
+	        );
 	    }
 	});
 	var CloudBrowserDialog = React.createClass({

@@ -1179,7 +1179,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 
         var $chartContainer = $('#pie-chart-contianer');
         $chartContainer.empty();
-        $chartContainer.html('<canvas id="usage-pie-chart"></canvas>');
+        $chartContainer.safeHTML('<canvas id="usage-pie-chart"></canvas>');
         var $pieChart = $('#usage-pie-chart', $chartContainer);
 
         M.require('charts_js').done(function usagePieChartDataPopulate() {
@@ -1288,7 +1288,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         M.require('charts_js').done(function () {
             var $charContainer = $("#chartcontainer");
             $charContainer.empty();
-            $charContainer.html('<canvas id="usage-bar-chart" class="daily-transfer-flow-container"></canvas>');
+            $charContainer.safeHTML('<canvas id="usage-bar-chart" class="daily-transfer-flow-container"></canvas>');
             var chartCanvas = $("#usage-bar-chart");
 
             var availableLabels = Object.keys(res);
@@ -2230,7 +2230,7 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
 
     dialogQuestion = dialogQuestion.replace('[B]', '<b>').replace('[/B]', '</b>')
         .replace('{0}', escapeHTML(userName));
-    $dialog.find('.dialog-text-one').html(dialogQuestion);
+    $dialog.find('.dialog-text-one').safeHTML(dialogQuestion);
     $dialog.find('.dialog-text-two').text(note);
 
     // event handler for clicking on "Yes" or "Cancel" buttons
@@ -3003,7 +3003,7 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
                                             $('.user-management-able-user-dialog.mig-success.user-management-dialog');
                                         $('.yes-answer', $dialog).off('click.suba').on('click.suba', closeDialog);
                                         $dialog.find('.dialog-text-one')
-                                            .html(l[19149].replace('{0}', '<b>' + M.suba[subUserHandle].e + '</b>')
+                                            .safeHTML(l[19149].replace('{0}', '<b>' + M.suba[subUserHandle].e + '</b>')
                                                 .replace('{1}', '<b>' + escapeHTML(folderName) + '</b>'));
                                         return $dialog;
                                     });

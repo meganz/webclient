@@ -330,6 +330,23 @@ RtcModule.prototype.onKickedFromChatroom = function(chat) {
     this._fire('onClientLeftCall', chatid, null, null, chat.callParticipants);
 };
 
+// There can only be one call that is not being destroyed and does not have .replacedCall
+RtcModule.prototype.getActiveCall = function() {
+    var calls = this.calls;
+    var result = null;
+    for (var chatid in calls) {
+        var call = calls[chatid];
+        if (!call._replacedCall) {
+            assert(!result);
+            result = call;
+        } else {
+            assert(call.state === CallState.kRingIn);
+            assert(!call.isCallInitiator);
+        }
+    }
+    return result;
+};
+
 RtcModule.prototype._updatePeerAvState = function(parsedCallData, peerIsUs) {
     var chatid = parsedCallData.chatid;
     var userid = parsedCallData.fromUser;
@@ -404,14 +421,19 @@ RtcModule.prototype.handleCallRequest = function(parsedCallData) {
             return;
         }
     }
-    function createNewCall() {
+    function createNewCall(replacedCall, avAutoAnswer) {
         var call = new Call(self, parsedCallData, self.handler.isGroupChat(chatid), CallRole.kAnswerer);
         assert(call._callerInfo);
         assert(call.state === CallState.kRingIn);
         self.calls[chatid] = call;
-        self.logger.log("Notifying app about incoming call from " + base64urlencode(parsedCallData.fromUser));
-        call.handler = self._fire('onCallIncoming', call, parsedCallData.fromUser);
+        call.handler = self._fire("onCallIncoming", call, parsedCallData.fromUser, replacedCall, avAutoAnswer);
         assert(call.handler);
+        call._replacedCall = replacedCall;
+        if (avAutoAnswer != null) {
+            setTimeout(function() {
+                call.answer(avAutoAnswer);
+            }, 0);
+        }
         return call;
     }
     function sendBusy(sendErrAlready) {
@@ -419,81 +441,58 @@ RtcModule.prototype.handleCallRequest = function(parsedCallData) {
         self.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, parsedCallData.chatid,
             parsedCallData.callid + String.fromCharCode(sendErrAlready ? Term.kErrAlready : Term.kBusy));
     }
+
     // Check if we have an existing call.
     // If it is an outgoing call request in the same 1on1 chatroom, then both parties are calling
     // each other at the same time - take care to establish the call
     // Otherwise - if the existing call is in the same chatroom - send kErrAlready, otherwise send kBusy
-
-    var keys = Object.keys(self.calls);
-    if (keys.length) {
-        assert(keys.length === 1);
-        var existingChatid = keys[0];
-        if (existingChatid !== chatid) {
-            self.logger.log("Incoming call while having a call (in any state) in another chatroom, sending busy");
-            sendBusy();
-            return;
-        }
-        // Both calls are in same chatroom
-        var existingCall = self.calls[existingChatid];
-        if (existingCall.isGroup) {
-            self.logger.log("Incoming call while having a call in same group chat room, sending kErrAlready");
-            sendBusy(true);
-            return;
-        }
-        // Both calls are in same 1on1 chatroom
-        if (existingCall.state >= CallState.kJoining) {
-            // Existing call is in progress or terminating
-            self.logger.warn("Received call request while another call in the same chatroom is in progress or",
-                " terminating, sending kErrAlready");
-            sendBusy(true);
-            return;
-        }
-        // Existing call's state is < kJoining
-        if (!existingCall.isCallInitiator) {
-            // Existing call and this call are both incoming, we don't support this
-            /*
-            var ci = existingCall._callerInfo;
-            if (ci) {
-                if (ci.fromUser === parsedCallData.fromUser && ci.fromClient === parsedCallData.fromClient &&
-                    ci.data === parsedCallData.data) {
-                // chatd sends duplicate CALLDATAs to immediately notify about incoming calls
-                // before the login and history fetch completes
+    var activeCall = self.getActiveCall();
+    if (activeCall) {
+        if (activeCall.chatid === chatid) {
+            // Both calls are in same chatroom
+            if (activeCall.isGroup) {
+                self.logger.log("Incoming call while having a call in same group chat room, sending kErrAlready");
+                sendBusy(true);
                 return;
             }
-            */
-            self.logger.warn("Another incoming call during an incoming call, sending kErrAlready");
-            sendBusy(true);
-            return;
-        }
+            // Both calls are in same 1on1 chatroom
+            if (activeCall.state < CallState.kJoining) {
+                // Concurrent call requests to each other?
+                if (!activeCall.isCallInitiator) {
+                    // No, just two incoming calls from different clients in same 1on1 room
+                    self.logger.warn("Another incoming call during an incoming call, sending kErrAlready");
+                    sendBusy(true);
+                    return;
+                }
 
-        // Existing call is in same 1on1 chatroom, outgoing and not yet answered
-        // If our user handle is greater than the calldata sender's, our outgoing call
-        // survives, and their call request is declined. Otherwise, our existing outgoing
-        // call is hung up, and theirs is answered
-        if (self.chatd.userId < self.handler.get1on1RoomPeer(chatid)) {
-            self.logger.warn("We have an outgoing call, and there is an incoming call - we don't have priority.",
-                "Hanging up our outgoing call and answering the incoming");
-            var av = existingCall.localAv();
-            existingCall.hangup()
-            .then(function() {
-                assert(!self.calls[existingChatid]);
-                // Make sure that possible async messages from the hangup
-                // are processed by the app before creating the new call
-                setTimeout(function() {
-                    // Create an incoming call from the packet, and auto answer it
-                    var incomingCall = createNewCall();
-                    setTimeout(function() {
-                        incomingCall.answer(av);
-                    }, 0);
-                }, 0);
-            });
-        }  else {
-            self.logger.warn("We have an outgoing call, and there is an incoming call - we have a priority.",
-                "The caller of the incoming call should abort the call");
+                // Concurrent call requests to each other in a 1on1 room
+                // If our user handle is greater than the calldata sender's, our outgoing call
+                // survives, and their call request is declined. Otherwise, our existing outgoing
+                // call is hung up, and theirs is answered
+                if (self.chatd.userId < self.handler.get1on1RoomPeer(chatid)) {
+                    self.logger.warn("Simultaneously calling each other with peer - we don't have priority.",
+                        "Hanging up our outgoing call and answering the incoming");
+                    // answer() of the newly created call destroys all other calls in the .calls map,
+                    // but in this case we are overwriting the activeCall with the new call (same chatid),
+                    // so we must take care ourselves of the previous call
+                    activeCall.hangup()
+                    .then(function() {
+                        // Create an incoming call from the packet, and auto answer it
+                        createNewCall(activeCall, activeCall._startOrJoinAv);
+                    });
+                }  else {
+                    self.logger.warn("Simultaneously calling each other with peer - we have priority.",
+                        "Peer should abort their call and answer ours");
+                }
+                return;
+            } else {
+                self.logger.warn("Incoming call request in 1on1 chatroom with user with whom we have " +
+                    "a call in progress, sending busy");
+                sendBusy(true);
+                return;
+            }
         }
-        return;
     }
-
     // Create incoming call
     var call = createNewCall();
     self.cmdEndpoint(RTCMD.CALL_RINGING, parsedCallData, parsedCallData.callid);
@@ -697,8 +696,8 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin) {
         }
     }
     var callid;
+    var roomState = self.offCallStates[chatid];
     if (isJoin) {
-        var roomState = self.offCallStates[chatid];
         if (roomState) {
             callid = roomState.callId;
         }
@@ -706,7 +705,13 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin) {
             self.logger.warn("Could not obtain callid for the call being joined, generating one locally,",
                 "but group call stats will be messed up");
         } else {
-            console.log("callid obtained from off state for joining call:", base64urlencode(callid));
+            self.logger.log("callid obtained from off state for joining call:", base64urlencode(callid));
+        }
+    } else { // starting new call
+        if (roomState) {
+            self.logger.warn("Refusing to start a new call in a room where there is already a call " +
+                "(in which we don't participate)");
+            return null;
         }
     }
     if (!callid) {
@@ -963,6 +968,7 @@ function Call(rtcModule, info, isGroup, role, handler) {
         this.state = CallState.kRingIn;
         this._callerInfo = info; // callerInfo is actually CALLDATA, needed for answering
     } else {
+        this.isCallInitiator = true;
         this.state = CallState.kInitial;
     }
     this.manager._startStatsTimer();
@@ -991,7 +997,7 @@ Call.prototype.handleMsg = function(packet) {
         case RTCMD.CALL_REQ_CANCEL:
             self.msgCallReqCancel(packet);
             return;
-        case RTCMD.CALL_TERMINATE: //ignore legacy command
+        case RTCMD.CALL_TERMINATE: // ignore legacy command
             self.logger.log("Ignoring legacy RTCMD.CALL_TERMINATE");
             return;
     }
@@ -1296,6 +1302,7 @@ Call.prototype.msgJoin = function(packet) {
             }
         }
         if (self.state === CallState.kReqSent) {
+            self.isRingingOut = false;
             self._setState(CallState.kCallInProgress);
             self._monitorCallSetupTimeout();
             if (!self.isGroup && !self._bcastCallData(CallDataType.kNotRinging)) {
@@ -1564,7 +1571,6 @@ Call.prototype._removeSession = function(sess, reason, msg) {
         oldSid: delSid
     };
     self.logger.warn("Scheduling session reconnect for session", base64urlencode(sess.sid));
-
     // The original joiner re-joins, the peer does nothing, just keeps the call
     // ongoing and accepts the JOIN
     if (sess.isJoiner) {
@@ -1644,6 +1650,7 @@ Call.prototype._startOrJoin = function(av) {
             av &= ~Av.Audio;
         }
     }
+    self._startOrJoinAv = av;
     var pms = self._getLocalStream(av);
     pms.catch(function(err) {
         self._destroy(Term.kErrLocalMedia, true, err);
@@ -1719,10 +1726,31 @@ Call.prototype.answer = function(av) {
             promises.push(call.hangup());
         }
     }
+    // At any point in time there should be only one call that is active,
+    // i.e. not in kTerminating state and not unanswered with ._replacedCall property.
+    // Since we are deleting the ._replacedCall property, we must first make any other call
+    // as "inactive" immediately, by calling hangup() on all of the. This immediately
+    // sets them to the kTerminating state.
+    // If the call was incoming while there was another call, and the user chose to hangup the
+    // other and pick up this one. This is the only place we need to delete ._replacedCall,
+    // because this is the only codepath that can make an existing Call go to established state.
+    // All other paths create fresh new Call objects
+    delete self._replacedCall;
+
     self.logger.log("answer: Waiting for other call(s) to terminate first...");
     return Promise.all(promises)
     .then(function() {
-        self.logger.log("answer: Other call(s) terminated, answering");
+        // The async resolution of native promises guarantees that any messages resulted
+        // from the hangup() operation will be processed before this .then() handler is invoked
+        if (promises.length) {
+            self.logger.log("answer: Other call(s) terminated, answering");
+        }
+        if (self.manager.getActiveCall() !== self) {
+            self.logger.warn("Another call was established while hanging up existing calls in order " +
+                "to answer a specific one");
+            self.hangup(Term.kBusy);
+            return;
+        }
         return self._startOrJoin(av);
     });
 };
@@ -2108,7 +2136,6 @@ There is a dedicated CALLDATA type kMute that clients send for the specific purp
 It is send when the client mutes/unmutes camera or mic. Currently this CALLDATA is sent together with the RTCMD.MUTE
 message, but in the future we may want to only rely on the CALLDATA packet.
 */
-
 function Session(call, packet, sessParams) {
     // Packet can be RTCMD.SESSION or RTCMD.SDP_OFFER
     var self = this;

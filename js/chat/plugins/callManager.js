@@ -709,7 +709,7 @@ var CallManagerCall = function (chatRoom, rtcCall) {
     self.localPlayer = null;
     self.remotePlayer = null;
 
-
+/*
     if (self.room.callManagerCall) {
         if (self.room.callManagerCall.isStarting() === true) {
             self.logger.debug(
@@ -733,6 +733,7 @@ var CallManagerCall = function (chatRoom, rtcCall) {
             return;
         }
     }
+*/
     self.room.callManagerCall = this;
 };
 
@@ -1485,7 +1486,7 @@ CallManagerCall.prototype.getRemoteMediaOptions = function (sessionId) {
         }
     }
     if (typeof firstSession.peerAv === 'undefined') {
-        this.logger.error(
+        this.logger.log(
             ".getRemoteMediaOptions could not find .peerAv for session",
             base64urlencode(firstSession.sid)
         );

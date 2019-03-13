@@ -1909,6 +1909,12 @@ var exportExpiry = {
      * @returns {MegaPromise}
      */
     ExportLink.prototype.removeExportLink = function(quiet) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
+
         var self = this;
         var promises = [];
         var handles = self.options.nodesToProcess || [];
@@ -2180,6 +2186,12 @@ var exportExpiry = {
      */
     var initCopyrightsDialog = function(nodesToProcess, isEmbed) {
         'use strict';
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
 
         $.itemExportEmbed = isEmbed;
         $.itemExport = nodesToProcess;

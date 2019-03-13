@@ -888,6 +888,7 @@
     /** Checks if the user can access dialogs copy/move/share */
     var isUserAllowedToOpenDialogs = function() {
         if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
             M.showExpiredBusiness();
             return false;
         }

@@ -2571,6 +2571,13 @@ FileManager.prototype.contactsUI = function() {
     });
 
     $addContact.rebind('clcik.contacts', function() {
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
+
         var $this = $(this);
         var user_handle = $this.attr('id');
 
@@ -2583,6 +2590,13 @@ FileManager.prototype.contactsUI = function() {
     });
 
     $buttons.rebind('click.contacts', function() {
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
+
         var $this = $(this);
         var user_handle = $this.closest('.data-block-view, tr').attr('id');
 
@@ -2611,6 +2625,13 @@ FileManager.prototype.contactsUI = function() {
 
     $('.fm-empty-contacts .fm-empty-button, .add-new-contact, .fm-add-user')
         .rebind('click', function(e) {
+
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
+
             var $this = $(this);
 
             $.hideContextMenu();
@@ -2669,6 +2690,12 @@ FileManager.prototype.addContactUI = function() {
 
         // Reset seen or verified fingerprints and re-enable the Verify button
         $('.fm-reset-stored-fingerprint').rebind('click', function() {
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
+
             authring.resetFingerprintsForUser(user.u);
             enableVerifyFingerprintsButton(user.u);
 
@@ -2680,11 +2707,23 @@ FileManager.prototype.addContactUI = function() {
         });
 
         $('.fm-share-folders').rebind('click', function() {
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
             openCopyShareDialog(M.currentdirid);
         });
 
         // Remove contact button on contacts page
         $('.fm-remove-contact').rebind('click', function() {
+
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
+
             fmremove([M.currentdirid]);
         });
 

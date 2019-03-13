@@ -49,26 +49,13 @@
         'LOG': '#808f8d'
     };
 
-    var xhrStack = [];
-    var getXMLHttpRequest = function() {
-        var idx = xhrStack.length;
-        while (idx--) {
-            var state = xhrStack[idx].readyState;
-            if (state === 4 || state === 0) {
-                break;
-            }
-        }
-        // logger.debug('xhrStack', xhrStack.map(x => [x.readyState, x.onloadend, x.onreadystatechange, x.timeout]));
-
-        if (idx < 0) {
-            idx = xhrStack.push(new XMLHttpRequest()) - 1;
-        }
-        return xhrStack[idx];
-    };
-
     var roundUpToMultiple = function(n, factor) {
         return (n + factor - 1) - ((n + factor - 1) % factor);
     };
+
+    var roundDownToMultiple = function (n, factor) {
+        return n - (n % factor);
+    }
 
     /**
      * Helper class for CloudRaidRequest, keeps the data per channel in one instance.
@@ -93,7 +80,9 @@
         this.channelPauseCount = 0;
         this.channelPauseMillisec = 0;
         this.channelLastPauseTime = 0;
-        this.resumeChannelCallback = null;
+        this.timedout = false;
+        this.readTimeoutId = null;
+        this.delayedinitialconnect = null;
 
         // raid part number
         this.partNum = partNum;
@@ -101,23 +90,16 @@
         // URL of this part's data
         this.baseUrl = baseUrl;
 
-        // network object. reuse for each request for the most chance to reuse sockets.
-        // Also so we can cancel everything on error/timeout
-        this.xhrInstance = null;
+        // AbortController lets us terminate a fetch() operation (eg. on timeout).
+        // We can't reuse it after it's been signalled though, eg timeout on this part, then another, then back to this one
+        this.abortController = null;
+        this.signal = null;
+
+        this.highlevelabort = false;
     }
 
     CloudRaidPartFetcher.prototype = Object.create(null, {constructor: {value: CloudRaidPartFetcher}});
-    CloudRaidPartFetcher.prototype.abort = function() {
-        var xhr = this.xhrInstance;
 
-        if (xhr) {
-            xhr.onreadystatechange = xhr.onloadend = null;
-            xhr.abort();
-        }
-        this.xhrInstance = null;
-
-        return this;
-    };
     Object.freeze(CloudRaidPartFetcher.prototype);
 
 
@@ -129,35 +111,19 @@
      * @param {*} [aFiveChannelsMode] 5-channel mode strategy.
      * @constructor
      *
-     * Downloads files that are stored in 'Cloud Raid' which means files are split into 5 pieces across 6 servers.
-     * 5 data channels and one that is the xor of the others. Each 16 byte file sector is distributed across the
-     * servers in round robin fashion.  Any 5 of the 6 sectors at a given point in the file are enough to
-     * reconstitute the file data at that point.
+     * Downloads CloudRAID files, which means files are split into 5 pieces + XOR, across 6 servers.
+     * Each 16 byte file sector is distributed across the servers in round robin fashion.
+     * Any 5 of the 6 sectors at a given point in the file are enough to reconstitute the file data at that point.
      *
-     * Strategy:  First try to download 6 channels at once for maximum download speed.
-     *            In case of a failure on any channel, fall back to download from the other 5 channels only
-     *            If one of those channels fails, try to use the other 5 (by reusing the originally failed channel)
-     *            Provided we can continue reading data, the fails will not cause the download to stop. If we can't
-     *            get data from the other channel though, the download will stop. If the 5 channel goes smoothly
-     *            for a while (and we were originally using 6 channel), then try to switch back to 6 channel.
-     *
-     * 6 channel sub-strategy:  Load data from each server in 'chunks'.
-     *                          Each channel takes a turn skipping a chunk so that after each channel has loaded
-     *                          5 chunks and skipped one, we have loaded 6 chunks of the file overall, though
-     *                          each channel has only downloaded 5.
-     *
-     * 5 channel sub-strategy:  Just use the 5 working channels.
-     *                          Each channel downloads a chunk at a time in parallel, no skipped data, and
-     *                          the results are combined and processed.
-     *
-     * Generally:               No channel is allowed to read further ahead of any other channel by more than 2 chunks
-     *                          Timeout (10s) when receiving data on a channel is considered a failure.
+     * Strategy:  First try to download 6 channels, and drop the slowest-to-respond channel. Build the file from the 5.
+     *            In case of a failure or timeout on any channel, stop using that channel and use the currently unused one.
      */
     function CloudRaidRequest(aDownload, aStartOffset, aEndOffset, aFiveChannelsMode) {
         var baseURLs = aDownload.url || aDownload.g;
         var fileSize = aDownload.size || aDownload.s;
 
         this.response = false;
+        this.resultBuffer = false;
         this.outputByteCount = 0;
         this.wholeFileDatalinePos = 0;
 
@@ -174,17 +140,16 @@
         // Only deliver data up to this position in the file (exclusive, 0-based)
         this.fileEndDeliverPos = 0;
 
-        // we can use this for six as well by specifying -1
+        // starts at -1, indicating we are trying 6 channels, and we will abandon the slowest.
+        // once we get the headers for 5 of the channels, it is the channel number that is not being fetched
         this.initialChannelMode = -1;
 
-        this.sixChannelFailed = false;
         this.lastFailureTime = null;
-        this.recoveringFromFail = false;
-        this.posToResumeSixChannelAt = null;
         this.startTime = null;
         this.bytesProcessed = 0;
         this.totalRequests = 0;
         this.channelReplyState = 0;
+        this.finished = false;
 
         // XMLHttpRequest properties
         this.status = 0;
@@ -231,8 +196,11 @@
         }
         this.cloudRaidSettings = cloudRaidSettings;
 
-        // Set the initial channel mode
-        this.setChannelMode(aFiveChannelsMode);
+        // Set the initial channel mode if we already know which server is slowest
+        if (this.cloudRaidSettings.lastFailedChannel !== undefined) {
+            this.initialChannelMode = this.cloudRaidSettings.lastFailedChannel;
+        }
+
     }
 
     /**
@@ -277,12 +245,18 @@
         send: {
             value: function _send() {
                 this.startTime = performance.now();
-                this.restart5Channel(this.initialChannelMode);
+                this.start5Channel(this.initialChannelMode);
             }
         },
         abort: {
             value: function _abort() {
-                this.cancelAllPieces();
+
+                this.highlevelabort = true;
+                for (var i = this.RAIDPARTS; i--;) {
+                    if (this.part[i].abortController !== null) this.part[i].abortController.abort();
+                    if (this.part[i].delayedinitialconnect !== null) clearTimeout(this.part[i].delayedinitialconnect);
+                }
+
                 this.dispatchEvent('abort', XMLHttpRequest.DONE);
                 this.readyState = XMLHttpRequest.UNSENT;
             }
@@ -316,74 +290,25 @@
     CloudRaidRequest.prototype.RAIDPARTS = 6;
     CloudRaidRequest.prototype.RAIDSECTOR = 16;
     CloudRaidRequest.prototype.RAIDLINE = 16 * 5;
-    CloudRaidRequest.prototype.RAIDLINESPERCHUNK = 16 * 1024;   // 256k per chunk, as default
 
-    // So typically reading 1.25Mb at a time per channel, and so buffering 6 times that when busy,
-    // so taking 7.6Mb in read ahead buffers. Sometimes up to doubling that if a second read occurs
-    // on the channel and another channel has not been processed yet.
-    CloudRaidRequest.prototype.MAXCHUNKSPERREAD = 5;
+    // With slow data speeds, and/or high cpu, we may not see data from a working fetch for over 40 seconds (experimentally determined)
+    CloudRaidRequest.prototype.FETCH_DATA_TIMEOUT_MS = 115000;
 
-    // Don't let any one channel get too far ahead of the others, in case we have a slow one
-    CloudRaidRequest.prototype.READAHEADCHUNKSPAUSEPOINT = 8;
-    CloudRaidRequest.prototype.READAHEADCHUNKSUNPAUSEPOINT = 4;
-
-    // if the server doesn't respond in a reasonable time, break the wait and reconsider
-    CloudRaidRequest.prototype.XHRTIMEOUT = 10000;
-
-    CloudRaidRequest.prototype.ReturnToSixChannelNoErrorsMillisec = 60000;
-    CloudRaidRequest.prototype.ReturnToSixChannelMinPercentLeft = 10;
-    CloudRaidRequest.prototype.ReturnToSixChannelMinBytesLeft = 10 * 1024 * 1024;
-
-    // We will auto choose 6 or 5 channel based on this.
-    // Six channel has more requests for a given size, and the latency matters more at low file sizes.
-    CloudRaidRequest.prototype.BytesBelowWhich5ChannelIsFaster = 6 * 1024 * 1024;
-
-
-    CloudRaidRequest.prototype.setChannelMode = function(aFiveChannelsMode) {
-
-        if (this.cloudRaidSettings.lastFailedChannel !== undefined) {
-            this.initialChannelMode = this.cloudRaidSettings.lastFailedChannel;
-        }
-
-        if (aFiveChannelsMode !== null) {
-            if (aFiveChannelsMode) {
-                this.initialChannelMode = Math.floor(Math.random() * this.RAIDPARTS);
-            }
-        }
-        else {
-            var sizeBased5Channel = this.expectedBytes < this.BytesBelowWhich5ChannelIsFaster;
-            if (sizeBased5Channel) {
-                this.logger.debug("5 channel based on size");
-                this.initialChannelMode = Math.floor(Math.random() * this.RAIDPARTS);
-            }
-            else {
-                this.logger.debug("6 channel based on size");
-            }
-        }
-    };
-
-    CloudRaidRequest.prototype.onFailure = function(ev, partNum) {
+    CloudRaidRequest.prototype.onFailure = function (ev, failedPartNum) {
         var self = this;
         var xhr = ev.target;
         var status = xhr.readyState > 1 && xhr.status;
 
-        // no need to report fails when we shut down XFRs ourselves.
-        if (this.recoveringFromFail) {
-            return;
-        }
-
-        this.recoveringFromFail = true;
-        this.part[partNum].failCount++;
+        this.part[failedPartNum].failCount++;
         this.lastFailureTime = Date.now();
-        this.posToResumeSixChannelAt = null;
 
         if (d) {
-            this.logger.warn("Recovering from fail, part %s (%s)", partNum, ev.type,
+            this.logger.warn("Recovering from fail, part %s (%s)", failedPartNum, ev.type,
                 this.part[0].failCount, this.part[1].failCount, this.part[2].failCount,
                 this.part[3].failCount, this.part[4].failCount, this.part[5].failCount);
         }
 
-        this.cloudRaidSettings.lastFailedChannel = partNum;
+        this.cloudRaidSettings.lastFailedChannel = failedPartNum;
 
         var sumFails = 0;
         for (var i = this.RAIDPARTS; i--;) {
@@ -400,34 +325,24 @@
             return this.dispatchLoadEnd();
         }
 
-        // only report and cancel everything once, cancelling will cause more callbacks here.
-        if (this.sixChannelFailed) {
-            if (d) {
-                this.logger.log("five channel download failed, part %s reason: %s." +
-                    " Restart 5 channel", partNum, ev.type);
-            }
+        var partStartPos = this.wholeFileDatalinePos / (this.RAIDPARTS - 1);
+
+        if (this.initialChannelMode < 0) {
+            // we haven't decided which channel to skip yet.  Eg. on the first 5 connects, this one reports back first with connection refused.
+            // in this case, try again but on a bit of a delay.  Probably this one will turn out to be the slowest, and be cancelled anyway.
+            this.logger.log("We will retry channel " + failedPartNum + " shortly");
+            this.part[failedPartNum].delayedinitialconnect = setTimeout(function () { this.startPart(failedPartNum, partStartPos, this.initialChannelMode); }, 1000);
         }
         else {
-            if (d) {
-                this.logger.log("six channel download failed, part %s reason: %s." +
-                    " Failing over to 5 channel", partNum, ev.type);
-            }
-            this.sixChannelFailed = true;
+            // turn the faulty channel (which is already stopped) into the idle channel (which already reached the end), and start reading from the old idle channel
+            this.logger.log("Resetting channels " + this.initialChannelMode + " and " + failedPartNum);
+            this.part[failedPartNum].filePieces = [];
+            this.part[this.initialChannelMode].filePieces = [];
+            this.startPart(failedPartNum, partStartPos, failedPartNum);
+            this.startPart(this.initialChannelMode, partStartPos, failedPartNum);
+            this.initialChannelMode = failedPartNum;
         }
 
-        // delay allows for XFRs callbacks to complete
-        onIdle(function() {
-            self.restart5Channel(partNum);
-        });
-
-        this.cancelAllPieces();
-    };
-
-    CloudRaidRequest.prototype.cancelAllPieces = function() {
-        // shut down all xfr and paused channels
-        for (var i = this.RAIDPARTS; i--;) {
-            this.part[i].abort().resumeChannelCallback = null;
-        }
     };
 
     CloudRaidRequest.prototype.dispatchLoadEnd = function() {
@@ -453,9 +368,8 @@
         return -1;
     };
 
-    CloudRaidRequest.prototype.restart5Channel = function(failedPartNum) {
+    CloudRaidRequest.prototype.start5Channel = function (failedPartNum) {
         var i;
-        this.recoveringFromFail = false;
 
         // keep outputpieces that we have so far, of course, but throw away any further
         // chunks we have already as some of them will be 'skipped' and not have actual data
@@ -502,82 +416,56 @@
     };
 
 
-    CloudRaidRequest.prototype.recoverFromParity = function(target, buffers, offset, len) {
+    CloudRaidRequest.prototype.recoverFromParity = function (target, buffers, offset, dolog) {
         // target is already initialised to 0 so we can xor directly into it
         for (var i = this.RAIDPARTS; i--;) {
-            if (buffers[i] !== null && !buffers[i].skipped) {
-                var minlen = Math.min(buffers[i].buffer.byteLength - offset, len);
-                if (minlen > 0) {
-                    var b = new Uint8Array(buffers[i].buffer, offset, minlen);
-                    for (var p = minlen; p--;) {
-                        target[p] ^= b[p];
-                    }
+            if (!buffers[i].skipped) {
+                var thisoffset = offset + buffers[i].used;
+                var b = buffers[i].buffer.subarray(thisoffset, thisoffset + this.RAIDSECTOR);
+                for (var p = this.RAIDSECTOR; p--;) {
+                    target[p] ^= b[p];
                 }
             }
         }
     };
 
-    CloudRaidRequest.prototype.getInputBuffer = function(piecesToProcess) {
-        var i;
-        var piecesToProcessPartPos = 0;
-        var piecesToProcessSumSize = 0;
+    CloudRaidRequest.prototype.getInputBuffer = function (piecesPos, piecesLen, pieces) {
 
-        for (i = this.RAIDPARTS; i--;) {
-            if (piecesToProcess[i]) {
-                piecesToProcessPartPos = piecesToProcess[i].partpos;
-                if (i) {
-                    piecesToProcessSumSize += piecesToProcess[i].buffer.byteLength;
-                }
-            }
-        }
+        var dataremaining = piecesLen * (this.RAIDPARTS - 1);
+        var fileBuf = new ArrayBuffer(dataremaining);
 
-        // Number of data lines to process this time.
-        // The end of the file may not be a whole number of datalines, but the ones prior are.
-        var datalines = roundUpToMultiple(piecesToProcessSumSize, this.RAIDLINE) / this.RAIDLINE;
-
-        var partpos = piecesToProcessPartPos;
-        var dataremaining = piecesToProcessSumSize;
-        var fileBuf = new ArrayBuffer(piecesToProcessSumSize);
-
+        var pos = piecesPos;
+        var datalines = piecesLen / this.RAIDSECTOR;
         for (var dataline = 0; dataline < datalines; ++dataline) {
-            for (i = 1; i < this.RAIDPARTS; i++) {
+            //		console.log("dataline " + dataline);
+            for (var i = 1; i < this.RAIDPARTS; i++) {
                 var s = Math.min(dataremaining, this.RAIDSECTOR);
-
-                if (s > 0 && piecesToProcess[i]) {
+                if (s > 0 && pieces[i] !== null) {
                     var target = new Uint8Array(fileBuf, dataline * this.RAIDLINE + (i - 1) * this.RAIDSECTOR, s);
-
-                    if (piecesToProcess[i].skipped) {
-                        this.recoverFromParity(target, piecesToProcess, partpos - piecesToProcessPartPos, s);
-                    }
-                    else {
-                        if (d > 2) {
-                            var bufLen = piecesToProcess[i].buffer.byteLength;
-                            this.logger.debug("source part %d, buf:%s offset:%s len:%s dataline:%s dataremaining:%s",
-                                i, bufLen, (partpos - piecesToProcessPartPos), s, dataline, dataremaining);
-                        }
-
-                        var source = new Uint8Array(piecesToProcess[i].buffer, partpos - piecesToProcessPartPos, s);
+                    if (pieces[i].skipped) {
+                        this.recoverFromParity(target, pieces, pos - piecesPos, false);
+                    } else {
+                        var offset = (pieces[i].used + pos - piecesPos);
+                        var source = pieces[i].buffer.subarray(offset, offset + s);
                         target.set(source);
                     }
-
                     dataremaining -= s;
                 }
             }
-
-            partpos += this.RAIDSECTOR;
+            pos += this.RAIDSECTOR;
         }
-
         return fileBuf;
     };
 
-    CloudRaidRequest.prototype.combineSectors = function(piecesToProcess) {
-        var skipFileBack = 0;
+    CloudRaidRequest.prototype.combineSectors = function (piecesPos, piecesLen, pieces, eofexcess) {
+        var skipFileBack = eofexcess;
         var skipFileFront = 0;
-        var fileBuf = this.getInputBuffer(piecesToProcess);
+
+        var fileBuf = this.getInputBuffer(piecesPos, piecesLen, pieces);
 
         // chop off any excess data after the last dataline has been xor'd
-        if (this.outputByteCount + fileBuf.byteLength >= (this.fileEndReadPos - this.fileStartPos)) {
-            skipFileBack = this.fileEndReadPos - this.fileEndDeliverPos;
+        if (this.outputByteCount + fileBuf.byteLength - eofexcess >= (this.fileEndReadPos - this.fileStartPos)) {
+            skipFileBack += this.fileEndReadPos - this.fileEndDeliverPos;
         }
 
         if (this.skipBeginningData > 0) {
@@ -585,27 +473,32 @@
             this.skipBeginningData = 0;
         }
 
-        var deliveredByteLen = fileBuf.byteLength - skipFileBack - skipFileFront;
-        var dataToDeliver = fileBuf.slice(skipFileFront, skipFileFront + deliveredByteLen);
+        var deliverByteLen = fileBuf.byteLength - skipFileBack - skipFileFront;
+        var dataToDeliver = new Uint8Array(fileBuf, skipFileFront, deliverByteLen);
 
-        if (d) {
-            this.logger.debug('combineSectors', [dataToDeliver], [this.response]);
+        // fill in the buffer with the new full-file rows
+        if (this.resultBuffer === false) {
+            this.resultBuffer = new Uint8Array(new ArrayBuffer(this.expectedBytes), 0, this.expectedBytes);
         }
+        this.resultBuffer.subarray(this.outputByteCount, this.outputByteCount + deliverByteLen).set(dataToDeliver);
 
-        if (this.response.byteLength) {
-            var tmp = new Uint8Array(this.response.byteLength + dataToDeliver.byteLength);
-            tmp.set(new Uint8Array(this.response), 0);
-            tmp.set(new Uint8Array(dataToDeliver), this.response.byteLength);
-            this.response = tmp.buffer;
-        }
-        else {
-            this.response = dataToDeliver;
-        }
-
-        this.outputByteCount += deliveredByteLen;
+        this.outputByteCount += deliverByteLen;
         this.wholeFileDatalinePos += fileBuf.byteLength;
 
-        if (this.response.byteLength === this.expectedBytes) {
+        // notify of progress anytime we construct rows of the original file for smooth data rate display (and avoiding timeouts)
+        if (dataToDeliver.byteLength > 0 && this.onprogress) {
+            this.dispatchEvent('progress', {
+                lengthComputable: 1,
+                total: this.expectedBytes,
+                loaded: this.outputByteCount
+            });
+        }
+
+        if (this.outputByteCount === this.expectedBytes) {
+
+            this.finished = true;
+            this.response = this.resultBuffer;
+
             if (d) {
                 var channelPauseMs = 0;
                 var channelPauseCount = 0;
@@ -625,302 +518,295 @@
             onIdle(this.dispatchLoadEnd.bind(this));
         }
 
-        // Consider if we should try to go back to six channel after errors stop. Must have been a
-        // while since the last one, and still have plenty of the file left to go (more than 10% or 10 meg)
-        if (this.posToResumeSixChannelAt === null && this.sixChannelFailed
-            && this.lastFailureTime + this.ReturnToSixChannelNoErrorsMillisec < Date.now()) {
-
-            var readSize = this.fileEndReadPos - this.fileStartPos;
-            var fileLeft = this.fileEndReadPos - this.wholeFileDatalinePos;
-
-            if (fileLeft * 100 / readSize > this.ReturnToSixChannelMinPercentLeft
-                && fileLeft > this.ReturnToSixChannelMinBytesLeft && readSize > 0) {
-
-                // well ahead of any point any channel has read to so far.
-                this.posToResumeSixChannelAt = (
-                    (this.wholeFileDatalinePos / (this.RAIDPARTS - 1))
-                    + (this.MAXCHUNKSPERREAD + this.READAHEADCHUNKSPAUSEPOINT) * 2
-                    * this.RAIDLINESPERCHUNK * this.RAIDSECTOR
-                );
-                this.sixChannelFailed = false;
-
-                if (d) {
-                    this.logger.debug("attempting to return to 6 channel, " +
-                        "when we get to part pos %s", this.posToResumeSixChannelAt);
-                }
-            }
-        }
     };
 
-    CloudRaidRequest.prototype.resumeChannels = function() {
-        // resume any channels that were paused due to getting too far ahead
+    CloudRaidRequest.prototype.discardUsedParts = function (piecesize) {
+        // remove from the beginning of each part's list of received data
         for (var i = this.RAIDPARTS; i--;) {
-            if (this.part[i].resumeChannelCallback) {
-                this.part[i].resumeChannelCallback();
+            var n = piecesize;
+            var fp = this.part[i].filePieces;
+            while (n > 0 && fp.length > 0 && (fp[0].buffer.byteLength - fp[0].used <= n)) {
+                n -= fp[0].buffer.byteLength - fp[0].used;
+                fp.shift();
+            }
+            if (fp.length > 0) {
+                fp[0].used += n;
             }
         }
-    };
+    }
 
     CloudRaidRequest.prototype.queueReceivedPiece = function(partNum, piece) {
-        var i;
-        var gotNextChunkAllPieces = true;
 
         this.part[partNum].filePieces.push(piece);
 
-        for (i = this.RAIDPARTS; i--;) {
-            if (!this.part[i].filePieces.length) {
-                // at least one piece at the current position hasn't arrived yet
-                gotNextChunkAllPieces = false;
-                break;
-            }
-        }
-
-        if (gotNextChunkAllPieces) {
-            var piecesToProcess = [];
-
-            for (i = 0; i < this.RAIDPARTS; ++i) {
-                piecesToProcess.push(this.part[i].filePieces.shift());
-            }
-            this.combineSectors(piecesToProcess);
-        }
-    };
-
-    CloudRaidRequest.prototype.loadPartNotTooFarAhead = function(partNum, pos, partsize, skipchunkcount) {
-        var datalineInParts = this.wholeFileDatalinePos / (this.RAIDPARTS - 1);
-
-        if (this.part[partNum].resumeChannelCallback !== null) {
-            // don't unpause too soon or the request will be for a small amount of data, and result in many round trips
-            if (datalineInParts + this.RAIDLINESPERCHUNK * this.RAIDSECTOR * this.READAHEADCHUNKSUNPAUSEPOINT <= pos) {
-                // stay paused
-                return;
-            }
-            this.part[partNum].resumeChannelCallback = null;
-
-            if (skipchunkcount !== -2) {
-                // don't count these if it's the inactive channel in a 5 channel download
-                this.part[partNum].channelPauseMillisec += performance.now() - this.part[partNum].channelLastPauseTime;
-
-                if (d) {
-                    this.logger.debug("resuming channel %s part pos %s (part dataline %s) count %s ms:%s sum ms:%s",
-                        partNum, pos, datalineInParts, this.part[partNum].channelPauseCount,
-                        (performance.now() - this.part[partNum].channelLastPauseTime),
-                        this.part[partNum].channelPauseMillisec);
-                }
-            }
-        }
-
-        // prevent fast channels getting too far ahead of slow channels as that will use a lot of buffer space
-        // no more than 2 chunks ahead of the point that all channels have achieved
-        if (pos >= datalineInParts + this.RAIDLINESPERCHUNK * this.RAIDSECTOR * this.READAHEADCHUNKSPAUSEPOINT) {
-            // check if it's already paused
-            if (this.part[partNum].resumeChannelCallback === null) {
-                if (skipchunkcount !== -2) {
-                    if (d) {
-                        var s = [];
-                        for (var i = this.RAIDPARTS; i--;) {
-                            var p = this.part[i];
-                            s.push(i + ": " + p.lastPos + " " + (p.lastPos - datalineInParts)
-                                + " " + (p.lastPos - datalineInParts) / (this.RAIDLINESPERCHUNK * this.RAIDSECTOR));
-                        }
-                        this.logger.debug("pausing channel %s part pos %s at part dataline %s (%s)",
-                            partNum, pos, datalineInParts, s.join('  '));
+        for (; ;) {
+            var combinesize = 1 << 20;
+            var partpos = -1;
+            var totalsize = 0, part1len = 0, part0len = 0;
+            for (var i = this.RAIDPARTS; i--;) {
+                var fp = this.part[i].filePieces;
+                if (fp.length == 0)
+                    combinesize = 0;
+                else {
+                    combinesize = Math.min(combinesize, fp[0].buffer.byteLength - fp[0].used);
+                    if (partpos == -1)
+                        partpos = fp[0].partpos + fp[0].used;
+                    else if (partpos != fp[0].partpos + fp[0].used) {
+                        this.logger.error('-----------ERROR: partpos mismatch ' + partpos + ' ' + (fp[0].partpos + fp[0].used));
+                        return; // should never happen
                     }
 
-                    // don't count these if it's the inactive channel in a 5 channel download
-                    this.part[partNum].channelPauseCount += 1;
-                    this.part[partNum].channelLastPauseTime = performance.now();
+                    if (i > 0) totalsize += fp[0].buffer.byteLength - fp[0].used;
+                    if (i == 0) part0len = fp[0].buffer.byteLength - fp[0].used;
+                    if (i == 1) part1len = fp[0].buffer.byteLength - fp[0].used;
+                }
+            }
+
+            var eof = totalsize == this.fileEndReadPos - partpos * 5 && part1len == part0len;
+            var fulllinesize = roundDownToMultiple(combinesize, this.RAIDSECTOR);
+
+            if (fulllinesize > 0) {
+
+                var tocombine = [];
+                for (var i = 0; i < this.RAIDPARTS; ++i) {
+                    tocombine.push(this.part[i].filePieces[0]);
                 }
 
-                var self = this;
-                this.part[partNum].resumeChannelCallback = function() {
-                    self.loadPartNotTooFarAhead(partNum, pos, partsize, skipchunkcount);
-                };
+                this.combineSectors(partpos, fulllinesize, tocombine, 0);
+                this.discardUsedParts(fulllinesize);
+            }
+            else if (combinesize > 0 || eof && part0len > 0) {
+                var tocombine = [];
+                for (var i = 0; i < this.RAIDPARTS; ++i) {
+                    var fp = this.part[i].filePieces;
+                    var loaded = 0;
+                    var b = new ArrayBuffer(this.RAIDSECTOR);
+                    for (var j = 0; loaded < this.RAIDSECTOR && j < fp.length; ++j) {
+                        var toload = Math.min(fp[j].buffer.byteLength - fp[j].used, this.RAIDSECTOR - loaded);
+                        var target = new Uint8Array(b, loaded, toload);
+                        var source = fp[j].buffer.subarray(fp[j].used, fp[j].used + toload);
+                        target.set(source);
+                        loaded += toload;
+                    }
+                    if (combinesize > 0 && !(eof && part0len > 0) && loaded < this.RAIDSECTOR) {
+                        return;
+                    }
+                    tocombine.push({
+                        'skipped': fp.length == 0 ? false : fp[0].skipped,
+                        'used': 0,
+                        'partpos': partpos,
+                        'buffer': new Uint8Array(b, 0, this.RAIDSECTOR)
+                    });
+                }
+                this.combineSectors(partpos, this.RAIDSECTOR, tocombine, (eof && part0len > 0) ? this.RAIDSECTOR * 5 - totalsize : 0);
+                this.discardUsedParts(this.RAIDSECTOR);
+            }
+            else {
+                return;
             }
         }
-        else {
-            this.loadPart(partNum, pos, partsize, skipchunkcount);
-        }
-    };
+    }
 
-    CloudRaidRequest.prototype.loadPart = function(partNum, pos, partsize, skipchunkcount) {
-        var chunksize;
+    CloudRaidRequest.prototype.loadPart = function (partNum, pos, endpos, skipchunkcount) {
 
-        if (pos >= partsize) {
-            if (partNum > 1) {
-                // the very last sector of the last parts could be empty if they are on the chunk boundary,
-                // whereas earlier parts have some data in that sector. Parts 0 and 1 will always have
-                // the most so no need to do it for them.
-                this.queueReceivedPiece(partNum, null);
-                this.resumeChannels();
+        if (pos >= endpos) {
+            // put one more 0-size piece on the end, which makes it easy to rebuild the last raidline of the file
+            if (!this.finished) {
+                this.queueReceivedPiece(partNum, { 'skipped': false, 'used': 0, 'partpos': pos, 'buffer': new Uint8Array(new ArrayBuffer(0), 0, 0) });
             }
             return;
         }
 
-        if (this.posToResumeSixChannelAt !== null && pos === this.posToResumeSixChannelAt) {
-            this.logger.debug("Resuming six channel mechanism for part " + partNum);
-            skipchunkcount = partNum;
-        }
+        var chunksize = endpos - pos;
 
-        // cycling around and skipping every 6th one in 6-part download
         // -1 indicates no skipping, load all data.
         // -2 indicates skipping all which is used when one channel has had a failure
         // -3 indicates we are starting a new download, and the slowest connection to respond should be discarded.
-        if (skipchunkcount === 0 || skipchunkcount === -2) {
-            chunksize = Math.min(this.RAIDLINESPERCHUNK * this.RAIDSECTOR, partsize - pos);
-            this.logger.debug("part %s skipping a piece at pos %s, size %s", partNum, pos, chunksize);
-
+        if (skipchunkcount === -2) {
             // skip this chunk, the other 5 channels will load the corresponding parts and we can xor to reassemble
             // fill in the buffer with an empty array to keep the algo simple
-            var filePiece = {skipped: true, partpos: pos, buffer: new ArrayBuffer(chunksize)};
+            var filePiece = { 'skipped': true, 'used': 0, 'partpos': pos, 'buffer': new Uint8Array(new ArrayBuffer(chunksize), 0, chunksize) };
             this.part[partNum].lastPos = pos + filePiece.buffer.byteLength;
             this.queueReceivedPiece(partNum, filePiece);
-            this.resumeChannels();
-            this.loadPartNotTooFarAhead(
-                partNum, pos + filePiece.buffer.byteLength, partsize,
-                skipchunkcount < 0
-                    ? skipchunkcount
-                    : ((skipchunkcount + this.RAIDPARTS - 1) % this.RAIDPARTS)
-            );
+            this.loadPart(partNum, pos + filePiece.buffer.byteLength, endpos, skipchunkcount);
             return;
         }
 
-        // see if we can read multiple chunks ahead to reduce round trips
-        var numChunks = this.MAXCHUNKSPERREAD;
-        if (skipchunkcount >= 0) {
-            // limit to next skip point
-            numChunks = Math.min(this.MAXCHUNKSPERREAD, skipchunkcount);
-        }
-
-        if (d) {
-            this.logger.debug("part %s reading ahead up to %s chunks", partNum, numChunks);
-        }
-
-        var partBytesPerChunk = this.RAIDLINESPERCHUNK * this.RAIDSECTOR;
-        chunksize = Math.min(numChunks * partBytesPerChunk, partsize - pos);
-        if (this.posToResumeSixChannelAt !== null && pos < this.posToResumeSixChannelAt) {
-            chunksize = Math.min(chunksize, this.posToResumeSixChannelAt - pos);
-        }
-
-        // all channels start at the same pos, and if skipchunkcount === -3 then this is the first chunk for all
-        var restartMiaPos = pos;
-
-        var self = this;
-        var part = self.part[partNum];
-        var xhr = getXMLHttpRequest();
-        part.xhrInstance = xhr;
-
-        xhr.onreadystatechange = function(ev) {
-            var state = ev.target.readyState;
-
-            // Check whether we do need to drop the slowest channel/connection.
-            if (state === XMLHttpRequest.HEADERS_RECEIVED && skipchunkcount === -3 && self.channelReplyState !== 63) {
-                var mia = -1;
-
-                self.channelReplyState |= (1 << partNum);
-
-                for (var i = self.RAIDPARTS; i--;) {
-                    if ((self.channelReplyState | (1 << i)) === 63) {
-                        mia = i;
-                    }
-                }
-
-                if (mia !== -1) {
-                    if (d) {
-                        self.logger.info("Slowest channel was %s, closing it.", mia);
-                    }
-                    self.cloudRaidSettings.lastFailedChannel = mia;
-
-                    self.part[mia].abort();
-                    self.channelReplyState = 63;
-                    self.initialChannelMode = mia;
-                    self.loadPart(mia, restartMiaPos, self.calcFilePartSize(mia, self.fileEndReadPos), -2);
-                }
-            }
-
-            if (state === XMLHttpRequest.DONE) {
-                if (ev.target.status !== 200) {
-                    self.onFailure(ev, partNum);
-                }
-            }
-            else if (state > self.readyState) {
-                self.dispatchEvent('readystatechange', state);
-            }
-        };
-
-        xhr.onloadend = tryCatch(function(ev) {
-            var xhr = ev.target;
-            var buffer = xhr.response || false;
-
-            part.abort();
-            self.bytesProcessed += buffer.byteLength || 0;
-
-            // self.logger.warn('loadend', partNum, [buffer], self.bytesProcessed);
-
-            if (buffer.byteLength !== chunksize) {
-                return self.onFailure(ev, partNum);
-            }
-
-            if (part.failCount) {
-                // data arrived, so consider this one error-free
-                part.failCount = 0;
-
-                if (d) {
-                    self.logger.debug("Reset fail count on part %s.", partNum,
-                        self.part[0].failCount, self.part[1].failCount, self.part[2].failCount,
-                        self.part[3].failCount, self.part[4].failCount, self.part[5].failCount);
-                }
-            }
-
-            for (var i = 0; i * partBytesPerChunk < buffer.byteLength; ++i) {
-                var offset = i * partBytesPerChunk;
-                var length = Math.min(partBytesPerChunk, buffer.byteLength - i * partBytesPerChunk);
-                var filePiece = {
-                    skipped: false,
-                    partpos: pos + i * partBytesPerChunk,
-                    buffer: buffer.slice(offset, offset + length)
-                };
-                part.lastPos = pos + filePiece.buffer.byteLength;
-                self.queueReceivedPiece(partNum, filePiece);
-            }
-
-            if (self.onprogress && self.response.byteLength) {
-                self.dispatchEvent('progress', {
-                    lengthComputable: 1,
-                    total: self.expectedBytes,
-                    loaded: self.response.byteLength
-                });
-            }
-
-            // resume after processing all chunks, as we might be able to request a larger amount per channel
-            self.resumeChannels();
-
-            self.loadPartNotTooFarAhead(
-                partNum, pos + buffer.byteLength, partsize,
-                skipchunkcount < 0
-                    ? skipchunkcount
-                    : ((skipchunkcount + numChunks * (self.RAIDPARTS - 1)) % self.RAIDPARTS)
-            );
-        }, function(ex) {
-            if (d) {
-                self.logger.error(ex);
-            }
-            self.onFailure($.Event('error', {target: self, message: ex}), partNum);
-        });
-
+        var part = this.part[partNum];
         var pieceUrl = part.baseUrl + "/" + pos + "-" + (pos + chunksize - 1);
 
         if (d) {
-            this.logger.debug("Part %s pos: %s chunks: %s of total: %s",
-                partNum, pos, chunksize / partBytesPerChunk, partsize, pieceUrl);
+            this.logger.log("Part %s pos: %s chunksize: %s from: %s",
+                partNum, pos, chunksize, pieceUrl);
         }
 
         this.totalRequests++;
         this.channelReplyState = 0;
 
-        xhr.open("GET", pieceUrl);
-        // xhr.timeout = this.XHRTIMEOUT;
-        xhr.responseType = "arraybuffer";
-        xhr.send();
+        var streamPos = 0;
+
+        // Execute the fetch, with continuation fuctions for each buffer piece that arrives
+        part.abortController = new AbortController();
+        part.signal = part.abortController.signal;
+        part.timedout = false;
+
+        var self = this;
+        try {
+            fetch(pieceUrl, { signal: part.signal })
+                .then(function (fetchresponse) { self.processFetchResponse(partNum, pos, endpos, streamPos, skipchunkcount, fetchresponse); })
+                .catch(function (ex) { self.fetchReadExceptionHandler(ex, partNum); });
+        }
+        catch (ex) {
+            self.fetchReadExceptionHandler(ex, partNum);
+        }
+    }
+
+    CloudRaidRequest.prototype.processFetchResponse = function (partNum, pos, endpos, streamPos, skipchunkcount, fetchresponse) {
+
+        if (fetchresponse.status == 509)
+        {
+            // if one or more channels can't get data due to overquota, shut them all down immediately (before more quota is used) and refer to higher layer
+            this.logger.error("received 509");
+            this.status = 509;
+            return this.dispatchLoadEnd();
+        }
+
+        if (!fetchresponse.ok || fetchresponse.status != 200) {
+            this.logger.error("response status: %s %s", fetchresponse.status, fetchresponse.ok);
+            this.onFailure($.Event('error', { target: this, message: "fetch failure" }), partNum);
+            return;
+        }
+
+        // Check whether we need to drop the slowest channel/connection.
+        if (skipchunkcount === -3 && this.channelReplyState !== 63) {
+            var mia = -1;
+
+            this.channelReplyState |= (1 << partNum);
+
+            for (var i = this.RAIDPARTS; i--;) {
+                if ((this.channelReplyState | (1 << i)) === 63) {
+                    mia = i;
+                }
+            }
+
+            if (mia !== -1) {
+                if (d) {
+                    this.logger.info("Slowest channel was %s, closing it.", mia);
+                }
+                this.cloudRaidSettings.lastFailedChannel = mia;
+
+                this.part[mia].abortController.abort();
+                if (this.part[mia].delayedinitialconnect !== null) clearTimeout(this.part[mia].delayedinitialconnect);
+                this.channelReplyState = 63;
+                this.initialChannelMode = mia;
+
+                // all channels start at the same pos, and if skipchunkcount === -3 then this is the first chunk for all, so that one can generate dummy data from 'pos'.
+                this.loadPart(mia, pos, this.calcFilePartSize(mia, this.fileEndReadPos), -2);
+            }
+        }
+
+        // stream the reply body
+        var reader = fetchresponse.body.getReader();
+
+        var self = this;
+        var part = self.part[partNum];
+        part.timedout = false;
+        part.readTimeoutId = setTimeout(function () { part.timedout = true; part.abortController.abort(); }, this.FETCH_DATA_TIMEOUT_MS);
+
+        try {
+            reader.read()
+                .then(function processPartStream({ done, value }) {
+                    self.processFetchData(reader, partNum, pos, endpos, streamPos, skipchunkcount, done, value);
+                })
+                .catch(function (ex) { self.fetchReadExceptionHandler(ex, partNum); });
+        }
+        catch (ex) {
+            self.fetchReadExceptionHandler(ex, partNum);
+        }
+    }
+
+    CloudRaidRequest.prototype.processFetchData = function (reader, partNum, pos, endpos, streamPos, skipchunkcount, done, value) {
+
+        var part = this.part[partNum];
+        clearTimeout(part.readTimeoutId);
+        part.readTimeoutId = null;
+
+        if (done) {
+            this.loadPart(partNum, pos + streamPos, endpos, skipchunkcount)
+            return;
+        }
+
+        //this.logger.log("Received data on part %s: %s", partNum, value.byteLength);
+
+        var filePiece = {
+            'skipped': false,
+            'used': 0,
+            'partpos': pos + streamPos,
+            'buffer': value
+        };
+
+        streamPos += value.length;
+
+        this.bytesProcessed += value.length;
+        part.lastPos = pos + streamPos;
+
+        if (part.failCount > 0) {
+            part.failCount = 0;
+            if (d) {
+                this.logger.log("Reset fail count on part %s.", partNum,
+                    this.part[0].failCount, this.part[1].failCount, this.part[2].failCount,
+                    this.part[3].failCount, this.part[4].failCount, this.part[5].failCount);
+            }
+        }
+
+        this.queueReceivedPiece(partNum, filePiece);
+
+        part.timedout = false;
+        part.readTimeoutId = setTimeout(function () { part.timedout = true; part.abortController.abort(); }, this.FETCH_DATA_TIMEOUT_MS);
+
+        var self = this;
+        try {
+            reader.read()
+                .then(function processPartStream({ done, value }) {
+                    self.processFetchData(reader, partNum, pos, endpos, streamPos, skipchunkcount, done, value);
+                })
+                .catch(function (ex) { self.fetchReadExceptionHandler(ex, partNum); });
+        }
+        catch (ex) {
+            self.fetchReadExceptionHandler(ex, partNum);
+        }
+    }
+
+    CloudRaidRequest.prototype.fetchReadExceptionHandler = function (ex, partNum) {
+
+        var part = this.part[partNum];
+
+        if (part.readTimeoutId !== null) {
+            clearTimeout(part.readTimeoutId);
+            part.readTimeoutId = null;
+        }
+
+        if (ex.name === 'AbortError') {
+            if (this.highlevelabort) {
+                this.logger.log("Part : " + partNum + " exiting");
+            }
+            else if (part.timedout) {
+                // switch to the currently idle channel instead, and pick up from there.
+                this.logger.log("Timeout on part : " + partNum);
+                this.onFailure($.Event('error', { target: this, message: ex }), partNum);
+                part.timedout = false;
+            }
+            else {
+                this.logger.log('Fetch on ' + partNum + " was the slowest");
+            }
+        } else {
+            this.logger.log("Caught exception from fetch on part: " + partNum + " ex: ");
+            this.logger.log(ex);
+            if (d) {
+                this.logger.error(ex);
+            }
+            this.onFailure($.Event('error', { target: this, message: ex }), partNum);
+        }
     };
 
     Object.freeze(CloudRaidRequest.prototype);

@@ -2114,7 +2114,7 @@
     "18682": "Not Now",
     "18683": "Insert preview",
     "18684": "Remove preview",
-    "18685": "The Rubbish Bin can be cleared for you automatically. The minimum period is 7 days.",
+    "18685": "The Rubbish Bin can be cleared for you automatically.",
     "18686": "The Rubbish Bin is cleared for you automatically. The minimum period is 7 days and the maximum period is 30 days.",
     "18687": "You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?",
     "18694": "Password accepted, we still recommend you back up your Recovery Key.",
@@ -2793,6 +2793,8 @@
     "19748": "Your account has been disabled by your administrator. You may contact your business account administrators for further details.",
     "19749": "Last Active Noong",
     "19750": "I-migrate ang User Data",
+    "19772": "Ang Basurahan ay nilinis na para sa iyo automatically.",
+    "19774": "The minimum period is 7 days and your maximum period is 30 days.",
     "19775": "%d na araw",
     "19779": "GitHub contains information about the MEGA Desktop App\u2019s features and usage instructions for every platform, and describes how to build it from our public source GitHub repository.",
     "19780": "Describes the MEGA Desktop App\u2019s features and answers frequently asked questions.",
@@ -3262,7 +3264,13 @@
     "20450": "Binalewala",
     "20460": "There is an active call. [A]Join[\/A]",
     "20461": "No folders in Cloud Drive",
-    "20462": "Your account is on [B]suspended[\/B] status. You can browse your data only.",
+    "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
     "20463": "Contact your business account administrator to resolve the issue and activate your account.",
-    "20464": "IMPORTANT"
+    "20464": "IMPORTANT",
+    "20471": "Overdue na ang bayad",
+    "20472": "To reactivate your Business account, you need to pay any overdue subscription payments.",
+    "20473": "Payment breakdown",
+    "20474": "You are about to close the dialog. All data entered will be lost.",
+    "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
+    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
 }

@@ -1962,6 +1962,12 @@ li.token-input-token-invite .input-close {
     transition: color 200ms ease-in-out;
     font-family: 'LatoWeb', 'source_sans_proregular';
 }
+
+/* just to replace padding property from the above class */
+.chat-rename-group-dialog {
+    padding: 0 10px 0 10px !important;
+}
+
 .fm-account-input input {
     font-size: 14px;
     line-height: 32px;

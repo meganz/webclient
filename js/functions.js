@@ -2782,3 +2782,40 @@ function getLastDayofTheMonth(dateObj) {
     }
     return new Date(year, month, day);
 }
+
+/**
+ * Block Chrome Password manager for password field with attribute `autocomplete="new-password"`
+ */
+function blockChromePasswordManager() {
+
+    "use strict";
+
+    if (window.chrome) {
+        var $newPasswordField = $('input[type="password"][autocomplete="new-password"]');
+        var switchReadonly = function __switchReadonly(input) {
+
+            input.setAttribute('readonly', true);
+            setTimeout(function() {
+                input.removeAttribute('readonly');
+            }, 200);
+        };
+
+        $newPasswordField.rebind('focus.blockAutofill, mousedown.blockAutofill', function() {
+            switchReadonly(this);
+        });
+
+        // For prevent last chracter deletion pops up password manager
+        $newPasswordField.rebind('keydown.blockAutofill', function(e) {
+
+            if ((e.keyCode === 8 &&
+                ((this.selectionStart === 1 && this.selectionEnd === 1) ||
+                (this.selectionStart === 0 && this.selectionEnd === this.value.length))) ||
+                (e.keyCode === 46 &&
+                ((this.selectionStart === 0 && this.selectionEnd === 0 && this.value.length === 1) ||
+                (this.selectionStart === 0 && this.selectionEnd === this.value.length)))) {
+                e.preventDefault();
+                this.value = '';
+            }
+        });
+    }
+}

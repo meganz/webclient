@@ -1748,6 +1748,8 @@ function init_page() {
 
     loggedout = false;
     flhashchange = false;
+
+    onIdle(blockChromePasswordManager);
 }
 
 function topmenuUI() {

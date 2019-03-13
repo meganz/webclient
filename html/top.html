@@ -35,7 +35,10 @@
             <div class="top-search-clear">
                 <div class="top-search-button hidden"></div>
                 <div class="top-clear-button hidden"></div>
-                <input type="text" placeholder="[$102]" class="top-search-input"/>
+                <!-- Cover with form to prevent autofilling -->
+                <!-- <form autocomplete="off"> -->
+                    <input type="text" placeholder="[$102]" autocomplete="disabled" class="top-search-input"/>
+                <!-- </form> -->
             </div>
         </div>
 
@@ -226,7 +229,7 @@
                 <div class="clear"></div>
             </div>
             <div class="top-login-pad login">
-                <form id="form_login_header" autocomplete="off"></form>
+                <form id="form_login_header"></form>
             </div>
             <div class="top-login-warning active">
                 <div class="top-login-warning-arrow"></div>

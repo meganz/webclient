@@ -1946,6 +1946,7 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').addClass('hidden');
         $topHeader.find('.top-icon.achievements').addClass('hidden');
         $topHeader.find('.create-account-button').removeClass('hidden');
+        $topHeader.find('.left.individual').addClass('hidden');
 
         $('.create-account-button').rebind('click', function () {
             if ($(this).hasClass('business-reg')) {

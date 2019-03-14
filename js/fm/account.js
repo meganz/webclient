@@ -39,8 +39,6 @@ function accountUI() {
 
     M.onSectionUIOpen('account');
 
-    M.require('zxcvbn_js');
-
     if (u_attr && u_attr.b && !u_attr.b.m) {
         $('.content-panel.account .fm-account-button.slide-in-out.plan').addClass('hidden');
     }
@@ -101,6 +99,7 @@ accountUI.renderAccountPage = function(account) {
             $('.fm-account-security').removeClass('hidden');
             sectionClass = 'security';
 
+            M.require('zxcvbn_js');
             accountUI.security.init();
             break;
 

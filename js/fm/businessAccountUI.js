@@ -1516,7 +1516,7 @@ BusinessAccountUI.prototype.showExpiredUIElements = function() {
     var msg = '';
     if (u_attr.b.m) {
         msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
-            .replace(/\[A\]/g, '<a href="/registerb" class="clickurl">').replace(/\[\/A\]/g, '</a>');
+            .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
     }
     else {
         msg = l[20462];

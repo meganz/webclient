@@ -28570,15 +28570,15 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     font-size: 15px;
     color: #333333;
     line-height: 20px;
-    padding: 0 12px 0 0;
+    padding: 4px 12px 0 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     display: table-cell;
     width: 115px;
     position: relative;
-    text-align: right;
-    vertical-align: middle;
+    text-align: left;
+    vertical-align: top;
 }
 .fm-picker-dialog .summary-row .summary-input {
     width: 422px;

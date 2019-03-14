@@ -532,6 +532,11 @@ MegaData.prototype.contacts = function() {
                 });
 
                 $dropdown.find('.startaudio-item').rebind('click.treePanel', function() {
+                    if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                        M.showExpiredBusiness();
+                        return;
+                    }
+
                     var $this = $(this);
                     var $triggeredBy = $this.parent().data("triggeredBy");
                     var $userDiv = $triggeredBy.parent().parent();
@@ -548,6 +553,11 @@ MegaData.prototype.contacts = function() {
                 });
 
                 $dropdown.find('.startvideo-item').rebind('click.treePanel', function() {
+                    if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                        M.showExpiredBusiness();
+                        return;
+                    }
+
                     var $this = $(this);
                     var $triggeredBy = $this.parent().data('triggeredBy');
                     var $userDiv = $triggeredBy.parent().parent();

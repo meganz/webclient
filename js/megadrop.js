@@ -1858,6 +1858,13 @@ mega.megadrop = (function() {
         // Context menu create widget
         $('.dropdown.body.context .dropdown-item.createwidget-item').rebind('click.create_widget', function () {
 
+            // check if this is an expired business account
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
+
             // Go to widget creation directly don't display PUF info dialog
             if (ui.skipInfoDlg()) {
                 puf.create($.selected[0]);
@@ -1868,7 +1875,14 @@ mega.megadrop = (function() {
         });
 
         // Context menu manage widget
-        $('.dropdown.body.context .dropdown-item.managewidget-item').rebind('click.manage_widget', function () {
+        $('.dropdown.body.context .dropdown-item.managewidget-item').rebind('click.manage_widget', function() {
+
+            // check if this is an expired business account
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
 
             // Go to widget creation directly don't display PUF info dialog
             if (ui.skipInfoDlg()) {
@@ -1880,7 +1894,15 @@ mega.megadrop = (function() {
         });
 
         // Context menu Remove upload page
-        $('.dropdown.body.context .dropdown-item.removewidget-item').rebind('click.remove_widget', function () {
+        $('.dropdown.body.context .dropdown-item.removewidget-item').rebind('click.remove_widget', function() {
+
+            // check if this is an expired business account
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
+
             puf.remove($.selected);
         });
     });

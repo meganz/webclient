@@ -2452,28 +2452,33 @@ React.makeElement = React['createElement'];
 	            }
 	            if (!chatRoom.isDisplayable()) {
 	                return;
-	            }
-	            if (chatRoom.type === "private") {
-	                contact = chatRoom.getParticipantsExceptMe()[0];
-	                if (!contact) {
-	                    return;
-	                }
-	                contact = M.u[contact];
+                }
+                if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                    chatRoom.privateReadOnlyChat = true;
+                }
+                else {
+                    if (chatRoom.type === "private") {
+                        contact = chatRoom.getParticipantsExceptMe()[0];
+                        if (!contact) {
+                            return;
+                        }
+                        contact = M.u[contact];
 
-	                if (contact) {
-	                    if (!chatRoom.privateReadOnlyChat && !contact.c) {
+                        if (contact) {
+                            if (!chatRoom.privateReadOnlyChat && !contact.c) {
 
-	                        Soon(function () {
-	                            chatRoom.privateReadOnlyChat = true;
-	                        });
-	                    } else if (chatRoom.privateReadOnlyChat && contact.c) {
+                                Soon(function() {
+                                    chatRoom.privateReadOnlyChat = true;
+                                });
+                            } else if (chatRoom.privateReadOnlyChat && contact.c) {
 
-	                        Soon(function () {
-	                            chatRoom.privateReadOnlyChat = false;
-	                        });
-	                    }
-	                }
-	            }
+                                Soon(function() {
+                                    chatRoom.privateReadOnlyChat = false;
+                                });
+                            }
+                        }
+                    }
+                }
 
 	            currConvsList.push(React.makeElement(ConversationsListItem, {
 	                key: chatRoom.roomId,
@@ -15499,7 +15504,9 @@ React.makeElement = React['createElement'];
 
 	    this.callRequest = null;
 	    this.callIsActive = false;
-	    this.shownMessages = {};
+        this.shownMessages = {};
+
+        
 
 	    self.members = {};
 

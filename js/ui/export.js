@@ -1312,6 +1312,12 @@ var exportExpiry = {
      */
     ExportLinkDialog.prototype.linksDialog = function(close) {
 
+        // Checking if this a business user with expired status
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            M.showExpiredBusiness();
+            return;
+        }
+
         /* jshint -W074 */
         var self = this;
         var $linksDialog = $('.fm-dialog.export-links-dialog');
@@ -1903,6 +1909,12 @@ var exportExpiry = {
      * @returns {MegaPromise}
      */
     ExportLink.prototype.removeExportLink = function(quiet) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
+
         var self = this;
         var promises = [];
         var handles = self.options.nodesToProcess || [];
@@ -2174,6 +2186,12 @@ var exportExpiry = {
      */
     var initCopyrightsDialog = function(nodesToProcess, isEmbed) {
         'use strict';
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
 
         $.itemExportEmbed = isEmbed;
         $.itemExport = nodesToProcess;

@@ -1061,6 +1061,7 @@ FileManager.prototype.initContextUI = function() {
             business_ui.showExpiredDialog(u_attr.b.m);
         });
     };
+    M.showExpiredBusiness = showExpiredBusiness;
 
     $(c + '.cloud-item').rebind('click', safeMoveNodes);
 
@@ -1269,6 +1270,11 @@ FileManager.prototype.initContextUI = function() {
     $(c + '.copy-item').rebind('click', openCopyDialog);
 
     $(c + '.revert-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         loadingDialog.pshow();
         M.revertRubbishNodes($.selected).always(loadingDialog.phide.bind(loadingDialog));
     });
@@ -1337,6 +1343,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.startchat-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var $this = $(this);
         var user_handle = $.selected;
 
@@ -1350,7 +1361,12 @@ FileManager.prototype.initContextUI = function() {
         }
     });
 
-    $(c + '.startaudio-item,'+ c + '.startaudiovideo-item').rebind('click', function() {
+    $(c + '.startaudio-item,' + c + '.startaudiovideo-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var $this = $(this);
         var user_handle = $.selected && $.selected[0];
 
@@ -1364,6 +1380,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.startvideo-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var $this = $(this);
         var user_handle = $.selected && $.selected[0];
 
@@ -1386,6 +1407,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.send-files-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var $this = $(this);
         var user_handle = $.selected && $.selected[0];
 
@@ -1395,6 +1421,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.share-folder-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var $this = $(this);
         var user_handle = $.selected && $.selected[0];
 
@@ -1415,6 +1446,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.remove-contact').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var user_handle = $.selected && $.selected[0];
 
         user_handle =user_handle .replace('contact_', '');
@@ -1596,11 +1632,21 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.preview-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         closeDialog();
         slideshow($.selected[0]);
     });
 
     $(c + '.play-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         var n = $.selected[0];
 
         closeDialog();
@@ -1610,6 +1656,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.clearbin-item').rebind('click', function() {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            showExpiredBusiness();
+            return;
+        }
         doClearbin(false);
     });
 
@@ -1745,6 +1796,12 @@ FileManager.prototype.createFolderUI = function() {
     };
 
     $('.fm-new-folder').rebind('click', function(e) {
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
 
         var c = $('.fm-new-folder').attr('class'),
             c2 = $(e.target).attr('class'),
@@ -2514,6 +2571,13 @@ FileManager.prototype.contactsUI = function() {
     });
 
     $addContact.rebind('clcik.contacts', function() {
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
+
         var $this = $(this);
         var user_handle = $this.attr('id');
 
@@ -2526,6 +2590,13 @@ FileManager.prototype.contactsUI = function() {
     });
 
     $buttons.rebind('click.contacts', function() {
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
+
         var $this = $(this);
         var user_handle = $this.closest('.data-block-view, tr').attr('id');
 
@@ -2554,6 +2625,13 @@ FileManager.prototype.contactsUI = function() {
 
     $('.fm-empty-contacts .fm-empty-button, .add-new-contact, .fm-add-user')
         .rebind('click', function(e) {
+
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
+
             var $this = $(this);
 
             $.hideContextMenu();
@@ -2612,6 +2690,12 @@ FileManager.prototype.addContactUI = function() {
 
         // Reset seen or verified fingerprints and re-enable the Verify button
         $('.fm-reset-stored-fingerprint').rebind('click', function() {
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
+
             authring.resetFingerprintsForUser(user.u);
             enableVerifyFingerprintsButton(user.u);
 
@@ -2623,11 +2707,23 @@ FileManager.prototype.addContactUI = function() {
         });
 
         $('.fm-share-folders').rebind('click', function() {
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
             openCopyShareDialog(M.currentdirid);
         });
 
         // Remove contact button on contacts page
         $('.fm-remove-contact').rebind('click', function() {
+
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
+
             fmremove([M.currentdirid]);
         });
 

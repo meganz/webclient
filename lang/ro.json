@@ -2115,7 +2115,6 @@
     "18683": "Insereaz\u0103 previzualizarea",
     "18684": "Elimin\u0103 previzualizarea",
     "18685": "Co\u0219ul de gunoi poate fi golit pentru tine automat.",
-    "18686": "Co\u0219ul de gunoi este golit pentru tine automat. Perioada minim\u0103 este de 7 zile \u0219i perioada maxim\u0103 este de 30 de zile.",
     "18687": "Dezactivezi definitiv previzualiz\u0103rile \u00eembog\u0103\u021bite ale URL-urilor. Po\u021bi reactiva previzualiz\u0103rile \u00eembog\u0103\u021bite ale URL-urilor din set\u0103ri. Dore\u0219ti s\u0103 continui?",
     "18694": "Parol\u0103 acceptat\u0103, \u00een continuare \u00ee\u021bi recomand\u0103m s\u0103 faci un backup cheii de recuperare.",
     "18696": "Previzualiz\u0103ri \u00eembog\u0103\u021bite ale URL-urilor",
@@ -3272,5 +3271,6 @@
     "20473": "Payment breakdown",
     "20474": "You are about to close the dialog. All data entered will be lost.",
     "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
-    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
+    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day.",
+    "20479": "This video shows INDIVIDUAL ACCOUNT USERS how to convert their account to a Business account. Please watch our other video if you wish to start a completely new Business account.If you already have an individual MEGA account, it\u2019s easy to upgrade to MEGA Business. Login and select \u201cUpgrade Account\u201d from the Settings or Dashboard PageThen click \u201cTry MEGA Business\u201dHere you can select \u201cCreate business account\u201dOn the Business Account Registration page choose the number of Users you would like to include (minimum is 3). You can add more later. Enter your MEGA Business Account billing detailsConfirm and enter your payment typeWait for payment to be processedYour Individual account has now been upgraded to a MEGA Business AccountAt this point (because you have not yet added Users) either selection will take you to the User Management pageIn Settings > Payment History, you can review your Business account subscription payments.Congratulations! You have completed your upgrade to a MEGA Business Account and are the overall Administrator!NEXT VIDEO - Adding Users to a MEGA Business Account"
 }

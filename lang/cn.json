@@ -2115,7 +2115,6 @@
     "18683": "\u63d2\u5165\u9884\u89c8",
     "18684": "\u5220\u9664\u9884\u89c8",
     "18685": "The Rubbish Bin can be cleared for you automatically.",
-    "18686": "The Rubbish Bin is cleared for you automatically. The minimum period is 7 days and the maximum period is 30 days.",
     "18687": "\u60a8\u6b63\u5728\u6c38\u4e45\u7981\u7528\u6269\u5c55\u7f51\u5740\u9884\u89c8\u3002\u60a8\u53ef\u4ee5\u5728\u8bbe\u7f6e\u4e2d\u91cd\u65b0\u542f\u7528\u6269\u5c55\u7f51\u5740\u9884\u89c8\u3002\u4f60\u60f3\u7ee7\u7eed\u5417\uff1f",
     "18694": "\u5bc6\u7801\u5df2\u88ab\u63a5\u53d7\uff0c\u6211\u4eec\u4ecd\u5efa\u8bae\u60a8\u5907\u4efd\u60a8\u7684\u6062\u590d\u91d1\u5319\u3002",
     "18696": "\u4e30\u5bcc\u7684\u7f51\u5740\u9884\u89c8",
@@ -3272,5 +3271,6 @@
     "20473": "Payment breakdown",
     "20474": "You are about to close the dialog. All data entered will be lost.",
     "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
-    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
+    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day.",
+    "20479": "This video shows INDIVIDUAL ACCOUNT USERS how to convert their account to a Business account. Please watch our other video if you wish to start a completely new Business account.If you already have an individual MEGA account, it\u2019s easy to upgrade to MEGA Business. Login and select \u201cUpgrade Account\u201d from the Settings or Dashboard PageThen click \u201cTry MEGA Business\u201dHere you can select \u201cCreate business account\u201dOn the Business Account Registration page choose the number of Users you would like to include (minimum is 3). You can add more later. Enter your MEGA Business Account billing detailsConfirm and enter your payment typeWait for payment to be processedYour Individual account has now been upgraded to a MEGA Business AccountAt this point (because you have not yet added Users) either selection will take you to the User Management pageIn Settings > Payment History, you can review your Business account subscription payments.Congratulations! You have completed your upgrade to a MEGA Business Account and are the overall Administrator!NEXT VIDEO - Adding Users to a MEGA Business Account"
 }

@@ -2115,7 +2115,6 @@
     "18683": "\ubbf8\ub9ac\ubcf4\uae30 \uc0bd\uc785",
     "18684": "\ubbf8\ub9ac\ubcf4\uae30 \uc81c\uac70",
     "18685": "\ud734\uc9c0\ud1b5\uc740 \uc790\ub3d9\uc73c\ub85c \ube44\uc6cc\uc9d1\ub2c8\ub2e4.",
-    "18686": "\ud734\uc9c0\ud1b5\uc740 \uc790\ub3d9\uc73c\ub85c \ube44\uc6cc\uc9d1\ub2c8\ub2e4. \ucd5c\ub2e8 \uae30\uac04\uc740 7\uc77c\uc774\uba70 \ucd5c\uc7a5 \uae30\uac04\uc740 30\uc77c\uc785\ub2c8\ub2e4.",
     "18687": "\ud48d\ubd80\ud55c URL \ubbf8\ub9ac\ubcf4\uae30\ub97c \uc601\uad6c\ud788 \ud574\uc81c\ud558\ub824\uace0 \ud569\ub2c8\ub2e4. \ub2f9\uc2e0\uc740 \ud48d\ubd80\ud55c URL \ubbf8\ub9ac\ubcf4\uae30\ub97c \uc124\uc815\uc5d0\uc11c \ub2e4\uc2dc \ud65c\uc131\ud654\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4. \uc9c4\ud589\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
     "18694": "\ube44\ubc00\ubc88\ud638\uac00 \ud655\uc778\ub418\uc5c8\uc2b5\ub2c8\ub2e4\ub9cc, \uadf8\ub798\ub3c4 \ubcf5\uad6c \ud0a4\ub97c \ubc31\uc5c5\ud560 \uac83\uc744 \uad8c\uc7a5\ud569\ub2c8\ub2e4.",
     "18696": "Rich URL \ubbf8\ub9ac\ubcf4\uae30",
@@ -3272,5 +3271,6 @@
     "20473": "Payment breakdown",
     "20474": "\ub300\ud654\ucc3d\uc744 \ub2eb\uc73c\ub824\uace0 \ud569\ub2c8\ub2e4. \uc785\ub825\ud55c \ubaa8\ub4e0 \ub370\uc774\ud130\ub97c \uc783\uac8c \ub420 \uac83\uc785\ub2c8\ub2e4.",
     "20475": "\ud30c\uc77c\ub4e4\uc774 %1\uc77c \ub3d9\uc548 \ud734\uc9c0\ud1b5\uc5d0 \ubcf4\uad00\ub41c \ud6c4 \uc601\uad6c\uc801\uc73c\ub85c \uc0ad\uc81c\ud558\ub3c4\ub85d \uc120\ud0dd\ud558\uc600\uc2b5\ub2c8\ub2e4.",
-    "20476": "\ud30c\uc77c\ub4e4\uc774 1\uc77c \ub3d9\uc548 \ud734\uc9c0\ud1b5\uc5d0 \ubcf4\uad00\ub41c \ud6c4 \uc601\uad6c\uc801\uc73c\ub85c \uc0ad\uc81c\ud558\ub3c4\ub85d \uc120\ud0dd\ud558\uc600\uc2b5\ub2c8\ub2e4."
+    "20476": "\ud30c\uc77c\ub4e4\uc774 1\uc77c \ub3d9\uc548 \ud734\uc9c0\ud1b5\uc5d0 \ubcf4\uad00\ub41c \ud6c4 \uc601\uad6c\uc801\uc73c\ub85c \uc0ad\uc81c\ud558\ub3c4\ub85d \uc120\ud0dd\ud558\uc600\uc2b5\ub2c8\ub2e4.",
+    "20479": "This video shows INDIVIDUAL ACCOUNT USERS how to convert their account to a Business account. Please watch our other video if you wish to start a completely new Business account.If you already have an individual MEGA account, it\u2019s easy to upgrade to MEGA Business. Login and select \u201cUpgrade Account\u201d from the Settings or Dashboard PageThen click \u201cTry MEGA Business\u201dHere you can select \u201cCreate business account\u201dOn the Business Account Registration page choose the number of Users you would like to include (minimum is 3). You can add more later. Enter your MEGA Business Account billing detailsConfirm and enter your payment typeWait for payment to be processedYour Individual account has now been upgraded to a MEGA Business AccountAt this point (because you have not yet added Users) either selection will take you to the User Management pageIn Settings > Payment History, you can review your Business account subscription payments.Congratulations! You have completed your upgrade to a MEGA Business Account and are the overall Administrator!NEXT VIDEO - Adding Users to a MEGA Business Account"
 }

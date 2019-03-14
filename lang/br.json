@@ -2793,6 +2793,8 @@
     "19748": "A sua conta foi desativada pelo seu administrador. Voc\u00ea deve entrar em contato com os administradores da sua conta business para obter mais informa\u00e7\u00f5es.",
     "19749": "\u00daltima atividade",
     "19750": "Migrar dados de usu\u00e1rio",
+    "19772": "A sua Lixeira ser\u00e1 esvaziada de forma autom\u00e1tica.",
+    "19774": "O per\u00edodo m\u00ednimo \u00e9 de 7 dias e o per\u00edodo m\u00e1ximo \u00e9 de 30 dias.",
     "19775": "%d dias",
     "19779": "O GitHub cont\u00e9m informa\u00e7\u00f5es sobre os recursos do aplicativo do MEGA para desktop, instru\u00e7\u00f5es de uso  para cada plataforma e explica\u00e7\u00f5es sobre como cri\u00e1-lo a partir de nosso reposit\u00f3rio de origem p\u00fablica no  GitHub.",
     "19780": "Explica os recursos do aplicativo do MEGA para desktop e responde \u00e0s perguntas mais frequentes.",
@@ -3262,7 +3264,13 @@
     "20450": "Ignorado",
     "20460": "H\u00e1 uma chamada ativa. [A]Entrar[\/A]",
     "20461": "No folders in Cloud Drive",
-    "20462": "Your account is on [B]suspended[\/B] status. You can browse your data only.",
+    "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
     "20463": "Contact your business account administrator to resolve the issue and activate your account.",
-    "20464": "IMPORTANT"
+    "20464": "IMPORTANT",
+    "20471": "Pagamento atrasado",
+    "20472": "To reactivate your Business account, you need to pay any overdue subscription payments.",
+    "20473": "Payment breakdown",
+    "20474": "You are about to close the dialog. All data entered will be lost.",
+    "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
+    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
 }

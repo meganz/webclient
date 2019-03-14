@@ -53,7 +53,7 @@
     height: 16px;
     left: 16px;
     top: 10px;
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
     background-repeat: no-repeat;
     opacity: 0.3;
 }
@@ -65,7 +65,7 @@
     height: 24px;
     right: 16px;
     top: 6px;
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
     background-repeat: no-repeat;
     background-position: -98px -249px;
     opacity: 0;
@@ -326,7 +326,8 @@
     padding: 0 0 0 10px;
 }
 .account.data-block.test-network .content-txt,
-.account.qr-settings .settings-left-block .content-txt {
+.account.qr-settings .settings-left-block .content-txt,
+.account.rubbish-cleaning .settings-left-block .content-txt {
     margin-bottom: 40px;
 }
 .account.qr-settings .settings-right-block .qr-http-link {
@@ -1236,6 +1237,9 @@
     -moz-box-shadow: 0 0 0 rgba(0,191,165, 0.5);
     box-shadow: 0 0 0 1px rgba(0,191,165, 0.5);
 }
+.fm-right-account-block .rubschedopt {
+    margin-top: 0;
+}
 .fm-right-account-block div.radioOn::after {
     background:rgb(0,191,165);
     background: -moz-linear-gradient(top, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 100%);
@@ -1300,12 +1304,42 @@
 .green-notification .button {
     margin: 12px 0px 12px 24px;
 }
-.green-notification .fvnotice {
+.green-notification .fvnotice, .orange-notification .fvnotice{
     background-position: -233px -1666px;
     width: 24px;
     height: 24px;
     display: inline-block;
     margin-top: 4px;
+}
+.orange-notification.body {
+    display: table;
+    background-color: rgba(191,74,0,0.05);
+    -webkit-box-shadow: 0 0 0 1px rgba(191, 104, 0, 0.2);
+    -moz-box-shadow: 0 0 0 1px rgba(191, 104, 0, 0.2);
+    box-shadow: 0 0 0 1px rgba(191, 104, 0, 0.2);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 0 16px 0 12px;
+    margin-left: 1px;
+    margin-top: 20px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    max-width: calc(100% - 2px);
+}
+.orange-notification.cell {
+    display: table-cell;
+    vertical-align: middle;
+    color: #FF6F00;
+    font-size: 13px;
+    line-height: 18px;
+}
+.orange-notification.cell.text {
+    padding: 5px 0;
+}
+.orange-notification .fvnotice {
+    background-position: -3px -1727px;
 }
 /*when its width is smaller than 992px, add class `half-size`*/
 .fm-account-main.low-width .settings-banner {

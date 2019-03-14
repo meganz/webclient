@@ -2793,6 +2793,8 @@
     "19748": "Your account has been disabled by your administrator. You may contact your business account administrators for further details.",
     "19749": "L\u1ea7n Hi\u1ec7n Cu\u1ed1i",
     "19750": "Migrate User Data",
+    "19772": "Th\u00f9ng R\u00e1c s\u1ebd \u0111\u01b0\u1ee3c t\u1ef1 \u0111\u1ed9ng d\u1ecdn d\u1eb9p \u0111\u00ecnh k\u1ef3.",
+    "19774": "Th\u1eddi gian ch\u1edd t\u1ed1i thi\u1ec3u l\u00e0 7 ng\u00e0y v\u00e0 t\u1ed1i \u0111a l\u00e0 30 ng\u00e0y.",
     "19775": "%d ng\u00e0y",
     "19779": "GitHub contains information about the MEGA Desktop App\u2019s features and usage instructions for every platform, and describes how to build it from our public source GitHub repository.",
     "19780": "Describes the MEGA Desktop App\u2019s features and answers frequently asked questions.",
@@ -3262,7 +3264,13 @@
     "20450": "\u0110\u00e3 b\u1ecf qua",
     "20460": "\u0110ang c\u00f3 m\u1ed9t cu\u1ed9c g\u1ecdi di\u1ec5n ra. [A]Tham gia[\/A]",
     "20461": "No folders in Cloud Drive",
-    "20462": "Your account is on [B]suspended[\/B] status. You can browse your data only.",
+    "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
     "20463": "Contact your business account administrator to resolve the issue and activate your account.",
-    "20464": "IMPORTANT"
+    "20464": "IMPORTANT",
+    "20471": "Payment overdue",
+    "20472": "To reactivate your Business account, you need to pay any overdue subscription payments.",
+    "20473": "Payment breakdown",
+    "20474": "You are about to close the dialog. All data entered will be lost.",
+    "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
+    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
 }

@@ -1303,6 +1303,12 @@ mega.megadrop = (function() {
 
             if (M.currentdirid === "account/transfers") {
                 $('#pup_' + pupHandle).remove();// Remove widget-card
+
+                // Display "No MEGAdrop folders" if the list is empty
+                if ($.isEmptyObject(pup.items)) {
+                    $(settingsOpts.card.wrapperClass)
+                        .append('<tr><td colspan="3" class="grid-table-empty">' + l[20139] + '</td></tr>');
+                }
             }
             ui.nodeIcon(nodeHandle);
         };

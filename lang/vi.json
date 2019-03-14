@@ -2115,7 +2115,6 @@
     "18683": "Th\u00eam \u1ea3nh xem tr\u01b0\u1edbc",
     "18684": "\u00c2\u0309n hi\u0300nh xem tr\u01b0\u01a1\u0301c",
     "18685": "Th\u00f9ng R\u00e1c t\u1ef1 \u0111\u1ed9ng \u0111\u01b0\u1ee3c d\u1ecdn d\u1eb9p. Th\u1eddi gian ch\u1edd (\u00edt nh\u1ea5t) cho m\u1ed7i l\u1ea7n d\u1ecdn l\u00e0 7 ng\u00e0y.",
-    "18686": "Th\u00f9ng R\u00e1c t\u1ef1 \u0111\u1ed9ng \u0111\u01b0\u1ee3c d\u1ecdn d\u1eb9p. Th\u1eddi gian ch\u1edd (\u00edt nh\u1ea5t) cho m\u1ed7i l\u1ea7n d\u1ecdn l\u00e0 7 ng\u00e0y v\u00e0 ch\u1edd l\u00e2u nh\u1ea5t l\u00e0 30 ng\u00e0y.",
     "18687": "Sau khi t\u0103\u0301t ti\u0301nh n\u0103ng xem tr\u01b0\u01a1\u0301c n\u00f4\u0323i du\u0323ng URL. N\u00ea\u0301u mu\u00f4\u0301n b\u00e2\u0323t la\u0323i se\u0303 c\u00e2\u0300n pha\u0309i va\u0300o ph\u00e2\u0300n Thi\u00ea\u0301t \u0110\u0103\u0323t. Co\u0301 ch\u0103\u0301c mu\u00f4\u0301n t\u0103\u0301t ti\u0301nh na\u0300y hay kh\u00f4ng?",
     "18694": "M\u00e2\u0323t kh\u00e2\u0309u nh\u00e2\u0323p \u0111u\u0301ng, nh\u01b0ng n\u00ean xu\u00e2\u0301t ra Ma\u0303 Phu\u0323c H\u00f4\u0300i \u0111\u00ea\u0309 \u0111\u00ea\u0300 pho\u0300ng.",
     "18696": "Xem Tr\u01b0\u01a1\u0301c N\u00f4\u0323i Dung URL",
@@ -3272,5 +3271,6 @@
     "20473": "Payment breakdown",
     "20474": "You are about to close the dialog. All data entered will be lost.",
     "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
-    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
+    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day.",
+    "20479": "This video shows INDIVIDUAL ACCOUNT USERS how to convert their account to a Business account. Please watch our other video if you wish to start a completely new Business account.If you already have an individual MEGA account, it\u2019s easy to upgrade to MEGA Business. Login and select \u201cUpgrade Account\u201d from the Settings or Dashboard PageThen click \u201cTry MEGA Business\u201dHere you can select \u201cCreate business account\u201dOn the Business Account Registration page choose the number of Users you would like to include (minimum is 3). You can add more later. Enter your MEGA Business Account billing detailsConfirm and enter your payment typeWait for payment to be processedYour Individual account has now been upgraded to a MEGA Business AccountAt this point (because you have not yet added Users) either selection will take you to the User Management pageIn Settings > Payment History, you can review your Business account subscription payments.Congratulations! You have completed your upgrade to a MEGA Business Account and are the overall Administrator!NEXT VIDEO - Adding Users to a MEGA Business Account"
 }

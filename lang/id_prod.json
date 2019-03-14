@@ -2057,7 +2057,6 @@
     "18683": "Masukkan pratinjau",
     "18684": "Hapus preview",
     "18685": "Sampah dapat dibersihkan untuk Anda secara otomatis. Jangka waktu minimum adalah 7 hari.",
-    "18686": "Tempat Sampah dibersihkan untuk Anda secara otomatis. Periode minimum adalah 7 hari dan periode maksimum adalah 30 hari.",
     "18687": "Anda menonaktifkan tampilan URL kaya secara permanen. Anda dapat mengaktifkan kembali tampilan URL kaya di pengaturan Anda. Apakah Anda ingin melanjutkan?",
     "18696": "Rich URL previews",
     "18698": "Panggilan ke [X] tidak dijawab pada waktu yang tepat.",
@@ -2703,6 +2702,8 @@
     "19748": "Akun Anda telah dinonaktifkan oleh administrator Anda. Anda dapat menghubungi administrator akun bisnis Anda untuk rincian lebih lanjut.",
     "19749": "Aktif Terakhir",
     "19750": "Migrasi Data Pengguna",
+    "19772": "Sampah dibersihkan untuk Anda secara otomatis.",
+    "19774": "Jangka waktu minimum adalah 7 hari dan periode maksimum Anda adalah 30 hari.",
     "19775": "%d hari",
     "19779": "GitHub berisi informasi tentang fitur Aplikasi Desktop MEGA dan petunjuk penggunaan untuk setiap platform, dan menjelaskan cara membangunnya dari repositori GitHub sumber publik kami.",
     "19780": "Menjelaskan fitur Aplikasi Desktop MEGA dan menjawab pertanyaan yang sering diajukan.",
@@ -3106,5 +3107,11 @@
     "20432": "Jangan pernah memasukkan kata sandi Anda pada perangkat yang tidak sepenuhnya Anda percayai.",
     "20433": "Tidak ada prosedur pemulihan untuk kata sandi yang hilang, pastikan Anda dapat mengingat kata sandi Anda setiap saat",
     "20435": "%1 berbagi folder berikut dengan Anda:",
-    "20460": "Ada panggilan aktif. [A]Bergabunglah[\/A]"
+    "20460": "Ada panggilan aktif. [A]Bergabunglah[\/A]",
+    "20461": "No folders in Cloud Drive",
+    "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
+    "20463": "Contact your business account administrator to resolve the issue and activate your account.",
+    "20464": "IMPORTANT",
+    "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
+    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
 }

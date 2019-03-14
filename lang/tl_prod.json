@@ -2056,8 +2056,7 @@
     "18682": "Not Now",
     "18683": "Insert preview",
     "18684": "Remove preview",
-    "18685": "The Rubbish Bin can be cleared for you automatically. The minimum period is 7 days.",
-    "18686": "The Rubbish Bin is cleared for you automatically. The minimum period is 7 days and the maximum period is 30 days.",
+    "18685": "The Rubbish Bin can be cleared for you automatically.",
     "18687": "You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?",
     "18696": "Rich URL Previews",
     "18698": "Call to [X] was not answered in a timely manner.",
@@ -2703,6 +2702,8 @@
     "19748": "Your account has been disabled by your administrator. You may contact your business account administrators for further details.",
     "19749": "Last Active Noong",
     "19750": "I-migrate ang User Data",
+    "19772": "Ang Basurahan ay nilinis na para sa iyo automatically.",
+    "19774": "The minimum period is 7 days and your maximum period is 30 days.",
     "19775": "%d na araw",
     "19779": "GitHub contains information about the MEGA Desktop App\u2019s features and usage instructions for every platform, and describes how to build it from our public source GitHub repository.",
     "19780": "Describes the MEGA Desktop App\u2019s features and answers frequently asked questions.",
@@ -3106,5 +3107,11 @@
     "20432": "Never enter your password on a device you do not fully trust.",
     "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
     "20435": "%1 shared the following folders with you:",
-    "20460": "There is an active call. [A]Join[\/A]"
+    "20460": "There is an active call. [A]Join[\/A]",
+    "20461": "No folders in Cloud Drive",
+    "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
+    "20463": "Contact your business account administrator to resolve the issue and activate your account.",
+    "20464": "IMPORTANT",
+    "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
+    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
 }

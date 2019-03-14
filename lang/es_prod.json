@@ -2056,8 +2056,7 @@
     "18682": "Ahora no",
     "18683": "Insertar vista previa",
     "18684": "Eliminar vista previa",
-    "18685": "La Papelera se puede vaciar de forma autom\u00e1tica. El per\u00edodo m\u00ednimo es de 7 d\u00edas.",
-    "18686": "La Papelera se vac\u00eda de forma autom\u00e1tica. El per\u00edodo m\u00ednimo es de 7 d\u00edas y el m\u00e1ximo es de 30 d\u00edas.",
+    "18685": "La Papelera se puede vaciar de forma autom\u00e1tica.",
     "18687": "La vista previa de los enlaces se desactivar\u00e1 de forma permanente. Puedes volver a activarla desde Ajustes. \u00bfQuieres continuar?",
     "18696": "Vista previa del enlace",
     "18698": "La llamada a [X] no ha sido contestada a tiempo.",
@@ -2703,6 +2702,8 @@
     "19748": "Tu cuenta ha sido desactivada por tu administrador. Puedes ponerte en contacto con los administradores de tu cuenta business para m\u00e1s informaci\u00f3n.",
     "19749": "\u00daltimo acceso",
     "19750": "Migrar datos de usuario",
+    "19772": "La Papelera se vac\u00eda autom\u00e1ticamente.",
+    "19774": "El per\u00edodo m\u00ednimo es de 7 d\u00edas y el per\u00edodo m\u00e1ximo es de 30 d\u00edas.",
     "19775": "%d d\u00edas",
     "19779": "GitHub contiene informaci\u00f3n sobre las caracter\u00edsticas de la aplicaci\u00f3n de escritorio MEGA y las instrucciones de uso para cada plataforma, y describe c\u00f3mo compilarla desde nuestro repositorio p\u00fablico de GitHub.",
     "19780": "Describe las caracter\u00edsticas de la aplicaci\u00f3n de escritorio MEGA y responde a las preguntas m\u00e1s frecuentes.",
@@ -3106,5 +3107,11 @@
     "20432": "Nunca introduzcas tu contrase\u00f1a en un dispositivo en el que no conf\u00edas plenamente.",
     "20433": "No existe ning\u00fan procedimiento de recuperaci\u00f3n si pierdes la contrase\u00f1a, aseg\u00farate de recordarla en todo momento",
     "20435": "%1 ha compartido las siguientes carpetas contigo:",
-    "20460": "Hay una llamada en curso. [A]\u00danete[\/A]"
+    "20460": "Hay una llamada en curso. [A]\u00danete[\/A]",
+    "20461": "No hay carpetas en tu Nube",
+    "20462": "Tu cuenta est\u00e1 [B]suspendida[\/B]. Solo puedes ver tus datos.",
+    "20463": "Ponte en contacto con el administrador de tu cuenta Business para resolver el problema y activar tu cuenta.",
+    "20464": "IMPORTANTE",
+    "20475": "Ha elegido eliminar permanentemente los archivos despu\u00e9s de que hayan estado en la Papelera durante %1 d\u00edas.",
+    "20476": "Ha elegido eliminar permanentemente los archivos despu\u00e9s de que hayan estado en la Papelera durante 1 d\u00eda."
 }

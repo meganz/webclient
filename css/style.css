@@ -17954,7 +17954,8 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     position: absolute;
     top: 50%;
     width: 100%;
-    margin-top: -122px;
+    margin-top: -15px;
+    transform: translateY(-50%);
 }
 .dialog-empty-txt {
     font-size: 13px;

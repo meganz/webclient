@@ -1960,8 +1960,9 @@ else if (!b_u) {
     jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
@@ -1977,7 +1978,6 @@ else if (!b_u) {
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
-    jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/js/registerb.js', n: 'registerb_js', j:1});
 
     if (!is_mobile) {

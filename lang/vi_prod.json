@@ -2056,7 +2056,8 @@
     "18682": "Kh\u00f4ng Pha\u0309i Lu\u0301c Na\u0300y",
     "18683": "Th\u00eam \u1ea3nh xem tr\u01b0\u1edbc",
     "18684": "\u00c2\u0309n hi\u0300nh xem tr\u01b0\u01a1\u0301c",
-    "18685": "Th\u00f9ng R\u00e1c t\u1ef1 \u0111\u1ed9ng \u0111\u01b0\u1ee3c d\u1ecdn d\u1eb9p. Th\u1eddi gian ch\u1edd (\u00edt nh\u1ea5t) cho m\u1ed7i l\u1ea7n d\u1ecdn l\u00e0 7 ng\u00e0y.",
+    "18685": "The Rubbish Bin can be cleared for you automatically. The minimum period is 7 days.",
+    "18686": "Th\u00f9ng R\u00e1c t\u1ef1 \u0111\u1ed9ng \u0111\u01b0\u1ee3c d\u1ecdn d\u1eb9p. Th\u1eddi gian ch\u1edd (\u00edt nh\u1ea5t) cho m\u1ed7i l\u1ea7n d\u1ecdn l\u00e0 7 ng\u00e0y v\u00e0 ch\u1edd l\u00e2u nh\u1ea5t l\u00e0 30 ng\u00e0y.",
     "18687": "Sau khi t\u0103\u0301t ti\u0301nh n\u0103ng xem tr\u01b0\u01a1\u0301c n\u00f4\u0323i du\u0323ng URL. N\u00ea\u0301u mu\u00f4\u0301n b\u00e2\u0323t la\u0323i se\u0303 c\u00e2\u0300n pha\u0309i va\u0300o ph\u00e2\u0300n Thi\u00ea\u0301t \u0110\u0103\u0323t. Co\u0301 ch\u0103\u0301c mu\u00f4\u0301n t\u0103\u0301t ti\u0301nh na\u0300y hay kh\u00f4ng?",
     "18696": "Xem Tr\u01b0\u01a1\u0301c N\u00f4\u0323i Dung URL",
     "18698": "Cu\u1ed9c g\u1ecdi t\u1edbi [X] kh\u00f4ng \u0111\u01b0\u1ee3c tr\u1ea3 l\u1eddi v\u00ec ch\u1edd qu\u00e1 l\u00e2u.",
@@ -2702,8 +2703,6 @@
     "19748": "Your account has been disabled by your administrator. You may contact your business account administrators for further details.",
     "19749": "L\u1ea7n Hi\u1ec7n Cu\u1ed1i",
     "19750": "Migrate User Data",
-    "19772": "Th\u00f9ng R\u00e1c s\u1ebd \u0111\u01b0\u1ee3c t\u1ef1 \u0111\u1ed9ng d\u1ecdn d\u1eb9p \u0111\u00ecnh k\u1ef3.",
-    "19774": "Th\u1eddi gian ch\u1edd t\u1ed1i thi\u1ec3u l\u00e0 7 ng\u00e0y v\u00e0 t\u1ed1i \u0111a l\u00e0 30 ng\u00e0y.",
     "19775": "%d ng\u00e0y",
     "19779": "GitHub contains information about the MEGA Desktop App\u2019s features and usage instructions for every platform, and describes how to build it from our public source GitHub repository.",
     "19780": "Describes the MEGA Desktop App\u2019s features and answers frequently asked questions.",
@@ -3111,7 +3110,5 @@
     "20461": "No folders in Cloud Drive",
     "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
     "20463": "Contact your business account administrator to resolve the issue and activate your account.",
-    "20464": "IMPORTANT",
-    "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
-    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
+    "20464": "IMPORTANT"
 }

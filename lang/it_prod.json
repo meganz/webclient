@@ -2057,6 +2057,7 @@
     "18683": "Inserisci anteprima",
     "18684": "Rimuovi anteprima",
     "18685": "Il Cestino pu\u00f2 essere svuotato per te automaticamente. Il periodo minimo \u00e8 di 7 giorni.",
+    "18686": "Il Cestino viene svuotato per te automaticamente. Il periodo minimo \u00e8 di 7 giorni ed il periodo massimo \u00e8 di 30 giorni.",
     "18687": "Stai disattivando l'anteprima ricca degli URL permanentemente. Puoi riattivare l'anteprima ricca degli URL nelle tue Impostazioni. Vuoi procedere?",
     "18696": "Anteprime arricchite degli URL",
     "18698": "Chiamata a [X] senza risposta in modo tempestivo.",
@@ -2702,8 +2703,6 @@
     "19748": "Il tuo account \u00e8 stato disabilitato dal tuo amministratore. Contatta il tuo amministratore degli account business per maggiori dettagli.",
     "19749": "Ultima attivit\u00e0",
     "19750": "Migra i dati dell'utente",
-    "19772": "Il Cestino viene svuotato per te automaticamente.",
-    "19774": "Il periodo minimo \u00e8 di 7 giorni e il periodo massimo \u00e8 di 30 giorni.",
     "19775": "%d giorni",
     "19779": "GitHub contiene informazioni riguardo le caratteristiche dell'app di MEGA per desktop e le istruzioni d'uso per ogni piattaforma, e descrive come costruirne una dalla nostra sorgente pubblica sulla repository di GitHib.",
     "19780": "Descrivi le caratteristiche dell'app per desktop di MEGA e rispondi alle domande frequenti.",
@@ -3108,10 +3107,8 @@
     "20433": "Non c'\u00e8 nessuna procedura di recupero per le password perse o dimenticate, sii sicuro di poter ricordare la tua password ogni volta",
     "20435": "%1 ha condiviso la seguente cartella condivisa te:",
     "20460": "C'\u00e8 una chiamata attiva in corso. [A]Unisciti[\/A]",
-    "20461": "No folders in Cloud Drive",
-    "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
-    "20463": "Contact your business account administrator to resolve the issue and activate your account.",
-    "20464": "IMPORTANT",
-    "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
-    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
+    "20461": "Nessuna cartella nel Cloud Drive",
+    "20462": "Il tuo account \u00e8 [B]sospeso[\/B] al momento. Puoi solo sfogliare tra i tuoi dati.",
+    "20463": "Contatta l'amministratore del tuo account business per risolvere il problema ed attivare il tuo account.",
+    "20464": "IMPORTANTE"
 }

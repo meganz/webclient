@@ -2056,7 +2056,8 @@
     "18682": "\u73b0\u5728\u4e0d\u7528",
     "18683": "\u63d2\u5165\u9884\u89c8",
     "18684": "\u5220\u9664\u9884\u89c8",
-    "18685": "The Rubbish Bin can be cleared for you automatically.",
+    "18685": "The Rubbish Bin can be cleared for you automatically. The minimum period is 7 days.",
+    "18686": "The Rubbish Bin is cleared for you automatically. The minimum period is 7 days and the maximum period is 30 days.",
     "18687": "\u60a8\u6b63\u5728\u6c38\u4e45\u7981\u7528\u6269\u5c55\u7f51\u5740\u9884\u89c8\u3002\u60a8\u53ef\u4ee5\u5728\u8bbe\u7f6e\u4e2d\u91cd\u65b0\u542f\u7528\u6269\u5c55\u7f51\u5740\u9884\u89c8\u3002\u4f60\u60f3\u7ee7\u7eed\u5417\uff1f",
     "18696": "\u4e30\u5bcc\u7684\u7f51\u5740\u9884\u89c8",
     "18698": "\u81f4\u7535[X]\u6ca1\u6709\u53ca\u65f6\u5e94\u7b54\u3002",
@@ -2702,8 +2703,6 @@
     "19748": "\u60a8\u7684\u5e10\u6237\u5df2\u88ab\u7ba1\u7406\u5458\u505c\u7528\u3002\u60a8\u53ef\u4ee5\u8054\u7cfb\u60a8\u7684\u4f01\u4e1a\u5e10\u6237\u7ba1\u7406\u5458\u4ee5\u83b7\u53d6\u8be6\u60c5\u3002",
     "19749": "\u4e0a\u4e00\u6b21\u6d3b\u52a8",
     "19750": "\u8fc1\u79fb\u7528\u6237\u6570\u636e",
-    "19772": "\u5783\u573e\u6876\u4f1a\u81ea\u52a8\u6e05\u7406\u3002",
-    "19774": "\u6700\u77ed\u671f\u9650\u4e3a7\u5929\uff0c\u6700\u957f\u671f\u9650\u4e3a30\u5929\u3002",
     "19775": "%d \u5929",
     "19779": "GitHub\u5305\u542b\u6709\u5173MEGA\u684c\u9762\u5e94\u7528\u7a0b\u5e8f\u7684\u529f\u80fd\u4ee5\u53ca\u6bcf\u4e2a\u5e73\u53f0\u7684\u4f7f\u7528\u8bf4\u660e\uff0c\u5e76\u63cf\u8ff0\u4e86\u5982\u4f55\u4ece\u6211\u4eec\u7684\u516c\u5171\u6e90GitHub\u5b58\u50a8\u5e93\u6784\u5efa\u5b83\u3002",
     "19780": "\u4ecb\u7ecdMEGA\u684c\u9762\u5e94\u7528\u7a0b\u5e8f\u7684\u529f\u80fd\u5e76\u56de\u7b54\u5e38\u89c1\u95ee\u9898\u3002",
@@ -3111,7 +3110,5 @@
     "20461": "No folders in Cloud Drive",
     "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
     "20463": "Contact your business account administrator to resolve the issue and activate your account.",
-    "20464": "IMPORTANT",
-    "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
-    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
+    "20464": "IMPORTANT"
 }

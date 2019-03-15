@@ -2057,6 +2057,7 @@
     "18683": "Weergave invoeren",
     "18684": "Weergave verwijderen",
     "18685": "De Prullenbak kan automatisch voor u gewist worden. De minimale periode is 7 dagen.",
+    "18686": "De Prullenbak wordt automatisch voor u gewist. De minimale periode is 7 dagen en uw maximale periode is 30 dagen.",
     "18687": "U schakelt rijke URL weergave permanent uit. U kunt rijke URL weergave opnieuw inschakelen in uw instellingen. Wilt u doorgaan?",
     "18696": "Rijke URL Weergave",
     "18698": "Oproep naar [X] was niet op tijd beantwoord.",
@@ -2702,8 +2703,6 @@
     "19748": "Uw account is uitgeschakeld door uw administratie. U kunt contact opnemen met uw zakelijke account administratie voor meer details.",
     "19749": "Laatst Actief",
     "19750": "Migreer Gebruikers Gegevens",
-    "19772": "De Prulenbak wordt automatisch voor u gewist.",
-    "19774": "De minimale periode is 7 dagen en uw maximum is 30 dagen.",
     "19775": "%d dagen",
     "19779": "GitHub bevat informatie over de MEGA Desktop Applicatie's kenmerken en gebruiks-instructies voor elk platform, en omschrijft hoe het gebouwd word vanuit onze publieke bron GitHub bewaarplaats.",
     "19780": "Omschrijft de MEGA Desktop Applicaties kenmerken en beantwoord meest gestelde vragen.",
@@ -3111,7 +3110,5 @@
     "20461": "Geen mappen in Cloud Schijf",
     "20462": "Uw account is momenteel [B]geschorst[\/B]\/ U kunt alleen door uw gegevens bladeren.",
     "20463": "Neem contact op met uw zakelijke accountbeheerder om het probleem op te lossen en uw account te activeren,.",
-    "20464": "BELANGRIJK",
-    "20475": "U heeft gekozen om bestanden permanent te verwijderen nadat ze in de Prullenbak zijn geweest voor %1 dagen.",
-    "20476": "U heeft gekozen om bestanden permanent te verwijderen nadat ze in de Prullenbak zijn geweest voor een dag"
+    "20464": "BELANGRIJK"
 }

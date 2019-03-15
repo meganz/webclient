@@ -2057,6 +2057,7 @@
     "18683": "Insereaz\u0103 previzualizarea",
     "18684": "Elimin\u0103 previzualizarea",
     "18685": "Co\u0219ul de gunoi poate fi golit pentru tine automat.",
+    "18686": "Co\u0219ul de gunoi este golit pentru tine automat. Perioada minim\u0103 este de 7 zile \u0219i perioada maxim\u0103 este de 30 de zile.",
     "18687": "Dezactivezi definitiv previzualiz\u0103rile \u00eembog\u0103\u021bite ale URL-urilor. Po\u021bi reactiva previzualiz\u0103rile \u00eembog\u0103\u021bite ale URL-urilor din set\u0103ri. Dore\u0219ti s\u0103 continui?",
     "18696": "Previzualiz\u0103ri \u00eembog\u0103\u021bite ale URL-urilor",
     "18698": "Apelul cu [X] nu a fost preluat \u00een timp util.",
@@ -2702,8 +2703,6 @@
     "19748": "Contul t\u0103u a fost dezactivat de c\u0103tre administrator. Po\u021bi contacta administratorii contului t\u0103u business pentru detalii suplimentare.",
     "19749": "Activ ultima dat\u0103",
     "19750": "Migreaz\u0103 datele utilizatorului",
-    "19772": "Co\u0219ul de gunoi este golit automat pentru tine.",
-    "19774": "Perioada minim\u0103 este de 7 zile \u0219i perioada maxim\u0103 este de 30 de zile.",
     "19775": "%d zile",
     "19779": "GitHub con\u021bine informa\u021bii despre caracteristicile aplica\u021biei MEGA \u0219i instruc\u021biunile de utilizare pentru fiecare platform\u0103 \u0219i descrie cum s\u0103 \u00eel construie\u0219ti din depozitul nostru public GitHub.",
     "19780": "Descrie caracteristicile aplica\u021biei desktop MEGA \u0219i r\u0103spunde la \u00eentreb\u0103rile frecvente.",
@@ -3111,7 +3110,5 @@
     "20461": "Niciun folder \u00een unitatea cloud",
     "20462": "\u00cen prezent, contul t\u0103u este [B]suspendat[\/B]. Po\u021bi r\u0103sfoi numai prin datele tale.",
     "20463": "Contacteaz\u0103 administratorul contului business pentru a rezolva problema \u0219i pentru a-\u021bi activa contul.",
-    "20464": "IMPORTANT",
-    "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
-    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
+    "20464": "IMPORTANT"
 }

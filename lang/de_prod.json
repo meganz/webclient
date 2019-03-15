@@ -2056,7 +2056,8 @@
     "18682": "Jetzt nicht",
     "18683": "URL-Ansicht einf\u00fcgen",
     "18684": "URL-Ansicht entfernen",
-    "18685": "The Rubbish Bin can be cleared for you automatically.",
+    "18685": "The Rubbish Bin can be cleared for you automatically. The minimum period is 7 days.",
+    "18686": "The Rubbish Bin is cleared for you automatically. The minimum period is 7 days and the maximum period is 30 days.",
     "18687": "Sie schalten die URL-Vorschau dauerhaft ab (eine Reaktivierung ist jedoch \u00fcber Ihre Benutzereinstellungen m\u00f6glich). Fortfahren?",
     "18696": "URL-Vorschau",
     "18698": "Keine Antwort von [X]",
@@ -2702,8 +2703,6 @@
     "19748": "Ihr Account wurde von Ihrem Administrator gesperrt. Bitte setzen Sie sich f\u00fcr weitere Informationen direkt mit ihm in Verbindung.",
     "19749": "Zuletzt aktiv",
     "19750": "Benutzerdaten migrieren",
-    "19772": "Der Papierkorb wird automatisch f\u00fcr Sie geleert.",
-    "19774": "Der erlaubte Zeitraum liegt zwischen sieben und 30 Tagen.",
     "19775": "%d Tage",
     "19779": "GitHub enth\u00e4lt Informationen \u00fcber die MEGA Desktop App, gibt plattformspezifische Nutzungshinweise und beschreibt die Compilierung auf Basis unseres \u00f6ffentlichen Quellcodes.",
     "19780": "Beschreibt die Features der MEGA Desktop App und geht auf h\u00e4ufig gestellte Fragen ein.",
@@ -3111,7 +3110,5 @@
     "20461": "No folders in Cloud Drive",
     "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
     "20463": "Contact your business account administrator to resolve the issue and activate your account.",
-    "20464": "IMPORTANT",
-    "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
-    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
+    "20464": "IMPORTANT"
 }

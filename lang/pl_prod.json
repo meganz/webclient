@@ -2057,6 +2057,7 @@
     "18683": "Ddoaj podgl\u0105d",
     "18684": "Usu\u0144 podgl\u0105d",
     "18685": "Kosz na \u015bmieci mo\u017cna wyczy\u015bci\u0107 automatycznie.",
+    "18686": "Kosz na \u015bmieci jest automatycznie sprawdzany. Minimalny okres wynosi 7 dni, a maksymalny okres 30 dni.",
     "18687": "Podgl\u0105d link\u00f3w zostanie zablokowany. Mo\u017cesz to zmieni\u0107\u00a0p\u00f3\u017aniej w ustawieniach. Czy chcesz kontynuowa\u0107?",
     "18696": "Zaawansowane podgl\u0105dy adres\u00f3w URL",
     "18698": "Po\u0142\u0105czenie z [X] nie zosta\u0142o odebrane w odpowiednim czasie.",
@@ -2702,8 +2703,6 @@
     "19748": "Twoje konto zosta\u0142o wy\u0142\u0105czone przez administratora. Mo\u017cesz skontaktowa\u0107 si\u0119 z administratorami kont firmowych w celu uzyskania dalszych szczeg\u00f3\u0142\u00f3w.",
     "19749": "Ostatnio aktywny",
     "19750": "Migracja danych u\u017cytkownika",
-    "19772": "Kosz na \u015bmieci jest automatycznie sprawdzany.",
-    "19774": "Minimalny okres to 7 dni, a maksymalny okres 30 dni.",
     "19775": "%d dni",
     "19779": "GitHub zawiera informacje o funkcjach aplikacji MEGA Desktop i instrukcje u\u017cytkowania dla ka\u017cdej platformy oraz opisuje, w jaki spos\u00f3b zbudowa\u0107 j\u0105 z naszego publicznego repozytorium GitHub.",
     "19780": "Opisuje funkcje aplikacji MEGA Desktop i odpowiada na najcz\u0119\u015bciej zadawane pytania.",
@@ -3111,7 +3110,5 @@
     "20461": "Brak folder\u00f3w w us\u0142udze Cloud Drive",
     "20462": "Twoje konto jest obecnie [B]zawieszone[\/B]. Mo\u017cesz tylko przegl\u0105da\u0107 swoje dane.",
     "20463": "Skontaktuj si\u0119 z administratorem konta biznesowego, aby rozwi\u0105za\u0107 problem i aktywowa\u0107 konto.",
-    "20464": "WA\u017bNE",
-    "20475": "Zdecydowa\u0142e\u015b si\u0119 trwale usun\u0105\u0107 pliki po tym, jak by\u0142y one w koszu na \u015bmieci przez %1 dni.",
-    "20476": "Zdecydowa\u0142e\u015b si\u0119 trwale usun\u0105\u0107 pliki po tym, jak by\u0142y one w koszu na \u015bmieci przez jeden dzie\u0144."
+    "20464": "WA\u017bNE"
 }

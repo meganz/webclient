@@ -2056,7 +2056,8 @@
     "18682": "Agora n\u00e3o",
     "18683": "Inserir visualiza\u00e7\u00e3o",
     "18684": "Remover visualiza\u00e7\u00e3o",
-    "18685": "A sua Lixeira pode ser esvaziada de forma autom\u00e1tica. O per\u00edodo m\u00ednimo \u00e9 de 7 dias.",
+    "18685": "The Rubbish Bin can be cleared for you automatically. The minimum period is 7 days.",
+    "18686": "A sua Lixeira ser\u00e1 esvaziada de forma autom\u00e1tica. O per\u00edodo m\u00ednimo \u00e9 de 7 dias, e o per\u00edodo m\u00e1ximo \u00e9 de 30 dias.",
     "18687": "Voc\u00ea vai desativar permanentemente a visualiza\u00e7\u00e3o de URLs avan\u00e7adas, mas poder\u00e1 reativ\u00e1-la nas suas configura\u00e7\u00f5es. Voc\u00ea quer continuar?",
     "18696": "Visualiza\u00e7\u00e3o de URLs avan\u00e7adas",
     "18698": "A chamada para [X] n\u00e3o foi atendida em tempo h\u00e1bil.",
@@ -2702,8 +2703,6 @@
     "19748": "A sua conta foi desativada pelo seu administrador. Voc\u00ea deve entrar em contato com os administradores da sua conta business para obter mais informa\u00e7\u00f5es.",
     "19749": "\u00daltima atividade",
     "19750": "Migrar dados de usu\u00e1rio",
-    "19772": "A sua Lixeira ser\u00e1 esvaziada de forma autom\u00e1tica.",
-    "19774": "O per\u00edodo m\u00ednimo \u00e9 de 7 dias e o per\u00edodo m\u00e1ximo \u00e9 de 30 dias.",
     "19775": "%d dias",
     "19779": "O GitHub cont\u00e9m informa\u00e7\u00f5es sobre os recursos do aplicativo do MEGA para desktop, instru\u00e7\u00f5es de uso  para cada plataforma e explica\u00e7\u00f5es sobre como cri\u00e1-lo a partir de nosso reposit\u00f3rio de origem p\u00fablica no  GitHub.",
     "19780": "Explica os recursos do aplicativo do MEGA para desktop e responde \u00e0s perguntas mais frequentes.",
@@ -3111,7 +3110,5 @@
     "20461": "No folders in Cloud Drive",
     "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
     "20463": "Contact your business account administrator to resolve the issue and activate your account.",
-    "20464": "IMPORTANT",
-    "20475": "You have chosen to permanently delete files after they have been in the Rubbish Bin for %1 days.",
-    "20476": "You have chosen to permanently delete files after they have been in the Rubbish Bin for one day."
+    "20464": "IMPORTANT"
 }

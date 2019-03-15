@@ -2446,7 +2446,7 @@ accountUI.fileManagement = {
                 else {
                     $rubschedParent.addClass('hidden');
                     $rubschedGreenNoti.removeClass('hidden');
-                    $('.rubbish-desc').text(l[19772]).removeClass('hidden');
+                    $('.rubbish-desc').text(l[18686]).removeClass('hidden');
                     $('.account.rubbish-cleaning .settings-right-block').removeClass('slide-in-out');
                 }
             }
@@ -2481,21 +2481,8 @@ accountUI.fileManagement = {
                     $rubschedParent.removeClass('border').parent().addClass('closed');
                 }
             }
-
-            var curVal = $('#rad14_opt').val();
-            if (curVal < 7) {
-                var warningMsg = parseInt(curVal) === 1 ? l[20476] : l[20475].replace('%1', curVal);
-                $('.rub-warn').removeClass('hidden').find('.text').text(warningMsg);
-            }
-
-            if (u_attr.p) {
-                $('.rub-free-range').addClass('hidden');
-            }
-            else {
-                $('.rub-free-range').removeClass('hidden');
-            }
         },
-        bindEvents: function(account) {
+        bindEvents: function() {
 
             'use strict';
 
@@ -2510,18 +2497,9 @@ accountUI.fileManagement = {
                 var maxVal;
 
                 if (this.id === 'rad14_opt') { // For days option
-                    var minVal = u_attr.p ? 1 : 7;
+                    var minVal = 7;
                     maxVal = u_attr.p ? Math.pow(2, 53) : 30;
                     curVal = Math.min(Math.max(curVal, minVal), maxVal);
-                    var $warningBlock = $('.rub-warn');
-
-                    if (curVal < 7) {
-                        var warningMsg = curVal === 1 ? l[20476] : l[20475].replace('%1', curVal);
-                        $warningBlock.removeClass('hidden').find('.text').text(warningMsg);
-                    }
-                    else {
-                        $warningBlock.addClass('hidden');
-                    }
                 }
 
                 if (this.id === 'rad15_opt') { // For size option

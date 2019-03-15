@@ -1041,7 +1041,7 @@ var attribCache = false;
         uaPacketParserHandler['^!rubbishtime'] = function(userHandle) {
             if (u_attr.flags.ssrs > 0) {
                 mega.attr.get(userHandle, 'rubbishtime', -2, 1, function(res) {
-                    if (fminitialized) {
+                    if (fminitialized && M.account) {
                         M.account.ssrs = parseInt(res);
                         if (page === 'fm/account/file-management') {
                             accountUI.fileManagement.rubsched.render(M.account);

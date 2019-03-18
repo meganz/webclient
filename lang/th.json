@@ -3271,6 +3271,7 @@
     "20462": "\u0e1a\u0e31\u0e0d\u0e0a\u0e35\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13[B]\u0e16\u0e39\u0e01\u0e23\u0e30\u0e07\u0e31\u0e1a[\/B]\u0e43\u0e19\u0e02\u0e13\u0e30\u0e19\u0e35\u0e49 \u0e04\u0e38\u0e13\u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16\u0e40\u0e23\u0e35\u0e22\u0e01\u0e14\u0e39\u0e44\u0e14\u0e49\u0e41\u0e04\u0e48\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13\u0e40\u0e17\u0e48\u0e32\u0e19\u0e31\u0e49\u0e19",
     "20463": "\u0e15\u0e34\u0e14\u0e15\u0e48\u0e2d\u0e1c\u0e39\u0e49\u0e14\u0e39\u0e41\u0e25\u0e23\u0e30\u0e1a\u0e1a\u0e1a\u0e31\u0e0d\u0e0a\u0e35\u0e18\u0e38\u0e23\u0e01\u0e34\u0e08\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e41\u0e01\u0e49\u0e44\u0e02\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e41\u0e25\u0e30\u0e40\u0e1b\u0e34\u0e14\u0e43\u0e0a\u0e49\u0e07\u0e32\u0e19\u0e1a\u0e31\u0e0d\u0e0a\u0e35\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13",
     "20464": "\u0e2a\u0e34\u0e48\u0e07\u0e2a\u0e33\u0e04\u0e31\u0e0d",
+    "20466": "\u0e1c\u0e39\u0e49\u0e2a\u0e31\u0e07\u0e40\u0e01\u0e15\u0e01\u0e32\u0e23\u0e13\u0e4c",
     "20471": "\u0e01\u0e32\u0e23\u0e0a\u0e33\u0e23\u0e30\u0e40\u0e07\u0e34\u0e19\u0e25\u0e48\u0e32\u0e0a\u0e49\u0e32",
     "20472": "\u0e2b\u0e32\u0e01\u0e15\u0e49\u0e2d\u0e07\u0e01\u0e32\u0e23\u0e40\u0e1b\u0e34\u0e14\u0e43\u0e0a\u0e49\u0e07\u0e32\u0e19\u0e1a\u0e31\u0e0d\u0e0a\u0e35\u0e18\u0e38\u0e23\u0e01\u0e34\u0e08\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07 \u0e04\u0e38\u0e13\u0e08\u0e30\u0e15\u0e49\u0e2d\u0e07\u0e0a\u0e33\u0e23\u0e30\u0e40\u0e07\u0e34\u0e19\u0e04\u0e48\u0e32\u0e2a\u0e21\u0e31\u0e04\u0e23\u0e2a\u0e21\u0e32\u0e0a\u0e34\u0e01\u0e17\u0e35\u0e48\u0e04\u0e49\u0e32\u0e07\u0e0a\u0e33\u0e23\u0e30",
     "20473": "\u0e23\u0e32\u0e22\u0e25\u0e30\u0e40\u0e2d\u0e35\u0e22\u0e14\u0e01\u0e32\u0e23\u0e0a\u0e33\u0e23\u0e30\u0e40\u0e07\u0e34\u0e19",
@@ -3278,6 +3279,7 @@
     "20475": "\u0e04\u0e38\u0e13\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e17\u0e35\u0e48\u0e08\u0e30\u0e25\u0e1a\u0e44\u0e1f\u0e25\u0e4c\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e16\u0e32\u0e27\u0e23\u0e2b\u0e25\u0e31\u0e07\u0e08\u0e32\u0e01\u0e17\u0e35\u0e48\u0e2d\u0e22\u0e39\u0e48\u0e43\u0e19\u0e16\u0e31\u0e07\u0e02\u0e22\u0e30\u0e40\u0e1b\u0e47\u0e19\u0e40\u0e27\u0e25\u0e32 %1 \u0e27\u0e31\u0e19",
     "20476": "\u0e04\u0e38\u0e13\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e17\u0e35\u0e48\u0e08\u0e30\u0e25\u0e1a\u0e44\u0e1f\u0e25\u0e4c\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e16\u0e32\u0e27\u0e23\u0e2b\u0e25\u0e31\u0e07\u0e08\u0e32\u0e01\u0e17\u0e35\u0e48\u0e2d\u0e22\u0e39\u0e48\u0e43\u0e19\u0e16\u0e31\u0e07\u0e02\u0e22\u0e30\u0e40\u0e1b\u0e47\u0e19\u0e40\u0e27\u0e25\u0e32\u0e2b\u0e19\u0e36\u0e48\u0e07\u0e27\u0e31\u0e19",
     "20479": "This video shows INDIVIDUAL ACCOUNT USERS how to convert their account to a Business account. Please watch our other video if you wish to start a completely new Business account.If you already have an individual MEGA account, it\u2019s easy to upgrade to MEGA Business. Login and select \u201cUpgrade Account\u201d from the Settings or Dashboard PageThen click \u201cTry MEGA Business\u201dHere you can select \u201cCreate business account\u201dOn the Business Account Registration page choose the number of Users you would like to include (minimum is 3). You can add more later. Enter your MEGA Business Account billing detailsConfirm and enter your payment typeWait for payment to be processedYour Individual account has now been upgraded to a MEGA Business AccountAt this point (because you have not yet added Users) either selection will take you to the User Management pageIn Settings > Payment History, you can review your Business account subscription payments.Congratulations! You have completed your upgrade to a MEGA Business Account and are the overall Administrator!NEXT VIDEO - Adding Users to a MEGA Business Account",
+    "20481": "Get chat link",
     "20484": "Key rotation is slightly more secure, but does not allow you to create a link to the chat and new participants will not see past messages.",
     "20487": "Delete link",
     "20488": "Chat link",
@@ -3351,5 +3353,6 @@
     "20619": "This will let anybody with the chat link read the history of this chat.",
     "20620": "Get the [S]MEGA[\/S] mobile app now.",
     "20621": "Get Business",
-    "20622": "Open chat"
+    "20622": "Open chat",
+    "20623": "Enable key rotation"
 }

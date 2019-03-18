@@ -3271,6 +3271,7 @@
     "20462": "Hesab\u0131n\u0131z \u015fu anda [B]ask\u0131ya al\u0131nm\u0131\u015f[\/B]. Yaln\u0131zca verilerinize g\u00f6z atabilirsiniz.",
     "20463": "Sorunu \u00e7\u00f6zmek ve hesab\u0131n\u0131z\u0131 etkinle\u015ftirmek i\u00e7in i\u015fletme hesab\u0131 y\u00f6neticinize ba\u015fvurun.",
     "20464": "\u00d6NEML\u0130",
+    "20466": "G\u00f6zlemciler",
     "20471": "\u00d6deme zaman\u0131 ge\u00e7mi\u015f",
     "20472": "\u0130\u015fletme hesab\u0131n\u0131z\u0131 yeniden etkinle\u015ftirmek i\u00e7in vadesi ge\u00e7mi\u015f abonelik \u00fccretlerini \u00f6demeniz gerekir.",
     "20473": "\u00d6deme d\u00f6k\u00fcm\u00fc",
@@ -3278,6 +3279,7 @@
     "20475": "Dosyalar\u0131 %1 g\u00fcn boyunca \u00c7\u00f6p Kutusunda bulunduktan sonra kal\u0131c\u0131 olarak silmeyi se\u00e7tiniz.",
     "20476": "Dosyalar\u0131n, bir g\u00fcnl\u00fc\u011f\u00fcne \u00c7\u00f6p Kutusuna al\u0131nd\u0131ktan sonra kal\u0131c\u0131 olarak silinmesini se\u00e7tiniz.",
     "20479": "This video shows INDIVIDUAL ACCOUNT USERS how to convert their account to a Business account. Please watch our other video if you wish to start a completely new Business account.If you already have an individual MEGA account, it\u2019s easy to upgrade to MEGA Business. Login and select \u201cUpgrade Account\u201d from the Settings or Dashboard PageThen click \u201cTry MEGA Business\u201dHere you can select \u201cCreate business account\u201dOn the Business Account Registration page choose the number of Users you would like to include (minimum is 3). You can add more later. Enter your MEGA Business Account billing detailsConfirm and enter your payment typeWait for payment to be processedYour Individual account has now been upgraded to a MEGA Business AccountAt this point (because you have not yet added Users) either selection will take you to the User Management pageIn Settings > Payment History, you can review your Business account subscription payments.Congratulations! You have completed your upgrade to a MEGA Business Account and are the overall Administrator!NEXT VIDEO - Adding Users to a MEGA Business Account",
+    "20481": "Get chat link",
     "20484": "Key rotation is slightly more secure, but does not allow you to create a link to the chat and new participants will not see past messages.",
     "20487": "Delete link",
     "20488": "Chat link",
@@ -3351,5 +3353,6 @@
     "20619": "This will let anybody with the chat link read the history of this chat.",
     "20620": "Get the [S]MEGA[\/S] mobile app now.",
     "20621": "Get Business",
-    "20622": "Open chat"
+    "20622": "Open chat",
+    "20623": "Enable key rotation"
 }

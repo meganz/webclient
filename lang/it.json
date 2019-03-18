@@ -3271,6 +3271,7 @@
     "20462": "Il tuo account \u00e8 [B]sospeso[\/B] al momento. Puoi solo sfogliare tra i tuoi dati.",
     "20463": "Contatta l'amministratore del tuo account business per risolvere il problema ed attivare il tuo account.",
     "20464": "IMPORTANTE",
+    "20466": "Osservatori",
     "20471": "Pagamento in ritardo",
     "20472": "Per riattivare il tuo account Business, devi pagare tutti i pagamenti dell'abbonamento in ritardo.",
     "20473": "Rateizzazione del pagamento",
@@ -3278,6 +3279,7 @@
     "20475": "Hai scelto di eliminare permanentemente i file dopo %1 giorni nel Cestino.",
     "20476": "Hai scelto di eliminare permanentemente i file dopo un giorno nel Cestino.",
     "20479": "This video shows INDIVIDUAL ACCOUNT USERS how to convert their account to a Business account. Please watch our other video if you wish to start a completely new Business account.If you already have an individual MEGA account, it\u2019s easy to upgrade to MEGA Business. Login and select \u201cUpgrade Account\u201d from the Settings or Dashboard PageThen click \u201cTry MEGA Business\u201dHere you can select \u201cCreate business account\u201dOn the Business Account Registration page choose the number of Users you would like to include (minimum is 3). You can add more later. Enter your MEGA Business Account billing detailsConfirm and enter your payment typeWait for payment to be processedYour Individual account has now been upgraded to a MEGA Business AccountAt this point (because you have not yet added Users) either selection will take you to the User Management pageIn Settings > Payment History, you can review your Business account subscription payments.Congratulations! You have completed your upgrade to a MEGA Business Account and are the overall Administrator!NEXT VIDEO - Adding Users to a MEGA Business Account",
+    "20481": "Get chat link",
     "20484": "Key rotation is slightly more secure, but does not allow you to create a link to the chat and new participants will not see past messages.",
     "20487": "Delete link",
     "20488": "Chat link",
@@ -3351,5 +3353,6 @@
     "20619": "This will let anybody with the chat link read the history of this chat.",
     "20620": "Get the [S]MEGA[\/S] mobile app now.",
     "20621": "Get Business",
-    "20622": "Open chat"
+    "20622": "Open chat",
+    "20623": "Enable key rotation"
 }

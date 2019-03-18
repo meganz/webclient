@@ -424,6 +424,9 @@ function dashboardUI() {
             $dataStats.find('.ba-rubbish .folder-number').text(account.stats[M.RubbishID].folders + ' ' + l[2035]);
             $dataStats.find('.ba-rubbish .file-number').text(account.stats[M.RubbishID].files + ' ' + l[2034]);
 
+            $dataStats.find('.ba-pub-links .ff-occupy').text(bytesToSize(account.stats['links'].bytes));
+            $dataStats.find('.ba-pub-links .file-number').text(account.stats['links'].files);
+
             var verFiles = 0;
             var verBytes = 0;
             verFiles = account.stats[M.RootID]['vfiles'];
@@ -439,6 +442,10 @@ function dashboardUI() {
 
             $('.ba-version .tiny-icon.cog.versioning-settings').rebind('click', function () {
                 loadSubPage('fm/account/file-management');
+            });
+
+            $('.business-dashboard .used-storage-info.ba-pub-links').rebind('click.suba', function() {
+                loadSubPage('fm/links');
             });
 
             $dataStats.find('.ba-version .ff-occupy').text(bytesToSize(verBytes));

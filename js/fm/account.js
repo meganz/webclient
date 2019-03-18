@@ -125,13 +125,17 @@ accountUI.renderAccountPage = function(account) {
             break;
 
         case '/fm/account/reseller' /** && M.account.reseller **/:
+            if (!account.reseller) {
+                loadSubPage('fm/account');
+                return false;
+            }
             $('.fm-account-reseller').removeClass('hidden');
             sectionClass = 'reseller';
 
             accountUI.reseller.init(account);
             break;
 
-        case '/fm/account/notifications' /** && M.account.reseller **/:
+        case '/fm/account/notifications':
             $('.fm-account-notifications').removeClass('hidden');
             $('.settings-banner').addClass('hidden');
             sectionClass = 'notifications';

@@ -141,7 +141,8 @@ function time2date(unixTime, format) {
     var printISO = function _printISO() {
         var timeOffset = date.getTimezoneOffset() * 60;
         var isodate = new Date((unixTime - timeOffset) * 1000);
-        return isodate.toISOString().replace('T', ' ').substr(0 ,16);
+        var length = format === 0 ? 16 : 10;
+        return isodate.toISOString().replace('T', ' ').substr(0, length);
     };
 
     dateFunc = dFObj === 'ISO' ? printISO : dFObj.format;

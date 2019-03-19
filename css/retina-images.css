@@ -36,7 +36,7 @@ body.pro:after {
 }
 
 .small-icon.membership.pro100, .tiny-icon.membership-status.pro100 {
-    background-image: url(../images/mega/big-icons_v2@2x.png);
+    background-image: url(../images/mega/big-icons_v3@2x.png);
     background-size: 192px auto;
 }
 
@@ -198,7 +198,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 48px auto;
 }
 .fm-picker-dialog-button::before {
-    background-image: url(../images/mega/big-icons_v2@2x.png);
+    background-image: url(../images/mega/big-icons_v3@2x.png);
     background-size: 192px auto;
 }
 .achievements-scroll .achievements-icon, .achievements-scroll .green-tick {
@@ -314,10 +314,10 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 48px auto;
 }
 
-.user-management-view .icon48, .user-management-dialog .icon48, .user-management-view .icon56, .user-management-dialog .icon56, .user-management-view-data .user-management-view-overall-usage .user-management-storage .img, .user-management-view-data .user-management-view-overall-usage .user-management-transfer .img, .user-management-landing-page .mega-56px-icon,  .user-management-view .icon64, .user-management-dialog .icon64, .user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon, .user-management-dialog .dialog-heading-img, .user-management-dialog .sent-email-logo, .bus-reg-btn .next-arrow, .bus-reg-btn-2 .next-arrow, .bus-plan-icon64, .bus-reg-featureImg100, .bus-confirm-body .bus-confirmImg, .user-management-account-settings .setting-icon24, .user-management-storage .img, .user-management-transfer .img {
-    background-image: url(../images/mega/big-icons_v2@2x.png);
-    background-size: 192px auto;
-}
+    .user-management-view .icon48, .user-management-dialog .icon48, .user-management-view .icon56, .user-management-dialog .icon56, .user-management-view-data .user-management-view-overall-usage .user-management-storage .img, .user-management-view-data .user-management-view-overall-usage .user-management-transfer .img, .user-management-landing-page .mega-56px-icon, .user-management-view .icon64, .user-management-dialog .icon64, .user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon, .user-management-dialog .dialog-heading-img, .user-management-dialog .sent-email-logo, .bus-reg-btn .next-arrow, .bus-reg-btn-2 .next-arrow, .bus-plan-icon64, .bus-reg-featureImg100, .bus-confirm-body .bus-confirmImg, .user-management-account-settings .setting-icon24, .user-management-dialog .icon102, .user-management-storage .img, .user-management-transfer .img {
+        background-image: url(../images/mega/big-icons_v3@2x.png);
+        background-size: 192px auto;
+    }
 .user-management-account-settings .invoice-detail .mega-logo, .user-management-account-settings .icon12 {
     background-image: url(../images/mega/invoice-image_v1@2x.png);
     background-size: 120px auto;

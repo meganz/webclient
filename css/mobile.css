@@ -1011,6 +1011,7 @@ ul, li {
     height: auto;
     cursor: default;
     background-color: #f5f6f7;
+    position: relative;
 }
 .mobile.session-history-page .mobile.fm-item:nth-child(even) {
     background-color: #fff;
@@ -1487,24 +1488,14 @@ ul, li {
     color: #467EBF;
     letter-spacing: 0;
     line-height: 20px;
-    text-overflow: ellipsis;
-    overflow: hidden;
     white-space: nowrap;
 }
 .mobile.session-history-page .sh-item-icon {
     display: inline-block;
     margin-right: 4px;
 }
-.mobile.session-history-page .sh-item-country::after {
-    content: '';
-    background-color: #467EBF;
-    width: 4px;
-    height: 4px;
-    display: inline-block;
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    border-radius: 6px;
-    margin: 3px 2px 3px 6px;
+.mobile.session-history-page .sh-item-ip {
+    display: block;
 }
 .mobile.session-history-page .sh-round-button {
     background: #F0373A;
@@ -1518,11 +1509,15 @@ ul, li {
     height: 28px;
     display: block;
     color: #fff;
-    margin: 26px 20px 0 12px;
+    margin: -1px 18px 0 12px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     font-size: 14px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
 }
 .mobile.session-history-page .bottom-action-bar-container .sh-round-button {
     cursor: pointer;
@@ -1542,6 +1537,7 @@ ul, li {
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
     border-radius: 6px;
+    position: relative;
 }
 .mobile.session-history-page .sh-round-button span {
     padding-left: 4px;
@@ -1597,7 +1593,11 @@ ul, li {
     padding: 0 12px;
 }
 .mobile.main-block .mobile.session-status {
-    margin: 26px 20px 0 8px;
+    margin: -1px 18px 0 8px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
 }
 .mobile.fm-item-name {
     font-size: 15px;
@@ -10451,8 +10451,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile .improved-recovery-steps .login-register-input {
         margin-bottom: 0;
     }
-    .mobile.session-history-page .mobile.fm-item {
-        height: 48px;
+    .mobile.session-history-page .active.session-history .sh-round-button, .mobile.main-block .mobile.session-status {
+        transform: none;
+        top: 10px;
     }
     .mobile.session-history-page .mobile.fm-item-info {
         padding-top: 10px;
@@ -10463,19 +10464,26 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         line-height: 26px;
         font-size: 14px;
         width: 180px;
-        text-align: left;
+        text-align: right;
+        white-space: nowrap;
     }
     .mobile.session-history-page .sh-item-device {
         display: inline-block;
+        float: left;
+        vertical-align: middle;
+        white-space: normal;
+        max-width: calc(100% - 430px);
+    }
+    .mobile.session-history-page .mobile.fm-item-info:after {
+        content: "";
+        clear: both;
+        display: block;
     }
     .mobile.session-history-page .mobile.fm-item-info {
-        padding: 10px 130px 0 20px;
+        padding: 10px 150px 10px 20px;
     }
-    .mobile.main-block .mobile.session-status {
-        margin-top: 11px;
-    }
-    .mobile.session-history-page .sh-round-button {
-        margin-top: 11px;
+    .mobile.session-history-page .session-history:not(.ipv6) .sh-item-ip {
+        display: inline-block;
     }
     .mobile.session-history-page .sh-item-location {
         display: inline-block;
@@ -10489,22 +10497,21 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     }
     .mobile.session-history-page .folders-files-text .sh-location-header {
         display: inline-block;
-        display: inline-block;
         float: right;
-        width: 244px;
+        width: 255px;
     }
     .mobile.session-history-page .folders-files-text .sh-date-header {
         display: inline-block;
         float: right;
         width: 180px;
+        text-align: right;
     }
     .mobile.session-history-page .folders-files-text .sh-status-header {
         display: inline-block;
         float: right;
         text-align: right;
-        float: right;
         margin-right: 22px;
-        width: 109px;
+        width: 117px;
     }
     .mobile.session-history-page .sh-round-button span {
         display: block;
@@ -11182,7 +11189,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         width: 200px;
     }
     .mobile.session-history-page .folders-files-text .sh-location-header {
-        width: 546px;
+        width: 560px;
     }
 }
 

@@ -94,7 +94,7 @@ BacktickRtfFilter.prototype.escapeAndProcessMessage = function(e, eventData, pro
             return; // ignore, maybe its a system message (or composing/paused composing notification)
         }
 
-        messageContents = messageContents ? $.trim(messageContents) : "";
+        messageContents = messageContents ? messageContents.trim() : "";
 
         /*jshint -W049 */
         if (prop === "messageHtml") {
@@ -132,7 +132,7 @@ BacktickRtfFilter.PARSER_STATE = {
     IN_PLACEHOLDER_MULTI: 2,
 };
 
-BacktickRtfFilter.PARSER_VALID_PREV_CHAR_MATCH = new RegExp(/\n|\s|\r/);
+BacktickRtfFilter.PARSER_VALID_PREV_CHAR_MATCH = new RegExp(/\n|\s|\r|[.,\/#!$%\^&\*;:{}=\-_~()]/);
 
 BacktickRtfFilter.processUrlsInTickStrings = function(s) {
     return Autolinker.link(s, {
@@ -198,7 +198,7 @@ BacktickRtfFilter.prototype.processBackticks = function(msgString, replaceGenCb)
             if (state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_SINGLE) {
 
                 // ensure the placeholder is not just empty thing.
-                if ($.trim(placeholderString) === "") {
+                if (placeholderString.trim() === "") {
                     // current char is `, try to start a new placeholder state
                     newString += "`" + placeholderString;
                     placeholderString = "";
@@ -296,7 +296,7 @@ BacktickRtfFilter.prototype.unescapeAndProcessMessage = function(e, eventData, p
             return; // ignore, maybe its a system message (or composing/paused composing notification)
         }
 
-        messageContents = messageContents ? $.trim(messageContents) : "";
+        messageContents = messageContents ? messageContents.trim() : "";
 
         /*jshint -W049 */
         if (prop === "messageHtml") {

@@ -87,6 +87,18 @@ describe("chat.rtf_filter unit test", function() {
 
     it("parser test", function() {
 
+        var punctuationCharacters = '.,/#!$%^&*;:{}=-_~()';
+        var expectedValues = [];
+
+        punctuationCharacters
+        .split('')
+        .forEach(function(char) {
+            expectedValues.push(
+                [char + '```placeholder```', char + '<pre class="rtf-multi">placeholder</pre>'],
+                [char + '`placeholder`', char +  '<pre class="rtf-single">placeholder</pre>']
+            );
+        });
+
         [
             [
                 '```a```',
@@ -164,7 +176,7 @@ describe("chat.rtf_filter unit test", function() {
                 '```test`dontparse`testok```',
                 '<pre class="rtf-multi">test`dontparse`testok</pre>'
             ]
-        ].forEach(function(expectedVals, k) {
+        ].concat(expectedValues).forEach(function(expectedVals, k) {
             var btkrtf = new BacktickRtfFilter({'rebind': function(){}});
             var found = [];
             var res = btkrtf.processBackticks(expectedVals[0], function(match, html, txt) {

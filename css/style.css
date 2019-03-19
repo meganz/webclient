@@ -28112,6 +28112,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     padding-left: 24px;
 }
 
+.business-dashboard .subaccount-view-used-data .used-storage-info.ba-pub-links{
+    cursor: pointer;
+}
+
 .business-dashboard .subaccount-view-used-data .used-storage-info .used-storage-info {
     box-sizing: border-box;
     padding-left: 24px;

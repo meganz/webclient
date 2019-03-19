@@ -664,7 +664,9 @@ function fmtopUI() {
     $('.button.link-button.accept-all').addClass('hidden');
 
     if (M.currentrootid === M.RubbishID) {
-        $('.fm-clearbin-button').removeClass('hidden');
+        if (M.v.length) {
+            $('.fm-clearbin-button').removeClass('hidden');
+        }
         $('.fm-right-files-block').addClass('rubbish-bin visible-notification');
     }
     else {

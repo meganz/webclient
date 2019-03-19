@@ -1443,6 +1443,16 @@ accountUI.plan = {
                 var planNum = u_attr.p;
                 var planText = pro.getProPlanName(planNum);
 
+                // if this is p=100 business
+                if (planNum === 100) {
+                    $('.account.plan-info.accounttype').addClass('business');
+                    $('.fm-account-plan .acc-renew-date-info').removeClass('border');
+                }
+                else {
+                    $('.account.plan-info.accounttype').removeClass('business');
+                    $('.fm-account-plan .acc-renew-date-info').addClass('border');
+                }
+
                 // Account type
                 $('.account.plan-info.accounttype span').text(planText);
                 $('.small-icon.membership').addClass('pro' + planNum);

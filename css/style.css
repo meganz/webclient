@@ -20810,6 +20810,9 @@ div.camera-bottom-txt {
 .lite .account.plan-info.accounttype {
     color: #ffa500;
 }
+.business.account.plan-info.accounttype {
+    color: rgba(0,191,165,1);
+}
 .account.plan-info.small {
     font-size: 14px;
 }

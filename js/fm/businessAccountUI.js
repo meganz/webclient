@@ -736,6 +736,12 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
     $('.fm-right-header-user-management .user-management-main-page-buttons').addClass('hidden');
     $businessAccountContainer.removeClass('hidden'); // BA container
     $landingContainer.removeClass('hidden');
+
+    // check if we are required to show add sub-user dialog.
+    if (window.triggerShowAddSubUserDialog) {
+        delete window.triggerShowAddSubUserDialog;
+        $('.landing-sub-container.adding-subuser', $landingContainer).click();
+    }
 };
 
 /**
@@ -2292,9 +2298,12 @@ BusinessAccountUI.prototype.showWelcomeDialog = function () {
                 closeDialog();
             });
 
-        $dialog.find('.welcome-dlg-options').off('click.subuser')
+        $dialog.find('.welcome-dlg-options .add-subuser, .welcome-dlg-options .go-to-landing').off('click.subuser')
             .on('click.subuser', function welcomeDlgGoToUsersManagement() {
                 closeDialog();
+                if ($(this).hasClass('add-subuser')) {
+                    window.triggerShowAddSubUserDialog = true;
+                }
                 M.openFolder('user-management', true);
             });
 
@@ -2589,6 +2598,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     $('.dialog-subtitle', $dialog).removeClass('hidden');
                     $('.dialog-title', $dialog).text(l[20035]).removeClass('left-version');
                     // $('.dialog-title', $dialog).addClass('hidden');
+                    $('.mega-logo.icon56.dialog-heading-img', $dialog).addClass('hidden');
                     $('.sent-email-logo.dialog-heading-img', $dialog).removeClass('hidden');
                     $('.dialog-button-container .invite-link-option', $dialog).addClass('hidden');
                 }

@@ -580,12 +580,9 @@ function contactVsUserDialog() {
             return false;
         }
 
-        var goToAddUserDialog = function() {
-            var businessInterface = new BusinessAccountUI();
-            businessInterface.showAddSubUserDialog();
-        };
+        window.triggerShowAddSubUserDialog = true;
+        M.openFolder('user-management', true);
 
-        M.require('businessAcc_js', 'businessAccUI_js').done(goToAddUserDialog);
     });
 
     M.safeShowDialog('contact-vs-user', $dialog);

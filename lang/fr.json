@@ -3298,7 +3298,6 @@
     "20536": "Les t\u00e9l\u00e9versements de la cam\u00e9ra sont une fonction essentielle de tout appareil mobile, et nous nous en occupons pour vous. Cr\u00e9ez votre compte maintenant.",
     "20552": "Secure Cloud Storage and Communication. [Br] Privacy by Design.",
     "20553": "Create a MEGA account to get [S]50 GB FREE*[\/S] storage",
-    "20554": "Reliable Storage & Fast Transfers",
     "20555": "We make secure cloud storage simple and convenient. Create a free MEGA account today!",
     "20556": "Get started",
     "20557": "Your MEGA files and chats are encrypted with keys controlled by you.",
@@ -3370,5 +3369,9 @@
     "20623": "Activer la rotation de la cl\u00e9",
     "20624": "From %1 \/ month",
     "20625": "From %1 \/ user \/ month",
-    "20626": "Frequents"
+    "20626": "Frequents",
+    "20627": "Do you want to add a contact or a user to your Business account?",
+    "20628": "Business users",
+    "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
+    "20630": "Business users are users you add to your Business account. Users will be added automatically to your and other Business users contacts lists."
 }

@@ -3298,7 +3298,6 @@
     "20536": "MEGA Kamera Y\u00fcklemelerinin her mobil cihaz i\u00e7in vazge\u00e7ilmez oldu\u011funu unutmad\u0131. Hesab\u0131n\u0131z\u0131 \u015fimdi olu\u015fturun.",
     "20552": "G\u00fcvenli Bulut Depolama ve \u0130leti\u015fim. [Br] Tasar\u0131m ile Gizlilik.",
     "20553": "[S]50 GB BEDAVA*[\/S] depolama alan\u0131n\u0131 almak i\u00e7in bir MEGA hesab\u0131 olu\u015fturun",
-    "20554": "G\u00fcvenilir Depolama ve H\u0131zl\u0131 Aktar\u0131mlar",
     "20555": "G\u00fcvenli bulut depolamay\u0131 basit ve kullan\u0131\u015fl\u0131 hale getiririz. Bug\u00fcn \u00fccretsiz bir MEGA hesab\u0131 olu\u015fturun!",
     "20556": "Ba\u015fla",
     "20557": "MEGA dosyalar\u0131n\u0131z ve sohbetleriniz sizin taraf\u0131n\u0131zdan kontrol edilen anahtarlarla \u015fifrelenir.",
@@ -3368,7 +3367,11 @@
     "20621": "Business al\u0131n",
     "20622": "Sohbeti a\u00e7",
     "20623": "Anahtar d\u00f6nd\u00fcrmeyi etkinle\u015ftir",
-    "20624": "From %1 \/ month",
-    "20625": "From %1 \/ user \/ month",
-    "20626": "Frequents"
+    "20624": "Ay \/ %1 ba\u015flayan",
+    "20625": "Ay \/ kullan\u0131c\u0131 \/ %1 ba\u015flayan",
+    "20626": "Frequents",
+    "20627": "Do you want to add a contact or a user to your Business account?",
+    "20628": "Business users",
+    "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
+    "20630": "Business users are users you add to your Business account. Users will be added automatically to your and other Business users contacts lists."
 }

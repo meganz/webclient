@@ -470,6 +470,9 @@ function createanonuser(ctx, passwordkey, invitecode, invitename, uh) {
     ctx.passwordkey = passwordkey;
 
     api_createuser(ctx, invitecode, invitename, uh);
+
+    // Forget whether the user was logged-in creating an ephemeral account.
+    delete localStorage.wasloggedin;
 }
 
 function createanonuser2(u, ctx) {

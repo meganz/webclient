@@ -300,6 +300,9 @@ if (!b_u) try
         if (typeof localStorage === 'undefined' || localStorage === null) {
             throw new Error('SecurityError: DOM Exception 18');
         }
+        if (typeof localStorage.d === 'undefined' && location.host === 'smoketest.static.mega.co.nz') {
+            localStorage.d = 1;
+        }
         d = localStorage.d | 0;
         jj = localStorage.jj;
         dd = localStorage.dd;

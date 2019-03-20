@@ -3288,7 +3288,7 @@
     "20488": "Gesprekskoppeling",
     "20497": "Gecodeerde Sleutel Rotatie",
     "20498": "Sleutel rotatie is iets veiliger, maar u kunt geen koppeling naar het gesprek cre\u00ebren en nieuwe deelnemers kunnen geen berichten uit het verleden zien.",
-    "20500": "Voordat u een link naar deze ruimte kunt genereren, moet u een beschrijvend onderwerp instellen:",
+    "20500": "Before you can generate a link for this chat, you need to set a description:",
     "20520": "Fout. Het bestand was niet verzonden naar elk van de geselecteerde gesprekken",
     "20522": "Verwijder oudere versies",
     "20532": "Veiligheid is waarom we bestaan, uw bestanden zijn veilig bij ons achter een goed geolied coderingsapparaat waar alleen u toegang heeft tot uw bestanden.",
@@ -3360,8 +3360,8 @@
     "20613": "Onze Dienst Spreekt voor Zich",
     "20614": "Miljoenen gebruikers kiezen MEGA. Hier is waarom:",
     "20615": "Onderwerp instellen",
-    "20616": "Kies een beschrijvend onderwerp voor deze kamer",
-    "20617": "Voordat u een link naar deze ruimte kunt genereren, moet u een beschrijvend onderwerp instellen:",
+    "20616": "Add a description for this chat",
+    "20617": "Before you can generate a link for this chat, you need to set a description:",
     "20618": "Onbeperkte opslag voor teams",
     "20619": "Hiermee kan iedereen met de Chat Koppeling de geschiedenis van dit gesprek lezen.",
     "20620": "Download de[S]MEGA[\/S] mobiele applicatie nu.",
@@ -3371,8 +3371,8 @@
     "20624": "From %1 \/ month",
     "20625": "From %1 \/ user \/ month",
     "20626": "Frequents",
-    "20627": "Do you want to add a contact or a user to your Business account?",
+    "20627": "Do you want to add a contact or add a user to your Business account?",
     "20628": "Business users",
     "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
-    "20630": "Business users are users you add to your Business account. Users will be added automatically to your and other Business users contacts lists."
+    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists."
 }

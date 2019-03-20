@@ -3288,7 +3288,7 @@
     "20488": "Link do czatu",
     "20497": "Szyfrowanie zaszyfrowanych kluczy",
     "20498": "Rotacja klucza jest nieco bezpieczniejsza, ale nie pozwala utworzy\u0107 \u0142\u0105cza do czatu, a nowi uczestnicy nie b\u0119d\u0105 widzie\u0107 poprzednich wiadomo\u015bci.",
-    "20500": "Zanim wygenerujesz link do tego pokoju, musisz ustawi\u0107 temat opisowy:",
+    "20500": "Before you can generate a link for this chat, you need to set a description:",
     "20520": "B\u0142\u0105d. Plik nie zosta\u0142 wys\u0142any do wybranych czat\u00f3w.",
     "20522": "Usu\u0144 stare wersje",
     "20532": "Bezpiecze\u0144stwo, dlatego istniejemy, twoje pliki s\u0105 bezpieczne u nas za dobrze naoliwion\u0105 maszyn\u0105 szyfruj\u0105c\u0105, gdzie tylko ty masz dost\u0119p do twoich plik\u00f3w.",
@@ -3360,8 +3360,8 @@
     "20613": "Nasz serwis m\u00f3wi sam za siebie",
     "20614": "Miliony u\u017cytkownik\u00f3w wybieraj\u0105 MEGA. Oto dlaczego:",
     "20615": "Ustaw temat",
-    "20616": "Wybierz temat opisowy dla tego pokoju",
-    "20617": "Zanim wygenerujesz link do tego pokoju, musisz ustawi\u0107 temat opisowy:",
+    "20616": "Add a description for this chat",
+    "20617": "Before you can generate a link for this chat, you need to set a description:",
     "20618": "Nieograniczona pami\u0119\u0107 masowa dla zespo\u0142\u00f3w",
     "20619": "Pozwoli to ka\u017cdemu z linkiem do czatu odczyta\u0107 histori\u0119 tego czatu.",
     "20620": "Pobierz teraz aplikacj\u0119 mobiln\u0105 [S]MEGA[\/S].",
@@ -3371,8 +3371,8 @@
     "20624": "Od %1 \/ miesi\u0105c",
     "20625": "Od %1 \/ u\u017cytkownik \/ miesi\u0105c",
     "20626": "Frequents",
-    "20627": "Do you want to add a contact or a user to your Business account?",
+    "20627": "Do you want to add a contact or add a user to your Business account?",
     "20628": "Business users",
     "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
-    "20630": "Business users are users you add to your Business account. Users will be added automatically to your and other Business users contacts lists."
+    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists."
 }

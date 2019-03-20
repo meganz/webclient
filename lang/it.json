@@ -3288,7 +3288,7 @@
     "20488": "Link della chat",
     "20497": "Rotazione della chiave criptata",
     "20498": "La rotazione della chiave \u00e8 leggermente pi\u00f9 sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.",
-    "20500": "Prima di generare il link per questa stanza, hai bisogno di impostare un tema descrittivo:",
+    "20500": "Before you can generate a link for this chat, you need to set a description:",
     "20520": "Errore. Il file non \u00e8 stato inviato a nessuna delle chat selezionate",
     "20522": "Elimina le versioni precedenti",
     "20532": "La sicurezza \u00e8 il motivo per cui esistiamo, i tuoi file sono al sicuro con noi dietro ad una macchina di criptazione ben oliata dove solo tu puoi accedere ad i tuoi file.",
@@ -3360,8 +3360,8 @@
     "20613": "Il nostro servizio parla da solo",
     "20614": "Milioni di utenti scelgono MEGA. Ecco perch\u00e9:",
     "20615": "Imposta tema",
-    "20616": "Scegli un tema per questa stanza",
-    "20617": "Prima di generare il link per questa stanza, hai bisogno di impostare un tema descrittivo:",
+    "20616": "Add a description for this chat",
+    "20617": "Before you can generate a link for this chat, you need to set a description:",
     "20618": "Spazio di archiviazione illimitato per i team",
     "20619": "Questo permetter\u00e0 a tutti coloro che hanno il link di questa chat di vedere l'intera cronologia di questa chat.",
     "20620": "Ottieni l'app per mobile di [S]MEGA[\/S] adesso.",
@@ -3371,8 +3371,8 @@
     "20624": "Da %1 \/ mese",
     "20625": "Da %1 \/ utente \/ mese",
     "20626": "Frequents",
-    "20627": "Do you want to add a contact or a user to your Business account?",
+    "20627": "Do you want to add a contact or add a user to your Business account?",
     "20628": "Business users",
     "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
-    "20630": "Business users are users you add to your Business account. Users will be added automatically to your and other Business users contacts lists."
+    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists."
 }

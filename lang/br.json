@@ -3288,7 +3288,7 @@
     "20488": "Link do chat",
     "20497": "Rota\u00e7\u00e3o da chave de cifrado",
     "20498": "A rota\u00e7\u00e3o de chaves \u00e9 um pouco mais segura, mas n\u00e3o permite criar um link para o chat, e os novos participantes n\u00e3o ver\u00e3o as mensagens anteriores.",
-    "20500": "Antes de poder gerar um link para este chat, voc\u00ea precisa adicionar uma descri\u00e7\u00e3o:",
+    "20500": "Before you can generate a link for this chat, you need to set a description:",
     "20520": "Erro. O arquivo n\u00e3o foi enviado a nenhum dos chats selecionados.",
     "20522": "Deletar vers\u00f5es anteriores",
     "20532": "A seguran\u00e7a \u00e9 a raz\u00e3o da nossa exist\u00eancia. Os seus arquivos est\u00e3o protegidos por uma m\u00e1quina de criptografia bem engrenada, na qual somente voc\u00ea pode acess\u00e1-los.",
@@ -3360,8 +3360,8 @@
     "20613": "O nosso servi\u00e7o fala por si mesmo",
     "20614": "Milh\u00f5es de usu\u00e1rios escolhem o MEGA. Aqui est\u00e1 o porqu\u00ea:",
     "20615": "Adicionar descri\u00e7\u00e3o",
-    "20616": "Adicione uma descri\u00e7\u00e3o para este chat",
-    "20617": "Antes de poder gerar um link para este chat, voc\u00ea precisa adicionar uma descri\u00e7\u00e3o:",
+    "20616": "Add a description for this chat",
+    "20617": "Before you can generate a link for this chat, you need to set a description:",
     "20618": "Armazenamento ilimitado para equipes",
     "20619": "Qualquer pessoa com o link do chat poder\u00e1 ler o hist\u00f3rico deste chat.",
     "20620": "Obtenha j\u00e1 o aplicativo m\u00f3vel do [S]MEGA[\/S].",
@@ -3371,8 +3371,8 @@
     "20624": "A partir de %1 por m\u00eas",
     "20625": "A partir de %1 por usu\u00e1rio ao m\u00eas",
     "20626": "Frequents",
-    "20627": "Do you want to add a contact or a user to your Business account?",
+    "20627": "Do you want to add a contact or add a user to your Business account?",
     "20628": "Business users",
     "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
-    "20630": "Business users are users you add to your Business account. Users will be added automatically to your and other Business users contacts lists."
+    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists."
 }

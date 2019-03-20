@@ -2704,6 +2704,9 @@ function loadSubPage(tpage, event) {
     // since hash changing above will fire popstate event, which in its turn will call
     // loadsubpage again. We will end up in folderlinks issue when they are decrypted with a provided key.
     if (page !== '' && page !== tpage) {
+        if (d) {
+            console.warn('LoadSubPage arrived to IF statement proving race-condition');
+        }
         return false;
     }
 

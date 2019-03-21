@@ -985,9 +985,11 @@ FileManager.prototype.updFileManagerUI = function() {
                     topmenuUI();
                 }
 
-                if (M.currentdirid === 'dashboard') {
-                    delay('dashboard:upd', dashboardUI, 2000);
-                }
+                delay('dashboard:upd', function() {
+                    if (M.currentdirid === 'dashboard') {
+                        dashboardUI();
+                    }
+                }, 2000);
 
                 if (d) {
                     console.timeEnd('rendernew');

@@ -563,6 +563,7 @@ function setContactLink() {
 
 /**Show Contact VS User difference dialog */
 function contactVsUserDialog() {
+    "use strict";
     var $dialog = $('.add-reassign-dialog.user-management-dialog');
 
     $dialog.find('.dif-dlg-contact-add-btn').rebind('click.dlg', function addContactClickHandler() {
@@ -592,7 +593,6 @@ function contactVsUserDialog() {
  * addContactUI
  *
  * Handle add contact dialog UI
- * @param {Boolean} dropdown            dialog parameter. Shows dropdown instead dialog
  * @param {Boolean} close               dialog parameter
  * @param {Boolean} dontWarnBusiness    if true, then porceed to show the dialog
  */

@@ -435,6 +435,25 @@ var mobile = {
                 }
             }
         });
+    },
+
+    /**
+     * Make back button works as closing overlay.
+     * @param {Object} $overlay target overlay
+     */
+    initOverlayPopstateHandler: function($overlay) {
+
+        'use strict';
+
+        history.pushState({ subpage: page }, "", "/" + page);
+
+        var $closeBtn = $overlay.find('.close-button, .cancel, .fm-dialog-close');
+
+        $(window).rebind('popstate.mega-mobile', function() {
+            
+            $closeBtn.trigger('tap');
+            $(this).off('popstate.mega-mobile');
+        });
     }
 };
 

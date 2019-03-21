@@ -35,6 +35,8 @@ mobile.createFolderOverlay = {
 
         // Clear the input from old dialog openings and open the keyboard for typing
         this.$overlay.find('.folder-name-input').val('').trigger("focus");
+
+        mobile.initOverlayPopstateHandler(this.$overlay);
     },
 
     /**

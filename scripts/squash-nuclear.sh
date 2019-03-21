@@ -116,3 +116,6 @@ else
     echo "7. Force push updated branch $current_branch-squashed. All done."
     echo "---"
 fi
+
+# Checkout the original branch again
+git checkout $current_branch

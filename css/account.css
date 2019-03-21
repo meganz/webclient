@@ -62,11 +62,27 @@
     -ms-transition: border-color 200ms ease-in-out;
     transition: border-color 200ms ease-in-out;
 }
-.top-login-popup.sign .account.input-wrapper {
+.account.input-wrapper.small {
     margin: 0 0 8px 0;
 }
+.account.input-wrapper.top-placeholder {
+    margin: 0 0 20px 0;
+}
+.account.input-wrapper.top-placeholder label {
+    display: none;
+    position: absolute;
+    top: -12px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    color: #999999;
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 0.86px;
+}
+.account.input-wrapper.top-placeholder input:not(:placeholder-shown) + label, .account.input-wrapper.top-placeholder.selected label {
+    display: block;
+}
 .fm-dialog.top-login-popup.sign .account.input-wrapper {
-        margin: 0 0 24px 0;
+    margin: 0 0 24px 0;
 }
 .account.input-wrapper.focused {
     border-color: rgba(0,0,0,0.4);
@@ -82,7 +98,7 @@
     top: 9px;
     opacity: 0.6;
 }
-.account.input-wrapper input {
+.account.input-wrapper input, .account.input-wrapper .ui-selectmenu-button, .account.input-wrapper select {
     background-color: transparent;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     border: 0;
@@ -102,10 +118,44 @@
     -ms-transition: color 200ms ease-in-out;
     transition: color 200ms ease-in-out;
 }
-.account.input-wrapper.recovery-key input {
-    letter-spacing: 0px;
+.account.input-wrapper select {
+    height: 25px;
+    opacity: 0;
 }
-.account.input-wrapper input[type='number'] {
+.account.input-wrapper .select-arrow {
+    left: auto;
+    right: 5px;
+    -webkit-transition: transform 200ms ease-in-out;
+    -moz-transition: transform 200ms ease-in-out;
+    -o-transition: transform 200ms ease-in-out;
+    -ms-transition: transform 200ms ease-in-out;
+    transition: transform 200ms ease-in-out;
+}
+.ui-selectmenu-button-open + label + .select-arrow {
+    -ms-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+.account.input-wrapper .ui-selectmenu-button {
+    float: none;
+    min-width:0;
+    height:25px;
+    color: #999999;
+    font-size: 12px;
+    letter-spacing: 0.86px;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+.account.input-wrapper.selected .ui-selectmenu-button {
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #000000;
+}
+.account.input-wrapper .ui-selectmenu-button::before {
+    display: none;
+}
+.account.input-wrapper:not(.small) input[type='number'] {
     font-size: 20px;
 }
 .account.input-wrapper.double input {
@@ -152,6 +202,53 @@
 .account.input-wrapper input:-webkit-autofill, input:-webkit-autofill:focus {
     -webkit-box-shadow: 0 0 0 50px #FAFAFA inset;
     -webkit-text-fill-color: #000000;
+}
+.account.grouped-inputs {
+    padding: 0 0 12px 0;
+    font-size: 0;
+    white-space: nowrap;
+    text-align: center;
+}
+.account.grouped-inputs .num {
+    width: 40px;
+    height: 48px;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 4px;
+    background-color: #F7F7F7;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    margin-left: 4px;
+}
+.account.grouped-inputs .num:first-child {
+    margin: 0;
+}
+.account.grouped-inputs .account.input-wrapper input[type='number'] {
+    font-size: 36px;
+    line-height: 45px;
+    text-align: center;
+}
+.sms-code-input-container {
+    position: relative;
+}
+.sms-verification-number-input {
+    background: transparent;
+    border: 0 none;
+    height: 38px;
+    line-height: 38px;
+    font-size: 38px;
+    letter-spacing: 25px;
+    position: absolute;
+    text-indent: 13px;
+    top: 4px;
+    width: 300px;
+    z-index: 2;
+}
+body.ar .sms-verification-number-input {
+    font-family: 'source_sans_proregular', Arial, sans-serif;
 }
 .account.input-tooltip, .both-input-tooltip {
     background-color: #f8e6e6;
@@ -205,6 +302,20 @@
     bottom: auto;
     margin-top: 9px;
     text-align: center;
+}
+.account.input-tooltip.static {
+    position: static;
+    margin: 0;
+}
+.incorrect + .account.input-tooltip.static {
+    display: block;
+}
+.account.input-wrapper.incorrect.top-placeholder + .account.input-tooltip.static {
+    margin: -12px 0 0 0;
+}
+.account.input-tooltip.static.visible {
+    display: block;
+    margin: -12px 0 0 0;
 }
 .account.checkbox-block {
     padding: 10px 0 64px 1px;

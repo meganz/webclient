@@ -250,6 +250,16 @@ function init_page() {
         delete localStorage.businessSubAc;
     }
 
+    // Users that logged in and are suspended (requiring special SMS unlock) are not allowed to go anywhere else in the
+    // site until they validate their account. So if they clicked the browser back button, then they should get logged
+    // out or they will end up with with a partially logged in account stuck in an infinite loop. This logout is not
+    // triggered on the mobile web sms/ pages because a session is still required to talk with the API to get unlocked.
+    if ((typeof sms !== 'undefined' && sms.isSuspended) ||
+        (typeof mobile !== 'undefined' && mobile.sms.isSuspended && page.substr(0, 3) !== 'sms')) {
+
+        u_logout(true);
+    }
+
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
 
@@ -944,39 +954,54 @@ function init_page() {
         loadSubPage('fm/account/achievements');
         return false;
     }
-    else if (is_mobile && page === 'twofactor/intro') {
+    else if (is_mobile && page.substr(0, 9) === 'twofactor') {
+
         parsepage(pages['mobile']);
-        mobile.twofactor.intro.init();
+
+        if (page.indexOf('intro') > -1) {
+            mobile.twofactor.intro.init();
+        }
+        else if (page.indexOf('verify-setup') > -1) {
+            mobile.twofactor.verifySetup.init();
+        }
+        else if (page.indexOf('setup') > -1) {
+            mobile.twofactor.setup.init();
+        }
+        else if (page.indexOf('enabled') > -1) {
+            mobile.twofactor.enabled.init();
+        }
+        else if (page.indexOf('verify-disable') > -1) {
+            mobile.twofactor.verifyDisable.init();
+        }
+        else if (page.indexOf('disabled') > -1) {
+            mobile.twofactor.disabled.init();
+        }
+        else if (page.indexOf('verify-login') > -1) {
+            mobile.twofactor.verifyLogin.init();
+        }
+
         return false;
     }
-    else if (is_mobile && page === 'twofactor/setup') {
+    else if (is_mobile && page.substr(0, 3) === 'sms') {
+
         parsepage(pages['mobile']);
-        mobile.twofactor.setup.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/verify-setup') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.verifySetup.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/enabled') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.enabled.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/verify-disable') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.verifyDisable.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/disabled') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.disabled.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/verify-login') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.verifyLogin.init();
+
+        if (page.indexOf('add-phone-suspended') > -1) {
+            mobile.sms.phoneInput.init();
+        }
+        else if (page.indexOf('verify-code') > -1) {
+            mobile.sms.verifyCode.init();
+        }
+        else if (page.indexOf('verify-success') > -1) {
+            mobile.sms.verifySuccess.init();
+        }
+        else if (page.indexOf('phone-achievement-intro') > -1) {
+            mobile.sms.achievement.init();
+        }
+        else if (page.indexOf('add-phone-achievement') > -1) {
+            mobile.sms.phoneInput.init();
+        }
+
         return false;
     }
     else if (page === 'fm/account/profile') {

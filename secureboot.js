@@ -2093,6 +2093,7 @@ else if (!b_u) {
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
+        jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
         jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
 
@@ -2216,6 +2217,10 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.twofactor.disabled.js', n: 'mobile_twofactor_disabled_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-action.js', n: 'mobile_twofactor_verify_action_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.phone-input.js', n: 'mobile_sms_phone_input_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.verify-code.js', n: 'mobile_sms_verify_code_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.verify-success.js', n: 'mobile_sms_verify_success_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.achievement.js', n: 'mobile_sms_achievement', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.titlemenu.js', n: 'mobile_titlemenu_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rubbish-bin-empty-overlay.js', n: 'mobile_rubbish_bin_empty_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rubbishbin.js', n: 'mobile_rubbishbin_js', j: 1, w: 1});

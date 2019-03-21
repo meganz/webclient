@@ -74,6 +74,11 @@
             localStorage.twoFactorAuthEnabled = '0';
         }
 
+        // SMS debug mode for testing the same phone number multiple times
+        if (window.location.search.indexOf('sms=1') > -1) {
+            localStorage.smsDebugMode = '1';
+        }
+
         // Use the beta CMS if requested
         if (window.location.search.indexOf('betacms=1') > -1) {
             localStorage.cms = 'https://cms2.systems.mega.nz/';

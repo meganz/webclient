@@ -1790,7 +1790,7 @@ a.blog-button:hover {
     display: none;
 }
 .notification-loading-icon {
-    background-image: url(../images/mega/dialog-sprite_v3.png);
+    background-image: url(../images/mega/dialog-sprite_v5.png);
     background-position: center -3245px;
     background-repeat: no-repeat;
     height: 225px;
@@ -24124,7 +24124,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
     display: block;
     max-width: 100%;
-    white-space: nowrap; 
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -24137,7 +24137,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
     display: block;
     max-width: 100%;
-    white-space: nowrap; 
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }

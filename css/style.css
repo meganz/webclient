@@ -29140,6 +29140,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .user-management-dialog .dialog-title.long-name {
     margin: 40px 32px;
+    line-height: 30px;
 }
 .fm-picker-dialog .dialog-subtitle {
     font-size: 14px;

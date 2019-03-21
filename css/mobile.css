@@ -10230,6 +10230,53 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     width: 100px;
 }
 
+.mobile span.roman-number {
+    font-family: 'Open Sans Semibold Italic', Arial;
+    font-size: 16px;
+    letter-spacing: -0.1px;
+    color: #D32400;
+    float: left;
+    display: block;
+}
+.mobile .copyrights-gray {
+    background-color: #fafafa;
+}
+.mobile .copyrights-gray .new-bottom-pages {
+    padding: 48px 20px 73px 20px;
+}
+.mobile .copyrights-page .reg-st5-complete-button.active {
+    min-width: 156px;
+    margin: 40px 0 5px 0;
+    text-align: center;
+}
+.mobile p.copyrights-red {
+    color: #BF1900;
+    padding-bottom: 6px;
+}
+.mobile .terms-agent-info {
+    background-image: url(../images/mega/terms-icons.png);
+    background-position: 0 6px;
+    background-repeat: no-repeat;
+    display: block;
+    padding-left: 32px;
+    padding: 0 0 0 32px;
+    margin-bottom: 15px;
+}
+.mobile .terms-agent-info.name {
+    margin: -5px 0 15px 0;
+    background-position: 0 6px;
+}
+.mobile .terms-agent-info.adress {
+    margin: 0 0 15px 0;
+    background-position: 0 -101px;
+}
+.mobile .terms-agent-info.email {
+    margin: 0;
+    background-position: 0 -229px;
+}
+.mobile .copyrights-agent-section {
+    width: 100%;
+}
 
 /* Only media queries after here */
 @media only screen and (max-width: 970px) {

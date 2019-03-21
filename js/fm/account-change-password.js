@@ -73,6 +73,9 @@ var accountChangePassword = {
                     $changePasswordStrengthBar.addClass('good1');    // Very Weak
                 }
             });
+
+            // Reset strength after re-rendering.
+            $newPasswordField.trigger('keyup.pwdchg');
         };
 
         if (typeof zxcvbn === 'undefined') {
@@ -81,9 +84,6 @@ var accountChangePassword = {
         else {
             bindStrengthChecker();
         }
-
-        // Reset strength after re-rendering.
-        $newPasswordField.trigger('keyup.pwdchg');
     },
 
     /**

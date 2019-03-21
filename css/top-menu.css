@@ -239,7 +239,7 @@
     height: 14px;
     right: 25px;
     top: 9px;
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     background-position: -12px -1303px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
@@ -295,7 +295,7 @@
     width: 24px;
     height: 24px;
     display: block;
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     background-repeat: no-repeat;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;

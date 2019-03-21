@@ -203,7 +203,7 @@
     min-width: 518px;
     display: inline-block;
     position: relative;
-    vertical-align: top;
+    vertical-align: middle;
 }
 .last-block {
     width: 20%;
@@ -249,7 +249,7 @@
 .subtitle-txt {
     font-size: 16px;
     color: #333;
-    line-height: 18px;
+    line-height: 22px;
     display: inline-block;
     vertical-align: top;
     max-width: 370px;
@@ -284,7 +284,7 @@
 .subtitle-txt.short-title {
     width: 140px;
 }
-.content-txt {
+.content-txt, .add-phone-text {
     font-size: 14px;
     line-height: 20px;
     padding-top: 18px;
@@ -725,6 +725,101 @@
 .settings-sub-section.profile .default-green-button,
 .settings-sub-section.preference .default-green-button {
     margin-top: 24px;
+}
+
+/* Settings -> Account -> Add phone banner */
+.account.add-phone-num-banner {
+    background-color: #fafafa;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+    border-radius: 8px;
+    background-color: #fafafa;
+    margin: 16px auto;
+    width: calc(100% - 32px);
+    max-width: 1020px;
+}
+.account.add-phone-num-banner .verify-header {
+    color: #333;
+    font-family: LatoWebBold;
+    font-size: 18px;
+    line-height: 24px;
+}
+.account.add-phone-wrapper {
+    padding: 0;
+    margin: 0 auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+}
+.account.add-phone-phone-num:not(.hidden) .fm-account-main {
+    height: -webkit-calc(100% - 148px);
+    height: -moz-calc(100% - 148px);
+    height: calc(100% - 148px);
+}
+.account.verify-icon {
+    width: 100px;
+    height: 100px;
+    display: inline-block;
+    border-radius: 100%;
+    overflow: hidden;
+    background: -moz-linear-gradient(top, #40b0d7 0%, #29a6d1 100%);
+    background: -webkit-linear-gradient(top, #40b0d7 0%,#29a6d1 100%);
+    background: linear-gradient(to bottom, #40b0d7 0%,#29a6d1 100%);
+    position: relative;
+    vertical-align: middle;
+}
+.account.verify-icon .verify-ph-icon {
+    width: 100px;
+    height: 100px;
+    background-size: 80px auto;
+    background-position: 10px -2981px;
+    background-repeat: no-repeat;
+    margin: 0;
+    left: 0;
+}
+.account.add-phone-content {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 0 12px 12px 12px;
+}
+.account.add-phone-button-container .skip-button {
+    color: #999;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 16px;
+    margin-top: 12px;
+    margin-left: 12px;
+    text-decoration: underline;
+}
+/* Phone settings */
+.settings-sub-section.phone-number-settings {
+   border-top: 1px solid rgba(0,0,0,0.1);
+}
+.settings-sub-section.phone-number-settings .add-phone-text {
+    color: #999;
+    font-family: 'LatoWeb';
+    font-size: 14px;
+    line-height: 18px;
+}
+.settings-sub-section.phone-number-settings .phone-number {
+    display: none;
+    color: #00bfa5;
+    font-family: 'LatoWeb';
+    font-size: 13px;
+    line-height: 24px;
+    position: absolute;
+    right: 0;
+    top: 22px;
+}
+.settings-sub-section.phone-number-settings.verified .phone-number {
+    display: block;
+}
+.settings-sub-section.phone-number-settings.verified .add-number-button {
+    display: none;
+}
+.settings-sub-section.phone-number-settings.verified .add-phone-text {
+    display: none;
 }
 .fm-right-account-block .dialog-feature-toggle {
     border: solid 1px rgba(0, 0, 0, 0.05);
@@ -1349,6 +1444,7 @@
     width: 100%;
     display: block;
     text-align: center;
+    padding: 16px 0;
 }
 .fm-account-main.low-width .first-block .title-txt {
     display: block;
@@ -1356,14 +1452,28 @@
 .fm-account-main.low-width .second-block {
     width: 100%;
     display: block;
-    height: 124px;
+/*    height: 124px;*/
+}
+.fm-account-main.low-width .second-block .title-txt {
+    display: block;
+    text-align: center;
+}
+.fm-account-main.low-width .second-block .account.add-phone-text {
+    display: block;
+    text-align: center;
 }
 .fm-account-main.low-width .last-block {
     width: 100%;
     display: block;
     position: relative;
     border-radius: 0 0px 8px 8px;
+    padding: 16px 0;
 }
+.fm-account-main.low-width .last-block .account.add-phone-button-container .skip-button {
+    display: block;
+    margin:12px auto;
+    text-align: center;
+} 
 .fm-account-main.low-width .last-block .content-txt {
     display: none;
 }
@@ -1519,7 +1629,7 @@
     position: absolute;
     top: -8px;
     right: 136px;
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     background-position: -10px -420px;
     background-repeat: no-repeat;
     width: 17px;

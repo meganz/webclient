@@ -264,7 +264,7 @@
     height: 24px;
     display: block;
     background-position: -6px -474px;
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -1008,6 +1008,9 @@
 .achievement-dialog.expires-txt.red {
     color: #FF333A;
 }
+body.fr .achievement-dialog.expires-txt.red, body.jp .achievement-dialog.expires-txt.red {
+    line-height: 18px;
+}
 .achievement-dialog .default-grey-button {
     display: inline-block;
     margin: 0 10px 0 10px;
@@ -1051,7 +1054,7 @@
 .achievements-scroll * {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
-.achievements-scroll .achievements-icon, .achievements-scroll .green-tick {
+.achievements-scroll .achievements-icon, .achievements-scroll .green-tick, .fm-dialog.verify-phone .achievements-icon {
     background-image: url(../images/mega/mid-achievements.png);
     background-size: 380px auto;
     background-repeat: no-repeat;
@@ -1069,7 +1072,7 @@
     background-position: -12px -104px;
 }
 .achievements-cell.ach-sms-verification .achievements-icon {
-    background-position: -109px -104px;  
+    background-position: -109px -104px;
 }
 .achievement-dialog.bottom-block .cloud-white {
     background-position: -208px -206px;
@@ -1369,7 +1372,7 @@
 .achievement-dialog.bottom-block .achievement-dialog.reward {
     display: inline-block;
     position: relative;
-    width: 100%;  
+    width: 100%;
     padding:0 24px;
     margin: 0;
     box-sizing: border-box;
@@ -3283,11 +3286,11 @@ li.token-input-token-invite .input-close {
     opacity: 0.8;
 }
 .embed-content-block .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite_v3.png);
+    background-image: url(../images/mega/dialog-sprite_v5.png);
     background-position: -128px -5818px;
 }
 .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v3.png);
+    background-image: url(../images/mega/dialog-sprite_v5.png);
     background-position: -88px -5818px;
 }
 .embed-content-block .fm-subheading {
@@ -3638,7 +3641,7 @@ li.token-input-token-invite .input-close {
     line-height: 25px;
     text-align: center;
 }
-.recovery-key-info-container { 
+.recovery-key-info-container {
     box-sizing: border-box;
     height: 66px;
     width: 386px;
@@ -4139,3 +4142,207 @@ li.token-input-token-invite .input-close {
 .fm-dialog.improved-recovery-steps .recover-paste-block {
     margin: 30px auto 0;
 }
+/* end of Recover account */
+
+/* Verify phone num */
+.fm-dialog.verify-phone {
+    width: 360px;
+    margin: -281px 0 0 -180px;
+    text-align: center;
+    border-radius: 4px;
+}
+.fm-dialog.verify-phone .verify-ph-top {
+    height: 240px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    background: #40b0d7;
+    background: -moz-linear-gradient(top, #40b0d7 0%, #29a6d1 100%);
+    background: -webkit-linear-gradient(top, #40b0d7 0%,#29a6d1 100%);
+    background: linear-gradient(to bottom, #40b0d7 0%,#29a6d1 100%);
+    position: relative;
+}
+.fm-dialog.verify-phone .fm-dialog-title.white {
+    color: white;
+    font-size: 15px;
+    line-height: 20px;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial;
+}
+.fm-dialog.verify-phone.suspended .js-dialog-close, .fm-dialog.verify-phone.suspended .not-now-button {
+    display: none;
+}
+.fm-dialog.verify-phone .verify-ph-body {
+    padding: 24px 35px;
+}
+.fm-dialog.verify-phone .verify-ph-info {
+    font-size: 14px;
+    line-height: 20px;
+    color: #333333;
+    min-height: 72px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    padding: 0 0 20px 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.fm-dialog.verify-phone .verify-ph-info.long {
+    letter-spacing: 1px;
+}
+.fm-dialog.verify-phone .verify-ph-info .green-lnk {
+    color: #00BFA5;
+    font-size: 13px;
+    cursor: pointer;
+    letter-spacing: 0.93px;
+    display: block;
+}
+.fm-dialog.verify-phone .verify-ph-info .green-lnk.hidden {
+    display: none;
+}
+.fm-dialog.verify-phone .verify-ph-info .phone-num {
+    color: #999999;
+    display: block;
+}
+.fm-dialog.verify-phone .verify-success-page .verify-ph-info {
+    min-height: 0;
+}
+.fm-dialog.verify-phone .verify-ph-country .ui-selectmenu-text {
+    width: 221px;
+}
+.verify-ph-buttons .button {
+    min-width: 92px;
+}
+.account.input-wrapper.incorrect + .account.input-tooltip.static + .verify-ph-buttons {
+    padding-top: 9px;
+}
+#verify-dialog-countries-menu {
+    min-width: 260px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    letter-spacing: 1px;
+}
+.verify-ph-icon, .verify-ph-success-icon {
+    width: 122px;
+    height: 154px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    margin: 0 0 0 -61px;
+    background-image: url(../images/mega/dialog-sprite_v5.png);
+}
+.verify-ph-icon {
+    background-position: -19px -6008px;
+}
+.verify-ph-success-icon {
+    background-position: -19px -6209px;
+}
+.verify-ph-buttons {
+    padding-top: 16px;
+    text-align: left;
+}
+.verify-ph-info.small-txt {
+    font-size: 13px;
+    min-height: 0;
+}
+.account.input-tooltip + .verify-ph-info {
+    padding: 32px 0 0 0;
+}
+.incorrect + .account.input-tooltip + .verify-ph-info {
+    padding: 8px 0 0 0;
+}
+.verify-ph-bonus-container {
+    padding:22px 0;
+    margin: auto;
+    text-align: left;
+    display: inline-block;
+}
+.verify-success-page {
+    text-align: center;
+}
+.verify-ph-info.long {
+    height: auto;
+    min-height: 0;
+}
+.verify-success-page.non-achievement-account .verify-ph-info.long {
+    height: 174px;
+    margin-top: 48px;
+}
+.verify-ph-bonus-container .bonus-image {
+    display: inline-block;
+    margin-right: 20px;
+}
+.verify-success-page.non-achievement-account .verify-ph-bonus-container {
+    display: none;
+}
+.verify-ph-bonus-block.storge-bonus .bonus-image {
+    background-position: -22px -267px;
+}
+.verify-ph-bonus-block.transfer-bonus .bonus-image {
+    background-position: -92px -267px;
+}
+.verify-ph-bonus-container .verify-ph-bonus-block:not(:last-child) .bonus-image {
+    margin-bottom: 24px;
+}
+.verify-ph-bonus-block {
+    display: table-row-group;
+}
+.verify-ph-bonus-intro-wrapper {
+    display: inline-block;
+    vertical-align: top;
+}
+.verify-ph-bonus-intro-wrapper .big-num {
+    display: table-row;
+    font-size: 30px;
+    line-height: 36px;
+    height: 38px;
+    color: #333;
+    text-align: left;
+    font-family: 'LatoWebLight','source_sans_proregular', Arial;
+}
+.verify-ph-bonus-intro-wrapper .body-txt {
+    display: table-row;
+    font-size: 14px;
+    line-height: 17px;
+    height: 18px;
+    color: #333;
+    text-align: left;
+    font-family: 'LatoWebSemibold','source_sans_proregular', Arial;
+}
+.verify-ph-bonus-valid-days {
+    display: inline-block;
+}
+.verify-success-page.non-achievement-account .verify-ph-bonus-valid-days {
+	display: none;
+}
+.verify-ph-bonus-valid-days .valid-days-title {
+    display: inline-block;
+    position: relative;
+    height: 18px;
+    font-size: 14px;
+    line-height: 18px;
+    color: #666;
+    padding-left: 26px;
+    padding-right: 8px;
+    margin: 7px 0;
+    max-width: 124px;
+    white-space: normal;
+}
+.verify-ph-bonus-valid-days .valid-days-title::before {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 0;
+    top: 0;
+    content: '';
+    background-position: -269px -211px;
+    background-image: url(../images/mega/mid-achievements.png);
+    background-size: 380px auto;
+    background-repeat: no-repeat;
+}
+.verify-ph-bonus-valid-days .valid-days-body-txt {
+    display: inline-block;
+    position: relative;
+    height: 18px;
+    font-size: 14px;
+    line-height:18px;
+    color: #666;
+    font-family: 'LatoWebSemibold','source_sans_proregular', Arial;
+}
+/* end of Verify phone num */

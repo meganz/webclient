@@ -373,6 +373,9 @@ function bytesToSize(bytes, precision, format) {
     if (format === 2) {
         return resultSize + '<span>' + resultUnit + '</span>';
     }
+    else if (format === 3) {
+        return resultSize;
+    }
     else if (format) {
         return '<span>' + resultSize + '</span>' + resultUnit;
     }

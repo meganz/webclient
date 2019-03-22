@@ -7,6 +7,8 @@ var bottompage = {
      * Initialise the page
      */
     init: function() {
+        "use strict";
+
         bottompage.initNavButtons();
         if (page.substr(0, 4) === 'help' || page === 'cpage' || page.substr(0, 9) === 'corporate') {
             $('body').addClass('old');
@@ -37,14 +39,14 @@ var bottompage = {
                 bottompage.videoResizing();
             });
         }
-        
+
         if (!is_mobile) {
             bottompage.initFloatingTop();
             $('body').removeClass('mobile');
+            bottompage.initBackToScroll();
         }
         else {
             $('body').addClass('mobile');
-
             if (is_android) {
                 bottompage.topBlockHeight();
 
@@ -53,6 +55,22 @@ var bottompage = {
                 });
             }
         } 
+    },
+
+    initBackToScroll: function() {
+        "use strict";
+
+        $('#startholder').bind('scroll.bottompage', function() {
+            sessionStorage.setItem('scrollPosition_' + page, $(this).scrollTop());
+        });
+
+        window.onpopstate = function() {
+            var sessionData = sessionStorage['scrollPosition_' + page];
+
+            if ($('body').hasClass('bottom-pages') && sessionData) {
+                $('#startholder').scrollTop(sessionData);
+            }
+        };
     },
 
     initNavButtons: function() {
@@ -88,11 +106,6 @@ var bottompage = {
                     hiddenNavDropdown();
                     return false;
                 }
-                else if (browserWidth >= 495 && $this.hasClass('other')) {
-                    hiddenNavDropdown();
-                    return false;
-                }
-
                 topPos = thisTopPos - $dropdown.outerHeight() + 4;
                 if (thisTopPos - $dropdown.outerHeight() + 4 < 10) {
                     topPos = thisTopPos + $this.outerHeight() - 4;
@@ -112,7 +125,7 @@ var bottompage = {
                 }
 
                 $dropdown.css({
-                    'left': leftPos,
+                    'left': leftPos > 0 ? leftPos : 0,
                     'top': topPos
                 });
             }
@@ -204,6 +217,7 @@ var bottompage = {
 
     initFloatingTop: function() {
         var topHeader;
+        var navBar = '.pages-nav.content-block';
 
         if (page === 'download') {
             topHeader = '.download.top-bar';
@@ -216,12 +230,17 @@ var bottompage = {
         }
 
         function topResize() {
-            var $topHeader = $(topHeader);
+            var $topHeader = $(topHeader + ',' + navBar);
+            var $navBar = $('.pages-nav.content-block');
             if ($topHeader.hasClass('floating')) {
                 $topHeader.width($topHeader.parent().outerWidth());
+                if (page !== 'download') {
+                    $navBar.parent().height($navBar.outerHeight());
+                }
             }
             else {
                 $topHeader.removeAttr('style');
+                $navBar.parent().removeAttr('style');
             }
         }
 
@@ -231,7 +250,10 @@ var bottompage = {
 
         $('.bottom-pages .fmholder').rebind('scroll.topmenu', function() {
             var $topHeader = $(topHeader);
+            var $navBar = $(navBar);
             var topPos = $(this).scrollTop();
+            var navTopPos;
+
             if (topPos > 300) {
                 $topHeader.addClass('floating');
                 topResize();
@@ -244,6 +266,26 @@ var bottompage = {
             }
             else {
                 $topHeader.removeClass('floating activated').removeAttr('style');
+            }
+
+            if ($navBar.length === 0) {
+                return;
+            }
+
+            navTopPos = $('.pages-nav-wrap').position().top;
+
+            if (topPos > navTopPos + 300) {
+                $navBar.addClass('floating');
+                topResize();
+                if (topPos > navTopPos + 600) {
+                    $navBar.addClass('activated');
+                }
+            }
+            else if (topPos <= navTopPos + 300 && topPos >= navTopPos + 50) {
+                $navBar.removeClass('activated');
+            }
+            else {
+                $navBar.removeClass('floating activated').removeAttr('style');
             }
         });
     },

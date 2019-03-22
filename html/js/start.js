@@ -3,6 +3,19 @@ var achieve_data = false;
 function init_start() {
     "use strict";
 
+    var carouselInterval;
+    var darkSliderInterval;
+    var swipeInterval = 10000;
+
+    // Set prices for personal and business plans
+    if (l[20624] && l[20624]) {
+        $('.startpage.plan-price.personal')
+            .safeHTML(l[20624].replace('%1', '<span class="price"><span class="big">4.</span>99 &euro;</span>'));
+
+        $('.startpage.plan-price.business')
+            .safeHTML(l[20625].replace('%1', '<span class="price"><span class="big">10.</span>00 &euro;</span>'));
+    }
+
     // Load the membership plans
     pro.loadMembershipPlans(function () {
 
@@ -15,20 +28,25 @@ function init_start() {
 
     if (u_type > 0) {
         $('.startpage.register:not(.business-reg)').text(l[164]);
+        $('.mid-green-link.register-lnk').attr('href', '/fm');
         $('.startpage.register').rebind('click', function () {
             loadSubPage('fm');
         });
 
+        $('.startpage.account').rebind('click', function () {
+            if (is_mobile) {
+                loadSubPage('fm/account');
+            }
+            else {
+                loadSubPage('fm/dashboard');
+            }
+        });
         if (u_type === 3) {
             $('.business-reg').addClass('hidden').off('click');
         }
-
-        $('.startpage.try-mega').text(l[187]);
-        $('.startpage.try-mega').rebind('click', function () {
-            loadSubPage('fm/dashboard');
-        });
     }
     else {
+        $('.mid-green-link.register-lnk').attr('href', '/register');
         $('.button-48-height.register').rebind('click', function () {
             if ($(this).hasClass('business-reg')) {
                 loadSubPage('registerb');
@@ -37,54 +55,248 @@ function init_start() {
                 loadSubPage('register');
             }
         });
-        $('.startpage.try-mega').text(l[16535]);
+    }
 
+    // Init Scroll to Top button event
+    $('.startpage.scroll-to-top').rebind('click', function () {
+        $('.fmholder, html, body').animate({ scrollTop: 0 }, 1600);
+    });
 
+    // Init Contacts us button event
+    $('.button-48-height.contact-us').rebind('click', function () {
+        loadSubPage('contact');
+    });
 
-        $('.startpage.try-mega').rebind('click', function () {
-            if (u_type === false) {
-                // open file manager with ephemeral account
-                u_storage = init_storage(localStorage);
-                loadingDialog.show();
-                u_checklogin({
-                    checkloginresult: function (u_ctx, r) {
-                        u_type = r;
-                        u_checked = true;
-                        loadingDialog.hide();
-                        loadSubPage('fm');
-                    }
-                }, true);
+    /**
+     * detectSwipe
+     *
+     * {Object} $textarea. DOM swipable area.
+     * {Function} func. Function which will be called after swipe direction is detected
+     */
+    function detectSwipe($el, func) {
+        var swipeStartX = 0;
+        var swipeEndX = 0;
+        var swipeStartY = 0;
+        var swipeEndY = 0;
+        var minX = 50;
+        var direc = '';
+
+        $el.on('touchstart', function(e) {
+            var t = e.touches[0];
+
+            swipeStartX = t.screenX;
+            swipeStartY = t.screenY;
+        });
+
+        $el.on('touchmove', function(e) {
+
+            var t = e.touches[0];
+            swipeEndX = t.screenX;
+            swipeEndY = t.screenY;
+        });
+
+        $el.on('touchend', function(e) {
+            if ((swipeEndX + minX < swipeStartX && swipeEndX !== 0)) {
+                direc = 'next';
             }
-            else {
-                loadSubPage('fm');
+            else if (swipeEndX - minX > swipeStartX) {
+                direc = 'prev';
+            }
+
+            if (direc !== '' && typeof func === 'function') {
+                func(direc);
+            }
+
+            direc = '';
+            swipeStartX = 0;
+            swipeEndX = 0;
+        });
+    }
+
+    /**
+     * carouselSwitch
+     *
+     * {String} direction. Sets what Reviews Carousel slide should be shown. Expected values: 'next' or 'prev'.
+     */
+    function carouselSwitch(direction) {
+        var $currentSlide;
+        var currentSlide;
+        var slideNum;
+        var nextSlide;
+        var prevSlide;
+        /*
+        if (carouselInterval) {
+            clearInterval(carouselInterval);
+        }
+        */
+        $currentSlide = $('.startpage.carousel-slide.current').length ?
+            $('.startpage.carousel-slide.current') : $('.startpage.carousel-slide').last();
+        currentSlide = parseInt($currentSlide.attr('data-sl'));
+        slideNum = $('.startpage.carousel-slide').length;
+
+        if (direction === 'next') {
+            currentSlide = currentSlide + 1 <= slideNum ? currentSlide + 1 : 1;
+        }
+        else {
+            currentSlide = currentSlide - 1 >= 1 ? currentSlide - 1 : slideNum;
+        }
+
+        nextSlide = currentSlide + 1 <= slideNum ? currentSlide + 1 : 1;
+        prevSlide = currentSlide - 1 >= 1 ? currentSlide - 1 : slideNum;
+
+        $('.startpage.carousel-slide').removeClass('current next prev');
+        $('.startpage.carousel-slide.slide' + currentSlide).addClass('current');
+        $('.startpage.carousel-slide.slide' + prevSlide).addClass('prev');
+        $('.startpage.carousel-slide.slide' + nextSlide).addClass('next');
+        /*
+        carouselInterval = setInterval(function() {
+            carouselSwitch('next');
+        },  swipeInterval);
+        */
+    }
+
+    // Reviews carousel. Controls init
+    $('.startpage.carousel-control').rebind('click', function () {
+        if ($(this).hasClass('next')) {
+            carouselSwitch('next');
+        }
+        else {
+            carouselSwitch('prev');
+        }
+    });
+
+    /**
+     * darkSliderSwitch
+     *
+     * {String} direction. Sets what DarkSlider slide should be shown. Expected values: 'next' or 'prev'.
+     */
+    function darkSliderSwitch(direction) {
+        var $slider = $('.dark-slider-wrap');
+        var currentSlide = parseInt($slider.find('.slide.active').attr('data-sl'));
+        var slideNum = $slider.find('.slide').length;
+
+        if (direction === 'next') {
+            currentSlide = currentSlide + 1 <= slideNum ? currentSlide + 1 : 1;
+        }
+        else {
+            currentSlide = currentSlide - 1 >= 1 ? currentSlide - 1 : slideNum;
+        }
+
+        showDarkSlide(currentSlide);
+    }
+
+    /**
+     * showDarkSlide
+     *
+     * {Num} slideNum. Number of next DarkSlider slide which should be shown.
+     */
+    function showDarkSlide(slideNum) {
+        var $slider;
+        /**
+        if (darkSliderInterval) {
+            clearInterval(darkSliderInterval);
+        }
+        **/
+        $slider = $('.dark-slider-wrap');
+        $slider.find('.dark-slider-info').removeClass('active');
+        $slider.find('.dark-slider-info.sl' + slideNum).addClass('active');
+        $slider.find('.dark-slider-nav span').removeClass('active');
+        $slider.find('.dark-slider-nav span.sl' + slideNum).addClass('active');
+        $slider.find('.dark-slider .slide').removeClass('active');
+        $slider.find('.dark-slider .dark-slide' + slideNum).addClass('active');
+        $slider.find('.square-nav-button').removeClass('active');
+        $slider.find('.square-nav-button.sl' + slideNum).addClass('active');
+        /*
+        darkSliderInterval = setInterval(function() {
+            darkSliderSwitch('next');
+        },  swipeInterval);
+        */
+    }
+
+    // DarkSlider. Controls init
+    $('.bottom-page.square-nav-button, .startpage.dark-slider-nav span').rebind('click', function () {
+        var $this = $(this);
+        var slideNum = $this.attr('data-sl');
+
+        if (!$this.hasClass('active')) {
+            showDarkSlide(slideNum);
+        }
+    });
+
+    // Init Animations
+    setTimeout(function() {
+        $('.startpage .bottom-page.top').addClass('start-animation');
+    },  700);
+
+    /**
+     * isVisibleBlock
+     *
+     * {Object} $row. DOM element which should be checked
+     */
+    function isVisibleBlock($row) {
+        if ($row.length === 0) {
+            return false;
+        }
+
+        var $window = $(window);
+        var elementTop = $row.offset().top;
+        var elementBottom = elementTop + $row.outerHeight();
+        var viewportTop = $window.scrollTop();
+        var viewportBottom = viewportTop + $window.outerHeight();
+
+        return elementBottom - 80 > viewportTop && elementTop  < viewportBottom;
+    }
+
+    /**
+     * showAnimated
+     */
+    function showAnimated() {
+        $('.animated').each(function() {
+            if (isVisibleBlock($(this))) {
+                if (!$(this).hasClass('start-animation')) {
+                    $(this).addClass('start-animation');
+                }
+            }
+            else if ($(this).hasClass('start-animation')) {
+                $(this).removeClass('start-animation');
             }
         });
     }
 
-    // If Pro plan clicked, go to step 2
-    $('.reg-st3-membership-bl').rebind('click', function () {
+    showAnimated();
 
-        // Get the Pro number from the box they clicked on
-        var proNum = $(this).attr('data-payment');
+    $('#startholder').add(window).bind('scroll.startpage', function() {
+        if (page === 'start' || page === 'download') {
 
-        // If logged in, load the Pro payment page directly with the plan selected
-        if (u_attr) {
-            loadSubPage('propay_' + proNum);
-        }
-        else {
-            // Otherwise load the Pro plan selection page (Step 1)
-            loadSubPage('pro');
-
-            // Select the Pro plan on the Step 1 page
-            var $proBoxes = $('.membership-step1 .reg-st3-membership-bl');
-            $proBoxes.removeClass('selected');
-            $proBoxes.filter('.pro' + proNum).addClass('selected');
-
-            // Trigger the Register/Login dialog, after completion they will be
-            // directed to the Pro payment page with the plan already selected
-            showSignupPromptDialog();
+            showAnimated();
+            if (!isVisibleBlock($('.bottom-page.light-blue.top, .bottom-page.top-bl'))) {
+                $('.startpage.scroll-to-top').addClass('floating');
+            }
+            else {
+                $('.startpage.scroll-to-top').removeClass('floating');
+            }
         }
     });
+
+    showDarkSlide(3);
+    carouselSwitch('next');
+
+    // Init swipes for Mobile
+    if (is_mobile) {
+        detectSwipe($('.startpage.carousel'), carouselSwitch);
+        detectSwipe($('.dark-slider-wrap'), darkSliderSwitch);
+
+        // Show text info is Icons block was clicked (Why Use MEGA section and similar)
+        $('.startpage.square-block').rebind('click', function () {
+            if (!$(this).hasClass('active')) {
+                $('.startpage.square-block.active').removeClass('active');
+                $(this).addClass('active');
+            }
+            else {
+                $(this).removeClass('active');
+            }
+        });
+    }
 
     // Handler for Try Business Account
     $('.try-business-button-plan-btn').off('click.suba').on('click.suba', function
@@ -94,7 +306,8 @@ function init_start() {
 
     if (!is_mobile && page === 'start') {
         InitFileDrag();
-    } else if (is_mobile && page === 'start') {
+    }
+    else if (is_mobile && page === 'start') {
         if (!mega.ui.contactLinkCardDialog) {
             var contactLinkCardHtml = $('#mobile-ui-contact-card');
             if (contactLinkCardHtml && contactLinkCardHtml.length) {
@@ -103,7 +316,8 @@ function init_start() {
             }
         }
         mobile.initMobileAppButton();
-    } else if (page === 'download') {
+    }
+    else if (page === 'download') {
         $('.widget-block').hide();
     }
     startCountRenderData = {
@@ -129,21 +343,7 @@ function init_start() {
             }
         });
     }
-    $('.bottom-page.top-header').text($('.bottom-page.top-header').text().replace('[A]', '').replace('[/A]', ''));
-    if (achieve_data) {
-        start_achievements(achieve_data);
-    }
-    else {
-        $('.bottom-page.white-block.top-pad.achievements').addClass('hidden');
-        api_req({
-            "a": "mafu"
-        }, {
-            callback: function (res) {
-                achieve_data = res;
-                start_achievements(res);
-            }
-        });
-    }
+
     if (getCleanSitePath() === 'mobile') {
         setTimeout(function () {
             var offset = $(".bottom-page.bott-pad.mobile").offset();
@@ -159,36 +359,6 @@ function init_start() {
 }
 
 var start_countLimit = 0;
-
-function start_achievements(res) {
-    "use strict";
-
-    if (res < 0) {
-        $('.bottom-page.white-block.top-pad.achievements').addClass('hidden');
-    }
-    else if (res && res.u && res.u[4] && res.u[5] && res.u[3]) {
-        // enable achievements:
-        $('.bottom-page.white-block.top-pad.achievements').removeClass('hidden');
-        var gbt = 'GB';
-        if (lang === 'fr') {
-            gbt = 'Go';
-        }
-        $('.achievements .megasync').html(escapeHTML(l[16632]).replace('[X]',
-            '<span class="txt-pad"><span class="big">' + Math.round(res.u[4][0] / 1024 / 1024 / 1024)
-            + '</span> ' + gbt + '</span>') + '*');
-        $('.achievements .invite').html(escapeHTML(l[16633]).replace('[X]',
-            '<span class="txt-pad"><span class="big">' + Math.round(res.u[3][0] / 1024 / 1024 / 1024)
-            + '</span> ' + gbt + '</span>') + '*');
-        $('.achievements .mobile').html(escapeHTML(l[16632]).replace('[X]',
-            '<span class="txt-pad"><span class="big">' + Math.round(res.u[5][0] / 1024 / 1024 / 1024)
-            + '</span> ' + gbt + '</span>') + '*');
-        $('.achievements .expiry').html('*' + escapeHTML(l[16631]).replace('[X]', parseInt(res.u[5][2].replace('d',
-            ''))));
-        $('.bottom-page.top-header').html(escapeHTML(l[16536]).replace('[A]', '').replace('[/A]', '*'));
-        $('.bottom-page.asterisktext').removeClass('hidden');
-    }
-}
-
 
 var start_countdata = false;
 

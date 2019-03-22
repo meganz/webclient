@@ -30,6 +30,9 @@
     box-shadow: rgba(0, 0, 0, 0.1) 0px -1px 0px 0px;
     background-color: rgb(255, 255, 255);
 }
+.download .pages-nav.content-block.floating {
+    padding-top: 48px;
+}
 .download .bottom-page.vertical-centered-bl.top-bl {
     height: 100%;
     height: -webkit-calc(100%);

@@ -1055,7 +1055,7 @@ body.fr .achievement-dialog.expires-txt.red, body.jp .achievement-dialog.expires
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .achievements-scroll .achievements-icon, .achievements-scroll .green-tick, .fm-dialog.verify-phone .achievements-icon {
-    background-image: url(../images/mega/mid-achievements.png);
+    background-image: url(../images/mega/mid-achievements-v2.png);
     background-size: 380px auto;
     background-repeat: no-repeat;
 }
@@ -4332,7 +4332,7 @@ li.token-input-token-invite .input-close {
     top: 0;
     content: '';
     background-position: -269px -211px;
-    background-image: url(../images/mega/mid-achievements.png);
+    background-image: url(../images/mega/mid-achievements-v2.png);
     background-size: 380px auto;
     background-repeat: no-repeat;
 }

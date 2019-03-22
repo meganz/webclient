@@ -978,6 +978,14 @@ a.account-manage-button:hover {
     position: relative;
     margin: 25px 0 0 0;
 }
+.ui-menu.ui-widget {
+    max-height: 200px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
 .ui-slider-handle {
     width: 33px;
     height: 20px;
@@ -1407,7 +1415,7 @@ input.radioOn, input.radioOff {
     padding-right: 24px;
 }
 .fm-account-sections.fm-account-transfers .account-counter-number{
-    margin: 0 12px 0 -16px;
+    margin: 0 10px 0 -16px;
 }
 .fm-dialog-footer .radio-txt {
     padding-right: 0;
@@ -9619,7 +9627,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .export-item-title {
     display: table-cell;
-    max-width: 490px;
+    max-width: 310px;
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -9627,6 +9635,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     vertical-align: top;
     padding-right: 10px;
     color: #333;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .export-link-gray-txt {
     color: #999;
@@ -17103,6 +17114,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
+    position: absolute;
 }
 .ui-helper-clearfix:before, .ui-helper-clearfix:after {
     content: "";
@@ -19343,12 +19355,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     font-family: "source_sans_proregular", Arial;
     font-size: 12px;
     list-style: outside none none;
-    max-height: 200px;
     outline: 0 none;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding: 0;
-    margin: 0;
 }
 #address-dialog-states-menu {
     min-width: 283px;

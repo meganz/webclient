@@ -57,6 +57,17 @@ function init_start() {
         });
     }
 
+    $('.bottom-menu.logo').rebind('click.clickurl', function(e) {
+        e.preventDefault();
+
+        if (page === 'start') {
+            $('.fmholder, html, body').animate({ scrollTop: 0 }, 1600);
+        }
+        else {
+            loadSubPage('start');
+        }
+    });
+
     // Init Scroll to Top button event
     $('.startpage.scroll-to-top').rebind('click', function () {
         $('.fmholder, html, body').animate({ scrollTop: 0 }, 1600);

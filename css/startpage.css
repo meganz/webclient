@@ -4,7 +4,7 @@
 .new-startpage .top-head::after {
     display: none;
 }
-.bottom-page {
+.bottom-page.startpage .top, .bottom-page.startpage .top, .bottom-page.startpage.full-block {
     font-family: 'LatoWeb', 'source_sans_proregular';
 }
 .bottom-page.light-blue {

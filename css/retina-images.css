@@ -202,7 +202,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 192px auto;
 }
 .achievements-scroll .achievements-icon, .achievements-scroll .green-tick, .verify-ph-bonus-valid-days .valid-days-title::before, .fm-dialog.verify-phone .achievements-icon {
-    background-image: url(../images/mega/mid-achievements@2x.png);
+    background-image: url(../images/mega/mid-achievements-v2@2x.png);
     background-size: 380px auto;
     background-repeat: no-repeat;
 }

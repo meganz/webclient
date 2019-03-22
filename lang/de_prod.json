@@ -3108,12 +3108,12 @@
     "20462": "Ihr Account ist [B]gesperrt[\/B]. Sie k\u00f6nnen lediglich lesend auf Ihre Daten zugreifen.",
     "20463": "Bitte setzen Sie sich zur L\u00f6sung des Problems und zur Aktivierung Ihres Accounts mit Ihrem Administrator in Verbindung",
     "20464": "WICHTIG",
-    "20552": "Sicherer Cloudspeicher und Kommunikation. [Br] Schutz Ihrer Privatsph\u00e4re durch Systemarchitektur",
-    "20553": "Richten Sie sich jetzt einen Account ein und erhalten Sie [S]50 GB KOSTENLOSEN*[\/S] Speicherplatz",
+    "20552": "Cloudspeicher und Kommunikation.[Br]Schutz Ihrer Privatsph\u00e4re durch Systemarchitektur.",
+    "20553": "Registrieren Sie sich jetzt und erhalten Sie [S]50 GB KOSTENLOSEN*[\/S] Speicherplatz!",
     "20554": "Zuverl\u00e4ssiger Speicherplatz und schnelle Daten\u00fcbertragung",
     "20555": "Die Cloud can so einfach und bequem sein. Erstellen Sie jetzt Ihren kostenlosen MEGA-Account!",
     "20556": "Jetzt einsteigen",
-    "20557": "Dateien, die Sie auf MEGA speichern, werden so verschl\u00fcsselt, dass nur Sie Zugang zu den Schl\u00fcsseln haben.",
+    "20557": "Nur Sie haben Zugang zu den kryptographischen Schl\u00fcsseln, mit denen Ihre Dateien vor der Speicherung auf MEGA chiffriert werden.",
     "20558": "Sichere Kommunikation",
     "20559": "Nachrichten- und Dateiaustausch sowie qualitativ hochwertige Audio-\/Videokonferenzen mit dem Ende-zu-Ende-verschl\u00fcsselten MEGAchat.",
     "20560": "Die sichere L\u00f6sung f\u00fcr Ihre Firma",
@@ -3158,5 +3158,5 @@
     "20618": "Unbegrenzter Speicherplatz f\u00fcr Teams",
     "20621": "Starten",
     "20624": "Ab %1 \/ Monat",
-    "20625": "Ab %1 pro Benutzer und Monat"
+    "20625": "Ab %1 \/ Benutzer \/ Monat"
 }

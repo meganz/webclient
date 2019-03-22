@@ -936,13 +936,13 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     width: 64px;
 }
 .bottom-page.big-icon.storage {
-    background-position: -160px -673px;
+    background-position: 0 -2583px;
 }
 .bottom-page.big-icon.transfer {
-    background-position: 0 -813px;
+    background-position: 0 -2443px;
 }
 .bottom-page.big-icon.tick {
-    background-position: -160px -953px;
+    background-position: -160px -2583px;
 }
 .bottom-page.big-icon.folders {
     background-position: -119px -1270px;

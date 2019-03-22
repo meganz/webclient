@@ -3340,10 +3340,10 @@
     "20570": "sohbet i\u00e7in herkese a\u00e7\u0131k bir ba\u011flant\u0131 olu\u015fturdu.",
     "20571": "sohbet i\u00e7in genel ba\u011flant\u0131 kald\u0131r\u0131ld\u0131.",
     "20572": "Bilgisayar\u0131n\u0131z ve MEGA bulutunuz aras\u0131nda kolay otomatik senkronizasyon. Windows, Mac ve Linux i\u00e7in kullan\u0131labilir.",
-    "20573": "Sohbet ba\u011flant\u0131lar\u0131n\u0131 etkinle\u015ftirmek i\u00e7in, olu\u015fturmak \u00fczere oldu\u011funuz grubu adland\u0131rman\u0131z gerekir.",
+    "20573": "Bir Sohbet Ba\u011flant\u0131s\u0131n\u0131 etkinle\u015ftirmek i\u00e7in, olu\u015fturmak \u00fczere oldu\u011funuz grubu adland\u0131rman\u0131z gerekir.",
     "20574": "MEGA hesab\u0131n\u0131zla ve dosyalar\u0131n\u0131zla \u00e7al\u0131\u015fmak i\u00e7in bir komut sat\u0131r\u0131 arac\u0131. Windows, Mac ve Linux i\u00e7in kullan\u0131labilir.",
     "20575": "Sohbet Ba\u011flant\u0131s\u0131 Olu\u015ftur",
-    "20576": "\u015eifreleme anahtar\u0131 d\u00f6nd\u00fcrme (kapal\u0131)",
+    "20576": "\u015eifrelemi\u015f anahtar d\u00f6nd\u00fcrme (kapal\u0131)",
     "20577": "Ak\u0131ll\u0131 arama",
     "20578": "MEGA\u2019n\u0131n Mobil Uygulamalar\u0131 hakk\u0131nda daha fazla bilgi edinin.",
     "20579": "MEGA\u2019n\u0131n UWP uygulamas\u0131 hakk\u0131nda daha fazla bilgi edinin.",
@@ -3358,7 +3358,7 @@
     "20588": "MEGA, kullan\u0131c\u0131lar\u0131 i\u00e7in en \u00fcst d\u00fczeyde [A]g\u00fcvenlik[\/A] elde etmek i\u00e7in dikkatlice tasarlanm\u0131\u015ft\u0131r.",
     "20589": "\u015eeffaf",
     "20590": "Anahtar d\u00f6nd\u00fcrmeyi etkinle\u015ftirmek istiyor musunuz?",
-    "20591": "Bu daha g\u00fc\u00e7l\u00fc \u015fifrelemeyi m\u00fcmk\u00fcn k\u0131lar (\u00f6rne\u011fin, anahtar d\u00f6nd\u00fcrmeyi etkinle\u015ftirir). Yeni kat\u0131l\u0131mc\u0131lar yeni mesajlar\u0131 yaln\u0131zca \u00f6zel sohbetlerde g\u00f6rebilir ve art\u0131k bu sohbet i\u00e7in sohbet ba\u011flant\u0131lar\u0131 olu\u015fturamazs\u0131n\u0131z.",
+    "20591": "Bu daha g\u00fc\u00e7l\u00fc \u015fifrelemeyi m\u00fcmk\u00fcn k\u0131lar (\u00f6rne\u011fin, anahtar d\u00f6nd\u00fcrmeyi etkinle\u015ftirir). Yeni kat\u0131l\u0131mc\u0131lar yeni mesajlar\u0131 yaln\u0131zca \u00f6zel sohbetlerde g\u00f6rebilir ve art\u0131k bu sohbet i\u00e7in Sohbet Ba\u011flant\u0131s\u0131 olu\u015fturamazs\u0131n\u0131z.",
     "20592": "MEGA'n\u0131n istemci uygulamalar\u0131 [A1]A\u00e7\u0131k Kaynakl\u0131d\u0131r[\/A1]. Kriptografik mimarisi kapsaml\u0131 [A2]G\u00fcvenlik Beyaz Ka\u011f\u0131d\u0131[\/A2]nda belirtilmi\u015ftir.",
     "20593": "\u00d6zel yap",
     "20594": "Sohbeti \u00f6zel yap",
@@ -3398,5 +3398,5 @@
     "20628": "\u0130\u015f kullan\u0131c\u0131lar\u0131",
     "20629": "Ki\u015filer etkile\u015fime (Sohbet, Arama, Payla\u015f\u0131m) ge\u00e7ebilece\u011finiz ki\u015fi listenize eklenen insanlard\u0131r.",
     "20630": "\u0130\u015f kullan\u0131c\u0131lar\u0131 \u0130\u015f hesab\u0131n\u0131z\u0131n par\u00e7as\u0131 olan insanlard\u0131r. \u0130\u015f kullan\u0131c\u0131lar\u0131 \u0130\u015f ki\u015fileri listenizdeki t\u00fcm kullan\u0131c\u0131lara otomatik olarak eklenecektir.",
-    "20631": "Encryption key rotation (on)"
+    "20631": "\u015eifrelenmi\u015f anahtar d\u00f6nd\u00fcrme (a\u00e7\u0131k)"
 }

@@ -3340,10 +3340,10 @@
     "20570": "created a public link for the chat.",
     "20571": "removed the public link for the chat.",
     "20572": "Vollautomatische Datensynchronisierung zwischen Ihrem Computer und Ihrer MEGA-Cloud. F\u00fcr Windows, Mac und Linux verf\u00fcgbar.",
-    "20573": "To enable Chat links you must name the group you are about to create.",
+    "20573": "To enable a Chat Link you must name the group you are about to create.",
     "20574": "Ein Kommandozeilenwerkzeug f\u00fcr den Zugriff auf Ihren MEGA-Account. F\u00fcr Windows, Mac und Linux.",
     "20575": "Create Chat Link",
-    "20576": "Encryption key rotation (off)",
+    "20576": "Encrypted key rotation (off)",
     "20577": "Relevante Kontakte",
     "20578": "Mehr zu den Mobil-Apps von MEGA",
     "20579": "Mehr zu der MEGA-UWP-App",
@@ -3358,7 +3358,7 @@
     "20588": "Die Architektur von MEGA stellt die [A]Sicherheit[\/A] seiner Benutzer in den Mittelpunkt.",
     "20589": "Transparenz",
     "20590": "Do you want to enable key rotation?",
-    "20591": "This will enable stronger cryptography (e.g. enable key rotation). New participants can only see new messages in private chats and you can no longer create chat links for this chat.",
+    "20591": "This will enable stronger cryptography (e.g. enable key rotation). New participants can only see new messages in private chats and you can no longer create a Chat Link for this chat.",
     "20592": "Alle Client-Apps von MEGA sind [A1]quelloffen[\/A1]. Seine kryptographische Architektur ist in einem [A2]Security Whitepaper[\/A2] detailliert beschrieben.",
     "20593": "Make private",
     "20594": "Make chat private",
@@ -3398,5 +3398,5 @@
     "20628": "Business-User",
     "20629": "Kontakte sind Benutzer, die Sie Ihrer Kontaktliste hinzuf\u00fcgen, um mit ihnen kommunizieren oder Ordnerfreigaben teilen zu k\u00f6nnen.",
     "20630": "Business-User sind Mitglieder Ihres Business-Accounts. Neue User erscheinen automatisch in allen Kontaktlisten der bestehenden User.",
-    "20631": "Encryption key rotation (on)"
+    "20631": "Encrypted key rotation (on)"
 }

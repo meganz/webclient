@@ -3358,7 +3358,7 @@
     "20588": "MEGA is carefully engineered to achieve the highest level of [A]security[\/A] for its users.",
     "20589": "Minh b\u1ea1ch",
     "20590": "Do you want to enable key rotation?",
-    "20591": "This will enable stronger cryptography (e.g. enable key rotation). New participants can only see new messages in private chats and you can no longer create chat links for this chat.",
+    "20591": "This will enable stronger cryptography (e.g. enable key rotation). New participants can only see new messages in private chats and you can no longer create a Chat Link for this chat.",
     "20592": "MEGA\u2019s client apps are [A1]Public Source[\/A1]. Its cryptographic architecture is specified in a comprehensive [A2]Security Whitepaper[\/A2].",
     "20593": "Make private",
     "20594": "Make chat private",
@@ -3398,5 +3398,5 @@
     "20628": "Business users",
     "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
     "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists.",
-    "20631": "Encryption key rotation (on)"
+    "20631": "Encrypted key rotation (on)"
 }

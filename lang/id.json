@@ -1521,7 +1521,6 @@
     "16173": "Pilih warna:",
     "16176": "Timpa",
     "16200": "Suara dan Panggilan Suara",
-    "16217": "Partisipan",
     "16221": "Tambah label %1",
     "16258": "Tampilan status",
     "16259": "Auto-away",
@@ -3313,7 +3312,6 @@
     "20500": "Sebelum Anda dapat membuat tautan untuk obrolan ini, Anda perlu menetapkan deskripsi:",
     "20520": "Error. File belum dikirim ke salah satu obrolan yang dipilih",
     "20522": "Hapus semua",
-    "20527": "%d versi berhasil dihapus",
     "20532": "Keamanan adalah alasan kami ada, file Anda aman bersama kami di belakang mesin enkripsi yang diminyaki di mana hanya Anda yang dapat mengakses file Anda.",
     "20533": "Buat Jaringan Anda",
     "20534": "Tambahkan kontak, buat jaringan, berkolaborasi, buat panggilan suara dan video tanpa harus meninggalkan MEGA",
@@ -3393,10 +3391,8 @@
     "20623": "Aktifkan rotasi tombol",
     "20624": "Dari %1 \/ bulan",
     "20625": "Dari %1 \/ pengguna \/ bulan",
-    "20626": "Frequents",
     "20627": "Apakah Anda ingin menambahkan kontak atau menambahkan pengguna ke akun Bisnis Anda?",
     "20628": "Pengguna bisnis",
     "20629": "Kontak adalah orang yang Anda tambahkan ke daftar kontak Anda untuk dapat berinteraksi dengan (Obrolan, Panggilan, Bagikan).",
-    "20630": "Pengguna bisnis adalah orang-orang yang merupakan bagian dari akun Bisnis Anda. Pengguna bisnis akan ditambahkan secara otomatis ke semua pengguna lain dalam daftar kontak Bisnis Anda.",
-    "20631": "Encrypted key rotation (on)"
+    "20630": "Pengguna bisnis adalah orang-orang yang merupakan bagian dari akun Bisnis Anda. Pengguna bisnis akan ditambahkan secara otomatis ke semua pengguna lain dalam daftar kontak Bisnis Anda."
 }

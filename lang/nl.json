@@ -1521,7 +1521,6 @@
     "16173": "Kies kleur:",
     "16176": "Plakken",
     "16200": "Spraak en Video oproepen",
-    "16217": "Deelnemers",
     "16221": "Voeg label toe %1",
     "16258": "Mijn status",
     "16259": "Automatisch op afwezig",
@@ -3313,7 +3312,6 @@
     "20500": "Before you can generate a link for this chat, you need to set a description:",
     "20520": "Fout. Het bestand was niet verzonden naar elk van de geselecteerde gesprekken",
     "20522": "Verwijder oudere versies",
-    "20527": "%d versie succesvol verwijderd",
     "20532": "Veiligheid is waarom we bestaan, uw bestanden zijn veilig bij ons achter een goed geolied coderingsapparaat waar alleen u toegang heeft tot uw bestanden.",
     "20533": "Cre\u00eber uw Netwerk",
     "20534": "Contacten toevoegen, cre\u00eber een netwerk, samenwerken, maak spraak en video gesprekken zonder ooit MEGA te verlaten",
@@ -3393,10 +3391,8 @@
     "20623": "Sleutel rotatie inschakelen",
     "20624": "From %1 \/ month",
     "20625": "From %1 \/ user \/ month",
-    "20626": "Frequents",
     "20627": "Do you want to add a contact or add a user to your Business account?",
     "20628": "Business users",
     "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
-    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists.",
-    "20631": "Encrypted key rotation (on)"
+    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists."
 }

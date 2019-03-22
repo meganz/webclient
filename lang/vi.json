@@ -1521,7 +1521,6 @@
     "16173": "Ch\u1ecdn m\u00e0u:",
     "16176": "Ch\u00e8n",
     "16200": "G\u1ecdi Tho\u1ea1i v\u00e0 Video",
-    "16217": "C\u00e1c Th\u00e0nh Vi\u00ean",
     "16221": "D\u00e1n nh\u00e3n m\u00e0u %1",
     "16258": "Tr\u1ea1ng th\u00e1i ho\u1ea1t \u0111\u1ed9ng online",
     "16259": "T\u1ef1 \u0111\u1ed9ng v\u1eafng m\u1eb7t",
@@ -3313,7 +3312,6 @@
     "20500": "Before you can generate a link for this chat, you need to set a description:",
     "20520": "L\u1ed7i. T\u1ec7p tin ch\u01b0a g\u1eedi \u0111\u01b0\u1ee3c t\u1edbi cu\u1ed9c chat \u0111\u00e3 ch\u1ecdn.",
     "20522": "Xo\u00e1 c\u00e1c phi\u00ean b\u1ea3n c\u0169",
-    "20527": "%d version deleted successfully",
     "20532": "Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access your files.",
     "20533": "Create your Network",
     "20534": "Add contacts, create a network, colaborate, make voice and video calls without ever leaving MEGA",
@@ -3393,10 +3391,8 @@
     "20623": "Enable key rotation",
     "20624": "Gi\u00e1 t\u1eeb %1 \/ th\u00e1ng",
     "20625": "Gi\u00e1 t\u1eeb %1 \/ ng\u01b0\u1eddi \/ th\u00e1ng",
-    "20626": "Frequents",
     "20627": "Do you want to add a contact or add a user to your Business account?",
     "20628": "Business users",
     "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
-    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists.",
-    "20631": "Encrypted key rotation (on)"
+    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists."
 }

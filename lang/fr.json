@@ -1521,7 +1521,6 @@
     "16173": "Choisir une couleur :",
     "16176": "Coller",
     "16200": "Appels vocaux et vid\u00e9os",
-    "16217": "Participants",
     "16221": "Ajouter une \u00e9tiquette %1",
     "16258": "Indicateur d\u2019\u00e9tat",
     "16259": "Absence automatique",
@@ -3313,7 +3312,6 @@
     "20500": "Before you can generate a link for this chat, you need to set a description:",
     "20520": "Erreur. Le fichier n\u2019a \u00e9t\u00e9 envoy\u00e9 \u00e0 aucune des conversations s\u00e9lectionn\u00e9es",
     "20522": "Supprimer les anciennes versions",
-    "20527": "%d version deleted successfully",
     "20532": "La s\u00e9curit\u00e9 est notre raison d\u2019\u00eatre. Avec nous, vos fichiers sont en s\u00e9curit\u00e9 \u00e0 l\u2019abri d\u2019un syst\u00e8me de chiffrement efficace dans lequel vous seul avez acc\u00e8s \u00e0 vos fichiers.",
     "20533": "Cr\u00e9er votre r\u00e9seau",
     "20534": "Ajoutez des contacts, cr\u00e9ez un r\u00e9seau, collaborez, faites des appels voix ou vid\u00e9o sans jamais quitter MEGA",
@@ -3393,10 +3391,8 @@
     "20623": "Activer la rotation de la cl\u00e9",
     "20624": "From %1 \/ month",
     "20625": "From %1 \/ user \/ month",
-    "20626": "Frequents",
     "20627": "Do you want to add a contact or add a user to your Business account?",
     "20628": "Business users",
     "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
-    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists.",
-    "20631": "Encrypted key rotation (on)"
+    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists."
 }

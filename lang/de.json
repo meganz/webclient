@@ -1521,7 +1521,6 @@
     "16173": "Farbe w\u00e4hlen:",
     "16176": "Einf\u00fcgen",
     "16200": "Audio- und Videoanrufe",
-    "16217": "Teilnehmer",
     "16221": "Mit %1 markieren",
     "16258": "Ihr Onlinestatus",
     "16259": "Auto-Abwesend",
@@ -3313,7 +3312,6 @@
     "20500": "Before you can generate a link for this chat, you need to set a description:",
     "20520": "Die Datei konnte nicht versandt werden",
     "20522": "Alle l\u00f6schen",
-    "20527": "%d version deleted successfully",
     "20532": "Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access your files.",
     "20533": "Create your Network",
     "20534": "Add contacts, create a network, colaborate, make voice and video calls without ever leaving MEGA",
@@ -3393,10 +3391,8 @@
     "20623": "Schl\u00fcsselwechsel aktivieren",
     "20624": "Ab %1 \/ Monat",
     "20625": "Ab %1 pro Benutzer und Monat",
-    "20626": "Frequents",
     "20627": "Wollen Sie einen Kontakt oder einen neuen Benutzer hinzuf\u00fcgen?",
     "20628": "Business-User",
     "20629": "Kontakte sind Benutzer, die Sie Ihrer Kontaktliste hinzuf\u00fcgen, um mit ihnen kommunizieren oder Ordnerfreigaben teilen zu k\u00f6nnen.",
-    "20630": "Business-User sind Mitglieder Ihres Business-Accounts. Neue User erscheinen automatisch in allen Kontaktlisten der bestehenden User.",
-    "20631": "Encrypted key rotation (on)"
+    "20630": "Business-User sind Mitglieder Ihres Business-Accounts. Neue User erscheinen automatisch in allen Kontaktlisten der bestehenden User."
 }

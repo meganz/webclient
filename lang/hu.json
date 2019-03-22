@@ -1521,7 +1521,6 @@
     "16173": "Choose colour:",
     "16176": "Paste",
     "16200": "Voice and Video Calls",
-    "16217": "Participants",
     "16221": "Add label %1",
     "16258": "Status appearance",
     "16259": "Auto-away",
@@ -3313,7 +3312,6 @@
     "20500": "Az \u00fczenetv\u00e1lt\u00e1shoz tartoz\u00f3 hivatkoz\u00e1s lek\u00e9r\u00e9se el\u0151tt, adjon hozz\u00e1 le\u00edr\u00e1st:",
     "20520": "Error. The file has not been sent to any of the selected chats",
     "20522": "Delete old versions",
-    "20527": "%d v\u00e1ltozat sikeresen t\u00f6r\u00f6lve",
     "20532": "Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access your files.",
     "20533": "Create your Network",
     "20534": "Add contacts, create a network, colaborate, make voice and video calls without ever leaving MEGA",
@@ -3393,10 +3391,8 @@
     "20623": "Kulcsv\u00e1ltogat\u00e1s bekapcsol\u00e1sa",
     "20624": "Havi %1-t\u00f3l",
     "20625": "%1-t\u00f3l \/ felhaszn\u00e1l\u00f3 \/ h\u00f3nap",
-    "20626": "Frequents",
     "20627": "Kapcsolatot, vagy felhaszn\u00e1l\u00f3t adna hozz\u00e1 az \u00dczleti fi\u00f3kj\u00e1hoz?",
     "20628": "\u00dczleti felhaszn\u00e1l\u00f3k",
     "20629": "A Kapcsolatokat az\u00e9rt adja a kapcsolatoklist\u00e1hoz, hogy \u00e9rtekezhessen vel\u00fck (Cseveg\u00e9s, H\u00edv\u00e1s, Megoszt\u00e1s)",
-    "20630": "Az \u00dczleti felhaszn\u00e1l\u00f3k az \u00dczleti fi\u00f3kj\u00e1nak tagjai. \u0150k automatikusan beker\u00fclnek az \u00dczleti kapcsolatai list\u00e1j\u00e1nak t\u00f6bbi felhaszn\u00e1l\u00f3ja k\u00f6z\u00e9.",
-    "20631": "Encrypted key rotation (on)"
+    "20630": "Az \u00dczleti felhaszn\u00e1l\u00f3k az \u00dczleti fi\u00f3kj\u00e1nak tagjai. \u0150k automatikusan beker\u00fclnek az \u00dczleti kapcsolatai list\u00e1j\u00e1nak t\u00f6bbi felhaszn\u00e1l\u00f3ja k\u00f6z\u00e9."
 }

@@ -1521,7 +1521,6 @@
     "16173": "Renk se\u00e7:",
     "16176": "Yap\u0131\u015ft\u0131r",
     "16200": "Sesli ve G\u00f6r\u00fcnt\u00fcl\u00fc Arama",
-    "16217": "Kat\u0131l\u0131mc\u0131lar",
     "16221": "%1 etiketini ekle",
     "16258": "Durum g\u00f6r\u00fcn\u00fcm\u00fc",
     "16259": "Oto-d\u0131\u015far\u0131da",
@@ -3313,7 +3312,6 @@
     "20500": "Bu sohbet i\u00e7in bir ba\u011flant\u0131 olu\u015fturmadan \u00f6nce, a\u00e7\u0131klay\u0131c\u0131 bir konu belirlemeniz gerekir:",
     "20520": "Hata. Dosya se\u00e7ilen sohbetlerden hi\u00e7birine g\u00f6nderilmedi",
     "20522": "Eski s\u00fcr\u00fcmleri sil",
-    "20527": "%d s\u00fcr\u00fcm\u00fc ba\u015far\u0131yla silindi",
     "20532": "Var olmam\u0131z\u0131n sebebi g\u00fcvenliktir, dosyalar\u0131n\u0131z sadece sizin eri\u015febilece\u011finiz g\u00fczelce ya\u011flanm\u0131\u015f bir \u015fifreleme makinesinin arkas\u0131nda bizle g\u00fcvendedir.",
     "20533": "A\u011f\u0131n\u0131z\u0131 Olu\u015fturun",
     "20534": "MEGA'dan ayr\u0131lmadan ki\u015filer ekleyin, a\u011f olu\u015fturun, i\u015fbirli\u011fi yap\u0131n, sesli ve g\u00f6r\u00fcnt\u00fcl\u00fc aramalar yap\u0131n.",
@@ -3369,7 +3367,7 @@
     "20599": "MEGA, do\u011frudan yedekli sunucu altyap\u0131s\u0131na sahiptir ve bunlar\u0131 i\u015fleterek verilerinizin her zaman kullan\u0131labilir durumda olmas\u0131n\u0131 sa\u011flar.",
     "20600": "C\u00f6mert",
     "20601": "MEGA, \u00fccretsiz depolama alan\u0131n\u0131z\u0131 geni\u015fletmek ve yaymak i\u00e7in kolay yollarla, \u0130nternet \u00fczerindeki en c\u00f6mert bulut hizmetlerinden biridir.",
-    "20602": "MEGA ile Neler Yapabilirsiniz?",
+    "20602": "MEGA ile neler yapabilirsiniz?",
     "20603": "Dosya ve klas\u00f6rlerinize g\u00fcvenli ba\u011flant\u0131lar verin veya MEGA'daki ki\u015filerinizle do\u011frudan klas\u00f6rleri payla\u015f\u0131n.",
     "20604": "Ba\u011flan",
     "20605": "MEGA'daki ki\u015filerinize ba\u011flan\u0131n ve g\u00fcvenli bir \u015fekilde ileti\u015fimde kal\u0131n.",
@@ -3393,10 +3391,8 @@
     "20623": "Anahtar d\u00f6nd\u00fcrmeyi etkinle\u015ftir",
     "20624": "Ay \/ %1 ba\u015flayan",
     "20625": "Ay \/ kullan\u0131c\u0131 \/ %1 ba\u015flayan",
-    "20626": "Frequents",
     "20627": "Ki\u015fi olarak m\u0131 yoksa i\u015f hesab\u0131n\u0131za kullan\u0131c\u0131 olarak m\u0131 eklemek istersiniz?",
     "20628": "\u0130\u015f kullan\u0131c\u0131lar\u0131",
     "20629": "Ki\u015filer etkile\u015fime (Sohbet, Arama, Payla\u015f\u0131m) ge\u00e7ebilece\u011finiz ki\u015fi listenize eklenen insanlard\u0131r.",
-    "20630": "\u0130\u015f kullan\u0131c\u0131lar\u0131 \u0130\u015f hesab\u0131n\u0131z\u0131n par\u00e7as\u0131 olan insanlard\u0131r. \u0130\u015f kullan\u0131c\u0131lar\u0131 \u0130\u015f ki\u015fileri listenizdeki t\u00fcm kullan\u0131c\u0131lara otomatik olarak eklenecektir.",
-    "20631": "\u015eifrelenmi\u015f anahtar d\u00f6nd\u00fcrme (a\u00e7\u0131k)"
+    "20630": "\u0130\u015f kullan\u0131c\u0131lar\u0131 \u0130\u015f hesab\u0131n\u0131z\u0131n par\u00e7as\u0131 olan insanlard\u0131r. \u0130\u015f kullan\u0131c\u0131lar\u0131 \u0130\u015f ki\u015fileri listenizdeki t\u00fcm kullan\u0131c\u0131lara otomatik olarak eklenecektir."
 }

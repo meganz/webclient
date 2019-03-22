@@ -985,6 +985,7 @@ a.account-manage-button:hover {
     position: relative;
     padding: 0;
     margin: 0;
+    display: block;
 }
 .ui-slider-handle {
     width: 33px;
@@ -17114,7 +17115,6 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
-    position: absolute;
 }
 .ui-helper-clearfix:before, .ui-helper-clearfix:after {
     content: "";
@@ -19351,7 +19351,6 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     color: #888787;
-    display: block;
     font-family: "source_sans_proregular", Arial;
     font-size: 12px;
     list-style: outside none none;

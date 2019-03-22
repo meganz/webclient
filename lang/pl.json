@@ -1521,7 +1521,6 @@
     "16173": "Wybierz kolor:",
     "16176": "Wklej",
     "16200": "Rozmowy i Video",
-    "16217": "Uczestnicy",
     "16221": "Dodaj etykiet\u0119 %1",
     "16258": "Status widoczno\u015bci",
     "16259": "Auto-drzemka",
@@ -3313,7 +3312,6 @@
     "20500": "Zanim wygenerujesz link do tego czatu, musisz ustawi\u0107 opis:",
     "20520": "B\u0142\u0105d. Plik nie zosta\u0142 wys\u0142any do wybranych czat\u00f3w.",
     "20522": "Usu\u0144 stare wersje",
-    "20527": "%d wersja usuni\u0119ta pomy\u015blnie",
     "20532": "Bezpiecze\u0144stwo, dlatego istniejemy, twoje pliki s\u0105 bezpieczne u nas za dobrze naoliwion\u0105 maszyn\u0105 szyfruj\u0105c\u0105, gdzie tylko ty masz dost\u0119p do twoich plik\u00f3w.",
     "20533": "Stw\u00f3rz swoj\u0105 sie\u0107",
     "20534": "Dodawaj kontakty, tw\u00f3rz sie\u0107, wsp\u00f3\u0142pracuj, nawi\u0105zywaj po\u0142\u0105czenia g\u0142osowe i wideo bez opuszczania MEGA",
@@ -3393,10 +3391,8 @@
     "20623": "W\u0142\u0105cz rotacj\u0119 kluczy",
     "20624": "Od %1 \/ miesi\u0105c",
     "20625": "Od %1 \/ u\u017cytkownik \/ miesi\u0105c",
-    "20626": "Frequents",
     "20627": "Czy chcesz doda\u0107 kontakt lub doda\u0107 u\u017cytkownika do konta firmowego?",
     "20628": "U\u017cytkownicy biznesowi",
     "20629": "Kontakty to osoby, kt\u00f3re dodajesz do listy kontakt\u00f3w, aby m\u00f3c wchodzi\u0107 w interakcje (Czat, Po\u0142\u0105cz, Udost\u0119pnij).",
-    "20630": "U\u017cytkownicy biznesowi to osoby, kt\u00f3re s\u0105 cz\u0119\u015bci\u0105 Twojego konta biznesowego. U\u017cytkownicy biznesowi zostan\u0105 automatycznie dodani do wszystkich innych u\u017cytkownik\u00f3w na listach kontakt\u00f3w biznesowych.",
-    "20631": "Encrypted key rotation (on)"
+    "20630": "U\u017cytkownicy biznesowi to osoby, kt\u00f3re s\u0105 cz\u0119\u015bci\u0105 Twojego konta biznesowego. U\u017cytkownicy biznesowi zostan\u0105 automatycznie dodani do wszystkich innych u\u017cytkownik\u00f3w na listach kontakt\u00f3w biznesowych."
 }

@@ -3290,6 +3290,7 @@
     "20441": "You are not allowed to enable video as this call has reached the maximum number of participants using video.",
     "20445": "Ongoing Call",
     "20449": "Annehmen",
+    "20454": "Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.",
     "20460": "Audio\/Video-Konferenz aktiv [A]Teilnehmen[\/A]",
     "20461": "Keine Ordner im Cloud Drive",
     "20462": "Ihr Account ist [B]gesperrt[\/B]. Sie k\u00f6nnen lediglich lesend auf Ihre Daten zugreifen.",

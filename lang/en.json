@@ -3290,6 +3290,7 @@
     "20441": "You are not allowed to enable video as this call has reached the maximum number of participants using video.",
     "20445": "Ongoing Call",
     "20449": "Answer",
+    "20454": "Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.",
     "20460": "There is an active call. [A]Join[\/A]",
     "20461": "No folders in Cloud Drive",
     "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",

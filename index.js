@@ -2428,7 +2428,12 @@ function topmenuUI() {
     // If the main Mega M logo in the header is clicked
     $('.top-head, .fm-main').find('.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
-            loadSubPage('start');
+            if (folderlink) {
+                M.openFolder(M.RootID, true);
+            }
+            else {
+                loadSubPage(typeof u_type !== 'undefined' && parseInt(u_type) > 2 ? 'fm' : 'start');
+            }
         }
     });
 

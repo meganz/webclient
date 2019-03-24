@@ -232,6 +232,11 @@ var alarm = {
                 return false;
             }
 
+            // If they recently upgraded to Pro in this session, don't render the icon & dialog
+            if (typeof u_attr !== 'undefined' && u_attr.p > 0) {
+                return false;
+            }
+
             // Ignored payment provider IDs (not applicable or no longer in use)
             var gatewayIgnoreList = [1, 2, 3, 7, 8, 13];
             var gatewayId = this.lastPayment.gw;

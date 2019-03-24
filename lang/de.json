@@ -3290,6 +3290,7 @@
     "20441": "You are not allowed to enable video as this call has reached the maximum number of participants using video.",
     "20445": "Ongoing Call",
     "20449": "Annehmen",
+    "20454": "Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.",
     "20460": "Audio\/Video-Konferenz aktiv [A]Teilnehmen[\/A]",
     "20461": "Keine Ordner im Cloud Drive",
     "20462": "Ihr Account ist [B]gesperrt[\/B]. Sie k\u00f6nnen lediglich lesend auf Ihre Daten zugreifen.",
@@ -3394,5 +3395,7 @@
     "20627": "Wollen Sie einen Kontakt oder einen neuen Benutzer hinzuf\u00fcgen?",
     "20628": "Business-User",
     "20629": "Kontakte sind Benutzer, die Sie Ihrer Kontaktliste hinzuf\u00fcgen, um mit ihnen kommunizieren oder Ordnerfreigaben teilen zu k\u00f6nnen.",
-    "20630": "Business-User sind Mitglieder Ihres Business-Accounts. Neue User erscheinen automatisch in allen Kontaktlisten der bestehenden User."
+    "20630": "Business-User sind Mitglieder Ihres Business-Accounts. Neue User erscheinen automatisch in allen Kontaktlisten der bestehenden User.",
+    "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
+    "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A]."
 }

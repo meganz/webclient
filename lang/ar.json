@@ -3290,6 +3290,7 @@
     "20441": "You are not allowed to enable video as this call has reached the maximum number of participants using video.",
     "20445": "Ongoing Call",
     "20449": "\u0625\u062c\u0627\u0628\u0629",
+    "20454": "Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.",
     "20460": "There is an active call. [A]Join[\/A]",
     "20461": "No folders in Cloud Drive",
     "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
@@ -3394,5 +3395,7 @@
     "20627": "Do you want to add a contact or add a user to your Business account?",
     "20628": "Business users",
     "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
-    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists."
+    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists.",
+    "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
+    "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A]."
 }

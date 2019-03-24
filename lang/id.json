@@ -3290,6 +3290,7 @@
     "20441": "Anda tidak diizinkan untuk mengaktifkan video karena panggilan ini telah mencapai jumlah maksimum peserta menggunakan video.",
     "20445": "Panggilan yang sedang berlangsung",
     "20449": "Jawab",
+    "20454": "Rotasi tombol sedikit lebih aman, tetapi tidak memungkinkan Anda membuat tautan obrolan dan peserta baru tidak akan melihat pesan sebelumnya.",
     "20460": "Ada panggilan aktif. [A]Bergabunglah[\/A]",
     "20461": "Tidak ada folder di Cloud Drive",
     "20462": "Akun Anda saat ini [B]ditangguhkan[\/B]. Anda hanya dapat menelusuri data Anda.",
@@ -3394,5 +3395,7 @@
     "20627": "Apakah Anda ingin menambahkan kontak atau menambahkan pengguna ke akun Bisnis Anda?",
     "20628": "Pengguna bisnis",
     "20629": "Kontak adalah orang yang Anda tambahkan ke daftar kontak Anda untuk dapat berinteraksi dengan (Obrolan, Panggilan, Bagikan).",
-    "20630": "Pengguna bisnis adalah orang-orang yang merupakan bagian dari akun Bisnis Anda. Pengguna bisnis akan ditambahkan secara otomatis ke semua pengguna lain dalam daftar kontak Bisnis Anda."
+    "20630": "Pengguna bisnis adalah orang-orang yang merupakan bagian dari akun Bisnis Anda. Pengguna bisnis akan ditambahkan secara otomatis ke semua pengguna lain dalam daftar kontak Bisnis Anda.",
+    "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
+    "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A]."
 }

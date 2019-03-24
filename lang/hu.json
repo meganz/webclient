@@ -3290,6 +3290,7 @@
     "20441": "You are not allowed to enable video as this call has reached the maximum number of participants using video.",
     "20445": "Ongoing Call",
     "20449": "V\u00e1lasz",
+    "20454": "Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.",
     "20460": "H\u00edv\u00e1s van folyamatban. [A]Csatlakoz\u00e1s[\/A]",
     "20461": "Nincs mappa a Felh\u0151 T\u00e1rhelyen",
     "20462": "A fi\u00f3kja jelenleg [B]fel van f\u00fcggesztve[\/B]. Adatait kiz\u00e1r\u00f3lag megtekintheti.",
@@ -3394,5 +3395,7 @@
     "20627": "Kapcsolatot, vagy felhaszn\u00e1l\u00f3t adna hozz\u00e1 az \u00dczleti fi\u00f3kj\u00e1hoz?",
     "20628": "\u00dczleti felhaszn\u00e1l\u00f3k",
     "20629": "A Kapcsolatokat az\u00e9rt adja a kapcsolatoklist\u00e1hoz, hogy \u00e9rtekezhessen vel\u00fck (Cseveg\u00e9s, H\u00edv\u00e1s, Megoszt\u00e1s)",
-    "20630": "Az \u00dczleti felhaszn\u00e1l\u00f3k az \u00dczleti fi\u00f3kj\u00e1nak tagjai. \u0150k automatikusan beker\u00fclnek az \u00dczleti kapcsolatai list\u00e1j\u00e1nak t\u00f6bbi felhaszn\u00e1l\u00f3ja k\u00f6z\u00e9."
+    "20630": "Az \u00dczleti felhaszn\u00e1l\u00f3k az \u00dczleti fi\u00f3kj\u00e1nak tagjai. \u0150k automatikusan beker\u00fclnek az \u00dczleti kapcsolatai list\u00e1j\u00e1nak t\u00f6bbi felhaszn\u00e1l\u00f3ja k\u00f6z\u00e9.",
+    "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
+    "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A]."
 }

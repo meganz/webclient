@@ -3290,6 +3290,7 @@
     "20441": "Nie mo\u017cesz w\u0142\u0105czy\u0107 wideo, poniewa\u017c to po\u0142\u0105czenie osi\u0105gn\u0119\u0142o maksymaln\u0105 liczb\u0119 uczestnik\u00f3w korzystaj\u0105cych z wideo.",
     "20445": "Trwaj\u0105ce po\u0142\u0105czenie",
     "20449": "Odpowied\u017a",
+    "20454": "Rotacja klucza jest nieco bezpieczniejsza, ale nie pozwala utworzy\u0107 \u0142\u0105cza do czatu, a nowi uczestnicy nie b\u0119d\u0105 widzie\u0107 poprzednich wiadomo\u015bci.",
     "20460": "Jest aktywne po\u0142\u0105czenie. [A]Do\u0142\u0105cz[\/A]",
     "20461": "Brak folder\u00f3w w us\u0142udze Cloud Drive",
     "20462": "Twoje konto jest obecnie [B]zawieszone[\/B]. Mo\u017cesz tylko przegl\u0105da\u0107 swoje dane.",
@@ -3394,5 +3395,7 @@
     "20627": "Czy chcesz doda\u0107 kontakt lub doda\u0107 u\u017cytkownika do konta firmowego?",
     "20628": "U\u017cytkownicy biznesowi",
     "20629": "Kontakty to osoby, kt\u00f3re dodajesz do listy kontakt\u00f3w, aby m\u00f3c wchodzi\u0107 w interakcje (Czat, Po\u0142\u0105cz, Udost\u0119pnij).",
-    "20630": "U\u017cytkownicy biznesowi to osoby, kt\u00f3re s\u0105 cz\u0119\u015bci\u0105 Twojego konta biznesowego. U\u017cytkownicy biznesowi zostan\u0105 automatycznie dodani do wszystkich innych u\u017cytkownik\u00f3w na listach kontakt\u00f3w biznesowych."
+    "20630": "U\u017cytkownicy biznesowi to osoby, kt\u00f3re s\u0105 cz\u0119\u015bci\u0105 Twojego konta biznesowego. U\u017cytkownicy biznesowi zostan\u0105 automatycznie dodani do wszystkich innych u\u017cytkownik\u00f3w na listach kontakt\u00f3w biznesowych.",
+    "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
+    "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A]."
 }

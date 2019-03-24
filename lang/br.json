@@ -3290,6 +3290,7 @@
     "20441": "Voc\u00ea n\u00e3o tem permiss\u00e3o para ativar o v\u00eddeo, pois essa chamada alcan\u00e7ou o n\u00famero m\u00e1ximo de participantes usando o v\u00eddeo.",
     "20445": "Chamada em andamento",
     "20449": "Responder",
+    "20454": "A rota\u00e7\u00e3o de chaves \u00e9 um pouco mais segura, mas n\u00e3o permite criar um link para o chat, e os novos participantes n\u00e3o ver\u00e3o as mensagens anteriores.",
     "20460": "H\u00e1 uma chamada ativa. [A]Entrar[\/A]",
     "20461": "N\u00e3o h\u00e1 pastas na sua Nuvem de arquivos",
     "20462": "A sua conta est\u00e1 [B]suspensa[\/B]. Voc\u00ea s\u00f3 pode visualizar os seus dados.",
@@ -3394,5 +3395,7 @@
     "20627": "Do you want to add a contact or add a user to your Business account?",
     "20628": "Business users",
     "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
-    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists."
+    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists.",
+    "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
+    "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A]."
 }

@@ -3290,6 +3290,7 @@
     "20441": "Non ti \u00e8 permesso di attivare il video in questa chiamata in quanto ha raggiunto il massimo numero di partecipanti che utilizzano il video.",
     "20445": "Chiamata in corso",
     "20449": "Rispondi",
+    "20454": "La rotazione della chiave \u00e8 leggermente pi\u00f9 sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.",
     "20460": "C'\u00e8 una chiamata attiva in corso. [A]Unisciti[\/A]",
     "20461": "Nessuna cartella nel Cloud Drive",
     "20462": "Il tuo account \u00e8 [B]sospeso[\/B] al momento. Puoi solo sfogliare tra i tuoi dati.",
@@ -3394,5 +3395,7 @@
     "20627": "Vuoi aggiungere un contatto o aggiungere un utente al tuo account Business?",
     "20628": "Utente Business",
     "20629": "I contatti sono le persone che aggiungi alla tua lista dei contatti per poterci interagire (chat, chiamate, condivisioni).",
-    "20630": "Gli utenti Business sono le persone che fanno parte del tuo account Business. Gli utenti Business verranno aggiunti automaticamente a tutti gli altri utenti nella tua lista dei contatti Business."
+    "20630": "Gli utenti Business sono le persone che fanno parte del tuo account Business. Gli utenti Business verranno aggiunti automaticamente a tutti gli altri utenti nella tua lista dei contatti Business.",
+    "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
+    "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A]."
 }

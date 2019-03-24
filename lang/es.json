@@ -3290,6 +3290,7 @@
     "20441": "No puedes activar el video ya que se alcanzado el n\u00famero m\u00e1ximo de participantes que usan el video en esta llamada.",
     "20445": "Llamada en curso",
     "20449": "Contestar",
+    "20454": "La rotaci\u00f3n de la clave es ligeramente m\u00e1s segura, pero no podr\u00e1s crear un enlace del chat y los nuevos participantes no ver\u00e1n los mensajes anteriores.",
     "20460": "Hay una llamada en curso. [A]\u00danete[\/A]",
     "20461": "No hay carpetas en tu Nube",
     "20462": "Tu cuenta est\u00e1 [B]suspendida[\/B]. Solo puedes ver tus datos.",
@@ -3394,5 +3395,7 @@
     "20627": "Do you want to add a contact or add a user to your Business account?",
     "20628": "Business users",
     "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
-    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists."
+    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists.",
+    "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
+    "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A]."
 }

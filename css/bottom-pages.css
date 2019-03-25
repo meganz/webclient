@@ -14,6 +14,17 @@
     font-style: normal;
 }
 @font-face {
+    font-family: 'LatoWebLight';
+    src: url('../fonts/Lato-Light.eot'); /* IE9 Compat Modes */
+    src: url('../fonts/Lato-Light.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../fonts/Lato-Light.woff2') format('woff2'), /* Modern Browsers */
+         url('../fonts/Lato-Light.woff') format('woff'), /* Modern Browsers */
+         url('../fonts/Lato-Light.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 300;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
     font-family: 'LatoWeb';
     src: url('../fonts/Lato-Regular.eot'); /* IE9 Compat Modes */
     src: url('../fonts/Lato-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
@@ -552,7 +563,7 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     font-size: 36px;
     color: #333333;
     line-height: 48px;
-    padding: 0 15px 14px 0;
+    padding: 0 0 14px 0;
     max-width: 890px;
     margin: 0 auto;
     -webkit-box-sizing: border-box;
@@ -840,7 +851,7 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     vertical-align: top;
     width: 8px;
     height: 13px;
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: -165px -7px;
     background-repeat: no-repeat;
 }
@@ -876,7 +887,7 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     width: 102px;
     height: 102px;
     margin: 10px auto 26px auto;
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: 0 -533px;
     background-repeat: no-repeat;
     padding: 0;
@@ -1365,7 +1376,7 @@ body:not(.en) .content-block .pages-nav.compound-items.active {
     margin: 12px auto 5px auto;
     width: 22px;
     height: 24px;
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: -0px -73px;
     opacity: 0.5;
     -webkit-transition: opacity 200ms ease-in-out;

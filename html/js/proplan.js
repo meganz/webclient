@@ -106,12 +106,6 @@ pro.proplan = {
                 pro.proplan.initMobilePlanDots();
             });
         }
-
-        // Handler for Try Business Account
-        $('.try-business-button-plan-btn').off('click.suba').on('click.suba', function
-            tryBusinessAccountButtonClickHandler() {
-            loadSubPage('business');
-        });
     },
 
     /**

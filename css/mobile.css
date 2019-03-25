@@ -3031,7 +3031,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-icon {
     width: 32px;
     height: 32px;
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -4701,7 +4701,7 @@ div.checkboxOn, div.checkboxOff {
     position: relative;
 }
 .mobile.icon {
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: 0 -2109px;
     background-repeat: no-repeat;
     width: 20px;
@@ -9646,6 +9646,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     text-align: right;
 }
 .business-page .big-red-button.height-48 {
+    display: block;
     height: 48px;
     line-height: 47px;
     font-size: 18px;
@@ -11258,6 +11259,10 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile .improved-recovery-steps .recover-image, .mobile .improved-recovery-steps .session-image-block, .mobile .improved-recovery-steps .recover-button.yes::after, .mobile .improved-recovery-steps .recover-button.no::after   {
     background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
     background-size: 344px auto;
+    }
+    .membership-question-mark span {
+        background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
+        background-size: 755px auto;
     }
 }
 

@@ -3398,5 +3398,7 @@
     "20630": "Business-User sind Mitglieder Ihres Business-Accounts. Neue User erscheinen automatisch in allen Kontaktlisten der bestehenden User.",
     "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
     "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].",
-    "20634": "Target folder is deleted"
+    "20634": "Target folder is deleted",
+    "20635": "Don't have an account? [A]Create one now[\/A]",
+    "20636": "Already have an account? [A]Login[\/A]"
 }

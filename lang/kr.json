@@ -3398,5 +3398,7 @@
     "20630": "\ube44\uc988\ub2c8\uc2a4 \uc774\uc6a9\uc790\ub4e4\uc740 \ub2f9\uc2e0\uc758 \ube44\uc988\ub2c8\uc2a4 \uacc4\uc815\uc5d0 \ucc38\uc5ec\ud55c \uc0ac\ub78c\ub4e4\uc785\ub2c8\ub2e4. \ube44\uc988\ub2c8\uc2a4 \uc774\uc6a9\uc790\ub4e4\uc740 \ub2f9\uc2e0\uc774 \ube44\uc988\ub2c8\uc2a4 \uc5f0\ub77d\ucc98 \ubaa9\ub85d\uc5d0 \uc788\ub294 \ub2e4\ub978 \ubaa8\ub4e0 \uc774\uc6a9\uc790\ub4e4\uc5d0\uac8c \uc790\ub3d9\uc73c\ub85c \ucd94\uac00\ub429\ub2c8\ub2e4.",
     "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
     "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].",
-    "20634": "Target folder is deleted"
+    "20634": "Target folder is deleted",
+    "20635": "Don't have an account? [A]Create one now[\/A]",
+    "20636": "Already have an account? [A]Login[\/A]"
 }

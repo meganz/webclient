@@ -547,6 +547,18 @@ if (is_bot) {
     nocontentcheck = true;
 }
 
+tmp = getCleanSitePath(location.hash || undefined);
+if (tmp.substr(0, 12) === 'sitetransfer') {
+    try {
+        sessionStorage.sitet = tmp;
+        document.location = 'https://mega.nz/start';
+    }
+    catch (ex) {
+        console.warn(ex);
+    }
+    hashLogic = true; // temporarily prevent the history.* calls in case they are reached...
+}
+
 if (!b_u && is_extension)
 {
     hashLogic = true;
@@ -3385,3 +3397,12 @@ function inherits(target, source) {
         enumerable: false
     });
 }
+
+mBroadcaster.once('startMega', function() {
+    var data = sessionStorage.sitet;
+
+    if (data) {
+        delete sessionStorage.sitet;
+        M.transferFromMegaCoNz(data);
+    }
+});

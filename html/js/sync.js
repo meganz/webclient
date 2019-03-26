@@ -8,10 +8,6 @@ function renderLinuxOptions(linuxsync) {
     syncurl = undefined;
     syncsel = false;
 
-    $content.find('.megaapp-button-info.linux-txt')
-        .safeHTML('<span class="nautilus-lnk">' +
-            'MEGA <a href="" class="red">Nautilus extension</a> (@@)</span>', l[2028])
-        .addClass('disabled');
     $content.addClass('linux');
     $content.find('.megaapp-linux').removeClass('hidden');
     $content.find('.architecture-checkbox input').rebind('click', function() {
@@ -21,7 +17,7 @@ function renderLinuxOptions(linuxsync) {
         $(this).prop('checked', true);
     });
     $content.find('.nav-buttons-bl a.linux')
-        .removeClass('download').addClass('disabled').attr('data-link', syncurl);
+        .addClass('active').attr('data-link', syncurl);
     $content.find('.megasync .megaapp-linux-default').text(l[7086]);
     var ua = navigator.userAgent.toLowerCase();
     if (ua.indexOf('i686') > -1
@@ -61,7 +57,7 @@ function resetMegasync() {
     var $linuxBlock = $content.find('.megaapp-linux');
 
     $content.removeClass('linux');
-    $content.find('.nav-buttons-bl a.linux').removeClass('download disabled')
+    $content.find('.nav-buttons-bl a.linux').removeClass('active')
         .attr('data-link', '');
     $linuxBlock.addClass('hidden');
     $linuxBlock.find('.megaapp-linux-default').text(l[7086]);
@@ -146,30 +142,20 @@ function changeLinux(linuxsync, i) {
         }
 
         $content.find('.megaapp-linux-default').text(linuxsync[i].name);
-        $content.find('.nav-buttons-bl a.linux').removeClass('download disabled');
+        $content.find('.nav-buttons-bl a.linux').removeClass('active');
 
         syncurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform);
         nautilusurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform + "n");
         $content.find('.nav-buttons-bl a.linux').addClass('download').attr('data-link', syncurl);
         mBroadcaster.sendMessage('megasync-linux-distro-selected', syncurl);
 
-        var $nautiluslink = $content.find('.megaapp-button-info.linux-txt');
-        if (nautilusurl === "https://mega.nz/MEGAsyncSetup.exe") {
-            nautilusurl = null;
-            $nautiluslink.addClass('disabled');
-        } else {
-            $nautiluslink.removeClass('disabled');
-        }
-        $content.find('.megaapp-button-info.linux-txt a').attr('href', nautilusurl);
         syncsel = i;
     }
     else {
         syncurl = false;
         nautilusurl = false;
-        $content.find('.nav-buttons-bl a.linux').removeClass('download').addClass('disabled')
+        $content.find('.nav-buttons-bl a.linux').addClass('active')
             .attr('data-link', '');
-        $content.find('.megaapp-button-info.linux-txt').addClass('disabled');
-        $content.find('.megaapp-button-info.linux-txt a').removeAttr('href');
         $content.find('.megaapp-linux-default').text(l[7086]);
     }
 }

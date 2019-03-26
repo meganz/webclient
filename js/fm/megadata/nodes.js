@@ -1544,13 +1544,7 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             n.tf = 0;
             n.tb = 0;
         }
-        if (n.rr && n.p !== M.RubbishID) {
-            if (d) {
-                console.debug('Removing rr attribute...', n.rr, n.p, n);
-            }
-            delete n.rr;
-            api_setattr(n, mRandomToken('rru'));
-        }
+        
         ufsc.addToDB(n);
 
         if (this.nn && n.name && !n.fv) {

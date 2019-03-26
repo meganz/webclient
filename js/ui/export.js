@@ -1375,16 +1375,23 @@ var exportExpiry = {
 
         $linksDialog.addClass('file-keys-view');
 
+        // Generate content
+        html = itemExportLink();
+
+        // Change dialog title depends on items
+        var dialogTitle = l[1031];
+
+        if ($.itemExportHasFolder) {
+            dialogTitle = $.itemExportHasFile ? l[20640] : l[20639];
+        }
+
         $('.fm-tab', $linksDialog).removeClass('active');
-        $('.fm-dialog-title', $linksDialog).text(l[1031]);
+        $('.fm-dialog-title', $linksDialog).text(dialogTitle);
         $('.preview-embed', $linksDialog).addClass('hidden');
         $('.fm-dialog-tab', $linksDialog).addClass('hidden');
         $('.embed-content-block', $linksDialog).addClass('hidden');
         $('.export-content-block', $linksDialog).removeClass('hidden');
         $('.export-link-body', $linksDialog).siblings().removeClass('hidden');
-
-        // Generate content
-        html = itemExportLink();
 
         // Fill with content
         if (!html.length) { // some how we dont have a link
@@ -1777,10 +1784,19 @@ var exportExpiry = {
 
         var html = '';
 
+        $.itemExportHasFolder = false;
+        $.itemExportHasFile = false;
+
         $.each($.itemExport, function(index, value) {
             var node = M.d[value];
             if (node && (folderlink || node.ph)) {
                 html += itemExportLinkHtml(node);
+            }
+            if (node.t) {
+                $.itemExportHasFolder = true;
+            }
+            else {
+                $.itemExportHasFile = true;
             }
         });
 

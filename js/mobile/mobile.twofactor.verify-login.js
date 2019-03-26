@@ -38,6 +38,9 @@ mobile.twofactor.verifyLogin = {
 
         // Put the focus in the PIN input field after its visible
         this.$page.find('.two-factor-seed-input input').trigger('focus');
+
+        // Initialise max length on input
+        mobile.initNumberMaxlength(this.$page);
     },
 
     /**

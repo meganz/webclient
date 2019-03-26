@@ -1531,6 +1531,9 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
+    -moz-border-radius: 0 4px 4px 0;
+    -webkit-border-radius: 0 4px 4px 0;
+    border-radius: 0 4px 4px 0;
 }
 .contrast .pages-nav.nav-button:first-child::before {
     -moz-border-radius-topleft: 4px;
@@ -1548,8 +1551,11 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
     -webkit-border-bottom-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
-.contrast .pages-nav.nav-button:not(.disabled):hover::before {
+.contrast .pages-nav.nav-button:not(.disabled):not(.active):hover::before {
     background-color: rgba(0,0,0,0.05);
+}
+.contrast .pages-nav.nav-button.active::before {
+    background-color: rgba(255,255,255,0.8);
 }
 .nav-buttons-bl .pages-nav.nav-button:first-child {
     border: 0;

@@ -1016,15 +1016,15 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $inShareExSection.find('.folder-number').text(inshareExternalInfo[2] + ' ' + l[2035]);
         $inShareExSection.find('.file-number').text(inshareExternalInfo[1] + ' ' + l[2034]);
 
-        $outShareSection.find('.ff-occupy').text(outshareTotalFormatted.size + ' ' +
+        $outShareExternalSection.find('.ff-occupy').text(outshareTotalFormatted.size + ' ' +
             outshareTotalFormatted.unit);
-        $outShareSection.find('.folder-number').text(outshareInfo[2] + ' ' + l[2035]);
-        $outShareSection.find('.file-number').text(outshareInfo[1] + ' ' + l[2034]);
+        $outShareExternalSection.find('.folder-number').text(outshareInfo[2] + ' ' + l[2035]);
+        $outShareExternalSection.find('.file-number').text(outshareInfo[1] + ' ' + l[2034]);
 
-        $outShareExternalSection.find('.ff-occupy').text(outshareTotalInternalFormatted.size + ' ' +
+        $outShareSection.find('.ff-occupy').text(outshareTotalInternalFormatted.size + ' ' +
             outshareTotalInternalFormatted.unit);
-        $outShareExternalSection.find('.folder-number').text(outshareInternalInfo[2] + ' ' + l[2035]);
-        $outShareExternalSection.find('.file-number').text(outshareInternalInfo[1] + ' ' + l[2034]);
+        $outShareSection.find('.folder-number').text(outshareInternalInfo[2] + ' ' + l[2035]);
+        $outShareSection.find('.file-number').text(outshareInternalInfo[1] + ' ' + l[2034]);
 
         $rubbishSection.find('.ff-occupy').text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
         $rubbishSection.find('.folder-number').text(rubbishInfo[2] + ' ' + l[2035]);

@@ -1937,7 +1937,7 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
         mySelf.business.previousInvoices = JSON.parse(JSON.stringify(invoicesList));
 
 
-        for (var k = 0; k < invoicesList.length; k++) {
+        for (var k = invoicesList.length - 1; k >= 0; k--) {
             // if the invoice is non buinsess one
             if (!invoicesList[k].b) {
                 continue;

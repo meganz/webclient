@@ -342,6 +342,7 @@ MegaData.prototype.injectNodes = function(nodes, target, callback) {
     return nodes.length;
 };
 
+// jshint maxdepth:10
 /**
  * @param {Array}       cn            Array of nodes that needs to be copied
  * @param {String}      t             Destination node handle
@@ -578,14 +579,14 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
                     continue;
                 }
                 if (M.getNodeRoot(srcNode.h) === M.RubbishID) {
-                    continue
+                    continue;
                 }
 
                 for (var j = 0; j < opsArr[d].length; j++) {
                     if (opsArr[d][j].h === srcNode.h) {
 
                         if (window.d) {
-                            console.debug('Adding rr attribute...', opsArr[d][j].rr, srcNode.p);
+                            console.debug('Adding rr attribute handle,parent...', opsArr[d][j].h, srcNode.p);
                         }
                         var newNode = {};
                         var originlNode = clone(M.d[opsArr[d][j].h]);
@@ -614,11 +615,11 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         }
 
         for (var q = 0; q < opsArr[d].length; q++) {
-            var c = (opsArr[d] || "").length == 11;
+            var c = (opsArr[d] || "").length === 11;
             try {
                 opsArr[d][q].k = c
-                    ? base64urlencode(encryptto(opsArr[d], a32_to_str(opsArr[d][q].k )))
-                    : a32_to_base64(encrypt_key(u_k_aes, opsArr[d][q].k ));
+                    ? base64urlencode(encryptto(opsArr[d], a32_to_str(opsArr[d][q].k)))
+                    : a32_to_base64(encrypt_key(u_k_aes, opsArr[d][q].k));
             }
             catch (ex) {
                 reportError(ex);
@@ -629,22 +630,6 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         ops.push(objj);
     }
     promiseResolves = ops.length;
-
-    // encrypt nodekeys, either by RSA or by AES, depending on whether
-    // we're sending them to a contact's inbox or not
-    // FIXME: do this in a worker
-    //var c = (t || "").length == 11;
-    //for (var i = a.length; i--;) {
-    //    try {
-    //        a[i].k = c
-    //            ? base64urlencode(encryptto(t, a32_to_str(a[i].k)))
-    //            : a32_to_base64(encrypt_key(u_k_aes, a[i].k));
-    //    }
-    //    catch (ex) {
-    //        reportError(ex);
-    //        return promise;
-    //    }
-    //}
 
     api_req(ops, {
         cn: cn,
@@ -815,6 +800,12 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                 if (!n.rr || n.rr !== p) {
                     n.rr = p;
                     api_setattr(n, mRandomToken('rrm'));
+                }
+            }
+            else {
+                if (n.rr) {
+                    delete n.rr;
+                    api_setattr(n, mRandomToken('rrm-d'));
                 }
             }
 
@@ -1267,6 +1258,10 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
             var h = handles[i];
             var n = M.getNodeByHandle(h);
             var t = n.rr;
+
+            if (n.p !== M.RubbishID) {
+                continue;
+            }
 
             if (!t || !M.d[t] || M.getNodeRoot(t) === M.RubbishID) {
                 if (d) {

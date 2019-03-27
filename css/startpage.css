@@ -961,10 +961,6 @@
 .startpage.carousel-control.next {
     right: 20px;
 }
-.startpage.scroll-to-top {
-    position: static;
-    margin: 20px auto 0 auto;
-}
 }
 
 @media only screen and (max-width: 880px) {
@@ -1183,10 +1179,6 @@
 .startpage.button-48-height {
     margin: 5px 5px;
 }
-.startpage.scroll-to-top {
-    position: static;
-    margin: -5px auto 0 auto;
-}
 }
 
 /* Mobile size */
@@ -1305,9 +1297,6 @@
 }
 .startpage.flip-wrapper {
     padding: 0 0 0 0;
-}
-.startpage.scroll-to-top {
-    margin: 20px auto 0 auto;
 }
 .startpage-chat-img {
     margin-bottom: 10px;

@@ -26,6 +26,8 @@ mobile.uploadOverlay = {
         // Init functionality
         mobile.uploadOverlay.initFileSelectedHandler();
         mobile.uploadOverlay.initCloseOverlayButton();
+
+        mobile.initOverlayPopstateHandler(this.$overlay);
     },
 
     /**

@@ -331,6 +331,7 @@ mobile.register = {
 
         // Change the header text, hide the registration and preinput the email
         var $loginScreen = $('.signin-register-block');
+        window.scrollTo(0, 0);
         $loginScreen.find('.fm-header-txt.sign-in').text(l[812]);            // Confirm Account
         $loginScreen.find('.signin-input.login input').val(isBusinessSubUser ? email.e : email);
     },

@@ -82,6 +82,15 @@ img.emoji, .chat-topic-block img.emoji.big, .small-info-txt img.emoji.big, .fm-p
     margin-left: 2px;
     margin-right: 2px;
 }
+
+/* overrides the class above on chat topic name*/
+.chat-topic-block .chat-topic-text img.emoji, 
+.chat-topic-block .chat-topic-text img.emoji.big {
+    width: 18px;
+    height: 18px;
+    margin-bottom: 0px;
+}
+
 .fm-picker-dialog img.emoji.big {
     margin-top: 2px;
 }

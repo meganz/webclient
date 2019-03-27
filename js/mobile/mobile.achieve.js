@@ -10,6 +10,7 @@ mobile.achieve = {
     BONUS_CLASS_REFERRAL: 3,
     BONUS_CLASS_MEGA_SYNC: 4,
     BONUS_CLASS_MOBILE_APP: 5,
+    BONUS_CLASS_VERIFY_PHONE: 9,
 
     /**
      * Array indexes for the API objects maf.r (reward details) and maf.u (available award classes)
@@ -45,6 +46,7 @@ mobile.achieve = {
         this.initReferralBonusesButton();
         this.initMobileAppButton();
         this.initMegaSyncButton();
+        this.initVerifyPhoneButton();
 
         // Initialise back button to go back to the My Account page
         mobile.initBackButton(this.$page, 'fm/account/');
@@ -81,12 +83,14 @@ mobile.achieve = {
             var $referralBonus = $bonusBlocks.filter('.referral');
             var $megaSyncBonus = $bonusBlocks.filter('.install-mega-sync');
             var $mobileAppBonus = $bonusBlocks.filter('.install-mobile-app');
+            var $verifyPhoneBonus = $bonusBlocks.filter('.verify-phone-number');
 
             // Display the available bonuses and whether they are achieved or not
             mobile.achieve.displayBonusItemInfo($registrationBonus, mobile.achieve.BONUS_CLASS_REGISTRATION);
             mobile.achieve.displayBonusItemInfo($referralBonus, mobile.achieve.BONUS_CLASS_REFERRAL);
             mobile.achieve.displayBonusItemInfo($megaSyncBonus, mobile.achieve.BONUS_CLASS_MEGA_SYNC);
             mobile.achieve.displayBonusItemInfo($mobileAppBonus, mobile.achieve.BONUS_CLASS_MOBILE_APP);
+            mobile.achieve.displayBonusItemInfo($verifyPhoneBonus, mobile.achieve.BONUS_CLASS_VERIFY_PHONE);
 
             // Display calculation of overall total storage and transfer bonus
             mobile.achieve.calculateAndDisplayTotalsUnlocked();
@@ -370,6 +374,39 @@ mobile.achieve = {
 
             // Load the page
             loadSubPage('sync');
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the button to take them Add Phone Number introduction screen
+     */
+    initVerifyPhoneButton: function() {
+
+        'use strict';
+
+        // If SMS verification enable is not on level 2 (Opt-in and unblock SMS allowed) then do nothing
+        if (u_attr.flags.smsve !== 2) {
+            return false;
+        }
+
+        var $verifyPhoneButton = mobile.achieve.$page.find('.verify-phone-number');
+
+        // Unhide the button because the SMS verification is enabled
+        $verifyPhoneButton.removeClass('hidden');
+
+        // On clicking/tapping the Verify phone number button
+        $verifyPhoneButton.off('tap').on('tap', function() {
+
+            // If they already have already added a phone number don't let them add again
+            if (typeof u_attr.smsv !== 'undefined') {
+                return false;
+            }
+
+            // Load the page
+            loadSubPage('sms/phone-achievement-intro');
+
+            // Prevent double taps
             return false;
         });
     }

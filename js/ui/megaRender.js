@@ -387,6 +387,7 @@
             if (!nodeListLength) {
                 if (M.RubbishID && M.currentdirid === M.RubbishID) {
                     $('.fm-empty-trashbin').removeClass('hidden');
+                    $('.fm-clearbin-button').addClass('hidden');
                 }
                 else if (M.currentdirid === 'contacts') {
                     $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
@@ -1223,7 +1224,7 @@
 
                 if (contact) {
                     $('.contact-share-notification')
-                        .text(contact.name + ' shared the following folders with you:')
+                        .text(l[20435].replace('%1', contact.name))
                         .removeClass('hidden');
                 }
             },

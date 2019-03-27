@@ -364,7 +364,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         $.totalDL += n.s;
         currDownloadSize += n.s;
 
-        var $tr = $('.transfer-table #dl_' + htmlentities(n.h));
+        var $tr = !z && $('.transfer-table #dl_' + htmlentities(n.h));
         if ($tr.length) {
             if (!$tr.hasClass('transfer-completed')) {
                 if ($tr.hasClass('transfer-error') && !entries.length) {
@@ -999,6 +999,15 @@ MegaData.prototype.addToTransferTable = function(gid, ttl, elem) {
             }
 
             if (fit) {
+                addToTransferTable(gid, elem);
+            }
+        }
+        else {
+            // Keep inserting uploads as long downloads are overquota...
+            // XXX: Check whether there is a noticeable performance degradation...
+
+            if (document.querySelector('.transfer-table tr.transfer-download .transfer-status.overquota')) {
+                fit = true;
                 addToTransferTable(gid, elem);
             }
         }

@@ -218,32 +218,41 @@ Chatd.MESSAGE_HISTORY_LOAD_COUNT = 32;
 Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL = 3;
 
 Chatd.VERSION = 1;
-
+// The per-chat state of the join/login sequence. It can also be null if we are no longer
+// part of that chatroom (i.e. -1 privilege)
+var LoginState = Chatd.LoginState = Object.freeze({
+    DISCONN: 0,
+    JOIN_SENT: 1,
+    JOIN_RECEIVED: 2,
+    HISTDONE: 3
+});
 
 // add a new chatd shard
-Chatd.prototype.addshard = function(chatId, shard, url) {
+Chatd.prototype._addShardAndChat = function(chatId, shardNo, url) {
     // instantiate Chatd.Shard object for this shard if needed
-    var newshard = !this.shards[shard];
+    var shard = this.shards[shardNo];
 
-    if (newshard) {
-        this.shards[shard] = new Chatd.Shard(this, shard);
+    var isNewShard;
+    if (!shard) {
+        isNewShard = true;
+        shard = this.shards[shardNo] = new Chatd.Shard(this, shardNo);
     }
+    // always update the URL to give the API an opportunity to migrate chat shards between hosts
+    shard.url = url;
 
     // map chatId to this shard
-    this.chatIdShard[chatId] = this.shards[shard];
+    this.chatIdShard[chatId] = shard;
 
     // add chatId to the connection's chatIds
-    this.shards[shard].chatIds[chatId] = true;
-
-    // always update the URL to give the API an opportunity to migrate chat shards between hosts
-    this.shards[shard].url = url;
-
-    // attempt a connection ONLY if this is a new shard.
-    if (newshard) {
-        this.shards[shard].reconnect();
+    var chat = this.chatIdMessages[chatId] = new Chatd.Messages(this, shard, chatId);
+    shard.chatIds[chatId] = true;
+    if (isNewShard) {
+        // attempt a connection ONLY if this is a new shard.
+        shard.reconnect();
+    } else {
+        chat.join();
     }
-
-    return newshard;
+    return isNewShard;
 };
 
 // Chatd.Shard - everything specific to a chatd instance
@@ -258,7 +267,6 @@ Chatd.Shard = function(chatd, shard) {
 
     // active chats on this connection
     self.chatIds = {};
-    self.joinedChatIds = {};
     self.mcurlRequests = {};
 
     // queued commands
@@ -497,7 +505,7 @@ Chatd.Shard.prototype.reconnect = function() {
         if (chat) {
             // seems at first connect self.chatIds is filled with ids,
             // but the chat objects in chatd.chatdIdMessages are not there
-            delete chat.isLoggedIn;
+            chat._setLoginState(LoginState.DISCONN);
         }
     }
 
@@ -539,6 +547,10 @@ Chatd.Shard.prototype.reconnect = function() {
         self.keepAlive.stop();
         self.connectionRetryManager.doConnectionRetry();
         self.histRequests = {};
+        var chats = self.chatd.chatIdMessages;
+        for (var chatid in self.chatIds) {
+            chats[chatid]._setLoginState(LoginState.DISCONN);
+        }
         self.chatd.trigger('onError', {
             shard: self
         });
@@ -569,7 +581,6 @@ Chatd.Shard.prototype.handleDisconnect = function() {
     self.keepAlive.stop();
     self.keepAlivePing.stop();
 
-    self.joinedChatIds = {};
     self.mcurlRequests = {};
     self.triggerEventOnAllChats('onRoomDisconnected');
     self.histRequests = {};
@@ -853,6 +864,7 @@ Chatd.Shard.prototype.cmd = function(opCode, cmd, sendFirst) {
  */
 Chatd.Shard.prototype.rtcmd = function(chatid, userid, clientid, rtcmdCode, payload) {
     if (!this.clientId) {
+        console.warn("Chatd.Shard.rtcmd: Trying to send an RTCMD when we don't yet have a CLIENTID assigned");
         return false;
     }
     var opcode;
@@ -923,10 +935,12 @@ Chatd.Shard.prototype.triggerSendIfAble = function() {
 
 // rejoin all open chats after reconnection (this is mandatory)
 Chatd.Shard.prototype.rejoinexisting = function() {
+    var chats = this.chatd.chatIdMessages;
     for (var c in this.chatIds) {
-        if (!this.joinedChatIds[c]) {
+        var chat = chats[c];
+        if (chat._loginState === LoginState.DISCONN) {
             // rejoin chat and immediately set the locally buffered message range
-            this.join(c);
+            chat.join();
         }
     }
 };
@@ -948,56 +962,12 @@ Chatd.Shard.prototype.resendpending = function(chatId) {
     }
 };
 
-// send JOIN
-Chatd.Shard.prototype.join = function(chatId) {
-    var self = this;
-    var chat = self.chatd.chatIdMessages[chatId];
-    assert(chat);
-    /*
-     Login here means completing the JOIN sequence, till HISTDONE is received
-     isLogged in has 3 states:
-     - undefined - the chat has not initiated the login sequence (shard may be disconnected)
-     - false - login is in progress
-     - true - the chat is logged in
-    */
-    chat.isLoggedIn = false;
-
-    var chatRoom = self.chatd.megaChat.getChatById(base64urlencode(chatId));
-
-    // reset chat state before join
-    chat.callParticipants = {}; // map of userid->array[clientid]
-
-    // send a `JOIN` (if no local messages are buffered) or a `JOINRANGEHIST` (if local messages are buffered)
-    if (
-        Object.keys(chat.buf).length === 0 &&
-        (!chatRoom.messagesBuff || chatRoom.messagesBuff.messages.length === 0)
-    ) {
-        // if the buff is empty and (messagesBuff not initialized (chat is initializing for the first time) OR its
-        // empty)
-        if (self.chatd.chatdPersist) {
-            self.hist(chatId, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1, true);
-        }
-        else {
-            self.cmd(Chatd.Opcode.JOIN, chatId + self.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE));
-            self.hist(chatId, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1);
-        }
-    } else {
-        self.chatd.joinrangehist(chatId);
-    }
-
-};
-
 Chatd.prototype.cmd = function(opCode, chatId, cmd) {
     return this.chatIdShard[chatId].cmd(opCode, chatId + cmd);
 };
 
 Chatd.prototype.hist = function(chatId, count) {
     this.chatIdShard[chatId].hist(chatId, count);
-};
-
-// send RANGE
-Chatd.prototype.joinrangehist = function(chatId) {
-    this.chatIdMessages[chatId].joinrangehist(chatId);
 };
 
 // send HIST
@@ -1249,29 +1219,29 @@ Chatd.Shard.prototype.exec = function(a) {
                 if (priv > 127) {
                     priv -= 256;
                 }
-
+                var chat = chatd.chatIdMessages[chatIdBin];
+                if (chat && chat._loginState === LoginState.JOIN_SENT) {
+                    // We mark the start of a login since the first received JOIN from the
+                    // initial JOIN dump send to us by chatd
+                    chat._setLoginState(LoginState.JOIN_RECEIVED);
+                }
                 if (userId === u_handle) {
-                    if (priv === 0 || priv === 1 || priv === 2 || priv === 3) {
-                        // ^^ explicit and easy to read...despite that i could have done >= 1 <= 3 or something like
-                        // that..
-                        if (!self.joinedChatIds[base64urldecode(chatId)]) {
-                            self.joinedChatIds[base64urldecode(chatId)] = true;
-                        }
-                    }
-                    else if (priv === -1) { // we left the chatroom
-                        delete self.joinedChatIds[base64urldecode(chatId)];
-                        var chat = chatd.chatIdMessages[chatIdBin];
+                    if (priv === -1) { // we left the chatroom
                         if (chat) {
+                            chat._setLoginState(null); // chat disabled, don't join upon re/connect
                             chat.callParticipants = {};
                             chatd.rtcHandler.onKickedFromChatroom(chat);
                         }
-                    }
-                    else {
-                        self.logger.error("Not sure how to handle priv: " + priv + ".");
+                    } else if (priv === 0 || priv === 1 || priv === 2 || priv === 3) {
+                        // ^^ explicit and easy to read...despite that i could have done >= 1 <= 3 or something like
+                        // that..
+                        if (chat._loginState === null) {
+                            // our privilege is changed from -1 to something valid, so have already been logged in
+                            chat._setLoginState(LoginState.HISTDONE);
+                        }
                     }
                 } else {
                     if (priv === -1) { // Someone else left the group chat
-                        var chat = chatd.chatIdMessages[chatIdBin];
                         if (chat) {
                             chat.onUserLeftRoom(userIdBin);
                         }
@@ -1535,21 +1505,22 @@ Chatd.Shard.prototype.exec = function(a) {
                 if (self.loggerIsEnabled) {
                     self.logger.log("History retrieval finished: " + base64urlencode(chatid));
                 }
-                var chat = chatd.chatIdMessages[chatid];
-                if (chat) {
-                    chat.isLoggedIn = true;
-                }
                 // Resending of pending message should be done via the integration code,
                 // since it have more info and a direct relation with the UI related actions on pending messages
                 // (persistence, user can click resend/cancel/etc).
                 self.resendpending();
-                chat.restoreIfNeeded(cmd.substr(1, 8));
-
-                self.chatd.trigger('onMessagesHistoryDone',
-                    {
-                        chatId: base64urlencode(chatid)
+                var chat = chatd.chatIdMessages[chatid];
+                if (chat) {
+                    var loginState = chat.loginState();
+                    if ((loginState !== null) && (loginState < LoginState.HISTDONE)) {
+                        chat._setLoginState(LoginState.HISTDONE); // logged in
                     }
-                );
+                    chat.restoreIfNeeded(cmd.substr(1, 8));
+                }
+                self.chatd.trigger('onMessagesHistoryDone', {
+                    // TODO: Should we trigger this for unknown chats as well?
+                    chatId: base64urlencode(chatid)
+                });
                 len = 9;
                 break;
             case Chatd.Opcode.NEWKEY:
@@ -1680,33 +1651,30 @@ Chatd.prototype.nexttransactionid = function() {
     return this.msgTransactionId;
 };
 
+Chatd.prototype.join = function(chatId, shardNo, url) {
+    if (this.chatIdShard[chatId]) { // this.chatidMessages[chatid] may be still missing!
+        return false;
+    }
+    // unknown chat
+    assert(!this.chatIdMessages[chatId]);
+    this._addShardAndChat(chatId, shardNo, url);
+    return true;
+};
+
 Chatd.prototype._sendNodeHist = function(chatId, lastMsgId, len) {
     var shard = this.chatIdShard[chatId];
     assert(shard, 'shard not found');
     shard._sendNodeHist(chatId, lastMsgId, len);
 };
-Chatd.prototype.join = function(chatId, shard, url) {
-    if (!this.chatIdShard[chatId]) {
-        var newshard = this.addshard(chatId, shard, url);
-        this.chatIdMessages[chatId] = new Chatd.Messages(this, chatId);
-        if (!newshard) {
-            if (!this.shards[shard].joinedChatIds[chatId]) {
-                this.shards[shard].join(chatId);
-                this.shards[shard].joinedChatIds[chatId] = true;
-            }
-        }
-    }
-};
 
 Chatd.prototype.leave = function(chatId) {
-    if (this.chatIdShard[chatId]) {
-        var shard = this.chatIdShard[chatId];
-        // do some cleanup now...
-        delete shard.joinedChatIds[chatId];
-
-        // clear up pending list.
-        this.chatIdMessages[chatId].clearpending();
+    var chat = this.chatIdMessages[chatId];
+    if (!chat) {
+        return;
     }
+    chat._setLoginState(null);
+    // clear up pending list.
+    chat.clearpending();
 };
 
 // gracefully terminate all connections/calls
@@ -1781,9 +1749,10 @@ Chatd.Shard.prototype.msgupdx = function(chatId, msgxid, updatedelta, message, k
 };
 
 // message storage subsystem
-Chatd.Messages = function(chatd, chatId) {
+Chatd.Messages = function(chatd, shard, chatId) {
     // parent linkage
     this.chatd = chatd;
+    this.shard = shard;
     this.chatId = chatId;
 
     // the message buffer can grow in two directions and is always contiguous, i.e. there are no "holes"
@@ -1809,6 +1778,48 @@ Chatd.Messages = function(chatd, chatId) {
     // expired message list
     this.expired = {};
     this.needsRestore = true;
+    this._loginState = LoginState.DISCONN;
+};
+
+Chatd.Messages.prototype._setLoginState = function(state) {
+    var oldState = this._loginState;
+    if ((oldState !== null) && (state !== LoginState.DISCONN && state !== null && state !== oldState + 1)) {
+        console.error("chat %s: Invalid login state transition from %s to %s",
+            base64urlencode(this.chatId), oldState, state);
+    }
+    this._loginState = state;
+};
+
+Chatd.Messages.prototype.loginState = function() {
+    return this._loginState;
+};
+// send JOIN
+Chatd.Messages.prototype.join = function() {
+    var self = this;
+    var shard = self.shard;
+    var chatId = self.chatId;
+    var chatRoom = self.chatd.megaChat.getChatById(base64urlencode(self.chatId));
+
+    // reset chat state before join
+    self.callParticipants = {}; // map of userid->array[clientid]
+    self._setLoginState(LoginState.JOIN_SENT); // joining
+    // send a `JOIN` (if no local messages are buffered) or a `JOINRANGEHIST` (if local messages are buffered)
+    if (
+        Object.keys(self.buf).length === 0 &&
+        (!chatRoom.messagesBuff || chatRoom.messagesBuff.messages.length === 0)
+    ) {
+        // if the buff is empty and (messagesBuff not initialized (chat is initializing for the first time) OR its
+        // empty)
+        if (self.chatd.chatdPersist) {
+            shard.hist(chatId, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1, true);
+        }
+        else {
+            shard.cmd(Chatd.Opcode.JOIN, chatId + self.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE));
+            shard.hist(chatId, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1);
+        }
+    } else {
+        self.joinrangehist();
+    }
 };
 
 Chatd.Messages.prototype.submit = function(messages, keyId, isAttachment) {
@@ -2079,13 +2090,14 @@ Chatd.Messages.prototype.resend = function(restore) {
  *
  * @param chatId
  */
-Chatd.Messages.prototype.joinrangehistViaMessagesBuff = function(chatId) {
+Chatd.Messages.prototype._joinrangehistViaMessagesBuff = function() {
     var self = this;
+    var chatId = self.chatId;
     var chatRoom = self.chatd.megaChat.getChatById(base64urlencode(chatId));
-
-    var firstLast;
+    // we are a lower level func, the login state is set by the higher level one
+    assert(self._loginState === LoginState.JOIN_SENT);
     if (chatRoom && chatRoom.messagesBuff && chatRoom.messagesBuff.messages.length > 0) {
-        firstLast = chatRoom.messagesBuff.getLowHighIds();
+        var firstLast = chatRoom.messagesBuff.getLowHighIds();
         if (firstLast) {
             // queued this as last to execute after this current .done cb.
             self.chatd.trigger('onMessagesHistoryRequest', {
@@ -2095,31 +2107,30 @@ Chatd.Messages.prototype.joinrangehistViaMessagesBuff = function(chatId) {
 
             self.chatd.cmd(Chatd.Opcode.JOINRANGEHIST, chatId,
                 base64urldecode(firstLast[0]) + base64urldecode(firstLast[1]));
+            return;
         }
     }
 
-    if (!firstLast) {
-        if (d) {
-            console.warn("JOINRANGEHIST failed, firstLast was missing");
-        }
-
-        self.chatd.cmd(
-            Chatd.Opcode.JOIN,
-            chatId,
-            self.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE)
-        );
-        self.chatd.trigger('onMessagesHistoryRequest', {
-            count: Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL,
-            chatId: base64urlencode(chatId)
-        });
-        self.chatd.chatIdShard[chatId]._sendHist(chatId, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1);
+    if (d) {
+        console.warn("JOINRANGEHIST failed, firstLast was missing");
     }
+
+    self.chatd.cmd(
+        Chatd.Opcode.JOIN,
+        chatId,
+        self.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE)
+    );
+    self.chatd.trigger('onMessagesHistoryRequest', {
+        count: Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL,
+        chatId: base64urlencode(chatId)
+    });
+    self.chatd.chatIdShard[chatId]._sendHist(chatId, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1);
 };
 
 // after a reconnect, we tell the chatd the oldest and newest buffered message
-Chatd.Messages.prototype.joinrangehist = function(chatId) {
+Chatd.Messages.prototype.joinrangehist = function() {
     var self = this;
-
+    var chatId = self.chatId;
     if (self.chatd.chatdPersist) {
         // this would be called on reconnect if messages were added to the buff,
         // so ensure we are using the correct first/last msgIds as from the actual
@@ -2142,7 +2153,6 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
                     count: 0xDEAD,
                     chatId: base64urlencode(chatId)
                 });
-
                 self.chatd.cmd(Chatd.Opcode.JOINRANGEHIST, chatId,
                     base64urldecode(result[0]) + base64urldecode(result[1]));
             })
@@ -2151,8 +2161,7 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
                 // case, we need to run JOINRANGEHIST otherwise, it would cause the client to (eventually) move
                 // existing msgs to lownum IDs (e.g. back to the top of the list of msgs)
 
-                self.joinrangehistViaMessagesBuff(chatId);
-
+                self._joinrangehistViaMessagesBuff();
             });
     }
     else {
@@ -2187,7 +2196,7 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
         }
 
         if (!requested) {
-            self.joinrangehistViaMessagesBuff(chatId);
+            self._joinrangehistViaMessagesBuff();
         }
     }
 };
@@ -2315,7 +2324,7 @@ Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
 
     var oldChatIdMessages = self.chatIdMessages[chatIdBin];
     var chatRoom = self.megaChat.getChatById(base64urlencode(chatIdBin));
-    var cdr = self.chatIdMessages[chatIdBin] = new Chatd.Messages(self, chatIdBin);
+    var cdr = self.chatIdMessages[chatIdBin] = new Chatd.Messages(self, self.chatIdShard[chatIdBin], chatIdBin);
     chatRoom.messagesBuff.messageOrders = {};
     chatRoom.messagesBuff.sharedFilesMessageOrders = {};
     chatRoom.notDecryptedBuffer = {};
@@ -2981,6 +2990,10 @@ Chatd.Messages.prototype.check = function(chatId, msgid) {
 };
 Chatd.Messages.prototype.onInCall = function(userid, clientid) {
     var self = this;
+    // We ignore preliminary INCALLs and CALLDATAs that chatd sends before we join (for fast call answer on mobile)
+    if (self._loginState < LoginState.JOIN_RECEIVED) {
+        return;
+    }
     var parts = self.callParticipants;
     var endpointId = userid + clientid;
     if (parts[endpointId]) {
@@ -2993,6 +3006,11 @@ Chatd.Messages.prototype.onInCall = function(userid, clientid) {
 
 Chatd.Messages.prototype.onEndCall = function(userid, clientid) {
     var self = this;
+    // We ignore preliminary INCALLs and CALLDATAs that chatd sends before we join (for fast call answer on mobile)
+    if (self._loginState < LoginState.JOIN_RECEIVED) {
+        return;
+    }
+
     var parts = self.callParticipants;
     var endpointId = userid + clientid;
     if (!parts[endpointId]) {

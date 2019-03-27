@@ -170,7 +170,7 @@ div.pro-popular-txt {
 .reg-st3-membership-icon, .membership-icon {
     width: 70px;
     height: 70px;
-    background-image: url(../images/mega/startpage-sprite_v7.png);
+    background-image: url(../images/mega/startpage-sprite_v8.png);
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 0 0 18px -35px;
@@ -179,7 +179,7 @@ div.pro-popular-txt {
     top: 28px;
 }
 .loginrequired-dialog .fm-notification-icon {
-    background-image: url(../images/mega/startpage-sprite_v7.png);
+    background-image: url(../images/mega/startpage-sprite_v8.png);
     background-position: center -210px;
     background-repeat: no-repeat;
 }
@@ -643,7 +643,7 @@ div.pro-feature-icon {
     position: absolute;
     width: 34px;
     height: 34px;
-    background-image: url(../images/mega/startpage-sprite_v7.png);
+    background-image: url(../images/mega/startpage-sprite_v8.png);
     background-position: 1px -1435px;
     margin: 0 0 0 -1px;
     display: block;
@@ -1596,7 +1596,7 @@ div.pro-feature-icon {
     width: 102px;
     height: 102px;
     margin: 0 auto;
-    background-image: url(../images/mega/startpage-sprite_v7.png);
+    background-image: url(../images/mega/startpage-sprite_v8.png);
     background-position: -160px -673px;
 }
 .transfer .pro-icon {

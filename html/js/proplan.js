@@ -16,8 +16,12 @@ pro.proplan = {
     init: function() {
         "use strict";
         // if business sub-user is trying to get to Pro page redirect to home.
-        if (u_attr && u_attr.b && !u_attr.b.m) {
+        if (u_attr && u_attr.b && (!u_attr.b.m || (u_attr.b.m && u_attr.b.s !== -1))) {
             loadSubPage('start');
+            return;
+        }
+        if (u_attr && u_attr.b && u_attr.b.m && u_attr.b.s === -1) {
+            loadSubPage('registerb');
             return;
         }
 
@@ -98,8 +102,14 @@ pro.proplan = {
 
             this.initMobilePlanDots();
 
-            $(window).rebind('resize.proslider', function() {
-                pro.proplan.initMobilePlanDots();
+            var prevWindowWidth = $(window).width();
+            $(window).rebind('resize.proslider', function(e) {
+                // Prevent Iphone url bar resizing trigger reinit.
+                var currentWindowWidth = $(window).width();
+                if (currentWindowWidth !== prevWindowWidth) {
+                    pro.proplan.initMobilePlanDots();
+                    prevWindowWidth = currentWindowWidth;
+                }
             });
         }
 
@@ -527,23 +537,35 @@ pro.proplan = {
         var numOfPlansNotApplicable = 0;
         var currentStorageGigabytes = pro.proplan.currentStorageBytes / 1024 / 1024 / 1024;
 
-        // Loop through membership plans
-        for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
+        if (u_attr && u_attr.b) {
+            // Hide  the plan
+            $pricingBoxes.filter('.pro1,.pro2,.pro3,.pro4').addClass('hidden');
+            $stepOne.find('.reg-st3-txt-localcurrencyprogram').addClass('hidden');
+        }
+        else {
+            $pricingBoxes.filter('.pro1,.pro2,.pro3,.pro4').removeClass('hidden');
+            if ($pricingBoxes.find('.pro1').hasClass('local-currency')) {
+                $stepOne.find('.reg-st3-txt-localcurrencyprogram').removeClass('hidden');
+            }
 
-            // Get plan details
-            var currentPlan = pro.membershipPlans[i];
-            var proNum = parseInt(currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
-            var planStorageGigabytes = parseInt(currentPlan[pro.UTQA_RES_INDEX_STORAGE]);
-            var months = parseInt(currentPlan[pro.UTQA_RES_INDEX_MONTHS]);
+            // Loop through membership plans
+            for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
 
-            // If their current storage usage is more than the plan's grey it out
-            if ((months !== 12) && (currentStorageGigabytes > planStorageGigabytes)) {
+                // Get plan details
+                var currentPlan = pro.membershipPlans[i];
+                var proNum = parseInt(currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
+                var planStorageGigabytes = parseInt(currentPlan[pro.UTQA_RES_INDEX_STORAGE]);
+                var months = parseInt(currentPlan[pro.UTQA_RES_INDEX_MONTHS]);
 
-                // Grey out the plan
-                $pricingBoxes.filter('.pro' + proNum).addClass('sub-optimal-plan');
+                // If their current storage usage is more than the plan's grey it out
+                if ((months !== 12) && (currentStorageGigabytes > planStorageGigabytes)) {
 
-                // Add count of plans that aren't applicable
-                numOfPlansNotApplicable++;
+                    // Grey out the plan
+                    $pricingBoxes.filter('.pro' + proNum).addClass('sub-optimal-plan');
+
+                    // Add count of plans that aren't applicable
+                    numOfPlansNotApplicable++;
+                }
             }
         }
 

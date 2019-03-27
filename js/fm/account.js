@@ -38,13 +38,6 @@ function accountUI() {
     });
 
     M.onSectionUIOpen('account');
-    if (typeof zxcvbn === 'undefined') {
-        loadingDialog.show();
-        return M.require('zxcvbn_js')
-            .done(function() {
-                delay(accountUI);
-            });
-    }
 
     if (u_attr && u_attr.b && !u_attr.b.m) {
         $('.content-panel.account .fm-account-button.slide-in-out.plan').addClass('hidden');
@@ -88,6 +81,9 @@ accountUI.renderAccountPage = function(account) {
 
     showOrHideBanner(id);
 
+    // Always hide the add-phone banner if it was shown by the account profile sub page
+    $('.add-phone-num-banner').addClass('hidden');
+
     switch (id) {
 
         case '/fm/account':
@@ -106,6 +102,7 @@ accountUI.renderAccountPage = function(account) {
             $('.fm-account-security').removeClass('hidden');
             sectionClass = 'security';
 
+            M.require('zxcvbn_js');
             accountUI.security.init();
             break;
 
@@ -131,13 +128,17 @@ accountUI.renderAccountPage = function(account) {
             break;
 
         case '/fm/account/reseller' /** && M.account.reseller **/:
+            if (!account.reseller) {
+                loadSubPage('fm/account');
+                return false;
+            }
             $('.fm-account-reseller').removeClass('hidden');
             sectionClass = 'reseller';
 
             accountUI.reseller.init(account);
             break;
 
-        case '/fm/account/notifications' /** && M.account.reseller **/:
+        case '/fm/account/notifications':
             $('.fm-account-notifications').removeClass('hidden');
             $('.settings-banner').addClass('hidden');
             sectionClass = 'notifications';
@@ -146,6 +147,7 @@ accountUI.renderAccountPage = function(account) {
             break;
 
         default:
+        
             // This is the main entry point for users who just had upgraded their accounts
             if (isNonActivatedAccount()) {
                 alarm.nonActivatedAccount.render(true);
@@ -351,6 +353,7 @@ accountUI.general = {
         $('.small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
 
         if (u_attr.p) {
+
             // LITE/PRO account
             var planNum = u_attr.p;
             var planText = pro.getProPlanName(planNum);
@@ -599,6 +602,7 @@ accountUI.leftPane = {
 
             if ($(this).attr('class').indexOf('active') === -1) {
                 $('.fm-account-main').data('jsp').scrollToY(0, false);
+
                 switch (true) {
                     case $(this).hasClass('account-s'):
                         loadSubPage('fm/account');
@@ -667,14 +671,15 @@ accountUI.account = {
 
         // Profile
         this.profiles.resetProfileForm();
+        this.profiles.renderPhoneBanner();
         this.profiles.renderFirstName();
         this.profiles.renderLastName();
-        this.profiles.renderBirthYear();
-        this.profiles.renderBirthMonth();
-        this.profiles.renderBirthDay();
+        this.profiles.renderBirth();
+        this.profiles.renderPhoneDetails();
 
         // if this is a business user, we want to hide some parts in profile page :)
         var hideOrViewCancelSection = function(setToHidden) {
+
             if (setToHidden) {
                 $('.fm-account-main .fm-account-sections .cancel-account-block').addClass('hidden');
                 $('.content-panel.account .acc-setting-menu-cancel-acc').addClass('hidden');
@@ -700,12 +705,16 @@ accountUI.account = {
             }
         }
         else {
+
             // user can set country only in non-business accounts
             $('.fm-account-main .settings-sub-section.profile .acc-setting-country-sec').removeClass('hidden');
+
             this.profiles.renderCountry();
+
             // we allow cancel for only non-business account + master users.
             hideOrViewCancelSection(false);
         }
+
         this.profiles.bindEvents();
 
         // QR Code
@@ -721,6 +730,66 @@ accountUI.account = {
 
     profiles: {
 
+        /**
+         * Render a banner at the top of the My Account section for enticing a user to add their phone number
+         * so that they can get an achievement bonus and link up with their phone contacts that might be on MEGA
+         */
+        renderPhoneBanner: function() {
+
+            'use strict';
+
+            // Cache selectors
+            var $addPhoneBanner = $('.add-phone-num-banner');
+            var $usageBanner = $('.settings-banner');
+            var $text = $addPhoneBanner.find('.add-phone-text');
+            var $addPhoneButton = $addPhoneBanner.find('.js-add-phone-button');
+            var $skipButton = $addPhoneBanner.find('.skip-button');
+
+            // If SMS verification enable is not on level 2 (Opt-in and unblock SMS allowed) then do nothing. Or if
+            // they already have already added a phone number then don't show this banner again. Or if they clicked the
+            // skip button then don't show the banner.
+            if (u_attr.flags.smsve !== 2 || typeof u_attr.smsv !== 'undefined' || fmconfig['skipsmsbanner']) {
+
+                // If not a business account
+                if (typeof u_attr.b === 'undefined') {
+
+                    // Show the standard storage/bandwidth usage banner instead of the phone banner
+                    $usageBanner.removeClass('hidden');
+                    $addPhoneBanner.addClass('hidden');
+                }
+                else {
+                    // Otherwise for business account hide both banners
+                    $usageBanner.addClass('hidden');
+                    $addPhoneBanner.addClass('hidden');
+                }
+
+                return false;
+            }
+
+            // On click of the Add Number button load the add phone dialog
+            $addPhoneButton.rebind('click', function() {
+
+                sms.phoneInput.init();
+            });
+
+            // On click of the Skip button, hide the banner and don't show it again
+            $skipButton.rebind('click', function() {
+
+                // Hide the banner
+                $addPhoneBanner.addClass('hidden');
+
+                // Save in fmconfig so it is not shown again on reload or login on different machine
+                mega.config.set('skipsmsbanner', true);
+            });
+
+            // Set the text for x GB storage and quota
+            sms.renderAddPhoneText($text);
+
+            // Show the phone banner, hide the storage/bandwidth usage banner
+            $usageBanner.addClass('hidden');
+            $addPhoneBanner.removeClass('hidden');
+        },
+
         renderFirstName: function() {
 
             'use strict';
@@ -735,12 +804,31 @@ accountUI.account = {
             $('#account-lastname').val(u_attr.lastname).trigger('blur');
         },
 
+        renderBirth: function () {
+
+            'use strict';
+
+            // If $.dateTimeFormat['stucture'] is not set, prepare it for birthday
+            if (!$.dateTimeFormat['structure']) {
+                $.dateTimeFormat['structure'] = getDateStructure() || 'ymd';
+            }
+
+            // Display only date format that is correct with current locale.
+            $('.dialog-input-title-ontop.birth').addClass('hidden');
+            $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure']).removeClass('hidden');
+
+            this.renderBirthYear();
+            this.renderBirthMonth();
+            this.renderBirthDay();
+        },
+
         renderBirthYear: function() {
 
             'use strict';
 
             var i = new Date().getFullYear() - 16;
-            var $input = $('.dialog-input-title-ontop.birth .byear').attr('max', i);
+            var $input = $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .byear')
+                .attr('max', i);
 
             if (u_attr.birthyear) {
                 $input.val(u_attr.birthyear);
@@ -752,7 +840,7 @@ accountUI.account = {
             'use strict';
 
             if (u_attr.birthmonth) {
-                var $input = $('.dialog-input-title-ontop.birth .bmonth');
+                var $input = $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bmonth');
                 $input.val(u_attr.birthmonth);
                 this.zerofill($input[0]);
             }
@@ -763,7 +851,7 @@ accountUI.account = {
             'use strict';
 
             if (u_attr.birthday) {
-                var $input = $('.dialog-input-title-ontop.birth .bdate');
+                var $input = $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bdate');
                 $input.val(u_attr.birthday);
                 this.zerofill($input[0]);
             }
@@ -794,10 +882,51 @@ accountUI.account = {
                      +  '</div>';
             }
             $('.default-select-scroll', $country).safeHTML(html);
+
             // Initialize scrolling. This is to prevent scroll losing bug with action packet.
             initSelectScrolling('#account-country .default-select-scroll');
+
             // Bind Dropdowns events
             bindDropdownEvents($country, 1, '.fm-account-main');
+        },
+
+        /**
+         * Show the phone number section if applicable
+         */
+        renderPhoneDetails: function() {
+
+            'use strict';
+
+            // If SMS Verification Enable is on level 1 (SMS suspended unlock allowed only) and they've verified
+            // by phone already, show the section and number. Or if SMS Verification Enable is on level 2 (Opt-in SMS
+            // allowed), then show the section (and number if added, or an Add button).
+            if ((u_attr.flags.smsve === 1 && typeof u_attr.smsv !== 'undefined') || u_attr.flags.smsve === 2) {
+
+                // Cache selectors
+                var $phoneSettings = $('.fm-account-main .phone-number-settings');
+                var $text = $phoneSettings.find('.add-phone-text');
+                var $phoneNumber = $phoneSettings.find('.phone-number');
+                var $addNumberButton = $phoneSettings.find('.add-number-button');
+
+                // If the phone is already added, show that
+                if (typeof u_attr.smsv !== 'undefined') {
+                    $phoneSettings.addClass('verified');
+                    $phoneNumber.text(u_attr.smsv);
+                }
+                else {
+                    // Otherwise set the text for x GB storage and quota
+                    sms.renderAddPhoneText($text);
+
+                    // On click of the Add Number button load the add phone dialog
+                    $addNumberButton.rebind('click', function() {
+
+                        sms.phoneInput.init();
+                    });
+                }
+
+                // Show the section
+                $phoneSettings.removeClass('hidden');
+            }
         },
 
         zerofill: function(elem) {
@@ -828,6 +957,8 @@ accountUI.account = {
             // Cache selectors
             var self = this;
             var $personalInfoBlock = $('.profile-form');
+            var $birthdayBlock = $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure'],
+                $personalInfoBlock);
             var $firstNameField = $personalInfoBlock.find('#account-firstname');
             var $saveBlock = $('.fm-account-sections .save-block');
             var $saveButton = $saveBlock.find('.fm-account-save');
@@ -839,7 +970,7 @@ accountUI.account = {
                 });
 
             // All profile text inputs
-            $firstNameField.add('#account-lastname, .byear, .bmonth, .bdate', $personalInfoBlock)
+            $firstNameField.add('#account-lastname', $personalInfoBlock).add('.byear, .bmonth, .bdate', $birthdayBlock)
                 .rebind('input.settingsGeneral, change.settingsGeneral', function() {
 
                     var $this = $(this);
@@ -886,7 +1017,7 @@ accountUI.account = {
                     }
                 });
 
-            $('.byear, .bmonth, .bdate', $personalInfoBlock).rebind('keydown.settingsGeneral', function(e) {
+            $('.byear, .bmonth, .bdate', $birthdayBlock).rebind('keydown.settingsGeneral', function(e) {
 
                 var $this = $(this);
                 var charCode = e.which || e.keyCode; // ff
@@ -931,7 +1062,7 @@ accountUI.account = {
                 }
             });
 
-            $('.bmonth, .bdate', $personalInfoBlock).rebind('blur.settingsGeneral', function() {
+            $('.bmonth, .bdate', $birthdayBlock).rebind('blur.settingsGeneral', function() {
                 self.zerofill(this);
             });
 
@@ -967,9 +1098,9 @@ accountUI.account = {
                 var checklist = {
                     firstname: String($('#account-firstname').val() || '').trim(),
                     lastname: String($('#account-lastname').val() || '').trim(),
-                    birthday: String($('.birth .bdate').val() || ''),
-                    birthmonth: String($('.birth .bmonth').val() || ''),
-                    birthyear: String($('.birth .byear').val() || ''),
+                    birthday: String($('.bdate', $birthdayBlock).val() || ''),
+                    birthmonth: String($('.bmonth', $birthdayBlock).val() || ''),
+                    birthyear: String($('.byear', $birthdayBlock).val() || ''),
                     country: String($('#account-country .default-dropdown-item.active').attr('data-value') || '')
                 };
                 var userAttrRequest = { a: 'up' };
@@ -1416,6 +1547,16 @@ accountUI.plan = {
                 // LITE/PRO account
                 var planNum = u_attr.p;
                 var planText = pro.getProPlanName(planNum);
+
+                // if this is p=100 business
+                if (planNum === 100) {
+                    $('.account.plan-info.accounttype').addClass('business');
+                    $('.fm-account-plan .acc-renew-date-info').removeClass('border');
+                }
+                else {
+                    $('.account.plan-info.accounttype').removeClass('business');
+                    $('.fm-account-plan .acc-renew-date-info').addClass('border');
+                }
 
                 // Account type
                 $('.account.plan-info.accounttype span').text(planText);
@@ -2204,7 +2345,8 @@ accountUI.security = {
 
             // Generate row html
             var html = '<tr class="' + (currentSession ? "current" : sessionId) + '">'
-                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent.replace(/\s*megext/i, ''))
+                + '<td class="browser-os"><span class="fm-browsers-icon"><img title="'
+                + escapeHTML(userAgent.replace(/\s*megext/i, ''))
                 + '" src="' + staticpath + 'images/browser/' + browser.icon
                 + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
                 + '</span></td>'
@@ -2212,7 +2354,7 @@ accountUI.security = {
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/'
                 + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">'
                 + htmlentities(country.name) + '</span></td>'
-                + '<td>' + dateTime + '</td>'
+                + '<td class="date-time">' + dateTime + '</td>'
                 + '<td>' + status + '</td>';
 
             // If the session is active show logout button
@@ -2271,7 +2413,7 @@ accountUI.fileManagement = {
 
         // Rubbish cleaning schedule
         this.rubsched.render(account);
-        this.rubsched.bindEvents();
+        this.rubsched.bindEvents(account);
 
         // User Interface
         this.userInterface.render();
@@ -2472,16 +2614,23 @@ accountUI.fileManagement = {
                 }
 
                 var curVal = parseInt($(this).val()) | 0;
+                var maxVal;
 
-                if (this.id === 'rad14_opt') { // for days option
+                if (this.id === 'rad14_opt') { // For days option
                     var minVal = 7;
-                    var maxVal = u_attr.p ? Math.pow(2, 53) : 30;
+                    maxVal = u_attr.p ? Math.pow(2, 53) : 30;
                     curVal = Math.min(Math.max(curVal, minVal), maxVal);
+                }
+
+                if (this.id === 'rad15_opt') { // For size option
+                    // Max value cannot be over current account's total storage space.
+                    maxVal = account.space / Math.pow(1024, 3);
+                    curVal = Math.min(curVal, maxVal);
                 }
 
                 $(this).val(curVal);
 
-                var id = String($(this).attr('id')).split('_')[0];
+                var id = String(this.id).split('_')[0];
                 mega.config.setn('rubsched', id.substr(3) + ':' + curVal);
             });
         }

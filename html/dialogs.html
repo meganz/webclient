@@ -224,7 +224,7 @@
     <div class="mega-logo icon56 dialog-heading-img"></div>
     <div class="dialog-title">[$18771]</div>
     <div class="dialog-subtitle">[$18772]</div>
-    <div class="delete-img icon"></div>
+    <div class="delete-img icon hidden"></div>
     <div class="dialog-input-container">
         <div class="dialog-input-title-ontop link-sub-user-pass">
             <div class="title"> </div>
@@ -256,7 +256,7 @@
             <div class="fm-dialog-new-folder-input">
                 <div class="fm-dialog-new-folder-pad decryption-password">
                     <span class="icon"></span>
-                    <input class="password-decrypt-input" type="password" placeholder="[$9073]" value="" />
+                    <input class="password-decrypt-input" type="password" placeholder="[$9073]" value="" autocomplete="new-password" />
                 </div>
             </div>
             <div class="password-link-decrypt-error"></div>
@@ -285,6 +285,7 @@
         <div class="reg-resend-email">
             <div class="reg-resend-input-bl">
                 <input type="text" value="" maxlength="190" />
+                <div class="reg-resend-email-meg">[$1100]</div>
             </div>
             <div class="reg-resend-button-bl">
                 <div class="resend-email-button">
@@ -441,7 +442,7 @@
             <div class="dialog-empty-pad">
                 <div class="dialog-empty-icon"></div>
                 <div class="dialog-empty-header">
-                    [$1343]
+                    [$20461]
                 </div>
             </div>
         </div>
@@ -1289,7 +1290,7 @@
         <div class="fm-dialog-close mid"></div>
         <div class="clear"></div>
     </div>
-    <form autocomplete="off" class="account dialog-login-form">
+    <form class="account dialog-login-form">
         <div class="top-login-pad">
             <div class="account input-wrapper email">
                 <div class="account input-tooltip mid">
@@ -1303,7 +1304,7 @@
             </div>
             <div class="account input-wrapper password">
                 <i class="account-icon lock"></i>
-                <input autocomplete="off" type="password" name="login-password3" id="login-password3" class="input-password" placeholder="[$909]" />
+                <input type="password" name="login-password3" id="login-password3" class="input-password" placeholder="[$909]" />
             </div>
             <div class="login-page-forgot-bl">
                 <a class="top-login-forgot-pass clickurl" href="/recovery" tabindex="-1">[$1934]</a>
@@ -1333,7 +1334,7 @@
 
     <div class="pro-register-scroll">
         <div class="fm-dialog-body hidden"></div>
-        <form autocomplete="off" class="account dialog-register-form">
+        <form class="account dialog-register-form">
             <div class="top-login-pad">
 
                 <div class="account input-wrapper name double">
@@ -1349,7 +1350,7 @@
                         [$1100]<br>[$1101].
                     </div>
                     <i class="account-icon email"></i>
-                    <input autocomplete="off" type="text" name="rigister-email" id="register-email" placeholder="[$95]" maxlength="190" />
+                    <input type="text" name="rigister-email" id="register-email" placeholder="[$95]" maxlength="190" />
                 </div>
                 <div class="account input-wrapper password first">
                     <div class="account input-tooltip">
@@ -1360,14 +1361,14 @@
                     </div>
                     <div class="register-loading-icon"><img alt="" src="{staticpath}images/mega/ajax-loader-gray.gif" /></div>
                     <i class="account-icon lock"></i>
-                    <input autocomplete="off" type="password" name="register-password" id="register-password" placeholder="[$909]" />
+                    <input type="password" name="register-password" id="register-password" placeholder="[$909]" />
                     <div class="account password-status hidden">
                         [$1106]
                     </div>
                 </div>
                 <div class="account input-wrapper password confirm">
                     <i class="account-icon lock"></i>
-                    <input autocomplete="off" type="password" name="register-password2" id="register-password2" placeholder="[$1114]" />
+                    <input type="password" name="register-password2" id="register-password2" placeholder="[$1114]" />
                 </div>
                 <div class="account checkbox-block register">
                     <div class="register-check checkboxOff checkbox">
@@ -2884,6 +2885,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Add class "achieved", "one-reward" !-->
             <div class="achievements-cell ach-install-mobile-app">
                 <div class="image-container">
@@ -2927,6 +2929,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Add class "achieved", "one-reward" !-->
             <div class="achievements-cell ach-invite-friend">
                 <div class="image-container">
@@ -2977,6 +2980,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Add class "achieved", "one-reward" !-->
             <div class="achievements-cell ach-sms-verification">
                 <div class="image-container">
@@ -2985,22 +2989,26 @@
                 </div>
                 <div class="achievement-full info">
                     <div class="subtitle-txt">
-                        SMS verification
+                        [$20409]
                     </div>
                     <div class="achi-content-txt">
-                        Verify your mobile device as an additional security feature for your MEGA account. Added bonus: verifying your mobile number will allow your approved contacts to connect via MEGAChat.
+                        [$20411]
                     </div>
-                    <div class="achievement-dialog expires-txt">
-                        <!-- do NOT translate this, it's on the JS side -->
-                        Expires in <span>X</span> months
-                    </div>
-                    <div class="default-green-button">[$16295]</div>
+                    <div class="achievement-dialog expires-txt"></div>
+                    <div class="default-green-button">[$1960]</div>
                 </div>
                 <div class="achievement-dialog bottom-block">
                     <div class="achievement-dialog reward storage">
                         <i class="medium-icon cloud-white achievements-icon"></i>
                         <div class="achievement-dialog reward-txt">
                             [$18322]
+                        </div>
+                        <span>XX GB</span>
+                    </div>
+                    <div class="achievement-dialog reward bandwidth">
+                        <i class="medium-icon speedometer-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$18323]
                         </div>
                         <span>XX GB</span>
                     </div>
@@ -3013,6 +3021,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Add class "achieved", "one-reward" !-->
             <div class="achievements-cell ach-create-account achieved">
                 <div class="image-container">
@@ -4085,7 +4094,7 @@
             <div class="dialog input-wrapper ">
                 <!-- Please add 'wrong' class is password is incorrect !-->
                 <div class="dialog big-input-bg">
-                    <input type="password" value="" name="test-pass1" id="test-pass" placeholder="[$16896]" autocomplete="off">
+                    <input type="password" value="" name="test-pass1" id="test-pass" placeholder="[$16896]" autocomplete="disabled">
                 </div>
                 <div class="dialog input-button">
                     <div class="default-white-button semi-big grey-txt confirm-password button-prd-confirm">
@@ -4472,7 +4481,7 @@
                     [$7431]
                 </div>
                 <i class="account-icon email"></i>
-                <input autocomplete="off" type="text" name="recover-input1" id="recover-input1-di" value="" placeholder="[$195]" maxlength="190">
+                <input autocomplete="disabled" type="text" name="recover-input1" id="recover-input1-di" value="" placeholder="[$195]" maxlength="190">
             </div>
         </div>
     </div>
@@ -4747,6 +4756,116 @@
         <div class="lost-authenticator-button">[$19215]</div>
     </div>
 </div>
+
+
+<!-- Verify phone number super dialog -->
+<div class="fm-dialog verify-phone hidden">
+    <div class="verify-ph-top">
+        <div class="fm-dialog-title white js-header-text"></div>
+        <div class="fm-dialog-close white js-dialog-close"></div>
+        <div class="verify-ph-icon"></div>
+        <div class="verify-ph-success-icon hidden"></div>
+    </div>
+    <div class="verify-ph-body">
+
+        <!-- Step 1 - Phone Input -->
+        <form id="verify-dialog_ph_form" class="js-phone-input-page hidden" autocomplete="off">
+            <div class="verify-ph-info">
+                <span class="js-body-text"></span>
+                <a class="green-lnk hidden" href="todo-waiting-for-help-center-link">[$8742]</a>
+            </div>
+            <div class="account input-wrapper small top-placeholder select country verify-ph-country">
+                <i class="account-icon globe"></i>
+                <select id="verify-dialog-countries" class="js-country-list" tabindex="1">
+                    <option disabled selected>[$481]</option>
+                    <option class="js-country-list-item template" value=""></option>
+                </select>
+                <label>[$481]</label>
+                <i class="account-icon select-arrow"></i>
+            </div>
+            <div class="account input-wrapper small top-placeholder phone">
+                <i class="account-icon mobile"></i>
+                <input class="js-phone-input" autocomplete="off" type="tel" name="verify-dialog-phone" value="" placeholder="[$20214]">
+                <label>[$20214]</label>
+            </div>
+            <div class="account input-tooltip static js-warning-message"></div>
+            <div class="verify-ph-buttons">                
+                <div class="button default-green-button gradient lato right disabled js-send-sms-button" tabindex="0">
+                    [$556]
+                </div>
+                <div class="button default-white-button gradient lato right not-now-button js-not-now-button">
+                    [$18682]
+                </div>
+                <div class="clear"></div>
+            </div>
+        </form>
+
+        <!-- Step 2 - Verify Code (from SMS) -->
+        <form id="verify-dialog_code_form" class="js-verify-code-page hidden" autocomplete="off" >
+            <div class="verify-ph-info long">
+                <span>[$20217]</span>
+                <span class="phone-num js-user-phone-number"></span>
+            </div>
+            <div class="sms-code-input-container account grouped-inputs">
+                <input class="sms-verification-number-input js-verification-number-input" autocomplete="off" type="text" name="verify-dialog-code1" value="" maxlength="6">
+                <div class="account input-wrapper num"></div>
+                <div class="account input-wrapper num"></div>
+                <div class="account input-wrapper num"></div>
+                <div class="account input-wrapper num"></div>
+                <div class="account input-wrapper num"></div>
+                <div class="account input-wrapper num"></div>
+            </div>
+            <div class="account input-tooltip static js-warning-message"></div>
+            <div class="verify-ph-info long small-txt">
+                <span>[$20218]</span>
+                <a class="green-lnk js-resend-button">[$8744]</a>
+            </div>
+            <div class="verify-ph-buttons">
+                <div class="button default-green-button gradient lato right disabled js-verify-button" tabindex="0">
+                    [$870]
+                </div>
+                <div class="button default-white-button gradient lato right js-back-button" tabindex="0">
+                    [$822]
+                </div>
+                <div class="clear"></div>
+            </div>
+        </form>
+
+        <!-- Step 3 - Verify success -->
+        <form id="verify-dialog_success_form" class="verify-success-page js-verify-success-page hidden">
+            <div class="verify-ph-info long">
+                <span class="js-body-text"></span>
+            </div>
+            <div class="verify-ph-bonus-container">
+                <div class="verify-ph-bonus-block storge-bonus">
+                    <div class="icon56 achievements-icon bonus-image"></div>
+                    <div class="verify-ph-bonus-intro-wrapper">
+                        <div class="big-num js-storage-quota"></div>
+                        <div class="body-txt">[$20405]</div>
+                    </div>
+                </div>
+                <div class="verify-ph-bonus-block transfer-bonus">
+                    <div class="icon56 achievements-icon bonus-image"></div>
+                    <div class="verify-ph-bonus-intro-wrapper">
+                        <div class="big-num js-transfer-quota"></div>
+                         <div class="body-txt">[$20406]</div>
+                    </div>
+                </div>
+            </div>
+            <div class="verify-ph-buttons">
+                <div class="verify-ph-bonus-valid-days">
+                    <div class="valid-days-title">[$20407]</div>
+                    <div class="valid-days-body-txt js-valid-days">180</div>
+                </div>
+                <div class="button default-green-button gradient lato right js-close-button" tabindex="0">
+                    [$148]
+                </div>
+                <div class="clear"></div>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <!-- Recover Account (Display recover key) !-->
 <div class="fm-dialog recovery-key-dialog backup-recover improved-recovery-steps hidden">
@@ -5044,12 +5163,12 @@
     <div class="dialog-title">[$19805]</div>
     <div class="delete-img icon close-x-icon"></div>
     <div class="dialog-input-container welcome-dlg-options">
-        <div class="dialog-left-block" align="centre">
+        <div class="dialog-left-block add-subuser" align="centre">
             <div class="icon64 add-user64"></div>
             <div class="dialog-sub-title">[$19084]</div>
             <div class="dialog-txt">[$19139]</div>
         </div>
-        <div class="dialog-right-block" align="centre">
+        <div class="dialog-right-block go-to-landing" align="centre">
             <div class="icon64 user-management64"></div>
             <div class="dialog-sub-title">[$18677]</div>
             <div class="dialog-txt">[$19806]</div>
@@ -5073,15 +5192,20 @@
 <div class="user-management-able-user-dialog warning user-management-dialog fm-dialog hidden">
     <div class="warning-large-icon icon64 dlg-suba-icon"></div>
     <div class="dialog-text-container">
-        <div class="dialog-text-one">Are you sure you want to cancel the business account of <b>ABC company</b>? </div>
-        <div class="dialog-text-two"><div class="bold-warning">WARNING:</div>This will remove access to all users & data for this business account, please ensure you have have taken a copy of all data before proceeding with this action.</div>
+        <div class="dialog-text-one">- <b>-</b> </div>
+        <div class="dialog-text-two">
+            <div class="bold-warning">-</div>
+            <div class="text-two-text">
+                -
+            </div>
+        </div>
     </div>
     <div class="dialog-button-container">
-        <div class="default-grey-button-user-management">
-            No
+        <div class="default-grey-button-user-management ok-action">
+            -
         </div>
-        <div class="default-white-button-user-management">
-            Cancel
+        <div class="default-white-button-user-management cancel-action">
+            -
         </div>
     </div>
 </div>
@@ -5099,31 +5223,3 @@
         <div class="clear"></div>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

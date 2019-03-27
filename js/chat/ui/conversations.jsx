@@ -576,25 +576,31 @@ var ConversationsList = React.createClass({
             if (!chatRoom.isDisplayable()) {
                 return;
             }
-            if (chatRoom.type === "private") {
-                contact = chatRoom.getParticipantsExceptMe()[0];
-                if (!contact) {
-                    return;
-                }
-                contact = M.u[contact];
-
-                if (contact) {
-                    if (!chatRoom.privateReadOnlyChat && !contact.c) {
-                        // a non-contact conversation, e.g. contact removed - mark as read only
-                        Soon(function () {
-                            chatRoom.privateReadOnlyChat = true;
-                        });
+            // Checking if this a business user with expired status
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                chatRoom.privateReadOnlyChat = true;
+            }
+            else {
+                if (chatRoom.type === "private") {
+                    contact = chatRoom.getParticipantsExceptMe()[0];
+                    if (!contact) {
+                        return;
                     }
-                    else if (chatRoom.privateReadOnlyChat && contact.c) {
-                        // a non-contact conversation, e.g. contact removed - mark as read only
-                        Soon(function () {
-                            chatRoom.privateReadOnlyChat = false;
-                        });
+                    contact = M.u[contact];
+
+                    if (contact) {
+                        if (!chatRoom.privateReadOnlyChat && !contact.c) {
+                            // a non-contact conversation, e.g. contact removed - mark as read only
+                            Soon(function() {
+                                chatRoom.privateReadOnlyChat = true;
+                            });
+                        }
+                        else if (chatRoom.privateReadOnlyChat && contact.c) {
+                            // a non-contact conversation, e.g. contact removed - mark as read only
+                            Soon(function() {
+                                chatRoom.privateReadOnlyChat = false;
+                            });
+                        }
                     }
                 }
             }

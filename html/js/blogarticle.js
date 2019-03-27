@@ -73,4 +73,6 @@ function render_blogarticle() {
     if (!m) {
         blog_archive();
     }
+
+    api_req({ a: 'log', e: 99801, m: blogid});
 }

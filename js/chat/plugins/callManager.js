@@ -709,7 +709,7 @@ var CallManagerCall = function (chatRoom, rtcCall) {
     self.localPlayer = null;
     self.remotePlayer = null;
 
-
+/*
     if (self.room.callManagerCall) {
         if (self.room.callManagerCall.isStarting() === true) {
             self.logger.debug(
@@ -733,6 +733,7 @@ var CallManagerCall = function (chatRoom, rtcCall) {
             return;
         }
     }
+*/
     self.room.callManagerCall = this;
 };
 
@@ -1458,7 +1459,7 @@ CallManagerCall.prototype.getPeer = function () {
 CallManagerCall.prototype.getMediaOptions = function () {
     var localAv = this.rtcCall.localAv();
     if (typeof localAv === 'undefined') {
-        this.logger.error(".getMediaOptions: rtcCall.localAv() returned undefined");
+        this.logger.log(".getMediaOptions: rtcCall.localAv() returned undefined");
         return {audio: false, video: false};
     }
     return {audio: !!(localAv & Av.Audio), video: !!(localAv & Av.Video)};// jscs:ignore disallowImplicitTypeConversion
@@ -1485,7 +1486,7 @@ CallManagerCall.prototype.getRemoteMediaOptions = function (sessionId) {
         }
     }
     if (typeof firstSession.peerAv === 'undefined') {
-        this.logger.error(
+        this.logger.log(
             ".getRemoteMediaOptions could not find .peerAv for session",
             base64urlencode(firstSession.sid)
         );

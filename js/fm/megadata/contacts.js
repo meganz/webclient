@@ -532,6 +532,11 @@ MegaData.prototype.contacts = function() {
                 });
 
                 $dropdown.find('.startaudio-item').rebind('click.treePanel', function() {
+                    if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                        M.showExpiredBusiness();
+                        return;
+                    }
+
                     var $this = $(this);
                     var $triggeredBy = $this.parent().data("triggeredBy");
                     var $userDiv = $triggeredBy.parent().parent();
@@ -548,6 +553,11 @@ MegaData.prototype.contacts = function() {
                 });
 
                 $dropdown.find('.startvideo-item').rebind('click.treePanel', function() {
+                    if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                        M.showExpiredBusiness();
+                        return;
+                    }
+
                     var $this = $(this);
                     var $triggeredBy = $this.parent().data('triggeredBy');
                     var $userDiv = $triggeredBy.parent().parent();
@@ -831,6 +841,8 @@ MegaData.prototype.syncContactEmail = function(userHash) {
                 fmdb.add('u', {u: u.u, d: cleanedUpUserData});
                 M.u[userId].firstName = '';
                 M.u[userId].lastName = '';
+                attribCache.removeItem(userId + "_firstname");
+                attribCache.removeItem(userId + "_lastname");
             }
 
             this.syncUsersFullname(userId);

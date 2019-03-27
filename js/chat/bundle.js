@@ -2453,24 +2453,29 @@ React.makeElement = React['createElement'];
 	            if (!chatRoom.isDisplayable()) {
 	                return;
 	            }
-	            if (chatRoom.type === "private") {
-	                contact = chatRoom.getParticipantsExceptMe()[0];
-	                if (!contact) {
-	                    return;
-	                }
-	                contact = M.u[contact];
 
-	                if (contact) {
-	                    if (!chatRoom.privateReadOnlyChat && !contact.c) {
+	            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+	                chatRoom.privateReadOnlyChat = true;
+	            } else {
+	                if (chatRoom.type === "private") {
+	                    contact = chatRoom.getParticipantsExceptMe()[0];
+	                    if (!contact) {
+	                        return;
+	                    }
+	                    contact = M.u[contact];
 
-	                        Soon(function () {
-	                            chatRoom.privateReadOnlyChat = true;
-	                        });
-	                    } else if (chatRoom.privateReadOnlyChat && contact.c) {
+	                    if (contact) {
+	                        if (!chatRoom.privateReadOnlyChat && !contact.c) {
 
-	                        Soon(function () {
-	                            chatRoom.privateReadOnlyChat = false;
-	                        });
+	                            Soon(function () {
+	                                chatRoom.privateReadOnlyChat = true;
+	                            });
+	                        } else if (chatRoom.privateReadOnlyChat && contact.c) {
+
+	                            Soon(function () {
+	                                chatRoom.privateReadOnlyChat = false;
+	                            });
+	                        }
 	                    }
 	                }
 	            }
@@ -5832,10 +5837,13 @@ React.makeElement = React['createElement'];
 	            { className: this.props.className + " " },
 	            React.makeElement(
 	                "div",
-	                { className: "contacts-search-header " + this.props.headerClasses },
+	                {
+	                    className: "contacts-search-header " + (this.props.headerClasses ? this.props.headerClasses : '')
+	                },
 	                React.makeElement("i", { className: "small-icon search-icon" }),
 	                React.makeElement("input", {
 	                    type: "search",
+	                    autoFocus: true,
 	                    placeholder: __(l[8010]),
 	                    ref: "contactSearchField",
 	                    onChange: this.onSearchChange,
@@ -5901,7 +5909,7 @@ React.makeElement = React['createElement'];
 	var SharedFilesAccordionPanel = __webpack_require__(33).SharedFilesAccordionPanel;
 	var IncomingSharesAccordionPanel = __webpack_require__(34).IncomingSharesAccordionPanel;
 
-	var ENABLE_GROUP_CALLING_FLAG = typeof localStorage.enableGroupCalling !== 'undefined' && localStorage.enableGroupCalling === "1";
+	var ENABLE_GROUP_CALLING_FLAG = true;
 
 	var ConversationAudioVideoPanel = __webpack_require__(35).ConversationAudioVideoPanel;
 
@@ -5909,6 +5917,15 @@ React.makeElement = React['createElement'];
 	    displayName: "JoinCallNotification",
 
 	    mixins: [MegaRenderMixin, RenderDebugger],
+	    componentDidUpdate: function componentDidUpdate() {
+	        var $node = $(this.findDOMNode());
+	        var room = this.props.chatRoom;
+	        $('a.joinActiveCall', $node).rebind('click.joinCall', function (e) {
+	            room.joinCall();
+	            e.preventDefault();
+	            return false;
+	        });
+	    },
 	    render: function render() {
 	        var room = this.props.chatRoom;
 	        if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
@@ -5916,23 +5933,17 @@ React.makeElement = React['createElement'];
 	                "div",
 	                { className: "in-call-notif yellow join" },
 	                React.makeElement("i", { className: "small-icon audio-call colorized" }),
-	                "There is an active group call, but maximum call participants count had been reached."
+	                l[20200]
 	            );
 	        } else {
+	            var translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
+	            translatedCode = translatedCode.replace("[A]", '<a href="javascript:;" class="joinActiveCall">').replace('[/A]', '</a>');
+
 	            return React.makeElement(
 	                "div",
 	                { className: "in-call-notif neutral join" },
 	                React.makeElement("i", { className: "small-icon audio-call colorized" }),
-	                "There is an active group call. ",
-	                React.makeElement(
-	                    "a",
-	                    { href: "javascript:;", onClick: function onClick(e) {
-	                            room.joinCall();
-	                            e.preventDefault();
-	                            return false;
-	                        } },
-	                    "Join"
-	                )
+	                React.makeElement("span", { dangerouslySetInnerHTML: { __html: translatedCode } })
 	            );
 	        }
 	    }
@@ -7257,17 +7268,24 @@ React.makeElement = React['createElement'];
 	                        React.makeElement(
 	                            "div",
 	                            { className: "rename-input-bl" },
-	                            React.makeElement("input", { type: "text", name: "newTopic",
+	                            React.makeElement("input", {
+	                                type: "text",
+	                                className: "chat-rename-group-dialog",
+	                                name: "newTopic",
 	                                defaultValue: self.props.chatRoom.getRoomTitle(),
 	                                value: self.state.renameDialogValue,
 	                                maxLength: "30",
 	                                onChange: function onChange(e) {
-	                                    self.setState({ 'renameDialogValue': e.target.value.substr(0, 30) });
-	                                }, onKeyUp: function onKeyUp(e) {
+	                                    self.setState({
+	                                        'renameDialogValue': e.target.value.substr(0, 30)
+	                                    });
+	                                },
+	                                onKeyUp: function onKeyUp(e) {
 	                                    if (e.which === 13) {
 	                                        onEditSubmit(e);
 	                                    }
-	                                } })
+	                                }
+	                            })
 	                        )
 	                    )
 	                )
@@ -8268,7 +8286,7 @@ React.makeElement = React['createElement'];
 
 	            $tooltip.css({
 	                'left': tooltipLeftPos,
-	                'top': tooltipTopPos
+	                'top': tooltipTopPos - 5
 	            });
 	            $tooltip.addClass(arrowClass);
 	        }
@@ -8992,7 +9010,8 @@ React.makeElement = React['createElement'];
 
 	                items.push(React.makeElement(
 	                    "div",
-	                    { className: "data-block-view node_" + node.h + " " + (isFolder ? " folder" : " file") + (isHighlighted ? " ui-selected" : "") + (share ? " linked" : "") + colorLabelClasses,
+	                    {
+	                        className: "data-block-view node_" + node.h + " " + (isFolder ? " folder" : " file") + (isHighlighted ? " ui-selected" : "") + (share ? " linked" : "") + colorLabelClasses,
 	                        onClick: function onClick(e) {
 	                            self.onEntryClick(e, node);
 	                        },
@@ -9000,7 +9019,8 @@ React.makeElement = React['createElement'];
 	                            self.onEntryDoubleClick(e, node);
 	                        },
 	                        id: "chat_" + node.h,
-	                        key: "block_" + node.h
+	                        key: "block_" + node.h,
+	                        title: node.name
 	                    },
 	                    React.makeElement(
 	                        "div",
@@ -14474,26 +14494,9 @@ React.makeElement = React['createElement'];
 
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
-	var utils = __webpack_require__(5);
 	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ButtonsUI = __webpack_require__(9);
-	var ModalDialogsUI = __webpack_require__(13);
-	var CloudBrowserModalDialog = __webpack_require__(16);
-	var DropdownsUI = __webpack_require__(10);
 	var ContactsUI = __webpack_require__(11);
-	var ConversationsUI = __webpack_require__(4);
-	var TypingAreaUI = __webpack_require__(17);
-	var WhosTyping = __webpack_require__(20).WhosTyping;
-	var getMessageString = __webpack_require__(7).getMessageString;
-	var PerfectScrollbar = __webpack_require__(8).PerfectScrollbar;
-	var ParticipantsList = __webpack_require__(22).ParticipantsList;
-
-	var GenericConversationMessage = __webpack_require__(23).GenericConversationMessage;
-	var AlterParticipantsConversationMessage = __webpack_require__(29).AlterParticipantsConversationMessage;
-	var TruncatedMessage = __webpack_require__(30).TruncatedMessage;
-	var PrivilegeChange = __webpack_require__(31).PrivilegeChange;
-	var TopicChange = __webpack_require__(32).TopicChange;
 
 	var DEBUG_PARTICIPANTS_MULTIPLICATOR = 1;
 

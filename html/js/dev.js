@@ -227,7 +227,20 @@ function dev_app() {
 
 
     $('.reg-st5-complete-button.cancel').rebind('click', function(e) {
-        loadSubPage('sdk');
+        // Fill further info after keys just being generated
+        if (sdk_app.hasOwnProperty('new') && sdk_app.new) {
+            api_req({
+                a: 'apd',
+                'ah': sdk_app.key
+            }, {
+                callback: function() {
+                    loadingDialog.hide();
+                    loadSubPage('sdk');
+                }
+            });
+        } else { // Modify the existing develop keys
+            loadSubPage('sdk');
+        }
     });
 
     $('.reg-st5-complete-button.save').rebind('click', function(e) {

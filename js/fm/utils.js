@@ -904,6 +904,12 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                 if (is_extension) {
                     location.reload();
                 }
+                else if (is_mobile) {
+
+                    // Always go back to the Login page on logout on mobile
+                    loadSubPage('login');
+                    location.reload();
+                }
                 else {
                     var myHost;
                     if (location.href.indexOf('/fm/search/') > -1) {
@@ -1031,10 +1037,15 @@ MegaUtils.prototype.findDupes = function() {
 /**
  * Handle a redirect from the mega.co.nz/#pro page to mega.nz/#pro page
  * and keep the user logged in at the same time
+ *
+ * @param {String} [data] optional data to decode
+ * @returns {Boolean}
  */
-MegaUtils.prototype.transferFromMegaCoNz = function() {
+MegaUtils.prototype.transferFromMegaCoNz = function(data) {
+    'use strict';
+
     // Get site transfer data from after the hash in the URL
-    var urlParts = /sitetransfer!(.*)/.exec(window.location);
+    var urlParts = /sitetransfer!(.*)/.exec(data || window.location);
 
     if (urlParts) {
 
@@ -2002,6 +2013,20 @@ MegaUtils.prototype.getStates = function() {
         this._states = (new RegionsCollection()).states;
     }
     return this._states;
+};
+
+/**
+ * Return a country call code for a given country
+ * @param {String} isoCountryCode A two letter ISO country code e.g. NZ, AU
+ * @returns {String} Returns the country international call code e.g. 64, 61
+ */
+MegaUtils.prototype.getCountryCallCode = function(isoCountryCode) {
+    'use strict';
+
+    if (!this._countryCallCodes) {
+        this._countryCallCodes = (new RegionsCollection()).countryCallCodes;
+    }
+    return this._countryCallCodes[isoCountryCode];
 };
 
 /**

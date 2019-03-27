@@ -93,12 +93,21 @@ var megasync = (function() {
      * creates an HTML dropdown with the list of distros we support.
      *
      */
-    function linuxDropdown(selected) {
+    function linuxDropdown(selected, forMsyncDialog) {
 
         var is64    = browserdetails().is64bit;
         var $dropdown = $('.megasync .megaapp-dropdown');
         var $select = $dropdown.find('.megaapp-scr-pad').empty();
-        var $list   = $dropdown.find('.megaapp-dropdown-list');
+        var $list = $dropdown.find('.megaapp-dropdown-list');
+        var $background = $('.bottom-page.scroll-block.megasync');
+
+        if (forMsyncDialog) {
+            $dropdown = $('.megasync-overlay .megasync-dropdown');
+            $select = $dropdown.find('.megasync-scr-pad').empty();
+            $list = $dropdown.find('.megasync-dropdown-list');
+            $background = $('.megasync-overlay');
+        }
+
         $('.megasync-overlay').addClass('linux');
 
         if (typeof selected !== "function") {
@@ -129,10 +138,10 @@ var megasync = (function() {
             selected($(this));
         });
 
-        $('.bottom-page.scroll-block.megasync').rebind('click.closesyncdropdown', function(e) {
+        $background.rebind('click.closesyncdropdown', function(e) {
             if ($dropdown.hasClass('active')) {
-                if ($(e.target).parent('.megaapp-dropdown').length === 0 &&
-                        !$(e.target).hasClass('megaapp-dropdown')) {
+                if ($(e.target).parent('.megaapp-dropdown, .megasync-dropdown').length === 0 &&
+                    !$(e.target).hasClass('megaapp-dropdown, .megasync-dropdown')) {
                     $dropdown.removeClass('active');
                     $list.addClass('hidden');
                 }
@@ -146,27 +155,35 @@ var megasync = (function() {
                 $list.addClass('hidden');
             } else {
                 $this.addClass('active');
-                $this.find('.megaapp-dropdown-list').removeClass('hidden');
-                linuxDropdownResizeHandler();
+                // $this.find('.megaapp-dropdown-list').removeClass('hidden');
+                $list.removeClass('hidden');
+                linuxDropdownResizeHandler(forMsyncDialog);
             }
         });
 
         $(window).rebind('resize.linuxDropdown', function() {
-            linuxDropdownResizeHandler();
+            linuxDropdownResizeHandler(forMsyncDialog);
         });
     }
 
     /**
      * Handle window-resize events on the Linux Dropdown
      */
-    function linuxDropdownResizeHandler() {
+    function linuxDropdownResizeHandler(forMsyncDialog) {
         var $list = $('.megaapp-dropdown-list:visible');
         var $pane = $list.find('.megaapp-dropdown-scroll');
-        var jsp   = $pane.data('jsp');
-        var $arrow = $list.find('.mega-list-arrow');
         var overlayHeight = $('body').outerHeight();
         var listHeight = $list.find('.megaapp-scr-pad').outerHeight() + 72;
         var listPosition;
+
+        if (forMsyncDialog) {
+            $list = $('.megasync-dropdown-list:visible');
+            $pane = $list.find('.megasync-dropdown-scroll');
+            listHeight = $list.find('.megasync-scr-pad').outerHeight() + 72;
+        }
+
+        var jsp = $pane.data('jsp');
+        var $arrow = $list.find('.mega-list-arrow');
 
         if ($list.length) {
             listPosition = $list.offset().top;
@@ -232,9 +249,12 @@ var megasync = (function() {
         $overlay.removeClass('hidden').addClass('downloading');
         $('body').addClass('overlayed');
 
-        $('.megasync-close', $overlay).rebind('click', function(e) {
-            $overlay.addClass('hidden');
+        $('.megasync-close, .megasync-close-txt', $overlay).rebind('click', function(e) {
+            $overlay.addClass('hidden').removeClass('downloading');
             $('body').removeClass('overlayed');
+            $('body').off('keyup.msd');
+            $overlay.hide();
+            return false;
         });
 
         $('body').rebind('keyup.sdd', function(e) {
@@ -252,7 +272,7 @@ var megasync = (function() {
             ns.getLinuxReleases(function() {
                 loadingDialog.hide();
                 $modal.show();
-                linuxDropdown();
+                linuxDropdown(null, true);
             });
         } else {
             window.location = url;

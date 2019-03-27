@@ -231,6 +231,7 @@ function init_page() {
     page = page || (u_type ? 'fm' : 'start');
 
     var mobilePageParsed = false;
+    var ar;
 
     if (!window.M) {
         return console.warn('Something went wrong, the initialization did not completed...');
@@ -249,10 +250,20 @@ function init_page() {
         delete localStorage.businessSubAc;
     }
 
+    // Users that logged in and are suspended (requiring special SMS unlock) are not allowed to go anywhere else in the
+    // site until they validate their account. So if they clicked the browser back button, then they should get logged
+    // out or they will end up with with a partially logged in account stuck in an infinite loop. This logout is not
+    // triggered on the mobile web sms/ pages because a session is still required to talk with the API to get unlocked.
+    if ((typeof sms !== 'undefined' && sms.isSuspended) ||
+        (typeof mobile !== 'undefined' && mobile.sms.isSuspended && page.substr(0, 3) !== 'sms')) {
+
+        u_logout(true);
+    }
+
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
 
-        var ar = page.substr(1, page.length - 1).split('!');
+        ar = page.substr(1, page.length - 1).split('!');
         if (ar[0]) {
             dlid = ar[0].replace(/[^\w-]+/g, "");
         }
@@ -389,7 +400,7 @@ function init_page() {
             $.autoSelectNode = page[1];
             page = page[0];
         }
-        var ar = page.substr(2, page.length - 1).split('!');
+        ar = page.substr(2, page.length - 1).split(/[^!\w-]/, 1)[0].split('!');
 
         pfid = false;
         if (ar[0]) {
@@ -943,39 +954,54 @@ function init_page() {
         loadSubPage('fm/account/achievements');
         return false;
     }
-    else if (is_mobile && page === 'twofactor/intro') {
+    else if (is_mobile && page.substr(0, 9) === 'twofactor') {
+
         parsepage(pages['mobile']);
-        mobile.twofactor.intro.init();
+
+        if (page.indexOf('intro') > -1) {
+            mobile.twofactor.intro.init();
+        }
+        else if (page.indexOf('verify-setup') > -1) {
+            mobile.twofactor.verifySetup.init();
+        }
+        else if (page.indexOf('setup') > -1) {
+            mobile.twofactor.setup.init();
+        }
+        else if (page.indexOf('enabled') > -1) {
+            mobile.twofactor.enabled.init();
+        }
+        else if (page.indexOf('verify-disable') > -1) {
+            mobile.twofactor.verifyDisable.init();
+        }
+        else if (page.indexOf('disabled') > -1) {
+            mobile.twofactor.disabled.init();
+        }
+        else if (page.indexOf('verify-login') > -1) {
+            mobile.twofactor.verifyLogin.init();
+        }
+
         return false;
     }
-    else if (is_mobile && page === 'twofactor/setup') {
+    else if (is_mobile && page.substr(0, 3) === 'sms') {
+
         parsepage(pages['mobile']);
-        mobile.twofactor.setup.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/verify-setup') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.verifySetup.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/enabled') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.enabled.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/verify-disable') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.verifyDisable.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/disabled') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.disabled.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/verify-login') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.verifyLogin.init();
+
+        if (page.indexOf('add-phone-suspended') > -1) {
+            mobile.sms.phoneInput.init();
+        }
+        else if (page.indexOf('verify-code') > -1) {
+            mobile.sms.verifyCode.init();
+        }
+        else if (page.indexOf('verify-success') > -1) {
+            mobile.sms.verifySuccess.init();
+        }
+        else if (page.indexOf('phone-achievement-intro') > -1) {
+            mobile.sms.achievement.init();
+        }
+        else if (page.indexOf('add-phone-achievement') > -1) {
+            mobile.sms.phoneInput.init();
+        }
+
         return false;
     }
     else if (page === 'fm/account/profile') {
@@ -1060,6 +1086,17 @@ function init_page() {
         parsepage(pages['contact']);
         if (lang == 'ru') {
             $('.account-mid-block').addClass('high');
+        }
+
+        // if this is a business user
+        var $supportLink = $('#contact-email-support-btn');
+        if (u_attr && u_attr.b) {
+            $supportLink.text('business@mega.nz');
+            $supportLink.prop('href', 'mailto:business@mega.nz');
+        }
+        else {
+            $supportLink.text('support@mega.nz');
+            $supportLink.prop('href', 'mailto:support@mega.nz');
         }
 
         // On clicking the directory buttons
@@ -1377,9 +1414,15 @@ function init_page() {
     }
     else if (page.substr(0, 7) === 'payment') {
 
-        // Load the Pro page in the background
-        parsepage(pages['proplan']);
-        pro.proplan.init();
+        if (page.indexOf('-b') === -1) {
+            // Load the Pro page in the background
+            parsepage(pages['proplan']);
+            pro.proplan.init();
+        }
+        else {
+            parsepage(pages['business']);
+            $('body').addClass('business');
+        }
 
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
         pro.proplan.processReturnUrlFromProvider(page);
@@ -1494,7 +1537,7 @@ function init_page() {
         localStorage.setItem('voucherExpiry', Date.now() + 36e5);
 
         // If not logged in, direct them to login or register first
-        if (u_type === false) {
+        if (!u_type) {
             if (u_wasloggedin()) {
                 login_txt = l[7712];
                 loadSubPage('login');
@@ -1605,8 +1648,8 @@ function init_page() {
             mega.initLoadReport();
             loadfm();
         }
-        else if ((!pfid || flhashchange) && id && id !== M.currentdirid) {
-            M.openFolder(id);
+        else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start')) {
+            M.openFolder(id, true);
         }
         else {
             if (ul_queue.length > 0) {
@@ -1730,6 +1773,8 @@ function init_page() {
 
     loggedout = false;
     flhashchange = false;
+
+    onIdle(blockChromePasswordManager);
 }
 
 function topmenuUI() {
@@ -1926,6 +1971,7 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').addClass('hidden');
         $topHeader.find('.top-icon.achievements').addClass('hidden');
         $topHeader.find('.create-account-button').removeClass('hidden');
+        $topHeader.find('.left.individual').addClass('hidden');
 
         $('.create-account-button').rebind('click', function () {
             if ($(this).hasClass('business-reg')) {
@@ -2380,14 +2426,9 @@ function topmenuUI() {
     });
 
     // If the main Mega M logo in the header is clicked
-    $topHeader.find('.logo').rebind('click', function () {
+    $('.top-head, .fm-main').find('.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
-            if (folderlink) {
-                M.openFolder(M.RootID, true);
-            }
-            else {
-                loadSubPage(typeof u_type !== 'undefined' && +u_type > 2 ? 'fm/dashboard' : 'start');
-            }
+            loadSubPage('start');
         }
     });
 
@@ -2684,6 +2725,15 @@ function loadSubPage(tpage, event) {
         else {
             history.pushState({ subpage: page }, "", "/" + page);
         }
+    }
+
+    // since hash changing above will fire popstate event, which in its turn will call
+    // loadsubpage again. We will end up in folderlinks issue when they are decrypted with a provided key.
+    if (page !== '' && page !== tpage) {
+        if (d) {
+            console.warn('LoadSubPage arrived to IF statement proving race-condition');
+        }
+        return false;
     }
 
     if (jsl.length > 0) {

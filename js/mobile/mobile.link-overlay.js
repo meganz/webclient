@@ -35,6 +35,8 @@ mobile.linkOverlay = {
         this.$overlay.find('.copy').addClass('disabled');
         this.$overlay.find('.remove').addClass('disabled');
 
+        mobile.initOverlayPopstateHandler(this.$overlay);
+
         var tmpFn = function() {
 
             // If a link already exists for this, show the link and copy/remove buttons

@@ -889,7 +889,6 @@ function api_reqfailed(c, e) {
 
         api_req({ a: 'whyamiblocked' }, {
             callback: function whyAmIBlocked(reasonCode) {
-                u_logout(true);
 
                 // On clicking OK, log the user out and redirect to contact page
                 loadingDialog.hide();
@@ -907,9 +906,28 @@ function api_reqfailed(c, e) {
                 else if (reasonCode === 400) {
                     reasonText = l[19748];// Your account was terminated due to breach of Mega's Terms of Service...
                 }
-                else {// Unknown reasonCode
-                    reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
+                else if (reasonCode === 500) {
+
+                    // Handle SMS verification for suspended account
+                    if (is_mobile) {
+                        loadSubPage('sms/add-phone-suspended');
+                    }
+                    else {
+                        sms.phoneInput.init(true);
+                    }
+
+                    // Exit early to prevent logout because further API requests are
+                    // needed to verify by SMS and if logged out then it won't work
+                    return false;
                 }
+                else {
+                    // Unknown reasonCode
+                    reasonText = l[17740]; // Your account was terminated due to breach of Mega's Terms of Service...
+                }
+
+                // Log the user out for all scenarios except SMS required (500)
+                u_logout(true);
+
                 // if fm-overlay click handler was initialized, we remove the handler to prevent dialog skip
                 $('.fm-dialog-overlay').off('click.fm');
                 msgDialog('warninga', dialogTitle,

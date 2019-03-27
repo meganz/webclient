@@ -120,6 +120,8 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                         fmdb.db = false;
                     });
                 }
+
+                eventlog(99724, '$init:' + error, true);
             }
 
             result(sn);
@@ -447,6 +449,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     fmdb.logger.error("Transaction failed, marking DB as crashed", e);
                     fmdb.state = -1;
                     fmdb.invalidate();
+
+                    eventlog(99724, '$wptr:' + e, true);
                 }
             });
     }
@@ -478,6 +482,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     fmdb.logger.error("SN clearing failed, marking DB as crashed", e);
                     fmdb.state = -1;
                     fmdb.invalidate();
+
+                    eventlog(99724, '$wpsn:' + e, true);
                 });
 
             }
@@ -607,6 +613,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     if (d) {
                         fmdb.logger.warn('Marked DB as crashed...', e.name);
                     }
+
+                    eventlog(99724, String(e), true);
                 });
 
                 // we don't send more than one transaction (looking at you, Microsoft!)
@@ -1163,7 +1171,7 @@ FMDB.prototype.invalidate = function fmdb_invalidate(cb, readop) {
     this.inval_cb = cb;
 
     // force a non-treecache on the next load
-    localStorage.force = 1;
+    // localStorage.force = 1;
 };
 
 // checks if crashed or being used by another tab concurrently

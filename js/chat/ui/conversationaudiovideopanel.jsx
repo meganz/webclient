@@ -1,26 +1,8 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-var utils = require('./../../ui/utils.jsx');
 var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
-var ButtonsUI = require('./../../ui/buttons.jsx');
-var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
-var CloudBrowserModalDialog = require('./../../ui/cloudBrowserModalDialog.jsx');
-var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
-var ConversationsUI = require('./../ui/conversations.jsx');
-var TypingAreaUI = require('./../ui/typingArea.jsx');
-var WhosTyping = require('./whosTyping.jsx').WhosTyping;
-var getMessageString = require('./messages/utils.jsx').getMessageString;
-var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
-var ParticipantsList = require('./participantsList.jsx').ParticipantsList;
-
-var GenericConversationMessage = require('./messages/generic.jsx').GenericConversationMessage;
-var AlterParticipantsConversationMessage =
-    require('./messages/alterParticipants.jsx').AlterParticipantsConversationMessage;
-var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
-var PrivilegeChange = require('./messages/privilegeChange.jsx').PrivilegeChange;
-var TopicChange = require('./messages/topicChange.jsx').TopicChange;
 
 var DEBUG_PARTICIPANTS_MULTIPLICATOR = 1;
 

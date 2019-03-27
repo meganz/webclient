@@ -48,6 +48,8 @@ mobile.downloadOverlay = {
 
         // Show the overlay
         this.$overlay.removeClass('hidden').addClass('overlay');
+
+        mobile.initOverlayPopstateHandler(this.$overlay);
     },
 
     /**

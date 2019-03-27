@@ -300,6 +300,9 @@ if (!b_u) try
         if (typeof localStorage === 'undefined' || localStorage === null) {
             throw new Error('SecurityError: DOM Exception 18');
         }
+        if (typeof localStorage.d === 'undefined' && location.host === 'smoketest.static.mega.co.nz') {
+            localStorage.d = 1;
+        }
         d = localStorage.d | 0;
         jj = localStorage.jj;
         dd = localStorage.dd;
@@ -542,6 +545,18 @@ var urlrootfile = '';
 // Disable hash checking for search engines to speed the site load up
 if (is_bot) {
     nocontentcheck = true;
+}
+
+tmp = getCleanSitePath(location.hash || undefined);
+if (tmp.substr(0, 12) === 'sitetransfer') {
+    try {
+        sessionStorage.sitet = tmp;
+        document.location = 'https://mega.nz/start';
+    }
+    catch (ex) {
+        console.warn(ex);
+    }
+    hashLogic = true; // temporarily prevent the history.* calls in case they are reached...
 }
 
 if (!b_u && is_extension)
@@ -1239,10 +1254,22 @@ else {
 
 function siteLoadError(error, filename) {
     'use strict';
+
+    if (!window.buildOlderThan10Days && !window.log99723) {
+        onIdle(function() {
+            var xhr = getxhr();
+            xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
+            xhr.send(JSON.stringify([{a: 'log', e: 99723, m: JSON.stringify([1, error, filename, staticpath])}]));
+        });
+
+        window.log99723 = true;
+    }
+
     var message = ['MEGA failed to load because of '];
     if (location.host !== 'mega.nz') {
         message[0] += '..';
     }
+
     if (error === 1) {
         message.push('The file "' + filename + '" is corrupt.');
     }
@@ -1253,17 +1280,30 @@ function siteLoadError(error, filename) {
         message.push('Filename: ' + filename + "\nException: " + error);
         message.push('Stack trace: ' + String(error.stack).split('\n').splice(1, 4).join('\n'));
     }
+
     message.push('Please click OK to refresh and try again.');
-    message.push("If the problem persists, please try disabling all third-party browser extensions,"
-        + " update your browser and MEGA browser extension to the latest version.If that does not help, "
-        + "contact support@mega.nz");
+    message.push("If the problem persists, please try disabling all third-party browser extensions, " +
+                 "update your browser and MEGA browser extension to the latest version. " +
+                 "If that does not help, contact support@mega.nz");
+
     message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
     message.push('Static server: ' + staticpath);
+
+    message = message.join("\n\n");
+    console.error(message);
     contenterror = 1;
-    // showing a confirm dialog containing the message, and if 'OK' pressed it will reload
-    if (confirm(message.join("\n\n")) === true) {
-        location.reload(true);
+
+    if (window.sleTick) {
+        return;
     }
+
+    window.sleTick = setTimeout(function() {
+        // showing a confirm dialog containing the message, and if 'OK' pressed it will reload
+        if (confirm(message) === true) {
+            location.reload(true);
+        }
+        window.sleTick = null;
+    }, 2e3);
 }
 
 // Add manifest.json so this can be used on latest browsers.
@@ -1935,8 +1975,9 @@ else if (!b_u) {
     jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
@@ -1952,7 +1993,6 @@ else if (!b_u) {
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
-    jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/js/registerb.js', n: 'registerb_js', j:1});
 
     if (!is_mobile) {
@@ -2068,6 +2108,7 @@ else if (!b_u) {
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
+        jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
         jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
 
@@ -2191,6 +2232,10 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.twofactor.disabled.js', n: 'mobile_twofactor_disabled_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-action.js', n: 'mobile_twofactor_verify_action_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.phone-input.js', n: 'mobile_sms_phone_input_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.verify-code.js', n: 'mobile_sms_verify_code_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.verify-success.js', n: 'mobile_sms_verify_success_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.achievement.js', n: 'mobile_sms_achievement', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.titlemenu.js', n: 'mobile_titlemenu_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rubbish-bin-empty-overlay.js', n: 'mobile_rubbish_bin_empty_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rubbishbin.js', n: 'mobile_rubbishbin_js', j: 1, w: 1});
@@ -3352,3 +3397,12 @@ function inherits(target, source) {
         enumerable: false
     });
 }
+
+mBroadcaster.once('startMega', function() {
+    var data = sessionStorage.sitet;
+
+    if (data) {
+        delete sessionStorage.sitet;
+        M.transferFromMegaCoNz(data);
+    }
+});

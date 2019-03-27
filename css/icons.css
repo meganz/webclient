@@ -60,6 +60,10 @@
     width: 48px;
     height: 48px;
 }
+.icon56 {
+    width: 56px;
+    height: 56px; 
+}
 .semi-huge-icon {
     width: 64px;
     height: 64px;
@@ -113,7 +117,7 @@
     background-position: -51px -3609px;
 }
 .tiny-icon.green-tick, .tiny-icon.red-cross {
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     background-position: -12px -1437px;
 }
 .tiny-icon.red-cross {
@@ -634,7 +638,7 @@
     background-position: -17px -10463px;
 }
 .medium-icon.rocket {
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     background-position: -7px -16px;
 }
 .medium-icon.down-arrow {
@@ -643,7 +647,7 @@
     width: 18px;
 }
 .medium-icon.icons-img, .semi-big-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -915,7 +919,7 @@
     background-position: -5px -876px;
 }
 .tiny-icon.membership-status {
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     background-position: -10px -979px;
     width: 16px;
 }
@@ -939,15 +943,15 @@
 }
 
 .semi-small-icon.grey-mega {
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     background-position: -10px -326px;
 }
 .semi-small-icon.white-mega {
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     background-position: -10px -701px;
 }
 .semi-small-icon.yellow-triangle {
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     background-position: -10px -1266px;
 }
 .small-icon.dark-grey-plus {
@@ -995,15 +999,15 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
     background-position: -148px -634px;
 }
 .thumb .small-icon.small-play-icon {
@@ -1011,7 +1015,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -1534,7 +1538,7 @@
 }
 
 i.icons-sprite, i.small-icon.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;
@@ -1643,7 +1647,7 @@ i.icons-sprite, i.small-icon.icons-sprite {
 i.account-icon {
     width: 26px;
     height: 26px;
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     background-repeat: no-repeat;
 }
 i.account-icon.building {
@@ -1661,7 +1665,15 @@ i.account-icon.email {
 i.account-icon.lock {
     background-position: -6px -1740px;
 }
-
+i.account-icon.globe {
+    background-position: -6px -2072px;
+}
+i.account-icon.mobile {
+    background-position: -6px -2112px;
+}
+i.account-icon.select-arrow {
+    background-position: -6px -2150px;
+}
 .link-button > .small-icon.colorized, .link-button:hover > .small-icon.colorized, .link-button.active > .small-icon, .link-button.red:hover > .small-icon, .link-button.red.active > .small-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;

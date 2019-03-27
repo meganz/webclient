@@ -17,7 +17,7 @@ function dashboardUI() {
 
     $('.fm-right-files-block, .section.conversations, .fm-right-account-block').addClass('hidden');
     $('.fm-right-block.dashboard').removeClass('hidden');
-    
+
     // Hide backup widget is user already saved recovery key before
     if (localStorage.recoverykey) {
         $('.account.widget.recovery-key').addClass('hidden');
@@ -25,11 +25,6 @@ function dashboardUI() {
     else {
         $('.account.widget.recovery-key').removeClass('hidden');
     }
-
-    // Button on dashboard to backup their master key
-    $('.dashboard .backup-master-key').rebind('click', function() {
-        M.showRecoveryKeyDialog(2);
-    });
 
     M.onSectionUIOpen('dashboard');
     accountUI.general.userUIUpdate();
@@ -429,6 +424,9 @@ function dashboardUI() {
             $dataStats.find('.ba-rubbish .folder-number').text(account.stats[M.RubbishID].folders + ' ' + l[2035]);
             $dataStats.find('.ba-rubbish .file-number').text(account.stats[M.RubbishID].files + ' ' + l[2034]);
 
+            $dataStats.find('.ba-pub-links .ff-occupy').text(bytesToSize(account.stats['links'].bytes));
+            $dataStats.find('.ba-pub-links .file-number').text(account.stats['links'].files);
+
             var verFiles = 0;
             var verBytes = 0;
             verFiles = account.stats[M.RootID]['vfiles'];
@@ -446,6 +444,10 @@ function dashboardUI() {
                 loadSubPage('fm/account/file-management');
             });
 
+            $('.business-dashboard .used-storage-info.ba-pub-links').rebind('click.suba', function() {
+                loadSubPage('fm/links');
+            });
+
             $dataStats.find('.ba-version .ff-occupy').text(bytesToSize(verBytes));
             // $dataStats.find('.ba-version .file-number').text(verFiles + ' ' + l[2034]);
             $dataStats.find('.ba-version .file-number').text(verFiles);
@@ -458,10 +460,13 @@ function dashboardUI() {
         //    $('.account.widget.body.achievements').addClass('hidden');
         // }
 
-        
-
         onIdle(fm_resize_handler);
         initTreeScroll();
+
+        // Button on dashboard to backup their master key
+        $('.dashboard .backup-master-key').rebind('click', function() {
+            M.showRecoveryKeyDialog(2);
+        });
     });
 }
 dashboardUI.updateWidgets = function(widget) {

@@ -160,7 +160,7 @@
     background-position: 0 -2249px;
 }
 .dropdown-dark-arrow {
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
     background-repeat: no-repeat;
     background-position: -41px -1315px;
     display: none;
@@ -178,6 +178,10 @@
     top: auto;
     bottom: -11px;
     background-position: -24px -2256px;
+}
+.dropdown.body.popup.astropay-payment-reminder {
+    width: auto;
+    max-width: 464px;
 }
 .left-arrow .dropdown-white-arrow {
     width: 11px;
@@ -279,7 +283,7 @@
     position: absolute;
     right: 7px;
     top: 9px;
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
     background-repeat: no-repeat;
     background-position: -106px -254px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
@@ -353,7 +357,7 @@
     top: 7px;
     content: '';
     display: block;
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
     background-repeat: no-repeat;
 }
 .colour-sorting-menu .dropdown-item.asc i::after {/* Dark arrow pointing up */
@@ -645,7 +649,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     transition: all 200ms ease-in-out, right 200ms ease-in-out;
 }
 .labels:not(.disabled) .dropdown-colour-item::after {
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
     background-position: 2.2px -532.2px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;

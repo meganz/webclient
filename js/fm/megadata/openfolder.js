@@ -473,18 +473,7 @@
         }
 
         var promise = new MegaPromise();
-
-        if (fetchdbnodes || $.ofShowNoFolders) {
-            var tp = $.ofShowNoFolders ? dbfetch.tree([id]) : dbfetch.get(id);
-
-            tp.always(function() {
-                if (!M.d[id]) {
-                    id = M.RootID;
-                }
-                _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
-            });
-        }
-        else if (fetchshares || id === 'shares') {
+        var fetchShares = function() {
             dbfetch.geta(Object.keys(M.c.shares || {}))
                 .always(function() {
                     if (!$.inSharesRebuild) {
@@ -493,6 +482,26 @@
                     }
                     _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
                 });
+        };
+
+        if (fetchdbnodes || $.ofShowNoFolders) {
+            var tp = $.ofShowNoFolders ? dbfetch.tree([id]) : dbfetch.get(id);
+
+            tp.always(function() {
+                if (!M.d[id]) {
+                    id = M.RootID;
+                }
+
+                if (M.getPath(id).pop() === 'shares') {
+                    fetchShares();
+                }
+                else {
+                    _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
+                }
+            });
+        }
+        else if (fetchshares || id === 'shares') {
+            fetchShares();
         }
         else {
             _openFolderCompletion.call(this, id, newHashLocation, firstopen, promise);

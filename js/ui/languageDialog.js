@@ -195,8 +195,21 @@ var langDialog = {
             // If not the currently selected language, change to the selected language
             if (selectedLangCode !== lang) {
 
-                // Store the new language in localStorage to be used upon reload
-                localStorage.lang = selectedLangCode;
+                var _reload = function() {
+                    loadingDialog.hide();
+
+                    // Store the new language in localStorage to be used upon reload
+                    localStorage.lang = selectedLangCode;
+
+                    // If there are transfers, ask the user to cancel them to reload...
+                    M.abortTransfers().then(function() {
+                        // Reload the site
+                        location.reload();
+                    }).catch(function(ex) {
+                        console.debug('Not reloading upon language change...', ex);
+                    });
+                };
+                loadingDialog.show();
 
                 // Set a language user attribute on the API (This is a private but unencrypted user
                 // attribute so that the API can read it and send emails in the correct language)
@@ -206,11 +219,13 @@ var langDialog = {
                         selectedLangCode,       // E.g. en, es, pt
                         -2,                     // Set to private private not encrypted
                         true                    // Set to non-historic, this won't retain previous values on API server
-                    );
+                    ).then(function() {
+                        setTimeout(_reload, 3e3);
+                    }).catch(_reload);
                 }
-
-                // Reload the site
-                document.location.reload();
+                else {
+                    _reload();
+                }
             }
         });
     }

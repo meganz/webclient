@@ -156,6 +156,7 @@ var exportPassword = {
             var $linkAndDecryptionKeyButtons = this.$dialog.find('.separate-link-and-key');
             var $passwordLinkText = this.$dialog.find('.password-protected-data');
             var $linkBlock = this.$dialog.find('.file-link-block');
+            var $copyBtn = this.$dialog.find('.copy-to-clipboard');
 
             // Slide button to the right
             $toggleBtn.find('.dialog-feature-switch').animate({ marginLeft: '17px' }, 150, 'swing', function() {
@@ -173,6 +174,9 @@ var exportPassword = {
 
                 // Disable other buttons as they are not applicable until the toggle is disabled
                 $linkAndDecryptionKeyButtons.addClass('disabled');
+
+                // Disable copy button until user enter password and click encrypt.
+                $copyBtn.addClass('disabled');
 
                 // Add special styling for the link text
                 $linkBlock.addClass('password-protect-link');
@@ -200,6 +204,7 @@ var exportPassword = {
             var $passwordInput = this.$dialog.find('.password-protect-input');
             var $errorLabel = this.$dialog.find('.password-protect-error');
             var $encryptButtonText = this.$dialog.find('.encrypt-link-button .encrypt-text');
+            var $copyBtn = this.$dialog.find('.copy-to-clipboard');
 
             // Slide the button to the left
             $toggleBtn.find('.dialog-feature-switch').animate({ marginLeft: '2px' }, 150, 'swing', function() {
@@ -214,6 +219,9 @@ var exportPassword = {
 
                 // Re-enable other buttons as they are not applicable until the toggle is disabled
                 $linkAndDecryptionKeyButtons.removeClass('disabled');
+
+                // enable copy button when user give up password encryption.
+                $copyBtn.removeClass('disabled');
 
                 // Remove special styling for the link text
                 $linkBlock.removeClass('password-protect-link');
@@ -429,6 +437,7 @@ var exportPassword = {
             var $encryptButtonProgress = $encryptButton.find('.encryption-in-progress');
             var $errorLabel = this.$dialog.find('.password-protect-error');
             var $strengthLabel = this.$dialog.find('.password-strength');
+            var $copyBtn = this.$dialog.find('.copy-to-clipboard');
 
             // If they have already encrypted the link (and the password has not changed) then don't do anything
             if ($encryptButtonText.hasClass('encrypted')) {
@@ -495,6 +504,8 @@ var exportPassword = {
                 // Derive the key and create the password protected link
                 processLinkInfo(link, algorithm, saltBytes, password);
             }
+
+            $copyBtn.removeClass('disabled');
         },
 
         /**
@@ -1429,6 +1440,7 @@ var exportExpiry = {
                     $('.embed-content-block', $linksDialog).removeClass('hidden');
                     $('.export-content-block', $linksDialog).addClass('hidden');
                     // $('.fm-dialog-title', $linksDialog).text(l[1344] + ' (' + l[17407] + ')');
+                    $('.copy-to-clipboard', $linksDialog).removeClass('disabled');
                 }
                 else {
                     $('.fm-tab.tab-url-link', $block).addClass('active');
@@ -1436,6 +1448,12 @@ var exportExpiry = {
                     $('.embed-content-block', $linksDialog).addClass('hidden');
                     $('.export-content-block', $linksDialog).removeClass('hidden');
                     // $('.fm-dialog-title', $linksDialog).text(page === 'download' ? l[5622] : l[1031]);
+
+                    var $passwordProtectData = $('.password-protected-data', $linksDialog);
+                    if (!$passwordProtectData.hasClass('hidden') && $passwordProtectData.text() === ''){
+                        $('.copy-to-clipboard', $linksDialog).addClass('disabled');
+                    }
+
                     deleteScrollPanel(scroll, 'jsp');
                 }
                 centerDialog();
@@ -1520,6 +1538,9 @@ var exportExpiry = {
         // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
         if (is_extension || M.execCommandUsable()) {
             $('.copy-to-clipboard').rebind('click', function() {
+                if ($(this).hasClass('disabled')) {
+                    return false;
+                }
                 copyToClipboard(getContentsToClip(), toastTxt);
                 return false;
             });

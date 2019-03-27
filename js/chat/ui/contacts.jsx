@@ -926,26 +926,31 @@ var ContactPickerWidget = React.createClass({
             contacts = <em>{noContactsMsg}</em>;
         }
         var displayStyle = (self.state.searchValue && self.state.searchValue.length > 0) ? "" : "none";
-        return <div className={this.props.className + " " }>
-            <div className={"contacts-search-header " + this.props.headerClasses}>
-                <i className="small-icon search-icon"></i>
-                <input
-                    type="search"
-                    placeholder={__(l[8010])}
-                    ref="contactSearchField"
-                    onChange={this.onSearchChange}
-                    value={this.state.searchValue}
-                />
-                <div className="search-result-clear" style={{display : displayStyle}} onClick={clearSearch}></div>
-            </div>
-
-            <utils.JScrollPane className="contacts-search-scroll" selected={this.state.selected}>
-                <div style={innerDivStyles}>
-                    {contacts}
+        return (
+            <div className={this.props.className + " " }>
+                <div 
+                    className={"contacts-search-header " + (this.props.headerClasses ? this.props.headerClasses : '')}
+                >
+                    <i className="small-icon search-icon"></i>
+                    <input
+                        type="search"
+                        autoFocus
+                        placeholder={__(l[8010])}
+                        ref="contactSearchField"
+                        onChange={this.onSearchChange}
+                        value={this.state.searchValue}
+                    />
+                    <div className="search-result-clear" style={{display : displayStyle}} onClick={clearSearch}></div>
                 </div>
-            </utils.JScrollPane>
-            {footer}
-        </div>;
+
+                <utils.JScrollPane className="contacts-search-scroll" selected={this.state.selected}>
+                    <div style={innerDivStyles}>
+                        {contacts}
+                    </div>
+                </utils.JScrollPane>
+                {footer}
+            </div>
+        );
     }
 });
 

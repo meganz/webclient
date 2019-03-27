@@ -2435,7 +2435,7 @@ accountUI.security = {
             var html = '<tr class="' + (currentSession ? "current" : sessionId) + '">'
                 + '<td class="browser-os"><span class="fm-browsers-icon"><img title="'
                 + escapeHTML(userAgent.replace(/\s*megext/i, ''))
-                + '" src="' + staticpath + 'images/browser/' + browser.icon
+                + '" src="' + staticpath + 'images/browser-icons/' + browser.icon
                 + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
                 + '</span></td>'
                 + '<td class="ip-addr">' + ipAddress + '</td>'

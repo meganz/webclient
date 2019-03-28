@@ -55,7 +55,7 @@
 
     var roundDownToMultiple = function (n, factor) {
         return n - (n % factor);
-    }
+    };
 
     /**
      * Helper class for CloudRaidRequest, keeps the data per channel in one instance.
@@ -79,7 +79,6 @@
         // slowest channel, to avoid using too much memory for buffers
         this.channelPauseCount = 0;
         this.channelPauseMillisec = 0;
-        this.channelLastPauseTime = 0;
         this.timedout = false;
         this.readTimeoutId = null;
         this.delayedinitialconnect = null;
@@ -90,16 +89,39 @@
         // URL of this part's data
         this.baseUrl = baseUrl;
 
-        // AbortController lets us terminate a fetch() operation (eg. on timeout).
-        // We can't reuse it after it's been signalled though, eg timeout on this part, then another, then back to this one
+        // AbortController lets us terminate a fetch() operation (eg. on timeout). We can't reuse it after
+        // it's been signalled though, eg timeout on this part, then another, then back to this one
         this.abortController = null;
         this.signal = null;
+        this.reader = null;
+        this.reading = false;
+        this.done = false;
 
+        // Whether abort was signalled from the higher layer.
         this.highlevelabort = false;
     }
 
     CloudRaidPartFetcher.prototype = Object.create(null, {constructor: {value: CloudRaidPartFetcher}});
+    CloudRaidPartFetcher.prototype.abort = function() {
 
+        if (this.abortController) {
+            this.abortController.abort();
+            this.abortController = false;
+        }
+
+        if (this.delayedinitialconnect) {
+            clearTimeout(this.delayedinitialconnect);
+            this.delayedinitialconnect = false;
+        }
+
+        this.done = false;
+        this.signal = false;
+        this.reader = false;
+        this.reading = false;
+        this.timedout = false;
+
+        return this;
+    };
     Object.freeze(CloudRaidPartFetcher.prototype);
 
 
@@ -115,15 +137,15 @@
      * Each 16 byte file sector is distributed across the servers in round robin fashion.
      * Any 5 of the 6 sectors at a given point in the file are enough to reconstitute the file data at that point.
      *
-     * Strategy:  First try to download 6 channels, and drop the slowest-to-respond channel. Build the file from the 5.
-     *            In case of a failure or timeout on any channel, stop using that channel and use the currently unused one.
+     * Strategy:  First try to download 6 channels, and drop the slowest-to-respond channel.
+     *            Build the file from the 5. In case of a failure or timeout on any channel,
+     *            stop using that channel and use the currently unused one.
      */
     function CloudRaidRequest(aDownload, aStartOffset, aEndOffset, aFiveChannelsMode) {
         var baseURLs = aDownload.url || aDownload.g;
         var fileSize = aDownload.size || aDownload.s;
 
         this.response = false;
-        this.resultBuffer = false;
         this.outputByteCount = 0;
         this.wholeFileDatalinePos = 0;
 
@@ -177,17 +199,6 @@
         // skip this amount of data in the first raid line to start at requested byte
         this.skipBeginningData = this.fileStartPos - this.wholeFileDatalinePos;
 
-        var lid = makeUUID().slice(-8) + ':' + this.fileStartPos + '-' + this.fileEndDeliverPos;
-        this.logger = new MegaLogger(lid, logger.options, logger);
-
-        if (!window.cloudRaidDebug) {
-            this.logger.debug = function() {};
-        }
-
-        if (d) {
-            this.logger.info("Initiating CloudRAID Request...", this);
-        }
-
         // Setup CloudRAID Settings inherited between CloudRaidRequest instances.
         var cloudRaidSettings = aDownload.cloudRaidSettings;
         if (!cloudRaidSettings || cloudRaidSettings.baseURLs !== baseURLs) {
@@ -201,6 +212,22 @@
             this.initialChannelMode = this.cloudRaidSettings.lastFailedChannel;
         }
 
+        var lid = false;
+        if (d) {
+            var uuid = makeUUID();
+            lid = cloudRaidSettings.iid || ((aDownload.id || aDownload.handle) + uuid.substr(-13, 5));
+            cloudRaidSettings.iid = lid;
+            lid += '-' + uuid.slice(-6) + ':' + this.fileStartPos + '-' + this.fileEndDeliverPos;
+        }
+        this.logger = new MegaLogger(lid, logger.options, logger);
+
+        if (!window.cloudRaidDebug) {
+            this.logger.debug = function() {};
+        }
+
+        if (d) {
+            this.logger.info("Initiating CloudRAID Request...", this);
+        }
     }
 
     /**
@@ -253,8 +280,7 @@
 
                 this.highlevelabort = true;
                 for (var i = this.RAIDPARTS; i--;) {
-                    if (this.part[i].abortController !== null) this.part[i].abortController.abort();
-                    if (this.part[i].delayedinitialconnect !== null) clearTimeout(this.part[i].delayedinitialconnect);
+                    this.part[i].abort();
                 }
 
                 this.dispatchEvent('abort', XMLHttpRequest.DONE);
@@ -291,7 +317,8 @@
     CloudRaidRequest.prototype.RAIDSECTOR = 16;
     CloudRaidRequest.prototype.RAIDLINE = 16 * 5;
 
-    // With slow data speeds, and/or high cpu, we may not see data from a working fetch for over 40 seconds (experimentally determined)
+    // With slow data speeds, and/or high cpu, we may not see data
+    // from a working fetch for over 40 seconds (experimentally determined)
     CloudRaidRequest.prototype.FETCH_DATA_TIMEOUT_MS = 115000;
 
     CloudRaidRequest.prototype.onFailure = function (ev, failedPartNum) {
@@ -328,14 +355,20 @@
         var partStartPos = this.wholeFileDatalinePos / (this.RAIDPARTS - 1);
 
         if (this.initialChannelMode < 0) {
-            // we haven't decided which channel to skip yet.  Eg. on the first 5 connects, this one reports back first with connection refused.
-            // in this case, try again but on a bit of a delay.  Probably this one will turn out to be the slowest, and be cancelled anyway.
-            this.logger.log("We will retry channel " + failedPartNum + " shortly");
-            this.part[failedPartNum].delayedinitialconnect = setTimeout(function () { this.startPart(failedPartNum, partStartPos, this.initialChannelMode); }, 1000);
+            // we haven't decided which channel to skip yet.  Eg. on the first 5 connects, this one reports
+            // back first with connection refused. in this case, try again but on a bit of a delay.
+            // Probably this one will turn out to be the slowest, and be cancelled anyway.
+            this.logger.debug("We will retry channel %s shortly...", failedPartNum);
+
+            this.part[failedPartNum].delayedinitialconnect = setTimeout(function() {
+                self.startPart(failedPartNum, partStartPos, self.initialChannelMode);
+            }, 1000);
         }
         else {
-            // turn the faulty channel (which is already stopped) into the idle channel (which already reached the end), and start reading from the old idle channel
-            this.logger.log("Resetting channels " + this.initialChannelMode + " and " + failedPartNum);
+            // turn the faulty channel (which is already stopped) into the idle
+            // channel (which already reached the end), and start reading from the old idle channel
+            this.logger.debug("Resetting channels %s and %s", this.initialChannelMode, failedPartNum);
+
             this.part[failedPartNum].filePieces = [];
             this.part[this.initialChannelMode].filePieces = [];
             this.startPart(failedPartNum, partStartPos, failedPartNum);
@@ -403,6 +436,7 @@
             }
         }
 
+        this.part[partNum].abort();
         this.loadPart(partNum, partStartPos, partSize, skipStrategy);
     };
 
@@ -416,7 +450,7 @@
     };
 
 
-    CloudRaidRequest.prototype.recoverFromParity = function (target, buffers, offset, dolog) {
+    CloudRaidRequest.prototype.recoverFromParity = function(target, buffers, offset) {
         // target is already initialised to 0 so we can xor directly into it
         for (var i = this.RAIDPARTS; i--;) {
             if (!buffers[i].skipped) {
@@ -433,18 +467,19 @@
 
         var dataremaining = piecesLen * (this.RAIDPARTS - 1);
         var fileBuf = new ArrayBuffer(dataremaining);
-
-        var pos = piecesPos;
         var datalines = piecesLen / this.RAIDSECTOR;
+        var pos = piecesPos;
+
         for (var dataline = 0; dataline < datalines; ++dataline) {
-            //		console.log("dataline " + dataline);
             for (var i = 1; i < this.RAIDPARTS; i++) {
                 var s = Math.min(dataremaining, this.RAIDSECTOR);
                 if (s > 0 && pieces[i] !== null) {
                     var target = new Uint8Array(fileBuf, dataline * this.RAIDLINE + (i - 1) * this.RAIDSECTOR, s);
+
                     if (pieces[i].skipped) {
                         this.recoverFromParity(target, pieces, pos - piecesPos, false);
-                    } else {
+                    }
+                    else {
                         var offset = (pieces[i].used + pos - piecesPos);
                         var source = pieces[i].buffer.subarray(offset, offset + s);
                         target.set(source);
@@ -477,27 +512,28 @@
         var dataToDeliver = new Uint8Array(fileBuf, skipFileFront, deliverByteLen);
 
         // fill in the buffer with the new full-file rows
-        if (this.resultBuffer === false) {
-            this.resultBuffer = new Uint8Array(new ArrayBuffer(this.expectedBytes), 0, this.expectedBytes);
+        if (!this.response) {
+            this.response = new Uint8Array(this.expectedBytes);
         }
-        this.resultBuffer.subarray(this.outputByteCount, this.outputByteCount + deliverByteLen).set(dataToDeliver);
+        this.response.subarray(this.outputByteCount, this.outputByteCount + deliverByteLen).set(dataToDeliver);
 
         this.outputByteCount += deliverByteLen;
         this.wholeFileDatalinePos += fileBuf.byteLength;
 
-        // notify of progress anytime we construct rows of the original file for smooth data rate display (and avoiding timeouts)
-        if (dataToDeliver.byteLength > 0 && this.onprogress) {
-            this.dispatchEvent('progress', {
+        // notify of progress anytime we construct rows of the original
+        // file for smooth data rate display (and avoiding timeouts)
+        if (this.outputByteCount && this.onprogress) {
+            var progress = this.dispatchEvent.bind(this, 'progress', {
                 lengthComputable: 1,
                 total: this.expectedBytes,
                 loaded: this.outputByteCount
             });
+            delay(this.logger.name, progress, 190);
         }
 
         if (this.outputByteCount === this.expectedBytes) {
 
             this.finished = true;
-            this.response = this.resultBuffer;
 
             if (d) {
                 var channelPauseMs = 0;
@@ -517,7 +553,6 @@
 
             onIdle(this.dispatchLoadEnd.bind(this));
         }
-
     };
 
     CloudRaidRequest.prototype.discardUsedParts = function (piecesize) {
@@ -533,42 +568,59 @@
                 fp[0].used += n;
             }
         }
-    }
+    };
 
     CloudRaidRequest.prototype.queueReceivedPiece = function(partNum, piece) {
 
         this.part[partNum].filePieces.push(piece);
 
-        for (; ;) {
+        while (1) {
+            var i;
+            var fp;
+            var tocombine = [];
             var combinesize = 1 << 20;
             var partpos = -1;
-            var totalsize = 0, part1len = 0, part0len = 0;
-            for (var i = this.RAIDPARTS; i--;) {
-                var fp = this.part[i].filePieces;
-                if (fp.length == 0)
+            var part1len = 0;
+            var part0len = 0;
+            var totalsize = 0;
+
+            for (i = this.RAIDPARTS; i--;) {
+                fp = this.part[i].filePieces;
+
+                if (!fp.length) {
                     combinesize = 0;
+                }
                 else {
                     combinesize = Math.min(combinesize, fp[0].buffer.byteLength - fp[0].used);
-                    if (partpos == -1)
+
+                    if (partpos === -1) {
                         partpos = fp[0].partpos + fp[0].used;
-                    else if (partpos != fp[0].partpos + fp[0].used) {
-                        this.logger.error('-----------ERROR: partpos mismatch ' + partpos + ' ' + (fp[0].partpos + fp[0].used));
+                    }
+                    else if (partpos !== fp[0].partpos + fp[0].used) {
+                        if (d) {
+                            this.logger.error('ERROR: partpos mismatch %s %s', partpos, (fp[0].partpos + fp[0].used));
+                        }
                         return; // should never happen
                     }
 
-                    if (i > 0) totalsize += fp[0].buffer.byteLength - fp[0].used;
-                    if (i == 0) part0len = fp[0].buffer.byteLength - fp[0].used;
-                    if (i == 1) part1len = fp[0].buffer.byteLength - fp[0].used;
+                    if (i > 0) {
+                        totalsize += fp[0].buffer.byteLength - fp[0].used;
+                    }
+                    if (i === 0) {
+                        part0len = fp[0].buffer.byteLength - fp[0].used;
+                    }
+                    if (i === 1) {
+                        part1len = fp[0].buffer.byteLength - fp[0].used;
+                    }
                 }
             }
 
-            var eof = totalsize == this.fileEndReadPos - partpos * 5 && part1len == part0len;
+            var eof = totalsize === this.fileEndReadPos - partpos * 5 && part1len === part0len;
             var fulllinesize = roundDownToMultiple(combinesize, this.RAIDSECTOR);
 
             if (fulllinesize > 0) {
 
-                var tocombine = [];
-                for (var i = 0; i < this.RAIDPARTS; ++i) {
+                for (i = 0; i < this.RAIDPARTS; ++i) {
                     tocombine.push(this.part[i].filePieces[0]);
                 }
 
@@ -576,11 +628,11 @@
                 this.discardUsedParts(fulllinesize);
             }
             else if (combinesize > 0 || eof && part0len > 0) {
-                var tocombine = [];
-                for (var i = 0; i < this.RAIDPARTS; ++i) {
-                    var fp = this.part[i].filePieces;
+                for (i = 0; i < this.RAIDPARTS; ++i) {
                     var loaded = 0;
                     var b = new ArrayBuffer(this.RAIDSECTOR);
+
+                    fp = this.part[i].filePieces;
                     for (var j = 0; loaded < this.RAIDSECTOR && j < fp.length; ++j) {
                         var toload = Math.min(fp[j].buffer.byteLength - fp[j].used, this.RAIDSECTOR - loaded);
                         var target = new Uint8Array(b, loaded, toload);
@@ -588,31 +640,92 @@
                         target.set(source);
                         loaded += toload;
                     }
+
                     if (combinesize > 0 && !(eof && part0len > 0) && loaded < this.RAIDSECTOR) {
+                        this.checkReadParts();
                         return;
                     }
+
                     tocombine.push({
-                        'skipped': fp.length == 0 ? false : fp[0].skipped,
                         'used': 0,
                         'partpos': partpos,
+                        'skipped': !fp.length ? false : fp[0].skipped,
                         'buffer': new Uint8Array(b, 0, this.RAIDSECTOR)
                     });
                 }
-                this.combineSectors(partpos, this.RAIDSECTOR, tocombine, (eof && part0len > 0) ? this.RAIDSECTOR * 5 - totalsize : 0);
+
+                this.combineSectors(
+                    partpos, this.RAIDSECTOR, tocombine,
+                    (eof && part0len > 0) ? this.RAIDSECTOR * 5 - totalsize : 0
+                );
                 this.discardUsedParts(this.RAIDSECTOR);
             }
             else {
+                this.checkReadParts();
                 return;
             }
         }
-    }
+    };
+
+    CloudRaidRequest.prototype.checkReadParts = function() {
+        var i;
+        var part;
+        var partpos = -1;
+        var torequest = [];
+
+        for (i = this.RAIDPARTS; i--;) {
+            var fp = this.part[i].filePieces;
+
+            if (fp.length) {
+                if (partpos === -1) {
+                    partpos = fp[0].partpos + fp[0].used;
+                }
+                else if (partpos !== fp[0].partpos + fp[0].used) {
+                    if (d) {
+                        this.logger.error(' --- ERROR: partpos mismatch %s %s', partpos, (fp[0].partpos + fp[0].used));
+                    }
+                    return; // should never happen
+                }
+            }
+        }
+
+        for (i = this.RAIDPARTS; i--;) {
+            part = this.part[i];
+
+            if (part.reader && !part.reading && !part.done && (part.pos < partpos + 81920)) {
+                torequest.push(part);
+            }
+        }
+
+        // read from the most-behind socket first
+        torequest.sort(function(a, b) {
+            return a.pos - b.pos;
+        });
+
+        for (i = 0; i < torequest.length; i++) {
+            part = torequest[i];
+
+            if (d > 1) {
+                this.logger.debug("part %s reading again from %s", part.partNum, part.pos);
+            }
+            this.readFetchData(part.partNum);
+        }
+    };
 
     CloudRaidRequest.prototype.loadPart = function (partNum, pos, endpos, skipchunkcount) {
+        var self = this;
+        var part = this.part[partNum];
 
         if (pos >= endpos) {
             // put one more 0-size piece on the end, which makes it easy to rebuild the last raidline of the file
             if (!this.finished) {
-                this.queueReceivedPiece(partNum, { 'skipped': false, 'used': 0, 'partpos': pos, 'buffer': new Uint8Array(new ArrayBuffer(0), 0, 0) });
+                this.queueReceivedPiece(partNum, {
+                    'skipped': false,
+                    'used': 0,
+                    'partpos': pos,
+                    'buffer': new Uint8Array(0)
+                });
+                part.done = true;
             }
             return;
         }
@@ -625,60 +738,71 @@
         if (skipchunkcount === -2) {
             // skip this chunk, the other 5 channels will load the corresponding parts and we can xor to reassemble
             // fill in the buffer with an empty array to keep the algo simple
-            var filePiece = { 'skipped': true, 'used': 0, 'partpos': pos, 'buffer': new Uint8Array(new ArrayBuffer(chunksize), 0, chunksize) };
+            var filePiece = {
+                'used': 0,
+                'partpos': pos,
+                'skipped': true,
+                'buffer': new Uint8Array(chunksize)
+            };
             this.part[partNum].lastPos = pos + filePiece.buffer.byteLength;
             this.queueReceivedPiece(partNum, filePiece);
             this.loadPart(partNum, pos + filePiece.buffer.byteLength, endpos, skipchunkcount);
             return;
         }
 
-        var part = this.part[partNum];
         var pieceUrl = part.baseUrl + "/" + pos + "-" + (pos + chunksize - 1);
 
         if (d) {
-            this.logger.log("Part %s pos: %s chunksize: %s from: %s",
-                partNum, pos, chunksize, pieceUrl);
+            this.logger.log("Part %s pos: %s chunksize: %s from: %s", partNum, pos, chunksize, pieceUrl);
         }
 
         this.totalRequests++;
         this.channelReplyState = 0;
 
-        var streamPos = 0;
-
-        // Execute the fetch, with continuation fuctions for each buffer piece that arrives
+        // Execute the fetch, with continuation functions for each buffer piece that arrives
         part.abortController = new AbortController();
         part.signal = part.abortController.signal;
         part.timedout = false;
+        part.pos = pos;
+        part.endpos = endpos;
+        part.skipchunkcount = skipchunkcount;
 
-        var self = this;
+        part.reading = true;
         try {
-            fetch(pieceUrl, { signal: part.signal })
-                .then(function (fetchresponse) { self.processFetchResponse(partNum, pos, endpos, streamPos, skipchunkcount, fetchresponse); })
-                .catch(function (ex) { self.fetchReadExceptionHandler(ex, partNum); });
+            fetch(pieceUrl, {signal: part.signal})
+                .then(function(fetchresponse) {
+                    part.reading = false;
+                    self.processFetchResponse(partNum, fetchresponse);
+                })
+                .catch(function(ex) {
+                    part.reading = false;
+                    self.fetchReadExceptionHandler(ex, partNum);
+                });
         }
         catch (ex) {
+            part.reading = false;
             self.fetchReadExceptionHandler(ex, partNum);
         }
-    }
+    };
 
-    CloudRaidRequest.prototype.processFetchResponse = function (partNum, pos, endpos, streamPos, skipchunkcount, fetchresponse) {
+    CloudRaidRequest.prototype.processFetchResponse = function(partNum, fetchResponse) {
 
-        if (fetchresponse.status == 509)
-        {
-            // if one or more channels can't get data due to overquota, shut them all down immediately (before more quota is used) and refer to higher layer
-            this.logger.error("received 509");
-            this.status = 509;
-            return this.dispatchLoadEnd();
+        if (this.readyState < XMLHttpRequest.HEADERS_RECEIVED) {
+            this.status = fetchResponse.status | 0;
+            this.dispatchEvent('readystatechange', XMLHttpRequest.HEADERS_RECEIVED);
+            this.dispatchEvent('readystatechange', XMLHttpRequest.LOADING);
         }
 
-        if (!fetchresponse.ok || fetchresponse.status != 200) {
-            this.logger.error("response status: %s %s", fetchresponse.status, fetchresponse.ok);
+        if (!fetchResponse.ok || fetchResponse.status !== 200) {
+            if (d) {
+                this.logger.error("response status: %s %s", fetchResponse.status, fetchResponse.ok);
+            }
             this.onFailure($.Event('error', { target: this, message: "fetch failure" }), partNum);
             return;
         }
 
         // Check whether we need to drop the slowest channel/connection.
-        if (skipchunkcount === -3 && this.channelReplyState !== 63) {
+        if (this.part[partNum].skipchunkcount === -3 && this.channelReplyState !== 63) {
             var mia = -1;
 
             this.channelReplyState |= (1 << partNum);
@@ -695,87 +819,89 @@
                 }
                 this.cloudRaidSettings.lastFailedChannel = mia;
 
-                this.part[mia].abortController.abort();
-                if (this.part[mia].delayedinitialconnect !== null) clearTimeout(this.part[mia].delayedinitialconnect);
+                this.part[mia].abort();
                 this.channelReplyState = 63;
                 this.initialChannelMode = mia;
 
-                // all channels start at the same pos, and if skipchunkcount === -3 then this is the first chunk for all, so that one can generate dummy data from 'pos'.
-                this.loadPart(mia, pos, this.calcFilePartSize(mia, this.fileEndReadPos), -2);
+                // all channels start at the same pos, and if skipchunkcount === -3 then this is
+                // the first chunk for all, so that one can generate dummy data from 'pos'.
+                this.loadPart(mia, this.part[mia].pos, this.part[mia].endpos, -2);
             }
         }
 
         // stream the reply body
-        var reader = fetchresponse.body.getReader();
+        this.part[partNum].reader = fetchResponse.body.getReader();
+        this.readFetchData(partNum);
+    };
+
+    CloudRaidRequest.prototype.readFetchData = function(partNum) {
 
         var self = this;
         var part = self.part[partNum];
+
         part.timedout = false;
-        part.readTimeoutId = setTimeout(function () { part.timedout = true; part.abortController.abort(); }, this.FETCH_DATA_TIMEOUT_MS);
+        part.readTimeoutId = setTimeout(function() {
+            part.timedout = true;
+            part.abortController.abort();
+        }, this.FETCH_DATA_TIMEOUT_MS);
+
+        part.reading = true;
 
         try {
-            reader.read()
-                .then(function processPartStream({ done, value }) {
-                    self.processFetchData(reader, partNum, pos, endpos, streamPos, skipchunkcount, done, value);
+            part.reader.read()
+                .then(function processPartStream(r) {
+                    part.reading = false;
+                    self.processFetchData(partNum, r.done, r.value);
                 })
-                .catch(function (ex) { self.fetchReadExceptionHandler(ex, partNum); });
+                .catch(function(ex) {
+                    part.reading = false;
+                    self.fetchReadExceptionHandler(ex, partNum);
+                });
         }
         catch (ex) {
+            part.reading = false;
             self.fetchReadExceptionHandler(ex, partNum);
         }
-    }
+    };
 
-    CloudRaidRequest.prototype.processFetchData = function (reader, partNum, pos, endpos, streamPos, skipchunkcount, done, value) {
+    CloudRaidRequest.prototype.processFetchData = function(partNum, done, value) {
 
         var part = this.part[partNum];
         clearTimeout(part.readTimeoutId);
         part.readTimeoutId = null;
 
         if (done) {
-            this.loadPart(partNum, pos + streamPos, endpos, skipchunkcount)
+            this.loadPart(partNum, part.pos, part.endpos, part.skipchunkcount);
             return;
         }
 
-        //this.logger.log("Received data on part %s: %s", partNum, value.byteLength);
+        if (d > 1) {
+            this.logger.debug("Received data on part %s: %s bytes", partNum, value.byteLength);
+        }
 
         var filePiece = {
             'skipped': false,
             'used': 0,
-            'partpos': pos + streamPos,
+            'partpos': part.pos,
             'buffer': value
         };
 
-        streamPos += value.length;
+        part.pos += value.length;
 
         this.bytesProcessed += value.length;
-        part.lastPos = pos + streamPos;
+        part.lastPos = part.pos;
 
         if (part.failCount > 0) {
             part.failCount = 0;
             if (d) {
-                this.logger.log("Reset fail count on part %s.", partNum,
+                this.logger.debug("Reset fail count on part %s.", partNum,
                     this.part[0].failCount, this.part[1].failCount, this.part[2].failCount,
                     this.part[3].failCount, this.part[4].failCount, this.part[5].failCount);
             }
         }
 
         this.queueReceivedPiece(partNum, filePiece);
-
-        part.timedout = false;
-        part.readTimeoutId = setTimeout(function () { part.timedout = true; part.abortController.abort(); }, this.FETCH_DATA_TIMEOUT_MS);
-
-        var self = this;
-        try {
-            reader.read()
-                .then(function processPartStream({ done, value }) {
-                    self.processFetchData(reader, partNum, pos, endpos, streamPos, skipchunkcount, done, value);
-                })
-                .catch(function (ex) { self.fetchReadExceptionHandler(ex, partNum); });
-        }
-        catch (ex) {
-            self.fetchReadExceptionHandler(ex, partNum);
-        }
-    }
+    };
 
     CloudRaidRequest.prototype.fetchReadExceptionHandler = function (ex, partNum) {
 
@@ -788,22 +914,23 @@
 
         if (ex.name === 'AbortError') {
             if (this.highlevelabort) {
-                this.logger.log("Part : " + partNum + " exiting");
+                this.logger.debug("Part %s exiting...", partNum);
             }
             else if (part.timedout) {
                 // switch to the currently idle channel instead, and pick up from there.
-                this.logger.log("Timeout on part : " + partNum);
+                if (d) {
+                    this.logger.warn("Timeout on part %s", partNum);
+                }
                 this.onFailure($.Event('error', { target: this, message: ex }), partNum);
                 part.timedout = false;
             }
             else {
-                this.logger.log('Fetch on ' + partNum + " was the slowest");
+                this.logger.debug('Fetch on %s was the slowest.', partNum);
             }
-        } else {
-            this.logger.log("Caught exception from fetch on part: " + partNum + " ex: ");
-            this.logger.log(ex);
+        }
+        else {
             if (d) {
-                this.logger.error(ex);
+                this.logger.warn("Caught exception from fetch on part: %s", partNum, ex);
             }
             this.onFailure($.Event('error', { target: this, message: ex }), partNum);
         }

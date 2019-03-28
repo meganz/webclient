@@ -277,6 +277,8 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
         dlmanager.isDownloading = false;
+        dlQueue.setSize((fmconfig.dl_maxSlots | 0) || 4);
+        dlQueue.resume();
 
         delay.cancel('overquota:retry');
         delay.cancel('overquota:uqft');

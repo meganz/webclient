@@ -261,6 +261,7 @@ ClassChunk.prototype.onXHRready = function(xhrEvent) {
     var xhr = xhrEvent.target;
     try {
         r = xhr.response || {};
+        xhr.response = false;
     }
     catch (e) {}
     if (r && r.byteLength === this.size) {

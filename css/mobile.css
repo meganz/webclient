@@ -1934,11 +1934,9 @@ ul, li {
     margin: 24px 0px;
 }
 .verify-login-page .mobile.two-factor-seed-input {
-    padding: 0 16px 0 12px;
+    padding: 12px 16px 0 12px;
     height: 64px;
-    background-color: rgba(0,0,0,0);
-    border: 0px solid rgba(0,0,0,0);
-    margin: 0 auto 16px;
+    margin: 0 auto 24px;
 }
 .mobile.verify-number .verify-number-code {
     border-radius: 4px;
@@ -2030,7 +2028,37 @@ ul, li {
     color: #999;
     font-size: 14px;
 }
-.verify-login-page .mobile.signin-input input, .mobile.verify-number .vn-input-wrapper .verify-number-code input {
+.two-factor-qr-block .mobile.signin-input.two-factor-seed-input input::placeholder {
+    color: #bbb;
+    font-size: 24px;
+    letter-spacing: 0px;
+    line-height: 38px;
+}
+.two-factor-qr-block .mobile.signin-input.two-factor-seed-input input::-webkit-input-placeholder {
+    color: #bbb;
+    font-size: 24px;
+    letter-spacing: 0px;
+    line-height: 38px;
+}
+.two-factor-qr-block .mobile.signin-input.two-factor-seed-input input::-moz-input-placeholder {
+    color: #bbb;
+    font-size: 24px;
+    letter-spacing: 0px;
+    line-height: 38px;
+}
+.two-factor-qr-block .mobile.signin-input.two-factor-seed-input input:-moz-input-placeholder {
+    color: #bbb;
+    font-size: 24px;
+    letter-spacing: 0px;
+    line-height: 38px;
+}
+.two-factor-qr-block .mobile.signin-input.two-factor-seed-input input:-ms-input-placeholder {
+    color: #bbb;
+    font-size: 24px;
+    letter-spacing: 0px;
+    line-height: 38px;
+}
+.verify-login-page .mobile.signin-input input, .mobile.verify-number .vn-input-wrapper .verify-number-code input, .mobile.signin-input.two-factor-seed-input input {
     font-size: 36px;
     height: initial;
     line-height: 62px;
@@ -2043,31 +2071,31 @@ ul, li {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px
+    line-height: 64px;
 }
 .verify-login-page .mobile.signin-input input::-webkit-input-placeholder, .mobile.verify-number .vn-input-wrapper .verify-number-code input::-webkit-input-placeholder {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px
+    line-height: 64px;
 }
 .verify-login-page .mobile.signin-input input::-moz-placeholder, .mobile.verify-number .vn-input-wrapper .verify-number-code input::-moz-placeholder {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px
+    line-height: 64px;
 }
 .verify-login-page .mobile.signin-input input:-moz-placeholder, .mobile.verify-number .vn-input-wrapper .verify-number-code input:-moz-placeholder {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px
+    line-height: 64px;
 }
 .verify-login-page .mobile.signin-input input:-ms-input-placeholder, .mobile.verify-page .vn-input-wrapper .verify-number-code input:-ms-input-placeholder {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px
+    line-height: 64px;
 }
 body.es .mobile.verify-number .vn-input-wrapper .verify-number-code input::-webkit-input-placeholder,
 body.de .mobile.verify-number .vn-input-wrapper .verify-number-code input::-webkit-input-placeholder {
@@ -2100,8 +2128,9 @@ body.de .mobile.verify-number .vn-input-wrapper .verify-number-code input::place
 .mobile.signin-input.incorrect input:-ms-input-placeholder, .mobile.verify-page .vn-input-wrapper .verify-number-code.incorrect input:-ms-input-placeholder, .mobile.phone-number-input.incorrect input:-ms-input-placeholder {
     color: #FF5555;
 }
-.mobile.signin-input.two-factor-seed-input input {
+.two-factor-qr-block .mobile.signin-input.two-factor-seed-input input {
     text-align: center;
+    line-height: 38px;
 }
 .signin-register-block .custom-login-message-block {
     color: #495057;
@@ -3031,7 +3060,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-icon {
     width: 32px;
     height: 32px;
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -4701,7 +4730,7 @@ div.checkboxOn, div.checkboxOff {
     position: relative;
 }
 .mobile.icon {
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: 0 -2109px;
     background-repeat: no-repeat;
     width: 20px;
@@ -9646,6 +9675,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     text-align: right;
 }
 .business-page .big-red-button.height-48 {
+    display: block;
     height: 48px;
     line-height: 47px;
     font-size: 18px;
@@ -11024,6 +11054,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         height: 54px;
         padding-top: 16px;
     }
+    .mobile.signin-input.two-factor-seed-input {
+        height: 64px;
+    }
     .mobile.signin-input span {
         top: 17px;
     }
@@ -11265,6 +11298,10 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile .improved-recovery-steps .recover-image, .mobile .improved-recovery-steps .session-image-block, .mobile .improved-recovery-steps .recover-button.yes::after, .mobile .improved-recovery-steps .recover-button.no::after   {
     background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
     background-size: 344px auto;
+    }
+    .membership-question-mark span {
+        background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
+        background-size: 755px auto;
     }
 }
 

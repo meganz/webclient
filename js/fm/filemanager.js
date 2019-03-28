@@ -109,7 +109,9 @@ FileManager.prototype.initFileManagerUI = function() {
         if ($.dialog === 'pro-login-dialog' || localStorage.awaitingConfirmationAccount) {
             return false;
         }
-        closeDialog(ev);
+        showWarningTokenInputLose().done(function() {
+            closeDialog(ev);
+        });
         $.hideContextMenu();
 
         // For ephemeral session redirect to 'fm' page

@@ -1234,8 +1234,12 @@ scparser.$add('d', function(a) {
 });
 
 scparser.$add('la', function() {
+
+    'use strict';
+
     // last seen/acknowledged notification sn
-    notify.countAndShowNewNotifications();
+    notify.markAllNotificationsAsSeen(true);
+
 });
 
 scparser.$add('usc', function() {

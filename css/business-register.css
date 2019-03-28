@@ -531,6 +531,14 @@
 	text-align: center;
 }
 
+.bus-reg-featureTxt a {
+    color: #F0373B;
+}
+
+.bus-reg-featureTxt a:hover {
+    text-decoration: underline;
+}
+
 .ky-icon {
 	background-position: -16px -464px;
 }

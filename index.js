@@ -1882,6 +1882,7 @@ function topmenuUI() {
         $topHeader.find('.create-account-button').addClass('hidden');
         $topHeader.find('.membership-status-block').removeClass('hidden');
         $topHeader.find('.top-icon.notification').removeClass('hidden');
+        $topHeader.find('.left.individual').addClass('hidden');
 
         // Show the rocket icon if achievements are enabled
         mega.achievem.enabled()
@@ -1923,7 +1924,6 @@ function topmenuUI() {
 
         if (is_fm()) {
             $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
-            $topHeader.find('.left.individual').addClass('hidden');
         }
 
         // If the chat is disabled don't show the green status icon in the header
@@ -1939,7 +1939,6 @@ function topmenuUI() {
             $topHeader.find('.top-icon.achievements').addClass('hidden');
             $topMenu.find('.upgrade-your-account').addClass('hidden');
             $topMenu.find('.resellers').addClass('hidden');
-            $topHeader.find('.left.individual').addClass('hidden');
         }
 
         // Show PRO plan expired warning popup (if applicable)
@@ -1971,7 +1970,10 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').addClass('hidden');
         $topHeader.find('.top-icon.achievements').addClass('hidden');
         $topHeader.find('.create-account-button').removeClass('hidden');
-        $topHeader.find('.left.individual').addClass('hidden');
+
+        if (u_type === 0) {
+            $topHeader.find('.left.individual').addClass('hidden');
+        }
 
         $('.create-account-button').rebind('click', function () {
             if ($(this).hasClass('business-reg')) {

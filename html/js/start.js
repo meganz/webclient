@@ -28,33 +28,21 @@ function init_start() {
 
     if (u_type > 0) {
         $('.startpage.register:not(.business-reg)').text(l[164]);
-        $('.mid-green-link.register-lnk').attr('href', '/fm');
-        $('.startpage.register').rebind('click', function () {
-            loadSubPage('fm');
-        });
-
-        $('.startpage.account').rebind('click', function () {
-            if (is_mobile) {
-                loadSubPage('fm/account');
-            }
-            else {
-                loadSubPage('fm/dashboard');
-            }
-        });
+        $('.mid-green-link.register-lnk, .startpage.register').attr('href', '/fm');
+        
+        if (is_mobile) {
+            $('.startpage.account').attr('href', '/fm/account');
+        }
+        else {
+            $('.startpage.account').attr('href', '/fm/dashboard');
+        }
         if (u_type === 3) {
-            $('.business-reg').addClass('hidden').off('click');
+            $('.business-reg').addClass('hidden').attr('href', '');
         }
     }
     else {
-        $('.mid-green-link.register-lnk').attr('href', '/register');
-        $('.button-48-height.register').rebind('click', function () {
-            if ($(this).hasClass('business-reg')) {
-                loadSubPage('registerb');
-            }
-            else {
-                loadSubPage('register');
-            }
-        });
+        $('.mid-green-link.register-lnk, .startpage.register').attr('href', '/register');
+        $('.business-reg').removeClass('hidden').attr('href', '/registerb');
     }
 
     $('.bottom-menu.logo').rebind('click.clickurl', function(e) {
@@ -70,12 +58,16 @@ function init_start() {
 
     // Init Scroll to Top button event
     $('.startpage.scroll-to-top').rebind('click', function () {
-        $('.fmholder, html, body').animate({ scrollTop: 0 }, 1600);
-    });
-
-    // Init Contacts us button event
-    $('.button-48-height.contact-us').rebind('click', function () {
-        loadSubPage('contact');
+        if ($(this).hasClass('up')) { 
+            $('.fmholder, html, body').animate({
+                scrollTop: 0
+            }, 1600);
+        }
+        else {
+            $('.fmholder, html, body').animate({
+                scrollTop: $('.bottom-page.content').outerHeight()
+            }, 1600);
+        }
     });
 
     /**
@@ -281,10 +273,10 @@ function init_start() {
 
             showAnimated();
             if (!isVisibleBlock($('.bottom-page.light-blue.top, .bottom-page.top-bl'))) {
-                $('.startpage.scroll-to-top').addClass('floating');
+                $('.startpage.scroll-to-top').addClass('up');
             }
             else {
-                $('.startpage.scroll-to-top').removeClass('floating');
+                $('.startpage.scroll-to-top').removeClass('up');
             }
         }
     });
@@ -308,12 +300,6 @@ function init_start() {
             }
         });
     }
-
-    // Handler for Try Business Account
-    $('.try-business-button-plan-btn').off('click.suba').on('click.suba', function
-        tryBusinessAccountButtonClickHandler() {
-        loadSubPage('business');
-    });
 
     if (!is_mobile && page === 'start') {
         InitFileDrag();

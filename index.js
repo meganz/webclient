@@ -1106,7 +1106,7 @@ function init_page() {
             var link = $(this).attr('data-link');
 
             // Scroll to the element's parent (not the element itself because it's hidden by the header)
-            $('.contact-new-title.' + link).parent().get(0).scrollIntoView();
+            $('.contact-new-title.' + link).parent().get(0).scrollIntoView({behavior: "smooth"});
         });
     }
     else if (page.substr(0, 4) == 'help') {
@@ -1444,7 +1444,7 @@ function init_page() {
         $('.uwp-windows-scrollto-button').rebind('click', function() {
 
             // Scroll to the Windows Phone section
-            $('.uwp-windows-section').get(0).scrollIntoView();
+            $('.uwp-windows-section').get(0).scrollIntoView({behavior: "smooth"});
         });
     }
     else if (page === 'extensions') {

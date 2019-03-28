@@ -194,7 +194,7 @@
     top: 10px;
 }
 .startpage.small-icon, .startpage.mid-icon {
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: -243px 14px;
     background-repeat: no-repeat;
     width: 20px;
@@ -476,6 +476,23 @@
 .startpage.square-bl-hover .txt a:hover {
     text-decoration: none;
 }
+.en .startpage.square-bl-hover .txt a {
+    text-decoration: none;
+    position: relative;
+}
+.en .startpage.square-bl-hover .txt a::before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    left: 0;
+    bottom: 0;
+    background-color: white;
+}
+.en .startpage.square-bl-hover .txt a:hover::before, .en .startpage.square-bl-hover .txt a.os-icons::before {
+    display: none;
+}
 .startpage.square-bl-hover .txt .header {
     font-size: 16px;
     padding-bottom: 5px;
@@ -569,7 +586,7 @@
     word-break: break-word;
 }
 .startpage.rating-block span {
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: -161px -618px;
     background-repeat: no-repeat;
     width: 14px;
@@ -591,7 +608,7 @@
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: -220px -650px;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -700,7 +717,7 @@
     box-sizing: border-box;
     padding: 0 4px;
     vertical-align: top;
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: -243px 14px;
     background-repeat: no-repeat;
 }
@@ -719,28 +736,31 @@
     width: 52px;
     height: 52px;
     right: 50px;
-    margin: -92px 0 0 0;
-    position: absolute;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    background-color: #CECECE;
-    background-image: url(../images/mega/startpage-sprite_v8.png);
-    background-position: -214px -601px;
-    cursor: pointer;
-    -webkit-transition: background-color 200ms ease-in-out;
-    -moz-transition: background-color 200ms ease-in-out;
-    -o-transition: background-color 200ms ease-in-out;
-    -ms-transition: background-color 200ms ease-in-out;
-    transition: background-color 200ms ease-in-out;
-}
-.startpage.scroll-to-top.floating {
     margin: 0;
     position: fixed;
     bottom: 60px;
     z-index: 10;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    background-color: #CECECE;
+    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-position: -214px -688px;
+    cursor: pointer;
+    -webkit-transition: background-color 200ms ease-in-out, opacity 200ms ease-in-out;
+    -moz-transition: background-color 200ms ease-in-out, opacity 200ms ease-in-out;
+    -o-transition: background-color 200ms ease-in-out, opacity 200ms ease-in-out;
+    -ms-transition: background-color 200ms ease-in-out, opacity 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out, opacity 200ms ease-in-out;
+    opacity: 0;
 }
-.mobile .startpage.scroll-to-top.floating {
+.start-animation .startpage.scroll-to-top {
+    opacity: 1;
+}
+.startpage.scroll-to-top.up {
+    background-position: -214px -601px;
+}
+.mobile .startpage.scroll-to-top {
     bottom: 30px;
     right: 30px;
 }
@@ -832,13 +852,13 @@
     width: 106px;
     height: 20px;
     margin: 20px auto 0 auto;
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: -108px -1447px;
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-.reg-st3-membership-icon, .membership-icon, .mobile.membership-icon, .pro-icon, div.pro-feature-icon, .startpage.mega-logo, .startpage.upload-cloud-icon, .startpage.white-question, .pages-nav.nav-icon, .bottom-page.big-icon, .startpage.medium-icon, .small-red-link i, .flip-bg, .startpage.quote-icon, .bottom-menu.logo, .loginrequired-dialog .fm-notification-icon, .top-arrow-icon, .mobile.icon, .startpage.small-icon, .startpage.mid-icon, .startpage.rating-block span, .startpage.carousel-control, .startpage.scroll-to-top, .startpage.os-icons {
-    background-image: url(../images/mega/startpage-sprite_v8@2x.png) !important;
+.reg-st3-membership-icon, .membership-icon, .mobile.membership-icon, .pro-icon, div.pro-feature-icon, .startpage.mega-logo, .startpage.upload-cloud-icon, .startpage.white-question, .pages-nav.nav-icon, .bottom-page.big-icon, .startpage.medium-icon, .small-red-link i, .flip-bg, .startpage.quote-icon, .bottom-menu.logo, .loginrequired-dialog .fm-notification-icon, .top-arrow-icon, .mobile.icon, .startpage.small-icon, .startpage.mid-icon, .startpage.rating-block span, .startpage.carousel-control, .startpage.scroll-to-top, .startpage.os-icons, .startpage.scroll-to-top {
+    background-image: url(../images/mega/startpage-sprite_v9@2x.png) !important;
     background-size: 267px auto;
 }
 .bottom-page.large-icon, .cropped-page .bottom-page.big-icon {
@@ -940,10 +960,6 @@
 }
 .startpage.carousel-control.next {
     right: 20px;
-}
-.startpage.scroll-to-top {
-    position: static;
-    margin: 20px auto 0 auto;
 }
 }
 
@@ -1163,10 +1179,6 @@
 .startpage.button-48-height {
     margin: 5px 5px;
 }
-.startpage.scroll-to-top {
-    position: static;
-    margin: -5px auto 0 auto;
-}
 }
 
 /* Mobile size */
@@ -1286,9 +1298,6 @@
 .startpage.flip-wrapper {
     padding: 0 0 0 0;
 }
-.startpage.scroll-to-top {
-    margin: 20px auto 0 auto;
-}
 .startpage-chat-img {
     margin-bottom: 10px;
 }
@@ -1302,11 +1311,11 @@
 
 @media only screen and (min-width: 783px) {
 .startpage.top-header, .startpage.top-info, .startpage.img1, .startpage.top-button, .startpage.img-wrap::before, .startpage.img-wrap::after, .startpage.top-notice {
-    -webkit-transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
+    -webkit-transition: opacity 200ms ease-in-out, transform 200ms ease-in-out, background-color 200ms ease-in-out ;
+    -moz-transition: opacity 200ms ease-in-out, transform 200ms ease-in-out, background-color 200ms ease-in-out ;
+    -o-transition: opacity 200ms ease-in-out, transform 200ms ease-in-out, background-color 200ms ease-in-out ;
+    -ms-transition: opacity 200ms ease-in-out, transform 200ms ease-in-out, background-color 200ms ease-in-out ;
+    transition: opacity 200ms ease-in-out, transform 200ms ease-in-out, background-color 200ms ease-in-out ;
     -webkit-transition-timing-function: ease-in-out;
     -moz-transition-timing-function: ease-in-out;
     -o-transition-timing-function: ease-in-out;
@@ -1670,3 +1679,4 @@ transform: translateY(0) scale(1);
  opacity: 1;
 }
 }
+

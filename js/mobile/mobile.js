@@ -435,6 +435,43 @@ var mobile = {
                 }
             }
         });
+    },
+
+    /**
+     * Make back button works as closing overlay.
+     * @param {Object} $overlay target overlay
+     */
+    initOverlayPopstateHandler: function($overlay) {
+
+        'use strict';
+
+        history.pushState({ subpage: page }, "", "/" + page);
+
+        var $closeBtn = $overlay.find('.close-button, .cancel, .fm-dialog-close');
+
+        $(window).rebind('popstate.mega-mobile', function() {
+            
+            $closeBtn.trigger('tap');
+            $(this).off('popstate.mega-mobile');
+        });
+    },
+
+    /**
+     *  Make maxlength work on input with type number.
+     */
+    initNumberMaxlength: function($page) {
+
+        'use strict';
+
+        $('input[type="number"][maxlength]', $page).rebind('keydown.applyMaxlength', function(e) {
+
+            if (this.value.length === parseInt($(this).attr('maxlength'))
+                && ((e.keyCode >= 48 && e.keyCode <= 57)
+                || (e.keyCode >= 96 && e.keyCode <= 105))
+                || e.keyCode === 69) {
+                e.preventDefault();
+            }
+        });
     }
 };
 

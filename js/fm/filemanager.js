@@ -109,7 +109,9 @@ FileManager.prototype.initFileManagerUI = function() {
         if ($.dialog === 'pro-login-dialog' || localStorage.awaitingConfirmationAccount) {
             return false;
         }
-        closeDialog(ev);
+        showWarningTokenInputLose().done(function() {
+            closeDialog(ev);
+        });
         $.hideContextMenu();
 
         // For ephemeral session redirect to 'fm' page
@@ -985,9 +987,11 @@ FileManager.prototype.updFileManagerUI = function() {
                     topmenuUI();
                 }
 
-                if (M.currentdirid === 'dashboard') {
-                    delay('dashboard:upd', dashboardUI, 2000);
-                }
+                delay('dashboard:upd', function() {
+                    if (M.currentdirid === 'dashboard') {
+                        dashboardUI();
+                    }
+                }, 2000);
 
                 if (d) {
                     console.timeEnd('rendernew');

@@ -370,8 +370,13 @@ var notify = {
     /**
      * Marks all notifications so far as seen, this will hide the red circle
      * and also make sure on reload these notifications are not new anymore
+     * If this is triggered by local, send `sla` request
+     *
+     * @param {Boolean} [remote] Optional. Show this function triggered by remote action packet.
      */
-    markAllNotificationsAsSeen: function() {
+    markAllNotificationsAsSeen: function(remote) {
+
+        'use strict';
 
         // Loop through the notifications and mark them as seen (read)
         for (var i = 0; i < notify.notifications.length; i++) {
@@ -387,7 +392,9 @@ var notify = {
 
         // Send 'set last acknowledged' API request to inform it which notifications have been seen
         // up to this point then they won't show these notifications as new next time they are fetched
-        api_req({ a: 'sla', i: requesti });
+        if (!remote) {
+            api_req({ a: 'sla', i: requesti });
+        }
     },
 
     /**

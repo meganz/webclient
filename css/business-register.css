@@ -94,7 +94,7 @@
 }
 
 .bus-reg-icon {
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     width: 24px;
     height: 24px;
 }
@@ -529,6 +529,14 @@
 	font-size: 16px;
 	line-height: 28px;
 	text-align: center;
+}
+
+.bus-reg-featureTxt a {
+    color: #F0373B;
+}
+
+.bus-reg-featureTxt a:hover {
+    text-decoration: underline;
 }
 
 .ky-icon {

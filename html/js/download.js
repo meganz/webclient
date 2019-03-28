@@ -476,7 +476,7 @@ function dl_g(res) {
             if (res.fa) {
                 var promise = Promise.resolve();
 
-                if (!window.safari && String(res.fa).indexOf(':8*') > 0) {
+                if (isStreamingEnabled() && String(res.fa).indexOf(':8*') > 0) {
                     promise = iniVideoStreamLayout(dl_node, $pageScrollBlock);
                     prevBut = false;
                 }

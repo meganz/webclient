@@ -357,7 +357,7 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
             // Export key showing a toast message
             u_exportkey(l[6040]);
         });
-        
+
         switch (version) {
             case 1:
                 $('.skip-button', $dialog).removeClass('hidden');

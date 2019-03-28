@@ -2885,6 +2885,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Add class "achieved", "one-reward" !-->
             <div class="achievements-cell ach-install-mobile-app">
                 <div class="image-container">
@@ -2928,6 +2929,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Add class "achieved", "one-reward" !-->
             <div class="achievements-cell ach-invite-friend">
                 <div class="image-container">
@@ -2978,6 +2980,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Add class "achieved", "one-reward" !-->
             <div class="achievements-cell ach-sms-verification">
                 <div class="image-container">
@@ -2986,22 +2989,26 @@
                 </div>
                 <div class="achievement-full info">
                     <div class="subtitle-txt">
-                        SMS verification
+                        [$20409]
                     </div>
                     <div class="achi-content-txt">
-                        Verify your mobile device as an additional security feature for your MEGA account. Added bonus: verifying your mobile number will allow your approved contacts to connect via MEGAChat.
+                        [$20411]
                     </div>
-                    <div class="achievement-dialog expires-txt">
-                        <!-- do NOT translate this, it's on the JS side -->
-                        Expires in <span>X</span> months
-                    </div>
-                    <div class="default-green-button">[$16295]</div>
+                    <div class="achievement-dialog expires-txt"></div>
+                    <div class="default-green-button">[$1960]</div>
                 </div>
                 <div class="achievement-dialog bottom-block">
                     <div class="achievement-dialog reward storage">
                         <i class="medium-icon cloud-white achievements-icon"></i>
                         <div class="achievement-dialog reward-txt">
                             [$18322]
+                        </div>
+                        <span>XX GB</span>
+                    </div>
+                    <div class="achievement-dialog reward bandwidth">
+                        <i class="medium-icon speedometer-white achievements-icon"></i>
+                        <div class="achievement-dialog reward-txt">
+                            [$18323]
                         </div>
                         <span>XX GB</span>
                     </div>
@@ -3014,6 +3021,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Add class "achieved", "one-reward" !-->
             <div class="achievements-cell ach-create-account achieved">
                 <div class="image-container">
@@ -4749,6 +4757,116 @@
     </div>
 </div>
 
+
+<!-- Verify phone number super dialog -->
+<div class="fm-dialog verify-phone hidden">
+    <div class="verify-ph-top">
+        <div class="fm-dialog-title white js-header-text"></div>
+        <div class="fm-dialog-close white js-dialog-close"></div>
+        <div class="verify-ph-icon"></div>
+        <div class="verify-ph-success-icon hidden"></div>
+    </div>
+    <div class="verify-ph-body">
+
+        <!-- Step 1 - Phone Input -->
+        <form id="verify-dialog_ph_form" class="js-phone-input-page hidden" autocomplete="off">
+            <div class="verify-ph-info">
+                <span class="js-body-text"></span>
+                <a class="green-lnk hidden" href="todo-waiting-for-help-center-link">[$8742]</a>
+            </div>
+            <div class="account input-wrapper small top-placeholder select country verify-ph-country">
+                <i class="account-icon globe"></i>
+                <select id="verify-dialog-countries" class="js-country-list" tabindex="1">
+                    <option disabled selected>[$481]</option>
+                    <option class="js-country-list-item template" value=""></option>
+                </select>
+                <label>[$481]</label>
+                <i class="account-icon select-arrow"></i>
+            </div>
+            <div class="account input-wrapper small top-placeholder phone">
+                <i class="account-icon mobile"></i>
+                <input class="js-phone-input" autocomplete="off" type="tel" name="verify-dialog-phone" value="" placeholder="[$20214]">
+                <label>[$20214]</label>
+            </div>
+            <div class="account input-tooltip static js-warning-message"></div>
+            <div class="verify-ph-buttons">                
+                <div class="button default-green-button gradient lato right disabled js-send-sms-button" tabindex="0">
+                    [$556]
+                </div>
+                <div class="button default-white-button gradient lato right not-now-button js-not-now-button">
+                    [$18682]
+                </div>
+                <div class="clear"></div>
+            </div>
+        </form>
+
+        <!-- Step 2 - Verify Code (from SMS) -->
+        <form id="verify-dialog_code_form" class="js-verify-code-page hidden" autocomplete="off" >
+            <div class="verify-ph-info long">
+                <span>[$20217]</span>
+                <span class="phone-num js-user-phone-number"></span>
+            </div>
+            <div class="sms-code-input-container account grouped-inputs">
+                <input class="sms-verification-number-input js-verification-number-input" autocomplete="off" type="text" name="verify-dialog-code1" value="" maxlength="6">
+                <div class="account input-wrapper num"></div>
+                <div class="account input-wrapper num"></div>
+                <div class="account input-wrapper num"></div>
+                <div class="account input-wrapper num"></div>
+                <div class="account input-wrapper num"></div>
+                <div class="account input-wrapper num"></div>
+            </div>
+            <div class="account input-tooltip static js-warning-message"></div>
+            <div class="verify-ph-info long small-txt">
+                <span>[$20218]</span>
+                <a class="green-lnk js-resend-button">[$8744]</a>
+            </div>
+            <div class="verify-ph-buttons">
+                <div class="button default-green-button gradient lato right disabled js-verify-button" tabindex="0">
+                    [$870]
+                </div>
+                <div class="button default-white-button gradient lato right js-back-button" tabindex="0">
+                    [$822]
+                </div>
+                <div class="clear"></div>
+            </div>
+        </form>
+
+        <!-- Step 3 - Verify success -->
+        <form id="verify-dialog_success_form" class="verify-success-page js-verify-success-page hidden">
+            <div class="verify-ph-info long">
+                <span class="js-body-text"></span>
+            </div>
+            <div class="verify-ph-bonus-container">
+                <div class="verify-ph-bonus-block storge-bonus">
+                    <div class="icon56 achievements-icon bonus-image"></div>
+                    <div class="verify-ph-bonus-intro-wrapper">
+                        <div class="big-num js-storage-quota"></div>
+                        <div class="body-txt">[$20405]</div>
+                    </div>
+                </div>
+                <div class="verify-ph-bonus-block transfer-bonus">
+                    <div class="icon56 achievements-icon bonus-image"></div>
+                    <div class="verify-ph-bonus-intro-wrapper">
+                        <div class="big-num js-transfer-quota"></div>
+                         <div class="body-txt">[$20406]</div>
+                    </div>
+                </div>
+            </div>
+            <div class="verify-ph-buttons">
+                <div class="verify-ph-bonus-valid-days">
+                    <div class="valid-days-title">[$20407]</div>
+                    <div class="valid-days-body-txt js-valid-days">180</div>
+                </div>
+                <div class="button default-green-button gradient lato right js-close-button" tabindex="0">
+                    [$148]
+                </div>
+                <div class="clear"></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <!-- Recover Account (Display recover key) !-->
 <div class="fm-dialog recovery-key-dialog backup-recover improved-recovery-steps hidden">
     <div class="content-wrapper">
@@ -5137,31 +5255,3 @@
         <div class="clear"></div>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -102,16 +102,16 @@ pro.proplan = {
 
             this.initMobilePlanDots();
 
-            $(window).rebind('resize.proslider', function() {
-                pro.proplan.initMobilePlanDots();
+            var prevWindowWidth = $(window).width();
+            $(window).rebind('resize.proslider', function(e) {
+                // Prevent Iphone url bar resizing trigger reinit.
+                var currentWindowWidth = $(window).width();
+                if (currentWindowWidth !== prevWindowWidth) {
+                    pro.proplan.initMobilePlanDots();
+                    prevWindowWidth = currentWindowWidth;
+                }
             });
         }
-
-        // Handler for Try Business Account
-        $('.try-business-button-plan-btn').off('click.suba').on('click.suba', function
-            tryBusinessAccountButtonClickHandler() {
-            loadSubPage('business');
-        });
     },
 
     /**

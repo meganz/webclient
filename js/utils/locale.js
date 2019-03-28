@@ -835,20 +835,44 @@ mBroadcaster.once('startMega', function populate_l() {
     l[20193] = l[20193].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20194] = l[20194].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20195] = l[20195].replace('[B]', '<b>').replace('[/B]', '</b>');
+
+    // Mobile only
     if (is_mobile) {
         l[20197] = l[20197].replace('[S1]', '<span class="used">').replace('[/S1]', '</span>\n').replace('[S2]', '')
             .replace('[/S2]', '\n').replace('[S3]', '<span class="total">').replace('[/S3]', '</span>\n') + '<br>';
+        l[20220] = l[20220].replace('%1', '<span class="mobile user-number js-user-phone-number"></span>');
     }
     else {
+        // Desktop only
         l[20197] = l[20197].replace('[S1]', '<span class="size-txt">').replace('[/S1]', '</span>')
             .replace('[S2]', '<span class="of-txt">').replace('[/S2]', '</span>\n')
             .replace('[S3]', '<span class="pecents-txt">').replace('[/S3]', '</span>\n<span class="gb-txt">GB</span>')
             .replace('$1', '0 MB').replace('$2', '0');
     }
+
     l[20206] = l[20206].replace('[S1]', '<span class="content-txt">').replace('[/S1]', '</span>')
         .replace('[S2]', '<span class="content-txt">').replace('[/S2]', '</span>')
         .replace('%1',
             '<span class="account-counter-number short"><input type="text" value="100" id="autoaway"></span>');
+    l[20223] = l[20223].replace('%1', '24');  // 24 hours
+
+    // Keep the word 'a' with the previous word by using non breaking space (TR76417)
+    if (lang === 'es') {
+        l[20217] = l[20217].replace(' a:', '&nbsp;a:');
+    }
+    l[20552] = l[20552].replace('[Br]', '<br>');
+    l[20553] = l[20553].replace('[S]', '<strong>').replace('[/S]', '</strong>');
+    l[20588] = l[20588].replace('[A]', '<a class="clickurl" href="/security">')
+        .replace('[/A]', '</a>');
+    l[20592] = l[20592].replace('[A1]', '<a class="clickurl" href="/sourcecode">')
+        .replace('[/A1]', '</a>');
+    l[20592] = l[20592].replace('[A2]', '<a target="_blank" rel="noopener noreferrer"'
+        + 'href="https://mega.nz/SecurityWhitepaper.pdf">').replace('[/A2]', '</a>');
+    l[20607] = l[20607].replace('[A1]', '<a class="clickurl" href="/mobile">')
+        .replace('[/A1]', '</a>');
+    l[20607] = l[20607].replace('[A2]', '<a class="clickurl" href="/sync">')
+        .replace('[/A2]', '</a>');
+    l[20609] = l[20609].replace('[A]', '<a class="clickurl" href="/sync">').replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

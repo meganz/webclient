@@ -671,7 +671,7 @@ function contactAddDialog(close, dontWarnBusiness) {
     });
 
     $('.add-user-popup .fm-dialog-close').rebind('click', function() {
-        contactAddDialog(1);
+        showWarningTokenInputLose().done(closeDialog);
     });
 }
 
@@ -699,7 +699,9 @@ function fmtopUI() {
     $('.button.link-button.accept-all').addClass('hidden');
 
     if (M.currentrootid === M.RubbishID) {
-        $('.fm-clearbin-button').removeClass('hidden');
+        if (M.v.length) {
+            $('.fm-clearbin-button').removeClass('hidden');
+        }
         $('.fm-right-files-block').addClass('rubbish-bin visible-notification');
     }
     else {
@@ -2120,7 +2122,7 @@ function initShareDialog() {
 
     $('.fm-dialog-close, .dialog-cancel-button', $dialog).rebind('click', function() {
         $('.export-links-warning').addClass('hidden');
-        closeDialog();
+        showWarningTokenInputLose().done(closeDialog);
     });
 
     /*
@@ -2394,9 +2396,47 @@ function closeImportContactNotification(c) {
     $(c + ' input#token-input-').trigger("blur");
 }
 
-function closeDialog(ev) {
+/**
+ * Check the dialog has token input that is already filled up by user.
+ * Warn user closing dialog will lose all inserted input.
+ */
+
+function showWarningTokenInputLose() {
+
     "use strict";
 
+    var promise = new MegaPromise();
+
+    // If there is any tokenizer on the dialog and it is triggered by dom event.
+    var $tokenInput = $('.fm-dialog:visible li[class*="token-input-input"]');
+
+    // Make sure all input is tokenized.
+    $tokenInput.find('input').trigger('blur');
+
+    // If tokenizer is on the dialog, check it has input already. If it has, warn user.
+    var $tokenItems = $('li[class*="token-input-token"]');
+
+    if ($tokenItems.length) {
+        msgDialog('confirmation', '', l[20474], l[18229], function(e) {
+            if (e) {
+                $tokenItems.remove();
+                promise.resolve();
+            }
+            else {
+                promise.reject();
+            }
+        });
+    }
+    else {
+        promise.resolve();
+    }
+
+    return promise;
+}
+
+function closeDialog(ev) {
+    "use strict";
+    
     if (d) {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
     }

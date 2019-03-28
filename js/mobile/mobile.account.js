@@ -21,11 +21,11 @@ mobile.account = {
 
         // Initialise functionality
         mobile.account.fetchAccountInformation($page);
-        mobile.account.displayAvatarAndNameDetails($page);
         mobile.account.initUpgradeAccountButton($page);
         mobile.account.initAchievementsButton($page);
         mobile.account.initRecoveryKeyButton($page);
         mobile.account.initCancelAccountButton($page);
+        mobile.account.initAddPhoneNumberButton($page);
         mobile.account.initSessionHistoryButton($page);
         mobile.account.fetchAndDisplayTwoFactorAuthStatus($page);
         mobile.account.initChangePasswordButton($page);
@@ -39,31 +39,6 @@ mobile.account = {
 
         // Add a server log
         api_req({ a: 'log', e: 99672, m: 'Mobile web My Account page accessed' });
-    },
-
-    /**
-     * Displays the user's avatar, name and email
-     * @param {String} $page The jQuery selector for the current page
-     */
-    displayAvatarAndNameDetails: function($page) {
-
-        'use strict';
-
-        // Cache selectors
-        var $avatarNameBlock = $page.find('.avatar-name-block');
-        var $avatar = $avatarNameBlock.find('.main-avatar');
-        var $userName = $avatarNameBlock.find('.user-name');
-        var $userEmail = $avatarNameBlock.find('.user-email');
-
-        // Generate the avatar from the user handle
-        var avatar = useravatar.contact(u_handle, '', 'div');
-
-        // Show the user's avatar and name
-        $avatarNameBlock.removeClass('hidden');
-        $avatar.safeHTML(avatar);
-        $avatar.find('.avatar').addClass('small-rounded-avatar');
-        $userName.text(u_attr.name);
-        $userEmail.text(u_attr.email);
     },
 
     /**
@@ -160,6 +135,7 @@ mobile.account = {
                 loadingDialog.hide();
 
                 // Display Pro account, plan & subscription details
+                mobile.account.displayAvatarAndNameDetails($page);
                 mobile.account.displayProPlanDetails($page);
                 mobile.account.displayStorageUsage($page);
                 mobile.account.renderCancelSubscriptionButton($page);
@@ -167,6 +143,40 @@ mobile.account = {
             true,   // Show loading spinner
             true    // Force clear cache
         );
+    },
+    
+    
+    /**
+     * Displays the user's avatar, name and email
+     * @param {String} $page The jQuery selector for the current page
+     */
+    displayAvatarAndNameDetails: function($page) {
+
+        'use strict';
+
+        // Cache selectors
+        var $avatarNameBlock = $page.find('.avatar-name-block');
+        var $avatar = $avatarNameBlock.find('.main-avatar');
+        var $userName = $avatarNameBlock.find('.user-name');
+        var $userEmail = $avatarNameBlock.find('.user-email');
+        var $userPhoneContainer = $avatarNameBlock.find('.user-phone');
+        var $userPhoneNum = $avatarNameBlock.find('.user-phone-number');
+
+        // Generate the avatar from the user handle
+        var avatar = useravatar.contact(u_handle, '', 'div');
+
+        // Show the user's avatar and name
+        $avatarNameBlock.removeClass('hidden');
+        $avatar.safeHTML(avatar);
+        $avatar.find('.avatar').addClass('small-rounded-avatar');
+        $userName.text(u_attr.name);
+        $userEmail.text(u_attr.email);
+
+        // Set the user's phone if they have verified it
+        if (typeof u_attr.smsv !== 'undefined') {
+            $userPhoneContainer.removeClass('hidden');
+            $userPhoneNum.text(u_attr.smsv);
+        }
     },
 
     /**
@@ -462,6 +472,26 @@ mobile.account = {
 
             return false;
         });
+    },
+
+    /**
+     * Initialise the Add Phone Number button
+     * @param {String} $page The jQuery selector for the current page
+     */
+    initAddPhoneNumberButton: function($page) {
+
+        'use strict';
+
+        // If the SMS Verification Enabled API flag is set and they have not added a phone number yet
+        if (u_attr.flags.smsve === 2 && typeof u_attr.smsv === 'undefined') {
+
+            // Unhide the button and on clicking/tapping the button, load the Add Phone page
+            $page.find('.account-add-phone-block').removeClass('hidden').off('tap').on('tap', function() {
+
+                loadSubPage('sms/add-phone-achievements');
+                return false;
+            });
+        }
     },
 
     /**

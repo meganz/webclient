@@ -2097,10 +2097,13 @@ var dlmanager = {
             $body.off('keyup.msd');
             $overlay.addClass('hidden');
             $body.removeClass('overlayed');
+            $overlay.hide();
+            return false;
         };
 
         $overlay.addClass('msd-dialog').removeClass('hidden downloading');
         $body.addClass('overlayed');
+        $overlay.show();
 
         var $slides = $overlay.find('.megasync-slide');
         var $currentSlide = $slides.filter('.megasync-slide:not(.hidden)').first();

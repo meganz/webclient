@@ -170,7 +170,7 @@ div.pro-popular-txt {
 .reg-st3-membership-icon, .membership-icon {
     width: 70px;
     height: 70px;
-    background-image: url(../images/mega/startpage-sprite_v7.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 0 0 18px -35px;
@@ -179,7 +179,7 @@ div.pro-popular-txt {
     top: 28px;
 }
 .loginrequired-dialog .fm-notification-icon {
-    background-image: url(../images/mega/startpage-sprite_v7.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: center -210px;
     background-repeat: no-repeat;
 }
@@ -643,7 +643,7 @@ div.pro-feature-icon {
     position: absolute;
     width: 34px;
     height: 34px;
-    background-image: url(../images/mega/startpage-sprite_v7.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: 1px -1435px;
     margin: 0 0 0 -1px;
     display: block;
@@ -1596,7 +1596,7 @@ div.pro-feature-icon {
     width: 102px;
     height: 102px;
     margin: 0 auto;
-    background-image: url(../images/mega/startpage-sprite_v7.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: -160px -673px;
 }
 .transfer .pro-icon {
@@ -1914,8 +1914,7 @@ div.pro-feature-icon {
    z-index: 1129;
 }
 .redeem-promo-page .onboard-image {
-    background-image: url(../images/mega/onboarding_download_v2@2x.png);
-    background-size: 600px auto;
+    background-image: url(../images/mega/onboarding_download_v2.png);
 }
 .redeem-promo-page .onboard-image.voucher {
     background-position: 0 -635px;
@@ -2014,7 +2013,7 @@ div.pro-feature-icon {
 }
 .dialog-input-title-ontop:hover::after {
    background-color: rgba(0,0,0,0.5);
-} /
+}
 @media only screen and (max-width: 1133px) {
 .key .reg-st3-membership-bl {
     padding: 4px;
@@ -2037,5 +2036,11 @@ div.pro-feature-icon {
 }
 .key .plans .reg-st3-membership-bl:first-child {
     margin-left: 0;
+}
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+.redeem-promo-page .onboard-image {
+    background-image: url(../images/mega/onboarding_download_v2@2x.png);
+    background-size: 600px auto;
 }
 }

@@ -101,6 +101,8 @@ mobile.messageOverlay = {
         $overlay.removeClass('hidden');
         $fileManagerHolder.addClass('no-scroll');
 
+        mobile.initOverlayPopstateHandler($overlay);
+
         // Initialise the OK/close button
         $('.confirm-ok-button', $overlay).rebind('tap.ok', function() {
 

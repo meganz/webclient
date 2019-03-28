@@ -2,7 +2,7 @@
 var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
 
 var m;
-var b_u = 0;
+var browserUpdate = 0;
 var apipath;
 var pageLoadTime;
 var maintenance = false;
@@ -39,7 +39,7 @@ var is_embed = location.pathname === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
 var is_iframed = is_embed || is_drop;
 var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
-var is_chrome_firefox = document.location.protocol === 'chrome:' &&
+var is_chrome_firefox = document.location.protocol === 'chrome:' &&       // Only true for Palemoon/Legacy FF extension
     document.location.host === 'mega' || document.location.protocol === 'mega:';
 var location_sub = document.location.href.substr(0, 16);
 var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
@@ -193,7 +193,10 @@ if (is_chrome_firefox) {
 }
 
 var myURL = window.URL;
-b_u = b_u || !myURL || typeof DataView === 'undefined' || (window.chrome && !document.exitPointerLock);
+
+// Check whether we should redirect the user to the browser update.html page (triggered for IE10 and worse browsers)
+browserUpdate = browserUpdate || !myURL || typeof DataView === 'undefined' ||
+    (window.chrome && !document.exitPointerLock);
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -254,10 +257,10 @@ catch (ex) {
     console.error(ex);
     window.megaChatIsReady = false;
     window.megaChatIsDisabled = false;
-    b_u = true;
+    browserUpdate = true;
 }
 
-if (!b_u) try
+if (!browserUpdate) try
 {
     if (is_chrome_firefox)
     {
@@ -299,6 +302,9 @@ if (!b_u) try
     try {
         if (typeof localStorage === 'undefined' || localStorage === null) {
             throw new Error('SecurityError: DOM Exception 18');
+        }
+        if (typeof localStorage.d === 'undefined' && location.host === 'smoketest.static.mega.co.nz') {
+            localStorage.d = 1;
         }
         d = localStorage.d | 0;
         jj = localStorage.jj;
@@ -416,7 +422,7 @@ catch(e) {
             "\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
             + extraInfo
         );
-        b_u = 1;
+        browserUpdate = 1;
     }
 }
 
@@ -544,7 +550,19 @@ if (is_bot) {
     nocontentcheck = true;
 }
 
-if (!b_u && is_extension)
+tmp = getCleanSitePath(location.hash || undefined);
+if (tmp.substr(0, 12) === 'sitetransfer') {
+    try {
+        sessionStorage.sitet = tmp;
+        document.location = 'https://mega.nz/start';
+    }
+    catch (ex) {
+        console.warn(ex);
+    }
+    hashLogic = true; // temporarily prevent the history.* calls in case they are reached...
+}
+
+if (!browserUpdate && is_extension)
 {
     hashLogic = true;
     nocontentcheck=true;
@@ -562,7 +580,7 @@ if (!b_u && is_extension)
         try {
             loadSubScript(bootstaticpath + 'fileapi.js');
         } catch(e) {
-            b_u = 1;
+            browserUpdate = 1;
             Cu.reportError(e);
             alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
         }
@@ -632,8 +650,15 @@ else {
 	}
 }
 
+// If IE 11 detected (https://stackoverflow.com/a/21825207), set flag to redirect to update page
+if (!!window.MSInputMethodContext && !!document.documentMode && localStorage.getItem('continueToSite') === null) {
+    browserUpdate = true;
+}
 
-if (b_u && !is_mobile) {
+// If they need to update their browser, store the current page before going to the update page
+// ToDo: make this update.html page work on mobile web
+if (browserUpdate && !is_mobile) {
+    localStorage.prevPage = page;
     document.location = 'update.html';
 }
 
@@ -1497,7 +1522,7 @@ if (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' || pa
         }
     }
 }
-else if (!b_u) {
+else if (!browserUpdate) {
     d = window.d || 0;
     jj = window.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
@@ -2093,6 +2118,7 @@ else if (!b_u) {
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
+        jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
         jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
 
@@ -2216,6 +2242,10 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.twofactor.disabled.js', n: 'mobile_twofactor_disabled_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-action.js', n: 'mobile_twofactor_verify_action_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.phone-input.js', n: 'mobile_sms_phone_input_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.verify-code.js', n: 'mobile_sms_verify_code_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.verify-success.js', n: 'mobile_sms_verify_success_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.achievement.js', n: 'mobile_sms_achievement', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.titlemenu.js', n: 'mobile_titlemenu_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rubbish-bin-empty-overlay.js', n: 'mobile_rubbish_bin_empty_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rubbishbin.js', n: 'mobile_rubbishbin_js', j: 1, w: 1});
@@ -3377,3 +3407,12 @@ function inherits(target, source) {
         enumerable: false
     });
 }
+
+mBroadcaster.once('startMega', function() {
+    var data = sessionStorage.sitet;
+
+    if (data) {
+        delete sessionStorage.sitet;
+        M.transferFromMegaCoNz(data);
+    }
+});

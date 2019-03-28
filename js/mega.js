@@ -1234,8 +1234,12 @@ scparser.$add('d', function(a) {
 });
 
 scparser.$add('la', function() {
+
+    'use strict';
+
     // last seen/acknowledged notification sn
-    notify.countAndShowNewNotifications();
+    notify.markAllNotificationsAsSeen(true);
+
 });
 
 scparser.$add('usc', function() {
@@ -1714,7 +1718,13 @@ function fm_fullreload(q, logMsg) {
     // without restarting them.
     // until then - it's the sledgehammer method; can't be anything
     // more surgical :(
-    localStorage.force = 1;
+    if (logMsg === 'ETOOMANY' && mega.loadReport.mode < 2 && !sessionStorage.lightTreeReload) {
+        sessionStorage.lightTreeReload = 1;
+    }
+    else {
+        localStorage.force = 1;
+        delete sessionStorage.lightTreeReload;
+    }
 
     // done reload callback
     var step = 1;
@@ -3508,7 +3518,7 @@ function loadfm_done(mDBload) {
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
         if (mDBload !== -0x800e0fff && !is_mobile) {
             onIdle(function _initialNotify() {
-                
+
                 // If this was called from the initial fm load via gettree or db load, we should request the
                 // latest notifications. These must be done after the first getSC call.
                 if (!folderlink) {

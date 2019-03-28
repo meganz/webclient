@@ -387,6 +387,7 @@
             if (!nodeListLength) {
                 if (M.RubbishID && M.currentdirid === M.RubbishID) {
                     $('.fm-empty-trashbin').removeClass('hidden');
+                    $('.fm-clearbin-button').addClass('hidden');
                 }
                 else if (M.currentdirid === 'contacts') {
                     $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);

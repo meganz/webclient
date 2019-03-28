@@ -126,8 +126,8 @@ function u_checklogin3a(res, ctx) {
     else {
         u_attr = res;
         var exclude = [
-            'aav', 'aas', 'c', 'currk', 'email', 'flags', 'k', 'lup', 'name',
-            'p', 'privk', 'pubk', 's', 'since', 'ts', 'u', 'ut', 'ipcc', 'b'
+            'aav', 'aas', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup',
+            'name', 'p', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut'
         ];
 
         for (var n in u_attr) {
@@ -470,6 +470,9 @@ function createanonuser(ctx, passwordkey, invitecode, invitename, uh) {
     ctx.passwordkey = passwordkey;
 
     api_createuser(ctx, invitecode, invitename, uh);
+
+    // Forget whether the user was logged-in creating an ephemeral account.
+    delete localStorage.wasloggedin;
 }
 
 function createanonuser2(u, ctx) {

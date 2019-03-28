@@ -241,6 +241,20 @@ span.browsers-update {
 .nw-bottom-social.twitter:hover {
 	background-position: -2px -317px;
 }
+a.continue-button {
+    color: #d22400;
+    display: block;
+    font-size: 16px;
+    font-family: 'source_sans_proregular', Arial;
+    font-size: 16px;
+    line-height: 30px;
+    padding-top: 20px;
+    text-decoration: underline;
+}
+a.continue-button.hidden {
+    display: none;
+}
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .logo {
  background-image: url(https://eu.static.mega.co.nz/3/images/mega/logo-black-v1@2x.png);
@@ -349,13 +363,14 @@ span.browsers-update {
           </a>
         </div>
         <div class="browsers-logo ie">
-          <a href="http://www.microsoft.com/download/internet-explorer-10-details.aspx" target="_blank" rel="noopener noreferrer" class="browsers-logo-lnk">
+          <a href="https://www.microsoft.com/en-nz/download/Internet-Explorer-11-for-Windows-7-details.aspx" target="_blank" rel="noopener noreferrer" class="browsers-logo-lnk">
             <span class="browsers-update">Download</span>
             <span class="browsers-recommendations partial-support">Partial support</span>
           </a>
         </div>
         <div class="clear"></div>
         </div>
+        <a id="continue-button" class="continue-button hidden" href="#">Continue anyway...</a>
       </div>
 
       <div class="browsers-bottom">
@@ -364,10 +379,9 @@ span.browsers-update {
           <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="nw-bottom-social twitter"></a>
           <div class="clear"></div>
       </div>
-
     </div>
-
   </div>
 </div>
+<script type="text/javascript" src="update.js" charset="utf-8"></script>
 </body>
 </html>

@@ -613,12 +613,12 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             }
 
         }
-
+        var c = (d || "").length === 11;
         for (var q = 0; q < opsArr[d].length; q++) {
-            var c = (opsArr[d] || "").length === 11;
+            
             try {
                 opsArr[d][q].k = c
-                    ? base64urlencode(encryptto(opsArr[d], a32_to_str(opsArr[d][q].k)))
+                    ? base64urlencode(encryptto(d, a32_to_str(opsArr[d][q].k)))
                     : a32_to_base64(encrypt_key(u_k_aes, opsArr[d][q].k));
             }
             catch (ex) {
@@ -655,6 +655,9 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             }
 
             nodesCount = importNodes - Object.keys(res).length;
+            if (t.length === 11) {
+                getsc(true);
+            }
         }
     });
 

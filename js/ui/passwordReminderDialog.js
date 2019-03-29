@@ -193,6 +193,7 @@
 
     var PasswordReminderDialog = function() {
         var self = this;
+        self.isLogout = false;
         self.passwordReminderAttribute = new PasswordReminderAttribute(self, function(prop) {
             self.recheck(prop !== "lastSuccess" && prop !== "dontShowAgain" ? true : false);
         });
@@ -475,6 +476,7 @@
                     unixtime() - self.passwordReminderAttribute.lastSkipped > SHOW_AFTER_LASTSKIP
                 )
             ) {
+                self.isLogout = false;
                 self.show();
             }
             else {
@@ -526,11 +528,7 @@
                 + "i-have-forgotten-my-password-can-i-reset-it-576c763f886688e6028b4582";
 
             $(this.firstText).html(
-                escapeHTML(
-                    this.isShown ? l[16900] : "Before you logout, please test your password below to ensure you " +
-                        "remember it. If you have lost your password, by logging out you will lose access to your " +
-                        "MEGA data. [A]Learn More[/A]."
-                )
+                escapeHTML(!this.isLogout ? l[16900] : l[20633])
                     .replace('[A]', '<a \n' +
                         'href="' + link + '" target="_blank" class="red">')
                     .replace('[/A]', '</a>')
@@ -705,16 +703,7 @@
             unixtime() - self.passwordReminderAttribute.lastSuccess > SHOW_AFTER_LASTSUCCESS &&
             unixtime() - self.passwordReminderAttribute.lastLogin > SHOW_AFTER_LASTLOGIN*/
         ) {
-            // skip recheck in case:
-            // - there is a visible .dropdown
-            // - the user had a textarea, input or select field focused
-            // - there is a visible/active dialog
-            var skipShowingDialog = $(
-                'textarea:focus, input:focus, select:focus, .dropdown:visible, .fm-dialog:visible'
-            ).length > 0;
-
             if (
-                !skipShowingDialog &&
                 is_fm() &&
                 !pfid/* &&
                 (
@@ -722,6 +711,8 @@
                     unixtime() - self.passwordReminderAttribute.lastSkipped > SHOW_AFTER_LASTSKIP_LOGOUT
                 )*/
             ) {
+
+                self.isLogout = true;
                 self.showDialog(returnedPromise);
             }
             else {

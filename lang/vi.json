@@ -1065,6 +1065,7 @@
     "7744": "Email Hi\u1ec7n T\u1ea1i",
     "7745": "\u0110\u1ecba ch\u1ec9 email m\u1edbi",
     "7747": "Ti\u1ebfp theo \u0111\u00f3, xin v\u00e0o h\u1ed9p th\u01b0 email c\u1ee7a b\u1ea1n \u0111\u1ec3 x\u00e1c minh vi\u1ec7c thay \u0111\u1ed5i \u0111\u1ecba ch\u1ec9 email.",
+    "7754": "C\u00e1c M\u1ee5c Chia S\u1ebb",
     "7869": "\u0110\u00e3 c\u00f3 m\u1ed9t t\u00e0i kho\u1ea3n \u0111\u0103ng k\u00fd v\u1edbi \u0111\u1ecba ch\u1ec9 email n\u00e0y. Xin ch\u1ecdn m\u1ed9t \u0111\u1ecba ch\u1ec9 email kh\u00e1c \u0111\u1ec3 ti\u1ebfp t\u1ee5c.",
     "7872": "Quy\u1ec1n truy c\u1eadp t\u1edbi c\u00e1c th\u01b0 m\u1ee5c chia s\u1ebb t\u1eeb ph\u00eda [X] s\u1ebd b\u1ecb m\u1ea5t.",
     "7879": "Quy\u1ec1n truy c\u1eadp t\u1edbi c\u00e1c th\u01b0 m\u1ee5c \u0111\u01b0\u1ee3c chia s\u1ebb t\u1eeb [X] \u0111\u00e3 b\u1ecb x\u00f3a.",
@@ -3393,5 +3394,7 @@
     "20639": "Export folder links and decryption keys",
     "20640": "Export file & foler links and decryption keys",
     "20641": "Chat link unavailable",
-    "20642": "This chat link is no longer available"
+    "20642": "This chat link is no longer available",
+    "20645": "My outgoing shares",
+    "20646": "My public links"
 }

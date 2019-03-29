@@ -1065,6 +1065,7 @@
     "7744": "Aktualny adres e-mail",
     "7745": "Nowy adres email",
     "7747": "Nast\u0119pnie, przejd\u017a do swojej skrzynki odbiorczej i potwierd\u017a zmian\u0119.",
+    "7754": "Udost\u0119pnione",
     "7869": "Adres email zosta\u0142 ju\u017c zarejestrowany. Prosz\u0119 u\u017cy\u0107 innego adresu email aby kontynuowa\u0107.",
     "7872": "Dost\u0119p do folder\u00f3w udost\u0119pnionych przez [X] zostanie utracony.",
     "7879": "Dost\u0119p do katalog\u00f3w udost\u0119pniony przez [X] zosta\u0142 usuni\u0119ty.",
@@ -3393,5 +3394,7 @@
     "20639": "Export folder links and decryption keys",
     "20640": "Export file & foler links and decryption keys",
     "20641": "Chat link unavailable",
-    "20642": "This chat link is no longer available"
+    "20642": "This chat link is no longer available",
+    "20645": "My outgoing shares",
+    "20646": "My public links"
 }

@@ -1065,6 +1065,7 @@
     "7744": "Huidige email",
     "7745": "Nieuw e-mailadres",
     "7747": "Daarna, ga alstublieft naar uw e-mail inbox en bevestig de verandering van uw e-mailadres.",
+    "7754": "Gedeelde items",
     "7869": "Dit e-mailadres is al geregistreerd. Kies alstublieft een alternatief e-mailadres om door te gaan.",
     "7872": "Toegang tot alle mappen gedeeld met jou door [X] gaan verloren.",
     "7879": "Toegang tot de mappen gedeeld door [X] werd verwijderd.",
@@ -3393,5 +3394,7 @@
     "20639": "Export folder links and decryption keys",
     "20640": "Export file & foler links and decryption keys",
     "20641": "Chat link unavailable",
-    "20642": "This chat link is no longer available"
+    "20642": "This chat link is no longer available",
+    "20645": "My outgoing shares",
+    "20646": "My public links"
 }

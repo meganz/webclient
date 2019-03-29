@@ -1065,6 +1065,7 @@
     "7744": "Correo electr\u00f3nico actual",
     "7745": "Nuevo correo electr\u00f3nico",
     "7747": "A continuaci\u00f3n, ve a tu bandeja de entrada y confirma el cambio de correo.",
+    "7754": "Carpetas compartidas",
     "7869": "Este correo electr\u00f3nico ya est\u00e1 registrado. Por favor, elige un correo alternativo para proceder.",
     "7872": "Perder\u00e1s el acceso a las carpetas compartidas contigo por [X].",
     "7879": "El acceso a las carpetas compartidas por [X] ha sido eliminado.",
@@ -3393,5 +3394,7 @@
     "20639": "Export folder links and decryption keys",
     "20640": "Export file & foler links and decryption keys",
     "20641": "Chat link unavailable",
-    "20642": "This chat link is no longer available"
+    "20642": "This chat link is no longer available",
+    "20645": "My outgoing shares",
+    "20646": "My public links"
 }

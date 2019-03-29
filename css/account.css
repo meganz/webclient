@@ -106,6 +106,7 @@
     padding: 0;
     font-size: 14px;
     line-height: 25px;
+    height: 25px;
     letter-spacing: 1px;
     color: #000000;
     width: 100%;
@@ -138,7 +139,7 @@
 }
 .account.input-wrapper .ui-selectmenu-button {
     float: none;
-    min-width:0;
+    min-width: 0;
     height:25px;
     color: #999999;
     font-size: 12px;
@@ -229,6 +230,7 @@
 .account.grouped-inputs .account.input-wrapper input[type='number'] {
     font-size: 36px;
     line-height: 45px;
+    height: 45px;
     text-align: center;
 }
 .sms-code-input-container {

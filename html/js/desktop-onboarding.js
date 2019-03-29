@@ -14,6 +14,8 @@
         $('.post-download', $wrapper).addClass('hidden');
         $('.pre-download', $wrapper).removeClass('hidden');
 
+        $('.top-head .left.individual').addClass('hidden');
+
         // Check if the user came from a voucher redemption.
         if (sessionStorage.voucherData) {
             var $voucherBlock = $('.promo-voucher-section', $wrapper).removeClass('hidden');

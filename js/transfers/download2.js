@@ -649,7 +649,6 @@ var dlmanager = {
         var req = {
             a: 'g',
             g: 1,
-            v: 2,
             ssl: use_ssl
         };
         var ctx = {
@@ -658,6 +657,11 @@ var dlmanager = {
             dl_key: dl.key,
             callback: this.dlGetUrlDone.bind(this)
         };
+
+        if (window.fetchStreamSupport) {
+            // can handle CloudRAID downloads.
+            req.v = 2;
+        }
 
         if (dl.ph) {
             req.p = dl.ph;
@@ -695,6 +699,9 @@ var dlmanager = {
 
                 if (res.g[0] < 0) {
                     res.e = res.e || res.g[0];
+                }
+                else {
+                    dlQueue.setSize(1);
                 }
             }
             if (res.d) {

@@ -150,7 +150,12 @@ function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
 
                 promise.reject(res && res.e || res);
             };
-            var req = {a: 'g', g: 1, v: 2, ssl: use_ssl};
+            var req = {a: 'g', g: 1, ssl: use_ssl};
+
+            if (window.fetchStreamSupport) {
+                // can handle CloudRAID downloads.
+                req.v = 2;
+            }
 
             if (!key) {
                 req.n = handle;

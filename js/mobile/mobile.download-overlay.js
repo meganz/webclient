@@ -73,13 +73,13 @@ mobile.downloadOverlay = {
 
         // On Open in Browser button click/tap
         this.$overlay.find('.second.dl-browser').off('tap').on('tap', function() {
-       
+
             // Start the download
             mobile.downloadOverlay.startFileDownload(nodeHandle);
 
             // Prevent default anchor link behaviour
             return false;
-            
+
         });
     },
 

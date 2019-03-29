@@ -3108,6 +3108,7 @@
     "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
     "20463": "Contact your business account administrator to resolve the issue and activate your account.",
     "20464": "IMPORTANT",
+    "20474": "You are about to close the dialog. All data entered will be lost.",
     "20552": "\u062a\u062e\u0632\u064a\u0646 \u0648\u062a\u0648\u0627\u0635\u0644 \u0633\u062d\u0627\u0628\u064a \u0622\u0645\u0646. [Br] \u0645\u0635\u0645\u0645 \u0644\u062a\u062d\u0642\u064a\u0642 \u0627\u0644\u062e\u0635\u0648\u0635\u064a\u0629",
     "20553": "\u0627\u0646\u0634\u0626 \u062d\u0633\u0627\u0628 \u0639\u0644\u0649 MEGA \u0648\u0627\u062d\u0635\u0644 \u0639\u0644\u0649 [S]50 \u063a\u064a\u063a\u0627\u0628\u0627\u064a\u062a \u0645\u062c\u0627\u0646\u0627\u064b*[\/S] \u0645\u0633\u0627\u062d\u0629 \u062a\u062e\u0632\u064a\u0646.",
     "20554": "\u062a\u062e\u0632\u064a\u0646 \u0645\u0648\u062b\u0648\u0642 \u0648\u062a\u0631\u0627\u0633\u0644 \u0633\u0631\u064a\u0639",
@@ -3158,5 +3159,10 @@
     "20618": "\u0645\u0633\u0627\u062d\u0629 \u062a\u062e\u0632\u064a\u0646 \u063a\u064a\u0631 \u0645\u062d\u062f\u0648\u062f\u0629 \u0644\u0641\u0631\u0642 \u0627\u0644\u0639\u0645\u0644",
     "20621": "\u0627\u062d\u0635\u0644 \u0639\u0644\u0649 \u0627\u0634\u062a\u0631\u0627\u0643 \u0627\u0644\u0627\u0639\u0645\u0627\u0644 Business",
     "20624": "\u0628\u062f\u0621\u064b \u0645\u0646 %1 \u0634\u0647\u0631\u064a\u0627\u064b",
-    "20625": "\u0628\u062f\u0621\u064b \u0645\u0646 %1 \u0634\u0647\u0631\u064a\u0627\u064b \u0644\u0644\u0645\u0633\u062a\u062e\u062f\u0645"
+    "20625": "\u0628\u062f\u0621\u064b \u0645\u0646 %1 \u0634\u0647\u0631\u064a\u0627\u064b \u0644\u0644\u0645\u0633\u062a\u062e\u062f\u0645",
+    "20627": "Do you want to add a contact or add a user to your Business account?",
+    "20628": "Business users",
+    "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
+    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists.",
+    "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your MEGA data. [A]Learn More[\/A]."
 }

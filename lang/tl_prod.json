@@ -3108,9 +3108,10 @@
     "20462": "Your account is currently [B]suspended[\/B]. You can only browse your data.",
     "20463": "Contact your business account administrator to resolve the issue and activate your account.",
     "20464": "IMPORTANT",
+    "20474": "You are about to close the dialog. All data entered will be lost.",
     "20552": "Secure Cloud Storage and Communication. [Br] Privacy by Design.",
     "20553": "Create a MEGA account to get [S]50 GB FREE*[\/S] storage",
-    "20554": "Reliable Storage & Fast Transfers",
+    "20554": "Reliable Storage and Fast Transfers",
     "20555": "We make secure cloud storage simple and convenient. Create a free MEGA account today!",
     "20556": "Get started",
     "20557": "Your MEGA files and chats are encrypted with keys controlled by you.",
@@ -3158,5 +3159,10 @@
     "20618": "Unlimited storage for teams",
     "20621": "Get Business",
     "20624": "From %1 \/ month",
-    "20625": "From %1 \/ user \/ month"
+    "20625": "From %1 \/ user \/ month",
+    "20627": "Do you want to add a contact or add a user to your Business account?",
+    "20628": "Business users",
+    "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
+    "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists.",
+    "20633": "Bago ka mag-logout, pakiusap subukan muna ang iyong password sa ibaba at siguraduhing natandaan mo ito. Kung mawala mo ang iyong password, saka nag-logout mawawalan ka ng access sa iyong MEGA data.\r\n[A]Learn More[\/A]."
 }

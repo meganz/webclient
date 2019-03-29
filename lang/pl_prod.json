@@ -3108,6 +3108,7 @@
     "20462": "Twoje konto jest obecnie [B]zawieszone[\/B]. Mo\u017cesz tylko przegl\u0105da\u0107 swoje dane.",
     "20463": "Skontaktuj si\u0119 z administratorem konta biznesowego, aby rozwi\u0105za\u0107 problem i aktywowa\u0107 konto.",
     "20464": "WA\u017bNE",
+    "20474": "Zamierzasz zamkn\u0105\u0107 okno dialogowe. Wszystkie wprowadzone dane zostan\u0105 utracone.",
     "20552": "Bezpieczne przechowywanie w chmurze i komunikacja. [Br] Prywatno\u015b\u0107 wed\u0142ug projektu.",
     "20553": "Utw\u00f3rz konto MEGA, aby uzyska\u0107 [S]50 GB DARMOWEJ *[\/S] pami\u0119ci masowej",
     "20554": "Niezawodne przechowywanie i szybkie transfery",
@@ -3158,5 +3159,10 @@
     "20618": "Nieograniczona pami\u0119\u0107 masowa dla zespo\u0142\u00f3w",
     "20621": "Dla biznesu",
     "20624": "Od %1 \/ miesi\u0105c",
-    "20625": "Od %1 \/ u\u017cytkownik \/ miesi\u0105c"
+    "20625": "Od %1 \/ u\u017cytkownik \/ miesi\u0105c",
+    "20627": "Czy chcesz doda\u0107 kontakt lub doda\u0107 u\u017cytkownika do konta firmowego?",
+    "20628": "U\u017cytkownicy biznesowi",
+    "20629": "Kontakty to osoby, kt\u00f3re dodajesz do listy kontakt\u00f3w, aby m\u00f3c wchodzi\u0107 w interakcje (Czat, Po\u0142\u0105cz, Udost\u0119pnij).",
+    "20630": "U\u017cytkownicy biznesowi to osoby, kt\u00f3re s\u0105 cz\u0119\u015bci\u0105 Twojego konta biznesowego. U\u017cytkownicy biznesowi zostan\u0105 automatycznie dodani do wszystkich innych u\u017cytkownik\u00f3w na listach kontakt\u00f3w biznesowych.",
+    "20633": "Przed wylogowaniem sprawd\u017a swoje has\u0142o poni\u017cej, aby upewni\u0107 si\u0119, \u017ce je pami\u0119tasz. Je\u015bli straci\u0142e\u015b has\u0142o, wylogowuj\u0105c si\u0119, utracisz dost\u0119p do danych MEGA. [A]Dowiedz si\u0119 wi\u0119cej[\/A]."
 }

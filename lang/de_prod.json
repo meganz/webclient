@@ -2888,7 +2888,7 @@
     "20197": "[S1]$1[\/S1][S2] von [\/S2][S3]$2[\/S3]",
     "20198": "URL ung\u00fcltig",
     "20199": "Ung\u00fcltiges URL-Format. Der eingegebene Link existiert nicht.",
-    "20200": "You are not allowed to join this call as it has reached the maximum number of participants.",
+    "20200": "Diese Konferenz hat die maximale Teilnehmerzahl erreicht. Sie k\u00f6nnen derzeit nicht teilnehmen.",
     "20204": "FTP-Zugang",
     "20205": "Ein FTP-Server erlaubt Ihnen den Zugang zu Ihrem MEGA-Account mit jedem FTP-Client. Das FTP-Protokoll erfreut sich breiter Unterst\u00fctzung.",
     "20206": "[S1]Status nach[\/S1] %1 [S2] Minuten Inaktivit\u00e4t auf Abwesend setzen.[\/S2]",
@@ -3108,6 +3108,7 @@
     "20462": "Ihr Account ist [B]gesperrt[\/B]. Sie k\u00f6nnen lediglich lesend auf Ihre Daten zugreifen.",
     "20463": "Bitte setzen Sie sich zur L\u00f6sung des Problems und zur Aktivierung Ihres Accounts mit Ihrem Administrator in Verbindung",
     "20464": "WICHTIG",
+    "20474": "Ihre Eingaben gehen bei Schlie\u00dfen des Dialogs verloren.",
     "20552": "Cloudspeicher und Kommunikation.[Br]Schutz Ihrer Privatsph\u00e4re durch Systemarchitektur.",
     "20553": "Registrieren Sie sich jetzt und erhalten Sie [S]50 GB KOSTENLOSEN*[\/S] Speicherplatz!",
     "20554": "Zuverl\u00e4ssiger Speicherplatz und schnelle Daten\u00fcbertragung",
@@ -3158,5 +3159,10 @@
     "20618": "Unbegrenzter Speicherplatz f\u00fcr Teams",
     "20621": "Starten",
     "20624": "Ab %1 \/ Monat",
-    "20625": "Ab %1 \/ Benutzer \/ Monat"
+    "20625": "Ab %1 \/ Benutzer \/ Monat",
+    "20627": "Wollen Sie einen Kontakt oder einen neuen Benutzer hinzuf\u00fcgen?",
+    "20628": "Business-User",
+    "20629": "Kontakte sind Benutzer, die Sie Ihrer Kontaktliste hinzuf\u00fcgen, um mit ihnen kommunizieren oder Ordnerfreigaben teilen zu k\u00f6nnen.",
+    "20630": "Business-User sind die Benutzeraccounts, die Ihrem Business-Account zugeordnet sind. Neue User erscheinen automatisch in allen Kontaktlisten der bestehenden User.",
+    "20633": "Bitte pr\u00fcfen Sie vor dem Ausloggen, ob Sie sich noch an Ihr Passwort erinnern k\u00f6nnen. Ohne Ihr Passwort sind Ihre Daten unwiederbringlich verloren! [A]Weitere Informationen[\/A]"
 }

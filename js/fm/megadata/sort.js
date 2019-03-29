@@ -159,8 +159,29 @@ MegaData.prototype.getSortByDateTimeFn = function() {
     var sortfn;
 
     sortfn = function(a, b, d) {
+        var getMaxShared = function _getMaxShared(shares) {
+            var max = 0;
+            for (var i in shares) {
+                if (i !== 'EXP') {
+                    max = Math.max(max, shares[i].ts - shares[i].ts % 60);
+                }
+            }
+            return max;
+        };
+
         var time1 = a.ts - a.ts % 60;
         var time2 = b.ts - b.ts % 60;
+
+        if (M.currentdirid === 'out-shares') {
+            time1 = getMaxShared(a.shares);
+            time2 = getMaxShared(b.shares);
+        }
+
+        if (M.currentdirid === 'public-links' && !$.dialog) {
+            time1 = a.shares.EXP.ts;
+            time2 = b.shares.EXP.ts;
+        }
+
         if (time1 !== time2) {
             return (time1 < time2 ? -1 : 1) * d;
         }
@@ -240,6 +261,10 @@ MegaData.prototype.getSortBySizeFn = function() {
         if (M.currentdirid === "shares" &&
             a.tb !== undefined && b.tb !== undefined && a.tb !== b.tb) {
             return (a.tb < b.tb ? -1 : 1) * d;
+        }
+        if (M.currentdirid === 'out-shares' &&
+            a.tb !== undefined && b.tb !== undefined && a.tb !== b.tb) {
+            return (a.tb + (a.tvb || 0) < b.tb + (b.tvb || 0) ? -1 : 1) * d;
         }
         if (a.s !== undefined && b.s !== undefined && a.s !== b.s) {
             return (a.s < b.s ? -1 : 1) * d;
@@ -443,7 +468,6 @@ MegaData.prototype.sortByInteraction = function(d) {
     this.sort();
 };
 
-
 MegaData.prototype.doSort = function(n, d) {
     $('.grid-table-header .arrow').removeClass('asc desc');
 
@@ -577,4 +601,48 @@ MegaData.prototype.doFallbackSortWithFolder = function(a, b) {
     }
     // even direction is desc, sort name by asc.
     return M.doFallbackSortWithName(a, b, 1);
+};
+
+MegaData.prototype.getSortBySharedWithFn = function() {
+    'use strict';
+
+    return function(a, b, d) {
+
+        var aShareNames = [];
+        var bShareNames = [];
+
+        for (var i in a.shares) {
+            if (a.shares[i]) {
+                aShareNames.push(M.getNameByHandle(i));
+            }
+        }
+        for (var j in b.shares) {
+            if (b.shares[j]) {
+                bShareNames.push(M.getNameByHandle(j));
+            }
+        }
+        aShareNames = aShareNames.sort().join();
+        bShareNames = bShareNames.sort().join();
+
+        if (aShareNames !== bShareNames) {
+            return M.compareStrings(aShareNames, bShareNames, d);
+        }
+        return M.doFallbackSortWithName(a, b, d);
+    };
+};
+
+MegaData.prototype.sortBySharedWith = function(d) {
+    'use strict';
+
+    var fn = this.sortfn = this.getSortBySharedWithFn();
+    this.sortd = d;
+
+    if (!d) {
+        d = 1;
+    }
+
+    // label sort is not doing folder sorting first. therefore using view sort directly to avoid.
+    this.v.sort(function(a, b) {
+        return fn(a, b, d);
+    });
 };

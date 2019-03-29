@@ -1005,7 +1005,6 @@
     MegaList.prototype._applyDOMChanges = function() {
         this._recalculate();
 
-
         var contentWasUpdated = false;
 
         var first = this._calculated['visibleFirstItemNum'];
@@ -1021,7 +1020,6 @@
                     delete this._currentlyRendered[id];
                 }
             }
-
 
             // remove items after the last visible item
             for (var i = last; i < this.items.length; i++) {

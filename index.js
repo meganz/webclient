@@ -1076,6 +1076,10 @@ function init_page() {
         loadSubPage('fm/account/security');
         return false;
     }
+    else if (page === 'fm/links') {
+        loadSubPage('fm/public-links');
+        return false;
+    }
     else if (page == 'key') {
         if (is_mobile) {
             parsepage(pages['mobile']);

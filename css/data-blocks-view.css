@@ -34,7 +34,7 @@
 .data-block-view.medium {
     width: 128px;
 }
-.fm-blocks-view .data-block-view, .shared-blocks-view .data-block-view {
+.fm-blocks-view .data-block-view, .shared-blocks-view .data-block-view, .out-shared-blocks-view .data-block-view {
     margin: 12px 0 0 12px;
 }
 .data-block-view::before, .data-block-view::after {
@@ -133,7 +133,7 @@
     top: 10px;
     margin: 0;
 }
-.shared-blocks-view .shared-folder-info-block {
+.shared-blocks-view .shared-folder-info-block, .out-shared-blocks-view .shared-folder-info-block {
     padding: 8px 6px 6px 50px;
 }
 .data-block-view .shared-folder-access {

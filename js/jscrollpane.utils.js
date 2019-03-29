@@ -142,6 +142,19 @@ function initShareBlocksScrolling() {
     jScrollFade(scroll);
 }
 
+function initOutShareBlocksScrolling() {
+
+    'use strict';
+    
+    var scroll = '.out-shared-blocks-scrolling';
+    if ($('.out-shared-blocks-scrolling:visible').length === 0) {
+        return;
+    }
+    deleteScrollPanel(scroll, 'jsp');
+    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    jScrollFade(scroll);
+}
+
 function initTransferScroll() {
     $('.transfer-scrolling-table').jScrollPane({
         enableKeyboardNavigation: false,

@@ -509,6 +509,7 @@ function sc_node(n) {
 
 // inter-actionpacket state, gets reset in getsc()
 var scsharesuiupd;
+var scpubliclinksuiupd;
 var scContactsSharesUIUpdate;
 var loadavatars = [];
 var scinshare = Object.create(null);
@@ -801,6 +802,7 @@ scparser.$add('s', {
             // a full share contains .h param
             onIdle(sharedUInode.bind(null, a.h));
         }
+        scsharesuiupd = true;
     }
 });
 
@@ -960,10 +962,13 @@ scparser.$add('ph', {
         if (typeof a.up !== 'undefined' && typeof a.down !== 'undefined') {
             notify.notifyFromActionPacket(a);
         }
+        scpubliclinksuiupd = true;
     },
     l: function(a) {
         // exported link
         processPH([a]);
+
+        scpubliclinksuiupd = true;
     }
 });
 
@@ -1436,13 +1441,24 @@ scparser.$finalize = function() {
             if (scsharesuiupd) {
                 onIdle(function() {
                     M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+                    M.buildtree({h: 'out-shares'}, M.buildtree.FORCE_REBUILD);
 
-                    if (M.currentrootid === 'shares') {
+                    if (M.currentrootid === 'shares' || M.currentrootid === 'out-shares') {
                         M.openFolder(M.currentdirid, true);
                     }
                 });
 
                 scsharesuiupd = false;
+            }
+
+            if (scpubliclinksuiupd) {
+                onIdle(function() {
+                    M.buildtree({h: 'public-links'}, M.buildtree.FORCE_REBUILD);
+
+                    if (M.currentrootid === 'public-links') {
+                        M.openFolder(M.currentdirid, true);
+                    }
+                });
             }
 
             if (scContactsSharesUIUpdate === M.currentdirid) {
@@ -1515,6 +1531,7 @@ function execsc() {
         }
 
         if (a.a === 's' || a.a === 's2') {
+            // Make this onIdle to prevent infinite loading.
             mBroadcaster.sendMessage('share-packet.' + a.n, a);
         }
 
@@ -2797,7 +2814,6 @@ function processPH(publicHandles) {
             delete share.a;
             delete share.i;
             delete share.n;
-            share.ts = timeNow;
             share.u = 'EXP';
             share.r = 0;
 

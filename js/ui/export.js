@@ -2252,7 +2252,7 @@ var exportExpiry = {
 
         var self = this;
         var $nodeId = $('#' + nodeId);
-        var $tree = $('#treea_' + nodeId);
+        var $tree = $('#treea_' + nodeId).add('#treea_os_' + nodeId).add('#treea_pl_' + nodeId);
 
         if ($nodeId.length === 0 && M.currentdirid.indexOf('chat') === -1) {
 

@@ -171,6 +171,9 @@ MegaData.prototype.getPath = function(id) {
     var result = [];
     var loop = true;
     var inshare;
+    var cv = this.isCustomView(id);
+
+    id = cv ? cv.nodeID : id;
 
     while (loop) {
         if ((id === 'contacts') && (result.length > 1)) {
@@ -187,6 +190,8 @@ MegaData.prototype.getPath = function(id) {
             || (id === 'contacts')
             || (id === 'messages')
             || (id === 'shares')
+            || (id === 'out-shares')
+            || (id === 'public-links')
             || (id === this.InboxID)
             || (id === 'opc')
             || (id === 'ipc')
@@ -223,7 +228,135 @@ MegaData.prototype.getPath = function(id) {
         }
     }
 
+    // Get path for Out-shares and Public links.
+    // This also cut off all path from invalid out-share and public-link path and return []
+    if (cv && result.length > 1) {
+
+        var outShareTree = M.getOutShareTree();
+
+        for (var i = result.length - 1; i >= 0; i--) {
+            if (cv.type === 'public-links' && typeof M.su.EXP !== 'undefined' && M.su.EXP[result[i]]) {
+                result[i + 1] = 'public-links';
+                break;
+            }
+            else if (outShareTree[result[i]]) {
+                result[i + 1] = 'out-shares';
+                break;
+            }
+            result.pop();
+        }
+    }
+
     return result;
+};
+
+/**
+ * Check entered path or id is a custom view like out-shares and public-links
+ * If it is, return a set of object that contain detail of it.
+ * If it is not, return false
+ * @param {String} pathOrID Path or id of current element.
+ * @return {Object|Boolean}
+ */
+MegaData.prototype.isCustomView = function(pathOrID) {
+
+    "use strict";
+
+    if (!pathOrID) {
+        return false;
+    }
+
+    var result = Object.create(null);
+    result.original = pathOrID;
+
+    // This is a out-share id from tree
+    if (pathOrID.substr(0, 3) === 'os_') {
+        result.type = 'out-shares';
+        result.nodeID = pathOrID.replace('os_', '');
+        result.prefixTree = 'os_';
+        result.prefixPath = 'out-shares/';
+    }
+    // This is a public-link id from tree
+    else if (pathOrID.substr(0, 3) === 'pl_') {
+        result.type = 'public-links';
+        result.nodeID = pathOrID.replace('pl_', '');
+        result.prefixTree = 'pl_';
+        result.prefixPath = 'public-links/';
+    }
+    // This is a out-share path
+    else if (pathOrID.substr(0, 11) === 'out-shares/') {
+        result.type = 'out-shares';
+        result.nodeID = pathOrID.replace('out-shares/', '');
+        result.prefixTree = 'os_';
+        result.prefixPath = 'out-shares/';
+    }
+    // This is a public-link path
+    else if (pathOrID.substr(0, 13) === 'public-links/') {
+        result.type = 'public-links';
+        result.nodeID = pathOrID.replace('public-links/', '');
+        result.prefixTree = 'pl_';
+        result.prefixPath = 'public-links/';
+    }
+    else if (pathOrID === 'out-shares') {
+        result.type = result.nodeID = 'out-shares';
+        result.prefixTree = 'os_';
+        result.prefixPath = '';
+    }
+    else if (pathOrID === 'public-links') {
+        result.type = result.nodeID = 'public-links';
+        result.prefixTree = 'pl_';
+        result.prefixPath = '';
+    }
+    // This is not a out-share or a public-link
+    else {
+        result = false;
+    }
+    return result;
+};
+
+/**
+ * Create tree of out-share's children. Same structure as M.tree
+ * @return {Object}
+ */
+MegaData.prototype.getOutShareTree = function() {
+
+    'use strict';
+
+    var ostree = {};
+    for (var suh in M.su) {
+        if (suh !== 'EXP') {
+            for (var h in M.su[suh]) {
+                if (M.d[h] && M.getNodeShareUsers(M.d[h], 'EXP').length || M.ps[h]) {
+                    ostree[h] = Object.assign({}, M.d[h]);
+                    ostree[h].t = this.getTreeValue(M.d[h]);
+                }
+            }
+        }
+    }
+    return ostree;
+};
+
+/**
+ * Get t value of custom view trees
+ * @return {Interger}
+ */
+MegaData.prototype.getTreeValue = function(n) {
+
+    'use strict';
+
+    var t = n.t;
+    if (n.fav) {
+        t |= M.IS_FAV;
+    }
+    if (M.su.EXP && M.su.EXP[n.h]) {
+        t |= M.IS_LINKED;
+    }
+    if (M.getNodeShareUsers(n, 'EXP').length || M.ps[n.h]) {
+        t |= M.IS_SHARED;
+    }
+    if (M.getNodeShare(n).down === 1) {
+        t |= M.IS_TAKENDOWN;
+    }
+    return t;
 };
 
 /**
@@ -1765,15 +1898,15 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
 
     if (fminitialized) {
         var n = M.d[handle] || false;
-
         var labelId = parseInt(value);
         var removeClasses = 'colour-label red orange yellow blue green grey purple';
         var color = '<div class="colour-label-ind %1"></div>';
+        var prefixTree = M.currentCustomView.prefixTree || '';
 
         // Remove all colour label classes
         $('#' + handle).removeClass(removeClasses);
         $('#' + handle + ' a').removeClass(removeClasses);
-        $('#treea_' + handle).removeClass('labeled').find('.colour-label-ind').remove();
+        $('#treea_' + prefixTree + handle).removeClass('labeled').find('.colour-label-ind').remove();
 
         if (labelId) {
             // Add colour label classes.
@@ -1781,7 +1914,7 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
 
             $('#' + handle).addClass(colourClass);
             $('#' + handle + ' a').addClass(colourClass);
-            $('#treea_' + handle).append(color.replace('%1', M.getLabelClassFromId(labelId)))
+            $('#treea_' + prefixTree + handle).append(color.replace('%1', M.getLabelClassFromId(labelId)))
                 .addClass('labeled');
         }
 
@@ -1790,13 +1923,14 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         if (currentTreeLabel && Object.keys(currentTreeLabel).length > 0) {
             // and action is assigning new tag
             if (labelId && currentTreeLabel[labelId]) {
-                $('#treeli_' + handle).removeClass("tree-item-on-filter-hidden");
+                $('#treeli_' + prefixTree + handle).removeClass("tree-item-on-filter-hidden");
             }
             // and action is unassigning old tag
             else {
-                $('#treeli_' + handle).addClass("tree-item-on-filter-hidden");
+                $('#treeli_' + prefixTree + handle).addClass("tree-item-on-filter-hidden");
             }
         }
+
 
         // make filter enable/disable depending on filter availabilty.
         $('.dropdown-section .dropdown-item-label')
@@ -1908,6 +2042,12 @@ MegaData.prototype.labelType = function() {
     switch (M.currentrootid) {
         case 'shares':
             result = 'shares';
+            break;
+        case 'out-shares':
+            result = 'out-shares';
+            break;
+        case 'public-links':
+            result = 'public-links';
             break;
         case M.RubbishID:
             result = 'rubbish';
@@ -2939,7 +3079,7 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
                         $('.create-new-folder input').val('');
 
                         M.updFileManagerUI().always(function() {
-                            if ($.copyDialog || $.moveDialog) {
+                            if ($.copyDialog || $.moveDialog || $.selectFolderDialog) {
                                 refreshDialogContent();
                             }
                             hideOverlay();

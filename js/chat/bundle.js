@@ -10312,7 +10312,7 @@ React.makeElement = React['createElement'];
 	        var entries = self.state.entries || self.getEntries();
 	        var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
-	        var classes = "add-from-cloud " + self.props.className;
+	        var classes = "add-from-cloud " + (self.props.className || '');
 
 	        var folderIsHighlighted = false;
 
@@ -10379,7 +10379,7 @@ React.makeElement = React['createElement'];
 
 	        var buttons = [];
 
-	        if (!folderIsHighlighted) {
+	        if (!folderIsHighlighted || self.props.folderSelectable) {
 	            buttons.push({
 	                "label": self.props.selectLabel,
 	                "key": "select",
@@ -10463,7 +10463,7 @@ React.makeElement = React['createElement'];
 	        return React.makeElement(
 	            ModalDialogsUI.ModalDialog,
 	            {
-	                title: __(l[8011]),
+	                title: self.props.title || __(l[8011]),
 	                className: classes,
 	                onClose: function onClose() {
 	                    self.props.onClose(self);

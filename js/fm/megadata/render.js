@@ -259,6 +259,8 @@ MegaData.prototype.renderTree = function() {
     });
 
     build('shares');
+    build('out-shares');
+    build('public-links');
     build(M.RootID);
     build(M.RubbishID);
     build(M.InboxID);
@@ -373,25 +375,6 @@ MegaData.prototype.renderPath = function(fileHandle) {
             + '</a>');
         $('.search-files-result').addClass('hidden');
     }
-    else if (this.currentdirid === 'links') {
-        $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
-            '<a class="fm-breadcrumbs public-links">'
-            + '<span class="right-arrow-bg ui-draggable">'
-            + '<span>'
-            + '<i class="small-icon context get-link"></i>'
-            + l[16516]
-            + '<span class="public-links-cnt">0</span>'
-            + '</span>'
-            + '</span>'
-            + '</a>');
-
-        if (this.su.EXP) {
-            $('.public-links-cnt').text(Object.keys(this.su.EXP).length);
-        }
-        else {
-            $('.public-links-cnt').text(0);
-        }
-    }
     else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
         $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
             '<a class="fm-breadcrumbs search ui-droppable" id="'
@@ -483,11 +466,15 @@ MegaData.prototype.renderPath = function(fileHandle) {
             else if ((crumbId === 'chatcrumb') || (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/')) {
                 return false;
             }
-
             // Remove focus from 'view ipc/opc' buttons
             $('.fm-received-requests').removeClass('active');
             $('.fm-contact-requests').removeClass('active');
-            M.openFolder($(this).attr('id').replace('path_', ''));
+            var replaceStr = '';
+            if ((M.currentdirid.startsWith('out-shares/') && !$(this).is('#path_out-shares')) ||
+                (M.currentdirid.startsWith('public-links/') && !$(this).is('#path_public-links'))) {
+                replaceStr = M.currentrootid + '/';
+            }
+            M.openFolder($(this).attr('id').replace('path_', replaceStr));
         }
     });
 
@@ -602,7 +589,8 @@ MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
 
     $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search')
         .add('.fm-empty-cloud,.fm-invalid-folder,.fm-empty-filter').addClass('hidden');
-    $('.fm-empty-folder,.fm-empty-incoming,.fm-empty-folder-link').addClass('hidden');
+    $('.fm-empty-folder,.fm-empty-incoming,.fm-empty-folder-link')
+        .add('.fm-empty-outgoing,.fm-empty-public-link').addClass('hidden');
     $('.fm-empty-pad.fm-empty-sharef').remove();
 };
 

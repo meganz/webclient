@@ -1097,6 +1097,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
     var ttl = this.getTransferTableLengths();
 
     target = target || this.currentdirid;
+    target = M.isCustomView(target).nodeID || target;
 
     if (String(target).startsWith('chat')) {
         toChat = true;

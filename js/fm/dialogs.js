@@ -134,6 +134,9 @@
         else if ($.copyDialog && section === 'cloud-drive') {
             $btn.removeClass('disabled');
         }
+        else if ($.selectFolderDialog && section === 'cloud-drive' && $.mcselected !== M.RootID) {
+            $btn.removeClass('disabled');
+        }
         else {
             var forceEnabled = $.copyToShare || $.copyToUpload || $.onImportCopyNodes || $.saveToDialog;
 
@@ -339,6 +342,10 @@
             $('.summary-target-title', $dialog).text(l[19180]);
             $('.summary-selected', $dialog).addClass('hidden');
         }
+        else if ($.selectFolderDialog) {
+            $('.summary-target-title', $dialog).text(l[19181]);
+            $('.summary-selected', $dialog).addClass('hidden');
+        }
         else {
             $('.summary-target-title', $dialog).text(l[19181]);
 
@@ -474,6 +481,10 @@
 
         if ($.moveDialog) {
             return l[62]; // Move
+        }
+
+        if ($.selectFolderDialog) {
+            return l[1523]; // Select
         }
 
         return l[16176]; // Paste
@@ -814,12 +825,12 @@
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).removeClass('hidden');
         }
 
-        if (!u_type || $.saveToDialog || $.copyToShare || $.mcImport) {
+        if (!u_type || $.saveToDialog || $.copyToShare || $.mcImport || $.selectFolderDialog) {
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
             $('.fm-picker-dialog-button.conversations', $dialog).addClass('hidden');
         }
 
-        if ($.copyToShare) {
+        if ($.copyToShare || $.selectFolderDialog) {
             $('.fm-picker-dialog-button.shared-with-me', $dialog).addClass('hidden');
         }
         else {
@@ -869,6 +880,9 @@
                         });
                     $menu.fadeIn(200);
                 });
+        }
+        else if ($.selectFolderDialog) {
+            $('.fm-picker-dialog-title', $dialog).text(l[16533]);
         }
         else {
             $('.share-dialog-permissions', $dialog).addClass('hidden');
@@ -935,6 +949,8 @@
         var b = $('.content-panel.' + tab).html();
 
         handleDialogTabContent(tab, 'ul', b);
+        buildDialogTree();
+
         delete $.cfsection; // safe deleting
 
         disableFolders($.moveDialog && 'move');
@@ -1023,6 +1039,26 @@
                 $.saveToDialogCb = cb;
                 $.saveToDialogNode = node;
                 handleOpenDialog(activeTab, M.RootID, activeTab !== 'conversations' && 'saveToDialog');
+                return $dialog;
+            });
+        }
+
+        return false;
+    };
+
+    /**
+     * A version of the select a folder dialog used for "New Shared Folder" in out-shares.
+     * @global
+     */
+    global.openNewSharedFolderDialog = function openNewSharedFolderDialog() {
+        if (isUserAllowedToOpenDialogs()) {
+            M.safeShowDialog('selectFolder', function() {
+                $.selected = [];
+                handleOpenDialog(0, M.RootID);
+                $.selectFolderCallback = function() {
+                    $.selected = [$.mcselected];
+                    M.openSharingDialog();
+                };
                 return $dialog;
             });
         }
@@ -1481,6 +1517,10 @@
                 closeDialog();
                 M.safeMoveNodes($.mcselected);
                 return false;
+            }
+
+            if ($.selectFolderDialog && typeof $.selectFolderCallback === 'function') {
+                $.selectFolderCallback();
             }
             closeDialog();
 

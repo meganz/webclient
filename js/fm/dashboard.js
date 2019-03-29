@@ -556,7 +556,17 @@ dashboardUI.updateCloudDataWidget = function() {
     var intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
     $('.data-item .links-s').rebind('click', function() {
-        loadSubPage('fm/links');
+        loadSubPage('fm/public-links');
+        return false;
+    });
+
+    $('.data-item .incoming').rebind('click', function() {
+        loadSubPage('fm/shares');
+        return false;
+    });
+
+    $('.data-item .outgoing').rebind('click', function() {
+        loadSubPage('fm/out-shares');
         return false;
     });
 

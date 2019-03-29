@@ -120,7 +120,8 @@ function MegaData() {
         'status': this.sortByStatus.bind(this),
         'fav': this.sortByFav.bind(this),
         'email': this.sortByEmail.bind(this),
-        'label': this.sortByLabel.bind(this)
+        'label': this.sortByLabel.bind(this),
+        'sharedwith': this.sortBySharedWith.bind(this)
     };
 
     /** EventListener interface. */

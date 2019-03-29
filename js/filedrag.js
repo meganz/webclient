@@ -222,6 +222,9 @@
                 target = $.onDroppedTreeFolder;
                 delete $.onDroppedTreeFolder;
             }
+            else if (M.currentCustomView) {
+                target = M.currentCustomView.nodeID;
+            }
             else if (String(M.currentdirid).length !== 8) {
                 target = M.lastSeenCloudFolder || M.RootID;
             }
@@ -329,7 +332,7 @@
 
         useMegaSync = -1;
 
-        var currentDir = M.currentdirid;
+        var currentDir = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
 
         // Clear drag element
         touchedElement = 0;
@@ -494,6 +497,8 @@
         if (is_fm() && // if page is fm,
             (slideshowid || !$('.feedback-dialog').hasClass('hidden') || // preview and feedback dialog show
                 M.currentdirid === 'shares' || // Share root page
+                M.currentdirid === 'out-shares' || // Out-share root page
+                M.currentdirid === 'public-links' || // Public-link root page
                 M.currentrootid === 'contacts' || // Contacts pages
                 M.currentrootid === 'ipc' || // IPC
                 M.currentrootid === 'opc' || // OPC

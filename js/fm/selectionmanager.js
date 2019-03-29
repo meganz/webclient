@@ -507,7 +507,8 @@ var SelectionManager = function($selectable, resume) {
 
         // ensure the current 'resume' selection list is matching the current M.v
         $.selected.forEach(function(nodeId) {
-            if (!M.c[M.currentdirid] || !M.c[M.currentdirid][nodeId]) {
+            if (!M.c[M.currentdirid] || !M.c[M.currentdirid][nodeId] ||
+                (M.currentdirid.type === 'public-links' && (!M.su.EXP || !M.su.EXP[nodeId]))) {
                 self.remove_from_selection(nodeId);
             }
         });

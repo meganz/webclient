@@ -1106,7 +1106,7 @@ function init_page() {
             var link = $(this).attr('data-link');
 
             // Scroll to the element's parent (not the element itself because it's hidden by the header)
-            $('.contact-new-title.' + link).parent().get(0).scrollIntoView();
+            $('.contact-new-title.' + link).parent().get(0).scrollIntoView({behavior: "smooth"});
         });
     }
     else if (page.substr(0, 4) == 'help') {
@@ -1444,7 +1444,7 @@ function init_page() {
         $('.uwp-windows-scrollto-button').rebind('click', function() {
 
             // Scroll to the Windows Phone section
-            $('.uwp-windows-section').get(0).scrollIntoView();
+            $('.uwp-windows-section').get(0).scrollIntoView({behavior: "smooth"});
         });
     }
     else if (page === 'extensions') {
@@ -1882,6 +1882,7 @@ function topmenuUI() {
         $topHeader.find('.create-account-button').addClass('hidden');
         $topHeader.find('.membership-status-block').removeClass('hidden');
         $topHeader.find('.top-icon.notification').removeClass('hidden');
+        $topHeader.find('.left.individual').addClass('hidden');
 
         // Show the rocket icon if achievements are enabled
         mega.achievem.enabled()
@@ -1923,7 +1924,6 @@ function topmenuUI() {
 
         if (is_fm()) {
             $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
-            $topHeader.find('.left.individual').addClass('hidden');
         }
 
         // If the chat is disabled don't show the green status icon in the header
@@ -1939,7 +1939,6 @@ function topmenuUI() {
             $topHeader.find('.top-icon.achievements').addClass('hidden');
             $topMenu.find('.upgrade-your-account').addClass('hidden');
             $topMenu.find('.resellers').addClass('hidden');
-            $topHeader.find('.left.individual').addClass('hidden');
         }
 
         // Show PRO plan expired warning popup (if applicable)
@@ -1971,7 +1970,10 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').addClass('hidden');
         $topHeader.find('.top-icon.achievements').addClass('hidden');
         $topHeader.find('.create-account-button').removeClass('hidden');
-        $topHeader.find('.left.individual').addClass('hidden');
+
+        if (u_type === 0) {
+            $topHeader.find('.left.individual').addClass('hidden');
+        }
 
         $('.create-account-button').rebind('click', function () {
             if ($(this).hasClass('business-reg')) {

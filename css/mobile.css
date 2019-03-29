@@ -1,99 +1,5 @@
 @charset "UTF-8";
-@font-face {
-    font-family: 'source_sans_prolight';
-    src: url('../fonts/SourceSansPro-Light.eot');
-    src: url('../fonts/SourceSansPro-Light.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-Light.woff2') format('woff2'), url('../fonts/SourceSansPro-Light.woff') format('woff'), url('../fonts/SourceSansPro-Light.ttf') format('truetype'), url('../fonts/SourceSansPro-Light.svg#source_sans_prolight') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'source_sans_proregular';
-    src: url('../fonts/SourceSansPro-Regular.eot');
-    src: url('../fonts/SourceSansPro-Regular.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-Regular.woff2') format('woff2'), url('../fonts/SourceSansPro-Regular.woff') format('woff'), url('../fonts/SourceSansPro-Regular.ttf') format('truetype'), url('../fonts/SourceSansPro-Regular.svg#source_sans_proregular') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'source_sans_prosemibold';
-    src: url('../fonts/SourceSansPro-Semibold.eot');
-    src: url('../fonts/SourceSansPro-Semibold.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-Semibold.woff2') format('woff2'), url('../fonts/SourceSansPro-Semibold.woff') format('woff'), url('../fonts/SourceSansPro-Semibold.ttf') format('truetype'), url('../fonts/SourceSansPro-Semibold.svg#source_sans_prosemibold') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'source_sans_probold';
-    src: url('../fonts/SourceSansPro-Bold.eot');
-    src: url('../fonts/SourceSansPro-Bold.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-Bold.woff2') format('woff2'), url('../fonts/SourceSansPro-Bold.woff') format('woff'), url('../fonts/SourceSansPro-Bold.ttf') format('truetype'), url('../fonts/SourceSansPro-Bold.svg#source_sans_probold') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'LatoWeb';
-    src: url('../fonts/Lato-Regular.eot'); /* IE9 Compat Modes */
-    src: url('../fonts/Lato-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-         url('../fonts/Lato-Regular.woff2') format('woff2'), /* Modern Browsers */
-         url('../fonts/Lato-Regular.woff') format('woff'), /* Modern Browsers */
-         url('../fonts/Lato-Regular.ttf') format('truetype');
-    font-style: normal;
-    font-weight: normal;
-    text-rendering: optimizeLegibility;
-}
-@font-face {
-    font-family: 'LatoWebBlack';
-    src: url('../fonts/Lato-Black.eot'); /* IE9 Compat Modes */
-    src: url('../fonts/Lato-Black.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-         url('../fonts/Lato-Black.woff2') format('woff2'), /* Modern Browsers */
-         url('../fonts/Lato-Black.woff') format('woff'), /* Modern Browsers */
-         url('../fonts/Lato-Black.ttf') format('truetype');
-    font-style: normal;
-    font-weight: normal;
-    text-rendering: optimizeLegibility;
-}
-@font-face {
-    font-family: 'LatoWebBold';
-    src: url('../fonts/Lato-Bold.eot'); /* IE9 Compat Modes */
-    src: url('../fonts/Lato-Bold.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-         url('../fonts/Lato-Bold.woff2') format('woff2'), /* Modern Browsers */
-         url('../fonts/Lato-Bold.woff') format('woff'), /* Modern Browsers */
-         url('../fonts/Lato-Bold.ttf') format('truetype');
-    font-style: normal;
-    font-weight: normal;
-    text-rendering: optimizeLegibility;
-}
-@font-face {
-    font-family: 'LatoWebSemibold';
-    src: url('../fonts/Lato-Semibold.eot'); /* IE9 Compat Modes */
-    src: url('../fonts/Lato-Semibold.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-         url('../fonts/Lato-Semibold.woff2') format('woff2'), /* Modern Browsers */
-         url('../fonts/Lato-Semibold.woff') format('woff'), /* Modern Browsers */
-         url('../fonts/Lato-Semibold.ttf') format('truetype');
-    font-style: normal;
-    font-weight: normal;
-    text-rendering: optimizeLegibility;
-}
-@font-face {
-    font-family: 'montserrat';
-    src: url('../fonts/montserrat-light-webfont.eot');
-    src: url('../fonts/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/montserrat-light-webfont.woff2') format('woff2'), url('../fonts/montserrat-light-webfont.woff') format('woff'), url('../fonts/montserrat-light-webfont.ttf') format('truetype'), url('../fonts/montserrat-light-webfont.svg#montserratlight') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
 
-@font-face {
-    font-family: 'montserrat_semibold';
-    src: url('../fonts/montserrat-semibold-webfont.eot');
-    src: url('../fonts/montserrat-semibold-webfont.eot?#iefix') format('embedded-opentype'),  url('../fonts/montserrat-semibold-webfont.woff2') format('woff2'),  url('../fonts/montserrat-semibold-webfont.woff') format('woff'),  url('../fonts/montserrat-semibold-webfont.ttf') format('truetype'),  url('../fonts/montserrat-semibold-webfont.svg#montserratsemibold') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'montserrat_light';
-    src: url('../fonts/montserrat-light-webfont.eot');
-    src: url('../fonts/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),  url('../fonts/montserrat-light-webfont.woff2') format('woff2'),  url('../fonts/montserrat-light-webfont.woff') format('woff'),  url('../fonts/montserrat-light-webfont.ttf') format('truetype'),  url('../fonts/montserrat-light-webfont.svg#montserratsemibold') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
 html, body {
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
@@ -1934,11 +1840,9 @@ ul, li {
     margin: 24px 0px;
 }
 .verify-login-page .mobile.two-factor-seed-input {
-    padding: 0 16px 0 12px;
+    padding: 12px 16px 0 12px;
     height: 64px;
-    background-color: rgba(0,0,0,0);
-    border: 0px solid rgba(0,0,0,0);
-    margin: 0 auto 16px;
+    margin: 0 auto 24px;
 }
 .mobile.verify-number .verify-number-code {
     border-radius: 4px;
@@ -2030,7 +1934,37 @@ ul, li {
     color: #999;
     font-size: 14px;
 }
-.verify-login-page .mobile.signin-input input, .mobile.verify-number .vn-input-wrapper .verify-number-code input {
+.two-factor-qr-block .mobile.signin-input.two-factor-seed-input input::placeholder {
+    color: #bbb;
+    font-size: 24px;
+    letter-spacing: 0px;
+    line-height: 38px;
+}
+.two-factor-qr-block .mobile.signin-input.two-factor-seed-input input::-webkit-input-placeholder {
+    color: #bbb;
+    font-size: 24px;
+    letter-spacing: 0px;
+    line-height: 38px;
+}
+.two-factor-qr-block .mobile.signin-input.two-factor-seed-input input::-moz-input-placeholder {
+    color: #bbb;
+    font-size: 24px;
+    letter-spacing: 0px;
+    line-height: 38px;
+}
+.two-factor-qr-block .mobile.signin-input.two-factor-seed-input input:-moz-input-placeholder {
+    color: #bbb;
+    font-size: 24px;
+    letter-spacing: 0px;
+    line-height: 38px;
+}
+.two-factor-qr-block .mobile.signin-input.two-factor-seed-input input:-ms-input-placeholder {
+    color: #bbb;
+    font-size: 24px;
+    letter-spacing: 0px;
+    line-height: 38px;
+}
+.verify-login-page .mobile.signin-input input, .mobile.verify-number .vn-input-wrapper .verify-number-code input, .mobile.signin-input.two-factor-seed-input input {
     font-size: 36px;
     height: initial;
     line-height: 62px;
@@ -2043,31 +1977,31 @@ ul, li {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px
+    line-height: 64px;
 }
 .verify-login-page .mobile.signin-input input::-webkit-input-placeholder, .mobile.verify-number .vn-input-wrapper .verify-number-code input::-webkit-input-placeholder {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px
+    line-height: 64px;
 }
 .verify-login-page .mobile.signin-input input::-moz-placeholder, .mobile.verify-number .vn-input-wrapper .verify-number-code input::-moz-placeholder {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px
+    line-height: 64px;
 }
 .verify-login-page .mobile.signin-input input:-moz-placeholder, .mobile.verify-number .vn-input-wrapper .verify-number-code input:-moz-placeholder {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px
+    line-height: 64px;
 }
 .verify-login-page .mobile.signin-input input:-ms-input-placeholder, .mobile.verify-page .vn-input-wrapper .verify-number-code input:-ms-input-placeholder {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px
+    line-height: 64px;
 }
 body.es .mobile.verify-number .vn-input-wrapper .verify-number-code input::-webkit-input-placeholder,
 body.de .mobile.verify-number .vn-input-wrapper .verify-number-code input::-webkit-input-placeholder {
@@ -2100,8 +2034,9 @@ body.de .mobile.verify-number .vn-input-wrapper .verify-number-code input::place
 .mobile.signin-input.incorrect input:-ms-input-placeholder, .mobile.verify-page .vn-input-wrapper .verify-number-code.incorrect input:-ms-input-placeholder, .mobile.phone-number-input.incorrect input:-ms-input-placeholder {
     color: #FF5555;
 }
-.mobile.signin-input.two-factor-seed-input input {
+.two-factor-qr-block .mobile.signin-input.two-factor-seed-input input {
     text-align: center;
+    line-height: 38px;
 }
 .signin-register-block .custom-login-message-block {
     color: #495057;
@@ -3031,7 +2966,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-icon {
     width: 32px;
     height: 32px;
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -4701,7 +4636,7 @@ div.checkboxOn, div.checkboxOff {
     position: relative;
 }
 .mobile.icon {
-    background-image: url(../images/mega/startpage-sprite_v8.png);
+    background-image: url(../images/mega/startpage-sprite_v9.png);
     background-position: 0 -2109px;
     background-repeat: no-repeat;
     width: 20px;
@@ -5430,7 +5365,7 @@ div.checkboxOn, div.checkboxOff {
     background-position: -2px -1960px;
 }
 .mobile.icon.pro-mini.pro100 {
-    background-image: url(../images/mega/big-icons_v2.png);
+    background-image: url(../images/mega/big-icons_v3.png);
     background-repeat: no-repeat;
     background-position: -149px -415px;
     height: 22px;
@@ -9646,6 +9581,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     text-align: right;
 }
 .business-page .big-red-button.height-48 {
+    display: block;
     height: 48px;
     line-height: 47px;
     font-size: 18px;
@@ -11024,6 +10960,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         height: 54px;
         padding-top: 16px;
     }
+    .mobile.signin-input.two-factor-seed-input {
+        height: 64px;
+    }
     .mobile.signin-input span {
         top: 17px;
     }
@@ -11265,6 +11204,10 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .mobile .improved-recovery-steps .recover-image, .mobile .improved-recovery-steps .session-image-block, .mobile .improved-recovery-steps .recover-button.yes::after, .mobile .improved-recovery-steps .recover-button.no::after   {
     background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
     background-size: 344px auto;
+    }
+    .membership-question-mark span {
+        background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
+        background-size: 755px auto;
     }
 }
 

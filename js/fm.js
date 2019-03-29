@@ -561,14 +561,42 @@ function setContactLink() {
     });
 }
 
+/**Show Contact VS User difference dialog */
+function contactVsUserDialog() {
+    "use strict";
+    var $dialog = $('.add-reassign-dialog.user-management-dialog');
+
+    $dialog.find('.dif-dlg-contact-add-btn').rebind('click.dlg', function addContactClickHandler() {
+        closeDialog();
+        return contactAddDialog(null, true);
+    });
+
+    $dialog.find('.dif-dlg-close').rebind('click.dlg', function closeClickHandler() {
+        return closeDialog();
+    });
+
+    $dialog.find('.dif-dlg-user-add-btn').rebind('click.dlg', function addUserClickHandler() {
+        closeDialog();
+        if (!u_attr || !u_attr.b || !u_attr.b.m || u_attr.b.s === -1) {
+            return false;
+        }
+
+        window.triggerShowAddSubUserDialog = true;
+        M.openFolder('user-management', true);
+
+    });
+
+    M.safeShowDialog('contact-vs-user', $dialog);
+}
+
 /**
  * addContactUI
  *
  * Handle add contact dialog UI
- * @param {Boolean} dropdown dialog parameter. Shows dropdown instead dialog
- * @param {Boolean} close dialog parameter
+ * @param {Boolean} close               dialog parameter
+ * @param {Boolean} dontWarnBusiness    if true, then porceed to show the dialog
  */
-function contactAddDialog(close) {
+function contactAddDialog(close, dontWarnBusiness) {
     var $d = $('.add-user-popup');
 
     // not for ephemeral
@@ -580,6 +608,13 @@ function contactAddDialog(close) {
     if (close) {
         closeDialog();
         return true;
+    }
+
+    // Check if this is a business master, then Warn him about the difference between Contact and User
+    if (!dontWarnBusiness) {
+        if (u_attr && u_attr.b && u_attr.b.m && u_attr.b.s !== -1) {
+            return contactVsUserDialog();
+        }
     }
 
     // Init default states
@@ -636,7 +671,7 @@ function contactAddDialog(close) {
     });
 
     $('.add-user-popup .fm-dialog-close').rebind('click', function() {
-        contactAddDialog(1);
+        showWarningTokenInputLose().done(closeDialog);
     });
 }
 
@@ -2087,7 +2122,7 @@ function initShareDialog() {
 
     $('.fm-dialog-close, .dialog-cancel-button', $dialog).rebind('click', function() {
         $('.export-links-warning').addClass('hidden');
-        closeDialog();
+        showWarningTokenInputLose().done(closeDialog);
     });
 
     /*
@@ -2361,9 +2396,47 @@ function closeImportContactNotification(c) {
     $(c + ' input#token-input-').trigger("blur");
 }
 
-function closeDialog(ev) {
+/**
+ * Check the dialog has token input that is already filled up by user.
+ * Warn user closing dialog will lose all inserted input.
+ */
+
+function showWarningTokenInputLose() {
+
     "use strict";
 
+    var promise = new MegaPromise();
+
+    // If there is any tokenizer on the dialog and it is triggered by dom event.
+    var $tokenInput = $('.fm-dialog:visible li[class*="token-input-input"]');
+
+    // Make sure all input is tokenized.
+    $tokenInput.find('input').trigger('blur');
+
+    // If tokenizer is on the dialog, check it has input already. If it has, warn user.
+    var $tokenItems = $('li[class*="token-input-token"]');
+
+    if ($tokenItems.length) {
+        msgDialog('confirmation', '', l[20474], l[18229], function(e) {
+            if (e) {
+                $tokenItems.remove();
+                promise.resolve();
+            }
+            else {
+                promise.reject();
+            }
+        });
+    }
+    else {
+        promise.resolve();
+    }
+
+    return promise;
+}
+
+function closeDialog(ev) {
+    "use strict";
+    
     if (d) {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
     }

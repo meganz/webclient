@@ -3821,6 +3821,9 @@ li.token-input-token-invite .input-close {
     width: 640px;
     margin: -150px 0 0 -320px;
 }
+.add-user-popup.fm-dialog.arrange-to-back {
+    z-index: 900;
+}
 .add-user-popup.fm-dialog.private {
     margin: -185px 0 0 -320px;
 }
@@ -4030,7 +4033,7 @@ li.token-input-token-invite .input-close {
     margin:8px 172px;
 }
 
-.bus-welcome-dialog {
+.bus-welcome-dialog, .add-reassign-dialog {
     width: 612px;
     margin-left: -306px;
     margin-top: -270px;
@@ -4049,13 +4052,16 @@ li.token-input-token-invite .input-close {
     margin: auto;
     display: block;
 }
+.user-management-dialog .icon102 {
+    background-image: url(../images/mega/big-icons_v3.png);
+    background-size: 192px auto;
+}
 .user-management-dialog .bus-welcome-logo {
     background-position: -8px -1420px;
     width: 102px;
     height: 75px;
     display: block;
 }
-
 .bus-welcome-dialog .dialog-input-container {
     width: 100%;
     position: relative;
@@ -4346,3 +4352,50 @@ li.token-input-token-invite .input-close {
     font-family: 'LatoWebSemibold','source_sans_proregular', Arial;
 }
 /* end of Verify phone num */
+/*adding contact reassign dialog*/
+.add-reassign-dialog .icon102 {
+    margin:8px auto 20px;
+}
+.user-management-dialog .add-contact-logo {
+    background-position: -8px -1507px;
+    width: 102px;
+    height: 75px;
+    display: block;
+}
+.add-reassign-dialog tr {
+    vertical-align: top;
+}
+.dialog-block {
+    width: 240px;
+    margin: 0 32px 40px;
+    display: inline-block;
+    text-align: center;
+}
+.add-reassign-dialog .default-green-button {
+    display: inline-block;
+}
+.add-reassign-dialog .dialog-input-container th, .add-reassign-dialog .dialog-input-container td {
+    width: 312px;
+}
+.add-reassign-dialog .dialog-input-container tr:nth-child(3) td {
+    box-sizing: border-box;
+    padding: 8px 32px 32px 32px;
+}
+.add-reassign-dialog .dialog-input-container tr:last-child td {
+    text-align: center;
+    box-sizing: border-box;
+    padding-bottom: 40px;
+}
+.add-reassign-dialog .dialog-dark-bottom {
+    padding-left: 32px;
+}
+
+
+
+
+
+
+
+
+
+

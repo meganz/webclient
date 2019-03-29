@@ -1836,10 +1836,6 @@ ul, li {
     padding-right: 46px;
 }
 .mobile.two-factor-seed-input {
-    padding: 8px 16px 0 12px;
-    margin: 24px 0px;
-}
-.verify-login-page .mobile.two-factor-seed-input {
     padding: 12px 16px 0 12px;
     height: 64px;
     margin: 0 auto 24px;

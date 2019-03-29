@@ -549,7 +549,8 @@ var notify = {
     init: function() {},
     notifyFromActionPacket: function() {},
     countAndShowNewNotifications: function() {},
-    closePopup: function() {}
+    closePopup: function() {},
+    markAllNotificationsAsSeen: function() {}
 };
 
 var alarm = {

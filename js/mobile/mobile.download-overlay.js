@@ -449,6 +449,14 @@ mobile.downloadOverlay = {
         $fileSizeUnsupportedMessage.addClass('hidden');
         $body.removeClass('wrong-file');
 
+        // If UC Browser, show an error message, remove the tap/click handler and show as greyed out
+        if (is_uc_browser) {
+            $body.addClass('wrong-file');
+            $openInBrowserButton.off('tap').addClass('disabled');
+            $fileTypeUnsupportedMessage.removeClass('hidden');
+            return false;
+        }
+
         // Check if the download is supported
         dlmanager.getMaximumDownloadSize().done(function(maxFileSize) {
             dlmanager.getResumeInfo({id: node.h}, function(aResumeInfo) {

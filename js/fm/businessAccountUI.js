@@ -130,6 +130,11 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide head
         $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
         loadingDialog.phide();
+
+        if (window.triggerShowAddSubUserDialog) {
+            delete window.triggerShowAddSubUserDialog;
+            mySelf.showAddSubUserDialog();
+        }
     };
 
     // private function to fill HTML table for sub users

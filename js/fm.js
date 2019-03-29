@@ -561,14 +561,42 @@ function setContactLink() {
     });
 }
 
+/**Show Contact VS User difference dialog */
+function contactVsUserDialog() {
+    "use strict";
+    var $dialog = $('.add-reassign-dialog.user-management-dialog');
+
+    $dialog.find('.dif-dlg-contact-add-btn').rebind('click.dlg', function addContactClickHandler() {
+        closeDialog();
+        return contactAddDialog(null, true);
+    });
+
+    $dialog.find('.dif-dlg-close').rebind('click.dlg', function closeClickHandler() {
+        return closeDialog();
+    });
+
+    $dialog.find('.dif-dlg-user-add-btn').rebind('click.dlg', function addUserClickHandler() {
+        closeDialog();
+        if (!u_attr || !u_attr.b || !u_attr.b.m || u_attr.b.s === -1) {
+            return false;
+        }
+
+        window.triggerShowAddSubUserDialog = true;
+        M.openFolder('user-management', true);
+
+    });
+
+    M.safeShowDialog('contact-vs-user', $dialog);
+}
+
 /**
  * addContactUI
  *
  * Handle add contact dialog UI
- * @param {Boolean} dropdown dialog parameter. Shows dropdown instead dialog
- * @param {Boolean} close dialog parameter
+ * @param {Boolean} close               dialog parameter
+ * @param {Boolean} dontWarnBusiness    if true, then porceed to show the dialog
  */
-function contactAddDialog(close) {
+function contactAddDialog(close, dontWarnBusiness) {
     var $d = $('.add-user-popup');
 
     // not for ephemeral
@@ -580,6 +608,13 @@ function contactAddDialog(close) {
     if (close) {
         closeDialog();
         return true;
+    }
+
+    // Check if this is a business master, then Warn him about the difference between Contact and User
+    if (!dontWarnBusiness) {
+        if (u_attr && u_attr.b && u_attr.b.m && u_attr.b.s !== -1) {
+            return contactVsUserDialog();
+        }
     }
 
     // Init default states

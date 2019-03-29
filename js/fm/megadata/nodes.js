@@ -342,6 +342,7 @@ MegaData.prototype.injectNodes = function(nodes, target, callback) {
     return nodes.length;
 };
 
+// jshint maxdepth:10
 /**
  * @param {Array}       cn            Array of nodes that needs to be copied
  * @param {String}      t             Destination node handle
@@ -400,62 +401,40 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
                 var promise = new MegaPromise();
 
                 if (t === M.RubbishID) {
-                    var promises = [];
 
-                    // allow to revert nodes sent to the rubbish bin
-                    for (var i = cn.length; i--;) {
-                        var h = cn[i];
-                        var n = M.getNodeByHandle(h);
+                    return promise.resolve(null, cn);
+                }
+                else {
+                    // 2. check for conflicts
+                    fileconflict.check(cn, t, 'copy')
+                        .always(function(files) {
+                            var handles = [];
+                            var parentsToKeep = Object.create(null);
+                            var names = Object.create(null);
 
-                        if (M.getNodeRoot(h) !== M.RubbishID) {
-                            if (window.d) {
-                                console.debug('Adding rr attribute...', n.rr, n.p);
+                            for (var i = files.length; i--;) {
+                                var n = files[i];
+
+                                names[n.h] = n.name;
+                                handles.push(n.h);
+
+                                if (n._replaces) {
+                                    todel.push(n._replaces);
+                                }
+                                if (n.keepParent) {
+                                    parentsToKeep[n.h] = n.keepParent;
+                                    del = false;
+                                    // it's complicated. For now if merging involved we wont delete
+                                    // as move to/from inshare is excuted as copy + del
+                                    // ---> here i am stopping 'del'
+                                }
                             }
-                            if (!n.rr || n.rr !== n.p) {
-                                n.rr = n.p;
-                                promises.push(api_setattr(n, mRandomToken('rrc')));
-                            }
-                        }
-                    }
 
-                    MegaPromise.allDone(promises)
-                        .always(function() {
-                            promise.resolve(null, cn);
+                            // 3. in case of new names, provide them back to getCopyNodes
+                            promise.resolve(names, handles, parentsToKeep);
                         });
-
                     return promise;
                 }
-
-                // 2. check for conflicts
-                fileconflict.check(cn, t, 'copy')
-                    .always(function(files) {
-                        var handles = [];
-                        var parentsToKeep = Object.create(null);
-                        var names = Object.create(null);
-
-                        for (var i = files.length; i--;) {
-                            var n = files[i];
-
-                            names[n.h] = n.name;
-                            handles.push(n.h);
-
-                            if (n._replaces) {
-                                todel.push(n._replaces);
-                            }
-                            if (n.keepParent) {
-                                parentsToKeep[n.h] = n.keepParent;
-                                del = false;
-                                // it's complicated. For now if merging involved we wont delete
-                                // as move to/from inshare is excuted as copy + del
-                                // ---> here i am stopping 'del'
-                            }
-                        }
-
-                        // 3. in case of new names, provide them back to getCopyNodes
-                        promise.resolve(names, handles, parentsToKeep);
-                    });
-
-                return promise;
             })
                 .always(function _(tree) {
                     assert(tree, 'No tree provided...');
@@ -591,25 +570,66 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             objj.cr = crypto_makecr(opsArr[d], s, false);
         }
         objj.sm = 1;
+        if (d === M.RubbishID) {
+            // since we are copying to rubbish we don't have multiple "d" as duplications are allowed in Rubbish
+            // but below code is generic and will work regardless
+            for (var b = 0; b < cn.length; b++) {
+                var srcNode = M.getNodeByHandle(cn[b]);
+                if (!srcNode) {
+                    continue;
+                }
+                if (M.getNodeRoot(srcNode.h) === M.RubbishID) {
+                    continue;
+                }
+
+                for (var j = 0; j < opsArr[d].length; j++) {
+                    if (opsArr[d][j].h === srcNode.h) {
+
+                        if (window.d) {
+                            console.debug('Adding rr attribute handle,parent...', opsArr[d][j].h, srcNode.p);
+                        }
+                        var newNode = {};
+                        var originlNode = clone(M.d[opsArr[d][j].h]);
+
+                        if (!originlNode) {
+                            break;
+                        }
+                        if (!originlNode.t) {
+                            newNode.k = originlNode.k;
+                        }
+                        originlNode.rr = srcNode.p;
+
+                        newNode.a = ab_to_base64(crypto_makeattr(originlNode, newNode));
+
+                        // new node inherits handle, parent and type
+                        newNode.h = originlNode.h;
+                        newNode.t = originlNode.t;
+
+                        opsArr[d][j] = newNode;
+                        break;
+                    }
+                }
+
+            }
+
+        }
+
+        for (var q = 0; q < opsArr[d].length; q++) {
+            var c = (opsArr[d] || "").length === 11;
+            try {
+                opsArr[d][q].k = c
+                    ? base64urlencode(encryptto(opsArr[d], a32_to_str(opsArr[d][q].k)))
+                    : a32_to_base64(encrypt_key(u_k_aes, opsArr[d][q].k));
+            }
+            catch (ex) {
+                reportError(ex);
+                return promise;
+            }
+        }
+
         ops.push(objj);
     }
     promiseResolves = ops.length;
-
-    // encrypt nodekeys, either by RSA or by AES, depending on whether
-    // we're sending them to a contact's inbox or not
-    // FIXME: do this in a worker
-    var c = (t || "").length == 11;
-    for (var i = a.length; i--;) {
-        try {
-            a[i].k = c
-                ? base64urlencode(encryptto(t, a32_to_str(a[i].k)))
-                : a32_to_base64(encrypt_key(u_k_aes, a[i].k));
-        }
-        catch (ex) {
-            reportError(ex);
-            return promise;
-        }
-    }
 
     api_req(ops, {
         cn: cn,
@@ -635,11 +655,6 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             }
 
             nodesCount = importNodes - Object.keys(res).length;
-
-            // accelerate arrival of SC-conveyed new nodes by directly
-            // issuing a fetch
-            // (instead of waiting for waitxhr's connection to drop)
-            getsc(true);
         }
     });
 
@@ -780,6 +795,12 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                 if (!n.rr || n.rr !== p) {
                     n.rr = p;
                     api_setattr(n, mRandomToken('rrm'));
+                }
+            }
+            else {
+                if (n.rr) {
+                    delete n.rr;
+                    api_setattr(n, mRandomToken('rrm-d'));
                 }
             }
 
@@ -1233,6 +1254,10 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
             var n = M.getNodeByHandle(h);
             var t = n.rr;
 
+            if (n.p !== M.RubbishID) {
+                continue;
+            }
+
             if (!t || !M.d[t] || M.getNodeRoot(t) === M.RubbishID) {
                 if (d) {
                     console.warn('Reverting falling back to cloud root for %s.', h, t, n);
@@ -1544,13 +1569,7 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             n.tf = 0;
             n.tb = 0;
         }
-        if (n.rr && n.p !== M.RubbishID) {
-            if (d) {
-                console.debug('Removing rr attribute...', n.rr, n.p, n);
-            }
-            delete n.rr;
-            api_setattr(n, mRandomToken('rru'));
-        }
+        
         ufsc.addToDB(n);
 
         if (this.nn && n.name && !n.fv) {
@@ -2350,9 +2369,11 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
             nn.k = n.k;
         }
 
+        var cloned = false;
         // check if renaming should be done
         if (names && names[n.h]) {
             n = clone(n);
+            cloned = true;
             n.name = M.getSafeName(names[n.h]);
         }
 
@@ -2360,6 +2381,14 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
         if ($.clearCopyNodeAttr) {
             n.lbl = 0;
             n.fav = 0;
+        }
+
+        // regardless to where the copy is remove rr
+        if (n.rr) {
+            if (!cloned) {
+                n = clone(n);
+            }
+            delete n.rr;
         }
 
         // new node inherits all attributes

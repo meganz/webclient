@@ -207,6 +207,10 @@ mobile.account.history = {
             $sessionHistoryRow.find('.sh-item-ip').text(ipAddress);
             $sessionHistoryRow.find('.sh-item-icon img').attr('src', staticpath + 'images/flags/' + countryIcon);
 
+            if (ipAddress.indexOf(':') > 0) {
+                $sessionHistoryRow.addClass('ipv6');
+            }
+
             // Update the current output
             outputHtml += $sessionHistoryRow.prop('outerHTML');
         }

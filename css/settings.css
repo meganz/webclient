@@ -995,6 +995,8 @@
     color: #888;
     position: relative;
     text-align: left;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
 .fm-right-account-block .grid-table.megadrop td {
@@ -1002,13 +1004,24 @@
     cursor: pointer;
 }
 .fm-right-account-block .grid-table td.ip-addr {
-    max-width: 165px;
-    word-wrap: break-word;
+    max-width: 120px;
     vertical-align: top;
+}
+.fm-right-account-block .grid-table td.date-time {
+    white-space: nowrap;
 }
 .fm-right-account-block .grid-table tr th:first-child,
 .fm-right-account-block .grid-table tr td:first-child {
     padding-left: 12px;
+}
+.fm-right-account-block .grid-table tr:hover td.ip-addr {
+    word-wrap: break-word;
+}
+.fm-right-account-block .low-width .grid-table td.browser-os {
+    max-width: 150px;
+}
+.fm-right-account-block .low-width .grid-table tr:hover td.browser-os .fm-browsers-txt {
+    white-space: unset;
 }
 .fm-right-account-block .grid-table.megadrop tr th:first-child {
     line-height: 24px;
@@ -1120,6 +1133,9 @@
     height: 1px;
     background-color: rgba(0,0,0,0.1);
 }
+.fm-right-account-block .grid-table.megadrop {
+    overflow: auto;
+}
 .fm-right-account-block .grid-table.megadrop .icon {
     position: relative;
 }
@@ -1147,11 +1163,11 @@
     -webkit-transform: translateX(-50%); /* Safari */
     transform: translateX(-50%);
     bottom: -15px;
-    -webkit-transition: bottom 1s ease-in, top 1s ease-in, visibility 0.5s, opacity 1s ease-in;
-    -moz-transition: bottom 1s ease-in, top 1s ease-in, visibility 0.5s, opacity 1s ease-in;
-    -o-transition: bottom 1s ease-in, top 1s ease-in, visibility 0.5s, opacity 1s ease-in;
-    -ms-transition: bottom 1s ease-in, top 1s ease-in, visibility 0.5s, opacity 1s ease-in;
-    transition: bottom 1s ease-in, top 1s ease-in, visibility 0.5s, opacity 1s ease-in;
+    -webkit-transition: bottom 0.3s ease-in, top 0.3s ease-in, visibility 0.3s, opacity 0.3s ease-in;
+    -moz-transition: bottom 0.3s ease-in, top 0.3s ease-in, visibility 0.3s, opacity 0.3s ease-in;
+    -o-transition: bottom 0.3s ease-in, top 0.3s ease-in, visibility 0.3s, opacity 0.3s ease-in;
+    -ms-transition: bottom 0.3s ease-in, top 0.3s ease-in, visibility 0.3s, opacity 0.3s ease-in;
+    transition: bottom 0.3s ease-in, top 0.3s ease-in, visibility 0.3s, opacity 0.3s ease-infm-right-account-block;
     filter:progid:DXImageTransform.Microsoft.Alpha(opacity=1);
     -moz-opacity: 0;
     -khtml-opacity: 0;
@@ -1208,8 +1224,11 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-.fm-right-account-block .fm-breadcrumbs {
+.fm-right-account-block .fm-picker-breadcrumbs.link-row {
     margin: 8px 0;
+    white-space: normal;
+}
+.fm-right-account-block .fm-breadcrumbs {
     cursor: pointer;
 }
 .fm-right-account-block .megadrop-row .fm-breadcrumbs:hover > span {
@@ -1653,4 +1672,128 @@
     color: #eee;
     padding-top: 0;
     height: auto;
+}
+.fm-account-history hr, .fm-account-reseller hr, .fm-account-widget hr  {
+    height: 28px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    position: relative;
+}
+.fm-account-history-head, .fm-account-widget-head {
+    padding: 22px 36px 0 36px;
+    height: 64px;
+    position: relative;
+    background-color: #FAFAFA;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.account-history-dropdown {
+    margin: 20px 9px 0 0;
+    background-image: none;
+}
+.account.voucher-history .account-history-dropdown {
+    margin: 44px 9px 0 0;
+}
+.account-widget-dropdown {
+    margin: 2px 9px 0 0;
+    background-image: none;
+}
+.active-session-txt, .current-session-txt, .expired-session-txt, .settings-logout {
+    display: block;
+    float: left;
+    height: 18px;
+    background-color: #13E03C;
+    border: 1px solid transparent;
+    color: white;
+    font-size: 12px;
+    text-transform: uppercase;
+    line-height: 16px;
+    padding: 0 6px;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    margin: 3px 0 0 0;
+    -webkit-transition: background-color 200ms ease-in-out;
+    -moz-transition: background-color 200ms ease-in-out;
+    -o-transition: background-color 200ms ease-in-out;
+    -ms-transition: background-color 200ms ease-in-out;
+    transition: background-color 200ms;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+.active-session-txt, .current-session-txt, .expired-session-txt {
+    text-align: center;
+}
+.active-session-txt {
+    background-color: #2BA6DE;
+}
+.expired-session-txt {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    color: #bbb;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.fm-close-all-sessions {
+    cursor: pointer;
+    height: 32px;
+    margin: 0px;
+}
+.fm-close-all-sessions span {
+    background: rgba(255, 255, 255, 1) url(../images/mega/fm-main-sprite_v7.png) no-repeat scroll -18px -5468px;
+    padding-left: 20px;
+}
+.settings-logout {
+    background: #ccc url(../images/mega/fm-main-sprite_v7.png) no-repeat scroll 5px -8423px;
+    cursor: pointer;
+    float: right;
+    padding-left: 19px;
+}
+.settings-logout:hover {
+    background-color: #999999;
+}
+.grid-table.sessions th.no-border {
+    background: none;
+}
+.fm-account-history .grey-bar, .fm-account-widget .grey-bar {
+    background-color: white;
+    border: 0 none;
+    clear: both;
+    margin: 0;
+    min-height: 28px;
+    overflow: auto;
+    text-align: right;
+    position: relative;
+}
+.fm-account-security .personal-data-container .loading-image {
+    display: none;
+}
+.fm-account-security .personal-data-container .download-button.loading .loading-txt {
+    display: none;
+}
+.fm-account-security .personal-data-container .download-button.loading .loading-image {
+    display: inline-block;
+    font-size: 0;
+    height: 16px;
+    left: 50%;
+    line-height: 0;
+    margin-left: -8px;
+    margin-top: 6px;
+    position: absolute;
+    width: 16px;
+}
+.fm-account-security .personal-data-container .download-button .loading-image img {
+    width: 16px;
+    height: 16px;
+}
+.fm-account-security .personal-data-container .error-message {
+    color: #d90007;
+    margin-top: 10px;
+}
+.account-history-drop-items {
+    line-height: 30px;
 }

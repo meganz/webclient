@@ -3125,6 +3125,7 @@ var Term = Object.freeze({
     kAppTerminating: 7,     // < The application is terminating
     kCallerGone: 8,         // < The call initiator of an incoming call went offline
     kBusy: 9,               // < Peer is in another call
+    kStreamChange: 10,      // < Session was force closed by a client because it wants to change the media stream.
     kNormalHangupLast: 20,  // < Last enum specifying a normal call termination
     kErrorFirst: 21,        // < First enum specifying call termination due to error
     kErrApiTimeout: 22,     // < Mega API timed out on some request (usually for RSA keys)
@@ -3159,7 +3160,9 @@ function isTermError(code) {
 }
 
 function isTermRetriable(code) {
-    return isTermError(code) && (code !== Term.kErrPeerOffline) && (code !== Term.kCallerGone);
+    code &= ~Term.kPeer;
+    return (isTermError(code) && (code !== Term.kErrPeerOffline) && (code !== Term.kCallerGone)) ||
+        (code === Term.kStreamChange);
 }
 
 var CallRole = Object.freeze({

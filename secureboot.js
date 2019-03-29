@@ -2,7 +2,7 @@
 var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
 
 var m;
-var b_u = 0;
+var browserUpdate = 0;
 var apipath;
 var pageLoadTime;
 var maintenance = false;
@@ -15,6 +15,7 @@ var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
+var uv = window.navigator.appVersion.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
 var l, d = false;
 
@@ -39,8 +40,9 @@ var is_embed = location.pathname === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
 var is_iframed = is_embed || is_drop;
 var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
-var is_chrome_firefox = document.location.protocol === 'chrome:' &&
+var is_chrome_firefox = document.location.protocol === 'chrome:' &&       // Only true for Palemoon/Legacy FF extension
     document.location.host === 'mega' || document.location.protocol === 'mega:';
+var is_msie = ua.indexOf('msie') !== 1 || uv.appVersion.indexOf('trident') > -1;
 var location_sub = document.location.href.substr(0, 16);
 var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
 var is_firefox_web_ext = location_sub === 'moz-extension://';
@@ -193,7 +195,10 @@ if (is_chrome_firefox) {
 }
 
 var myURL = window.URL;
-b_u = b_u || !myURL || typeof DataView === 'undefined' || (window.chrome && !document.exitPointerLock);
+
+// Check whether we should redirect the user to the browser update.html page (triggered for IE10 and worse browsers)
+browserUpdate = browserUpdate || !myURL || typeof DataView === 'undefined' ||
+    (window.chrome && !document.exitPointerLock);
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -254,10 +259,10 @@ catch (ex) {
     console.error(ex);
     window.megaChatIsReady = false;
     window.megaChatIsDisabled = false;
-    b_u = true;
+    browserUpdate = true;
 }
 
-if (!b_u) try
+if (!browserUpdate) try
 {
     if (is_chrome_firefox)
     {
@@ -419,7 +424,7 @@ catch(e) {
             "\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
             + extraInfo
         );
-        b_u = 1;
+        browserUpdate = 1;
     }
 }
 
@@ -547,7 +552,19 @@ if (is_bot) {
     nocontentcheck = true;
 }
 
-if (!b_u && is_extension)
+tmp = getCleanSitePath(location.hash || undefined);
+if (tmp.substr(0, 12) === 'sitetransfer') {
+    try {
+        sessionStorage.sitet = tmp;
+        document.location = 'https://mega.nz/start';
+    }
+    catch (ex) {
+        console.warn(ex);
+    }
+    hashLogic = true; // temporarily prevent the history.* calls in case they are reached...
+}
+
+if (!browserUpdate && is_extension)
 {
     hashLogic = true;
     nocontentcheck=true;
@@ -565,7 +582,7 @@ if (!b_u && is_extension)
         try {
             loadSubScript(bootstaticpath + 'fileapi.js');
         } catch(e) {
-            b_u = 1;
+            browserUpdate = 1;
             Cu.reportError(e);
             alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
         }
@@ -635,8 +652,15 @@ else {
 	}
 }
 
+// If IE 11 detected (https://stackoverflow.com/a/21825207), set flag to redirect to update page
+if (!!window.MSInputMethodContext && !!document.documentMode && localStorage.getItem('continueToSite') === null) {
+    browserUpdate = true;
+}
 
-if (b_u && !is_mobile) {
+// If they need to update their browser, store the current page before going to the update page
+// ToDo: make this update.html page work on mobile web
+if (browserUpdate && !is_mobile) {
+    localStorage.prevPage = page;
     document.location = 'update.html';
 }
 
@@ -1500,7 +1524,7 @@ if (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' || pa
         }
     }
 }
-else if (!b_u) {
+else if (!browserUpdate) {
     d = window.d || 0;
     jj = window.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
@@ -1955,6 +1979,7 @@ else if (!b_u) {
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
     // Common desktop and mobile, bottom pages
+    jsl.push({f:'css/fonts.css', n: 'fonts_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3385,3 +3410,12 @@ function inherits(target, source) {
         enumerable: false
     });
 }
+
+mBroadcaster.once('startMega', function() {
+    var data = sessionStorage.sitet;
+
+    if (data) {
+        delete sessionStorage.sitet;
+        M.transferFromMegaCoNz(data);
+    }
+});

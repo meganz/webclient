@@ -2345,7 +2345,8 @@ accountUI.security = {
 
             // Generate row html
             var html = '<tr class="' + (currentSession ? "current" : sessionId) + '">'
-                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent.replace(/\s*megext/i, ''))
+                + '<td class="browser-os"><span class="fm-browsers-icon"><img title="'
+                + escapeHTML(userAgent.replace(/\s*megext/i, ''))
                 + '" src="' + staticpath + 'images/browser/' + browser.icon
                 + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
                 + '</span></td>'
@@ -2353,7 +2354,7 @@ accountUI.security = {
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/'
                 + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">'
                 + htmlentities(country.name) + '</span></td>'
-                + '<td>' + dateTime + '</td>'
+                + '<td class="date-time">' + dateTime + '</td>'
                 + '<td>' + status + '</td>';
 
             // If the session is active show logout button

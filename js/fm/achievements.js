@@ -520,7 +520,7 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
     var $dialog = $('.fm-dialog.invite-dialog');
 
     if (close) {
-        closeDialog();
+        showWarningTokenInputLose().done(closeDialog);
         return true;
     }
 

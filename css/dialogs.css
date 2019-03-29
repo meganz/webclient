@@ -3821,6 +3821,9 @@ li.token-input-token-invite .input-close {
     width: 640px;
     margin: -150px 0 0 -320px;
 }
+.add-user-popup.fm-dialog.arrange-to-back {
+    z-index: 900;
+}
 .add-user-popup.fm-dialog.private {
     margin: -185px 0 0 -320px;
 }

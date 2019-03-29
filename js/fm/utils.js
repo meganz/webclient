@@ -1037,10 +1037,15 @@ MegaUtils.prototype.findDupes = function() {
 /**
  * Handle a redirect from the mega.co.nz/#pro page to mega.nz/#pro page
  * and keep the user logged in at the same time
+ *
+ * @param {String} [data] optional data to decode
+ * @returns {Boolean}
  */
-MegaUtils.prototype.transferFromMegaCoNz = function() {
+MegaUtils.prototype.transferFromMegaCoNz = function(data) {
+    'use strict';
+
     // Get site transfer data from after the hash in the URL
-    var urlParts = /sitetransfer!(.*)/.exec(window.location);
+    var urlParts = /sitetransfer!(.*)/.exec(data || window.location);
 
     if (urlParts) {
 

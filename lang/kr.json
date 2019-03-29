@@ -1065,6 +1065,7 @@
     "7744": "\ud604\uc7ac \uc774\uba54\uc77c",
     "7745": "\uc0c8 \uc774\uba54\uc77c",
     "7747": "\uc800\uc7a5\uc744 \ub204\ub978 \ud6c4, \ubcc0\uacbd\uc744 \uc2b9\uc778\ud558\uae30 \uc704\ud574 \uc774\uba54\uc77c \uc218\uc2e0\ud568\uc5d0\uc11c \ub9c1\ud06c\ub97c \ud074\ub9ad\ud558\uc138\uc694.",
+    "7754": "\uacf5\uc720\ub41c \ud56d\ubaa9",
     "7869": "\uc774 \uc774\uba54\uc77c \uc8fc\uc18c\ub294 \uc774\ubbf8 \ub4f1\ub85d\ub418\uc5c8\uc2b5\ub2c8\ub2e4. \uc9c4\ud589\ud558\ub824\uba74 \ub2e4\ub978 \uc774\uba54\uc77c \uc8fc\uc18c\ub97c \uc120\ud0dd\ud558\uc138\uc694.",
     "7872": "[X]\uc5d0 \uc758\ud574 \ub2f9\uc2e0\uacfc \uacf5\uc720\ub41c \ud3f4\ub354\uc5d0 \uc811\uadfc\ud560 \uc218 \uc5c6\uac8c \ub429\ub2c8\ub2e4.",
     "7879": "[X]\uc5d0 \uc758\ud574 \uacf5\uc720\ub41c \ud3f4\ub354\uc5d0 \ub300\ud55c \uc811\uadfc\uc774 \uc81c\uac70\ub428",
@@ -3393,5 +3394,7 @@
     "20639": "Export folder links and decryption keys",
     "20640": "Export file & foler links and decryption keys",
     "20641": "Chat link unavailable",
-    "20642": "This chat link is no longer available"
+    "20642": "This chat link is no longer available",
+    "20645": "My outgoing shares",
+    "20646": "My public links"
 }

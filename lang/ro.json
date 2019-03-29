@@ -1065,6 +1065,7 @@
     "7744": "E-mail actual",
     "7745": "E-mail nou",
     "7747": "Ca urmare a acesteia, te rug\u0103m s\u0103 accesezi e-mailul \u0219i s\u0103 confirmi aceast\u0103 schimbare de e-mail.",
+    "7754": "Elemente partajate",
     "7869": "Aceast\u0103 adres\u0103 de e-mail a fost \u00eenregistrat\u0103 deja. Te rug\u0103m s\u0103 alegi o adres\u0103 de e-mail alternativ\u0103 pentru a continua.",
     "7872": "Accesul la orice folder partajat cu tine de c\u0103tre [X] va fi pierdut.",
     "7879": "Accesul la foldere partajat de [X] a fost eliminat.",
@@ -3393,5 +3394,7 @@
     "20639": "Export folder links and decryption keys",
     "20640": "Export file & foler links and decryption keys",
     "20641": "Chat link unavailable",
-    "20642": "This chat link is no longer available"
+    "20642": "This chat link is no longer available",
+    "20645": "My outgoing shares",
+    "20646": "My public links"
 }

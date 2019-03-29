@@ -1065,6 +1065,7 @@
     "7744": "\u76ee\u524d\u7684\u96fb\u5b50\u90f5\u4ef6\u5730\u5740",
     "7745": "\u65b0\u90f5\u4ef6",
     "7747": "\u6b64\u5f8c\uff0c\u8acb\u81f3\u60a8\u7684\u96fb\u5b50\u4fe1\u7bb1\u6536\u4ef6\u5323\u6536\u4fe1\uff0c\u4e26\u78ba\u8a8d\u6b64\u7b46\u96fb\u5b50\u90f5\u4ef6\u5730\u5740\u4e4b\u66f4\u52d5\u3002",
+    "7754": "\u5171\u4eab\u6a94\u6848",
     "7869": "\u6b64\u96fb\u5b50\u90f5\u4ef6\u5730\u5740\u5df2\u88ab\u4f7f\u7528\u8a3b\u518a\u3002\u8acb\u9078\u64c7\u5176\u4ed6\u96fb\u5b50\u90f5\u4ef6\u5730\u5740\u4ee5\u7e7c\u7e8c\u9032\u884c\u3002",
     "7872": "\u60a8\u5c07\u7121\u6cd5\u518d\u9032\u5165\u7531[X]\u958b\u8a2d\u4e26\u8207\u60a8\u5206\u4eab\u4e4b\u4efb\u4f55\u8cc7\u6599\u593e\u3002",
     "7879": "\u7531 [X] \u5206\u4eab\u53ef\u5b58\u53d6\u7684\u8cc7\u6599\u593e\u5df2\u79fb\u9664",
@@ -3393,5 +3394,7 @@
     "20639": "Export folder links and decryption keys",
     "20640": "Export file & foler links and decryption keys",
     "20641": "Chat link unavailable",
-    "20642": "This chat link is no longer available"
+    "20642": "This chat link is no longer available",
+    "20645": "My outgoing shares",
+    "20646": "My public links"
 }

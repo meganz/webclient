@@ -1065,6 +1065,7 @@
     "7744": "Email terkini",
     "7745": "Email baru",
     "7747": "Berikutnya, harap pergi ke inbox email anda dan konfirmasi perubahan email ini.",
+    "7754": "Item Berbagi",
     "7869": "Alamat email ini telah terdaftar. Harap pilih alternatif alamat email untuk melanjutkan.",
     "7872": "Akses ke seluruh folder yang dibagikan dengan anda oleh [X] akan hilang.",
     "7879": "Akses ke folder yang dibagikan oleh [X] telah dihapus.",
@@ -3393,5 +3394,7 @@
     "20639": "Export folder links and decryption keys",
     "20640": "Export file & foler links and decryption keys",
     "20641": "Chat link unavailable",
-    "20642": "This chat link is no longer available"
+    "20642": "This chat link is no longer available",
+    "20645": "My outgoing shares",
+    "20646": "My public links"
 }

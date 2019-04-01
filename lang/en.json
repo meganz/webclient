@@ -3383,5 +3383,7 @@
     "20628": "Business users",
     "20629": "Contacts are people you add to your contacts list to be able to interact with (Chat, Call, Share).",
     "20630": "Business users are people who are part of your Business account. Business users will be added automatically to all other users in your Business contact lists.",
-    "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your MEGA data. [A]Learn More[\/A]."
+    "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your MEGA data. [A]Learn More[\/A].",
+    "20647": "Please confirm your email and join the chat.",
+    "20648": "This is the last step before entering a fully encrypted chat system with voice and video calls, group messaging and file sharing integration with the MEGA Cloud Drive."
 }

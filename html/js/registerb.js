@@ -199,7 +199,21 @@ BusinessRegister.prototype.initPage = function () {
     // event handler for clicking on terms anchor
     $pageContainer.find('.bus-reg-agreement.mega-terms .bus-reg-txt span').off('click')
         .on('click', function termsClickHandler() {
-            bottomPageDialog(false, 'terms', false, true);
+            if (!is_mobile) {
+                bottomPageDialog(false, 'terms', false, true);
+            }
+            else {
+                var wentOut = false;
+                if (window.open) {
+                    var cutPlace = location.href.indexOf('/registerb');
+                    var myHost = location.href.substr(0, cutPlace);
+                    myHost += '/terms';
+                    wentOut = window.open(myHost, 'MEGA LIMITED TERMS OF SERVICE');
+                }
+                if (!wentOut) {
+                    loadSubPage('terms');
+                }
+            }
             return false;
         });
 

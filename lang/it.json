@@ -3384,6 +3384,9 @@
     "20629": "I contatti sono le persone che aggiungi alla tua lista dei contatti per poterci interagire (chat, chiamate, condivisioni).",
     "20630": "Gli utenti Business sono le persone che fanno parte del tuo account Business. Gli utenti Business verranno aggiunti automaticamente a tutti gli altri utenti nella tua lista dei contatti Business.",
     "20633": "Prima di effettuare il logout, per favore testa la tua password qui sotto per assicurarti di ricordarla. Se hai perso la tua password, effettuando il logout perderai l'accesso a tutti i tuoi dati archiviati su MEGA. [A]Scopri di pi\u00f9[\/A].",
+    "20634": "Target folder is deleted",
     "20647": "Please confirm your email and join the chat.",
-    "20648": "This is the last step before entering a fully encrypted chat system with voice and video calls, group messaging and file sharing integration with the MEGA Cloud Drive."
+    "20648": "This is the last step before entering a fully encrypted chat system with voice and video calls, group messaging and file sharing integration with the MEGA Cloud Drive.",
+    "20650": "This month payment [S]has failed[\/S], please resolve payment issue [A]here[\/A] ASAP to avoid any suspension on your business account",
+    "20651": "Your account may be [S]suspended[\/S] soon, please contact your business administrator to resolve the issue"
 }

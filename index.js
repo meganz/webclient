@@ -1358,7 +1358,7 @@ function init_page() {
 
         // Show message that the copyright takedown should be submitted in a desktop browser
         parsepage(pages['mobile']);
-        mobile.messageOverlay.show(l[621], l[19628], function() {
+        mobile.messageOverlay.show(l[621], l[19628]).always(function() {
 
             // On clicking OK in the dialog, go to the file manager if logged in, or start page if not
             loadSubPage(u_type === 3 ? 'fm' : 'start');

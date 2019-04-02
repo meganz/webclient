@@ -2841,6 +2841,14 @@ div.checkboxOn, div.checkboxOff {
     -webkit-border-radius: inherit;
     border-radius: inherit;
 }
+.mobile.payment-address-dialog .white-container-box::before {
+    content: none;
+}
+.mobile.remember-billing-info-wrapper {
+    overflow: hidden;
+    padding-left: 18px;
+    margin: 24px 0;
+}
 .payment-options .pro-gray-block, .payment-options .third-section {
     position: relative;
 }

@@ -1172,6 +1172,8 @@ var addressDialog = {
      */
     init: function (plan, userInfo, businessRegisterPage) {
         "use strict";
+        var self = this;
+
         if (plan) {
             this.businessPlan = plan;
             this.userInfo = userInfo;
@@ -1182,12 +1184,25 @@ var addressDialog = {
             delete this.userInfo;
             delete this.businessRegPage;
         }
-        this.showDialog();
-        this.initStateDropDown();
-        this.initCountryDropDown();
-        this.initCountryDropdownChangeHandler();
-        this.initBuyNowButton();
-        this.initCloseButton();
+
+        loadingDialog.show();
+        mega.attr.get(u_attr.u, 'billinginfo', false, true)
+        .always(function(billingInfo) {
+            var selectedCountry = (billingInfo && billingInfo.hasOwnProperty('country')) ? billingInfo.country
+                : u_attr.country ? u_attr.country : u_attr.ipcc || false;
+            
+            var selectedState = ((selectedCountry === 'US' || selectedCountry === 'CA')
+                && billingInfo && billingInfo.hasOwnProperty('state')) ? billingInfo.state : false;
+            self.showDialog();
+            self.prefillInfo(billingInfo);
+            self.initStateDropDown(selectedState);
+            self.initCountryDropDown(selectedCountry);
+            loadingDialog.hide();
+            self.initCountryDropdownChangeHandler();
+            self.initBuyNowButton();
+            self.initCloseButton();
+            self.initRememberDetailsCheckbox();
+        });
     },
 
     /**
@@ -1208,8 +1223,6 @@ var addressDialog = {
         var monthsWording;
 
         this.$dialog.find('.plan-icon .reg-st3-membership-icon').removeClass('hidden');
-        this.$dialog.find('input.first-name').val('');
-        this.$dialog.find('input.last-name').val('');
 
         // in case we are coming from normal users sign ups (PRO)
         if (!this.businessPlan || !this.userInfo) {
@@ -1234,8 +1247,6 @@ var addressDialog = {
             numOfMonths = this.businessPlan.m;
 
             this.$dialog.find('.plan-icon .reg-st3-membership-icon').addClass('hidden');
-            this.$dialog.find('input.first-name').val(this.userInfo.fname);
-            this.$dialog.find('input.last-name').val(this.userInfo.lname);
             // auto renew is mandatory in business
             this.$dialog.find('.payment-buy-now').text(l[6172]);
         }
@@ -1257,16 +1268,23 @@ var addressDialog = {
     /**
      * Creates a list of state names with the ISO 3166-1-alpha-2 code as the option value
      */
-    initStateDropDown: function() {
+    initStateDropDown: function(preselected) {
 
         var stateOptions = '';
         var $statesSelect = this.$dialog.find('.states');
+
+        // Remove all states (leave the first option because its actually placeholder).
+        $statesSelect.children(':not(:first-child)').remove();
 
         // Build options
         $.each(M.getStates(), function(isoCode, stateName) {
 
             // Create the option and set the ISO code and state name
             var $stateOption = $('<option>').val(isoCode).text(stateName);
+
+            if (preselected && isoCode === preselected) {
+                $stateOption.attr('selected', true);
+            }
 
             // Append the HTML to the list of options
             stateOptions += $stateOption.prop('outerHTML');
@@ -1283,21 +1301,34 @@ var addressDialog = {
                 collision: "flip"  // default is ""
             }
         });
+
+        $statesSelect.selectmenu('refresh');
+
+        if (preselected) {
+            $statesSelect.selectmenu('enable');
+        }
     },
 
     /**
      * Creates a list of country names with the ISO 3166-1-alpha-2 code as the option value
      */
-    initCountryDropDown: function() {
+    initCountryDropDown: function(preselected) {
 
         var countryOptions = '';
         var $countriesSelect = this.$dialog.find('.countries');
+
+        // Remove all countries (leave the first option because its actually placeholder).
+        $countriesSelect.children(':not(:first-child)').remove();
 
         // Build options
         $.each(M.getCountries(), function(isoCode, countryName) {
 
             // Create the option and set the ISO code and country name
             var $countryOption = $('<option>').val(isoCode).text(countryName);
+
+            if (preselected && isoCode === preselected) {
+                $countryOption.attr('selected', true);
+            }
 
             // Append the HTML to the list of options
             countryOptions += $countryOption.prop('outerHTML');
@@ -1314,6 +1345,9 @@ var addressDialog = {
                 collision: "flip"  // default is ""
             }
         });
+
+        $countriesSelect.selectmenu('refresh');
+        $countriesSelect.selectmenu('enable');
     },
 
     /**
@@ -1408,6 +1442,68 @@ var addressDialog = {
             addressDialog.validateAndPay();
         });
     },
+
+    /**
+     * Attempt to prefill the info based on the user_attr information.
+     */
+    prefillInfo: function(billingInfo) {
+        'use strict';
+        var $firstName = this.$dialog.find('input.first-name');
+        if (billingInfo && billingInfo.hasOwnProperty('firstname')) {
+            $firstName.val(billingInfo.firstname);
+        } else if (this.businessPlan && this.userInfo && this.userInfo.hasOwnProperty("fname")) {
+            $firstName.val(this.userInfo.fname);
+        } else if (u_attr && u_attr.hasOwnProperty('firstname')) {
+            $firstName.val(u_attr.firstname);
+        } else {
+            $firstName.val('');
+        }
+
+        var $lastName = this.$dialog.find('input.last-name');
+        if (billingInfo && billingInfo.hasOwnProperty('lastname')) {
+            $lastName.val(billingInfo.lastname);
+        } else if (this.businessPlan && this.userInfo && this.userInfo.hasOwnProperty("lname")) {
+            $lastName.val(this.userInfo.lname);
+        } else if (u_attr && u_attr.hasOwnProperty('lastname')) {
+            $lastName.val(u_attr.lastname);
+        } else {
+            $lastName.val('');
+        }
+
+        if (billingInfo) {
+            if (billingInfo.hasOwnProperty('address1')) {
+                this.$dialog.find(".address1").val(billingInfo.address1);
+            }
+
+            if (billingInfo.hasOwnProperty('address2')) {
+                this.$dialog.find(".address2").val(billingInfo.address2);
+            }
+
+            if (billingInfo.hasOwnProperty('city')) {
+                this.$dialog.find(".city").val(billingInfo.city);
+            }
+
+            if (billingInfo.hasOwnProperty('postcode')) {
+                this.$dialog.find(".postcode").val(billingInfo.postcode);
+            }
+        }
+    },
+
+    initRememberDetailsCheckbox: function() {
+        'use strict';
+        var self = this;
+        this.$rememberDetailsCheckbox = $(".remember-billing-info-wrapper").find(".checkbox");
+        $(".remember-billing-info, .radio-txt", this.$dialog).rebind('click.commonevent', function() {
+            if (self.$rememberDetailsCheckbox.hasClass('checkboxOn')) {
+                self.$rememberDetailsCheckbox.addClass('checkboxOff').removeClass('checkboxOn');
+            }
+            else {
+                self.$rememberDetailsCheckbox.addClass('checkboxOn').removeClass('checkboxOff');
+            }
+            return false;
+        });
+    },
+
 
     /**
      * Initialise the X (close) button in the top right corner of the dialog
@@ -1510,6 +1606,27 @@ var addressDialog = {
             $errorMessage.removeClass('hidden');
             return false;
         }
+
+        // If remember billing address, save as user attribute for future usage.
+        if (this.$rememberDetailsCheckbox.hasClass("checkboxOn")) {
+            var saveAttribute = function(name, value) {
+                if (value) {
+                    mega.attr.setArrayAttribute('billinginfo', name, value, false, true);
+                }
+            };
+            saveAttribute('firstname', fieldValues['first-name']);
+            saveAttribute('lastname', fieldValues['last-name']);
+            saveAttribute('address1', fieldValues['address1']);
+            saveAttribute('address2', fieldValues['address2']);
+            saveAttribute('postcode', fieldValues['postcode']);
+            saveAttribute('city', fieldValues['city']);
+            saveAttribute('country', country);
+            saveAttribute('state', state);
+        } else {
+            // Forget Attribute.
+            mega.attr.remove('billinginfo', false, true);
+        }
+
 
         // Send to the API
         this.proceedToPay(fieldValues, state, country);

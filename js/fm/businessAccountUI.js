@@ -1542,11 +1542,8 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
         if (u_attr.b.m) {
             msg = l[20650].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
                 .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+            $('.fm-notification-block.grace-business').safeHTML(msg).show();
         }
-        else {
-            msg = l[20651].replace('[S]', '<span>').replace('[/S]', '</span>');
-        }
-        $('.fm-notification-block.grace-business').text(msg).show();
     }
 };
 

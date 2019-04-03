@@ -2506,13 +2506,13 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
 
             if (!uNameTrimed.length) {
                 $uName.parent().addClass('error');
-                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
+                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1098]);
 
                 return;
             }
             if (!uLastNameTrimed) {
                 $uLastName.parent().addClass('error');
-                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
+                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1098]);
 
                 return;
             }

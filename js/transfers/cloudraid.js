@@ -204,6 +204,10 @@
         if (!cloudRaidSettings || cloudRaidSettings.baseURLs !== baseURLs) {
             cloudRaidSettings = aDownload.cloudRaidSettings = Object.create(null);
             cloudRaidSettings.baseURLs = baseURLs;
+            cloudRaidSettings.onFails = 0;
+            cloudRaidSettings.timeouts = 0;
+            cloudRaidSettings.toomanyfails = 0;
+            cloudRaidSettings.startglitches = 0;
         }
         this.cloudRaidSettings = cloudRaidSettings;
 
@@ -244,10 +248,11 @@
 
             xhr.onloadend = function(ev) {
 
-                if (this.response && this.response.byteLength === this.expectedBytes) {
+                if (this.outputByteCount === this.expectedBytes) {
                     resolve(ev);
                 }
                 else {
+                    this.response = false;
                     reject(ev);
                 }
 
@@ -326,6 +331,8 @@
         var xhr = ev.target;
         var status = xhr.readyState > 1 && xhr.status;
 
+        this.cloudRaidSettings.onFails += 1;
+
         this.part[failedPartNum].failCount++;
         this.lastFailureTime = Date.now();
 
@@ -349,12 +356,15 @@
                     sumFails > 2 ? 'too many fails' : 'network error', ev);
             }
             this.status = status | 0;
+            this.cloudRaidSettings.toomanyfails += 1;
+            this.response = false;
             return this.dispatchLoadEnd();
         }
 
         var partStartPos = this.wholeFileDatalinePos / (this.RAIDPARTS - 1);
 
         if (this.initialChannelMode < 0) {
+            this.cloudRaidSettings.startglitches += 1;
             // we haven't decided which channel to skip yet.  Eg. on the first 5 connects, this one reports
             // back first with connection refused. in this case, try again but on a bit of a delay.
             // Probably this one will turn out to be the slowest, and be cancelled anyway.
@@ -579,10 +589,6 @@
             var fp;
             var tocombine = [];
             var combinesize = 1 << 20;
-            var partpos = -1;
-            var part1len = 0;
-            var part0len = 0;
-            var totalsize = 0;
 
             for (i = this.RAIDPARTS; i--;) {
                 fp = this.part[i].filePieces;
@@ -593,30 +599,14 @@
                 else {
                     combinesize = Math.min(combinesize, fp[0].buffer.byteLength - fp[0].used);
 
-                    if (partpos === -1) {
-                        partpos = fp[0].partpos + fp[0].used;
-                    }
-                    else if (partpos !== fp[0].partpos + fp[0].used) {
-                        if (d) {
-                            this.logger.error('ERROR: partpos mismatch %s %s', partpos, (fp[0].partpos + fp[0].used));
-                        }
-                        return; // should never happen
-                    }
-
-                    if (i > 0) {
-                        totalsize += fp[0].buffer.byteLength - fp[0].used;
-                    }
-                    if (i === 0) {
-                        part0len = fp[0].buffer.byteLength - fp[0].used;
-                    }
-                    if (i === 1) {
-                        part1len = fp[0].buffer.byteLength - fp[0].used;
+                    if ((fp[0].partpos + fp[0].used)*5 != this.wholeFileDatalinePos) {
+                        this.logger.error('ERROR: partpos dataline mismatch %s %s %s', (fp[0].partpos + fp[0].used), this.wholeFileDatalinePos, partNum);
                     }
                 }
             }
 
-            var eof = totalsize === this.fileEndReadPos - partpos * 5 && part1len === part0len;
             var fulllinesize = roundDownToMultiple(combinesize, this.RAIDSECTOR);
+            var lastline = this.wholeFileDatalinePos >= roundDownToMultiple(this.fileEndReadPos, this.RAIDLINE);
 
             if (fulllinesize > 0) {
 
@@ -624,10 +614,16 @@
                     tocombine.push(this.part[i].filePieces[0]);
                 }
 
-                this.combineSectors(partpos, fulllinesize, tocombine, 0);
+                this.combineSectors(this.wholeFileDatalinePos/5, fulllinesize, tocombine, 0);
                 this.discardUsedParts(fulllinesize);
+                continue;
             }
-            else if (combinesize > 0 || eof && part0len > 0) {
+            else if (combinesize > 0 || lastline) {
+
+                var part1len = 0;
+                var part0len = 0;
+                var totalsize = 0;
+
                 for (i = 0; i < this.RAIDPARTS; ++i) {
                     var loaded = 0;
                     var b = new ArrayBuffer(this.RAIDSECTOR);
@@ -641,58 +637,47 @@
                         loaded += toload;
                     }
 
-                    if (combinesize > 0 && !(eof && part0len > 0) && loaded < this.RAIDSECTOR) {
-                        this.checkReadParts();
-                        return;
+                    if (i > 0) {
+                        totalsize += loaded;
+                    }
+                    if (i === 0) {
+                        part0len = loaded;
+                    }
+                    if (i === 1) {
+                        part1len = loaded;
                     }
 
                     tocombine.push({
                         'used': 0,
-                        'partpos': partpos,
+                        'partpos': this.wholeFileDatalinePos/5,
                         'skipped': !fp.length ? false : fp[0].skipped,
                         'buffer': new Uint8Array(b, 0, this.RAIDSECTOR)
                     });
                 }
 
-                this.combineSectors(
-                    partpos, this.RAIDSECTOR, tocombine,
-                    (eof && part0len > 0) ? this.RAIDSECTOR * 5 - totalsize : 0
-                );
-                this.discardUsedParts(this.RAIDSECTOR);
+                if (part1len === part0len && (totalsize === this.RAIDLINE || totalsize === this.fileEndReadPos - this.wholeFileDatalinePos)) {
+                    this.combineSectors(
+                        this.wholeFileDatalinePos/5, this.RAIDSECTOR, tocombine,
+                        (totalsize === this.RAIDLINE) ? 0 : this.RAIDLINE - totalsize
+                    );
+                    this.discardUsedParts(this.RAIDSECTOR);
+                    continue;
+                }
             }
-            else {
-                this.checkReadParts();
-                return;
-            }
+            break;
         }
+        this.checkReadParts();
     };
 
     CloudRaidRequest.prototype.checkReadParts = function() {
         var i;
         var part;
-        var partpos = -1;
         var torequest = [];
-
-        for (i = this.RAIDPARTS; i--;) {
-            var fp = this.part[i].filePieces;
-
-            if (fp.length) {
-                if (partpos === -1) {
-                    partpos = fp[0].partpos + fp[0].used;
-                }
-                else if (partpos !== fp[0].partpos + fp[0].used) {
-                    if (d) {
-                        this.logger.error(' --- ERROR: partpos mismatch %s %s', partpos, (fp[0].partpos + fp[0].used));
-                    }
-                    return; // should never happen
-                }
-            }
-        }
 
         for (i = this.RAIDPARTS; i--;) {
             part = this.part[i];
 
-            if (part.reader && !part.reading && !part.done && (part.pos < partpos + 81920)) {
+            if (part.reader && !part.reading && !part.done && (part.pos < this.wholeFileDatalinePos/5 + 81920)) {
                 torequest.push(part);
             }
         }
@@ -917,6 +902,7 @@
                 this.logger.debug("Part %s exiting...", partNum);
             }
             else if (part.timedout) {
+                this.cloudRaidSettings.timeouts += 1;
                 // switch to the currently idle channel instead, and pick up from there.
                 if (d) {
                     this.logger.warn("Timeout on part %s", partNum);

@@ -787,7 +787,16 @@ var dlmanager = {
         if (eekey) {
             if (dl && Array.isArray(dl.url)) {
                 // Decryption error from native CloudRAID download
-                eventlog(99720, JSON.stringify([1, dl && dl.id]));
+
+                var str = "";
+                if (dl.cloudRaidSettings) {
+                    str += "f:" + dl.cloudRaidSettings.onFails;
+                    str += " t:" + dl.cloudRaidSettings.timeouts;
+                    str += " sg:" + dl.cloudRaidSettings.startglitches;
+                    str += " tmf:" + dl.cloudRaidSettings.toomanyfails;
+                }
+
+                eventlog(99720, JSON.stringify([2, dl && dl.id, str]));
             }
             else if (String(dl && dl.url).length > 256) {
                 // Decryption error from proxied CloudRAID download

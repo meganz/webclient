@@ -3384,6 +3384,9 @@
     "20629": "\u806f\u7d61\u4eba\u662f\u7531\u60a8\u65b0\u589e\u5230\u806f\u7d61\u4eba\u5217\u8868\u4e2d\uff0c\u4ee5\u4fbf\u80fd\u5920\u8207\u4e4b\u806f\u7d61\u7684\u4f7f\u7528\u8005\uff08\u5305\u62ec\u4f7f\u7528\u804a\u5929\u3001\u901a\u8a71\u3001\u5171\u4eab\u8cc7\u6599\u7b49\u529f\u80fd\uff09\u3002",
     "20630": "\u4f01\u696d\u4f7f\u7528\u8005\u662f\u60a8\u7684\u4f01\u696d\u5e33\u6236\u7684\u4e00\u90e8\u5206\u3002\u4f01\u696d\u4f7f\u7528\u8005\u5c07\u81ea\u52d5\u65b0\u589e\u81f3\u60a8\u7684\u4f01\u696d\u806f\u7d61\u4eba\u5217\u8868\u7684\u6240\u6709\u5176\u4ed6\u4f7f\u7528\u8005\u4e2d\u3002",
     "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your MEGA data. [A]Learn More[\/A].",
+    "20634": "Target folder is deleted",
     "20647": "Please confirm your email and join the chat.",
-    "20648": "This is the last step before entering a fully encrypted chat system with voice and video calls, group messaging and file sharing integration with the MEGA Cloud Drive."
+    "20648": "This is the last step before entering a fully encrypted chat system with voice and video calls, group messaging and file sharing integration with the MEGA Cloud Drive.",
+    "20650": "This month payment [S]has failed[\/S], please resolve payment issue [A]here[\/A] ASAP to avoid any suspension on your business account",
+    "20651": "Your account may be [S]suspended[\/S] soon, please contact your business administrator to resolve the issue"
 }

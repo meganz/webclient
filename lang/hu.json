@@ -3384,6 +3384,9 @@
     "20629": "A Kapcsolatokat az\u00e9rt adja a kapcsolatoklist\u00e1hoz, hogy \u00e9rtekezhessen vel\u00fck (Cseveg\u00e9s, H\u00edv\u00e1s, Megoszt\u00e1s)",
     "20630": "Az \u00dczleti felhaszn\u00e1l\u00f3k az \u00dczleti fi\u00f3kj\u00e1nak tagjai. \u0150k automatikusan beker\u00fclnek az \u00dczleti kapcsolatai list\u00e1j\u00e1nak t\u00f6bbi felhaszn\u00e1l\u00f3ja k\u00f6z\u00e9.",
     "20633": "Kijelentkez\u00e9s el\u0151tt al\u00e1bb ellen\u0151rizze, helyesen eml\u00e9kszik-e a jelszav\u00e1ra. Ha ugyanis nem, a kil\u00e9p\u00e9st k\u00f6vet\u0151en elveszti a MEGA-s adataihoz val\u00f3 hozz\u00e1f\u00e9r\u00e9st. [A]Tudjon meg t\u00f6bbet[\/A].",
-    "20647": "Please confirm your email and join the chat.",
-    "20648": "This is the last step before entering a fully encrypted chat system with voice and video calls, group messaging and file sharing integration with the MEGA Cloud Drive."
+    "20634": "Target folder is deleted",
+    "20647": "Hiteles\u00edtse email c\u00edm\u00e9t a besz\u00e9lget\u00e9shez val\u00f3 csatlakoz\u00e1shoz.",
+    "20648": "Ez a v\u00e9gs\u0151 l\u00e9p\u00e9s, miel\u0151tt r\u00e9szese lehet egy teljesk\u00f6r\u0171en titkos\u00edtott \u00fczen\u0151rendszernek, hang- \u00e9s vide\u00f3h\u00edv\u00e1sokkal, csoport\u00fczen\u0151vel \u00e9s be\u00e9p\u00edtett f\u00e1jlmegoszt\u00e1ssal a MEGA Felh\u0151 T\u00e1rhellyel.",
+    "20650": "This month payment [S]has failed[\/S], please resolve payment issue [A]here[\/A] ASAP to avoid any suspension on your business account",
+    "20651": "Your account may be [S]suspended[\/S] soon, please contact your business administrator to resolve the issue"
 }

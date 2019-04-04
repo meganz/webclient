@@ -445,7 +445,7 @@
             }
         }
         else if (String(id).length === 11) {
-            if (M.u[id]) {
+            if (M.u[id] && id !== u_handle) {
                 fetchshares = !M.c[id];
             }
             else {

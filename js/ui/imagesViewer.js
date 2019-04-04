@@ -1170,11 +1170,13 @@ var slideshowid;
         $imgBlock.find('video').addClass('hidden');
         $imgBlock.find('.img-wrap').removeClass('hidden');
         $imgBlock.find('#pdfpreviewdiv1').addClass('hidden');
+        $overlay.find('.viewer-bottom-bl').removeClass('hidden');
 
         if (previews[id].type === 'application/pdf') {
             $overlay.addClass('pdf');
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
+            $overlay.find('.viewer-bottom-bl').addClass('hidden');
             $imgBlock.find('.img-wrap').addClass('hidden');
             // preview pdfs using pdfjs for all browsers #8036
             // to fix pdf compatibility - Bug #7796

@@ -772,7 +772,7 @@ var dlmanager = {
         }
 
         var eekey = code === EKEY;
-        if (eekey || code === EACCESS) {
+        if (eekey || code === EACCESS || code === ETOOMANY) {
             // TODO: Check if other codes should raise abort()
             later(function() {
                 dlmanager.abort(dl, eekey);

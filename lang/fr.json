@@ -3395,5 +3395,7 @@
     "20647": "Veuillez confirmez votre adresse courriel et joignez-vous \u00e0 la conversation.",
     "20648": "Cette \u00e9tape est la derni\u00e8re avant d'entrer dans un syst\u00e8me de dialogue en ligne enti\u00e8rement chiffr\u00e9, avec des appels voix et vid\u00e9o, une messagerie de groupe et l\u2019int\u00e9gration du partage de fichiers avec le disque nuagique MEGA.",
     "20650": "This month payment [S]has failed[\/S], please resolve payment issue [A]here[\/A] ASAP to avoid any suspension on your business account",
-    "20651": "Your account may be [S]suspended[\/S] soon, please contact your business administrator to resolve the issue"
+    "20651": "Your account may be [S]suspended[\/S] soon, please contact your business administrator to resolve the issue",
+    "20652": "and 1 other",
+    "20653": "and  $1 others"
 }

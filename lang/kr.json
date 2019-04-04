@@ -3395,5 +3395,7 @@
     "20647": "\uc774\uba54\uc77c\uc744 \ud655\uc778\ud558\uace0 \ub300\ud654\uc5d0 \ucc38\uc5ec\ud558\uc138\uc694.",
     "20648": "\uc774\uac83\uc740 \uc74c\uc131\uacfc \uc601\uc0c1 \ud1b5\ud654, \uadf8\ub8f9 \uba54\uc2dc\uc9c0, MEGA \ud074\ub77c\uc6b0\ub4dc \ub4dc\ub77c\uc774\ube0c\uc640 \ud1b5\ud569\ub41c \ud30c\uc77c \uacf5\uc720\ub97c \uac16\ucd98 \uc644\uc804\ud788 \uc554\ud638\ud654\ub41c \ub300\ud654 \uc2dc\uc2a4\ud15c\uc5d0 \ucc38\uc5ec\ud558\uae30 \uc804 \ub9c8\uc9c0\ub9c9 \ub2e8\uacc4\uc785\ub2c8\ub2e4.",
     "20650": "This month payment [S]has failed[\/S], please resolve payment issue [A]here[\/A] ASAP to avoid any suspension on your business account",
-    "20651": "Your account may be [S]suspended[\/S] soon, please contact your business administrator to resolve the issue"
+    "20651": "Your account may be [S]suspended[\/S] soon, please contact your business administrator to resolve the issue",
+    "20652": "and 1 other",
+    "20653": "and  $1 others"
 }

@@ -2663,6 +2663,7 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
         $subIDInput.val('');
         $phoneInput.val('');
         $locationInput.val('');
+        $dialog.find('.dialog-input-title-ontop').removeClass('correctinput error active');
     };
 
     clearDialog();
@@ -2831,14 +2832,20 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
             else {
                 if ('fname' in changedVals && !changedVals.fname.length) {
                     $nameInput.parent().addClass('error');
+                    $('.dialog-input-container .error-message.edit-er-sub-n', $dialog)
+                        .removeClass('hidden').text(l[1098]);
                     return;
                 }
                 if ('lname' in changedVals && !changedVals.lname.length) {
                     $lnameInput.parent().addClass('error');
+                    $('.dialog-input-container .error-message.edit-er-sub-n', $dialog)
+                        .removeClass('hidden').text(l[1098]);
                     return;
                 }
                 if ('email' in changedVals && !isValidEmail(changedVals.email)) {
                     $emailInput.parent().addClass('error');
+                    $('.dialog-input-container .error-message.edit-er-sub-m', $dialog)
+                        .removeClass('hidden').text(l[5705]);
                     return;
                 }
                 var editPromise = mySelf.business.editSubAccount(subUserHandle, changedVals.email,

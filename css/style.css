@@ -26219,6 +26219,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     left: 5px;
 }
 
+.user-management-dialog .dialog-input-title-ontop .error-message.edit-er-sub-n,
+.user-management-dialog .dialog-input-title-ontop .error-message.edit-er-sub-m  {
+    left: 0;
+}
+
 .user-management-account-settings .bus-input.note .error-message {
     top: 80px;
 }

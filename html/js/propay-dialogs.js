@@ -1195,7 +1195,7 @@ var addressDialog = {
                 && billingInfo && billingInfo.hasOwnProperty('state')) ? billingInfo.state : false;
             self.showDialog();
             self.prefillInfo(billingInfo);
-            self.initStateDropDown(selectedState);
+            self.initStateDropDown(selectedState, selectedCountry);
             self.initCountryDropDown(selectedCountry);
             loadingDialog.hide();
             self.initCountryDropdownChangeHandler();
@@ -1268,7 +1268,7 @@ var addressDialog = {
     /**
      * Creates a list of state names with the ISO 3166-1-alpha-2 code as the option value
      */
-    initStateDropDown: function(preselected) {
+    initStateDropDown: function(preselected, country) {
 
         var stateOptions = '';
         var $statesSelect = this.$dialog.find('.states');
@@ -1279,8 +1279,10 @@ var addressDialog = {
         // Build options
         $.each(M.getStates(), function(isoCode, stateName) {
 
+            var countryCode = isoCode.substr(0, 2);
+
             // Create the option and set the ISO code and state name
-            var $stateOption = $('<option>').val(isoCode).text(stateName);
+            var $stateOption = $('<option>').val(isoCode).text(stateName).prop('disabled', countryCode !== country);
 
             if (preselected && isoCode === preselected) {
                 $stateOption.attr('selected', true);
@@ -1304,7 +1306,7 @@ var addressDialog = {
 
         $statesSelect.selectmenu('refresh');
 
-        if (preselected) {
+        if (preselected || country === 'US' || country === 'CA') {
             $statesSelect.selectmenu('enable');
         }
     },
@@ -1414,16 +1416,11 @@ var addressDialog = {
                             $stateOption.prop('disabled', true);
                         }
                     });
+                }
 
-                    // Refresh the selectmenu to show/hide disabled options and enable the dropdown so it works
-                    $statesSelect.selectmenu('refresh');
-                    $statesSelect.selectmenu('enable');
-                }
-                else {
-                    // Refresh the selectmenu to show the selected first option (State) then disable the dropdown
-                    $statesSelect.selectmenu('refresh');
-                    $statesSelect.selectmenu('disable');
-                }
+                // Refresh the selectmenu to show/hide disabled options and enable the dropdown so it works
+                $statesSelect.selectmenu('refresh');
+                $statesSelect.selectmenu('enable');
 
                 // Remove any previous validation error
                 $stateSelectmenuButton.removeClass('error');

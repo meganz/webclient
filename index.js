@@ -533,7 +533,6 @@ function init_page() {
         && (page !== 'privacy')
         && (page !== 'gdpr')
         && (page !== 'takendown')
-        && (page !== 'general')
         && (page !== 'resellers')
         && (page !== 'security')
         && (page !== 'downloadapp')
@@ -1339,9 +1338,6 @@ function init_page() {
         else {
             parsepage(pages['terms']);
         }
-    }
-    else if (page === 'general') {
-        parsepage(pages['general']);
     }
     else if (page === 'security') {
         parsepage(pages['securitypractice']);
@@ -2170,7 +2166,7 @@ function topmenuUI() {
             var subpage;
             var subPages = [
                 'about', 'account', 'backup', 'blog', 'cmd', 'contact',
-                'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
+                'copyright', 'corporate', 'credits', 'doc', 'extensions',
                 'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp'

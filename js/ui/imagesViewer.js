@@ -531,7 +531,7 @@ var slideshowid;
 
     // Viewer Init
     function slideshow(id, close, hideCounter) {
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+        if (!close && u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
             M.showExpiredBusiness();
             return;

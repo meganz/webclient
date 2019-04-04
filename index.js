@@ -1414,7 +1414,7 @@ function init_page() {
     }
     else if (page.substr(0, 7) === 'payment') {
 
-        if (page.indexOf('-b') === -1) {
+        if (page.indexOf('-b') === -1 || is_mobile) {
             // Load the Pro page in the background
             parsepage(pages['proplan']);
             pro.proplan.init();

@@ -260,6 +260,9 @@ mobile.downloadOverlay = {
             // Destroy any streaming instance if running
             $(window).trigger('video-destroy');
 
+            // Abort the running download.
+            dlmanager.abort(null);
+
             // Hide overlay with download button options
             mobile.downloadOverlay.$overlay.addClass('hidden');
             $body.removeClass('wrong-file');

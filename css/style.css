@@ -23722,11 +23722,9 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-view .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar img,
 .fm-right-header-user-management .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar img,
 .user-management-dialog .user-management-subuser-avatars .avatar-wrapper.small-rounded-avatar img{
-    width:24px;
-    height: 24px;
+    width:20px;
+    height: 20px;
 }
-
-
 .user-management-view .user-management-subuser-image, .fm-right-header-user-management .user-management-subuser-image, .user-management-dialog .user-management-subuser-image{
     margin: 1px;
     padding: 0;

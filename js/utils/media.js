@@ -3102,6 +3102,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     return false;
                 }
 
+                if (this.u && this.u !== u_handle) {
+                    if (d) {
+                        console.debug('Ignoring media attribute state for non-own node...', this);
+                    }
+                    return false;
+                }
+
                 return a.fps < MediaInfoLib.build || a.width < MediaInfoLib.version || a.playtime < this.avflv;
             }
 

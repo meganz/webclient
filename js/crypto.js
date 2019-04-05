@@ -493,7 +493,7 @@ function api_req(request, context, channel) {
         channel = 0;
     }
 
-    if (d) console.log("API request on " + channel + ": " + JSON.stringify(request));
+    if (d) console.debug("API request on " + channel + ": " + JSON.stringify(request));
 
     if (context === undefined) {
         context = Object.create(null);

@@ -11,6 +11,7 @@ var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationPanelUI = require("./../ui/conversationpanel.jsx");
 var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
+var StartGroupChatWizard = require('./startGroupChatWizard.jsx').StartGroupChatWizard;
 
 var renderMessageSummary = function(lastMessage) {
     var renderableSummary;
@@ -87,7 +88,7 @@ var renderMessageSummary = function(lastMessage) {
                 renderableSummary = l[19285] + " " + renderableSummary;
             }
         }
-        else if (lastMessage.chatRoom.type === "group") {
+        else if (lastMessage.chatRoom.type === "group" || lastMessage.chatRoom.type === "public") {
             if (author) {
                 if (author.u === u_handle) {
                     renderableSummary = l[19285] + " " + renderableSummary;
@@ -199,6 +200,12 @@ var ConversationsListItem = React.createClass({
             presenceClass = 'group';
             classString += ' groupchat';
         }
+        else if (chatRoom.type === "public") {
+            contactId = roomId;
+            id = 'conversation_' + contactId;
+            presenceClass = 'group';
+            classString += ' groupchat public';
+        }
         else {
             return "unknown room type: " + chatRoom.roomId;
         }
@@ -249,6 +256,7 @@ var ConversationsListItem = React.createClass({
 
         var lastMessageDiv = null;
         var lastMessageDatetimeDiv = null;
+
         var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
         var lastMsgDivClasses;
         if (lastMessage) {
@@ -274,7 +282,7 @@ var ConversationsListItem = React.createClass({
             }
             else {
                 // if not in the last 2 days, use 1st June [Year]
-                curTimeMarker = acc_time2date(timestamp, true);
+                curTimeMarker = acc_time2date(timestamp, false);
             }
 
             lastMessageDatetimeDiv = <div className="date-time">{curTimeMarker}</div>;
@@ -316,6 +324,20 @@ var ConversationsListItem = React.createClass({
                         {__(emptyMessage)}
                     </div>
                 </div>;
+
+
+            timestamp = chatRoom.ctime;
+            var msgDate = new Date(timestamp * 1000);
+            var iso = (msgDate.toISOString());
+            if (todayOrYesterday(iso)) {
+                // if in last 2 days, use the time2lastSeparator
+                curTimeMarker = time2lastSeparator(iso) + ", " + unixtimeToTimeString(timestamp);
+            }
+            else {
+                // if not in the last 2 days, use 1st June [Year]
+                curTimeMarker = acc_time2date(timestamp, false);
+            }
+            lastMessageDatetimeDiv = <div className="date-time">{l[19077].replace("%s1", curTimeMarker)}</div>;
         }
 
         if (chatRoom.callManagerCall && chatRoom.callManagerCall.isActive() === true) {
@@ -343,6 +365,9 @@ var ConversationsListItem = React.createClass({
             archivedDiv = "";
         }
 
+        if (chatRoom.type !== "public") {
+            nameClassString += " privateChat";
+        }
         if (
             chatRoom.callManagerCall &&
             (
@@ -365,6 +390,10 @@ var ConversationsListItem = React.createClass({
                             undefined
                     }
                 </div>
+                {
+                    (chatRoom.type === "group" || chatRoom.type === "private") ?
+                        <i className="tiny-icon blue-key"></i> : undefined
+                }
                 {archivedDiv}
                 {notificationItems.length > 0 ? (
                     <div className={"unread-messages items-" + notificationItems.length}>{notificationItems}</div>
@@ -396,6 +425,7 @@ var ArchivedConversationsListItem = React.createClass({
             classString += " ui-selected";
         }
 
+        var nameClassString = "user-card-name conversation-name";
 
         var contactId;
         var presenceClass;
@@ -419,6 +449,12 @@ var ArchivedConversationsListItem = React.createClass({
             id = 'conversation_' + contactId;
             presenceClass = 'group';
             classString += ' groupchat';
+        }
+        else if (chatRoom.type === "public") {
+            contactId = roomId;
+            id = 'conversation_' + contactId;
+            presenceClass = 'group';
+            classString += ' groupchat public';
         }
         else {
             return "unknown room type: " + chatRoom.roomId;
@@ -446,7 +482,7 @@ var ArchivedConversationsListItem = React.createClass({
             }
             else {
                 // if not in the last 2 days, use 1st June [Year]
-                curTimeMarker = acc_time2date(timestamp, true);
+                curTimeMarker = acc_time2date(timestamp, false);
             }
 
             lastMessageDatetimeDiv = <div className="date-time">{curTimeMarker}</div>;
@@ -480,14 +516,18 @@ var ArchivedConversationsListItem = React.createClass({
                     </div>
                 </div>;
         }
+        if (chatRoom.type !== "public") {
+            nameClassString += " privateChat";
+        }
 
         return (
             <tr className={classString} id={id} data-room-id={roomId} data-jid={contactId}
                 onClick={this.props.onConversationSelected} onDoubleClick={this.props.onConversationClicked}>
                 <td className="">
                 <div className="fm-chat-user-info todo-star">
-                    <div className="user-card-name conversation-name">
+                    <div className={nameClassString}>
                         <utils.EmojiFormattedContent>{chatRoom.getRoomTitle()}</utils.EmojiFormattedContent>
+                        {(chatRoom.type === "group") ? <i className="tiny-icon blue-key"></i> : undefined}
                     </div>
                     {lastMessageDiv}
                     {lastMessageDatetimeDiv}
@@ -520,7 +560,7 @@ var ConversationsList = React.createClass({
         }
     },
     contactClicked: function(contact, e) {
-        loadSubPage("fm/chat/" + contact.u);
+        loadSubPage("fm/chat/p/" + contact.u);
         e.stopPropagation();
     },
     endCurrentCall: function(e) {
@@ -567,7 +607,10 @@ var ConversationsList = React.createClass({
 
         var sortedConversations = obj_values(this.props.chats.toJS());
 
-        sortedConversations.sort(M.sortObjFn("lastActivity", -1));
+        sortedConversations.sort(M.sortObjFn(function(room) {
+            return !room.lastActivity ? room.ctime : room.lastActivity;
+        }, -1));
+
         sortedConversations.forEach((chatRoom) => {
             var contact;
             if (!chatRoom || !chatRoom.roomId) {
@@ -831,7 +874,8 @@ var ConversationsApp = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     getInitialState: function() {
         return {
-            'leftPaneWidth': mega.config.get('leftPaneWidth')
+            'leftPaneWidth': mega.config.get('leftPaneWidth'),
+            'startGroupChatDialogShown': false
         };
     },
     startChatClicked: function(selected) {
@@ -847,6 +891,11 @@ var ConversationsApp = React.createClass({
     },
     componentDidMount: function() {
         var self = this;
+
+        $(document.body).rebind('startNewChatLink.conversations', function(e) {
+            self.startGroupChatFlow = 2;
+            self.setState({'startGroupChatDialogShown': true});
+        });
 
         window.addEventListener('resize', this.handleWindowResize);
         $(document).rebind('keydown.megaChatTextAreaFocus', function(e) {
@@ -977,8 +1026,15 @@ var ConversationsApp = React.createClass({
         }
         else {
             lPaneResizableInit();
+
         }
 
+        if (anonymouschat) {
+            $('.conversationsApp .fm-left-panel').addClass('hidden');
+        }
+        else {
+            $('.conversationsApp .fm-left-panel').removeClass('hidden');
+        }
         this.handleWindowResize();
 
     },
@@ -993,11 +1049,20 @@ var ConversationsApp = React.createClass({
     },
     handleWindowResize: function() {
         // small piece of what is done in fm_resize_handler...
-        $('.fm-right-files-block, .fm-right-account-block')
-            .filter(':visible')
-            .css({
-                'margin-left': ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width()) + "px"
-            });
+        if (anonymouschat) {
+            $('.fm-right-files-block, .fm-right-account-block')
+                .filter(':visible')
+                .css({
+                    'margin-left': "0px"
+                });
+        }
+        else {
+            $('.fm-right-files-block, .fm-right-account-block')
+                .filter(':visible')
+                .css({
+                    'margin-left': ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+                });
+        }
     },
     initArchivedChatsScrolling: function () {
         var scroll = '.archive-chat-list';
@@ -1021,10 +1086,61 @@ var ConversationsApp = React.createClass({
         });
         return count;
     },
+    getTopButtonsForContactsPicker: function() {
+        var self = this;
+        if (!self._topButtonsContactsPicker) {
+            self._topButtonsContactsPicker = [
+                {
+                    'key': 'add',
+                    'title': l[71],
+                    'icon': 'rounded-plus colorized',
+                    'onClick': function(e) {
+                        contactAddDialog();
+                    }
+                },
+                {
+                    'key': 'newGroupChat',
+                    'title': l[19483],
+                    'icon': 'conversation-with-plus',
+                    'onClick': function(e) {
+                        self.startGroupChatFlow = 1;
+                        self.setState({'startGroupChatDialogShown': true});
+                    }
+                },
+                {
+                    'key': 'newChatLink',
+                    'title': l[20638],
+                    'icon': 'small-icon blue-chain colorized',
+                    'onClick': function(e) {
+                        self.startGroupChatFlow = 2;
+                        self.setState({'startGroupChatDialogShown': true});
+                    }
+                },
+
+            ]
+        }
+        return self._topButtonsContactsPicker;
+    },
     render: function() {
         var self = this;
 
-        var presence = self.props.megaChat.getMyPresence();
+        var startGroupChatDialog = null;
+        if (self.state.startGroupChatDialogShown === true) {
+            startGroupChatDialog = <StartGroupChatWizard
+                    name="start-group-chat"
+                    megaChat={self.props.megaChat}
+                    flowType={self.startGroupChatFlow}
+                    contacts={M.u}
+                    onClose={() => {
+                        self.setState({'startGroupChatDialogShown': false});
+                        delete self.startGroupChatFlow;
+                    }}
+                    onConfirmClicked={() => {
+                        self.setState({'startGroupChatDialogShown': false});
+                        delete self.startGroupChatFlow;
+                    }}
+                />;
+        }
 
 
         var leftPanelStyles = {};
@@ -1092,11 +1208,12 @@ var ConversationsApp = React.createClass({
             </div>;
         var archivedChatsCount = this.calcArchiveChats();
         var arcBtnClass = megaChat.displayArchivedChats === true ?
-                            "arc-conversation-btn-block active" : "arc-conversation-btn-block";
+                            "left-pane-button archived active" : "left-pane-button archived";
         var arcIconClass = megaChat.displayArchivedChats === true ?
             "small-icon archive white" : "small-icon archive colorized";
         return (
             <div className="conversationsApp" key="conversationsApp">
+                {startGroupChatDialog}
                 <div className="fm-left-panel chat-left-panel" style={leftPanelStyles}>
                     <div className="left-pane-drag-handle"></div>
 
@@ -1110,10 +1227,12 @@ var ConversationsApp = React.createClass({
                                 contacts={this.props.contacts}
                                 >
                                 <DropdownsUI.DropdownContactsSelector
+                                    className="main-start-chat-dropdown"
                                     contacts={this.props.contacts}
                                     megaChat={this.props.megaChat}
                                     onSelectDone={this.startChatClicked}
-                                    multiple={true}
+                                    multiple={false}
+                                    showTopButtons={self.getTopButtonsForContactsPicker()}
                                     />
                             </ButtonsUI.Button>
                         </div>
@@ -1123,22 +1242,30 @@ var ConversationsApp = React.createClass({
                             <div className={
                                 "content-panel conversations" + (
 
-									getSitePath().indexOf("/chat") !== -1 ? " active" : ""
+                                    getSitePath().indexOf("/chat") !== -1 ? " active" : ""
                                 )
                             }>
                                 <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat}
                                                    contacts={this.props.contacts}/>
                             </div>
                         </PerfectScrollbar>
-                        <div className={arcBtnClass}  onClick={this.archiveChatsClicked}>
-                            <div className="arc-conversation-icon">
-                                <i className={arcIconClass}></i>
+                        <div className="left-pane-button new-link" onClick={function(e) {
+                            self.startGroupChatFlow = 2;
+                            self.setState({'startGroupChatDialogShown': true});
+                            return false;
+                        }}>
+                            <i className="small-icon blue-chain colorized"></i>
+                            <div className="heading">
+                                {__(l[20638])}
                             </div>
-                            <div className="arc-conversation-heading">
+                        </div>
+                        <div className={arcBtnClass}  onClick={this.archiveChatsClicked}>
+                            <i className={arcIconClass}></i>
+                            <div className="heading">
                                 {__(l[19066])}
                             </div>
-                            <div className="arc-conversation-number">
-                                    {archivedChatsCount}
+                            <div className="indicator">
+                                {archivedChatsCount}
                             </div>
                         </div>
                     </div>

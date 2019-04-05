@@ -527,7 +527,7 @@ MegaData.prototype.contacts = function() {
 
                     if (!$this.is(".disabled")) {
                         var user_handle = $.selected && $.selected[0];
-                        loadSubPage("fm/chat/" + user_handle);
+                        loadSubPage("fm/chat/p/" + user_handle);
                     }
                 });
 
@@ -607,7 +607,7 @@ MegaData.prototype.contacts = function() {
 
         // Get the user handle and change to conversations screen
         var user_handle = id.replace('contact_', '');
-        loadSubPage('fm/chat/' + user_handle);
+        loadSubPage('fm/chat/p/' + user_handle);
     });
 
     M.addTreeUI();
@@ -623,7 +623,7 @@ MegaData.prototype.getContacts = function(n) {
     return folders;
 };
 
-MegaData.prototype.syncUsersFullname = function(userId) {
+MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
     "use strict";
     var self = this;
 
@@ -639,12 +639,12 @@ MegaData.prototype.syncUsersFullname = function(userId) {
     var lnameEncoded = '';
 
     MegaPromise.allDone([
-        mega.attr.get(userId, 'firstname', -1)
+        mega.attr.get(userId, 'firstname', -1, false, undefined, undefined, chatHandle)
             .done(function(r) {
                 firstName.value = r;
                 fnameEncoded = r;
             }),
-        mega.attr.get(userId, 'lastname', -1)
+        mega.attr.get(userId, 'lastname', -1, false, undefined, undefined, chatHandle)
             .done(function(r) {
                 lastName.value = r;
                 lnameEncoded = r;

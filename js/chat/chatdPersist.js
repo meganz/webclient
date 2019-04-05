@@ -240,11 +240,32 @@
         });
 
     };
+
+
     ChatdPersist.DB_STATE = {
         'NOT_READY': 0,
         'READY': 1,
         'INITIALISING': 2,
         'FAILED': 3,
+    };
+
+    ChatdPersist.prototype.deleteAllMessages = function(chatId) {
+        var self = this;
+
+        if (self._msgActionsQueuePerChat[chatId]) {
+            clearTimeout(self._msgActionsQueuePerChat[chatId].timer);
+            self._msgActionsQueuePerChat[chatId].promise &&
+                self._msgActionsQueuePerChat[chatId].promise.reject();
+            delete self._msgActionsQueuePerChat[chatId];
+        }
+        self.db.transaction('rw', self.db.msgs, function(msgs, trans) {
+            self._encryptedWhere('msgs', {'chatId': chatId})
+                .done(function (results) {
+                    results.forEach(function (r) {
+                        msgs.delete(r.id);
+                    });
+                });
+        });
     };
 
     /**
@@ -1747,6 +1768,9 @@
         var self = this;
         var promise = new MegaPromise();
 
+        if (keyId === 0) {
+            return promise.resolve();
+        }
 
         self.chatd.chatdPersist.getKey(
             chatId,
@@ -1960,7 +1984,8 @@
                         orderValues[v.orderValue] = v.messageId;
                     });
                     if (foundErrors !== false) {
-                        console.error("Found", foundErrors, "errors in", chatRoom.chatId);
+                        console.error("Found", foundErrors, "errors in", chatRoom.chatId, "in total of", msgs.length,
+                            "messages");
                     }
                     else {
                         console.error(

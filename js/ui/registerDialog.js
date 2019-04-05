@@ -76,7 +76,9 @@
 
             // Close the Pro register dialog, pre-set email and password into the Pro login dialog
             closeRegisterDialog($dialog, false);
-            showLoginDialog(rv.email, rv.password);
+            if (!(page === "chat" || page && page.indexOf("chat/") > -1)) {
+                showLoginDialog(rv.email, rv.password);
+            }
 
             // Show a message dialog telling them to log in
             msgDialog('warninga', l[882], l[1783], l[1768]);
@@ -239,6 +241,27 @@
         var $button = $dialog.find('.big-red-button');
         var $password = $dialog.find('.account.input-wrapper.password input');
 
+
+
+
+
+        if (typeof page !== 'undefined' && page === 'chat') {
+            $('.fm-dialog-subheading').html(
+                htmlentities(l[20636])
+                    .replace("[A]", "<a>")
+                    .replace("[/A]", "</a>")
+            );
+
+            $('.fm-dialog-subheading', $dialog).removeClass('hidden');
+            $('.fm-dialog-subheading > a', $dialog).rebind('click.doSignup', function() {
+                closeDialog();
+                megaChat.loginOrRegisterBeforeJoining(undefined, false, true);
+            });
+        }
+        else {
+            $('.fm-dialog-subheading', $dialog).addClass('hidden');
+        }
+
         var dialogBodyScroll = function() {
             var bodyHeight = $('body').height();
             var $scrollBlock =  $('.pro-register-scroll', $dialog);
@@ -389,6 +412,16 @@
         var $dialog = $('.fm-dialog.registration-page-success').removeClass('hidden');
         var $button = $('.resend-email-button', $dialog);
 
+        if (page && page.indexOf("chat/") > -1  || page === "chat") {
+            $dialog.addClass('chatlink');
+            $('.reg-success-icon-container-chat', $dialog).removeClass('hidden');
+            $('.reg-success-icon-container', $dialog).addClass('hidden');
+        }
+        else {
+            $dialog.removeClass('chatlink');
+            $('.reg-success-icon-container-chat', $dialog).addClass('hidden');
+            $('.reg-success-icon-container', $dialog).removeClass('hidden');
+        }
         $('input', $dialog).val(accountData.email);
 
         $button.rebind('click', function _click() {
@@ -396,6 +429,10 @@
                 callback: function(res) {
                     loadingDialog.hide();
 
+                    if (res === -5) {
+                        alert(l[7717]);
+                        return;
+                    }
                     if (res !== 0) {
                         console.error('sendsignuplink failed', res);
 

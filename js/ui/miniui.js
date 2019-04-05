@@ -60,6 +60,10 @@ var uiCheckboxes = function($scope, saveState, stateChangeCb, initialState) {
         var $input = $('input[type="checkbox"]', $cbxElement);
 
         var doToggle = function(state) {
+            if ($label.parent().is(".disabled")) {
+                return false;
+            }
+
             if (state) {
                 $cbxElement.removeClass('checkboxOff').addClass('checkboxOn');
             }

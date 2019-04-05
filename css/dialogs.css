@@ -1,3 +1,33 @@
+.nw-fm-dialog-title, .fm-dialog-title {
+    font-size: 20px;
+    line-height: 24px;
+    color: #666;
+    padding: 20px 48px 0 48px;
+    text-align: center;
+    min-height: 38px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    line-height: 24px;
+}
+.fm-dialog-title.small {
+    font-family: 'LatoWeb', 'source_sans_proregular';
+    font-size: 16px;
+    line-height: 25px;
+    letter-spacing: -0.18px;
+    color: #666666;
+}
+.fm-dialog-title.top-pad {
+    padding-top: 30px;
+}
+.contrast .fm-dialog-title {
+    color: #333333;
+}
+
 .fm-main-user-management.main-blur-block {
     width: 100%;
     height: 100%;
@@ -98,6 +128,10 @@
     border-top: 1px solid rgba(0,0,0,0.1);
     position: relative;
 }
+.small-footer .fm-dialog-footer {
+    padding: 8px 8px 0 8px;
+    height:  49px;
+}
 .fm-notifications-bottom.voucher-container {
     height: 64px;
     background-color: rgba(250,250,250,1);
@@ -146,54 +180,136 @@
     max-width: 240px;
 }
 /* Send Contact Dialog */
-.fm-dialog.send-contact {
-    width: 644px;
-    margin: -246px 0 0 -322px;
+.fm-dialog.send-contact, .fm-dialog.new-group-chat {
+    width: 360px;
+    margin: -275px 0 0 -180px;
+}
+body.de .fm-dialog.new-group-chat {
+    width: 440px;
 }
 .fm-dialog .contacts-search-scroll {
     height: 336px !important;
 }
-.fm-dialog .contacts-search-scroll, .fm-dialog .contacts-search-scroll .jspPane {
-    background-position: 0 -48px;
+.fm-dialog.send-contact .fm-dialog-content, .fm-dialog.new-group-chat .fm-dialog-content {
+    padding: 0 0 0 12px;
 }
-.fm-dialog .contacts-info.body.contacts-search {
-    height: 48px;
-    padding: 6px 0;
-    cursor: pointer;
-    background-color: #fafafa;
+.fm-dialog-footer .link-button {
+    margin-top: 5px;
 }
-.fm-dialog .contacts-info.body.contacts-search:nth-child(odd) {
-    background-color: white;
+.fm-dialog.send-contact .contacts-search-scroll, .fm-dialog.new-group-chat .contacts-search-scroll {
+    height: 320px !important;
 }
-.contacts-info.body.contacts-search.selected {
-    background-color: #2ba6de;
-    color: white;
+.contacts-search-header .small-icon.conversations {
+    opacity: 0.65;
 }
-.contacts-info.body.contacts-search.selected:nth-child(odd) {
-    background-color: #2ba6de;
-}
-.contacts-info.body.contacts-search.selected span, .contacts-info.body.contacts-search.selected .user-card-email, .contacts-info.body.contacts-search.selected .user-card-name {
-    color: white;
-}
-.contacts-info.body.contacts-search.selected .user-card-presence {
-    background-color: white;
-}
-.fm-dialog .contacts-search-header {
-    padding-top: 10px;
-}
-.contacts-search .user-card-name span {
-    margin-top: -4px;
-    color: #000000;
-}
-.contacts-search-footer em {
-    display: block;
-    color: #2ba6de;
-    font-style: normal;
-    text-align: center;
-    line-height: 46px;
-    vertical-align: middle;
+ .fm-dialog.new-group-chat .contacts-search-header:first-child, .contacts-search-header.top-pad {
+     margin-top:  18px;
 }
 /* End of Send Contact Dialog */
+
+/*New group chat dialog */
+.group-chat-dialog {
+    padding: 0 0 0 0;
+    font-size: 14px;
+    line-height:  20px;
+    color: #333333;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
+}
+.group-chat-dialog.header {
+    padding: 14px 12px 10px 0;
+}
+.group-chat-dialog.description {
+    padding: 0 12px 0 0;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 12px;
+    color: #666666;
+}
+.toggle-checkbox.right + .group-chat-dialog.header {
+    padding-right: 80px;
+}
+.group-chat-dialog.checkbox {
+    padding:  0 0 12px 0;
+}
+.radio-txt.lato.mid {
+    font-size: 14px;
+    line-height:  20px;
+    color: #333333;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
+}
+.fm-dialog .group-chat-dialog .checkboxOn, .fm-dialog .group-chat-dialog .checkboxOff {
+    margin: 14px 12px 0 0;
+}
+.fm-dialog .group-chat-dialog .radio-txt {
+    padding-top: 12px;
+}
+.fm-dialog.new-group-chat .contacts-search-scroll.short, .fm-dialog.new-group-chat .group-chat-dialog.checkbox +  .contacts-search-scroll {
+    height: 226px !important;
+}
+.toggle-checkbox {
+    width: 40px;
+    height: 20px;
+    position: relative;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.15);
+    background: -moz-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 100%);
+    background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.1) 100%);
+    background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.1) 100%);
+    overflow: hidden;
+    font-size: 0;
+    line-height: 0;
+}
+.group-chat-dialog .toggle-checkbox {
+    margin: 16px 12px 0 0;
+}
+.toggle-checkbox-wrap {
+    position: relative;
+    height: 100%;
+    width: 50%;
+    display: inline-block;
+     -webkit-transition: all 400ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    border-radius: 20px;
+    background: rgb(255,51,58, 0);
+    background: -moz-linear-gradient(top, rgba(255,51,58,0) 0%, rgba(217,0,7,0) 100%);
+    background: -webkit-linear-gradient(top, rgba(255,51,58,10) 0%,rgba(217,0,7,00) 100%);
+    background: linear-gradient(to bottom, rgba(255,51,58,0) 0%,rgba(217,0,7,0) 100%);
+}
+.checked .toggle-checkbox-wrap {
+    width: 100%;
+    background: rgb(255,51,58);
+    background: -moz-linear-gradient(top, rgba(255,51,58,1) 0%, rgba(217,0,7,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(255,51,58,1) 0%,rgba(217,0,7,1) 100%);
+    background: linear-gradient(to bottom, rgba(255,51,58,1) 0%,rgba(217,0,7,1) 100%);
+}
+.toggle-checkbox-button {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: white;
+    border-radius: 100%;
+    right: 0;
+    margin: 2px;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    cursor:  pointer;
+}
+.toggle-checkbox-button::before {
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.15);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.15);
+}
+.group-chat-dialog.checkbox.disabled .checkdiv,
+.group-chat-dialog.checkbox.disabled label.radio-txt {
+    cursor: default !important;
+}
+/*end of New group chat dialog */
 
 /* Add From Cloud Dialog */
 .fm-dialog.add-from-cloud {
@@ -365,7 +481,7 @@
         width: 1219px;
     }
 }
-@media only screen and (max-height: 720px) {
+@media only screen and (max-height: 850px) {
     .fm-dialog.add-from-cloud {
         margin-top: -305px;
     }
@@ -3783,13 +3899,13 @@ li.token-input-token-invite .input-close {
 /* Private chat dialog */
 .create-private-chat {
     width: 560px;
-    margin: -190px 0 0 -280px;
+    margin: -220px 0 0 -280px;
     overflow: visible;
+    text-align: center;
 }
 .create-private-chat .fm-dialog-title {
     font-size: 20px;
     color: #666666;
-    text-align: center;
 }
 .create-private-chat .wrapper {
     width: 460px;
@@ -3798,7 +3914,6 @@ li.token-input-token-invite .input-close {
 .create-private-chat .fm-body-text {
     font-size: 16px;
     line-height: 24px;
-    text-align: center;
 }
 .create-private-chat .default-huge-button.make-private {
     display: table;
@@ -3812,7 +3927,19 @@ li.token-input-token-invite .input-close {
     display: table;
     margin: 24px auto;
 }
-
+.create-private-chat i {
+    margin: 14px 0 18px 0;
+}
+.fm-dialog.create-private-chat .dialog-body-text {
+    max-width: 480px;
+    margin: 0 auto 24px;
+    font-size: 16px;
+    line-height: 24px;
+    color: #555;
+}
+.fm-dialog.create-private-chat .big-red-button {
+    margin: 0 0 34px 0;
+}
 /* Add contact */
 .add-user-popup.fm-dialog {
     z-index: 1200;
@@ -4390,12 +4517,145 @@ li.token-input-token-invite .input-close {
     padding-left: 32px;
 }
 
+.fm-dialog.export-chat-links-dialog {
+    width: 560px;
+    margin-top: -160px;
+    margin-left: -265px;
+    background-color: #fafafa;
+}
+.fm-dialog.export-chat-links-dialog .export-link-item {
+    margin: 12px auto 32px;
+}
+.fm-dialog.export-chat-links-dialog .export-link-text-pad {
+    padding: 10px 0;
+}
+.fm-dialog.export-chat-links-dialog .file-link-block {
+    padding: 9px 16px 9px 16px;
+    font-size: 15px;
+}
+.fm-dialog.export-chat-links-dialog .export-chat-ink-warning {
+    text-align: center;
+    font-size: 15px;
+    margin: 28px auto 16px;
+    color: #444;
+    margin-top: 23px;
+    width: 70%;
+}
+.fm-dialog.export-chat-links-dialog .default-red-button {
+    margin-top: 12px;
+}
+.fm-dialogs.export-chat-links-dialog .rename-input-bl input {
+    padding-left: 8px;
+}
 
+/* Join group chat */
+.fm-dialog.join-group-chat {
+    width: 480px;
+    margin: -241px 0 0 -240px;
+    text-align: center;
+    font-family: 'LatoWeb', 'source_sans_proregular';
+}
+.join-group-chat .fm-dialog-body {
+    padding: 12px 42px 24px 42px;
+}
+.join-group-chat .chat-title {
+    font-size:  20px;
+    line-height: 24px;
+    color: #333333;
+    padding: 22px 0 7px 0;
+    letter-spacing: -0.52px;
+}
+.join-group-chat .members {
+    font-size: 16px;
+    line-height: 21px;
+    color: #666666;
+    padding: 0 0 0 0;
+    letter-spacing: -0.18px;
+}
+.join-group-chat .info {
+    font-size: 14px;
+    line-height: 21px;
+    color: #333333;
+    padding: 32px 0 32px 0;
+    letter-spacing: -0.18px;
+}
+.join-group-chat .huge-icon {
+    margin: 12px auto 0 auto;
+}
+.join-group-chat .button {
+    margin: 0 0 22px 0;
+}
+.join-group-chat .red-link {
+    display: inline-block;
+    margin: 0;
+    font-size: 16px;
+    line-height: 21px;
+    color: #F0373A;
+    padding: 0 0 0 0;
+    letter-spacing: -0.18px;
+    cursor: pointer;
+}
+.join-group-chat .red-link:hover {
+    text-decoration: underline;
+}
+/* end of Join group chat */
 
-
-
-
-
-
-
-
+/* Group chat link */
+.fm-dialog-close.small-pad {
+    top: 10px;
+    right: 10px;
+}
+.fm-dialog.group-chat-link {
+    width: 360px;
+    margin: -142px 0 0 -180px;
+    text-align: center;
+    font-family: 'LatoWeb', 'source_sans_proregular';
+    background-color: white;
+}
+.fr .fm-dialog.group-chat-link {
+    width: 440px;
+    margin: -142px 0 0 -220px;
+}
+.group-chat-link .chat-title {
+    font-size: 14px;
+    line-height: 20px;
+    color: #333333;
+    padding: 24px 0 24px 0;
+}
+.group-chat-link .info {
+    font-size: 13px;
+    line-height: 20px;
+    color: #666666;
+    padding: 16px 0 4px 0;
+}
+.group-chat-link .big-icon {
+    margin: 12px auto 0 auto;
+}
+.chat-link-input {
+    height: 32px;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-sizing: border-box;
+    border-radius: 4px;
+    position: relative;
+    padding: 0 10px 0 35px;
+}
+.chat-link-input i {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+}
+.chat-link-input input {
+    border: 0;
+    width: 100%;
+    height: 30px;
+    font-size: 13px;
+    line-height: 30px;
+    color: #333333;
+    padding: 0;
+    margin: 0;
+    font-family: 'LatoWeb', 'source_sans_proregular';
+}
+.group-chat-link.requires-topic {
+    width: 450px;
+}
+/* end of Make chat private */

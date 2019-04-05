@@ -509,7 +509,8 @@ function contactsInfoDialog(title, username, msg, close) {
 function setContactLink() {
     "use strict";
 
-    var $publicLink = $('.public-contact-link');
+    var $publicLink = $('.public-contact-link:visible');
+    // multiple link data may exists!
     var linkData = $publicLink.attr('data-lnk');
     var account = M.account || false;
     var contactPrefix = '';
@@ -2054,7 +2055,7 @@ function initShareDialog() {
     "use strict";
 
     var $dialog = $('.share-dialog');
-    
+
     $.shareTokens = [];
 
     /*if (!u_type) {
@@ -2436,7 +2437,7 @@ function showWarningTokenInputLose() {
 
 function closeDialog(ev) {
     "use strict";
-    
+
     if (d) {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
     }

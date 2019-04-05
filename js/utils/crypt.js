@@ -190,7 +190,10 @@ var crypt = (function() {
             }
         }
         else {
-            var pubKeyPromise = mega.attr.get(userhandle, ns.PUBKEY_ATTRIBUTE_MAPPING[keyType], true, false);
+            var pubKeyPromise = userData && userData.chatHandle ?
+                    mega.attr.get(userhandle, ns.PUBKEY_ATTRIBUTE_MAPPING[keyType], true, false,
+                        undefined, undefined, userData.chatHandle) :
+                    mega.attr.get(userhandle, ns.PUBKEY_ATTRIBUTE_MAPPING[keyType], true, false);
 
             pubKeyPromise.done(function(result) {
                 result = base64urldecode(result);
@@ -271,6 +274,55 @@ var crypt = (function() {
      */
     ns._pubKeyRetrievalPromises = {};
 
+    ns.getPubKeyViaChatHandle = function(userhandle, keyType, chathandle, callback) {
+        // This promise will be the one which is going to be returned.
+        var masterPromise = new MegaPromise();
+        // Some things we need to progress.
+        var pubKeyCache = ns.getPubKeyCacheMapping(keyType);
+        var authMethod;
+        var newAuthMethod;
+
+        /** If a callback is passed in, ALWAYS call it when the master promise
+         * is resolved. */
+        var __callbackAttachAfterDone = function(aPromise) {
+            if (callback) {
+                aPromise.done(function __classicCallback(result) {
+                    logger.debug('Calling callback');
+                    callback(result);
+                });
+            }
+        };
+        // Get out quickly if the key is cached.
+        if (pubKeyCache[userhandle]) {
+            masterPromise.resolve(pubKeyCache[userhandle]);
+            __callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
+        }
+
+        // And now for non-cached keys.
+
+        /** Persist potential changes in authentication, call callback and exit. */
+        var __finish = function(pubKey, authMethod, newAuthMethod) {
+            __callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
+        };
+
+        // Get the pub key and update local variable and the cache.
+        var getPubKeyPromise = ns.getPubKeyAttribute(userhandle, keyType, {'chatHandle': chathandle});
+
+        getPubKeyPromise.done(function __resolvePubKey(result) {
+            var pubKey = result;
+            pubKeyCache[userhandle] = pubKey;
+            masterPromise.resolve(pubKey);
+
+                // Finish off.
+                __finish(pubKey, authMethod, newAuthMethod);
+        });
+        masterPromise.linkFailTo(getPubKeyPromise);
+        return masterPromise;
+    };
     /**
      * Caching public key retrieval utility.
      *
@@ -324,7 +376,7 @@ var crypt = (function() {
             }
         };
 
-        if (authring.hadInitialised() === false || typeof u_authring === 'undefined') {
+        if (!anonymouschat && (authring.hadInitialised() === false || typeof u_authring === 'undefined')) {
             // Need to initialise the authentication system (authring).
             if (d > 1) {
                 logger.debug('Waiting for authring to initialise first.', 'Tried to access: ', userhandle, keyType);
@@ -526,6 +578,28 @@ var crypt = (function() {
         return ns.getPubKey(userhandle, 'Ed25519', callback);
     };
 
+    /**
+     * Cached Ed25519 public key retrieval utility via chat handle.
+     *
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @param chathandle {string}
+     *     Mega chat handle.
+     * @param [callback] {function}
+     *     Callback function to call upon completion of operation. The
+     *     callback requires two parameters: `value` (an object
+     *     containing the public in `pubkey` and its authencation
+     *     state in `authenticated`). `value` will be `false` upon a
+     *     failed request.
+     * @return {MegaPromise}
+     *     A promise that is resolved when the original asynch code is
+     *     settled.  Can be used to use promises instead of callbacks
+     *     for asynchronous dependencies.
+     */
+    ns.getPubEd25519ViaChatHandle = function(userhandle, chathandle, callback) {
+        assertUserHandle(userhandle);
+        return ns.getPubKeyViaChatHandle(userhandle, 'Ed25519', chathandle, callback);
+    };
 
     /**
      * Cached Curve25519 public key retrieval utility. If the key is cached, no API
@@ -546,6 +620,29 @@ var crypt = (function() {
     ns.getPubCu25519 = function(userhandle, callback) {
         assertUserHandle(userhandle);
         return ns.getPubKey(userhandle, 'Cu25519', callback);
+    };
+
+    /**
+     * Cached Curve25519 public key retrieval utility. If the key is cached, no API
+     * request will be performed. The key's authenticity is validated through
+     * the tracking in the authring and signature verification.
+     *
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @param chathandle {string}
+     *     Mega chat handle.
+     * @param [callback] {function}
+     *     (Optional) Callback function to call upon completion of operation. The callback
+     *     requires one parameter: the actual public Cu25519 key. The user handle is
+     *     passed as a second parameter, and may be obtained that way if the call
+     *     back supports it.
+     * @return {MegaPromise}
+     *     A promise that is resolved when the original asynch code is settled.
+     *     The promise returns the Curve25519 public key.
+     */
+    ns.getPubCu25519ViaChatHandle = function(userhandle, chathandle, callback) {
+        assertUserHandle(userhandle);
+        return ns.getPubKeyViaChatHandle(userhandle, 'Cu25519', chathandle, callback);
     };
 
 

@@ -241,6 +241,13 @@
             newHashLocation = 'F!' + pfid + '!' + pfkey + target;
             this.lastSeenFolderLink = newHashLocation;
         }
+        else if (
+            id.substr(0, 5) === "chat/" &&
+            id.substr(6, 1) !== "/"
+        ) {
+            // is a chat link, e.g. chat/[^/]
+            newHashLocation = this.currentdirid;
+        }
         else {
             // new hash location can be altered already by the chat logic in the previous lines in this func
             if (!newHashLocation) {

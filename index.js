@@ -30,11 +30,12 @@ var account = false;
 var register_txt = false;
 var login_next = false;
 var loggedout = false;
+var anonymouschat = false;
 var flhashchange = false;
 var folderLinkVisitLogged = false;
 var avatars = {};
 var mega_title = 'MEGA';
-
+var pchandle = false;
 
 
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
@@ -229,7 +230,6 @@ function topPopupAlign(button, popup, topPos) {
 
 function init_page() {
     page = page || (u_type ? 'fm' : 'start');
-
     var mobilePageParsed = false;
     var ar;
 
@@ -507,6 +507,18 @@ function init_page() {
         page = 'resetpassword';
     }
 
+    // is chat link?
+    if (is_mobile && page.substr(0, 4) === 'chat') {
+        var chatInfo = window.location.toString().split("chat/");
+        if (chatInfo[1] && chatInfo[1].split) {
+            chatInfo = chatInfo[1].split("#");
+            var chatHandle = chatInfo[0];
+            var chatKey = chatInfo[1];
+            parsepage(pages['mobile']);
+            mobile.chatlink.show(chatHandle, chatKey);
+            return;
+        }
+    }
     if ((pfkey || dlkey) && location.hash[0] !== '#') {
         return location.replace(getAppBaseUrl());
     }
@@ -1581,6 +1593,26 @@ function init_page() {
         loadSubPage('redeem');
         return false;
     }
+    // If they recently tried to join a chat link, forward to the chat link page.
+    else if (
+        localStorage.getItem('autoJoinOnLoginChat') !== null && u_type === 3 &&
+        getSitePath().indexOf("/chat/") !== 0
+    ) {
+        var autoLoginChatInfo = typeof localStorage.autoJoinOnLoginChat !== "undefined" ?
+            JSON.parse(localStorage.autoJoinOnLoginChat) : false;
+
+        if (unixtime() - 2 * 60 * 60 < autoLoginChatInfo[1]) {
+            loadSubPage("/chat/" + autoLoginChatInfo[0] + autoLoginChatInfo[2]);
+            return false;
+        }
+        else {
+            localStorage.removeItem('autoJoinOnLoginChat');
+            // the only way tto not refactor this whole piece of code is to simply do a recurrsion, after the
+            // autoJoin... is removed.
+            return init_page();
+        }
+
+    }
     else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
@@ -1631,6 +1663,31 @@ function init_page() {
 
             if (typeof mDBcls === 'function') {
                 mDBcls(); // close fmdb
+            }
+        }
+
+        if (page.substr(0, 5) === "chat/") {
+            id = page;
+            page = "chat";
+            if (u_type === false) {
+                anonymouschat = true;
+                u_handle = "AAAAAAAAAAA";
+                pchandle = id.substr(5, 8);
+
+                M.require('chat')
+                    .always(function() {
+                        if (typeof ChatRoom !== 'undefined') {
+                            init_chat();
+                        }
+                    });
+            }
+            else if (u_type === 0) {
+                // ephemeral
+                mega.ui.sendSignupLinkDialog({}, false);
+            }
+            else {
+                anonymouschat = false;
+                pchandle = false;
             }
         }
 
@@ -1701,7 +1758,12 @@ function init_page() {
             $('#startholder').empty();
         }
 
+        $('.nw-fm-left-icons-panel').removeClass('hidden');
         if ($('#fmholder:visible').length == 0) {
+            if (anonymouschat) {
+                $('.nw-fm-left-icons-panel').addClass('hidden');
+                $('.top-head .logo').css("display", "block");
+            }
             $('#fmholder').show();
             if (fminitialized && !is_mobile) {
                 M.addViewUI();
@@ -2500,6 +2562,10 @@ function is_fm() {
     if (!r && (u_type !== false)) {
         r = page === '' || page === 'start' || page === 'index'
             || page.substr(0, 2) === 'fm' || page.substr(0, 7) === 'account';
+    }
+
+    if (!r && (page.substr(0, 5) === 'chat/' || page === "chat")) {
+        r = true;
     }
 
     if (d > 2) {

@@ -72,7 +72,9 @@ var Accordion = React.createClass({
             }
 
             if (
-                child.type.displayName === 'AccordionPanel' || child.type.displayName.indexOf('AccordionPanel') > -1
+                child.type.displayName === 'AccordionPanel' || (
+                    child.type.displayName && child.type.displayName.indexOf('AccordionPanel') > -1
+                )
             ) {
                 accordionPanels.push(React.cloneElement(child, {
                     key: child.key,
@@ -84,7 +86,7 @@ var Accordion = React.createClass({
                 }));
             }
             else {
-                otherElements.push(
+                accordionPanels.push(
                     React.cloneElement(child, {
                         key: x++,
                         accordion: self

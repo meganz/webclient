@@ -94,7 +94,7 @@ pro.proplan = {
         if (is_mobile) {
             // Set title just for the Pro page
             $('#startholder .mobile.fm-header-txt').text(l[16111]);
-            
+
             if ($body.hasClass('key')) {
                 $body.find('.pro4 .cta-button').removeClass('secondary').addClass('green');
                 $body.find('.pro1 .cta-button').addClass('secondary').removeClass('green');
@@ -198,7 +198,9 @@ pro.proplan = {
 
         // If not logged in, show the login/register prompt
         if (!u_handle) {
-            megaAnalytics.log('pro', 'loginreq');
+            if (typeof page !== 'undefined' && page !== 'chat') {
+                megaAnalytics.log('pro', 'loginreq');
+            }
             showSignupPromptDialog();
             return false;
         }
@@ -600,10 +602,10 @@ pro.proplan = {
         var pageParts = page.split('-');
         var provider = pageParts[1];
         var status = pageParts[2];
-        
+
         var successPayText = l[19514];
         var $pendingOverlay = $('.payment-result.pending.alternate');
-        
+
 
         // manipulate the texts if business account
         if (status === 'success' && pageParts && pageParts[3] === 'b') {
@@ -644,7 +646,10 @@ pro.proplan = {
  */
 function showLoginDialog(email, password) {
 
-    megaAnalytics.log("pro", "loginDialog");
+    if (typeof page !== 'undefined' && page !== 'chat') {
+        megaAnalytics.log("pro", "loginDialog");
+    }
+
     $.dialog = 'pro-login-dialog';
 
     var $dialog = $('.pro-login-dialog');
@@ -706,7 +711,10 @@ function closeLoginDialog($dialog) {
 
 var doProLogin = function($dialog) {
 
-    megaAnalytics.log('pro', 'doLogin');
+    if (typeof page !== 'undefined' && page !== 'chat') {
+        megaAnalytics.log('pro', 'doLogin');
+    }
+
     loadingDialog.show();
 
     var $emailContainer = $dialog.find('.account.input-wrapper.email');
@@ -803,8 +811,14 @@ function completeProLogin(result) {
         // Find the plan they clicked on before the login/register prompt popped up
         var proNum = $('.reg-st3-membership-bl.selected').data('payment');
 
-        // Load the Pro payment page (step 2)
-        loadSubPage('propay_' + proNum);
+        if (page === "chat") {
+            var chatHash = getSitePath().replace("/chat/", "").split("#")[0];
+            megaChat.loginOrRegisterBeforeJoining(chatHash);
+        }
+        else {
+            // Load the Pro payment page (step 2)
+            loadSubPage('propay_' + proNum);
+        }
     }
     else {
         // Close the 2FA dialog for a generic error
@@ -818,13 +832,17 @@ function completeProLogin(result) {
 
 function showRegisterDialog() {
 
-    megaAnalytics.log("pro", "regDialog");
+    if (typeof page !== 'undefined' && page !== 'chat') {
+        megaAnalytics.log("pro", "regDialog");
+    }
 
     mega.ui.showRegisterDialog({
         title: l[5840],
 
         onCreatingAccount: function() {
-            megaAnalytics.log("pro", "doRegister");
+            if (typeof page !== 'undefined' && page !== 'chat') {
+                megaAnalytics.log("pro", "doRegister");
+            }
         },
 
         onLoginAttemptFailed: function(registerData) {

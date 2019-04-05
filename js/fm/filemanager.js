@@ -606,7 +606,9 @@ FileManager.prototype.initFileManagerUI = function() {
         }
     });
 
-    $('.fm-right-header.fm').removeClass('hidden');
+    if (page !== "chat") {
+        $('.fm-right-header.fm').removeClass('hidden');
+    }
 
     if (folderlink) {
         $('.fm-tree-header.cloud-drive-item span').text('');
@@ -1357,11 +1359,11 @@ FileManager.prototype.initContextUI = function() {
 
         if (user_handle.length === 1) {
             if (!$this.is('.disabled') && user_handle[0]) {
-                loadSubPage('fm/chat/' + user_handle[0]);
+                loadSubPage('fm/chat/p/' + user_handle[0]);
             }
         }
         else {
-            megaChat.createAndShowGroupRoomFor(user_handle);
+            megaChat.createAndShowGroupRoomFor(user_handle, "", true, false);
         }
     });
 
@@ -2609,7 +2611,7 @@ FileManager.prototype.contactsUI = function() {
         }
 
         if ($this.hasClass('start-conversation')) {
-            loadSubPage("fm/chat/" + user_handle);
+            loadSubPage("fm/chat/p/" + user_handle);
         }
         else if ($this.hasClass('start-audio-call')) {
             megaChat.createAndShowPrivateRoomFor(user_handle)
@@ -2735,7 +2737,7 @@ FileManager.prototype.addContactUI = function() {
 
             // Bind the "Start conversation" button
             $('.fm-start-conversation').rebind('click.megaChat', function() {
-                loadSubPage('fm/chat/' + u_h);
+                loadSubPage('fm/chat/p/' + u_h);
                 return false;
             });
         }
@@ -3767,10 +3769,10 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     if (d) {
         console.log('sectionUIopen', id, folderlink);
     }
-
-    if ($.hideContextMenu) {
-        $.hideContextMenu();
+    if (!anonymouschat && $.hideContextMenu) {
+       $.hideContextMenu();
     }
+
     $('.nw-fm-left-icon').removeClass('active');
     if (this.hasInboxItems() === true) {
         $('.nw-fm-left-icon.inbox').removeClass('hidden');

@@ -105,6 +105,7 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
         api_req(req, {
             callback: function (res) {
                 if (typeof res === 'object') {
+
                     self.contactAvatar = res['+a'];
                     self.contactEmail = res.e;
                     self.contactName = res.fn + ' ' + res.ln;

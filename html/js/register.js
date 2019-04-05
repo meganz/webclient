@@ -431,7 +431,7 @@ function init_register() {
         bottomPageDialog(false, 'terms', false, true);
         return false;
     });
-    
+
 
     var $regInfoContainer = $('.main-mid-pad.big-pad.register1 .main-left-block');
     $('.input-wrapper.name', $regInfoContainer).removeClass('hidden');

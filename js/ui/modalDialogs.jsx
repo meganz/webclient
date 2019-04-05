@@ -38,9 +38,6 @@ var ModalDialog = React.createClass({
                 self.onBlur();
             }
         });
-        $(window).rebind('resize.modalDialog' + self.getUniqueId(), function() {
-            self.onResize();
-        });
     },
     onBlur: function(e) {
         var $element = $(ReactDOM.findDOMNode(this));
@@ -69,24 +66,8 @@ var ModalDialog = React.createClass({
             self.props.onClose(self);
         }
     },
-    onResize: function() {
-        if (!this.domNode) {
-            return;
-        }
-
-        // always center modal dialogs after they are mounted
-        $(this.domNode)
-            .css({
-                'margin': 'auto'
-            })
-            .position({
-                of: $(document.body)
-            });
-    },
     onPopupDidMount: function(elem) {
         this.domNode = elem;
-
-        this.onResize();
 
         if (this.props.popupDidMount) {
             // bubble up...
@@ -96,7 +77,7 @@ var ModalDialog = React.createClass({
     render: function() {
         var self = this;
 
-        var classes = "fm-dialog " + self.props.className;
+        var classes = "fm-dialog fm-modal-dialog " + self.props.className;
 
         var footer = null;
 
@@ -131,13 +112,20 @@ var ModalDialog = React.createClass({
             var buttons = [];
             self.props.buttons.forEach(function(v) {
                 buttons.push(
-                    <a href="javascript:;" className={"default-white-button right" + (v.className ? " " + v.className : "")} onClick={(e) => {
-                        if (v.onClick) {
-                            v.onClick(e, self);
-                        }
-                    }} key={v.key}>
-                        {v.label}
-                    </a>
+                    <a href="javascript:;"
+                        className={(v.defaultClassname ? v.defaultClassname : "default-white-button right") + (v.className ? " " + v.className : "")}
+                        onClick={(e) => {
+                            if ($(e.target).is(".disabled")) {
+                                return false;
+                            }
+                            if (v.onClick) {
+                                v.onClick(e, self);
+                            }
+                        }} key={v.key}>
+                            {v.iconBefore ? <i className={v.iconBefore} /> : null}
+                            {v.label}
+                            {v.iconAfter ? <i className={v.iconAfter} /> : null}
+                        </a>
                 );
             });
 
@@ -196,7 +184,7 @@ var SelectContactDialog = React.createClass({
     render: function() {
         var self = this;
 
-        var classes = "send-contact " + self.props.className;
+        var classes = "send-contact contrast small-footer " + self.props.className;
 
 
         return (
@@ -211,6 +199,7 @@ var SelectContactDialog = React.createClass({
                         {
                             "label": self.props.selectLabel,
                             "key": "select",
+                            "defaultClassname": "default-grey-button lato right",
                             "className": self.state.selected.length === 0 ? "disabled" : null,
                             "onClick": function(e) {
                                 if (self.state.selected.length > 0) {
@@ -226,6 +215,7 @@ var SelectContactDialog = React.createClass({
                         {
                             "label": self.props.cancelLabel,
                             "key": "cancel",
+                            "defaultClassname": "link-button lato left",
                             "onClick": function(e) {
                                 self.props.onClose(self);
                                 e.preventDefault();
@@ -237,10 +227,12 @@ var SelectContactDialog = React.createClass({
                 megaChat={self.props.megaChat}
                 contacts={self.props.contacts}
                 exclude={self.props.exclude}
+                selectableContacts="true"
                 onSelectDone={self.props.onSelectClicked}
                 onSelected={self.onSelected}
                 selected={self.state.selected}
                 headerClasses="left-aligned"
+                multiple={true}
                 />
             </ModalDialog>
         );

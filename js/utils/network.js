@@ -157,6 +157,11 @@ function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
                 req.v = 2;
             }
 
+            // IF this is an anonymous chat OR a chat that I'm not a part of
+            if (M.chat && megaChatIsReady) {
+                megaChat.eventuallyAddDldTicketToReq(req);
+            }
+
             if (!key) {
                 req.n = handle;
                 key = M.getNodeByHandle(handle).k;

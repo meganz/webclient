@@ -275,13 +275,21 @@
         <div class="fm-dialog-close"></div>
         <div class="clear"></div>
     </div>
-    <div class="reg-success-icon"></div>
+    <div class="reg-success-icon-container-chat hidden">
+        <i class="huge-icon email-with-conversations"></i>
+    </div>
+    <div class="reg-success-icon-container">
+        <div class="reg-success-icon-green"></div>
+    </div>
     <div class="reg-success-normal">
         <div class="reg-success-header">[$8688]</div>
         <div class="reg-success-txt">[$217]</div>
     </div>
     <div class="reg-success-special">
         <div class="reg-success-txt">[$217]</div>
+        <div class="reg-success-txt chat-header">[$20647]</div>
+        <div class="reg-success-txt chat-message">[$20648]</div>
+        <div class="reg-grey-bar"></div>
         <div class="reg-resend-email">
             <div class="reg-resend-input-bl">
                 <input type="text" value="" maxlength="190" />
@@ -293,8 +301,8 @@
                 </div>
             </div>
         </div>
-        <div class="reg-success-txtb">[$9029]</div>
     </div>
+    <div class="reg-success-txtb">[$9029]</div>
 </div>
 
 <div class="fm-dialog rename-dialog hidden">
@@ -1286,7 +1294,10 @@
 <div class="top-login-popup sign fm-dialog pro-login-dialog big-radius login hidden">
 
     <div class="fm-dialog-header">
-        <div class="account top-header login left small">[$190]</div>
+        <div class="account top-header login left small">
+            <div>[$190]</div>
+            <div class="fm-dialog-subheading hidden">[$20635]</div>
+        </div>
         <div class="fm-dialog-close mid"></div>
         <div class="clear"></div>
     </div>
@@ -1327,7 +1338,10 @@
 
 <div class="top-login-popup sign fm-dialog pro-register-dialog big-radius hidden">
     <div class="fm-dialog-header">
-        <div class="account top-header login left small">[$968]</div>
+        <div class="account top-header login left small">
+            <div>[$968]</div>
+            <div class="fm-dialog-subheading">[$20636]</div>
+        </div>
         <div class="fm-dialog-close mid"></div>
         <div class="clear"></div>
     </div>
@@ -4795,7 +4809,7 @@
                 <label>[$20214]</label>
             </div>
             <div class="account input-tooltip static js-warning-message"></div>
-            <div class="verify-ph-buttons">                
+            <div class="verify-ph-buttons">
                 <div class="button default-green-button gradient lato right disabled js-send-sms-button" tabindex="0">
                     [$556]
                 </div>
@@ -5263,3 +5277,26 @@
         <div class="clear"></div>
     </div>
 </div>
+
+<!-- Group Chat Link !-->
+<div class="fm-dialog group-chat-link hidden">
+    <div class="fm-dialog-close small small-pad"></div>
+    <div class="fm-dialog-body">
+        <i class="big-icon group-chat"></i>
+        <div class="chat-title">
+            Group Chat Title
+        </div>
+        <div class="chat-link-input">
+            <i class="small-icon blue-chain colorized"></i>
+            <input type="text" value="https://mega.nz/chat/uhNHUIZa#DILHMgfq7XDILHMgfq7X">
+        </div>
+        <div class="info">
+            [$20644]
+         </div>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="default-green-button button right"><span>[$63]</span></div>
+        <div class="clear"></div>
+    </div>
+</div>
+<!-- end of Group Chat Link !-->

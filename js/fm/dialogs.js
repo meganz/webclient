@@ -536,6 +536,7 @@
                         contactStatus = M.onlineStatusClass(M.d[handle].presence)[1];
                     }
                     contactElem += contactStatus + '">';
+                    contactElem += '<i class="tiny-icon green-key"></i>';
                     contactElem += '<span class="nw-contact-status"></span>';
                     contactElem += '<span class="nw-contact-name">' + escapeHTML(name) + '</span>';
                     contactElem += '<span class="nw-contact-email">' + escapeHTML(email) + '</span>';
@@ -547,11 +548,17 @@
                     return '';
                 }
             };
-            var createGroupEntry = function _createGroupEntry(names, nb, handle) {
+            var createGroupEntry = function _createGroupEntry(names, nb, handle, chatRoom) {
                 if (names && names.length && nb && handle) {
                     var groupElem = '<span id="cpy-dlg-chat-itm-spn-' + handle
                         + '" class="nw-contact-item multi-contact">';
+
+                    if (chatRoom && (chatRoom.type === "group" || chatRoom.type === "private")) {
+                        groupElem += '<i class="tiny-icon green-key"></i>';
+                    }
+
                     groupElem += '<span class="nw-contact-group-icon"></span>';
+
                     var namesCombine = names[0];
                     var k = 1;
                     while (namesCombine.length <= 40 && k < names.length) {
@@ -582,32 +589,45 @@
                 var sortedChats = obj_values(myChats.toJS());
                 sortedChats.sort(M.sortObjFn("lastActivity", -1));
                 for (var chati = 0; chati < sortedChats.length; chati++) {
-                    if (sortedChats[chati].isArchived()) {
+                    var chatRoom = sortedChats[chati];
+                    if (chatRoom.isArchived()) {
                         continue;
                     }
-                    if (sortedChats[chati].type === 'group') {
+                    var isValidGroupOrPubChat = false;
+                    if (chatRoom.type === 'group') {
+                        isValidGroupOrPubChat = true;
+                    }
+                    else if (
+                        chatRoom.type === "public" &&
+                        chatRoom.membersSetFromApi &&
+                        chatRoom.membersSetFromApi.members[u_handle] >= 2
+                    ) {
+                        isValidGroupOrPubChat = true;
+                    }
+
+                    if (isValidGroupOrPubChat) {
                         var gNames = [];
-                        if (!sortedChats[chati].topic) {
-                            ChatdIntegration._ensureNamesAreLoaded(sortedChats[chati].members);
-                            for (var grHandle in sortedChats[chati].members) {
+                        if (!chatRoom.topic) {
+                            ChatdIntegration._ensureNamesAreLoaded(chatRoom.members);
+                            for (var grHandle in chatRoom.members) {
                                 if (grHandle !== u_handle) {
                                     gNames.push(M.getNameByHandle(grHandle));
                                 }
                             }
                         }
                         else {
-                            gNames.push(sortedChats[chati].topic);
+                            gNames.push(chatRoom.topic);
                         }
                         if (gNames.length) {
                             if (nbOfRecent < top5) {
                                 var gElem = createGroupEntry(gNames,
-                                    Object.keys(sortedChats[chati].members).length, sortedChats[chati].roomId);
+                                    Object.keys(chatRoom.members).length, chatRoom.roomId, chatRoom);
                                 contactGeneratedList = contactGeneratedList + gElem;
                             }
                             else {
                                 myContacts.push({
-                                    id: Object.keys(sortedChats[chati].members).length,
-                                    name: gNames[0], handle: sortedChats[chati].roomId, isG: true,
+                                    id: Object.keys(chatRoom.members).length,
+                                    name: gNames[0], handle: chatRoom.roomId, isG: true,
                                     gMembers: gNames
                                 });
                             }
@@ -618,7 +638,7 @@
                     else {
                         if (nbOfRecent < top5) {
                             var contactHandle;
-                            for (var ctHandle in sortedChats[chati].members) {
+                            for (var ctHandle in chatRoom.members) {
                                 if (ctHandle !== u_handle) {
                                     contactHandle = ctHandle;
                                     break;
@@ -648,7 +668,12 @@
                     ctElem = createContactEntry(myContacts[a].name, myContacts[a].id, myContacts[a].handle);
                 }
                 else {
-                    ctElem = createGroupEntry(myContacts[a].gMembers, myContacts[a].id, myContacts[a].handle);
+                    ctElem = createGroupEntry(
+                        myContacts[a].gMembers,
+                        myContacts[a].id,
+                        myContacts[a].handle,
+                        megaChat.chats[myContacts[a].handle]
+                    );
                 }
                 contactGeneratedList = contactGeneratedList + ctElem;
             }
@@ -1421,7 +1446,17 @@
 
                 if (section === 'conversations') {
                     target = chats.map(function(h) {
-                        return 'chat/' + h;
+                        if (megaChat.chats[h]) {
+                            return megaChat.chats[h].getRoomUrl().replace("fm/", "");
+                        } else if (M.u[h]) {
+                            return 'chat/p/' + h;
+                        }
+                        else {
+                            if (d) {
+                                console.error("Chat room not found for handle:", h);
+                            }
+                            return '';
+                        }
                     });
                 }
 

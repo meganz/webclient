@@ -596,7 +596,7 @@ var ConversationAudioVideoPanel = React.createClass({
         var localPlayerElement = null;
         var remotePlayerElement = null;
         var activeStreamIdOrPlayer = (
-            chatRoom.type === "group" && self.getViewMode() === VIEW_MODES.CAROUSEL ?
+            (chatRoom.type === "group" || chatRoom.type === "public") && self.getViewMode() === VIEW_MODES.CAROUSEL ?
                 self.getCurrentStreamId() :
                 false
         );
@@ -895,7 +895,7 @@ var ConversationAudioVideoPanel = React.createClass({
         }
 
 
-        if (chatRoom.type === "group") {
+        if (chatRoom.type === "group" || chatRoom.type === "public") {
             header = <div className="call-header">
                 <div className="call-topic">{ellipsis(chatRoom.getRoomTitle(), 'end', 70)}</div>
                 <div className="call-participants-count">{Object.keys(chatRoom.callParticipants).length}</div>
@@ -935,7 +935,7 @@ var ConversationAudioVideoPanel = React.createClass({
 
         var notifBar = null;
 
-        if (chatRoom.type === "group") {
+        if (chatRoom.type === "group" || chatRoom.type === "public") {
             var notif = chatRoom.callManagerCall.callNotificationsEngine.getCurrentNotification();
 
             if (!chatRoom.callManagerCall.callNotificationsEngine._bound) {

@@ -2054,7 +2054,7 @@ function initShareDialog() {
     "use strict";
 
     var $dialog = $('.share-dialog');
-    
+
     $.shareTokens = [];
 
     /*if (!u_type) {
@@ -2133,8 +2133,9 @@ function initShareDialog() {
     $('.dialog-share-button', $dialog).rebind('click', function() {
         addNewContact($(this), false).done(function() {
             var share = new mega.Share();
-            share.updateNodeShares();
-            $('.token-input-token-mega').remove();
+            share.updateNodeShares().always(function() {
+                $('.token-input-token-mega').remove();
+            });
         });
     });
 
@@ -2436,7 +2437,7 @@ function showWarningTokenInputLose() {
 
 function closeDialog(ev) {
     "use strict";
-    
+
     if (d) {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
     }

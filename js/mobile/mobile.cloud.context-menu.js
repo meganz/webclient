@@ -78,6 +78,7 @@ mobile.cloud.contextMenu = {
 
             // Otherwise inititalise tap handler on the buttons
             mobile.cloud.contextMenu.initFolderOpenButtonHandler($folderContextMenu, nodeHandle);
+            mobile.cloud.contextMenu.initDownloadButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initLinkButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDeleteButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initCloseButton($folderContextMenu);
@@ -100,6 +101,10 @@ mobile.cloud.contextMenu = {
             // Hide the folder context menu if open and show the file context menu
             $folderContextMenu.addClass('hidden');
             $fileContextMenu.removeClass('hidden');
+        }
+
+        if (pfid) {
+            $('.context-menu-item.link-button, .context-menu-item.delete-button').addClass('hidden');
         }
     },
 

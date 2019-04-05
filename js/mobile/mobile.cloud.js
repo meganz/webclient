@@ -34,7 +34,7 @@ mobile.cloud = {
 
         // jQuery selectors
         var $fileManager = $('.mobile.file-manager-block');
-        
+
 
         // Render the file manager header, folders, files and footer
         this.initTitleMenu();
@@ -491,6 +491,9 @@ mobile.cloud = {
         // Show the number of files in that folder
         $template.find('.num-files').text(foldersWording + ', ' + filesWording);
 
+        // Show the context-menu opener
+        $template.find('.fm-icon.open-context-menu').removeClass('hidden');
+
         // If in regular cloud drive (not a public folder link)
         if (!pfid) {
 
@@ -498,7 +501,6 @@ mobile.cloud = {
             $template.find('.fm-item-link.open-folder').removeClass('hidden');
             $template.find('.fm-item-link.link').removeClass('hidden');
             $template.find('.fm-item-link.delete').removeClass('hidden');
-            $template.find('.fm-icon.open-context-menu').removeClass('hidden');
 
             // Show the link icon if it already has a public link
             if (typeof node.shares !== 'undefined' && typeof node.shares.EXP !== 'undefined') {
@@ -547,12 +549,12 @@ mobile.cloud = {
         $template.find('.date').text(fileDate);
         $template.removeClass('file-template');
         $template.find('.fm-item-img img').attr('src', iconPath);
+        $template.find('.fm-icon.open-context-menu').removeClass('hidden');
 
         // If in regular cloud drive (not a public folder link)
         if (!pfid) {
 
             // Enable the open context menu, link and delete options
-            $template.find('.fm-icon.open-context-menu').removeClass('hidden');
             $template.find('.fm-item-link.link').removeClass('hidden');
             $template.find('.fm-item-link.delete').removeClass('hidden');
 

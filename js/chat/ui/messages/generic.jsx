@@ -1311,7 +1311,7 @@ var GenericConversationMessage = React.createClass({
                 var translationString = "";
 
                 if (participantNames && participantNames.length > 0) {
-                    translationString += mega.utils.trans.listToString(participantNames, "With %s");
+                    translationString += mega.utils.trans.listToString(participantNames, l[20234]);
                 }
 
                 if (

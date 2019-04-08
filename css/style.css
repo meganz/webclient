@@ -5908,11 +5908,11 @@ th.grid-first-th {
     overflow: hidden;
     white-space: normal;
 }
-.fm-notification-block.almost-full {
+.fm-notification-block.almost-full, .fm-notification-block.grace-business {
     background-color: #fbedb6;
     color: #333;
 }
-.fm-notification-block.almost-full a {
+.fm-notification-block.almost-full a, .fm-notification-block.grace-business a {
     color: #333;
 }
 .fm-notification-block.full a, .fm-notification-block.expired-business, .fm-notification-block.expired-business a {

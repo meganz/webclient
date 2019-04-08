@@ -1519,22 +1519,31 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
 };
 
 /** Show UI elements if the account got expired  */
-BusinessAccountUI.prototype.showExpiredUIElements = function() {
+BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
     "use strict";
-    if (!u_attr || !u_attr.b || u_attr.b.s !== -1) {
+    if (!u_attr || !u_attr.b || (u_attr.b.s !== -1 && u_attr.b.s !== 2)) {
         return;
     }
     var msg = '';
-    if (u_attr.b.m) {
-        msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
-            .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+    if (u_attr.b.s === -1) { // expired
+        if (u_attr.b.m) {
+            msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+                .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+        }
+        else {
+            msg = l[20462];
+        }
+        $('.fm-notification-block.expired-business').safeHTML(msg).show();
+        clickURLs();
+        this.showExpiredDialog(u_attr.b.m);
     }
-    else {
-        msg = l[20462];
+    else if (u_attr.b.s === 2) { // grace
+        if (u_attr.b.m) {
+            msg = l[20650].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+                .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+            $('.fm-notification-block.grace-business').safeHTML(msg).show();
+        }
     }
-    $('.fm-notification-block.expired-business').safeHTML(msg).show();
-    clickURLs();
-    this.showExpiredDialog(u_attr.b.m);
 };
 
 /**

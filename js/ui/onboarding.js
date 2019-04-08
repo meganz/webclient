@@ -812,7 +812,7 @@
                         business_ui.showWelcomeDialog();
                     }
                     // the function will check if the account is expired
-                    business_ui.showExpiredUIElements();
+                    business_ui.showExp_GraceUIElements();
                 });
             }
 

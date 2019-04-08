@@ -449,7 +449,11 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     overflow: visible;
 }
 .bottom-page.very-dark-blue-bg {
-	background: #2F3541;
+	background: #12151c;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICA8c3RvcCBvZmZzZXQ9IjEwJSIgc3RvcC1jb2xvcj0iIzEyMTUxYyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwJSIgc3RvcC1jb2xvcj0iIzEyMTUxYyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM1YjY2NzIiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(-85deg, #12151c 10%, #12151c 10%, #5b6672 100%);
+    background: -webkit-linear-gradient(-85deg, #12151c 10%,#12151c 10%,#5b6672 100%);
+    background: linear-gradient(165deg, #12151c 10%,#12151c 10%,#5b6672 100%);
 }
 .bottom-page.grey-graident {
     background: #fafafa;
@@ -485,7 +489,7 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     box-sizing: border-box;
 }
 .bottom-page.large-header {
-    font-family: 'montserrat-light', 'source_sans_prolight', arial;
+    font-family: 'montserrat_light', 'source_sans_prolight', arial;
     font-size: 36px;
     color: #333333;
     line-height: 48px;
@@ -1449,7 +1453,7 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
     background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(250,250,250,1) 100%);
     background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(250,250,250,1) 100%);
     background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(250,250,250,1) 100%);
-    margin: 14px 0 0 0;
+    margin: 10px 0 0 0;
     height: 64px;
     white-space: nowrap;
 }
@@ -1473,18 +1477,14 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
 }
 .bottom-page.nav-buttons-bl.dark {
     background: #fafafa;
-background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZhZmFmYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjYyJSIgc3RvcC1jb2xvcj0iI2UwZTBlMCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlOGU4ZTgiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-background: -moz-linear-gradient(top, #fafafa 0%, #e0e0e0 62%, #e8e8e8 100%);
-background: -webkit-linear-gradient(top, #fafafa 0%,#e0e0e0 62%,#e8e8e8 100%);
-background: linear-gradient(to bottom, #fafafa 0%,#e0e0e0 62%,#e8e8e8 100%);
-margin-top: 24px;
-height: 56px;
-}
-.megacmd .bottom-page.nav-buttons-bl.dark {
-    margin-bottom: 170px;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZhZmFmYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNjY2NjY2MiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top, #fafafa 0%, #cccccc 100%);
+    background: -webkit-linear-gradient(top, #fafafa 0%,#cccccc 100%);
+    background: linear-gradient(to bottom, #fafafa 0%,#cccccc 100%);
+    height: 56px;
 }
 .bottom-page.nav-buttons-bl.contrast.pad {
-    margin-top: 40px;
+    margin: 40px 0 50px 0;
 }
 .bottom-page.nav-buttons-bl::before {
     content: '';
@@ -1531,6 +1531,9 @@ height: 56px;
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
+    -moz-border-radius: 0 4px 4px 0;
+    -webkit-border-radius: 0 4px 4px 0;
+    border-radius: 0 4px 4px 0;
 }
 .contrast .pages-nav.nav-button:first-child::before {
     -moz-border-radius-topleft: 4px;
@@ -1548,8 +1551,11 @@ height: 56px;
     -webkit-border-bottom-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
-.contrast .pages-nav.nav-button:not(.disabled):hover::before {
+.contrast .pages-nav.nav-button:not(.disabled):not(.active):hover::before {
     background-color: rgba(0,0,0,0.05);
+}
+.contrast .pages-nav.nav-button.active::before {
+    background-color: rgba(255,255,255,0.8);
 }
 .nav-buttons-bl .pages-nav.nav-button:first-child {
     border: 0;
@@ -1625,6 +1631,9 @@ height: 56px;
 }
 .bottom-page.full-block.top-border {
     border-top: 1px solid rgba(0,0,0,0.1);
+}
+.megacmd .bottom-page .megaapp-linux {
+    margin-bottom: 170px;
 }
 .megacmd .bottom-page.horizontal-centered-bl.wide {
     max-width: 1246px;
@@ -1836,9 +1845,6 @@ height: 56px;
     border-bottom-right-radius: 4px;
     background-color: rgba(255,255,255,0.8);
 }
-.very-dark-blue-bg .nav-buttons-bl .pages-nav.nav-button.disabled::after {
-    background-color: rgba(100,100,100,0.2);
-}
 .bottom-page.top-title::before {
     content: '';
     display: inline-block;
@@ -1851,7 +1857,7 @@ height: 56px;
     background-repeat: no-repeat;
 }
 .cropped-page .bottom-page.top-title::before {
-    background-image: url(../images/mega/new-pages-sprite_v2.png);
+    background-image: url(../images/mega/new-pages-sprite_v3.png);
     background-repeat: no-repeat;
 }
 .bottom-page.top-title.mobile::before {
@@ -1873,7 +1879,7 @@ height: 56px;
 .bottom-page.top-title span {
     display: inline-block;
     vertical-align: top;
-    margin: 1px 0 28px 0;
+    margin: 1px 0 25px 0;
 }
 .bottom-page.dark-big-header {
     font-size: 36px;
@@ -1911,59 +1917,11 @@ height: 56px;
     z-index: 99;
 }
 .bottom-page.top-dark-info.small {
-    font-size: 18px;
-    line-height: 24px;
-    color: #333333;
-    padding: 8.5% 0 1px 0;
-}
-.bottom-page.top-dark-info.small.pad {
-    padding-top: 18.5%;
-}
-.linux .bottom-page.top-dark-info.small {
-    display: none;
-}
-.megaapp-linux-info {
     font-size: 16px;
     line-height: 24px;
     color: #333333;
-    padding: 28px 0 0px 0;
-    font-family: 'LatoWebBold', 'source_sans_prosemibold';
-}
-.cmd .default-select.megaapp-dropdown {
-    margin: 13px auto 12px auto;
-    color: #333333;
-    width: 250px;
-    -webkit-box-shadow: 0 0 0 0 rgba(0,0,0,0.15);
-    -moz-box-shadow: 0 0 0 0 rgba(0,0,0,0.15);
-    box-shadow: 0 0 0  0 rgba(0,0,0,0.15);
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-}
-.cmd .default-select.megaapp-dropdown:hover {
-    box-shadow: 0 0 0  4px rgba(0,0,0,0.15);
-    -webkit-box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-}
-
-.cmd .default-select.megaapp-dropdown::before {
-    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
-    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
-}
-.cmd.megaapp-linux .bottom-page.radio-buttons {
-    width: auto;
-    display: inline-block;
-    white-space: nowrap;
-    padding-left: 36px;
-    margin: 0 auto 9px auto;
+    padding: 48px 0 0 0;
+    font-family: 'LatoWeb', 'source_sans_proregular';
 }
 .bottom-page.sides-pad {
     padding: 0 40px;
@@ -2028,27 +1986,6 @@ height: 56px;
 .body:not(.mobile) .bottom-page.dark-txt a:hover {
     text-decoration: none;
 }
-.default-select.megaapp-dropdown {
-    width: 228px;
-    float: none;
-    margin: 40px auto 5px auto;
-}
-.megaapp-button-info {
-    color: #666666;
-    font-size: 14px;
-    line-height: 24px;
-    padding: 28px 0 62px 0;
-}
-.bottom-page.megasync.linux .megaapp-button-info {
-    padding-bottom: 0;
-}
-.bottom-page.megasync.linux .default-select.megaapp-dropdown {
-    margin-top: 20px;
-}
-.megaapp-button-info a.red {
-    cursor: pointer;
-    color: #FF333A;
-}
 .bird .bottom-page .button.default-huge-button {
      margin: 0 0;
      padding: 0 20px;
@@ -2103,46 +2040,6 @@ height: 56px;
     background-image: url(../images/mega/pages-sprite_v5.png);
     background-position: -119px -1920px;
 }
-.megaapp-linux .bottom-page.radio-buttons {
-    width: 228px;
-    margin: 0 auto;
-}
-.bottom-page.radio-buttons {
-    padding: 5px 0 0px 0;
-}
-.default-dropdown-item.icon {
-    padding: 0 30px 0 34px;
-    background-image: url(../images/mega/download-sprite-v8.png);
-    background-position: 0 64px;
-    background-repeat: no-repeat;
-}
-.default-dropdown-item.centos {
-    background-position: 10px -1921px;
-}
-.default-dropdown-item.debian {
-    background-position: 10px -1982px;
-}
-.default-dropdown-item.elementary, .default-dropdown-item.elementaryosfreya {
-    background-position: 10px -1952px;
-}
-.default-dropdown-item.fedora {
-    background-position: 10px -2132px;
-}
-.default-dropdown-item.mint {
-    background-position: 10px -2102px;
-}
-.default-dropdown-item.opensuse {
-    background-position: 10px -2072px;
-}
-.default-dropdown-item.redhat {
-    background-position: 10px -2042px;
-}
-.default-dropdown-item.ubuntu {
-    background-position: 10px -2012px;
-}
-.mobile .bottom-page.nav-buttons-bl.contrast, .mobile .bottom-page.top-dark-info.small {
-    display: none;
-}
 .megacmd .bottom-page.scroll-button {
     display: block;
 }
@@ -2165,7 +2062,7 @@ height: 56px;
     width: 188px;
     height: 188px;
     margin: 0 auto;
-    background-image: url(../images/mega/new-pages-sprite_v2.png);
+    background-image: url(../images/mega/new-pages-sprite_v3.png);
     background-size: 376px auto;
     background-repeat: no-repeat;
     padding: 0;
@@ -2206,7 +2103,7 @@ height: 56px;
     width: 96px;
     height: 96px;
     margin: 0 auto 16px;
-    background-image: url(../images/mega/new-pages-sprite_v2.png);
+    background-image: url(../images/mega/new-pages-sprite_v3.png);
     background-size: 376px auto;
     background-repeat: no-repeat;
     padding: 0;
@@ -2265,7 +2162,7 @@ height: 56px;
     font-family: 'LatoWebBold';
 }
 .top-bl .top-title {
-    padding-top: 72px;
+    padding-top: 60px;
 }
 .uwp .bottom-page.top-title::before {
     background-image: none !important;
@@ -2389,7 +2286,7 @@ height: 56px;
     width: 28px;
     height: 28px;
     margin: 6px 9px 0 0px;
-    background-image: url(../images/mega/new-pages-sprite_v2.png);
+    background-image: url(../images/mega/new-pages-sprite_v3.png);
     background-repeat: no-repeat;
 }
 .uwp .advertise-chat .mobile-apps-button.red.android span::before {
@@ -2449,7 +2346,7 @@ height: 56px;
 
 .megasync .bottom-page.img.sync1 {
     max-width: 960px;
-    margin: 24px auto 32px;
+    margin: 38px auto 42px;
     display: block;
 }
 .megasync .sync-2 .bottom-page img {
@@ -2478,7 +2375,13 @@ height: 56px;
     margin: 32px 0 32px -30px;
     display: block;
 }
-.bottom-page.very-dark-blue-bg .white-text, .very-dark-blue-bg .radio-txt, .very-dark-blue-bg .megaapp-linux-info, .very-dark-blue-bg .megaapp-button-info {
+.bottom-page.very-dark-blue-bg .white-text,
+.bottom-page .megaapp-linux .radio-txt,
+.bottom-page .megaapp-linux .megaapp-linux-info,
+.bottom-page .megaapp-linux .megaapp-button-info,
+.bottom-page .megaapp-linux .megaext-container .radio-txt,
+.bottom-page .megaapp-linux .megaext-container .megaapp-linux-info,
+.bottom-page .megaapp-linux .megaext-container .megaapp-button-info {
 	color: #fff;
 }
 .very-dark-blue-bg .megaapp-button-info.disabled {
@@ -2487,17 +2390,251 @@ height: 56px;
     -khtml-opacity: 0.6;
     opacity: 0.6;
 }
- .very-dark-blue-bg .megaapp-linux {
-     padding-bottom: 20px;
+
+/* Linux Dropdowns */
+.megaapp-linux .default-select-dropdown::before, .megaapp-linux .default-select-dropdown::after {
+    content: unset;
+}
+.bottom-page.radio-buttons {
+    padding: 5px 0 0px 0;
+}
+.megaapp-linux .bottom-page.radio-buttons {
+    width: auto;
+    margin: 0;
+    padding: 6px 0 0 0;
+}
+.default-dropdown-item.icon {
+    padding: 0 30px 0 34px;
+    background-image: url(../images/mega/download-sprite-v9.png);
+    background-position: 0 64px;
+    background-repeat: no-repeat;
+}
+.default-dropdown-item.centos {
+    background-position: 10px -1921px;
+}
+.default-dropdown-item.debian, .default-dropdown-item.raspbian {
+    background-position: 10px -1982px;
+}
+.default-dropdown-item.elementary, .default-dropdown-item.elementaryosfreya {
+    background-position: 10px -1952px;
+}
+.default-dropdown-item.fedora {
+    background-position: 10px -2132px;
+}
+.default-dropdown-item.mint {
+    background-position: 10px -2102px;
+}
+.default-dropdown-item.opensuse {
+    background-position: 10px -2072px;
+}
+.default-dropdown-item.redhat {
+    background-position: 10px -2042px;
+}
+.default-dropdown-item.ubuntu {
+    background-position: 10px -2012px;
+}
+.default-dropdown-item.arch {
+    background-position: 12px -3633px;
+}
+.default-dropdown-item.nautilus {
+    background-position: 11px -3503px;
+}
+.default-dropdown-item.dolphin {
+    background-position: 11px -3535px;
+}
+.default-dropdown-item.nemo {
+    background-position: 11px -3601px;
+}
+.default-dropdown-item.thunar {
+    background-position: 11px -3567px;
+}
+.mobile .bottom-page.nav-buttons-bl.contrast, .mobile .bottom-page.top-dark-info.small {
+    display: none;
+}
+
+.bottom-page .megaapp-linux {
+    background-color: #333333;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    width: 398px;
+    border: 1px solid rgba(0,0,0,0.3);
+    position: relative;
+    margin: -40px auto 50px auto;
+    text-align: left;
+    padding: 24px;
+    white-space: nowrap;
  }
-.megasync .bottom-page.top-bl {
-	max-height: 1000px;
+.bottom-page.linux .megaapp-linux {
+    display: table;
 }
-.business-info-block {
-    max-width: 464px;
-    margin: 0 auto;
+.megaapp-linux-arrow {
+    position: absolute;
+    width: 18px;
+    height: 9px;
+    background-image: url(../images/mega/new-pages-sprite_v3.png);
+    background-repeat: no-repeat;
+    background-position: -347px -329px;
+    top: -9px;
+    left: 50%;
+    margin: 0 0 0 120px;
+    z-index: 10;
+}
+.megaapp-linux .default-select {
+    color: #333333;
+    font-family: 'source_sans_proregular', Arial;
+    background-image: url(../images/mega/new-pages-sprite_v3.png);
+    background-repeat: no-repeat;
+    background-position: right -385px;
+}
+ .very-dark-blue-bg .megaapp-linux {
+     background-color: rgba(0,0,0,0.3);
+ }
+ .very-dark-blue-bg .megaapp-linux-arrow {
+    background-position: -347px -349px;
+}
+
+.megaapp-linux-info {
+    font-size: 16px;
+    line-height: 24px;
+    color: #333333;
+    padding: 32px 0 0 0;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold';
+}
+.megaapp-linux-info span, .megaapp-linux-info .bottom-page-icon {
+    display: inline-block;
+    vertical-align: top;
+}
+.megaapp-linux-info .bottom-page-icon.white-info {
+    margin: 5px 0 0 5px;
+}
+.bottom-page-icon.white-info {
+    width: 18px;
+    height: 18px;
+    background-image: url(../images/mega/new-pages-sprite_v3.png);
+    background-repeat: no-repeat;
+    background-position: -355px -433px;
+    position: relative;
+}
+.dark-notification-block {
+    width: 228px;
+    position: absolute;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    padding: 10px;
+    color: white;
     text-align: center;
+    position: absolute;
+    left: 32px;
+    top: -19px;
+    display: none;
+    background-color: black;
+    font-size: 13px;
+    line-height: 18px;
+    white-space: normal;
+    font-family: 'source_sans_proregular', Arial;
+    opacity: 0;
+    z-index: 10;
 }
+.bottom-page-icon.white-info:not(.disabled):hover .dark-notification-block {
+    display: block;
+    opacity: 1;
+}
+.dark-notification-arrow {
+    position: absolute;
+    left: -8px;
+    top: 21px;
+    width: 8px;
+    height: 15px;
+    background-image: url(../images/mega/new-pages-sprite_v3.png);
+    background-repeat: no-repeat;
+    background-position: -328px -436px;
+}
+.bottom-page .megaapp-linux-info:first-child {
+    padding-top: 0;
+}
+.bottom-page .default-select.megaapp-dropdown,
+.bottom-page .default-select.megaext-dropdown {
+    width: 250px;
+    float: none;
+    margin: 40px 0 5px 0;
+}
+.megaapp-button-info {
+    color: #666666;
+    font-size: 14px;
+    line-height: 24px;
+    padding: 28px 0 62px 0;
+}
+.bottom-page .megaapp-linux .default-select.megaapp-dropdown,
+.bottom-page .megaapp-linux .default-select.megaext-dropdown{
+    margin: 13px 12px 0 0;
+    display: inline-block;
+    vertical-align: top;
+}
+.megaapp-button-info a.red {
+    cursor: pointer;
+    color: #FF333A;
+}
+div.radioOn.green, div.radioOff.green {
+    width: 16px;
+    height: 16px;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+    -moz-background-clip: padding-box;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+div.radioOn.green {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border-color: #00BFA5;
+}
+div.radioOn::before.green, div.radioOff::before.green {
+    display: none;
+}
+div.radioOn.green::after {
+    background: #00BFA5;
+    opacity: 1;
+}
+.megaapp-linux .radio-txt {
+    min-width: 85px;
+}
+.small-green-button {
+    display: inline-block;
+    vertical-align: top;
+    min-width: 88px;
+    height: 32px;
+    background-color: #00BFA5;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    color: white;
+    font-size: 14px;
+    line-height: 32px;
+    text-align: center;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 10px;
+    cursor: pointer;
+    margin-top: 13px;
+}
+.small-green-button:not(.disabled):hover {
+    -webkit-box-shadow: 0 0 0 4px rgba(62,136,126,0.4);
+    -moz-box-shadow: 0 0 0 4px rgba(62,136,126,0.4);
+    box-shadow: 0 0 0 4px rgba(62,136,126,0.4);
+}
+/* end of Linux dropdowns */
+
 @media only screen and (max-width: 870px) {
     .bottom-btn-container p {
         display: block;
@@ -3158,7 +3295,7 @@ body:not(.en) .content-block .pages-nav.compound-items.active {
     border-radius: 0;
     margin: 54px auto 0;
     background-color: #000;
-    background-image: url(../images/mega/new-pages-sprite_v2.png);
+    background-image: url(../images/mega/new-pages-sprite_v3.png);
     background-size: 376px auto;
 }
 .mobile-apps-button.no-pad {
@@ -4328,7 +4465,7 @@ a.opensource-icon-txt.coming-soon {
 .mobile .default-huge-button.inline, .mobile .megaapp-button-info {
     display: none;
 }
-.mobile .megasync .top-bl .medium-txt.small-lineheight, .mobile .megacmd .top-bl top-header, .mobile .megacmd .top-header {
+.mobile .megasync .top-bl .medium-txt.small-lineheight, .mobile .megacmd .top-bl .top-header, .mobile .megacmd .top-header {
     padding-bottom: 63px;
 }
 
@@ -4336,14 +4473,6 @@ a.opensource-icon-txt.coming-soon {
 @media only screen and (max-height: 1385px) {
 .bottom-page.img.mobile-top {
     width: 100%;
-}
-}
-@media only screen and (max-height: 800px) {
-.bottom-page.top-dark-info.small.pad {
-    padding-top: 127px;
-}
-.megacmd .bottom-page.nav-buttons-bl.dark {
-    margin-bottom: 140px;
 }
 }
 @media only screen and (max-width: 970px) {
@@ -5138,10 +5267,6 @@ body:not(.en) .pages-nav.content-block .nav-button {
     max-width: 60%;
     position: relative;
     margin-top: -30px;
-}
-.megasync .default-select.megaapp-dropdown, .megasync .bottom-page.radio-buttons {
-    margin-left: auto;
-    margin-right: auto;
 }
 .bird .top-bl .bottom-page.left-cell .img-description {
     padding-left: 0;

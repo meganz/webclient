@@ -604,7 +604,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     font-family: 'Open Sans Semibold Italic', Arial;
 }
 .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon {
-    background-image: url(../images/mega/download-sprite-v8.png);
+    background-image: url(../images/mega/download-sprite-v9.png);
     background-repeat: no-repeat;
     background-position: -117px -772px;
     padding-left: 40px;

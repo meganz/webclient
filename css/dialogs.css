@@ -2342,6 +2342,10 @@ li.token-input-token-invite .input-close {
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
+.nw-dark-overlay.megasync-overlay .default-select-dropdown::before,
+.nw-dark-overlay.megasync-overlay .default-select-dropdown::after {
+    content: unset;
+}
 .nw-dark-overlay.megasync-overlay.downloading {
     background-color: rgba(34,34,34,0.95);
 }
@@ -2536,7 +2540,7 @@ li.token-input-token-invite .input-close {
 .megasync-info-arrow {
     width: 46px;
     height: 45px;
-    background-image: url(../images/mega/download-sprite-v8.png);
+    background-image: url(../images/mega/download-sprite-v9.png);
     background-position: -15px -2448px;
     position: absolute;
     left: 350px;
@@ -2549,7 +2553,7 @@ li.token-input-token-invite .input-close {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    background-image: url(../images/mega/download-sprite-v8.png);
+    background-image: url(../images/mega/download-sprite-v9.png);
     background-position: -1px -1178px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -2571,7 +2575,7 @@ li.token-input-token-invite .input-close {
     left: 0;
     position: absolute;
     margin: 0 0 0 0;
-    background-image: url(../images/mega/download-sprite-v8.png);
+    background-image: url(../images/mega/download-sprite-v9.png);
     background-position: 0 -2289px;
 }
 .megasync-icon.blink {

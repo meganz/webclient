@@ -1524,6 +1524,13 @@ var exportExpiry = {
                 });
             }, 300);
 
+            $('.copy-to-clipboard', $linksDialog).rebind('click.ctc', function() {
+                if (!$(this).hasClass('disabled')) {
+                    copyToClipboard(getContentsToClip(), toastTxt);
+                }
+                return false;
+            });
+
             centerDialog();
             return $linksDialog;
         });
@@ -1534,79 +1541,6 @@ var exportExpiry = {
 
         // Setup the copy to clipboard buttons
         $span.text(l[1990]);
-
-        // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
-        if (is_extension || M.execCommandUsable()) {
-            $('.copy-to-clipboard').rebind('click', function() {
-                if ($(this).hasClass('disabled')) {
-                    return false;
-                }
-                copyToClipboard(getContentsToClip(), toastTxt);
-                return false;
-            });
-        }
-        else if (flashIsEnabled()) {
-            $('.copy-to-clipboard').safeHTML(
-                '<span>' + htmlentities(l[1990]) + '</span>'
-              + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash" '
-              +     'width="100%" height="32" allowscriptaccess="always">'
-              +     '<param name="wmode" value="transparent" />'
-              +     '<param value="always" name="allowscriptaccess" />'
-              +     '<param value="all" name="allowNetworkin" />'
-              +     '<param name="FlashVars" value="buttonclick=1" />'
-              + '</object>');
-
-            $('.copy-to-clipboard').rebind('mouseover.copyToClipboard', function() {
-                var e = $('#clipboardswf1')[0];
-                if (e && e.setclipboardtext) {
-                    e.setclipboardtext(getContentsToClip());
-                }
-            });
-            $('.copy-to-clipboard').rebind('mousedown.copyToClipboard', function() {
-                showToast('clipboard', toastTxt);
-            });
-        }
-        else {
-            var uad = browserdetails(ua);
-
-            if (uad.icon === 'ie.png' && window.clipboardData) {
-                $('.copy-to-clipboard').rebind('click', function() {
-                    links = getContentsToClip();
-                    var mode = links.indexOf("\n") !== -1 ? 'Text' : 'URL';
-                    window.clipboardData.setData(mode, links);
-                    showToast('clipboard', toastTxt);
-                });
-            }
-            else {
-                if (window.ClipboardEvent) {
-                    $('.copy-to-clipboard').rebind('click', function() {
-
-                        window.onCopyEventHandler = function onCopyEvent(ev) {
-                            if (d) {
-                                console.log('onCopyEvent', arguments);
-                            }
-                            links = getContentsToClip();
-                            ev.clipboardData.setData('text/plain', links);
-                            if (links[0] !== '<') {
-                                ev.clipboardData.setData('text/html', links.split("\n").map(function(link) {
-                                    return '<a href="' + link + '"></a>';
-                                }).join("<br/>\n"));
-                            }
-                            ev.preventDefault();
-                            showToast('clipboard', toastTxt); // Done
-                        };
-                        document.addEventListener('copy', window.onCopyEventHandler, false);
-                        Soon(function() {
-                            $span.text(l[7663] + ' ' + (uad.os === 'Apple' ? 'command' : 'ctrl') + ' + C');
-                        });
-                    });
-                }
-                else {
-                    // Hide the clipboard buttons if not using the extension and Flash is disabled
-                    $('.copy-to-clipboard').addClass('hidden');
-                }
-            }
-        }
 
         // Click anywhere on export link dialog will hide export link dropdown
         $('.export-links-dialog').rebind('click', function(e) {
@@ -1655,19 +1589,21 @@ var exportExpiry = {
             $linkButtons.removeClass('selected');
             $this.addClass('selected');
 
-            // we have to deal with the extra '!' since the applied logic relies on CSS !!!
-            var $key = $('.file-link-info.key', $linksDialog);
-            var keyPart = $.trim($key.text());
-            if ($this.hasClass('link-handle-and-key')) {
-                if (keyPart[0] !== '!') {
-                    // Restore key part, containing sub file/folder handle(s), if any
-                    $key.text($key.data('key'));
+            $('.file-link-info-wrapper', $linksDialog).each(function() {
+                // we have to deal with the extra '!' since the applied logic relies on CSS !!!
+                var $key = $('.file-link-info.key', this);
+                var keyPart = $.trim($key.text());
+                if ($this.hasClass('link-handle-and-key')) {
+                    if (keyPart[0] !== '!') {
+                        // Restore key part, containing sub file/folder handle(s), if any
+                        $key.text($key.data('key'));
+                    }
                 }
-            }
-            else if (keyPart[0] === '!') {
-                // Remove initial ! separator and subsequent file/folder handle, if any
-                $key.text(keyPart.substr(1).split(/[?!]/)[0]);
-            }
+                else if (keyPart[0] === '!') {
+                    // Remove initial ! separator and subsequent file/folder handle, if any
+                    $key.text(keyPart.substr(1).split(/[?!]/)[0]);
+                }
+            });
 
             // Show the relevant 'Link without key', 'Decryption key' or 'Link with key'
             $('.export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);

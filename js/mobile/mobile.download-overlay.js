@@ -73,13 +73,13 @@ mobile.downloadOverlay = {
 
         // On Open in Browser button click/tap
         this.$overlay.find('.second.dl-browser').off('tap').on('tap', function() {
-       
+
             // Start the download
             mobile.downloadOverlay.startFileDownload(nodeHandle);
 
             // Prevent default anchor link behaviour
             return false;
-            
+
         });
     },
 
@@ -259,6 +259,9 @@ mobile.downloadOverlay = {
 
             // Destroy any streaming instance if running
             $(window).trigger('video-destroy');
+
+            // Abort the running download.
+            dlmanager.abort(null);
 
             // Hide overlay with download button options
             mobile.downloadOverlay.$overlay.addClass('hidden');

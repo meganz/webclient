@@ -1449,7 +1449,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         s.on('playing', function() {
             var events = {
                 'WebM': 99681, 'MPEG Audio': 99684, 'M4A ': 99687, 'Wave': 99688, 'Ogg': 99689,
-                'FLAC': 99712, 'Matroska': 99722
+                'FLAC': 99712, 'Matroska': 99722, 'qt  ': 99725
             };
             var eid = events[s.options.type] || 99668;
 
@@ -2654,6 +2654,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             case 'M4V ':
             case 'avc1': // JVT
             case 'f4v ': // Adobe Flash (MPEG-4 Part 12)
+            case 'qt  ':
                 if (videocodec === 'avc1') {
                     mime = 'video/mp4; codecs="avc1.640029';
 
@@ -3098,6 +3099,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             if (a && !localStorage.resetMediaAttributes) {
                 if (a.shortformat < 255) {
+                    return false;
+                }
+
+                if (this.u && this.u !== u_handle) {
+                    if (d) {
+                        console.debug('Ignoring media attribute state for non-own node...', this);
+                    }
                     return false;
                 }
 

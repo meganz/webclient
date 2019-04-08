@@ -533,7 +533,6 @@ function init_page() {
         && (page !== 'privacy')
         && (page !== 'gdpr')
         && (page !== 'takendown')
-        && (page !== 'general')
         && (page !== 'resellers')
         && (page !== 'security')
         && (page !== 'downloadapp')
@@ -1340,9 +1339,6 @@ function init_page() {
             parsepage(pages['terms']);
         }
     }
-    else if (page === 'general') {
-        parsepage(pages['general']);
-    }
     else if (page === 'security') {
         parsepage(pages['securitypractice']);
         securityPractice.init();
@@ -1358,7 +1354,7 @@ function init_page() {
 
         // Show message that the copyright takedown should be submitted in a desktop browser
         parsepage(pages['mobile']);
-        mobile.messageOverlay.show(l[621], l[19628], function() {
+        mobile.messageOverlay.show(l[621], l[19628]).always(function() {
 
             // On clicking OK in the dialog, go to the file manager if logged in, or start page if not
             loadSubPage(u_type === 3 ? 'fm' : 'start');
@@ -2170,7 +2166,7 @@ function topmenuUI() {
             var subpage;
             var subPages = [
                 'about', 'account', 'backup', 'blog', 'cmd', 'contact',
-                'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
+                'copyright', 'corporate', 'credits', 'doc', 'extensions',
                 'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp'
@@ -2430,7 +2426,12 @@ function topmenuUI() {
     // If the main Mega M logo in the header is clicked
     $('.top-head, .fm-main').find('.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
-            loadSubPage('start');
+            if (folderlink) {
+                M.openFolder(M.RootID, true);
+            }
+            else {
+                loadSubPage(typeof u_type !== 'undefined' && parseInt(u_type) > 2 ? 'fm' : 'start');
+            }
         }
     });
 

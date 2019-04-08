@@ -158,7 +158,7 @@
         if (!isFileDragAllowed()) {
             return;
         }
-        if (localStorage.d > 1) {
+        if (d > 1) {
             console.info('----- ENTER event :' + e.target.className);
         }
         touchedElement++;
@@ -174,9 +174,6 @@
             console.log('DragOver');
         }
         e.preventDefault();
-        if (!isFileDragAllowed()) {
-            return;
-        }
         e.stopPropagation();
     }
     var useMegaSync = -1;
@@ -294,10 +291,8 @@
             return;
         }
         e.stopPropagation();
-        if (!isFileDragAllowed()) {
-            return;
-        }
-        if (localStorage.d > 1) {
+        
+        if (d > 1) {
             console.warn('----- LEAVE event :' + e.target.className + '   ' + e.type);
         }
         touchedElement--;
@@ -524,6 +519,14 @@
                 }
             }
         }
+
+        // dran&drop overlay click handler, to allow closing if stuck
+        $('.drag-n-drop.overlay').off('click.dnd').on('click.dnd',
+            function dragDropLayoutClickHndler() {
+                $('.drag-n-drop.overlay').addClass('hidden');
+                $('body').removeClass('overlayed');
+            }
+        );
 
         var fnHandler = FileSelectHandler;
         var fnEnter = FileDragEnter;

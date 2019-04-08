@@ -914,7 +914,8 @@ var notify = {
 
         // Get data from initial c=50 notification fetch or action packet
         var action = (typeof notification.data.c !== 'undefined') ? notification.data.c : notification.data.u[0].c;
-        var userHandle = (Array.isArray(notification.userHandle)) ? notification.data.ou : notification.userHandle;
+        var userHandle = (Array.isArray(notification.userHandle)) ?
+            notification.data.ou || notification.userHandle[0].u : notification.userHandle;
         var className = '';
         var title = '';
 

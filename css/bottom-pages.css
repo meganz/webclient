@@ -2375,7 +2375,13 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
     margin: 32px 0 32px -30px;
     display: block;
 }
-.bottom-page.very-dark-blue-bg .white-text, .bottom-page .megaapp-linux  .radio-txt, .bottom-page .megaapp-linux  .megaapp-linux-info, .bottom-page .megaapp-linux  .megaapp-button-info {
+.bottom-page.very-dark-blue-bg .white-text,
+.bottom-page .megaapp-linux .radio-txt,
+.bottom-page .megaapp-linux .megaapp-linux-info,
+.bottom-page .megaapp-linux .megaapp-button-info,
+.bottom-page .megaapp-linux .megaext-container .radio-txt,
+.bottom-page .megaapp-linux .megaext-container .megaapp-linux-info,
+.bottom-page .megaapp-linux .megaext-container .megaapp-button-info {
 	color: #fff;
 }
 .very-dark-blue-bg .megaapp-button-info.disabled {
@@ -2386,6 +2392,9 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
 }
 
 /* Linux Dropdowns */
+.megaapp-linux .default-select-dropdown::before, .megaapp-linux .default-select-dropdown::after {
+    content: unset;
+}
 .bottom-page.radio-buttons {
     padding: 5px 0 0px 0;
 }
@@ -2396,14 +2405,14 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
 }
 .default-dropdown-item.icon {
     padding: 0 30px 0 34px;
-    background-image: url(../images/mega/download-sprite-v8.png);
+    background-image: url(../images/mega/download-sprite-v9.png);
     background-position: 0 64px;
     background-repeat: no-repeat;
 }
 .default-dropdown-item.centos {
     background-position: 10px -1921px;
 }
-.default-dropdown-item.debian {
+.default-dropdown-item.debian, .default-dropdown-item.raspbian {
     background-position: 10px -1982px;
 }
 .default-dropdown-item.elementary, .default-dropdown-item.elementaryosfreya {
@@ -2424,6 +2433,21 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
 .default-dropdown-item.ubuntu {
     background-position: 10px -2012px;
 }
+.default-dropdown-item.arch {
+    background-position: 12px -3633px;
+}
+.default-dropdown-item.nautilus {
+    background-position: 11px -3503px;
+}
+.default-dropdown-item.dolphin {
+    background-position: 11px -3535px;
+}
+.default-dropdown-item.nemo {
+    background-position: 11px -3601px;
+}
+.default-dropdown-item.thunar {
+    background-position: 11px -3567px;
+}
 .mobile .bottom-page.nav-buttons-bl.contrast, .mobile .bottom-page.top-dark-info.small {
     display: none;
 }
@@ -2441,7 +2465,7 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
     position: relative;
     margin: -40px auto 50px auto;
     text-align: left;
-    padding: 16px 22px 22px 22px;
+    padding: 24px;
     white-space: nowrap;
  }
 .bottom-page.linux .megaapp-linux {
@@ -2477,7 +2501,7 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
     font-size: 16px;
     line-height: 24px;
     color: #333333;
-    padding: 38px 0 0 0;
+    padding: 32px 0 0 0;
     font-family: 'LatoWebBold', 'source_sans_prosemibold';
 }
 .megaapp-linux-info span, .megaapp-linux-info .bottom-page-icon {
@@ -2518,7 +2542,7 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
     opacity: 0;
     z-index: 10;
 }
-.bottom-page-icon.white-info:hover .dark-notification-block {
+.bottom-page-icon.white-info:not(.disabled):hover .dark-notification-block {
     display: block;
     opacity: 1;
 }
@@ -2535,7 +2559,8 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
 .bottom-page .megaapp-linux-info:first-child {
     padding-top: 0;
 }
-.bottom-page .default-select.megaapp-dropdown {
+.bottom-page .default-select.megaapp-dropdown,
+.bottom-page .default-select.megaext-dropdown {
     width: 250px;
     float: none;
     margin: 40px 0 5px 0;
@@ -2546,7 +2571,8 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
     line-height: 24px;
     padding: 28px 0 62px 0;
 }
-.bottom-page .megaapp-linux .default-select.megaapp-dropdown {
+.bottom-page .megaapp-linux .default-select.megaapp-dropdown,
+.bottom-page .megaapp-linux .default-select.megaext-dropdown{
     margin: 13px 12px 0 0;
     display: inline-block;
     vertical-align: top;

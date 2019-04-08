@@ -27,7 +27,7 @@ body.pro:after {
     background-size: 27px auto;
 }
 .download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .mega-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .default-dropdown-item.icon, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .video .play-video-button {
-    background-image: url(../images/mega/download-sprite-v8@2x.png);
+    background-image: url(../images/mega/download-sprite-v9@2x.png);
     background-size: 257px auto;
 }
 .top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-clear-button, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .small-icon.membership, .dropdown-white-arrow, .dropdown-item.tick-item.active::before, .dropdown-item.do-sort.selected i, .fm-dialog:not(exceeded) .pro-plan-descr::after, .dropdown.close-button {

@@ -2473,7 +2473,7 @@ div.checkboxOn, div.checkboxOff {
 
 /* Hide the dropdown on the MegaSync page */
 .megaapp-linux {
-    display: none;
+    display: none !important;
 }
 
 /* Terms of Service page */
@@ -6926,7 +6926,7 @@ textarea.mobile.support-text-field {
     z-index: 10;
     cursor: pointer;
     background-color: #F52929;
-    background-image: url(../images/mega/download-sprite-v8.png);
+    background-image: url(../images/mega/download-sprite-v9.png);
     background-position: -31px -1141.5px;
     background-size: 128.5px auto;
 }

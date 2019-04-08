@@ -2822,3 +2822,20 @@ function blockChromePasswordManager() {
         });
     }
 }
+
+/**
+ * Attach the download file link handler
+ * Use in /sync and /cmd
+ * @param $links
+ */
+/*exported registerLinuxDownloadButton */
+function registerLinuxDownloadButton($links) {
+    'use strict';
+    $links.rebind('click', function() {
+        var $link = $(this);
+        if (!$link.hasClass('disabled') && $link.attr('data-link')) {
+            window.location = $link.attr('data-link');
+        }
+        return false;
+    });
+}

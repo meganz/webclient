@@ -22,7 +22,7 @@
                                     <i class="pages-nav nav-icon win bott-sprite"></i>
                                     <span class="pages-nav button-label transition"> Windows </span>
                                 </a>
-                                <a class="pages-nav nav-button transition linux clickurl" data-os="linux">
+                                <a class="pages-nav nav-button transition linux" data-os="linux">
                                     <i class="pages-nav nav-icon linux bott-sprite"></i>
                                     <span class="pages-nav button-label transition"> Linux </span>
                                 </a>
@@ -30,57 +30,59 @@
                             </div>
 
                             <div class="megaapp-linux hidden">
-                                <div class="megaapp-linux-info linux-txt">
-                                    Choose bit version:
-                                </div>
-                                <div class="bottom-page radio-buttons">
-                                    <div class="architecture-checkbox radioOff green transition">
-                                        <input type="radio" name="architecture" id="rad1" class="linux32 radioOff" value="32">
-                                    </div>
-                                    <label for="rad1" class="radio-txt 32">32 bit</label>
-                                    <div class="architecture-checkbox radioOn green transition">
-                                        <input type="radio" name="architecture" id="rad2" class="linux64 radioOn" checked="checked" value="64">
-                                    </div>
-                                    <label for="rad2" class="radio-txt 64">64 bit</label>
-                                    <div class="clear"></div>
-                                </div>
+
                                 <div class="megaapp-linux-info linux-txt">
                                     [$18777]
                                 </div>
                                 <div class="default-select megaapp-dropdown"> <span class="megaapp-linux-default">[$7086]</span>
                                     <div class="megaapp-dropdown-list default-select-dropdown hidden">
+                                        <div class="mega-list-arrow up hidden inactive"></div>
                                         <div class="megaapp-dropdown-scroll">
                                             <div class="megaapp-scr-pad"> </div>
                                         </div>
-                                        <div class="mega-list-arrow hidden"></div>
+                                        <div class="mega-list-arrow down hidden"></div>
                                     </div>
                                 </div>
-                                <div class="small-green-button disabled transition">
+                                <div class="small-green-button transition megaapp-linux-download disabled">
                                     [$58]
                                 </div>
-                                <div class="megaapp-linux-info linux-txt">
-                                    <span>MEGA desktop app extensions(optional) :</span>
-                                    <div class="bottom-page-icon white-info">
+                                <div class="bottom-page radio-buttons linux-bit-radio hidden">
+                                    <div class="architecture-checkbox radioOff green transition">
+                                        <input type="radio" name="architecture" id="rad1" class="linux32 radioOff" value="32">
+                                    </div>
+                                    <label for="rad1" class="radio-txt 32">[$20663]</label>
+
+                                    <div class="architecture-checkbox radioOn green transition">
+                                        <input type="radio" name="architecture" id="rad2" class="linux64 radioOn" checked="checked" value="64">
+                                    </div>
+                                    <label for="rad2" class="radio-txt 64">[$20662]</label>
+                                    <div class="clear"></div>
+                                </div>
+
+                                <!-- Extension -->
+                                <div class="megaapp-linux-info linux-txt megaext-header transition">
+                                    <span>[$20654]</span>
+                                    <div class="bottom-page-icon white-info megaext-info-hover disabled transition">
                                         <div class="dark-notification-block transition">
                                             <div class="dark-notification-arrow"></div>
-                                            <span>
-                                                Hover to show the explaination of what extension is
-                                            </span>
+                                            <span>[$20655]</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="default-select megaapp-dropdown"> <span class="megaapp-linux-default">Please select the extensions</span>
-                                    <div class="megaapp-dropdown-list default-select-dropdown hidden">
-                                        <div class="megaapp-dropdown-scroll">
-                                            <div class="megaapp-scr-pad"> </div>
+                                <div class="default-select megaext-dropdown disabled transition"> <span class="megaext-linux-default"></span>
+                                    <div class="megaext-dropdown-list default-select-dropdown hidden">
+                                        <div class="mega-list-arrow up hidden inactive"></div>
+                                        <div class="megaext-dropdown-scroll">
+                                            <div class="megaext-scr-pad"> </div>
                                         </div>
-                                        <div class="mega-list-arrow hidden"></div>
+                                        <div class="mega-list-arrow down hidden"></div>
                                     </div>
                                 </div>
-                                <div class="small-green-button transition disabled">
+                                <div class="small-green-button transition megaext-linux-download disabled">
                                     [$58]
                                 </div>
-                                <div class="megaapp-linux-arrow"></div>
+                                <div class="megaext-linux-arrow"></div>
+
                             </div>
                         </div>
                     </div>
@@ -310,59 +312,61 @@
                             </a>
                             <div class="clear"></div>
                         </div>
-                    
+
                     <div class="megaapp-linux hidden">
-                        <div class="megaapp-linux-info linux-txt">
-                            Choose bit version:
-                        </div>
-                        <div class="bottom-page radio-buttons">
-                            <div class="architecture-checkbox radioOff green transition">
-                                <input type="radio" name="architecture" id="rad1" class="linux32 radioOff" value="32">
-                            </div>
-                            <label for="rad1" class="radio-txt 32">32 bit</label>
-                            <div class="architecture-checkbox radioOn green transition">
-                                <input type="radio" name="architecture" id="rad2" class="linux64 radioOn" checked="checked" value="64">
-                            </div>
-                            <label for="rad2" class="radio-txt 64">64 bit</label>
-                            <div class="clear"></div>
-                        </div>
+
                         <div class="megaapp-linux-info linux-txt">
                             [$18777]
                         </div>
                         <div class="default-select megaapp-dropdown"> <span class="megaapp-linux-default">[$7086]</span>
                             <div class="megaapp-dropdown-list default-select-dropdown hidden">
+                                <div class="mega-list-arrow up hidden inactive"></div>
                                 <div class="megaapp-dropdown-scroll">
                                     <div class="megaapp-scr-pad"> </div>
                                 </div>
-                                <div class="mega-list-arrow hidden"></div>
+                                <div class="mega-list-arrow down hidden"></div>
                             </div>
                         </div>
-                        <div class="small-green-button disabled transition">
+                        <div class="small-green-button transition megaapp-linux-download disabled">
                             [$58]
                         </div>
-                        <div class="megaapp-linux-info linux-txt">
-                            <span>MEGA desktop app extensions(optional) :</span>
-                            <div class="bottom-page-icon white-info">
+                        <div class="bottom-page radio-buttons linux-bit-radio hidden">
+                            <div class="architecture-checkbox radioOff green transition">
+                                <input type="radio" name="architecture" id="rad5" class="linux32 radioOff" value="32">
+                            </div>
+                            <label for="rad5" class="radio-txt 32">[$20663]</label>
+
+                            <div class="architecture-checkbox radioOn green transition">
+                                <input type="radio" name="architecture" id="rad6" class="linux64 radioOn" checked="checked" value="64">
+                            </div>
+                            <label for="rad6" class="radio-txt 64">[$20662]</label>
+                            <div class="clear"></div>
+                        </div>
+
+                        <!-- Extension -->
+                        <div class="megaapp-linux-info linux-txt megaext-header transition">
+                            <span>[$20654]</span>
+                            <div class="bottom-page-icon white-info megaext-info-hover disabled">
                                 <div class="dark-notification-block transition">
                                     <div class="dark-notification-arrow"></div>
-                                    <span>
-                                        Hover to show the explaination of what extension is
-                                    </span>
+                                    <span>[$20655]</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="default-select megaapp-dropdown"> <span class="megaapp-linux-default">Please select the extensions</span>
-                            <div class="megaapp-dropdown-list default-select-dropdown hidden">
-                                <div class="megaapp-dropdown-scroll">
-                                    <div class="megaapp-scr-pad"> </div>
+                        <div class="default-select megaext-dropdown disabled transition"> <span class="megaext-linux-default">[$7086]</span>
+                            <div class="megaext-dropdown-list default-select-dropdown hidden">
+                                <div class="mega-list-arrow up hidden inactive"></div>
+                                <div class="megaext-dropdown-scroll">
+                                    <div class="megaext-scr-pad"> </div>
                                 </div>
-                                <div class="mega-list-arrow hidden"></div>
+                                <div class="mega-list-arrow down hidden"></div>
                             </div>
                         </div>
-                        <div class="small-green-button transition disabled">
+                        <div class="small-green-button transition megaext-linux-download disabled">
                             [$58]
                         </div>
-                        <div class="megaapp-linux-arrow"></div>
+                        <div class="megaext-linux-arrow"></div>
+
                     </div>
 
                     <div class="button default-huge-button download-megacmd inline hidden" data-link="/" style="display: none;">

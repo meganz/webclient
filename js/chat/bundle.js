@@ -6101,6 +6101,7 @@ React.makeElement = React['createElement'];
 
 	        var contacts = [];
 	        var frequentContacts = [];
+	        var extraClasses = "";
 
 	        var contactsSelected = [];
 
@@ -6421,12 +6422,14 @@ React.makeElement = React['createElement'];
 	                    React.makeElement("span", { dangerouslySetInnerHTML: { __html: l[19111] } })
 	                )
 	            );
+
+	            extraClasses += " no-contacts";
 	        }
 
 	        var displayStyle = self.state.searchValue && self.state.searchValue.length > 0 ? "" : "none";
 	        return React.makeElement(
 	            "div",
-	            { className: this.props.className + " " },
+	            { className: this.props.className + " " + extraClasses },
 	            multipleContacts,
 	            !self.props.readOnly && haveContacts ? React.makeElement(
 	                "div",
@@ -16814,7 +16817,8 @@ React.makeElement = React['createElement'];
 	        var haveContacts = self.state.haveContacts;
 	        var buttons = [];
 	        var allowNext = false;
-	        var failedToEnableChatlink = self.state.createChatLink === true && !self.state.groupName;
+	        var failedToEnableChatlink = self.state.failedToEnableChatlink && self.state.createChatLink === true && !self.state.groupName;
+
 	        if (self.state.keyRotation) {
 	            failedToEnableChatlink = false;
 	        }
@@ -16860,7 +16864,13 @@ React.makeElement = React['createElement'];
 	                "key": "done",
 	                "defaultClassname": "default-grey-button lato right",
 	                "className": !allowNext ? "disabled" : null,
-	                "onClick": self.onFinalizeClick
+	                "onClick": function onClick(e) {
+	                    if (self.state.createChatLink === true && !self.state.groupName) {
+	                        self.setState({ 'failedToEnableChatlink': true });
+	                    } else {
+	                        self.onFinalizeClick(e);
+	                    }
+	                }
 	            });
 
 	            if (!haveContacts || this.props.flowType === 2) {
@@ -16918,7 +16928,10 @@ React.makeElement = React['createElement'];
 	                            }
 	                        },
 	                        onChange: function onChange(e) {
-	                            self.setState({ 'groupName': e.target.value });
+	                            self.setState({
+	                                'groupName': e.target.value,
+	                                'failedToEnableChatlink': false
+	                            });
 	                        } })
 	                ),
 	                this.props.flowType !== 2 ? React.makeElement(

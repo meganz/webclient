@@ -71,7 +71,9 @@ var StartGroupChatWizard = React.createClass({
         var haveContacts = self.state.haveContacts;
         var buttons = [];
         var allowNext = false;
-        var failedToEnableChatlink = self.state.createChatLink === true && !self.state.groupName;
+        var failedToEnableChatlink = self.state.failedToEnableChatlink && self.state.createChatLink === true &&
+            !self.state.groupName;
+
         if (self.state.keyRotation) {
             failedToEnableChatlink = false;
         }
@@ -118,7 +120,14 @@ var StartGroupChatWizard = React.createClass({
                     "key": "done",
                     "defaultClassname": "default-grey-button lato right",
                     "className": !allowNext ? "disabled" : null,
-                    "onClick": self.onFinalizeClick
+                    "onClick": function(e) {
+                        if (self.state.createChatLink === true && !self.state.groupName) {
+                            self.setState({'failedToEnableChatlink': true});
+                        }
+                        else {
+                            self.onFinalizeClick(e);
+                        }
+                    }
                 });
 
             if (!haveContacts || this.props.flowType === 2) {
@@ -175,7 +184,10 @@ var StartGroupChatWizard = React.createClass({
                                }
                            }}
                            onChange={function(e) {
-                               self.setState({'groupName': e.target.value});
+                               self.setState({
+                                   'groupName': e.target.value,
+                                   'failedToEnableChatlink': false
+                               });
                     }} />
                 </div>
                 {this.props.flowType !== 2 ?

@@ -830,6 +830,7 @@ var ContactPickerWidget = React.createClass({
 
         var contacts = [];
         var frequentContacts = [];
+        var extraClasses = "";
 
         var contactsSelected = [];
 
@@ -1114,10 +1115,12 @@ var ContactPickerWidget = React.createClass({
                     <span dangerouslySetInnerHTML={{__html: l[19111]}}></span>
                 </div>
             </div>;
+
+            extraClasses += " no-contacts";
         }
 
         var displayStyle = (self.state.searchValue && self.state.searchValue.length > 0) ? "" : "none";
-        return <div className={this.props.className + " " }>
+        return <div className={this.props.className + " " + extraClasses}>
             {multipleContacts}
             {!self.props.readOnly && haveContacts ?
                 <div className={"contacts-search-header " + this.props.headerClasses}>

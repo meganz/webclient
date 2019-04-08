@@ -1524,8 +1524,8 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
     if (!u_attr || !u_attr.b || (u_attr.b.s !== -1 && u_attr.b.s !== 2)) {
         return;
     }
+    var msg = '';
     if (u_attr.b.s === -1) { // expired
-        var msg = '';
         if (u_attr.b.m) {
             msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
                 .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
@@ -1538,7 +1538,6 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
         this.showExpiredDialog(u_attr.b.m);
     }
     else if (u_attr.b.s === 2) { // grace
-        var msg = '';
         if (u_attr.b.m) {
             msg = l[20650].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
                 .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');

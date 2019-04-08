@@ -109,6 +109,9 @@ PresencedIntegration.cssClassToPresence = function(strPresence) {
 };
 
 PresencedIntegration.prototype.init = function() {
+    if (anonymouschat) {
+        return;
+    }
     var self = this;
     var megaChat = self.megaChat;
 
@@ -441,6 +444,10 @@ PresencedIntegration.prototype.eventuallyRemovePeer = function(user_handle, chat
 };
 
 PresencedIntegration.prototype.eventuallyAddPeer = function(user_handle, isNewChat) {
+    if (typeof(megaChat) !== 'undefined' && !megaChat.userPresence) {
+        return;
+    }
+
     // .c === 0 means "removed contact"
     if (!M.u[user_handle] || M.u[user_handle].c === 0) {
         return;

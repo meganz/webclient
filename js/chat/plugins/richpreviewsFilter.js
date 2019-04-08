@@ -45,6 +45,9 @@ var RichpreviewsFilter = function(megaChat) {
         });
 
     megaChat.rebind("onInit.richpreviewsFilter", function() {
+        if (anonymouschat === true) {
+            return;
+        }
         RichpreviewsFilter.syncFromAttribute();
         mBroadcaster.addListener("attr:rp", function() {
             RichpreviewsFilter.syncFromAttribute();

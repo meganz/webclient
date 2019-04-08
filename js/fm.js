@@ -509,7 +509,8 @@ function contactsInfoDialog(title, username, msg, close) {
 function setContactLink() {
     "use strict";
 
-    var $publicLink = $('.public-contact-link');
+    var $publicLink = $('.public-contact-link:visible');
+    // multiple link data may exists!
     var linkData = $publicLink.attr('data-lnk');
     var account = M.account || false;
     var contactPrefix = '';

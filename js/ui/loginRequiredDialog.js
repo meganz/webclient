@@ -36,6 +36,7 @@
                 $('.fm-dialog-title', this.$dialog)
                     .text(this.options.title);
 
+
                 // custom buttons, because of the styling
                 $('.fm-notification-info', this.$dialog)
                     .safeHTML('<p>@@</p>', options.textContent || l[7679]);
@@ -79,6 +80,23 @@
         var $dialog = $('.fm-dialog.pro-login-dialog');
         var $inputs = $dialog.find('.account.input-wrapper input');
         var $button = $dialog.find('.big-red-button');
+
+        if (typeof page !== 'undefined' && page === 'chat') {
+            $('.fm-dialog-subheading').html(
+                htmlentities(l[20635])
+                    .replace("[A]", "<a>")
+                    .replace("[/A]", "</a>")
+            );
+
+            $('.fm-dialog-subheading', $dialog).removeClass('hidden');
+            $('.fm-dialog-subheading > a', $dialog).rebind('click.doSignup', function() {
+                closeDialog();
+                megaChat.loginOrRegisterBeforeJoining(undefined, true, false);
+            });
+        }
+        else {
+            $('.fm-dialog-subheading', $dialog).addClass('hidden');
+        }
 
         M.safeShowDialog('pro-login-dialog', function() {
 
@@ -197,7 +215,7 @@
      */
     function completeLogin(result) {
         'use strict';
-    
+
         var $formWrapper = $('.pro-login-dialog form');
         var $emailContainer = $formWrapper.find('.account.input-wrapper.email');
         var $emailField = $emailContainer.find('input');

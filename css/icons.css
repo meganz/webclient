@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite_v8.png);
+    background-image: url(../images/mega/new-chat-sprite_v10.png);
     background-repeat: no-repeat;
     background-position: -2px -1446px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v8.png);
+    background-image: url(../images/mega/new-chat-sprite_v10.png);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -27,6 +27,9 @@
     -moz-opacity: 0.75;
     -khtml-opacity: 0.75;
     opacity: 0.75;
+}
+.link-button > span + .small-icon {
+    margin: 0 -3px 0 9px;
 }
 .link-button.red > .small-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -87,6 +90,11 @@
     width: 22px;
     height: 22px;
 }
+.tiny-icon.eye {
+    width: 14px;
+    height: 14px;
+    background-position: -50px -1197px;
+}
 .tiny-icon.blue-handset {
     background-position: -6px -2217px;
 }
@@ -123,6 +131,14 @@
 .tiny-icon.red-cross {
     background-position: -12px -1403px;
 }
+.tiny-icon.blue-key {
+    width: 16px;
+    background-position: -172px -1237px;
+}
+.tiny-icon.green-key {
+    width: 16px;
+    background-position: -212px -1237px;
+}
 .small-icon.audio-call {
     background-position: -4px -38px;
 }
@@ -140,6 +156,16 @@
 }
 .small-icon.rounded-stop {
     background-position: -4px -218px;
+}
+.small-icon.chat-lock {
+    background-position: -51px -4136px;
+    width: 24px;
+    height: 24px;
+    margin-left: -2px;
+    margin-right: 1px;
+}
+.chat-right-area .buttons-block .link-button i.small-icon.chat-lock {
+    margin-top: 5px;
 }
 .small-icon.grey-letter {
     background-position: -4px -2154px;
@@ -202,6 +228,9 @@
 }
 .small-icon.search-icon {
     background-position: -5px -1287px;
+}
+.small-icon.thin-search-icon {
+    background-position: -50px -774px;
 }
 .small-icon.rounded-grey-down-arrow {
     background-position: -3px -2931px;
@@ -281,11 +310,34 @@
     background-position: -50px -736px;
     width: 21px;
 }
+.small-icon.conversation-with-plus {
+    background-position: -170px -934px;
+    width: 22px;
+    height: 21px;
+    margin: 5px 0px 0px 5px !important;
+}
+.small-icon.mid-green-tick {
+    background-position: -150px -1017px;
+}
+.small-icon.grey-right-arrow {
+    background-position: -121px -1017px;
+}
+.small-icon.grey-left-arrow {
+    background-position: -121px -1017px;
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
 .small-icon.arrow-in-square {
     background-position: -170px -775px;
 }
 .small-icon.arrow-in-square.active {
     background-position: -50px -855px;
+}
+.tiny-icon.small-cross {
+    background-position: -184px -1019px;
 }
 .tiny-icon.right-arrow {
     background-position: -205px -898px;
@@ -318,6 +370,11 @@
 .small-icon.tiny-down-arrow.flipped {
     background-position: -204px -292px;
 }
+/*Icons for private chat */
+.small-icon.chatlock {
+    background-position: -54px -262px;
+}
+
 /*  end of Icons for chat archived */
 
 .dropdown-item .small-icon.rounded-grey-plus {
@@ -447,7 +504,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v8.png);
+    background-image: url(../images/mega/new-chat-sprite_v10.png);
     background-repeat: no-repeat;
 }
 .call-icon.handset-with-stop {
@@ -840,6 +897,41 @@
 .huge-icon.achievement {
     background-image: url(../images/mega/big-achievements.png);
 }
+.huge-icon.group-chat {
+    width: 96px;
+    height: 96px;
+    background-position: -50px -1074px;
+}
+.big-icon.group-chat {
+    width: 48px;
+    height: 48px;
+    background-position: -176px -1075px;
+}
+.huge-icon.lock {
+    width: 112px;
+    height: 112px;
+    background-position: 4px -4012px;
+}
+.huge-icon.conversations {
+    width: 112px;
+    height: 112px;
+    background-position: -115px -4012px;
+}
+.huge-icon.email-with-chat {
+    width: 122px;
+    height: 122px;
+    background-position: 0px -4182px;
+}
+.huge-icon.email-with-conversations {
+    width: 122px;
+    height: 122px;
+    background-position: 0px -4312px;
+}
+.huge-icon.conversations-with-at-sign {
+    width: 111px;
+    height: 106px;
+    background-position: 0px -4455px;
+}
 .small-icon.fm-s, .big-icon.fm-s {
     background-image: url(../images/mega/fm-main-sprite_v7.png);
 }
@@ -1185,6 +1277,9 @@
 }
 .small-icon.icons-sprite.writing-pencil {
     background-position: -201px -226px;
+}
+.small-icon.icons-sprite.right-white-arrow {
+    background-position: -33px -1396px;
 }
 .dropdown-item:hover .small-icon.icons-sprite.grey-plus {
     background-position: -240px -391px;
@@ -1536,7 +1631,6 @@
 .small-icon.icons-sprite.small-cross {
     background-position: 1px -1316px;
 }
-
 i.icons-sprite, i.small-icon.icons-sprite {
     background-image: url(../images/mega/icons-sprite_v26.png);
 }
@@ -1720,6 +1814,16 @@ i.account-icon.select-arrow {
 .small-icon.grey-cloud.colorized {
     background-position: -50px -934px;
     width: 22px;
+}
+.small-icon.yellow-key.colorized {
+    background-position: -89px -1237px;
+    width: 22px;
+}
+.small-icon.blue-chain.colorized {
+    background-position: -50px -1236px;
+}
+.link-button.light i.small-icon.yellow-key.colorized {
+    margin-left: 5px;
 }
 .dropdown-item.link-button.light i.small-icon.grey-cloud.colorized {
     background-position: -50px -934px;

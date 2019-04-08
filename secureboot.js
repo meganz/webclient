@@ -95,7 +95,9 @@ function getSitePath() {
         }
     }
 
-    return document.location.pathname;
+    return (document.location.pathname.substr(0, 6) === '/chat/') ?
+            document.location.pathname + '#' + hash :
+            document.location.pathname;
 }
 
 // remove dangling characters from the pathname/hash
@@ -623,10 +625,13 @@ if (!browserUpdate && is_extension)
 
 var page;
 var locSearch = location.search;
-
 if (hashLogic) {
     // legacy support:
     page = getCleanSitePath(document.location.hash);
+}
+else if (getSitePath().substr(0, 6) === '/chat/') {
+    page = getSitePath().substring(1).split("#")[0] + "#" + document.location.hash.split("#")[1];
+    history.replaceState({subpage: page}, "", '/' + page);
 }
 else if ((page = isPublicLink(document.location.hash))) {
     // folder or file link: always keep the hash URL to ensure that keys remain client side
@@ -2219,6 +2224,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.decryption-password-overlay.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.delete-overlay.js', n: 'mobile_delete_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.download-overlay.js', n: 'mobile_download_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.chatlink.js', n: 'mobile_chatlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.language-menu.js', n: 'mobile_language_menu_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.link-overlay.js', n: 'mobile_link_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});

@@ -511,7 +511,7 @@ dashboardUI.updateChatWidget = function() {
 
     if (!megaChatIsDisabled && typeof megaChat !== 'undefined') {
         megaChat.chats.forEach(function(chatRoom) {
-            if (chatRoom.type === "group") {
+            if (chatRoom.type === "group" || chatRoom.type === "public") {
                 groupChats++;
             }
             else {

@@ -651,6 +651,12 @@ var dlmanager = {
             g: 1,
             ssl: use_ssl
         };
+
+        // IF this is an anonymous chat OR a chat that I'm not a part of
+        if (M.chat && megaChatIsReady) {
+            megaChat.eventuallyAddDldTicketToReq(req);
+        }
+
         var ctx = {
             object: dl,
             next: callback,

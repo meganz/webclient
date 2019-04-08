@@ -665,6 +665,9 @@ FMDB.prototype.strdecrypt = function fmdb_strdecrypt(ab) {
     for (var i = s.length; i--; ) if (s.charCodeAt(i)) return s.substr(0, i+1);
 };
 
+// TODO: @lp/@diego we need to move this to some other place...
+FMDB._mcfCache = {};
+
 // remove fields that are duplicated in or can be inferred from the index to reduce database size
 FMDB.prototype.stripnode = Object.freeze({
     f : function(f) {
@@ -731,6 +734,40 @@ FMDB.prototype.stripnode = Object.freeze({
 
     ua : function(ua, index) {
         delete ua.k;
+    },
+    mcf: function(mcfResponse) {
+        var newMcf = {};
+        // mcfResponse may contain 'undefined' values, which should NOT be set, otherwise they may replace the mcfCache
+        var keys = [
+            'id',
+            'cs',
+            'g',
+            'u',
+            'ts',
+            'ct',
+            'ck',
+            'f',
+            'm',
+        ];
+        for (var idx in keys) {
+            var k = keys[idx];
+            if (typeof mcfResponse[k] !== 'undefined') {
+                newMcf[k] = mcfResponse[k];
+            }
+        }
+
+        var t = {
+            'ou': mcfResponse.ou,
+            'n': mcfResponse.n,
+            'url': mcfResponse.url
+        };
+        delete mcfResponse.ou;
+        delete mcfResponse.url;
+        delete mcfResponse.n;
+
+        FMDB._mcfCache[newMcf.id] = Object.assign({}, FMDB._mcfCache[mcfResponse.id], newMcf);
+        Object.assign(mcfResponse, FMDB._mcfCache[newMcf.id]);
+        return t;
     }
 });
 
@@ -775,6 +812,11 @@ FMDB.prototype.restorenode = Object.freeze({
 
     mk : function(mk, index) {
         mk.h = index.h;
+    },
+
+    mcf: function(mcf, index) {
+        // fill cache.
+        FMDB._mcfCache[mcf.id] = mcf;
     }
 });
 

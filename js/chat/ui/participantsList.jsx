@@ -89,7 +89,7 @@ var ParticipantsList = React.createClass({
         }
         var contactHandle;
         var contact;
-        var contacts = room.getParticipantsExceptMe();
+        var contacts = room.stateIsLeftOrLeaving() ? [] : room.getParticipantsExceptMe();
         if (contacts && contacts.length > 0) {
             contactHandle = contacts[0];
             contact = M.u[contactHandle];
@@ -162,20 +162,11 @@ var ParticipantsListInner = React.createClass({
             contact = {};
         }
 
-        var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
+        var myPresence = anonymouschat ? 'offline' : room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
 
         var contactsList = [];
 
 
-        contacts = room.type === "group" ?
-            (
-                room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) :
-                    room.getParticipantsExceptMe()
-            )   :
-            room.getParticipantsExceptMe();
-        if (contacts.indexOf(u_handle) >= 0) {
-            array.remove(contacts, u_handle, true);
-        }
         var firstVisibleUserNum = Math.floor(self.props.scrollPositionY/self.props.contactCardHeight);
         var visibleUsers = Math.ceil(self.props.scrollHeight/self.props.contactCardHeight);
         var lastVisibleUserNum = firstVisibleUserNum + visibleUsers;
@@ -187,7 +178,8 @@ var ParticipantsListInner = React.createClass({
         // slice and only add a specific number of contacts to the list
 
 
-        if (room.type === "group" && !room.stateIsLeftOrLeaving()) {
+        if ((room.type === "group" || room.type === "public") && !room.stateIsLeftOrLeaving()
+            && room.members.hasOwnProperty(u_handle)) {
             contacts.unshift(
                 u_handle
             );
@@ -197,6 +189,7 @@ var ParticipantsListInner = React.createClass({
         var i = 0;
         contacts.forEach(function(contactHash) {
             var contact = M.u[contactHash];
+
             if (contact) {
                 if (i < firstVisibleUserNum || i > lastVisibleUserNum) {
                     i++;
@@ -207,7 +200,8 @@ var ParticipantsListInner = React.createClass({
 
                 var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
 
-                if (room.type === "group" && room.members) {
+                if ((room.type === "public") ||
+                    (room.type === "group" && room.members && myPresence !== 'offline')) {
                     var dropdownRemoveButton = [];
 
                     if (room.iAmOperator() && contactHash !== u_handle) {
@@ -309,9 +303,10 @@ var ParticipantsListInner = React.createClass({
                         dropdownPositionMy="left top"
                         dropdownPositionAt="left top"
                         dropdowns={dropdowns}
-                        dropdownDisabled={contactHash === u_handle}
+                        dropdownDisabled={contactHash === u_handle || anonymouschat}
                         dropdownButtonClasses={
-                            room.type == "group" ? "button icon-dropdown" : "default-white-button tiny-button"
+                            (room.type == "group" || room.type === "public") &&
+                            myPresence !== 'offline' ? "button icon-dropdown" : "button icon-dropdown"
                         }
                         dropdownRemoveButton={dropdownRemoveButton}
                         dropdownIconClasses={dropdownIconClasses}

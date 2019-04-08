@@ -450,7 +450,7 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
         };
     }
     else {
-        if (!self._puRequest || self._puRequest.state() !== "pending") {
+        if ((!self._puRequest || self._puRequest.state() !== "pending") && !anonymouschat) {
             self.connectionRetryManager.pause();
             self._puRequest = asyncApiReq({'a': 'pu'})
                 .always(function() {

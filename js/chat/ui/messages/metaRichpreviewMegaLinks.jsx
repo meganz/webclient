@@ -31,7 +31,10 @@ var MetaRichpreviewMegaLinks = React.createClass({
                 if (megaLinkInfo.startedLoading() === false) {
                     megaLinkInfo.getInfo()
                         .always(function() {
-                            message.trackDataChange();
+                            Soon(function() {
+                                message.trackDataChange();
+                                self.safeForceUpdate();
+                            });
                         });
                 }
 
@@ -42,13 +45,13 @@ var MetaRichpreviewMegaLinks = React.createClass({
                 var is_icon = megaLinkInfo.is_dir ?
                     true : !(megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url);
 
-                if (!megaLinkInfo.is_dir) {
+                if(megaLinkInfo.is_chatlink) {
+                    desc = l[8876] + ": " + megaLinkInfo.info['ncm'];
+                }
+                else if (!megaLinkInfo.is_dir) {
                     desc = bytesToSize(megaLinkInfo.info.size);
                 }
                 else {
-                    if (!megaLinkInfo.info || !megaLinkInfo.info.s) {
-                        debugger;
-                    }
                     desc = <span>
                         {fm_contains(megaLinkInfo.info.s[1], megaLinkInfo.info.s[2] - 1)}<br/>
                         {bytesToSize(megaLinkInfo.info.size)}
@@ -56,7 +59,8 @@ var MetaRichpreviewMegaLinks = React.createClass({
                 }
 
                 previewContainer = <div className={"message richpreview body " + (
-                    is_icon ? "have-icon" : "no-icon"
+                    (is_icon ? "have-icon" : "no-icon") + " " +
+                    (megaLinkInfo.is_chatlink ? "is-chat" : "")
                 )}>
                     {megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url ?
                         <div className="message richpreview img-wrapper">
@@ -64,16 +68,24 @@ var MetaRichpreviewMegaLinks = React.createClass({
                                  style={{"backgroundImage": 'url(' + megaLinkInfo.info.preview_url + ')'}}></div>
                         </div> :
                         <div className="message richpreview img-wrapper">
-                            <div className={"message richpreview icon block-view-file-type " + (
-                                megaLinkInfo.is_dir ?
-                                    "folder" :
-                                    fileIcon(megaLinkInfo.info)
-                            )}></div>
+                            {megaLinkInfo.is_chatlink ?
+                                <i className="huge-icon conversations"></i>
+                                :
+                                <div className={"message richpreview icon block-view-file-type " + (
+                                    megaLinkInfo.is_dir ?
+                                        "folder" :
+                                        fileIcon(megaLinkInfo.info)
+                                )}></div>
+                            }
                         </div>
                         }
                     <div className="message richpreview inner-wrapper">
                         <div className="message richpreview data-title">
-                            <span className="message richpreview title">{megaLinkInfo.info.name}</span>
+                            <span className="message richpreview title">
+                                <utils.EmojiFormattedContent>
+                                    {megaLinkInfo.info.name || megaLinkInfo.info.topic || ""}
+                                </utils.EmojiFormattedContent>
+                            </span>
                         </div>
                         <div className="message richpreview desc">{desc}</div>
                         <div className="message richpreview url-container">

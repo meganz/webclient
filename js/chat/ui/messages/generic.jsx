@@ -779,7 +779,7 @@ var GenericConversationMessage = React.createClass({
                                         icon="conversations"
                                         label={__(l[8632])}
                                         onClick={() => {
-                                            loadSubPage("fm/chat/" + contact.u);
+                                            loadSubPage("fm/chat/p/" + contact.u);
                                         }}
                                     />
                                     {deleteButtonOptional ? <hr /> : null}
@@ -1186,7 +1186,10 @@ var GenericConversationMessage = React.createClass({
         // if this is an inline dialog
         else if (message.type) {
             var avatarsListing = [];
-            textMessage = getMessageString(message.type, message.chatRoom.type === "group");
+            textMessage = getMessageString(
+                message.type,
+                message.chatRoom.type === "group" || message.chatRoom.type === "public"
+            );
 
             if (!textMessage) {
                 console.error("Message with type: ", message.type, " - no text string defined. Message: ", message);
@@ -1293,7 +1296,7 @@ var GenericConversationMessage = React.createClass({
             }
 
             if (
-                message.chatRoom.type === "group"
+                message.chatRoom.type === "group" || message.chatRoom.type === "public"
             ) {
                 var participantNames = [];
                 (message.meta && message.meta.participants || []).forEach(function(handle) {

@@ -83,9 +83,9 @@ var accountinputs = {
 
         $('.radio-txt, .checkbox', $formWrapper).rebind('click.commonevent', function(e) {
             var $wrapper = $(this).parent().find('.checkbox');
-    
+
             $wrapper.parent().removeClass('focused');
-    
+
             if ($wrapper.hasClass('checkboxOn')) {
                 $wrapper.addClass('checkboxOff').removeClass('checkboxOn');
             }
@@ -313,6 +313,11 @@ var tooltiplogin = {
 
             if (login_next) {
                 loadSubPage(login_next);
+            }
+            else if (M && M.currentdirid && M.currentdirid.substr(0, 5) === "chat/") {
+                // is a chat link
+                window.location.reload();
+                login_next = false;
             }
             else if (page !== 'login') {
                 page = getSitePath().substr(1);

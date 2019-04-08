@@ -216,7 +216,7 @@
         var chatRoom = this.megaChat.getChatById(base64urlencode(chatId));
         assert(chatRoom, "RtcGlobalEventHandles.isGroupChat: chatroom with specified chatid not found,",
             "this should never happen");
-        return (chatRoom.type === "group");
+        return (chatRoom.type === "group" || chatRoom.type === "public");
     };
     RtcGlobalEventHandler.prototype.get1on1RoomPeer = function(chatid) {
         chatid = base64urlencode(chatid);

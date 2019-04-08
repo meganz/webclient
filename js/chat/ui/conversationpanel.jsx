@@ -27,6 +27,11 @@ var TopicChange = require('./messages/topicChange.jsx').TopicChange;
 var SharedFilesAccordionPanel = require('./sharedFilesAccordionPanel.jsx').SharedFilesAccordionPanel;
 var IncomingSharesAccordionPanel = require('./incomingSharesAccordionPanel.jsx').IncomingSharesAccordionPanel;
 
+var CloseOpenModeMessage = require('./messages/closeOpenMode.jsx').CloseOpenModeMessage;
+var ChatHandleMessage = require('./messages/chatHandle.jsx').ChatHandleMessage;
+var ChatlinkDialog = require('./../ui/chatlinkDialog.jsx').ChatlinkDialog;
+
+
 var ENABLE_GROUP_CALLING_FLAG = true;
 
 var ConversationAudioVideoPanel = require('./conversationaudiovideopanel.jsx').ConversationAudioVideoPanel;
@@ -117,8 +122,6 @@ var ConversationRightArea = React.createClass({
             contact = {};
         }
 
-
-
         // room is not active, don't waste DOM nodes, CPU and Memory (and save some avatar loading calls...)
         if (!room.isCurrentlyActive && !self._wasAppendedEvenOnce) {
             return null;
@@ -136,7 +139,7 @@ var ConversationRightArea = React.createClass({
 
 
         var disableStartCalls = disabledCalls || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) || (
-            room.type === "group" && !ENABLE_GROUP_CALLING_FLAG
+            (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG
         );
 
         var startAudioCallButtonClass = "";
@@ -173,7 +176,7 @@ var ConversationRightArea = React.createClass({
                         }
                     }}>
             <i className="small-icon colorized horizontal-red-handset"></i>
-            {room.type === "group" ? "Leave call" : l[5884]}
+                        {room.type === "group" || room.type === "public" ? "Leave call" : l[5884]}
         </div>;
 
 
@@ -188,8 +191,7 @@ var ConversationRightArea = React.createClass({
 
 
 
-        if (room.type === "group") {
-            // if its a 1on1
+        if (room.type === "group" || room.type === "public") {
             if (
                 room.callParticipants &&
                 Object.keys(room.callParticipants).length > 0 &&
@@ -204,7 +206,7 @@ var ConversationRightArea = React.createClass({
         }
 
 
-        if (room.type === "group" && !ENABLE_GROUP_CALLING_FLAG) {
+        if ((room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG) {
             startAudioCallButton = startVideoCallButton = null;
         }
 
@@ -213,9 +215,9 @@ var ConversationRightArea = React.createClass({
         var isReadOnlyElement = null;
 
         if (room.isReadOnly()) {
-            // isReadOnlyElement = <span className="center">(read only chat)</span>;
+            isReadOnlyElement = <center className="center" style={{margin: "6px"}}>(read only chat)</center>;
         }
-        var excludedParticipants = room.type === "group" ?
+        var excludedParticipants = room.type === "group" || room.type === "public" ?
             (
                 room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) :
                     room.getParticipants()
@@ -238,7 +240,6 @@ var ConversationRightArea = React.createClass({
             dontShowTruncateButton = true;
         }
 
-        var membersHeader = null;
 
         // console.error(
         //     self.findDOMNode(),
@@ -255,7 +256,7 @@ var ConversationRightArea = React.createClass({
             );
 
         var participantsList = null;
-        if (room.type === "group") {
+        if (room.type === "group" || room.type === "public") {
             participantsList = <div>
                 {isReadOnlyElement}
                 <ParticipantsList
@@ -292,6 +293,8 @@ var ConversationRightArea = React.createClass({
                         onSelectDone={this.props.onAddParticipantSelected}
                         positionMy="center top"
                         positionAt="left bottom"
+                        arrowHeight={-32}
+                        selectFooter={true}
                     />
                 </ButtonsUI.Button>
             </div>;
@@ -318,18 +321,25 @@ var ConversationRightArea = React.createClass({
                                 }
                             }, 250);
                         }}
-                        expandedPanel={room.type === "group" ? "participants" : "options"}>
+                        expandedPanel={room.type === "group" || room.type === "public" ? "participants" : "options"}>
                         {participantsList ? <AccordionPanel className="small-pad" title={l[8876]} key="participants">
                             {participantsList}
                         </AccordionPanel> : null}
 
+                        {room.type === "public" ? <div className="accordion-text observers">
+                            {l[20466]}
+                            <span className="observers-count">
+                                <i className="tiny-icon eye"></i>
+                                {self.props.chatRoom.observers}
+                            </span>
+                        </div> : <div></div>}
                         <AccordionPanel className="have-animation buttons" title={l[7537]} key="options">
                             <div>
                             {startAudioCallButton}
                             {startVideoCallButton}
                             {AVseperator}
                             {
-                                room.type == "group" ?
+                                room.type == "group" || room.type == "public" ?
                                 (
                                     <div className={renameButtonClass}
                                          onClick={(e) => {
@@ -341,9 +351,43 @@ var ConversationRightArea = React.createClass({
                                              }
                                     }}>
                                         <i className="small-icon colorized writing-pen"></i>
-                                        {__(l[9080])}
+                                        {l[9080]}
                                     </div>
                                 ) : null
+                            }
+                            {
+                                (!room.isReadOnly() && (room.type === "public")) ?
+                                    (
+                                        <div className="link-button light"
+                                             onClick={(e) => {
+                                                 if ($(e.target).closest('.disabled').length > 0) {
+                                                     return false;
+                                                 }
+
+                                                 self.props.onGetManageChatLinkClicked();
+                                             }}>
+                                            <i className="small-icon blue-chain colorized"></i>
+                                            {l[20481]}
+                                        </div>
+                                    ) : null
+                            }
+                            {
+                                !room.membersSetFromApi.members.hasOwnProperty(u_handle) &&
+                                room.type === "public" && !anonymouschat &&
+                                room.publicChatHandle && room.publicChatKey ?
+                                    (
+                                        <div className="link-button light"
+                                             onClick={(e) => {
+                                                 if ($(e.target).closest('.disabled').length > 0) {
+                                                     return false;
+                                                 }
+
+                                                 self.props.onJoinViaPublicLinkClicked();
+                                             }}>
+                                            <i className="small-icon writing-pen"></i>
+                                            {l[20597]}
+                                        </div>
+                                    ) : null
                             }
 
                             <ButtonsUI.Button
@@ -382,74 +426,104 @@ var ConversationRightArea = React.createClass({
 
                             {endCallButton}
 
+                            <div className={"link-button light " + (
+                                dontShowTruncateButton || !room.members.hasOwnProperty(u_handle) ? "disabled" : "")
+                            }
+                                 onClick={(e) => {
+                                     if ($(e.target).closest('.disabled').length > 0) {
+                                         return false;
+                                     }
+                                     if (self.props.onTruncateClicked) {
+                                         self.props.onTruncateClicked();
+                                     }
+                                 }}>
+                                <i className="small-icon colorized clear-arrow"></i>
+                                {__(l[8871])}
+                            </div>
+
                             {
-                                <div className={"link-button light " + (dontShowTruncateButton ? "disabled" : "")}
+                                (room.iAmOperator() && (room.type === "public")) ?
+                                    (
+                                        <div className="chat-enable-key-rotation-paragraph">
+                                            <div className="chat-button-seperator"></div>
+                                            <div className="link-button light"
+                                                 onClick={(e) => {
+                                                     if ($(e.target).closest('.disabled').length > 0) {
+                                                         return false;
+                                                     }
+                                                     self.props.onMakePrivateClicked();
+                                                 }}>
+                                                <i className="small-icon yellow-key colorized"></i>
+                                                {l[20623]}
+                                            </div>
+                                            <p>
+                                                {l[20454]}
+                                            </p>
+                                        </div>
+                                    ) : null
+                            }
+
+                            <div className="chat-button-seperator"></div>
+                            {
+                                <div className={"link-button light" + (
+                                    !(room.members.hasOwnProperty(u_handle) && !anonymouschat) ? " disabled" : ""
+                                )}
                                      onClick={(e) => {
                                          if ($(e.target).closest('.disabled').length > 0) {
                                              return false;
                                          }
-                                         if (self.props.onTruncateClicked) {
-                                            self.props.onTruncateClicked();
+                                         if (room.isArchived()) {
+                                             if (self.props.onUnarchiveClicked) {
+                                                 self.props.onUnarchiveClicked();
+                                             }
+                                         } else {
+                                             if (self.props.onArchiveClicked) {
+                                                 self.props.onArchiveClicked();
+                                             }
                                          }
-                                }}>
-                                    <i className="small-icon colorized clear-arrow"></i>
-                                    {__(l[8871])}
-                                </div>
-                            }
-                            {<div className="chat-button-seperator"></div>}
-                            {
-                                <div className={"link-button light"}
-                                     onClick={(e) => {
-                                        if ($(e.target).closest('.disabled').length > 0) {
-                                            return false;
-                                        }
-                                        if (room.isArchived()) {
-                                            if (self.props.onUnarchiveClicked) {
-                                               self.props.onUnarchiveClicked();
-                                            }
-                                        } else {
-                                            if (self.props.onArchiveClicked) {
-                                               self.props.onArchiveClicked();
-                                            }
-                                        }
-                                }}>
-                                    <i className={"small-icon colorized " +  ((room.isArchived()) ? "unarchive" :
-                                        "archive")}></i>
+                                     }}>
+                                    <i className={"small-icon colorized " +  ((room.isArchived()) ?
+                                        "unarchive" : "archive")}></i>
                                     {room.isArchived() ? __(l[19065]) : __(l[16689])}
                                 </div>
                             }
-                            { room.type === "group" ? (
+                            {
+                                room.type !== "private" ? (
                                 <div className={"link-button light red " + (
-                                        room.stateIsLeftOrLeaving() ? "disabled" : ""
+                                        (room.stateIsLeftOrLeaving() || !(
+                                            (
+                                                room.type !== "private" &&
+                                                room.membersSetFromApi.members.hasOwnProperty(u_handle)
+                                            ) && !anonymouschat
+                                        )) ? "disabled" : ""
                                     )}
-                                     onClick={(e) => {
+                                    onClick={(e) => {
                                          if ($(e.target).closest('.disabled').length > 0) {
                                              return false;
                                          }
                                          if (self.props.onLeaveClicked) {
-                                            self.props.onLeaveClicked();
+                                             self.props.onLeaveClicked();
                                          }
-                                }}>
-                                    <i className="small-icon colorized rounded-stop"></i>
+                                     }}>
+                                    <i className="small-icon rounded-stop colorized"></i>
                                     {l[8633]}
-                                </div>
-                            ) : null
+                                </div>) : null
                             }
-                            { room._closing !== true && room.type === "group" && room.stateIsLeftOrLeaving() ? (
+                            { room._closing !== true && (room.type === "group" || room.type === "public") &&
+                            room.stateIsLeftOrLeaving() && !anonymouschat ? (
                                 <div className="link-button light red" onClick={() => {
                                     if (self.props.onCloseClicked) {
                                         self.props.onCloseClicked();
                                     }
                                 }}>
-                                    <i className="small-icon colorized rounded-stop"></i>
+                                    <i className="small-icon rounded-stop colorized"></i>
                                     {l[148]}
                                 </div>
                             ) : null
-                            }
+                        }
                             </div>
                         </AccordionPanel>
-                        <SharedFilesAccordionPanel key="sharedFiles" title={l[19796] ? l[19796] : "Shared Files"}
-                                                   chatRoom={room}
+                        <SharedFilesAccordionPanel key="sharedFiles" title={l[19796] ? l[19796] : "Shared Files"} chatRoom={room}
                                                    sharedFiles={room.messagesBuff.sharedFiles} />
                         {room.type === "private" ?
                             <IncomingSharesAccordionPanel key="incomingShares" title={l[5542]} chatRoom={room} /> :
@@ -481,6 +555,7 @@ var ConversationPanel = React.createClass({
             sendContactDialog: false,
             confirmDeleteDialog: false,
             pasteImageConfirmDialog: false,
+            nonLoggedInJoinChatDialog: anonymouschat,
             messageToBeDeleted: null,
             editing: false
         };
@@ -539,6 +614,31 @@ var ConversationPanel = React.createClass({
         self.props.chatRoom.rebind('openSendFilesDialog.cpanel', function(e) {
             self.setState({'attachCloudDialog': true});
         });
+        self.props.chatRoom.rebind('showGetChatLinkDialog.ui', function (e, eventData) {
+            createTimeoutPromise(function() {
+                return self.props.chatRoom.topic && self.props.chatRoom.state === ChatRoom.STATE.READY;
+            }, 350, 15000)
+                .always(function() {
+                    if (self.props.chatRoom.isActive) {
+                        self.setState({
+                            'chatLinkDialog': true
+                        });
+                    }
+                    else {
+                        // not visible anymore, proceed w/ generating a link silently.
+                        self.props.chatRoom.updatePublicHandle();
+                    }
+                });
+        });
+
+        if (self.props.chatRoom.type === "private") {
+            var otherContactHash = self.props.chatRoom.getParticipantsExceptMe()[0];
+            if (M.u[otherContactHash]) {
+                M.u[otherContactHash].addChangeListener(function() {
+                    self.safeForceUpdate();
+                })
+            }
+        }
 
         self.eventuallyInit();
     },
@@ -713,7 +813,10 @@ var ConversationPanel = React.createClass({
             $('.chat-content-block', $container).outerHeight() -
             ($('.chat-topic-block', $container).outerHeight() || 0) -
             ($('.call-block', $container).outerHeight() || 0) -
-            $('.chat-textarea-block', $container).outerHeight()
+            (
+                (anonymouschat) ? $('.join-chat-block', $container).outerHeight() :
+                $('.chat-textarea-block', $container).outerHeight()
+            )
         );
 
         if (scrollBlockHeight != self.$messages.outerHeight()) {
@@ -946,16 +1049,18 @@ var ConversationPanel = React.createClass({
 
         }
 
-        var conversationPanelClasses = "conversation-panel " + room.type + "-chat";
+        var conversationPanelClasses = "conversation-panel " +  (room.type === "public" ? "group-chat " : "") +
+            room.type + "-chat";
 
         if (!room.isCurrentlyActive) {
             conversationPanelClasses += " hidden";
         }
 
-
-
-
-
+        var topicBlockClass = "chat-topic-block";
+        if (room.type !== "public") {
+            topicBlockClass += " privateChat";
+        }
+        var privateChatDiv = (room.type === "group") ? "privateChatDiv" : '' ;
         var messagesList = [
         ];
 
@@ -978,6 +1083,7 @@ var ConversationPanel = React.createClass({
                 room.messagesBuff.isDecrypting.state() === 'pending'
             )
         ) {
+
             self.loadingShown = true;
         }
         else if (
@@ -990,7 +1096,12 @@ var ConversationPanel = React.createClass({
                         __(l[8002])
                 );
 
-                headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
+                if (contactName) {
+                    headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
+                }
+                else {
+                    headerText = room.getRoomTitle();
+                }
 
                 messagesList.push(
                     <div className="messages notification" key="initialMsg">
@@ -1082,10 +1193,7 @@ var ConversationPanel = React.createClass({
                         }
                     }
 
-                    if (
-                        (v instanceof Message) &&
-                        (v.keyid !== 0)
-                    ) {
+                    if (v instanceof Message && v.dialogType !== "truncated") {
 
                         // the grouping logic for messages.
                         if (!lastMessageFrom || (userId && lastMessageFrom === userId)) {
@@ -1160,7 +1268,22 @@ var ConversationPanel = React.createClass({
                             grouped={grouped}
                         />
                     }
-
+                    else if (v.dialogType === 'openModeClosed') {
+                        messageInstance = <CloseOpenModeMessage
+                            message={v}
+                            key={v.messageId}
+                            contact={M.u[v.userId]}
+                            grouped={grouped}
+                        />
+                    }
+                    else if (v.dialogType === 'chatHandleUpdate') {
+                        messageInstance = <ChatHandleMessage
+                            message={v}
+                            key={v.messageId}
+                            contact={M.u[v.userId]}
+                            grouped={grouped}
+                        />
+                    }
                     messagesList.push(messageInstance);
                 }
                 else {
@@ -1292,7 +1415,128 @@ var ConversationPanel = React.createClass({
                         selected
                     );
                 }}
+            />;
+        }
+
+        var nonLoggedInJoinChatDialog = null;
+        if (self.state.nonLoggedInJoinChatDialog === true) {
+            var usersCount = Object.keys(room.members).length;
+            nonLoggedInJoinChatDialog = <ModalDialogsUI.ModalDialog
+                title={l[20596]}
+                className={"fm-dialog chat-links-preview-desktop"}
+                megaChat={room.megaChat}
+                chatRoom={room}
+                onClose={() => {
+                    self.setState({'nonLoggedInJoinChatDialog': false});
+                }}
+            >
+                <div className="fm-dialog-body">
+                    <div className="chatlink-contents">
+                        <div className="huge-icon group-chat"></div>
+                        <h3>
+                            <utils.EmojiFormattedContent>
+                                {room.topic ? room.getRoomTitle() : " "}
+                            </utils.EmojiFormattedContent>
+                        </h3>
+                        <h5>{usersCount? l[20233].replace("%s", usersCount) : " "}</h5>
+
+                        <p>{l[20595]}</p>
+
+                        <a className="join-chat" onClick={function(e) {
+                            self.setState({'nonLoggedInJoinChatDialog': false});
+
+                            megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle);
+                        }}>{l[20597]}</a>
+
+                        <a className="not-now" onClick={function(e) {
+                            self.setState({'nonLoggedInJoinChatDialog': false});
+                        }}>{l[18682]}</a>
+                    </div>
+                </div>
+            </ModalDialogsUI.ModalDialog>;
+        }
+
+        var chatLinkDialog;
+        if (self.state.chatLinkDialog === true) {
+            chatLinkDialog = <ChatlinkDialog
+                chatRoom={self.props.chatRoom}
+                onClose={() => {
+                    self.setState({'chatLinkDialog': false});
+                }}
             />
+        }
+
+        var privateChatDialog;
+
+        if (self.state.privateChatDialog === true) {
+            if (!$.dialog || $.dialog === "create-private-chat") {
+                $.dialog = "create-private-chat";
+
+                privateChatDialog = <ModalDialogsUI.ModalDialog
+                    title={l[20594]}
+                    className={"fm-dialog create-private-chat"}
+                    megaChat={room.megaChat}
+                    chatRoom={room}
+                    onClose={() => {
+                        self.setState({'privateChatDialog': false});
+                        if ($.dialog === "create-private-chat") {
+                            closeDialog();
+                        }
+                    }}
+                >
+                    <div className="create-private-chat-content-block fm-dialog-body">
+                        <i className="huge-icon lock"></i>
+                        <div className="dialog-body-text">
+                            <div className="">
+                                <b>{l[20590]}</b><br/>
+                                {l[20591]}
+                            </div>
+                        </div>
+                        <div className="clear"></div>
+                        <div className="big-red-button" id="make-chat-private" onClick={function() {
+                            self.props.chatRoom.switchOffPublicMode();
+                            self.setState({'privateChatDialog': false});
+                            if ($.dialog === "create-private-chat") {
+                                closeDialog();
+                            }
+                        }}>
+                            <div className="big-btn-txt">{l[20593]}</div>
+                        </div>
+                    </div>
+                </ModalDialogsUI.ModalDialog>;
+
+                $('.create-private-chat .fm-dialog-close').rebind('click', function() {
+                    $('.create-private-chat').addClass('hidden');
+                    $('.fm-dialog-overlay').addClass('hidden');
+                });
+                $('.create-private-chat .default-red-button').rebind('click', function() {
+                    var participants = self.props.chatRoom.protocolHandler.getTrackedParticipants();
+                    var promises = [];
+                    promises.push(
+                        ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
+                    );
+                    var _runSwitchOffPublicMode = function() {
+                        // self.state.value
+                        var topic = null;
+                        if (self.props.chatRoom.topic) {
+                            topic = self.props.chatRoom.protocolHandler.embeddedEncryptTo(
+                                self.props.chatRoom.topic,
+                                strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
+                                participants,
+                                true,
+                                self.props.chatRoom.type === "public"
+                            );
+                            topic = base64urlencode(topic);
+                        }
+                        self.props.onSwitchOffPublicMode(topic);
+                    };
+                    MegaPromise.allDone(promises).done(
+                        function () {
+                            _runSwitchOffPublicMode();
+                        }
+                    );
+                });
+            }
         }
 
         var sendContactDialog = null;
@@ -1493,6 +1737,7 @@ var ConversationPanel = React.createClass({
                 </div>
             </ModalDialogsUI.ConfirmDialog>
         }
+
         if (self.state.archiveDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 megaChat={room.megaChat}
@@ -1549,37 +1794,7 @@ var ConversationPanel = React.createClass({
         }
         if (self.state.renameDialog === true) {
             var onEditSubmit = function(e) {
-                if ($.trim(self.state.renameDialogValue).length > 0 &&
-                    self.state.renameDialogValue !== self.props.chatRoom.getRoomTitle()
-                ) {
-                    self.props.chatRoom.scrolledToBottom = true;
-
-                    var participants = self.props.chatRoom.protocolHandler.getTrackedParticipants();
-                    var promises = [];
-                    promises.push(
-                        ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
-                    );
-                    var _runUpdateTopic = function() {
-                        // self.state.value
-                        var newTopic = self.state.renameDialogValue;
-                        var topic = self.props.chatRoom.protocolHandler.embeddedEncryptTo
-                                            (newTopic,
-                                             strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
-                                             participants);
-                        if (topic) {
-                            asyncApiReq({
-                                "a":"mcst",
-                                "id":self.props.chatRoom.chatId,
-                                "ct":base64urlencode(topic),
-                                "v": Chatd.VERSION
-                            });
-                        }
-                    };
-                    MegaPromise.allDone(promises).done(
-                        function () {
-                            _runUpdateTopic();
-                        }
-                    );
+                if (self.props.chatRoom.setRoomTitle(self.state.renameDialogValue)) {
                     self.setState({'renameDialog': false, 'renameDialogValue': undefined});
                 }
                 e.preventDefault();
@@ -1621,8 +1836,8 @@ var ConversationPanel = React.createClass({
                 <div className="fm-dialog-content">
                     <div className="dialog secondary-header">
                         <div className="rename-input-bl">
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 className="chat-rename-group-dialog"
                                 name="newTopic"
                                 defaultValue={self.props.chatRoom.getRoomTitle()}
@@ -1656,7 +1871,7 @@ var ConversationPanel = React.createClass({
         }
 
         var topicInfo = null;
-        if (self.props.chatRoom.type === "group") {
+        if (self.props.chatRoom.type === "group" || self.props.chatRoom.type === "public") {
             topicInfo = <div className="chat-topic-info">
                 <div className="chat-topic-icon"></div>
                 <div className="chat-topic-text">
@@ -1678,12 +1893,12 @@ var ConversationPanel = React.createClass({
             var contact = M.u[contactHandle];
 
             topicInfo = <ContactsUI.ContactCard
-                    className="short"
-                    noContextButton="true"
-                    contact={contact}
-                    megaChat={self.props.chatRoom.megaChat}
-                    showLastGreen={true}
-                    key={contact.u}/>
+                className="short"
+                noContextButton="true"
+                contact={contact}
+                megaChat={self.props.chatRoom.megaChat}
+                showLastGreen={true}
+                key={contact.u}/>
         }
 
         var disabledCalls = (
@@ -1697,19 +1912,18 @@ var ConversationPanel = React.createClass({
 
 
         var disableStartCalls = disabledCalls || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) || (
-            room.type === "group" && !ENABLE_GROUP_CALLING_FLAG
+            (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG
         );
 
         return (
             <div className={conversationPanelClasses} onMouseMove={self.onMouseMove}
                  data-room-id={self.props.chatRoom.chatId}>
-                <div className={"chat-content-block " +
-                    (!room.megaChat.chatUIFlags['convPanelCollapse'] ?
+                <div className={"chat-content-block " + (!room.megaChat.chatUIFlags['convPanelCollapse'] ?
                     "with-pane" : "no-pane")}>
                     {!room.megaChat.chatUIFlags['convPanelCollapse'] ? <ConversationRightArea
                         isVisible={this.props.chatRoom.isCurrentlyActive}
                         chatRoom={this.props.chatRoom}
-                        members={this.props.chatRoom.members}
+                        members={this.props.chatRoom.membersSetFromApi}
                         contacts={self.props.contacts}
                         megaChat={this.props.chatRoom.megaChat}
                         messagesBuff={room.messagesBuff}
@@ -1731,11 +1945,25 @@ var ConversationPanel = React.createClass({
                                 'renameDialogValue': self.props.chatRoom.getRoomTitle()
                             });
                         }}
+                        onGetManageChatLinkClicked={function() {
+                            self.setState({
+                                'chatLinkDialog': true
+                            });
+                        }}
+                        onMakePrivateClicked={function() {
+                            self.setState({'privateChatDialog': true});
+                        }}
                         onLeaveClicked={function() {
                             room.leave(true);
                         }}
+                        onJoinViaPublicLinkClicked={function() {
+                            room.joinViaPublicHandle();
+                        }}
                         onCloseClicked={function() {
                             room.destroy();
+                        }}
+                        onSwitchOffPublicMode = {function(topic) {
+                            room.switchOffPublicMode(topic);
                         }}
                         onAttachFromCloudClicked={function() {
                             self.setState({'attachCloudDialog': true});
@@ -1777,6 +2005,9 @@ var ConversationPanel = React.createClass({
                             /> : null
                     }
 
+                    {privateChatDialog}
+                    {chatLinkDialog}
+                    {nonLoggedInJoinChatDialog}
                     {attachCloudDialog}
                     {sendContactDialog}
                     {confirmDeleteDialog}
@@ -1809,7 +2040,7 @@ var ConversationPanel = React.createClass({
                         </div>
                     </div>
 
-                    <div className={"chat-topic-block " + (
+                    <div className={"chat-topic-block " + topicBlockClass + (
                         self.props.chatRoom.havePendingGroupCall() || self.props.chatRoom.haveActiveCall() ?
                             " have-pending-group-call" : ""
                     )}>
@@ -1827,31 +2058,31 @@ var ConversationPanel = React.createClass({
                                 }}
                             >
                             </ButtonsUI.Button>
-                            {!disableStartCalls ? (
-                                <span>
-                                    <ButtonsUI.Button
-                                        className="right"
-                                        icon="small-icon video-call colorized"
-                                        disabled={room.isReadOnly()}
-                                        onClick={function() {
-                                            if (!disabledCalls) {
-                                                room.startVideoCall();
-                                            }
-                                        }}
-                                    >
-                                    </ButtonsUI.Button>
-                                    <ButtonsUI.Button
-                                        className="right"
-                                        icon="small-icon audio-call colorized"
-                                        disabled={room.isReadOnly()}
-                                        onClick={function() {
-                                            if (!disabledCalls) {
-                                                room.startAudioCall();
-                                            }
-                                        }}
-                                        >
-                                    </ButtonsUI.Button>
-                                </span>) : null}
+                            <span>
+                                <div
+                                     className="button right"
+                                     onClick={function() {
+                                         if (!disabledCalls) {
+                                             room.startVideoCall();
+                                         }
+                                     }}>
+                                    <i className={"small-icon small-icon video-call colorized" + (
+                                        room.isReadOnly() || disableStartCalls ? " disabled" : ""
+                                    )}></i>
+                                </div>
+
+                                <div
+                                     className="button right"
+                                     onClick={function() {
+                                         if (!disabledCalls) {
+                                             room.startAudioCall();
+                                         }
+                                     }}>
+                                    <i className={"small-icon small-icon audio-call colorized" + (
+                                        room.isReadOnly() || disableStartCalls ? " disabled" : ""
+                                    )}></i>
+                                </div>
+                            </span>
                         </div>
                          {topicInfo}
                     </div>
@@ -1900,6 +2131,7 @@ var ConversationPanel = React.createClass({
                             </PerfectScrollbar>
                         </div>
                         {
+                            !anonymouschat &&
                             room.state != ChatRoom.STATE.LEFT &&
                             room.havePendingGroupCall() && (
                                 !room.callManagerCall ||
@@ -1908,6 +2140,28 @@ var ConversationPanel = React.createClass({
                                 <JoinCallNotification chatRoom={room} /> : null
                         }
 
+                        {
+                            anonymouschat || (
+                                !room.membersSetFromApi.members.hasOwnProperty(u_handle) &&
+                                room.type === "public" && !anonymouschat &&
+                                room.publicChatHandle && room.publicChatKey
+                            ) ?
+                        (
+                        <div className="join-chat-block">
+                            <div className="join-chat-button"
+                                onClick={(e) => {
+                                    if (anonymouschat) {
+                                        megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle);
+                                    }
+                                    else {
+                                        room.joinViaPublicHandle();
+                                    }
+                                }}>
+                                {l[20597]}
+                            </div>
+                        </div>
+                        ) :
+                        (
                         <div className="chat-textarea-block">
                             <WhosTyping chatRoom={room} />
 
@@ -2030,8 +2284,9 @@ var ConversationPanel = React.createClass({
                                         </DropdownsUI.Dropdown>
                                     </ButtonsUI.Button>
                             </TypingAreaUI.TypingArea>
-
                         </div>
+                        )
+                        }
                     </div>
                 </div>
             </div>
@@ -2046,7 +2301,7 @@ var ConversationPanels = React.createClass({
 
         var conversations = [];
 
-        var hadLoaded = (
+        var hadLoaded = anonymouschat || (
             ChatdIntegration.allChatsHadLoaded.state() !== 'pending' &&
             ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending' &&
             Object.keys(ChatdIntegration._loadingChats).length === 0
@@ -2122,12 +2377,15 @@ var ConversationPanels = React.createClass({
                     </div>
                     <div className="empty-block">
                         <div className="empty-pad conversations">
-                            <div className="empty-icon conversations"></div>
-                            <div className="empty-title" dangerouslySetInnerHTML={{
+                            <div className="fm-empty-conversations-bg"></div>
+                            <div className="fm-empty-cloud-txt small" dangerouslySetInnerHTML={{
                                 __html: __(emptyMessage)
                                     .replace("[P]", "<span>")
                                     .replace("[/P]", "</span>")
                             }}></div>
+                            <div className="big-red-button new-chat-link" onClick={function(e) {
+                                $(document.body).trigger('startNewChatLink');
+                            }}>{l[20638]}</div>
                         </div>
                     </div>
                 </div>

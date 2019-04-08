@@ -358,6 +358,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         promise = new MegaPromise();
         promise.always(tmp);
     }
+
     // check if this is a business expired account
     if (u_attr && u_attr.b && u_attr.b.s === -1) {
         $.hideContextMenu();
@@ -564,12 +565,18 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         var objj = { a: 'p', t: d, n: opsArr[d] };
         objj.v = 3;
         objj.i = mRandomToken('pn');
+
         this.scAckQueue[objj.i] = onScDone;
         var s = this.getShareNodesSync(d);
         if (s && s.length) {
             objj.cr = crypto_makecr(opsArr[d], s, false);
         }
         objj.sm = 1;
+        // eventually append 'cauth' ticket in the objj req.
+        if (M.chat && megaChatIsReady) {
+            megaChat.eventuallyAddDldTicketToReq(objj);
+        }
+
         if (d === M.RubbishID) {
             // since we are copying to rubbish we don't have multiple "d" as duplications are allowed in Rubbish
             // but below code is generic and will work regardless
@@ -615,7 +622,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         }
         var c = (d || "").length === 11;
         for (var q = 0; q < opsArr[d].length; q++) {
-            
+
             try {
                 opsArr[d][q].k = c
                     ? base64urlencode(encryptto(d, a32_to_str(opsArr[d][q].k)))
@@ -1572,7 +1579,7 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             n.tf = 0;
             n.tb = 0;
         }
-        
+
         ufsc.addToDB(n);
 
         if (this.nn && n.name && !n.fv) {

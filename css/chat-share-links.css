@@ -99,6 +99,31 @@ a.shared-link.show-more {
     background-position: center;
     background-size: 36px auto;
 }
+.chat-small-loader, .chat-small-loader::after {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+    margin: -18px 0 0 -18px;
+    width: 36px;
+    height: 36px;
+    -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    background-color: white;
+}
+.chat-small-loader::after {
+    content: '';
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    background-image: url(../images/mega/loader-light-small.gif);
+    background-position: center;
+    background-size: 36px auto;
+}
 .shared-link.thumb.video {
     background-color: black;
     background-image: none;

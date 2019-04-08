@@ -189,7 +189,7 @@
             return false;
         }
 
-        if (page.indexOf('/chat/') > -1) {
+        if (page === "chat" || page.indexOf('/chat/') > -1) {
             return true;
         }
         if (useMegaSync === -1) {
@@ -326,7 +326,7 @@
         if (!isFileDragAllowed()) {
             return;
         }
-        
+
         useMegaSync = -1;
 
         var currentDir = M.currentdirid;

@@ -98,12 +98,15 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm24_';
+    var dbpfx = 'fm25_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
     fmdb.inval_cb = false;
     fmdb.inval_ready = false;
+
+    // Make the database name dependent on the current schema.
+    dbpfx += MurmurHash3(JSON.stringify(this.schema), 0x6f01f).toString(16);
 
     // Notify completion invoking the provided callback
     var resolve = function(sn, error) {

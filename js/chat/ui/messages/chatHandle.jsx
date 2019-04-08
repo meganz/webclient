@@ -54,7 +54,7 @@ var ChatHandleMessage = React.createClass({
                     {datetime}
 
                     <div className="message text-block">
-                        {(message.meta.handleUpdate === 1) ? __('created a public link for the chat.') : __('removed the public link for the chat.')}
+                        {(message.meta.handleUpdate === 1) ? l[20570] : l[20571]}
                     </div>
                 </div>
             </div>

@@ -516,7 +516,7 @@ function setContactLink() {
     var contactPrefix = '';
 
     // Exit if link exists
-    if (linkData) {
+    if (!$publicLink.length || linkData) {
         return false;
     }
 

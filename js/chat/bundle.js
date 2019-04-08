@@ -8156,8 +8156,7 @@ React.makeElement = React['createElement'];
 	                    React.makeElement(
 	                        "span",
 	                        { className: "txt small" },
-	                        Object.keys(self.props.chatRoom.members).length,
-	                        "Members"
+	                        (l[20233] || "%s Members").replace("%s", Object.keys(self.props.chatRoom.members).length)
 	                    )
 	                )
 	            );
@@ -13855,7 +13854,7 @@ React.makeElement = React['createElement'];
 	                var translationString = "";
 
 	                if (participantNames && participantNames.length > 0) {
-	                    translationString += mega.utils.trans.listToString(participantNames, "With %s");
+	                    translationString += mega.utils.trans.listToString(participantNames, l[20234]);
 	                }
 
 	                if ((message.type === "call-ended" || message.type === "call-failed") && message.meta && message.meta.duration) {

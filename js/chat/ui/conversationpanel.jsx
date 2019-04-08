@@ -1881,8 +1881,7 @@ var ConversationPanel = React.createClass({
                         }</utils.EmojiFormattedContent>
                     </span>
                     <span className="txt small">
-                        {Object.keys(self.props.chatRoom.members).length}
-                        Members
+                        {(l[20233] || "%s Members").replace("%s", Object.keys(self.props.chatRoom.members).length)}
                     </span>
                 </div>
             </div>;

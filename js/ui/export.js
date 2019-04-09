@@ -1085,6 +1085,9 @@ var exportExpiry = {
         var $toggleBtn = $dialog.find('.fm-expiry-dropdown .dialog-feature-toggle');
         var $expirySelect = $dialog.find('.expiry-date-select-container');
 
+        // Clear the date of any old entries
+        $dialog.find('.expiry-date-select').datepicker('setDate', null);
+
         // Slide button to the right
         $toggleBtn.find('.dialog-feature-switch').animate({ marginLeft: '17px' }, 150, 'swing', function() {
 
@@ -1092,8 +1095,6 @@ var exportExpiry = {
             $toggleBtn.addClass('toggle-on');
             $expirySelect.removeClass('hidden');
 
-            // Clear the date of any old entries
-            $dialog.find('.expiry-date-select').datepicker('setDate', null);
         });
     },
 
@@ -1113,11 +1114,11 @@ var exportExpiry = {
             $toggleBtn.removeClass('toggle-on');
             $expirySelect.addClass('hidden');
 
-            // Clear the date of any old entries
-            $dialog.find('.expiry-date-select').datepicker('setDate', null);
-
             // Reset text to 'Set an expiry date'
             $dialog.find('.set-expiry-text').text(l[8953]);
+
+            // Clear the date of any old entries
+            $dialog.find('.expiry-date-select').datepicker('setDate', null);
         });
     },
 
@@ -1218,6 +1219,7 @@ var exportExpiry = {
 
         // Keep a counter for how many nodes have expiry times
         var numOfNodesWithExpiryTime = 0;
+        var lastExpireTime = null;
 
         // For each selected file/folder
         for (var i in handles) {
@@ -1231,6 +1233,7 @@ var exportExpiry = {
                 // If it has an expiry time, increment the count
                 if (expiryTimestamp) {
                     numOfNodesWithExpiryTime++;
+                    lastExpireTime = expiryTimestamp;
                 }
 
                 // If the expiry timestamp is set show it
@@ -1246,6 +1249,12 @@ var exportExpiry = {
 
             // Set the text to 'Set new expiry date'
             $('.export-links-dialog .set-expiry-text').text(l[8736]);
+
+            // set the data-select input value
+            var exDate = new Date(lastExpireTime * 1000);
+            $('.export-links-dialog .expiry-date-select').datepicker('setDate', exDate);
+            
+            // $('.export-links-dialog .expiry-date-select').val(time2date(lastExpireTime, 1).replace('\\', '-'));
         }
         else {
             // Otherwise disable the toggle switch

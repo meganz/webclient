@@ -185,6 +185,10 @@ var ContactButton = React.createClass({
                         key="view2" icon="small-icon icons-sprite grey-plus" label={__(l[101])} onClick={() => {
                         loadingDialog.show();
 
+                        if (anonymouschat && (!u_handle || u_type !== 3)) {
+                            megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
+                            return;
+                        }
                         M.syncContactEmail(contact.u)
                             .done(function(email) {
                                 var exists = false;

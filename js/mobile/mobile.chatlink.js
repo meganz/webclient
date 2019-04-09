@@ -53,6 +53,9 @@ mobile.chatlink = {
         );
 
         anonymouschat = true;
+        if (!u_handle) {
+            u_handle = "AAAAAAAAAAA";
+        }
 
         var self = this;
         M.require('chat')

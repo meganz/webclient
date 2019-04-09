@@ -394,15 +394,15 @@ var ConversationAudioVideoPanel = React.createClass({
         });
 
 
+        var localStream = room.callManagerCall.localStream();
         if (
-            room.megaChat.rtc &&
-            room.megaChat.rtc.gLocalStream &&
+            localStream &&
             self.refs.localViewport &&
             self.refs.localViewport.src === "" &&
             self.refs.localViewport.currentTime === 0 &&
             !self.refs.localViewport.srcObject
         ) {
-            RTC.attachMediaStream(self.refs.localViewport, room.megaChat.rtc.gLocalStream);
+            RTC.attachMediaStream(self.refs.localViewport, localStream);
             // attachMediaStream would do the .play call
         }
 
@@ -411,13 +411,12 @@ var ConversationAudioVideoPanel = React.createClass({
 
         if (
             smallLocalViewport && bigLocalViewport && !bigLocalViewport.src && !bigLocalViewport.srcObject &&
-            room.megaChat.rtc &&
-            room.megaChat.rtc.gLocalStream &&
+            localStream &&
             bigLocalViewport &&
             bigLocalViewport.src === "" &&
             bigLocalViewport.currentTime === 0
         ) {
-            RTC.attachMediaStream(bigLocalViewport, room.megaChat.rtc.gLocalStream);
+            RTC.attachMediaStream(bigLocalViewport, localStream);
         }
 
         $(room).rebind('toggleMessages.av', function() {
@@ -602,10 +601,7 @@ var ConversationAudioVideoPanel = React.createClass({
         );
 
         var visiblePanelClass = "";
-        var localPlayerStream;
-        if (callManagerCall && chatRoom.megaChat.rtc && chatRoom.megaChat.rtc.gLocalStream) {
-            localPlayerStream = chatRoom.megaChat.rtc.gLocalStream;
-        }
+        var localPlayerStream = callManagerCall.localStream();
 
         if (this.visiblePanel === true) {
             visiblePanelClass += " visible-panel";

@@ -10091,6 +10091,14 @@ React.makeElement = React['createElement'];
 	            $('input', $parentBlock).trigger("focus");
 	        }
 	    },
+	    onClearSearchIconClick: function onClearSearchIconClick() {
+	        var self = this;
+
+	        self.setState({
+	            'searchValue': '',
+	            'currentlyViewedEntry': M.RootID
+	        });
+	    },
 	    onTabButtonClick: function onTabButtonClick(e, selectedTab) {
 	        var $this = $(e.target);
 
@@ -10390,6 +10398,17 @@ React.makeElement = React['createElement'];
 	            ));
 	        }
 
+	        var clearSearchBtn = null;
+	        if (self.state.searchValue.length >= 3) {
+	            clearSearchBtn = React.makeElement("i", {
+	                className: "top-clear-button",
+	                style: { 'right': '85px' },
+	                onClick: function onClick() {
+	                    self.onClearSearchIconClick();
+	                }
+	            });
+	        }
+
 	        return React.makeElement(
 	            ModalDialogsUI.ModalDialog,
 	            {
@@ -10449,7 +10468,8 @@ React.makeElement = React['createElement'];
 	                            ">"
 	                        ),
 	                        React.makeElement("input", { type: "search", placeholder: __(l[102]), value: self.state.searchValue,
-	                            onChange: self.onSearchChange })
+	                            onChange: self.onSearchChange }),
+	                        clearSearchBtn
 	                    ),
 	                    React.makeElement("div", { className: "clear" })
 	                ),

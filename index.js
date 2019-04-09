@@ -1421,11 +1421,14 @@ function init_page() {
         }
     }
     else if (page.substr(0, 7) === 'payment') {
+        var isBussiness = page.indexOf('-b') !== -1;
 
-        if (page.indexOf('-b') === -1 || is_mobile) {
+        if (!isBussiness || is_mobile) {
             // Load the Pro page in the background
             parsepage(pages['proplan']);
-            pro.proplan.init();
+            if (!isBussiness) {
+                pro.proplan.init();
+            }
         }
         else {
             parsepage(pages['business']);

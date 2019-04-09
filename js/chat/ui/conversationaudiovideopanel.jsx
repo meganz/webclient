@@ -1,8 +1,8 @@
-var React = require("react");
-var ReactDOM = require("react-dom");
-var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
-var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
-var ContactsUI = require('./../ui/contacts.jsx');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { RenderDebugger, MegaRenderMixin } from './../../stores/mixins.js';
+import ContactsUI from './../ui/contacts.jsx';
+import { EmojiFormattedContent } from './../../ui/utils.jsx';
 
 var DEBUG_PARTICIPANTS_MULTIPLICATOR = 1;
 
@@ -896,41 +896,49 @@ var ConversationAudioVideoPanel = React.createClass({
 
 
         if (chatRoom.type === "group" || chatRoom.type === "public") {
-            header = <div className="call-header">
-                <div className="call-topic">{ellipsis(chatRoom.getRoomTitle(), 'end', 70)}</div>
-                <div className="call-participants-count">{Object.keys(chatRoom.callParticipants).length}</div>
+            header = (
+                <div className="call-header">
+                    <div className="call-topic">
+                        <EmojiFormattedContent>
+                            {ellipsis(chatRoom.getRoomTitle(), 'end', 70)}
+                        </EmojiFormattedContent>
+                    </div>
+                    <div className="call-participants-count">
+                        {Object.keys(chatRoom.callParticipants).length}
+                    </div>
 
-                <a href="javascript:;" className={
-                    "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") +
-                    (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : "")
-                } onClick={function(e) {
-                    if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
-                        return;
-                    }
+                    <a href="javascript:;" className={
+                        "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") +
+                        (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : "")
+                    } onClick={function(e) {
+                        if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
+                            return;
+                        }
 
-                    self.setState({
-                        'selectedStreamSid': false,
-                        'viewMode':
-                            self.getViewMode() === VIEW_MODES.GRID ?
-                                VIEW_MODES.CAROUSEL :
-                                VIEW_MODES.GRID
-                    });
-                }}></a>
-                <div className={"call-av-counter" + (
-                    videoSessionCount >= RtcModule.kMaxCallVideoSenders ? " limit-reached" : ""
-                )}>{videoSessionCount} / {RtcModule.kMaxCallVideoSenders}</div>
+                        self.setState({
+                            'selectedStreamSid': false,
+                            'viewMode':
+                                self.getViewMode() === VIEW_MODES.GRID ?
+                                    VIEW_MODES.CAROUSEL :
+                                    VIEW_MODES.GRID
+                        });
+                    }}></a>
+                    <div className={"call-av-counter" + (
+                        videoSessionCount >= RtcModule.kMaxCallVideoSenders ? " limit-reached" : ""
+                    )}>{videoSessionCount} / {RtcModule.kMaxCallVideoSenders}</div>
 
-                <div className={
-                    "call-video-icon" + (
-                        chatRoom.callManagerCall.hasVideoSlotLimitReached() ? " call-video-icon-warn" : ""
-                    )}></div>
-                <div className="call-header-duration"
-                     data-room-id={chatRoom.chatId}>
-                    {secondsToTimeShort(chatRoom._currentCallCounter)}
+                    <div 
+                        className={
+                            "call-video-icon" + (
+                                chatRoom.callManagerCall.hasVideoSlotLimitReached() ? " call-video-icon-warn" : ""
+                        )}>
+                    </div>
+                    <div className="call-header-duration"
+                        data-room-id={chatRoom.chatId}>
+                        {secondsToTimeShort(chatRoom._currentCallCounter)}
+                    </div>
                 </div>
-
-
-            </div>;
+            );
         }
 
         var notifBar = null;

@@ -2091,7 +2091,7 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-	Chat.prototype.loginOrRegisterBeforeJoining = function (chatHandle, forceRegister, forceLogin) {
+	Chat.prototype.loginOrRegisterBeforeJoining = function (chatHandle, forceRegister, forceLogin, notJoinReq) {
 	    if (!chatHandle && (page === 'chat' || page.indexOf('chat') > -1)) {
 	        chatHandle = getSitePath().split("chat/")[1].split("#")[0];
 	    }
@@ -2106,7 +2106,9 @@ React.makeElement = React['createElement'];
 	            closeDialog();
 	            topmenuUI();
 	            if (page !== 'login') {
-	                localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+	                if (!notJoinReq) {
+	                    localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+	                }
 	                window.location.reload();
 	            }
 	        });
@@ -2129,8 +2131,10 @@ React.makeElement = React['createElement'];
 	            },
 
 	            onAccountCreated: function onAccountCreated(gotLoggedIn, registerData) {
-	                localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
-	                localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+	                if (!notJoinReq) {
+	                    localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
+	                    localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+	                }
 
 	                mega.ui.sendSignupLinkDialog(registerData, false);
 	                megaChat.destroy();
@@ -2140,7 +2144,9 @@ React.makeElement = React['createElement'];
 
 	    if (u_handle && u_handle !== "AAAAAAAAAAA") {
 
-	        localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+	        if (!notJoinReq) {
+	            localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+	        }
 	        window.location.reload();
 	        return;
 	    }
@@ -5455,6 +5461,10 @@ React.makeElement = React['createElement'];
 	                    key: "view2", icon: "small-icon icons-sprite grey-plus", label: __(l[101]), onClick: function onClick() {
 	                        loadingDialog.show();
 
+	                        if (anonymouschat && (!u_handle || u_type !== 3)) {
+	                            megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
+	                            return;
+	                        }
 	                        M.syncContactEmail(contact.u).done(function (email) {
 	                            var exists = false;
 	                            Object.keys(M.opc).forEach(function (k) {
@@ -6973,7 +6983,7 @@ React.makeElement = React['createElement'];
 	            sendContactDialog: false,
 	            confirmDeleteDialog: false,
 	            pasteImageConfirmDialog: false,
-	            nonLoggedInJoinChatDialog: anonymouschat,
+	            nonLoggedInJoinChatDialog: false,
 	            messageToBeDeleted: null,
 	            editing: false
 	        };
@@ -7057,6 +7067,11 @@ React.makeElement = React['createElement'];
 	        }
 
 	        self.eventuallyInit();
+	        if (anonymouschat) {
+	            setTimeout(function () {
+	                self.setState({ 'nonLoggedInJoinChatDialog': true });
+	            }, rand_range(5, 10) * 1000);
+	        }
 	    },
 	    eventuallyInit: function eventuallyInit(doResize) {
 	        var self = this;

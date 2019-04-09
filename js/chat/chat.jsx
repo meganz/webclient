@@ -2618,7 +2618,7 @@ Chat.prototype.eventuallyAddDldTicketToReq = function(req) {
 };
 
 
-Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister, forceLogin) {
+Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister, forceLogin, notJoinReq) {
     if (!chatHandle && (page === 'chat' || page.indexOf('chat') > -1)) {
         chatHandle = getSitePath().split("chat/")[1].split("#")[0];
     }
@@ -2634,9 +2634,11 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister
                 closeDialog();
                 topmenuUI();
                 if (page !== 'login') {
-                    localStorage.autoJoinOnLoginChat = JSON.stringify(
-                        [chatHandle, unixtime(), chatKey]
-                    );
+                    if (!notJoinReq) {
+                        localStorage.autoJoinOnLoginChat = JSON.stringify(
+                            [chatHandle, unixtime(), chatKey]
+                        );
+                    }
                     window.location.reload();
                 }
             });
@@ -2659,13 +2661,15 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister
             },
 
             onAccountCreated: function(gotLoggedIn, registerData) {
-                localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
-                localStorage.autoJoinOnLoginChat = JSON.stringify(
-                    [chatHandle, unixtime(), chatKey]
-                );
+                if (!notJoinReq) {
+                    localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
+                    localStorage.autoJoinOnLoginChat = JSON.stringify(
+                        [chatHandle, unixtime(), chatKey]
+                    );
+                }
                 // If true this means they do not need to confirm their email before continuing to step 2
                 mega.ui.sendSignupLinkDialog(registerData, false);
-                    megaChat.destroy();
+                megaChat.destroy();
             }
         });
     };
@@ -2673,9 +2677,11 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister
 
     if (u_handle && u_handle !== "AAAAAAAAAAA") {
         // logged in/confirmed account in another tab!
-        localStorage.autoJoinOnLoginChat = JSON.stringify(
-            [chatHandle, unixtime(), chatKey]
-        );
+        if (!notJoinReq) {
+            localStorage.autoJoinOnLoginChat = JSON.stringify(
+                [chatHandle, unixtime(), chatKey]
+            );
+        }
         window.location.reload();
         return;
     }

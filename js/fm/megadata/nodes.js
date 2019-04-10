@@ -3624,7 +3624,7 @@ MegaData.prototype.importWelcomePDF = function() {
     'use strict';
     var promise = new MegaPromise();
 
-    M.req('wpdf').done(function(res) {
+    M.req('wpdf').always(function(res) {
         if (typeof res === 'object') {
             var ph = res.ph;
             var key = res.k;

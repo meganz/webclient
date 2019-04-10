@@ -1946,6 +1946,7 @@
     "17766": "T\u00ea\u0323p tin \u0111\u00e3 \u0111\u01b0\u01a1\u0323c g\u01b0\u0309i t\u01a1\u0301i ch\u00e1t",
     "17767": "Ca\u0301c t\u00ea\u0323p tin \u0111\u01b0\u01a1\u0323c g\u01b0\u0309i t\u01a1\u0301i ch\u00e1t",
     "17768": "T\u00e0i kho\u1ea3n b\u1ecb ch\u1ea5m d\u1ee9t ho\u1ea1t \u0111\u1ed9ng",
+    "17777": "Phi\u00ean b\u1ea3n hi\u1ec7n t\u1ea1i",
     "17789": "S\u1ed1 thu\u1ebf v\u1eeba nh\u1eadp kh\u00f4ng h\u1ee3p l\u1ec7",
     "17791": "L\u1ecdc",
     "17792": "\u1ed4 \u0111\u0129a c\u1ee7a m\u00e1y b\u1ecb \u0111\u1ea7y. Xin t\u1ea1o th\u00eam kh\u00f4ng gian tr\u1ed1ng r\u1ed3i t\u1ea3i l\u1ea1i.",
@@ -2151,6 +2152,8 @@
     "18700": "Qu\u00e1 ng\u1eafn",
     "18701": "M\u1eadt kh\u1ea9u c\u1ea7n ph\u1ea3i d\u00e0i h\u01a1n 8 k\u00fd t\u1ef1.",
     "18704": "M\u00e3 QR \u0111\u00e3 b\u1ecb xo\u00e1",
+    "18711": "The QR code is invalid. Please try to scan a valid code.",
+    "18714": "\u0110\u01b0\u1eddng li\u00ean k\u1ebft kh\u00f4ng h\u1ee3p l\u1ec7. Xin th\u1eed l\u1ea1i c\u00e1i kh\u00e1c.",
     "18716": "So th\u1eb3ng h\u00e0ng camera v\u1edbi m\u00e3 QR \u0111\u1ec3 ti\u1ebfn h\u00e0nh qu\u00e9t.",
     "18717": "[A]\u0110ang t\u1ea3i[\/A] c\u00e1c [B]Cu\u1ed9c Tr\u00f2 Chuy\u1ec7n\u2026[\/B]",
     "18718": "\u0110ang x\u1eed l\u00fd \u0111\u01b0\u1eddng li\u00ean k\u1ebft\u2026",
@@ -3413,7 +3416,8 @@
     "20657": "M\u01a1\u0309 m\u00f4\u0323t cu\u00f4\u0323c tro\u0300 chuy\u00ea\u0323n v\u01a1\u0301i ca\u0301c t\u00ean li\u00ean la\u0323c n\u0103\u0300m trong danh sa\u0301ch, v\u01a1\u0301i ti\u0301nh ba\u0309o m\u00e2\u0323t t\u00f4\u0301i \u01b0u",
     "20660": "No chat link available.",
     "20661": "Do you want to make this chat permanently more private?",
-    "20662": "64 bit",
-    "20663": "32 bit",
-    "20664": "removed the link for the chat."
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20664": "removed the link for the chat.",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

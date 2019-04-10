@@ -1946,6 +1946,7 @@
     "17766": "File dikirim ke obrolan",
     "17767": "File dikirim ke obrolan",
     "17768": "Akun yang dihentikan",
+    "17777": "Versi sekarang",
     "17789": "Nomor pajak yang dimasukkan tidak valid.",
     "17791": "Filter",
     "17792": "Volume disk utama Anda penuh. Silakan kosongkan beberapa ruang dan coba lagi.",
@@ -2151,6 +2152,8 @@
     "18700": "Terlalu singkat",
     "18701": "Kata sandi Anda harus setidaknya 8 karakter.",
     "18704": "Kode QR berhasil dihapus",
+    "18711": "Kode QR tidak valid. Silakan coba memindai kode yang valid.",
+    "18714": "Link kontak tidak valid. Silakan coba dengan link yang valid.",
     "18716": "Sejajarkan kode QR untuk memindainya dengan kamera perangkat Anda",
     "18717": "[A]Memuat[\/A] [B]Percakapan...[\/B]",
     "18718": "Memproses tautan ...",
@@ -3413,7 +3416,8 @@
     "20657": "Mulai mengobrol dengan aman dengan kontak Anda menggunakan enkripsi ujung-ke-ujung",
     "20660": "No chat link available.",
     "20661": "Do you want to make this chat permanently more private?",
-    "20662": "64 bit",
-    "20663": "32 bit",
-    "20664": "removed the link for the chat."
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20664": "removed the link for the chat.",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

@@ -2040,7 +2040,7 @@ Call.prototype.enableVideo = function(enable) {
                 var pc = sess.rtcConn;
                 assert(pc);
                 var pms = RTC.peerConnRemoveVideoTrack(pc);
-                // pms may be null if there was no video track
+                // pms is null if there was no video track
                 assert(pms, "Disable video: Session peerconnection's sender doesn't have a video track, " +
                     "but gLocalStream has one");
                 sess._setStreamRenegTimeout();

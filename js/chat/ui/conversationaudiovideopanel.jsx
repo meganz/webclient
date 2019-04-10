@@ -445,6 +445,14 @@ var ConversationAudioVideoPanel = React.createClass({
             }
         });
 
+
+        this.props.chatRoom.rebind('onLocalMuteInProgress.ui', function() {
+            self.setState({'muteInProgress': true});
+        });
+        this.props.chatRoom.rebind('onLocalMuteComplete.ui', function() {
+            self.setState({'muteInProgress': false});
+        });
+
         if (self.initialRender === false && ReactDOM.findDOMNode(self)) {
             self.bindInitialEvents();
         }
@@ -1034,7 +1042,10 @@ var ConversationAudioVideoPanel = React.createClass({
                     {unreadDiv}
                     <i className="big-icon conversations"></i>
                 </div>
-                <div className="button call" onClick={function(e) {
+                <div className={"button call " + (this.state.muteInProgress ? " disabled" : "")} onClick={function(e) {
+                    if (self.state.muteInProgress || $(this).is(".disabled")) {
+                        return;
+                    }
                     if (callManagerCall.getMediaOptions().audio === true) {
                         callManagerCall.muteAudio();
                     }
@@ -1048,8 +1059,12 @@ var ConversationAudioVideoPanel = React.createClass({
                 </div>
                 <div className={
                     "button call" + (callManagerCall.hasVideoSlotLimitReached() === true &&
-                    callManagerCall.getMediaOptions().video === false ? " disabled" : "")
+                    callManagerCall.getMediaOptions().video === false ? " disabled" : "") +
+                        (this.state.muteInProgress ? " disabled" : "")
                 } onClick={function(e) {
+                    if (self.state.muteInProgress || $(this).is(".disabled")) {
+                        return;
+                    }
                     if (callManagerCall.getMediaOptions().video === true) {
                         callManagerCall.muteVideo();
                     }

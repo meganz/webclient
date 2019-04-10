@@ -1335,14 +1335,12 @@ CallManagerCall.prototype.onRemoteMute = function () {
 
 CallManagerCall.prototype.onLocalMuteInProgress = function () {
     var self = this;
-    console.warn("TODO: @lp implement disabling of mic and cam mute buttons");
-    $('.videocam,.crossed-videocam,.microphone,.crossed-microphone').css('opacity', '0.5');
+    this.room.trigger('onLocalMuteInProgress', [this]);
     self.room.trackDataChange();
 };
 CallManagerCall.prototype.onLocalMuteComplete = function () {
     var self = this;
-    console.warn("TODO: @lp implement re-enabling of mic and cam mute buttons");
-    $('.videocam,.crossed-videocam,.microphone,.crossed-microphone').css('opacity', '1.0');
+    this.room.trigger('onLocalMuteComplete', [this]);
     self.room.trackDataChange();
 };
 

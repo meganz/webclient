@@ -1946,6 +1946,7 @@
     "17766": "Arquivo enviado ao chat",
     "17767": "Arquivos enviados ao chat",
     "17768": "Conta encerrada",
+    "17777": "Vers\u00e3o atual",
     "17789": "O n\u00famero de identifica\u00e7\u00e3o digitado n\u00e3o \u00e9 valido.",
     "17791": "Filtro",
     "17792": "O espa\u00e7o dispon\u00edvel no seu disco principal est\u00e1 cheio. Libere espa\u00e7o e tente novamente.",
@@ -2151,6 +2152,8 @@
     "18700": "Muito curta",
     "18701": "A sua senha precisa ter pelo menos 8 caracteres.",
     "18704": "C\u00f3digo QR deletado corretamente",
+    "18711": "O c\u00f3digo QR \u00e9 inv\u00e1lido. Por favor, tente escanear um c\u00f3digo v\u00e1lido.",
+    "18714": "O link do contato \u00e9 inv\u00e1lido. Por favor, tente novamente usando um link v\u00e1lido.",
     "18716": "Alinhe o c\u00f3digo QR para escane\u00e1-lo com a c\u00e2mera",
     "18717": "[A]Carregando[\/A] [B]chats...[\/B]",
     "18718": "Processando o link...",
@@ -3415,5 +3418,6 @@
     "20661": "Do you want to make this chat permanently more private?",
     "20662": "64-bit",
     "20663": "32-bit",
-    "20664": "removed the link for the chat."
+    "20664": "removed the link for the chat.",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

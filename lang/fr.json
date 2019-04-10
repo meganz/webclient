@@ -1946,6 +1946,7 @@
     "17766": "Le fichier a \u00e9t\u00e9 envoy\u00e9 vers la conversation",
     "17767": "Les fichiers ont \u00e9t\u00e9 envoy\u00e9s vers la conversation",
     "17768": "Compte r\u00e9sili\u00e9",
+    "17777": "Version actuelle",
     "17789": "Le num\u00e9ro d\u2019identification fiscale saisi est invalide.",
     "17791": "Filtre",
     "17792": "Votre volume de stockage principal est plein. Veuillez lib\u00e9rer de l\u2019espace et ressayer.",
@@ -2151,6 +2152,8 @@
     "18700": "Trop court",
     "18701": "Votre mot de passe doit comprendre au moins 8 caract\u00e8res.",
     "18704": "Le code QR a \u00e9t\u00e9 supprim\u00e9 avec succ\u00e8s",
+    "18711": "Le code QR est invalide. Veuillez essayez de lire un code valide.",
+    "18714": "Le lien de contact est invalide. Veuillez essayer avec un lien valide.",
     "18716": "Alignez le code QR pour le balayer avec l\u2019appareil photo de votre appareil",
     "18717": "[A]Chargement des[\/A] [B]conversations\u2026[\/B]",
     "18718": "Traitement du lien\u2026",
@@ -3415,5 +3418,6 @@
     "20661": "Do you want to make this chat permanently more private?",
     "20662": "64 bits",
     "20663": "32 bits",
-    "20664": "removed the link for the chat."
+    "20664": "removed the link for the chat.",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

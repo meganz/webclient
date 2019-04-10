@@ -1946,6 +1946,7 @@
     "17766": "Naipadala na file sa chat",
     "17767": "Naipadala na ang mga files sa chat",
     "17768": "Terminated na account",
+    "17777": "Kasalukuyang version",
     "17789": "Ang nilagay na tax number ay invalid.",
     "17791": "Filter",
     "17792": "Ang iyong primary disk volume ay puno na. Magtanggal ng ibang files at subukang muli.",
@@ -2151,6 +2152,8 @@
     "18700": "Too short",
     "18701": "Your password needs to be at least 8 characters long.",
     "18704": "QR code successfully deleted",
+    "18711": "The QR code is invalid. Please try to scan a valid code.",
+    "18714": "The contact link is invalid. Please try with a valid link.",
     "18716": "Itama ang QR code sa camera ng iyong device para ma-scan ito",
     "18717": "[A]Loading[\/A] [B]Conversations\u2026[\/B]",
     "18718": "Processing link\u2026",
@@ -3415,5 +3418,6 @@
     "20661": "Do you want to make this chat permanently more private?",
     "20662": "64-bit",
     "20663": "32-bit",
-    "20664": "removed the link for the chat."
+    "20664": "removed the link for the chat.",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

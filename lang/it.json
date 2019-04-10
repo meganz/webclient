@@ -1358,7 +1358,7 @@
     "9062": "Mostra opzioni PRO",
     "9063": "Imposta la protezione della password",
     "9064": "Nascondi opzioni",
-    "9065": "Questa opzione non \u00e8 supportata dal tuo browser. Usa Firefox o Chrome.",
+    "9065": "Questa opzione non \u00e8 supportata dal tuo browser. Per favore, usa Firefox o Chrome.",
     "9066": "Le password non sono le stesse, per favore controlla di averle inserite correttamente.",
     "9067": "Per favore, usa una password pi\u00f9 sicura.",
     "9068": "Il link non pu\u00f2 essere decodificato, per favore controlla che il link sia corretto e riprova.",
@@ -1946,6 +1946,7 @@
     "17766": "Il file \u00e8 stato inviato alla chat",
     "17767": "I file sono stati inviati alla chat",
     "17768": "Account chiuso",
+    "17777": "Versione corrente",
     "17789": "Il codice fiscale inserito non \u00e8 valido.",
     "17791": "Filtro",
     "17792": "Lo spazio del tuo disco principale \u00e8 pieno. Per favore, libera un po' di spazio e riprova.",
@@ -2151,6 +2152,8 @@
     "18700": "Troppo corta",
     "18701": "La tua password deve essere lunga almeno 8 caratteri.",
     "18704": "Il QRcode \u00e8 stato eliminato con successo",
+    "18711": "Il QRcode non \u00e8 valido. Per favore, prova a scaricare un codice valido.\r\n",
+    "18714": "Il link di contatto non \u00e8 valido. Per favore, riprova con un link valido.",
     "18716": "Inquadra il QRcode fa scansionare con la fotocamera del tuo dispositivo",
     "18717": "[A] Caricamento delle[\/A] [B]Conversazioni...[\/B]",
     "18718": "Caricamento...",
@@ -3413,7 +3416,8 @@
     "20657": "Inizia a chattare in sicurezza con i tuoi contatti utilizzando la criptazione end-to-end",
     "20660": "Nessun link della chat disponibile.",
     "20661": "Do you want to make this chat permanently more private?",
-    "20662": "64 bit",
-    "20663": "32 bit",
-    "20664": "removed the link for the chat."
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20664": "removed the link for the chat.",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

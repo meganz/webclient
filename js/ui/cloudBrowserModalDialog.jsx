@@ -805,6 +805,14 @@ var CloudBrowserDialog = React.createClass({
             $('input', $parentBlock).trigger("focus");
         }
     },
+    onClearSearchIconClick: function() {
+        var self = this;
+
+        self.setState({
+            'searchValue': '',
+            'currentlyViewedEntry': M.RootID
+        })
+    },
     onTabButtonClick: function(e, selectedTab) {
         var $this = $(e.target);
 
@@ -1119,6 +1127,20 @@ var CloudBrowserDialog = React.createClass({
             );
         }
 
+        var clearSearchBtn = null;
+        if (self.state.searchValue.length >= 3) {
+            clearSearchBtn = (
+                <i
+                    className="top-clear-button"
+                    style={{'right': '85px'}}
+                    onClick={() => {
+                        self.onClearSearchIconClick();
+                    }}
+                >
+                </i>
+            );
+        }
+
         return (
             <ModalDialogsUI.ModalDialog
                 title={__(l[8011])}
@@ -1165,6 +1187,7 @@ var CloudBrowserDialog = React.createClass({
                             ></i>
                             <input type="search" placeholder={__(l[102])}  value={self.state.searchValue}
                                 onChange={self.onSearchChange} />
+                            {clearSearchBtn}
                         </div>
                         <div className="clear"></div>
                     </div>

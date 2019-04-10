@@ -2091,7 +2091,7 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-	Chat.prototype.loginOrRegisterBeforeJoining = function (chatHandle, forceRegister, forceLogin) {
+	Chat.prototype.loginOrRegisterBeforeJoining = function (chatHandle, forceRegister, forceLogin, notJoinReq) {
 	    if (!chatHandle && (page === 'chat' || page.indexOf('chat') > -1)) {
 	        chatHandle = getSitePath().split("chat/")[1].split("#")[0];
 	    }
@@ -2106,7 +2106,9 @@ React.makeElement = React['createElement'];
 	            closeDialog();
 	            topmenuUI();
 	            if (page !== 'login') {
-	                localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+	                if (!notJoinReq) {
+	                    localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+	                }
 	                window.location.reload();
 	            }
 	        });
@@ -2129,8 +2131,10 @@ React.makeElement = React['createElement'];
 	            },
 
 	            onAccountCreated: function onAccountCreated(gotLoggedIn, registerData) {
-	                localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
-	                localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+	                if (!notJoinReq) {
+	                    localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
+	                    localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+	                }
 
 	                mega.ui.sendSignupLinkDialog(registerData, false);
 	                megaChat.destroy();
@@ -2140,7 +2144,9 @@ React.makeElement = React['createElement'];
 
 	    if (u_handle && u_handle !== "AAAAAAAAAAA") {
 
-	        localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+	        if (!notJoinReq) {
+	            localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+	        }
 	        window.location.reload();
 	        return;
 	    }
@@ -5455,6 +5461,10 @@ React.makeElement = React['createElement'];
 	                    key: "view2", icon: "small-icon icons-sprite grey-plus", label: __(l[101]), onClick: function onClick() {
 	                        loadingDialog.show();
 
+	                        if (anonymouschat && (!u_handle || u_type !== 3)) {
+	                            megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
+	                            return;
+	                        }
 	                        M.syncContactEmail(contact.u).done(function (email) {
 	                            var exists = false;
 	                            Object.keys(M.opc).forEach(function (k) {
@@ -6973,7 +6983,7 @@ React.makeElement = React['createElement'];
 	            sendContactDialog: false,
 	            confirmDeleteDialog: false,
 	            pasteImageConfirmDialog: false,
-	            nonLoggedInJoinChatDialog: anonymouschat,
+	            nonLoggedInJoinChatDialog: false,
 	            messageToBeDeleted: null,
 	            editing: false
 	        };
@@ -7057,6 +7067,11 @@ React.makeElement = React['createElement'];
 	        }
 
 	        self.eventuallyInit();
+	        if (anonymouschat) {
+	            setTimeout(function () {
+	                self.setState({ 'nonLoggedInJoinChatDialog': true });
+	            }, rand_range(5, 10) * 1000);
+	        }
 	    },
 	    eventuallyInit: function eventuallyInit(doResize) {
 	        var self = this;
@@ -10076,6 +10091,14 @@ React.makeElement = React['createElement'];
 	            $('input', $parentBlock).trigger("focus");
 	        }
 	    },
+	    onClearSearchIconClick: function onClearSearchIconClick() {
+	        var self = this;
+
+	        self.setState({
+	            'searchValue': '',
+	            'currentlyViewedEntry': M.RootID
+	        });
+	    },
 	    onTabButtonClick: function onTabButtonClick(e, selectedTab) {
 	        var $this = $(e.target);
 
@@ -10375,6 +10398,17 @@ React.makeElement = React['createElement'];
 	            ));
 	        }
 
+	        var clearSearchBtn = null;
+	        if (self.state.searchValue.length >= 3) {
+	            clearSearchBtn = React.makeElement("i", {
+	                className: "top-clear-button",
+	                style: { 'right': '85px' },
+	                onClick: function onClick() {
+	                    self.onClearSearchIconClick();
+	                }
+	            });
+	        }
+
 	        return React.makeElement(
 	            ModalDialogsUI.ModalDialog,
 	            {
@@ -10434,7 +10468,8 @@ React.makeElement = React['createElement'];
 	                            ">"
 	                        ),
 	                        React.makeElement("input", { type: "search", placeholder: __(l[102]), value: self.state.searchValue,
-	                            onChange: self.onSearchChange })
+	                            onChange: self.onSearchChange }),
+	                        clearSearchBtn
 	                    ),
 	                    React.makeElement("div", { className: "clear" })
 	                ),
@@ -15775,13 +15810,25 @@ React.makeElement = React['createElement'];
 /* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(3);
-	var RenderDebugger = __webpack_require__(6).RenderDebugger;
-	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(11);
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(3);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _mixins = __webpack_require__(6);
+
+	var _contacts = __webpack_require__(11);
+
+	var _contacts2 = _interopRequireDefault(_contacts);
+
+	var _utils = __webpack_require__(5);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var DEBUG_PARTICIPANTS_MULTIPLICATOR = 1;
 
@@ -15792,10 +15839,10 @@ React.makeElement = React['createElement'];
 	    "CAROUSEL": 2
 	};
 
-	var ConversationAudioVideoPanel = React.createClass({
-	    displayName: "ConversationAudioVideoPanel",
+	var ConversationAudioVideoPanel = _react2.default.createClass({
+	    displayName: 'ConversationAudioVideoPanel',
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    getInitialState: function getInitialState() {
 	        return {
 	            'messagesBlockEnabled': false,
@@ -15844,7 +15891,7 @@ React.makeElement = React['createElement'];
 	            return;
 	        }
 
-	        var $container = $(ReactDOM.findDOMNode(self));
+	        var $container = $(_reactDom2.default.findDOMNode(self));
 
 	        self.visiblePanel = false;
 	        $('.call.bottom-panel, .call.local-video, .call.local-audio, .participantsContainer', $container).removeClass('visible-panel');
@@ -15872,7 +15919,7 @@ React.makeElement = React['createElement'];
 	            return;
 	        }
 
-	        var $container = $(ReactDOM.findDOMNode(self));
+	        var $container = $(_reactDom2.default.findDOMNode(self));
 
 	        var totalWidth = $container.outerWidth();
 	        if (totalWidth > $('.participantsContainer', $container).parent().outerWidth()) {
@@ -15960,7 +16007,7 @@ React.makeElement = React['createElement'];
 	            return;
 	        }
 
-	        var $container = $(ReactDOM.findDOMNode(self));
+	        var $container = $(_reactDom2.default.findDOMNode(self));
 
 	        var mouseoutThrottling = null;
 	        $container.rebind('mouseover.chatUI' + self.props.chatRoom.roomId, function () {
@@ -16161,7 +16208,7 @@ React.makeElement = React['createElement'];
 	            self.setState({ 'muteInProgress': false });
 	        });
 
-	        if (self.initialRender === false && ReactDOM.findDOMNode(self)) {
+	        if (self.initialRender === false && _reactDom2.default.findDOMNode(self)) {
 	            self.bindInitialEvents();
 	        }
 
@@ -16179,7 +16226,7 @@ React.makeElement = React['createElement'];
 	    },
 	    bindInitialEvents: function bindInitialEvents() {
 	        var self = this;
-	        var $container = $(ReactDOM.findDOMNode(self));
+	        var $container = $(_reactDom2.default.findDOMNode(self));
 	        self.avResizable = new FMResizablePane($container, {
 	            'direction': 's',
 	            'handle': '.av-resize-handler',
@@ -16199,7 +16246,7 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        var room = self.props.chatRoom;
 
-	        var $container = $(ReactDOM.findDOMNode(self));
+	        var $container = $(_reactDom2.default.findDOMNode(self));
 	        if ($container) {
 	            $container.off('mouseover.chatUI' + self.props.chatRoom.roomId);
 	            $container.off('mouseout.chatUI' + self.props.chatRoom.roomId);
@@ -16255,7 +16302,7 @@ React.makeElement = React['createElement'];
 	        e.preventDefault();
 	        e.stopPropagation();
 
-	        var $container = $(ReactDOM.findDOMNode(this));
+	        var $container = $(_reactDom2.default.findDOMNode(this));
 	        var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
 
 	        $localMediaDisplay.addClass('right-aligned').addClass('bottom-aligned').css({
@@ -16291,7 +16338,7 @@ React.makeElement = React['createElement'];
 	        var remoteCamEnabled = null;
 
 	        if (callManagerCall.getRemoteMediaOptions().video) {
-	            remoteCamEnabled = React.makeElement("i", { className: "small-icon blue-videocam" });
+	            remoteCamEnabled = _react2.default.createElement('i', { className: 'small-icon blue-videocam' });
 	        }
 
 	        var localPlayerElement = null;
@@ -16331,23 +16378,23 @@ React.makeElement = React['createElement'];
 	            if (!remotePlayerStream || callManagerCall.getRemoteMediaOptions(sessionId).video === false) {
 
 	                var contact = M.u[userId];
-	                var player = React.makeElement(
-	                    "div",
+	                var player = _react2.default.createElement(
+	                    'div',
 	                    {
 	                        className: "call user-audio is-avatar " + (activeStreamIdOrPlayer === streamId ? "active" : "") + " stream" + streamId.replace(/:/g, "_"),
 	                        key: streamId + "_" + k,
 	                        onClick: function onClick(e) {
 	                            self.onPlayerClick(streamId);
 	                        } },
-	                    callManagerCall.peerQuality[streamId] === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
-	                    React.makeElement(
-	                        "div",
-	                        { className: "center-avatar-wrapper" },
-	                        callManagerCall.getRemoteMediaOptions(sessionId).audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
-	                        React.makeElement(ContactsUI.Avatar, { contact: contact, className: "avatar-wrapper", simpletip: contact.name,
-	                            simpletipWrapper: "#call-block",
+	                    callManagerCall.peerQuality[streamId] === 0 ? _react2.default.createElement('div', { className: 'icon-connection-issues' }) : null,
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'center-avatar-wrapper' },
+	                        callManagerCall.getRemoteMediaOptions(sessionId).audio === false ? _react2.default.createElement('div', { className: 'small-icon icon-audio-muted' }) : _react2.default.createElement('div', { className: 'small-icon icon-audio-muted hidden' }),
+	                        _react2.default.createElement(_contacts2.default.Avatar, { contact: contact, className: 'avatar-wrapper', simpletip: contact.name,
+	                            simpletipWrapper: '#call-block',
 	                            simpletipOffset: 8,
-	                            simpletipPosition: "top",
+	                            simpletipPosition: 'top',
 	                            hideVerifiedBadge: true })
 	                    )
 	                );
@@ -16357,19 +16404,19 @@ React.makeElement = React['createElement'];
 	                }
 	                remotePlayerElement.push(player);
 	            } else {
-	                player = React.makeElement(
-	                    "div",
+	                player = _react2.default.createElement(
+	                    'div',
 	                    {
 	                        className: "call user-video is-video " + (activeStreamIdOrPlayer === streamId ? "active" : "") + " stream" + streamId.replace(/:/g, "_"),
 	                        key: streamId + "_" + k,
 	                        onClick: function onClick(e) {
 	                            self.onPlayerClick(streamId);
 	                        } },
-	                    callManagerCall.peerQuality[streamId] === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
-	                    callManagerCall.getRemoteMediaOptions(sessionId).audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
-	                    React.makeElement("video", {
+	                    callManagerCall.peerQuality[streamId] === 0 ? _react2.default.createElement('div', { className: 'icon-connection-issues' }) : null,
+	                    callManagerCall.getRemoteMediaOptions(sessionId).audio === false ? _react2.default.createElement('div', { className: 'small-icon icon-audio-muted' }) : _react2.default.createElement('div', { className: 'small-icon icon-audio-muted hidden' }),
+	                    _react2.default.createElement('video', {
 	                        autoPlay: true,
-	                        className: "rmtViewport rmtVideo",
+	                        className: 'rmtViewport rmtVideo',
 	                        id: "remotevideo_" + streamId,
 	                        ref: function ref(_ref) {
 	                            if (_ref && self.remoteVideoRefs.indexOf(_ref) === -1) {
@@ -16388,20 +16435,20 @@ React.makeElement = React['createElement'];
 
 	        if (this.getViewMode() === VIEW_MODES.GRID) {
 	            if (!localPlayerStream || callManagerCall.getMediaOptions().video === false) {
-	                localPlayerElement = React.makeElement(
-	                    "div",
+	                localPlayerElement = _react2.default.createElement(
+	                    'div',
 	                    { className: "call local-audio right-aligned bottom-aligned is-avatar" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass },
-	                    chatRoom.megaChat.networkQuality === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
-	                    React.makeElement(
-	                        "div",
-	                        { className: "default-white-button tiny-button call", onClick: this.toggleLocalVideoDisplay },
-	                        React.makeElement("i", { className: "tiny-icon grey-minus-icon" })
+	                    chatRoom.megaChat.networkQuality === 0 ? _react2.default.createElement('div', { className: 'icon-connection-issues' }) : null,
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'default-white-button tiny-button call', onClick: this.toggleLocalVideoDisplay },
+	                        _react2.default.createElement('i', { className: 'tiny-icon grey-minus-icon' })
 	                    ),
-	                    React.makeElement(
-	                        "div",
+	                    _react2.default.createElement(
+	                        'div',
 	                        { className: "center-avatar-wrapper " + (this.state.localMediaDisplay ? "" : "hidden") },
-	                        callManagerCall.getMediaOptions().audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
-	                        React.makeElement(ContactsUI.Avatar, {
+	                        callManagerCall.getMediaOptions().audio === false ? _react2.default.createElement('div', { className: 'small-icon icon-audio-muted' }) : _react2.default.createElement('div', { className: 'small-icon icon-audio-muted hidden' }),
+	                        _react2.default.createElement(_contacts2.default.Avatar, {
 	                            contact: M.u[u_handle],
 	                            className: "call avatar-wrapper is-avatar " + (this.state.localMediaDisplay ? "" : "hidden"),
 	                            hideVerifiedBadge: true
@@ -16409,20 +16456,20 @@ React.makeElement = React['createElement'];
 	                    )
 	                );
 	            } else {
-	                localPlayerElement = React.makeElement(
-	                    "div",
+	                localPlayerElement = _react2.default.createElement(
+	                    'div',
 	                    {
 	                        className: "call local-video right-aligned is-video bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass + (activeStreamIdOrPlayer === "local" ? " active " : "") },
-	                    chatRoom.megaChat.networkQuality === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
-	                    React.makeElement(
-	                        "div",
-	                        { className: "default-white-button tiny-button call", onClick: this.toggleLocalVideoDisplay },
-	                        React.makeElement("i", { className: "tiny-icon grey-minus-icon" })
+	                    chatRoom.megaChat.networkQuality === 0 ? _react2.default.createElement('div', { className: 'icon-connection-issues' }) : null,
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'default-white-button tiny-button call', onClick: this.toggleLocalVideoDisplay },
+	                        _react2.default.createElement('i', { className: 'tiny-icon grey-minus-icon' })
 	                    ),
-	                    callManagerCall.getMediaOptions().audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
-	                    React.makeElement("video", {
-	                        ref: "localViewport",
-	                        className: "localViewport",
+	                    callManagerCall.getMediaOptions().audio === false ? _react2.default.createElement('div', { className: 'small-icon icon-audio-muted' }) : _react2.default.createElement('div', { className: 'small-icon icon-audio-muted hidden' }),
+	                    _react2.default.createElement('video', {
+	                        ref: 'localViewport',
+	                        className: 'localViewport',
 	                        defaultMuted: true,
 	                        muted: true,
 	                        volume: 0,
@@ -16436,19 +16483,19 @@ React.makeElement = React['createElement'];
 
 	            var localPlayer;
 	            if (!localPlayerStream || callManagerCall.getMediaOptions().video === false) {
-	                localPlayer = React.makeElement(
-	                    "div",
-	                    { className: "call user-audio local-carousel is-avatar" + (activeStreamIdOrPlayer === "local" ? " active " : ""), key: "local",
+	                localPlayer = _react2.default.createElement(
+	                    'div',
+	                    { className: "call user-audio local-carousel is-avatar" + (activeStreamIdOrPlayer === "local" ? " active " : ""), key: 'local',
 	                        onClick: function onClick(e) {
 	                            self.onPlayerClick("local");
 	                        } },
-	                    chatRoom.megaChat.networkQuality === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
-	                    React.makeElement(
-	                        "div",
-	                        { className: "center-avatar-wrapper" },
-	                        callManagerCall.getMediaOptions().audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
-	                        React.makeElement(ContactsUI.Avatar, {
-	                            contact: M.u[u_handle], className: "call avatar-wrapper",
+	                    chatRoom.megaChat.networkQuality === 0 ? _react2.default.createElement('div', { className: 'icon-connection-issues' }) : null,
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'center-avatar-wrapper' },
+	                        callManagerCall.getMediaOptions().audio === false ? _react2.default.createElement('div', { className: 'small-icon icon-audio-muted' }) : _react2.default.createElement('div', { className: 'small-icon icon-audio-muted hidden' }),
+	                        _react2.default.createElement(_contacts2.default.Avatar, {
+	                            contact: M.u[u_handle], className: 'call avatar-wrapper',
 	                            hideVerifiedBadge: true
 	                        })
 	                    )
@@ -16460,19 +16507,19 @@ React.makeElement = React['createElement'];
 	                    activeStreamIdOrPlayer = localPlayer;
 	                }
 	            } else {
-	                localPlayer = React.makeElement(
-	                    "div",
+	                localPlayer = _react2.default.createElement(
+	                    'div',
 	                    {
 	                        className: "call user-video local-carousel is-video" + (activeStreamIdOrPlayer === "local" ? " active " : ""),
-	                        key: "local-video",
+	                        key: 'local-video',
 	                        onClick: function onClick(e) {
 	                            self.onPlayerClick("local");
 	                        } },
-	                    chatRoom.megaChat.networkQuality === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
-	                    callManagerCall.getMediaOptions().audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
-	                    React.makeElement("video", {
-	                        ref: "localViewport",
-	                        className: "localViewport smallLocalViewport",
+	                    chatRoom.megaChat.networkQuality === 0 ? _react2.default.createElement('div', { className: 'icon-connection-issues' }) : null,
+	                    callManagerCall.getMediaOptions().audio === false ? _react2.default.createElement('div', { className: 'small-icon icon-audio-muted' }) : _react2.default.createElement('div', { className: 'small-icon icon-audio-muted hidden' }),
+	                    _react2.default.createElement('video', {
+	                        ref: 'localViewport',
+	                        className: 'localViewport smallLocalViewport',
 	                        defaultMuted: true,
 	                        muted: true,
 	                        volume: 0,
@@ -16483,15 +16530,15 @@ React.makeElement = React['createElement'];
 	                remotePlayerElement.push(localPlayer);
 
 	                if (activeStreamIdOrPlayer === "local") {
-	                    activeStreamIdOrPlayer = React.makeElement(
-	                        "div",
+	                    activeStreamIdOrPlayer = _react2.default.createElement(
+	                        'div',
 	                        {
-	                            className: "call user-video is-video local-carousel local-carousel-big",
-	                            key: "local-video2" },
-	                        chatRoom.megaChat.networkQuality === 0 ? React.makeElement("div", { className: "icon-connection-issues" }) : null,
-	                        callManagerCall.getMediaOptions().audio === false ? React.makeElement("div", { className: "small-icon icon-audio-muted" }) : React.createElement("div", { className: "small-icon icon-audio-muted hidden" }),
-	                        React.makeElement("video", {
-	                            className: "localViewport bigLocalViewport",
+	                            className: 'call user-video is-video local-carousel local-carousel-big',
+	                            key: 'local-video2' },
+	                        chatRoom.megaChat.networkQuality === 0 ? _react2.default.createElement('div', { className: 'icon-connection-issues' }) : null,
+	                        callManagerCall.getMediaOptions().audio === false ? _react2.default.createElement('div', { className: 'small-icon icon-audio-muted' }) : _react2.default.createElement('div', { className: 'small-icon icon-audio-muted hidden' }),
+	                        _react2.default.createElement('video', {
+	                            className: 'localViewport bigLocalViewport',
 	                            defaultMuted: true,
 	                            muted: true,
 	                            volume: 0,
@@ -16505,9 +16552,9 @@ React.makeElement = React['createElement'];
 	        var unreadDiv = null;
 	        var unreadCount = chatRoom.messagesBuff.getUnreadCount();
 	        if (unreadCount > 0) {
-	            unreadDiv = React.makeElement(
-	                "div",
-	                { className: "unread-messages" },
+	            unreadDiv = _react2.default.createElement(
+	                'div',
+	                { className: 'unread-messages' },
 	                unreadCount > 9 ? "9+" : unreadCount
 	            );
 	        }
@@ -16530,20 +16577,24 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (chatRoom.type === "group" || chatRoom.type === "public") {
-	            header = React.makeElement(
-	                "div",
-	                { className: "call-header" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "call-topic" },
-	                    ellipsis(chatRoom.getRoomTitle(), 'end', 70)
+	            header = _react2.default.createElement(
+	                'div',
+	                { className: 'call-header' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'call-topic' },
+	                    _react2.default.createElement(
+	                        _utils.EmojiFormattedContent,
+	                        null,
+	                        ellipsis(chatRoom.getRoomTitle(), 'end', 70)
+	                    )
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "call-participants-count" },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'call-participants-count' },
 	                    Object.keys(chatRoom.callParticipants).length
 	                ),
-	                React.makeElement("a", { href: "javascript:;", className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : ""), onClick: function onClick(e) {
+	                _react2.default.createElement('a', { href: 'javascript:;', className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : ""), onClick: function onClick(e) {
 	                        if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
 	                            return;
 	                        }
@@ -16553,18 +16604,19 @@ React.makeElement = React['createElement'];
 	                            'viewMode': self.getViewMode() === VIEW_MODES.GRID ? VIEW_MODES.CAROUSEL : VIEW_MODES.GRID
 	                        });
 	                    } }),
-	                React.makeElement(
-	                    "div",
+	                _react2.default.createElement(
+	                    'div',
 	                    { className: "call-av-counter" + (videoSessionCount >= RtcModule.kMaxCallVideoSenders ? " limit-reached" : "") },
 	                    videoSessionCount,
-	                    " / ",
+	                    ' / ',
 	                    RtcModule.kMaxCallVideoSenders
 	                ),
-	                React.makeElement("div", { className: "call-video-icon" + (chatRoom.callManagerCall.hasVideoSlotLimitReached() ? " call-video-icon-warn" : "") }),
-	                React.makeElement(
-	                    "div",
-	                    { className: "call-header-duration",
-	                        "data-room-id": chatRoom.chatId },
+	                _react2.default.createElement('div', {
+	                    className: "call-video-icon" + (chatRoom.callManagerCall.hasVideoSlotLimitReached() ? " call-video-icon-warn" : "") }),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'call-header-duration',
+	                        'data-room-id': chatRoom.chatId },
 	                    secondsToTimeShort(chatRoom._currentCallCounter)
 	                )
 	            );
@@ -16591,8 +16643,8 @@ React.makeElement = React['createElement'];
 
 	            if (notif) {
 	                var title = notif.getTitle();
-	                notifBar = React.makeElement(
-	                    "div",
+	                notifBar = _react2.default.createElement(
+	                    'div',
 	                    { className: "in-call-notif " + notif.getClassName() },
 	                    title ? title : null
 	                );
@@ -16603,8 +16655,8 @@ React.makeElement = React['createElement'];
 	        if (chatRoom.megaChat.networkQuality <= 1) {
 	            var networkQualityMessage = "Slow connection.";
 
-	            networkQualityBar = React.makeElement(
-	                "div",
+	            networkQualityBar = _react2.default.createElement(
+	                'div',
 	                { className: "in-call-notif yellow" + (notifBar ? " after-green-notif" : "") },
 	                networkQualityMessage
 	            );
@@ -16614,29 +16666,29 @@ React.makeElement = React['createElement'];
 
 	        var players = null;
 	        if (self.getViewMode() === VIEW_MODES.GRID) {
-	            players = React.makeElement(
-	                "div",
-	                { className: "participantsWrapper", key: "container" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "participantsContainer", key: "partsContainer" },
+	            players = _react2.default.createElement(
+	                'div',
+	                { className: 'participantsWrapper', key: 'container' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'participantsContainer', key: 'partsContainer' },
 	                    remotePlayerElement
 	                ),
 	                localPlayerElement
 	            );
 	        } else {
 
-	            players = React.makeElement(
-	                "div",
-	                { key: "container" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "activeStream", key: "activeStream" },
+	            players = _react2.default.createElement(
+	                'div',
+	                { key: 'container' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'activeStream', key: 'activeStream' },
 	                    activeStreamIdOrPlayer
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "participantsContainer", key: "partsContainer" },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'participantsContainer', key: 'partsContainer' },
 	                    remotePlayerElement,
 	                    localPlayerElement
 	                )
@@ -16646,22 +16698,22 @@ React.makeElement = React['createElement'];
 	        var topPanel = null;
 
 	        if (chatRoom.type !== "group") {
-	            topPanel = React.makeElement(
-	                "div",
-	                { className: "call top-panel" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "call top-user-info" },
-	                    React.makeElement(
-	                        "span",
-	                        { className: "user-card-name white" },
+	            topPanel = _react2.default.createElement(
+	                'div',
+	                { className: 'call top-panel' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'call top-user-info' },
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'user-card-name white' },
 	                        displayNames.join(", ")
 	                    ),
 	                    remoteCamEnabled
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "call-duration medium blue call-counter", "data-room-id": chatRoom.chatId },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'call-duration medium blue call-counter', 'data-room-id': chatRoom.chatId },
 	                    secondsToTimeShort(chatRoom._currentCallCounter)
 	                )
 	            );
@@ -16677,26 +16729,26 @@ React.makeElement = React['createElement'];
 	            additionalClass = additionalClass + " participants-a-lot";
 	        }
 
-	        return React.makeElement(
-	            "div",
-	            { className: "call-block" + additionalClass, id: "call-block" },
-	            React.makeElement("div", { className: "av-resize-handler ui-resizable-handle ui-resizable-s " + (this.state.messagesBlockEnabled === true && this.state.fullScreenModeEnabled === false ? "" : "hidden") }),
+	        return _react2.default.createElement(
+	            'div',
+	            { className: "call-block" + additionalClass, id: 'call-block' },
+	            _react2.default.createElement('div', { className: "av-resize-handler ui-resizable-handle ui-resizable-s " + (this.state.messagesBlockEnabled === true && this.state.fullScreenModeEnabled === false ? "" : "hidden") }),
 	            header,
 	            notifBar,
 	            networkQualityBar,
 	            players,
 	            topPanel,
-	            React.makeElement(
-	                "div",
-	                { className: "call bottom-panel" },
-	                React.makeElement(
-	                    "div",
+	            _react2.default.createElement(
+	                'div',
+	                { className: 'call bottom-panel' },
+	                _react2.default.createElement(
+	                    'div',
 	                    { className: "button call left" + (unreadDiv ? " unread" : ""), onClick: this.toggleMessages },
 	                    unreadDiv,
-	                    React.makeElement("i", { className: "big-icon conversations" })
+	                    _react2.default.createElement('i', { className: 'big-icon conversations' })
 	                ),
-	                React.makeElement(
-	                    "div",
+	                _react2.default.createElement(
+	                    'div',
 	                    { className: "button call " + (this.state.muteInProgress ? " disabled" : ""), onClick: function onClick(e) {
 	                            if (self.state.muteInProgress || $(this).is(".disabled")) {
 	                                return;
@@ -16707,10 +16759,10 @@ React.makeElement = React['createElement'];
 	                                callManagerCall.unmuteAudio();
 	                            }
 	                        } },
-	                    React.makeElement("i", { className: "big-icon " + (callManagerCall.getMediaOptions().audio ? " microphone" : " crossed-microphone") })
+	                    _react2.default.createElement('i', { className: "big-icon " + (callManagerCall.getMediaOptions().audio ? " microphone" : " crossed-microphone") })
 	                ),
-	                React.makeElement(
-	                    "div",
+	                _react2.default.createElement(
+	                    'div',
 	                    { className: "button call" + (callManagerCall.hasVideoSlotLimitReached() === true && callManagerCall.getMediaOptions().video === false ? " disabled" : "") + (this.state.muteInProgress ? " disabled" : ""), onClick: function onClick(e) {
 	                            if (self.state.muteInProgress || $(this).is(".disabled")) {
 	                                return;
@@ -16723,21 +16775,21 @@ React.makeElement = React['createElement'];
 	                                }
 	                            }
 	                        } },
-	                    React.makeElement("i", { className: "big-icon " + (callManagerCall.getMediaOptions().video ? " videocam" : " crossed-videocam") })
+	                    _react2.default.createElement('i', { className: "big-icon " + (callManagerCall.getMediaOptions().video ? " videocam" : " crossed-videocam") })
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "button call", onClick: function onClick(e) {
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'button call', onClick: function onClick(e) {
 	                            if (chatRoom.callManagerCall) {
 	                                chatRoom.callManagerCall.endCall();
 	                            }
 	                        } },
-	                    React.makeElement("i", { className: "big-icon horizontal-red-handset" })
+	                    _react2.default.createElement('i', { className: 'big-icon horizontal-red-handset' })
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "button call right", onClick: this.fullScreenModeToggle },
-	                    React.makeElement("i", { className: "big-icon nwse-resize" })
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'button call right', onClick: this.fullScreenModeToggle },
+	                    _react2.default.createElement('i', { className: 'big-icon nwse-resize' })
 	                )
 	            )
 	        );

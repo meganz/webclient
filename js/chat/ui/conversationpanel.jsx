@@ -555,7 +555,7 @@ var ConversationPanel = React.createClass({
             sendContactDialog: false,
             confirmDeleteDialog: false,
             pasteImageConfirmDialog: false,
-            nonLoggedInJoinChatDialog: anonymouschat,
+            nonLoggedInJoinChatDialog: false,
             messageToBeDeleted: null,
             editing: false
         };
@@ -641,6 +641,11 @@ var ConversationPanel = React.createClass({
         }
 
         self.eventuallyInit();
+        if (anonymouschat) {
+            setTimeout(function() {
+                self.setState({'nonLoggedInJoinChatDialog': true});
+            }, rand_range(5, 10) * 1000);
+        }
     },
     eventuallyInit: function(doResize) {
         var self = this;

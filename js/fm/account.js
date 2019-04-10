@@ -147,7 +147,7 @@ accountUI.renderAccountPage = function(account) {
             break;
 
         default:
-        
+
             // This is the main entry point for users who just had upgraded their accounts
             if (isNonActivatedAccount()) {
                 alarm.nonActivatedAccount.render(true);
@@ -1809,27 +1809,26 @@ accountUI.plan = {
             });
 
             $('.fm-voucher-button').rebind('click.voucherBtnClick', function() {
+                var $input = $('.fm-voucher-body input');
+                var code = $input.val();
+
+                $input.val('');
                 loadingDialog.show();
-                api_req({a: 'uavr', v: $('.fm-voucher-body input').val()},
-                    {
-                        callback: function(res) {
-                            loadingDialog.hide();
-                            $('.fm-voucher-popup').addClass('hidden');
-                            $('.fm-voucher-body input').val('');
-                            if (typeof res === 'number') {
-                                if (res === -11) {
-                                    msgDialog('warninga', l[135], l[714]);
-                                }
-                                else if (res < 0) {
-                                    msgDialog('warninga', l[135], l[473]);
-                                }
-                                else {
-                                    if (M.account) {
-                                        M.account.lastupdate = 0;
-                                    }
-                                    accountUI();
-                                }
-                            }
+                $('.fm-voucher-popup').addClass('hidden');
+
+                M.require('redeem_js')
+                    .then(function() {
+                        return redeem.redeemVoucher(code);
+                    })
+                    .then(function() {
+                        loadingDialog.hide();
+                        Object(M.account).lastupdate = 0;
+                        onIdle(accountUI);
+                    })
+                    .catch(function(ex) {
+                        loadingDialog.hide();
+                        if (ex) {
+                            msgDialog('warninga', l[135], l[47], ex);
                         }
                     });
             });

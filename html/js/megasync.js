@@ -164,7 +164,6 @@ var megasync = (function() {
                     $list.addClass('hidden');
                 }
             }
-            return false;
         });
 
         // Set the close function.

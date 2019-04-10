@@ -77,11 +77,13 @@ function initMegasync() {
     'use strict';
 
     var $content = $('.bottom-page.megasync');
+    var pf = navigator.platform.toUpperCase();
 
     resetMegasync();
 
     // Preload linux options if on a linux client
-    if (ua.indexOf('linux') >= 0) {
+    if (pf.indexOf('LINUX') >= 0) {
+        $('.nav-buttons-bl a.linux').addClass('active');
         megasync.getLinuxReleases(renderLinuxOptions);
     }
 
@@ -122,14 +124,13 @@ function initMegasync() {
         return false;
     });
 
-    $content.on('click.resetMegaSync', function(e) {
+    $content.rebind('click.resetMegaSync', function(e) {
         var $target = $(e.target);
         if (!(megasync.UICloseLinuxDropdown() || megasync.UICloseExtensionsDropdown())) {
-            if ($target.closest('.megaapp-linux').length < 1) {
+            if (pf.indexOf('LINUX') < 0 && $target.closest('.megaapp-linux').length < 1) {
                 resetMegasync();
             }
         }
-        return false;
     });
 
     $('.pages-nav.nav-button').removeClass('active');

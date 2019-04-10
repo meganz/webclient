@@ -140,10 +140,10 @@ function WebrtcApi() {
             });
         };
     }
-};
+}
 
 WebrtcApi.prototype.getBrowserId = function() {
-    var ret = this.browser.charAt(0) + (navigator.userAgent.match(/(Android|iPhone)/i)?'m':'');
+    var ret = this.browser.charAt(0) + (navigator.userAgent.match(/(Android|iPhone)/i) ? 'm' : '');
     var ver = this.browserVersion;
     if (ver) {
         ret += ":" + ver;
@@ -217,7 +217,7 @@ WebrtcApi.prototype.peerConnAddVideoTrack = function(peerConn, track, stream) {
     peerConn.videoSender = peerConn.addTrack(track, stream);
 };
 
-WebrtcApi.prototype.peerConnReplaceVideoTrack = function(peerConn, track, stream) {
+WebrtcApi.prototype.peerConnReplaceVideoTrack = function(peerConn, track) {
     assert(this.supportsReplaceTrack);
     assert(peerConn.videoSender);
     return peerConn.videoSender.replaceTrack(track);
@@ -230,7 +230,7 @@ WebrtcApi.prototype.peerConnRemoveVideoTrack = function(peerConn) {
     }
     try {
         return peerConn.videoSender.replaceTrack(null);
-    } catch(e) {
+    } catch (e) {
         return Promise.reject("replaceTrack(null) exception: " + e);
     }
 };

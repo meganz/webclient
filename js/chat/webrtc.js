@@ -2,7 +2,7 @@
 "use strict";
 // jscs:disable disallowImplicitTypeConversion
 // jscs:disable validateIndentation
-// jscs: disable disallowEmptyBlocks
+// jscs:disable disallowEmptyBlocks
 
 // jshint -W116
 // We often enumerate our own objects, created by 'obj = {}', so no inherited properties
@@ -610,7 +610,6 @@ Call.prototype._initialGetLocalStream = function(av) {
 
             if (self.state >= CallState.kTerminating) {
                 return Promise.reject("_initialGetLocalStream: Call killed while getting local video");
-                return; // the local stream cleanup is done by destroyCall()
             }
             assert(!self.gLocalStream); // assure nobody set it meanwhile
             self.gLocalStream = stream;
@@ -1863,7 +1862,7 @@ Call.prototype._checkLocalMuteCompleted = function() {
         return;
     }
     var sessRetries = self.sessRetries;
-    var kStreamChange = Term.kStreamChange; //avoid lookup in loop
+    var kStreamChange = Term.kStreamChange; // avoid lookup in loop
     // first, check for fallback 'renegotiations'
     for (var id in sessRetries) {
         var reason = sessRetries[id].termReason;
@@ -1979,7 +1978,6 @@ Call.prototype.enableAudio = function(enable) {
         }
     }
 };
-
 Call.prototype.enableVideo = function(enable) {
     var self = this;
     if (self.state !== CallState.kCallInProgress) {
@@ -1991,7 +1989,7 @@ Call.prototype.enableVideo = function(enable) {
         return;
     }
     var oldAv = Av.fromStream(self.gLocalStream);
-    if (!!(oldAv & Av.Video) === enable) {
+    if ((!!(oldAv & Av.Video)) === enable) { // jshint -W018
         self.logger.log("enableVideo: Nothing to change");
         return;
     }
@@ -2021,9 +2019,9 @@ Call.prototype.enableVideo = function(enable) {
                 if (RTC.peerConnCanReplaceVideoTrack(sess.rtcConn)) { // we can just replace the track at the sender
                     sess._setStreamRenegTimeout();
                     RTC.peerConnReplaceVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream)
-                    .then(function() {
-                        sess._notifyRenegotiationComplete();
-                    });
+                    .then((function() {
+                        this._notifyRenegotiationComplete();
+                    }).bind(sess));
                 } else { // no videoSender or we don't have replaceTrack support
                     if (RTC.supportsUnifiedPlan && sess.peerSupportsReneg) {
                         RTC.peerConnAddVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream);
@@ -2034,28 +2032,30 @@ Call.prototype.enableVideo = function(enable) {
             }
             self._bcastLocalAvChange(Av.fromStream(self.gLocalStream));
         });
-    } else {
+    } else { // disable video
         RTC.streamStopAndRemoveVideoTracks(self.gLocalStream);
-        for (var sid in sessions) {
-            var sess = sessions[sid];
-            if (RTC.supportsReplaceTrack) {
+        if (RTC.supportsReplaceTrack) {
+            for (var sid in sessions) {
+                var sess = sessions[sid];
                 var pc = sess.rtcConn;
                 assert(pc);
                 var pms = RTC.peerConnRemoveVideoTrack(pc);
                 // pms may be null if there was no video track
-                if (pms) {
-                    pms.then(function() {
-                        self._notifyLocalMuteComplete();
-                    });
-                    pms.catch(function() { // replaceTrack(null) is not supported
-                        self.logger.warn("peerConnRemoveVideoTrack() returned failed promise: " + err + " falling back to session reconnect");
-                        sess.terminateAndDestroy(Term.kStreamChange);
-                    });
-                } else {
-                    self._notifyLocalMuteComplete();
-                }
-            } else {
-                sess.terminateAndDestroy(Term.kStreamChange);
+                assert(pms, "Disable video: Session peerconnection's sender doesn't have a video track, " +
+                    "but gLocalStream has one");
+                sess._setStreamRenegTimeout();
+                pms.then(function() {
+                    this._notifyRenegotiationComplete();
+                }.bind(sess));
+                pms.catch(function() { // replaceTrack(null) is not supported
+                    self.logger.warn("peerConnRemoveVideoTrack() returned failed promise: " + err +
+                        " falling back to session reconnect");
+                    this.terminateAndDestroy(Term.kStreamChange);
+                }.bind(sess));
+            }
+        } else {
+            for (var sid in sessions) {
+                sessions[sid].terminateAndDestroy(Term.kStreamChange);
             }
         }
         self._bcastLocalAvChange(Av.fromStream(self.gLocalStream));
@@ -2071,7 +2071,7 @@ Call.prototype._bcastLocalAvChange = function(av) {
             sessions[sid]._sendAv(av);
         }
     }
-}
+};
 
 Call.prototype.localAv = function() {
     return Av.fromStream(this.gLocalStream);
@@ -2558,12 +2558,6 @@ Session.prototype._createRtcConn = function() {
             self._fire("onRemoteStreamRemoved");
         }
         var stream = self.remoteStream = event.stream;
-        /*
-        stream.onremovetrack = function(event) {
-            self.logger.log("onRemoveTrack: " + streamInfo(stream));
-            self._onRemoteMuteUnmute(Av.fromStream(stream));
-        }
-        */
         self._fire("onRemoteStreamAdded", stream);
         if (stream.getAudioTracks().length) {
             // self.audioLevelMonitor = new AudioLevelMonitor(stream, self.handler);
@@ -2658,7 +2652,7 @@ Session.prototype._createRtcConn = function() {
 Session.prototype._setStreamRenegTimeout = function() {
     var self = this;
     assert(!self._streamRenegTimer);
-    self._streamRenegTimer = setTimeout(function(){
+    self._streamRenegTimer = setTimeout(function() {
         if (!self._streamRenegTimer || self.state >= SessState.kTerminating) {
             return;
         }
@@ -2673,7 +2667,7 @@ Session.prototype._notifyRenegotiationComplete = function() {
     delete self._streamRenegTimer;
     delete self._onNegotiationNeededCalled;
     self.call._checkLocalMuteCompleted();
-}
+};
 
 // stats interface
 Session.prototype.onStatCommonInfo = function(info) {
@@ -2841,7 +2835,8 @@ Session.prototype.msgSdpAnswerRenegotiate = function(packet) {
         return;
     }
     if (self.state !== SessState.kSessInProgress) {
-        self.logger.warn("Ignoring unexpected SDP_ANSWER_RENEGOTIATE while in state", constStateToText(SessState, self.state));
+        self.logger.warn("Ignoring unexpected SDP_ANSWER_RENEGOTIATE while in state",
+            constStateToText(SessState, self.state));
         return;
     }
     self._setRemoteAnswerSdp(packet)
@@ -3353,21 +3348,21 @@ Av.enableTracks = function(tracks, enable) {
     }
     var len = tracks.length;
     if (enable) {
-        for (var i = 0; i< len; i++) {
+        for (var i = 0; i < len; i++) {
             tracks[i].enabled = true;
         }
     } else {
-        for (var i = 0; i< len; i++) {
+        for (var i = 0; i < len; i++) {
             tracks[i].enabled = false;
         }
     }
-}
+};
 
 Av.enableAudio = function(stream, enable) {
     if (stream) {
         Av.enableTracks(stream.getAudioTracks(), enable);
     }
-}
+};
 
 Av.applyToStream = function(stream, av) {
     if (!stream) {
@@ -3435,22 +3430,23 @@ var Term = Object.freeze({
     kUserHangup: 0,         // < Normal user hangup
 //  kCallReqCancel: 1,      // < deprecated, now we have CALL_REQ_CANCEL specially for call requests
     kCallRejected: 2,       // < Outgoing call has been rejected by the peer OR incoming call has been rejected by
-    // <another client of our user
+                            // <another client of our user
     kAnsElsewhere: 3,       // < Call was answered on another device of ours
     kAnswerTimeout: 5,      // < Call was not answered in a timely manner
     kRingOutTimeout: 6,     // < We have sent a call request but no RINGING received within this timeout - no other
-    // < users are online
+                            // < users are online
     kAppTerminating: 7,     // < The application is terminating
     kCallerGone: 8,         // < The call initiator of an incoming call went offline
     kBusy: 9,               // < Peer is in another call
     kStreamChange: 10,      // < Session was force closed by a client because it wants to change the media stream.
-    // < This is a fallback if one of the peers doesn't support Unified Plan stream renegotiation
+                            // < This is a fallback if one of the peers doesn't support Unified Plan
+                            // < stream renegotiation
     kNormalHangupLast: 20,  // < Last enum specifying a normal call termination
     kErrorFirst: 21,        // < First enum specifying call termination due to error
     kErrApiTimeout: 22,     // < Mega API timed out on some request (usually for RSA keys)
     kErrFprVerifFailed: 23, // < Peer DTLS-SRTP fingerprint verification failed, posible MiTM attack
     kErrProtoTimeout: 24,   // < Protocol timeout - one if the peers did not send something that was expected,
-    // < in a timely manner
+                            // < in a timely manner
     kErrProtocol: 25,       // < General protocol error
     kErrInternal: 26,       // < Internal error in the client
     kErrLocalMedia: 27,     // < Error getting media from mic/camera
@@ -3468,11 +3464,12 @@ var Term = Object.freeze({
     kErrKickedFromChat: 39, // Call terminated because we were removed from the group chat
     kErrIceTimeout: 40,     // < Sesion setup timed out, because ICE stuck at the 'checking' stage
     kErrStreamReneg: 41,    // < SDP error during stream renegotiation
-    kErrStreamRenegTimeout: 42, // < Timed out waiting for completion of offer-answer exchange during stream renegotiation
+    kErrStreamRenegTimeout: 42, // < Timed out waiting for completion of offer-answer exchange
+                                // < during stream renegotiation
     kErrorLast: 42,         // < Last enum indicating call termination due to error
     kLast: 42,              // < Last call terminate enum value
     kPeer: 128              // < If this flag is set, the condition specified by the code happened at the peer,
-    // < not at our side
+                            // < not at our side
 });
 
 function isTermError(code) {
@@ -4006,14 +4003,16 @@ function eventArgsToString(args) {
 
 function trackInfo(track) {
     assert(track);
-    return track.kind + ": " + ((track.muted ? "muted" : "NOT muted") + "; " + (track.enabled ? "enabled" : "disabled"));
+    return track.kind + ": " + ((track.muted ? "muted" : "NOT muted") + "; " +
+        (track.enabled ? "enabled" : "disabled"));
 }
 
 function streamInfo(stream) {
-    var str ="stream id: " +stream.id;
+    var str = "stream id: " + stream.id;
     var tracks = stream.getTracks();
-    for (var track of tracks) {
-        str += "\n\t" + trackInfo(track);
+    var len = tracks.length;
+    for (var i = 0; i < len; i++) {
+        str += "\n\t" + trackInfo(tracks[i]);
     }
     return str;
 }

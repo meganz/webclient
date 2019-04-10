@@ -3,6 +3,7 @@
 // jshint -W089
 // jshint -W074
 // jshint -W004
+// jscs:disable disallowImplicitTypeConversion
 
 mBroadcaster.once('startMega', function() {
 if (!window.RTC || !window.RTCPeerConnection || !RTCPeerConnection.prototype.getStats
@@ -60,7 +61,7 @@ function addSampleToArrays(sample, arrs, len) {
             if (!sub) {
                 sub = arrs[k] = {};
             }
-            addSampleToArrays(val, sub, len); //this points to the object owning the cloneObject() method
+            addSampleToArrays(val, sub, len); // this points to the object owning the cloneObject() method
         } else { // val is a primitive value
             if (isNaN(val)) {
                 val = -1;
@@ -182,12 +183,13 @@ Recorder.prototype.pollStats = function() {
             pc.getRemoteStreams()
         );
     } else if (RTC.isFirefox) {
+        // jshint -W083
         if (RTC.supportsRxTxGetStats) {
             var statsMap = {};
             var promises = [];
             var senders = pc.getSenders();
             var len = senders.length;
-            for(var i = 0; i < len; i++) {
+            for (var i = 0; i < len; i++) {
                 promises.push(senders[i].getStats().then(function(stats) {
                     for (var k in stats) {
                         statsMap[k] = stats.get(k);
@@ -196,7 +198,7 @@ Recorder.prototype.pollStats = function() {
             }
             var receivers = pc.getReceivers();
             len = receivers.length;
-            for(var i = 0; i < len; i++) {
+            for (var i = 0; i < len; i++) {
                 promises.push(receivers[i].getStats().then(function(stats) {
                     for (var k in stats) {
                         statsMap[k] = stats.get(k);
@@ -455,7 +457,7 @@ Recorder.prototype.parseChromeStat = function(period, item, prevSample) {
             r.dly = stat('googCurrentDelayMs');
         }
     } else if ((item.type === 'googCandidatePair') && (item.stat('googActiveConnection') === 'true')) {
-        if (self._hadConnItem) { //happens if peer is Firefox
+        if (self._hadConnItem) { // happens if peer is Firefox
             return;
         }
 
@@ -529,7 +531,10 @@ Recorder.prototype.parseFirefoxStat = function(period, allStats, item, prevSampl
         var isOutbound = (type === "outbound-rtp");
         var isRemote = item.isRemote;
         var kind = item.kind;
-        var x, prevX, isAudio, isVideo;
+        var x;
+        var prevX;
+        var isAudio;
+        var isVideo;
         if (kind === "audio") {
             x = stats.a;
             prevX = prevSample.a;
@@ -558,9 +563,9 @@ Recorder.prototype.parseFirefoxStat = function(period, allStats, item, prevSampl
                 calcBwAverage(xr, period, item.bytesReceived, prevX.r);
 
                 if (isVideo) { // local video receive
-                    var fps = item.framerateMean;
-                    if (!isNaN(fps)) {
-                        xr.fps = Math.round(fps * 10) / 10;
+                    var rfps = item.framerateMean;
+                    if (!isNaN(rfps)) {
+                        xr.fps = Math.round(rfps * 10) / 10;
                     }
                     setIfPresent(item.firCount, xr, 'firtx');
                     setIfPresent(item.nackCount, xr, 'nacktx');
@@ -573,9 +578,9 @@ Recorder.prototype.parseFirefoxStat = function(period, allStats, item, prevSampl
             calcBwAverage(xs, period, item.bytesSent, prevX.s);
             if (isVideo) {
                 setIfPresent(item.droppedFrames, xs, 'fd');
-                var fps = item.framerateMean;
-                if (!isNaN(fps)) {
-                    xs.fps = Math.round(fps * 10) / 10;
+                var sfps = item.framerateMean;
+                if (!isNaN(sfps)) {
+                    xs.fps = Math.round(sfps * 10) / 10;
                 }
             }
         }

@@ -149,7 +149,21 @@ function CreateWorkers(url, message, size) {
                     worker[i].byteOffset = t * 16;
                 }
 
-                worker[i].postMessage(t);
+                try {
+                    worker[i].postMessage(t);
+                }
+                catch (ex) {
+                    if (ex.name === 'DataCloneError' && t.constructor === Uint8Array) {
+                        worker[i].postMessage(t.buffer, [t.buffer]);
+                    }
+                    else {
+                        console.error(' --- FATAL UNRECOVERABLE ERROR --- ', ex);
+
+                        onIdle(function() {
+                            throw ex;
+                        });
+                    }
+                }
             }
         });
     }, size, url.split('/').pop().split('.').shift() + '-worker');

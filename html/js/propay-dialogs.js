@@ -1045,7 +1045,7 @@ var directReseller = {
 
         var baseurls = [
             '',
-            'https://mega.and1.tw/', // 6media
+            'https://mega.6media.tw/', // 6media
             'https://mega.bwm-mediasoft.com/mega.php5?', // BWM Mediasoft
             'https://my.hosting.co.uk/' // Hosting.co.uk
         ];

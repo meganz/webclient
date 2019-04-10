@@ -255,15 +255,21 @@ var ConversationRightArea = React.createClass({
                 "disabled" : ""
             );
 
-        var participantsList = null;
+        let participantsList = null;
         if (room.type === "group" || room.type === "public") {
-            participantsList = <div>
-                {isReadOnlyElement}
-                <ParticipantsList
-                    chatRoom={room}
-                    members={room.members}
-                    isCurrentlyActive={room.isCurrentlyActive}
-                />
+            participantsList = (
+                <div>
+                    {isReadOnlyElement}
+                    <ParticipantsList
+                        chatRoom={room}
+                        members={room.members}
+                        isCurrentlyActive={room.isCurrentlyActive}
+                    />
+                </div>
+            );
+        }
+
+        const addParticipantBtn = (
                 <ButtonsUI.Button
                     className="link-button green light"
                     icon="rounded-plus colorized"
@@ -297,9 +303,7 @@ var ConversationRightArea = React.createClass({
                         selectFooter={true}
                     />
                 </ButtonsUI.Button>
-            </div>;
-        }
-
+        );
         return <div className="chat-right-area">
             <PerfectScrollbar
                 className="chat-right-area conversation-details-scroll"
@@ -321,11 +325,11 @@ var ConversationRightArea = React.createClass({
                                 }
                             }, 250);
                         }}
-                        expandedPanel={room.type === "group" || room.type === "public" ? "participants" : "options"}>
-                        {participantsList ? <AccordionPanel className="small-pad" title={l[8876]} key="participants">
+                        expandedPanel={room.type === "group" || room.type === "public" ? "participants" : "options"}
+                    >
+                       {participantsList ? <AccordionPanel className="small-pad" title={l[8876]} key="participants">
                             {participantsList}
                         </AccordionPanel> : null}
-
                         {room.type === "public" ? <div className="accordion-text observers">
                             {l[20466]}
                             <span className="observers-count">
@@ -333,8 +337,10 @@ var ConversationRightArea = React.createClass({
                                 {self.props.chatRoom.observers}
                             </span>
                         </div> : <div></div>}
+                        
                         <AccordionPanel className="have-animation buttons" title={l[7537]} key="options">
                             <div>
+                            {addParticipantBtn}
                             {startAudioCallButton}
                             {startVideoCallButton}
                             {AVseperator}
@@ -1977,7 +1983,11 @@ var ConversationPanel = React.createClass({
 
                             if (self.props.chatRoom.type == "private") {
                                 var megaChat = self.props.chatRoom.megaChat;
-
+                                const options = {
+                                    keyRotation: false,
+                                    topic: ''
+                                };
+                                
                                 loadingDialog.show();
 
                                 megaChat.trigger(
@@ -1985,8 +1995,9 @@ var ConversationPanel = React.createClass({
                                     [
                                         self.props.chatRoom.getParticipantsExceptMe().concat(
                                             contactHashes
-                                        )
-                                    ]
+                                        ),
+                                        options
+                                    ],
                                 );
                             }
                             else {

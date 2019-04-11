@@ -340,6 +340,13 @@ function init_page() {
         return false;
     }
 
+    // Block about page in Mobile Webclient temporarily
+    // We would remove it till we finish the new about page and support mobile version of it
+    if (is_mobile && page === 'about') {
+        loadSubPage('startpage');
+        return false;
+    }
+
     if (!page.match(/^(blog|help|corporate|fm\/recents|page_)/)) {
         $('.top-head').remove();
     }

@@ -1946,6 +1946,7 @@
     "17766": "Datei an den Chat gesendet",
     "17767": "Dateien an den Chat gesendet",
     "17768": "Benutzerkonto gesperrt",
+    "17777": "Aktuelle Version",
     "17789": "Die eingegebene Steuernummer ist ung\u00fcltig.",
     "17791": "Filter",
     "17792": "Ihre Prim\u00e4rfestplatte ist voll. Bitte geben Sie etwas Platz frei und versuchen Sie es dann noch einmal.",
@@ -2151,6 +2152,8 @@
     "18700": "Zu kurz",
     "18701": "Ihr Passwort ist zu kurz. Die Mindestl\u00e4nge betr\u00e4gt acht Zeichen.",
     "18704": "QR-Code gel\u00f6scht",
+    "18711": "Der QR-Code ist ung\u00fcltig. Scannen Sie bitte einen g\u00fcltigen Code.",
+    "18714": "Ung\u00fcltiger Kontaktlink. Bitte versuchen Sie es noch einmal.",
     "18716": "Richten Sie Ihre Kamera auf den QR-Code",
     "18717": "[B]Chats[\/B] [A]werden geladen...[\/A]",
     "18718": "Link wird verarbeitet...",
@@ -3413,7 +3416,8 @@
     "20657": "Sicherer Chat mit Ihren Kontakten - Ende-zu-Ende-verschl\u00fcsselt",
     "20660": "No chat link available.",
     "20661": "Do you want to make this chat permanently more private?",
-    "20662": "64 bit",
-    "20663": "32 bit",
-    "20664": "removed the link for the chat."
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20664": "removed the link for the chat.",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

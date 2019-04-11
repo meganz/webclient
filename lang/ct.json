@@ -1946,6 +1946,7 @@
     "17766": "\u6a94\u6848\u5df2\u767c\u9001\u81f3\u804a\u5929\u5c0d\u8a71\u4e2d",
     "17767": "\u6a94\u6848\u5df2\u767c\u9001\u81f3\u804a\u5929\u5c0d\u8a71\u4e2d",
     "17768": "\u5df2\u7d42\u6b62\u7684\u5e33\u6236",
+    "17777": "\u7576\u524d\u7684\u7248\u672c",
     "17789": "The entered tax number is invalid.",
     "17791": "Filter",
     "17792": "Your primary disk volume is full. Please free up some space and try again.",
@@ -2151,6 +2152,8 @@
     "18700": "\u592a\u77ed\u4e86",
     "18701": "\u60a8\u7684\u5bc6\u78bc\u81f3\u5c11\u9700\u89818\u500b\u5b57\u7b26\u3002",
     "18704": "QR code successfully deleted",
+    "18711": "The QR code is invalid. Please try to scan a valid code.",
+    "18714": "The contact link is invalid. Please try with a valid link.",
     "18716": "Line up the QR code to scan it with your device\u2019s camera",
     "18717": "[A]\u8f09\u5165[\/A] [B]\u5c0d\u8a71\u4e2d...[\/B]",
     "18718": "\u9023\u7d50\u8655\u7406\u4e2d...",
@@ -3413,7 +3416,8 @@
     "20657": "Start chatting securely with your contacts using end-to-end encryption",
     "20660": "No chat link available.",
     "20661": "Do you want to make this chat permanently more private?",
-    "20662": "64 bit",
-    "20663": "32 bit",
-    "20664": "removed the link for the chat."
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20664": "removed the link for the chat.",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

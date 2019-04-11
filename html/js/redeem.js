@@ -702,6 +702,52 @@ var redeem = {
     },
 
     /**
+     * Redeems a voucher code
+     * @param {String} code The voucher code
+     */
+    redeemVoucher: function(code) {
+        'use strict';
+
+        var self = this;
+        return new Promise(function(resolve, reject) {
+            self.getVoucherData(code)
+                .then(function(data) {
+                    var redeem = function() {
+                        M.req({a: 'uavr', v: code}).then(resolve.bind(null, data)).catch(reject);
+                    };
+
+                    if (data.promotional) {
+                        msgDialog('confirmation', l[761], l[20665], l[6994], function(yes) {
+                            if ($.dialog) {
+                                fm_showoverlay();
+                            }
+                            if (yes) {
+                                return redeem();
+                            }
+                            reject(null);
+                        });
+                    }
+                    else {
+                        redeem();
+                    }
+                })
+                .catch(function(ex) {
+                    if (ex) {
+                        console.warn('redeemVoucher', ex);
+                    }
+
+                    // Oops, that does not seem to be a valid voucher code.
+                    msgDialog('warninga', l[135], l[473], '', function() {
+                        if ($.dialog) {
+                            fm_showoverlay();
+                        }
+                        reject(null);
+                    });
+                });
+        });
+    },
+
+    /**
      * Shows the background overlay
      */
     showBackgroundOverlay: function() {

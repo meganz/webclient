@@ -523,10 +523,14 @@ var voucherDialog = {
      * Display the dialog
      */
     showVoucherDialog: function() {
+        'use strict';
+        var self = this;
 
         // Add the styling for the overlay
-        this.$dialog.removeClass('hidden');
-        this.showBackgroundOverlay();
+        M.safeShowDialog('voucher-dialog', function() {
+            self.showBackgroundOverlay();
+            return self.$dialog;
+        });
     },
 
     /**
@@ -556,7 +560,7 @@ var voucherDialog = {
         this.$dialog.find('.voucher-plan-price .price').text(proPrice);
         this.$dialog.find('#voucher-code-input input').val('');
         this.changeColourIfSufficientBalance();
-        
+
         var $voucherAccountBalance = this.$dialog.find('.voucher-account-balance');
         var $balanceAmount = $voucherAccountBalance.find('.balance-amount');
         $balanceAmount.text(balance);
@@ -649,9 +653,10 @@ var voucherDialog = {
      * Hide the overlay and dialog
      */
     hideDialog: function() {
+        'use strict';
 
+        closeDialog();
         voucherDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-        voucherDialog.$dialog.addClass('hidden');
     },
 
     /**
@@ -707,54 +712,56 @@ var voucherDialog = {
      * @param {String} voucherCode The voucher code
      */
     addVoucher: function(voucherCode) {
+        'use strict';
 
         loadingDialog.show();
 
-        // Make API call to add voucher
-        api_req({ a: 'uavr', v: voucherCode }, {
-            callback: function(result) {
+        M.require('redeem_js')
+            .then(function() {
+                return redeem.redeemVoucher(voucherCode);
+            })
+            .then(function(data, res) {
+                loadingDialog.hide();
 
-                if (typeof result === 'number') {
-
-                    loadingDialog.hide();
-
-                    // This voucher has already been redeemed
-                    if (result === -11) {
-                        msgDialog('warninga', l[135], l[714], '', function() {
-                            voucherDialog.showBackgroundOverlay();
-                        });
-                    }
-
-                    // Not a valid voucher code
-                    else if (result < 0) {
-                        msgDialog('warninga', l[135], l[473], '', function() {
-                            voucherDialog.showBackgroundOverlay();
-                        });
-                    }
-                    else {
-                        // Get the latest account balance and update the price in the dialog
-                        voucherDialog.getLatestBalance(function() {
-
-                            // Format to 2dp
-                            var proPrice = pro.propay.selectedProPackage[5];
-                            var balance = pro.propay.proBalance.toFixed(2);
-                            var newBalance = parseFloat(balance - proPrice).toFixed(2);
-
-                            // Update dialog details
-                            voucherDialog.$dialog.find('.voucher-account-balance .balance-amount').text(balance);
-                            voucherDialog.$dialog.find('.voucher-account-balance .new-balance-amount')
-                                .text(newBalance);
-                            voucherDialog.changeColourIfSufficientBalance();
-
-                            // Hide voucher input
-                            voucherDialog.$dialog.find('.voucher-redeem-container').show();
-                            voucherDialog.$dialog.find('.purchase-now-container').show();
-                            voucherDialog.$dialog.find('.voucher-input-container').hide();
-                        });
-                    }
+                if (d) {
+                    console.debug('voucherDialog.addVoucher', res, data);
                 }
-            }
-        });
+
+                if (data.promotional) {
+                    voucherDialog.hideDialog();
+                    pro.propay.selectedProPackage = [0, data.proNum];
+                    voucherDialog.showSuccessfulPayment();
+                    return;
+                }
+
+                // Get the latest account balance and update the price in the dialog
+                voucherDialog.getLatestBalance(function() {
+
+                    // Format to 2dp
+                    var proPrice = pro.propay.selectedProPackage[5];
+                    var balance = pro.propay.proBalance.toFixed(2);
+                    var newBalance = parseFloat(balance - proPrice).toFixed(2);
+
+                    // Update dialog details
+                    voucherDialog.$dialog.find('.voucher-account-balance .balance-amount').text(balance);
+                    voucherDialog.$dialog.find('.voucher-account-balance .new-balance-amount').text(newBalance);
+                    voucherDialog.changeColourIfSufficientBalance();
+
+                    // Hide voucher input
+                    voucherDialog.$dialog.find('.voucher-redeem-container').show();
+                    voucherDialog.$dialog.find('.purchase-now-container').show();
+                    voucherDialog.$dialog.find('.voucher-input-container').hide();
+                });
+            })
+            .catch(function(ex) {
+                loadingDialog.hide();
+
+                if (ex) {
+                    msgDialog('warninga', l[135], l[47], ex, function() {
+                        voucherDialog.showBackgroundOverlay();
+                    });
+                }
+            });
     },
 
     /**
@@ -1190,7 +1197,7 @@ var addressDialog = {
         .always(function(billingInfo) {
             var selectedCountry = (billingInfo && billingInfo.hasOwnProperty('country')) ? billingInfo.country
                 : u_attr.country ? u_attr.country : u_attr.ipcc || false;
-            
+
             var selectedState = ((selectedCountry === 'US' || selectedCountry === 'CA')
                 && billingInfo && billingInfo.hasOwnProperty('state')) ? billingInfo.state : false;
             self.showDialog();
@@ -1251,7 +1258,7 @@ var addressDialog = {
             this.$dialog.find('.payment-buy-now').text(l[6172]);
         }
         monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
-        
+
 
         // Update template
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 bus-plan-icon64')

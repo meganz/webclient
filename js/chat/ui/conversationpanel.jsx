@@ -1105,7 +1105,7 @@ var ConversationPanel = React.createClass({
                     headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
                 }
                 else {
-                    headerText = room.getRoomTitle();
+                    headerText = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.getRoomTitle()));
                 }
 
                 messagesList.push(

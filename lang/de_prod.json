@@ -1760,7 +1760,6 @@
     "17412": "MEGAdrop-Ordner erstellen",
     "17413": "Ein MEGAdrop-Ordner erlaubt es jedermann, Dateien in ihn hochzuladen - sogar ganz ohne Account!",
     "17445": "Uploaddatum",
-    "17446": "Erstellungsdatum",
     "17450": "MEGAdrop-Ordner erstellen",
     "17464": "Freunde einladen und Boni einstreichen",
     "17465": "Freunde einladen",
@@ -1872,6 +1871,7 @@
     "17766": "Datei an den Chat gesendet",
     "17767": "Dateien an den Chat gesendet",
     "17768": "Benutzerkonto gesperrt",
+    "17777": "Aktuelle Version",
     "17789": "Die eingegebene Steuernummer ist ung\u00fcltig.",
     "17791": "Filter",
     "17792": "Ihre Prim\u00e4rfestplatte ist voll. Bitte geben Sie etwas Platz frei und versuchen Sie es dann noch einmal.",
@@ -2906,6 +2906,7 @@
     "20231": "Voucherhistorie",
     "20232": "Kontostand",
     "20233": "%s Teilnehmer",
+    "20234": "Mit %s",
     "20235": "Komfortable automatisierte Synchronisierung zwischen Computer und MEGA-Cloud",
     "20237": "Zahlungsadresse speichern",
     "20238": "Autodesk 3D Studio Meshdateiformat",
@@ -3194,6 +3195,7 @@
     "20655": "File Manager Integration allows you to interact with your MEGA account directly from within a Linux file manager.",
     "20656": "No extensions available",
     "20660": "No chat link available.",
-    "20662": "64 bit",
-    "20663": "32 bit"
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

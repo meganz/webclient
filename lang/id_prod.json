@@ -1760,7 +1760,6 @@
     "17412": "Buat MEGAdrop Folder",
     "17413": "MEGAdrop folder memungkinkan seseorang untuk mengunggah file ke akun MEGA Anda, meskipun mereka tidak memiliki akun!",
     "17445": "Tanggal Ditambahkan",
-    "17446": "Tanggal Dibuat",
     "17450": "Buat MEGAdrop Folder",
     "17464": "Undang teman dan dapatkan bonus",
     "17465": "Undang teman",
@@ -1872,6 +1871,7 @@
     "17766": "File dikirim ke obrolan",
     "17767": "File dikirim ke obrolan",
     "17768": "Akun yang dihentikan",
+    "17777": "Versi sekarang",
     "17789": "Nomor pajak yang dimasukkan tidak valid.",
     "17791": "Filter",
     "17792": "Volume disk utama Anda penuh. Silakan kosongkan beberapa ruang dan coba lagi.",
@@ -2906,6 +2906,7 @@
     "20231": "Riwayat Voucher",
     "20232": "Saldo rekening",
     "20233": "%s Anggota",
+    "20234": "Dengan %s",
     "20235": "Sinkronisasi otomatis yang mudah antara komputer Anda dan cloud MEGA Anda.",
     "20237": "Ingat alamat penagihan saya",
     "20238": "Autodesk 3D Studio format file mesh",
@@ -3194,6 +3195,7 @@
     "20655": "File Manager Integration allows you to interact with your MEGA account directly from within a Linux file manager.",
     "20656": "No extensions available",
     "20660": "No chat link available.",
-    "20662": "64 bit",
-    "20663": "32 bit"
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

@@ -1760,7 +1760,6 @@
     "17412": "Criar pasta MEGAdrop",
     "17413": "Uma pasta MEGAdrop permite que qualquer pessoa fa\u00e7a upload de arquivos na sua conta no MEGA, mesmo se n\u00e3o tiver uma conta pr\u00f3pria!",
     "17445": "Data de inclus\u00e3o",
-    "17446": "Data de cria\u00e7\u00e3o",
     "17450": "Criar pasta MEGAdrop",
     "17464": "Convide amigos e ganhe b\u00f4nus",
     "17465": "Convide amigos",
@@ -1872,6 +1871,7 @@
     "17766": "Arquivo enviado ao chat",
     "17767": "Arquivos enviados ao chat",
     "17768": "Conta encerrada",
+    "17777": "Vers\u00e3o atual",
     "17789": "O n\u00famero de identifica\u00e7\u00e3o digitado n\u00e3o \u00e9 valido.",
     "17791": "Filtro",
     "17792": "O espa\u00e7o dispon\u00edvel no seu disco principal est\u00e1 cheio. Libere espa\u00e7o e tente novamente.",
@@ -2906,6 +2906,7 @@
     "20231": "Hist\u00f3rico de vouchers",
     "20232": "Saldo da conta",
     "20233": "%s membros",
+    "20234": "com %s",
     "20235": "Sincroniza\u00e7\u00e3o f\u00e1cil e autom\u00e1tica entre o seu computador e a sua Nuvem no MEGA.",
     "20237": "Salvar o meu endere\u00e7o para fatura\u00e7\u00e3o",
     "20238": "Formato Autodesk 3D Studio mesh-file",
@@ -3194,6 +3195,7 @@
     "20655": "File Manager Integration allows you to interact with your MEGA account directly from within a Linux file manager.",
     "20656": "No extensions available",
     "20660": "No chat link available.",
-    "20662": "64 bit",
-    "20663": "32 bit"
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

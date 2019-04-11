@@ -1760,7 +1760,6 @@
     "17412": "Chuy\u1ec3n th\u00e0nh Th\u01b0 M\u1ee5c MEGAdrop",
     "17413": "Khi m\u1ed9t th\u01b0 m\u1ee5c \u0111\u01b0\u1ee3c chuy\u1ec3n th\u00e0nh th\u01b0 m\u1ee5c MEGAdrop, n\u00f3 s\u1ebd nh\u01b0 m\u1ed9t c\u00e1i h\u1ed9p cho ph\u00e9p m\u1ecdi ng\u01b0\u1eddi \u0111\u0103ng t\u1ea3i t\u1ec7p tin v\u00e0o m\u00e0 kh\u00f4ng c\u1ea7n ph\u1ea3i c\u00f3 t\u00e0i kho\u1ea3n.",
     "17445": "Ng\u00e0y Th\u00eam V\u00e0o",
-    "17446": "Ng\u00e0y T\u1ea1o",
     "17450": "L\u00e0m th\u00e0nh Th\u01b0 M\u1ee5c MEGAdrop",
     "17464": "M\u1eddi b\u1ea1n b\u00e8 tham gia s\u1eed d\u1ee5ng MEGA \u0111\u1ec3 nh\u1eadn th\u00eam ph\u1ea7n th\u01b0\u1edfng",
     "17465": "M\u1eddi b\u1ea1n b\u00e8",
@@ -1872,6 +1871,7 @@
     "17766": "T\u00ea\u0323p tin \u0111\u00e3 \u0111\u01b0\u01a1\u0323c g\u01b0\u0309i t\u01a1\u0301i ch\u00e1t",
     "17767": "Ca\u0301c t\u00ea\u0323p tin \u0111\u01b0\u01a1\u0323c g\u01b0\u0309i t\u01a1\u0301i ch\u00e1t",
     "17768": "T\u00e0i kho\u1ea3n b\u1ecb ch\u1ea5m d\u1ee9t ho\u1ea1t \u0111\u1ed9ng",
+    "17777": "Phi\u00ean b\u1ea3n hi\u1ec7n t\u1ea1i",
     "17789": "S\u1ed1 thu\u1ebf v\u1eeba nh\u1eadp kh\u00f4ng h\u1ee3p l\u1ec7",
     "17791": "L\u1ecdc",
     "17792": "\u1ed4 \u0111\u0129a c\u1ee7a m\u00e1y b\u1ecb \u0111\u1ea7y. Xin t\u1ea1o th\u00eam kh\u00f4ng gian tr\u1ed1ng r\u1ed3i t\u1ea3i l\u1ea1i.",
@@ -2906,6 +2906,7 @@
     "20231": "L\u1ecbch S\u1eed Quy \u0110\u1ed5i Voucher",
     "20232": "Account balance",
     "20233": "%s Th\u00e0nh vi\u00ean",
+    "20234": "C\u00f9ng v\u1edbi %s",
     "20235": "Easy automated synchronisation between your computer and your MEGA cloud.",
     "20237": "Remember my billing address",
     "20238": "Autodesk 3D Studio mesh-file format",
@@ -3194,6 +3195,7 @@
     "20655": "File Manager Integration allows you to interact with your MEGA account directly from within a Linux file manager.",
     "20656": "No extensions available",
     "20660": "No chat link available.",
-    "20662": "64 bit",
-    "20663": "32 bit"
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

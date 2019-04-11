@@ -1760,7 +1760,6 @@
     "17412": "Crear carpeta MEGAdrop",
     "17413": "Gracias a la carpeta MEGAdrop, cualquiera puede subir archivos a tu cuenta MEGA, \u00a1aunque no tenga una cuenta propia!",
     "17445": "Fecha de subida",
-    "17446": "Fecha de creaci\u00f3n",
     "17450": "Crear carpeta MEGAdrop",
     "17464": "Invita a tus amigos y obt\u00e9n bonos",
     "17465": "Invita a tus amigos",
@@ -1872,6 +1871,7 @@
     "17766": "Archivo enviado al chat",
     "17767": "Archivos enviados al chat",
     "17768": "Cuenta cerrada",
+    "17777": "Versi\u00f3n actual",
     "17789": "El n\u00famero de identificaci\u00f3n tributaria no es v\u00e1lido.",
     "17791": "Filtro",
     "17792": "Tu disco principal est\u00e1 lleno. Por favor libera espacio y prueba de nuevo.",
@@ -2906,6 +2906,7 @@
     "20231": "Historial de cupones",
     "20232": "Saldo de la cuenta",
     "20233": "%s miembros",
+    "20234": "con %s",
     "20235": "Sincronizaci\u00f3n autom\u00e1tica y f\u00e1cil entre tu ordenador y tu nube MEGA.",
     "20237": "Recordar mi direcci\u00f3n de facturaci\u00f3n",
     "20238": "Archivo mesh Autodesk 3D Studio",
@@ -3194,6 +3195,7 @@
     "20655": "La integraci\u00f3n del gestor de archivos te permite interactuar con tu cuenta MEGA directamente desde un gestor de archivos de Linux.",
     "20656": "No hay extensiones disponibles.",
     "20660": "Link del chat no disponible.",
-    "20662": "64 bit",
-    "20663": "32 bit"
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

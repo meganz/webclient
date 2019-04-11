@@ -1760,7 +1760,6 @@
     "17412": "\u5275\u5efaMEGAdrop\u8cc7\u6599\u593e",
     "17413": "MEGAdrop\u8cc7\u6599\u593e\u8b93\u4efb\u4f55\u4eba\u90fd\u80fd\u4e0a\u50b3\u6a94\u6848\u5230\u60a8\u7684MEGA\u5e33\u6236\u4e2d\uff0c\u5373\u4f7f\u4ed6\u5011\u6c92\u6709\u5e33\u6236\u4e5f\u53ef\u4ee5\u5594\uff01",
     "17445": "\u4e0a\u50b3\u65e5\u671f",
-    "17446": "\u5275\u5efa\u65e5\u671f",
     "17450": "\u5275\u5efaMEGAdrop\u8cc7\u6599\u593e",
     "17464": "\u9080\u8acb\u670b\u53cb\u4e26\u7372\u5f97\u734e\u52f5",
     "17465": "\u9080\u8acb\u670b\u53cb",
@@ -1872,6 +1871,7 @@
     "17766": "\u6a94\u6848\u5df2\u767c\u9001\u81f3\u804a\u5929\u5c0d\u8a71\u4e2d",
     "17767": "\u6a94\u6848\u5df2\u767c\u9001\u81f3\u804a\u5929\u5c0d\u8a71\u4e2d",
     "17768": "\u5df2\u7d42\u6b62\u7684\u5e33\u6236",
+    "17777": "\u7576\u524d\u7684\u7248\u672c",
     "17789": "The entered tax number is invalid.",
     "17791": "Filter",
     "17792": "Your primary disk volume is full. Please free up some space and try again.",
@@ -2906,6 +2906,7 @@
     "20231": "Voucher History",
     "20232": "Account balance",
     "20233": "%s Members",
+    "20234": "With %s",
     "20235": "Easy automated synchronisation between your computer and your MEGA cloud.",
     "20237": "Remember my billing address",
     "20238": "Autodesk 3D Studio mesh-file format",
@@ -3194,6 +3195,7 @@
     "20655": "File Manager Integration allows you to interact with your MEGA account directly from within a Linux file manager.",
     "20656": "No extensions available",
     "20660": "No chat link available.",
-    "20662": "64 bit",
-    "20663": "32 bit"
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

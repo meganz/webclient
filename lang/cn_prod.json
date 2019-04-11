@@ -1760,7 +1760,6 @@
     "17412": "\u521b\u5efaMEGAdrop\u6587\u4ef6\u5939",
     "17413": "MEGAdrop\u6587\u4ef6\u5939\u5c06\u5141\u8bb8\u4efb\u4f55\u4eba\u4e0a\u4f20\u6587\u4ef6\u5230\u60a8\u7684MEGA\u5e10\u6237\uff0c\u5373\u4fbf\u5bf9\u65b9\u662f\u672a\u6ce8\u518c\u7528\u6237\u3002",
     "17445": "\u6dfb\u52a0\u65e5\u671f",
-    "17446": "\u521b\u5efa\u65e5\u671f",
     "17450": "\u5236\u4f5cMEGAdrop\u6587\u4ef6\u5939",
     "17464": "\u9080\u8bf7\u670b\u53cb\u5e76\u83b7\u5f97\u5956\u52b1",
     "17465": "\u9080\u8bf7\u670b\u53cb",
@@ -1872,6 +1871,7 @@
     "17766": "\u6587\u4ef6\u5df2\u53d1\u9001\u81f3\u804a\u5929",
     "17767": "\u6587\u4ef6\u5df2\u53d1\u9001\u81f3\u804a\u5929",
     "17768": "\u8be5\u8d26\u6237\u5df2\u88ab\u7ec8\u6b62",
+    "17777": "\u5f53\u524d\u7248\u672c",
     "17789": "\u8f93\u5165\u7684\u7a0e\u53f7\u65e0\u6548\u3002",
     "17791": "\u7b5b\u9009",
     "17792": "\u60a8\u7684\u4e3b\u78c1\u76d8\u5df2\u6ee1\u3002\u8bf7\u6e05\u7406\u4e00\u4e9b\u7a7a\u95f4\u5e76\u91cd\u8bd5\u3002",
@@ -2906,6 +2906,7 @@
     "20231": "\u51ed\u8bc1\u5386\u53f2\u8bb0\u5f55",
     "20232": "\u8d26\u6237\u4f59\u989d",
     "20233": "%s\u4f4d\u6210\u5458",
+    "20234": "\u4e0e%s",
     "20235": "\u8f7b\u677e\u5b9e\u73b0\u8ba1\u7b97\u673a\u4e0eMEGA\u4e91\u4e4b\u95f4\u7684\u81ea\u52a8\u540c\u6b65\u3002",
     "20237": "\u8bb0\u4f4f\u6211\u7684\u8d26\u5355\u5730\u5740",
     "20238": "Autodesk 3D Studio\u7f51\u683c\u6587\u4ef6\u683c\u5f0f",
@@ -3194,6 +3195,7 @@
     "20655": "File Manager Integration allows you to interact with your MEGA account directly from within a Linux file manager.",
     "20656": "No extensions available",
     "20660": "No chat link available.",
-    "20662": "64 bit",
-    "20663": "32 bit"
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

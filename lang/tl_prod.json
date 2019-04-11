@@ -1760,7 +1760,6 @@
     "17412": "Gumawa ng MEGAdrop Folder",
     "17413": "Ina-allow ng MEGAdrop ang sinuman na mag-upload ng files sa iyong MEGA account, kahit pa wala silang account!",
     "17445": "Date Added",
-    "17446": "Date na Ginawa",
     "17450": "Gumawa ng MEGAdrop Folder",
     "17464": "Imbitahan ang mga kaibigan at makakuha ng bonuses",
     "17465": "Mag-invite ng friends",
@@ -1872,6 +1871,7 @@
     "17766": "Naipadala na file sa chat",
     "17767": "Naipadala na ang mga files sa chat",
     "17768": "Terminated na account",
+    "17777": "Kasalukuyang version",
     "17789": "Ang nilagay na tax number ay invalid.",
     "17791": "Filter",
     "17792": "Ang iyong primary disk volume ay puno na. Magtanggal ng ibang files at subukang muli.",
@@ -2906,6 +2906,7 @@
     "20231": "Voucher History",
     "20232": "Account balance",
     "20233": "%s Members",
+    "20234": "With %s",
     "20235": "Easy automated synchronisation between your computer and your MEGA cloud.",
     "20237": "Remember my billing address",
     "20238": "Autodesk 3D Studio mesh-file format",
@@ -3194,6 +3195,7 @@
     "20655": "File Manager Integration allows you to interact with your MEGA account directly from within a Linux file manager.",
     "20656": "No extensions available",
     "20660": "No chat link available.",
-    "20662": "64 bit",
-    "20663": "32 bit"
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

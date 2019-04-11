@@ -1760,7 +1760,6 @@
     "17412": "Utw\u00f3rz katalog MEGAdrop",
     "17413": "Katalog MEGAdrop pozwala ka\u017cdemu wgrywa\u0107 pliki na Twoje konto na MEGA, nawet bez posiadania w\u0142asnego konta!",
     "17445": "Data dodania",
-    "17446": "Data utworzenia",
     "17450": "Zmie\u0144 na katalog MEGAdrop",
     "17464": "Zapro\u015b znajomych i odbierz bonusy",
     "17465": "Zapro\u015b znajomych",
@@ -1872,6 +1871,7 @@
     "17766": "Plik wys\u0142any do czatu",
     "17767": "PlikI wys\u0142ane do czatu",
     "17768": "Konto zawieszone",
+    "17777": "Aktualna wersja",
     "17789": "Wprowadzony numer jest nieprawid\u0142owy.",
     "17791": "Filtr",
     "17792": "Tw\u00f3j g\u0142\u00f3wny dysk ju\u017c pe\u0142ny. Udost\u0119pnij woln\u0105 pami\u0119\u0107 i spr\u00f3buj ponownie.",
@@ -2906,6 +2906,7 @@
     "20231": "Historia kupon\u00f3w",
     "20232": "Bilans konta",
     "20233": "%s cz\u0142onk\u00f3w",
+    "20234": "Z %s",
     "20235": "\u0141atwa automatyczna synchronizacja mi\u0119dzy komputerem a chmur\u0105 MEGA.",
     "20237": "Zapami\u0119taj m\u00f3j adres rozliczeniowy",
     "20238": "Autodesk 3D Studio mesh-file format",
@@ -3194,6 +3195,7 @@
     "20655": "Integracja Mened\u017cera plik\u00f3w umo\u017cliwia interakcj\u0119 z kontem MEGA bezpo\u015brednio z mened\u017cera plik\u00f3w w systemie Linux.",
     "20656": "Brak dost\u0119pnych rozszerze\u0144",
     "20660": "Brak dost\u0119pnego linku do czatu.",
-    "20662": "64 bit",
-    "20663": "32 bit"
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
 }

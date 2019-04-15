@@ -380,7 +380,7 @@ body.tl .dropdown.body.popup.contacts-search {
 .dark-direct-tooltip.simpletip-tooltip {
     display: block;
     position: absolute;
-    z-index: 1;
+    z-index: 10;
 }
 .dark-direct-tooltip.simpletip-tooltip.simpletip-v-b {
     margin-top: 5px;

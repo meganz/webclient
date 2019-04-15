@@ -58,7 +58,7 @@
         if (contents) {
             var $node = $template.clone();
             $('span', $node).text(contents);
-            $node.insertAfter($this);
+            $('body').append($node);
 
             $currentNode = $node;
             var wrapper = $this.attr('data-simpletipwrapper') || "";

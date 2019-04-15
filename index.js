@@ -2282,7 +2282,8 @@ function topmenuUI() {
         return false;
     });
 
-    $topMenu.find('.top-social-bl a').rebind('click', function () {
+    $topMenu.find('.top-social-bl a').rebind('click', function (e) {
+        e.preventDefault();
         window.open($(this).attr('href'));
     });
 

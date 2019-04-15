@@ -124,7 +124,7 @@ var crypt = (function() {
 
             var myCtx = {};
             /** Function to settle the promise for the RSA pub key attribute. */
-            var __settleFunction = function(res, ctx, xhr, fromCache) {
+            var __settleFunction = function(res, ctx, xhr, tResult, fromCache) {
                 if (typeof res === 'object') {
 
                     var debugUserHandle = userhandle;
@@ -175,7 +175,7 @@ var crypt = (function() {
                 attribCache.getItem(cacheKey)
                     .done(function(r) {
                         if (r && r.length !== 0) {
-                            __settleFunction(JSON.parse(r), undefined, undefined, true);
+                            __settleFunction(JSON.parse(r), undefined, undefined, undefined, true);
                         }
                         else {
                             __retrieveRsaKeyFunc();

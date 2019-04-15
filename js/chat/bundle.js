@@ -6706,36 +6706,36 @@ React.makeElement = React['createElement'];
 	                    chatRoom: room,
 	                    members: room.members,
 	                    isCurrentlyActive: room.isCurrentlyActive
-	                }),
-	                React.makeElement(
-	                    ButtonsUI.Button,
-	                    {
-	                        className: "link-button green light",
-	                        icon: "rounded-plus colorized",
-	                        label: __(l[8007]),
-	                        contacts: this.props.contacts,
-	                        disabled: !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
-	                    },
-	                    React.makeElement(DropdownsUI.DropdownContactsSelector, {
-	                        contacts: this.props.contacts,
-	                        megaChat: this.props.megaChat,
-	                        chatRoom: room,
-	                        exclude: excludedParticipants,
-	                        multiple: true,
-	                        className: "popup add-participant-selector",
-	                        singleSelectedButtonLabel: __(l[8869]),
-	                        multipleSelectedButtonLabel: __(l[8869]),
-	                        nothingSelectedButtonLabel: __(l[8870]),
-	                        onSelectDone: this.props.onAddParticipantSelected,
-	                        positionMy: "center top",
-	                        positionAt: "left bottom",
-	                        arrowHeight: -32,
-	                        selectFooter: true
-	                    })
-	                )
+	                })
 	            );
 	        }
 
+	        var addParticipantBtn = React.makeElement(
+	            ButtonsUI.Button,
+	            {
+	                className: "link-button green light",
+	                icon: "rounded-plus colorized",
+	                label: __(l[8007]),
+	                contacts: this.props.contacts,
+	                disabled: !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
+	            },
+	            React.makeElement(DropdownsUI.DropdownContactsSelector, {
+	                contacts: this.props.contacts,
+	                megaChat: this.props.megaChat,
+	                chatRoom: room,
+	                exclude: excludedParticipants,
+	                multiple: true,
+	                className: "popup add-participant-selector",
+	                singleSelectedButtonLabel: __(l[8869]),
+	                multipleSelectedButtonLabel: __(l[8869]),
+	                nothingSelectedButtonLabel: __(l[8870]),
+	                onSelectDone: this.props.onAddParticipantSelected,
+	                positionMy: "center top",
+	                positionAt: "left bottom",
+	                arrowHeight: -32,
+	                selectFooter: true
+	            })
+	        );
 	        return React.makeElement(
 	            "div",
 	            { className: "chat-right-area" },
@@ -6765,7 +6765,8 @@ React.makeElement = React['createElement'];
 	                                    }
 	                                }, 250);
 	                            },
-	                            expandedPanel: room.type === "group" || room.type === "public" ? "participants" : "options" },
+	                            expandedPanel: room.type === "group" || room.type === "public" ? "participants" : "options"
+	                        },
 	                        participantsList ? React.makeElement(
 	                            AccordionPanel,
 	                            { className: "small-pad", title: l[8876], key: "participants" },
@@ -6788,6 +6789,7 @@ React.makeElement = React['createElement'];
 	                            React.makeElement(
 	                                "div",
 	                                null,
+	                                addParticipantBtn,
 	                                startAudioCallButton,
 	                                startVideoCallButton,
 	                                AVseperator,
@@ -8256,10 +8258,14 @@ React.makeElement = React['createElement'];
 
 	                        if (self.props.chatRoom.type == "private") {
 	                            var megaChat = self.props.chatRoom.megaChat;
+	                            var options = {
+	                                keyRotation: false,
+	                                topic: ''
+	                            };
 
 	                            loadingDialog.show();
 
-	                            megaChat.trigger('onNewGroupChatRequest', [self.props.chatRoom.getParticipantsExceptMe().concat(contactHashes)]);
+	                            megaChat.trigger('onNewGroupChatRequest', [self.props.chatRoom.getParticipantsExceptMe().concat(contactHashes), options]);
 	                        } else {
 	                            self.props.chatRoom.trigger('onAddUserRequest', [contactHashes]);
 	                        }
@@ -12347,7 +12353,7 @@ React.makeElement = React['createElement'];
 	    render: function render() {
 	        var self = this;
 
-	        var classes = "accordion-panels " + self.props.className;
+	        var classes = "accordion-panels " + (self.props.className ? self.props.className : '');
 
 	        var accordionPanels = [];
 	        var otherElements = [];

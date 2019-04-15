@@ -59,7 +59,7 @@ var Accordion = React.createClass({
     render: function() {
         var self = this;
 
-        var classes = "accordion-panels " + self.props.className;
+        var classes = "accordion-panels " + (self.props.className ? self.props.className : '');
 
         var accordionPanels = [];
         var otherElements = [];

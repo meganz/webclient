@@ -545,6 +545,7 @@
     "1513": "\u7121\u6548\u96fb\u5b50\u90f5\u4ef6\u4fe1\u7bb1",
     "1514": "\u7db2\u8def\u9023\u7dda\u554f\u984c\uff0c\u8acb\u7a0d\u5f8c\u518d\u8a66\u3002",
     "1517": "\u6a94\u6848\u6240\u6709\u8005\u88ab\u5c01\u9396",
+    "1523": "\u9078\u64c7",
     "1565": "\u97f3\u983b",
     "1566": "\u5f71\u7247",
     "1578": "\u932f\u8aa4",
@@ -1652,6 +1653,7 @@
     "16516": "\u516c\u958b\u9023\u7d50",
     "16517": "\u60a8\u5df2\u6210\u529f\u767b\u5165%1\u5e33\u6236\uff0c\u6211\u5011\u73fe\u5728\u5c07\u6703\u628a\u60a8\u81e8\u6642\u5e33\u6236\u4e2d\u7684\u5167\u5bb9\u9077\u79fb\u5230\u60a8\u7684\u96f2\u7aef\u786c\u789f\u4e2d\u3002",
     "16518": "\u5728MEGA\u4e0a\u95b1\u89bd",
+    "16533": "\u65b0\u5171\u4eab\u8cc7\u6599\u593e",
     "16535": "\u5728\u7121\u5e33\u6236\u72c0\u6cc1\u4e0b\u8a66\u7528",
     "16536": "\u5b89\u5168\u7684\u96f2\u7aef\u670d\u52d9\u518d\u4e5f\u4e0d\u662f\u5922\u4e86\uff01\u73fe\u5728\u5c31\u5728MEGA\u7684\u7aef\u5c0d\u7aef\u52a0\u5bc6\u96f2\u7aef\u5354\u4f5c\u5e73\u53f0\u4e0a\u5275\u5efa\u4e00\u500b\u5e33\u865f\uff0c\u4e26\u514d\u8cbb\u7372\u5f97[A] 50 GB [\/A]\uff01",
     "16537": "\u5411\u4e0b\u6efe\u52d5",
@@ -3392,7 +3394,7 @@
     "20630": "\u4f01\u696d\u4f7f\u7528\u8005\u662f\u60a8\u7684\u4f01\u696d\u5e33\u6236\u7684\u4e00\u90e8\u5206\u3002\u4f01\u696d\u4f7f\u7528\u8005\u5c07\u81ea\u52d5\u65b0\u589e\u81f3\u60a8\u7684\u4f01\u696d\u806f\u7d61\u4eba\u5217\u8868\u7684\u6240\u6709\u5176\u4ed6\u4f7f\u7528\u8005\u4e2d\u3002",
     "20631": "Encrypted key rotation (on)",
     "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
-    "20633": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your MEGA data. [A]Learn More[\/A]",
+    "20633": "Before you log out, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your MEGA data. [A]Learn More[\/A]",
     "20634": "Target folder has been deleted",
     "20635": "Don\u2019t have an account? [A]Create one now[\/A]",
     "20636": "Already have an account? [A]Login[\/A]",
@@ -3419,5 +3421,10 @@
     "20662": "64-bit",
     "20663": "32-bit",
     "20664": "removed the link for the chat.",
-    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account.",
+    "20666": "Transfer quota exceeded.",
+    "20667": "Create New Link",
+    "20668": "No Outgoing Shares",
+    "20669": "No Public Links",
+    "20670": "Date Shared"
 }

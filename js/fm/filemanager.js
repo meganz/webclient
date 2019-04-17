@@ -2826,6 +2826,9 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
 
     $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder')
         .rebind('contextmenu.fm', function(e) {
+            if (page === "fm/links") { // Remove context menu option from filtered view
+                return false;
+            }
             $(this).find('.data-block-view').removeClass('ui-selected');
             // is this required? don't we have a support for a multi-selection context menu?
             if (selectionManager) {
@@ -2996,6 +2999,9 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,' +
         '.fm-empty-cloud,.fm-empty-folder,.fm.shared-folder-content,' +
         '.files-grid-view.contacts-view').rebind('contextmenu.fm', function(e) {
+            if (page === "fm/links") { // Remove context menu option from filtered view
+                return false;
+            }
             $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
             if (selectionManager) {
                 selectionManager.clear_selection();

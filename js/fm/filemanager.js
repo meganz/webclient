@@ -504,7 +504,7 @@ FileManager.prototype.initFileManagerUI = function() {
             M.renderMain();
         }
         else {
-            M.openFolder(M.currentdirid, true).then(reselect.bind(null, null));
+            M.openFolder(M.currentdirid, true).then(reselect.bind(null, 1));
         }
 
         return false;

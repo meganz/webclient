@@ -691,7 +691,6 @@ var languages = {
     'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
     'th': [['||'], 'Thai', 'ไทย'],
     'tl': [['en-ph'], 'Tagalog', 'Tagalog'],
-    'tr': [['tr', 'tr-'], 'Turkish', 'Türkçe'],
     'uk': [['||'], 'Ukrainian', 'Українська'],
     'vi': [['vn', 'vi'], 'Vietnamese', 'Tiếng Việt']
 };

@@ -545,6 +545,7 @@
     "1513": "Indirizzo email non valido",
     "1514": "Problema di connessione di rete, riprova pi\u00f9 tardi",
     "1517": "Il proprietario di questo file \u00e8 bloccato",
+    "1523": "Seleziona",
     "1565": "Audio",
     "1566": "Video",
     "1578": "Errore",
@@ -666,7 +667,7 @@
     "5542": "Condivisioni in arrivo",
     "5543": "Condivisione in uscita",
     "5545": "Nuova cartella",
-    "5549": "Passa a PRO",
+    "5549": "Aumenta il piano PRO",
     "5552": "Vista thumbnail",
     "5553": "Modalit\u00e0 lista",
     "5557": "file",
@@ -1652,6 +1653,7 @@
     "16516": "Link pubblici",
     "16517": "Hai effettuato l'accesso con successo nell'account %1, adesso procederemo a far migrare i contenuti del tuo account effimero nel tuo Cloud Drive.",
     "16518": "Vedi su MEGA",
+    "16533": "Nuova cartella condivisa",
     "16535": "Prova senza account",
     "16536": "Noi rendiamo semplice l'archiviazione cloud sicura. Crea un account e ottieni [A]50 GB[\/A] gratuiti sulla piattaforma di collaborazione cloud criptata end-to-end di MEGA oggi stesso!",
     "16537": "Vai gi\u00f9",
@@ -3419,5 +3421,10 @@
     "20662": "64-bit",
     "20663": "32-bit",
     "20664": "removed the link for the chat.",
-    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
+    "20665": "Questo \u00e8 un voucher promozionale, se continui verr\u00e0 automaticamente riscosso nel piano appropriato, e non verr\u00e0 addebitato alcun costo al tuo account.",
+    "20666": "Transfer quota exceeded.",
+    "20667": "Create New Link",
+    "20668": "No Outgoing Shares",
+    "20669": "No Public Links",
+    "20670": "Date Shared"
 }

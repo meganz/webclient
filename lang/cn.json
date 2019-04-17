@@ -545,6 +545,7 @@
     "1513": "\u65e0\u6548\u7684\u90ae\u7bb1\u5730\u5740",
     "1514": "\u7f51\u7edc\u8fde\u7ebf\u95ee\u9898\uff0c\u8bf7\u7a0d\u540e\u518d\u8bd5\u3002",
     "1517": "\u6587\u4ef6\u6240\u6709\u8005\u88ab\u5c01\u9501",
+    "1523": "\u9009\u62e9",
     "1565": "\u8bed\u97f3",
     "1566": "\u89c6\u9891",
     "1578": "\u9519\u8bef",
@@ -1652,6 +1653,7 @@
     "16516": "\u516c\u5f00\u94fe\u63a5",
     "16517": "\u60a8\u5df2\u6210\u529f\u767b\u5165%1\u5e10\u6237\uff0c\u6211\u4eec\u73b0\u5728\u5c06\u4f1a\u628a\u60a8\u4e34\u65f6\u5e10\u6237\u4e2d\u7684\u5185\u5bb9\u8fc1\u79fb\u5230\u60a8\u7684\u4e91\u76d8\u4e2d\u3002",
     "16518": "\u5728MEGA\u4e0a\u9605\u89c8",
+    "16533": "\u65b0\u5171\u4eab\u6587\u4ef6\u5939",
     "16535": "\u5728\u65e0\u5e10\u6237\u72b6\u51b5\u4e0b\u8bd5\u7528",
     "16536": "\u53ef\u9760\u5b89\u5168\u7684\u4e91\u7aef\u670d\u52a1\u5c31\u662f\u8fd9\u4e48\u7b80\u5355\uff01\u73b0\u5728\u5c31\u5728MEGA\u7ec8\u7aef\u81f3\u7ec8\u7aef\u52a0\u5bc6\u4e91\u7aef\u534f\u4f5c\u5e73\u53f0\u4e0a\u521b\u5efa\u4e00\u4e2a\u5e10\u53f7\uff0c\u5e76\u83b7\u5f97[A] 50 GB [\/A]\u514d\u8d39\u50a8\u5b58\u7a7a\u95f4\uff01",
     "16537": "\u5411\u4e0b\u6eda\u52a8",
@@ -3392,7 +3394,7 @@
     "20630": "\u4f01\u4e1a\u7528\u6237\u662f\u60a8\u4f01\u4e1a\u5e10\u6237\u7684\u4e00\u90e8\u5206\u3002\u4f01\u4e1a\u7528\u6237\u4f1a\u88ab\u81ea\u52a8\u6dfb\u52a0\u81f3\u60a8\u7684\u4f01\u4e1a\u7528\u6237\u8054\u7cfb\u4eba\u5217\u8868\u4e2d\u3002",
     "20631": "\u5bc6\u94a5\u8f6e\u6362\uff08\u542f\u7528\uff09",
     "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
-    "20633": "\u767b\u51fa\u8d26\u53f7\u524d\uff0c\u8bf7\u786e\u4fdd\u60a8\u59cb\u7ec8\u8bb0\u5f97\u60a8\u7684\u5bc6\u7801\u3002\u5982\u679c\u60a8\u4e22\u5931\u5bc6\u7801\uff0c\u767b\u51fa\u540e\u60a8\u5c06\u65e0\u6cd5\u8bbf\u95ee\u60a8\u5b58\u50a8\u5728MEGA\u7684\u6570\u636e\u3002[A]\u4e86\u89e3\u66f4\u591a[\/A]\u3002",
+    "20633": "Before you log out, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your MEGA data. [A]Learn More[\/A]",
     "20634": "Target folder has been deleted",
     "20635": "Don\u2019t have an account? [A]Create one now[\/A]",
     "20636": "Already have an account? [A]Login[\/A]",
@@ -3419,5 +3421,10 @@
     "20662": "64-bit",
     "20663": "32-bit",
     "20664": "removed the link for the chat.",
-    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
+    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account.",
+    "20666": "Transfer quota exceeded.",
+    "20667": "Create New Link",
+    "20668": "No Outgoing Shares",
+    "20669": "No Public Links",
+    "20670": "Date Shared"
 }

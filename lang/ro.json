@@ -545,6 +545,7 @@
     "1513": "Adres\u0103 de e-mail nevalid\u0103",
     "1514": "Problem\u0103 cu conexiunea de re\u021bea, te rug\u0103m s\u0103 re\u00eencerci mai t\u00e2rziu",
     "1517": "Proprietarul acestui cont este blocat",
+    "1523": "Selecteaz\u0103",
     "1565": "Audio",
     "1566": "Video",
     "1578": "Eroare",
@@ -1652,6 +1653,7 @@
     "16516": "Linkuri publice",
     "16517": "Te-ai autentificat cu succes \u00een contul %1, vom proceda acum la migrarea con\u021binutului contului t\u0103u efemer \u00een inboxul unit\u0103\u021bii cloud.",
     "16518": "Vezi pe MEGA",
+    "16533": "Folder nou partajat",
     "16535": "\u00cencearc\u0103 f\u0103r\u0103 un cont",
     "16536": "Facem stocarea securizat\u0103 \u00een cloud simpl\u0103. Creeaz\u0103 un cont \u0219i ob\u021bine ast\u0103zi [A]50 GB[\/A] gratuit pe platforma \u00een cloud de colaborare, cu criptare cap\u0103t-la-cap\u0103t MEGA!",
     "16537": "Deruleaz\u0103 \u00een jos",
@@ -3419,5 +3421,10 @@
     "20662": "64 de bi\u021bi",
     "20663": "32 de bi\u021bi",
     "20664": "removed the link for the chat.",
-    "20665": "Acesta este un voucher promo\u021bional, dac\u0103 vei continua va fi valorificat automat \u00een planul corespunz\u0103tor, acesta nu va ad\u0103uga credit \u00een contul t\u0103u."
+    "20665": "Acesta este un voucher promo\u021bional, dac\u0103 vei continua va fi valorificat automat \u00een planul corespunz\u0103tor, acesta nu va ad\u0103uga credit \u00een contul t\u0103u.",
+    "20666": "Transfer quota exceeded.",
+    "20667": "Create New Link",
+    "20668": "No Outgoing Shares",
+    "20669": "No Public Links",
+    "20670": "Date Shared"
 }

@@ -545,6 +545,7 @@
     "1513": "Adresse courriel invalide",
     "1514": "Probl\u00e8me de connexion r\u00e9seau, veuillez ressayer.",
     "1517": "Le propri\u00e9taire de ce fichier est bloqu\u00e9.",
+    "1523": "S\u00e9lectionner",
     "1565": "Audio",
     "1566": "Vid\u00e9o",
     "1578": "Erreur",
@@ -1652,6 +1653,7 @@
     "16516": "Liens publics",
     "16517": "Vous \u00eates connect\u00e9 avec succ\u00e8s au compte %1. Nous allons maintenant migrer le contenu de votre compte temporaire vers votre disque nuagique.",
     "16518": "Visualiser sur MEGA",
+    "16533": "Nouveau dossier partag\u00e9",
     "16535": "Essayer sans compte",
     "16536": "Nous simplifions le stockage nuagique s\u00e9curis\u00e9. Cr\u00e9ez un compte et obtenez aujourd\u2019hui [A]50\u00a0Go[\/A] gratuits sur la plateforme nuagique de collaboration chiffr\u00e9e de bout en bout de MEGA\u2009!",
     "16537": "D\u00e9filer vers le bas",
@@ -3392,7 +3394,7 @@
     "20630": "Les utilisateurs du compte d\u2019entreprise sont des personnes qui font partie de votre compte d\u2019entreprise. Les utilisateurs du compte d\u2019entreprise seront automatiquement ajout\u00e9s \u00e0 tous les autres utilisateurs dans votre liste de contacts d\u2019entreprise.",
     "20631": "Rotation de la cl\u00e9 chiffr\u00e9e (activ\u00e9e)",
     "20632": "Before you logout, please test your password below to ensure you remember it. If you have lost your password, by logging out you will lose access to your  MEGA data. [A]Learn More[\/A].\"",
-    "20633": "Avant de vous d\u00e9connecter, veuillez tester votre mot de passe ci-dessous pour vous assurer de l\u2019avoir bien m\u00e9moris\u00e9. Si vous avez perdu votre mot de passe, en vous d\u00e9connectant, vous perdrez l\u2019acc\u00e8s \u00e0 vos donn\u00e9es sur MEGA. [A]En apprendre davantage[\/A].Le",
+    "20633": "Avant de vous d\u00e9connecter, veuillez tester votre mot de passe ci-dessous pour vous assurer de l\u2019avoir bien m\u00e9moris\u00e9. Si vous avez perdu votre mot de passe, en vous d\u00e9connectant vous perdrez l\u2019acc\u00e8s \u00e0 vos donn\u00e9es sur MEGA. [A]En apprendre davantage[\/A].",
     "20634": "Le dossier cible a \u00e9t\u00e9 supprim\u00e9",
     "20635": "Pas encore de compte\u2009? [A]Cr\u00e9ez-en un maintenant[\/A]",
     "20636": "Avez-vous d\u00e9j\u00e0 un compte\u2009? [A]Connectez-vous[\/A]",
@@ -3419,5 +3421,10 @@
     "20662": "64 bits",
     "20663": "32 bits",
     "20664": "removed the link for the chat.",
-    "20665": "Ceci est un coupon promotionnel. Si vous poursuivez, il sera automatiquement valider dans l\u2019abonnement appropri\u00e9. Il n\u2019ajoutera pas de cr\u00e9dit \u00e0 votre compte."
+    "20665": "Ceci est un coupon promotionnel. Si vous poursuivez, il sera automatiquement valider dans l\u2019abonnement appropri\u00e9. Il n\u2019ajoutera pas de cr\u00e9dit \u00e0 votre compte.",
+    "20666": "Transfer quota exceeded.",
+    "20667": "Create New Link",
+    "20668": "No Outgoing Shares",
+    "20669": "No Public Links",
+    "20670": "Date Shared"
 }

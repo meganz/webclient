@@ -545,6 +545,7 @@
     "1513": "Niepoprawny adres email",
     "1514": "Problemy z po\u0142\u0105czeniem do sieci, spr\u00f3buj ponownie",
     "1517": "W\u0142a\u015bciciel tego pliku zosta\u0142 zablokowany",
+    "1523": "Wybierz",
     "1565": "Dzwi\u0119k",
     "1566": "Film",
     "1578": "B\u0142\u0105d",
@@ -1358,7 +1359,7 @@
     "9062": "Poka\u017c opcje PRO",
     "9063": "Dodaj zabezpieczenie has\u0142em",
     "9064": "Ukryj opcje",
-    "9065": "Ta funkcjonalno\u015b\u0107 nie jest dost\u0119pna w Twojej przegl\u0105darce. Skorzystaj z Firefox lub Chrome.",
+    "9065": "Ta funkcja nie jest obs\u0142ugiwana w Twojej przegl\u0105darce. Spr\u00f3buj Firefox lub Chrome.",
     "9066": "Wprowadzone has\u0142a nie s\u0105 jednakowe, spr\u00f3buj ponownie.",
     "9067": "U\u017cyj bardziej skomplikowanego has\u0142a.",
     "9068": "Link nie mo\u017ce zosta\u0107 odszyfrowany. Sprawd\u017a link i spr\u00f3buj ponownie.",
@@ -1652,6 +1653,7 @@
     "16516": "Publiczne linki",
     "16517": "Twoje logowanie do konta %1 powiod\u0142o si\u0119, teraz przeprowadzimy migracj\u0119 zawarto\u015bci konta do Twojego dysku.",
     "16518": "Poka\u017c na MEGA",
+    "16533": "Nowy udost\u0119pniony katalog",
     "16535": "Spr\u00f3buj bez zak\u0142adania konta",
     "16536": "Stworzyli\u015bmy bezpieczn\u0105 chmur\u0119 na pliki. Otw\u00f3rz swoje konto i odbierz [A]50 GB[\/A] za darmo i rozpocznij korzystanie jeszcze dzisiaj.",
     "16537": "Przewi\u0144",
@@ -3419,5 +3421,10 @@
     "20662": "64-bit",
     "20663": "32-bit",
     "20664": "removed the link for the chat.",
-    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
+    "20665": "Jest to kupon promocyjny, je\u015bli b\u0119dziesz kontynuowa\u0107, zostanie on automatycznie wykupiony na odpowiedni plan, nie doda to kredytu do Twojego konta.",
+    "20666": "Transfer quota exceeded.",
+    "20667": "Create New Link",
+    "20668": "No Outgoing Shares",
+    "20669": "No Public Links",
+    "20670": "Date Shared"
 }

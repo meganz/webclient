@@ -6736,6 +6736,14 @@ React.makeElement = React['createElement'];
 	                selectFooter: true
 	            })
 	        );
+
+	        var expandedPanel = {};
+	        if (room.type === "group" || room.type === "public") {
+	            expandedPanel['participants'] = true;
+	        } else {
+	            expandedPanel['options'] = true;
+	        }
+
 	        return React.makeElement(
 	            "div",
 	            { className: "chat-right-area" },
@@ -6765,7 +6773,7 @@ React.makeElement = React['createElement'];
 	                                    }
 	                                }, 250);
 	                            },
-	                            expandedPanel: room.type === "group" || room.type === "public" ? "participants" : "options"
+	                            expandedPanel: expandedPanel
 	                        },
 	                        participantsList ? React.makeElement(
 	                            AccordionPanel,
@@ -12347,7 +12355,13 @@ React.makeElement = React['createElement'];
 	    },
 	    onResize: function onResize() {},
 	    onToggle: function onToggle(e, key) {
-	        this.setState({ 'expandedPanel': this.state.expandedPanel === key ? undefined : key });
+	        var obj = clone(this.state.expandedPanel);
+	        if (obj[key]) {
+	            delete obj[key];
+	        } else {
+	            obj[key] = true;
+	        }
+	        this.setState({ 'expandedPanel': obj });
 	        this.props.onToggle && this.props.onToggle(key);
 	    },
 	    render: function render() {
@@ -12368,7 +12382,7 @@ React.makeElement = React['createElement'];
 	            if (child.type.displayName === 'AccordionPanel' || child.type.displayName && child.type.displayName.indexOf('AccordionPanel') > -1) {
 	                accordionPanels.push(React.cloneElement(child, {
 	                    key: child.key,
-	                    expanded: this.state.expandedPanel === child.key,
+	                    expanded: !!self.state.expandedPanel[child.key],
 	                    accordion: self,
 	                    onToggle: function onToggle(e) {
 	                        self.onToggle(e, child.key);

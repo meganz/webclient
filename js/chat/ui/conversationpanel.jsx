@@ -304,6 +304,15 @@ var ConversationRightArea = React.createClass({
                     />
                 </ButtonsUI.Button>
         );
+
+        var expandedPanel = {};
+        if (room.type === "group" || room.type === "public") {
+            expandedPanel['participants'] = true;
+        }
+        else {
+            expandedPanel['options'] = true;
+        }
+
         return <div className="chat-right-area">
             <PerfectScrollbar
                 className="chat-right-area conversation-details-scroll"
@@ -325,7 +334,7 @@ var ConversationRightArea = React.createClass({
                                 }
                             }, 250);
                         }}
-                        expandedPanel={room.type === "group" || room.type === "public" ? "participants" : "options"}
+                        expandedPanel={expandedPanel}
                     >
                        {participantsList ? <AccordionPanel className="small-pad" title={l[8876]} key="participants">
                             {participantsList}
@@ -337,7 +346,7 @@ var ConversationRightArea = React.createClass({
                                 {self.props.chatRoom.observers}
                             </span>
                         </div> : <div></div>}
-                        
+
                         <AccordionPanel className="have-animation buttons" title={l[7537]} key="options">
                             <div>
                             {addParticipantBtn}
@@ -1987,7 +1996,7 @@ var ConversationPanel = React.createClass({
                                     keyRotation: false,
                                     topic: ''
                                 };
-                                
+
                                 loadingDialog.show();
 
                                 megaChat.trigger(

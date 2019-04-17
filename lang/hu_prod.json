@@ -2908,7 +2908,7 @@
     "20233": "%s R\u00e9sztvev\u0151",
     "20234": "Vele: %s",
     "20235": "K\u00f6nnyed automatikus \u00f6sszhang a sz\u00e1m\u00edt\u00f3g\u00e9pe \u00e9s a MEGA felh\u0151 k\u00f6z\u00f6tt.",
-    "20237": "Jegyezd meg a sz\u00e1ml\u00e1z\u00e1si c\u00edmem",
+    "20237": "Sz\u00e1ml\u00e1z\u00e1si c\u00edm megjegyz\u00e9se",
     "20238": "Autodesk 3D Studio h\u00e1l\u00f3s f\u00e1jlform\u00e1tum",
     "20239": "Rhino3D Modell",
     "20240": "RAW K\u00e9p",
@@ -3195,7 +3195,7 @@
     "20655": "A F\u00e1jlkezel\u0151 B\u0151v\u00edtm\u00e9ny lehet\u0151v\u00e9 teszi a MEGA fi\u00f3kja haszn\u00e1lat\u00e1t k\u00f6zvetlen\u00fcl a Linux f\u00e1jlkezel\u0151b\u0151l.",
     "20656": "Kiterjeszt\u00e9sek nem el\u00e9rhet\u0151k.",
     "20660": "Az \u00fczen\u0151hivatkoz\u00e1s nem el\u00e9rhet\u0151.",
-    "20662": "64 bit",
-    "20663": "32 bit",
-    "20665": "This is a promotional voucher, if you continue it will be automatically redeemed into the appropriate plan, it will not add credit to your account."
+    "20662": "64-bit",
+    "20663": "32-bit",
+    "20665": "Ez egy prom\u00f3ci\u00f3s utalv\u00e1ny, mely automatikusan bev\u00e1lt\u00e1sra ker\u00fcl a megfelel\u0151 csomaghoz \u00e9s nem ad\u00f3dik a fi\u00f3kja egyenleg\u00e9hez, ha folytatja."
 }

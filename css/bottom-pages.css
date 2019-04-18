@@ -3918,6 +3918,12 @@ a.opensource-icon-txt.coming-soon {
 
 
 /* Desktop download during onboarding phase */
+.bottom-page.onboarding-suggestions.megasync .megaapp-linux {
+    margin-top: 0px;
+}
+.bottom-page.onboarding-suggestions.megasync .megaapp-linux .default-select.megaapp-dropdown {
+    width: 100%;
+}
 .onboarding-suggestions .top-buttons, .onboarding-suggestions .top-icon.menu, .onboarding-suggestions .top-icon.notification, .onboarding-suggestions .top-icon.achievements, .onboarding-suggestions .membership-status-block {
     display: none;
 }
@@ -3960,6 +3966,7 @@ a.opensource-icon-txt.coming-soon {
     font-size: 16px;
     padding: 0 24px;
     z-index: 999;
+    margin-top: 10px;
 }
 .default-green-button.redirect-clouddrive.hidden, .default-green-button.download-app.hidden {
     display: none;

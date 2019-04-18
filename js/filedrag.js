@@ -104,6 +104,10 @@
     }
 
     function start_upload() {
+        if (u_type && u_attr) { // logged in user landing on start-page
+            loadSubPage('fm');
+            return;
+        }
         if (u_wasloggedin()) {
             msgDialog('confirmation', l[1193], l[2001], l[2002], function(e) {
                 if (e) {
@@ -154,7 +158,7 @@
         if (!isFileDragAllowed()) {
             return;
         }
-        if (localStorage.d > 1) {
+        if (d > 1) {
             console.info('----- ENTER event :' + e.target.className);
         }
         touchedElement++;
@@ -170,9 +174,6 @@
             console.log('DragOver');
         }
         e.preventDefault();
-        if (!isFileDragAllowed()) {
-            return;
-        }
         e.stopPropagation();
     }
     var useMegaSync = -1;
@@ -180,7 +181,15 @@
 
 
     function FileSelectHandlerMegaSyncClick(e) {
-        if (page.indexOf('/chat/') > -1) {
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            e.preventDefault();
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return false;
+        }
+
+        if (page === "chat" || page.indexOf('/chat/') > -1) {
             return true;
         }
         if (useMegaSync === -1) {
@@ -282,10 +291,8 @@
             return;
         }
         e.stopPropagation();
-        if (!isFileDragAllowed()) {
-            return;
-        }
-        if (localStorage.d > 1) {
+        
+        if (d > 1) {
             console.warn('----- LEAVE event :' + e.target.className + '   ' + e.type);
         }
         touchedElement--;
@@ -299,9 +306,17 @@
 
     // on Drop event
     function FileSelectHandler(e) {
+
         if (e.preventDefault) {
             e.preventDefault();
         }
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return false;
+        }
+
         if ($.dialog === 'avatar') {
             return;
         }
@@ -311,7 +326,7 @@
         if (!isFileDragAllowed()) {
             return;
         }
-        
+
         useMegaSync = -1;
 
         var currentDir = M.currentdirid;
@@ -473,16 +488,17 @@
      * @return {Boolean} Is allowed or not
      */
     function isFileDragAllowed() {
-        if ((page !== 'start' && !is_fm()) || // If page is not fm, only start page is allowed
-            (is_fm() && // if page is fm,
-                (slideshowid || !$('.feedback-dialog').hasClass('hidden') || // preview and feedback dialog show
+        if (page === 'start') {
+            return true;
+        }
+        if (is_fm() && // if page is fm,
+            (slideshowid || !$('.feedback-dialog').hasClass('hidden') || // preview and feedback dialog show
                 M.currentdirid === 'shares' || // Share root page
                 M.currentrootid === 'contacts' || // Contacts pages
                 M.currentrootid === 'ipc' || // IPC
                 M.currentrootid === 'opc' || // OPC
                 M.currentrootid === M.RubbishID || // Rubbish bin
                 (M.currentrootid === undefined && M.currentdirid !== 'transfers') // Dashboard and Settings pages
-                )
             )
         ) {
             return false;
@@ -503,6 +519,14 @@
                 }
             }
         }
+
+        // dran&drop overlay click handler, to allow closing if stuck
+        $('.drag-n-drop.overlay').off('click.dnd').on('click.dnd',
+            function dragDropLayoutClickHndler() {
+                $('.drag-n-drop.overlay').addClass('hidden');
+                $('body').removeClass('overlayed');
+            }
+        );
 
         var fnHandler = FileSelectHandler;
         var fnEnter = FileDragEnter;

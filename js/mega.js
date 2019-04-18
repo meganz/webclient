@@ -1234,8 +1234,12 @@ scparser.$add('d', function(a) {
 });
 
 scparser.$add('la', function() {
+
+    'use strict';
+
     // last seen/acknowledged notification sn
-    notify.countAndShowNewNotifications();
+    notify.markAllNotificationsAsSeen(true);
+
 });
 
 scparser.$add('usc', function() {
@@ -1284,19 +1288,16 @@ scparser.$add('pses', function(a) {
     notify.notifyFromActionPacket(a);
 });
 
-scparser.$add('mcc', function(a) {
+scparser.mcpc = scparser.mcc = function (a) {
     // MEGAchat
     if (!megaChatIsDisabled) {
         if (megaChatIsReady) {
             megaChat._queuedMccPackets.push(a);
-        }
-        else if (typeof ChatdIntegration !== 'undefined') {
+        } else if (typeof ChatdIntegration !== 'undefined') {
             ChatdIntegration._queuedChats[a.id] = a;
-        }
-        else if (Array.isArray(loadfm.chatmcf)) {
+        } else if (Array.isArray(loadfm.chatmcf)) {
             loadfm.chatmcf.push(a);
-        }
-        else {
+        } else {
             srvlog('@lp unable to parse mcc packet');
         }
     }
@@ -1304,10 +1305,10 @@ scparser.$add('mcc', function(a) {
         delete a.a;
         fmdb.add('mcf', {id: a.id, d: a});
     }
-});
+};
 
 // MEGAchat archive/unarchive
-scparser.$add('mcfc', function(a) {
+scparser.mcfc = scparser.mcpfc = function(a) {
     'use strict';
 
     if (window.megaChatIsReady) {
@@ -1321,7 +1322,8 @@ scparser.$add('mcfc', function(a) {
         loadfm.chatmcfc = {};
     }
     loadfm.chatmcfc[a.id] = a.f;
-});
+};
+
 
 scparser.$add('_sn', function(a) {
     // sn update?
@@ -1714,7 +1716,13 @@ function fm_fullreload(q, logMsg) {
     // without restarting them.
     // until then - it's the sledgehammer method; can't be anything
     // more surgical :(
-    localStorage.force = 1;
+    if (logMsg === 'ETOOMANY' && mega.loadReport.mode < 2 && !sessionStorage.lightTreeReload) {
+        sessionStorage.lightTreeReload = 1;
+    }
+    else {
+        localStorage.force = 1;
+        delete sessionStorage.lightTreeReload;
+    }
 
     // done reload callback
     var step = 1;
@@ -2018,6 +2026,9 @@ var mclp;
 function loadfm(force) {
     "use strict";
 
+    if (anonymouschat) {
+        return;
+    }
     if (force) {
         localStorage.force = true;
         loadfm.loaded = false;
@@ -2221,6 +2232,9 @@ function dbfetchfm() {
                                         // only set chatmcf is there is anything returned
                                         // if not, this would force the chat to do a 'mcf' call
                                         loadfm.chatmcf = r;
+                                    }
+                                    else {
+                                        loadfm.chatmcf = -1;
                                     }
                                 }
                                 else {
@@ -3125,8 +3139,8 @@ function process_ok(ok, ignoreDB) {
     }
 }
 
-function processMCF(mcfResponse, ignoreDB) {
 
+function processMCF(mcfResponse, ignoreDB) {
     if (typeof ChatdIntegration !== 'undefined') {
         ChatdIntegration.requiresUpdate = true;
     }
@@ -3138,20 +3152,6 @@ function processMCF(mcfResponse, ignoreDB) {
     // reopen chats from the MCF response.
     if (typeof mcfResponse !== 'undefined' && typeof mcfResponse.length !== 'undefined' && mcfResponse.forEach) {
         mcfResponse.forEach(function (chatRoomInfo) {
-            if (chatRoomInfo.active === 0) {
-                // skip non active chats for now...
-                return;
-            }
-
-            if (chatRoomInfo.n) {
-                for (var i = 0; i < chatRoomInfo.n.length; i++) {
-                    var member = chatRoomInfo.n[i];
-                    // was removed from the chat.
-                    if (member.u === u_handle && member.p === -1) {
-                        return;
-                    }
-                }
-            }
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });
             }
@@ -3168,7 +3168,13 @@ function processMCF(mcfResponse, ignoreDB) {
         }
     }
     else if (typeof ChatdIntegration !== 'undefined') {
-        ChatdIntegration.mcfHasFinishedPromise.reject(mcfResponse);
+        if (mcfResponse === -1) {
+            // new user, empty chat list.
+            ChatdIntegration.mcfHasFinishedPromise.resolve();
+        }
+        else {
+            ChatdIntegration.mcfHasFinishedPromise.reject(mcfResponse);
+        }
     }
 }
 
@@ -3212,7 +3218,7 @@ function folderreqerr(c, e)
 
 function init_chat() {
     function __init_chat() {
-        if (u_type && !megaChatIsReady) {
+        if ((anonymouschat || u_type) && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
 
             var _chat = new Chat();
@@ -3222,7 +3228,7 @@ function init_chat() {
                 window.megaChat = _chat;
                 megaChat.init();
 
-                if (fminitialized) {
+                if (anonymouschat || fminitialized) {
                     if (String(M.currentdirid).substr(0, 5) === 'chat/') {
                         chatui(M.currentdirid);
                     }
@@ -3237,12 +3243,16 @@ function init_chat() {
             loadingInitDialog.hide();
         }
     }
-
-    if (pfid) {
-        if (d) console.log('Will not initialize chat [branch:1]');
+    if (anonymouschat) {
+        __init_chat();
     }
     else {
-        authring.onAuthringReady('chat').done(__init_chat);
+        if (pfid) {
+            if (d) console.log('Will not initialize chat [branch:1]');
+        }
+        else {
+            authring.onAuthringReady('chat').done(__init_chat);
+        }
     }
 }
 
@@ -3299,11 +3309,19 @@ function loadfm_callback(res) {
     if (res.mcf) {
         // save the response to be processed later once chat files were loaded
         loadfm.chatmcf = res.mcf.c || res.mcf;
+        if (res.mcf.pc) {
+            loadfm.chatmcf = (loadfm.chatmcf || []).concat(res.mcf.pc);
+        }
         // cf will include the flags (like whether it is archived) and chatid,
         // so it needs to combine it before processing it.
         if (res.mcf.cf) {
             for (var i = 0; i < res.mcf.cf.length; i++) {
                 loadfm.chatmcf[i].f = res.mcf.cf[i].f;
+            }
+        }
+        if (res.mcf.pcf) {
+            for (var i = 0; i < res.mcf.pcf.length; i++) {
+                loadfm.chatmcf[i].f = res.mcf.pcf[i].f;
             }
         }
         // ensure the response is saved in fmdb, even if the chat is disabled or not loaded yet
@@ -3508,7 +3526,7 @@ function loadfm_done(mDBload) {
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
         if (mDBload !== -0x800e0fff && !is_mobile) {
             onIdle(function _initialNotify() {
-                
+
                 // If this was called from the initial fm load via gettree or db load, we should request the
                 // latest notifications. These must be done after the first getSC call.
                 if (!folderlink) {

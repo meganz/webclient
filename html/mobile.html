@@ -41,7 +41,7 @@
                 <div class="top-menu-item mobile">[$955]</div>
                 <div class="top-menu-item sync">[$956]</div>
                 <div class="top-menu-item extensions">[$16603]</div>
-                <div class="top-menu-item megabird">MEGAbird</div>
+                <div class="top-menu-item bird">MEGAbird</div>
                 <div class="top-menu-item cmd">MEGAcmd</div>
             </div>
 
@@ -58,7 +58,6 @@
                 <div class="top-menu-item privacy">[$386]</div>
                 <div class="top-menu-item copyright not-mobile-ready">[$387]</div>
                 <div class="top-menu-item takedown">[$966]</div>
-                <div class="top-menu-item general">[$1712]</div>
                 <div class="top-menu-item gdpr">[$18501]</div>
             </div>
 
@@ -354,6 +353,10 @@
         <div class="mobile fm-icon open-folder"></div>
         <span class="mobile text">[$17086]</span>
     </div>
+    <!--div class="context-menu-item download-file-button">
+        <div class="mobile fm-icon download"></div>
+        <span class="mobile text">[$58]</span>
+    </div-->
     <div class="context-menu-item link-button">
         <div class="mobile fm-icon manage-link"></div>
         <span class="mobile text">[$6909]</span>
@@ -509,6 +512,10 @@
                 <div class="mobile user-info">
                     <div class="mobile user-name"></div>
                     <div class="mobile user-email"></div>
+                    <div class="mobile user-phone hidden">
+                        <span class="user-phone-number"></span>
+                        <span class="user-phone-verified-icon"></span>
+                    </div>
                 </div>
             </div>
             <div class="mobile account-type-block">
@@ -563,6 +570,11 @@
                     <span class="mobile two-factor-text enabled">[$17601]</span>
                     <span class="mobile two-factor-text disabled">[$7070]</span>
                 </div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="mobile button-block account-add-phone-block hidden">
+                <div class="mobile fm-icon phone"></div>
+                <div class="mobile two-factor-heading">[$20222]</div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
             <div class="mobile button-block account-session-history-block">
@@ -1156,6 +1168,17 @@
                         <div class="mobile fm-icon right-arrow"></div>
                     </div>
                 </div>
+                <div class="mobile bonus-information-block verify-phone-number inactive hidden">
+                    <div class="mobile left-block">
+                        <div class="mobile storage-bonus"></div>
+                        <div class="mobile transfer-bonus"></div>
+                    </div>
+                    <div class="mobile right-block">
+                        <div class="mobile bonus-header">[$20213]</div>
+                        <div class="mobile time-remaining">[$17543]</div>
+                        <div class="mobile fm-icon right-arrow"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1674,9 +1697,13 @@
                     <!-- Sign in Tab !-->
                     <div class="mobile tab-block sign-in hidden">
                         <form>
-                            <div class="mobile custom-login-message-block hidden">
+                            <div class="mobile custom-login-message-block original-message hidden">
                                 <div class="mobile empty-icon custom-login-icon"></div>
                                 <div class="mobile custom-login-text"></div>
+                            </div>
+                            <div class="mobile custom-login-message-block sms-verified-message hidden">
+                                <div class="mobile empty-icon big-green-tick"></div>
+                                <div class="mobile custom-login-text">[$20220] [$20392]</div>
                             </div>
                             <div class="mobile signin-input login">
                                 <span></span>
@@ -2114,7 +2141,15 @@
                                 <select id="address-dialog-states" class="states default-select" tabindex="8" disabled>
                                     <option value="">[$7352]</option>
                                 </select>
-
+                                <div class="mobile remember-billing-info-wrapper">
+                                    <div class="checkbox checkboxOn square">
+                                        <i></i>
+                                        <input id="address-dialog-save-billing-info" class="remember-billing-info" type="checkbox" tabindex="9">
+                                    </div>
+                                    <div class="checkbox-label text radio-txt">
+                                        [$20237]
+                                    </div>
+                                </div>
                                 <div class="redirect-information-container">
                                     <div class="redirect-information">
                                         You will be redirected to another site to complete your payment.
@@ -2778,7 +2813,7 @@
                     </p>
                     <p>
                         <span class="number">25</span>
-                        <span class="text">To file a counter-notice with us, you must provide a written communication at <a href="https://mega.nz/copyright">https://mega.nz/copyright</a> or by email to <a href="mailto:copyright@mega.nz">copyright@mega.nz</a> that includes substantially the following:</span>
+                        <span class="text">To file a counter-notice with us, you must provide a written communication at <a href="https://mega.nz/dispute">https://mega.nz/dispute</a> or by email to <a href="mailto:copyright@mega.nz">copyright@mega.nz</a> that includes substantially the following:</span>
                     </p>
                     <p class="list">
                         <span class="number">25.1</span>
@@ -3425,6 +3460,158 @@
 </div>
 
 
+<!-- SMS phone number entry for suspended account or achievement process -->
+<div class="mobile main-block verify-number number-input-page js-phone-input-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon mega left"></div>
+        <div class="mobile fm-header-txt"><span class="js-header-text"></span></div>
+    </div>
+    <div class="mobile fm-block">
+        <div class="mobile fm-row">
+            <div class="mobile fm-content">
+                <div class="mobile fm-scrolling">
+                    <div class="mobile vn-block">
+                        <div class="mobile vn-illustration-block">
+                            <div class="mobile empty-icon vn-illustration"></div>
+                        </div>
+                        <div class="mobile centre-body-text js-body-text"></div>
+                        <div class="mobile vn-input-wrapper">
+                            <div class="mobile country-input login js-country-selector-open-button">
+                                <span></span>
+                                <input class="js-country-input" data-country-name="" data-country-iso-code="" data-country-call-code="" type="text" value="" placeholder="Choose your Country" maxlength="10" readonly>
+                                <span class="show-country-icon"></span>
+                            </div>
+                            <div class="mobile phone-number-input login">
+                                <span></span>
+                                <input class="js-phone-input" type="tel" value="" placeholder="[$20214]" maxlength="15">
+                            </div>
+                            <div class="mobile warning-text-field js-warning-message hidden">
+                                [$19210]
+                            </div>
+                            <div class="mobile cta-button green js-send-sms-button">
+                                <span class="label">[$1940]</span>
+                                <span class="loading-image">
+                                    <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Dialog for selecting countries -->
+<div class="mobile main-block country-selector js-country-selector hidden">
+    <div class="mobile country-selector-dialog">
+        <div class="mobile dialog-header">
+            <div class="mobile dialog-heading-text">[$20215]</div>
+        </div>
+        <div class="mobile fm-block">
+            <div class="mobile fm-row">
+                <div class="mobile fm-content">
+                    <div class="mobile fm-scrolling js-country-list">
+                        <div class="mobile country-list-item js-country-list-item template" data-country-iso-code="">
+                            <div class="mobile country-name js-country-name"></div>
+                            <div class="mobile country-iso-code js-country-iso-code"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mobile dialog-footer">
+            <div class="mobile cta-button white active js-cancel-country-selection">
+                <span class="label">[$1597]</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- SMS Verify Code page  -->
+<div class="mobile main-block verify-number verify-number-input-page js-verify-code-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$20216]</span></div>
+    </div>
+    <div class="mobile fm-block">
+        <div class="mobile fm-row">
+            <div class="mobile fm-content">
+                <div class="mobile fm-scrolling">
+                    <div class="vn-block">
+                        <div class="mobile empty-icon enter-number"></div>
+                        <div class="mobile centre-body-text">
+                            [$20217]<br/>
+                            <div class="mobile user-number js-user-phone-number"></div>
+                            [$20218] <span class="mobile resend-verification js-resend-button">[$8744]</span>
+                        </div>
+                        <div class="mobile vn-input-wrapper">
+                            <div class="mobile signin-input verify-number-code">
+                                <input class="js-verification-number-input" type="number" value="" placeholder="[$19193]" maxlength="6" />
+                            </div>
+                            <div class="mobile warning-text-field js-warning-message hidden">
+                                [$19210]
+                            </div>
+                            <div class="mobile cta-button green verify-number-sms-code js-verify-button">
+                                <span class="label">[$1960]</span>
+                                <span class="loading-image">
+                                    <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Phone number verification successful dialog !-->
+<div class="mobile main-block overlay hidden verify-number-success js-verify-success-page">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile empty-icon big-green-tick"></div>
+                <div class="mobile dialog-heading-text">[$20219]</div>
+                <div class="mobile">
+                    <div class="mobile dialog-body-text">[$20220]</div>
+                </div>
+                 <div class="mobile cta-button green active js-ok-button">
+                    <span class="label">[$1596]</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Add phone number achievement dialog !-->
+<div class="mobile main-block overlay hidden add-number-achievement js-add-phone-achievement-page">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <div class="mobile empty-icon add-number"></div>
+                <div class="mobile dialog-heading-text">[$20211]</div>
+                <div class="mobile">
+                    <div class="mobile dialog-body-text js-achievement-text">[$20210]</div>
+                </div>
+                 <div class="mobile cta-button green active js-add-phone-button">
+                    <span class="label">[$20222]</span>
+                </div>
+                <a class="mobile text-button third cancel js-cancel-button"><span>[$148]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- Video Block template -->
 <div class="mobile-video-template">
     <div class="download video-block hidden">
@@ -3474,4 +3661,22 @@
         </div>
         <div class="mobile bottom-info fm-dialog-close"></div>
     </div>
+</div>
+
+<div class="mobile chat-links-preview hidden">
+    <div class="chatlink-mobile-header">
+        <a href="" class="mobile fm-icon mega left"></a>
+    </div>
+    <a class="chatlink-red-row">
+        <span></span> <i class="small-icon icons-sprite right-white-arrow"></i>
+    </a>
+    <div class="chatlink-contents">
+        <span>[$20596]</span>
+        <div class="huge-icon group-chat"></div>
+        <h3>&nbsp;</h3>
+        <h5>&nbsp;</h5>
+        <a href="">[$20622]</a>
+        <p>[$20595]</p>
+    </div>
+
 </div>

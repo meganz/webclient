@@ -47,7 +47,7 @@ var tlvstore = (function () {
      * There is no separator in between and the length is fixted 2 bytes.
      * If the length of the value is bigger than 0xffff, then it will use 0xffff
      * as the length, and append the value after.
-     * 
+     *
      * @param key {string}
      *     ASCII string label of record's key.
      * @param value {string}

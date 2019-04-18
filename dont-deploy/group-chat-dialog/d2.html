@@ -1,0 +1,112 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>New Group Chat</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="../../css/style.css" />
+<link rel="stylesheet" type="text/css" href="../../css/user-card.css" />
+<link rel="stylesheet" type="text/css" href="../../css/avatars.css" />
+<link rel="stylesheet" type="text/css" href="../../css/icons.css" />
+<link rel="stylesheet" type="text/css" href="../../css/buttons.css" />
+<link rel="stylesheet" type="text/css" href="../../css/dropdowns.css" />
+ <link rel="stylesheet" type="text/css" href="../../css/dialogs.css" />
+<link rel="stylesheet" type="text/css" href="../../css/popups.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-messages.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-share-links.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-textarea.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-typing.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-left-pane.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-feedback.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/retina-images.css" />
+<link rel="stylesheet" type="text/css" href="../../css/retina-images.css" />
+<script type="text/javascript" src="../../js/vendor/jquery.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.toggle-checkbox-button').bind('mousedown', function() {
+            var $checkbox =$(this).closest('.toggle-checkbox');
+            if ($checkbox.hasClass('checked')) {
+                 $checkbox.removeClass('checked');
+            }
+            else {
+                $checkbox.addClass('checked');
+            }
+        });
+    });
+</script>
+</head>
+
+<body>
+
+<div class="fm-dialog new-group-chat contrast small-footer">
+
+    <div class="fm-dialog-close"></div>
+    <div class="fm-dialog-title">New Group Chat</div>
+    <div class="fm-dialog-content">
+         <!-- Please add "top-pad" class if Selected contacts block is missing!-->
+        <div class="contacts-search-header left-aligned top-pad">
+            <i class="small-icon conversations"></i>
+            <input type="search" placeholder="Enter group name" value="">
+            <div class="search-result-clear" style="display:none;"></div>
+        </div>
+        <div class="group-chat-dialog content">
+            <!-- Please add "checked" class !-->
+            <div class="toggle-checkbox right">
+                <div class="toggle-checkbox-wrap">
+                    <div class="toggle-checkbox-button"></div>
+                </div>
+            </div>
+            <div class="group-chat-dialog header">
+                Encryption key rotation (off)
+            </div>
+            <div class="group-chat-dialog description">
+                Key rotation is slightly more secure, but does not allow you to create a link to the chat and new participants will not see past messages.
+            </div>
+            <div class="group-chat-dialog checkbox">
+                <div class="checkdiv checkboxOn">
+                    <input type="checkbox" name="group-encryption" id="group-encryption" class="checkboxOn" checked="">
+                </div>
+                <label for="group-encryption" class="radio-txt lato mid">Create chat link</label>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="contacts-list-header">Contacts</div>
+        <!-- Please add "short" class for Step 2 !-->
+        <div class="contacts-search-scroll short">
+            <div class="contacts-search-list">
+                <div class="contacts-info body  contacts-search short">
+                    <div class="avatar-wrapper small-rounded-avatar chat-avatar color9">
+                        <span>B</span>
+                    </div>
+                    <div class="user-card-tick-wrap">
+                        <i class="small-icon mid-green-tick"></i>
+                    </div>
+                    <div class="user-card-data">
+                        <div class="user-card-name light">Bram van der Kolk</div>
+                        <div class="user-card-status">
+                            <div class="user-card-presence black"></div>
+                            <span>Offline</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fm-dialog-footer white">
+        <a href="javascript:;" class="button default-grey-button lato right">
+            <span>Done</span>
+        </a>
+        <a href="javascript:;" class="button link-button lato left">
+            <i class="small-icon grey-left-arrow"></i>
+            <span>Back</span>
+        </a>
+        <div class="clear"></div>
+    </div>
+
+</div>
+                            
+    
+    
+</body>
+</html>

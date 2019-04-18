@@ -70,6 +70,20 @@ var Dropdown = React.createClass({
                         var horizOffset = 0;
 
                         if (!self.props.noArrow) {
+                            var $arrow = $('.dropdown-white-arrow', $element);
+                            var arrowHeight;
+                            if (self.props.arrowHeight) {
+                                arrowHeight = self.props.arrowHeight;
+                                if (info.vertical !== "top") {
+                                    arrowHeight = arrowHeight * -1;
+                                }
+                                else {
+                                    arrowHeight = 0;
+                                }
+                            }
+                            else {
+                                arrowHeight = $arrow.outerHeight();
+                            }
                             if (info.vertical != "top") {
                                 $(this)
                                     .removeClass("up-arrow")
@@ -81,8 +95,9 @@ var Dropdown = React.createClass({
                                     .addClass("up-arrow");
                             }
 
-                            var $arrow = $('.dropdown-white-arrow', $element);
-                            vertOffset += (info.vertical == "top" ? $arrow.outerHeight() : 0);
+                            vertOffset += (
+                                info.vertical == "top" ? arrowHeight : 0
+                            );
                         }
 
 
@@ -251,14 +266,19 @@ var DropdownContactsSelector = React.createClass({
                          ref="dropdown"
                          positionMy={this.props.positionMy}
                          positionAt={this.props.positionAt}
+                         arrowHeight={this.props.arrowHeight}
+                         vertOffset={this.props.vertOffset}
                 >
                 <ContactsUI.ContactPickerWidget
                     active={this.props.active}
-                    className="popup contacts-search tooltip-blur"
+                    className="popup contacts-search tooltip-blur small-footer"
                     contacts={this.props.contacts}
+                    selectFooter={this.props.selectFooter}
                     megaChat={this.props.megaChat}
                     exclude={this.props.exclude}
+                    allowEmpty={this.props.allowEmpty}
                     multiple={this.props.multiple}
+                    showTopButtons={this.props.showTopButtons}
                     onSelectDone={this.props.onSelectDone}
                     multipleSelectedButtonLabel={this.props.multipleSelectedButtonLabel}
                     singleSelectedButtonLabel={this.props.singleSelectedButtonLabel}

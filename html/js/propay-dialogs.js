@@ -523,10 +523,14 @@ var voucherDialog = {
      * Display the dialog
      */
     showVoucherDialog: function() {
+        'use strict';
+        var self = this;
 
         // Add the styling for the overlay
-        this.$dialog.removeClass('hidden');
-        this.showBackgroundOverlay();
+        M.safeShowDialog('voucher-dialog', function() {
+            self.showBackgroundOverlay();
+            return self.$dialog;
+        });
     },
 
     /**
@@ -556,7 +560,7 @@ var voucherDialog = {
         this.$dialog.find('.voucher-plan-price .price').text(proPrice);
         this.$dialog.find('#voucher-code-input input').val('');
         this.changeColourIfSufficientBalance();
-        
+
         var $voucherAccountBalance = this.$dialog.find('.voucher-account-balance');
         var $balanceAmount = $voucherAccountBalance.find('.balance-amount');
         $balanceAmount.text(balance);
@@ -649,9 +653,10 @@ var voucherDialog = {
      * Hide the overlay and dialog
      */
     hideDialog: function() {
+        'use strict';
 
+        closeDialog();
         voucherDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-        voucherDialog.$dialog.addClass('hidden');
     },
 
     /**
@@ -707,54 +712,56 @@ var voucherDialog = {
      * @param {String} voucherCode The voucher code
      */
     addVoucher: function(voucherCode) {
+        'use strict';
 
         loadingDialog.show();
 
-        // Make API call to add voucher
-        api_req({ a: 'uavr', v: voucherCode }, {
-            callback: function(result) {
+        M.require('redeem_js')
+            .then(function() {
+                return redeem.redeemVoucher(voucherCode);
+            })
+            .then(function(data, res) {
+                loadingDialog.hide();
 
-                if (typeof result === 'number') {
-
-                    loadingDialog.hide();
-
-                    // This voucher has already been redeemed
-                    if (result === -11) {
-                        msgDialog('warninga', l[135], l[714], '', function() {
-                            voucherDialog.showBackgroundOverlay();
-                        });
-                    }
-
-                    // Not a valid voucher code
-                    else if (result < 0) {
-                        msgDialog('warninga', l[135], l[473], '', function() {
-                            voucherDialog.showBackgroundOverlay();
-                        });
-                    }
-                    else {
-                        // Get the latest account balance and update the price in the dialog
-                        voucherDialog.getLatestBalance(function() {
-
-                            // Format to 2dp
-                            var proPrice = pro.propay.selectedProPackage[5];
-                            var balance = pro.propay.proBalance.toFixed(2);
-                            var newBalance = parseFloat(balance - proPrice).toFixed(2);
-
-                            // Update dialog details
-                            voucherDialog.$dialog.find('.voucher-account-balance .balance-amount').text(balance);
-                            voucherDialog.$dialog.find('.voucher-account-balance .new-balance-amount')
-                                .text(newBalance);
-                            voucherDialog.changeColourIfSufficientBalance();
-
-                            // Hide voucher input
-                            voucherDialog.$dialog.find('.voucher-redeem-container').show();
-                            voucherDialog.$dialog.find('.purchase-now-container').show();
-                            voucherDialog.$dialog.find('.voucher-input-container').hide();
-                        });
-                    }
+                if (d) {
+                    console.debug('voucherDialog.addVoucher', res, data);
                 }
-            }
-        });
+
+                if (data.promotional) {
+                    voucherDialog.hideDialog();
+                    pro.propay.selectedProPackage = [0, data.proNum];
+                    voucherDialog.showSuccessfulPayment();
+                    return;
+                }
+
+                // Get the latest account balance and update the price in the dialog
+                voucherDialog.getLatestBalance(function() {
+
+                    // Format to 2dp
+                    var proPrice = pro.propay.selectedProPackage[5];
+                    var balance = pro.propay.proBalance.toFixed(2);
+                    var newBalance = parseFloat(balance - proPrice).toFixed(2);
+
+                    // Update dialog details
+                    voucherDialog.$dialog.find('.voucher-account-balance .balance-amount').text(balance);
+                    voucherDialog.$dialog.find('.voucher-account-balance .new-balance-amount').text(newBalance);
+                    voucherDialog.changeColourIfSufficientBalance();
+
+                    // Hide voucher input
+                    voucherDialog.$dialog.find('.voucher-redeem-container').show();
+                    voucherDialog.$dialog.find('.purchase-now-container').show();
+                    voucherDialog.$dialog.find('.voucher-input-container').hide();
+                });
+            })
+            .catch(function(ex) {
+                loadingDialog.hide();
+
+                if (ex) {
+                    msgDialog('warninga', l[135], l[47], ex, function() {
+                        voucherDialog.showBackgroundOverlay();
+                    });
+                }
+            });
     },
 
     /**
@@ -1045,7 +1052,7 @@ var directReseller = {
 
         var baseurls = [
             '',
-            'https://mega.and1.tw/', // 6media
+            'https://mega.6media.tw/', // 6media
             'https://mega.bwm-mediasoft.com/mega.php5?', // BWM Mediasoft
             'https://my.hosting.co.uk/' // Hosting.co.uk
         ];
@@ -1172,6 +1179,8 @@ var addressDialog = {
      */
     init: function (plan, userInfo, businessRegisterPage) {
         "use strict";
+        var self = this;
+
         if (plan) {
             this.businessPlan = plan;
             this.userInfo = userInfo;
@@ -1182,12 +1191,25 @@ var addressDialog = {
             delete this.userInfo;
             delete this.businessRegPage;
         }
-        this.showDialog();
-        this.initStateDropDown();
-        this.initCountryDropDown();
-        this.initCountryDropdownChangeHandler();
-        this.initBuyNowButton();
-        this.initCloseButton();
+
+        loadingDialog.show();
+        mega.attr.get(u_attr.u, 'billinginfo', false, true)
+        .always(function(billingInfo) {
+            var selectedCountry = (billingInfo && billingInfo.hasOwnProperty('country')) ? billingInfo.country
+                : u_attr.country ? u_attr.country : u_attr.ipcc || false;
+
+            var selectedState = ((selectedCountry === 'US' || selectedCountry === 'CA')
+                && billingInfo && billingInfo.hasOwnProperty('state')) ? billingInfo.state : false;
+            self.showDialog();
+            self.prefillInfo(billingInfo);
+            self.initStateDropDown(selectedState, selectedCountry);
+            self.initCountryDropDown(selectedCountry);
+            loadingDialog.hide();
+            self.initCountryDropdownChangeHandler();
+            self.initBuyNowButton();
+            self.initCloseButton();
+            self.initRememberDetailsCheckbox();
+        });
     },
 
     /**
@@ -1208,8 +1230,6 @@ var addressDialog = {
         var monthsWording;
 
         this.$dialog.find('.plan-icon .reg-st3-membership-icon').removeClass('hidden');
-        this.$dialog.find('input.first-name').val('');
-        this.$dialog.find('input.last-name').val('');
 
         // in case we are coming from normal users sign ups (PRO)
         if (!this.businessPlan || !this.userInfo) {
@@ -1234,13 +1254,11 @@ var addressDialog = {
             numOfMonths = this.businessPlan.m;
 
             this.$dialog.find('.plan-icon .reg-st3-membership-icon').addClass('hidden');
-            this.$dialog.find('input.first-name').val(this.userInfo.fname);
-            this.$dialog.find('input.last-name').val(this.userInfo.lname);
             // auto renew is mandatory in business
             this.$dialog.find('.payment-buy-now').text(l[6172]);
         }
         monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
-        
+
 
         // Update template
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 bus-plan-icon64')
@@ -1257,16 +1275,25 @@ var addressDialog = {
     /**
      * Creates a list of state names with the ISO 3166-1-alpha-2 code as the option value
      */
-    initStateDropDown: function() {
+    initStateDropDown: function(preselected, country) {
 
         var stateOptions = '';
         var $statesSelect = this.$dialog.find('.states');
 
+        // Remove all states (leave the first option because its actually placeholder).
+        $statesSelect.children(':not(:first-child)').remove();
+
         // Build options
         $.each(M.getStates(), function(isoCode, stateName) {
 
+            var countryCode = isoCode.substr(0, 2);
+
             // Create the option and set the ISO code and state name
-            var $stateOption = $('<option>').val(isoCode).text(stateName);
+            var $stateOption = $('<option>').val(isoCode).text(stateName).prop('disabled', countryCode !== country);
+
+            if (preselected && isoCode === preselected) {
+                $stateOption.attr('selected', true);
+            }
 
             // Append the HTML to the list of options
             stateOptions += $stateOption.prop('outerHTML');
@@ -1283,21 +1310,34 @@ var addressDialog = {
                 collision: "flip"  // default is ""
             }
         });
+
+        $statesSelect.selectmenu('refresh');
+
+        if (preselected || country === 'US' || country === 'CA') {
+            $statesSelect.selectmenu('enable');
+        }
     },
 
     /**
      * Creates a list of country names with the ISO 3166-1-alpha-2 code as the option value
      */
-    initCountryDropDown: function() {
+    initCountryDropDown: function(preselected) {
 
         var countryOptions = '';
         var $countriesSelect = this.$dialog.find('.countries');
+
+        // Remove all countries (leave the first option because its actually placeholder).
+        $countriesSelect.children(':not(:first-child)').remove();
 
         // Build options
         $.each(M.getCountries(), function(isoCode, countryName) {
 
             // Create the option and set the ISO code and country name
             var $countryOption = $('<option>').val(isoCode).text(countryName);
+
+            if (preselected && isoCode === preselected) {
+                $countryOption.attr('selected', true);
+            }
 
             // Append the HTML to the list of options
             countryOptions += $countryOption.prop('outerHTML');
@@ -1314,6 +1354,9 @@ var addressDialog = {
                 collision: "flip"  // default is ""
             }
         });
+
+        $countriesSelect.selectmenu('refresh');
+        $countriesSelect.selectmenu('enable');
     },
 
     /**
@@ -1380,16 +1423,11 @@ var addressDialog = {
                             $stateOption.prop('disabled', true);
                         }
                     });
+                }
 
-                    // Refresh the selectmenu to show/hide disabled options and enable the dropdown so it works
-                    $statesSelect.selectmenu('refresh');
-                    $statesSelect.selectmenu('enable');
-                }
-                else {
-                    // Refresh the selectmenu to show the selected first option (State) then disable the dropdown
-                    $statesSelect.selectmenu('refresh');
-                    $statesSelect.selectmenu('disable');
-                }
+                // Refresh the selectmenu to show/hide disabled options and enable the dropdown so it works
+                $statesSelect.selectmenu('refresh');
+                $statesSelect.selectmenu('enable');
 
                 // Remove any previous validation error
                 $stateSelectmenuButton.removeClass('error');
@@ -1408,6 +1446,68 @@ var addressDialog = {
             addressDialog.validateAndPay();
         });
     },
+
+    /**
+     * Attempt to prefill the info based on the user_attr information.
+     */
+    prefillInfo: function(billingInfo) {
+        'use strict';
+        var $firstName = this.$dialog.find('input.first-name');
+        if (billingInfo && billingInfo.hasOwnProperty('firstname')) {
+            $firstName.val(billingInfo.firstname);
+        } else if (this.businessPlan && this.userInfo && this.userInfo.hasOwnProperty("fname")) {
+            $firstName.val(this.userInfo.fname);
+        } else if (u_attr && u_attr.hasOwnProperty('firstname')) {
+            $firstName.val(u_attr.firstname);
+        } else {
+            $firstName.val('');
+        }
+
+        var $lastName = this.$dialog.find('input.last-name');
+        if (billingInfo && billingInfo.hasOwnProperty('lastname')) {
+            $lastName.val(billingInfo.lastname);
+        } else if (this.businessPlan && this.userInfo && this.userInfo.hasOwnProperty("lname")) {
+            $lastName.val(this.userInfo.lname);
+        } else if (u_attr && u_attr.hasOwnProperty('lastname')) {
+            $lastName.val(u_attr.lastname);
+        } else {
+            $lastName.val('');
+        }
+
+        if (billingInfo) {
+            if (billingInfo.hasOwnProperty('address1')) {
+                this.$dialog.find(".address1").val(billingInfo.address1);
+            }
+
+            if (billingInfo.hasOwnProperty('address2')) {
+                this.$dialog.find(".address2").val(billingInfo.address2);
+            }
+
+            if (billingInfo.hasOwnProperty('city')) {
+                this.$dialog.find(".city").val(billingInfo.city);
+            }
+
+            if (billingInfo.hasOwnProperty('postcode')) {
+                this.$dialog.find(".postcode").val(billingInfo.postcode);
+            }
+        }
+    },
+
+    initRememberDetailsCheckbox: function() {
+        'use strict';
+        var self = this;
+        this.$rememberDetailsCheckbox = $(".remember-billing-info-wrapper").find(".checkbox");
+        $(".remember-billing-info, .radio-txt", this.$dialog).rebind('click.commonevent', function() {
+            if (self.$rememberDetailsCheckbox.hasClass('checkboxOn')) {
+                self.$rememberDetailsCheckbox.addClass('checkboxOff').removeClass('checkboxOn');
+            }
+            else {
+                self.$rememberDetailsCheckbox.addClass('checkboxOn').removeClass('checkboxOff');
+            }
+            return false;
+        });
+    },
+
 
     /**
      * Initialise the X (close) button in the top right corner of the dialog
@@ -1510,6 +1610,27 @@ var addressDialog = {
             $errorMessage.removeClass('hidden');
             return false;
         }
+
+        // If remember billing address, save as user attribute for future usage.
+        if (this.$rememberDetailsCheckbox.hasClass("checkboxOn")) {
+            var saveAttribute = function(name, value) {
+                if (value) {
+                    mega.attr.setArrayAttribute('billinginfo', name, value, false, true);
+                }
+            };
+            saveAttribute('firstname', fieldValues['first-name']);
+            saveAttribute('lastname', fieldValues['last-name']);
+            saveAttribute('address1', fieldValues['address1']);
+            saveAttribute('address2', fieldValues['address2']);
+            saveAttribute('postcode', fieldValues['postcode']);
+            saveAttribute('city', fieldValues['city']);
+            saveAttribute('country', country);
+            saveAttribute('state', state);
+        } else {
+            // Forget Attribute.
+            mega.attr.remove('billinginfo', false, true);
+        }
+
 
         // Send to the API
         this.proceedToPay(fieldValues, state, country);

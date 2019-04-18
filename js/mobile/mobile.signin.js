@@ -49,9 +49,20 @@ mobile.signin = {
         // If the custom message is set
         if (login_txt) {
 
+            // Default messages
+            var $containerBlock = this.$screen.find('.custom-login-message-block.original-message');
+            var $messageText = $containerBlock.find('.custom-login-text');
+            var messageToShow = login_txt;
+
+            // If a phone number has been used as the text, show a special custom phone verified icon & message
+            if (login_txt.charAt(0) === '+') {
+                $containerBlock = this.$screen.find('.custom-login-message-block.sms-verified-message');
+                $messageText = $containerBlock.find('.js-user-phone-number');
+            }
+
             // Unhide the block and show the message
-            this.$screen.find('.custom-login-message-block').removeClass('hidden');
-            this.$screen.find('.custom-login-text').text(login_txt);
+            $containerBlock.removeClass('hidden');
+            $messageText.text(messageToShow);
 
             // Clear the message so it's only shown once
             login_txt = false;

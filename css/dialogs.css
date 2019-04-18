@@ -1,3 +1,33 @@
+.nw-fm-dialog-title, .fm-dialog-title {
+    font-size: 20px;
+    line-height: 24px;
+    color: #666;
+    padding: 20px 48px 0 48px;
+    text-align: center;
+    min-height: 38px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    line-height: 24px;
+}
+.fm-dialog-title.small {
+    font-family: 'LatoWeb', 'source_sans_proregular';
+    font-size: 16px;
+    line-height: 25px;
+    letter-spacing: -0.18px;
+    color: #666666;
+}
+.fm-dialog-title.top-pad {
+    padding-top: 30px;
+}
+.contrast .fm-dialog-title {
+    color: #333333;
+}
+
 .fm-main-user-management.main-blur-block {
     width: 100%;
     height: 100%;
@@ -98,6 +128,10 @@
     border-top: 1px solid rgba(0,0,0,0.1);
     position: relative;
 }
+.small-footer .fm-dialog-footer {
+    padding: 8px 8px 0 8px;
+    height:  49px;
+}
 .fm-notifications-bottom.voucher-container {
     height: 64px;
     background-color: rgba(250,250,250,1);
@@ -146,54 +180,136 @@
     max-width: 240px;
 }
 /* Send Contact Dialog */
-.fm-dialog.send-contact {
-    width: 644px;
-    margin: -246px 0 0 -322px;
+.fm-dialog.send-contact, .fm-dialog.new-group-chat {
+    width: 360px;
+    margin: -275px 0 0 -180px;
+}
+body.de .fm-dialog.new-group-chat {
+    width: 440px;
 }
 .fm-dialog .contacts-search-scroll {
     height: 336px !important;
 }
-.fm-dialog .contacts-search-scroll, .fm-dialog .contacts-search-scroll .jspPane {
-    background-position: 0 -48px;
+.fm-dialog.send-contact .fm-dialog-content, .fm-dialog.new-group-chat .fm-dialog-content {
+    padding: 0 0 0 12px;
 }
-.fm-dialog .contacts-info.body.contacts-search {
-    height: 48px;
-    padding: 6px 0;
-    cursor: pointer;
-    background-color: #fafafa;
+.fm-dialog-footer .link-button {
+    margin-top: 5px;
 }
-.fm-dialog .contacts-info.body.contacts-search:nth-child(odd) {
-    background-color: white;
+.fm-dialog.send-contact .contacts-search-scroll, .fm-dialog.new-group-chat .contacts-search-scroll {
+    height: 320px !important;
 }
-.contacts-info.body.contacts-search.selected {
-    background-color: #2ba6de;
-    color: white;
+.contacts-search-header .small-icon.conversations {
+    opacity: 0.65;
 }
-.contacts-info.body.contacts-search.selected:nth-child(odd) {
-    background-color: #2ba6de;
-}
-.contacts-info.body.contacts-search.selected span, .contacts-info.body.contacts-search.selected .user-card-email, .contacts-info.body.contacts-search.selected .user-card-name {
-    color: white;
-}
-.contacts-info.body.contacts-search.selected .user-card-presence {
-    background-color: white;
-}
-.fm-dialog .contacts-search-header {
-    padding-top: 10px;
-}
-.contacts-search .user-card-name span {
-    margin-top: -4px;
-    color: #000000;
-}
-.contacts-search-footer em {
-    display: block;
-    color: #2ba6de;
-    font-style: normal;
-    text-align: center;
-    line-height: 46px;
-    vertical-align: middle;
+ .fm-dialog.new-group-chat .contacts-search-header:first-child, .contacts-search-header.top-pad {
+     margin-top:  18px;
 }
 /* End of Send Contact Dialog */
+
+/*New group chat dialog */
+.group-chat-dialog {
+    padding: 0 0 0 0;
+    font-size: 14px;
+    line-height:  20px;
+    color: #333333;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
+}
+.group-chat-dialog.header {
+    padding: 14px 12px 10px 0;
+}
+.group-chat-dialog.description {
+    padding: 0 12px 0 0;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 12px;
+    color: #666666;
+}
+.toggle-checkbox.right + .group-chat-dialog.header {
+    padding-right: 80px;
+}
+.group-chat-dialog.checkbox {
+    padding:  0 0 12px 0;
+}
+.radio-txt.lato.mid {
+    font-size: 14px;
+    line-height:  20px;
+    color: #333333;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
+}
+.fm-dialog .group-chat-dialog .checkboxOn, .fm-dialog .group-chat-dialog .checkboxOff {
+    margin: 14px 12px 0 0;
+}
+.fm-dialog .group-chat-dialog .radio-txt {
+    padding-top: 12px;
+}
+.fm-dialog.new-group-chat .contacts-search-scroll.short, .fm-dialog.new-group-chat .group-chat-dialog.checkbox +  .contacts-search-scroll {
+    height: 226px !important;
+}
+.toggle-checkbox {
+    width: 40px;
+    height: 20px;
+    position: relative;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.15);
+    background: -moz-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 100%);
+    background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.1) 100%);
+    background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.1) 100%);
+    overflow: hidden;
+    font-size: 0;
+    line-height: 0;
+}
+.group-chat-dialog .toggle-checkbox {
+    margin: 16px 12px 0 0;
+}
+.toggle-checkbox-wrap {
+    position: relative;
+    height: 100%;
+    width: 50%;
+    display: inline-block;
+     -webkit-transition: all 400ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    border-radius: 20px;
+    background: rgb(255,51,58, 0);
+    background: -moz-linear-gradient(top, rgba(255,51,58,0) 0%, rgba(217,0,7,0) 100%);
+    background: -webkit-linear-gradient(top, rgba(255,51,58,10) 0%,rgba(217,0,7,00) 100%);
+    background: linear-gradient(to bottom, rgba(255,51,58,0) 0%,rgba(217,0,7,0) 100%);
+}
+.checked .toggle-checkbox-wrap {
+    width: 100%;
+    background: rgb(255,51,58);
+    background: -moz-linear-gradient(top, rgba(255,51,58,1) 0%, rgba(217,0,7,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(255,51,58,1) 0%,rgba(217,0,7,1) 100%);
+    background: linear-gradient(to bottom, rgba(255,51,58,1) 0%,rgba(217,0,7,1) 100%);
+}
+.toggle-checkbox-button {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: white;
+    border-radius: 100%;
+    right: 0;
+    margin: 2px;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    cursor:  pointer;
+}
+.toggle-checkbox-button::before {
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.15);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.15);
+}
+.group-chat-dialog.checkbox.disabled .checkdiv,
+.group-chat-dialog.checkbox.disabled label.radio-txt {
+    cursor: default !important;
+}
+/*end of New group chat dialog */
 
 /* Add From Cloud Dialog */
 .fm-dialog.add-from-cloud {
@@ -264,7 +380,7 @@
     height: 24px;
     display: block;
     background-position: -6px -474px;
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -365,7 +481,7 @@
         width: 1219px;
     }
 }
-@media only screen and (max-height: 720px) {
+@media only screen and (max-height: 850px) {
     .fm-dialog.add-from-cloud {
         margin-top: -305px;
     }
@@ -1008,6 +1124,9 @@
 .achievement-dialog.expires-txt.red {
     color: #FF333A;
 }
+body.fr .achievement-dialog.expires-txt.red, body.jp .achievement-dialog.expires-txt.red {
+    line-height: 18px;
+}
 .achievement-dialog .default-grey-button {
     display: inline-block;
     margin: 0 10px 0 10px;
@@ -1051,8 +1170,8 @@
 .achievements-scroll * {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
-.achievements-scroll .achievements-icon, .achievements-scroll .green-tick {
-    background-image: url(../images/mega/mid-achievements.png);
+.achievements-scroll .achievements-icon, .achievements-scroll .green-tick, .fm-dialog.verify-phone .achievements-icon {
+    background-image: url(../images/mega/mid-achievements-v2.png);
     background-size: 380px auto;
     background-repeat: no-repeat;
 }
@@ -1069,7 +1188,7 @@
     background-position: -12px -104px;
 }
 .achievements-cell.ach-sms-verification .achievements-icon {
-    background-position: -109px -104px;  
+    background-position: -109px -104px;
 }
 .achievement-dialog.bottom-block .cloud-white {
     background-position: -208px -206px;
@@ -1369,7 +1488,7 @@
 .achievement-dialog.bottom-block .achievement-dialog.reward {
     display: inline-block;
     position: relative;
-    width: 100%;  
+    width: 100%;
     padding:0 24px;
     margin: 0;
     box-sizing: border-box;
@@ -1962,6 +2081,12 @@ li.token-input-token-invite .input-close {
     transition: color 200ms ease-in-out;
     font-family: 'LatoWeb', 'source_sans_proregular';
 }
+
+/* just to replace padding property from the above class */
+.chat-rename-group-dialog {
+    padding: 0 10px 0 10px !important;
+}
+
 .fm-account-input input {
     font-size: 14px;
     line-height: 32px;
@@ -2217,6 +2342,10 @@ li.token-input-token-invite .input-close {
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
+.nw-dark-overlay.megasync-overlay .default-select-dropdown::before,
+.nw-dark-overlay.megasync-overlay .default-select-dropdown::after {
+    content: unset;
+}
 .nw-dark-overlay.megasync-overlay.downloading {
     background-color: rgba(34,34,34,0.95);
 }
@@ -2411,7 +2540,7 @@ li.token-input-token-invite .input-close {
 .megasync-info-arrow {
     width: 46px;
     height: 45px;
-    background-image: url(../images/mega/download-sprite-v8.png);
+    background-image: url(../images/mega/download-sprite-v9.png);
     background-position: -15px -2448px;
     position: absolute;
     left: 350px;
@@ -2424,7 +2553,7 @@ li.token-input-token-invite .input-close {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    background-image: url(../images/mega/download-sprite-v8.png);
+    background-image: url(../images/mega/download-sprite-v9.png);
     background-position: -1px -1178px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -2446,7 +2575,7 @@ li.token-input-token-invite .input-close {
     left: 0;
     position: absolute;
     margin: 0 0 0 0;
-    background-image: url(../images/mega/download-sprite-v8.png);
+    background-image: url(../images/mega/download-sprite-v9.png);
     background-position: 0 -2289px;
 }
 .megasync-icon.blink {
@@ -2849,7 +2978,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v25.png);
+    background-image: url(../images/mega/icons-sprite_v26.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -3277,11 +3406,11 @@ li.token-input-token-invite .input-close {
     opacity: 0.8;
 }
 .embed-content-block .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite_v3.png);
+    background-image: url(../images/mega/dialog-sprite_v5.png);
     background-position: -128px -5818px;
 }
 .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v3.png);
+    background-image: url(../images/mega/dialog-sprite_v5.png);
     background-position: -88px -5818px;
 }
 .embed-content-block .fm-subheading {
@@ -3632,7 +3761,7 @@ li.token-input-token-invite .input-close {
     line-height: 25px;
     text-align: center;
 }
-.recovery-key-info-container { 
+.recovery-key-info-container {
     box-sizing: border-box;
     height: 66px;
     width: 386px;
@@ -3774,13 +3903,13 @@ li.token-input-token-invite .input-close {
 /* Private chat dialog */
 .create-private-chat {
     width: 560px;
-    margin: -190px 0 0 -280px;
+    margin: -220px 0 0 -280px;
     overflow: visible;
+    text-align: center;
 }
 .create-private-chat .fm-dialog-title {
     font-size: 20px;
     color: #666666;
-    text-align: center;
 }
 .create-private-chat .wrapper {
     width: 460px;
@@ -3789,7 +3918,6 @@ li.token-input-token-invite .input-close {
 .create-private-chat .fm-body-text {
     font-size: 16px;
     line-height: 24px;
-    text-align: center;
 }
 .create-private-chat .default-huge-button.make-private {
     display: table;
@@ -3803,7 +3931,19 @@ li.token-input-token-invite .input-close {
     display: table;
     margin: 24px auto;
 }
-
+.create-private-chat i {
+    margin: 14px 0 18px 0;
+}
+.fm-dialog.create-private-chat .dialog-body-text {
+    max-width: 480px;
+    margin: 0 auto 24px;
+    font-size: 16px;
+    line-height: 24px;
+    color: #555;
+}
+.fm-dialog.create-private-chat .big-red-button {
+    margin: 0 0 34px 0;
+}
 /* Add contact */
 .add-user-popup.fm-dialog {
     z-index: 1200;
@@ -3811,6 +3951,9 @@ li.token-input-token-invite .input-close {
     top: 50%;
     width: 640px;
     margin: -150px 0 0 -320px;
+}
+.add-user-popup.fm-dialog.arrange-to-back {
+    z-index: 900;
 }
 .add-user-popup.fm-dialog.private {
     margin: -185px 0 0 -320px;
@@ -4021,7 +4164,7 @@ li.token-input-token-invite .input-close {
     margin:8px 172px;
 }
 
-.bus-welcome-dialog {
+.bus-welcome-dialog, .add-reassign-dialog {
     width: 612px;
     margin-left: -306px;
     margin-top: -270px;
@@ -4040,13 +4183,16 @@ li.token-input-token-invite .input-close {
     margin: auto;
     display: block;
 }
+.user-management-dialog .icon102 {
+    background-image: url(../images/mega/big-icons_v3.png);
+    background-size: 192px auto;
+}
 .user-management-dialog .bus-welcome-logo {
     background-position: -8px -1420px;
     width: 102px;
     height: 75px;
     display: block;
 }
-
 .bus-welcome-dialog .dialog-input-container {
     width: 100%;
     position: relative;
@@ -4133,3 +4279,387 @@ li.token-input-token-invite .input-close {
 .fm-dialog.improved-recovery-steps .recover-paste-block {
     margin: 30px auto 0;
 }
+/* end of Recover account */
+
+/* Verify phone num */
+.fm-dialog.verify-phone {
+    width: 360px;
+    margin: -281px 0 0 -180px;
+    text-align: center;
+    border-radius: 4px;
+}
+.fm-dialog.verify-phone .verify-ph-top {
+    height: 240px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    background: #40b0d7;
+    background: -moz-linear-gradient(top, #40b0d7 0%, #29a6d1 100%);
+    background: -webkit-linear-gradient(top, #40b0d7 0%,#29a6d1 100%);
+    background: linear-gradient(to bottom, #40b0d7 0%,#29a6d1 100%);
+    position: relative;
+}
+.fm-dialog.verify-phone .fm-dialog-title.white {
+    color: white;
+    font-size: 15px;
+    line-height: 20px;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial;
+}
+.fm-dialog.verify-phone.suspended .js-dialog-close, .fm-dialog.verify-phone.suspended .not-now-button {
+    display: none;
+}
+.fm-dialog.verify-phone .verify-ph-body {
+    padding: 24px 35px;
+}
+.fm-dialog.verify-phone .verify-ph-info {
+    font-size: 14px;
+    line-height: 20px;
+    color: #333333;
+    min-height: 72px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    padding: 0 0 20px 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.fm-dialog.verify-phone .verify-ph-info.long {
+    letter-spacing: 1px;
+}
+.fm-dialog.verify-phone .verify-ph-info .green-lnk {
+    color: #00BFA5;
+    font-size: 13px;
+    cursor: pointer;
+    letter-spacing: 0.93px;
+    display: block;
+}
+.fm-dialog.verify-phone .verify-ph-info .green-lnk.hidden {
+    display: none;
+}
+.fm-dialog.verify-phone .verify-ph-info .phone-num {
+    color: #999999;
+    display: block;
+}
+.fm-dialog.verify-phone .verify-success-page .verify-ph-info {
+    min-height: 0;
+}
+.fm-dialog.verify-phone .verify-ph-country .ui-selectmenu-text {
+    width: 221px;
+}
+.verify-ph-buttons .button {
+    min-width: 92px;
+}
+.account.input-wrapper.incorrect + .account.input-tooltip.static + .verify-ph-buttons {
+    padding-top: 9px;
+}
+#verify-dialog-countries-menu {
+    min-width: 260px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    letter-spacing: 1px;
+}
+.verify-ph-icon, .verify-ph-success-icon {
+    width: 122px;
+    height: 154px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    margin: 0 0 0 -61px;
+    background-image: url(../images/mega/dialog-sprite_v5.png);
+}
+.verify-ph-icon {
+    background-position: -19px -6008px;
+}
+.verify-ph-success-icon {
+    background-position: -19px -6209px;
+}
+.verify-ph-buttons {
+    padding-top: 16px;
+    text-align: left;
+}
+.verify-ph-info.small-txt {
+    font-size: 13px;
+    min-height: 0;
+}
+.account.input-tooltip + .verify-ph-info {
+    padding: 32px 0 0 0;
+}
+.incorrect + .account.input-tooltip + .verify-ph-info {
+    padding: 8px 0 0 0;
+}
+.verify-ph-bonus-container {
+    padding:22px 0;
+    margin: auto;
+    text-align: left;
+    display: inline-block;
+}
+.verify-success-page {
+    text-align: center;
+}
+.verify-ph-info.long {
+    height: auto;
+    min-height: 0;
+}
+.verify-success-page.non-achievement-account .verify-ph-info.long {
+    height: 174px;
+    margin-top: 48px;
+}
+.verify-ph-bonus-container .bonus-image {
+    display: inline-block;
+    margin-right: 20px;
+}
+.verify-success-page.non-achievement-account .verify-ph-bonus-container {
+    display: none;
+}
+.verify-ph-bonus-block.storge-bonus .bonus-image {
+    background-position: -22px -267px;
+}
+.verify-ph-bonus-block.transfer-bonus .bonus-image {
+    background-position: -92px -267px;
+}
+.verify-ph-bonus-container .verify-ph-bonus-block:not(:last-child) .bonus-image {
+    margin-bottom: 24px;
+}
+.verify-ph-bonus-block {
+    display: table-row-group;
+}
+.verify-ph-bonus-intro-wrapper {
+    display: inline-block;
+    vertical-align: top;
+}
+.verify-ph-bonus-intro-wrapper .big-num {
+    display: table-row;
+    font-size: 30px;
+    line-height: 36px;
+    height: 38px;
+    color: #333;
+    text-align: left;
+    font-family: 'LatoWebLight','source_sans_proregular', Arial;
+}
+.verify-ph-bonus-intro-wrapper .body-txt {
+    display: table-row;
+    font-size: 14px;
+    line-height: 17px;
+    height: 18px;
+    color: #333;
+    text-align: left;
+    font-family: 'LatoWebSemibold','source_sans_proregular', Arial;
+}
+.verify-ph-bonus-valid-days {
+    display: inline-block;
+}
+.verify-success-page.non-achievement-account .verify-ph-bonus-valid-days {
+	display: none;
+}
+.verify-ph-bonus-valid-days .valid-days-title {
+    display: inline-block;
+    position: relative;
+    height: 18px;
+    font-size: 14px;
+    line-height: 18px;
+    color: #666;
+    padding-left: 26px;
+    padding-right: 8px;
+    margin: 7px 0;
+    max-width: 124px;
+    white-space: normal;
+}
+.verify-ph-bonus-valid-days .valid-days-title::before {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 0;
+    top: 0;
+    content: '';
+    background-position: -269px -211px;
+    background-image: url(../images/mega/mid-achievements-v2.png);
+    background-size: 380px auto;
+    background-repeat: no-repeat;
+}
+.verify-ph-bonus-valid-days .valid-days-body-txt {
+    display: inline-block;
+    position: relative;
+    height: 18px;
+    font-size: 14px;
+    line-height:18px;
+    color: #666;
+    font-family: 'LatoWebSemibold','source_sans_proregular', Arial;
+}
+/* end of Verify phone num */
+/*adding contact reassign dialog*/
+.add-reassign-dialog .icon102 {
+    margin:8px auto 20px;
+}
+.user-management-dialog .add-contact-logo {
+    background-position: -8px -1507px;
+    width: 102px;
+    height: 75px;
+    display: block;
+}
+.add-reassign-dialog tr {
+    vertical-align: top;
+}
+.dialog-block {
+    width: 240px;
+    margin: 0 32px 40px;
+    display: inline-block;
+    text-align: center;
+}
+.add-reassign-dialog .default-green-button {
+    display: inline-block;
+}
+.add-reassign-dialog .dialog-input-container th, .add-reassign-dialog .dialog-input-container td {
+    width: 312px;
+}
+.add-reassign-dialog .dialog-input-container tr:nth-child(3) td {
+    box-sizing: border-box;
+    padding: 8px 32px 32px 32px;
+}
+.add-reassign-dialog .dialog-input-container tr:last-child td {
+    text-align: center;
+    box-sizing: border-box;
+    padding-bottom: 40px;
+}
+.add-reassign-dialog .dialog-dark-bottom {
+    padding-left: 32px;
+}
+
+.fm-dialog.export-chat-links-dialog {
+    width: 560px;
+    margin-top: -160px;
+    margin-left: -265px;
+    background-color: #fafafa;
+}
+.fm-dialog.export-chat-links-dialog .export-link-item {
+    margin: 12px auto 32px;
+}
+.fm-dialog.export-chat-links-dialog .export-link-text-pad {
+    padding: 10px 0;
+}
+.fm-dialog.export-chat-links-dialog .file-link-block {
+    padding: 9px 16px 9px 16px;
+    font-size: 15px;
+}
+.fm-dialog.export-chat-links-dialog .export-chat-ink-warning {
+    text-align: center;
+    font-size: 15px;
+    margin: 28px auto 16px;
+    color: #444;
+    margin-top: 23px;
+    width: 70%;
+}
+.fm-dialog.export-chat-links-dialog .default-red-button {
+    margin-top: 12px;
+}
+.fm-dialogs.export-chat-links-dialog .rename-input-bl input {
+    padding-left: 8px;
+}
+
+/* Join group chat */
+.fm-dialog.join-group-chat {
+    width: 480px;
+    margin: -241px 0 0 -240px;
+    text-align: center;
+    font-family: 'LatoWeb', 'source_sans_proregular';
+}
+.join-group-chat .fm-dialog-body {
+    padding: 12px 42px 24px 42px;
+}
+.join-group-chat .chat-title {
+    font-size:  20px;
+    line-height: 24px;
+    color: #333333;
+    padding: 22px 0 7px 0;
+    letter-spacing: -0.52px;
+}
+.join-group-chat .members {
+    font-size: 16px;
+    line-height: 21px;
+    color: #666666;
+    padding: 0 0 0 0;
+    letter-spacing: -0.18px;
+}
+.join-group-chat .info {
+    font-size: 14px;
+    line-height: 21px;
+    color: #333333;
+    padding: 32px 0 32px 0;
+    letter-spacing: -0.18px;
+}
+.join-group-chat .huge-icon {
+    margin: 12px auto 0 auto;
+}
+.join-group-chat .button {
+    margin: 0 0 22px 0;
+}
+.join-group-chat .red-link {
+    display: inline-block;
+    margin: 0;
+    font-size: 16px;
+    line-height: 21px;
+    color: #F0373A;
+    padding: 0 0 0 0;
+    letter-spacing: -0.18px;
+    cursor: pointer;
+}
+.join-group-chat .red-link:hover {
+    text-decoration: underline;
+}
+/* end of Join group chat */
+
+/* Group chat link */
+.fm-dialog-close.small-pad {
+    top: 10px;
+    right: 10px;
+}
+.fm-dialog.group-chat-link {
+    width: 360px;
+    margin: -142px 0 0 -180px;
+    text-align: center;
+    font-family: 'LatoWeb', 'source_sans_proregular';
+    background-color: white;
+}
+.fr .fm-dialog.group-chat-link {
+    width: 440px;
+    margin: -142px 0 0 -220px;
+}
+.group-chat-link .chat-title {
+    font-size: 14px;
+    line-height: 20px;
+    color: #333333;
+    padding: 24px 0 24px 0;
+}
+.group-chat-link .info {
+    font-size: 13px;
+    line-height: 20px;
+    color: #666666;
+    padding: 16px 0 4px 0;
+}
+.group-chat-link .big-icon {
+    margin: 12px auto 0 auto;
+}
+.chat-link-input {
+    height: 32px;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-sizing: border-box;
+    border-radius: 4px;
+    position: relative;
+    padding: 0 10px 0 35px;
+}
+.chat-link-input i {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+}
+.chat-link-input input {
+    border: 0;
+    width: 100%;
+    height: 30px;
+    font-size: 13px;
+    line-height: 30px;
+    color: #333333;
+    padding: 0;
+    margin: 0;
+    font-family: 'LatoWeb', 'source_sans_proregular';
+}
+.group-chat-link.requires-topic {
+    width: 450px;
+}
+/* end of Make chat private */

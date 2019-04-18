@@ -271,7 +271,7 @@ var useravatar = (function() {
                 .safeHTML($avatar.html());
         };
 
-        $('.avatar-wrapper.' + user.replace(/[^\w-]/g, '')).each(updateAvatar);
+        $('.avatar-wrapper.' + user.replace(/[^\w-]/g, '') + ':not(.in-chat)').each(updateAvatar);
 
         if ((M.u[user] || {}).m) {
             var eem = String(M.u[user].m).replace(/[^\w@.,+-]/g, '').replace(/\W/g, '\\$&');
@@ -346,9 +346,10 @@ var useravatar = (function() {
         /**
          * Load the avatar associated with an user handle
          * @param {String} handle The user handle
+         * @param {String} chathandle The chat handle
          * @return {MegaPromise}
          */
-        ns.loadAvatar = function(handle) {
+        ns.loadAvatar = function(handle, chathandle) {
             // Ensure this is a sane call...
             if (typeof handle !== 'string' || handle.length !== 11) {
                 logger.error('Unable to retrieve user-avatar, invalid handle!', handle);
@@ -391,7 +392,7 @@ var useravatar = (function() {
                 logger.debug('Initiating user-avatar retrieval for "%s"...', handle);
             }
 
-            mega.attr.get(handle, 'a', true, false)
+            mega.attr.get(handle, 'a', true, false, undefined, undefined, chathandle)
                 .fail(reject)
                 .done(function(res) {
                     var error = res;

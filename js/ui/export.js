@@ -156,6 +156,7 @@ var exportPassword = {
             var $linkAndDecryptionKeyButtons = this.$dialog.find('.separate-link-and-key');
             var $passwordLinkText = this.$dialog.find('.password-protected-data');
             var $linkBlock = this.$dialog.find('.file-link-block');
+            var $copyBtn = this.$dialog.find('.copy-to-clipboard');
 
             // Slide button to the right
             $toggleBtn.find('.dialog-feature-switch').animate({ marginLeft: '17px' }, 150, 'swing', function() {
@@ -173,6 +174,9 @@ var exportPassword = {
 
                 // Disable other buttons as they are not applicable until the toggle is disabled
                 $linkAndDecryptionKeyButtons.addClass('disabled');
+
+                // Disable copy button until user enter password and click encrypt.
+                $copyBtn.addClass('disabled');
 
                 // Add special styling for the link text
                 $linkBlock.addClass('password-protect-link');
@@ -200,6 +204,7 @@ var exportPassword = {
             var $passwordInput = this.$dialog.find('.password-protect-input');
             var $errorLabel = this.$dialog.find('.password-protect-error');
             var $encryptButtonText = this.$dialog.find('.encrypt-link-button .encrypt-text');
+            var $copyBtn = this.$dialog.find('.copy-to-clipboard');
 
             // Slide the button to the left
             $toggleBtn.find('.dialog-feature-switch').animate({ marginLeft: '2px' }, 150, 'swing', function() {
@@ -214,6 +219,9 @@ var exportPassword = {
 
                 // Re-enable other buttons as they are not applicable until the toggle is disabled
                 $linkAndDecryptionKeyButtons.removeClass('disabled');
+
+                // enable copy button when user give up password encryption.
+                $copyBtn.removeClass('disabled');
 
                 // Remove special styling for the link text
                 $linkBlock.removeClass('password-protect-link');
@@ -429,6 +437,7 @@ var exportPassword = {
             var $encryptButtonProgress = $encryptButton.find('.encryption-in-progress');
             var $errorLabel = this.$dialog.find('.password-protect-error');
             var $strengthLabel = this.$dialog.find('.password-strength');
+            var $copyBtn = this.$dialog.find('.copy-to-clipboard');
 
             // If they have already encrypted the link (and the password has not changed) then don't do anything
             if ($encryptButtonText.hasClass('encrypted')) {
@@ -495,6 +504,8 @@ var exportPassword = {
                 // Derive the key and create the password protected link
                 processLinkInfo(link, algorithm, saltBytes, password);
             }
+
+            $copyBtn.removeClass('disabled');
         },
 
         /**
@@ -1074,6 +1085,9 @@ var exportExpiry = {
         var $toggleBtn = $dialog.find('.fm-expiry-dropdown .dialog-feature-toggle');
         var $expirySelect = $dialog.find('.expiry-date-select-container');
 
+        // Clear the date of any old entries
+        $dialog.find('.expiry-date-select').datepicker('setDate', null);
+
         // Slide button to the right
         $toggleBtn.find('.dialog-feature-switch').animate({ marginLeft: '17px' }, 150, 'swing', function() {
 
@@ -1081,8 +1095,6 @@ var exportExpiry = {
             $toggleBtn.addClass('toggle-on');
             $expirySelect.removeClass('hidden');
 
-            // Clear the date of any old entries
-            $dialog.find('.expiry-date-select').datepicker('setDate', null);
         });
     },
 
@@ -1102,11 +1114,11 @@ var exportExpiry = {
             $toggleBtn.removeClass('toggle-on');
             $expirySelect.addClass('hidden');
 
-            // Clear the date of any old entries
-            $dialog.find('.expiry-date-select').datepicker('setDate', null);
-
             // Reset text to 'Set an expiry date'
             $dialog.find('.set-expiry-text').text(l[8953]);
+
+            // Clear the date of any old entries
+            $dialog.find('.expiry-date-select').datepicker('setDate', null);
         });
     },
 
@@ -1207,6 +1219,7 @@ var exportExpiry = {
 
         // Keep a counter for how many nodes have expiry times
         var numOfNodesWithExpiryTime = 0;
+        var lastExpireTime = null;
 
         // For each selected file/folder
         for (var i in handles) {
@@ -1220,6 +1233,7 @@ var exportExpiry = {
                 // If it has an expiry time, increment the count
                 if (expiryTimestamp) {
                     numOfNodesWithExpiryTime++;
+                    lastExpireTime = expiryTimestamp;
                 }
 
                 // If the expiry timestamp is set show it
@@ -1235,6 +1249,12 @@ var exportExpiry = {
 
             // Set the text to 'Set new expiry date'
             $('.export-links-dialog .set-expiry-text').text(l[8736]);
+
+            // set the data-select input value
+            var exDate = new Date(lastExpireTime * 1000);
+            $('.export-links-dialog .expiry-date-select').datepicker('setDate', exDate);
+            
+            // $('.export-links-dialog .expiry-date-select').val(time2date(lastExpireTime, 1).replace('\\', '-'));
         }
         else {
             // Otherwise disable the toggle switch
@@ -1311,6 +1331,12 @@ var exportExpiry = {
      * @param {Boolean} close To close or to show public link dialog
      */
     ExportLinkDialog.prototype.linksDialog = function(close) {
+
+        // Checking if this a business user with expired status
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            M.showExpiredBusiness();
+            return;
+        }
 
         /* jshint -W074 */
         var self = this;
@@ -1423,6 +1449,7 @@ var exportExpiry = {
                     $('.embed-content-block', $linksDialog).removeClass('hidden');
                     $('.export-content-block', $linksDialog).addClass('hidden');
                     // $('.fm-dialog-title', $linksDialog).text(l[1344] + ' (' + l[17407] + ')');
+                    $('.copy-to-clipboard', $linksDialog).removeClass('disabled');
                 }
                 else {
                     $('.fm-tab.tab-url-link', $block).addClass('active');
@@ -1430,6 +1457,12 @@ var exportExpiry = {
                     $('.embed-content-block', $linksDialog).addClass('hidden');
                     $('.export-content-block', $linksDialog).removeClass('hidden');
                     // $('.fm-dialog-title', $linksDialog).text(page === 'download' ? l[5622] : l[1031]);
+
+                    var $passwordProtectData = $('.password-protected-data', $linksDialog);
+                    if (!$passwordProtectData.hasClass('hidden') && $passwordProtectData.text() === ''){
+                        $('.copy-to-clipboard', $linksDialog).addClass('disabled');
+                    }
+
                     deleteScrollPanel(scroll, 'jsp');
                 }
                 centerDialog();
@@ -1500,6 +1533,13 @@ var exportExpiry = {
                 });
             }, 300);
 
+            $('.copy-to-clipboard', $linksDialog).rebind('click.ctc', function() {
+                if (!$(this).hasClass('disabled')) {
+                    copyToClipboard(getContentsToClip(), toastTxt);
+                }
+                return false;
+            });
+
             centerDialog();
             return $linksDialog;
         });
@@ -1510,76 +1550,6 @@ var exportExpiry = {
 
         // Setup the copy to clipboard buttons
         $span.text(l[1990]);
-
-        // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
-        if (is_extension || M.execCommandUsable()) {
-            $('.copy-to-clipboard').rebind('click', function() {
-                copyToClipboard(getContentsToClip(), toastTxt);
-                return false;
-            });
-        }
-        else if (flashIsEnabled()) {
-            $('.copy-to-clipboard').safeHTML(
-                '<span>' + htmlentities(l[1990]) + '</span>'
-              + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash" '
-              +     'width="100%" height="32" allowscriptaccess="always">'
-              +     '<param name="wmode" value="transparent" />'
-              +     '<param value="always" name="allowscriptaccess" />'
-              +     '<param value="all" name="allowNetworkin" />'
-              +     '<param name="FlashVars" value="buttonclick=1" />'
-              + '</object>');
-
-            $('.copy-to-clipboard').rebind('mouseover.copyToClipboard', function() {
-                var e = $('#clipboardswf1')[0];
-                if (e && e.setclipboardtext) {
-                    e.setclipboardtext(getContentsToClip());
-                }
-            });
-            $('.copy-to-clipboard').rebind('mousedown.copyToClipboard', function() {
-                showToast('clipboard', toastTxt);
-            });
-        }
-        else {
-            var uad = browserdetails(ua);
-
-            if (uad.icon === 'ie.png' && window.clipboardData) {
-                $('.copy-to-clipboard').rebind('click', function() {
-                    links = getContentsToClip();
-                    var mode = links.indexOf("\n") !== -1 ? 'Text' : 'URL';
-                    window.clipboardData.setData(mode, links);
-                    showToast('clipboard', toastTxt);
-                });
-            }
-            else {
-                if (window.ClipboardEvent) {
-                    $('.copy-to-clipboard').rebind('click', function() {
-
-                        window.onCopyEventHandler = function onCopyEvent(ev) {
-                            if (d) {
-                                console.log('onCopyEvent', arguments);
-                            }
-                            links = getContentsToClip();
-                            ev.clipboardData.setData('text/plain', links);
-                            if (links[0] !== '<') {
-                                ev.clipboardData.setData('text/html', links.split("\n").map(function(link) {
-                                    return '<a href="' + link + '"></a>';
-                                }).join("<br/>\n"));
-                            }
-                            ev.preventDefault();
-                            showToast('clipboard', toastTxt); // Done
-                        };
-                        document.addEventListener('copy', window.onCopyEventHandler, false);
-                        Soon(function() {
-                            $span.text(l[7663] + ' ' + (uad.os === 'Apple' ? 'command' : 'ctrl') + ' + C');
-                        });
-                    });
-                }
-                else {
-                    // Hide the clipboard buttons if not using the extension and Flash is disabled
-                    $('.copy-to-clipboard').addClass('hidden');
-                }
-            }
-        }
 
         // Click anywhere on export link dialog will hide export link dropdown
         $('.export-links-dialog').rebind('click', function(e) {
@@ -1628,19 +1598,21 @@ var exportExpiry = {
             $linkButtons.removeClass('selected');
             $this.addClass('selected');
 
-            // we have to deal with the extra '!' since the applied logic relies on CSS !!!
-            var $key = $('.file-link-info.key', $linksDialog);
-            var keyPart = $.trim($key.text());
-            if ($this.hasClass('link-handle-and-key')) {
-                if (keyPart[0] !== '!') {
-                    // Restore key part, containing sub file/folder handle(s), if any
-                    $key.text($key.data('key'));
+            $('.file-link-info-wrapper', $linksDialog).each(function() {
+                // we have to deal with the extra '!' since the applied logic relies on CSS !!!
+                var $key = $('.file-link-info.key', this);
+                var keyPart = $.trim($key.text());
+                if ($this.hasClass('link-handle-and-key')) {
+                    if (keyPart[0] !== '!') {
+                        // Restore key part, containing sub file/folder handle(s), if any
+                        $key.text($key.data('key'));
+                    }
                 }
-            }
-            else if (keyPart[0] === '!') {
-                // Remove initial ! separator and subsequent file/folder handle, if any
-                $key.text(keyPart.substr(1).split(/[?!]/)[0]);
-            }
+                else if (keyPart[0] === '!') {
+                    // Remove initial ! separator and subsequent file/folder handle, if any
+                    $key.text(keyPart.substr(1).split(/[?!]/)[0]);
+                }
+            });
 
             // Show the relevant 'Link without key', 'Decryption key' or 'Link with key'
             $('.export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
@@ -1903,6 +1875,12 @@ var exportExpiry = {
      * @returns {MegaPromise}
      */
     ExportLink.prototype.removeExportLink = function(quiet) {
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
+
         var self = this;
         var promises = [];
         var handles = self.options.nodesToProcess || [];
@@ -2174,6 +2152,12 @@ var exportExpiry = {
      */
     var initCopyrightsDialog = function(nodesToProcess, isEmbed) {
         'use strict';
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
 
         $.itemExportEmbed = isEmbed;
         $.itemExport = nodesToProcess;

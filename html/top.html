@@ -35,7 +35,10 @@
             <div class="top-search-clear">
                 <div class="top-search-button hidden"></div>
                 <div class="top-clear-button hidden"></div>
-                <input type="text" placeholder="[$102]" class="top-search-input"/>
+                <!-- Cover with form to prevent autofilling -->
+                <!-- <form autocomplete="off"> -->
+                    <input type="text" placeholder="[$102]" autocomplete="disabled" class="top-search-input"/>
+                <!-- </form> -->
             </div>
         </div>
 
@@ -226,7 +229,7 @@
                 <div class="clear"></div>
             </div>
             <div class="top-login-pad login">
-                <form id="form_login_header" autocomplete="off"></form>
+                <form id="form_login_header"></form>
             </div>
             <div class="top-login-warning active">
                 <div class="top-login-warning-arrow"></div>
@@ -309,7 +312,7 @@
                 <div class="top-menu-item mobile">[$955]</div>
                 <div class="top-menu-item sync">[$956]</div>
                 <div class="top-menu-item extensions">[$16603]</div>
-                <div class="top-menu-item megabird">MEGAbird</div>
+                <div class="top-menu-item bird">MEGAbird</div>
                 <div class="top-menu-item cmd">MEGAcmd</div>
                 <div class="top-menu-item uwp">[$20028]</div>
             </div>
@@ -327,12 +330,11 @@
                 <div class="top-menu-item privacy">[$386]</div>
                 <div class="top-menu-item copyright">[$387]</div>
                 <div class="top-menu-item takedown">[$966]</div>
-                <div class="top-menu-item general">[$1712]</div>
                 <div class="top-menu-item gdpr">[$18501]</div>
             </div>
 
             <div class="top-social-bl">
-                <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-facebook-button clickable"></a>
+                <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-facebook-button"></a>
                 <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-twitter-button"></a>
             </div>
 

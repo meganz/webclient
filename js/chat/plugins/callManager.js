@@ -11,6 +11,12 @@
  */
 var CallManager = function (megaChat) {
     var self = this;
+
+    if (anonymouschat) {
+        return;
+    }
+
+
     self.logger = MegaLogger.getLogger("callManager", {}, megaChat.logger);
 
     self.megaChat = megaChat;
@@ -182,7 +188,7 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
             new ChatDialogMessage({
                 messageId: 'outgoing-call-' + callManagerCall.id,
                 type: 'outgoing-call',
-                showInitiatorAvatar: chatRoom.type === "group",
+                showInitiatorAvatar: chatRoom.type === "group" || chatRoom.type === "public",
                 authorContact: M.u[u_handle],
                 delay: unixtime(),
                 persist: false,
@@ -494,7 +500,7 @@ CallManager.prototype.remoteStartedCallToDialogMsg = function(chatRoom, msgInsta
     result = new ChatDialogMessage({
         messageId: msgId,
         type: type,
-        showInitiatorAvatar: chatRoom.type === "group",
+        showInitiatorAvatar: chatRoom.type === "group" || chatRoom.type === "public",
         authorContact: authorContact,
         delay: delay,
         cssClasses: cssClasses,
@@ -532,7 +538,7 @@ CallManager.prototype.remoteEndCallToDialogMsg = function(chatRoom, msgInstance)
             messageId: msgId,
             type: type,
             authorContact: authorContact,
-            showInitiatorAvatar: chatRoom.type === "group",
+            showInitiatorAvatar: chatRoom.type === "group" || chatRoom.type === "public",
             delay: delay,
             cssClasses: cssClasses,
             currentCallCounter: currentCallCounter,
@@ -544,7 +550,7 @@ CallManager.prototype.remoteEndCallToDialogMsg = function(chatRoom, msgInstance)
             messageId: 'call-rejected-' + msgInstance.messageId,
             type: 'call-rejected',
             authorContact: authorContact,
-            showInitiatorAvatar: chatRoom.type === "group",
+            showInitiatorAvatar: chatRoom.type === "group" || chatRoom.type === "public",
             delay: delay,
             meta: meta
         });
@@ -555,7 +561,7 @@ CallManager.prototype.remoteEndCallToDialogMsg = function(chatRoom, msgInstance)
                 messageId: 'call-canceled-' + msgInstance.messageId,
                 type: 'call-canceled',
                 authorContact: authorContact,
-                showInitiatorAvatar: chatRoom.type === "group",
+                showInitiatorAvatar: chatRoom.type === "group" || chatRoom.type === "public",
                 delay: delay,
                 meta: meta
             });
@@ -565,7 +571,7 @@ CallManager.prototype.remoteEndCallToDialogMsg = function(chatRoom, msgInstance)
                 messageId: 'call-missed-' + msgInstance.messageId,
                 type: 'call-missed',
                 authorContact: authorContact,
-                showInitiatorAvatar: chatRoom.type === "group",
+                showInitiatorAvatar: chatRoom.type === "group" || chatRoom.type === "public",
                 delay: delay,
                 meta: meta
             });
@@ -576,7 +582,7 @@ CallManager.prototype.remoteEndCallToDialogMsg = function(chatRoom, msgInstance)
             messageId: 'call-missed-' + msgInstance.messageId,
             type: 'call-missed',
             authorContact: authorContact,
-            showInitiatorAvatar: chatRoom.type === "group",
+            showInitiatorAvatar: chatRoom.type === "group" || chatRoom.type === "public",
             delay: delay,
             meta: meta
         });
@@ -586,7 +592,7 @@ CallManager.prototype.remoteEndCallToDialogMsg = function(chatRoom, msgInstance)
             messageId: 'call-timeout-' + msgInstance.messageId,
             type: 'call-timeout',
             authorContact: authorContact,
-            showInitiatorAvatar: chatRoom.type === "group",
+            showInitiatorAvatar: chatRoom.type === "group" || chatRoom.type === "public",
             delay: delay,
             meta: meta
         });
@@ -597,7 +603,7 @@ CallManager.prototype.remoteEndCallToDialogMsg = function(chatRoom, msgInstance)
                 messageId: 'call-ended-' + msgInstance.messageId,
                 type: 'call-ended',
                 authorContact: authorContact,
-                showInitiatorAvatar: chatRoom.type === "group",
+                showInitiatorAvatar: chatRoom.type === "group" || chatRoom.type === "public",
                 delay: delay,
                 meta: meta
             });
@@ -607,7 +613,7 @@ CallManager.prototype.remoteEndCallToDialogMsg = function(chatRoom, msgInstance)
                 messageId: 'call-failed-' + msgInstance.messageId,
                 type: 'call-failed',
                 authorContact: authorContact,
-                showInitiatorAvatar: chatRoom.type === "group",
+                showInitiatorAvatar: chatRoom.type === "group" || chatRoom.type === "public",
                 delay: delay,
                 meta: meta
             });
@@ -709,7 +715,7 @@ var CallManagerCall = function (chatRoom, rtcCall) {
     self.localPlayer = null;
     self.remotePlayer = null;
 
-
+/*
     if (self.room.callManagerCall) {
         if (self.room.callManagerCall.isStarting() === true) {
             self.logger.debug(
@@ -733,6 +739,7 @@ var CallManagerCall = function (chatRoom, rtcCall) {
             return;
         }
     }
+*/
     self.room.callManagerCall = this;
 };
 
@@ -844,7 +851,7 @@ CallManagerCall.prototype.onWaitingResponseIncoming = function (e, eventData) {
         messageId: 'incoming-call-' + self.id,
         type: 'incoming-call',
         authorContact: contact,
-        showInitiatorAvatar: self.room.type === "group",
+        showInitiatorAvatar: self.room.type === "group" || self.room.type === "public",
         delay: unixtime(),
         persist: false,
         buttons: {
@@ -910,7 +917,7 @@ CallManagerCall.prototype.onWaitingResponseIncoming = function (e, eventData) {
             function () {
                 doCancel();
             },
-            self.room.type === "group"
+            self.room.type === "group" || self.room.type === "public"
         );
     }
 
@@ -961,7 +968,7 @@ CallManagerCall.prototype.onCallStarting = function () {
 
     self.room.appendMessage(
         new ChatDialogMessage({
-            showInitiatorAvatar: self.room.type === "group",
+            showInitiatorAvatar: self.room.type === "group" || self.room.type === "public",
             messageId: 'call-starting-' + self.id,
             type: 'call-starting',
             authorContact: self.getPeer(),
@@ -979,7 +986,7 @@ CallManagerCall.prototype.onCallAnswered = function () {
 
     self.room.appendMessage(
         new ChatDialogMessage({
-            showInitiatorAvatar: self.room.type === "group",
+            showInitiatorAvatar: self.room.type === "group" || self.room.type === "public",
             messageId: 'call-initialising-' + self.id,
             type: 'call-initialising',
             authorContact: self.getPeer(),
@@ -1049,7 +1056,7 @@ CallManagerCall.prototype.onCallStarted = function (tsCallStart) {
                 messageId: 'call-started-' + self.id,
                 type: 'call-started',
                 authorContact: self.getPeer(),
-                showInitiatorAvatar: self.room.type === "group",
+                showInitiatorAvatar: self.room.type === "group" || self.room.type === "public",
                 delay: unixtime(),
                 persist: false
             })
@@ -1068,7 +1075,7 @@ CallManagerCall.prototype.onCallEnded = function (e, reason) {
                 messageId: 'call-failed-' + self.id,
                 type: 'call-failed',
                 authorContact: self.getPeer(),
-                showInitiatorAvatar: self.room.type === "group",
+                showInitiatorAvatar: self.room.type === "group" || self.room.type === "public",
                 delay: unixtime(),
                 persist: false
             })
@@ -1084,7 +1091,7 @@ CallManagerCall.prototype.onCallRejected = function (e, reason) {
     if (reason === Term.kErrAlready) {
         self.room.appendMessage(
             new ChatDialogMessage({
-                showInitiatorAvatar: self.room.type === "group",
+                showInitiatorAvatar: self.room.type === "group" || self.room.type === "public",
                 messageId: 'call-rejected-' + self.id,
                 type: 'call-rejected',
                 authorContact: self.getPeer(),
@@ -1107,7 +1114,7 @@ CallManagerCall.prototype.onCallHandledElsewhere = function (e) {
 
     self.room.appendMessage(
         new ChatDialogMessage({
-            showInitiatorAvatar: self.room.type === "group",
+            showInitiatorAvatar: self.room.type === "group" || self.room.type === "public",
             messageId: 'call-handled-elsewhere-' + self.id,
             type: 'call-handled-elsewhere',
             authorContact: peer,
@@ -1134,7 +1141,7 @@ CallManagerCall.prototype.onCallFailed = function (e, reason) {
         messageId: 'call-failed-' + self.id,
         type: 'call-failed',
         authorContact: peer,
-        showInitiatorAvatar: self.room.type === "group",
+        showInitiatorAvatar: self.room.type === "group" || self.room.type === "public",
         delay: unixtime(),
         persist: false
     };
@@ -1443,7 +1450,7 @@ CallManagerCall.prototype.getPeer = function () {
         }
         return M.u[base64urlencode(this.rtcCall.callerInfo.fromUser)];
     }
-    else if (this.room.type === "group" && this.initiator) {
+    else if ((this.room.type === "group" || this.room.type === "public") && this.initiator) {
         return M.u[base64urlencode(this.initiator)];
     }
     else if (this.room.type === "private") {
@@ -1485,7 +1492,7 @@ CallManagerCall.prototype.getRemoteMediaOptions = function (sessionId) {
         }
     }
     if (typeof firstSession.peerAv === 'undefined') {
-        this.logger.error(
+        this.logger.log(
             ".getRemoteMediaOptions could not find .peerAv for session",
             base64urlencode(firstSession.sid)
         );

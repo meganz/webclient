@@ -106,12 +106,14 @@ var attribCache = false;
      * @param ctx {Object}
      *     Context, in case higher hierarchies need to inject a context
      *     (default: none).
+     * @param [chathandle] {String} pass chathandle in case this is an anonymous user previewing a specific pub chat
+     *
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      *     Can be used to use promises instead of callbacks for asynchronous
      *     dependencies.
      */
-    ns.get = function _getUserAttribute(userhandle, attribute, pub, nonHistoric, callback, ctx) {
+    ns.get = function _getUserAttribute(userhandle, attribute, pub, nonHistoric, callback, ctx, chathandle) {
         assertUserHandle(userhandle);
         var self = this;
         var myCtx = ctx || {};
@@ -264,7 +266,12 @@ var attribCache = false;
                 });
             }
             else {
-                api_req({'a': 'uga', 'u': userhandle, 'ua': attribute, 'v': 1}, myCtx);
+                if (chathandle) {
+                    api_req({'a': 'mcuga', "ph": chathandle, 'u': userhandle, 'ua': attribute, 'v': 1}, myCtx);
+                }
+                else {
+                    api_req({'a': 'uga', 'u': userhandle, 'ua': attribute, 'v': 1}, myCtx);
+                }
             }
         };
 
@@ -1041,7 +1048,7 @@ var attribCache = false;
         uaPacketParserHandler['^!rubbishtime'] = function(userHandle) {
             if (u_attr.flags.ssrs > 0) {
                 mega.attr.get(userHandle, 'rubbishtime', -2, 1, function(res) {
-                    if (fminitialized) {
+                    if (fminitialized && M.account) {
                         M.account.ssrs = parseInt(res);
                         if (page === 'fm/account/file-management') {
                             accountUI.fileManagement.rubsched.render(M.account);

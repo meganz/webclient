@@ -189,7 +189,7 @@
      * @param {String} fromUser base64urldecoded user handle of the call initiator
      * @returns {RtcCallEventHandler}
      */
-    RtcGlobalEventHandler.prototype.onCallIncoming = function (call, fromUser) {
+    RtcGlobalEventHandler.prototype.onCallIncoming = function (call, fromUser, replacedCall, avAutoAnswer) {
         var callManager = this.megaChat.plugins.callManager;
         var chatRoom = self.megaChat.getChatById(base64urlencode(call.chatid));
         if (!chatRoom) {
@@ -203,6 +203,10 @@
         callHandler.call = call;
         var callManagerCall = callManager.registerCall(chatRoom, call);
         callManagerCall.initiator = fromUser;
+        if (avAutoAnswer != null) {
+            callManagerCall.setState(CallManagerCall.STATE.WAITING_RESPONSE_INCOMING);
+            return callHandler;
+        }
         callManagerCall.setState(CallManagerCall.STATE.WAITING_RESPONSE_INCOMING);
         callManager.trigger('WaitingResponseIncoming', [callManagerCall]);
         return callHandler;
@@ -212,7 +216,7 @@
         var chatRoom = this.megaChat.getChatById(base64urlencode(chatId));
         assert(chatRoom, "RtcGlobalEventHandles.isGroupChat: chatroom with specified chatid not found,",
             "this should never happen");
-        return (chatRoom.type === "group");
+        return (chatRoom.type === "group" || chatRoom.type === "public");
     };
     RtcGlobalEventHandler.prototype.get1on1RoomPeer = function(chatid) {
         chatid = base64urlencode(chatid);

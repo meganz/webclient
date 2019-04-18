@@ -63,7 +63,9 @@ pro.propay = {
             return;
         }
 
-        megaAnalytics.log('pro', 'proc');
+        if (typeof page !== 'undefined' && page !== 'chat') {
+            megaAnalytics.log('pro', 'proc');
+        }
 
         // If the plan number is not set in the URL e.g. propay_4, go back to Pro page step 1 so they can choose a plan
         if (!pro.propay.setProPlanFromUrl()) {

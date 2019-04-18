@@ -75,16 +75,16 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                 }
             }
         });
-
-        api_req({a: 'uga', u: u_handle, ua: '^!rubbishtime', v: 1}, {
-            account: account,
-            callback: function(res, ctx) {
-                if (typeof res === 'object') {
-                    ctx.account.ssrs = base64urldecode(String(res.av || res)) | 0;
+        if (!anonymouschat) {
+            api_req({a: 'uga', u: u_handle, ua: '^!rubbishtime', v: 1}, {
+                account: account,
+                callback: function(res, ctx) {
+                    if (typeof res === 'object') {
+                        ctx.account.ssrs = base64urldecode(String(res.av || res)) | 0;
+                    }
                 }
-            }
-        });
-
+            });
+        }
         api_req({a: 'utt'}, {
             account: account,
             callback: function(res, ctx) {
@@ -357,7 +357,7 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
             // Export key showing a toast message
             u_exportkey(l[6040]);
         });
-        
+
         switch (version) {
             case 1:
                 $('.skip-button', $dialog).removeClass('hidden');

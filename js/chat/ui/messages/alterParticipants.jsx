@@ -67,7 +67,9 @@ var AlterParticipantsConversationMessage = React.createClass({
                                             className="message avatar-wrapper small-rounded-avatar"/>;
             var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
-            var text = __(l[8907]).replace(
+            var text = (h === contact.u) ?
+                __('joined the group chat.') :
+                __(l[8907]).replace(
                 "%s",
                 '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
             );

@@ -649,15 +649,25 @@ var dlmanager = {
         var req = {
             a: 'g',
             g: 1,
-            v: 2,
             ssl: use_ssl
         };
+
+        // IF this is an anonymous chat OR a chat that I'm not a part of
+        if (M.chat && megaChatIsReady) {
+            megaChat.eventuallyAddDldTicketToReq(req);
+        }
+
         var ctx = {
             object: dl,
             next: callback,
             dl_key: dl.key,
             callback: this.dlGetUrlDone.bind(this)
         };
+
+        if (window.fetchStreamSupport) {
+            // can handle CloudRAID downloads.
+            req.v = 2;
+        }
 
         if (dl.ph) {
             req.p = dl.ph;
@@ -695,6 +705,9 @@ var dlmanager = {
 
                 if (res.g[0] < 0) {
                     res.e = res.e || res.g[0];
+                }
+                else {
+                    dlQueue.setSize(1);
                 }
             }
             if (res.d) {
@@ -765,7 +778,7 @@ var dlmanager = {
         }
 
         var eekey = code === EKEY;
-        if (eekey || code === EACCESS) {
+        if (eekey || code === EACCESS || code === ETOOMANY) {
             // TODO: Check if other codes should raise abort()
             later(function() {
                 dlmanager.abort(dl, eekey);
@@ -780,7 +793,16 @@ var dlmanager = {
         if (eekey) {
             if (dl && Array.isArray(dl.url)) {
                 // Decryption error from native CloudRAID download
-                eventlog(99720, JSON.stringify([1, dl && dl.id]));
+
+                var str = "";
+                if (dl.cloudRaidSettings) {
+                    str += "f:" + dl.cloudRaidSettings.onFails;
+                    str += " t:" + dl.cloudRaidSettings.timeouts;
+                    str += " sg:" + dl.cloudRaidSettings.startglitches;
+                    str += " tmf:" + dl.cloudRaidSettings.toomanyfails;
+                }
+
+                eventlog(99720, JSON.stringify([2, dl && dl.id, str]));
             }
             else if (String(dl && dl.url).length > 256) {
                 // Decryption error from proxied CloudRAID download
@@ -2097,10 +2119,13 @@ var dlmanager = {
             $body.off('keyup.msd');
             $overlay.addClass('hidden');
             $body.removeClass('overlayed');
+            $overlay.hide();
+            return false;
         };
 
         $overlay.addClass('msd-dialog').removeClass('hidden downloading');
         $body.addClass('overlayed');
+        $overlay.show();
 
         var $slides = $overlay.find('.megasync-slide');
         var $currentSlide = $slides.filter('.megasync-slide:not(.hidden)').first();

@@ -53,7 +53,7 @@ Message._getTextContentsForDialogType = function(message) {
     ) {
         var textMessage = mega.ui.chat.getMessageString(
                 message.type || message.dialogType,
-                message.chatRoom.type === "group"
+                message.chatRoom.type === "group" || message.chatRoom.type === "public"
             ) || "";
 
         // if is an array.
@@ -86,8 +86,9 @@ Message._getTextContentsForDialogType = function(message) {
             textMessage = textMessage.replace("%s1", newPrivilegeText);
         }
         else if (message.dialogType === "alterParticipants" && message.meta) {
+            var otherContact;
             if (message.meta.excluded && message.meta.excluded.length > 0) {
-                var otherContact = M.u[message.meta.excluded[0]];
+                otherContact = M.u[message.meta.excluded[0]];
                 if (otherContact) {
                     if (otherContact.u === contact.u) {
                         textMessage = l[8908];
@@ -102,7 +103,9 @@ Message._getTextContentsForDialogType = function(message) {
             else if (message.meta.included && message.meta.included.length > 0) {
                 otherContact = M.u[message.meta.included[0]];
                 if (contact && otherContact) {
-                    textMessage = l[8907].replace("%s", contactName);
+                    textMessage = (contact.u === otherContact.u) ?
+                                __('joined the group chat.') :
+                                l[8907].replace("%s", contactName);
                     var otherContactName = htmlentities(M.getNameByHandle(message.meta.included[0]));
                     contact = otherContact;
                     contactName = otherContactName;
@@ -119,7 +122,10 @@ Message._getTextContentsForDialogType = function(message) {
             );
         }
         else if (message.dialogType === "remoteCallStarted") {
-            textMessage = mega.ui.chat.getMessageString("call-started", message.chatRoom.type === "group");
+            textMessage = mega.ui.chat.getMessageString(
+                "call-started",
+                message.chatRoom.type === "group" || message.chatRoom.type === "public"
+            );
 
             if (textMessage.splice) {
                 textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage);
@@ -129,32 +135,41 @@ Message._getTextContentsForDialogType = function(message) {
                 textMessage = textMessage.replace("%s", contactName);
             }
         }
+        else if (message.dialogType === "openModeClosed") {
+            textMessage = l[20569];
+        }
+        else if (message.dialogType === "chatHandleUpdate" && typeof message.meta.handleUpdate !== 'undefined') {
+            textMessage = (message.meta.handleUpdate === 1) ?
+                        l[20570]
+                        : l[20571];
+        }
         else if (message.dialogType === "remoteCallEnded") {
             var meta = message.meta;
 
+            var isGroupOrPublic = message.chatRoom.type === "group" || message.chatRoom.type === "public";
             if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CALL_ENDED || (
                     meta.reason === CallManager.CALL_END_REMOTE_REASON.FAILED && meta.duration >= 5
                 )
             ) {
-                textMessage = mega.ui.chat.getMessageString("call-ended", message.chatRoom.type === "group");
+                textMessage = mega.ui.chat.getMessageString("call-ended", isGroupOrPublic);
             }
             else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.REJECTED) {
-                textMessage = mega.ui.chat.getMessageString("call-rejected", message.chatRoom.type === "group");
+                textMessage = mega.ui.chat.getMessageString("call-rejected", isGroupOrPublic);
             }
             else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED && contact.u === u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-canceled", message.chatRoom.type === "group");
+                textMessage = mega.ui.chat.getMessageString("call-canceled", isGroupOrPublic);
             }
             else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED && contact.u !== u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-missed", message.chatRoom.type === "group");
+                textMessage = mega.ui.chat.getMessageString("call-missed", isGroupOrPublic);
             }
             else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u !== u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-missed", message.chatRoom.type === "group");
+                textMessage = mega.ui.chat.getMessageString("call-missed", isGroupOrPublic);
             }
             else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u === u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-timeout", message.chatRoom.type === "group");
+                textMessage = mega.ui.chat.getMessageString("call-timeout", isGroupOrPublic);
             }
             else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.FAILED) {
-                textMessage = mega.ui.chat.getMessageString("call-failed", message.chatRoom.type === "group");
+                textMessage = mega.ui.chat.getMessageString("call-failed", isGroupOrPublic);
             }
             else {
                 if (d) {
@@ -762,6 +777,18 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
             // note: ignoreDB can be a message, in case fnName is 'replace', which is not actually an ignoreDB.
             if (ignoreDB !== true && self.chatd.chatdPersist) {
+                if (
+                    self.chatRoom.type === "public" &&
+                    self.joined === true &&
+                    (
+                        typeof self.chatRoom.members[u_handle] === "undefined" ||
+                        self.chatRoom.members[u_handle] === -1
+                    )
+                ) {
+                    // previewing a chat room. halt persistence.
+                    return res;
+                }
+
                 chatdPersist.persistMessageBatched(
                     fnName === "removeByKey" ? "remove" : fnName,
                     chatRoom.chatId,
@@ -879,6 +906,24 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (chatRoom.roomId === self.chatRoom.roomId) {
             self.setLastSeen(eventData.messageId, eventData.chatd);
             self.trackDataChange();
+        }
+    });
+    self.chatd.rebind('onMembersUpdated.messagesBuff' + chatRoomId, function(e, eventData) {
+        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+
+        if (!chatRoom) {
+            self.logger.warn("Message not found for: ", e, eventData);
+            return;
+        }
+
+        if (chatRoom.roomId === self.chatRoom.roomId) {
+            if ((eventData.userId === u_handle)
+                    || (chatRoom.type === "public"))  {
+                self.joined = true;
+                if (chatRoom.state === ChatRoom.STATE.JOINING) {
+                    chatRoom.setState(ChatRoom.STATE.READY);
+                }
+            }
         }
     });
 
@@ -1301,7 +1346,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
             var promises = [];
             promises.push(
-                ChatdIntegration._ensureKeysAreLoaded([editedMessage])
+                ChatdIntegration._ensureKeysAreLoaded([editedMessage], undefined, chatRoom.publicChatHandle)
             );
 
             var pendingkeys = [];
@@ -1484,7 +1529,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
             var promises = [];
             promises.push(
-                ChatdIntegration._ensureKeysAreLoaded([outgoingMessage])
+                ChatdIntegration._ensureKeysAreLoaded([outgoingMessage], undefined, chatRoom.publicChatHandle)
             );
 
             MegaPromise.allDone(promises).always(function() {
@@ -1540,7 +1585,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             }
         };
         ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
-            ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
+            ChatdIntegration._ensureKeysAreLoaded(keys, undefined, chatRoom.publicChatHandle).always(seedKeys);
         });
 
         if (chatRoom.roomId === self.chatRoom.roomId) {
@@ -1572,7 +1617,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 chatRoom.protocolHandler.restoreKeys(keyxid, keys);
             }
         };
-        ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
+        ChatdIntegration._ensureKeysAreLoaded(keys, undefined, chatRoom.publicChatHandle).always(seedKeys);
 
         if (chatRoom.roomId === self.chatRoom.roomId) {
             self.trackDataChange();
@@ -1592,7 +1637,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 var shouldRender = true;
                 if (
                     (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) ||
-                    v.revoked === true
+                    v.revoked === true ||
+                    /* dont add to the unread newCounter if the current user is not a part of the chat */
+                    (Object.keys(self.chatRoom.members).indexOf(u_handle) === -1)
                 ) {
                     shouldRender = false;
                 }
@@ -1608,6 +1655,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
     });
 
+    self.initChatdPersistEvents();
 };
 
 
@@ -1638,6 +1686,35 @@ MessagesBuff.orderFunc = function(a, b) {
     return 0;
 };
 
+MessagesBuff.prototype.initChatdPersistEvents = function() {
+    var self = this;
+    self.chatRoom.rebind('onMeJoined.mb', function() {
+        var cp = self.chatRoom.megaChat.plugins.chatdIntegration.chatd.chatdPersist;
+
+        if (cp) {
+            var r = self.chatRoom;
+            if (self.chatRoom.type === "public") {
+                if (self.lastSeen) {
+                    self.setLastSeen(self.lastSeen, false, true);
+                }
+                self.messages.forEach(function(msg) {
+                    cp.persistMessageBatched("push", r.chatId, [msg]);
+                });
+            }
+        }
+    });
+
+    self.chatRoom.rebind('onMeLeft.mb', function() {
+
+        if (self.chatRoom.megaChat.plugins.chatdIntegration.chatd.chatdPersist) {
+            var r = self.chatRoom;
+            var cp = r.megaChat.plugins.chatdIntegration.chatd.chatdPersist;
+            if (self.chatRoom.type === "public") {
+                cp.deleteAllMessages(r.chatId);
+            }
+        }
+    });
+};
 
 MessagesBuff.prototype.getByInternalId = function(internalId) {
     assert(internalId, 'missing internalId');
@@ -1683,27 +1760,35 @@ MessagesBuff.prototype.getUnreadCount = function() {
     return this._unreadCountCache;
 };
 
-MessagesBuff.prototype.setLastSeen = function(msgId, isFromChatd) {
+MessagesBuff.prototype.setLastSeen = function(msgId, isFromChatd, force) {
     var self = this;
 
-    if (msgId === self.lastSeen) {
+    if (!force && msgId === self.lastSeen) {
         return; // already the same. can be triggered by the reset notifications in the UI.
     }
 
     var targetMsg = Message._mockupNonLoadedMessage(msgId, self.messages[msgId], 999999999);
     var lastMsg = Message._mockupNonLoadedMessage(self.lastSeen, self.messages[self.lastSeen], 0);
 
-    if (!self.lastSeen || lastMsg.orderValue < targetMsg.orderValue) {
+    if (!self.lastSeen || lastMsg.orderValue < targetMsg.orderValue || force) {
         self.lastSeen = msgId;
 
-        if (!isFromChatd && self.joined && !self.isRetrievingHistory && !self.chatRoom.stateIsLeftOrLeaving()) {
+        if (
+            force || (
+                !isFromChatd &&
+                self.joined &&
+                !self.isRetrievingHistory &&
+                typeof self.chatRoom.members[u_handle] !== 'undefined' &&
+                !anonymouschat
+            )
+        ) {
             if (self._lastSeenThrottling) {
                 clearTimeout(self._lastSeenThrottling);
             }
             self._lastSeenThrottling = setTimeout(function() {
                 delete self._lastSeenThrottling;
                 self.chatdInt.markMessageAsSeen(self.chatRoom, msgId);
-            }, 160);
+            }, 200);
         }
         if (ChatdPersist.isMasterTab() && self.chatdInt.chatd.chatdPersist) {
             var chatdPersist = self.chatdInt.chatd.chatdPersist;
@@ -2118,12 +2203,20 @@ MessagesBuff.prototype.dumpBufferToConsole = function() {
 MessagesBuff.prototype.detachMessages = function() {
     var self = this;
     var msg;
+    var room = self.chatRoom;
     // instead of causing potential different execution paths, by implementing a in-memory VS in iDB persistence
     // and detaching of messages from the UI, we would need to simply disable the detaching of messages for
     // indexedDB incompatible browsers
-    if (!self.chatRoom.megaChat.plugins.chatdIntegration.chatd.chatdPersist) {
+    if (!room.megaChat.plugins.chatdIntegration.chatd.chatdPersist) {
         return;
     }
+    if (room.type === "public" && !anonymouschat && room.publicChatHandle && room.publicChatKey) {
+        // do not detach messages in pub mode..otherwise, IF the user joins - the chat history that would get
+        // persisted may contain missing messages in the iDB db.
+        return;
+    }
+
+
     var removedAnyMessage = false;
     while (msg = self.messages.getItem(self.messages.length - Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2)) {
         self.messages.removeByKey(msg.messageId, true);

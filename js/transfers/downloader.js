@@ -261,6 +261,7 @@ ClassChunk.prototype.onXHRready = function(xhrEvent) {
     var xhr = xhrEvent.target;
     try {
         r = xhr.response || {};
+        xhr.response = false;
     }
     catch (e) {}
     if (r && r.byteLength === this.size) {
@@ -636,7 +637,7 @@ ClassFile.prototype.run = function(task_done) {
             error = true;
         }
         else if (error) {
-            var fatal = (error === EBLOCKED);
+            var fatal = (error === EBLOCKED || error === ETOOMANY);
 
             this.dlGetUrlErrors = (this.dlGetUrlErrors | 0) + 1;
 

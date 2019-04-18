@@ -2,7 +2,7 @@
 var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
 
 var m;
-var b_u = 0;
+var browserUpdate = 0;
 var apipath;
 var pageLoadTime;
 var maintenance = false;
@@ -15,6 +15,7 @@ var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
+var uv = window.navigator.appVersion.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
 var l, d = false;
 
@@ -39,8 +40,9 @@ var is_embed = location.pathname === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
 var is_iframed = is_embed || is_drop;
 var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
-var is_chrome_firefox = document.location.protocol === 'chrome:' &&
+var is_chrome_firefox = document.location.protocol === 'chrome:' &&       // Only true for Palemoon/Legacy FF extension
     document.location.host === 'mega' || document.location.protocol === 'mega:';
+var is_msie = ua.indexOf('msie') !== 1 || uv.appVersion.indexOf('trident') > -1;
 var location_sub = document.location.href.substr(0, 16);
 var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
 var is_firefox_web_ext = location_sub === 'moz-extension://';
@@ -51,6 +53,8 @@ var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
+var is_uc_browser = /ucbrowser/.test(ua);
+var fetchStreamSupport = window.fetch && typeof ReadableStream === 'function' && typeof AbortController === 'function' && !window.MSBlobBuilder;
 
 /**
  * Check if the user is coming from a mobile device
@@ -64,7 +68,7 @@ function isMobile() {
     }
 
     var mobileStrings = [
-        'iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini',
+        'iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'ucbrowser',
         'windows mobile', 'windows phone', 'iemobile', 'mobile safari', 'bb10; touch'
     ];
 
@@ -91,7 +95,9 @@ function getSitePath() {
         }
     }
 
-    return document.location.pathname;
+    return (document.location.pathname.substr(0, 6) === '/chat/') ?
+            document.location.pathname + '#' + hash :
+            document.location.pathname;
 }
 
 // remove dangling characters from the pathname/hash
@@ -193,7 +199,10 @@ if (is_chrome_firefox) {
 }
 
 var myURL = window.URL;
-b_u = b_u || !myURL || typeof DataView === 'undefined' || (window.chrome && !document.exitPointerLock);
+
+// Check whether we should redirect the user to the browser update.html page (triggered for IE10 and worse browsers)
+browserUpdate = browserUpdate || !myURL || typeof DataView === 'undefined' ||
+    (window.chrome && !document.exitPointerLock);
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -254,10 +263,10 @@ catch (ex) {
     console.error(ex);
     window.megaChatIsReady = false;
     window.megaChatIsDisabled = false;
-    b_u = true;
+    browserUpdate = true;
 }
 
-if (!b_u) try
+if (!browserUpdate) try
 {
     if (is_chrome_firefox)
     {
@@ -299,6 +308,9 @@ if (!b_u) try
     try {
         if (typeof localStorage === 'undefined' || localStorage === null) {
             throw new Error('SecurityError: DOM Exception 18');
+        }
+        if (typeof localStorage.d === 'undefined' && location.host === 'smoketest.static.mega.co.nz') {
+            localStorage.d = 1;
         }
         d = localStorage.d | 0;
         jj = localStorage.jj;
@@ -416,7 +428,7 @@ catch(e) {
             "\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
             + extraInfo
         );
-        b_u = 1;
+        browserUpdate = 1;
     }
 }
 
@@ -544,7 +556,19 @@ if (is_bot) {
     nocontentcheck = true;
 }
 
-if (!b_u && is_extension)
+tmp = getCleanSitePath(location.hash || undefined);
+if (tmp.substr(0, 12) === 'sitetransfer') {
+    try {
+        sessionStorage.sitet = tmp;
+        document.location = 'https://mega.nz/start';
+    }
+    catch (ex) {
+        console.warn(ex);
+    }
+    hashLogic = true; // temporarily prevent the history.* calls in case they are reached...
+}
+
+if (!browserUpdate && is_extension)
 {
     hashLogic = true;
     nocontentcheck=true;
@@ -562,7 +586,7 @@ if (!b_u && is_extension)
         try {
             loadSubScript(bootstaticpath + 'fileapi.js');
         } catch(e) {
-            b_u = 1;
+            browserUpdate = 1;
             Cu.reportError(e);
             alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
         }
@@ -601,10 +625,13 @@ if (!b_u && is_extension)
 
 var page;
 var locSearch = location.search;
-
 if (hashLogic) {
     // legacy support:
     page = getCleanSitePath(document.location.hash);
+}
+else if (getSitePath().substr(0, 6) === '/chat/') {
+    page = getSitePath().substring(1).split("#")[0] + "#" + document.location.hash.split("#")[1];
+    history.replaceState({subpage: page}, "", '/' + page);
 }
 else if ((page = isPublicLink(document.location.hash))) {
     // folder or file link: always keep the hash URL to ensure that keys remain client side
@@ -632,8 +659,15 @@ else {
 	}
 }
 
+// If IE 11 detected (https://stackoverflow.com/a/21825207), set flag to redirect to update page
+if (!!window.MSInputMethodContext && !!document.documentMode && localStorage.getItem('continueToSite') === null) {
+    browserUpdate = true;
+}
 
-if (b_u && !is_mobile) {
+// If they need to update their browser, store the current page before going to the update page
+// ToDo: make this update.html page work on mobile web
+if (browserUpdate && !is_mobile) {
+    localStorage.prevPage = page;
     document.location = 'update.html';
 }
 
@@ -657,7 +691,6 @@ var languages = {
     'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
     'th': [['||'], 'Thai', 'ไทย'],
     'tl': [['en-ph'], 'Tagalog', 'Tagalog'],
-    'tr': [['tr', 'tr-'], 'Turkish', 'Türkçe'],
     'uk': [['||'], 'Ukrainian', 'Українська'],
     'vi': [['vn', 'vi'], 'Vietnamese', 'Tiếng Việt']
 };
@@ -1497,7 +1530,7 @@ if (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' || pa
         }
     }
 }
-else if (!b_u) {
+else if (!browserUpdate) {
     d = window.d || 0;
     jj = window.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
@@ -1952,6 +1985,7 @@ else if (!b_u) {
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
     // Common desktop and mobile, bottom pages
+    jsl.push({f:'css/fonts.css', n: 'fonts_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
@@ -1960,8 +1994,9 @@ else if (!b_u) {
     jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
@@ -1977,7 +2012,6 @@ else if (!b_u) {
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
-    jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/js/registerb.js', n: 'registerb_js', j:1});
     jsl.push({f:'html/repay.html', n: 'repay', j:0});
     jsl.push({f:'html/js/repay.js', n: 'repay_js', j:1});
@@ -2095,6 +2129,7 @@ else if (!b_u) {
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
+        jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
         jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
 
@@ -2190,6 +2225,7 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.decryption-password-overlay.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.delete-overlay.js', n: 'mobile_delete_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.download-overlay.js', n: 'mobile_download_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.chatlink.js', n: 'mobile_chatlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.language-menu.js', n: 'mobile_language_menu_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.link-overlay.js', n: 'mobile_link_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
@@ -2218,6 +2254,10 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.twofactor.disabled.js', n: 'mobile_twofactor_disabled_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-action.js', n: 'mobile_twofactor_verify_action_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.phone-input.js', n: 'mobile_sms_phone_input_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.verify-code.js', n: 'mobile_sms_verify_code_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.verify-success.js', n: 'mobile_sms_verify_success_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.sms.achievement.js', n: 'mobile_sms_achievement', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.titlemenu.js', n: 'mobile_titlemenu_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rubbish-bin-empty-overlay.js', n: 'mobile_rubbish_bin_empty_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rubbishbin.js', n: 'mobile_rubbishbin_js', j: 1, w: 1});
@@ -2315,7 +2355,6 @@ else if (!b_u) {
         'gdpr_js': {f:'html/js/gdpr.js', n: 'gdpr_js', j:1},
         'mega': {f:'html/mega.html', n: 'mega', j:0},
         'terms': {f:'html/terms.html', n: 'terms', j:0},
-        'general': {f:'html/general.html', n: 'general', j:0},
         'backup': {f:'html/backup.html', n: 'backup', j:0},
         'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
         'cancel': {f:'html/cancel.html', n: 'cancel', j:0},
@@ -2433,7 +2472,6 @@ else if (!b_u) {
         'about': ['about'],
         'sourcecode': ['sourcecode'],
         'terms': ['terms'],
-        'general': ['general'],
         'credits': ['credits'],
         'backup': ['backup','backup_js','filesaver'],
         'recovery': ['recovery','recovery_js'],
@@ -3379,3 +3417,12 @@ function inherits(target, source) {
         enumerable: false
     });
 }
+
+mBroadcaster.once('startMega', function() {
+    var data = sessionStorage.sitet;
+
+    if (data) {
+        delete sessionStorage.sitet;
+        M.transferFromMegaCoNz(data);
+    }
+});

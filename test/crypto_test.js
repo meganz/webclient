@@ -88,7 +88,7 @@ describe("crypto unit test", function() {
                 assert.strictEqual(api_req.args[0][1].u, 'you456789xw');
 
                 var settleFunction = api_req.args[0][1].callback;
-                settleFunction({ pubk: pubKey, u: 'you456789xw'}, 0,0,1);
+                settleFunction({ pubk: pubKey, u: 'you456789xw'}, 0, 0, 0, 1);
                 assert.strictEqual(rootPromise.resolve.callCount, 1);
                 assert.strictEqual(rootPromise.resolve.args[0][0], pubKey);
                 assert.strictEqual(ns._logger._log.args[0][0],

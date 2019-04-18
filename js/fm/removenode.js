@@ -82,6 +82,7 @@ function removeUInode(h, parent) {
             if (!hasItems) {
                 $('.contacts-grid-view .contacts-grid-header tr').remove();
                 $('.fm-empty-trashbin').removeClass('hidden');
+                $('.fm-clearbin-button').addClass('hidden');
             }
             break;
         case M.RootID:

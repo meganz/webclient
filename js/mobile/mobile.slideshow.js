@@ -37,6 +37,8 @@ mobile.slideshow = {
         mobile.slideshow.initCloseButton();
         mobile.slideshow.initHideShowToggleForHeaderAndButtons();
         mobile.slideshow.fetchImageFromApi(nodeHandle, mobile.slideshow.displayImage, 'mid', true);
+
+        mobile.initOverlayPopstateHandler(mobile.slideshow.$overlay);
     },
 
     /**

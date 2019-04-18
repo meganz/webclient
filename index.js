@@ -30,11 +30,12 @@ var account = false;
 var register_txt = false;
 var login_next = false;
 var loggedout = false;
+var anonymouschat = false;
 var flhashchange = false;
 var folderLinkVisitLogged = false;
 var avatars = {};
 var mega_title = 'MEGA';
-
+var pchandle = false;
 
 
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
@@ -229,7 +230,6 @@ function topPopupAlign(button, popup, topPos) {
 
 function init_page() {
     page = page || (u_type ? 'fm' : 'start');
-
     var mobilePageParsed = false;
     var ar;
 
@@ -248,6 +248,16 @@ function init_page() {
     // cleaning local-storage used attr for business signup
     if (localStorage.businessSubAc && page !== 'register') {
         delete localStorage.businessSubAc;
+    }
+
+    // Users that logged in and are suspended (requiring special SMS unlock) are not allowed to go anywhere else in the
+    // site until they validate their account. So if they clicked the browser back button, then they should get logged
+    // out or they will end up with with a partially logged in account stuck in an infinite loop. This logout is not
+    // triggered on the mobile web sms/ pages because a session is still required to talk with the API to get unlocked.
+    if ((typeof sms !== 'undefined' && sms.isSuspended) ||
+        (typeof mobile !== 'undefined' && mobile.sms.isSuspended && page.substr(0, 3) !== 'sms')) {
+
+        u_logout(true);
     }
 
     dlkey = false;
@@ -327,6 +337,13 @@ function init_page() {
     // Redirect url to extensions when it tries to go plugin or chrome or firefox
     if (page === 'plugin' || page === 'chrome' || page === 'firefox') {
         loadSubPage('extensions');
+        return false;
+    }
+
+    // Block about page in Mobile Webclient temporarily
+    // We would remove it till we finish the new about page and support mobile version of it
+    if (is_mobile && page === 'about') {
+        loadSubPage('startpage');
         return false;
     }
 
@@ -497,6 +514,18 @@ function init_page() {
         page = 'resetpassword';
     }
 
+    // is chat link?
+    if (is_mobile && page.substr(0, 4) === 'chat') {
+        var chatInfo = window.location.toString().split("chat/");
+        if (chatInfo[1] && chatInfo[1].split) {
+            chatInfo = chatInfo[1].split("#");
+            var chatHandle = chatInfo[0];
+            var chatKey = chatInfo[1];
+            parsepage(pages['mobile']);
+            mobile.chatlink.show(chatHandle, chatKey);
+            return;
+        }
+    }
     if ((pfkey || dlkey) && location.hash[0] !== '#') {
         return location.replace(getAppBaseUrl());
     }
@@ -523,7 +552,6 @@ function init_page() {
         && (page !== 'privacy')
         && (page !== 'gdpr')
         && (page !== 'takendown')
-        && (page !== 'general')
         && (page !== 'resellers')
         && (page !== 'security')
         && (page !== 'downloadapp')
@@ -944,39 +972,54 @@ function init_page() {
         loadSubPage('fm/account/achievements');
         return false;
     }
-    else if (is_mobile && page === 'twofactor/intro') {
+    else if (is_mobile && page.substr(0, 9) === 'twofactor') {
+
         parsepage(pages['mobile']);
-        mobile.twofactor.intro.init();
+
+        if (page.indexOf('intro') > -1) {
+            mobile.twofactor.intro.init();
+        }
+        else if (page.indexOf('verify-setup') > -1) {
+            mobile.twofactor.verifySetup.init();
+        }
+        else if (page.indexOf('setup') > -1) {
+            mobile.twofactor.setup.init();
+        }
+        else if (page.indexOf('enabled') > -1) {
+            mobile.twofactor.enabled.init();
+        }
+        else if (page.indexOf('verify-disable') > -1) {
+            mobile.twofactor.verifyDisable.init();
+        }
+        else if (page.indexOf('disabled') > -1) {
+            mobile.twofactor.disabled.init();
+        }
+        else if (page.indexOf('verify-login') > -1) {
+            mobile.twofactor.verifyLogin.init();
+        }
+
         return false;
     }
-    else if (is_mobile && page === 'twofactor/setup') {
+    else if (is_mobile && page.substr(0, 3) === 'sms') {
+
         parsepage(pages['mobile']);
-        mobile.twofactor.setup.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/verify-setup') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.verifySetup.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/enabled') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.enabled.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/verify-disable') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.verifyDisable.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/disabled') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.disabled.init();
-        return false;
-    }
-    else if (is_mobile && page === 'twofactor/verify-login') {
-        parsepage(pages['mobile']);
-        mobile.twofactor.verifyLogin.init();
+
+        if (page.indexOf('add-phone-suspended') > -1) {
+            mobile.sms.phoneInput.init();
+        }
+        else if (page.indexOf('verify-code') > -1) {
+            mobile.sms.verifyCode.init();
+        }
+        else if (page.indexOf('verify-success') > -1) {
+            mobile.sms.verifySuccess.init();
+        }
+        else if (page.indexOf('phone-achievement-intro') > -1) {
+            mobile.sms.achievement.init();
+        }
+        else if (page.indexOf('add-phone-achievement') > -1) {
+            mobile.sms.phoneInput.init();
+        }
+
         return false;
     }
     else if (page === 'fm/account/profile') {
@@ -1081,7 +1124,7 @@ function init_page() {
             var link = $(this).attr('data-link');
 
             // Scroll to the element's parent (not the element itself because it's hidden by the header)
-            $('.contact-new-title.' + link).parent().get(0).scrollIntoView();
+            $('.contact-new-title.' + link).parent().get(0).scrollIntoView({behavior: "smooth"});
         });
     }
     else if (page.substr(0, 4) == 'help') {
@@ -1315,9 +1358,6 @@ function init_page() {
             parsepage(pages['terms']);
         }
     }
-    else if (page === 'general') {
-        parsepage(pages['general']);
-    }
     else if (page === 'security') {
         parsepage(pages['securitypractice']);
         securityPractice.init();
@@ -1333,7 +1373,7 @@ function init_page() {
 
         // Show message that the copyright takedown should be submitted in a desktop browser
         parsepage(pages['mobile']);
-        mobile.messageOverlay.show(l[621], l[19628], function() {
+        mobile.messageOverlay.show(l[621], l[19628]).always(function() {
 
             // On clicking OK in the dialog, go to the file manager if logged in, or start page if not
             loadSubPage(u_type === 3 ? 'fm' : 'start');
@@ -1388,11 +1428,14 @@ function init_page() {
         }
     }
     else if (page.substr(0, 7) === 'payment') {
+        var isBussiness = page.indexOf('-b') !== -1;
 
-        if (page.indexOf('-b') === -1) {
+        if (!isBussiness || is_mobile) {
             // Load the Pro page in the background
             parsepage(pages['proplan']);
-            pro.proplan.init();
+            if (!isBussiness) {
+                pro.proplan.init();
+            }
         }
         else {
             parsepage(pages['business']);
@@ -1430,7 +1473,7 @@ function init_page() {
         $('.uwp-windows-scrollto-button').rebind('click', function() {
 
             // Scroll to the Windows Phone section
-            $('.uwp-windows-section').get(0).scrollIntoView();
+            $('.uwp-windows-section').get(0).scrollIntoView({behavior: "smooth"});
         });
     }
     else if (page === 'extensions') {
@@ -1567,6 +1610,26 @@ function init_page() {
         loadSubPage('redeem');
         return false;
     }
+    // If they recently tried to join a chat link, forward to the chat link page.
+    else if (
+        localStorage.getItem('autoJoinOnLoginChat') !== null && u_type === 3 &&
+        getSitePath().indexOf("/chat/") !== 0
+    ) {
+        var autoLoginChatInfo = typeof localStorage.autoJoinOnLoginChat !== "undefined" ?
+            JSON.parse(localStorage.autoJoinOnLoginChat) : false;
+
+        if (unixtime() - 2 * 60 * 60 < autoLoginChatInfo[1]) {
+            loadSubPage("/chat/" + autoLoginChatInfo[0] + autoLoginChatInfo[2]);
+            return false;
+        }
+        else {
+            localStorage.removeItem('autoJoinOnLoginChat');
+            // the only way tto not refactor this whole piece of code is to simply do a recurrsion, after the
+            // autoJoin... is removed.
+            return init_page();
+        }
+
+    }
     else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
@@ -1617,6 +1680,31 @@ function init_page() {
 
             if (typeof mDBcls === 'function') {
                 mDBcls(); // close fmdb
+            }
+        }
+
+        if (page.substr(0, 5) === "chat/") {
+            id = page;
+            page = "chat";
+            if (u_type === false) {
+                anonymouschat = true;
+                u_handle = "AAAAAAAAAAA";
+                pchandle = id.substr(5, 8);
+
+                M.require('chat')
+                    .always(function() {
+                        if (typeof ChatRoom !== 'undefined') {
+                            init_chat();
+                        }
+                    });
+            }
+            else if (u_type === 0) {
+                // ephemeral
+                mega.ui.sendSignupLinkDialog({}, false);
+            }
+            else {
+                anonymouschat = false;
+                pchandle = false;
             }
         }
 
@@ -1687,7 +1775,12 @@ function init_page() {
             $('#startholder').empty();
         }
 
+        $('.nw-fm-left-icons-panel').removeClass('hidden');
         if ($('#fmholder:visible').length == 0) {
+            if (anonymouschat) {
+                $('.nw-fm-left-icons-panel').addClass('hidden');
+                $('.top-head .logo').css("display", "block");
+            }
             $('#fmholder').show();
             if (fminitialized && !is_mobile) {
                 M.addViewUI();
@@ -1759,6 +1852,8 @@ function init_page() {
 
     loggedout = false;
     flhashchange = false;
+
+    onIdle(blockChromePasswordManager);
 }
 
 function topmenuUI() {
@@ -1866,6 +1961,7 @@ function topmenuUI() {
         $topHeader.find('.create-account-button').addClass('hidden');
         $topHeader.find('.membership-status-block').removeClass('hidden');
         $topHeader.find('.top-icon.notification').removeClass('hidden');
+        $topHeader.find('.left.individual').addClass('hidden');
 
         // Show the rocket icon if achievements are enabled
         mega.achievem.enabled()
@@ -1907,7 +2003,6 @@ function topmenuUI() {
 
         if (is_fm()) {
             $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
-            $topHeader.find('.left.individual').addClass('hidden');
         }
 
         // If the chat is disabled don't show the green status icon in the header
@@ -1923,7 +2018,6 @@ function topmenuUI() {
             $topHeader.find('.top-icon.achievements').addClass('hidden');
             $topMenu.find('.upgrade-your-account').addClass('hidden');
             $topMenu.find('.resellers').addClass('hidden');
-            $topHeader.find('.left.individual').addClass('hidden');
         }
 
         // Show PRO plan expired warning popup (if applicable)
@@ -1955,6 +2049,10 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').addClass('hidden');
         $topHeader.find('.top-icon.achievements').addClass('hidden');
         $topHeader.find('.create-account-button').removeClass('hidden');
+
+        if (u_type === 0) {
+            $topHeader.find('.left.individual').addClass('hidden');
+        }
 
         $('.create-account-button').rebind('click', function () {
             if ($(this).hasClass('business-reg')) {
@@ -2151,7 +2249,7 @@ function topmenuUI() {
             var subpage;
             var subPages = [
                 'about', 'account', 'backup', 'blog', 'cmd', 'contact',
-                'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
+                'copyright', 'corporate', 'credits', 'doc', 'extensions',
                 'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp'
@@ -2195,7 +2293,8 @@ function topmenuUI() {
         return false;
     });
 
-    $topMenu.find('.top-social-bl a').rebind('click', function () {
+    $topMenu.find('.top-social-bl a').rebind('click', function (e) {
+        e.preventDefault();
         window.open($(this).attr('href'));
     });
 
@@ -2411,7 +2510,12 @@ function topmenuUI() {
     // If the main Mega M logo in the header is clicked
     $('.top-head, .fm-main').find('.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
-            loadSubPage('start');
+            if (folderlink) {
+                M.openFolder(M.RootID, true);
+            }
+            else {
+                loadSubPage(typeof u_type !== 'undefined' && parseInt(u_type) > 2 ? 'fm' : 'start');
+            }
         }
     });
 
@@ -2481,6 +2585,10 @@ function is_fm() {
     if (!r && (u_type !== false)) {
         r = page === '' || page === 'start' || page === 'index'
             || page.substr(0, 2) === 'fm' || page.substr(0, 7) === 'account';
+    }
+
+    if (!r && (page.substr(0, 5) === 'chat/' || page === "chat")) {
+        r = true;
     }
 
     if (d > 2) {
@@ -2708,6 +2816,15 @@ function loadSubPage(tpage, event) {
         else {
             history.pushState({ subpage: page }, "", "/" + page);
         }
+    }
+
+    // since hash changing above will fire popstate event, which in its turn will call
+    // loadsubpage again. We will end up in folderlinks issue when they are decrypted with a provided key.
+    if (page !== '' && page !== tpage) {
+        if (d) {
+            console.warn('LoadSubPage arrived to IF statement proving race-condition');
+        }
+        return false;
     }
 
     if (jsl.length > 0) {

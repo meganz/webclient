@@ -44,6 +44,7 @@ function CreateWorkers(url, message, size) {
                 if (d > 1) {
                     console.debug('[%s] Worker #%s finished...', wid, id);
                 }
+                worker[id].onerror = null;
                 worker[id].context = null;
                 worker[id].busy = false;
                 worker[id].tts = Date.now();
@@ -99,6 +100,7 @@ function CreateWorkers(url, message, size) {
 
     return new MegaQueue(function _(task, done) {
         var i = size;
+        var self = this;
 
         while (i--) {
             if (!worker[i] && !(worker[i] = create(i))) {
@@ -117,6 +119,18 @@ function CreateWorkers(url, message, size) {
 
         instances[i] = done;
         worker[i].busy = true;
+        worker[i].onerror = function(ex) {
+            console.warn('[%s] Worker #%s error on %s:%d, %s.',
+                wid, i, ex.filename || 0, ex.lineno | 0, ex.message || 'Failed to load', ex, task);
+
+            onIdle(_.bind(self, task, done));
+
+            try {
+                worker[i].terminate();
+            }
+            catch (e) {}
+            worker[i] = instances[i] = null;
+        };
 
         if (d > 1) {
             console.debug('[%s] Sending task to worker #%s', wid, i, task);
@@ -126,15 +140,30 @@ function CreateWorkers(url, message, size) {
             if (e === 0) {
                 worker[i].context = t;
             }
-            else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
-                worker[i].postMessage(t.buffer, [t.buffer]);
-            }
+            // Unfortunately, we had to cease to use transferables for the onerror handler to work properly..
+            // else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
+            //     worker[i].postMessage(t.buffer, [t.buffer]);
+            // }
             else {
                 if (e === 2) {
                     worker[i].byteOffset = t * 16;
                 }
 
-                worker[i].postMessage(t);
+                try {
+                    worker[i].postMessage(t);
+                }
+                catch (ex) {
+                    if (ex.name === 'DataCloneError' && t.constructor === Uint8Array) {
+                        worker[i].postMessage(t.buffer, [t.buffer]);
+                    }
+                    else {
+                        console.error(' --- FATAL UNRECOVERABLE ERROR --- ', ex);
+
+                        onIdle(function() {
+                            throw ex;
+                        });
+                    }
+                }
             }
         });
     }, size, url.split('/').pop().split('.').shift() + '-worker');

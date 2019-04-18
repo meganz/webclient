@@ -51,6 +51,9 @@
     box-shadow: 0 1px 0 0 rgba(0,0,0,0.15);
 }
 /* End of main top menu */
+.business-page .bottom-page.top-bl {
+    overflow: hidden;
+}
 i.medium-icon.business-sprite {
     background-image: url(../images/mega/business.png);
 }

@@ -129,7 +129,7 @@ var Tooltip = React.createClass({
 
             $tooltip.css({
                 'left': tooltipLeftPos,
-                'top': tooltipTopPos
+                'top': tooltipTopPos -5 // avoid image preview flashing due to arrow position
             });
             $tooltip.addClass(arrowClass);
         }

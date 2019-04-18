@@ -1,0 +1,273 @@
+@font-face {
+    font-family: 'LatoWebBlack';
+    src: url('../fonts/lato-black-ie.eot');
+    src: url('../fonts/lato-black-ie.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/lato-black-ie.woff2') format('woff2'),
+         url('../fonts/lato-black-ie.woff') format('woff'),
+         url('../fonts/lato-black-ie.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'LatoWebBold';
+    src: url('../fonts/lato-bold-ie.eot');
+    src: url('../fonts/lato-bold-ie.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/lato-bold-ie.woff2') format('woff2'),
+         url('../fonts/lato-bold-ie.woff') format('woff'),
+         url('../fonts/lato-bold-ie.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'LatoWeb';
+    src: url('../fonts/lato-regular-ie.eot');
+    src: url('../fonts/lato-regular-ie.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/lato-regular-ie.woff2') format('woff2'),
+         url('../fonts/lato-regular-ie.woff') format('woff'),
+         url('../fonts/lato-regular-ie.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'LatoWebLight';
+    src: url('../fonts/lato-light-ie.eot');
+    src: url('../fonts/lato-light-ie.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/lato-light-ie.woff2') format('woff2'),
+         url('../fonts/lato-light-ie.woff') format('woff'),
+         url('../fonts/lato-light-ie.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+ @font-face {
+    font-family: 'LatoWebSemibold';
+    src: url('../fonts/lato-semibold-ie.eot');
+    src: url('../fonts/lato-semibold-ie.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/lato-semibold-ie.woff2') format('woff2'),
+         url('../fonts/lato-semibold-ie.woff') format('woff'),
+         url('../fonts/lato-semibold-ie.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+/* All browsers except IE */
+@media all {
+    @font-face {
+        font-family: 'LatoWeb';
+        src: url('../fonts/Lato-Regular.woff2') format('woff2'),
+            url('../fonts/Lato-Regular.woff') format('woff'),
+            url('../fonts/Lato-Regular.ttf') format('truetype');
+        font-style: normal;
+        font-weight: normal;
+        text-rendering: optimizeLegibility;
+    }
+    @font-face {
+        font-family: 'LatoWebLight';
+        src: url('../fonts/Lato-Light.woff2') format('woff2'),
+            url('../fonts/Lato-Light.woff') format('woff'),
+            url('../fonts/Lato-Light.ttf') format('truetype');
+        font-style: normal;
+        font-weight: 300;
+        text-rendering: optimizeLegibility;
+    }
+    @font-face {
+        font-family: 'LatoWebSemibold';
+        src: url('../fonts/Lato-Semibold.woff2') format('woff2'),
+             url('../fonts/Lato-Semibold.woff') format('woff'),
+             url('../fonts/Lato-Semibold.ttf') format('truetype');
+        font-style: normal;
+        font-weight: normal;
+        text-rendering: optimizeLegibility;
+    }
+    @font-face {
+        font-family: 'LatoWebBlack';
+        src: url('../fonts/Lato-Black.woff2') format('woff2'),
+            url('../fonts/Lato-Black.woff') format('woff'),
+            url('../fonts/Lato-Black.ttf') format('truetype');
+        font-style: normal;
+        font-weight: normal;
+        text-rendering: optimizeLegibility;
+    }
+    @font-face {
+        font-family: 'LatoWebSemibold';
+        src: url('../fonts/Lato-Semibold.woff2') format('woff2'),
+            url('../fonts/Lato-Semibold.woff') format('woff'),
+            url('../fonts/Lato-Semibold.ttf') format('truetype');
+        font-style: normal;
+        font-weight: normal;
+        text-rendering: optimizeLegibility;
+    }
+    @font-face {
+        font-family: 'LatoWebBold';
+        src: url('../fonts/Lato-Bold.woff2') format('woff2'),
+            url('../fonts/Lato-Bold.woff') format('woff'),
+            url('../fonts/Lato-Bold.ttf') format('truetype');
+        font-style: normal;
+        font-weight: normal;
+        text-rendering: optimizeLegibility;
+    }
+}
+/* end of All browsers except IE */
+
+@font-face {
+    font-family: 'brandon_textbold_italic';
+    src: url('../fonts/brandontext-bolditalic-webfont.eot');
+    src: url('../fonts/brandontext-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/brandontext-bolditalic-webfont.woff') format('woff'),
+        url('../fonts/brandontext-bolditalic-webfont.ttf') format('truetype'),
+        url('../fonts/brandontext-bolditalic-webfont_v2.svg#brandon_textbold_italic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'brandon_textmedium';
+    src: url('../fonts/brandontext-medium-webfont.eot');
+    src: url('../fonts/brandontext-medium-webfont.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/brandontext-medium-webfont.woff') format('woff'),
+        url('../fonts/brandontext-medium-webfont.ttf') format('truetype'),
+        url('../fonts/brandontext-medium-webfont_v2.svg#brandon_textmedium') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'source_sans_probold';
+    src: url('../fonts/SourceSansPro-Bold.eot');
+    src: url('../fonts/SourceSansPro-Bold.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/SourceSansPro-Bold.woff2') format('woff2'),
+        url('../fonts/SourceSansPro-Bold.woff') format('woff'),
+        url('../fonts/SourceSansPro-Bold.ttf') format('truetype'),
+        url('../fonts/SourceSansPro-Bold.svg#source_sans_probold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'source_sans_proextralight';
+    src: url('../fonts/SourceSansPro-ExtraLight.eot');
+    src: url('../fonts/SourceSansPro-ExtraLight.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/SourceSansPro-ExtraLight.woff2') format('woff2'),
+        url('../fonts/SourceSansPro-ExtraLight.woff') format('woff'),
+        url('../fonts/SourceSansPro-ExtraLight.ttf') format('truetype'),
+        url('../fonts/SourceSansPro-ExtraLight.svg#source_sans_proextralight') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'source_sans_prolight';
+    src: url('../fonts/SourceSansPro-Light.eot');
+    src: url('../fonts/SourceSansPro-Light.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/SourceSansPro-Light.woff2') format('woff2'),
+        url('../fonts/SourceSansPro-Light.woff') format('woff'),
+        url('../fonts/SourceSansPro-Light.ttf') format('truetype'),
+        url('../fonts/SourceSansPro-Light.svg#source_sans_prolight') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'source_sans_proregular';
+    src: url('../fonts/SourceSansPro-Regular.eot');
+    src: url('../fonts/SourceSansPro-Regular.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/SourceSansPro-Regular.woff2') format('woff2'),
+        url('../fonts/SourceSansPro-Regular.woff') format('woff'),
+        url('../fonts/SourceSansPro-Regular.ttf') format('truetype'),
+        url('../fonts/SourceSansPro-Regular.svg#source_sans_proregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'source_sans_prosemibold';
+    src: url('../fonts/SourceSansPro-Semibold.eot');
+    src: url('../fonts/SourceSansPro-Semibold.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/SourceSansPro-Semibold.woff2') format('woff2'),
+        url('../fonts/SourceSansPro-Semibold.woff') format('woff'),
+        url('../fonts/SourceSansPro-Semibold.ttf') format('truetype'),
+        url('../fonts/SourceSansPro-Semibold.svg#source_sans_prosemibold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'Open Sans Semibold Italic';
+    src: url('../fonts/OpenSans-SemiboldItalic_v3.eot');
+    src: url('../fonts/OpenSans-SemiboldItalic_v3.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/OpenSans-SemiboldItalic.woff2') format('woff2'),
+        url('../fonts/OpenSans-SemiboldItalic_v3.woff') format('woff'),
+        url('../fonts/OpenSans-SemiboldItalic_v3.ttf') format('truetype'),
+        url('../fonts/OpenSans-SemiboldItalic_v3.svg#open_sanssemibold_italic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'Open Sans Italic';
+    src: url('../fonts/opensans-italic-webfont.eot');
+    src: url('../fonts/opensans-italic-webfont.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/opensans-italic-webfont.woff2') format('woff2'),
+        url('../fonts/opensans-italic-webfont.woff') format('woff'), 
+        url('../fonts/opensans-italic-webfont.ttf') format('truetype'), 
+        url('../fonts/opensans-italic-webfont.svg#open_sansitalic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'source_code_proregular';
+    src: url('../fonts/sourcecodepro-regular-webfont.eot');
+    src: url('../fonts/sourcecodepro-regular-webfont.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/sourcecodepro-regular-webfont.woff2') format('woff2'),
+        url('../fonts/sourcecodepro-regular-webfont.woff') format('woff'),
+        url('../fonts/sourcecodepro-regular-webfont.ttf') format('truetype'),
+        url('../fonts/sourcecodepro-regular-webfont.svg#source_code_proregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'VentiCF-Bold';
+    src: url('../fonts/VentiCF-Bold.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/VentiCF-Bold.otf') format('opentype'),
+        url('../fonts/VentiCF-Bold.woff') format('woff'),
+        url('../fonts/VentiCF-Bold.ttf') format('truetype'),
+        url('../fonts/VentiCF-Bold.svg#VentiCF-Bold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'montserrat';
+    src: url('../fonts/montserrat-light-webfont.eot');
+    src: url('../fonts/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/montserrat-light-webfont.woff2') format('woff2'),
+        url('../fonts/montserrat-light-webfont.woff') format('woff'),
+        url('../fonts/montserrat-light-webfont.ttf') format('truetype'),
+        url('../fonts/montserrat-light-webfont.svg#montserratlight') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'montserrat_semibold';
+    src: url('../fonts/montserrat-semibold-webfont.eot');
+    src: url('../fonts/montserrat-semibold-webfont.eot?#iefix') format('embedded-opentype'), 
+        url('../fonts/montserrat-semibold-webfont.woff2') format('woff2'), 
+        url('../fonts/montserrat-semibold-webfont.woff') format('woff'), 
+        url('../fonts/montserrat-semibold-webfont.ttf') format('truetype'), 
+        url('../fonts/montserrat-semibold-webfont.svg#montserratsemibold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'montserrat_light';
+    src: url('../fonts/montserrat-light-webfont.eot');
+    src: url('../fonts/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/montserrat-light-webfont.woff2') format('woff2'),
+        url('../fonts/montserrat-light-webfont.woff') format('woff'),
+        url('../fonts/montserrat-light-webfont.ttf') format('truetype'),
+        url('../fonts/montserrat-light-webfont.svg#montserratsemibold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+}

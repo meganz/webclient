@@ -1,6 +1,12 @@
-function isMediaSourceSupported() {
+function isStreamingEnabled() {
     'use strict';
-    return window.MediaSource && typeof MediaSource.isTypeSupported === 'function' && (!window.safari || d);
+    // return !window.safari || d;
+    return true;
+}
+
+function isMediaSourceSupported() {
+    'use strict'; // https://caniuse.com/#feat=mediasource
+    return window.MediaSource && typeof MediaSource.isTypeSupported === 'function' && isStreamingEnabled();
 }
 
 function is_video(n) {
@@ -1442,7 +1448,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         s.on('playing', function() {
             var events = {
-                'WebM': 99681, 'MPEG Audio': 99684, 'M4A ': 99687, 'Wave': 99688, 'Ogg': 99689, 'FLAC': 99712
+                'WebM': 99681, 'MPEG Audio': 99684, 'M4A ': 99687, 'Wave': 99688, 'Ogg': 99689,
+                'FLAC': 99712, 'Matroska': 99722, 'qt  ': 99725
             };
             var eid = events[s.options.type] || 99668;
 
@@ -1455,6 +1462,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             console.assert(eid !== 99668 || is_video(node) !== 2, 'This is not a video...');
             eventlog(eid);
+
+            if (/av0?1\b/i.test(s.hasVideo)) {
+                eventlog(99721, JSON.stringify([1, s.hasVideo, s.hasAudio, s.options.type]));
+            }
         });
 
         if (typeof dataURLToAB === 'function') {
@@ -2633,7 +2644,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             return 0;
         };
 
-        switch ('MediaSource' in window && container) {
+        switch (isMediaSourceSupported() && container) {
             case 'mp41':
             case 'mp42':
             case 'isom':
@@ -2643,6 +2654,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             case 'M4V ':
             case 'avc1': // JVT
             case 'f4v ': // Adobe Flash (MPEG-4 Part 12)
+            case 'qt  ':
                 if (videocodec === 'avc1') {
                     mime = 'video/mp4; codecs="avc1.640029';
 
@@ -2655,10 +2667,20 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                     return MediaSource.isTypeSupported(mime + '"') ? 1 : 0;
                 }
+                else if (videocodec === 'av01') {
+                    return MediaSource.isTypeSupported('video/mp4; codecs="av01.2.23M.12"') ? 1 : 0;
+                }
                 return canPlayMSEAudio();
 
+            case 'Matroska':
+                if (audiocodec && audiocodec !== 'A_OPUS') {
+                    return 0;
+                }
+                /* falls through */
             case 'WebM':
                 switch (mega.chrome && videocodec) {
+                    case 'V_AV1':
+                        return MediaSource.isTypeSupported('video/webm; codecs="av01.2.23M.12"') ? 1 : 0;
                     case 'V_VP8':
                     case 'V_VP9':
                         var codec = videocodec.substr(2).toLowerCase();
@@ -2779,7 +2801,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             entry = new MediaAttribute(entry);
 
             var mfa = entry.data;
-            if (!mfa || !('MediaSource' in window)) {
+            if (!mfa || !isMediaSourceSupported()) {
                 return resolve(false);
             }
 
@@ -3077,6 +3099,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             if (a && !localStorage.resetMediaAttributes) {
                 if (a.shortformat < 255) {
+                    return false;
+                }
+
+                if (this.u && this.u !== u_handle) {
+                    if (d) {
+                        console.debug('Ignoring media attribute state for non-own node...', this);
+                    }
                     return false;
                 }
 

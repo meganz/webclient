@@ -26,9 +26,9 @@
 }
 .conversation-reduce-height {
     position: relative;
-    height: -webkit-calc(100% - 37px) !important;
-    height:    -moz-calc(100% - 37px) !important;
-    height:         calc(100% - 37px) !important;
+    height: -webkit-calc(100% - 74px) !important;
+    height: -moz-calc(100% - 74px) !important;
+    height: calc(100% - 74px) !important;
 }
 .conversations-pane li {
     padding: 6px 12px;
@@ -55,19 +55,22 @@
 .user-card-name.conversation-name {
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
     color: #333333;
-    padding: 0 26px 0 0;
+    padding: 0 16px 0 0;
     float: left;
     line-height: 21px;
     max-width: 100%;
+    max-width: -webkit-calc(100% - 25px);
+    max-width: -moz-calc(100% -25px);
+    max-width: calc(100% - 25px);
     letter-spacing: -0.05px;
 }
 .user-card-name.conversation-name.group {
     padding: 0;
 }
-.conversation-name .user-card-presence {
-    margin: 8px 0 0 0;
+.user-card-name.conversation-name .user-card-presence {
+    margin: 8px 2px 0 6px;
     position: absolute;
-    right: 8px;
+    right: 0;
 }
 .conversation-message {
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
@@ -98,33 +101,11 @@
 .conversations-pane li.active .date-time {
     color: white;
 }
-
-.conversations-pane li.active .user-card-name.conversation-name {
-    padding-right: 20px;
-}
-
-.conversations-pane li.active .user-card-presence:before {
+.conversations-pane li.active .user-card-presence {
     -webkit-box-shadow: 0px 0px 0px 2px #FFFFFF;
     -moz-box-shadow: 0px 0px 0px 2px #FFFFFF;
     box-shadow: 0px 0px 0px 2px #FFFFFF;
 }
-
-.conversations-pane li.active .user-card-presence {
-    content: '';
-    width: 10px;
-    height: 10px;
-    border: 2px solid rgb(250, 250, 250);
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    margin-top: 5.5px;
-    right: 0;
-    margin-left: -2px;
-}
-
 .unread-messages {
     position: absolute;
     right: 12px;
@@ -191,13 +172,11 @@
     margin-right: 150px;
 }
 
-.arc-conversation-btn-block {
-    position: absolute;
-    bottom: 0;
+.left-pane-button {
     height: 36px;
     background-color: white;
-    width: 100%;
     box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
+    margin-top: 1px;
     cursor: pointer;
     -webkit-transition: all 300ms ease;
     -moz-transition: all 300ms ease;
@@ -205,23 +184,21 @@
     -o-transition: all 300ms ease;
     transition: all 300ms ease;
 }
-.arc-conversation-btn-block:hover {
-    background-color: rgb(248, 233, 177, 0.05);
-    -webkit-transition: all 300ms ease;
-    -moz-transition: all 300ms ease;
-    -ms-transition: all 300ms ease;
-    -o-transition: all 300ms ease;
-    transition: all 300ms ease;
+.left-pane-button.archived:hover {
+    background-color: rgba(248, 233, 177, 0.05);
 }
-.arc-conversation-btn-block.active {
+.left-pane-button.new-link:hover {
+    background-color: rgba(173, 234, 251, 0.03);
+}
+.left-pane-button.archived.active {
     background-color: #66BCE3;
 }
-.arc-conversation-icon {
+.left-pane-button i {
     display: inline-block;
     margin: 8px 12px;
     float:left;
 }
-.arc-conversation-heading {
+.left-pane-button .heading {
     display: inline-block;
     float:left;
     font-size: 13px;
@@ -229,10 +206,10 @@
     color: #333333;
     font-family: 'LatoWeb', 'source_sans_proregular';
 }
-.arc-conversation-btn-block.active .arc-conversation-heading {
+.left-pane-button.archived.active .heading {
     color: #fff;
 }
-.arc-conversation-number {
+.left-pane-button .indicator {
     float: right;
     font-size: 11px;
     line-height: 16px;
@@ -243,7 +220,7 @@
     border-radius: 4px;
     margin: 10px 12px;
 }
-.arc-conversation-btn-block.active .arc-conversation-number {
+.left-pane-button.archived.active .indicator {
     color: #66BCE3;
     background-color: #fff;
 }
@@ -304,4 +281,11 @@
     -ms-animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite; /* Internet Explorer */
     -o-animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite; /* Opera < 12.1 */
     animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite;
+}
+
+/* Private Chat Styles */
+.privateChat + .tiny-icon.blue-key {
+    position: absolute;
+    right: 12px;
+    top: 8px;
 }

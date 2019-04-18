@@ -181,7 +181,8 @@ Object.defineProperty(mega, 'achievem', {
         /*  5 */ 'APPINSTALL'  : 'ach-install-mobile-app:/mobile',
         /*  6 */ 'VERIFYE164'  : 'ach-verify-number',
         /*  7 */ 'GROUPCHAT'   : 'ach-group-chat:/fm/chat',
-        /*  8 */ 'FOLDERSHARE' : 'ach-share-folder:/fm/contacts'
+        /*  8 */ 'FOLDERSHARE' : 'ach-share-folder:/fm/contacts',
+        /*  9 */ 'SMSVERIFY'   : 'ach-sms-verification:~smsVerifyDialog'
     };
     var mapToAction = Object.create(null);
     var mapToElement = Object.create(null);
@@ -448,9 +449,14 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
                         .removeClass('red')
                         .safeHTML('%n', locFmt, data.expiry.value, data.expiry.utxt);
                 }
-                
+
                 ach.bind.call($('.default-green-button', $cell), ach.mapToAction[idx]);
                 $cell.removeClass('hidden');
+
+                // If this is the SMS achievement, and SMS achievements are not enabled yet, hide the container
+                if (selector === 'ach-sms-verification' && u_attr.flags.smsve !== 2) {
+                    $cell.addClass('hidden');
+                }
             }
         }
     }
@@ -514,7 +520,7 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
     var $dialog = $('.fm-dialog.invite-dialog');
 
     if (close) {
-        closeDialog();
+        showWarningTokenInputLose().done(closeDialog);
         return true;
     }
 
@@ -584,6 +590,16 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
     else {
         $('.default-white-button.inline.status', $dialog).addClass('hidden');
     }
+};
+
+/**
+ * Load the SMS phone verification dialog
+ */
+mega.achievem.smsVerifyDialog = function () {
+
+    'use strict';
+
+    sms.phoneInput.init();
 };
 
 mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiInputPlugin() {
@@ -729,7 +745,7 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
                 .removeClass('red').trigger('focus');
         }, timeOut);
     }
-    
+
     // Invite dialog back button click event handler
     $('.fm-dialog.invite-dialog .button.back').rebind('click', function() {
         var $dialog = $('.fm-dialog.invite-dialog');

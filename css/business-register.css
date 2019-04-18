@@ -67,7 +67,7 @@
 	width: 100%;
 }
 .bus-reg-icon {
-    background-image: url(../images/mega/top-sprite_v5.png);
+    background-image: url(../images/mega/top-sprite_v6.png);
     width: 24px;
     height: 24px;
 }
@@ -326,7 +326,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	width: 24px;
 	height: 24px;
 	background-position: -93px -414px;
-    background-image: url(../images/mega/big-icons_v2.png);
+    background-image: url(../images/mega/big-icons_v3.png);
     display: inline-block;
     margin-left: 12px;
     margin-top: 12px;
@@ -352,7 +352,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	width: 64px;
 	height: 64px;
 	background-position: -128px -339px;
-    background-image: url(../images/mega/big-icons_v2.png);
+    background-image: url(../images/mega/big-icons_v3.png);
     background-repeat: no-repeat;
 	margin:40px auto 0;
 }
@@ -477,7 +477,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	width: 100px;
 	height: 100px;
 	margin: auto;
-	background-image: url(../images/mega/big-icons_v2.png);
+	background-image: url(../images/mega/big-icons_v3.png);
     background-repeat: no-repeat;
 }
 
@@ -488,6 +488,14 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	font-size: 16px;
 	line-height: 28px;
 	text-align: center;
+}
+
+.bus-reg-featureTxt a {
+    color: #F0373B;
+}
+
+.bus-reg-featureTxt a:hover {
+    text-decoration: underline;
 }
 
 .ky-icon {
@@ -527,7 +535,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 .bus-confirm-body .bus-confirmImg {
 	width:160px;
 	height: 120px;
-	background-image: url(../images/mega/big-icons_v2.png);
+	background-image: url(../images/mega/big-icons_v3.png);
     background-repeat: no-repeat;
     background-position: -16px -809px;
 	margin:0 auto 48px auto;

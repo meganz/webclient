@@ -98,12 +98,15 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm24_';
+    var dbpfx = 'fm25_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
     fmdb.inval_cb = false;
     fmdb.inval_ready = false;
+
+    // Make the database name dependent on the current schema.
+    dbpfx += MurmurHash3(JSON.stringify(this.schema), 0x6f01f).toString(16);
 
     // Notify completion invoking the provided callback
     var resolve = function(sn, error) {
@@ -120,6 +123,8 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                         fmdb.db = false;
                     });
                 }
+
+                eventlog(99724, '$init:' + error, true);
             }
 
             result(sn);
@@ -447,6 +452,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     fmdb.logger.error("Transaction failed, marking DB as crashed", e);
                     fmdb.state = -1;
                     fmdb.invalidate();
+
+                    eventlog(99724, '$wptr:' + e, true);
                 }
             });
     }
@@ -478,6 +485,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     fmdb.logger.error("SN clearing failed, marking DB as crashed", e);
                     fmdb.state = -1;
                     fmdb.invalidate();
+
+                    eventlog(99724, '$wpsn:' + e, true);
                 });
 
             }
@@ -607,6 +616,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     if (d) {
                         fmdb.logger.warn('Marked DB as crashed...', e.name);
                     }
+
+                    eventlog(99724, String(e), true);
                 });
 
                 // we don't send more than one transaction (looking at you, Microsoft!)
@@ -656,6 +667,9 @@ FMDB.prototype.strdecrypt = function fmdb_strdecrypt(ab) {
     var s = from8(a32_to_str(decrypt_key(u_k_aes, a32)));
     for (var i = s.length; i--; ) if (s.charCodeAt(i)) return s.substr(0, i+1);
 };
+
+// TODO: @lp/@diego we need to move this to some other place...
+FMDB._mcfCache = {};
 
 // remove fields that are duplicated in or can be inferred from the index to reduce database size
 FMDB.prototype.stripnode = Object.freeze({
@@ -723,6 +737,40 @@ FMDB.prototype.stripnode = Object.freeze({
 
     ua : function(ua, index) {
         delete ua.k;
+    },
+    mcf: function(mcfResponse) {
+        var newMcf = {};
+        // mcfResponse may contain 'undefined' values, which should NOT be set, otherwise they may replace the mcfCache
+        var keys = [
+            'id',
+            'cs',
+            'g',
+            'u',
+            'ts',
+            'ct',
+            'ck',
+            'f',
+            'm',
+        ];
+        for (var idx in keys) {
+            var k = keys[idx];
+            if (typeof mcfResponse[k] !== 'undefined') {
+                newMcf[k] = mcfResponse[k];
+            }
+        }
+
+        var t = {
+            'ou': mcfResponse.ou,
+            'n': mcfResponse.n,
+            'url': mcfResponse.url
+        };
+        delete mcfResponse.ou;
+        delete mcfResponse.url;
+        delete mcfResponse.n;
+
+        FMDB._mcfCache[newMcf.id] = Object.assign({}, FMDB._mcfCache[mcfResponse.id], newMcf);
+        Object.assign(mcfResponse, FMDB._mcfCache[newMcf.id]);
+        return t;
     }
 });
 
@@ -767,6 +815,11 @@ FMDB.prototype.restorenode = Object.freeze({
 
     mk : function(mk, index) {
         mk.h = index.h;
+    },
+
+    mcf: function(mcf, index) {
+        // fill cache.
+        FMDB._mcfCache[mcf.id] = mcf;
     }
 });
 
@@ -1163,7 +1216,7 @@ FMDB.prototype.invalidate = function fmdb_invalidate(cb, readop) {
     this.inval_cb = cb;
 
     // force a non-treecache on the next load
-    localStorage.force = 1;
+    // localStorage.force = 1;
 };
 
 // checks if crashed or being used by another tab concurrently

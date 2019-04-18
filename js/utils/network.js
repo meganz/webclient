@@ -150,7 +150,17 @@ function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
 
                 promise.reject(res && res.e || res);
             };
-            var req = {a: 'g', g: 1, v: 2, ssl: use_ssl};
+            var req = {a: 'g', g: 1, ssl: use_ssl};
+
+            if (window.fetchStreamSupport) {
+                // can handle CloudRAID downloads.
+                req.v = 2;
+            }
+
+            // IF this is an anonymous chat OR a chat that I'm not a part of
+            if (M.chat && megaChatIsReady) {
+                megaChat.eventuallyAddDldTicketToReq(req);
+            }
 
             if (!key) {
                 req.n = handle;

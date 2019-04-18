@@ -178,9 +178,6 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
     obj._dataChangeIndex = 0;
     obj._dataChangeTrackedId = _trackedId++;
 
-
-
-
     obj.trackDataChange = function() {
         var self = this;
 
@@ -419,12 +416,7 @@ var MegaDataMap = function(parent) {
 
 MegaDataMap.prototype.exists = function(keyValue) {
     var self = this;
-    if (typeof(self._data[keyValue]) !== 'undefined') {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (typeof(self._data[keyValue]) !== 'undefined');
 };
 
 MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
@@ -521,9 +513,8 @@ MegaDataSortedMap.prototype.replace = function(k, newValue) {
         self.push(newValue);
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 };
 
 MegaDataSortedMap.prototype.getComparator = function() {
@@ -622,7 +613,7 @@ MegaDataSortedMap.prototype.push = function(v) {
     return self._sortedVals.length;
 };
 
-MegaDataSortedMap.prototype.removeByKey = function(keyValue) {
+MegaDataSortedMap.prototype.removeByKey = MegaDataSortedMap.prototype.remove = function(keyValue) {
     var self = this;
 
     if (self._data[keyValue]) {
@@ -632,20 +623,14 @@ MegaDataSortedMap.prototype.removeByKey = function(keyValue) {
         self.trackDataChange();
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 };
 
 
 MegaDataSortedMap.prototype.exists = function(keyValue) {
     var self = this;
-    if (self._data[keyValue]) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (self._data[keyValue] ? true : false);
 };
 
 MegaDataSortedMap.prototype.keys = function() {
@@ -667,28 +652,12 @@ MegaDataSortedMap.prototype.getItem = function(num) {
     var self = this;
 
     var foundKeyVal = self._sortedVals[num];
-    if (foundKeyVal) {
-        return self._data[foundKeyVal];
-    }
-    else {
-        return undefined;
-    }
+    return (foundKeyVal ? self._data[foundKeyVal] : undefined);
 };
-
 
 MegaDataSortedMap.prototype.indexOfKey = function(value) {
     var self = this;
     return self._sortedVals.indexOf(value);
-};
-
-
-/**
- * Alias of .removeByKey
- *
- * @param k
- */
-MegaDataSortedMap.prototype.remove = function(k) {
-    return this.removeByKey(k);
 };
 
 MegaDataSortedMap.prototype.clear = function() {

@@ -1,26 +1,8 @@
-var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require('./../../ui/utils.jsx');
-var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
-var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
-var ButtonsUI = require('./../../ui/buttons.jsx');
-var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
-var CloudBrowserModalDialog = require('./../../ui/cloudBrowserModalDialog.jsx');
-var DropdownsUI = require('./../../ui/dropdowns.jsx');
-var ContactsUI = require('./../ui/contacts.jsx');
-var ConversationsUI = require('./../ui/conversations.jsx');
-var TypingAreaUI = require('./../ui/typingArea.jsx');
-var WhosTyping = require('./whosTyping.jsx').WhosTyping;
-var getMessageString = require('./messages/utils.jsx').getMessageString;
-var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
-var ParticipantsList = require('./participantsList.jsx').ParticipantsList;
-
-var GenericConversationMessage = require('./messages/generic.jsx').GenericConversationMessage;
-var AlterParticipantsConversationMessage =
-    require('./messages/alterParticipants.jsx').AlterParticipantsConversationMessage;
-var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
-var PrivilegeChange = require('./messages/privilegeChange.jsx').PrivilegeChange;
-var TopicChange = require('./messages/topicChange.jsx').TopicChange;
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { RenderDebugger, MegaRenderMixin } from './../../stores/mixins.js';
+import ContactsUI from './../ui/contacts.jsx';
+import { EmojiFormattedContent } from './../../ui/utils.jsx';
 
 var DEBUG_PARTICIPANTS_MULTIPLICATOR = 1;
 
@@ -614,7 +596,7 @@ var ConversationAudioVideoPanel = React.createClass({
         var localPlayerElement = null;
         var remotePlayerElement = null;
         var activeStreamIdOrPlayer = (
-            chatRoom.type === "group" && self.getViewMode() === VIEW_MODES.CAROUSEL ?
+            (chatRoom.type === "group" || chatRoom.type === "public") && self.getViewMode() === VIEW_MODES.CAROUSEL ?
                 self.getCurrentStreamId() :
                 false
         );
@@ -913,47 +895,55 @@ var ConversationAudioVideoPanel = React.createClass({
         }
 
 
-        if (chatRoom.type === "group") {
-            header = <div className="call-header">
-                <div className="call-topic">{ellipsis(chatRoom.getRoomTitle(), 'end', 70)}</div>
-                <div className="call-participants-count">{Object.keys(chatRoom.callParticipants).length}</div>
+        if (chatRoom.type === "group" || chatRoom.type === "public") {
+            header = (
+                <div className="call-header">
+                    <div className="call-topic">
+                        <EmojiFormattedContent>
+                            {ellipsis(chatRoom.getRoomTitle(), 'end', 70)}
+                        </EmojiFormattedContent>
+                    </div>
+                    <div className="call-participants-count">
+                        {Object.keys(chatRoom.callParticipants).length}
+                    </div>
 
-                <a href="javascript:;" className={
-                    "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") +
-                    (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : "")
-                } onClick={function(e) {
-                    if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
-                        return;
-                    }
+                    <a href="javascript:;" className={
+                        "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") +
+                        (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : "")
+                    } onClick={function(e) {
+                        if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
+                            return;
+                        }
 
-                    self.setState({
-                        'selectedStreamSid': false,
-                        'viewMode':
-                            self.getViewMode() === VIEW_MODES.GRID ?
-                                VIEW_MODES.CAROUSEL :
-                                VIEW_MODES.GRID
-                    });
-                }}></a>
-                <div className={"call-av-counter" + (
-                    videoSessionCount >= RtcModule.kMaxCallVideoSenders ? " limit-reached" : ""
-                )}>{videoSessionCount} / {RtcModule.kMaxCallVideoSenders}</div>
+                        self.setState({
+                            'selectedStreamSid': false,
+                            'viewMode':
+                                self.getViewMode() === VIEW_MODES.GRID ?
+                                    VIEW_MODES.CAROUSEL :
+                                    VIEW_MODES.GRID
+                        });
+                    }}></a>
+                    <div className={"call-av-counter" + (
+                        videoSessionCount >= RtcModule.kMaxCallVideoSenders ? " limit-reached" : ""
+                    )}>{videoSessionCount} / {RtcModule.kMaxCallVideoSenders}</div>
 
-                <div className={
-                    "call-video-icon" + (
-                        chatRoom.callManagerCall.hasVideoSlotLimitReached() ? " call-video-icon-warn" : ""
-                    )}></div>
-                <div className="call-header-duration"
-                     data-room-id={chatRoom.chatId}>
-                    {secondsToTimeShort(chatRoom._currentCallCounter)}
+                    <div 
+                        className={
+                            "call-video-icon" + (
+                                chatRoom.callManagerCall.hasVideoSlotLimitReached() ? " call-video-icon-warn" : ""
+                        )}>
+                    </div>
+                    <div className="call-header-duration"
+                        data-room-id={chatRoom.chatId}>
+                        {secondsToTimeShort(chatRoom._currentCallCounter)}
+                    </div>
                 </div>
-
-
-            </div>;
+            );
         }
 
         var notifBar = null;
 
-        if (chatRoom.type === "group") {
+        if (chatRoom.type === "group" || chatRoom.type === "public") {
             var notif = chatRoom.callManagerCall.callNotificationsEngine.getCurrentNotification();
 
             if (!chatRoom.callManagerCall.callNotificationsEngine._bound) {

@@ -119,8 +119,8 @@ var ContactButton = React.createClass({
                 if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
                     moreDropdowns.push(
                         <DropdownsUI.DropdownItem
-                            key="startCall" className="contains-submenu" icon="context handset" label={__(l[19125])} onClick={() => {
-
+                            key="startCall" className="contains-submenu" icon="context handset" label={__(l[19125])}
+                            onClick={() => {
                                 megaChat.createAndShowPrivateRoomFor(contact.u)
                                     .then(function(room) {
                                         room.setActive();
@@ -133,21 +133,21 @@ var ContactButton = React.createClass({
                             <div>
                                 <DropdownsUI.DropdownItem
                                         key="startAudio" icon="context handset" label={__(l[1565])} onClick={() => {
-                                    megaChat.createAndShowPrivateRoomFor(contact.u)
-                                        .then(function(room) {
-                                            room.setActive();
-                                            room.startAudioCall();
-                                        });
+                                            megaChat.createAndShowPrivateRoomFor(contact.u)
+                                                .then(function(room) {
+                                                    room.setActive();
+                                                    room.startAudioCall();
+                                                });
                                         }} />
                             </div>
                             <div>
                                 <DropdownsUI.DropdownItem
                                     key="startVideo" icon="context videocam" label={__(l[1566])} onClick={() => {
-                                    megaChat.createAndShowPrivateRoomFor(contact.u)
-                                        .then(function(room) {
-                                            room.setActive();
-                                            room.startVideoCall();
-                                        });
+                                        megaChat.createAndShowPrivateRoomFor(contact.u)
+                                            .then(function(room) {
+                                                room.setActive();
+                                                room.startVideoCall();
+                                            });
                                     }} />
                             </div>
                         </div>
@@ -157,7 +157,7 @@ var ContactButton = React.createClass({
                     moreDropdowns.push(
                             <DropdownsUI.DropdownItem
                                 key="startChat" icon="context conversation" label={__(l[5885])} onClick={() => {
-                                    loadSubPage('fm/chat/' + contact.u);
+                                    loadSubPage('fm/chat/p/' + contact.u);
                                 }} />
                     );
                 }
@@ -185,6 +185,10 @@ var ContactButton = React.createClass({
                         key="view2" icon="small-icon icons-sprite grey-plus" label={__(l[101])} onClick={() => {
                         loadingDialog.show();
 
+                        if (anonymouschat && (!u_handle || u_type !== 3)) {
+                            megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
+                            return;
+                        }
                         M.syncContactEmail(contact.u)
                             .done(function(email) {
                                 var exists = false;
@@ -321,7 +325,7 @@ var ContactFingerprint = React.createClass({
     render: function() {
         var self = this;
         var contact = this.props.contact;
-        if (!contact || !contact.u) {
+        if (!contact || !contact.u || anonymouschat) {
             return null;
         }
 
@@ -351,7 +355,6 @@ var ContactFingerprint = React.createClass({
                     icon="grey-key"
                     onClick={() => {
                         $(document).trigger('closeDropdowns');
-
                         fingerprintDialog(contact.u);
                     }} />
             }
@@ -393,7 +396,9 @@ var Avatar = React.createClass({
 
         var avatarMeta = useravatar.generateContactAvatarMeta(contact);
 
-        var classes = (this.props.className ? this.props.className : ' avatar-wrapper small-rounded-avatar') + ' ' + contact.u;
+        var classes = (
+            this.props.className ? this.props.className : ' avatar-wrapper small-rounded-avatar'
+        ) + ' ' + contact.u + ' in-chat';
 
         classes += " chat-avatar";
 
@@ -402,12 +407,12 @@ var Avatar = React.createClass({
 
         var verifiedElement = null;
 
-        if (!this.props.hideVerifiedBadge) {
+        if (!this.props.hideVerifiedBadge && !anonymouschat) {
             verifiedElement = <ContactVerified contact={this.props.contact} className={this.props.verifiedClassName} />
         }
 
         if (!avatars[contact.u] && !_noAvatars[contact.u]) {
-            useravatar.loadAvatar(contact.u)
+            useravatar.loadAvatar(contact.u, pchandle)
                 .done(function() {
                     self.safeForceUpdate();
                 })
@@ -522,13 +527,16 @@ var ContactCard = React.createClass({
             (this.props.megaChat ? this.props.megaChat : window.megaChat).userPresenceToCssClass(contact.presence);
         var avatarMeta = generateAvatarMeta(contact.u);
         var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
+        if (contact.u == u_handle) {
+            username += " (Me)";
+        }
         var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
         var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
         var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
         var dropdownRemoveButton = self.props.dropdownRemoveButton ? self.props.dropdownRemoveButton : [];
 
         var usernameBlock;
-        if (!noContextMenu) {
+        if (!noContextMenu && !anonymouschat) {
             usernameBlock = <ContactButton key="lnk" dropdowns={dropdowns}
                     noContextMenu={noContextMenu}
                     contact={contact}
@@ -542,7 +550,8 @@ var ContactCard = React.createClass({
         }
 
         var userCard = null;
-        if (this.props.className === "short") {
+        var className = this.props.className || "";
+        if (className.indexOf("short") >=0) {
             var presenceRow;
             var lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
             if (this.props.showLastGreen && contact.presence <= 2 && lastActivity) {
@@ -553,28 +562,46 @@ var ContactCard = React.createClass({
             }
 
             userCard = <div className="user-card-data">
-                    {usernameBlock}
-                    <div className="user-card-status">
-                        <ContactPresence contact={contact} className={this.props.presenceClassName}/>
-                        {presenceRow}
-                    </div>
+                {usernameBlock}
+                <div className="user-card-status">
+                    <ContactPresence contact={contact} className={this.props.presenceClassName}/>
+                    {
+                        this.props.isInCall ?
+                            <i className="small-icon audio-call"></i> :
+                            null
+                    }
+                    {presenceRow}
                 </div>
+            </div>
         }
         else {
             userCard = <div className="user-card-data">
-                    {usernameBlock}
-                    <ContactPresence contact={contact} className={this.props.presenceClassName}/>
-                    <div className="user-card-email">{contact.m}</div>
-                </div>
+                {usernameBlock}
+                <ContactPresence contact={contact} className={this.props.presenceClassName}/>
+                {
+                    this.props.isInCall ?
+                        <i className="small-icon audio-call"></i> :
+                        null
+                }
+                <div className="user-card-email">{contact.m}</div>
+            </div>
+        }
+
+        var selectionTick = null;
+        if (this.props.selectable) {
+            selectionTick = <div className="user-card-tick-wrap">
+                <i className="small-icon mid-green-tick"></i>
+            </div>
         }
 
         return <div
                     className={
                         "contacts-info body " +
                         (pres === "offline" ? "offline" : "") +
-                        (this.props.className ? " " + this.props.className : "")
+                        (className ? " " + className : "")
                     }
                     onClick={(e) => {
+
                         if (self.props.onClick) {
                             self.props.onClick(contact, e);
                         }
@@ -589,20 +616,20 @@ var ContactCard = React.createClass({
                 <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar" />
 
                 {
-                    noContextButton? null : <ContactButton key="button"
-                                dropdowns={dropdowns}
-                                dropdownIconClasses={self.props.dropdownIconClasses ?
-                                    self.props.dropdownIconClasses : ""}
-                                disabled={self.props.dropdownDisabled}
-                                noContextMenu={noContextMenu}
-                                contact={contact}
-                                className={self.props.dropdownButtonClasses}
-                                dropdownRemoveButton={dropdownRemoveButton}
-                                megaChat={self.props.megaChat ? this.props.megaChat : window.megaChat}
+                    anonymouschat || noContextButton ? null :
+                        <ContactButton key="button"
+                             dropdowns={dropdowns}
+                             dropdownIconClasses={self.props.dropdownIconClasses ? self.props.dropdownIconClasses : ""}
+                             disabled={self.props.dropdownDisabled}
+                             noContextMenu={noContextMenu}
+                             contact={contact}
+                             className={self.props.dropdownButtonClasses}
+                             dropdownRemoveButton={dropdownRemoveButton}
+                             megaChat={self.props.megaChat ? this.props.megaChat : window.megaChat}
                         />
                 }
-
-            {userCard}
+                {selectionTick}
+                {userCard}
             </div>;
     }
 });
@@ -620,16 +647,15 @@ var ContactItem = React.createClass({
 
         var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
 
-        return <div className="selected-contact-card">
+        return <div className="selected-contact-card short">
             <div className="remove-contact-bttn"  onClick={(e) => {
                         if (self.props.onClick) {
                             self.props.onClick(contact, e);
                         }
                     }}>
-                <div className="remove-contact-icon">
-                </div>
+                <i className="tiny-icon small-cross"></i>
             </div>
-            <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar"/>
+            <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar" hideVerifiedBadge={true} />
             <div className="user-card-data">
                     <ContactButton contact={contact} className="light" label={username} />
             </div>
@@ -642,19 +668,23 @@ var ContactPickerWidget = React.createClass({
     getInitialState: function() {
         return {
             'searchValue': '',
-            'selected': false,
+            'selected': this.props.selected || false,
         }
     },
     getDefaultProps: function() {
         return {
             multipleSelectedButtonLabel: false,
             singleSelectedButtonLabel: false,
-            nothingSelectedButtonLabel: false
+            nothingSelectedButtonLabel: false,
+            allowEmpty: false
         }
     },
     onSearchChange: function(e) {
         var self = this;
         self.setState({searchValue: e.target.value});
+    },
+    componentDidMount: function() {
+        setContactLink();
     },
     componentDidUpdate: function() {
 
@@ -665,6 +695,7 @@ var ContactPickerWidget = React.createClass({
             self.psSelected.scrollToPercentX(100, false);
         }
 
+        setContactLink();
     },
     componentWillMount: function() {
         var self = this;
@@ -686,26 +717,151 @@ var ContactPickerWidget = React.createClass({
                         }
                     }
                 }
-            })
+            });
         }
+
+        self._frequents = megaChat.getFrequentContacts();
+        self._frequents.always(function(r) {
+            self._foundFrequents = r.reverse().splice(0, 30);
+            self.safeForceUpdate();
+        });
     },
     componentWillUnmount: function() {
         var self = this;
+
+        delete self._foundFrequents;
+        delete self._frequents;
 
         if (self.props.multiple) {
             $(document.body).off('keypress.contactPicker' + self.getUniqueId());
         }
     },
+    _eventuallyAddContact: function (v, contacts, selectableContacts, forced) {
+        var self = this;
+        if (self.props.exclude && self.props.exclude.indexOf(v.u) > -1) {
+            // continue;
+            return false;
+        }
+
+        var pres = self.props.megaChat.getPresence(
+            v.u
+        );
+
+        if (!forced && (v.c != 1 || v.u == u_handle)) {
+            return false;
+        }
+
+        var avatarMeta = generateAvatarMeta(v.u);
+
+        if (self.state.searchValue && self.state.searchValue.length > 0) {
+            // DON'T add to the contacts list if the contact's name or email does not match the search value
+            if (
+                avatarMeta.fullName.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1 &&
+                v.m.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1
+            ) {
+                return false;
+            }
+        }
+
+
+        if (pres === "chat") {
+            pres = "online";
+        }
+
+        var selectedClass = "";
+        if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
+            selectedClass = "selected";
+        }
+
+        contacts.push(
+            <ContactCard
+                contact={v}
+                className={"contacts-search short " + selectedClass}
+                noContextButton="true"
+                selectable={selectableContacts}
+                onClick={self.props.readOnly ? () => {} : (contact, e) => {
+                    var contactHash = contact.u;
+
+                    // differentiate between a click and a double click.
+                    if (
+                        (contactHash === self.lastClicked && (new Date() - self.clickTime) < 500) ||
+                        !self.props.multiple
+                    ) {
+                        // is a double click
+                        if (self.props.onSelected) {
+                            self.props.onSelected([contactHash]);
+                        }
+                        self.props.onSelectDone([contactHash]);
+                        return;
+                    }
+                    else {
+                        var selected = clone(self.state.selected || []);
+
+                        // is a single click
+                        if (selected.indexOf(contactHash) === -1) {
+                            selected.push(contactHash);
+                            // only set the scrollToLastSelected if a contact was added,
+                            // so that the user can scroll left/right and remove contacts
+                            // form the list using the X buttons in the UI.
+                            self.scrollToLastSelected = true;
+                            if (self.props.onSelected) {
+                                self.props.onSelected(selected);
+                            }
+                        }
+                        else {
+                            if (selected.indexOf(contactHash) >= 0) {
+                                array.remove(selected, contactHash);
+                            }
+                            if (self.props.onSelected) {
+                                self.props.onSelected(selected);
+                            }
+                        }
+                        self.setState({'selected': selected});
+                        self.setState({'searchValue': ''});
+                        self.refs.contactSearchField.focus();
+                    }
+                    self.clickTime = new Date();
+                    self.lastClicked = contactHash;
+                }}
+                noContextMenu={true}
+                key={v.u}
+            />
+        );
+        return true;
+    },
     render: function() {
         var self = this;
 
         var contacts = [];
+        var frequentContacts = [];
+        var extraClasses = "";
 
         var contactsSelected = [];
 
-        var footer = null;
+        var multipleContacts = null;
+        var topButtons = null;
+        var selectableContacts = false;
+        var selectFooter = null;
+        var selectedContacts = false;
+        var isSearching = !!self.state.searchValue;
 
-        if (self.props.multiple) {
+
+        var onAddContact = (e) => {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            contactAddDialog();
+        };
+
+        if (self.props.readOnly) {
+            (self.state.selected || []).forEach(function (v, k) {
+                contactsSelected.push(<ContactItem contact={self.props.contacts[v]} key={v} />);
+            });
+        }
+        else if (self.props.multiple) {
+            selectableContacts = true;
+
             var onSelectDoneCb = (e) => {
 
                 e.preventDefault();
@@ -716,17 +872,6 @@ var ContactPickerWidget = React.createClass({
                 if (self.props.onSelectDone) {
                     self.props.onSelectDone(self.state.selected);
                 }
-            };
-            var clearSearch = (e) => {
-                self.setState({searchValue: ''});
-                self.refs.contactSearchField.focus();
-            };
-            var onAddContact = (e) => {
-
-                e.preventDefault();
-                e.stopPropagation();
-
-                contactAddDialog();
             };
             var onContactSelectDoneCb = (contact, e) => {
 
@@ -771,34 +916,29 @@ var ContactPickerWidget = React.createClass({
                 self.lastClicked = contactHash;
             };
             var selectedWidth = self.state.selected.length * 54;
+
             if (!self.state.selected || self.state.selected.length === 0) {
-                footer = <div className="fm-dialog-footer">
-                    <a href="javascript:;" className="default-white-button left" onClick={onAddContact}>
-                        {l[71]}
-                    </a>
-                    <div className="fm-dialog-footer-txt right">{
+                selectedContacts = false;
+
+                multipleContacts = <div className="horizontal-contacts-list">
+                    <div className="contacts-list-empty-txt">{
                         self.props.nothingSelectedButtonLabel ?
                             self.props.nothingSelectedButtonLabel
-                            :
-                            __(l[8889])
+                            : l[8889]
                     }</div>
                 </div>;
             }
             else {
+                selectedContacts = true;
+
                 (self.state.selected || []).forEach(function (v, k) {
                     contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
                                                        key={v}
                     />);
                 });
 
-                var buttonLabel = self.props.multipleSelectedButtonLabel;
-
-                if (!buttonLabel) {
-                    buttonLabel = self.state.selected.length === 1 ? __(l[5885]) : __(l[8890]);
-                }
-
-                footer =
-                    <div className="contacts-search-footer">
+                multipleContacts =
+                    <div className="horizontal-contacts-list">
                         <PerfectScrollbar className="perfectScrollbarContainer selected-contact-block horizontal-only"
                                           selected={this.state.selected}
                                           ref={function (psSelected) {
@@ -808,143 +948,208 @@ var ContactPickerWidget = React.createClass({
                                 {contactsSelected}
                             </div>
                         </PerfectScrollbar>
-                        <div className="fm-dialog-footer">
-                            <span className="selected-contact-amount">
-                                {self.state.selected.length} contacts selected
-                            </span>
-                            <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
-                                {buttonLabel}
-                            </a>
-                        </div>
                     </div>;
             }
+
+            if (self.props.selectFooter) {
+
+                selectFooter = <div className="fm-dialog-footer">
+                    <a href="javascript:;" className="default-white-button left" onClick={onAddContact}>
+                        {l[71]}
+                    </a>
+
+                    <a href="javascript:;" className={"default-grey-button right " + (!selectedContacts ? "disabled" : "")}
+                        onClick = {function(e) {
+                                if (self.state.selected.length > 0) {
+                                    onSelectDoneCb(e);
+                                }
+                            }}>
+                        {
+                            this.props.multipleSelectedButtonLabel ?
+                                this.props.multipleSelectedButtonLabel
+                                : l[8890]
+                        }
+                    </a>
+                </div>;
+            }
         }
 
+        if (self.props.showTopButtons) {
+            var _topButtons = [];
+
+            self.props.showTopButtons.forEach(function(button) {
+                _topButtons.push(
+                    <div className={"link-button light"} key={button.key} onClick = {function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        // trigger dropdown close.
+                        $(document).trigger('closeDropdowns');
+
+                        button.onClick(e);
+                    }}>
+                        <i className={"small-icon " + button.icon}></i>
+                        {button.title}
+                    </div>
+                )
+            });
+            topButtons = <div className="contacts-search-buttons">
+                {_topButtons}
+            </div>;
+        }
+
+        var alreadyAdded = {};
+        var hideFrequents = !self.props.readOnly && !self.state.searchValue && frequentContacts.length > 0;
+        var frequentsLoading = false;
+        if (self._frequents && !self._foundFrequents) {
+            if (self._frequents.state() === 'pending') {
+                hideFrequents = false;
+                frequentsLoading = true;
+            }
+        } else if (!self.props.readOnly && self._foundFrequents) {
+            var totalFound = 0;
+            self._foundFrequents.forEach(function(v) {
+                if (totalFound < 5 && M.u[v.userId]) {
+                    if (self._eventuallyAddContact(M.u[v.userId], frequentContacts, selectableContacts)) {
+                        alreadyAdded[v.userId] = 1;
+                        totalFound++;
+                    }
+                }
+            });
+        }
 
         self.props.contacts.forEach(function(v, k) {
-            if (self.props.exclude && self.props.exclude.indexOf(v.u) > -1) {
-                // continue;
-                return;
-            }
-
-            var pres = self.props.megaChat.getPresence(
-                v.u
-            );
-
-            if (v.c != 1 || v.u == u_handle) {
-                return;
-            }
-
-            var avatarMeta = generateAvatarMeta(v.u);
-
-            if (self.state.searchValue && self.state.searchValue.length > 0) {
-                // DON'T add to the contacts list if the contact's name or email does not match the search value
-                if (
-                    avatarMeta.fullName.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1 &&
-                    v.m.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1
-                ) {
-                    return;
-                }
-            }
-
-
-            if (pres === "chat") {
-                pres = "online";
-            }
-
-            var selectedClass = "";
-            if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
-                selectedClass = "selected";
-            }
-            contacts.push(
-                <ContactCard
-                    contact={v}
-                    className={"contacts-search " + selectedClass}
-                    onClick={(contact, e) => {
-                        var contactHash = contact.u;
-
-                        // differentiate between a click and a double click.
-                        if (contactHash === self.lastClicked && (new Date() - self.clickTime) < 500) {
-                            // is a double click
-                            if (self.props.onSelected) {
-                                self.props.onSelected([contactHash]);
-                            }
-                            self.props.onSelectDone([contactHash]);
-                            return;
-                        }
-                        else {
-                            var selected = clone(self.state.selected || []);
-
-                            // is a single click
-                            if (selected.indexOf(contactHash) === -1) {
-                                selected.push(contactHash);
-                                // only set the scrollToLastSelected if a contact was added,
-                                // so that the user can scroll left/right and remove contacts
-                                // form the list using the X buttons in the UI.
-                                self.scrollToLastSelected = true;
-                                if (self.props.onSelected) {
-                                    self.props.onSelected(selected);
-                                }
-                            }
-                            else {
-                                if (selected.indexOf(contactHash) >= 0) {
-                                    array.remove(selected, contactHash);
-                                }
-                                if (self.props.onSelected) {
-                                    self.props.onSelected(selected);
-                                }
-                            }
-                            self.setState({'selected': selected});
-                            self.setState({'searchValue': ''});
-                            self.refs.contactSearchField.focus();
-                        }
-                        self.clickTime = new Date();
-                        self.lastClicked = contactHash;
-                    }}
-                    noContextMenu={true}
-                    key={v.u}
-                />
-            );
+            !alreadyAdded[v.h] && self._eventuallyAddContact(v, contacts, selectableContacts);
         });
 
+        if (Object.keys(alreadyAdded).length === 0) {
+            hideFrequents = true;
+        }
         var innerDivStyles = {};
 
-        if (contacts.length < 6) {
-            innerDivStyles['height'] = Math.max(48, contacts.length * 48);
-            innerDivStyles['overflow'] = "visible";
-        }
+        // if (contacts.length < 6) {
+            // innerDivStyles['height'] = Math.max(48, contacts.length * 48);
+            // innerDivStyles['overflow'] = "visible";
+        // }
 
+        if (this.props.showMeAsSelected) {
+            self._eventuallyAddContact(M.u[u_handle], contacts, selectableContacts, true);
+        }
+        var noOtherContacts = false;
         if (contacts.length === 0) {
+            noOtherContacts = true;
             var noContactsMsg = "";
             if (M.u.length < 2) {
-                noContactsMsg = __(l[8877]);
+                noContactsMsg = l[8877];
             }
             else {
-                noContactsMsg = __(l[8878]);
+                noContactsMsg = l[8878];
             }
 
-            contacts = <em>{noContactsMsg}</em>;
+            if (hideFrequents) {
+                contacts = <em>{noContactsMsg}</em>;
+            }
         }
-        var displayStyle = (self.state.searchValue && self.state.searchValue.length > 0) ? "" : "none";
-        return <div className={this.props.className + " " }>
-            <div className={"contacts-search-header " + this.props.headerClasses}>
-                <i className="small-icon search-icon"></i>
-                <input
-                    type="search"
-                    placeholder={__(l[8010])}
-                    ref="contactSearchField"
-                    onChange={this.onSearchChange}
-                    value={this.state.searchValue}
-                />
-                <div className="search-result-clear" style={{display : displayStyle}} onClick={clearSearch}></div>
-            </div>
 
-            <utils.JScrollPane className="contacts-search-scroll" selected={this.state.selected}>
-                <div style={innerDivStyles}>
-                    {contacts}
+        var haveContacts = isSearching || frequentContacts.length !== 0 || !noOtherContacts;
+
+        var contactsList;
+        if (haveContacts) {
+            if (frequentContacts.length === 0 && noOtherContacts) {
+                contactsList = <div className="chat-contactspicker-no-contacts">
+                    <div className="contacts-list-header">
+                        {l[165]}
+                    </div>
+                    <div className="fm-empty-contacts-bg"></div>
+                    <div className="fm-empty-cloud-txt small">{l[784]}</div>
+                    <div className="fm-empty-description small">{l[19115]}</div>
+                </div>;
+            }
+            else {
+                contactsList = <utils.JScrollPane className="contacts-search-scroll"
+                                                  selected={this.state.selected}
+                                                  changedHashProp={this.props.changedHashProp}
+                                                  searchValue={this.state.searchValue}>
+                    <div>
+                        <div className="contacts-search-subsection"
+                             style={{'display': (!hideFrequents ? "" : "none")}}>
+                            <div className="contacts-list-header">
+                                {l[20141]}
+                            </div>
+
+                            {frequentsLoading ?
+                                <div className="loading-spinner">...</div> :
+                                <div className="contacts-search-list" style={innerDivStyles}>
+                                    {frequentContacts}
+                                </div>
+                            }
+                        </div>
+
+                        {contacts.length > 0 ?
+                            <div className="contacts-search-subsection">
+                                <div className="contacts-list-header">
+                                    {!frequentsLoading && frequentContacts.length === 0 ? (
+                                        !self.props.readOnly ? l[165] : l[16217]
+                                    ) : l[165]}
+                                </div>
+
+                                <div className="contacts-search-list" style={innerDivStyles}>
+                                    {contacts}
+                                </div>
+                            </div> : undefined}
+                    </div>
+                </utils.JScrollPane>;
+            }
+        }
+        else {
+            contactsList = <div className="chat-contactspicker-no-contacts">
+                <div className="contacts-list-header">
+                    {l[165]}
                 </div>
-            </utils.JScrollPane>
-            {footer}
+                <div className="fm-empty-contacts-bg"></div>
+                <div className="fm-empty-cloud-txt small">{l[784]}</div>
+                <div className="fm-empty-description small">{l[19115]}</div>
+                <div className=" big-red-button fm-empty-button" onClick={function(e) {
+                    contactAddDialog();
+                }}>
+                    {l[101]}
+                </div>
+                <div className="empty-share-public">
+                    <i className="small-icon icons-sprite grey-chain"></i>
+                    <span dangerouslySetInnerHTML={{__html: l[19111]}}></span>
+                </div>
+            </div>;
+
+            extraClasses += " no-contacts";
+        }
+
+        var displayStyle = (self.state.searchValue && self.state.searchValue.length > 0) ? "" : "none";
+        return <div className={this.props.className + " " + extraClasses}>
+            {multipleContacts}
+            {!self.props.readOnly && haveContacts ?
+                <div className={"contacts-search-header " + this.props.headerClasses}>
+                    <i className="small-icon thin-search-icon"></i>
+                    <input
+                        autoFocus
+                        type="search"
+                        placeholder={__(l[8010])}
+                        ref="contactSearchField"
+                        onChange={this.onSearchChange}
+                        value={this.state.searchValue}
+                    />
+                    <div
+                        onClick={function(e) {
+                            self.setState({searchValue: ''});
+                            self.refs.contactSearchField.focus();
+                        }}
+                        className="search-result-clear"
+                        style={{display : displayStyle}}
+                    ></div>
+                </div> : null}
+
+            {topButtons}
+            {contactsList}
+            {selectFooter}
         </div>;
     }
 });

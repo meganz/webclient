@@ -20,7 +20,7 @@
         <a class="dropdown-item do-sort" data-by="ts">
             <i class="small-icon"></i>[$17445]</a>
         <a class="dropdown-item do-sort" data-by="mtime">
-            <i class="small-icon"></i>[$17446]</a>
+            <i class="small-icon"></i>[$94]</a>
     </div>
     <div class="dropdown-section">
         <a class="dropdown-item play-item"><i class="small-icon context videocam"></i><span>[$16275]</span></a>
@@ -747,6 +747,9 @@
                 <div class="fm-notification-close"></div>
                 [$16316]
             </div>
+            <div class="fm-notification-block grace-business">
+                [$16316]
+            </div>
 
             <div class="contacts-tabs-bl hidden">
                 <div class="contacts-tab-lnk contacts" data-folder="contacts">[$165]</div>
@@ -881,7 +884,7 @@
             </div>
 
             <!-- Users Management Header -->
-            <div class="fm-right-header-user-management">
+            <div class="fm-right-header-user-management hidden">
                 <div class="user-management-main-page-buttons hidden">
                     <a class="fm-files-view-icon-user-management block-view hidden" title="Thumbnail view"></a>
                     <a class="fm-files-view-icon-user-management listing-view active hidden" title="List view"></a>
@@ -930,7 +933,7 @@
                 </div>
 
                 <div class="user-management-overview-buttons hidden">
-                    <div class="default-white-button-user-management pdf-exp">
+                    <div class="default-white-button-user-management pdf-exp hidden">
                         <div class="export-pdf-icon icon"></div>
                         Export to PDF
                     </div>
@@ -1320,7 +1323,6 @@
                             </div>
 
                             <div class="subuser-sec-profile-container">
-                                <div class="id-card-icon icon"></div>
                                 <ul>
                                     <li>
                                         <span>[$19151]:</span>
@@ -2064,6 +2066,30 @@
         <!-- check if there is any other place using account qr-block -->
         <div class="fm-right-account-block">
             <div class="fm-account-main">
+
+                <div class="account add-phone-num-banner hidden">
+                    <div class="account add-phone-wrapper">
+                        <div class="first-block">
+                            <div class="account verify-icon">
+                                <div class="verify-ph-icon"></div>
+                            </div>
+                        </div>
+                        <div class="second-block">
+                            <div class="account add-phone-content">
+                                <div class="account title-txt">[$20211]</div>
+                                <div class="account add-phone-text">[$20210]</div>
+                            </div>
+                        </div>
+                        <div class="last-block">
+                            <div class="account add-phone-button-container">
+                                <div class="button default-green-button gradient lato add-phone-button js-add-phone-button">[$20222]</div>
+                                <div class="account skip-button">[$1379]</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
                 <div class="settings-banner hidden">
                     <div class="first-block">
                         <div class="title-txt">[$16118]:</div>
@@ -2211,21 +2237,22 @@
                                 <div class="dialog-input-title-ontop underline-dropdown-input acc-setting-country-sec">
                                     <div class="title">[$481]</div>
                                     <div class="list-arrow"></div>
-                                    <!-- <div class="fm-account-select-block"> -->
-                                        <div class="dialog-input default-select country" id="account-country">
-                                            <span>[$996]</span>
-                                            <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
-                                        </div>
-                                    <!-- <select id ="cnt-ddl" name="prf-country" placeholder="[$996]">
-                                        <option value="New Zealand">New Zealand</option>
-                                        <option value="Syria">Syria</option>
-                                        <option value="Spain">Spain</option>
-                                    </select> -->
+                                    <div class="dialog-input default-select country" id="account-country">
+                                        <span>[$996]</span>
+                                        <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="settings-sub-section button-container save-block slide-in-out closed">
                                 <div class="default-green-button right fm-account-save slide-item">[$19631]</div>
                                 <div class="clear"></div>
+                            </div>
+                            <div class="settings-sub-section phone-number-settings hidden">
+                                <div class="subtitle-txt">[$19152]</div>
+                                <div class="add-phone-text">[$20210]</div>
+                                <div class="clear"></div>
+                                <div class="phone-number"></div>
+                                <div class="default-white-button add-number-button">[$20222]</div>
                             </div>
                         </div>
                     </div>
@@ -2390,7 +2417,7 @@
                                 </div>
                                 <div class="clear"></div>
                             </div>
-                            <div class="settings-sub-section border">
+                            <div class="settings-sub-section acc-renew-date-info border">
                                 <div class="subtitle-txt account plan-info expiry-txt">[$7354]</div>
                                 <div class="account plan-info right-textalign expiry right">
                                     <span class="red">September 1st 2013</span>
@@ -2552,23 +2579,26 @@
                         </div>
                         <div class="settings-right-block">
                             <div class="settings-sub-section">
-                                <div class="dialog-input-title-ontop">
-                                    <div class="title">[$717]</div>
-                                    <input class="dialog-input" type="password" value="" name="account-new-password" id="account-new-password" />
-                                    <div class="account-pass-lines">
-                                         <div class="register-pass-status-line1"></div>
-                                         <div class="register-pass-status-line2"></div>
-                                         <div class="register-pass-status-line3"></div>
-                                         <div class="register-pass-status-line4"></div>
-                                         <div class="register-pass-status-line5"></div>
-                                         <div class="clear"></div>
+                                <!-- Cover with form to prevent autofilling -->
+                                <form autocomplete="off">
+                                    <div class="dialog-input-title-ontop">
+                                        <div class="title">[$717]</div>
+                                        <input class="dialog-input" type="password" value="" autocomplete="new-password" name="account-new-password" id="account-new-password" />
+                                        <div class="account-pass-lines">
+                                             <div class="register-pass-status-line1"></div>
+                                             <div class="register-pass-status-line2"></div>
+                                             <div class="register-pass-status-line3"></div>
+                                             <div class="register-pass-status-line4"></div>
+                                             <div class="register-pass-status-line5"></div>
+                                             <div class="clear"></div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="dialog-input-title-ontop">
-                                     <div class="title">[$718]</div>
-                                    <input class="dialog-input" type="password" value="" name="account-confirm-password" id="account-confirm-password" />
-                                    <div class="error-message"></div>
-                                </div>
+                                    <div class="dialog-input-title-ontop">
+                                        <div class="title">[$718]</div>
+                                        <input class="dialog-input" type="password" value="" autocomplete="new-password" name="account-confirm-password" id="account-confirm-password" />
+                                        <div class="error-message"></div>
+                                    </div>
+                                </form>
                             </div>
                             <div class="settings-sub-section button-container slide-in-out closed">
                                 <div class="default-green-button right change-password-button slide-item">[$706]</div>
@@ -2589,7 +2619,7 @@
                                 </div>
                                 <div class="dialog-input-title-ontop">
                                      <div class="title">[$7745]</div>
-                                    <input class="dialog-input" type="text" value="" name="account-email" id="account-email" maxlength="190" />
+                                    <input class="dialog-input" type="text" value="" autocomplete="disabled" name="account-email" id="account-email" maxlength="190" />
                                     <div class="error-message"></div>
                                 </div>
                             </div>
@@ -3258,6 +3288,15 @@
                                     <div class="ff-name">[$167]</div>
                                     <div class="ff-number">
                                         <div class="folder-number"> </div>
+                                        <div class="file-number"> </div>
+                                    </div>
+                                    <div class="ff-occupy"> </div>
+                                    <div class="clear"></div>
+                                </div>
+                                <div class="used-storage-info ba-pub-links">
+                                    <i class="folder-small-icon semi-small-icon linked"></i>
+                                    <div class="ff-name">[$16516]</div>
+                                    <div class="ff-number">
                                         <div class="file-number"> </div>
                                     </div>
                                     <div class="ff-occupy"> </div>

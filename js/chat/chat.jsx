@@ -11,6 +11,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 (function() {
     chatui = function(id) {
         var roomOrUserHash = id.replace("chat/", "");
+        var isPubLink = id.substr(0, 5) === "chat/" && id.substr(6, 1) !== "/";
 
         var roomType = false;
         megaChat.displayArchivedChats = false;
@@ -18,31 +19,85 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             roomType = "archived";
             megaChat.displayArchivedChats = true;
         }
-        else if (roomOrUserHash.substr(0, 2) === "g/") {
-            roomType = "group";
-            roomOrUserHash = roomOrUserHash.substr(2, roomOrUserHash.length);
+        else if (roomOrUserHash.substr(0, 2) === "g/" || roomOrUserHash.substr(0, 2) === "c/" || isPubLink) {
+            roomType = (isPubLink || roomOrUserHash.substr(0, 2) === "c/") ? "public" : "group";
+
+            var publicChatHandle;
+            var publicChatKey;
+            var publicChatId;
+            if (roomType === "public" && isPubLink) {
+                publicChatHandle = roomOrUserHash.split("#")[0];
+                publicChatKey = roomOrUserHash.split("#")[1];
+                // FB's ?fbclid stuff...
+                if (publicChatKey && String(publicChatKey).indexOf("?") > -1) {
+                    publicChatKey = publicChatKey.split("?")[0];
+                }
+                publicChatId = megaChat.handleToId[publicChatHandle];
+                roomOrUserHash = publicChatHandle;
+
+                megaChat.publicChatKeys = megaChat.publicChatKeys || {};
+                megaChat.publicChatKeys[publicChatHandle] = publicChatKey;
+            }
+            else {
+                roomOrUserHash = roomOrUserHash.substr(2, roomOrUserHash.length);
+            }
+
             megaChat.displayArchivedChats = false;
-            if (!megaChat.chats[roomOrUserHash]) {
+            if (publicChatId && megaChat.chats[publicChatId]) {
+                megaChat.chats[publicChatId].show();
+            }
+            else if (!megaChat.chats[roomOrUserHash]) {
                 // chat not found
                 // is it still loading?
-                if (
-                    ChatdIntegration._loadingChats[roomOrUserHash] &&
-                    ChatdIntegration._loadingChats[roomOrUserHash].loadingPromise.state() === 'pending'
-                ) {
-                    ChatdIntegration._loadingChats[roomOrUserHash].loadingPromise.done(function() {
-                        chatui(id);
-                    });
-                    return;
+                if (anonymouschat || publicChatHandle) {
+                    // since openFolder is not getting called in this situation, setting M.chat is required
+                    // to make previews work.
+
+                    M.chat = true;
+
+                    var promises = [];
+                    if (!anonymouschat) {
+                        promises.push(ChatdIntegration.mcfHasFinishedPromise);
+                    }
+                    MegaPromise.allDone(promises)
+                        .always(function() {
+                            megaChat.plugins.chatdIntegration.openChat(publicChatHandle)
+                                .always(function () {
+                                    if (anonymouschat) {
+                                        ChatdIntegration.mcfHasFinishedPromise.resolve();
+                                        ChatdIntegration.allChatsHadLoaded.resolve();
+                                    }
+                                    var publicChatId = megaChat.handleToId[publicChatHandle];
+                                    if (megaChat.chats[publicChatId]) {
+                                        megaChat.chats[publicChatId].show();
+                                    }
+                                });
+                        });
+                }
+                else {
+                    if (
+                        ChatdIntegration._loadingChats[roomOrUserHash] &&
+                        ChatdIntegration._loadingChats[roomOrUserHash].loadingPromise.state() === 'pending'
+                    ) {
+                        ChatdIntegration._loadingChats[roomOrUserHash].loadingPromise.done(function () {
+                            chatui(id);
+                        });
+                        return;
+                    }
+                    setTimeout(function () {
+                        loadSubPage('fm/chat');
+                        M.openFolder('chat');
+                    }, 100);
                 }
 
-                setTimeout(function () {
-                    loadSubPage('fm/chat');
-                    M.openFolder('chat');
-                }, 100);
+
                 return;
             }
         }
         else {
+            if (roomOrUserHash.substr(0, 2) === "p/") {
+                roomOrUserHash = roomOrUserHash.substr(2);
+            }
             megaChat.displayArchivedChats = false;
             if (!M.u[roomOrUserHash]) {
                 setTimeout(function () {
@@ -74,7 +129,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         megaChat.refreshConversations();
 
         if (roomType === "private") {
-            var userHandle = id.split("chat/").pop();
+            var userHandle = id.split("chat/p/").pop();
             var userHandles = [
                 u_handle,
                 userHandle
@@ -94,6 +149,19 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             }
             megaChat.chats[roomOrUserHash].show();
         }
+        else if(roomType === "public") {
+            if (megaChat.chats[roomOrUserHash] && id.indexOf('chat/') > -1) {
+                megaChat.chats[roomOrUserHash].show();
+            }
+
+            else {
+                var publicChatId = megaChat.handleToId[roomOrUserHash];
+
+                if (publicChatId && megaChat.chats[publicChatId]) {
+                    megaChat.chats[publicChatId].show();
+                }
+            }
+        }
         else if(roomType === "archived") {
             megaChat.hideAllChats();
             M.onSectionUIOpen('conversations');
@@ -112,7 +180,6 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 
         // since .fm-chat-block is out of the scope of the CovnersationsApp, this should be done manually :(
         $('.fm-chat-block').removeClass('hidden');
-
     };
 })();
 
@@ -155,6 +222,9 @@ var Chat = function() {
     this._imagesToBeLoaded = Object.create(null);
     this._imageAttributeCache = Object.create(null);
     this._queuedMccPackets = [];
+
+    this.publicChatKeys = {};
+    this.handleToId = {};
 
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
@@ -409,9 +479,12 @@ Chat.prototype.init = function() {
         }
     }
     self.is_initialized = true;
+    if (!anonymouschat) {
+        $('.activity-status-block, .activity-status').show();
+    }
+    else {
 
-    $('.activity-status-block, .activity-status').show();
-
+    }
     // contacts tab update
     self.on('onRoomInitialized', function(e, room) {
         if (room.type === "private") {
@@ -582,10 +655,9 @@ Chat.prototype.registerUploadListeners = function() {
         }
 
         for (var i = chats.length; i--;) {
-            var roomId = String(chats[i]).split('/').pop();
-
-            if (self.chats[roomId]) {
-                callback(roomId, ++result);
+            var room = self.getRoomFromUrlHash(chats[i]);
+            if (room) {
+                callback(room, ++result);
             }
         }
 
@@ -613,11 +685,10 @@ Chat.prototype.registerUploadListeners = function() {
     // Attach nodes to a chat room on upload completion
     var onUploadComplete = function(ul) {
         if (ulmanager.ulEventData[ul && ul.uid]) {
-            forEachChat(ul.chat, function(roomId) {
-                var room = self.chats[roomId];
+            forEachChat(ul.chat, function(room) {
 
                 if (d) {
-                    logger.debug('Attaching node[%s] to chat room[%s]...', ul.h, roomId, ul.uid, ul, M.d[ul.h]);
+                    logger.debug('Attaching node[%s] to chat room[%s]...', ul.h, room.chatId, ul.uid, ul, M.d[ul.h]);
                 }
                 room.attachNodes([ul.h]);
             });
@@ -742,8 +813,8 @@ Chat.prototype.registerUploadListeners = function() {
             logger.info('onUploadStart', [data]);
         }
 
-        var notify = function(roomId) {
-            self.chats[roomId].onUploadStart(data);
+        var notify = function(room) {
+            room.onUploadStart(data);
         };
 
         for (var k in data) {
@@ -759,12 +830,13 @@ Chat.prototype.registerUploadListeners = function() {
 };
 
 Chat.prototype.getRoomFromUrlHash = function(urlHash) {
+    // works only for group and private chats for now
     if (urlHash.indexOf("#") === 0) {
         urlHash = urlHash.subtr(1, urlHash.length);
     }
-    if (urlHash.indexOf("chat/g/") > -1) {
+    if (urlHash.indexOf("chat/g/") > -1 || urlHash.indexOf("chat/c/") > -1) {
         var foundRoom = null;
-        urlHash = urlHash.replace("chat/g/", "");
+        urlHash = urlHash.replace("chat/g/", "").replace("chat/c/", "");
         megaChat.chats.forEach(function(room) {
             if (!foundRoom && room.chatId === urlHash) {
                 foundRoom = room;
@@ -772,14 +844,32 @@ Chat.prototype.getRoomFromUrlHash = function(urlHash) {
         });
         return foundRoom;
     }
-    else {
-        var contactHash = urlHash.replace("chat/", "");
+    else if (urlHash.indexOf("chat/p/") > -1) {
+        var contactHash = urlHash.replace("chat/p/", "");
         if (!contactHash) {
             return;
         }
 
         var chatRoom = this.getPrivateRoom(contactHash);
         return chatRoom;
+    }
+    else if (urlHash.indexOf("chat/") > -1 && urlHash[13] === "#") {
+        var foundRoom = null;
+        var pubHandle = urlHash.replace("chat/", "").split("#")[0];
+        urlHash = urlHash.replace("chat/g/", "");
+        var chatIds = megaChat.chats.keys();
+        for (var i = 0; i < chatIds.length; i++) {
+            var cid = chatIds[i];
+            var room = megaChat.chats[cid];
+            if (room.publicChatHandle === pubHandle) {
+                foundRoom = room;
+                break;
+            }
+        }
+        return foundRoom;
+    }
+    else {
+        return null;
     }
 };
 
@@ -810,6 +900,9 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
     self.haveAnyActiveCall() === false && self.chats.forEach(function(megaRoom, k) {
         if (megaRoom.state == ChatRoom.STATE.LEFT) {
             // skip left rooms.
+            return;
+        }
+        if (megaRoom.isArchived()) {
             return;
         }
 
@@ -898,7 +991,7 @@ Chat.prototype.destroy = function(isLogout) {
 
     self.chats.forEach( function(room, roomJid) {
         if (!isLogout) {
-            room.destroy();
+            room.destroy(false, true);
         }
         self.chats.remove(roomJid);
     });
@@ -1084,19 +1177,29 @@ Chat.prototype.reorderContactTree = function() {
  * Open (and (optionally) show) a new chat
  *
  * @param userHandles {Array} list of user handles
- * @param type {String} "private" or "group"
+ * @param type {String} "private" or "group", "public"
  * @param [chatId] {String}
  * @param [chatShard]  {String}
  * @param [chatdUrl]  {String}
  * @param [setAsActive] {Boolean}
  * @returns [roomId {string}, room {MegaChatRoom}, {Deferred}]
  */
-Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUrl, setAsActive) {
+Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUrl, setAsActive, chatHandle,
+                                   publicChatKey, ck) {
     var self = this;
     type = type || "private";
     setAsActive = setAsActive === true;
 
     var roomId = chatId;
+    var publicChatKey;
+
+    if (!publicChatKey && chatHandle && self.publicChatKeys[chatHandle]) {
+        if (type !== "public") {
+            console.error("this should never happen.", type);
+            type = "public";
+        }
+        publicChatKey = self.publicChatKeys[chatHandle];
+    }
 
     var $promise = new MegaPromise();
 
@@ -1136,7 +1239,10 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         roomId = chatId;
     }
 
-    if (type === "group") {
+    if (type === "group" || type == "public") {
+        ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
+        ChatdIntegration._ensureNamesAreLoaded(userHandles, chatHandle);
+
         userHandles.forEach(function(contactHash) {
             assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
 
@@ -1157,7 +1263,7 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         });
     }
 
-    if (!roomId && setAsActive === true) {
+    if (!roomId && setAsActive) {
         // manual/UI trigger, before the mcf/all chats are already loaded? postpone, since that chat may already
         // exists, so an 'mcc' API call may not be required
         if (
@@ -1169,7 +1275,8 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                 ChatdIntegration.mcfHasFinishedPromise,
             ])
                 .always(function() {
-                    var res = self.openChat(userHandles, type, chatId, chatShard, chatdUrl, setAsActive);
+                    var res = self.openChat(userHandles, type, chatId, chatShard, chatdUrl, setAsActive,
+                        chatHandle, publicChatKey, ck);
                     $promise.linkDoneAndFailTo(
                         res[2]
                     );
@@ -1209,11 +1316,14 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                 }
                 var res = self.openChat(
                     userHandles,
-                    ap.g === 1 ? "group" : "private",
+                    (ap.m === 1) ? "public" : (ap.g === 1 ? "group" : "private"),
                     ap.id,
                     ap.cs,
                     ap.url,
-                    setAsActive
+                    setAsActive,
+                    chatHandle,
+                    publicChatKey,
+                    ck
                 );
 
                 $promise.linkDoneAndFailTo(
@@ -1236,7 +1346,6 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
 
     // chat room not found, create a new one
 
-
     var room = new ChatRoom(
         self,
         roomId,
@@ -1246,7 +1355,11 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         undefined,
         chatId,
         chatShard,
-        chatdUrl
+        chatdUrl,
+        null,
+        chatHandle,
+        publicChatKey,
+        ck
     );
 
     self.chats.set(
@@ -1518,6 +1631,12 @@ Chat.prototype.refreshConversations = function() {
     // move to the proper place if loaded before the FM
     if (self.$container.parent('.section.conversations .fm-right-files-block').length == 0) {
         $('.section.conversations .fm-right-files-block').append(self.$container);
+    }
+    if (anonymouschat) {
+        $('.conversationsApp .fm-left-panel').addClass('hidden');
+    }
+    else {
+        $('.conversationsApp .fm-left-panel').removeClass('hidden');
     }
 };
 
@@ -1961,11 +2080,16 @@ Chat.prototype.createAndShowPrivateRoomFor = function(h) {
     return promise;
 };
 
-Chat.prototype.createAndShowGroupRoomFor = function(contactHashes) {
+Chat.prototype.createAndShowGroupRoomFor = function(contactHashes, topic, keyRotation, createChatLink) {
     this.trigger(
         'onNewGroupChatRequest',
         [
-            contactHashes
+            contactHashes,
+            {
+                'topic': topic || "",
+                'keyRotation': keyRotation,
+                'createChatLink': createChatLink
+            }
         ]
     );
 };
@@ -2362,6 +2486,218 @@ Chat.prototype.onSnActionPacketReceived = function() {
         for (var i = 0; i < aps.length; i++) {
             mBroadcaster.sendMessage('onChatdChatUpdatedActionPacket', aps[i]);
         }
+    }
+};
+
+
+Chat.prototype.getFrequentContacts = function() {
+    var chats = this.chats;
+    var recentContacts = {};
+    var promises = [];
+    var finishedLoadingChats = {};
+    var loadingMoreChats = {};
+
+    // this should use potential "Incoming shares" managed .ts, but it seems it doesn't work and its only updated
+    // by the chat, but in a different algorithm (that won't be UX-effective enough for showing top3-5 "recent"
+    // contacts, so its disabled for now.
+    // PS: .ts is used for "Last interaction", which is different (semantically) then "Recent(s)"
+
+    // M.u.forEach(function(contact) {
+    //     if (contact.c === 1 && contact.ts) {
+    //         recentContacts[contact.h] = {'userId': contact.h, 'ts': contact.ts};
+    //     }
+    // });
+
+    var _calculateLastTsFor = function(r, maxMessages) {
+        var msgIds = r.messagesBuff.messages.keys().reverse();
+        msgIds = msgIds.splice(0, maxMessages);
+        msgIds.forEach(function(msgId) {
+            var msg = r.messagesBuff.getMessageById(msgId);
+            var contactHandle = msg.userId === "gTxFhlOd_LQ" && msg.meta ? msg.meta.userId : msg.userId;
+            if (r.type === "private" && contactHandle === u_handle) {
+                contactHandle = contactHandle || r.getParticipantsExceptMe()[0]
+            }
+
+            if (
+                contactHandle !== "gTxFhlOd_LQ" &&
+                M.u[contactHandle] && M.u[contactHandle].c === 1 &&
+                contactHandle !== u_handle
+            ) {
+                if (!recentContacts[contactHandle] || recentContacts[contactHandle].ts < msg.delay) {
+                    recentContacts[contactHandle] = {'userId': contactHandle, 'ts': msg.delay};
+                }
+            }
+        });
+    };
+
+    chats.forEach(function(r) {
+        /**
+         * @type ChatRoom
+         */
+            // r = r;
+
+        var _histDecryptedCb = function(r) {
+                // console.error("loading?", r.chatId, r.messagesBuff.messages.length);
+                if (!loadingMoreChats[r.chatId] &&
+                    r.messagesBuff.messages.length < 32 &&
+                    r.messagesBuff.haveMoreHistory()
+                ) {
+                    // console.error("loading:", r.chatId);
+                    loadingMoreChats[r.chatId] = true;
+                    r.messagesBuff.retrieveChatHistory(false);
+                }
+                else {
+                    $(r).unbind('onHistoryDecrypted.recent');
+                    _calculateLastTsFor(r, 32);
+                    delete loadingMoreChats[r.chatId];
+                    finishedLoadingChats[r.chatId] = true;
+                }
+
+
+            };
+
+
+        if (r.isLoading()) {
+            var promise = createTimeoutPromise(function() {
+                return finishedLoadingChats[r.chatId] === true;
+            },
+                300,
+                10000,
+                undefined,
+                undefined,
+                r.roomId + "FrequentsLoading"
+            );
+
+            finishedLoadingChats[r.chatId] = false;
+            promises.push(promise);
+            $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
+        }
+        else if (r.messagesBuff.messages.length < 32 && r.messagesBuff.haveMoreHistory()) {
+            // console.error("loading:", r.chatId);
+            loadingMoreChats[r.chatId] = true;
+            finishedLoadingChats[r.chatId] = false;
+            $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
+            var promise = createTimeoutPromise(function() {
+                return finishedLoadingChats[r.chatId] === true;
+            }, 300, 15000);
+            promises.push(promise);
+            r.messagesBuff.retrieveChatHistory(false);
+        }
+        else {
+            _calculateLastTsFor(r, 32);
+        };
+        // console.error(r.getRoomTitle(), r.messagesBuff.messages.length);
+    });
+
+    var masterPromise = new MegaPromise();
+    MegaPromise.allDone(promises).always(function () {
+        var result = obj_values(recentContacts).sort(function(a, b) {
+            return a.ts < b.ts ? 1 : (b.ts < a.ts ? -1 : 0);
+        });
+        masterPromise.resolve(result.reverse());
+    });
+    return masterPromise;
+};
+
+
+Chat.prototype.eventuallyAddDldTicketToReq = function(req) {
+    if (!u_handle) {
+        return;
+    }
+
+    var currentRoom = this.getCurrentRoom();
+    if (currentRoom && currentRoom.type == "public" && currentRoom.publicChatHandle && (
+        anonymouschat || (
+            currentRoom.membersSetFromApi &&
+            !currentRoom.membersSetFromApi.members[u_handle]
+        )
+    )
+    ) {
+        req['cauth'] = currentRoom.publicChatHandle;
+    }
+};
+
+
+Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister, forceLogin, notJoinReq) {
+    if (!chatHandle && (page === 'chat' || page.indexOf('chat') > -1)) {
+        chatHandle = getSitePath().split("chat/")[1].split("#")[0];
+    }
+    assert(chatHandle, 'missing chat handle when calling megaChat.loginOrRegisterBeforeJoining');
+
+    var chatKey = "#" + window.location.hash.split("#").pop();
+    var doShowLoginDialog = function() {
+        mega.ui.showLoginRequiredDialog({
+                minUserType: 3,
+                skipInitialDialog: 1
+            })
+            .done(function () {
+                closeDialog();
+                topmenuUI();
+                if (page !== 'login') {
+                    if (!notJoinReq) {
+                        localStorage.autoJoinOnLoginChat = JSON.stringify(
+                            [chatHandle, unixtime(), chatKey]
+                        );
+                    }
+                    window.location.reload();
+                }
+            });
+    };
+
+    var doShowRegisterDialog = function() {
+        mega.ui.showRegisterDialog({
+            title: l[5840],
+            onCreatingAccount: function() {},
+            onLoginAttemptFailed: function(registerData) {
+                msgDialog('warninga:' + l[171], l[1578], l[218], null, function(e) {
+                    if (e) {
+                        $('.pro-register-dialog').addClass('hidden');
+                        if (signupPromptDialog) {
+                            signupPromptDialog.hide();
+                        }
+                        doShowLoginDialog();
+                    }
+                });
+            },
+
+            onAccountCreated: function(gotLoggedIn, registerData) {
+                if (!notJoinReq) {
+                    localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
+                    localStorage.autoJoinOnLoginChat = JSON.stringify(
+                        [chatHandle, unixtime(), chatKey]
+                    );
+                }
+                // If true this means they do not need to confirm their email before continuing to step 2
+                mega.ui.sendSignupLinkDialog(registerData, false);
+                megaChat.destroy();
+            }
+        });
+    };
+
+
+    if (u_handle && u_handle !== "AAAAAAAAAAA") {
+        // logged in/confirmed account in another tab!
+        if (!notJoinReq) {
+            localStorage.autoJoinOnLoginChat = JSON.stringify(
+                [chatHandle, unixtime(), chatKey]
+            );
+        }
+        window.location.reload();
+        return;
+    }
+    if (forceRegister) {
+        return doShowRegisterDialog();
+    }
+    else if (forceLogin) {
+        return doShowLoginDialog();
+    }
+
+    // no forcing, proceed w/ regular logic.
+    if (u_wasloggedin()) {
+        doShowLoginDialog();
+    }
+    else {
+        doShowRegisterDialog();
     }
 };
 

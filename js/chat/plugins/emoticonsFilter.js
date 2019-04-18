@@ -102,6 +102,7 @@ EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
                     staticpath + 'images/mega/twemojis/2_v2/' + twemoji.size + '/' +
                     twemoji.convert.toCodePoint(self.reservedEmotions[foundSlug]) + twemoji.ext + '"/>';
         }
+
         if (!utf) {
             return match;
         }

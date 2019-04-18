@@ -41,6 +41,8 @@ mobile.deleteOverlay = {
         // Disable scrolling of the file manager in the background to fix a bug on iOS Safari and show the overlay
         this.$fileManagerBlock.addClass('disable-scroll');
         this.$overlay.removeClass('hidden').addClass('overlay');
+
+        mobile.initOverlayPopstateHandler(this.$overlay);
     },
 
     /**

@@ -527,11 +527,16 @@ MegaData.prototype.contacts = function() {
 
                     if (!$this.is(".disabled")) {
                         var user_handle = $.selected && $.selected[0];
-                        loadSubPage("fm/chat/" + user_handle);
+                        loadSubPage("fm/chat/p/" + user_handle);
                     }
                 });
 
                 $dropdown.find('.startaudio-item').rebind('click.treePanel', function() {
+                    if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                        M.showExpiredBusiness();
+                        return;
+                    }
+
                     var $this = $(this);
                     var $triggeredBy = $this.parent().data("triggeredBy");
                     var $userDiv = $triggeredBy.parent().parent();
@@ -548,6 +553,11 @@ MegaData.prototype.contacts = function() {
                 });
 
                 $dropdown.find('.startvideo-item').rebind('click.treePanel', function() {
+                    if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                        M.showExpiredBusiness();
+                        return;
+                    }
+
                     var $this = $(this);
                     var $triggeredBy = $this.parent().data('triggeredBy');
                     var $userDiv = $triggeredBy.parent().parent();
@@ -597,7 +607,7 @@ MegaData.prototype.contacts = function() {
 
         // Get the user handle and change to conversations screen
         var user_handle = id.replace('contact_', '');
-        loadSubPage('fm/chat/' + user_handle);
+        loadSubPage('fm/chat/p/' + user_handle);
     });
 
     M.addTreeUI();
@@ -613,7 +623,7 @@ MegaData.prototype.getContacts = function(n) {
     return folders;
 };
 
-MegaData.prototype.syncUsersFullname = function(userId) {
+MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
     "use strict";
     var self = this;
 
@@ -629,12 +639,12 @@ MegaData.prototype.syncUsersFullname = function(userId) {
     var lnameEncoded = '';
 
     MegaPromise.allDone([
-        mega.attr.get(userId, 'firstname', -1)
+        mega.attr.get(userId, 'firstname', -1, false, undefined, undefined, chatHandle)
             .done(function(r) {
                 firstName.value = r;
                 fnameEncoded = r;
             }),
-        mega.attr.get(userId, 'lastname', -1)
+        mega.attr.get(userId, 'lastname', -1, false, undefined, undefined, chatHandle)
             .done(function(r) {
                 lastName.value = r;
                 lnameEncoded = r;
@@ -773,6 +783,18 @@ MegaData.prototype.syncContactEmail = function(userHash) {
 };
 
 (function(global) {
+    "use strict";
+
+    var eventuallyReorderContactsTreePane = function() {
+        if (
+            typeof $.sortTreePanel !== 'undefined' &&
+            typeof $.sortTreePanel.contacts !== 'undefined' &&
+            $.sortTreePanel.contacts.by === 'status'
+        ) {
+            M.contacts(); // we need to resort
+        }
+    };
+
     /**
      * Callback, that would be called when a contact is changed.
      */
@@ -781,9 +803,20 @@ MegaData.prototype.syncContactEmail = function(userHash) {
             if (getSitePath() === '/fm/' + contact.u) {
                 // re-render the contact view page if the presence had changed
                 M.addContactUI();
+                eventuallyReorderContactsTreePane();
             }
-            if (M.currentdirid === 'contacts') {
-                M.openFolder(M.currentdirid, true);
+            else if (M.currentdirid === 'contacts') {
+                // throttle updates, if the user is on the contacts page, since a lot of batched updates may come at
+                // pretty much the same moment (+/- few ms, enough to trigger tons of updates)
+                delay('onContactChanged', function() {
+                    if (M.currentdirid === 'contacts') {
+                        M.openFolder(M.currentdirid, true);
+                        eventuallyReorderContactsTreePane();
+                    }
+                }, 1000);
+            }
+            else {
+                eventuallyReorderContactsTreePane();
             }
         }
     };

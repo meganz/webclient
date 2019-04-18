@@ -624,7 +624,8 @@ var BrowserEntries = React.createClass({
                 }
 
                 items.push(
-                    <div className={
+                    <div 
+                        className={
                             "data-block-view node_" + node.h + " " + (isFolder ? " folder" :" file") +
                             (isHighlighted ? " ui-selected" : "") +
                             (share ? " linked" : "") +
@@ -636,8 +637,9 @@ var BrowserEntries = React.createClass({
                         onDoubleClick={(e) => {
                             self.onEntryDoubleClick(e, node);
                         }}
-                         id={"chat_" + node.h}
-                         key={"block_" + node.h}
+                        id={"chat_" + node.h}
+                        key={"block_" + node.h}
+                        title={node.name}
                     >
                         <div className={
                             (src ? "data-block-bg thumb" : "data-block-bg") +
@@ -719,29 +721,40 @@ var BrowserEntries = React.createClass({
                 </div>
             );
         }
-        else {
+        else if (!self.props.entries.length && self.props.currentlyViewedEntry === 'search') {
             return (
                 <div className="dialog-empty-block dialog-fm folder">
-                    {
-                        self.props.currentlyViewedEntry === 'shares' ? (
-                            <div className="dialog-empty-pad">
-                                <div className="fm-empty-incoming-bg"></div>
-                                <div className="dialog-empty-header">
-                                    {l[6871]}
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="dialog-empty-pad">
-                                <div className="fm-empty-folder-bg"></div>
-                                <div className="dialog-empty-header">
-                                    {self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]}
-                                </div>
-                            </div>
-                        )
-                    }
+                    <div className="dialog-empty-pad">
+                        <div className="fm-empty-search-bg"></div>
+                        <div className="dialog-empty-header">
+                            {l[978]}
+                        </div>
+                    </div>
                 </div>
             );
         }
+
+        return (
+            <div className="dialog-empty-block dialog-fm folder">
+                {
+                    self.props.currentlyViewedEntry === 'shares' ? (
+                        <div className="dialog-empty-pad">
+                            <div className="fm-empty-incoming-bg"></div>
+                            <div className="dialog-empty-header">
+                                {l[6871]}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="dialog-empty-pad">
+                            <div className="fm-empty-folder-bg"></div>
+                            <div className="dialog-empty-header">
+                                {self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]}
+                            </div>
+                        </div>
+                    )
+                }
+            </div>
+        );
     }
 });
 var CloudBrowserDialog = React.createClass({
@@ -802,6 +815,14 @@ var CloudBrowserDialog = React.createClass({
             $parentBlock.addClass("active-search");
             $('input', $parentBlock).trigger("focus");
         }
+    },
+    onClearSearchIconClick: function() {
+        var self = this;
+
+        self.setState({
+            'searchValue': '',
+            'currentlyViewedEntry': M.RootID
+        })
     },
     onTabButtonClick: function(e, selectedTab) {
         var $this = $(e.target);
@@ -1117,6 +1138,20 @@ var CloudBrowserDialog = React.createClass({
             );
         }
 
+        var clearSearchBtn = null;
+        if (self.state.searchValue.length >= 3) {
+            clearSearchBtn = (
+                <i
+                    className="top-clear-button"
+                    style={{'right': '85px'}}
+                    onClick={() => {
+                        self.onClearSearchIconClick();
+                    }}
+                >
+                </i>
+            );
+        }
+
         return (
             <ModalDialogsUI.ModalDialog
                 title={__(l[8011])}
@@ -1163,6 +1198,7 @@ var CloudBrowserDialog = React.createClass({
                             ></i>
                             <input type="search" placeholder={__(l[102])}  value={self.state.searchValue}
                                 onChange={self.onSearchChange} />
+                            {clearSearchBtn}
                         </div>
                         <div className="clear"></div>
                     </div>

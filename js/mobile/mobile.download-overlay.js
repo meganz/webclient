@@ -48,6 +48,8 @@ mobile.downloadOverlay = {
 
         // Show the overlay
         this.$overlay.removeClass('hidden').addClass('overlay');
+
+        mobile.initOverlayPopstateHandler(this.$overlay);
     },
 
     /**
@@ -71,13 +73,13 @@ mobile.downloadOverlay = {
 
         // On Open in Browser button click/tap
         this.$overlay.find('.second.dl-browser').off('tap').on('tap', function() {
-       
+
             // Start the download
             mobile.downloadOverlay.startFileDownload(nodeHandle);
 
             // Prevent default anchor link behaviour
             return false;
-            
+
         });
     },
 
@@ -258,6 +260,9 @@ mobile.downloadOverlay = {
             // Destroy any streaming instance if running
             $(window).trigger('video-destroy');
 
+            // Abort the running download.
+            dlmanager.abort(null);
+
             // Hide overlay with download button options
             mobile.downloadOverlay.$overlay.addClass('hidden');
             $body.removeClass('wrong-file');
@@ -304,8 +309,8 @@ mobile.downloadOverlay = {
             n: n.name,
             nauth: n_h,
             t: n.mtime || n.ts,
-            onDownloadProgress: function(h, p, b) {
-                self.showDownloadProgress(p, b);
+            onDownloadProgress: function(h, p, b, t, s) {
+                self.showDownloadProgress(p, b, s * 1e3);
             },
             onDownloadComplete: function(dl) {
                 // Show the download completed so they can open the file
@@ -333,7 +338,7 @@ mobile.downloadOverlay = {
                 if (error === EOVERQUOTA) {
                     dlmanager.showOverQuotaDialog();
                 }
-                else {
+                else if (error !== EAGAIN) {
                     // Show message 'An error occurred, please try again.'
                     mobile.messageOverlay.show(l[8982]);
                 }
@@ -348,8 +353,9 @@ mobile.downloadOverlay = {
      * Download progress handler
      * @param {Number} percentComplete The number representing the percentage complete e.g. 49.23, 51.5 etc
      * @param {Number} bytesLoaded The number of bytes loaded so far
+     * @param {Number} bytesPerSecond Speed
      */
-    showDownloadProgress: function(percentComplete, bytesLoaded) {
+    showDownloadProgress: function(percentComplete, bytesLoaded, bytesPerSecond) {
 
         'use strict';
 
@@ -361,9 +367,6 @@ mobile.downloadOverlay = {
 
         // Calculate the download speed
         var percentCompleteRounded = Math.round(percentComplete);
-        var currentTime = new Date().getTime();
-        var secondsElapsed = (currentTime - this.startTime) / 1000;
-        var bytesPerSecond = secondsElapsed ? bytesLoaded / secondsElapsed : 0;
         var speed = numOfBytes(bytesPerSecond);
         var speedSizeRounded = Math.round(speed.size);
         var speedText = speedSizeRounded + ' ' + speed.unit + '/s';
@@ -447,9 +450,17 @@ mobile.downloadOverlay = {
         $fileSizeUnsupportedMessage.addClass('hidden');
         $body.removeClass('wrong-file');
 
+        // If UC Browser, show an error message, remove the tap/click handler and show as greyed out
+        if (is_uc_browser) {
+            $body.addClass('wrong-file');
+            $openInBrowserButton.off('tap').addClass('disabled');
+            $fileTypeUnsupportedMessage.removeClass('hidden');
+            return false;
+        }
+
         // Check if the download is supported
         dlmanager.getMaximumDownloadSize().done(function(maxFileSize) {
-            dlmanager.getResumeInfo({id: node.h}, function(aResumeInfo) {
+            dlmanager.getResumeInfo({id: node.h, hasResumeSupport: true}, function(aResumeInfo) {
                 var supported = dlmanager.canSaveToDisk(node);
 
                 if (aResumeInfo) {

@@ -240,6 +240,15 @@ function dl_g(res) {
                     .attr('src', staticpath + 'images/mobile/extensions/' + fileIcon(dl_node) + '.png');
 
                 onMaxSizeKnown = function() {
+
+                    // If UC Browser, show an error message, remove the tap/click handler and show as greyed out
+                    if (is_uc_browser) {
+                        $('body').addClass('wrong-file');
+                        $('.mobile.dl-browser').addClass('disabled').off('click');
+                        $('.mobile.error-txt.file-unsupported').removeClass('hidden');
+                        return false;
+                    }
+
                     var supported = dlmanager.canSaveToDisk(dl_node);
 
                     if (dl_node.s > maxDownloadSize || !supported) {
@@ -476,7 +485,7 @@ function dl_g(res) {
             if (res.fa) {
                 var promise = Promise.resolve();
 
-                if (!window.safari && String(res.fa).indexOf(':8*') > 0) {
+                if (isStreamingEnabled() && String(res.fa).indexOf(':8*') > 0) {
                     promise = iniVideoStreamLayout(dl_node, $pageScrollBlock);
                     prevBut = false;
                 }

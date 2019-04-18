@@ -545,7 +545,7 @@ var Help = (function() {
 
             $('.support-email-icon').rebind('click', function() {
                 var parts = getUrlParts($(this).parents('.support-article').attr('id'));
-                window.helpOrigin = parts.join('/');
+                window.helpOrigin = 'https://mega.nz/' + parts.join('/');
                 var newpage = 'support';
                 if (!u_type) {
                     login_next = newpage;

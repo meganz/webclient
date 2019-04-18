@@ -177,7 +177,7 @@ mobile.account.changePassword = {
 
             // Show 'Your password has been changed' message and load the account page on button click
             mobile.messageOverlay.show(l[725], null, function() {
-                loadSubPage('account');
+                loadSubPage('fm/account');
             });
         }
 

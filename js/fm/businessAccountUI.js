@@ -130,6 +130,11 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide head
         $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
         loadingDialog.phide();
+
+        if (window.triggerShowAddSubUserDialog) {
+            delete window.triggerShowAddSubUserDialog;
+            mySelf.showAddSubUserDialog();
+        }
     };
 
     // private function to fill HTML table for sub users
@@ -736,6 +741,12 @@ BusinessAccountUI.prototype.viewLandingPage = function () {
     $('.fm-right-header-user-management .user-management-main-page-buttons').addClass('hidden');
     $businessAccountContainer.removeClass('hidden'); // BA container
     $landingContainer.removeClass('hidden');
+
+    // check if we are required to show add sub-user dialog.
+    if (window.triggerShowAddSubUserDialog) {
+        delete window.triggerShowAddSubUserDialog;
+        $('.landing-sub-container.adding-subuser', $landingContainer).click();
+    }
 };
 
 /**
@@ -1010,15 +1021,15 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $inShareExSection.find('.folder-number').text(inshareExternalInfo[2] + ' ' + l[2035]);
         $inShareExSection.find('.file-number').text(inshareExternalInfo[1] + ' ' + l[2034]);
 
-        $outShareSection.find('.ff-occupy').text(outshareTotalFormatted.size + ' ' +
+        $outShareExternalSection.find('.ff-occupy').text(outshareTotalFormatted.size + ' ' +
             outshareTotalFormatted.unit);
-        $outShareSection.find('.folder-number').text(outshareInfo[2] + ' ' + l[2035]);
-        $outShareSection.find('.file-number').text(outshareInfo[1] + ' ' + l[2034]);
+        $outShareExternalSection.find('.folder-number').text(outshareInfo[2] + ' ' + l[2035]);
+        $outShareExternalSection.find('.file-number').text(outshareInfo[1] + ' ' + l[2034]);
 
-        $outShareExternalSection.find('.ff-occupy').text(outshareTotalInternalFormatted.size + ' ' +
+        $outShareSection.find('.ff-occupy').text(outshareTotalInternalFormatted.size + ' ' +
             outshareTotalInternalFormatted.unit);
-        $outShareExternalSection.find('.folder-number').text(outshareInternalInfo[2] + ' ' + l[2035]);
-        $outShareExternalSection.find('.file-number').text(outshareInternalInfo[1] + ' ' + l[2034]);
+        $outShareSection.find('.folder-number').text(outshareInternalInfo[2] + ' ' + l[2035]);
+        $outShareSection.find('.file-number').text(outshareInternalInfo[1] + ' ' + l[2034]);
 
         $rubbishSection.find('.ff-occupy').text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
         $rubbishSection.find('.folder-number').text(rubbishInfo[2] + ' ' + l[2035]);
@@ -1179,7 +1190,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 
         var $chartContainer = $('#pie-chart-contianer');
         $chartContainer.empty();
-        $chartContainer.html('<canvas id="usage-pie-chart"></canvas>');
+        $chartContainer.safeHTML('<canvas id="usage-pie-chart"></canvas>');
         var $pieChart = $('#usage-pie-chart', $chartContainer);
 
         M.require('charts_js').done(function usagePieChartDataPopulate() {
@@ -1288,7 +1299,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         M.require('charts_js').done(function () {
             var $charContainer = $("#chartcontainer");
             $charContainer.empty();
-            $charContainer.html('<canvas id="usage-bar-chart" class="daily-transfer-flow-container"></canvas>');
+            $charContainer.safeHTML('<canvas id="usage-bar-chart" class="daily-transfer-flow-container"></canvas>');
             var chartCanvas = $("#usage-bar-chart");
 
             var availableLabels = Object.keys(res);
@@ -1508,16 +1519,31 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
 };
 
 /** Show UI elements if the account got expired  */
-BusinessAccountUI.prototype.showExpiredUIElements = function() {
+BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
     "use strict";
-    if (!u_attr || !u_attr.b || !u_attr.b.m || u_attr.b.s !== -1) {
+    if (!u_attr || !u_attr.b || (u_attr.b.s !== -1 && u_attr.b.s !== 2)) {
         return;
     }
-    var msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
-        .replace(/\[A\]/g, '<a href="/registerb" class="clickurl">').replace(/\[\/A\]/g, '</a>');
-    $('.fm-notification-block.expired-business').safeHTML(msg).show();
-    clickURLs();
-    this.showExpiredDialog(true);
+    var msg = '';
+    if (u_attr.b.s === -1) { // expired
+        if (u_attr.b.m) {
+            msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+                .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+        }
+        else {
+            msg = l[20462];
+        }
+        $('.fm-notification-block.expired-business').safeHTML(msg).show();
+        clickURLs();
+        this.showExpiredDialog(u_attr.b.m);
+    }
+    else if (u_attr.b.s === 2) { // grace
+        if (u_attr.b.m) {
+            msg = l[20650].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+                .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+            $('.fm-notification-block.grace-business').safeHTML(msg).show();
+        }
+    }
 };
 
 /**
@@ -1548,6 +1574,20 @@ BusinessAccountUI.prototype.showExpiredDialog = function(isMaster) {
     }
     else {
         $dialog = $('.user-management-able-user-dialog.warning.user-management-dialog');
+
+        $dialog.find('.dialog-text-one').safeHTML(l[20462]);
+        $dialog.find('.dialog-text-two .text-two-text').text(l[20463]);
+        $dialog.find('.dialog-text-two .bold-warning').text(l[20464] + ':');
+
+        $dialog.find('.cancel-action').addClass('hidden');
+        $dialog.find('.ok-action').text(l[81]).off('click.subuser')
+            .on('click.subuser', function closeExpiredSubAccountDialog() {
+                closeDialog();
+            });
+
+        M.safeShowDialog('expired-business-dialog', function() {
+            return $dialog;
+        });
     }
 };
 
@@ -1911,7 +1951,7 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
         mySelf.business.previousInvoices = JSON.parse(JSON.stringify(invoicesList));
 
 
-        for (var k = 0; k < invoicesList.length; k++) {
+        for (var k = invoicesList.length - 1; k >= 0; k--) {
             // if the invoice is non buinsess one
             if (!invoicesList[k].b) {
                 continue;
@@ -2050,7 +2090,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceTopTitle.find('#invoice-date').text(time2date(invoiceDetail.ts, 1));
         $invoiceTopTitle.find('#invoice-number').text(invoiceDetail.n);
         $invoiceTopTitle.find('.invoice-vat').text(invoiceDetail.mega.taxnum[1]);
-        $invoiceTopTitle.find('.inv-vat-label').text(invoiceDetail.mega.taxnum[0]);
+        $invoiceTopTitle.find('.inv-vat-label').text(invoiceDetail.mega.taxnum[0] + ':');
 
         // billed-to details
         $invoiceDetailContainer.find('.billed-name').text(invoiceDetail.u.cname);
@@ -2229,8 +2269,8 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
     }
 
     dialogQuestion = dialogQuestion.replace('[B]', '<b>').replace('[/B]', '</b>')
-        .replace('{0}', userName);
-    $dialog.find('.dialog-text-one').html(dialogQuestion);
+        .replace('{0}', escapeHTML(userName));
+    $dialog.find('.dialog-text-one').safeHTML(dialogQuestion);
     $dialog.find('.dialog-text-two').text(note);
 
     // event handler for clicking on "Yes" or "Cancel" buttons
@@ -2272,9 +2312,12 @@ BusinessAccountUI.prototype.showWelcomeDialog = function () {
                 closeDialog();
             });
 
-        $dialog.find('.welcome-dlg-options').off('click.subuser')
+        $dialog.find('.welcome-dlg-options .add-subuser, .welcome-dlg-options .go-to-landing').off('click.subuser')
             .on('click.subuser', function welcomeDlgGoToUsersManagement() {
                 closeDialog();
+                if ($(this).hasClass('add-subuser')) {
+                    window.triggerShowAddSubUserDialog = true;
+                }
                 M.openFolder('user-management', true);
             });
 
@@ -2472,13 +2515,13 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
 
             if (!uNameTrimed.length) {
                 $uName.parent().addClass('error');
-                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
+                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1098]);
 
                 return;
             }
             if (!uLastNameTrimed) {
                 $uLastName.parent().addClass('error');
-                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1099]);
+                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1098]);
 
                 return;
             }
@@ -2569,6 +2612,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     $('.dialog-subtitle', $dialog).removeClass('hidden');
                     $('.dialog-title', $dialog).text(l[20035]).removeClass('left-version');
                     // $('.dialog-title', $dialog).addClass('hidden');
+                    $('.mega-logo.icon56.dialog-heading-img', $dialog).addClass('hidden');
                     $('.sent-email-logo.dialog-heading-img', $dialog).removeClass('hidden');
                     $('.dialog-button-container .invite-link-option', $dialog).addClass('hidden');
                 }
@@ -2628,6 +2672,7 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
         $subIDInput.val('');
         $phoneInput.val('');
         $locationInput.val('');
+        $dialog.find('.dialog-input-title-ontop').removeClass('correctinput error active');
     };
 
     clearDialog();
@@ -2796,14 +2841,20 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
             else {
                 if ('fname' in changedVals && !changedVals.fname.length) {
                     $nameInput.parent().addClass('error');
+                    $('.dialog-input-container .error-message.edit-er-sub-n', $dialog)
+                        .removeClass('hidden').text(l[1098]);
                     return;
                 }
                 if ('lname' in changedVals && !changedVals.lname.length) {
                     $lnameInput.parent().addClass('error');
+                    $('.dialog-input-container .error-message.edit-er-sub-n', $dialog)
+                        .removeClass('hidden').text(l[1098]);
                     return;
                 }
                 if ('email' in changedVals && !isValidEmail(changedVals.email)) {
                     $emailInput.parent().addClass('error');
+                    $('.dialog-input-container .error-message.edit-er-sub-m', $dialog)
+                        .removeClass('hidden').text(l[5705]);
                     return;
                 }
                 var editPromise = mySelf.business.editSubAccount(subUserHandle, changedVals.email,
@@ -3003,8 +3054,8 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
                                             $('.user-management-able-user-dialog.mig-success.user-management-dialog');
                                         $('.yes-answer', $dialog).off('click.suba').on('click.suba', closeDialog);
                                         $dialog.find('.dialog-text-one')
-                                            .html(l[19149].replace('{0}', '<b>' + M.suba[subUserHandle].e + '</b>')
-                                            .replace('{1}', '<b>' + folderName + '</b>'));
+                                            .safeHTML(l[19149].replace('{0}', '<b>' + M.suba[subUserHandle].e + '</b>')
+                                                .replace('{1}', '<b>' + escapeHTML(folderName) + '</b>'));
                                         return $dialog;
                                     });
                                     return;

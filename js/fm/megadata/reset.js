@@ -21,24 +21,6 @@ MegaData.prototype.reset = function() {
     this.suba = Object.create(null);
     if (typeof MegaDataMap !== 'undefined') {
         this.u = new MegaDataMap();
-        this.u.addChangeListener(function() {
-            if (fminitialized) {
-                if (
-                    typeof $.sortTreePanel !== 'undefined' &&
-                    typeof $.sortTreePanel.contacts !== 'undefined' &&
-                    $.sortTreePanel.contacts.by === 'status'
-                ) {
-                    M.contacts(); // we need to resort
-                }
-                else if (M.currentdirid && M.u[M.currentdirid]) {
-                    M.contacts(); // we need to resort
-                }
-                if (getSitePath() === "/fm/contacts") {
-                    // re-render the contact view page if the presence had changed
-                    M.openFolder('contacts', true);
-                }
-            }
-        });
     }
 
     this.nn = false;

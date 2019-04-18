@@ -241,6 +241,13 @@
             newHashLocation = 'F!' + pfid + '!' + pfkey + target;
             this.lastSeenFolderLink = newHashLocation;
         }
+        else if (
+            id.substr(0, 5) === "chat/" &&
+            id.substr(6, 1) !== "/"
+        ) {
+            // is a chat link, e.g. chat/[^/]
+            newHashLocation = this.currentdirid;
+        }
         else {
             // new hash location can be altered already by the chat logic in the previous lines in this func
             if (!newHashLocation) {
@@ -445,7 +452,7 @@
             }
         }
         else if (String(id).length === 11) {
-            if (M.u[id]) {
+            if (M.u[id] && id !== u_handle) {
                 fetchshares = !M.c[id];
             }
             else {
@@ -473,18 +480,7 @@
         }
 
         var promise = new MegaPromise();
-
-        if (fetchdbnodes || $.ofShowNoFolders) {
-            var tp = $.ofShowNoFolders ? dbfetch.tree([id]) : dbfetch.get(id);
-
-            tp.always(function() {
-                if (!M.d[id]) {
-                    id = M.RootID;
-                }
-                _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
-            });
-        }
-        else if (fetchshares || id === 'shares') {
+        var fetchShares = function() {
             dbfetch.geta(Object.keys(M.c.shares || {}))
                 .always(function() {
                     if (!$.inSharesRebuild) {
@@ -493,6 +489,26 @@
                     }
                     _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
                 });
+        };
+
+        if (fetchdbnodes || $.ofShowNoFolders) {
+            var tp = $.ofShowNoFolders ? dbfetch.tree([id]) : dbfetch.get(id);
+
+            tp.always(function() {
+                if (!M.d[id]) {
+                    id = M.RootID;
+                }
+
+                if (M.getPath(id).pop() === 'shares') {
+                    fetchShares();
+                }
+                else {
+                    _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
+                }
+            });
+        }
+        else if (fetchshares || id === 'shares') {
+            fetchShares();
         }
         else {
             _openFolderCompletion.call(this, id, newHashLocation, firstopen, promise);

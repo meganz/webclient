@@ -2826,7 +2826,7 @@ browserDialog.isWeak = function() {
 
     result.ie10 = (ua.indexOf('MSIE 10') > -1);
     result.ie11 = ('-ms-scroll-limit' in style) && ('-ms-ime-align' in style);
-    result.edge = /\sEdge\/\d/.test(ua);
+    result.edge = /\sEdg(?:e|A|iOS)?\/\d/.test(ua);
     result.safari = (ua.indexOf('Safari') > -1) && (ua.indexOf('Chrome') === -1);
 
     result.weak = result.edge || result.ie11 || result.ie10 || result.safari;

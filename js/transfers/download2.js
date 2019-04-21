@@ -2019,6 +2019,9 @@ var dlmanager = {
         if (message) {
             $elm.addClass('default-warning');
         }
+        else if (String(uad.browser).startsWith('Edg')) {
+            $elm.addClass('edge');
+        }
         else if (window.safari) {
             $elm.addClass('safari');
         }
@@ -2033,9 +2036,6 @@ var dlmanager = {
         }
         else if (uad.engine === 'Trident') {
             $elm.addClass('ie');
-        }
-        else if (uad.browser === 'Edge') {
-            $elm.addClass('edge');
         }
 
         var setText = function(locale, $elm) {

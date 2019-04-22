@@ -560,7 +560,7 @@ tmp = getCleanSitePath(location.hash || undefined);
 if (tmp.substr(0, 12) === 'sitetransfer') {
     try {
         sessionStorage.sitet = tmp;
-        // document.location = 'https://mega.nz/start';
+        document.location = 'https://mega.nz/start';
     }
     catch (ex) {
         console.warn(ex);
@@ -3421,6 +3421,8 @@ mBroadcaster.once('startMega', function() {
 
     if (data) {
         delete sessionStorage.sitet;
-        M.transferFromMegaCoNz(data);
+        onIdle(function() {
+            M.transferFromMegaCoNz(data);
+        });
     }
 });

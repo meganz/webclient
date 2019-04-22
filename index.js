@@ -79,6 +79,7 @@ mBroadcaster.once('startMega:desktop', function () {
 });
 
 function startMega() {
+    jsl = [];
     mBroadcaster.sendMessage('startMega');
 
     if (is_mobile) {
@@ -90,7 +91,6 @@ function startMega() {
         mBroadcaster.removeListeners('startMega:mobile');
     }
 
-    jsl = [];
     if (silent_loading) {
         onIdle(silent_loading);
         silent_loading = false;

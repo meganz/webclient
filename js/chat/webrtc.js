@@ -929,6 +929,10 @@ RtcModule.prototype.getAudioVideoSenderCount = function(chatid) {
     return { audio: audioSenders, video: videoSenders };
 };
 
+RtcModule.onNoInputAudioDetected = function() {
+    this._fire("onNoInputAudioDetected");
+};
+
 RtcModule.prototype.logout = function() {
     this._loggedOut = true;
 };

@@ -3904,7 +3904,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.dragover {
     background-color: rgba(217,0,7,0.3);
 }
-.shared-with-me .nw-fm-tree-item:hover {
+.shared-with-me .nw-fm-tree-item:hover, .shared-with-me .nw-fm-tree-item.hovered {
     background-color: rgba(255,179,0,0.3);
 }
 .shared-with-me .nw-fm-tree-item.selected {
@@ -3913,7 +3913,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .shared-with-me .nw-fm-tree-item.dragover {
     background-color: rgba(255,179,0,0.4);
 }
-.rubbish-bin .nw-fm-tree-item:hover {
+.rubbish-bin .nw-fm-tree-item:hover, .rubbish-bin .nw-fm-tree-item.hovered {
     background-color: rgba(39,183,0,0.3);
 }
 .rubbish-bin .nw-fm-tree-item.selected {

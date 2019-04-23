@@ -603,6 +603,10 @@ Call.prototype._initialGetLocalStream = function(av) {
 
     return new Promise(function(resolve, reject) {
         pms.then(function(stream) {
+            if (resolved) {
+                RTC.stopMediaStream(stream);
+                return;
+            }
             resolved = true;
             if (!needAudio) {
                 Av.enableAudio(stream, false);
@@ -632,6 +636,7 @@ Call.prototype._initialGetLocalStream = function(av) {
         });
         setTimeout(function() {
             if (!resolved) {
+                resolved = true;
                 reject("timeout");
             }
         }, RtcModule.kMediaGetTimeout);
@@ -661,6 +666,10 @@ Call.prototype._getLocalVideo = function() {
     return new Promise(function(resolve, reject) {
         RTC.getUserMedia({audio: false, video: vidOpts})
         .then(function(stream) {
+            if (resolved) {
+                RTC.stopMediaStream(stream);
+                return;
+            }
             resolved = true;
             if (self.state >= CallState.kTerminating) {
                 return;
@@ -675,11 +684,14 @@ Call.prototype._getLocalVideo = function() {
             resolve(self.gLocalStream);
         })
         .catch(function(err) {
-            resolved = true;
-            reject(err);
+            if (!resolved) {
+                resolved = true;
+                reject(err);
+            }
         });
         setTimeout(function() {
             if (!resolved) {
+                resolved = true;
                 reject("timeout");
             }
         }, RtcModule.kMediaGetTimeout);

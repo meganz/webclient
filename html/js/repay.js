@@ -1,15 +1,16 @@
 ﻿function RepayPage() {
-
+    this.noOverduePaymentErrorCode = -1;
+    this.unknownErrorCode = -99;
 };
 
 RepayPage.prototype.init = function() {
 
-    if (!u_attr || !u_attr.b || !u_attr.b.m || (u_attr.b.s !== -1 && u_attr.b.s !== -2)) {
+    if (!u_attr || !u_attr.b || !u_attr.b.m || (u_attr.b.s !== -1 && u_attr.b.s !== 2)) {
         loadSubPage('start');
         return;
     }
-
-    // loadingDialog.show();
+    var mySelf = this;
+    loadingDialog.show();
 
     parsepage(pages['repay']);
 
@@ -83,4 +84,58 @@ RepayPage.prototype.init = function() {
                 }
             }
         });
+
+    M.require('businessAcc_js').done(function() {
+        var business = new BusinessAccount();
+        var overduePromise = business.getOverduePayments();
+
+        var failHandler = function(st, res) {
+            var msg = l[20671];
+            var title = l[6859];
+            if (res !== mySelf.noOverduePaymentErrorCode) {
+                msg = l[20672];
+                title = l[1578];
+            }
+            msgDialog('warninga', l[6859], l[20671], '', function() {
+                loadingDialog.hide();
+                loadSubPage('');
+            });
+        };
+
+        overduePromise.fail(failHandler)
+
+        overduePromise.done(function(st, res) {
+            // validations of API response
+            if (st !== 1 || !res || !res.t || !res.inv || !res.inv.length) {
+                return failHandler(0, mySelf.unknownErrorCode);
+            }
+
+            loadingDialog.hide();
+
+            var $rightBlock = ('.main-right-block', $repaySection);
+
+            var $overduePaymentRow = $('.repay-breakdown-tb-content', $rightBlock);
+            var $overduePaymentHeader = $('.repay-breakdown-tb-header', $rightBlock);
+
+            var rowTemplate = $overduePaymentRow.clone();
+
+            // adding due invoice row
+            $overduePaymentRow.find('.content-desc').text(res.inv[0].d);
+            $overduePaymentRow.find('.content-date').text(time2date(res.inv[0].ts, 1));
+            $overduePaymentRow.find('.content-amou').text(res.inv[0].tot);
+
+            if (res.nb && res.et) {
+                var futurePaymentRow = rowTemplate.clone();
+
+                futurePaymentRow.find('.content-desc').text(res.nb + l[5569]);
+                futurePaymentRow.find('.content-date').text(time2date(new Date().getTime() / 1000, 1));
+                futurePaymentRow.find('.content-amou').text(res.et);
+
+                futurePaymentRow.insertAfter($overduePaymentHeader);
+            }
+
+            $rightBlock.find('.repay-td-total').text(res.t);
+        });
+
+    });
 };

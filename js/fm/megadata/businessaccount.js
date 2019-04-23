@@ -1580,6 +1580,34 @@ BusinessAccount.prototype.resendInvitation = function (subuserHandle) {
 
 
 /**
+ * Ask API about due payments
+ */
+BusinessAccount.prototype.getOverduePayments = function() {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    var request = {
+        "a": "iu"
+    };
+
+    api_req(request, {
+        callback: function(res) {
+            if (typeof res === 'object') {
+                operationPromise.resolve(1, res);
+            }
+            else {
+                operationPromise.reject(0, res, 'API returned error, ret=' + res);
+            }
+        }
+    });
+
+    return operationPromise;
+};
+
+
+
+
+/**
  * update a sub user attributes upon their change notification
  * @param {String} subuserHandle            Sub-user handle
  * @param {String[]} changedAttrs           Array of changed attributes names

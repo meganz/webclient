@@ -608,6 +608,10 @@ Call.prototype._initialGetLocalStream = function(av) {
                 return;
             }
             resolved = true;
+            if (self.state >= CallState.kTerminating) {
+                RTC.stopMediaStream(stream);
+                return;
+            }
             if (!needAudio) {
                 Av.enableAudio(stream, false);
             }
@@ -672,6 +676,7 @@ Call.prototype._getLocalVideo = function() {
             }
             resolved = true;
             if (self.state >= CallState.kTerminating) {
+                RTC.stopMediaStream(stream);
                 return;
             }
             var track = stream.getVideoTracks()[0];

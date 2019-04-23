@@ -4258,6 +4258,7 @@ li.token-input-token-invite .input-close {
     width: 80px;
     height: 80px;
     display: block;
+    margin-left: calc(50% - 40px);
 }
 .user-management-dialog.payment-reminder .big-red-button {
     margin: 0;

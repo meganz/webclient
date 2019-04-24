@@ -560,7 +560,7 @@ tmp = getCleanSitePath(location.hash || undefined);
 if (tmp.substr(0, 12) === 'sitetransfer') {
     try {
         sessionStorage.sitet = tmp;
-        document.location = 'https://mega.nz/start';
+        location.hash = 'home';
     }
     catch (ex) {
         console.warn(ex);
@@ -624,7 +624,6 @@ if (!browserUpdate && is_extension)
 
 
 var page;
-var locSearch = location.search;
 if (hashLogic) {
     // legacy support:
     page = getCleanSitePath(document.location.hash);

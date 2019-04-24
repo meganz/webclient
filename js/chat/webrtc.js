@@ -3813,7 +3813,9 @@ function AudioLevelMonitor(stream, handler, changeThreshold) {
     }
     self.handler = handler;
     self._changeThreshold = changeThreshold ? (changeThreshold / 100) : 0.05;
+    console.warn("DEBUG: About to call new AudioContext()");
     var ctx = self.audioCtx = new AudioContext();
+    console.warn("DEBUG: new AudioContext() called");
     self.source = ctx.createMediaStreamSource(stream);
     var scriptNode = self.scriptNode = ctx.createScriptProcessor(8192, 1, 1);
     scriptNode.onaudioprocess = function(event) {

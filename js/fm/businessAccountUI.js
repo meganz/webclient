@@ -1528,7 +1528,7 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
     if (u_attr.b.s === -1) { // expired
         if (u_attr.b.m) {
             msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
-                .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+                .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>');
         }
         else {
             msg = l[20462];
@@ -1540,7 +1540,7 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
     else if (u_attr.b.s === 2) { // grace
         if (u_attr.b.m) {
             msg = l[20650].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
-                .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+                .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>');
             $('.fm-notification-block.grace-business').safeHTML(msg).show();
         }
     }
@@ -1565,7 +1565,7 @@ BusinessAccountUI.prototype.showExpiredDialog = function(isMaster) {
         $dialog.find('.pay-reactive-acc').off('click.subuser')
             .on('click.subuser', function payReactivateAccountButtonClickHandler() {
                 closeDialog();
-                loadSubPage('registerb');
+                loadSubPage('repay');
             });
 
         M.safeShowDialog('expired-business-dialog', function() {

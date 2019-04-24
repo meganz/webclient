@@ -112,6 +112,8 @@ RepayPage.prototype.init = function() {
 
             loadingDialog.hide();
 
+            var nbOfUsers = new BusinessRegister().minUsers;
+
             var $rightBlock = ('.main-right-block', $repaySection);
 
             var $overduePaymentRow = $('.repay-breakdown-tb-content', $rightBlock);
@@ -123,11 +125,13 @@ RepayPage.prototype.init = function() {
             $overduePaymentRow.find('.content-desc').text(res.inv[0].d);
             $overduePaymentRow.find('.content-date').text(time2date(res.inv[0].ts, 1));
             $overduePaymentRow.find('.content-amou').text(res.inv[0].tot);
+            nbOfUsers = res.inv[0].nb;
 
             if (res.nb && res.et) {
                 var futurePaymentRow = rowTemplate.clone();
+                nbOfUsers = res.nb;
 
-                futurePaymentRow.find('.content-desc').text(res.nb + l[5569]);
+                futurePaymentRow.find('.content-desc').text(res.nb + ' ' + l[5569]);
                 futurePaymentRow.find('.content-date').text(time2date(new Date().getTime() / 1000, 1));
                 futurePaymentRow.find('.content-amou').text(res.et);
 
@@ -135,6 +139,34 @@ RepayPage.prototype.init = function() {
             }
 
             $rightBlock.find('.repay-td-total').text(res.t);
+
+            if (u_attr['%name']) {
+                $leftSection.find('#repay-business-cname').text(u_attr['%name']);
+            }
+            else {
+                mega.attr.get(u_attr.b.bu, '%name', -1, undefined,
+                    function(res, ctx) {
+                        if (typeof res !== 'number' && ctx.ua === "%name") {
+                            u_attr['%name'] = from8(base64urldecode(res));
+                            $leftSection.find('#repay-business-cname').text(u_attr['%name']);
+                        }
+                    });
+            }
+
+            if (u_attr['%email']) {
+                $leftSection.find('#repay-business-email').text(u_attr['%email']);
+            }
+            else {
+                mega.attr.get(u_attr.b.bu, '%email', -1, undefined,
+                    function(res, ctx) {
+                        if (typeof res !== 'number' && ctx.ua === "%email") {
+                            u_attr['%email'] = from8(base64urldecode(res));
+                            $leftSection.find('#repay-business-email').text(u_attr['%email']);
+                        }
+                    });
+            }
+
+            $leftSection.find('#repay-business-nb-users').text(nbOfUsers + ' ' + l[5569]);
         });
 
     });

@@ -1249,6 +1249,9 @@ var addressDialog = {
             proNum = 'bus-plan-icon64'; // business account Plan icon
             proPlan = l[19510];
             proPrice = (this.userInfo.nbOfUsers * this.businessPlan.p).toFixed(2);
+            if (this.businessPlan.pastInvoice) {
+                proPrice += this.businessPlan.pastInvoice.tot;
+            }
             this.businessPlan.totalPrice = proPrice;
             this.businessPlan.totalUsers = this.userInfo.nbOfUsers;
             numOfMonths = this.businessPlan.m;

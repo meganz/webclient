@@ -167,6 +167,16 @@ RepayPage.prototype.init = function() {
             }
 
             $leftSection.find('#repay-business-nb-users').text(nbOfUsers + ' ' + l[5569]);
+
+            business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
+                mySelf.planInfo = info;
+                mySelf.planInfo.pastInvoice = res.inv[0];
+                mySelf.userInfo = {
+                    fname: '',
+                    lname: '',
+                    nbOfUsers: res.nb || 0;
+                };
+            });
         });
 
     });

@@ -3,8 +3,8 @@
     this.unknownErrorCode = -99;
 };
 
-RepayPage.prototype.init = function() {
-
+RepayPage.prototype.initPage = function() {
+    "use strict";
     if (!u_attr || !u_attr.b || !u_attr.b.m || (u_attr.b.s !== -1 && u_attr.b.s !== 2)) {
         loadSubPage('start');
         return;
@@ -28,7 +28,8 @@ RepayPage.prototype.init = function() {
             if ($(this).hasClass('disabled')) {
                 return false;
             }
-            alert('Hi Kiro');
+            addressDialog.init(mySelf.planInfo, mySelf.userInfo, new BusinessRegister());
+            return false;
         });
 
     // event handler for radio buttons
@@ -171,10 +172,11 @@ RepayPage.prototype.init = function() {
             business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
                 mySelf.planInfo = info;
                 mySelf.planInfo.pastInvoice = res.inv[0];
+                mySelf.planInfo.currInvoice = { et: res.et || 0, t: res.t };
                 mySelf.userInfo = {
                     fname: '',
                     lname: '',
-                    nbOfUsers: res.nb || 0;
+                    nbOfUsers: res.nb || 0
                 };
             });
         });

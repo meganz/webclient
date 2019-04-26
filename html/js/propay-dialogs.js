@@ -1249,8 +1249,11 @@ var addressDialog = {
             proNum = 'bus-plan-icon64'; // business account Plan icon
             proPlan = l[19510];
             proPrice = (this.userInfo.nbOfUsers * this.businessPlan.p).toFixed(2);
-            if (this.businessPlan.pastInvoice) {
-                proPrice += this.businessPlan.pastInvoice.tot;
+            if (this.businessPlan.pastInvoice && this.businessPlan.currInvoice) {
+                // since API returned values types cant be guarnteed,
+                // sometimes they are strings, and sometimes they are numbers!
+                proPrice = Number(this.businessPlan.currInvoice.t);
+                proPrice = proPrice.toFixed(2);
             }
             this.businessPlan.totalPrice = proPrice;
             this.businessPlan.totalUsers = this.userInfo.nbOfUsers;
@@ -1531,10 +1534,16 @@ var addressDialog = {
             // if we are coming from business plan, we need to reset registration
             if (mySelf.businessPlan && mySelf.userInfo) {
                 if (is_mobile) {
-                    parsepage(pages['registerb']);
+                    parsepage(pages[page]);
                 }
-                var businessReg = new BusinessRegister();
-                businessReg.initPage();
+                if (page === 'registerb') {
+                    var businessReg = new BusinessRegister();
+                    businessReg.initPage();
+                }
+                else if (page === 'repay') {
+                    var businessRepay = new RepayPage();
+                    businessRepay.initPage();
+                }
             }
         });
     },

@@ -3428,5 +3428,8 @@
     "20667": "Crear nuevo enlace",
     "20668": "No hay elementos compartidos por mi",
     "20669": "No hay enlaces p\u00fablico",
-    "20670": "Compartido el"
+    "20670": "Compartido el",
+    "20671": "You don't have any overdue payments.",
+    "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
+    "20673": "a long time ago"
 }

@@ -3428,5 +3428,8 @@
     "20667": "Utw\u00f3rz nowy link",
     "20668": "Brak akcji wychodz\u0105cych",
     "20669": "Brak link\u00f3w publicznych",
-    "20670": "Data udost\u0119pnienia"
+    "20670": "Data udost\u0119pnienia",
+    "20671": "You don't have any overdue payments.",
+    "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
+    "20673": "a long time ago"
 }

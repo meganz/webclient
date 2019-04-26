@@ -3428,5 +3428,8 @@
     "20667": "Crea un nuovo link",
     "20668": "Nessuna condivisione in uscita",
     "20669": "Nessun link pubblico",
-    "20670": "Data di condivisione"
+    "20670": "Data di condivisione",
+    "20671": "You don't have any overdue payments.",
+    "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
+    "20673": "a long time ago"
 }

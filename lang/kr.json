@@ -3428,5 +3428,8 @@
     "20667": "\uc0c8 \ub9c1\ud06c \uc0dd\uc131",
     "20668": "\ub098\uac00\ub294 \uacf5\uc720 \uc5c6\uc74c",
     "20669": "\uacf5\uac1c \ub9c1\ud06c \uc5c6\uc74c",
-    "20670": "\uacf5\uc720\ub41c \ub0a0\uc9dc"
+    "20670": "\uacf5\uc720\ub41c \ub0a0\uc9dc",
+    "20671": "You don't have any overdue payments.",
+    "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
+    "20673": "a long time ago"
 }

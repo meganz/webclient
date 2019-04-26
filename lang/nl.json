@@ -3428,5 +3428,8 @@
     "20667": "Cre\u00eber Nieuwe Link",
     "20668": "Geen Uitgaande Gedeeld",
     "20669": "Geen Publieke Links",
-    "20670": "Datum Gedeeld"
+    "20670": "Datum Gedeeld",
+    "20671": "You don't have any overdue payments.",
+    "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
+    "20673": "a long time ago"
 }

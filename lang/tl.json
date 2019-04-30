@@ -3314,7 +3314,6 @@
     "20484": "Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.",
     "20487": "Delete chat link",
     "20488": "Chat link",
-    "20538": "This conversation will no longer be accessible through the chat link once it has been removed.",
     "20552": "Secure Cloud Storage and Communication. [Br] Privacy by Design.",
     "20553": "Create a MEGA account to get [S]50 GB FREE*[\/S] storage",
     "20554": "Reliable Storage and Fast Transfers",
@@ -3428,8 +3427,13 @@
     "20667": "Create New Link",
     "20668": "No Outgoing Shares",
     "20669": "No Public Links",
-    "20670": "Date Shared",
+    "20670": "Share Created",
     "20671": "You don't have any overdue payments.",
     "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
-    "20673": "a long time ago"
+    "20673": "a long time ago",
+    "20694": "Link Created",
+    "20695": "Open containing folder",
+    "20696": "Know more about desktop app",
+    "20697": "Download MEGA desktop app",
+    "20698": "Transfer with MEGA desktop app."
 }

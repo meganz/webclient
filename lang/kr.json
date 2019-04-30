@@ -3314,7 +3314,6 @@
     "20484": "\ud0a4 \uc21c\ud658\uc740 \uc57d\uac04 \ub354 \uc548\uc804\ud569\ub2c8\ub2e4\ub9cc, \ub300\ud654 \ub9c1\ud06c\ub97c \uc0dd\uc131\ud560 \uc218 \uc5c6\uace0 \uc0c8\ub85c\uc6b4 \ucc38\uc5ec\uc790\ub294 \uacfc\uac70 \uba54\uc2dc\uc9c0\ub97c \ubcfc \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.",
     "20487": "\ub300\ud68c \ub9c1\ud06c \uc0ad\uc81c",
     "20488": "\ub300\ud654 \ub9c1\ud06c",
-    "20538": "\ub300\ud654 \ub9c1\ud06c\uac00 \uc0ad\uc81c\ub418\uba74 \uc774 \ub300\ud654\uc5d0 \ub300\ud654 \ub9c1\ud06c\ub97c \ud1b5\ud558\uc5ec \ucc38\uc5ec\ud560 \uc218 \uc5c6\uac8c \ub429\ub2c8\ub2e4.",
     "20552": "\uc548\uc804\ud55c \ud074\ub77c\uc6b0\ub4dc \uc800\uc7a5\uc18c\uc640 \ub300\ud654. [Br] \uac1c\uc778 \uc815\ubcf4 \ubcf4\ud638\ub97c \uc704\ud55c \uc124\uacc4.",
     "20553": "[S]50 GB\uc758 \ubb34\ub8cc*[\/S] \uc800\uc7a5\uc18c\ub97c \ubc1b\uc73c\ub824\uba74 MEGA \uacc4\uc815\uc744 \uc0dd\uc131\ud558\uc138\uc694",
     "20554": "\ubbff\uc744\ub9cc\ud55c \uc800\uc7a5\uc18c\uc640 \ube60\ub978 \uc804\uc1a1",
@@ -3431,5 +3430,10 @@
     "20670": "\uacf5\uc720\ub41c \ub0a0\uc9dc",
     "20671": "You don't have any overdue payments.",
     "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
-    "20673": "a long time ago"
+    "20673": "a long time ago",
+    "20694": "Link Created",
+    "20695": "Open containing folder",
+    "20696": "Know more about desktop app",
+    "20697": "Download MEGA desktop app",
+    "20698": "Transfer with MEGA desktop app."
 }

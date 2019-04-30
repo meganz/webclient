@@ -3314,7 +3314,6 @@
     "20484": "Rota\u021bia cheii este pu\u021bin mai sigur\u0103, dar nu \u00ee\u021bi permite s\u0103 creezi un link al chatului, iar noii participan\u021bi nu vor vedea mesajele din trecut.",
     "20487": "\u0218terge linkul chatului",
     "20488": "Linkul chatului",
-    "20538": "Aceast\u0103 conversa\u021bie nu va mai fi accesibil\u0103 prin linkul chatului odat\u0103 ce acesta a fost eliminat.",
     "20552": "Stocare \u0219i comunicare securizat\u0103 \u00een cloud. [Br] Confiden\u021bialitate prin design.",
     "20553": "Creeaz\u0103 un cont MEGA pentru a ob\u021bine [S]50 GB GRATUI\u021aI*[\/S] spa\u021biu de stocare",
     "20554": "Stocare fiabil\u0103 \u0219i transferuri rapide",
@@ -3431,5 +3430,10 @@
     "20670": "Data partaj\u0103rii",
     "20671": "You don't have any overdue payments.",
     "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
-    "20673": "a long time ago"
+    "20673": "a long time ago",
+    "20694": "Link Created",
+    "20695": "Open containing folder",
+    "20696": "Know more about desktop app",
+    "20697": "Download MEGA desktop app",
+    "20698": "Transfer with MEGA desktop app."
 }

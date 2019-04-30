@@ -3314,7 +3314,6 @@
     "20484": "Sleutel rotatie is iets veiliger, maar u kunt geen koppeling naar het gesprek cre\u00ebren en nieuwe deelnemers kunnen geen berichten uit het verleden zien.",
     "20487": "Verwijder Gesprekskoppeling",
     "20488": "Gesprekskoppeling",
-    "20538": "Deze conversatie blijft niet langer toegankelijk via de gesprekslink zodra het is verwijderd.",
     "20552": "Veilige Cloudopslag en Communicatie. [Br]Privacy by Design",
     "20553": "Maak een MEGA-account om [S]50 GB GRATIS*[\/S] opslag te krijgen",
     "20554": "Betrouwbare Opslag en Snelle Overdrachten",
@@ -3431,5 +3430,10 @@
     "20670": "Datum Gedeeld",
     "20671": "You don't have any overdue payments.",
     "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
-    "20673": "a long time ago"
+    "20673": "a long time ago",
+    "20694": "Link Created",
+    "20695": "Open containing folder",
+    "20696": "Know more about desktop app",
+    "20697": "Download MEGA desktop app",
+    "20698": "Transfer with MEGA desktop app."
 }

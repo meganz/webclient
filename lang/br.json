@@ -3314,7 +3314,6 @@
     "20484": "A rota\u00e7\u00e3o de chaves \u00e9 um pouco mais segura, mas n\u00e3o permite criar um link do chat, e os novos participantes n\u00e3o ver\u00e3o as mensagens anteriores.",
     "20487": "Deletar o link do chat",
     "20488": "Link do chat",
-    "20538": "Se o link for eliminado, este chat j\u00e1 n\u00e3o poder\u00e1 ser acessado usando-o.",
     "20552": "Comunica\u00e7\u00e3o e armazenamento em nuvem seguros. [Br] Privacidade por design.",
     "20553": "Crie uma conta no MEGA para obter [S]50 GB de armazenamento GRATUITO*[\/S]",
     "20554": "Armazenamento confi\u00e1vel e transfer\u00eancias r\u00e1pidas",
@@ -3431,5 +3430,10 @@
     "20670": "Compartilhado em",
     "20671": "You don't have any overdue payments.",
     "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
-    "20673": "a long time ago"
+    "20673": "a long time ago",
+    "20694": "Link Created",
+    "20695": "Open containing folder",
+    "20696": "Know more about desktop app",
+    "20697": "Download MEGA desktop app",
+    "20698": "Transfer with MEGA desktop app."
 }

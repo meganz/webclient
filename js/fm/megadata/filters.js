@@ -125,7 +125,6 @@ MegaData.prototype.filterBySearch = function (str) {
             // Wait for this.openFolder to finish and set colors to matching hashes
             this.onRenderFinished = function() {
                 var find = M.viewmode ? 'a' : 'tr';
-                $(window).trigger('dynlist.flush');
                 $(M.fsViewSel).find(find).each(function() {
                     var $this = $(this);
                     var node = M.d[$this.attr('id')];

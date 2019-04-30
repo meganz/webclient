@@ -1037,6 +1037,127 @@ MegaUtils.prototype.findDupes = function() {
 };
 
 /**
+ * Search for nodes
+ * @param {String} searchTerm The search term to look for.
+ * @returns {Promise}
+ */
+MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
+    'use strict';
+
+    // Add log to see how often they use the search
+    eventlog(99603, JSON.stringify([1, pfid ? 1 : 0, Object(M.d[M.RootID]).tf, searchTerm.length]), pfid);
+
+    return new Promise(function(resolve, reject) {
+        var promise = MegaPromise.resolve();
+        var fill = function(nodes) {
+            var r = 0;
+
+            for (var i = nodes.length; i--;) {
+                var n = nodes[i];
+                if (M.nn[n.h]) {
+                    r = 1;
+                }
+                else if (!n.fv) {
+                    M.nn[n.h] = n.name;
+                }
+            }
+
+            return r;
+        };
+
+        if (d) {
+            console.time('fm-search-nodes');
+        }
+
+        if (!M.nn) {
+            M.nn = Object.create(null);
+
+            if (fmdb) {
+                loadingDialog.show();
+                promise = new Promise(function(resolve, reject) {
+                    var ts = 0;
+                    var max = 96;
+                    var options = {
+                        sortBy: 't',
+                        limit: 16384,
+
+                        query: function(db) {
+                            return db.where('t').aboveOrEqual(ts);
+                        },
+                        include: function() {
+                            return true;
+                        }
+                    };
+
+                    onIdle(function _() {
+                        var done = function(r) {
+                            if (!Array.isArray(r)) {
+                                return reject(r);
+                            }
+
+                            if (r.length) {
+                                ts = r[r.length - 1].ts + fill(r);
+
+                                if (--max && r.length === options.limit) {
+                                    return onIdle(_);
+                                }
+                            }
+
+                            resolve();
+                        };
+                        fmdb.getbykey('f', options).then(done).catch(done);
+                    });
+                });
+            }
+            else {
+                fill(Object.values(M.d));
+            }
+        }
+
+        promise.then(function() {
+            var h;
+            var filter = M.getFilterBySearchFn(searchTerm);
+
+            if (folderlink) {
+                M.v = [];
+                for (h in M.nn) {
+                    if (filter({name: M.nn[h]}) && h !== M.currentrootid) {
+                        M.v.push(M.d[h]);
+                    }
+                }
+                M.currentdirid = 'search/' + searchTerm;
+                M.renderMain();
+                M.onSectionUIOpen('cloud-drive');
+                onIdle(resolve);
+            }
+            else {
+                var handles = [];
+
+                for (h in M.nn) {
+                    if (!M.d[h] && filter({name: M.nn[h]}) && handles.push(h) > 4e3) {
+                        break;
+                    }
+                }
+
+                loadingDialog.show();
+                dbfetch.geta(handles).always(function() {
+                    loadSubPage('fm/search/' + searchTerm);
+                    onIdle(resolve);
+                });
+            }
+
+            if (d) {
+                console.timeEnd('fm-search-nodes');
+            }
+        }).catch(function(ex) {
+            loadingDialog.hide();
+            msgDialog('warninga', l[135], l[47], ex);
+            reject(ex);
+        });
+    });
+};
+
+/**
  * Handle a redirect from the mega.co.nz/#pro page to mega.nz/#pro page
  * and keep the user logged in at the same time
  *

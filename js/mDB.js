@@ -955,7 +955,8 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, lim
 };
 // @private
 FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, limit) {
-    "use strict";
+    "use strict"; /* jshint -W074 */
+
     var options = false;
     if (typeof index !== 'string') {
         options = index;
@@ -1030,8 +1031,9 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
     if (limit) {
         t = t.limit(limit);
     }
+    t = options.sortBy ? t.sortBy(options.sortBy) : t.toArray();
 
-    t.toArray().then(function(r){
+    t.then(function(r) {
         // now scan the pending elements to capture and return unwritten updates
         // FIXME: typically, there are very few or no pending elements -
         // determine if we can reduce overall CPU load by replacing the

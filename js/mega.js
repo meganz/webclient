@@ -2871,10 +2871,10 @@ function processPS(pendingShares, ignoreDB) {
                             id: M.opc[pendingContactId].m,
                             name: contactName
                         }]);
-                    addToMultiInputDropDownList('.add-contact-multiple-input', {
-                        id: M.opc[pendingContactId].m,
-                        name: contactName
-                    });
+                    addToMultiInputDropDownList('.add-contact-multiple-input', [{
+                            id: M.opc[pendingContactId].m,
+                            name: contactName
+                        }]);
                 }
             }
             else {

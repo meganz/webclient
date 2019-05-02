@@ -3314,7 +3314,6 @@
     "20484": "Rotacja klucza jest nieco bezpieczniejsza, ale nie pozwala utworzy\u0107 \u0142\u0105cza do czatu, a nowi uczestnicy nie b\u0119d\u0105 widzie\u0107 poprzednich wiadomo\u015bci.",
     "20487": "Usu\u0144 link czatu",
     "20488": "Link do czatu",
-    "20538": "Ta rozmowa nie b\u0119dzie ju\u017c dost\u0119pna za po\u015brednictwem \u0142\u0105cza czatu po jej usuni\u0119ciu.",
     "20552": "Bezpieczne przechowywanie w chmurze i komunikacja. [Br] Prywatno\u015b\u0107 wed\u0142ug projektu.",
     "20553": "Utw\u00f3rz konto MEGA, aby uzyska\u0107 [S]50 GB DARMOWEJ *[\/S] pami\u0119ci masowej",
     "20554": "Niezawodne przechowywanie i szybkie transfery",
@@ -3428,5 +3427,15 @@
     "20667": "Utw\u00f3rz nowy link",
     "20668": "Brak akcji wychodz\u0105cych",
     "20669": "Brak link\u00f3w publicznych",
-    "20670": "Data udost\u0119pnienia"
+    "20670": "Data udost\u0119pnienia",
+    "20671": "You don't have any overdue payments.",
+    "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
+    "20673": "a long time ago",
+    "20694": "Link Created",
+    "20695": "Open containing folder",
+    "20696": "Know more about desktop app",
+    "20697": "Download MEGA desktop app",
+    "20698": "Transfer with MEGA desktop app.",
+    "20707": "[B]50 GB*[\/B] Free storage",
+    "20708": "Create an account and get [S]50 GB*[\/B] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process."
 }

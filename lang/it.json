@@ -3314,7 +3314,6 @@
     "20484": "La rotazione della chiave \u00e8 leggermente pi\u00f9 sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.",
     "20487": "Elimina il link della chat",
     "20488": "Link della chat",
-    "20538": "Questa conversazione non sar\u00e0 pi\u00f9 accessibile dal momento in cui verr\u00e0 rimosso il link della chat.",
     "20552": "Spazio di archiviazione cloud e comunicazione sicura.[Br]Privacy di design.",
     "20553": "Crea un account MEGA per ottenere [S]50 GB GRATIS*[\/S] di spazio di archiviazione",
     "20554": "Archiviazione affidabile e trasferimenti veloci",
@@ -3428,5 +3427,15 @@
     "20667": "Crea un nuovo link",
     "20668": "Nessuna condivisione in uscita",
     "20669": "Nessun link pubblico",
-    "20670": "Data di condivisione"
+    "20670": "Condivisione creata il",
+    "20671": "You don't have any overdue payments.",
+    "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
+    "20673": "a long time ago",
+    "20694": "Link creato il",
+    "20695": "Open containing folder",
+    "20696": "Know more about desktop app",
+    "20697": "Download MEGA desktop app",
+    "20698": "Transfer with MEGA desktop app.",
+    "20707": "[B]50 GB*[\/B] Free storage",
+    "20708": "Create an account and get [S]50 GB*[\/B] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process."
 }

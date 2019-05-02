@@ -3314,7 +3314,6 @@
     "20484": "A kulcsv\u00e1ltogat\u00e1s n\u00e9mileg biztons\u00e1gosabb, \u00e1m vele nem hozhat l\u00e9tre cseveg\u0151hivatkoz\u00e1st \u00e9s az \u00faj r\u00e9sztvev\u0151k nem l\u00e1tj\u00e1k a kor\u00e1bbi \u00fczeneteket.",
     "20487": "\u00dczen\u0151hivatkoz\u00e1s T\u00f6rl\u00e9se",
     "20488": "Chat link",
-    "20538": "This conversation will no longer be accessible through the chat link once it has been removed.",
     "20552": "Biztons\u00e1gos Felh\u0151 T\u00e1rhely \u00e9s Kommunik\u00e1ci\u00f3. [Br] Fel\u00e9p\u00edt\u00e9sb\u0151l Ered\u0151 Titkos\u00edt\u00e1s.",
     "20553": "K\u00e9sz\u00edtsen MEGA fi\u00f3kot \u00e9s szerezzen [S]50 GB INGYENES*[\/S] t\u00e1rhelyet",
     "20554": "Megb\u00edzhat\u00f3 T\u00e1rhely \u00e9s Gyors \u00c1tvitel",
@@ -3428,5 +3427,15 @@
     "20667": "\u00daj hivatkoz\u00e1s",
     "20668": "Nincs kimen\u0151 megoszt\u00e1s",
     "20669": "Nincs nyilv\u00e1nos hivatkoz\u00e1s",
-    "20670": "Megosztva"
+    "20670": "Megosztva",
+    "20671": "You don't have any overdue payments.",
+    "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
+    "20673": "a long time ago",
+    "20694": "L\u00e9trehozva",
+    "20695": "Open containing folder",
+    "20696": "Know more about desktop app",
+    "20697": "Download MEGA desktop app",
+    "20698": "Transfer with MEGA desktop app.",
+    "20707": "[B]50 GB*[\/B] Free storage",
+    "20708": "Create an account and get [S]50 GB*[\/B] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process."
 }

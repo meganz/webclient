@@ -3427,13 +3427,15 @@
     "20667": "Crea un nuovo link",
     "20668": "Nessuna condivisione in uscita",
     "20669": "Nessun link pubblico",
-    "20670": "Data di condivisione",
+    "20670": "Condivisione creata il",
     "20671": "You don't have any overdue payments.",
     "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
     "20673": "a long time ago",
-    "20694": "Link Created",
+    "20694": "Link creato il",
     "20695": "Open containing folder",
     "20696": "Know more about desktop app",
     "20697": "Download MEGA desktop app",
-    "20698": "Transfer with MEGA desktop app."
+    "20698": "Transfer with MEGA desktop app.",
+    "20707": "[B]50 GB*[\/B] Free storage",
+    "20708": "Create an account and get [S]50 GB*[\/B] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process."
 }

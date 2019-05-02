@@ -289,7 +289,7 @@
     "836": "Ng\u01b0\u1eddi d\u00f9ng [X] \u0111\u00e3 th\u00eam v\u00e0o [DATA]",
     "837": "\u0110\u00e3 th\u00eam v\u00e0o [X]",
     "838": "\u0110\u00e3 th\u00eam v\u00e0o [X]",
-    "862": "Th\u00f4ng b\u00e1o",
+    "862": "Th\u00f4ng B\u00e1o",
     "864": "T\u1ea3i v\u1ec1 d\u01b0\u1edbi d\u1ea1ng n\u00e9n ZIP",
     "865": "M\u1edf",
     "870": "X\u00e1c nh\u1eadn",
@@ -3427,13 +3427,15 @@
     "20667": "T\u1ea1o li\u00ean k\u1ebft M\u1edbi",
     "20668": "Kh\u00f4ng c\u00f3 M\u1ee5c Chia S\u1ebb G\u1eedi \u0110i n\u00e0o",
     "20669": "Kh\u00f4ng c\u00f3 Li\u00ean K\u1ebft C\u00f4ng Khai n\u00e0o",
-    "20670": "Ng\u00e0y \u0111\u01b0\u1ee3c Chia S\u1ebb",
+    "20670": "Th\u1eddi \u0110i\u1ec3m Chia S\u1ebb",
     "20671": "You don't have any overdue payments.",
     "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
     "20673": "a long time ago",
-    "20694": "Link Created",
+    "20694": "\u0110\u01b0\u1ee3c T\u1ea1o",
     "20695": "Open containing folder",
     "20696": "Know more about desktop app",
     "20697": "Download MEGA desktop app",
-    "20698": "Transfer with MEGA desktop app."
+    "20698": "Transfer with MEGA desktop app.",
+    "20707": "[B]50 GB*[\/B] Free storage",
+    "20708": "Create an account and get [S]50 GB*[\/B] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process."
 }

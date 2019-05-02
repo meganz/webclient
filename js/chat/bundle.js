@@ -3172,9 +3172,14 @@ React.makeElement = React['createElement'];
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        this.handleWindowResize();
-	        this.initArchivedChatsScrolling();
+	        if (this.props.megaChat.displayArchivedChats === true) {
+	            this.initArchivedChatsScrolling();
+	        }
 	    },
 	    handleWindowResize: function handleWindowResize() {
+	        if (!M.chat) {
+	            return;
+	        }
 
 	        if (anonymouschat) {
 	            $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
@@ -3196,9 +3201,8 @@ React.makeElement = React['createElement'];
 	        loadSubPage('fm/chat/archived');
 	    },
 	    calcArchiveChats: function calcArchiveChats() {
-	        var conversations = obj_values(this.props.megaChat.chats.toJS());
 	        var count = 0;
-	        conversations.forEach(function (chatRoom) {
+	        this.props.megaChat.chats.forEach(function (chatRoom) {
 	            if (!chatRoom || !chatRoom.roomId) {
 	                return;
 	            }
@@ -4398,7 +4402,10 @@ React.makeElement = React['createElement'];
 	            requiresUpdateOnResize: true
 	        };
 	    },
-	    doProgramaticScroll: function doProgramaticScroll(newPos, forced, isX) {
+	    doProgramaticScroll: SoonFc(function (newPos, forced, isX) {
+	        if (!this.isMounted()) {
+	            return;
+	        }
 	        var self = this;
 	        var $elem = $(ReactDOM.findDOMNode(self));
 	        var animFrameInner = false;
@@ -4429,7 +4436,7 @@ React.makeElement = React['createElement'];
 	            self.isUserScroll = true;
 	            $elem.off('scroll.progscroll' + idx);
 	        }.bind(this, idx));
-	    },
+	    }, 10),
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
 	        var $elem = $(ReactDOM.findDOMNode(self));
@@ -6234,12 +6241,12 @@ React.makeElement = React['createElement'];
 	                    { className: "fm-dialog-footer" },
 	                    React.makeElement(
 	                        "a",
-	                        { href: "javascript:;", className: "default-white-button left", onClick: onAddContact },
+	                        { className: "default-white-button left", onClick: onAddContact },
 	                        l[71]
 	                    ),
 	                    React.makeElement(
 	                        "a",
-	                        { href: "javascript:;", className: "default-grey-button right " + (!selectedContacts ? "disabled" : ""),
+	                        { className: "default-grey-button right " + (!selectedContacts ? "disabled" : ""),
 	                            onClick: function onClick(e) {
 	                                if (self.state.selected.length > 0) {
 	                                    onSelectDoneCb(e);
@@ -6545,7 +6552,7 @@ React.makeElement = React['createElement'];
 	            );
 	        } else {
 	            var translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
-	            translatedCode = translatedCode.replace("[A]", '<a href="javascript:;" class="joinActiveCall">').replace('[/A]', '</a>');
+	            translatedCode = translatedCode.replace("[A]", '<a class="joinActiveCall">').replace('[/A]', '</a>');
 
 	            return React.makeElement(
 	                "div",
@@ -7225,6 +7232,9 @@ React.makeElement = React['createElement'];
 	        }
 	    },
 	    handleWindowResize: function handleWindowResize(e, scrollToBottom) {
+	        if (!M.chat) {
+	            return;
+	        }
 	        var $container = $(ReactDOM.findDOMNode(this));
 	        var self = this;
 
@@ -16624,7 +16634,7 @@ React.makeElement = React['createElement'];
 	                    { className: 'call-participants-count' },
 	                    Object.keys(chatRoom.callParticipants).length
 	                ),
-	                _react2.default.createElement('a', { href: 'javascript:;', className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : ""), onClick: function onClick(e) {
+	                _react2.default.createElement('a', { className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : ""), onClick: function onClick(e) {
 	                        if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
 	                            return;
 	                        }

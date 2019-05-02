@@ -59,7 +59,7 @@ var JoinCallNotification = React.createClass({
         else {
             var translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
             translatedCode = translatedCode
-                .replace("[A]", '<a href="javascript:;" class="joinActiveCall">')
+                .replace("[A]", '<a class="joinActiveCall">')
                 .replace('[/A]', '</a>');
 
             return <div className="in-call-notif neutral join">
@@ -818,6 +818,9 @@ var ConversationPanel = React.createClass({
         }
     },
     handleWindowResize: function(e, scrollToBottom) {
+        if (!M.chat) {
+            return;
+        }
         var $container = $(ReactDOM.findDOMNode(this));
         var self = this;
 

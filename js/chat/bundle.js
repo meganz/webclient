@@ -18348,12 +18348,27 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-	ChatRoom.prototype.startAudioCall = function () {
-	    var self = this;
-	    return self.megaChat.plugins.callManager.startCall(self, { audio: true, video: false });
+	ChatRoom._fnRequireParticipantKeys = function (fn, scope) {
+	    var origFn = fn;
+	    return function () {
+	        var self = scope || this;
+	        var args = toArray.apply(null, arguments);
+	        var participants = self.protocolHandler.getTrackedParticipants();
+
+	        return ChatdIntegration._ensureKeysAreLoaded(undefined, participants).done(function () {
+	            origFn.apply(self, args);
+	        }).fail(function () {
+	            self.logger.error("Failed to retr. keys.");
+	        });
+	    };
 	};
 
-	ChatRoom.prototype.joinCall = function () {
+	ChatRoom.prototype.startAudioCall = ChatRoom._fnRequireParticipantKeys(function () {
+	    var self = this;
+	    return self.megaChat.plugins.callManager.startCall(self, { audio: true, video: false });
+	});
+
+	ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function () {
 	    var self = this;
 	    assert(self.type === "group" || self.type === "public", "Can't join non-group chat call.");
 
@@ -18362,12 +18377,12 @@ React.makeElement = React['createElement'];
 	    }
 
 	    return self.megaChat.plugins.callManager.joinCall(self, { audio: true, video: false });
-	};
+	});
 
-	ChatRoom.prototype.startVideoCall = function () {
+	ChatRoom.prototype.startVideoCall = ChatRoom._fnRequireParticipantKeys(function () {
 	    var self = this;
 	    return self.megaChat.plugins.callManager.startCall(self, { audio: true, video: true });
-	};
+	});
 
 	ChatRoom.prototype.stateIsLeftOrLeaving = function () {
 	    return this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.READY && this.membersSetFromApi && !this.membersSetFromApi.members.hasOwnProperty(u_handle);

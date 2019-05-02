@@ -820,7 +820,7 @@ CallManagerCall.prototype.onWaitingResponseIncoming = function (e, eventData) {
     var mediaOptions = {audio: true, video: true};
     // var mediaOptions = self.getRemoteMediaOptions();
 
-    var doAnswer = function () {
+    var doAnswer = ChatRoom._fnRequireParticipantKeys(function () {
         self.room.activateWindow();
         self.room.show();
         self.getCallManager().incomingCallDialog.hide();
@@ -835,7 +835,7 @@ CallManagerCall.prototype.onWaitingResponseIncoming = function (e, eventData) {
             self.room.megaChat.trigger('onCallAnswered', [self, eventData]);
             self.getCallManager().trigger('CallAnswered', [self, eventData]);
         });
-    };
+    }, self.room);
 
     var doCancel = function () {
         self.getCallManager().incomingCallDialog.hide();

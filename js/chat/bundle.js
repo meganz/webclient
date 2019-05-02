@@ -5637,7 +5637,7 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 
-	        var fingerprintCode;
+	        var fingerprintCode = null;
 	        if (infoBlocks.length > 0) {
 	            fingerprintCode = React.makeElement(
 	                "div",

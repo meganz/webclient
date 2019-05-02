@@ -360,7 +360,7 @@ var ContactFingerprint = React.createClass({
             }
         }
 
-        var fingerprintCode;
+        var fingerprintCode = null;
         if (infoBlocks.length > 0) {
             fingerprintCode = <div className="dropdown-fingerprint">
                 <div className="contact-fingerprint-title">

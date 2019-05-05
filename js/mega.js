@@ -1231,6 +1231,11 @@ scparser.$add('d', function(a) {
             }
         }
     }
+
+    // Remove all upload in queue that target deleted node
+    if (fminitialized && ul_queue.length > 0) {
+        ulmanager.ulClearTargetDeleted(a.n);
+    }
 });
 
 scparser.$add('la', function() {

@@ -249,6 +249,11 @@ MegaData.prototype.clearRubbish = function(all) {
 
     if (all) {
         loadingDialog.show();
+        for (var h in M.c[M.RubbishID]) {
+            if (M.c[M.RubbishID][h]) {
+                ulmanager.ulClearTargetDeleted(h);
+            }
+        }
         return M.req('dr').finally(loadingDialog.hide.bind(loadingDialog));
     }
 
@@ -292,7 +297,11 @@ MegaData.prototype.clearRubbish = function(all) {
                 promise.reject(selids.length - success);
             }
         };
-        selids.forEach(apiReq);
+        selids.forEach(function (handle) {
+            // Check is there a upload target the deleted folder.
+            ulmanager.ulClearTargetDeleted(handle);
+            apiReq(handle);
+        });
     }
     else {
         promise.reject(EINCOMPLETE);

@@ -3427,15 +3427,18 @@
     "20667": "\u65b0\u3057\u3044\u30ea\u30f3\u30af\u3092\u4f5c\u6210",
     "20668": "\u9001\u4fe1\u5171\u6709\u306f\u3042\u308a\u307e\u305b\u3093",
     "20669": "\u30d1\u30d6\u30ea\u30c3\u30af\u30ea\u30f3\u30af\u306f\u3042\u308a\u307e\u305b\u3093",
-    "20670": "\u5171\u6709\u65e5",
+    "20670": "\u5171\u6709\u4f5c\u6210\u65e5",
     "20671": "You don't have any overdue payments.",
     "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
-    "20673": "a long time ago",
-    "20694": "Link Created",
+    "20673": "\u3060\u3044\u3076\u524d",
+    "20694": "\u30ea\u30f3\u30af\u4f5c\u6210\u65e5",
     "20695": "Open containing folder",
     "20696": "Know more about desktop app",
     "20697": "Download MEGA desktop app",
     "20698": "Transfer with MEGA desktop app.",
+    "20699": "MEGA\u30c7\u30b9\u30af\u30c8\u30c3\u30d7\u30a2\u30d7\u30ea",
     "20707": "[B]50 GB*[\/B] Free storage",
-    "20708": "Create an account and get [S]50 GB*[\/B] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process."
+    "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
+    "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
+    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage."
 }

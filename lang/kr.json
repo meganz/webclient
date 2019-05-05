@@ -3436,6 +3436,9 @@
     "20696": "Know more about desktop app",
     "20697": "Download MEGA desktop app",
     "20698": "Transfer with MEGA desktop app.",
+    "20699": "MEGA \ub370\uc2a4\ud06c\ud1b1 \uc571",
     "20707": "[B]50 GB*[\/B] Free storage",
-    "20708": "Create an account and get [S]50 GB*[\/B] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process."
+    "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
+    "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
+    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage."
 }

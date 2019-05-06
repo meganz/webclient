@@ -2406,13 +2406,14 @@ var ConversationPanels = React.createClass({
                         <div className="empty-pad conversations">
                             <div className="fm-empty-conversations-bg"></div>
                             <div className="fm-empty-cloud-txt small" dangerouslySetInnerHTML={{
-                                __html: __(emptyMessage)
+                                __html: __(anonymouschat ? "" : emptyMessage)
                                     .replace("[P]", "<span>")
                                     .replace("[/P]", "</span>")
                             }}></div>
-                            <div className="big-red-button new-chat-link" onClick={function(e) {
-                                $(document.body).trigger('startNewChatLink');
-                            }}>{l[20638]}</div>
+                            {hadLoaded && !anonymouschat ? <div className="big-red-button new-chat-link"
+                                onClick={function(e) {
+                                    $(document.body).trigger('startNewChatLink');
+                                }}>{l[20638]}</div> : null}
                         </div>
                     </div>
                 </div>

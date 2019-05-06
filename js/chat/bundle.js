@@ -8662,15 +8662,16 @@ React.makeElement = React['createElement'];
 	                        { className: "empty-pad conversations" },
 	                        React.makeElement("div", { className: "fm-empty-conversations-bg" }),
 	                        React.makeElement("div", { className: "fm-empty-cloud-txt small", dangerouslySetInnerHTML: {
-	                                __html: __(emptyMessage).replace("[P]", "<span>").replace("[/P]", "</span>")
+	                                __html: __(anonymouschat ? "" : emptyMessage).replace("[P]", "<span>").replace("[/P]", "</span>")
 	                            } }),
-	                        React.makeElement(
+	                        hadLoaded && !anonymouschat ? React.makeElement(
 	                            "div",
-	                            { className: "big-red-button new-chat-link", onClick: function onClick(e) {
+	                            { className: "big-red-button new-chat-link",
+	                                onClick: function onClick(e) {
 	                                    $(document.body).trigger('startNewChatLink');
 	                                } },
 	                            l[20638]
-	                        )
+	                        ) : null
 	                    )
 	                )
 	            );

@@ -2091,6 +2091,7 @@
     "18501": "Data Protection Regulation",
     "18506": "\u0625\u0630\u0627 \u0643\u0646\u062a \u062a\u0633\u062a\u0637\u064a\u0639 \u0627\u062f\u062e\u0627\u0644 \u0628\u0631\u064a\u062f\u0643 \u0627\u0644\u0627\u0644\u0643\u062a\u0631\u0648\u0646\u064a\u060c \u064a\u0631\u062c\u0649 \u0625\u062f\u062e\u0627\u0644\u0647. \u0627\u0645\u0627 \u0625\u0630\u0627 \u0643\u0646\u062a \u0644\u0627 \u062a\u0633\u062a\u0637\u064a\u0639 \u062a\u0630\u0643\u0631\u0647\u060c \u064a\u0631\u062c\u0649 \u0627\u0644\u0636\u063a\u0637 \u0639\u0644\u0649 \u0632\u0631 \u0627\u0628\u062f\u0623 \u0645\u0631\u0629 \u0623\u062e\u0631\u0649 \u0644\u0644\u0645\u062a\u0627\u0628\u0639\u0629",
     "18508": "\u064a\u0631\u062c\u0649 \u0627\u062f\u062e\u0627\u0644 \u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0627\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u0644\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0630\u064a \u062a\u0648\u062f \u0627\u0633\u062a\u0631\u062c\u0627\u0639\u0647. \u0625\u0630\u0627 \u0643\u0646\u062a \u0644\u0627 \u062a\u0633\u062a\u0637\u064a\u0639 \u062a\u0630\u0643\u0631\u0647 \u064a\u0645\u0643\u0646\u0643 \u062a\u0631\u0643 \u0627\u0644\u062d\u0642\u0644 \u0641\u0627\u0631\u063a\u0627",
+    "18509": "\u0627\u062f\u062e\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629",
     "18513": "\u0647\u0644 \u062a\u0631\u064a\u062f \u0627\u0646\u0647\u0627\u0621 \u0643\u0644 \u0627\u0644\u062c\u0644\u0633\u0627\u062a \u0627\u0644\u0641\u0639\u0627\u0644\u0629 \u062d\u0627\u0644\u064a\u0627\u061f \u0630\u0644\u0643 \u0633\u064a\u0633\u062c\u0644 \u0627\u0644\u062e\u0631\u0648\u062c \u0645\u0646 \u0643\u0644 \u0647\u0630\u0647 \u0627\u0644\u062c\u0644\u0633\u0627\u062a \u0627\u0644\u0641\u0639\u0627\u0644\u0629 \u0628\u0627\u0633\u062a\u062b\u0646\u0627\u0621 \u0627\u0644\u062d\u0627\u0644\u064a\u0629",
     "18514": "\u0647\u0630\u0627 \u0631\u0627\u0628\u0637 \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0627\u0644\u062e\u0627\u0635 \u0628\u0643",
     "18517": "All MEGA encryption is end-to-end. Data being uploaded is encrypted on the uploading device before it is sent out to the Internet, and data downloaded is decrypted only after it has arrived on the downloaded device. The client machines are responsible for generating, exchanging and managing the encryption keys. MEGA's encryption model does not require any usable symmetric or private keys to ever leave the end-user's computer.",
@@ -3440,5 +3441,10 @@
     "20707": "[B]50 GB*[\/B] Free storage",
     "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
     "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
-    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage."
+    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage.",
+    "20711": "Current plan",
+    "20712": "Planned",
+    "20713": "Ends on [B]%1[\/B]",
+    "20714": "After [B1]$1[\/B1], Your account's plan will be the [B2]$2[\/B2] subscription.",
+    "20715": "Do you want grant bandwidth feature?"
 }

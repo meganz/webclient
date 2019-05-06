@@ -2091,6 +2091,7 @@
     "18501": "Data Protection Regulation",
     "18506": "Jika Anda dapat memberikan alamat email akun Anda, silakan lakukan. Jika Anda tidak dapat mengingatnya, klik Mulai lagi untuk melewati langkah ini.",
     "18508": "Harap masukkan alamat email dari akun yang ingin Anda pulihkan. Jika Anda tidak dapat mengingatnya, kosongkan bidang ini.",
+    "18509": "Masukan nama grup",
     "18513": "Apakah Anda ingin menutup semua sesi lainnya? Ini akan mengeluarkan Anda di semua sesi aktif lainnya kecuali sesi saat ini.",
     "18514": "Ini adalah link kontak Anda sendiri",
     "18517": "All MEGA encryption is end-to-end. Data being uploaded is encrypted on the uploading device before it is sent out to the Internet, and data downloaded is decrypted only after it has arrived on the downloaded device. The client machines are responsible for generating, exchanging and managing the encryption keys. MEGA's encryption model does not require any usable symmetric or private keys to ever leave the end-user's computer.",
@@ -3440,5 +3441,10 @@
     "20707": "[B]50 GB*[\/B] Free storage",
     "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
     "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
-    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage."
+    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage.",
+    "20711": "Current plan",
+    "20712": "Planned",
+    "20713": "Ends on [B]%1[\/B]",
+    "20714": "After [B1]$1[\/B1], Your account's plan will be the [B2]$2[\/B2] subscription.",
+    "20715": "Do you want grant bandwidth feature?"
 }

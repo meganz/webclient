@@ -873,6 +873,10 @@ mBroadcaster.once('startMega', function populate_l() {
     l[20607] = l[20607].replace('[A2]', '<a class="clickurl" href="/sync">')
         .replace('[/A2]', '</a>');
     l[20609] = l[20609].replace('[A]', '<a class="clickurl" href="/sync">').replace('[/A]', '</a>');
+    l[20713] = escapeHTML(l[20713]).replace('[B]%1[/B]', '<b></b>');
+    l[20714] = escapeHTML(l[20714]).replace('[B1]%1[/B1]', '<b class="plan-time"></b>')
+                    .replace('[B2]%2[/B2]', '<b class="plan-name"></b>');
+    l[20759] = escapeHTML(l[20759]).replace('[B]%1[/B]', '<b></b>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

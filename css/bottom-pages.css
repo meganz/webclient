@@ -585,7 +585,7 @@ body:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     padding: 27px 0 28px 0;
 }
 .bottom-page.top-pad {
-    padding-top: 62px;
+    padding-top: 70px;
 }
 .bottom-page.small-top-pad {
     padding-top: 11px;
@@ -1587,7 +1587,6 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
 /* Plans block */
 .bottom-page.plans-block {
     padding: 10px 0 68px 0;
-    overflow: hidden;
     font-size: 0;
 }
 .bottom-page.plans-block.no-pad {

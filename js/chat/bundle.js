@@ -70,7 +70,7 @@ React.makeElement = React['createElement'];
 	(function () {
 	    _chatui = function chatui(id) {
 	        var roomOrUserHash = id.replace("chat/", "");
-	        var isPubLink = id.substr(0, 5) === "chat/" && id.substr(6, 1) !== "/";
+	        var isPubLink = id !== "chat/archived" && id.substr(0, 5) === "chat/" && id.substr(6, 1) !== "/";
 
 	        var roomType = false;
 	        megaChat.displayArchivedChats = false;

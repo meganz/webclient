@@ -255,7 +255,7 @@
     -moz-box-shadow: 0px 0px 0px 1px #666666;
     box-shadow: 0px 0px 0px 1px #666666;
 }
-.default-white-button::first-letter {
+body:not(.rtl) .default-white-button::first-letter {
     text-transform: uppercase;
 }
 .default-white-button.small-height {

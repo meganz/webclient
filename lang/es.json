@@ -2091,6 +2091,7 @@
     "18501": "Reglamento de protecci\u00f3n de datos",
     "18506": "Si es posible, indica la direcci\u00f3n de correo electr\u00f3nico de tu cuenta. Si no la recuerdas, haz clic de nuevo en Empezar para saltar este paso.",
     "18508": "Por favor, ingresa la direcci\u00f3n de correo electr\u00f3nico de la cuenta que deseas recuperar. Si no logras recordarla, deja el campo en blanco.",
+    "18509": "Escribe el nombre del grupo",
     "18513": "\u00bfQuieres cerrar las dem\u00e1s sesiones? Te desconectar\u00e1s de todas sesiones activas excepto la actual.",
     "18514": "Este es tu propio enlace de contacto",
     "18517": "Todo el cifrado de MEGA es de punto a punto. Los datos se cifran antes de ser enviados a Internet a trav\u00e9s del dispositivo que los sube, y se descifran s\u00f3lo despu\u00e9s de haber llegado al dispositivo donde se descargan. Los mismos dispositivos son responsables de generar, intercambiar y administrar las claves de cifrado. El modelo de cifrado de MEGA no requiere que ninguna clave sim\u00e9trica o privada abandone el ordenador del usuario final.",
@@ -3440,5 +3441,10 @@
     "20707": "[B]50 GB*[\/B] Free storage",
     "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
     "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
-    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage."
+    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage.",
+    "20711": "Current plan",
+    "20712": "Planned",
+    "20713": "Ends on [B]%1[\/B]",
+    "20714": "After [B1]$1[\/B1], Your account's plan will be the [B2]$2[\/B2] subscription.",
+    "20715": "Do you want grant bandwidth feature?"
 }

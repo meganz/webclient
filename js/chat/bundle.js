@@ -17016,7 +17016,8 @@ React.makeElement = React['createElement'];
 	                    { className: "contacts-search-header left-aligned top-pad" + (failedToEnableChatlink ? " failed" : "") },
 	                    React.makeElement("i", { className: "small-icon conversations" }),
 	                    React.makeElement("input", { type: "search",
-	                        placeholder: "Enter group name", value: self.state.groupName,
+	                        placeholder: l[18509], value: self.state.groupName,
+	                        maxLength: 30,
 	                        onKeyDown: function onKeyDown(e) {
 	                            var code = e.which || e.keyCode;
 	                            if (allowNext && code === 13) {

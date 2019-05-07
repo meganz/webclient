@@ -2091,6 +2091,7 @@
     "18501": "Data Protection Regulation",
     "18506": "If you are able to provide your account\u2019s email address, please do so. If you cannot remember it, please click Start again to skip this step.",
     "18508": "Please enter the email address of the account you wish to recover. If you cannot remember it, please leave the field blank.",
+    "18509": "Enter group name",
     "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
     "18514": "This is your own contact link",
     "18517": "All MEGA encryption is end-to-end. Data being uploaded is encrypted on the uploading device before it is sent out to the Internet, and data downloaded is decrypted only after it has arrived on the downloaded device. The client machines are responsible for generating, exchanging and managing the encryption keys. MEGA\u2019s encryption model does not require any usable symmetric or private keys to ever leave the end-user\u2019s computer.",
@@ -3440,5 +3441,10 @@
     "20707": "[B]50 GB*[\/B] Free storage",
     "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
     "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
-    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage."
+    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage.",
+    "20711": "Current plan",
+    "20712": "Planned",
+    "20713": "Ends on [B]%1[\/B]",
+    "20714": "After [B1]$1[\/B1], Your account's plan will be the [B2]$2[\/B2] subscription.",
+    "20715": "Do you want grant bandwidth feature?"
 }

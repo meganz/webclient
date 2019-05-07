@@ -2091,6 +2091,7 @@
     "18501": "Data Protection Regulation",
     "18506": "\u041f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430, \u0443\u043a\u0430\u0436\u0438\u0442\u0435 \u0430\u0434\u0440\u0435\u0441 \u0441\u0432\u043e\u0435\u0439 \u0443\u0447\u0435\u0442\u043d\u043e\u0439 \u0437\u0430\u043f\u0438\u0441\u0438, \u0435\u0441\u043b\u0438 \u044d\u0442\u043e \u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e. \u0415\u0441\u043b\u0438 \u0432\u044b \u043d\u0435 \u043c\u043e\u0436\u0435\u0442\u0435 \u0435\u0433\u043e \u0432\u0441\u043f\u043e\u043c\u043d\u0438\u0442\u044c, \u043d\u0430\u0436\u043c\u0438\u0442\u0435 \u00ab\u041d\u0430\u0447\u0430\u0442\u044c \u0441\u043d\u043e\u0432\u0430\u00bb, \u0447\u0442\u043e\u0431\u044b \u043f\u0440\u043e\u043f\u0443\u0441\u0442\u0438\u0442\u044c \u044d\u0442\u043e\u0442 \u0448\u0430\u0433.",
     "18508": "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0430\u0434\u0440\u0435\u0441 \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043d\u043d\u043e\u0439 \u043f\u043e\u0447\u0442\u044b \u0443\u0447\u0435\u0442\u043d\u043e\u0439 \u0437\u0430\u043f\u0438\u0441\u0438, \u043a\u043e\u0442\u043e\u0440\u0443\u044e \u0432\u044b \u0445\u043e\u0442\u0438\u0442\u0435 \u0432\u043e\u0441\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u044c. \u0415\u0441\u043b\u0438 \u0432\u044b \u043d\u0435 \u043c\u043e\u0436\u0435\u0442\u0435 \u0435\u0433\u043e \u0432\u0441\u043f\u043e\u043c\u043d\u0438\u0442\u044c, \u043e\u0441\u0442\u0430\u0432\u044c\u0442\u0435 \u043f\u043e\u043b\u0435 \u043f\u0443\u0441\u0442\u044b\u043c.",
+    "18509": "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0438\u043c\u044f \u0433\u0440\u0443\u043f\u043f\u044b",
     "18513": "\u0417\u0430\u043a\u0440\u044b\u0442\u044c \u0434\u0440\u0443\u0433\u0438\u0435 \u0441\u0435\u0430\u043d\u0441\u044b? \u0411\u0443\u0434\u0435\u0442 \u0432\u044b\u043f\u043e\u043b\u043d\u0435\u043d \u0432\u044b\u0445\u043e\u0434 \u0438\u0437 \u0441\u0438\u0441\u0442\u0435\u043c\u044b \u0434\u043b\u044f \u0432\u0441\u0435\u0445 \u0430\u043a\u0442\u0438\u0432\u043d\u044b\u0445 \u0441\u0435\u0430\u043d\u0441\u043e\u0432 \u043a\u0440\u043e\u043c\u0435 \u044d\u0442\u043e\u0433\u043e.",
     "18514": "\u042d\u0442\u043e \u0432\u0430\u0448\u0430 \u043b\u0438\u0447\u043d\u0430\u044f \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u0430\u044f \u0441\u0441\u044b\u043b\u043a\u0430",
     "18517": "All MEGA encryption is end-to-end. Data being uploaded is encrypted on the uploading device before it is sent out to the Internet, and data downloaded is decrypted only after it has arrived on the downloaded device. The client machines are responsible for generating, exchanging and managing the encryption keys. MEGA's encryption model does not require any usable symmetric or private keys to ever leave the end-user's computer.",
@@ -3440,5 +3441,10 @@
     "20707": "[B]50 GB*[\/B] Free storage",
     "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
     "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
-    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage."
+    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage.",
+    "20711": "Current plan",
+    "20712": "Planned",
+    "20713": "Ends on [B]%1[\/B]",
+    "20714": "After [B1]$1[\/B1], Your account's plan will be the [B2]$2[\/B2] subscription.",
+    "20715": "Do you want grant bandwidth feature?"
 }

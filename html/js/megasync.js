@@ -17,6 +17,7 @@ var megasync = (function() {
     var lastCheckStatus;
     var defaultStatusThreshold = 15 * 60000; // 15 minutes
     var statusThresholdWhenDifferentUsr = 30000; // 0.5 minutes
+    var defaultStatusThresholdForFailed = 15000; // 0.5 minutes
     var currBid = -1;
     function getNewBid() {
         currBid = Math.random().toString().substr(2);
@@ -572,6 +573,10 @@ var megasync = (function() {
         megaSyncRequest(args, function(ev, response) {
             api_handle(next, response, args);
         }, function(ev) {
+            if (args && args.a === 'v') {
+                lastCheckStatus = 0;
+                lastCheckTime = Date.now();
+            }
             handler.error(next, ev);
         });
     }
@@ -884,7 +889,18 @@ var megasync = (function() {
             next(true, false); // next with error=true and isworking=false
         }
         else if (!lastCheckStatus || !lastCheckTime) {
-            SyncAPI({ a: "v" }, next);
+            if (lastCheckTime) {
+                var tDif = Date.now() - lastCheckTime;
+                if (tDif >= defaultStatusThresholdForFailed) {
+                    SyncAPI({ a: "v" }, next);
+                }
+                else {
+                    next(null, lastCheckStatus);
+                }
+            }
+            else {
+                SyncAPI({ a: "v" }, next);
+            }
         }
         else {
             var myNow = Date.now();

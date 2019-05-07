@@ -2091,6 +2091,7 @@
     "18501": "Data Protection Regulation",
     "18506": "Dac\u0103 po\u021bi s\u0103 furnizezi adresa de e-mail a contului t\u0103u, te rug\u0103m s\u0103 faci acest lucru. Dac\u0103 nu \u021bi-o po\u021bi aminti, d\u0103 clic din nou pe butonul Start din nou pentru a omite acest pas.",
     "18508": "Introdu adresa de e-mail a contului pe care dore\u0219ti s\u0103-l recuperezi. Dac\u0103 nu \u021bi-o po\u021bi aminti, te rug\u0103m s\u0103 la\u0219i c\u00e2mpul gol.",
+    "18509": "Introdu numele grupului",
     "18513": "Vrei s\u0103 \u00eenchizi toate celelalte sesiuni? Acest lucru te va deconecta din toate celelalte sesiuni active, cu excep\u021bia celei actuale.",
     "18514": "Acesta este propriul t\u0103u link de contact",
     "18517": "All MEGA encryption is end-to-end. Data being uploaded is encrypted on the uploading device before it is sent out to the Internet, and data downloaded is decrypted only after it has arrived on the downloaded device. The client machines are responsible for generating, exchanging and managing the encryption keys. MEGA's encryption model does not require any usable symmetric or private keys to ever leave the end-user's computer.",
@@ -3440,5 +3441,10 @@
     "20707": "[B]50 GB*[\/B] Free storage",
     "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
     "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
-    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage."
+    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage.",
+    "20711": "Current plan",
+    "20712": "Planned",
+    "20713": "Ends on [B]%1[\/B]",
+    "20714": "After [B1]$1[\/B1], Your account's plan will be the [B2]$2[\/B2] subscription.",
+    "20715": "Do you want grant bandwidth feature?"
 }

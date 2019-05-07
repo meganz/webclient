@@ -2091,6 +2091,7 @@
     "18501": "Datenschutz-Grundverordnung",
     "18506": "Falls Sie die E-Mail-Adresse des Accounts zur Hand haben, geben Sie sie bitte ein. Andernfalls klicken Sie erneut auf Start, um ohne E-Mail-Adresse weiterzumachen.",
     "18508": "Bitte geben Sie die E-Mail-Adresse Ihres Accounts ein, sofern Sie sich an diese erinnern k\u00f6nnen. Falls nicht, lassen Sie das Eingabefeld leer.",
+    "18509": "Benennen Sie den Gruppenchat",
     "18513": "Alle anderen Sitzungen schlie\u00dfen? Sie werden \u00fcberall au\u00dfer auf diesem Ger\u00e4t ausgeloggt.",
     "18514": "Das ist Ihr eigener Kontaktlink",
     "18517": "All MEGA encryption is end-to-end. Data being uploaded is encrypted on the uploading device before it is sent out to the Internet, and data downloaded is decrypted only after it has arrived on the downloaded device. The client machines are responsible for generating, exchanging and managing the encryption keys. MEGA's encryption model does not require any usable symmetric or private keys to ever leave the end-user's computer.",
@@ -3440,5 +3441,10 @@
     "20707": "[B]50 GB*[\/B] Free storage",
     "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
     "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
-    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage."
+    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage.",
+    "20711": "Current plan",
+    "20712": "Planned",
+    "20713": "Ends on [B]%1[\/B]",
+    "20714": "After [B1]$1[\/B1], Your account's plan will be the [B2]$2[\/B2] subscription.",
+    "20715": "Do you want grant bandwidth feature?"
 }

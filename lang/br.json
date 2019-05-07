@@ -2091,6 +2091,7 @@
     "18501": "Regulamento de prote\u00e7\u00e3o de dados",
     "18506": "Se for poss\u00edvel, indique o endere\u00e7o de email da sua conta. Se n\u00e3o conseguir lembrar, clique em Iniciar novamente para pular esta etapa.",
     "18508": "Por favor, digite o endere\u00e7o de email da conta que voc\u00ea quer recuperar. Se voc\u00ea n\u00e3o conseguir lembrar qual \u00e9, por favor, deixe o campo em branco.",
+    "18509": "Digite o nome do grupo",
     "18513": "Voc\u00ea quer fechar as demais sess\u00f5es? Essa a\u00e7\u00e3o far\u00e1o  logout de todas as outras sess\u00f5es ativas, exceto a atual.",
     "18514": "Este \u00e9 o seu pr\u00f3prio link de contato",
     "18517": "Toda a criptografia MEGA \u00e9 de ponta a ponta. Os dados que est\u00e3o sendo carregados s\u00e3o criptografados no dispositivo de carregamento antes de serem enviados para a Internet e os dados descarregados s\u00e3o descriptografados apenas depois de terem chegado ao dispositivo transferido. As m\u00e1quinas clientes s\u00e3o respons\u00e1veis pela gera\u00e7\u00e3o, troca e gerenciamento das chaves de criptografia. O modelo de criptografia do MEGA n\u00e3o exige que nenhuma chave sim\u00e9trica ou particular utiliz\u00e1vel deixe o computador do usu\u00e1rio final.",
@@ -3440,5 +3441,10 @@
     "20707": "[B]50 GB*[\/B] Free storage",
     "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
     "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
-    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage."
+    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage.",
+    "20711": "Current plan",
+    "20712": "Planned",
+    "20713": "Ends on [B]%1[\/B]",
+    "20714": "After [B1]$1[\/B1], Your account's plan will be the [B2]$2[\/B2] subscription.",
+    "20715": "Do you want grant bandwidth feature?"
 }

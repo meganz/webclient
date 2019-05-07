@@ -2091,6 +2091,7 @@
     "18501": "Adatv\u00e9delmi Szab\u00e1lyoz\u00e1s",
     "18506": "Amennyiben meg tudja adni a fi\u00f3kja email c\u00edm\u00e9t, tegyen \u00fagy. Ha nem eml\u00e9kszik r\u00e1, a l\u00e9p\u00e9s kihagy\u00e1s\u00e1hoz kattintson \u00fajra a Kezd\u00e9sre.",
     "18508": "Adja meg helyre\u00e1ll\u00edtani k\u00edv\u00e1nt fi\u00f3khoz tartoz\u00f3 email c\u00edmet. Ha elfelejtette, hagyja \u00fcresen a mez\u0151t.",
+    "18509": "Enter group name",
     "18513": "Bez\u00e1r minden m\u00e1s munkamenetet? Ez az \u00f6sszes akt\u00edv munkameneten kil\u00e9pteti, a jelenlegi kiv\u00e9tel\u00e9vel.",
     "18514": "Ez a szem\u00e9lyes kapcsolati hivatkoz\u00e1sa.",
     "18517": "All MEGA encryption is end-to-end. Data being uploaded is encrypted on the uploading device before it is sent out to the Internet, and data downloaded is decrypted only after it has arrived on the downloaded device. The client machines are responsible for generating, exchanging and managing the encryption keys. MEGA's encryption model does not require any usable symmetric or private keys to ever leave the end-user's computer.",
@@ -3440,5 +3441,10 @@
     "20707": "[B]50 GB*[\/B] Free storage",
     "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
     "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
-    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage."
+    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage.",
+    "20711": "Current plan",
+    "20712": "Planned",
+    "20713": "Ends on [B]%1[\/B]",
+    "20714": "After [B1]$1[\/B1], Your account's plan will be the [B2]$2[\/B2] subscription.",
+    "20715": "Do you want grant bandwidth feature?"
 }

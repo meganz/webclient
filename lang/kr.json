@@ -2091,6 +2091,7 @@
     "18501": "Data Protection Regulation",
     "18506": "\ub2f9\uc2e0\uc758 \uacc4\uc815\uc758 \uc774\uba54\uc77c \uc8fc\uc18c\ub97c \uc785\ub825\ud560 \uc218 \uc788\ub2e4\uba74, \uadf8\ub807\uac8c \ud558\uc138\uc694. \uae30\uc5b5\ud560 \uc218 \uc5c6\ub2e4\uba74, \uc2dc\uc791\uc744 \ub2e4\uc2dc \ub204\ub974\uace0 \uc774 \ub2e8\uacc4\ub97c \uac74\ub108\ub6f0\uc138\uc694.",
     "18508": "\ubcf5\uad6c\ud558\ub824\ub294 \uacc4\uc815\uc758 \uc774\uba54\uc77c \uc8fc\uc18c\ub97c \uc785\ub825\ud558\uc138\uc694. \uae30\uc5b5\ub098\uc9c0 \uc54a\ub294\ub2e4\uba74, \ube48 \uce78\uc73c\ub85c \ub450\uc138\uc694.",
+    "18509": "\uadf8\ub8f9 \uc774\ub984\uc744 \uc785\ub825\ud558\uc138\uc694",
     "18513": "\ub2e4\ub978 \ubaa8\ub4e0 \uc138\uc158\uc744 \ub2eb\uace0 \uc2f6\uc73c\uc2e0\uac00\uc694? \uc774\uac83\uc740 \ud604\uc7ac \uc138\uc158\uc744 \uc81c\uc678\ud55c \ubaa8\ub4e0 \ud65c\uc131 \uc138\uc158\uc5d0\uc11c \ub2f9\uc2e0\uc744 \ub85c\uadf8\uc544\uc6c3 \uc2dc\ud0b5\ub2c8\ub2e4.",
     "18514": "\uc774\uac83\uc740 \ub2f9\uc2e0\uc758 \uc5f0\ub77d\ucc98 \ub9c1\ud06c\uc785\ub2c8\ub2e4.",
     "18517": "All MEGA encryption is end-to-end. Data being uploaded is encrypted on the uploading device before it is sent out to the Internet, and data downloaded is decrypted only after it has arrived on the downloaded device. The client machines are responsible for generating, exchanging and managing the encryption keys. MEGA's encryption model does not require any usable symmetric or private keys to ever leave the end-user's computer.",
@@ -3440,5 +3441,10 @@
     "20707": "[B]50 GB*[\/B] Free storage",
     "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
     "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
-    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage."
+    "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage.",
+    "20711": "Current plan",
+    "20712": "Planned",
+    "20713": "Ends on [B]%1[\/B]",
+    "20714": "After [B1]$1[\/B1], Your account's plan will be the [B2]$2[\/B2] subscription.",
+    "20715": "Do you want grant bandwidth feature?"
 }

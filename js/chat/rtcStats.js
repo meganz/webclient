@@ -178,10 +178,10 @@ Recorder.prototype.pollStats = function() {
     }
     self._waitingForStats = true;
     if (RTC.isChrome) {
-        pc.getStats(
-            self.onStats.bind(self),
-            pc.getRemoteStreams()
-        );
+        var streams = pc.getRemoteStreams();
+        if (streams && streams.length) {
+            pc.getStats(self.onStats.bind(self), streams);
+        }
     } else if (RTC.isFirefox) {
         // jshint -W083
         if (RTC.supportsRxTxGetStats) {

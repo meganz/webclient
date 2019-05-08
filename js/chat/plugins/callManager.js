@@ -829,8 +829,10 @@ CallManagerCall.prototype.onWaitingResponseIncoming = function (e, eventData) {
         var $promise = self.room._retrieveTurnServerFromLoadBalancer(4000);
 
         $promise.always(function () {
-            self.rtcCall.answer(Av.fromMediaOptions(mediaOptions));
-
+            if (!self.rtcCall.answer(Av.fromMediaOptions(mediaOptions))) {
+                self.onCallTerminated();
+                return;
+            }
 
             self.room.megaChat.trigger('onCallAnswered', [self, eventData]);
             self.getCallManager().trigger('CallAnswered', [self, eventData]);
@@ -1083,7 +1085,6 @@ CallManagerCall.prototype.onCallEnded = function (e, reason) {
     }
     self.room.trigger('call-ended', self);
     self.room.trigger('CallTerminated', [e, self.room]);
-    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
 CallManagerCall.prototype.onCallRejected = function (e, reason) {
@@ -1100,11 +1101,9 @@ CallManagerCall.prototype.onCallRejected = function (e, reason) {
             })
         );
     }
-    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
+
 CallManagerCall.prototype.onCallAborted = function (e, reason) {
-    var self = this;
-    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
 CallManagerCall.prototype.onCallHandledElsewhere = function (e) {
@@ -1122,8 +1121,6 @@ CallManagerCall.prototype.onCallHandledElsewhere = function (e) {
             persist: false
         })
     );
-
-    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
 CallManagerCall.prototype.onCallFailed = function (e, reason) {
@@ -1158,20 +1155,12 @@ CallManagerCall.prototype.onCallFailed = function (e, reason) {
     );
 
     self.room.trigger('CallTerminated', [e, self.room]);
-
-    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
 CallManagerCall.prototype.onCallMissed = function (e) {
-    var self = this;
-
-    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
+
 CallManagerCall.prototype.onCallTimeout = function (e) {
-    var self = this;
-
-
-    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
 /**
@@ -1224,9 +1213,6 @@ CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates)
         case CallManagerCall.STATE.MISSED:
             callMgr.trigger('CallMissed', [self, terminationCode]);
             break;
-        case CallManagerCall.STATE.STARTED:
-            callMgr.trigger('CallStarted', [self, terminationCode]);
-            break;
         case CallManagerCall.STATE.ENDED:
             callMgr.trigger('CallEnded', [self, terminationCode]);
             break;
@@ -1235,9 +1221,6 @@ CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates)
             break;
         case CallManagerCall.STATE.HANDLED_ELSEWHERE:
             callMgr.trigger('CallHandledElsewhere', [self, terminationCode]);
-            break;
-        case CallManagerCall.STATE.MISSED:
-            callMgr.trigger('CallMissed', [self, terminationCode]);
             break;
         case CallManagerCall.STATE.TIMEOUT:
             callMgr.trigger('CallTimeout', [self, terminationCode]);
@@ -1248,7 +1231,7 @@ CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates)
                 " for termcode ", RtcModule.getTermCodeName(terminationCode));
             break;
     }
-    this.onCallTerminated();
+    self.onCallTerminated();
 };
 
 CallManagerCall.prototype.onRemoteStreamAdded = function (rtcSessionEventHandler, stream) {

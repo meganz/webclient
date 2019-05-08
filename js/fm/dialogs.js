@@ -184,6 +184,9 @@
             else {
                 aTarget = chats[0] || String(aTarget || '').split('/').pop();
             }
+            if (aTarget && String(aTarget).indexOf("#") > -1) {
+                aTarget = aTarget.split("#")[0];
+            }
         }
 
         // Update global $.mcselected with the target handle

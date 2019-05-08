@@ -222,11 +222,11 @@
 
             p.t4 = versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
             p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
-            p.t8 = p.t9 ? (l[896] + ':') : '';
+            p.t8 = p.t9 ? (l[17445] + ':') : '';
             p.t12 = ' second';
             p.t13 = l[17150] + ':';
             p.t14 = (svfilecnt === 1) ? l[17152] : l[17151].replace("[X]", svfilecnt);
-            p.t15 = l[17149] + ':';
+            p.t15 = l[17777] + ':';
             p.t16 = bytesToSize(size);
             p.t17 = ' second';
             p.t18 = l[16474] + ':';

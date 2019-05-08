@@ -1531,6 +1531,7 @@ MegaData.prototype.ulerror = function(ul, error) {
 
     if (ul) {
         var id = ul.id;
+        var target = ul.target;
 
         this.ulfinalize(ul, api_strerror(error));
 
@@ -1569,8 +1570,13 @@ MegaData.prototype.ulerror = function(ul, error) {
             }
 
             // Inform user that upload MEGAdrop is not available anymore
-            if (page.substr(0, 8) === 'megadrop' && error === ENOENT || error === EACCESS) {
+            if ((error === ENOENT || error === EACCESS) && page.substr(0, 8) === 'megadrop') {
                 mBroadcaster.sendMessage('MEGAdrop:disabled');
+            }
+
+            // Target is not exist on M.d anymore, target is deleted.
+            if (error === EACCESS && !M.d[target]) {
+                ulmanager.ulClearTargetDeleted(target);
             }
         }
     }

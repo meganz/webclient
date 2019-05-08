@@ -249,6 +249,11 @@ MegaData.prototype.clearRubbish = function(all) {
 
     if (all) {
         loadingDialog.show();
+        for (var h in M.c[M.RubbishID]) {
+            if (M.c[M.RubbishID][h]) {
+                ulmanager.ulClearTargetDeleted(h);
+            }
+        }
         return M.req('dr').finally(loadingDialog.hide.bind(loadingDialog));
     }
 
@@ -292,7 +297,11 @@ MegaData.prototype.clearRubbish = function(all) {
                 promise.reject(selids.length - success);
             }
         };
-        selids.forEach(apiReq);
+        selids.forEach(function (handle) {
+            // Check is there a upload target the deleted folder.
+            ulmanager.ulClearTargetDeleted(handle);
+            apiReq(handle);
+        });
     }
     else {
         promise.reject(EINCOMPLETE);
@@ -3628,7 +3637,7 @@ MegaData.prototype.importWelcomePDF = function() {
         if (typeof res === 'object') {
             var ph = res.ph;
             var key = res.k;
-            M.req({a: 'g', p: ph}).done(function(res) {
+            M.req({a: 'g', p: ph}).always(function(res) {
                 if (typeof res.at === 'string') {
                     // No need to wait for FileManager to be ready, and no need to check anything
                     // This method is ONLY called when the initial ephemral account is created

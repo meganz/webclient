@@ -46,6 +46,7 @@ function RtcModule(chatd, crypto, handler, allIceServers, iceServers) {
     self.ownAnonId = base64urldecode(u_handle); // crypto.ownAnonId();
     self.handler = handler;
     self.calls = {};
+    self._rejectedCallIds = {};
     self.allIceServers = allIceServers;
     self.iceServers = iceServers ? iceServers : allIceServers;
     self.pc_constraints = {};
@@ -210,8 +211,7 @@ RtcModule.prototype.handleMessage = function(shard, msg, len) {
 
         var call = this.calls[chatid];
         if (!call) {
-            this.logger.warn("Received " + constStateToText(RTCMD, type) +
-                " for a chat that doesn't currently have a call, ignoring");
+            this.logger.log("Ignoring a " + constStateToText(RTCMD, type) + " for a call we don't participate in");
             return;
         }
         call.handleMsg(packet);
@@ -308,15 +308,21 @@ RtcModule.prototype.handleCallData = function(shard, msg, payloadLen) {
                 ci.fromUser === parsedCallData.fromUser &&
                 ci.fromClient === parsedCallData.fromClient) { // stop ringing
                     if (!call.isGroup) {
-                        self.logger.error("Received not-terminate CALLDATA with ringing flag off, " +
+                        self.logger.error(
+                            "Received not-terminate CALLDATA with ringing flag off, " +
                             "for a 1on1 call in kRingIn state. The call should have " +
-                            "already been taken out of this state by a RTMSG");
+                            "already been taken out of this state by a RTMSG"
+                        );
                     }
                     call._destroy(Term.kAnswerTimeout, false);
                     return;
             }
         } else { // no call
             if (ringing) {
+                if (self._rejectedCallIds[parsedCallData.callid]) {
+                    self.logger.log("Ignoring ring flag in received CALLDATA since we have already rejected that call");
+                    return;
+                }
                 self.handleCallRequest(parsedCallData);
                 return;
             }
@@ -1305,7 +1311,6 @@ Call.prototype.msgJoin = function(packet) {
             }
         }
         if (self.state === CallState.kReqSent) {
-            self.isRingingOut = false;
             self._setState(CallState.kCallInProgress);
             self._monitorCallSetupTimeout();
             if (!self.isGroup && !self._bcastCallData(CallDataType.kNotRinging)) {
@@ -1795,14 +1800,8 @@ Call.prototype.hangup = function(reason) {
         this.cmdBroadcast(RTCMD.CALL_REQ_CANCEL, this.id + String.fromCharCode(reason));
         return this._destroy(reason, false);
     case CallState.kRingIn:
-        if (reason == null) {
-            reason = Term.kCallRejected;
-        }
-        var cinfo = this._callerInfo;
-        assert(cinfo);
-        assert(this.hasNoSessionsOrPendingRetries());
-        this.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, cinfo.callid + String.fromCharCode(reason));
-        return this._destroy(reason, false);
+        this.manager._rejectedCallIds[this.id] = true;
+        return this._reject();
     case CallState.kJoining:
     case CallState.kCallInProgress:
     case CallState.kWaitLocalStream:
@@ -1825,6 +1824,17 @@ Call.prototype.hangup = function(reason) {
         break;
     }
     return this._destroy(reason, true);
+};
+
+Call.prototype._reject = function(reason) {
+    if (reason == null) {
+        reason = Term.kCallRejected;
+    }
+    var cinfo = this._callerInfo;
+    assert(cinfo);
+    assert(this.hasNoSessionsOrPendingRetries());
+    this.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, cinfo.callid + String.fromCharCode(reason));
+    return this._destroy(reason, false);
 };
 
 Call.prototype._onClientLeftCall = function(userid, clientid) {
@@ -3967,6 +3977,7 @@ RtcModule.callDataToString = function(cmd, tx) {
     var type = cmd.charCodeAt(31);
     result += ' type: ' + constStateToText(CallDataType, type);
     var flags = cmd.charCodeAt(32);
+    result += ' flags: ' + flags;
     if (flags & CallDataFlag.kRinging) {
         result = '(ringing) ' + result;
     }

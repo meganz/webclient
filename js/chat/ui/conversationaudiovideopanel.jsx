@@ -911,7 +911,7 @@ var ConversationAudioVideoPanel = React.createClass({
                         {Object.keys(chatRoom.callParticipants).length}
                     </div>
 
-                    <a href="javascript:;" className={
+                    <a className={
                         "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") +
                         (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : "")
                     } onClick={function(e) {
@@ -931,7 +931,7 @@ var ConversationAudioVideoPanel = React.createClass({
                         videoSessionCount >= RtcModule.kMaxCallVideoSenders ? " limit-reached" : ""
                     )}>{videoSessionCount} / {RtcModule.kMaxCallVideoSenders}</div>
 
-                    <div 
+                    <div
                         className={
                             "call-video-icon" + (
                                 chatRoom.callManagerCall.hasVideoSlotLimitReached() ? " call-video-icon-warn" : ""

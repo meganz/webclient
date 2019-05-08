@@ -1045,9 +1045,14 @@ var ConversationsApp = React.createClass({
     },
     componentDidUpdate: function() {
         this.handleWindowResize();
-        this.initArchivedChatsScrolling();
+        if (this.props.megaChat.displayArchivedChats === true) {
+            this.initArchivedChatsScrolling();
+        }
     },
     handleWindowResize: function() {
+        if (!M.chat) {
+            return;
+        }
         // small piece of what is done in fm_resize_handler...
         if (anonymouschat) {
             $('.fm-right-files-block, .fm-right-account-block')
@@ -1074,9 +1079,8 @@ var ConversationsApp = React.createClass({
         loadSubPage('fm/chat/archived');
     },
     calcArchiveChats : function() {
-        var conversations = obj_values(this.props.megaChat.chats.toJS());
         var count = 0;
-        conversations.forEach((chatRoom) => {
+        this.props.megaChat.chats.forEach((chatRoom) => {
             if (!chatRoom || !chatRoom.roomId) {
                 return;
             }

@@ -57,23 +57,26 @@
                     </div>
 
                     <!-- Remove hidden class if user is operating Linux -->
-                    <div class="megaapp-linux cmd hidden">
+                    <div class="megaapp-linux hidden">
                         <div class="default-select megaapp-dropdown"> <span class="megaapp-linux-default">[$7086]</span>
                             <div class="megaapp-dropdown-list default-select-dropdown hidden">
+                                <div class="mega-list-arrow up hidden inactive"></div>
                                 <div class="megaapp-dropdown-scroll">
                                     <div class="megaapp-scr-pad"> </div>
                                 </div>
-                                <div class="mega-list-arrow hidden"></div>
+                                <div class="mega-list-arrow down hidden"></div>
                             </div>
                         </div>
-                        <div class="bottom-page radio-buttons split-buttons">
-                            <div class="architecture-checkbox radioOff">
-                                <input type="radio" name="architecture" id="rad1" class="linux32 radioOff" value="32"><label for="rad1" class="radio-txt 32">32 bit</label>
+                        <div class="bottom-page radio-buttons linux-bit-radio hidden">
+                            <div class="architecture-checkbox radioOff green transition">
+                                <input type="radio" name="architecture" id="rad1" class="linux32 radioOff" value="32">
                             </div>
+                            <label for="rad1" class="radio-txt 32">[$20663]</label>
 
-                            <div class="architecture-checkbox radioOn">
-                                <input type="radio" name="architecture" id="rad2" class="linux64 radioOn" checked="checked" value="64"> <label for="rad2" class="radio-txt 64">64 bit</label>
+                            <div class="architecture-checkbox radioOn green transition">
+                                <input type="radio" name="architecture" id="rad2" class="linux64 radioOn" checked="checked" value="64">
                             </div>
+                            <label for="rad2" class="radio-txt 64">[$20662]</label>
                             <div class="clear"></div>
                         </div>
                     </div>

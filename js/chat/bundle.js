@@ -70,7 +70,7 @@ React.makeElement = React['createElement'];
 	(function () {
 	    _chatui = function chatui(id) {
 	        var roomOrUserHash = id.replace("chat/", "");
-	        var isPubLink = id.substr(0, 5) === "chat/" && id.substr(6, 1) !== "/";
+	        var isPubLink = id !== "chat/archived" && id.substr(0, 5) === "chat/" && id.substr(6, 1) !== "/";
 
 	        var roomType = false;
 	        megaChat.displayArchivedChats = false;
@@ -3172,9 +3172,14 @@ React.makeElement = React['createElement'];
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        this.handleWindowResize();
-	        this.initArchivedChatsScrolling();
+	        if (this.props.megaChat.displayArchivedChats === true) {
+	            this.initArchivedChatsScrolling();
+	        }
 	    },
 	    handleWindowResize: function handleWindowResize() {
+	        if (!M.chat) {
+	            return;
+	        }
 
 	        if (anonymouschat) {
 	            $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
@@ -3196,9 +3201,8 @@ React.makeElement = React['createElement'];
 	        loadSubPage('fm/chat/archived');
 	    },
 	    calcArchiveChats: function calcArchiveChats() {
-	        var conversations = obj_values(this.props.megaChat.chats.toJS());
 	        var count = 0;
-	        conversations.forEach(function (chatRoom) {
+	        this.props.megaChat.chats.forEach(function (chatRoom) {
 	            if (!chatRoom || !chatRoom.roomId) {
 	                return;
 	            }
@@ -4398,7 +4402,10 @@ React.makeElement = React['createElement'];
 	            requiresUpdateOnResize: true
 	        };
 	    },
-	    doProgramaticScroll: function doProgramaticScroll(newPos, forced, isX) {
+	    doProgramaticScroll: SoonFc(function (newPos, forced, isX) {
+	        if (!this.isMounted()) {
+	            return;
+	        }
 	        var self = this;
 	        var $elem = $(ReactDOM.findDOMNode(self));
 	        var animFrameInner = false;
@@ -4429,7 +4436,7 @@ React.makeElement = React['createElement'];
 	            self.isUserScroll = true;
 	            $elem.off('scroll.progscroll' + idx);
 	        }.bind(this, idx));
-	    },
+	    }, 10),
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
 	        var $elem = $(ReactDOM.findDOMNode(self));
@@ -5630,7 +5637,7 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 
-	        var fingerprintCode;
+	        var fingerprintCode = null;
 	        if (infoBlocks.length > 0) {
 	            fingerprintCode = React.makeElement(
 	                "div",
@@ -6234,12 +6241,12 @@ React.makeElement = React['createElement'];
 	                    { className: "fm-dialog-footer" },
 	                    React.makeElement(
 	                        "a",
-	                        { href: "javascript:;", className: "default-white-button left", onClick: onAddContact },
+	                        { className: "default-white-button left", onClick: onAddContact },
 	                        l[71]
 	                    ),
 	                    React.makeElement(
 	                        "a",
-	                        { href: "javascript:;", className: "default-grey-button right " + (!selectedContacts ? "disabled" : ""),
+	                        { className: "default-grey-button right " + (!selectedContacts ? "disabled" : ""),
 	                            onClick: function onClick(e) {
 	                                if (self.state.selected.length > 0) {
 	                                    onSelectDoneCb(e);
@@ -6545,7 +6552,7 @@ React.makeElement = React['createElement'];
 	            );
 	        } else {
 	            var translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
-	            translatedCode = translatedCode.replace("[A]", '<a href="javascript:;" class="joinActiveCall">').replace('[/A]', '</a>');
+	            translatedCode = translatedCode.replace("[A]", '<a class="joinActiveCall">').replace('[/A]', '</a>');
 
 	            return React.makeElement(
 	                "div",
@@ -6706,34 +6713,42 @@ React.makeElement = React['createElement'];
 	                    chatRoom: room,
 	                    members: room.members,
 	                    isCurrentlyActive: room.isCurrentlyActive
-	                }),
-	                React.makeElement(
-	                    ButtonsUI.Button,
-	                    {
-	                        className: "link-button green light",
-	                        icon: "rounded-plus colorized",
-	                        label: __(l[8007]),
-	                        contacts: this.props.contacts,
-	                        disabled: !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
-	                    },
-	                    React.makeElement(DropdownsUI.DropdownContactsSelector, {
-	                        contacts: this.props.contacts,
-	                        megaChat: this.props.megaChat,
-	                        chatRoom: room,
-	                        exclude: excludedParticipants,
-	                        multiple: true,
-	                        className: "popup add-participant-selector",
-	                        singleSelectedButtonLabel: __(l[8869]),
-	                        multipleSelectedButtonLabel: __(l[8869]),
-	                        nothingSelectedButtonLabel: __(l[8870]),
-	                        onSelectDone: this.props.onAddParticipantSelected,
-	                        positionMy: "center top",
-	                        positionAt: "left bottom",
-	                        arrowHeight: -32,
-	                        selectFooter: true
-	                    })
-	                )
+	                })
 	            );
+	        }
+
+	        var addParticipantBtn = React.makeElement(
+	            ButtonsUI.Button,
+	            {
+	                className: "link-button green light",
+	                icon: "rounded-plus colorized",
+	                label: __(l[8007]),
+	                contacts: this.props.contacts,
+	                disabled: !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
+	            },
+	            React.makeElement(DropdownsUI.DropdownContactsSelector, {
+	                contacts: this.props.contacts,
+	                megaChat: this.props.megaChat,
+	                chatRoom: room,
+	                exclude: excludedParticipants,
+	                multiple: true,
+	                className: "popup add-participant-selector",
+	                singleSelectedButtonLabel: __(l[8869]),
+	                multipleSelectedButtonLabel: __(l[8869]),
+	                nothingSelectedButtonLabel: __(l[8870]),
+	                onSelectDone: this.props.onAddParticipantSelected,
+	                positionMy: "center top",
+	                positionAt: "left bottom",
+	                arrowHeight: -32,
+	                selectFooter: true
+	            })
+	        );
+
+	        var expandedPanel = {};
+	        if (room.type === "group" || room.type === "public") {
+	            expandedPanel['participants'] = true;
+	        } else {
+	            expandedPanel['options'] = true;
 	        }
 
 	        return React.makeElement(
@@ -6765,7 +6780,8 @@ React.makeElement = React['createElement'];
 	                                    }
 	                                }, 250);
 	                            },
-	                            expandedPanel: room.type === "group" || room.type === "public" ? "participants" : "options" },
+	                            expandedPanel: expandedPanel
+	                        },
 	                        participantsList ? React.makeElement(
 	                            AccordionPanel,
 	                            { className: "small-pad", title: l[8876], key: "participants" },
@@ -6788,6 +6804,7 @@ React.makeElement = React['createElement'];
 	                            React.makeElement(
 	                                "div",
 	                                null,
+	                                addParticipantBtn,
 	                                startAudioCallButton,
 	                                startVideoCallButton,
 	                                AVseperator,
@@ -7215,6 +7232,9 @@ React.makeElement = React['createElement'];
 	        }
 	    },
 	    handleWindowResize: function handleWindowResize(e, scrollToBottom) {
+	        if (!M.chat) {
+	            return;
+	        }
 	        var $container = $(ReactDOM.findDOMNode(this));
 	        var self = this;
 
@@ -7405,7 +7425,7 @@ React.makeElement = React['createElement'];
 	                if (contactName) {
 	                    headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
 	                } else {
-	                    headerText = room.getRoomTitle();
+	                    headerText = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.getRoomTitle()));
 	                }
 
 	                messagesList.push(React.makeElement(
@@ -8256,10 +8276,14 @@ React.makeElement = React['createElement'];
 
 	                        if (self.props.chatRoom.type == "private") {
 	                            var megaChat = self.props.chatRoom.megaChat;
+	                            var options = {
+	                                keyRotation: false,
+	                                topic: ''
+	                            };
 
 	                            loadingDialog.show();
 
-	                            megaChat.trigger('onNewGroupChatRequest', [self.props.chatRoom.getParticipantsExceptMe().concat(contactHashes)]);
+	                            megaChat.trigger('onNewGroupChatRequest', [self.props.chatRoom.getParticipantsExceptMe().concat(contactHashes), options]);
 	                        } else {
 	                            self.props.chatRoom.trigger('onAddUserRequest', [contactHashes]);
 	                        }
@@ -8638,15 +8662,16 @@ React.makeElement = React['createElement'];
 	                        { className: "empty-pad conversations" },
 	                        React.makeElement("div", { className: "fm-empty-conversations-bg" }),
 	                        React.makeElement("div", { className: "fm-empty-cloud-txt small", dangerouslySetInnerHTML: {
-	                                __html: __(emptyMessage).replace("[P]", "<span>").replace("[/P]", "</span>")
+	                                __html: __(anonymouschat ? "" : emptyMessage).replace("[P]", "<span>").replace("[/P]", "</span>")
 	                            } }),
-	                        React.makeElement(
+	                        hadLoaded && !anonymouschat ? React.makeElement(
 	                            "div",
-	                            { className: "big-red-button new-chat-link", onClick: function onClick(e) {
+	                            { className: "big-red-button new-chat-link",
+	                                onClick: function onClick(e) {
 	                                    $(document.body).trigger('startNewChatLink');
 	                                } },
 	                            l[20638]
-	                        )
+	                        ) : null
 	                    )
 	                )
 	            );
@@ -10006,31 +10031,46 @@ React.makeElement = React['createElement'];
 	                    )
 	                )
 	            );
-	        } else {
+	        } else if (!self.props.entries.length && self.props.currentlyViewedEntry === 'search') {
 	            return React.makeElement(
 	                "div",
 	                { className: "dialog-empty-block dialog-fm folder" },
-	                self.props.currentlyViewedEntry === 'shares' ? React.makeElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "dialog-empty-pad" },
-	                    React.makeElement("div", { className: "fm-empty-incoming-bg" }),
+	                    React.makeElement("div", { className: "fm-empty-search-bg" }),
 	                    React.makeElement(
 	                        "div",
 	                        { className: "dialog-empty-header" },
-	                        l[6871]
-	                    )
-	                ) : React.makeElement(
-	                    "div",
-	                    { className: "dialog-empty-pad" },
-	                    React.makeElement("div", { className: "fm-empty-folder-bg" }),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "dialog-empty-header" },
-	                        self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]
+	                        l[978]
 	                    )
 	                )
 	            );
 	        }
+
+	        return React.makeElement(
+	            "div",
+	            { className: "dialog-empty-block dialog-fm folder" },
+	            self.props.currentlyViewedEntry === 'shares' ? React.makeElement(
+	                "div",
+	                { className: "dialog-empty-pad" },
+	                React.makeElement("div", { className: "fm-empty-incoming-bg" }),
+	                React.makeElement(
+	                    "div",
+	                    { className: "dialog-empty-header" },
+	                    l[6871]
+	                )
+	            ) : React.makeElement(
+	                "div",
+	                { className: "dialog-empty-pad" },
+	                React.makeElement("div", { className: "fm-empty-folder-bg" }),
+	                React.makeElement(
+	                    "div",
+	                    { className: "dialog-empty-header" },
+	                    self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]
+	                )
+	            )
+	        );
 	    }
 	});
 	var CloudBrowserDialog = React.createClass({
@@ -12326,13 +12366,19 @@ React.makeElement = React['createElement'];
 	    },
 	    onResize: function onResize() {},
 	    onToggle: function onToggle(e, key) {
-	        this.setState({ 'expandedPanel': this.state.expandedPanel === key ? undefined : key });
+	        var obj = clone(this.state.expandedPanel);
+	        if (obj[key]) {
+	            delete obj[key];
+	        } else {
+	            obj[key] = true;
+	        }
+	        this.setState({ 'expandedPanel': obj });
 	        this.props.onToggle && this.props.onToggle(key);
 	    },
 	    render: function render() {
 	        var self = this;
 
-	        var classes = "accordion-panels " + self.props.className;
+	        var classes = "accordion-panels " + (self.props.className ? self.props.className : '');
 
 	        var accordionPanels = [];
 	        var otherElements = [];
@@ -12347,7 +12393,7 @@ React.makeElement = React['createElement'];
 	            if (child.type.displayName === 'AccordionPanel' || child.type.displayName && child.type.displayName.indexOf('AccordionPanel') > -1) {
 	                accordionPanels.push(React.cloneElement(child, {
 	                    key: child.key,
-	                    expanded: this.state.expandedPanel === child.key,
+	                    expanded: !!self.state.expandedPanel[child.key],
 	                    accordion: self,
 	                    onToggle: function onToggle(e) {
 	                        self.onToggle(e, child.key);
@@ -16594,7 +16640,7 @@ React.makeElement = React['createElement'];
 	                    { className: 'call-participants-count' },
 	                    Object.keys(chatRoom.callParticipants).length
 	                ),
-	                _react2.default.createElement('a', { href: 'javascript:;', className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : ""), onClick: function onClick(e) {
+	                _react2.default.createElement('a', { className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : ""), onClick: function onClick(e) {
 	                        if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
 	                            return;
 	                        }
@@ -16981,7 +17027,8 @@ React.makeElement = React['createElement'];
 	                    { className: "contacts-search-header left-aligned top-pad" + (failedToEnableChatlink ? " failed" : "") },
 	                    React.makeElement("i", { className: "small-icon conversations" }),
 	                    React.makeElement("input", { type: "search",
-	                        placeholder: "Enter group name", value: self.state.groupName,
+	                        placeholder: l[18509], value: self.state.groupName,
+	                        maxLength: 30,
 	                        onKeyDown: function onKeyDown(e) {
 	                            var code = e.which || e.keyCode;
 	                            if (allowNext && code === 13) {
@@ -18314,12 +18361,27 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-	ChatRoom.prototype.startAudioCall = function () {
-	    var self = this;
-	    return self.megaChat.plugins.callManager.startCall(self, { audio: true, video: false });
+	ChatRoom._fnRequireParticipantKeys = function (fn, scope) {
+	    var origFn = fn;
+	    return function () {
+	        var self = scope || this;
+	        var args = toArray.apply(null, arguments);
+	        var participants = self.protocolHandler.getTrackedParticipants();
+
+	        return ChatdIntegration._ensureKeysAreLoaded(undefined, participants).done(function () {
+	            origFn.apply(self, args);
+	        }).fail(function () {
+	            self.logger.error("Failed to retr. keys.");
+	        });
+	    };
 	};
 
-	ChatRoom.prototype.joinCall = function () {
+	ChatRoom.prototype.startAudioCall = ChatRoom._fnRequireParticipantKeys(function () {
+	    var self = this;
+	    return self.megaChat.plugins.callManager.startCall(self, { audio: true, video: false });
+	});
+
+	ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function () {
 	    var self = this;
 	    assert(self.type === "group" || self.type === "public", "Can't join non-group chat call.");
 
@@ -18328,12 +18390,12 @@ React.makeElement = React['createElement'];
 	    }
 
 	    return self.megaChat.plugins.callManager.joinCall(self, { audio: true, video: false });
-	};
+	});
 
-	ChatRoom.prototype.startVideoCall = function () {
+	ChatRoom.prototype.startVideoCall = ChatRoom._fnRequireParticipantKeys(function () {
 	    var self = this;
 	    return self.megaChat.plugins.callManager.startCall(self, { audio: true, video: true });
-	};
+	});
 
 	ChatRoom.prototype.stateIsLeftOrLeaving = function () {
 	    return this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.READY && this.membersSetFromApi && !this.membersSetFromApi.members.hasOwnProperty(u_handle);

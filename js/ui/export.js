@@ -1085,6 +1085,9 @@ var exportExpiry = {
         var $toggleBtn = $dialog.find('.fm-expiry-dropdown .dialog-feature-toggle');
         var $expirySelect = $dialog.find('.expiry-date-select-container');
 
+        // Clear the date of any old entries
+        $dialog.find('.expiry-date-select').datepicker('setDate', null);
+
         // Slide button to the right
         $toggleBtn.find('.dialog-feature-switch').animate({ marginLeft: '17px' }, 150, 'swing', function() {
 
@@ -1092,8 +1095,6 @@ var exportExpiry = {
             $toggleBtn.addClass('toggle-on');
             $expirySelect.removeClass('hidden');
 
-            // Clear the date of any old entries
-            $dialog.find('.expiry-date-select').datepicker('setDate', null);
         });
     },
 
@@ -1113,11 +1114,11 @@ var exportExpiry = {
             $toggleBtn.removeClass('toggle-on');
             $expirySelect.addClass('hidden');
 
-            // Clear the date of any old entries
-            $dialog.find('.expiry-date-select').datepicker('setDate', null);
-
             // Reset text to 'Set an expiry date'
             $dialog.find('.set-expiry-text').text(l[8953]);
+
+            // Clear the date of any old entries
+            $dialog.find('.expiry-date-select').datepicker('setDate', null);
         });
     },
 
@@ -1218,6 +1219,7 @@ var exportExpiry = {
 
         // Keep a counter for how many nodes have expiry times
         var numOfNodesWithExpiryTime = 0;
+        var lastExpireTime = null;
 
         // For each selected file/folder
         for (var i in handles) {
@@ -1231,6 +1233,7 @@ var exportExpiry = {
                 // If it has an expiry time, increment the count
                 if (expiryTimestamp) {
                     numOfNodesWithExpiryTime++;
+                    lastExpireTime = expiryTimestamp;
                 }
 
                 // If the expiry timestamp is set show it
@@ -1246,6 +1249,12 @@ var exportExpiry = {
 
             // Set the text to 'Set new expiry date'
             $('.export-links-dialog .set-expiry-text').text(l[8736]);
+
+            // set the data-select input value
+            var exDate = new Date(lastExpireTime * 1000);
+            $('.export-links-dialog .expiry-date-select').datepicker('setDate', exDate);
+            
+            // $('.export-links-dialog .expiry-date-select').val(time2date(lastExpireTime, 1).replace('\\', '-'));
         }
         else {
             // Otherwise disable the toggle switch
@@ -1366,16 +1375,23 @@ var exportExpiry = {
 
         $linksDialog.addClass('file-keys-view');
 
+        // Generate content
+        html = itemExportLink();
+
+        // Change dialog title depends on items
+        var dialogTitle = l[1031];
+
+        if ($.itemExportHasFolder) {
+            dialogTitle = $.itemExportHasFile ? l[20640] : l[20639];
+        }
+
         $('.fm-tab', $linksDialog).removeClass('active');
-        $('.fm-dialog-title', $linksDialog).text(l[1031]);
+        $('.fm-dialog-title', $linksDialog).text(dialogTitle);
         $('.preview-embed', $linksDialog).addClass('hidden');
         $('.fm-dialog-tab', $linksDialog).addClass('hidden');
         $('.embed-content-block', $linksDialog).addClass('hidden');
         $('.export-content-block', $linksDialog).removeClass('hidden');
         $('.export-link-body', $linksDialog).siblings().removeClass('hidden');
-
-        // Generate content
-        html = itemExportLink();
 
         // Fill with content
         if (!html.length) { // some how we dont have a link
@@ -1768,10 +1784,19 @@ var exportExpiry = {
 
         var html = '';
 
+        $.itemExportHasFolder = false;
+        $.itemExportHasFile = false;
+
         $.each($.itemExport, function(index, value) {
             var node = M.d[value];
             if (node && (folderlink || node.ph)) {
                 html += itemExportLinkHtml(node);
+            }
+            if (node.t) {
+                $.itemExportHasFolder = true;
+            }
+            else {
+                $.itemExportHasFile = true;
             }
         });
 

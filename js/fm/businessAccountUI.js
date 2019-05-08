@@ -13,6 +13,21 @@ function BusinessAccountUI() {
     else {
         this.business = mega.buinsessController;
         this.initialized = true;
+        if (u_handle && u_attr) {
+            this.currAdmin = {
+                u: u_handle,
+                p: u_attr.b.bu,
+                s: 0,
+                e: u_attr.email,
+                firstname: base64urlencode(to8(u_attr.firstname)),
+                lastname: base64urlencode(to8(u_attr.lastname)),
+                position: null,
+                idnum: null,
+                phonenum: null,
+                location: null,
+                isAdmin: true
+            };
+        }
     }
 
     var mySelf = this;
@@ -122,6 +137,15 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
     loadingDialog.pshow();
 
+    // API doesn't send the "Admin" user, i assume that this because the current admin is the caller.
+    // if later, when we get multiple admins the same thing happened for other admins, then we can't rely
+    // on the below adding of the current user as an admin.
+    if (this.currAdmin) {
+        if (!currSubAccounts[this.currAdmin.u]) {
+            currSubAccounts[this.currAdmin.u] = this.currAdmin;
+        }
+    }
+
     currSubAccounts = mySelf.sortSubusers(currSubAccounts);
 
     var unhideUsersListSection = function () {
@@ -171,7 +195,14 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             $currUserLeftPane.attr('id', subUsers[h].u);
             // now we will hide icon and role, since we are not ready to support yet.
             // $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
-            $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
+            if (!subUsers[h].isAdmin) {
+                $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
+                $currUser.find('.edit-icon.icon, .disabled-icon.icon').removeClass('disabled');
+            }
+            else {
+                $currUser.find('.fm-user-management-user .admin-icon').removeClass('hidden');
+                $currUser.find('.edit-icon.icon, .disabled-icon.icon').addClass('disabled');
+            }
 
             $currUserLeftPane.removeClass('selected');
             var uName = 'Error';
@@ -340,6 +371,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         // 4- on clicking on a sub-user row to edit his info (edit  icon)
         $('.grid-table-user-management .edit-icon.icon').off('click.subuser').on('click.subuser',
             function editSubUserClickHandler() {
+                if ($(this).hasClass('disabled')) {
+                    return false;
+                }
                 var userHandle = $(this).closest('tr').attr('id');
                 mySelf.showEditSubUserDialog(userHandle);
                 return false;
@@ -348,6 +382,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         // 5- on clicking on a sub-user row to enable/disable
         $('.grid-table-user-management .dis-en-icon').off('click.subuser').on('click.subuser',
             function disableEnableSubUserClickHandler() {
+                if ($(this).hasClass('disabled')) {
+                    return false;
+                }
                 var userHandle = $(this).closest('tr').attr('id');
                 if (!M.suba[userHandle]) {
                     return;
@@ -814,6 +851,19 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $subAccountContainer.find('.pending-email-note').removeClass('active');
     }
 
+    if (subUser.isAdmin) {
+        $subAccountContainer.find('.profile-button-container .migrate-data, .profile-button-container .edit-profile, '
+            + '.profile-button-container .resend-verification, .profile-button-container .disable-account')
+            .addClass('disabled');
+        $subAccountContainer.find('.admin-icon.role').removeClass('hidden');
+    }
+    else {
+        $subAccountContainer.find('.profile-button-container .migrate-data, .profile-button-container .edit-profile, '
+            + '.profile-button-container .resend-verification, .profile-button-container .disable-account')
+            .removeClass('disabled');
+        $subAccountContainer.find('.admin-icon.role').addClass('hidden');
+    }
+
     $subAccountContainer.find('.user-management-view-status').removeClass('enabled pending disabled');
     // $subAccountContainer.find('.profile-button-container .disable-account').removeClass('hidden');
     $subAccountContainer.find('.profile-button-container .disable-account').text(l[19092])
@@ -853,6 +903,9 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     // event handler for enable/disable account
     $subAccountContainer.find('.profile-button-container .disable-account').off('click.subuser')
         .on('click.subuser', function enable_disableClickHandler() {
+            if ($(this).hasClass('disabled')) {
+                return false;
+            }
             if ($(this).hasClass('sub-disable')) { // button now in disable status
 
                 var confirmationDlgResultHandler = function (adminAnswer) {
@@ -904,12 +957,18 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     // event handler for data-migration of a sub-user
     $subAccountContainer.find('.profile-button-container .migrate-data').off('click.subuser')
         .on('click.subuser', function migrateData_ClickHandler() {
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
             mySelf.migrateSubUserData(subUserHandle);
         });
 
     // event handler for edit sub-user button
     $subAccountContainer.find('.profile-button-container .edit-profile').off('click.subuser').on('click.subuser',
         function editSubUserClickHandler() {
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
             mySelf.showEditSubUserDialog(subUserHandle);
         });
 
@@ -917,7 +976,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     // event handler for re-send invitation
     $subAccountContainer.find('.profile-button-container .resend-verification').off('click.subuser')
         .on('click.subuser', function resendInvitation_ClickHandler() {
-            if ($(this).hasClass('hidden')) {
+            if ($(this).hasClass('hidden disabled')) {
                 return;
             }
             var resendPromise = mySelf.business.resendInvitation(subUserHandle);

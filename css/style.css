@@ -3904,7 +3904,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.dragover {
     background-color: rgba(217,0,7,0.3);
 }
-.shared-with-me .nw-fm-tree-item:hover {
+.shared-with-me .nw-fm-tree-item:hover, .shared-with-me .nw-fm-tree-item.hovered {
     background-color: rgba(255,179,0,0.3);
 }
 .shared-with-me .nw-fm-tree-item.selected {
@@ -3913,7 +3913,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .shared-with-me .nw-fm-tree-item.dragover {
     background-color: rgba(255,179,0,0.4);
 }
-.rubbish-bin .nw-fm-tree-item:hover {
+.rubbish-bin .nw-fm-tree-item:hover, .rubbish-bin .nw-fm-tree-item.hovered {
     background-color: rgba(39,183,0,0.3);
 }
 .rubbish-bin .nw-fm-tree-item.selected {
@@ -23245,6 +23245,13 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     opacity: 0.5;
 }
 
+.files-grid-view.user-management-view .view-icon.disabled,
+.files-grid-view.user-management-view .enable-icon.disabled,
+.files-grid-view.user-management-view .edit-icon.disabled,
+.files-grid-view.user-management-view .disabled-icon.disabled {
+    opacity: 0.3;
+}
+
 .user-management-view .overview-icon, .fm-right-header-user-management .overview-icon, .user-management-breadcrumbs-img.overview-icon, .user-management-dialog .overview-icon {
     background-position: 0px -12033px;
     opacity: 0.5;
@@ -27364,6 +27371,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     padding-right: 8px;
     float: left;
     z-index: 1130;
+    margin-left:4px;
 }
 
 .user-management-list-table .fm-user-management-user .admin-icon .tooltip{

@@ -420,7 +420,6 @@ MegaData.prototype.getActiveContacts = function() {
 
 // Contacts left panel handling
 MegaData.prototype.contacts = function() {
-
     // Contacts rendering not used on mobile
     if (is_mobile) {
         return true;
@@ -783,18 +782,35 @@ MegaData.prototype.syncContactEmail = function(userHash) {
 };
 
 (function(global) {
+    "use strict";
+
+    var eventuallyReorderContactsTreePane = function() {
+        if (
+            typeof $.sortTreePanel !== 'undefined' &&
+            typeof $.sortTreePanel.contacts !== 'undefined' &&
+            $.sortTreePanel.contacts.by === 'status'
+        ) {
+            M.contacts(); // we need to resort
+        }
+    };
+
     /**
      * Callback, that would be called when a contact is changed.
      */
     var onContactChanged = function(contact) {
         if (fminitialized) {
-            if (getSitePath() === '/fm/' + contact.u) {
-                // re-render the contact view page if the presence had changed
-                M.addContactUI();
-            }
-            if (M.currentdirid === 'contacts') {
-                M.openFolder(M.currentdirid, true);
-            }
+            // throttle updates, since a lot of batched updates may come at
+            // pretty much the same moment (+/- few ms, enough to trigger tons of updates)
+            delay('onContactChanged', function() {
+                if (getSitePath() === '/fm/' + contact.u) {
+                    // re-render the contact view page if the presence had changed
+                    M.addContactUI();
+                }
+                else if (M.currentdirid === 'contacts') {
+                    M.openFolder(M.currentdirid, true);
+                }
+                eventuallyReorderContactsTreePane();
+            }, 1000);
         }
     };
 

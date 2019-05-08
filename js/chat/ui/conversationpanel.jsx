@@ -59,7 +59,7 @@ var JoinCallNotification = React.createClass({
         else {
             var translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
             translatedCode = translatedCode
-                .replace("[A]", '<a href="javascript:;" class="joinActiveCall">')
+                .replace("[A]", '<a class="joinActiveCall">')
                 .replace('[/A]', '</a>');
 
             return <div className="in-call-notif neutral join">
@@ -255,15 +255,21 @@ var ConversationRightArea = React.createClass({
                 "disabled" : ""
             );
 
-        var participantsList = null;
+        let participantsList = null;
         if (room.type === "group" || room.type === "public") {
-            participantsList = <div>
-                {isReadOnlyElement}
-                <ParticipantsList
-                    chatRoom={room}
-                    members={room.members}
-                    isCurrentlyActive={room.isCurrentlyActive}
-                />
+            participantsList = (
+                <div>
+                    {isReadOnlyElement}
+                    <ParticipantsList
+                        chatRoom={room}
+                        members={room.members}
+                        isCurrentlyActive={room.isCurrentlyActive}
+                    />
+                </div>
+            );
+        }
+
+        const addParticipantBtn = (
                 <ButtonsUI.Button
                     className="link-button green light"
                     icon="rounded-plus colorized"
@@ -297,7 +303,14 @@ var ConversationRightArea = React.createClass({
                         selectFooter={true}
                     />
                 </ButtonsUI.Button>
-            </div>;
+        );
+
+        var expandedPanel = {};
+        if (room.type === "group" || room.type === "public") {
+            expandedPanel['participants'] = true;
+        }
+        else {
+            expandedPanel['options'] = true;
         }
 
         return <div className="chat-right-area">
@@ -321,11 +334,11 @@ var ConversationRightArea = React.createClass({
                                 }
                             }, 250);
                         }}
-                        expandedPanel={room.type === "group" || room.type === "public" ? "participants" : "options"}>
-                        {participantsList ? <AccordionPanel className="small-pad" title={l[8876]} key="participants">
+                        expandedPanel={expandedPanel}
+                    >
+                       {participantsList ? <AccordionPanel className="small-pad" title={l[8876]} key="participants">
                             {participantsList}
                         </AccordionPanel> : null}
-
                         {room.type === "public" ? <div className="accordion-text observers">
                             {l[20466]}
                             <span className="observers-count">
@@ -333,8 +346,10 @@ var ConversationRightArea = React.createClass({
                                 {self.props.chatRoom.observers}
                             </span>
                         </div> : <div></div>}
+
                         <AccordionPanel className="have-animation buttons" title={l[7537]} key="options">
                             <div>
+                            {addParticipantBtn}
                             {startAudioCallButton}
                             {startVideoCallButton}
                             {AVseperator}
@@ -803,6 +818,9 @@ var ConversationPanel = React.createClass({
         }
     },
     handleWindowResize: function(e, scrollToBottom) {
+        if (!M.chat) {
+            return;
+        }
         var $container = $(ReactDOM.findDOMNode(this));
         var self = this;
 
@@ -1105,7 +1123,7 @@ var ConversationPanel = React.createClass({
                     headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
                 }
                 else {
-                    headerText = room.getRoomTitle();
+                    headerText = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.getRoomTitle()));
                 }
 
                 messagesList.push(
@@ -1977,6 +1995,10 @@ var ConversationPanel = React.createClass({
 
                             if (self.props.chatRoom.type == "private") {
                                 var megaChat = self.props.chatRoom.megaChat;
+                                const options = {
+                                    keyRotation: false,
+                                    topic: ''
+                                };
 
                                 loadingDialog.show();
 
@@ -1985,8 +2007,9 @@ var ConversationPanel = React.createClass({
                                     [
                                         self.props.chatRoom.getParticipantsExceptMe().concat(
                                             contactHashes
-                                        )
-                                    ]
+                                        ),
+                                        options
+                                    ],
                                 );
                             }
                             else {
@@ -2383,13 +2406,14 @@ var ConversationPanels = React.createClass({
                         <div className="empty-pad conversations">
                             <div className="fm-empty-conversations-bg"></div>
                             <div className="fm-empty-cloud-txt small" dangerouslySetInnerHTML={{
-                                __html: __(emptyMessage)
+                                __html: __(anonymouschat ? "" : emptyMessage)
                                     .replace("[P]", "<span>")
                                     .replace("[/P]", "</span>")
                             }}></div>
-                            <div className="big-red-button new-chat-link" onClick={function(e) {
-                                $(document.body).trigger('startNewChatLink');
-                            }}>{l[20638]}</div>
+                            {hadLoaded && !anonymouschat ? <div className="big-red-button new-chat-link"
+                                onClick={function(e) {
+                                    $(document.body).trigger('startNewChatLink');
+                                }}>{l[20638]}</div> : null}
                         </div>
                     </div>
                 </div>

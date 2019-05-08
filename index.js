@@ -79,6 +79,7 @@ mBroadcaster.once('startMega:desktop', function () {
 });
 
 function startMega() {
+    jsl = [];
     mBroadcaster.sendMessage('startMega');
 
     if (is_mobile) {
@@ -90,7 +91,6 @@ function startMega() {
         mBroadcaster.removeListeners('startMega:mobile');
     }
 
-    jsl = [];
     if (silent_loading) {
         onIdle(silent_loading);
         silent_loading = false;
@@ -337,6 +337,13 @@ function init_page() {
     // Redirect url to extensions when it tries to go plugin or chrome or firefox
     if (page === 'plugin' || page === 'chrome' || page === 'firefox') {
         loadSubPage('extensions');
+        return false;
+    }
+
+    // Block about page in Mobile Webclient temporarily
+    // We would remove it till we finish the new about page and support mobile version of it
+    if (is_mobile && page === 'about') {
+        loadSubPage('startpage');
         return false;
     }
 
@@ -1421,11 +1428,14 @@ function init_page() {
         }
     }
     else if (page.substr(0, 7) === 'payment') {
+        var isBussiness = page.indexOf('-b') !== -1;
 
-        if (page.indexOf('-b') === -1 || is_mobile) {
+        if (!isBussiness || is_mobile) {
             // Load the Pro page in the background
             parsepage(pages['proplan']);
-            pro.proplan.init();
+            if (!isBussiness) {
+                pro.proplan.init();
+            }
         }
         else {
             parsepage(pages['business']);
@@ -2272,7 +2282,8 @@ function topmenuUI() {
         return false;
     });
 
-    $topMenu.find('.top-social-bl a').rebind('click', function () {
+    $topMenu.find('.top-social-bl a').rebind('click', function (e) {
+        e.preventDefault();
         window.open($(this).attr('href'));
     });
 

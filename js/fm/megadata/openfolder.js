@@ -241,10 +241,7 @@
             newHashLocation = 'F!' + pfid + '!' + pfkey + target;
             this.lastSeenFolderLink = newHashLocation;
         }
-        else if (
-            id.substr(0, 5) === "chat/" &&
-            id.substr(6, 1) !== "/"
-        ) {
+        else if (id && id !== "chat/archived" && (id.startsWith('chat/') && id[6] !== '/')) {
             // is a chat link, e.g. chat/[^/]
             newHashLocation = this.currentdirid;
         }

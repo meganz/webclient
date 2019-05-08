@@ -187,7 +187,7 @@
         }
 
         // Update global $.mcselected with the target handle
-        $.mcselected = aTarget || undefined;
+        $.mcselected = aTarget && aTarget !== 'transfers' ? aTarget : undefined;
         path = path || M.getPath($.mcselected);
 
         titles[M.RootID] = l[164];

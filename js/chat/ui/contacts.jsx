@@ -360,7 +360,7 @@ var ContactFingerprint = React.createClass({
             }
         }
 
-        var fingerprintCode;
+        var fingerprintCode = null;
         if (infoBlocks.length > 0) {
             fingerprintCode = <div className="dropdown-fingerprint">
                 <div className="contact-fingerprint-title">
@@ -954,11 +954,11 @@ var ContactPickerWidget = React.createClass({
             if (self.props.selectFooter) {
 
                 selectFooter = <div className="fm-dialog-footer">
-                    <a href="javascript:;" className="default-white-button left" onClick={onAddContact}>
+                    <a className="default-white-button left" onClick={onAddContact}>
                         {l[71]}
                     </a>
 
-                    <a href="javascript:;" className={"default-grey-button right " + (!selectedContacts ? "disabled" : "")}
+                    <a className={"default-grey-button right " + (!selectedContacts ? "disabled" : "")}
                         onClick = {function(e) {
                                 if (self.state.selected.length > 0) {
                                     onSelectDoneCb(e);

@@ -26,13 +26,13 @@ function resetMegacmd() {
  * Init MEGAcmd functions
  */
 function initMegacmd() {
-    var url;
     var pf = navigator.platform.toUpperCase();
     var $content = $('.bottom-page.megacmd');
 
     resetMegacmd();
 
     if (pf.indexOf('LINUX') >= 0) {
+        $('.nav-buttons-bl a.linux').addClass('active');
         linuxMegacmdDropdown();
     }
 
@@ -78,18 +78,17 @@ function initMegacmd() {
 
     registerLinuxDownloadButton($content.find('.megacmd-linux-download'));
 
-    $('.bottom-page.scroll-block').on('click.closeMegaCmdLinux', function(e) {
+    $('.bottom-page.scroll-block').rebind('click.closeMegaCmdLinux', function(e) {
         var $dropdown = $('.bottom-page.megacmd').find('.megaapp-dropdown');
         if ($dropdown.hasClass('active')) {
             $dropdown.removeClass('active');
             $dropdown.find('.megaapp-dropdown-list').addClass('hidden');
         } else {
             var $target = $(e.target);
-            if ($target.closest('.megaapp-linux').length < 1) {
+            if (pf.indexOf('LINUX') < 0 && $target.closest('.megaapp-linux').length < 1) {
                 resetMegacmd();
             }
         }
-        return false;
     });
 
 }
@@ -135,7 +134,7 @@ function linuxMegacmdDropdown() {
     var $content = $('.bottom-page.megacmd');
     var $button = $content.find('.pages-nav.nav-button.linux');
     var $dropdown = $content.find('.megaapp-dropdown');
-    var $select = $dropdown.find('.megaapp-scr-pad');
+    var $select = $dropdown.find('.megaapp-scr-pad').empty();
     var $list = $dropdown.find('.megaapp-dropdown-list');
     $button.addClass('active');
     $content.find('.megaapp-linux').removeClass('hidden');

@@ -53,13 +53,20 @@ var Accordion = React.createClass({
         //     });
     },
     onToggle: function(e, key) {
-        this.setState({'expandedPanel': this.state.expandedPanel === key ? undefined : key});
+        var obj = clone(this.state.expandedPanel);
+        if (obj[key]) {
+            delete obj[key];
+        }
+        else {
+            obj[key] = true;
+        }
+        this.setState({'expandedPanel': obj});
         this.props.onToggle && this.props.onToggle(key);
     },
     render: function() {
         var self = this;
 
-        var classes = "accordion-panels " + self.props.className;
+        var classes = "accordion-panels " + (self.props.className ? self.props.className : '');
 
         var accordionPanels = [];
         var otherElements = [];
@@ -78,7 +85,7 @@ var Accordion = React.createClass({
             ) {
                 accordionPanels.push(React.cloneElement(child, {
                     key: child.key,
-                    expanded: this.state.expandedPanel === child.key,
+                    expanded: !!self.state.expandedPanel[child.key],
                     accordion: self,
                     onToggle: function (e) {
                         self.onToggle(e, child.key);

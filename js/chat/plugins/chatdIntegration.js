@@ -675,12 +675,22 @@ ChatdIntegration.prototype.openChat = function(chatInfo, isMcf, missingMcf) {
             chatRoom.trackMemberUpdatesFromActionPacket(chatInfo, isMcf);
 
             if (setAsActive) {
-                var promise = chatRoom.setRoomTitle(setAsActive.topic);
-                if (promise && setAsActive.createChatLink) {
-                    promise.always(function() {
-                        chatRoom.trigger('showGetChatLinkDialog');
+                // wait for the .protocolHandler to be initialized
+                createTimeoutPromise(function() {
+                    return !!chatRoom.protocolHandler;
+                }, 300, 10000)
+                    .done(function() {
+                        var promise = chatRoom.setRoomTitle(setAsActive.topic);
+                        if (promise && setAsActive.createChatLink) {
+                            promise.always(function () {
+                                chatRoom.trigger('showGetChatLinkDialog');
+                            });
+                        }
+                    })
+                    .fail(function() {
+                        self.logger.warn("Timed out waiting for the protocolHandler to init, so that we can set" +
+                            "room title");
                     });
-                }
             }
         }
         else {

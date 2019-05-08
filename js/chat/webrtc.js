@@ -347,7 +347,7 @@ RtcModule.prototype.getActiveCall = function() {
             result = call;
         } else {
             assert(call.state === CallState.kRingIn);
-            assert(!call.isCallInitiator);
+            assert(!call.isUserInitiated);
         }
     }
     return result;
@@ -464,7 +464,7 @@ RtcModule.prototype.handleCallRequest = function(parsedCallData) {
             // Both calls are in same 1on1 chatroom
             if (activeCall.state < CallState.kJoining) {
                 // Concurrent call requests to each other?
-                if (!activeCall.isCallInitiator) {
+                if (!activeCall.isUserInitiated) {
                     // No, just two incoming calls from different clients in same 1on1 room
                     self.logger.warn("Another incoming call during an incoming call, sending kErrAlready");
                     sendBusy(true);
@@ -627,8 +627,14 @@ RtcModule.prototype._getLocalStream = function(av, resolution) {
                     self._fire('onLocalMediaFail', stream);
                 }
             } else {
-                self.gLocalStream = stream;
-                self.gLocalAv = Av.applyToStream(self.gLocalStream, av);
+                if (Object.keys(self.calls).length === 0) { // call went away, stop stream
+                    RTC.stopMediaStream(stream);
+                    self.gLocalStream = null;
+                    self.gLocalAv = 0;
+                } else {
+                    self.gLocalStream = stream;
+                    self.gLocalAv = Av.applyToStream(self.gLocalStream, av);
+                }
                 if (notified) {
                     self._fire('onLocalMediaObtained', stream);
                 }
@@ -964,6 +970,7 @@ function Call(rtcModule, info, isGroup, role, handler) {
     this.isGroup = isGroup;
     this.logger = MegaLogger.getLogger("call[" + base64urlencode(this.id) + "]",
         rtcModule._loggerOpts, rtcModule.logger);
+    this.role = role;
     // An answerer is a joiner
     this.isJoiner = (role === CallRole.kJoiner || role === CallRole.kAnswerer);
     this.sessions = {};
@@ -974,8 +981,8 @@ function Call(rtcModule, info, isGroup, role, handler) {
         this.state = CallState.kRingIn;
         this._callerInfo = info; // callerInfo is actually CALLDATA, needed for answering
     } else {
-        this.isCallInitiator = true;
-        this.state = CallState.kInitial;
+        this.isUserInitiated = true; // both kCaller and kJoiner are user-initiated
+        this.state = (role === CallRole.kJoiner) ? CallState.kJoining : CallState.kCallingOut;
     }
     this.manager._startStatsTimer();
 }
@@ -1064,7 +1071,6 @@ Call.prototype._setState = function(newState) {
 
 Call.prototype._getLocalStream = function(av) {
     var self = this;
-    self._setState(CallState.kWaitLocalStream);
     // getLocalStream currently never fails - if there is error, stream is a string with the error message
     return self.manager._getLocalStream(av, (self.isGroup && !RTC.isFirefox) ? "low" : undefined)
         .catch(function(err) {
@@ -1076,7 +1082,6 @@ Call.prototype._getLocalStream = function(av) {
                 return Promise.reject("getLocalStream: Call killed (or went into state " +
                     constStateToText(CallState, self.state) + ") while obtaining local stream");
             }
-            self._setState(CallState.kHasLocalStream);
         });
 };
 
@@ -1466,14 +1471,14 @@ Call.prototype._broadcastCallReq = function() {
     var self = this;
     if (self.state >= CallState.kTerminating) {
         self.logger.warn("_broadcastCallReq: Call terminating/destroyed");
-        return;
+        return false;
     }
-    assert(self.state === CallState.kHasLocalStream);
+    // assert(self.state === CallState.kHasLocalStream);
     assert(self.localAv() != null);
-    self.isCallInitiator = true;
+    assert(self.isUserInitiated);
     self.isRingingOut = true;
     if (!self._bcastCallData(CallDataType.kRinging)) {
-        return;
+        return false;
     }
     self._setState(CallState.kReqSent);
     // self.state is not enough - we continue ringing even
@@ -1656,16 +1661,21 @@ Call.prototype._startOrJoin = function(av) {
         }
     }
     self._startOrJoinAv = av;
-    var pms = self._getLocalStream(av);
-    pms.catch(function(err) {
+    return self._getLocalStream(av)
+    .catch(function(err) {
         self._destroy(Term.kErrLocalMedia, true, err);
-    });
-    pms.then(function() {
+        return Promise.reject(err);
+    })
+    .then(function() {
         self._updateOwnPeerAvState();
         if (self.isJoiner) {
-            self._join();
+            if (!self._join()) {
+                return Promise.reject();
+            }
         } else {
-            self._broadcastCallReq();
+            if (!self._broadcastCallReq()) {
+                return Promise.reject();
+            }
         }
     });
 };
@@ -1673,7 +1683,7 @@ Call.prototype._startOrJoin = function(av) {
 Call.prototype._join = function() {
     var self = this;
     self._sentSessions = {};
-    assert(self.state === CallState.kHasLocalStream);
+    // assert(self.state === CallState.kHasLocalStream);
     // JOIN:
     // chatid.8 userid.8 clientid.4 dataLen.2 type.1 callid.8 anonId.8 sentAv.1
     var data = self.id + self.manager.ownAnonId + String.fromCharCode(0);
@@ -1779,8 +1789,6 @@ Call.prototype.hangup = function(reason) {
         return this._reject();
     case CallState.kJoining:
     case CallState.kCallInProgress:
-    case CallState.kWaitLocalStream:
-        // TODO: For group calls, check if the sender is the call host and only then destroy the call
         if (reason == null) { // covers both 'undefined' and 'null'
             reason = Term.kUserHangup;
         } else {
@@ -3182,9 +3190,9 @@ var CallRole = Object.freeze({
 });
 
 var CallState = Object.freeze({
-    kInitial: 0, // < Call object was initialised
-    kWaitLocalStream: 1,
-    kHasLocalStream: 2,
+    kCallingOut: 0, // < Call object was initialised
+//  kWaitLocalStream: 1,
+//  kHasLocalStream: 2,
     kReqSent: 3, // < Call request sent
     kRingIn: 4, // < Call request received, ringing
     kJoining: 5, // < Joining a call
@@ -3194,18 +3202,8 @@ var CallState = Object.freeze({
 });
 
 var CallStateAllowedStateTransitions = {};
-CallStateAllowedStateTransitions[CallState.kInitial] = [
-    CallState.kWaitLocalStream,
+CallStateAllowedStateTransitions[CallState.kCallingOut] = [
     CallState.kReqSent
-];
-CallStateAllowedStateTransitions[CallState.kWaitLocalStream] = [
-    CallState.kHasLocalStream,
-    CallState.kTerminating
-];
-CallStateAllowedStateTransitions[CallState.kHasLocalStream] = [
-    CallState.kJoining,
-    CallState.kReqSent,
-    CallState.kTerminating
 ];
 CallStateAllowedStateTransitions[CallState.kReqSent] = [
     CallState.kCallInProgress,
@@ -3213,8 +3211,7 @@ CallStateAllowedStateTransitions[CallState.kReqSent] = [
 ];
 
 CallStateAllowedStateTransitions[CallState.kRingIn] = [
-    CallState.kWaitLocalStream,
-    CallState.kCallInProgress,
+    CallState.kJoining,
     CallState.kTerminating
 ];
 
@@ -3298,7 +3295,7 @@ RtcModule.termCodeIsTimeout = function(termCode, name) {
 
 Call.prototype.termCodeToUIState = function(terminationCode) {
     var self = this;
-    var isIncoming = self.isJoiner;
+    var isIncoming = (self._callerInfo != null);
     switch (terminationCode) {
         case Term.kUserHangup:
             switch (self.predestroyState) {
@@ -3307,7 +3304,18 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
                 case CallState.kReqSent:
                     return UICallTerm.ABORTED;
                 case CallState.kCallInProgress:
-                    return UICallTerm.ENDED;
+                    // We go into kCallInProgress as soon as we receive the fist JOIN,
+                    // and GUI - when the first session gets connected. So, we may be in
+                    // kCallInProgress and GUI still in WAITING_RESPONSE_OUTGOING
+                    // Determine whether GUI is already in in-progress state
+                    if (self._callStartSignalled) {
+                        return UICallTerm.ENDED;
+                    } else {
+                        // GUI still considers the call in the setup phase
+                        return (self.role === CallRole.kCaller)
+                            ? UICallTerm.ABORTED
+                            : UICallTerm.ENDED;
+                    }
                 default:
                     return UICallTerm.FAILED;
             }

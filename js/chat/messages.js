@@ -1887,7 +1887,7 @@ MessagesBuff.prototype.retrieveSharedFilesHistory = function(len) {
         return proxyPromise;
     }
     else {
-        var lastKnownMessage = self.messages.getItem(self.messages.length - 1);
+        var lastKnownMessage = self.getLastMessageFromServer();
         /**
          * Edge case:
          * If the last known message was retrieved via HIST e.g. as OLDMSG, it would not be synced in the sharedFiles.
@@ -1897,6 +1897,7 @@ MessagesBuff.prototype.retrieveSharedFilesHistory = function(len) {
         if (
             lastKnownMessage &&
             !self.sharedFilesLoadedOnce &&
+            lastKnownMessage.hasAttachments &&
             lastKnownMessage.hasAttachments() &&
             !lastKnownMessage.source
         ) {
@@ -2103,6 +2104,36 @@ MessagesBuff.prototype.removeMessageByType = function(type) {
             return false;
         }
     });
+};
+
+MessagesBuff.prototype.getLastMessageFromServer = function() {
+    "use strict";
+    if (this.messages.length > 0) {
+        var msgs = this.messages;
+        for (var i = msgs.length - 1; i >= 0; i--) {
+            var msg = msgs.getItem(i);
+            if (
+                msg && (
+                    (msg.textContents && msg.textContents.length > 0) ||
+                    msg.dialogType
+                ) &&
+                msg.messageId && msg.messageId.length === 11
+            ) {
+                if (
+                    (msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false) ||
+                    msg.revoked === true
+                ) {
+                    continue;
+                }
+                return msg;
+            }
+        }
+        // no renderable msgs found
+        return false;
+    }
+    else {
+        return false;
+    }
 };
 
 MessagesBuff.prototype.getLatestTextMessage = function() {

@@ -895,7 +895,7 @@ var megasync = (function() {
                     SyncAPI({ a: "v" }, next);
                 }
                 else {
-                    next(null, lastCheckStatus);
+                    next(true, lastCheckStatus);
                 }
             }
             else {

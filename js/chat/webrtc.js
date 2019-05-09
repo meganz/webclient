@@ -3192,7 +3192,7 @@ Session.prototype.calcNetworkQualityChrome = function(sample) {
     }
     if (aplAvg > 2) {
         // We have lost audio packets since the last sample, that's the worst network quality
-        this.logger.warn(apl, "audio packets lost, returning link quality 0");
+        this.logger.log(apl, "audio packets lost, returning link quality 0");
         return 0;
     }
     if ((sample.f & Av.Video) && sample.v && sample.v.s) {
@@ -3204,7 +3204,7 @@ Session.prototype.calcNetworkQualityChrome = function(sample) {
         if (bwav != null && width != null) {
             if (width >= 480) {
                 if (bwav < 30) {
-                    this.logger.warn("Width >= 480, bu bwav < 30, returning link quality 0");
+                    this.logger.log("Width >= 480, bu bwav < 30, returning link quality 0");
                     return 0;
                 } else if (bwav < 64) {
                     return 1;
@@ -3223,7 +3223,7 @@ Session.prototype.calcNetworkQualityChrome = function(sample) {
         var fps = vs.fps;
         if (fps != null && fps < 15) {
             if (fps < 3) {
-                this.logger.warn("send video fps(" + fps + ") < 3, returning link quality 0");
+                this.logger.log("send video fps(" + fps + ") < 3, returning link quality 0");
                 result = 0;
             } else if (fps < 5) {
                 result = 1;
@@ -3254,11 +3254,11 @@ Session.prototype.calcNetworkQualityChrome = function(sample) {
         } else if (rtt < 1000) {
             return 1;
         } else {
-            this.logger.warn("rtt >= 1000ms, returning link quality 0");
+            this.logger.log("rtt >= 1000ms, returning link quality 0");
             return 0;
         }
     }
-    this.logger.warn("Don't have any key stat param to estimate network quality from, returning 2");
+    this.logger.log("Don't have any key stat param to estimate network quality from, returning 2");
     return 2;
 };
 
@@ -3266,7 +3266,7 @@ Session.prototype.calcNetworkQualityFirefox = function(sample) {
     //  console.warn(sample);
     if (sample.d_apl) {
         // We have lost audio packets since the last sample, that's the worst network quality
-        this.logger.warn("Audio packets lost, returning 0 link quality");
+        this.logger.log("Audio packets lost, returning 0 link quality");
         return 0;
     }
     var a = sample.a;

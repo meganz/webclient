@@ -17,7 +17,7 @@ var megasync = (function() {
     var lastCheckStatus;
     var defaultStatusThreshold = 15 * 60000; // 15 minutes
     var statusThresholdWhenDifferentUsr = 30000; // 0.5 minutes
-    var defaultStatusThresholdForFailed = 15000; // 0.5 minutes
+    var defaultStatusThresholdForFailed = 15000; // 15 sec
     var currBid = -1;
     function getNewBid() {
         currBid = Math.random().toString().substr(2);

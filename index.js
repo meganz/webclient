@@ -1846,6 +1846,7 @@ function init_page() {
 }
 
 function topmenuUI() {
+    'use strict';
 
     var $topMenu = $('.top-menu-popup');
     var $topHeader = $('.top-head');
@@ -2337,100 +2338,20 @@ function topmenuUI() {
         $topHeader.find('.top-clear-button').addClass('hidden');
     });
 
-    var isFolderLink = function(val) {
-        if (val === '') {
-            M.openFolder();
-            $(this).trigger('blur');
-            return false;
-        }
-        else if (val.length < 2) {
-            return false;
-        }
-
-        if (!M.nn) {
-            M.nn = Object.create(null);
-            var keys = Object.keys(M.d);
-            for (var i = keys.length; i--;) {
-                M.nn[M.d[keys[i]].h] = M.d[keys[i]].name;
-            }
-        }
-
-        var filter = M.getFilterBySearchFn(val);
-        var v = [];
-        for (var h in M.nn) {
-            if (filter({ name: M.nn[h] }) && h !== M.currentrootid) {
-                v.push(M.d[h]);
-            }
-        }
-        M.v = v;
-        M.currentdirid = 'search/' + val;
-        M.renderMain();
-        M.onSectionUIOpen('cloud-drive');
-        $(this).trigger('blur');
-    };
-
-    var isNotFolderLink = function(val) {
-        loadingDialog.show();
-        var promise = new MegaPromise();
-
-        if (!M.nn) {
-            M.nn = Object.create(null);
-
-            promise = fmdb.get('f')
-                .always(function (r) {
-                    for (var i = r.length; i--;) {
-                        if (!r[i].fv) {
-                            M.nn[r[i].h] = r[i].name;
-                        }
-                    }
-                });
-        }
-        else {
-            promise.resolve();
-        }
-
-        promise.always(function () {
-            var handles = [];
-            var filter = M.getFilterBySearchFn(val);
-
-            for (var h in M.nn) {
-                if (!M.d[h] && filter({ name: M.nn[h] })) {
-                    handles.push(h);
-                }
-            }
-
-            dbfetch.geta(handles).always(function () {
-                loadingDialog.hide();
-                loadSubPage('fm/search/' + val);
-            });
-        });
-    };
-
     $topHeader.find('.top-search-button').rebind('click mousedown', function _topSearchHandler() {
-        if (folderlink) {
-            // Flush cached nodes, if any
-            $(window).trigger('dynlist.flush');
-        }
-
-        if (!folderlink || !_topSearchHandler.logFired) {
-            // Add log to see how often they use the search
-            api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
-            _topSearchHandler.logFired = true;
-        }
-
         var val = $.trim($('.top-search-input').val());
-        if (folderlink || val.length > 2 || !asciionly(val)) {
-            if (folderlink) {
-                isFolderLink(val);
-            }
-            else {
-                isNotFolderLink(val);
-            }
-        }
+
         // if current page is search and value is empty result move to root.
-        else if (val === '' && page.indexOf('/search/') !== -1) {
+        if (!val && page.indexOf('/search/') !== -1) {
             $topHeader.find('.top-clear-button').addClass('hidden');
             loadSubPage(page.slice(0, page.indexOf('/search/')));
+        }
+        else if (val.length > 2 || !asciionly(val)) {
+            var $this = $(this);
+
+            M.fmSearchNodes(val).then(function() {
+                $this.trigger('blur');
+            });
         }
     });
 

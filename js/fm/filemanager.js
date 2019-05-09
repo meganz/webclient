@@ -2317,9 +2317,6 @@ FileManager.prototype.addTransferPanelUI = function() {
                 if (path.length > 1) {
                     M.openFolder(path[1], true)
                         .always(function() {
-                            if (!$('#' + id).length) {
-                                $(window).trigger('dynlist.flush');
-                            }
                             $.selected = [id];
                             reselect(1);
                         });

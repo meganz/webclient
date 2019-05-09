@@ -103,19 +103,10 @@ function initFileblocksScrolling2() {
 function initContactsGridScrolling() {
     "use strict";
     var scroll = '.grid-scrolling-table.contacts';
-
-    var jsp = $(scroll).data('jsp');
-    if (jsp) {
-        jsp.reinitialise();
-    }
-    else {
-        deleteScrollPanel(scroll, 'jsp');
-        $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    }
-
+    deleteScrollPanel(scroll, 'jsp');
+    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     jScrollFade(scroll);
 }
-
 
 function initOpcGridScrolling() {
     var scroll = '.grid-scrolling-table.opc';
@@ -132,19 +123,12 @@ function initIpcGridScrolling() {
 }
 
 function initContactsBlocksScrolling() {
-    "use strict";
     var scroll = '.contacts-blocks-scrolling';
     if ($('.contacts-blocks-scrolling:visible').length === 0) {
         return;
     }
-    var jsp = $(scroll).data('jsp');
-    if (jsp) {
-        jsp.reinitialise();
-    }
-    else {
-        deleteScrollPanel(scroll, 'jsp');
-        $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    }
+    deleteScrollPanel(scroll, 'jsp');
+    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     jScrollFade(scroll);
 }
 

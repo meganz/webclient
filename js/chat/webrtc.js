@@ -2082,7 +2082,7 @@ Call.prototype.enableVideo = function(enable) {
                 pms.then(function() {
                     this._notifyRenegotiationComplete();
                 }.bind(sess));
-                pms.catch(function() { // replaceTrack(null) is not supported
+                pms.catch(function(err) { // replaceTrack(null) is not supported
                     self.logger.warn("peerConnRemoveVideoTrack() returned failed promise: " + err +
                         " falling back to session reconnect");
                     this.terminateAndDestroy(Term.kStreamChange);

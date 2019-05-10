@@ -567,14 +567,14 @@ RtcModule.prototype._removeCall = function(call) {
 
 Call.prototype._initialGetLocalStream = function(av) {
     var self = this;
-    assert(self.state !== CallState.kWaitLocalStream);
+    assert(!self._obtainingLocalStream);
     assert(!self.gLocalStream);
 
     var needVideo = !!(av & Av.Video);
     var needAudio = !!(av & Av.Audio);
     assert(needAudio || needVideo);
 
-    self._setState(CallState.kWaitLocalStream);
+    self._obtainingLocalStream = true;
     var resolved = false; // track whether the promise was resolved for the timeout reject
     var notified = false;
     // If it takes too long, display in browser a hint that we are requesting permissions for camera/mic
@@ -637,7 +637,7 @@ Call.prototype._initialGetLocalStream = function(av) {
                     self._audioMutedChecker.start(stream);
                 } // otherwise it should be started when user unmutes audio
             }
-            self._setState(CallState.kHasLocalStream);
+            delete self._obtainingLocalStream;
             resolve(stream);
         });
         pms.catch(function(err) {
@@ -655,7 +655,7 @@ Call.prototype._initialGetLocalStream = function(av) {
         if (notified) {
             self._fire('onLocalMediaFail', err);
         }
-        self._setState(CallState.kHasLocalStream);
+        delete self._obtainingLocalStream;
     });
 };
 
@@ -1483,7 +1483,7 @@ Call.prototype._broadcastCallReq = function() {
         self.logger.warn("_broadcastCallReq: Call terminating/destroyed");
         return false;
     }
-//  assert(self.state === CallState.kHasLocalStream, "state is " + constStateToText(CallState, self.state));
+    assert(!self._obtainingLocalStream);
     assert(self.localAv() != null);
     assert(self.isUserInitiated);
     self.isRingingOut = true;
@@ -1702,7 +1702,7 @@ Call.prototype._startOrJoin = function(av) {
 Call.prototype._join = function() {
     var self = this;
     self._sentSessions = {};
-    // assert(self.state === CallState.kHasLocalStream);
+    assert(!self._obtainingLocalStream);
     // JOIN:
     // chatid.8 userid.8 clientid.4 dataLen.2 type.1 callid.8 anonId.8 flags.1
     // flags is sentAv + whether we support stream renegotiation
@@ -3527,8 +3527,6 @@ var CallRole = Object.freeze({
 
 var CallState = Object.freeze({
     kCallingOut: 0, // < Call object was initialised
-//  kWaitLocalStream: 1,
-//  kHasLocalStream: 2,
     kReqSent: 3, // < Call request sent
     kRingIn: 4, // < Call request received, ringing
     kJoining: 5, // < Joining a call

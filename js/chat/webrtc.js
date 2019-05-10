@@ -91,7 +91,7 @@ RtcModule.kIceTimeout = 18000;
 RtcModule.kMaxCallReceivers = 20;
 RtcModule.kMaxCallAudioSenders = RtcModule.kMaxCallReceivers;
 RtcModule.kMaxCallVideoSenders = 6;
-
+RtcModule.kMicInputDetectTimeout = 10000;
 RtcModule.kEnableStreamReneg = true;
 
 RtcModule.prototype.logToServer = function(type, data) {
@@ -564,6 +564,9 @@ RtcModule.prototype._removeCall = function(call) {
         }
     }
 };
+Call.prototype.onNoInputAudioDetected = function() {
+    this.manager._fire("onNoInputAudioDetected");
+};
 
 Call.prototype._initialGetLocalStream = function(av) {
     var self = this;
@@ -631,7 +634,7 @@ Call.prototype._initialGetLocalStream = function(av) {
 
             if (!self.manager.audioInputDetected) {
                 if (!self._audioMutedChecker) {
-                    self._audioMutedChecker = new AudioMutedChecker(self.manager, 10000);
+                    self._audioMutedChecker = new AudioMutedChecker(self, RtcModule.kMicInputDetectTimeout);
                 }
                 if (needAudio) {
                     self._audioMutedChecker.start(stream);
@@ -950,10 +953,6 @@ RtcModule.prototype.getAudioVideoSenderCount = function(chatid) {
         }
     }
     return { audio: audioSenders, video: videoSenders };
-};
-
-RtcModule.onNoInputAudioDetected = function() {
-    this._fire("onNoInputAudioDetected");
 };
 
 RtcModule.prototype.logout = function() {
@@ -3824,15 +3823,14 @@ function AudioLevelMonitor(stream, handler, changeThreshold) {
         handler = { onAudioLevelChange: function(level) {  console.log("audio level change:", level);  } };
     }
     self.handler = handler;
-    self._changeThreshold = changeThreshold ? (changeThreshold / 100) : 0.05;
-    console.warn("DEBUG: About to call new AudioContext()");
+    self._changeThreshold = changeThreshold ? (changeThreshold / 100) : 0.01;
     var ctx = self.audioCtx = new AudioContext();
-    console.warn("DEBUG: new AudioContext() called");
     self.source = ctx.createMediaStreamSource(stream);
     var scriptNode = self.scriptNode = ctx.createScriptProcessor(8192, 1, 1);
     scriptNode.onaudioprocess = function(event) {
         var inData = event.inputBuffer.getChannelData(0);
         var max = Math.abs(inData[0]);
+        // Samples are in float format. Process each second sample to save some cpu cycles
         for (var sn = 2; sn < inData.length; sn += 2) {
             var sample = Math.abs(inData[sn]);
             if (sample > max) {
@@ -3841,7 +3839,7 @@ function AudioLevelMonitor(stream, handler, changeThreshold) {
         }
         var lastLevel = self._lastLevel;
         if (Math.abs(max - lastLevel) >= self._changeThreshold ||
-           (max < 0.005 && lastLevel >= 0.005)) { // return to zero
+           (max < 0.001 && lastLevel >= 0.005)) { // return to zero
             self._lastLevel = max;
             handler.onAudioLevelChange(Math.round(max * 100));
         }

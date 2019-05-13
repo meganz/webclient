@@ -1522,6 +1522,7 @@
     "16172": "Label...",
     "16173": "Pumili ng kulay:",
     "16176": "I-paste",
+    "16183": "Itigil ang Download",
     "16200": "Voice at Video Calls",
     "16217": "Mga Kasama",
     "16221": "Lagyan ng %1",
@@ -3436,8 +3437,16 @@
     "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
     "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage.",
     "20711": "Current plan",
-    "20712": "Planned",
+    "20712": "Next plan",
     "20713": "Ends on [B]%1[\/B]",
-    "20714": "After [B1]$1[\/B1], Your account's plan will be the [B2]$2[\/B2] subscription.",
-    "20715": "Do you want grant bandwidth feature?"
+    "20714": "After [B1]%1[\/B1], your account's plan will be the [B2]%2[\/B2] subscription.",
+    "20715": "Do you want this feature?",
+    "20750": "Create your account and get [S]50 GB*[\/S] free storage on MEGA. Your download will not get interrupted while you create an account.",
+    "20751": "Do you want to import this file?",
+    "20752": "Please login to complete your import. Alternatively, you can import this file to a new temporary account.",
+    "20753": "Please register an account to import files. Alternatively, you can import this file to a new temporary account.",
+    "20754": "Import to temporary account",
+    "20755": "Create Free Account",
+    "20756": "Create an account and get [S]50 GB*[\/S] free storage on MEGA, which you can use to import and upload your files.",
+    "20757": "Create your and get [S]50 GB*[\/S] free storage on MEGA."
 }

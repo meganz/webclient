@@ -1522,6 +1522,7 @@
     "16172": "\u0e1b\u0e49\u0e32\u0e22\u0e01\u0e33\u0e01\u0e31\u0e1a...",
     "16173": "\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e2a\u0e35:",
     "16176": "\u0e27\u0e32\u0e07",
+    "16183": "\u0e2b\u0e22\u0e38\u0e14\u0e14\u0e32\u0e27\u0e19\u0e4c\u0e42\u0e2b\u0e25\u0e14\u0e0a\u0e31\u0e48\u0e27\u0e04\u0e23\u0e32\u0e27",
     "16200": "\u0e01\u0e32\u0e23\u0e42\u0e17\u0e23\u0e14\u0e49\u0e27\u0e22\u0e40\u0e2a\u0e35\u0e22\u0e07\u0e41\u0e25\u0e30\u0e2a\u0e19\u0e17\u0e19\u0e32\u0e17\u0e32\u0e07\u0e27\u0e34\u0e14\u0e35\u0e42\u0e2d",
     "16217": "\u0e1c\u0e39\u0e49\u0e40\u0e02\u0e49\u0e32\u0e23\u0e48\u0e27\u0e21",
     "16221": "\u0e40\u0e1e\u0e34\u0e48\u0e21\u0e1b\u0e49\u0e32\u0e22\u0e01\u0e33\u0e01\u0e31\u0e1a %1",
@@ -3436,8 +3437,16 @@
     "20709": "Create an account and get [S]50 GB*[\/S] free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!",
     "20710": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform to complete your import. Or it will be import to ephemeral account for temporary storage.",
     "20711": "Current plan",
-    "20712": "Planned",
+    "20712": "Next plan",
     "20713": "Ends on [B]%1[\/B]",
-    "20714": "After [B1]$1[\/B1], Your account's plan will be the [B2]$2[\/B2] subscription.",
-    "20715": "Do you want grant bandwidth feature?"
+    "20714": "After [B1]%1[\/B1], your account's plan will be the [B2]%2[\/B2] subscription.",
+    "20715": "Do you want this feature?",
+    "20750": "Create your account and get [S]50 GB*[\/S] free storage on MEGA. Your download will not get interrupted while you create an account.",
+    "20751": "Do you want to import this file?",
+    "20752": "Please login to complete your import. Alternatively, you can import this file to a new temporary account.",
+    "20753": "Please register an account to import files. Alternatively, you can import this file to a new temporary account.",
+    "20754": "Import to temporary account",
+    "20755": "Create Free Account",
+    "20756": "Create an account and get [S]50 GB*[\/S] free storage on MEGA, which you can use to import and upload your files.",
+    "20757": "Create your and get [S]50 GB*[\/S] free storage on MEGA."
 }

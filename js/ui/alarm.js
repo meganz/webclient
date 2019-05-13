@@ -506,7 +506,7 @@ var alarm = {
 
                 // Check for update in 3 seconds using the test update file
                 this.checkInterval = 3 * 1000;
-                this.updateUrl = 'https://eu.static.mega.co.nz/3/current_ver_test.txt';
+                this.updateUrl = defaultStaticPath + 'current_ver_test.txt';
             }
 
             // Only run the update check if using legacy Firefox ext, or on mega.nz, or the testSiteUpdate flag is set

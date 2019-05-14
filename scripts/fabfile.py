@@ -15,16 +15,19 @@ Fabfile for deploying the Mega Web Client.
   fab dev:build_bundle=True,branch_name=1657-simple-translations
 
 * To delete previously deployed beta and re-deploy the current branch on beta.developers.mega.co.nz:
-  fab dev:del_exist=True
+  fab dev:del_exist=True or fab dev:del_exist=1
 
 * To build a test Firefox extension:
-  fab dev:build_firefox_ext=True
+  fab dev:build_firefox_ext=True or fab dev:build_firefox_ext=1
 
 * To build a test Chrome extension:
-  fab dev:build_chrome_ext=True
+  fab dev:build_chrome_ext=True or fab dev:build_chrome_ext=1
+
+* To pull latest language files from babel:
+  fab dev:fetch_lang=True or fab dev:fetch_lang=1 
 
 * To build both extensions:
-  fab dev:build_firefox_ext=True,build_chrome_ext=True
+  fab dev:build_firefox_ext=True,build_chrome_ext=True or fab dev:build_firefox_ext=1,build_chrome_ext=1
 
 * To deploy/update a branch on sandbox3.developers.mega.co.nz:
   fab sandbox dev:branch_name=1657-simple-translations
@@ -97,7 +100,7 @@ def _build_chat_bundle(target_dir):
 
 
 @task
-def dev(build_bundle=False, branch_name='', del_exist=False, build_firefox_ext=False, build_chrome_ext=False):
+def dev(build_bundle=False, branch_name='', del_exist=False, build_firefox_ext=False, build_chrome_ext=False, fetch_lang=False):
     """
     Clones a branch and deploys it to beta.developers.mega.co.nz.
     It will then output a test link which can be pasted into a Redmine
@@ -153,6 +156,11 @@ def dev(build_bundle=False, branch_name='', del_exist=False, build_firefox_ext=F
                 run('git checkout js/chat/bundle.js')
                 run('git pull --update-shallow')
                 run('git log -1')
+
+        if fetch_lang:
+            print('Pulling latest language file from babel.\n')
+            with cd(remote_branch_path):
+                run('./scripts/lang-beta.sh')
 
         # Update version info.
         version = None

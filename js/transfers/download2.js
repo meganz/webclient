@@ -464,7 +464,7 @@ var dlmanager = {
                     });
                 delete this._newUrlQueue[gid];
             }
-            dlmanager.logger.info("Resuming, got new URL for %s:%s", gid, res.g, changed, res);
+            dlmanager.logger.info("Resuming, got new URL for %s", gid, res.g, changed, res);
             dlQueue.resume();
         }.bind(this));
     },
@@ -736,7 +736,7 @@ var dlmanager = {
                         ctx.object.data = new ArrayBuffer(res.s);
                     }
 
-                    dlmanager.onNolongerOverquota();
+                    // dlmanager.onNolongerOverquota();
                     return ctx.next(false, res, attr, ctx.object);
                 }
             }
@@ -1372,7 +1372,7 @@ var dlmanager = {
                 }
             }.bind(this)
 
-        M.req({a: 'uq', xfer: 1}).then(function(res) {
+        M.req.poll(-10, {a: 'uq', xfer: 1}).then(function(res) {
             delay('overquotainfo:reply.success', function() {
                 onQuotaInfo(res);
             });

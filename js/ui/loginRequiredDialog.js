@@ -237,6 +237,10 @@
             u_checked = true;
 
             if (u_type === 3) {
+                if (window.n_h) {
+                    // set new u_sid under folderlinks
+                    api_setfolder(n_h);
+                }
                 completePromise.resolve();
             }
             else {

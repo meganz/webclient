@@ -35,7 +35,14 @@ MegaApi.prototype.prod = function(aSave) {
 };
 
 MegaApi.prototype._apiReqInflight = Object.create(null);
+MegaApi.prototype._apiReqPollCache = Object.create(null);
 
+/**
+ * Perform an API request, with capability of de-duplicating pending requests.
+ * @param {Object|String} params The request parameters as an object.
+ *                               If an string is provided, assumes a plain request with no additional parameters.
+ * @returns {MegaPromise} The promise is rejected if API gives a negative number.
+ */
 MegaApi.prototype.req = function(params) {
     'use strict';
 
@@ -73,6 +80,103 @@ MegaApi.prototype.req = function(params) {
     return promise;
 };
 
+/**
+ * Wrapper around MegaApi.req with polling capabilities.
+ * @param {Number} seconds The number of seconds to wait between requests, returning a cached result until exhausted.
+ * @param {Object|String} params see MegaApi.req
+ * @returns {MegaPromise}
+ * @see MegaApi.req
+ */
+MegaApi.prototype.req.poll = function(seconds, params) {
+    'use strict';
+
+    var cache = M._apiReqPollCache;
+    var key = JSON.stringify(params);
+    var logger = d && MegaLogger.getLogger('req:poll');
+
+    return new Promise(function _reqPollPromise(resolve, reject) {
+        var feedback = function(entry) {
+            if (entry.e) {
+                reject(entry.r);
+            }
+            else {
+                resolve(entry.r);
+            }
+
+            cache = params = resolve = reject = undefined;
+        };
+
+        var fill = function(error, res) {
+            var entry = cache[key];
+            if (!entry) {
+                if (d) {
+                    logger.debug('Storing cache entry...', key);
+                }
+                entry = cache[key] = Object.create(null);
+            }
+
+            entry.r = res;
+            entry.e = error;
+
+            if (entry.t) {
+                clearTimeout(entry.t);
+            }
+            entry.t = setTimeout(function() {
+                if (d) {
+                    logger.debug('Expiring cache entry...', key);
+                }
+                var c = M._apiReqPollCache[key];
+                delete M._apiReqPollCache[key];
+
+                if (c && c.f) {
+                    for (var i = c.f.length; i--;) {
+                        if (d) {
+                            logger.debug('Dispatching awaiting function call...', key, c);
+                        }
+                        c.f[i]();
+                    }
+                }
+            }, Math.abs(seconds) * 1e3);
+
+            feedback(entry);
+        };
+
+        if (cache[key]) {
+            if (d) {
+                logger.warn('Preventing API request from being re-fired.', params, cache[key]);
+            }
+
+            if (seconds < 0) {
+                if (d) {
+                    logger.debug('Awaiting to re-fire request...', params);
+                }
+
+                var c = cache[key];
+                var f = _reqPollPromise.bind(this, resolve, reject);
+
+                if (c.f) {
+                    c.f.push(f);
+                }
+                else {
+                    c.f = [f];
+                }
+            }
+            else {
+                feedback(cache[key]);
+            }
+        }
+        else {
+            M.req(params).tryCatch(fill.bind(null, false), fill.bind(null, true));
+        }
+    });
+};
+
+/**
+ * A wrapper around MegaApi.req
+ * @param {Array} params An array of parameters to pass through MegaApi.req
+ * @returns {MegaPromise} The promise is *always* resolved with an Array of results for each API request.
+ * @see MegaApi.req
+ */
 MegaApi.prototype.reqA = function(params) {
     'use strict';
 

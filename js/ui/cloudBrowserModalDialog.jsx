@@ -583,8 +583,16 @@ var BrowserEntries = React.createClass({
                 }
             }
 
+            const share = M.getNodeShare(node);
 
-
+            let hasPublicLink = null;
+            let classLinked = null;
+            if (share) {
+                classLinked = 'linked';
+                hasPublicLink = (
+                    <span className="data-item-icon public-link-icon"></span>
+                );
+            }
 
             if (viewMode === "0") {
                 items.push(
@@ -607,7 +615,7 @@ var BrowserEntries = React.createClass({
                             <span className={"tranfer-filetype-txt"}>{node.name}</span>
                         </td>
                         <td>{!isFolder ? bytesToSize(node.s) : ""}</td>
-                        <td>{time2date(node.ts)}</td>
+                        <td className={classLinked}>{time2date(node.ts)} {hasPublicLink}</td>
                     </tr>
                 );
             } else {
@@ -615,7 +623,7 @@ var BrowserEntries = React.createClass({
                 if (playtime) {
                     playtime = secondsToTimeShort(playtime);
                 }
-                var share = M.getNodeShare(node);
+
                 var colorLabelClasses = "";
                 if (node.lbl) {
                     var colourLabel = M.getLabelClassFromId(node.lbl);

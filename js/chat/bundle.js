@@ -9873,6 +9873,15 @@ React.makeElement = React['createElement'];
 	                }
 	            }
 
+	            var share = M.getNodeShare(node);
+
+	            var hasPublicLink = null;
+	            var classLinked = null;
+	            if (share) {
+	                classLinked = 'linked';
+	                hasPublicLink = React.makeElement("span", { className: "data-item-icon public-link-icon" });
+	            }
+
 	            if (viewMode === "0") {
 	                items.push(React.makeElement(
 	                    "tr",
@@ -9907,8 +9916,10 @@ React.makeElement = React['createElement'];
 	                    ),
 	                    React.makeElement(
 	                        "td",
-	                        null,
-	                        time2date(node.ts)
+	                        { className: classLinked },
+	                        time2date(node.ts),
+	                        " ",
+	                        hasPublicLink
 	                    )
 	                ));
 	            } else {
@@ -9916,7 +9927,7 @@ React.makeElement = React['createElement'];
 	                if (playtime) {
 	                    playtime = secondsToTimeShort(playtime);
 	                }
-	                var share = M.getNodeShare(node);
+
 	                var colorLabelClasses = "";
 	                if (node.lbl) {
 	                    var colourLabel = M.getLabelClassFromId(node.lbl);

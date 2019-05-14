@@ -359,11 +359,11 @@ body.de .fm-dialog.new-group-chat {
     width: calc(100% - 300px);
 }
 .fm-dialog-table.grid-table-header th:nth-child(3), .fm-dialog-table.grid-table td:nth-child(3) {
-    width: 114px;
+    width: 95px;
     background-image: none;
 }
 .fm-dialog-table.grid-table-header th:nth-child(4), .fm-dialog-table.grid-table td:nth-child(4) {
-    width: 136px;
+    width: 155px;
 }
 .fm-files-search {
     float: right;
@@ -432,6 +432,13 @@ body.de .fm-dialog.new-group-chat {
 .fm-dialog-scroll, .add-from-cloud .dialog-empty-block {
     height: 612px !important;
 }
+
+.fm-dialog .public-link-icon {
+    position: absolute;
+    top: 3px;
+    right: 10px;
+}
+
 .fm-dialog-scroll.grid, .add-from-cloud .grid-table-header + .dialog-empty-block {
     height: 588px !important;
 }

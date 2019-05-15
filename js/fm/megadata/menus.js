@@ -416,7 +416,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         fupload.dispatchEvent(mEvent);
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-        if (M.getNodeRights(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
+        if (M.getNodeRights(M.currentCustomView.nodeID || M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
             $(menuCMI).filter('.dropdown-item').hide();
             if (M.currentrootid === 'contacts') {
                 $(menuCMI).filter('.addcontact-item').show();
@@ -488,7 +488,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
             // File manager left panel click
             else if (id.indexOf('treea_') !== -1) {
-                id = id.replace('treea_', '');
+                id = id.replace(/treea_+|(os_|pl_)/g, '');
             }
         }
 

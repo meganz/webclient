@@ -2157,7 +2157,6 @@ if (typeof sjcl !== 'undefined') {
 
         // Share button enabled
         if ($.dialog === 'share' && !$shareDialog.find('.dialog-share-button').is('.disabled')) {
-
             selectedNode = $.selected[0];
             $newContacts = $shareDialog.find('.token-input-list-mega .token-input-token-mega');
 

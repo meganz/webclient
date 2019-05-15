@@ -60,8 +60,20 @@ MegaData.prototype.filterByParent = function(id) {
         }
     }
     // We should have a parent's childs into M.c, no need to traverse the whole M.d
-    else if (this.c[id]) {
-        this.v = Object.keys(this.c[id])
+    else if (id === 'public-links' || id === 'out-shares' || this.c[id]) {
+        var list;
+
+        if (id === 'public-links') {
+            list = this.su.EXP || {};
+        }
+        else if (id === 'out-shares') {
+            list = this.getOutShareTree();
+        }
+        else {
+            list = this.c[id];
+        }
+
+        this.v = Object.keys(list)
             .map(function(h) {
                 return M.d[h];
             })

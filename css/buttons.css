@@ -533,7 +533,7 @@ body:not(.rtl) .default-white-button::first-letter {
     opacity: 0.6;
 }
 .icon-dropdown:not(.disabled):hover, .icon-dropdown.active {
-    background-image: url(../images/mega/new-chat-sprite_v10.png);
+    background-image: url(../images/mega/new-chat-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: -64px -657px;
 }
@@ -1059,7 +1059,7 @@ body:not(.rtl) .default-white-button::first-letter {
     width: 24px;
     height: 24px;
     margin:3px 8px 4px 0px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v8.png);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;

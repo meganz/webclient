@@ -380,14 +380,13 @@ body.tl .dropdown.body.popup.contacts-search {
 .dark-direct-tooltip.simpletip-tooltip {
     display: block;
     position: absolute;
-    z-index: 10;
+    z-index: 100;
 }
 .dark-direct-tooltip.simpletip-tooltip.simpletip-v-b {
     margin-top: 5px;
 }
 .dark-direct-tooltip.simpletip-tooltip.simpletip-v-b i {
-    bottom: 34px;
+    top: -8px;
     -webkit-transform: rotate(180deg) !important;
     transform: rotate(180deg) !important;
 }
-

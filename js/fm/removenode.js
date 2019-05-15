@@ -136,8 +136,14 @@ function removeUInode(h, parent) {
         }
     }
 
+    if (M.currentCustomView.nodeID === h || M.isCircular(h, M.currentCustomView.nodeID) === true) {
+        parent = parent || M.getNodeParent(n || h) || M.getNodeRoot(h);
+        parent = parent === M.RootID ? M.currentCustomView.type : (M.currentCustomView.prefixPath + parent);
 
-    if (M.currentdirid === h || M.isCircular(h, M.currentdirid) === true) {
+        // if parent is exist on M.su.EXP
+        delay('openfolder', M.openFolder.bind(M, parent));
+    }
+    else if (M.currentdirid === h || M.isCircular(h, M.currentdirid) === true) {
         parent = parent || M.getNodeParent(n || h) || M.getNodeRoot(h);
         delay('openfolder', M.openFolder.bind(M, parent));
     }

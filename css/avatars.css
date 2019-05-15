@@ -16,6 +16,60 @@
     position: relative;
     background: white;
 }
+
+.multi-avatar {
+    position: relative;
+}
+.multi-avatar .avatar-wrapper {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    line-height: 14px;
+    font-size: 8px;
+}
+.multi-avatar .avatar-wrapper img {
+    width: 14px;
+    height: 14px;
+}
+.multi-avatar .verified .verified_icon {
+    display: none;
+}
+.multi-avatar-2 .avatar-0 {
+    top: 1px;
+    left: 1px;
+}
+.multi-avatar-2 .avatar-1 {
+    top: 17px;
+    left: 17px;
+}
+.multi-avatar-3 .avatar-0 {
+    top: 0;
+    left: 9px;
+}
+.multi-avatar-3 .avatar-1 {
+    top: 19px;
+    left: -2px;
+}
+.multi-avatar-3 .avatar-2 {
+    top: 19px;
+    left: 19px;
+}
+.multi-avatar-4 .avatar-0 {
+    top: -2px;
+    left: -2px;
+}
+.multi-avatar-4 .avatar-1 {
+    top: -2px;
+    left: 19px;
+}
+.multi-avatar-4 .avatar-2 {
+    top: 19px;
+    left: -2px;
+}
+.multi-avatar-4 .avatar-3 {
+    top: 19px;
+    left: 19px;
+}
 .avatar-wrapper img {
     -moz-border-radius: inherit;
     -webkit-border-radius: inherit;
@@ -162,7 +216,7 @@
 .shared-data .user-card-verified {
     display: none;
 }
-.shared-blocks-view .avatar-wrapper {
+.shared-blocks-view .avatar-wrapper, .out-shared-blocks-view .avatar-wrapper {
     margin: 8px 0 6px 8px;
 }
 #mobile-ui-contact-card .mobile.semi-big-avatar, #mobile-ui-contact-card .avatar-wrapper {

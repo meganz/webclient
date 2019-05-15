@@ -1009,7 +1009,7 @@ var CloudBrowserDialog = React.createClass({
         var entries = self.state.entries || self.getEntries();
         var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
-        var classes = "add-from-cloud " + self.props.className;
+        var classes = "add-from-cloud " + (self.props.className || '');
 
         var folderIsHighlighted = false;
 
@@ -1078,7 +1078,7 @@ var CloudBrowserDialog = React.createClass({
 
         var buttons = [];
 
-        if (!folderIsHighlighted) {
+        if (!folderIsHighlighted || self.props.folderSelectable) {
             buttons.push({
                 "label": self.props.selectLabel,
                 "key": "select",
@@ -1162,7 +1162,7 @@ var CloudBrowserDialog = React.createClass({
 
         return (
             <ModalDialogsUI.ModalDialog
-                title={__(l[8011])}
+                title={self.props.title || __(l[8011])}
                 className={classes}
                 onClose={() => {
                     self.props.onClose(self);

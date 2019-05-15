@@ -1155,7 +1155,11 @@ function processEmailChangeActionPacket(ap) {
             var nodeType = {viewmodes: 1, sortmodes: 1, treenodes: 1};
             var handles = array.unique(
                 Object.keys(nodeType).reduce(function(s, v) {
-                    return Object.keys(config[v] || {}).concat(s);
+                    return Object.keys(config[v] || {}).map(function(h) {
+                        var cv = M.isCustomView(h);
+                        h = cv ? cv.nodeID : h;
+                        return h;
+                    }).concat(s);
                 }, []).filter(function(s) {
                     return s.length === 8 && s !== 'contacts';
                 })
@@ -1167,7 +1171,9 @@ function processEmailChangeActionPacket(ap) {
                 }
 
                 var isValid = function(handle) {
-                    return handle.length !== 8 || nodes[handle] || handle === 'contacts';
+                    var cv = M.isCustomView(handle);
+                    handle = cv.nodeID || handle;
+                    return handle.length !== 8 || nodes[handle] || handle === 'contacts' || handle === cv.type;
                 };
 
                 for (var key in config) {

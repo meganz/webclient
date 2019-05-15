@@ -1938,87 +1938,49 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
 
 ChatdIntegration.prototype.decryptTopic = function(chatRoom) {
     var self = this;
-    var promise = new MegaPromise();
-
-    if (chatRoom && chatRoom.ct && chatRoom.protocolHandler) {
-        var parsedMessage = strongvelope._parseMessageContent(base64urldecode(chatRoom.ct));
-        if (parsedMessage) {
-            var promises = [];
-            promises.push(
-                ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor], chatRoom.publicChatHandle)
-            );
-            var _runTopicDecryption = function() {
-                try {
-                    chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct))
-                        .done(function(decryptedCT) {
-                            if (decryptedCT) {
-                                chatRoom.topic = decryptedCT.payload;
-                                promise.resolve();
-                            }
-                            else {
-                                promise.reject();
-                            }
-                        })
-                        .fail(function(e) {
-                            if (localStorage.debugSignatureInvalid) {
-                                self.logger.error(
-                                    "Could not decrypt topic: ",
-                                    e,
-                                    "in room",
-                                    chatRoom.chatId, parsedMessage
-                                );
-                            }
-                            else {
-                                self.logger.error("Could not decrypt topic: ", e, "in room", chatRoom.chatId);
-                            }
-                            promise.reject();
-                        });
-                } catch (e) {
-                    self.logger.error("Could not decrypt topic: ", e, "in room", chatRoom.chatId);
-                    promise.reject();
-                }
-            };
-            MegaPromise.allDone(promises).done(
-                function () {
-                    _runTopicDecryption();
-                }
-            );
+    return new MegaPromise(function(resolve, reject) {
+        if (!chatRoom.protocolHandler) {
+            return reject(false);
         }
-    }
-    return promise;
+        var parsedMessage = strongvelope._parseMessageContent(base64urldecode(chatRoom.ct));
+
+        ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor], chatRoom.publicChatHandle)
+            .then(function() {
+                return chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct));
+            })
+            .then(function(decryptedCT) {
+                chatRoom.topic = decryptedCT.payload;
+                resolve();
+            })
+            .catch(function(ex) {
+                if (d) {
+                    self.logger.warn("Could not decrypt topic in root %s",
+                        chatRoom.chatId, ex, localStorage.debugSignatureInvalid && parsedMessage);
+                }
+                reject(ex);
+            });
+    });
 };
 
 ChatdIntegration.prototype.decryptUnifiedkey = function(chatRoom) {
     var self = this;
-    var pms = new MegaPromise();
-    if (chatRoom && chatRoom.ck && chatRoom.protocolHandler) {
-        var parsedKey = strongvelope.unpackKey(base64urldecode(chatRoom.ck));
-        if (parsedKey) {
-            var promises = [];
-            promises.push(
-                ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedKey.sender], chatRoom.publicChatHandle)
-            );
-            var _runDecryption = function() {
-                try {
-                    var decryptedKeys = chatRoom.protocolHandler._decryptKeysFrom(parsedKey.senderKey,
-                                                                  parsedKey.sender);
-                    if (decryptedKeys) {
-                        chatRoom.protocolHandler.unifiedKey = decryptedKeys[0];
-                        pms.resolve();
-                    }
-                } catch (e) {
-                    self.logger.error("Could not get unified key: ", e);
-                    pms.reject();
-                }
-            };
-            MegaPromise.allDone(promises).done(
-                function () {
-                    _runDecryption();
-                }
-            );
+    return new MegaPromise(function(resolve, reject) {
+        if (!chatRoom.protocolHandler) {
+            return reject(false);
         }
-    }
-    return pms;
+        var parsedKey = strongvelope.unpackKey(base64urldecode(chatRoom.ck));
+
+        ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedKey.sender], chatRoom.publicChatHandle)
+            .then(function() {
+                var decryptedKeys = chatRoom.protocolHandler._decryptKeysFrom(parsedKey.senderKey, parsedKey.sender);
+                chatRoom.protocolHandler.unifiedKey = decryptedKeys[0];
+                resolve();
+            })
+            .catch(function(e) {
+                self.logger.error("Could not get unified key: ", e);
+                reject(e);
+            });
+    });
 };
 
 /** chatd related commands **/

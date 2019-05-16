@@ -76,7 +76,7 @@ CallManager.CALL_END_REMOTE_REASON = {
  * @param megaChat
  */
 CallManager.prototype._attachToChat = function (megaChat) {
-    megaChat.rtc.statsUrl = "https://stats.karere.mega.nz:1380";
+    megaChat.rtc.statsUrl = "https://stats.karere.mega.nz";
 
     megaChat.rebind("onRoomDestroy.callManager", function(e, chatRoom) {
         CallManager.assert(chatRoom.type, 'missing room type');
@@ -122,7 +122,8 @@ CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onDestroy', 'rtcCall'
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onRemoteStreamAdded', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onRemoteStreamRemoved', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onRemoteMute', 'rtcCall');
-CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onLocalMute', 'rtcCall');
+CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onLocalMuteInProgress', 'rtcCall');
+CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onLocalMuteComplete', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onCallStarted', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onCallStarting', 'rtcCall');
 
@@ -829,10 +830,8 @@ CallManagerCall.prototype.onWaitingResponseIncoming = function (e, eventData) {
         var $promise = self.room._retrieveTurnServerFromLoadBalancer(4000);
 
         $promise.always(function () {
-            if (!self.rtcCall.answer(Av.fromMediaOptions(mediaOptions))) {
-                self.onCallTerminated();
-                return;
-            }
+            self.rtcCall.answer(Av.fromMediaOptions(mediaOptions));
+
 
             self.room.megaChat.trigger('onCallAnswered', [self, eventData]);
             self.getCallManager().trigger('CallAnswered', [self, eventData]);
@@ -1085,6 +1084,7 @@ CallManagerCall.prototype.onCallEnded = function (e, reason) {
     }
     self.room.trigger('call-ended', self);
     self.room.trigger('CallTerminated', [e, self.room]);
+    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
 CallManagerCall.prototype.onCallRejected = function (e, reason) {
@@ -1101,9 +1101,11 @@ CallManagerCall.prototype.onCallRejected = function (e, reason) {
             })
         );
     }
+    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
-
 CallManagerCall.prototype.onCallAborted = function (e, reason) {
+    var self = this;
+    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
 CallManagerCall.prototype.onCallHandledElsewhere = function (e) {
@@ -1121,6 +1123,8 @@ CallManagerCall.prototype.onCallHandledElsewhere = function (e) {
             persist: false
         })
     );
+
+    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
 CallManagerCall.prototype.onCallFailed = function (e, reason) {
@@ -1155,12 +1159,20 @@ CallManagerCall.prototype.onCallFailed = function (e, reason) {
     );
 
     self.room.trigger('CallTerminated', [e, self.room]);
+
+    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
 CallManagerCall.prototype.onCallMissed = function (e) {
-};
+    var self = this;
 
+    self.getCallManager().trigger('CallTerminated', [self, e]);
+};
 CallManagerCall.prototype.onCallTimeout = function (e) {
+    var self = this;
+
+
+    self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
 /**
@@ -1213,6 +1225,9 @@ CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates)
         case CallManagerCall.STATE.MISSED:
             callMgr.trigger('CallMissed', [self, terminationCode]);
             break;
+        case CallManagerCall.STATE.STARTED:
+            callMgr.trigger('CallStarted', [self, terminationCode]);
+            break;
         case CallManagerCall.STATE.ENDED:
             callMgr.trigger('CallEnded', [self, terminationCode]);
             break;
@@ -1221,6 +1236,9 @@ CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates)
             break;
         case CallManagerCall.STATE.HANDLED_ELSEWHERE:
             callMgr.trigger('CallHandledElsewhere', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.MISSED:
+            callMgr.trigger('CallMissed', [self, terminationCode]);
             break;
         case CallManagerCall.STATE.TIMEOUT:
             callMgr.trigger('CallTimeout', [self, terminationCode]);
@@ -1231,7 +1249,7 @@ CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates)
                 " for termcode ", RtcModule.getTermCodeName(terminationCode));
             break;
     }
-    self.onCallTerminated();
+    this.onCallTerminated();
 };
 
 CallManagerCall.prototype.onRemoteStreamAdded = function (rtcSessionEventHandler, stream) {
@@ -1315,50 +1333,51 @@ CallManagerCall.prototype.onRemoteMute = function () {
     self.room.trackDataChange();
 };
 
-CallManagerCall.prototype.onLocalMute = function () {
+CallManagerCall.prototype.onLocalMuteInProgress = function () {
     var self = this;
+    this.room.trigger('onLocalMuteInProgress', [this]);
+    self.room.trackDataChange();
+};
+CallManagerCall.prototype.onLocalMuteComplete = function () {
+    var self = this;
+    this.room.trigger('onLocalMuteComplete', [this]);
+    self.room.trackDataChange();
+};
+
+CallManagerCall.prototype.onLocalMediaRequest = function () {
+    $('.camera-access').removeClass('hidden');
+};
+
+CallManagerCall.prototype.onLocalMediaObtained = function () {
+    var self = this;
+    $('.camera-access').addClass('hidden');
+    self.room.trackDataChange();
+};
+
+CallManagerCall.prototype.onLocalMediaFail = function () {
+    var self = this;
+    $('.camera-access').addClass('hidden');
     self.room.trackDataChange();
 };
 
 CallManagerCall.prototype.muteAudio = function () {
     var self = this;
-
-    var mediaOpts = self.getMediaOptions();
-    mediaOpts.audio = false;
-
-    self.rtcCall.muteUnmute(Av.fromMediaOptions(mediaOpts));
-
-    self.getCallManager().trigger('LocalMute', [self]);
+    self.rtcCall.enableAudio(false);
 };
+
 CallManagerCall.prototype.unmuteAudio = function () {
     var self = this;
-
-    var mediaOpts = self.getMediaOptions();
-    mediaOpts.audio = true;
-
-    self.rtcCall.muteUnmute(Av.fromMediaOptions(mediaOpts));
-
-    self.getCallManager().trigger('LocalMute', [self]);
+    self.rtcCall.enableAudio(true);
 };
+
 CallManagerCall.prototype.muteVideo = function () {
     var self = this;
-
-    var mediaOpts = self.getMediaOptions();
-    mediaOpts.video = false;
-
-    self.rtcCall.muteUnmute(Av.fromMediaOptions(mediaOpts));
-
-    self.getCallManager().trigger('LocalMute', [self]);
+    self.rtcCall.enableVideo(false);
 };
+
 CallManagerCall.prototype.unmuteVideo = function () {
     var self = this;
-
-    var mediaOpts = self.getMediaOptions();
-    mediaOpts.video = true;
-
-    self.rtcCall.muteUnmute(Av.fromMediaOptions(mediaOpts));
-
-    self.getCallManager().trigger('LocalMute', [self]);
+    self.rtcCall.enableVideo(true);
 };
 
 CallManagerCall.prototype.setState = function (newState) {
@@ -1388,7 +1407,6 @@ CallManagerCall.prototype.setState = function (newState) {
 
     this.getCallManager().trigger('StateChanged', [this, this, oldState, newState]);
 };
-
 
 CallManagerCall.prototype.getStateAsText = function () {
     return constStateToText(CallManagerCall.STATE, this.state);
@@ -1443,6 +1461,10 @@ CallManagerCall.prototype.getPeer = function () {
     else {
         return M.u[u_handle];
     }
+};
+
+CallManagerCall.prototype.localStream = function() {
+    return this.rtcCall.localStream();
 };
 
 CallManagerCall.prototype.getMediaOptions = function () {

@@ -1488,7 +1488,7 @@ function constStateToText(enumMap, state) {
 function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     "use strict";
 
-    assert(typeof newState !== "undefined", "assertStateChange: Invalid newState");
+    assert(typeof newState !== "undefined", "assertStateChange: newState is 'undefined'");
     var checksAvailable = allowedStatesMap[currentState];
     var allowed = false;
     if (checksAvailable) {

@@ -16221,15 +16221,16 @@ React.makeElement = React['createElement'];
 	            }
 	        });
 
-	        if (room.megaChat.rtc && room.megaChat.rtc.gLocalStream && self.refs.localViewport && self.refs.localViewport.src === "" && self.refs.localViewport.currentTime === 0 && !self.refs.localViewport.srcObject) {
-	            RTC.attachMediaStream(self.refs.localViewport, room.megaChat.rtc.gLocalStream);
+	        var localStream = room.callManagerCall.localStream();
+	        if (localStream && self.refs.localViewport && self.refs.localViewport.src === "" && self.refs.localViewport.currentTime === 0 && !self.refs.localViewport.srcObject) {
+	            RTC.attachMediaStream(self.refs.localViewport, localStream);
 	        }
 
 	        var bigLocalViewport = $('.bigLocalViewport')[0];
 	        var smallLocalViewport = $('.smallLocalViewport')[0];
 
-	        if (smallLocalViewport && bigLocalViewport && !bigLocalViewport.src && !bigLocalViewport.srcObject && room.megaChat.rtc && room.megaChat.rtc.gLocalStream && bigLocalViewport && bigLocalViewport.src === "" && bigLocalViewport.currentTime === 0) {
-	            RTC.attachMediaStream(bigLocalViewport, room.megaChat.rtc.gLocalStream);
+	        if (smallLocalViewport && bigLocalViewport && !bigLocalViewport.src && !bigLocalViewport.srcObject && localStream && bigLocalViewport && bigLocalViewport.src === "" && bigLocalViewport.currentTime === 0) {
+	            RTC.attachMediaStream(bigLocalViewport, localStream);
 	        }
 
 	        $(room).rebind('toggleMessages.av', function () {
@@ -16255,6 +16256,13 @@ React.makeElement = React['createElement'];
 	                    'box-shadow': '0px 0px 0px 0px rgba(255, 255, 255, 0)'
 	                });
 	            }
+	        });
+
+	        this.props.chatRoom.rebind('onLocalMuteInProgress.ui', function () {
+	            self.setState({ 'muteInProgress': true });
+	        });
+	        this.props.chatRoom.rebind('onLocalMuteComplete.ui', function () {
+	            self.setState({ 'muteInProgress': false });
 	        });
 
 	        if (self.initialRender === false && _reactDom2.default.findDOMNode(self)) {
@@ -16395,10 +16403,7 @@ React.makeElement = React['createElement'];
 	        var activeStreamIdOrPlayer = (chatRoom.type === "group" || chatRoom.type === "public") && self.getViewMode() === VIEW_MODES.CAROUSEL ? self.getCurrentStreamId() : false;
 
 	        var visiblePanelClass = "";
-	        var localPlayerStream;
-	        if (callManagerCall && chatRoom.megaChat.rtc && chatRoom.megaChat.rtc.gLocalStream) {
-	            localPlayerStream = chatRoom.megaChat.rtc.gLocalStream;
-	        }
+	        var localPlayerStream = callManagerCall.localStream();
 
 	        if (this.visiblePanel === true) {
 	            visiblePanelClass += " visible-panel";
@@ -16801,7 +16806,10 @@ React.makeElement = React['createElement'];
 	                ),
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: 'button call', onClick: function onClick(e) {
+	                    { className: "button call " + (this.state.muteInProgress ? " disabled" : ""), onClick: function onClick(e) {
+	                            if (self.state.muteInProgress || $(this).is(".disabled")) {
+	                                return;
+	                            }
 	                            if (callManagerCall.getMediaOptions().audio === true) {
 	                                callManagerCall.muteAudio();
 	                            } else {
@@ -16812,7 +16820,10 @@ React.makeElement = React['createElement'];
 	                ),
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: "button call" + (callManagerCall.hasVideoSlotLimitReached() === true && callManagerCall.getMediaOptions().video === false ? " disabled" : ""), onClick: function onClick(e) {
+	                    { className: "button call" + (callManagerCall.hasVideoSlotLimitReached() === true && callManagerCall.getMediaOptions().video === false ? " disabled" : "") + (this.state.muteInProgress ? " disabled" : ""), onClick: function onClick(e) {
+	                            if (self.state.muteInProgress || $(this).is(".disabled")) {
+	                                return;
+	                            }
 	                            if (callManagerCall.getMediaOptions().video === true) {
 	                                callManagerCall.muteVideo();
 	                            } else {

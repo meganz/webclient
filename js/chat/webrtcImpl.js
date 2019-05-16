@@ -122,7 +122,12 @@
     RtcCallEventHandler.prototype.onCallStarting = function () {
         return this.chatRoom.megaChat.plugins.callManager.onCallStarting(this.call);
     };
-
+    RtcCallEventHandler.prototype.onLocalMuteInProgress = function () {
+        return this.chatRoom.callManagerCall.onLocalMuteInProgress();
+    };
+    RtcCallEventHandler.prototype.onLocalMuteComplete = function () {
+        return this.chatRoom.callManagerCall.onLocalMuteComplete();
+    };
     var RtcGlobalEventHandler = function (megaChat) {
         var self = this;
         self.megaChat = megaChat;
@@ -227,15 +232,6 @@
         return base64urldecode(room.getParticipantsExceptMe()[0]);
     };
 
-    RtcGlobalEventHandler.prototype.onLocalMediaRequest = function () {
-        $('.camera-access').removeClass('hidden');
-    };
-    RtcGlobalEventHandler.prototype.onLocalMediaObtained = function () {
-        $('.camera-access').addClass('hidden');
-    };
-    RtcGlobalEventHandler.prototype.onLocalMediaFail = function () {
-        $('.camera-access').addClass('hidden');
-    };
     RtcGlobalEventHandler.prototype.onClientJoinedCall = function(chatId, userid, clientid, parts) {
         var self = this;
         var chatRoom = self.megaChat.getChatById(base64urlencode(chatId));

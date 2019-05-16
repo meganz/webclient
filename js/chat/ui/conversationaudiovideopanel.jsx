@@ -394,15 +394,15 @@ var ConversationAudioVideoPanel = React.createClass({
         });
 
 
+        var localStream = room.callManagerCall.localStream();
         if (
-            room.megaChat.rtc &&
-            room.megaChat.rtc.gLocalStream &&
+            localStream &&
             self.refs.localViewport &&
             self.refs.localViewport.src === "" &&
             self.refs.localViewport.currentTime === 0 &&
             !self.refs.localViewport.srcObject
         ) {
-            RTC.attachMediaStream(self.refs.localViewport, room.megaChat.rtc.gLocalStream);
+            RTC.attachMediaStream(self.refs.localViewport, localStream);
             // attachMediaStream would do the .play call
         }
 
@@ -411,13 +411,12 @@ var ConversationAudioVideoPanel = React.createClass({
 
         if (
             smallLocalViewport && bigLocalViewport && !bigLocalViewport.src && !bigLocalViewport.srcObject &&
-            room.megaChat.rtc &&
-            room.megaChat.rtc.gLocalStream &&
+            localStream &&
             bigLocalViewport &&
             bigLocalViewport.src === "" &&
             bigLocalViewport.currentTime === 0
         ) {
-            RTC.attachMediaStream(bigLocalViewport, room.megaChat.rtc.gLocalStream);
+            RTC.attachMediaStream(bigLocalViewport, localStream);
         }
 
         $(room).rebind('toggleMessages.av', function() {
@@ -444,6 +443,14 @@ var ConversationAudioVideoPanel = React.createClass({
                     'box-shadow': '0px 0px 0px 0px rgba(255, 255, 255, 0)'
                 });
             }
+        });
+
+
+        this.props.chatRoom.rebind('onLocalMuteInProgress.ui', function() {
+            self.setState({'muteInProgress': true});
+        });
+        this.props.chatRoom.rebind('onLocalMuteComplete.ui', function() {
+            self.setState({'muteInProgress': false});
         });
 
         if (self.initialRender === false && ReactDOM.findDOMNode(self)) {
@@ -602,10 +609,7 @@ var ConversationAudioVideoPanel = React.createClass({
         );
 
         var visiblePanelClass = "";
-        var localPlayerStream;
-        if (callManagerCall && chatRoom.megaChat.rtc && chatRoom.megaChat.rtc.gLocalStream) {
-            localPlayerStream = chatRoom.megaChat.rtc.gLocalStream;
-        }
+        var localPlayerStream = callManagerCall.localStream();
 
         if (this.visiblePanel === true) {
             visiblePanelClass += " visible-panel";
@@ -1046,7 +1050,10 @@ var ConversationAudioVideoPanel = React.createClass({
                     {unreadDiv}
                     <i className="big-icon conversations"></i>
                 </div>
-                <div className="button call" onClick={function(e) {
+                <div className={"button call " + (this.state.muteInProgress ? " disabled" : "")} onClick={function(e) {
+                    if (self.state.muteInProgress || $(this).is(".disabled")) {
+                        return;
+                    }
                     if (callManagerCall.getMediaOptions().audio === true) {
                         callManagerCall.muteAudio();
                     }
@@ -1060,8 +1067,12 @@ var ConversationAudioVideoPanel = React.createClass({
                 </div>
                 <div className={
                     "button call" + (callManagerCall.hasVideoSlotLimitReached() === true &&
-                    callManagerCall.getMediaOptions().video === false ? " disabled" : "")
+                    callManagerCall.getMediaOptions().video === false ? " disabled" : "") +
+                        (this.state.muteInProgress ? " disabled" : "")
                 } onClick={function(e) {
+                    if (self.state.muteInProgress || $(this).is(".disabled")) {
+                        return;
+                    }
                     if (callManagerCall.getMediaOptions().video === true) {
                         callManagerCall.muteVideo();
                     }

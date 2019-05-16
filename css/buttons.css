@@ -1059,7 +1059,7 @@ body:not(.rtl) .default-white-button::first-letter {
     width: 24px;
     height: 24px;
     margin:3px 8px 4px 0px;
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v8.png);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;

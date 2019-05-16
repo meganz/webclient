@@ -1191,6 +1191,8 @@ mBroadcaster.once('startMega', function() {
                 mega.loadReport.invisibleTime += invisibleTime;
             }
         }
+
+        mBroadcaster.sendMessage('visibilitychange:' + Boolean(document.hidden));
     });
 });
 

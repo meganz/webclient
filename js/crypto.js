@@ -536,7 +536,7 @@ function chunkedfetch(xhr, uri, postdata, httpMethod) {
         var reader = response.body.getReader();
         var evt = { loaded: 0 };
         xhr.status = response.status;
-        xhr.totalBytes = response.headers.get('Original-Content-Length');
+        xhr.totalBytes = response.headers.get('Original-Content-Length') | 0;
 
         function chunkedread() {
             return reader.read().then(function(r) {
@@ -869,7 +869,7 @@ function api_reqfailed(c, e) {
         loadingInitDialog.hide();
         loadSubPage('login');
     }
-    else if (c == 2 && e == ETOOMANY) {
+    else if ((c == 2 || c == 5) && e == ETOOMANY) {
         // too many pending SC requests - reload from scratch
         fm_fullreload(this.q, 'ETOOMANY');
     }

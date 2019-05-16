@@ -880,7 +880,7 @@ a.account-manage-button:hover {
     background-color: rgba(255,255,255,1);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -6px -10649px;
     background-repeat: no-repeat;
     left: 0;
@@ -1042,7 +1042,7 @@ a.account-manage-button:hover {
     height: 40px;
 }
 .free .fm-right-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .no-percs .chart.data .perc-txt {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -10px -11854px;
     width: 30px;
 }
@@ -1147,9 +1147,9 @@ a.account-manage-button:hover {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 4px 8px;
+    padding: 4px;
     width: 10px;
-    min-width: 127px;
+    min-width: 135px;
     text-align: center;
 }
 .slider-percentage span {
@@ -1788,7 +1788,7 @@ a.blog-button:hover {
     line-height: 18px;
     padding: 2px 0 2px 28px;
     margin: 0 14px 0 0;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -14px -7100px;
     background-repeat: no-repeat;
 }
@@ -1798,7 +1798,7 @@ a.blog-button:hover {
     height: 20px;
     right: -4px;
     top: -4px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -10px -27px;
     background-position: -14px -6776px;
     background-repeat: no-repeat;
@@ -3442,9 +3442,6 @@ img.blog-new-logos {
     transition: all 200ms ease-in-out;
     cursor: pointer;
 }
-.properties-context-item span{
-    white-space: nowrap;
-}
 .properties-context-item.show-more {
     color: white;
 }
@@ -3709,7 +3706,7 @@ label.iPhoneCheckLabelOff span {
     height: 24px;
     left: 10px;
     top: 6px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -1px -3036px;
     background-repeat: no-repeat;
 }
@@ -3907,13 +3904,13 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.dragover {
     background-color: rgba(217,0,7,0.3);
 }
-.shared-with-me .nw-fm-tree-item:hover, .out-shares .nw-fm-tree-item:hover, .public-links .nw-fm-tree-item:hover, .shared-with-me .nw-fm-tree-item.hovered, .out-shares .nw-fm-tree-item.hovered, .public-links .nw-fm-tree-item.hovered {
+.shared-with-me .nw-fm-tree-item:hover, .shared-with-me .nw-fm-tree-item.hovered {
     background-color: rgba(255,179,0,0.3);
 }
-.shared-with-me .nw-fm-tree-item.selected, .out-shares .nw-fm-tree-item.selected, .public-links .nw-fm-tree-item.selected {
+.shared-with-me .nw-fm-tree-item.selected {
     background-color: rgba(255,179,0,0.5);
 }
-.shared-with-me .nw-fm-tree-item.dragover, .out-shares .nw-fm-tree-item.dragover, .public-links .nw-fm-tree-item.dragoved {
+.shared-with-me .nw-fm-tree-item.dragover {
     background-color: rgba(255,179,0,0.4);
 }
 .rubbish-bin .nw-fm-tree-item:hover, .rubbish-bin .nw-fm-tree-item.hovered {
@@ -3941,7 +3938,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     cursor: default;
 }
 .nw-fm-tree-item.contains-folders .nw-fm-arrow-icon {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: center -9911px;
     cursor: pointer;
@@ -4123,7 +4120,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .fm-add-user-scrolling .nw-contact-item {
     padding-right: 32px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: right -2907px;
     background-repeat: no-repeat;
 }
@@ -4148,7 +4145,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     margin: 12px;
     border: 2px solid #d9d9d9;
     padding: 0 10px 0 32px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -10px -2969px;
     background-repeat: no-repeat;
     -moz-border-radius: 5px;
@@ -4165,7 +4162,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     color: #868686;
 }
 .verified .nw-contact-verified-icon {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -19px -2827px;
     background-repeat: no-repeat;
     position: absolute;
@@ -4238,7 +4235,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     width: 16px;
     height: 16px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     z-index: 10;
     background-position: -11px -2244px;
     -webkit-box-sizing: border-box;
@@ -4317,7 +4314,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     right: 2px;
     top: 6px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -12px -9768px;
     cursor: pointer;
@@ -4947,7 +4944,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     height: 36px;
     background-color: rgba(242,242,242,100);
 }
-.fm-left-menu.shared-with-me, .fm-left-menu.out-shares, .fm-left-menu.public-links {
+.fm-left-menu.shared-with-me {
     background-color: rgba(255,165,0,1);
 }
 .fm-left-menu.inbox {
@@ -5135,7 +5132,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .fm-left-menu.account + div + div + .nw-tree-panel-header {
     display: none;
 }
-.cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .out-shares .nw-fm-tree-header.shared-with-me, .public-links .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications, .inbox .nw-fm-tree-header.inbox, .account .nw-fm-tree-header.account, .dashboard .nw-fm-tree-header.dashboard, .user-management .nw-fm-tree-header.user-management {
+.cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications, .inbox .nw-fm-tree-header.inbox, .account .nw-fm-tree-header.account, .dashboard .nw-fm-tree-header.dashboard, .user-management .nw-fm-tree-header.user-management {
     display: block;
 }
 .transfers-header-bl {
@@ -5148,7 +5145,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     display: block;
 }
 .nw-fm-search-icon {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -10px -7881px;
     position: absolute;
@@ -5193,7 +5190,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     height: 48px;
     content: '';
     position: absolute;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -100px -100px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -5228,7 +5225,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     background-position: 3px -6142px;
 }
 .nw-fm-left-icon.shared-with-me::before {
-    background-position: 0 -12717px;
+    background-position: 3px -88px;
 }
 .nw-fm-left-icon.contacts::before {
     background-position: 3px -136px;
@@ -5443,7 +5440,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     position: absolute;
     top: 49px;
     width: 36px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: center -848px;
 }
@@ -5706,7 +5703,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     -khtml-opacity: 1;
     opacity: 1;
 }
-.files-grid-view, .files-grid-view.shared-view, .files-grid-view.out-shares-view, .files-grid-view.public-links-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view, .out-shared-grid-view, .transfer-table-wrapper {
+.files-grid-view, .files-grid-view.shared-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view, .transfer-table-wrapper {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -5717,11 +5714,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     position: relative;
     top: -1px;
     overflow: hidden;
-}
-.files-grid-view.shared-view, .files-grid-view.out-shares-view, .files-grid-view.public-links-view, .shared-grid-view, .out-shared-grid-view {
-    height: -webkit-calc(100% - 73px);
-    height: -moz-calc(100% - 73px);
-    height: calc(100% - 73px);
 }
 .files-grid-view.archived-chat-view {
     height: -webkit-calc(100% );
@@ -5773,7 +5765,7 @@ th.grid-first-th {
     height: 24px;
     width: 30px;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -8px -4790px;
 }
@@ -5787,7 +5779,7 @@ th.grid-first-th {
 .grid-sixth-th {
     width: 45px;
 }
-.grid-table.shared-with-me td, .grid-table.out-shares td, .grid-table.contacts td, .grid-table.contact-requests td, .grid-table.sent-requests td {
+.grid-table.shared-with-me td, .grid-table.contacts td, .grid-table.contact-requests td, .grid-table.sent-requests td {
     height: 48px;
 }
 .sent-requests-grid th {
@@ -5811,7 +5803,7 @@ th.grid-first-th {
     height: 24px;
     width: 25px;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -13px -4884px;
     background-size: auto;
@@ -5900,32 +5892,6 @@ th.grid-first-th {
 .linked .data-item-icon, .taken-down.linked .data-item-icon, .undecryptable.nw-fm-tree-item .data-item-icon {
     display: block;
 }
-
-/* Out Shares */
-.out-shared-grid-view .fm-chat-users-wrapper.simpletip {
-    display: inline-block;
-    max-width: 100%;
-    vertical-align: top;
-}
-.out-shared-grid-view .fm-chat-users-wrapper.simpletip:hover {
-    text-decoration: underline;
-    font-weight: 600;
-}
-.out-shared-grid-view .fm-chat-users {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.out-shared-grid-view .simpletip-parent {
-    position: static !important;
-}
-.out-shared-blocks-view .shared-folder-info-block {
-    z-index: 1;
-}
-.out-shared-blocks-view .shared-folder-info, .contact-email, .shared-contact-info {
-    display: inline-block;
-}
-/* End of Out Shares */
-
 /* FM notification */
 .fm-notification-block {
     display: none;
@@ -5995,7 +5961,7 @@ th.grid-first-th {
     height: calc(100% - 61px);
 }
 /* End of FM notification */
-.fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .out-shared-blocks-view, .fm-blocks-view.out-shares-view, .fm-blocks-view.public-links-view, .contacts-details-block, .contacts-blocks-view {
+.fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .contacts-details-block, .contacts-blocks-view {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -6008,12 +5974,12 @@ th.grid-first-th {
     padding: 0;
     overflow: hidden;
 }
-.fm-blocks-view.contacts-view, .fm-contacts-blocks-view, .contacts-details-block, .contacts-blocks-view, .files-grid-view.contacts-view, .shared-details-block, .shared-blocks-view, .out-shared-blocks-view, .fm-blocks-view.out-shares-view, .fm-blocks-view.public-links-view {
+.fm-blocks-view.contacts-view, .fm-contacts-blocks-view, .contacts-details-block, .contacts-blocks-view, .files-grid-view.contacts-view {
     height: -webkit-calc(100% - 73px);
     height: -moz-calc(100% - 73px);
     height: calc(100% - 73px);
 }
-.file-block-scrolling, .contacts-blocks-scrolling, .shared-blocks-scrolling, .out-shared-blocks-scrolling {
+.file-block-scrolling, .contacts-blocks-scrolling, .shared-blocks-scrolling {
     height: 100%;
     padding-right: 14px;
     -webkit-box-sizing: border-box;
@@ -6043,7 +6009,7 @@ th.grid-first-th {
     display: none;
 }
 */
-.file-block-scrolling .jspPane::after, .contacts-blocks-scrolling .jspPane::after, .shared-blocks-scrolling .jspPane::after, .out-shared-blocks-scrolling .jspPane::after {
+.file-block-scrolling .jspPane::after, .contacts-blocks-scrolling .jspPane::after, .shared-blocks-scrolling .jspPane::after {
     clear: both;
     display: block;
     content: '';
@@ -6306,7 +6272,7 @@ th.grid-first-th {
 .clear-transfer-icon::after {
     opacity: 0.67;
     background-position: 1px -4045px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 .hide-settings-icon {
     -moz-opacity: 0;
@@ -6331,7 +6297,7 @@ th.grid-first-th {
 .grid-table {
     width: 100%;
 }
-.contacts-view .grid-table, .shared-grid-view .grid-table, .out-shared-grid-view .grid-table, .contact-details-view .grid-table {
+.contacts-view .grid-table, .shared-grid-view .grid-table, .contact-details-view .grid-table {
     table-layout: fixed;
 }
 .transfer-table td, .grid-table td, .grid-share-table td, .contacts-grid-table td {
@@ -6347,7 +6313,7 @@ th.grid-first-th {
     box-sizing: border-box;
     position: relative;
 }
-.grid-table.shared-with-me td, .grid-table.out-shares td, .grid-table.contacts td, .contact-requests-grid td, .sent-requests-grid td {
+.grid-table.shared-with-me td, .grid-table.contacts td, .contact-requests-grid td, .sent-requests-grid td {
     vertical-align: middle;
 }
 table {
@@ -6793,7 +6759,7 @@ table {
 .fm-blocks-view.shared-view .block-view-file-type.folder, .shared-blocks-view .block-view-file-type.folder, .fm-blocks-view.contacts-view .block-view-file-type.folder, .contacts-blocks-view .block-view-file-type.folder, .block-view-file-type.folder.inbound-share, .contact-details-view .block-view-file-type.folder-shared {
     background-position: 0 -4794px;
 }
-.block-view-file-type.folder-shared, .out-shared-blocks-view .block-view-file-type.folder {
+.block-view-file-type.folder-shared {
     background-position: 0 -5034px;
 }
 .rubbish-bin .block-view-file-type.folder-shared {
@@ -7188,7 +7154,7 @@ table {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
 }
 .transfer-table tr:nth-child(odd) td .transfer-type::before {
@@ -7262,7 +7228,7 @@ table {
     display: block;
     left: 0;
     top: 6px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -15px -700px;
     position: absolute;
@@ -7288,7 +7254,7 @@ table {
 .transfer-table .eta {
     min-width: 100px;
     display: inline-block;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -15px -724px;
     background-repeat: no-repeat;
     text-indent: 17px;
@@ -7305,7 +7271,7 @@ table {
     text-indent: 18px;
 }
 .transfer-table .eta.unknown::before {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: 0 -4172px;
     background-repeat: no-repeat;
     content: '';
@@ -7359,9 +7325,6 @@ table {
     -ms-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
     transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
 }
-.fm-right-header .link-button.fm-new-shared-folder {
-    overflow: visible;
-}
 .fm-right-header .link-button > .small-icon {
     margin-right: 6px;
 }
@@ -7414,12 +7377,6 @@ table {
 .fm-breadcrumbs.shared-with-me:first-child .right-arrow-bg {
     background-position: 9px -8096px;
 }
-.fm-breadcrumbs#path_out-shares:first-child .right-arrow-bg {
-    background-position: 9px -12766px;
-}
-.fm-breadcrumbs#path_public-links:first-child .right-arrow-bg {
-    background-position: 0px -4823px;
-}
 .fm-breadcrumbs.contacts .right-arrow-bg {
     background-position: 9px -8136px;
 }
@@ -7428,7 +7385,7 @@ table {
     margin-left: -1px;
 }
 .fm-breadcrumbs.has-next-button {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: right -1434px;
 }
@@ -7459,7 +7416,7 @@ table {
     opacity: 0;
 }
 .fm-breadcrumbs:first-child:not(.public-links) .right-arrow-bg {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
 }
 .fm-breadcrumbs.has-next-button .right-arrow-bg {
@@ -7524,7 +7481,7 @@ table {
     font-size: 13px;
     color: #333333;
     padding: 0 20px 0 22px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -2px -3304px;
     float: right;
@@ -7603,7 +7560,7 @@ table {
     display: block;
     float: right;
     margin: 9px 11px 0 29px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -7648,7 +7605,7 @@ table {
     opacity: 0.05;
     cursor: default;
 }
-.fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-contacts, .fm-empty-messages, .fm-empty-folder, .fm-empty-conversations, .fm-empty-incoming, .fm-empty-outgoing, .fm-empty-public-link, .fm-invalid-folder, .fm-empty-folder-link, .fm-empty-filter {
+.fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-contacts, .fm-empty-messages, .fm-empty-folder, .fm-empty-conversations, .fm-empty-incoming, .fm-invalid-folder, .fm-empty-folder-link, .fm-empty-filter {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -7710,7 +7667,7 @@ table {
     height: 370px;
     margin-top: -186px;
 }
-.fm-empty-folder .fm-empty-pad, .fm-empty-folder-link .fm-empty-pad {
+.fm-empty-folder .fm-empty-pad, .fm-empty-incoming .fm-empty-pad, .fm-empty-folder-link .fm-empty-pad {
     height: 288px;
     margin-top: -144px;
 }
@@ -7729,7 +7686,7 @@ table {
     height: 390px;
     margin-top: -171px;
 }
-.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-outgoing-bg, .fm-empty-public-link-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg, .fm-empty-filter-bg {
+.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg, .fm-empty-filter-bg {
     background-image: url(../images/mega/empty-sprite_v6.png);
     background-repeat: no-repeat;
 }
@@ -7770,16 +7727,8 @@ table {
     background-position: center -276px;
 }
 .fm-empty-incoming-bg {
-    height: 102px;
-    background-position: 50.4% -3921px;
-}
-.fm-empty-outgoing-bg {
-    height: 102px;
-    background-position: center -3751px;
-}
-.fm-empty-public-link-bg {
-    height: 102px;
-    background-position: center -3575px;
+    height: 212px;
+    background-position: center -856px;
 }
 .fm-empty-folder-link .fm-empty-pad {
     height: 354px;
@@ -9119,7 +9068,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: right -8359px;
     -webkit-box-sizing: border-box;
@@ -10350,7 +10299,7 @@ span.orange {
     margin: 0 0 0 -6px;
     position: absolute;
     top: 6px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: center -8343px;
     background-position: right -1288px;
     background-repeat: no-repeat;
@@ -10431,11 +10380,11 @@ span.orange {
     background-color: rgba(255,255,255,0.1);
 }
 .sorting-menu-item.active, .sorting-menu-item.selected {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     color: rgba(255,255,255,1);
 }
 .sorting-menu-arrow {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: left -7998px;
     display: block;
@@ -10466,7 +10415,7 @@ table {
 }
 .transfer-table-header th:first-child span {
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -6px -4019px;
     height: 24px;
@@ -10762,12 +10711,12 @@ table {
     height: calc(100% - 37px);
     background-color: white;
 }
-.account.tabs-bl, .contacts-tabs-bl, .shares-tabs-bl {
+.account.tabs-bl, .contacts-tabs-bl {
     background-color: #fafafa;
     border-bottom: 1px solid #e5e5e5;
     padding: 5px 16px 0 12px;
 }
-.contacts-tabs-bl, .shares-tabs-bl {
+.contacts-tabs-bl {
     margin: -1px 0 0 0;
     display: table;
     width: 100%;
@@ -10778,7 +10727,7 @@ table {
 .fm-account-history .account.tab-content, .fm-account-reseller .account.tab-content {
     height: 100%;
 }
-.account.tab-lnk, .contacts-tab-lnk, .shares-tab-lnk {
+.account.tab-lnk, .contacts-tab-lnk {
     cursor: pointer;
     font-size: 16px;
     line-height: 20px;
@@ -10794,10 +10743,10 @@ table {
     position: relative;
     margin-bottom: -1px;
 }
-.contacts-tab-lnk.filled, .shares-tab-lnk.filled {
+.contacts-tab-lnk.filled {
     padding: 4px 5px 0 24px;
 }
-.contacts-tab-lnk span, .shares-tab-lnk span {
+.contacts-tab-lnk span {
     font-size: 12px;
     line-height: 14px;
     height: 14px;
@@ -10813,7 +10762,7 @@ table {
     border-radius: 4px;
     font-family: 'source_sans_prosemibold', Arial;
 }
-.contacts-tab-lnk.filled span, .shares-tab-lnk.filled span {
+.contacts-tab-lnk.filled span {
     display: inline-block;
 }
 .account.tab-lnk.active {
@@ -10822,10 +10771,6 @@ table {
 }
 .contacts-tab-lnk.active {
     border-color: #00897B;
-    color: #333333;
-}
-.shares-tab-lnk.active {
-    border-color: rgba(255,165,0,1);
     color: #333333;
 }
 .account.tab-lnk.achievements, .active-achievements .account.tab-lnk.payment {
@@ -10940,7 +10885,7 @@ table {
     width: 25px;
     height: 13px;
     position: absolute;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: center -6063px;
     background-repeat: no-repeat;
     margin: -20px 0 0 -12px;
@@ -11460,7 +11405,7 @@ table {
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
     margin: 2px 0 0 0;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -13px -11775px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -15077,7 +15022,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .arrow:not(.grid-header-star) {
     cursor: pointer;
     background-position: right top;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     padding: 0 15px 0 0;
     display: block;
@@ -15138,7 +15083,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .search-path-icon.cloud-drive {
     background-position: -5px -999px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 .search-path-icon.folder, .search-path-icon.shared-folder {
     background-position: -337px -717px;
@@ -15147,19 +15092,19 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .search-path-icon.shared-folder {
     background-position: -12px -4369px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 .search-path-icon.recycle-item {
     background-position: -1px -8035px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 .search-path-icon.contacts-item {
     background-position: -12px -4410px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 .search-path-icon.inbox-item {
     background-position: -3px -6717px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 .search-path-icon img {
     width: 24px;
@@ -15178,7 +15123,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     width: 10px;
     height: 30px;
     background-repeat: no-repeat;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: right -1430px;
     margin: 0 4px 0 0;
 }
@@ -15567,7 +15512,7 @@ span.incoming-call-name {
     display: inline-block;
 }
 .star .incoming-contact-info span.incoming-call-name {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: right -6265px;
     background-repeat: no-repeat;
     padding-right: 25px;
@@ -15843,7 +15788,7 @@ span.incoming-call-name {
     text-overflow: ellipsis;
     overflow: hidden;
 }
-.shared-folder-info, .contact-email, .shared-contact-info {
+.shared-folder-info, .contact-email {
     color: #777;
     font-size: 13px;
     line-height: 18px;
@@ -15852,9 +15797,6 @@ span.incoming-call-name {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
-}
-.shared-contact-info {
-    display: inline-block;
 }
 .data-block-view.semi-big .shared-folder-info {
     line-height: 20px;
@@ -15866,7 +15808,7 @@ span.incoming-call-name {
     padding-left: 31px;
     color: #666;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -13px -4292px;
     background-repeat: no-repeat;
 }
@@ -17951,7 +17893,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     margin: 12px 12px 12px 12px
 }
 .fm-mega-dialog-size-icon {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: center -5509px;
     background-repeat: no-repeat;
     width: 20px;
@@ -19777,7 +19719,7 @@ body.pro:after {
 }
 .transfer-bar-overlay div {
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -13px -564px;
     background-color: rgba(255,255,255,0.7);
@@ -23037,7 +22979,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
 }
 .content-panel.user-management .user-management-status::before, .user-management-view .user-management-status::before {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     left: 0px;
     top: 0px;
@@ -23131,7 +23073,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
     left: 16px;
     top: 12px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 
 .user-management-tree-panel-header .img.enabled-accounts{
@@ -23160,7 +23102,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
     right: 2px;
     top: 12px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -12px -9768px;
     cursor: pointer;
@@ -23247,7 +23189,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: block;
     float: right;
     margin-top: 5px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -23563,7 +23505,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height:24px;
     padding:0;
     margin:20px 8px 20px 0;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     float: left;
 }
@@ -23708,7 +23650,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:24px;
     height:24px;
     margin: 4px 0px 4px 8px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     display: inline-block;
 }
@@ -23733,7 +23675,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:24px;
     height:24px;
     margin: 4px 0px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     display: inline-block;
     background-position: 0px -12216px;
@@ -23837,7 +23779,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-breadcrumb .user-management-icon {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: 0 -12281px;
     width:24px;
     height: 24px;
@@ -23846,7 +23788,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     cursor: pointer;
 }
 .user-management-breadcrumb .user-management-next-arrow {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -41px -1433px;
     width: 7px;
     height: 24px;
@@ -24060,7 +24002,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: 10px;
     border-radius: 100%;
     margin:9px 15px 9px 3px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     display: inline-block;
     position: relative;
 }
@@ -24312,7 +24254,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:16px;
     height: 16px;
     margin:4px 0;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     float: left;
 }
@@ -24409,7 +24351,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:24px;
     height: 24px;
     position: relative;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     opacity: 0.6;
 }
@@ -24820,7 +24762,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 16px;
     height: 16px;
     margin:8px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -4px -12309px;
     right: 0;
@@ -24998,7 +24940,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     left: 94px;
     bottom:-11px;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -24px -12312px;
     opacity: 0.8;
@@ -25084,7 +25026,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-grid-table .subaccount-img-big .subaccount-selection-button::before {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -16px -4912px;
     width: 15px;
@@ -25419,7 +25361,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-view .icon, .fm-right-header-user-management .icon, .user-management-dialog .icon, .user-management-overview-bar .icon{
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     width:24px;
     height:24px;
@@ -27420,7 +27362,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:16px;
     height: 18px;
     background-position: -28px -12060px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     position: absolute;
 }
@@ -27929,7 +27871,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-account-settings .bus-input.short-input.underline-dropdown-input .list-arrow {
     width: 16px;
     height: 16px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -4px -12309px;
     right: 8px;
@@ -28420,7 +28362,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     overflow: hidden;
 }
 .fm-picker-dialog .icon {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-size: 48px auto;
     background-repeat: no-repeat;
     width:24px;
@@ -28533,7 +28475,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin: 4px 0 0 9px;
 }
 .fm-picker-dialog .summary-container .transfer-filetype-icon.chat {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-size: 48px auto;
     background-position: -12px -4517px;
@@ -28627,7 +28569,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin:4px 4px 0 8px;
 }
 .fm-picker-dialog .next-arrow {
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -41px -1433px;
     width: 7px;
     height: 24px;
@@ -28959,7 +28901,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     -webkit-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
     -moz-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
     box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -11px -2244px;
 }
 .fm-picker-dialog .my-chat-list {
@@ -29143,7 +29085,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 24px;
     height: 24px;
     margin:4px 8px 4px 0px;
-    background-image: url(../images/mega/fm-main-sprite_v8.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;

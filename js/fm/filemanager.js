@@ -2552,26 +2552,6 @@ FileManager.prototype.contactsUI = function() {
             $this.find('.contact-chat-buttons').removeClass('hidden');
         }
     });
-
-    $addContact.rebind('clcik.contacts', function() {
-
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            M.showExpiredBusiness();
-            return;
-        }
-
-        var $this = $(this);
-        var user_handle = $this.attr('id');
-
-        if ($this.hasClass('offline') || megaChatIsDisabled) {
-            $this.find('.start-audio-call, .start-video-call').addClass('disabled');
-        }
-        else {
-            $this.find('.start-audio-call, .start-video-call').removeClass('disabled');
-        }
-    });
-
     $buttons.rebind('click.contacts', function() {
 
         if (u_attr && u_attr.b && u_attr.b.s === -1) {
@@ -2607,7 +2587,7 @@ FileManager.prototype.contactsUI = function() {
     });
 
     $('.fm-empty-contacts .fm-empty-button, .add-new-contact, .fm-add-user')
-        .rebind('click', function(e) {
+        .rebind('mousedown.addcontact1', function(e) {
 
             if (u_attr && u_attr.b && u_attr.b.s === -1) {
                 $.hideContextMenu();
@@ -3226,6 +3206,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         return false;
     }
 
+
     if (d) {
         console.time('selectddUI');
     }
@@ -3339,16 +3320,18 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
     $('.ui-selectable-helper').remove();
 
-    $ddUIgrid.selectable({
-        filter: $.selectddUIitem,
-        start: function(e, u) {
-            $.hideContextMenu(e);
-            $.hideTopMenu();
-        },
-        stop: function(e, u) {
-            M.searchPath();
-        }
-    });
+    if (this.currentdirid && this.currentdirid.substr(0, 8) !== 'contacts') {
+        $ddUIgrid.selectable({
+            filter: $.selectddUIitem,
+            start: function (e, u) {
+                $.hideContextMenu(e);
+                $.hideTopMenu();
+            },
+            stop: function (e, u) {
+                M.searchPath();
+            }
+        });
+    }
 
     $ddUIitem.rebind('contextmenu', function(e) {
         if (e.shiftKey) {

@@ -591,8 +591,18 @@ accountUI.session = {
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
     'use strict';
 
+    // Some webclient calls require callback to return the selected option as a boolean. Hence two callbacks.
     // Call the mobile version
-    mobile.messageOverlay.show(msg, submsg, callback);
+    mobile.messageOverlay.show(
+        msg,
+        submsg,
+        function() {
+            callback(true);
+        },
+        function() {
+            callback(false);
+        }
+    );
 }
 
 function fm_showoverlay() {

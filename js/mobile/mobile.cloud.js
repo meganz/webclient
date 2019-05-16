@@ -43,6 +43,7 @@ mobile.cloud = {
         this.renderFoldersAndFiles();
         this.renderFoldersAndFilesSubHeader();
         this.showEmptyCloudIfEmpty();
+        this.initSelectedUI();
 
         // Init folder and file row handlers
         this.initFileRowClickHandler();
@@ -614,6 +615,9 @@ mobile.cloud = {
             var node = M.d[nodeHandle];
             var fileName = node.name;
 
+            // Clear selection
+            mobile.cloud.deselect();
+
             // If this is an image, load the preview slideshow
             if (is_image(node) && fileext(fileName) !== 'pdf' || is_video(node)) {
                 mobile.slideshow.init(nodeHandle);
@@ -650,6 +654,9 @@ mobile.cloud = {
             // Get the node handle
             var $currentFolderRow = $(this);
             var nodeHandle = $currentFolderRow.data('handle');
+
+            // Clear Selection
+            mobile.cloud.deselect();
 
             // Open the folder immediately
             M.openFolder(nodeHandle);
@@ -806,6 +813,30 @@ mobile.cloud = {
         if (!mobile.rubbishBin.isRestoring) {
             mobile.deleteOverlay.completeDeletionProcess(nodeHandle);
         }
-    }
+    },
+
+    /**
+     * Deselect all selected nodes.
+     */
+    deselect: function() {
+        'use strict';
+        $('.ui-selected').removeClass('ui-selected');
+        $.selected = [];
+    },
+
+    /**
+     * Initialises the Selected UI on folder open.
+     */
+    initSelectedUI: function() {
+        'use strict';
+
+        // Cleanup any previous selections.
+        mobile.cloud.deselect();
+
+        // Attach listener on background to deselect elements.
+        $('.mobile.file-manager-block .mobile.fm-scrolling').off('tap').on('tap', function() {
+            mobile.cloud.deselect();
+        });
+    },
 
 };

@@ -25,6 +25,9 @@ mobile.cloud.contextMenu = {
             // Get the node handle for this row
             var nodeHandle = $selectedRow.data('handle');
 
+            // Clear any selections.
+            mobile.cloud.deselect();
+
             // Show the file info inside the context menu
             $contextMenuItemInfo.empty()
                 .append($itemImage.clone())
@@ -144,7 +147,11 @@ mobile.cloud.contextMenu = {
                     mobile.cloud.removeNodesFromViewIfRemoved();
                     if (!mobile.cloud.nodeInView(nodeHandle)) {
                         mobile.showSuccessToast(l[19636] + ". " + l[7224], null, null, function() {
-                            M.openFolder(M.getNodeParent(nodeHandle));
+                            M.openFolder(M.getNodeParent(nodeHandle))
+                                .finally(function() {
+                                    $.selected = [nodeHandle];
+                                    reselect(1);
+                                });
                             mobile.closeToast();
                             return false;
                         });

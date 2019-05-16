@@ -6002,7 +6002,15 @@ textarea.mobile.support-text-field {
     -khtml-opacity: 0.8;
     opacity: 0.8;
 }
-
+/* Selected UI */
+.mobile.file-manager-block.grid-view .mobile.fm-item.ui-selected {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+}
+.mobile.file-manager-block:not(.grid-view) .mobile.fm-item.ui-selected {
+    background-color: rgba(233,233,233,1);
+}
 /* Change password page */
 .mobile.my-account-change-password-page .body-text {
     color: #818993;

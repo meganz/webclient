@@ -2207,6 +2207,29 @@ input[type='checkbox'] {
     transition: all 200ms ease-in-out;
     opacity: 0.3;
 }
+.mobile.register-cancel-button {
+    background-image: linear-gradient(-179deg, #FF3333 0%, #FF4444 100%);
+    border: 1px solid #D82928;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 2px 1px 0 rgba(255,255,255,0.20);
+    color: #fff;
+    font-size: 16px;
+    height: 48px;
+    line-height: 48px;
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-top: 8px;
+    padding: 0;
+    position: relative;
+    text-align: center;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
 .mobile.signin-button.active, .mobile.register-button.active, .mobile.resend-button.active, .mobile.create-account-botton.active {
     background: #00bfa5;
     border: 1px solid #00A58F;
@@ -10980,7 +11003,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         margin-left: 24px;
         margin-right: 19px;
     }
-    .mobile.signin-button, .mobile.register-button, .mobile.resend-button, .mobile.create-account-button {
+    .mobile.signin-button, .mobile.register-button,
+    .mobile.resend-button, .mobile.register-cancel-button, .mobile.create-account-button {
         height: 48px;
         line-height: 47px;
         margin-left: 24px;

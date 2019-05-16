@@ -6028,6 +6028,9 @@ textarea.mobile.support-text-field {
 .mobile .recover-account-body-text br {
     margin-bottom: 12px;
 }
+.mobile.park-account.confirm-data-loss .checkdiv {
+    margin-right: 5px;
+}
 .mobile.recovery-key-page .mobile.recovery-key-string-block, .mobile.two-factor-qr-code-wrapper, .mobile.two-factor-verify-seed-wrapper {
     margin: 16px 24px 4px;
 }

@@ -174,7 +174,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             folders = folders
                 .filter(function(n) {
                     var folderParents = {};
-                    while (n.p !== M.RootID) {
+                    while (n && n.p !== M.RootID) {
                         folderParents[n.p] = 1;
                         n = M.d[n.p];
                     }

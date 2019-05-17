@@ -93,6 +93,12 @@ accountUI.renderAccountPage = function(account) {
             break;
 
         case '/fm/account/plan':
+            if ($.openAchievemetsDialog) {
+                delete $.openAchievemetsDialog;
+                onIdle(function() {
+                    $('.fm-account-plan.fm-account-sections .btn-achievements:visible').trigger('click');
+                });
+            }
             $('.fm-account-plan').removeClass('hidden');
             sectionClass = 'plan';
             accountUI.plan.init(account);

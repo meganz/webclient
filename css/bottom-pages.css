@@ -3007,9 +3007,6 @@ body:not(.en) .content-block .pages-nav.compound-items.active {
 .browsers.icon.ff {
     background-position: -68px -86px;
 }
-.browsers.icon.palemoon {
-    background-position: -216px -87px;
-}
 .browsers.icon.chrome {
     background-position: -141px -87px;
 }
@@ -5364,9 +5361,6 @@ body:not(.en) .pages-nav.content-block .nav-button {
 @media only screen and (max-height: 665px), only screen and (max-width: 805px) and (min-height: 665px) {
 .medium-txt.small-lineheight.info {
     display: none;
-}
-.browsers.download-info.palemoon {
-    margin-bottom: 50px;
 }
 }
 

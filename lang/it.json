@@ -2474,10 +2474,10 @@
     "19094": "Riattiva utente",
     "19095": "Migra dati",
     "19097": "Reinvia mail di verifica",
-    "19098": "Sei sicuro di voler disabilitare l'utente di [B]{0}[\/B]?",
+    "19098": "Sei sicuro di voler disabilitare l'account utente di [B]{0}[\/B]?",
     "19099": "Ricorda: Puoi riattivare l'utente in qualsiasi momento dalla lista degli utenti disattivati.",
     "19100": "Errore nella disabilitazione dell'utente",
-    "19101": "Sei sicuro di voler riattivare l'utente di [B]{0}[\/B]?",
+    "19101": "Sei sicuro di voler riattivare l'account utente di [B]{0}[\/B]?",
     "19102": "Ricorda: questa azione aumenter\u00e0 il numero di licenze utilizzate.",
     "19103": "Aggiungi",
     "19104": "Invita persone nel team",
@@ -3476,5 +3476,7 @@
     "20754": "Import to temporary account",
     "20755": "Create Free Account",
     "20756": "Create an account and get [S]50 GB*[\/S] free storage on MEGA, which you can use to import and upload your files.",
-    "20757": "Create your and get [S]50 GB*[\/S] free storage on MEGA."
+    "20757": "Create your and get [S]50 GB*[\/S] free storage on MEGA.",
+    "20758": "You don\u2019t have MEGA desktop App yet, want to install it?",
+    "20759": "Renews on [B]%1[\/B]"
 }

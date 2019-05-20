@@ -652,17 +652,22 @@ var dlmanager = {
             ssl: use_ssl
         };
 
-        // IF this is an anonymous chat OR a chat that I'm not a part of
-        if (M.chat && megaChatIsReady) {
-            megaChat.eventuallyAddDldTicketToReq(req);
-        }
-
         var ctx = {
             object: dl,
             next: callback,
             dl_key: dl.key,
             callback: this.dlGetUrlDone.bind(this)
         };
+
+        // IF this is an anonymous chat OR a chat that I'm not a part of
+        if (M.chat && megaChatIsReady) {
+            megaChat.eventuallyAddDldTicketToReq(req);
+        }
+
+        if (d && String(apipath).indexOf('staging') > 0) {
+            var s = sessionStorage;
+            req.f = [s.dltfefq | 0, s.dltflimit | 0];
+        }
 
         if (window.fetchStreamSupport) {
             // can handle CloudRAID downloads.

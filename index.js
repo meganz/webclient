@@ -1545,6 +1545,9 @@ function init_page() {
         loadSubPage(page.substr(6) || 'fm');
         return location.reload(true);
     }
+    else if (page.substr(0, 4) === 'test') {
+        test(page.substr(4));
+    }
 
     /**
      * If voucher code from url e.g. #voucherZUSA63A8WEYTPSXU4985

@@ -301,10 +301,13 @@
         M.safeShowDialog('register', function() {
             options = Object(opts);
 
-            $('.fm-dialog-title', $dialog).text(options.title || l[5840]);
+            $('.dialog-title', $dialog).text(options.title || l[968]);
 
             if (options.body) {
-                $('.fm-dialog-body', $dialog).safeHTML(options.body);
+                $('.fm-dialog-body', $dialog).removeClass('hidden').safeHTML(options.body);
+            }
+            else {
+                $('.fm-dialog-body', $dialog).addClass('hidden').text('');
             }
 
             redraw();

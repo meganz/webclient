@@ -2768,7 +2768,15 @@ accountUI.transfers = {
                         }
                     });
                     $('.slider-percentage span').text(bandwidthLimit + ' %');
-                    $('.bandwith-settings').removeClass('hidden');
+                    $('.bandwith-settings').removeClass('disabled').addClass('border');
+                    $('.slider-percentage-bl').removeClass('hidden');
+                    $('.band-grn-noti').addClass('hidden');
+                }
+                // Business account
+                else if (u_attr.b) {
+                    $('.bandwith-settings').addClass('hidden');
+                    $('.slider-percentage-bl').addClass('hidden');
+                    $('.band-grn-noti').addClass('hidden');
                 }
             }
         },

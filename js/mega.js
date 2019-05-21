@@ -2226,10 +2226,19 @@ function dbfetchfm() {
 
                         mega.loadReport.pn4 = Date.now() - mega.loadReport.stepTimeStamp;
 
+                        var fetchPS = function _fetchPS(ps, ignoreDB) {
+                            for (var i in ps) {
+                                if (!M.d[ps[i].h]) {
+                                    promises.push(dbfetch.get[ps[i].h]);
+                                }
+                            }
+                            processPS(ps, ignoreDB);
+                        };
+
                         var tables = {
                             opc: processOPC,
                             ipc: processIPC,
-                            ps: processPS,
+                            ps: fetchPS,
                             suba: process_suba,
                             puf: mega.megadrop.pufProcessDb,
                             pup: mega.megadrop.pupProcessDb,

@@ -325,7 +325,7 @@ MegaData.prototype.getOutShareTree = function() {
     for (var suh in M.su) {
         if (suh !== 'EXP') {
             for (var h in M.su[suh]) {
-                if (M.d[h] && M.getNodeShareUsers(M.d[h], 'EXP').length || M.ps[h]) {
+                if (M.d[h]) {
                     ostree[h] = Object.assign({}, M.d[h]);
                     ostree[h].t = this.getTreeValue(M.d[h]);
                 }

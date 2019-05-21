@@ -271,7 +271,15 @@ var ConversationsListItem = React.createClass({
             }
             lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
                     </div>;
-
+            const voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
+            if (lastMessage.textContents && lastMessage.textContents[1] === voiceClipType) {
+                lastMessageDiv = (
+                    <div className={lastMsgDivClasses}>
+                        {'Voice Message'}
+                    </div>
+                );
+            }
+            
             var timestamp = lastMessage.delay;
             var curTimeMarker;
             var msgDate = new Date(timestamp * 1000);

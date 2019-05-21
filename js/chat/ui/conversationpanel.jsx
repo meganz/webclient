@@ -1612,9 +1612,19 @@ var ConversationPanel = React.createClass({
                     if (msg.getState() === Message.STATE.SENT ||
                         msg.getState() === Message.STATE.DELIVERED ||
                         msg.getState() === Message.STATE.NOT_SENT) {
-                        chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
-                        msg.deleted = true;
-                        msg.textContents = "";
+                            const textContents = msg.textContents || '';
+
+                            if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP) {
+                                const attachmentMetadata = msg.getAttachmentMeta() || [];
+
+                                attachmentMetadata.forEach((v) => {
+                                    M.moveToRubbish(v.h);
+                                });
+                            }
+
+                            chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
+                            msg.deleted = true;
+                            msg.textContents = "";
                     }
                     else if (
                         msg.getState() === Message.STATE.NOT_SENT_EXPIRED
@@ -1658,10 +1668,11 @@ var ConversationPanel = React.createClass({
                     </div>
 
                     <GenericConversationMessage
-                        className="dialog-wrapper"
+                        className=" dialog-wrapper"
                         message={self.state.messageToBeDeleted}
                         hideActionButtons={true}
                         initTextScrolling={true}
+                        dialog={true}
                     />
                 </div>
             </ModalDialogsUI.ConfirmDialog>

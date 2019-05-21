@@ -972,6 +972,11 @@ function init_page() {
         loadSubPage('fm/account/achievements');
         return false;
     }
+    else if (page === 'fm/account/achievements') {
+        $.openAchievemetsDialog = true;
+        loadSubPage('fm/account/plan');
+        return false;
+    }
     else if (is_mobile && page.substr(0, 9) === 'twofactor') {
 
         parsepage(pages['mobile']);

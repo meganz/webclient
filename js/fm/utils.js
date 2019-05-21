@@ -1304,8 +1304,8 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                 else {
                     loadSubPage(urlParts[2]);
                     // if user click MEGAsync pro upgrade button and logged in as different account on webclient.
-                    if (urlParts[2].substr(0, 4) === "pro/") {
-                        msgDialog('warninga', l[882], l[19341]);
+                    if (String(urlParts[2]).startsWith('pro')) {
+                        later(msgDialog.bind(null, 'warninga', l[882], l[19341]));
                     }
                     return false;
                 }

@@ -1,4 +1,5 @@
 
+/* jshint -W098 */
 makeEnum(['MDBOPEN', 'EXECSC', 'LOADINGCLOUD'], 'MEGAFLAG_', window);
 
 // navigate to links internally, not by the browser.
@@ -2663,21 +2664,20 @@ function invalidLinkError() {
     }
 }
 
-/* jshint -W098 */
-
 /**
  * Classifies the strength of the password (used on the main Registration, Reset password (key or park) pages and
  * in the Pro Register dialog. The minimum allowed strength is 8 characters in length and password score of 1 (weak).
  * @param {String} password The user's password (should be trimmed for whitespace beforehand)
  */
-function classifyPassword(password) {
+function classifyPassword(password, $wrapper) {
 
     'use strict';
 
     // Calculate the password score using the ZXCVBN library and its length
     var passwordScore = zxcvbn(password).score;
     var passwordLength = password.length;
-    var $passStatus = $('.account.password-status');
+    var $passStatus = $wrapper.length ? $wrapper.find('.account.password-status')
+        : $('.account.password-status');
     var className = '';
     var string1 = '';
     var string2 = '';
@@ -2744,7 +2744,6 @@ function classifyPassword(password) {
             '@@<div class="password-tooltip-arrow"></div>', l[34], l[1129]);
     $('.password-status-warning').css('margin-left', ($('.password-status-warning').width() / 2 * -1) - 13);
 }
-/* jshint +W098 */
 
 /**
  * A function to get the last day of the month

@@ -758,7 +758,7 @@ MegaData.prototype.dlerror = function(dl, error) {
             errorstr = l[24];
             break;
         case EOVERQUOTA:
-            errorstr = l[1673];
+            errorstr = l[20666];
             break;
         // case EAGAIN:               errorstr = l[233]; break;
         // case ETEMPUNAVAIL:         errorstr = l[233]; break;
@@ -788,13 +788,14 @@ MegaData.prototype.dlerror = function(dl, error) {
              */
             if (page === 'download') {
                 if (error === EOVERQUOTA) {
-                    $('.download.eta-block span').text('');
+                    $('.download.eta-block .span').text('');
                     $('.download.speed-block span').text('');
-                    $('.download .pause-transfer').addClass('active');
-                    $('.download.file-info').addClass('overquota');
+                    $('.download .pause-transfer').removeClass('hidden').addClass('active')
+                        .find('span').text(l[1649]);
+                    $('.download.top-bar').addClass('overquota');
                 }
                 else {
-                    $('.download.file-info').removeClass('overquota');
+                    $('.download.top-bar').removeClass('overquota');
                 }
             }
             else {
@@ -1944,14 +1945,16 @@ function fm_tfspause(gid, overquota) {
 
         if (page === 'download') {
             if (overquota === true) {
-                setTransferStatus(gid, l[1673]);
-                $('.download.file-info').addClass('overquota');
+                setTransferStatus(gid, l[20666]);
+                $('.download.top-bar').addClass('overquota');
             }
-            $('.download .pause-transfer span').text(l[9118]);
-            $('.download.scroll-block').addClass('paused-transfer');
-            $('.download.eta-block span').text('');
+            $('.download .pause-transfer').removeClass('hidden').addClass('active')
+                .find('span').text(l[1649]);
+            $('.download.top-bar').addClass('paused-transfer');
+            $('.download.eta-block .dark-numbers').text('');
+            $('.download.eta-block .light-txt').text(l[1651]);
             $('.download.speed-block .dark-numbers').text('');
-            $('.download.speed-block .light-txt').text(l[1651]).addClass('small');
+            $('.download.speed-block .light-txt').safeHTML('&mdash; KB/s');
         }
         else {
             var $tr = $('.transfer-table tr#' + gid);
@@ -1997,12 +2000,12 @@ function fm_tfsresume(gid) {
             var $tr = $('.transfer-table tr#' + gid);
 
             if (page === 'download'
-                && $('.download.file-info').hasClass('overquota')
+                && $('.download.top-bar').hasClass('overquota')
                 || $tr.find('.transfer-status').hasClass('overquota')) {
 
                 if (page === 'download') {
-                    $('.download .pause-transfer').addClass('active');
-                    $('.download.scroll-block').addClass('paused-transfer');
+                    $('.download .pause-transfer').removeClass('hidden').addClass('active');
+                    $('.download.top-bar').addClass('paused-transfer');
                 }
 
                 if (dlmanager.isOverFreeQuota) {
@@ -2014,9 +2017,9 @@ function fm_tfsresume(gid) {
             dlQueue.resume(gid);
 
             if (page === 'download') {
-                $('.download .pause-transfer span').text(l[9112]);
-                $('.download.scroll-block').removeClass('paused-transfer');
-                $('.download.speed-block .light-txt').text('').removeClass('small');
+                $('.download .pause-transfer').removeClass('active').find('span').text(l[9112]);
+                $('.download.top-bar').removeClass('paused-transfer');
+                $('.download.speed-block .light-txt').safeHTML('&mdash; KB/s');
             }
             else {
                 $tr.removeClass('transfer-paused');

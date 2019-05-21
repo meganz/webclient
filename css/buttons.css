@@ -226,6 +226,16 @@
     -moz-box-shadow: 0px 0px 0px 1px rgba(102,102,102,1);
     box-shadow: 0px 0px 0px 1px rgba(102,102,102,1);
 }
+.default-white-button.dark-border::after {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(151,151,151,1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(151,151,151,1);
+    box-shadow: 0px 0px 0px 1px rgba(151,151,151,1);
+}
+.default-white-button.dark-border::before {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
 .default-white-button.light.grey {
     background-color: #F5F5F5;
     color: #666666;
@@ -285,6 +295,9 @@ body:not(.rtl) .default-white-button::first-letter {
 .default-green-button {
     background-color: #00BFA5;
     color: white;
+    -webkit-box-shadow: 0 0.5px 1px 0px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
+    box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
 }
 .default-green-button.contrast {
     background-color: #00BFA5;
@@ -295,7 +308,7 @@ body:not(.rtl) .default-white-button::first-letter {
     background: -webkit-linear-gradient(top, #00bfa5 0%,#00a690 100%);
     background: linear-gradient(to bottom, #00bfa5 0%,#00a690 100%);
 }
-.default-green-button:hover {
+.default-green-button:hover, .default-green-button.focused {
     background-color:#00AC94;
 }
 .default-white-button.lato, .default-green-button.lato {
@@ -329,7 +342,7 @@ body:not(.rtl) .default-white-button::first-letter {
     background: -webkit-linear-gradient(top, rgba(255,174,0,1) 0%, #FFA500 100%);
     background: linear-gradient(to bottom, rgba(255,174,0,1) 0%, #FFA500 100%);
 }
-.button.inline, .default-white-button.inline, .default-grey-button.inline {
+.button.inline, .default-white-button.inline, .default-grey-button.inline, .default-green-button.inline, .default-orange-button.inline {
     display: inline-block;
     margin: 0 5px;
 }
@@ -337,10 +350,10 @@ body:not(.rtl) .default-white-button::first-letter {
     display: inline-block;
     margin: 0 3px;
 }
-.default-white-button.hidden, .default-grey-button.hidden, .default-red-button.hidden, .default-orange-button.hidden {
+.default-white-button.hidden, .default-grey-button.hidden, .default-red-button.hidden, .default-orange-button.hidden, .default-green-button.hidden {
     display: none;
 }
-.button.disabled, .default-white-button.disabled, .default-grey-button.disabled, .default-red-button.disabled, .default-orange-button.disabled {
+.button.disabled, .default-white-button.disabled, .default-grey-button.disabled, .default-red-button.disabled, .default-orange-button.disabled, .default-green-button.disabled {
     cursor: default;
     -moz-opacity: 0.3;
     -khtml-opacity: 0.3;
@@ -350,7 +363,7 @@ body:not(.rtl) .default-white-button::first-letter {
     line-height: 35px;
     height: 36px;
 }
-.default-white-button.big, .default-red-button.big {
+.default-white-button.big, .default-red-button.big, .default-green-button.big {
     line-height: 43px;
     height: 43px;
     font-size: 16px;
@@ -365,7 +378,7 @@ body:not(.rtl) .default-white-button::first-letter {
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
-.default-white-button.small, .default-grey-button.small {
+.default-white-button.small, .default-grey-button.small, .default-green-button.small {
     font-size: 14px;
     line-height: 24px;
     height: 24px;
@@ -404,9 +417,9 @@ body:not(.rtl) .default-white-button::first-letter {
     border-radius: inherit;
 }
 .default-green-button::before {
-    -webkit-box-shadow: 0 0 0 1px #00B098;
-    -moz-box-shadow: 0 0 0 1px #00B098;
-    box-shadow: 0 0 0 1px #00B098;
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
 }
 .default-green-button.gradient::before {
     -webkit-box-shadow: 0 0 0 1px #009985;
@@ -700,6 +713,9 @@ body:not(.rtl) .default-white-button::first-letter {
     top: 0;
     padding: 0 24px;
 }
+.register-side-pane .default-big-button span {
+    font-size: 16px;
+}
 .default-big-button span::before {
     content: '';
     display: block;
@@ -743,17 +759,26 @@ body:not(.rtl) .default-white-button::first-letter {
 .default-big-button.green {
     color: white;
     background: #00BFA5;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
 }
 .default-big-button.green span {
-    background: #00BFA5;
-    -webkit-box-shadow: 0 0 0 1px #00B098;
-    -moz-box-shadow: 0 0 0 1px #00B098;
-    box-shadow: 0 0 0 1px #00B098;
+    background: transparent;
+    -webkit-box-shadow: 0 0.5px 1px 0px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
+    box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
+    
 }
 .default-big-button.green span::before {
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,145,125,0.5);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(0,145,125,0.5);
-    box-shadow: 0px 0px 0px 1px rgba(0,145,125,0.5);
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+}
+.default-big-button.green:hover, .default-big-button.green.focused {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
+    box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
 }
 .default-big-button.grey-gradient:hover {
     webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
@@ -976,6 +1001,11 @@ body:not(.rtl) .default-white-button::first-letter {
     webkit-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
     -moz-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
     box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
     content: '';
     display: block;
     position: absolute;
@@ -987,12 +1017,18 @@ body:not(.rtl) .default-white-button::first-letter {
     -webkit-border-radius: 4px;
     border-radius: 4px;
 }
-.big-red-button:hover, .big-red-button.focused, .default-white-button.small.red-bg:hover {
+.big-red-button:hover, .big-red-button.focused, .default-white-button.small.red-bg:not(.no-hover):hover {
     background: #E12124;
     -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
     -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
     box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
 }
+.default-white-button.small.red-bg:not(.no-hover):hover::before {
+    webkit-box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);
+    box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);
+}
+
 .big-red-button::after, .default-white-button.small.red-bg::after {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
     -moz-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
@@ -1052,7 +1088,7 @@ body:not(.rtl) .default-white-button::first-letter {
     color: #ffffff;
 }
 .default-grey-button-user-management {
-    background-color: rgba(0,191,165,1);background: rgb(170,170,170);
+    background: rgb(170,170,170);
     background: -moz-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
     background: -webkit-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
     background: linear-gradient(to bottom, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);

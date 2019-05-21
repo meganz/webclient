@@ -19,14 +19,29 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
     }
 
     if (page === 'download') {
-        $('.download.main-transfer-info').addClass('hidden');
-        $('.download.main-transfer-error')
+        var $dlTopBar = $('.download.top-bar');
+        var $dlMainTNfo = $('.download.main-transfer-info');
+        var $dlTopBarErrorBlock = $('.download.main-transfer-error', $dlTopBar);
+
+        if (status === l[20666]) {
+            $('.download.error-text', $dlTopBar).addClass('hidden');
+            $dlTopBarErrorBlock = $('.download.overquoata-error', $dlTopBar);
+        }
+
+        $dlTopBar.addClass('error');
+        $('.download.speed-block', $dlTopBar).addClass('hidden');
+        $('.download.eta-block', $dlTopBar).addClass('hidden');
+        $('.bar-table .progress-block', $dlTopBar).addClass('hidden');
+
+        $dlTopBarErrorBlock
             .removeClass('hidden')
             .attr('title', status)
             .find('span')
             .text(text);
 
         if (fatalError) {
+            $('.mid-pause', $dlTopBar).addClass('hidden');
+            $('.default-white-button', $dlMainTNfo).addClass('hidden');
             dlmanager.setBrowserWarningClasses('.download.warning-block', 0, status);
         }
     }

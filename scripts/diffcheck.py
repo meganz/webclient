@@ -386,19 +386,20 @@ def copypaste_detector(file_line_mapping):
     cwd = os.getcwd()
 
     try:
-        output = subprocess.check_output('{} {}'.format(config.JSCPD_BIN, config.JSCPD_RULES).split())
+        output = subprocess.check_output('{} {} ./html/js ./js'.format(config.JSCPD_BIN, config.JSCPD_RULES).split())
     except OSError as ex:
         logging.error('Error calling JSCPD: {}'.format(ex))
         return False
     output = strip_ansi_codes(output.decode('utf8')).rstrip().split('\n')
-    output = [re.sub(r'\t-? [\\/]', '', f.replace(cwd, '')).strip() for f in output if re.search(r'^\t', f)]
+    output = [re.sub(r'^[ -]+ [\\/]?', '', f.replace(cwd, '')).strip() for f in output if re.search(r'^ ', f)]
 
     # Build a list of duplicated blocks per file
     idx = 0
     dupes = collections.defaultdict(set)
     for file in output:
-        x,filename,ln1,ln2,z = re.split(r'^(.*): (\d+)-(\d+)$', file)
+        x,filename,ln1,ln2,z = re.split(r'^(.*) \[(\d+):\d+ - (\d+):\d+\]$', file)
         dupes[filename].update(range(int(ln1), int(ln2) + 1))
+    print dupes
 
     # Check whether changed lines includes copy/paste code
     for filename, line_set in file_line_mapping.items():

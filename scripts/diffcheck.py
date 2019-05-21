@@ -399,7 +399,6 @@ def copypaste_detector(file_line_mapping):
     for file in output:
         x,filename,ln1,ln2,z = re.split(r'^(.*) \[(\d+):\d+ - (\d+):\d+\]$', file)
         dupes[filename].update(range(int(ln1), int(ln2) + 1))
-    print dupes
 
     # Check whether changed lines includes copy/paste code
     for filename, line_set in file_line_mapping.items():

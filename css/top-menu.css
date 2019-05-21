@@ -365,6 +365,9 @@
 .top-head .default-white-button.small.red-bg i {
     margin: 3px 3px 1px -3px;
 }
+.placeholder .top-head .default-white-button.semi-small {
+    display: none;
+}
 .top-head .default-white-button.semi-small {
     margin: 4px 0 0 14px;
 }

@@ -148,11 +148,11 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
         console.group('BUILDTREE for "' + n.h + '"');
     }
 
-    if (n.h.indexOf('os_') === 0) {
+    if (n.h && n.h.indexOf('os_') === 0) {
         treeType = 'os';
         n.h = n.h.substr(3);
     }
-    else if (n.h.indexOf('pl_') === 0) {
+    else if (n.h && n.h.indexOf('pl_') === 0) {
         treeType = 'pl';
         n.h = n.h.substr(3);
     }

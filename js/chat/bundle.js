@@ -15287,7 +15287,6 @@ React.makeElement = React['createElement'];
 	    render: function render() {
 	        var self = this;
 	        var node = this.props.node;
-	        var cs = M.contactstatus(node.h);
 
 	        return React.makeElement(
 	            "div",
@@ -15311,7 +15310,7 @@ React.makeElement = React['createElement'];
 	                React.makeElement(
 	                    "span",
 	                    { className: "txt small" },
-	                    fm_contains(cs.files, cs.folders)
+	                    fm_contains(node.tf, node.td)
 	                )
 	            )
 	        );

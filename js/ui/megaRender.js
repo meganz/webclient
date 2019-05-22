@@ -913,14 +913,7 @@
                     }
                 }
                 else {
-                    var cs = M.contactstatus(aHandle);
-
-                    if (cs.files === 0 && cs.folders === 0) {
-                        props.shareInfo = l[782];// Empty Folder
-                    }
-                    else {
-                        props.shareInfo = fm_contains(cs.files, cs.folders);
-                    }
+                    props.shareInfo = fm_contains(aNode.tf, aNode.td);
 
                     if (this.chatIsReady) {
                         var contact = M.u[props.userHandle];
@@ -985,12 +978,7 @@
                     }
                 }
                 else {
-                    if (aNode.td === 0 && aNode.tf === 0) {
-                        props.shareInfo = l[782];// Empty Folder
-                    }
-                    else {
-                        props.shareInfo = fm_contains(aNode.tf, aNode.td);
-                    }
+                    props.shareInfo = fm_contains(aNode.tf, aNode.td);
                 }
 
                 // Colour label

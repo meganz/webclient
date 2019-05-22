@@ -4336,7 +4336,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
         // check if this is a business expired account
         if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
-            showExpiredBusiness();
+            M.showExpiredBusiness();
             return;
         }
         if (u_type === 0) {

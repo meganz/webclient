@@ -78,11 +78,16 @@ MegaData.prototype.filterByParent = function(id) {
                 return M.d[h];
             })
             .filter(function(n) {
-                // filter label applies here.
+                // Filter versioned file or undefined node.
+                if (!n || n.fv) {
+                    return false;
+                }
+
+                // Filter label applies here.
                 if (M.currentLabelFilter && !M.filterByLabel(n)){
                     return false;
                 }
-                return n !== undefined;
+                return true;
             });
     }
     else {

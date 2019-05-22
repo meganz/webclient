@@ -597,10 +597,14 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         msg,
         submsg,
         function() {
-            callback(true);
+            if (typeof callback === 'function') {
+                callback(true);
+            }
         },
         function() {
-            callback(false);
+            if (typeof callback === 'function') {
+                callback(false);
+            }
         }
     );
 }

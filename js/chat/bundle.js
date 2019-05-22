@@ -4743,8 +4743,7 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (this.state.focused != nextState.focused && nextState.focused === true) {
-	            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
-	            document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
+	            $('.conversationsApp').rebind('mousedown.button' + self.getUniqueId(), this.onBlur);
 
 	            $(document).rebind('keyup.button' + self.getUniqueId(), function (e) {
 	                if (self.state.focused === true) {
@@ -4757,7 +4756,7 @@ React.makeElement = React['createElement'];
 	            if (self._pageChangeListener) {
 	                mBroadcaster.removeListener(self._pageChangeListener);
 	            }
-	            mBroadcaster.addListener('pagechange', function () {
+	            this._pageChangeListener = mBroadcaster.addListener('pagechange', function () {
 	                if (self.state.focused === true) {
 	                    self.onBlur();
 	                }
@@ -4770,6 +4769,7 @@ React.makeElement = React['createElement'];
 	            if (this.props.group) {
 	                if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] != this) {
 	                    _buttonGroups[this.props.group].setState({ focused: false });
+	                    _buttonGroups[this.props.group].unbindEvents();
 	                }
 	                _buttonGroups[this.props.group] = this;
 	            }
@@ -4779,6 +4779,9 @@ React.makeElement = React['createElement'];
 	            _buttonGroups[this.props.group] = null;
 	        }
 	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        this.unbindEvents();
+	    },
 	    renderChildren: function renderChildren() {
 	        var self = this;
 
@@ -4787,6 +4790,7 @@ React.makeElement = React['createElement'];
 	                active: self.state.focused,
 	                closeDropdown: function closeDropdown() {
 	                    self.setState({ 'focused': false });
+	                    self.unbindEvents();
 	                },
 	                onActiveChange: function onActiveChange(newVal) {
 	                    var $element = $(self.findDOMNode());
@@ -4821,14 +4825,18 @@ React.makeElement = React['createElement'];
 
 	        if (!e || !$(e.target).closest(".button").is($element)) {
 	            this.setState({ focused: false });
-	            $(document).off('keyup.button' + this.getUniqueId());
-	            $(document).off('closeDropdowns.' + this.getUniqueId());
-	            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
-
-	            if (this._pageChangeListener) {
-	                mBroadcaster.removeListener(this._pageChangeListener);
-	            }
+	            this.unbindEvents();
 	            this.forceUpdate();
+	        }
+	    },
+	    unbindEvents: function unbindEvents() {
+	        var self = this;
+	        $(document).off('keyup.button' + self.getUniqueId());
+	        $(document).off('closeDropdowns.' + self.getUniqueId());
+	        $('.conversationsApp').unbind('mousedown.button' + self.getUniqueId());
+
+	        if (self._pageChangeListener) {
+	            mBroadcaster.removeListener(self._pageChangeListener);
 	        }
 	    },
 	    onClick: function onClick(e) {
@@ -4858,7 +4866,7 @@ React.makeElement = React['createElement'];
 	            }
 	        } else if (this.state.focused === true) {
 	            this.setState({ focused: false });
-	            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
+	            this.unbindEvents();
 	        }
 	    },
 	    render: function render() {
@@ -5011,11 +5019,20 @@ React.makeElement = React['createElement'];
 	    },
 	    componentDidMount: function componentDidMount() {
 	        this.onResized();
+	        var self = this;
+	        $(document.body).rebind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId(), function (e, target) {
+	            if (self.props.active && target !== self) {
+	                if (self.props && self.props.closeDropdown) {
+	                    self.props.closeDropdown();
+	                }
+	            }
+	        });
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        this.onResized();
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
+	        $(document.body).unbind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId());
 	        if (this.props.active) {
 
 	            this.onActiveChange(false);
@@ -5095,7 +5112,9 @@ React.makeElement = React['createElement'];
 	                    } },
 	                React.makeElement(
 	                    "div",
-	                    null,
+	                    { onClick: function onClick(e) {
+	                            $(document.body).trigger('closeAllDropdownsExcept', self);
+	                        } },
 	                    !this.props.noArrow ? React.makeElement("i", { className: "dropdown-white-arrow" }) : null,
 	                    child
 	                )

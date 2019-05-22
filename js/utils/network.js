@@ -162,6 +162,11 @@ function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
                 megaChat.eventuallyAddDldTicketToReq(req);
             }
 
+            if (d && String(apipath).indexOf('staging') > 0) {
+                var s = sessionStorage;
+                req.f = [s.dltfefq | 0, s.dltflimit | 0];
+            }
+
             if (!key) {
                 req.n = handle;
                 key = M.getNodeByHandle(handle).k;

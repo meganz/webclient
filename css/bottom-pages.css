@@ -105,7 +105,7 @@
 .new-bottom-pages p.sub-list span.number, .new-bottom-pages h2.sub-list span.number {
     margin: 2px 0 0 70px;
 }
-.new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a, .new-bottom-pages div a, .new-bottom-page li a, .new-bottom-pages li a, .download.error-text a, .bottom-pages-dialog a {
+.new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a, .new-bottom-pages .investors-pdf-block a, .new-bottom-page li a, .new-bottom-pages li a, .download.error-text a, .bottom-pages-dialog a {
     color: #F0373B;
 }
 .new-bottom-pages h2 span.number, .new-bottom-pages h2.list span.number, .new-bottom-pages h2.sub-list span.number {
@@ -3007,9 +3007,6 @@ body:not(.en) .content-block .pages-nav.compound-items.active {
 .browsers.icon.ff {
     background-position: -68px -86px;
 }
-.browsers.icon.palemoon {
-    background-position: -216px -87px;
-}
 .browsers.icon.chrome {
     background-position: -141px -87px;
 }
@@ -5364,9 +5361,6 @@ body:not(.en) .pages-nav.content-block .nav-button {
 @media only screen and (max-height: 665px), only screen and (max-width: 805px) and (min-height: 665px) {
 .medium-txt.small-lineheight.info {
     display: none;
-}
-.browsers.download-info.palemoon {
-    margin-bottom: 50px;
 }
 }
 

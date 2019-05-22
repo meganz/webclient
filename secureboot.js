@@ -560,12 +560,15 @@ tmp = getCleanSitePath(location.hash || undefined);
 if (tmp.substr(0, 12) === 'sitetransfer') {
     try {
         sessionStorage.sitet = tmp;
-        document.location = 'https://mega.nz/start';
+        location.hash = 'home';
     }
     catch (ex) {
         console.warn(ex);
     }
     hashLogic = true; // temporarily prevent the history.* calls in case they are reached...
+}
+else if (tmp.substr(0, 4) === 'test') {
+    hashLogic = true;
 }
 
 if (!browserUpdate && is_extension)
@@ -624,7 +627,6 @@ if (!browserUpdate && is_extension)
 
 
 var page;
-var locSearch = location.search;
 if (hashLogic) {
     // legacy support:
     page = getCleanSitePath(document.location.hash);
@@ -1947,6 +1949,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
     jsl.push({f:'js/utils/splitter.js', n: 'js_utils_splitter_js', j: 1});
     jsl.push({f:'js/utils/stringcrypt.js', n: 'js_utils_stringcrypt_js', j: 1});
+    jsl.push({f:'js/utils/test.js', n: 'js_utils_test_js', j: 1});
     jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
     jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
     jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});

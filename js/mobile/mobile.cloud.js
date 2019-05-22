@@ -14,7 +14,6 @@ mobile.cloud = {
      */
     renderLayout: function() {
 
-
         'use strict';
 
         // If a public folder link and the initial folder overlay has not been shown yet
@@ -256,7 +255,7 @@ mobile.cloud = {
         $folderSize.addClass('hidden');
 
         // Get the current folder
-        var currentFolder = M.d[M.currentdirid];
+        var currentFolder = M.d[M.currentdirid] || {};
 
         // If the user is currently in a public folder link
         if (pfid) {

@@ -972,6 +972,11 @@ function init_page() {
         loadSubPage('fm/account/achievements');
         return false;
     }
+    else if (page === 'fm/account/achievements') {
+        $.openAchievemetsDialog = true;
+        loadSubPage('fm/account/plan');
+        return false;
+    }
     else if (is_mobile && page.substr(0, 9) === 'twofactor') {
 
         parsepage(pages['mobile']);
@@ -1544,6 +1549,9 @@ function init_page() {
         localStorage.minLogLevel = 0;
         loadSubPage(page.substr(6) || 'fm');
         return location.reload(true);
+    }
+    else if (page.substr(0, 4) === 'test') {
+        test(page.substr(4));
     }
 
     /**

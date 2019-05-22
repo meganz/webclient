@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "make test",
-    "jscpd": "jscpd --verbose -g javascript,jsx -e **/vendor/** -p ./js --skip-comments -o jscpd-report.xml",
+    "jscpd": "jscpd -g -f javascript,jsx -i \"**/vendor/**\" -r \"time,consoleFull\" ./js",
     "plato": "plato -n -d coverage/plato-report -l .jshintrc -x \"(vendor|bundle|firefox|fileapi|e10s|strg)\" -r js html \"*.js\"",
     "api-doc": "make api-doc"
   },
@@ -58,7 +58,7 @@
     "eslint-loader": "^1.1.1",
     "htmlhint": "^0.10.1",
     "istanbul": "^0.4.2",
-    "jscpd": "^0.6.25",
+    "jscpd": "^2.0.15",
     "jscs": "^3.0.7",
     "jscs-jsdoc": "^2.0.0",
     "jsdoc": "~3.3.0",

@@ -261,7 +261,7 @@ MegaData.prototype.isCustomView = function(pathOrID) {
 
     "use strict";
 
-    if (!pathOrID) {
+    if (!pathOrID || typeof pathOrID !== 'string') {
         return false;
     }
 

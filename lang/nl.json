@@ -3425,14 +3425,14 @@
     "20668": "Geen Uitgaande Gedeeld",
     "20669": "Geen Publieke Links",
     "20670": "Deel Gecre\u00eberd",
-    "20671": "You don't have any overdue payments.",
-    "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact business@mega.nz.",
+    "20671": "You don\u2019t have any overdue payments.",
+    "20672": "An error occurred while trying to fetch your overdue payments details. Please try again later, and if the problem persists please contact us at business@mega.nz.",
     "20673": "een lange tijd geleden",
     "20694": "Link Gecre\u00eberd",
     "20695": "Open map met gedownload bestand",
-    "20696": "Know more about desktop app",
-    "20697": "Download MEGA desktop app",
-    "20698": "Transfer with MEGA desktop app.",
+    "20696": "Leer meer over de MEGA Desktop Applicatie",
+    "20697": "Download MEGA Desktop App",
+    "20698": "Transfer with MEGA Desktop App.",
     "20699": "MEGA Desktop Applicatie",
     "20707": "[B]50 GB*[\/B] Free storage",
     "20708": "Create an account and get [S]50 GB*[\/S] free storage on MEGA cloud collaboration platform while you are waiting. It won\u2019t affect your download process.",
@@ -3476,5 +3476,7 @@
     "20754": "Import to temporary account",
     "20755": "Create Free Account",
     "20756": "Create an account and get [S]50 GB*[\/S] free storage on MEGA, which you can use to import and upload your files.",
-    "20757": "Create your and get [S]50 GB*[\/S] free storage on MEGA."
+    "20757": "Create your and get [S]50 GB*[\/S] free storage on MEGA.",
+    "20758": "You don\u2019t have MEGA Desktop App yet, want to install it?",
+    "20759": "Renews on [B]%1[\/B]"
 }

@@ -2226,19 +2226,13 @@ function dbfetchfm() {
 
                         mega.loadReport.pn4 = Date.now() - mega.loadReport.stepTimeStamp;
 
-                        var fetchPS = function _fetchPS(ps, ignoreDB) {
-                            for (var i in ps) {
-                                if (!M.d[ps[i].h]) {
-                                    promises.push(dbfetch.get[ps[i].h]);
-                                }
-                            }
-                            processPS(ps, ignoreDB);
-                        };
-
                         var tables = {
                             opc: processOPC,
                             ipc: processIPC,
-                            ps: fetchPS,
+                            ps: function _(r) {
+                                processPS(r, true);
+                                _.promise.linkDoneAndFailTo(dbfetch.geta(r.map(function(n) { return n.h; })));
+                            },
                             suba: process_suba,
                             puf: mega.megadrop.pufProcessDb,
                             pup: mega.megadrop.pupProcessDb,
@@ -2249,6 +2243,7 @@ function dbfetchfm() {
                             },
                             mcf: 1
                         };
+                        tables.ps.promise = new MegaPromise();
 
                         // Prevent MEGAdrop tables being created for mobile
                         if (is_mobile) {
@@ -2273,6 +2268,10 @@ function dbfetchfm() {
                                 }
                             });
                             promises.push(promise);
+
+                            if (tables[t].promise) {
+                                promises.push(tables[t].promise);
+                            }
                         });
                         mega.loadReport.pn5 = Date.now() - mega.loadReport.stepTimeStamp;
 

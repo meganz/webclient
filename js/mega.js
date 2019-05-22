@@ -2229,7 +2229,10 @@ function dbfetchfm() {
                         var tables = {
                             opc: processOPC,
                             ipc: processIPC,
-                            ps: processPS,
+                            ps: function _(r) {
+                                processPS(r, true);
+                                _.promise.linkDoneAndFailTo(dbfetch.geta(r.map(function(n) { return n.h; })));
+                            },
                             suba: process_suba,
                             puf: mega.megadrop.pufProcessDb,
                             pup: mega.megadrop.pupProcessDb,
@@ -2240,6 +2243,7 @@ function dbfetchfm() {
                             },
                             mcf: 1
                         };
+                        tables.ps.promise = new MegaPromise();
 
                         // Prevent MEGAdrop tables being created for mobile
                         if (is_mobile) {
@@ -2264,6 +2268,10 @@ function dbfetchfm() {
                                 }
                             });
                             promises.push(promise);
+
+                            if (tables[t].promise) {
+                                promises.push(tables[t].promise);
+                            }
                         });
                         mega.loadReport.pn5 = Date.now() - mega.loadReport.stepTimeStamp;
 

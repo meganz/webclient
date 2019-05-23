@@ -884,7 +884,7 @@ var slideshowid;
 
                 M.require('videostream').done(function() {
                     if (preqs[n.h]) {
-                        previewimg(n.h, Array(26).join('x'), filemime(n));
+                        previewimg(n.h, Array(26).join('x'), filemime(n, 'video/mp4'));
                     }
                 }).fail(function() {
                     console.error('Failed to load videostream.js');

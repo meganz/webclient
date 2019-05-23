@@ -1678,7 +1678,7 @@
     "16637": "Inizia a sentirti sicuro. Unisciti a noi oggi!",
     "16638": "Milioni di persone si fidano di MEGA per archiviare miliardi di file utilizzando il nostro stato di infrastruttura dell'arte. Unisciti a loro e proteggi i tuoi dati utilizzando uno dei fornitori di servizi cloud pi\u00f9 sicuri di Internet.",
     "16639": "Numero di utenti registrati",
-    "16640": "Numero di file archiviati",
+    "16640": "Numero di file caricati",
     "16644": "Policy di servizio",
     "16645": "Stampa & media",
     "16646": "Servizi cloud criptati",
@@ -1983,7 +1983,7 @@
     "18308": "S\u00ec, voglio ancora parcheggiare il mio account.",
     "18309": "Se procederai, l'account esistente sotto questo indirizzo verr\u00e0 disattivato, e perderai qualsiasi accesso ai tuoi dati.",
     "18311": "S\u00ec, capisco che dopo 60 giorni dal momento in cui ho parcheggiato il mio account,[B1] tutti i miei file vrranno eliminati permanentemente.[\/B1]",
-    "18312": "S\u00ec, capisco che parcheggiare il mio account [B]rimuover\u00e0 tutti i miei file, contatti e messaggi dal mio account[\/B].",
+    "18312": "S\u00ec, capisco che parcheggiare il mio account [B]rimuover\u00e0 tutti i miei file, contatti e messaggi (e utenti se questo \u00e8 un account Business) dal mio account[\/B].",
     "18314": "Clicca sul [B]Nome del tuo account[\/B] in alto a sinistra nel Menu.",
     "18315": "Clicca sui tre puntini orizzontali in basso a destra.",
     "18316": "Inserisci la tua nuova password, confermala e clicca [B]Fatto[\/B].",
@@ -3212,5 +3212,6 @@
     "20668": "Nessuna condivisione in uscita",
     "20669": "Nessun link pubblico",
     "20670": "Condivisione creata il",
-    "20694": "Link creato il"
+    "20694": "Link creato il",
+    "20715": "Vuoi avere questa opzione?"
 }

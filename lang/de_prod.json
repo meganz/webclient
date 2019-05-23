@@ -1983,7 +1983,7 @@
     "18308": "Ja, ich m\u00f6chte meine Account trotzdem parken.",
     "18309": "Achtung: Ihr bestehender Account unter dieser Adresse wird deaktiviert. Sie verlieren den Zugang zu allen gespeicherten Daten!",
     "18311": "Ja, ich bin mir der Tatsache bewusst, dass 60 Tage nach dem Parken meines Accounts [B1]s\u00e4mtliche Dateien unwiederbringlich gel\u00f6scht werden[\/B1].",
-    "18312": "Yes, I understand parking my account will [B]remove all my files, contacts, messages from my account[\/B].",
+    "18312": "Yes, I understand parking my account will [B]remove all my files, contacts, messages (and users if this is a Business account) from my account[\/B].",
     "18314": "Tippen Sie auf Ihren [B]Benutzernamen[\/B] in der oberen linken Men\u00fcecke.",
     "18315": "Tippen Sie auf die drei horizontalen Punkte in der unteren rechten Ecke.",
     "18316": "Geben Sie Ihr neues Passwort ein, best\u00e4tigen Sie es und tippen Sie auf [B]Fertig[\/B].",
@@ -3106,7 +3106,7 @@
     "20464": "WICHTIG",
     "20466": "Beobachter",
     "20474": "Ihre Eingaben gehen bei Schlie\u00dfen des Dialogs verloren.",
-    "20481": "Chatlink exportieren",
+    "20481": "Get chat link",
     "20484": "Schl\u00fcsselrotation ist etwas sicherer, jedoch k\u00f6nnen Sie keine Chatlinks exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzug\u00e4nglich.",
     "20487": "Chatlink l\u00f6schen",
     "20552": "Cloudspeicher und Kommunikation.[Br]Schutz Ihrer Privatsph\u00e4re durch Systemarchitektur.",
@@ -3212,5 +3212,6 @@
     "20668": "Keine Ordnerfreigaben an Dritte",
     "20669": "Keine exportierten Links",
     "20670": "Erstellt",
-    "20694": "Erstellt"
+    "20694": "Erstellt",
+    "20715": "Do you want this feature?"
 }

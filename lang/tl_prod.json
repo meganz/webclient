@@ -1983,7 +1983,7 @@
     "18308": "Yes, I still want to park my account.",
     "18309": "If you proceed, the existing account under this address will be deactivated, and you will lose access to your data.",
     "18311": "Yes, I understand that after 60 days from the time I parked my account,[B1] all my files will be deleted permanently.[\/B1]",
-    "18312": "Yes, I understand parking my account will [B]remove all my files, contacts, messages from my account[\/B].",
+    "18312": "Yes, I understand parking my account will [B]remove all my files, contacts, messages (and users if this is a Business account) from my account[\/B].",
     "18314": "Tap on your [B]Account name[\/B] at the top left of the Menu.",
     "18315": "Tap on the three horizontal dots at the bottom right.",
     "18316": "Type your new password, confirm it and tap [B]Done[\/B].",
@@ -3106,7 +3106,7 @@
     "20464": "IMPORTANT",
     "20466": "Observers",
     "20474": "You are about to close the dialog. All data entered will be lost.",
-    "20481": "Get Chat Link",
+    "20481": "Get chat link",
     "20484": "Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.",
     "20487": "Delete chat link",
     "20552": "Secure Cloud Storage and Communication. [Br] Privacy by Design.",
@@ -3212,5 +3212,6 @@
     "20668": "No Outgoing Shares",
     "20669": "No Public Links",
     "20670": "Share Created",
-    "20694": "Link Created"
+    "20694": "Link Created",
+    "20715": "Do you want this feature?"
 }

@@ -3106,7 +3106,7 @@
     "20464": "PENTING",
     "20466": "Pengamat",
     "20474": "Anda akan menutup dialog. Semua data yang dimasukkan akan hilang.",
-    "20481": "Dapatkan Tautan Obrolan",
+    "20481": "Get chat link",
     "20484": "Rotasi tombol sedikit lebih aman, tetapi tidak memungkinkan Anda membuat tautan obrolan dan peserta baru tidak akan melihat pesan sebelumnya.",
     "20487": "Hapus Tautan Obrolan",
     "20552": "Penyimpanan dan Komunikasi Cloud yang Aman. [Br] Privasi oleh Desain.",
@@ -3212,5 +3212,6 @@
     "20668": "No Outgoing Shares",
     "20669": "No Public Links",
     "20670": "Share Created",
-    "20694": "Link Created"
+    "20694": "Link Created",
+    "20715": "Do you want this feature?"
 }

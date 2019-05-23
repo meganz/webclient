@@ -1678,7 +1678,7 @@
     "16637": "Word veiliger. Doe vandaag nog met ons mee!",
     "16638": "Miljoenen mensen vertrouwen MEGA om miljarden bestanden op te slaan in onze bijzondere infrastructuur. Doe mee en bescherm uw gegevens door gebruik van \u00e9\u00e9n van Internet's meest veilige cloud en communicatie diensten.",
     "16639": "Aantal geregistreerde gebruikers",
-    "16640": "Aantal opgeslagen bestanden",
+    "16640": "Aantal bestanden ge\u00fcpload",
     "16644": "Dienst Beleid",
     "16645": "Pers & Media",
     "16646": "Gebruiker-gecodeerde cloud diensten",
@@ -1983,7 +1983,7 @@
     "18308": "Ja, ik wil nog steeds mijn account parkeren.",
     "18309": "Als u doorgaat, wordt de bestaande account onder dit adres gedeactiveerd, en verliest u toegang tot uw gegevens.",
     "18311": "Ja, ik begrijp dat na 60 dagen vanaf het moment dat ik mijn account geparkeerd heb,[B1] al mijn bestanden permanent verwijderd worden.[\/B1]",
-    "18312": "Ja, ik begrijp dat het parkeren van mijn account mijn [B]bestanden, contacten, berichten allemaal worden verwijderd van mijn account[\/B].",
+    "18312": "Ja, ik begrijp dat bij het parkeren van mijn account [B] mijn bestanden, contacten, berichten (en gebruikers als dit een Zakelijke account is) worden verwijderd van mijn account[\/B].",
     "18314": "Tik op uw [B]Account naam[\/B] bij de linker bovenkant van het Menu.",
     "18315": "Tik op de drie horizontale puntjes bij de rechter onderkant.",
     "18316": "Typ uw nieuwe wachtwoord, bevestig het en tik [B]Klaar[\/B].",
@@ -2487,7 +2487,7 @@
     "19525": "De gebruiker's gegevens zijn bijgewerkt.",
     "19527": "Een fout heeft opgetreden tijdens het opnieuw-versturen van de uitnodigingskoppeling, probeer later nogmaals.",
     "19528": "Een fout heeft opgetreden tijdens het updaten van uw account gegevens, probeer later nogmaals.",
-    "19529": "Of Probeer MEGA individueel",
+    "19529": "Of Probeer MEGA Individueel",
     "19530": "Zakelijk",
     "19531": "De Veilige oplossing voor uw bedrijf",
     "19532": "Met onze end-to-end-codering zijn uw gegevens nog nooit zo veilig geweest",
@@ -3106,7 +3106,7 @@
     "20464": "BELANGRIJK",
     "20466": "Waarnemers",
     "20474": "U staat op het punt het dialoog te sluiten. Alle ingevoerde gegevens gaan verloren.",
-    "20481": "Haal Gesprekslink op",
+    "20481": "Haal gesprekslink",
     "20484": "Sleutel rotatie is iets veiliger, maar u kunt geen koppeling naar het gesprek cre\u00ebren en nieuwe deelnemers kunnen geen berichten uit het verleden zien.",
     "20487": "Verwijder Gesprekskoppeling",
     "20552": "Veilige Cloudopslag en Communicatie. [Br]Privacy by Design",
@@ -3212,5 +3212,6 @@
     "20668": "Geen Uitgaande Gedeeld",
     "20669": "Geen Publieke Links",
     "20670": "Deel Gecre\u00eberd",
-    "20694": "Link Gecre\u00eberd"
+    "20694": "Link Gecre\u00eberd",
+    "20715": "Wilt u dit kenmerk?"
 }

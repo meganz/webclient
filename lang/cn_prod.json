@@ -758,7 +758,7 @@
     "6126": "PRO III",
     "6159": "MEGA SDK\u8f6f\u4ef6\u5f00\u53d1\u5305",
     "6168": "\u9690\u79c1\u653f\u7b56",
-    "6172": "\u7b7e\u7ea6",
+    "6172": "\u8ba2\u9605",
     "6181": "\u53d6\u6d88\u8d26\u6237",
     "6182": "\u5220\u9664\u60a8\u7684\u8d26\u6237",
     "6183": "\u662f\u7684\uff0c\u6211\u5e0c\u671b\u6ce8\u9500\u6211\u7684\u8d26\u6237",
@@ -877,7 +877,7 @@
     "6974": "\u5220\u9664\u5934\u50cf",
     "6975": "\u9009\u62e9\u4ed8\u6b3e\u65b9\u5f0f",
     "6976": "\u60a8\u5df2\u9009%1\u5957\u9910",
-    "6978": "\u7b7e\u7ea6\u4e00\u5e74\u4e13\u4e1a\u7248\u65b9\u6848[A]\u83b7\u5f97\u5305\u542b2\u4e2a\u6708\u514d\u8d39[\/A]",
+    "6978": "\u8ba2\u9605\u4e00\u5e74PRO\u5957\u9910\u5373\u53ef[A]\u83b7\u5f97\u4e24\u4e2a\u6708\u514d\u8d39[\/A]",
     "6991": "\u53d6\u6d88\u6240\u6709\u4f20\u8f93",
     "6992": "\u5df2\u6e05\u9664",
     "6993": "\u6682\u505c\u6240\u6709\u4f20\u8f93",
@@ -3106,7 +3106,7 @@
     "20464": "IMPORTANT",
     "20466": "Observers",
     "20474": "You are about to close the dialog. All data entered will be lost.",
-    "20481": "Get Chat Link",
+    "20481": "Get chat link",
     "20484": "Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.",
     "20487": "Delete chat link",
     "20552": "\u5b89\u5168\u7684\u4e91\u7aef\u5b58\u50a8\u7a7a\u95f4\u4e0e\u901a\u8baf\u529f\u80fd\u3002[Br]\u4e13\u4e3a\u60a8\u7684\u9690\u79c1\u800c\u8bbe\u8ba1\u3002",
@@ -3212,5 +3212,6 @@
     "20668": "No Outgoing Shares",
     "20669": "No Public Links",
     "20670": "Share Created",
-    "20694": "Link Created"
+    "20694": "Link Created",
+    "20715": "Do you want this feature?"
 }

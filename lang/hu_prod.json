@@ -1678,7 +1678,7 @@
     "16637": "Start being secure. Join us today!",
     "16638": "Millions of people trust MEGA to store billions of files using our state of the art infrastructure. Join them and protect your data using one of the Internet\u2019s most secure cloud and communication providers.",
     "16639": "Number of registered users",
-    "16640": "Number of stored files",
+    "16640": "Number of files uploaded",
     "16644": "Service Policy",
     "16645": "Press & Media",
     "16646": "User-encrypted cloud services",
@@ -1983,7 +1983,7 @@
     "18308": "Yes, I still want to park my account.",
     "18309": "If you proceed, the existing account under this address will be deactivated, and you will lose access to your data.",
     "18311": "Yes, I understand that after 60 days from the time I parked my account,[B1] all my files will be deleted permanently.[\/B1]",
-    "18312": "Yes, I understand parking my account will [B]remove all my files, contacts, messages from my account[\/B].",
+    "18312": "Yes, I understand parking my account will [B]remove all my files, contacts, messages (and users if this is a Business account) from my account[\/B].",
     "18314": "Tap on your [B]Account name[\/B] at the top left of the Menu.",
     "18315": "Tap on the three horizontal dots at the bottom right.",
     "18316": "Type your new password, confirm it and tap [B]Done[\/B].",
@@ -3106,9 +3106,9 @@
     "20464": "FONTOS",
     "20466": "Megfigyel\u0151k",
     "20474": "Amennyiben bez\u00e1rja az ablakot, minden be\u00edrt adat elv\u00e9sz.",
-    "20481": "Get Chat Link",
+    "20481": "Get chat link",
     "20484": "A kulcsv\u00e1ltogat\u00e1s n\u00e9mileg biztons\u00e1gosabb, \u00e1m vele nem hozhat l\u00e9tre cseveg\u0151hivatkoz\u00e1st \u00e9s az \u00faj r\u00e9sztvev\u0151k nem l\u00e1tj\u00e1k a kor\u00e1bbi \u00fczeneteket.",
-    "20487": "\u00dczen\u0151hivatkoz\u00e1s T\u00f6rl\u00e9se",
+    "20487": "Delete chat link",
     "20552": "Biztons\u00e1gos Felh\u0151 T\u00e1rhely \u00e9s Kommunik\u00e1ci\u00f3. [Br] Fel\u00e9p\u00edt\u00e9sb\u0151l Ered\u0151 Titkos\u00edt\u00e1s.",
     "20553": "K\u00e9sz\u00edtsen MEGA fi\u00f3kot \u00e9s szerezzen [S]50 GB INGYENES*[\/S] t\u00e1rhelyet",
     "20554": "Megb\u00edzhat\u00f3 T\u00e1rhely \u00e9s Gyors \u00c1tvitel",
@@ -3212,5 +3212,6 @@
     "20668": "Nincs kimen\u0151 megoszt\u00e1s",
     "20669": "Nincs nyilv\u00e1nos hivatkoz\u00e1s",
     "20670": "Megosztva",
-    "20694": "L\u00e9trehozva"
+    "20694": "L\u00e9trehozva",
+    "20715": "Do you want this feature?"
 }

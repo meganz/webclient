@@ -1678,7 +1678,7 @@
     "16637": "Pour une s\u00e9curit\u00e9 imm\u00e9diate, joignez-vous \u00e0 nous d\u00e8s aujourd\u2019hui\u2009!",
     "16638": "Des millions de personnes font confiance \u00e0 MEGA pour stocker des milliards de fichiers en utilisant notre infrastructure \u00e0 la fine pointe de la technologie. Joignez-vous \u00e0 eux et prot\u00e9gez vos donn\u00e9es en utilisant l'un des fournisseurs de service nuagique et de communication les plus s\u00fbrs d'Internet.",
     "16639": "Nombre d\u2019utilisateurs inscrits",
-    "16640": "Nombre de fichiers stock\u00e9s",
+    "16640": "Nombre de fichiers t\u00e9l\u00e9vers\u00e9s",
     "16644": "Politique de service",
     "16645": "Presse",
     "16646": "Des services nuagiques chiffr\u00e9s par l\u2019utilisateur",
@@ -1983,7 +1983,7 @@
     "18308": "Oui, je souhaite remiser mon compte.",
     "18309": "Si vous poursuivez, le compte existant sous cette adresse courriel sera d\u00e9sactiv\u00e9 et vous perdrez l\u2019acc\u00e8s \u00e0 vos donn\u00e9es.",
     "18311": "Oui, je comprends qu\u2019apr\u00e8s 60 jours \u00e0 partir du moment o\u00f9 j'aurai remis\u00e9 mon compte, [B1]tous mes fichiers seront irr\u00e9m\u00e9diablement supprim\u00e9s.[\/B1]",
-    "18312": "Oui, je comprends que le remisage de mon compte [B]supprimera tous mes fichiers, contacts et messages de mon compte.[\/B]",
+    "18312": "Oui, je comprends que le remisage de mon compte [B]supprimera tous mes fichiers, contacts et messages (et utilisateurs pour un compte d\u2019entreprise) de mon compte.[\/B]",
     "18314": "Toquez sur le [B]nom de votre compte[\/B] en haut \u00e0 gauche du menu.",
     "18315": "Toquez sur les trois points horizontaux en bas \u00e0 droite.",
     "18316": "Saisissez votre nouveau mot de passe, confirmez-le et toquez sur [B]Termin\u00e9[\/B].",
@@ -2487,7 +2487,7 @@
     "19525": "Les renseignements de l\u2019utilisateur ont \u00e9t\u00e9 mis \u00e0 jour.",
     "19527": "Une erreur est survenue lors du renvoi du lien d\u2019invitation, veuillez ressayer ult\u00e9rieurement",
     "19528": "Une erreur est survenue lors de la mise \u00e0 jour des renseignements de votre compte. Veuillez ressayer ult\u00e9rieurement.",
-    "19529": "Ou essayez les comptes personnels MEGA",
+    "19529": "Ou essayez un compte personnel MEGA",
     "19530": "Entreprise",
     "19531": "La solution s\u00e9curis\u00e9e pour votre entreprise",
     "19532": "Avec notre chiffrement de bout en bout, vos donn\u00e9es n\u2019ont jamais \u00e9t\u00e9 plus en s\u00e9curit\u00e9",
@@ -3212,5 +3212,6 @@
     "20668": "Il n\u2019y a aucun partage sortant",
     "20669": "Il n\u2019y a aucun lien public",
     "20670": "Partage cr\u00e9\u00e9",
-    "20694": "Lien cr\u00e9\u00e9"
+    "20694": "Lien cr\u00e9\u00e9",
+    "20715": "Souhaitez-vous cette fonction\u2009?"
 }

@@ -1046,7 +1046,7 @@ Chat.prototype.userPresenceToCssClass = function(presence) {
     else if (presence === UserPresence.PRESENCE.DND) {
         return 'busy';
     }
-    else if (!presence || presence === UserPresence.PRESENCE.OFFLINE) {
+    else if (presence === UserPresence.PRESENCE.OFFLINE) {
         return 'offline';
     }
     else {
@@ -1240,9 +1240,6 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
     }
 
     if (type === "group" || type == "public") {
-        ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
-        ChatdIntegration._ensureNamesAreLoaded(userHandles, chatHandle);
-
         userHandles.forEach(function(contactHash) {
             assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
 
@@ -1261,6 +1258,9 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                 M.syncContactEmail(contactHash);
             }
         });
+
+        ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
+        ChatdIntegration._ensureNamesAreLoaded(userHandles, chatHandle);
     }
 
     if (!roomId && setAsActive) {

@@ -4227,6 +4227,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .black .nw-contact-status, .black .properties-contact-status {
     background-color: black;
+    visibility: hidden;
 }
 .add-contact-item, .add-contact-pad {
     display: block;
@@ -4627,6 +4628,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 }
 .activity-status.black, .contact-status.black-status {
     background-color: black;
+    visibility: hidden;
 }
 .dropdown-item:hover .activity-status {
     -webkit-box-shadow: 0px 0px 0px 2px #FFFFFF;

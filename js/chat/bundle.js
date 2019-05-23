@@ -935,7 +935,7 @@ React.makeElement = React['createElement'];
 	        return 'away';
 	    } else if (presence === UserPresence.PRESENCE.DND) {
 	        return 'busy';
-	    } else if (!presence || presence === UserPresence.PRESENCE.OFFLINE) {
+	    } else if (presence === UserPresence.PRESENCE.OFFLINE) {
 	        return 'offline';
 	    } else {
 	        return 'black';
@@ -1070,9 +1070,6 @@ React.makeElement = React['createElement'];
 	    }
 
 	    if (type === "group" || type == "public") {
-	        ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
-	        ChatdIntegration._ensureNamesAreLoaded(userHandles, chatHandle);
-
 	        userHandles.forEach(function (contactHash) {
 	            assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
 
@@ -1088,6 +1085,9 @@ React.makeElement = React['createElement'];
 	                M.syncContactEmail(contactHash);
 	            }
 	        });
+
+	        ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
+	        ChatdIntegration._ensureNamesAreLoaded(userHandles, chatHandle);
 	    }
 
 	    if (!roomId && setAsActive) {
@@ -5588,7 +5588,7 @@ React.makeElement = React['createElement'];
 	    render: function render() {
 	        var self = this;
 	        var contact = this.props.contact;
-	        if (!contact) {
+	        if (!contact || !contact.c) {
 	            return null;
 	        }
 

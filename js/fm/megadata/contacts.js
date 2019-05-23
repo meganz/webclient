@@ -46,8 +46,11 @@ MegaData.prototype.onlineStatusClass = function(os) {
         // UserPresence.PRESENCE.ONLINE
         return [l[5923], 'online'];
     }
-    else {
+    else if (os === 1 || os === 'offline') {
         return [l[5926], 'offline'];
+    }
+    else {
+        return ['', 'black'];
     }
 };
 

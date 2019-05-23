@@ -82,7 +82,7 @@ PresencedIntegration.presenceToCssClass = function(presence) {
     else if (presence === UserPresence.PRESENCE.DND) {
         return 'busy';
     }
-    else if (!presence || presence === UserPresence.PRESENCE.OFFLINE) {
+    else if (presence === UserPresence.PRESENCE.OFFLINE) {
         return 'offline';
     }
     else {
@@ -104,7 +104,7 @@ PresencedIntegration.cssClassToPresence = function(strPresence) {
         return UserPresence.PRESENCE.OFFLINE;
     }
     else {
-        return UserPresence.PRESENCE.OFFLINE;
+        return UserPresence.PRESENCE.UNAVAILABLE;
     }
 };
 
@@ -193,7 +193,7 @@ PresencedIntegration.prototype.init = function() {
             return;
         }
 
-        if (v.c !== 0) {
+        if (v.c === 1) {
             self.eventuallyAddPeer(k);
         }
 
@@ -347,7 +347,7 @@ PresencedIntegration.prototype.removeContact = function(u_h) {
         // fully loaded and initialised
         this.userPresence.addremovepeers([u_h], true);
     }
-    this._peerstatuscb(u_h, UserPresence.PRESENCE.OFFLINE, false);
+    this._peerstatuscb(u_h, UserPresence.PRESENCE.UNAVAILABLE, false);
 };
 
 /**
@@ -448,25 +448,15 @@ PresencedIntegration.prototype.eventuallyAddPeer = function(user_handle, isNewCh
         return;
     }
 
-    // .c === 0 means "removed contact"
-    if (!M.u[user_handle] || M.u[user_handle].c === 0) {
+    if (!M.u[user_handle] || M.u[user_handle].c !== 1) {
         return;
     }
 
-    var foundInGroupChat = isNewChat || false;
     var self = this;
     var megaChat = self.megaChat;
 
-    if (!foundInGroupChat && typeof M.u[user_handle].c === "undefined") {
-        megaChat.chats.forEach(function(testChatRoom) {
-            if (typeof(testChatRoom.members[user_handle]) !== 'undefined') {
-                foundInGroupChat = true;
-            }
-        });
-    }
-
     var binUserHandle = base64urldecode(user_handle);
-    if ((M.u[user_handle].c === 1 || foundInGroupChat) && !megaChat.userPresence.peers[binUserHandle]) {
+    if (M.u[user_handle].c === 1 && !megaChat.userPresence.peers[binUserHandle]) {
         megaChat.userPresence.addremovepeers([user_handle], false);
     }
 };

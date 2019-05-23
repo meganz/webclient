@@ -206,6 +206,7 @@ var UserPresence = function userpresence(
 };
 
 UserPresence.PRESENCE = {
+    UNAVAILABLE: 15, // black/hidden/unavailable
     OFFLINE: 1, // grey
     AWAY:    2, // yellow
     ONLINE:  3, // green

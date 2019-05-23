@@ -765,7 +765,7 @@ ChatdIntegration.prototype.openChat = function(chatInfo, isMcf, missingMcf) {
 
                             if (
                                 M.u[v.u] &&
-                                !M.u[v.u].c &&
+                                M.u[v.u].c === 1 &&
                                 typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
                             ) {
                                 chatRoom.megaChat.plugins.presencedIntegration.eventuallyAddPeer(

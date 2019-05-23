@@ -34,6 +34,11 @@
     background-color: #666666;
     border-color: #666666;
 }
+.black.user-card-presence {
+    background-color: black;
+    border-color: black;
+    visibility: hidden;
+}
 
 .user-card-presence.big {
     width: 16px;

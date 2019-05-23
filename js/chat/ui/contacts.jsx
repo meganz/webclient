@@ -310,7 +310,7 @@ var ContactPresence = React.createClass({
     render: function() {
         var self = this;
         var contact = this.props.contact;
-        if (!contact) {
+        if (!contact || !contact.c) {
             return null;
         }
 

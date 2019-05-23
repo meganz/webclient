@@ -399,6 +399,29 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
             showToast('recoveryKey', l[8922]);
         });
 
+        // Automatically select all string when key is clicked.
+        $('#backup_keyinput_2fa', $dialog).rebind('click.backupRecoveryKey', function() {
+            this.select();
+        });
+
+        // Update localStorage.recoveryKey when user copied his/her key.
+        $('#backup_keyinput_2fa', $dialog).rebind('copy.backupRecoveryKey', function() {
+
+            var selection = document.getSelection();
+
+            // If user is fully selected key and copy it completely.
+            if (selection.toString() === this.value) {
+
+                mBroadcaster.sendMessage('keyexported');
+
+                if (!localStorage.recoverykey) {
+                    localStorage.recoverykey = 1;
+                    $('body').addClass('rk-saved');
+                }
+            }
+
+        });
+
         $('a.toResetLink', $dialog).rebind('click', function() {
             loadingDialog.show();
 

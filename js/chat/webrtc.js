@@ -1521,11 +1521,13 @@ Call.prototype._broadcastCallReq = function() {
 
 Call.prototype._startIncallPingTimer = function() {
     var self = this;
-    self._inCallPingTimer = setInterval(function() {
+    var func = function() {
         if (!self.shard.cmd(Chatd.Opcode.INCALL, self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0')) {
             self._destroy(Term.kErrNetSignalling, true);
         }
-    }, RtcModule.kIncallPingInterval);
+    };
+    self._inCallPingTimer = setInterval(func, RtcModule.kIncallPingInterval);
+    func();
 };
 
 Call.prototype._stopIncallPingTimer = function() {

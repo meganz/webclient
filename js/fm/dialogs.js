@@ -1388,6 +1388,13 @@
             if (jsp) {
                 jsp.scrollToElement($(this), true);
             }
+
+            if ($.mcselected && M.getNodeRights($.mcselected) > 0) {
+                $('.dialog-newfolder-button', $dialog).removeClass('hidden');
+            }
+            else {
+                $('.dialog-newfolder-button', $dialog).addClass('hidden');
+            }
         });
 
         $swm.rebind('mouseenter', '.nw-fm-tree-item', function _try(ev) {

@@ -512,7 +512,7 @@ MegaData.prototype.searchPath = function() {
                     c = 'contacts-item';
                     name = M.u[path[i]].m;
                 }
-                else if (path[i] === M.RootID) {
+                else if (path[i] === M.RootID && !folderlink) {
                     id = M.RootID;
                     c = 'cloud-drive';
                     name = l[164];

@@ -13,19 +13,7 @@ function u_login(ctx, email, password, uh, pinCode, permanent) {
     ctx.result = u_login2;
     ctx.permanent = permanent;
 
-    // check whether the pwd came from the browser manager
-    var pwdman = passwordManager.getStoredCredentials(password);
-    if (pwdman) {
-        uh = pwdman.hash;
-        keypw = pwdman.keypw;
-
-        if (d) {
-            console.log('Using pwdman credentials.');
-        }
-    }
-    else {
-        keypw = prepare_key_pw(password);
-    }
+    keypw = prepare_key_pw(password);
 
     api_getsid(ctx, email, keypw, uh, pinCode);
 }

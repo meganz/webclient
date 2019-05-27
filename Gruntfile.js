@@ -1,5 +1,4 @@
 var fs = require('fs');
-var RJSON = require('relaxed-json');
 var fileLimit = 512*1024;
 var useHtmlMin = false;
 
@@ -66,13 +65,18 @@ var Secureboot = function() {
         var lines = [];
         var jsgroup = [];
         var cssgroup = [];
+        var seenFiles = {};
+        var bundleFiles = [];
+        var outOfBundle = [];
+        var watchSeenFiles = true;
         var jsGroups = this.getJSGroups();
         var jsKeys   = Object.keys(jsGroups);
         var cssGroups = this.getCSSGroups();
         var cssKeys   = Object.keys(cssGroups);
         for (var i in content) {
+            var file = null;
             if (content[i].match(/jsl\.push.+(js)/)) {
-                var file = content[i].match(/'.+\.(js)'/);
+                file = content[i].match(/'.+\.(js)'/);
                 if (!file) {
                     lines.push(content[i]);
                     continue;
@@ -81,12 +85,14 @@ var Secureboot = function() {
                 if (jsGroups[jsKeys[0]] && jsGroups[jsKeys[0]][0] == file) {
                     ns.addHeader(lines, jsGroups[jsKeys[0]]);
                     lines.push("    jsl.push({f:'" + jsKeys[0] + "', n: '" + jsKeys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 1, w: " + getWeight(jsKeys[0]) + "});");
+                    bundleFiles.push(jsKeys[0]);
                     jsgroup = jsGroups[jsKeys.shift()];
                 } else if (jsgroup.indexOf(file) == -1) {
+                    outOfBundle.push(content[i]);
                     lines.push(content[i]);
                 }
             } else if (content[i].match(/jsl\.push.+(css)/)) {
-                var file = content[i].match(/'.+\.(css)'/);
+                file = content[i].match(/'.+\.(css)'/);
                 if (!file) {
                     lines.push(content[i]);
                     continue;
@@ -95,8 +101,10 @@ var Secureboot = function() {
                 if (cssGroups[cssKeys[0]] && cssGroups[cssKeys[0]][0] == file) {
                     ns.addHeader(lines, cssGroups[cssKeys[0]]);
                     lines.push("    jsl.push({f:'" + cssKeys[0] + "', n: '" + cssKeys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 2, w: " + getWeight(cssKeys[0]) + "});");
+                    bundleFiles.push(cssKeys[0]);
                     cssgroup = cssGroups[cssKeys.shift()];
                 } else if (cssgroup.indexOf(file) == -1) {
+                    outOfBundle.push(content[i]);
                     lines.push(content[i]);
                 }
             } else if (content[i].match(/jsl\.push.+html/) && content[i].indexOf('embedplayer') < 0) {
@@ -106,6 +114,15 @@ var Secureboot = function() {
                 addedHtml = true;
             } else {
                 lines.push(content[i]);
+
+                if (content[i].indexOf('if (is_embed') > 0) {
+                    // no longer need to check for seen-files
+                    watchSeenFiles = false;
+                }
+            }
+
+            if (watchSeenFiles && file) {
+                seenFiles[file] = (seenFiles[file] | 0) + 1;
             }
         }
         lines = lines.join("\n");
@@ -151,6 +168,7 @@ var Secureboot = function() {
                         if (content.length) {
                             var filename = pfx + '/' + g + '-group' + (++idx) + '.' + pfx;
                             fs.writeFileSync(filename, content.join("\n"));
+                            bundleFiles.push(filename);
 
                             if (!jsl3_new[g]) {
                                 jsl3_new[g] = {};
@@ -194,6 +212,38 @@ var Secureboot = function() {
         });
 
         fs.writeFileSync(name, lines);
+
+        // print out coverage
+        outOfBundle = outOfBundle.map(function(f) {
+            f = String(f).trim();
+            if (!f.startsWith('//')) {
+                f = f.match(/f:'([^']+)'/)[1];
+                if (!/^(js\/(beta|vendor))|makecache|dont-deploy/.test(f)) {
+                    return f + ' (' + fs.statSync(f).size + ' bytes)';
+                }
+            }
+            return '';
+        }).filter(String).sort();
+
+        if (outOfBundle.length) {
+            console.info('Files leaved out of a bundle:\n- ' + outOfBundle.join('\n- '));
+            console.info('-- %d', outOfBundle.length);
+        }
+
+        // check for small bundles.
+        bundleFiles.forEach(function(f) {
+            var size = fs.statSync(f).size;
+            if (size < 24000) {
+                console.warn('WARNING: Small bundle generated, file "%s" of %d bytes', f, size);
+            }
+        });
+
+        // check for files included more than once.
+        for (var k in seenFiles) {
+            if (seenFiles[k] > 1) {
+                console.error('ERROR The file "%s" was included %d times!', k, seenFiles[k]);
+            }
+        }
     };
 
     ns.getJS = function() {

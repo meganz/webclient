@@ -13,7 +13,8 @@ var storageQuotaError = false;
 var lastactive = new Date().getTime();
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
-var staticpath = 'https://eu.static.mega.co.nz/3/';
+var staticpath = null;
+var defaultStaticPath = 'https://eu.static.mega.co.nz/3/'; // EU should never fail. EU is the mothership.
 var ua = window.navigator.userAgent.toLowerCase();
 var uv = window.navigator.appVersion.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
@@ -55,6 +56,24 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
 var is_uc_browser = /ucbrowser/.test(ua);
 var fetchStreamSupport = window.fetch && typeof ReadableStream === 'function' && typeof AbortController === 'function' && !window.MSBlobBuilder;
+var staticServerLoading = {
+    loadFailuresOriginal: 0,        // Count of failures on the original static server (from any thread)
+    loadFailuresDefault: {},        // Count of failures on the EU static server per file
+    maxRetryAttemptsOriginal: 3,    // Max retry attempts on the original static server before switching to the default
+    maxRetryAttemptsDefault: 3,     // Max retry attempts on the default static server per file before it shows dialog
+    failureLoggedOriginal: false,   // Flag to indicate failure of original static server was logged to the API
+    failureLoggedDefault: false,    // Flag to indicate failure of the default static server was logged to the API
+    failureLoggedCorrupt: false,    // Flag to indicate that file corruption (hash mismatch) was logged to the API
+    flippedToDefault: false         // Flag to indicate if the static server was flipped
+};
+var load_error_types = {
+
+    /** The file is corrupt i.e. mismatch on SHA-2 hash check */
+    file_corrupt: 1,
+
+    /** A file loading issue, network issue or the static server is down */
+    file_load_error: 2
+};
 
 /**
  * Check if the user is coming from a mobile device
@@ -139,30 +158,46 @@ function mURIDecode(path) {
     return path;
 }
 
-function geoStaticpath(eu)
-{
-    if (!eu) {
-        try {
-            if (!sessionStorage.skipcdn) {
-                var cc_eu = 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW';
-                var cc_na = 'US CA MX AG BS BB BZ CR CO CU DO GD GT GY HT HN JM NI PA KN LC VC SR TT VE IS GL AI BL VG PR VI VE CO EC CL BR BO PY UY AR GY SR PE GF FK';
-                var cc_nz = 'NZ AU FJ NC';
-				var cc_sg = 'HK TH VN ID MY BD NP MM BT IN PH LK BN';
-                var cm = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
-				if (cm && cm[1] && cc_sg.indexOf(cm[1]) > -1)
-                    return 'https://sg.static.mega.co.nz/3/';
-                else if (cm && cm[1] && cc_na.indexOf(cm[1]) > -1)
-                    return 'https://na.static.mega.co.nz/3/';
-                else if (cm && cm[1] && cc_nz.indexOf(cm[1]) > -1)
-                    return 'https://nz.static.mega.co.nz/3/';
-                else if (cm && cm[1] && cc_eu.indexOf(cm[1]) == -1)
-                    return 'https://g.cdn1.mega.co.nz/3/';
+/**
+ * Based on the user's geographic location, set the closest static path.
+ * This is detected by the mega.nz server and set as a cookie e.g. "geoip=SG".
+ * @returns {String} Returns the nearest static server to be used or the EU one as default
+ */
+function geoStaticPath() {
+
+    'use strict';
+
+    try {
+        // If flag is not set to force the default EU static server
+        if (!sessionStorage.skipGeoStaticPath) {
+
+            // Set which countries will use which static server
+            var northAmericaStaticCountries = 'AG AI AR BB BL BO BR BS BZ CA CL CO CO CR CU DO EC FK GD GF GL GT GY HN HT IS JM KN LC MX NI PA PE PR PY SR SR TT US UY VC VE VE VG VI';
+            var newZealandStaticCountries = 'AU FJ NC NZ';
+            var singaporeStaticCountries = 'BD BN BT HK ID IN JP KR LK MM MY NP PH SG TH VN';
+
+            // Match on cookie e.g. "geoip=SG" returns array ['geoip=SG', 'SG']
+            var cookieMatch = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
+
+            // Check the country code to return a closer static server
+            if (cookieMatch && cookieMatch[1] && singaporeStaticCountries.indexOf(cookieMatch[1]) > -1) {
+                return 'https://sg.static.mega.co.nz/3/';
             }
-        } catch(e) {
-            setTimeout(function() { throw e; }, 2100);
+            else if (cookieMatch && cookieMatch[1] && northAmericaStaticCountries.indexOf(cookieMatch[1]) > -1) {
+                return 'https://na.static.mega.co.nz/3/';
+            }
+            else if (cookieMatch && cookieMatch[1] && newZealandStaticCountries.indexOf(cookieMatch[1]) > -1) {
+                return 'https://nz.static.mega.co.nz/3/';
+            }
         }
     }
-    return 'https://eu.static.mega.co.nz/3/';
+    catch(ex) {
+        setTimeout(function() {
+            throw ex;
+        }, 2100);
+    }
+
+    return defaultStaticPath;
 }
 
 if (is_chrome_firefox) {
@@ -390,20 +425,30 @@ if (!browserUpdate) try
 
         nocontentcheck = true;
         var devhost = window.location.host;
+
         // handle subdirs
         // Disable pathSuffixes, because they are no longer supported: the webclient will now only work from root
         var pathSuffix = '';
         pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
+
         // set the staticpath for debug mode
         staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
         if (window.d) {
             console.debug('StaticPath set to "' + staticpath + '"');
         }
     }
-    else {
+
+    // Override any set static path with the one from localStorage to test standard static server failure
+    if (localStorage.getItem('staticpath') !== null) {
         staticpath = localStorage.staticpath;
     }
-    staticpath = staticpath || geoStaticpath();
+
+    // Override the default static path to test recovery after standard static server failure
+    if (localStorage.getItem('defaultstaticpath') !== null) {
+        defaultStaticPath = localStorage.defaultstaticpath;
+    }
+
+    staticpath = staticpath || geoStaticPath();
     apipath = localStorage.apipath || 'https://g.api.mega.co.nz/';
 }
 catch(e) {
@@ -436,7 +481,7 @@ var mega = {
     ui: {},
     flags: 0,
     utils: {},
-    updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt',
+    updateURL: defaultStaticPath + 'current_ver.txt',
     chrome: (
         typeof window.chrome === 'object'
         && window.chrome.runtime !== undefined
@@ -584,7 +629,7 @@ if (!browserUpdate && is_extension)
             staticpath = bootstaticpath;
         }
         else {
-            staticpath = 'https://eu.static.mega.co.nz/3/';
+            staticpath = defaultStaticPath;
         }
         try {
             loadSubScript(bootstaticpath + 'fileapi.js');
@@ -608,8 +653,8 @@ if (!browserUpdate && is_extension)
         urlrootfile = 'index.html';
         bootstaticpath = location.href.replace(urlrootfile, '');
     }
-    else /* Google Chrome */
-    {
+    else {
+        // WebExtensions
         tmp = 'mega';
         if (typeof chrome.runtime.getManifest === 'function' && !Object(chrome.runtime.getManifest()).update_url) {
             tmp = localStorage.chromextdevpath || tmp;
@@ -1187,7 +1232,6 @@ function compareHashes(hashFromWorker, fileName) {
     var hashFromDeployment = fileName.substring(startOfHash, endOfHash);
 
     if (hashFromWorker === hashFromDeployment) {
-        //console.log('Hash match on file: ' + fileName + '. Hash from worker thread: ' + hashFromWorker + ' Hash from deployment script: ' + hashFromDeployment);
         return true;
     }
     else {
@@ -1272,33 +1316,109 @@ else {
     };
 }
 
-function siteLoadError(error, filename) {
+/**
+ * Logs errors when loading/verifying files. This will log once for a file load error on the regular static server
+ * (after x retries of any file), log once for any error on the default static server (after x retries per file) and
+ * log once for any file corruption errors.
+ * @param {Number} errorType The error code (see load_error_types object)
+ * @param {String} filename The file that failed to load
+ * @param {String} staticPathToLog The static path to be logged
+ */
+function logStaticServerFailure(errorType, filename, staticPathToLog) {
+
     'use strict';
 
-    if (!window.buildOlderThan10Days && !window.log99723) {
-        onIdle(function() {
-            var xhr = getxhr();
-            xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
-            xhr.send(JSON.stringify([{a: 'log', e: 99723, m: JSON.stringify([1, error, filename, staticpath])}]));
-        });
+    // Don't log if the build is older than 10 days
+    if (window.buildOlderThan10Days) {
+        return false;
+    }
+
+    // If file loading error
+    if (errorType === load_error_types.file_load_error) {
+
+        // If using the default static path
+        if (staticpath === defaultStaticPath) {
+
+            // If already logged that the default static server failed, exit
+            if (staticServerLoading.failureLoggedDefault) {
+                return false;
+            }
+
+            // Otherwise set flag to not log it again
+            staticServerLoading.failureLoggedDefault = true;
+        }
+        else {
+            // If already logged that the regular static server failed, exit
+            if (staticServerLoading.failureLoggedOriginal) {
+                return false;
+            }
+
+            staticServerLoading.failureLoggedOriginal = true;
+        }
+    }
+
+    // If file corruption (hash mismatch) error
+    else if (errorType === load_error_types.file_corrupt) {
+
+        // If already logged that there was a corrupt file error, exit
+        if (staticServerLoading.failureLoggedCorrupt) {
+            return false;
+        }
+
+        staticServerLoading.failureLoggedCorrupt = true;
+    }
+    else {
+        // Otherwise if already logged some other error, exit
+        if (window.log99723) {
+            return false;
+        }
 
         window.log99723 = true;
     }
+
+    // Send log. NB: Not using staticpath global here, in case it changed in the main thread
+    // and due to the onIdle timeout below it hasn't actually sent the log yet
+    onIdle(function() {
+        var xhr = getxhr();
+        xhr.open('POST', apipath + 'cs?id=0' + mega.urlParams(), true);
+        xhr.send(
+            JSON.stringify(
+                [{ a: 'log', e: 99723, m: JSON.stringify([1, errorType, filename, staticPathToLog]) }]
+            )
+        );
+    });
+}
+
+/**
+ * Show a site load error alert with OK and Cancel buttons
+ * @param {Number|Error|String} error The type of error e.g. loadErrorType.file_corrupt/file_load_error, or an
+ *                                    Error/exception, or an error message to be displayed.
+ * @param {String} filename The file that failed to load
+ */
+function siteLoadError(error, filename) {
+
+    'use strict';
+
+    logStaticServerFailure(error, filename, staticpath);
 
     var message = ['MEGA failed to load because of '];
     if (location.host !== 'mega.nz') {
         message[0] += '..';
     }
 
-    if (error === 1) {
+    if (error === load_error_types.file_corrupt) {
         message.push('The file "' + filename + '" is corrupt.');
     }
-    else if (error === 2) {
+    else if (error === load_error_types.file_load_error) {
         message.push('The file "' + filename + '" could not be loaded.');
     }
     else {
         message.push('Filename: ' + filename + "\nException: " + error);
-        message.push('Stack trace: ' + String(error.stack).split('\n').splice(1, 4).join('\n'));
+
+        // Only print stack trace if Error object
+        if (error instanceof Error) {
+            message.push('Stack trace: ' + String(error.stack).split('\n').splice(1, 4).join('\n'));
+        }
     }
 
     message.push('Please click OK to refresh and try again.');
@@ -1317,12 +1437,19 @@ function siteLoadError(error, filename) {
         return;
     }
 
+    // Give time for window.onerror to fire 'cd2' before showing the blocking confirm-dialog
     window.sleTick = setTimeout(function() {
-        // showing a confirm dialog containing the message, and if 'OK' pressed it will reload
+
+        // Show confirm dialog, if 'OK' is pressed it will reload
         if (confirm(message) === true) {
+
+            // Force EU static on page reload
+            sessionStorage.skipGeoStaticPath = '1';
             location.reload(true);
         }
+
         window.sleTick = null;
+
     }, 2e3);
 }
 
@@ -1553,6 +1680,11 @@ else if (!browserUpdate) {
     // Do not report exceptions if this build is older than 10 days
     var exTimeLeft = ((buildVersion.timestamp + (10 * 86400)) * 1000) > Date.now();
     window.buildOlderThan10Days = !exTimeLeft;
+
+    // Override to see logs being sent
+    if (localStorage.getItem('sendStaticFailureLogs') !== null) {
+        window.buildOlderThan10Days = false;
+    }
 
     if (!d && exTimeLeft && (location.host === 'mega.nz' || is_extension || onBetaW))
     {
@@ -2556,17 +2688,9 @@ else if (!browserUpdate) {
                         alert('error');
                     }
                     var file = Object(jsl[e.data.jsi]).f || 'unknown.js';
-                    if (!nocontentcheck && !compareHashes(e.data.hash, file))
-                    {
-                        if (bootstaticpath.indexOf('cdn') > -1)
-                        {
-                            sessionStorage.skipcdn = 1;
-                            document.location.reload();
-                        }
-                        else {
-                            siteLoadError(1, bootstaticpath + file);
-                        }
 
+                    if (!nocontentcheck && !compareHashes(e.data.hash, file)) {
+                        siteLoadError(load_error_types.file_corrupt, bootstaticpath + file);
                         contenterror = 1;
                     }
                     if (!contenterror)
@@ -2631,7 +2755,11 @@ else if (!browserUpdate) {
         jslcomplete = 0;
         if (d && jj) {
             xhr_progress = [0, 0, 0, 0, 0];
-        } else {
+        }
+        else if (localStorage.testSingleThreadLoad) {
+            xhr_progress = [0];
+        }
+        else {
             xhr_progress = [0, 0];
         }
         xhr_stack = Array(xhr_progress.length);
@@ -2714,7 +2842,7 @@ else if (!browserUpdate) {
                 {
                     mozNetUtilFetch(file, jsl[jsi].j === 3, function(data) {
                         if (data === null) {
-                            siteLoadError(2, file);
+                            siteLoadError(load_error_types.file_load_error, file);
                         }
                         else {
                             jsl[jsi].text = String(data);
@@ -2735,32 +2863,91 @@ else if (!browserUpdate) {
         }
     }
 
-    var xhr_timeout=30000;
+    // Set XHR timeout to 5 seconds for regular static servers and 30 seconds for the EU static servers
+    var xhr_timeout = (staticpath === defaultStaticPath) ? 30000 : 5000;
     var urlErrors = {};
 
-    function xhr_error()
-    {
-        xhr_timeout+=10000;
-        console.log(xhr_timeout);
-        if (bootstaticpath.indexOf('cdn') > -1)
-        {
-            bootstaticpath = geoStaticpath(1);
-            staticpath = geoStaticpath(1);
-        }
+    /**
+     * Handles the XHR loading error. It tries reloading the file multiple times and switches the static path to the
+     * default static server if necessary. NB: there may be 2 or more concurrent XHR threads running which can arrive
+     * into this function (order of arrival not guaranteed). Using a regular static server counts errors overall,
+     * whereas using the default static counts errors per file.
+     */
+    var xhr_error = function() {
+
+        'use strict';
+
         var url = this.url;
         var jsi = this.jsi;
         var xhri = this.xhri;
-        urlErrors[url] = (urlErrors[url] | 0) + 1;
-        if (urlErrors[url] < 20) {
-            setTimeout(function() {
-                xhr_progress[xhri] = 0;
-                xhr_load(url, jsi, xhri);
-            }, urlErrors[url] * 100);
+
+        // If on original staticpath (NA, SG, NZ)
+        if (staticpath !== defaultStaticPath) {
+
+            // Increment count
+            staticServerLoading.loadFailuresOriginal++;
+
+            // If the number of regular static load failures (any file from any thread) are less than the max allowed
+            if (staticServerLoading.loadFailuresOriginal < staticServerLoading.maxRetryAttemptsOriginal) {
+
+                // Set short timeout to go to new thread
+                setTimeout(function() {
+
+                    // Try loading the file again from the same static
+                    xhr_progress[xhri] = 0;
+                    xhr_load(url, jsi, xhri);
+
+                }, 50);
+            }
+            else {
+                // Log that the original static server failed
+                logStaticServerFailure(load_error_types.file_load_error, url, staticpath);
+
+                // If not using an extension, set the bootstaticpath to EU static
+                // NB: extensions load JS, CSS and lang files locally, only fonts, images come from the statics
+                if (!is_extension) {
+                    bootstaticpath = defaultStaticPath;
+                }
+
+                // Set the static path to EU static, then continue to default static path handling below...
+                staticpath = defaultStaticPath;
+
+                // Set flag to show the static server was flipped to the default EU server
+                staticServerLoading.flippedToDefault = true;
+            }
         }
-        else {
-            siteLoadError(2, this.url);
+
+        // If on default EU static server
+        if (staticpath === defaultStaticPath) {
+
+            // If the failure count for this file on the default static server is not initialised
+            if (typeof staticServerLoading.loadFailuresDefault[url] === 'undefined') {
+
+                // Initialise count to 1 if they were originally on EU static server as they have already had one error
+                staticServerLoading.loadFailuresDefault[url] = (staticServerLoading.flippedToDefault) ? 0 : 1;
+            }
+
+            // If the failure count for this file on the default static server is less than the max allowed retries
+            if (staticServerLoading.loadFailuresDefault[url] < staticServerLoading.maxRetryAttemptsDefault) {
+
+                // Set to retry after 0~ ms, then 100ms, then 200ms
+                setTimeout(function() {
+
+                    // Try loading the file again from the default EU static
+                    xhr_progress[xhri] = 0;
+                    xhr_load(url, jsi, xhri);
+
+                }, staticServerLoading.loadFailuresDefault[url] * 100);
+
+                // Increment count of failures
+                staticServerLoading.loadFailuresDefault[url]++;
+            }
+            else {
+                // Show site load error and log that it failed
+                siteLoadError(load_error_types.file_load_error, url, staticpath);
+            }
         }
-    }
+    };
 
     function xhr_load(url,jsi,xhri)
     {
@@ -2786,9 +2973,8 @@ else if (!browserUpdate) {
                     var hashHex = asmCryptoSha256.SHA256.hex(jsl[this.jsi].text);
 
                     // Compare the hash from the file and the correct hash determined at deployment time
-                    if (!compareHashes(hashHex, jsl[this.jsi].f))
-                    {
-                        siteLoadError(1, jsl[this.jsi].f);
+                    if (!compareHashes(hashHex, jsl[this.jsi].f)) {
+                        siteLoadError(load_error_types.file_corrupt, jsl[this.jsi].f);
                         contenterror = 1;
                     }
                 }

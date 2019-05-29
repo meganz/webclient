@@ -1802,13 +1802,23 @@ FileManager.prototype.createFolderUI = function() {
     });
 
     $('.fm-new-shared-folder').rebind('click', function() {
-        openNewSharedFolderDialog();
+        if (u_type === 0) {
+            ephemeralDialog(l[997]);
+        }
+        else {
+            openNewSharedFolderDialog();
+        }
     });
 
     $('.fm-new-link').rebind('click', function() {
-        M.safeShowDialog('create-new-link', function () {
-            M.initFileAndFolderSelectDialog('create-new-link');
-        });
+        if (u_type === 0) {
+            ephemeralDialog(l[1005]);
+        }
+        else {
+            M.safeShowDialog('create-new-link', function () {
+                M.initFileAndFolderSelectDialog('create-new-link');
+            });
+        }
     });
 };
 
@@ -1818,13 +1828,18 @@ FileManager.prototype.createFolderUI = function() {
  * @param {String} type Type of dialog for select default options, e.g. newLink for New public link
  */
 FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
-
     'use strict';
 
-    // Check chat is ready, if not retru after 1 sec
+    // If chat is not ready.
     if (!megaChatIsReady) {
-        loadingDialog.show();
-        delay('waitChatLoad', this.initFileAndFolderSelectDialog.bind(this), 1000);
+        if (megaChatIsDisabled) {
+            console.error('Mega Chat is disabled, cannot proceed');
+        }
+        else {
+            // Waiting for chat_initialized broadcaster.
+            loadingDialog.show();
+            mBroadcaster.once('chat_initialized', this.initFileAndFolderSelectDialog.bind(this, type));
+        }
         return false;
     }
 
@@ -1844,11 +1859,11 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
                 closeDialog();
                 $.selected = selected;
                 M.getLinkAction();
-            },
+            }
         }
     };
 
-    var dialog =  React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, {
+    var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, {
         title: options[type].title,
         folderSelectable: options[type].folderSelectable,
         selectLabel: options[type].selectLabel,
@@ -3865,7 +3880,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     else {
         $('.nw-fm-left-icon.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
     }
-    
+
     $('.content-panel.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
     $('.fm-left-menu').removeClass(
         'cloud-drive folder-link shared-with-me rubbish-bin contacts out-shares public-links ' +

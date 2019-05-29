@@ -169,7 +169,7 @@ function dashboardUI() {
             var $achWidget = $('.account.widget.achievements');
             var maf = M.maf;
             var $storage = $('.account.bonuses-size.storage', $achWidget);
-            var $transfer = $('.account.bonuses-size.transfer', $achWidget);
+            var $transfer = $('.account.bonuses-size.transfers', $achWidget);
             var storageCurrentValue = maf.storage.current /*+ maf.storage.base*/;
             var transferCurrentValue = maf.transfer.current /*+ maf.transfer.base*/;
 

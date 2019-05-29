@@ -828,6 +828,7 @@ React.makeElement = React['createElement'];
 	    var unreadCount = 0;
 
 	    var havePendingCall = false;
+	    var haveCall = false;
 	    self.haveAnyActiveCall() === false && self.chats.forEach(function (megaRoom, k) {
 	        if (megaRoom.state == ChatRoom.STATE.LEFT) {
 
@@ -839,7 +840,11 @@ React.makeElement = React['createElement'];
 
 	        var c = parseInt(megaRoom.messagesBuff.getUnreadCount(), 10);
 	        unreadCount += c;
-	        havePendingCall = havePendingCall || megaRoom.havePendingCall();
+	        if (!havePendingCall) {
+	            if (megaRoom.havePendingCall() && megaRoom.uniqueCallParts && !megaRoom.uniqueCallParts[u_handle]) {
+	                havePendingCall = true;
+	            }
+	        }
 	    });
 
 	    unreadCount = unreadCount > 9 ? "9+" : unreadCount;
@@ -849,8 +854,14 @@ React.makeElement = React['createElement'];
 	    if (havePendingCall) {
 	        haveContents = true;
 	        $('.new-messages-indicator .chat-pending-call').removeClass('hidden');
+
+	        if (haveCall) {
+	            $('.new-messages-indicator .chat-pending-call').addClass('call-exists');
+	        } else {
+	            $('.new-messages-indicator .chat-pending-call').removeClass('call-exists');
+	        }
 	    } else {
-	        $('.new-messages-indicator .chat-pending-call').addClass('hidden');
+	        $('.new-messages-indicator .chat-pending-call').addClass('hidden').removeClass("call-exists");
 	    }
 
 	    if (self._lastUnreadCount != unreadCount) {

@@ -3096,15 +3096,18 @@ accountUI.contactAndChat = {
 
         var self = this;
 
-        // TODO: FIXME, make accountUI elements not dependant!
         if (!megaChatIsReady) {
-            // notification section was called too early, e.g. before chat's initialisation...delay the init.
-            var args = toArray.apply(null, arguments);
-            setTimeout(function() {
-                self.init.apply(self, args);
-            }, 700);
+            if (megaChatIsDisabled) {
+                console.error('Mega Chat is disabled, cannot proceed to Contact and Chat settings');
+            }
+            else {
+                // If chat is not ready waiting for chat_initialized broadcaster.
+                loadingDialog.show();
+                mBroadcaster.once('chat_initialized', self.delayRender.bind(self, presenceInt, autoaway));
+            }
             return true;
         }
+        loadingDialog.hide();
 
         if (!presenceInt || !presenceInt.userPresence) {
             setTimeout(function() {

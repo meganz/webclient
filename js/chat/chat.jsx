@@ -479,6 +479,7 @@ Chat.prototype.init = function() {
         }
     }
     self.is_initialized = true;
+    mBroadcaster.sendMessage('chat_initialized');
     if (!anonymouschat) {
         $('.activity-status-block, .activity-status').show();
     }

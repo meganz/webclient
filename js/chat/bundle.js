@@ -447,6 +447,7 @@ React.makeElement = React['createElement'];
 	        }
 	    }
 	    self.is_initialized = true;
+	    mBroadcaster.sendMessage('chat_initialized');
 	    if (!anonymouschat) {
 	        $('.activity-status-block, .activity-status').show();
 	    } else {}

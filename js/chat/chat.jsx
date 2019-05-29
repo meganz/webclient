@@ -897,6 +897,7 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 
 
     var havePendingCall = false;
+    var haveCall = false;
     self.haveAnyActiveCall() === false && self.chats.forEach(function(megaRoom, k) {
         if (megaRoom.state == ChatRoom.STATE.LEFT) {
             // skip left rooms.
@@ -908,7 +909,11 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 
         var c = parseInt(megaRoom.messagesBuff.getUnreadCount(), 10);
         unreadCount += c;
-        havePendingCall = havePendingCall || megaRoom.havePendingCall();
+        if (!havePendingCall) {
+            if (megaRoom.havePendingCall() && megaRoom.uniqueCallParts && !megaRoom.uniqueCallParts[u_handle]) {
+                havePendingCall = true;
+            }
+        }
     });
 
     unreadCount = unreadCount > 9 ? "9+" : unreadCount;
@@ -919,10 +924,18 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
         haveContents = true;
         $('.new-messages-indicator .chat-pending-call')
             .removeClass('hidden');
+
+        if (haveCall) {
+            $('.new-messages-indicator .chat-pending-call').addClass('call-exists');
+        }
+        else {
+            $('.new-messages-indicator .chat-pending-call').removeClass('call-exists');
+        }
     }
     else {
         $('.new-messages-indicator .chat-pending-call')
-            .addClass('hidden');
+            .addClass('hidden')
+            .removeClass("call-exists");
     }
 
     if (self._lastUnreadCount != unreadCount) {

@@ -110,7 +110,7 @@ function addNewContact($addButton, cd) {
     var email;
     var emailText;
     var $mails;
-    var $textarea = $('.add-user-textarea textarea');
+    var $textarea = $addButton.parents('.fm-dialog').find('textarea');
     var promise = new MegaPromise();
     cd = cd === undefined ? true : cd;
 
@@ -131,7 +131,7 @@ function addNewContact($addButton, cd) {
             // Custom text message
             emailText = $textarea.val();
 
-            if (emailText === '') {
+            if (emailText === '' || emailText === l[6853]) {
                 emailText = l[17738];
             }
 

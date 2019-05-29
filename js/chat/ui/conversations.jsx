@@ -280,6 +280,15 @@ var ConversationsListItem = React.createClass({
                 );
             }
             
+
+            if (lastMessage.metaType && lastMessage.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
+                lastMessageDiv = (
+                    <div className={lastMsgDivClasses}>
+                        <span className="geolocation-icon"></span>{l[20789]}
+                    </div>
+                );
+            }
+
             var timestamp = lastMessage.delay;
             var curTimeMarker;
             var msgDate = new Date(timestamp * 1000);

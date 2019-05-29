@@ -271,7 +271,8 @@ var Chat = function() {
             'persistedTypeArea': PersistedTypeArea,
             'btRtfFilter': BacktickRtfFilter,
             'rtfFilter': RtfFilter,
-            'richpreviewsFilter': RichpreviewsFilter
+            'richpreviewsFilter': RichpreviewsFilter,
+            'geoLocationLinks': GeoLocationLinks
         },
         'chatNotificationOptions':  {
             'textMessages': {

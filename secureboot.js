@@ -2654,6 +2654,7 @@ else if (!browserUpdate) {
             'emojiUtils_js': {f:'js/utils/emoji.js', n: 'emojiUtils_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
             'callManager_js': {f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1},
+            'geoLocationLinks_js': {f:'js/chat/plugins/geoLocationLinks.js', n: 'geoLocationLinks_js', j:1},
             'cne_js': {f:'js/chat/callNotificationsEngine.js', n: 'cne_js', j:1},
             'urlFilter_js': {f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1},
             'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},

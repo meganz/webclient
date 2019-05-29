@@ -1574,9 +1574,11 @@ accountUI.plan = {
                 }
                 else if (account.stype === 'O') {
 
+                    var expiryTimestamp = account.nextplan ? account.nextplan.t : account.expiry;
+
                     // one-time or cancelled subscription
                     $('.account.plan-info.expiry-txt').text(l[987]);
-                    $('.account.plan-info.expiry span').text(time2date(account.expiry, 2));
+                    $('.account.plan-info.expiry span').text(time2date(expiryTimestamp, 2));
                     $('.account.data-block .btn-cancel-sub').addClass('hidden');
                 }
 

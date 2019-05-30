@@ -1088,8 +1088,8 @@ var notify = {
 
         // first we are parsing an action packet.
         if (notification.data.orig) {
-            notificationOwner = notification.data.u;
-            notificationTarget = notification.data.rece;
+            notificationOwner = notification.data.rece;
+            notificationTarget = notification.data.u;
             notificationOrginating = notification.data.orig;
         }
         else {

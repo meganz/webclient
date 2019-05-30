@@ -611,9 +611,9 @@ scparser.$add('s', {
                         notify.notifyFromActionPacket({
                             a: 'dshare',
                             n: a.n,
-                            u: a.o,
+                            u: a.u,
                             orig: a.ou,
-                            rece: a.u
+                            rece: a.o
                         });
                     }
                 }

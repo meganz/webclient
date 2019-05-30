@@ -559,7 +559,7 @@ mega.tpw = new function TransferProgressGadget() {
      */
     this.addDownloadUpload = function(type, entry, specifiedSize) {
         'use strict';
-        if (typeof type === 'undefined' || !entry) {
+        if (!$rowsContainer || typeof type === 'undefined' || !entry) {
             return;
         }
 
@@ -681,7 +681,7 @@ mega.tpw = new function TransferProgressGadget() {
 
     this.updateDownloadUpload = function(type, id, perc, bytesLoaded, bytesTotal, kbps, queue_num, startTime) {
         'use strict';
-        if (typeof type === 'undefined' || !id) {
+        if (!$rowsContainer || typeof type === 'undefined' || !id) {
             return;
         }
 
@@ -762,7 +762,7 @@ mega.tpw = new function TransferProgressGadget() {
 
     this.finishDownloadUpload = function(type, entry, handle) {
         'use strict';
-        if (typeof type === 'undefined' || !entry) {
+        if (!$rowsContainer || typeof type === 'undefined' || !entry) {
             return;
         }
 
@@ -834,7 +834,7 @@ mega.tpw = new function TransferProgressGadget() {
 
     this.errorDownloadUpload = function(type, entry, errorStr, isOverQuota) {
         'use strict';
-        if (typeof type === 'undefined' || !entry) {
+        if (!$rowsContainer || typeof type === 'undefined' || !entry) {
             return;
         }
 
@@ -892,7 +892,7 @@ mega.tpw = new function TransferProgressGadget() {
 
     this.pauseDownloadUpload = function(type, entry) {
         'use strict';
-        if (typeof type === 'undefined' || !entry) {
+        if (!$rowsContainer || typeof type === 'undefined' || !entry) {
             return;
         }
 

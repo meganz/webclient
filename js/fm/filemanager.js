@@ -691,6 +691,17 @@ FileManager.prototype.initFileManagerUI = function() {
             else {
                 // reset - to ckeck again next time
                 isMegaSyncTransfer = true;
+                if (!mega.tpw.isWidgetVisibile()) {
+                    mega.tpw.showWidget();
+                    if (mega.tpw.isWidgetVisibile()) {
+                        // do if there's no transfers, we will allow going to transfers page
+                        return false;
+                    }
+                    
+                }
+                else {
+                    mega.tpw.hideWidget();
+                }
             }
 
         }
@@ -1612,12 +1623,7 @@ FileManager.prototype.initContextUI = function() {
 
         if ($(this).hasClass('transfer-play')) {
             ids.map(fm_tfsresume);
-
-            if (uldl_hold) {
-                dlQueue.resume();
-                ulQueue.resume();
-                uldl_hold = false;
-            }
+            
         }
         else {
             ids.map(fm_tfspause);
@@ -1634,14 +1640,7 @@ FileManager.prototype.initContextUI = function() {
         ulmanager.abort(toabort);
         $.clearTransferPanel();
         fm_tfsupdate();
-
-        if (toabort.length) {
-            for (var i = toabort.length; i--;) {
-                var blk = String(toabort[i]).indexOf('ul_') !== -1 ? 'ul' : 'dl';
-                mega.ui.tpp.setTotal(-1, blk);
-                mega.ui.tpp.updateIndexes(blk);
-            }
-        }
+        mega.tpw.removeRow(toabort);
 
         onIdle(function() {
             // XXX: better way to stretch the scrollbar?
@@ -2278,6 +2277,7 @@ FileManager.prototype.addTransferPanelUI = function() {
                 }
                 target.fadeOut(function() {
                     $(this).remove();
+                    mega.tpw.removeRow(target.attr('id'));
                     $.clearTransferPanel();
                     fm_tfsupdate();
                     $.tresizer();
@@ -2370,15 +2370,11 @@ FileManager.prototype.addTransferPanelUI = function() {
     };
 
     $.transferClose = function() {
-        if (M.pendingTransfers) {
-            mega.ui.tpp.show();
-        }
         $('.nw-fm-left-icon.transfers').removeClass('active');
         $('#fmholder').removeClass('transfer-panel-opened');
     };
 
     $.transferOpen = function(force) {
-        mega.ui.tpp.hide();
         if (force || !$('.nw-fm-left-icon.transfers').hasClass('active')) {
             $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.transfers').addClass('active');
@@ -2410,8 +2406,10 @@ FileManager.prototype.addTransferPanelUI = function() {
     };
 
     $.removeTransferItems = function($trs) {
+        var type = null;
         if (!$trs) {
             $trs = $('.transfer-table tr.transfer-completed');
+            type = mega.tpw.DONE;
         }
         var $len = $trs.length;
         if ($len && $len < 100) {
@@ -2426,6 +2424,7 @@ FileManager.prototype.addTransferPanelUI = function() {
             $trs.remove();
             Soon($.clearTransferPanel);
         }
+        mega.tpw.clearRows(type);
     };
 
     $('.transfer-clear-all-icon').rebind('click', function() {

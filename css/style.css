@@ -4875,7 +4875,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     position: absolute;
     z-index: 100;
     cursor: pointer;
-    background-image: url(../images/mega/icons-sprite_v26.png);
+    background-image: url(../images/mega/icons-sprite_v27.png);
     background-position: 6px -1350px;
     background-repeat: no-repeat;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
@@ -5378,7 +5378,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     float: left;
     height: 100%;
     position: relative;
-    z-index: 30;
+    z-index: 20;
 }
 .default-white-button.l-pane-visibility {
     display: none;
@@ -5386,6 +5386,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     top: 50%;
     margin-top: -12px;
     right: -11px;
+    z-index: 19;
 }
 .active-folder-link .l-pane-visibility {
     display: block;
@@ -5420,7 +5421,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     -webkit-box-shadow: inset 0 1px 0 0px rgba(0,0,0,0.15);
     -moz-box-shadow: inset 0 1px 0 0px rgba(0,0,0,0.15);
     box-shadow: inset 0 1px 0 0px rgba(0,0,0,0.15);
-    z-index: 30;
+    z-index: 20;
 }
 .l-pane-collapsed .fm-left-panel {
     width: 6px !important;
@@ -5568,7 +5569,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v26.png);
+    background-image: url(../images/mega/icons-sprite_v27.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -6296,7 +6297,7 @@ th.grid-first-th {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/icons-sprite_v26.png);
+    background-image: url(../images/mega/icons-sprite_v27.png);
     background-repeat: no-repeat;
     background-position: -160px -831px;
     display: block;
@@ -7230,11 +7231,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v26.png);
+    background-image: url(../images/mega/icons-sprite_v27.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v26.png);
+    background-image: url(../images/mega/icons-sprite_v27.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {
@@ -20067,7 +20068,7 @@ body.pro:after {
 .membership-step2 .bandwidth-back-button {
     display: block;
 }
-.dropdown.body.popup.transfer-widget {
+./*dropdown.body.popup.transfer-widget {
     width: 256px;
     position: absolute;
     bottom: 4px;
@@ -20081,12 +20082,12 @@ body.pro:after {
     top: -1px;
     right: -1px;
     display: none;
-}
+}*/
 .fm-dialog-close.small {
     background-image: url(../images/mega/register-big-sprite-v15.png);
     background-position: -40px -130px;
 }
-.transfer-widget.left-arrow .dropdown-white-arrow {
+/*.transfer-widget.left-arrow .dropdown-white-arrow {
     top: auto;
     bottom: 8px;
 }
@@ -20133,7 +20134,7 @@ body.pro:after {
 }
 .transfer-widget.info-block .dark {
     color: #333333;
-}
+}*/
 .upload-overlay-body {
     width: 100%;
     position: absolute;
@@ -23520,7 +23521,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
     bottom: 0px;
     background-color: rgba(250,250,250,1);
-    z-index: 102;
+    z-index: 19;
     cursor: pointer;
     text-align: center;
 }
@@ -29630,3 +29631,751 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     text-align: right;
 }
 /* end terms page index table */
+
+/* Transfer tooltips */
+.float-widget.transfer-prorgess * {
+    font-family: 'latoWeb', 'source_sans_proregular', sans-serif; 
+}
+.float-widget.transfer-prorgess {
+    position: fixed;
+    height: auto;
+    bottom: 8px;
+    left: 56px;
+    z-index: 21;
+}
+.transfer-progress-widget, .banner.transfer {
+    position: relative;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 1px 1px 10px 0px rgba(0,0,0,0.2);
+    -moz-box-shadow: 1px 1px 10px 0px rgba(0,0,0,0.2);
+    box-shadow: 1px 1px 10px 0px rgba(0,0,0,0.2);
+}
+.transfer-progress-widget.collapse {
+    height: 44px;
+    display: inline-block;
+}
+.transfer-progress-widget.expand {
+    width: 512px;
+}
+.transfer-progress-txt {
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.8px;
+    color: #ddd;
+    display: inline-block;
+    padding: 4px 0;
+    vertical-align: top;
+    margin-left: 6px;
+}
+.transfer-progress-type.overquota .transfer-progress-txt, .transfer-progress-type.almost-overquota .transfer-progress-txt {
+    margin-left: 12px;
+}
+.transfer-progress-type.error .transfer-progress-txt {
+    color: #FC5401;
+}
+.transfer-progress-type.error.overquota .transfer-progress-txt {
+    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    color: #F0373A;
+    font-size: 14px;
+}
+.transfer-progress-type.error.almost-overquota .transfer-progress-txt {
+    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    color: #FFA500;
+    font-size: 14px;
+}
+/* Transfer tooltips - head */
+.transfer-progress-head {
+    position: relative;
+    width: auto;
+    min-width: 264px;
+    -moz-border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0;
+    background: -moz-linear-gradient(top, #696969 0%, #323232 100%);
+    background: -webkit-linear-gradient(top, #696969 0%,#323232 100%);
+    background: linear-gradient(to bottom, #696969 0%,#323232 100%);
+}
+.transfer-progress-widget.collapse .transfer-progress-head {
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+.transfer-progress-type {
+    margin: 10px 12px 10px 14px;
+    height: 28px;
+    display: inline-block;
+}
+.transfer-progress-type:nth-child(2) {
+    margin-right: 94px;
+}
+.transfer-progress-initial {
+    background-image: url("../images/mega/white-spinner-24px.svg");
+    display: none;
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+    margin-right: 2px;
+    opacity: 0.7;
+}
+.transfer-progress-type.initial .transfer-progress-initial {
+    display: inline-block;
+}
+.status-indicator {
+    width: 28px;
+    height: 28px;
+    border-radius: 100%;
+    border: 3px solid rgba(255,255,255,0.2);
+    box-sizing: border-box;
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+}
+.transfer-progress-type.download .status-indicator::before, .transfer-progress-type.upload .status-indicator::before {
+    content: "";
+    background-image: url("../images/mega/icons-sprite_v27.png");
+    width: 24px;
+    height: 24px;
+    left: -1px;
+    top: -1px;
+    display: block;
+    position: absolute;
+    z-index: 11;
+}
+.transfer-progress-type.overquota .status-indicator .transfer-progress-icon.overquota, .transfer-progress-type.almost-overquota .status-indicator .transfer-progress-icon.almost-overquota {
+    position: absolute;
+    display: inline-block;
+    left: 16px;
+    top: -8px;
+    z-index: 12;
+}
+.status-indicator .transfer-progress-icon.overquota::before, .status-indicator .transfer-progress-icon.almost-overquota::before {
+    content: "";
+    margin-top: 3px;
+    margin-left: 1px;
+    z-index: 13;
+    border: 1px solid #5a5a5a;
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    border-radius: 100%;
+}
+.status-indicator-pct ul, .status-indicator-pct li, .status-indicator-pct p, .status-indicator-pct span {
+    height: 28px;
+    width: 28px;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+.status-indicator-pct .overlay {
+    width: 22px;
+    height: 22px;
+    background-color: #4B4B4B;
+    position: absolute;
+    display: block;
+    left: 0px;
+    top: 0px;
+    border-radius: 100%;
+    z-index: 10;
+}
+.status-indicator-pct ul li {
+    position: absolute;
+    left: -3px;
+    top: -3px;
+}
+.status-indicator-pct ul .right-c {
+    clip: rect(0, 28px, 28px, 14px);
+}
+.status-indicator-pct ul .left-c {
+    clip: rect(0, 14px, 28px, 0);
+}
+.status-indicator-pct ul .left-c p {
+    transform: rotate(60deg);
+}
+.status-indicator-pct ul .right-c p {
+    transform: rotate(180deg);
+}
+.status-indicator-pct ul li span {
+    width: 14px;
+    height: 28px;
+    display: block;
+}
+.status-indicator-pct ul li.right-c span {
+    -moz-border-radius-topleft: 14px;
+    -moz-border-radius-bottomleft: 14px;
+    -webkit-border-top-left-radius: 14px;
+    -webkit-border-bottom-left-radius: 14px;
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+}
+.status-indicator-pct ul li.left-c span {
+    margin-left: 14px;
+    -moz-border-radius-topright: 14px;
+    -moz-border-radius-bottomright: 14px;
+    -webkit-border-top-right-radius: 14px;
+    -webkit-border-bottom-right-radius: 14px;
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+}
+.transfer-progress-type.download .status-indicator-pct ul span {
+    background-color: #88FF5B;
+}
+.transfer-progress-type.upload .status-indicator-pct ul span {
+    background-color: #0EDCEE;
+}
+.transfer-progress-type.error .status-indicator-pct ul span {
+    background-color: #FC5401;
+}
+.transfer-progress-type .transfer-progress-icon {
+    display: none;
+}
+.transfer-progress-type.complete .transfer-progress-icon, .transfer-progress-type.error:not(.overquota):not(.almost-overquota) .transfer-progress-icon {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 2px;
+    margin-left: 2px;
+}
+.transfer-control-panel {
+    position: absolute;
+    display: inline-block;
+    right: 0;
+    top: 0;
+    min-width: 44px;
+    height: 100%;
+    background-color: rgba(0,0,0,0.1);
+    cursor: pointer;
+}
+.transfer-control-panel::before {
+    content: "";
+    width: 1px;
+    height: 100%;
+    background-color: rgba(0,0,0,0.2);
+    position: absolute;
+    display: inline-block;
+    left: 0;
+    top: 0;
+}
+.transfer-progress-icon {
+    background-image: url("../images/mega/icons-sprite_v27.png");
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+}
+.transfer-control-panel .transfer-progress-icon {
+    margin: 12px 0 12px 12px;
+    opacity: 0.7;
+    transition: 0.2s;
+    display: inline-block;
+}
+.transfer-progress-widget.expand .transfer-progress-icon.expand, .transfer-progress-widget.collapse .transfer-progress-icon.collapse {
+    display: none;
+}
+.transfer-control-panel .transfer-progress-icon:nth-child(3) {
+    margin-right: 12px;
+}
+.transfer-control-panel .transfer-progress-icon:hover {
+    opacity: 1;
+}
+/* Transfer tooltips - body */
+.transfer-progress-widget.collapse .transfer-progress-widget-body {
+    display: none;
+}
+.transfer-progress-widget-body {
+    position: relative;
+    background-color: #fff;
+    -moz-border-radius: 0 0 4px 4px;
+    -webkit-border-radius: 0 0 4px 4px;
+    border-radius: 0 0 4px 4px;
+    /*max-height: 218px;*/
+    overflow:hidden;
+    z-index: 40;
+}
+.transfer-prorgess.tpw .widget-body-container {
+    max-height: 240px;
+}
+.transfer-task-row {
+    width: 100%;
+    height: 48px;
+    padding:12px 16px 12px 48px;
+    position: relative;
+    box-sizing: border-box;
+    transition: 0.2s;
+}
+.transfer-task-row:last-child {
+    height: 50px;
+}
+.transfer-task-row:hover {
+    background-color: #fafafa;
+}
+.transfer-task-row::before {
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: 16px;
+    width: 16px;
+    height: 16px;
+    display: block;
+    background-image: url("../images/mega/icons-sprite_v27.png");
+}
+.transfer-task-row::after {
+    content: "";
+    width: 480px;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 16px;
+}
+.transfer-task-row .transfer-filetype-txt {
+    display: inline-block;
+    margin-left: 28px;
+    max-width: 176px;
+    font-size: 13px;
+    line-height: 24px;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.transfer-task-row .transfer-file-size {
+    position: relative;
+    display: inline-block;
+    margin-top: 1px;
+    margin-left: 12px;
+    padding-left: 12px;
+    font-size: 13px;
+    line-height: 24px;
+    color: #999;
+    vertical-align: top;
+}
+.transfer-task-row .transfer-file-size::before {
+    content: "";
+    width: 2px;
+    height: 12px;
+    background-color: rgba(0,0,0,0.1);
+    display: block;
+    position: absolute;
+    top: 6px;
+    left: 0px;
+}
+.transfer-task-status {
+    font-size: 14px;
+    line-height: 24px;
+    color: #333;
+    padding-left: 28px;
+    position: absolute;
+    right: 24px;
+    top: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.transfer-task-status::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    display: none;
+    background-image: url("../images/mega/icons-sprite_v27.png");
+}
+.transfer-task-actions {
+    display: none;
+    z-index: 25;
+}
+.transfer-task-row:hover .transfer-task-actions {
+    display: inline-block;
+    position: absolute;
+    right: 24px;
+    top: 12px;
+}
+.transfer-task-row:hover .transfer-task-status {
+    display: none;
+}
+.transfer-task-actions i {
+    display: inline-block;
+    margin-left: 12px;
+    opacity: 0.6;
+    cursor: pointer;
+    position: relative;
+}
+.transfer-task-actions i:hover {
+    opacity: 1;
+}
+.transfer-complete-actions i .tooltips, .transfer-task-actions .transfer-progress-icon .tooltips{
+    height: 24px;
+    padding: 0 8px;
+    background-color: rgba(0,0,0,1);
+    line-height: 23px;
+    color: #fff;
+    font-size: 13px;
+    font-style: normal;
+    position: absolute;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    white-space: nowrap;
+    right: 20px;
+    -webkit-transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
+    -moz-transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
+    -o-transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
+    -ms-transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
+    transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    z-index: 99;
+    visibility: hidden;
+}
+.transfer-complete-actions i:hover .tooltips, .transfer-task-actions .transfer-progress-icon:hover .tooltips {
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    right: 28px;
+    visibility: visible;
+}
+.transfer-progress-bar, .transfer-progress-bar-pct {
+    position: absolute;
+    display: block;
+    width: 480px;
+    height: 2px;
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 1px;
+    left: 16px;
+    bottom: 0;
+    z-index: 8;
+}
+.transfer-task-row:last-child .transfer-progress-bar, .transfer-task-row:last-child .transfer-progress-bar-pct {
+    bottom: 2px;
+}
+.transfer-task-row.upload .transfer-progress-bar-pct {
+    width: 200px;
+    background-color: #2BA6DE;
+    left: 0px;
+    z-index: 9;
+}
+.transfer-task-row.download .transfer-progress-bar-pct {
+    width: 200px;
+    background-color: #31B500;
+    left: 0px;
+    z-index: 9;
+}
+/* complete mode */
+.transfer-task-row.complete .transfer-filetype-txt {
+    color: #666;
+}
+.transfer-task-row.complete .transfer-file-size {
+    display: none;
+}
+.transfer-task-row.complete .transfer-task-status {
+    color: #00BFA5;
+}
+.transfer-complete-actions {
+    display: none;
+    margin-left: 6px;
+}
+.transfer-task-row.complete .transfer-complete-actions {
+    display: inline-block;
+}
+.transfer-complete-actions i {
+    display: inline-block;
+    position: relative;
+    margin: 0 6px;
+    cursor: pointer;
+    opacity: 0.4;
+}
+.transfer-complete-actions i:hover {
+    opacity: 1;
+}
+.transfer-task-row.complete .transfer-progress-bar {
+    display: none;
+}
+/* error mode */
+.transfer-task-row.upload.error .transfer-progress-bar-pct, .transfer-task-row.download.error .transfer-progress-bar-pct {
+    width: 200px;
+    background-color: #D90007;
+    left: 0px;
+    z-index: 9;
+}
+.transfer-task-row.error .transfer-task-status {
+    color: #D90007;
+}
+/* inqueue mode */
+.transfer-task-row.inqueue .transfer-task-status::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    display: block;
+    position: absolute; 
+    left: 10px;
+    top: 3px;
+    background-image: url(../images/mega/dual-spinner-small.svg);
+    background-repeat: no-repeat;
+    opacity: 0.6;
+}
+/* pause mode */
+.transfer-task-row.pause .transfer-task-status {
+    color: #666;
+}
+/* deploy icons */
+.transfer-task-row.pause .transfer-task-status::before {
+    display: block;
+    background-position: -2px -37px;
+}
+.transfer-progress-icon.close {
+    background-position: -9px -1764px;
+}
+.transfer-progress-icon.expand {
+    background-position: -39px -1766px;
+}
+.transfer-progress-icon.collapse {
+    background-position: -72px -1766px;
+}
+.transfer-progress-icon.almost-overquota {
+    background-position: -147px -1767px;
+}
+.transfer-progress-icon.overquota {
+    background-position: -108px -1767px;
+}
+.transfer-progress-icon.wait {
+    background-position: -195px -342px;
+}
+.transfer-progress-icon.complete {
+    display: block;
+    background-position: -160px -1697px;
+}
+.transfer-progress-icon.transfer-error-1 {
+    background-position: -129px -1804px;
+}
+.transfer-progress-icon.link{
+    background-position: -7px -1840px;
+}
+.transfer-progress-icon.cloud-folder{
+    background-position: -49px -1840px;
+}
+.transfer-progress-icon.pause{
+    background-position: -91px -1840px;
+}
+.transfer-progress-icon.cancel{
+    background-position: -124px -1840px;
+}
+.transfer-progress-icon.restart{
+    background-position: -158px -1840px;
+}
+.transfer-progress-icon.link:hover{
+    background-position: -7px -1884px;
+    opacity: 0.8;
+}
+.transfer-progress-icon.cloud-folder:hover {
+    background-position: -48px -1884px;
+    opacity: 0.8;
+}
+.transfer-progress-icon.pause:hover{
+    background-position: -91px -1884px;
+    opacity: 0.8;
+}
+.transfer-progress-icon.cancel:hover{
+    background-position: -124px -1884px;
+    opacity: 0.8;
+}
+.transfer-progress-icon.restart:hover{
+    background-position: -159px -1884px;
+    opacity: 0.8;
+}  
+.transfer-progress-type.upload .status-indicator::before {
+    background-position: -8px -1804px;
+}
+.transfer-progress-type.download .status-indicator::before {
+    background-position: -68px -1803px;
+}
+.transfer-progress-type.upload.error .status-indicator::before {
+    background-position: -38px -1804px;
+}
+.transfer-progress-type.download.error .status-indicator::before {
+    background-position: -98px -1803px;
+}
+.transfer-task-row.upload::before {
+    background-position: -227px -1239px;
+}
+.transfer-task-row.download::before {
+    background-position: -197px -1239px;
+}
+.transfer-task-row.complete .transfer-task-status::before {
+    display: block;
+    background-position: -160px -1696px;
+}
+.transfer-task-row.error .transfer-task-status::before {
+    display: block;
+    background-position: -159px -1804px;
+}
+/*overquota banner*/
+.float-widget.transfer-prorgess .banner {
+    width: 100%;
+    min-width: 148px;
+    max-width: 512px;
+    background-color: #fff;
+    padding: 24px;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+.float-widget.transfer-prorgess .banner .delete-img.icon {
+    background-image: url("../images//mega/fm-main-sprite_v7.png");
+    background-position: 0px -12400px;
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    top: 12px;
+    right: 12px;
+    opacity: 0.4;
+    transition: 0.2s;
+    cursor: pointer;
+    z-index: 19;
+}
+.float-widget.transfer-prorgess .banner .delete-img.icon:hover {
+    opacity: 0.8;
+}
+.background-cloud-img {
+    content: "";
+    background-image: url("../images/mega/cloud-background.png");
+    position: absolute;
+    width: 512px;
+    height: 148px;
+    bottom: 0;
+    left: 0;
+    opacity: 0.05;
+}
+.left-section.circle-dashboard {
+    width: 108px;
+    height: 108px;
+    margin-right: 24px;
+    position: relative;
+    display: inline-block;
+    border: 5px solid #D8D8D8;
+    border-radius: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    vertical-align: top;
+}
+.quota-info-pct-txt {
+    font-size: 28px;
+    font-family: 'LatoWebLight','source_sans_proregular', Arial;
+    line-height: 32px;
+    position: relative;
+    margin-top: 18px;
+    z-index: 11;
+}
+.float-widget.transfer-prorgess .banner.almost-overquota .quota-info-pct-txt {
+    color: #FFA500;
+}
+.float-widget.transfer-prorgess .banner.overquota .quota-info-pct-txt {
+    color: #F0373A;
+}
+.quota-info-pr-txt {
+    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    font-size: 12px;
+    color: #333;
+    line-height: 18px;
+    position: relative;
+    margin-top: 6px;
+    z-index: 11;
+}
+.right-section.upgrade-block {
+    width: calc(100% - 136px);
+    display: inline-block;
+}
+.right-section.upgrade-block .head-title {
+    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    left: 0;
+    top: 0;
+    padding: 0;
+    cursor: default;
+}
+.right-section.upgrade-block .head-title:hover {
+    background-color: transparent;
+}
+.right-section.upgrade-block .head-title::before {
+    display: none;
+}
+.right-section.upgrade-block .content-txt {
+    padding-top: 12px;
+}
+.right-section.upgrade-block .button {
+    margin-top: 20px;
+    display: inline-block;
+    z-index: 14;
+}
+.quota-info-pct-circle ul, .quota-info-pct-circle li, .quota-info-pct-circle p, .quota-info-pct-circle span {
+    height: 108px;
+    width: 108px;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+.quota-info-pct-circle .overlay {
+    width: 98px;
+    height: 98px;
+    background-color: rgba(255,255,255,1);
+    position: absolute;
+    display: block;
+    left: 0px;
+    top: 0px;
+    border-radius: 100%;
+    z-index: 10;
+}
+.pro .quota-info-pct-circle li:not(.no-red-dot), .blog-new-full .quota-info-pct-circle ul li, .sync .quota-info-pct-circle li, .affiliate .quota-info-pct-circle li, .pro .quota-info-pct-circle li:not(.no-red-dot), .quota-info-pct-circle ul li {
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    padding: 0;
+    background: none;
+}
+.pro .status-indicator-pct li:not(.no-red-dot), .blog-new-full .status-indicator-pct ul li, .sync .status-indicator-pct li, .affiliate .status-indicator-pct li, .pro .status-indicator-pct li:not(.no-red-dot), .status-indicator-pct ul li {
+    padding: 0;
+    background: none;
+    background-position: unset;
+}
+.quota-info-pct-circle ul .right-c {
+    clip: rect(0, 108px, 108px, 54px);
+}
+.quota-info-pct-circle ul .left-c {
+    clip: rect(0, 54px, 108px, 0);
+}
+.quota-info-pct-circle ul .left-c p {
+    transform: rotate(30deg);
+}
+.quota-info-pct-circle ul .right-c p {
+    transform: rotate(180deg);
+}
+.quota-info-pct-circle ul li span {
+    width: 54px;
+    height: 108px;
+    display: block;
+}
+.quota-info-pct-circle ul li.right-c span {
+    -moz-border-radius-topleft: 54px;
+    -moz-border-radius-bottomleft: 54px;
+    -webkit-border-top-left-radius: 54px;
+    -webkit-border-bottom-left-radius: 54px;
+    border-top-left-radius: 54px;
+    border-bottom-left-radius: 54px;
+}
+.quota-info-pct-circle ul li.left-c span {
+    margin-left: 54px;
+    -moz-border-radius-topright: 54px;
+    -moz-border-radius-bottomright: 54px;
+    -webkit-border-top-right-radius: 54px;
+    -webkit-border-bottom-right-radius: 54px;
+    border-top-right-radius: 54px;
+    border-bottom-right-radius: 54px;
+}
+.float-widget.transfer-prorgess .banner.almost-overquota .quota-info-pct-circle ul span {
+    background-color: #FFA500;
+}
+.float-widget.transfer-prorgess .banner.overquota .quota-info-pct-circle ul span {
+    background-color: #F0373A;
+}

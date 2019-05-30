@@ -181,7 +181,7 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
     if (folderlink && u_type) {
         if (fmconfig.dlThroughMEGAsync === 0) {
             if (typeof fmconfig.tpp === 'undefined') {
-                mega.ui.tpp.setEnabled(1);
+                // mega.ui.tpp.setEnabled(1);
             }
             return webdl();
         }
@@ -326,7 +326,6 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         else {
             zipname = (zipname || ('Archive-' + Math.random().toString(16).slice(-4))) + '.zip';
         }
-        mega.ui.tpp.setTotal(1, 'dl');
     }
     else {
         z = false;
@@ -432,6 +431,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         }
     }
 
+    var tempEntry = !z && new Array(entries.length);
     for (var e = 0; e < entries.length; e++) {
         n = entries[e].node;
 
@@ -440,8 +440,19 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
 
         if (!z) {
             this.putToTransferTable(n, ttl);
-            mega.ui.tpp.setTotal(1, 'dl');
+            tempEntry[e] = entries[e].entry;
         }
+    }
+    if (z) {
+        mega.tpw.addDownloadUpload(mega.tpw.DOWNLOAD, entries[0].entry, zipsize);
+    }
+    else {
+        // unfortunately, we iterate again in reversed order...  2*O(n)
+        // for (var r = entries.length - 1; r >= 0; r--) {
+        //    mega.tpw.addDownloadUpload(mega.tpw.DOWNLOAD, entries[r].entry);
+        // }
+        mega.tpw.addDownloadUpload(mega.tpw.DOWNLOAD, tempEntry);
+        tempEntry = null;
     }
 
     var flashhtml = '';
@@ -502,25 +513,12 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
         $('.transfer-clear-completed').removeClass('disabled');
         $('.transfer-clear-all-icon').removeClass('disabled');
 
-        M.onFileManagerReady(function() {
-            // mega.ui.tpp.setTotal(1, 'dl');
-            mega.ui.tpp.started('dl');
-            if (typeof fdl_queue_var !== 'undefined' && Object(fdl_queue_var).ph) {
-                var gid = dlmanager.getGID(fdl_queue_var);
-
-                if (dlQueue.isPaused(gid) && !dlmanager.isOverQuota) {
-                    mega.ui.tpp.pause(gid, 'dl');
-                }
-                else if (dlmanager.isOverQuota) {
-                    mega.ui.tpp.hide();
-                }
-            }
-        });
     }
 };
 
 MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, force) {
     var st;
+    var original_id = id;
 
     if (dl_queue[dl_queue_num].zipid) {
         id = 'zip_' + dl_queue[dl_queue_num].zipid;
@@ -528,7 +526,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
         var ts = 0;
         for (var i in dl_queue) {
             if (dl_queue[i].zipid == dl_queue[dl_queue_num].zipid) {
-                if (!st) {
+                if (!st || st > dl_queue[i].st) {
                     st = dl_queue[i].st;
                 }
                 ts += dl_queue[i].size;
@@ -550,7 +548,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
     // failed not long ago
 
     // if (failed+30000 > NOW()) return;
-
+    mega.tpw.updateDownloadUpload(mega.tpw.DOWNLOAD, original_id, perc, bl, bt, kbps, dl_queue_num, st);
     if (!bl) {
         return false;
     }
@@ -632,23 +630,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
             else {
                 $tr.find('.speed').addClass('unknown').text('');
             }
-
-            if (page.substr(0, 2) !== 'fm') {
-                $('.widget-block').removeClass('hidden');
-                $('.widget-block').show();
-                if (!ulmanager.isUploading) {
-                    $('.widget-circle').attr('class', 'widget-circle percents-' + perc);
-                }
-                $('.widget-icon.downloading').removeClass('hidden');
-                $('.widget-speed-block.dlspeed').text(bytesToSize(bps, 1) + '/s');
-                $('.widget-block').addClass('active');
-            }
-            else {
-                if (mega.ui.tpp.shouldProcessData()) {
-                    mega.ui.tpp.setTransfered(id, bl, 'dl', dl_queue[dl_queue_num], bps);
-                    mega.ui.tpp.updateBlock('dl');
-                }
-            }
+            
             delay('percent_megatitle', percent_megatitle, 50);
         }
     }
@@ -660,6 +642,8 @@ MegaData.prototype.dlcomplete = function(dl) {
     if (dl.hasResumeSupport) {
         dlmanager.remResumeInfo(dl).dump();
     }
+
+    mega.tpw.finishDownloadUpload(mega.tpw.DOWNLOAD, dl);
 
     var slideshowid = slideshow_handle();
     if (slideshowid == id && !previews[slideshowid]) {
@@ -699,20 +683,7 @@ MegaData.prototype.dlcomplete = function(dl) {
         setTimeout(fm_chromebar, 500, $.dlheight);
         setTimeout(fm_chromebar, 1000, $.dlheight);
     }
-    if (page.substr(0, 2) !== 'fm') {
-        var a = dl_queue.filter(isQueueActive).length;
-        if (a < 2 && !ulmanager.isUploading) {
-            $('.widget-block').fadeOut('slow', function(e) {
-                $('.widget-block').addClass('hidden').css({opacity: 1});
-            });
-        }
-        else if (a < 2) {
-            $('.widget-icon.downloading').addClass('hidden');
-        }
-        else {
-            $('.widget-circle').attr('class', 'widget-circle percents-0');
-        }
-    }
+
     if ($.transferprogress && $.transferprogress[id]) {
         if (!$.transferprogress['dlc']) {
             $.transferprogress['dlc'] = 0;
@@ -723,7 +694,6 @@ MegaData.prototype.dlcomplete = function(dl) {
 
     delay('tfscomplete', function() {
         M.resetUploadDownload();
-        mega.ui.tpp.setIndex(1, 'dl');
         $.tresizer();
     });
 };
@@ -780,10 +750,7 @@ MegaData.prototype.dlerror = function(dl, error) {
             errorstr = l[x = 233];
             break;
     }
-
-    // Hide TPP
-    mega.ui.tpp.hide();
-    mega.ui.tpp.reset('dl');
+    mega.tpw.errorDownloadUpload(mega.tpw.DOWNLOAD, dl, errorstr);
 
     var slideshowid = slideshow_handle();
     if (slideshowid === dl.id && !previews[slideshowid]) {
@@ -848,12 +815,7 @@ MegaData.prototype.dlstart = function(dl) {
     if (typeof dl_queue[dl.pos] === 'object') {
         fm_tfsupdate(); // this will call $.transferHeader()
         this.dlprogress(id, 0, 0, 0, 0, dl.pos);
-        if (mega.ui.tpp.getTime('dl') === 0) {
-            mega.ui.tpp.setTime(Date.now(), 'dl');
-        }
-        Soon(function() {
-            mega.ui.tpp.start(dl, 'dl');
-        });
+
     }
 };
 
@@ -1158,7 +1120,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             }
             ttl.left--;
             added++;
-            mega.ui.tpp.setTotal(1, 'ul');
 
             // When dragging files to create an ephemeral, uldl_hold is set at the time of showing the terms dialog.
             if (!ephemeral && uldl_hold) {
@@ -1169,6 +1130,12 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 f.chatid = target;
             }
         }
+        // unfortunately, looping again in reversed order
+        // for (var ur = 0; ur < u.length; ur++) {
+        //    mega.tpw.addDownloadUpload(mega.tpw.UPLOAD, u[ur]);
+        // }
+        mega.tpw.addDownloadUpload(mega.tpw.UPLOAD, u);
+
         if (!added) {
             ulmanager.logger.warn('Nothing added to upload.');
             return;
@@ -1193,7 +1160,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             $('.transfer-clear-all-icon').removeClass('disabled');
 
             M.onFileManagerReady(function() {
-                mega.ui.tpp.started('ul');
 
                 if (ulmanager.ulOverStorageQuota) {
                     ulmanager.ulShowOverStorageQuotaDialog();
@@ -1444,6 +1410,9 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
     if (!bl || !ul.starttime || uldl_hold) {
         return false;
     }
+
+    mega.tpw.updateDownloadUpload(mega.tpw.UPLOAD, id, perc, bl, bt, bps, ul.pos, ul.starttime);
+
     $.transferprogress['ul_' + id] = [bl, bt, bps];
 
     var retime = bps > 1000 ? (bt - bl) / bps : -1;
@@ -1491,18 +1460,7 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
         domElement._elmSpeed.textContent = '';
     }
 
-    if (mega.ui.tpp.shouldProcessData()) {
-        mega.ui.tpp.setTransfered(id, bl, 'ul', ul, bps);
-        mega.ui.tpp.updateBlock('ul');
-    }
     delay('percent_megatitle', percent_megatitle, 50);
-
-    if (page.substr(0, 2) !== 'fm') {
-        $('.widget-circle').attr('class', 'widget-circle percents-' + perc);
-        $('.widget-icon.uploading').removeClass('hidden');
-        $('.widget-speed-block.ulspeed').text(bytesToSize(bps, 1) + '/s');
-        $('.widget-block').removeClass('hidden').addClass('active').show();
-    }
 };
 
 // Handle upload error
@@ -1534,11 +1492,11 @@ MegaData.prototype.ulerror = function(ul, error) {
         var id = ul.id;
         var target = ul.target;
 
-        this.ulfinalize(ul, api_strerror(error));
+        var errStr = api_strerror(error);
 
-        // Hide TPP
-        mega.ui.tpp.hide();
-        mega.ui.tpp.reset('ul');
+        this.ulfinalize(ul, errStr);
+        mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, ul, errStr, overquota);
+
 
         if (ul.owner) {
             ul.owner.destroy();
@@ -1555,7 +1513,6 @@ MegaData.prototype.ulerror = function(ul, error) {
                         mBroadcaster.sendMessage('upload:error', ul.id, error);
                     });
             }
-            mega.ui.tpp.hide();
             ulmanager.abort(null);
             $("tr[id^='ul_']").addClass('transfer-error')
                 .removeClass('transfer-completed').find('.transfer-status').text(l[1010]);
@@ -1595,6 +1552,8 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
         showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
     }
 
+    mega.tpw.finishDownloadUpload(mega.tpw.UPLOAD, ul, h);
+
     this.ulfinalize(ul, ul.skipfile ? l[1668] : l[1418]);
 };
 
@@ -1610,23 +1569,7 @@ MegaData.prototype.ulfinalize = function(ul, status) {
     $tr.find('.eta, .speed').text('').removeClass('unknown');
     $tr.find('.uploaded-size').html($tr.find('.transfer-size').text());
 
-
     ul_queue[ul.pos] = Object.freeze({});
-
-    if (page.substr(0, 2) !== 'fm') {
-        var a = ul_queue.filter(isQueueActive).length;
-        if (a < 2 && !ulmanager.isDownloading) {
-            $('.widget-block').fadeOut('slow', function(e) {
-                $('.widget-block').addClass('hidden').css({opacity: 1});
-            });
-        }
-        else if (a < 2) {
-            $('.widget-icon.uploading').addClass('hidden');
-        }
-        else {
-            $('.widget-circle').attr('class', 'widget-circle percents-0');
-        }
-    }
 
     if ($.transferprogress && $.transferprogress['ul_' + id]) {
         if (!$.transferprogress['ulc']) {
@@ -1643,7 +1586,6 @@ MegaData.prototype.ulfinalize = function(ul, status) {
 
     delay('tfscomplete', function() {
         M.resetUploadDownload();
-        mega.ui.tpp.setIndex(1, 'ul');
         $.tresizer();
     });
 };
@@ -1666,10 +1608,7 @@ MegaData.prototype.ulstart = function(ul) {
     ul.starttime = new Date().getTime();
     fm_tfsupdate();// this will call $.transferHeader()
     this.ulprogress(ul, 0, 0, 0);
-    if (mega.ui.tpp.getTime('ul') === 0) {
-        mega.ui.tpp.setTime(Date.now(), 'ul');
-    }
-    mega.ui.tpp.start(ul, 'ul');
+
 };
 
 MegaData.prototype.openTransfersPanel = function openTransfersPanel() {
@@ -1976,12 +1915,15 @@ function fm_tfsorderupd() {
 
 function fm_tfspause(gid, overquota) {
     'use strict';
+    var transferType;
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Ivalid GID to pause')) {
         if (gid[0] === 'u') {
             ulQueue.pause(gid);
+            transferType = mega.tpw.UPLOAD;
         }
         else {
             dlQueue.pause(gid);
+            transferType = mega.tpw.DOWNLOAD;
         }
 
         if (page === 'download') {
@@ -2008,17 +1950,17 @@ function fm_tfspause(gid, overquota) {
             if (overquota === true) {
                 $tr.addClass('transfer-error');
                 $tr.find('.transfer-status').addClass('overquota').text(l[1673]);
+
+                mega.tpw.errorDownloadUpload(transferType, { id: gid.split('_').pop() }, l[1673], overquota);
             }
             else {
                 $tr.addClass('transfer-queued');
                 $tr.removeClass('transfer-error');
                 $tr.find('.transfer-status').text(l[7227]);
+                mega.tpw.pauseDownloadUpload(transferType, { id: gid.split('_').pop() });
             }
 
-            if (fminitialized) {
-                // FIXME: do not rely on cached DOM nodes and just queue the paused state for transfers
-                mega.ui.tpp.pause(gid, gid[0] === 'u' ? 'ul' : 'dl');
-            }
+
         }
         return true;
     }
@@ -2031,9 +1973,6 @@ function fm_tfsresume(gid) {
         if (gid[0] === 'u') {
             ulQueue.resume(gid);
 
-            if (page !== 'download') {
-                mega.ui.tpp.resume(gid, 'ul');
-            }
         }
         else {
             var $tr = $('.transfer-table tr#' + gid);
@@ -2055,10 +1994,6 @@ function fm_tfsresume(gid) {
             }
             dlQueue.resume(gid);
 
-            if (page !== 'download') {
-                mega.ui.tpp.resume(gid, 'dl');
-            }
-
             if (page === 'download') {
                 $('.download .pause-transfer span').text(l[9112]);
                 $('.download.scroll-block').removeClass('paused-transfer');
@@ -2076,6 +2011,11 @@ function fm_tfsresume(gid) {
                     $tr.find('.speed, .eta').removeClass('unknown').text('');
                 }
             }
+        }
+        if (uldl_hold) {
+            dlQueue.resume();
+            ulQueue.resume();
+            uldl_hold = false;
         }
         return true;
     }
@@ -2272,8 +2212,5 @@ function fm_tfsupdate() {
     M.pendingTransfers = i + u;
     tfse.domUploadBlock.textContent = u || '';
     tfse.domDownloadBlock.textContent = i || '';
-
-    if (!i && !u) {
-        mega.ui.tpp.hide();
-    }
+    
 }

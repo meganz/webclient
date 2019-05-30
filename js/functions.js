@@ -1056,8 +1056,6 @@ function percent_megatitle() {
     var x_ul = Math.floor(ul_r / ul_t * 100) || 0;
     var x_dl = Math.floor(dl_r / dl_t * 100) || 0;
 
-    mega.ui.tpp.setTotalProgress(x_ul, 'ul');
-    mega.ui.tpp.setTotalProgress(x_dl, 'dl');
 
     if (dl_t && ul_t) {
         t = ' \u2193 ' + x_dl + '% \u2191 ' + x_ul + '%';

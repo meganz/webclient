@@ -431,8 +431,10 @@ if (!browserUpdate) try
         var pathSuffix = '';
         pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
 
-        // set the staticpath for debug mode
+        // Set the static path and default static path for debug mode to be the same
         staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+        defaultStaticPath = staticpath;
+
         if (window.d) {
             console.debug('StaticPath set to "' + staticpath + '"');
         }
@@ -2863,8 +2865,8 @@ else if (!browserUpdate) {
         }
     }
 
-    // Set XHR timeout to 10 seconds for regular static servers and 30 seconds for the EU static servers
-    var xhr_timeout = (staticpath === defaultStaticPath) ? 30000 : 10000;
+    // Set XHR timeout to 15 seconds for regular static servers and 30 seconds for the EU static servers
+    var xhr_timeout = (staticpath === defaultStaticPath) ? 30000 : 15000;
     var urlErrors = {};
 
     /**

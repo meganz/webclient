@@ -37,7 +37,7 @@
                 <div class="top-clear-button hidden"></div>
                 <!-- Cover with form to prevent autofilling -->
                 <!-- <form autocomplete="off"> -->
-                    <input type="text" placeholder="[$102]" autocomplete="disabled" class="top-search-input"/>
+                <input type="text" placeholder="[$102]" autocomplete="disabled" class="top-search-input" />
                 <!-- </form> -->
             </div>
         </div>
@@ -342,5 +342,127 @@
                 v. dev
             </div>
         </div>
+    </div>
+</div>
+<div class="float-widget transfer-prorgess tpw hidden">
+    <!-- add almost-overquota/overquota to banner -->
+    <div class="banner transfer almost-overquota hidden">
+        <div class="delete-img close-over icon"></div>
+        <div class="background-cloud-img"></div>
+        <div class="left-section circle-dashboard">
+            <div class="quota-info-pct-txt">97%</div>
+            <div class="quota-info-pr-txt">48 GB/50 GB</div>
+            <div class="quota-info-pct-circle">
+                <div class="overlay"></div>
+                <ul>
+                    <li class="nw-fm-chart0 right-c">
+                        <p>
+                            <span></span>
+                        </p>
+                    </li>
+                    <li class="nw-fm-chart0 left-c">
+                        <p>
+                            <span></span>
+                        </p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="right-section upgrade-block">
+            <div class="head-title">[$20666]</div>
+            <div class="content-txt">[$18085]</div>
+            <!-- change button color to default-red-button when it is overquota -->
+            <div class="default-red-button button up-action">[$5549]</div>
+            <!--<div class="default-orange-button button hidden">Upgrade account</div>-->
+        </div>
+    </div>
+    <div class="transfer-progress-widget expand">
+        <div class="transfer-progress-head">
+            <!-- add download/upload/error/complete/overquota/almost-overquota to transfer-progress-widget -->
+            <div class="transfer-progress-type download">
+                <div class="status-indicator">
+                    <div class="transfer-progress-icon overquota"></div>
+                    <div class="status-indicator-pct">
+                        <div class="overlay"></div>
+                        <ul>
+                            <li class="nw-fm-chart0 right-c">
+                                <p>
+                                    <span></span>
+                                </p>
+                            </li>
+                            <li class="nw-fm-chart0 left-c">
+                                <p>
+                                    <span></span>
+                                </p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="transfer-progress-txt">11/44</div>
+                <div class="transfer-progress-icon transfer-error-1"></div>
+            </div>
+            <div class="transfer-progress-type upload"> <!--error almost-overquota-->
+                <div class="status-indicator">
+                    <div class="transfer-progress-icon almost-overquota"></div>
+                    <div class="status-indicator-pct">
+                        <div class="overlay"></div>
+                        <ul>
+                            <li class="nw-fm-chart0 right-c">
+                                <p>
+                                    <span></span>
+                                </p>
+                            </li>
+                            <li class="nw-fm-chart0 left-c">
+                                <p>
+                                    <span></span>
+                                </p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="transfer-progress-txt"> </div>
+                <div class="transfer-progress-icon transfer-error-1"></div>
+            </div>
+            <div class="transfer-progress-type initial hidden">
+                <div class="transfer-progress-initial"></div>
+                <div class="transfer-progress-txt"> </div>
+            </div>
+            <div class="transfer-control-panel">
+                <div class="transfer-progress-icon tpw-c-e expand"></div>
+                <div class="transfer-progress-icon tpw-c-e collapse"></div>
+                <div class="transfer-progress-icon tpw-close close"></div>
+            </div>
+        </div>
+
+        <div class="widget-body-container">
+            <div class="transfer-progress-widget-body">
+
+                <!-- add progress/complete/error/inqueue/pause and upload/download to transfer-task-row -->
+                <div class="transfer-task-row upload progress">
+                    <span class="transfer-filetype-icon image"></span>
+                    <div class="transfer-filetype-txt">example image name loooo oooo.png</div>
+                    <div class="transfer-file-size">200 MB</div>
+                    <div class="transfer-task-status">1.3 MB/s</div>
+                    <div class="transfer-task-actions">
+                        <i class="transfer-progress-icon pause">
+                            <div class="tooltips"> </div>
+                        </i>
+                        <i class="transfer-progress-icon cancel">
+                            <div class="tooltips"> </div>
+                        </i>
+                    </div>
+                    <div class="transfer-progress-bar">
+                        <div class="transfer-progress-bar-pct"></div>
+                    </div>
+                </div>
+                <div class="transfer-task-row download complete">
+                    <span class="transfer-filetype-icon image"></span>
+                    <div class="transfer-filetype-txt">example image name loooo oooo.png</div>
+                    <div class="transfer-file-size">200 MB</div>
+                    <div class="transfer-task-status">1.3 MB/s</div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>

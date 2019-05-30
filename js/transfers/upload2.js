@@ -81,7 +81,6 @@ var ulmanager = {
         var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
 
         ulQueue.pause();
-        mega.ui.tpp.hide();
         this.ulOverStorageQuota = true;
 
         // clear completed uploads and set over quota for the rest.
@@ -1116,12 +1115,6 @@ var ulmanager = {
             ulmanager.abort(toAbort);
         }
 
-        // TODO: adding error message on tpp rather than check this and hide it manually.
-        onIdle(function() {
-            if (ul_queue.length === 0) {
-                mega.ui.tpp.hide();
-            }
-        });
     }
 };
 

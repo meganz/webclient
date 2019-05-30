@@ -511,20 +511,20 @@ mBroadcaster.once('startMega:mobile', function() {
 /* jshint -W007 */
 /* jshint strict: false */
 
-mega.ui.tpp = {
-    reset: function() {},
-    setTotalProgress: function() {},
-    pause: function() {},
-    resume: function() {},
-    getTime: function() {},
-    start: function() {},
-    setIndex: function() {},
-    isCached: function() {
+mega.tpw = {
+    addDownloadUpload: function() {},
+    updateDownloadUpload: function() {},
+    finishDownloadUpload: function() {},
+    errorDownloadUpload: function() {},
+    pauseDownloadUpload: function() {},
+    removeRow: function() {},
+    showWidget: function() { return false;},
+    isWidgetVisibile: function() {
         'use strict';
         return false;
     },
-    statusPaused: function() {},
-    hide: function() {}
+    hideWidget: function() {},
+    clearRows: function() {}
 };
 
 mega.megadrop = {

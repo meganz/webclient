@@ -366,18 +366,13 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
 
         if (page !== 'download') {
-            mega.ui.tpp.reset('ul');
 
             if (mega.megadrop.isInit()) {
                 mega.megadrop.onCompletion();
             }
         }
     }
-    else {
-        if (page !== 'download') {
-            mega.ui.tpp.statusPaused(ul_queue, 'ul');
-        }
-    }
+    
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
         dlmanager.isDownloading = false;
@@ -390,16 +385,8 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         dlmanager._quotaPushBack = {};
         dlmanager._dlQuotaListener = [];
 
-        if (page !== 'download') {
-            mega.ui.tpp.reset('dl');
-        }
 
         $.totalDL = false;
-    }
-    else {
-        if (page !== 'download') {
-            mega.ui.tpp.statusPaused(dl_queue, 'dl');
-        }
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {

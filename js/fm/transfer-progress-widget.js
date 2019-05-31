@@ -1,6 +1,6 @@
 /** This class will function as a UI controller.
  */
-mega.tpw = new function TransferProgressGadget() {
+mega.tpw = new function TransferProgressWidget() {
     var downloadRowPrefix = 'tpw_dl_';
     var uploadRowPrefix = 'tpw_ul_';
     var totalUploads = 0;
@@ -159,7 +159,11 @@ mega.tpw = new function TransferProgressGadget() {
 
 
     var viewOverQuotaBanner = function(type) {
-        if (!type) {
+        if (!type || !u_type) {
+            return;
+        }
+
+        if (!$overQuotaBanner.hasClass('hidden')) {
             return;
         }
 

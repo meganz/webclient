@@ -1,0 +1,316 @@
+/**
+ * Styles for the update.html page
+ */
+@font-face {
+    font-family: 'source_sans_proregular';
+    src: url('https://eu.static.mega.co.nz/3/fonts/SourceSansPro-Regular.eot');
+    src: url('https://eu.static.mega.co.nz/3/fonts/SourceSansPro-Regular.eot?#iefix') format('embedded-opentype'), url('https://eu.static.mega.co.nz/3/fonts/SourceSansPro-Regular.woff2') format('woff2'), url('https://eu.static.mega.co.nz/3/fonts/SourceSansPro-Regular.woff') format('woff'), url('https://eu.static.mega.co.nz/3/fonts/SourceSansPro-Regular.ttf') format('truetype'), url('https://eu.static.mega.co.nz/3/fonts/SourceSansPro-Regular.svg#source_sans_proregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Open Sans Semibold Italic';
+    src: url('https://eu.static.mega.co.nz/3/fonts/OpenSans-SemiboldItalic_v3.eot');
+    src: url('https://eu.static.mega.co.nz/3/fonts/OpenSans-SemiboldItalic_v3.eot?#iefix') format('embedded-opentype'), url('https://eu.static.mega.co.nz/3/fonts/OpenSans-SemiboldItalic.woff2') format('woff2'), url('https://eu.static.mega.co.nz/3/fonts/OpenSans-SemiboldItalic_v3.woff') format('woff'), url('https://eu.static.mega.co.nz/3/fonts/OpenSans-SemiboldItalic_v3.ttf') format('truetype'), url('https://eu.static.mega.co.nz/3/fonts/OpenSans-SemiboldItalic_v3.svg#open_sanssemibold_italic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+body, td, th {
+    font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    color: #333333;
+    line-height: 15px;
+}
+html {
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    width: 100%;
+    height: 100%;
+}
+body {
+    background-color: #FFFFFF;
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    overflow: auto;
+    height: 100%;
+    min-width: 987px;
+    min-height: 434px;
+    position: relative;
+}
+a, a:link, a:visited, a:hover, a:active {
+    text-decoration: none;
+    outline: none;
+}
+.div, span, input {
+    outline: none;
+}
+.hidden {
+    display: none;
+}
+.clear {
+    clear: both;
+    margin: 0px;
+    padding: 0px;
+    display: block;
+}
+.left {
+    float: left;
+}
+.top-head {
+    height: 50px;
+}
+.logo {
+    background-image: url('https://eu.static.mega.co.nz/3/images/mega/browsers-page-v2.png');
+    background-position: -50px -165px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    display: block;
+    float: left;
+    height: 48px;
+    margin: 6px 0 0 6px;
+    width: 47px;
+}
+.browsers-mid {
+    min-height: 434px;
+}
+.browsers-centered-block {
+    left: 50%;
+    margin: -252px 0 0 -380px;
+    position: absolute;
+    top: 50%;
+    width: 760px;
+}
+.browsers-header {
+    font-size: 20px;
+    line-height: 30px;
+    color: #D22400;
+    font-family: "Open Sans Semibold Italic", Arial;
+    padding-bottom: 17px;
+}
+.browsers-centered-block img {
+    width: 24px;
+    margin-left: -4px;
+}
+.browser-title {
+    font-size: 14px;
+    line-height: 24px;
+    color: #999999;
+    margin: 0 0 0 23px;
+}
+.browsers-notification {
+    color: #333333;
+    font-size: 14px;
+    margin: 20px 0 42px 0;
+    background-image: url('https://eu.static.mega.co.nz/3/images/mega/browsers-page-v2.png');
+    background-position: -50px -50px;
+    background-repeat: no-repeat;
+    line-height: 16px;
+    padding-left: 28px;
+}
+.browsers-logo {
+    float: left;
+    width: auto;
+    border: 2px solid #d9d9d9;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+.browsers-logo-lnk {
+    display: block;
+    width: 176px;
+    height: 176px;
+    background-image: url('https://eu.static.mega.co.nz/3/images/mega/browsers-page-v2.png');
+    background-repeat: no-repeat;
+    position: relative;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.firefox .browsers-logo-lnk {
+    background-position: -11px -277px;
+}
+.chromium .browsers-logo-lnk {
+    background-position: -11px -1479px;
+}
+.brave .browsers-logo-lnk {
+    background-position: -5px -1279px;
+}
+.chrome .browsers-logo-lnk {
+    background-position: -12px -479px;
+}
+.opera .browsers-logo-lnk {
+    background-position: -13px -877px;
+}
+.edge .browsers-logo-lnk {
+    background-position: -11px -1674px;
+}
+.safari .browsers-logo-lnk {
+    background-position: -11px -1073px;
+}
+.ie .browsers-logo-lnk {
+    background-position: -18px -676px;
+}
+span.browsers-update {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    font-size: 12px;
+    line-height: 19px;
+    height: 20px;
+    padding: 0 5px;
+    display: block;
+    background-color: #D22400;
+    color: white;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    display: none;
+}
+.browsers-logo-lnk:hover .browsers-update {
+    display: block;
+}
+.browsers-logo-lnk:hover .browsers-update.recommended {
+    background-color: #7BB328;
+}
+.browsers-logo-lnk:hover .browsers-update.supported {
+    background-color: #FFBC00;
+}
+.browsers-logo-lnk:hover .browsers-update.partial-support {
+    background-color: #D22400;
+}
+.browsers-recommendations {
+    position: absolute;
+    display: block;
+    bottom: 2px;
+    right: 2px;
+    font-size: 12px;
+    line-height: 19px;
+    height: 20px;
+    padding: 0 5px;
+    display: block;
+    background-color: #7BB328;
+    color: white;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+.browsers-recommendations.supported {
+    background-color: #FFBC00;
+}
+.browsers-recommendations.partial-support {
+    background-color: #b2b2b2;
+}
+.browsers-bottom {
+    bottom: 0;
+    height: 43px;
+    left: 50%;
+    margin-left: -380px;
+    position: absolute;
+    width: 750px;
+}
+.nw-bottom-copyrights {
+    font-size: 13px;
+    color: #333333;
+    line-height: 21px;
+    padding: 10px 0 10px 20px;
+    background-image: url(https://eu.static.mega.co.nz/3/images/mega/bottom-sprite-ie6.png);
+    background-repeat: no-repeat;
+    background-position: left -207px;
+    float: left;
+}
+.nw-bottom-copyrights span {
+    color: #666666;
+    padding-left: 5px;
+}
+.nw-bottom-social {
+    width: 26px;
+    height: 26px;
+    float: right;
+    background-image: url(https://eu.static.mega.co.nz/3/images/mega/bottom-sprite-ie6.png);
+    background-repeat: no-repeat;
+    background-position: -46px -277px;
+    margin: 7px 0 0 17px;
+    display: block;
+    cursor: pointer;
+}
+.nw-bottom-social:hover {
+    background-position: -46px -317px;
+}
+.nw-bottom-social.twitter {
+    background-position: -2px -277px;
+}
+.nw-bottom-social.twitter:hover {
+    background-position: -2px -317px;
+}
+a.continue-button {
+    color: #d22400;
+    display: block;
+    font-size: 16px;
+    font-family: 'source_sans_proregular', Arial;
+    font-size: 16px;
+    line-height: 30px;
+    padding-top: 20px;
+    text-decoration: underline;
+}
+a.continue-button.hidden {
+    display: none;
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+
+    .logo, .browsers-notification, .browsers-logo-lnk {
+        background-image: url(https://eu.static.mega.co.nz/3/images/mega/browsers-page-v2@2x.png);
+        background-size: 201px auto;
+    }
+    .nw-bottom-copyrights {
+        background-image: url(https://eu.static.mega.co.nz/3/images/mega/bottom-sprite@2x.png);
+        background-size: 170px auto;
+        background-repeat: no-repeat;
+        background-position: left -207px;
+    }
+    .nw-bottom-social {
+        background-image: url(https://eu.static.mega.co.nz/3/images/mega/bottom-sprite@2x.png);
+        background-size: 170px auto;
+        background-repeat: no-repeat;
+        background-position: -46px -277px;
+    }
+}
+
+@media only screen and (max-width: 987px){
+
+    body {
+        min-width: 0;
+    }
+    .browsers-header {
+        margin-top: 20px;
+    }
+    .browsers-centered-block {
+        left: auto;
+        margin: 0 0 0 10px;
+        position: static;
+        top: auto;
+        width: auto;
+    }
+    .browsers-notification {
+        margin: 20px 10px 20px 0;
+    }
+    .browsers-bottom {
+        bottom: auto;
+        height: 43px;
+        left: auto;
+        margin-left: 11px;
+        position: static;
+        width: auto;
+    }
+    a.continue-button {
+        margin-bottom: 20px;
+    }
+    .nw-bottom-social {
+        float: left;
+    }
+}

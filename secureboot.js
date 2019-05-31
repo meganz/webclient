@@ -54,6 +54,7 @@ var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
+var is_internet_explorer_11 = Boolean(window.MSInputMethodContext) && Boolean(document.documentMode);
 var is_uc_browser = /ucbrowser/.test(ua);
 var fetchStreamSupport = window.fetch && typeof ReadableStream === 'function' && typeof AbortController === 'function' && !window.MSBlobBuilder;
 var staticServerLoading = {
@@ -708,14 +709,46 @@ else {
 	}
 }
 
-// If IE 11 detected (https://stackoverflow.com/a/21825207), set flag to redirect to update page
-if (!!window.MSInputMethodContext && !!document.documentMode && localStorage.getItem('continueToSite') === null) {
+// Determine whether to show the legacy mobile page for these links so that they redirect back to the app
+var showLegacyMobilePage = (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
+    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' || page.substr(0, 4) === 'blog' ||
+    (is_old_windows_phone && page.substr(0, 7) === 'confirm')));
+
+/**
+ * Determines whether to show the Site Update page for IE11 users. For IE11 users they are shown the Site Update page
+ * once initially with option to continue to the site, then they are shown again after 2 weeks, then 1 week, then 4
+ * days, then 2 days, then every day after that.
+ * @returns {Boolean} Returns true if it should show the page, false if not
+ */
+var showUpdatePage = function() {
+
+    'use strict';
+
+    var showSiteUpdateAfter = localStorage.getItem('showSiteUpdateAfter');
+
+    // If they've already seen the update page in the past
+    if (showSiteUpdateAfter !== null) {
+
+        // Convert from JSON string
+        var showSiteUpdateAfterObj = JSON.parse(showSiteUpdateAfter);
+
+        // If it is not yet time to show the update page again, don't show it
+        if (showSiteUpdateAfterObj.showAgainDateTime >= Date.now()) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+// If IE 11 and they are due to see the Site Update page again, set flag to redirect to update page.
+// This won't be shown for the legacy mobile page so that the apps keep working.
+if (!showLegacyMobilePage && (localStorage.testie11 || is_internet_explorer_11) && showUpdatePage()) {
     browserUpdate = true;
 }
 
 // If they need to update their browser, store the current page before going to the update page
-// ToDo: make this update.html page work on mobile web
-if (browserUpdate && !is_mobile) {
+if (browserUpdate) {
     localStorage.prevPage = page;
     document.location = 'update.html';
 }
@@ -1539,9 +1572,7 @@ if (is_ios) {
  * app if any cancel, verify, fm/ipc, newsignup, recover or account links are clicked in the app
  * because the new mobile site is not designed for those yet.
  */
-if (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' || page.substr(0, 9) === 'newsignup' ||
-    page.substr(0, 7) === 'account' || page.substr(0, 4) === 'blog' ||
-    (is_old_windows_phone && page.substr(0, 7) === 'confirm'))) {
+if (showLegacyMobilePage) {
 
     var app;
     var mobileblog;

@@ -376,14 +376,6 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        uglify: {
-            prod: {
-                options: {
-                    sourceMap: true,
-                },
-                files: Secureboot.getJSGroups(),
-            }
-        },
         concat: {
             prod: {
                 options: {
@@ -422,7 +414,6 @@ module.exports = function(grunt) {
     });
 
     // Load the plugin that provides the "uglify" task.
-    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-htmljson');
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
     grunt.loadNpmTasks('grunt-contrib-concat');
@@ -434,5 +425,5 @@ module.exports = function(grunt) {
         Secureboot.rewrite("secureboot.prod.js");
     });
     grunt.registerTask('default', ['htmlmin', 'concat', 'htmljson', 'secureboot']);
-    grunt.registerTask('prod', ['htmlmin', 'htmljson', 'uglify', 'secureboot']);
+    grunt.registerTask('prod', ['htmlmin', 'concat', 'htmljson', 'secureboot']); // <- remove me if unused
 };

@@ -4,28 +4,23 @@ describe("chat.emoticon_shortcuts unit test", function() {
     var assert = chai.assert;
     var DEBUG = false;
 
-
-    var sandbox;
     var validEmojiSlugs = {
         "camera": true,
     };
 
     beforeEach(function () {
-        sandbox = sinon.sandbox.create();
-        assert(typeof(megaChat) === 'undefined');
-        window.megaChat = {
+        mStub(window, 'megaChat', {
             'isValidEmojiSlug': function(s) {
                 if (DEBUG) {
                     console.error('isValidEmojiSlug', s, validEmojiSlugs[s]);
                 }
                 return !!validEmojiSlugs[s];
             }
-        };
+        });
     });
 
     afterEach(function () {
-        sandbox.restore();
-        delete window.megaChat;
+        mStub.restore();
     });
 
 

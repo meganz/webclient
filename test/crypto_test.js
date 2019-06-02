@@ -12,9 +12,6 @@ describe("crypto unit test", function() {
     // for anyone reading this line... never mock global stuff in unit tests...
     var origMegaPromise = MegaPromise;
 
-    // Create/restore Sinon stub/spy/mock sandboxes.
-    var sandbox = null;
-
     // Some test data.
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
     var ED25519_FINGERPRINT = base64urldecode('If4x36FUomFia/hUBG/SJxt77Us');
@@ -51,10 +48,9 @@ describe("crypto unit test", function() {
     var _echo = function(x) { return x; };
 
     beforeEach(function() {
-        sandbox = sinon.sandbox.create();
         //sandbox.stub(attribCache, 'isDisabled', true);
 
-        sandbox.stub(backgroundNacl.sign.detached, 'verify', function() {
+        mStub(backgroundNacl.sign.detached, 'verify').callsFake(function() {
             return MegaPromise.resolve(
                 nacl.sign.detached.verify.apply(this, arguments)
             );
@@ -63,22 +59,22 @@ describe("crypto unit test", function() {
 
     afterEach(function() {
         _hideDebug();
-        sandbox.restore();
+        mStub.restore();
     });
 
     describe('crypt namespace', function() {
         describe('getPubKeyAttribute()', function() {
             it("RSA key", function() {
-                sandbox.stub(ns._logger, '_log');
+                mStub(ns._logger, '_log');
                 var pubKey = 'the key';
-                var rootPromise = _stubMegaPromise(sinon, sandbox);
+                var rootPromise = _stubMegaPromise(sinon, true);
                 var attribCachePromise = _stubMegaPromise(sinon);
                 attribCachePromise.fail = function(callback) {
                     callback();
                 };
-                sandbox.stub(window, 'crypto_decodepubkey').returns(pubKey);
-                sandbox.stub(attribCache, 'getItem').returns(attribCachePromise);
-                _showDebug(sandbox, ['api_req', 'assertUserHandle', 'base64urldecode']);
+                mStub(window, 'crypto_decodepubkey').returns(pubKey);
+                mStub(attribCache, 'getItem').returns(attribCachePromise);
+                _showDebug(['api_req', 'assertUserHandle', 'base64urldecode']);
 
                 var result = ns.getPubKeyAttribute('you456789xw', 'RSA');
                 assert.strictEqual(result, rootPromise);
@@ -96,14 +92,14 @@ describe("crypto unit test", function() {
             });
 
             it("API error on RSA key", function() {
-                sandbox.stub(ns._logger, '_log');
-                var rootPromise = _stubMegaPromise(sinon, sandbox);
+                mStub(ns._logger, '_log');
+                var rootPromise = _stubMegaPromise(sinon, true);
                 var attribCachePromise = _stubMegaPromise(sinon);
                 attribCachePromise.fail = function(callback) {
                     callback();
                 };
-                sandbox.stub(attribCache, 'getItem').returns(attribCachePromise);
-                _showDebug(sandbox, ['api_req']);
+                mStub(attribCache, 'getItem').returns(attribCachePromise);
+                _showDebug(['api_req']);
 
                 var result = ns.getPubKeyAttribute('you456789xw', 'RSA');
                 assert.strictEqual(result, rootPromise);
@@ -121,9 +117,9 @@ describe("crypto unit test", function() {
             });
 
             it("Cu25519 key", function(done) {
-                sandbox.stub(ns._logger, '_log');
+                mStub(ns._logger, '_log');
                 var attributePromise = { done: sinon.stub(), then: sinon.stub() };
-                sandbox.stub(mega.attr, 'get').returns(attributePromise);
+                mStub(mega.attr, 'get').returns(attributePromise);
 
                 var result = ns.getPubKeyAttribute('you456789xw', 'Cu25519');
 
@@ -145,9 +141,9 @@ describe("crypto unit test", function() {
             });
 
             it("Ed25519 key", function(done) {
-                sandbox.stub(ns._logger, '_log');
+                mStub(ns._logger, '_log');
                 var attributePromise = { done: sinon.stub(), then: sinon.stub() };
-                sandbox.stub(mega.attr, 'get').returns(attributePromise);
+                mStub(mega.attr, 'get').returns(attributePromise);
 
                 var result = ns.getPubKeyAttribute('you456789xw', 'Ed25519');
 
@@ -171,43 +167,43 @@ describe("crypto unit test", function() {
 
         describe('_getPubKeyAuthentication()', function() {
             it("unseen key", function() {
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
-                sandbox.stub(authring, 'getContactAuthenticated').returns(false);
-                sandbox.stub(authring, 'equalFingerprints').returns(undefined);
+                mStub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
+                mStub(authring, 'getContactAuthenticated').returns(false);
+                mStub(authring, 'equalFingerprints').returns(undefined);
                 var result = ns._getPubKeyAuthentication('you456789xw', ED25519_PUB_KEY, 'Ed25519');
                 assert.strictEqual(result, null);
             });
 
             it("seen key", function() {
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
+                mStub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
                 var authenticated = { fingerprint: ED25519_FINGERPRINT,
                                       method: authring.AUTHENTICATION_METHOD.SEEN,
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
-                sandbox.stub(authring, 'getContactAuthenticated').returns(authenticated);
-                sandbox.stub(authring, 'equalFingerprints').returns(true);
+                mStub(authring, 'getContactAuthenticated').returns(authenticated);
+                mStub(authring, 'equalFingerprints').returns(true);
                 var result = ns._getPubKeyAuthentication('you456789xw', ED25519_PUB_KEY, 'Ed25519');
                 assert.strictEqual(result, authring.AUTHENTICATION_METHOD.SEEN);
             });
 
             it("signed key", function() {
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
+                mStub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
                 var authenticated = { fingerprint: ED25519_FINGERPRINT,
                                       method: authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED,
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
-                sandbox.stub(authring, 'getContactAuthenticated').returns(authenticated);
-                sandbox.stub(authring, 'equalFingerprints').returns(true);
+                mStub(authring, 'getContactAuthenticated').returns(authenticated);
+                mStub(authring, 'equalFingerprints').returns(true);
                 var result = ns._getPubKeyAuthentication('you456789xw', ED25519_PUB_KEY, 'Ed25519');
                 assert.strictEqual(result, authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED);
             });
 
             it("fingerprint mismatch", function() {
-                sandbox.stub(ns._logger, '_log');
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
+                mStub(ns._logger, '_log');
+                mStub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
                 var authenticated = { fingerprint: base64urldecode('XyeqVYkXl3DkdXWxYqHe2XuL_G0'),
                                       method: authring.AUTHENTICATION_METHOD.SEEN,
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
-                sandbox.stub(authring, 'getContactAuthenticated').returns(authenticated);
-                sandbox.stub(authring, 'equalFingerprints').returns(false);
+                mStub(authring, 'getContactAuthenticated').returns(authenticated);
+                mStub(authring, 'equalFingerprints').returns(false);
                 var result = ns._getPubKeyAuthentication('you456789xw', ED25519_PUB_KEY, 'Ed25519');
                 assert.strictEqual(result, false);
             });
@@ -215,7 +211,7 @@ describe("crypto unit test", function() {
 
         describe('_checkSignature()', function() {
             it("good signature", function(done) {
-                sandbox.stub(authring, 'verifyKey').returns(origMegaPromise.resolve(true));
+                mStub(authring, 'verifyKey').returns(origMegaPromise.resolve(true));
                 ns._checkSignature('squiggle', 'RSA key', 'RSA', 'Ed key')
                     .done(function(result) {
                         assert.strictEqual(result, true);
@@ -229,7 +225,7 @@ describe("crypto unit test", function() {
             });
 
             it("bad signature", function(done) {
-                sandbox.stub(authring, 'verifyKey').returns(origMegaPromise.resolve(false));
+                mStub(authring, 'verifyKey').returns(origMegaPromise.resolve(false));
                 ns._checkSignature('squiggle', 'RSA key', 'RSA', 'Ed key')
                     .done(function(result) {
                         assert.strictEqual(result, false);
@@ -242,7 +238,7 @@ describe("crypto unit test", function() {
             });
 
             it("empty signature", function(done) {
-                sandbox.stub(authring, 'verifyKey').returns(origMegaPromise.resolve(null));
+                mStub(authring, 'verifyKey').returns(origMegaPromise.resolve(null));
                 ns._checkSignature('', 'RSA key', 'RSA', 'Ed key')
                     .done(function(result) {
                         assert.strictEqual(result, null);
@@ -264,9 +260,9 @@ describe("crypto unit test", function() {
 
         describe('getPubKey()', function() {
             it("cached Ed25519 key", function(done) {
-                sandbox.stub(window, 'u_authring', { Ed25519: {} });
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(authring, 'hadInitialised').returns(true);
+                mStub(window, 'u_authring', {Ed25519: {}});
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(authring, 'hadInitialised').returns(true);
 
                 var result = ns.getPubKey('you456789xw', 'Ed25519');
                 result
@@ -282,12 +278,11 @@ describe("crypto unit test", function() {
             });
 
             it("cached Ed25519 key, with callback", function(done) {
-                sandbox.stub(ns._logger, '_log');
-                sandbox.stub(window, 'u_authring', { Ed25519: {} });
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(window, 'u_handle', 'me3456789xw');
-
-                sandbox.stub(authring, 'hadInitialised').returns(true);
+                mStub(ns._logger, '_log');
+                mStub(window, 'u_authring', {Ed25519: {}});
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(window, 'u_handle', 'me3456789xw');
+                mStub(authring, 'hadInitialised').returns(true);
 
                 var callback = sinon.stub();
 
@@ -307,19 +302,19 @@ describe("crypto unit test", function() {
             });
 
             it("cached Ed25519 key, uninitialised authring", function(done) {
-                sandbox.stub(ns._logger, '_log');
-                sandbox.stub(window, 'u_handle', 'me3456789xw');
-                sandbox.stub(window, 'u_attr', {});
-                sandbox.stub(window, 'u_authring', { Ed25519: undefined });
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
+                mStub(ns._logger, '_log');
+                mStub(window, 'u_handle', 'me3456789xw');
+                mStub(window, 'u_attr', {});
+                mStub(window, 'u_authring', {Ed25519: undefined});
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
 
-                sandbox.stub(window, 'api_req', function(apiCallDetails, ctx) {
+                mStub(window, 'api_req').callsFake(function(apiCallDetails, ctx) {
                     console.error("Not implemented - api call:", apiCallDetails, ctx);
                 });
 
                 var authringPromise = { done: sinon.stub() };
-                sandbox.stub(authring, 'getContacts').returns(authringPromise);
-                sandbox.stub(authring, '_initKeyPair').returns(MegaPromise.resolve());
+                mStub(authring, 'getContacts').returns(authringPromise);
+                mStub(authring, '_initKeyPair').returns(MegaPromise.resolve());
 
                 var _initKeyringAndEd25519 = {
                     done: function(cb) {
@@ -333,7 +328,7 @@ describe("crypto unit test", function() {
                         return this;
                     }
                 };
-                sandbox.stub(authring, '_initKeyringAndEd25519').returns(_initKeyringAndEd25519);
+                mStub(authring, '_initKeyringAndEd25519').returns(_initKeyringAndEd25519);
 
                 var result = ns.getPubKey('you456789xw', 'Ed25519');
 
@@ -352,12 +347,12 @@ describe("crypto unit test", function() {
             });
 
             it("uncached Ed25519 key", function(done) {
-                sandbox.stub(window, 'u_authring', { Ed25519: {} });
-                sandbox.stub(window, 'pubEd25519', {});
+                mStub(window, 'u_authring', {Ed25519: {}});
+                mStub(window, 'pubEd25519', {});
 
-                sandbox.stub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
-                sandbox.stub(authring, 'computeFingerprint').returns('smudge');
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
+                mStub(authring, 'computeFingerprint').returns('smudge');
 
                 var result = ns.getPubKey('you456789xw', 'Ed25519');
 
@@ -376,13 +371,13 @@ describe("crypto unit test", function() {
             });
 
             it("uncached Ed25519 key, unseen", function(done) {
-                sandbox.stub(window, 'u_authring', { Ed25519: {} });
-                sandbox.stub(window, 'pubEd25519', {});
+                mStub(window, 'u_authring', {Ed25519: {}});
+                mStub(window, 'pubEd25519', {});
 
-                sandbox.stub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(null);
-                sandbox.stub(authring, 'computeFingerprint').returns('smudge');
-                sandbox.stub(authring, 'setContactAuthenticated');
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(ns, '_getPubKeyAuthentication').returns(null);
+                mStub(authring, 'computeFingerprint').returns('smudge');
+                mStub(authring, 'setContactAuthenticated');
 
                 var result = ns.getPubKey('you456789xw', 'Ed25519');
 
@@ -402,13 +397,13 @@ describe("crypto unit test", function() {
             });
 
             it("uncached Ed25519 key, bad fingerprint", function(done) {
-                sandbox.stub(window, 'u_authring', { Ed25519: {} });
-                sandbox.stub(window, 'pubEd25519', {});
+                mStub(window, 'u_authring', {Ed25519: {}});
+                mStub(window, 'pubEd25519', {});
 
-                sandbox.stub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(false);
-                sandbox.stub(authring, 'computeFingerprint').returns('smudge');
-                sandbox.stub(ns, '_showFingerprintMismatchException');
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(ns, '_getPubKeyAuthentication').returns(false);
+                mStub(authring, 'computeFingerprint').returns('smudge');
+                mStub(ns, '_showFingerprintMismatchException');
 
                 var result = ns.getPubKey('you456789xw', 'Ed25519');
 
@@ -434,20 +429,20 @@ describe("crypto unit test", function() {
 
             it("uncached Cu25519 key", function(done) {
 // dump('*** begin');
-                sandbox.stub(window, 'u_authring', { Cu25519: {} });
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(window, 'pubCu25519', {});
+                mStub(window, 'u_authring', {Cu25519: {}});
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(window, 'pubCu25519', {});
 
-                sandbox.stub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED);
-                sandbox.stub(mega.attr, 'get').returns('squiggle');
-                sandbox.stub(authring, 'computeFingerprint').returns('smudge');
-                sandbox.stub(ns, '_checkSignature').returns(origMegaPromise.resolve(true));
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED);
+                mStub(mega.attr, 'get').returns('squiggle');
+                mStub(authring, 'computeFingerprint').returns('smudge');
+                mStub(ns, '_checkSignature').returns(origMegaPromise.resolve(true));
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
                 var _getPubKey = ns.getPubKey;
                 var callCount = 0;
-                sandbox.stub(ns, 'getPubKey', function __getPubKey(userhandle, keyType, callback) {
+                mStub(ns, 'getPubKey').callsFake(function __getPubKey(userhandle, keyType, callback) {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
@@ -484,22 +479,22 @@ describe("crypto unit test", function() {
 
             it("uncached Cu25519 key, unseen", function(done) {
 
-                sandbox.stub(window, 'u_authring', { Cu25519: {} });
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(window, 'pubCu25519', {});
+                mStub(window, 'u_authring', {Cu25519: {}});
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(window, 'pubCu25519', {});
 
-                sandbox.stub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the Cu key'));
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED);
-                sandbox.stub(mega.attr, 'get').returns('squiggle');
-                sandbox.stub(authring, 'computeFingerprint').returns('smudge');
-                sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(ns, '_checkSignature').returns(origMegaPromise.resolve(true));
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the Cu key'));
+                mStub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED);
+                mStub(mega.attr, 'get').returns('squiggle');
+                mStub(authring, 'computeFingerprint').returns('smudge');
+                mStub(window, 'base64urldecode').callsFake(_echo);
+                mStub(window, 'assertUserHandle');
+                mStub(ns, '_checkSignature').returns(origMegaPromise.resolve(true));
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
                 var _getPubKey = ns.getPubKey;
                 var callCount = 0;
-                sandbox.stub(ns, 'getPubKey', function __getPubKey(userhandle, keyType, callback) {
+                mStub(ns, 'getPubKey').callsFake(function __getPubKey(userhandle, keyType, callback) {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
@@ -540,23 +535,23 @@ describe("crypto unit test", function() {
             });
 
             it("uncached Cu25519 key, new key", function(done) {
-                sandbox.stub(window, 'u_authring', { Cu25519: {} });
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(window, 'pubCu25519', {});
+                mStub(window, 'u_authring', {Cu25519: {}});
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(window, 'pubCu25519', {});
 
-                sandbox.stub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(false);
-                sandbox.stub(mega.attr, 'get').returns('squiggle');
-                sandbox.stub(authring, 'computeFingerprint').returns('smudge');
-                sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(ns, '_checkSignature').returns(origMegaPromise.resolve(true));
-                sandbox.stub(authring, 'setContactAuthenticated');
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(ns, '_getPubKeyAuthentication').returns(false);
+                mStub(mega.attr, 'get').returns('squiggle');
+                mStub(authring, 'computeFingerprint').returns('smudge');
+                mStub(window, 'base64urldecode').callsFake(_echo);
+                mStub(window, 'assertUserHandle');
+                mStub(ns, '_checkSignature').returns(origMegaPromise.resolve(true));
+                mStub(authring, 'setContactAuthenticated');
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
                 var _getPubKey = ns.getPubKey;
                 var callCount = 0;
-                sandbox.stub(ns, 'getPubKey', function __getPubKey(userhandle, keyType, callback) {
+                mStub(ns, 'getPubKey').callsFake(function __getPubKey(userhandle, keyType, callback) {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
@@ -589,131 +584,24 @@ describe("crypto unit test", function() {
                     });
             });
 
-            /*it("uncached Cu25519 key, new key, no signature", function(done) {
-
-                // TODO: this test is failing, because of the bad fingerprint is getting the masterPromise rejected.
-                // To be fixed by Guy
-                sandbox.stub(window, 'u_authring',
-                    { Cu25519: { 'you456789xw': 'different stuff' } });
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(window, 'pubCu25519', {});
-
-
-                sandbox.stub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
-                sandbox.stub(authring, 'getContactAuthenticated').returns({ fingerprint: 'bad smudge' });
-                sandbox.stub(ns, '_showFingerprintMismatchException');
-                sandbox.stub(mega.attr, 'get').returns('');
-                sandbox.stub(authring, 'computeFingerprint').returns('smudge');
-                sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(ns, '_checkSignature').returns(null);
-
-                // This is to pass through the first call directly, then stub on subsequent ones.
-                var _getPubKey = ns.getPubKey;
-                var callCount = 0;
-                sandbox.stub(ns, 'getPubKey', function __getPubKey(userhandle, keyType, callback) {
-                    callCount++;
-                    if (callCount === 1) {
-                        return _getPubKey(userhandle, keyType, callback);
-                    }
-                    else {
-                        return 'Ed placebo';
-                    }
-                });
-
-                var result = ns.getPubKey('you456789xw', 'Cu25519');
-                result
-                    .done(function() {
-                        assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
-                        assert.strictEqual(ns.getPubKey.callCount, 2);
-                        assert.strictEqual(mega.attr.get.callCount, 1);
-
-                        assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
-                        assert.strictEqual(authring.computeFingerprint.callCount, 1);
-
-                        assert.strictEqual(base64urldecode.callCount, 1);
-                        assert.strictEqual(ns._checkSignature.callCount, 1);
-                        assert.strictEqual(authring.getContactAuthenticated.callCount, 1);
-                        assert.strictEqual(ns._showFingerprintMismatchException.callCount, 1);
-                        assert.strictEqual(pubCu25519['you456789xw'], undefined);
-
-                        done();
-                    })
-                    .fail(function() {
-                        assert.fail('failed to retrv. uncached, new Cu key, no sig.');
-                    });
-            });*/
-
-            /*it("uncached Cu25519 key, bad signature", function(done) {
-                // TODO: this test is failing, because of the bad fingerprint is getting the masterPromise rejected.
-                // To be fixed by Guy
-                sandbox.stub(window, 'u_authring', { Cu25519: {} });
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(window, 'pubCu25519', {});
-
-                sandbox.stub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(false);
-                sandbox.stub(mega.attr, 'get').returns('squiggle');
-                sandbox.stub(authring, 'computeFingerprint').returns('smudge');
-                sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(ns, '_checkSignature').returns(false);
-                sandbox.stub(ns, '_showKeySignatureFailureException');
-
-                // This is to pass through the first call directly, then stub on subsequent ones.
-                var _getPubKey = ns.getPubKey;
-                var callCount = 0;
-                sandbox.stub(ns, 'getPubKey', function __getPubKey(userhandle, keyType, callback) {
-                    callCount++;
-                    if (callCount === 1) {
-                        return _getPubKey(userhandle, keyType, callback);
-                    }
-                    else {
-                        return 'Ed placebo';
-                    }
-                });
-
-                var result = ns.getPubKey('you456789xw', 'Cu25519');
-                result
-                    .done(function() {
-                        assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
-                        assert.strictEqual(ns.getPubKey.callCount, 2);
-                        assert.strictEqual(mega.attr.get.callCount, 1);
-                        assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
-                        assert.strictEqual(authring.computeFingerprint.callCount, 1);
-
-                        assert.strictEqual(base64urldecode.callCount, 1);
-                        assert.strictEqual(ns._checkSignature.callCount, 1);
-                        assert.strictEqual(ns._showKeySignatureFailureException.callCount, 1);
-                        assert.strictEqual(pubCu25519['you456789xw'], undefined);
-                        assert.deepEqual(pubEd25519, {'you456789xw': 'the key'});
-
-                        done();
-                    })
-                    .fail(function() {
-                        assert.fail('failed to retrv. uncached, Cu key, bad sig.');
-                    });
-            });*/
-
             it("uncached Cu25519 key, seen, no signature", function(done) {
-                sandbox.stub(window, 'u_authring', { Cu25519: {} });
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(window, 'pubCu25519', {});
+                mStub(window, 'u_authring', {Cu25519: {}});
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(window, 'pubCu25519', {});
 
-                sandbox.stub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
-                sandbox.stub(authring, 'getContactAuthenticated').returns({ fingerprint: 'smudge' });
-                sandbox.stub(mega.attr, 'get').returns('');
-                sandbox.stub(authring, 'computeFingerprint').returns('smudge');
-                sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(ns, '_checkSignature').returns(origMegaPromise.resolve(null));
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
+                mStub(authring, 'getContactAuthenticated').returns({fingerprint: 'smudge'});
+                mStub(mega.attr, 'get').returns('');
+                mStub(authring, 'computeFingerprint').returns('smudge');
+                mStub(window, 'base64urldecode').callsFake(_echo);
+                mStub(window, 'assertUserHandle');
+                mStub(ns, '_checkSignature').returns(origMegaPromise.resolve(null));
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
                 var _getPubKey = ns.getPubKey;
                 var callCount = 0;
-                sandbox.stub(ns, 'getPubKey', function __getPubKey(userhandle, keyType, callback) {
+                mStub(ns, 'getPubKey').callsFake(function __getPubKey(userhandle, keyType, callback) {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
@@ -745,24 +633,24 @@ describe("crypto unit test", function() {
             });
 
             it("uncached Cu25519 key, unseen, no signature", function(done) {
-                sandbox.stub(window, 'u_authring', { Cu25519: {} });
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(window, 'pubCu25519', {});
+                mStub(window, 'u_authring', {Cu25519: {}});
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(window, 'pubCu25519', {});
 
-                sandbox.stub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(null);
-                sandbox.stub(authring, 'getContactAuthenticated').returns(false);
-                sandbox.stub(mega.attr, 'get').returns('');
-                sandbox.stub(authring, 'computeFingerprint').returns('smudge');
-                sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(ns, '_checkSignature').returns(origMegaPromise.resolve(null));
-                sandbox.stub(authring, 'setContactAuthenticated');
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(ns, '_getPubKeyAuthentication').returns(null);
+                mStub(authring, 'getContactAuthenticated').returns(false);
+                mStub(mega.attr, 'get').returns('');
+                mStub(authring, 'computeFingerprint').returns('smudge');
+                mStub(window, 'base64urldecode').callsFake(_echo);
+                mStub(window, 'assertUserHandle');
+                mStub(ns, '_checkSignature').returns(origMegaPromise.resolve(null));
+                mStub(authring, 'setContactAuthenticated');
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
                 var _getPubKey = ns.getPubKey;
                 var callCount = 0;
-                sandbox.stub(ns, 'getPubKey', function __getPubKey(userhandle, keyType, callback) {
+                mStub(ns, 'getPubKey').callsFake(function __getPubKey(userhandle, keyType, callback) {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
@@ -798,23 +686,23 @@ describe("crypto unit test", function() {
             });
 
             it("cached Cu25519 key, seen, new signature", function(done) {
-                sandbox.stub(window, 'u_authring', { Cu25519: {} });
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(window, 'pubCu25519', {});
+                mStub(window, 'u_authring', {Cu25519: {}});
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(window, 'pubCu25519', {});
 
-                sandbox.stub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
-                sandbox.stub(mega.attr, 'get').returns('squiggle');
-                sandbox.stub(authring, 'computeFingerprint').returns('smudge');
-                sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(ns, '_checkSignature').returns(origMegaPromise.resolve(true));
-                sandbox.stub(authring, 'setContactAuthenticated');
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
+                mStub(mega.attr, 'get').returns('squiggle');
+                mStub(authring, 'computeFingerprint').returns('smudge');
+                mStub(window, 'base64urldecode').callsFake(_echo);
+                mStub(window, 'assertUserHandle');
+                mStub(ns, '_checkSignature').returns(origMegaPromise.resolve(true));
+                mStub(authring, 'setContactAuthenticated');
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
                 var _getPubKey = ns.getPubKey;
                 var callCount = 0;
-                sandbox.stub(ns, 'getPubKey', function __getPubKey(userhandle, keyType, callback) {
+                mStub(ns, 'getPubKey').callsFake(function __getPubKey(userhandle, keyType, callback) {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
@@ -851,7 +739,7 @@ describe("crypto unit test", function() {
 
         describe("convenience wrappers", function() {
             it('getPubRSA()', function() {
-                sandbox.stub(ns, 'getPubKey').returns('a promise');
+                mStub(ns, 'getPubKey').returns('a promise');
                 var result = ns.getPubRSA('you456789xw');
                 assert.strictEqual(result, 'a promise');
                 assert.strictEqual(ns.getPubKey.callCount, 1);
@@ -860,7 +748,7 @@ describe("crypto unit test", function() {
             });
 
             it('getPubEd25519()', function() {
-                sandbox.stub(ns, 'getPubKey').returns('a promise');
+                mStub(ns, 'getPubKey').returns('a promise');
                 var result = ns.getPubEd25519('you456789xw');
                 assert.strictEqual(result, 'a promise');
                 assert.strictEqual(ns.getPubKey.callCount, 1);
@@ -869,7 +757,7 @@ describe("crypto unit test", function() {
             });
 
             it('getPubCu25519()', function() {
-                sandbox.stub(ns, 'getPubKey').returns('a promise');
+                mStub(ns, 'getPubKey').returns('a promise');
                 var result = ns.getPubCu25519('you456789xw');
                 assert.strictEqual(result, 'a promise');
                 assert.strictEqual(ns.getPubKey.callCount, 1);
@@ -880,10 +768,10 @@ describe("crypto unit test", function() {
 
         describe('getFingerprintEd25519', function() {
             it("cached key", function() {
-                sandbox.stub(ns._logger, '_log');
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(authring, 'computeFingerprint').returns('the fingerprint');
-                var masterPromise = _stubMegaPromise(sinon, sandbox);
+                mStub(ns._logger, '_log');
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(authring, 'computeFingerprint').returns('the fingerprint');
+                var masterPromise = _stubMegaPromise(sinon, true);
 
                 var result = ns.getFingerprintEd25519('you456789xw');
                 assert.strictEqual(result, masterPromise);
@@ -895,10 +783,10 @@ describe("crypto unit test", function() {
             });
 
             it("cached key, hex", function() {
-                sandbox.stub(ns._logger, '_log');
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(authring, 'computeFingerprint').returns('the hexprint');
-                var masterPromise = _stubMegaPromise(sinon, sandbox);
+                mStub(ns._logger, '_log');
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(authring, 'computeFingerprint').returns('the hexprint');
+                var masterPromise = _stubMegaPromise(sinon, true);
 
                 var result = ns.getFingerprintEd25519('you456789xw', 'hex');
                 assert.strictEqual(result, masterPromise);
@@ -910,10 +798,10 @@ describe("crypto unit test", function() {
             });
 
             it("cached key, binary string", function() {
-                sandbox.stub(ns._logger, '_log');
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                sandbox.stub(authring, 'computeFingerprint').returns('\u0000\u0001\u0002\u0003');
-                var masterPromise = _stubMegaPromise(sinon, sandbox);
+                mStub(ns._logger, '_log');
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(authring, 'computeFingerprint').returns('\u0000\u0001\u0002\u0003');
+                var masterPromise = _stubMegaPromise(sinon, true);
 
                 var result = ns.getFingerprintEd25519('you456789xw', 'string');
                 assert.strictEqual(result, masterPromise);
@@ -925,12 +813,12 @@ describe("crypto unit test", function() {
             });
 
             it("non-cached", function() {
-                sandbox.stub(ns._logger, '_log');
-                sandbox.stub(window, 'pubEd25519', {});
-                sandbox.stub(authring, 'computeFingerprint').returns('the fingerprint');
-                var masterPromise = _stubMegaPromise(sinon, sandbox);
+                mStub(ns._logger, '_log');
+                mStub(window, 'pubEd25519', {});
+                mStub(authring, 'computeFingerprint').returns('the fingerprint');
+                var masterPromise = _stubMegaPromise(sinon, true);
                 var keyPromise = _stubMegaPromise(sinon);
-                sandbox.stub(crypt, 'getPubEd25519').returns(keyPromise);
+                mStub(crypt, 'getPubEd25519').returns(keyPromise);
 
                 var result = ns.getFingerprintEd25519('you456789xw');
                 assert.strictEqual(result, masterPromise);
@@ -940,7 +828,7 @@ describe("crypto unit test", function() {
 
                 var fingerprintCallback = keyPromise.done.args[0][0];
                 // Now stub getFingerprintEd25519(), as we're calling it recursively.
-                sandbox.stub(ns, 'getFingerprintEd25519').returns('recursion');
+                mStub(ns, 'getFingerprintEd25519').returns('recursion');
                 fingerprintCallback();
                 assert.strictEqual(ns.getFingerprintEd25519.callCount, 1);
                 assert.deepEqual(ns.getFingerprintEd25519.args[0], ['you456789xw', undefined]);
@@ -949,9 +837,9 @@ describe("crypto unit test", function() {
             });
 
             it("cached, hex", function() {
-                sandbox.stub(ns._logger, '_log');
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
-                sandbox.stub(authring, 'computeFingerprint').returns('21fe31dfa154a261626bf854046fd2271b7bed4b');
+                mStub(ns._logger, '_log');
+                mStub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
+                mStub(authring, 'computeFingerprint').returns('21fe31dfa154a261626bf854046fd2271b7bed4b');
                 ns.getFingerprintEd25519('you456789xw', 'hex');
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.args[0][2], 'hex');
@@ -961,9 +849,9 @@ describe("crypto unit test", function() {
             });
 
             it("cached, string", function() {
-                sandbox.stub(ns._logger, '_log');
-                sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
-                sandbox.stub(authring, 'computeFingerprint').returns(ED25519_FINGERPRINT);
+                mStub(ns._logger, '_log');
+                mStub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
+                mStub(authring, 'computeFingerprint').returns(ED25519_FINGERPRINT);
                 ns.getFingerprintEd25519('you456789xw', 'string');
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.args[0][2], 'string');

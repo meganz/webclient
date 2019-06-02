@@ -1,11 +1,5 @@
 describe("Fakebroadcaster Unit Test", function() {
-
-
     localStorage.fakeBroadcasterWatchdogDebug = 1;
-
-
-    var sandbox = sinon.sandbox.create();
-
 
     var replyToQuery = function(watchdog, token, query, value) {
         watchdog.notify('Q!Rep!y', {
@@ -21,14 +15,14 @@ describe("Fakebroadcaster Unit Test", function() {
 
     beforeEach(function(done) {
         ph = new PromiseHelpers();
-        sandbox.stub(window, 'u_handle', 'Rmen0mUCyuk');
+        mStub(window, 'u_handle', 'Rmen0mUCyuk');
         done();
     });
 
 
     afterEach(function(done) {
         ph.destroy();
-        sandbox.restore();
+        mStub.restore();
         done();
     });
 

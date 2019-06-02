@@ -3026,6 +3026,11 @@ else if (!browserUpdate) {
     window.onload = function() {
         'use strict';
 
+        window.onload = null;
+        if (is_karma) {
+            return;
+        }
+
         pageLoadTime = Date.now();
         mBroadcaster.once('startMega', function() {
             var now = Date.now();
@@ -3356,7 +3361,7 @@ else if (!browserUpdate) {
         };
 
         // No session handling needed for
-        if (is_drop) {
+        if (is_drop || is_karma) {
             return;
         }
 

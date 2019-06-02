@@ -6,14 +6,11 @@
 describe("chat.rtf_filter unit test", function() {
     "use strict";
 
-    var assert = chai.assert;
-
-    var sandbox;
     var rtf;
     var megaChat;
+    var assert = chai.assert;
 
     beforeEach(function() {
-        sandbox = sinon.sandbox.create();
         var EMOJI_DATASET_VERSION = 2;
         megaChat = {
             'getEmojiDataSet': function(name) {
@@ -73,12 +70,12 @@ describe("chat.rtf_filter unit test", function() {
     });
 
     afterEach(function() {
-        sandbox.restore();
+        mStub.restore();
         rtf = null;
     });
 
     var expected = function(expected, got, msg) {
-        if (expected != got) {
+        if (expected !== got) {
             var errorMsg = "Expected: " + expected + "\nGot: \n" + got + "\nError message: " + msg;
             assert.fail(expected, got, errorMsg);
         }

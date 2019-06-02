@@ -4,15 +4,6 @@
 describe("Initialization Unit Tests", function() {
     "use strict";
 
-    // Create/restore Sinon stub/spy/mock sandboxes.
-    var sandbox = null;
-
-    beforeEach(function() {
-        sandbox = sinon.sandbox.create();
-    });
-    afterEach(function() {
-        sandbox.restore();
-    });
     var assert = chai.assert;
 
     it("did not called jsl_start()", function() {
@@ -30,7 +21,7 @@ describe("Initialization Unit Tests", function() {
         // jsl_start -> initall -> boot_done -> boot_auth -> startMega
         // So, lets invoke mBroadcaster's startMega to initialize any required stuff
 
-        _showDebug(sandbox, ['console.log', 'console.error']);
+        _showDebug(['api_req', 'console.error', 'console.info']);
 
         // turn the `ua` (userAgent) string into an object which holds the browser details
         try {
@@ -39,13 +30,51 @@ describe("Initialization Unit Tests", function() {
         }
         catch (e) {}
 
+        var len = function(o) {
+            return Object.keys(o || {}).length;
+        };
+        var blen = function(p) {
+            return len(mBroadcaster._topics[p]);
+        };
+
+        // We must have boot_done listeners at least for:
+        // api_reset(), watchdog.setup(), eventsCollect(), MegaData(), polyfills, and attrs.js
+        assert(blen('boot_done') > 5, 'Unexpected boot_done listeners...');
+
+        // We must have a bunch of listeners waiting for startMega() to get invoked...
+        assert(blen('startMega'), 'Should listen to startMega()...');
+        assert(blen('startMega:desktop'), 'Should listen to startMega:desktop...');
+
+        // Check for some others...
+        assert(blen('closedialog'), 'safeShowDialog() should listen to closeDialog()');
+        assert(blen('crossTab:master'), 'Should listen to cross-tab master ownership');
+        assert(blen('mediainfo:collect'), 'Should listen to collect mediainfo metadata');
+
+        // Initialize core components
         mBroadcaster.sendMessage('boot_done');
+
+        var rejectedPromise = MegaPromise.reject(EBLOCKED);
+        M.$reqStub = sinon.stub(M, 'req').callsFake(function(r) {
+            console.warn('Prevented call to M.req(), the network should not be reached.' +
+                '\nREQUEST: ' + JSON.stringify(r) +
+                '\nSTACKTRACE: \n' + mStub.stack() + '\n\n');
+            return rejectedPromise;
+        });
+
         mBroadcaster.sendMessage('startMega');
         mBroadcaster.sendMessage('startMega:desktop');
 
-        _hideDebug();
-        // expect(console.log.callCount).to.be.at.least(1);
         expect(console.error.callCount).to.eql(0);
+        _hideDebug();
+
+        // Test stubbing and restoring.
+        var warn = sinon.stub(console, 'warn');
+        M.req('doh');
+        expect(console.warn.callCount).to.eql(1);
+        M.reqA(['hah']);
+        assert.ok(M.req.calledWith('hah'));
+        expect(console.warn.callCount).to.eql(2);
+        warn.restore();
 
         var iDBState = 'OK';
         try {

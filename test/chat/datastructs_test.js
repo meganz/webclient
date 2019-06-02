@@ -15,16 +15,6 @@ describe("Mega Data Structs Test", function() {
         return promise;
     };
 
-    beforeEach(function(done) {
-        done();
-    });
-
-
-    afterEach(function(done) {
-        done();
-    });
-
-
     it("MegaDataObject", function(done) {
         var obj = new MegaDataObject(
             {

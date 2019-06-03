@@ -2601,6 +2601,11 @@ function closeDialog(ev) {
     delete $.mcImport;
     treesearch = false;
 
+    if ($.registerDialog) {
+        // if the terms dialog was closed from the register dialog
+        $.dialog = $.registerDialog;
+    }
+
     if ($.propertiesDialog) {
         // if the dialog was close from the properties dialog
         $.dialog = $.propertiesDialog;

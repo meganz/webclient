@@ -36,8 +36,6 @@ module.exports = function(config) {
         'js/vendor/nacl-fast.js',
         'js/vendor/dexie.js',
         // For notifications.
-        'js/vendor/ion.sound.js',
-        'js/vendor/favico.js',
         'js/vendor/notification.js',
         'js/vendor/moment.js',
 
@@ -100,7 +98,6 @@ module.exports = function(config) {
         'js/crypto.js',
         'js/megaPromise.js',
         'js/idbkvstorage.js',
-        'js/vendor/dexie.js',
         'sjcl.js',
         'js/mDB.js',
         'js/sharedlocalkvstorage.js',
@@ -110,7 +107,6 @@ module.exports = function(config) {
         'js/authring.js',
         'js/mouse.js',
         'js/filedrag.js',
-        'js/mDB.js',
         'js/thumbnail.js',
         'js/vendor/exif.js',
         'js/vendor/smartcrop.js',
@@ -128,8 +124,6 @@ module.exports = function(config) {
         'js/cms.js',
         'js/appActivityHandler.js',
         'js/keepAlive.js',
-        // Google Import Contacts
-        'js/gContacts.js',
 
         // Transfers
         'js/transfers/meths/filesystem.js',
@@ -142,6 +136,7 @@ module.exports = function(config) {
         'js/transfers/reader.js',
         'js/transfers/upload2.js',
         'js/transfers/zip64.js',
+        'js/transfers/meths.js',
         {pattern: 'aesasm.js', included: false},
         {pattern: 'encrypter.js', included: false},
 
@@ -161,9 +156,6 @@ module.exports = function(config) {
         'js/chat/ui/incomingCallDialog.js',
         'js/chat/callNotificationsEngine.js',
         'js/utils/emoji.js',
-
-        // Speedmeter
-        'js/network-testing.js',
 
         {pattern: 'test/chat/transcripts/*.json', included: false},
 
@@ -221,6 +213,7 @@ module.exports = function(config) {
 
     // JUnit reporter configuration.
     junitReporter: {
+        outputDir: 'coverage/',
         outputFile: 'test-results.xml'
     },
 

@@ -3,8 +3,6 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
     var shouldDropDatabases = [];
 
-    var sandbox = sinon.sandbox.create();
-
 
     var dropOnFinished = function(kvStorage) {
         shouldDropDatabases.push(kvStorage);
@@ -29,9 +27,8 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         shouldDropDatabases = [];
 
-        sandbox.stub(window, 'u_handle', 'Rmen0mUCyuk');
-
-        sandbox.stub(window, 'u_k_aes', new sjcl.cipher.aes([-1644492891,-652192788,-1110521596,-1637366567]));
+        mStub(window, 'u_handle', 'Rmen0mUCyuk');
+        mStub(window, 'u_k_aes', new sjcl.cipher.aes([-1644492891, -652192788, -1110521596, -1637366567]));
 
         done();
     });
@@ -67,8 +64,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
             }
         });
         MegaPromise.allDone(waiting).always(function() {
-            sandbox.restore();
-
+            mStub.restore();
             done();
         });
 
@@ -231,7 +227,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
                                     .always(function() {
                                         dexieStorage.destroy().always(res);
                                     });
-                            }, 300);
+                            });
                         });
                 });
 

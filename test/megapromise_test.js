@@ -1,13 +1,4 @@
 describe("MegaPromise Unit Test", function() {
-    beforeEach(function(done) {
-        done();
-    });
-
-
-    afterEach(function(done) {
-        done();
-    });
-
     var assert = chai.assert;
     var fail = function(message) {
         assert(false, message);
@@ -328,7 +319,7 @@ describe("MegaPromise Unit Test", function() {
             setTimeout(function() {
                 result.push('p2-resolved');
                 p.resolve(v<<1);
-            }, 280);
+            }, 80);
             return p;
         };
         var track = function(tag) {
@@ -387,9 +378,9 @@ describe("MegaPromise Unit Test", function() {
                 });
         };
 
-        var minOffset = 100;
+        var minOffset = 10;
         var dummyTimedPromise = function(r, type) {
-            minOffset += rand(1, 100);
+            minOffset += Math.random() * 10 | 0;
             var p = (new MegaPromise());
             setTimeout(function() {
                 p[type](r);
@@ -426,9 +417,9 @@ describe("MegaPromise Unit Test", function() {
                 });
         };
 
-        var minOffset = 100;
+        var minOffset = 10;
         var dummyTimedPromise = function(r, type) {
-            minOffset += rand(1, 100);
+            minOffset += Math.random() * 10 | 0;
             var p = (new MegaPromise());
             setTimeout(function() {
                 p[type](r);
@@ -491,10 +482,10 @@ describe("MegaPromise Unit Test", function() {
             }
         };
 
-        queue.queue(res("p1", 100));
-        queue.queue(res("p2", 150));
-        queue.queue(rej("p3", 300));
-        queue.queue(res("p4", 200));
+        queue.queue(res("p1", 10));
+        queue.queue(res("p2", 15));
+        queue.queue(rej("p3", 30));
+        queue.queue(res("p4", 20));
         queue.tick();
 
         var expected = [
@@ -514,6 +505,6 @@ describe("MegaPromise Unit Test", function() {
                 JSON.stringify(callstack, null, '\t')
             );
             done();
-        }, 800);
+        }, 80);
     })
 });

@@ -10,9 +10,6 @@ describe("paycrypt unit test", function() {
 
     var assert = chai.assert;
 
-    // Create/restore Sinon stub/spy/mock sandboxes.
-    var sandbox = null;
-
     // Some test data.
     var PUBKEY = [
         base64urldecode('plp2MuzOXah-7Iaq4-IxEX4YQn86FObg8nAKH9aPCch7vxeO29GgA'
@@ -61,14 +58,8 @@ describe("paycrypt unit test", function() {
         + 'AlUK6pA+9vILbtbzCopWGRsjNqONr/zZUuisBTTCU6QjjJPEGAdDQVB0qQP9a47KjoC'
         + '4FOuTYKGvOiGTyuv3+gt+q2id3';
 
-    var _echo = function(x) { return x; };
-
-    beforeEach(function() {
-        sandbox = sinon.sandbox.create();
-    });
-
     afterEach(function() {
-        sandbox.restore();
+        mStub.restore();
     });
 
     describe('user attributes', function() {
@@ -85,8 +76,8 @@ describe("paycrypt unit test", function() {
 
         describe('_encryptPayload()', function() {
             it("encryption keys", function() {
-                sandbox.stub(asmCrypto.HMAC_SHA256, 'base64').returns(HMAC);
-                sandbox.stub(asmCrypto.AES_CBC, 'encrypt').returns(asmCrypto.string_to_bytes(atob(CIPHER_BYTES)));
+                mStub(asmCrypto.HMAC_SHA256, 'base64').returns(HMAC);
+                mStub(asmCrypto.AES_CBC, 'encrypt').returns(asmCrypto.string_to_bytes(atob(CIPHER_BYTES)));
                 var result = ns._encryptPayload(CONTENT, KEYS_DUMMY);
                 assert.strictEqual(asmCrypto.AES_CBC.encrypt.callCount, 1);
                 assert.strictEqual(asmCrypto.HMAC_SHA256.base64.callCount, 1);
@@ -96,14 +87,18 @@ describe("paycrypt unit test", function() {
 
         describe('_rsaEncryptKeys()', function() {
             it("a movie quote", function() {
-                sandbox.stub(asmCrypto.RSA_RAW, 'encrypt').returns(asmCrypto.string_to_bytes(atob(GORT_SAYS).substring(2)));
+                mStub(asmCrypto.RSA_RAW, 'encrypt')
+                    .returns(asmCrypto.string_to_bytes(atob(GORT_SAYS).substring(2)));
+
                 var result = ns._rsaEncryptKeys('Klaatu barada nikto.', PUBKEY);
                 assert.strictEqual(asmCrypto.RSA_RAW.encrypt.callCount, 1);
                 assert.strictEqual(btoa(result), GORT_SAYS);
             });
 
             it("encryption keys", function() {
-                sandbox.stub(asmCrypto.RSA_RAW, 'encrypt').returns(asmCrypto.string_to_bytes(atob(CRYPT_KEYS_BYTES).substring(2)));
+                mStub(asmCrypto.RSA_RAW, 'encrypt')
+                    .returns(asmCrypto.string_to_bytes(atob(CRYPT_KEYS_BYTES).substring(2)));
+
                 var result = ns._rsaEncryptKeys(KEYS_DUMMY.keys, PUBKEY);
                 assert.strictEqual(asmCrypto.RSA_RAW.encrypt.callCount, 1);
                 assert.strictEqual(btoa(result), CRYPT_KEYS_BYTES);
@@ -112,9 +107,9 @@ describe("paycrypt unit test", function() {
 
         describe('hybridEncrypt()', function() {
             it("a movie quote", function() {
-                sandbox.stub(ns, '_generateKeys').returns(KEYS_DUMMY);
-                sandbox.stub(ns, '_encryptPayload').returns('foo');
-                sandbox.stub(ns, '_rsaEncryptKeys').returns('bar');
+                mStub(ns, '_generateKeys').returns(KEYS_DUMMY);
+                mStub(ns, '_encryptPayload').returns('foo');
+                mStub(ns, '_rsaEncryptKeys').returns('bar');
                 var result = ns.hybridEncrypt('Klaatu barada nikto.', PUBKEY);
                 assert.strictEqual(ns._generateKeys.callCount, 1);
                 assert.strictEqual(ns._encryptPayload.callCount, 1);
@@ -123,9 +118,9 @@ describe("paycrypt unit test", function() {
             });
 
             it("encryption keys", function() {
-                sandbox.stub(ns, '_generateKeys').returns(KEYS_DUMMY);
-                sandbox.stub(ns, '_encryptPayload').returns(atob(CRYPT_PAYLOAD));
-                sandbox.stub(ns, '_rsaEncryptKeys').returns(atob(CRYPT_KEYS_BYTES));
+                mStub(ns, '_generateKeys').returns(KEYS_DUMMY);
+                mStub(ns, '_encryptPayload').returns(atob(CRYPT_PAYLOAD));
+                mStub(ns, '_rsaEncryptKeys').returns(atob(CRYPT_KEYS_BYTES));
                 var result = ns.hybridEncrypt(CONTENT, PUBKEY);
                 assert.strictEqual(ns._generateKeys.callCount, 1);
                 assert.strictEqual(ns._encryptPayload.callCount, 1);

@@ -5,32 +5,14 @@
 
 describe("CallNotificationsEngine tests", function () {
     "use strict";
-
-    var assert = chai.assert;
-
-    // Create/restore Sinon stub/spy/mock sandboxes.
-    var sandbox = null;
     var fakeChatRoom = null;
     var clock;
-
     var now = 1;
 
     beforeEach(function () {
         clock = sinon.useFakeTimers("Date", "setTimeout", "clearTimeout");
-        sandbox = sinon.sandbox.create();
-
-
-
-        var fakeChatRoomObj = {};
-
-        if (typeof(window.ChatRoom) === 'undefined') {
-            window.ChatRoom = fakeChatRoomObj;
-        }
-        else {
-            sandbox.stub(window, 'ChatRoom', fakeChatRoomObj);
-        }
-
-        sandbox.stub(Date, 'now', function() {
+        mStub(window, 'ChatRoom', {});
+        mStub(Date, 'now').callsFake(function() {
             return now * 1000;
         });
 
@@ -42,7 +24,7 @@ describe("CallNotificationsEngine tests", function () {
 
     afterEach(function () {
         clock.restore();
-        sandbox.restore();
+        mStub.restore();
     });
 
 

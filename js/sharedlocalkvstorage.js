@@ -560,7 +560,7 @@ SharedLocalKVStorage.Utils.DexieStorage = function(name, manualFlush, wdID) {
 SharedLocalKVStorage.Utils.DexieStorage._requiresDbReady = function SLKVDBConnRequired(fn) {
     return function __requiresDBConnWrapper() {
         var self = this;
-        var args = arguments;
+        var args = toArray.apply(null, arguments);
         var promise = new MegaPromise();
 
         if (!u_handle) {
@@ -711,11 +711,7 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype._queuedExecution = function(cb
         self._execQueue = MegaPromise.QueuedPromiseCallbacks();
     }
 
-    var arr = [self];
-    args.forEach(function(v) {
-        arr.push(v);
-    });
-
+    var arr = [self].concat(args);
     var resultPromise = self._execQueue.queue(cb.bind.apply(cb, arr), fnName);
     self._execQueue.tick();
     return resultPromise;
@@ -1106,7 +1102,7 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.close = function __SLKVClose()
     .forEach(function(methodName) {
         var origFunc = SharedLocalKVStorage.Utils.DexieStorage.prototype[methodName];
         SharedLocalKVStorage.Utils.DexieStorage.prototype[methodName] = function() {
-            return this._queuedExecution(origFunc, Array.prototype.slice.call(arguments), methodName);
+            return this._queuedExecution(origFunc, toArray.apply(null, arguments), methodName);
         };
     });
 /**

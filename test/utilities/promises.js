@@ -8,19 +8,17 @@ var internalAssert = function (evaled, msg) {
 var PromiseHelpers = function() {
     this.promiseCount = 0;
     this._testIsWaitingForPromises = [];
-    this.sandbox = sinon.sandbox.create();
-    this.sandbox.stub(MegaPromise, 'debugPreStack', true);
+    mStub(MegaPromise, 'debugPreStack', true);
     if (typeof window.promisesDebug === 'undefined') {
         window.promisesDebug = false;
     }
-    this.sandbox.stub(window, 'promisesDebug', true);
+    mStub(window, 'promisesDebug', true);
 };
-
 
 PromiseHelpers.prototype.destroy = function() {
     this._testIsWaitingForPromises = [];
     this.promiseCount = 0;
-    this.sandbox.restore();
+    mStub.restore();
 };
 
 PromiseHelpers.prototype.queueTestPromise = function(promise) {

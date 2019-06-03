@@ -5,20 +5,11 @@
 
 describe("stringcrypt unit test", function() {
     "use strict";
-
     var assert = chai.assert;
-
     var ns = stringcrypt;
 
-    // Create/restore Sinon stub/spy/mock sandboxes.
-    var sandbox = null;
-
-    beforeEach(function() {
-        sandbox = sinon.sandbox.create();
-    });
-
     afterEach(function() {
-        sandbox.restore();
+        mStub.restore();
     });
 
     describe('string en-/decryption', function() {

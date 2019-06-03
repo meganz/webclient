@@ -9,14 +9,8 @@ describe("chat.emoticon_shortcuts unit test", function() {
 
     var assert = chai.assert;
 
-    var sandbox;
-
-    beforeEach(function() {
-        sandbox = sinon.sandbox.create();
-    });
-
     afterEach(function() {
-        sandbox.restore();
+        mStub.restore();
     });
 
     var expected = function(expected, got, msg) {
@@ -50,7 +44,7 @@ describe("chat.emoticon_shortcuts unit test", function() {
         })
 
     });
-    
+
     it("testing proper replacement of shortcuts to emoticons", function() {
 
         var fixture = [

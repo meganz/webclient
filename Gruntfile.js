@@ -420,10 +420,14 @@ module.exports = function(grunt) {
 
 
     // Default task(s).
+    var tasks = ['concat', 'htmljson', 'secureboot'];
+    if (useHtmlMin) {
+        tasks.unshift('htmlmin');
+    }
     grunt.registerTask('secureboot', function() {
         console.log("Write secureboot.prod.js");
         Secureboot.rewrite("secureboot.prod.js");
     });
-    grunt.registerTask('default', ['htmlmin', 'concat', 'htmljson', 'secureboot']);
-    grunt.registerTask('prod', ['htmlmin', 'concat', 'htmljson', 'secureboot']); // <- remove me if unused
+    grunt.registerTask('default', tasks);
+    grunt.registerTask('prod', tasks); // <- remove me if unused
 };

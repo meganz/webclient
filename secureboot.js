@@ -2865,8 +2865,8 @@ else if (!browserUpdate) {
         }
     }
 
-    // Set XHR timeout to 15 seconds for regular static servers and 30 seconds for the EU static servers
-    var xhr_timeout = (staticpath === defaultStaticPath) ? 30000 : 15000;
+    // Set no timeout, let the lower layers handle it
+    var xhr_timeout = 0;
     var urlErrors = {};
 
     /**

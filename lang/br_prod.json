@@ -1242,7 +1242,6 @@
     "8803": "Aceito o servi\u00e7o de procedimento na Nova Zel\u00e2ndia ou na jurisdi\u00e7\u00e3o onde o meu endere\u00e7o desta contra-notifica\u00e7\u00e3o est\u00e1 localizado, a partir da pessoa que forneceu \u00e0 MEGA o aviso de retirada de direitos de autor original ou a um agente de tal pessoa.",
     "8804": "Eu tenho cren\u00e7a em boa f\u00e9 que o material foi removido ou desativado como resultado de um engano ou identifica\u00e7\u00e3o errada do material a ser removido ou desativado.",
     "8806": "Diagn\u00f3stico de rede",
-    "8807": "Houve uma mensagem de erro ao falar com o servidor API. Por favor, verifique se este \u00e9 um link v\u00e1lido.",
     "8809": "Por favor fornecer o coment\u00e1rio suficiente para explicar o engano ou identifica\u00e7\u00e3o errada.",
     "8810": "Por favor, descreva o conte\u00fado que foi eliminado.",
     "8811": "Por favor, informe o link do conte\u00fado que foi eliminado.",
@@ -3229,5 +3228,5 @@
     "20714": "Depois de [B1]%1[\/B1], a sua conta ser\u00e1 [B2]%2[\/B2].",
     "20715": "Voc\u00ea quer essa fun\u00e7\u00e3o?",
     "20759": "Renova em [B]%1[\/B]",
-    "20808": "{0} left"
+    "20808": "{0} pendente(s)"
 }

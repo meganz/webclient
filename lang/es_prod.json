@@ -1242,7 +1242,6 @@
     "8803": "Acepto la citaci\u00f3n judicial en Nueva Zelanda o en la jurisdicci\u00f3n donde est\u00e9 ubicada mi direcci\u00f3n en esta contranotificaci\u00f3n, por parte de la persona que proporcion\u00f3 a MEGA la notificaci\u00f3n y retirada original por derechos de autor o de un agente de dicha persona.",
     "8804": "Tengo la convicci\u00f3n por buena fe de que el material fue eliminado o deshabilitado como consecuencia de un error de identificaci\u00f3n del material que se ha eliminado o desactivado.",
     "8806": "Diagn\u00f3stico de red",
-    "8807": "Se ha producido un error de comunicaci\u00f3n con el servidor API. Por favor, comprueba que sea un enlace v\u00e1lido.",
     "8809": "Por favor proporciona informaci\u00f3n suficiente para explicar el error o la identificaci\u00f3n err\u00f3nea.",
     "8810": "Por favor, indica una descripci\u00f3n del contenido que ha sido eliminado.",
     "8811": "Por favor, indica el enlace del contenido que ha sido eliminado.",
@@ -2312,7 +2311,7 @@
     "19048": "1 hora",
     "19049": "%d horas",
     "19060": "C\u00f3dec de audio no soportado (%1)",
-    "19061": "Este video no tiene audio.",
+    "19061": "Este v\u00eddeo no tiene audio.",
     "19062": "Aceptar todo",
     "19063": "Restaurar chat",
     "19064": "\u00bfEst\u00e1s seguro de que quieres restaurar esta conversaci\u00f3n?",
@@ -3229,5 +3228,5 @@
     "20714": "Despu\u00e9s del [B1]%1[\/B1], tu cuenta ser\u00e1 [B2]%2[\/B2].",
     "20715": "\u00bfQuieres esta funci\u00f3n?",
     "20759": "Se renueva el [B]%1[\/B]",
-    "20808": "{0} left"
+    "20808": "quedan {0}"
 }

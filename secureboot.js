@@ -1076,7 +1076,7 @@ function mObjectURL(data, type)
             if (timeout) {
                 setTimeout(function() {
                     if (this.hasListener(topic + '_awaiting_listener')) {
-                        this.removeListener.bind(this, topic + '_awaiting_listener');
+                        this.removeListener(topic + '_awaiting_listener');
                     }
                 }, timeout);
             }

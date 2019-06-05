@@ -649,6 +649,11 @@ ClassFile.prototype.run = function(task_done) {
                 // Prevent stuck ZIP downloads if there are repetitive errors for some of the files
                 // TODO: show notification to the user about empty files in the zip?
                 console.error('Too many errors for "' + this.dl.n + '", saving as 0-bytes...');
+
+                if (error === EBLOCKED) {
+                    Zips[this.dl.zipid].eblocked++;
+                }
+
                 try {
                     this.dl.size = 0;
                     this.dl.urls = [];

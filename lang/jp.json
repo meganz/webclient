@@ -3466,5 +3466,10 @@
     "20795": "\u5834\u6240\u3092\u9001\u4fe1",
     "20799": "\u3053\u306e\u5834\u6240\u3092\u9001\u4fe1",
     "20803": "\u30d4\u30f3\u7559\u3081\u3055\u308c\u305f\u5834\u6240",
-    "20808": "\u6b8b\u308a{0}"
+    "20808": "\u6b8b\u308a{0}",
+    "20816": "Your account has been removed by your administrator. You may contact your business account administrators for further details.",
+    "20817": "Your in-browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
+    "20818": "The file could be downloaded as a ZIP file. This can happen if the file was taken down.",
+    "20819": "None of the files could be downloaded as a ZIP file. This can happen if the files were taken down.",
+    "20820": "Not all of the files could be downloaded as a ZIP file. This can happen if some of the files were taken down. The operation finished with %1 of %2 items downloaded successfully."
 }

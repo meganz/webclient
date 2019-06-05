@@ -1134,7 +1134,7 @@ FileManager.prototype.initContextUI = function() {
         $.hideContextMenu();
     });
 
-    $(c + '.getlink-item, ' + c + '.embedcode-item').rebind('click', this.getLinkAction.bind(this));
+    $(c + '.getlink-item, ' + c + '.embedcode-item').rebind('click', this.getLinkAction);
 
     $(c + '.removelink-item').rebind('click', function() {
         // check if this is a business expired account
